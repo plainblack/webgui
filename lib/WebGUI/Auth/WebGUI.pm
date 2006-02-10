@@ -516,28 +516,28 @@ sub new {
 
 #-------------------------------------------------------------------
 sub recoverPassword {
-   my $self = shift;
-   return $self->displayLogin if($self->userId ne "1");	
-   my $template = 'Auth/WebGUI/Recovery';
-   my $vars;
+	my $self = shift;
+	return $self->displayLogin if($self->userId ne "1");	
+	my $template = 'Auth/WebGUI/Recovery';
+	my $vars;
 	my $i18n = WebGUI::International->new($self->session);
-   $vars->{title} = $i18n->get(71);
-   $vars->{'recover.form.header'} = "\n\n".WebGUI::Form::formHeader($self->session,{});
-   $vars->{'recover.form.hidden'} = WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"});
-   $vars->{'recover.form.hidden'} .= WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>"recoverPasswordFinish"});
+	$vars->{title} = $i18n->get(71);
+	$vars->{'recover.form.header'} = "\n\n".WebGUI::Form::formHeader($self->session,{});
+	$vars->{'recover.form.hidden'} = WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"});
+	$vars->{'recover.form.hidden'} .= WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>"recoverPasswordFinish"});
 
-   $vars->{'recover.form.submit'} = WebGUI::Form::submit($self->session,{});
-   $vars->{'recover.form.footer'} = WebGUI::Form::formFooter($self->session,);
-    $vars->{'login.url'} = $self->session->url->page('op=auth;method=init');
-    $vars->{'login.label'} = $i18n->get(58);
+	$vars->{'recover.form.submit'} = WebGUI::Form::submit($self->session,{});
+	$vars->{'recover.form.footer'} = WebGUI::Form::formFooter($self->session,);
+	$vars->{'login.url'} = $self->session->url->page('op=auth;method=init');
+	$vars->{'login.label'} = $i18n->get(58);
 
-	     $vars->{'anonymousRegistration.isAllowed'} = ($self->session->setting->get("anonymousRegistration"));
-           $vars->{'createAccount.url'} = $self->session->url->page('op=auth=;method=createAccount');
-           $vars->{'createAccount.label'} = $i18n->get(67);
-   $vars->{'recover.message'} = $_[0] if ($_[0]);
-   $vars->{'recover.form.email'} = WebGUI::Form::text($self->session,{"name"=>"email"});
-   $vars->{'recover.form.email.label'} = $i18n->get(56);
-   return WebGUI::Asset::Template->new($self->session,$self->getPasswordRecoveryTemplateId)->process($vars);
+	$vars->{'anonymousRegistration.isAllowed'} = ($self->session->setting->get("anonymousRegistration"));
+	$vars->{'createAccount.url'} = $self->session->url->page('op=auth;method=createAccount');
+	$vars->{'createAccount.label'} = $i18n->get(67);
+	$vars->{'recover.message'} = $_[0] if ($_[0]);
+	$vars->{'recover.form.email'} = WebGUI::Form::text($self->session,{"name"=>"email"});
+	$vars->{'recover.form.email.label'} = $i18n->get(56);
+	return WebGUI::Asset::Template->new($self->session,$self->getPasswordRecoveryTemplateId)->process($vars);
 }
 
 #-------------------------------------------------------------------

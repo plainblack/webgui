@@ -37,6 +37,9 @@
  - fix [ 1426170 ] passthruUrls ignores single value
  - fix [ 1428117 ] Uploading files with 0 size
  - fix [ 1411884 ] DirectoryIndex doesn't work with passthruUrls in v6.8.5
+ - fix [ 1428396 ] IP Filter Broken
+ - fixed a bug where uploaded files and images did not get the right .wgaccess 
+   file (Martin Kamerbeek / Procolix)
 
 6.8.5
  - fix [ 1396957 ] Insufficient privileges check on the DataForm

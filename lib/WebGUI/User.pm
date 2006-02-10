@@ -250,11 +250,27 @@ sub isInGroup {
         ### The following several checks are to increase performance. If this section were removed, everything would continue to work as normal. 
         return 1 if ($gid eq '7');		# everyone is in the everyone group
         return 1 if ($gid eq '1' && $uid eq '1'); 	# visitors are in the visitors group
+        ### Get data for auxillary checks.
+	my $group = WebGUI::Group->new($self->session,$gid);
+	my $isInGroup = $self->session->stow->get("isInGroup");
+        ### Check IP Address
+        if ($group->get("ipFilter")) {
+		my $ipFilter = $group->get("ipFilter");
+                $ipFilter =~ s/\s//g;
+                $ipFilter =~ s/\./\\\./g;
+                my @ips = split(";",$ipFilter);
+                foreach my $ip (@ips) {
+                        if ($self->session->env->get("REMOTE_ADDR") =~ /^$ip/) {
+                                $isInGroup->{$uid}{$gid} = 1;
+				$self->session->stow->set("isInGroup",$isInGroup);
+                                return 1;
+                        }
+                }
+        }
         return 0 if ($uid eq '1');  #Visitor is in no other groups
         return 1 if ($uid eq '3');  #Admin is in every group
         return 1 if ($gid eq '2' && $uid ne '1'); 	# if you're not a visitor, then you're a registered user
         ### Look to see if we've already looked up this group. 
-	my $isInGroup = $self->session->stow->get("isInGroup");
         if ($isInGroup->{$uid}{$gid} eq '1') {
                 return 1;
         } elsif ($isInGroup->{$uid}{$gid} eq "0") {
@@ -271,22 +287,6 @@ sub isInGroup {
                 	return 1;
         	}
 	}
-        ### Get data for auxillary checks.
-	my $group = WebGUI::Group->new($self->session,$gid);
-        ### Check IP Address
-        if ($group->get("ipFilter")) {
-		my $ipFilter = $group->get("ipFilter");
-                $ipFilter =~ s/\s//g;
-                $ipFilter =~ s/\./\\\./g;
-                my @ips = split(";",$ipFilter);
-                foreach my $ip (@ips) {
-                        if ($self->session->env->get("REMOTE_ADDR") =~ /^$ip/) {
-                                $isInGroup->{$uid}{$gid} = 1;
-				$self->session->stow->set("isInGroup",$isInGroup);
-                                return 1;
-                        }
-                }
-        }
         ### Check Scratch Variables 
         if ($group->get("scratchFilter")) {
 		my $scratchFilter = $group->get("scratchFilter");

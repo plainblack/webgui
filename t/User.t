@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::Utility;
 
 use WebGUI::User;
-use Test::More tests => 49; # increment this value for each test you create
+use Test::More tests => 56; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -209,3 +209,32 @@ SKIP: {
   skip("uncache() -- Don't know how to test uncache()",1);
   ok(undef, "uncache");
 }
+
+my $cm = WebGUI::Group->new($session, 4);
+is( $cm->name, "Content Managers", "content manager name check");
+is( $cm->getId, 4, "content manager groupId check");
+
+my $admin = WebGUI::User->new($session, 3);
+my $visitor = WebGUI::User->new($session, 1);
+
+##Manipulate the env object to set up this test
+my $env = $session->{_env};
+$env->{_env}->{"REMOTE_ADDR"} = '192.168.0.101';
+
+ok (!$visitor->isInGroup($cm->getId), "Visitor is not member of group");
+ok ($admin->isInGroup($cm->getId), "Admin is not member of group");
+
+my $origFilter = $cm->ipFilter;
+
+$cm->ipFilter('192.168.0.');
+
+is( $cm->ipFilter, "192.168.0.", "ipFilter assignment to local net, 192.168.0.");
+
+ok ($visitor->isInGroup($cm->getId), "Visitor is allowed in via IP");
+
+$env->{_env}->{"REMOTE_ADDR"} = '193.168.0.101';
+
+ok (!$visitor->isInGroup($cm->getId), "Visitor is not allowed in via IP");
+
+##Restore original filter
+$cm->ipFilter($origFilter);
