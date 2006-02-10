@@ -1532,7 +1532,7 @@ sub www_manageAssets {
 			."',".$edit."contextMenu.draw()," 
 			.$child->getRank
 			.",'<a href=\"".$child->getUrl("func=manageAssets")."\">".$title
-			."<\\/a>','<img src=\"".$child->getIcon(1)."\" border=\"0\" alt=\"".$child->getName."\" /> ".$child->getName
+			."</a>','<img src=\"".$child->getIcon(1)."\" border=\"0\" alt=\"".$child->getName."\" /> ".$child->getName
 			."','".WebGUI::DateTime::epochToHuman($child->get("revisionDate"))
 			."','".formatBytes($child->get("assetSize"))."'".$lockLink.");\n";
          	$output .= "assetManager.AddLineSortData('','','','".$title."','".$child->getName
