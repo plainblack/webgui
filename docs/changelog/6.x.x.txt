@@ -40,6 +40,7 @@
  - fix [ 1428396 ] IP Filter Broken
  - fixed a bug where uploaded files and images did not get the right .wgaccess 
    file (Martin Kamerbeek / Procolix)
+ - fix [ 1429349 ] Invalid HTML returned by func=manageAssets
 
 6.8.5
  - fix [ 1396957 ] Insufficient privileges check on the DataForm

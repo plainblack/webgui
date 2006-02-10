@@ -1046,12 +1046,12 @@ sub manageAssets {
 		my $edit;
 		if ($child->isLocked) {
 			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/locked.gif" alt="locked" border="0" />';
-			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit<\\/a> | '+" if ($child->canEditIfLocked && $self->session->scratch->get("versionTag") eq $self->get("tagId"));
+			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+" if ($child->canEditIfLocked && $self->session->scratch->get("versionTag") eq $self->get("tagId"));
 		} else {
-			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit<\\/a> | '+";
+			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+";
 			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/unlocked.gif" alt="unlocked" border="0" />';
 		}
-		my $lockLink = ", '<a href=\"".$child->getUrl("func=manageRevisions")."\">".$locked."<\\/a>'" unless ($self->session->setting->get("autoCommit"));
+		my $lockLink = ", '<a href=\"".$child->getUrl("func=manageRevisions")."\">".$locked."</a>'" unless ($self->session->setting->get("autoCommit"));
          	$output .= "assetManager.AddLine('"
 			.WebGUI::Form::checkbox($self->session,{
 				name=>'assetId',
@@ -1060,7 +1060,7 @@ sub manageAssets {
 			."',".$edit."contextMenu.draw()," 
 			.$child->getRank
 			.",'<a href=\"".$child->getUrl("func=manageAssets")."\">".$title
-			."<\\/a>','<img src=\"".$child->getIcon(1)."\" border=\"0\" alt=\"".$child->getName."\" /> ".$child->getName
+			."</a>','<img src=\"".$child->getIcon(1)."\" border=\"0\" alt=\"".$child->getName."\" /> ".$child->getName
 			."','".$self->session->datetime->epochToHuman($child->get("revisionDate"))
 			."','".formatBytes($child->get("assetSize"))."'".$lockLink.");\n";
          	$output .= "assetManager.AddLineSortData('','','','".$title."','".$child->getName
@@ -1208,12 +1208,12 @@ sub manageAssetsSearch {
 		my $edit;
 		if ($child->isLocked) {
 			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/locked.gif" alt="locked" border="0" />';
-			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit<\\/a> | '+" if ($child->canEditIfLocked && $self->session->scratch->get("versionTag") eq $self->get("tagId"));
+			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+" if ($child->canEditIfLocked && $self->session->scratch->get("versionTag") eq $self->get("tagId"));
 		} else {
-			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit<\\/a> | '+";
+			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+";
 			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/unlocked.gif" alt="unlocked" border="0" />';
 		}
-		my $lockLink = ", '<a href=\"".$child->getUrl("func=manageRevisions")."\">".$locked."<\\/a>'" unless ($self->session->setting->get("autoCommit"));
+		my $lockLink = ", '<a href=\"".$child->getUrl("func=manageRevisions")."\">".$locked."</a>'" unless ($self->session->setting->get("autoCommit"));
          	$output .= "assetManager.AddLine('"
 			.WebGUI::Form::checkbox($self->session,{
 				name=>'assetId',
@@ -1222,7 +1222,7 @@ sub manageAssetsSearch {
 			."',".$edit."contextMenu.draw()," 
 			.$child->getRank
 			.",'<a href=\"".$child->getUrl("func=manageAssets&manage=1")."\">".$title
-			."<\\/a>','<img src=\"".$child->getIcon(1)."\" border=\"0\" alt=\"".$child->getName."\" /> ".$child->getName
+			."</a>','<img src=\"".$child->getIcon(1)."\" border=\"0\" alt=\"".$child->getName."\" /> ".$child->getName
 			."','".$self->session->datetime->epochToHuman($child->get("revisionDate"))
 			."','".formatBytes($child->get("assetSize"))."'".$lockLink.");\n";
          	$output .= "assetManager.AddLineSortData('','','','".$title."','".$child->getName
