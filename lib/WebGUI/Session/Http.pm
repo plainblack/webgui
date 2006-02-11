@@ -98,12 +98,13 @@ Generates an HTTP header.
 sub getHeader {
 	my $self = shift;
 	return undef if ($self->{_http}{noHeader});
+	return undef unless $self->session->request;
 	my %params;
 	if ($self->isRedirect()) {
 		$self->session->request->headers_out->set(Location => $self->{_http}{location});
 		$self->session->request->status(301);
 	} else {
-		$self->session->request->content_type($self->{_http}{mimetype} || "text/html") if ($self->session->request);
+		$self->session->request->content_type($self->{_http}{mimetype} || "text/html");
 		if ($self->session->setting->get("preventProxyCache")) {
 			$self->session->request->headers_out->set(Expires => "-1d");
 		}
@@ -112,7 +113,7 @@ sub getHeader {
 		}
 	}
 	#$params{"-cookie"} = $self->{_http}{cookie};
-	$self->session->request->status_line($self->getStatus().' '.$self->{_http}{statusDescription}) if $self->session->request;
+	$self->session->request->status_line($self->getStatus().' '.$self->{_http}{statusDescription});
 	return;
 }
 

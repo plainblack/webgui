@@ -234,7 +234,6 @@ sub uploadsHandler {
 sub upgrading {
 	my $session = shift;
 	$session->http->getHeader;
-	$session->output->print($session->http->getHeader());
 	open(FILE,"<".$session->config->getWebguiRoot."/docs/maintenance.html");
 	while (<FILE>) {
 		$session->output->print($_);
