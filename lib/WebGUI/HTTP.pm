@@ -83,10 +83,10 @@ sub getHeader {
 	} else {
 		$session{req}->content_type($session{http}{mimetype} || "text/html");
 		if ($session{setting}{preventProxyCache}) {
-			$params{"-expires"} = "-1d";
+			$session{req}->headers_out->set(Expires => "-1d");
 		}
 		if ($session{http}{filename}) {
-			$params{"-attachment"} = $session{http}{filename};
+                        $session{req}->headers_out->set('Content-Disposition' => qq!attachment; filename="$session{http}{filename}"!);
 		}
 	}
 	$params{"-cookie"} = $session{http}{cookie};
