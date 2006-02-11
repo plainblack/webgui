@@ -102,7 +102,6 @@ Unique hash identifier for a user. If not supplied, current user.
 sub canEdit {
 	my $self = shift;
 	my $userId = shift || $self->session->user->userId;
- 	return 0 if ($self->isLocked && !$self->canEditIfLocked);
  	if ($userId eq $self->get("ownerUserId")) {
                 return 1;
 	}
