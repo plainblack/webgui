@@ -170,6 +170,19 @@ sub getName {
 
 #-------------------------------------------------------------------
 
+=head2 getType ( )
+
+Returns the type of workflow that this activity may be used in. Unless this method is overriden, the type is "none". This is a class method.
+
+=cut
+
+sub getType {
+	return "none";
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 new ( session, activityId )
 
 Constructor.

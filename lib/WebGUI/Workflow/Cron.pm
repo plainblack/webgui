@@ -221,14 +221,14 @@ sub set {
 	my $self = shift;
 	my $properties = shift;
 	if ($properties->{enabled} == 1) {
-		$self->{enabled} = 1;
+		$self->{_data}{enabled} = 1;
 	} elsif ($properties->{enabled} == 0) {
-		$self->{enabled} = 0;
+		$self->{_data}{enabled} = 0;
 	}
 	if ($properties->{runOnce} == 1) {
-		$self->{runOnce} = 1;
+		$self->{_data}{runOnce} = 1;
 	} elsif ($properties->{runOnce} == 0) {
-		$self->{runOnce} = 0;
+		$self->{_data}{runOnce} = 0;
 	}
 	$self->{_data}{minuteOfHour} = $properties->{minuteOfHour} || $self->{_data}{minuteOfHour} || 0;
 	$self->{_data}{hourOfDay} = $properties->{hourOfDay} || $self->{_data}{hourOfDay} || "*";

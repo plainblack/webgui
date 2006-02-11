@@ -159,6 +159,32 @@ sub getActivities {
 	return \@activities;
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 getNextActivity ( [ activityId ] )
+
+Returns the next activity in the workflow after the activity specified. If no activity id is specified, then the first workflow will be returned.
+
+=head3 activityId
+
+The unique id of an activity in this workflow.
+
+=cut
+
+sub getNextActivity {
+	my $self = shift;
+	my $activityId = shift;
+	my ($sequenceNumber) = $self->session->db->quickArray("select sequenceNumber from WorkflowActivity where activityId=?", [$activityId]);
+	$sequenceNumber++;
+	my $rs = $self->session->db->read("select activityId, className from WorkflowActivity where workflowId=? 
+		and sequenceNumber>=? order by sequenceNumber", [$self->getId, $sequenceNumber]);
+	my ($id, $class) = $rs->array;
+	$rs->finish;
+	return $class->new($self->session, $id);
+}
+
+
 #-------------------------------------------------------------------
 
 =head2 getId ( )
@@ -212,13 +238,13 @@ sub session {
 
 #-------------------------------------------------------------------
 
-=head2 set ( name , value )
+=head2 set ( properties )
 
 Sets a variable for this workflow.
 
-=head3 name
+=head3 properties
 
-The name of the variable to set. The following are the available fields to set.
+A hash reference containing the properties to set.
 
 =head4 title
 
@@ -232,17 +258,23 @@ A longer description of the workflow.
 
 A boolean indicating whether this workflow may be executed right now.
 
-=head3 value
+=head4 type
 
-The value of the variable.
+A string indicating the type of object this workflow will be operating on. Valid values are "none", "versiontag" and "user".
 
 =cut
 
 sub set {
 	my $self = shift;
-	my $name = shift;
-	my $value = shift;
-	$self->{_data}{$name} = $value;
+	my $properties = shift;
+	if ($properties->{enabled} == 1) {
+		$self->{_data}{enabled} = 1;
+	} elsif ($properties->{enabled} == 0) {
+		$self->{_data}{enabled} = 0;
+	}
+	$self->{_data}{title} = $properties->{title} || $self->{_data}{title} || "Untitled";
+	$self->{_data}{description} = (exists $properties->{description}) ? $properties->{description} : $self->{_data}{description};
+	$self->{_data}{type} = $properties->{type} || $self->{_data}{type} || "none";
 	$self->session->db->setRow("Workflow","workflowId",$self->{_data});
 }
 

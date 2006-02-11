@@ -50,6 +50,7 @@ sub addWorkflow {
 		workflowId varchar(22) binary not null,
 		className varchar(255),
 		methodName varchar(255),
+		priority int not null default 2,
 		parameters text
 		)");
 	$session->db->write("create table WorkflowInstance (
@@ -60,7 +61,8 @@ sub addWorkflow {
 		className varchar(255),
 		methodName varchar(255),
 		parameters text,
-		runningSince bigint
+		runningSince bigint,
+		lastUpdate bigint
 		)");
 	$session->db->write("create table Workflow (
 		workflowId varchar(22) binary not null primary key,
