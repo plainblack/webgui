@@ -109,7 +109,7 @@ sub _tabAdminIcons {
 
 #-------------------------------------------------------------------
 sub _tonull { 
-	return $_[1] eq "0" ? (undef, undef) : @_ ;
+	return @_ ;
 }
 
 
