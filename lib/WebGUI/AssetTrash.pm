@@ -143,7 +143,7 @@ Moves self to trash, returns www_view() method of Parent if canEdit. Otherwise r
 
 sub www_delete {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless ($asset->canEdit && !($self->isLocked && !$self->canEditIfLocked));
 	return WebGUI::Privilege::vitalComponent() if (isIn($self->getId, $session{setting}{defaultPage}, $session{setting}{notFoundPage}));
 	$self->trash;
 	$session{asset} = $self->getParent;
@@ -163,7 +163,7 @@ sub www_deleteList {
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	foreach my $assetId ($session{req}->param("assetId")) {
 		my $asset = WebGUI::Asset->newByDynamicClass($assetId);
-		if ($asset->canEdit) {
+		if ($asset->canEdit && !($self->isLocked && !$self->canEditIfLocked)) {
 			$asset->trash;
 		}
 	}
