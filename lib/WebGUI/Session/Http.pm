@@ -105,13 +105,13 @@ sub getHeader {
 	} else {
 		$self->session->request->content_type($self->{_http}{mimetype} || "text/html") if ($self->session->request);
 		if ($self->session->setting->get("preventProxyCache")) {
-			$params{"-expires"} = "-1d";
+			$self->session->request->headers_out->set(Expires => "-1d");
 		}
 		if ($self->{_http}{filename}) {
-			$params{"-attachment"} = $self->{_http}{filename};
+                        $self->session->request->headers_out->set('Content-Disposition' => qq!attachment; filename="$self->{_http}{filename}"!);
 		}
 	}
-	$params{"-cookie"} = $self->{_http}{cookie};
+	#$params{"-cookie"} = $self->{_http}{cookie};
 	$self->session->request->status_line($self->getStatus().' '.$self->{_http}{statusDescription}) if $self->session->request;
 	return;
 }
