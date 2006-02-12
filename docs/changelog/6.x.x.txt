@@ -25,6 +25,8 @@
  - fix [ 1423608 ] Bug in Data Form in v6.8.5
  - fix [ 1423324 ] Delete locked asset
  - fix [ 1415743 ] Collab reply count includes old versions
+ - fixed a bug where uploaded files would give an Auth Required regardless of
+   the user being in the view group or not (Martin Kamerbeek / Procolix)
 
 6.8.5
  - fix [ 1396957 ] Insufficient privileges check on the DataForm

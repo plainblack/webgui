@@ -258,7 +258,10 @@ sub uploadsHandler {
 					WebGUI::Session::setupSessionVars($session{cookie}{wgSession});
 				}
 				$session{req}->user($session{var}{username}) if $session{req};
-				my $hasPrivs = ($session{var}{userId} eq $privs[0] || WebGUI::Grouping::isInGroup($privs[1]) || WebGUI::Grouping::isInGroup($privs[2]));
+				my $hasPrivs = ($session{var}{userId} eq $privs[0] || 
+					WebGUI::Grouping::isInGroup($privs[1], $session{var}{userId}) || 
+					WebGUI::Grouping::isInGroup($privs[2], $session{var}{userId})
+				);
 				WebGUI::Session::close();
 				if ($hasPrivs) {
 					return $ok;
