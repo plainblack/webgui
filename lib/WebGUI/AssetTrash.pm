@@ -1,4 +1,4 @@
-package WebGUI::Asset;
+package WebGUI::AssetTrash;
 
 =head1 LEGAL
 
@@ -26,7 +26,7 @@ This is a mixin package for WebGUI::Asset that contains all trash related functi
 
 =head1 SYNOPSIS
 
- use WebGUI::Asset;
+ use WebGUI::AssetTrash;
 
 =head1 METHODS
 
@@ -142,7 +142,7 @@ Moves self to trash, returns www_view() method of Parent if canEdit. Otherwise r
 
 sub www_delete {
 	my $self = shift;
-	return $self->session->privilege->insufficient() unless ($asset->canEdit && !($self->isLocked && !$self->canEditIfLocked));
+	return $self->session->privilege->insufficient() unless ($self->canEdit && !($self->isLocked && !$self->canEditIfLocked));
 	return $self->session->privilege->vitalComponent() if (isIn($self->getId, $self->session->setting->get("defaultPage"), $self->session->setting->get("notFoundPage")));
 	$self->trash;
 	$self->session->asset($self->getParent);
