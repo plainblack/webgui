@@ -1,4 +1,4 @@
-package WebGUI::AssetTrash;
+package WebGUI::Asset;
 
 =head1 LEGAL
 
@@ -18,7 +18,7 @@ use strict;
 
 =head1 NAME
 
-Package WebGUI::AssetTrash
+Package WebGUI::Asset
 
 =head1 DESCRIPTION
 
@@ -26,7 +26,7 @@ This is a mixin package for WebGUI::Asset that contains all trash related functi
 
 =head1 SYNOPSIS
 
- use WebGUI::AssetTrash;
+ use WebGUI::Asset;
 
 =head1 METHODS
 
