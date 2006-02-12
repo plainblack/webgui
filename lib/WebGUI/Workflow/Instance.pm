@@ -39,7 +39,7 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 create ( session, properties ) 
+=head2 create ( session, properties [, id ] ) 
 
 Creates a new workflow instance.
 
@@ -51,13 +51,18 @@ A reference to the current session.
 
 The settable properties of the workflow instance. See the set() method for details.
 
+=head3 id
+
+Normally an ID will be generated for you, but if you want to override this and provide your own 22 character id, then you can specify it here.
+
 =cut
 
 sub create {
 	my $class = shift;
 	my $session = shift;
 	my $properties = shift;
-	my $instanceId = $session->db->setRow("WorkflowInstance","instanceId",{instanceId=>"new", runningSince=>time()});
+	my $id = shift;
+	my $instanceId = $session->db->setRow("WorkflowInstance","instanceId",{instanceId=>"new", runningSince=>time()}, $id);
 	my $self = $class->new($session, $instanceId);
 	$self->set($properties);
 	return $self;
@@ -102,7 +107,8 @@ Returns the value for a given property. See the set() method for details.
 
 sub get {
 	my $self = shift;
-	return $self->{_data}{shift};
+	my $name = shift;
+	return $self->{_data}{$name};
 }
 
 #-------------------------------------------------------------------

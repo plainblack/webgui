@@ -39,7 +39,7 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 create ( session, workflowId ) 
+=head2 create ( session, workflowId [, id ] ) 
 
 Creates a new instance of this activity in a workflow.
 
@@ -51,15 +51,25 @@ A reference to the current session.
 
 The unique id of the workflow to attach this activity to.
 
+=head3 id
+
+Normally an ID will be generated for you, but if you want to override this and provide your own 22 character id, then you can specify it here.
+
 =cut
 
 sub create {
 	my $class = shift;
 	my $session = shift;
 	my $workflowId = shift;
+	my $id = shift;
 	my ($sequenceNumber) = $session->db->quickArray("select count(*) from WorkflowActivity where workflowId=?", [$workflowId]);
 	$sequenceNumber++;
-	my $activityId = $session->db->setRow("WorkflowActivity","activityId",{sequenceNumber=>$sequenceNumber, activityId=>"new", className=>$class, workflowId=>$workflowId});
+	my $activityId = $session->db->setRow("WorkflowActivity","activityId", {
+		sequenceNumber=>$sequenceNumber, 
+		activityId=>"new", 
+		className=>$class, 
+		workflowId=>$workflowId
+		}, $id);
 	return $class->new($session, $activityId);
 }
 
@@ -121,7 +131,8 @@ Returns the value for a given property.
 
 sub get {
 	my $self = shift;
-	return $self->{_data}{shift};
+	my $name = shift;
+	return $self->{_data}{$name};
 }
 
 #-------------------------------------------------------------------
@@ -203,7 +214,7 @@ sub new {
 	my $activityId = shift;
 	my $main = $session->db->getRow("WorkflowActivity","activityId", $activityId);
 	return undef unless $main->{activityId};
-	my $sub = $session->db->buildHashRef("select name,value from WorkflowActivityData where activityId=".$session->db->quote($activityId)); 
+	my $sub = $session->db->buildHashRef("select name,value from WorkflowActivityData where activityId=?",[$activityId]); 
 	my %data = (%{$main}, %{$sub});
 	bless {_session=>$session, _id=>$activityId, _data=>\%data}, $class;
 }
@@ -245,8 +256,8 @@ sub set {
 	if ($name eq "title" || $name eq "description") {
 		$self->session->db->setRow("WorkflowActivity","activityId",{ activityId=>$self->getId, title=>$self->get("title"), description=>$self->get("description")});
 	} else {
-		my $sth = $self->session->db->prepare("replace into WorkflowActivitydata (activityId, name, value) values (?,?,?)");
-		$sth->execute($self->getId, $name, $value);
+		my $sth = $self->session->db->prepare("replace into WorkflowActivityData (activityId, name, value) values (?,?,?)");
+		$sth->execute([$self->getId, $name, $value]);
 	}
 }
 

@@ -13,6 +13,8 @@ use strict;
 use Getopt::Long;
 use WebGUI::Session;
 use File::Path;
+use WebGUI::Workflow;
+use WebGUI::Workflow::Cron;
 
 my $toVersion = "6.9.0"; # make this match what version you're going to
 my $quiet; # this line required
@@ -68,7 +70,8 @@ sub addWorkflow {
 		workflowId varchar(22) binary not null primary key,
 		title varchar(255) not null default 'Untitled',
 		description text,
-		enabled int not null default 0
+		enabled int not null default 0,
+		type varchar(255) not null default 'none'
 		)");
 	$session->db->write("create table WorkflowActivity (
 		activityId varchar(22) binary not null primary key,
@@ -76,15 +79,32 @@ sub addWorkflow {
 		title varchar(255) not null default 'Untitled',
 		description text,
 		sequenceNumber int not null default 1,
-		dateCreated bigint,
 		className varchar(255)
 		)");
-	$session->db->write("create table WorkflowActivityProperty (
-		propertyId varchar(22) binary not null primary key,
+	$session->db->write("create table WorkflowActivityData (
 		activityId varchar(22) binary not null,
-		name varchar(255),
-		value text
+		name varchar(255) not null,
+		value text,
+		primary key (activityId, name)
 		)");
+	my $workflow = WebGUI::Workflow->create($session, {
+		title=>"Clean Up Temp Files",
+		description=>"This workflow deletes temporary files from the WebGUI uploads folder.",
+		enabled=>1,
+		type=>"none"
+		}, "pbworkflow000000000001");
+	my $activity = $workflow->addActivity("WebGUI::Workflow::Activity::CleanTempStorage", "pbwfactivity0000000001");
+	$activity->set("title","Delete files older than 24 hours");
+	$activity->set("storageTimeout",60*60*24);
+	my $cron = WebGUI::Workflow::Cron->create($session, {
+		enabled=>1,
+		runOnce=>0,
+		minuteOfHour=>"30",
+		hourOfDay=>"23",
+		priority=>3,
+		workflowId=>$workflow->getId
+		}, "pbcron0000000000000001");
+		
 }
 
 #-------------------------------------------------

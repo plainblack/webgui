@@ -128,6 +128,7 @@ sub commit {
 	$self->unsetVersionLock;
 	$self->update({status=>'approved'});
 	$self->purgeCache;
+	$self->indexContent;
 }
 
 #-------------------------------------------------------------------

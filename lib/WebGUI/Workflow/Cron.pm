@@ -39,7 +39,7 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 create ( session, properties ) 
+=head2 create ( session, properties [, id ] ) 
 
 Creates a new scheduler job.
 
@@ -51,13 +51,18 @@ A reference to the current session.
 
 The settable properties of the scheduler. See the set() method for details.
 
+=head3 id
+
+Normally an ID will be generated for you, but if you want to override this and provide your own 22 character id, then you can specify it here.
+
 =cut
 
 sub create {
 	my $class = shift;
 	my $session = shift;
 	my $properties = shift;
-	my $taskId = $session->db->setRow("WorkflowSchedule","taskId",{taskId=>"new"});
+	my $id = shift;
+	my $taskId = $session->db->setRow("WorkflowSchedule","taskId",{taskId=>"new", enabled=>0, runOnce=>0}, $id);
 	my $self = $class->new($session, $taskId);
 	$self->set($properties);
 	return $self;
@@ -102,7 +107,8 @@ Returns the value for a given property. See the set() method for details.
 
 sub get {
 	my $self = shift;
-	return $self->{_data}{shift};
+	my $name = shift;
+	return $self->{_data}{$name};
 }
 
 #-------------------------------------------------------------------
@@ -207,13 +213,17 @@ The unique ID of the workflow we should kick off when this cron matches.
 
 The classname of an object that will be created to pass into the workflow.
 
-=head4 method
+=head4 methodName
 
 The method name of the constructor for className.
 
 =head4 parameters
 
 The parameters to be passed into the constructor. Note that the system will always pass in the session as the first argument.
+
+=head4 priority
+
+An integer between 1 and 3 that will represent what priority the workflow will run, 1 being highest and 3 being lowest. Defaults to 2. 
 
 =cut
 
@@ -230,6 +240,7 @@ sub set {
 	} elsif ($properties->{runOnce} == 0) {
 		$self->{_data}{runOnce} = 0;
 	}
+	$self->{_data}{priority} = $properties->{priority} || $self->{_data}{priority} || 2;
 	$self->{_data}{minuteOfHour} = $properties->{minuteOfHour} || $self->{_data}{minuteOfHour} || 0;
 	$self->{_data}{hourOfDay} = $properties->{hourOfDay} || $self->{_data}{hourOfDay} || "*";
 	$self->{_data}{dayOfMonth} = $properties->{dayOfMonth} || $self->{_data}{dayOfMonth} || "*";
@@ -237,9 +248,9 @@ sub set {
 	$self->{_data}{dayOfWeek} = $properties->{dayOfWeek} || $self->{_data}{dayOfWeek} || "*";
 	$self->{_data}{workflowId} = $properties->{workflowId} || $self->{_data}{workflowId};
 	$self->{_data}{className} = (exists $properties->{className}) ? $properties->{className} : $self->{_data}{className};
-	$self->{_data}{method} = (exists $properties->{method}) ? $properties->{method} : $self->{_data}{method};
+	$self->{_data}{methodName} = (exists $properties->{methodName}) ? $properties->{methodName} : $self->{_data}{methodName};
 	$self->{_data}{parameters} = (exists $properties->{parameters}) ? $properties->{parameters} : $self->{_data}{parameters};
-	$self->{_data}{enabled} = 0 unless ($self->get("workflowId"));
+	$self->{_data}{enabled} = 0 unless ($self->{_data}{workflowId});
 	my $spectre = WebGUI::Workflow::Spectre->new($self->session);
 	$self->session->db->setRow("WorkflowSchedule","taskId",$self->{_data});
 	$spectre->notify("cron/deleteJob",$self->getId);

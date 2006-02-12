@@ -38,26 +38,33 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 addActivity ( class ) 
+=head2 addActivity ( class [, id ] ) 
 
-Adds an activity to this workflow.
+Adds an activity to this workflow. Returns a reference to the new activity object.
 
 =head3 class
 
 The classname of the activity to add.
+
+=head3 id
+
+Normally an ID will be generated for you, but if you want to override this and provide your own 22 character id, then you can specify it here.
 
 =cut
 
 sub addActivity {
 	my $self = shift;
 	my $class = shift;
-	$class->create($self->session, $self->getId);
+	my $id = shift;
+	my $cmd = "use ".$class;
+	eval($cmd);
+	return $class->create($self->session, $self->getId, $id);
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 create ( session ) 
+=head2 create ( session, properties, [, id ] ) 
 
 Creates a new instance of a workflow.
 
@@ -65,13 +72,25 @@ Creates a new instance of a workflow.
 
 A reference to the current session.
 
+=head3 properties
+
+A hash reference of properties to set for this workflow. See set() for details.
+
+=head3 id
+
+Normally an ID will be generated for you, but if you want to override this and provide your own 22 character id, then you can specify it here.
+
 =cut
 
 sub create {
 	my $class = shift;
 	my $session = shift;
-	my $workflowId = $session->db->setRow("Workflow","workflowId",{workflowId=>"new",enabled=>0});
-	return $class->new($session, $workflowId);
+	my $properties = shift;
+	my $id = shift;
+	my $workflowId = $session->db->setRow("Workflow","workflowId",{workflowId=>"new",enabled=>0},$id);
+	my $self = $class->new($session, $workflowId);
+	$self->set($properties);
+	return $self;
 }
 
 #-------------------------------------------------------------------
@@ -109,6 +128,8 @@ sub deleteActivity {
 	my $self = shift;
 	my $activityId = shift;
 	my ($class) = $self->session->db->quickArray("select className from WorkflowActivity where activityId=?",[$activityId]);
+	my $cmd = "use ".$class;
+	eval{$cmd};
 	$class->new($self->session, $activityId)->delete;
 }
 
@@ -136,7 +157,8 @@ Returns the value for a given property.
 
 sub get {
 	my $self = shift;
-	return $self->{_data}{shift};
+	my $name = shift;
+	return $self->{_data}{$name};
 }
 
 
@@ -154,6 +176,8 @@ sub getActivities {
 	my $rs = $self->session->db->prepare("select activityId, className from WorkflowActivity where workflowId=? order by sequenceNumber");
 	$rs->execute([$self->getId]);
 	while (my ($activityId, $class) = $rs->array) {
+		my $cmd = "use ".$class;
+		eval{$cmd};
 		push(@activities, $class->new($self->session, $activityId));
 	}
 	return \@activities;
@@ -181,6 +205,8 @@ sub getNextActivity {
 		and sequenceNumber>=? order by sequenceNumber", [$self->getId, $sequenceNumber]);
 	my ($id, $class) = $rs->array;
 	$rs->finish;
+	my $cmd = "use ".$class;
+	eval{$cmd};
 	return $class->new($self->session, $id);
 }
 
