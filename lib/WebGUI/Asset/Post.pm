@@ -814,7 +814,7 @@ Sets the post to approved and sends any necessary notifications.
 sub setStatusApproved {
 	my $self = shift;
 	$self->commit;
-	$self->getThread->incrementReplies($self->get("dateUpdated"),$self->getId) if ($self->isReply && ($session->form->process('assetId') eq
+	$self->getThread->incrementReplies($self->get("dateUpdated"),$self->getId) if ($self->isReply && ($self->session->form->process('assetId') eq
 	"new"));
 	unless ($self->isPoster) {
 		WebGUI::MessageLog::addInternationalizedEntry($self->get("ownerUserId"),'',$self->session->url->getSiteURL().'/'.$self->getUrl,579);
