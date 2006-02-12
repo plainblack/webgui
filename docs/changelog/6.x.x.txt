@@ -49,6 +49,7 @@
  - fix [ 1429299 ] RTE Collateral Functions Break when Prev Proxy Cache On
  - fixed a bug where uploaded files would give an Auth Required regardless of
    the user being in the view group or not (Martin Kamerbeek / Procolix)
+ - fix [ 1411210 ] HttpProxy Error (Thanks to Eric Kennedy for the patch)
 
 6.8.5
  - fix [ 1396957 ] Insufficient privileges check on the DataForm

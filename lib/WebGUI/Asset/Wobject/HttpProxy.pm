@@ -262,7 +262,7 @@ sub view {
    	 next if ($input_name !~ /^HttpProxy_/); # Skip non proxied form var's
    	 $input_name =~ s/^HttpProxy_//;
    
-            my $uploadFile = $self->session->request->tmpFileName($self->session->form->process('HttpProxy_'.$input_name));
+            my $uploadFile = $self->session->request->upload($self->session->form->process('HttpProxy_'.$input_name));
             if(-r $uploadFile) { # Found uploaded file
       	       @formUpload=($uploadFile, qq/$self->session->form->process('HttpProxy_'.$input_name)/);
    	       $formdata{$input_name}=\@formUpload;
