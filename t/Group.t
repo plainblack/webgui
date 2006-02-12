@@ -18,7 +18,7 @@ use WebGUI::Utility;
 
 use WebGUI::User;
 use WebGUI::Group;
-use Test::More tests => 4; # increment this value for each test you create
+use Test::More tests => 8; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -26,11 +26,23 @@ my $g = WebGUI::Group->new($session, "new");
 
 diag("Object creation and defaults");
 is( ref $g, "WebGUI::Group", "Group object creation");
-isnt( $g->getId, "new", "Group assigned new groupId, not new");
-is( length($g->getId), 22, "GroupId is proper length");
-
 my $gid = $g->getId;
+isnt( $gid, "new", "Group assigned new groupId, not new");
+is( length($gid), 22, "GroupId is proper length");
 
+is ($g->name('**TestGroup**'), '**TestGroup**', 'Set name');
+is ($g->name(), '**TestGroup**', 'Get name via accessor');
+is ($g->get('groupName'), '**TestGroup**', 'Get name via generic accessor');
+
+my $g2 = WebGUI::Group->find($session, '**TestGroup**');
+my $skipFindGroup = is(ref $g2, 'WebGUI::Group', 'find returns a group');
+
+SKIP: {
+	skip('find did not return a WebGUI::Group object', !$skipFindGroup);
+	is( $g->getId, $g2->getId, 'find returns correct group');
+}
+
+undef $g2;
 $g->delete();
 
 my $matchingGroups = $session->db->quickArray("select groupId from groups where groupId=".$session->db->quote($gid));

@@ -162,7 +162,7 @@ sub www_addGroupsToGroupSave {
 	my $group = WebGUI::Group->new($session,$_[0]);
 	my @groups = $session->form->group('groups');
 	$group->addGroups(\@groups);
-	return www_manageGroupsInGroup();
+	return www_manageGroupsInGroup($session);
 }
 
 #-------------------------------------------------------------------
@@ -172,7 +172,7 @@ sub www_addUsersToGroupSave {
         my @users = $session->form->selectList('users');
 	my $group = WebGUI::Group->new($session,$session->form->process("gid"));
 	$group->addUsers(\@users);
-        return www_manageUsersInGroup();
+        return www_manageUsersInGroup($session);
 }
 
 #-------------------------------------------------------------------
@@ -228,7 +228,7 @@ sub www_deleteGroupGrouping {
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup('3') || _hasSecondaryPrivilege($session,$session->form->process("gid")));
 	my $group = WebGUI::Group->new($session,$session->form->process("gid"));
 	$group->deleteGroups([$session->form->process("delete")]);
-	return www_manageGroupsInGroup();
+	return www_manageGroupsInGroup($session);
 }
 
 #-------------------------------------------------------------------
@@ -429,7 +429,7 @@ sub www_editGroupSave {
 	$g->ldapGroup($session->form->text("ldapGroup"));
 	$g->ldapGroupProperty($session->form->text("ldapGroupProperty"));
 	$g->ldapRecursiveProperty($session->form->text("ldapRecursiveProperty"));
-    return www_listGroups($session);
+	return www_listGroups($session);
 }
 
 #-------------------------------------------------------------------
