@@ -708,11 +708,12 @@ sub new {
 
 =head2 scratchFilter ( [ value ] )
 
-Returns the name of this group.
+Returns the scratch value that should be set to automatically add this user
+to a group.
 
 =head3 value
 
-If specified, the name is set to this value.
+If specified, the scratchFilter is set to this value.
 
 =cut
 
@@ -748,8 +749,6 @@ sub showInForms {
 
 
 #-------------------------------------------------------------------
-
-=head2 dbQuery ( )
 
 =head2 dbQuery ( [ value ] )
 

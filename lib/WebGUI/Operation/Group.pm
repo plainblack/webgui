@@ -219,7 +219,7 @@ sub www_deleteGroupConfirm {
 	return $session->privilege->vitalComponent() if (isIn($session->form->process("gid"), qw(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17)));
 	my $g = WebGUI::Group->new($session,$session->form->process("gid"));
 	$g->delete;
-        return www_listGroups();
+        return www_listGroups($session);
 }
 
 #-------------------------------------------------------------------
@@ -429,7 +429,7 @@ sub www_editGroupSave {
 	$g->ldapGroup($session->form->text("ldapGroup"));
 	$g->ldapGroupProperty($session->form->text("ldapGroupProperty"));
 	$g->ldapRecursiveProperty($session->form->text("ldapRecursiveProperty"));
-    return www_listGroups();
+    return www_listGroups($session);
 }
 
 #-------------------------------------------------------------------
