@@ -43,6 +43,12 @@
  - fix [ 1429349 ] Invalid HTML returned by func=manageAssets
  - fix [ 1429348 ] Textboxes need to filter CR/LF
  - fix [ 1428481 ] WebGUI::HTTP::setFilename not working correctly in 6.8.5
+ - fix [ 1423608 ] Bug in Data Form in v6.8.5
+ - fix [ 1423324 ] Delete locked asset
+ - fix [ 1415743 ] Collab reply count includes old versions
+ - fix [ 1429299 ] RTE Collateral Functions Break when Prev Proxy Cache On
+ - fixed a bug where uploaded files would give an Auth Required regardless of
+   the user being in the view group or not (Martin Kamerbeek / Procolix)
 
 6.8.5
  - fix [ 1396957 ] Insufficient privileges check on the DataForm
