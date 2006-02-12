@@ -245,7 +245,8 @@ sub view {
    	 next if ($input_name !~ /^HttpProxy_/); # Skip non proxied form var's
    	 $input_name =~ s/^HttpProxy_//;
    
-            my $uploadFile = $session{req}->tmpFileName($session{form}{'HttpProxy_'.$input_name});
+           # my $uploadFile = $session{req}->tmpFileName($session{form}{'HttpProxy_'.$input_name});
+           my $uploadFile = $session{req}->upload($session{form}{'HttpProxy_'.$input_name});
             if(-r $uploadFile) { # Found uploaded file
       	       @formUpload=($uploadFile, qq/$session{form}{'HttpProxy_'.$input_name}/);
    	       $formdata{$input_name}=\@formUpload;
