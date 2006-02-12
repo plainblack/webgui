@@ -19,6 +19,8 @@ use DateTime;
 use DateTime::Cron::Simple;
 use POE;
 use WebGUI::Session;
+use WebGUI::Workflow::Cron;
+use WebGUI::Workflow::Instance;
 
 #-------------------------------------------------------------------
 
@@ -82,7 +84,12 @@ sub addJob {
 		jobId=>$job->{jobId},
 		config=>$config,
 		schedule=>join(" ", $job->{minuteOfHour}, $job->{hourOfDay}, $job->{dayOfMonth}, $job->{monthOfYear}, $job->{dayOfWeek}),
-		workflowId=>$job->{workflowId} 
+		runOnce=>$job->{runOnce},
+		workflowId=>$job->{workflowId},
+		className=>$job->{className},
+		methodName=>$job->{methodName},
+		parameters=>$job->{parameters},
+		priority=>$job->{priority}
 		}
 }
 
@@ -107,7 +114,15 @@ sub checkSchedule {
 	my ($kernel, $self, $job, $now) = @_[KERNEL, OBJECT, ARG0, ARG1];
 	my $cron = DateTime::Cron::Simple->new($job->{schedule});
        	if ($cron->validate_time($now)) {
-		# kick off an event here once we know what that api looks like
+		my $session = WebGUI::Session->open($self->{_config}->getWebguiRoot, $job->{config});
+		my $instance = WebGUI::Workflow::Instance->create($session, {
+			workflowId=>$job->{workflowId},
+			className=>$job->{className},
+			methodName=>$job->{methodName},
+			parameters=>$job->{parameters},
+			priority=>$job->{priority}
+			});
+		$session->close;
 	}
 }
 
@@ -125,6 +140,7 @@ sub checkSchedules {
 	foreach my $jobId (keys %{$self->{_jobs}}) {
 		$kernel->yield("checkSchedule", $self->{_jobs}{$jobId}, $now)
 	}
+	$kernel->delay_set("checkSchedules",60);
 }
 
 

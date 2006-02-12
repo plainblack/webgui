@@ -44,7 +44,7 @@ sub addWorkflow {
 		taskId varchar(22) binary not null primary key,
 		enabled int not null default 0,
 		runOnce int not null default 0,
-		minuteofHour varchar(25) not null default '0',
+		minuteOfHour varchar(25) not null default '0',
 		hourOfDay varchar(25) not null default '*',
 		dayOfMonth varchar(25) not null default '*',
 		monthOfYear varchar(25) not null default '*',

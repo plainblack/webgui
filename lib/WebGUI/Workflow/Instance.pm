@@ -171,8 +171,8 @@ sub run {
 	return "complete" unless (defined $activity);
 	my $object = {};
 	my $class = $self->get("className");
-	my $method = $self->get("method");
-	my $params = $self->get("params");
+	my $method = $self->get("methodName");
+	my $params = $self->get("parameters");
 	if ($class && $method) {
 		$params = eval($params);
 		if ($@) {
@@ -224,7 +224,7 @@ The id of the workflow we're executing.
 
 The classname of an object that will be created to pass into the workflow.
 
-=head4 method
+=head4 methodName
 
 The method name of the constructor for className.
 
@@ -244,7 +244,7 @@ sub set {
 	$self->{_data}{priority} = $properties->{priority} || $self->{_data}{priority} || 2;
 	$self->{_data}{workflowId} = $properties->{workflowId} || $self->{_data}{workflowId};
 	$self->{_data}{className} = (exists $properties->{className}) ? $properties->{className} : $self->{_data}{className};
-	$self->{_data}{method} = (exists $properties->{method}) ? $properties->{method} : $self->{_data}{method};
+	$self->{_data}{methodName} = (exists $properties->{methodName}) ? $properties->{methodName} : $self->{_data}{methodName};
 	$self->{_data}{parameters} = (exists $properties->{parameters}) ? $properties->{parameters} : $self->{_data}{parameters};
 	$self->{_data}{currentActivityId} = (exists $properties->{currentActivityId}) ? $properties->{currentActivityId} : $self->{_data}{currentActivityId};
 	$self->{_data}{lastUpdate} = time();
