@@ -18,7 +18,7 @@ use WebGUI::Utility;
 
 use WebGUI::User;
 use WebGUI::Group;
-use Test::More tests => 21; # increment this value for each test you create
+use Test::More tests => 27; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -39,6 +39,12 @@ is ($g->databaseLinkId(), 0, 'Default databaseLinkId');
 is ($g->dbCacheTimeout(), 3600, 'Default external database cache timeout');
 is ($g->dateCreated(), $g->lastUpdated(), 'lastUpdated = create time');
 is_deeply ($g->getGroupsIn(), [3], 'Admin group added by default to this group');
+is_deeply ($g->getGroupsFor(), [], 'Group not added to any other group');
+is_deeply ($g->getUsers(), [], 'No users added by default');
+is ($g->autoAdd(), 0, 'auto Add is off by default');
+is ($g->autoDelete(), 0, 'auto Delete is off by default');
+is ($g->isEditable(), 1, 'isEditable is on by default');
+is ($g->showInForms(), 1, 'show in forms is on by default');
 
 my $gname = '**TestGroup**';
 is ($g->name($gname), $gname, 'Set name');
@@ -56,7 +62,7 @@ undef $g2;
 
 delete $g->{_group};
 ok( !exists $g->{_group}, 'deleted group property hash');
-is( $g->name, $gname, 'group name restored');
+is( $g->name, $gname, 'group name restored after ->get');
 ok( exists $g->{_group}, 'group property hash restored');
 
 $g->delete();
