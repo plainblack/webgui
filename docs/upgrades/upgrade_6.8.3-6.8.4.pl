@@ -272,6 +272,7 @@ sub updateDataFormEmailFields {
 	print "\tFix default email tabId's.\n" unless ($quiet);
 	WebGUI::SQL->write("alter table DataForm_field alter DataForm_tabId set default 0;");
 	my $sth = WebGUI::SQL->read('select DataForm_fieldId,DataForm_tabId from DataForm_field');
+	my $wrh = WebGUI::SQL->prepare('update DataForm_field set DataForm_tabId=0 where DataForm_fieldId=?');
 	while (my %hash = $sth->hash) {
 		$wrh->execute([$hash{DataForm_fieldId}]) unless $hash{DataForm_tabId};
 	}
