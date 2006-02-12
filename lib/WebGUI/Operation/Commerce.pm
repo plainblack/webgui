@@ -523,6 +523,7 @@ sub www_editCommerceSettingsSave {
 			});
 		} elsif ($_ ne 'op') {
 			WebGUI::Setting::set($_,$session{form}{$_});
+			$session{setting}{$_} = $session{form}{$_};
 		}
 	}
 	
