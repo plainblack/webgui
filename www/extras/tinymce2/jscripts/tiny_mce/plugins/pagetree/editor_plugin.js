@@ -22,8 +22,11 @@ function TinyMCE_pagetree_execCommand(editor_id, element, command, user_interfac
 			var template = new Array();
 						
 			//alert(getWebguiProperty("pageURL"));
-
-			template['file'] = "../../../../../.." + getWebguiProperty ("pageURL") + '?op=richEditPageTree';
+			
+			//Check for proper get delimiter
+			var seperator = '';
+			if (getWebguiProperty ("pageURL").match(/\?/)) { seperator = ';' } else { seperator = '?'}
+			template['file'] = "../../../../../.." + getWebguiProperty ("pageURL") + seperator + 'op=richEditPageTree';
 			
 		//	alert(template['file']);
 			template['width'] = 500;

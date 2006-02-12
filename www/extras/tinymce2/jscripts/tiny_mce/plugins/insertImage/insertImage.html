@@ -31,8 +31,13 @@ function Init() {
     if(document.getElementById("dpicheck")) {
         dpi = document.getElementById("dpicheck").width;
     }
-    document.getElementById("lister").src = pageURL + '?op=richEditImageTree&DPI=' + dpi;
-    document.getElementById("viewer").src = pageURL + '?op=richEditViewThumbnail&DPI=' + dpi;
+    
+    //Check for proper get delimiter
+    var seperator = '';
+    if (pageURL.match(/\?/)) { seperator = ';' } else { seperator = '?'}
+    
+    document.getElementById("lister").src = pageURL + seperator + 'op=richEditImageTree&DPI=' + dpi;
+    document.getElementById("viewer").src = pageURL + seperator + 'op=richEditViewThumbnail&DPI=' + dpi;
 
     var txtFileName = document.getElementById("txtFileName");
 		
