@@ -1,6 +1,11 @@
 package WebGUI::i18n::English::AuthWebGUI;
 
 our $I18N = {
+	'no registration hack' => {
+		message => q|complete anonymous registration by calling createAccountSave directly from the URL.|,
+		lastUpdated => 1078852836
+	
+	},
 	'account template' => {
 		message => q|Account Template|,
 		lastUpdated => 1078852836

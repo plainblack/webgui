@@ -16,6 +16,7 @@ use URI;
 use WebGUI::Asset::Template;
 use WebGUI::Auth;
 use WebGUI::DateTime;
+use WebGUI::ErrorHandler;
 use WebGUI::FormProcessor;
 use WebGUI::HTMLForm;
 use WebGUI::HTTP;
@@ -197,6 +198,11 @@ sub createAccountSave {
    
    return $self->displayAccount if ($session{user}{userId} ne "1");
    
+   #Make sure anonymous registration is enabled 
+   unless ($session{setting}{anonymousRegistration}) {    
+     WebGUI::ErrorHandler::security(WebGUI::International::get("no registration hack", "AuthWebGUI"));
+     return $self->displayLogin;
+   }
    my $username = $session{form}{'authWebGUI.username'};
    my $password = $session{form}{'authWebGUI.identifier'};
    my $passConfirm = $session{form}{'authWebGUI.identifierConfirm'};
