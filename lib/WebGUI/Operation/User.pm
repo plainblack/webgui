@@ -401,7 +401,7 @@ sub www_editUserSave {
 	my $error;
 	if (($uid eq $session->form->process("uid") || $uid eq "") && $session->form->process("username") ne '') {
 	   	my $u = WebGUI::User->new($session,$session->form->process("uid"));
-		$session->form->process("uid") = $u->userId unless ($isSecondary);
+		$session->form->process("uid") = $u->userId unless ( $isAdmin ||$isSecondary);
 	   	$u->username($session->form->process("username"));
 	   	$u->authMethod($session->form->process("authMethod"));
 	   	$u->status($session->form->process("status"));
