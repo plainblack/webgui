@@ -18,31 +18,47 @@ use WebGUI::Utility;
 
 use WebGUI::User;
 use WebGUI::Group;
-use Test::More tests => 8; # increment this value for each test you create
+use Test::More tests => 21; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
 my $g = WebGUI::Group->new($session, "new");
 
 diag("Object creation and defaults");
-is( ref $g, "WebGUI::Group", "Group object creation");
+is (ref $g, "WebGUI::Group", "Group object creation");
 my $gid = $g->getId;
-isnt( $gid, "new", "Group assigned new groupId, not new");
-is( length($gid), 22, "GroupId is proper length");
+isnt ($gid, "new", "Group assigned new groupId, not new");
+is (length($gid), 22, "GroupId is proper length");
+is ($g->name(), 'New Group', 'Default name');
+is ($g->expireOffset(), 314496000, 'Default karma threshold');
+is ($g->karmaThreshold(), 1_000_000_000, 'Default karma threshold');
+is ($g->expireNotifyOffset(), -14, 'Default expire notify offset time');
+is ($g->deleteOffset(), 14, 'Default delete offset time');
+is ($g->expireNotify(), 0, 'Default expire notify time');
+is ($g->databaseLinkId(), 0, 'Default databaseLinkId');
+is ($g->dbCacheTimeout(), 3600, 'Default external database cache timeout');
+is ($g->dateCreated(), $g->lastUpdated(), 'lastUpdated = create time');
+is_deeply ($g->getGroupsIn(), [3], 'Admin group added by default to this group');
 
-is ($g->name('**TestGroup**'), '**TestGroup**', 'Set name');
-is ($g->name(), '**TestGroup**', 'Get name via accessor');
-is ($g->get('groupName'), '**TestGroup**', 'Get name via generic accessor');
+my $gname = '**TestGroup**';
+is ($g->name($gname), $gname, 'Set name');
+is ($g->name(), $gname, 'Get name via accessor');
+is ($g->get('groupName'), $gname, 'Get name via generic accessor');
 
-my $g2 = WebGUI::Group->find($session, '**TestGroup**');
+my $g2 = WebGUI::Group->find($session, $gname);
 my $skipFindGroup = is(ref $g2, 'WebGUI::Group', 'find returns a group');
 
 SKIP: {
 	skip('find did not return a WebGUI::Group object', !$skipFindGroup);
 	is( $g->getId, $g2->getId, 'find returns correct group');
 }
-
 undef $g2;
+
+delete $g->{_group};
+ok( !exists $g->{_group}, 'deleted group property hash');
+is( $g->name, $gname, 'group name restored');
+ok( exists $g->{_group}, 'group property hash restored');
+
 $g->delete();
 
 my $matchingGroups = $session->db->quickArray("select groupId from groups where groupId=".$session->db->quote($gid));

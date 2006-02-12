@@ -418,6 +418,8 @@ sub expireOffset {
 =head2 find ( session, name )
 
 An alternative to the constructor "new", use find as a constructor by name rather than id.
+Returns the first group with that name found.  There is no guaranteed order of the search
+to be sure not to create groups with the same name!
 
 =head3 session
 
