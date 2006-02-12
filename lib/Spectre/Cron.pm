@@ -115,13 +115,17 @@ sub checkSchedule {
 	my $cron = DateTime::Cron::Simple->new($job->{schedule});
        	if ($cron->validate_time($now)) {
 		my $session = WebGUI::Session->open($self->{_config}->getWebguiRoot, $job->{config});
-		my $instance = WebGUI::Workflow::Instance->create($session, {
+		WebGUI::Workflow::Instance->create($session, {
 			workflowId=>$job->{workflowId},
 			className=>$job->{className},
 			methodName=>$job->{methodName},
 			parameters=>$job->{parameters},
 			priority=>$job->{priority}
 			});
+		if ($job->{runOnce}) {
+			my $cron = WebGUI::Workflow::Cron->new($session, $job->{jobId});
+			$cron->delete if defined $cron;
+		}
 		$session->close;
 	}
 }
