@@ -194,15 +194,21 @@ sub createAccount {
 #-------------------------------------------------------------------
 sub createAccountSave {
    my $self = shift;
-   
-   return $self->displayAccount if ($self->session->user->userId ne "1");
-   
+   my $i18n = WebGUI::International->new($self->session);
+ 
+  return $self->displayAccount if ($self->session->user->userId ne "1");
+
+   #Make sure anonymous registration is enabled 
+   unless ($self->session->setting->get("anonymousRegistration")) {    
+     $self->session->errorHandler->security($i18n->get("no registration hack", "AuthWebGUI"));
+     return $self->displayLogin;
+   }
    my $username = $self->session->form->process('authWebGUI.username');
    my $password = $self->session->form->process('authWebGUI.identifier');
    my $passConfirm = $self->session->form->process('authWebGUI.identifierConfirm');
    
    my $error;
-	my $i18n = WebGUI::International->new($self->session);
+	
    $error = $self->error unless($self->validUsername($username));
 	if ($self->session->setting->get("webguiUseCaptcha")) {
 		unless ($self->session->form->process('authWebGUI.captcha.validation') eq Digest::MD5::md5_base64(lc($self->session->form->process('authWebGUI.captcha')))) {
