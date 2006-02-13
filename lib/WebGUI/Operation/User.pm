@@ -275,7 +275,7 @@ sub www_deleteUserConfirm {
     } else {
 	   $u = WebGUI::User->new($session,$session->form->process("uid"));
 	   $u->delete;
-       return www_listUsers();
+       return www_listUsers($session);
     }
 }
 
@@ -406,7 +406,7 @@ sub www_editUserSave {
 	   	$u->authMethod($session->form->process("authMethod"));
 	   	$u->status($session->form->process("status"));
 	   	foreach (@{$session->config->get("authMethods")}) {
-	      		my $authInstance = WebGUI::Operation::Auth::getInstance($_,$u->userId);
+	      		my $authInstance = WebGUI::Operation::Auth::getInstance($session,$_,$u->userId);
 	      		$authInstance->editUserFormSave;
        		}
 		foreach my $field (@{WebGUI::ProfileField->new($session,'dummy')->getFields}) {
@@ -423,7 +423,7 @@ sub www_editUserSave {
 	if ($isSecondary) {
 		return _submenu($session,$i18n->get(978));
 	} else {
-		return www_editUser($error);
+		return www_editUser($session,$error);
 	}
 }
 
