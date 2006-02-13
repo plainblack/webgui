@@ -390,7 +390,6 @@ sub www_editCommerceSettings {
 	# general
 	$tabform->getTab('general')->template(
 		-name		=> 'commerceConfirmCheckoutTemplateId',
-		-value		=> $session->setting->get('commerceConfirmCheckoutTemplateId'),
 		-label		=> $i18n->get('confirm checkout template'),
 		-hoverHelp	=> $i18n->get('confirm checkout template description'),
 		-value		=> $session->setting->get("commerceConfirmCheckoutTemplateId"),
