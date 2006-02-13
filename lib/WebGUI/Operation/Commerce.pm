@@ -390,7 +390,7 @@ sub www_editCommerceSettings {
 	# general
 	$tabform->getTab('general')->template(
 		-name		=> 'commerceConfirmCheckoutTemplateId',
-		-value		=> $session{setting}{commerceConfirmCheckoutTemplateId},
+		-value		=> $session->setting->get('commerceConfirmCheckoutTemplateId'),
 		-label		=> $i18n->get('confirm checkout template'),
 		-hoverHelp	=> $i18n->get('confirm checkout template description'),
 		-value		=> $session->setting->get("commerceConfirmCheckoutTemplateId"),
@@ -400,7 +400,7 @@ sub www_editCommerceSettings {
 		-name		=> 'commerceTransactionErrorTemplateId',
 		-label		=> $i18n->get('transaction error template'),
 		-hoverHelp	=> $i18n->get('transaction error template description'),
-		-value		=> $session{setting}{commerceTransactionPendingTemplateId},
+		-value		=> $session->setting->get('commerceTransactionPendingTemplateId'),
 		-namespace	=> 'Commerce/TransactionError'
 		);
 	$tabform->getTab('general')->template(
