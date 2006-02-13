@@ -169,13 +169,9 @@ sub createAccount {
    } 
 	my $i18n = WebGUI::International->new($self->session);
    $vars->{'create.message'} = $_[0] if ($_[0]);
-	my $storage = WebGUI::Storage::Image->createTemp($self->session);
-	my ($filename, $challenge) = $storage->addFileFromCaptcha;
 	$vars->{useCaptcha} = $self->session->setting->get("webguiUseCaptcha");
 	if ($vars->{useCaptcha}) {
-   		$vars->{'create.form.captcha'} = WebGUI::Form::text($self->session,{"name"=>"authWebGUI.captcha", size=>6, maxlength=>6})
-			.WebGUI::Form::hidden($self->session,{name=>"authWebGUI.captcha.validation", value=>Digest::MD5::md5_base64(lc($challenge))})
-			.'<img src="'.$storage->getUrl($filename).'" border="0" alt="captcha" align="middle" />';
+   		$vars->{'create.form.captcha'} = WebGUI::Form::Captcha($self->session,{"name"=>"authWebGUI.captcha"});
    		$vars->{'create.form.captcha.label'} = $i18n->get("captcha label","AuthWebGUI");
 	}
    $vars->{'create.form.username'} = WebGUI::Form::text($self->session,{"name"=>"authWebGUI.username","value"=>$self->session->form->process("authWebGUI.username")});
@@ -211,7 +207,7 @@ sub createAccountSave {
 	
    $error = $self->error unless($self->validUsername($username));
 	if ($self->session->setting->get("webguiUseCaptcha")) {
-		unless ($self->session->form->process('authWebGUI.captcha.validation') eq Digest::MD5::md5_base64(lc($self->session->form->process('authWebGUI.captcha')))) {
+		unless ($self->session->form->process('authWebGUI.captcha', "Captcha")) {
 			$error .= $i18n->get("captcha failure","AuthWebGUI");
 		}
 	}
