@@ -41,7 +41,7 @@ These methods are available from this class:
 
 =head2 create ( session, properties [, id ] ) 
 
-Creates a new workflow instance.
+Creates a new workflow instance and returns a reference to the object. Will return undef if the workflow specified is serial and an instance of it already exists.
 
 =head3 session
 
@@ -62,6 +62,9 @@ sub create {
 	my $session = shift;
 	my $properties = shift;
 	my $id = shift;
+	my ($isSerial) = $session->db->quickArray("select isSerial from Workflow where workflowId=?",[$properties->{workflowId}]);
+	my ($count) = $session->db->quickArray("select count(*) from WorkflowInstance where workflowId=?",[$properties->{workflowId}]);
+	return undef if ($isSerial && $count);
 	my $instanceId = $session->db->setRow("WorkflowInstance","instanceId",{instanceId=>"new", runningSince=>time()}, $id);
 	my $self = $class->new($session, $instanceId);
 	$self->set($properties);

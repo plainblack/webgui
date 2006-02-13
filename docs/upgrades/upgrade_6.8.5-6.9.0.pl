@@ -71,6 +71,7 @@ sub addWorkflow {
 		title varchar(255) not null default 'Untitled',
 		description text,
 		enabled int not null default 0,
+		isSerial int not null default 0,
 		type varchar(255) not null default 'none'
 		)");
 	$session->db->write("create table WorkflowActivity (

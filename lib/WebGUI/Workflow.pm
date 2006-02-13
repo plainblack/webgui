@@ -288,6 +288,10 @@ A boolean indicating whether this workflow may be executed right now.
 
 A string indicating the type of object this workflow will be operating on. Valid values are "none", "versiontag" and "user".
 
+=head4 isSerial
+
+A boolean indicating whether this workflow can be run in parallel or serial. If it's serial, then only one instance of the workflow will be allowed to be created at a given time. So if you try to create a new instance of it, and one instance is already created, the create() method will return undef instead of a reference to the object.
+
 =cut
 
 sub set {
@@ -297,6 +301,11 @@ sub set {
 		$self->{_data}{enabled} = 1;
 	} elsif ($properties->{enabled} == 0) {
 		$self->{_data}{enabled} = 0;
+	}
+	if ($properties->{isSerial} == 1) {
+		$self->{_data}{isSerial} = 1;
+	} elsif ($properties->{isSerial} == 0) {
+		$self->{_data}{isSerial} = 0;
 	}
 	$self->{_data}{title} = $properties->{title} || $self->{_data}{title} || "Untitled";
 	$self->{_data}{description} = (exists $properties->{description}) ? $properties->{description} : $self->{_data}{description};
