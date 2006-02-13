@@ -35,7 +35,7 @@ sub handler {
 	my $r = shift;
 	my $s = Apache2::ServerUtil->server;
 	my $config = WebGUI::Config->new($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'));
-	$r->set_handlers(PerlFixupHandler => \&fixupHandler) if (defined $config->get("passthruUrls"));
+	$r->push_handlers(PerlFixupHandler => \&fixupHandler) if (defined $config->get("passthruUrls"));
 	foreach my $url ($config->get("extrasURL"), @{$config->get("passthruUrls")}) {
 		return Apache2::Const::DECLINED if ($r->uri =~ m/^$url/);
 	}
