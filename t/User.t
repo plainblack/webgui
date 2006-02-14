@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::Utility;
 
 use WebGUI::User;
-use Test::More tests => 56; # increment this value for each test you create
+use Test::More tests => 60; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -198,6 +198,11 @@ is($count, '0', 'delete() -- userProfileData table');
 ($count) = $session->db->quickArray("select count(*) from messageLog where userId=".$session->db->quote($userId));
 is($count, '0', 'delete() -- messageLog table'); 
 
+
+ok(WebGUI::User->validUserId($session, 1), 'Visitor has a valid userId');
+ok(WebGUI::User->validUserId($session, 3), 'Admin has a valid userId');
+ok(!WebGUI::User->validUserId($session, 'eeee'), 'random illegal Id #1');
+ok(!WebGUI::User->validUserId($session, 37), 'random illegal Id #2');
 
 #identifier() and uncache()
 SKIP: {
