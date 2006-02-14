@@ -192,7 +192,7 @@ sub isInSubnet {
 	}
 	my $net = Net::Subnets->new;
 	$net->subnets($subnets);
-	if ($net->check($ip)) {
+	if ($net->check(\$ip)) {
 		return 1;
 	} else {
 		return 0;

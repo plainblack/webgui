@@ -258,16 +258,10 @@ sub isInGroup {
         ### Check IP Address
         if ($group->get("ipFilter")) {
 		my $ipFilter = $group->get("ipFilter");
-                $ipFilter =~ s/\s//g;
-                $ipFilter =~ s/\./\\\./g;
-                my @ips = split(";",$ipFilter);
-                foreach my $ip (@ips) {
-                        if ($self->session->env->get("REMOTE_ADDR") =~ /^$ip/) {
-                                $isInGroup->{$uid}{$gid} = 1;
-				$self->session->stow->set("isInGroup",$isInGroup);
-                                return 1;
-                        }
-                }
+                $ipFilter =~ s/\s+//g;
+                my @ips = split(",",$ipFilter);
+		my $ipMatch = WebGUI::Utility::isInSubnet($self->session->env->get("REMOTE_ADDR"), [ @ips ]);
+		return 1 if $ipMatch;
         }
         return 0 if ($uid eq '1');  #Visitor is in no other groups
         return 1 if ($uid eq '3');  #Admin is in every group

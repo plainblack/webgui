@@ -12,8 +12,8 @@ our $I18N = {
 	},
 
 	'debug ip description' => {
-		message => q|This will limit debugging output to a specific IP address or IP range. To limit the output to anyone in a subnet of 10.0.0.0/24 you'd simply enter 10.0.0. |,
-		lastUpdated => 0
+		message => q|This will limit debugging output to a specific IP address or IP range. Enter the subnet that you want to be able to view debug output in CIDR format.  For example: 10.0.0.0/24.  Multiple CIDR addresses may be entered, separated by commas.|,
+		lastUpdated => 1139948380
 	},
 
 	'debug ip' => {
@@ -1760,11 +1760,11 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
         },
 
         '857 description' => {
-                message => q|Specify an IP address or an IP mask to match. If the user's IP address matches, they'll automatically be included in this group. An IP mask is simply the IP address minus an octet or two. You may also specify multiple IP masks separated by semicolons.
+                message => q|Specify IP addresses in CIDR format.  Multiple addresses can be entered if they are separated by commas.  Spaces, tabs and carriage returns and newlines will be ignored.
 <p>
-<i>IP Mask Example:</i> 10.;192.168.;101.42.200.142
+<i>IP Mask Example:</i> 10.0.0.32/27, 192.168.0.1/30
 <p>|,
-                lastUpdated => 1120448672,
+                lastUpdated => 1139955354,
         },
 
         '945 description' => {

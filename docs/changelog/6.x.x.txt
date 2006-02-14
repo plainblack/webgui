@@ -22,6 +22,11 @@
  - fix [ 1410577 ] WebGUI::Session not included
  - Strengthened security of Captcha validation.
  - Added Captcha form control type.
+ - All IPs used by WebGUI (Settings: debugIp and Group: ipFilter) now accept
+   IP addresses in CIDR format.  They also will accept multiple IP addresses
+   if they are separated by commas.  Whitespace is ignored.  The upgrade
+   script will migrate the data automatically, and hoverHelp documentation
+   has been updated to reflect the changes as well.
 
 6.8.7
  - fix [ 1431098 ] op=becomeUser can become non-existent userIds

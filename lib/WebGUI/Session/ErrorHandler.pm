@@ -87,14 +87,10 @@ sub canShowDebug {
 	return 0 unless ($self->session->setting->get("showDebug"));
 	return 0 unless ($self->session->http->getMimeType eq "text/html");
 	return 1 if ($self->session->setting->get("debugIp") eq "");
-	my @ips = split(" ",$self->session->setting->get("debugIp"));
-	my $ok = 0;
-	foreach my $ip (@ips) {
-		if ($self->session->env->get("REMOTE_ADDR") =~ /^$ip/) {
-			$ok = 1;
-			last;
-		}	
-	}
+	my $ips = $self->session->setting->get("debugIp");
+	$ips =~ s/\s+//g;
+	my @ips = split(",", $ips);
+	my $ok = WebGUI::Utility::isInSubnet($self->session->env->get("REMOTE_ADDR"), [ @ips] );
 	return $ok;
 }
 

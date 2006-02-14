@@ -30,6 +30,7 @@ addEMSTables();
 updateTemplates();
 updateDatabaseLinksAndSQLReport();
 addWorkflow();
+ipsToCIDR();
 
 finish($session); # this line required
 
@@ -392,6 +393,39 @@ sub removeFiles {
 	rmtree('../../lib/WebGUI/Asset/Wobject/IndexedSearch');
 }
 
+#-------------------------------------------------
+sub ipsToCIDR {
+	print "\tTranslating IP addresses to CIDR format.\n" unless ($quiet);
+	print "\t\tStarting with Group ipFilters.\n" unless ($quiet);
+	my $sth = $session->db->read('select groupId, ipFilter from groups');
+	while (my $hash = $sth->hashRef) {
+		next unless $hash->{ipFilter};
+		$hash->{ipFilter} =~ s/\s//g;
+		my @ips = split /;/, $hash->{ipFilter};
+		@ips = map { ip2cidr($_) } @ips;
+		$session->db->write('update groups set ipFilter=? where groupId=?',
+				[join(',', @ips), $hash->{groupId}]);
+	}
+	print "\t\tUpdating debug Ip.\n" unless ($quiet);
+	$sth = $session->db->read("select * from settings where name='debugIp'");
+	while (my $hash = $sth->hashRef) {
+		next unless $hash->{value};
+		my @ips = split /\s+/, $hash->{value};
+		@ips = map { ip2cidr($_) } @ips;
+		$session->db->write('update settings set value=? where name=?',
+				[join(',', @ips), $hash->{name}]);
+	}
+}
+
+sub ip2cidr {
+	my ($ip) = @_;
+	$ip =~ s/\.$//;
+	my $bytes = $ip =~ tr/././;
+	my $new_bytes = 3-$bytes;
+	my $prefixLength = 32 - 8*$new_bytes;
+	$ip .= ('.0' x $new_bytes) . "/$prefixLength";
+	return $ip;
+}
 
 
 # ---- DO NOT EDIT BELOW THIS LINE ----

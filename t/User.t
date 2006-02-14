@@ -231,9 +231,9 @@ ok ($admin->isInGroup($cm->getId), "Admin is not member of group");
 
 my $origFilter = $cm->ipFilter;
 
-$cm->ipFilter('192.168.0.');
+$cm->ipFilter('192.168.0.0/24');
 
-is( $cm->ipFilter, "192.168.0.", "ipFilter assignment to local net, 192.168.0.");
+is( $cm->ipFilter, "192.168.0.0/24", "ipFilter assignment to local net, 192.168.0.0/24");
 
 ok ($visitor->isInGroup($cm->getId), "Visitor is allowed in via IP");
 
