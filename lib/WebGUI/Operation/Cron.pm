@@ -92,7 +92,7 @@ sub www_editCronJob {
 		value=>$value,
 		defaultValue=>0,
 		label=>$i18n->get("run once"),
-		hoverHelp=>$i18n->get("ron once help")
+		hoverHelp=>$i18n->get("run once help")
 		);
 	my $value = $cron->get("workflowId") if defined $cron;
 	$f->workflow(
@@ -157,6 +157,7 @@ sub www_editCronJob {
 	$f->submit;
 	my $ac = WebGUI::AdminConsole->new($session,"cron");
 	$ac->addSubmenuItem($session->url->page("op=editCronJob"), $i18n->get("add a new task"));
+	$ac->addSubmenuItem($session->url->page("op=manageCron"), $i18n->get("manage tasks"));
 	return $ac->render($f->print);
 }
 

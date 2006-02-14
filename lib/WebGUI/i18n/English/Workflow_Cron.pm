@@ -157,6 +157,18 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
+	'id' => {
+		message => q|Task ID|,
+		context => q|a label for the unique id representing the task|,
+		lastUpdated => 0,
+	},
+
+	'manage tasks' => {
+		message => q|Manage all tasks.|,
+		context => q|clicking on this text linked will show the user a list of all cron jobs|,
+		lastUpdated => 0,
+	},
+
 	'add a new task' => {
 		message => q|Add a new task.|,
 		context => q|clicking on this text linked will add a new cron job|,
