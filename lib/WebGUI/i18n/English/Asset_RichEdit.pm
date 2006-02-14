@@ -365,6 +365,17 @@ our $I18N = {
         	lastUpdated => 1119584956,
 	},
 
+	'disable rich edit' => {
+		message => q|Disable this Rich Editor?|,
+        	lastUpdated => 1139957794,
+	},
+
+        'disable rich edit description' => {
+                message => q|This is a master disable for the rich editor, and will turn off the Rich
+		Edit across the entire site without any user intervention.|,
+                lastUpdated => 1139958262,
+        },
+
         'using rich edit description' => {
                 message => q|Ask the user whether or not to use the Rich Editor on this form.|,
                 lastUpdated => 1119584875,

@@ -31,6 +31,7 @@ updateTemplates();
 updateDatabaseLinksAndSQLReport();
 addWorkflow();
 ipsToCIDR();
+addDisabletoRichEditor();
 
 finish($session); # this line required
 
@@ -391,6 +392,12 @@ sub removeFiles {
 	unlink '../../lib/WebGUI/i18n/Asset_IndexedSearch.pm';
 	unlink '../../sbin/Hourly/IndexedSearch_buildIndex.pm';
 	rmtree('../../lib/WebGUI/Asset/Wobject/IndexedSearch');
+}
+
+#-------------------------------------------------
+sub addDisabletoRichEditor {
+	print "\tUpdating Rich Editor to add master disable.\n" unless ($quiet);
+	$session->db->write("alter table RichEdit add column disableRichEditor int(11) default '0'");
 }
 
 #-------------------------------------------------

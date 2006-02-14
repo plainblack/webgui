@@ -68,6 +68,10 @@ sub definition {
                 tableName=>'RichEdit',
                 className=>'WebGUI::Asset::RichEdit',
                 properties=>{
+ 			disableRichEditor=>{
+                        	fieldType=>'yesNo',
+                                defaultValue=>0
+                                },
  			askAboutRichEdit=>{
                         	fieldType=>'yesNo',
                                 defaultValue=>0
@@ -267,6 +271,12 @@ sub getEditForm {
 		-value=>$buttonGrid
 		);
         $tabform->getTab("properties")->yesNo(
+                -value=>$self->getValue("disableRichEditor"),
+		-label=>$i18n->get('disable rich edit'),
+		-hoverHelp=>$i18n->get('disable rich edit description'),
+		-name=>"disableRichEditor"
+                );
+        $tabform->getTab("properties")->yesNo(
                 -value=>$self->getValue("askAboutRichEdit"),
 		-label=>$i18n->get('using rich edit'),
 		-hoverHelp=>$i18n->get('using rich edit description'),
@@ -390,6 +400,7 @@ sub getToolbar {
 #-------------------------------------------------------------------
 sub getRichEditor {
 	my $self = shift;
+	return '' if $self->getValue('disableRichEditor');
 	my $nameId = shift;
 	my @toolbarRow1 = split("\n",$self->getValue("toolbarRow1"));	
 	push(@toolbarRow1,"contextmenu") if ($self->getValue("enableContextMenu"));

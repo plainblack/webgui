@@ -7,6 +7,11 @@ our $HELP = {
 		body => 'rich edit add/edit body',
 		fields => [
                         {
+                                title => 'disable rich edit',
+                                description => 'disable rich edit description',
+                                namespace => 'Asset_RichEdit',
+                        },
+                        {
                                 title => 'using rich edit',
                                 description => 'using rich edit description',
                                 namespace => 'Asset_RichEdit',
