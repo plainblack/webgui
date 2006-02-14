@@ -151,6 +151,7 @@ The user for the session to become.
 =cut
 
 sub convertVisitorToUser {
+	return unless WebGUI::User->validUserId($_[1]);
 	WebGUI::SQL->write("update userSession set userId=".quote($_[1])." where sessionId=".quote($_[0]));
 	if ($session{setting}{passiveProfilingEnabled}) {
 		WebGUI::SQL->write("update passiveProfileLog set userId = ".quote($_[1])." where sessionId = ".quote($_[0]));

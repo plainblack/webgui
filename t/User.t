@@ -18,7 +18,7 @@ use WebGUI::Utility;
 
 use WebGUI::User;
 use WebGUI::SQL;
-use Test::More tests => 33; # increment this value for each test you create
+use Test::More tests => 38; # increment this value for each test you create
 
 initialize();  # this line is required
 
@@ -140,6 +140,15 @@ $user = "";
 $user = WebGUI::User->new;
 is($user->userId, '1', 'new() -- returns visitor with no args');
 $user = "";
+
+ok(WebGUI::User->validUserId(1), 'Visitor has a valid userId');
+ok(WebGUI::User->validUserId(3), 'Admin has a valid userId');
+ok(!WebGUI::User->validUserId('eeee'), 'random illegal Id #1');
+ok(!WebGUI::User->validUserId(37), 'random illegal Id #2');
+
+my $userId = $session{var}{userId};
+WebGUI::Session::convertVisitorToUser($session{var}{sessionId},'ROYSUNIQUEUSERID000001');
+is($session{var}{userId}, $userId, 'session userId remains unchanged');
 
 #identifier() and uncache()
 SKIP: {

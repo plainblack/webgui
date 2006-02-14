@@ -47,6 +47,8 @@ This package provides an object-oriented way of managing WebGUI users as well as
  $u->deleteFromGroups(\@arr);
  $u->delete;
 
+ WebGUI::User->validUserId($userId);
+
 =head1 METHODS
 
 These methods are available from this class:
@@ -416,6 +418,20 @@ Returns the userId for this user.
 
 sub userId {
         return $_[0]->{_userId};
+}
+
+#-------------------------------------------------------------------
+
+=head2 validUserId ( userId )
+
+Returns true if the userId exists in the users table. 
+
+=cut
+
+sub validUserId {
+	my ($class, $userId) = @_;
+	my $sth = WebGUI::SQL->read('select userId from users where userId='.quote($_[1]));
+	return ($sth->rows == 1);
 }
 
 1;

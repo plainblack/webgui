@@ -76,6 +76,7 @@ Generates an HTTP header.
 
 sub getHeader {
 	return undef if ($session{http}{noHeader});
+	return undef unless $session{req};
 	my %params;
 	if (isRedirect()) {
 		$session{req}->headers_out->set(Location => $session{http}{location});
