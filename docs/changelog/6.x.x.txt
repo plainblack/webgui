@@ -23,6 +23,9 @@
  - Strengthened security of Captcha validation.
  - Added Captcha form control type.
 
+6.8.7
+ - fix [ 1431098 ] op=becomeUser can become non-existent userIds
+
 6.8.6
  - Added logic to deal with case sensitivity and whitespace problems in LDAP
    Group matching.
