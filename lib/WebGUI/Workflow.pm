@@ -201,6 +201,7 @@ If specified this will limit the list to a certain type of workflow based upon t
 =cut
 
 sub getList {
+	my $class = shift;
 	my $session = shift;
 	my $type = shift;
 	my $sql = "select workflowId, title from Workflow";

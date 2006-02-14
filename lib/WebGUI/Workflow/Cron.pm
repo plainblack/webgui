@@ -225,6 +225,10 @@ The parameters to be passed into the constructor. Note that the system will alwa
 
 An integer between 1 and 3 that will represent what priority the workflow will run, 1 being highest and 3 being lowest. Defaults to 2. 
 
+=head4 title
+
+A human readable label.
+
 =cut
 
 sub set {
@@ -240,6 +244,7 @@ sub set {
 	} elsif ($properties->{runOnce} == 0) {
 		$self->{_data}{runOnce} = 0;
 	}
+	$self->{_data}{title} = $properties->{title} || $self->{_data}{title} || "Untitled";
 	$self->{_data}{priority} = $properties->{priority} || $self->{_data}{priority} || 2;
 	$self->{_data}{minuteOfHour} = $properties->{minuteOfHour} || $self->{_data}{minuteOfHour} || 0;
 	$self->{_data}{hourOfDay} = $properties->{hourOfDay} || $self->{_data}{hourOfDay} || "*";

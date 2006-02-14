@@ -73,14 +73,14 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
-	'enabled help' => {
+	'is enabled help' => {
 		message => q|If this is set to yes, then the workflow will be kicked off at the scheduled time.|,
 		context => q|the hover help for the enabled field|,
 		lastUpdated => 0,
 	},
 
-	'enabled' => {
-		message => q|Enabled?|,
+	'is enabled' => {
+		message => q|Is Enabled?|,
 		context => q|Yes or no question asking the user if this cron job is enabled.|,
 		lastUpdated => 0,
 	},
@@ -136,6 +136,18 @@ our $I18N = {
 	'medium' => {
 		message => q|Medium|,
 		context => q|Mid range priority.|,
+		lastUpdated => 0,
+	},
+
+	'enabled' => {
+		message => q|Enabled|,
+		context => q|A label to indicate that the cron job is ready to run.|,
+		lastUpdated => 0,
+	},
+
+	'disabled' => {
+		message => q|Disabled|,
+		context => q|A label to indicate that the cron job is not ready to run.|,
 		lastUpdated => 0,
 	},
 

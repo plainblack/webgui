@@ -83,8 +83,8 @@ sub www_editCronJob {
 		name=>"enabled",
 		value=>$value,
 		defaultValue=>0,
-		label=>$i18n->get("enabled"),
-		hoverHelp=>$i18n->get("enabled help")
+		label=>$i18n->get("is enabled"),
+		hoverHelp=>$i18n->get("is enabled help")
 		);
 	my $value = $cron->get("runOnce") if defined $cron;
 	$f->yesNo(
@@ -171,14 +171,14 @@ sub www_manageCron {
 	my $session = shift;
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my $i18n = WebGUI::International->new($session, "Workflow_Cron");
-	my $output = '<table>'; 
-	my $rs = $session->db->read("select taskId, title, concat(minuteOfHour, hourOfDay, dayOfMonth, monthOfYear, dayOfWeek), enabled from WorkflowSchedule");
+	my $output = '<table width="100%">'; 
+	my $rs = $session->db->read("select taskId, title, concat(minuteOfHour, ' ', hourOfDay, ' ', dayOfMonth, ' ', monthOfYear, ' ', dayOfWeek), enabled from WorkflowSchedule");
 	while (my ($id, $title, $schedule, $enabled) = $rs->array) {
 		$output .= '<tr><td>'
 			.$session->icon->delete("op=deleteCronJob;id=".$id, undef, $i18n->get("are you sure you want to delete this scheduled task"))
 			.$session->icon->edit("op=editCronJob;id=".$id)
 			.'</td><td>'.$title.'</td><td>'.$schedule.'</td><td>'
-			.($enabled ? "X" : "")
+			.($enabled ? $i18n->get("enabled") : $i18n->get("disabled"))
 			."</td></tr>\n";
 	}
 	$output .= '</table>';

@@ -123,7 +123,7 @@ Adds code to the subtext field of the form so that buttons for managing or editi
 
 sub setManageIcons {
 	my $self = shift;
-        my $returnUrl = ";proceed=goBackToPage;returnUrl=".$self->session->url->escape($self->session->asset->getUrl);
+        my $returnUrl = ";proceed=goBackToPage;returnUrl=".$self->session->url->escape($self->session->asset->getUrl) if $self->session->asset;
         my $buttons = $self->session->icon->edit("op=editWorkflow".$returnUrl);
         $buttons .= $self->session->icon->manage("op=manageWorkflows".$returnUrl);
 	$self->set("subtext",$buttons . $self->get("subtext"));
