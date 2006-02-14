@@ -161,6 +161,15 @@ sub getAdminFunction {
 			func=>"manageVersions",
 			group=>"3"
 		},
+		"cron"=>{
+			title=>{
+				id=>"topicName",
+				namespace=>"Workflow_Cron"
+			},
+			icon=>"cron.gif",
+			op=>"manageCron",
+			group=>"3"
+		},
 		"users"=>{
 			title=>{
 				id=>"149",

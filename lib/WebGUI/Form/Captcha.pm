@@ -60,7 +60,7 @@ sub definition {
 	my $i18n = WebGUI::International->new($session,"Form_Captcha");
 	push(@{$definition}, {
 		formName=>{
-			defaultValue=>$i18n->get("formName")
+			defaultValue=>$i18n->get("topicName")
 			},
 		profileEnabled=>{
 			defaultValue=>1

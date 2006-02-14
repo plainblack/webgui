@@ -42,6 +42,7 @@ sub addWorkflow {
 	$session->config->set("spectreCryptoKey","123qwe");
 	$session->db->write("create table WorkflowSchedule (
 		taskId varchar(22) binary not null primary key,
+		title varchar(255) not null default 'Untitled',
 		enabled int not null default 0,
 		runOnce int not null default 0,
 		minuteOfHour varchar(25) not null default '0',
@@ -98,6 +99,7 @@ sub addWorkflow {
 	$activity->set("title","Delete files older than 24 hours");
 	$activity->set("storageTimeout",60*60*24);
 	my $cron = WebGUI::Workflow::Cron->create($session, {
+		title=>'Delete temp files',
 		enabled=>1,
 		runOnce=>0,
 		minuteOfHour=>"30",

@@ -77,6 +77,10 @@ Returns a hash reference containing operation and package names.
 
 sub getOperations {
 	return {
+	  'manageCron' => 'WebGUI::Operation::Cron',
+	  'editCronJob' => 'WebGUI::Operation::Cron',
+	  'editCronJobSave' => 'WebGUI::Operation::Cron',
+	  'deleteCronJob' => 'WebGUI::Operation::Cron',
 	  'spectre' => 'WebGUI::Operation::Spectre',
 	  'adminConsole' => 'WebGUI::Operation::Admin',
           'switchOffAdmin' => 'WebGUI::Operation::Admin',
