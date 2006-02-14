@@ -186,6 +186,31 @@ sub getActivities {
 
 #-------------------------------------------------------------------
 
+=head2 getList ( session, [ type ] )
+
+Returns a hash reference of workflowId/title pairs of all the workflows defined in the system. This is a class method.
+
+=head3 session
+
+A reference to the current session.
+
+=head3 type
+
+If specified this will limit the list to a certain type of workflow based upon the object type that the workflow is set up to handle.
+
+=cut
+
+sub getList {
+	my $session = shift;
+	my $type = shift;
+	my $sql = "select workflowId, title from Workflow";
+	$sql .= " where type=?" if ($type);
+	return $session->db->buildHashRef($sql, $type);
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getNextActivity ( [ activityId ] )
 
 Returns the next activity in the workflow after the activity specified. If no activity id is specified, then the first workflow will be returned.
