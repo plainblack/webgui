@@ -183,6 +183,7 @@ sub addEMSTemplates {
         print "\tAdding Event Management System Templates.\n" unless ($quiet);
 
 my $template = <<EOT1;
+
 <a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a>
 
 <tmpl_if session.var.adminOn>
@@ -190,20 +191,20 @@ my $template = <<EOT1;
 </tmpl_if>
 <tmpl_if canManageEvents>
    <a href='<tmpl_var manageEvents.url>'><tmpl_var manageEvents.label></a>
-    </tmpl_if>
+</tmpl_if>
     
-    <tmpl_loop events_loop>
-      <tmpl_var title>&nbsp;<tmpl_var description>&nbsp;<tmpl_var price><br>
-      </tmpl_loop>
+<tmpl_loop events_loop>
+  <tmpl_var event>
+</tmpl_loop>
       
-      <tmpl_var paginateBar>
+<tmpl_var paginateBar>
 EOT1
 
 my $template2 = <<EOT2;
+
 <h1><tmpl_var title></h1><br>
 <tmpl_var description>&nbsp;<tmpl_var price><br>
-
-
+<a href="<tmpl_var purchase.url>"><tmpl_var purchase.label></a>
 EOT2
         my $in = WebGUI::Asset->getImportNode($session);
         $in->addChild({

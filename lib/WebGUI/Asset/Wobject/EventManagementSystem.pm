@@ -21,6 +21,7 @@ use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Commerce::ShoppingCart;
 use WebGUI::Commerce::Item;
+use Data::Dumper;
 #-------------------------------------------------------------------
 
 =head2 checkRequiredFields ( requiredFields )
@@ -285,6 +286,49 @@ sub getRequiredEventNames {
 }
 
 #------------------------------------------------------------------
+sub getSubEvents {
+	my $self = shift;
+	my $eventId = shift;
+	my @subEvents;
+	
+	my @prerequisites = $self->session->db->buildArray("
+			    select prerequisiteId from EventManagementSystem_prerequisites
+			    where productId=".$self->session->db->quote($eventId));
+	print "<pre>".Dumper(@prerequisites)."</pre>";
+	
+	foreach my $prerequisite (@prerequisites) {
+		
+		my $sth = $self->session->db->read("
+			select p.productId, p.title, pr.operator
+			from products as p, EventManagementSystem_prerequisites as pr, EventManagementSystem_prerequisiteEvents as pe
+			where
+			 p.productId = pe.requiredProductId and
+			 pr.prerequisiteId = pe.prerequisiteId and
+			 pr.prerequisiteId =".$self->session->db->quote($prerequisite));
+		my %eventList;
+		my $operator;
+		while (my $hashRef = $sth->hashRef) {
+			$eventList{$hashRef->{productId}} = $hashRef->{title};
+			$operator = $hashRef->{operator} #overwritten each itteration with same value
+		}
+		push (@subEvents, {
+				   'eventList' => \%eventList,
+				   'operator'  => $operator
+				  });	
+	}
+	
+	print "<pre>".Dumper(@subEvents)."</pre>";
+	return \@subEvents;
+}
+
+#------------------------------------------------------------------
+sub startCheckoutWizard {
+	my $self = shift;
+	my $eventId = shift;
+	my $subEvents = $self->getSubEvents($eventId);
+}
+
+#------------------------------------------------------------------
 
 =head2 validateEditEventForm ( )
 
@@ -335,6 +379,7 @@ Method that will add an event to the users shopping cart.
 sub www_addToCart {
 	my $self = shift;
 	my $eventId = $self->session->form->get("pid");
+	$self->startCheckoutWizard($eventId);
 	
 	WebGUI::Commerce::ShoppingCart->new($self->session)->add($eventId, 'Event');
 	
@@ -509,7 +554,7 @@ sub www_editEvent {
 	$f->dateTime(
 		-name  => "endDate",
 		-value => $self->session->form->get("endDate") || $event->{endDate},
-		-defaultValue => "32472169200",
+		-defaultValue => time()+3600, #one hour from start date
 		-hoverHelp => $i18n->get('add/edit event end date description'),
 		-label => $i18n->get('add/edit event end date')
 	);
@@ -540,10 +585,10 @@ sub www_editEvent {
 
 	 $f->radioList(
 		-name  => "requirement",
-		-options => { "and" => $i18n->get("and"),
-			      "or"  => $i18n->get("or"),
+		-options => { 'and' => $i18n->get("and"),
+			      'or'  => $i18n->get("or"),
 			    },
-		-defaultValue => "and"
+		-value => 'and',
 		-label => $i18n->get("add/edit event operator"),
 		-hoverHelp => $i18n->get("add/edit event operator description"),
 	 );
@@ -784,7 +829,7 @@ sub view {
 		   where
 		   	p.productId = e.productId and approved=1
 		   	and e.assetId =".$self->session->db->quote($self->get("assetId"))." 
-			and p.productId not in (select distinct(productId) from EventManagementSystem_prerequisites)";		
+			and p.productId not in (select distinct(requiredProductId) from EventManagementSystem_prerequisiteEvents)";		
 
 	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->get("paginateAfter"));
 	$p->setDataByQuery($sql);
