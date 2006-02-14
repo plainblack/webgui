@@ -155,7 +155,52 @@ sub www_editCronJob {
 		hoverHelp=>$i18n->get("day of week help")
 		);
 	$f->submit;
-	return WebGUI::AdminConsole->new($session,"cron")->render($f->print);
+	my $ac = WebGUI::AdminConsole->new($session,"cron");
+	$ac->addSubmenuItem($session->url->page("op=editCronJob"), $i18n->get("add a new task"));
+	return $ac->render($f->print);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 www_editCronJobSave ( )
+
+Saves the results of www_editCronJob()
+
+=cut
+
+sub www_editCronJobSave {
+	my $session = shift;
+	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	if ($session->form->get("id") eq "new") {
+		WebGUI::Workflow::Cron->create($session,{
+			monthOfYear=>$session->form->get("monthOfYear"),
+			dayOfMonth=>$session->form->get("dayOfMonth"),
+			minuteOfHour=>$session->form->get("minuteOfHour"),
+			hourOfDay=>$session->form->get("hourOfDay"),
+			dayOfWeek=>$session->form->get("dayOfWeek"),
+			enabled=>$session->form->get("enabled","yesNo"),
+			runOnce=>$session->form->get("runOnce","yesNo"),
+			priority=>$session->form->get("priority","radioList"),
+			workflowId=>$session->form->get("workflowId","workflow"),
+			title=>$session->form->get("title"),
+			});
+	} else {
+		my $cron = WebGUI::Workflow::Cron->new($session, $session->form->get("id"));
+		$cron->set({
+			monthOfYear=>$session->form->get("monthOfYear"),
+			dayOfMonth=>$session->form->get("dayOfMonth"),
+			minuteOfHour=>$session->form->get("minuteOfHour"),
+			hourOfDay=>$session->form->get("hourOfDay"),
+			dayOfWeek=>$session->form->get("dayOfWeek"),
+			enabled=>$session->form->get("enabled","yesNo"),
+			runOnce=>$session->form->get("runOnce","yesNo"),
+			priority=>$session->form->get("priority","radioList"),
+			workflowId=>$session->form->get("workflowId","workflow"),
+			title=>$session->form->get("title"),
+			});
+	}
+	return www_manageCron($session);
 }
 
 
@@ -182,7 +227,9 @@ sub www_manageCron {
 			."</td></tr>\n";
 	}
 	$output .= '</table>';
-	return WebGUI::AdminConsole->new($session,"cron")->render($output);
+	my $ac = WebGUI::AdminConsole->new($session,"cron");
+	$ac->addSubmenuItem($session->url->page("op=editCronJob"), $i18n->get("add a new task"));
+	return $ac->render($output);
 }
 
 1;

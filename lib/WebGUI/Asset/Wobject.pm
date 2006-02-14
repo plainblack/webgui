@@ -592,6 +592,8 @@ sub www_view {
                 return "";
         }
 	$self->logView();
+	# must find a way to do this next line better
+	$self->session->http->setCookie("wgSession",$self->session->var->{_var}{sessionId}) unless $self->session->var->{_var}{sessionId} eq $self->session->http->getCookies->{"wgSession"};
 	$self->session->http->getHeader;	
 	$self->prepareView;
 	my $style = $self->processStyle("~~~");
