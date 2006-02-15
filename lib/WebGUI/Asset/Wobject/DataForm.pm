@@ -113,7 +113,7 @@ sub _tabAdminIcons {
 
 #-------------------------------------------------------------------
 sub _tonull { 
-	return @_ ;
+	return $_[1] eq "0" ? (undef, undef) : @_ ;
 }
 
 
@@ -890,7 +890,7 @@ sub www_editFieldSave {
 		vertical=>$session{form}{vertical},
 		extras=>$session{form}{extras},
 		}, "1","1", _tonull("DataForm_tabId",$session{form}{tid}));
-	if($session{form}{position}) {
+	if($session{form}{position}) {  ##Only on non-new, non-email fields
 		WebGUI::SQL->write("update DataForm_field set sequenceNumber=".quote($session{form}{position}).
 					" where DataForm_fieldId=".quote($session{form}{fid}));
 	}
