@@ -23,7 +23,7 @@ sub process {
 		my $sth = WebGUI::SQL->read("select assetId,className from asset where state='trash' and stateChanged <".$expireDate);
 		while (my ($id, $class) = $sth->array) {
 			my $asset = WebGUI::Asset->new($id,$class);
-			$asset->purgeBranch;
+			$asset->purge;
 		}
 		$sth->finish;
 	}

@@ -90,13 +90,17 @@ sub getAssetsInTrash {
 
 =head2 purge ( )
 
-Deletes an asset from tables and removes anything bound to that asset.
+Deletes an asset from tables and removes anything bound to that asset, including descendants.
 
 =cut
 
 sub purge {
 	my $self = shift;
-	return undef if ($self->getId eq $self->session->setting->get("defaultPage") || $self->getId eq $self->session->setting->get("notFoundPage"));
+	return undef if ($self->getId eq $self->session->setting->get("defaultPage") || $self->getId eq $self->session->setting->get("notFoundPage") || $self->get("isSystem");
+	my $kids = $self->getLineage(["children"],{returnObjects=>1, statesToInclude=>['published', 'clipboard', 'clipboard-limbo','trash','trash-limbo']});
+	foreach my $kid (@{$kids}) {
+		$kid->purge;
+	}
 	$self->session->db->beginTransaction;
 	foreach my $definition (@{$self->definition($self->session)}) {
 		$self->session->db->write("delete from ".$definition->{tableName}." where assetId=".$self->session->db->quote($self->getId));

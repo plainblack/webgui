@@ -69,24 +69,6 @@ sub duplicateBranch {
 
 #-------------------------------------------------------------------
 
-=head2 purgeBranch ( )
-
-Returns 1. Purges self and all descendants.
-
-=cut
-
-sub purgeBranch {
-	my $self = shift;
-	my $descendants = $self->getLineage(["self","descendants"],{returnObjects=>1, invertTree=>1, statesToInclude=>['published', 'clipboard', 'clipboard-limbo','trash','trash-limbo']});
-	foreach my $descendant (@{$descendants}) {
-		$descendant->purge;
-	}
-	return 1;
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 www_editBranch ( )
 
 Creates a tabform to edit the Asset Tree. If canEdit returns False, returns insufficient Privilege page. 
