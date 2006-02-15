@@ -16,7 +16,7 @@ package WebGUI::Workflow;
 =cut
 
 use strict;
-
+use WebGUI::Workflow::Activity;
 
 =head1 NAME
 
@@ -56,9 +56,7 @@ sub addActivity {
 	my $self = shift;
 	my $class = shift;
 	my $id = shift;
-	my $cmd = "use ".$class;
-	eval($cmd);
-	return $class->create($self->session, $self->getId, $id);
+	return WebGUI::Workflow::Activity->create($self->session, $self->getId, $id, $class);
 }
 
 
@@ -128,9 +126,7 @@ sub deleteActivity {
 	my $self = shift;
 	my $activityId = shift;
 	my ($class) = $self->session->db->quickArray("select className from WorkflowActivity where activityId=?",[$activityId]);
-	my $cmd = "use ".$class;
-	eval{$cmd};
-	$class->new($self->session, $activityId)->delete;
+	WebGUI::Workflow::Activity->new($self->session, $activityId, $class)->delete;
 }
 
 #-------------------------------------------------------------------
@@ -176,9 +172,7 @@ sub getActivities {
 	my $rs = $self->session->db->prepare("select activityId, className from WorkflowActivity where workflowId=? order by sequenceNumber");
 	$rs->execute([$self->getId]);
 	while (my ($activityId, $class) = $rs->array) {
-		my $cmd = "use ".$class;
-		eval{$cmd};
-		push(@activities, $class->new($self->session, $activityId));
+		push(@activities, WebGUI::Workflow::Activity->new($self->session, $activityId, $class));
 	}
 	return \@activities;
 }
@@ -231,9 +225,7 @@ sub getNextActivity {
 		and sequenceNumber>=? order by sequenceNumber", [$self->getId, $sequenceNumber]);
 	my ($id, $class) = $rs->array;
 	$rs->finish;
-	my $cmd = "use ".$class;
-	eval{$cmd};
-	return $class->new($self->session, $id);
+	return WebGUI::Workflow::Activity->new($self->session, $id, $class);
 }
 
 

@@ -39,7 +39,7 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 create ( session, workflowId [, id ] ) 
+=head2 create ( session, workflowId [, id, classname  ] ) 
 
 Creates a new instance of this activity in a workflow.
 
@@ -55,22 +55,27 @@ The unique id of the workflow to attach this activity to.
 
 Normally an ID will be generated for you, but if you want to override this and provide your own 22 character id, then you can specify it here.
 
+=head3 classname
+
+The classname of the activity you wish to create.
+
 =cut
 
 sub create {
 	my $class = shift;
 	my $session = shift;
 	my $workflowId = shift;
+	my $classname = shift;
 	my $id = shift;
 	my ($sequenceNumber) = $session->db->quickArray("select count(*) from WorkflowActivity where workflowId=?", [$workflowId]);
 	$sequenceNumber++;
 	my $activityId = $session->db->setRow("WorkflowActivity","activityId", {
 		sequenceNumber=>$sequenceNumber, 
 		activityId=>"new", 
-		className=>$class, 
+		className=>$classname || $class, 
 		workflowId=>$workflowId
 		}, $id);
-	return $class->new($session, $activityId);
+	return $class->new($session, $activityId, $classname);
 }
 
 #-------------------------------------------------------------------
@@ -194,7 +199,7 @@ sub getType {
 
 #-------------------------------------------------------------------
 
-=head2 new ( session, activityId )
+=head2 new ( session, activityId [, classname] )
 
 Constructor.
 
@@ -206,14 +211,28 @@ A reference to the current session.
 
 A unique id refering to an instance of an activity.
 
+=head3 classname
+
+The classsname of the activity you wish to add.
+
 =cut
 
 sub new {
 	my $class = shift;
 	my $session = shift;
 	my $activityId = shift;
+	my $className = shift;
 	my $main = $session->db->getRow("WorkflowActivity","activityId", $activityId);
 	return undef unless $main->{activityId};
+	if ($className) {
+                my $cmd = "use ".$className;
+                eval ($cmd);
+                if ($@) {
+                        $session->errorHandler->error("Couldn't compile workflow activity package: ".$className.". Root cause: ".$@);                        
+			return undef;                
+		}
+                $class = $className;
+        }
 	my $sub = $session->db->buildHashRef("select name,value from WorkflowActivityData where activityId=?",[$activityId]); 
 	my %data = (%{$main}, %{$sub});
 	bless {_session=>$session, _id=>$activityId, _data=>\%data}, $class;
