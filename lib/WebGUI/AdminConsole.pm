@@ -161,6 +161,15 @@ sub getAdminFunction {
 			func=>"manageVersions",
 			group=>"3"
 		},
+		"workflow"=>{
+			title=>{
+				id=>"topicName",
+				namespace=>"Workflow"
+			},
+			icon=>"workflow.gif",
+			op=>"manageWorkflows",
+			group=>"pbgroup000000000000015"
+		},
 		"cron"=>{
 			title=>{
 				id=>"topicName",

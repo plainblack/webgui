@@ -114,7 +114,7 @@ sub delete {
 
 =head2 deleteActivity ( activityId )
 
-Removes an activity from this workflow.
+Removes an activity from this workflow. This is just a convenience method, so you don't have to manually load and construct activity objects when you're already working with a workflow.
 
 =head3 activityId
 
@@ -125,8 +125,8 @@ The unique id of the activity to remove.
 sub deleteActivity {
 	my $self = shift;
 	my $activityId = shift;
-	my ($class) = $self->session->db->quickArray("select className from WorkflowActivity where activityId=?",[$activityId]);
-	WebGUI::Workflow::Activity->new($self->session, $activityId, $class)->delete;
+	my $activity = $self->getActivity($activityId);
+	$activity->delete if ($activity);
 }
 
 #-------------------------------------------------------------------
@@ -160,6 +160,32 @@ sub get {
 
 #-------------------------------------------------------------------
 
+=head2 getActivity ( activityId [, classname ] )
+
+Retrieves an activity object. This is just a convenience method, so you don't have to manually load and construct activity objects when you're already working with a workflow.
+
+=head3 activityId
+
+The unique id of the activity.
+
+=head3 classname
+
+The classname of the activity. This will be looked up if you don't specify it.
+
+=cut
+
+sub getActivity {
+	my $self = shift;
+	my $activityId = shift;
+	my $class = shift;
+	unless ($class) {
+		($class) = $self->session->db->quickArray("select className from WorkflowActivity where activityId=?",[$activityId]);
+	}
+	return WebGUI::Workflow::Activity->new($self->session, $activityId, $class);
+}
+
+#-------------------------------------------------------------------
+
 =head2 getActivities ( )
 
 Returns an array reference of the activity objects associated with this workflow.
@@ -172,7 +198,7 @@ sub getActivities {
 	my $rs = $self->session->db->prepare("select activityId, className from WorkflowActivity where workflowId=? order by sequenceNumber");
 	$rs->execute([$self->getId]);
 	while (my ($activityId, $class) = $rs->array) {
-		push(@activities, WebGUI::Workflow::Activity->new($self->session, $activityId, $class));
+		push(@activities, $self->getActivity($activityId, $class));
 	}
 	return \@activities;
 }
@@ -180,9 +206,22 @@ sub getActivities {
 
 #-------------------------------------------------------------------
 
+=head2 getId ( )
+
+Returns the ID of this workflow.
+
+=cut
+
+sub getId {
+	my $self = shift;
+	return $self->{_id};
+}
+
+#-------------------------------------------------------------------
+
 =head2 getList ( session, [ type ] )
 
-Returns a hash reference of workflowId/title pairs of all the workflows defined in the system. This is a class method.
+Returns a hash reference of workflowId/title pairs of all the workflows defined in the system. This is a class method. Note that this will not return anything that is disabled.
 
 =head3 session
 
@@ -198,7 +237,7 @@ sub getList {
 	my $class = shift;
 	my $session = shift;
 	my $type = shift;
-	my $sql = "select workflowId, title from Workflow";
+	my $sql = "select workflowId, title from Workflow where enabled=1";
 	$sql .= " where type=?" if ($type);
 	return $session->db->buildHashRef($sql, $type);
 }
@@ -225,21 +264,27 @@ sub getNextActivity {
 		and sequenceNumber>=? order by sequenceNumber", [$self->getId, $sequenceNumber]);
 	my ($id, $class) = $rs->array;
 	$rs->finish;
-	return WebGUI::Workflow::Activity->new($self->session, $id, $class);
+	return $self->getActivity($id, $class);
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 getId ( )
+=head2 getTypeName ( [ type ] ) 
 
-Returns the ID of this workflow.
+Returns a human readable name for the object type this workflow supports.
+
+=head3 type
+
+Optionally override the type by specifying it here.
 
 =cut
 
-sub getId {
+sub getTypeName {
 	my $self = shift;
-	return $self->{_id};
+	my $type = shift || $self->get("type");
+	my $i18n = WebGUI::International->new($self->session,"Workflow");
+	return $i18n->get($type);
 }
 
 #-------------------------------------------------------------------

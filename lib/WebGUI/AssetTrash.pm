@@ -96,7 +96,7 @@ Deletes an asset from tables and removes anything bound to that asset, including
 
 sub purge {
 	my $self = shift;
-	return undef if ($self->getId eq $self->session->setting->get("defaultPage") || $self->getId eq $self->session->setting->get("notFoundPage") || $self->get("isSystem");
+	return undef if ($self->getId eq $self->session->setting->get("defaultPage") || $self->getId eq $self->session->setting->get("notFoundPage") || $self->get("isSystem"));
 	my $kids = $self->getLineage(["children"],{returnObjects=>1, statesToInclude=>['published', 'clipboard', 'clipboard-limbo','trash','trash-limbo']});
 	foreach my $kid (@{$kids}) {
 		$kid->purge;

@@ -145,12 +145,6 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
-	'are you sure you want to delete this scheduled task' => {
-		message => q|Are you certain you wish to delete this task?|,
-		context => q|The question asked before deleteing a cron job.|,
-		lastUpdated => 0,
-	},
-
 	'disabled' => {
 		message => q|Disabled|,
 		context => q|A label to indicate that the cron job is not ready to run.|,

@@ -83,6 +83,7 @@ These methods are available from this class:
 #-------------------------------------------------------------------
 sub _create {
 	my $self = shift;
+	my $override = shift;
 	$self->{_groupId} = $self->session->db->setRow("groups","groupId",{
 		groupId=>"new",
 		dateCreated=>$self->session->datetime->time(),
@@ -95,7 +96,7 @@ sub _create {
 		databaseLinkId=>0,
 		dbCacheTimeout=>3600,
 		lastUpdated=>$self->session->datetime->time()
-		});
+		}, $override);
 	$self->addGroups([3]);
 }
 
@@ -680,7 +681,7 @@ sub name {
 
 #-------------------------------------------------------------------
 
-=head2 new ( session, groupId )
+=head2 new ( session, groupId [, overrideId ] )
 
 Constructor.
 
@@ -690,7 +691,11 @@ A reference to the current session.
 
 =head3 groupId
 
-The groupId of the group you're creating an object reference for. If specified as "new" then a new group will be created and assigned the next available groupId. If left blank then the object methods will just return default values for everything.
+The groupId of the group you're creating an object reference for. If specified as "new" then a new group will be created and assigned a new random groupId. If left blank then the object methods will just return default values for everything.
+
+=head3 overrideId
+
+If you specified "new" for groupId, you can use this property to specify an id you wish to create, rather than having the system generate one for you.
 
 =cut
 
@@ -701,8 +706,9 @@ sub new {
 	my $self = {};
 	$self->{_session} = shift;
 	$self->{_groupId} = shift;
+	my $override = shift;
 	bless $self, $class;
-        $self->_create() if ($self->{_groupId} eq "new");
+        $self->_create($override) if ($self->{_groupId} eq "new");
 	return $self;
 }
 

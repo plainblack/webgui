@@ -77,6 +77,13 @@ Returns a hash reference containing operation and package names.
 
 sub getOperations {
 	return {
+	  'addWorkflow' => 'WebGUI::Operation::Workflow',
+	  'deleteWorkflow' => 'WebGUI::Operation::Workflow',
+	  'deleteWorkflowActivity' => 'WebGUI::Operation::Workflow',
+	  'addWorkflowSave' => 'WebGUI::Operation::Workflow',
+	  'editWorkflow' => 'WebGUI::Operation::Workflow',
+	  'editWorkflowSave' => 'WebGUI::Operation::Workflow',
+	  'manageWorkflows' => 'WebGUI::Operation::Workflow',
 	  'manageCron' => 'WebGUI::Operation::Cron',
 	  'editCronJob' => 'WebGUI::Operation::Cron',
 	  'editCronJobSave' => 'WebGUI::Operation::Cron',

@@ -1,0 +1,225 @@
+package WebGUI::Operation::Workflow;
+
+#-------------------------------------------------------------------
+# WebGUI is Copyright 2001-2006 Plain Black Corporation.
+#-------------------------------------------------------------------
+# Please read the legal notices (docs/legal.txt) and the license
+# (docs/license.txt) that came with this distribution before using
+# this software.
+#-------------------------------------------------------------------
+# http://www.plainblack.com                     info@plainblack.com
+#-------------------------------------------------------------------
+
+use strict;
+use Tie::IxHash;
+use WebGUI::AdminConsole;
+use WebGUI::HTMLForm;
+use WebGUI::International;
+use WebGUI::Workflow;
+
+=head1 NAME
+
+Package WebGUI::Operations::Workflow
+
+=head1 DESCRIPTION
+
+Operation handler for managing workflows.
+
+=cut
+
+#-------------------------------------------------------------------
+
+=head2 www_addWorkflow ()
+
+Allows the user to choose the type of workflow that's going to be created. 
+
+=cut
+
+sub www_addWorkflow {
+	my $session = shift;
+        return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
+	my $i18n = WebGUI::International->new($session, "Workflow");
+	my $f = WebGUI::HTMLForm->new($session);
+	$f->hidden(
+		name=>"op",
+		value=>"addWorkflowSave"
+		);
+	$f->selectBox(
+		name=>"type",
+		label=>$i18n->get("object type"),
+		options=>{
+			none=>$i18n->get("none"),
+			versiontag=>$i18n->get("versiontag"),
+			user=>$i18n->get("user")
+			},
+		value=>"none",
+		hoverHelp=>$i18n->get("object type help")
+		);
+	my $ac = WebGUI::AdminConsole->new($session,"workflow");
+	$ac->addSubmenuItem($session->url->page("op=manageWorkflows"), $i18n->get("manage workflows"));
+	return $ac->render($f->print);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_addWorkflowSave ()
+
+Saves the results from www_addWorkflow().
+
+=cut
+
+sub www_addWorkflowSave {
+	my $session = shift;
+        return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
+	my $workflow = WebGUI::Workflow->create($session, {type=>$session->form->get("type")});	
+	return www_editWorkflowSave($session, $workflow);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_deleteWorkflow ( )
+
+Deletes an entire workflow.
+
+=cut
+
+sub www_deleteWorkflow {
+	my $session = shift;
+        return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
+	my $workflow = WebGUI::Workflow->new($session, $session->form->get("workflowId"));
+	$workflow->delete if defined $workflow;
+	return www_manageWorkflow($session);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_deleteWorkflowActivity ( )
+
+Deletes an activity from a workflow.
+
+=cut
+
+sub www_deleteWorkflowActivity {
+	my $session = shift;
+        return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
+	my $workflow = WebGUI::Workflow->new($session, $session->form->get("workflowId"));
+	$workflow->deleteActivity($session->form->get("activityId")) if defined $workflow;
+	return www_editWorkflow($session);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_editWorkflow ( session, workflow )
+
+Displays displays the editable properties of a workflow.
+
+=cut
+
+sub www_editWorkflow {
+	my $session = shift;
+	my $workflow = shift;
+        return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
+	$workflow = WebGUI::Workflow->new($session, $session->form->get("workflowId")) unless (defined $workflow);
+	my $i18n = WebGUI::International->new($session, "Workflow");
+	my $f = WebGUI::HTMLForm->new($session);
+	$f->hidden(
+		name=>"op",
+		value=>"editWorkflowSave"
+		);
+	$f->hidden(
+		name=>"workflowId",
+		value=>$workflow->getId
+		);
+	$f->readOnly(
+		label=>$i18n->get("workflowId"),
+		value=>$workflow->getId
+		);
+	$f->readOnly(
+		label=>$i18n->get("object type"),
+		value=>$workflow->getTypeName
+		);
+	$f->text(
+		name=>"title",
+		value=>$workflow->get("title"),
+		label=>$i18n->get("title"),
+		hoverHelp=>$i18n->get("title help")
+		);
+	$f->text(
+		name=>"description",
+		value=>$workflow->get("description"),
+		label=>$i18n->get("description"),
+		hoverHelp=>$i18n->get("description help")
+		);
+	$f->yesNo(
+		name=>"enabled",
+		value=>$workflow->get("enabled"),
+		defaultValue=>0,
+		label=>$i18n->get("is enabled"),
+		hoverHelp=>$i18n->get("is enabled help")
+		);
+	$f->yesNo(
+		name=>"isSerial",
+		value=>$workflow->get("isSerial"),
+		defaultValue=>0,
+		label=>$i18n->get("is serial"),
+		hoverHelp=>$i18n->get("is serial help")
+		);
+	$f->submit;
+	my $ac = WebGUI::AdminConsole->new($session,"workflow");
+	$ac->addSubmenuItem($session->url->page("op=addWorkflow"), $i18n->get("add a new workflow"));
+	$ac->addSubmenuItem($session->url->page("op=manageWorkflows"), $i18n->get("manage workflows"));
+	return $ac->render($f->print);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 www_editWorkflowSave ( )
+
+Saves the results of www_editWorkflow()
+
+=cut
+
+sub www_editWorkflowSave {
+	my $session = shift;
+        return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
+	my $workflow = WebGUI::Workflow::Cron->new($session, $session->form->get("workflowId"));
+	$workflow->set({
+		enabled=>$session->form->get("enabled","yesNo"),
+		isSerial=>$session->form->get("isSerial","yesNo"),
+		title=>$session->form->get("title"),
+		description=>$session->form->get("description","textarea"),
+		});
+	return www_editWorkflow($session, $workflow);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 www_manageCron  ( )
+
+Display a list of the workflows.
+
+=cut
+
+sub www_manageWorkflows {
+	my $session = shift;
+        return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
+	my $i18n = WebGUI::International->new($session, "Workflow");
+	my $output = '<table width="100%">'; 
+	my $rs = $session->db->read("select workflowId, title, enabled from Workflow order by title");
+	while (my ($id, $title, $enabled) = $rs->array) {
+		$output .= '<tr><td>'
+			.$session->icon->delete("op=deleteWorkflow;workflowId=".$id, undef, $i18n->get("are you sure you want to delete this workflow"))
+			.$session->icon->edit("op=editWorkflow;workflowId=".$id)
+			.'</td><td>'.$title.'</td><td>'
+			.($enabled ? $i18n->get("enabled") : $i18n->get("disabled"))
+			."</td></tr>\n";
+	}
+	$output .= '</table>';
+	my $ac = WebGUI::AdminConsole->new($session,"workflow");
+	$ac->addSubmenuItem($session->url->page("op=addWorkflow"), $i18n->get("add a new workflow"));
+	return $ac->render($output);
+}
+
+1;

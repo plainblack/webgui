@@ -446,7 +446,7 @@ sub lastUpdated {
 
 #-------------------------------------------------------------------
 
-=head2 new ( userId [, overrideId ] )
+=head2 new ( session, userId [, overrideId ] )
 
 Constructor.
 

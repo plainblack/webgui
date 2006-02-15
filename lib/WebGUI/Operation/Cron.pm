@@ -221,7 +221,7 @@ sub www_manageCron {
 	my $rs = $session->db->read("select taskId, title, concat(minuteOfHour, ' ', hourOfDay, ' ', dayOfMonth, ' ', monthOfYear, ' ', dayOfWeek), enabled from WorkflowSchedule");
 	while (my ($id, $title, $schedule, $enabled) = $rs->array) {
 		$output .= '<tr><td>'
-			.$session->icon->delete("op=deleteCronJob;id=".$id, undef, $i18n->get("are you sure you want to delete this scheduled task"))
+			.$session->icon->delete("op=deleteCronJob;id=".$id, undef, $i18n->get("are you sure you wish to delete this scheduled task"))
 			.$session->icon->edit("op=editCronJob;id=".$id)
 			.'</td><td>'.$title.'</td><td>'.$schedule.'</td><td>'
 			.($enabled ? $i18n->get("enabled") : $i18n->get("disabled"))

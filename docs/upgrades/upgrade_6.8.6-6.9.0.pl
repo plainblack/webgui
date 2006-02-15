@@ -15,6 +15,7 @@ use WebGUI::Session;
 use File::Path;
 use WebGUI::Workflow;
 use WebGUI::Workflow::Cron;
+use WebGUI::Group;
 
 my $toVersion = "6.9.0"; # make this match what version you're going to
 my $quiet; # this line required
@@ -38,6 +39,9 @@ finish($session); # this line required
 #-------------------------------------------------
 sub addWorkflow {
 	print "\tAdding workflow.\n";
+	my $group = WebGUI::Group->new($session,"new","pbgroup000000000000015");
+	$group->set("groupName", "Workflow Managers");
+	$group->set("description", "People who can create, edit, and delete workflows.");
 	$session->config->set("spectreIp","127.0.0.1");
 	$session->config->set("spectrePort",32133);
 	$session->config->set("spectreSubnets",["127.0.0.1/32"]);

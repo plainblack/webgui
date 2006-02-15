@@ -65,8 +65,8 @@ sub create {
 	my $class = shift;
 	my $session = shift;
 	my $workflowId = shift;
-	my $classname = shift;
 	my $id = shift;
+	my $classname = shift;
 	my ($sequenceNumber) = $session->db->quickArray("select count(*) from WorkflowActivity where workflowId=?", [$workflowId]);
 	$sequenceNumber++;
 	my $activityId = $session->db->setRow("WorkflowActivity","activityId", {
@@ -195,7 +195,6 @@ Returns the type of workflow that this activity may be used in. Unless this meth
 sub getType {
 	return "none";
 }
-
 
 #-------------------------------------------------------------------
 
