@@ -198,6 +198,9 @@ sub getEditForm {
                         my %params;
                         foreach my $key (keys %{$properties->{$fieldname}}) {
                                 $params{$key} = $properties->{$fieldname}{$key};
+				if ($fieldname eq "title" && lc($params{$key}) eq "untitled") {
+					$params{$key} = $definition->[0]{name};
+				}
                         }
                         $params{value} = $self->get($fieldname);
                         $params{name} = $fieldname;
@@ -291,7 +294,8 @@ Updates activity with data from Form.
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	my %data;
-	foreach my $definition (@{$self->definition($self->session)}) {
+	my $fullDefinition = $self->definition($self->session);
+	foreach my $definition (@{$fullDefinition}) {
 		foreach my $property (keys %{$definition->{properties}}) {
 			$data{$property} = $self->session->form->process(
 				$property,
@@ -300,7 +304,7 @@ sub processPropertiesFromFormPost {
 				);
 		}
 	}
-	$data{title} = "Untitled" unless ($data{title});
+	$data{title} = $fullDefinition->[0]{name} if ($data{title} eq "" || lc($data{title}) eq "untitled");
 	$self->set(\%data);
 }
 
