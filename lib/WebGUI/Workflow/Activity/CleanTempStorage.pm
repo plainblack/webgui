@@ -66,6 +66,47 @@ sub checkFileAge {
 
 #-------------------------------------------------------------------
 
+=head2 definition ( session, definition )
+
+See WebGUI::Workflow::Activity::defintion() for details.
+
+=cut 
+
+sub definition {
+	my $class = shift;
+	my $session = shift;
+	my $definition = shift;
+	my $i18n = WebGUI::International->new($session, "Workflow_Activity_CleanTempStorage");
+	push(@{$definition}, {
+		name=>$i18n->get("topicName"),
+		properties=> {
+			storageTimeout => {
+				label=>$i18n->get("storage timeout"),
+				defaultValue=>6*60*60,
+				hoverHelp=>$i18n->get("storage timeout help")
+				}
+			}
+		});
+	return $class->SUPER::definition($session,$definition);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 execute (  )
+
+See WebGUI::Workflow::Activity::execute() for details.
+
+=cut
+
+sub execute {
+	my $self = shift;
+	$self->recurseFileSystem($self->session->config->get("uploadsPath")."/temp");
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 recurseFileSystem ( path )
 
 Recurses the filesystem deleting files older than the specified time.
@@ -93,56 +134,6 @@ sub recurseFileSystem {
                 }
         }
 }
-
-
-
-#-------------------------------------------------------------------
-
-=head2 execute (  )
-
-See WebGUI::Workflow::Activity::execute() for details.
-
-=cut
-
-sub execute {
-	my $self = shift;
-	$self->recurseFileSystem($self->session->config->get("uploadsPath")."/temp");
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 getEditForm ( )
-
-See WebGUI::Workflow::Activity::getEditForm() for details.
-
-=cut 
-
-sub getEditForm {
-	my $self = shift;
-	my $form = $self->SUPER::getEditForm();
-	$form->interval(
-		-name=>"storageTimeout",
-		-label=>"Storage Timeout",
-		-defaultValue=>6*60*60,
-		-value=>$self->get("storageTimeout")
-		);
-	return $form;
-}
-
-#-------------------------------------------------------------------
-
-=head2 getName ( session )
-
-See WebGUI::Workflow::Activity::getName() for details.
-
-=cut
-
-sub getName {
-	my $session = shift;
-	return "Clean Temp Storage";
-}
-
 
 
 1;

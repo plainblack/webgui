@@ -344,5 +344,14 @@
 
 "spectreCryptoKey" : "123qwe"
 
+# Define the workflow activities that are available in the editing
+# process and what object types they support. 
+
+"workflowActivities" : {
+		"none": [ "WebGUI::Workflow::Activity::CleanTempStorage" ],
+		"user" : [ ],
+		"revisiontag" : [ ]
+	},
+
 }
 

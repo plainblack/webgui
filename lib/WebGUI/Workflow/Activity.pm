@@ -80,6 +80,45 @@ sub create {
 
 #-------------------------------------------------------------------
 
+=head2 definition ( session, definition )
+
+Sets up the parameters of the activity for use in forms in the workflow editor. This is a class method.
+
+=head3 session
+
+A reference to the current session.
+
+=head3 definition
+
+An array reference containing a list of hash hreferences of properties.
+
+=cut
+
+sub definition {
+	my $class = shift;
+	my $session = shift;
+	my $definition = shift;
+	my $i18n = WebGUI::International->new($session, "Workflow_Activity");
+	push (@{$definition}, {
+		name=>$i18n->get("topicName"),
+		properties=>{
+			title=>{
+				defaultValue=>"Untitled",
+				label=>$i18n->get("title"),
+				hoverHelp=>$i18n->get("title help")
+				},
+			description=>{
+				defaultValue=>undef,
+				label=>$i18n->get("description"),
+				hoverHelp=>$i18n->get("description help")
+				}
+			}
+		});
+	return $definition;
+}
+
+#-------------------------------------------------------------------
+
 =head2 delete ( )
 
 Removes this activity from its workflow.
@@ -180,20 +219,10 @@ A reference to the current session.
 =cut
 
 sub getName {
+	my $class = shift;
 	my $session = shift;
-	return "Unnamed";
-}
-
-#-------------------------------------------------------------------
-
-=head2 getType ( )
-
-Returns the type of workflow that this activity may be used in. Unless this method is overriden, the type is "none". This is a class method.
-
-=cut
-
-sub getType {
-	return "none";
+	my $definition = $class->definition($session);
+	return $definition->[0]{name};
 }
 
 #-------------------------------------------------------------------

@@ -48,7 +48,8 @@ These methods are available from this class:
 =cut
 
 #-------------------------------------------------------------------
-=head2 definition ( [definition] )
+
+=head2 definition ( session, [definition] )
 
 Returns an array reference of definitions. Adds tableName, className, properties to array definition.
 

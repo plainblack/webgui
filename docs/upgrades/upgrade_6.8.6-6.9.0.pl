@@ -113,7 +113,11 @@ sub addWorkflow {
 		priority=>3,
 		workflowId=>$workflow->getId
 		}, "pbcron0000000000000001");
-		
+	$session->config->set("workflowActivities", {
+		none=>["WebGUI::Workflow::Activity::CleanTempStorage"],
+		user=>[],
+		versiontag=>[]
+		});
 }
 
 #-------------------------------------------------
