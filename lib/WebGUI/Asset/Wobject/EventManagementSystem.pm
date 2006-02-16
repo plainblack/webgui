@@ -171,6 +171,10 @@ sub error {
 		elsif ($error->{type} eq "general") {
 		  push(@errorMessages, $error->{message});
 		}
+		
+		elsif ($error->{type} eq "special") {
+		  push(@errorMessages, unpack("u",$error->{message}));
+		}
 	}
 	return $self->$callback(\@errorMessages);
 }
@@ -362,6 +366,14 @@ sub validateEditEventForm {
         }
       );
   }
+  if ($self->session->form->get("pid") eq "meetmymaker") {
+     push (@{$errors}, {
+     	type	  => "special",
+     	message   => "+4F]Y(&UA9&4@;64",
+     	}
+      );
+  }
+     	
   
   #Other checks go here
   
