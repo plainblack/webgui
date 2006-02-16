@@ -35,6 +35,7 @@
 6.8.7
  - fix [ 1431098 ] op=becomeUser can become non-existent userIds
  - fix [ 1431944 ] 6.8.6 DataForm moving fields
+ - fix [ 1433195 ] 6.8.6 In/Out board labels missing
 
 6.8.6
  - Added logic to deal with case sensitivity and whitespace problems in LDAP
