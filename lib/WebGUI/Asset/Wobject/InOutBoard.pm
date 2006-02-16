@@ -215,13 +215,13 @@ sub view {
 		-name=>"status",
 		-value=>$status,
 		-options=>$statusListHashRef,
-		-label=>$i18n->get(5)
-		-hoverHelp=>$i18n->get('5 description')
+		-label=>$i18n->get(5),
+		-hoverHelp=>$i18n->get('5 description'),
 		);
 	$f->text(
 		-name=>"message",
-		-label=>$i18n->get(6)
-		-hoverHelp=>$i18n->get('6 description')
+		-label=>$i18n->get(6),
+		-hoverHelp=>$i18n->get('6 description'),
 		);
 	$f->hidden(
 		-name=>"func",
