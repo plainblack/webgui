@@ -199,13 +199,13 @@ sub view {
 		-name=>"status",
 		-value=>$status,
 		-options=>$statusListHashRef,
-		-label=>WebGUI::International::get(5, "Asset_InOutBoard")
-		-hoverHelp=>WebGUI::International::get('5 description', "Asset_InOutBoard")
+		-label=>WebGUI::International::get(5, "Asset_InOutBoard"),
+		-hoverHelp=>WebGUI::International::get('5 description', "Asset_InOutBoard"),
 		);
 	$f->text(
 		-name=>"message",
-		-label=>WebGUI::International::get(6, "Asset_InOutBoard")
-		-hoverHelp=>WebGUI::International::get('6 description', "Asset_InOutBoard")
+		-label=>WebGUI::International::get(6, "Asset_InOutBoard"),
+		-hoverHelp=>WebGUI::International::get('6 description', "Asset_InOutBoard"),
 		);
 	$f->hidden(
 		-name=>"func",
