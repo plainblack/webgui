@@ -103,11 +103,13 @@ sub definition {
 		name=>$i18n->get("topicName"),
 		properties=>{
 			title=>{
+				fieldType=>"text",
 				defaultValue=>"Untitled",
 				label=>$i18n->get("title"),
 				hoverHelp=>$i18n->get("title help")
 				},
 			description=>{
+				fieldType=>"textarea",
 				defaultValue=>undef,
 				label=>$i18n->get("description"),
 				hoverHelp=>$i18n->get("description help")
@@ -180,17 +182,29 @@ sub get {
 }
 
 #-------------------------------------------------------------------
-
-=head2 getEditForm ( )
-
-Returns a WebGUI::HTMLForm object that represents the parameters of this activity. This method must be extended by the subclasses.
-
-=cut 
-
+        
+=head2 getEditForm ()
+                
+Returns the form that will be used to edit the properties of an activity.
+ 
+=cut            
+        
 sub getEditForm {
-	my $self = shift;
+        my $self = shift;
 	my $form = WebGUI::HTMLForm->new($self->session);
-	return $form;
+        foreach my $definition (reverse @{$self->definition($self->session)}) {
+                my $properties = $definition->{properties};
+                foreach my $fieldname (keys %{$properties}) {
+                        my %params;
+                        foreach my $key (keys %{$properties->{$fieldname}}) {
+                                $params{$key} = $properties->{$fieldname}{$key};
+                        }
+                        $params{value} = $self->get($fieldname);
+                        $params{name} = $fieldname;
+                        $form->dynamicField(%params);
+                }
+        }
+        return $form;
 }
 
 #-------------------------------------------------------------------
@@ -264,6 +278,30 @@ sub new {
 	my $sub = $session->db->buildHashRef("select name,value from WorkflowActivityData where activityId=?",[$activityId]); 
 	my %data = (%{$main}, %{$sub});
 	bless {_session=>$session, _id=>$activityId, _data=>\%data}, $class;
+}
+
+#-------------------------------------------------------------------
+
+=head2 processPropertiesFromFormPost ( )
+
+Updates activity with data from Form.
+
+=cut
+
+sub processPropertiesFromFormPost {
+	my $self = shift;
+	my %data;
+	foreach my $definition (@{$self->definition($self->session)}) {
+		foreach my $property (keys %{$definition->{properties}}) {
+			$data{$property} = $self->session->form->process(
+				$property,
+				$definition->{properties}{$property}{fieldType},
+				$definition->{properties}{$property}{defaultValue}
+				);
+		}
+	}
+	$data{title} = "Untitled" unless ($data{title});
+	$self->set(\%data);
 }
 
 #-------------------------------------------------------------------

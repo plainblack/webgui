@@ -81,6 +81,7 @@ sub definition {
 		name=>$i18n->get("topicName"),
 		properties=> {
 			storageTimeout => {
+				fieldType=>"interval",
 				label=>$i18n->get("storage timeout"),
 				defaultValue=>6*60*60,
 				hoverHelp=>$i18n->get("storage timeout help")
