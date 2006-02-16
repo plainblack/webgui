@@ -872,7 +872,6 @@ sub getToolbar {
 	} else {
 		$toolbar .= $self->session->icon->locked('func=manageRevisions',$self->get("url"));
 	}
-	$commit = 'contextMenu.addLink("'.$self->getUrl("func=commitRevision").'","'.$i18n->get("commit").'");' if ($self->canEditIfLocked);
         $toolbar .= $self->session->icon->cut('func=cut',$self->get("url"))
             	.$self->session->icon->copy('func=copy',$self->get("url"));
         $toolbar .= $self->session->icon->shortcut('func=createShortcut',$self->get("url")) unless ($self->get("className") =~ /Shortcut/);
@@ -887,7 +886,6 @@ sub getToolbar {
 		contextMenu.addLink("'.$self->getUrl("func=demote").'","'.$i18n->get("demote").'");
 		contextMenu.addLink("'.$self->getUrl("func=manageAssets").'","'.$i18n->get("manage").'");
 		contextMenu.addLink("'.$self->getUrl("func=manageRevisions").'","'.$i18n->get("revisions").'");
-		'.$commit.'
 		contextMenu.addLink("'.$self->getUrl.'","'.$i18n->get("view").'");
 		contextMenu.print();
 		//]]>
@@ -1033,12 +1031,10 @@ sub manageAssets {
          assetManager.AddColumn('".$i18n->get("size")."','','right','');\n";
          $output .= "assetManager.AddColumn('".$i18n->get("locked")."','','center','');\n" unless ($self->session->setting->get("autoCommit"));
 	foreach my $child (@{$self->getLineage(["children"],{returnObjects=>1})}) {
-		my $commit = 'contextMenu.addLink("'.$child->getUrl("func=commitRevision").'","'.$i18n->get("commit").'");' if ($child->canEditIfLocked);
 		$output .= 'var contextMenu = new contextMenu_createWithLink("'.$child->getId.'","More");
                 contextMenu.addLink("'.$child->getUrl("func=editBranch").'","'.$i18n->get("edit branch").'");
                 contextMenu.addLink("'.$child->getUrl("func=createShortcut;proceed=manageAssets").'","'.$i18n->get("create shortcut").'");
 		contextMenu.addLink("'.$child->getUrl("func=manageRevisions").'","'.$i18n->get("revisions").'");
-		'.$commit.'
                 contextMenu.addLink("'.$child->getUrl.'","'.$i18n->get("view").'"); '."\n";
 		my $title = $child->getTitle;
 		$title =~ s/\'/\\\'/g;
