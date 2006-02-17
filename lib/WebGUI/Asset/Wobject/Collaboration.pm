@@ -1153,6 +1153,7 @@ sub www_view {
 # print out RSS 2.0 feed describing the items visible on the first page
 sub www_viewRSS {
 	my $self = shift;
+	 return $self->session->privilege->noAccess() unless $self->canView;
 	my %var;
 
 	$self->logView() if ($self->session->setting->get("passiveProfilingEnabled"));        
