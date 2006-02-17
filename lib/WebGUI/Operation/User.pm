@@ -285,6 +285,7 @@ sub www_editUser {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(11));
 	my $error = shift;
+	my $uid = shift || $session->form->process("uid");
 	my $i18n = WebGUI::International->new($session, "WebGUI");
 	my %tabs;
 	tie %tabs, 'Tie::IxHash';
@@ -294,7 +295,9 @@ sub www_editUser {
 		"groups"=> { label=>$i18n->get('89')},
 		);
 	my $tabform = WebGUI::TabForm->new($session,\%tabs);
-	my $u = WebGUI::User->new($session,($session->form->process("uid") eq 'new') ? '' : $session->form->process("uid"));
+	
+	$uid = '' if ($uid eq 'new');
+	my $u = WebGUI::User->new($session,$uid);
 	$session->style->setScript($session->config->get("extrasURL")."/swapLayers.js", {type=>"text/javascript"});
 	$session->style->setRawHeadTags('<script type="text/javascript">var active="'.$u->authMethod.'";</script>');
     	$tabform->hidden({name=>"op",value=>"editUserSave"});
@@ -402,7 +405,13 @@ sub www_editUserSave {
 	my $error;
 	if (($uid eq $session->form->process("uid") || $uid eq "") && $session->form->process("username") ne '') {
 	   	my $u = WebGUI::User->new($session,$session->form->process("uid"));
-		$session->form->process("uid") = $u->userId unless ( $isAdmin ||$isSecondary);
+
+	   	#many were asked but none could determine what the hell this next line was trying to accomplish
+	   	#we think you were trying to set the uid session variable and others think you actually meant
+	   	#to set the uid via the $user object.  Anyways, you can't do either of those things.
+	   	#
+		#$session->form->process("uid") = $u->userId unless ( $isAdmin ||$isSecondary);
+
 	   	$u->username($session->form->process("username"));
 	   	$u->authMethod($session->form->process("authMethod"));
 	   	$u->status($session->form->process("status"));
@@ -424,7 +433,7 @@ sub www_editUserSave {
 	if ($isSecondary) {
 		return _submenu($session,$i18n->get(978));
 	} else {
-		return www_editUser($session,$error);
+		return www_editUser($session,$error,$uid);
 	}
 }
 
