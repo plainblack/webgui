@@ -186,7 +186,7 @@ sub new {
 	my $class = shift;
 	my $session = shift;
 	my $messageId = shift;
-	bless {_properties=>$self->session->db->getRow("userInbox","messageId",$self->getId), _session=>$session, _messageId=>$messageId}, $class;
+	bless {_properties=>$session->db->getRow("userInbox","messageId",$messageId), _session=>$session, _messageId=>$messageId}, $class;
 }
 
 #-------------------------------------------------------------------
