@@ -31,6 +31,9 @@
    Rich Editor across the entire site without querying the user.
  - Commit options have been removed from the Asset Manager "More" and Wobject
    type icon context menus.
+ - The Navigation Asset now allows setting the MIME type of its output so that
+   you can generate non-HTML navigations or take advantate of the Google
+   SiteMap feature.
 
 6.8.7
  - fix [ 1431098 ] op=becomeUser can become non-existent userIds

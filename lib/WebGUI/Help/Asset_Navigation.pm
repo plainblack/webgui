@@ -9,6 +9,10 @@ our $HELP = {
                                 title => '1096',
                                 description => '1096 description',
                                 namespace => 'Asset_Navigation',
+                        {
+                                title => 'mimeType',
+                                description => 'mimeType description',
+                                namespace => 'Asset_Navigation',
                         },
                         {
                                 title => 'Start Point Type',

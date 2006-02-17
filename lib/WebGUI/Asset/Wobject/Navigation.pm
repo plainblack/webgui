@@ -38,6 +38,10 @@ sub definition {
 				fieldType=>"template",
 				defaultValue=>'PBtmpl0000000000000048'
 				},
+			mimeType =>{
+				fieldType=>"mimeType",
+				defaultValue=>'text/html'
+				},
 			assetsToInclude=>{
 				fieldType=>'checkList',
 				defaultValue=>"descendants"
@@ -85,6 +89,12 @@ sub getEditForm {
       		-namespace=>"Navigation",
 		-label=>$i18n->get(1096),
 		-hoverHelp=>$i18n->get('1096 description'),
+   		);
+   	$tabform->getTab("display")->mimeType(
+      		-value=>$self->getValue('mimeType'),
+      		-name=>"mimeType",
+		-label=>$i18n->get('mimeType'),
+		-hoverHelp=>$i18n->get('mimeType description'),
    		);
 	$tabform->hidden({
 		name=>"returnUrl",
@@ -447,7 +457,6 @@ sub view {
 			($lastChildren{@{$var->{page_loop}}[$counter]->{"page.parent.assetId"}} 
 				eq @{$var->{page_loop}}[$counter]->{"page.assetId"});
 	}
-	#use Data::Dumper;$self->session->errorHandler->warn(Dumper($var));
 	return $self->processTemplate($var,undef,$self->{_viewTemplate});
 }
 
@@ -502,4 +511,24 @@ sub www_preview {
 	return _submenu($output,"preview"); 
 }
 
-1;
+#-------------------------------------------------------------------
+
+=head2 www_view
+
+A web accessible version of the view method.  The SUPER method is overridden so that we can serve
+other types aside from text/html.
+
+=cut
+
+sub www_view {
+	my $self = shift;
+	my $mimeType = $self->getValue('mimeType') || 'text/html';
+	if ($mimeType eq 'text/html') {
+		return $self->SUPER->www_view();
+	}
+	else {
+		$self->prepareView();
+		$self->session->http->setMimeType($mimeType || 'text/html');
+		return $self->view();
+	}
+}1;

@@ -76,7 +76,7 @@ sub definition {
                                 defaultValue=>0
                                 },
 			mimeType=>{
-                        	fieldType=>'text',
+                        	fieldType=>'mimeType',
                                 defaultValue=>'text/html'
                                 }
 
@@ -99,10 +99,6 @@ sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
 	my $i18n = WebGUI::International->new($self->session,"Asset_Snippet");
-	my %mimeTypes;
-	foreach ('text/html','text/css','text/javascript','text/plain','text/xml','application/xml') {
-	    $mimeTypes{$_}=$_;
-	} 
         $tabform->getTab("properties")->codearea(
                 -name=>"snippet",
                 -label=>$i18n->get('assetName'),
@@ -115,12 +111,11 @@ sub getEditForm {
                 -hoverHelp=>$i18n->get('process as template description'),
                 -value=>$self->getValue("processAsTemplate")
                 );
-        $tabform->getTab("properties")->combo(
+        $tabform->getTab("properties")->mimeType(
                 -name=>"mimeType",
                 -label=>$i18n->get('mimeType'),
                 -hoverHelp=>$i18n->get('mimeType description'),
                 -value=>[$self->getValue('mimeType')],
-		-options=>\%mimeTypes
                 );
 
 	return $tabform;

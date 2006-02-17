@@ -33,6 +33,7 @@ updateDatabaseLinksAndSQLReport();
 addWorkflow();
 ipsToCIDR();
 addDisabletoRichEditor();
+addNavigationMimeType();
 
 finish($session); # this line required
 
@@ -406,6 +407,12 @@ sub removeFiles {
 sub addDisabletoRichEditor {
 	print "\tUpdating Rich Editor to add master disable.\n" unless ($quiet);
 	$session->db->write("alter table RichEdit add column disableRichEditor int(11) default '0'");
+}
+
+#-------------------------------------------------
+sub addNavigationMimeType {
+	print "\tAdding Mime Type to Navigations.\n" unless ($quiet);
+	$session->db->write("alter table Navigation add column mimeType varchar(50) default 'text/html'");
 }
 
 #-------------------------------------------------

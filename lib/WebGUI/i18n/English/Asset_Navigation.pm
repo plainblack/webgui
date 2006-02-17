@@ -197,13 +197,17 @@ the Navigation Template to determine who can see them in the menu.</P>
 
 
 	'1093' => {
-		message => q|<P>The Add/Edit Navigation form allows you to do choose the which pages are shown in
-		your site navigation, and how to display them.  Some of the default Navigation templates that come with WebGUI are
-		vertical, horizontal and crumbtrail.  These templates can often be styled via CSS to match your site's design, instead
-		of rewriting the templates.</P>
+		message => q|<p>Navigation Assets will help you build sets of links so that users can get around in your
+site.  You can customize a Navigation form to choose the which pages are shown in
+your site navigation and how to display them.  Some of the default Navigation templates that come with WebGUI are
+vertical, horizontal and crumbtrail.  These templates can often be styled via CSS to match your site's design, instead
+of rewriting the templates.</P>
+<p>The Navigation Asset can also be used to generate XML output by creating a
+template and setting the MIME Type appropriately.  This could be useful for building
+a Google sitemap of your site.
 |,
 
-		lastUpdated => 1121969647,
+		lastUpdated => 1140139614,
 	},
 
 	'1096' => {
@@ -296,6 +300,17 @@ the Navigation Template to determine who can see them in the menu.</P>
 <P>Note: In this example "myMenu" is used, but you can pick any name, as long as it is unique.</P>|,
 		lastUpdated => 1101774239
 	},
+
+	'mimeType' => {
+		message => q|MIME Type|,
+        	lastUpdated => 1140129010,
+	},
+
+
+        'mimeType description' => {
+                message => q|Allows you to specify the MIME type of this asset when viewed via the web; useful if you'd like to serve CSS, plain text,  javascript or other text files directly from the WebGUI asset system. Defaults to <b>text/html</b>.|,
+                lastUpdated => 1140129008,
+        },
 
 };
 

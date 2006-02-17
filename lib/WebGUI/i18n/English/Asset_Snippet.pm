@@ -44,7 +44,7 @@ our $I18N = {
         },
 
         'mimeType description' => {
-                message => q|Allows you to specify the MIME type of this asset when viewed via the web, useful if you'd like to serve CSS, plain text,  javascript or other text files directly from the WebGUI asset system. Defaults to <b>text/html</b>.|,
+                message => q|Allows you to specify the MIME type of this asset when viewed via the web; useful if you'd like to serve CSS, plain text,  javascript or other text files directly from the WebGUI asset system. Defaults to <b>text/html</b>.|,
                 lastUpdated => 1130880372,
         },
 
