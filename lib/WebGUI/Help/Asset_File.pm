@@ -41,12 +41,16 @@ our $HELP = {
 		],
 		related => [
 			{
-				tag => 'file add/edit',
-				namespace => 'Asset_File',
+				tag => 'asset template',
+				namespace => 'Asset',
 			},
 			{
 				tag => 'template language',
 				namespace => 'Asset_Template',
+			},
+			{
+				tag => 'file add/edit',
+				namespace => 'Asset_File',
 			},
 		]
 	},
