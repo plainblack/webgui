@@ -17,7 +17,7 @@ our $HELP = {
                         },
                         {
                                 title => 'In Out Template',
-                                description => 'In Out Template' description',
+                                description => 'In Out Template description',
                                 namespace => 'Asset_InOutBoard',
                         },
                         {
