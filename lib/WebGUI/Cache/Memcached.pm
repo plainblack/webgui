@@ -14,7 +14,7 @@ package WebGUI::Cache::Memcached;
 
 =cut
 
-use WebGUI::Cache::Memcached;
+use Cache::Memcached;
 use Digest::MD5;
 
 our @ISA = qw(WebGUI::Cache);
