@@ -450,7 +450,8 @@ sub www_editUserSave {
 		
 	# Display an error telling them the username they are trying to use is not available and suggest alternatives	
 	} else {
-       		$error = '<ul><li>'.$i18n->get(77).' '.$session->form->process("username").'Too or '.$session->form->process("username").'02</li></ul>';
+		my $username = $session->form->process("username");
+       		$error = '<ul>' . sprintf($i18n->get(77), $username, $username, $username, $session->datetime->epochToHuman($session->datetime->time(),"%y")).'</ul>';
 	}
 	if ($isSecondary) {
 		return _submenu($session,$i18n->get(978));

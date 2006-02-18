@@ -20,9 +20,6 @@ use Test::More tests => 22; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-# base 36
-is(WebGUI::Utility::fromBase36(WebGUI::Utility::toBase36(1234567890)), 1234567890, "{to/from}Base36()");
-
 # commify
 is(WebGUI::Utility::commify(10), "10", 'commify() - no comma needed');
 is(WebGUI::Utility::commify(1000), "1,000", 'commify() - single comma');

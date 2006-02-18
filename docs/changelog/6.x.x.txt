@@ -38,6 +38,7 @@
    you can generate non-HTML navigations or take advantate of the Google
    SiteMap feature.
  - [ 1433525 ] 6.9: Compilation errors 
+ - base36 removed from Utility.t because it no longer exists in WebGUI::Utility.pm
 
 6.8.7
  - fix [ 1431098 ] op=becomeUser can become non-existent userIds

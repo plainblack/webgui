@@ -508,8 +508,12 @@ Be aware that any database links you create here will be available to all conten
 	},
 
 	'77' => {
-		message => q|That account name is already in use by another member of this site. Please try a different username. The following are some suggestions:|,
-		lastUpdated => 1031514049
+		message => q|<li>That account name is already in use by another member of this site. Please try a different username. The following are some suggestions:<br />
+%sToo<br />
+%s2<br />
+%s_%d<br />
+</li>|,
+		lastUpdated => 1140292461
 	},
 
 	'444' => {
