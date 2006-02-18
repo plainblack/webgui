@@ -333,8 +333,9 @@ sub editUserForm {
 
 sub editUserFormSave {
    my $self = shift;
+   my $userId = $self->session->form->get("uid");
    my $properties;
-   my $userData = $self->getParams;
+   my $userData = $self->getParams($userId);
    unless (!$self->session->form->process('authWebGUI.identifier') || $self->session->form->process('authWebGUI.identifier') eq "password") {
       $properties->{identifier} = Digest::MD5::md5_base64($self->session->form->process('authWebGUI.identifier'));
 	   if($userData->{identifier} ne $properties->{identifier}){

@@ -624,7 +624,9 @@ sub new {
 	$self->{_session} = shift;
 	$self->{authMethod} = shift;
 	my $userId = shift || $self->{_session}->user->userId;
-	$self->{user} = $self->{_session}->user;
+	# Can't do this... if you're updating the account of a user that's not you, this will not work
+	#$self->{user} = $self->{_session}->user;
+	$self->{user} = WebGUI::User->new($self->{_session}, $userId);
 	$self->{error} = "";
 	$self->{profile} = ();
 	$self->{warning} = "";

@@ -294,20 +294,21 @@ sub getSubEvents {
 	my $self = shift;
 	my $eventId = shift;
 	my @subEvents;
+	#Get a list of all unique prerequisiteIds where requiredProductId matches eventId.  The productId
+	#associated with the prerequisite entry is the one that requires the event we're listing.
 	
 	my @prerequisites = $self->session->db->buildArray("
-			    select prerequisiteId from EventManagementSystem_prerequisites
-			    where productId=".$self->session->db->quote($eventId));
+			    select distinct(prerequisiteId) from EventManagementSystem_prerequisiteEvents
+			    where requiredProductId=".$self->session->db->quote($eventId));
 	print "<pre>".Dumper(@prerequisites)."</pre>";
 	
 	foreach my $prerequisite (@prerequisites) {
 		
 		my $sth = $self->session->db->read("
 			select p.productId, p.title, pr.operator
-			from products as p, EventManagementSystem_prerequisites as pr, EventManagementSystem_prerequisiteEvents as pe
+			from products as p, EventManagementSystem_prerequisites as pr
 			where
-			 p.productId = pe.requiredProductId and
-			 pr.prerequisiteId = pe.prerequisiteId and
+			 p.productId = pr.productId and
 			 pr.prerequisiteId =".$self->session->db->quote($prerequisite));
 		my %eventList;
 		my $operator;
@@ -841,7 +842,7 @@ sub view {
 		   where
 		   	p.productId = e.productId and approved=1
 		   	and e.assetId =".$self->session->db->quote($self->get("assetId"))." 
-			and p.productId not in (select distinct(requiredProductId) from EventManagementSystem_prerequisiteEvents)";		
+			and p.productId not in (select distinct(productId) from EventManagementSystem_prerequisites)";		
 
 	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->get("paginateAfter"));
 	$p->setDataByQuery($sql);
