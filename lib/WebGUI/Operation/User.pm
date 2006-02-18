@@ -296,14 +296,13 @@ sub www_editUser {
 		);
 	my $tabform = WebGUI::TabForm->new($session,\%tabs);
 	
-	$uid = '' if ($uid eq 'new');
-	my $u = WebGUI::User->new($session,$uid);
+	my $u = WebGUI::User->new($session,($uid eq 'new') ? '' : $uid); #Setting uid to '' when uid is 'new' so visitor defaults prefill field for new user
 	$session->style->setScript($session->config->get("extrasURL")."/swapLayers.js", {type=>"text/javascript"});
 	$session->style->setRawHeadTags('<script type="text/javascript">var active="'.$u->authMethod.'";</script>');
     	$tabform->hidden({name=>"op",value=>"editUserSave"});
-    	$tabform->hidden({name=>"uid",value=>$session->form->process("uid")});
+    	$tabform->hidden({name=>"uid",value=>$uid});
     	$tabform->getTab("account")->raw('<tr><td width="170">&nbsp;</td><td>&nbsp;</td></tr>');
-	$tabform->getTab("account")->readOnly(value=>$session->form->process("uid"),label=>$i18n->get(378));
+	$tabform->getTab("account")->readOnly(value=>$uid,label=>$i18n->get(378));
     	$tabform->getTab("account")->readOnly(value=>$u->karma,label=>$i18n->get(537)) if ($session->setting->get("useKarma"));
     	$tabform->getTab("account")->readOnly(value=>$session->datetime->epochToHuman($u->dateCreated,"%z"),label=>$i18n->get(453));
     	$tabform->getTab("account")->readOnly(value=>$session->datetime->epochToHuman($u->lastUpdated,"%z"),label=>$i18n->get(454));
@@ -393,47 +392,66 @@ sub www_editUser {
 
 #-------------------------------------------------------------------
 sub www_editUserSave {
-	my $session = shift;	
+	my $session = shift;
+	my $postedUserId = $session->form->process("uid"); #userId posted from www_editUser form
 	my $isAdmin = $session->user->isInGroup(3);
 	my $isSecondary;
-	unless ($isAdmin) {
-		$isSecondary = ($session->user->isInGroup(11) && $session->form->process("uid") eq "new");
-	}
-	return $session->privilege->adminOnly() unless ($isAdmin || $isSecondary);
 	my $i18n = WebGUI::International->new($session);
-	my ($uid) = $session->db->quickArray("select userId from users where username=".$session->db->quote($session->form->process("username")));
+	my ($existingUserId) = $session->db->quickArray("select userId from users where username=".$session->db->quote($session->form->process("username")));
 	my $error;
-	if (($uid eq $session->form->process("uid") || $uid eq "") && $session->form->process("username") ne '') {
-	   	my $u = WebGUI::User->new($session,$session->form->process("uid"));
+	my $actualUserId;  #userId returned from the user object
 
-	   	#many were asked but none could determine what the hell this next line was trying to accomplish
-	   	#we think you were trying to set the uid session variable and others think you actually meant
-	   	#to set the uid via the $user object.  Anyways, you can't do either of those things.
-	   	#
-		#$session->form->process("uid") = $u->userId unless ( $isAdmin ||$isSecondary);
+	unless ($isAdmin) {
+		$isSecondary = ($session->user->isInGroup(11) && $postedUserId eq "new");
+	}
 
+	return $session->privilege->adminOnly() unless ($isAdmin || $isSecondary);
+
+	#Check to see if the userId associated with the posted username matches the posted userId or that the userId is new
+	#Also verify that the posted username is not blank
+	if (($existingUserId eq $postedUserId || $postedUserId eq "new") && $session->form->process("username") ne '') {
+
+		# Create a user object with the id passed in.  If the Id is 'new', the new method will return a new user,
+		# otherwise return the existing users properties
+	   	my $u = WebGUI::User->new($session,$postedUserId);
+	   	$actualUserId = $u->userId;
+	   	
+		# Update the user properties with passed in values.  These methods will save changes to the db.
 	   	$u->username($session->form->process("username"));
 	   	$u->authMethod($session->form->process("authMethod"));
 	   	$u->status($session->form->process("status"));
+
+	   	# Loop through all of this users authentication methods
 	   	foreach (@{$session->config->get("authMethods")}) {
-	      		my $authInstance = WebGUI::Operation::Auth::getInstance($session,$_,$u->userId);
-	      		$authInstance->editUserFormSave;
+
+	   		# Instantiate each auth object and call it's save method.  These methods are responsible for
+	   		# updating authentication information with values supplied by the www_editUser form.
+	      		my $authInstance = WebGUI::Operation::Auth::getInstance($session, $_, $actualUserId);
+	      		$authInstance->editUserFormSave();
        		}
+       		
+       		# Loop through all profile fields, and update them with new values.
 		foreach my $field (@{WebGUI::ProfileField->new($session,'dummy')->getFields}) {
 			next if $field->getId =~ /contentPositions/;
 			$u->profileField($field->getId,$field->formProcess);
 		}
+		
+		# Update group assignements
 		my @groups = $session->form->group("groupsToAdd");
 		$u->addToGroups(\@groups);
 		@groups = $session->form->group("groupsToDelete");
 		$u->deleteFromGroups(\@groups);
+		
+	# Display an error telling them the username they are trying to use is not available and suggest alternatives	
 	} else {
        		$error = '<ul><li>'.$i18n->get(77).' '.$session->form->process("username").'Too or '.$session->form->process("username").'02</li></ul>';
 	}
 	if ($isSecondary) {
 		return _submenu($session,$i18n->get(978));
+
+	# Display updated user information
 	} else {
-		return www_editUser($session,$error,$uid);
+		return www_editUser($session,$error,$actualUserId);
 	}
 }
 
