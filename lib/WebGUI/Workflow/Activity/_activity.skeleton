@@ -1,4 +1,4 @@
-package WebGUI::Workflow::Activity::CommitVersionTag;
+package WebGUI::Workflow::Activity::Skeleton; # change "Skeleton" to your namespace.
 
 
 =head1 LEGAL
@@ -17,16 +17,14 @@ package WebGUI::Workflow::Activity::CommitVersionTag;
 
 use strict;
 use base 'WebGUI::Workflow::Activity';
-use WebGUI::VersionTag;
-
 
 =head1 NAME
 
-Package WebGUI::Workflow::Activity::CommitVersionTag
+Package WebGUI::Workflow::Activity::Skeleton
 
 =head1 DESCRIPTION
 
-This activity commmits an open version tag.
+Tell a little about what this activity does.
 
 =head1 SYNOPSIS
 
@@ -37,6 +35,7 @@ See WebGUI::Workflow::Activity for details on how to use any activity.
 These methods are available from this class:
 
 =cut
+
 
 #-------------------------------------------------------------------
 
@@ -50,10 +49,16 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, "Workflow_Activity_CommitVersionTag");
 	push(@{$definition}, {
 		name=>$i18n->get("topicName"),
-		properties=> { }
+		properties=> {
+			someField => {
+				fieldType=>"integer",
+				label=>"Some Field"
+				defaultValue=>0,
+				hoverHelp=>"Hover help for some field."
+				},
+			}
 		});
 	return $class->SUPER::definition($session,$definition);
 }
@@ -61,7 +66,7 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 execute (  )
+=head2 execute ( [ object ] )
 
 See WebGUI::Workflow::Activity::execute() for details.
 
@@ -69,10 +74,8 @@ See WebGUI::Workflow::Activity::execute() for details.
 
 sub execute {
 	my $self = shift;
-	my $versionTag = shift;
-	$versionTag->commit;
+	# do some work here, whatever this activity is supposed to do
 }
-
 
 
 

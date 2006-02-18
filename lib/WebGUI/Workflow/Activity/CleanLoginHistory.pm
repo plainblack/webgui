@@ -1,4 +1,4 @@
-package WebGUI::Workflow::Activity::CommitVersionTag;
+package WebGUI::Workflow::Activity::CleanLoginHistory;
 
 
 =head1 LEGAL
@@ -17,16 +17,14 @@ package WebGUI::Workflow::Activity::CommitVersionTag;
 
 use strict;
 use base 'WebGUI::Workflow::Activity';
-use WebGUI::VersionTag;
-
 
 =head1 NAME
 
-Package WebGUI::Workflow::Activity::CommitVersionTag
+Package WebGUI::Workflow::Activity::CleanLoginHistory
 
 =head1 DESCRIPTION
 
-This activity commmits an open version tag.
+Deletes some of the old cruft from the userLoginLog table.
 
 =head1 SYNOPSIS
 
@@ -37,6 +35,7 @@ See WebGUI::Workflow::Activity for details on how to use any activity.
 These methods are available from this class:
 
 =cut
+
 
 #-------------------------------------------------------------------
 
@@ -50,10 +49,17 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, "Workflow_Activity_CommitVersionTag");
+	my $i18n = WebGUI::International->new($session, "Workflow_Activity_CleanLoginHistory");
 	push(@{$definition}, {
 		name=>$i18n->get("topicName"),
-		properties=> { }
+		properties=> {
+			ageToDelete => {
+				fieldType=>"interval",
+				label=>$i18n->get("age to delete"),
+				defaultValue=>60 * 60 * 24 * 90,
+				hoverHelp=>$i18n->get("age to delete help")
+				}
+			}
 		});
 	return $class->SUPER::definition($session,$definition);
 }
@@ -69,10 +75,8 @@ See WebGUI::Workflow::Activity::execute() for details.
 
 sub execute {
 	my $self = shift;
-	my $versionTag = shift;
-	$versionTag->commit;
+        $self->session->db->write("delete from userLoginLog where timeStamp < ?", [(time()-(86400*$self->get("ageToDelete")))]);
 }
-
 
 
 

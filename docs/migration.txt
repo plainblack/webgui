@@ -196,7 +196,7 @@ be using this any longer anyway, but we thought we'd warn you anyway.
 
 1.8 Output Chunking
 
-Starting in 6.9 WebGUI www_ asset methods are capable of having full control
+Starting in 6.99 WebGUI www_ asset methods are capable of having full control
 over the output buffer. They can use $session->output->print() to send chunks
 of content back to the browser before the page is entirely processed. The 
 advantage here is that the page appears to load more quickly to the end user.
@@ -275,10 +275,14 @@ take a look a WebGUI::Asset::Template for changes in the template system API.
 4. Scheduler Migration
 -----------------------
 
-4.1 Nothing Yet
+4.1 Converted to Workflow
 
-There have currently been no changes to the scheduler API.
-
+As of 6.99 we've converted the scheduler (runHourly.pl) and it's plugins
+(sbin/Hourly/*) to the new WebGUI Workflow system. The program that replaces
+runHourly.pl is sbin/spectre.pl, which is always running and therefore doesn't
+need to be scheduled via crontab or Windows Scheduler. To see the new API for
+the sbin/Hourly/* scripts, check out
+lib/WebGUI/Workflow/Activity/_activity.skeleton
 
 
 5. System Changes Affecting Migration
@@ -564,7 +568,7 @@ Apache2::Request which is referenced through $session{modperl} and $session{req}
 
 5.23 Session System Replaced
 
-As of 6.9.0 we've removed the old global session system and replaced it with a
+As of 6.99 we've removed the old global session system and replaced it with a
 newer, safer, more modern, object oriented session system. Because session is
 the glue that holds WebGUI together, it has basically affected every API in
 the system. Here's a (hopefully complete) list of what's been changed and how
@@ -630,7 +634,7 @@ perl -pi.bak -e 's!\$session{scratch}{(.*)}!\$self->session->scratch->get("$1")!
 
 5.23.1 WebGUI::SQL API Refactored
 
-The SQL API has been made more object oriented in 6.9, so it now handles database
+The SQL API has been made more object oriented in 6.99, so it now handles database
 connections for you. You can get the default database connection via
 $session->db or a random slave via $session->dbSlave or you can create your
 own by my $db = WebGUI::SQL->connect($session, $dsn, $user, $pass);
@@ -654,14 +658,14 @@ perl -pi.bak -e 's!WebGUI\:\:FormProcessor\:\:!\$self->session->form->!g' fileNa
 
 5.23.3 WebGUI::ErrorHandler API Refactored
 
-As of 6.9 WebGUI::ErrorHandler is now accessed through session.
+As of 6.99  WebGUI::ErrorHandler is now accessed through session.
 
 perl -pi.bak -e 's!WebGUI\:\:ErrorHandler\:\:!\$self->session->errorHandler->!g' fileNameGoesHere
 
 
 5.23.4 WebGUI::Style API Refactored
 
-As of 6.9 the WebGUI::Style API has been convereted to OO and is accessed
+As of 6.99 the WebGUI::Style API has been convereted to OO and is accessed
 through session. The following command line tricks will help you convert your
 assets.
 
@@ -679,14 +683,14 @@ perl -pi.bak -e 's!WebGUI\:\:Macro\:\:process\((.*)\)!WebGUI::Macro::process(\$s
 
 5.23.6 WebGUI::URL API Refactored
 
-As of 6.9 WebGUI::URL is now accessed through session like $session->url
+As of 6.99 WebGUI::URL is now accessed through session like $session->url
 
 perl -pi.bak -e 's!WebGUI\:\:URL\:\:!\$self->session->url->!g' fileNameGoesHere
 
 
 5.23.7 WebGUI::Cache API Refactored
 
-As of 6.9 WebGUI::Cache requires you to pass in a reference to $session into
+As of 6.99 WebGUI::Cache requires you to pass in a reference to $session into
 the constructor.
 
 perl -pi.bak -e 's!WebGUI\:\:Cache\-\>new\(!WebGUI::Cache->new(\$self->session,!g' fileNameGoesHere
@@ -694,7 +698,7 @@ perl -pi.bak -e 's!WebGUI\:\:Cache\-\>new\(!WebGUI::Cache->new(\$self->session,!
 
 5.23.8 WebGUI::AdminConsole Refactored
 
-As of 6.9 WebGUI::AdminConsole requires you to pass a reference to $session
+As of 6.99 WebGUI::AdminConsole requires you to pass a reference to $session
 into the constructor.
 
 perl -pi.bak -e 's!WebGUI\:\:AdminConsole\-\>new\(!WebGUI::AdminConsole->new(\$self->session,!g' fileNameGoesHere
@@ -702,7 +706,7 @@ perl -pi.bak -e 's!WebGUI\:\:AdminConsole\-\>new\(!WebGUI::AdminConsole->new(\$s
 
 5.23.9 WebGUI::DatabaseLink API Refactored
 
-As of 6.9 WebGUI::DatabaseLink requires  you to pass in a reference to
+As of 6.99 WebGUI::DatabaseLink requires  you to pass in a reference to
 $session into the constructor. Also, the API has been heavily refactored to be
 more complete. Please see it's API docs for more info.
 
@@ -712,7 +716,7 @@ perl -pi.bak -e 's!WebGUI\:\:DatabaseLink\-\>new\(!WebGUI::DatabaseLink->new(\$s
 5.23.10 WebGUI::Privilege API Refactored
 
 WebGUI::Privilege is now accessed through session like $session->privilege as
-of 6.9.
+of 6.99.
 
 perl -pi.bak -e 's!WebGUI\:\:Privilege\:\:!\$self->session->privilege->!g' fileNameGoesHere
 
@@ -735,7 +739,7 @@ perl -pi.bak -e 's!WebGUI\:\:DateTime\:\:!\$self->session->datetime->!g' fileNam
 
 5.23.12 WebGUI::Form API Refactored
 
-In 6.9 the WebGUI::Form API was refactored to accept $session as the first
+In 6.99 the WebGUI::Form API was refactored to accept $session as the first
 parameter to each method.
 
 perl -pi.bak -e 's!WebGUI\:\:Form\:\:(\w+)\((.*)\)!WebGUI::Form::$1(\$self->session,$2)!g' fileNameGoesHere

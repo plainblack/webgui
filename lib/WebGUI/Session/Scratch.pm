@@ -76,7 +76,7 @@ Deletes all scratch variables for this session.
 sub deleteAll {
 	my $self = shift;
 	delete $self->{_data};
-	$self->session->db->write("delete from userSessionScratch where sessionId=".$self->session->db->quote($self->{_sessionId}));
+	$self->session->db->write("delete from userSessionScratch where sessionId=?", [$self->{_sessionId}]);
 }
 
 
@@ -97,7 +97,32 @@ sub deleteName {
 	my $name = shift;
 	return undef unless ($name);	
 	delete $self->{_data}{$name};
-	$self->session->db->write("delete from userSessionScratch where name=".$self->session->db->quote($name));
+	$self->session->db->write("delete from userSessionScratch where name=?", [$name]);
+}
+
+#-------------------------------------------------------------------
+
+=head2 deleteNameByValue ( name, value )
+
+Deletes a scratch variable for all users where a particular name equals a particular value. This function must be used with care.
+
+=head3 name
+
+The name of the scratch variable.
+
+=head3 value
+
+The value to match.
+
+=cut
+
+sub deleteName {
+	my $self = shift;
+	my $name = shift;
+	my $value = shift;
+	return undef unless ($name);	
+	delete $self->{_data}{$name};
+	$self->session->db->write("delete from userSessionScratch where name=? and value=?", [$name,$value]);
 }
 
 

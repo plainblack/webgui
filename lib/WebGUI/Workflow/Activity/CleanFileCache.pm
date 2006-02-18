@@ -1,4 +1,4 @@
-package WebGUI::Workflow::Activity::CommitVersionTag;
+package WebGUI::Workflow::Activity::CleanFileCache;
 
 
 =head1 LEGAL
@@ -17,16 +17,15 @@ package WebGUI::Workflow::Activity::CommitVersionTag;
 
 use strict;
 use base 'WebGUI::Workflow::Activity';
-use WebGUI::VersionTag;
-
+use WebGUI::Cache::FileCache;
 
 =head1 NAME
 
-Package WebGUI::Workflow::Activity::CommitVersionTag
+Package WebGUI::Workflow::Activity::CleanFileCache
 
 =head1 DESCRIPTION
 
-This activity commmits an open version tag.
+This activity deletes files from the file cache if the file cache has gotten too big.
 
 =head1 SYNOPSIS
 
@@ -37,6 +36,7 @@ See WebGUI::Workflow::Activity for details on how to use any activity.
 These methods are available from this class:
 
 =cut
+
 
 #-------------------------------------------------------------------
 
@@ -50,10 +50,18 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, "Workflow_Activity_CommitVersionTag");
+	my $i18n = WebGUI::International->new($session, "Workflow_Activity_CleanFileCache");
 	push(@{$definition}, {
 		name=>$i18n->get("topicName"),
-		properties=> { }
+		properties=> {
+			sizeLimit => {
+				fieldType=>"integer",
+				label=>$i18n->get("size limit"),
+				subtext=>$i18n->get("bytes"),
+				defaultValue=>100000000,
+				hoverHelp=>$i18n->get("size limit help")
+				}
+			}
 		});
 	return $class->SUPER::definition($session,$definition);
 }
@@ -69,10 +77,14 @@ See WebGUI::Workflow::Activity::execute() for details.
 
 sub execute {
 	my $self = shift;
-	my $versionTag = shift;
-	$versionTag->commit;
+        my $size = $self->get("sizeLimit") + 10;
+        my $expiresModifier = 0;
+        my $cache = WebGUI::Cache::FileCache->new;
+        while ($size > $self->get("sizeLimit")) {
+                $size = $cache->getNamespaceSize($expiresModifier);
+                $expiresModifier += 60 * 30; # add 30 minutes each pass
+        }
 }
-
 
 
 

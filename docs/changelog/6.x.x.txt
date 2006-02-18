@@ -1,4 +1,7 @@
 6.9.0
+ - Added a workflow system.
+ - Added a workflow scheduler system.
+ - Converted the runHourly.pl scripts to run as scheduled workflows. 
  - Converted WebGUI to use a new object oriented session system. More details
    in migation.txt.
  - Added a lot more tests to the test suite.

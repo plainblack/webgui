@@ -97,16 +97,19 @@ sub addWorkflow {
 		primary key (activityId, name)
 		)");
 	my $workflow = WebGUI::Workflow->create($session, {
-		title=>"Clean Up Temp Files",
-		description=>"This workflow deletes temporary files from the WebGUI uploads folder.",
+		title=>"Daily Maintenance Tasks",
+		description=>"This workflow runs daily maintenance tasks such as cleaning up old temporary files and cache.",
 		enabled=>1,
 		type=>"none"
 		}, "pbworkflow000000000001");
 	my $activity = $workflow->addActivity("WebGUI::Workflow::Activity::CleanTempStorage", "pbwfactivity0000000001");
-	$activity->set("title","Delete files older than 24 hours");
+	$activity->set("title","Delete temp files older than 24 hours");
 	$activity->set("storageTimeout",60*60*24);
-	my $cron = WebGUI::Workflow::Cron->create($session, {
-		title=>'Delete temp files',
+	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::CleanFileCache", "pbwfactivity0000000002");
+	$activity->set("title","Prune cache larger than 100MB");
+	$activity->set("sizeLimit", 1000000000);
+	WebGUI::Workflow::Cron->create($session, {
+		title=>'Daily Maintenance',
 		enabled=>1,
 		runOnce=>0,
 		minuteOfHour=>"30",
@@ -115,10 +118,40 @@ sub addWorkflow {
 		workflowId=>$workflow->getId
 		}, "pbcron0000000000000001");
 	$session->config->set("workflowActivities", {
-		none=>["WebGUI::Workflow::Activity::CleanTempStorage"],
+		none=>["WebGUI::Workflow::Activity::DecayKarma", "WebGUI::Workflow::Activity::TrashClipboard", "WebGUI::Workflow::Activity::CleanTempStorage", 
+			"WebGUI::Workflow::Activity::CleanFileCache", "WebGUI::Workflow::Activity::CleanLoginHistory"],
 		user=>[],
-		versiontag=>[]
+		versiontag=>["WebGUI::Workflow::Activity::CommitVersionTag", "WebGUI::Workflow::Activity::RollbackVersionTag"]
 		});
+	$workflow = WebGUI::Workflow->create($session, {
+		title=>"Weekly Maintenance Tasks",
+		description=>"This workflow runs once per week to perform maintenance tasks like cleaning up log files.",
+		enabled=>1,
+		type=>"none"
+		}, "pbworkflow000000000002");
+	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::CleanLoginHistory", "pbwfactivity0000000003");
+	$activity->set("title", "Delete login entries older than 90 days");
+	$activity->set("ageToDelete", 60*60*24*90);
+	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::TrashClipboard", "pbwfactivity0000000004");
+	$activity->set("title", "Move clipboard items older than 30 days to trash");
+	$activity->set("trashAfter", 60*60*24*30);
+	WebGUI::Workflow::Cron->create($session, {
+                title=>'Weekly Maintenance Maintenance',
+                enabled=>1,
+                runOnce=>0,
+                minuteOfHour=>"30",
+                hourOfDay=>"1",
+		dayOfWeek=>"0",
+                priority=>3,
+                workflowId=>$workflow->getId
+                }, "pbcron0000000000000002");
+	$session->db->write("alter table assetVersionTag add column isLocked int not null default 0");
+	$session->db->write("alter table assetVersionTag add column lockedBy varchar(22) binary not null");
+	$session->config->delete("fileCacheSizeLimit");
+	$session->config->delete("CleanLoginHistory_ageToDelete");
+	$session->config->delete("DecayKarma_minimumKarma");
+	$session->config->delete("DecayKarma_decayFactor");
+	$session->config->delete("DeleteExpiredClipboard_offset");
 }
 
 #-------------------------------------------------

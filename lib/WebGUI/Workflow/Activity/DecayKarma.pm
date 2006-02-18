@@ -1,4 +1,4 @@
-package WebGUI::Workflow::Activity::CommitVersionTag;
+package WebGUI::Workflow::Activity::DecayKarma;
 
 
 =head1 LEGAL
@@ -17,16 +17,14 @@ package WebGUI::Workflow::Activity::CommitVersionTag;
 
 use strict;
 use base 'WebGUI::Workflow::Activity';
-use WebGUI::VersionTag;
-
 
 =head1 NAME
 
-Package WebGUI::Workflow::Activity::CommitVersionTag
+Package WebGUI::Workflow::Activity::DecayKarma
 
 =head1 DESCRIPTION
 
-This activity commmits an open version tag.
+Subtracts a little bit of karma from each user. This can be used to slowly degrade the abilities of the users who stay away from the site for a long period of time.
 
 =head1 SYNOPSIS
 
@@ -37,6 +35,7 @@ See WebGUI::Workflow::Activity for details on how to use any activity.
 These methods are available from this class:
 
 =cut
+
 
 #-------------------------------------------------------------------
 
@@ -50,10 +49,23 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, "Workflow_Activity_CommitVersionTag");
+	my $i18n = WebGUI::International->new($session, "Workflow_Activity_DecayKarma");
 	push(@{$definition}, {
 		name=>$i18n->get("topicName"),
-		properties=> { }
+		properties=> {
+			minimumKarma => {
+				fieldType=>"integer",
+				label=>$i18n->get("minimum karma"),
+				defaultValue=>0,
+				hoverHelp=>$i18n->get("minimum karma help")
+				},
+			decayFactor => {
+				fieldType=>"integer",
+				label=>$i18n->get("decay factor"),
+				defaultValue=>1,
+				hoverHelp=>$i18n->get("decay factor help")
+				}
+			}
 		});
 	return $class->SUPER::definition($session,$definition);
 }
@@ -69,10 +81,8 @@ See WebGUI::Workflow::Activity::execute() for details.
 
 sub execute {
 	my $self = shift;
-	my $versionTag = shift;
-	$versionTag->commit;
+        $self->session->db->write("update users set karma=karma-? where karma > ?", [$self->get("decayFactor"), $self->get("minimumKarma")]);
 }
-
 
 
 

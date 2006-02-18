@@ -1,4 +1,4 @@
-package WebGUI::Workflow::Activity::CommitVersionTag;
+package WebGUI::Workflow::Activity::TrashClipboard;
 
 
 =head1 LEGAL
@@ -17,16 +17,14 @@ package WebGUI::Workflow::Activity::CommitVersionTag;
 
 use strict;
 use base 'WebGUI::Workflow::Activity';
-use WebGUI::VersionTag;
-
 
 =head1 NAME
 
-Package WebGUI::Workflow::Activity::CommitVersionTag
+Package WebGUI::Workflow::Activity::TrashClipboard;
 
 =head1 DESCRIPTION
 
-This activity commmits an open version tag.
+Deletes 
 
 =head1 SYNOPSIS
 
@@ -37,6 +35,7 @@ See WebGUI::Workflow::Activity for details on how to use any activity.
 These methods are available from this class:
 
 =cut
+
 
 #-------------------------------------------------------------------
 
@@ -50,10 +49,17 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, "Workflow_Activity_CommitVersionTag");
+	my $i18n = WebGUI::International->new($session, "Workflow_Activity_TrashClipboard");
 	push(@{$definition}, {
 		name=>$i18n->get("topicName"),
-		properties=> { }
+		properties=> {
+			trashAfter => {
+				fieldType=>"interval",
+				label=>$i18n->get("trash after"),
+				defaultValue=>60 * 60 * 24 * 30,
+				hoverHelp=>$i18n->get("trash after help")
+				}
+			}
 		});
 	return $class->SUPER::definition($session,$definition);
 }
@@ -69,10 +75,13 @@ See WebGUI::Workflow::Activity::execute() for details.
 
 sub execute {
 	my $self = shift;
-	my $versionTag = shift;
-	$versionTag->commit;
+        my $expireDate = (time()-(86400*$self->get("trashAfter")));
+        my $sth = $self->session->db->read("select assetId,className from asset where state='clipboard' and stateChanged < ?", [$expireDate]);
+        while (my ($id, $class) = $sth->array) {
+        	my $asset = WebGUI::Asset->new($id,$class);
+        	$asset->trash;
+       	}
 }
-
 
 
 

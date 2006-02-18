@@ -50,10 +50,6 @@
 
 # "fileCacheRoot" : "/path/to/cache",
 
-# Tell WebGUI how big to let the file cache grow in bytes.
-
-"fileCacheSizeLimit" : 100000000,
-
 # Support for the memcached distributed caching system.
 # See http://www.danga.com/memcached/ for details on memcached.
 # Uncomment this and point it to your memcached server(s). Use a
@@ -281,24 +277,6 @@
 # in the UI.
 
 "passiveProfileInterval" : 86400,
-
-# If specified, the user login log will delete login history
-# information older than the specified value. It is specified in
-# days.
-
-# "CleanLoginHistory_ageToDelete" : 90,
-
-# If minimum karma and decay factor are both specified, then a
-# user's karma will be decremented by the decay factor every hour
-# until the user has less than the minimum karma.
-
-# "DecayKarma_minimumKarma" : 100, 
-# "DecayKarma_decayFactor" : 1,
-
-# Specify the number of days content should remain in the
-# clipboard before being moved to the trash.
-
-"DeleteExpiredClipboard_offset" : 30,
 
 # Specify the number of days content should remain in the trash
 # before it gets purged from the system completely.

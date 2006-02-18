@@ -246,11 +246,23 @@ sub set {
 	}
 	$self->{_data}{title} = $properties->{title} || $self->{_data}{title} || "Untitled";
 	$self->{_data}{priority} = $properties->{priority} || $self->{_data}{priority} || 2;
-	$self->{_data}{minuteOfHour} = $properties->{minuteOfHour} || $self->{_data}{minuteOfHour} || 0;
-	$self->{_data}{hourOfDay} = $properties->{hourOfDay} || $self->{_data}{hourOfDay} || "*";
 	$self->{_data}{dayOfMonth} = $properties->{dayOfMonth} || $self->{_data}{dayOfMonth} || "*";
 	$self->{_data}{monthOfYear} = $properties->{monthOfYear} || $self->{_data}{monthOfYear} || "*";
-	$self->{_data}{dayOfWeek} = $properties->{dayOfWeek} || $self->{_data}{dayOfWeek} || "*";
+	if ($properties->{minuteOfHour} ne "") {
+		$self->{_data}{minuteOfHour} = $properties->{minuteOfHour};
+	} elsif ($self->{_data}{minuteOfHour} eq "") {
+		$self->{_data}{minuteOfHour} = "0";
+	}
+	if ($properties->{hourOfDay} ne "") {
+		$self->{_data}{hourOfDay} = $properties->{hourOfDay};
+	} elsif ($self->{_data}{hourOfDay} eq "") {
+		$self->{_data}{hourOfDay} = "*";
+	}
+	if ($properties->{dayOfWeek} ne "") {
+		$self->{_data}{dayOfWeek} = $properties->{dayOfWeek};
+	} elsif ($self->{_data}{dayOfWeek} eq "") {
+		$self->{_data}{dayOfWeek} = "*";
+	}
 	$self->{_data}{workflowId} = $properties->{workflowId} || $self->{_data}{workflowId};
 	$self->{_data}{className} = (exists $properties->{className}) ? $properties->{className} : $self->{_data}{className};
 	$self->{_data}{methodName} = (exists $properties->{methodName}) ? $properties->{methodName} : $self->{_data}{methodName};

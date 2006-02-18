@@ -1,4 +1,4 @@
-package WebGUI::Workflow::Activity::CommitVersionTag;
+package WebGUI::Workflow::Activity::RollbackVersionTag;
 
 
 =head1 LEGAL
@@ -22,11 +22,11 @@ use WebGUI::VersionTag;
 
 =head1 NAME
 
-Package WebGUI::Workflow::Activity::CommitVersionTag
+Package WebGUI::Workflow::Activity::RollbackVersionTag
 
 =head1 DESCRIPTION
 
-This activity commmits an open version tag.
+This activity rolls back a version tag.
 
 =head1 SYNOPSIS
 
@@ -50,7 +50,7 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, "Workflow_Activity_CommitVersionTag");
+	my $i18n = WebGUI::International->new($session, "Workflow_Activity_RollbackVersionTag");
 	push(@{$definition}, {
 		name=>$i18n->get("topicName"),
 		properties=> { }
@@ -70,7 +70,7 @@ See WebGUI::Workflow::Activity::execute() for details.
 sub execute {
 	my $self = shift;
 	my $versionTag = shift;
-	$versionTag->commit;
+	$versionTag->rollback;
 }
 
 

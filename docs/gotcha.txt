@@ -7,15 +7,19 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
-6.9.0
+6.99.0
 --------------------------------------------------------------------
+ * The 6.99 series is the last round of changes before 7.0.0 is
+	released. It will serve as the beta, gamma, and release
+	candidates for 7.0.0.
+
  * The session system has been replaced by a new object-oriented one,
 	which has caused massive API changes. Please consult
 	migration.txt to bring your custom code up to date with the
 	new API.
 
  * You need to upgrade to the latest 6.8 release before you can
-	upgrade to 6.9.
+	upgrade to 6.99.
 
  * If you wish to use one of the new optional template engines
 	you'll need to install the perl modules for them:
@@ -42,6 +46,11 @@ save you many hours of grief.
 	from the current PlainConfig format to the new JSON format.
 	Don't be alarmed by this, it's a normal part of the upgrade
 	procedure.
+
+ * You no longer need the cron job for runHourly.pl. Instead, you
+	must start sbin/spectre.pl when your server starts up.
+	Spectre is WebGUI's offline execution engine. It triggers
+	scheduled events and executes workflow tasks.
 
 
 6.8.4
