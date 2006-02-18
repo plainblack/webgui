@@ -51,7 +51,7 @@ A hash reference containing template variables and loops.
 sub process {
 	my $class = shift;
 	my $template = shift;
-	my $vars = $self->addSessionVars(shift);
+	my $vars = $class->addSessionVars(shift);
  	my $t;
         eval {
                 $t = HTML::Template::Expr->new(scalarref=>\$template,
@@ -65,8 +65,8 @@ sub process {
                 $t->param(%{$vars});
                 return $t->output;
         } else {
-                $self->session->errorHandler->error("Error in template. ".$@);
-                return WebGUI::International->new($self->session,'Asset_Template')->get('template error').$@;
+                $class->session->errorHandler->error("Error in template. ".$@);
+                return WebGUI::International->new($class->session,'Asset_Template')->get('template error').$@;
         }	
 }
 

@@ -37,6 +37,7 @@
  - The Navigation Asset now allows setting the MIME type of its output so that
    you can generate non-HTML navigations or take advantate of the Google
    SiteMap feature.
+ - [ 1433525 ] 6.9: Compilation errors 
 
 6.8.7
  - fix [ 1431098 ] op=becomeUser can become non-existent userIds
