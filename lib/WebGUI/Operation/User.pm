@@ -407,10 +407,13 @@ sub www_editUserSave {
 
 	return $session->privilege->adminOnly() unless ($isAdmin || $isSecondary);
 
-	#Check to see if the userId associated with the posted username matches the posted userId or that the userId is new
-	#Also verify that the posted username is not blank
-	if (($existingUserId eq $postedUserId || $postedUserId eq "new") && $session->form->process("username") ne '') {
-
+	# Check to see if the userId associated with the posted username matches the posted userId
+	# or that the userId is new
+	# or that the username passed in isn't assigned a userId
+	# Also verify that the posted username is not blank
+	if (($existingUserId eq $postedUserId || $postedUserId eq "new" || $existingUserId eq '')
+             && $session->form->process("username") ne '') 
+             {
 		# Create a user object with the id passed in.  If the Id is 'new', the new method will return a new user,
 		# otherwise return the existing users properties
 	   	my $u = WebGUI::User->new($session,$postedUserId);
