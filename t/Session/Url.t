@@ -38,7 +38,7 @@ is( $url2, $url.'?a=b;c=d', 'append second pair');
 
 diag("gateway tests");
 
-$session->config->{_config}->set(gateway => '/');
+$session->config->{_config}->{'gateway'} = '/';
 
 is ( $session->config->get('gateway'), '/', 'Set gateway for downstream tests');
 
