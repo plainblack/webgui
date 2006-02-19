@@ -29,22 +29,24 @@ SQL Reports are Wobjects and Assets, so they share the properties of both.  SQL 
         },
 
         'Placeholder Parameters description' => {
-                message => q|Placeholders, also called parameter markers, are used to indicate values in a SQL query that will be supplied later, before the statement is executed.<br>
-Placeholder Parameters are delimited a new line.<br>
+                message => q|<p>Placeholders, also called parameter markers, are used to indicate values in a SQL query that will be supplied later, before the statement is executed.</p>
 There are four input types:
-<ul><b>Integer</b><br>A simple number</ul>
-<ul><b>Form</b><br>Form fields begin with "form:".</ul>
-<ul><b>Query results</b><br>Query results begin with "query1:" through "query4:". Query results are populated with data from prior queries. So when the second query is initiated, it can used the results returned by query1. When query 5 is initiated it can use the results from queries 1 through 4.</ul>
-<ul><b>String</b><br>Anything else is a string</ul>
+<ul>
+<li><b>Integer</b><br>A simple number</li>
+<li><b>Form</b><br>Form fields begin with "form:".</li>
+<li><b>Query results</b><br>Query results begin with "query1:" through "query4:". Query results are populated with data from prior queries. So when the second query is initiated, it can used the results returned by query1. When query 5 is initiated it can use the results from queries 1 through 4.</li>
+<li><b>String</b><br>Anything else is a string</li>
+</ul></p>
 <p>Example:
 <blockquote>
-Query: select * from some_table where some_field = ? and some_other_field < ?<br>
+Query: select * from some_table where some_field = ? and some_other_field &lt; ?<br>
 Placeholder Parameters: query1:pageId<br />form:field1
 </blockquote>
 In this example the first question mark will contain the field value of pageId in query1,
-while the second question mark will contain the form variable "field1".
-<p>|,
-                lastUpdated => 1119841649,
+while the second question mark will contain the form variable "field1".</p>
+<p>Place one Placeholder Parameter on each line.</p>
+|,
+                lastUpdated => 1140308175,
         },
 
         '15 description' => {
