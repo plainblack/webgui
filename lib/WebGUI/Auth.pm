@@ -128,7 +128,7 @@ sub addUserFormSave {
 
 =head2 authenticate ( )
 
-Superclass method that performs standard login routines.  This method should return true or false.
+Superclass method that performs standard login routines.  This method returns true if login success, otherwise returns false.
 
 =cut
 
