@@ -1,4 +1,4 @@
-package WebGUI::i18n::English::Workflow_Activity_CleanTempStorage;
+package WebGUI::i18n::English::Workflow_Activity_CleanFileCache;
 
 our $I18N = {
 	'size limit help' => {

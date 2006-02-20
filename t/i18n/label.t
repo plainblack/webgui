@@ -10,7 +10,7 @@
 
 use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/../lib"; ##t/lib
 
 use WebGUI::Test;
 use WebGUI::Operation::Help;
@@ -27,6 +27,7 @@ use Test::More; # increment this value for each test you create
 my $numTests = 0;
 
 my $session = WebGUI::Test->session;
+my $lib = WebGUI::Test->lib;
 
 # put your tests here
 
@@ -75,10 +76,10 @@ diag("Getting Help labels");
 #@sqlLabels = getSQLLabels();
 
 diag("Getting subroutine labels");
-find(\&label_finder_pm, '../../lib/');
+find(\&label_finder_pm, $lib);
 
 diag("Getting object labels");
-find(\&obj_finder_pm, '../../lib/');
+find(\&obj_finder_pm, $lib);
 
 diag ("Checking ". scalar(@helpLabels). " help labels");
 #diag ("Checking ". scalar(@sqlLabels). " SQL labels");
