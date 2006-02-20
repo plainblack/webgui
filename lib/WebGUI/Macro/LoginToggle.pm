@@ -20,7 +20,7 @@ Package WebGUI::Macro::LoginToggle
 
 =head1 DESCRIPTION
 
-Macro for a login or logout message with link to the user depending on whether they are logged in or now.
+Macro for a login or logout message with link to the user depending on whether they are logged in or not.
 
 =head2 process ( [ loginText, logoutText, templateId ] )
 
