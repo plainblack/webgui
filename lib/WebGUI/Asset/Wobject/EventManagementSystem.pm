@@ -395,10 +395,11 @@ sub getSubEventForm {
 	#
 	
 	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
+	my $i18n = WebGUI::International->new('Asset_EventManagementSystem');
 	
 	$f->hidden(-name=>"func",-value=>"www_addToCart");
 	$f->hidden(-name=>"method",-value=>"addSubEvents");
-	$f->readOnly(-value=>"You may also attend the following sub-events based on the events currently in your shopping cart.<br />");	
+	$f->readOnly(-value=>$i18n->get('allowed sub events'));
 	$f->readOnly(-value=>"<table width='100%'>");
 	foreach my $subEvent (@$subEvents) {
 	 while (my $eventData = $subEvent->hashRef) {
@@ -630,7 +631,7 @@ sub www_editEvent {
 		-namespace => "EventManagementSystem_product",
 		-value => $self->session->form->get("templateId") || $event->{templateId},
 		-hoverHelp => $i18n->get('add/edit event template description'),		
-		-label => "Event Template" #$i18n->get('add/edit event template')
+		-label => $i18n->get('add/edit event template')
 	);
 	
 	$f->hidden(
@@ -647,7 +648,7 @@ sub www_editEvent {
 		-name  => "startDate",
 		-value => $self->session->form->get("startDate") || $event->{startDate},
 		-hoverHelp => $i18n->get('add/edit event start date description'),
-		-label => "Start Date" #$i18n->get('add/edit event start date')
+		-label => $i18n->get('add/edit event start date')
 	);
 	
 	$f->dateTime(
@@ -727,6 +728,7 @@ sub www_editEvent {
 	}
 
 	my $output = $f->print;
+	$self->getAdminConsole->setHelp('add/edit event','Asset_EventManagementSystem');
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEvents'),$i18n->get("manage events"));
 	my $addEdit = ($pid eq "new" or !$pid) ? $i18n->get('add', 'Wobject') : $i18n->get('edit', 'Wobject');
 	return $self->getAdminConsole->render($output, $addEdit.' '.$i18n->get('event'));
@@ -857,6 +859,7 @@ sub www_manageEvents {
 	}
 	$output .= "</table>";
 	
+	$self->getAdminConsole->setHelp('event management system manage events','Asset_EventManagementSystem');
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editEvent;pid=new'), $i18n->get('add event'));
 	return $self->getAdminConsole->render($output, $i18n->get("manage events"));
 }

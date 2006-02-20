@@ -35,7 +35,11 @@ our $HELP = {
 		],
 		related => [
 			{
-				tag => 'event management system add/edit',
+				tag => 'event management system manage events',
+				namespace => 'Asset_EventManagementSystem',
+			},
+			{
+				tag => 'event management system template',
 				namespace => 'Asset_EventManagementSystem',
 			},
 			{
@@ -49,6 +53,87 @@ our $HELP = {
 		],
 	},
 
+	'add/edit event' => {
+		title => 'add/edit event help title',
+		body => 'add/edit event help body',
+		fields => [
+                        {
+                                title => 'add/edit event title',
+                                description => 'add/edit event title description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'add/edit event description',
+                                description => 'add/edit event description description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'add/edit event price',
+                                description => 'add/edit event price description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'add/edit event template',
+                                description => 'add/edit event template description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'add/edit event start date',
+                                description => 'add/edit event start date description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'add/edit event end date',
+                                description => 'add/edit event end date description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'add/edit event maximum attendees',
+                                description => 'add/edit event maximum attendees description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'add/edit event required events',
+                                description => 'add/edit event required events description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'add/edit event operator',
+                                description => 'add/edit event title description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'add/edit event what next',
+                                description => 'add/edit event what next description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+		],
+		related => [
+			{
+				tag => 'event management system add/edit',
+				namespace => 'Asset_EventManagementSystem',
+			},
+		],
+	},
+
+	'event management system manage events' => {
+		title => 'manage events',
+		body => 'manage events help body',
+		fields => [
+		],
+		related => [
+			{
+				tag => 'add/edit event',
+				namespace => 'Asset_EventManagementSystem',
+			},
+			{
+				tag => 'event management system add/edit',
+				namespace => 'Asset_EventManagementSystem',
+			},
+		],
+	},
+
+
 	'event management system template' => {
 		title => 'template help title',
 		body => 'template help body',
@@ -60,11 +145,37 @@ our $HELP = {
 				namespace => 'Asset_EventManagementSystem',
 			},
 			{
+				tag => 'event management system event template',
+				namespace => 'Asset_EventManagementSystem',
+			},
+			{
 				tag => 'template language',
 				namespace => 'Asset_Template',
 			},
 		],
 	},
+
+	'event management system event template' => {
+		title => 'event template help title',
+		body => 'event template help body',
+		fields => [
+		],
+		related => [
+			{
+				tag => 'event management system add/edit',
+				namespace => 'Asset_EventManagementSystem',
+			},
+			{
+				tag => 'event management system template',
+				namespace => 'Asset_EventManagementSystem',
+			},
+			{
+				tag => 'template language',
+				namespace => 'Asset_Template',
+			},
+		],
+	},
+
 
 };
 

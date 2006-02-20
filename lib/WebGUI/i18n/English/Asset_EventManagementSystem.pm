@@ -291,6 +291,11 @@ our $I18N = { ##hashref of hashes
 		context => q|Label to invite the user to purchase this event and add it to their shopping cart.|,
 	},
 
+	'allowed sub events' => {
+		message => q|You may also attend the following sub-events based on the events currently in your shopping cart.<br />|,
+		lastUpdated => 1140469381,
+	},
+
 	'template help title' => {
 		message => q|Event Management System Template|,
 		lastUpdated => 1140465899,
@@ -308,24 +313,8 @@ This loop contains all events that have been approved so that users can register
 
 <blockquote>
 
-<p><b>title</b><br />
-The title of this event.
-</p>
-
-<p><b>description</b><br />
-The description of this event.
-</p>
-
-<p><b>price</b><br />
-The price of this event.
-</p>
-
-<p><b>purchase.url</b><br />
-A URL for the user to register for this event and add it to their shopping cart.
-</p>
-
-<p><b>purchase.label</b><br />
-An internationalized label to dispaly to the user the link for purchasing this event.
+<p><b>event</b><br />
+The information for one event that has been processed by its own event template.
 </p>
 
 </blockquote>
@@ -349,6 +338,75 @@ An internationalized label to dispaly to the user the link for managing events.
 |,
 		lastUpdated => 1140465899,
 	},
+
+	'event template help title' => {
+		message => q|Event Management System Event Template|,
+		lastUpdated => 1140465899,
+	},
+
+	'event template help body' => {
+		message => q|
+<p>This template is used to display the contents of a single Event to the
+user.</p>
+
+<p><b>title</b><br />
+The title of this event.
+</p>
+
+<p><b>description</b><br />
+The description of this event.
+</p>
+
+<p><b>price</b><br />
+The price of this event.
+</p>
+
+<p><b>purchase.url</b><br />
+A URL for the user to register for this event and add it to their shopping cart.
+</p>
+
+<p><b>purchase.label</b><br />
+An internationalized label to dispaly to the user the link for purchasing this event.
+</p>
+
+|,
+		lastUpdated => 1140471404,
+	},
+
+	'add/edit event help title' => { 
+		message => q|Add/Edit Event|,
+		lastUpdated => 1140469726,
+		context => q|Title for Add/Edit Event Help|
+	},
+
+	'add/edit event help body' => { 
+		message => q|
+<p>In this form you will create an Event for sale on the site.
+Each Event is very similar to a cross between a Product in the Product
+Manager and an Event in the Events Calendar.  You will give the Event
+a title, description, price, a template for displaying the event to the user and when
+the event starts and ends.  There are also several Event Management System specific fields for
+defining the maximum number of attendees, and if there are other events which are prerequisites
+for this event.</p>
+
+|,
+		lastUpdated => 1140470450,
+		context => q|Body for Add/Edit Event Help|
+	},
+
+	'manage events help body' => { 
+		message => q|
+<p>As the name implies, this screen allows you to manage the events in this instance
+of the Event Management System.</p>
+<p>The table of events will provide you with a quick overview of the events in the system,
+by title, price and status (approved or pending approval).  The icon bar for each event
+allows you to edit events,  delete events, or change their order.</p>
+<p>The link, Add Event, will allow you to add new events.</p>
+|,
+		lastUpdated => 1140475291,
+		context => q|Body for Add/Edit Event Help|
+	},
+
 
 	#If the help file documents an Asset, it must include an assetName key
 	#If the help file documents an Macro, it must include an macroName key
