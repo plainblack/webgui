@@ -945,7 +945,7 @@ sub view {
 	  $eventFields{'description'} = $event->{'description'};
 	  $eventFields{'price'} = $event->{'price'};
 	  $eventFields{'purchase.url'} = $self->getUrl('func=addToCart;pid='.$event->{'productId'});
-	  $eventFields{'purchase.label'} = "Add To Cart";
+	  $eventFields{'purchase.label'} = $i18n->get('add to cart');
 	  
 	  push (@events, {'event' => $self->processTemplate(\%eventFields, $event->{'templateId'}) });	  
 	} 

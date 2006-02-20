@@ -34,6 +34,35 @@ our $HELP = {
                         },
 		],
 		related => [
+			{
+				tag => 'event management system add/edit',
+				namespace => 'Asset_EventManagementSystem',
+			},
+			{
+				tag => 'wobjects using',
+				namespace => 'Wobject'
+			},
+			{
+				tag => 'asset fields',
+				namespace => 'Asset'
+			},
+		],
+	},
+
+	'event management system template' => {
+		title => 'template help title',
+		body => 'template help body',
+		fields => [
+		],
+		related => [
+			{
+				tag => 'event management system add/edit',
+				namespace => 'Asset_EventManagementSystem',
+			},
+			{
+				tag => 'template language',
+				namespace => 'Asset_Template',
+			},
 		],
 	},
 

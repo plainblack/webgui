@@ -313,7 +313,7 @@ sub isInGroup {
                         my $dbh = $dbLink->dbh;
                         if (defined $dbh) {
                                 if ($group->get("dbQuery") =~ /select 1/i) {
-					my $query = $group->group("dbQuery");
+					my $query = $group->get("dbQuery");
 					WebGUI::Macro::process($self->session,\$query);
                                         my $sth = $dbh->unconditionalRead($query);
                                         unless ($sth->errorCode < 1) {

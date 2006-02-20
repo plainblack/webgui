@@ -285,6 +285,70 @@ our $I18N = { ##hashref of hashes
 		context => q|When a required field is empty/blank, then this message is used in sprintf to tell the user which field it is and that it cannot be blank|,
 	},
 
+	'add to cart' => {
+		message => q|Add To Cart|,
+		lastUpdated => 1140466438,
+		context => q|Label to invite the user to purchase this event and add it to their shopping cart.|,
+	},
+
+	'template help title' => {
+		message => q|Event Management System Template|,
+		lastUpdated => 1140465899,
+	},
+
+	'template help body' => {
+		message => q|
+<p>This template is used to style the main page of the Event Management System where
+products are displayed to the user as well as providing a link for managing events
+in the system.</p>
+
+<p><b>events_loop</b><br />
+This loop contains all events that have been approved so that users can register.
+</p>
+
+<blockquote>
+
+<p><b>title</b><br />
+The title of this event.
+</p>
+
+<p><b>description</b><br />
+The description of this event.
+</p>
+
+<p><b>price</b><br />
+The price of this event.
+</p>
+
+<p><b>purchase.url</b><br />
+A URL for the user to register for this event and add it to their shopping cart.
+</p>
+
+<p><b>purchase.label</b><br />
+An internationalized label to dispaly to the user the link for purchasing this event.
+</p>
+
+</blockquote>
+
+<p><b>paginateBar</b><br />
+A bar to help the user page through sets of Events if several pages of Events exist.
+</p>
+
+<p><b>canManageEvents</b><br />
+A flag to indiciate if the current user is allowed to Manage Events.
+</p>
+
+<p><b>manageEvents.url</b><br />
+A URL to take the user to the screen where Events can be managed (i.e. added, approved, deleted)
+</p>
+
+<p><b>manageEvents.label</b><br />
+An internationalized label to dispaly to the user the link for managing events.
+</p>
+
+|,
+		lastUpdated => 1140465899,
+	},
 
 	#If the help file documents an Asset, it must include an assetName key
 	#If the help file documents an Macro, it must include an macroName key
