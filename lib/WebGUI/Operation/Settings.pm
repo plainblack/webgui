@@ -109,6 +109,7 @@ sub www_editSettings {
 	 $tabform->getTab("content")->yesNo(
                 -name=>"autoCommit",
                 -label=>WebGUI::International::get("enable autocommit of asset versioning","Asset"),
+                -hoverHelp=>WebGUI::International::get("enable autocommit of asset versioning description","Asset"),
                 -value=>$session{setting}{autoCommit}
         	);
 	 $tabform->getTab("content")->yesNo(
