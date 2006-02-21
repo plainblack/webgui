@@ -427,14 +427,9 @@ sub www_editUserSave {
 	   	$u->authMethod($session->form->process("authMethod"));
 	   	$u->status($session->form->process("status"));
 
-	   	# Loop through all of this users authentication methods
-	   	foreach (@{$session->config->get("authMethods")}) {
-
-	   		# Instantiate each auth object and call it's save method.  These methods are responsible for
-	   		# updating authentication information with values supplied by the www_editUser form.
-	      		my $authInstance = WebGUI::Operation::Auth::getInstance($session, $_, $actualUserId);
-	      		$authInstance->editUserFormSave();
-       		}
+	        # Instantiate auth object and call it's save method.  These methods are responsible for updating authentication information with values supplied by the www_editUser form.
+	      	my $authInstance = WebGUI::Operation::Auth::getInstance($session, $u->authMethod, $actualUserId);
+	      	$authInstance->editUserFormSave();
        		
        		# Loop through all profile fields, and update them with new values.
 		foreach my $field (@{WebGUI::ProfileField->new($session,'dummy')->getFields}) {
