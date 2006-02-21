@@ -25,6 +25,13 @@ our $I18N = {
 		context => q|A label for the toggle for asset versioning.|
 	},
 
+	'enable autocommit of asset versioning description' => {
+		message => q|Setting this to "Yes", the default, makes WebGUI's content version system
+do a commit immediately after an edit occurs.|,
+		lastUpdated => 1140546767,
+		context => q|Hover help for the toggle for asset versioning.|
+	},
+
 	'set tag' => {
 		message => q|Set As Working Tag|,
 		lastUpdated => 0,
