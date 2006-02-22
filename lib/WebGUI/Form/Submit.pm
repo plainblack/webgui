@@ -52,6 +52,9 @@ sub definition {
 		formName=>{
 			defaultValue=>WebGUI::International::get("submit","WebGUI")
 			},
+		value=>{
+			defaultValue=>WebGUI::International::get("submit","WebGUI")
+			},
 		});
 	return $class->SUPER::definition($definition);
 }

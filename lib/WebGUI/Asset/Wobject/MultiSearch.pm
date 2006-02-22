@@ -50,7 +50,7 @@ sub definition {
 			tab=>"display",
 			defaultValue=>'MultiSearchTmpl0000001',
 			namespace=>"MultiSearch",
-			hoverHelp=>$i18n->get('MultiSearch Template'),
+			hoverHelp=>$i18n->get('MultiSearch Template description'),
 			label=>$i18n->get('MultiSearch Template')
 		},
 #		predefinedSearches=>{
@@ -83,10 +83,15 @@ to be displayed within the page style
 sub view {
 	my $self = shift;	
 	my %var = $self->get();
+	my $i18n = WebGUI::International->new('Asset_MultiSearch');
 	#Set some template variables
 
 	#Build list of searches as an array
 #	my $defaults = $self->getValue("predefinedSearches");
+
+	$var{'for'}    = $i18n->get('for');
+	$var{'search'} = $i18n->get('search');
+	$var{'submit'} = WebGUI::Form::Submit->new({name=>'SearchSubmit'})->toHtml();
 
 	return $self->processTemplate(\%var, $self->get("templateId"));
 }
