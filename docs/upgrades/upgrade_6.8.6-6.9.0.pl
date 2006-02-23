@@ -135,6 +135,8 @@ sub addWorkflow {
 	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::TrashClipboard", "pbwfactivity0000000004");
 	$activity->set("title", "Move clipboard items older than 30 days to trash");
 	$activity->set("trashAfter", 60*60*24*30);
+	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::ArchiveOldPosts", "pbwfactivity0000000005");
+	$activity->set("title", "Archive old CS posts");
 	WebGUI::Workflow::Cron->create($session, {
                 title=>'Weekly Maintenance Maintenance',
                 enabled=>1,
