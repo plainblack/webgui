@@ -16,6 +16,7 @@ package WebGUI::Asset;
 
 use strict;
 use WebGUI::Session;
+use WebGUI::Grouping;
 
 =head1 NAME
 
@@ -555,11 +556,13 @@ An asset object reference representing the new parent to paste the asset to.
 sub setParent {
 	my $self = shift;
 	my $newParent = shift;
+	return 0 unless WebGUI::Grouping::isInGroup('4');
 	return 0 unless (defined $newParent); # can't move it if a parent object doesn't exist
 	return 0 if ($newParent->getId eq $self->get("parentId")); # don't move it to where it already is
 	return 0 if ($newParent->getId eq $self->getId); # don't move it to itself
 	if (defined $newParent) {
 		my $oldLineage = $self->get("lineage");
+		return 0 unless $newParent->canEdit;
 		my $lineage = $newParent->get("lineage").$newParent->getNextChildRank; 
 		return 0 if ($lineage =~ m/^$oldLineage/); # can't move it to its own child
 		WebGUI::SQL->beginTransaction;
@@ -685,7 +688,10 @@ sub www_setParent {
 	my $self = shift;
 	return WebGUI::Privilege::insufficient() unless $self->canEdit;
 	my $newParent = WebGUI::Asset->newByDynamicClass($session{form}{assetId});
-	$self->setParent($newParent) if (defined $newParent);
+	if (defined $newParent) {
+		my $success = $self->setParent($newParent);
+		return WebGUI::Privilege::insufficient() unless $success;
+	}
 	return $self->www_manageAssets();
 
 }

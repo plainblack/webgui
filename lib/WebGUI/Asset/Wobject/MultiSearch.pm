@@ -91,7 +91,7 @@ sub view {
 
 	$var{'for'}    = $i18n->get('for');
 	$var{'search'} = $i18n->get('search');
-	$var{'submit'} = WebGUI::Form::Submit->new({name=>'SearchSubmit'})->toHtml();
+	$var{'submit'} = WebGUI::Form::Submit->new({name=>'SearchSubmit',value=>$i18n->get('submit','WebGUI')})->toHtml();
 
 	return $self->processTemplate(\%var, $self->get("templateId"));
 }
