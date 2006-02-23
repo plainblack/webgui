@@ -3304,8 +3304,8 @@ that Asset and all Assets below it.</p>
 
 	'submit' => {
 		message => q|Submit|,
-		lastUpdated =>0,
-                context => q|Field type name|
+		lastUpdated =>1140589512,
+                context => q|Field type name and button label|
         },
 
 	'button' => {

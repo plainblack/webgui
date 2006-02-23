@@ -7,6 +7,11 @@ our $I18N = {
 		lastUpdated => 1133619940,
 	},
 
+	'MultiSearch Template' => {
+		message => q|Select a template to display the multiple search engine form to the user.|,
+		lastUpdated => 1140587435,
+	},
+
 	'assetName' => {
 		message => q|MultiSearch|,
 		lastUpdated => 1133619940,
@@ -18,7 +23,31 @@ our $I18N = {
 	},
 
 	'multisearch add/edit body' => {
-		message => q|The MultiSearch wobject is a simple wobject that enables the user to search various search engines.  The results appear in a new window.  The search engines are entirely contained within the MultiSearch template, for which there are no special template variables.|,
+		message => q|The MultiSearch wobject is a simple wobject that enables the user to search various search engines.  The results appear in a new window.|,
+		lastUpdated => 1140587496,
+	},
+
+	'multisearch template title' => {
+		message => q|MultiSearch Template Variables|,
+		lastUpdated => 1133619940,
+	},
+
+	'multi search template body' => {
+		message => q|<p>The MultiSearch template has all the template variables used by Wobjects,
+as well as these:
+<p><b>search</b><br />
+Internationalized label for the word "search"
+</p>
+
+<p><b>for</b><br />
+Internationalized label for the word "for"
+</p>
+
+<p><b>submit</b><br />
+Submit button with internationalized label for "Submit".
+</p>
+
+|,
 		lastUpdated => 1133619940,
 	},
 

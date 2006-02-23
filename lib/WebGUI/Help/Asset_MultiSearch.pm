@@ -5,12 +5,38 @@ our $HELP = {
 		title => 'multisearch add/edit title',
 		body => 'multisearch add/edit body',
 		fields => [
+                        {
+                                title => 'MultiSearch Template',
+                                description => 'MultiSearch Template description',
+                                namespace => 'Asset_MultiSearch',
+                        },
 		],
 		related => [
+			{
+				tag => 'multisearch template',
+				namespace => 'Asset_MultiSearch'
+			},
 			{
 				tag => 'dashboard add/edit',
 				namespace => 'Asset_Dashboard'
 			},
+		]
+	},
+
+	'multisearch template' => {
+		title => 'multisearch template title',
+		body => 'multisearch template body',
+		fields => [
+		],
+		related => [
+			{
+				tag => 'multisearch template',
+				namespace => 'Asset_MultiSearch'
+			},
+			{
+				tag => 'wobject template',
+				namespace => 'Wobject'
+			}
 		]
 	}
 };
