@@ -272,7 +272,7 @@ Verifies proper inputs in the Asset Tree and saves them. Returns ManageAssets me
 
 sub www_editBranchSave {
 	my $self = shift;
-	return $self->session->privilege->insufficient() unless ($self->canEdit);
+	return $self->session->privilege->insufficient() unless ($self->canEdit && WebGUI::Grouping::isInGroup('4'));
 	my %data;
 	$data{isHidden} = $self->session->form->yesNo("isHidden") if ($self->session->form->yesNo("change_isHidden"));
 	$data{newWindow} = $self->session->form->yesNo("newWindow") if ($self->session->form->yesNo("change_newWindow"));
@@ -297,6 +297,7 @@ sub www_editBranchSave {
 	}
 	my $descendants = $self->getLineage(["self","descendants"],{returnObjects=>1});	
 	foreach my $descendant (@{$descendants}) {
+		next unless $descendant->canEdit;
 		my $url;
 		if ($changeUrl) {
 			if ($urlBaseBy eq "parentUrl") {

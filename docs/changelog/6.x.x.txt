@@ -44,6 +44,18 @@
  - fix [ 1431098 ] op=becomeUser can become non-existent userIds
  - fix [ 1431944 ] 6.8.6 DataForm moving fields
  - fix [ 1433195 ] 6.8.6 In/Out board labels missing
+ - fix : Registered users can deploy packages (Thanks to Lucas Bartholemy
+   for his work on finding this bug)
+ - fix : Package will deploy assets not defined as packages (Thanks to Lucas
+   Bartholemy for his work on finding this bug)
+ - fix : editBranchSave method does not check that user is a content
+   manager (Thanks to Lucas Bartholemy for his work on finding this bug)
+ - fix : editBranchSave does not check privileges of descendants (Thanks to
+   Lucas Bartholemy for his work on finding this bug)
+ - fix : setParent does not check that user is a content manager (Colin
+   Kuskie / Thanks to Lucas Bartholemy for his work on finding this bug)
+ - fix : setParent does not check permissions of target page (Colin Kuskie
+   / Thanks to Lucas Bartholemy for his work on finding this bug)
 
 6.8.6
  - Added logic to deal with case sensitivity and whitespace problems in LDAP

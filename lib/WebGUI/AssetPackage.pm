@@ -81,10 +81,16 @@ Returns "". Deploys a Package. If canEdit is Fales, renders an insufficient Priv
 
 sub www_deployPackage {
 	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	my $packageMasterAssetId = $self->session->form->process("assetId");
+	# Must have edit rights to the asset deploying the package.  Also, must be a Content Manager.
+	# This protects against non content managers deploying packages using a post or similar trickery.
+	return $self->session->privilege->insufficient() unless ($self->canEdit && WebGUI::Grouping::isInGroup('4'));
+	my $packageMasterAssetId = $session{form}{assetId};
 	if (defined $packageMasterAssetId) {
 		my $packageMasterAsset = WebGUI::Asset->newByDynamicClass($packageMasterAssetId);
+		unless ($packageMasterAsset->getValue('isPackage')) { #only deploy packages
+		 WebGUI::ErrorHandler::security('deploy an asset as a package which was not set as a package.');
+		 return;
+		}
 		my $masterLineage = $packageMasterAsset->get("lineage");
                 if (defined $packageMasterAsset && $packageMasterAsset->canView && $self->get("lineage") !~ /^$masterLineage/) {
 			my $deployedTreeMaster = $self->duplicateBranch($packageMasterAsset);
