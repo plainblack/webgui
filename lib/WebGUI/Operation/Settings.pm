@@ -124,7 +124,7 @@ sub www_editSettings {
 		-label=>$i18n->get("default rich editor"),
 		-hoverHelp=>$i18n->get("default rich editor description"),
 		-value=>[$session{setting}{richEditor}],
-		-options=>WebGUI::SQL->buildHashRef("select assetData.assetId,assetData.title from asset left join assetData on asset.assetId=assetData.assetId where asset.className='WebGUI::Asset::RichEdit' order by assetData.title"),
+		-options=>WebGUI::Asset::RichEdit->getList(),
 		-defaultValue=>["PBrichedit000000000001"]
 		);
         $tabform->getTab("ui")->integer(
