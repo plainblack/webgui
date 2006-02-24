@@ -116,12 +116,12 @@ The value to match.
 
 =cut
 
-sub deleteName {
+sub deleteNameByValue {
 	my $self = shift;
 	my $name = shift;
 	my $value = shift;
-	return undef unless ($name);	
-	delete $self->{_data}{$name};
+	return undef unless ($name and $value);
+	delete $self->{_data}{$name} if ($self->{_data}{$name} eq $value);
 	$self->session->db->write("delete from userSessionScratch where name=? and value=?", [$name,$value]);
 }
 
