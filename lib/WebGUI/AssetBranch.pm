@@ -51,7 +51,8 @@ The asset to duplicate. Defaults to self.
 sub duplicateBranch {
 	my $self = shift;
 	my $assetToDuplicate = shift || $self;
-	my $newAsset = $self->duplicate($assetToDuplicate);
+	my $newAsset = $assetToDuplicate->duplicate();
+	$newAsset->setParent($self);
 	my $contentPositions;
 	$contentPositions = $assetToDuplicate->get("contentPositions");
 	foreach my $child (@{$assetToDuplicate->getLineage(["children"],{returnObjects=>1})}) {
