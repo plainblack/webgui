@@ -85,6 +85,7 @@ sub appendPostListTemplateVars {
                 push(@{$var->{post_loop}}, {
 			%{$post->get},
                         "id"=>$post->getId,
+                        "parentId"=>$self->getId,
                         "url"=>$url,
 			rating_loop=>\@rating_loop,
 			"content"=>$post->formatContent,

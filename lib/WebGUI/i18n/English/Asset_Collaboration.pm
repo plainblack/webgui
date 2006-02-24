@@ -989,6 +989,10 @@ of the ones below.
 The AssetId of this Post.
 
 <p>
+<b>parentId</b><br>
+The AssetId of this Post's parent.
+
+<p>
 <b>url</b><br>
 The URL of this Post.
 
