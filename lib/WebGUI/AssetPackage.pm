@@ -83,8 +83,8 @@ sub www_deployPackage {
 	my $self = shift;
 	# Must have edit rights to the asset deploying the package.  Also, must be a Content Manager.
 	# This protects against non content managers deploying packages using a post or similar trickery.
-	return $self->session->privilege->insufficient() unless ($self->canEdit && WebGUI::Grouping::isInGroup('4'));
-	my $packageMasterAssetId = $session{form}{assetId};
+	return $self->session->privilege->insufficient() unless ($self->canEdit && $self->session->user->isInGroup(4));
+	my $packageMasterAssetId = $self->session->form->process("assetId");
 	if (defined $packageMasterAssetId) {
 		my $packageMasterAsset = WebGUI::Asset->newByDynamicClass($packageMasterAssetId);
 		unless ($packageMasterAsset->getValue('isPackage')) { #only deploy packages
