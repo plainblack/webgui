@@ -43,6 +43,7 @@
 6.8.7
  - fix [ 1437186 ] 6.8.7 deploy DataForm package does not copy fields
  - fix [ 1437563 ] Data picker intermittent for Admin
+ - fix [ 1437977 ] richeditor selectbox options not versioned, trashed appear
 
 6.8.7
  - fix [ 1431098 ] op=becomeUser can become non-existent userIds

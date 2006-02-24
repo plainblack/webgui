@@ -383,6 +383,30 @@ sub getEditForm {
 
 #-------------------------------------------------------------------
 
+=head2 getList ( )
+
+Returns a list of all available richEditors, considering revisionDate and asset status
+
+NOTE: This is a class method.
+
+=cut
+
+sub getList {
+	my $class = shift;
+	my $session = shift;
+my $sql = "select asset.assetId, assetData.revisionDate from RichEdit left join asset on asset.assetId=RichEdit.assetId left join assetData on assetData.revisionDate=RichEdit.revisionDate and assetData.assetId=RichEdit.assetId where asset.state='published' and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId and (assetData.status='approved' or assetData.tagId=?)) order by assetData.title";
+	my $sth = $session->db->read($sql, [ $session->scratch->get('versionTag') ] );
+	my %richEditors;
+	tie %richEditors, 'Tie::IxHash';
+	while (my ($id, $version) = $sth->array) {
+		$richEditors{$id} = WebGUI::Asset::RichEdit->new($session, $id, undef, $version)->getTitle;
+	}	
+	$sth->finish;	
+	return \%richEditors;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getToolbar ( )
 
 Returns a toolbar with a set of icons that hyperlink to functions that delete, edit, promote, demote, cut, and copy.
