@@ -11,6 +11,7 @@
 use lib "../../lib";
 use strict;
 use Getopt::Long;
+use WebGUI::User;
 use WebGUI::Session;
 use WebGUI::SQL;
 
@@ -23,8 +24,17 @@ start(); # this line required
 
 # upgrade functions go here
 
+setAdminFirstDayOfWeek();
+
 finish(); # this line required
 
+
+#-------------------------------------------------
+sub setAdminFirstDayOfWeek {
+	print "\tSet the first day of the week profile field for Admin.\n" unless ($quiet);
+	my $admin = WebGUI::User->new('3');
+	$admin->profileField('firstDayOfWeek',0);
+}
 
 ##-------------------------------------------------
 #sub exampleFunction {
