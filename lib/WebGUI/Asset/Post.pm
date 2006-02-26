@@ -689,6 +689,7 @@ sub processPropertiesFromFormPost {
 			$self->getThread->lock if ($self->session->form->process('lock'));
 			$self->getThread->stick if ($self->session->form->process("stick"));
 		}
+		$self->getThread->unarchive if ($self->getThread->get("status") eq "archived");
 	}
 	$data{groupIdView} =$self->getThread->getParent->get("groupIdView");
 	$data{groupIdEdit} = $self->getThread->getParent->get("groupIdEdit");
@@ -828,14 +829,14 @@ sub setStatusApproved {
 
 =head2 setStatusArchived ( )
 
-Sets the status of this post to archived.
+Sets the status of this post to archived. This will only happen if the post status is approved.
 
 =cut
 
 
 sub setStatusArchived {
         my ($self) = @_;
-        $self->update({status=>'archived'});
+        $self->update({status=>'archived'}) if ($self->get("status") eq "approved");
 }
 
 
@@ -872,6 +873,20 @@ sub setStatusPending {
 	}
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 setStatusUnarchived ( )
+
+Sets the status of this post to approved, but does so without any of the normal notifications and other stuff.
+
+=cut
+
+
+sub setStatusUnarchived {
+        my ($self) = @_;
+        $self->update({status=>'approved'}) if ($self->get("status") eq "archived");
+}
 
 #-------------------------------------------------------------------
 

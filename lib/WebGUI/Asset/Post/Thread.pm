@@ -22,6 +22,13 @@ use WebGUI::Utility;
 
 our @ISA = qw(WebGUI::Asset::Post);
 
+#-------------------------------------------------------------------
+sub archive {
+	my $self = shift;
+	foreach my $post (@{$self->getPosts}) {
+		$post->setStatusArchived;
+	}
+}
 
 #-------------------------------------------------------------------
 sub canReply {
@@ -122,6 +129,19 @@ sub DESTROY {
 
 
 #-------------------------------------------------------------------
+
+=head2 getArchiveUrl ( ) 
+
+Formats the url to set the status of a thread archived.
+
+=cut
+
+sub getArchiveUrl {
+	my $self = shift;
+	$self->getUrl("func=archive");
+}
+
+#-------------------------------------------------------------------
 sub getLastPost {
 	my $self = shift;
 	my $lastPostId = $self->get("lastPostId");
@@ -206,6 +226,19 @@ sub getNextThread {
 
 #-------------------------------------------------------------------
 
+=head2 getPosts ( ) 
+
+Returns a list of the post objects in this thread, including the thread post itself.
+
+=cut
+
+sub getPosts {
+	my $self = shift;
+	$self->getLineage(["self","descendants"], {returnObjects=>1});	
+}
+
+#-------------------------------------------------------------------
+
 =head2 getPreviousThread ( )
 
 Returns a thread object for the previous (older) thread in the same forum.
@@ -270,6 +303,19 @@ sub getSubscribeUrl {
 #-------------------------------------------------------------------
 sub getThread {
 	return shift;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getUnarchiveUrl ( ) 
+
+Formats the url to set the status of a thread unarchived.
+
+=cut
+
+sub getUnarchiveUrl {
+	my $self = shift;
+	$self->getUrl("func=unarchive");
 }
 
 #-------------------------------------------------------------------
@@ -592,6 +638,21 @@ sub trash {
 
 #-------------------------------------------------------------------
 
+=head2 unarchive ( ) 
+
+Unarchives this thread.
+
+=cut
+ 
+sub unarchive {
+	my $self = shift;
+	foreach my $post (@{$self->getPosts}) {
+		$post->setStatusUnarchived;
+	}
+}
+
+#-------------------------------------------------------------------
+
 =head2 unlock ( )
 
 Negates the lock method.
@@ -656,6 +717,10 @@ sub view {
         $var->{'user.isSubscribed'} = $self->isSubscribed;
         $var->{'subscribe.url'} = $self->getSubscribeUrl;
         $var->{'unsubscribe.url'} = $self->getUnsubscribeUrl;
+
+        $var->{'isArchived'} = $self->get("status") eq "archived";
+        $var->{'archive.url'} = $self->getArchivedUrl;
+        $var->{'unarchive.url'} = $self->getUnarchivedUrl;
 
         $var->{'isSticky'} = $self->isSticky;
         $var->{'stick.url'} = $self->getStickUrl;
@@ -722,6 +787,20 @@ sub view {
 
 #-------------------------------------------------------------------
 
+=head2 www_archive ( )
+
+The web method to archive all the posts in this thread.
+
+=cut
+
+sub www_archive {
+	my $self = shift;
+	$self->archive if ($self->canEdit);
+	return $self->www_view;
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_lock (  )
 
 The web method to lock a thread.
@@ -759,6 +838,20 @@ The web method to subscribe to a thread.
 sub www_subscribe {
 	my $self = shift;
 	$self->subscribe if $self->canSubscribe;
+	return $self->www_view;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_unarchive ( )
+
+The web method to unarchive all the posts in this thread.
+
+=cut
+
+sub www_unarchive {
+	my $self = shift;
+	$self->unarchive if ($self->canEdit);
 	return $self->www_view;
 }
 

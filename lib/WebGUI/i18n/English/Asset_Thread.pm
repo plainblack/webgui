@@ -73,6 +73,18 @@ A URL to subscribe the current user to the thread.
 A URL to subscribe the current user from the thread.
 <p>
 
+<b>isArchived</b><br>
+A conditional indicating if the current thread is archived.
+<p>
+
+<b>archive.url</b><br>
+The URL to archive this thread.
+<p>
+
+<b>unarchive.url</b><br>
+The URL to unarchive this thread.
+<p>
+
 <b>isSticky</b><br>
 A conditional indicating if the current thread is sticky.
 <p>
@@ -163,7 +175,7 @@ The description of the collaboration system that this post is a part of.
 <p>
 
 |,
-		lastUpdated => 1111768115,
+		lastUpdated => 1140982574,
 	},
 
         'assetName' => {

@@ -126,7 +126,7 @@ sub addWorkflow {
 		}, "pbcron0000000000000001");
 	$session->config->set("workflowActivities", {
 		none=>["WebGUI::Workflow::Activity::DecayKarma", "WebGUI::Workflow::Activity::TrashClipboard", "WebGUI::Workflow::Activity::CleanTempStorage", 
-			"WebGUI::Workflow::Activity::CleanFileCache", "WebGUI::Workflow::Activity::CleanLoginHistory"],
+			"WebGUI::Workflow::Activity::CleanFileCache", "WebGUI::Workflow::Activity::CleanLoginHistory", "WebGUI::Workflow::Activity::ArchiveOldThreads"],
 		user=>[],
 		versiontag=>["WebGUI::Workflow::Activity::CommitVersionTag", "WebGUI::Workflow::Activity::RollbackVersionTag"]
 		});
@@ -142,8 +142,8 @@ sub addWorkflow {
 	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::TrashClipboard", "pbwfactivity0000000004");
 	$activity->set("title", "Move clipboard items older than 30 days to trash");
 	$activity->set("trashAfter", 60*60*24*30);
-	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::ArchiveOldPosts", "pbwfactivity0000000005");
-	$activity->set("title", "Archive old CS posts");
+	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::ArchiveOldThreads", "pbwfactivity0000000005");
+	$activity->set("title", "Archive old CS threads");
 	WebGUI::Workflow::Cron->create($session, {
                 title=>'Weekly Maintenance Maintenance',
                 enabled=>1,

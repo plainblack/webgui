@@ -1,4 +1,4 @@
-package WebGUI::Workflow::Activity::ArchiveOldPosts;
+package WebGUI::Workflow::Activity::ArchiveOldThreads;
 
 
 =head1 LEGAL
@@ -17,6 +17,7 @@ package WebGUI::Workflow::Activity::ArchiveOldPosts;
 
 use strict;
 use base 'WebGUI::Workflow::Activity';
+use WebGUI::Asset;
 
 =head1 NAME
 
@@ -71,16 +72,20 @@ sub execute {
         my $epoch = $self->session->datetime->time();
         my $a = $self->session->db->read("select assetId from asset where className='WebGUI::Asset::Wobject::Collaboration'");
         while (my ($assetId) = $a->array) {
-                my $cs = WebGUI::Asset::Wobject::Collaboration->new($assetId);
+                my $cs = WebGUI::Asset->new($assetId, "WebGUI::Asset::Wobject::Collaboration");
                 my $archiveDate = $epoch - $cs->get("archiveAfter");
                 my $sql = "select asset.assetId, assetData.revisionDate from Post left join asset on asset.assetId=Post.assetId 
                         left join assetData on Post.assetId=assetData.assetId and Post.revisionDate=assetData.revisionDate
                         where Post.dateUpdated<? and assetData.status='approved' and asset.state='published'
-                        and asset.lineage like ?";
+			and Post.threadId=Post.assetId and asset.lineage like ?";
                 my $b = $self->session->db->read($sql,[$archiveDate, $cs->get("lineage").'%']);
                 while (my ($id, $version) = $b->array) {
-                        my $post = WebGUI::Asset::Post->new($id,undef,$version);
-                        $post->setStatusArchived if (defined $post && $post->get("dateUpdated") < $archiveDate);
+			my $thread = WebGUI::Asset->new($id, "WebGUI::Asset::Post::Thread", $version);
+			my $archiveIt = 1;
+			foreach my $post (@{$thread->getPosts}) {
+                        	$archiveIt = 0 if (defined $post && $post->get("dateUpdated") > $archiveDate);
+			}
+			$thread->archive if ($archiveIt);
                 }
                 $b->finish;
         }
