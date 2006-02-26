@@ -39,6 +39,7 @@
    SiteMap feature.
  - [ 1433525 ] 6.9: Compilation errors 
  - base36 removed from Utility.t because it no longer exists in WebGUI::Utility.pm
+ - Add tests that verify the integrity of the WebGUI Database.
 
 6.8.8
  - fix [ 1437186 ] 6.8.7 deploy DataForm package does not copy fields
