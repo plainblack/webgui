@@ -1415,19 +1415,7 @@ sub newByUrl {
 	$url =~ s/\"//;
 	my $asset;
 	if ($url ne "") {
-		my ($id, $class) = $session->db->quickArray("
-			select 
-				asset.assetId, 
-				asset.className
-			from 
-				asset 
-			left join
-				assetData on asset.assetId=assetData.assetId
-			where 
-				assetData.url=".$session->db->quote($url)." 
-			group by
-				assetData.assetId
-			");
+		my ($id, $class) = $session->db->quickArray("select distinct asset.assetId, asset.className from assetData join asset using (assetId) where assetData.url = ?", [ $url ]);
 		if ($id ne "" || $class ne "") {
 			return WebGUI::Asset->new($session,$id, $class, $revisionDate);
 		} else {

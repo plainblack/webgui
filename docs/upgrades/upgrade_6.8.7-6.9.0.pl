@@ -34,8 +34,15 @@ addWorkflow();
 ipsToCIDR();
 addDisabletoRichEditor();
 addNavigationMimeType();
+addIndexes();
 
 finish($session); # this line required
+
+#-------------------------------------------------
+sub addIndexes {
+	print "\tAdding indexes to increase performance.\n";
+	$session->db->write("alter table assetData add index url (url)");
+}
 
 #-------------------------------------------------
 sub addWorkflow {
