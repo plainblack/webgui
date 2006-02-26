@@ -15,13 +15,13 @@ function FileUploadControl(fieldName, imageArray, removeLabel, fileLimit) {
 	document.write('<div id="'+workspaceId+'"> </div>');	
 	var workspace = document.getElementById(workspaceId);
 	
-	var str = '<table border="0"><tbody id="' + workspaceId + '.fileUpload.body">';			
+	var str = '<table border="0" cellspacing="0" cellpadding="0"><tbody id="' + workspaceId + '.fileUpload.body">';			
 	str += '</tbody></table>';
 	
 	str +='<table style="display: none;">'
 	
-	str += '<tr id="' + workspaceId + '.template" class="fileUploadRow"><td><img src="' + imageArray["unknown"] + '" style="visibility: hidden"></td>';
-	str +='<td><input type="file" name="'+fieldName+'" size="40" onchange="FileUploadControl_valueChange(event)"></td><td><input type="button" value="' + removeLabel + '" onclick="FileUploadControl_removeButtonClick(event)"></td></tr>';
+	str += '<tr id="' + workspaceId + '.template" class="fileUploadRow"><td style="display:none;"><img src="' + imageArray["unknown"] + '" style="visibility: hidden;"></td>';
+	str +='<td colspan="2"><input type="file" name="'+fieldName+'" size="40" onchange="FileUploadControl_valueChange(event)"></td><td><input type="button" value="' + removeLabel + '" onclick="FileUploadControl_removeButtonClick(event)"></td></tr>';
 	
 	str += '</table>';
 	
@@ -76,6 +76,8 @@ function FileUploadControl_swapImage(firedobj) {
 	}		
 	var row = this.getRow(firedobj);
 	
+	row.childNodes[0].style.display='';
+	row.childNodes[1].colSpan=1;
 	var img = row.childNodes[0].childNodes[0];
 	img.src = imgPath;
 	img.style.visibility="visible";
