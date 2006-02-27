@@ -1,5 +1,6 @@
 6.99.0
  - Added archive/unarchive options to CS threads.
+ - Added a database cache option as an alternative to memcached.
  - Added a workflow system.
  - Added a workflow scheduler system.
  - Converted the runHourly.pl scripts to run as scheduled workflows. 

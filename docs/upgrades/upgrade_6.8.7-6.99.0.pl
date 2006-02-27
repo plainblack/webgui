@@ -35,8 +35,21 @@ ipsToCIDR();
 addDisabletoRichEditor();
 addNavigationMimeType();
 addIndexes();
+addDatabaseCache();
 
 finish($session); # this line required
+
+#-------------------------------------------------
+sub addDatabaseCache {
+	print "\tAdding database cache.\n";
+	$session->db->write("create table cache ( namespace varchar(128) not null, cachekey varchar(128) not null, expires bigint not null, size int not null, content mediumtext, primary key (namespace, cachekey))");
+	$session->db->write("alter table cache add index namespace_cachekey_size (namespace,cachekey,expires)");
+	if ($session->config->get("memcached_servers")) {
+		$session->config->set("cacheType","WebGUI::Cache::Memcached");
+	} else {
+		$session->config->set("cacheType","WebGUI::Cache::FileCache");
+	}
+}
 
 #-------------------------------------------------
 sub addIndexes {

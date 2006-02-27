@@ -45,6 +45,17 @@
 
 # "passthruUrls" : ["/icons", "/documentation/pdf", "/my-custom-application", "/server-status", "/perl-status"],
 
+# What kind of cache do you wish to use? Available types are 
+# WebGUI::Cache::FileCache, WebGUI::Cache::Database, and
+# WebGUI::Cache::Memcached. We highly recommend the file
+# cache if you're in a single server environment, and the
+# database cache if you have multiple web nodes. Memcached
+# is experimental and is slower and buggier than the other
+# two, so should only be used if you know what you're
+# doing.
+
+"cacheType" : "WebGUI::Cache::FileCache",
+
 # Tell WebGUI where to store cached files. Defaults to the 
 # /tmp or c:\temp folder depending upon your operating system.
 
