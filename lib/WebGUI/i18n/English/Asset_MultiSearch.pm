@@ -7,7 +7,7 @@ our $I18N = {
 		lastUpdated => 1133619940,
 	},
 
-	'MultiSearch Template' => {
+	'MultiSearch Template description' => {
 		message => q|Select a template to display the multiple search engine form to the user.|,
 		lastUpdated => 1140587435,
 	},
@@ -32,7 +32,7 @@ our $I18N = {
 		lastUpdated => 1133619940,
 	},
 
-	'multi search template body' => {
+	'multisearch template body' => {
 		message => q|<p>The MultiSearch template has all the template variables used by Wobjects,
 as well as these:
 <p><b>search</b><br />
@@ -49,6 +49,16 @@ Submit button with internationalized label for "Submit".
 
 |,
 		lastUpdated => 1133619940,
+	},
+
+	'for' => {
+		message => q|For|,
+		lastUpdated => 1141147361,
+	},
+
+	'search' => {
+		message => q|Search|,
+		lastUpdated => 1141147361,
 	},
 
 };
