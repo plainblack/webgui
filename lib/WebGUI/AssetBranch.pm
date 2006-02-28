@@ -139,18 +139,21 @@ sub www_editBranch {
                 -value=>$self->get("isHidden"),
                 -label=>WebGUI::International::get(886,"Asset"),
                 -uiLevel=>6,
+		-hoverHelp=>WebGUI::International::get('886 description',"Asset"),
 		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_isHidden"})
                 );
         $tabform->getTab("display")->yesNo(
                 -name=>"newWindow",
                 -value=>$self->get("newWindow"),
                 -label=>WebGUI::International::get(940,"Asset"),
+		-hoverHelp=>WebGUI::International::get('940 description',"Asset"),
                 -uiLevel=>6,
 		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_newWindow"})
                 );
 	$tabform->getTab("display")->yesNo(
                 -name=>"displayTitle",
                 -label=>WebGUI::International::get(174,"Asset"),
+		-hoverHelp=>WebGUI::International::get('174 description','Wobject'),
                 -value=>$self->getValue("displayTitle"),
                 -uiLevel=>5,
 		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_displayTitle"})
@@ -159,6 +162,7 @@ sub www_editBranch {
 		-name=>"styleTemplateId",
 		-label=>WebGUI::International::get(1073,"Asset"),
 		-value=>$self->getValue("styleTemplateId"),
+		-hoverHelp=>WebGUI::International::get('1073 description','Wobject'),
 		-namespace=>'style',
 		-afterEdit=>'op=editPage;npp='.$session{form}{npp},
 		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_styleTemplateId"})
@@ -166,6 +170,7 @@ sub www_editBranch {
          $tabform->getTab("display")->template(
 		-name=>"printableStyleTemplateId",
 		-label=>WebGUI::International::get(1079,"Asset"),
+		-hoverHelp=>WebGUI::International::get('1079 description','Wobject'),
 		-value=>$self->getValue("printableStyleTemplateId"),
 		-namespace=>'style',
 		-afterEdit=>'op=editPage;npp='.$session{form}{npp},
@@ -174,6 +179,7 @@ sub www_editBranch {
         $tabform->getTab("display")->interval(
                 -name=>"cacheTimeout",
                 -label=>WebGUI::International::get(895,"Asset"),
+		-hoverHelp=>WebGUI::International::get('895 description','Wobject'),
                 -value=>$self->getValue("cacheTimeout"),
                 -uiLevel=>8,
 		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_cacheTimeout"})
@@ -181,6 +187,7 @@ sub www_editBranch {
         $tabform->getTab("display")->interval(
                 -name=>"cacheTimeoutVisitor",
                 -label=>WebGUI::International::get(896,"Asset"),
+		-hoverHelp=>WebGUI::International::get('896 description','Wobject'),
                 -value=>$self->getValue("cacheTimeoutVisitor"),
                 -uiLevel=>8,
 		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_cacheTimeoutVisitor"})
@@ -190,12 +197,14 @@ sub www_editBranch {
                 -name=>"encryptPage",
                 -value=>$self->get("encryptPage"),
                 -label=>WebGUI::International::get('encrypt page',"Asset"),
+		-hoverHelp=>WebGUI::International::get('encrypt page description',"Asset"),
                 -uiLevel=>6,
 		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_encryptPage"})
                 );
 	$tabform->getTab("security")->dateTime(
                 -name=>"startDate",
                 -label=>WebGUI::International::get(497,"Asset"),
+		-hoverHelp=>WebGUI::International::get('497 description',"Asset"),
                 -value=>$self->get("startDate"),
                 -uiLevel=>6,
 		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_startDate"})
@@ -203,6 +212,7 @@ sub www_editBranch {
         $tabform->getTab("security")->dateTime(
                 -name=>"endDate",
                 -label=>WebGUI::International::get(498,"Asset"),
+		-hoverHelp=>WebGUI::International::get('498 description',"Asset"),
                 -value=>$self->get("endDate"),
                 -uiLevel=>6,
 		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_endDate"})
@@ -226,6 +236,7 @@ sub www_editBranch {
                -name=>"ownerUserId",
                -options=>$users,
                -label=>WebGUI::International::get(108,"Asset"),
+		-hoverHelp=>WebGUI::International::get('108 description',"Asset"),
                -value=>[$self->get("ownerUserId")],
                -subtext=>$subtext,
                -uiLevel=>6,
@@ -234,6 +245,7 @@ sub www_editBranch {
         $tabform->getTab("security")->group(
                -name=>"groupIdView",
                -label=>WebGUI::International::get(872,"Asset"),
+		-hoverHelp=>WebGUI::International::get('872 description',"Asset"),
                -value=>[$self->get("groupIdView")],
                -uiLevel=>6,
 		-subtext=>'<br />'.WebGUI::International::get("change","Asset").' '.WebGUI::Form::yesNo({name=>"change_groupIdView"})
@@ -241,6 +253,7 @@ sub www_editBranch {
         $tabform->getTab("security")->group(
                -name=>"groupIdEdit",
                -label=>WebGUI::International::get(871,"Asset"),
+		-hoverHelp=>WebGUI::International::get('871 description',"Asset"),
                -value=>[$self->get("groupIdEdit")],
                -excludeGroups=>[1,7],
                -uiLevel=>6,
@@ -278,7 +291,7 @@ sub www_editBranch {
                                 );
                 }
         }	
-	return $ac->render($tabform->print, "Edit Branch");
+	return $ac->render($tabform->print, WebGUI::International::get('edit branch','Asset'));
 }
 
 #-------------------------------------------------------------------
