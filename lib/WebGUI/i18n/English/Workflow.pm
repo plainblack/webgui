@@ -1,6 +1,12 @@
 package WebGUI::i18n::English::Workflow;
 
 our $I18N = { 
+	'confirm delete activity' => {
+		message => q|Are you certain you wish to delete this activity from this workflow?|,
+		context => q|prompt the user before deleting an activity from a workflow|,
+		lastUpdated => 0,
+	},
+
 	'are you sure you want to delete this workflow' => {
 		message => q|Are you certain you wish to delete this workflow and all running instances of it?|,
 		context => q|prompt the user before deleting a workflow|,

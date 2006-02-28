@@ -192,14 +192,17 @@ Returns the form that will be used to edit the properties of an activity.
 sub getEditForm {
         my $self = shift;
 	my $form = WebGUI::HTMLForm->new($self->session);
-        foreach my $definition (reverse @{$self->definition($self->session)}) {
+	$form->hidden(name=>"activityId", value=>$self->getId);
+	$form->hidden(name=>"className", value=>$self->get("className"));
+	my $fullDefinition = $self->definition($self->session);
+        foreach my $definition (reverse @{$fullDefinition}) {
                 my $properties = $definition->{properties};
                 foreach my $fieldname (keys %{$properties}) {
                         my %params;
                         foreach my $key (keys %{$properties->{$fieldname}}) {
                                 $params{$key} = $properties->{$fieldname}{$key};
 				if ($fieldname eq "title" && lc($params{$key}) eq "untitled") {
-					$params{$key} = $definition->[0]{name};
+					$params{$key} = $fullDefinition->[0]{name};
 				}
                         }
                         $params{value} = $self->get($fieldname);
@@ -282,6 +285,38 @@ sub new {
 	my %data = (%{$main}, %{$sub});
 	bless {_session=>$session, _id=>$activityId, _data=>\%data}, $class;
 }
+
+#-------------------------------------------------------------------
+
+=head2 newByPropertyHashRef ( session,  properties )
+
+Constructor. 
+
+=head3 session
+        
+A reference to the current session.
+        
+=head3 properties
+                
+A properties hash reference. The className of the properties hash must be valid.
+                        
+=cut                    
+                
+sub newByPropertyHashRef {
+        my $class = shift;
+        my $session = shift;
+        my $properties = shift;
+        return undef unless defined $properties;
+        return undef unless exists $properties->{className};
+        my $className = $properties->{className};
+        my $cmd = "use ".$className;
+        eval ($cmd);    
+        if ($@) {
+                $session->errorHandler->warn("Couldn't compile activity package: ".$className.". Root cause: ".$@);
+                return undef;
+        }               
+        bless {_session=>$session, _id=>$properties->{activityId}, _data => $properties}, $className;
+} 
 
 #-------------------------------------------------------------------
 

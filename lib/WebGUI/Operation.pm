@@ -79,6 +79,8 @@ sub getOperations {
 	return {
 	  'addWorkflow' => 'WebGUI::Operation::Workflow',
 	  'deleteWorkflow' => 'WebGUI::Operation::Workflow',
+	  'editWorkflowActivity' => 'WebGUI::Operation::Workflow',
+	  'editWorkflowActivitySave' => 'WebGUI::Operation::Workflow',
 	  'deleteWorkflowActivity' => 'WebGUI::Operation::Workflow',
 	  'addWorkflowSave' => 'WebGUI::Operation::Workflow',
 	  'editWorkflow' => 'WebGUI::Operation::Workflow',

@@ -16,6 +16,7 @@ use WebGUI::AdminConsole;
 use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Workflow;
+use WebGUI::Workflow::Activity;
 
 =head1 NAME
 
@@ -55,6 +56,7 @@ sub www_addWorkflow {
 		value=>"none",
 		hoverHelp=>$i18n->get("object type help")
 		);
+	$f->submit;
 	my $ac = WebGUI::AdminConsole->new($session,"workflow");
 	$ac->addSubmenuItem($session->url->page("op=manageWorkflows"), $i18n->get("manage workflows"));
 	return $ac->render($f->print);
@@ -72,7 +74,7 @@ sub www_addWorkflowSave {
 	my $session = shift;
         return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
 	my $workflow = WebGUI::Workflow->create($session, {type=>$session->form->get("type")});	
-	return www_editWorkflowSave($session, $workflow);
+	return www_editWorkflow($session, $workflow);
 }
 
 #-------------------------------------------------------------------
@@ -103,7 +105,10 @@ sub www_deleteWorkflowActivity {
 	my $session = shift;
         return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
 	my $workflow = WebGUI::Workflow->new($session, $session->form->get("workflowId"));
-	$workflow->deleteActivity($session->form->get("activityId")) if defined $workflow;
+	if (defined $workflow) {
+		$workflow->deleteActivity($session->form->get("activityId"));
+		$workflow->set({enabled=>0});
+	}
 	return www_editWorkflow($session);
 }
 
@@ -121,6 +126,19 @@ sub www_editWorkflow {
         return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
 	$workflow = WebGUI::Workflow->new($session, $session->form->get("workflowId")) unless (defined $workflow);
 	my $i18n = WebGUI::International->new($session, "Workflow");
+	my $workflowActivities = $session->config->get("workflowActivities");
+	my $addmenu = '<div style="float: left; width: 180px;">';
+	foreach my $activity (@{$workflowActivities->{$workflow->get("type")}}) {
+		my $cmd = "use $activity";
+        	eval ($cmd);
+        	if ($@) {
+                	$session->errorHandler->warn("Couldn't compile activity package: ".$activity.". Root cause: ".$@);
+                	return undef;
+       	 	} else {
+			$addmenu .= '<a href="'.$session->url->page("op=editWorkflowActivity;className=".$activity.";workflowId=".$workflow->getId).'">'.$activity->getName($session)."</a><br />\n";
+		}
+	}	
+	$addmenu .= '</div>';
 	my $f = WebGUI::HTMLForm->new($session);
 	$f->hidden(
 		name=>"op",
@@ -165,10 +183,19 @@ sub www_editWorkflow {
 		hoverHelp=>$i18n->get("is serial help")
 		);
 	$f->submit;
+	my $steps = '<table class="content">';
+	my $rs = $session->db->read("select activityId, title from workflowActivity where workflowId=?",[$workflow->getId]);
+	while (my ($id, $title) = $rs->array) {
+		$steps .= '<tr><td>'
+			.$session->icon->delete("op=deleteWorkflowActivity;workflowId=".$workflow->getId.";activityId=".$id, undef, $i18n->get("confirm delete activity"))
+			.$session->icon->edit("op=editWorkflowActivity;workflowId=".$workflow->getId.";activityId=".$id)
+			.'</td><td>'.$title.'</td></tr>';	
+	}
+	$steps .= '</table>';
 	my $ac = WebGUI::AdminConsole->new($session,"workflow");
 	$ac->addSubmenuItem($session->url->page("op=addWorkflow"), $i18n->get("add a new workflow"));
 	$ac->addSubmenuItem($session->url->page("op=manageWorkflows"), $i18n->get("manage workflows"));
-	return $ac->render($f->print);
+	return $ac->render($f->print.$addmenu.$steps);
 }
 
 
@@ -196,7 +223,61 @@ sub www_editWorkflowSave {
 
 #-------------------------------------------------------------------
 
-=head2 www_manageCron  ( )
+=head2 www_editWorkflowActivity ( )
+
+Displays a form to edit the properties of a workflow activity.
+
+=cut
+
+sub www_editWorkflowActivity {
+	my $session = shift;
+        return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
+	my $activity = '';
+	if ($session->form->get("className")) {
+		$activity = WebGUI::Workflow::Activity->newByPropertyHashRef($session, {activityId=>"new",className=>$session->form->get("className")});
+	} else {
+		$activity = WebGUI::Workflow::Activity->new($session, $session->form->get("activityId"));
+	}
+	my $form = $activity->getEditForm;
+	$form->hidden( name=>"op", value=>"editWorkflowActivitySave");
+	$form->hidden( name=>"workflowId", value=>$session->form->get("workflowId"));
+	$form->submit;
+	my $i18n = WebGUI::International->new($session, "Workflow");
+	my $ac = WebGUI::AdminConsole->new($session,"workflow");
+	$ac->addSubmenuItem($session->url->page("op=addWorkflow"), $i18n->get("add a new workflow"));
+	$ac->addSubmenuItem($session->url->page("op=manageWorkflows"), $i18n->get("manage workflows"));
+	return $ac->render($form->print,$activity->getName($session));
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_editWorkflowActivitySave ( )
+
+Saves the results of www_editWorkflowActivity().
+
+=cut
+
+sub www_editWorkflowActivitySave {
+	my $session = shift;
+        return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
+	my $workflow = WebGUI::Workflow->new($session, $session->form->get("workflowId"));
+	if (defined $workflow) {
+		my $activityId = $session->form->get("activityId");
+		my $activity = '';
+		if ($activityId eq "new") {
+			$activity = $workflow->addActivity($session->form->get("className"));
+		} else {
+			$activity = $workflow->getActivity($activityId);
+		}
+		$activity->processPropertiesFromFormPost;
+		$workflow->set({enabled=>0});
+	}
+	return www_editWorkflow($session);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_manageWorkflows ( )
 
 Display a list of the workflows.
 
