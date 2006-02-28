@@ -42,12 +42,16 @@
  - [ 1433525 ] 6.9: Compilation errors 
  - base36 removed from Utility.t because it no longer exists in WebGUI::Utility.pm
  - Add tests that verify the integrity of the WebGUI Database.
+ - Added a karma ranking system to CS threads for conducting popularity
+   contests.
 
 6.8.8
  - fix [ 1437186 ] 6.8.7 deploy DataForm package does not copy fields
  - fix [ 1437563 ] Data picker intermittent for Admin
  - fix broken link to top of CS Assets configured as FAQs
  - fix [ 1437977 ] richeditor selectbox options not versioned, trashed appear
+ - fixed a bug in the rich editor where the page chooser didn't have scroll
+   bars
 
 6.8.7
  - fix [ 1431098 ] op=becomeUser can become non-existent userIds

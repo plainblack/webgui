@@ -1133,6 +1133,11 @@ sub www_edit {
 	$var{'form.submit'} = WebGUI::Form::submit($self->session, {
 		extras=>"onclick=\"this.value='".$i18n->get(452)."'; this.form.func.value='editSave'; this.form.submit();return false;\""
 		});
+	$var{'karmaScale.form'} = WebGUI::Form::integer($self->session, {
+		name=>"karmaScale",
+		value=>$self->getValue("karmaScale"),
+		defaultValue=>1
+		});
 	$var{'form.preview'} = WebGUI::Form::submit($self->session, {
 		value=>$i18n->get("preview","Asset_Collaboration")
 		});

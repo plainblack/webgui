@@ -405,6 +405,10 @@ sub definition {
 			postGroupId =>{
 				fieldType=>"group",
 				defaultValue=>'2'
+				},
+			defaultKarmaScale => {
+				fieldType=>"integer",
+				defaultValue=>1
 				}
 			}
 		});
@@ -515,7 +519,17 @@ sub getEditForm {
 			-hoverHelp=>$i18n->get('karma rating multiplier description'),
 			-value=>$self->getValue("karmaRatingMultiplier")
 			);
+                $tabform->getTab("properties")->integer(
+			-name=>"defaultKarmaScale",
+			$i18n->get("default karma scale"),
+			-hoverHelp=>$i18n->get('default karma scale help'),
+			-value=>$self->getValue("defaultKarmaScale")
+			);
         } else {
+                $tabform->getTab("properties")->hidden(
+			-name=>"defaultKarmaScale",
+			-value=>$self->getValue("defaultKarmaScale")
+			);
                 $tabform->getTab("properties")->hidden(
 			-name=>"karmaPerPost",
 			-value=>$self->getValue("karmaPerPost")
@@ -548,6 +562,7 @@ sub getEditForm {
 			userDefined4=>$i18n->get('user defined 4'),
 			userDefined5=>$i18n->get('user defined 5'),
 			);
+	$options{karmaRank} = $i18n->get("karma rank") if ($self->session->setting->get("useKarma"));
 	$tabform->getTab("display")->selectBox(
 		-name=>"sortBy",
 		-value=>[$self->getValue("sortBy")],

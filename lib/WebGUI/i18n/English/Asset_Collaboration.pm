@@ -2,6 +2,24 @@ package WebGUI::i18n::English::Asset_Collaboration;
 
 our $I18N = {
 
+	'karma rank' => {
+		message => q|Karma Rank|,
+		context => q|a label used in sorting threads by karma divided by karma scale|,
+		lastUpdated => 0,
+	},
+
+	'default karma scale' => {
+		message => q|Default Karma Scale|,
+		context => q|a label indicating the default scale of all threads in the system|,
+		lastUpdated => 0,
+	},
+
+	'default karma scale help' => {
+		message => q|This is the default value that will be assigned to the karma scale field in threads. Karma scale is a weighting mechanism for karma sorting that can be used for handicaps, difficulty, etc.|,
+		context => q|hover help for the default karma scale field|,
+		lastUpdated => 0,
+	},
+
 	'assetName' => {
 		message => q|Collaboration System|,
 		context => q|label for Asset Manager|,
@@ -19,8 +37,8 @@ our $I18N = {
 	},
 
 	'karma rating multiplier' => {
-		message => q|Karma Rating Multiplier|,
-		lastUpdated => 0,
+		message => q|Karma Given To Poster on Rating|,
+		lastUpdated => 1141142205,
 	},
 
 	'delete file warning' => {
@@ -891,8 +909,8 @@ submitted by a user.|,
         },
 
         'karma rating multiplier description' => {
-                message => q|If karma is enabled on your site, this amount multiplied by the rating the user gives a post will be the amount of karma the original author of the post receives.|,
-                lastUpdated => 1119070429,
+                message => q|If karma is enabled on your site, this will be the amount of karma the original author of the post receives when another user rates the post.|,
+                lastUpdated => 1141142205,
         },
 
         'filter code description' => {

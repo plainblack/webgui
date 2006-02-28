@@ -108,8 +108,23 @@ sub definition {
 				},
 			lastPostDate => {
 				noFormPost=>1,
-				fieldType=>"hidden",
+				fieldType=>"dateTime",
 				defaultValue=>undef
+				},
+			karma => {
+				noFormPost=>1,
+				fieldType=>"integer",
+				defaultValue=>0
+				},
+			karmaRank => {
+				noFormPost=>1,
+				fieldType=>"hidden",
+				defaultValue=>0
+				},
+			karmaScale => {
+				noFormPost=>1,
+				fieldType=>"integer",
+				defaultValue=>1
 				}
 			},
 		});
@@ -489,6 +504,10 @@ sub processPropertiesFromFormPost {
 	if ($self->get("subscriptionGroupId") eq "") {
 		$self->createSubscriptionGroup;
 	}
+	if ($self->getParent->canModerate) {
+		my $karmaScale = $self->session->form("karmaScale","integer") || 1;
+		$self->update({karmaScale=>$karmaScale, karmaRank=>$self->get("karma")/$karmaScale});
+	}
 }
 
 
@@ -730,6 +749,18 @@ sub view {
         $var->{'lock.url'} = $self->getLockUrl;
         $var->{'unlock.url'} = $self->getUnlockUrl;
 
+	$var->{'transfer.karma.form'} = WebGUI::Form::formHeader($self->session, {action=>$self->getUrl})
+		.WebGUI::Form::hidden($self->session, {
+			name=>"func",
+			value=>"transferKarma"
+			})
+		.WebGUI::Form::integer($self->session, {
+			name=>"karma",
+			value=>10
+			})
+		.WebGUI::Form::submit($self->session)
+		.WebGUI::Form::formFooter($self->session);
+
         my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->getParent->get("postsPerPage"));
 	my $sql = "select asset.assetId, asset.className, assetData.revisionDate as revisionDate, assetData.url as url from asset 
 		left join assetData on assetData.assetId=asset.assetId
@@ -838,6 +869,26 @@ The web method to subscribe to a thread.
 sub www_subscribe {
 	my $self = shift;
 	$self->subscribe if $self->canSubscribe;
+	return $self->www_view;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_transferKarma ( )
+
+Transfers karma from the current user to this thread.
+
+=cut
+
+sub www_transferKarma {
+	my $self = shift;
+	my $amount = $self->session->form->get("karma","integer");
+	# cant have them giving more karma then they have
+	if ($amount <= $self->session->user->karma) {
+		$self->session->user->karma($amount, "Thread ".$self->getId, "Transferring karma to a thread.");
+		my $newKarma = $self->get("karma")+$amount;
+		$self->update({karma=>$newKarma,karmaRank=>$newKarma/$self->get("karmaScale")});
+	}
 	return $self->www_view;
 }
 

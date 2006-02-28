@@ -61,6 +61,11 @@ our $HELP = {
                                 namespace => 'Asset_Collaboration',
                         },
                         {
+                                title => 'default karma scale',
+                                description => 'default karma scale help',
+                                namespace => 'Asset_Collaboration',
+                        },
+                        {
                                 title => 'karma/post',
                                 description => 'karma/post description',
                                 namespace => 'Asset_Collaboration',

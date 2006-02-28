@@ -11,6 +11,22 @@ our $I18N = {
 		message => q|The variables below are available in the Thread template.  In addition, all variables from the Post Template can be used.  Labels for URLs for actions like <b>unlock.url</b>, <b>stick.url</b>, etc. are provided by the Collaboration Labels.  The Pagination Template variables are also available to display multiple pages of posts and threads.
 <p>
 
+<b>karma.transfer.form</b><br>
+A variable that displays a small form that allows a user to transfer an amount of karma from their account to the thread.
+<p>
+
+<b>karma</b><br>
+Indicates the amount of karma this thread has.
+<p>
+
+<b>karmaScale</b><br>
+A weighting factor for difficulty, complexity, or handicap in contests.
+<p>
+
+<b>karmaRank</b><br>
+This is karma divided by karma scale.
+<p>
+
 <b>user.isVisitor</b><br>
 A conditional indicating that the current user is a Visitor.
 <p>
@@ -175,7 +191,7 @@ The description of the collaboration system that this post is a part of.
 <p>
 
 |,
-		lastUpdated => 1140982574,
+		lastUpdated => 1141142205,
 	},
 
         'assetName' => {

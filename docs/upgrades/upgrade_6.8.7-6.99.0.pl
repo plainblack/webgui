@@ -40,6 +40,15 @@ addDatabaseCache();
 finish($session); # this line required
 
 #-------------------------------------------------
+sub addCsPopularityContest {
+	print "\tAdding collaboration system popularity system based upon karma.\n";
+	$session->db->write("alter table Collaboration add column defaultKarmaScale integer not null default 1");
+	$session->db->write("alter table Thread add column karma integer not null default 0");
+	$session->db->write("alter table Thread add column karmaScale integer not null default 1");
+	$session->db->write("alter table Thread add column karmaRank decimal(5,6) not null default 0");
+}
+
+#-------------------------------------------------
 sub addDatabaseCache {
 	print "\tAdding database cache.\n";
 	$session->db->write("create table cache ( namespace varchar(128) not null, cachekey varchar(128) not null, expires bigint not null, size int not null, content mediumtext, primary key (namespace, cachekey))");

@@ -61,6 +61,10 @@ A yes/no button to lock the thread, so that no posts can be added or edited.
 A conditional that is true if the user is editing an existing post.
 <p>
 
+<b>karmaScale.form</b><br>
+A form element that allows moderators to set the scale of an individual thread. This is only available for threads.
+<p>
+
 <b>preview.title</b><br>
 The web safe title for previewing a post.
 <p>
