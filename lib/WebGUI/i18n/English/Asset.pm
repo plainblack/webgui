@@ -32,6 +32,12 @@ do a commit immediately after an edit occurs.|,
 		context => q|Hover help for the toggle for asset versioning.|
 	},
 
+	'purge' => {
+		message => q|Purge|,
+		lastUpdated => 0,
+		context => q|The label for the purge button in the trash manager.|
+	},
+
 	'set tag' => {
 		message => q|Set As Working Tag|,
 		lastUpdated => 0,

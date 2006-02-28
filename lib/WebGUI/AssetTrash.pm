@@ -204,6 +204,7 @@ sub www_manageTrash {
         $self->session->style->setScript($self->session->config->get("extrasURL").'/assetManager/assetManager.js', {type=>"text/javascript"});
 	my $output = "
    <script type=\"text/javascript\">
+   //<![CDATA[
      var assetManager = new AssetManager();
          assetManager.AddColumn('".WebGUI::Form::checkbox($self->session,{extras=>'onchange="toggleAssetListSelectAll(this.form);"'})."','','center','form');
          assetManager.AddColumn('".$i18n->get("99")."','','left','');
@@ -226,7 +227,9 @@ sub www_manageTrash {
          	$output .= "assetManager.AddLineSortData('','".$title."','".$child->getName
 			."','".$child->get("revisionDate")."','".$child->get("assetSize")."');\n";
 	}
-	$output .= 'assetManager.AddButton("'.$i18n->get("restore").'","restoreList","manageTrash");
+	$output .= '
+assetManager.AddButton("'.$i18n->get("restore").'","restoreList","manageTrash");
+assetManager.AddButton("'.$i18n->get("purge").'","purgeList","manageTrash");
 		assetManager.Write();        
                 var assetListSelectAllToggle = false;
                 function toggleAssetListSelectAll(form){
@@ -234,8 +237,31 @@ sub www_manageTrash {
                         for(var i = 0; i < form.assetId.length; i++)
                         form.assetId[i].checked = assetListSelectAllToggle;
                  }
+		 //]]>
 		</script> <div class="adminConsoleSpacer"> &nbsp;</div>';
 	return $ac->render($output, $header);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_purgeList ( )
+
+Purges a piece of content, including all it's revisions, from the system permanently.
+
+=cut
+
+sub www_purgeList {
+        my $self = shift;
+        return $self->session->privilege->insufficient() unless $self->canEdit;
+        foreach my $id ($self->session->form->param("assetId")) {
+                my $asset = WebGUI::Asset->newByDynamicClass($self->session,$id);
+                $asset->purge;
+        }
+        if ($self->session->form->process("proceed") ne "") {
+                my $method = "www_".$self->session->form->process("proceed");
+                return $self->$method();
+        }
+        return $self->www_manageTrash();
 }
 
 #-------------------------------------------------------------------
