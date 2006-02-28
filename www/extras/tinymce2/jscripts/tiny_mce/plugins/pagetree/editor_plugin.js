@@ -32,7 +32,7 @@ function TinyMCE_pagetree_execCommand(editor_id, element, command, user_interfac
 			template['width'] = 500;
 			template['height'] = 500;
 
-			tinyMCE.openWindow(template, {editor_id : editor_id});
+			tinyMCE.openWindow(template, {editor_id : editor_id, scrollbars : "yes"} );
 
 			return true;
 	}
