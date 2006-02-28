@@ -66,7 +66,8 @@ A partial composite key to remove.
 
 sub deleteChunk {
 	my $self = shift;
-	$self->session->db->write("delete from cache where namespace=? and cachekey like ?",[$self->{_namespace}, $self->{_key}.'%']);
+	my $key = $self->parseKey(shift);
+	$self->session->db->write("delete from cache where namespace=? and cachekey like ?",[$self->{_namespace}, $key.'%']);
 }
 
 #-------------------------------------------------------------------
