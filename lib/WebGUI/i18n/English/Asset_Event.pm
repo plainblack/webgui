@@ -2,6 +2,24 @@ package WebGUI::i18n::English::Asset_Event;
 
 our $I18N = {
 
+	'trash after' => {
+		message => q|Trash After|,
+		lastUpdated => 0,
+		context=> q|a label for the workflow activity property that sets how long old events stick around|
+	},
+
+	'trash after help' => {
+		message => q|How long should old events stay in the calendar before being trashed?|,
+		lastUpdated => 0,
+		context=> q|hover help for the trash after field|
+	},
+
+	'trash expired events' => {
+		message => q|Trash Expired Events|,
+		lastUpdated => 0,
+		context=> q|The label for the workflow activity that trashes old events.|
+	},
+
 	'72' => {
 		message => q|Event, Add/Edit|,
 		lastUpdated => 1038887363

@@ -229,12 +229,6 @@
 
 "soapHttpHeaderOverride" : 0,
 
-# Specify the number of days after an event has passed that it
-# should be purged from the Events Calendar. Comment it out if
-# you never want events to be purged automatically.
-
-"DeleteExpiredEvents_offset" : 30,
-
 # Specify the list of macros you wish to be processed on each page.
 
 "macros" : {
@@ -298,11 +292,6 @@
 # available for rollbacks.
 
 "DeleteExpiredRevisions_offset" : 365,
-
-# How many days after a piece of content expires should it be
-# moved to the trash.
-
-"TrashExpiredContent_offset" : 30,
 
 # What hour of the day (for example, 22 : 10 PM = 22:00:00)
 # should WebGUI try to synchronize user profile information from 

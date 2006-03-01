@@ -95,7 +95,10 @@ sub www_editCronJob {
 		hoverHelp=>$i18n->get("run once help")
 		);
 	my $value = $cron->get("workflowId") if defined $cron;
-	my $type = "None" unless defined $cron;
+	my $type = "None";
+	if (defined $cron) {
+		$type = $cron->get("className");
+	}
 	$f->workflow(
 		name=>"workflowId",
 		value=>$value,

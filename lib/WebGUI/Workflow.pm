@@ -330,7 +330,7 @@ A boolean indicating whether this workflow may be executed right now.
 
 =head4 type
 
-A string indicating the type of object this workflow will be operating on. Valid values are "None", "VersionTag" and "User".
+A string indicating the type of object this workflow will be operating on. Valid values are "None", or any object type, like "WebGUI::VersionTag".
 
 =head4 isSerial
 

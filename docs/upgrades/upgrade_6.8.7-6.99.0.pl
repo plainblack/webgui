@@ -125,6 +125,14 @@ sub addWorkflow {
 		value text,
 		primary key (activityId, name)
 		)");
+	$session->config->set("workflowActivities", {
+		None=>["WebGUI::Workflow::Activity::DecayKarma", "WebGUI::Workflow::Activity::TrashClipboard", "WebGUI::Workflow::Activity::CleanTempStorage", 
+			"WebGUI::Workflow::Activity::CleanFileCache", "WebGUI::Workflow::Activity::CleanLoginHistory", "WebGUI::Workflow::Activity::ArchiveOldThreads",
+			"WebGUI::Workflow::Activity::TrashExpiredEvents", "WebGUI::Workflow::Activity::CreateCronJob"],
+		"WebGUI::User"=>["WebGUI::Workflow::Activity::CreateCronJob"],
+		"WebGUI::VersionTag"=>["WebGUI::Workflow::Activity::CommitVersionTag", "WebGUI::Workflow::Activity::RollbackVersionTag", 
+			"WebGUI::Workflow::Activity::TrashVersionTag", "WebGUI::Workflow::Activity::CreateCronJob"]
+		});
 	my $workflow = WebGUI::Workflow->create($session, {
 		title=>"Daily Maintenance Tasks",
 		description=>"This workflow runs daily maintenance tasks such as cleaning up old temporary files and cache.",
@@ -137,6 +145,11 @@ sub addWorkflow {
 	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::CleanFileCache", "pbwfactivity0000000002");
 	$activity->set("title","Prune cache larger than 100MB");
 	$activity->set("sizeLimit", 1000000000);
+	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::ArchiveOldThreads", "pbwfactivity0000000005");
+	$activity->set("title", "Archive old CS threads");
+	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::TrashExpiredEvents", "pbwfactivity0000000006");
+	$activity->set("title", "Trash old Events Calendar Events");
+	$activity->set("trashAfter", 60*60*24*30);
 	WebGUI::Workflow::Cron->create($session, {
 		title=>'Daily Maintenance',
 		enabled=>1,
@@ -146,13 +159,6 @@ sub addWorkflow {
 		priority=>3,
 		workflowId=>$workflow->getId
 		}, "pbcron0000000000000001");
-	$session->config->set("workflowActivities", {
-		None=>["WebGUI::Workflow::Activity::DecayKarma", "WebGUI::Workflow::Activity::TrashClipboard", "WebGUI::Workflow::Activity::CleanTempStorage", 
-			"WebGUI::Workflow::Activity::CleanFileCache", "WebGUI::Workflow::Activity::CleanLoginHistory", "WebGUI::Workflow::Activity::ArchiveOldThreads"],
-		User=>[],
-		VersionTag=>["WebGUI::Workflow::Activity::CommitVersionTag", "WebGUI::Workflow::Activity::RollbackVersionTag", 
-			"WebGUI::Workflow::Activity::TrashVersionTag"]
-		});
 	$session->db->write("alter table assetData drop column startDate");
 	$session->db->write("alter table assetData drop column endDate");
 	$workflow = WebGUI::Workflow->create($session, {
@@ -167,10 +173,8 @@ sub addWorkflow {
 	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::TrashClipboard", "pbwfactivity0000000004");
 	$activity->set("title", "Move clipboard items older than 30 days to trash");
 	$activity->set("trashAfter", 60*60*24*30);
-	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::ArchiveOldThreads", "pbwfactivity0000000005");
-	$activity->set("title", "Archive old CS threads");
 	WebGUI::Workflow::Cron->create($session, {
-                title=>'Weekly Maintenance Maintenance',
+                title=>'Weekly Maintenance',
                 enabled=>1,
                 runOnce=>0,
                 minuteOfHour=>"30",
@@ -186,11 +190,13 @@ sub addWorkflow {
 	$session->config->delete("DecayKarma_minimumKarma");
 	$session->config->delete("DecayKarma_decayFactor");
 	$session->config->delete("DeleteExpiredClipboard_offset");
+	$session->config->delete("DeleteExpiredEvents_offset");
+	$session->config->delete("TrashExpiredContent_offset");
 	$workflow = WebGUI::Workflow->create($session, {
 		title=>"Commit Without Approval",
 		description=>"This workflow commits all the assets in this version tag without asking for any approval.",
 		enabled=>1,
-		type=>"VersionTag"
+		type=>"WebGUI::VersionTag"
 		}, "pbworkflow000000000003");
 	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::CommitVersionTag", "pbwfactivity0000000006");
 	$activity->set("title", "Commit Assets");
