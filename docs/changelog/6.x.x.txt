@@ -53,6 +53,7 @@
  - fix [ 1437977 ] richeditor selectbox options not versioned, trashed appear
  - fixed a bug in the rich editor where the page chooser didn't have scroll
    bars
+ - fixed a delete bug on cs posts.
 
 6.8.7
  - fix [ 1431098 ] op=becomeUser can become non-existent userIds

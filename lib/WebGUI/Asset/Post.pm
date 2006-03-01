@@ -738,7 +738,8 @@ sub purge {
         my $self = shift;
         my $sth = $self->session->db->read("select storageId from Post where assetId=".$self->session->db->quote($self->getId));
         while (my ($storageId) = $sth->array) {
-                WebGUI::Storage->get($self->session,$storageId)->delete;
+		my $storage = WebGUI::Storage->get($storageId);
+                $storage->delete if defined $storage;
         }
         $sth->finish;
 	$self->session->db->write("delete from Post_rating where assetId=".$self->session->db->quote($self->getId));
