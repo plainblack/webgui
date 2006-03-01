@@ -1,6 +1,24 @@
 package WebGUI::i18n::English::Asset;
 
 our $I18N = {
+	'purge old asset revisions' => {
+		message => q|Purge Old Asset Revisions|,
+		lastUpdated => 0,
+		context => q|title of the purge old asset revisions workflow activity|
+	},
+
+	'purge revision after' => {
+		message => q|Purge Old Revisions After|,
+		lastUpdated => 0,
+		context => q|the label used in the purge expired asset revisions workflow activity|
+	},
+
+	'purge revision after help' => {
+		message => q|How long should old revisions of an asset be kept? Old asset revisions are those that are no longer viewable by users, but are kept in the versioning system for rollbacks.|,
+		lastUpdated => 0,
+		context => q|the hover help for the purge revision after field|
+	},
+
 	'purge revision prompt' => {
 		message => q|Are you certain you wish to delete this revision of this asset? It CANNOT be restored if you delete it.|,
 		lastUpdated => 0,

@@ -129,7 +129,7 @@ sub addWorkflow {
 		None=>["WebGUI::Workflow::Activity::DecayKarma", "WebGUI::Workflow::Activity::TrashClipboard", "WebGUI::Workflow::Activity::CleanTempStorage", 
 			"WebGUI::Workflow::Activity::CleanFileCache", "WebGUI::Workflow::Activity::CleanLoginHistory", "WebGUI::Workflow::Activity::ArchiveOldThreads",
 			"WebGUI::Workflow::Activity::TrashExpiredEvents", "WebGUI::Workflow::Activity::CreateCronJob", 
-			"WebGUI::Workflow::Activity::DeleteExpiredGroupings"],
+			"WebGUI::Workflow::Activity::DeleteExpiredGroupings", "WebGUI::Workflow::Activity::PurgeOldAssetRevisions"],
 		"WebGUI::User"=>["WebGUI::Workflow::Activity::CreateCronJob"],
 		"WebGUI::VersionTag"=>["WebGUI::Workflow::Activity::CommitVersionTag", "WebGUI::Workflow::Activity::RollbackVersionTag", 
 			"WebGUI::Workflow::Activity::TrashVersionTag", "WebGUI::Workflow::Activity::CreateCronJob"]
@@ -176,6 +176,9 @@ sub addWorkflow {
 	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::TrashClipboard", "pbwfactivity0000000004");
 	$activity->set("title", "Move clipboard items older than 30 days to trash");
 	$activity->set("trashAfter", 60*60*24*30);
+	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::PurgeOldAssetRevisions", "pbwfactivity0000000008");
+	$activity->set("title", "delete asset revisions older than a year from the database");
+	$activity->set("purgeAfter", 60*60*24*365);
 	WebGUI::Workflow::Cron->create($session, {
                 title=>'Weekly Maintenance',
                 enabled=>1,
