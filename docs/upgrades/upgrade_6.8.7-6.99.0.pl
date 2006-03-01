@@ -128,7 +128,7 @@ sub addWorkflow {
 	$session->config->set("workflowActivities", {
 		None=>["WebGUI::Workflow::Activity::DecayKarma", "WebGUI::Workflow::Activity::TrashClipboard", "WebGUI::Workflow::Activity::CleanTempStorage", 
 			"WebGUI::Workflow::Activity::CleanFileCache", "WebGUI::Workflow::Activity::CleanLoginHistory", "WebGUI::Workflow::Activity::ArchiveOldThreads",
-			"WebGUI::Workflow::Activity::TrashExpiredEvents", "WebGUI::Workflow::Activity::CreateCronJob", 
+			"WebGUI::Workflow::Activity::TrashExpiredEvents", "WebGUI::Workflow::Activity::CreateCronJob", "WebGUI::Workflow::Activity::DeleteExpiredSessions",
 			"WebGUI::Workflow::Activity::DeleteExpiredGroupings", "WebGUI::Workflow::Activity::PurgeOldAssetRevisions"],
 		"WebGUI::User"=>["WebGUI::Workflow::Activity::CreateCronJob"],
 		"WebGUI::VersionTag"=>["WebGUI::Workflow::Activity::CommitVersionTag", "WebGUI::Workflow::Activity::RollbackVersionTag", 
@@ -189,6 +189,22 @@ sub addWorkflow {
                 priority=>3,
                 workflowId=>$workflow->getId
                 }, "pbcron0000000000000002");
+	$workflow = WebGUI::Workflow->create($session, {
+		title=>"Hourly Maintenance Tasks",
+		description=>"This workflow runs once per hour to perform maintenance tasks like deleting expired user sessions.",
+		enabled=>1,
+		type=>"None"
+		}, "pbworkflow000000000004");
+	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::DeleteExpiredSessions", "pbwfactivity0000000009");
+	$activity->set("title", "delete expired sessions");
+	WebGUI::Workflow::Cron->create($session, {
+                title=>'Hourly Maintenance',
+                enabled=>1,
+                runOnce=>0,
+                minuteOfHour=>"15",
+                priority=>3,
+                workflowId=>$workflow->getId
+                }, "pbcron0000000000000003");
 	$session->db->write("alter table assetVersionTag add column isLocked int not null default 0");
 	$session->db->write("alter table assetVersionTag add column lockedBy varchar(22) binary not null");
 	$session->config->delete("fileCacheSizeLimit");

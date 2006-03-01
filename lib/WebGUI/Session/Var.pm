@@ -147,13 +147,17 @@ sub isAdminOn {
 
 #-------------------------------------------------------------------
 
-=head2 new ( session )
+=head2 new ( session, noFuss )
 
 Constructor. Returns a var object.
 
 =head3 session
 
 A reference to the session.
+
+=head3 noFuss
+
+A boolean, that if true will not update the session, or check if it's expired. This is mainly for WebGUI session maintenance, and shouldn't normally be used by anyone.
 
 =cut
 

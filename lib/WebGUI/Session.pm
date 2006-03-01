@@ -325,7 +325,7 @@ sub id {
 
 #-------------------------------------------------------------------
 
-=head2 open ( webguiRoot, configFile [, requestObject, serverObject, sessionId ] )
+=head2 open ( webguiRoot, configFile [, requestObject, serverObject, sessionId, noFuss ] )
 
 Constructor. Opens a closed ( or new ) WebGUI session.
 
@@ -349,6 +349,10 @@ The Apache server object (Apache2::ServerUtil). If this session is being instanc
 
 Optionally retrieve a specific session id. Normally this is set by a cookie in the user's browser.
 
+=head3 noFuss
+
+Uses simple session vars. See WebGUI::Session::Var::new() for more details.
+
 =cut
 
 sub open {
@@ -362,7 +366,8 @@ sub open {
 	bless $self , $class;
 	$self->{_request} = Apache2::Request->new($request, POST_MAX => 1024 * $self->setting->get("maxAttachmentSize")) if (defined $request);
 	my $sessionId = shift || $self->http->getCookies->{"wgSession"} || $self->id->generate;
-	$self->{_var} = WebGUI::Session::Var->new($self,$sessionId);
+	my $noFuss = shift;
+	$self->{_var} = WebGUI::Session::Var->new($self,$sessionId, $noFuss);
 	return $self;
 }
 
