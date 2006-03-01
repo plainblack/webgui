@@ -109,7 +109,7 @@ sub addWorkflow {
 		description text,
 		enabled int not null default 0,
 		isSerial int not null default 0,
-		type varchar(255) not null default 'none'
+		type varchar(255) not null default 'None'
 		)");
 	$session->db->write("create table WorkflowActivity (
 		activityId varchar(22) binary not null primary key,
@@ -129,7 +129,7 @@ sub addWorkflow {
 		title=>"Daily Maintenance Tasks",
 		description=>"This workflow runs daily maintenance tasks such as cleaning up old temporary files and cache.",
 		enabled=>1,
-		type=>"none"
+		type=>"None"
 		}, "pbworkflow000000000001");
 	my $activity = $workflow->addActivity("WebGUI::Workflow::Activity::CleanTempStorage", "pbwfactivity0000000001");
 	$activity->set("title","Delete temp files older than 24 hours");
@@ -147,16 +147,19 @@ sub addWorkflow {
 		workflowId=>$workflow->getId
 		}, "pbcron0000000000000001");
 	$session->config->set("workflowActivities", {
-		none=>["WebGUI::Workflow::Activity::DecayKarma", "WebGUI::Workflow::Activity::TrashClipboard", "WebGUI::Workflow::Activity::CleanTempStorage", 
+		None=>["WebGUI::Workflow::Activity::DecayKarma", "WebGUI::Workflow::Activity::TrashClipboard", "WebGUI::Workflow::Activity::CleanTempStorage", 
 			"WebGUI::Workflow::Activity::CleanFileCache", "WebGUI::Workflow::Activity::CleanLoginHistory", "WebGUI::Workflow::Activity::ArchiveOldThreads"],
-		user=>[],
-		versiontag=>["WebGUI::Workflow::Activity::CommitVersionTag", "WebGUI::Workflow::Activity::RollbackVersionTag"]
+		User=>[],
+		VersionTag=>["WebGUI::Workflow::Activity::CommitVersionTag", "WebGUI::Workflow::Activity::RollbackVersionTag", 
+			"WebGUI::Workflow::Activity::TrashVersionTag"]
 		});
+	$session->db->write("alter table assetData drop column startDate");
+	$session->db->write("alter table assetData drop column endDate");
 	$workflow = WebGUI::Workflow->create($session, {
 		title=>"Weekly Maintenance Tasks",
 		description=>"This workflow runs once per week to perform maintenance tasks like cleaning up log files.",
 		enabled=>1,
-		type=>"none"
+		type=>"None"
 		}, "pbworkflow000000000002");
 	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::CleanLoginHistory", "pbwfactivity0000000003");
 	$activity->set("title", "Delete login entries older than 90 days");
@@ -183,6 +186,14 @@ sub addWorkflow {
 	$session->config->delete("DecayKarma_minimumKarma");
 	$session->config->delete("DecayKarma_decayFactor");
 	$session->config->delete("DeleteExpiredClipboard_offset");
+	$workflow = WebGUI::Workflow->create($session, {
+		title=>"Commit Without Approval",
+		description=>"This workflow commits all the assets in this version tag without asking for any approval.",
+		enabled=>1,
+		type=>"VersionTag"
+		}, "pbworkflow000000000003");
+	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::CommitVersionTag", "pbwfactivity0000000006");
+	$activity->set("title", "Commit Assets");
 }
 
 #-------------------------------------------------
@@ -465,6 +476,9 @@ sub removeFiles {
 	unlink '../../lib/WebGUI/i18n/Asset_IndexedSearch.pm';
 	unlink '../../sbin/Hourly/IndexedSearch_buildIndex.pm';
 	rmtree('../../lib/WebGUI/Asset/Wobject/IndexedSearch');
+	# uncomment this after they've all been converted
+	#rmtree('../../sbin/Hourly');
+	#unlink('../../sbin/runHourly.pl');
 }
 
 #-------------------------------------------------

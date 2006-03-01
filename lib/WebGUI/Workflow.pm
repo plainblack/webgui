@@ -270,25 +270,6 @@ sub getNextActivity {
 
 #-------------------------------------------------------------------
 
-=head2 getTypeName ( [ type ] ) 
-
-Returns a human readable name for the object type this workflow supports.
-
-=head3 type
-
-Optionally override the type by specifying it here.
-
-=cut
-
-sub getTypeName {
-	my $self = shift;
-	my $type = shift || $self->get("type");
-	my $i18n = WebGUI::International->new($self->session,"Workflow");
-	return $i18n->get($type);
-}
-
-#-------------------------------------------------------------------
-
 =head2 new ( session, workflowId )
 
 Constructor.
@@ -349,7 +330,7 @@ A boolean indicating whether this workflow may be executed right now.
 
 =head4 type
 
-A string indicating the type of object this workflow will be operating on. Valid values are "none", "versiontag" and "user".
+A string indicating the type of object this workflow will be operating on. Valid values are "None", "VersionTag" and "User".
 
 =head4 isSerial
 
@@ -372,7 +353,7 @@ sub set {
 	}
 	$self->{_data}{title} = $properties->{title} || $self->{_data}{title} || "Untitled";
 	$self->{_data}{description} = (exists $properties->{description}) ? $properties->{description} : $self->{_data}{description};
-	$self->{_data}{type} = $properties->{type} || $self->{_data}{type} || "none";
+	$self->{_data}{type} = $properties->{type} || $self->{_data}{type} || "None";
 	$self->session->db->setRow("Workflow","workflowId",$self->{_data});
 }
 

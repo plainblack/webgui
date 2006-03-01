@@ -220,8 +220,6 @@ sub www_createShortcut () {
 		menuTitle=>$self->getMenuTitle,
 		isHidden=>$self->get("isHidden"),
 		newWindow=>$self->get("newWindow"),
-		startDate=>$self->get("startDate"),
-		endDate=>$self->get("endDate"),
 		ownerUserId=>$self->get("ownerUserId"),
 		groupIdEdit=>$self->get("groupIdEdit"),
 		groupIdView=>$self->get("groupIdView"),

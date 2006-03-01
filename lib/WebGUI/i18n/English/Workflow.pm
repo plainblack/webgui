@@ -13,24 +13,6 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
-	'none' => {
-		message => q|None|,
-		context => q|Workflow doesn't work on objects.|,
-		lastUpdated => 0,
-	},
-
-	'versiontag' => {
-		message => q|Version Tag|,
-		context => q|Workflow can work on version tag objects.|,
-		lastUpdated => 0,
-	},
-
-	'user' => {
-		message => q|User|,
-		context => q|Workflow can work on user objects.|,
-		lastUpdated => 0,
-	},
-
 	'object type help' => {
 		message => q|What type of objects do you want this workflow to be able to handle?|,
 		context => q|the hover help for the object type field|,

@@ -45,15 +45,15 @@ sub www_addWorkflow {
 		name=>"op",
 		value=>"addWorkflowSave"
 		);
+	my %options = ();
+	foreach my $object (keys %{$session->config->get("workflowActivities")}) {
+		$options{$object} = $object;
+	}
 	$f->selectBox(
 		name=>"type",
 		label=>$i18n->get("object type"),
-		options=>{
-			none=>$i18n->get("none"),
-			versiontag=>$i18n->get("versiontag"),
-			user=>$i18n->get("user")
-			},
-		value=>"none",
+		options=>\%options,
+		value=>"None",
 		hoverHelp=>$i18n->get("object type help")
 		);
 	$f->submit;
@@ -154,7 +154,7 @@ sub www_editWorkflow {
 		);
 	$f->readOnly(
 		label=>$i18n->get("object type"),
-		value=>$workflow->getTypeName
+		value=>$workflow->get("type")
 		);
 	$f->text(
 		name=>"title",

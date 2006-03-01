@@ -89,10 +89,8 @@ Commits all assets edited under a version tag, and then sets the version tag to 
 
 sub commit {
 	my $self = shift;
-	my $tagId = $self->getId;
-	my $sth = $self->session->db->read("select asset.assetId,asset.className,assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.tagId=?", [$tagId]);
-	while (my ($id,$class,$version) = $sth->array) {
-		WebGUI::Asset->new($self->session,$id,$class,$version)->commit;
+	foreach my $asset (@{$self->getAssets}) {
+		$asset->commit;
 	}
 	$self->{_data}{isCommited} = 1;
 	$self->{_data}{commitedBy} = $self->session->user->userId;
@@ -114,6 +112,24 @@ sub get {
 	my $self = shift;
 	my $name = shift;
 	return $self->{_data}{$name};
+}
+
+#-------------------------------------------------------------------
+
+=head2 getAssets ( )
+
+Returns a list of asset objects that are part of this version tag.
+
+=cut
+
+sub getAssets {
+	my $self = shift;
+	my @assets = ();
+	my $sth = $self->session->db->read("select asset.assetId,asset.className,assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.tagId=?", [$self->getId]);
+	while (my ($id,$class,$version) = $sth->array) {
+		push(@assets, WebGUI::Asset->new($self->session,$id,$class,$version));
+	}
+	return \@assets;
 }
 
 #-------------------------------------------------------------------

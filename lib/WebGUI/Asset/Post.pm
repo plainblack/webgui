@@ -693,8 +693,6 @@ sub processPropertiesFromFormPost {
 	}
 	$data{groupIdView} =$self->getThread->getParent->get("groupIdView");
 	$data{groupIdEdit} = $self->getThread->getParent->get("groupIdEdit");
-	$data{startDate} = $self->getThread->getParent->get("startDate") unless ($self->session->form->process("startDate"));
-	$data{endDate} = $self->getThread->getParent->get("endDate") unless ($self->session->form->process("endDate"));
 	($data{synopsis}, $data{content}) = $self->getSynopsisAndContentFromFormPost;
 	if ($self->getThread->getParent->get("addEditStampToPosts")) {
 		$data{content} .= "\n\n --- (".$i18n->get('Edited_on','Asset_Post')." ".$self->session->datetime->epochToHuman(undef,"%z %Z [GMT%O]").$i18n->get('By','Asset_Post').$self->session->user->profileField("alias").") --- \n";
@@ -1147,18 +1145,6 @@ sub www_edit {
                 name=>'contentType',
                 value=>$self->getValue("contentType") || "mixed"
                 });
-	my $startDate = $self->get("startDate");
-	$startDate = $self->session->datetime->setToEpoch($self->session->form->process("startDate")) if ($self->session->form->process("startDate"));
-	$var{'startDate.form'} = WebGUI::Form::dateTime($self->session, {
-		name  => 'startDate',
-		value => $startDate
-		});
-	my $endDate = $self->get("endDate");
-	$endDate = $self->session->datetime->setToEpoch($self->session->form->process("endDate")) if ($self->session->form->process("endDate"));
-	$var{'endDate.form'} = WebGUI::Form::dateTime($self->session, {
-		name  => 'endDate',
-		value => $endDate
-		});
 	$self->getThread->getParent->appendTemplateLabels(\%var);
 	return $self->getThread->getParent->processStyle($self->processTemplate(\%var,$self->getThread->getParent->get("postFormTemplateId")));
 }

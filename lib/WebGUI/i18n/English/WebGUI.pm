@@ -998,11 +998,6 @@ removed from the system after a set period of time.  That period of time is set 
 		lastUpdated => 1127337912,
 	},
 
-	'498' => {
-		message => q|End Date|,
-		lastUpdated => 1031514049
-	},
-
 	'483' => {
 		message => q|Yes or No|,
 		lastUpdated => 1031514049
@@ -2541,11 +2536,6 @@ The headings of columns on things like message boards and user contributions.
 	'36' => {
 		message => q|You must be an administrator to perform this function. Please contact one of your administrators. |,
 		lastUpdated => 1058092984
-	},
-
-	'497' => {
-		message => q|Start Date|,
-		lastUpdated => 1031514049
 	},
 
 	'518' => {

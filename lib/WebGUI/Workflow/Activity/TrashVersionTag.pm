@@ -1,4 +1,4 @@
-package WebGUI::Workflow::Activity::CommitVersionTag;
+package WebGUI::Workflow::Activity::TrashVersionTag;
 
 
 =head1 LEGAL
@@ -22,11 +22,11 @@ use WebGUI::VersionTag;
 
 =head1 NAME
 
-Package WebGUI::Workflow::Activity::CommitVersionTag
+Package WebGUI::Workflow::Activity::TrashVersionTag
 
 =head1 DESCRIPTION
 
-This activity commits an open version tag.
+This activity trashes all content attached to a version tag.
 
 =head1 SYNOPSIS
 
@@ -50,7 +50,7 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, "Workflow_Activity_CommitVersionTag");
+	my $i18n = WebGUI::International->new($session, "Workflow_Activity_TrashVersionTag");
 	push(@{$definition}, {
 		name=>$i18n->get("topicName"),
 		properties=> { }
@@ -70,7 +70,11 @@ See WebGUI::Workflow::Activity::execute() for details.
 sub execute {
 	my $self = shift;
 	my $versionTag = shift;
-	$versionTag->commit;
+	foreach my $asset (@{$versionTag->getAssets}) {
+		$asset->trash;
+	}
+	$versionTag->lock;
+	$versionTag->clearWorking;
 }
 
 

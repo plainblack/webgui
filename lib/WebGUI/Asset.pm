@@ -130,9 +130,7 @@ sub canView {
 	return 0 unless ($self->get("state") eq "published");
 	if ($userId eq $self->get("ownerUserId")) {
                 return 1;
-        } elsif ( $self->get("startDate") <$self->session->datetime->time() && 
-		$self->get("endDate") >$self->session->datetime->time() && 
-		$self->session->user->isInGroup($self->get("groupIdView"),$userId)) {
+        } elsif ($self->session->user->isInGroup($self->get("groupIdView"),$userId)) {
                 return 1;
         }
         return $self->canEdit($userId);
@@ -194,14 +192,6 @@ sub definition {
                                 ownerUserId=>{
                                         fieldType=>'selectBox',
                                         defaultValue=>'3'
-                                        },
-                                startDate=>{
-                                        fieldType=>'dateTime',
-                                        defaultValue=>997995720
-                                        },
-                                endDate=>{
-                                        fieldType=>'dateTime',
-                                        defaultValue=>4294967294
                                         },
 				status=>{
 					noFormPost=>1,
@@ -316,7 +306,7 @@ Returns a reference to a list of properties (or specified property) of an Asset.
 
 =head3 propertyName
 
-Any of the values associated with the properties of an Asset. Default choices are "title", "menutTitle", "synopsis", "url", "groupIdEdit", "groupIdView", "ownerUserId", "startDate", "endDate",  and "assetSize".
+Any of the values associated with the properties of an Asset. Default choices are "title", "menutTitle", "synopsis", "url", "groupIdEdit", "groupIdView", "ownerUserId",  and "assetSize".
 
 =cut
 
@@ -558,20 +548,6 @@ sub getEditForm {
                 -value=>$self->get("encryptPage"),
                 -label=>$i18n->get('encrypt page'),
 		-hoverHelp=>$i18n->get('encrypt page description'),
-                -uiLevel=>6
-                );
-	$tabform->getTab("security")->dateTime(
-                -name=>"startDate",
-                -label=>$i18n->get(497),
-		-hoverHelp=>$i18n->get('497 description'),
-                -value=>$self->get("startDate"),
-                -uiLevel=>6
-                );
-        $tabform->getTab("security")->dateTime(
-                -name=>"endDate",
-                -label=>$i18n->get(498),
-		-hoverHelp=>$i18n->get('498 description'),
-                -value=>$self->get("endDate"),
                 -uiLevel=>6
                 );
 	my $subtext;
@@ -1706,8 +1682,6 @@ sub www_add {
 		styleTemplateId => $self->get("styleTemplateId"),
 		printableStyleTemplateId => $self->get("printableStyleTemplateId"),
 		isHidden => $self->get("isHidden"),
-		startDate => $self->get("startDate"),
-		endDate => $self->get("endDate"),
 		className=>$class,
 		assetId=>"new"
 		);

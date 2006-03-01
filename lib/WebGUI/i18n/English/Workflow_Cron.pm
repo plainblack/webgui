@@ -169,6 +169,12 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
+	'create cron job' => {
+		message => q|Create a Scheduled Event|,
+		context => q|the title of the CreateCronJob workflow activity|,
+		lastUpdated => 0,
+	},
+
 	'topicName' => {
 		message => q|Scheduler|,
 		context => q|The title of the cron/scheduler interface.|,

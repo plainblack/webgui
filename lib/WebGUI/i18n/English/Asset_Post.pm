@@ -141,14 +141,6 @@ A form field that will describe how the content of the post is formatted, HTML, 
 Defaults to mixed.
 <p>
 
-<b>startDate.form</b><br>
-A form that will set when the post starts to be available.
-<p>
-
-<b>endDate.form</b><br>
-A form that will set when the post stops being available.
-<p>
-
 |,
 		lastUpdated => 1134670945,
 	},
@@ -363,14 +355,6 @@ The ID of the group with permission to view this Post.
 
 <b>ownerUserId</b><br>
 An alias for <b>userId</b>.
-<p>
-
-<b>startDate</b><br>
-The date when the Post is first available, in epoch format.
-<p>
-
-<b>endDate</b><br>
-The date when the Post is stops being available, in epoch format.
 <p>
 
 <b>assetSize</b><br>

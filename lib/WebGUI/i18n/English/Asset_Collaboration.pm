@@ -186,11 +186,6 @@ our $I18N = {
 		lastUpdated => 1109618544,
 	},
 
-	'endDate' => {
-		message => q|End Date|,
-		lastUpdated => 1109618544,
-	},
-
 	'exactPhrase' => {
 		message => q|Exact Phrase|,
 		lastUpdated => 1109618544,
@@ -358,11 +353,6 @@ our $I18N = {
 
 	'synopsis' => {
 		message => q|Summary|,
-		lastUpdated => 1109696029,
-	},
-
-	'start date' => {
-		message => q|Start Date|,
 		lastUpdated => 1109696029,
 	},
 
@@ -635,10 +625,6 @@ our $I18N = {
 ^International("word","Asset_Collaboration"); "^International("edit","Asset_Collaboration");".
 <p>
 
-<b>endDate.label</b><br>
-^International("phrase","Asset_Collaboration"); "^International("endDate","Asset_Collaboration");".
-<p>
-
 <b>exactphrase.label</b><br>
 ^International("phrase","Asset_Collaboration"); "^International("exactPhrase","Asset_Collaboration");".
 <p>
@@ -765,10 +751,6 @@ our $I18N = {
 
 <b>submission.header.label</b><br>
 ^International("phrase","Asset_Collaboration"); "^International("edit submission","Asset_Collaboration");".
-<p>
-
-<b>startDate.label</b><br>
-^International("phrase","Asset_Collaboration"); "^International("start date","Asset_Collaboration");".
 <p>
 
 <b>stick.label</b><br>
@@ -1069,11 +1051,6 @@ The URL to edit this Post.
 <p>
 <b>controls</b><br>
 A set of editing icons to delete or re-order this Post.
-
-<p>
-<b>inDateRange</b><br>
-A conditional indicating that the current time is greater than the start date and less than
-the end date.
 
 <p>
 <b>isSecond</b><br>

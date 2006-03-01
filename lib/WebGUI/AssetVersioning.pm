@@ -58,9 +58,9 @@ sub addRevision {
 	my $now = shift ||$self->session->datetime->time();
 	my $versionTag = $self->session->scratch->get("versionTag") || 'pbversion0000000000002';
 	my $status = $self->session->setting->get("autoCommit") ? 'approved' : 'pending';
-	$self->session->db->write("insert into assetData (assetId, revisionDate, revisedBy, tagId, status, url, startDate, endDate, 
+	$self->session->db->write("insert into assetData (assetId, revisionDate, revisedBy, tagId, status, url,  
 		ownerUserId, groupIdEdit, groupIdView) values (".$self->session->db->quote($self->getId).",".$now.", ".$self->session->db->quote($self->session->user->userId).", 
-		".$self->session->db->quote($versionTag).", ".$self->session->db->quote($status).", ".$self->session->db->quote($self->getId).", 997995720, 32472169200,'3','3','7')");
+		".$self->session->db->quote($versionTag).", ".$self->session->db->quote($status).", ".$self->session->db->quote($self->getId).", '3','3','7')");
         foreach my $definition (@{$self->definition($self->session)}) {
                 unless ($definition->{tableName} eq "assetData") {
                         $self->session->db->write("insert into ".$definition->{tableName}." (assetId,revisionDate) values (".$self->session->db->quote($self->getId).",".$now.")");

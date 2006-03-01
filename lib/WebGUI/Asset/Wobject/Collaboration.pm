@@ -42,12 +42,6 @@ sub appendPostListTemplateVars {
 				$controls .= $self->session->icon->moveUp('func=promote',$post->get("url")).$self->session->icon->moveDown('func=demote',$post->get("url"));
 			}
 		}
-		my $inDateRange;
-		if ($post->get("startDate") < $self->session->datetime->time() && $post->get("endDate") > $self->session->datetime->time()) {
-		  	$inDateRange = 1;
-		} else { 
-			$inDateRange = 0; 
-		}
 		my @rating_loop;
 		for (my $i=0;$i<=$post->get("rating");$i++) {
 			push(@rating_loop,{'rating_loop.count'=>$i});
@@ -90,7 +84,6 @@ sub appendPostListTemplateVars {
                         "user.isVisitor"=>$post->get("ownerUserId") eq "1",
         		"edit.url"=>$post->getEditUrl,
 			'controls'=>$controls,
-			'inDateRange'=>$inDateRange,
                         "isSecond"=>(($i+1)%2==0),
                         "isThird"=>(($i+1)%3==0),
                         "isFourth"=>(($i+1)%4==0),
@@ -127,7 +120,6 @@ sub appendTemplateLabels {
         $var->{'description.label'} = $i18n->get("description");
 	$var->{"deny.label"} = $i18n->get("deny");
 	$var->{"edit.label"} = $i18n->get("edit");
-	$var->{'endDate.label'} = $i18n->get("endDate");
         $var->{'exactphrase.label'} = $i18n->get("exactPhrase");
 	$var->{'image.label'} = $i18n->get("image");
 	$var->{"job.header.label"} = $i18n->get("edit job");
@@ -160,7 +152,6 @@ sub appendTemplateLabels {
         $var->{'subject.label'} = $i18n->get("subject");
 	$var->{"subscribe.label"} = $i18n->get("subscribe");
         $var->{'submission.header.label'} = $i18n->get("edit submission");
-	$var->{'startDate.label'} = $i18n->get("start date");
 	$var->{"stick.label"} = $i18n->get("sticky");
 	$var->{"status.label"} = $i18n->get("status");
 	$var->{"synopsis.label"} = $i18n->get("synopsis");

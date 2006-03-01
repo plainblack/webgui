@@ -84,20 +84,6 @@ sub edit {
                 -uiLevel=>6
        	        );
 	$tabform->addTab("security",$i18n->get(107,"Asset"),6);
-	$tabform->getTab("security")->dateTime(
-               	-name=>"startDate",
-                -label=>$i18n->get(497),
-                -hoverHelp=>$i18n->get('497 description'),
-       	        -value=>$self->get("startDate"),
-               	-uiLevel=>6
-                );
-       	$tabform->getTab("security")->dateTime(
-               	-name=>"endDate",
-                -label=>$i18n->get(498),
-                -hoverHelp=>$i18n->get('498 description'),
-       	        -value=>$self->get("endDate"),
-               	-uiLevel=>6
-               	);
 	my $subtext;
        	if ($self->session->user->isInGroup(3)) {
                	 $subtext = $self->session->icon->manage('op=listUsers');

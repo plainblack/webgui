@@ -309,20 +309,6 @@ a URL will be made from the parent's URL and the <b>Menu Title</b>.<br />
                 lastUpdated => 1127426194,
         },
 
-        '497 description' => {
-                message => q|<p>The date when users may begin viewing this asset. Before this date only Content Managers with the rights to edit this asset will see it<br />
-<i>UI level: 6</i>.
-</p>|,
-                lastUpdated => 1127426192,
-        },
-
-        '498 description' => {
-                message => q|<p>The date when users will stop viewing this asset. After this date only Content Managers with the rights to edit this asset will see it.<br />
-<i>UI level: 6</i>
-</p>|,
-                lastUpdated => 1127426188,
-        },
-
         '108 description' => {
                 message => q|The owner of a asset is usually the person who created the asset. This user always has full edit and viewing rights on the asset.<br>
 <i>UI level: 6</i>
@@ -708,14 +694,6 @@ each asset under the tab &quot;Meta&quot; in the asset properties.</p>
         '486' => {
                    lastUpdated => 1031514049,
                    message => q|Data Type|
-                 },
-        '497' => {
-                   lastUpdated => 1031514049,
-                   message => q|Start Date|
-                 },
-        '498' => {
-                   lastUpdated => 1031514049,
-                   message => q|End Date|
                  },
         '949' => {
                    lastUpdated => 1052850265,

@@ -183,22 +183,6 @@ sub www_editBranch {
                 -uiLevel=>6,
 		-subtext=>'<br />'.$i18n->get("change").' '.WebGUI::Form::yesNo($self->session,{name=>"change_encryptPage"})
                 );
-	$tabform->getTab("security")->dateTime(
-                -name=>"startDate",
-                -label=>$i18n->get(497),
-		-hoverHelp=>$i18n->get('497 description',"Asset"),
-                -value=>$self->get("startDate"),
-                -uiLevel=>6,
-		-subtext=>'<br />'.$i18n->get("change").' '.WebGUI::Form::yesNo($self->session,{name=>"change_startDate"})
-                );
-        $tabform->getTab("security")->dateTime(
-                -name=>"endDate",
-                -label=>$i18n->get(498),
-		-hoverHelp=>$i18n->get('498 description',"Asset"),
-                -value=>$self->get("endDate"),
-                -uiLevel=>6,
-		-subtext=>'<br />'.$i18n->get("change").' '.WebGUI::Form::yesNo($self->session,{name=>"change_endDate"})
-                );
 	my $subtext;
         if ($self->session->user->isInGroup(3)) {
                  $subtext = $self->session->icon->manage('op=listUsers');
@@ -296,8 +280,6 @@ sub www_editBranchSave {
 	$data{cacheTimeout} = $self->session->form->interval("cacheTimeout") if ($self->session->form->yesNo("change_cacheTimeout"));
 	$data{cacheTimeoutVisitor} = $self->session->form->interval("cacheTimeoutVisitor") if ($self->session->form->yesNo("change_cacheTimeoutVisitor"));
 	$data{encryptPage} = $self->session->form->yesNo("encryptPage") if ($self->session->form->yesNo("change_encryptPage"));
-	$data{startDate} = $self->session->form->dateTime("startDate") if ($self->session->form->yesNo("change_startDate"));
-	$data{endDate} = $self->session->form->dateTime("endDate") if ($self->session->form->yesNo("change_endDate"));
 	$data{ownerUserId} = $self->session->form->selectBox("ownerUserId") if ($self->session->form->yesNo("change_ownerUserId"));
 	$data{groupIdView} = $self->session->form->group("groupIdView") if ($self->session->form->yesNo("change_groupIdView"));
 	$data{groupIdEdit} = $self->session->form->group("groupIdEdit") if ($self->session->form->yesNo("change_groupIdEdit"));

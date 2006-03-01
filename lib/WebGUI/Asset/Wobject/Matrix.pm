@@ -613,8 +613,6 @@ sub www_editListingSave {
 			url=>$self->session->form->process("productName"),
 			groupIdView=>7,
 			groupIdEdit=>3,
-			startDate=>$self->session->datetime->time(),
-			endDate=>$self->session->datetime->time()+60*60*24*365*15,
                         displayLastReply => 0,
                         allowReplies => 1,
                         threadsPerPage => 30,
