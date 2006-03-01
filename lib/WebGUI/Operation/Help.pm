@@ -120,13 +120,20 @@ sub www_viewHelp {
 		$ac->addSubmenuItem(_link($session,$row->{tag},$row->{namespace}),$i18n->get($relatedHelp->{title},$row->{namespace}));
 	}
         my %vars;
+        $vars{uiLevelLabel} = $i18n->get('739', 'WebGUI');
         $vars{body} = $i18n->get($help->{body});
+	my $userUiLevel = $session->user->profileField("uiLevel");
+	my $uiOverride = $session->form->process("uiOverride");
         foreach my $row (@{ $help->{fields} }) {
                 push @{ $vars{fields} }, 
-                        { 'title' =>       $i18n->get($row->{title},$row->{namespace}),
-                          'description' => $i18n->get($row->{description},$row->{namespace}), }
+			{ 'title'       => $i18n->get($row->{title},$row->{namespace}),
+                          'description' => $i18n->get($row->{description},$row->{namespace}),
+                          'uiLevel'     => $row->{uiLevel},
+			} if ($uiOverride || ($userUiLevel >= ($row->{uiLevel} || 1)));
         }
         my $body = WebGUI::Asset::Template->new($session,"PBtmplHelp000000000001")->process(\%vars);
+	my $uiOverrideText = $uiOverride ? $i18n->get('show my fields','WebGUI') : $i18n->get('show all fields','WebGUI');
+	$ac->addSubmenuItem(_link($session, $session->form->process("hid"), $namespace).";uiOverride=".!$uiOverride, $uiOverrideText) if $userUiLevel < 9;
     	$ac->addSubmenuItem($session->url->page('op=viewHelpIndex'),$i18n->get(95, 'WebGUI'));
     	$ac->addSubmenuItem($session->url->page('op=viewHelpTOC'),$i18n->get('help contents', 'WebGUI'));
 	WebGUI::Macro::process($session,\$body);

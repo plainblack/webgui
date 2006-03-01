@@ -247,6 +247,21 @@ our $I18N = {
 		lastUpdated => 1033832377
 	},
 
+	'show all fields' => {
+		message => q|Show all fields|,
+		lastUpdated => 1141184463
+	},
+
+	'show my fields' => {
+		message => q|Show fields my UI level allows|,
+		lastUpdated => 1141184463
+	},
+
+	'739' => {
+		message => q|UI Level|,
+		lastUpdated => 1033832377
+	},
+
 	'992' => {
 		message => q|Title|,
 		lastUpdated => 1056151382

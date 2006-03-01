@@ -11,19 +11,22 @@ our $HELP = {
                                 namespace => 'Asset_Article',
                         },
                         {
-                                title => '7',
-                                description => 'link title description',
-                                namespace => 'Asset_Article',
-                        },
-                        {
                                 title => '8',
                                 description => 'link url description',
                                 namespace => 'Asset_Article',
+				uiLevel => 3,
+                        },
+                        {
+                                title => '7',
+                                description => 'link title description',
+                                namespace => 'Asset_Article',
+				uiLevel => 3,
                         },
                         {
                                 title => '10',
                                 description => 'carriage return description',
                                 namespace => 'Asset_Article',
+				uiLevel => 5,
                         },
 		],
 		related => [
