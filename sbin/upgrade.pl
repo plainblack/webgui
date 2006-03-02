@@ -243,7 +243,6 @@ my $notRun = 1;
 			
 chdir($upgradesPath);
 foreach my $filename (keys %config) {
-	print "Considering $filename\n";
 	my $clicmd = $config{$filename}{mysqlCLI} || $mysql;
 	my $dumpcmd = $config{$filename}{mysqlDump} || $mysqldump;
 	my $backupTo = $config{$filename}{backupPath} || $backupDir;
