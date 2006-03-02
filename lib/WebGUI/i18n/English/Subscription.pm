@@ -1,6 +1,12 @@
 package WebGUI::i18n::English::Subscription;
 
 our $I18N = {
+	'expire subscription codes' => {
+		message => q|Expire Subscription Codes|,
+		lastUpdated => 0,
+		context => q|the title of the expire subscription codes workflow activity|
+	},
+
 	'no subscription code batches' => {
 		message => q|No subscription code batches have been created yet. Use the submenu on the right to generate a batch.|,
 		lastUpdated => 1101228391,
