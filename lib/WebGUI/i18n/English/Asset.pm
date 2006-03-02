@@ -1,6 +1,11 @@
 package WebGUI::i18n::English::Asset;
 
 our $I18N = {
+	'ago' => {
+		message => q|ago|,
+		lastUpdated => 0,
+		context => q|a suffix for a measurement of time, like "3 seconds ago"|
+	},
 	'purge old asset revisions' => {
 		message => q|Purge Old Asset Revisions|,
 		lastUpdated => 0,

@@ -478,6 +478,15 @@ Creates and returns a tabform to edit parameters of an Asset.
 sub getEditForm {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session, "Asset");
+	my $ac = $self->getAdminConsole;
+	my $ago = $i18n->get("ago");
+	my $rs = $self->session->db->read("select revisionDate from assetData where assetId=? order by revisionDate desc limit 5", [$self->getId]);
+	$ac->addSubmenuItem($self->getUrl("func=manageRevisions"),$i18n->get("revisions").":");
+	while (my ($version) = $rs->array) {
+		my ($interval, $units) = $self->session->datetime->secondsToInterval(time() - $version);
+		$ac->addSubmenuItem($self->getUrl("func=edit;revision=".$version), $interval." ".$units." ".$ago);
+	}
+	$ac->addSubmenuItem();
 	my $uiLevelOverride = $self->get("className");
 	$uiLevelOverride =~ s/\:\:/_/g;
 	my $tabform = WebGUI::TabForm->new($self->session,undef,undef,$self->getUrl(),$uiLevelOverride);
