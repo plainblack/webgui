@@ -129,7 +129,7 @@ sub addWorkflow {
 		None=>["WebGUI::Workflow::Activity::DecayKarma", "WebGUI::Workflow::Activity::TrashClipboard", "WebGUI::Workflow::Activity::CleanTempStorage", 
 			"WebGUI::Workflow::Activity::CleanFileCache", "WebGUI::Workflow::Activity::CleanLoginHistory", "WebGUI::Workflow::Activity::ArchiveOldThreads",
 			"WebGUI::Workflow::Activity::TrashExpiredEvents", "WebGUI::Workflow::Activity::CreateCronJob", "WebGUI::Workflow::Activity::DeleteExpiredSessions",
-			"WebGUI::Workflow::Activity::DeleteExpiredGroupings", "WebGUI::Workflow::Activity::PurgeOldAssetRevisions",
+			"WebGUI::Workflow::Activity::ExpireGroupings", "WebGUI::Workflow::Activity::PurgeOldAssetRevisions",
 			"WebGUI::Workflow::Activity::ExpireSubscriptionCodes", "WebGUI::Workflow::Activity::PurgeOldTrash", 
 			"WebGUI::Workflow::Activity::GetSyndicatedContent"],
 		"WebGUI::User"=>["WebGUI::Workflow::Activity::CreateCronJob"],
@@ -153,8 +153,8 @@ sub addWorkflow {
 	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::TrashExpiredEvents", "pbwfactivity0000000006");
 	$activity->set("title", "Trash old Events Calendar Events");
 	$activity->set("trashAfter", 60*60*24*30);
-	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::DeleteExpiredGroupings", "pbwfactivity0000000007");
-	$activity->set("title", "Delete groupings that have expired");
+	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::ExpireGroupings", "pbwfactivity0000000007");
+	$activity->set("title", "deal with user groupings that have expired");
 	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::ExpireSubscriptionCodes", "pbwfactivity0000000011");
 	$activity->set("title", "Expire old subscription codes");
 	WebGUI::Workflow::Cron->create($session, {

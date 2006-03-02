@@ -1,4 +1,4 @@
-package WebGUI::Workflow::Activity::DeleteExpiredGroupings;
+package WebGUI::Workflow::Activity::ExpireGroupings;
 
 
 =head1 LEGAL
@@ -17,15 +17,16 @@ package WebGUI::Workflow::Activity::DeleteExpiredGroupings;
 
 use strict;
 use base 'WebGUI::Workflow::Activity';
-use WebGUI::Cache::FileCache;
+use WebGUI::Inbox;
+use WebGUI::International;
 
 =head1 NAME
 
-Package WebGUI::Workflow::Activity::DeleteExpiredGroupings;
+Package WebGUI::Workflow::Activity::ExpireGroupings
 
 =head1 DESCRIPTION
 
-Deletes user groupings that are past their expire date.
+Handles expiring user groupings.
 
 =head1 SYNOPSIS
 
@@ -50,9 +51,9 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, "Workflow_Activity_DeleteExpiredGroupings");
+	my $i18n = WebGUI::International->new($session, "WebGUI");
 	push(@{$definition}, {
-		name=>$i18n->get("topicName"),
+		name=>$i18n->get("expire groupings"),
 		properties=> {}
 		});
 	return $class->SUPER::definition($session,$definition);
@@ -69,6 +70,22 @@ See WebGUI::Workflow::Activity::execute() for details.
 
 sub execute {
 	my $self = shift;
+ 	my $now = time();
+	my $inbox = WebGUI::Inbox->new($self->session);
+	my $i18n = WebGUI::International->new($self->session, "WebGUI");
+        my $a = $self->session->db->read("select groupId,expireNotifyOffset,expireNotifyMessage from groups where expireNotify=1");
+        while (my $group = $a->hashRef) {
+        	my $start = $now + (86400 * ($group->{expireNotifyOffset}-1));
+                my $end = $start + 86400;
+                my $b = $self->session->db->read("select userId from groupings where groupId=? and expireDate>=? and expireDate<=?", [$group->{groupId}, $start, $end]);
+                while (my ($userId) = $b->array) { 
+			$inbox->addMessage({
+				userId=>$userId,
+				subject=>$i18n->get(867),
+				message=>$group->{expireNotifyMessage}
+				});	
+                }
+        } 
 	my $sth = $self->session->db->read("select groupId,deleteOffset,dbCacheTimeout from groups");
         while (my $data = $sth->hashRef) {
         	if ($data->{dbCacheTimeout} > 0) {

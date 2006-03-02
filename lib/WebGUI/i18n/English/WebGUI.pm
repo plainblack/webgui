@@ -1,6 +1,11 @@
 package WebGUI::i18n::English::WebGUI;
 
 our $I18N = {
+	'expire groupings' => {
+		message => q|Expire User Groupings|,
+		lastUpdated => 0
+	},
+
 	'show performance indicators' => {
 		message => q|Show performance indicators?|,
 		lastUpdated => 0
