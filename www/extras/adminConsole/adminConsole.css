@@ -113,7 +113,7 @@ th {
 	width: 100px;
 	font-size: 14px;
 	font-family: helvetica, arial;
-	opacity: 1.0;
+	opacity: 1.0; 
 	height: 110px;
 }
 
@@ -211,7 +211,7 @@ a{
 
 a:hover{
 	font-family:  "Lucida Grande", "Lucida Sans Unicode", Tahoma, Verdana, Arial, sans-serif;
-	color: 336B8A;
+	color: #336B8A;
 	text-decoration: underline;	
 	
 }
