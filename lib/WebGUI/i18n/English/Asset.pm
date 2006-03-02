@@ -6,6 +6,25 @@ our $I18N = {
 		lastUpdated => 0,
 		context => q|a suffix for a measurement of time, like "3 seconds ago"|
 	},
+
+	'purge old trash' => {
+		message => q|Purge Old Trash|,
+		lastUpdated => 0,
+		context => q|title of the purge trash workflow activity|
+	},
+
+	'purge trash after' => {
+		message => q|Purge Old Trash After|,
+		lastUpdated => 0,
+		context => q|the label used in the purge old trash workflow activity|
+	},
+
+	'purge trash after help' => {
+		message => q|How long should an asset stay in the trash before it's considered old enough to purge? Note that when it get's purged all it's revisions and descendants will be purged as well.|,
+		lastUpdated => 0,
+		context => q|the hover help for the purge trash after field|
+	},
+
 	'purge old asset revisions' => {
 		message => q|Purge Old Asset Revisions|,
 		lastUpdated => 0,

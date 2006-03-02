@@ -179,6 +179,9 @@ sub addWorkflow {
 	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::PurgeOldAssetRevisions", "pbwfactivity0000000008");
 	$activity->set("title", "delete asset revisions older than a year from the database");
 	$activity->set("purgeAfter", 60*60*24*365);
+	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::PurgeOldTrash", "pbwfactivity0000000010");
+	$activity->set("title", "delete assets from trash that have been sitting around for 30 days");
+	$activity->set("purgeAfter", 60*60*24*30);
 	WebGUI::Workflow::Cron->create($session, {
                 title=>'Weekly Maintenance',
                 enabled=>1,
@@ -214,6 +217,8 @@ sub addWorkflow {
 	$session->config->delete("DeleteExpiredClipboard_offset");
 	$session->config->delete("DeleteExpiredEvents_offset");
 	$session->config->delete("TrashExpiredContent_offset");
+	$session->config->delete("DeleteExpiredTrash_offset");
+	$session->config->delete("DeleteExpiredRevisions_offset");
 	$workflow = WebGUI::Workflow->create($session, {
 		title=>"Commit Without Approval",
 		description=>"This workflow commits all the assets in this version tag without asking for any approval.",

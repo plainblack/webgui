@@ -283,16 +283,6 @@
 
 "passiveProfileInterval" : 86400,
 
-# Specify the number of days content should remain in the trash
-# before it gets purged from the system completely.
-
-"DeleteExpiredTrash_offset" : 30,
-
-# Specify the number of days old revisions of assets should remain
-# available for rollbacks.
-
-"DeleteExpiredRevisions_offset" : 365,
-
 # What hour of the day (for example, 22 : 10 PM = 22:00:00)
 # should WebGUI try to synchronize user profile information from 
 # the LDAP server. Note that this will only happen for users
