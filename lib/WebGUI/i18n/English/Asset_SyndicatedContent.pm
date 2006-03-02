@@ -1,6 +1,12 @@
 package WebGUI::i18n::English::Asset_SyndicatedContent;
 
 our $I18N = {
+	     'get syndicated content' => {
+		     'lastUpdated' => 0, 
+		     'message' => 'Get Syndicated Content',
+			context => ' the title of the get syndicated content workflow activity'
+		    },
+		
 	     '1' => {
 		     'lastUpdated' => 1031514049,
 		     'message' => 'URL to RSS File'

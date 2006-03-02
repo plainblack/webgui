@@ -130,7 +130,8 @@ sub addWorkflow {
 			"WebGUI::Workflow::Activity::CleanFileCache", "WebGUI::Workflow::Activity::CleanLoginHistory", "WebGUI::Workflow::Activity::ArchiveOldThreads",
 			"WebGUI::Workflow::Activity::TrashExpiredEvents", "WebGUI::Workflow::Activity::CreateCronJob", "WebGUI::Workflow::Activity::DeleteExpiredSessions",
 			"WebGUI::Workflow::Activity::DeleteExpiredGroupings", "WebGUI::Workflow::Activity::PurgeOldAssetRevisions",
-			"WebGUI::Workflow::Activity::ExpireSubscriptionCodes", "WebGUI::Workflow::Activity::PurgeOldTrash"],
+			"WebGUI::Workflow::Activity::ExpireSubscriptionCodes", "WebGUI::Workflow::Activity::PurgeOldTrash", 
+			"WebGUI::Workflow::Activity::GetSyndicatedContent"],
 		"WebGUI::User"=>["WebGUI::Workflow::Activity::CreateCronJob"],
 		"WebGUI::VersionTag"=>["WebGUI::Workflow::Activity::CommitVersionTag", "WebGUI::Workflow::Activity::RollbackVersionTag", 
 			"WebGUI::Workflow::Activity::TrashVersionTag", "WebGUI::Workflow::Activity::CreateCronJob"]
@@ -203,6 +204,8 @@ sub addWorkflow {
 		}, "pbworkflow000000000004");
 	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::DeleteExpiredSessions", "pbwfactivity0000000009");
 	$activity->set("title", "delete expired sessions");
+	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::GetSyndicatedContent", "pbwfactivity0000000012");
+	$activity->set("title", "Get syndicated content");
 	WebGUI::Workflow::Cron->create($session, {
                 title=>'Hourly Maintenance',
                 enabled=>1,

@@ -231,10 +231,10 @@ sub _normalize_items {
 
 #-------------------------------------------------------------------
 sub _get_rss_data {
-	my $self = shift;
+	my $session = shift;
         my $url = shift;
         
-	my $cache = WebGUI::Cache->new($self->session,'url:' . $url, 'RSS');
+	my $cache = WebGUI::Cache->new($session,'url:' . $url, 'RSS');
         my $rss_serial = $cache->get;
         my $rss = {};
         if ($rss_serial) {
@@ -243,7 +243,7 @@ sub _get_rss_data {
                 my $ua = LWP::UserAgent->new(timeout => 5);
                 my $response = $ua->get($url);
                 if (!$response->is_success()) {
-                        $self->session->errorHandler->warn("Error retrieving url '$url': " . 
+                        $session->errorHandler->warn("Error retrieving url '$url': " . 
                              $response->status_line());
                         return undef;
                 }
@@ -256,7 +256,7 @@ sub _get_rss_data {
 			my $encoding = 'utf8';
 			if (lc($xmlEncoding) ne lc($encoding)) {
 				eval {	from_to($xml, $xmlEncoding, $encoding) };
-				$self->session->errorHandler->warn($@) if ($@);
+				$session->errorHandler->warn($@) if ($@);
 			}
 				
 		}
@@ -266,7 +266,7 @@ sub _get_rss_data {
                         XML::RSSLite::parseXML($rss_lite, \$xml);
                 };
                 if ($@) {
-                        $self->session->errorHandler->warn("error parsing rss for url $url :".$@);
+                        $session->errorHandler->warn("error parsing rss for url $url :".$@);
 			#Returning undef on a parse failure is a change from previous behaviour,
 			#but it SHOULDN'T have a major effect.
 			return undef;
@@ -281,10 +281,10 @@ sub _get_rss_data {
                 $rss_lite = {channel => $rss_lite};
                 if (!($rss->{channel} = 
                       _find_record($rss_lite, qr/^channel$/))) {
-                        $self->session->errorHandler->warn("unable to find channel info for url $url");
+                        $session->errorHandler->warn("unable to find channel info for url $url");
                 }
                 if (!($rss->{items} = _find_record($rss_lite, qr/^items?$/))) {
-                        $self->session->errorHandler->warn("unable to find item info for url $url");
+                        $session->errorHandler->warn("unable to find item info for url $url");
                         $rss->{items} = [];
 		}
                 
@@ -296,7 +296,7 @@ sub _get_rss_data {
 		#Assign dates "globally" rather than when seen in a viewed feed.
 		#This is important because we can "filter" now and want to ensure we keep order
 		#correctly as new items appear.
-		$self->_assign_rss_dates($rss->{items});
+		_assign_rss_dates($session, $rss->{items});
 
                 #Default to an hour timeout
                 $cache->set(Storable::freeze($rss), 3600);
@@ -311,17 +311,17 @@ sub _get_rss_data {
 # whole database to keep the thing from growing too large
 
 sub _assign_rss_dates {
-	my $self = shift;
+	my $session = shift;
         my ($items) = @_;
         
         for my $item (@{$items}) {
                 my $key = 'dates:' . ($item->{guid} || $item->{title} || 
                                       $item->{description} || $item->{link});
-                my $cache = WebGUI::Cache->new($self->session,$key, 'RSS');
+                my $cache = WebGUI::Cache->new($session,$key, 'RSS');
                 if (my $date = $cache->get()) {
                         $item->{date} = $date;
                 } else {
-                        $item->{date} =$self->session->datetime->time();
+                        $item->{date} =$session->datetime->time();
                         $cache->set($item->{date}, '1 year');
                 }
         }
@@ -444,7 +444,7 @@ sub _get_items {
                 $items = [];
                 
                 for my $url (@{$urls}) {
-		    my $rss_info=$self->_get_rss_data($url);
+		    my $rss_info=_get_rss_data($self->session,$url);
 		    push(@rss_feeds, $rss_info) if($rss_info);
                 }
 
