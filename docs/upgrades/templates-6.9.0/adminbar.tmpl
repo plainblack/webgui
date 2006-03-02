@@ -6,7 +6,7 @@
 	<tmpl_loop adminbar_loop>
 		panel = new createPanel("<tmpl_var name>", "<tmpl_var label>");
 		<tmpl_loop items>
-			panel.addLink("<tmpl_var icon.small>", "<tmpl_var title escape=JS>", "<tmpl_var url escape=JS>");
+			panel.addLink("<tmpl_var icon>", "<tmpl_var title escape=JS>", "<tmpl_var url escape=JS>");
 		</tmpl_loop>
 		slider.addPanel(panel);
 	</tmpl_loop>
