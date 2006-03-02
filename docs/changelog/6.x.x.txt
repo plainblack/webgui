@@ -1,4 +1,6 @@
 6.99.0
+ - Refactored admin bar to be more dynamic.
+ - Added version tags menu to admin bar.
  - Added a revisions list to the edit screen of assets, so that you can
    quickly edit/view an old revision.
  - Removed start/end dates from assets in favor of the workflow system.

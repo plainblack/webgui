@@ -18,83 +18,39 @@ content from the clipboard, accessing the help system and other administrative f
 The macro may take one optional argument, an alternate template in the Macro/AdminBar namespace for generating the AdminBar.  The following variables are available in the template:
 
 <p/>
-<b>packages.label</b><br/>
-The internationalized label for adding packages.
-
-<p/>
-<b>packages.canAdd</b><br/>
-A boolean indicating whether the current user can add packages.
-
-<p/>
-<b>addContent.label</b><br/>
-The internationalized label for adding content.
-
-<p/>
-<b>contenttypes_loop</b><br/>
-The loop containing different types of content to add
-
+<b>adminbar_loop</b><br/>
+A loop containing the various lists of data to display.
 <blockquote>
-<p/>
-<b>contenttype.label</b><br/>
-The internationalized label for this content type.
+<b>label</b><br />
+A heading label for this category.
+<p />
 
-<p/>
-<b>contenttype.url</b><br/>
-The URL for adding an instance of this content type.
+<b>name</b><br />
+A javascript friendly name for this category.
+<p />
+
+<b>items</b>
+A loop containing the list if items in this category.
+<blockquote>
+
+<b>title</b><br />
+The displayable link title for this item.
+<p />
+
+<b>url</b><br />
+The link URL for this item.
+<p />
+
+<b>icon</b><br />
+The URL of an icon to associate with this item.
+<p />
 
 </blockquote>
 
-<p/>
-<b>addpage.label</b><br/>
-The internationalized label for adding a page.
-
-<p/>
-<b>addpage.url</b><br/>
-The URL for adding a page.
-
-<p/>
-<b>clipboard.label</b><br/>
-The internationalized label for the clipboard.
-
-<p/>
-<b>clipboard_loop</b><br/>
-The loop containing a list of items in the clipboard.
-
-<blockquote>
-<p/>
-<b>clipboard.label</b><br/>
-The label for this item in the clipboard.
-
-<p/>
-<b>clipboard.url</b><br/>
-The URL for pasting this clipboard item onto the current page.
-
 </blockquote>
-
 <p/>
-<b>admin.label</b><br/>
-The internationalized label for administrative functions.
-
-<p/>
-<b>admin_loop</b><br/>
-The loop containing a list of administrative functions, such as turning off admin mode or
-validating the current page.
-
-<blockquote>
-<p/>
-<b>admin.label</b><br/>
-The label for this item in the clipboard.
-
-<p/>
-<b>admin.url</b><br/>
-The URL for executing this admin function.
-
-</blockquote>
-
-<p/>
- The <i>.adminBar</i> style sheet class is tied to the default template for this macro.
 |,
-		lastUpdated => 1112583521,
+		lastUpdated => 1141328392,
 	},
 
 	'376' => {
@@ -117,9 +73,19 @@ The URL for executing this admin function.
 		lastUpdated => 1031514049
 	},
 
+	'version tags' => {
+		message => q|Version Tags|,
+		lastUpdated => 0 
+	},
+
 	'12' => {
 		message => q|Turn admin off.|,
 		lastUpdated => 1031514049
+	},
+
+	'commit my changes' => {
+		message => q|Commit My Changes|,
+		lastUpdated => 0
 	},
 
 	'macroName' => {

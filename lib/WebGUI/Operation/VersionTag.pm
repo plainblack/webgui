@@ -16,6 +16,8 @@ package WebGUI::Operation::VersionTag;
 
 use strict;
 use WebGUI::Paginator;
+use WebGUI::AdminConsole;
+use WebGUI::International;
 
 =head1 NAME
 
@@ -86,13 +88,17 @@ sub www_addVersionTagSave {
 #-------------------------------------------------------------------
 
 sub www_commitVersionTag {
-	my $self = shift;
-	return $self->session->privilege->adminOnly() unless $self->session->user->isInGroup(3);
-	my $tagId = $self->session->form->process("tagId");
+	my $session = shift;
+	return $session->privilege->adminOnly() unless $session->user->isInGroup(3);
+	my $tagId = $session->form->process("tagId");
 	if ($tagId) {
-		$self->commitVersionTag($tagId);
+		my $tag = WebGUI::VersionTag->new($session, $tagId);
+		$tag->commit if (defined $tag);
 	}
-	return $self->www_manageVersions;
+	if ($session->form->get("backToSite")) {
+		return "";
+	}
+	return www_manageVersions($session);
 }
 
 #-------------------------------------------------------------------

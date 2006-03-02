@@ -147,6 +147,12 @@ sub getEditForm {
 		-hoverHelp=>$i18n->get('template description'),
 		-value=>$self->getValue("template")
 		);
+        $tabform->getTab("properties")->codearea(
+		-name=>"headBlock",
+		-label=>$i18n->get('head block'),
+		-hoverHelp=>$i18n->get('head block description'),
+		-value=>$self->getValue("headBlock")
+		);
 	if($self->session->config->get("templateParsers")){
 		my @temparray = @{$self->session->config->get("templateParsers")};
 		tie my %parsers, 'Tie::IxHash';

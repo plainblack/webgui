@@ -1,6 +1,18 @@
 package WebGUI::i18n::English::Asset_Template;
 
 our $I18N = {
+	'head block' => {
+		message => q|Head Block|,
+		context => q|label for the get edit form where users should put things that go in the html head block|,
+		lastUpdated => 0,
+	},
+
+	'head block description' => {
+		message => q|Put meta tags, script tags, link tables, style sheets, and anything else here that you want to appear in the head block of the HTML document.|,
+		context => q|hover help for the head block field|,
+		lastUpdated => 0,
+	},
+
 	'style wizard' => {
 		message => q|Style Wizard|,
 		context => q|Label for link to engage the style wizard.|,

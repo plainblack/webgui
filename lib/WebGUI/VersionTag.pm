@@ -147,15 +147,24 @@ sub getId {
 
 #-------------------------------------------------------------------
 
-=head2 getWorking ( )
+=head2 getWorking ( session, noCreate )
 
 This is a class method. Returns the current working version tag for this user as set by setWorking(). If there is no current working tag an autotag will be created and assigned as the working tag for this user.
+
+=head3 session
+
+A reference to the current session.
+
+=head3 noCreate
+
+A boolean that if set to true, will prevent this method from creating an autotag.
 
 =cut
 
 sub getWorking {
 	my $class = shift;
 	my $session = shift;
+	my $noCreate = shift;
 	if ($session->stow->get("versionTag")) {
 		return $session->stow->get("versionTag");
 	} else {
@@ -164,6 +173,8 @@ sub getWorking {
 			my $tag = $class->new($session, $tagId);
 			$session->stow->set("versionTag",$tag);
 			return $tag;
+		} elsif ($noCreate) {
+			return undef;
 		} else {
 			my $tag = $class->create($session);
 			$tag->setAsWorking;
