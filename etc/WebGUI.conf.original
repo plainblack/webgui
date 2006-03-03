@@ -276,13 +276,6 @@
         "u" : "u_companyUrl"
 	},
 
-# What hour of the day (for example, 22 : 10 PM = 22:00:00)
-# should WebGUI try to synchronize user profile information from 
-# the LDAP server. Note that this will only happen for users
-# that have LDAP as their authentication.
-
-"SyncProfilesToLDAP_hour" : 2,
-
 # Define the subnets that WebGUI should expect Spectre communication
 # to come from. All other subnets will be ignored. The subnet
 # should be listed in CIDR notation.

@@ -1,6 +1,12 @@
 package WebGUI::i18n::English::AuthLDAP;
 
 our $I18N = {
+	'sync profiles to ldap' => {
+		message => q|Sync Profiles To LDAP|,
+		lastUpdated => 0,
+		context => q|the title for the sync profiles workflow activity|
+	},
+
 	'account template' => {
 		message => q|Account Template|,
 		lastUpdated => 1078852969

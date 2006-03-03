@@ -133,7 +133,7 @@ sub addWorkflow {
 			"WebGUI::Workflow::Activity::ExpireGroupings", "WebGUI::Workflow::Activity::PurgeOldAssetRevisions",
 			"WebGUI::Workflow::Activity::ExpireSubscriptionCodes", "WebGUI::Workflow::Activity::PurgeOldTrash", 
 			"WebGUI::Workflow::Activity::GetSyndicatedContent", "WebGUI::Workflow::Activity::ProcessRecurringPayments",
-			"WebGUI::Workflow::Activity::SummarizePassiveProfileLog"],
+			"WebGUI::Workflow::Activity::SyncProfilesToLdap", "WebGUI::Workflow::Activity::SummarizePassiveProfileLog"],
 		"WebGUI::User"=>["WebGUI::Workflow::Activity::CreateCronJob"],
 		"WebGUI::VersionTag"=>["WebGUI::Workflow::Activity::CommitVersionTag", "WebGUI::Workflow::Activity::RollbackVersionTag", 
 			"WebGUI::Workflow::Activity::TrashVersionTag", "WebGUI::Workflow::Activity::CreateCronJob"]
@@ -163,6 +163,8 @@ sub addWorkflow {
 	$activity->set("title", "Expire old subscription codes");
 	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::SummarizePassiveProfileLog", "pbwfactivity0000000014");
 	$activity->set("title", "Summarize Passive Profiling Data");
+	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::SyncProfilesToLdap", "pbwfactivity0000000015");
+	$activity->set("title", "Sync User Profiles With LDAP");
 	WebGUI::Workflow::Cron->create($session, {
 		title=>'Daily Maintenance',
 		enabled=>1,
@@ -222,6 +224,7 @@ sub addWorkflow {
                 }, "pbcron0000000000000003");
 	$session->db->write("alter table assetVersionTag add column isLocked int not null default 0");
 	$session->db->write("alter table assetVersionTag add column lockedBy varchar(22) binary not null");
+	$session->config->delete("SyncProfilesToLDAP_hour");
 	$session->config->delete("fileCacheSizeLimit");
 	$session->config->delete("passiveProfileInterval");
 	$session->config->delete("CleanLoginHistory_ageToDelete");
@@ -522,9 +525,8 @@ sub removeFiles {
 	unlink '../../lib/WebGUI/i18n/Asset_IndexedSearch.pm';
 	unlink '../../sbin/Hourly/IndexedSearch_buildIndex.pm';
 	rmtree('../../lib/WebGUI/Asset/Wobject/IndexedSearch');
-	# uncomment this after they've all been converted
-	#rmtree('../../sbin/Hourly');
-	#unlink('../../sbin/runHourly.pl');
+	rmtree('../../sbin/Hourly');
+	unlink('../../sbin/runHourly.pl');
 }
 
 #-------------------------------------------------
