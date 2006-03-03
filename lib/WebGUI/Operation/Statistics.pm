@@ -31,7 +31,7 @@ Utility routine for creating the AdminConsole for Statistics functions.
 
 =head3 $session
 
-The current WebGUI session variable.
+The current WebGUI session object.
 
 =head3 $workarea
 

@@ -27,11 +27,11 @@ a search and replace function in word processors.
 
 =head2 _submenu ( $session, $workarea, $title, $help )
 
-Utility routine for creating the AdminConsole for DatabaseLink functions.
+Utility routine for creating the AdminConsole for Replacement functions.
 
 =head3 $session
 
-The current WebGUI session variable.
+The current WebGUI session object.
 
 =head3 $workarea
 

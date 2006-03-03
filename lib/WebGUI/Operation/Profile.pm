@@ -39,7 +39,7 @@ to be used as template variables in the WebGUI template system.
 
 =head3 $session
 
-The current WebGUI session variable.
+The current WebGUI session object.
 
 =cut
 
@@ -87,7 +87,7 @@ Saves profile data to a user's profile.  Does not validate any of the data.
 
 =head3 $session
 
-WebGUI session variable
+WebGUI session object
 
 =head3 $user
 

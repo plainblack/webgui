@@ -34,11 +34,11 @@ Only users in group Admin (3) are allowed to call subroutines in this package.
 
 =head2 _submenu ( $session, $workarea, $title, $help )
 
-Utility routine for creating the AdminConsole for DatabaseLink functions.
+Utility routine for creating the AdminConsole for ProfileSetting functions.
 
 =head3 $session
 
-The current WebGUI session variable.
+The current WebGUI session object.
 
 =head3 $workarea
 
