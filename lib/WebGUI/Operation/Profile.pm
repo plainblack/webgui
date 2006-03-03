@@ -24,6 +24,26 @@ use WebGUI::ProfileField;
 use WebGUI::ProfileCategory;
 use WebGUI::Operation::Shared;
 
+=head1 NAME
+
+Package WebGUI::Operation::Profile
+
+=head1 DESCRIPTION
+
+Operational handler for viewing, editing and validating user profile data.
+
+=head2 getRequiredProfileFields ( $session )
+
+Returns an array of hashes for required profile fields.  This array is ready
+to be used as template variables in the WebGUI template system.
+
+=head3 $session
+
+The current WebGUI session variable.
+
+=cut
+
+
 #-------------------------------------------------------------------
 # Builds Extra form requirements for anonymous registration. 
 sub getRequiredProfileFields {
@@ -41,12 +61,14 @@ sub getRequiredProfileFields {
 #-------------------------------------------------------------------
 =head2 isDuplicateEmail ( )
 
- Checks the value of the email address passed in to see if it is duplicated in the system.  Returns true of false.  Will return false if the email address passed in is
- same as the email address of the current user.
- 
+Checks the value of the email address passed in to see if it is
+duplicated in the system.  Returns true of false.  Will return false
+if the email address passed in is same as the email address of the
+current user.
+
 =head3 email
-   
-   email address to check for duplication
+
+email address to check for duplication
 
 =cut
 
@@ -58,15 +80,55 @@ sub isDuplicateEmail {
 }
 
 #-------------------------------------------------------------------
+
+=head2 saveProfileFields ( $session, $u, $profile )
+
+Saves profile data to a user's profile.  Does not validate any of the data.
+
+=head3 $session
+
+WebGUI session variable
+
+=head3 $user
+
+User object.  Profile data will be placed in this user's profile.
+
+=head4 $profile
+
+Hash ref of profile data to save.
+
+=cut
+
 sub saveProfileFields {
 	my $session = shift;
-   my $u = shift;
-   my $profile = shift;
-   
-   foreach my $fieldName (keys %{$profile}) {
-      $u->profileField($fieldName,${$profile}{$fieldName});
-   }
+	my $u = shift;
+	my $profile = shift;
+
+	foreach my $fieldName (keys %{$profile}) {
+		$u->profileField($fieldName,${$profile}{$fieldName});
+	}
 }
+
+=head2 validateProfileData ( $session )
+
+Validates profile data from the session form variables.  Returns processed data, warnings
+and errors.
+
+There are two levels of validation:
+
+=over 4
+
+=item 1
+
+If the profile field is required, and the form field is blank, returns an error.
+
+=item 2
+
+If the profile field label is "email", then checks for a duplicate email and returns a
+warning if it is a duplicate.
+
+=cut
+
 
 #-------------------------------------------------------------------
 sub validateProfileData {
@@ -90,6 +152,21 @@ sub validateProfileData {
 	}
 	return (\%data, $error, $warning);
 }
+
+=head2 www_editProfile ( $session )
+
+Provide a form where user profile data can be entered or edited.  The subroutine
+makes a large set of template variables which are passed to a template for presentation
+and styling.  The default template is PBtmpl0000000000000051 and is not user
+selectable.
+
+Calls www_editProfileSave on submission.
+
+=head3 $session
+
+=head3 $error
+
+=cut
 
 #-------------------------------------------------------------------
 sub www_editProfile {
@@ -129,6 +206,19 @@ sub www_editProfile {
 }
 
 #-------------------------------------------------------------------
+=head2 www_editProfileSave ( $session )
+
+Validates all data submitted by www_editProfile.  If errors or warnings are present, 
+they are concatenated and sent back to www_editProfile for display and to let the user
+correct their mistakes.
+
+If no mistakes are present, saves the data to the user's profile, updates the session user
+object.
+
+Returns the user to WebGUI::Operation::Auth::www_auth when done.
+
+=cut
+
 sub www_editProfileSave {
 	my $session = shift;
 	my ($profile, $fieldName, $error, $u, $warning);
@@ -146,6 +236,16 @@ sub www_editProfileSave {
 	$session->user({user=>$u});
 	return WebGUI::Operation::Auth::www_auth($session);
 }
+
+=head2 www_viewProfile ( $session )
+
+View the profile data for a user by the userId specified by the form variable C<uid>.
+Validates that the user requesting the profile data is allowed to see it.
+Similarly to www_editProfile, this method is templated.  The default template
+is PBtmpl0000000000000052.  The template is not user selectable.
+
+=cut
+
 
 #-------------------------------------------------------------------
 sub www_viewProfile {

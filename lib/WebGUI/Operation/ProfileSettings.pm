@@ -19,6 +19,43 @@ use WebGUI::Form::FieldType;
 use WebGUI::ProfileField;
 use WebGUI::ProfileCategory;
 
+=head1 NAME
+
+Package WebGUI::Operation::ProfileSettings
+
+=head1 DESCRIPTION
+
+Operation handler for configuring the user profile system in WebGUI.
+You are allowed to create categories of profile settings and manage
+them (delete, reorder, edit) as well as adding new fields to the
+profile and managing them.
+
+Only users in group Admin (3) are allowed to call subroutines in this package.
+
+=head2 _submenu ( $session, $workarea, $title, $help )
+
+Utility routine for creating the AdminConsole for DatabaseLink functions.
+
+=head3 $session
+
+The current WebGUI session variable.
+
+=head3 $workarea
+
+The content to display to the user.
+
+=head3 $title
+
+The title of the Admin Console.  This should be an entry in the i18n
+table in the WebGUI namespace.
+
+=head3 $help
+
+An entry in the Help system in the WebGUI namespace.  This will be shown
+as a link to the user.
+
+=cut
+
 #-------------------------------------------------------------------
 sub _submenu {
 	my $session = shift;
@@ -46,6 +83,14 @@ sub _submenu {
         return $ac->render($workarea, $title);
 }
 
+=head2 www_deleteProfileCategoryConfirm ( $session )
+
+Deletes the profile category in form variable C<cid>, unless the category is
+protected, in which case it returns $session->privilege->vitalComponent.
+Othewise, it returns the user to www_editProfileSettings.
+
+=cut
+
 #-------------------------------------------------------------------
 sub www_deleteProfileCategoryConfirm {
 	my $session = shift;
@@ -56,6 +101,14 @@ sub www_deleteProfileCategoryConfirm {
         return www_editProfileSettings($session);
 }
 
+=head2 www_deleteProfileFieldConfirm ( $session )
+
+Deletes the profile field in form variable C<fid>, unless the field is
+protected, in which case it returns $session->privilege->vitalComponent.
+Othewise, it returns the user to www_editProfileSettings.
+
+=cut
+
 #-------------------------------------------------------------------
 sub www_deleteProfileFieldConfirm {
 	my $session = shift;
@@ -65,6 +118,13 @@ sub www_deleteProfileFieldConfirm {
 	$field->delete;
         return www_editProfileSettings($session); 
 }
+
+=head2 www_editProfileCategory ( $session )
+
+Add or edit a profile category specified in form variable C<cid>.  Calls www_editProfileCategorySave when done.
+
+=cut
+
 
 #-------------------------------------------------------------------
 sub www_editProfileCategory {
@@ -116,6 +176,14 @@ sub www_editProfileCategory {
 	return _submenu($session,$f->print,'468','user profile category add/edit','WebGUIProfile');
 }
 
+=head2 www_editProfileCategorySave ( $session )
+
+Saves the data submitted by www_editProfileCategorySave and/or creates a new category.
+Returns the user to www_editProfileSettings when done.
+
+=cut
+
+
 #-------------------------------------------------------------------
 sub www_editProfileCategorySave {
 	my $session = shift;
@@ -132,6 +200,12 @@ sub www_editProfileCategorySave {
 	}
 	return www_editProfileSettings($session);
 }
+
+=head2 www_editProfileField ( $session )
+
+Add or edit a profile field specified in form variable C<fid>.  Calls www_editProfileFieldSave when done.
+
+=cut
 
 #-------------------------------------------------------------------
 sub www_editProfileField {
@@ -235,6 +309,13 @@ sub www_editProfileField {
 	return _submenu($session,$f->print,'471','profile settings edit',"WebGUIProfile");
 }
 
+=head2 www_editProfileFieldSave ( $session )
+
+Saves the data submitted by www_editProfileFieldSave and/or creates a new field.
+Returns the user to www_editProfileSettings when done.
+
+=cut
+
 #-------------------------------------------------------------------
 sub www_editProfileFieldSave {
 	my $session = shift;
@@ -259,6 +340,12 @@ sub www_editProfileFieldSave {
 	}
 	return www_editProfileSettings($session);
 }
+
+=head2 www_editProfileSettings ( $session )
+
+Allows profile categories and fields to be managed (added, edited, deleted or moved).
+
+=cut
 
 #-------------------------------------------------------------------
 sub www_editProfileSettings {
@@ -285,6 +372,14 @@ sub www_editProfileSettings {
 	return _submenu($session,$output,undef,"profile settings edit",'WebGUIProfile');
 }
 
+=head2 www_moveProfileCategoryDown ( $session )
+
+Moves the profile category specified by form variable C<cid> down one notch.
+Returns the user to www_editProfileSettings.
+
+=cut
+
+
 #-------------------------------------------------------------------
 sub www_moveProfileCategoryDown {
 	my $session = shift;
@@ -292,6 +387,13 @@ sub www_moveProfileCategoryDown {
 	WebGUI::ProfileCategory->new($session,$session->form->process("cid"))->moveDown;
         return www_editProfileSettings($session);
 }
+
+=head2 www_moveProfileCategoryUp ( $session )
+
+Moves the profile category specified by form variable C<cid> up one notch.
+Returns the user to www_editProfileSettings.
+
+=cut
 
 #-------------------------------------------------------------------
 sub www_moveProfileCategoryUp {
@@ -301,6 +403,14 @@ sub www_moveProfileCategoryUp {
         return www_editProfileSettings($session);
 }
 
+=head2 www_moveProfileFieldDown ( $session )
+
+Moves the profile field specified by form variable C<cid> down one notch.
+This will not move the field into another category.
+Returns the user to www_editProfileSettings.
+
+=cut
+
 #-------------------------------------------------------------------
 sub www_moveProfileFieldDown {
 	my $session = shift;
@@ -308,6 +418,14 @@ sub www_moveProfileFieldDown {
 	WebGUI::ProfileField->new($session,$session->form->process("fid"))->moveDown;
         return www_editProfileSettings($session);
 }
+
+=head2 www_moveProfileFieldUp ( $session )
+
+Moves the profile field specified by form variable C<cid> up one notch.
+This will not move the field into another category.
+Returns the user to www_editProfileSettings.
+
+=cut
 
 #-------------------------------------------------------------------
 sub www_moveProfileFieldUp {
