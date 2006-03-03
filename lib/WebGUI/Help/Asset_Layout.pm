@@ -20,6 +20,7 @@ our $HELP = {
                                 title => 'assets to hide',
                                 description => 'assets to hide description',
                                 namespace => 'Asset_Layout',
+				uiLevel => 9,
                         },
 		],
 		related => [

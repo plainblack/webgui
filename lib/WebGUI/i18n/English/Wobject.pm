@@ -57,8 +57,7 @@ To add a wobject to a page, first go to that page, then select <b>Add Content...
                    },
 
         '174 description' => {
-                message => q|Do you wish to display the Wobject's title? On some sites, displaying the title is not necessary. 
-<i>UI Level: 5</i>|,
+                message => q|Do you wish to display the Wobject's title? On some sites, displaying the title is not necessary.|,
                 lastUpdated => 1119410887,
         },
 
@@ -79,14 +78,12 @@ is displayed as part of a Layout Asset, the Layout Asset's <b>Style Template</b>
         },
 
         '895 description' => {
-                message => q|The amount of time this page should remain cached for registered users.  
-<i>UI Level: 8</i>|,
+                message => q|The amount of time this page should remain cached for registered users.|,
                 lastUpdated => 1119410887,
         },
 
         '896 description' => {
-                message => q|The amount of time this page should remain cached for visitors.
-<i>UI Level: 8</i>|,
+                message => q|The amount of time this page should remain cached for visitors.|,
                 lastUpdated => 1119410887,
         },
 

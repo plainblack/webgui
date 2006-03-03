@@ -35,6 +35,7 @@ our $HELP = {
                                 title => '174',
                                 description => '174 description',
                                 namespace => 'Wobject',
+				uiLevel => 5,
                         },
                         {
                                 title => '1073',
@@ -55,11 +56,13 @@ our $HELP = {
                                 title => '895',
                                 description => '895 description',
                                 namespace => 'Wobject',
+				uiLevel => 8,
                         },
                         {
                                 title => '896',
                                 description => '896 description',
                                 namespace => 'Wobject',
+				uiLevel => 8,
                         },
 		],
 		related => [

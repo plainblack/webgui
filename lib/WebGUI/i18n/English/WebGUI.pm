@@ -247,11 +247,6 @@ our $I18N = {
 		lastUpdated => 1043879866
 	},
 
-	'739' => {
-		message => q|UI Level|,
-		lastUpdated => 1033832377
-	},
-
 	'show all fields' => {
 		message => q|Show all fields|,
 		lastUpdated => 1141184463
