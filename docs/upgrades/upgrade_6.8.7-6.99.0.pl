@@ -132,7 +132,7 @@ sub addWorkflow {
 			"WebGUI::Workflow::Activity::TrashExpiredEvents", "WebGUI::Workflow::Activity::CreateCronJob", "WebGUI::Workflow::Activity::DeleteExpiredSessions",
 			"WebGUI::Workflow::Activity::ExpireGroupings", "WebGUI::Workflow::Activity::PurgeOldAssetRevisions",
 			"WebGUI::Workflow::Activity::ExpireSubscriptionCodes", "WebGUI::Workflow::Activity::PurgeOldTrash", 
-			"WebGUI::Workflow::Activity::GetSyndicatedContent"],
+			"WebGUI::Workflow::Activity::GetSyndicatedContent", "WebGUI::Workflow::Activity::ProcessRecurringPayments"],
 		"WebGUI::User"=>["WebGUI::Workflow::Activity::CreateCronJob"],
 		"WebGUI::VersionTag"=>["WebGUI::Workflow::Activity::CommitVersionTag", "WebGUI::Workflow::Activity::RollbackVersionTag", 
 			"WebGUI::Workflow::Activity::TrashVersionTag", "WebGUI::Workflow::Activity::CreateCronJob"]
@@ -146,6 +146,8 @@ sub addWorkflow {
 	my $activity = $workflow->addActivity("WebGUI::Workflow::Activity::CleanTempStorage", "pbwfactivity0000000001");
 	$activity->set("title","Delete temp files older than 24 hours");
 	$activity->set("storageTimeout",60*60*24);
+	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::ProcessRecurringPayments", "pbwfactivity0000000013");
+	$activity->set("title", "Process Recurring Payments");
 	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::CleanFileCache", "pbwfactivity0000000002");
 	$activity->set("title","Prune cache larger than 100MB");
 	$activity->set("sizeLimit", 1000000000);

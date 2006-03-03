@@ -1,6 +1,11 @@
 package WebGUI::i18n::English::Commerce;
 
 our $I18N = {
+	'process recurring payments' => {
+		message => q|Process Recurring Payments|,
+		lastUpdated => 0,
+		context => q|the title for the workflow activity that processes recurring payments|
+	},
 	'commerce settings' => {
 		message => q|Commerce|,
 		lastUpdated => 1101772584,
