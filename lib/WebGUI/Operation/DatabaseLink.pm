@@ -16,6 +16,39 @@ use WebGUI::AdminConsole;
 use WebGUI::DatabaseLink;
 use WebGUI::International;
 
+=head1 NAME
+
+Package WebGUI::Operation::DatabaseLink
+
+=head1 DESCRIPTION
+
+Handles creating, managing and deleting Database Links via operations.  Many
+of the subroutines here are wrappers around corresponding routines in WebGUI::Database.
+
+=head2 _submenu ( $session, $workarea, $title, $help )
+
+Utility routine for creating the AdminConsole for DatabaseLink functions.
+
+=head3 $session
+
+The current WebGUI session variable.
+
+=head3 $workarea
+
+The content to display to the user.
+
+=head3 $title
+
+The title of the Admin Console.  This should be an entry in the i18n
+table in the WebGUI namespace.
+
+=head3 $help
+
+An entry in the Help system in the WebGUI namespace.  This will be shown
+as a link to the user.
+
+=cut
+
 #-------------------------------------------------------------------
 sub _submenu {
 	my $session = shift;
@@ -38,6 +71,13 @@ sub _submenu {
         return $ac->render($workarea, $title);
 }
 
+=head2 www_copyDatabaseLink ( $session )
+
+Copies the requested database link in the form variable C<dlid> if the user
+is in group Admin (3).  Returns the user to the List Database Links screen.
+
+=cut
+
 #-------------------------------------------------------------------
 sub www_copyDatabaseLink {
 	my $session = shift;
@@ -46,10 +86,19 @@ sub www_copyDatabaseLink {
         return www_listDatabaseLinks();
 }
 
+=head2 www_deleteDatabaseLink ( $session )
+
+Requests that the user confirm the deletion of the database link in
+the form variable C<dlid>.  Returns Insufficient privilege if the
+user is not in group Admin (3).
+
+=cut
+
 #-------------------------------------------------------------------
 sub www_deleteDatabaseLink {
 	my $session = shift;
         return $session->privilege->insufficient unless ($session->user->isInGroup(3));
+	return $session->privilege->vitalComponent if ($session->form->process("dlid") == 0);
 	my $i18n = WebGUI::International->new($session);
         my ($output);
         $output .= $i18n->get(988).'<p>';
@@ -61,6 +110,16 @@ sub www_deleteDatabaseLink {
         return _submenu($session,$output,"987","database link delete");
 }
 
+=head2 www_deleteDatabaseLinkConfirm ( $session )
+
+Deletes the requested database link in the form variable C<dlid> if the user
+is in group Admin (3) and the default WebGUI database link (dlid 0) has not
+been requested.
+
+Returns the user to the List Database Links screen.
+
+=cut
+
 #-------------------------------------------------------------------
 sub www_deleteDatabaseLinkConfirm {
 	my $session = shift;
@@ -70,6 +129,15 @@ sub www_deleteDatabaseLinkConfirm {
 	WebGUI::DatabaseLink->new($session,$session->form->process("dlid"))->delete;
         return www_listDatabaseLinks($session);
 }
+
+=head2 www_editDatabaseLink ( $session )
+
+Create a new database link or edit an existing database link.  The user must
+be in group Admin (3).
+
+Calls www_editDatabaseLinkSave on user submission.
+
+=cut
 
 #-------------------------------------------------------------------
 sub www_editDatabaseLink {
@@ -137,6 +205,15 @@ sub www_editDatabaseLink {
         return _submenu($session,$output,"990","database link add/edit");
 }
 
+=head2 www_editDatabaseLinkSave ( $session )
+
+Form postprocessor for www_editDatabaseLink.  Only users in group Admin (3)
+are allowed to use this subroutine.
+
+Returns the user the Link Database Links screen.
+
+=cut
+
 #-------------------------------------------------------------------
 sub www_editDatabaseLinkSave {
 	my ($allowedKeywords);
@@ -159,6 +236,13 @@ sub www_editDatabaseLinkSave {
 	}
         return www_listDatabaseLinks($session);
 }
+
+=head2 www_listDatabaseLinks ( $session )
+
+List all Database links and allow the user to edit, copy or delete them.
+Only users in group Admin (3) are allowed to see this screen.
+
+=cut
 
 #-------------------------------------------------------------------
 sub www_listDatabaseLinks {

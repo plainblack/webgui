@@ -18,6 +18,21 @@ use WebGUI::Asset::Template;
 use WebGUI::Macro;
 use WebGUI::Utility;
 
+=head1 NAME
+
+Package WebGUI::Operation::Help
+
+=head1 DESCRIPTION
+
+Handles displaying WebGUI's internal help to the user as an operation.
+
+=head2 _load ( $session, $namespace )
+
+Safely load's the Help file for the requested namespace and logs errors
+during the load.
+
+=cut
+
 #-------------------------------------------------------------------
 sub _load {
 	my $session = shift;
@@ -35,6 +50,13 @@ sub _load {
 	}
 }
 
+=head2 _get ( $session, $id, $namespace )
+
+Safely load's the Help file for the requested namespace and returns
+the specified id (help key).
+
+=cut
+
 #-------------------------------------------------------------------
 sub _get {
 	my $session = shift;
@@ -49,17 +71,37 @@ sub _get {
 	}
 }
 
+=head2 _link ( $session, $id, $namespace )
+
+Utility routine for formatting a link for returning a help entry in the requested
+namespace.
+
+=cut
+
 #-------------------------------------------------------------------
 sub _link {
 	my $session = shift;
 	return $session->url->page('op=viewHelp;hid='.$session->url->escape($_[0]).';namespace='.$_[1]);
 }
 
+=head2 _linkTOC ( $session, $namespace )
+
+Utility routine for formatting a link for returning a table of contents entry
+for a Help namespace.
+
+=cut
+
 #-------------------------------------------------------------------
 sub _linkTOC {
 	my $session = shift;
 	return $session->url->page('op=viewHelpChapter;namespace='.$_[0]);
 }
+
+=head2 _getHelpFilesList ( $session )
+
+Utility routine for returning a list of all Help files in the lib/WebGUI/Help folder.
+
+=cut
 
 #-------------------------------------------------------------------
 sub _getHelpFilesList {
@@ -76,6 +118,15 @@ sub _getHelpFilesList {
         closedir(DIR);
 	return @files;
 }
+
+
+=head2 _getHelpName ( $session, $file )
+
+To support the table of contents, all WebGUI help files have a corresponding
+entry in the i18n file for the name of the chapter.  This utility routine
+will fetch the correct i18n name for the chapter.
+
+=cut
 
 #-------------------------------------------------------------------
 sub _getHelpName {
@@ -95,6 +146,18 @@ sub _getHelpName {
 	return $i18n->get($helpName,$file);
 }
 
+=head2 _related ( $session, $related )
+
+Utility routine for returning a list of topics related the the current help
+entry.
+
+=head3 $related
+
+A scalar ref to either an array ref, which will be dereferenced to return a list, or
+a code ref, which will be executed and should return a list.
+
+=cut
+
 #-------------------------------------------------------------------
 sub _related {
 	my ($session, $related) = @_;
@@ -105,6 +168,14 @@ sub _related {
 		return @{ $related };
 	}
 }
+
+=head2 www_viewHelp ( $session )
+
+Display a single help entry in a namespace.  The entry and namespace are passed in as
+form parameters.  Entries in the fields key of the hash are filtered by the user's
+UI level, and this can be toggled on and off by another form parameter, uiOverride.
+
+=cut
 
 #-------------------------------------------------------------------
 sub www_viewHelp {
@@ -143,6 +214,12 @@ sub www_viewHelp {
 		);
 }
 
+=head2 _viewHelpIndex ( $session )
+
+Display the index of all help entries in all namespaces.
+
+=cut
+
 #-------------------------------------------------------------------
 sub www_viewHelpIndex {
 	my $session = shift;
@@ -178,6 +255,13 @@ sub www_viewHelpIndex {
 	return $ac->render($output, join ': ',$i18n->get(93), $i18n->get('help index'));
 }
 
+=head2 www_viewHelpTOC ( $session )
+
+Display the table of contents for the Help system.  This generates a list of
+the assetName,macroName,topicNames for each installed Help file.
+
+=cut
+
 #-------------------------------------------------------------------
 sub www_viewHelpTOC {
 	my $session = shift;
@@ -208,6 +292,13 @@ sub www_viewHelpTOC {
     	$ac->addSubmenuItem($session->url->page('op=viewHelpIndex'),$i18n->get(95));
 	return $ac->render($output, join ': ',$i18n->get(93), $i18n->get('help toc'));
 }
+
+=head2 www_viewHelpChapter ( $session )
+
+Display all entries in one chapter of the help.  The namespace is passed in via
+the form paramter "namespace".
+
+=cut
 
 #-------------------------------------------------------------------
 sub www_viewHelpChapter {
