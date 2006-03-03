@@ -276,13 +276,6 @@
         "u" : "u_companyUrl"
 	},
 
-# How often, in seconds, should WebGUI calculate the statistics
-# of passively profiling users to content preferences. Note that
-# this won't have any effect unless passive profiling is enabled
-# in the UI.
-
-"passiveProfileInterval" : 86400,
-
 # What hour of the day (for example, 22 : 10 PM = 22:00:00)
 # should WebGUI try to synchronize user profile information from 
 # the LDAP server. Note that this will only happen for users

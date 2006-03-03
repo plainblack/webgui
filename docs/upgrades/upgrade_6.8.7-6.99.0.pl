@@ -132,7 +132,8 @@ sub addWorkflow {
 			"WebGUI::Workflow::Activity::TrashExpiredEvents", "WebGUI::Workflow::Activity::CreateCronJob", "WebGUI::Workflow::Activity::DeleteExpiredSessions",
 			"WebGUI::Workflow::Activity::ExpireGroupings", "WebGUI::Workflow::Activity::PurgeOldAssetRevisions",
 			"WebGUI::Workflow::Activity::ExpireSubscriptionCodes", "WebGUI::Workflow::Activity::PurgeOldTrash", 
-			"WebGUI::Workflow::Activity::GetSyndicatedContent", "WebGUI::Workflow::Activity::ProcessRecurringPayments"],
+			"WebGUI::Workflow::Activity::GetSyndicatedContent", "WebGUI::Workflow::Activity::ProcessRecurringPayments",
+			"WebGUI::Workflow::Activity::SummarizePassiveProfileLog"],
 		"WebGUI::User"=>["WebGUI::Workflow::Activity::CreateCronJob"],
 		"WebGUI::VersionTag"=>["WebGUI::Workflow::Activity::CommitVersionTag", "WebGUI::Workflow::Activity::RollbackVersionTag", 
 			"WebGUI::Workflow::Activity::TrashVersionTag", "WebGUI::Workflow::Activity::CreateCronJob"]
@@ -160,6 +161,8 @@ sub addWorkflow {
 	$activity->set("title", "deal with user groupings that have expired");
 	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::ExpireSubscriptionCodes", "pbwfactivity0000000011");
 	$activity->set("title", "Expire old subscription codes");
+	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::SummarizePassiveProfileLog", "pbwfactivity0000000014");
+	$activity->set("title", "Summarize Passive Profiling Data");
 	WebGUI::Workflow::Cron->create($session, {
 		title=>'Daily Maintenance',
 		enabled=>1,
@@ -220,6 +223,7 @@ sub addWorkflow {
 	$session->db->write("alter table assetVersionTag add column isLocked int not null default 0");
 	$session->db->write("alter table assetVersionTag add column lockedBy varchar(22) binary not null");
 	$session->config->delete("fileCacheSizeLimit");
+	$session->config->delete("passiveProfileInterval");
 	$session->config->delete("CleanLoginHistory_ageToDelete");
 	$session->config->delete("DecayKarma_minimumKarma");
 	$session->config->delete("DecayKarma_decayFactor");
