@@ -126,8 +126,8 @@ sub getEditForm {
 			-name=>"assetsToHide",
 			-value=>\@assetsToHide,
 			-options=>\%childIds,
-			-label=>$i18n->get('assets to hide', 'Asset_Layout'),
-			-hoverHelp=>$i18n->get('assets to hide description', 'Asset_Layout'),
+			-label=>$i18n->get('assets to hide'),
+			-hoverHelp=>$i18n->get('assets to hide description'),
 			-vertical=>1,
 			-uiLevel=>9
 		);

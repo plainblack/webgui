@@ -33,36 +33,6 @@ our $I18N = {
 		message => q|Dashboard Template|,
 		lastUpdated => 1133619940
 	},
-	'dashboard template field label' => {
-		message => q|Dashboard Template|,
-		lastUpdated => 1133619940
-	},
-	'dashboard template field label' => {
-		message => q|Dashboard Template|,
-		lastUpdated => 1133619940
-	},
-	'dashboard template field label' => {
-		message => q|Dashboard Template|,
-		lastUpdated => 1133619940
-	},
-	'dashboard template field label' => {
-		message => q|Dashboard Template|,
-		lastUpdated => 1133619940
-	},
-	'dashboard template field label' => {
-		message => q|Dashboard Template|,
-		lastUpdated => 1133619940
-	},
-	'dashboard template field label' => {
-		message => q|Dashboard Template|,
-		lastUpdated => 1133619940
-	},
-	'dashboard template field label' => {
-		message => q|Dashboard Template|,
-		lastUpdated => 1133619940
-	},
-
-
 
 	'dashboard add/edit title' => {
 		message => q|Dashboard Add/Edit|,
@@ -76,11 +46,18 @@ our $I18N = {
 		message => q|Dashboard Template|,
 		lastUpdated => 1133619940
 	},
-	'dashboard template field label' => {
-		message => q|Dashboard Template|,
-		lastUpdated => 1133619940
+
+	'assets to hide' => {
+		message => q|Assets To Hide.|,
+		lastUpdated => 1118942468
 	},
 
+        'assets to hide description' => {
+                message => q|This list contains one checkbox for each child Asset of the Page Layout.  Select the
+checkbox for any Asset that you do not want displayed in the Page Layout Asset.
+<p/>|,
+                lastUpdated => 1119410080,
+        },
 
 };
 

@@ -48,16 +48,6 @@ our $HELP = {
                                 namespace => 'Asset',
                         },
                         {
-                                title => '497',
-                                description => '497 description',
-                                namespace => 'Asset',
-                        },
-                        {
-                                title => '498',
-                                description => '498 description',
-                                namespace => 'Asset',
-                        },
-                        {
                                 title => '108',
                                 description => '108 description',
                                 namespace => 'Asset',
