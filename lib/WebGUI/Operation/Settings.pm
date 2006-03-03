@@ -17,6 +17,20 @@ use WebGUI::TabForm;
 use WebGUI::International;
 use WebGUI::SQL;
 
+=head1 NAME
+
+Package WebGUI::Operation::Settings
+
+=head1 DESCRIPTION
+
+Operation handler for sitewide settings for content, messaging, authentication, etc.
+
+=head2 www_editSettings ( $session )
+
+Display a form for sitewide settings, if the user is in group Admin (3).
+
+=cut
+
 #-------------------------------------------------------------------
 sub www_editSettings {
 	my $session = shift;
@@ -286,6 +300,13 @@ sub www_editSettings {
 	$ac->setHelp("settings");
 	return $ac->render($tabform->print);
 }
+
+=head2 www_saveSettings ( $session )
+
+Form postprocessor for www_editSettings.  Returns adminOnly() unless the user
+is in group Admin (3).  Returns the user to the Edit Settings screen, www_editSettings.
+
+=cut
 
 #-------------------------------------------------------------------
 sub www_saveSettings {

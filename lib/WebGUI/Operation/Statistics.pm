@@ -16,6 +16,40 @@ use WebGUI::Cache;
 use WebGUI::International;
 use WebGUI::SQL;
 
+=head1 NAME
+
+Package WebGUI::Operation::Statistics
+
+=head1 DESCRIPTION
+
+Handles displaying statistics about WebGUI.  This isn't page count, but rather information
+about the number of assets, users, groups, etc.
+
+=head2 _submenu ( $session, $workarea, $title, $help )
+
+Utility routine for creating the AdminConsole for Statistics functions.
+
+=head3 $session
+
+The current WebGUI session variable.
+
+=head3 $workarea
+
+The content to display to the user.
+
+=head3 $title
+
+The title of the Admin Console.  This should be an entry in the i18n
+table in the WebGUI namespace.
+
+=head3 $help
+
+An entry in the Help system in the WebGUI namespace.  This will be shown
+as a link to the user.
+
+=cut
+
+
 #-------------------------------------------------------------------
 sub _submenu {
 	my $session = shift;
@@ -30,6 +64,50 @@ sub _submenu {
         return $ac->render($workarea, $title);
 }
 
+=head2 www_viewStatistics ( $session )
+
+Displays information to the user about WebGUI statistics if they are
+in group Admin (3).
+
+=head3 Displayed information
+
+=over 4
+
+=item *
+
+Newest WebGUI version.
+
+=item *
+
+Current WebGUI version, if different from newest.
+
+=item *
+
+Number of published assets.
+
+=item *
+
+Number of assets set to be packages.
+
+=item *
+
+Number of templates
+
+=item *
+
+Number of sessions
+
+=item *
+
+Number of users.
+
+=item *
+
+Number of groups.
+
+=back
+
+=cut
 
 #-------------------------------------------------------------------
 sub www_viewStatistics {

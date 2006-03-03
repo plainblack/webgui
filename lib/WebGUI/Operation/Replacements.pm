@@ -16,6 +16,39 @@ use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::SQL;
 
+=head1 NAME
+
+Package WebGUI::Operation::Replacements
+
+=head1 DESCRIPTION
+
+Operation handler for conditional editing of submitted WebGUI content, similar to
+a search and replace function in word processors.
+
+=head2 _submenu ( $session, $workarea, $title, $help )
+
+Utility routine for creating the AdminConsole for DatabaseLink functions.
+
+=head3 $session
+
+The current WebGUI session variable.
+
+=head3 $workarea
+
+The content to display to the user.
+
+=head3 $title
+
+The title of the Admin Console.  This should be an entry in the i18n
+table in the WebGUI namespace.
+
+=head3 $help
+
+An entry in the Help system in the WebGUI namespace.  This will be shown
+as a link to the user.
+
+=cut
+
 #-------------------------------------------------------------------
 sub _submenu {
 	my $session = shift;
@@ -34,6 +67,13 @@ sub _submenu {
 }
 
 
+=head2 www_deleteReplacement ( $session )
+
+Delete a replacement specified by the form variable C<replacementId> if the user is in group Admin (3).  Returns the
+user to the List Replacements screen, www_listReplacements.
+
+=cut
+
 #-------------------------------------------------------------------
 sub www_deleteReplacement {
 	my $session = shift;
@@ -41,6 +81,16 @@ sub www_deleteReplacement {
 	$session->db->write("delete from replacements where replacementId=".$session->db->quote($session->form->process("replacementId")));
 	return www_listReplacements();
 }
+
+=head2 www_editReplacement ( $session )
+
+Add a new, or edit an existing specified by the form variable
+C<replacementId> if the user is in group Admin (3).  Allows the user
+to enter in a string to search for and the text to replace it with.
+
+Calls www_editReplacementSave on submission.
+
+=cut
 
 #-------------------------------------------------------------------
 sub www_editReplacement {
@@ -77,6 +127,15 @@ sub www_editReplacement {
 	return _submenu($session,$f->print,"1052",'replacements edit');
 }
 
+=head2 www_editReplacementSave ( $session )
+
+Form post processor for www_editReplacement.  You must be in group Admin (3) to
+execute this function.
+
+Returns the user to www_listReplacements.
+
+=cut
+
 #-------------------------------------------------------------------
 sub www_editReplacementSave {
 	my $session = shift;
@@ -88,6 +147,13 @@ sub www_editReplacementSave {
 		});
 	return www_listReplacements();
 }
+
+=head2 www_listReplacements ( $session )
+
+List all replacements if the user is in group Admin (3) and provides URls for replacements
+to be added or deleted.
+
+=cut
 
 #-------------------------------------------------------------------
 sub www_listReplacements {

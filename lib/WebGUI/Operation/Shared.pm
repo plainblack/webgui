@@ -15,6 +15,20 @@ use strict;
 use WebGUI::International;
 use Safe;
 
+=head1 NAME
+
+Package WebGUI::Operation::Shared
+
+=head1 DESCRIPTION
+
+Shared routines for WebGUI Operations.
+
+=head2 accountOptions ( $session )
+
+Copies the requested database link in the form variable C<dlid> if the user
+is in group Admin (3).  Returns the user to the List Database Links screen.
+
+=cut
 
 #-------------------------------------------------------------------
  sub accountOptions {
@@ -65,6 +79,14 @@ use Safe;
 	return \@array;
 }
 
+
+=head2 secureEval ( $session, $code )
+
+Eval $code inside of a Safe compartment to prevent sneaky attacks, mainly for use with
+the Profile system, where internationalized labels are stored as perl code inside
+the database.
+
+=cut
 
 #-------------------------------------------------------------------
 # This function is here to replace the dangerous eval calls in the User Profile System.
