@@ -100,7 +100,7 @@ sub execute {
  			$transaction->gatewayId;
 			my $status = $payment->getRecurringPaymentStatus($self->session, $transaction->gatewayId, $term);
 			my $output = $item->name." (tid: ".$transaction->get('transactionId').") ";
-		        $output .= " by user ".WebGUI::User->new($self->session, $transaction->get(userId))->username." (uid: ".$transaction->get(userId).") ";
+		        $output .= " by user ".WebGUI::User->new($self->session, $transaction->get("userId"))->username." (uid: ".$transaction->get("userId").") ";
 			$output .= " for term ". sprintf('% 6d', $term)." "; 
 			$output .= " -> ".$transaction->gateway.": (".$transaction->gatewayId.")\t";
 			unless ($payment->resultCode) {
@@ -110,7 +110,7 @@ sub execute {
 				} elsif ($status->{resultCode} eq '0') {
 					$output .= "OK";
 					push (@ok, $output);
-					$item->handler($transaction->get(userId)) unless ($term == 1);
+					$item->handler($transaction->get("userId")) unless ($term == 1);
 					$transaction->lastPayedTerm($term);
 				} else {
 					$output .= "PAYMENT FAILED: ".$status->{resultCode};
