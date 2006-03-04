@@ -11,6 +11,29 @@ use WebGUI::Product;
 use WebGUI::HTML;
 
 #-------------------------------------------------------------------
+
+=head2 _submenu ( $session )
+
+Returns a rendered Admin Console view, with a standard list of five submenu items.
+
+=head3 $session
+
+The current WebGUI session object.
+
+=head3 workarea
+
+A scalar of HTML that defines the current workarea.
+
+=head3 title
+
+The i18n key of the title of this workarea.
+
+=head3 help
+
+The i18n key of the help link for this workarea.
+
+=cut
+
 sub _submenu {
 	my $session = shift;
 	my $i18n = WebGUI::International->new($session, "ProductManager");
@@ -35,6 +58,17 @@ sub _submenu {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteProductParameterOption ( $session )
+
+Deletes a product parameter option specified by form parameter 'optionId'.
+
+=head3 $session
+
+The current WebGUI session object.
+
+=cut
+
 sub www_deleteProductParameterOption {
 	my $session = shift;
 	my $optionId = $session->form->process("optionId");
@@ -47,6 +81,17 @@ sub www_deleteProductParameterOption {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteProductParameter ( $session )
+
+Deletes a product parameter specified by form parameter 'parameterId'.
+
+=head3 $session
+
+The current WebGUI session object.
+
+=cut
+
 sub www_deleteProductParameter {
 	my $session = shift;
 	my $parameterId = $session->form->process("parameterId");
@@ -59,6 +104,17 @@ sub www_deleteProductParameter {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteProduct ( $session )
+
+Deletes a product specified by form parameter 'productId'.
+
+=head3 $session
+
+The current WebGUI session object.
+
+=cut
+
 sub www_deleteProduct {
 	my $session = shift;
 	my $productId = $session->form->process("productId");
@@ -71,6 +127,17 @@ sub www_deleteProduct {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editProduct ( $session )
+
+Returns a form to edit or add a new product.
+
+=head3 $session
+
+The current WebGUI session object.
+
+=cut
+
 sub www_editProduct {
 	my $session = shift;
 	my ($productId, $product, $f, $i18n);
@@ -147,6 +214,17 @@ sub www_editProduct {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editProductSave ( $session )
+
+Saves the properties of a product.
+
+=head3 $session
+
+The current WebGUI session object.
+
+=cut
+
 sub www_editProductSave {
 	my $session = shift;
 	my ($self, @error, $productId, $product, $i18n);
@@ -179,6 +257,17 @@ sub www_editProductSave {
 }
 		
 #-------------------------------------------------------------------
+
+=head2 www_editProductParameter ( $session )
+
+Returns a form to edit a product parameter.
+
+=head3 $session
+
+The current WebGUI session object.
+
+=cut
+
 sub www_editProductParameter {
 	my $session = shift;
 	my ($parameterId, $product, $productId, $parameter, $f, $i18n);
@@ -226,6 +315,17 @@ sub www_editProductParameter {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editProductParameterSave ( $session )
+
+Saves the properties of a product parameter.
+
+=head3 $session
+
+The current WebGUI session object.
+
+=cut
+
 sub www_editProductParameterSave {
 	my $session = shift;
 	my (@error, $parameterId, $product, $i18n, $skuTemplate, $oldName, $newName);
@@ -265,6 +365,17 @@ sub www_editProductParameterSave {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editProductParameterOption ( $session )
+
+Edits the options of a product parameter.
+
+=head3 $session
+
+The current WebGUI session object.
+
+=cut
+
 sub www_editProductParameterOption {
 	my $session = shift;
 	my ($self, $optionId, $option, $f, $i18n);
@@ -329,6 +440,17 @@ sub www_editProductParameterOption {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editProductParameterOptionSave ( $session )
+
+Saves the properties of a Product Parameter Option
+
+=head3 $session
+
+The current WebGUI session object.
+
+=cut
+
 sub www_editProductParameterOptionSave {
 	my $session = shift;
 	my ($self, @error, $optionId, $product, $i18n);
@@ -356,6 +478,17 @@ sub www_editProductParameterOptionSave {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editProductVariant ( $session )
+
+Returns a form to edit a Product Variant.
+
+=head3 $session
+
+The current WebGUI session object.
+
+=cut
+
 sub www_editProductVariant {
 	my $session = shift;
 	my ($variantId, $variant, $f, $i18n);
@@ -410,6 +543,17 @@ sub www_editProductVariant {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editProductVariantSave ( $session )
+
+Saves the properties of a Product Variant.
+
+=head3 $session
+
+The current WebGUI session object.
+
+=cut
+
 sub www_editProductVariantSave {
 	my $session = shift;
 my	$variantId = $session->form->process("variantId");
@@ -422,6 +566,17 @@ my	$variantId = $session->form->process("variantId");
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editSkuTemplate ( $session )
+
+Returns a form to edit a Sku Template.
+
+=head3 $session
+
+The current WebGUI session object.
+
+=cut
+
 sub www_editSkuTemplate {
 	my $session = shift;
 	my ($product, $productId, $output, $f, $name, $i18n);
@@ -462,6 +617,17 @@ sub www_editSkuTemplate {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editSkuTemplateSave ( $session )
+
+Saves the properties of a Sku Template.
+
+=head3 $session
+
+The current WebGUI session object.
+
+=cut
+
 sub www_editSkuTemplateSave {
 	my $session = shift;
 	my ($productId) = $session->form->process("productId");
@@ -476,6 +642,17 @@ sub www_editSkuTemplateSave {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_listProducts ( $session )
+
+Returns a list of products with manage and delete buttons.
+
+=head3 $session
+
+The current WebGUI session object.
+
+=cut
+
 sub www_listProducts {
 	my $session = shift;
 	my ($self, $sth, $output, $row, $i18n);
@@ -504,6 +681,17 @@ sub www_listProducts {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_listProductVariants ( $session )
+
+Returns a list of Product Variants.
+
+=head3 $session
+
+The current WebGUI session object.
+
+=cut
+
 sub www_listProductVariants {
 	my $session = shift;
 	my ($productId, $product, @variants, %parameters, %options, $output, %composition, $i18n);
@@ -567,6 +755,17 @@ sub www_listProductVariants {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_listProductVariantsSave ( $session )
+
+Saves the properties of some product variants.
+
+=head3 $session
+
+The current WebGUI session object.
+
+=cut
+
 sub www_listProductVariantsSave {
 	my $session = shift;
 
@@ -586,6 +785,17 @@ sub www_listProductVariantsSave {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_manageProduct ( $session )
+
+Returns a screen that displays lots of options for editing all aspects of a product.
+
+=head3 $session
+
+The current WebGUI session object.
+
+=cut
+
 sub www_manageProduct {
 	my $session = shift;
 	my ($productId, $product, $output, $parameter, $option, $optionId, $i18n);

@@ -12,6 +12,29 @@ use WebGUI::Asset::Template;
 use WebGUI::Form;
 use WebGUI::International;
 
+=head1 NAME
+
+Package WebGUI::Operation::Subscription
+
+=head1 DESCRIPTION
+
+Operational handler for viewing, editing, listing, purchasing/redeeming, and deleting Subscriptions and Subscription Code Batches.  
+
+=head2 _generateCode ( $session, codeLength )
+
+Generates a human-readable subscription code, meant to be typed/pasted in somewhere.
+
+=head3 $session
+
+The current WebGUI session object.
+
+=head3 codeLength
+
+The whole number amount of characters you want returned.
+
+=cut
+
+
 #-------------------------------------------------------------------
 sub _generateCode {
 	my $session = shift;
@@ -25,6 +48,28 @@ sub _generateCode {
 
 	return $code;
 }
+
+=head2 _submenu ( $session )
+
+Returns a rendered Admin Console view, with a standard list of five submenu items.
+
+=head3 $session
+
+The current WebGUI session object.
+
+=head3 workarea
+
+A scalar of HTML that defines the current workarea.
+
+=head3 title
+
+The i18n key of the title of this workarea.
+
+=head3 help
+
+The i18n key of the help link for this workarea.
+
+=cut
 
 #-------------------------------------------------------------------
 sub _submenu {
@@ -46,6 +91,21 @@ sub _submenu {
 	$ac->addSubmenuItem($session->url->page('op=listSubscriptions'), 'Manage Subscriptions');
         return $ac->render($workarea, $title);
 }
+
+=head2 www_createSubscriptionCodeBatch ( $session, error )
+
+Form to accept parameters to create a batch of subscription codes.
+
+=head3 $session
+
+The current WebGUI session object.
+
+=head3 error
+
+An HTML scalar of an error message to be returned to the user.
+
+=cut
+
 
 #-------------------------------------------------------------------
 sub www_createSubscriptionCodeBatch {
@@ -104,7 +164,18 @@ sub www_createSubscriptionCodeBatch {
 
 	return _submenu($session,$errorMessage.$f->print, 'create batch menu', 'create batch');
 }
-	
+
+=head2 www_createSubscriptionCodeBatchSave ( $session )
+
+Method that accepts the form parameters to create a batch of subscription codes.  
+
+=head3 $session
+
+The current WebGUI session object.
+
+=cut
+
+
 #-------------------------------------------------------------------
 sub www_createSubscriptionCodeBatchSave {
 	my $session = shift;
@@ -123,7 +194,7 @@ sub www_createSubscriptionCodeBatchSave {
 	push(@error, $i18n->get('no association error')) unless ($session->form->process("subscriptionId"));
 	push(@error, $i18n->get('code length error')) unless ($session->form->process("codeLength") >= 10 && $session->form->process("codeLength") <= 64 && $session->form->process("codeLength") =~ m/^\d\d$/);
 
-	return www_createSubscriptionCodeBatch(\@error) if (@error);
+	return www_createSubscriptionCodeBatch($session,\@error) if (@error);
 
 	$creationEpoch =$session->datetime->time();
 	
@@ -143,8 +214,19 @@ sub www_createSubscriptionCodeBatchSave {
 		}
 	}
 	
-	return www_listSubscriptionCodeBatches();
+	return www_listSubscriptionCodeBatches($session);
 }
+
+=head2 www_deleteSubscription ( $session )
+
+Method that deletes the subscription passed by the user through the form variable 'sid'. 
+
+=head3 $session
+
+The current WebGUI session object.
+
+=cut
+
 
 #-------------------------------------------------------------------
 sub www_deleteSubscription {
@@ -152,8 +234,19 @@ sub www_deleteSubscription {
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
 	WebGUI::Subscription->new($session,$session->form->process("sid"))->delete;
-	return www_listSubscriptions();
+	return www_listSubscriptions($session);
 }
+
+=head2 www_deleteSubscriptionCodeBatch ( $session )
+
+Method that deletes the subscription code batch passed by the user through the form variable 'bid'. 
+
+=head3 $session
+
+The current WebGUI session object.
+
+=cut
+
 
 #-------------------------------------------------------------------
 sub www_deleteSubscriptionCodeBatch {
@@ -163,8 +256,19 @@ sub www_deleteSubscriptionCodeBatch {
 	$session->db->write("delete from subscriptionCodeBatch where batchId=".$session->db->quote($session->form->process("bid")));
 	$session->db->write("delete from subscriptionCode where batchId=".$session->db->quote($session->form->process("bid")));
 	
-	return www_listSubscriptionCodeBatches();
+	return www_listSubscriptionCodeBatches($session);
 }
+
+=head2 www_deleteSubscriptionCodes ( $session )
+
+Method that deletes some subscription codes. 
+
+=head3 $session
+
+The current WebGUI session object.
+
+=cut
+
 
 #-------------------------------------------------------------------
 sub www_deleteSubscriptionCodes {
@@ -179,8 +283,19 @@ sub www_deleteSubscriptionCodes {
 			' and dateUsed <= '.$session->db->quote($session->form->process("duStop")));
 	}
 
-	return www_listSubscriptionCodes();
+	return www_listSubscriptionCodes($session);
 }
+
+=head2 www_editSubscription ( $session )
+
+Returns a form so the user can edit the properties of a subscription.  Uses the form variable 'sid'. 
+
+=head3 $session
+
+The current WebGUI session object.
+
+=cut
+
 
 #-------------------------------------------------------------------
 sub www_editSubscription {
@@ -259,6 +374,17 @@ sub www_editSubscription {
 	return _submenu($session,$f->print, 'edit subscription title', 'subscription add/edit');
 }
 
+=head2 www_editSubscriptionSave ( $session )
+
+Saves the properties of a subscription.
+
+=head3 $session
+
+The current WebGUI session object.
+
+=cut
+
+
 #-------------------------------------------------------------------
 sub www_editSubscriptionSave {
 	my $session = shift;
@@ -267,8 +393,19 @@ sub www_editSubscriptionSave {
 	
 	@relevantFields = qw(subscriptionId name price description subscriptionGroup duration executeOnSubscription karma);
 	WebGUI::Subscription->new($session,$session->form->process("sid"))->set({map {$_ => $session->form->process($_)} @relevantFields});
-	return www_listSubscriptions();
+	return www_listSubscriptions($session);
 }
+
+=head2 www_listSubscriptionCodeBatches ( $session )
+
+Returns a paginated list of batches of subscription codes, along with various links for each one.
+
+=head3 $session
+
+The current WebGUI session object.
+
+=cut
+
 
 #-------------------------------------------------------------------
 sub www_listSubscriptionCodeBatches {
@@ -299,6 +436,17 @@ sub www_listSubscriptionCodeBatches {
 
 	return _submenu($session,$output, 'manage batches', 'manage batch');
 }
+
+=head2 www_listSubscriptionCodes ( $session )
+
+Non-templated.  Returns a paginated list of subscription codes.
+
+=head3 $session
+
+The current WebGUI session object.
+
+=cut
+
 
 #-------------------------------------------------------------------
 sub www_listSubscriptionCodes {
@@ -382,6 +530,17 @@ sub www_listSubscriptionCodes {
 	return _submenu($session,$output, 'listSubscriptionCodes title', 'subscription codes manage');
 }
 
+=head2 www_listSubscriptions ( $session )
+
+Returns a paginated list of subscriptions along with edit and delete links.
+
+=head3 $session
+
+The current WebGUI session object.
+
+=cut
+
+
 #-------------------------------------------------------------------
 sub www_listSubscriptions {
 	my $session = shift;
@@ -411,6 +570,17 @@ sub www_listSubscriptions {
 	return _submenu($session,$output, 'manage subscriptions', 'subscription manage');
 }
 
+=head2 www_purchaseSubscription ( $session )
+
+Adds subscription 'sid' to the user's shopping cart and returns the checkout screen.
+
+=head3 $session
+
+The current WebGUI session object.
+
+=cut
+
+
 #-------------------------------------------------------------------
 sub www_purchaseSubscription {
 	my $session = shift;
@@ -418,6 +588,17 @@ sub www_purchaseSubscription {
 	
 	return $session->http->setRedirect($session->url->page('op=checkout'));
 }
+
+=head2 www_redeemSubscriptionCode ( $session )
+
+Returns a form so the user can redeem a subscription code, or actually redeems the subscription code.
+
+=head3 $session
+
+The current WebGUI session object.
+
+=cut
+
 
 #-------------------------------------------------------------------
 sub www_redeemSubscriptionCode {
