@@ -74,7 +74,7 @@ sub definition {
                                         },
 				parameters=>{
 					fieldType=>'textarea',
-					defaultValue=>'border="0"'
+					defaultValue=>'style="border: 0px;"'
 					}
                         }
                 });

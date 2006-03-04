@@ -1026,11 +1026,11 @@ sub manageAssets {
 		my $locked;
 		my $edit;
 		if ($child->isLocked) {
-			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/locked.gif" alt="locked" border="0" />';
+			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/locked.gif" alt="locked" style="border: 0px;" />';
 			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+" if ($child->canEditIfLocked && $self->session->scratch->get("versionTag") eq $self->get("tagId"));
 		} else {
 			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+";
-			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/unlocked.gif" alt="unlocked" border="0" />';
+			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/unlocked.gif" alt="unlocked" style="border: 0px;" />';
 		}
 		my $lockLink = ", '<a href=\"".$child->getUrl("func=manageRevisions")."\">".$locked."</a>'" unless ($self->session->setting->get("autoCommit"));
          	$output .= "assetManager.AddLine('"
@@ -1041,7 +1041,7 @@ sub manageAssets {
 			."',".$edit."contextMenu.draw()," 
 			.$child->getRank
 			.",'<a href=\"".$child->getUrl("func=manageAssets")."\">".$title
-			."</a>','<img src=\"".$child->getIcon(1)."\" border=\"0\" alt=\"".$child->getName."\" /> ".$child->getName
+			."</a>','<img src=\"".$child->getIcon(1)."\" style=\"border: 0px;\" alt=\"".$child->getName."\" /> ".$child->getName
 			."','".$self->session->datetime->epochToHuman($child->get("revisionDate"))
 			."','".formatBytes($child->get("assetSize"))."'".$lockLink.");\n";
          	$output .= "assetManager.AddLineSortData('','','','".$title."','".$child->getName
@@ -1066,21 +1066,21 @@ sub manageAssets {
         </div>
 		<div style="float: left; padding-right: 30px; font-size: 14px;width: 28%;"><fieldset><legend>'.$i18n->get(1083).'</legend>';
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets","assetContainers")}) {
-		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" border="0" /> 
+		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" style="border: 0px;" /> 
 			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
 		$output .= $self->session->icon->edit("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
 		$output .= '<br />';
 	}
 	$output .= '<hr />';
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets")}) {
-		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" border="0" /> 
+		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" style="border: 0px;" /> 
 			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
 		$output .= $self->session->icon->edit("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
 		$output .= '<br />';
 	}
 	$output .= '<hr />';
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets","utilityAssets")}) {
-		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" border="0" /> 
+		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" style="border: 0px;" /> 
 			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
 		$output .= $self->session->icon->edit("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
 		$output .= '<br />';
@@ -1090,7 +1090,7 @@ sub manageAssets {
 	tie %options, 'Tie::IxHash';
 	my $hasClips = 0;
         foreach my $asset (@{$self->getAssetsInClipboard(1)}) {
-              	$options{$asset->getId} = '<img src="'.$asset->getIcon(1).'" alt="'.$asset->getName.'" border="0" /> '.$asset->getTitle;
+              	$options{$asset->getId} = '<img src="'.$asset->getIcon(1).'" alt="'.$asset->getName.'" style="border: 0px;" /> '.$asset->getTitle;
 		$hasClips = 1;
         }
 	if ($hasClips) {
@@ -1118,7 +1118,7 @@ sub manageAssets {
 	my $hasPackages = 0;
 	my $packages;
         foreach my $asset (@{$self->getPackageList}) {
-              	$packages  .= '<img src="'.$asset->getIcon(1).'" align="middle" alt="'.$asset->getName.'" border="0" /> 
+              	$packages  .= '<img src="'.$asset->getIcon(1).'" align="middle" alt="'.$asset->getName.'" style="border: 0px;" /> 
 			<a href="'.$self->getUrl("func=deployPackage;assetId=".$asset->getId).'">'.$asset->getTitle.'</a> '
 			.$self->session->icon->edit("func=edit;proceed=manageAssets",$asset->get("url"))
 			.'<br />';
@@ -1188,11 +1188,11 @@ sub manageAssetsSearch {
 		my $locked;
 		my $edit;
 		if ($child->isLocked) {
-			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/locked.gif" alt="locked" border="0" />';
+			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/locked.gif" alt="locked" style="border: 0px;" />';
 			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+" if ($child->canEditIfLocked && $self->session->scratch->get("versionTag") eq $self->get("tagId"));
 		} else {
 			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+";
-			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/unlocked.gif" alt="unlocked" border="0" />';
+			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/unlocked.gif" alt="unlocked" style="border: 0px;" />';
 		}
 		my $lockLink = ", '<a href=\"".$child->getUrl("func=manageRevisions")."\">".$locked."</a>'" unless ($self->session->setting->get("autoCommit"));
          	$output .= "assetManager.AddLine('"
@@ -1203,7 +1203,7 @@ sub manageAssetsSearch {
 			."',".$edit."contextMenu.draw()," 
 			.$child->getRank
 			.",'<a href=\"".$child->getUrl("func=manageAssets&manage=1")."\">".$title
-			."</a>','<img src=\"".$child->getIcon(1)."\" border=\"0\" alt=\"".$child->getName."\" /> ".$child->getName
+			."</a>','<img src=\"".$child->getIcon(1)."\" style=\"border: 0px;\" alt=\"".$child->getName."\" /> ".$child->getName
 			."','".$self->session->datetime->epochToHuman($child->get("revisionDate"))
 			."','".formatBytes($child->get("assetSize"))."'".$lockLink.");\n";
          	$output .= "assetManager.AddLineSortData('','','','".$title."','".$child->getName
