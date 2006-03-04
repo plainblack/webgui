@@ -3869,6 +3869,18 @@ Message Boards hold forums for users.  There are many different Wobjects in WebG
 		lastUpdated => 0,
 	},
 
+	'preview' => {
+		message => q|Preview|,
+		context => q|alternate image text displayed when a thumbnail cannot be found for an image.  The image is being previewed.|,
+		lastUpdated => 1141434351,
+	},
+
+	'image manager' => {
+		message => q|Image Manager|,
+		context => q|alternate text when an icon cannot be found in the Rich Editor image manager thumbnail display form.|,
+		lastUpdated => 1141434353,
+	},
+
 };
 
 1;

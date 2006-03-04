@@ -14,7 +14,23 @@ use strict;
 use WebGUI::Asset;
 use WebGUI::HTMLForm;
 
+=head1 NAME
+
+Package WebGUI::Operation::FormHelpers
+
+=head1 DESCRIPTION
+
+Operational support for various things relating to forms and rich editors.
+
 #-------------------------------------------------------------------
+
+=head2 www_formAssetTree ( $session )
+
+Returns a list of the all the current Asset's children as form.  The children can be filtered via the
+form variable C<classLimiter>.  A crumb trail is provided for navigation.
+
+=cut
+
 sub www_formAssetTree {
 	my $session = shift;
 	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
@@ -44,6 +60,12 @@ sub www_formAssetTree {
 
 
 #-------------------------------------------------------------------
+
+=head2 www_richEditPageTree ( $session )
+
+Asset picker for the rich editor.
+
+=cut
 
 sub www_richEditPageTree {
 	my $session = shift;
@@ -99,6 +121,14 @@ window.opener.tinyMCE.insertLink("^" + "/" + ";" + document.getElementById("url_
 
 
 #-------------------------------------------------------------------
+
+=head2 www_richEditImageTree ( $session )
+
+Similar to www_formAssetTree, except it is limited to only display assets of class WebGUI::Asset::File::Image.
+Each link display a thumbnail of the image via www_richEditViewThumbnail.
+
+=cut
+
 sub www_richEditImageTree {
 	my $session = shift;
 	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
@@ -124,13 +154,22 @@ sub www_richEditImageTree {
 
 
 #-------------------------------------------------------------------
+
+=head2 www_richEditViewThumbnail ( $session )
+
+Displays a thumbnail of an Image Asset in the Image manager for the Rich Editor.  The current
+URL in the session object is used to determine which Image is used.
+
+=cut
+
 sub www_richEditViewThumbnail {
 	my $session = shift;
 	my $image = WebGUI::Asset->newByUrl($session);
+	my $i18n = WebGUI::International->new($session);
 	$session->style->useEmptyStyle("1");
 	if ($image->get("className") =~ /WebGUI::Asset::File::Image/) {
 		my $output = '<div align="center">';
-		$output .= '<img src="'.$image->getThumbnailUrl.'" border="0" alt="Preview">';
+		$output .= '<img src="'.$image->getThumbnailUrl.'" border="0" alt="'.$i18n->get('preview').'">';
 		$output .= '<br />';
 		$output .= $image->get("filename");
 		$output .= '</div>';
@@ -144,7 +183,7 @@ sub www_richEditViewThumbnail {
     		    </script>\n";
 		return $output;
 	}
-	return '<div align="center"><img src="'.$session->config->get("extrasURL").'/tinymce/images/icon.gif" border="0" alt="Image Manager"></div>';
+	return '<div align="center"><img src="'.$session->config->get("extrasURL").'/tinymce/images/icon.gif" border="0" alt="'.$i18n->get('image manager').'"></div>';
 }
 
 
