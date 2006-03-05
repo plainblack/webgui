@@ -1,5 +1,15 @@
 package WebGUI::Commerce::Item::Product;
 
+=head1 NAME
+
+Package WebGUI::Commerce::Item::Product
+
+=head1 DESCRIPTION
+
+Item plugin for products in the Commerce system.
+
+=cut
+
 use strict;
 #use WebGUI::SQL;
 use WebGUI::Product;
@@ -40,6 +50,13 @@ sub name {
 }
 
 #-------------------------------------------------------------------
+
+=head2 new ( $session )
+
+Overload default constructor to glue in a WebGUI::Product object.
+
+=cut
+
 sub new {
 	my ($class, $session, $sku, $product, $variantId);
 	$class = shift;

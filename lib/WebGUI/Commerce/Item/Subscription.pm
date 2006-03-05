@@ -1,5 +1,15 @@
 package WebGUI::Commerce::Item::Subscription;
 
+=head1 NAME
+
+Package WebGUI::Commerce::Item::Subscription
+
+=head1 DESCRIPTION
+
+Item plugin for subscriptions.
+
+=cut
+
 use strict;
 #use WebGUI::SQL;
 use WebGUI::Subscription;
@@ -37,6 +47,13 @@ sub name {
 }
 
 #-------------------------------------------------------------------
+
+=head2 new ( $session , $subscriptionId, $type )
+
+Overload default constructor to glue in a WebGUI::Subscription object.
+
+=cut
+
 sub new {
 	my ($class, $session, $subscriptionId, $type, $subscription);
 	$class = shift;

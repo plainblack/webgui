@@ -1,10 +1,27 @@
 package WebGUI::Commerce::Shipping::ByPrice;
 
+=head1 NAME
+
+Package WebGUI::Commerce::Shipping::ByPrice
+
+=head1 DESCRIPTION
+
+Shipping plugin for determining shipping cost by a percentage of total price.
+
+=cut
+
 our @ISA = qw(WebGUI::Commerce::Shipping);
 
 use strict;
 
 #-------------------------------------------------------------------
+
+=head2 calc ( $session )
+
+Calculate the shipping price for this plugin.
+
+=cut
+
 sub calc {
 	my ($self, $items, $price);
 	$self = shift;
@@ -19,6 +36,13 @@ sub calc {
 };
 
 #-------------------------------------------------------------------
+
+=head2 configurationForm ( $session )
+
+Configuration form for this shipping method.
+
+=cut
+
 sub configurationForm {
 	my ($self, $f);
 	$self = shift;
@@ -45,6 +69,13 @@ sub init {
 }
 
 #-------------------------------------------------------------------
+
+=head2 name ( $session )
+
+Returns the internationalized name for this shipping plugin.
+
+=cut
+
 sub name {
 	my ($session) = @_;
 	my $i18n = WebGUI::International->new($session, 'CommerceShippingByPrice');

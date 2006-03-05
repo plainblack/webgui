@@ -1,5 +1,16 @@
 package WebGUI::Commerce::Item::Event;
 
+=head1 NAME
+
+Package WebGUI::Commerce::Item::Event
+
+=head1 DESCRIPTION
+
+Item plugin for events in the EventManagement system.  Allows events entered there
+to be part of the Commerce system.
+
+=cut
+
 use strict;
 
 our @ISA = qw(WebGUI::Commerce::Item);
@@ -30,6 +41,13 @@ sub name {
 }
 
 #-------------------------------------------------------------------
+
+=head2 new ( $session )
+
+Overload default constructor to glue in information from the EMS.
+
+=cut
+
 sub new {
 	my ($class, $session, $eventId, $eventData);
 	$class = shift;
