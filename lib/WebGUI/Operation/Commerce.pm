@@ -19,6 +19,29 @@ use Storable;
 
 
 #-------------------------------------------------------------------
+
+=head2 _submenu ( $session )
+
+Returns a rendered Admin Console view, with a standard list of five submenu items.
+
+=head3 $session
+
+The current WebGUI session object.
+
+=head3 workarea
+
+A scalar of HTML that defines the current workarea.
+
+=head3 title
+
+The i18n key of the title of this workarea.
+
+=head3 help
+
+The i18n key of the help link for this workarea.
+
+=cut
+
 sub _submenu {
 	my $session = shift;
 	my $i18n = WebGUI::International->new($session, "Commerce");
@@ -37,6 +60,13 @@ sub _submenu {
 }
 
 #-------------------------------------------------------------------
+
+=head2 _clearCheckoutScratch ( $session )
+
+A wrapper around _clearShippingScratch and _clearPaymentScratch.
+
+=cut
+
 sub _clearCheckoutScratch {
 	my $session = shift;
 	_clearShippingScratch($session);
@@ -44,12 +74,26 @@ sub _clearCheckoutScratch {
 }
 
 #-------------------------------------------------------------------
+
+=head2 _clearPaymentScratch ( $session )
+
+Clears the C<paymentGateway> scratch variable.
+
+=cut
+
 sub _clearPaymentScratch {
 	my $session = shift;
 	$session->scratch->set('paymentGateway', '-delete-');
 }
 
 #-------------------------------------------------------------------
+
+=head2 _clearShippingScratch ( $session )
+
+Clear the C<shippingMethod> and C<shippingOptions> scratch variables.
+
+=cut
+
 sub _clearShippingScratch {
 	my $session = shift;
 	$session->scratch->set('shippingMethod', '-delete-');
@@ -57,6 +101,15 @@ sub _clearShippingScratch {
 }
 
 #-------------------------------------------------------------------
+
+=head2 _paymentSelected ( $session )
+
+A utility method to tell if the C<paymentGateway> scratch variable is
+set, that it points to a valid payment plugin that can be loaded and
+is enabled.
+
+=cut
+
 sub _paymentSelected {
 	my $session = shift;
 	return 0 unless ($session->scratch->get('paymentGateway'));
@@ -66,6 +119,16 @@ sub _paymentSelected {
 }
 
 #-------------------------------------------------------------------
+
+=head2 _shippingSelected ( $session )
+
+
+A utility method to tell if the C<shippingMethod> scratch variable is
+set, that it points to a valid shipping plugin that can be loaded and
+is enabled and whose C<optionsOk> method returns true.
+
+=cut
+
 sub _shippingSelected {
 	my $session = shift;
 	return 0 unless ($session->scratch->get('shippingMethod'));
@@ -80,6 +143,31 @@ sub _shippingSelected {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_addToCart ( $session )
+
+Adds the requested item to the user's shopping cart and creates a cart if necessary.
+
+Uses these form variables:
+
+=over 4
+
+=item C<itemId>
+
+The id of the item to add.
+
+=item C<itemType>
+
+The type (namespace) of the item that's to be added to the cart.
+
+=item C<quantity>
+
+The number of items to add. Defaults to 1 if quantity is not given.
+
+=back
+
+=cut
+
 sub www_addToCart {
 	my $session = shift;
 	WebGUI::Commerce::ShoppingCart->new($session)->add($session->form->process("itemId"), $session->form->process("itemType"), $session->form->process("quantity"));
@@ -88,6 +176,15 @@ sub www_addToCart {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_cancelTransaction ( $session )
+
+Cancel the transaction described by the form varialbe C<tid> if the
+transaction status is C<Completed>.  Display an internationalized
+message to the user using the C<commerceCheckoutCanceledTemplateId> template from the site settings.
+
+=cut
+
 sub www_cancelTransaction {
 	my $session = shift;
 	my ($transaction, %var);
@@ -105,6 +202,15 @@ sub www_cancelTransaction {
 
 # This operation is here for easier future extensions to the commerce system.
 #-------------------------------------------------------------------
+
+=head2 www_checkout ( $session )
+
+A wrapper around the selectShippingMethod, selectPaymentGateway and
+checkoutConform methods.  selectShippingMethod and selectPaymentGateway 
+are only executed if their respective scratch variables are not set.
+
+=cut
+
 sub www_checkout {
 	my $session = shift;
 	return WebGUI::Operation::execute($session,'selectShippingMethod') unless (_shippingSelected($session));
@@ -115,6 +221,20 @@ sub www_checkout {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_checkoutConfirm ( $session )
+
+Show the user the contents of their shopping cart and a button to pay for the contents.  Form
+controls are provided to delete items from the cart, change quantities on items, and to
+change payment and shipping plugins.  All information is placed in variables and styled
+using the C<commerceConfirmCheckoutTemplateId> template.
+
+If no plugins have been chosen yet, then they are redirected back to www_checkout.
+
+If the user continues, the next sub called is www_checkoutSubmit.
+
+=cut
+
 sub www_checkoutConfirm {
 	my $session = shift;
 	my ($plugin, $f, %var, $errors, $i18n, $shoppingCart, $normal, $recurring, $shipping, $total);
@@ -195,6 +315,20 @@ sub www_checkoutConfirm {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_checkoutSubmit ( $session )
+
+This is the real, final checkout routine.  Requires that the user be logged in and have
+valid Shipping and Payment plugins set.
+
+Processes all transactions using the appropriate method for each one, and then return
+any templated errors via C<commerceTransactionErrorTemplateId>.
+
+If everything is okay, clears all scratch variables and returns the user to the
+C<viewPurchaseHistory> operation.
+
+=cut
+
 sub www_checkoutSubmit {
 	my $session = shift;
 	my ($plugin, $shoppingCart, $transaction, $var, $amount, @cartItems, $i18n, @transactions, 
@@ -209,7 +343,7 @@ sub www_checkoutSubmit {
 		return WebGUI::Operation::execute($session,'displayLogin');
 	}
 
-	# Check if a valid payment gateway has bee selected. If not have the user do so.
+	# Check if a valid payment gateway has been selected. If not have the user do so.
 	return WebGUI::Operation::execute($session,'checkout') unless (_paymentSelected($session) && _shippingSelected($session));
 
 	# Load shipping plugin.
@@ -325,6 +459,16 @@ sub www_checkoutSubmit {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_completePendingTransaction ( $session )
+
+You must be in group Admin (3) to execute the subroutine.  Completes
+the transaction specified in the form variable C<tid> by calling
+WebGUI::Commerce::Transaction->completeTransaction.  Returns the user
+to the C<listPendingTransactions> operation.
+
+=cut
+
 sub www_completePendingTransaction {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
@@ -335,6 +479,14 @@ sub www_completePendingTransaction {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_confirmRecurringTransaction ( $session )
+
+Using the Payment plugin from the C<gateway> form variable and attempts to complete a
+recurring transaction, but only if the plugin is valid.
+
+=cut
+
 sub www_confirmRecurringTransaction {
 	my $session = shift;
 	my($plugin, %var);
@@ -346,6 +498,14 @@ sub www_confirmRecurringTransaction {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_confirmTransaction ( $session )
+
+Using the Payment plugin from the C<pg> form variable and attempts to complete the
+transaction, but only if the plugin's C<confirmTransaction> returns true.
+
+=cut
+
 sub www_confirmTransaction {
 	my $session = shift;
 	my($plugin, %var);
@@ -357,6 +517,14 @@ sub www_confirmTransaction {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteCartItem ( $session )
+
+Delete an item, C<itemId>, from the user's cart.  Returns the user to
+the C<viewCart> operation.
+
+=cut
+
 sub www_deleteCartItem {
 	my $session = shift;
 	WebGUI::Commerce::ShoppingCart->new($session)->delete($session->form->process("itemId"), $session->form->process("itemType"));
@@ -365,6 +533,18 @@ sub www_deleteCartItem {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editCommerceSettings ( $session )
+
+Only users in group Admin (3) can execute the subroutine.
+
+Site wide setting for commerce, including payment plugins, shipping plugins
+and templates.
+
+Calls C<www_editCommerceSettingsSave> on form submission.
+
+=cut
+
 sub www_editCommerceSettings {
 	my $session = shift;
 	my (%tabs, $tabform, $currentPlugin, $ac, $jscript, $i18n, 
@@ -407,7 +587,6 @@ sub www_editCommerceSettings {
 		-label		=> $i18n->get('checkout canceled template'),
 		-hoverHelp	=> $i18n->get('checkout canceled template description'),
 		-value		=> $session->setting->get("commerceCheckoutCanceledTemplateId"),
-		-hoverHelp	=> $i18n->get('checkout canceled template description'),
 		-namespace	=> 'Commerce/CheckoutCanceled'
 		);
 	$tabform->getTab('general')->template(
@@ -415,7 +594,6 @@ sub www_editCommerceSettings {
 		-label		=> $i18n->get('checkout select payment template'),
 		-hoverHelp	=> $i18n->get('checkout select payment template description'),
 		-value		=> $session->setting->get("commerceSelectPaymentGatewayTemplateId"),
-		-hoverHelp	=> $i18n->get('checkout select payment template description'),
 		-namespace	=> 'Commerce/SelectPaymentGateway'
 		);
 	$tabform->getTab('general')->template(
@@ -423,7 +601,6 @@ sub www_editCommerceSettings {
 		-label		=> $i18n->get('checkout select shipping template'),
 		-hoverHelp	=> $i18n->get('checkout select shipping template description'),
 		-value		=> $session->setting->get("commerceSelectShippingMethodTemplateId"),
-		-hoverHelp	=> $i18n->get('checkout select shipping template description'),
 		-namespace	=> 'Commerce/SelectShippingMethod'
 		);
 	$tabform->getTab('general')->template(
@@ -431,7 +608,6 @@ sub www_editCommerceSettings {
 		-label		=> $i18n->get('view shopping cart template'),
 		-hoverHelp	=> $i18n->get('view shopping cart template description'),
 		-value		=> $session->setting->get("commerceViewShoppingCartTemplateId"),
-		-hoverHelp	=> $i18n->get('view shopping cart template description'),
 		-namespace	=> 'Commerce/ViewShoppingCart'
 		);
 
@@ -440,7 +616,6 @@ sub www_editCommerceSettings {
 		-label		=> $i18n->get('daily report email'),
 		-hoverHelp	=> $i18n->get('daily report email description'),
 		-value		=> $session->setting->get("commerceSendDailyReportTo")
-		-hoverHelp	=> $i18n->get('daily report email description'),
 		);
 
 	# Check which payment plugins will compile, and load them.
@@ -523,12 +698,25 @@ sub www_editCommerceSettings {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editCommerceSettingsSave ( $session )
+
+Only users in group Admin (3) can execute the subroutine.
+
+Form post processor for C<www_editCommerceSettings>.  Plugin
+configuration data is stored in a special table for security and all
+other settings in the WebGUI settings table for easy access.
+
+Returns the user to C<www_editCommerceSettings>.
+
+=cut
+
 sub www_editCommerceSettingsSave {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
 	foreach ($session->form->param) {
-		# Store the plugin confiuration data in a special table for security and the general settings in the
+		# Store the plugin configuration data in a special table for security and the general settings in the
 		# normal settings table for easy access.
 		if (/~([^~]*)~([^~]*)~([^~]*)/) {
 			WebGUI::Commerce::setCommerceSetting({
@@ -546,6 +734,16 @@ sub www_editCommerceSettingsSave {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_listPendingTransactions ( $session )
+
+Only users in group Admin (3) can execute the subroutine.
+
+Show a paginated list of all transactions with status, Pending.  Provide
+links so the Admin can complete any pending transaction.
+
+=cut
+
 sub www_listPendingTransactions {
 	my $session = shift;
 	my ($p, $transactions, $output, $properties, $i18n);
@@ -579,6 +777,17 @@ sub www_listPendingTransactions {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_listTransactions ( $session )
+
+Show all transactions in the system and allow them to be managed.
+
+You must be in group Admin (3) in order to access this screen.
+
+The screen is not templated.
+
+=cut
+
 sub www_listTransactions {
 	my $session = shift;
 	my ($output, %criteria, $transaction, @transactions);
@@ -681,6 +890,14 @@ sub www_listTransactions {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_selectPaymentGateway ( $session )
+
+Allow the user to select a payment plugin.  Uses the C<commerceSelectPaymentGatewayTemplateId>
+template.  After form submission, calls www_selectPaymentGatewaySave
+
+=cut
+
 sub www_selectPaymentGateway {
 	my $session = shift;
 	my ($plugins, $f, $i18n, @pluginLoop, %var);
@@ -714,6 +931,17 @@ sub www_selectPaymentGateway {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_selectPaymentGatewaySave ( $session )
+
+Form processor for www_selectPaymentGateway.  If the user selected payment plugin can
+be loaded and enabled, sets the scratch variable C<paymentGateway> so that it can
+be used.  Otherwise the value of the scratch variable is cleared.
+
+Returns the user to the operation C<checkout> when it is done.
+
+=cut
+
 sub www_selectPaymentGatewaySave {
 	my $session = shift;
 	if (WebGUI::Commerce::Payment->load($session, $session->form->process("paymentGateway"))->enabled) {
@@ -726,6 +954,14 @@ sub www_selectPaymentGatewaySave {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_selectShippingMethod ( $session )
+
+Allow the user to select a payment plugin.  Uses the C<commerceSelectShippingMethodTemplateId>
+template.  After form submission, calls www_selectPaymentGatewaySave
+
+=cut
+
 sub www_selectShippingMethod {
 	my $session = shift;
 	my ($plugins, $f, $i18n, @pluginLoop, %var);
@@ -760,6 +996,20 @@ sub www_selectShippingMethod {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_selectShippingMethodSave ( $session )
+
+Form processor for www_selectShippingMethod.  If the shipping method
+plugin can be loaded and the C<optionsOk> method returns false, then
+takes the user back to the C<selectShipping> operation (probably
+www_selectShippingMethod).
+
+If the plugin is enabled, then set scratch variables to be used downstream.
+
+Returns the user to the operation C<checkout> when it is done.
+
+=cut
+
 sub www_selectShippingMethodSave {
 	my $session = shift;
 	my $shipping = WebGUI::Commerce::Shipping->load($session, $session->form->process("shippingMethod"));
@@ -778,12 +1028,28 @@ sub www_selectShippingMethodSave {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_transactionComplete ( $session )
+
+This is wrapper for the C<viewPurchaseHistory> operation, probably
+WebGUI::Operation::TransactionLog::www_viewPurchaseHistory.
+
+=cut
+
 sub www_transactionComplete {
 	my $session = shift;
 	return WebGUI::Operation::execute($session,'viewPurchaseHistory');	
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_updateCart ( $session )
+
+Update the shopping cart with new quantities for items.  Returns the user
+to the C<viewCart> operation, probably www_viewCart.
+
+=cut
+
 sub www_updateCart {
 	my $session = shift;
 my	$shoppingCart = WebGUI::Commerce::ShoppingCart->new($session);
@@ -798,6 +1064,17 @@ my	$shoppingCart = WebGUI::Commerce::ShoppingCart->new($session);
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_viewCart ( $session )
+
+Display the user's shopping cart to the user using the C<commerceViewShoppingCartTemplateId>
+template, and allow them to delete items or change the quantity of regular items.
+
+Will call the C<updateCart> operation, the C<checkout> operation or C<deleteCartItem>
+based on user input.
+
+=cut
+
 sub www_viewCart {
 	my $session = shift;
 	my ($shoppingCart, $normal, $recurring, %var, $total, $i18n);
