@@ -187,9 +187,13 @@ sub getEnabledPlugins {
 	
 #-------------------------------------------------------------------
 
-=head2 init ( namespace )
+=head2 init ( session, namespace )
 
 Constructor for the plugin. You should extend this method.
+
+=head3 session
+
+A copy of the session object
 
 =head3 namespace
 

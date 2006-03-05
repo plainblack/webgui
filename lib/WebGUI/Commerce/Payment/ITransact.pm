@@ -1,5 +1,15 @@
 package WebGUI::Commerce::Payment::ITransact;
 
+=head1 NAME
+
+Package WebGUI::Payment::ITransact
+
+=head1 DESCRIPTION
+
+Payment plug-in for ITransact payment gateway.
+
+=cut
+
 use strict;
 use WebGUI::HTMLForm;
 use WebGUI::Commerce::Payment;
@@ -498,6 +508,20 @@ sub confirmTransaction {
 }
 
 #-------------------------------------------------------------------
+
+=head2 init ( namespace )
+
+Constructor for the ITransact plugin.
+
+=head3 session
+
+A copy of the session object
+
+=head3 namespace
+
+The namespace of the plugin.
+
+=cut
 sub init {
 	my ($class, $self);
 	$class = shift;
