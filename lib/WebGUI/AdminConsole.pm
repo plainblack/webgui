@@ -257,7 +257,7 @@ sub getAdminFunction {
 				namespace=>"WebGUI"
 			},
 			icon=>"help.gif",
-			op=>"viewHelpIndex",
+			op=>"viewHelpTOC",
 			group=>"7"
 		},
 		"statistics"=>{

@@ -248,15 +248,15 @@ sub www_editProfileField {
 	);
 	$f->yesNo(
 		-name=>"visible",
-		-label=>$i18n->get(473),
-		-hoverHelp=>$i18n->get('473 description'),
+		-label=>$i18n->get('473a'),
+		-hoverHelp=>$i18n->get('473a description'),
 		-value=>$data->{visible}
 		);
 	$f->yesNo(
                 -name=>"editable",
                 -value=>$data->{editable},
-                -label=>$i18n->get(897),
-                -hoverHelp=>$i18n->get('897 description'),
+                -label=>$i18n->get('897a'),
+                -hoverHelp=>$i18n->get('897a description'),
                 );
 	$f->yesNo(
 		-name=>"required",

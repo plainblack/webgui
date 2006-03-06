@@ -226,9 +226,19 @@ How should this user be notified when they get a new WebGUI message?
                 lastUpdated => 1122315199,
         },
 
+        '473a description' => {
+                message => q|Should the field be visible to users?|,
+                lastUpdated => 1141667205,
+        },
+
         '897 description' => {
                 message => q|Should the category be editable by users?|,
                 lastUpdated => 1122315199,
+        },
+
+        '897a description' => {
+                message => q|Should the field be editable by users?|,
+                lastUpdated => 1141667241,
         },
 
 	'user profile category add/edit title' => {
@@ -267,7 +277,14 @@ new categories of profile settings.
 
 	'897' => {
 		message => q|Editable?|,
+		context => q|Label for profile categories|,
 		lastUpdated => 1050167573
+	},
+
+	'897a' => {
+		message => q|Editable?|,
+		context => q|Label for profile fields|,
+		lastUpdated => 1141667261
 	},
 
 	'474' => {
@@ -287,12 +304,19 @@ new categories of profile settings.
 
 	'788' => {
 		message => q|Delete this profile field.|,
-		lastUpdated => 1036964681
+		lastUpdated => 1036964681,
 	},
 
 	'473' => {
 		message => q|Visible?|,
-		lastUpdated => 1031514049
+		lastUpdated => 1031514049,
+		context => q|Label for visibility field for profile categories|,
+	},
+
+	'473a' => {
+		message => q|Visible?|,
+		lastUpdated => 1141667189,
+		context => q|Label for visibility field for profile fields|,
 	},
 
 	'user profiling' => {

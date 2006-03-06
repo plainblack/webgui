@@ -16,13 +16,13 @@ our $HELP = {
                                 namespace => 'WebGUIProfile',
                         },
                         {
-                                title => '473',
-                                description => '473 description',
+                                title => '473a',
+                                description => '473a description',
                                 namespace => 'WebGUIProfile',
                         },
                         {
-                                title => '897',
-                                description => '897 description',
+                                title => '897a',
+                                description => '897a description',
                                 namespace => 'WebGUIProfile',
                         },
                         {
