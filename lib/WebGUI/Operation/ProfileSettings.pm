@@ -169,8 +169,8 @@ sub www_editProfileField {
 	);
 	$f->yesNo(
 		-name=>"visible",
-		-label=>WebGUI::International::get(473,"WebGUIProfile"),
-		-hoverHelp=>WebGUI::International::get('473 description',"WebGUIProfile"),
+		-label=>WebGUI::International::get('473a',"WebGUIProfile"),
+		-hoverHelp=>WebGUI::International::get('473a description',"WebGUIProfile"),
 		-value=>$data->{visible}
 		);
 	$f->yesNo(
