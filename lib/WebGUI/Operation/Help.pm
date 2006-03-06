@@ -17,6 +17,7 @@ use WebGUI::International;
 use WebGUI::Asset::Template;
 use WebGUI::Macro;
 use WebGUI::Utility;
+use WebGUI::TabForm;
 
 =head1 NAME
 
@@ -26,6 +27,10 @@ Package WebGUI::Operation::Help
 
 Handles displaying WebGUI's internal help to the user as an operation.
 
+=cut
+
+#-------------------------------------------------------------------
+
 =head2 _load ( $session, $namespace )
 
 Safely load's the Help file for the requested namespace and logs errors
@@ -33,7 +38,6 @@ during the load.
 
 =cut
 
-#-------------------------------------------------------------------
 sub _load {
 	my $session = shift;
 	my $namespace = shift;
@@ -50,6 +54,8 @@ sub _load {
 	}
 }
 
+#-------------------------------------------------------------------
+
 =head2 _get ( $session, $id, $namespace )
 
 Safely load's the Help file for the requested namespace and returns
@@ -57,7 +63,6 @@ the specified id (help key).
 
 =cut
 
-#-------------------------------------------------------------------
 sub _get {
 	my $session = shift;
 	my $id = shift;
@@ -71,6 +76,8 @@ sub _get {
 	}
 }
 
+#-------------------------------------------------------------------
+
 =head2 _link ( $session, $id, $namespace )
 
 Utility routine for formatting a link for returning a help entry in the requested
@@ -78,11 +85,12 @@ namespace.
 
 =cut
 
-#-------------------------------------------------------------------
 sub _link {
 	my $session = shift;
 	return $session->url->page('op=viewHelp;hid='.$session->url->escape($_[0]).';namespace='.$_[1]);
 }
+
+#-------------------------------------------------------------------
 
 =head2 _linkTOC ( $session, $namespace )
 
@@ -91,7 +99,6 @@ for a Help namespace.
 
 =cut
 
-#-------------------------------------------------------------------
 sub _linkTOC {
 	my $session = shift;
 	return $session->url->page('op=viewHelpChapter;namespace='.$_[0]);
@@ -103,7 +110,6 @@ Utility routine for returning a list of all Help files in the lib/WebGUI/Help fo
 
 =cut
 
-#-------------------------------------------------------------------
 sub _getHelpFilesList {
 	my $session = shift;
         my $dir = join '/', $session->config->getWebguiRoot,"lib","WebGUI","Help";
@@ -119,6 +125,7 @@ sub _getHelpFilesList {
 	return @files;
 }
 
+#-------------------------------------------------------------------
 
 =head2 _getHelpName ( $session, $file )
 
@@ -128,7 +135,6 @@ will fetch the correct i18n name for the chapter.
 
 =cut
 
-#-------------------------------------------------------------------
 sub _getHelpName {
 	my $session = shift;
 	my $file = shift;
@@ -146,6 +152,8 @@ sub _getHelpName {
 	return $i18n->get($helpName,$file);
 }
 
+#-------------------------------------------------------------------
+
 =head2 _related ( $session, $related )
 
 Utility routine for returning a list of topics related the the current help
@@ -158,7 +166,6 @@ a code ref, which will be executed and should return a list.
 
 =cut
 
-#-------------------------------------------------------------------
 sub _related {
 	my ($session, $related) = @_;
 	if (ref $related eq 'CODE') {
@@ -169,6 +176,45 @@ sub _related {
 	}
 }
 
+=head2 _columnar ( $session, $columns, $list )
+
+Utility routine for taking a list of data and returning it multiple columns.
+
+=head3 $session
+
+The session object.
+
+=head3 $columns
+
+The number of columns to create.
+
+=head3 $list
+
+A scalar ref to the array of data that will be broken into columns.
+
+=cut
+
+sub _columnar {
+	my ($session, $columns, $list) = @_;
+	my @entries = @{ $list };
+	my $fraction = round(@entries/3 + 0.50);
+	my $output = '<tr><td valign="top">';
+	@entries = sort { $a->[0] cmp $b->[0] } @entries;
+	my $i = 0;
+	foreach my $helpEntry (@entries) {
+		my ($helpName, $helpFile) = @{ $helpEntry };
+                $output .= '<p><a href="'._linkTOC($session,$helpFile).'">'.$helpName."</a></p>\n";
+                $i++;
+                if ($i % $fraction == 0) {
+                        $output .= '</td><td valign="top">';
+                }	
+	}
+	$output .= "</tr>";
+	return $output;
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_viewHelp ( $session )
 
 Display a single help entry in a namespace.  The entry and namespace are passed in as
@@ -177,7 +223,6 @@ UI level, and this can be toggled on and off by another form parameter, uiOverri
 
 =cut
 
-#-------------------------------------------------------------------
 sub www_viewHelp {
 	my $session = shift;
 	return $session->privilege->insufficient() unless ($session->user->isInGroup(7));
@@ -214,13 +259,14 @@ sub www_viewHelp {
 		);
 }
 
+#-------------------------------------------------------------------
+
 =head2 _viewHelpIndex ( $session )
 
 Display the index of all help entries in all namespaces.
 
 =cut
 
-#-------------------------------------------------------------------
 sub www_viewHelpIndex {
 	my $session = shift;
 	return $session->privilege->insufficient() unless ($session->user->isInGroup(7));
@@ -255,6 +301,8 @@ sub www_viewHelpIndex {
 	return $ac->render($output, join ': ',$i18n->get(93), $i18n->get('help index'));
 }
 
+#-------------------------------------------------------------------
+
 =head2 www_viewHelpTOC ( $session )
 
 Display the table of contents for the Help system.  This generates a list of
@@ -262,36 +310,52 @@ the assetName,macroName,topicNames for each installed Help file.
 
 =cut
 
-#-------------------------------------------------------------------
 sub www_viewHelpTOC {
 	my $session = shift;
 	return $session->privilege->insufficient() unless ($session->user->isInGroup(7));
-        my @helpIndex;
+	my $i18n = WebGUI::International->new($session);
+	my %tabs;
+	tie %tabs, 'Tie::IxHash';
+	%tabs = (
+		other => {
+			label => $i18n->get('topicName', 'WebGUI'),
+			uiLevel => 1,
+		},
+		asset => {
+			label => $i18n->get('topicName', 'Asset'),
+			uiLevel => 1,
+		},
+        	macro => {
+			label => $i18n->get('topicName', 'Macros'),
+			uiLevel => 1,
+		},
+	);
 	my $i;
 	my @files = _getHelpFilesList($session,);
-	my $third = round(@files/3 + 0.50);
-	my @entries;
+	my %entries;
+	my $tabForm = WebGUI::TabForm->new($session, \%tabs);
 	foreach my $fileSet (@files) {
 		my $file = $fileSet->[1];
-		push @entries, [_getHelpName($session,$file), $file];
+		my $tab = lc substr $file, 0, 5;
+		if (exists $tabs{$tab} or $tab eq "wobje") {
+			push @{ $entries{$tab} } , [_getHelpName($session,$file), $file];
+		}
+		else {
+			push @{ $entries{'other'} }, [_getHelpName($session,$file), $file];
+		}
 	}
-	$i = 0;
-	my $output = '<table width="100%" class="content"><tr><td valign="top">';
-	@entries = sort { $a->[0] cmp $b->[0] } @entries;
-        foreach my $helpEntry (@entries) {
-		my ($helpName, $helpFile) = @{ $helpEntry };
-                $output .= '<p><a href="'._linkTOC($session,$helpFile).'">'.$helpName."</a></p>\n";
-                $i++;
-                if ($i % $third == 0) {
-                        $output .= '</td><td valign="top">';
-                }	
+	foreach my $tab ( keys %tabs ) {
+		my $tabPut = '<table width="100%" class="content"><tr><td valign="top">';
+		$tabPut .= _columnar($session, 3, $entries{$tab});
+		$tabPut .= '</table>';
+		$tabForm->getTab($tab)->raw($tabPut);
 	}
-	$output .= '</td></tr></table>';
-	my $i18n = WebGUI::International->new($session);
 	my $ac = WebGUI::AdminConsole->new($session,"help");
     	$ac->addSubmenuItem($session->url->page('op=viewHelpIndex'),$i18n->get(95));
-	return $ac->render($output, join ': ',$i18n->get(93), $i18n->get('help toc'));
+	$tabForm->{_submit} = $tabForm->{_cancel} = '';
+	return $ac->render($tabForm->print, join(': ',$i18n->get(93), $i18n->get('help toc')));
 }
+#-------------------------------------------------------------------
 
 =head2 www_viewHelpChapter ( $session )
 
@@ -300,7 +364,6 @@ the form paramter "namespace".
 
 =cut
 
-#-------------------------------------------------------------------
 sub www_viewHelpChapter {
 	my $session = shift;
 	return $session->privilege->insufficient() unless ($session->user->isInGroup(7));

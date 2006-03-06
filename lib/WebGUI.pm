@@ -31,6 +31,17 @@ use Apache2::Const -compile => qw(OK DECLINED NOT_FOUND DIR_MAGIC_TYPE);
 use Apache2::ServerUtil ();
 
 #-------------------------------------------------------------------
+
+=head2 handler ( requestObject )
+
+Primary http init/response handler for WebGUI.  This method decides whether to hand off the request to contentHandler() or uploadsHandler()
+
+=head3 requestObject
+
+The Apache2::RequestRec object passed in by Apache's mod_perl.
+
+=cut
+
 sub handler {
 	my $r = shift;
 	my $s = Apache2::ServerUtil->server;
@@ -51,6 +62,19 @@ sub handler {
 
 
 #-------------------------------------------------------------------	
+
+=head2 contentHandler ( requestObject )
+
+Creates the WebGUI session, handles exceptional request 
+headers, handles special states, prints the response headers,
+and (usually) prints the output of page().
+
+=head3 requestObject
+
+The Apache2::RequestRec object passed in by Apache's mod_perl.
+
+=cut
+
 sub contentHandler {
 	### inherit Apache request.
 	my $r = shift;
@@ -85,12 +109,19 @@ sub contentHandler {
 }
 
 #-------------------------------------------------------------------
+
+=head2 fixupHandler ( requestObject )
+
+This method is here to allow proper handling of DirectoryIndexes
+when someone is using the passthruUrls feature.
+
+=head3 requestObject
+
+The Apache2::RequestRec object passed in by Apache's mod_perl.
+
+=cut
+
 sub fixupHandler {
-
-## This method is here to allow proper handling of DirectoryIndexes
-#  when someone is using the passthruUrls feature.
-
-
 	my $r = shift;
 	
 	if ($r->handler eq 'perl-script' &&  # Handler is Perl
@@ -98,14 +129,23 @@ sub fixupHandler {
 	    $r->is_initial_req)		     # and this is the initial request
 	{
 	    $r->handler(Apache2::Const::DIR_MAGIC_TYPE);  # Hand off to mod_dir
-	                  
 	    return Apache2::Const::OK;
 	}
-	                        
 	return Apache2::Const::DECLINED;  # just pass it on
 }
 
 #-------------------------------------------------------------------
+
+=head2 page ( session )
+
+Processes operations (if any), then tries the requested method on the asset corresponding to the requested URL.  If that asset fails to be created, it tries the default page.
+
+=head3 session
+
+The current WebGUI::Session object.
+
+=cut
+
 sub page {
 	my $session = shift;
 	my $assetUrl = shift;
@@ -147,6 +187,17 @@ sub page {
 
 
 #-------------------------------------------------------------------
+
+=head2 processOperations ( session )
+
+Calls the operation dispatcher using the requested operation.  Currently only handles one operation per request.
+
+=head3 session
+
+The current WebGUI::Session object.
+
+=cut
+
 sub processOperations {
 	my $session = shift;
 	my $output = "";
@@ -172,6 +223,17 @@ sub processOperations {
 
 
 #-------------------------------------------------------------------
+
+=head2 setup ( session )
+
+Handles a specialState: "setup"
+
+=head3 session
+
+The current WebGUI::Session object.
+
+=cut
+
 sub setup {
 	my $session = shift;
 	require WebGUI::Operation::WebGUI;
@@ -181,6 +243,17 @@ sub setup {
 
 
 #-------------------------------------------------------------------
+
+=head2 tryAssetMethod ( session )
+
+Tries an asset method on the requested asset.  Tries the "view" method if that method fails.
+
+=head3 session
+
+The current WebGUI::Session object.
+
+=cut
+
 sub tryAssetMethod {
 	my $session = shift;
 	my $asset = shift;
@@ -196,6 +269,17 @@ sub tryAssetMethod {
 }
 
 #-------------------------------------------------------------------
+
+=head2 uploadsHandler ( requestObject )
+
+Primary http init/response handler for WebGUI.  
+
+=head3 requestObject
+
+The Apache2::RequestRec object passed in by handler().
+
+=cut
+
 sub uploadsHandler {
 	my $r = shift;
 	my $ok = Apache2::Const::OK;
@@ -231,6 +315,17 @@ sub uploadsHandler {
 
 
 #-------------------------------------------------------------------
+
+=head2 upgrading ( session )
+
+Handles a specialState: "upgrading"
+
+=head3 session
+
+The current WebGUI::Session object.
+
+=cut
+
 sub upgrading {
 	my $session = shift;
 	$session->http->getHeader;

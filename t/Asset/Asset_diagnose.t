@@ -47,7 +47,6 @@ SKIP: {
 
 foreach my $asset ( @assets ) {
 	diag("Checking $asset");
-	my $assetObj = WebGUI::Asset->newByPropertyHashRef($session, { className=>$asset });
 	my $def = $asset->definition($session);
 	my $tableName = $def->[0]->{tableName};
 	my $classIds = $session->db->buildArrayRef("select distinct(assetId) from asset where className=? order by assetId", [$asset]);

@@ -51,6 +51,10 @@
  - Add tests that verify the integrity of the WebGUI Database.
  - Added a karma ranking system to CS threads for conducting popularity
    contests.
+ - The main page for the Help system is now a "Table of Contents" with a
+   tabbed view to make scanning for content easier.
+ - Help for forms now shows the fields that you should see with your UI level.
+   There is a link to show all fields.
 
 6.8.8
  - fix [ 1437186 ] 6.8.7 deploy DataForm package does not copy fields

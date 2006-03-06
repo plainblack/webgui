@@ -58,7 +58,7 @@ Package that makes creating tab-based forms simple through an object-oriented AP
  
 The best and easiest way to use this package is to just call the methods on the tabs directly. 
 
- $tabform->get($tabname)->textarea( -name=>$name, -value=>$value, -label=>$label);
+ $tabform->getTab($tabname)->textarea( -name=>$name, -value=>$value, -label=>$label);
 
 =head1 SEE ALSO
 
