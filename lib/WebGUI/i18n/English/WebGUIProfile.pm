@@ -315,7 +315,7 @@ new categories of profile settings.
 
 	'473a' => {
 		message => q|Visible?|,
-		lastUpdated => 1141667189
+		lastUpdated => 1141667189,
 		context => q|Label for visibility field for profile fields|,
 	},
 

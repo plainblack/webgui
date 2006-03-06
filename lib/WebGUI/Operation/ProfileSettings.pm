@@ -176,8 +176,8 @@ sub www_editProfileField {
 	$f->yesNo(
                 -name=>"editable",
                 -value=>$data->{editable},
-                -label=>WebGUI::International::get(897,"WebGUIProfile"),
-                -hoverHelp=>WebGUI::International::get('897 description',"WebGUIProfile"),
+                -label=>WebGUI::International::get('897a',"WebGUIProfile"),
+                -hoverHelp=>WebGUI::International::get('897a description',"WebGUIProfile"),
                 );
 	$f->yesNo(
 		-name=>"required",
