@@ -137,7 +137,7 @@ sub finish {
 
 #-------------------------------------------------------------------
 
-=head2 getColumnNames {
+=head2 getColumnNames 
 
 Returns an array of column names. Use with a "read" method.
 
@@ -185,7 +185,7 @@ sub hashRef {
 
 #-------------------------------------------------------------------
 
-=head2 prepare ( sql, db ) {
+=head2 prepare ( sql, db ) 
 
 Constructor. Returns a result set statement handler.
 
