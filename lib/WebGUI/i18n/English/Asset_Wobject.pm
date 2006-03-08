@@ -142,7 +142,7 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
                      lastUpdated => 1047858549,
                      message => q|Wobjects, Using|
                    },
-          'topicName' => {
+          'assetName' => {
                      message => q|Wobject|,
                      lastUpdated => 1128830333,
                    },
