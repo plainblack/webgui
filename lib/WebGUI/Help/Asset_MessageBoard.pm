@@ -18,7 +18,7 @@ our $HELP = {
 			},
 			{
 				tag => 'wobjects using',
-				namespace => 'Wobject'
+				namespace => 'Asset_Wobject'
 			}
 		]
 	},
@@ -30,7 +30,7 @@ our $HELP = {
 		related => [
 			{
 				tag => 'wobject template',
-				namespace => 'Wobject'
+				namespace => 'Asset_Wobject'
 			}
 		]
 	}

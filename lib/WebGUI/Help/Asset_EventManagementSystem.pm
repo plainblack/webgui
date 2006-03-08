@@ -44,7 +44,7 @@ our $HELP = {
 			},
 			{
 				tag => 'wobjects using',
-				namespace => 'Wobject'
+				namespace => 'Asset_Wobject'
 			},
 			{
 				tag => 'asset fields',

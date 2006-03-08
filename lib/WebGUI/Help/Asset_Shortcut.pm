@@ -48,7 +48,7 @@ our $HELP = {
 			},
 			{
 				tag => 'wobjects using',
-				namespace => 'Wobject'
+				namespace => 'Asset_Wobject'
 			},
 			{
 				tag => 'metadata manage',
@@ -70,7 +70,7 @@ our $HELP = {
 		related => [
 			{
 				tag => 'wobjects using',
-				namespace => 'Wobject'
+				namespace => 'Asset_Wobject'
 			},
 			{
 				tag => 'shortcut add/edit',
@@ -90,7 +90,7 @@ our $HELP = {
 		related => [
 			{
 				tag => 'wobjects using',
-				namespace => 'Wobject'
+				namespace => 'Asset_Wobject'
 			},
 			{
 				tag => 'template language',

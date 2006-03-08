@@ -18,11 +18,11 @@ our $HELP = {
 			},
 			{
 				tag => 'wobject add/edit',
-				namespace => 'Wobject'
+				namespace => 'Asset_Wobject'
 			},
 			{
 				tag => 'wobject delete',
-				namespace => 'Wobject'
+				namespace => 'Asset_Wobject'
 			}
 		]
 	},
@@ -34,34 +34,34 @@ our $HELP = {
                         {
                                 title => '174',
                                 description => '174 description',
-                                namespace => 'Wobject',
+                                namespace => 'Asset_Wobject',
 				uiLevel => 5,
                         },
                         {
                                 title => '1073',
                                 description => '1073 description',
-                                namespace => 'Wobject',
+                                namespace => 'Asset_Wobject',
                         },
                         {
                                 title => '1079',
                                 description => '1079 description',
-                                namespace => 'Wobject',
+                                namespace => 'Asset_Wobject',
                         },
                         {
                                 title => '85',
                                 description => '85 description',
-                                namespace => 'Wobject',
+                                namespace => 'Asset_Wobject',
                         },
                         {
                                 title => '895',
                                 description => '895 description',
-                                namespace => 'Wobject',
+                                namespace => 'Asset_Wobject',
 				uiLevel => 8,
                         },
                         {
                                 title => '896',
                                 description => '896 description',
-                                namespace => 'Wobject',
+                                namespace => 'Asset_Wobject',
 				uiLevel => 8,
                         },
 		],
@@ -72,7 +72,7 @@ our $HELP = {
 			},
 			{
 				tag => 'wobjects using',
-				namespace => 'Wobject'
+				namespace => 'Asset_Wobject'
 			}
 		]
 	},
@@ -85,7 +85,7 @@ our $HELP = {
 		related => [
 			{
 				tag => 'wobjects using',
-				namespace => 'Wobject'
+				namespace => 'Asset_Wobject'
 			}
 		]
 	},

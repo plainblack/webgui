@@ -730,7 +730,7 @@ sub www_editEvent {
 	my $output = $f->print;
 	$self->getAdminConsole->setHelp('add/edit event','Asset_EventManagementSystem');
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEvents'),$i18n->get("manage events"));
-	my $addEdit = ($pid eq "new" or !$pid) ? $i18n->get('add', 'Wobject') : $i18n->get('edit', 'Wobject');
+	my $addEdit = ($pid eq "new" or !$pid) ? $i18n->get('add', 'Asset_Wobject') : $i18n->get('edit', 'Asset_Wobject');
 	return $self->getAdminConsole->render($output, $addEdit.' '.$i18n->get('event'));
 }
 

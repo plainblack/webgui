@@ -47,11 +47,11 @@ our $HELP = {
 			},
 			{
 				tag => 'wobject add/edit',
-				namespace => 'Wobject'
+				namespace => 'Asset_Wobject'
 			},
 			{
 				tag => 'wobjects using',
-				namespace => 'Wobject'
+				namespace => 'Asset_Wobject'
 			}
 		]
 	},
@@ -69,7 +69,7 @@ our $HELP = {
 			},
 			{
 				tag => 'wobject template',
-				namespace => 'Wobject'
+				namespace => 'Asset_Wobject'
 			}
 		]
 	},

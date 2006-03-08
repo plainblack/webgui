@@ -1,4 +1,4 @@
-package WebGUI::i18n::English::Wobject;
+package WebGUI::i18n::English::Asset_Wobject;
 
 our $I18N = {
 

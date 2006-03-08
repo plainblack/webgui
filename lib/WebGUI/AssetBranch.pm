@@ -135,7 +135,7 @@ sub www_editBranch {
 	$tabform->getTab("display")->yesNo(
                 -name=>"displayTitle",
                 -label=>$i18n->get(174),
-		-hoverHelp=>$i18n->get('174 description','Wobject'),
+		-hoverHelp=>$i18n->get('174 description','Asset_Wobject'),
                 -value=>$self->getValue("displayTitle"),
                 -uiLevel=>5,
 		-subtext=>'<br />'.$i18n->get("change").' '.WebGUI::Form::yesNo($self->session,{name=>"change_displayTitle"})
@@ -144,7 +144,7 @@ sub www_editBranch {
 		-name=>"styleTemplateId",
 		-label=>$i18n->get(1073),
 		-value=>$self->getValue("styleTemplateId"),
-		-hoverHelp=>$i18n->get('1073 description','Wobject'),
+		-hoverHelp=>$i18n->get('1073 description','Asset_Wobject'),
 		-namespace=>'style',
 		-afterEdit=>'op=editPage;npp='.$self->session->form->process("npp"),
 		-subtext=>'<br />'.$i18n->get("change").' '.WebGUI::Form::yesNo($self->session,{name=>"change_styleTemplateId"})
@@ -152,7 +152,7 @@ sub www_editBranch {
          $tabform->getTab("display")->template(
 		-name=>"printableStyleTemplateId",
 		-label=>$i18n->get(1079),
-		-hoverHelp=>$i18n->get('1079 description','Wobject'),
+		-hoverHelp=>$i18n->get('1079 description','Asset_Wobject'),
 		-value=>$self->getValue("printableStyleTemplateId"),
 		-namespace=>'style',
 		-afterEdit=>'op=editPage;npp='.$self->session->form->process("npp"),
@@ -161,7 +161,7 @@ sub www_editBranch {
         $tabform->getTab("display")->interval(
                 -name=>"cacheTimeout",
                 -label=>$i18n->get(895),
-		-hoverHelp=>$i18n->get('895 description','Wobject'),
+		-hoverHelp=>$i18n->get('895 description','Asset_Wobject'),
                 -value=>$self->getValue("cacheTimeout"),
                 -uiLevel=>8,
 		-subtext=>'<br />'.$i18n->get("change").' '.WebGUI::Form::yesNo($self->session,{name=>"change_cacheTimeout"})
@@ -169,7 +169,7 @@ sub www_editBranch {
         $tabform->getTab("display")->interval(
                 -name=>"cacheTimeoutVisitor",
                 -label=>$i18n->get(896),
-		-hoverHelp=>$i18n->get('896 description','Wobject'),
+		-hoverHelp=>$i18n->get('896 description','Asset_Wobject'),
                 -value=>$self->getValue("cacheTimeoutVisitor"),
                 -uiLevel=>8,
 		-subtext=>'<br />'.$i18n->get("change").' '.WebGUI::Form::yesNo($self->session,{name=>"change_cacheTimeoutVisitor"})

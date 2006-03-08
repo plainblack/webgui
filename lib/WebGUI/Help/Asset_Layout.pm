@@ -30,7 +30,7 @@ our $HELP = {
 			},
 			{
 				tag => 'wobject add/edit',
-				namespace => 'Wobject'
+				namespace => 'Asset_Wobject'
 			},
 			{
 				tag => 'layout template',

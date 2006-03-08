@@ -18,7 +18,7 @@ our $HELP = {
 			},
 			{
 				tag => 'wobjects using',
-				namespace => 'Wobject'
+				namespace => 'Asset_Wobject'
 			},
 			{
 				tag => 'asset fields',
@@ -38,7 +38,7 @@ our $HELP = {
 			},
 			{
 				tag => 'wobject template',
-				namespace => 'Wobject'
+				namespace => 'Asset_Wobject'
 			}
 		]
 	},

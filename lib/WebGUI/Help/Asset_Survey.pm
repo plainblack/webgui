@@ -78,7 +78,7 @@ our $HELP = {
 			},
 			{
 				tag => 'wobjects using',
-				namespace => 'Wobject'
+				namespace => 'Asset_Wobject'
 			},
 			{
 				tag => 'question add/edit',
@@ -198,7 +198,7 @@ our $HELP = {
 			},
 			{
 				tag => 'wobject template',
-				namespace => 'Wobject'
+				namespace => 'Asset_Wobject'
 			}
 		]
 	},

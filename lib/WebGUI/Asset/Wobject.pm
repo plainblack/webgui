@@ -63,7 +63,7 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,'Wobject');
+	my $i18n = WebGUI::International->new($session,'Asset_Wobject');
 	my %properties;
 	tie %properties, 'Tie::IxHash';
 	%properties = (
@@ -196,7 +196,7 @@ sub confirm {
 	my $self = shift;
         return $self->session->privilege->vitalComponent() if ($_[4]);
 	my $noURL = $_[3] || $_[0]->getUrl;
-	my $i18n = WebGUI::International->new($self->session,'Wobject');
+	my $i18n = WebGUI::International->new($self->session,'Asset_Wobject');
         my $output = '<h1>'.$i18n->get(42).'</h1>';
         $output .= $_[1].'<p>';
         $output .= '<div align="center"><a href="'.$_[2].'">'.$i18n->get(44).'</a>';
@@ -558,7 +558,7 @@ sub www_edit {
 	$tag =~ s/([a-z])([A-Z])/$1 $2/g;  #Separate studly caps
 	$tag =~ s/([A-Z]+(?![a-z]))/$1 /g; #Separate acronyms
 	$self->getAdminConsole->setHelp(lc($tag)." add/edit", "Asset_".$tag2);
-	my $i18n = WebGUI::International->new($self->session,'Wobject');
+	my $i18n = WebGUI::International->new($self->session,'Asset_Wobject');
 	my $addEdit = ($self->session->form->process("func") eq 'add') ? $i18n->get('add') : $i18n->get('edit');
 	return $self->getAdminConsole->render($self->getEditForm->print,$addEdit.' '.$self->getName);
 }
