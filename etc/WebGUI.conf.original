@@ -296,16 +296,23 @@
 # between Spectre and WebGUI. Note that this must match the
 # cryptoKey in the Spectre config file.
 
-"spectreCryptoKey" : "123qwe"
+"spectreCryptoKey" : "123qwe",
 
 # Define the workflow activities that are available in the editing
 # process and what object types they support. 
 
 "workflowActivities" : {
-		"none": [ "WebGUI::Workflow::Activity::CleanTempStorage" ],
-		"user" : [ ],
-		"revisiontag" : [ ]
-	},
+		"None" : ["WebGUI::Workflow::Activity::DecayKarma", "WebGUI::Workflow::Activity::TrashClipboard", "WebGUI::Workflow::Activity::CleanTempStorage", 
+			"WebGUI::Workflow::Activity::CleanFileCache", "WebGUI::Workflow::Activity::CleanLoginHistory", "WebGUI::Workflow::Activity::ArchiveOldThreads",
+			"WebGUI::Workflow::Activity::TrashExpiredEvents", "WebGUI::Workflow::Activity::CreateCronJob", "WebGUI::Workflow::Activity::DeleteExpiredSessions",
+			"WebGUI::Workflow::Activity::ExpireGroupings", "WebGUI::Workflow::Activity::PurgeOldAssetRevisions",
+			"WebGUI::Workflow::Activity::ExpireSubscriptionCodes", "WebGUI::Workflow::Activity::PurgeOldTrash", 
+			"WebGUI::Workflow::Activity::GetSyndicatedContent", "WebGUI::Workflow::Activity::ProcessRecurringPayments",
+			"WebGUI::Workflow::Activity::SyncProfilesToLdap", "WebGUI::Workflow::Activity::SummarizePassiveProfileLog"],
+		"WebGUI::User" : ["WebGUI::Workflow::Activity::CreateCronJob"],
+		"WebGUI::VersionTag" : ["WebGUI::Workflow::Activity::CommitVersionTag", "WebGUI::Workflow::Activity::RollbackVersionTag", 
+			"WebGUI::Workflow::Activity::TrashVersionTag", "WebGUI::Workflow::Activity::CreateCronJob"]
+		}
 
 }
 
