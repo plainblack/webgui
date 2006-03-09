@@ -47,7 +47,7 @@ sub _createField {
 	}
 	if (isIn($data->{type},qw(selectList checkList))) {
 		my @defaultValues;
-		if ($name) {
+		if ($self->session->form->param($name)) {
                 	@defaultValues = $self->session->form->selectList($name);
                 } else {
                 	foreach (split(/\n/, $data->{value})) {
@@ -756,6 +756,7 @@ sub www_deleteTabConfirm {
 sub www_editField {
 	my $self = shift;
 	my $fid = shift || $self->session->form->process("fid") || 'new';
+	$self->session->errorHandler->warn("fid: $fid");
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
     	my (%field, $f, %fieldStatus,$tab);
@@ -888,27 +889,27 @@ sub www_editFieldSave {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	$self->session->form->process("name") = $self->session->form->process("label") if ($self->session->form->process("name") eq "");
-	my $tid = $self->session->form->process("tid") || "0";
+	my $tid = $self->session->form->process("tid", 'selectBox') || "0";
 	my $name = $self->session->url->urlize($self->session->form->process("name"));
         $name =~ s/\-//g;
         $name =~ s/\///g;
 	$self->setCollateral("DataForm_field","DataForm_fieldId",{
 		DataForm_fieldId=>$self->session->form->process("fid"),
-		width=>$self->session->form->process("width"),
+		width=>$self->session->form->process("width", 'integer'),
 		name=>$name,
 		label=>$self->session->form->process("label"),
 		DataForm_tabId=>$tid,
-		status=>$self->session->form->process("status"),
-		type=>$self->session->form->process("type"),
-		possibleValues=>$self->session->form->process("possibleValues"),
-		defaultValue=>$self->session->form->process("defaultValue"),
+		status=>$self->session->form->process("status", 'selectBox'),
+		type=>$self->session->form->process("type", 'fieldType'),
+		possibleValues=>$self->session->form->process("possibleValues", 'textarea'),
+		defaultValue=>$self->session->form->process("defaultValue", 'textarea'),
 		subtext=>$self->session->form->process("subtext"),
-		rows=>$self->session->form->process("rows"),
-		vertical=>$self->session->form->process("vertical"),
+		rows=>$self->session->form->process("rows", 'integer'),
+		vertical=>$self->session->form->process("vertical", 'yesNo'),
 		extras=>$self->session->form->process("extras"),
 		}, "1","1", _tonull("DataForm_tabId",$tid));
 	if($self->session->form->process("position")) {
-		$self->session->db->write("update DataForm_field set sequenceNumber=".$self->session->db->quote($self->session->form->process("position")).
+		$self->session->db->write("update DataForm_field set sequenceNumber=".$self->session->db->quote($self->session->form->process("position", 'integer')).
 					" where DataForm_fieldId=".$self->session->db->quote($self->session->form->process("fid")));
 	}
 	$self->reorderCollateral("DataForm_field","DataForm_fieldId", _tonull("DataForm_tabId",$tid)) if ($self->session->form->process("fid") ne "new");
@@ -926,6 +927,7 @@ sub www_editTab {
     	my (%tab, $f);
     	tie %tab, 'Tie::CPHash';
         my $tid = shift || $self->session->form->process("tid") || "new";
+	$self->session->errorHandler->warn("tid: $tid");
 	unless ($tid eq "new") {	
         	%tab = $self->session->db->quickHash("select * from DataForm_tab where DataForm_tabId=".$self->session->db->quote($tid));
 	}
@@ -976,7 +978,7 @@ sub www_editTabSave {
 	$self->setCollateral("DataForm_tab","DataForm_tabId",{
 		DataForm_tabId=>$self->session->form->process("tid"),
 		label=>$self->session->form->process("label"),
-		subtext=>$self->session->form->process("subtext")
+		subtext=>$self->session->form->process("subtext", 'textarea')
 		});
         if ($self->session->form->process("proceed") eq "editTab") {
             return $self->www_editTab("new");

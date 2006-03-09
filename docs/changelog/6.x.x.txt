@@ -32,6 +32,7 @@
    more powerful and will use slightly less memory.
  - fix [ 1406210 ] 6.9 i18n in create.sql, previous.sql broken.
  - fix [ 1410577 ] WebGUI::Session not included
+ - fix [ 1445387 ] 6.9 DataForm add Checkbox List, SellectList broken
  - Strengthened security of Captcha validation.
  - Added Captcha form control type.
  - All IPs used by WebGUI (Settings: debugIp and Group: ipFilter) now accept
