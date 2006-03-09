@@ -1069,6 +1069,7 @@ sub www_moveTabLeft {
 #-------------------------------------------------------------------
 sub www_process {
 	my $self = shift;
+	return $self->session->privilege->insufficient() unless $self->canView;
 	my $entryId = $self->setCollateral("DataForm_entry","DataForm_entryId",{
 		DataForm_entryId=>$self->session->form->process("entryId"),
                 assetId=>$self->getId,
@@ -1106,7 +1107,7 @@ sub www_process {
 				and DataForm_fieldId=".$self->session->db->quote($row{DataForm_fieldId}));
 			if ($exists) {
 				$self->session->db->write("update DataForm_entryData set value=".$self->session->db->quote($value)."
-					where DataForm_entryId=".$self->session->db->quote($entryId)." and DataForm_fieldId=".$self->session->db->quote($row{DataForm_fieldId}));
+					where DataForm_entryId=".$self->session->db->quote($entryId)." and DataForm_fieldId=".$self->session->db->quote($row{DataForm_fieldId})) if $self->canEdit;
 				$updating = 1;
 			} else {
 				$self->session->db->write("insert into DataForm_entryData (DataForm_entryId,DataForm_fieldId,assetId,value) values
