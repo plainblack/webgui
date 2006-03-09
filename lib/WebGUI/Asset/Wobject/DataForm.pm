@@ -767,15 +767,15 @@ sub www_editField {
 		"editable" => $i18n->get(6),
 		"required" => $i18n->get(75) 
 		);
-	unless ($self->session->form->process("fid") eq "new") {	
-        	%field = $self->session->db->quickHash("select * from DataForm_field where DataForm_fieldId=".$self->session->db->quote($self->session->form->process("fid")));
+	unless ($fid eq "new") {	
+        	%field = $self->session->db->quickHash("select * from DataForm_field where DataForm_fieldId=".$self->session->db->quote($fid));
 	}
 	$tab = $self->session->db->buildHashRef("select DataForm_tabId,label from DataForm_tab where assetId=".$self->session->db->quote($self->getId));
 	$tab->{0} = $i18n->get("no tab");
         $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
         $f->hidden(
 		-name => "fid",
-		-value => $self->session->form->process("fid")
+		-value => $fid
 	);
         $f->hidden(
 		-name => "func",
@@ -868,7 +868,7 @@ sub www_editField {
 		-value=>$field{defaultValue},
 		-subtext=>'<br />'.$i18n->get(85)
 		);
-	if ($self->session->form->process("fid") eq "new" && $self->session->form->process("proceed") ne "manageAssets") {
+	if ($fid eq "new" && $self->session->form->process("proceed") ne "manageAssets") {
         	$f->whatNext(
 			-options=>{
 				"editField"=>$i18n->get(76),
@@ -932,7 +932,7 @@ sub www_editTab {
         $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
         $f->hidden(
 		-name => "tid",
-		-value => $self->session->form->process("tid")
+		-value => $tid
 	);
         $f->hidden(
 		-name => "func",
