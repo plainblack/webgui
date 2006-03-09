@@ -55,6 +55,7 @@
    tabbed view to make scanning for content easier.
  - Help for forms now shows the fields that you should see with your UI level.
    There is a link to show all fields.
+ - fix [ 1445393 ] 6.9 WhatNext missing from DataForm editField
 
 6.8.8
  - fix [ 1437186 ] 6.8.7 deploy DataForm package does not copy fields
