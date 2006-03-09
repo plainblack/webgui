@@ -261,7 +261,7 @@ sub updateDatabaseLinksAndSQLReport {
 sub updateTemplates {
         print "\tUpdating base templates for XHTML compliance, and a cleaner look.\n" unless ($quiet);
 	$session->db->write("alter table template add column headBlock text");
-	opendir(DIR,"templates-6.9.0");
+	opendir(DIR,"templates-6.99.0");
 	my @files = readdir(DIR);
 	closedir(DIR);
 	my $importNode = WebGUI::Asset->getImportNode($session);
@@ -275,7 +275,7 @@ sub updateTemplates {
 	$folder->commit;
 	foreach my $file (@files) {
 		next unless ($file =~ /\.tmpl$/);
-		open(FILE,"<templates-6.9.0/".$file);
+		open(FILE,"<templates-6.99.0/".$file);
 		my $first = 1;
 		my $create = 0;
 		my $head = 0;
