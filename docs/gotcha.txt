@@ -52,6 +52,12 @@ save you many hours of grief.
 	Spectre is WebGUI's offline execution engine. It triggers
 	scheduled events and executes workflow tasks.
 
+ * If you wish to run the full test suite, you'll need to install
+	these optional modules:
+
+	Test::Deep
+	Test::MockObject
+
 
 6.8.4
 --------------------------------------------------------------------
