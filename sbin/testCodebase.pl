@@ -13,6 +13,7 @@ $|=1;
 use strict;
 use FindBin;
 use lib "$FindBin::Bin/../t/lib";
+use File::Spec qw[];
 use Getopt::Long;
 
 my $configFile;
@@ -45,16 +46,23 @@ my $helpmsg=<<STOP;
 STOP
 
 my $verboseFlag = "-v" if ($verbose);
-my $config = $ENV{WEBGUI_CONFIG};
 
 $perlBase .= '/bin/' if ($perlBase);
 
 if ( $configFile ) {
-	system("WEBGUI_CONFIG=".$configFile." ".$perlBase."prove ".$verboseFlag." -r ../t");
-	exit;
+	if (! -e $configFile) {
+		##Probably given the name of the config file with no path, prepend
+		##the path to it.
+		$configFile = File::Spec->canonpath($FindBin::Bin.'/../etc/'.$configFile);
+	}
+	if (-e $configFile) {
+		system("WEBGUI_CONFIG=".$configFile." ".$perlBase."prove ".$verboseFlag." -r ../t");
+	}
+	else {
+		die "Unable to use $configFile as a WebGUI config file\n";
+	}
 } elsif ( defined @ENV{WEBGUI_CONFIG} ) {
         system($perlBase."prove ".$verboseFlag." -r ../t");
-	exit;
 } else {
 	print $helpmsg;
 }
