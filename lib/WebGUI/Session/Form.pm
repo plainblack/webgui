@@ -94,7 +94,7 @@ An alias for process()
 
 sub get {
 	my $self = shift;
-	$self->process(@_);
+	return $self->process(@_);
 }
 
 #-------------------------------------------------------------------
@@ -199,17 +199,25 @@ The default value for this variable. If the variable is undefined then the defau
 
 sub process {
 	my ($self, $name, $type, $default) = @_;
-	my $value;
 	$type = ucfirst($type);
-	$type = "Text" if ($type eq "");
-	$value = $self->$type($name);
-	unless (defined $value) {
-		return $default;
+	return $self->param($name) if ($type eq "");
+	if (wantarray) {	
+		my @values = $self->$type($name);
+		if (scalar(@values) < 1 && ref $default eq "ARRAY") {
+			return @{$default};
+		} else {
+			return @values;
+		}
+	} else {
+		my $value = $self->$type($name);
+		unless (defined $value) {
+			return $default;
+		}
+		if ($value =~ /^[\s]+$/) {
+			return undef;
+		}
+		return $value;
 	}
-	if ($value =~ /^[\s]+$/) {
-		return undef;
-	}
-	return $value;
 }
 
 #-------------------------------------------------------------------
