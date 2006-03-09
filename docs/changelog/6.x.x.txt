@@ -65,6 +65,7 @@
  - fixed a bug in the rich editor where the page chooser didn't have scroll
    bars
  - fixed a delete bug on cs posts.
+ - fixed two security problems with www_process in DataForm.pm
 
 6.8.7
  - fix [ 1431098 ] op=becomeUser can become non-existent userIds
