@@ -1052,7 +1052,7 @@ sub www_moveTabLeft {
 #-------------------------------------------------------------------
 sub www_process {
 	my $self = shift;
-	return WebGUI::Privilege::insufficient() unless $self->canEdit;
+	return WebGUI::Privilege::insufficient() unless $self->canView;
 	my $entryId = $self->setCollateral("DataForm_entry","DataForm_entryId",{
 		DataForm_entryId=>$session{form}{entryId},
                 assetId=>$self->getId,
