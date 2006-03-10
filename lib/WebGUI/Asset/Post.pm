@@ -860,10 +860,8 @@ sub trash {
 	my $self = shift;
 	$self->SUPER::trash;
 	if ($self->isReply) {
-		my $kids = WebGUI::SQL->quickArray("select count(*) from asset where lineage like ".quote($self->get("lineage").'%'));
-		foreach (1..$kids) { # above query will count ourself as 1
-			$self->getThread->decrementReplies;
-		}
+		my ($kids) = WebGUI::SQL->quickArray("select count(*) from asset where lineage like ".quote($self->get("lineage").'%'));
+		$self->getThread->decrementReplies($kids);
 	}
 	if ($self->getThread->get("lastPostId") eq $self->getId) {
 		my $threadLineage = $self->getThread->get("lineage");

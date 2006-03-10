@@ -62,9 +62,10 @@ Deccrements this reply counter.
 =cut
 
 sub decrementReplies {
-        my $self = shift;
-	$self->update({replies=>$self->get("replies")-1});
-	$self->getParent->decrementReplies;
+	my $self = shift;
+	my $number = shift || 1;
+	$self->update({replies=>$self->get("replies")-$number});
+	$self->getParent->decrementReplies($number);
 }
 
 #-------------------------------------------------------------------
