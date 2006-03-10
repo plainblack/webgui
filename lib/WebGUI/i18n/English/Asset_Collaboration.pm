@@ -815,7 +815,13 @@ our $I18N = {
 	},
 
 	'collaboration add/edit body' => {
-		message => q|This Asset is used to hold a collection of Posts submitted by users and content managers.  Based on how it is configured and which templates it uses, it can be used to build message boards, photo galleries, weblogs, FAQ lists and many more tools for your website.<p>
+		message => q|<p>This Asset is used to hold a collection of Posts submitted by users and content managers.  Based on how it is configured and which templates it uses, it can be used to build message boards, photo galleries, weblogs, FAQ lists and many more tools for your website.</p>
+<p>When a Post is deleted from a Collaboration Asset, it goes into the trash and all replies or children
+of that post are removed from the Collaboration Asset, and the reply counter is decremented.  The Post
+you deleted may be restored from the Trash.  This will also restore all the replies to that Post.
+However, it is not possible to restore the children of the Post directly, without restoring the
+Post that was originally deleted.
+</p>
 
 <P>Collaboration Assets have the properties of Assets and Wobjects, as well as the
 properties listed below:</p>
