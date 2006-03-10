@@ -3856,6 +3856,26 @@ Message Boards hold forums for users.  There are many different Wobjects in WebG
 		lastUpdated => 1141434353,
 	},
 
+	'insert a link' => {
+		message => q|Insert A Link|,
+		lastUpdated => 1141963447,
+	},
+
+	'link settings' => {
+		message => q|Link Settings|,
+		lastUpdated => 1141963463,
+	},
+
+	'choose an asset' => {
+		message => q|Choose an Asset|,
+		lastUpdated => 1141963463,
+	},
+
+	'pages' => {
+		message => q|Pages|,
+		lastUpdated => 1141963573,
+	},
+
 };
 
 1;

@@ -88,8 +88,8 @@ sub www_richEditPageTree {
 		-extras=>'onclick="createLink()"'
 		);
 	$session->style->setScript($session->config->get("extrasURL")."/tinymce/jscripts/tiny_mce/tiny_mce_popup.js",{type=>"text/javascript"});
-	my $output = '<fieldset><legend>Insert A Link</legend>
-		<fieldset><legend>Link Settings</legend>'.$f->print.'</fieldset>
+	my $output = '<fieldset><legend>'.$i18n->get('insert a link').'</legend>
+		<fieldset><legend>'.$i18n->get('insert a link').'</legend>'.$f->print.'</fieldset>
 	<script type="text/javascript">
 function createLink() {
     if (window.opener) {        
@@ -101,7 +101,7 @@ window.opener.tinyMCE.insertLink("^" + "/" + ";" + document.getElementById("url_
      window.close();
     }
 }
-</script><fieldset><legend>Pages</legend> ';
+</script><fieldset><legend>'.$i18n->get('pages').'</legend> ';
 	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
 	my @crumb;
 	my $ancestors = $base->getLineage(["self","ancestors"],{returnObjects=>1});
