@@ -3876,6 +3876,26 @@ Message Boards hold forums for users.  There are many different Wobjects in WebG
 		lastUpdated => 1141963573,
 	},
 
+	'534' => {
+		message => q|Alert on new user?|,
+		lastUpdated => 1031514049
+	},
+
+	'535' => {
+		message => q|Group To Alert On New User|,
+		lastUpdated => 1031514049
+	},
+
+        '534 description' => {
+                message => q|Should someone be alerted when a new user registers anonymously?|,
+                lastUpdated => 1120239343,
+        },
+
+        '535 description' => {
+                message => q|What group should be alerted when a new user registers?|,
+                lastUpdated => 1120239343,
+        },
+
 };
 
 1;
