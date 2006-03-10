@@ -1,7 +1,8 @@
 body{
 	background-image: url(bg.jpg);
 	background-repeat: repeat-x;
-	border: 5px #4E8AAB solid;
+/*	border: 5px #4E8AAB solid; */
+	border: 5px #2F5CAC solid; 
 	margin:0px;
 	padding:0px;
 	min-height: 700px;
@@ -205,13 +206,13 @@ div.tabs {
 
 a{
 	font-family:  "Lucida Grande", "Lucida Sans Unicode", Tahoma, Verdana, Arial, sans-serif;
-	color: #639CBA;
+	color: #2F5CAC;
 	text-decoration: none;
 }
 
 a:hover{
 	font-family:  "Lucida Grande", "Lucida Sans Unicode", Tahoma, Verdana, Arial, sans-serif;
-	color: #336B8A;
+	color: #000080;
 	text-decoration: underline;	
 	
 }
