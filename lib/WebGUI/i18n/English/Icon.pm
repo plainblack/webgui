@@ -41,11 +41,6 @@ our $I18N = {
 		lastUpdated => 1096319564
 	},
 
-	'Paste' => {
-		message => q|Paste|,
-		lastUpdated => 1096319546
-	},
-
 	'Move To Top' => {
 		message => q|Move To Top|,
 		lastUpdated => 1096319549
@@ -89,11 +84,6 @@ our $I18N = {
 	'Drag' => {
 		message => q|Drag|,
 		lastUpdated => 1096319563
-	},
-
-	'Help' => {
-		message => q|Help|,
-		lastUpdated => 1096319560
 	},
 
 	'Export' => {

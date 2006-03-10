@@ -34,7 +34,6 @@ A package for generating user interface buttons. The subroutines found herein do
  $html = $self->session->icon->delete('op=something');
  $html = $self->session->icon->drag();
  $html = $self->session->icon->edit('op=something');
- $html = $self->session->icon->help(1,"MyNamespace");
  $html = $self->session->icon->manage('op=something');
  $html = $self->session->icon->moveBottom('op=something');
  $html = $self->session->icon->moveDown('op=something');
@@ -42,7 +41,6 @@ A package for generating user interface buttons. The subroutines found herein do
  $html = $self->session->icon->moveRight('op=something');
  $html = $self->session->icon->moveTop('op=something');
  $html = $self->session->icon->moveUp('op=something');
- $html = $self->session->icon->paste('op=something');
  $html = $self->session->icon->shortcut('op=something');
  $html = $self->session->icon->view('op=something');
 
@@ -264,33 +262,6 @@ sub getToolbarOptions {
         }
         closedir(DIR);
 	return \%options;
-}
-
-#-------------------------------------------------------------------
-
-=head2 help ( helpId [, namespace ] )
-
-Generates a button with the word "Help" printed on it.
-
-=head3 helpId 
-
-The id in the help table that relates to the help documentation for your function.
-
-=head3 namespace
-
-If your help documentation is not in the WebGUI namespace, then you must specify the namespace for this help.
-
-=cut
-
-sub help {
-	 my $self = shift;
-        my $urlParams = shift;
-        my $pageURL = shift || $self->session->url->getRequestedUrl;
-	my ($output, $namespace);
-	my $i18n = WebGUI::International->new($self->session,'Icon');
-	$output = '<a href="'.$self->session->url->page('op=viewHelp;hid='.$urlParams.';namespace='.$namespace).
-		'" target="_blank"><img src="'.$self->_getBaseURL().'help.gif" style="border: 0px;" align="right" title="'.$i18n->get('Help').'" Alt="'.$i18n->get('Help').'"></a>';
-	rneturn $output;
 }
 
 #-------------------------------------------------------------------
@@ -520,32 +491,6 @@ sub new {
 	bless {_session=>$session}, $class;
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 paste ( urlParameters [, pageURL ] )
-
-Generates a button with the word "Paste" printed on it.
-
-=head3 urlParameters
-
-Any URL parameters that need to be tacked on to the current URL to accomplish whatever function this button represents.
-
-=head3 pageURL
-
-The URL to any page. Defaults to the current page.
-
-=cut
-
-sub paste {
-	 my $self = shift;
-        my $urlParams = shift;
-        my $pageURL = shift || $self->session->url->getRequestedUrl;
-	my $i18n = WebGUI::International->new($self->session,'Icon');
-        my $output = '<a href="'.$self->session->url->gateway($pageURL,$urlParams).'">';
-        $output .= '<img src="'.$self->_getBaseURL().'paste.gif" align="middle" style="border: 0px;" alt="'.$i18n->get('Paste').'" title="'.$i18n->get('Paste').'" /></a>';
-        return $output;
-}
 
 #-------------------------------------------------------------------
 
