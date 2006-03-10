@@ -56,7 +56,7 @@ sub www_formAssetTree {
 			.$session{form}{formId}).'">'.$child->get("menuTitle").'</a>'."<br />\n";	
 	}
 	$session{page}{useEmptyStyle} = 1;
-	return _outputWrapper('Choose an Asset',$output);
+	return _outputWrapper($i18n->get('choose an asset',$output);
 }
 
 
@@ -109,7 +109,7 @@ window.opener.tinyMCE.insertLink("^" + "/" + ";" + document.getElementById("url_
 		$output .= '<a href="#" onclick="document.getElementById(\'url_formId\').value=\''.$child->get("url").'\'">(&bull;)</a> <a href="'.$child->getUrl("op=richEditPageTree").'">'.$child->get("menuTitle").'</a>'."<br />\n";	
 	}
 	$session{page}{useEmptyStyle} = 1;
-	return _outputWrapper('Choose an Asset',$output.'</fieldset></fieldset>');
+	return _outputWrapper($i18n->get('choose an asset'),$output.'</fieldset></fieldset>');
 }
 
 
