@@ -57,14 +57,21 @@ B<NOTE:> It is important to distinguish the difference between a WebGUI session 
 
  $session->asset
  $session->close
+ $session->config
+ $session->datetime
  $session->db
  $session->dbSlave
  $session->env
  $session->errorHandler
  $session->form
+ $session->getId
  $session->http
- $session->os
+ $session->icon
+ $session->id
+ $session->open
  $session->output
+ $session->os
+ $session->privilege
  $session->request
  $session->scratch
  $session->server
