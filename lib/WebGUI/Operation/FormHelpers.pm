@@ -16,6 +16,22 @@ use WebGUI::HTMLForm;
 use WebGUI::Session;
 use WebGUI::Style;
 
+sub _outputWrapper {
+	my $title = shift;
+	my $body = shift;
+	return '<html>
+<head>
+<title>'.$title.'
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+</head>
+<body>
+'.$body.'
+</body>
+</html>';
+}
+
+
+
 #-------------------------------------------------------------------
 sub www_formAssetTree {
 	my $base = WebGUI::Asset->newByUrl || WebGUI::Asset->getRoot;
@@ -40,7 +56,7 @@ sub www_formAssetTree {
 			.$session{form}{formId}).'">'.$child->get("menuTitle").'</a>'."<br />\n";	
 	}
 	$session{page}{useEmptyStyle} = 1;
-	return $output;
+	return _outputWrapper('Choose an Asset',$output);
 }
 
 
@@ -92,7 +108,7 @@ window.opener.tinyMCE.insertLink("^" + "/" + ";" + document.getElementById("url_
 		$output .= '<a href="#" onclick="document.getElementById(\'url_formId\').value=\''.$child->get("url").'\'">(&bull;)</a> <a href="'.$child->getUrl("op=richEditPageTree").'">'.$child->get("menuTitle").'</a>'."<br />\n";	
 	}
 	$session{page}{useEmptyStyle} = 1;
-	return $output.'</fieldset></fieldset>';
+	return _outputWrapper('Choose an Asset',$output.'</fieldset></fieldset>');
 }
 
 
@@ -117,7 +133,7 @@ sub www_richEditImageTree {
 		$output .= '<a href="'.$child->getUrl("op=richEditImageTree").'">'.$child->get("menuTitle").'</a>'."<br />\n";	
 	}
 	$session{page}{useEmptyStyle} = 1;
-	return $output;
+	return _outputWrapper($base->getTitle,$output);
 }
 
 
@@ -141,7 +157,7 @@ sub www_richEditViewThumbnail {
     		    </script>\n";
 		return $output;
 	}
-	return '<div align="center"><img src="'.$session{config}{extrasURL}.'/tinymce/images/icon.gif" border="0" alt="Image Manager"></div>';
+	return _outputWrapper($image->getTitle,'<div align="center"><img src="'.$session{config}{extrasURL}.'/tinymce/images/icon.gif" border="0" alt="Image Manager"></div>');
 }
 
 
