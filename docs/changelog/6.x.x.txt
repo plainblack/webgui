@@ -7,6 +7,9 @@
    bars.
  - fixed a delete bug on cs posts.
  - fixed two security problems with www_process in DataForm.pm
+ - [ 1441488 ] Sort Order of Profile Fields in Form "Create New Account"
+ - fix [ 1439352 ] Deleting post is chain of posts ... descendants
+ - fix [ 1432491 ] 6.8.6 popup windows has not head & body tags
 
 6.8.7
  - fix [ 1431098 ] op=becomeUser can become non-existent userIds
