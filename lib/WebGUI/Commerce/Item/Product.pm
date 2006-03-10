@@ -60,6 +60,7 @@ Overload default constructor to glue in a WebGUI::Product object.
 sub new {
 	my ($class, $session, $sku, $product, $variantId);
 	$class = shift;
+	$session = shift;
 	$variantId = shift;
 	
 	$product = WebGUI::Product->getByVariantId($session,$variantId);

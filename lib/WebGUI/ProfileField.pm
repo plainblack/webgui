@@ -292,12 +292,12 @@ Returns an array reference of WebGUI::ProfileField objects that are marked "requ
 =cut
 
 sub getRequiredFields {
-        my $self = shift;
-        my @fields = ();
-        foreach my $fieldName ($self->session->db->buildArray("select fieldName from userProfileField where required=1 order by sequenceNumber")) {
-                push(@fields,WebGUI::ProfileField->new($self->session,$fieldName));
-        }
-        return \@fields;
+	my $self = shift;
+	my @fields = ();
+	foreach my $fieldName ($self->session->db->buildArray("select userProfileField.fieldName from  userProfileField LEFT JOIN userProfileCategory ON userProfileField.profileCategoryId = userProfileCategory.profileCategoryId where userProfileField.required=1 order by userProfileCategory.sequenceNumber, userProfileField.sequenceNumber")) {
+		push(@fields,WebGUI::ProfileField->new($self->session,$fieldName));
+	}
+	return \@fields;
 }
 
 #-------------------------------------------------------------------

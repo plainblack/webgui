@@ -55,6 +55,7 @@ This returns the description of the item. This must be implemented by an item pl
 =cut
 
 sub description {
+	my $self = shift;
 	return $self->session->errorHandler->fatal('The description method of WebGUI::Commerce::Item must be overridden.');
 }
 
@@ -95,6 +96,7 @@ by an item plugin.
 =cut
 
 sub id {
+	my $self = shift;
 	return $self->session->errorHandler->fatal('The id method of WebGUI::Commerce::Item must be overridden.');
 }
 
@@ -120,6 +122,7 @@ Returns the name of the item. This must be implemented by an item plugin.
 =cut
 
 sub name {
+	my $self = shift;
 	return $self->session->errorHandler->fatal('The name method of WebGUI::Commerce::Item must be overridden.');
 }
 
@@ -183,6 +186,7 @@ term price. This must be implemented by an item plugin.
 =cut
 
 sub price {
+	my $self = shift;
 	return $self->session->errorHandler->fatalError('The price method of WebGUI::Commerce::Item must be overridden.');
 }
 
@@ -195,6 +199,7 @@ Returns the type (namespace) of the item.
 =cut 
 
 sub type {
+	my $self = shift;
 	return $self->session->errorHandler->fatalError('The type method of WebGUI::Commerce::Item must be overridden.');
 }
 

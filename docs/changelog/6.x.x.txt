@@ -59,6 +59,8 @@
  - Help for forms now shows the fields that you should see with your UI level.
    There is a link to show all fields.
  - fix [ 1445393 ] 6.9 WhatNext missing from DataForm editField
+ - fix [ 1443378 ] 6.99 Commerce system needs to be sessionized
+ - fix [ 1442942 ] 6.99: listLDAPLinks broken
 
 6.8.8
  - fix [ 1437186 ] 6.8.7 deploy DataForm package does not copy fields
@@ -69,6 +71,9 @@
    bars
  - fixed a delete bug on cs posts.
  - fixed two security problems with www_process in DataForm.pm
+ - [ 1441488 ] Sort Order of Profile Fields in Form "Create New Account"
+ - fix [ 1439352 ] Deleting post is chain of posts ... descendants
+ - fix [ 1432491 ] 6.8.6 popup windows has not head & body tags
 
 6.8.7
  - fix [ 1431098 ] op=becomeUser can become non-existent userIds
