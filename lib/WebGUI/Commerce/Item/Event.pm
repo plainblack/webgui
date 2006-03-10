@@ -58,7 +58,7 @@ sub new {
                    from EventManagementSystem_products as e, products as p
 		   where p.productId = e.productId and p.productId=".$session->db->quote($eventId)); 	
 	
-	bless {_event => $eventData}, $class;
+	bless {_event => $eventData, _session => $session }, $class;
 }
 
 #-------------------------------------------------------------------

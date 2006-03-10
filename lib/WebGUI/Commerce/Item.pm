@@ -192,6 +192,19 @@ sub price {
 
 #-------------------------------------------------------------------
 
+=head2 session ( )
+
+Returns a reference to the current session.
+
+=cut
+
+sub session {
+	my $self = shift;
+	return $self->{_session};
+}
+
+#-------------------------------------------------------------------
+
 =head2 type ( )
 
 Returns the type (namespace) of the item.

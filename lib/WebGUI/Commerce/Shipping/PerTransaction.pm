@@ -16,7 +16,7 @@ use strict;
 
 #-------------------------------------------------------------------
 
-=head2 calc ( $session )
+=head2 calc ( $self )
 
 Calculate the shipping price for this plugin.
 
@@ -33,7 +33,7 @@ sub calc {
 
 #-------------------------------------------------------------------
 
-=head2 configurationForm ( $session )
+=head2 configurationForm ( $self )
 
 Configuration form for this shipping method.
 
@@ -65,8 +65,8 @@ Constructor
 sub init {
 	my ($class, $self);
 	$class = shift;
-		
-	$self = $class->SUPER::init('PerTransaction');
+	my $session = shift;
+	$self = $class->SUPER::init($session,'PerTransaction');
 
 	return $self;
 }
@@ -80,8 +80,8 @@ Returns the internationalized name for this shipping plugin.
 =cut
 
 sub name {
-	my ($session) = @_;
-	my $i18n = WebGUI::International->new($session, 'CommerceShippingPerTransaction');
+	my ($self) = shift;
+	my $i18n = WebGUI::International->new($self->session, 'CommerceShippingPerTransaction');
 	return $i18n->get('title');
 }
 

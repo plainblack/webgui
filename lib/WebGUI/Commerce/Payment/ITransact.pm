@@ -588,8 +588,8 @@ sub errorCode {
 
 #-------------------------------------------------------------------
 sub name {
-	my ($session) = @_;
-	my $i18n = WebGUI::International->new($session, "CommercePaymentITransact");
+	my ($self) = shift;
+	my $i18n = WebGUI::International->new($self->session, "CommercePaymentITransact");
 	return $i18n->get('module name');
 }
 

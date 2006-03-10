@@ -70,8 +70,8 @@ Constructor
 sub init {
 	my ($class, $self);
 	$class = shift;
-		
-	$self = $class->SUPER::init('ByWeight');
+	my $session = shift;
+	$self = $class->SUPER::init($session,'ByWeight');
 
 	return $self;
 }
@@ -85,8 +85,8 @@ Returns the internationalized name for this shipping plugin.
 =cut
 
 sub name {
-	my ($session) = @_;
-	my $i18n = WebGUI::International->new($session, 'CommerceShippingByWeight');
+	my $self = shift;
+	my $i18n = WebGUI::International->new($self->session, 'CommerceShippingByWeight');
 	return $i18n->get('title');
 }
 

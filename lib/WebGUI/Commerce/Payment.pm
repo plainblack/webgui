@@ -21,7 +21,7 @@ An abstract class for all payment plugins to extend.
 
 Invoking goes as follows:
 
- $plugin = WebGUI::Commerce::Payment->init('MyPlugin');
+ $plugin = WebGUI::Commerce::Payment->init($session,'MyPlugin');
 
 =head1 METHODS
 
@@ -291,7 +291,8 @@ sub load {
 	$load = "use $cmd";
 	eval($load);
 	$session->errorHandler->warn("Payment plugin failed to compile: $cmd.".$@) if($@);
-	$plugin = eval($cmd."->init");
+	$plugin = eval($cmd.'->init($session)');
+	
 	$session->errorHandler->warn("Couldn't instantiate payment plugin: $cmd.".$@) if($@);
 	return $plugin;
 }

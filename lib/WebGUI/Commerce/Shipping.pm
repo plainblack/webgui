@@ -215,7 +215,7 @@ sub load {
 	$load = "use $cmd";
 	eval($load);
 	$session->errorHandler->warn("Shipping plugin failed to compile: $cmd.".$@) if($@);
-	$plugin = eval($cmd."->init");
+	$plugin = eval($cmd.'->init($session)');
 	$session->errorHandler->warn("Couldn't instantiate shipping plugin: $cmd.".$@) if($@);
 	return $plugin;
 }
@@ -229,8 +229,8 @@ Returns the (display) name of the plugin. You must override this method.
 =cut
 
 sub name {
-	my ($session) = @_;
-	return $session->errorHandler->fatal("You must override the name method in the shipping plugin.");
+	my ($self) = @_;
+	return $self->session->errorHandler->fatal("You must override the name method in the shipping plugin.");
 }
 
 #-------------------------------------------------------------------

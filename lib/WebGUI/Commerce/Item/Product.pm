@@ -68,7 +68,7 @@ sub new {
 	my %parameters = map {split(/\./, $_)} split(/,/, $variant->{composition});
 	my $composition = join(', ',map {$product->getParameter($_)->{name} .': '. $product->getOption($parameters{$_})->{value}} keys (%parameters));
 	
-	bless {_product => $product, _composition => $composition, _variant => $variant}, $class;
+	bless {_product => $product, _composition => $composition, _variant => $variant, _session => $session }, $class;
 }
 
 #-------------------------------------------------------------------

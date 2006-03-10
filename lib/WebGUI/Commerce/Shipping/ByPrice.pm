@@ -62,8 +62,8 @@ sub configurationForm {
 sub init {
 	my ($class, $self);
 	$class = shift;
-		
-	$self = $class->SUPER::init('ByPrice');
+	my $session = shift;
+	$self = $class->SUPER::init($session,'ByPrice');
 
 	return $self;
 }
@@ -77,8 +77,8 @@ Returns the internationalized name for this shipping plugin.
 =cut
 
 sub name {
-	my ($session) = @_;
-	my $i18n = WebGUI::International->new($session, 'CommerceShippingByPrice');
+	my ($self) = @_;
+	my $i18n = WebGUI::International->new($self->session, 'CommerceShippingByPrice');
 	return $i18n->get('title');
 }
 
