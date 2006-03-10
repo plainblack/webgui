@@ -857,19 +857,24 @@ Moves post to the trash and decrements reply counter on thread.
 =cut
 
 sub trash {
-        my $self = shift;
-        $self->SUPER::trash;
-        $self->getThread->decrementReplies if ($self->isReply);
-        if ($self->getThread->get("lastPostId") eq $self->getId) {
-                my $threadLineage = $self->getThread->get("lineage");
-                my ($id, $date) = WebGUI::SQL->quickArray("select Post.assetId, Post.dateSubmitted from Post, asset where asset.lineage like ".quote($threadLineage.'%')." and Post.assetId<>".quote($self->getId)." and asset.assetId=Post.assetId and asset.state='published' order by Post.dateSubmitted desc");
-                $self->getThread->update({lastPostId=>$id, lastPostDate=>$date});
-        }
-        if ($self->getThread->getParent->get("lastPostId") eq $self->getId) {
-                my $forumLineage = $self->getThread->getParent->get("lineage");
-                my ($id, $date) = WebGUI::SQL->quickArray("select Post.assetId, Post.dateSubmitted from Post, asset where asset.lineage like ".quote($forumLineage.'%')." and Post.assetId<>".quote($self->getId)." and asset.assetId=Post.assetId and asset.state='published' order by Post.dateSubmitted desc");
-                $self->getThread->getParent->update({lastPostId=>$id, lastPostDate=>$date});
-        }
+	my $self = shift;
+	$self->SUPER::trash;
+	if ($self->isReply) {
+		my $kids = WebGUI::SQL->quickArray("select count(*) from asset where lineage like ".quote($self->get("lineage").'%'));
+		foreach (1..$kids) { # above query will count ourself as 1
+			$self->getThread->decrementReplies;
+		}
+	}
+	if ($self->getThread->get("lastPostId") eq $self->getId) {
+		my $threadLineage = $self->getThread->get("lineage");
+		my ($id, $date) = WebGUI::SQL->quickArray("select Post.assetId, Post.dateSubmitted from Post, asset where asset.lineage like ".quote($threadLineage.'%')." and Post.assetId<>".quote($self->getId)." and asset.assetId=Post.assetId and asset.state='published' order by Post.dateSubmitted desc");
+		$self->getThread->update({lastPostId=>$id, lastPostDate=>$date});
+	}
+	if ($self->getThread->getParent->get("lastPostId") eq $self->getId) {
+		my $forumLineage = $self->getThread->getParent->get("lineage");
+		my ($id, $date) = WebGUI::SQL->quickArray("select Post.assetId, Post.dateSubmitted from Post, asset where asset.lineage like ".quote($forumLineage.'%')." and Post.assetId<>".quote($self->getId)." and asset.assetId=Post.assetId and asset.state='published' order by Post.dateSubmitted desc");
+		$self->getThread->getParent->update({lastPostId=>$id, lastPostDate=>$date});
+	}
 }
 
 #-------------------------------------------------------------------
