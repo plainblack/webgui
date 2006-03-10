@@ -53,11 +53,15 @@ The identifier for this field. Defaults to "workflowId".
 
 =head4 type
                 
-The type of workflows to list based upon the object type that will be passed to them "none", "versiontag", etc. If this is omitted, the entire list of workflows will be returned.
+The type of workflows to list based upon the object type that will be passed to them "none", "WebGUI::VersionTag", etc. If this is omitted, the entire list of workflows will be returned.
                 
 =head4 label
 
 A text label that will be displayed if toHtmlWithWrapper() is called. Defaults to getName().
+
+=head4 none
+
+If set to 1 then a "None" option will appear in the list of workflows, which will store a null value in the field. Defaults to 0.
 
 =cut
 
@@ -65,7 +69,7 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session, 'Workflow_Cron');
+	my $i18n = WebGUI::International->new($session, 'Workflow');
 	push(@{$definition}, {
 		formName=>{
 			defaultValue=>$i18n->get("topicName")
@@ -76,9 +80,12 @@ sub definition {
 		name=>{
 			defaultValue=>"workflowId"
 			},
-		namespace=>{
+		type=>{
 			defaultValue=>undef
 			},
+		none=>{
+			defaulValue=>0
+			}
 		});
         return $class->SUPER::definition($session, $definition);
 }
@@ -94,6 +101,7 @@ Renders a template picker control.
 sub toHtml {
 	my $self = shift;
 	my $workflowList = WebGUI::Workflow->getList($self->session, $self->get("type"));
+	$workflowList->{""} = "None";
 	$self->set("options", $workflowList);
 	$self->setManageIcons();
 	return $self->SUPER::toHtml();
@@ -124,7 +132,7 @@ Adds code to the subtext field of the form so that buttons for managing or editi
 sub setManageIcons {
 	my $self = shift;
         my $returnUrl = ";proceed=goBackToPage;returnUrl=".$self->session->url->escape($self->session->asset->getUrl) if $self->session->asset;
-        my $buttons = $self->session->icon->edit("op=editWorkflow".$returnUrl);
+        my $buttons = $self->session->icon->edit("op=editWorkflow;workflowId=".$self->get("workflowId").$returnUrl) if ($self->get("workflowId"));
         $buttons .= $self->session->icon->manage("op=manageWorkflows".$returnUrl);
 	$self->set("subtext",$buttons . $self->get("subtext"));
 }

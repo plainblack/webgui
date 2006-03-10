@@ -457,11 +457,6 @@ Be aware that any database links you create here will be available to all conten
 		lastUpdated => 1031514049
 	},
 
-	'536' => {
-		message => q|A new user named ^@; has joined the site.|,
-		lastUpdated => 1031514049
-	},
-
 	'379' => {
 		message => q|Group ID|,
 		lastUpdated => 1031514049
@@ -509,11 +504,6 @@ Be aware that any database links you create here will be available to all conten
 
 	'107' => {
 		message => q|Security|,
-		lastUpdated => 1031514049
-	},
-
-	'535' => {
-		message => q|Group To Alert On New User|,
 		lastUpdated => 1031514049
 	},
 
@@ -800,11 +790,6 @@ to add or remove users from their groups.
 	'746' => {
 		message => q|Toolbar Icon Set|,
 		lastUpdated => 1036046598
-	},
-
-	'534' => {
-		message => q|Alert on new user?|,
-		lastUpdated => 1031514049
 	},
 
 	'400' => {
@@ -3519,16 +3504,6 @@ Optionally, if you are running a sendmail server on the same machine as WebGUI, 
                 lastUpdated => 1120239343,
         },
 
-        '534 description' => {
-                message => q|Should someone be alerted when a new user registers anonymously?|,
-                lastUpdated => 1120239343,
-        },
-
-        '535 description' => {
-                message => q|What group should be alerted when a new user registers?|,
-                lastUpdated => 1120239343,
-        },
-
         '400 description' => {
                 message => q|Some companies have proxy servers that cause problems with WebGUI. If you're experiencing problems with WebGUI, and you have a proxy server, you may want to set this setting to <i>Yes</i>. Beware that WebGUI's URLs will not be as user-friendly after this feature is turned on.|,
                 lastUpdated => 1120239343,
@@ -3550,8 +3525,8 @@ Optionally, if you are running a sendmail server on the same machine as WebGUI, 
         },
 
         '559 description' => {
-                message => q|If there is a command line specified here, it will be executed each time a user registers anonymously.|,
-                lastUpdated => 1120239343,
+                message => q|If there is a workflow chosen here, it will be executed each time a user registers anonymously.|,
+                lastUpdated => 1141956483,
         },
 
         '539 description' => {

@@ -190,7 +190,7 @@ sub new {
 
 =head2 send ( )
 
-Sends the message via SMTP.
+Sends the message via SMTP. Returns 1 if successful.
 
 =cut
 
@@ -202,6 +202,7 @@ sub send {
 			close(MAIL) or $self->session->errorHandler->error("Couldn't close connection to mail server: ".$self->session->setting->get("smtpServer"));
 		} else {
 			$self->session->errorHandler->error("Couldn't connect to mail server: ".$self->session->setting->get("smtpServer"));
+			return 0;
 		}
 	} else {
 		my $smtp = Net::SMTP->new($self->session->setting->get("smtpServer")); # connect to an SMTP server
@@ -216,8 +217,10 @@ sub send {
 			$smtp->quit;                # Close the SMTP connection
 		} else {
 			$self->session->errorHandler->error("Couldn't connect to mail server: ".$self->session->setting->get("smtpServer"));
+			return 0;
 		}
 	}
+	return 1;
 }
 
 #-------------------------------------------------------------------

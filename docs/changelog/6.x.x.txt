@@ -1,4 +1,6 @@
 6.99.0
+ - Run on registration and alert on new user have been converted to a single
+   workflow.
  - Many changes for better XHTML compliance.
  - Refactored admin bar to be more dynamic.
  - Added version tags menu to admin bar.

@@ -232,7 +232,9 @@ sub www_editSettings {
 		-hoverHelp=>$i18n->get('118 description'),
 		-value=>$session->setting->get("anonymousRegistration")
 		);
-   	$tabform->getTab("user")->text(
+   	$tabform->getTab("user")->workflow(
+		-none=>1,
+		-type=>"WebGUI::User",
 		-name=>"runOnRegistration",
 		-label=>$i18n->get(559),
 		-hoverHelp=>$i18n->get('559 description'),

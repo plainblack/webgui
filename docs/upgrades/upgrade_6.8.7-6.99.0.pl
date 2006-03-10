@@ -243,6 +243,9 @@ sub addWorkflow {
 		}, "pbworkflow000000000003");
 	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::CommitVersionTag", "pbwfactivity0000000006");
 	$activity->set("title", "Commit Assets");
+	$session->setting->remove("alertOnNewUser");
+	$session->setting->remove("onNewUserAlertGroup");
+	$session->setting->set("runOnRegistration","");
 }
 
 #-------------------------------------------------

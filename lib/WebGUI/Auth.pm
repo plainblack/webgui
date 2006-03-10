@@ -28,6 +28,7 @@ use WebGUI::Utility;
 use WebGUI::User;
 use WebGUI::Operation::Shared;
 use WebGUI::Operation::Profile;
+use WebGUI::Workflow::Instance;
 
 
 =head1 NAME
@@ -267,10 +268,15 @@ sub createAccountSave {
 	$self->session->var->start($userId,$self->session->getId);
 	$self->_logLogin($userId,"success");
 	$self->session->http->setStatus(201,"Account Registration Successful");
-	my $command = $self->session->setting->get("runOnRegistration");
-	WebGUI::Macro::process($self->session,\$command);
-	system($command) if ($self->session->setting->get("runOnRegistration") ne "");
-	WebGUI::MessageLog::addInternationalizedEntry('',$self->session->setting->get("onNewUserAlertGroup"),'',536) if ($self->session->setting->get("alertOnNewUser"));
+	if ($self->session->setting->get("runOnRegistration")) {
+		WebGUI::Workflow::Instance->create($self->session, {
+			workflowId=>$self->session->setting->get("runOnRegistration"),
+			methodName=>"new",
+			className=>"WebGUI::User",
+			parameters=>$self->session->userId,
+			priority=>1
+			});
+	}
 	return "";
 }
 
