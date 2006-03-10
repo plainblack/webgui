@@ -104,7 +104,7 @@ sub definition {
 		);
 	push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
-		icon=>'article.gif',
+		icon=>'ems.gif',
 		autoGenerateForms=>1,
 		tableName=>'EventManagementSystem',
 		className=>'WebGUI::Asset::Wobject::EventManagementSystem',
