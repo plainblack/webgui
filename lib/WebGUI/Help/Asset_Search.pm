@@ -20,11 +20,6 @@ our $HELP = {
                                 description => 'class limiter description',
                                 namespace => 'Asset_Search',
                         },
-                        {
-                                title => 'view template',
-                                description => 'view template description',
-                                namespace => 'Asset_Search',
-                        },
 		],
 		related => [
 			{
@@ -45,26 +40,6 @@ our $HELP = {
 		title => 'search template',
 		body => 'search template body',
 		fields => [
-                        {
-                                title => 'search template',
-                                description => 'search template description',
-                                namespace => 'Asset_Search',
-                        },
-                        {
-                                title => 'search root',
-                                description => 'search root description',
-                                namespace => 'Asset_Search',
-                        },
-                        {
-                                title => 'class limiter',
-                                description => 'class limiter description',
-                                namespace => 'Asset_Search',
-                        },
-                        {
-                                title => 'view template',
-                                description => 'view template description',
-                                namespace => 'Asset_Search',
-                        },
 		],
 		related => [
 			{
@@ -72,9 +47,13 @@ our $HELP = {
 				namespace => 'Asset'
 			},
 			{
-				tag => 'wobjects using',
+				tag => 'wobject template',
 				namespace => 'Asset_Wobject'
-			},
+			}
+			{
+				tag => 'template language',
+				namespace => 'Asset_Template'
+			}
 		]
 	},
 };
