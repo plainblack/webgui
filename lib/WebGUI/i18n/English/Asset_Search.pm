@@ -49,6 +49,42 @@ our $I18N = { ##hashref of hashes
 		context => q|hover help for search root|
 	},
 
+	'search template body' => {
+		message => q|<p>The following template variables are available for Search Asset templates.  All of these variables are required.</p>
+
+<p><b>form_header*</b><br>
+HTML Code to begin the search form
+</p>
+
+<p><b>form_footer*</b><br>
+HTML Code to end the search form
+</p>
+
+<p><b>form_submit*</b><br>
+A button to allow the user to submit a search.
+</p>
+
+<p><b>form_keywords*</b><br>
+A form to let the user enter in keywords for the search.
+</p>
+
+<p><b>result_set*</b><br>
+Paginated search results with pagination controls.
+</p>
+|,
+		lastUpdated => 1142051703,
+	},
+
+	'add/edit title' => {
+		message => q|Add/Edit Search|,
+		lastUpdated => 1142052517,
+	},
+
+	'add/edit body' => {
+		message => q|<p>The Search Asset is used to search WebGUI content.  In addition to the properties below, Search Assets also have the properties of Wobjects and Assets.</p>|,
+		lastUpdated => 1142052519,
+	},
+
 };
 
 1;
