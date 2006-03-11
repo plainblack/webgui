@@ -61,6 +61,7 @@
  - fix [ 1445393 ] 6.9 WhatNext missing from DataForm editField
  - fix [ 1443378 ] 6.99 Commerce system needs to be sessionized
  - fix [ 1442942 ] 6.99: listLDAPLinks broken
+ - fix [ 1430276 ] 6.9: Can't kill active sessions
 
 6.8.8
  - fix [ 1437186 ] 6.8.7 deploy DataForm package does not copy fields

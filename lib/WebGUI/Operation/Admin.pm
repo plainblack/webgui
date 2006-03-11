@@ -43,7 +43,7 @@ sub www_adminConsole {
 =head2 www_switchOffAdmin ( )
 
 If the current user is in the Turn On Admin Group, then allow them to turn off Admin mode
-via WebGUI::Session::switchAdminOff()
+via WebGUI::Session::Var::switchAdminOff()
 
 
 =cut
