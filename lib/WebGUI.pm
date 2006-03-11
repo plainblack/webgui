@@ -160,7 +160,7 @@ sub page {
 			if ($session->form->process("func")) {
 				$method = $session->form->process("func");
 				unless ($method =~ /^[A-Za-z]+$/) {
-					$session->security("tried to call a non-existent method $method on $assetUrl");
+					$session->errorHandler->security("to call a non-existent method $method on $assetUrl");
 					$method = "view";
 				}
 			}
