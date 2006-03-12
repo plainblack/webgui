@@ -2,30 +2,6 @@ package WebGUI::Help::Asset_Template;
 
 our $HELP = {
 
-	'templates manage' => {
-		title => '683',
-		body => '638',
-		fields => [
-		],
-		related => [
-			{
-				tag => 'template add/edit',
-				namespace => 'Asset_Template'
-			},
-			{
-				tag => 'template delete',
-				namespace => 'Asset_Template'
-			},
-			{
-				tag => 'template language',
-				namespace => 'Asset_Template'
-			},
-			{
-				tag => 'template variables',
-				namespace => 'Asset_Template'
-			},
-		]
-	},
 	'template add/edit' => {
 		title => '684',
 		body => '639',
@@ -47,10 +23,6 @@ our $HELP = {
                         },
 		],
 		related => [
-			{
-				tag => 'templates manage',
-				namespace => 'Asset_Template'
-			}
 		]
 	},
 
@@ -60,10 +32,6 @@ our $HELP = {
 		fields => [
 		],
 		related => [
-			{
-				tag => 'templates manage',
-				namespace => 'Asset_Template'
-			}
 		]
 	},
 
@@ -73,10 +41,6 @@ our $HELP = {
 		fields => [
 		],
 		related => [
-			{
-				tag => 'templates manage',
-				namespace => 'Asset_Template'
-			},
 			{
 				tag => 'template variables',
 				namespace => 'Asset_Template'
@@ -90,10 +54,6 @@ our $HELP = {
 		fields => [
 		],
 		related => [
-			{
-				tag => 'templates manage',
-				namespace => 'Asset_Template'
-			}
 		]
 	},
 

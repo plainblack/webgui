@@ -104,10 +104,6 @@ our $HELP = {
 				tag => 'template language',
 				namespace => 'Asset_Template'
 			},
-			{
-				tag => 'templates manage',
-				namespace => 'Asset_Template'
-			},
 		]
 	},
 };

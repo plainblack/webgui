@@ -49,17 +49,6 @@ our $I18N = {
 		lastUpdated => 1107391368,
 	},
 
-	'683' => {
-		message => q|Templates, Manage|,
-		lastUpdated => 1050430164
-	},
-
-	'638' => {
-		message => q|Templates are used to affect how content is laid out in WebGUI. There are many templates that come with WebGUI, and using the template management system, you can add your own templates to the system to ensure that your site looks <b>exactly</b> how you want it to look. 
-|,
-		lastUpdated => 1050430164
-	},
-
 	'684' => {
 		message => q|Template, Add/Edit|,
 		lastUpdated => 1038890615

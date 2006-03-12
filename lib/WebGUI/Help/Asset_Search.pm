@@ -49,7 +49,7 @@ our $HELP = {
 			{
 				tag => 'wobject template',
 				namespace => 'Asset_Wobject'
-			}
+			},
 			{
 				tag => 'template language',
 				namespace => 'Asset_Template'
