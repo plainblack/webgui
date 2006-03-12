@@ -1,8 +1,7 @@
 body{
 	background-image: url(bg.jpg);
 	background-repeat: repeat-x;
-/*	border: 5px #4E8AAB solid; */
-	border: 5px #2F5CAC solid; 
+	border: 5px #515A6A solid; 
 	margin:0px;
 	padding:0px;
 	min-height: 700px;
