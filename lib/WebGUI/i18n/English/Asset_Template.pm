@@ -92,19 +92,6 @@ Give this template a descriptive name so that you'll know what it is when you're
                 lastUpdated => 1119979645,
         },
 
-	'685' => {
-		message => q|Template, Delete|,
-		lastUpdated => 1038791020
-	},
-
-	'640' => {
-		message => q|It is not a good idea to delete templates as you never know what kind of adverse affect it may have on your site (some content may still be using the template). 
-<p>
-
-|,
-		lastUpdated => 1038791020
-	},
-
 	'825' => {
 		message => q|Template, Language|,
 		lastUpdated => 1038865669

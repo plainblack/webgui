@@ -1,5 +1,17 @@
 package WebGUI::Commerce::Item;
 
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2006 Plain Black Corporation.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
 =head1 NAME
 
 Package WebGUI::Commerce::Item
@@ -228,6 +240,7 @@ So for instance if your units are kg's 3.154 means 3 kg and 154 grams.
 sub weight {
 	return 0;
 }
+
 
 1;
 

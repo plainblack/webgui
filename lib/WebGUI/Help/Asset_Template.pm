@@ -26,15 +26,6 @@ our $HELP = {
 		]
 	},
 
-	'template delete' => {
-		title => '685',
-		body => '640',
-		fields => [
-		],
-		related => [
-		]
-	},
-
 	'template language' => {
 		title => '825',
 		body => '826',
