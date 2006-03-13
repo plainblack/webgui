@@ -56,18 +56,14 @@ This package provides an object-oriented way of managing WebGUI groups and group
  
 
  $g->addGroups(\@arr);
- $g->addUsers(\@arr);
+ $g->addUsers(\@arr, $expireOffset);
  $g->deleteGroups(\@arr);
  $g->deleteUsers(\@arr);
  $g->delete;
 
- $group->addGroups(\@groups, \@toGroups);
- $group->addUsers(\@users, \@toGroups);
- $group->deleteGroups(\@groups, \@fromGroups);
- $group->deleteUsers(\@users, \@fromGroups);
- $arrayRef = $group->getGroupsFor($groupId);
+ $arrayRef = $group->getGroupsFor();
  $arrayRef = $self->session->user->getGroups($userId);
- $arrayRef = $group->getGroupsIn($groupId);
+ $arrayRef = $group->getGroupsIn($recursive);
  $arrayRef = $group->getUsers($groupId);
  $boolean = $self->session->user->isInGroup($groupId, $userId);
  $boolean = $group->userIsAdmin($userId,$groupId);
@@ -119,10 +115,10 @@ sub addGroups {
 	$self->session->stow->delete("isInGroup");
 	foreach my $gid (@{$groups}) {
 		next if ($gid eq '1');
-		my ($isIn) = $self->session->db->quickArray("select count(*) from groupGroupings where groupId=".$self->session->db->quote($gid)." and inGroup=".$self->session->db->quote($self->getId));
+		my ($isIn) = $self->session->db->quickArray("select count(*) from groupGroupings where groupId=? and inGroup=?", [$gid, $self->getId]);
 		my $recursive = isIn($self->getId, @{$self->getGroupsIn($gid,1)});
 		unless ($isIn || $recursive) {
-			$self->session->db->write("insert into groupGroupings (groupId,inGroup) values (".$self->session->db->quote($gid).",".$self->session->db->quote($self->getId).")");
+			$self->session->db->write("insert into groupGroupings (groupId,inGroup) values (?,?)",[$gid, $self->getId]);
 		}
 	}
 }
@@ -474,19 +470,24 @@ Returns an array reference containing a list of groups this group is in.
 
 sub getGroupsFor {
 	my $self = shift;
-	return $self->session->db->buildArrayRef("select inGroup from groupGroupings where groupId=".$self->session->db->quote($self->getId));
+	return $self->session->db->buildArrayRef("select inGroup from groupGroupings where groupId=?",[$self->getId]);
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 getGroupsIn ( [ recursive ] )
+=head2 getGroupsIn ( [ recursive , loopCount ] )
 
 Returns an array reference containing a list of groups that belong to this group.
 
 =head3 recursive
 
 A boolean value to determine whether the method should return the groups directly in the group, or to follow the entire groups of groups hierarchy. Defaults to "0".
+
+=head3 loopCount
+
+If recursive is set, how many times this subroutine should recurse before it
+determines that it is in an infinite loop.  The loop in incremented by 1.
 
 =cut
 
@@ -498,7 +499,7 @@ sub getGroupsIn {
 	my $gotGroupsInGroup = $self->session->stow->get("gotGroupsInGroup");
 	if ($isRecursive && exists $gotGroupsInGroup->{recursive}{$self->getId}) {
 		return $gotGroupsInGroup->{recursive}{$self->getId};
-	} elsif (exists $gotGroupsInGroup->{recursive}{$self->getId}) {
+	} elsif (exists $gotGroupsInGroup->{direct}{$self->getId}) {
 		return $gotGroupsInGroup->{direct}{$self->getId};
 	}
         my $groups = $self->session->db->buildArrayRef("select groupId from groupGroupings where inGroup=".$self->session->db->quote($self->getId));

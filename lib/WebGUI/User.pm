@@ -38,8 +38,9 @@ This package provides an object-oriented way of managing WebGUI users as well as
  $languagePreference = 	$u->profileField("language",1);
  $referringAffiliate =	$u->referringAffiliate;
  $status =		$u->status("somestatus");
- $username = 		$u->username("jonboy");
- $arrayRef =  $u->getGroups;
+ $username =		$u->username("jonboy");
+ $arrayRef =		$u->getGroups;
+ $member =		$u->isInGroup($groupId);
 
  $u->addToGroups(\@arr);
  $u->deleteFromGroups(\@arr);

@@ -18,7 +18,8 @@ use WebGUI::Utility;
 
 use WebGUI::User;
 use WebGUI::Group;
-use Test::More tests => 27; # increment this value for each test you create
+use Test::More tests => 33; # increment this value for each test you create
+use Test::Deep;
 
 my $session = WebGUI::Test->session;
 
@@ -62,12 +63,36 @@ undef $g2;
 
 delete $g->{_group};
 ok( !exists $g->{_group}, 'deleted group property hash');
-is( $g->name, $gname, 'group name restored after ->get');
+is( $g->name, $gname, 'group name restored after ->get through ->name');
 ok( exists $g->{_group}, 'group property hash restored');
 
 $g->delete();
 
-my $matchingGroups = $session->db->quickArray("select groupId from groups where groupId=".$session->db->quote($gid));
+my $matchingGroups = $session->db->quickArray("select groupId from groups where groupId=?",[$gid]);
 
 is ( $matchingGroups, 0, 'group was removed');
 
+my $gA = WebGUI::Group->new($session, "new");
+my $gB = WebGUI::Group->new($session, "new");
+$gA->name('Group A');
+$gB->name('Group B');
+ok( ($gA->name eq 'Group A' and $gB->name eq 'Group B'), 'object name assignment, multiple objects');
+
+$gB->addGroups([$gA->getId]);
+
+cmp_bag([$gA->getId, 3], $gB->getGroupsIn()  ,'Group A is in Group B');
+cmp_bag([$gB->getId], $gA->getGroupsFor() ,'Group B contains Group A');
+cmp_bag([3], $gA->getGroupsIn()  ,'Admin added to group A automatically');
+
+$gA->addGroups([$gB->getId]);
+cmp_bag([3], $gA->getGroupsIn()  ,'Not allowed to create recursive group loops');
+
+$gA->addGroups([1]);
+cmp_bag([3], $gA->getGroupsIn()  ,'Not allowed to add group Visitor to a group');
+
+END {
+	(defined $gA and ref $gA eq 'WebGUI::Group') and $gA->delete;
+	(defined $gB and ref $gB eq 'WebGUI::Group') and $gB->delete;
+	(defined $g2 and ref $g2 eq 'WebGUI::Group') and $g2->delete;
+	(defined $g  and ref $g  eq 'WebGUI::Group') and $g->delete;
+}
