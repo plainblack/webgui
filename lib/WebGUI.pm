@@ -168,7 +168,7 @@ sub page {
 			$output = tryAssetMethod($session,$asset,"view") unless ($output || ($method eq "view"));
 		}
 	}
-	if ($output eq "") {
+	if (defined($output) and $output eq "") {
 		$session->http->setStatus("404","Page Not Found");
 		my $notFound = WebGUI::Asset->getNotFound($session);
 		if (defined $notFound) {

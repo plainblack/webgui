@@ -602,6 +602,7 @@ sub www_view {
 	$self->session->output->print($head);
 	$self->session->output->print($self->view);
 	$self->session->output->print($foot);
+	return undef;
 }
 
 #-------------------------------------------------------------------
