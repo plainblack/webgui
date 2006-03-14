@@ -25,6 +25,14 @@ use WebGUI::Utility;
 use Data::Dumper;
 
 #-------------------------------------------------------------------
+
+=head2 checkConflicts ( )
+
+Check for scheduling conflicts in events in the user's cart.  A conflict is defined as
+whenever two events have overlapping times.
+
+=cut
+
 sub checkConflicts {
 	my $self = shift;
 	my $eventsInCart = $self->getEventsInCart;
@@ -44,7 +52,7 @@ sub checkConflicts {
 		# make sure it's a subevent... 
 		my ($isSubEvent) = $self->session->db->quickArray("
 			select count(*) from EventManagementSystem_prerequisites
-			where productId=".$self->session->db->quote($scheduleData->{productId})
+			where productId=?", [$scheduleData->{productId}]
 		);
 		next unless ($isSubEvent);
 				
@@ -270,15 +278,19 @@ sub getAssignedPrerequisites {
 }
 
 #------------------------------------------------------------------
+
+=head2 getEventsInCart ( )
+
+Returns an array ref of all items in the cart, by id.
+
+=cut
+
 sub getEventsInCart {
 	my $self = shift;
 	my $cart = WebGUI::Commerce::ShoppingCart->new($self->session);
-	my ($cartItems, $trash) = $cart->getItems;
-	my @eventsInCart;
+	my ($cartItems) = $cart->getItems;
 	
-	foreach (@$cartItems) {
-	  push(@eventsInCart, $_->{item}->id);
-	}
+	my @eventsInCart = map { $_->{item}->id } @{ $cartItems };
 
 	return \@eventsInCart;
 }
@@ -540,8 +552,8 @@ sub resolveConflictForm {
 		.$self->session->db->quote($event2).")"
 	);
 	
-	$output = "<table>";
-	$output .= "<tr><td>You have a scheduling conflict.  Please remove one of the events below from your cart to resolve the problem.</td></tr>";
+	my $i18n = WebGUI::International->new($self->session, 'Asset_EventManagementSystem');
+	$output = sprintf "<table><tr><td>%s</td></tr>", $i18n->get('scheduling conflict message');
 	while (my $data = $sth->hashRef) {
 		$output .= "<tr><td>";
 		$output .= $self->session->icon->delete('op=deleteCartItem;itemType=Event;itemId='.$data->{productId}, $self->getUrl);
@@ -551,7 +563,7 @@ sub resolveConflictForm {
 	}
 	
 	$output .= "</table>";
-	$output .= "<a href=''>Click here to continue</a>";
+	$output .= sprintf "<a href=''>%s</a>", $i18n->get('scheduling conflict continue');
 	
 	return $output;
 }
@@ -618,7 +630,7 @@ sub www_addToCart {
 	$conflicts = shift;
 	
 	# Check if conflicts were found that the user needs to fix
-	foreach (@$conflicts) { $output .= $_; }
+	$output = join '', @{ $conflicts };
 
 	unless ($output) { #Skip this if we have errors
 
@@ -661,8 +673,8 @@ sub www_approveEvent {
 	my $eventId = $self->session->form->get("pid");
 	return $self->session->privilege->insuffficent unless ($self->session->user->isInGroup($self->get("groupToApproveEvents")));
 
-	$self->session->db->write("update EventManagementSystem_products set approved=1 where productId=".
-				   $self->session->db->quote($eventId));
+	$self->session->db->write("update EventManagementSystem_products set approved=1 where productId=?",
+				   [$eventId]);
 	
 	return $self->www_manageEvents;
 }
@@ -682,13 +694,13 @@ sub www_deleteEvent {
 	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
 	
 	#Remove this event as a prerequisite to any other event
-	$self->session->db->write("delete from EventManagementSystem_prerequisiteEvents where requiredProductId=".
-				   $self->session->db->quote($eventId));
+	$self->session->db->write("delete from EventManagementSystem_prerequisiteEvents where requiredProductId=?".
+				   [$eventId]);
 	$self->deleteOrphans;	
 
 	#Remove the event
 	$self->deleteCollateral('EventManagementSystem_products', 'productId', $eventId);
-	$self->session->db->write("delete from products where productId=".$self->session->db->quote($eventId));
+	$self->session->db->write("delete from products where productId=?",[$eventId]);
 	$self->reorderCollateral('EventManagementSystem_products', 'productId');
 
 	return $self->www_manageEvents;			  
@@ -708,10 +720,10 @@ sub www_deletePrerequisite {
 	
 	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
 	
-	$self->session->db->write("delete from EventManagementSystem_prerequisiteEvents where prerequisiteId=".
-				   $self->session->db->quote($eventId));
-	$self->session->db->write("delete from EventManagementSystem_prerequisites where prerequisiteId=".
-				   $self->session->db->quote($eventId));
+	$self->session->db->write("delete from EventManagementSystem_prerequisiteEvents where prerequisiteId=?",
+				   [$eventId]);
+	$self->session->db->write("delete from EventManagementSystem_prerequisites where prerequisiteId=?",
+				   [$eventId]);
 	
 	return $self->www_editEvent;
 }
@@ -744,7 +756,7 @@ sub www_editEvent {
 		from
 		       products as p, EventManagementSystem_products as e
 		where
-		       p.productId = e.productId and p.productId=".$self->session->db->quote($pid)
+		       p.productId = e.productId and p.productId=?",[$pid]
 	); 
 
 	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
@@ -990,7 +1002,7 @@ sub www_manageEvents {
 	my $output;
 	my $sth = $self->session->db->read("select p.productId, p.title, p.price, pe.approved from products as p, 
 				EventManagementSystem_products as pe where p.productId = pe.productId
-				and pe.assetId=".$self->session->db->quote($self->get("assetId"))." order by sequenceNumber");
+				and pe.assetId=? order by sequenceNumber", [$self->get("assetId")]);
 	
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	$output = sprintf "<table width='100%'><tr><th>%s</th><th>%s</th><th>%s</th></tr>",

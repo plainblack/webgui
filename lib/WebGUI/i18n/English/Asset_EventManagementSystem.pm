@@ -296,6 +296,16 @@ our $I18N = { ##hashref of hashes
 		lastUpdated => 1140469381,
 	},
 
+	'scheduling conflict message' => {
+		message => q|You have a scheduling conflict.  Please remove one of the events below from your cart to resolve the problem.|,
+		lastUpdated => 1142362442,
+	},
+
+	'scheduling conflict continue' => {
+		message => q|Click here to continue|,
+		lastUpdated => 1142362439,
+	},
+
 	'template help title' => {
 		message => q|Event Management System Template|,
 		lastUpdated => 1140465899,
