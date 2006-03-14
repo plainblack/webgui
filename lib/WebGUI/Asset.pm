@@ -32,7 +32,6 @@ use WebGUI::Search;
 use WebGUI::Search::Index;
 use WebGUI::TabForm;
 use WebGUI::Utility;
-use WebGUI::VersionTag;
 
 =head1 NAME
 
@@ -1014,8 +1013,8 @@ sub manageAssets {
          assetManager.AddColumn('".$i18n->get("99")."','','left','');
          assetManager.AddColumn('".$i18n->get("type")."','','left','');
          assetManager.AddColumn('".$i18n->get("last updated")."','','center','');
-         assetManager.AddColumn('".$i18n->get("size")."','','right','');\n";
-         $output .= "assetManager.AddColumn('".$i18n->get("locked")."','','center','');\n" unless ($self->session->setting->get("autoCommit"));
+         assetManager.AddColumn('".$i18n->get("size")."','','right','');\n
+         assetManager.AddColumn('".$i18n->get("locked")."','','center','');\n";
 	foreach my $child (@{$self->getLineage(["children"],{returnObjects=>1})}) {
 		$output .= 'var contextMenu = new contextMenu_createWithLink("'.$child->getId.'","More");
                 contextMenu.addLink("'.$child->getUrl("func=editBranch").'","'.$i18n->get("edit branch").'");
@@ -1033,7 +1032,7 @@ sub manageAssets {
 			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+";
 			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/unlocked.gif" alt="unlocked" style="border: 0px;" />';
 		}
-		my $lockLink = ", '<a href=\"".$child->getUrl("func=manageRevisions")."\">".$locked."</a>'" unless ($self->session->setting->get("autoCommit"));
+		my $lockLink = ", '<a href=\"".$child->getUrl("func=manageRevisions")."\">".$locked."</a>'";
          	$output .= "assetManager.AddLine('"
 			.WebGUI::Form::checkbox($self->session,{
 				name=>'assetId',
@@ -1193,7 +1192,7 @@ sub manageAssetsSearch {
 			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+";
 			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/unlocked.gif" alt="unlocked" style="border: 0px;" />';
 		}
-		my $lockLink = ", '<a href=\"".$child->getUrl("func=manageRevisions")."\">".$locked."</a>'" unless ($self->session->setting->get("autoCommit"));
+		my $lockLink = ", '<a href=\"".$child->getUrl("func=manageRevisions")."\">".$locked."</a>'";
          	$output .= "assetManager.AddLine('"
 			.WebGUI::Form::checkbox($self->session,{
 				name=>'assetId',
@@ -1257,10 +1256,9 @@ sub new {
 	my $assetRevision = $session->stow->get("assetRevision");
 	my $revisionDate = shift || $assetRevision->{$assetId}{$session->scratch->get("versionTag")||'_'};
 	unless ($revisionDate) {
-		($revisionDate) = $session->db->quickArray("select max(revisionDate) from assetData where assetId="
-			.$session->db->quote($assetId)." and  (status='approved' or status='archived' or tagId="
-			.$session->db->quote($session->scratch->get("versionTag")).")
-			group by assetData.assetId order by assetData.revisionDate");
+		($revisionDate) = $session->db->quickArray("select max(revisionDate) from assetData where assetId=? and  
+			(status='approved' or status='archived' or tagId=?) order by assetData.revisionDate", 
+			[$assetId, $session->scratch->get("versionTag")]);
 		$assetRevision->{$assetId}{$session->scratch->get("versionTag")||'_'} = $revisionDate;
 		$session->stow("assetRevision",$assetRevision);
 	}
@@ -1744,7 +1742,6 @@ sub www_editSave {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	my $object;
-	my $tag = WebGUI::VersionTag->getWorking($self->session);
 	if ($self->session->form->process("assetId") eq "new") {
 		$object = $self->addChild({className=>$self->session->form->process("class")});	
 		$object->{_parent} = $self;

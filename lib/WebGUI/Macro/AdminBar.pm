@@ -98,10 +98,12 @@ sub process {
 		}
 	}
 	my $working = WebGUI::VersionTag->getWorking($session, 1);
+	my $workingId = "";
 	my @tags = ();
 	if ($working) {
+		$workingId = $working->getId;
 		push(@tags, {
-			url=>$session->url->page("op=commitVersionTag;backToSite=1;tagId=".$working->getId),
+			url=>$session->url->page("op=commitVersionTag;backToSite=1;tagId=".$workingId),
 			title=>$i18n->get("commit my changes"),
 			icon=>$session->config->get("extrasURL").'/adminConsole/small/versionTags.gif'
 			});
@@ -110,7 +112,7 @@ sub process {
 	while (my ($id, $name) = $rs->array) {
 		push(@tags, {
 			url=>$session->url->page("op=setWorkingVersionTag;backToSite=1;tagId=".$id),
-			title=>($id eq $working->getId) ?  '<span style="color: #000080;">* '.$name.'</span>' : $name,
+			title=>($id eq $workingId) ?  '<span style="color: #000080;">* '.$name.'</span>' : $name,
 			icon=>$session->config->get("extrasURL").'/spacer.gif'
 			});
 	}

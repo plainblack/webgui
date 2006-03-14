@@ -84,7 +84,7 @@ sub getOperations {
 	  'manageVersions' => 'WebGUI::Operation::VersionTag',
 	  'manageRevisionsInTag' => 'WebGUI::Operation::VersionTag',
 	  'rollbackVersionTag' => 'WebGUI::Operation::VersionTag',
-	  'setVersionTag' => 'WebGUI::Operation::VersionTag',
+	  'setWorkingVersionTag' => 'WebGUI::Operation::VersionTag',
 	  'addWorkflow' => 'WebGUI::Operation::Workflow',
 	  'deleteWorkflow' => 'WebGUI::Operation::Workflow',
 	  'editWorkflowActivity' => 'WebGUI::Operation::Workflow',

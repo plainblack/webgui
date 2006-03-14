@@ -23,6 +23,7 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
+addWorkflow();
 templateParsers();
 removeFiles();
 addSearchEngine();
@@ -30,7 +31,6 @@ addEMSTemplates();
 addEMSTables();
 updateTemplates();
 updateDatabaseLinksAndSQLReport();
-addWorkflow();
 ipsToCIDR();
 addDisabletoRichEditor();
 addNavigationMimeType();
@@ -70,6 +70,12 @@ sub addIndexes {
 #-------------------------------------------------
 sub addWorkflow {
 	print "\tAdding workflow.\n";
+	$session->db->write("alter table assetData drop column startDate");
+	$session->db->write("alter table assetData drop column endDate");
+	$session->db->write("alter table assetVersionTag add column isLocked int not null default 0");
+	$session->db->write("alter table assetVersionTag add column lockedBy varchar(22) binary not null");
+	$session->db->write("alter table assetVersionTag add column groupToUse varchar(22) binary not null");
+	$session->db->write("alter table assetVersionTag add column workflowId varchar(22) binary not null");
 	my $group = WebGUI::Group->new($session,"new","pbgroup000000000000015");
 	$group->set("groupName", "Workflow Managers");
 	$group->set("description", "People who can create, edit, and delete workflows.");
@@ -177,8 +183,6 @@ sub addWorkflow {
 		priority=>3,
 		workflowId=>$workflow->getId
 		}, "pbcron0000000000000001");
-	$session->db->write("alter table assetData drop column startDate");
-	$session->db->write("alter table assetData drop column endDate");
 	$workflow = WebGUI::Workflow->create($session, {
 		title=>"Weekly Maintenance Tasks",
 		description=>"This workflow runs once per week to perform maintenance tasks like cleaning up log files.",
@@ -225,10 +229,6 @@ sub addWorkflow {
                 priority=>3,
                 workflowId=>$workflow->getId
                 }, "pbcron0000000000000003");
-	$session->db->write("alter table assetVersionTag add column isLocked int not null default 0");
-	$session->db->write("alter table assetVersionTag add column lockedBy varchar(22) binary not null");
-	$session->db->write("alter table assetVersionTag add column groupToUse varchar(22) binary not null");
-	$session->db->write("alter table assetVersionTag add column workflowId varchar(22) binary not null");
 	$session->db->write("update groups set showInForms=1 where groupId='12'");
 	$session->config->delete("SyncProfilesToLDAP_hour");
 	$session->config->delete("fileCacheSizeLimit");

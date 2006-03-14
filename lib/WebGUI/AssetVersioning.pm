@@ -16,6 +16,7 @@ package WebGUI::Asset;
 
 use strict;
 use WebGUI::Paginator;
+use WebGUI::VersionTag;
 
 =head1 NAME
 
@@ -56,20 +57,19 @@ sub addRevision {
         my $self = shift;
         my $properties = shift;
 	my $now = shift ||$self->session->datetime->time();
-	my $versionTag = $self->session->scratch->get("versionTag") || 'pbversion0000000000002';
-	my $status = $self->session->setting->get("autoCommit") ? 'approved' : 'pending';
+	my $workingTag = WebGUI::VersionTag->getWorking($self->session);
 	$self->session->db->write("insert into assetData (assetId, revisionDate, revisedBy, tagId, status, url,  
-		ownerUserId, groupIdEdit, groupIdView) values (".$self->session->db->quote($self->getId).",".$now.", ".$self->session->db->quote($self->session->user->userId).", 
-		".$self->session->db->quote($versionTag).", ".$self->session->db->quote($status).", ".$self->session->db->quote($self->getId).", '3','3','7')");
+		ownerUserId, groupIdEdit, groupIdView) values (?, ?, ?, ?, 'pending', ?, '3','3','7')", 
+		[$self->getId, $now, $self->session->user->userId, $workingTag->getId, $self->getId] );
         foreach my $definition (@{$self->definition($self->session)}) {
                 unless ($definition->{tableName} eq "assetData") {
-                        $self->session->db->write("insert into ".$definition->{tableName}." (assetId,revisionDate) values (".$self->session->db->quote($self->getId).",".$now.")");
+                        $self->session->db->write("insert into ".$definition->{tableName}." (assetId,revisionDate) values (?,?)", [$self->getId, $now]);
                 }
         }               
         my $newVersion = WebGUI::Asset->new($self->session,$self->getId, $self->get("className"), $now);
         $newVersion->updateHistory("created revision");
 	$newVersion->update($self->get);
-	$newVersion->setVersionLock unless ($self->session->setting->get("autoCommit"));
+	$newVersion->setVersionLock;
         $newVersion->update($properties) if (defined $properties);
         return $newVersion;
 }
