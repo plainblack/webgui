@@ -101,7 +101,7 @@ Renders a template picker control.
 sub toHtml {
 	my $self = shift;
 	my $workflowList = WebGUI::Workflow->getList($self->session, $self->get("type"));
-	$workflowList->{""} = "None";
+	$workflowList->{""} = "None" if ($self->get("none"));
 	$self->set("options", $workflowList);
 	$self->setManageIcons();
 	return $self->SUPER::toHtml();

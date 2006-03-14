@@ -32,6 +32,7 @@ use WebGUI::Search;
 use WebGUI::Search::Index;
 use WebGUI::TabForm;
 use WebGUI::Utility;
+use WebGUI::VersionTag;
 
 =head1 NAME
 
@@ -1176,12 +1177,10 @@ sub manageAssetsSearch {
          assetManager.AddColumn('".$i18n->get("size")."','','right','');
          \n";
         foreach my $child (@{$assets}) {
-		my $commit = 'contextMenu.addLink("'.$child->getUrl("func=commitRevision").'","'.$i18n->get("commit").'");' if ($child->canEditIfLocked);
 		$output .= 'var contextMenu = new contextMenu_createWithLink("'.$child->getId.'","More");
                 contextMenu.addLink("'.$child->getUrl("func=editBranch").'","'.$i18n->get("edit branch").'");
                 contextMenu.addLink("'.$child->getUrl("func=createShortcut;proceed=manageAssets").'","'.$i18n->get("create shortcut").'");
 		contextMenu.addLink("'.$child->getUrl("func=manageRevisions").'","'.$i18n->get("revisions").'");
-		'.$commit.'
                 contextMenu.addLink("'.$child->getUrl.'","'.$i18n->get("view").'"); '."\n";
 		my $title = $child->getTitle;
 		$title =~ s/\'/\\\'/g;
@@ -1745,9 +1744,7 @@ sub www_editSave {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	my $object;
-	unless($self->session->setting->get("autoCommit") || $self->session->scratch->get("versionTag")) {
-		$self->addVersionTag;
-	}
+	my $tag = WebGUI::VersionTag->getWorking($self->session);
 	if ($self->session->form->process("assetId") eq "new") {
 		$object = $self->addChild({className=>$self->session->form->process("class")});	
 		$object->{_parent} = $self;

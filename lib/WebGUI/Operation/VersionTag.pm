@@ -18,6 +18,8 @@ use strict;
 use WebGUI::Paginator;
 use WebGUI::AdminConsole;
 use WebGUI::International;
+use WebGUI::VersionTag;
+use WebGUI::HTMLForm;
 
 =head1 NAME
 
@@ -40,60 +42,126 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 www_addVersionTag ()
+=head2 www_editVersionTag ( session, [ tagId ] )
 
-Displays the add version tag form.
+Displays the edit version tag form.
+
+=head3 session
+
+A reference to the current session.
+
+=head3 tagId
+
+An open tag id. This is optional as it normally grabs this value from a form post.
 
 =cut
 
-sub www_addVersionTag {
-	my $self = shift;
-	my $ac = WebGUI::AdminConsole->new($self->session,"versions");
-        return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(12));
-	my $i18n = WebGUI::International->new($self->session,"Asset");
-        $ac->addSubmenuItem($self->getUrl('func=manageVersions'), $i18n->get("manage versions"));
-	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
-	my $tag = $self->session->db->getRow("assetVersionTag","tagId",$self->session->form->process("tagId"));
+sub www_editVersionTag {
+	my $session = shift;
+        return $session->privilege->insufficient() unless ($session->user->isInGroup(12));
+	my $tagId = shift || $session->form->param("tagId");
+	my $ac = WebGUI::AdminConsole->new($session,"versions");
+	my $i18n = WebGUI::International->new($session,"VersionTag");
+        $ac->addSubmenuItem($session->url->page('op=manageVersions'), $i18n->get("manage versions"));
+	my $f = WebGUI::HTMLForm->new($session);
+	my $tag = WebGUI::VersionTag->new($session, $tagId);
 	$f->hidden(
-		-name=>"func",
-		-value=>"addVersionTagSave"
+		-name=>"op",
+		-value=>"editVersionTagSave"
 		);
+	my $value = $tag->getId if defined $tag;
+	$f->hidden(
+		-name=>"tagId",
+		-value=>$value,
+		-defaultValue=>"new"
+		);
+	my $value = $tag->get("name") if defined $tag;
 	$f->text(
 		-name=>"name",
 		-label=>$i18n->get("version tag name"),
 		-hoverHelp=>$i18n->get("version tag name description"),
-		-value=>$tag->{name},
+		-value=>$value,
 		);
+	my $workflowId = (defined $tag) ? $tag->get("workflowId") : $session->setting->get("defaultVersionTagWorkflow");
+	my $groupId = (defined $tag) ? $tag->get("groupToUse") : "12";
+	if ($session->user->isInGroup("pbgroup000000000000016")) {
+		$f->workflow(
+			value=>$workflowId,
+			type=>"WebGUI::VersionTag"
+			);
+		$f->group(
+			value=>[$groupId],
+			name=>"groupToUse",
+			label=>$i18n->get("group to use"),
+			hoverHelp=>$i18n->get("group to use help")
+			);
+	} else {
+		$f->hidden(
+			value=>$workflowId,
+			name=>"workflowId"
+			);
+		$f->hidden(
+			value=>$groupId,
+			name=>"groupToUse"
+			);
+	}
 	$f->submit;
-        return $ac->render($f->print,$i18n->get("add version tag"));	
+        return $ac->render($f->print,$i18n->get("edit version tag"));	
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 www_addVersionTagSave ()
+=head2 www_editVersionTagSave ( session )
 
 Adds a version tag and sets the user's default version tag to that.
 
+=head3 session
+
+A reference to the current session.
+
 =cut
 
-sub www_addVersionTagSave {
-	my $self = shift;
-        return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(12));
-	$self->addVersionTag($self->session->form->process("name"));
-	return $self->www_manageVersions();
+sub www_editVersionTagSave {
+	my $session = shift;
+        return $session->session->privilege->insufficient() unless ($session->user->isInGroup(12));
+	if ($session->form->param("tagId") eq "new") {
+		my $tag = WebGUI::VersionTag->create($session, {
+			name=>$session->form->process("name","text", "Untitled"),
+			groupToUse=>$session->form->process("groupToUse","group","12"),
+			workflowId=>$session->form->process("workflowId","workflow", $session->setting->get("defaultVersionTagWorkflow"))
+			});
+		$tag->setWorking;
+	} else {
+		my $tag = WebGUI::VersionTag->new($session, $session->form->param("tagId"));
+		$tag->set({
+			name=>$session->form->process("name","text", "Untitled"),
+			groupToUse=>$session->form->process("groupToUse","group","12"),
+			workflowId=>$session->form->process("workflowId","workflow", $session->setting->get("defaultVersionTagWorkflow"))
+			});
+	}
+	return www_manageVersions($session);
 }
 
 
 #-------------------------------------------------------------------
 
+=head2 www_commitVersionTag ( session )
+
+Commits a version tag.
+
+=head3 session
+
+A reference to the current session.
+
+=cut
+
 sub www_commitVersionTag {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless $session->user->isInGroup(3);
-	my $tagId = $session->form->process("tagId");
+	my $tagId = $session->form->param("tagId");
 	if ($tagId) {
 		my $tag = WebGUI::VersionTag->new($session, $tagId);
-		$tag->commit if (defined $tag);
+		$tag->commit if (defined $tag && $session->user->isInGroup($tag->get("groupToUse")));
 	}
 	if ($session->form->get("backToSite")) {
 		return "";
@@ -103,31 +171,35 @@ sub www_commitVersionTag {
 
 #-------------------------------------------------------------------
 
-=head2 www_manageVersionTags ()
+=head2 www_manageCommittedVersions ( session )
 
 Shows a list of the currently available asset version tags.
+
+=head3 session
+
+A reference to the current session.
 
 =cut
 
 sub www_manageCommittedVersions {
-        my $self = shift;
-        my $ac = WebGUI::AdminConsole->new($self->session,"versions");
-        return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(3));
-        my $i18n = WebGUI::International->new($self->session,"Asset");
+        my $session = shift;
+        return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+        my $ac = WebGUI::AdminConsole->new($session,"versions");
+        my $i18n = WebGUI::International->new($session,"VersionTag");
 	my $rollback = $i18n->get('rollback');
 	my $rollbackPrompt = $i18n->get('rollback version tag confirm');
-        $ac->addSubmenuItem($self->getUrl('func=addVersionTag'), $i18n->get("add a version tag"));
-        $ac->addSubmenuItem($self->getUrl('func=manageVersions'), $i18n->get("manage versions"));
+        $ac->addSubmenuItem($session->url->page('op=editVersionTag'), $i18n->get("add a version tag"));
+        $ac->addSubmenuItem($session->url->page('op=manageVersions'), $i18n->get("manage versions"));
         my $output = '<table width=100% class="content">
-        <tr><th>Tag Name</th><th>Committed On</th><th>Committed By</th><th></th></tr> ';
-        my $sth = $self->session->db->read("select tagId,name,commitDate,committedBy from assetVersionTag where isCommitted=1");
+        <tr><th>'.$i18n->get("version tag name").'</th><th>'.$i18n->get("committed on").'</th><th>'.$i18n->get("committed by").'</th><th></th></tr> ';
+        my $sth = $session->db->read("select tagId,name,commitDate,committedBy from assetVersionTag where isCommitted=1");
         while (my ($id,$name,$date,$by) = $sth->array) {
-                my $u = WebGUI::User->new($self->session,$by);
+                my $u = WebGUI::User->new($session,$by);
                 $output .= '<tr>
-			<td><a href="'.$self->getUrl("func=manageRevisionsInTag;tagId=".$id).'">'.$name.'</a></td>
-			<td>'.$self->session->datetime->epochToHuman($date).'</td>
+			<td><a href="'.$session->url->page("op=manageRevisionsInTag;tagId=".$id).'">'.$name.'</a></td>
+			<td>'.$session->datetime->epochToHuman($date).'</td>
 			<td>'.$u->username.'</td>
-			<td><a href="'.$self->getUrl("proceed=manageCommittedVersions;func=rollbackVersionTag;tagId=".$id).'" onclick="return confirm(\''.$rollbackPrompt.'\');">'.$rollback.'</a></td></tr>';
+			<td><a href="'.$session->url->page("proceed=manageCommittedVersions;op=rollbackVersionTag;tagId=".$id).'" onclick="return confirm(\''.$rollbackPrompt.'\');">'.$rollback.'</a></td></tr>';
         }
         $sth->finish;
         $output .= '</table>';
@@ -137,40 +209,48 @@ sub www_manageCommittedVersions {
 
 #-------------------------------------------------------------------
 
-=head2 www_manageVersionTags ()
+=head2 www_manageVersions ( session )
 
 Shows a list of the currently available asset version tags.
+
+=head3 session
+
+A reference to the current session.
 
 =cut
 
 sub www_manageVersions {
-	my $self = shift;
-        my $ac = WebGUI::AdminConsole->new($self->session,"versions");
-        return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(3));
-	my $i18n = WebGUI::International->new($self->session,"Asset");
+	my $session = shift;
+        return $session->privilege->insufficient() unless ($session->user->isInGroup(12));
+        my $ac = WebGUI::AdminConsole->new($session,"versions");
+	my $i18n = WebGUI::International->new($session,"VersionTag");
 	$ac->setHelp("versions manage");
-	$ac->addSubmenuItem($self->getUrl('func=addVersionTag'), $i18n->get("add a version tag"));
-	$ac->addSubmenuItem($self->getUrl('func=manageCommittedVersions'), $i18n->get("manage committed versions"));
-	my ($tag) = $self->session->db->quickArray("select name from assetVersionTag where tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")));
+	$ac->addSubmenuItem($session->url->page('op=editVersionTag'), $i18n->get("add a version tag"));
+	$ac->addSubmenuItem($session->url->page('op=manageCommittedVersions'), $i18n->get("manage committed versions")) if ($session->user->isInGroup(3));
+	my ($tag) = $session->db->quickArray("select name from assetVersionTag where tagId=?",[$session->scratch->get("versionTag")]);
 	$tag ||= "None";
 	my $rollback = $i18n->get("rollback");
 	my $commit = $i18n->get("commit");
 	my $setTag = $i18n->get("set tag");
 	my $rollbackPrompt = $i18n->get("rollback version tag confirm");
 	my $commitPrompt = $i18n->get("commit version tag confirm");
-	my $output = '<p>You are currently working under a tag called: <b>'.$tag.'</b>.</p><table width=100% class="content">
-	<tr><th></th><th>Tag Name</th><th>Created On</th><th>Created By</th><th></th></tr> ';
-	my $sth = $self->session->db->read("select tagId,name,creationDate,createdBy from assetVersionTag where isCommitted=0");
-	while (my ($id,$name,$date,$by) = $sth->array) {
-		my $u = WebGUI::User->new($self->session,$by);
+	my $output = '<p>'.$i18n->get("current tag is called").': <b>'.$tag.'</b>.</p><table width=100% class="content">
+	<tr><th></th><th>'.$i18n->get("version tag name").'</th><th>'.$i18n->get("created on").'</th><th>'.$i18n->get("created by").'</th><th></th></tr> ';
+	my $sth = $session->db->read("select tagId,name,creationDate,createdBy,groupToUse from assetVersionTag where isCommitted=0 and isLocked=0");
+	while (my ($id,$name,$date,$by,$group) = $sth->array) {
+		next unless ($session->user->isInGroup($group));
+		my $u = WebGUI::User->new($session,$by);
 		$output .= '<tr>
-			<td>'.$self->session->icon->delete("func=rollbackVersionTag;tagId=".$id,$self->get("url"),$rollbackPrompt).'</td>
-			<td><a href="'.$self->getUrl("func=manageRevisionsInTag;tagId=".$id).'">'.$name.'</a></td>
-			<td>'.$self->session->datetime->epochToHuman($date).'</td>
+			<td>'
+				.$session->icon->delete("op=rollbackVersionTag;tagId=".$id,undef,$rollbackPrompt)
+				.$session->icon->edit("op=editVersionTag;tagId=".$id)
+			.'</td>
+			<td><a href="'.$session->url->page("op=manageRevisionsInTag;tagId=".$id).'">'.$name.'</a></td>
+			<td>'.$session->datetime->epochToHuman($date).'</td>
 			<td>'.$u->username.'</td>
 			<td>
-			<a href="'.$self->getUrl("func=setVersionTag;tagId=".$id).'">'.$setTag.'</a> |
-			<a href="'.$self->getUrl("func=commitVersionTag;tagId=".$id).'" onclick="return confirm(\''.$commitPrompt.'\');">'.$commit.'</a></td></tr>';
+			<a href="'.$session->url->page("op=setVersionTag;tagId=".$id).'">'.$setTag.'</a> |
+			<a href="'.$session->url->page("op=commitVersionTag;tagId=".$id).'" onclick="return confirm(\''.$commitPrompt.'\');">'.$commit.'</a></td></tr>';
 	}
 	$sth->finish;	
 	$output .= '</table>';
@@ -180,66 +260,98 @@ sub www_manageVersions {
 
 #-------------------------------------------------------------------
 
+=head2 www_manageRevisionsInTag ( session )
+
+Displays a list of the revsions associated with this tag.
+
+=head3 session
+
+A reference to the current session.
+
+=cut
+
 sub www_manageRevisionsInTag {
-	my $self = shift;
-	my $ac = WebGUI::AdminConsole->new($self->session,"versions");
-        return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(3));
-        my $i18n = WebGUI::International->new($self->session,"Asset");
-	$ac->addSubmenuItem($self->getUrl('func=addVersionTag'), $i18n->get("add a version tag"));
-	$ac->addSubmenuItem($self->getUrl('func=manageCommittedVersions'), $i18n->get("manage committed versions"));
-        $ac->addSubmenuItem($self->getUrl('func=manageVersions'), $i18n->get("manage versions"));
+	my $session = shift;
+	my $tagId = $session->form->get("tagId");
+	my $tag = WebGUI::VersionTag->new($session, $tagId);
+        return $session->privilege->insufficient() unless ($session->user->isInGroup($tag->get("groupToUse")));
+	my $ac = WebGUI::AdminConsole->new($session,"versions");
+        my $i18n = WebGUI::International->new($session,"VersionTag");
+	$ac->addSubmenuItem($session->url->page('op=editVersionTag'), $i18n->get("add a version tag"));
+	$ac->addSubmenuItem($session->url->page('op=manageCommittedVersions'), $i18n->get("manage committed versions")) if ($session->user->isInGroup(3));
+        $ac->addSubmenuItem($session->url->page('op=manageVersions'), $i18n->get("manage versions"));
         my $output = '<table width=100% class="content">
-        <tr><th></th><th>Title</th><th>Type</th><th>Revision Date</th><th>Revised By</th></tr> ';
-	my $p = WebGUI::Paginator->new($self->session,$self->getUrl("func=manageRevisionsInTag;tagId=".$self->session->form->process("tagId")));
+        <tr><th></th><th>'.$i18n->get("title","Asset").'</th><th>'.$i18n->get("type","Asset").'</th><th>'.$i18n->get("revision date","Asset").'</th><th>'.$i18n->get("revised by","Asset").'</th></tr> ';
+	my $p = WebGUI::Paginator->new($session,$session->url->page("op=manageRevisionsInTag;tagId=".$session->form->process("tagId")));
 	$p->setDataByQuery("select assetData.revisionDate, users.username, asset.assetId, asset.className from assetData 
 		left join asset on assetData.assetId=asset.assetId left join users on assetData.revisedBy=users.userId
-		where assetData.tagId=".$self->session->db->quote($self->session->form->process("tagId")));
+		where assetData.tagId=?",undef, undef, [$session->form->process("tagId")]);
 	foreach my $row (@{$p->getPageData}) {
         	my ($date,$by,$id, $class) = ($row->{revisionDate}, $row->{username}, $row->{assetId}, $row->{className});
-		my $asset = WebGUI::Asset->new($self->session,$id,$class,$date);
-                $output .= '<tr><td>'.$self->session->icon->delete("func=purgeRevision;proceed=manageRevisionsInTag;tagId=".$self->session->form->process("tagId").";revisionDate=".$date,$asset->get("url"),$i18n->get("purge revision prompt")).'</td>
+		my $asset = WebGUI::Asset->new($session,$id,$class,$date);
+                $output .= '<tr><td>'.$session->icon->delete("func=purgeRevision;proceed=manageRevisionsInTag;tagId=".$session->form->process("tagId").";revisionDate=".$date,$asset->get("url"),$i18n->get("purge revision prompt")).'</td>
 			<td>'.$asset->getTitle.'</td>
 			<td><img src="'.$asset->getIcon(1).'" alt="'.$asset->getName.'" />'.$asset->getName.'</td>
-			<td><a href="'.$asset->getUrl("func=viewRevision;revisionDate=".$date).'">'.$self->session->datetime->epochToHuman($date).'</a></td>
+			<td><a href="'.$asset->getUrl("func=viewRevision;revisionDate=".$date).'">'.$session->datetime->epochToHuman($date).'</a></td>
 			<td>'.$by.'</td></tr>';
         }
         $output .= '</table>'.$p->getBarSimple;
-	my $tag = $self->session->db->getRow("assetVersionTag","tagId",$self->session->form->process("tagId"));
+	my $tag = $session->db->getRow("assetVersionTag","tagId",$session->form->process("tagId"));
         return $ac->render($output,$i18n->get("revisions in tag").": ".$tag->{name});
 }
 
 
-#-------------------------------------------------------------------A
+#-------------------------------------------------------------------
+
+=head2 www_rollbackVersionTag ( session )
+
+Deletes a version tag and all asset revisions attached to it.
+
+=head2 session
+
+A reference to the current session.
+
+=cut
 
 sub www_rollbackVersionTag {
-	my $self = shift;
-	return $self->session->privilege->adminOnly() unless $self->session->user->isInGroup(3);
-	return $self->session->privilege->vitalComponent() if ($self->session->form->process("tagId") eq "pbversion0000000000001" || $self->session->form->process("tagId") eq "pbversion0000000000002");
-	my $tagId = $self->session->form->process("tagId");
+	my $session = shift;
+	return $session->privilege->adminOnly() unless $session->user->isInGroup(3);
+	my $tagId = $session->form->process("tagId");
+	return $session->privilege->vitalComponent() if ($tagId eq "pbversion0000000000001");
 	if ($tagId) {
-		$self->rollbackVersionTag($tagId);
+		my $tag = WebGUI::VersionTag->new($session, $tagId);
+		$tag->rollback if defined $tag;
 	}
-	if ($self->session->form->process("proceed") eq "manageCommittedVersions") {
-		return $self->www_manageCommittedVersions;
+	if ($session->form->process("proceed") eq "manageCommittedVersions") {
+		return www_manageCommittedVersions($session);
 	}
-	return $self->www_manageVersions;
+	return www_manageVersions($session);
 }
 
 
 
 #-------------------------------------------------------------------
 
-=head2 www_setVersionTag ()
+=head2 www_setVersionTag ( session )
 
 Sets the current user's working version tag.
+
+=head3 session
+
+A reference to the current session.
 
 =cut
 
 sub www_setVersionTag () {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->session->user->isInGroup(12);
-	$self->session->scratch->set("versionTag",$self->session->form->process("tagId"));
-	return $self->www_manageVersions();
+	my $session = shift;
+	my $tag = WebGUI::VersionTag->new($session, $session->form->process("tagId"));
+	if (defined $tag && $session->user->isInGroup($tag->get("groupToUse"))) {
+		$tag->setWorking();
+	}
+	if ($session->form->param("backToSite")) {
+		return undef;
+	}
+	return www_manageVersions($session);
 }
 
 

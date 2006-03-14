@@ -71,6 +71,13 @@ sub www_editSettings {
 		-value=>$session->setting->get("companyURL")
 		);
 # content settings
+	$tabform->getTab("content")->workflow(
+		name=>"defaultVersionTagWorkflow",
+		value=>$session->setting->get("defaultVersionTagWorkflow"),
+		type=>"WebGUI::VersionTag",
+		label=>$i18n->get("default version tag workflow"),
+		hoverHelp=>$i18n->get('default version tag workflow help')
+		);
         my %htmlFilter = (
 		'none'=>$i18n->get(420), 
 		'most'=>$i18n->get(421), 
@@ -113,12 +120,6 @@ sub www_editSettings {
 		-hoverHelp=>$i18n->get('406 description'),
 		-value=>$session->setting->get("thumbnailSize")
 		);
-	 $tabform->getTab("content")->yesNo(
-                -name=>"autoCommit",
-                -label=>$i18n->get("enable autocommit of asset versioning","Asset"),
-                -hoverHelp=>$i18n->get("enable autocommit of asset versioning description","Asset"),
-                -value=>$session->setting->get("autoCommit")
-        	);
 	 $tabform->getTab("content")->yesNo(
                 -name=>"metaDataEnabled",
                 -label=>$i18n->get("Enable Metadata"),

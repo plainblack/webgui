@@ -102,16 +102,16 @@ sub process {
 	if ($working) {
 		push(@tags, {
 			url=>$session->url->page("op=commitVersionTag;backToSite=1;tagId=".$working->getId),
-			label=>$i18n->get("commit my changes"),
-			icon=>$session->config->get("extrasURL").'/spacer.gif'
+			title=>$i18n->get("commit my changes"),
+			icon=>$session->config->get("extrasURL").'/adminConsole/small/versionTags.gif'
 			});
 	}
 	my $rs = $session->db->read("select tagId, name from assetVersionTag where isCommitted=0 and isLocked=0 order by name");
 	while (my ($id, $name) = $rs->array) {
 		push(@tags, {
-			url=>$session->url->page("op=setAsWorkingVersionTag;backToSite=1;tagId=".$id),
-			label=>$name,
-			icon=>($id eq $working->getId) ? $session->config->get("extrasURL").'/adminConsole/small/versionTags.gif' : $session->config->get("extrasURL").'/spacer.gif'
+			url=>$session->url->page("op=setWorkingVersionTag;backToSite=1;tagId=".$id),
+			title=>($id eq $working->getId) ?  '<span style="color: #000080;">* '.$name.'</span>' : $name,
+			icon=>$session->config->get("extrasURL").'/spacer.gif'
 			});
 	}
 	if (scalar(@tags)) {

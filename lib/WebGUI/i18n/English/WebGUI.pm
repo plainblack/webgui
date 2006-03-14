@@ -1,6 +1,18 @@
 package WebGUI::i18n::English::WebGUI;
 
 our $I18N = {
+	'default version tag workflow help' => {
+		message => q|Which workflow should be used by default when user's create their own version tags.|,
+		lastUpdated => 0,
+		context=>"Settings hover help"
+	},
+
+	'default version tag workflow' => {
+		message => q|Default Version Tag Workflow|,
+		lastUpdated => 0,
+		context=>"Settings"
+	},
+
 	'expire groupings' => {
 		message => q|Expire User Groupings|,
 		lastUpdated => 0

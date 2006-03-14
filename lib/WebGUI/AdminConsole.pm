@@ -155,11 +155,11 @@ sub getAdminFunction {
 		"versions"=>{
 			title=>{
 				id=>"content versioning",
-				namespace=>"Asset"
+				namespace=>"VersionTag"
 			},
 			icon=>"versionTags.gif",
-			func=>"manageVersions",
-			group=>"3"
+			op=>"manageVersions",
+			group=>"12"
 		},
 		"workflow"=>{
 			title=>{

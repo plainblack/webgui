@@ -49,59 +49,10 @@ our $I18N = {
 		context => q|The prompt for purging a revision from the asset tree.|
 	},
 
-	'rollback version tag confirm' => {
-		message => q|Are you certain you wish to delete this version tag and all content created under it? It CANNOT be restored if you delete it.|,
-		lastUpdated => 0,
-		context => q|The prompt for purging a version tag from the asset tree.|
-	},
-
-	'commit version tag confirm' => {
-		message => q|Are you certain you wish to commit this version tag and everything edited under it?|,
-		lastUpdated => 0,
-		context => q|The prompt for committing a version tag to the asset tree.|
-	},
-
-	'enable autocommit of asset versioning' => {
-		message => q|Enable autocommit of asset versioning?|,
-		lastUpdated => 0,
-		context => q|A label for the toggle for asset versioning.|
-	},
-
-	'enable autocommit of asset versioning description' => {
-		message => q|Setting this to "Yes", the default, makes WebGUI's content version system
-do a commit immediately after an edit occurs.|,
-		lastUpdated => 1140546767,
-		context => q|Hover help for the toggle for asset versioning.|
-	},
-
 	'purge' => {
 		message => q|Purge|,
 		lastUpdated => 0,
 		context => q|The label for the purge button in the trash manager.|
-	},
-
-	'set tag' => {
-		message => q|Set As Working Tag|,
-		lastUpdated => 0,
-		context => q|The label for choosing as a tag to work under.|
-	},
-
-	'revisions in tag' => {
-		message => q|Revisions In Tag|,
-		lastUpdated => 0,
-		context => q|The label for displaying the revisions created under a specific tag.|
-	},
-
-	'commit' => {
-		message => q|Commit|,
-		lastUpdated => 0,
-		context => q|The label for committing a tag to the asset tree.|
-	},
-
-	'rollback' => {
-		message => q|Rollback|,
-		lastUpdated => 0,
-		context => q|The label for purging a revision from the asset tree.|
 	},
 
 	'locked' => {
@@ -116,57 +67,22 @@ do a commit immediately after an edit occurs.|,
 		context => q|Context menu item.|
 	},
 
-	'manage versions' => {
-		message => q|Manage versions.|,
-		lastUpdated => 0,
-		context => q|Menu item in version tag manager.|
-	},
-
-	'manage committed versions' => {
-		message => q|Manage committed versions.|,
-		lastUpdated => 0,
-		context => q|Menu item in version tag manager.|
-	},
-
-	'add version tag' => {
-		message => q|Add Version Tag|,
-		lastUpdated => 0,
-		context => q|Admin console label.|
-	},
-
-	'version tag name' => {
-		message => q|Version Tag Name|,
-		lastUpdated => 1129403466,
-		context => q|Admin console label.|
-	},
-
-	'version tag name description' => {
-		message => q|<p>Enter a name to tag the work you will do on this version of the asset.  The tag will be used to reference this work when it is time to commit, rollback or make further edits.</p>|,
-		lastUpdated => 1129403469,
-	},
-
-	'content versioning' => {
-		message => q|Content Versioning|,
-		lastUpdated => 0,
-		context => q|Admin console label.|
-	},
-
-	'committed versions' => {
-		message => q|Committed Versions|,
-		lastUpdated => 0,
-		context => q|Admin console label.|
-	},
-
-	'add a version tag' => {
-		message => q|Add a version tag.|,
-		lastUpdated => 0,
-		context => q|Menu item in version tag manager.|
-	},
-
 	'rank' => {
 		message => q|Rank|,
 		lastUpdated => 0,
 		context => q|Column heading in asset manager.|
+	},
+	
+	'revised by' => {
+		message => q|Revised By|,
+		lastUpdated => 0,
+		context => q|manage revisions in tag|
+	},
+	
+	'revision date' => {
+		message => q|Revision Date|,
+		lastUpdated => 0,
+		context => q|manage revisions in tag|
 	},
 	
 	'type' => {

@@ -77,6 +77,14 @@ Returns a hash reference containing operation and package names.
 
 sub getOperations {
 	return {
+	  'editVersionTag' => 'WebGUI::Operation::VersionTag',
+	  'editVersionTagSave' => 'WebGUI::Operation::VersionTag',
+	  'commitVersionTag' => 'WebGUI::Operation::VersionTag',
+	  'manageCommittedVersions' => 'WebGUI::Operation::VersionTag',
+	  'manageVersions' => 'WebGUI::Operation::VersionTag',
+	  'manageRevisionsInTag' => 'WebGUI::Operation::VersionTag',
+	  'rollbackVersionTag' => 'WebGUI::Operation::VersionTag',
+	  'setVersionTag' => 'WebGUI::Operation::VersionTag',
 	  'addWorkflow' => 'WebGUI::Operation::Workflow',
 	  'deleteWorkflow' => 'WebGUI::Operation::Workflow',
 	  'editWorkflowActivity' => 'WebGUI::Operation::Workflow',

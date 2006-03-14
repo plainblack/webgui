@@ -291,11 +291,6 @@ our $HELP = {
                                 namespace => 'WebGUI',
                         },
                         {
-                                title => 'enable autocommit of asset versioning',
-                                description => 'enable autocommit of asset versioning description',
-                                namespace => 'Asset',
-                        },
-                        {
                                 title => 'Enable Metadata',
                                 description => 'Enable Metadata description',
                                 namespace => 'WebGUI',

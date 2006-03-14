@@ -75,7 +75,9 @@ sub create {
 		creationDate=>$session->datetime->time(),
 		createdBy=>$session->user->userId
 		});
-	return $tagId;
+	my $tag = $class->new($session, $tagId);
+	$tag->set($properties);
+	return $tag;
 } 
 
 
@@ -92,8 +94,8 @@ sub commit {
 	foreach my $asset (@{$self->getAssets}) {
 		$asset->commit;
 	}
-	$self->{_data}{isCommited} = 1;
-	$self->{_data}{commitedBy} = $self->session->user->userId;
+	$self->{_data}{isCommitted} = 1;
+	$self->{_data}{committedBy} = $self->session->user->userId;
 	$self->{_data}{commitDate} = $self->session->datetime->time();
 	$self->session->db->setRow("assetVersionTag", "tagId", $self->{_data});
 	$self->clearWorking;
@@ -177,7 +179,7 @@ sub getWorking {
 			return undef;
 		} else {
 			my $tag = $class->create($session);
-			$tag->setAsWorking;
+			$tag->setWorking;
 			return $tag;	
 		}
 	}
@@ -283,16 +285,21 @@ A human readable name.
 
 =head4 workflowId
 
-The ID of the workflow that will be triggered when this workflow is committed.
+The ID of the workflow that will be triggered when this workflow is committed. Defaults to the default version tag workflow set in the settings.
+
+=head4 groupToUse
+
+The ID of the group that's allowed to use this tag. Defaults to the turn admin on group.
 
 =cut
 
 sub set {
 	my $self = shift;
 	my $properties = shift;
-	$self->{_data}{name} = $properties->{name} || $self->{_data}{name} || "Autotag created ".$self->session->datetime->epochToHuman()." by ".$self->session->user->username;
-	$self->{_data}{workflowId} = $properties->{workflowId} || $self->{_data}{workflowId};
-	$self->session->db->setRow("Workflow","workflowId",$self->{_data});
+	$self->{_data}{name} = $properties->{name} || $self->{_data}{name} || "(Autotag) ".$self->session->datetime->epochToHuman()." / ".$self->session->user->username;
+	$self->{_data}{workflowId} = $properties->{workflowId} || $self->{_data}{workflowId} || $self->session->setting->get("defaultVersionTagWorkflow");
+	$self->{_data}{groupToUse} = $properties->{groupToUse} || $self->{_data}{groupToUse} || "12";
+	$self->session->db->setRow("assetVersionTag","tagId",$self->{_data});
 }
 
 #-------------------------------------------------------------------

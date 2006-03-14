@@ -50,9 +50,9 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, "Workflow_Activity_CommitVersionTag");
+	my $i18n = WebGUI::International->new($session, "VersionTag");
 	push(@{$definition}, {
-		name=>$i18n->get("topicName"),
+		name=>$i18n->get("commit version tag"),
 		properties=> { }
 		});
 	return $class->SUPER::definition($session,$definition);

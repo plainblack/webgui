@@ -73,6 +73,9 @@ sub addWorkflow {
 	my $group = WebGUI::Group->new($session,"new","pbgroup000000000000015");
 	$group->set("groupName", "Workflow Managers");
 	$group->set("description", "People who can create, edit, and delete workflows.");
+	$group = WebGUI::Group->new($session,"new","pbgroup000000000000016");
+	$group->set("groupName", "Version Tag Managers");
+	$group->set("description", "People who can create, edit, and delete special version tags.");
 	$session->config->set("spectreIp","127.0.0.1");
 	$session->config->set("spectrePort",32133);
 	$session->config->set("spectreSubnets",["127.0.0.1/32"]);
@@ -224,6 +227,9 @@ sub addWorkflow {
                 }, "pbcron0000000000000003");
 	$session->db->write("alter table assetVersionTag add column isLocked int not null default 0");
 	$session->db->write("alter table assetVersionTag add column lockedBy varchar(22) binary not null");
+	$session->db->write("alter table assetVersionTag add column groupToUse varchar(22) binary not null");
+	$session->db->write("alter table assetVersionTag add column workflowId varchar(22) binary not null");
+	$session->db->write("update groups set showInForms=1 where groupId='12'");
 	$session->config->delete("SyncProfilesToLDAP_hour");
 	$session->config->delete("fileCacheSizeLimit");
 	$session->config->delete("passiveProfileInterval");
@@ -243,9 +249,11 @@ sub addWorkflow {
 		}, "pbworkflow000000000003");
 	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::CommitVersionTag", "pbwfactivity0000000006");
 	$activity->set("title", "Commit Assets");
+	$session->setting->remove("autoCommit");
 	$session->setting->remove("alertOnNewUser");
 	$session->setting->remove("onNewUserAlertGroup");
 	$session->setting->set("runOnRegistration","");
+	$session->setting->add("defaultVersionTagWorkflow",$workflow->getId);
 }
 
 #-------------------------------------------------
