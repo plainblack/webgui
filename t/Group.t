@@ -18,7 +18,7 @@ use WebGUI::Utility;
 
 use WebGUI::User;
 use WebGUI::Group;
-use Test::More tests => 33; # increment this value for each test you create
+use Test::More tests => 39; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -80,7 +80,11 @@ ok( ($gA->name eq 'Group A' and $gB->name eq 'Group B'), 'object name assignment
 
 $gB->addGroups([$gA->getId]);
 
+$session->errorHandler->warn('A, B recursive groupsIn');
+cmp_bag([$gA->getId, 3], $gB->getGroupsIn(1)  ,'Group A is in Group B, recursively');
+$session->errorHandler->warn('A, B regular groupsIn');
 cmp_bag([$gA->getId, 3], $gB->getGroupsIn()  ,'Group A is in Group B');
+$session->errorHandler->warn('A, B regular groupsFor');
 cmp_bag([$gB->getId], $gA->getGroupsFor() ,'Group B contains Group A');
 cmp_bag([3], $gA->getGroupsIn()  ,'Admin added to group A automatically');
 
@@ -90,9 +94,27 @@ cmp_bag([3], $gA->getGroupsIn()  ,'Not allowed to create recursive group loops')
 $gA->addGroups([1]);
 cmp_bag([3], $gA->getGroupsIn()  ,'Not allowed to add group Visitor to a group');
 
+$gA->addGroups([$gA->getId]);
+cmp_bag([3], $gA->getGroupsIn()  ,'Not allowed to add myself to my group');
+
+my $gC = WebGUI::Group->new($session, "new");
+$gC->name('Group C');
+$gA->addGroups([$gC->getId]);
+
+cmp_bag([$gA->getId], $gC->getGroupsFor() ,'Group A contains Group C');
+cmp_bag([3], $gA->getGroupsIn() ,'Group C is a member of Group A, cached');
+cmp_bag([$gA->getId, 3], $gB->getGroupsIn()  ,'Group A is in Group B, cached result');
+cmp_bag([$gA->getId, 3], $gB->getGroupsIn(1)  ,'Group C is in Group B, recursively, cached result');
+
+use Data::Dumper;
+
+diag("direct: ".Dumper $gB->getGroupsIn());
+diag("recursive: ".Dumper $gB->getGroupsIn(1));
+
 END {
 	(defined $gA and ref $gA eq 'WebGUI::Group') and $gA->delete;
 	(defined $gB and ref $gB eq 'WebGUI::Group') and $gB->delete;
+	(defined $gC and ref $gC eq 'WebGUI::Group') and $gC->delete;
 	(defined $g2 and ref $g2 eq 'WebGUI::Group') and $g2->delete;
 	(defined $g  and ref $g  eq 'WebGUI::Group') and $g->delete;
 }
