@@ -23,6 +23,48 @@ use WebGUI::Commerce::ShoppingCart;
 use WebGUI::Commerce::Item;
 use WebGUI::Utility;
 use Data::Dumper;
+
+#-------------------------------------------------------------------
+sub checkConflicts {
+	my $self = shift;
+	my $eventsInCart = $self->getEventsInCart;
+	my @schedule;
+	
+	# Get schedule info for events in cart and sort asc by start date
+	my $sth = $self->session->db->read("
+		select productId, startDate, endDate from EventManagementSystem_products
+		where productId in (".$self->session->db->quoteAndJoin($eventsInCart).")
+		order by startDate"
+	);
+	
+	
+	# Build our schedule
+	while (my $scheduleData = $sth->hashRef) {
+	
+		# make sure it's a subevent... 
+		my ($isSubEvent) = $self->session->db->quickArray("
+			select count(*) from EventManagementSystem_prerequisites
+			where productId=".$self->session->db->quote($scheduleData->{productId})
+		);
+		next unless ($isSubEvent);
+				
+		push(@schedule, $scheduleData);
+	}
+	
+	# Check the schedule for conflicts
+	for (my $i=0; $i < scalar(@schedule); $i++) {
+		next if ($i == 0);
+		
+		unless ($schedule[$i]->{startDate} > $schedule[$i-1]->{endDate}) { #conflict
+			return [{ 'event1'    => $schedule[$i]->{productId},
+				  'event2'    => $schedule[$i-1]->{productId},
+				  'type'      => 'conflict'
+			       }]; 	
+		}
+	}
+	return [];
+}
+
 #-------------------------------------------------------------------
 
 =head2 checkRequiredFields ( requiredFields )
@@ -171,6 +213,11 @@ sub error {
 		#General Error Message
 		elsif ($error->{type} eq "general") {
 		  push(@errorMessages, $error->{message});
+		}
+		
+		#Scheduling Conflict
+		elsif ($error->{type} eq "conflict") {
+		  push(@errorMessages, $self->resolveConflictForm($error->{event1}, $error->{event2}));
 		}
 		
 		elsif ($error->{type} eq "special") {
@@ -481,6 +528,35 @@ sub getSubEventForm {
 }
 
 #------------------------------------------------------------------
+sub resolveConflictForm {
+	my $self = shift;
+	my $event1 = shift;
+	my $event2 = shift;
+	my $output;
+	
+	my $sth = $self->session->db->read("
+		select productId, title, price, description
+		from products where productId in (".$self->session->db->quote($event1).","
+		.$self->session->db->quote($event2).")"
+	);
+	
+	$output = "<table>";
+	$output .= "<tr><td>You have a scheduling conflict.  Please remove one of the events below from your cart to resolve the problem.</td></tr>";
+	while (my $data = $sth->hashRef) {
+		$output .= "<tr><td>";
+		$output .= $self->session->icon->delete('op=deleteCartItem;itemType=Event;itemId='.$data->{productId}, $self->getUrl);
+		$output .= "</td><td>";
+		$output .= $data->{title}."&nbsp;".$data->{description}."&nbsp;".$data->{price};
+		$output .= "</td></tr>"; 
+	}
+	
+	$output .= "</table>";
+	$output .= "<a href=''>Click here to continue</a>";
+	
+	return $output;
+}
+
+#------------------------------------------------------------------
 
 =head2 validateEditEventForm ( )
 
@@ -537,28 +613,37 @@ Method that will add an event to the users shopping cart.
 =cut
 
 sub www_addToCart {
-	my ($self, @pids, $output);
+	my ($self, @pids, $output, $errors, $conflicts, $errorMessages);
 	$self = shift;
+	$conflicts = shift;
+	
+	# Check if conflicts were found that the user needs to fix
+	foreach (@$conflicts) { $output .= $_; }
 
-	if ($self->session->form->get("method") eq "addSubEvents") { # List of ids from subevent form
-		@pids = $self->session->form->process("subEventPID", "checkList");
-		#Hack until the form->process method returns elements like it should
-		@pids = split("\n", $pids[0]);
+	unless ($output) { #Skip this if we have errors
+
+		if ($self->session->form->get("method") eq "addSubEvents") { # List of ids from subevent form
+			@pids = $self->session->form->process("subEventPID", "checkList");
+			#Hack until the form->process method returns elements like it should
+			#@pids = split("\n", $pids[0]);
+		}
+		else {  # A single id, i.e., a master event
+			push(@pids, $self->session->form->get("pid"));
+		}
+
+		my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
+		foreach my $eventId (@pids) {
+			$shoppingCart->add($eventId, 'Event');
+		}
+
+		$output = $self->getSubEventForm(\@pids);
+	
+		$errors = $self->checkConflicts;
+		if (scalar(@$errors) > 0) { return $self->error($errors, "www_addToCart"); }
+		
+		#
+		#	 Also need to make all of this output use a template	
 	}
-	else {  # A single id, i.e., a master event
-		push(@pids, $self->session->form->get("pid"));
-	}
-
-	my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
-	foreach my $eventId (@pids) {
-		$shoppingCart->add($eventId, 'Event');
-	}
-
-	$output = $self->getSubEventForm(\@pids);
-
-	#
-	#	 Also need to make all of this output use a template	
-
 	#return $self->session->style->process($self->processTemplate($f->print,$self->getValue("gradebookTemplateId")),$self->getValue("styleTemplateId"));
 	return $self->session->style->process($output,$self->getValue("styleTemplateId"));
 } 
@@ -830,7 +915,7 @@ sub www_editEventSave {
 	my $pid = $self->session->form->get("pid");
         my $eventIsNew = 1 if ($pid eq "" || $pid eq "new");
         my $event;
-        
+
 	#Save the extended product data
 	$pid = $self->setCollateral("EventManagementSystem_products", "productId",
 			    {
@@ -841,17 +926,17 @@ sub www_editEventSave {
 			     approved	=> $self->session->form->get("approved")
 			    },1,1
 			   );
-			   
+
 	#Save the standard product data
 	$event = {
 		productId	=> $pid,
-		title		=> $self->session->form->get("title"),
-		description	=> $self->session->form->get("description"),
-		price		=> $self->session->form->get("price"),
+		title		=> $self->session->form->get("title", "text"),
+		description	=> $self->session->form->get("description", "HTMLArea"),
+		price		=> $self->session->form->get("price", "float"),
 		weight		=> $self->session->form->get("weight"),
 		sku		=> $self->session->form->get("sku"),
-		skuTemplate	=> $self->session->form->get("skuTemplate"),
-		templateId	=> $self->session->form->get("templateId")
+		skuTemplate	=> "",
+		templateId	=> $self->session->form->get("templateId", "template"),
 	};
 
 	if ($eventIsNew) { # Event is new we need to use the same productId so we can join them later
