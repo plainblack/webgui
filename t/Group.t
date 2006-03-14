@@ -80,11 +80,8 @@ ok( ($gA->name eq 'Group A' and $gB->name eq 'Group B'), 'object name assignment
 
 $gB->addGroups([$gA->getId]);
 
-$session->errorHandler->warn('A, B recursive groupsIn');
 cmp_bag([$gA->getId, 3], $gB->getGroupsIn(1)  ,'Group A is in Group B, recursively');
-$session->errorHandler->warn('A, B regular groupsIn');
 cmp_bag([$gA->getId, 3], $gB->getGroupsIn()  ,'Group A is in Group B');
-$session->errorHandler->warn('A, B regular groupsFor');
 cmp_bag([$gB->getId], $gA->getGroupsFor() ,'Group B contains Group A');
 cmp_bag([3], $gA->getGroupsIn()  ,'Admin added to group A automatically');
 
@@ -105,11 +102,6 @@ cmp_bag([$gA->getId], $gC->getGroupsFor() ,'Group A contains Group C');
 cmp_bag([3], $gA->getGroupsIn() ,'Group C is a member of Group A, cached');
 cmp_bag([$gA->getId, 3], $gB->getGroupsIn()  ,'Group A is in Group B, cached result');
 cmp_bag([$gA->getId, 3], $gB->getGroupsIn(1)  ,'Group C is in Group B, recursively, cached result');
-
-use Data::Dumper;
-
-diag("direct: ".Dumper $gB->getGroupsIn());
-diag("recursive: ".Dumper $gB->getGroupsIn(1));
 
 END {
 	(defined $gA and ref $gA eq 'WebGUI::Group') and $gA->delete;

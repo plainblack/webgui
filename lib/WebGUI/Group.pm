@@ -494,7 +494,6 @@ not ever manually set this.
 
 =cut
 
-
 sub getGroupsIn {
 	my $self = shift;
         my $isRecursive = shift;
@@ -516,6 +515,8 @@ sub getGroupsIn {
                         my $gog = WebGUI::Group->new($self->session,$group)->getGroupsIn(1,$loopCount);
                         push(@groupsOfGroups, @$gog);
                 }
+		my %unique = map { $_ => 1 } @groupsOfGroups;
+		@groupsOfGroups = keys %unique;
 		$gotGroupsInGroup->{recursive}{$self->getId} = \@groupsOfGroups;
                 return \@groupsOfGroups;
 	}
