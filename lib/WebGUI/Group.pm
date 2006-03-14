@@ -116,11 +116,13 @@ sub addGroups {
 	foreach my $gid (@{$groups}) {
 		next if ($gid eq '1');
 		my ($isIn) = $self->session->db->quickArray("select count(*) from groupGroupings where groupId=? and inGroup=?", [$gid, $self->getId]);
-		my $recursive = isIn($self->getId, @{$self->getGroupsIn($gid,1)});
+		my $group = WebGUI::Group->new($self->session, $gid);
+		my $recursive = isIn($self->getId, @{$group->getGroupsIn(1)});
 		unless ($isIn || $recursive) {
 			$self->session->db->write("insert into groupGroupings (groupId,inGroup) values (?,?)",[$gid, $self->getId]);
 		}
 	}
+	return 1;
 }
 
 
@@ -464,7 +466,8 @@ sub get {
 
 =head2 getGroupsFor ( )
 
-Returns an array reference containing a list of groups this group is in.
+Returns an array reference containing a list of groups this group is in.  This method
+does not check recursively backwards up the list of groups.
 
 =cut
 
@@ -486,8 +489,8 @@ A boolean value to determine whether the method should return the groups directl
 
 =head3 loopCount
 
-If recursive is set, how many times this subroutine should recurse before it
-determines that it is in an infinite loop.  The loop in incremented by 1.
+This is the loop counter for recursive group checks.  You probably should
+not ever manually set this.
 
 =cut
 
@@ -497,12 +500,12 @@ sub getGroupsIn {
         my $isRecursive = shift;
         my $loopCount = shift;
 	my $gotGroupsInGroup = $self->session->stow->get("gotGroupsInGroup");
-	if ($isRecursive && exists $gotGroupsInGroup->{recursive}{$self->getId}) {
+	if ($isRecursive && exists($gotGroupsInGroup->{recursive}{$self->getId})) {
 		return $gotGroupsInGroup->{recursive}{$self->getId};
 	} elsif (exists $gotGroupsInGroup->{direct}{$self->getId}) {
 		return $gotGroupsInGroup->{direct}{$self->getId};
 	}
-        my $groups = $self->session->db->buildArrayRef("select groupId from groupGroupings where inGroup=".$self->session->db->quote($self->getId));
+        my $groups = $self->session->db->buildArrayRef("select groupId from groupGroupings where inGroup=?",[$self->getId]);
         if ($isRecursive) {
                 $loopCount++;
                 if ($loopCount > 99) {
