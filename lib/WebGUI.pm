@@ -150,13 +150,11 @@ sub page {
 	my $session = shift;
 	my $assetUrl = shift;
 	my $output = processOperations($session);
-$session->errorHandler->warn("a");
 	if ($output eq "") {
 		my $asset = eval{WebGUI::Asset->newByUrl($session,$assetUrl,$session->form->process("revision"))};
 		if ($@) {
 			$session->errorHandler->warn("Couldn't instantiate asset for url: ".$session->url->getRequestedUrl." Root cause: ".$@);
 		}
-$session->errorHandler->warn("d");
 		if (defined $asset) {
 			my $method = "view";
 			if ($session->form->process("func")) {
@@ -166,13 +164,10 @@ $session->errorHandler->warn("d");
 					$method = "view";
 				}
 			}
-$session->errorHandler->warn("e");
 			$output = tryAssetMethod($session,$asset,$method);
-$session->errorHandler->warn("f");
 			$output = tryAssetMethod($session,$asset,"view") unless ($output || ($method eq "view"));
 		}
 	}
-$session->errorHandler->warn("b");
 	if (defined($output) and $output eq "") {
 		$session->http->setStatus("404","Page Not Found");
 		my $notFound = WebGUI::Asset->getNotFound($session);
@@ -184,7 +179,6 @@ $session->errorHandler->warn("b");
 		}
 		$output = "An error was encountered while processing your request." if $output eq '';
 	}
-$session->errorHandler->warn("c");
 	if ($session->errorHandler->canShowDebug()) {
 		$output .= $session->errorHandler->showDebug();
 	}

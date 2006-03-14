@@ -215,7 +215,7 @@ sub prepareView {
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
-	if ($self->{_viewVars}{showAdmin}) {	
+	if ($self->{_viewVars}{showAdmin} && (($self->canEditIfLocked && $self->session->scratch->get("versionTag") eq $self->get("tagId")) || !$self->isLocked)) {
 		# under normal circumstances we don't put HTML stuff in our code, but this will make it much easier
 		# for end users to work with our templates
 		$self->{_viewVars}{"dragger.icon"} = $self->session->icon->drag();

@@ -243,8 +243,11 @@ sub www_manageRevisions {
 		left join assetVersionTag on assetData.tagId=assetVersionTag.tagId left join users on assetData.revisedBy=users.userId
 		where assetData.assetId=".$self->session->db->quote($self->getId));
         while (my ($date,$by,$tag,$tagId) = $sth->array) {
-                $output .= '<tr><td>'.$self->session->icon->delete("func=purgeRevision;revisionDate=".$date,$self->get("url"),$i18n->get("purge revision prompt")).'</td>
-			<td><a href="'.$self->getUrl("func=viewRevision;revisionDate=".$date).'">'.$self->session->datetime->epochToHuman($date).'</a></td>
+                $output .= '<tr><td>'
+			.$self->session->icon->delete("func=purgeRevision;revisionDate=".$date,$self->get("url"),$i18n->get("purge revision prompt"))
+			.$self->session->icon->view("func=viewRevision;revisionDate=".$date)
+			.'</td>
+			<td>'.$self->session->datetime->epochToHuman($date).'</td>
 			<td>'.$by.'</td>
 			<td><a href="'.$self->getUrl("op=manageRevisionsInTag;tagId=".$tagId).'">'.$tag.'</a></td>
 			</tr>';
