@@ -80,10 +80,11 @@ sub canAdd {
 	my $className = shift;
 	my $session = shift;
 	my $userId = shift || $session->user->userId;
+	my $user = WebGUI::User->new($self->session, $userId);
 	my $subclassGroupId = shift;
 	my $addPrivs = $session->config->get("assetAddPrivilege");
 	my $groupId = $addPrivs->{$className} || $subclassGroupId || '12';
-        return $session->user->isInGroup($groupId,$userId);
+        return $user->isInGroup($groupId);
 }
 
 
@@ -102,10 +103,11 @@ Unique hash identifier for a user. If not supplied, current user.
 sub canEdit {
 	my $self = shift;
 	my $userId = shift || $self->session->user->userId;
+	my $user = WebGUI::User->new($self->session, $userId);
  	if ($userId eq $self->get("ownerUserId")) {
                 return 1;
 	}
-        return $self->session->user->isInGroup($self->get("groupIdEdit"),$userId);
+        return $user->isInGroup($self->get("groupIdEdit"));
 }
 
 

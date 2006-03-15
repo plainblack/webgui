@@ -312,7 +312,7 @@ sub view {
         $var{question} = $self->get("question");
 	if ($self->get("active") eq "0") {
 		$showPoll = 0;
-	} elsif ($self->session->user->isInGroup($self->get("voteGroup"),$self->session->user->userId)) {
+	} elsif ($self->session->user->isInGroup($self->get("voteGroup"))) {
 		if ($self->_hasVoted()) {
 			$showPoll = 0;
 		} else {

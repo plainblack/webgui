@@ -54,8 +54,8 @@ Templated display all messages for the current user.
 
 sub www_viewMessageLog {
 	my $session = shift;
-   my (@msg, $vars);
-   return $session->privilege->insufficient() unless ($session->user->isInGroup(2,$session->user->userId));
+	my (@msg, $vars);
+	return $session->privilege->insufficient() unless ($session->user->isInGroup(2));
 	my $i18n = WebGUI::International->new($session);
    $vars->{displayTitle} = '<h1>'.$i18n->get(159).'</h1>';
    my $p = WebGUI::Paginator->new($session,$session->url->page('op=viewMessageLog'));
@@ -100,8 +100,8 @@ Templated display of a single message for the user.
 
 sub www_viewMessageLogMessage {
 	my $session = shift;
-   my ($data, $vars);
-   return $session->privilege->insufficient() unless ($session->user->isInGroup(2,$session->user->userId));
+	my ($data, $vars);
+	return $session->privilege->insufficient() unless ($session->user->isInGroup(2));
 	my $i18n = WebGUI::International->new($session);
    $vars->{displayTitle} = '<h1>'.$i18n->get(159).'</h1>';
    
