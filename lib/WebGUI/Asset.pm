@@ -196,7 +196,7 @@ sub definition {
 				status=>{
 					noFormPost=>1,
 					fieldType=>'hidden',
-					defaultValue=>'approved'
+					defaultValue=>'pending'
 					},
 				assetSize=>{
 					noFormPost=>1,

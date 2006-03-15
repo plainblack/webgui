@@ -69,8 +69,9 @@ sub addRevision {
         my $newVersion = WebGUI::Asset->new($self->session,$self->getId, $self->get("className"), $now);
         $newVersion->updateHistory("created revision");
 	$newVersion->update($self->get);
-	$newVersion->setVersionLock;
-        $newVersion->update($properties) if (defined $properties);
+	$newVersion->{isLockedBy} = $self->session->user->userId;
+	$properties->{status} = 'pending';
+        $newVersion->update($properties);
         return $newVersion;
 }
 

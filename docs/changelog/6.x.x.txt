@@ -65,6 +65,7 @@
  - fix [ 1429389 ] 6.9: "1" appended to HTML
 
 6.8.8
+ - fix [ 1423434 ] 6.8.5 - Versioning - users can see uncommitted data
  - fix [ 1437186 ] 6.8.7 deploy DataForm package does not copy fields
  - fix [ 1437563 ] Data picker intermittent for Admin
  - fix broken link to top of CS Assets configured as FAQs
