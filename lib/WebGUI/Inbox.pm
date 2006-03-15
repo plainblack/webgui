@@ -37,13 +37,19 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 addMessage ( )
+=head2 addMessage ( properties )
+
+Adds a new message to the inbox.
+
+=head3 properties
+
+See WebGUI::Inbox::Message::create() for details.
 
 =cut 
 
 sub addMessage {
 	my $self = shift;
-	return WebGUI::Inbox::Message->create($self);
+	return WebGUI::Inbox::Message->create($self->session, @_);
 }
 
 #-------------------------------------------------------------------

@@ -62,7 +62,7 @@ sub appendPostListTemplateVars {
 			}
 		}
 		my $url;
-		if ($post->get("status") eq "pending" || $post->get("status") eq "denied") {
+		if ($post->get("status") eq "pending") {
 			$url = $post->getUrl("revision=".$post->get("revisionDate"))."#".$post->getId;
 		} else {
 			$url = $post->getUrl."#".$post->getId;
@@ -118,7 +118,6 @@ sub appendTemplateLabels {
 	$var->{"date.label"} = $i18n->get("date");
 	$var->{"delete.label"} = $i18n->get("delete");
         $var->{'description.label'} = $i18n->get("description");
-	$var->{"deny.label"} = $i18n->get("deny");
 	$var->{"edit.label"} = $i18n->get("edit");
         $var->{'exactphrase.label'} = $i18n->get("exactPhrase");
 	$var->{'image.label'} = $i18n->get("image");

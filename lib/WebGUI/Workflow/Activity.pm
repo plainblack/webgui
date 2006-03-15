@@ -151,19 +151,25 @@ sub DESTROY {
 
 #-------------------------------------------------------------------
 
-=head2 execute ( object )
+=head2 execute ( object, instance )
 
-This method will be called during workflow operation. It needs to be overridden by the base classes.
+This method will be called during workflow operation. It needs to be mutated by the sub classes.
 
 =head2 object
 
 A reference to some object that will be passed in to this activity for an action to be taken on it.
+
+=head2 instance
+
+A reference to the workflow instance object. 
 
 =cut
 
 sub execute {
 	my $self = shift;
 	my $object = shift;
+	my $instance = shift;
+	return 1;
 }
 
 

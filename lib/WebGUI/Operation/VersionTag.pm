@@ -280,7 +280,44 @@ sub www_manageRevisionsInTag {
 	$ac->addSubmenuItem($session->url->page('op=editVersionTag'), $i18n->get("add a version tag"));
 	$ac->addSubmenuItem($session->url->page('op=manageCommittedVersions'), $i18n->get("manage committed versions")) if ($session->user->isInGroup(3));
         $ac->addSubmenuItem($session->url->page('op=manageVersions'), $i18n->get("manage versions"));
-        my $output = '<table width=100% class="content">
+        my $output = "";
+	if ($session->form->param("workflowInstanceId")) {
+		my $instance = WebGUI::Workflow::Instance->new($session, $session->form->param("workflowInstanceId"));
+		if (defined $instance) {
+			my $form = WebGUI::HTMLForm->new($session);
+			$form->hidden(
+				name=>"tagId",
+				value=>$tagId
+				);
+			$form->hidden(
+				name=>"op",
+				value=>"approveVersionTag"
+				);
+			$form->selectBox(
+				name=>"status",
+				defaultValue=>"approve",
+				label=>$i18n->get("approve/deny"),
+				hoverHelp=>$i18n->get("approve/deny help"),
+				options=>{
+					approve=>$i18n->get("approve"),
+					deny=>$i18n->get("deny")
+					},
+				);
+			$form->textarea(
+				name=>"comments",
+				label=>$i18n->get("comments"),
+				hoverHelp=>$i18n->get("comments help")
+				);
+			$form->submit;
+			$output .= $form->print;
+		}
+	}
+	if ($tag->get("comments")) {
+		my $comments = $tag->get("comments");
+		$comments =~ s/\n/<br \/>/g;
+		$output .= '<p>'.$comments.'</p>';
+	}
+	$output .= '<table width=100% class="content">
         <tr><th></th><th>'.$i18n->get(99,"Asset").'</th><th>'.$i18n->get("type","Asset").'</th><th>'.$i18n->get("revision date","Asset").'</th><th>'.$i18n->get("revised by","Asset").'</th></tr> ';
 	my $p = WebGUI::Paginator->new($session,$session->url->page("op=manageRevisionsInTag;tagId=".$tag->getId));
 	$p->setDataByQuery("select assetData.revisionDate, users.username, asset.assetId, asset.className from assetData 

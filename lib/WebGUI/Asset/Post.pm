@@ -79,7 +79,7 @@ sub canView {
         my $self = shift;
         if (($self->get("status") eq "approved" || $self->get("status") eq "archived") && $self->getThread->getParent->canView) {
                 return 1;
-        } elsif ($self->get("status") eq "denied" && $self->canEdit) {
+        } elsif ($self->canEdit) {
                 return 1;
         } else {
                 $self->getThread->getParent->canEdit;
@@ -272,19 +272,6 @@ sub getDeleteUrl {
 
 #-------------------------------------------------------------------
 
-=head2 getDenyUrl (  )
-
-Formats the url to deny a post.
-
-=cut
-
-sub getDenyUrl {
-	my $self = shift;
-	return $self->getUrl("revision=".$self->get("revisionDate").";func=deny;mlog=".$self->session->form->process("mlog"));
-}
-
-#-------------------------------------------------------------------
-
 =head2 getEditUrl ( )
 
 Formats the url to edit a post.
@@ -369,8 +356,6 @@ sub getStatus {
 	my $i18n = WebGUI::International->new($self->session,"Asset_Post");
         if ($status eq "approved") {
                 return $i18n->get('approved');
-        } elsif ($status eq "denied") {
-                return $i18n->get('denied');
         } elsif ($status eq "pending") {
                 return $i18n->get('pending');
         } elsif ($status eq "archived") {
@@ -423,7 +408,6 @@ sub getTemplateVars {
 	$var{"edit.url"} = $self->getEditUrl;
 	$var{"status"} = $self->getStatus;
 	$var{"approve.url"} = $self->getApproveUrl;
-	$var{"deny.url"} = $self->getDenyUrl;
 	$var{"reply.url"} = $self->getReplyUrl;
 	$var{'reply.withquote.url'} = $self->getReplyUrl(1);
 	$var{'url'} = $self->getUrl.'#id'.$self->getId;
@@ -841,20 +825,6 @@ sub setStatusArchived {
 
 #-------------------------------------------------------------------
 
-=head2 setStatusDenied ( )
-
-Sets the status of this post to denied.
-
-=cut
-
-sub setStatusDenied {
-        my ($self) = @_;
-        $self->update({status=>'denied'});
-        WebGUI::MessageLog::addInternationalizedEntry($self->get("ownerUserId"),'',$self->session->url->getSiteURL().'/'.$self->getUrl,580);
-}
-
-#-------------------------------------------------------------------
-
 =head2 setStatusPending ( )
 
 Sets the status of this post to pending.
@@ -976,20 +946,6 @@ sub www_deleteFile {
 	return $self->www_edit;
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 www_deny ( )
-
-The web method to deny a post.
-
-=cut
-
-sub www_deny {
-	my $self = shift;
-	$self->setStatusDenied if $self->getThread->getParent->canModerate;
-	return $self->www_view;
-}
 
 #-------------------------------------------------------------------
 sub www_edit {

@@ -81,9 +81,29 @@ Removes this instance.
 
 sub delete {
 	my $self = shift;
+	$self->session->db->write("delete from WorkflowInstanceScratch where instanceId=?",[$self->getId]);
 	$self->session->db->deleteRow("WorkflowInstance","instanceId",$self->getId);
 	WebGUI::Workflow::Spectre->new($self->session)->notify("workflow/deleteJob",$self->getId);
 	undef $self;
+}
+
+#-------------------------------------------------------------------
+
+=head2 deleteScratch ( name ) 
+
+Removes a scratch variable that's assigned to this instance.
+
+=head3 name 
+
+The name of the variable to remove.
+
+=cut
+
+sub deleteScratch {
+	my $self = shift;
+	my $name = shift;
+	delete $self->{_scratch}{$name};
+	$self->session->db->write("delete from WorkflowInstanceScratch where instanceId=?", [$self->getId]);
 }
 
 #-------------------------------------------------------------------
@@ -112,6 +132,23 @@ sub get {
 	my $self = shift;
 	my $name = shift;
 	return $self->{_data}{$name};
+}
+
+#-------------------------------------------------------------------
+
+=head2 getScratch ( name ) 
+
+Returns the value for a given scratch variable. 
+
+=cut
+
+sub get {
+	my $self = shift;
+	my $name = shift;
+	unless (exists $self->{_scratch}) {
+		$self->{_scratch} = $self->session->db->buildHashRef("select name,value from WorkflowInstanceScratch where instanceId=?", [ $self->getId ]);
+	}
+	return $self->{_scratch}{$name};
 }
 
 #-------------------------------------------------------------------
@@ -188,7 +225,7 @@ sub run {
 			return "error";
 		}
 	}
-	$activity->execute($object);	
+	$activity->execute($object, $self);	
 }
 
 
@@ -255,6 +292,30 @@ sub set {
 	my $spectre = WebGUI::Workflow::Spectre->new($self->session);
 	$spectre->notify("workflow/deleteJob",$self->getId);
 	$spectre->notify("workflow/addJob",$self->session->config->getFilename, $self->{_data});
+}
+
+#-------------------------------------------------------------------
+
+=head2 setScratch (name, value)
+
+Attaches a scratch variable to this workflow instance.
+
+=head3 name
+
+A scalar representing the name of the variable.
+
+=head3 value
+
+A scalar value to assign to the variable.
+
+=cut
+
+sub setScratch {
+	my $self = shift;
+	my $name = shift;
+	my $value = shift;
+	delete $self->{_scratch};
+	$self->session->write("replace into WorkflowInstanceScratch (instanceId, name, value) values (?,?,?)", [$self->getId, $name, $value]);
 }
 
 

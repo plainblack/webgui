@@ -70,22 +70,13 @@ sub addIndexes {
 #-------------------------------------------------
 sub addWorkflow {
 	print "\tAdding workflow.\n";
+	print "\t\tMaking database changes.\n";
 	$session->db->write("alter table assetData drop column startDate");
 	$session->db->write("alter table assetData drop column endDate");
 	$session->db->write("alter table assetVersionTag add column isLocked int not null default 0");
 	$session->db->write("alter table assetVersionTag add column lockedBy varchar(22) binary not null");
 	$session->db->write("alter table assetVersionTag add column groupToUse varchar(22) binary not null");
 	$session->db->write("alter table assetVersionTag add column workflowId varchar(22) binary not null");
-	my $group = WebGUI::Group->new($session,"new","pbgroup000000000000015");
-	$group->set("groupName", "Workflow Managers");
-	$group->set("description", "People who can create, edit, and delete workflows.");
-	$group = WebGUI::Group->new($session,"new","pbgroup000000000000016");
-	$group->set("groupName", "Version Tag Managers");
-	$group->set("description", "People who can create, edit, and delete special version tags.");
-	$session->config->set("spectreIp","127.0.0.1");
-	$session->config->set("spectrePort",32133);
-	$session->config->set("spectreSubnets",["127.0.0.1/32"]);
-	$session->config->set("spectreCryptoKey","123qwe");
 	$session->db->write("create table WorkflowSchedule (
 		taskId varchar(22) binary not null primary key,
 		title varchar(255) not null default 'Untitled',
@@ -135,6 +126,28 @@ sub addWorkflow {
 		value text,
 		primary key (activityId, name)
 		)");
+	print "\t\tPurging old workflow info.\n";
+	my $rs = $session->db->read("select assetId from assetData where status='denied'");
+	while (my ($id) = $rs->array) {
+		my $asset = WebGUI::Asset->newByDynamicClass($session, $id);
+		if ($asset->get("status") eq "denied") {
+			$asset->trash;
+		}
+	}
+	$session->db->write("update assetData set status='approved' where status='denied'");
+	print "\t\tUpdating groups.\n";
+	$session->db->write("update groups set showInForms=1 where groupId='12'");
+	my $group = WebGUI::Group->new($session,"new","pbgroup000000000000015");
+	$group->set("groupName", "Workflow Managers");
+	$group->set("description", "People who can create, edit, and delete workflows.");
+	$group = WebGUI::Group->new($session,"new","pbgroup000000000000016");
+	$group->set("groupName", "Version Tag Managers");
+	$group->set("description", "People who can create, edit, and delete special version tags.");
+	print "\t\tUpdating the config file.\n";
+	$session->config->set("spectreIp","127.0.0.1");
+	$session->config->set("spectrePort",32133);
+	$session->config->set("spectreSubnets",["127.0.0.1/32"]);
+	$session->config->set("spectreCryptoKey","123qwe");
 	$session->config->set("workflowActivities", {
 		None=>["WebGUI::Workflow::Activity::DecayKarma", "WebGUI::Workflow::Activity::TrashClipboard", "WebGUI::Workflow::Activity::CleanTempStorage", 
 			"WebGUI::Workflow::Activity::CleanFileCache", "WebGUI::Workflow::Activity::CleanLoginHistory", "WebGUI::Workflow::Activity::ArchiveOldThreads",
@@ -145,8 +158,21 @@ sub addWorkflow {
 			"WebGUI::Workflow::Activity::SyncProfilesToLdap", "WebGUI::Workflow::Activity::SummarizePassiveProfileLog"],
 		"WebGUI::User"=>["WebGUI::Workflow::Activity::CreateCronJob", "WebGUI::Workflow::Activity::NotifyAboutUser"],
 		"WebGUI::VersionTag"=>["WebGUI::Workflow::Activity::CommitVersionTag", "WebGUI::Workflow::Activity::RollbackVersionTag", 
-			"WebGUI::Workflow::Activity::TrashVersionTag", "WebGUI::Workflow::Activity::CreateCronJob"]
+			"WebGUI::Workflow::Activity::TrashVersionTag", "WebGUI::Workflow::Activity::CreateCronJob", "WebGUI::Workflow::Activity::UnlockVersionTag",
+			"WebGUI::Workflow::Activity::RequestApprovalForVersionTag", "WebGUI::Workflow::Activity::NotifyAboutVersionTag"]
 		});
+	$session->config->delete("SyncProfilesToLDAP_hour");
+	$session->config->delete("fileCacheSizeLimit");
+	$session->config->delete("passiveProfileInterval");
+	$session->config->delete("CleanLoginHistory_ageToDelete");
+	$session->config->delete("DecayKarma_minimumKarma");
+	$session->config->delete("DecayKarma_decayFactor");
+	$session->config->delete("DeleteExpiredClipboard_offset");
+	$session->config->delete("DeleteExpiredEvents_offset");
+	$session->config->delete("TrashExpiredContent_offset");
+	$session->config->delete("DeleteExpiredTrash_offset");
+	$session->config->delete("DeleteExpiredRevisions_offset");
+	print "\t\tAdding default workflows and cron jobs.\n";
 	my $workflow = WebGUI::Workflow->create($session, {
 		title=>"Daily Maintenance Tasks",
 		description=>"This workflow runs daily maintenance tasks such as cleaning up old temporary files and cache.",
@@ -229,18 +255,6 @@ sub addWorkflow {
                 priority=>3,
                 workflowId=>$workflow->getId
                 }, "pbcron0000000000000003");
-	$session->db->write("update groups set showInForms=1 where groupId='12'");
-	$session->config->delete("SyncProfilesToLDAP_hour");
-	$session->config->delete("fileCacheSizeLimit");
-	$session->config->delete("passiveProfileInterval");
-	$session->config->delete("CleanLoginHistory_ageToDelete");
-	$session->config->delete("DecayKarma_minimumKarma");
-	$session->config->delete("DecayKarma_decayFactor");
-	$session->config->delete("DeleteExpiredClipboard_offset");
-	$session->config->delete("DeleteExpiredEvents_offset");
-	$session->config->delete("TrashExpiredContent_offset");
-	$session->config->delete("DeleteExpiredTrash_offset");
-	$session->config->delete("DeleteExpiredRevisions_offset");
 	$workflow = WebGUI::Workflow->create($session, {
 		title=>"Commit Without Approval",
 		description=>"This workflow commits all the assets in this version tag without asking for any approval.",
@@ -248,7 +262,39 @@ sub addWorkflow {
 		type=>"WebGUI::VersionTag"
 		}, "pbworkflow000000000003");
 	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::CommitVersionTag", "pbwfactivity0000000006");
+	$workflow = WebGUI::Workflow->create($session, {
+		title=>"Commit With Approval",
+		description=>"This workflow commits all the assets in this version tag after getting approval from content managers.",
+		enabled=>1,
+		type=>"WebGUI::VersionTag"
+		}, "pbworkflow000000000005");
+	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::RequestApprovalForVersionTag", "pbwfactivity0000000017");
+	$activity->set("title", "Get Approval from Content Managers");
+	$activity->set("groupToApprove", "4");
+	$activity->set("approvalSubject", "Approval Pending");
+	$activity->set("approvalMessage", "A new version tag waits your approval.");
+	$activity->set("doOnDeny", "pbworkflow000000000006");
+	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::CommitVersionTag", "pbwfactivity0000000016");
 	$activity->set("title", "Commit Assets");
+	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::NotifyAboutVersionTag", "pbwfactivity0000000018");
+	$activity->set("title", "Notify Committer of Approval");
+	$activity->set("subject", "Content Approved");
+	$activity->set("message", "Your version tag was approved.");
+	$activity->set("who", "committer");
+	$workflow = WebGUI::Workflow->create($session, {
+		title=>"Unlock Version Tag and Notify Owner",
+		description=>"This workflow is used when a version tag approval is denied. It unlocks the version tag, making it available for editing, and notifies the tag owner.",
+		enabled=>1,
+		type=>"WebGUI::VersionTag"
+		}, "pbworkflow000000000006");
+	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::UnlockVersionTag", "pbwfactivity0000000019");
+	$activity->set("title", "Unlock Version Tag");
+	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::NotifyAboutVersionTag", "pbwfactivity0000000020");
+	$activity->set("title", "Notify Committer of Denial");
+	$activity->set("subject", "Content Denied");
+	$activity->set("message", "Your version tag was denied. Please take corrective actions and recommit your changes.");
+	$activity->set("who", "committer");
+	print "\t\tUpdating settings.\n";
 	$session->setting->remove("autoCommit");
 	$session->setting->remove("alertOnNewUser");
 	$session->setting->remove("onNewUserAlertGroup");

@@ -117,7 +117,7 @@ Returns the number of revisions available for this asset.
 
 =head3 status
 
-Optionally specify to get the count based upon the status of the revisions. Options are "approved", "archived", "pending", "denied". Defaults to any status.
+Optionally specify to get the count based upon the status of the revisions. Options are "approved", "archived", or "pending". Defaults to any status.
 
 =cut
 

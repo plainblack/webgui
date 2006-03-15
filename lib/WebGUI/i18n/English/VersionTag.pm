@@ -1,6 +1,156 @@
 package WebGUI::i18n::English::VersionTag;
 
 our $I18N = {
+	'comments' => {
+		message => q|Comments|,
+		lastUpdated => 0,
+		context => q|label on the manage revisions in tag page during the approval process|
+	},
+
+	'comments help' => {
+		message => q|Attach any comments or feedback to this tag that you wish. They will be available to anyone looking at this tag throughout the publish and approval process, as well as in the future as reference.|,
+		lastUpdated => 0,
+		context => q|hover help for the comments field|
+	},
+
+	'deny' => {
+		message => q|Deny|,
+		lastUpdated => 0,
+		context => q|label on the manage revisions in tag page during the approval process|
+	},
+
+	'approve' => {
+		message => q|Approve|,
+		lastUpdated => 0,
+		context => q|label on the manage revisions in tag page during the approval process|
+	},
+
+	'approve/deny' => {
+		message => q|Approve/Deny|,
+		lastUpdated => 0,
+		context => q|label on the manage revisions in tag page during the approval process|
+	},
+
+	'approve/deny help' => {
+		message => q|Do you wish to approve or deny this tag?|,
+		lastUpdated => 0,
+		context => q|hover help for the approve/deny field|
+	},
+
+	'tag committer' => {
+		message => q|Tag Committer|,
+		lastUpdated => 0,
+		context => q|label in the notify about version tag activity|
+	},
+
+	'tag creator' => {
+		message => q|Tag Creator|,
+		lastUpdated => 0,
+		context => q|label in the notify about version tag activity|
+	},
+
+	'who to notify' => {
+		message => q|Notify whom?|,
+		lastUpdated => 0,
+		context => q|label in the notify about version tag activity|
+	},
+
+	'who to notify help' => {
+		message => q|Notify the person that created the tag, the person that committed the tag, or the people who were allowed to work on the tag.|,
+		lastUpdated => 0,
+		context => q|hover help for the who to notify field|
+	},
+
+	'notify message' => {
+		message => q|Notification Message|,
+		lastUpdated => 0,
+		context => q|label in the notify about version tag activity|
+	},
+
+	'notify message help' => {
+		message => q|Type a message that will be sent along with the tag data.|,
+		lastUpdated => 0,
+		context => q|hover help for the notify message field|
+	},
+
+	'notify subject' => {
+		message => q|Notification Subject|,
+		lastUpdated => 0,
+		context => q|label in the notify about version tag activity|
+	},
+
+	'notify subject help' => {
+		message => q|Enter the subject line of the approval message.|,
+		lastUpdated => 0,
+		context => q|hover help for the notify subject field|
+	},
+
+	'notify about version tag' => {
+		message => q|Notify About Version Tag|,
+		lastUpdated => 0,
+		context => q|the name of the activity|
+	},
+
+	'approval subject' => {
+		message => q|Approval Subject|,
+		lastUpdated => 0,
+		context => q|label in the request approval for version tag activity|
+	},
+
+	'approval subject help' => {
+		message => q|Enter the subject line of the approval message.|,
+		lastUpdated => 0,
+		context => q|hover help for the approval subject field|
+	},
+
+	'approval message' => {
+		message => q|Approval Message|,
+		lastUpdated => 0,
+		context => q|label in the request approval for version tag activity|
+	},
+
+	'approval message help' => {
+		message => q|Type a message that will be sent to the approver's along with the approval link and the tag data.|,
+		lastUpdated => 0,
+		context => q|hover help for the approval message field|
+	},
+
+	'do on deny' => {
+		message => q|Do On Deny|,
+		lastUpdated => 0,
+		context => q|label in the request approval for version tag activity|
+	},
+
+	'do on deny help' => {
+		message => q|What workflow should we run if the tag is denied approval?|,
+		lastUpdated => 0,
+		context => q|hover help for the do on deny field|
+	},
+
+	'group to approve' => {
+		message => q|Group To Approve|,
+		lastUpdated => 0,
+		context => q|label in the request approval for version tag activity|
+	},
+
+	'group to approve help' => {
+		message => q|Which group should be notified and allowed to approve or deny this tag?|,
+		lastUpdated => 0,
+		context => q|hover help for the group to approve field|
+	},
+
+	'request approval for version tag' => {
+		message => q|Request Approval For Version Tag|,
+		lastUpdated => 0,
+		context => q|the name of the activity|
+	},
+
+	'unlock version tag' => {
+		message => q|Unlock Version Tag|,
+		lastUpdated => 0,
+		context => q|the name of the activity|
+	},
+
 	'current tag is called' => {
 		message => q|You are currently working under a tag called|,
 		lastUpdated => 0,

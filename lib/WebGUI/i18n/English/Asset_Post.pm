@@ -152,7 +152,7 @@ Defaults to mixed.
 
 	'post template variables body' => {
 		message => q|The following variables are available in all Post templates.  Internationalized labels
-		for the action URLs (reply, delete, deny, etc.)  are provided in the set of Collaboration Template labels.
+		for the action URLs (reply, delete, etc.)  are provided in the set of Collaboration Template labels.
 <p>
 
 <b>userId</b><br>
@@ -197,15 +197,11 @@ A URL to edit this Post.
 <p>
 
 <b>status</b><br>
-The status of this Post, typically "Approved", "Denied", "Pending" or "Archived".
+The status of this Post: "Approved", "Pending" or "Archived".
 <p>
 
 <b>approve.url</b><br>
 The URL to approve this Post, if it's moderated.
-<p>
-
-<b>deny.url</b><br>
-The URL to deny this Post, if it's moderated.
 <p>
 
 <b>reply.url</b><br>
@@ -406,11 +402,6 @@ back the data with a simple &lt;tmpl_var userDefined1&gt;.
 	'approved' => {
 		message => q|Approved|,
 		lastUpdated => 1031514049,
-	},
-
-	'denied' => {
-		message => q|Denied|,
-		lastUpdated => 1031514049
 	},
 
 	'pending' => {
