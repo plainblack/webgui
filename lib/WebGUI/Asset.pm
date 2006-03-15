@@ -80,7 +80,7 @@ sub canAdd {
 	my $className = shift;
 	my $session = shift;
 	my $userId = shift || $session->user->userId;
-	my $user = WebGUI::User->new($self->session, $userId);
+	my $user = WebGUI::User->new($session, $userId);
 	my $subclassGroupId = shift;
 	my $addPrivs = $session->config->get("assetAddPrivilege");
 	my $groupId = $addPrivs->{$className} || $subclassGroupId || '12';
@@ -103,7 +103,7 @@ Unique hash identifier for a user. If not supplied, current user.
 sub canEdit {
 	my $self = shift;
 	my $userId = shift || $self->session->user->userId;
-	my $user = WebGUI::User->new($self->session, $userId);
+	my $user = WebGUI::User->new($session, $userId);
  	if ($userId eq $self->get("ownerUserId")) {
                 return 1;
 	}
@@ -129,7 +129,7 @@ Unique hash identifier for a user. If not specified, uses current userId.
 sub canView {
 	my $self = shift;
 	my $userId = shift || $self->session->user->userId;
-	my $user = WebGUI::User->new($self->session, $userId);
+	my $user = WebGUI::User->new($session, $userId);
 	return 0 unless ($self->get("state") eq "published");
 	if ($userId eq $self->get("ownerUserId")) {
                 return 1;
