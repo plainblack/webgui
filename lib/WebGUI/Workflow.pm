@@ -160,7 +160,7 @@ sub get {
 
 #-------------------------------------------------------------------
 
-=head2 getActivity ( activityId [, classname ] )
+=head2 getActivity ( activityId )
 
 Retrieves an activity object. This is just a convenience method, so you don't have to manually load and construct activity objects when you're already working with a workflow.
 
@@ -168,20 +168,12 @@ Retrieves an activity object. This is just a convenience method, so you don't ha
 
 The unique id of the activity.
 
-=head3 classname
-
-The classname of the activity. This will be looked up if you don't specify it.
-
 =cut
 
 sub getActivity {
 	my $self = shift;
 	my $activityId = shift;
-	my $class = shift;
-	unless ($class) {
-		($class) = $self->session->db->quickArray("select className from WorkflowActivity where activityId=?",[$activityId]);
-	}
-	return WebGUI::Workflow::Activity->new($self->session, $activityId, $class);
+	return WebGUI::Workflow::Activity->new($self->session, $activityId);
 }
 
 #-------------------------------------------------------------------
@@ -195,10 +187,10 @@ Returns an array reference of the activity objects associated with this workflow
 sub getActivities {
 	my $self = shift;
 	my @activities = ();
-	my $rs = $self->session->db->prepare("select activityId, className from WorkflowActivity where workflowId=? order by sequenceNumber");
+	my $rs = $self->session->db->prepare("select activityId from WorkflowActivity where workflowId=? order by sequenceNumber");
 	$rs->execute([$self->getId]);
-	while (my ($activityId, $class) = $rs->array) {
-		push(@activities, $self->getActivity($activityId, $class));
+	while (my ($activityId) = $rs->array) {
+		push(@activities, $self->getActivity($activityId));
 	}
 	return \@activities;
 }
@@ -260,11 +252,9 @@ sub getNextActivity {
 	my $activityId = shift;
 	my ($sequenceNumber) = $self->session->db->quickArray("select sequenceNumber from WorkflowActivity where activityId=?", [$activityId]);
 	$sequenceNumber++;
-	my $rs = $self->session->db->read("select activityId, className from WorkflowActivity where workflowId=? 
+	my ($id) = $self->session->db->quickArray("select activityId from WorkflowActivity where workflowId=? 
 		and sequenceNumber>=? order by sequenceNumber", [$self->getId, $sequenceNumber]);
-	my ($id, $class) = $rs->array;
-	$rs->finish;
-	return $self->getActivity($id, $class);
+	return $self->getActivity($id);
 }
 
 

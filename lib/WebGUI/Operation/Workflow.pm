@@ -127,16 +127,10 @@ sub www_editWorkflow {
 	$workflow = WebGUI::Workflow->new($session, $session->form->get("workflowId")) unless (defined $workflow);
 	my $i18n = WebGUI::International->new($session, "Workflow");
 	my $workflowActivities = $session->config->get("workflowActivities");
-	my $addmenu = '<div style="float: left; width: 180px;">';
-	foreach my $activity (@{$workflowActivities->{$workflow->get("type")}}) {
-		my $cmd = "use $activity";
-        	eval ($cmd);
-        	if ($@) {
-                	$session->errorHandler->warn("Couldn't compile activity package: ".$activity.". Root cause: ".$@);
-                	return undef;
-       	 	} else {
-			$addmenu .= '<a href="'.$session->url->page("op=editWorkflowActivity;className=".$activity.";workflowId=".$workflow->getId).'">'.$activity->getName($session)."</a><br />\n";
-		}
+	my $addmenu = '<div style="float: left; width: 200px; font-size: 11px;">';
+	foreach my $class (@{$workflowActivities->{$workflow->get("type")}}) {
+		my $activity = WebGUI::Workflow::Activity->newByPropertyHashRef($session, {className=>$class});
+		$addmenu .= '<a href="'.$session->url->page("op=editWorkflowActivity;className=".$class.";workflowId=".$workflow->getId).'">'.$activity->getName."</a><br />\n";
 	}	
 	$addmenu .= '</div>';
 	my $f = WebGUI::HTMLForm->new($session);
@@ -246,7 +240,7 @@ sub www_editWorkflowActivity {
 	my $ac = WebGUI::AdminConsole->new($session,"workflow");
 	$ac->addSubmenuItem($session->url->page("op=addWorkflow"), $i18n->get("add a new workflow"));
 	$ac->addSubmenuItem($session->url->page("op=manageWorkflows"), $i18n->get("manage workflows"));
-	return $ac->render($form->print,$activity->getName($session));
+	return $ac->render($form->print,$activity->getName);
 }
 
 #-------------------------------------------------------------------

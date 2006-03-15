@@ -97,7 +97,7 @@ An array reference containing a list of hash hreferences of properties.
 sub definition {
 	my $class = shift;
 	my $session = shift;
-	my $definition = shift;
+	my $definition = shift || [];
 	my $i18n = WebGUI::International->new($session, "Workflow_Activity");
 	push (@{$definition}, {
 		name=>$i18n->get("topicName"),
@@ -228,26 +228,21 @@ sub getId {
 
 #-------------------------------------------------------------------
 
-=head2 getName ( session )
+=head2 getName ( )
 
-Returns the name of the activity. Must be overridden. This is a class method.
-
-=head3 session
-
-A reference to the current session.
+Returns the name of the activity. 
 
 =cut
 
 sub getName {
-	my $class = shift;
-	my $session = shift;
-	my $definition = $class->definition($session);
+	my $self = shift;
+	my $definition = $self->definition($self->session);
 	return $definition->[0]{name};
 }
 
 #-------------------------------------------------------------------
 
-=head2 new ( session, activityId [, classname] )
+=head2 new ( session, activityId  )
 
 Constructor.
 
@@ -259,28 +254,21 @@ A reference to the current session.
 
 A unique id refering to an instance of an activity.
 
-=head3 classname
-
-The classsname of the activity you wish to add.
-
 =cut
 
 sub new {
 	my $class = shift;
 	my $session = shift;
 	my $activityId = shift;
-	my $className = shift;
 	my $main = $session->db->getRow("WorkflowActivity","activityId", $activityId);
 	return undef unless $main->{activityId};
-	if ($className) {
-                my $cmd = "use ".$className;
-                eval ($cmd);
-                if ($@) {
-                        $session->errorHandler->error("Couldn't compile workflow activity package: ".$className.". Root cause: ".$@);                        
-			return undef;                
-		}
-                $class = $className;
-        }
+	$class = $main->{className};
+        my $cmd = "use ".$class;
+        eval ($cmd);
+        if ($@) {
+                $session->errorHandler->error("Couldn't compile workflow activity package: ".$class.". Root cause: ".$@); 
+		return undef;                
+	}
 	my $sub = $session->db->buildHashRef("select name,value from WorkflowActivityData where activityId=?",[$activityId]); 
 	my %data = (%{$main}, %{$sub});
 	bless {_session=>$session, _id=>$activityId, _data=>\%data}, $class;
