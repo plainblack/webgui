@@ -294,6 +294,11 @@ our $I18N = {
 		context => q|Menu item in version tag manager.|
 	},
 
+	'purge revision prompt' => {
+		message => q|Are you certain you wish to delete this revision of this asset? It CANNOT be restored if you delete it.|,
+		lastUpdated => 1142455321,
+		context => q|The prompt for purging a revision from the manage revisios screen.|
+	},
 
 };
 
