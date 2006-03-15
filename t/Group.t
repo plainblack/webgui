@@ -80,28 +80,28 @@ ok( ($gA->name eq 'Group A' and $gB->name eq 'Group B'), 'object name assignment
 
 $gB->addGroups([$gA->getId]);
 
-cmp_bag([$gA->getId, 3], $gB->getGroupsIn(1)  ,'Group A is in Group B, recursively');
-cmp_bag([$gA->getId, 3], $gB->getGroupsIn()  ,'Group A is in Group B');
-cmp_bag([$gB->getId], $gA->getGroupsFor() ,'Group B contains Group A');
-cmp_bag([3], $gA->getGroupsIn()  ,'Admin added to group A automatically');
+cmp_bag($gB->getGroupsIn(1), [$gA->getId, 3], 'Group A is in Group B, recursively');
+cmp_bag($gB->getGroupsIn(),  [$gA->getId, 3], 'Group A is in Group B');
+cmp_bag($gA->getGroupsFor(), [$gB->getId], 'Group B contains Group A');
+cmp_bag($gA->getGroupsIn(),  [3], 'Admin added to group A automatically');
 
 $gA->addGroups([$gB->getId]);
-cmp_bag([3], $gA->getGroupsIn()  ,'Not allowed to create recursive group loops');
+cmp_bag($gA->getGroupsIn(), [3], 'Not allowed to create recursive group loops');
 
 $gA->addGroups([1]);
-cmp_bag([3], $gA->getGroupsIn()  ,'Not allowed to add group Visitor to a group');
+cmp_bag($gA->getGroupsIn(), [3], 'Not allowed to add group Visitor to a group');
 
 $gA->addGroups([$gA->getId]);
-cmp_bag([3], $gA->getGroupsIn()  ,'Not allowed to add myself to my group');
+cmp_bag($gA->getGroupsIn(), [3], 'Not allowed to add myself to my group');
 
 my $gC = WebGUI::Group->new($session, "new");
 $gC->name('Group C');
 $gA->addGroups([$gC->getId]);
 
-cmp_bag([$gA->getId], $gC->getGroupsFor() ,'Group A contains Group C');
-cmp_bag([3], $gA->getGroupsIn() ,'Group C is a member of Group A, cached');
-cmp_bag([$gA->getId, 3], $gB->getGroupsIn()  ,'Group A is in Group B, cached result');
-cmp_bag([$gA->getId, 3], $gB->getGroupsIn(1)  ,'Group C is in Group B, recursively, cached result');
+cmp_bag($gC->getGroupsFor(), [$gA->getId], 'Group A contains Group C');
+cmp_bag($gA->getGroupsIn(),  [$gC->getId, 3], 'Group C is a member of Group A, cached');
+cmp_bag($gB->getGroupsIn(1), [$gC->getId, $gA->getId, 3], 'Group C is in Group B, recursively, cached result');
+cmp_bag($gB->getGroupsIn(),  [$gA->getId, 3], 'Group A is in Group B, cached result');
 
 END {
 	(defined $gA and ref $gA eq 'WebGUI::Group') and $gA->delete;

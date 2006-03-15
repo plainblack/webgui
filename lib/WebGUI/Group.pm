@@ -105,7 +105,8 @@ Adds groups to this group.
 
 =head3 groups
 
-An array reference containing the list of group ids to add.
+An array reference containing the list of group ids to add.  Group Visitor may
+not be added to any group.  Groups may not be added to themselves.
 
 =cut
 
@@ -115,6 +116,7 @@ sub addGroups {
 	$self->session->stow->delete("isInGroup");
 	foreach my $gid (@{$groups}) {
 		next if ($gid eq '1');
+		next if ($gid eq $self->getId);
 		my ($isIn) = $self->session->db->quickArray("select count(*) from groupGroupings where groupId=? and inGroup=?", [$gid, $self->getId]);
 		my $group = WebGUI::Group->new($self->session, $gid);
 		my $recursive = isIn($self->getId, @{$group->getGroupsIn(1)});
@@ -122,6 +124,7 @@ sub addGroups {
 			$self->session->db->write("insert into groupGroupings (groupId,inGroup) values (?,?)",[$gid, $self->getId]);
 		}
 	}
+	$self->session->stow->delete("gotGroupsInGroup");
 	return 1;
 }
 
@@ -501,7 +504,8 @@ sub getGroupsIn {
 	my $gotGroupsInGroup = $self->session->stow->get("gotGroupsInGroup");
 	if ($isRecursive && exists($gotGroupsInGroup->{recursive}{$self->getId})) {
 		return $gotGroupsInGroup->{recursive}{$self->getId};
-	} elsif (exists $gotGroupsInGroup->{direct}{$self->getId}) {
+	}
+	elsif (!$isRecursive and exists($gotGroupsInGroup->{direct}{$self->getId})) {
 		return $gotGroupsInGroup->{direct}{$self->getId};
 	}
         my $groups = $self->session->db->buildArrayRef("select groupId from groupGroupings where inGroup=?",[$self->getId]);
@@ -518,6 +522,7 @@ sub getGroupsIn {
 		my %unique = map { $_ => 1 } @groupsOfGroups;
 		@groupsOfGroups = keys %unique;
 		$gotGroupsInGroup->{recursive}{$self->getId} = \@groupsOfGroups;
+		$self->session->stow->set("gotGroupsInGroup", $gotGroupsInGroup);
                 return \@groupsOfGroups;
 	}
 	$gotGroupsInGroup->{direct}{$self->getId} = $groups;
