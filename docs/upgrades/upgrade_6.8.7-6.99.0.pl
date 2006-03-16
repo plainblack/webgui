@@ -302,7 +302,7 @@ sub addWorkflow {
 	$session->setting->remove("alertOnNewUser");
 	$session->setting->remove("onNewUserAlertGroup");
 	$session->setting->set("runOnRegistration","");
-	$session->setting->add("defaultVersionTagWorkflow",$workflow->getId);
+	$session->setting->add("defaultVersionTagWorkflow","pbworkflow000000000003");
 }
 
 #-------------------------------------------------
