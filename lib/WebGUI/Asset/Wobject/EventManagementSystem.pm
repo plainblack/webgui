@@ -418,7 +418,6 @@ sub findSubEvents {
 		my ($prerequisiteId, $productId) = split(':', $subEvent);
 		push (@subEvents, $productId) unless (WebGUI::Utility::isIn($productId, @failedSubEvents));
 	}
-	print "<pre>".Dumper(@subEvents)."</pre>";
 	return \@subEvents;	
 }
 
@@ -545,6 +544,8 @@ sub resolveConflictForm {
 	my $event1 = shift;
 	my $event2 = shift;
 	my $output;
+	my $extrasURL = $self->session->config->get("extrasURL");
+	my $deleteIcon = $extrasURL."/toolbar/bullet/delete.gif";
 	
 	my $sth = $self->session->db->read("
 		select productId, title, price, description
@@ -553,17 +554,26 @@ sub resolveConflictForm {
 	);
 	
 	my $i18n = WebGUI::International->new($self->session, 'Asset_EventManagementSystem');
-	$output = sprintf "<table><tr><td>%s</td></tr>", $i18n->get('scheduling conflict message');
+	$output .= sprintf "<table><tr><td>%s</td></tr>", $i18n->get('scheduling conflict message');
+	$output .= "<form action='".$self->getUrl."' method='post'";
+	$output .= "<input type='hidden' name='func' value='deleteCartItem' />";
+	$output .= "<input type='hidden' name='event1' value='$event1' />";
+	$output .= "<input type='hidden' name='event2' value='$event2' />";
 	while (my $data = $sth->hashRef) {
 		$output .= "<tr><td>";
-		$output .= $self->session->icon->delete('op=deleteCartItem;itemType=Event;itemId='.$data->{productId}, $self->getUrl);
+		$output .= "<input type='image' src='$deleteIcon' name='productToRemove' value='$data->{productId}' style='border: 0px;'/>";
 		$output .= "</td><td>";
 		$output .= $data->{title}."&nbsp;".$data->{description}."&nbsp;".$data->{price};
 		$output .= "</td></tr>"; 
 	}
-	
+	$output .= "</form>";
 	$output .= "</table>";
 	$output .= sprintf "<a href=''>%s</a>", $i18n->get('scheduling conflict continue');
+
+	#
+	# This will all be templated
+	#
+
 	
 	return $output;
 }
@@ -625,12 +635,13 @@ Method that will add an event to the users shopping cart.
 =cut
 
 sub www_addToCart {
-	my ($self, @pids, $output, $errors, $conflicts, $errorMessages);
+	my ($self, $pid, @pids, $output, $errors, $conflicts, $errorMessages);
 	$self = shift;
 	$conflicts = shift;
+	$pid = shift;
 	
 	# Check if conflicts were found that the user needs to fix
-	$output = join '', @{ $conflicts };
+	$output = join '', @{ $conflicts } if defined $conflicts;
 
 	unless ($output) { #Skip this if we have errors
 
@@ -640,7 +651,7 @@ sub www_addToCart {
 			#@pids = split("\n", $pids[0]);
 		}
 		else {  # A single id, i.e., a master event
-			push(@pids, $self->session->form->get("pid"));
+			push(@pids, $self->session->form->get("pid") || $pid);
 		}
 
 		my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
@@ -677,6 +688,26 @@ sub www_approveEvent {
 				   [$eventId]);
 	
 	return $self->www_manageEvents;
+}
+
+#-------------------------------------------------------------------
+sub www_deleteCartItem {
+	my $self = shift;
+	my $event1 = $self->session->form->get("event1");
+	my $event2 = $self->session->form->get("event2");
+	my $eventUserDeleted = $self->session->form->get("productToRemove");
+	my $cart = WebGUI::Commerce::ShoppingCart->new($self->session);
+	
+	# Delete all of the subevents last added by the user
+	$cart->delete($event1, 'Event');
+	$cart->delete($event2, 'Event');
+	
+	# Add the subevents back to the cart except for the one the user choose to remove.
+	# This will re-trigger the conflict/sub-event display code correctly
+
+	my $eventToAdd = ($event1 eq $eventUserDeleted) ? $event2 : $event1;
+
+	return $self->www_addToCart(undef,$eventToAdd);
 }
 
 #-------------------------------------------------------------------
