@@ -78,6 +78,8 @@
  - [ 1441488 ] Sort Order of Profile Fields in Form "Create New Account"
  - fix [ 1439352 ] Deleting post is chain of posts ... descendants
  - fix [ 1432491 ] 6.8.6 popup windows has not head & body tags
+ - fixed a bug in the File asset that caused file redirects to be cached
+   incorrectly for Visitor.  Thanks to Jukka Raimovaara / Axxion Oy.
 
 6.8.7
  - fix [ 1431098 ] op=becomeUser can become non-existent userIds

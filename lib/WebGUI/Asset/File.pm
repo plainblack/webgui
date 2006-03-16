@@ -330,7 +330,7 @@ sub www_view {
 		return $self->getContainer->www_view;
 	}
 	$self->session->http->setRedirect($self->getFileUrl);
-	return undef;
+	return '1';
 }
 
 
