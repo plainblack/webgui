@@ -31,16 +31,16 @@ Initializes the scheduler.
 =cut
 
 sub _start {
-        print "Starting WebGUI Spectre Scheduler...";
         my ( $kernel, $self, $publicEvents) = @_[ KERNEL, OBJECT, ARG0 ];
+	$self->debug("Starting Spectre scheduler.");
         my $serviceName = "scheduler";
         $kernel->alias_set($serviceName);
         $kernel->call( IKC => publish => $serviceName, $publicEvents );
-	my $configs = WebGUI::Config->readAllConfigs($self->{_config}->getWebguiRoot);
+	$self->debug("Loading the schedules from all the sites.");
+	my $configs = WebGUI::Config->readAllConfigs($self->config->getWebguiRoot);
 	foreach my $config (keys %{$configs}) {
 		$kernel->yield("loadSchedule", $config);
 	}
-        print "OK\n";
         $kernel->yield("checkSchedules");
 }
 
@@ -54,9 +54,8 @@ Gracefully shuts down the scheduler.
 
 sub _stop {
 	my ($kernel, $self) = @_[KERNEL, OBJECT];
-	print "Stopping WebGUI Spectre Scheduler...";
+	$self->debug("Stopping the scheduler.");
 	undef $self;
-	print "OK\n";
 }
 
 
@@ -80,8 +79,9 @@ A hash reference containing the properties of the job from the WorkflowSchedule 
 sub addJob {
 	my ($self, $config, $job) = @_[OBJECT, ARG0, ARG1];
 	return 0 unless ($job->{enabled});
-	$self->{_jobs}{$job->{jobId}} = {
-		jobId=>$job->{jobId},
+	$self->debug("Adding schedule ".$job->{taskId}." to the queue.");
+	$self->{_jobs}{$job->{taskId}} = {
+		taskId=>$job->{taskId},
 		config=>$config,
 		schedule=>join(" ", $job->{minuteOfHour}, $job->{hourOfDay}, $job->{dayOfMonth}, $job->{monthOfYear}, $job->{dayOfWeek}),
 		runOnce=>$job->{runOnce},
@@ -112,19 +112,32 @@ A DateTime object representing the time to compare the schedule with.
 
 sub checkSchedule {
 	my ($kernel, $self, $job, $now) = @_[KERNEL, OBJECT, ARG0, ARG1];
+	$self->debug("Checking schedule ".$job->{taskId}." against the current time.");
 	my $cron = DateTime::Cron::Simple->new($job->{schedule});
        	if ($cron->validate_time($now)) {
-		my $session = WebGUI::Session->open($self->{_config}->getWebguiRoot, $job->{config});
-		WebGUI::Workflow::Instance->create($session, {
+		$self->debug("It's time to run ".$job->{taskId}.". Creating workflow instance.");
+		my $session = WebGUI::Session->open($self->config->getWebguiRoot, $job->{config});
+		my $instance = WebGUI::Workflow::Instance->create($session, {
 			workflowId=>$job->{workflowId},
 			className=>$job->{className},
 			methodName=>$job->{methodName},
 			parameters=>$job->{parameters},
 			priority=>$job->{priority}
 			});
+		if (defined $instance) {
+			$self->debug("Created workflow instance ".$instance->getId.".");
+		} else {
+			$self->debug("Something bad happened. Couldn't create workflow instance for schedule ".$job->{taskId}.".");
+		}
 		if ($job->{runOnce}) {
-			my $cron = WebGUI::Workflow::Cron->new($session, $job->{jobId});
-			$cron->delete if defined $cron;
+			$self->debug("Schedule ".$job->{taskId}." is only supposed to run once.");
+			my $cron = WebGUI::Workflow::Cron->new($session, $job->{taskId});
+			if (defined $cron) {		
+				$self->debug("Deleting schedule from database.");
+				$cron->delete;
+			} else {
+				$self->debug("Couldn't instanciate schedule ".$job->{taskId}." in order to delete it.");
+			}
 		}
 		$session->close;
 	}
@@ -140,9 +153,10 @@ Checks all the schedules of the jobs in the queue and triggers a workflow if a s
 
 sub checkSchedules {
 	my ($kernel, $self) = @_[KERNEL, OBJECT];
+	$self->debug("Checking schedules against current time.");
 	my $now = DateTime->from_epoch(epoch=>time());
-	foreach my $jobId (keys %{$self->{_jobs}}) {
-		$kernel->yield("checkSchedule", $self->{_jobs}{$jobId}, $now)
+	foreach my $taskId (keys %{$self->{_jobs}}) {
+		$kernel->yield("checkSchedule", $self->{_jobs}{$taskId}, $now)
 	}
 	$kernel->delay_set("checkSchedules",60);
 }
@@ -150,19 +164,51 @@ sub checkSchedules {
 
 #-------------------------------------------------------------------
 
-=head2 deleteJob ( jobId ) 
+=head2 config 
+
+Returns a reference to the config object.
+
+=cut 
+
+sub config {
+	my $self = shift;
+	return $self->{_config};
+}
+
+#-------------------------------------------------------------------
+
+=head2 debug ( output )
+
+Prints out debug information if debug is enabled.
+
+=head3 
+
+=cut 
+
+sub debug {
+	my $self = shift;
+	my $output = shift;
+	if ($self->{_debug}) {
+		print "CRON: ".$output."\n";
+	}
+}
+
+#-------------------------------------------------------------------
+
+=head2 deleteJob ( taskId ) 
 
 Removes a job from the monitoring queue.
 
-=head3 jobId
+=head3 taskId
 
 The unique id of the job to remove.
 
 =cut
 
 sub deleteJob {
-	my ($self, $jobId) = @_[OBJECT, ARG0];
-	delete $self->{_jobs}{$jobId};
+	my ($self, $taskId) = @_[OBJECT, ARG0];
+	$self->debug("Deleting schedule $taskId from queue.");
+	delete $self->{_jobs}{$taskId};
 }
 
 
@@ -180,7 +226,8 @@ The config filename for the site to load the schedule.
 
 sub loadSchedule {
 	my ($kernel, $self, $config) = @_[KERNEL, OBJECT, ARG0];
-	my $session = WebGUI::Session->open($self->{_config}->getWebguiRoot, $config);
+	$self->debug("Loading schedules for $config.");
+	my $session = WebGUI::Session->open($self->config->getWebguiRoot, $config);
 	my $result = $session->db->read("select * from WorkflowSchedule");
 	while (my $data = $result->hashRef) {
 		$kernel->yield("addJob",$config, $data);
@@ -198,12 +245,17 @@ Constructor.
 
 A WebGUI::Config object that represents the spectre.conf file.
 
+=head3 debug
+
+A boolean indicating Spectre should spew forth debug as it runs.
+
 =cut
 
 sub new {
 	my $class = shift;
 	my $config  = shift;
-	my $self = {_config=>$config};
+	my $debug = shift;
+	my $self = {_debug=>$debug, _config=>$config};
 	bless $self, $class;
 	my @publicEvents = qw(addJob deleteJob);
 	POE::Session->create(

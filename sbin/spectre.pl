@@ -20,14 +20,18 @@ $|=1; # disable output buffering
 my $help;
 my $shutdown;
 my $daemon;
+my $run;
+my $debug;
 
 GetOptions(
 	'help'=>\$help,
 	'shutdown'=>\$shutdown,
-	'daemon'=>\$daemon
+	'daemon'=>\$daemon,
+	'debug' =>\$debug,
+	'run' => \$run
 	);
 
-if ($help || !($shutdown||$daemon)) {
+if ($help || !($shutdown||$daemon||$run)) {
 	print <<STOP;
 
 	S.P.E.C.T.R.E. is the Supervisor of Perplexing Event-handling Contraptions for 
@@ -40,6 +44,12 @@ if ($help || !($shutdown||$daemon)) {
 	Options:
 
 	--daemon	Starts the Spectre server.
+
+	--debug		If specified at startup, Spectre will provide verbose
+			debug to standard out so that you can see exactly what
+			it's doing.
+
+	--run		Starts Spectre without forking it as a daemon.
 
 	--shutdown	Stops the running Spectre server.
 
@@ -71,8 +81,10 @@ if ($shutdown) {
 	my $result = $remote->post('admin/shutdown');
 	die $POE::Component::IKC::ClientLite::error unless defined $result;
 	undef $remote;
+} elsif ($run) {
+	Spectre::Admin->new($config, $debug);
 } elsif ($daemon) {
 	fork and exit;
-	Spectre::Admin->new($config);
+	Spectre::Admin->new($config, $debug);
 }
 

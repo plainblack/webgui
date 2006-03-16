@@ -202,8 +202,10 @@ Executes the next iteration in this workflow. Returns a status code based upon w
 
  undefined	The workflow doesn't exist.
  disabled	The workflow is disabled.
- complete	Workflow has completely run it's course.
+ done		Workflow has completely run it's course.
  error		Something bad happened. Try again later.
+ complete	The activity completed successfully, you may run the next one.
+ waiting	The activity is waiting on an external event such as user input.
 
 =cut
 
@@ -213,7 +215,7 @@ sub run {
 	return "undefined" unless (defined $workflow);
 	return "disabled" unless ($workflow->get("enabled"));
 	my $activity = $workflow->getNextActivity($self->get("currentActivity"));
-	return "complete" unless (defined $activity);
+	return "done" unless (defined $activity);
 	my $object = {};
 	my $class = $self->get("className");
 	my $method = $self->get("methodName");

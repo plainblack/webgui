@@ -30,12 +30,11 @@ Initializes the admin interface.
 =cut
 
 sub _start {
-        print "Starting WebGUI Spectre Admin...";
         my ( $kernel, $self, $publicEvents) = @_[ KERNEL, OBJECT, ARG0 ];
+	$self->debug("Starting Spectre administrative manager.");
         my $serviceName = "admin";
         $kernel->alias_set($serviceName);
         $kernel->call( IKC => publish => $serviceName, $publicEvents );
-        print "OK\n";
 }
 
 #-------------------------------------------------------------------
@@ -48,15 +47,45 @@ Gracefully shuts down the admin interface.
 
 sub _stop {
 	my ($kernel, $self) = @_[KERNEL, OBJECT];
-	print "Stopping Spectre...";
+	$self->debug("Stopping Spectre administrative manager.");
 	undef $self;
 	$kernel->stop;
-	print "OK\n";
 }
 
 #-------------------------------------------------------------------
 
-=head2 new ( config )
+=head2 config ()
+
+Returns a reference to the config object.
+
+=cut 
+
+sub config {
+	my $self = shift;
+	return $self->{_config};
+}
+
+#-------------------------------------------------------------------
+
+=head2 debug ( output )
+
+Prints out debug information if debug is enabled.
+
+=head3 
+
+=cut 
+
+sub debug {
+	my $self = shift;
+	my $output = shift;
+	if ($self->{_debug}) {
+		print "ADMIN: ".$output."\n";
+	}
+}
+
+#-------------------------------------------------------------------
+
+=head2 new ( config [ , debug ] )
 
 Constructor.
 
@@ -64,12 +93,17 @@ Constructor.
 
 A WebGUI::Config object that represents the spectre.conf file.
 
+=head3 debug
+
+A boolean indicating Spectre should spew forth debug as it runs.
+
 =cut
 
 sub new {
 	my $class = shift;
 	my $config = shift;
-	my $self = {_config=>$config};
+	my $debug = shift;
+	my $self = {_debug=>$debug, _config=>$config};
 	bless $self, $class;
 	create_ikc_server(
         	port => $config->get("port"),
@@ -79,8 +113,8 @@ sub new {
 		object_states => [ $self => {_start=>"_start", _stop=>"_stop", "shutdown"=>"_stop"} ],
 		args=>[["shutdown"]]
         	);
-	$self->{_cron} = Spectre::Cron->new($config);
-	$self->{_workflow} = Spectre::Workflow->new($config);
+	$self->{_cron} = Spectre::Cron->new($config, $debug);
+	$self->{_workflow} = Spectre::Workflow->new($config, $debug);
 	POE::Kernel->run();
 }
 
