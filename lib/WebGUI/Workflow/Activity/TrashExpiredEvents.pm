@@ -84,7 +84,7 @@ sub execute {
 		}	
         }
         $sth->finish;
-	return 1;
+	return $self->COMPLETE;
 }
 
 

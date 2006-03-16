@@ -90,6 +90,7 @@ sub execute {
                 $b->finish;
         }
         $a->finish;
+	return $self->COMPLETE;
 }
 
 1;

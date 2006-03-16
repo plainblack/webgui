@@ -105,44 +105,45 @@ See WebGUI::Workflow::Activity::execute() for details.
 sub execute {
 	my $self = shift;
 	my ($userId, $u, $userData, $uri, $port, %args, $fieldName, $ldap, $search, $a, $b);
-		$a = $self->session->db->read("select userId from users where authMethod='LDAP'");
-		while (($userId) = $a->array) {
-			$u = WebGUI::User->new($self->session, $userId);
-			my $auth = WebGUI::Auth->new($self->session, "LDAP",$userId);
-			$userData = $auth->getParams;
-			$uri = URI->new($userData->{ldapUrl});
-			if ($uri->port < 1) {
-				$port = 389;
-			} else {
-				$port = $uri->port;
-			}
-			%args = (port => $port);
-			$ldap = Net::LDAP->new($uri->host, %args);
-			if ($ldap) {
-			   my $result = $ldap->bind;
-			   if ($result->code == 0) {
-				   $search = $ldap->search( base=>$userData->{connectDN}, filter=>"&(objectClass=*)" );
-				   if($search->code) {
-				      	$self->session->errorHandler->warn("Couldn't search LDAP ".$uri->host." to find user ".$u->username." (".$userId.").\nError Message from LDAP: ".$ldapStatusCode{$search->code});
-				   } elsif($search->count == 0) {
-				      	$self->session->errorHandler->warn("No results returned for user with dn ".$userData->{connectDN});
-				   } else {
-				      my $user = WebGUI::User->new($self->session, $userId);
-					  $b = $self->session->db->read("select fieldName from userProfileField where profileCategoryId<>4");
-					  while (($fieldName) = $b->array) {
-					     if ($search->entry(0)->get_value(_alias($fieldName)) ne "") {
-						    $user->profileField($fieldName,$search->entry(0)->get_value(_alias($fieldName)));
-						 }
-					  }
-					  $b->finish;
-				   }
-				   $ldap->unbind;
-				} else {
-			      $self->session->errorHandler->warn("Couldn't bind to LDAP host ".$uri->host."\nError Message from LDAP: ".$ldapStatusCode{$result->code});
-			   }
-			} 
+	$a = $self->session->db->read("select userId from users where authMethod='LDAP'");
+	while (($userId) = $a->array) {
+		$u = WebGUI::User->new($self->session, $userId);
+		my $auth = WebGUI::Auth->new($self->session, "LDAP",$userId);
+		$userData = $auth->getParams;
+		$uri = URI->new($userData->{ldapUrl});
+		if ($uri->port < 1) {
+			$port = 389;
+		} else {
+			$port = $uri->port;
 		}
-		$a->finish;
+		%args = (port => $port);
+		$ldap = Net::LDAP->new($uri->host, %args);
+		if ($ldap) {
+		   my $result = $ldap->bind;
+		   if ($result->code == 0) {
+			   $search = $ldap->search( base=>$userData->{connectDN}, filter=>"&(objectClass=*)" );
+			   if($search->code) {
+			      	$self->session->errorHandler->warn("Couldn't search LDAP ".$uri->host." to find user ".$u->username." (".$userId.").\nError Message from LDAP: ".$ldapStatusCode{$search->code});
+			   } elsif($search->count == 0) {
+			      	$self->session->errorHandler->warn("No results returned for user with dn ".$userData->{connectDN});
+			   } else {
+			      my $user = WebGUI::User->new($self->session, $userId);
+				  $b = $self->session->db->read("select fieldName from userProfileField where profileCategoryId<>4");
+				  while (($fieldName) = $b->array) {
+				     if ($search->entry(0)->get_value(_alias($fieldName)) ne "") {
+					    $user->profileField($fieldName,$search->entry(0)->get_value(_alias($fieldName)));
+					 }
+				  }
+				  $b->finish;
+			   }
+			   $ldap->unbind;
+			} else {
+		      $self->session->errorHandler->warn("Couldn't bind to LDAP host ".$uri->host."\nError Message from LDAP: ".$ldapStatusCode{$result->code});
+		   }
+		} 
+	}
+	$a->finish;
+	return $self->COMPLETE;
 }
 
 1;

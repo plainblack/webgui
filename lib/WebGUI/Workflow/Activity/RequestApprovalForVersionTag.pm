@@ -107,6 +107,7 @@ sub execute {
 			});
 		$instance->setScratch("messageId",$message->getId);
 		$instance->setScratch("status","notified");
+		return $self->WAITING;
 	} elsif ($instance->getScratch("status") eq "denied") {
 		my $newInstance = WebGUI::Workflow::Instance->create($self->session, {
 			workflowId=>$self->get("doOnDeny"),
@@ -116,13 +117,15 @@ sub execute {
 			priority=>$instance->get("priority")
 			});
 		$instance->delete;
+		return $self->COMPLETE;
 	} elsif ($instance->getScratch("status") eq "approved") {
 		my $message = $inbox->getMessage($instance->getScratch("messageId"));
 		$message->setCompleted;
 		$instance->deleteScratch("messageId");
 		$instance->deleteScratch("status");
-		return 1;
+		return $self->COMPLETE;
 	}
+	return $self->WAITING;
 }
 
 

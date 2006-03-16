@@ -17,7 +17,7 @@ package WebGUI::Workflow::Cron;
 
 use strict;
 use WebGUI::Workflow::Spectre;
-
+use JSON;
 
 =head1 NAME
 
@@ -108,6 +108,10 @@ Returns the value for a given property. See the set() method for details.
 sub get {
 	my $self = shift;
 	my $name = shift;
+	if ($name eq "parameters") {
+		my $parameters = JSON::jsonToObj( $self->{_data}{$name});
+		return $parameters->{parameters};
+	}
 	return $self->{_data}{$name};
 }
 
@@ -266,7 +270,9 @@ sub set {
 	$self->{_data}{workflowId} = $properties->{workflowId} || $self->{_data}{workflowId};
 	$self->{_data}{className} = (exists $properties->{className}) ? $properties->{className} : $self->{_data}{className};
 	$self->{_data}{methodName} = (exists $properties->{methodName}) ? $properties->{methodName} : $self->{_data}{methodName};
-	$self->{_data}{parameters} = (exists $properties->{parameters}) ? $properties->{parameters} : $self->{_data}{parameters};
+	if (exists $properties->{parameters}) {
+		$self->{_data}{parameters} = JSON::objToJson({parameters => $properties->{parameters}});
+	}
 	$self->{_data}{enabled} = 0 unless ($self->{_data}{workflowId});
 	my $spectre = WebGUI::Workflow::Spectre->new($self->session);
 	$self->session->db->setRow("WorkflowSchedule","taskId",$self->{_data});

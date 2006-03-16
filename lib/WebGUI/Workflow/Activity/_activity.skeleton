@@ -75,6 +75,7 @@ See WebGUI::Workflow::Activity::execute() for details.
 sub execute {
 	my $self = shift;
 	# do some work here, whatever this activity is supposed to do
+	return $self->COMPLETE;
 }
 
 

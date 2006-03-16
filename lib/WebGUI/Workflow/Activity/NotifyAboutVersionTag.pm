@@ -108,7 +108,7 @@ sub execute {
 		$properties->{groupId} = $versionTag->get("groupToUse");
 	}
 	$inbox->addMessage($properties);
-	return 1;
+	return $self->COMPLETE;
 }
 
 

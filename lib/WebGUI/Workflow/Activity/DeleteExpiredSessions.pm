@@ -77,6 +77,7 @@ sub execute {
 		}
         }
         $sth->finish;
+	return $self->COMPLETE;
 }
 
 

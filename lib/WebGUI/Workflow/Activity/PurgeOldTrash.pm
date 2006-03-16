@@ -81,7 +81,7 @@ sub execute {
         	my $asset = WebGUI::Asset->new($self->session, $id,$class);
                $asset->purge if (defined $asset);
         }
-	return 1;
+	return $self->COMPLETE;
 }
 
 

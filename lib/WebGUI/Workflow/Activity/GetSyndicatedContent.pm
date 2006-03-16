@@ -79,7 +79,7 @@ sub execute {
             		WebGUI::Asset::Wobject::SyndicatedContent::_get_rss_data($self->session,$_);
         	}
     	}
-	return 1;
+	return $self->COMPLETE;
 }
 
 

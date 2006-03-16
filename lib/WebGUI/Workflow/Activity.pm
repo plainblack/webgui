@@ -18,7 +18,6 @@ package WebGUI::Workflow::Activity;
 use strict;
 use WebGUI::HTMLForm;
 
-
 =head1 NAME
 
 Package WebGUI::Workflow::Activity
@@ -30,6 +29,34 @@ This package provides the base class for workflow activities.
 =head1 SYNOPSIS
 
  use WebGUI::Workflow::Activity;
+
+=head1 CONSTANTS
+
+The following constants are available from this package.
+
+=head2 COMPLETE
+
+A constant  to be sent to Spectre informing it that this activity completed successfully.
+
+=cut
+
+sub COMPLETE { return "complete" };
+
+=head2 ERROR
+
+A constant to be sent to Spectre informing it that this activity did not execute properly due to some error.
+
+=cut
+
+sub ERROR { return "error" };
+
+=head2 WAITING
+
+A constant to be sent to Spectre informing it that this actiivty is waiting for some other event to be triggered.
+
+=cut
+
+sub WAITING { return "waiting" };
 
 =head1 METHODS
 

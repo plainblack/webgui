@@ -72,6 +72,7 @@ See WebGUI::Workflow::Activity::execute() for details.
 sub execute {
 	my $self = shift;
 	$self->session->db->write("update subscriptionCode set status='Expired' where status = 'Unused' and dateCreated + expires < ?", [time()]);
+	return $self->COMPLETE;
 }
 
 

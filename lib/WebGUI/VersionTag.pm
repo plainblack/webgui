@@ -16,6 +16,7 @@ package WebGUI::VersionTag;
 
 use strict;
 use WebGUI::Asset;
+use WebGUI::Workflow::Instance;
 
 =head1 NAME
 
@@ -226,6 +227,26 @@ sub new {
         return undef unless $data->{tagId};
         bless {_session=>$session, _id=>$tagId, _data=>$data}, $class;
 }
+
+#-------------------------------------------------------------------
+
+=head2 requestCommit ( )
+
+Locks the version tag and then kicks off the approval/commit workflow for it.
+
+=cut
+
+sub requestCommit {
+	my $self = shift;
+	$self->lock;
+	my $instance = WebGUI::Workflow::Instance->new($self->session, {
+		workflowId=>$self->get("workflowId"),
+		className=>"WebGUI::VersionTag",
+		method=>"new",
+		parameters=>$self->getId
+		});	
+}
+
 
 #-------------------------------------------------------------------
 

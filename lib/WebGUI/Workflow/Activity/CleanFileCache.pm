@@ -84,6 +84,7 @@ sub execute {
                 $size = $cache->getNamespaceSize($expiresModifier);
                 $expiresModifier += 60 * 30; # add 30 minutes each pass
         }
+	return $self->COMPLETE;
 }
 
 

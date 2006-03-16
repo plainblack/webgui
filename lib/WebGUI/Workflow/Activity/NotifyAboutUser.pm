@@ -99,7 +99,7 @@ sub execute {
 		subject=>$self->get("subject")
 		});
 	$mail->addText($message);
-	return $mail->send;
+	return $mail->send ? $self->COMPLETE : $self->ERROR;
 }
 
 

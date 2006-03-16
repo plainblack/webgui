@@ -145,7 +145,7 @@ sub execute {
 		methodName=>$instance->get("methodName"),
 		parameters=>$instance->get("parameters")
 		});
-	return defined $cron ? 1 : 0;
+	return defined $cron ? $self->COMPLETE : $self->ERROR;
 }
 
 

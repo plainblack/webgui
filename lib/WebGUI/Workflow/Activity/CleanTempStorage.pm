@@ -134,6 +134,7 @@ sub recurseFileSystem {
                         }
                 }
         }
+	return $self->COMPLETE;
 }
 
 

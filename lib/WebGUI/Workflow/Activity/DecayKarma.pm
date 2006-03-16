@@ -82,6 +82,7 @@ See WebGUI::Workflow::Activity::execute() for details.
 sub execute {
 	my $self = shift;
         $self->session->db->write("update users set karma=karma-? where karma > ?", [$self->get("decayFactor"), $self->get("minimumKarma")]);
+	return $self->COMPLETE;
 }
 
 

@@ -71,6 +71,7 @@ sub execute {
 	my $self = shift;
 	my $versionTag = shift;
 	$versionTag->rollback;
+	return $self->COMPLETE;
 }
 
 

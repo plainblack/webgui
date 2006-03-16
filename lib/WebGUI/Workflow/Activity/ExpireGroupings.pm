@@ -95,6 +95,7 @@ sub execute {
                         $self->session->db->write("delete from groupings where groupId=? and expireDate < ?", [$data->{groupId}, time()-(86400*$data->{deleteOffset})]);
                 }
         }
+	return $self->COMPLETE;
 }
 
 

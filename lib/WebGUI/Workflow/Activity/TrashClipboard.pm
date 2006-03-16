@@ -81,6 +81,7 @@ sub execute {
         	my $asset = WebGUI::Asset->new($id,$class);
         	$asset->trash;
        	}
+	return $self->COMPLETE;
 }
 
 

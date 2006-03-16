@@ -75,6 +75,7 @@ sub execute {
 	}
 	$versionTag->lock;
 	$versionTag->clearWorking;
+	return $self->COMPLETE;
 }
 
 

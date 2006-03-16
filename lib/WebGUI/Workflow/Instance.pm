@@ -16,6 +16,7 @@ package WebGUI::Workflow::Instance;
 =cut
 
 use strict;
+use JSON;
 use WebGUI::Workflow::Spectre;
 
 
@@ -131,6 +132,10 @@ Returns the value for a given property. See the set() method for details.
 sub get {
 	my $self = shift;
 	my $name = shift;
+	if ($name eq "parameters") {
+		my $parameters = JSON::jsonToObj( $self->{_data}{$name});
+		return $parameters->{parameters};
+	}
 	return $self->{_data}{$name};
 }
 
@@ -214,18 +219,13 @@ sub run {
 	my $method = $self->get("methodName");
 	my $params = $self->get("parameters");
 	if ($class && $method) {
-		$params = eval($params);
-		if ($@) {
-			$self->session->errorHandler->warn("Error reconsituting activity (".$activity->getId.") pass-in params: ".$@);
-			return "error";
-		}
 		$object = eval($class->$method($self->session, $params));
 		if ($@) {
 			$self->session->errorHandler->warn("Error instanciating  activity (".$activity->getId.") pass-in object: ".$@);
 			return "error";
 		}
 	}
-	$activity->execute($object, $self);	
+	return $activity->execute($object, $self);	
 }
 
 
@@ -285,7 +285,9 @@ sub set {
 	$self->{_data}{workflowId} = $properties->{workflowId} || $self->{_data}{workflowId};
 	$self->{_data}{className} = (exists $properties->{className}) ? $properties->{className} : $self->{_data}{className};
 	$self->{_data}{methodName} = (exists $properties->{methodName}) ? $properties->{methodName} : $self->{_data}{methodName};
-	$self->{_data}{parameters} = (exists $properties->{parameters}) ? $properties->{parameters} : $self->{_data}{parameters};
+	if (exists $properties->{parameters}) {
+		$self->{_data}{parameters} = JSON::objToJson({parameters => $properties->{parameters}});
+	}
 	$self->{_data}{currentActivityId} = (exists $properties->{currentActivityId}) ? $properties->{currentActivityId} : $self->{_data}{currentActivityId};
 	$self->{_data}{lastUpdate} = time();
 	$self->session->db->setRow("WorkflowInstance","instanceId",$self->{_data});

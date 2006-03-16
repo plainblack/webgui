@@ -76,6 +76,7 @@ See WebGUI::Workflow::Activity::execute() for details.
 sub execute {
 	my $self = shift;
         $self->session->db->write("delete from userLoginLog where timeStamp < ?", [(time()-(86400*$self->get("ageToDelete")))]);
+	return $self->COMPLETE;
 }
 
 

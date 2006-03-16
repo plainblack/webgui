@@ -82,9 +82,10 @@ sub execute {
 	$self->session->user({user=>$user});
 	WebGUI::Macro::process(\$cmd);
 	if (system($cmd)) {
-		return 0;
+		$self->session->errorHandler->error("Workflow: RunCommandAsUser failed because: $!");
+		return $self->ERROR;
 	} else {
-		return 1;
+		return $self->COMPLETE;
 	}
 }
 
