@@ -46,6 +46,8 @@ sub start {
 	);
 	my $session = WebGUI::Session->open("../..",$configFile);
 	$session->user({userId=>3});
+	my $versionTag = WebGUI::VersionTag->getWorking($session);
+	$versionTag->set({name=>"Upgrade to ".$toVersion});
 	$session->db->write("insert into webguiVersion values (".$session->db->quote($toVersion).",'upgrade',".$session->datetime->time().")");
 	return $session;
 }
@@ -53,6 +55,8 @@ sub start {
 #-------------------------------------------------
 sub finish {
 	my $session = shift;
+	my $versionTag = WebGUI::VersionTag->getWorking($session);
+	$versionTag->commit;
 	$session->close();
 }
 

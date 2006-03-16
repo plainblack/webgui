@@ -12,6 +12,7 @@ use lib "../../lib";
 use strict;
 use Getopt::Long;
 use WebGUI::Session;
+use WebGUI::VersionTag;
 use File::Path;
 use WebGUI::Workflow;
 use WebGUI::Workflow::Cron;
@@ -329,7 +330,6 @@ sub updateTemplates {
 		url=> "6_9_0_new_templates",
 		groupIdView=>"12"
 		});
-	$folder->commit;
 	foreach my $file (@files) {
 		next unless ($file =~ /\.tmpl$/);
 		open(FILE,"<templates-6.99.0/".$file);
@@ -358,13 +358,11 @@ sub updateTemplates {
 		if ($create) {
 			sleep(1);
 			my $template = $folder->addChild(\%properties, $properties{id});
-			$template->commit;
 		} else {
 			sleep(1);
 			my $template = WebGUI::Asset->new($session,$properties{id}, "WebGUI::Asset::Template");
 			if (defined $template) {
 				my $newRevision = $template->addRevision(\%properties);
-				$newRevision->commit;
 			}
 		}
 	}
@@ -654,7 +652,7 @@ sub updateHelpTemplate {
 	 </tmpl_if>
 EOT
 	my $asset = WebGUI::Asset->new($session,"PBtmplHelp000000000001","WebGUI::Asset::Template");
-	$asset->addRevision({template=>$template})->commit;
+	$asset->addRevision({template=>$template});
 }
 
 # ---- DO NOT EDIT BELOW THIS LINE ----
@@ -669,6 +667,8 @@ sub start {
 	);
 	my $session = WebGUI::Session->open("../..",$configFile);
 	$session->user({userId=>3});
+	my $versionTag = WebGUI::VersionTag->getWorking($session);
+	$versionTag->set({name=>"Upgrade to ".$toVersion});
 	$session->db->write("insert into webguiVersion values (".$session->db->quote($toVersion).",'upgrade',".$session->datetime->time().")");
 	return $session;
 }
@@ -676,6 +676,8 @@ sub start {
 #-------------------------------------------------
 sub finish {
 	my $session = shift;
+	my $versionTag = WebGUI::VersionTag->getWorking($session);
+	$versionTag->commit;
 	$session->close();
 }
 
