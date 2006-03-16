@@ -96,7 +96,7 @@ sub www_editCronJob {
 		);
 	my $value = $cron->get("workflowId") if defined $cron;
 	my $type = "None";
-	if (defined $cron) {
+	if (defined $cron && $cron->get("className")) {
 		$type = $cron->get("className");
 	}
 	$f->workflow(

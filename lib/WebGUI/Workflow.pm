@@ -230,8 +230,11 @@ sub getList {
 	my $session = shift;
 	my $type = shift;
 	my $sql = "select workflowId, title from Workflow where enabled=1";
-	$sql .= " and type=?" if ($type);
-	return $session->db->buildHashRef($sql, [$type]);
+	if ($type) {
+		$sql .= " and type=?";
+		$type = [$type];
+	}
+	return $session->db->buildHashRef($sql, $type);
 }
 
 

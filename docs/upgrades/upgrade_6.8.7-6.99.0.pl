@@ -266,6 +266,7 @@ sub addWorkflow {
 		type=>"WebGUI::VersionTag"
 		}, "pbworkflow000000000003");
 	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::CommitVersionTag", "pbwfactivity0000000006");
+	$activity->set("title", "Commit Assets");
 	$workflow = WebGUI::Workflow->create($session, {
 		title=>"Commit With Approval",
 		description=>"This workflow commits all the assets in this version tag after getting approval from content managers.",
