@@ -762,20 +762,20 @@ sub www_editOverride {
 		%props = (%props,%{$def->{properties}});
 	}
 	$output .= '</table>';
-  my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
-  $f->hidden(-name=>"func",-value=>"saveOverride");
-  $f->hidden(-name=>"overrideFieldName",-value=>$self->session->form->process("fieldName"));
-  $f->readOnly(-label=>$i18n->get("fieldName"),-value=>$self->session->form->process("fieldName"));
-  $f->readOnly(-label=>$i18n->get("Original Value"),-value=>$overrides{overrides}{$fieldName}{origValue});
-  my %params;
-  foreach my $key (keys %{$props{$fieldName}}) {
+	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
+	$f->hidden(-name=>"func",-value=>"saveOverride");
+	$f->hidden(-name=>"overrideFieldName",-value=>$self->session->form->process("fieldName"));
+	$f->readOnly(-label=>$i18n->get("fieldName"),-value=>$self->session->form->process("fieldName"));
+	$f->readOnly(-label=>$i18n->get("Original Value"),-value=>$overrides{overrides}{$fieldName}{origValue});
+	my %params;
+	foreach my $key (keys %{$props{$fieldName}}) {
 		next if ($key eq "tab");
-			$params{$key} = $props{$fieldName}{$key};
-		}
+		$params{$key} = $props{$fieldName}{$key};
+	}
 	$params{value} = $overrides{overrides}{$fieldName}{origValue};
 	$params{name} = $fieldName;
 	$params{label} = $params{label} || $i18n->get("Edit Field Directly");
-	$params{hoverhelp} = $params{hoverhelp} || $i18n->get("Use this field to edit the override using the native form handler for this field type");
+	$params{hoverHelp} = $params{hoverHelp} || $i18n->get("Use this field to edit the override using the native form handler for this field type");
 	if ($fieldName eq 'templateId') {$params{namespace} = $params{namespace} || WebGUI::Asset->newByDynamicClass($self->session, $overrides{overrides}{templateId}{origValue})->get("namespace");}
 	$f->dynamicField(%params);
 	$f->textarea(
