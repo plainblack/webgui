@@ -866,9 +866,14 @@ sub getToolbar {
 	$toolbar .= $self->session->icon->export('func=export',$self->get("url")) if defined ($self->session->config->get("exportPath"));
 	$self->session->style->setLink($self->session->config->get("extrasURL").'/contextMenu/contextMenu.css', {rel=>"stylesheet",type=>"text/css"});
 	$self->session->style->setScript($self->session->config->get("extrasURL").'/contextMenu/contextMenu.js', {type=>"text/javascript"});
+	my $lock = "";
+	if (!$self->isLocked) {
+		$lock = 'contextMenu.addLink("'.$self->getUrl("func=lock").'","'.$i18n->get("lock").'");';
+	}
 	return '<script type="text/javascript">
 		//<![CDATA[
 		var contextMenu = new contextMenu_createWithImage("'.$self->getIcon(1).'","'.$self->getId.'","'.$self->getName.'");
+		'.$lock.'
 		contextMenu.addLink("'.$self->getUrl("func=editBranch").'","'.$i18n->get("edit branch").'");
 		contextMenu.addLink("'.$self->getUrl("func=promote").'","'.$i18n->get("promote").'");
 		contextMenu.addLink("'.$self->getUrl("func=demote").'","'.$i18n->get("demote").'");
@@ -1024,6 +1029,7 @@ sub manageAssets {
                 contextMenu.addLink("'.$child->getUrl("func=createShortcut;proceed=manageAssets").'","'.$i18n->get("create shortcut").'");
 		contextMenu.addLink("'.$child->getUrl("func=manageRevisions").'","'.$i18n->get("revisions").'");
                 contextMenu.addLink("'.$child->getUrl.'","'.$i18n->get("view").'"); '."\n";
+		$output .= 'contextMenu.addLink("'.$child->getUrl("func=lock;proceed=manageAssets").'","'.$i18n->get("lock").'");' unless ($child->isLocked);
 		my $title = $child->getTitle;
 		$title =~ s/\'/\\\'/g;
 		my $locked;

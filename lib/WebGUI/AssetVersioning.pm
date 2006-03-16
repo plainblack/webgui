@@ -69,7 +69,7 @@ sub addRevision {
         my $newVersion = WebGUI::Asset->new($self->session,$self->getId, $self->get("className"), $now);
         $newVersion->updateHistory("created revision");
 	$newVersion->update($self->get);
-	$newVersion->{isLockedBy} = $self->session->user->userId;
+	$newVersion->setVersionLock;
 	$properties->{status} = 'pending';
         $newVersion->update($properties);
         return $newVersion;
@@ -224,6 +224,27 @@ sub updateHistory {
 	$self->session->db->write("insert into assetHistory (assetId, userId, actionTaken, dateStamp) values (".$self->session->db->quote($self->getId).", ".$self->session->db->quote($userId).", ".$self->session->db->quote($action).", ".$dateStamp.")");
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 www_lock () 
+
+This is the same as doing an www_editSave without changing anything. It's here so that users can lock assets if they're planning on working on them, or they're working on some of the content offline.
+
+=cut
+
+sub www_lock {
+	my $self = shift;
+	if (!$self->isLocked && $self->canEdit) {
+		$self = $self->addRevision;
+	}
+	if ($self->session->form->process("proceed") eq "manageAssets") {
+                $self->session->asset($self->getParent);
+                return $self->session->asset->www_manageAssets;
+        }
+        $self->session->asset($self->getContainer);
+        return $self->session->asset->www_view;	
+}
 
 #-------------------------------------------------------------------
 

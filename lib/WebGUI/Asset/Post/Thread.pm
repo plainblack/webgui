@@ -197,7 +197,7 @@ Formats the url to lock a thread.
 
 sub getLockUrl {
 	my $self = shift;
-	$self->getUrl("func=lock");
+	$self->getUrl("func=lockThread");
 }
 
 
@@ -343,7 +343,7 @@ Formats the url to unlock the thread
 
 sub getUnlockUrl {
 	my $self = shift;
-	return $self->getUrl("func=unlock");
+	return $self->getUrl("func=unlockThread");
 }
 
 
@@ -838,7 +838,7 @@ The web method to lock a thread.
 
 =cut
 
-sub www_lock {
+sub www_lockThread {
 	my $self = shift;
 	$self->lock if $self->getParent->canModerate;
 	return $self->www_view;
@@ -914,7 +914,7 @@ The web method to unlock a thread.
 
 =cut
 
-sub www_unlock {
+sub www_unlockThread {
 	my $self = shift;
 	$self->unlock if $self->getParent->canModerate;
 	return $self->www_view;

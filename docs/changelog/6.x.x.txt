@@ -1,4 +1,5 @@
 6.99.0
+ - Addded a lock menu item to explicitly lock an asset from editing.
  - Run on registration and alert on new user have been converted to a single
    workflow.
  - Many changes for better XHTML compliance.

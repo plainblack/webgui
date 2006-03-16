@@ -55,6 +55,12 @@ our $I18N = {
 		context => q|The label for the purge button in the trash manager.|
 	},
 
+	'lock' => {
+		message => q|Lock|,
+		lastUpdated => 0,
+		context => q|A context menu item to lock an asset for editing.|
+	},
+
 	'locked' => {
 		message => q|Locked|,
 		lastUpdated => 0,
