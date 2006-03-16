@@ -210,7 +210,7 @@ sub www_commitVersionTagConfirm {
 			$tag->commit;
 			my $i18n = WebGUI::International->new($session, "VersionTag");
         		my $ac = WebGUI::AdminConsole->new($session,"versions");
-			$ac->render(
+			return $ac->render(
 				'<p>'.$i18n->get("commit accepted").'</p>'
 				.'<ul>
 				<li><a href="'.$session->url->page.'">'.$i18n->get("493","WebGUI").'</a></li>
