@@ -156,22 +156,6 @@ sub isManaging {
 	return 0;
 }
 
-#-------------------------------------------------------------------
-
-=head2 prepareView ( )
-
-See WebGUI::Asset::prepareView() for details.
-
-=cut
-
-sub prepareView {
-	my $self = shift;
-	$self->SUPER::prepareView();
-	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
-	$template->prepare;
-	$self->{_viewTemplate} = $template;
-}
-
 
 #-------------------------------------------------------------------
 sub processPropertiesFromFormPost {
@@ -301,17 +285,31 @@ sub www_setContentPositions {
 
 #-------------------------------------------------------------------
 
-=head2 www_view ( )
+=head2 www_view (  )
 
-Returns the view() method of the asset object if the requestor canView.
+Renders self->view based upon current style, subject to timeouts. Returns Privilege::noAccess() if canView is False.
 
 =cut
 
 sub www_view {
-	my $self = shift;
-	return $self->SUPER::www_view(1);
+        my $self = shift;
+        unless ($self->canView) {
+                if ($self->get("state") eq "published") { # no privileges, make em log in
+                        return $self->session->privilege->noAccess();
+                } elsif ($self->session->var->get("adminOn") && $self->get("state") =~ /^trash/) { # show em trash
+                        $self->session->http->setRedirect($self->getUrl("func=manageTrash"));
+                        return "";
+                } elsif ($self->session->var->get("adminOn") && $self->get("state") =~ /^clipboard/) { # show em clipboard
+                        $self->session->http->setRedirect($self->getUrl("func=manageClipboard"));
+                        return "";
+                } else { # tell em it doesn't exist anymore
+                        $self->session->http->setStatus("410");
+                        return WebGUI::Asset->getNotFound($self->session)->www_view;
+                }
+        }
+        $self->logView();
+        my $style = $self->processStyle($self->view);
 }
-
 
 
 

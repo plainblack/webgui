@@ -566,7 +566,7 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 
-=head2 www_view ( [ disableCache ] )
+=head2 www_view (  )
 
 Renders self->view based upon current style, subject to timeouts. Returns Privilege::noAccess() if canView is False.
 
@@ -588,10 +588,11 @@ sub www_view {
 			return WebGUI::Asset->getNotFound($self->session)->www_view;
 		}
 	}
-	if ($self->get("encryptPage") && $self->session->env->get("HTTPS") ne "on") {
-                $self->session->http->setRedirect($self->getUrl);
-                return "";
-        }
+# causes problems with the wre so it's commented out
+#	if ($self->get("encryptPage") && $self->session->env->get("HTTPS") ne "on") {
+ #               $self->session->http->setRedirect($self->getUrl);
+  #              return "";
+   #     }
 	$self->logView();
 	# must find a way to do this next line better
 	$self->session->http->setCookie("wgSession",$self->session->var->{_var}{sessionId}) unless $self->session->var->{_var}{sessionId} eq $self->session->http->getCookies->{"wgSession"};
