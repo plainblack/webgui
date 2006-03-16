@@ -128,6 +128,8 @@ sub addWorkflow {
 		primary key (activityId, name)
 		)");
 	print "\t\tPurging old workflow info.\n";
+	my $versionTag = WebGUI::VersionTag->getWorking($session);
+	$versionTag->set({name=>"Upgrade to ".$toVersion});
 	my $rs = $session->db->read("select assetId from assetData where status='denied'");
 	while (my ($id) = $rs->array) {
 		my $asset = WebGUI::Asset->newByDynamicClass($session, $id);
@@ -667,8 +669,6 @@ sub start {
 	);
 	my $session = WebGUI::Session->open("../..",$configFile);
 	$session->user({userId=>3});
-	my $versionTag = WebGUI::VersionTag->getWorking($session);
-	$versionTag->set({name=>"Upgrade to ".$toVersion});
 	$session->db->write("insert into webguiVersion values (".$session->db->quote($toVersion).",'upgrade',".$session->datetime->time().")");
 	return $session;
 }
