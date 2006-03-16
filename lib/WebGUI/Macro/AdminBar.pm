@@ -103,7 +103,7 @@ sub process {
 	if ($working) {
 		$workingId = $working->getId;
 		push(@tags, {
-			url=>$session->url->page("op=commitVersionTag;backToSite=1;tagId=".$workingId),
+			url=>$session->url->page("op=commitVersionTag;tagId=".$workingId),
 			title=>$i18n->get("commit my changes"),
 			icon=>$session->config->get("extrasURL").'/adminConsole/small/versionTags.gif'
 			});

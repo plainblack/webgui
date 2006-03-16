@@ -291,6 +291,10 @@ The ID of the workflow that will be triggered when this workflow is committed. D
 
 The ID of the group that's allowed to use this tag. Defaults to the turn admin on group.
 
+=head4 comments
+
+Some text about this version tag, what it's for, why it was committed, why it was denied, why it was approved, etc.
+
 =cut
 
 sub set {
@@ -299,6 +303,13 @@ sub set {
 	$self->{_data}{name} = $properties->{name} || $self->{_data}{name} || "(Autotag) ".$self->session->datetime->epochToHuman()." / ".$self->session->user->username;
 	$self->{_data}{workflowId} = $properties->{workflowId} || $self->{_data}{workflowId} || $self->session->setting->get("defaultVersionTagWorkflow");
 	$self->{_data}{groupToUse} = $properties->{groupToUse} || $self->{_data}{groupToUse} || "12";
+	if (exists $properties->{comments}) {
+		$self->{_data}{comments}=$self->{_data}{comments}
+                                .$self->session->datetime->epochToHuman.' - '.$self->session->user->username
+                                ."\n"
+                                .$properties->{comments}
+                                ."\n\n";
+	}
 	$self->session->db->setRow("assetVersionTag","tagId",$self->{_data});
 }
 

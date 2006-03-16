@@ -80,6 +80,7 @@ sub getOperations {
 	  'editVersionTag' => 'WebGUI::Operation::VersionTag',
 	  'editVersionTagSave' => 'WebGUI::Operation::VersionTag',
 	  'commitVersionTag' => 'WebGUI::Operation::VersionTag',
+	  'commitVersionTagConfirm' => 'WebGUI::Operation::VersionTag',
 	  'manageCommittedVersions' => 'WebGUI::Operation::VersionTag',
 	  'manageVersions' => 'WebGUI::Operation::VersionTag',
 	  'manageRevisionsInTag' => 'WebGUI::Operation::VersionTag',

@@ -78,6 +78,7 @@ sub addWorkflow {
 	$session->db->write("alter table assetVersionTag add column lockedBy varchar(22) binary not null");
 	$session->db->write("alter table assetVersionTag add column groupToUse varchar(22) binary not null");
 	$session->db->write("alter table assetVersionTag add column workflowId varchar(22) binary not null");
+	$session->db->write("alter table assetVersionTag add column comments text");
 	$session->db->write("create table WorkflowSchedule (
 		taskId varchar(22) binary not null primary key,
 		title varchar(255) not null default 'Untitled',

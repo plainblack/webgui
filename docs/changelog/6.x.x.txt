@@ -1,19 +1,21 @@
 6.99.0
+ - Added a workflow system.
+ - Added a workflow scheduler system.
+ - Converted the runHourly.pl scripts to run as scheduled workflows. 
+ - Added version tags menu to admin bar.
+ - Added versioning commit comments.
+ - Removed autocommit mode in favor of workflow controlled commits.
+ - Added a revisions list to the edit screen of assets, so that you can
+   quickly edit/view an old revision.
  - Addded a lock menu item to explicitly lock an asset from editing.
  - Run on registration and alert on new user have been converted to a single
    workflow.
  - Many changes for better XHTML compliance.
  - Refactored admin bar to be more dynamic.
- - Added version tags menu to admin bar.
- - Added a revisions list to the edit screen of assets, so that you can
-   quickly edit/view an old revision.
  - Removed start/end dates from assets in favor of the workflow system.
  - Readded the purge option to the trash manager.
  - Added archive/unarchive options to CS threads.
  - Added a database cache option as an alternative to memcached.
- - Added a workflow system.
- - Added a workflow scheduler system.
- - Converted the runHourly.pl scripts to run as scheduled workflows. 
  - Converted WebGUI to use a new object oriented session system. More details
    in migation.txt.
  - Added a lot more tests to the test suite.

@@ -146,9 +146,9 @@ sub www_editVersionTagSave {
 
 #-------------------------------------------------------------------
 
-=head2 www_commitVersionTag ( session )
+=head2 www_commitVersionTag ( session ) 
 
-Commits a version tag.
+Prompts a user to apply some comments before they commit their tag.
 
 =head3 session
 
@@ -161,12 +161,65 @@ sub www_commitVersionTag {
 	my $tagId = $session->form->param("tagId");
 	if ($tagId) {
 		my $tag = WebGUI::VersionTag->new($session, $tagId);
-		$tag->commit if (defined $tag && $session->user->isInGroup($tag->get("groupToUse")));
-	}
-	if ($session->form->get("backToSite")) {
-		return "";
+		if (defined $tag && $session->user->isInGroup($tag->get("groupToUse"))) {
+			my $i18n = WebGUI::International->new($session, "VersionTag");
+			my $f = WebGUI::HTMLForm->new($session);
+			$f->readOnly(
+				label=>$i18n->get("version tag name"),
+				value=>$tag->get("name")
+				);
+			$f->hidden(
+				name=>"tagId",
+				value=>$session->form->param("tagId")
+				);
+			$f->hidden(
+				name=>"op",
+				value=>"commitVersionTagConfirm"
+				);
+			$f->textarea(
+				name=>"comments",
+				label=>$i18n->get("comments")
+				);
+			$f->submit;
+        		my $ac = WebGUI::AdminConsole->new($session,"versions");
+			return $ac->render($f->print);
+		}
 	}
 	return www_manageVersions($session);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_commitVersionTagConfirm ( session )
+
+Commits a version tag.
+
+=head3 session
+
+A reference to the current session.
+
+=cut
+
+sub www_commitVersionTagConfirm {
+	my $session = shift;
+	my $tagId = $session->form->param("tagId");
+	if ($tagId) {
+		my $tag = WebGUI::VersionTag->new($session, $tagId);
+		if (defined $tag && $session->user->isInGroup($tag->get("groupToUse"))) {
+			$tag->set({comments=>$session->form->process("comments", "textarea")});
+			$tag->commit;
+			my $i18n = WebGUI::International->new($session, "VersionTag");
+        		my $ac = WebGUI::AdminConsole->new($session,"versions");
+			$ac->render(
+				'<p>'.$i18n->get("commit accepted").'</p>'
+				.'<ul>
+				<li><a href="'.$session->url->page.'">'.$i18n->get("493","WebGUI").'</a></li>
+				<li><a href="'.$session->url->page("op=manageVersions").'">'.$i18n->get("manage versions").'</a></li>
+				</ul>'	
+				);
+		}
+	}
+	return www_manageVersions($session);	
 }
 
 #-------------------------------------------------------------------
@@ -315,7 +368,7 @@ sub www_manageRevisionsInTag {
 	if ($tag->get("comments")) {
 		my $comments = $tag->get("comments");
 		$comments =~ s/\n/<br \/>/g;
-		$output .= '<p>'.$comments.'</p>';
+		$output .= $comments;
 	}
 	$output .= '<table width=100% class="content">
         <tr><th></th><th>'.$i18n->get(99,"Asset").'</th><th>'.$i18n->get("type","Asset").'</th><th>'.$i18n->get("revision date","Asset").'</th><th>'.$i18n->get("revised by","Asset").'</th></tr> ';
