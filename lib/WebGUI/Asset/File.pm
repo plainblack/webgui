@@ -297,7 +297,7 @@ sub www_view {
 		return $self->getContainer->www_view;
 	}
 	WebGUI::HTTP::setRedirect($self->getFileUrl);
-	return "";
+	return "1";
 }
 
 
