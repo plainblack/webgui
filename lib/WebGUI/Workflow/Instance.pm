@@ -147,7 +147,7 @@ Returns the value for a given scratch variable.
 
 =cut
 
-sub get {
+sub getScratch {
 	my $self = shift;
 	my $name = shift;
 	unless (exists $self->{_scratch}) {
