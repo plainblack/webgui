@@ -428,12 +428,11 @@ sub _make_regex{
 sub _get_items {
 	my $self = shift;
 	my $urls = shift;
-	my $maxHeadlines = shift;
+	my $maxHeadlines = shift || $self->getValue('maxHeadlines');
         
 	my $displayMode=$self->getValue('displayMode');
 
 	my $hasTermsRegex=_make_regex($self->getValue('hasTerms'));
-	my $maxHeadlines=$self->getValue('maxHeadlines');
 	
 	my $key=join(':',('aggregate', $displayMode,$hasTermsRegex,$maxHeadlines,$self->get('rssUrl')));
 
