@@ -147,13 +147,17 @@ sub isAdminOn {
 
 #-------------------------------------------------------------------
 
-=head2 new ( session, noFuss )
+=head2 new ( session, sessionId, noFuss )
 
 Constructor. Returns a var object.
 
 =head3 session
 
 A reference to the session.
+
+=head3 sessionId
+
+The specific sessionId you want to instantiate.
 
 =head3 noFuss
 
