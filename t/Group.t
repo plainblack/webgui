@@ -18,7 +18,7 @@ use WebGUI::Utility;
 
 use WebGUI::User;
 use WebGUI::Group;
-use Test::More tests => 39; # increment this value for each test you create
+use Test::More tests => 45; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -100,8 +100,45 @@ $gA->addGroups([$gC->getId]);
 
 cmp_bag($gC->getGroupsFor(), [$gA->getId], 'Group A contains Group C');
 cmp_bag($gA->getGroupsIn(),  [$gC->getId, 3], 'Group C is a member of Group A, cached');
-cmp_bag($gB->getGroupsIn(1), [$gC->getId, $gA->getId, 3], 'Group C is in Group B, recursively, cached result');
-cmp_bag($gB->getGroupsIn(),  [$gA->getId, 3], 'Group A is in Group B, cached result');
+cmp_bag($gB->getGroupsIn(1), [$gC->getId, $gA->getId, 3], 'Group C is in Group B, recursively');
+cmp_bag($gB->getGroupsIn(),  [$gA->getId, 3], 'Group A is in Group B');
+
+$gC->addGroups([$gB->getId]);
+cmp_bag($gC->getGroupsIn(), [3], 'Adding Group B to Group C fails, recursively');
+
+$gA->deleteGroups([$gC->getId]);
+cmp_bag($gA->getGroupsIn(),  [3], 'Group C is not a member of Group A');
+cmp_bag($gB->getGroupsIn(1), [$gA->getId, 3], 'Group C is not in Group B, recursively');
+cmp_bag($gC->getGroupsFor(), [], 'No groups contain Group C');
+
+#	B		Z
+#      / \	       / \
+#     A   C	      Y   X
+
+$gB->addGroups([$gC->getId]);
+
+my $gX = WebGUI::Group->new($session, "new");
+my $gY = WebGUI::Group->new($session, "new");
+my $gZ = WebGUI::Group->new($session, "new");
+$gX->name('Group X');
+$gY->name('Group Y');
+$gZ->name('Group Z');
+
+$gZ->addGroups([$gX->getId, $gY->getId]);
+
+#		B
+#	       / \
+#	      A   C
+#	      |
+#	      Z
+#            / \
+#           X   Y
+
+$gA->addGroups([$gZ->getId]);
+cmp_bag($gB->getGroupsIn(1), [$gA->getId, $gC->getId, $gZ->getId, $gY->getId, $gX->getId, 3], 'Add Z tree to A under B');
+
+$gX->addGroups([$gA->getId]);
+cmp_bag($gX->getGroupsIn(), [3], 'Not able to add B tree under Z tree under X');
 
 END {
 	(defined $gA and ref $gA eq 'WebGUI::Group') and $gA->delete;

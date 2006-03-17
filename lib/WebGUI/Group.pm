@@ -256,8 +256,9 @@ sub deleteGroups {
 	my $groups = shift;
 	$self->session->stow->delete("isInGroup");
         foreach my $gid (@{$groups}) {
-        	$self->session->db->write("delete from groupGroupings where groupId=".$self->session->db->quote($gid)." and inGroup=".$self->session->db->quote($self->getId));
+        	$self->session->db->write("delete from groupGroupings where groupId=? and inGroup=?",[$gid, $self->getId]);
         }
+	$self->session->stow->delete("gotGroupsInGroup");
 }
 
 
