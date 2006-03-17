@@ -416,19 +416,5 @@ sub  trackingUrl {
 	return undef;
 }
 
-#-------------------------------------------------------------------
-
-=head2 optionsOk
-
-This method returns a boolean indicating wheter the supplied options (loaded into the plugin 
-by either setOptions or processOptionsForm) are valid. Overload if your plugin support configuration 
-options. Defaults to true.
-
-=cut
-
-sub optionsOk {
-	return 1;	
-};
-
 1;
 
