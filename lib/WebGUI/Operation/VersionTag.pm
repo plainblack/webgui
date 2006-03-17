@@ -75,7 +75,7 @@ sub www_editVersionTag {
 		-value=>$value,
 		-defaultValue=>"new"
 		);
-	my $value = $tag->get("name") if defined $tag;
+	$value = $tag->get("name") if defined $tag;
 	$f->text(
 		-name=>"name",
 		-label=>$i18n->get("version tag name"),
@@ -389,7 +389,7 @@ sub www_manageRevisionsInTag {
 			<td>'.$by.'</td></tr>';
         }
         $output .= '</table>'.$p->getBarSimple;
-	my $tag = $session->db->getRow("assetVersionTag","tagId",$tag->getId);
+	$tag = $session->db->getRow("assetVersionTag","tagId",$tag->getId);
         return $ac->render($output,$i18n->get("revisions in tag").": ".$tag->{name});
 }
 

@@ -78,7 +78,7 @@ sub www_editCronJob {
 		label=>$i18n->get("title"),
 		hoverHelp=>$i18n->get("title help")
 		);
-	my $value = $cron->get("enabled") if defined $cron;
+	$value = $cron->get("enabled") if defined $cron;
 	$f->yesNo(
 		name=>"enabled",
 		value=>$value,
@@ -86,7 +86,7 @@ sub www_editCronJob {
 		label=>$i18n->get("is enabled"),
 		hoverHelp=>$i18n->get("is enabled help")
 		);
-	my $value = $cron->get("runOnce") if defined $cron;
+	$value = $cron->get("runOnce") if defined $cron;
 	$f->yesNo(
 		name=>"runOnce",
 		value=>$value,
@@ -94,7 +94,7 @@ sub www_editCronJob {
 		label=>$i18n->get("run once"),
 		hoverHelp=>$i18n->get("run once help")
 		);
-	my $value = $cron->get("workflowId") if defined $cron;
+	$value = $cron->get("workflowId") if defined $cron;
 	my $type = "None";
 	if (defined $cron && $cron->get("className")) {
 		$type = $cron->get("className");
@@ -109,7 +109,7 @@ sub www_editCronJob {
 	my %priorities = ();
 	tie %priorities, 'Tie::IxHash';
 	%priorities = (1=>$i18n->get("high"), 2=>$i18n->get("medium"), 3=>$i18n->get("low"));
-	my $value = $cron->get("priority") if defined $cron;
+	$value = $cron->get("priority") if defined $cron;
 	$f->radioList(
 		name=>"priority",
 		vertical=>1,
@@ -119,7 +119,7 @@ sub www_editCronJob {
 		label=>$i18n->get("priority"),
 		hoverHelp=>$i18n->get("priority help")
 		);
-	my $value = $cron->get("minuteOfHour") if defined $cron;
+	$value = $cron->get("minuteOfHour") if defined $cron;
 	$f->text(
 		name=>"minuteOfHour",
 		value=>$value,
@@ -127,7 +127,7 @@ sub www_editCronJob {
 		label=>$i18n->get("minute of hour"),
 		hoverHelp=>$i18n->get("minute of hour help")
 		);
-	my $value = $cron->get("hourOfDay") if defined $cron;
+	$value = $cron->get("hourOfDay") if defined $cron;
 	$f->text(
 		name=>"hourOfDay",
 		value=>$value,
@@ -135,7 +135,7 @@ sub www_editCronJob {
 		label=>$i18n->get("hour of day"),
 		hoverHelp=>$i18n->get("hour of day help")
 		);
-	my $value = $cron->get("dayOfMonth") if defined $cron;
+	$value = $cron->get("dayOfMonth") if defined $cron;
 	$f->text(
 		name=>"dayOfMonth",
 		value=>$value,
@@ -143,7 +143,7 @@ sub www_editCronJob {
 		label=>$i18n->get("day of month"),
 		hoverHelp=>$i18n->get("day of month help")
 		);
-	my $value = $cron->get("monthOfYear") if defined $cron;
+	$value = $cron->get("monthOfYear") if defined $cron;
 	$f->text(
 		name=>"monthOfYear",
 		value=>$value,
@@ -151,7 +151,7 @@ sub www_editCronJob {
 		label=>$i18n->get("month of year"),
 		hoverHelp=>$i18n->get("month of year help")
 		);
-	my $value = $cron->get("dayOfWeek") if defined $cron;
+	$value = $cron->get("dayOfWeek") if defined $cron;
 	$f->text(
 		name=>"dayOfWeek",
 		value=>$value,

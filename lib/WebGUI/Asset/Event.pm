@@ -231,8 +231,9 @@ sub view {
 	$var{"delete.url"} = $self->session->url->page('func=deleteEvent;rid='.$self->getValue("EventsCalendar_recurringId"));
 	$var{"delete.label"} = $i18n->get(576);
 	my @others;
-	my ($start, $garbage) = $self->session->datetime->dayStartEnd($self->get("eventStartDate"));
-	my ($garbage, $end) = $self->session->datetime->dayStartEnd($self->get("eventEndDate"));
+	my ($start, $garbage, $end);
+	($start, $garbage) = $self->session->datetime->dayStartEnd($self->get("eventStartDate"));
+	($garbage, $end) = $self->session->datetime->dayStartEnd($self->get("eventEndDate"));
 	my $sth = $self->session->db->read("select assetId from EventsCalendar_event where ((eventStartDate >= $start and eventStartDate <= $end) or (eventEndDate >= $start and eventEndDate <= $end)) and assetId<>".$self->session->db->quote($self->getId));
 	while (my ($assetId) = $sth->array) {
 		my $asset = WebGUI::Asset::Event->new($self->session, $assetId);
