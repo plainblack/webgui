@@ -166,10 +166,12 @@ sub new {
 	my $session = shift;
 	my $self = bless {_session=>$session}, $class;
 	my $sessionId = shift;
+	my $noFuss = shift;
 	if ($sessionId eq "") {
 		$self->start(1);
 	} else {
-		$self->{_var} = $session->db->quickHashRef("select * from userSession where sessionId=".$session->db->quote($sessionId));
+		$self->{_var} = $session->db->quickHashRef("select * from userSession where sessionId=?",[$sessionId]);
+		return $self if $noFuss && $self->{_var}{sessionId};
 		if ($self->{_var}{expires} && $self->{_var}{expires} < $session->datetime->time()) {
 			$self->end;
 			$self->start(1,$sessionId);
