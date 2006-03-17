@@ -106,6 +106,7 @@ sub checkJobs {
 			$kernel->yield("runWorker",$job);
 		}
 	}	
+	$kernel->delay_set("checkJobs",$self->config->get("timeBetweenJobs"));
 }
 
 #-------------------------------------------------------------------
@@ -186,6 +187,10 @@ sub getNextJob {
 	$self->debug("Looking for a workflow instance to execute.");
 	foreach my $priority (1..3) {
 		foreach my $job (@{$self->{"_priority".$priority}}) {
+			if (time() > $job->{statusDelay} & $job->{status}) {
+				delete $job->{statusDelay};
+				$job->{status} eq "waiting";
+			}
 			if ($job->{status} eq "waiting") {
 				$self->debug("Looks like ".$job->{instanceId}." would be a good workflow instance to run.");
 				return $job;
@@ -288,7 +293,8 @@ sub suspendJob {
 	my $self = shift;
 	my $instanceId = shift;
 	$self->debug("Suspending workflow instance ".$instanceId.".");
-	$self->{_jobs}{$instanceId}{status} = "waiting";
+	$self->{_jobs}{$instanceId}{status} = "delay";
+	$self->{_jobs}{$instanceId}{statusDelay} = $self->config->get("delayAfterSuspension") + time();
 	for (my $i=0; $i < scalar(@{$self->{_runningJobs}}); $i++) {
 		if ($self->{_runningJobs}[$i]{instanceId} eq $instanceId) {
 			splice(@{$self->{_runningJobs}}, $i, 1);
@@ -323,9 +329,10 @@ sub workerResponse {
 		my $state = $payload->{state}; 
 		if ($state eq "waiting") {
 			$self->debug("Was told to wait on $jobId because we're still waiting on some external event.");
-			$self->suspendJob($jobId, $self->config->get("waitTime"));
+			$self->suspendJob($jobId);
 		} elsif ($state eq "complete") {
 			$self->debug("Workflow instance $jobId ran one of it's activities successfully.");
+			$self->suspendJob($jobId);
 		} elsif ($state eq "disabled") {
 			$self->debug("Workflow instance $jobId is disabled.");
 			$self->deleteJob($jobId);			
@@ -334,10 +341,10 @@ sub workerResponse {
 			$self->deleteJob($jobId);			
 		} elsif ($state eq "error") {
 			$self->debug("Got an error for $jobId.");
-			$self->suspendJob($jobId, $self->config->get("waitTime"));
+			$self->suspendJob($jobId);
 		} else {
-			$self->debug("Something bad happened on the return of $jobId, so we're suspending it's run for a while.");
-			$self->suspendJob($jobId, $self->config->get("waitTime"));
+			$self->debug("Something bad happened on the return of $jobId.");
+			$self->suspendJob($jobId);
 			# something bad happened
 		}
 	} elsif ($response->is_redirect) {
