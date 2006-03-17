@@ -17,6 +17,8 @@ use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Workflow;
 use WebGUI::Workflow::Activity;
+use WebGUI::Workflow::Instance;
+use WebGUI::Utility;
 
 =head1 NAME
 
@@ -295,6 +297,28 @@ sub www_manageWorkflows {
 	my $ac = WebGUI::AdminConsole->new($session,"workflow");
 	$ac->addSubmenuItem($session->url->page("op=addWorkflow"), $i18n->get("add a new workflow"));
 	return $ac->render($output);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_runWorkflow ( )
+
+Checks to ensure the requestor is who we think it is, and then executes a workflow and returns the results.
+
+=cut
+
+sub www_runWorkflow {
+        my $session = shift;
+	$session->http->setMimeType("text/plain");
+        return "error" unless (isInSubnet($session->env->get("REMOTE_ADDR"), $session->config->get("spectreSubnets")));
+	my $instanceId = $session->form->param("instanceId");
+	if ($instanceId) {
+		my $instance = WebGUI::Workflow::Instance->new($session, $instanceId);
+		if (defined $instance) {
+			return $instance->run;
+		}
+	}
+	return "error";
 }
 
 1;

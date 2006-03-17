@@ -39,7 +39,6 @@ save you many hours of grief.
 	POE
 	POE::Component::IKC::Server
 	POE::Component::Client::UserAgent
-	Crypt::Blowfish
 	Net::Subnets
 
  * The upgrade script is going to convert your WebGUI config files

@@ -239,7 +239,7 @@ Locks the version tag and then kicks off the approval/commit workflow for it.
 sub requestCommit {
 	my $self = shift;
 	$self->lock;
-	my $instance = WebGUI::Workflow::Instance->new($self->session, {
+	my $instance = WebGUI::Workflow::Instance->create($self->session, {
 		workflowId=>$self->get("workflowId"),
 		className=>"WebGUI::VersionTag",
 		method=>"new",

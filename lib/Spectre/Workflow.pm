@@ -15,8 +15,7 @@ package Spectre::Workflow;
 =cut
 
 use strict;
-use Crypt::Blowfish;
-use JSON;
+use HTTP::Request::Common;
 use POE;
 use POE::Component::Client::UserAgent;
 
@@ -76,7 +75,7 @@ A hash reference containing a row of data from the WorkflowInstance table.
 
 sub addJob {
 	my ($self, $config, $job) = @_[OBJECT, ARG0, ARG1];
-	$self->debug->("Adding workflow instance ".$job->{instanceId}." from ".$config."  to job queue at priority ".$job->{priority}.".");
+	$self->debug("Adding workflow instance ".$job->{instanceId}." from ".$config."  to job queue at priority ".$job->{priority}.".");
 	# job list
 	$self->{_jobs}{$job->{instanceId}} = {
 		instanceId=>$job->{instanceId},
@@ -262,12 +261,7 @@ sub runWorker {
 	my $url = $job->{sitename}.'/'.$job->{gateway};
 	$url =~ s/\/\//\//g;
 	$url = "http://".$url."?op=spectre;instanceId=".$job->{instanceId};
-	my $payload = {
-		'do'=>'runWorkflow',
-		instanceId=>$job->{instanceId},
-		};
-	my $cipher = Crypt::Blowfish->new($self->config->get("cryptoKey"));
-	my $request = HTTP::Request->new(POST => $url, Content => { op=>"spectre", payload=>$cipher->encrypt(objToJson($payload)) });
+	my $request = POST $url, [op=>"runWorkflow", instanceId=>$job->{instanceId}];
 	my $cookie = $self->{_cookies}{$job->{sitename}};
 	$request->header("Cookie","wgSession=".$cookie) if (defined $cookie);
 	$request->header("User-Agent","Spectre");
@@ -324,9 +318,7 @@ sub workerResponse {
 			$cookie =~ s/wgSession=([a-zA-Z0-9\_\-]{22})/$1/;
 			$self->{_cookies}{$self->{_jobs}{$jobId}{sitename}} = $cookie;
 		}
-		my $cipher = Crypt::Blowfish->new($self->config->get("cryptoKey"));
-		my $payload = jsonToObj($cipher->decrypt($response->content));
-		my $state = $payload->{state}; 
+		my $state = $response->content; 
 		if ($state eq "waiting") {
 			$self->debug("Was told to wait on $jobId because we're still waiting on some external event.");
 			$self->suspendJob($jobId);
