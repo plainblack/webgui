@@ -345,7 +345,7 @@ Sets this tag as the working tag for the current user.
 sub setWorking {
 	my $self = shift;
 	$self->session->scratch->set("versionTag",$self->getId);
-	$self->session->stow("versionTag", $self);
+	$self->session->stow->set("versionTag", $self);
 }
 
 #-------------------------------------------------------------------

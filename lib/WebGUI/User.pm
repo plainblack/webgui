@@ -206,13 +206,13 @@ sub getGroups {
                 return $gotGroupsForUser->{$self->userId};
         } else {
                 my @groups = $self->session->db->buildArray("select groupId from groupings where userId=".$self->session->db->quote($self->userId)." $clause");
-		my $isInGroup = $self->session->stow("isInGroup");
+		my $isInGroup = $self->session->stow->get("isInGroup");
                 foreach my $gid (@groups) {	
                         $isInGroup->{$self->userId}{$gid} = 1;
                 }
-		$self->session->stow("isInGroup",$isInGroup);
+		$self->session->stow->set("isInGroup",$isInGroup);
                 $gotGroupsForUser->{$self->userId} = \@groups;
-		$self->session->stow("gotGroupsForUser",$gotGroupsForUser);
+		$self->session->stow->set("gotGroupsForUser",$gotGroupsForUser);
                 return \@groups;
         }
 }

@@ -1269,7 +1269,7 @@ sub new {
 			(status='approved' or status='archived' or tagId=?) order by assetData.revisionDate", 
 			[$assetId, $session->scratch->get("versionTag")]);
 		$assetRevision->{$assetId}{$session->scratch->get("versionTag")||'_'} = $revisionDate;
-		$session->stow("assetRevision",$assetRevision);
+		$session->stow->set("assetRevision",$assetRevision);
 	}
 	return undef unless ($revisionDate);
         if ($className) {
