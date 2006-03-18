@@ -1831,8 +1831,20 @@ This group could then be named "Employees in HMO 1", and would allow you to rest
 
 
 	'622' => {
-		message => q|Here you will define a new group or edit an existing group.  Group membership is very flexible.  You can allow group inclusion via membership in an LDAP group or database query, or restrict users to be in a certain range of IP addresses.  Groups can also be setup to that users can add or remove themselves from the group, although it is strongly recommended that you not allow user to add themselves to default WebGUI groups such a Admin or Content Manager.|,
-		lastUpdated => 1132360148
+		message => q|
+<p>Here you will define a new group or edit an existing group.
+Group membership is very flexible, determined from any or all of the following:</p>
+<ul>
+<li>Add users directly to a group.</li>
+<li>Via membership in an LDAP group.</li>
+<li>From a database query.</li>
+<li>By IP address.</li>
+</ul>
+<p>Groups can also be setup to that
+users can add or remove themselves from the group, although it is
+strongly recommended that you not allow users to add themselves to
+default WebGUI groups such as Admin or Content Manager.</p> |,
+		lastUpdated => 1142647256,
 	},
 
 	'361' => {
