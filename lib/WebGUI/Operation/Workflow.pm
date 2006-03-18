@@ -309,15 +309,21 @@ Checks to ensure the requestor is who we think it is, and then executes a workfl
 
 sub www_runWorkflow {
         my $session = shift;
+$session->errorHandler->warn("A");
 	$session->http->setMimeType("text/plain");
+$session->errorHandler->warn("b");
         return "error" unless (isInSubnet($session->env->get("REMOTE_ADDR"), $session->config->get("spectreSubnets")));
+$session->errorHandler->warn("c");
 	my $instanceId = $session->form->param("instanceId");
 	if ($instanceId) {
+$session->errorHandler->warn("d");
 		my $instance = WebGUI::Workflow::Instance->new($session, $instanceId);
 		if (defined $instance) {
+$session->errorHandler->warn("e");
 			return $instance->run;
 		}
 	}
+$session->errorHandler->warn("f");
 	return "error";
 }
 

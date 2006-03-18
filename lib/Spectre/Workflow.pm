@@ -36,7 +36,7 @@ sub _start {
 	$self->debug("Reading workflow configs.");
 	my $configs = WebGUI::Config->readAllConfigs($self->config->getWebguiRoot);
 	foreach my $config (keys %{$configs}) {
-		$kernel->yield("loadWorkflows", $config);
+		$kernel->yield("loadWorkflows", $configs->{$config});
 	}
         $kernel->yield("checkJobs");
 }
@@ -75,11 +75,12 @@ A hash reference containing a row of data from the WorkflowInstance table.
 
 sub addJob {
 	my ($self, $config, $job) = @_[OBJECT, ARG0, ARG1];
-	$self->debug("Adding workflow instance ".$job->{instanceId}." from ".$config."  to job queue at priority ".$job->{priority}.".");
+	$self->debug("Adding workflow instance ".$job->{instanceId}." from ".$config->getFilename."  to job queue at priority ".$job->{priority}.".");
 	# job list
+	my $sitename = $config->get("sitename");
 	$self->{_jobs}{$job->{instanceId}} = {
+		sitename=>$sitename->[0],
 		instanceId=>$job->{instanceId},
-		config=>$config,
 		status=>"waiting",
 		priority=>$job->{priority}
 		};
@@ -208,8 +209,8 @@ sub getNextJob {
 
 sub loadWorkflows {
 	my ($kernel, $self, $config) = @_[KERNEL, OBJECT, ARG0];
-	$self->debug("Loading workflows for ".$config.".");
-	my $session = WebGUI::Session->open($self->config->getWebguiRoot, $config);
+	$self->debug("Loading workflows for ".$config->getFilename.".");
+	my $session = WebGUI::Session->open($config->getWebguiRoot, $config->getFilename);
 	my $result = $session->db->read("select * from WorkflowInstance");
 	while (my $data = $result->hashRef) {
 		$kernel->yield("addJob", $config, $data);
@@ -258,15 +259,13 @@ sub runWorker {
 	my ($kernel, $self, $job, $session) = @_[KERNEL, OBJECT, ARG0, SESSION];
 	$self->debug("Preparing to run workflow instance ".$job->{instanceId}.".");
 	POE::Component::Client::UserAgent->new;
-	my $url = $job->{sitename}.'/'.$job->{gateway};
-	$url =~ s/\/\//\//g;
-	$url = "http://".$url."?op=spectre;instanceId=".$job->{instanceId};
+	my $url = "http://".$job->{sitename}.'/';
 	my $request = POST $url, [op=>"runWorkflow", instanceId=>$job->{instanceId}];
 	my $cookie = $self->{_cookies}{$job->{sitename}};
 	$request->header("Cookie","wgSession=".$cookie) if (defined $cookie);
 	$request->header("User-Agent","Spectre");
 	$request->header("X-JobId",$job->{instanceId});
-	$self->debug("Posting workflow instance ".$job->{instanceId}.".");
+	$self->debug("Posting workflow instance ".$job->{instanceId}." to $url.");
 	$kernel->post( useragent => 'request', { request => $request, response => $session->postback('workerResponse') });
 	$self->debug("Workflow instance ".$job->{instanceId}." posted.");
 }

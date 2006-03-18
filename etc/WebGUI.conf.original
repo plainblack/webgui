@@ -292,12 +292,6 @@
 
 "spectrePort" : 32133,
 
-# Define the key that will be used to encrypt communcation
-# between Spectre and WebGUI. Note that this must match the
-# cryptoKey in the Spectre config file.
-
-"spectreCryptoKey" : "123qwe",
-
 # Define the workflow activities that are available in the editing
 # process and what object types they support. 
 

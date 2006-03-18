@@ -151,7 +151,6 @@ sub addWorkflow {
 	$session->config->set("spectreIp","127.0.0.1");
 	$session->config->set("spectrePort",32133);
 	$session->config->set("spectreSubnets",["127.0.0.1/32"]);
-	$session->config->set("spectreCryptoKey","123qwe");
 	$session->config->set("workflowActivities", {
 		None=>["WebGUI::Workflow::Activity::DecayKarma", "WebGUI::Workflow::Activity::TrashClipboard", "WebGUI::Workflow::Activity::CleanTempStorage", 
 			"WebGUI::Workflow::Activity::CleanFileCache", "WebGUI::Workflow::Activity::CleanLoginHistory", "WebGUI::Workflow::Activity::ArchiveOldThreads",
