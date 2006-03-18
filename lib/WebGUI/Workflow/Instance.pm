@@ -84,7 +84,7 @@ sub delete {
 	my $self = shift;
 	$self->session->db->write("delete from WorkflowInstanceScratch where instanceId=?",[$self->getId]);
 	$self->session->db->deleteRow("WorkflowInstance","instanceId",$self->getId);
-	WebGUI::Workflow::Spectre->new($self->session)->notify("workflow/deleteJob",$self->getId);
+	WebGUI::Workflow::Spectre->new($self->session)->notify("workflow/deleteInstance",$self->getId);
 	undef $self;
 }
 
@@ -306,8 +306,8 @@ sub set {
 	$self->{_data}{lastUpdate} = time();
 	$self->session->db->setRow("WorkflowInstance","instanceId",$self->{_data});
 	my $spectre = WebGUI::Workflow::Spectre->new($self->session);
-	$spectre->notify("workflow/deleteJob",$self->getId);
-	$spectre->notify("workflow/addJob",$self->session->config->getFilename, $self->{_data});
+	$spectre->notify("workflow/deleteInstance",$self->getId);
+	$spectre->notify("workflow/addInstance", {sitename=>$self->session->config->get("sitename")->[0], instanceId=>$self->getId, priority=>$self->{_data}{priority}});
 }
 
 #-------------------------------------------------------------------

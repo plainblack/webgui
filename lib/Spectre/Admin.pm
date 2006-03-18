@@ -110,14 +110,19 @@ sub new {
        	 	name => 'Spectre',
         	);
 	POE::Session->create(
-		object_states => [ $self => {_start=>"_start", _stop=>"_stop", "shutdown"=>"_stop"} ],
-		args=>[["shutdown"]]
+		object_states => [ $self => {_start=>"_start", _stop=>"_stop", "shutdown"=>"_stop","test"=>"test"} ],
+		args=>[["shutdown","test"]]
         	);
 	$self->{_cron} = Spectre::Cron->new($config, $debug);
 	$self->{_workflow} = Spectre::Workflow->new($config, $debug);
 	POE::Kernel->run();
 }
-
+sub test {
+	my $arg = $_[ARG1];
+use JSON;
+	print objToJson($arg);
+}
+	
 
 
 1;

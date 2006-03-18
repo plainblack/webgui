@@ -81,7 +81,7 @@ sub notify {
                 timeout=>10
                 );
 	if ($remote) {
-        	my $result = $remote->post('admin/shutdown', @params);
+        	my $result = $remote->post(@params);
 		unless (defined $result) {
 			$self->session->errorHandler->warn("Couldn't send command to Spectre because ".$POE::Component::IKC::ClientLite::error);
 		}

@@ -16,18 +16,20 @@
 
 "maxWorkers" : 3,
 
-# How many seconds should Spectre wait between spawning jobs. This
+# How many seconds should Spectre wait between spawning jobs This
 # can help avoid creating a denial of service attack on overworked
 # or underpowered servers.
 
-"timeBetweenJobs" : 5,
+"timeBetweenRunningWorkflows" : 5,
 
 # The number of seconds that Spectre should wait after an activity
-# has been suspended before it should start it back up again. An
-# activity may be suspended if it's waiting on user input, or
-# if it returns an error.
+# has been suspended before it should start it back up again. This
+# gives other workflows a chance to run if one particular workflow
+# has a lot of activites in it, and provides an opportunity to
+# bypass workflows that are waiting for input from an external
+# source.
 
-"delayAfterSuspension" : 500
+"delayAfterSuspension" : 60
 
 }
 

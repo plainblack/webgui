@@ -35,8 +35,8 @@ if ($help || !($shutdown||$daemon||$run)) {
 	print <<STOP;
 
 	S.P.E.C.T.R.E. is the Supervisor of Perplexing Event-handling Contraptions for 
-	Triggering Relentless Executions. It handles WebGUI's workflow, mail sending,
-	search engine indexing, and other background processes.
+	Triggering Relentless Executions. It triggers WebGUI's workflow and scheduling
+	functions.
 
 	Usage: perl spectre.pl [ options ]
 
