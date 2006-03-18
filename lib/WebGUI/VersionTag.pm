@@ -242,7 +242,7 @@ sub requestCommit {
 	my $instance = WebGUI::Workflow::Instance->create($self->session, {
 		workflowId=>$self->get("workflowId"),
 		className=>"WebGUI::VersionTag",
-		method=>"new",
+		methodName=>"new",
 		parameters=>$self->getId
 		});	
 }

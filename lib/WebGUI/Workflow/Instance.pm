@@ -214,20 +214,32 @@ sub run {
 	my $workflow = WebGUI::Workflow->new($self->session, $self->get("workflowId"));
 	return "undefined" unless (defined $workflow);
 	return "disabled" unless ($workflow->get("enabled"));
-	my $activity = $workflow->getNextActivity($self->get("currentActivity"));
-	return "done" unless (defined $activity);
+	my $activity = $workflow->getNextActivity($self->get("currentActivityId"));
+	if  (defined $activity)  {
+		$self->set({"currentActivityId",$activity->getId});
+	} else {
+		$self->delete;
+		return "done";
+	}
 	my $object = {};
 	my $class = $self->get("className");
 	my $method = $self->get("methodName");
 	my $params = $self->get("parameters");
 	if ($class && $method) {
-		$object = eval($class->$method($self->session, $params));
+		my $cmd = "use $class";
+		eval($cmd);
 		if ($@) {
-			$self->session->errorHandler->warn("Error instanciating  activity (".$activity->getId.") pass-in object: ".$@);
+			$self->session->errorHandler->warn("Error loading activity class $class: ".$@);
 			return "error";
 		}
+		eval{ $object = $class->$method($self->session, $params) };
+		if ($@) {
+			$self->session->errorHandler->warn("Error instanciating activity (".$activity->getId.") pass-in object: ".$@);
+			return "error";
+		}
+		return $activity->execute($object, $self);	
 	}
-	return $activity->execute($object, $self);	
+	return $activity->execute(undef, $self);
 }
 
 

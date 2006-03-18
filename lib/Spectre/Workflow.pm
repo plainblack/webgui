@@ -76,7 +76,6 @@ A hash reference containing a row of data from the WorkflowInstance table.
 sub addJob {
 	my ($self, $config, $job) = @_[OBJECT, ARG0, ARG1];
 	$self->debug("Adding workflow instance ".$job->{instanceId}." from ".$config->getFilename."  to job queue at priority ".$job->{priority}.".");
-	# job list
 	my $sitename = $config->get("sitename");
 	$self->{_jobs}{$job->{instanceId}} = {
 		sitename=>$sitename->[0],
@@ -165,7 +164,8 @@ Removes a workflow job from the processing queue.
 =cut
 
 sub deleteJob {
-	my ($self, $instanceId) = @_[OBJECT, ARG0];
+	my ($self, $instanceId,$kernel) = @_[OBJECT, ARG0, KERNEL];
+	$kernel->yield("suspendJob",$instanceId);	
 	$self->debug("Deleting workflow instance $instanceId from job queue.");
 	my $priority = $self->{_jobs}{$instanceId}{priority};
 	delete $self->{_jobs}{$instanceId};
@@ -242,7 +242,7 @@ sub new {
 	bless $self, $class;
 	my @publicEvents = qw(addJob deleteJob);
 	POE::Session->create(
-		object_states => [ $self => [qw(_start _stop checkJobs loadWorkflows runWorker), @publicEvents] ],
+		object_states => [ $self => [qw(_start _stop checkJobs deleteJob suspendJob loadWorkflows runWorker workerResponse), @publicEvents] ],
 		args=>[\@publicEvents]
         	);
 }
@@ -272,19 +272,14 @@ sub runWorker {
 
 #-------------------------------------------------------------------
 
-=head2 suspendJob ( jobId ) 
+=head2 suspendJob ( ) 
 
 This method puts a running job back into the available jobs pool thusly freeing up a slot in the running jobs pool. This is done when a job has executed a workflow activity, but the entire workflow has not yet completed.
-
-=head3 jobId
-
-The job being suspended.
 
 =cut
 
 sub suspendJob {
-	my $self = shift;
-	my $instanceId = shift;
+	my ($self, $instanceId) = @_[OBJECT, ARG0];
 	$self->debug("Suspending workflow instance ".$instanceId.".");
 	$self->{_jobs}{$instanceId}{status} = "delay";
 	$self->{_jobs}{$instanceId}{statusDelay} = $self->config->get("delayAfterSuspension") + time();
@@ -304,7 +299,7 @@ This method is called when the response from the runWorker() method is received.
 =cut
 
 sub workerResponse {
-	my $self = $_[OBJECT];
+	my ($self, $kernel) = @_[OBJECT, KERNEL];
 	$self->debug("Retrieving response from workflow instance job.");
         my ($request, $response, $entry) = @{$_[ARG1]};
 	my $jobId = $request->header("X-JobId");	# got to figure out how to get this from the request, cuz the response may die
@@ -320,29 +315,29 @@ sub workerResponse {
 		my $state = $response->content; 
 		if ($state eq "waiting") {
 			$self->debug("Was told to wait on $jobId because we're still waiting on some external event.");
-			$self->suspendJob($jobId);
+			$kernel->yield("suspendJob",$jobId);
 		} elsif ($state eq "complete") {
 			$self->debug("Workflow instance $jobId ran one of it's activities successfully.");
-			$self->suspendJob($jobId);
+			$kernel->yield("suspendJob",$jobId);
 		} elsif ($state eq "disabled") {
 			$self->debug("Workflow instance $jobId is disabled.");
-			$self->deleteJob($jobId);			
+			$kernel->yield("deleteJob",$jobId);			
 		} elsif ($state eq "done") {
 			$self->debug("Workflow instance $jobId is now complete.");
-			$self->deleteJob($jobId);			
+			$kernel->yield("deleteJob",$jobId);			
 		} elsif ($state eq "error") {
 			$self->debug("Got an error for $jobId.");
-			$self->suspendJob($jobId);
+			$kernel->yield("suspendJob",$jobId);
 		} else {
 			$self->debug("Something bad happened on the return of $jobId.");
-			$self->suspendJob($jobId);
+			$kernel->yield("suspendJob",$jobId);
 			# something bad happened
 		}
 	} elsif ($response->is_redirect) {
 		$self->debug("Response for $jobId was redirected.");
 	} elsif ($response->is_error) {	
 		$self->debug("Response for $jobId had a communications error.");
-		$self->suspendJob($jobId)
+		$kernel->yield("suspendJob",$jobId)
 		# we should probably log something
 	}
 }

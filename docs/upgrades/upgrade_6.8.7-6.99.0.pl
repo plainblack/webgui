@@ -106,6 +106,12 @@ sub addWorkflow {
 		runningSince bigint,
 		lastUpdate bigint
 		)");
+	$session->db->write("create table WorkflowInstanceScratch (
+		instanceId varchar(22) binary not null,
+		name varchar(255) not null,
+		value text,
+		primary key (instanceId, name)
+		)");
 	$session->db->write("create table Workflow (
 		workflowId varchar(22) binary not null primary key,
 		title varchar(255) not null default 'Untitled',
