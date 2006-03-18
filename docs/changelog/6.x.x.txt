@@ -68,6 +68,7 @@
  - fix [ 1429389 ] 6.9: "1" appended to HTML
  - fix [ 1433508 ] 6.9: isInGroup does not work correctly
  - fix a bug where a link was provided to become or delete non-existant users.
+ - fix bugs with the in-memory session caching of user and group memberships
 
 6.8.8
  - fix [ 1423434 ] 6.8.5 - Versioning - users can see uncommitted data

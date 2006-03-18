@@ -58,9 +58,9 @@ These methods are available from this class:
 sub _create {
 	my $session = shift;
 	my $userId = shift || $session->id->generate();
-	$session->db->write("insert into users (userId,dateCreated) values (".$session->db->quote($userId).",".time().")");
-	WebGUI::Group->new($session,[2])->addUsers([$userId]);
-	WebGUI::Group->new($session,[7])->addUsers([$userId]);
+	$session->db->write("insert into users (userId,dateCreated) values (?,?)",[$userId, time()]);
+	WebGUI::Group->new($session,2)->addUsers([$userId]);
+	WebGUI::Group->new($session,7)->addUsers([$userId]);
         return $userId;
 }
 
@@ -88,6 +88,7 @@ sub addToGroups {
 	foreach my $groupId (@{$groups}) {
 		WebGUI::Group->new($self->session,$groupId)->addUsers([$self->userId],$expireOffset);
 	}
+	$self->session->stow->delete("gotGroupsForUser");
 }
 
 #-------------------------------------------------------------------
@@ -142,12 +143,12 @@ sub delete {
 	foreach my $groupId (@{$self->getGroups($self->userId)}) {
 		WebGUI::Group->new($self->session,$groupId)->deleteUsers([$self->userId]);
 	}
-	$self->session->db->write("delete from messageLog where userId=".$self->session->db->quote($self->{_userId}));
+	$self->session->db->write("delete from messageLog where userId=?",[$self->{_userId}]);
 	require WebGUI::Operation::Auth;
 	my $authMethod = WebGUI::Operation::Auth::getInstance($self->session,$self->authMethod,$self->{_userId});
 	$authMethod->deleteParams($self->{_userId});
-        $self->session->db->write("delete from userProfileData where userId=".$self->session->db->quote($self->{_userId}));
-        $self->session->db->write("delete from users where userId=".$self->session->db->quote($self->{_userId}));
+        $self->session->db->write("delete from userProfileData where userId=?",[$self->{_userId}]);
+        $self->session->db->write("delete from users where userId=?",[$self->{_userId}]);
 }
 
 #-------------------------------------------------------------------
@@ -169,6 +170,7 @@ sub deleteFromGroups {
 	foreach my $groupId (@{$groups}) {
 		WebGUI::Group->new($self->session,$groupId)->deleteUsers([$self->userId]);
 	}
+	$self->session->stow->delete("gotGroupsForUser");
 }
 
 #-------------------------------------------------------------------

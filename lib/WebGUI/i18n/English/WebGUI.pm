@@ -1279,9 +1279,10 @@ Users that have privileges to add, edit, and delete packages of wobjects and pag
 When users are added to the system they are put into the registered users group. A user should only be removed from this group if their account is deleted or if you wish to punish a troublemaker.
 <p>
 
-<b>Secondary Admins</b><br>
-Users in the Secondary Admins group may add new users, but cannot edit users. Also, if 
-you are a Secondary Admin for a group, you may modify the membership of that group.
+<b>Secondary Admins</b><br> Users in the Secondary Admins group may
+add new users, but cannot edit users. Also, if you are a Secondary
+Admin, you can be set as the Secondary Admin for a group and you may
+modify the membership of that group.
 <p>
 
 <b>Style Managers</b><br>

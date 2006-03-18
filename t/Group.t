@@ -18,7 +18,7 @@ use WebGUI::Utility;
 
 use WebGUI::User;
 use WebGUI::Group;
-use Test::More tests => 45; # increment this value for each test you create
+use Test::More tests => 46; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -140,7 +140,18 @@ cmp_bag($gB->getGroupsIn(1), [$gA->getId, $gC->getId, $gZ->getId, $gY->getId, $g
 $gX->addGroups([$gA->getId]);
 cmp_bag($gX->getGroupsIn(), [3], 'Not able to add B tree under Z tree under X');
 
+$gX->userIsAdmin(1, "yes");
+
+ok(!$gX->userIsAdmin(1), "userIsAdmin: Visitor is not allowed to be a Group Admin");
+
+my $user = WebGUI::User->new($session, "new");
+$user->addToGroups([]);
+$user->delete;
+
 END {
+	(defined $gX and ref $gX eq 'WebGUI::Group') and $gX->delete;
+	(defined $gY and ref $gY eq 'WebGUI::Group') and $gY->delete;
+	(defined $gZ and ref $gZ eq 'WebGUI::Group') and $gZ->delete;
 	(defined $gA and ref $gA eq 'WebGUI::Group') and $gA->delete;
 	(defined $gB and ref $gB eq 'WebGUI::Group') and $gB->delete;
 	(defined $gC and ref $gC eq 'WebGUI::Group') and $gC->delete;

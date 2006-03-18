@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::Utility;
 
 use WebGUI::User;
-use Test::More tests => 65; # increment this value for each test you create
+use Test::More tests => 80; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -39,6 +39,11 @@ is($user->lastUpdated, $lastUpdate, 'lastUpdated() -- username change');
 
 #Let's check the UID and make sure it's sane
 ok($user->userId =~ m/[A-Za-z0-9\-\_]{22}/, 'userId() returns sane value');
+
+#Let's make sure the user was added to the correct groups;
+foreach my $groupId (2,7) {
+	ok($user->isInGroup($groupId), "User added to group $groupId by default");
+}
 
 #Let's check the status method
 $lastUpdate = time();
@@ -94,11 +99,11 @@ $user->referringAffiliate(10);
 is($user->referringAffiliate, '10', 'referringAffiliate() -- get/set');
 is($user->lastUpdated, $lastUpdate, 'lastUpdated() -- referringAffiliate');
 
-#Let's try adding this user to some groups
-my @groups = qw|2 4|;
+#Let's try adding this user to some groups.  Note, users are auto-added to 2 and 7 on creation
+my @groups = qw|6 4|;
 $user->addToGroups(\@groups);
 
-my ($result) = $session->db->quickArray("select count(*) from groupings where groupId=? and userId=?", [2, $user->userId]);
+my ($result) = $session->db->quickArray("select count(*) from groupings where groupId=? and userId=?", [6, $user->userId]);
 ok($result, 'addToGroups() -- added to first test group');
 
 ($result) = $session->db->quickArray("select count(*) from groupings where groupId=? and userId=?", [4, $user->userId]);
@@ -107,7 +112,7 @@ ok($result, 'addToGroups() -- added to second test group');
 #Let's delete this user from our test groups
 $user->deleteFromGroups(\@groups);
 
-my ($result) = $session->db->quickArray("select count(*) from groupings where groupId=? and userId=?", [2, $user->userId]);
+my ($result) = $session->db->quickArray("select count(*) from groupings where groupId=? and userId=?", [6, $user->userId]);
 is($result, '0', 'deleteFromGroups() -- removed from first test group');
 
 my ($result) = $session->db->quickArray("select count(*) from groupings where groupId=? and userId=?", [4, $user->userId]);
@@ -249,10 +254,38 @@ $user = WebGUI::User->new($session, "new");
 
 $user->addToGroups([3]);
 
-ok($user->isInGroup(3), "New user is in group 3(Admin)");
+ok($user->isInGroup(3), "addToGroups: New user is in group 3(Admin)");
 ok($user->isInGroup(11), "New user is in group 11(Secondary Admins)");
 ok($user->isInGroup(12), "New user is in group 12(Turn On Admin)");
 ok($user->isInGroup(13), "New user is in group 13(Turn On Admin)");
 ok($user->isInGroup(14), "New user is in group 14(Product Managers)");
 
+$user->deleteFromGroups([3]);
+ok(!$user->isInGroup(3), "deleteFromGroups: New user is not in group 3(Admin)");
+ok(!$user->isInGroup(11), "New user is not in group 11(Secondary Admins)");
+ok(!$user->isInGroup(12), "New user is not in group 12(Turn On Admin)");
+ok(!$user->isInGroup(13), "New user is not in group 13(Turn On Admin)");
+ok(!$user->isInGroup(14), "New user is not in group 14(Product Managers)");
+
 $user->delete;
+
+ok($visitor->isInGroup(1), "Visitor is a member of group Visitor");
+ok($visitor->isInGroup(7), "Visitor is a member of group Everyone");
+
+##remove Visitor from those groups, and make sure we can add him back in.
+WebGUI::Group->new($session, '1')->deleteUsers([1]);
+($result) = $session->db->quickArray("select count(*) from groupings where groupId=? and userId=?", [1, $user->userId]);
+is($result, 0, 'deleteFromGroups() -- Visitor removed from Visitor group');
+WebGUI::Group->new($session, '7')->deleteUsers([1]);
+($result) = $session->db->quickArray("select count(*) from groupings where groupId=? and userId=?", [7, $user->userId]);
+is($result, 0, 'deleteFromGroups() -- Visitor removed from Everyone group');
+
+ok($visitor->isInGroup(1), "isInGroup: Visitor is in group Visitor, hardcoded");
+ok($visitor->isInGroup(7), "isInGroup: Everyone is in group Everyone, hardcoded");
+
+##Add Visitor back to those groups
+WebGUI::Group->new($session, '1')->addUsers([1]);
+WebGUI::Group->new($session, '7')->addUsers([1]);
+
+ok($visitor->isInGroup(1), "Visitor added back to group Visitor");
+ok($visitor->isInGroup(7), "Visitor added back to group Everyone");

@@ -151,7 +151,7 @@ sub addUsers {
 	$self->session->stow->delete("isInGroup");
 	my $expireOffset = shift || $self->get("expireOffset");
 	foreach my $uid (@{$users}) {
-		next if ($uid eq '1');
+		next if ($uid eq '1' and !isIn($self->getId, 1, 7));
 		my ($isIn) = $self->session->db->quickArray("select count(*) from groupings where groupId=".$self->session->db->quote($self->getId)." and userId=".$self->session->db->quote($uid));
 		unless ($isIn) {
 			$self->session->db->write("insert into groupings (groupId,userId,expireDate) values (".$self->session->db->quote($self->getId).", ".$self->session->db->quote($uid).", ".($self->session->datetime->time()+$expireOffset).")");
