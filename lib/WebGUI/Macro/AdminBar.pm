@@ -28,13 +28,11 @@ Macro for displaying administrative functions to a user with Admin turned on.
 
 =head2 process ( [templateId ] )
 
-process takes one optional parameters for customizing the layout
-of the Admin bar.
+process takes one optional parameters for customizing the layout of the Admin bar.
 
 =head3 templateId
 
-The ID for a template to use for formatting the link.  The default template creates the sliding
-Admin bar to the left of the screen.
+The ID for a template to use for formatting the link.  The default template creates the sliding Admin bar to the left of the screen.
 
 =cut
 
