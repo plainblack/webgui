@@ -1281,8 +1281,8 @@ When users are added to the system they are put into the registered users group.
 
 <b>Secondary Admins</b><br> Users in the Secondary Admins group may
 add new users, but cannot edit users. Also, if you are a Secondary
-Admin, you can be set as the Secondary Admin for a group and you may
-modify the membership of that group.
+Admin and are a member of a different group, you can be set as an admin for that group.  This
+will allow you to add or remove members from that group.
 <p>
 
 <b>Style Managers</b><br>

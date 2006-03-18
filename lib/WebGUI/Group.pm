@@ -152,9 +152,9 @@ sub addUsers {
 	my $expireOffset = shift || $self->get("expireOffset");
 	foreach my $uid (@{$users}) {
 		next if ($uid eq '1' and !isIn($self->getId, 1, 7));
-		my ($isIn) = $self->session->db->quickArray("select count(*) from groupings where groupId=".$self->session->db->quote($self->getId)." and userId=".$self->session->db->quote($uid));
+		my ($isIn) = $self->session->db->quickArray("select count(*) from groupings where groupId=? and userId=?", [$self->getId, $uid]);
 		unless ($isIn) {
-			$self->session->db->write("insert into groupings (groupId,userId,expireDate) values (".$self->session->db->quote($self->getId).", ".$self->session->db->quote($uid).", ".($self->session->datetime->time()+$expireOffset).")");
+			$self->session->db->write("insert into groupings (groupId,userId,expireDate) values (?,?,?)", [$self->getId, $uid, ($self->session->datetime->time()+$expireOffset)]);
 		} else {
 			$self->userGroupExpireDate($uid,($self->session->datetime->time()+$expireOffset));
 		}
@@ -438,7 +438,7 @@ sub find {
 	my $class = shift;
 	my $session = shift;
 	my $name = shift;
-	my ($groupId) = $session->db->quickArray("select groupId from groups where groupName=".$session->db->quote($name));
+	my ($groupId) = $session->db->quickArray("select groupId from groups where groupName=?",[$name]);
 	return WebGUI::Group->new($session,$groupId);
 }
 
@@ -954,10 +954,10 @@ sub userIsAdmin {
 	my $userId = shift || $self->session->user->userId;
 	my $value = shift;
 	if ($value ne "") {
-		$self->session->db->write("update groupings set groupAdmin=".$self->session->db->quote($value)." where groupId=".$self->session->db->quote($self->getId)." and userId=".$self->session->db->quote($userId));
+		$self->session->db->write("update groupings set groupAdmin=? where groupId=? and userId=?",[$value, $self->getId, $userId]);
 		return $value;
 	} else {
-		my ($admin) = $self->session->db->quickArray("select groupAdmin from groupings where groupId=".$self->session->db->quote($self->getId)." and userId=".$self->session->db->quote($userId));
+		my ($admin) = $self->session->db->quickArray("select groupAdmin from groupings where groupId=? and userId=?", [$self->getId, $userId]);
 		return $admin;
 	}
 }	

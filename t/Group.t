@@ -18,7 +18,7 @@ use WebGUI::Utility;
 
 use WebGUI::User;
 use WebGUI::Group;
-use Test::More tests => 46; # increment this value for each test you create
+use Test::More tests => 50; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -140,12 +140,26 @@ cmp_bag($gB->getGroupsIn(1), [$gA->getId, $gC->getId, $gZ->getId, $gY->getId, $g
 $gX->addGroups([$gA->getId]);
 cmp_bag($gX->getGroupsIn(), [3], 'Not able to add B tree under Z tree under X');
 
-$gX->userIsAdmin(1, "yes");
+#$gX->userIsAdmin(1, "yes");
 
-ok(!$gX->userIsAdmin(1), "userIsAdmin: Visitor is not allowed to be a Group Admin");
+#ok(!$gX->userIsAdmin(1), "userIsAdmin: Visitor is not allowed to be a Group Admin");
 
 my $user = WebGUI::User->new($session, "new");
-$user->addToGroups([]);
+$gX->userIsAdmin($user->userId, "yes");
+ok(!$gX->userIsAdmin($user->userId), "userIsAdmin: User who isn't secondary admin can't be group admin");
+
+$user->addToGroups([12]);
+ok($user->isInGroup(12), "userIsAdmin: Added dude to Secondary Admins");
+
+$gX->userIsAdmin($user->userId, 1);
+ok(!$gX->userIsAdmin($user->userId), "userIsAdmin: User must be member of group to be group admin");
+
+$user->addToGroups([$gX->getId]);
+ok($user->isInGroup($gX->getId), "userIsAdmin: Added dude to gX");
+
+$gX->userIsAdmin($user->userId, 1);
+ok($gX->userIsAdmin($user->userId), "userIsAdmin: Dude set to be group admin for gX");
+
 $user->delete;
 
 END {
