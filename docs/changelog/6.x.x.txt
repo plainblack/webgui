@@ -66,6 +66,8 @@
  - fix [ 1442942 ] 6.99: listLDAPLinks broken
  - fix [ 1430276 ] 6.9: Can't kill active sessions
  - fix [ 1429389 ] 6.9: "1" appended to HTML
+ - fix [ 1433508 ] 6.9: isInGroup does not work correctly
+ - fix a bug where a link was provided to become or delete non-existant users.
 
 6.8.8
  - fix [ 1423434 ] 6.8.5 - Versioning - users can see uncommitted data

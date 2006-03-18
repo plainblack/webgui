@@ -71,16 +71,18 @@ sub _submenu {
 	}
 	if ($session->user->isInGroup(3)) {
 		unless ($session->form->process("op") eq "listUsers" 
-			|| $session->form->process("op") eq "deleteUserConfirm") {
-			$ac->addSubmenuItem($session->url->page("op=editUser;uid=".$session->form->process("uid")), $i18n->get(457));
-			$ac->addSubmenuItem($session->url->page('op=becomeUser;uid='.$session->form->process("uid")), $i18n->get(751));
-			$ac->addSubmenuItem($session->url->page('op=deleteUser;uid='.$session->form->process("uid")), $i18n->get(750));
+			|| $session->form->process("op") eq "deleteUserConfirm"
+			|| $session->stow->get("editUser_UID") eq "new") {
+			$ac->addSubmenuItem($session->url->page("op=editUser;uid=".$session->stow->get("editUser_UID")), $i18n->get(457));
+			$ac->addSubmenuItem($session->url->page('op=becomeUser;uid='.$session->stow->get("editUser_UID")), $i18n->get(751));
+			$ac->addSubmenuItem($session->url->page('op=deleteUser;uid='.$session->stow->get("editUser_UID")), $i18n->get(750));
 			if ($session->setting->get("useKarma")) {
-				$ac->addSubmenuItem($session->url->page("op=editUserKarma;uid=".$session->form->process("uid")), $i18n->get(555));
+				$ac->addSubmenuItem($session->url->page("op=editUserKarma;uid=".$session->stow->get("editUser_UID")), $i18n->get(555));
 			}
 		}
 		$ac->addSubmenuItem($session->url->page("op=listUsers"), $i18n->get(456));
 	}
+	$session->stow->delete("editUser_UID");
         return $ac->render($workarea, $title);
 }
 
@@ -297,6 +299,7 @@ sub www_editUser {
 	my $tabform = WebGUI::TabForm->new($session,\%tabs);
 	
 	my $u = WebGUI::User->new($session,($uid eq 'new') ? '' : $uid); #Setting uid to '' when uid is 'new' so visitor defaults prefill field for new user
+	$session->stow->set("editUser_UID", $uid);
 	$session->style->setScript($session->config->get("extrasURL")."/swapLayers.js", {type=>"text/javascript"});
 	$session->style->setRawHeadTags('<script type="text/javascript">var active="'.$u->authMethod.'";</script>');
     	$tabform->hidden({name=>"op",value=>"editUserSave"});

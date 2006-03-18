@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::Utility;
 
 use WebGUI::User;
-use Test::More tests => 60; # increment this value for each test you create
+use Test::More tests => 65; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -79,7 +79,7 @@ my $oldKarma = $user->karma;
 $user->karma('69', 'peter gibbons', 'test karma');
 is($user->karma, $oldKarma+69, 'karma() -- get/set add amount');
 
-my ($source, $description) = $session->db->quickArray("select source, description from karmaLog where userId=".$session->db->quote($user->userId));
+my ($source, $description) = $session->db->quickArray("select source, description from karmaLog where userId=?",[$user->userId]);
 
 is($source, 'peter gibbons', 'karma() -- get/set source');
 is($description, 'test karma', 'karma() -- get/set description');
@@ -98,32 +98,32 @@ is($user->lastUpdated, $lastUpdate, 'lastUpdated() -- referringAffiliate');
 my @groups = qw|2 4|;
 $user->addToGroups(\@groups);
 
-my ($result) = $session->db->quickArray("select count(*) from groupings where groupId=".$session->db->quote('2')." and userId=".$session->db->quote($user->userId));
+my ($result) = $session->db->quickArray("select count(*) from groupings where groupId=? and userId=?", [2, $user->userId]);
 ok($result, 'addToGroups() -- added to first test group');
 
-($result) = $session->db->quickArray("select count(*) from groupings where groupId=".$session->db->quote('4')." and userId=".$session->db->quote($user->userId));
+($result) = $session->db->quickArray("select count(*) from groupings where groupId=? and userId=?", [4, $user->userId]);
 ok($result, 'addToGroups() -- added to second test group');
 
 #Let's delete this user from our test groups
 $user->deleteFromGroups(\@groups);
 
-($result) = $session->db->quickArray("select count(*) from groupings where groupId=".$session->db->quote('2')." and userId=".$session->db->quote($user->userId));
+my ($result) = $session->db->quickArray("select count(*) from groupings where groupId=? and userId=?", [2, $user->userId]);
 is($result, '0', 'deleteFromGroups() -- removed from first test group');
 
-($result) = $session->db->quickArray("select count(*) from groupings where groupId=".$session->db->quote('4')." and userId=".$session->db->quote($user->userId));
+my ($result) = $session->db->quickArray("select count(*) from groupings where groupId=? and userId=?", [4, $user->userId]);
 is($result, '0', 'deleteFromGroups() -- removed from second test group');
 
 #Let's delete this user
 my $userId = $user->userId;
 $user->delete;
 
-my ($count) = $session->db->quickArray("select count(*) from users where userId=".$session->db->quote($userId));
+my ($count) = $session->db->quickArray("select count(*) from users where userId=?",[$userId]);
 is($count, '0', 'delete() -- users table');
 
-($count) = $session->db->quickArray("select count(*) from userProfileData where userId=".$session->db->quote($userId));
+($count) = $session->db->quickArray("select count(*) from userProfileData where userId=?",[$userId]);
 is($count, '0', 'delete() -- userProfileData table');
 
-($count) = $session->db->quickArray("select count(*) from messageLog where userId=".$session->db->quote($userId));
+($count) = $session->db->quickArray("select count(*) from messageLog where userId=?",[$userId]);
 is($count, '0', 'delete() -- messageLog table'); 
 
 #Let's test new with an override uid
@@ -151,7 +151,7 @@ my $oldKarma = $user->karma;
 $user->karma('69', 'peter gibbons', 'test karma');
 is($user->karma, $oldKarma+69, 'karma() -- get/set add amount');
 
-my ($source, $description) = $session->db->quickArray("select source, description from karmaLog where userId=".$session->db->quote($user->userId));
+my ($source, $description) = $session->db->quickArray("select source, description from karmaLog where userId=?",[$user->userId]);
 
 is($source, 'peter gibbons', 'karma() -- get/set source');
 is($description, 'test karma', 'karma() -- get/set description');
@@ -242,4 +242,17 @@ $env->{_env}->{"REMOTE_ADDR"} = '193.168.0.101';
 ok (!$visitor->isInGroup($cm->getId), "Visitor is not allowed in via IP");
 
 ##Restore original filter
-$cm->ipFilter($origFilter);
+$cm->ipFilter(defined $origFilter ? $origFilter : '');
+
+##Test for group membership
+$user = WebGUI::User->new($session, "new");
+
+$user->addToGroups([3]);
+
+ok($user->isInGroup(3), "New user is in group 3(Admin)");
+ok($user->isInGroup(11), "New user is in group 11(Secondary Admins)");
+ok($user->isInGroup(12), "New user is in group 12(Turn On Admin)");
+ok($user->isInGroup(13), "New user is in group 13(Turn On Admin)");
+ok($user->isInGroup(14), "New user is in group 14(Product Managers)");
+
+$user->delete;
