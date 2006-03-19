@@ -285,7 +285,6 @@ sub www_checkoutConfirm {
 
 	$shipping = WebGUI::Commerce::Shipping->load($session, $session->scratch->get('shippingMethod'));
 	$shipping->setOptions(Storable::thaw($session->scratch->get('shippingOptions'))) if ($session->scratch->get('shippingOptions'));
-
 	$var{shippingName} = $shipping->name;
 	$var{shippingCost} = sprintf('%.2f', $shipping->calc);
 
@@ -915,9 +914,8 @@ sub www_selectPaymentGateway {
 				});
 		}
 	} elsif (scalar(@$plugins) == 1) {
-		#$session->form->process("paymentGateway") = $plugins->[0]->namespace;
-		$session->stow->set("paymentGateway", $plugins->[0]->namespace);
-		return WebGUI::Operation::execute($session,'selectPaymentGatewaySave');
+		my $paymentGateway = $plugins->[0]->namespace;
+		return WebGUI::Operation::Commerce::www_selectPaymentGatewaySave($session, $paymentGateway);
 	}
 	
 	$var{pluginLoop} = \@pluginLoop;
@@ -945,8 +943,7 @@ Returns the user to the operation C<checkout> when it is done.
 
 sub www_selectPaymentGatewaySave {
 	my $session = shift;
-	# shifting stow first because it's only set when one payment gateway is defined
-	my $paymentGateway = $session->stow->get("paymentGateway") || $session->form->process("paymentGateway");
+	my $paymentGateway = shift || $session->form->process("paymentGateway");
 	if (WebGUI::Commerce::Payment->load($session, $paymentGateway)->enabled) {
 		$session->scratch->set('paymentGateway', $paymentGateway);
 	} else {
@@ -983,9 +980,9 @@ sub www_selectShippingMethod {
 				});
 		}
 	} elsif (scalar(@$plugins) == 1) {
-		#$session->form->process("shippingMethod") = $plugins->[0]->namespace;
 		$session->stow->set('shippingMethod', $plugins->[0]->namespace);
-		return WebGUI::Operation::execute($session,"selectShippingMethodSave");
+		my $shippingMethod = $plugins->[0]->namespace;
+		return WebGUI::Operation::Commerce::www_selectShippingMethodSave($session, $shippingMethod);
 	}
 	
 	$var{pluginLoop} = \@pluginLoop;
@@ -1016,8 +1013,7 @@ Returns the user to the operation C<checkout> when it is done.
 
 sub www_selectShippingMethodSave {
 	my $session = shift;
-	# Shifting stow first b/c it's only set when one shipping plug-in exists
-	my $shippingMethod = $session->stow->get('shippingMethod') || $session->form->process("shippingMethod");
+	my $shippingMethod = shift || $session->form->process("shippingMethod");
 	my $shipping = WebGUI::Commerce::Shipping->load($session, $shippingMethod);
 	
 	$shipping->processOptionsForm;
