@@ -187,7 +187,9 @@ Returns a reference to an array of all enabled instantiated payment plugins.
 =cut
 
 sub getEnabledPlugins {
-	my ($session) = @_;
+	#my ($session) = @_;
+	my $class = shift;
+	my $session = shift;
 	my (@enabledPlugins, $plugin, @plugins);
 	@enabledPlugins = $session->db->buildArray("select namespace from commerceSettings where type='Payment' and fieldName='enabled' and fieldValue='1'");
 

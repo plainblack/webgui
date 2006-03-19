@@ -381,6 +381,7 @@ sub updateTemplates {
 sub addEMSTemplates {
         print "\tAdding Event Management System Templates.\n" unless ($quiet);
 
+## Display Template ##
 my $template = <<EOT1;
 
 <a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a>
@@ -399,12 +400,68 @@ my $template = <<EOT1;
 <tmpl_var paginateBar>
 EOT1
 
+## Event Template ##
 my $template2 = <<EOT2;
 
 <h1><tmpl_var title></h1><br>
 <tmpl_var description>&nbsp;<tmpl_var price><br>
 <a href="<tmpl_var purchase.url>"><tmpl_var purchase.label></a>
 EOT2
+
+## Checkout Template ##
+my $template3 = <<EOT3;
+<tmpl_var form.header>
+<table width='100%'>
+<tr><td><tmpl_var message></td></tr>
+
+<tmpl_if chooseSubevents>
+ <tmpl_loop subevents_loop>
+  <tr>
+  <td><tmpl_var form.checkBox></td>
+  <td><tmpl_var title></td>
+  <td><tmpl_var description></td>
+  <td><tmpl_var price></td>
+  </tr>
+ </tmpl_loop>
+</tmpl_if>
+
+<tmpl_if resolveConflicts>
+ <tmpl_loop conflict_loop>
+ <tr>
+  <td><tmpl_var form.deleteControl></td>
+  <td><tmpl_var title></td>
+  <td><tmpl_var description></td>
+  <td><tmpl_var price></td>
+  </tr>
+ </tmpl_loop>
+</tmpl_if>
+
+<tr><td><tmpl_var form.submit></td></tr>
+</table>
+<tmpl_var form.footer>
+
+<tmpl_if registration>
+  <tmpl_var form.header>
+  <table>
+  <tr><td><tmpl_var form.firstName.label></td><td><tmpl_var form.firstName></td></tr>
+<tr><td><tmpl_var form.lastName.label></td><td><tmpl_var form.lastName></td></tr>
+<tr><td><tmpl_var form.address.label></td><td><tmpl_var form.address></td></tr>
+<tr><td><tmpl_var form.city.label></td><td><tmpl_var form.city></td></tr>
+<tr><td><tmpl_var form.state.label></td><td><tmpl_var form.state></td></tr>
+<tr><td><tmpl_var form.zipcode.label></td><td><tmpl_var form.zipcode></td></tr>
+<tr><td><tmpl_var form.firstName.label></td><td><tmpl_var form.firstName></td></tr>
+<tr><td><tmpl_var form.country.label></td><td><tmpl_var form.country></td></tr>
+<tr><td><tmpl_var form.phoneNumber.label></td><td><tmpl_var form.phoneNumber></td></tr>
+<tr><td><tmpl_var form.email.label></td><td><tmpl_var form.email></td></tr>
+<tr><td rowspan='2' align='center'><tmpl_var form.submit></td></tr>
+</table>
+<tmpl_var form.footer>
+</tmpl_if>
+
+EOT3
+
+## End Templates
+
         my $in = WebGUI::Asset->getImportNode($session);
         $in->addChild({
                  className=>'WebGUI::Asset::Template',
@@ -419,6 +476,13 @@ EOT2
         	namespace=>'EventManagementSystem_product',
         	}, "EventManagerTmpl000002"
 	);
+	
+	$in->addChild({
+		className=>'WebGUI::Asset::Template',
+		template=>$template3,
+		namespace=>'EventManagementSystem_checkout',
+		}, "EventManagerTmpl000003"
+	);
 }
 
 #-------------------------------------------------
@@ -432,6 +496,7 @@ create table EventManagementSystem (
  assetId varchar(22) not null,
  revisionDate bigint(20) not null,
  displayTemplateId varchar(22),
+ checkoutTemplateId varchar(22),
  paginateAfter int(11) default 10,
  groupToAddEvents varchar(22),
  groupToApproveEvents varchar(22),

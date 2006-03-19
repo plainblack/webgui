@@ -123,6 +123,14 @@ sub definition {
                 		hoverHelp=>$i18n->get('display template description'),
                 		label=>$i18n->get('display template')
 				},
+			checkoutTemplateId =>{
+				fieldType=>"template",
+				defaultValue=>'EventManagerTmpl000003',
+				tab=>"display",
+				namespace=>"EventManagementSystem_checkout",
+				hoverHelp=>'',
+				label=>"Checkout Template"
+				},
 			paginateAfter =>{
 				fieldType=>"integer",
 				defaultValue=>10,
@@ -422,6 +430,38 @@ sub findSubEvents {
 }
 
 #------------------------------------------------------------------
+sub getRegistrationInfo {
+	my $self = shift;
+	my %var;
+	
+	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
+			     .WebGUI::Form::hidden($self->session,{name=>"func",value=>"www_saveRegistration"});
+
+	$var{'form.footer'} = WebGUI::Form::formFooter($self->session);
+	$var{'form.submit'} = WebGUI::Form::submit($self->session);
+	$var{'form.firstName.label'} = "First Name";
+	$var{'form.lastName.label'} = "Last Name";
+	$var{'form.address.label'} = "Address";
+	$var{'form.city.label'} = "City";
+	$var{'form.state.label'} = "State";
+	$var{'form.zipCode.label'} = "Zip Code";
+	$var{'form.country.label'} = "Country";
+	$var{'form.phoneNumber.label'} = "Phone Number";
+	$var{'form.email.label'} = "Email Address";
+	$var{'form.firstName'} = WebGUI::Form::Text($self->session,{});
+	$var{'form.lastName'} = WebGUI::Form::Text($self->session,{});
+	$var{'form.address'} = WebGUI::Form::Text($self->session,{});
+	$var{'form.city'} = WebGUI::Form::Text($self->session,{});
+	$var{'form.state'} = WebGUI::Form::Text($self->session,{});
+	$var{'form.zipCode'} = WebGUI::Form::Text($self->session,{});
+	$var{'form.country'} = WebGUI::Form::SelectList($self->session,{});
+	$var{'form.phoneNumber'} = WebGUI::Form::Phone($self->session,{});
+	$var{'form.email'} = WebGUI::Form::Email($self->session,{});
+	$var{'registration'} = 1;	
+	return \%var;
+}
+
+#------------------------------------------------------------------
 sub getSubEventPrerequisites {
 	my $self = shift;
 	my $eventId = shift;
@@ -504,36 +544,40 @@ sub getSubEventForm {
 	my $pids = shift;
 	my $subEvents = $self->getSubEvents($pids);
 	my @usedEventIds;
-
-	#
-	# TODO : This will all be template variable assignments
-	#        and need to make checkbox for each subevent so it can be selected
-	#	 and added to the cart
-	#
-	
-	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
+	my %var;
 	my $i18n = WebGUI::International->new($self->session, 'Asset_EventManagementSystem');
 	
-	$f->hidden(-name=>"func",-value=>"addToCart");
-	$f->hidden(-name=>"method",-value=>"addSubEvents");
-	$f->readOnly(-value=>$i18n->get('allowed sub events'));
+	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
+			     .WebGUI::Form::hidden($self->session,{name=>"func",value=>"addToCart"})
+			     .WebGUI::Form::hidden($self->session,{name=>"method",value=>"addSubEvents"}
+	);
+
+	$var{'form.footer'} = WebGUI::Form::formFooter($self->session);
+	$var{'form.submit'} = WebGUI::Form::Submit($self->session);
+	$var{'message'}	    = $i18n->get('allowed sub events');
+
+	my @subEventLoop;
 	foreach my $subEvent (@$subEvents) {
 	 while (my $eventData = $subEvent->hashRef) {
-	   
+
 	   # Track used event ids so we can prevent listing a subevent more than once.
 	   next if (WebGUI::Utility::isIn($eventData->{productId}, @usedEventIds));
 	   push (@usedEventIds, $eventData->{productId});
-	 
-	   $f->checkbox(-value=>$eventData->{productId},
-	   		-label=>$eventData->{title}.
-	    "&nbsp;".$eventData->{description}."&nbsp;".$eventData->{price}."<br />",
-	    		-name=>"subEventPID"
-	    );
+	   
+	   push(@subEventLoop, {
+	   	'form.checkBox' => WebGUI::Form::checkbox($self->session, {
+					value => $eventData->{productId},
+	   	                        name  => "subEventPID"}),
+		'title'		=> $eventData->{title},
+		'description'	=> $eventData->{description},
+		'price'		=> $eventData->{price}
+
+	   });	 
 	 }
 	}
-	$f->submit;
-	
-	my $output = $f->print if (scalar (@$subEvents) > 0);
+	$var{'subevents_loop'} = \@subEventLoop;
+	$var{'chooseSubevents'} = 1;
+	my $output = \%var if (scalar (@$subEvents) > 0);
 	
 	return $output;	
 }
@@ -543,10 +587,9 @@ sub resolveConflictForm {
 	my $self = shift;
 	my $event1 = shift;
 	my $event2 = shift;
-	my $output;
 	my $extrasURL = $self->session->config->get("extrasURL");
 	my $deleteIcon = $extrasURL."/toolbar/bullet/delete.gif";
-	
+	my %var;
 	my $sth = $self->session->db->read("
 		select productId, title, price, description
 		from products where productId in (".$self->session->db->quote($event1).","
@@ -554,28 +597,30 @@ sub resolveConflictForm {
 	);
 	
 	my $i18n = WebGUI::International->new($self->session, 'Asset_EventManagementSystem');
-	$output .= sprintf "<table><tr><td>%s</td></tr>", $i18n->get('scheduling conflict message');
-	$output .= "<form action='".$self->getUrl."' method='post'";
-	$output .= "<input type='hidden' name='func' value='deleteCartItem' />";
-	$output .= "<input type='hidden' name='event1' value='$event1' />";
-	$output .= "<input type='hidden' name='event2' value='$event2' />";
+
+	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
+			     .WebGUI::Form::hidden($self->session,{name=>"func",value=>"deleteCartItem"})
+			     .WebGUI::Form::hidden($self->session,{name=>"event1",value=>"$event1"})
+			     .WebGUI::Form::hidden($self->session,{name=>"event2",value=>"$event2"}
+	);
+
+	$var{'form.footer'} = WebGUI::Form::formFooter($self->session);
+	$var{'form.submit'} = WebGUI::Form::Submit($self->session);
+	$var{'message'}	    = $i18n->get('allowed sub events');
+
+	my @loop;
 	while (my $data = $sth->hashRef) {
-		$output .= "<tr><td>";
-		$output .= "<input type='image' src='$deleteIcon' name='productToRemove' value='$data->{productId}' style='border: 0px;'/>";
-		$output .= "</td><td>";
-		$output .= $data->{title}."&nbsp;".$data->{description}."&nbsp;".$data->{price};
-		$output .= "</td></tr>"; 
+		push(@loop, {
+			'form.deleteControl' => "<input type='image' src='$deleteIcon' name='productToRemove' value='".$data->{productId}."' style='border: 0px;'/>",
+			'title' => $data->{title},
+			'description' => $data->{description},
+			'price' => $data->{price}			
+		});
 	}
-	$output .= "</form>";
-	$output .= "</table>";
-	$output .= sprintf "<a href=''>%s</a>", $i18n->get('scheduling conflict continue');
+	$var{'conflict_loop'} = \@loop;
+	$var{'resolveConflicts'} = 1;
 
-	#
-	# This will all be templated
-	#
-
-	
-	return $output;
+	return \%var;
 }
 
 #------------------------------------------------------------------
@@ -641,14 +686,12 @@ sub www_addToCart {
 	$pid = shift;
 	
 	# Check if conflicts were found that the user needs to fix
-	$output = join '', @{ $conflicts } if defined $conflicts;
-
+	$output = $conflicts->[0] if defined $conflicts;
+	
 	unless ($output) { #Skip this if we have errors
 
 		if ($self->session->form->get("method") eq "addSubEvents") { # List of ids from subevent form
 			@pids = $self->session->form->process("subEventPID", "checkList");
-			#Hack until the form->process method returns elements like it should
-			#@pids = split("\n", $pids[0]);
 		}
 		else {  # A single id, i.e., a master event
 			push(@pids, $self->session->form->get("pid") || $pid);
@@ -664,11 +707,10 @@ sub www_addToCart {
 		$errors = $self->checkConflicts;
 		if (scalar(@$errors) > 0) { return $self->error($errors, "www_addToCart"); }
 		
-		#
-		#	 Also need to make all of this output use a template	
+		$output = $self->getRegistrationInfo unless ($output);
+		
 	}
-	#return $self->session->style->process($self->processTemplate($f->print,$self->getValue("gradebookTemplateId")),$self->getValue("styleTemplateId"));
-	return $self->session->style->process($output,$self->getValue("styleTemplateId"));
+	return $self->session->style->process($self->processTemplate($output,$self->getValue("checkoutTemplateId")),$self->getValue("styleTemplateId"));
 } 
 
 #-------------------------------------------------------------------

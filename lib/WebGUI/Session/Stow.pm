@@ -106,7 +106,8 @@ The name of the variable.
 sub get {
 	my $self = shift;
 	my $var = shift;
-	return undef if $self->session->config->get("disableCache");
+	# wtf!? This line is breaking stuff, what does stow have to do with caching?
+	#return undef if $self->session->config->get("disableCache");
 	return $self->{_data}{$var};
 }
 

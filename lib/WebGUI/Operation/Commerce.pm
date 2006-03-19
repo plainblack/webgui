@@ -719,7 +719,7 @@ sub www_editCommerceSettingsSave {
 		# Store the plugin configuration data in a special table for security and the general settings in the
 		# normal settings table for easy access.
 		if (/~([^~]*)~([^~]*)~([^~]*)/) {
-			WebGUI::Commerce::setCommerceSetting({
+			WebGUI::Commerce::setCommerceSetting($session,{
 				type		=> $1,
 				namespace	=> $2,
 				fieldName	=> $3, 
@@ -915,7 +915,8 @@ sub www_selectPaymentGateway {
 				});
 		}
 	} elsif (scalar(@$plugins) == 1) {
-		$session->form->process("paymentGateway") = $plugins->[0]->namespace;
+		#$session->form->process("paymentGateway") = $plugins->[0]->namespace;
+		$session->stow->set("paymentGateway", $plugins->[0]->namespace);
 		return WebGUI::Operation::execute($session,'selectPaymentGatewaySave');
 	}
 	
@@ -944,8 +945,10 @@ Returns the user to the operation C<checkout> when it is done.
 
 sub www_selectPaymentGatewaySave {
 	my $session = shift;
-	if (WebGUI::Commerce::Payment->load($session, $session->form->process("paymentGateway"))->enabled) {
-		$session->scratch->set('paymentGateway', $session->form->process("paymentGateway"));
+	# shifting stow first because it's only set when one payment gateway is defined
+	my $paymentGateway = $session->stow->get("paymentGateway") || $session->form->process("paymentGateway");
+	if (WebGUI::Commerce::Payment->load($session, $paymentGateway)->enabled) {
+		$session->scratch->set('paymentGateway', $paymentGateway);
 	} else {
 		$session->scratch->set('paymentGateway', '-delete-');
 	}
@@ -980,7 +983,8 @@ sub www_selectShippingMethod {
 				});
 		}
 	} elsif (scalar(@$plugins) == 1) {
-		$session->form->process("shippingMethod") = $plugins->[0]->namespace;
+		#$session->form->process("shippingMethod") = $plugins->[0]->namespace;
+		$session->stow->set('shippingMethod', $plugins->[0]->namespace);
 		return WebGUI::Operation::execute($session,"selectShippingMethodSave");
 	}
 	
@@ -988,9 +992,9 @@ sub www_selectShippingMethod {
 	$var{message} = $i18n->get('select shipping method');
 	$var{pluginsAvailable} = @$plugins;
 	$var{noPluginsMessage} = $i18n->get('no shipping methods available');
-	$var{formHeader} = WebGUI::Form::formHeader.WebGUI::Form::hidden($session,{name=>'op', value=>'selectShippingMethodSave'});
+	$var{formHeader} = WebGUI::Form::formHeader($session).WebGUI::Form::hidden($session,{name=>'op', value=>'selectShippingMethodSave'});
 	$var{formSubmit} = WebGUI::Form::submit($session,{value=>$i18n->get('shipping select button')});
-	$var{formFooter} = WebGUI::Form::formFooter;		
+	$var{formFooter} = WebGUI::Form::formFooter($session);		
 	
 	return $session->style->userStyle(WebGUI::Asset::Template->new($session,$session->setting->get("commerceSelectShippingMethodTemplateId"))->process(\%var));
 }
@@ -1012,7 +1016,9 @@ Returns the user to the operation C<checkout> when it is done.
 
 sub www_selectShippingMethodSave {
 	my $session = shift;
-	my $shipping = WebGUI::Commerce::Shipping->load($session, $session->form->process("shippingMethod"));
+	# Shifting stow first b/c it's only set when one shipping plug-in exists
+	my $shippingMethod = $session->stow->get('shippingMethod') || $session->form->process("shippingMethod");
+	my $shipping = WebGUI::Commerce::Shipping->load($session, $shippingMethod);
 	
 	$shipping->processOptionsForm;
 	return WebGUI::Operation::execute($session,'selectShipping') unless ($shipping->optionsOk);
