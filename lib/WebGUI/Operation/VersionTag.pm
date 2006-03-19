@@ -207,7 +207,6 @@ sub www_commitVersionTagConfirm {
 		my $tag = WebGUI::VersionTag->new($session, $tagId);
 		if (defined $tag && $session->user->isInGroup($tag->get("groupToUse"))) {
 			$tag->set({comments=>$session->form->process("comments", "textarea")});
-		#	$tag->commit;
 			$tag->requestCommit;
 			my $i18n = WebGUI::International->new($session, "VersionTag");
         		my $ac = WebGUI::AdminConsole->new($session,"versions");

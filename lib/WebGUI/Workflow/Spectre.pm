@@ -66,22 +66,22 @@ The module/method pair you wish to communicate with in Spectre.
 
 =head3 params
 
-An array of the parameters to send.
+A scalar, array reference, or hash reference of data to pass to Spectre.
 
 =cut
 
 sub notify {
 	my $self = shift;
 	my $module = shift;
-	my @params = @_;
+	my $params = shift;;
 	my $remote = create_ikc_client(
                 port=>$self->session->config->get("spectrePort"),
                 ip=>$self->session->config->get("spectreIp"),
                 name=>rand(100000),
                 timeout=>10
                 );
-	if ($remote) {
-        	my $result = $remote->post(@params);
+	if (defined $remote) {
+        	my $result = $remote->post($module, $params);
 		unless (defined $result) {
 			$self->session->errorHandler->warn("Couldn't send command to Spectre because ".$POE::Component::IKC::ClientLite::error);
 		}
