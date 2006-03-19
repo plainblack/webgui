@@ -311,7 +311,7 @@ sub www_checkoutConfirm {
 	$var{'viewShoppingCart.url'} = $session->url->page('op=viewCart');
 	$var{'viewShoppingCart.label'} = $i18n->get('view shopping cart');
 
-	return $session->style->userStyle(WebGUI::Asset::Template->new($session,$session->setting->get("commerceConfirmCheckoutTemplateId"))->process(\%var));
+	return $session->style->userStyle(WebGUI::Asset->newByDynamicClass($session,$session->setting->get("commerceConfirmCheckoutTemplateId"))->process(\%var));
 }
 
 #-------------------------------------------------------------------
