@@ -220,6 +220,7 @@ sub run {
 		$self->delete;
 		return "done";
 	}
+	$self->session->errorHandler->debug("Running workflow activity ".$activity->getId.", which is a ".(ref $activity).", for instance ".$self->getId.".");
 	my $object = {};
 	my $class = $self->get("className");
 	my $method = $self->get("methodName");

@@ -79,7 +79,7 @@ sub execute {
 	my $self = shift;
         my $size = $self->get("sizeLimit") + 10;
         my $expiresModifier = 0;
-        my $cache = WebGUI::Cache::FileCache->new;
+        my $cache = WebGUI::Cache::FileCache->new($self->session);
         while ($size > $self->get("sizeLimit")) {
                 $size = $cache->getNamespaceSize($expiresModifier);
                 $expiresModifier += 60 * 30; # add 30 minutes each pass

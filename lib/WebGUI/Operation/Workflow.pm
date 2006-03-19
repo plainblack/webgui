@@ -206,7 +206,7 @@ Saves the results of www_editWorkflow()
 sub www_editWorkflowSave {
 	my $session = shift;
         return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
-	my $workflow = WebGUI::Workflow::Cron->new($session, $session->form->get("workflowId"));
+	my $workflow = WebGUI::Workflow->new($session, $session->form->param("workflowId"));
 	$workflow->set({
 		enabled=>$session->form->get("enabled","yesNo"),
 		isSerial=>$session->form->get("isSerial","yesNo"),
@@ -266,7 +266,6 @@ sub www_editWorkflowActivitySave {
 			$activity = $workflow->getActivity($activityId);
 		}
 		$activity->processPropertiesFromFormPost;
-		$workflow->set({enabled=>0});
 	}
 	return www_editWorkflow($session);
 }

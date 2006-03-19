@@ -72,7 +72,7 @@ sub execute {
         my $epoch = $self->session->datetime->time();
         my $a = $self->session->db->read("select assetId from asset where className='WebGUI::Asset::Wobject::Collaboration'");
         while (my ($assetId) = $a->array) {
-                my $cs = WebGUI::Asset->new($assetId, "WebGUI::Asset::Wobject::Collaboration");
+                my $cs = WebGUI::Asset->new($self->session, $assetId, "WebGUI::Asset::Wobject::Collaboration");
                 my $archiveDate = $epoch - $cs->get("archiveAfter");
                 my $sql = "select asset.assetId, assetData.revisionDate from Post left join asset on asset.assetId=Post.assetId 
                         left join assetData on Post.assetId=assetData.assetId and Post.revisionDate=assetData.revisionDate
@@ -80,7 +80,7 @@ sub execute {
 			and Post.threadId=Post.assetId and asset.lineage like ?";
                 my $b = $self->session->db->read($sql,[$archiveDate, $cs->get("lineage").'%']);
                 while (my ($id, $version) = $b->array) {
-			my $thread = WebGUI::Asset->new($id, "WebGUI::Asset::Post::Thread", $version);
+			my $thread = WebGUI::Asset->new($self->session, $id, "WebGUI::Asset::Post::Thread", $version);
 			my $archiveIt = 1;
 			foreach my $post (@{$thread->getPosts}) {
                         	$archiveIt = 0 if (defined $post && $post->get("dateUpdated") > $archiveDate);
