@@ -70,16 +70,23 @@ sub create {
 
 #-------------------------------------------------------------------
 
-=head2 delete ( )
+=head2 delete ( [ skipNotify ] )
 
 Removes this job from the schedule.
+
+=head3 skipNotify
+
+A boolean indicating whether to skip spectre notification of this event.
 
 =cut
 
 sub delete {
 	my $self = shift;
+	my $skipNotify = shift;
 	$self->session->db->deleteRow("WorkflowSchedule","taskId",$self->getId);
-	WebGUI::Workflow::Spectre->new($self->session)->notify("cron/deleteJob",$self->getId);
+	if ($skipNotify) {	
+		WebGUI::Workflow::Spectre->new($self->session)->notify("cron/deleteJob",{taskId=>$self->getId, config=>$self->session->config->getFilename});
+	}
 	undef $self;
 }
 
@@ -276,8 +283,11 @@ sub set {
 	$self->{_data}{enabled} = 0 unless ($self->{_data}{workflowId});
 	my $spectre = WebGUI::Workflow::Spectre->new($self->session);
 	$self->session->db->setRow("WorkflowSchedule","taskId",$self->{_data});
-	$spectre->notify("cron/deleteJob",$self->getId);
-	$spectre->notify("cron/addJob",$self->session->config->getFilename, $self->{_data});
+	$spectre->notify("cron/deleteJob",{taskId=>$self->getId,config=>$self->session->config->getFilename});
+	my %params = %{$self->{_data}};
+	$params{config} = $self->session->config->getFilename;
+	$params{sitename} = $self->session->config->get("sitename")->[0];
+	$spectre->notify("cron/addJob", \%params);
 }
 
 

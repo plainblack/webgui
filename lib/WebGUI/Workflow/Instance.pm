@@ -68,7 +68,7 @@ sub create {
 	return undef if ($isSerial && $count);
 	my $instanceId = $session->db->setRow("WorkflowInstance","instanceId",{instanceId=>"new", runningSince=>time()}, $id);
 	my $self = $class->new($session, $instanceId);
-	$properties->{priority} ||= 2;
+	$properties->{notifySpectre} = 1 unless ($properties->{notifySpectre} eq "0");
 	$self->set($properties);
 	return $self;
 }
@@ -306,7 +306,7 @@ sub set {
 	$self->{_data}{currentActivityId} = (exists $properties->{currentActivityId}) ? $properties->{currentActivityId} : $self->{_data}{currentActivityId};
 	$self->{_data}{lastUpdate} = time();
 	$self->session->db->setRow("WorkflowInstance","instanceId",$self->{_data});
-	if ($properties->{priority}) {
+	if ($properties->{priority} && $properties->{notifySpectre}) {
 		my $spectre = WebGUI::Workflow::Spectre->new($self->session);
 		$spectre->notify("workflow/deleteInstance",$self->getId);
 		$spectre->notify("workflow/addInstance", {sitename=>$self->session->config->get("sitename")->[0], instanceId=>$self->getId, priority=>$self->{_data}{priority}});
