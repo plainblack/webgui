@@ -18,7 +18,7 @@ use WebGUI::Utility;
 
 use WebGUI::User;
 use WebGUI::Group;
-use Test::More tests => 50; # increment this value for each test you create
+use Test::More tests => 51; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -140,10 +140,6 @@ cmp_bag($gB->getGroupsIn(1), [$gA->getId, $gC->getId, $gZ->getId, $gY->getId, $g
 $gX->addGroups([$gA->getId]);
 cmp_bag($gX->getGroupsIn(), [3], 'Not able to add B tree under Z tree under X');
 
-#$gX->userIsAdmin(1, "yes");
-
-#ok(!$gX->userIsAdmin(1), "userIsAdmin: Visitor is not allowed to be a Group Admin");
-
 my $user = WebGUI::User->new($session, "new");
 $gX->userIsAdmin($user->userId, "yes");
 ok(!$gX->userIsAdmin($user->userId), "userIsAdmin: User who isn't secondary admin can't be group admin");
@@ -154,11 +150,17 @@ ok($user->isInGroup(12), "userIsAdmin: Added dude to Secondary Admins");
 $gX->userIsAdmin($user->userId, 1);
 ok(!$gX->userIsAdmin($user->userId), "userIsAdmin: User must be member of group to be group admin");
 
+my $addedUserTime = time();
 $user->addToGroups([$gX->getId]);
 ok($user->isInGroup($gX->getId), "userIsAdmin: Added dude to gX");
 
 $gX->userIsAdmin($user->userId, 1);
 ok($gX->userIsAdmin($user->userId), "userIsAdmin: Dude set to be group admin for gX");
+
+my $expireOffset = $gX->expireOffset;
+my $expireTime = $addedUserTime+$expireOffset;
+
+ok( abs($gX->userGroupExpireDate($user->userId) - $expireTime) < 1, 'userGroupExpireDate: Default expire time');
 
 $user->delete;
 

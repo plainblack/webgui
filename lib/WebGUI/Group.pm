@@ -229,9 +229,9 @@ Deletes this group and all references to it.
 
 sub delete {
 	my $self = shift;
-        $self->session->db->write("delete from groups where groupId=".$self->session->db->quote($self->getId));
-        $self->session->db->write("delete from groupings where groupId=".$self->session->db->quote($self->getId));
-        $self->session->db->write("delete from groupGroupings where inGroup=".$self->session->db->quote($self->getId)." or groupId=".$self->session->db->quote($self->getId));
+        $self->session->db->write("delete from groups where groupId=?", [$self->getId]);
+        $self->session->db->write("delete from groupings where groupId=?", [$self->getId]);
+        $self->session->db->write("delete from groupGroupings where inGroup=? or groupId=?", [$self->getId, $self->getId]);
 	undef $self;
 }
 
@@ -279,7 +279,7 @@ sub deleteUsers {
 	my $users = shift;
 	$self->session->stow->delete("isInGroup");
 	foreach my $uid (@{$users}) {
-               	$self->session->db->write("delete from groupings where groupId=".$self->session->db->quote($self->getId)." and userId=".$self->session->db->quote($uid));
+               	$self->session->db->write("delete from groupings where groupId=? and userId=?",[$self->getId, $uid]);
 	}
 }
 
@@ -966,7 +966,7 @@ sub userIsAdmin {
 
 =head2 userGroupExpireDate ( userId [, epoch ] )
 
-Returns the epoch date that this grouping will expire.
+Returns the epoch date that this grouping will expire for a particular user.
 
 =head3 userId
 
@@ -983,15 +983,12 @@ sub userGroupExpireDate {
 	my $userId = shift;
 	my $epoch = shift;
 	if ($epoch) {
-		$self->session->db->write("update groupings set expireDate=".$self->session->db->quote($epoch)." where groupId=".$self->session->db->quote($self->getId)." and userId=".$self->session->db->quote($userId));
+		$self->session->db->write("update groupings set expireDate=? where groupId=? and userId=?",[$epoch, $self->getId, $userId]);
 		return $epoch;
 	} else {
-		my ($expireDate) = $self->session->db->quickArray("select expireDate from groupings where groupId=".$self->session->db->quote($self->getId)." and userId=".$self->session->db->quote($userId));
+		my ($expireDate) = $self->session->db->quickArray("select expireDate from groupings where groupId=? and userId=?", [$self->getId, $userId]);
 		return $expireDate;
 	}
 }	
 
-
-
 1;
-
