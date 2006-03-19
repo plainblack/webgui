@@ -292,8 +292,6 @@ sub www_checkoutConfirm {
 	$var{total} = sprintf('%.2f', $total + $shipping->calc);
 	
 	$plugin = WebGUI::Commerce::Payment->load($session, $session->scratch->get('paymentGateway'));
-		use Data::Dumper;
-		$session->errorHandler->warn(Dumper($plugin->session));
 
 	$f = WebGUI::HTMLForm->new($session);
 	$f->hidden(
