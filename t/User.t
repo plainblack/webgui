@@ -257,14 +257,14 @@ $user->addToGroups([3]);
 ok($user->isInGroup(3), "addToGroups: New user is in group 3(Admin)");
 ok($user->isInGroup(11), "New user is in group 11(Secondary Admins)");
 ok($user->isInGroup(12), "New user is in group 12(Turn On Admin)");
-ok($user->isInGroup(13), "New user is in group 13(Turn On Admin)");
+ok($user->isInGroup(13), "New user is in group 13(Export Managers)");
 ok($user->isInGroup(14), "New user is in group 14(Product Managers)");
 
 $user->deleteFromGroups([3]);
 ok(!$user->isInGroup(3), "deleteFromGroups: New user is not in group 3(Admin)");
 ok(!$user->isInGroup(11), "New user is not in group 11(Secondary Admins)");
 ok(!$user->isInGroup(12), "New user is not in group 12(Turn On Admin)");
-ok(!$user->isInGroup(13), "New user is not in group 13(Turn On Admin)");
+ok(!$user->isInGroup(13), "New user is not in group 13(Export Managers)");
 ok(!$user->isInGroup(14), "New user is not in group 14(Product Managers)");
 
 $user->delete;
