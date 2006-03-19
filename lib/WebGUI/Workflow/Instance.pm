@@ -216,9 +216,7 @@ sub run {
 	return "undefined" unless (defined $workflow);
 	return "disabled" unless ($workflow->get("enabled"));
 	my $activity = $workflow->getNextActivity($self->get("currentActivityId"));
-	if  (defined $activity)  {
-		$self->set({"currentActivityId",$activity->getId});
-	} else {
+	unless  (defined $activity)  {
 		$self->delete;
 		return "done";
 	}
@@ -226,6 +224,7 @@ sub run {
 	my $class = $self->get("className");
 	my $method = $self->get("methodName");
 	my $params = $self->get("parameters");
+	my $status = "";
 	if ($class && $method) {
 		my $cmd = "use $class";
 		eval($cmd);
@@ -238,9 +237,14 @@ sub run {
 			$self->session->errorHandler->warn("Error instanciating activity (".$activity->getId.") pass-in object: ".$@);
 			return "error";
 		}
-		return $activity->execute($object, $self);	
+		$status = $activity->execute($object, $self);	
+	} else {
+		$status = $activity->execute(undef, $self);
 	}
-	return $activity->execute(undef, $self);
+	if ($status eq "complete") {
+		$self->set({"currentActivityId"=>$activity->getId});
+	}
+	return $status;
 }
 
 

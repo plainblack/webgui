@@ -317,6 +317,15 @@ Suspends a workflow instance for a number of seconds defined in the config file,
 sub suspendInstance {
 	my ($self, $instanceId, $kernel) = @_[OBJECT, ARG0, KERNEL];
 	$self->debug("Suspending workflow instance ".$instanceId." for ".$self->config->get("suspensionDelay")." seconds.");
+	# normally this is taken care of by the returnInstanceToQueue method, but we want to free up the running count
+	# so that other things can be run while this thing is suspended
+	if ($self->{_instances}{$instanceId}) {
+		for (my $i=0; $i < scalar(@{$self->{_runningInstances}}); $i++) {
+			if ($self->{_runningInstances}[$i] eq $instanceId) {
+				splice(@{$self->{_runningInstances}}, $i, 1);
+			}
+		}
+	}
 	$kernel->delay_set("returnInstanceToQueue",$self->config->get("suspensionDelay"), $instanceId);
 }
 
