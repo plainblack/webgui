@@ -22,7 +22,7 @@ Package WebGUI::Session::Stow
 
 =head1 DESCRIPTION
 
-This package allows you to "stow" a scalar or a reference to any other perl structure for the duration of the request. It's sort of like a mini in memory cache that only exists unless $session->close is called. Note that this is NOT supposed to be used as a global variable system. It's simply an in memory cache.
+This package allows you to "stow" a scalar or a reference to any other perl structure for the duration of the request. It's sort of like a mini in memory cache that only exists until $session->close is called. It is great to stow stuff that might otherwise have to be requested many times during a single page view, but that you would't want to store in the regular cache. Note that this is NOT supposed to be used as a global variable system. It's simply an in memory cache.
 
 =head1 SYNOPSIS
 
@@ -106,8 +106,7 @@ The name of the variable.
 sub get {
 	my $self = shift;
 	my $var = shift;
-	# wtf!? This line is breaking stuff, what does stow have to do with caching?
-	#return undef if $self->session->config->get("disableCache");
+	return undef if $self->session->config->get("disableCache");
 	return $self->{_data}{$var};
 }
 
