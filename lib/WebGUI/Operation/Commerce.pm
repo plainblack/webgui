@@ -292,6 +292,8 @@ sub www_checkoutConfirm {
 	$var{total} = sprintf('%.2f', $total + $shipping->calc);
 	
 	$plugin = WebGUI::Commerce::Payment->load($session, $session->scratch->get('paymentGateway'));
+		use Data::Dumper;
+		$session->errorHandler->warn(Dumper($plugin->session));
 
 	$f = WebGUI::HTMLForm->new($session);
 	$f->hidden(
@@ -363,7 +365,7 @@ sub www_checkoutSubmit {
 
 	# check submitted form params
 	$formError = $plugin->validateFormData;
-	return www_checkoutConfirm($formError) if ($formError);
+	return www_checkoutConfirm($session,$formError) if ($formError);
 
 	# Combine all non recurring item in one transaction and combine with all recurring ones
 	map {push(@transactions, {recurring => 1, items => [$_]})} @$recurring;
