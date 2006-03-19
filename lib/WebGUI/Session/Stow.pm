@@ -22,7 +22,7 @@ Package WebGUI::Session::Stow
 
 =head1 DESCRIPTION
 
-This package allows you to "stow" a scalar or a reference to any other perl structure for the duration of the request. It's sort of like a mini in memory cache that only exists unless $session->close is called.
+This package allows you to "stow" a scalar or a reference to any other perl structure for the duration of the request. It's sort of like a mini in memory cache that only exists unless $session->close is called. Note that this is NOT supposed to be used as a global variable system. It's simply an in memory cache.
 
 =head1 SYNOPSIS
 
