@@ -133,7 +133,8 @@ sub addGroups {
 
 =head2 addUsers ( users [, expireOffset ] )
 
-Adds users to this group.
+Adds users to this group.  If a user is already a member of a group, their expiration date
+is updated.
 
 =head3 users 
 
@@ -155,6 +156,7 @@ sub addUsers {
 		my ($isIn) = $self->session->db->quickArray("select count(*) from groupings where groupId=? and userId=?", [$self->getId, $uid]);
 		unless ($isIn) {
 			$self->session->db->write("insert into groupings (groupId,userId,expireDate) values (?,?,?)", [$self->getId, $uid, ($self->session->datetime->time()+$expireOffset)]);
+			$self->session->stow->delete("gotGroupsForUser");
 		} else {
 			$self->userGroupExpireDate($uid,($self->session->datetime->time()+$expireOffset));
 		}
@@ -281,6 +283,7 @@ sub deleteUsers {
 	foreach my $uid (@{$users}) {
                	$self->session->db->write("delete from groupings where groupId=? and userId=?",[$self->getId, $uid]);
 	}
+	$self->session->stow->delete("gotGroupsForUser");
 }
 
 #-------------------------------------------------------------------
@@ -937,7 +940,7 @@ sub set {
 
 =head2 userIsAdmin ( [ userId, value ] )
 
-Returns a 1 or 0 depending upon whether the user is a sub-admin for this group.
+Sets or returns $userid's status as a group admin in this group.
 
 =head3 userId
 
@@ -945,7 +948,8 @@ A guid that is the unique identifier for a user. Defaults to the currently logge
 
 =head3 value
 
-If specified the admin flag will be set to this value.
+If defined and not the empty string, the admin flag will be set to this value.  Otherwise,
+returns 1 if the user has been set as a group admin and 0 if the user hasn't.
 
 =cut
 
@@ -958,7 +962,7 @@ sub userIsAdmin {
 		return $value;
 	} else {
 		my ($admin) = $self->session->db->quickArray("select groupAdmin from groupings where groupId=? and userId=?", [$self->getId, $userId]);
-		return $admin;
+		return ($admin ? 1 : 0);
 	}
 }	
 

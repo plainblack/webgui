@@ -647,7 +647,7 @@ Be aware that any database links you create here will be available to all conten
         },
 
         '977 description' => {
-                message => q|Set this to yes to make this user a secondary admin.  Secondary admins have the ability
+                message => q|Set this to yes to make this user a group admin.  Group admins have the ability
 to add or remove users from their groups.
 		|,
                 lastUpdated => 1132359856,
@@ -1036,7 +1036,7 @@ removed from the system after a set period of time.  That period of time is set 
 	},
 
 	'977' => {
-		message => q|Is secondary admin?|,
+		message => q|Is group admin?|,
 		lastUpdated => 1053803387
 	},
 
@@ -1280,9 +1280,7 @@ When users are added to the system they are put into the registered users group.
 <p>
 
 <b>Secondary Admins</b><br> Users in the Secondary Admins group may
-add new users, but cannot edit users. Also, if you are a Secondary
-Admin and are a member of a different group, you can be set as an admin for that group.  This
-will allow you to add or remove members from that group.
+add new users, but cannot edit users.
 <p>
 
 <b>Style Managers</b><br>

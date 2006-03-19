@@ -18,7 +18,7 @@ use WebGUI::Utility;
 
 use WebGUI::User;
 use WebGUI::Group;
-use Test::More tests => 51; # increment this value for each test you create
+use Test::More tests => 59; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -143,24 +143,43 @@ cmp_bag($gX->getGroupsIn(), [3], 'Not able to add B tree under Z tree under X');
 my $user = WebGUI::User->new($session, "new");
 $gX->userIsAdmin($user->userId, "yes");
 ok(!$gX->userIsAdmin($user->userId), "userIsAdmin: User who isn't secondary admin can't be group admin");
-
-$user->addToGroups([12]);
-ok($user->isInGroup(12), "userIsAdmin: Added dude to Secondary Admins");
+isnt($gX->userIsAdmin($user->userId), 'yes', "userIsAdmin returns 1 or 0, not value");
 
 $gX->userIsAdmin($user->userId, 1);
 ok(!$gX->userIsAdmin($user->userId), "userIsAdmin: User must be member of group to be group admin");
 
-my $addedUserTime = time();
+my $expireOffset = $gX->expireOffset;
+
 $user->addToGroups([$gX->getId]);
-ok($user->isInGroup($gX->getId), "userIsAdmin: Added dude to gX");
+##User expire time is calculated correctly
+my $expireTime = abs($gX->userGroupExpireDate($user->userId) - $expireOffset - time());
+ok(  $expireTime < 1, 'userGroupExpireDate: Default expire time');
+ok($user->isInGroup($gX->getId), "addToGroups: Added dude to gX");
 
 $gX->userIsAdmin($user->userId, 1);
 ok($gX->userIsAdmin($user->userId), "userIsAdmin: Dude set to be group admin for gX");
 
-my $expireOffset = $gX->expireOffset;
-my $expireTime = $addedUserTime+$expireOffset;
+sleep 5;
+$expireTime = time() + $expireOffset - $gX->userGroupExpireDate($user->userId) ;
+ok( ($expireTime < 6 && $expireTime > 0), 'userGroupExpireDate: Default expire time ages');
 
-ok( abs($gX->userGroupExpireDate($user->userId) - $expireTime) < 1, 'userGroupExpireDate: Default expire time');
+$gX->addUsers([$user->userId]);
+my $expireTime = abs($gX->userGroupExpireDate($user->userId) - $expireOffset - time());
+ok(  $expireTime < 1, 'adding exising user to group resets expire date');
+ok($gX->userIsAdmin($user->userId), "userIsAdmin: adding existing user to group does not change group admin status");
+
+##undef and the empty string will return the set value because they're
+##interpreted as the empty string.
+is($gX->userIsAdmin($user->userId, ''), 1, "userIsAdmin: empty string returns status");
+is($gX->userIsAdmin($user->userId, undef), 1, "userIsAdmin: undef returns status");
+
+##Now we'll try various settings and see how they work with userIsAdmin.
+$gX->userIsAdmin($user->userId, 0);
+ok(!$gX->userIsAdmin($user->userId), "userIsAdmin: trying 0 as value");
+$gX->userIsAdmin($user->userId, '0E0');
+ok(!$gX->userIsAdmin($user->userId), "userIsAdmin: trying '0E0'(string) as value");
+$gX->userIsAdmin($user->userId, 0E0);
+ok(!$gX->userIsAdmin($user->userId), "userIsAdmin: trying 0E0 as value");
 
 $user->delete;
 
