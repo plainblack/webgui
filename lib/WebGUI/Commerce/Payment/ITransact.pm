@@ -128,7 +128,7 @@ sub checkoutForm {
 	
 	$i18n = WebGUI::International->new($self->session, 'CommercePaymentITransact');
 
-	$u = WebGUI::User->new($self->session->user->userId);
+	$u = WebGUI::User->new($self->session,$self->session->user->userId);
 
 	$f = WebGUI::HTMLForm->new($self->session);
 	$f->text(
@@ -622,7 +622,7 @@ sub normalTransaction {
 		$self->{_recurring} = 0;
 		$self->{_transactionParams} = {
 			AMT		=> sprintf('%.2f', $normal->{amount}),
-			DESCRIPTION	=> WebGUI::URL::escape($normal->{description}) || $i18n->get('no description'),
+			DESCRIPTION	=> $self->session->url->escape($normal->{description}) || $i18n->get('no description'),
 			INVOICENUMBER	=> $normal->{invoiceNumber},
 			ORGID		=> $normal->{id},
 		};
@@ -650,7 +650,7 @@ sub recurringTransaction {
 			INITIALAMT	=> sprintf('%.2f', $initialAmount),
 			TERM		=> $recurring->{term} || 9999,
 			RECIPE		=> _resolveRecipe($recurring->{payPeriod}),
-			DESCRIPTION	=> WebGUI::URL::escape($recurring->{description}) || $i18n->get('no description'),
+			DESCRIPTION	=> $self->session->url->escape($recurring->{description}) || $i18n->get('no description'),
 			INVOICENUMBER	=> $recurring->{invoiceNumber},
 			ORGID		=> $recurring->{id},
 		};

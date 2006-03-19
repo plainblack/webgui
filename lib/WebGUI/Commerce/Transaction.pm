@@ -476,7 +476,7 @@ Returns the cached, local session variable.
 =cut
 
 sub session {
-	my ($self) = @_;
+	my $self = shift;
 	return $self->{_session};
 }
 

@@ -383,8 +383,9 @@ sub www_checkoutSubmit {
 		
 		# Write transaction to the log with status pending
 		$transaction = WebGUI::Commerce::Transaction->new($session, 'new');
+		
 		foreach (@{$currentPurchase->{items}}) {
-			$transaction->addItem($_->{item}, $_->{quantity});
+			$transaction->addItem($_->{item}, $_->{quantity});			
 			$amount += ($_->{item}->price * $_->{quantity});
 			$var->{purchaseDescription} .= $_->{quantity}.' x '.$_->{item}->name.'<br />';
 		}
@@ -451,10 +452,10 @@ sub www_checkoutSubmit {
 	_clearCheckoutScratch($session);
 	
 	# If everythings ok show the purchase history
-	return WebGUI::Operation::execute($session,'viewPurchaseHistory') unless ($checkoutError);
-
+	return WebGUI::Operation::TransactionLog::www_viewPurchaseHistory($session) unless ($checkoutError);
+	
 	# If an error has occurred show the template errorlog
-	return $session->style->userStyle(WebGUI::Asset::Template->new($session,$session->setting->get("commerceTransactionErrorTemplateId"))->process(\%param));
+	return $session->style->userStyle(WebGUI::Asset->newByDynamicClass($session,$session->setting->get("commerceTransactionErrorTemplateId"))->process(\%param));
 }
 
 #-------------------------------------------------------------------
