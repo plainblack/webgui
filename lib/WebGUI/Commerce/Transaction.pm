@@ -103,7 +103,8 @@ sub completeTransaction {
 
 	foreach (@{$self->getItems}) {
 		$item = WebGUI::Commerce::Item->new($self->session,$_->{itemId}, $_->{itemType});
-		$item->handler;
+		$item->handler($_->{transactionId});
+		#$item->handler;
 	}
 
 	$self->status('Completed');	

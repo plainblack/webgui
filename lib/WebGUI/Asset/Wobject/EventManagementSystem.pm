@@ -435,7 +435,7 @@ sub getRegistrationInfo {
 	my %var;
 	
 	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
-			     .WebGUI::Form::hidden($self->session,{name=>"func",value=>"www_saveRegistration"});
+			     .WebGUI::Form::hidden($self->session,{name=>"func",value=>"saveRegistration"});
 
 	$var{'form.footer'} = WebGUI::Form::formFooter($self->session);
 	$var{'form.submit'} = WebGUI::Form::submit($self->session);
@@ -448,15 +448,15 @@ sub getRegistrationInfo {
 	$var{'form.country.label'} = "Country";
 	$var{'form.phoneNumber.label'} = "Phone Number";
 	$var{'form.email.label'} = "Email Address";
-	$var{'form.firstName'} = WebGUI::Form::Text($self->session,{});
-	$var{'form.lastName'} = WebGUI::Form::Text($self->session,{});
-	$var{'form.address'} = WebGUI::Form::Text($self->session,{});
-	$var{'form.city'} = WebGUI::Form::Text($self->session,{});
-	$var{'form.state'} = WebGUI::Form::Text($self->session,{});
-	$var{'form.zipCode'} = WebGUI::Form::Text($self->session,{});
-	$var{'form.country'} = WebGUI::Form::SelectList($self->session,{});
-	$var{'form.phoneNumber'} = WebGUI::Form::Phone($self->session,{});
-	$var{'form.email'} = WebGUI::Form::Email($self->session,{});
+	$var{'form.firstName'} = WebGUI::Form::Text($self->session,{name=>'firstName'});
+	$var{'form.lastName'} = WebGUI::Form::Text($self->session,{name=>'lastName'});
+	$var{'form.address'} = WebGUI::Form::Text($self->session,{name=>'address'});
+	$var{'form.city'} = WebGUI::Form::Text($self->session,{name=>'city'});
+	$var{'form.state'} = WebGUI::Form::Text($self->session,{name=>'state'});
+	$var{'form.zipCode'} = WebGUI::Form::Text($self->session,{name=>'zipCode'});
+	$var{'form.country'} = WebGUI::Form::SelectList($self->session,{name=>'country', options => {'us' => 'UnitedStates'}});
+	$var{'form.phoneNumber'} = WebGUI::Form::Phone($self->session,{name=>'phoneNumber'});
+	$var{'form.email'} = WebGUI::Form::Email($self->session,{name=>'email'});
 	$var{'registration'} = 1;	
 	return \%var;
 }
@@ -1150,6 +1150,44 @@ sub www_moveEventUp {
 }
 
 #-------------------------------------------------------------------
+sub www_saveRegistration {
+	my $self = shift;
+	my $eventsInCart = $self->getEventsInCart;
+	my $purchaseId = $self->session->id->generate;
+
+	foreach my $eventId (@$eventsInCart) {
+		my $registrationId = $self->setCollateral("EventManagementSystem_registrations", "registrationId",
+				{
+				 registrationId  => "new",
+				 purchaseId	 => $purchaseId,
+				 productId	 => $eventId,
+				 firstName       => $self->session->form->get("firstName", "text"),
+				 lastName	 => $self->session->form->get("lastName", "text"),
+				 address         => $self->session->form->get("address", "text"),
+				 city            => $self->session->form->get("city", "text"),
+				 state		 => $self->session->form->get("state", "text"),
+				 zipCode	 => $self->session->form->get("zipCode", "text"),
+				 country	 => $self->session->form->get("country", "selectList"),
+				 phone		 => $self->session->form->get("phoneNumber", "phone"),
+				 email		 => $self->session->form->get("email", "email")
+				},0,0
+		);
+	}
+	
+	#Our item plug-in needs to be able to associate these records with the result of the payment attempt
+	my $counter = 0;
+	while (1) {
+		unless ($self->session->scratch->get("purchaseId".$counter)) {
+			$self->session->scratch->set("purchaseId".$counter, $purchaseId);
+			last;
+		}
+		$counter++;	
+	}	
+	#use Data::Dumper; print "<pre>".Dumper($self->session)."</pre>";
+	return $self->www_view;
+}
+
+#-------------------------------------------------------------------
 
 =head2 prepareView ( )
 
@@ -1199,7 +1237,8 @@ sub view {
 	  
 	  push (@events, {'event' => $self->processTemplate(\%eventFields, $event->{'templateId'}) });	  
 	} 
-		
+	$var{'checkout.url'} = $self->getUrl('op=viewCart');
+	$var{'checkout.label'} = "Checkout";
 	$var{'events_loop'} = \@events;
 	$var{'paginateBar'} = $p->getBarTraditional;
 	$var{'manageEvents.url'} = $self->getUrl('func=manageEvents');

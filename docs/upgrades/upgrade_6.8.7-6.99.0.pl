@@ -541,7 +541,7 @@ my $sql4 = <<SQL4;
 
 create table EventManagementSystem_purchases (
  purchaseId varchar(22) not null,
- userId varchar(22),
+ transactionId varchar(22),
 primary key(purchaseId)
 )
 SQL4

@@ -38,6 +38,23 @@ sub description {
 }
 
 #-------------------------------------------------------------------
+sub handler {
+	my $self = shift;
+	my $transactionId = shift;
+	#mark all purchaseIds as paid
+	my $counter = 0;
+	while (1) {
+		my $purchaseId;
+		if ($purchaseId = $self->session->scratch->get("purchaseId".$counter)) {
+			$self->session->db->setRow('EventManagementSystem_purchases', 'purchaseId', {'purchaseId'=>$purchaseId, 'transactionId'=>$transactionId}, $purchaseId);
+			$self->session->scratch->delete("purchaseId".$counter);
+			$counter++;
+		}
+		else { last; }
+	}
+}
+
+#-------------------------------------------------------------------
 sub id {
 	return $_[0]->{_event}->{productId};
 }
@@ -81,6 +98,12 @@ sub needsShipping {
 #-------------------------------------------------------------------
 sub price {
 	return $_[0]->{_event}->{price};
+}
+
+#-------------------------------------------------------------------
+sub session {
+	my $self = shift;
+	return $self->{_session};
 }
 
 #-------------------------------------------------------------------
