@@ -1211,7 +1211,7 @@ sub view {
 	
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	# Get the products available for sale for this page
-	my $sql = "select p.productId, p.title, p.description, p.price, p.templateId, e.approved 
+	my $sql = "select p.productId, p.title, p.description, p.price, p.templateId, e.approved, e.maximumAttendees 
 		   from products as p, EventManagementSystem_products as e
 		   where
 		   	p.productId = e.productId and approved=1
@@ -1232,9 +1232,20 @@ sub view {
 	  $eventFields{'title'} = $event->{'title'};
 	  $eventFields{'description'} = $event->{'description'};
 	  $eventFields{'price'} = $event->{'price'};
-	  $eventFields{'purchase.url'} = $self->getUrl('func=addToCart;pid='.$event->{'productId'});
-	  $eventFields{'purchase.label'} = $i18n->get('add to cart');
-	  
+	  my ($numberRegistered) = $self->session->db->quickArray("select count(*) from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p
+	  	where r.purchaseId = p.purchaseId and r.productId=".$self->session->db->quote($event->{'productId'}));
+	  $eventFields{'numberRegistered'} = $numberRegistered;
+	  $eventFields{'maximumAttendees'} = $event->{'maximumAttendees'};
+	  $eventFields{'seatsRemaining'} = $event->{'maximumAttendees'} - $numberRegistered;
+	  $eventFields{'eventIsFull'} = ($eventFields{'seatsRemaining'} == 0);
+
+	  if ($eventFields{'eventIsFull'}) {
+	  	$eventFields{'purchase.label'} = "Sold Out";;
+	  }
+	  else {
+	  	$eventFields{'purchase.url'} = $self->getUrl('func=addToCart;pid='.$event->{'productId'});
+	  	$eventFields{'purchase.label'} = $i18n->get('add to cart');
+	  }
 	  push (@events, {'event' => $self->processTemplate(\%eventFields, $event->{'templateId'}) });	  
 	} 
 	$var{'checkout.url'} = $self->getUrl('op=viewCart');

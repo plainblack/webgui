@@ -402,10 +402,18 @@ EOT1
 
 ## Event Template ##
 my $template2 = <<EOT2;
-
 <h1><tmpl_var title></h1><br>
 <tmpl_var description>&nbsp;<tmpl_var price><br>
+
+<tmpl_unless eventIsFull>
 <a href="<tmpl_var purchase.url>"><tmpl_var purchase.label></a>
+<tmpl_else>
+<tmpl_var purchase.label><br />
+</tmpl_unless>
+max attendees:<tmpl_var maximumAttendees><br />
+seats remaining:<tmpl_var seatsRemaining><br />
+number registered:<tmpl_var numberRegistered><br />
+event full?:<tmpl_var eventIsFull<br />
 EOT2
 
 ## Checkout Template ##
@@ -449,7 +457,6 @@ my $template3 = <<EOT3;
 <tr><td><tmpl_var form.city.label></td><td><tmpl_var form.city></td></tr>
 <tr><td><tmpl_var form.state.label></td><td><tmpl_var form.state></td></tr>
 <tr><td><tmpl_var form.zipcode.label></td><td><tmpl_var form.zipcode></td></tr>
-<tr><td><tmpl_var form.firstName.label></td><td><tmpl_var form.firstName></td></tr>
 <tr><td><tmpl_var form.country.label></td><td><tmpl_var form.country></td></tr>
 <tr><td><tmpl_var form.phoneNumber.label></td><td><tmpl_var form.phoneNumber></td></tr>
 <tr><td><tmpl_var form.email.label></td><td><tmpl_var form.email></td></tr>
