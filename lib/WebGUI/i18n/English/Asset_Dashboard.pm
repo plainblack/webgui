@@ -39,8 +39,8 @@ our $I18N = {
 		lastUpdated => 1133619940
 	},
 	'dashboard add/edit body' => {
-		message => q|The dashboard is a new container wobject.  It acts like a portal.  When in Admin mode, the dashboard admin is actually editing the Visitor's (default) view.  When not in admin mode, the dashboard admin is editing their own personalized view.  Shortcuts are the main source of functionality for the Dashboard.  See the Shortcut add/edit documentation for details.|,
-		lastUpdated => 1133619940
+		message => q|<p>The dashboard is a container asset that acts like a portal.  When in Admin mode, the dashboard admin is actually editing the Visitor's (default) view.  When not in admin mode, the dashboard admin is editing their own personalized view.  Shortcuts are the main source of functionality for the Dashboard.  See the Shortcut add/edit documentation for details.</p><p><b>NOTE:<b> Due to limitations in Internet Explorer the dashboard does not work well with XHTML Strict compliance enabled. Therefore your style templates for dashboard pages should not be XHTML Strict. The other way to get around this problem is to ensure that when using XHTML Strict compliance, make sure that neither your does not constrain the dashboard inside of a div tag with a width attached to it.</p>|,
+		lastUpdated => 1142888566
 	},
 	'dashboard template field label' => {
 		message => q|Dashboard Template|,
