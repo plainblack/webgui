@@ -361,7 +361,9 @@ sub processPropertiesFromFormPost {
 		}
 	}
 	$data{title} = $fullDefinition->[0]{name} if ($data{title} eq "" || lc($data{title}) eq "untitled");
-	$self->set(\%data);
+	foreach my $key (keys %data) {
+		$self->set($key, $data{$key});
+	}
 }
 
 #-------------------------------------------------------------------

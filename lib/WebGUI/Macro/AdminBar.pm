@@ -116,7 +116,7 @@ sub process {
 	}
 	if (scalar(@tags)) {
 		push(@adminbar, {
-			label => $i18n->get("version tags"),
+			label => $i18n->get("version tags","VersionTag"),
 			name => "versions",
 			items => \@tags
 			});

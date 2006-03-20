@@ -73,11 +73,6 @@ The URL of an icon to associate with this item.
 		lastUpdated => 1031514049
 	},
 
-	'version tags' => {
-		message => q|Version Tags|,
-		lastUpdated => 0 
-	},
-
 	'12' => {
 		message => q|Turn admin off.|,
 		lastUpdated => 1031514049

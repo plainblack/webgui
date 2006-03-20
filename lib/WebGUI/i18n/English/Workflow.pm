@@ -26,7 +26,7 @@ our $I18N = {
 	},
 
 	'is serial help' => {
-		message => q|If yes is selected then only one instance of this workflow will be allowed to be created at one time. Generally speaking this would be a bad idea for approval workflows, but is probably a good idea for workflows the download emails from a remote server, to avoid getting duplicates.|,
+		message => q|If yes is selected then only one instance of this workflow will be allowed to be created at one time. Generally speaking this would be a bad idea for approval workflows, but is probably a good idea for workflows that download emails from a remote server, to avoid getting duplicates.|,
 		context => q|the hover help for the is serial field|,
 		lastUpdated => 0,
 	},

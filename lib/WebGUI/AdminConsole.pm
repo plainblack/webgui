@@ -154,7 +154,7 @@ sub getAdminFunction {
 		},
 		"versions"=>{
 			title=>{
-				id=>"content versioning",
+				id=>"version tags",
 				namespace=>"VersionTag"
 			},
 			icon=>"versionTags.gif",

@@ -280,7 +280,7 @@ sub www_manageVersions {
 	$ac->setHelp("versions manage");
 	$ac->addSubmenuItem($session->url->page('op=editVersionTag'), $i18n->get("add a version tag"));
 	$ac->addSubmenuItem($session->url->page('op=manageCommittedVersions'), $i18n->get("manage committed versions")) if ($session->user->isInGroup(3));
-	my ($tag) = $session->db->quickArray("select name from assetVersionTag where tagId=?",[$session->scratch->get("versionTag")]);
+	my ($tag,$workingTagId) = $session->db->quickArray("select name,tagId from assetVersionTag where tagId=?",[$session->scratch->get("versionTag")]);
 	$tag ||= "None";
 	my $rollback = $i18n->get("rollback");
 	my $commit = $i18n->get("commit");
@@ -301,8 +301,11 @@ sub www_manageVersions {
 			<td><a href="'.$session->url->page("op=manageRevisionsInTag;tagId=".$id).'">'.$name.'</a></td>
 			<td>'.$session->datetime->epochToHuman($date).'</td>
 			<td>'.$u->username.'</td>
-			<td>
-			<a href="'.$session->url->page("op=setWorkingVersionTag;tagId=".$id).'">'.$setTag.'</a> |
+			<td>';
+		unless ($workingTagId eq $id) {
+			$output .= '<a href="'.$session->url->page("op=setWorkingVersionTag;tagId=".$id).'">'.$setTag.'</a> | ';
+		}
+		$output .='
 			<a href="'.$session->url->page("op=commitVersionTag;tagId=".$id).'" onclick="return confirm(\''.$commitPrompt.'\');">'.$commit.'</a></td></tr>';
 	}
 	$sth->finish;	
@@ -381,7 +384,7 @@ sub www_manageRevisionsInTag {
 		my $asset = WebGUI::Asset->new($session,$id,$class,$date);
                 $output .= '<tr><td>'
 			.$session->icon->delete("func=purgeRevision;proceed=manageRevisionsInTag;tagId=".$tag->getId.";revisionDate=".$date,$asset->get("url"),$i18n->get("purge revision prompt"))
-			.$session->icon->view("func=viewRevision;revisionDate=".$date)
+			.$session->icon->view("func=viewRevision;revisionDate=".$date, $asset->get("url"))
 			.'</td>
 			<td>'.$asset->getTitle.'</td>
 			<td><img src="'.$asset->getIcon(1).'" alt="'.$asset->getName.'" />'.$asset->getName.'</td>

@@ -1,6 +1,11 @@
 package WebGUI::i18n::English::VersionTag;
 
 our $I18N = {
+	'version tags' => {
+		message => q|Version Tags|,
+		lastUpdated => 0 
+	},
+
 	'commit accepted' => {
 		message => q|Your tag has been submitted for approval and commit. It may take some time before it appears live on the site. Where would you like to go next?|,
 		lastUpdated => 0,

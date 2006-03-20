@@ -158,7 +158,7 @@ sub www_editWorkflow {
 		label=>$i18n->get("title"),
 		hoverHelp=>$i18n->get("title help")
 		);
-	$f->text(
+	$f->textarea(
 		name=>"description",
 		value=>$workflow->get("description"),
 		label=>$i18n->get("description"),
