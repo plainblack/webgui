@@ -393,6 +393,8 @@ my $template = <<EOT1;
    <a href='<tmpl_var manageEvents.url>'><tmpl_var manageEvents.label></a>
 </tmpl_if>
     
+<a href="<tmpl_var checkout.url>"><tmpl_var checkout.label></a>
+
 <tmpl_loop events_loop>
   <tmpl_var event>
 </tmpl_loop>
