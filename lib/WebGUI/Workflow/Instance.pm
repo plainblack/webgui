@@ -243,7 +243,7 @@ sub run {
 		$status = $activity->execute(undef, $self);
 	}
 	if ($status eq "complete") {
-		$self->set({"currentActivityId"=>$activity->getId});
+		$self->set({"currentActivityId"=>$activity->getId, notifySpectre=>0});
 	}
 	return $status;
 }
@@ -311,7 +311,7 @@ sub set {
 	$self->{_data}{currentActivityId} = (exists $properties->{currentActivityId}) ? $properties->{currentActivityId} : $self->{_data}{currentActivityId};
 	$self->{_data}{lastUpdate} = time();
 	$self->session->db->setRow("WorkflowInstance","instanceId",$self->{_data});
-	if ($properties->{priority} && $properties->{notifySpectre}) {
+	if ($properties->{notifySpectre}) {
 		my $spectre = WebGUI::Workflow::Spectre->new($self->session);
 		$spectre->notify("workflow/deleteInstance",$self->getId);
 		$spectre->notify("workflow/addInstance", {sitename=>$self->session->config->get("sitename")->[0], instanceId=>$self->getId, priority=>$self->{_data}{priority}});
