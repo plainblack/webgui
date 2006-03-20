@@ -855,7 +855,7 @@ sub getToolbar {
 	my $i18n = WebGUI::International->new($self->session, "Asset");
 	my $toolbar = $self->session->icon->delete('func=delete',$self->get("url"),$i18n->get(43));
 	my $commit;
-	if (($self->canEditIfLocked && $self->session->scratch->get("versionTag") eq $self->get("tagId")) || !$self->isLocked) {
+	if ($self->canEditIfLocked) {
         	$toolbar .= $self->session->icon->edit('func=edit',$self->get("url"));
 	} else {
 		$toolbar .= $self->session->icon->locked('func=manageRevisions',$self->get("url"));
@@ -1036,7 +1036,7 @@ sub manageAssets {
 		my $edit;
 		if ($child->isLocked) {
 			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/locked.gif" alt="locked" style="border: 0px;" />';
-			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+" if ($child->canEditIfLocked && $self->session->scratch->get("versionTag") eq $self->get("tagId"));
+			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+" if ($child->canEditIfLocked);
 		} else {
 			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+";
 			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/unlocked.gif" alt="unlocked" style="border: 0px;" />';
@@ -1196,7 +1196,7 @@ sub manageAssetsSearch {
 		my $edit;
 		if ($child->isLocked) {
 			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/locked.gif" alt="locked" style="border: 0px;" />';
-			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+" if ($child->canEditIfLocked && $self->session->scratch->get("versionTag") eq $self->get("tagId"));
+			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+" if ($child->canEditIfLocked);
 		} else {
 			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+";
 			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/unlocked.gif" alt="unlocked" style="border: 0px;" />';
@@ -1755,7 +1755,7 @@ sub www_editSave {
 		$object = $self->addChild({className=>$self->session->form->process("class")});	
 		$object->{_parent} = $self;
 	} else {
-		if ($self->canEditIfLocked || !$self->isLocked) {
+		if ($self->canEditIfLocked) {
                         $object = $self->addRevision;
                 } else {
                         return $self->getContainer->www_view;

@@ -80,14 +80,14 @@ sub addRevision {
 
 =head2 canEditIfLocked ( )
 
-Returns a boolean indicating whether this asset is locked and if the current user can edit it in that state.
+Returns 1 if it's not locked. Returns 1 if is locked, and the user is using the tag it was edited under. Otherwise returns 0.
 
 =cut
 
 sub canEditIfLocked {
 	my $self = shift;
-	return 0 unless ($self->isLocked);
-	return ($self->get("isLockedBy") eq $self->session->user->userId);
+	return 1 unless ($self->isLocked);
+	return ($self->session->scratch->get("versionTag") eq $self->get("tagId"));
 }
 
 
