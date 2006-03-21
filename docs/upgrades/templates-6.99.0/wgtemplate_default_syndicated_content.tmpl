@@ -1,0 +1,43 @@
+#PBtmpl0000000000000065
+<a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a>
+
+<tmpl_if session.var.adminOn>
+	<p><tmpl_var controls></p>
+</tmpl_if>
+
+<tmpl_if displayTitle>
+	<h2><tmpl_var title></h2>
+</tmpl_if>
+
+<tmpl_if description>
+	<tmpl_var description>
+	<p />
+</tmpl_if>
+
+<h2>
+<tmpl_if channel.link>
+	<a href="<tmpl_var channel.link>"><tmpl_var channel.title></a>
+<tmpl_else>
+	<tmpl_var channel.title>
+</tmpl_if>
+</h2>
+
+<tmpl_if channel.description>
+	<tmpl_var channel.description>
+	<p />
+</tmpl_if>
+
+<ul>
+<tmpl_loop item_loop>
+<li>
+	<tmpl_if link>
+		<a href="<tmpl_var link>"><tmpl_var title></a>
+	<tmpl_else>
+		<tmpl_var title>
+	</tmpl_if>
+	<tmpl_if description>
+		- <tmpl_var description>
+	</tmpl_if>
+</li>	
+</tmpl_loop>
+</ul>

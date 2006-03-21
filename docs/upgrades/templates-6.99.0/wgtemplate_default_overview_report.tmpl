@@ -1,0 +1,93 @@
+#PBtmpl0000000000000063
+
+<h2><tmpl_var title></h2>
+
+<tmpl_if user.canViewReports>
+<table cellspacing="2" cellpadding="1" style="border:solid silver 1px;">
+<tr>
+	<td colspan="4">
+		<table width="100%" cellspacing="2" cellpadding="1">
+		<tr>
+			<td style="width:33%;text-align:center;background-color:#F0F0F0;"><a href="<tmpl_var report.gradebook.url>"><tmpl_var report.gradebook.label></a></td>
+			<td style="width:33%;text-align:center;background-color:#F0F0F0;"><a href="<tmpl_var report.overview.url>"><tmpl_var report.overview.label></a></td>
+			<td style="width:33%;text-align:center;background-color:#F0F0F0;"><a href="<tmpl_var delete.all.responses.url>"><tmpl_var delete.all.responses.label></a></td>
+		</tr>
+		</table>
+	</td>
+</tr>
+<tr>
+	<td style="text-align:center;background-color:#F0F0F0;"><a href="<tmpl_var export.answers.url>"><tmpl_var export.answers.label></a></td>
+	<td style="text-align:center;background-color:#F0F0F0;"><a href="<tmpl_var export.questions.url>"><tmpl_var export.questions.label></a></td>
+	<td style="text-align:center;background-color:#F0F0F0;"><a href="<tmpl_var export.responses.url>"><tmpl_var export.responses.label></a></td>
+	<td style="text-align:center;background-color:#F0F0F0;"><a href="<tmpl_var export.composite.url>"><tmpl_var export.composite.label></a></td>
+</tr>
+</table>
+</tmpl_if>
+
+<br />
+<br />
+
+<script type="text/javascript" defer="defer">
+<!--
+function toggleDiv(divId) {
+   if (document.getElementById(divId).style.visibility == "none") {
+	document.getElementById(divId).style.display = "block";
+   } else {
+	document.getElementById(divId).style.display = "none";
+   }
+}
+//-->
+</script>
+
+<tmpl_loop question_loop>
+	<b><tmpl_var question></b>
+	<tmpl_if question.isRadioList>
+		<table class="tableData">
+		<tr class="tableHeader"><td style="width:60%"><tmpl_var answer.label></td>
+		<td style="width:20%"><tmpl_var response.count.label></td>
+		<td style="width:20%"><tmpl_var response.percent.label></td></tr>
+		<tmpl_loop answer_loop>
+			<tmpl_if answer.isCorrect>
+				<tr class="highlight">
+			<tmpl_else>
+				<tr>
+			</tmpl_if>
+			<td><tmpl_var answer></td>
+			<td><tmpl_var answer.response.count></td>
+			<td><tmpl_var answer.response.percent></td>
+			<tmpl_if allowComment>
+				<td><a href="#" onclick="toggle('comment<tmpl_var answer.id>');"><tmpl_var show.comments.label></a></td>
+			</tmpl_if>
+			</tr>
+			<tmpl_if question.allowComment>
+				<tr id="comment<tmpl_var answer.id>">
+				<td colspan="3">
+				<tmpl_loop comment_loop>
+					<p><tmpl_var answer.comment></p>
+				</tmpl_loop>
+				</td>
+				</tr>
+			</tmpl_if>
+		</tmpl_loop>
+		</table>
+	<tmpl_else>
+		<br />
+		<a href="#" onclick="toggle('response<tmpl_var question.id>');"><tmpl_var show.answers.label></a>
+		<br />
+		<div id="response<tmpl_var question.id>">
+		<tmpl_loop answer_loop>
+			<p><tmpl_var answer.response></p>
+			<tmpl_if question.allowComment>
+				<blockquote><tmpl_var answer.comment></blockquote>
+			</tmpl_if>
+		</tmpl_loop>
+		</div>
+	</tmpl_if>
+	<br /><br /><br />
+</tmpl_loop>
+
+<tmpl_if pagination.pageCount.isMultiple>
+	<div class="pagination">
+		<tmpl_var pagination.previousPage> &middot; <tmpl_var pagination.pageList.upTo20> &middot; <tmpl_var pagination.nextPage>
+	</div>
+</tmpl_if>

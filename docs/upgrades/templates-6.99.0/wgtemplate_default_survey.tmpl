@@ -1,0 +1,113 @@
+#PBtmpl0000000000000061
+
+<a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a>
+
+<tmpl_if session.var.adminOn>
+	<p><tmpl_var controls></p>
+</tmpl_if>
+
+<tmpl_if displayTitle>
+	<h2><tmpl_var title></h2>
+</tmpl_if>
+
+<tmpl_if description>
+	<tmpl_var description>
+	<p />
+</tmpl_if>
+
+<tmpl_if user.canTakeSurvey>
+	<tmpl_if response.isComplete>
+		<tmpl_if mode.isSurvey>
+			<tmpl_var thanks.survey.label>
+		<tmpl_else>
+			<tmpl_var thanks.quiz.label>
+			<div align="center">
+				<b><tmpl_var questions.correct.count.label>:</b> <tmpl_var questions.correct.count> / <tmpl_var questions.total>
+				<br />
+				<b><tmpl_var questions.correct.percent.label>:</b><tmpl_var questions.correct.percent>%
+			</div>
+		</tmpl_if>
+		<tmpl_if user.canRespondAgain>
+			<br /><br /><a href="<tmpl_var start.newResponse.url>"><tmpl_var start.newResponse.label></a>
+		</tmpl_if>
+	<tmpl_else>
+		<tmpl_if response.id>
+			<tmpl_var form.header>
+			<table width="50%" cellpadding="3" cellspacing="0" border="0" class="content">
+				<tr>
+					<td valign="top">
+					<tmpl_loop question_loop>
+						<p><tmpl_var question.question></p>
+						<tmpl_var question.answer.label><br />
+						<tmpl_var question.answer.field><br />
+						<br />
+						<tmpl_if question.allowComment>
+							<tmpl_var question.comment.label><br />
+							<tmpl_var question.comment.field><br />
+						</tmpl_if>
+					</tmpl_loop>
+					</td>
+					<td valign="top" style="white-space:nowrap;">
+						<b><tmpl_var questions.sofar.label>:</b> <tmpl_var questions.sofar.count> / <tmpl_var questions.total> <br />
+						<tmpl_unless mode.isSurvey>
+							<b><tmpl_var questions.correct.count.label>:</b> <tmpl_var questions.correct.count> / <tmpl_var questions.sofar.count><br />
+							<b><tmpl_var questions.correct.percent.label>:</b><tmpl_var questions.correct.percent>% / 100%<br />
+						</tmpl_unless>
+					</td>
+				</tr>
+				<tr>
+					<td align="right" colspan="2"><tmpl_var form.submit></td>
+				</tr>
+			</table>
+			
+			<tmpl_var form.footer>
+		<tmpl_else>
+			<a href="<tmpl_var start.newResponse.url>"><tmpl_var start.newResponse.label></a>
+		</tmpl_if>
+	</tmpl_if>
+<tmpl_else>
+	<tmpl_if mode.isSurvey>
+		<tmpl_var survey.noprivs.label>
+	<tmpl_else>
+		<tmpl_var quiz.noprivs.label>
+	</tmpl_if>
+</tmpl_if>
+<br />
+<br />
+<tmpl_if user.canViewReports>
+<table cellspacing="2" cellpadding="1" style="border:solid silver 1px;">
+<tr>
+	<td colspan="4">
+		<table width="100%" cellspacing="2" cellpadding="1">
+		<tr>
+			<td style="width:33%;text-align:center;background-color:#F0F0F0;"><a href="<tmpl_var report.gradebook.url>"><tmpl_var report.gradebook.label></a></td>
+			<td style="width:33%;text-align:center;background-color:#F0F0F0;"><a href="<tmpl_var report.overview.url>"><tmpl_var report.overview.label></a></td>
+			<td style="width:33%;text-align:center;background-color:#F0F0F0;"><a href="<tmpl_var delete.all.responses.url>"><tmpl_var delete.all.responses.label></a></td>
+		</tr>
+		</table>
+	</td>
+</tr>
+<tr>
+	<td style="text-align:center;background-color:#F0F0F0;"><a href="<tmpl_var export.answers.url>"><tmpl_var export.answers.label></a></td>
+	<td style="text-align:center;background-color:#F0F0F0;"><a href="<tmpl_var export.questions.url>"><tmpl_var export.questions.label></a></td>
+	<td style="text-align:center;background-color:#F0F0F0;"><a href="<tmpl_var export.responses.url>"><tmpl_var export.responses.label></a></td>
+	<td style="text-align:center;background-color:#F0F0F0;"><a href="<tmpl_var export.composite.url>"><tmpl_var export.composite.label></a></td>
+</tr>
+</table>
+	
+</tmpl_if>
+
+<tmpl_if session.var.adminOn>
+	<p style="border:solid silver 1px;width:150px;padding:2px;text-align:center;margin-bottom:2px;"><a style="text-align:center;background-color:#F0F0F0;width:100%;display:block;" href="<tmpl_var section.add.url>"><tmpl_var section.add.label></a></p>
+	<p style="border:solid silver 1px;width:150px;padding:2px;text-align:center;margin-top:2px;"><a style="text-align:center;background-color:#F0F0F0;width:100%;display:block;" href="<tmpl_var question.add.url>"><tmpl_var question.add.label></a></p>
+<tmpl_loop section.edit_loop>
+<tmpl_var section.edit.controls>
+<tmpl_var section.edit.sectionName><br /><br />
+	<tmpl_loop section.questions_loop>
+		&nbsp;&nbsp;<tmpl_var question.edit.controls>
+          	<tmpl_var question.edit.question>
+		<br />
+        </tmpl_loop>
+</tmpl_loop>
+<br /><br />
+</tmpl_if>

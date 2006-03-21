@@ -1,0 +1,46 @@
+#PBtmpl0000000000000062
+<h2><tmpl_var title></h2>
+
+<tmpl_if user.canViewReports>
+<table cellspacing="2" cellpadding="1" style="border:solid silver 1px;">
+<tr>
+	<td colspan="4">
+		<table width="100%" cellspacing="2" cellpadding="1">
+		<tr>
+			<td style="width:33%;text-align:center;background-color:#F0F0F0;"><a href="<tmpl_var report.gradebook.url>"><tmpl_var report.gradebook.label></a></td>
+			<td style="width:33%;text-align:center;background-color:#F0F0F0;"><a href="<tmpl_var report.overview.url>"><tmpl_var report.overview.label></a></td>
+			<td style="width:33%;text-align:center;background-color:#F0F0F0;"><a href="<tmpl_var delete.all.responses.url>"><tmpl_var delete.all.responses.label></a></td>
+		</tr>
+		</table>
+	</td>
+</tr>
+<tr>
+	<td style="text-align:center;background-color:#F0F0F0;"><a href="<tmpl_var export.answers.url>"><tmpl_var export.answers.label></a></td>
+	<td style="text-align:center;background-color:#F0F0F0;"><a href="<tmpl_var export.questions.url>"><tmpl_var export.questions.label></a></td>
+	<td style="text-align:center;background-color:#F0F0F0;"><a href="<tmpl_var export.responses.url>"><tmpl_var export.responses.label></a></td>
+	<td style="text-align:center;background-color:#F0F0F0;"><a href="<tmpl_var export.composite.url>"><tmpl_var export.composite.label></a></td>
+</tr>
+</table> 
+</tmpl_if>
+
+<br /> <br />
+
+<table class="tableData">
+<tr class="tableHeader"><td style="width:60%"><tmpl_var response.user.label></td>
+                <td style="width:20%"><tmpl_var response.count.label></td>
+                <td style="width:20%"><tmpl_var response.percent.label></td></tr>
+<tmpl_loop response_loop>
+<tr>
+	<td><a href="<tmpl_var response.url>"><tmpl_var response.user.name></a></td>
+	<td><tmpl_var response.count.correct>/<tmpl_var question.count></td>
+             <td><tmpl_var response.percent>%</td>
+</tr>
+</tmpl_loop>
+</table>
+
+
+<tmpl_if pagination.pageCount.isMultiple>
+  <div class="pagination">
+    <tmpl_var pagination.previousPage>  &middot; <tmpl_var pagination.pageList.upTo20> &middot; <tmpl_var pagination.nextPage>
+  </div>
+</tmpl_if>
