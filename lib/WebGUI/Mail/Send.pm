@@ -14,10 +14,13 @@ http://www.plainblack.com                     info@plainblack.com
 
 =cut
 
+use strict;
 use Net::SMTP;
 use MIME::Entity;
+use MIME::Parser;
 use LWP::MediaTypes qw(guess_media_type);
-use strict;
+use WebGUI::Group;
+use WebGUI::User;
 
 =head1 NAME
 
@@ -31,11 +34,15 @@ This package is used for sending emails via SMTP.
 
 use WebGUI::Mail::Send;
 
-my $mail = WebGUI::Mail::Send->new($session, { to=>$to, from=>$from, subject=>$subject});
+my $mail = WebGUI::Mail::Send->create($session, { to=>$to, from=>$from, subject=>$subject});
+my $mail = WebGUI::Mail::Send->retrieve($session, $messageId);
+
 $mail->addText($text);
 $mail->addHtml($html);
 $mail->addAttachment($pathToFile);
+
 $mail->send;
+$mail->queue;
 
 =head1 METHODS
 
@@ -46,7 +53,7 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 addAttachment ( pathToFile )
+=head2 addAttachment ( pathToFile [ , mimetype ] )
 
 Adds an attachment to the message.
 
@@ -54,15 +61,20 @@ Adds an attachment to the message.
 
 The filesystem path to the file you wish to attach.
 
+=head3 mimetype
+
+Optionally specify a mime type for this attachment. If one is not specified it will be guessed based upon the file extension.
+
 =cut
 
 sub addAttachment {
 	my $self = shift;
 	my $path = shift;
+	my $mimetype = shift || guess_media_type($path);
 	$self->{_message}->attach(
 		Path=>$path,
 		Encoding=>'-SUGGEST',
-		Type=>guess_media_type($path)
+		Type=>$mimetype
 		);
 }
 
@@ -114,9 +126,9 @@ sub addText {
 
 #-------------------------------------------------------------------
 
-=head2 new ( session, headers )
+=head2 create ( session, headers )
 
-Constructor.
+Creates a new message and returns a WebGUI::Mail::Send object. This is a class method.
 
 =head3 session
 
@@ -129,6 +141,10 @@ A hash reference containing addressing and other header level options.
 =head4 to
 
 A string containing a comma seperated list of email addresses to send to.
+
+=head4 toGroup
+
+A WebGUI groupId. The email address of the users in this group will be looked up and will each be sent a copy of this message.
 
 =head4 subject
 
@@ -156,22 +172,13 @@ A mime type for the message. Defaults to "multipart/mixed".
 
 =cut
 
-sub new {
+sub create {
 	my $class = shift;
 	my $session = shift;
 	my $headers = shift;
-	$headers->{from} ||= $session->setting->get("companyEmail");
-	$headers->{contentType} ||= "multipart/mixed";
-	my $override = "";
-	if ($session->config->get("emailOverride")) {
-		$override = $headers->{to};
-		$headers->{to} = $session->config->get("emailOverride");
-		delete $headers->{bcc};
-		delete $headers->{cc};
-	}
 	my $message = MIME::Entity->build(
-		Type=>$headers->{contentType},
-		From=>$headers->{from},
+		Type=>$headers->{contentType} || "multipart/mixed",
+		From=>$headers->{from} || $session->setting->get("companyEmail"),
 		To=>$headers->{to},
 		Cc=>$headers->{cc},
 		Bcc=>$headers->{bcc},
@@ -180,11 +187,79 @@ sub new {
 		Date=>$session->datetime->epochToHuman("","%W, %d %C %y %j:%n:%s %O"),
 		"X-Mailer"=>"WebGUI"
 		);
-	if ($override) {
-		$message->attach(Data=>"This message was intended for ".$override." but was overridden in the config file.\n\n");
+	if ($session->config->get("emailOverride")) {
+		my $to = $headers->{to};
+		$to = "WebGUI Group ".$headers->{toGroup} if ($headers->{toGroup});
+		$message->head->replace("to", $session->config->get("emailOverride"));
+		$message->head->replace("cc",undef);
+		$message->head->replace("bcc",undef);
+		delete $headers->{toGroup};
+		$message->attach(Data=>"This message was intended for ".$to." but was overridden in the config file.\n\n");
 	}
-	bless {_message=>$message,  _session=>$session, _headers=>$headers}, $class;
+	bless {_message=>$message,  _session=>$session, _toGroup=>$headers->{toGroup} }, $class;
 }
+
+#-------------------------------------------------------------------
+
+=head2 getMessageIdsInQueue ( session ) 
+
+Returns an array reference of the message IDs in the mail queue. Use with the retrieve() method. This is a class method.
+
+=head3 session
+
+A reference to the current session.
+
+=cut
+
+sub getMessageIdsInQueue {
+	my $class = shift;
+	my $session = shift;
+	return $session->db->buildArrayRef("select messageId from mailQueue");
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 queue ( )
+
+Puts this message in the mail queue so it can be sent out later by the workflow system. Returns a messageId so that the message can be retrieved later if necessary. Note that this is the preferred method of sending messages because it keeps WebGUI running faster.
+
+=cut
+
+sub queue {
+	my $self = shift;
+	return $self->session->db->setRow("mailQueue", "messageId", { messageId=>"new", message=>$self->{_message}->stringify, toGroup=>$self->{_toGroup} });
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 retrieve ( session, messageId ) 
+
+Retrieves a message from the mail queue, which thusly deletes it from the queue. This is a class method.
+
+=head3 session
+
+A reference to the current session.
+
+=head3 messageId
+
+The unique id for a message in the queue.
+
+=cut
+
+sub retrieve {
+	my $class = shift;
+	my $session = shift;
+	my $messageId = shift;
+	return undef unless $messageId;
+	my $data = $session->db->getRow("mailQueue","messageId", $messageId);
+	return undef unless $data->{messageId};
+	$session->db->deleteRow("mailQueue","messageId", $messageId);
+	my $parser = MIME::Parser->new;
+	bless {_session=>$session, _message=>$parser->parse_data($data->{messageId}), _toGroup=>$data->{toGroup}}, $class;
+}
+
 
 #-------------------------------------------------------------------
 
@@ -196,31 +271,50 @@ Sends the message via SMTP. Returns 1 if successful.
 
 sub send {
 	my $self = shift;
-	if ($self->session->setting->get("smtpServer") =~ /\/sendmail/) {
-		if (open(MAIL,"| ".$self->session->setting->get("smtpServer")." -t -oi -oem")) {
-			$self->{_message}->print(\*MAIL);
-			close(MAIL) or $self->session->errorHandler->error("Couldn't close connection to mail server: ".$self->session->setting->get("smtpServer"));
+	my $status = 1;
+	if ($self->{_message}->head->get("To")) {
+		if ($self->session->setting->get("smtpServer") =~ /\/sendmail/) {
+			if (open(MAIL,"| ".$self->session->setting->get("smtpServer")." -t -oi -oem")) {
+				$self->{_message}->print(\*MAIL);
+				close(MAIL) or $self->session->errorHandler->error("Couldn't close connection to mail server: ".$self->session->setting->get("smtpServer"));
+			} else {
+				$self->session->errorHandler->error("Couldn't connect to mail server: ".$self->session->setting->get("smtpServer"));
+				$status = 0;
+			}
 		} else {
-			$self->session->errorHandler->error("Couldn't connect to mail server: ".$self->session->setting->get("smtpServer"));
-			return 0;
-		}
-	} else {
-		my $smtp = Net::SMTP->new($self->session->setting->get("smtpServer")); # connect to an SMTP server
-		if (defined $smtp) {
-			$smtp->mail($self->{_headers}{from});     # use the sender's address here
-			$smtp->to(split(",",$self->{_headers}{to}));             # recipient's address
-			$smtp->cc(split(",",$self->{_headers}{cc}));
-			$smtp->bcc(split(",",$self->{_headers}{bcc}));
-			$smtp->data();              # Start the mail
-			$smtp->datasend($self->{_message}->stringify);
-			$smtp->dataend();           # Finish sending the mail
-			$smtp->quit;                # Close the SMTP connection
-		} else {
-			$self->session->errorHandler->error("Couldn't connect to mail server: ".$self->session->setting->get("smtpServer"));
-			return 0;
+			my $smtp = Net::SMTP->new($self->session->setting->get("smtpServer")); # connect to an SMTP server
+			if (defined $smtp) {
+				$smtp->mail($self->{_message}->head->get("from"));     # use the sender's address here
+				$smtp->to(split(",",$self->{_message}->head->get("to")));             # recipient's address
+				$smtp->cc(split(",",$self->{_message}->head->get("cc")));
+				$smtp->bcc(split(",",$self->{_message}->head->get("bcc")));
+				$smtp->data();              # Start the mail
+				$smtp->datasend($self->{_message}->stringify);
+				$smtp->dataend();           # Finish sending the mail
+				$smtp->quit;                # Close the SMTP connection
+			} else {
+				$self->session->errorHandler->error("Couldn't connect to mail server: ".$self->session->setting->get("smtpServer"));
+				$status = 0;
+			}
 		}
 	}
-	return 1;
+	my $group = $self->{_toGroup};
+	delete $self->{_toGroup};
+	if ($group) {
+		my $group = WebGUI::Group->new($self->session, $self->{_toGroup});
+		$self->{_message}->head->replace("bcc", undef);
+		$self->{_message}->head->replace("cc", undef);
+		foreach my $userId (@{$group->getUsers(1,1)}) {
+			my $user = WebGUI::User->new($self->session, $userId);
+			if ($user->profileField("email")) {
+				$self->{_message}->head->replace("To",$user->profileField("email"));
+				unless ($self->send) {
+					$status = 0;
+				}	
+			}
+		}
+	}
+	return $status;
 }
 
 #-------------------------------------------------------------------

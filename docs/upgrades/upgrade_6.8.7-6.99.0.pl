@@ -134,6 +134,11 @@ sub addWorkflow {
 		value text,
 		primary key (activityId, name)
 		)");
+	$session->db->write("create table mailQueue (
+		messageId varchar(22) binary not null primary key,
+		message mediumtext,
+		toGroup varchar(22) binary
+		)");
 	print "\t\tPurging old workflow info.\n";
 	my $versionTag = WebGUI::VersionTag->getWorking($session);
 	$versionTag->set({name=>"Upgrade to ".$toVersion});
@@ -164,6 +169,7 @@ sub addWorkflow {
 			"WebGUI::Workflow::Activity::ExpireGroupings", "WebGUI::Workflow::Activity::PurgeOldAssetRevisions",
 			"WebGUI::Workflow::Activity::ExpireSubscriptionCodes", "WebGUI::Workflow::Activity::PurgeOldTrash", 
 			"WebGUI::Workflow::Activity::GetSyndicatedContent", "WebGUI::Workflow::Activity::ProcessRecurringPayments",
+			"WebGUI::Workflow::Activity::SendQueuedMailMessages",
 			"WebGUI::Workflow::Activity::SyncProfilesToLdap", "WebGUI::Workflow::Activity::SummarizePassiveProfileLog"],
 		"WebGUI::User"=>["WebGUI::Workflow::Activity::CreateCronJob", "WebGUI::Workflow::Activity::NotifyAboutUser"],
 		"WebGUI::VersionTag"=>["WebGUI::Workflow::Activity::CommitVersionTag", "WebGUI::Workflow::Activity::RollbackVersionTag", 
@@ -304,6 +310,23 @@ sub addWorkflow {
 	$activity->set("subject", "Content Denied");
 	$activity->set("message", "Your version tag was denied. Please take corrective actions and recommit your changes.");
 	$activity->set("who", "committer");
+	$workflow = WebGUI::Workflow->create($session, {
+		title=>"Send Queued Email Messages",
+		description => "Sends all the messages in the mail queue.",
+		enabled=>1,
+		isSerial=>1,
+		type=>"None"
+		}, "pbworkflow000000000006");
+	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::SendQueuedMailMessages", "pbwfactivity0000000021");
+	$activity->set("title", "Send Queued Messages");
+	WebGUI::Workflow::Cron->create($session, {
+                title=>'Send Queued Email Messages Every 5 Minutes',
+                enabled=>1,
+                runOnce=>0,
+                minuteOfHour=>"*/5",
+                priority=>3,
+                workflowId=>$workflow->getId
+                }, "pbcron0000000000000004");
 	print "\t\tUpdating settings.\n";
 	$session->setting->remove("autoCommit");
 	$session->setting->remove("alertOnNewUser");
