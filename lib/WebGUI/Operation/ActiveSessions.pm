@@ -40,8 +40,8 @@ sub www_killSession {
 	my $session = shift;
 	return www_viewActiveSessions($session) if $session->form->process("sid") eq $session->var->get("sessionId");
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
-	$self->session->db->write("delete from userSession where sessionId=?",[$session->form->process("sid")]);
-	$self->session->db->write("delete from userSessionScratch where sessionId=?", [$session->form->process("sid")]);
+	$session->db->write("delete from userSession where sessionId=?",[$session->form->process("sid")]);
+	$session->db->write("delete from userSessionScratch where sessionId=?", [$session->form->process("sid")]);
 	return www_viewActiveSessions($session);
 }
 
