@@ -402,7 +402,7 @@ sub view {
 	$var->{'extrasFolder'} = $self->session->config->get("extrasURL")."/wobject/StockData";
 	$var->{'editUrl'} = $self->getUrl("func=editStocks");
 	$var->{'isVisitor'} = $self->session->user->userId eq 1;
-	$var->{'stock.display.url'} = $self->getUrl("func=displayStock&symbol=");
+	$var->{'stock.display.url'} = $self->getUrl("func=displayStock;symbol=");
 	
 	#Build list of stocks as an array
 	my $defaults = $self->getValue("defaultStocks");
@@ -460,7 +460,6 @@ sub www_displayStock {
    $var->{'lastUpdate.intl'} = $self->session->datetime->epochToHuman($luEpoch,"%y-%m-%d");
    $var->{'lastUpdate.us'} = $self->session->datetime->epochToHuman($luEpoch,"%m/%d/%y");
    
-   $self->session->setting->get("showDebug") = 0;
    return $self->processTemplate($var, $self->get("displayTemplateId"));
 }
 
