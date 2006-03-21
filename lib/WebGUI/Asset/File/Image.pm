@@ -74,7 +74,7 @@ sub definition {
                                         },
 				parameters=>{
 					fieldType=>'textarea',
-					defaultValue=>'style="border: 0px;"'
+					defaultValue=>'style="border-style:none;"'
 					}
                         }
                 });
@@ -291,7 +291,7 @@ sub www_resize {
 		-value=>$y,
 		);
 	$f->submit;
-	my $image = '<div align="center"><img src="'.$self->getStorageLocation->getUrl($self->get("filename")).'" border="1" alt="'.$self->get("filename").'" /></div>';
+	my $image = '<div align="center"><img src="'.$self->getStorageLocation->getUrl($self->get("filename")).'" style="border-style:none;" alt="'.$self->get("filename").'" /></div>';
         $self->getAdminConsole->setHelp("image resize","Asset_Image");
         return $self->getAdminConsole->render($f->print.$image,$i18n->get("resize image"));
 }

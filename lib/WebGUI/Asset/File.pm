@@ -137,7 +137,7 @@ sub getEditForm {
 		$tabform->getTab("properties")->readOnly(
 			-label=>$i18n->get('current file'),
 			-hoverHelp=>$i18n->get('current file description', 'Asset_File'),
-			-value=>'<a href="'.$self->getFileUrl.'"><img src="'.$self->getFileIconUrl.'" alt="'.$self->get("filename").'" border="0" align="middle" /> '.$self->get("filename").'</a>'
+			-value=>'<a href="'.$self->getFileUrl.'"><img src="'.$self->getFileIconUrl.'" alt="'.$self->get("filename").'" style="border-style:none;" align="middle" /> '.$self->get("filename").'</a>'
 		);
 
 	}

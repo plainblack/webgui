@@ -169,7 +169,7 @@ sub www_richEditViewThumbnail {
 	$session->style->useEmptyStyle("1");
 	if ($image->get("className") =~ /WebGUI::Asset::File::Image/) {
 		my $output = '<div align="center">';
-		$output .= '<img src="'.$image->getThumbnailUrl.'" border="0" alt="'.$i18n->get('preview').'">';
+		$output .= '<img src="'.$image->getThumbnailUrl.'" style="border-style:none;" alt="'.$i18n->get('preview').'" />';
 		$output .= '<br />';
 		$output .= $image->get("filename");
 		$output .= '</div>';
@@ -183,7 +183,7 @@ sub www_richEditViewThumbnail {
     		    </script>\n";
 		return $output;
 	}
-	return '<div align="center"><img src="'.$session->config->get("extrasURL").'/tinymce/images/icon.gif" border="0" alt="'.$i18n->get('image manager').'"></div>';
+	return '<div align="center"><img src="'.$session->config->get("extrasURL").'/tinymce/images/icon.gif" style="border-style:none;" alt="'.$i18n->get('image manager').'" /></div>';
 }
 
 

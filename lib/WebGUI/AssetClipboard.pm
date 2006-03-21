@@ -341,7 +341,7 @@ $self->session->style->setLink($self->session->config->get("extrasURL").'/assetM
                                 value=>$child->getId
                                 })
                         ."','<a href=\"".$child->getUrl("func=manageAssets")."\">".$title
-                        ."</a>','<img src=\"".$child->getIcon(1)."\" border=\"0\" alt=\"".$child->getName."\" /> ".$child->getName
+                        ."</a>','<img src=\"".$child->getIcon(1)."\" style=\"border-style:none;\" alt=\"".$child->getName."\" /> ".$child->getName
                         ."','".$self->session->datetime->epochToHuman($child->get("revisionDate"))
                         ."','".formatBytes($child->get("assetSize"))."');\n";
                 $output .= "assetManager.AddLineSortData('','".$title."','".$child->getName

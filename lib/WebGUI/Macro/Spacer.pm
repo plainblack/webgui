@@ -43,7 +43,7 @@ sub process {
         @param = @_;
         $width = $param[0] if defined $param[0];
         $height = $param[1] if defined $param[1];
-        $output = '<img src="'.$session->config->get("extrasURL").'/spacer.gif"'.(defined $width?' width="'.$width.'"':'').(defined $height?' height="'.$height.'"':'').' border="0" alt="" />';
+        $output = '<img src="'.$session->config->get("extrasURL").'/spacer.gif"'.(defined $width?' width="'.$width.'"':'').(defined $height?' height="'.$height.'"':'').' style="border-style:none;" alt="[]" />';
         return $output;
 }
 
