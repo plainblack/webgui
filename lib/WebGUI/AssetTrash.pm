@@ -221,7 +221,7 @@ sub www_manageTrash {
 				value=>$child->getId
 				})
 			."','<a href=\"".$child->getUrl("func=manageAssets")."\">".$title
-			."</a>','<img src=\"".$child->getIcon(1)."\" style=\"border-style:none;\" alt=\"".$child->getName."\" /> ".$child->getName
+			."</a>','<p style=\"display:inline;vertical-align:middle;\"><img src=\"".$child->getIcon(1)."\" style=\"vertical-align:middle;border-style:none;\" alt=\"".$child->getName."\" /></p> ".$child->getName
 			."','".$self->session->datetime->epochToHuman($child->get("revisionDate"))
 			."','".formatBytes($child->get("assetSize"))."');\n";
          	$output .= "assetManager.AddLineSortData('','".$title."','".$child->getName

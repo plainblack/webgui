@@ -1075,21 +1075,21 @@ sub manageAssets {
         </div>
 		<div style="float: left; padding-right: 30px; font-size: 14px;width: 28%;"><fieldset><legend>'.$i18n->get(1083).'</legend>';
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets","assetContainers")}) {
-		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" style="border: 0px;" /> 
+		$output .= '<p style="display:inline;vertical-align:middle;"><img src="'.$link->{'icon.small'}.'" alt="'.$link->{label}.'" style="border: 0px;vertical-align:middle;" /></p> 
 			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
 		$output .= $self->session->icon->edit("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
 		$output .= '<br />';
 	}
 	$output .= '<hr />';
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets")}) {
-		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" style="border: 0px;" /> 
+		$output .= '<p style="display:inline;vertical-align:middle;"><img src="'.$link->{'icon.small'}.'" alt="'.$link->{label}.'" style="border: 0px;vertical-align:middle;" /></p> 
 			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
 		$output .= $self->session->icon->edit("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
 		$output .= '<br />';
 	}
 	$output .= '<hr />';
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets","utilityAssets")}) {
-		$output .= '<img src="'.$link->{'icon.small'}.'" align="middle" alt="'.$link->{label}.'" style="border: 0px;" /> 
+		$output .= '<p style="display:inline;vertical-align:middle;"><img src="'.$link->{'icon.small'}.'" alt="'.$link->{label}.'" style="border: 0px;vertical-align:middle;" /></p> 
 			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
 		$output .= $self->session->icon->edit("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
 		$output .= '<br />';
@@ -1127,7 +1127,7 @@ sub manageAssets {
 	my $hasPackages = 0;
 	my $packages;
         foreach my $asset (@{$self->getPackageList}) {
-              	$packages  .= '<img src="'.$asset->getIcon(1).'" align="middle" alt="'.$asset->getName.'" style="border: 0px;" /> 
+              	$packages  .= '<p style="display:inline;vertical-align:middle;"><img src="'.$asset->getIcon(1).'" alt="'.$asset->getName.'" style="vertical-align:middle;border: 0px;" /></p> 
 			<a href="'.$self->getUrl("func=deployPackage;assetId=".$asset->getId).'">'.$asset->getTitle.'</a> '
 			.$self->session->icon->edit("func=edit;proceed=manageAssets",$asset->get("url"))
 			.'<br />';

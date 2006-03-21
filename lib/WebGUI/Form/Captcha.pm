@@ -97,7 +97,7 @@ sub toHtml {
         $self->set("size", 6);
 	$self->set("maxlength", 6);
 	$self->session->scratch->set("captcha_".$self->get("name"), $challenge);
-	$self->set("subtext", '<img src="'.$storage->getUrl($filename).'" style="border-style:none;" alt="captcha" align="middle" />'.$self->get("subtext"));
+	$self->set("subtext", '<p style="display:inline;vertical-align:middle;"><img src="'.$storage->getUrl($filename).'" style="border-style:none;vertical-align:middle;" alt="captcha" /></p>'.$self->get("subtext"));
 	return $self->SUPER::toHtml;
 }
 
