@@ -993,9 +993,9 @@ sub www_viewDetail {
 	if ($self->session->form->process("do") eq "sendEmail") {
 		if ($self->session->form->process("body") ne "") {
 			my $u = WebGUI::User->new($self->session, $listing->{maintainerId});
-			my $mail = WebGUI::Mail::Send->new($self->session, {to=>$u->profileField("email"),subject=>$listing->{productName}." - ".$self->session->form->process("subject"),from=>$self->session->form->process("from")});
+			my $mail = WebGUI::Mail::Send->create($self->session, {to=>$u->profileField("email"),subject=>$listing->{productName}." - ".$self->session->form->process("subject"),from=>$self->session->form->process("from")});
 			$mail->addText($self->session->form->process("body"));
-			$mail->send;
+			$mail->queue;
 		}
 		$var{'email.wasSent'} = 1;
 	} else {

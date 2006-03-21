@@ -234,7 +234,7 @@ sub createAccountSave {
    	if ($self->session->setting->get("webguiValidateEmail")) {
 		my $key = $self->session->id->generate();
 		$self->saveParams($self->userId,"WebGUI",{emailValidationKey=>$key});
-   		my $mail = WebGUI::Mail::Send->new($self->session,{
+   		my $mail = WebGUI::Mail::Send->create($self->session,{
 			to=>$profile->{email},
 			subject=>$i18n->get('email address validation email subject','AuthWebGUI')
 			});

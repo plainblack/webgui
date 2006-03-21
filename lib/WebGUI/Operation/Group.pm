@@ -534,9 +534,9 @@ sub www_emailGroupSend {
 		on a.userId=b.userId and b.fieldName='email' where a.groupId=".$session->db->quote($session->form->process("gid")));
 	while (($email) = $sth->array) {
 		if ($email ne "") {
-			my $mail = WebGUI::Mail::Send->new($session, {to=>$email,subject=>$session->form->process("subject"),from=>$session->form->process("from")});
+			my $mail = WebGUI::Mail::Send->create($session, {to=>$email,subject=>$session->form->process("subject"),from=>$session->form->process("from")});
 			$mail->addHtml($session->form->process("message","HTMLArea"));
-			$mail->send;
+			$mail->queue;
 		}
 	}
 	$sth->finish;

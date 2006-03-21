@@ -125,7 +125,7 @@ sub execute {
 	$message .= "UNPROCESSED PAYMENTS:\n-----------------------------\n".join("\n", @unprocessed)."\n\n\n";
 	$message .= "FATAL ERRORS:\n-----------------------------\n".join("\n",@fatal)."\n\n\n";
 	$message .= "SUCCESFUL PAYMENTS:\n-----------------------------\n".join("\n", @ok)."\n\n\n";
-	my $mail = WebGUI::Mail::Send->new($self->session, {
+	my $mail = WebGUI::Mail::Send->create($self->session, {
 		to=>$self->session->setting->get("commerceSendDailyReportTo"), 
 		subject=>'Daily recurring payments report'
 		});

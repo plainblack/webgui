@@ -94,7 +94,7 @@ sub execute {
 	$self->session->user({user=>$user});
 	my $message = $self->get("message");
 	WebGUI::Macro::process(\$message);
-	my $mail = WebGUI::Mail::Send->new($self->session, {
+	my $mail = WebGUI::Mail::Send->create($self->session, {
 		to=>$self->get("to"),
 		subject=>$self->get("subject")
 		});
