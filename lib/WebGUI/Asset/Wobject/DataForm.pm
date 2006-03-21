@@ -19,7 +19,7 @@ use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Mail::Send;
 use WebGUI::Macro;
-use WebGUI::MessageLog;
+use WebGUI::Inbox;
 use WebGUI::SQL;
 use WebGUI::Asset::Wobject;
 use WebGUI::Utility;
@@ -661,7 +661,13 @@ sub sendEmail {
                 unless ($userId || $groupId) {
                         $self->session->errorHandler->warn($self->getId.": Unable to send message, no user or group found.");
                 } else {
-                        WebGUI::MessageLog::addEntry($userId, $groupId, $subject, $message, "", "", $from);
+			WebGUI::Inbox->new($self->session)->addMessage({
+				userId=>$userId,
+				groupId=>$groupId,
+				subject=>$subject,
+				message=>$message,
+				status=>'complete'
+				});
                         my $mail =  WebGUI::Mail::Send->create($self->session,{to=>$cc, subject=>$subject, from=>$from});
 			if ($cc) {
                                

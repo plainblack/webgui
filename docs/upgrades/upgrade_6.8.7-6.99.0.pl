@@ -25,6 +25,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 addWorkflow();
+convertMessageLogToInbox();
 templateParsers();
 removeFiles();
 addSearchEngine();
@@ -40,6 +41,48 @@ addDatabaseCache();
 updateHelpTemplate();
 
 finish($session); # this line required
+
+#-------------------------------------------------
+sub convertMessageLogToInbox {
+	print "\tConverting message log to inbox.\n";
+	$session->db->write("create table inbox (
+		messageId varchar(22) binary not null primary key,
+		status varchar(15) not null default 'pending',
+		dateStamp bigint not null,
+		completedOn bigint,
+		completedBy varchar(22) binary,
+		userId varchar(22) binary,
+		groupId varchar(22) binary,
+		subject varchar(256) not null default 'No Subject',
+		message mediumtext
+		)");	
+	$session->db->write("alter table Matrix_listing add column approvalMessageId varchar(22) binary");
+	my $prepared = $session->db->prepare("insert into inbox (messageId, status, dateStamp, completedOn, completedBy, userId, subject, message) 
+		values ( ?,?,?,?,?,?,?,? )");
+	my $rs = $session->db->read("select * from messageLog");
+	while (my $data = $rs->hashRef) {
+		$prepared->execute([
+			$session->id->generate,
+			'completed',
+			$data->{dateOfEntry},
+			time(),
+			'3',
+			$data->{userId},
+			$data->{subject},
+			$data->{message}
+			]);	
+	}
+	$session->db->write("delete from userProfileField where fieldname='INBOXNotifications'");
+	$session->db->write("delete from userProfileData where fieldname='INBOXNotifications'");
+	$session->db->write("drop table MessageLog");
+	$rs = $session->db->read("select distinct assetId from template where namespace='Operation/MessageLog/View' or namespace='Operation/MessageLog/Message'");
+	while (my ($id) = $rs->array) {
+		my $asset = WebGUI::Asset->new($session, $id, "WebGUI::Asset::Template");
+		if (defined $asset) {
+			$asset->trash;
+		}
+	}
+}
 
 #-------------------------------------------------
 sub addCsPopularityContest {
@@ -669,6 +712,8 @@ sub templateParsers {
 #-------------------------------------------------
 sub removeFiles {
 	print "\tRemoving old unneeded files.\n" unless ($quiet);
+	unlink '../../lib/WebGUI/MessageLog.pm';
+	unlink '../../lib/WebGUI/Operation/MessageLog.pm';
 	unlink '../../lib/WebGUI/ErrorHandler.pm';
 	unlink '../../lib/WebGUI/HTTP.pm';
 	unlink '../../lib/WebGUI/Privilege.pm';

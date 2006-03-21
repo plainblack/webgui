@@ -15,7 +15,6 @@ use WebGUI::Asset::Template;
 use WebGUI::Asset::Post;
 use WebGUI::Group;
 use WebGUI::International;
-use WebGUI::MessageLog;
 use WebGUI::Paginator;
 use WebGUI::SQL;
 use WebGUI::Utility;

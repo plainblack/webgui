@@ -142,6 +142,10 @@ A hash reference containing addressing and other header level options.
 
 A string containing a comma seperated list of email addresses to send to.
 
+=head4 toUser
+
+A WebGUI userId of a user you'd like to send this message to.
+
 =head4 toGroup
 
 A WebGUI groupId. The email address of the users in this group will be looked up and will each be sent a copy of this message.
@@ -176,6 +180,19 @@ sub create {
 	my $class = shift;
 	my $session = shift;
 	my $headers = shift;
+	if ($headers->{toUser}) {
+		my $user = WebGUI::User->new($session, $headers->{toUser});
+		if (defined $user) {
+			my $email = $user->profileField("email");
+			if ($email) {
+				if ($headers->{to}) {
+					$headers->{to} .= ','.$email;
+				} else {
+					$headers->{to} = $email;
+				}
+			}	
+		}
+	}
 	my $message = MIME::Entity->build(
 		Type=>$headers->{contentType} || "multipart/mixed",
 		From=>$headers->{from} || $session->setting->get("companyEmail"),

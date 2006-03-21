@@ -20,7 +20,7 @@ use WebGUI::Group;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
 use WebGUI::International;
-use WebGUI::MessageLog;
+use WebGUI::Inbox;
 use WebGUI::Operation;
 use WebGUI::Paginator;
 use WebGUI::SQL;
@@ -620,30 +620,25 @@ Send notifications to the thread and forum subscribers that a new post has been 
 
 sub notifySubscribers {
 	my $self = shift;
-	my %subscribers;
-	my $group = WebGUI::Group->new($self->session,$self->getThread->get("subscriptionGroupId"));
-	foreach my $userId (@{$group->getUsers(undef,1)}) {
-		$subscribers{$userId} = $userId unless ($userId eq $self->get("ownerUserId"));
-	}
-	$group = WebGUI::Group->new($self->session, $self->getThread->getParent->get("subscriptionGroupId"));
-	foreach my $userId (@{$group->getUsers(undef,1)}) {
-		$subscribers{$userId} = $userId unless ($userId eq $self->get("ownerUserId"));
-	}
-        my %lang;
 	my $i18n = WebGUI::International->new($self->session);
-        foreach my $userId (keys %subscribers) {
-                my $u = WebGUI::User->new($self->session, $userId);
-                if ($lang{$u->profileField("language")}{message} eq "") {
-                        $lang{$u->profileField("language")}{var} = $self->getTemplateVars();
-			$self->getThread->getParent->appendTemplateLabels($lang{$u->profileField("language")}{var});
-			$lang{$u->profileField("language")}{var}{url} = $self->session->url->getSiteURL().$self->getUrl;
-                        $lang{$u->profileField("language")}{var}{'notify.subscription.message'} =
-                                         $i18n->get(875,"Asset_Post",$u->profileField("language"));
-                        $lang{$u->profileField("language")}{subject} = $i18n->get(523,"Asset_Post",$u->profileField("language"));
-                        $lang{$u->profileField("language")}{message} = $self->processTemplate($lang{$u->profileField("language")}{var}, $self->getThread->getParent->get("notificationTemplateId"));
-                }
-                WebGUI::MessageLog::addEntry($userId,"",$lang{$u->profileField("language")}{subject},$lang{$u->profileField("language")}{message});
-        }
+	my $inbox = WebGUI::Inbox->new($self->session);
+	my $var = $self->getTemplateVars();
+	$self->getThread->getParent->appendTemplateLabels($var);
+	$var->{url} = $self->session->url->getSiteURL().$self->getUrl;
+	$var->{'notify.subscription.message'} = $i18n->get(875,"Asset_Post");
+	my $message = $self->processTemplate($var, $self->getThread->getParent->get("notificationTemplateId"));
+	$inbox->addMessage({
+		groupId=>$self->getThread->getParent->get("subscriptionGroupId"),
+		status=>"completed",
+		subject=>$self->get("subject"),
+		message=>$message
+		});
+	$inbox->addMessage({
+		groupId=>$self->getThread->get("subscriptionGroupId"),
+		status=>"completed",
+		subject=>$self->get("subject"),
+		message=>$message
+		});
 }
 
 
@@ -801,7 +796,12 @@ sub setStatusApproved {
 	$self->getThread->incrementReplies($self->get("dateUpdated"),$self->getId) if ($self->isReply && ($self->session->form->process('assetId') eq
 	"new"));
 	unless ($self->isPoster) {
-		WebGUI::MessageLog::addInternationalizedEntry($self->get("ownerUserId"),'',$self->session->url->getSiteURL().'/'.$self->getUrl,579);
+		my $i18n = WebGUI::International->new($self->session);
+		WebGUI::Inbox->new($self->session)->addMessage({
+			userId=>$self->get("ownerUserId"),
+			status=>'completed',
+			message=>$i18n->get(579)."\n\n".$self->session->url->getSiteURL().'/'.$self->getUrl
+			});
 	}
 	$self->notifySubscribers unless ($self->session->form->process("func") eq 'add');
 }
@@ -837,8 +837,12 @@ sub setStatusPending {
 		$self->setStatusApproved;
 	} else {
         	$self->update({status=>'pending'});
-        	WebGUI::MessageLog::addInternationalizedEntry('',$self->getThread->getParent->get("moderateGroupId"),
-                	$self->session->url->getSiteURL().'/'.$self->getUrl("revision=".$self->get("revisionDate")),578,'WebGUI','pending');
+		my $i18n = WebGUI::International->new($self->session);
+		WebGUI::Inbox->new($self->session)->addMessage({
+			status=>'pending',
+			message=>$i18n->get("578")."\n\n".$self->session->url->getSiteURL().'/'.$self->getUrl("revision=".$self->get("revisionDate")),
+			groupId=>$self->getThread->getParent->get("moderateGroupId")
+			});
 	}
 }
 

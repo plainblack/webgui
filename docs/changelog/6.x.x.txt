@@ -29,8 +29,10 @@
    otherwise be slow or complex pages. More details in migration.txt.
  - The SMTP mail backend has been replaced with a new API that's capable of
    sending attachments, HTML messages, and more. This will introduce many new
- - Added a mail queue system.
    options for developers.
+ - Replaced the old Message Log system with a new Inbox system that's more
+   reliable, and scalable.
+ - Added a mail queue system.
  - The group mail screen now allows sending of HTML messages.
  - Added prequery statements to the SQLReport and configurable allowed statements
    to the database link properties. (Martin Kamerbeek / Procolix)

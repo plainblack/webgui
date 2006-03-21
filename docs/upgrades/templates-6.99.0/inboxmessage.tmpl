@@ -1,0 +1,20 @@
+#PBtmpl0000000000000205
+#create
+#namespace:Inbox/Message
+#url:default_inbox_message
+#title:Default Inbox Message
+#menuTitle:Default Inbox Message
+<h1><tmpl_var title></h1>
+<b><tmpl_var subject></b><br />
+<tmpl_var dateStamp><br />
+<tmpl_var status><br /><br />
+<p> <tmpl_var message></p>
+
+<div class="accountOptions">
+        <ul>
+        <tmpl_loop accountOptions>
+                <li><tmpl_var options.display></li>
+        </tmpl_loop>
+        </ul>
+</div>
+

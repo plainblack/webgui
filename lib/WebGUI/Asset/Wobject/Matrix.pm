@@ -8,6 +8,7 @@ use WebGUI::Mail::Send;
 use WebGUI::SQL;
 use WebGUI::User;
 use WebGUI::Utility;
+use WebGUI::Inbox;
 use WebGUI::Asset::Wobject;
 use WebGUI::Asset::Wobject::Collaboration;
 
@@ -219,9 +220,17 @@ sub www_approveListing {
         return $self->session->privilege->insufficient() unless($self->canEdit);
 	my $listing = $self->session->db->getRow("Matrix_listing","listingId",$self->session->form->process("listingId"));
 	$self->session->db->write("update Matrix_listing set status='approved' where listingId=".$self->session->db->quote($self->session->form->process("listingId")));
-	WebGUI::MessageLog::addEntry($listing->{maintainerId},"","New Listing Approved","Your new listing, ".$listing->{productName}.", has been approved.",
-		$self->formatURL("viewDetail",$self->session->form->process("listingId")),"notice");
-	WebGUI::MessageLog::completeEntry($self->session->form->process("mlog"));
+	my $inbox = WebGUI::Inbox->new($self->session);
+	$inbox->addMessage({
+		subject=>"New Listing Approved",
+		message=>"Your new listing, ".$listing->{productName}.", has been approved.",
+		status=>'completed',
+		userId=>$listing->{maintainerId}
+		});
+	my $message = $inbox->getMessage($listing->{approvalMessageId});
+	if (defined $message) {
+		$message->setCompleted;
+	}
 	return $self->www_viewDetail;
 }
 
@@ -349,8 +358,17 @@ sub www_deleteListingConfirm {
 	$self->session->db->write("delete from Matrix_listingData where listingId=".$self->session->db->quote($self->session->form->process("listingId")));
 	$self->session->db->write("delete from Matrix_rating where listingId=".$self->session->db->quote($self->session->form->process("listingId")));
 	$self->session->db->write("delete from Matrix_ratingSummary where listingId=".$self->session->db->quote($self->session->form->process("listingId")));
-	WebGUI::MessageLog::addEntry($listing->{maintainerId},"","Listing Deleted","Your listing, ".$listing->{productName}.", has been deleted from the matrix.","","notice");
-	WebGUI::MessageLog::completeEntry($self->session->form->process("mlog"));
+	my $inbox = WebGUI::Inbox->new($self->session);
+	$inbox->addMessage({
+		status=>'completed',
+		subject=>"Listing Deleted",
+		message=>"Your listing, ".$listing->{productName}.", has been deleted from the matrix.",
+		userId=>$listing->{maintainerId}
+		});
+	my $message = $inbox->getMessage($listing->{approvalMessageId});
+	if (defined $message) {
+		$message->setCompleted;
+	}
 	return "";
 }
 
@@ -646,9 +664,14 @@ sub www_editListingSave {
 	$data{maintainerId} = $self->session->form->process("maintainerId") if ($self->canEdit);
 	$data{assetId} = $self->getId;
 	$self->session->form->process("listingId") = $self->session->db->setRow("Matrix_listing","listingId",\%data);
-	if ($data{status} eq "pending") {
-		WebGUI::MessageLog::addEntry($self->get("ownerUserId"),$self->get("groupIdEdit"),"New Listing Added","A new listing, ".$data{productName}.", is waiting to be added.",
-			$self->session->url->getSiteURL()."/".$self->formatURL("viewDetail",$self->session->form->process("listingId")),"pending");
+	if ($data{status} eq "pending" && !$listing->{approvalMessageId}) {
+		$data{approvalMessageId} = WebGUI::Inbox->new($self->session)->addMessage({
+			status=>'pending',
+			groupId=>$self->get("groupIdEdit"),
+			userId=>$self->get("ownerUserId"),
+			subject=>"New Listing Added",
+			message=>"A new listing, ".$data{productName}.", is waiting to be added.\n\n".$self->session->url->getSiteURL()."/".$self->formatURL("viewDetail",$self->session->form->process("listingId"))
+			});
 	}
 	my $a = $self->session->db->read("select fieldId, name, fieldType from Matrix_field");
 	while (my ($id, $name, $type) = $a->array) {

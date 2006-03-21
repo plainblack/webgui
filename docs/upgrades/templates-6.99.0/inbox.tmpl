@@ -1,0 +1,53 @@
+#PBtmpl0000000000000206
+#create
+#namespace:Inbox
+#url:default_inbox
+#title:Default Inbox
+#menuTitle:Default Inbox
+<h1><tmpl_var title></h1>
+
+<table width="100%" cellspacing="1" cellpadding="2" border="0">
+<tr>
+   <td class="tableHeader">
+      <tmpl_var subject.label>
+   </td>
+   <td class="tableHeader">
+      <tmpl_var status.label>
+   </td>
+   <td class="tableHeader">
+      <tmpl_var dateStamp.label>
+   </td>
+</tr>
+<tmpl_if message.noresults>
+   <tr>
+       <td class="tableData">
+          <tmpl_var noresults>
+       </td>
+       <td class="tableData">
+          &nbsp;
+       </td>
+       <td class="tableData">
+          &nbsp;
+       </td>
+   </tr>
+<tmpl_else>
+   <tmpl_loop messages>
+      <tr>
+         <td class="tableData">
+            <tmpl_var subject>
+         </td>
+         <td class="tableData">
+            <tmpl_var status>
+         </td>
+         <td class="tableData">
+            <tmpl_var dateStamp>
+         </td>
+     </tr>
+  </tmpl_loop>
+</tmpl_if>
+</table>
+   <ul class="accountOptions">
+      <tmpl_loop accountOptions>
+         <li><tmpl_var options.display>
+      </tmpl_loop>
+   </ul>

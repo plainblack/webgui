@@ -886,6 +886,13 @@ messages, and to multiple recipients, unlike WebGUI::Mail. Please see the API
 for details.
 
 
+5.25 WebGUI::MessageLog Replaced
+
+IN 6.99 the venerable WebGUI::MessageLog has been retired and replaced with
+WebGUI::Inbox, which has an object oriented API, is more resource efficient,
+is more flexible, is more reliable, and is compliant with the new mail system.
+
+
 
 6.  Automatic list of Assets in Help System.
 -------------------------------------

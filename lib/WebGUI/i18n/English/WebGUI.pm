@@ -884,11 +884,6 @@ to add or remove users from their groups.
 		lastUpdated => 1031514049
 	},
 
-	'519' => {
-		message => q|I would not like to be notified.|,
-		lastUpdated => 1031514049
-	},
-
 	'1074' => {
 		message => q|Style templates are a special kind of template in WebGUI. They allow you to keep your content separated from the look and feel of your site. The following are the template variables available in style templates:
 
@@ -1537,11 +1532,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 		lastUpdated => 1100154599
 	},
 
-	'520' => {
-		message => q|I would like to be notified via email.|,
-		lastUpdated => 1031514049
-	},
-
 	'1004' => {
 		message => q|Cache external groups for how long?|,
 		lastUpdated => 1057208065
@@ -2054,11 +2044,6 @@ You can find out more about karma in <a href="http://www.plainblack.com/ruling_w
 		lastUpdated => 1031514049
 	},
 
-	'521' => {
-		message => q|I would like to be notified via email to pager.|,
-		lastUpdated => 1031514049
-	},
-
 	'880' => {
 		message => q|Last Resort Editor|,
 		lastUpdated => 1044705137
@@ -2546,11 +2531,6 @@ The headings of columns on things like message boards and user contributions.
 		lastUpdated => 1058092984
 	},
 
-	'518' => {
-		message => q|Inbox Notifications|,
-		lastUpdated => 1031514049
-	},
-
 	'748' => {
 		message => q|User Count|,
 		lastUpdated => 1036553016
@@ -2623,11 +2603,6 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 
 	'125' => {
 		message => q|Company Name|,
-		lastUpdated => 1031514049
-	},
-
-	'522' => {
-		message => q|I would like to be notified via ICQ.|,
 		lastUpdated => 1031514049
 	},
 

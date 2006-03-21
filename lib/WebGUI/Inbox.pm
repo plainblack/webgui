@@ -95,14 +95,14 @@ A user object.
 
 =head3 limit
 
-An integer indicating the number of messages to fetch. Defaults to 30.
+An integer indicating the number of messages to fetch. Defaults to 50.
 
 =cut
 
 sub getMessagesForUser {
 	my $self = shift;
 	my $user = shift;
-	my $limit = shift;
+	my $limit = shift || 50;
 	my @messages = ();
 	my $counter = 0;
 	my $rs = $self->session->db->read("select messageId, userId, groupId from inbox order by status='pending', dateStamp");

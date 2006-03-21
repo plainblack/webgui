@@ -15,6 +15,7 @@ package WebGUI::Inbox::Message;
 =cut
 
 use strict;
+use WebGUI::Mail::Send;
 
 =head1 NAME
 
@@ -57,7 +58,7 @@ The content of this message.
 
 =head4 subject
 
-The topic of this message.
+The topic of this message. Defaults to 'Notification'.
 
 =head4 status
 
@@ -82,7 +83,7 @@ sub create {
 	my $self = {};
 	$self->{_properties}{messageId} = "new";
 	$self->{_properties}{status} = $properties->{status} || "pending";
-	$self->{_properties}{subject} = $properties->{subject} || "No Subject";
+	$self->{_properties}{subject} = $properties->{subject} || WebGUI::International->new($session)->get(523);
 	$self->{_properties}{message} = $properties->{message};
 	$self->{_properties}{dateStamp} = time();
 	$self->{_properties}{userId} = $properties->{userId};
@@ -92,6 +93,19 @@ sub create {
 		$self->{_properties}{completedOn} = time();
 	}
 	$self->{_messageId} = $self->{_properties}{messageId} = $session->setRow("inbox","messageId",$self->{_properties});	
+	my $mail = WebGUI::Mail::Send->create($session, {
+		toUser=>$self->{_properties}{userId},
+		toGroup=>$self->{_properties}{groupId},
+		subject=>$self->{_properties}{subject}
+		});
+	if (defined $mail) {
+		if ($self->{_properties}{message} =~ m/\<.*\>/) {
+			$mail->addHtml($self->{_properties}{message});
+		} else {
+			$mail->addText($self->{_properties}{message});
+		}
+		$mail->queue;
+	}
 	$self->{_session} = $session;
 	bless $self, $class;
 }

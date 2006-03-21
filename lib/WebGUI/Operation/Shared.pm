@@ -59,9 +59,9 @@ is in group Admin (3).  Returns the user to the List Database Links screen.
 		$hash{'options.display'} = '<a href="'.$session->url->page('op=viewProfile;uid='.$session->user->userId).'">'.$i18n->get(343).'</a>';
 		push(@array,\%hash);
 	}
-	unless ($session->form->process("op") eq "viewMessageLog"){
+	unless ($session->form->process("op") eq "viewInbox"){
 		my %hash;
-		$hash{'options.display'} = '<a href="'.$session->url->page('op=viewMessageLog').'">'.$i18n->get(354).'</a>';
+		$hash{'options.display'} = '<a href="'.$session->url->page('op=viewInbox').'">'.$i18n->get(354).'</a>';
 		push(@array,\%hash);
 	}
 	unless ($session->form->process("op") eq "redeemSubscriptionCode") {
