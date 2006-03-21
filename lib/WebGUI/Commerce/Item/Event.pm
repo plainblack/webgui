@@ -78,7 +78,7 @@ Overload default constructor to glue in information from the EMS.
 =cut
 
 sub new {
-	my ($class, $session, $eventId, $eventData);
+	my ($class, $session, $eventId);
 	$class = shift;
 	$session = shift;
 	$eventId = shift;
