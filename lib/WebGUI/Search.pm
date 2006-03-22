@@ -16,7 +16,6 @@ package WebGUI::Search;
 
 use strict;
 use WebGUI::Asset;
-use WebGUI::SQL;
 
 =head1 NAME
 

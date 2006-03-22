@@ -916,12 +916,12 @@ sub view {
 	$var{'best.views.url'} = $self->formatURL("viewDetail",$data->{listingId});
 	$var{'best.views.count'} = $data->{views}; 
 	$var{'best.views.name'} = $data->{productName}; 
-	my $data = $self->session->db->quickHashRef("select compares, productName, listingId from Matrix_listing 
+	$data = $self->session->db->quickHashRef("select compares, productName, listingId from Matrix_listing 
 		where assetId=".$self->session->db->quote($self->getId)." and status='approved'  order by compares desc limit 1");
 	$var{'best.compares.url'} = $self->formatURL("viewDetail",$data->{listingId});
 	$var{'best.compares.count'} = $data->{compares}; 
 	$var{'best.compares.name'} = $data->{productName}; 
-	my $data = $self->session->db->quickHashRef("select clicks, productName, listingId from Matrix_listing 
+	$data = $self->session->db->quickHashRef("select clicks, productName, listingId from Matrix_listing 
 		where assetId=".$self->session->db->quote($self->getId)." and status='approved'  order by clicks desc limit 1");
 	$var{'best.clicks.url'} = $self->formatURL("viewDetail",$data->{listingId});
 	$var{'best.clicks.count'} = $data->{clicks}; 

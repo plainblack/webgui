@@ -17,6 +17,7 @@ package WebGUI::Asset;
 use strict;
 use WebGUI::Paginator;
 use WebGUI::VersionTag;
+use WebGUI::Search::Index;
 
 =head1 NAME
 

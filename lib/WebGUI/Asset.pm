@@ -28,8 +28,6 @@ use WebGUI::AdminConsole;
 use WebGUI::Cache;
 use WebGUI::Form;
 use WebGUI::HTMLForm;
-use WebGUI::Search;
-use WebGUI::Search::Index;
 use WebGUI::TabForm;
 use WebGUI::Utility;
 
@@ -1421,7 +1419,7 @@ sub newByUrl {
 
 =head2 prepareView ( )
 
-Executes what is necessary to make the view() method work with content streaming. This includes things like processing template head tags.
+Executes what is necessary to make the view() method work with content chunking. This includes things like processing template head tags.
 
 =cut
 
