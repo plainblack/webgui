@@ -663,7 +663,7 @@ sub www_editListingSave {
 	}
 	$data{maintainerId} = $self->session->form->process("maintainerId") if ($self->canEdit);
 	$data{assetId} = $self->getId;
-	$self->session->form->process("listingId") = $self->session->db->setRow("Matrix_listing","listingId",\%data);
+	my $listingId = $self->session->db->setRow("Matrix_listing","listingId",\%data);
 	if ($data{status} eq "pending" && !$listing->{approvalMessageId}) {
 		$data{approvalMessageId} = WebGUI::Inbox->new($self->session)->addMessage({
 			status=>'pending',
@@ -685,7 +685,7 @@ sub www_editListingSave {
 			".$self->session->db->quote($self->getId).", ".$self->session->db->quote($self->session->form->process("listingId")).", ".$self->session->db->quote($id).", ".$self->session->db->quote($value).")");
 	}
 	$a->finish;
-        return $self->www_viewDetail;
+        return $self->www_viewDetail($listingId);
 }
  
 #-------------------------------------------------------------------
@@ -1012,7 +1012,7 @@ sub www_viewDetail {
 	my $listing = $self->session->db->getRow("Matrix_listing","listingId",$listingId);
 	my $forum = WebGUI::Asset::Wobject::Collaboration->new($self->session, $listing->{forumId});
 	$var{"discussion"} = $forum->view;
-	$var{'isLoggedIn'} = ($self->session->user->get("userId") ne "1");
+	$var{'isLoggedIn'} = ($self->session->user->userId ne "1");
 	if ($self->session->form->process("do") eq "sendEmail") {
 		if ($self->session->form->process("body") ne "") {
 			my $u = WebGUI::User->new($self->session, $listing->{maintainerId});

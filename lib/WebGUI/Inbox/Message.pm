@@ -92,7 +92,7 @@ sub create {
 		$self->{_properties}{completedBy} = $session->user->userId;
 		$self->{_properties}{completedOn} = time();
 	}
-	$self->{_messageId} = $self->{_properties}{messageId} = $session->setRow("inbox","messageId",$self->{_properties});	
+	$self->{_messageId} = $self->{_properties}{messageId} = $session->db->setRow("inbox","messageId",$self->{_properties});	
 	my $mail = WebGUI::Mail::Send->create($session, {
 		toUser=>$self->{_properties}{userId},
 		toGroup=>$self->{_properties}{groupId},
@@ -120,7 +120,7 @@ Deletes  this message from the inbox.
 
 sub delete {
 	my $self = shift;
-	my $sth = $self->session->db->prepare("delete from userInbox where messageId=?");
+	my $sth = $self->session->db->prepare("delete from inbox where messageId=?");
 	$sth->execute($self->getId);
 }
 
@@ -200,7 +200,7 @@ sub new {
 	my $class = shift;
 	my $session = shift;
 	my $messageId = shift;
-	bless {_properties=>$session->db->getRow("userInbox","messageId",$messageId), _session=>$session, _messageId=>$messageId}, $class;
+	bless {_properties=>$session->db->getRow("inbox","messageId",$messageId), _session=>$session, _messageId=>$messageId}, $class;
 }
 
 #-------------------------------------------------------------------

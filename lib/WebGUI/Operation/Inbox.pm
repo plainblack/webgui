@@ -56,11 +56,13 @@ sub www_viewInbox {
 	my $session = shift;
 	return $session->privilege->insufficient() unless ($session->user->isInGroup(2));
 	my $i18n = WebGUI::International->new($session);
+	my $vars = {};
+	my @msg = ();
    	$vars->{title} = $i18n->get(159);
    	$vars->{'subject.label'} = $i18n->get(351);
    	$vars->{'status.label'} = $i18n->get(553);
    	$vars->{'dateStamp.label'} = $i18n->get(352);
-  	my $messages = WebGUI::Inbox->getMessagesForUser($session, $session->user); 
+  	my $messages = WebGUI::Inbox->new($session)->getMessagesForUser($session->user); 
    	foreach my $message (@$messages) {   
       		my $hash;
       		$hash->{'subject'} =  '<a href="'.$session->url->page('op=viewInboxMessage;messageId='.$message->getId).'">'.$message->get("subject").'</a>';
@@ -88,7 +90,7 @@ sub www_viewInboxMessage {
 	return $session->privilege->insufficient() unless ($session->user->isInGroup(2));
 	my $i18n = WebGUI::International->new($session);
    	$vars->{title} = $i18n->get(159);
-	my $message = WebGUI::Inbox->getMessage($session, $session->form->param("messageId"));
+	my $message = WebGUI::Inbox->new($session)->getMessage($session->form->param("messageId"));
 	if (defined $message) {
 	   	$vars->{'subject'} = $data->{subject};
 	   	$vars->{'dateStamp'} =$session->datetime->epochToHuman($data->{dateStamp});

@@ -950,8 +950,8 @@ That particular example will help you get good ranking on search engines.
 	},
 
 	'352' => {
-		message => q|Date Of Entry|,
-		lastUpdated => 1031514049
+		message => q|Date|,
+		lastUpdated => 1142991266
 	},
 
 	'1006' => {
@@ -1409,11 +1409,6 @@ The Groups page displays all groups that you are allowed to edit.  The form on t
 
 	'130' => {
 		message => q|Maximum Attachment Size|,
-		lastUpdated => 1031514049
-	},
-
-	'245' => {
-		message => q|Date|,
 		lastUpdated => 1031514049
 	},
 
@@ -1955,11 +1950,6 @@ default WebGUI groups such as Admin or Content Manager.</p> |,
 	'747' => {
 		message => q|Usernames must contain only alpha-numeric characters, dashes, underscores, periods, commas or @ signs.|,
 		lastUpdated => 1129431985
-	},
-
-	'479' => {
-		message => q|Date|,
-		lastUpdated => 1031514049
 	},
 
 	'159' => {
