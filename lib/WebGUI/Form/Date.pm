@@ -77,7 +77,7 @@ sub definition {
 	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
 		formName=>{
-			defaultValue=>$i18n->get("479")
+			defaultValue=>$i18n->get("352")
 			},
 		defaultValue=>{
 			defaultValue=>$session->datetime->time()
