@@ -57,6 +57,12 @@ The url of the Folder.
 <p><b>title</b><br>
 The title of the Folder.
 
+<p><b>icon.small</b><br>
+The URL to a small icon of the appropriate type for this Asset.
+
+<p><b>icon.big</b><br>
+The URL to a big icon of the appropriate type for this Asset.
+
 </blockquote>
 
 <p><b>file_loop</b><br>
@@ -66,6 +72,9 @@ A loop containing all non-Folder assets which are children of the Folder.
 
 <p><b>id</b><br>
 The assetId of the Asset.
+
+<p><b>canView</b><br>
+A conditional indicating if the current user can view this Asset.
 
 <p><b>title</b><br>
 The title of the Asset.
@@ -94,14 +103,21 @@ The URL of the Asset.
 <p><b>isImage</b><br>
 A conditional indicating if this Asset is an Image Asset.
 
-<p><b>thumbnail.url</b><br>
-If this Asset is an Image, the URL to the thumbnail for it.
+<p><b>canEdit</b><br>
+A conditional indicating if this Asset can be edited by the current user.
+
+<p><b>controls</b><br>
+The editing control bar for this child
 
 <p><b>isFile</b><br>
 A conditional indicating if this Asset is a File Asset.
 
+<p><b>thumbnail.url</b><br>
+If this Asset is an Image, the URL to the thumbnail for it.
+
 <p><b>file.url</b><br>
-If this Asset is a File, the URL to the actual file for downloading.
+If this Asset is a File Asset (File, Image or Zip Archive), the URL to the actual file for downloading.  Otherwise,
+this variable will be empty
 
 </blockquote>
 		|,

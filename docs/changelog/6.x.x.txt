@@ -14,6 +14,7 @@
  - fixed a bug in the File asset that caused file redirects to be cached
    incorrectly for Visitor.  Thanks to Jukka Raimovaara / Axxion Oy.
  - fix [ 1454694 ] Children of a folder not linking correctly
+ - fix [ 1454684 ] Folder listing every asset
 
 6.8.7
  - fix [ 1431098 ] op=becomeUser can become non-existent userIds

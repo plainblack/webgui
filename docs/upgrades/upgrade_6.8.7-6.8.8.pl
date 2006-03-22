@@ -173,7 +173,7 @@ END
 
 #-------------------------------------------------
 sub fixFolderTemplateLinks {
-	print "\tFix Folder links for Assets.\n" unless ($quiet);
+	print "\tFix Folder links and viewing rights for Folder children.\n" unless ($quiet);
 	
 my $folderTemplate = <<END;
 <a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a>
@@ -188,10 +188,15 @@ my $folderTemplate = <<END;
 				
 <table width="100%" cellpadding="3" cellspacing="0" class="content"> 
 <tmpl_loop subfolder_loop> 
+
  <tr>
  <td class="tableData" valign="top">
- <a href="<tmpl_var url>"><img src="<tmpl_var icon.small>" border="0" alt="<tmpl_var title>" /></a>
- <a href="<tmpl_var url>"><tmpl_var title></a>
+<tmpl_if canView>
+	<a href="<tmpl_var url>"><img src="<tmpl_var icon.small>" border="0" alt="<tmpl_var title>" /></a>
+	<a href="<tmpl_var url>"><tmpl_var title></a>
+<tmpl_else>
+	<img src="<tmpl_var icon.small>" border="0" alt="<tmpl_var title>" /><tmpl_var title>
+</tmpl_if>
  </td>
  <td class="tableData" valign="top" colspan="3">
  <tmpl_var synopsis>
@@ -207,8 +212,13 @@ my $folderTemplate = <<END;
    <tmpl_var controls>
   </tmpl_if>
  </tmpl_if>
+<tmpl_if canView>
  <a href="<tmpl_if isFile><tmpl_var file.url><tmpl_else><tmpl_var url></tmpl_if>"><img src="<tmpl_var icon.small>" border="0" alt="<tmpl_var title>" /></a>
- <a href="<tmpl_if isFile><tmpl_var file.url><tmpl_else><tmpl_var url></tmpl_if>"><tmpl_var title> </td> <td class="tableData" valign="top">
+ <a href="<tmpl_if isFile><tmpl_var file.url><tmpl_else><tmpl_var url></tmpl_if>"><tmpl_var title></a>
+<tmpl_else>
+ <img src="<tmpl_var icon.small>" border="0" alt="<tmpl_var title>" /><tmpl_var title>
+</tmpl_if>
+</td> <td class="tableData" valign="top">
  <tmpl_var synopsis></td><td class="tableData" valign="top">^D("%z %Z",<tmpl_var date.epoch>);</td>
  <td class="tableData" valign="top"><tmpl_var size></td></tr>
 </tmpl_loop>
