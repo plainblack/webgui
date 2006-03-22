@@ -105,7 +105,7 @@ sub getMessagesForUser {
 	my $limit = shift || 50;
 	my @messages = ();
 	my $counter = 0;
-	my $rs = $self->session->db->read("select messageId, userId, groupId from inbox order by status='pending', dateStamp");
+	my $rs = $self->session->db->read("select messageId, userId, groupId from inbox order by status='pending' desc, dateStamp desc");
 	while (my ($messageId, $userId, $groupId) = $rs->array) {
 		if ($user->userId eq $userId || $user->isInGroup($groupId)) {
 			push(@messages, $self->getMessage($messageId));

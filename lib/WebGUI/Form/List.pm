@@ -234,18 +234,20 @@ to the case of the values.
 =cut
 
 sub orderedHash {
-	my ($self) = @_;
+        my ($self) = @_;
         my %options;
         tie %options, 'Tie::IxHash';
-        if ($self->get("sortByValue")) {
-                foreach my $optionKey (sort {"\L${$self->get('options')}{$a}" cmp "\L${$self->get('options')}{$b}" } keys %{$self->get('options')}) {
-                         $options{$optionKey} = $self->get('options')->{$optionKey};
+	my $original = $self->get("options");
+        if ($self->{sortByValue}) {
+                foreach my $optionKey (sort {"\L${$original}{$a}" cmp "\L${$original}}{$b}" } keys %{$original}) {
+                         $options{$optionKey} = $original->{$optionKey};
                 }
         } else {
-                %options = %{$self->get('options')};
+                %options = %{$original};
         }
         return %options;
 }
+
 
 #-------------------------------------------------------------------
 

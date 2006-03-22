@@ -527,11 +527,11 @@ sub www_editListing {
 		);
         if ($self->canEdit) {
 		$f->selectBox(
-			-name=>"maintainerId",
-			-value=>[$listing->{maintainerId}],
-			-label=>$i18n->get('listing maintainer'),
-			-options=>$self->session->db->buildHashRef("select userId,username from users order by username")
-			-hoverHelp=>$i18n->get('listing maintainer description'),
+			options=>$self->session->db->buildHashRef("select userId,username from users order by username"),
+			name=>"maintainerId",
+			value=>$listing->{maintainerId},
+			label=>$i18n->get('listing maintainer'),
+			hoverHelp=>$i18n->get('listing maintainer description'),
 			);
 	}
 	my %goodBad = (
@@ -665,13 +665,14 @@ sub www_editListingSave {
 	$data{assetId} = $self->getId;
 	my $listingId = $self->session->db->setRow("Matrix_listing","listingId",\%data);
 	if ($data{status} eq "pending" && !$listing->{approvalMessageId}) {
-		$data{approvalMessageId} = WebGUI::Inbox->new($self->session)->addMessage({
+		my $approvalMessage = WebGUI::Inbox->new($self->session)->addMessage({
 			status=>'pending',
 			groupId=>$self->get("groupIdEdit"),
 			userId=>$self->get("ownerUserId"),
 			subject=>"New Listing Added",
 			message=>"A new listing, ".$data{productName}.", is waiting to be added.\n\n".$self->session->url->getSiteURL()."/".$self->formatURL("viewDetail",$listingId)
 			});
+		$self->session->db->setRow("Matrix_listing","listingId",{listingId=>$listingId, approvalMessageId=>$approvalMessage->getId});
 	}
 	my $a = $self->session->db->read("select fieldId, name, fieldType from Matrix_field");
 	while (my ($id, $name, $type) = $a->array) {
