@@ -95,7 +95,7 @@ sub formatURL {
 	my $self = shift;
 	my $func = shift;
 	my $listingId = shift;
-	my $url = $self->getUrl("func=".$func."&listingId=".$listingId);
+	my $url = $self->getUrl("func=".$func.";listingId=".$listingId);
 	return $url;
 }
 
@@ -129,7 +129,7 @@ sub getCompareForm {
 			vertical=>1,
 			value=>\@ids,
 			options=>$self->session->db->buildHashRef("select listingId, concat('<a href=\\\"".
-				$self->getUrl("func=viewDetail")."&amp;listingId=',listingId,'\\\">', productName,'</a>') from Matrix_listing 
+				$self->getUrl("func=viewDetail").";listingId=',listingId,'\\\">', productName,'</a>') from Matrix_listing 
 				where assetId=".$self->session->db->quote($self->getId)." and status='approved' order by productName")
 			})
 		."<br />"
@@ -343,7 +343,7 @@ sub www_deleteListing {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
 	my $output = sprintf $i18n->get('delete listing confirmation'),
-		$self->getUrl("func=deleteListingConfirm&listingId=".$self->session->form->process("listingId")),
+		$self->getUrl("func=deleteListingConfirm;listingId=".$self->session->form->process("listingId")),
 		$self->formatURL("viewDetail",$self->session->form->process("listingId"));
 	return $self->processStyle($output);
 }
@@ -670,7 +670,7 @@ sub www_editListingSave {
 			groupId=>$self->get("groupIdEdit"),
 			userId=>$self->get("ownerUserId"),
 			subject=>"New Listing Added",
-			message=>"A new listing, ".$data{productName}.", is waiting to be added.\n\n".$self->session->url->getSiteURL()."/".$self->formatURL("viewDetail",$self->session->form->process("listingId"))
+			message=>"A new listing, ".$data{productName}.", is waiting to be added.\n\n".$self->session->url->getSiteURL()."/".$self->formatURL("viewDetail",$listingId)
 			});
 	}
 	my $a = $self->session->db->read("select fieldId, name, fieldType from Matrix_field");
@@ -682,7 +682,7 @@ sub www_editListingSave {
 			$value = $self->session->form->process($name,$type);
 		}
 		$self->session->db->write("replace into Matrix_listingData (assetId, listingId, fieldId, value) values (
-			".$self->session->db->quote($self->getId).", ".$self->session->db->quote($self->session->form->process("listingId")).", ".$self->session->db->quote($id).", ".$self->session->db->quote($value).")");
+			".$self->session->db->quote($self->getId).", ".$self->session->db->quote($listingId).", ".$self->session->db->quote($id).", ".$self->session->db->quote($value).")");
 	}
 	$a->finish;
         return $self->www_viewDetail($listingId);
@@ -779,10 +779,10 @@ sub www_listFields {
         return $self->session->privilege->insufficient() unless($self->canEdit);
 	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
 	my $output = sprintf $i18n->get('list fields'),
-				$self->getUrl("func=editField&amp;fieldId=new");
+				$self->getUrl("func=editField;fieldId=new");
 	my $sth = $self->session->db->read("select fieldId, label from Matrix_field where assetId=".$self->session->db->quote($self->getId)." order by label");
 	while (my ($id, $label) = $sth->array) {
-		$output .= '<a href="'.$self->getUrl("func=editField&amp;fieldId=".$id).'">'.$label.'</a><br />';
+		$output .= '<a href="'.$self->getUrl("func=editField;fieldId=".$id).'">'.$label.'</a><br />';
 	}
 	$sth->finish;
 	return $self->processStyle($output);
@@ -1028,8 +1028,8 @@ sub www_viewDetail {
 	$var{id} = $listingId;
 	$var{'user.canEdit'} = ($self->session->user->userId eq $listing->{maintainerId} || $self->canEdit);
 	$var{'user.canApprove'} = $self->canEdit;
-	$var{'approve.url'} = $self->getUrl("func=approveListing&listingId=".$listingId."&mlog=".$self->session->form->process("mlog"));
-	$var{'delete.url'} = $self->getUrl("func=deleteListing&listingId=".$listingId."&mlog=".$self->session->form->process("mlog"));
+	$var{'approve.url'} = $self->getUrl("func=approveListing;listingId=".$listingId);
+	$var{'delete.url'} = $self->getUrl("func=deleteListing;listingId=".$listingId);
 	$var{'isPending'} = ($listing->{status} eq "pending");
 	$var{'lastUpdated.epoch'} = $listing->{lastupdated};
 	$var{'lastUpdated.date'} = $self->session->datetime->epochToHuman($listing->{lastUpdated},"%z");
@@ -1039,7 +1039,7 @@ sub www_viewDetail {
 	$var{'productUrl.click'} = $self->formatURL("click",$listingId);
 	$var{manufacturerName} = $listing->{manufacturerName};
 	$var{manufacturerUrl} = $listing->{manufacturerUrl};
-	$var{'manufacturerUrl.click'} = $self->getUrl("m=1&amp;func=click&amp;listingId=".$listingId);
+	$var{'manufacturerUrl.click'} = $self->getUrl("m=1;func=click;listingId=".$listingId);
 	$var{versionNumber} = $listing->{versionNumber};
 	my $f = WebGUI::HTMLForm->new($self->session,
 		-extras=>'class="content"',

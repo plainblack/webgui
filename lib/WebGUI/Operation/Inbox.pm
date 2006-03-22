@@ -64,7 +64,7 @@ sub www_viewInbox {
    	$vars->{'dateStamp.label'} = $i18n->get(352);
   	my $messages = WebGUI::Inbox->new($session)->getMessagesForUser($session->user); 
    	foreach my $message (@$messages) {   
-      		my $hash;
+      		my $hash = {};
       		$hash->{'subject'} =  '<a href="'.$session->url->page('op=viewInboxMessage;messageId='.$message->getId).'">'.$message->get("subject").'</a>';
       		$hash->{status} = _status($session)->{$message->get("status")};
 	  	$hash->{'dateStamp'} =$session->datetime->epochToHuman($message->get("dateStamp"));
@@ -86,22 +86,22 @@ Templated display of a single message for the user.
 
 sub www_viewInboxMessage {
 	my $session = shift;
-	my ($data, $vars);
 	return $session->privilege->insufficient() unless ($session->user->isInGroup(2));
 	my $i18n = WebGUI::International->new($session);
+	my $vars = {};
    	$vars->{title} = $i18n->get(159);
 	my $message = WebGUI::Inbox->new($session)->getMessage($session->form->param("messageId"));
 	if (defined $message) {
-	   	$vars->{'subject'} = $data->{subject};
-	   	$vars->{'dateStamp'} =$session->datetime->epochToHuman($data->{dateStamp});
-   		$vars->{'status'} = _status($session)->{$data->{status}}; 
-   		unless ($data->{message} =~ /\<div/ig || $data->{message} =~ /\<br/ig || $data->{message} =~ /\<p/ig) {
-      			$data->{message} =~ s/\n/\<br\>/g;
+	   	$vars->{'subject'} = $message->get("subject");
+	   	$vars->{'dateStamp'} =$session->datetime->epochToHuman($message->get("dateStamp"));
+   		$vars->{'status'} = _status($session)->{$message->get("status")}; 
+		$vars->{message} = $message->get("message");
+   		unless ($vars->{message} =~ /\<div/ig || $vars->{message} =~ /\<br/ig || $vars->{message} =~ /\<p/ig) {
+      			$vars->{message} =~ s/\n/\<br\>/g;
    		}
-   		unless ($data->{message} =~ /\<a/ig) {
-      			$data->{message} =~ s/(http\S*)\s/\<a href=\"$1\"\>$1\<\/a\>/g;
+   		unless ($vars->{message} =~ /\<a/ig) {
+      			$vars->{message} =~ s/(http\S*)/\<a href=\"$1\"\>$1\<\/a\>/g;
    		}
-   		$vars->{'message'} = $data->{message};
 	}
    	$vars->{'accountOptions'} = WebGUI::Operation::Shared::accountOptions($session);
    	return $session->style->userStyle(WebGUI::Asset::Template->new($session,"PBtmpl0000000000000205")->process($vars));

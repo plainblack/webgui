@@ -163,7 +163,8 @@ An epoch date representing when the action associated with this message was comp
 
 sub get {
 	my $self = shift;
-	return $self->{_properties}{shift};
+	my $name = shift;
+	return $self->{_properties}{$name};
 }
 
 
