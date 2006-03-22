@@ -135,6 +135,7 @@ sub view {
 				id => $child->getId,
 				url => $child->getUrl,
 				title => $child->get("title"),
+				canView => $child->canView(),
 				"icon.small"=>$child->getIcon(1),
 				"icon.big"=>$child->getIcon
 				});
@@ -145,6 +146,7 @@ sub view {
 			my $file = $child->getFileUrl if ($isFile);
 			push(@{$vars{"file_loop"}},{
 				id=>$child->getId,
+				canView => $child->canView(),
 				title=>$child->get("title"),
 				synopsis=>$child->get("synopsis"),
 				size=>WebGUI::Utility::formatBytes($child->get("assetSize")),
