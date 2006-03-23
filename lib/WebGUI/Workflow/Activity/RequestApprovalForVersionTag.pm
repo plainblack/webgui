@@ -19,6 +19,7 @@ use strict;
 use base 'WebGUI::Workflow::Activity';
 use WebGUI::VersionTag;
 use WebGUI::Inbox;
+use WebGUI::International;
 
 =head1 NAME
 
@@ -60,12 +61,6 @@ sub definition {
 				label=>$i18n->get("group to approve"),
 				hoverHelp=>$i18n->get("group to approve help")
 				},
-			subject => {
-				fieldType=>"text",
-				defaultValue=>"",
-				label=>$i18n->get("approval subject"),
-				hoverHelp => $i18n->get("approval subject help")
-				},
 			message => {
 				fieldType=>"textarea",
 				defaultValue => "",
@@ -96,13 +91,14 @@ sub execute {
 	my $self = shift;
 	my $versionTag = shift;
 	my $instance = shift;
+	my $i18n = WebGUI::International->new($self->session, "VersionTag");
 	my $inbox = WebGUI::Inbox->new($self->session);
 	if ($instance->getScratch("status") eq "") {
 		my $message = $inbox->addMessage({
-			subject=>$self->get("subject"),
+			subject=>$i18n->get("approve/deny").": ".$versionTag->get("name"),
 			message=>join("\n\n",$self->get("message"),
-				$self->session->url->page("op=manageRevisionsInTag;workflowInstanceId=".$instance->getId.";tagId=".$versionTag->getId),
-				$versionTag->get('name'), $versionTag->get("comments")),
+				$self->session->url->getSiteURL().$self->session->url->page("op=manageRevisionsInTag;workflowInstanceId=".$instance->getId.";tagId=".$versionTag->getId),
+				$versionTag->get("comments")),
 			groupId=>$self->get("groupToApprove"),
 			status=>'pending'
 			});

@@ -65,12 +65,6 @@ sub definition {
 				label=>$i18n->get("who to notify"),
 				hoverHelp=>$i18n->get("who to notify help")
 				},
-			subject => {
-				fieldType=>"text",
-				defaultValue=>"",
-				label=>$i18n->get("notify subject"),
-				hoverHelp => $i18n->get("notify subject help")
-				},
 			message => {
 				fieldType=>"textarea",
 				defaultValue => "",
@@ -97,8 +91,8 @@ sub execute {
 	my $inbox = WebGUI::Inbox->new($self->session);
 	my $properties = {
 		status=>"completed",
-		subject=>$self->get("subject"),
-		message=>$self->get("message")."\n\n".$versionTag->get("name")."\n\n".$versionTag->get("comments"),
+		subject=>$versionTag->get("name"),
+		message=>$self->get("message")."\n\n".$versionTag->get("comments"),
 		};	
 	if ($self->get("who") eq "committer") {
 		$properties->{userId} = $versionTag->get("committedBy");

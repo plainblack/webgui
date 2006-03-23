@@ -54,7 +54,7 @@ sub www_approveVersionTag {
 	my $instance = $tag->getWorkflowInstance;
 	my $activity = $instance->getNextActivity;
 	return $session->privilege->insufficient() unless ($session->user->isInGroup($activity->get("groupToApprove")));
-	if ($session->form->process("status", "selectBox") eq "approved") {
+	if ($session->form->process("status", "selectBox") eq "approve") {
 		$activity->setApproved($instance);
 	} else {
 		$activity->setDenied($instance);

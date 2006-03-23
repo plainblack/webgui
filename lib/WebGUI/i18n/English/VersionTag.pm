@@ -84,34 +84,10 @@ our $I18N = {
 		context => q|hover help for the notify message field|
 	},
 
-	'notify subject' => {
-		message => q|Notification Subject|,
-		lastUpdated => 0,
-		context => q|label in the notify about version tag activity|
-	},
-
-	'notify subject help' => {
-		message => q|Enter the subject line of the approval message.|,
-		lastUpdated => 0,
-		context => q|hover help for the notify subject field|
-	},
-
 	'notify about version tag' => {
 		message => q|Notify About Version Tag|,
 		lastUpdated => 0,
 		context => q|the name of the activity|
-	},
-
-	'approval subject' => {
-		message => q|Approval Subject|,
-		lastUpdated => 0,
-		context => q|label in the request approval for version tag activity|
-	},
-
-	'approval subject help' => {
-		message => q|Enter the subject line of the approval message.|,
-		lastUpdated => 0,
-		context => q|hover help for the approval subject field|
 	},
 
 	'approval message' => {

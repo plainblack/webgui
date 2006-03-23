@@ -96,11 +96,11 @@ sub www_viewInboxMessage {
 	   	$vars->{'dateStamp'} =$session->datetime->epochToHuman($message->get("dateStamp"));
    		$vars->{'status'} = _status($session)->{$message->get("status")}; 
 		$vars->{message} = $message->get("message");
-   		unless ($vars->{message} =~ /\<div/ig || $vars->{message} =~ /\<br/ig || $vars->{message} =~ /\<p/ig) {
-      			$vars->{message} =~ s/\n/\<br\>/g;
-   		}
    		unless ($vars->{message} =~ /\<a/ig) {
       			$vars->{message} =~ s/(http\S*)/\<a href=\"$1\"\>$1\<\/a\>/g;
+   		}
+   		unless ($vars->{message} =~ /\<div/ig || $vars->{message} =~ /\<br/ig || $vars->{message} =~ /\<p/ig) {
+      			$vars->{message} =~ s/\n/\<br \/\>\n/g;
    		}
 	}
    	$vars->{'accountOptions'} = WebGUI::Operation::Shared::accountOptions($session);

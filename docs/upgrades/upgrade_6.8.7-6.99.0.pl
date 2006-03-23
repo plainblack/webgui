@@ -331,14 +331,12 @@ sub addWorkflow {
 	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::RequestApprovalForVersionTag", "pbwfactivity0000000017");
 	$activity->set("title", "Get Approval from Content Managers");
 	$activity->set("groupToApprove", "4");
-	$activity->set("approvalSubject", "Approval Pending");
-	$activity->set("approvalMessage", "A new version tag waits your approval.");
+	$activity->set("message", "A new version tag awaits your approval.");
 	$activity->set("doOnDeny", "pbworkflow000000000006");
 	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::CommitVersionTag", "pbwfactivity0000000016");
 	$activity->set("title", "Commit Assets");
 	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::NotifyAboutVersionTag", "pbwfactivity0000000018");
 	$activity->set("title", "Notify Committer of Approval");
-	$activity->set("subject", "Content Approved");
 	$activity->set("message", "Your version tag was approved.");
 	$activity->set("who", "committer");
 	$workflow = WebGUI::Workflow->create($session, {
@@ -351,7 +349,6 @@ sub addWorkflow {
 	$activity->set("title", "Unlock Version Tag");
 	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::NotifyAboutVersionTag", "pbwfactivity0000000020");
 	$activity->set("title", "Notify Committer of Denial");
-	$activity->set("subject", "Content Denied");
 	$activity->set("message", "Your version tag was denied. Please take corrective actions and recommit your changes.");
 	$activity->set("who", "committer");
 	$workflow = WebGUI::Workflow->create($session, {
@@ -360,7 +357,7 @@ sub addWorkflow {
 		enabled=>1,
 		isSerial=>1,
 		type=>"None"
-		}, "pbworkflow000000000006");
+		}, "pbworkflow000000000007");
 	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::SendQueuedMailMessages", "pbwfactivity0000000021");
 	$activity->set("title", "Send Queued Messages");
 	WebGUI::Workflow::Cron->create($session, {
