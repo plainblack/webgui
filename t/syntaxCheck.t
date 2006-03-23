@@ -20,7 +20,6 @@ use Test::More;
 plan skip_all => 'set TEST_SYNTAX to enable this test' unless $ENV{TEST_SYNTAX};
 
 my @modules;
-my @failed_packages;
 my $wgLib = WebGUI::Test->lib;
 diag("Checking modules in $wgLib");
 File::Find::find( \&getWebGUIModules, $wgLib);
@@ -32,17 +31,9 @@ plan tests => $numTests;
 diag("Planning on $numTests tests");
 
 foreach my $package (@modules) {
-	my $returnVal = system("$^X -I$wgLib -wc $package");
-	is($returnVal, 0, "syntax check for $package");
-	push(@failed_packages, $package) if ($returnVal != 0);
-}
-
-if (@failed_packages) {
-	print "\n# Compilation FAILED for the following packages:\n";
-	foreach my $package (@failed_packages) {
-		print "# - $package\n";
-	}
-	print "\n"
+	my $command = "$^X -I$wgLib -wc $package 2>&1";
+	my $output = `$command`;
+	is($?, 0, "syntax check for $package");
 }
 
 #----------------------------------------

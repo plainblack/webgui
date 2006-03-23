@@ -89,7 +89,7 @@ sub convertMessageLogToInbox {
 	}
 	$session->db->write("delete from userProfileField where fieldname='INBOXNotifications'");
 	$session->db->write("delete from userProfileData where fieldname='INBOXNotifications'");
-	$session->db->write("drop table MessageLog");
+	$session->db->write("drop table if exists messageLog");
 	$rs = $session->db->read("select distinct assetId from template where namespace='Operation/MessageLog/View' or namespace='Operation/MessageLog/Message'");
 	while (my ($id) = $rs->array) {
 		my $asset = WebGUI::Asset->new($session, $id, "WebGUI::Asset::Template");
