@@ -105,7 +105,7 @@ sub deleteScratch {
 	my $self = shift;
 	my $name = shift;
 	delete $self->{_scratch}{$name};
-	$self->session->db->write("delete from WorkflowInstanceScratch where instanceId=?", [$self->getId]);
+	$self->session->db->write("delete from WorkflowInstanceScratch where instanceId=? and name=?", [$self->getId, $name]);
 }
 
 #-------------------------------------------------------------------
@@ -142,6 +142,34 @@ sub get {
 
 #-------------------------------------------------------------------
 
+=head2 getId ( )
+
+Returns the ID of this instance.
+
+=cut
+
+sub getId {
+	my $self = shift;
+	return $self->{_id};
+}
+
+#-------------------------------------------------------------------
+
+=head2 getNextActivity ( )
+
+Returns a reference to the next activity in this workflow from the current position of this instance.
+
+=cut
+
+sub getNextActivity {
+	my $self = shift;
+	my $workflow = $self->getWorkflow;
+	return undef unless defined $workflow;
+	return $workflow->getNextActivity($self->get("currentActivityId"));
+}
+
+#-------------------------------------------------------------------
+
 =head2 getScratch ( name ) 
 
 Returns the value for a given scratch variable. 
@@ -159,15 +187,15 @@ sub getScratch {
 
 #-------------------------------------------------------------------
 
-=head2 getId ( )
+=head2 getWorkflow ( )
 
-Returns the ID of this instance.
+Returns a reference to the workflow object this instance is associated with.
 
 =cut
 
-sub getId {
+sub getWorkflow {
 	my $self = shift;
-	return $self->{_id};
+	return WebGUI::Workflow->new($self->session, $self->get("workflowId"));
 }
 
 #-------------------------------------------------------------------
@@ -212,7 +240,7 @@ Executes the next iteration in this workflow. Returns a status code based upon w
 
 sub run {
 	my $self = shift;
-	my $workflow = WebGUI::Workflow->new($self->session, $self->get("workflowId"));
+	my $workflow = $self->getWorkflow;
 	return "undefined" unless (defined $workflow);
 	return "disabled" unless ($workflow->get("enabled"));
 	my $activity = $workflow->getNextActivity($self->get("currentActivityId"));
@@ -339,7 +367,7 @@ sub setScratch {
 	my $name = shift;
 	my $value = shift;
 	delete $self->{_scratch};
-	$self->session->write("replace into WorkflowInstanceScratch (instanceId, name, value) values (?,?,?)", [$self->getId, $name, $value]);
+	$self->session->db->write("replace into WorkflowInstanceScratch (instanceId, name, value) values (?,?,?)", [$self->getId, $name, $value]);
 }
 
 

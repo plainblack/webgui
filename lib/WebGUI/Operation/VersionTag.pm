@@ -42,6 +42,29 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
+=head2 www_editVersionTag ( session ) 
+
+Sets an approval for a version tag.
+
+=cut
+
+sub www_approveVersionTag {
+	my $session = shift;
+	my $tag = WebGUI::VersionTag->new($session, $session->form->param("tagId"));
+	my $instance = $tag->getWorkflowInstance;
+	my $activity = $instance->getNextActivity;
+	return $session->privilege->insufficient() unless ($session->user->isInGroup($activity->get("groupToApprove")));
+	if ($session->form->process("status", "selectBox") eq "approved") {
+		$activity->setApproved($instance);
+	} else {
+		$activity->setDenied($instance);
+	}
+	$tag->set({comments=>$session->form->process("comments", "textarea")});
+	return www_manageVersions($session);
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_editVersionTag ( session, [ tagId ] )
 
 Displays the edit version tag form.

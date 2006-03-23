@@ -150,6 +150,19 @@ sub getId {
 
 #-------------------------------------------------------------------
 
+=head2 getWorkflowInstance ( )
+
+Returns a reference to the workflow instance attached to this version tag if any.
+
+=cut
+
+sub getWorkflowInstance {
+	my $self = shift;
+	return WebGUI::Workflow::Instance->new($self->session, $self->get("workflowInstanceId"));
+}
+
+#-------------------------------------------------------------------
+
 =head2 getWorking ( session, noCreate )
 
 This is a class method. Returns the current working version tag for this user as set by setWorking(). If there is no current working tag an autotag will be created and assigned as the working tag for this user.
@@ -245,6 +258,8 @@ sub requestCommit {
 		methodName=>"new",
 		parameters=>$self->getId
 		});	
+	$self->{_data}{workflowInstanceId} = $instance->getId;
+	$self->session->db->setRow("assetVersionTag","tagId",$self->{_data});
 }
 
 

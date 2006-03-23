@@ -103,12 +103,15 @@ sub execute {
 			message=>join("\n\n",$self->get("message"),
 				$self->session->url->page("op=manageRevisionsInTag;workflowInstanceId=".$instance->getId.";tagId=".$versionTag->getId),
 				$versionTag->get('name'), $versionTag->get("comments")),
-			groupId=>$self->get("groupToApprove")
+			groupId=>$self->get("groupToApprove"),
+			status=>'pending'
 			});
 		$instance->setScratch("messageId",$message->getId);
 		$instance->setScratch("status","notified");
 		return $self->WAITING;
 	} elsif ($instance->getScratch("status") eq "denied") {
+		my $message = $inbox->getMessage($instance->getScratch("messageId"));
+		$message->setCompleted;
 		my $newInstance = WebGUI::Workflow::Instance->create($self->session, {
 			workflowId=>$self->get("doOnDeny"),
 			methodName=>$instance->get("methodName"),
@@ -129,6 +132,41 @@ sub execute {
 }
 
 
+#-------------------------------------------------------------------
+
+=head2 setApproved ( insstance )
+
+Marks this approved so that the workflow engine knows it can continue on as approved.
+
+=head3 instance
+
+A reference to the instance that you wish to set this approved.
+
+=cut
+
+sub setApproved {
+	my $self = shift;
+	my $instance = shift;
+	$instance->setScratch("status","approved");
+}	
+
+#-------------------------------------------------------------------
+
+=head2 setDenied ( insstance )
+
+Marks this approved so that the workflow engine knows it can continue on as denied.
+
+=head3 instance
+
+A reference to the instance that you wish to set this denied.
+
+=cut
+
+sub setDenied {
+	my $self = shift;
+	my $instance = shift;
+	$instance->setScratch("status","denied");
+}	
 
 
 1;
