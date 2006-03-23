@@ -362,8 +362,8 @@ sub view {
 
 sub www_view {
         my $self = shift;
-        my $output = $self->view;
         return $self->session->privilege->noAccess() unless $self->canView;
+        my $output = $self->view;
         # this is s a stop gap. we need to do something here that deals with the real www_view and caching, etc.
         if ($self->session->http->getMimeType() ne "text/html") {
                 return $output;
