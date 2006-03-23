@@ -258,7 +258,7 @@ Shows a list of the revisions for this asset.
 sub www_manageRevisions {
         my $self = shift;
         my $ac = WebGUI::AdminConsole->new($self->session,"versions");
-        return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(3));
+        return $self->session->privilege->insufficient() unless ($self->canEdit);
         my $i18n = WebGUI::International->new($self->session,"Asset");
         my $output = '<table width=100% class="content">
         <tr><th></th><th>Revision Date</th><th>Revised By</th><th>Tag Name</th></tr> ';

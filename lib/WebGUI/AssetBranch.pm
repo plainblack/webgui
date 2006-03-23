@@ -270,7 +270,7 @@ Verifies proper inputs in the Asset Tree and saves them. Returns ManageAssets me
 
 sub www_editBranchSave {
 	my $self = shift;
-	return $self->session->privilege->insufficient() unless ($self->canEdit && WebGUI::Grouping::isInGroup('4'));
+	return $self->session->privilege->insufficient() unless ($self->canEdit && $self->session->user->isInGroup('4'));
 	my %data;
 	$data{isHidden} = $self->session->form->yesNo("isHidden") if ($self->session->form->yesNo("change_isHidden"));
 	$data{newWindow} = $self->session->form->yesNo("newWindow") if ($self->session->form->yesNo("change_newWindow"));

@@ -49,7 +49,11 @@ sub www_addWorkflow {
 		);
 	my %options = ();
 	foreach my $object (keys %{$session->config->get("workflowActivities")}) {
-		$options{$object} = $object;
+		if ($object eq "None") {
+			$options{$object} = $i18n->get("no object");
+		} else {
+			$options{$object} = $object;
+		}
 	}
 	$f->selectBox(
 		name=>"type",

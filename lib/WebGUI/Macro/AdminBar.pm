@@ -106,8 +106,9 @@ sub process {
 			icon=>$session->config->get("extrasURL").'/adminConsole/small/versionTags.gif'
 			});
 	}
-	my $rs = $session->db->read("select tagId, name from assetVersionTag where isCommitted=0 and isLocked=0 order by name");
-	while (my ($id, $name) = $rs->array) {
+	my $rs = $session->db->read("select tagId, name, groupToUse from assetVersionTag where isCommitted=0 and isLocked=0 order by name");
+	while (my ($id, $name, $group) = $rs->array) {
+		next unless $session->user->isInGroup($group);
 		push(@tags, {
 			url=>$session->url->page("op=setWorkingVersionTag;backToSite=1;tagId=".$id),
 			title=>($id eq $workingId) ?  '<span style="color: #000080;">* '.$name.'</span>' : $name,

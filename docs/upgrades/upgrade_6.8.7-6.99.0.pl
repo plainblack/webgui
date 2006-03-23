@@ -39,8 +39,23 @@ addNavigationMimeType();
 addIndexes();
 addDatabaseCache();
 updateHelpTemplate();
+fixImportNodePrivileges();
 
 finish($session); # this line required
+
+#-------------------------------------------------
+sub fixImportNodePrivileges {
+	print "\tFixing the privileges of all the content in the import node.\n";
+	my $importNode = WebGUI::Asset->getImportNode($session);
+	$importNode->update({groupIdView=>'7', groupIdEdit=>'12'});
+	my $prepared = $session->db->prepare("update assetData set groupIdView='7', groupIdEdit='12' where assetId=?");
+	my $rs = $session->db->read("select assetId from asset where lineage like ?",[$importNode->get("lineage").'%']);
+	while (my ($id) = $rs->array) {
+		$prepared->execute([$id]);	
+	}
+	my $root = WebGUI::Asset->getRoot($session);
+	$root->update({groupIdView=>'7'});
+}
 
 #-------------------------------------------------
 sub convertMessageLogToInbox {

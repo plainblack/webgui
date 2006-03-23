@@ -340,11 +340,11 @@ sub set {
 	$self->{_data}{workflowId} = $properties->{workflowId} || $self->{_data}{workflowId} || $self->session->setting->get("defaultVersionTagWorkflow");
 	$self->{_data}{groupToUse} = $properties->{groupToUse} || $self->{_data}{groupToUse} || "12";
 	if (exists $properties->{comments}) {
-		$self->{_data}{comments}=$self->{_data}{comments}
-                                .$self->session->datetime->epochToHuman.' - '.$self->session->user->username
+		$self->{_data}{comments}=$self->session->datetime->epochToHuman.' - '.$self->session->user->username
                                 ."\n"
                                 .$properties->{comments}
-                                ."\n\n";
+                                ."\n\n"
+				.$self->{_data}{comments};
 	}
 	$self->session->db->setRow("assetVersionTag","tagId",$self->{_data});
 }

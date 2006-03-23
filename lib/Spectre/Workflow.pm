@@ -374,7 +374,7 @@ sub workerResponse {
 	} elsif ($response->is_redirect) {
 		$self->debug("Response for $instanceId was redirected.");
 	} elsif ($response->is_error) {	
-		$self->debug("Response for $instanceId had a communications error.");
+		$self->debug("Response for $instanceId had a communications error. ".$response->error_as_HTML);
 		$kernel->yield("suspendInstance",$instanceId)
 		# we should probably log something
 	}

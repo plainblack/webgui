@@ -1,6 +1,12 @@
 package WebGUI::i18n::English::Workflow;
 
 our $I18N = { 
+	'no object' => {
+		message => q|No Object|,
+		context => q|used when selecting an object type to be passed through a workflow|,
+		lastUpdated => 0,
+	},
+
 	'confirm delete activity' => {
 		message => q|Are you certain you wish to delete this activity from this workflow?|,
 		context => q|prompt the user before deleting an activity from a workflow|,
