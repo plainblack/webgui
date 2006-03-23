@@ -305,6 +305,15 @@ sub getAdminFunction {
 			op=>"viewLoginHistory",
 			group=>"3"
 		},
+		"inbox"=>{
+			title=>{
+				id=>"159",
+				namespace=>"WebGUI"
+			},
+			icon=>"inbox.gif",
+			op=>"viewInbox",
+			group=>"2"
+		},
 		"activeSessions"=>{
 			title=>{
 				id=>"425",
