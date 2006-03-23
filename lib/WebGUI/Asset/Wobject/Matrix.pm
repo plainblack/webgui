@@ -972,7 +972,7 @@ sub view {
 	$var{'best_rating_loop'} = \@best;
 	$var{'worst_rating_loop'} = \@worst;
 	$var{'ratings.details.url'} = $self->getUrl("func=viewRatingDetails");
-	my $data = $self->session->db->quickHashRef("select lastUpdated, productName, listingId from Matrix_listing 
+	$data = $self->session->db->quickHashRef("select lastUpdated, productName, listingId from Matrix_listing 
 		where assetId=".$self->session->db->quote($self->getId)." and status='approved'  order by lastUpdated desc limit 1");
 	my @lastUpdated;
         my $sth = $self->session->db->read("select listingId,lastUpdated,productName from Matrix_listing order by lastUpdated desc limit 20");
@@ -992,7 +992,7 @@ sub view {
 	($var{'user.count'}) = $self->session->db->quickArray("select count(*) from users");
 	($var{'current.user.count'}) = $self->session->db->quickArray("select count(*)+0 from userSession where lastPageView>".($self->session->datetime->time()-600));
 	($var{'listing.count'}) = $self->session->db->quickArray("select count(*) from Matrix_listing where status = 'approved' and assetId=".$self->session->db->quote($self->getId));
-        my $sth = $self->session->db->read("select listingId,productName from Matrix_listing where status='pending'");
+        $sth = $self->session->db->read("select listingId,productName from Matrix_listing where status='pending'");
         while (my ($id,$name) = $sth->array) {
                 push(@{$var{pending_list}},{
                         url=>$self->formatURL("viewDetail",$id),
