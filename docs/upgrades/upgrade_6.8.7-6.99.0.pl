@@ -407,6 +407,10 @@ sub updateDatabaseLinksAndSQLReport {
 sub updateTemplates {
         print "\tUpdating base templates for XHTML compliance, and a cleaner look.\n" unless ($quiet);
 	$session->db->write("alter table template add column headBlock text");
+	my $template = WebGUI::Asset->new($session, "PBtmpl0000000000000003", "WebGUI::Asset::Template");
+	if (defined $template) {
+		$template->trash;
+	}
 	opendir(DIR,"templates-6.99.0");
 	my @files = readdir(DIR);
 	closedir(DIR);

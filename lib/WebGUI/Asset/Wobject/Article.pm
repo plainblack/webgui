@@ -154,7 +154,6 @@ sub view {
 	my $children = $self->getLineage(["children"],{returnObjects=>1,includeOnlyClasses=>["WebGUI::Asset::File","WebGUI::Asset::File::Image"]});
 	foreach my $child (@{$children}) {
 		if (ref $child eq "WebGUI::Asset::File") {
-			$var{"attachment.box"} = $child->getBox;
 			$var{"attachment.icon"} = $child->getFileIconUrl;
 			$var{"attachment.url"} = $child->getFileUrl;
 			$var{"attachment.name"} = $child->get("filename");

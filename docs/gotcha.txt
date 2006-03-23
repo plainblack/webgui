@@ -57,6 +57,13 @@ save you many hours of grief.
 	Test::Deep
 	Test::MockObject
 
+ * The content in the import node has had inappropriate privileges
+	since it was created. We're resetting the privileges to be
+	viewable by everyone and editable by the turn admin on
+	group. If this is not what you want for your site, or for
+	segments of the content in your import node, you'll need
+	to change it after the upgrade.
+
 
 6.8.4
 --------------------------------------------------------------------

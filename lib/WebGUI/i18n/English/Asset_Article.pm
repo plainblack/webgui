@@ -136,11 +136,6 @@ The first three sentences in the description. A sentence is determined by counti
 The first four sentences in the description. A sentence is determined by counting the periods found in the text.
 <p>
 
-
-<b>attachment.box</b><br/>
-Outputs a standard WebGUI attachment box including icon, filename, and attachment indicator.
-<p/>
-
 <b>attachment.icon</b><br/>
 The URL to the icon image for this attachment type.
 <p/>
