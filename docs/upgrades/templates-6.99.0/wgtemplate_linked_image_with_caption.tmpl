@@ -32,7 +32,7 @@
 </tmpl_if>
 
 <tmpl_if pagination.isLastPage>
-	<tmpl_var attachment.box>
+	<tmpl_var attachment.icon> <tmpl_var attachment.name> <tmpl_var attachment.name>
 	<p />
 </tmpl_if>
 
@@ -54,8 +54,8 @@
 <tmpl_if allowDiscussion>
 	<p />
 	<table width="100%" cellspacing="2" cellpadding="1" border="0">
-	<tr><td align="center" width="50%" class="tableMenu"><a href="<tmpl_var replies.URL>"><tmpl_var replies.label> (<tmpl_var replies.count>)</a></td>
-	<td align="center" width="50%" class="tableMenu"><a href="<tmpl_var post.url>"><tmpl_var post.label></a></td></tr>
+	<tr><td align="center" style="width:50%;" class="tableMenu"><a href="<tmpl_var replies.URL>"><tmpl_var replies.label> (<tmpl_var replies.count>)</a></td>
+	<td align="center" style="width:50%;" class="tableMenu"><a href="<tmpl_var post.url>"><tmpl_var post.label></a></td></tr>
 	</table>
 </tmpl_if>
 </tmpl_if>
