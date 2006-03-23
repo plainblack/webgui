@@ -755,7 +755,11 @@ sub removeFiles {
 #-------------------------------------------------
 sub addDisabletoRichEditor {
 	print "\tUpdating Rich Editor to add master disable.\n" unless ($quiet);
-	$session->db->write("alter table RichEdit add column disableRichEditor int(11) default '0'");
+	my $sth = $session->db->read('show columns from RichEdit');
+	my $numColumns = $sth->rows;
+	$sth->finish;
+	# only add the column if it doesn't already exist.
+	$session->db->write("alter table RichEdit add column disableRichEditor int(11) default 0") if ($numColumns < 21);
 }
 
 #-------------------------------------------------
