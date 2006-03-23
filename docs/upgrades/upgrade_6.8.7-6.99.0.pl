@@ -68,7 +68,7 @@ sub convertMessageLogToInbox {
 		completedBy varchar(22) binary,
 		userId varchar(22) binary,
 		groupId varchar(22) binary,
-		subject varchar(256) not null default 'No Subject',
+		subject varchar(255) not null default 'No Subject',
 		message mediumtext
 		)");	
 	$session->db->write("alter table Matrix_listing add column approvalMessageId varchar(22) binary");
