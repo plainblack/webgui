@@ -1,0 +1,30 @@
+#PBtmpl0000000000000117
+<tmpl_if displayTitle>
+	<h2><tmpl_var title></h2>
+</tmpl_if>
+
+<tmpl_if description>
+	<p><tmpl_var description></p>
+</tmpl_if>
+
+<script type="text/javascript" defer="defer">
+<!--
+function go(formObj) {
+	if (formObj.chooser.options[formObj.chooser.selectedIndex].value != "none") {
+		location = formObj.chooser.options[formObj.chooser.selectedIndex].value;
+	}
+}
+//-->
+</script>
+
+<form action="#">
+<tmpl_if session.var.adminOn><tmpl_var controls></tmpl_if>
+<p style="margin:0px;">
+<select name="chooser" size="1" onchange="go(this.form)">
+<option value="none">Where do you want to go?</option>
+<tmpl_loop page_loop>
+	<option value="<tmpl_var page.url>"><tmpl_loop page.indent_loop>&nbsp;&nbsp;</tmpl_loop>- <tmpl_var page.menuTitle></option>
+</tmpl_loop>
+</select>
+</p>
+</form>

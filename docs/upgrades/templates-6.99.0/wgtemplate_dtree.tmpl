@@ -1,0 +1,37 @@
+#PBtmpl0000000000000130
+<tmpl_if displayTitle>
+	<h2><tmpl_var title></h2>
+</tmpl_if>
+
+<tmpl_if description>
+	<p><tmpl_var description></p>
+</tmpl_if>
+
+^StyleSheet("<tmpl_var session.config.extrasURL>/Navigation/dtree/dtree.css");
+^JavaScript("<tmpl_var session.config.extrasURL>/Navigation/dtree/dtree.js");
+
+<tmpl_if session.var.adminOn>
+	<tmpl_var controls>
+</tmpl_if>
+
+<div class="dtree">
+<script type="text/javascript">
+<!--
+	// Path to dtree directory
+	_dtree_url = "<tmpl_var session.config.extrasURL>/Navigation/dtree/";
+
+	d = new dTree('d');
+	<tmpl_loop page_loop>
+	d.add(
+		'<tmpl_var page.assetId escape=JS>',
+		<tmpl_if __first__>-99<tmpl_else>'<tmpl_var page.parentId escape=JS>'</tmpl_if>,
+		'<tmpl_var page.menuTitle escape=JS>',
+		'<tmpl_var page.url escape=JS>',
+		'<tmpl_var page.synopsis escape=JS>'
+		<tmpl_if page.newWindow>,'_blank'</tmpl_if>
+	);
+	</tmpl_loop>
+	document.write(d);
+//-->
+</script>
+</div>

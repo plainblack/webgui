@@ -1,0 +1,19 @@
+#PBtmpl0000000000000124
+		<tmpl_if displayTitle>
+		<h2><tmpl_var title></h2>
+		</tmpl_if>
+		<tmpl_if description>
+			<p><tmpl_var description></p>
+		</tmpl_if>
+		<tmpl_if session.var.adminOn>
+<tmpl_var controls>
+</tmpl_if>
+<tmpl_loop page_loop>
+   <tmpl_if page.isCurrent>
+      <span class="rootTabOn">
+   <tmpl_else>
+      <span class="rootTabOff">
+   </tmpl_if>
+   <a <tmpl_if page.newWindow></tmpl_if> href="<tmpl_var page.url>"><tmpl_var page.menuTitle></a>
+   </span>
+</tmpl_loop>

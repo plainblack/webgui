@@ -1,0 +1,18 @@
+#PBtmpl0000000000000071
+		<tmpl_if displayTitle>
+		<h1><tmpl_var title></h1>
+		</tmpl_if>
+		<tmpl_if description>
+			<p><tmpl_var description></p>
+		</tmpl_if>
+		<tmpl_if session.var.adminOn>
+<tmpl_var controls>
+</tmpl_if>
+<span class="horizontalMenu">
+<tmpl_loop page_loop>
+<a class="horizontalMenu"
+   <tmpl_if page.newWindow></tmpl_if>
+   href="<tmpl_var page.url>"><tmpl_var page.menuTitle></a>
+   <tmpl_unless "__last__"> &middot; </tmpl_unless>
+</tmpl_loop>
+</span>
