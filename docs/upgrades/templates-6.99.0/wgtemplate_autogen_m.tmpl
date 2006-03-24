@@ -11,8 +11,7 @@
 <span class="horizontalMenu">
 <tmpl_loop page_loop>
 <a class="horizontalMenu" 
-   <tmpl_if page.newWindow>target="_blank"</tmpl_if>
-   href="<tmpl_var page.url>"><tmpl_var page.menuTitle></a>
+   <tmpl_if page.newWindow>onclick="window.open('<tmpl_var page.url>')" href="#" <tmpl_else>href="<tmpl_var page.url>"</tmpl_if>><tmpl_var page.menuTitle></a>
    <tmpl_unless "__last__"> &middot; </tmpl_unless>
 </tmpl_loop>
 </span>

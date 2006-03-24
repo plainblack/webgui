@@ -11,8 +11,7 @@
 <span class="crumbTrail">
 <tmpl_loop page_loop>
 <a class="crumbTrail" 
-   <tmpl_if page.newWindow></tmpl_if>
-   href="<tmpl_var page.url>"><tmpl_var page.menuTitle></a>
+    <tmpl_if page.newWindow>onclick="window.open('<tmpl_var page.url>')" href="#" <tmpl_else>href="<tmpl_var page.url>"</tmpl_if>><tmpl_var page.menuTitle></a>
    <tmpl_unless "__last__"> &gt; </tmpl_unless>
 </tmpl_loop>
 </span>

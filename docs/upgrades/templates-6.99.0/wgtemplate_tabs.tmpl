@@ -14,6 +14,6 @@
    <tmpl_else>
       <span class="rootTabOff">
    </tmpl_if>
-   <a <tmpl_if page.newWindow></tmpl_if> href="<tmpl_var page.url>"><tmpl_var page.menuTitle></a>
+   <a  <tmpl_if page.newWindow>onclick="window.open('<tmpl_var page.url>')" href="#" <tmpl_else>href="<tmpl_var page.url>"</tmpl_if>><tmpl_var page.menuTitle></a>
    </span>
 </tmpl_loop>

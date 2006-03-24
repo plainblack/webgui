@@ -11,7 +11,7 @@
 <span class="verticalMenu">
 <tmpl_loop page_loop>
 <tmpl_var page.indent>
-	<a <tmpl_if page.isCurrent>class="selectedMenuItem"</tmpl_if> <tmpl_if page.newWindow></tmpl_if> href="<tmpl_var page.url>"><tmpl_var page.menuTitle></a>
+	<a <tmpl_if page.isCurrent>class="selectedMenuItem"</tmpl_if> <tmpl_if page.newWindow>onclick="window.open('<tmpl_var page.url>')" href="#" <tmpl_else>href="<tmpl_var page.url>"</tmpl_if>><tmpl_var page.menuTitle></a>
 	<br />		
 </tmpl_loop>
 </span>
