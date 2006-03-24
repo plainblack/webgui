@@ -118,6 +118,26 @@ sub www_deleteWorkflowActivity {
 	return www_editWorkflow($session);
 }
 
+#------------------------------------------------------------------
+
+=head2 www_demoteWorkflowActivity ( session )
+
+Moves a workflow activity down one position in the execution order.
+
+=head3 session
+
+A reference to the current session.
+
+=cut
+
+sub www_demoteWorkflowActivity {
+	my $session = shift;
+	return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
+	my $workflow = WebGUI::Workflow->new($session, $session->form->param("workflowId"));
+	$workflow->demoteActivity($session->form->param("activityId"));
+	return www_editWorkflow($session);
+}
+
 #-------------------------------------------------------------------
 
 =head2 www_editWorkflow ( session, workflow )
@@ -184,11 +204,13 @@ sub www_editWorkflow {
 		);
 	$f->submit;
 	my $steps = '<table class="content">';
-	my $rs = $session->db->read("select activityId, title from workflowActivity where workflowId=?",[$workflow->getId]);
+	my $rs = $session->db->read("select activityId, title from workflowActivity where workflowId=? order by sequenceNumber",[$workflow->getId]);
 	while (my ($id, $title) = $rs->array) {
 		$steps .= '<tr><td>'
 			.$session->icon->delete("op=deleteWorkflowActivity;workflowId=".$workflow->getId.";activityId=".$id, undef, $i18n->get("confirm delete activity"))
 			.$session->icon->edit("op=editWorkflowActivity;workflowId=".$workflow->getId.";activityId=".$id)
+			.$session->icon->moveDown("op=demoteWorkflowActivity;workflowId=".$workflow->getId.";activityId=".$id)
+			.$session->icon->moveUp("op=promoteWorkflowActivity;workflowId=".$workflow->getId.";activityId=".$id)
 			.'</td><td>'.$title.'</td></tr>';	
 	}
 	$steps .= '</table>';
@@ -300,6 +322,27 @@ sub www_manageWorkflows {
 	my $ac = WebGUI::AdminConsole->new($session,"workflow");
 	$ac->addSubmenuItem($session->url->page("op=addWorkflow"), $i18n->get("add a new workflow"));
 	return $ac->render($output);
+}
+
+
+#------------------------------------------------------------------
+
+=head2 www_promoteWorkflowActivity ( session )
+
+Moves a workflow activity up one position in the execution order.
+
+=head3 session
+
+A reference to the current session.
+
+=cut
+
+sub www_promoteWorkflowActivity {
+	my $session = shift;
+	return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
+	my $workflow = WebGUI::Workflow->new($session, $session->form->param("workflowId"));
+	$workflow->promoteActivity($session->form->param("activityId"));
+	return www_editWorkflow($session);
 }
 
 #-------------------------------------------------------------------

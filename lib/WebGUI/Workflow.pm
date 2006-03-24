@@ -131,6 +131,31 @@ sub deleteActivity {
 
 #-------------------------------------------------------------------
 
+=head2 demoteActivity ( activityId ) 
+
+Moves an activity down one position in the execution order.
+
+=head3 activityId
+
+The id of the activity to move.
+
+=cut
+
+sub demoteActivity {
+	my $self = shift;
+	my $thisId = shift;
+        my ($thisSeq) = $self->session->db->quickArray("select sequenceNumber from WorkflowActivity where activityId=?",[$thisId]);
+        my ($otherId) = $self->session->db->quickArray("select activityId from WorkflowActivity where workflowId=? and sequenceNumber=?",[$self->getId, $thisSeq+1]);
+        if ($otherId ne "") {
+                $self->session->db->write("update WorkflowActivity set sequenceNumber=sequenceNumber+1 where activityId=?", [$thisId]);
+                $self->session->db->write("update WorkflowActivity set sequenceNumber=sequenceNumber-1 where activityId=?", [$otherId]);
+                $self->reorderActivities;
+        }
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 DESTROY ( )
 
 Deconstructor.
@@ -285,6 +310,49 @@ sub new {
 	return undef unless $data->{workflowId};
 	bless {_session=>$session, _id=>$workflowId, _data=>$data}, $class;
 }
+
+#-------------------------------------------------------------------
+
+=head2 promoteActivity ( activityId ) 
+
+Moves an activity up one position in the execution order.
+
+=head3 activityId
+
+The id of the activity to move.
+
+=cut
+
+sub promoteActivity {
+	my $self = shift;
+	my $thisId = shift;
+        my ($thisSeq) = $self->session->db->quickArray("select sequenceNumber from WorkflowActivity where activityId=?",[$thisId]);
+        my ($otherId) = $self->session->db->quickArray("select activityId from WorkflowActivity where workflowId=? and sequenceNumber=?",[$self->getId, $thisSeq-1]);
+        if ($otherId ne "") {
+                $self->session->db->write("update WorkflowActivity set sequenceNumber=sequenceNumber-1 where activityId=?", [$thisId]);
+                $self->session->db->write("update WorkflowActivity set sequenceNumber=sequenceNumber+1 where activityId=?", [$otherId]);
+                $self->reorderActivities;
+        }
+}
+
+#-------------------------------------------------------------------
+
+=head3 reorderActivities ( )
+
+Reorders the acitivities to make sure they're consecutive.
+
+=cut
+
+sub reorderActivities {
+	my $self = shift;
+        my $sth = $self->session->db->read("select activityId from WorkflowActivity where workflowId=? order by sequenceNumber",[$self->getId]);
+	my $i = 0;
+        while (my ($id) = $sth->array) {
+                $i++;   
+                $self->session->db->write("update WorkflowActivity set sequenceNumber=? where activityId=?",[$i, $id]);
+        }               
+}    
+
 
 #-------------------------------------------------------------------
 
