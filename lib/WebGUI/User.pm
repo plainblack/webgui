@@ -143,7 +143,7 @@ sub delete {
 	foreach my $groupId (@{$self->getGroups($self->userId)}) {
 		WebGUI::Group->new($self->session,$groupId)->deleteUsers([$self->userId]);
 	}
-	$self->session->db->write("delete from messageLog where userId=?",[$self->{_userId}]);
+	$self->session->db->write("delete from inbox where userId=? and (groupId is null or groupId='')",[$self->{_userId}]);
 	require WebGUI::Operation::Auth;
 	my $authMethod = WebGUI::Operation::Auth::getInstance($self->session,$self->authMethod,$self->{_userId});
 	$authMethod->deleteParams($self->{_userId});
