@@ -510,8 +510,7 @@ sub www_listUsers {
 	my $session = shift;
 	unless ($session->user->isInGroup(3)) {
 		if ($session->user->isInGroup(11)) {
-			$session->form->process("uid") = "new";
-			return www_editUser();
+			return www_editUser($session, undef, "new");
 		}
 		return $session->privilege->adminOnly();
 	}
