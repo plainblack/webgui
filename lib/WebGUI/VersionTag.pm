@@ -96,7 +96,7 @@ sub commit {
 		$asset->commit;
 	}
 	$self->{_data}{isCommitted} = 1;
-	$self->{_data}{committedBy} = $self->session->user->userId;
+	$self->{_data}{committedBy} = $self->session->user->userId unless ($self->{_data}{committedBy});
 	$self->{_data}{commitDate} = $self->session->datetime->time();
 	$self->session->db->setRow("assetVersionTag", "tagId", $self->{_data});
 	$self->clearWorking;
@@ -258,6 +258,7 @@ sub requestCommit {
 		methodName=>"new",
 		parameters=>$self->getId
 		});	
+	$self->{_data}{committedBy} = $self->session->user->userId;
 	$self->{_data}{workflowInstanceId} = $instance->getId;
 	$self->session->db->setRow("assetVersionTag","tagId",$self->{_data});
 }

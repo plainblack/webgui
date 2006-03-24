@@ -128,7 +128,7 @@ sub www_editBranch {
                 -name=>"newWindow",
                 -value=>$self->get("newWindow"),
                 -label=>$i18n->get(940),
-		-hoverHelp=>$i18n->get('940 description',"Asset"),
+		-hoverHelp=>$i18n->get('940 description'),
                 -uiLevel=>6,
 		-subtext=>'<br />'.$i18n->get("change").' '.WebGUI::Form::yesNo($self->session,{name=>"change_newWindow"})
                 );

@@ -260,10 +260,10 @@ a URL will be made from the parent's URL and the <b>Menu Title</b>.<br />
         },
 
         '940 description' => {
-                message => q|<p>Select yes to open this asset in a new window.<br />
-<i>UI level: 6</i>
+                message => q|<p>Select yes to open this asset in a new window. Note that there are potentially many problems with this. It may not work in some navigations, or if the user turns off Javascript, or it may be blocked by some pop-up blockers. Use this feature with care.<br />
+<i>UI level: 9</i>
 </p>|,
-                lastUpdated => 1127426196,
+                lastUpdated => 1143218834,
         },
 
         'encrypt page description' => {

@@ -373,11 +373,6 @@ Be aware that any database links you create here will be available to all conten
 		lastUpdated => 1056151382
 	},
 
-	'940' => {
-		message => q|Open in new window?|,
-		lastUpdated => 1050438829
-	},
-
 	'43' => {
 		message => q|Are you certain that you wish to delete this content?|,
 		lastUpdated => 1031514049

@@ -550,7 +550,7 @@ sub getEditForm {
                 -value=>$self->get("newWindow"),
                 -label=>$i18n->get(940),
 		-hoverHelp=>$i18n->get('940 description'),
-                -uiLevel=>6
+                -uiLevel=>9
                 );
 	$tabform->addTab("security",$i18n->get(107),6);
         $tabform->getTab("security")->yesNo(
