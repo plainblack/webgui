@@ -407,7 +407,7 @@ sub www_manageRevisionsInTag {
 		my $asset = WebGUI::Asset->new($session,$id,$class,$date);
                 $output .= '<tr><td>'
 			.$session->icon->delete("func=purgeRevision;proceed=manageRevisionsInTag;tagId=".$tag->getId.";revisionDate=".$date,$asset->get("url"),$i18n->get("purge revision prompt"))
-			.$session->icon->view("func=viewRevision;revisionDate=".$date, $asset->get("url"))
+			.$session->icon->view("func=view;revision=".$date, $asset->get("url"))
 			.'</td>
 			<td>'.$asset->getTitle.'</td>
 			<td><img src="'.$asset->getIcon(1).'" alt="'.$asset->getName.'" />'.$asset->getName.'</td>

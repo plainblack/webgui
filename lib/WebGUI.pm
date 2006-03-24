@@ -178,7 +178,8 @@ sub page {
 			$output = "An error was encountered while processing your request.";
 		}
 		$output = "An error was encountered while processing your request." if $output eq '';
-	} elsif ($output eq "chunked") {
+	}
+	if ($output eq "chunked") {
 		$output = undef;
 	}
 	if ($session->errorHandler->canShowDebug()) {

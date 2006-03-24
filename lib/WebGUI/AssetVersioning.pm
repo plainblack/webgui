@@ -268,7 +268,7 @@ sub www_manageRevisions {
         while (my ($date,$by,$tag,$tagId) = $sth->array) {
                 $output .= '<tr><td>'
 			.$self->session->icon->delete("func=purgeRevision;revisionDate=".$date,$self->get("url"),$i18n->get("purge revision prompt"))
-			.$self->session->icon->view("func=viewRevision;revisionDate=".$date)
+			.$self->session->icon->view("func=view;revision=".$date)
 			.'</td>
 			<td>'.$self->session->datetime->epochToHuman($date).'</td>
 			<td>'.$by.'</td>
@@ -294,15 +294,6 @@ sub www_purgeRevision {
 		return "";
 	}
 	return $self->www_manageRevisions;
-}
-
-
-#-------------------------------------------------------------------
-
-sub www_viewRevision {
-	my $self = shift;
-	my $otherSelf = WebGUI::Asset->new($self->session,$self->getId,$self->get("className"),$self->session->form->process("revisionDate"));
-	return (defined $otherSelf) ? $otherSelf->www_view : undef;
 }
 
 1;

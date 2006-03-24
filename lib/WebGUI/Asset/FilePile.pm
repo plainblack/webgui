@@ -158,7 +158,10 @@ sub editSave {
 		$data{storageId} = $storage->getId;
 		$data{filename} = $data{title} = $data{menuTitle} = $filename;
 		$data{templateId} = 'PBtmpl0000000000000024';
-		$data{templateId} = 'PBtmpl0000000000000088' if ($selfName eq  "WebGUI::Asset::File::Image");
+		if ($selfName eq  "WebGUI::Asset::File::Image") {
+			$data{templateId} = 'PBtmpl0000000000000088';
+			$data{parameters} = 'alt="'.$self->get("title").'"';
+		}
 		$data{url} = $self->getParent->get('url').'/'.$filename;
 		my $newAsset = $self->getParent->addChild(\%data);
 		delete $newAsset->{_storageLocation};
