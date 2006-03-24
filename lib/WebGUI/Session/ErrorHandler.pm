@@ -295,7 +295,7 @@ sub info {
 	my $self = shift;
 	my $message = shift;
 	$self->getLogger->info($message);
-        $self->session->stow->set("debug_info") = $self->session->stow->get("debug_info").$message."\n";
+        $self->session->stow->set("debug_info", $self->session->stow->get("debug_info").$message."\n");
 }
 
 #-------------------------------------------------------------------
