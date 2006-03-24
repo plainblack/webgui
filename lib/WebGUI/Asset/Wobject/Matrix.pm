@@ -950,7 +950,7 @@ sub view {
 			order by 
 				Matrix_ratingSummary.meanValue
 			";
-		my $data = $self->session->db->quickHashRef($sql." desc limit 1");
+		$data = $self->session->db->quickHashRef($sql." desc limit 1");
 		push(@best,{
 			url=>$self->formatURL("viewDetail",$data->{listingId}),
 			category=>$category,
