@@ -19,10 +19,7 @@ use WebGUI::Session;
 use HTML::Form;
 use Test::MockObject;
 
-#The goal of this test is to verify that Text form elements
-#work, via HTMLForm.  HTML::Form is actuall parsing the HTML
-#looking for stuff inside form tags, which is why we have to use
-#HTMLForm.
+#The goal of this test is to verify that Textarea form elements work
 
 use Test::More; # increment this value for each test you create
 

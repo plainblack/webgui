@@ -14,12 +14,13 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Form;
-use WebGUI::Form::Text;
+use WebGUI::Form::Email;
 use WebGUI::Session;
 use HTML::Form;
 use Test::MockObject;
 
-#The goal of this test is to verify that Text form elements work
+#The goal of this test is to verify that Email form elements work.
+#The Email form accepts and validates an email address.
 
 use Test::More; # increment this value for each test you create
 
@@ -27,7 +28,7 @@ my $session = WebGUI::Test->session;
 
 # put your tests here
 
-my $numTests = 10;
+my $numTests = 8;
 
 diag("Planning on running $numTests tests\n");
 
@@ -37,9 +38,9 @@ my ($header, $footer) = (WebGUI::Form::formHeader($session), WebGUI::Form::formF
 
 my $html = join "\n",
 	$header, 
-	WebGUI::Form::Text->new($session, {
-		name => 'TestText',
-		value => 'Some text in here',
+	WebGUI::Form::Email->new($session, {
+		name => 'TestEmail',
+		value => 'me@nowhere.com',
 	})->toHtml,
 	$footer;
 
@@ -55,9 +56,9 @@ is(scalar @inputs, 1, 'The form has 1 input');
 #Basic tests
 
 my $input = $inputs[0];
-is($input->name, 'TestText', 'Checking input name');
+is($input->name, 'TestEmail', 'Checking input name');
 is($input->type, 'text', 'Checking input type');
-is($input->value, 'Some text in here', 'Checking default value');
+is($input->value, 'me@nowhere.com', 'Checking default value');
 is($input->disabled, undef, 'Disabled param not sent to form');
 
 ##Test Form Output parsing
@@ -67,31 +68,17 @@ $request->mock('body',
 	sub {
 		my ($self, $value) = @_;
 		my @return = ();
-		return 'some user value' if ($value eq 'TestText');
-		return "some user value\nwith\r\nwhitespace" if ($value eq 'TestText2');
+		return 'me@nowhere.com' if ($value eq 'TestEmail');
+		return "what do you want?" if ($value eq 'TestEmail2');
 		return;
 	}
 );
 $session->{_request} = $request;
 
-my $value = $session->form->get('TestText', 'Text');
-is($value, 'some user value', 'checking existent form value');
-$value = $session->form->get('TestText2', 'Text');
-is($value, 'some user valuewithwhitespace', 'checking form postprocessing for whitespace');
+my $value = $session->form->get('TestEmail', 'Email');
+is($value, 'me@nowhere.com', 'checking existent form value');
+$value = $session->form->get('TestEmail2', 'Email');
+is($value, undef, 'checking form postprocessing for bad email address');
 
-##Form value preprocessing
-##Note that HTML::Form will unencode the text for you.
+##Email form does no preprocessing of its input
 
-$html = join "\n",
-	$header, 
-	WebGUI::Form::Text->new($session, {
-		name => 'preTestText',
-		value => q!Some & text in " here!,
-	})->toHtml,
-	$footer;
-
-@forms = HTML::Form->parse($html, 'http://www.webgui.org');
-@inputs = $forms[0]->inputs;
-$input = $inputs[0];
-is($input->name, 'preTestText', 'Checking input name');
-is($input->value, 'Some & text in " here', 'Checking default value');
