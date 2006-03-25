@@ -13,36 +13,38 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::HTMLForm;
+use WebGUI::Form;
+use WebGUI::Form::Text;
 use WebGUI::Session;
 use HTML::Form;
 use Test::MockObject;
 
 #The goal of this test is to verify that Text form elements
-#work, via HTMLForm.
+#work, via HTMLForm.  HTML::Form is actuall parsing the HTML
+#looking for stuff inside form tags, which is why we have to use
+#HTMLForm.
 
 use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-my $i18n = WebGUI::International->new($session);
-
 # put your tests here
 
-my $numTests = 8;
+my $numTests = 10;
 
 diag("Planning on running $numTests tests\n");
 
 plan tests => $numTests;
 
-my $HTMLForm = WebGUI::HTMLForm->new($session);
+my ($header, $footer) = (WebGUI::Form::formHeader($session), WebGUI::Form::formFooter($session));
 
-$HTMLForm->text(
-	-name => 'TestText',
-	-value => 'Some text in here',
-);
-
-my $html = $HTMLForm->print;
+my $html = join "\n",
+	$header, 
+	WebGUI::Form::Text->new($session, {
+		name => 'TestText',
+		value => 'Some text in here',
+	})->toHtml,
+	$footer;
 
 my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 
@@ -52,6 +54,8 @@ is(scalar @forms, 1, '1 form was parsed');
 
 my @inputs = $forms[0]->inputs;
 is(scalar @inputs, 1, 'The form has 1 input');
+
+#Basic tests
 
 my $input = $inputs[0];
 is($input->name, 'TestText', 'Checking input name');
@@ -77,3 +81,20 @@ my $value = $session->form->get('TestText', 'Text');
 is($value, 'some user value', 'checking existent form value');
 $value = $session->form->get('TestText2', 'Text');
 is($value, 'some user valuewithwhitespace', 'checking form postprocessing for whitespace');
+
+##Form value preprocessing
+##Note that HTML::Form will unencode the text for you.
+
+$html = join "\n",
+	$header, 
+	WebGUI::Form::Text->new($session, {
+		name => 'preTestText',
+		value => q!Some & text in " here!,
+	})->toHtml,
+	$footer;
+
+@forms = HTML::Form->parse($html, 'http://www.webgui.org');
+@inputs = $forms[0]->inputs;
+$input = $inputs[0];
+is($input->name, 'preTestText', 'Checking input name');
+is($input->value, 'Some & text in " here', 'Checking default value');
