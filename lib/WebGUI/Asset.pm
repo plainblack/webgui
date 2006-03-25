@@ -1696,6 +1696,7 @@ sub www_add {
 		printableStyleTemplateId => $self->get("printableStyleTemplateId"),
 		isHidden => $self->get("isHidden"),
 		className=>$class,
+		url=>$self->session->form->param("url"),
 		assetId=>"new"
 		);
 	$properties{isHidden} = 1 unless (WebGUI::Utility::isIn($class, @{$self->session->config->get("assetContainers")}));

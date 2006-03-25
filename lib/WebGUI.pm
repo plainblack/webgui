@@ -136,7 +136,7 @@ sub fixupHandler {
 
 #-------------------------------------------------------------------
 
-=head2 page ( session )
+=head2 page ( session , [ assetUrl ] )
 
 Processes operations (if any), then tries the requested method on the asset corresponding to the requested URL.  If that asset fails to be created, it tries the default page.
 
@@ -144,16 +144,20 @@ Processes operations (if any), then tries the requested method on the asset corr
 
 The current WebGUI::Session object.
 
+=head3 assetUrl
+
+Optionally pass in a URL to be loaded.
+
 =cut
 
 sub page {
 	my $session = shift;
-	my $assetUrl = shift;
+	my $assetUrl = shift || $session->url->getRequestedUrl;
 	my $output = processOperations($session);
 	if ($output eq "") {
 		my $asset = eval{WebGUI::Asset->newByUrl($session,$assetUrl,$session->form->process("revision"))};
 		if ($@) {
-			$session->errorHandler->warn("Couldn't instantiate asset for url: ".$session->url->getRequestedUrl." Root cause: ".$@);
+			$session->errorHandler->warn("Couldn't instantiate asset for url: ".$assetUrl." Root cause: ".$@);
 		}
 		if (defined $asset) {
 			my $method = "view";
@@ -169,15 +173,20 @@ sub page {
 		}
 	}
 	if (defined($output) and $output eq "") {
-		$session->http->setStatus("404","Page Not Found");
-		my $notFound = WebGUI::Asset->getNotFound($session);
-		if (defined $notFound) {
-			$output = tryAssetMethod($session,$notFound,'view');
-		} else {
-			$session->errorHandler->error("The notFound page failed to be created!");
-			$output = "An error was encountered while processing your request.";
+		if ($session->var->isAdminOn) { # they're expecting it to be there, so let's help them add it
+			my $asset = WebGUI::Asset->newByUrl($session, $session->url->getRefererUrl) || WebGUI::Asset->getDefault($session);
+			$session->http->setRedirect($asset->getUrl("func=add;assetId=new;class=WebGUI::Asset::Wobject::Layout;url=".$assetUrl));
+		} else { # not in admin mode, so can't create it,  so display not found
+			$session->http->setStatus("404","Page Not Found");
+			my $notFound = WebGUI::Asset->getNotFound($session);
+			if (defined $notFound) {
+				$output = tryAssetMethod($session,$notFound,'view');
+			} else {
+				$session->errorHandler->error("The notFound page could not be instanciated!");
+				$output = "An error was encountered while processing your request.";
+			}
+			$output = "An error was encountered while processing your request." if $output eq '';
 		}
-		$output = "An error was encountered while processing your request." if $output eq '';
 	}
 	if ($output eq "chunked") {
 		$output = undef;
