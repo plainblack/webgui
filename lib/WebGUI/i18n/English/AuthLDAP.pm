@@ -167,7 +167,7 @@ Internationalized text label for the karma form value.
 
 <P>
 <B>account.options</B><BR>
-Links list of options which allow users to turn on Admin, view and edit profile, view the messageLog, etc.
+Links list of options which allow users to turn on Admin, view and edit profile, view the inbox, etc.
 
 <P>
 <B>displayTitle</B><BR>

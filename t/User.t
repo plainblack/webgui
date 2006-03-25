@@ -128,8 +128,8 @@ is($count, '0', 'delete() -- users table');
 ($count) = $session->db->quickArray("select count(*) from userProfileData where userId=?",[$userId]);
 is($count, '0', 'delete() -- userProfileData table');
 
-($count) = $session->db->quickArray("select count(*) from messageLog where userId=?",[$userId]);
-is($count, '0', 'delete() -- messageLog table'); 
+($count) = $session->db->quickArray("select count(*) from inbox where userId=?",[$userId]);
+is($count, '0', 'delete() -- inbox table'); 
 
 #Let's test new with an override uid
 $user = WebGUI::User->new($session, "new", "ROYSUNIQUEUSERID000001");
@@ -200,8 +200,8 @@ is($count, '0', 'delete() -- users table');
 ($count) = $session->db->quickArray("select count(*) from userProfileData where userId=".$session->db->quote($userId));
 is($count, '0', 'delete() -- userProfileData table');
 
-($count) = $session->db->quickArray("select count(*) from messageLog where userId=".$session->db->quote($userId));
-is($count, '0', 'delete() -- messageLog table'); 
+($count) = $session->db->quickArray("select count(*) from inbox where userId=".$session->db->quote($userId));
+is($count, '0', 'delete() -- inbox table'); 
 
 
 ok(WebGUI::User->validUserId($session, 1), 'Visitor has a valid userId');
