@@ -4,16 +4,125 @@ use lib "../../lib";
 use strict;
 use Getopt::Long;
 use WebGUI::Session;
-
-
+use WebGUI::VersionTag;
+use WebGUI::Asset;
+use WebGUI::Utility;
 
 
 my $session = start(); # this line required
 
+my $versionTag = WebGUI::VersionTag->getWorking($session);
+$versionTag->set({name=>"Stuff just for 7.0 installs"});
 addPrototypes();
+rearrangeImportNode();
+$versionTag->commit;
+purgeOldRevisions();
 
 finish($session); # this line required
 
+
+#-------------------------------------------------
+sub rearrangeImportNode {
+	print "\tRearranging import node.\n";
+	my @oldFolders = $session->db->buildArray("select assetId from asset where className='WebGUI::Asset::Wobject::Folder' and assetId<>'PBasset000000000000002'");
+	my $import = WebGUI::Asset->getImportNode($session);
+	my $rs1 = $session->db->read("select distinct namespace from template order by namespace");
+	while (my ($namespace) = $rs1->array) {
+		next if (isIn($namespace, qw(Matrix/Compare Matrix/Detail Matrix/RatingDetail Matrix/Search EventManagementSystem_checkout EventManagementSystem_product Collaboration/Notification Collaboration/PostForm Collaboration/RSS Collaboration/Search Collaboration/Thread EventsCalendar/Event Inbox/Message InOutBoard/Report StockData/Display Survey/Gradebook Survey/Overview Survey/Response Commerce/CheckoutCanceled Commerce/ConfirmCheckout Commerce/Product Commerce/SelectPaymentGateway Commerce/SelectShippingMethod Commerce/TransactionError Commerce/ViewPurchaseHistory Commerce/ViewShoppingCart DataForm/List)));
+		my $folder = $import->addChild({
+			assetId=>"new",
+			styleTemplateId=>'PBtmpl0000000000000060',
+			className=>"WebGUI::Asset::Wobject::Folder",
+			title=>$namespace,
+			menuTitle=>$namespace,
+			url=>'root/import/'.$namespace,
+			ownerUserId=>'3',
+			groupIdView=>'7',
+			groupIdEdit=>'12',
+			templateId=>'PBtmpl0000000000000078'
+			});
+		my $rs2 = "";
+		if (isIn($namespace, qw(Matrix EventManagementSystem Collaboration EventsCalendar Inbox InOutBoard StockData Survey DataForm))) {
+			$rs2 = $session->db->read("select assetId from template where namespace like ?",[$namespace.'%']);
+		} else {
+			$rs2 = $session->db->read("select assetId from template where namespace=?",[$namespace]);
+		}
+		while (my ($id) = $rs2->array) {
+			my $asset = WebGUI::Asset->new($session, $id, "WebGUI::Asset::Template");
+			$asset->setParent($folder) if defined $asset;
+		}
+		if ($namespace eq "SyndicatedContent") {
+			foreach my $id (qw(SynConXSLT000000000001 SynConXSLT000000000002 SynConXSLT000000000003 SynConXSLT000000000004)) {
+				my $asset = WebGUI::Asset->new($session, $id, "WebGUI::Asset::Snippet");
+				$asset->setParent($folder) if defined $asset;
+			}
+		} elsif ($namespace eq "Navigation") {
+			my $navFolder = WebGUI::Asset->new($session, "Wmjn6I1fe9DKhiIR39YC0g", "WebGUI::Asset::Wobject::Folder");
+			foreach my $asset (@{$navFolder->getLineage(["children"],{returnObjects=>1})}) {
+				$asset->setParent($folder) if defined $asset;
+			}
+		} elsif ($namespace eq "Collaboration") {
+			foreach my $id (qw(pbproto000000000000001)) {
+				my $asset = WebGUI::Asset->new($session, $id, "WebGUI::Asset::Wobject::Collaboration");
+				$asset->setParent($folder) if defined $asset;
+			}
+		}
+	}
+	my $folder = $import->addChild({
+		assetId=>"new",
+		styleTemplateId=>'PBtmpl0000000000000060',
+		className=>"WebGUI::Asset::Wobject::Folder",
+		title=>'Commerce',
+		menuTitle=>'Commerce',
+		url=>'root/import/commerce',
+		ownerUserId=>'3',
+		groupIdView=>'7',
+		groupIdEdit=>'12',
+		templateId=>'PBtmpl0000000000000078'
+		});
+	foreach my $id (qw(PBtmpl0000000000000015 PBtmpl0000000000000016 PBtmplCP00000000000001 PBtmpl0000000000000017 PBtmplCSSM000000000001 PBtmpl0000000000000018 PBtmpl0000000000000019 PBtmplVSC0000000000001)) {
+		my $asset = WebGUI::Asset->new($session, $id, "WebGUI::Asset::Template");
+		$asset->setParent($folder) if defined $asset;
+	}
+	my $folder = $import->addChild({
+		assetId=>"new",
+		styleTemplateId=>'PBtmpl0000000000000060',
+		className=>"WebGUI::Asset::Wobject::Folder",
+		title=>'RichEdit',
+		menuTitle=>'RichEdit',
+		url=>'root/import/richedit',
+		ownerUserId=>'3',
+		groupIdView=>'7',
+		groupIdEdit=>'12',
+		templateId=>'PBtmpl0000000000000078'
+		});
+	foreach my $id (qw(PBrichedit000000000001 PBrichedit000000000002)) {
+		my $asset = WebGUI::Asset->new($session, $id, "WebGUI::Asset::RichEdit");
+		$asset->setParent($folder) if defined $asset;
+	}
+	foreach my $id (@oldFolders) {
+		my $folder = WebGUI::Asset->new($session, $id, "WebGUI::Asset::Wobject::Folder");
+		$folder->purge if (defined $folder);
+	}
+}
+
+#-------------------------------------------------
+sub purgeOldRevisions {
+	print "\tGetting rid of the old cruft.\n";
+	my $rs1 = $session->db->read("select assetId, className from asset");
+	while (my ($id, $class) = $rs1->array) {
+		my $asset = WebGUI::Asset->new($session, $id, $class);
+		if (defined $asset) {
+			if ($asset->getRevisionCount > 1) {
+				my $rs2 = $session->db->read("select revisionDate from assetData where assetId=? and revisionDate<>?",[$id, $asset->get("revisionDate")]);
+				while (my ($version) = $rs2->array) {
+					my $old = WebGUI::Asset->new($session, $id, $class, $version);
+					$old->purgeRevision if defined $old;
+				}
+			}	
+		}
+	}
+}
 
 #-------------------------------------------------
 sub addPrototypes {
@@ -50,16 +159,12 @@ sub start {
 	);
 	my $session = WebGUI::Session->open("../..",$configFile);
 	$session->user({userId=>3});
-	my $versionTag = WebGUI::VersionTag->getWorking($session);
-	$versionTag->set({name=>"Stuff just for 7.0 installs"});
 	return $session;
 }
 
 #-------------------------------------------------
 sub finish {
 	my $session = shift;
-	my $versionTag = WebGUI::VersionTag->getWorking($session);
-	$versionTag->commit;
 	$session->close();
 }
 

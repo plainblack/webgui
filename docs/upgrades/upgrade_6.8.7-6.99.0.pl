@@ -95,7 +95,7 @@ sub convertMessageLogToInbox {
 	while (my ($id) = $rs->array) {
 		my $asset = WebGUI::Asset->new($session, $id, "WebGUI::Asset::Template");
 		if (defined $asset) {
-			$asset->trash;
+			$asset->purge;
 		}
 	}
 }
@@ -206,7 +206,7 @@ sub addWorkflow {
 	while (my ($id) = $rs->array) {
 		my $asset = WebGUI::Asset->newByDynamicClass($session, $id);
 		if ($asset->get("status") eq "denied") {
-			$asset->trash;
+			$asset->purge;
 		}
 	}
 	$session->db->write("update assetData set status='approved' where status='denied'");
@@ -410,7 +410,7 @@ sub updateTemplates {
 	$session->db->write("alter table template add column headBlock text");
 	my $template = WebGUI::Asset->new($session, "PBtmpl0000000000000003", "WebGUI::Asset::Template");
 	if (defined $template) {
-		$template->trash;
+		$template->purge;
 	}
 	opendir(DIR,"templates-6.99.0");
 	my @files = readdir(DIR);
@@ -559,6 +559,9 @@ EOT3
         $in->addChild({
                  className=>'WebGUI::Asset::Template',
                  template=>$template,
+		title=>'Default Event Management System',
+		menuTitle=>'Default Event Management System',
+		url=>'default-ems-template',
                  namespace=>'EventManagementSystem',
                  }, "EventManagerTmpl000001"
         );
@@ -566,12 +569,18 @@ EOT3
         $in->addChild({
         	className=>'WebGUI::Asset::Template',
         	template=>$template2,
+		title=>'Default Event Management System Product',
+		menuTitle=>'Default Event Management System Product',
+		url=>'default-ems-product-template',
         	namespace=>'EventManagementSystem_product',
         	}, "EventManagerTmpl000002"
 	);
 	
 	$in->addChild({
 		className=>'WebGUI::Asset::Template',
+		title=>'Default Event Management System Checkout',
+		menuTitle=>'Default Event Management System Checkout',
+		url=>'default-ems-checkout-template',
 		template=>$template3,
 		namespace=>'EventManagementSystem_checkout',
 		}, "EventManagerTmpl000003"
