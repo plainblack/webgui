@@ -702,7 +702,6 @@ sub processPropertiesFromFormPost {
 			}
 		}
 	}
-	$self->session->form->process("proceed") = "redirectToParent";
 	# clear some cache
 	WebGUI::Cache->new($self->session,"wobject_".$self->getThread->getParent->getId."_".$self->session->user->userId)->delete;
 	WebGUI::Cache->new($self->session,"cspost_".($self->getParent->getId)."_".$self->session->user->userId."_".$self->session->scratch->get("discussionLayout")."_1")->delete;
@@ -996,6 +995,7 @@ sub www_edit {
 				});
 		} elsif ($self->session->form->process("class") eq "WebGUI::Asset::Post::Thread") { # new thread
 			return $self->session->privilege->insufficient() unless ($self->getThread->getParent->canPost);
+			$var{'form.header'} .= WebGUI::Form::hidden($self->session, {name=>"proceed", value=>"redirectToParent"});
 			$var{isNewThread} = 1;
                 	if ($self->getThread->getParent->canModerate) {
                         	$var{'sticky.form'} = WebGUI::Form::yesNo($self->session, {

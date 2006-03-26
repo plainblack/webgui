@@ -851,9 +851,10 @@ sub getToolbar {
 	return undef unless $self->canEdit;
 	return $self->{_toolbar} if (exists $self->{_toolbar});
 	my $i18n = WebGUI::International->new($self->session, "Asset");
-	my $toolbar = $self->session->icon->delete('func=delete',$self->get("url"),$i18n->get(43));
+	my $toolbar = "";
 	my $commit;
 	if ($self->canEditIfLocked) {
+		$toolbar .= $self->session->icon->delete('func=delete',$self->get("url"),$i18n->get(43));
         	$toolbar .= $self->session->icon->edit('func=edit',$self->get("url"));
 	} else {
 		$toolbar .= $self->session->icon->locked('func=manageRevisions',$self->get("url"));

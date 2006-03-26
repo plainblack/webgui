@@ -212,7 +212,7 @@ sub getNextThread {
 	my $self = shift;
         unless (defined $self->{_next}) {
 		my $sortBy = $self->getParent->getValue("sortBy");
-		my ($id, $class, $version) = $self->session->db->quickArray("
+		my ($id, $class, $version) = $self->session->dbSlave->quickArray("
 				select asset.assetId,asset.className,max(assetData.revisionDate)
 				from Thread
 				left join asset on asset.assetId=Thread.assetId 
@@ -229,7 +229,7 @@ sub getNextThread {
 						)
 				group by assetData.assetId
 				order by ".$sortBy." asc 
-				",$self->session->dbSlave);
+				");
 		$self->{_next} = WebGUI::Asset->new($self->session, $id,$class,$version);
 	#	delete $self->{_next} unless ($self->{_next}->{_properties}{className} =~ /Thread/);
 	};
@@ -263,7 +263,7 @@ sub getPreviousThread {
 	my $self = shift;
         unless (defined $self->{_previous}) {
 		my $sortBy = $self->getParent->getValue("sortBy");
-		my ($id, $class, $version) = $self->session->db->quickArray("
+		my ($id, $class, $version) = $self->session->dbSlave->quickArray("
 				select asset.assetId,asset.className,max(assetData.revisionDate)
 				from Thread
 				left join asset on asset.assetId=Thread.assetId 
@@ -279,7 +279,7 @@ sub getPreviousThread {
 						or (assetData.ownerUserId=".$self->session->db->quote($self->session->user->userId)." and assetData.ownerUserId<>'1')
 						)
 				group by assetData.assetId
-				order by ".$sortBy." desc, assetData.revisionDate desc ",$self->session->dbSlave);
+				order by ".$sortBy." desc, assetData.revisionDate desc ");
 		$self->{_previous} = WebGUI::Asset::Post::Thread->new($self->session, $id,$class,$version);
 	#	delete $self->{_previous} unless ($self->{_previous}->{_properties}{className} =~ /Thread/);
 	};
@@ -737,8 +737,8 @@ sub view {
         $var->{'unsubscribe.url'} = $self->getUnsubscribeUrl;
 
         $var->{'isArchived'} = $self->get("status") eq "archived";
-        $var->{'archive.url'} = $self->getArchivedUrl;
-        $var->{'unarchive.url'} = $self->getUnarchivedUrl;
+        $var->{'archive.url'} = $self->getArchiveUrl;
+        $var->{'unarchive.url'} = $self->getUnarchiveUrl;
 
         $var->{'isSticky'} = $self->isSticky;
         $var->{'stick.url'} = $self->getStickUrl;

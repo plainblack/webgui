@@ -26,6 +26,7 @@ my $session = start(); # this line required
 
 addWorkflow();
 convertMessageLogToInbox();
+addCsPopularityContest();
 templateParsers();
 removeFiles();
 addSearchEngine();
@@ -105,7 +106,7 @@ sub addCsPopularityContest {
 	$session->db->write("alter table Collaboration add column defaultKarmaScale integer not null default 1");
 	$session->db->write("alter table Thread add column karma integer not null default 0");
 	$session->db->write("alter table Thread add column karmaScale integer not null default 1");
-	$session->db->write("alter table Thread add column karmaRank decimal(5,6) not null default 0");
+	$session->db->write("alter table Thread add column karmaRank decimal(6,6) not null default 0");
 }
 
 #-------------------------------------------------
