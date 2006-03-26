@@ -10,6 +10,7 @@
  - Addded a lock menu item to explicitly lock an asset from editing.
  - Run on registration and alert on new user have been converted to a single
    workflow.
+ - Added a Photogallery prototype to the default installation.
  - Added a wiki-like feature that will automatically bring a user to the
    create a page form if they are in admin mode, and click on a link to
    a page that doesn't exist yet.

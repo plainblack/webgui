@@ -175,7 +175,7 @@ sub page {
 	if (defined($output) and $output eq "") {
 		if ($session->var->isAdminOn) { # they're expecting it to be there, so let's help them add it
 			my $asset = WebGUI::Asset->newByUrl($session, $session->url->getRefererUrl) || WebGUI::Asset->getDefault($session);
-			$session->http->setRedirect($asset->getUrl("func=add;assetId=new;class=WebGUI::Asset::Wobject::Layout;url=".$assetUrl));
+			$session->http->setRedirect($asset->getUrl("func=add;class=WebGUI::Asset::Wobject::Layout;url=".$assetUrl));
 		} else { # not in admin mode, so can't create it,  so display not found
 			$session->http->setStatus("404","Page Not Found");
 			my $notFound = WebGUI::Asset->getNotFound($session);

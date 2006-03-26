@@ -1677,7 +1677,7 @@ sub www_add {
 		return "";
 	}
 	if ($self->session->form->process('prototype')) {
-		my $prototype = WebGUI::Asset->new($self->session->form->process("prototype"),$class);
+		my $prototype = WebGUI::Asset->new($self->session, $self->session->form->process("prototype"),$class);
 		foreach my $definition (@{$prototype->definition($self->session)}) { # cycle through rather than copying properties to avoid grabbing stuff we shouldn't grab
 			foreach my $property (keys %{$definition->{properties}}) {
 				next if (isIn($property,qw(title menuTitle url isPrototype isPackage)));
@@ -1696,10 +1696,11 @@ sub www_add {
 		printableStyleTemplateId => $self->get("printableStyleTemplateId"),
 		isHidden => $self->get("isHidden"),
 		className=>$class,
-		url=>$self->session->form->param("url"),
-		assetId=>"new"
+		assetId=>"new",
+		url=>$self->session->form->param("url")
 		);
 	$properties{isHidden} = 1 unless (WebGUI::Utility::isIn($class, @{$self->session->config->get("assetContainers")}));
+$self->session->errorHandler->warn($properties{url});
 	my $newAsset = WebGUI::Asset->newByPropertyHashRef($self->session,\%properties);
 	$newAsset->{_parent} = $self;
 	return $self->session->privilege->insufficient() unless ($newAsset->canAdd($self->session));
