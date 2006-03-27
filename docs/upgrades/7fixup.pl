@@ -15,11 +15,115 @@ my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Stuff just for 7.0 installs"});
 addPrototypes();
 rearrangeImportNode();
+addNewStyles();
 $versionTag->commit;
 purgeOldRevisions();
 
 finish($session); # this line required
 
+
+#-------------------------------------------------
+sub addNewStyles {
+	print "\tAdding new 7.0 styles.\n";
+	my $assetCounter = 0;
+	my $import = WebGUI::Asset->getImportNode($session);
+	my $styleCounter = 0;
+	foreach my $style (qw(style1 style2 style3)) {
+		$styleCounter++;
+		opendir(DIR,$style);
+		my @files = readdir(DIR);
+		closedir(DIR);
+		$assetCounter++;
+		my $folder = $import->addChild({
+			styleTemplateId=>'PBtmpl0000000000000060',
+			className=>"WebGUI::Asset::Wobject::Folder",
+			title=>"WebGUI 7 Style ".$styleCounter,
+			menuTitle=>"WebGUI 7 Style ".$styleCounter,
+			url=>'root/import/webgui-7-style-'.$styleCounter,
+			ownerUserId=>'3',
+			groupIdView=>'7',
+			groupIdEdit=>'12',
+			templateId=>'PBtmpl0000000000000078'
+			},"7.0-style".sprintf("%013d",$assetCounter));
+		foreach my $file (@files) {
+			next if $file eq "..";
+			next if $file eq ".";
+			$assetCounter++;
+			my $newId = "7.0-style".sprintf("%013d",$assetCounter);
+			if ($file =~ m/\.[png|jpg|gif]+$/) {
+				my $asset = $folder->addChild({
+					className=>"WebGUI::Asset::File::Image",
+					title=>$file,
+					menuTitle=>$file,
+					url=>$file,
+					ownerUserId=>'3',
+					groupIdView=>'7',
+					groupIdEdit=>'12',
+					filename=>$file
+					},"7.0-style".sprintf("%013d",$assetCounter));
+				$asset->getStorageLocation->addFileFromFileSystem($style."/".$file);
+				$asset->getStorageLocation->generateThumbnail($file);
+			} elsif ($file =~ m/.tmpl$/) {
+				open(FILE,"<".$style."/".$file);
+				my $first = 1;
+				my $head = 0;
+				my %properties = (className=>"WebGUI::Asset::Template");
+				while (my $line = <FILE>) {
+					if ($first) {
+						$line =~ m/^\#(.*)$/;
+						$properties{id} = $1;
+						$first = 0;
+					} elsif ($line =~ m/^\#create$/) {
+					} elsif ($line =~ m/^\#(.*):(.*)$/) {
+						$properties{$1} = $2;
+					} elsif ($line =~ m/^~~~$/) {
+						$head = 1;
+					} elsif ($head) {
+						$properties{headBlock} .= $line;
+					} else {
+						$properties{template} .= $line;	
+					}
+				}
+				close(FILE);
+				my $template = $folder->addChild(\%properties, $properties{id});
+			} elsif ($file =~ m/.nav$/) {
+				open(FILE,"<".$style."/".$file);
+				my $first = 1;
+				my $head = 0;
+				my %properties = (className=>"WebGUI::Asset::Wobject::Navigation", styleTemplateId=>'PBtmpl0000000000000060');
+				while (my $line = <FILE>) {
+					if ($first) {
+						$line =~ m/^\#(.*)$/;
+						$properties{id} = $1;
+						$first = 0;
+					} elsif ($line =~ m/^\#(.*):(.*)$/) {
+						$properties{$1} = $2;
+					}
+				}
+				close(FILE);
+				my $template = $folder->addChild(\%properties, "7.0-style".sprintf("%013d",$assetCounter));
+			} elsif ($file =~ m/.snippet$/) {
+				open(FILE,"<".$style."/".$file);
+				my $head = 0;
+				my %properties = (className=>"WebGUI::Asset::Snippet");
+				while (my $line = <FILE>) {
+					if ($line =~ m/^\#(.*):(.*)$/) {
+						$properties{$1} = $2;
+					} else {
+						$properties{snippet} .= $line;	
+					}
+				}
+				close(FILE);
+				my $template = $folder->addChild(\%properties, "7.0-style".sprintf("%013d",$assetCounter));
+			}
+		}
+	}
+#	$session->db->write("update assetData set templateId='stevesnewid' where templateId in ('B1bNjWVtzSjsvGZh9lPz_A','9tBSOV44a9JPS8CcerOvYw')");
+#	my $asset = WebGUI::Asset->new($session,'9tBSOV44a9JPS8CcerOvYw');
+#	$asset->purge if defined $asset;
+#	my $asset = WebGUI::Asset->new($session,'B1bNjWVtzSjsvGZh9lPz_A');
+#	$asset->purge if defined $asset;
+}
 
 #-------------------------------------------------
 sub rearrangeImportNode {
