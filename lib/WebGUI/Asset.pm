@@ -873,6 +873,7 @@ sub getToolbar {
 		//<![CDATA[
 		var contextMenu = new contextMenu_createWithImage("'.$self->getIcon(1).'","'.$self->getId.'","'.$self->getName.'");
 		'.$lock.'
+		contextMenu.addLink("'.$self->getUrl("func=changeUrl").'","'.$i18n->get("change url").'");
 		contextMenu.addLink("'.$self->getUrl("func=editBranch").'","'.$i18n->get("edit branch").'");
 		contextMenu.addLink("'.$self->getUrl("func=promote").'","'.$i18n->get("promote").'");
 		contextMenu.addLink("'.$self->getUrl("func=demote").'","'.$i18n->get("demote").'");
@@ -1024,6 +1025,7 @@ sub manageAssets {
          assetManager.AddColumn('".$i18n->get("locked")."','','center','');\n";
 	foreach my $child (@{$self->getLineage(["children"],{returnObjects=>1})}) {
 		$output .= 'var contextMenu = new contextMenu_createWithLink("'.$child->getId.'","More");
+                contextMenu.addLink("'.$child->getUrl("func=changeUrl;proceed=manageAssets").'","'.$i18n->get("change url").'");
                 contextMenu.addLink("'.$child->getUrl("func=editBranch").'","'.$i18n->get("edit branch").'");
                 contextMenu.addLink("'.$child->getUrl("func=createShortcut;proceed=manageAssets").'","'.$i18n->get("create shortcut").'");
 		contextMenu.addLink("'.$child->getUrl("func=manageRevisions").'","'.$i18n->get("revisions").'");
@@ -1723,6 +1725,52 @@ sub www_ajaxInlineView {
 	return $self->view;
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 www_changeUrl ( )
+
+Allows a user to change a url permanently to something else.
+
+=cut
+
+sub www_changeUrl {
+	my $self = shift;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
+	my $i18n = WebGUI::International->new($self->session, "Asset");
+	my $f = WebGUI::HTMLForm->new($self->session, action=>$self->getUrl);
+	$f->hidden(name=>"func", value=>"changeUrlConfirm");
+	$f->hidden(name=>"proceed", value=>$self->session->form->param("proceed"));
+	$f->text(name=>"url", value=>$self->get('url'), label=>$i18n->get("104"), hoverHelp=>$i18n->get('104 description'));
+	$f->yesNo(name=>"confirm", value=>0, label=>$i18n->get("confirm change"), hoverHelp=>$i18n->get("confirm change url message"), subtext=>'<br />'.$i18n->get("confirm change url message"));
+	$f->submit;
+	return $self->getAdminConsole->render($f->print,$i18n->get("change url"));
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_changeUrlConfirm ( )
+
+This actually does the change url of the www_changeUrl() function.
+
+=cut
+
+sub www_changeUrlConfirm {
+	my $self = shift;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
+	if ($self->session->form->process("confirm","yesNo") && $self->session->form->process("url","text")) {
+		$self->update({url=>$self->session->form->process("url","text")});
+	 	my $rs = $self->session->db->read("select revisionDate from assetData where assetId=? and revisionDate<>?",[$self->getId, $self->get("revisionDate")]);
+                while (my ($version) = $rs->array) {
+                	my $old = WebGUI::Asset->new($self->session, $self->getId, $self->get("className"), $version);
+                        $old->purgeRevision if defined $old;
+                }
+	}
+	if ($self->session->form->param("proceed") eq "manageAssets") {
+		return $self->www_manageAssets;
+	}
+	return undef;
+}
 
 #-------------------------------------------------------------------
 

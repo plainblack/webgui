@@ -1,6 +1,24 @@
 package WebGUI::i18n::English::Asset;
 
 our $I18N = {
+	'confirm change url message' => {
+		message => q|Setting this to 'Yes' confirms that you want to permanently change this URL, thusly deleteing all old revisions of this asset.|,
+		lastUpdated => 0,
+		context => q|explains the implications of the change url function|
+	},
+
+	'confirm change' => {
+		message => q|Are you sure?|,
+		lastUpdated => 0,
+		context => q|confirmation question|
+	},
+
+	'change url' => {
+		message => q|Change URL|,
+		lastUpdated => 0,
+		context => q|the title of the change url function|
+	},
+
 	'ago' => {
 		message => q|ago|,
 		lastUpdated => 0,
