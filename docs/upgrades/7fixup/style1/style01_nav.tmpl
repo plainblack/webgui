@@ -1,0 +1,28 @@
+#id:fk9EMfHpG_KYEFjZ5jD9dA
+#title:Style 01 Nav
+#menutitle:Style 01 Nav
+#url:style01_nav
+<tmpl_if displayTitle>
+	<h2><tmpl_var title></h2>
+</tmpl_if>			
+		
+<tmpl_if description>
+	<p><tmpl_var description></p>
+</tmpl_if>
+		
+<tmpl_if session.var.adminOn>
+	<tmpl_var controls>
+</tmpl_if>		
+		
+	<span style="float:left">&#160;&#160;&#160;&#160;&#160;&#160;</span>
+	<tmpl_loop page_loop>	
+	<div<tmpl_if page.isCurrent> class="navOn"</tmpl_if><tmpl_if page.isAncestor> class="navOn"</tmpl_if>>
+		<span class="left">&#160;</span>
+		<span class="center">
+			<a <tmpl_if page.newWindow>onclick="window.open('<tmpl_var page.url>')" href="#" <tmpl_else>href="<tmpl_var page.url>"</tmpl_if>><tmpl_var page.menuTitle></a>
+		</span>
+		<span class="right">&#160;</span>
+	</div>	
+	</tmpl_loop>
+
+<div style="clear:both;"></div>
