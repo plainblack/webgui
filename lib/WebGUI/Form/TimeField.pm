@@ -131,12 +131,8 @@ sub toHtmlAsHidden {
 	my $self = shift;
 	return WebGUI::Form::Hidden->new($self->session,
 		name=>$self->get("name"),
-		value=>secondsToTime($self->get("value"))
+		value=>$self->session->datetime->secondsToTime($self->get("value"))
 		)->toHtmlAsHidden;
 }
 
-
-
-
 1;
-

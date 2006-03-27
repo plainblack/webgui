@@ -79,7 +79,7 @@ Returns a string filtered to allow only digits, spaces, and these special charac
 sub getValueFromPost {
 	my $self = shift;
 	my $value = $self->session->form->param($self->get("name"));
-   	if ($value =~ /^[\d \.\-\+\(\)]+$/ and $value =~ /\d/) {
+   	if ($value =~ /^[x\d \.\-\+\(\)]+$/ and $value =~ /\d/) {
                 return $value;
         }
         return undef;
@@ -96,7 +96,7 @@ Renders a phone number field.
 sub toHtml {
         my $self = shift;
 	$self->session->style->setScript($self->session->config->get("extrasURL").'/inputCheck.js',{ type=>'text/javascript' });
-        $self->set("extras", $self->get('extras') . ' onkeyup="doInputCheck(this.form.'.$self->get("name").',\'0123456789-()+ \')" ');
+        $self->set("extras", $self->get('extras') . ' onkeyup="doInputCheck(this.form.'.$self->get("name").',\'x0123456789-()+ \')" ');
 	return $self->SUPER::toHtml;
 }
 

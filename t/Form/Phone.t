@@ -36,11 +36,12 @@ tie %testBlock, 'Tie::IxHash';
 	PHONE1 => [ "503\n867\n5309",  undef, 'newline separation'],
 	PHONE2 => [ '503 867 5309',  'EQUAL', 'valid: space separation'],
 	PHONE3 => [ '503.867.5309',  'EQUAL', 'valid: dot separation'],
-	PHONE4 => [ '503 867 5309 x227',  undef, 'WRONG: extension syntax rejectd'],
+	PHONE4 => [ '503 867 5309 x227',  'EQUAL', 'valid: extension syntax rejectd'],
 	PHONE5 => [ '()()()',  undef, 'invalid: no digits'],
 	PHONE6 => [ '------',  undef, 'invalid: no digits'],
 	PHONE7 => [ "\n",  undef, 'invalid: no digits'],
 	PHONE8 => [ "++++",  undef, 'invalid: no digits'],
+	PHONE9 => [ "0xx31 3456 1234",  'EQUAL', 'Brazilian long distance'],
 );
 
 my $formClass = 'WebGUI::Form::Phone';
