@@ -14,12 +14,13 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Form;
-use WebGUI::Form::Integer;
+use WebGUI::Form::Float;
 use WebGUI::Session;
+use Tie::IxHash;
 use HTML::Form;
 use Test::MockObject;
 
-#The goal of this test is to verify that Integer form elements work
+#The goal of this test is to verify that Float form elements work
 
 use Test::More; # increment this value for each test you create
 
@@ -27,7 +28,22 @@ my $session = WebGUI::Test->session;
 
 # put your tests here
 
-my $numTests = 10;
+my %testBlock;
+
+tie %testBlock, 'Tie::IxHash';
+
+%testBlock = (
+	TestInteger  => [ '-1.23456', 1, 'valid, negative float'],
+	TestInteger2 => [ '.23456', 1, 'valid, no integer part'],
+	TestInteger3 => [ '123456789.', 1, 'valid, no fractional part'],
+	TestInteger4 => [ '-.123456', 1, 'valid, negative, no integer part'],
+	TestInteger5 => [ '+123.456', 0, 'invalid, no explicit plus sign'],
+	TestInteger6 => [ '123456', 1, 'WRONG, no decimal point'],
+	TestInteger7 => [ '......', 1, 'WRONG, no digits'],
+	TestInteger8 => [ '.123-456', 0, 'invalid, embedded minus sign'],
+);
+
+my $numTests = 6 + scalar keys %testBlock;
 
 diag("Planning on running $numTests tests\n");
 
@@ -37,9 +53,9 @@ my ($header, $footer) = (WebGUI::Form::formHeader($session), WebGUI::Form::formF
 
 my $html = join "\n",
 	$header, 
-	WebGUI::Form::Integer->new($session, {
-		name => 'TestInteger',
-		value => '123456',
+	WebGUI::Form::Float->new($session, {
+		name => 'TestFloat',
+		value => '12.3456',
 	})->toHtml,
 	$footer;
 
@@ -55,9 +71,9 @@ is(scalar @inputs, 1, 'The form has 1 input');
 #Basic tests
 
 my $input = $inputs[0];
-is($input->name, 'TestInteger', 'Checking input name');
+is($input->name, 'TestFloat', 'Checking input name');
 is($input->type, 'text', 'Checking input type');
-is($input->value, '123456', 'Checking default value');
+is($input->value, '12.3456', 'Checking default value');
 is($input->disabled, undef, 'Disabled param not sent to form');
 
 ##Test Form Output parsing
@@ -66,23 +82,16 @@ my $request = Test::MockObject->new;
 $request->mock('body',
 	sub {
 		my ($self, $value) = @_;
-		my @return = ();
-		return '-123456' if ($value eq 'TestInteger');
-		return "+123456" if ($value eq 'TestInteger2');
-		return "123-456" if ($value eq 'TestInteger3');
-		return "123.456" if ($value eq 'TestInteger4');
+		return $testBlock{$value}->[0] if (exists $testBlock{$value});
 		return;
 	}
 );
+
 $session->{_request} = $request;
 
-my $value = $session->form->get('TestInteger', 'integer');
-is($value, '-123456', 'checking negative integer');
-$value = $session->form->get('TestInteger2', 'integer');
-is($value, 0, 'checking form rejects explicitly postive integer');
-$value = $session->form->get('TestInteger3', 'integer');
-is($value, 0, 'checking form rejects non-sense integer');
-$value = $session->form->get('TestInteger4', 'integer');
-is($value, 0, 'checking form rejects non-sense integer');
-
+foreach my $key (keys %testBlock) {
+	my ($testValue, $passes, $comment) = @{ $testBlock{$key} };
+	my $value = $session->form->get($key, 'float');
+	is($value, ($passes ? $testValue : 0.0), $comment);
+}
 ##Integer Forms have no special value preprocessing,
