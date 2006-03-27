@@ -17,7 +17,8 @@ use WebGUI::Form;
 use WebGUI::Form::Url;
 use WebGUI::Session;
 use HTML::Form;
-use Test::MockObject;
+use Tie::IxHash;
+use WebGUI::Form_Checking;
 
 #The goal of this test is to verify that Url form elements work
 
@@ -27,7 +28,23 @@ my $session = WebGUI::Test->session;
 
 # put your tests here
 
-my $numTests = 14;
+my %testBlock;
+
+tie %testBlock, 'Tie::IxHash';
+
+%testBlock = (
+	Email1 => [ 'mailto:whatever', 'EQUAL', 'mailto processing'],
+	Email2 => [ 'me@nowhere.com', 'mailto:me@nowhere.com', 'email address processing'],
+	Email3 => [ '/', 'EQUAL', 'Url'],
+	Email4 => [ '://', 'EQUAL', 'colon'],
+	Email5 => [ '^', 'EQUAL', 'caret'],
+	Email6 => [ 'mySite', 'http://mySite', 'bare hostname'],
+	Email7 => [ '??**()!!', 'http://??**()!!', 'WRONG: random crap is passed through'],
+);
+
+my $formClass = 'WebGUI::Form::Url';
+
+my $numTests = 12 + scalar keys %testBlock;
 
 diag("Planning on running $numTests tests\n");
 
@@ -37,7 +54,7 @@ my ($header, $footer) = (WebGUI::Form::formHeader($session), WebGUI::Form::formF
 
 my $html = join "\n",
 	$header, 
-	WebGUI::Form::Text->new($session, {
+	$formClass->new($session, {
 		name => 'TestUrl',
 		value => 'http://www.webgui.org',
 	})->toHtml,
@@ -59,46 +76,19 @@ is($input->name, 'TestUrl', 'Checking input name');
 is($input->type, 'text', 'Checking input type');
 is($input->value, 'http://www.webgui.org', 'Checking default value');
 is($input->disabled, undef, 'Disabled param not sent to form');
-
-##Test Form Output parsing
-
-my $request = Test::MockObject->new;
-$request->mock('body',
-	sub {
-		my ($self, $value) = @_;
-		my @return = ();
-		return 'mailto:whatever' if ($value eq 'mailto_test');
-		return 'me@nowhere.com' if ($value eq 'address_test');
-		return "/" if ($value eq 'leading_slash');
-		return "://" if ($value eq 'colon');
-		return "^" if ($value eq 'caret');
-		return "mySite" if ($value eq 'host');
-		return;
-	}
-);
-$session->{_request} = $request;
-
-my $value = $session->form->get('mailto_test', 'Url');
-is($value, 'mailto:whatever', 'checking mailto processing');
-$value = $session->form->get('address_test', 'Url');
-is($value, 'mailto:me@nowhere.com', 'checking email address processing');
-$value = $session->form->get('leading_slash', 'Url');
-is($value, '/', 'checking leading slash');
-$value = $session->form->get('colon', 'Url');
-is($value, '://', 'checking colon slash slash');
-$value = $session->form->get('caret', 'Url');
-is($value, '^', 'checking leading caret');
-$value = $session->form->get('host', 'Url');
-is($value, 'http://mySite', 'checking host');
+is($input->{size}, 30, 'Checking size param, default');
+is($input->{maxlength}, 2048, 'Checking maxlength param, default');
 
 ##Form value preprocessing
 ##Note that HTML::Form will unencode the text for you.
 
 $html = join "\n",
 	$header, 
-	WebGUI::Form::Text->new($session, {
+	$formClass->new($session, {
 		name => 'preTestUrl',
 		value => q!http://www.webgui.org?foo=bar&baz=buz!,
+		size => 25,
+		maxlength => 1024,
 	})->toHtml,
 	$footer;
 
@@ -107,3 +97,9 @@ $html = join "\n",
 $input = $inputs[0];
 is($input->name, 'preTestUrl', 'Checking input name');
 is($input->value, 'http://www.webgui.org?foo=bar&baz=buz', 'Checking default value');
+is($input->{size}, 25, 'set size');
+is($input->{maxlength}, 1024, 'set maxlength');
+
+##Test Form Output parsing
+
+WebGUI::Form_Checking::auto_check($session, 'Url', %testBlock);

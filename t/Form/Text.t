@@ -17,7 +17,8 @@ use WebGUI::Form;
 use WebGUI::Form::Text;
 use WebGUI::Session;
 use HTML::Form;
-use Test::MockObject;
+use Tie::IxHash;
+use WebGUI::Form_Checking;
 
 #The goal of this test is to verify that Text form elements work
 
@@ -27,7 +28,18 @@ my $session = WebGUI::Test->session;
 
 # put your tests here
 
-my $numTests = 10;
+my %testBlock;
+
+tie %testBlock, 'Tie::IxHash';
+
+%testBlock = (
+	TestText  => [ 'some user value', 'EQUAL', 'Regular text'],
+	TestText2 => [ "some user value\nwith\r\nwhitespace", "some user valuewithwhitespace", 'Embedded whitespace is stripped'],
+);
+
+my $formType = 'text';
+
+my $numTests = 12 + scalar keys %testBlock;
 
 diag("Planning on running $numTests tests\n");
 
@@ -56,28 +68,11 @@ is(scalar @inputs, 1, 'The form has 1 input');
 
 my $input = $inputs[0];
 is($input->name, 'TestText', 'Checking input name');
-is($input->type, 'text', 'Checking input type');
+is($input->type, $formType, 'Checking input type');
 is($input->value, 'Some text in here', 'Checking default value');
 is($input->disabled, undef, 'Disabled param not sent to form');
-
-##Test Form Output parsing
-
-my $request = Test::MockObject->new;
-$request->mock('body',
-	sub {
-		my ($self, $value) = @_;
-		my @return = ();
-		return 'some user value' if ($value eq 'TestText');
-		return "some user value\nwith\r\nwhitespace" if ($value eq 'TestText2');
-		return;
-	}
-);
-$session->{_request} = $request;
-
-my $value = $session->form->get('TestText', 'Text');
-is($value, 'some user value', 'checking existent form value');
-$value = $session->form->get('TestText2', 'Text');
-is($value, 'some user valuewithwhitespace', 'checking form postprocessing for whitespace');
+is($input->{size}, 30, 'Checking size param, default');
+is($input->{maxlength}, 255, 'Checking maxlength param, default');
 
 ##Form value preprocessing
 ##Note that HTML::Form will unencode the text for you.
@@ -87,6 +82,8 @@ $html = join "\n",
 	WebGUI::Form::Text->new($session, {
 		name => 'preTestText',
 		value => q!Some & text in " here!,
+		size => 25,
+		maxlength => 200,
 	})->toHtml,
 	$footer;
 
@@ -95,3 +92,9 @@ $html = join "\n",
 $input = $inputs[0];
 is($input->name, 'preTestText', 'Checking input name');
 is($input->value, 'Some & text in " here', 'Checking default value');
+is($input->{size}, 25, 'Checking size param, set');
+is($input->{maxlength}, 200, 'Checking maxlength param, set');
+
+##Test Form Output parsing
+
+WebGUI::Form_Checking::auto_check($session, $formType, %testBlock);

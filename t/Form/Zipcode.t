@@ -17,7 +17,8 @@ use WebGUI::Form;
 use WebGUI::Form::Zipcode;
 use WebGUI::Session;
 use HTML::Form;
-use Test::MockObject;
+use Tie::IxHash;
+use WebGUI::Form_Checking;
 
 #The goal of this test is to verify that Zipcode form elements work
 
@@ -27,7 +28,21 @@ my $session = WebGUI::Test->session;
 
 # put your tests here
 
-my $numTests = 11;
+my %testBlock;
+
+tie %testBlock, 'Tie::IxHash';
+
+%testBlock = (
+	Zip1 => [ 'ABCDE', 'EQUAL', 'alpha'],
+	Zip2 => [ '02468', 'EQUAL', 'numeric'],
+	Zip3 => [ 'NO WHERE', 'EQUAL', 'alpha space'],
+	Zip4 => [ '-', 'EQUAL', 'base dash'],
+	Zip5 => [ 'abcde', undef, 'lower case'],
+);
+
+my $formClass = 'WebGUI::Form::Zipcode';
+
+my $numTests = 14 + scalar keys %testBlock;
 
 diag("Planning on running $numTests tests\n");
 
@@ -37,7 +52,7 @@ my ($header, $footer) = (WebGUI::Form::formHeader($session), WebGUI::Form::formF
 
 my $html = join "\n",
 	$header, 
-	WebGUI::Form::Zipcode->new($session, {
+	$formClass->new($session, {
 		name => 'TestZip',
 		value => '97123-ORST',
 	})->toHtml,
@@ -59,34 +74,29 @@ is($input->name, 'TestZip', 'Checking input name');
 is($input->type, 'text', 'Checking input type');
 is($input->value, '97123-ORST', 'Checking default value');
 is($input->disabled, undef, 'Disabled param not sent to form');
+is($input->{size}, 30, 'Checking size param, default');
+is($input->{maxlength}, 10, 'Checking maxlength param, default');
 
 ##Test Form Output parsing
 
-my $request = Test::MockObject->new;
-$request->mock('body',
-	sub {
-		my ($self, $value) = @_;
-		my @return = ();
-		return 'ABCDE' if ($value eq 'alpha');
-		return '02468' if ($value eq 'numeric');
-		return "NO WHERE" if ($value eq 'alpha space');
-		return "-" if ($value eq 'dash');
-		return "abcde" if ($value eq 'failure');
-		return;
-	}
-);
-$session->{_request} = $request;
+WebGUI::Form_Checking::auto_check($session, 'Zipcode', %testBlock);
 
-my $value = $session->form->get('alpha', 'Zipcode');
-is($value, 'ABCDE', 'checking alpha processing');
-$value = $session->form->get('numeric', 'Zipcode');
-is($value, '02468', 'checking numeric processing');
-$value = $session->form->get('alpha space', 'Zipcode');
-is($value, 'NO WHERE', 'checking alpha space');
-$value = $session->form->get('dash', 'Zipcode');
-is($value, '-', 'checking dash');
-$value = $session->form->get('failure', 'Zipcode');
-is($value, undef, 'checking failure');
+$html = join "\n",
+	$header, 
+	$formClass->new($session, {
+		name => 'TestZip2',
+		value => '97229-MXIM',
+		size => 12,
+		maxlength => 13,
+	})->toHtml,
+	$footer;
 
-##Form value preprocessing.  Zipcode does no preprocessing
-
+my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
+@inputs = $forms[0]->inputs;
+$input = $inputs[0];
+is($input->name, 'TestZip2', 'Checking input name');
+is($input->type, 'text', 'Checking input type');
+is($input->value, '97229-MXIM', 'Checking default value');
+is($input->disabled, undef, 'Disabled param not sent to form');
+is($input->{size}, 12, 'Checking size param, default');
+is($input->{maxlength}, 13, 'Checking maxlength param, default');

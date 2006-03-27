@@ -17,7 +17,8 @@ use WebGUI::Form;
 use WebGUI::Form::Textarea;
 use WebGUI::Session;
 use HTML::Form;
-use Test::MockObject;
+use Tie::IxHash;
+use WebGUI::Form_Checking;
 
 #The goal of this test is to verify that Textarea form elements work
 
@@ -27,7 +28,18 @@ my $session = WebGUI::Test->session;
 
 # put your tests here
 
-my $numTests = 10;
+my %testBlock;
+
+tie %testBlock, 'Tie::IxHash';
+
+%testBlock = (
+	TestText  => [ 'some user value', 'EQUAL', 'Regular text'],
+	TestText2 => [ "some user value\nwith\r\nwhitespace", 'EQUAL', 'Embedded whitespace is left'],
+);
+
+my $formType = 'textarea';
+
+my $numTests = 14 + scalar keys %testBlock;
 
 diag("Planning on running $numTests tests\n");
 
@@ -56,37 +68,21 @@ is(scalar @inputs, 1, 'The form has 1 input');
 
 my $input = $inputs[0];
 is($input->name, 'TestText', 'Checking input name');
-is($input->type, 'textarea', 'Checking input type');
+is($input->type, $formType, 'Checking input type');
 is($input->value, 'Some text in here', 'Checking default value');
 is($input->disabled, undef, 'Disabled param not sent to form');
-
-##Test Form Output parsing
-
-my $request = Test::MockObject->new;
-$request->mock('body',
-	sub {
-		my ($self, $value) = @_;
-		my @return = ();
-		return 'some user value' if ($value eq 'TestText');
-		return "some user value\nwith\r\nwhitespace" if ($value eq 'TestText2');
-		return;
-	}
-);
-$session->{_request} = $request;
-
-my $value = $session->form->get('TestText', 'Textarea');
-is($value, 'some user value', 'checking existent form value');
-$value = $session->form->get('TestText2', 'Textarea');
-is($value, "some user value\nwith\r\nwhitespace", 'checking form postprocessing for whitespace');
-
-##Form value preprocessing
-##Note that HTML::Form will unencode the text for you.
+is($input->{rows}, 5, 'Default number of rows');
+is($input->{cols}, 50, 'Default number of columns');
+is($input->{wrap}, 'virtual', 'Default wrap');
 
 $html = join "\n",
 	$header, 
 	WebGUI::Form::Textarea->new($session, {
 		name => 'preTestText',
 		value => q!Some & text in " here!,
+		rows => 10,
+		columns => 80,
+		wrap => 'off'
 	})->toHtml,
 	$footer;
 
@@ -95,3 +91,10 @@ $html = join "\n",
 $input = $inputs[0];
 is($input->name, 'preTestText', 'Checking input name');
 is($input->value, 'Some & text in " here', 'Checking default value');
+is($input->{rows}, 10, 'set number of rows');
+is($input->{cols}, 80, 'set number of columns');
+is($input->{wrap}, 'off', 'set wrap to off');
+
+##Test Form Output parsing
+
+WebGUI::Form_Checking::auto_check($session, $formType, %testBlock);
