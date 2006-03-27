@@ -17,7 +17,8 @@ use WebGUI::Form;
 use WebGUI::Form::Email;
 use WebGUI::Session;
 use HTML::Form;
-use Test::MockObject;
+use Tie::IxHash;
+use WebGUI::Form_Checking;
 
 #The goal of this test is to verify that Email form elements work.
 #The Email form accepts and validates an email address.
@@ -28,7 +29,19 @@ my $session = WebGUI::Test->session;
 
 # put your tests here
 
-my $numTests = 8;
+my %testBlock;
+
+tie %testBlock, 'Tie::IxHash';
+
+%testBlock = (
+	EMAIL1 => [ 'me@nowhere.com', 'EQUAL', 'regular email address'],
+	EMAIL2 => [ "what do you want?", undef, 'not an email address'],
+);
+
+my $formType = 'text';
+my $formClass = 'WebGUI::Form::Email';
+
+my $numTests = 12 + scalar keys %testBlock;
 
 diag("Planning on running $numTests tests\n");
 
@@ -38,7 +51,7 @@ my ($header, $footer) = (WebGUI::Form::formHeader($session), WebGUI::Form::formF
 
 my $html = join "\n",
 	$header, 
-	WebGUI::Form::Email->new($session, {
+	$formClass->new($session, {
 		name => 'TestEmail',
 		value => 'me@nowhere.com',
 	})->toHtml,
@@ -57,28 +70,30 @@ is(scalar @inputs, 1, 'The form has 1 input');
 
 my $input = $inputs[0];
 is($input->name, 'TestEmail', 'Checking input name');
-is($input->type, 'text', 'Checking input type');
+is($input->type, $formType, 'Checking input type');
 is($input->value, 'me@nowhere.com', 'Checking default value');
 is($input->disabled, undef, 'Disabled param not sent to form');
+is($input->{size}, 30, 'Checking size param, default');
+is($input->{maxlength}, 255, 'Checking maxlength param, default');
+
+$html = join "\n",
+	$header, 
+	$formClass->new($session, {
+		name => 'email2',
+		value => q!Some & text in " here!,
+		size => 25,
+		maxlength => 200,
+	})->toHtml,
+	$footer;
+
+@forms = HTML::Form->parse($html, 'http://www.webgui.org');
+@inputs = $forms[0]->inputs;
+$input = $inputs[0];
+is($input->name, 'email2', 'Checking input name');
+is($input->value, 'Some & text in " here', 'Checking default value');
+is($input->{size}, 25, 'Checking size param, set');
+is($input->{maxlength}, 200, 'Checking maxlength param, set');
 
 ##Test Form Output parsing
 
-my $request = Test::MockObject->new;
-$request->mock('body',
-	sub {
-		my ($self, $value) = @_;
-		my @return = ();
-		return 'me@nowhere.com' if ($value eq 'TestEmail');
-		return "what do you want?" if ($value eq 'TestEmail2');
-		return;
-	}
-);
-$session->{_request} = $request;
-
-my $value = $session->form->get('TestEmail', 'Email');
-is($value, 'me@nowhere.com', 'checking existent form value');
-$value = $session->form->get('TestEmail2', 'Email');
-is($value, undef, 'checking form postprocessing for bad email address');
-
-##Email form does no preprocessing of its input
-
+WebGUI::Form_Checking::auto_check($session, 'email', %testBlock);
