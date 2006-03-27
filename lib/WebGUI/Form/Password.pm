@@ -93,7 +93,7 @@ Renders an input tag of type password.
 sub toHtml {
 	my $self = shift;
 	my $html = '<input type="password" name="'.$self->get("name").'" value="'.$self->fixQuotes($self->get("value")).'" size="'.$self->get("size").'" id="'.$self->get('id').'" ';
-	$html .= 'maxlength="'.$self->get("maxLength").'" ' if ($self->get("maxLength"));
+	$html .= 'maxlength="'.$self->get("maxlength").'" ' if ($self->get("maxlength"));
 	$html .= $self->get("extras").' />';
 	return $html;
 }

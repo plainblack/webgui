@@ -17,7 +17,8 @@ use WebGUI::Form;
 use WebGUI::Form::Password;
 use WebGUI::Session;
 use HTML::Form;
-use Test::MockObject;
+use Tie::IxHash;
+use WebGUI::Form_Checking;
 
 #The goal of this test is to verify that Password form elements work
 
@@ -27,7 +28,19 @@ my $session = WebGUI::Test->session;
 
 # put your tests here
 
-my $numTests = 10;
+my %testBlock;
+
+tie %testBlock, 'Tie::IxHash';
+
+%testBlock = (
+	PASS1 => [ 'some user value', 'EQUAL', 'Regular text'],
+	PASS2 => [ "some user value\nwith\r\nwhitespace", "EQUAL", 'Embedded whitespace is passed'],
+);
+
+my $formType = 'password';
+my $formClass = 'WebGUI::Form::Password';
+
+my $numTests = 12 + scalar keys %testBlock;
 
 diag("Planning on running $numTests tests\n");
 
@@ -37,7 +50,7 @@ my ($header, $footer) = (WebGUI::Form::formHeader($session), WebGUI::Form::formF
 
 my $html = join "\n",
 	$header, 
-	WebGUI::Form::Password->new($session, {
+	$formClass->new($session, {
 		name => 'TestText',
 		value => 'Some text in here',
 	})->toHtml,
@@ -55,38 +68,26 @@ is(scalar @inputs, 1, 'The form has 1 input');
 #Basic tests
 
 my $input = $inputs[0];
+use Data::Dumper;
+diag(Dumper $input);
+diag($html);
 is($input->name, 'TestText', 'Checking input name');
-is($input->type, 'password', 'Checking input type');
+is($input->type, $formType, 'Checking input type');
 is($input->value, 'Some text in here', 'Checking default value');
 is($input->disabled, undef, 'Disabled param not sent to form');
-
-##Test Form Output parsing
-
-my $request = Test::MockObject->new;
-$request->mock('body',
-	sub {
-		my ($self, $value) = @_;
-		my @return = ();
-		return 'some user value' if ($value eq 'TestText');
-		return "some user value\nwith\r\nwhitespace" if ($value eq 'TestText2');
-		return;
-	}
-);
-$session->{_request} = $request;
-
-my $value = $session->form->get('TestText', 'Password');
-is($value, 'some user value', 'checking existent form value');
-$value = $session->form->get('TestText2', 'Password');
-is($value, "some user value\nwith\r\nwhitespace", 'checking form postprocessing for whitespace');
+is($input->{size}, 30, 'Default size');
+is($input->{maxlength}, 35, 'Default maxlength');
 
 ##Form value preprocessing
 ##Note that HTML::Form will unencode the text for you.
 
 $html = join "\n",
 	$header, 
-	WebGUI::Form::Password->new($session, {
+	$formClass->new($session, {
 		name => 'preTestText',
 		value => q!Some & text in " here!,
+		size => 25,
+		maxlength => 200,
 	})->toHtml,
 	$footer;
 
@@ -95,3 +96,9 @@ $html = join "\n",
 $input = $inputs[0];
 is($input->name, 'preTestText', 'Checking input name');
 is($input->value, 'Some & text in " here', 'Checking default value');
+is($input->{size}, 25, 'Checking size param, set');
+is($input->{maxlength}, 200, 'Checking maxlength param, set');
+
+##Test Form Output parsing
+
+WebGUI::Form_Checking::auto_check($session, $formType, %testBlock);
