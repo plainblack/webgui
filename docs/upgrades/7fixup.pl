@@ -30,7 +30,8 @@ sub addNewStyles {
 	my $styleCounter = 0;
 	foreach my $style (qw(style1 style2 style3)) {
 		$styleCounter++;
-		opendir(DIR,$style);
+		print "\t\tStyle $styleCounter\n";
+		opendir(DIR,"7fixup/".$style);
 		my @files = readdir(DIR);
 		closedir(DIR);
 		$assetCounter++;
@@ -49,22 +50,22 @@ sub addNewStyles {
 			next if $file eq "..";
 			next if $file eq ".";
 			$assetCounter++;
-			my $newId = "7.0-style".sprintf("%013d",$assetCounter);
 			if ($file =~ m/\.[png|jpg|gif]+$/) {
 				my $asset = $folder->addChild({
 					className=>"WebGUI::Asset::File::Image",
 					title=>$file,
 					menuTitle=>$file,
-					url=>$file,
+					url=>$style."/".$file,
 					ownerUserId=>'3',
 					groupIdView=>'7',
 					groupIdEdit=>'12',
+					templateId=>'PBtmpl0000000000000088',
 					filename=>$file
 					},"7.0-style".sprintf("%013d",$assetCounter));
-				$asset->getStorageLocation->addFileFromFileSystem($style."/".$file);
+				$asset->getStorageLocation->addFileFromFilesystem("7fixup/".$style."/".$file);
 				$asset->getStorageLocation->generateThumbnail($file);
 			} elsif ($file =~ m/.tmpl$/) {
-				open(FILE,"<".$style."/".$file);
+				open(FILE,"<7fixup/".$style."/".$file);
 				my $first = 1;
 				my $head = 0;
 				my %properties = (className=>"WebGUI::Asset::Template");
@@ -87,7 +88,7 @@ sub addNewStyles {
 				close(FILE);
 				my $template = $folder->addChild(\%properties, $properties{id});
 			} elsif ($file =~ m/.nav$/) {
-				open(FILE,"<".$style."/".$file);
+				open(FILE,"<"."7fixup/".$style."/".$file);
 				my $first = 1;
 				my $head = 0;
 				my %properties = (className=>"WebGUI::Asset::Wobject::Navigation", styleTemplateId=>'PBtmpl0000000000000060');
@@ -103,7 +104,7 @@ sub addNewStyles {
 				close(FILE);
 				my $template = $folder->addChild(\%properties, "7.0-style".sprintf("%013d",$assetCounter));
 			} elsif ($file =~ m/.snippet$/) {
-				open(FILE,"<".$style."/".$file);
+				open(FILE,"<7fixup/".$style."/".$file);
 				my $head = 0;
 				my %properties = (className=>"WebGUI::Asset::Snippet");
 				while (my $line = <FILE>) {
@@ -118,11 +119,13 @@ sub addNewStyles {
 			}
 		}
 	}
-#	$session->db->write("update assetData set templateId='stevesnewid' where templateId in ('B1bNjWVtzSjsvGZh9lPz_A','9tBSOV44a9JPS8CcerOvYw')");
-#	my $asset = WebGUI::Asset->new($session,'9tBSOV44a9JPS8CcerOvYw');
-#	$asset->purge if defined $asset;
-#	my $asset = WebGUI::Asset->new($session,'B1bNjWVtzSjsvGZh9lPz_A');
-#	$asset->purge if defined $asset;
+	print "\t\tSetting all pages to use new style.\n";
+	$session->db->write("update wobject set styleTemplateId='stevestyle000000000001' where styleTemplateId in ('B1bNjWVtzSjsvGZh9lPz_A','9tBSOV44a9JPS8CcerOvYw')");
+	print "\t\tDeleting old styles.\n";
+	my $asset = WebGUI::Asset->new($session,'9tBSOV44a9JPS8CcerOvYw');
+	$asset->purge if defined $asset;
+	my $asset = WebGUI::Asset->new($session,'B1bNjWVtzSjsvGZh9lPz_A');
+	$asset->purge if defined $asset;
 }
 
 #-------------------------------------------------
