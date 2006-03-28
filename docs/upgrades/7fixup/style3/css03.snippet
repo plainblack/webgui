@@ -1,0 +1,117 @@
+#stevestyle00000000css3
+#title:css03.css
+#menuTitle:css03.css
+#url:css03.css
+<style type="text/css">
+	body, html {
+		margin:0px;
+		background-color:#3c3c3c;
+	}
+	
+	/* HEADER STYLES */
+	#header {
+		background: url('^FileUrl(style3/header_bg.jpg);') repeat-x;
+		height:129px;
+		width:100%;
+		position:relative;
+		margin:0px;
+		z-index:0;
+	}
+	#header #titles {
+		color:white;			
+		font-family:arial;
+		position:relative;
+		width:100%;
+		height:100%;
+		background:url(^FileUrl(style3/header_right.jpg);) right no-repeat;
+	}
+	#header #titles h1 {
+		text-transform:uppercase;			
+		margin:0px;
+		margin-bottom:2px;	
+		font-weight:normal;
+		font-size:26pt;
+		display:block;
+		top:20px;
+		left:20px;
+		position:relative;
+		line-height:72px;
+		display:inline;
+	}
+	#header #titles h2 {
+		color:#E5E5E5;
+		margin-top:0px;	
+		left:30px;
+		font-size:12pt;
+		position:relative;
+		display:inline;
+	}
+	/* END HEADER STYLES */
+
+	
+	
+	/* MAIN STYLES */
+	#main {
+		background: #fff url(^FileUrl(style3/main_bg.jpg);) repeat-y;
+		width:95%;
+		height:500px;
+		position:relative;	
+		left:0px;
+		top:0px;			
+		-moz-box-sizing:border-box;
+		box-sizing:border-box;
+		z-index:0;
+		padding-top:55px;
+	}
+	#main #mainBody {
+		margin-left:30px;			
+		-moz-box-sizing:border-box;			
+		z-index:2;
+		position:relative;
+		background-color: transparent;
+		font-family:arial;
+		font-size:9pt;
+		padding-bottom:50px;
+	}	
+	* html #mainBody { height:1%; }
+	#main #mainBody a {
+		color:#EE963E;
+		font-weight:bold;
+		letter-spacing:1px;
+		font-size:8pt;
+	}
+	#main #topCorner {
+		width:100%;
+		height:214px;
+		position:absolute;
+		top:0px;
+		left:0px;
+		background: url('^FileUrl(style3/main_top.jpg);') no-repeat;
+		z-index:1;
+	}
+	#main #bottomCorner {
+		width:100%;
+		height:211px;
+		position:absolute;
+		bottom:0px;
+		right:0px;
+		background: url('^FileUrl(style3/main_bottom.jpg);') no-repeat right;
+		z-index:1;
+	}
+	body > #main {
+		height:auto;
+		min-height:500px;				
+	}
+	/* END MAIN STYLES */
+
+
+	
+	#footer {
+		width:95%;
+		height:68px;
+		background:orange  url('^FileUrl(style3/footer_bg.jpg);') repeat-x;
+	}
+	#footer img {
+		float:right;
+	}
+</style>
