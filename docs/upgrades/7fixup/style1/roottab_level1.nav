@@ -1,8 +1,8 @@
 #title:RootTab Level 1
-#menutitle:RootTab Level 1
+#menuTitle:RootTab Level 1
 #url:roottab_level1
-#startpointtype:relativeToRoot
-#startpoint:2
-#relativestoinclude:descendants
-#descendantendpoint:1
+#startPointType:relativeToRoot
+#startPoint:2
+#relativesToInclude:descendants
+#descendantEndPoint:1
 #templateId:stevenav00000000000001
