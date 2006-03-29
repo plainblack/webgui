@@ -54,11 +54,18 @@ sub addChild {
 	my $self = shift;
 	my $properties = shift;
 	my $id = shift || $self->session->id->generate();
+	# add a few things just in case the creator forgets
+	$properties->{ownerUserId} ||= '3';
+	$properties->{groupIdEdit} ||= '12';
+	$properties->{groupIdView} ||= '7';
+	$properties->{styleTemplateId} ||= 'PBtmpl0000000000000060';
+
 	my $lineage = $self->get("lineage").$self->getNextChildRank;
 	$self->{_hasChildren} = 1;
 	$self->session->db->beginTransaction;
 	my $now =$self->session->datetime->time();
-	$self->session->db->write("insert into asset (assetId, parentId, lineage, creationDate, createdBy, className, state) values (".$self->session->db->quote($id).",".$self->session->db->quote($self->getId).", ".$self->session->db->quote($lineage).", ".$now.", ".$self->session->db->quote($self->session->user->userId).", ".$self->session->db->quote($properties->{className}).", 'published')");
+	$self->session->db->write("insert into asset (assetId, parentId, lineage, creationDate, createdBy, className, state) values (?,?,?,?,?,?,'published')",
+		[$id,$self->getId,$lineage,$now,$self->session->user->userId,$properties->{className}]);
 	my $temp = WebGUI::Asset->newByPropertyHashRef($self->session,{
 		assetId=>$id,
 		className=>$properties->{className}

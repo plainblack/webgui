@@ -11,6 +11,8 @@
  - Run on registration and alert on new user have been converted to a single
    workflow.
  - Added a Photogallery prototype to the default installation.
+ - Added an option for hosters to limit the number of assets that may be
+   created on a WebGUI site.
  - Added a change url function that will allow an editor to change the URL of
    an asset permanently (circumventing normal versioning).
  - Added a wiki-like feature that will automatically bring a user to the

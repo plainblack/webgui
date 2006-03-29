@@ -386,19 +386,19 @@ sub showDebug {
 	my $self = shift;
 	my $text = $self->session->stow->get('debug_error');
 	$text =~  s/\n/\<br \/\>\n/g;
-	my $output = 'beginDebug<br /><div style="background-color: #800000;color: #ffffff;">'.$text."</div>\n";
+	my $output = '<div style="text-align: left;background-color: #800000;color: #ffffff;">'.$text."</div>\n";
 	$text = $self->session->stow->get('debug_warn'); 
 	$text =~  s/\n/\<br \/\>\n/g;
-	$output .= '<div style="background-color: #ffdddd;color: #000000;">'.$text."</div>\n";
+	$output .= '<div style="text-align: left;background-color: #ffdddd;color: #000000;">'.$text."</div>\n";
 	$text = $self->session->stow->get('debug_info'); 
 	$text =~  s/\n/\<br \/\>\n/g;
-	$output .= '<div style="background-color: #ffffdd;color: #000000;">'.$text."</div>\n";
+	$output .= '<div style="text-align: left;background-color: #ffffdd;color: #000000;">'.$text."</div>\n";
 	$text = $self->session->stow->get('debug_debug'); 
 	$text =~  s/\n/\<br \/\>\n/g;
-	$output .= '<div style="background-color: #dddddd;color: #000000;">'.$text."</div>\n";
+	$output .= '<div style="text-align: left;background-color: #dddddd;color: #000000;">'.$text."</div>\n";
 	$text = $self->getSessionVars();
 	$text =~  s/\n/\<br \/\>\n/g;
-	$output .= '<div style="background-color: #ffffff;color: #000000;">'.$text."</div>\n";
+	$output .= '<div style="text-align: left;background-color: #ffffff;color: #000000;">'.$text."</div>\n";
 	return $output;
 }
 

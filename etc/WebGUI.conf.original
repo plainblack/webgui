@@ -147,6 +147,13 @@
 	"htm" : "/bin/cat"
 	},
 
+# Enter the maximum number of assets that should be allowed to
+# be created on this site. Keep in mind that a base install of
+# WebGUI has around 300 assets. Enter zero (0) if you want to
+# allow an unlimited number.
+
+"maximumAssets" : 0,
+
 # Specify a the list of assets you want to appear in your
 # Add Content menus.
 

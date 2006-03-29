@@ -1,6 +1,12 @@
 package WebGUI::i18n::English::Asset;
 
 our $I18N = {
+	'over max assets' => {
+		message => q|Your administrator has limited the number of assets you may place on your site, and you have exceeded the limit. Delete some old assets in order to add more.|,
+		lastUpdated => 0,
+		context => q|an error message that will be displayed if the number of assets is >= to the maximumAssets defined in the config file|
+	},
+
 	'confirm change url message' => {
 		message => q|Setting this to 'Yes' confirms that you want to permanently change this URL, thusly deleteing all old revisions of this asset.|,
 		lastUpdated => 0,

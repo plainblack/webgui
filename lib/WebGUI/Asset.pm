@@ -1799,6 +1799,11 @@ NOTE: Don't try to override or overload this method. It won't work. What you are
 sub www_editSave {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
+	if ($self->session->config("maximumAssets")) {
+		my ($count) = $self->session->db->quickArray("select count(*) from asset");
+		my $i18n = WebGUI::International->new($self->session, "Asset");
+		$self->session->style->userStyle($i18n->get("over max assets")) if ($self->session->config("maximumAssets") <= $count);
+	}
 	my $object;
 	if ($self->session->form->process("assetId") eq "new") {
 		$object = $self->addChild({className=>$self->session->form->process("class")});	
