@@ -1703,7 +1703,6 @@ sub www_add {
 		url=>$self->session->form->param("url")
 		);
 	$properties{isHidden} = 1 unless (WebGUI::Utility::isIn($class, @{$self->session->config->get("assetContainers")}));
-$self->session->errorHandler->warn($properties{url});
 	my $newAsset = WebGUI::Asset->newByPropertyHashRef($self->session,\%properties);
 	$newAsset->{_parent} = $self;
 	return $self->session->privilege->insufficient() unless ($newAsset->canAdd($self->session));

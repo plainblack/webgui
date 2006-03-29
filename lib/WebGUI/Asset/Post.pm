@@ -1145,7 +1145,7 @@ sub www_view {
 	my $self = shift;
 	$self->markRead;
 	$self->incrementViews;
-	return $self->getThread->www_view($self->getId);
+	return $self->getThread->www_view;
 }
 
 

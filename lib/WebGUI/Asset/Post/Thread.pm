@@ -956,7 +956,6 @@ Renders self->view based upon current style, subject to timeouts. Returns Privil
 
 sub www_view {
         my $self = shift;
-	my $postId = shift;
 	return $self->session->privilege->noAccess() unless $self->canView;
         unless ($self->canView) {
                 if ($self->get("state") eq "published") { # no privileges, make em log in
