@@ -588,11 +588,6 @@ sub www_view {
 			return WebGUI::Asset->getNotFound($self->session)->www_view;
 		}
 	}
-# causes problems with the wre so it's commented out
-#	if ($self->get("encryptPage") && $self->session->env->get("HTTPS") ne "on") {
- #               $self->session->http->setRedirect($self->getUrl);
-  #              return "";
-   #     }
 	$self->logView();
 	# must find a way to do this next line better
 	$self->session->http->setCookie("wgSession",$self->session->var->{_var}{sessionId}) unless $self->session->var->{_var}{sessionId} eq $self->session->http->getCookies->{"wgSession"};
@@ -604,43 +599,6 @@ sub www_view {
 	$self->session->output->print($self->view);
 	$self->session->output->print($foot);
 	return "chunked";
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_view ( [ disableCache ] )
-
-Renders self->view based upon current style, subject to timeouts. Returns Privilege::noAccess() if canView is False.
-
-=cut
-sub www_viewOld {
-	my $self = shift;
-	my $disableCache = shift;
-	my $cache;
-	my $output;
-        my $useCache = (
-		$self->session->form->process("op") eq "" && $self->session->form->process("pn") eq "" 
-		&& (
-			( $self->get("cacheTimeout") > 10 && $self->session->user->userId ne '1') 
-			|| ( $self->get("cacheTimeoutVisitor") > 10 && $self->session->user->userId eq '1')
-		) 
-		&& !( $self->session->var->get("adminOn") || $disableCache)
-	);
-	if ($useCache) {
-               	$cache = WebGUI::Cache->new($self->session,"wobject_".$self->getId."_".$self->session->user->userId);
-           	$output = $cache->get;
-	}
-	unless ($output) {
-		$output = $self->processStyle($self->view);
-		my $ttl;
-		if ($self->session->user->userId eq '1') {
-			$ttl = $self->get("cacheTimeoutVisitor");
-		} else {
-			$ttl = $self->get("cacheTimeout");
-		}
-		$cache->set($output, $ttl) if ($useCache && !$self->session->http->isRedirect());
-	}
-	return $output;
 }
 
 1;

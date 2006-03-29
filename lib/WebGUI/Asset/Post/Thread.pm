@@ -810,7 +810,6 @@ sub view {
         $var->{"collaboration.url"} = $self->getThread->getParent->getUrl;
         $var->{'collaboration.title'} = $self->getParent->get("title");
         $var->{'collaboration.description'} = $self->getParent->get("description");
-
 	return $self->processTemplate($var,undef,$self->{_viewTemplate});
 }
 
@@ -948,38 +947,43 @@ sub www_unsubscribe {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_view (  )
+
+Renders self->view based upon current style, subject to timeouts. Returns Privilege::noAccess() if canView is False.
+
+=cut
+
 sub www_view {
-	my $self = shift;
+        my $self = shift;
 	my $postId = shift;
 	return $self->session->privilege->noAccess() unless $self->canView;
-	my $cache;
-	my $output;
-        my $useCache = (
-		$self->session->form->process("op") eq "" && 
-		$self->session->form->process("func") eq "" && 
-		$self->session->form->process("layout") eq "" && 
-		(
-			( $self->getParent->get("cacheTimeout") > 10 && $self->session->user->userId ne '1') || 
-			( $self->getParent->get("cacheTimeoutVisitor") > 10 && $self->session->user->userId eq '1')
-		) && 
-		not $self->session->var->get("adminOn")
-	);
-	if ($useCache) {
-               	$cache = WebGUI::Cache->new($self->session,"cspost_".($postId||$self->getId)."_".$self->session->user->userId."_".$self->session->scratch->get("discussionLayout")."_".$self->session->form->process("pn"));
-           	$output = $cache->get;
-	}
-	unless ($output) {
-		$output = $self->getParent->processStyle($self->view);
-		my $ttl;
-		if ($self->session->user->userId eq '1') {
-			$ttl = $self->getParent->get("cacheTimeoutVisitor");
-		} else {
-			$ttl = $self->getParent->get("cacheTimeout");
-		}
-		$cache->set($output, $ttl) if ($useCache);
-	}
-	return $output;
+        unless ($self->canView) {
+                if ($self->get("state") eq "published") { # no privileges, make em log in
+                        return $self->session->privilege->noAccess();
+                } elsif ($self->session->var->get("adminOn") && $self->get("state") =~ /^trash/) { # show em trash
+                        $self->session->http->setRedirect($self->getUrl("func=manageTrash"));
+                        return undef;
+                } elsif ($self->session->var->get("adminOn") && $self->get("state") =~ /^clipboard/) { # show em clipboard
+                        $self->session->http->setRedirect($self->getUrl("func=manageClipboard"));
+                        return undef;
+                } else { # tell em it doesn't exist anymore
+                        $self->session->http->setStatus("410");
+                        return WebGUI::Asset->getNotFound($self->session)->www_view;
+                }
+        }
+        # must find a way to do this next line better
+        $self->session->http->setCookie("wgSession",$self->session->var->{_var}{sessionId}) unless $self->session->var->{_var}{sessionId} eq $self->session->http->getCookies->{"wgSession"};
+        $self->session->http->getHeader;    
+        $self->prepareView;
+        my $style = $self->getParent->processStyle("~~~");
+        my ($head, $foot) = split("~~~",$style);
+        $self->session->output->print($head);
+        $self->session->output->print($self->view);
+        $self->session->output->print($foot);
+        return "chunked";
 }
+
 
 
 1;
