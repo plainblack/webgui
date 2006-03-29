@@ -76,14 +76,17 @@ is(scalar @inputs, 5, 'The form has 5 inputs');
 
 #Basic tests
 
-my @names = $form->param();
-is (scalar @names, 1, 'Only 1 name');
-is (scalar(grep {$_ ne 'ListMultiple'} @names), 0, 'All names are ListMultiple');
+#use Data::Dumper;
+#diag(Dumper $form);
 
-my $input = $form->find_input("ListMultiple");
-is($input->type, 'option', 'Checking input type');
-diag(join ":", $form->find_input("ListMultiple")->possible_values());
-#cmp_bag([ $form->find_input("ListMultiple")->possible_values() ], [qw(a b c d e)], 'all options are present');
-#cmp_bag([ $input->value ], [qw(a c e)], 'preselected values');
+my @options = $form->find_input('ListMultiple');
 
+is( scalar(grep {$_->type ne 'option'} @options), 0, 'All inputs are of type option');
 
+my @names = map { $_->name } @options;
+cmp_bag( [@names], [ ('ListMultiple')x5 ], 'correct number of names and names');
+
+cmp_bag([ $form->param('ListMultiple') ], [qw(a c e)], 'preselected values');
+
+my @values = map { $_->possible_values } @options;
+#cmp_bag([ @values ], [qw(a b c d e), ('')x5], 'list of all options');
