@@ -1,17 +1,17 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
+
 <html>
 <head>
 	<tmpl_var head.tags>
-	<title>^c; - ^Page(title);</title>
+	<title>^c; - ^Page(title);</title>	
 </head>
 <body>
 
 	^AdminBar("PBtmpl0000000000000090");
 	^AssetProxy(coolmenu);
 	
-	<div id="header">
-		<div id="titles">
+	<div id="header">		<div id="titles">			<div id="login">				^L("","","PBtmpl0000000000000092"); &middot; ^AdminToggle;			</div>
 			<h1>^c;</h1><br />
 			<h2>^Page(title);</h2>
 		</div>
@@ -26,11 +26,9 @@
 	</div>
 	<div id="footer">
 		^AssetProxy(style3/footer_right.jpg);
-	</div>
-
-	^AdminToggle;
-	
+	</div>	
 </body>
 </html>	
+
 ~~~
 ^AssetProxy(css03.css);
