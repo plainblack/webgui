@@ -957,6 +957,10 @@ sub www_edit {
 				value=>"edit"
 				})
 			.WebGUI::Form::hidden($self->session, {
+				name=>"revision",
+				value=>$self->session->form->param("revision")
+				})
+			.WebGUI::Form::hidden($self->session, {
 				name=>"ownerUserId",
 				value=>$self->getValue("ownerUserId")
 				})

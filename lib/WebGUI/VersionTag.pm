@@ -142,7 +142,7 @@ Returns a list of asset objects that are part of this version tag.
 sub getAssets {
 	my $self = shift;
 	my @assets = ();
-	my $sth = $self->session->db->read("select asset.assetId,asset.className,assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.tagId=?", [$self->getId]);
+	my $sth = $self->session->db->read("select asset.assetId,asset.className,assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.tagId=? order by revisionDate desc", [$self->getId]);
 	while (my ($id,$class,$version) = $sth->array) {
 		push(@assets, WebGUI::Asset->new($self->session,$id,$class,$version));
 	}

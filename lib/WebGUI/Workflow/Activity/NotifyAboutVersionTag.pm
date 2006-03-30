@@ -89,10 +89,16 @@ sub execute {
 	my $self = shift;
 	my $versionTag = shift;
 	my $inbox = WebGUI::Inbox->new($self->session);
+	my $urlOfSingleAsset = "";
+	if ($versionTag->getAssetCount) {
+		# if there's only one asset in the tag, we might as well give them a direct link to it
+		my $asset = $versionTag->getAssets->[0];	
+		$urlOfSingleAsset = "\n\n".$self->session->getSiteURL().$asset->getUrl("func=view;revision=".$asset->get("revisionDate"));
+	}
 	my $properties = {
 		status=>"completed",
 		subject=>$versionTag->get("name"),
-		message=>$self->get("message")."\n\n".$versionTag->get("comments"),
+		message=>$self->get("message")."\n\n".$versionTag->get("comments").$urlOfSingleAsset,
 		};	
 	if ($self->get("who") eq "committer") {
 		$properties->{userId} = $versionTag->get("committedBy");

@@ -536,6 +536,14 @@ sub setCollateral {
 }
 
 
+#-------------------------------------------------------------------
+
+=head2 www_edit () 
+
+Returns an edit form for this asset.
+
+=cut
+
 sub www_edit {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
