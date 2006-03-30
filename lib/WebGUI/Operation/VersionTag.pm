@@ -233,11 +233,12 @@ sub www_commitVersionTagConfirm {
 			$tag->requestCommit;
 			my $i18n = WebGUI::International->new($session, "VersionTag");
         		my $ac = WebGUI::AdminConsole->new($session,"versions");
+			my $default = WebGUI::Asset->getDefault($session);
 			return $ac->render(
 				'<p>'.$i18n->get("commit accepted").'</p>'
 				.'<ul>
-				<li><a href="'.$session->url->page.'">'.$i18n->get("493","WebGUI").'</a></li>
-				<li><a href="'.$session->url->page("op=manageVersions").'">'.$i18n->get("manage versions").'</a></li>
+				<li><a href="'.$default->getUrl.'">'.$i18n->get("493","WebGUI").'</a></li>
+				<li><a href="'.$default->getUrl("op=manageVersions").'">'.$i18n->get("manage versions").'</a></li>
 				</ul>'	
 				);
 		}

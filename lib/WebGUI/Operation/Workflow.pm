@@ -363,6 +363,7 @@ sub www_runWorkflow {
 		if (defined $instance) {
 			return $instance->run;
 		}
+		return "complete";
 	}
 	return "error";
 }

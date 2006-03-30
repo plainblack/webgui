@@ -463,6 +463,7 @@ sub getEditForm {
 		);
         $tabform->getTab("security")->workflow(
 		-name=>"approvalWorkflow",
+		-type=>"WebGUI::VersionTag",
 		-label=>$i18n->get('approval workflow'),
 		-hoverHelp=>$i18n->get('approval workflow description'),
 		-value=>[$self->getValue("approvalWorkflow")]
