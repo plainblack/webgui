@@ -368,7 +368,7 @@ sub workerResponse {
 			$self->debug("Got an error for $instanceId.");
 			$kernel->yield("suspendInstance",$instanceId);
 		} else {
-			$self->debug("Something bad happened on the return of $instanceId.");
+			$self->debug("Something bad happened on the return of $instanceId. ".$response->error_as_HTML);
 			$kernel->yield("suspendInstance",$instanceId);
 		}
 	} elsif ($response->is_redirect) {
