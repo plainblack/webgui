@@ -69,8 +69,6 @@ is(scalar @inputs, 1, 'The form has 1 input');
 
 my $input = $inputs[0];
 use Data::Dumper;
-diag(Dumper $input);
-diag($html);
 is($input->name, 'TestText', 'Checking input name');
 is($input->type, $formType, 'Checking input type');
 is($input->value, 'Some text in here', 'Checking default value');
