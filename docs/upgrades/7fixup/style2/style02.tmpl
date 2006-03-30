@@ -1,0 +1,61 @@
+#stevestyle000000000002
+#title:Style 02
+#menuTitle:Style 02
+#url:style_02
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+	<title>^c(); - ^Page(title);</title>
+	<tmpl_var head.tags>	
+</head>
+<body>
+^AdminBar("PBtmpl0000000000000090");
+<table border="0" cellpadding="0" cellspacing="0" width="100%" style="height:100%">
+<tr>
+	<td class="leftColumn" valign="top">
+		<div id="header">
+			<div id="title">^c;</div>
+			<div id="title_bg">^c;</div>
+		</div>
+		<div id="pageTitleBG">
+			<div id="pageTitle"><h2>^Page(title);</h2>
+			</div>
+		</div>
+		<div id="context">
+			<tmpl_var body.content>
+		</div>	
+	</td>
+	<td class="rightColumn" valign="top">
+		<div id="pb_wg_bg">
+			<div id="pb_wg">
+				&#160;
+			</div>
+		</div>
+		<br />
+		<table style="width:90%;margin-left:auto;margin-right:auto;background: url('^FileUrl(style2/navbar_bg.jpg);') repeat-x;" cellpadding="0" cellspacing="0" border="0">
+		<tr>
+			<td style="background: url('^FileUrl(style2/navbar_left.jpg);') no-repeat left;height:9px;width:10%;" align="left"></td>			
+			<td style="background: url('^FileUrl(style2/navbar_right.jpg);') no-repeat right;height:9px;width:90%;" align="right"></td>
+		</tr>
+		</table>
+		<div id="nav">
+			^AssetProxy(flexmenu);
+		</div>
+		<table style="width:90%;margin-left:auto;margin-right:auto;background: url('^FileUrl(style2/navbar_bg.jpg);') repeat-x;" cellpadding="0" cellspacing="0" border="0">
+		<tr>
+			<td style="background: url('^FileUrl(style2/navbar_left.jpg);') no-repeat left;height:9px;width:10%;" align="left"></td>			
+			<td style="background: url('^FileUrl(style2/navbar_right.jpg);') no-repeat right;height:9px;width:90%;" align="right"></td>
+		</tr>
+		</table>
+		<div id="loginStyles">
+			^L("","","PBtmpl0000000000000044");
+			^AdminToggle;
+		</div>	
+	</td>	
+</tr>
+</table>
+
+</body>
+</html>
+~~~
+^AssetProxy(css03.css);	
