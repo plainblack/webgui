@@ -580,8 +580,9 @@ Superclass method that performs standard logout routines.
 
 sub logout {
 	my $self = shift;
+	my $oldSessionId = $session{var}{sessionId};
    WebGUI::Session::end($session{var}{sessionId});
-   WebGUI::Session::start(1);
+   WebGUI::Session::start(1,$oldSessionId);
 	my $u = WebGUI::User->new(1);
 	$self->{user} = $u;
    return "";
