@@ -361,7 +361,6 @@ sub www_vote {
 			$u = WebGUI::User->new($self->session->user->userId);
 			$u->karma($self->get("karmaPerVote"),"Poll (".$self->getId.")","Voted on this poll.");
 		}
-		$self->deletePageCache;
 		$self->getContainer->purgeCache;
 	}
 	return $self->getContainer->www_view;

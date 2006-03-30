@@ -127,19 +127,6 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 deletePageCache ( )
-
-Deletes the rendered page cache for this wobject.
-
-=cut
-
-sub deletePageCache {
-	my $self = shift;
-        WebGUI::Cache->new($self->session,"wobject_".$self->getId."_".$self->session->user->userId)->delete;
-}
-
-#-------------------------------------------------------------------
-
 =head2 deleteCollateral ( tableName, keyName, keyValue )
 
 Deletes a row of collateral data where keyName=keyValue.
@@ -398,7 +385,6 @@ sub moveCollateralUp {
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
-	$self->deletePageCache;
 }
 
 
