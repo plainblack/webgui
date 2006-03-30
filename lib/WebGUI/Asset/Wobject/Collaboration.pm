@@ -107,7 +107,6 @@ sub appendTemplateLabels {
 	$var->{"addquestion.label"} = $i18n->get("addquestion");
         $var->{'all.label'} = $i18n->get("all");
         $var->{'atleastone.label'} = $i18n->get("atleastone");
-	$var->{"approve.label"} = $i18n->get("approve");
 	$var->{'answer.label'} = $i18n->get("answer");
 	$var->{'attachment.label'} = $i18n->get("attachment");
 	$var->{"by.label"} = $i18n->get("by");
@@ -174,15 +173,9 @@ sub canEdit {
 }
 
 #-------------------------------------------------------------------
-sub canModerate {
-	my $self = shift;
-	return $self->session->user->isInGroup($self->get("moderateGroupId"));
-}
-
-#-------------------------------------------------------------------
 sub canPost {
 	my $self = shift;
-	return $self->session->user->isInGroup($self->get("postGroupId")) || $self->canModerate;
+	return $self->session->user->isInGroup($self->get("postGroupId")) || $self->canEdit;
 }
 
 
@@ -252,6 +245,10 @@ sub definition {
                 tableName=>'Collaboration',
                 className=>'WebGUI::Asset::Wobject::Collaboration',
                 properties=>{
+			approvalWorkflow =>{
+				fieldType=>"workflow",
+				defaultValue=>"pbworkflow000000000003"
+				},
 			displayLastReply =>{
 				fieldType=>"yesNo",
 				defaultValue=>0
@@ -380,17 +377,9 @@ sub definition {
 				fieldType => "integer",
 				defaultValue=> 0
 				},
-			moderatePosts =>{
-				fieldType=>"yesNo",
-				defaultValue=>0
-				},
 			avatarsEnabled =>{
 				fieldType=>"yesNo",
 				defaultValue=>0
-				},
-			moderateGroupId =>{
-				fieldType=>"group",
-				defaultValue=>'4'
 				},
 			postGroupId =>{
 				fieldType=>"group",
@@ -467,16 +456,16 @@ sub getEditForm {
 		-hoverHelp=>$i18n->get('rss template description'),
                 );
         $tabform->getTab("security")->group(
-		-name=>"moderateGroupId",
-		-label=>$i18n->get('who moderates'),
-		-hoverHelp=>$i18n->get('who moderates description'),
-		-value=>[$self->getValue("moderateGroupId")]
-		);
-        $tabform->getTab("security")->group(
 		-name=>"postGroupId",
 		-label=>$i18n->get('who posts'),
 		-hoverHelp=>$i18n->get('who posts description'),
 		-value=>[$self->getValue("postGroupId")]
+		);
+        $tabform->getTab("security")->workflow(
+		-name=>"approvalWorkflow",
+		-label=>$i18n->get('approval workflow'),
+		-hoverHelp=>$i18n->get('approval workflow description'),
+		-value=>[$self->getValue("approvalWorkflow")]
 		);
         $tabform->getTab("display")->integer(
 		-name=>"threadsPerPage",
@@ -624,12 +613,6 @@ sub getEditForm {
 		-label=>$i18n->get('enable avatars'),
 		-hoverHelp=>$i18n->get('enable avatars description'),
 		-value=>$self->getValue("avatarsEnabled")
-		);
-        $tabform->getTab("security")->yesNo(
-		-name=>"moderatePosts",
-		-label=>$i18n->get('moderate'),
-		-hoverHelp=>$i18n->get('moderate description'),
-		-value=>$self->getValue("moderatePosts")
 		);
 	return $tabform;
 }
@@ -807,7 +790,7 @@ sub prepareView {
 #-------------------------------------------------------------------
 sub processPropertiesFromFormPost {
 	my $self = shift;
-        my $updatePrivs = ($self->session->form->process("groupIdView") ne $self->get("groupIdView") || $self->session->form->process("moderateGroupId") ne $self->get("moderateGroupId"));
+        my $updatePrivs = ($self->session->form->process("groupIdView") ne $self->get("groupIdView") || $self->session->form->process("groupIdEdit") ne $self->get("groupIdEdit"));
 	$self->SUPER::processPropertiesFromFormPost;
 	if ($self->get("subscriptionGroupId") eq "") {
 		$self->createSubscriptionGroup;
@@ -816,7 +799,7 @@ sub processPropertiesFromFormPost {
                 foreach my $descendant (@{$self->getLineage(["descendants"],{returnObjects=>1})}) {
                         $descendant->update({
                                 groupIdView=>$self->get("groupIdView"),
-                                groupIdEdit=>$self->get("moderateGroupId")
+                                groupIdEdit=>$self->get("groupIdEdit")
                                 });
                 }
         }
@@ -886,7 +869,6 @@ Subscribes a user to this collaboration system.
 
 sub subscribe {
 	my $self = shift;
-	WebGUI::Cache->new($self->session,"wobject_".$self->getId."_".$self->session->user->userId)->delete;
 	my $group = WebGUI::Group->new($self->session,$self->get("subscriptionGroupId"));
 	$group->addUsers([$self->session->user->userId]);
 }
@@ -901,7 +883,6 @@ Unsubscribes a user from this collaboration system
 
 sub unsubscribe {
 	my $self = shift;
-	WebGUI::Cache->new($self->session,"wobject_".$self->getId."_".$self->session->user->userId)->delete;
 	my $group = WebGUI::Group->new($self->session,$self->get("subscriptionGroupId"));
 	$group->deleteUsers([$self->session->user->userId],[$self->get("subscriptionGroupId")]);
 }
@@ -930,7 +911,7 @@ sub view {
 	$var{'user.canPost'} = $self->canPost;
         $var{"add.url"} = $self->getNewThreadUrl;
         $var{"rss.url"} = $self->getRssUrl;
-        $var{'user.isModerator'} = $self->canModerate;
+        $var{'user.isModerator'} = $self->canEdit;
         $var{'user.isVisitor'} = ($self->session->user->userId eq '1');
 	$var{'user.isSubscribed'} = $self->isSubscribed;
 	$var{'sortby.title.url'} = $self->getSortByUrl("title");
@@ -1079,7 +1060,7 @@ sub www_search {
 				and (
 					assetData.status in ('approved','archived')
 				 or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag"));
-		$sql .= "		or assetData.status='pending'" if ($self->canModerate);
+		$sql .= "		or assetData.status='pending'" if ($self->canEdit);
 		$sql .= "		or (assetData.ownerUserId=".$self->session->db->quote($self->session->user->userId)." and assetData.ownerUserId<>'1')
 					) ";
 		$sql .= " and ($all) " if ($all ne "");

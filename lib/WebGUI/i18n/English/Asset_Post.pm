@@ -200,10 +200,6 @@ A URL to edit this Post.
 The status of this Post: "Approved", "Pending" or "Archived".
 <p>
 
-<b>approve.url</b><br>
-The URL to approve this Post, if it's moderated.
-<p>
-
 <b>reply.url</b><br>
 The URL to reply to this Post without quoting it.
 <p>
@@ -397,6 +393,12 @@ back the data with a simple &lt;tmpl_var userDefined1&gt;.
 
 |,
 		lastUpdated => 1134670360,
+	},
+
+	'post received' => {
+		message => q|Your post has been received and is pending approval.|,
+		context => q|Displayed after someone posts a new message.|,
+		lastUpdated => 0,
 	},
 
 	'approved' => {

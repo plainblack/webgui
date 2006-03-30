@@ -41,13 +41,13 @@ our $HELP = {
                                 namespace => 'Asset_Collaboration',
                         },
                         {
-                                title => 'who moderates',
-                                description => 'who moderates description',
+                                title => 'who posts',
+                                description => 'who posts description',
                                 namespace => 'Asset_Collaboration',
                         },
                         {
-                                title => 'who posts',
-                                description => 'who posts description',
+                                title => 'approval workflow',
+                                description => 'approval workflow description',
                                 namespace => 'Asset_Collaboration',
                         },
                         {
@@ -138,11 +138,6 @@ our $HELP = {
                         {
                                 title => 'enable avatars',
                                 description => 'enable avatars description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'moderate',
-                                description => 'moderate description',
                                 namespace => 'Asset_Collaboration',
                         },
 		],

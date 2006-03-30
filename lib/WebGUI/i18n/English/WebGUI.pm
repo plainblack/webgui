@@ -139,11 +139,6 @@ our $I18N = {
 		lastUpdated => 1065356764
 	},
 
-	'578' => {
-		message => q|You have a pending message to approve.|,
-		lastUpdated => 1031514049
-	},
-
 	'978' => {
 		message => q|User added successfully.|,
 		lastUpdated => 1053804577
@@ -487,11 +482,6 @@ Be aware that any database links you create here will be available to all conten
 	'862' => {
 		message => q|This user's profile is not public.|,
 		lastUpdated => 1043881275
-	},
-
-	'579' => {
-		message => q|Your message has been approved.|,
-		lastUpdated => 1031514049
 	},
 
 	'480' => {

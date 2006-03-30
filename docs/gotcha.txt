@@ -64,6 +64,12 @@ save you many hours of grief.
 	segments of the content in your import node, you'll need
 	to change it after the upgrade.
 
+ * Because collaboration system posts are now integrated with
+	the workflow engine, the approve/deny links are no longer
+	needed or used in your templates. In addition if you wish
+	to use an approval process on any of your collaboration 
+	systems, you'll need to re-enable it after this upgrade.
+
 
 6.8.4
 --------------------------------------------------------------------

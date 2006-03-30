@@ -251,7 +251,7 @@ sub www_exportGenerate {
 		$self->session->output->print($i18n->get('done'));
 	}
 	$self->session->output->printf($i18n->get('export information'), scalar(@{$assets}), ($self->session->datetime->time()-$startTime));
-	$self->session->output->print('<a target="_parent" href="'.$self->getUrl.'">'.$i18n->get(493).'</a>');
+	$self->session->output->print('<a target="_parent" href="'.$self->getUrl.'">'.$i18n->get(493,'WebGUI').'</a>');
 	return;
 }
 

@@ -1801,7 +1801,7 @@ sub www_editSave {
 	if ($self->session->config("maximumAssets")) {
 		my ($count) = $self->session->db->quickArray("select count(*) from asset");
 		my $i18n = WebGUI::International->new($self->session, "Asset");
-		$self->session->style->userStyle($i18n->get("over max assets")) if ($self->session->config("maximumAssets") <= $count);
+		return $self->session->style->userStyle($i18n->get("over max assets")) if ($self->session->config("maximumAssets") <= $count);
 	}
 	my $object;
 	if ($self->session->form->process("assetId") eq "new") {

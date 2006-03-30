@@ -119,6 +119,20 @@ sub get {
 
 #-------------------------------------------------------------------
 
+=head2 getAssetCount ( )
+
+Returns the number of assets that are under this tag.
+
+=cut
+
+sub getAssetCount {
+	my $self = shift;
+	my ($count) = $self->session->db->quickArray("select count(distinct(assetId)) from assetData where tagId=?", [$self->getId]);
+	return $count;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getAssets ( )
 
 Returns a list of asset objects that are part of this version tag.
@@ -146,6 +160,20 @@ Returns the ID of this version tag.
 sub getId {
 	my $self = shift;
 	return $self->{_id};
+}
+
+#-------------------------------------------------------------------
+
+=head2 getRevisionCount ( )
+
+Returns the number of revisions that are under this tag.
+
+=cut
+
+sub getRevisionCount {
+	my $self = shift;
+	my ($count) = $self->session->db->quickArray("select count(assetId) from assetData where tagId=?", [$self->getId]);
+	return $count;
 }
 
 #-------------------------------------------------------------------

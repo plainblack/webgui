@@ -27,7 +27,7 @@ use WebGUI::SQL;
 use WebGUI::Storage::Image;
 use WebGUI::User;
 use WebGUI::Utility;
-
+use WebGUI::VersionTag;
 our @ISA = qw(WebGUI::Asset);
 
 
@@ -63,7 +63,7 @@ sub canEdit {
 	return (($self->session->form->process("func") eq "add" || ($self->session->form->process("assetId") eq "new" && $self->session->form->process("func") eq "editSave" && $self->session->form->process("class") eq "WebGUI::Asset::Post")) && $self->getThread->getParent->canPost) || # account for new posts
 
 		($self->isPoster && $self->getThread->getParent->get("editTimeout") > ($self->session->datetime->time() - $self->get("dateUpdated"))) ||
-		$self->getThread->getParent->canModerate;
+		$self->getThread->getParent->canEdit;
 
 }
 
@@ -98,6 +98,14 @@ Cuts a title string off at 30 characters.
 sub chopTitle {
 	my $self = shift;
         return substr($self->get("title"),0,30);
+}
+
+#-------------------------------------------------------------------
+
+sub commit {
+	my $self = shift;
+	$self->SUPER::commit;
+        $self->notifySubscribers;
 }
 
 #-------------------------------------------------------------------
@@ -213,19 +221,6 @@ sub formatContent {
                 $msg = WebGUI::HTML::processReplacements($self->session,$msg);
         }
         return $msg;
-}
-
-#-------------------------------------------------------------------
-
-=head2 getApproveUrl (  )
-
-Formats the URL to approve a post.
-
-=cut
-
-sub getApproveUrl {
-	my $self = shift;
-	return $self->getUrl("revision=".$self->get("revisionDate").";func=approve;mlog=".$self->session->form->process("mlog"));
 }
 
 #-------------------------------------------------------------------
@@ -407,7 +402,6 @@ sub getTemplateVars {
 	$var{"delete.url"} = $self->getDeleteUrl;
 	$var{"edit.url"} = $self->getEditUrl;
 	$var{"status"} = $self->getStatus;
-	$var{"approve.url"} = $self->getApproveUrl;
 	$var{"reply.url"} = $self->getReplyUrl;
 	$var{'reply.withquote.url'} = $self->getReplyUrl(1);
 	$var{'url'} = $self->getUrl.'#id'.$self->getId;
@@ -664,11 +658,12 @@ sub processPropertiesFromFormPost {
 			isHidden => 1,
 			);
 		$data{url} = $self->fixUrl($self->getThread->get("url")."/1") if ($self->isReply);
-		if ($self->getThread->getParent->canModerate) {
+		if ($self->getThread->getParent->canEdit) {
 			$self->getThread->lock if ($self->session->form->process('lock'));
 			$self->getThread->stick if ($self->session->form->process("stick"));
 		}
 		$self->getThread->unarchive if ($self->getThread->get("status") eq "archived");
+        	$self->getThread->incrementReplies($self->get("dateUpdated"),$self->getId) if ($self->isReply);
 	}
 	$data{groupIdView} =$self->getThread->getParent->get("groupIdView");
 	$data{groupIdEdit} = $self->getThread->getParent->get("groupIdEdit");
@@ -681,12 +676,7 @@ sub processPropertiesFromFormPost {
 	}
 	$self->update(\%data);
         $self->getThread->subscribe if ($self->session->form->process("subscribe"));
-        if ($self->getThread->getParent->get("moderatePosts")) {
-                $self->setStatusPending;
-        } else {
-                $self->setStatusApproved;
-        }
-  delete $self->{_storageLocation};
+ 	delete $self->{_storageLocation};
 	my $storage = $self->getStorageLocation;
 	my $filename;
 	my $attachmentLimit = $self->getThread->getParent->get("attachmentsPerPost");
@@ -702,9 +692,20 @@ sub processPropertiesFromFormPost {
 			}
 		}
 	}
-	# clear some cache
-	WebGUI::Cache->new($self->session,"wobject_".$self->getThread->getParent->getId."_".$self->session->user->userId)->delete;
-	WebGUI::Cache->new($self->session,"cspost_".($self->getParent->getId)."_".$self->session->user->userId."_".$self->session->scratch->get("discussionLayout")."_1")->delete;
+	# allows us to let the cs post use it's own workflow approval process
+	my $currentTag = WebGUI::VersionTag->getWorking($self->session);
+	if ($currentTag->getAssetCount < 2) {
+		$currentTag->set({workflowId=>$self->getThread->getParent->get("approvalWorkflow")});
+		$currentTag->requestCommit;
+	} else {
+		my $newTag = WebGUI::VersionTag->create($self->session, {
+			name=>$self->getTitle." / ".$self->session->user->username,
+			workflowId=>$self->getThread->getParent->get("approvalWorkflow")
+			});
+		$self->session->db->write("update assetData set tagId=? where assetId=? and tagId=?",[$newTag->getId, $self->getId, $currentTag->getId]);
+		$self->purgeCache;
+		$newTag->requestCommit;
+	}
 }
 
 
@@ -781,68 +782,19 @@ sub setParent {
         return $self->SUPER::setParent($newParent);
 }
 
-#-------------------------------------------------------------------
-
-=head2 setStatusApproved ( )
-
-Sets the post to approved and sends any necessary notifications.
-
-=cut
-
-sub setStatusApproved {
-	my $self = shift;
-	$self->commit;
-	$self->getThread->incrementReplies($self->get("dateUpdated"),$self->getId) if ($self->isReply && ($self->session->form->process('assetId') eq
-	"new"));
-	unless ($self->isPoster) {
-		my $i18n = WebGUI::International->new($self->session);
-		WebGUI::Inbox->new($self->session)->addMessage({
-			userId=>$self->get("ownerUserId"),
-			status=>'completed',
-			message=>$i18n->get(579)."\n\n".$self->session->url->getSiteURL().'/'.$self->getUrl
-			});
-	}
-	$self->notifySubscribers unless ($self->session->form->process("func") eq 'add');
-}
-
-
 
 #-------------------------------------------------------------------
 
 =head2 setStatusArchived ( )
 
-Sets the status of this post to archived. This will only happen if the post status is approved.
+Sets the status of this post to archived.
 
 =cut
 
 
 sub setStatusArchived {
         my ($self) = @_;
-        $self->update({status=>'archived'}) if ($self->get("status") eq "approved");
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 setStatusPending ( )
-
-Sets the status of this post to pending.
-
-=cut
-
-sub setStatusPending {
-        my ($self) = @_;
-	if ($self->session->user->isInGroup($self->getThread->getParent->get("moderateGroupId"))) {
-		$self->setStatusApproved;
-	} else {
-        	$self->update({status=>'pending'});
-		my $i18n = WebGUI::International->new($self->session);
-		WebGUI::Inbox->new($self->session)->addMessage({
-			status=>'pending',
-			message=>$i18n->get("578")."\n\n".$self->session->url->getSiteURL().'/'.$self->getUrl("revision=".$self->get("revisionDate")),
-			groupId=>$self->getThread->getParent->get("moderateGroupId")
-			});
-	}
+        $self->update({status=>'archived'});
 }
 
 
@@ -927,21 +879,6 @@ sub view {
 }
 
 
-
-#-------------------------------------------------------------------
-
-=head2 www_approve ( )
-
-The web method to approve a post.
-
-=cut
-
-sub www_approve {
-	my $self = shift;
-	$self->setStatusApproved if $self->getThread->getParent->canModerate;
-	return $self->www_view;
-}
-
 #-------------------------------------------------------------------
 sub www_deleteFile {
 	my $self = shift;
@@ -995,9 +932,8 @@ sub www_edit {
 				});
 		} elsif ($self->session->form->process("class") eq "WebGUI::Asset::Post::Thread") { # new thread
 			return $self->session->privilege->insufficient() unless ($self->getThread->getParent->canPost);
-			$var{'form.header'} .= WebGUI::Form::hidden($self->session, {name=>"proceed", value=>"redirectToParent"});
 			$var{isNewThread} = 1;
-                	if ($self->getThread->getParent->canModerate) {
+                	if ($self->getThread->getParent->canEdit) {
                         	$var{'sticky.form'} = WebGUI::Form::yesNo($self->session, {
                                 	name=>'stick',
                                 	value=>$self->session->form->process("stick")
@@ -1032,6 +968,7 @@ sub www_edit {
 		$content = $self->getValue("content");
 		$title = $self->getValue("title");
 	}
+	$var{'form.header'} .= WebGUI::Form::hidden($self->session, {name=>"proceed", value=>"showConfirmation"});
 	if ($self->session->form->process("title") || $self->session->form->process("content") || $self->session->form->process("synopsis")) {
 		$var{'preview.title'} = WebGUI::HTML::filter($self->session->form->process("title"),"all");
 		($var{'preview.synopsis'}, $var{'preview.content'}) = $self->getSynopsisAndContentFromFormPost;
@@ -1042,7 +979,7 @@ sub www_edit {
 	}
 	$var{'form.footer'} = WebGUI::Form::formFooter($self->session,);
 	$var{usePreview} = $self->getThread->getParent->get("usePreview");
-	$var{'user.isModerator'} = $self->getThread->getParent->canModerate;
+	$var{'user.isModerator'} = $self->getThread->getParent->canEdit;
 	$var{'user.isVisitor'} = ($self->session->user->userId eq '1');
 	$var{'visitorName.form'} = WebGUI::Form::text($self->session, {
 		name=>"visitorName",
@@ -1112,6 +1049,41 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 
+=head2 www_editSave ()
+
+We're extending www_editSave() here to deal with editing a post that has been denied by the approval process.  Our change will reassign the old working tag of this post to the user so that they can edit it.
+
+=cut
+
+sub www_editSave {
+	my $self = shift;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
+	if ($self->session->config("maximumAssets")) {
+		my ($count) = $self->session->db->quickArray("select count(*) from asset");
+		my $i18n = WebGUI::International->new($self->session, "Asset");
+		return $self->session->style->userStyle($i18n->get("over max assets")) if ($self->session->config("maximumAssets") <= $count);
+	}
+	if ($self->session->form->param("assetId") ne "new" && $self->get("status") eq "pending") { 
+		my $currentTag = WebGUI::VersionTag->getWorking($self->session, 1);
+		if (defined $currentTag && $currentTag->getAssetCount > 0) {
+			# play a little working tag switcheroo
+			$self->session->stow("temporaryWorkingTagHolder",$currentTag);
+		}
+		my $tag = WebGUI::VersionTag->new($self->session, $self->get("tagId"));
+		$tag->setWorking if defined $tag;
+	}
+	my $output = $self->SUPER::www_editSave();
+	if ($self->session->stow->get("temporaryWorkingTagHolder")) {
+		# undo switcharoo
+		my $tag = $self->session->stow->get("temporaryWorkingTagHolder");
+		$tag->setWorking if defined $tag;
+		$self->session->stow->delete("temporaryWorkingTagHolder");
+	}	
+	return $output;
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_ratePost ( )
 
 The web method to rate a post.
@@ -1127,15 +1099,16 @@ sub www_rate {
 
 #-------------------------------------------------------------------
 
-=head2 www_redirectToParent ( )
+=head2 www_showConfirmation ( )
 
-This is here to stop people from duplicating posts by hitting refresh in their browser.
+Shows a confirmation message letting the user know their post has been submitted.
 
 =cut 
 
-sub www_redirectToParent {
+sub www_showConfirmation {
 	my $self = shift;
-	$self->session->http->setRedirect($self->getParent->getUrl);
+	my $i18n = WebGUI::International->new($self->session, "Asset_Post");
+	return $self->getThread->getParent->processStyle('<p>'.$i18n->get("post received").'</p><p><a href="'.$self->getThread->getParent->getUrl.'">'.$i18n->get("493","WebGUI").'</a></p>');
 }
 
 

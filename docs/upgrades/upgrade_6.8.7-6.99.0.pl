@@ -199,6 +199,9 @@ sub addWorkflow {
 		message mediumtext,
 		toGroup varchar(22) binary
 		)");
+	$session->db->write("alter table Collaboration drop column moderatePosts");
+	$session->db->write("alter table Collaboration drop column moderateGroupId");
+	$session->db->write("alter table Collaboration add column approvalWorkflow varchar(22) binary not null default 'pbworkflow000000000003'");
 	print "\t\tPurging old workflow info.\n";
 	my $versionTag = WebGUI::VersionTag->getWorking($session);
 	$versionTag->set({name=>"Upgrade to ".$toVersion});

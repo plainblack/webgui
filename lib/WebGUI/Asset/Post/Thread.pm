@@ -503,7 +503,10 @@ sub processPropertiesFromFormPost {
 	if ($self->get("subscriptionGroupId") eq "") {
 		$self->createSubscriptionGroup;
 	}
-	if ($self->getParent->canModerate) {
+	if ($self->session->form->process("assetId") eq "new") {
+        	$self->getParent->incrementThreads($self->get("dateUpdated"),$self->getId) unless ($self->isReply);
+	}
+	if ($self->getParent->canEdit) {
 		my $karmaScale = $self->session->form("karmaScale","integer") || 1;
 		$self->update({karmaScale=>$karmaScale, karmaRank=>$self->get("karma")/$karmaScale});
 	}
@@ -590,19 +593,6 @@ sub setParent {
         return $self->WebGUI::Asset::setParent($newParent);
 }  
 
-#-------------------------------------------------------------------
-
-=head2 setStatusApproved ( )
-
-Sets the post to approved and sends any necessary notifications.
-
-=cut
-
-sub setStatusApproved {
-	my $self = shift;
-	$self->SUPER::setStatusApproved;
-        $self->getParent->incrementThreads($self->get("dateUpdated"),$self->getId) unless ($self->isReply);
-}
 
 
 #-------------------------------------------------------------------
@@ -629,7 +619,6 @@ Subscribes the user to this thread.
 sub subscribe {
 	my $self = shift;
 	$self->createSubscriptionGroup;
-  WebGUI::Cache->new($self->session,"cspost_".$self->getId."_".$self->session->user->userId."_".$self->session->scratch->get("discussionLayout")."_".$self->session->form->process("pn"))->delete;
 	my $group = WebGUI::Group->new($self->session,$self->get("subscriptionGroupId"));
   $group->addUsers([$self->session->user->userId]);
 }
@@ -705,7 +694,6 @@ Negates the subscribe method.
 
 sub unsubscribe {
 	my $self = shift;
-  WebGUI::Cache->new($self->session,"cspost_".$self->getId."_".$self->session->user->userId."_".$self->session->scratch->get("discussionLayout")."_".$self->session->form->process("pn"))->delete;
   my $group = WebGUI::Group->new($self->session,$self->get("subscriptionGroupId"));
   $group->deleteUsers([$self->session->user->userId]);
 }
@@ -721,7 +709,7 @@ sub view {
 	$self->getParent->appendTemplateLabels($var);
 
         $var->{'user.isVisitor'} = ($self->session->user->userId eq '1');
-        $var->{'user.isModerator'} = $self->getParent->canModerate;
+        $var->{'user.isModerator'} = $self->getParent->canEdit;
         $var->{'user.canPost'} = $self->getParent->canPost;
         $var->{'user.canReply'} = $self->canReply;
         $var->{'repliesAllowed'} = $self->getParent->get("allowReplies");
@@ -770,7 +758,7 @@ sub view {
 			and (
 				assetData.status in ('approved','archived')
 						 or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag"));
-	$sql .= "		or assetData.status='pending'" if ($self->getParent->canModerate);
+	$sql .= "		or assetData.status='pending'" if ($self->getParent->canEdit);
 	$sql .= "		or (assetData.ownerUserId=".$self->session->db->quote($self->session->user->userId)." and assetData.ownerUserId<>'1')
 			))
 		group by assetData.assetId
@@ -838,7 +826,7 @@ The web method to lock a thread.
 
 sub www_lockThread {
 	my $self = shift;
-	$self->lock if $self->getParent->canModerate;
+	$self->lock if $self->getParent->canEdit;
 	return $self->www_view;
 }
 
@@ -852,7 +840,7 @@ The web method to make a thread sticky.
 
 sub www_stick {
 	my $self = shift;
-	$self->stick if $self->getParent->canModerate;
+	$self->stick if $self->getParent->canEdit;
 	return $self->www_view;
 }
 
@@ -914,7 +902,7 @@ The web method to unlock a thread.
 
 sub www_unlockThread {
 	my $self = shift;
-	$self->unlock if $self->getParent->canModerate;
+	$self->unlock if $self->getParent->canEdit;
 	return $self->www_view;
 }
 
@@ -928,7 +916,7 @@ The web method to make a sticky thread normal again.
 
 sub www_unstick {
 	my $self = shift;
-	$self->unstick if $self->getParent->canModerate;
+	$self->unstick if $self->getParent->canEdit;
 	$self->www_view;
 }
 

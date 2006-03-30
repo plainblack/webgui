@@ -126,11 +126,6 @@ our $I18N = {
 		lastUpdated => 1109618544,
 	},
 
-	'approve' => {
-		message => q|Approve|,
-		lastUpdated => 1109618544,
-	},
-
 	'answer' => {
 		message => q|Answer|,
 		lastUpdated => 1109618544,
@@ -173,11 +168,6 @@ our $I18N = {
 
 	'description' => {
 		message => q|Description|,
-		lastUpdated => 1109618544,
-	},
-
-	'deny' => {
-		message => q|Deny|,
 		lastUpdated => 1109618544,
 	},
 
@@ -446,11 +436,6 @@ our $I18N = {
 		lastUpdated => 1109698614,
 	},
 
-	'who moderates' => {
-		message => q|Who can moderate?|,
-		lastUpdated => 1109698614,
-	},
-
 	'who posts' => {
 		message => q|Who can post?|,
 		lastUpdated => 1109698614,
@@ -526,11 +511,6 @@ our $I18N = {
 		lastUpdated => 1109698614,
 	},
 
-	'moderate' => {
-		message => q|Moderate posts?|,
-		lastUpdated => 1109698614,
-	},
-
 	'collaboration template labels title' => {
 		message => q|Collaboration Template Labels|,
                 lastUpdated => 1111520746,
@@ -573,10 +553,6 @@ our $I18N = {
 ^International("phrase","Asset_Collaboration"); "^International("atleastone","Asset_Collaboration");".
 <p>
 
-<b>approve.label</b><br>
-^International("word","Asset_Collaboration"); "^International("approve","Asset_Collaboration");".
-<p>
-
 <b>answer.label</b><br>
 ^International("word","Asset_Collaboration"); "^International("answer","Asset_Collaboration");".
 <p>
@@ -615,10 +591,6 @@ our $I18N = {
 
 <b>description.label</b><br>
 ^International("word","Asset_Collaboration"); "^International("description","Asset_Collaboration");".
-<p>
-
-<b>deny.label</b><br>
-^International("word","Asset_Collaboration"); "^International("deny","Asset_Collaboration");".
 <p>
 
 <b>edit.label</b><br>
@@ -863,9 +835,14 @@ properties listed below:</p>
                 lastUpdated => 1119070429,
         },
 
-        'who moderates description' => {
-                message => q|The group that will moderate posts to this Asset, if moderation is enabled.|,
-                lastUpdated => 1119070429,
+        'approval workflow description' => {
+                message => q|Choose a workflow to be executed on each post as it gets submitted.|,
+                lastUpdated => 0,
+        },
+
+        'approval workflow' => {
+                message => q|Approval Workflow|,
+                lastUpdated => 0,
         },
 
         'who posts description' => {
@@ -960,12 +937,6 @@ the preview is displayed, the Post can either be edited or canceled.|,
                 lastUpdated => 1119070429,
         },
 
-        'moderate description' => {
-                message => q|Enable moderation for Posts to the Collaboration Asset.|,
-                lastUpdated => 1119070429,
-        },
-
-	
 	'collaboration post list template variables title' => {
 		message => q|Collaboration, Post List Template Variables|,
 		lastUpdated => 1113673895,

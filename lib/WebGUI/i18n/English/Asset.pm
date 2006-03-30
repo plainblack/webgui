@@ -703,10 +703,6 @@ each asset under the tab &quot;Meta&quot; in the asset properties.</p>
                    lastUpdated => 1050438829,
                    message => q|Open in new window?|
                  },
-        '493' => {
-                   lastUpdated => 1031514049,
-                   message => q|Back to site.|
-                 },
 	'encrypt page' => {
                 message => q|Encrypt content?|,
                 lastUpdated =>1092748557,
