@@ -55,12 +55,41 @@ our $I18N = {
 	},
 
 	'639' => {
-		message => q|<b>Template Name</b><br/>
+		message => q|<p>Templates allow you to customize the look and feel of your content on your site.  WebGUI comes with many existing templates that you can use as is or copy and modify to suit your individual needs.  Note that in many cases that you can change the look of default WebGUI templates through CSS.  The advantage to this is that the default templates are automatically updated when you upgrade WebGUI, where custom templates will have to be manually updated.</p>
+<p>There are two ways to edit templates, via the Display tab of the Asset Edit screen or via the Asset Manager.  In either case, you will need to be an Admin or a Template Admin.
+</p>
+
+<p><b>Display tab of the Asset Edit screen</b><br/>
+<ul>
+<li>Turn on Admin mode.</li>
+<li>Click on the Edit icon for an Asset.</li>
+<li>Select the "Display" tab for the Asset.</li>
+<li>Next to the template that the Asset uses will be two icons.</li>
+	<dl>
+	<dt>Edit</dt>
+	<dd>This will allow you to edit the currently selected template.</dd>
+	<dt>Manage</dt>
+	<dd>This will take you to the Folder in the Asset Manager that contains this template.</dd>
+	</dl>
+</ul>
+</p>
+
+<p><b>Asset Manager</b><br/>
+<ul>
+<li>Turn on Admin mode.</li>
+<li>Click on the "Assets" icon in the Admin bar.</li>
+<li>In the crumb trail style navigation, click on "Root".</li>
+<li>Then click on Asset titled, "Import Node".</li>
+<li>Most default WebGUI templates are stored by type in folders inside the Template Folder.</li>
+</ul>
+</p>
+
+<b>Template Name</b><br/>
 Give this template a descriptive name so that you'll know what it is when you're applying a template to content.
 <p/>
 <b>NOTE:</b> You should never edit the default templates that come with WebGUI as they are subject to change with each new release. Instead, copy the template you wish to edit, and edit the copy.
 |,
-		lastUpdated => 1119979659
+		lastUpdated => 1143755587
 	},
 
         'namespace description' => {
