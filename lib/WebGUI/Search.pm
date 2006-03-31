@@ -262,7 +262,15 @@ sub search {
 	my $query = "";
 	my @clauses = ();
 	if ($rules->{keywords}) {
-		push(@params,$rules->{keywords},$rules->{keywords});
+		my $keywords = $rules->{keywords};
+		unless ($keywords =~ m/"|\*/) { # do wildcards for people, like they'd expect
+        		my @terms = split(' ',$keywords);
+        		for (my $i = 0; $i < scalar(@terms); $i++) {
+                		$terms[$i] .= "*";
+        		}
+        		$keywords = join(" ", @terms);
+		}	
+		push(@params, $keywords, $keywords);
 		$self->{_score} = "match (keywords) against (? in boolean mode) as score";
 		push(@clauses, "match (keywords) against (? in boolean mode)");
 	}
