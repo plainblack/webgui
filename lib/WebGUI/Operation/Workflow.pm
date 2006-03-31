@@ -204,7 +204,7 @@ sub www_editWorkflow {
 		);
 	$f->submit;
 	my $steps = '<table class="content">';
-	my $rs = $session->db->read("select activityId, title from workflowActivity where workflowId=? order by sequenceNumber",[$workflow->getId]);
+	my $rs = $session->db->read("select activityId, title from WorkflowActivity where workflowId=? order by sequenceNumber",[$workflow->getId]);
 	while (my ($id, $title) = $rs->array) {
 		$steps .= '<tr><td>'
 			.$session->icon->delete("op=deleteWorkflowActivity;workflowId=".$workflow->getId.";activityId=".$id, undef, $i18n->get("confirm delete activity"))
