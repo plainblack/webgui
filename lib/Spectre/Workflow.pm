@@ -170,6 +170,7 @@ sub debug {
 	if ($self->{_debug}) {
 		print "WORKFLOW: ".$output."\n";
 	}
+	$self->getLogger->debug("WORKFLOW: ".$output);
 }
 
 #-------------------------------------------------------------------
@@ -193,6 +194,38 @@ sub deleteInstance {
 			}
 		}
 	}
+}
+
+#-------------------------------------------------------------------
+
+=head2 error ( output )
+
+Prints out error information if debug is enabled.
+
+=head3 
+
+=cut 
+
+sub error {
+	my $self = shift;
+	my $output = shift;
+	if ($self->{_debug}) {
+		print "WORKFLOW: ".$output."\n";
+	}
+	$self->getLogger->error("WORKFLOW: ".$output);
+}
+
+#-------------------------------------------------------------------
+
+=head3 getLogger ( )
+
+Returns a reference to the logger.
+
+=cut
+
+sub getLogger {
+	my $self = shift;
+	return $self->{_logger};
 }
 
 #-------------------------------------------------------------------
@@ -235,13 +268,17 @@ sub loadWorkflows {
 
 #-------------------------------------------------------------------
 
-=head2 new ( config [ , debug ] )
+=head2 new ( config, logger, [ , debug ] )
 
 Constructor. Loads all active workflows from each WebGUI site and begins executing them.
 
 =head3 config
 
-The path to the root of the WebGUI installation.
+The config object for spectre.
+
+=head3 logger
+
+A reference to the logger object.
 
 =head3 debug
 
@@ -252,8 +289,9 @@ A boolean indicating Spectre should spew forth debug as it runs.
 sub new {
 	my $class = shift;
 	my $config = shift;
+	my $logger = shift;
 	my $debug = shift;
-	my $self = {_debug=>$debug, _config=>$config};
+	my $self = {_debug=>$debug, _config=>$config, _logger=>$logger};
 	bless $self, $class;
 	my @publicEvents = qw(addInstance deleteInstance);
 	POE::Session->create(
@@ -365,16 +403,16 @@ sub workerResponse {
 			$self->debug("Workflow instance $instanceId is now complete.");
 			$kernel->yield("deleteInstance",$instanceId);			
 		} elsif ($state eq "error") {
-			$self->debug("Got an error for $instanceId.");
+			$self->debug("Got an error response for $instanceId.");
 			$kernel->yield("suspendInstance",$instanceId);
 		} else {
-			$self->debug("Something bad happened on the return of $instanceId. ".$response->error_as_HTML);
+			$self->error("Something bad happened on the return of $instanceId. ".$response->error_as_HTML);
 			$kernel->yield("suspendInstance",$instanceId);
 		}
 	} elsif ($response->is_redirect) {
 		$self->debug("Response for $instanceId was redirected.");
 	} elsif ($response->is_error) {	
-		$self->debug("Response for $instanceId had a communications error. ".$response->error_as_HTML);
+		$self->error("Response for $instanceId had a communications error. ".$response->error_as_HTML);
 		$kernel->yield("suspendInstance",$instanceId)
 		# we should probably log something
 	}

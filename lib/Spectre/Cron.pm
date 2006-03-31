@@ -253,6 +253,7 @@ sub debug {
 	if ($self->{_debug}) {
 		print "CRON: ".$output."\n";
 	}
+	$self->getLogger->debug("CRON: ".$output);
 }
 
 #-------------------------------------------------------------------
@@ -284,6 +285,19 @@ sub deleteJob {
 
 #-------------------------------------------------------------------
 
+=head3 getLogger ( )
+
+Returns a reference to the logger.
+
+=cut
+
+sub getLogger {
+	my $self = shift;
+	return $self->{_logger};
+}
+
+#-------------------------------------------------------------------
+
 =head2 loadSchedule ( config )
 
 Loads the workflow schedule from a particular site.
@@ -309,7 +323,7 @@ sub loadSchedule {
 
 #-------------------------------------------------------------------
 
-=head2 new ( config )
+=head2 new ( config, logger, workflow, [ debug ] )
 
 Constructor.
 
@@ -317,7 +331,11 @@ Constructor.
 
 A WebGUI::Config object that represents the spectre.conf file.
 
-=head3 workflowSession
+=head3 logger
+
+A reference to the logger object.
+
+=head3 workflow
 
 A reference to the Worfklow session.
 
@@ -330,9 +348,10 @@ A boolean indicating Spectre should spew forth debug as it runs.
 sub new {
 	my $class = shift;
 	my $config  = shift;
+	my $logger = shift;
 	my $workflowSession = shift;
 	my $debug = shift;
-	my $self = {_debug=>$debug, _workflowSession=>$workflowSession, _config=>$config};
+	my $self = {_debug=>$debug, _workflowSession=>$workflowSession, _config=>$config, _logger=>$logger};
 	bless $self, $class;
 	my @publicEvents = qw(addJob deleteJob);
 	POE::Session->create(

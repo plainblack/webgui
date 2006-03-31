@@ -81,6 +81,20 @@ sub debug {
 	if ($self->{_debug}) {
 		print "ADMIN: ".$output."\n";
 	}
+	$self->getLogger->debug("ADMIN: ".$output);
+}
+
+#-------------------------------------------------------------------
+
+=head3 getLogger ( )
+
+Returns a reference to the logger.
+
+=cut
+
+sub getLogger {
+	my $self = shift;
+	return $self->{_logger};
 }
 
 #-------------------------------------------------------------------
@@ -103,7 +117,10 @@ sub new {
 	my $class = shift;
 	my $config = shift;
 	my $debug = shift;
-	my $self = {_debug=>$debug, _config=>$config};
+ 	Log::Log4perl->init( $config->getWebguiRoot."/etc/log.conf" );   
+	$Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth+3;
+	my $logger = Log::Log4perl->get_logger($config->getFilename);
+	my $self = {_debug=>$debug, _config=>$config, _logger=>$logger};
 	bless $self, $class;
 	create_ikc_server(
         	port => $config->get("port"),
@@ -113,8 +130,8 @@ sub new {
 		object_states => [ $self => {_start=>"_start", _stop=>"_stop", "shutdown"=>"_stop"} ],
 		args=>[["shutdown"]]
         	);
-	$self->{_workflow} = Spectre::Workflow->new($config, $debug);
-	$self->{_cron} = Spectre::Cron->new($config, $self->{_workflow}, $debug);
+	$self->{_workflow} = Spectre::Workflow->new($config, $logger, $debug);
+	$self->{_cron} = Spectre::Cron->new($config, $logger, $self->{_workflow}, $debug);
 	POE::Kernel->run();
 }
 	
