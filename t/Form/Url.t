@@ -17,7 +17,6 @@ use WebGUI::Form;
 use WebGUI::Form::Url;
 use WebGUI::Session;
 use HTML::Form;
-use Tie::IxHash;
 use WebGUI::Form_Checking;
 
 #The goal of this test is to verify that Url form elements work
@@ -28,23 +27,54 @@ my $session = WebGUI::Test->session;
 
 # put your tests here
 
-my %testBlock;
-
-tie %testBlock, 'Tie::IxHash';
-
-%testBlock = (
-	Email1 => [ 'mailto:whatever', 'EQUAL', 'mailto processing'],
-	Email2 => [ 'me@nowhere.com', 'mailto:me@nowhere.com', 'email address processing'],
-	Email3 => [ '/', 'EQUAL', 'Url'],
-	Email4 => [ '://', 'EQUAL', 'colon'],
-	Email5 => [ '^', 'EQUAL', 'caret'],
-	Email6 => [ 'mySite', 'http://mySite', 'bare hostname'],
-	Email7 => [ '??**()!!', 'http://??**()!!', 'WRONG: random crap is passed through'],
-);
+my $testBlock = [
+	{
+		key => 'Url1',
+		testValue => 'mailto:whatever',
+		expected  => 'EQUAL',
+		comment   => 'mailto processing',
+	},
+	{
+		key => 'Url2',
+		testValue => 'me@nowhere.com',
+		expected  => 'mailto:me@nowhere.com',
+		comment   => 'email address processing',
+	},
+	{
+		key => 'Url3',
+		testValue => '/',
+		expected  => 'EQUAL',
+		comment   => 'Bare slash',
+	},
+	{
+		key => 'Url4',
+		testValue => '://',
+		expected  => 'EQUAL',
+		comment   => 'colon slash slash',
+	},
+	{
+		key => 'Url5',
+		testValue => '^',
+		expected  => 'EQUAL',
+		comment   => 'caret',
+	},
+	{
+		key => 'Url6',
+		testValue => 'mySite',
+		expected  => 'http://mySite',
+		comment   => 'bare hostname',
+	},
+	{
+		key => 'Url7',
+		testValue => '??**()!!',
+		expected  => 'http://??**()!!',
+		comment   => 'WRONG: random crap is passed through',
+	},
+];
 
 my $formClass = 'WebGUI::Form::Url';
 
-my $numTests = 12 + scalar keys %testBlock;
+my $numTests = 12 + scalar @{ $testBlock } + 1;
 
 diag("Planning on running $numTests tests\n");
 
@@ -102,4 +132,4 @@ is($input->{maxlength}, 1024, 'set maxlength');
 
 ##Test Form Output parsing
 
-WebGUI::Form_Checking::auto_check($session, 'Url', %testBlock);
+WebGUI::Form_Checking::auto_check($session, 'Url', $testBlock);

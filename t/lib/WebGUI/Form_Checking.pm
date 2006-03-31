@@ -5,35 +5,40 @@ use Test::More;
 use Test::Deep;
 
 sub auto_check {
-	my ($session, $formType, %testBlock) = @_;
+	my ($session, $formType, $testBlock) = @_;
 	my $origSessionRequest = $session->{_request};
+
+	##Create a by-name interface to the test to simplify the
+	##mocked request.
+	my %tests = map { $_->{key} => $_ } @{ $testBlock };
+	is(scalar keys %tests, scalar @{ $testBlock }, 'no collisions in testBlock');
 
 	my $request = Test::MockObject->new;
 	$request->mock('body',
 		sub {
 			my ($self, $value) = @_;
-			return unless exists $testBlock{$value};
-			if (ref $testBlock{$value}->[0] eq "ARRAY") {
-				return @{ $testBlock{$value}->[0] };
+			return unless exists $tests{$value};
+			if (ref $tests{$value}->{testValue} eq "ARRAY") {
+				return @{ $tests{$value}->{testValue} } ;
 			}
 			else {
-				return $testBlock{$value}->[0];
+				return $tests{$value}->{testValue};
 			}
 		}
 	);
 
 	$session->{_request} = $request;
 
-	foreach my $key (keys %testBlock) {
-		my ($testValue, $expected, $comment, $dataType) = @{ $testBlock{$key} };
-		$dataType ||= 'SCALAR';
-		if ($dataType eq 'SCALAR') {
-			my $value = $session->form->get($key, $formType);
-			is($value, ($expected eq 'EQUAL' ? $testValue : $expected), $comment);
+	foreach my $test ( @{ $testBlock } ) {
+		$test->{dataType} ||= 'SCALAR';
+		$test->{expected} = $test->{testValue} if $test->{expected} eq 'EQUAL';
+		if ($test->{dataType} eq 'SCALAR') {
+			my $value = $session->form->get($test->{key}, $formType);
+			is($value, $test->{expected}, $test->{comment});
 		}
-		elsif ($dataType eq 'ARRAY') {
-			my @value = $session->form->get($key, $formType);
-			cmp_bag(\@value, ($expected eq 'EQUAL' ? $testValue : $expected), $comment);
+		elsif ($test->{dataType} eq 'ARRAY') {
+			my @value = $session->form->get($test->{key}, $formType);
+			cmp_bag(\@value, $test->{expected}, $test->{comment});
 		}
 	}
 

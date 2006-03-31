@@ -17,7 +17,6 @@ use WebGUI::Form;
 use WebGUI::Form::Email;
 use WebGUI::Session;
 use HTML::Form;
-use Tie::IxHash;
 use WebGUI::Form_Checking;
 
 #The goal of this test is to verify that Email form elements work.
@@ -29,19 +28,25 @@ my $session = WebGUI::Test->session;
 
 # put your tests here
 
-my %testBlock;
-
-tie %testBlock, 'Tie::IxHash';
-
-%testBlock = (
-	EMAIL1 => [ 'me@nowhere.com', 'EQUAL', 'regular email address'],
-	EMAIL2 => [ "what do you want?", undef, 'not an email address'],
-);
+my $testBlock = [
+	{
+		key => 'EMAIL1',
+		testValue => 'me@nowhere.com',
+		expected  => 'EQUAL',
+		comment   => 'regular email address'
+	},
+	{
+		key => 'EMAIL2',
+		testValue => 'what do you want?',
+		expected  => undef,
+		comment   => 'not an email address'
+	},
+];
 
 my $formType = 'text';
 my $formClass = 'WebGUI::Form::Email';
 
-my $numTests = 12 + scalar keys %testBlock;
+my $numTests = 12 + scalar @{ $testBlock } + 1;
 
 diag("Planning on running $numTests tests\n");
 
@@ -96,4 +101,4 @@ is($input->{maxlength}, 200, 'Checking maxlength param, set');
 
 ##Test Form Output parsing
 
-WebGUI::Form_Checking::auto_check($session, 'email', %testBlock);
+WebGUI::Form_Checking::auto_check($session, 'email', $testBlock);

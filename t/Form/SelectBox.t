@@ -17,7 +17,6 @@ use WebGUI::Form;
 use WebGUI::Form::SelectBox;
 use WebGUI::Session;
 use HTML::Form;
-use Tie::IxHash;
 use WebGUI::Form_Checking;
 
 #The goal of this test is to verify that SelectBox form elements work
@@ -29,19 +28,27 @@ my $session = WebGUI::Test->session;
 
 # put your tests here
 
-my %testBlock;
-
-tie %testBlock, 'Tie::IxHash';
-
-%testBlock = (
-	BOX1 => [ [qw/a/],	'a', 'return a scalar', 'SCALAR'],
-	BOX2 => [ [qw/z y x/],	'z', 'first element', 'SCALAR'],
-);
+my $testBlock = [
+	{
+		key => 'Box1',
+		testValue => [qw/a/],
+		expected  => 'a',
+		comment   => 'return a scalar',
+		dataType   => 'SCALAR',
+	},
+	{
+		key => 'Box2',
+		testValue => [qw/ z y x/],
+		expected  => 'z',
+		comment   => 'first element',
+		dataType   => 'SCALAR',
+	},
+];
 
 my $formClass = 'WebGUI::Form::SelectBox';
 my $formType = 'SelectBox';
 
-my $numTests = 9 + scalar keys %testBlock;
+my $numTests = 9 + scalar @{ $testBlock } + 1;
 
 diag("Planning on running $numTests tests\n");
 
@@ -102,4 +109,4 @@ is($input->{size}, 5, 'set size');
 
 ##Test Form Output parsing
 
-WebGUI::Form_Checking::auto_check($session, $formType, %testBlock);
+WebGUI::Form_Checking::auto_check($session, $formType, $testBlock);

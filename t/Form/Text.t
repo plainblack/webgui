@@ -17,7 +17,6 @@ use WebGUI::Form;
 use WebGUI::Form::Text;
 use WebGUI::Session;
 use HTML::Form;
-use Tie::IxHash;
 use WebGUI::Form_Checking;
 
 #The goal of this test is to verify that Text form elements work
@@ -28,18 +27,24 @@ my $session = WebGUI::Test->session;
 
 # put your tests here
 
-my %testBlock;
-
-tie %testBlock, 'Tie::IxHash';
-
-%testBlock = (
-	TestText  => [ 'some user value', 'EQUAL', 'Regular text'],
-	TestText2 => [ "some user value\nwith\r\nwhitespace", "some user valuewithwhitespace", 'Embedded whitespace is stripped'],
-);
+my $testBlock = [
+	{
+		key => 'Text1',
+		testValue => 'some user value',
+		expected  => 'EQUAL',
+		comment   => 'Regular text',
+	},
+	{
+		key => 'Text2',
+		testValue => "some user value\nwith\r\nwhitespace",
+		expected  => "some user valuewithwhitespace",
+		comment   => 'Embedded whitespace is stripped',
+	},
+];
 
 my $formType = 'text';
 
-my $numTests = 12 + scalar keys %testBlock;
+my $numTests = 12 + scalar @{ $testBlock } + 1;
 
 diag("Planning on running $numTests tests\n");
 
@@ -97,4 +102,4 @@ is($input->{maxlength}, 200, 'Checking maxlength param, set');
 
 ##Test Form Output parsing
 
-WebGUI::Form_Checking::auto_check($session, $formType, %testBlock);
+WebGUI::Form_Checking::auto_check($session, $formType, $testBlock);

@@ -17,7 +17,6 @@ use WebGUI::Form;
 use WebGUI::Form::Phone;
 use WebGUI::Session;
 use HTML::Form;
-use Tie::IxHash;
 use WebGUI::Form_Checking;
 
 #The goal of this test is to verify that Phone form elements work
@@ -28,26 +27,67 @@ my $session = WebGUI::Test->session;
 
 # put your tests here
 
-my %testBlock;
-
-tie %testBlock, 'Tie::IxHash';
-
-%testBlock = (
-	PHONE1 => [ "503\n867\n5309",  undef, 'newline separation'],
-	PHONE2 => [ '503 867 5309',  'EQUAL', 'valid: space separation'],
-	PHONE3 => [ '503.867.5309',  'EQUAL', 'valid: dot separation'],
-	PHONE4 => [ '503 867 5309 x227',  'EQUAL', 'valid: extension syntax rejectd'],
-	PHONE5 => [ '()()()',  undef, 'invalid: no digits'],
-	PHONE6 => [ '------',  undef, 'invalid: no digits'],
-	PHONE7 => [ "\n",  undef, 'invalid: no digits'],
-	PHONE8 => [ "++++",  undef, 'invalid: no digits'],
-	PHONE9 => [ "0xx31 3456 1234",  'EQUAL', 'Brazilian long distance'],
-);
+my $testBlock = [
+	{
+		key => 'Phone1',
+		testValue => '503\n867\n5309',
+		expected  => undef,
+		comment   => 'newline separation',
+	},
+	{
+		key => 'Phone2',
+		testValue => '503 867 5309',
+		expected  => 'EQUAL',
+		comment   => 'valid: space separation',
+	},
+	{
+		key => 'Phone3',
+		testValue => '503.867.5309',
+		expected  => 'EQUAL',
+		comment   => 'valid: dot separation',
+	},
+	{
+		key => 'Phone4',
+		testValue => '503 867 5309 x227',
+		expected  => 'EQUAL',
+		comment   => 'valid: extension syntax rejectd',
+	},
+	{
+		key => 'Phone5',
+		testValue => '()()()',
+		expected  => undef,
+		comment   => 'invalid: parens only, no digits',
+	},
+	{
+		key => 'Phone6',
+		testValue => '------',
+		expected  => undef,
+		comment   => 'invalid: dashes only, no digits',
+	},
+	{
+		key => 'Phone7',
+		testValue => "\n",
+		expected  => undef,
+		comment   => 'invalid: newline only, no digits',
+	},
+	{
+		key => 'Phone8',
+		testValue => '++++',
+		expected  => undef,
+		comment   => 'invalid, plusses only, no digits',
+	},
+	{
+		key => 'Phone9',
+		testValue => '0xx31 3456 1234',
+		expected  => 'EQUAL',
+		comment   => 'Brazilian long distance',
+	},
+];
 
 my $formClass = 'WebGUI::Form::Phone';
 my $formType = 'Phone';
 
-my $numTests = 12 + scalar keys %testBlock;
+my $numTests = 12 + scalar @{ $testBlock } + 1;
 
 diag("Planning on running $numTests tests\n");
 
@@ -104,5 +144,5 @@ is($input->{maxlength}, 20, 'set maxlength');
 
 ##Test Form Output parsing
 
-WebGUI::Form_Checking::auto_check($session, $formType, %testBlock);
+WebGUI::Form_Checking::auto_check($session, $formType, $testBlock);
 

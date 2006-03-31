@@ -17,7 +17,6 @@ use WebGUI::Form;
 use WebGUI::Form::Integer;
 use WebGUI::Session;
 use HTML::Form;
-use Tie::IxHash;
 use WebGUI::Form_Checking;
 
 #The goal of this test is to verify that Integer form elements work
@@ -28,22 +27,43 @@ my $session = WebGUI::Test->session;
 
 # put your tests here
 
-my %testBlock;
-
-tie %testBlock, 'Tie::IxHash';
-
-%testBlock = (
-	INT1 => [ '-123456',  'EQUAL', 'valid, negative integer'],
-	INT2 => [ '002300',  'EQUAL', 'valid, leading zeroes'],
-	INT3 => [ '+123456',  0, 'reject explicitly positive integer'],
-	INT4 => [ '123-456.', 0, 'rejects non-sense integer with negative sign'],
-	INT5 => [ '123.456',  0, 'rejects float'],
-);
+my $testBlock = [
+	{
+		key => 'Int1',
+		testValue => '-123456',
+		expected  => 'EQUAL',
+		comment   => 'valid, negative integer',
+	},
+	{
+		key => 'Int2',
+		testValue => '002300',
+		expected  => 'EQUAL',
+		comment   => 'valid, leading zeroes',
+	},
+	{
+		key => 'Int3',
+		testValue => '+123456',
+		expected  => 0,
+		comment   => 'reject explicitly positive integer',
+	},
+	{
+		key => 'Int4',
+		testValue => '123-456.',
+		expected  => 0,
+		comment   => 'rejects non-sense integer with negative sign',
+	},
+	{
+		key => 'Int5',
+		testValue => '123.456',
+		expected  => 0,
+		comment   => 'rejects float',
+	},
+];
 
 my $formClass = 'WebGUI::Form::Integer';
 my $formType = 'Integer';
 
-my $numTests = 12 + scalar keys %testBlock;
+my $numTests = 12 + scalar @{ $testBlock } + 1;
 
 diag("Planning on running $numTests tests\n");
 
@@ -100,5 +120,5 @@ is($input->{maxlength}, 20, 'set maxlength');
 
 ##Test Form Output parsing
 
-WebGUI::Form_Checking::auto_check($session, $formType, %testBlock);
+WebGUI::Form_Checking::auto_check($session, $formType, $testBlock);
 

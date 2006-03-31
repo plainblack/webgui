@@ -14,12 +14,12 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Form;
-use WebGUI::Form::Password;
+use WebGUI::Form::Checkbox;
 use WebGUI::Session;
 use HTML::Form;
 use WebGUI::Form_Checking;
 
-#The goal of this test is to verify that Password form elements work
+#The goal of this test is to verify that Checkbox form elements work
 
 use Test::More; # increment this value for each test you create
 
@@ -29,23 +29,23 @@ my $session = WebGUI::Test->session;
 
 my $testBlock = [
 	{
-		key => 'Text1',
-		testValue => 'some user value',
+		key => 'CHECK1',
+		testValue => 'string1',
 		expected  => 'EQUAL',
-		comment   => 'Regular text',
+		comment   => 'string check'
 	},
 	{
-		key => 'Text2',
-		testValue => "some user value\nwith\r\nwhitespace",
-		expected  => "EQUAL",
-		comment   => 'Embedded whitespace is left',
+		key => 'CHECK2',
+		testValue => '002300',
+		expected  => 'EQUAL',
+		comment   => 'valid, leading zeroes'
 	},
 ];
 
-my $formType = 'password';
-my $formClass = 'WebGUI::Form::Password';
+my $formClass = 'WebGUI::Form::Checkbox';
+my $formType = 'Checkbox';
 
-my $numTests = 12 + scalar @{ $testBlock } + 1;
+my $numTests = 6 + scalar @{ $testBlock } + 1;
 
 diag("Planning on running $numTests tests\n");
 
@@ -56,8 +56,9 @@ my ($header, $footer) = (WebGUI::Form::formHeader($session), WebGUI::Form::formF
 my $html = join "\n",
 	$header, 
 	$formClass->new($session, {
-		name => 'TestText',
-		value => 'Some text in here',
+		name => 'CBox1',
+		value => 'Check me',
+		checked => 1,
 	})->toHtml,
 	$footer;
 
@@ -73,35 +74,12 @@ is(scalar @inputs, 1, 'The form has 1 input');
 #Basic tests
 
 my $input = $inputs[0];
-use Data::Dumper;
-is($input->name, 'TestText', 'Checking input name');
-is($input->type, $formType, 'Checking input type');
-is($input->value, 'Some text in here', 'Checking default value');
+is($input->name, 'CBox1', 'Checking input name');
+is($input->type, 'checkbox', 'Checking input type');
+is($input->value, 'Check me', 'Checking default value');
 is($input->disabled, undef, 'Disabled param not sent to form');
-is($input->{size}, 30, 'Default size');
-is($input->{maxlength}, 35, 'Default maxlength');
-
-##Form value preprocessing
-##Note that HTML::Form will unencode the text for you.
-
-$html = join "\n",
-	$header, 
-	$formClass->new($session, {
-		name => 'preTestText',
-		value => q!Some & text in " here!,
-		size => 25,
-		maxlength => 200,
-	})->toHtml,
-	$footer;
-
-@forms = HTML::Form->parse($html, 'http://www.webgui.org');
-@inputs = $forms[0]->inputs;
-$input = $inputs[0];
-is($input->name, 'preTestText', 'Checking input name');
-is($input->value, 'Some & text in " here', 'Checking default value');
-is($input->{size}, 25, 'Checking size param, set');
-is($input->{maxlength}, 200, 'Checking maxlength param, set');
 
 ##Test Form Output parsing
 
 WebGUI::Form_Checking::auto_check($session, $formType, $testBlock);
+

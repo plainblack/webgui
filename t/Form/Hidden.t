@@ -28,21 +28,42 @@ my $session = WebGUI::Test->session;
 
 # put your tests here
 
-my %testBlock;
-
-tie %testBlock, 'Tie::IxHash';
-
-%testBlock = (
-	HIDDEN1 => [ 'ABCDEzyxwv', 'EQUAL', 'alpha'],
-	HIDDEN2 => [ '02468', 'EQUAL', 'numeric'],
-	HIDDEN3 => [ 'NO WHERE', 'EQUAL', 'alpha space'],
-	HIDDEN4 => [ '-.&*(', 'EQUAL', 'punctuation'],
-	HIDDEN5 => [ " \t\n\tdata", 'EQUAL', 'white space'],
-);
+my $testBlock = [
+	{
+		key => 'Hidden1',
+		testValue => 'ABCDEzyxwv',
+		expected  => 'EQUAL',
+		comment   => 'alpha',
+	},
+	{
+		key => 'Hidden2',
+		testValue => '02468',
+		expected  => 'EQUAL',
+		comment   => 'numeric',
+	},
+	{
+		key => 'Hidden3',
+		testValue => 'NO WHERE',
+		expected  => 'EQUAL',
+		comment   => 'alpha space',
+	},
+	{
+		key => 'Hidden4',
+		testValue => '-.&*(',
+		expected  => 'EQUAL',
+		comment   => 'punctuation',
+	},
+	{
+		key => 'Hidden5',
+		testValue => ' \t\n\tdata',
+		expected  => 'EQUAL',
+		comment   => 'white space',
+	},
+];
 
 my $formClass = 'WebGUI::Form::Hidden';
 
-my $numTests = 6 + scalar keys %testBlock;
+my $numTests = 6 + scalar @{ $testBlock } + 1;
 
 diag("Planning on running $numTests tests\n");
 
@@ -79,4 +100,4 @@ is($input->disabled, undef, 'Disabled param not sent to form');
 
 ##Test Form Output parsing
 
-WebGUI::Form_Checking::auto_check($session, 'Hidden', %testBlock);
+WebGUI::Form_Checking::auto_check($session, 'Hidden', $testBlock);

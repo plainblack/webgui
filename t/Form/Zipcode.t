@@ -17,7 +17,6 @@ use WebGUI::Form;
 use WebGUI::Form::Zipcode;
 use WebGUI::Session;
 use HTML::Form;
-use Tie::IxHash;
 use WebGUI::Form_Checking;
 
 #The goal of this test is to verify that Zipcode form elements work
@@ -28,21 +27,42 @@ my $session = WebGUI::Test->session;
 
 # put your tests here
 
-my %testBlock;
-
-tie %testBlock, 'Tie::IxHash';
-
-%testBlock = (
-	Zip1 => [ 'ABCDE', 'EQUAL', 'alpha'],
-	Zip2 => [ '02468', 'EQUAL', 'numeric'],
-	Zip3 => [ 'NO WHERE', 'EQUAL', 'alpha space'],
-	Zip4 => [ '-', 'EQUAL', 'base dash'],
-	Zip5 => [ 'abcde', undef, 'lower case'],
-);
+my $testBlock = [
+	{
+		key => 'Zip1',
+		testValue => 'ABCDE',
+		expected  => 'EQUAL',
+		comment   => 'alpha',
+	},
+	{
+		key => 'Zip2',
+		testValue => '02468',
+		expected  => 'EQUAL',
+		comment   => 'numeric',
+	},
+	{
+		key => 'Zip3',
+		testValue => 'NO WHERE',
+		expected  => 'EQUAL',
+		comment   => 'alpha space',
+	},
+	{
+		key => 'Zip4',
+		testValue => '-',
+		expected  => 'EQUAL',
+		comment   => 'bare dash',
+	},
+	{
+		key => 'Zip5',
+		testValue => 'abcde',
+		expected  => undef,
+		comment   => 'lower case',
+	},
+];
 
 my $formClass = 'WebGUI::Form::Zipcode';
 
-my $numTests = 14 + scalar keys %testBlock;
+my $numTests = 14 + scalar @{ $testBlock } + 1;
 
 diag("Planning on running $numTests tests\n");
 
@@ -77,10 +97,6 @@ is($input->disabled, undef, 'Disabled param not sent to form');
 is($input->{size}, 30, 'Checking size param, default');
 is($input->{maxlength}, 10, 'Checking maxlength param, default');
 
-##Test Form Output parsing
-
-WebGUI::Form_Checking::auto_check($session, 'Zipcode', %testBlock);
-
 $html = join "\n",
 	$header, 
 	$formClass->new($session, {
@@ -100,3 +116,7 @@ is($input->value, '97229-MXIM', 'Checking default value');
 is($input->disabled, undef, 'Disabled param not sent to form');
 is($input->{size}, 12, 'Checking size param, default');
 is($input->{maxlength}, 13, 'Checking maxlength param, default');
+
+##Test Form Output parsing
+
+WebGUI::Form_Checking::auto_check($session, 'Zipcode', $testBlock);

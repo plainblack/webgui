@@ -18,7 +18,6 @@ use WebGUI::Form::Float;
 use WebGUI::Session;
 use Tie::IxHash;
 use HTML::Form;
-use Tie::IxHash;
 use WebGUI::Form_Checking;
 
 #The goal of this test is to verify that Float form elements work
@@ -29,26 +28,67 @@ my $session = WebGUI::Test->session;
 
 # put your tests here
 
-my %testBlock;
-
-tie %testBlock, 'Tie::IxHash';
-
-%testBlock = (
-	FLOAT1 => [ '-1.23456',   'EQUAL', 'valid, negative float'],
-	FLOAT2 => [ '.23456',     'EQUAL', 'valid, no integer part'],
-	FLOAT3 => [ '123456789.', 'EQUAL', 'valid, no fractional part'],
-	FLOAT4 => [ '-.123456',   'EQUAL', 'valid, negative, no integer part'],
-	FLOAT5 => [ '+123.456',    0, 'invalid, no explicit plus sign'],
-	FLOAT6 => [ '123456',      'EQUAL', 'WRONG, no decimal point'],
-	FLOAT7 => [ '......',      0, 'invalid, no digits'],
-	FLOAT8 => [ '-00789.25',   'EQUAL', 'leading zeroes are okay'],
-	FLOAT9 => [ '.123-456',    0, 'invalid, embedded minus sign'],
-);
+my $testBlock = [
+	{
+		key => 'FLOAT1',
+		testValue => '-1.23456',
+		expected  => 'EQUAL',
+		comment   => 'valid, negative float'
+	},
+	{
+		key => 'FLOAT2',
+		testValue => '.23456',
+		expected  => 'EQUAL',
+		comment   => 'valid, no integer part'
+	},
+	{
+		key => 'FLOAT3',
+		testValue => '123456789.',
+		expected  => 'EQUAL',
+		comment   => 'valid, no fractional part'
+	},
+	{
+		key => 'FLOAT4',
+		testValue => '-.123456',
+		expected  => 'EQUAL',
+		comment   => 'valid, negative, no integer part'
+	},
+	{
+		key => 'FLOAT5',
+		testValue => '+123.456',
+		expected  => '0',
+		comment   => 'invalid, no explicit plus sign'
+	},
+	{
+		key => 'FLOAT6',
+		testValue => '123456',
+		expected  => 'EQUAL',
+		comment   => 'WRONG, no decimal point'
+	},
+	{
+		key => 'FLOAT7',
+		testValue => '......',
+		expected  => 0,
+		comment   => 'invalid, no digits'
+	},
+	{
+		key => 'FLOAT8',
+		testValue => '-00789.25',
+		expected  => 'EQUAL',
+		comment   => 'leading zeroes are okay'
+	},
+	{
+		key => 'FLOAT9',
+		testValue => '.123-456',
+		expected  => 0,
+		comment   => 'invalid, embedded minus sign'
+	},
+];
 
 my $formClass = 'WebGUI::Form::Float';
 my $formType = 'Float';
 
-my $numTests = 12 + scalar keys %testBlock;
+my $numTests = 12 + scalar @{ $testBlock } + 1;
 
 diag("Planning on running $numTests tests\n");
 
@@ -103,5 +143,5 @@ is($input->{maxlength}, 20, 'set maxlength');
 
 ##Test Form Output parsing
 
-WebGUI::Form_Checking::auto_check($session, $formType, %testBlock);
+WebGUI::Form_Checking::auto_check($session, $formType, $testBlock);
 

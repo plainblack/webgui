@@ -17,7 +17,6 @@ use WebGUI::Form;
 use WebGUI::Form::Textarea;
 use WebGUI::Session;
 use HTML::Form;
-use Tie::IxHash;
 use WebGUI::Form_Checking;
 
 #The goal of this test is to verify that Textarea form elements work
@@ -28,18 +27,24 @@ my $session = WebGUI::Test->session;
 
 # put your tests here
 
-my %testBlock;
-
-tie %testBlock, 'Tie::IxHash';
-
-%testBlock = (
-	TestText  => [ 'some user value', 'EQUAL', 'Regular text'],
-	TestText2 => [ "some user value\nwith\r\nwhitespace", 'EQUAL', 'Embedded whitespace is left'],
-);
+my $testBlock = [
+	{
+		key => 'Text1',
+		testValue => 'some user value',
+		expected  => 'EQUAL',
+		comment   => 'Regular text',
+	},
+	{
+		key => 'Text2',
+		testValue => "some user value\nwith\r\nwhitespace",
+		expected  => "EQUAL",
+		comment   => 'Embedded whitespace is left',
+	},
+];
 
 my $formType = 'textarea';
 
-my $numTests = 14 + scalar keys %testBlock;
+my $numTests = 14 + scalar @{ $testBlock } + 1;
 
 diag("Planning on running $numTests tests\n");
 
@@ -97,4 +102,4 @@ is($input->{wrap}, 'off', 'set wrap to off');
 
 ##Test Form Output parsing
 
-WebGUI::Form_Checking::auto_check($session, $formType, %testBlock);
+WebGUI::Form_Checking::auto_check($session, $formType, $testBlock);

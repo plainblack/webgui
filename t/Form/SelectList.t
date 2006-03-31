@@ -29,21 +29,41 @@ my $session = WebGUI::Test->session;
 
 # put your tests here
 
-my %testBlock;
-
-tie %testBlock, 'Tie::IxHash';
-
-%testBlock = (
-	LIST1 => [ [qw/a/],	'a',		'single element array, scalar', 'SCALAR'],
-	LIST2 => [ [qw/a/],	'EQUAL',	'single element array, array', 'ARRAY'],
-	LIST3 => [ [qw/a b c/],	"a\nb\nc",	'multi element array, scalar', 'SCALAR'],
-	LIST4 => [ [qw/a b c/],	'EQUAL',	'multi element array, array', 'ARRAY'],
-);
+my $testBlock = [
+	{
+		key => 'List1',
+		testValue => [qw/a/],
+		expected  => 'a',
+		comment   => 'single element array, scalar',
+		dataType  => 'SCALAR'
+	},
+	{
+		key => 'List2',
+		testValue => [qw/a/],
+		expected  => 'EQUAL',
+		comment   => 'single element array, array',
+		dataType  => 'ARRAY'
+	},
+	{
+		key => 'List3',
+		testValue => [qw/a b c/],
+		expected  => "a\nb\nc",
+		comment   => 'multi element array, scalar',
+		dataType  => 'SCALAR'
+	},
+	{
+		key => 'List4',
+		testValue => [qw/a b c/],
+		expected  => 'EQUAL',
+		comment   => 'multi element array, array',
+		dataType  => 'ARRAY'
+	},
+];
 
 my $formClass = 'WebGUI::Form::SelectList';
 my $formType = 'SelectList';
 
-my $numTests = 11 + scalar keys %testBlock;
+my $numTests = 11 + scalar @{ $testBlock } + 1;
 
 diag("Planning on running $numTests tests\n");
 
@@ -142,4 +162,4 @@ cmp_set([ $form->param('ListMultiple') ], [qw(a b c d e)], 'sorted value check')
 
 ##Test Form Output parsing
 
-WebGUI::Form_Checking::auto_check($session, $formType, %testBlock);
+WebGUI::Form_Checking::auto_check($session, $formType, $testBlock);
