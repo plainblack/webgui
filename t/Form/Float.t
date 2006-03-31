@@ -41,8 +41,8 @@ tie %testBlock, 'Tie::IxHash';
 	FLOAT5 => [ '+123.456',    0, 'invalid, no explicit plus sign'],
 	FLOAT6 => [ '123456',      'EQUAL', 'WRONG, no decimal point'],
 	FLOAT7 => [ '......',      0, 'invalid, no digits'],
-	FLOAT7 => [ '-00789.25',   'EQUAL', 'leading zeroes are okay'],
-	FLOAT8 => [ '.123-456',    0, 'invalid, embedded minus sign'],
+	FLOAT8 => [ '-00789.25',   'EQUAL', 'leading zeroes are okay'],
+	FLOAT9 => [ '.123-456',    0, 'invalid, embedded minus sign'],
 );
 
 my $formClass = 'WebGUI::Form::Float';

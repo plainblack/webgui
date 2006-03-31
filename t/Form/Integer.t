@@ -34,10 +34,10 @@ tie %testBlock, 'Tie::IxHash';
 
 %testBlock = (
 	INT1 => [ '-123456',  'EQUAL', 'valid, negative integer'],
-	INT1 => [ '002300',  'EQUAL', 'valid, leading zeroes'],
-	INT2 => [ '+123456',  0, 'reject explicitly positive integer'],
-	INT3 => [ '123-456.', 0, 'rejects non-sense integer with negative sign'],
-	INT4 => [ '123.456',  0, 'rejects float'],
+	INT2 => [ '002300',  'EQUAL', 'valid, leading zeroes'],
+	INT3 => [ '+123456',  0, 'reject explicitly positive integer'],
+	INT4 => [ '123-456.', 0, 'rejects non-sense integer with negative sign'],
+	INT5 => [ '123.456',  0, 'rejects float'],
 );
 
 my $formClass = 'WebGUI::Form::Integer';

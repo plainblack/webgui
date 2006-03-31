@@ -20,7 +20,7 @@ use HTML::Form;
 use Tie::IxHash;
 use WebGUI::Form_Checking;
 
-#The goal of this test is to verify that SelectList form elements work
+#The goal of this test is to verify that SelectBox form elements work
 
 use Test::More;
 use Test::Deep;
