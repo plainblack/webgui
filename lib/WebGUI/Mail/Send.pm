@@ -274,6 +274,7 @@ sub retrieve {
 	return undef unless $data->{messageId};
 	$session->db->deleteRow("mailQueue","messageId", $messageId);
 	my $parser = MIME::Parser->new;
+	$parser->output_to_core(1);
 	bless {_session=>$session, _message=>$parser->parse_data($data->{messageId}), _toGroup=>$data->{toGroup}}, $class;
 }
 

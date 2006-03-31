@@ -26,7 +26,14 @@
 # it gets suspended. It can get suspended if it's waiting for 
 # external input, or if it errors for any reason.
 
-"suspensionDelay" : 60
+"suspensionDelay" : 60,
+
+# What port should we connect to WebGUI on? If you've configured
+# WebGUI yourself, then this should probably be 80. If you're using
+# the WebGUI Runtime Environment, 81 might be a better choice to go
+# directly at the mod_perl server. 
+
+"webguiPort" : 80
 
 }
 

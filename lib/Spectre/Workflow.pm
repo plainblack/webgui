@@ -295,7 +295,7 @@ sub runWorker {
 	my ($kernel, $self, $instance, $session) = @_[KERNEL, OBJECT, ARG0, SESSION];
 	$self->debug("Preparing to run workflow instance ".$instance->{instanceId}.".");
 	POE::Component::Client::UserAgent->new;
-	my $url = "http://".$instance->{sitename}.'/';
+	my $url = "http://".$instance->{sitename}.':'.$self->config->get("webguiPort").'/';
 	my $request = POST $url, [op=>"runWorkflow", instanceId=>$instance->{instanceId}];
 	my $cookie = $self->{_cookies}{$instance->{sitename}};
 	$request->header("Cookie","wgSession=".$cookie) if (defined $cookie);

@@ -184,7 +184,7 @@ sub checkSchedule {
 			});
 		if (defined $instance) {
 			$self->debug("Created workflow instance ".$instance->getId.".");
-			$kernel->post($self->workflowSession, "addInstance", {instanceId=>$instance->getId, priority=>$job->{priority}, sitename=>});
+			$kernel->post($self->workflowSession, "addInstance", {instanceId=>$instance->getId, priority=>$job->{priority}, sitename=>$job->{sitename}});
 		} else {
 			$self->debug("Something bad happened. Couldn't create workflow instance for schedule ".$job->{taskId}." for ".$job->{config}.".");
 		}

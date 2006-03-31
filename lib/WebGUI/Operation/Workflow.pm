@@ -356,7 +356,11 @@ Checks to ensure the requestor is who we think it is, and then executes a workfl
 sub www_runWorkflow {
         my $session = shift;
 	$session->http->setMimeType("text/plain");
-        return "error" unless (isInSubnet($session->env->get("REMOTE_ADDR"), $session->config->get("spectreSubnets")));
+	unless (isInSubnet($session->env->get("REMOTE_ADDR"), $session->config->get("spectreSubnets"))) {
+		$session->errorHandler->security("make a Spectre workflow runner request, but we're only allowed to
+			accept requests from ".join(",",@{$session->config->get("spectreSubnets")}).".");
+        	return "error";
+	}
 	my $instanceId = $session->form->param("instanceId");
 	if ($instanceId) {
 		my $instance = WebGUI::Workflow::Instance->new($session, $instanceId);
@@ -365,6 +369,7 @@ sub www_runWorkflow {
 		}
 		return "complete";
 	}
+	$session->errorHandler->warn("No instance ID passed to workflow runner.");
 	return "error";
 }
 
