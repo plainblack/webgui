@@ -16,13 +16,11 @@ use WebGUI::Test;
 use WebGUI::Form::FieldType;
 use WebGUI::Form::DynamicField;
 use WebGUI::Session;
-use Data::Dumper;
+use WebGUI::Utility;
 
-#The goal of this test is to verify that getName works with all Form types.
-#getName is now inherited by all Forms and pulls the internationalized ID
-#from sub definition.
-#It would be nice to have a way to automatically verify that each Form has
-#the correct name, but it would have to be table driven.
+#The goal of this test is to verify that the profileEnabled setting
+#works on all form elements and that only the correct forms are profile
+#enabled.
 
 use Test::More; # increment this value for each test you create
 
@@ -37,19 +35,27 @@ my @formTypes = sort @{ WebGUI::Form::FieldType->getTypes($session) };
 ##We have to remove DynamicField from this list, since when you call new
 ##it wants to return a type.  We'll check it manually.
 
-$numTests = (2 * scalar @formTypes) + 1;
+$numTests = scalar @formTypes + 1;
 
 plan tests => $numTests;
 
 diag("Planning on running $numTests tests\n");
 
+my @notEnabled = qw/Asset Button Captcha Color Control List MimeType Submit/;
+
 foreach my $formType (@formTypes) {
 	my $form = WebGUI::Form::DynamicField->new($session, fieldType => $formType);
 	my $ref = (split /::/, ref $form)[-1];
-	is($ref, $formType, "checking form type $formType");
-	ok($form->getName($session), sprintf "form getName = %s", $form->getName($session));
+	if (isIn($ref, @notEnabled)) {
+		ok(!$form->get('profileEnabled'), " $ref should not be profile enabled");
+	}
+	else {
+		ok($form->get('profileEnabled'), "$ref should be profile enabled");
+	}
 }
 
-my $name = WebGUI::Form::DynamicField->getName($session);
+##Note: DynamicField will report true, but only because it's actually creating
+##an object of type Text!
+my $form = WebGUI::Form::DynamicField->new($session);
 
-ok($name, 'did not inherit default form name');
+ok($form->get('profileEnabled'), 'DynamicField lies about being profile enable');
