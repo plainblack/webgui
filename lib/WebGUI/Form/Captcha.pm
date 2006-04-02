@@ -62,6 +62,9 @@ sub definition {
 		formName=>{
 			defaultValue=>$i18n->get("topicName")
 			},
+		profileEnabled=>{
+			defaultValue=>0
+			},
 		});
         return $class->SUPER::definition($session, $definition);
 }
