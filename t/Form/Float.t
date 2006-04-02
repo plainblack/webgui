@@ -88,7 +88,7 @@ my $testBlock = [
 my $formClass = 'WebGUI::Form::Float';
 my $formType = 'Float';
 
-my $numTests = 12 + scalar @{ $testBlock } + 1;
+my $numTests = 11 + scalar @{ $testBlock } + 1;
 
 diag("Planning on running $numTests tests\n");
 
@@ -119,7 +119,6 @@ my $input = $inputs[0];
 is($input->name, 'TestFloat', 'Checking input name');
 is($input->type, 'text', 'Checking input type');
 is($input->value, '12.3456', 'Checking default value');
-is($input->disabled, undef, 'Disabled param not sent to form');
 is($input->{size}, 11, 'Default size');
 is($input->{maxlength}, 14, 'Default maxlength');
 

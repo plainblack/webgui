@@ -62,7 +62,7 @@ my $testBlock = [
 
 my $formClass = 'WebGUI::Form::Zipcode';
 
-my $numTests = 14 + scalar @{ $testBlock } + 1;
+my $numTests = 12 + scalar @{ $testBlock } + 1;
 
 diag("Planning on running $numTests tests\n");
 
@@ -93,7 +93,6 @@ my $input = $inputs[0];
 is($input->name, 'TestZip', 'Checking input name');
 is($input->type, 'text', 'Checking input type');
 is($input->value, '97123-ORST', 'Checking default value');
-is($input->disabled, undef, 'Disabled param not sent to form');
 is($input->{size}, 30, 'Checking size param, default');
 is($input->{maxlength}, 10, 'Checking maxlength param, default');
 
@@ -113,7 +112,6 @@ $input = $inputs[0];
 is($input->name, 'TestZip2', 'Checking input name');
 is($input->type, 'text', 'Checking input type');
 is($input->value, '97229-MXIM', 'Checking default value');
-is($input->disabled, undef, 'Disabled param not sent to form');
 is($input->{size}, 12, 'Checking size param, default');
 is($input->{maxlength}, 13, 'Checking maxlength param, default');
 

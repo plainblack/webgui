@@ -45,7 +45,7 @@ my $testBlock = [
 my $formType = 'password';
 my $formClass = 'WebGUI::Form::Password';
 
-my $numTests = 12 + scalar @{ $testBlock } + 1;
+my $numTests = 11 + scalar @{ $testBlock } + 1;
 
 diag("Planning on running $numTests tests\n");
 
@@ -77,7 +77,6 @@ use Data::Dumper;
 is($input->name, 'TestText', 'Checking input name');
 is($input->type, $formType, 'Checking input type');
 is($input->value, 'Some text in here', 'Checking default value');
-is($input->disabled, undef, 'Disabled param not sent to form');
 is($input->{size}, 30, 'Default size');
 is($input->{maxlength}, 35, 'Default maxlength');
 

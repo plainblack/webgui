@@ -74,7 +74,7 @@ my $testBlock = [
 
 my $formClass = 'WebGUI::Form::Url';
 
-my $numTests = 12 + scalar @{ $testBlock } + 1;
+my $numTests = 11 + scalar @{ $testBlock } + 1;
 
 diag("Planning on running $numTests tests\n");
 
@@ -105,7 +105,6 @@ my $input = $inputs[0];
 is($input->name, 'TestUrl', 'Checking input name');
 is($input->type, 'text', 'Checking input type');
 is($input->value, 'http://www.webgui.org', 'Checking default value');
-is($input->disabled, undef, 'Disabled param not sent to form');
 is($input->{size}, 30, 'Checking size param, default');
 is($input->{maxlength}, 2048, 'Checking maxlength param, default');
 

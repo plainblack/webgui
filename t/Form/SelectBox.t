@@ -48,7 +48,7 @@ my $testBlock = [
 my $formClass = 'WebGUI::Form::SelectBox';
 my $formType = 'SelectBox';
 
-my $numTests = 9 + scalar @{ $testBlock } + 1;
+my $numTests = 8 + scalar @{ $testBlock } + 1;
 
 diag("Planning on running $numTests tests\n");
 
@@ -83,7 +83,6 @@ is(scalar @inputs, 1, 'The form has 1 input');
 my $input = $form->find_input('ListBox');
 is($input->name, 'ListBox', 'Checking input name');
 is($input->type, 'option', 'Checking input type');
-is($input->disabled, undef, 'Disabled param not sent to form');
 is($input->value, 'c', 'Checking default value');
 is($input->{size}, 1, 'default size');
 

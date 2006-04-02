@@ -14,13 +14,12 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Form;
-use WebGUI::Form::Hidden;
+use WebGUI::Form::Radio;
 use WebGUI::Session;
 use HTML::Form;
-use Tie::IxHash;
 use WebGUI::Form_Checking;
 
-#The goal of this test is to verify that Zipcode form elements work
+#The goal of this test is to verify that Radio form elements work
 
 use Test::More; # increment this value for each test you create
 
@@ -30,40 +29,23 @@ my $session = WebGUI::Test->session;
 
 my $testBlock = [
 	{
-		key => 'Hidden1',
-		testValue => 'ABCDEzyxwv',
+		key => 'RADIO1',
+		testValue => 'string1',
 		expected  => 'EQUAL',
-		comment   => 'alpha',
+		comment   => 'string check'
 	},
 	{
-		key => 'Hidden2',
-		testValue => '02468',
+		key => 'RADIO2',
+		testValue => '002300',
 		expected  => 'EQUAL',
-		comment   => 'numeric',
-	},
-	{
-		key => 'Hidden3',
-		testValue => 'NO WHERE',
-		expected  => 'EQUAL',
-		comment   => 'alpha space',
-	},
-	{
-		key => 'Hidden4',
-		testValue => '-.&*(',
-		expected  => 'EQUAL',
-		comment   => 'punctuation',
-	},
-	{
-		key => 'Hidden5',
-		testValue => ' \t\n\tdata',
-		expected  => 'EQUAL',
-		comment   => 'white space',
+		comment   => 'valid, leading zeroes'
 	},
 ];
 
-my $formClass = 'WebGUI::Form::Hidden';
+my $formClass = 'WebGUI::Form::Radio';
+my $formType = 'Radio';
 
-my $numTests = 5 + scalar @{ $testBlock } + 1;
+my $numTests = 7 + scalar @{ $testBlock } + 1;
 
 diag("Planning on running $numTests tests\n");
 
@@ -74,8 +56,9 @@ my ($header, $footer) = (WebGUI::Form::formHeader($session), WebGUI::Form::formF
 my $html = join "\n",
 	$header, 
 	$formClass->new($session, {
-		name => 'TestHidden',
-		value => 'hiddenData',
+		name => 'radio1',
+		value => 'Selectify',
+		checked => 1,
 	})->toHtml,
 	$footer;
 
@@ -89,14 +72,36 @@ my @inputs = $forms[0]->inputs;
 is(scalar @inputs, 1, 'The form has 1 input');
 
 #Basic tests
-
 my $input = $inputs[0];
-is($input->name, 'TestHidden', 'Checking input name');
-is($input->type, 'hidden', 'Checking input type');
-is($input->value, 'hiddenData', 'Checking default value');
+is($input->name, 'radio1', 'Checking input name');
+is($input->type, 'radio', 'Checking input type');
+is($input->value, 'Selectify', 'Checking default value');
 
-##no need for secondary checking for now
+$html = join "\n",
+	$header, 
+	$formClass->new($session, {
+		name => 'radio2',
+		value => '024680',
+		checked => 1,
+	})->toHtml,
+	$footer;
+
+@forms = HTML::Form->parse($html, 'http://www.webgui.org');
+is( $forms[0]->param('radio2'), '024680', 'numeric values');
+
+$html = join "\n",
+	$header, 
+	$formClass->new($session, {
+		name => 'radio2',
+		value => '    ',
+		checked => 1,
+	})->toHtml,
+	$footer;
+
+@forms = HTML::Form->parse($html, 'http://www.webgui.org');
+is( $forms[0]->param('radio2'), '    ', 'WRONG: whitespace value');
 
 ##Test Form Output parsing
 
-WebGUI::Form_Checking::auto_check($session, 'Hidden', $testBlock);
+WebGUI::Form_Checking::auto_check($session, $formType, $testBlock);
+

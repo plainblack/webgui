@@ -44,7 +44,7 @@ my $testBlock = [
 
 my $formType = 'textarea';
 
-my $numTests = 14 + scalar @{ $testBlock } + 1;
+my $numTests = 13 + scalar @{ $testBlock } + 1;
 
 diag("Planning on running $numTests tests\n");
 
@@ -75,7 +75,6 @@ my $input = $inputs[0];
 is($input->name, 'TestText', 'Checking input name');
 is($input->type, $formType, 'Checking input type');
 is($input->value, 'Some text in here', 'Checking default value');
-is($input->disabled, undef, 'Disabled param not sent to form');
 is($input->{rows}, 5, 'Default number of rows');
 is($input->{cols}, 50, 'Default number of columns');
 is($input->{wrap}, 'virtual', 'Default wrap');

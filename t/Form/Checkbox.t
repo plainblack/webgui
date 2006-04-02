@@ -45,7 +45,7 @@ my $testBlock = [
 my $formClass = 'WebGUI::Form::Checkbox';
 my $formType = 'Checkbox';
 
-my $numTests = 6 + scalar @{ $testBlock } + 1;
+my $numTests = 7 + scalar @{ $testBlock } + 1;
 
 diag("Planning on running $numTests tests\n");
 
@@ -57,7 +57,7 @@ my $html = join "\n",
 	$header, 
 	$formClass->new($session, {
 		name => 'CBox1',
-		value => 'Check me',
+		value => 'Checkme',
 		checked => 1,
 	})->toHtml,
 	$footer;
@@ -76,8 +76,31 @@ is(scalar @inputs, 1, 'The form has 1 input');
 my $input = $inputs[0];
 is($input->name, 'CBox1', 'Checking input name');
 is($input->type, 'checkbox', 'Checking input type');
-is($input->value, 'Check me', 'Checking default value');
-is($input->disabled, undef, 'Disabled param not sent to form');
+is($input->value, 'Checkme', 'Checking default value');
+
+$html = join "\n",
+	$header, 
+	$formClass->new($session, {
+		name => 'cbox2',
+		value => '024680',
+		checked => 1,
+	})->toHtml,
+	$footer;
+
+@forms = HTML::Form->parse($html, 'http://www.webgui.org');
+is( $forms[0]->param('cbox2'), '024680', 'numeric values');
+
+$html = join "\n",
+	$header, 
+	$formClass->new($session, {
+		name => 'cbox3',
+		value => '    ',
+		checked => 1,
+	})->toHtml,
+	$footer;
+
+@forms = HTML::Form->parse($html, 'http://www.webgui.org');
+is( $forms[0]->param('cbox3'), '    ', 'WRONG: whitespace value');
 
 ##Test Form Output parsing
 
