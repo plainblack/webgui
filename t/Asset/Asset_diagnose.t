@@ -46,7 +46,7 @@ SKIP: {
 }
 
 foreach my $asset ( @assets ) {
-	diag("Checking $asset");
+	#diag("Checking $asset");
 	eval "use $asset";
 	my $def = $asset->definition($session);
 	my $tableName = $def->[0]->{tableName};
