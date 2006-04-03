@@ -714,7 +714,7 @@ If you specified "new" for groupId, you can use this property to specify an id y
 =cut
 
 sub new {
-        my ($class, $groupId, %default, $value, $key, %group, %profile);
+        my ($class, %group);
         tie %group, 'Tie::CPHash';
         $class = shift;
 	my $self = {};
@@ -787,6 +787,8 @@ sub dbQuery {
         my $value = shift;
         if (defined $value) {
                 $self->set("dbQuery",$value);
+		$self->session->stow->delete("gotGroupsInGroup");
+		$self->session->stow->delete("isInGroup");
         }
         return $self->get("dbQuery");
 }
@@ -799,7 +801,7 @@ Returns the databaseLinkId for this group.
 
 =head3 value
 
-If specified, the databaseLinkId is set to this value.
+If specified, the databaseLinkId is set to this value and in-memory cached user and group data is cleared.
 
 =cut
 
@@ -808,6 +810,8 @@ sub databaseLinkId {
         my $value = shift;
         if (defined $value) {
                 $self->set("databaseLinkId",$value);
+		$self->session->stow->delete("gotGroupsInGroup");
+		$self->session->stow->delete("isInGroup");
         }
         return $self->get("databaseLinkId");
 }

@@ -17,6 +17,7 @@ package WebGUI::User;
 use strict;
 use WebGUI::Cache;
 use WebGUI::Group;
+use WebGUI::DatabaseLink;
 
 =head1 NAME
 
@@ -309,11 +310,11 @@ sub isInGroup {
                 }
         }
         ### Check external database
-        if ($group->get("dbQuery") && $group->get("databaseLinkId")) {
+        if ($group->get("dbQuery") && defined $group->get("databaseLinkId")) {
                 # skip if not logged in and query contains a User macro
                 unless ($group->get("dbQuery") =~ /\^User/i && $uid eq '1') {
                         my $dbLink = WebGUI::DatabaseLink->new($self->session,$group->get("databaseLinkId"));
-                        my $dbh = $dbLink->dbh;
+                        my $dbh = $dbLink->db;
                         if (defined $dbh) {
                                 if ($group->get("dbQuery") =~ /select 1/i) {
 					my $query = $group->get("dbQuery");
