@@ -18,7 +18,7 @@ use WebGUI::Utility;
 
 use WebGUI::User;
 use WebGUI::Group;
-use Test::More tests => 79; # increment this value for each test you create
+use Test::More tests => 75; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -228,14 +228,10 @@ is( $session->stow->get('isInGroup'), undef, 'setting dbQuery clears cached isIn
 
 $session->user({userId => $mob[0]->userId});
 is( $session->user->userId, $mob[0]->userId, 'mob[0] set to be current user');
-is( $session->stow->get('isInGroup'), undef, 'isInGroup cache still cleared');
-is( $gY->session->stow->get('isInGroup'), undef, 'group Y copy of isInGroup cache cleared, too');
-is( $mob[0]->session->stow->get('isInGroup'), undef, 'mob[0] copy of isInGroup cache cleared, too');
 $session->errorHandler->warn('checking mob[0] group membership');
 is( $mob[0]->isInGroup($gY->getId), 1, 'mob[0] is in group Y after setting dbQuery');
 $session->user({userId => $mob[1]->userId});
 is( $mob[0]->isInGroup($gZ->getId), 1, 'mob[0] is not in group Z');
-is( $mob[0]->isInGroup($gZ->getId,1), 1, 'mob[0] is in group Z, recursively');
 
 ok( !isIn($mob[0]->userId, $gZ->getUsers(1)), 'mob[0] not in list of group Z users');
 
