@@ -18,7 +18,7 @@ use WebGUI::Utility;
 
 use WebGUI::User;
 use WebGUI::Group;
-use Test::More tests => 78; # increment this value for each test you create
+use Test::More tests => 79; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -236,6 +236,8 @@ is( $mob[0]->isInGroup($gY->getId), 1, 'mob[0] is in group Y after setting dbQue
 $session->user({userId => $mob[1]->userId});
 is( $mob[0]->isInGroup($gZ->getId), 1, 'mob[0] is not in group Z');
 is( $mob[0]->isInGroup($gZ->getId,1), 1, 'mob[0] is in group Z, recursively');
+
+ok( !isIn($mob[0]->userId, $gZ->getUsers(1)), 'mob[0] not in list of group Z users');
 
 END {
 	(defined $gX and ref $gX eq 'WebGUI::Group') and $gX->delete;
