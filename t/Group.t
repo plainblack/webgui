@@ -18,7 +18,7 @@ use WebGUI::Utility;
 
 use WebGUI::User;
 use WebGUI::Group;
-use Test::More tests => 67; # increment this value for each test you create
+use Test::More tests => 68; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -186,6 +186,7 @@ $user->delete;
 ##Build a group of users and add them to various groups to test fetching users
 
 my @crowd = map { WebGUI::User->new($session, "new") } 0..7;
+my @mob = map { WebGUI::User->new($session, "new") } 0..2;
 
 my @bUsers = map { $_->userId } @crowd[0,1];
 my @aUsers = map { $_->userId } @crowd[2,3];
@@ -207,6 +208,18 @@ cmp_bag($gA->getUsers(1), [@aUsers, @zUsers, 3], 'users in group A, recursively'
 cmp_bag($gC->getUsers(1), [@cUsers, 3], 'users in group C, recursively');
 cmp_bag($gZ->getUsers(1), [@zUsers, 3], 'users in group Z, recursively');
 
+$session->db->dbh->do('DROP TABLE IF EXISTS myUserTable');
+$session->db->dbh->do(q!CREATE TABLE myUserTable (userId varchar(22) binary NOT NULL default '', PRIMARY KEY(userId)) TYPE=InnoDB!);
+
+my $sth = $session->db->prepare('INSERT INTO myUserTable VALUES(?)');
+foreach my $mob (@mob) {
+	$sth->execute([ $mob->userId ]);
+}
+
+my $mobUsers = $session->db->buildArrayRef('select userId from myUserTable');
+
+cmp_bag($mobUsers, [map {$_->userId} @mob], 'verify SQL table built correctly');
+
 END {
 	(defined $gX and ref $gX eq 'WebGUI::Group') and $gX->delete;
 	(defined $gY and ref $gY eq 'WebGUI::Group') and $gY->delete;
@@ -220,4 +233,5 @@ END {
 	foreach my $dude (@crowd) {
 		$dude->delete if (defined $dude and ref $dude eq 'WebGUI::User');
 	}
+	$session->db->dbh->do('DROP TABLE IF EXISTS myUserTable');
 }

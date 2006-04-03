@@ -213,7 +213,8 @@ A reference to the current session.
 
 =head3 databaseLinkId
 
-The databaseLinkId of the databaseLink you're creating an object reference for. 
+The databaseLinkId of the databaseLink you're creating an object reference for.   databaseLinkId 0
+is reserved for the WebGUI database.
 
 =cut
 
