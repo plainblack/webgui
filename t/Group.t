@@ -235,7 +235,7 @@ $session->errorHandler->warn('checking mob[0] group membership');
 is( $mob[0]->isInGroup($gY->getId), 1, 'mob[0] is in group Y after setting dbQuery');
 $session->user({userId => $mob[1]->userId});
 is( $mob[0]->isInGroup($gZ->getId), 1, 'mob[0] is not in group Z');
-is( $mob[0]->isInGroup($gZ->getId,1), 1, 'mob[0] is in group Z');
+is( $mob[0]->isInGroup($gZ->getId,1), 1, 'mob[0] is in group Z, recursively');
 
 END {
 	(defined $gX and ref $gX eq 'WebGUI::Group') and $gX->delete;
@@ -247,7 +247,7 @@ END {
 	(defined $g2 and ref $g2 eq 'WebGUI::Group') and $g2->delete;
 	(defined $g  and ref $g  eq 'WebGUI::Group') and $g->delete;
 	(defined $user  and ref $g  eq 'WebGUI::User') and $g->delete;
-	foreach my $dude (@crowd) {
+	foreach my $dude (@crowd, @mob) {
 		$dude->delete if (defined $dude and ref $dude eq 'WebGUI::User');
 	}
 	$session->db->dbh->do('DROP TABLE IF EXISTS myUserTable');
