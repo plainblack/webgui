@@ -64,7 +64,7 @@ This package provides an object-oriented way of managing WebGUI groups and group
  $arrayRef = $group->getGroupsFor();
  $arrayRef = $self->session->user->getGroups($userId);
  $arrayRef = $group->getGroupsIn($recursive);
- $arrayRef = $group->getUsers($groupId);
+ $arrayRef = $group->getUsers($recursive);
  $boolean = $self->session->user->isInGroup($groupId);
  $boolean = $group->userIsAdmin($userId,$groupId);
  $epoch = $group->userGroupExpireDate($userId,$groupId);

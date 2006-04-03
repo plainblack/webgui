@@ -18,7 +18,7 @@ use WebGUI::Utility;
 
 use WebGUI::User;
 use WebGUI::Group;
-use Test::More tests => 59; # increment this value for each test you create
+use Test::More tests => 67; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -183,6 +183,30 @@ ok(!$gX->userIsAdmin($user->userId), "userIsAdmin: trying 0E0 as value");
 
 $user->delete;
 
+##Build a group of users and add them to various groups to test fetching users
+
+my @crowd = map { WebGUI::User->new($session, "new") } 0..7;
+
+my @bUsers = map { $_->userId } @crowd[0,1];
+my @aUsers = map { $_->userId } @crowd[2,3];
+my @cUsers = map { $_->userId } @crowd[4,5];
+my @zUsers = map { $_->userId } @crowd[6,7];
+
+$gB->addUsers([ @bUsers ]);
+$gA->addUsers([ @aUsers ]);
+$gC->addUsers([ @cUsers ]);
+$gZ->addUsers([ @zUsers ]);
+
+cmp_bag($gB->getUsers, [@bUsers], 'users in group B');
+cmp_bag($gA->getUsers, [@aUsers], 'users in group A');
+cmp_bag($gC->getUsers, [@cUsers], 'users in group C');
+cmp_bag($gZ->getUsers, [@zUsers], 'users in group Z');
+
+cmp_bag($gB->getUsers(1), [@bUsers, @aUsers, @cUsers, @zUsers, 3], 'users in group B, recursively');
+cmp_bag($gA->getUsers(1), [@aUsers, @zUsers, 3], 'users in group A, recursively');
+cmp_bag($gC->getUsers(1), [@cUsers, 3], 'users in group C, recursively');
+cmp_bag($gZ->getUsers(1), [@zUsers, 3], 'users in group Z, recursively');
+
 END {
 	(defined $gX and ref $gX eq 'WebGUI::Group') and $gX->delete;
 	(defined $gY and ref $gY eq 'WebGUI::Group') and $gY->delete;
@@ -192,4 +216,8 @@ END {
 	(defined $gC and ref $gC eq 'WebGUI::Group') and $gC->delete;
 	(defined $g2 and ref $g2 eq 'WebGUI::Group') and $g2->delete;
 	(defined $g  and ref $g  eq 'WebGUI::Group') and $g->delete;
+	(defined $user  and ref $g  eq 'WebGUI::User') and $g->delete;
+	foreach my $dude (@crowd) {
+		$dude->delete if (defined $dude and ref $dude eq 'WebGUI::User');
+	}
 }
