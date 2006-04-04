@@ -15,7 +15,7 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 22; # increment this value for each test you create
+use Test::More tests => 26; # increment this value for each test you create
  
 my $session = WebGUI::Test->session;
  
@@ -30,10 +30,32 @@ for (my $count = 1; $count <= $maxCount; $count++){
 }
  
 for (my $count = 1; $count <= $maxCount; $count++){
-   is($stow->get("Test$count"), $count, "Passed set/get $count\n");
+   is($stow->get("Test$count"), $count, "Passed set/get $count");
 }
 
 $stow->delete("Test1");
 is($stow->get("Test1"), undef, "delete()");
 $stow->deleteAll;
 is($stow->get("Test2"), undef, "deleteAll()");
+
+my @list = qw/alpha delta tango charlie omicron zero/;
+my @orig_list = qw/alpha delta tango charlie omicron zero/;
+
+my $mil1 = [ @list ];
+
+$stow->set("military", $mil1);
+
+is_deeply($stow->get("military"), $mil1, 'fetched a copy of an array ref from stow');
+
+undef $mil1;
+is_deeply($stow->get("military"), [ @list ], 'removing original reference does not affect stow');
+
+push @list, qw/beta gamma/;
+
+is_deeply($stow->get("military"), [ @orig_list ], "modifying original list does not affect stow'ed list");
+
+my $milList = $stow->get("military");
+
+push @{ $milList }, qw/foxtrot echo/;
+
+is_deeply($stow->get("military"), [ @orig_list, qw/foxtrot echo/ ], "modifying fetched list changes stow'ed list because it is a reference");
