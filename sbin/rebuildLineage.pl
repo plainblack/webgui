@@ -85,6 +85,8 @@ WebGUI::Session::end($session{var}{sessionId});
 WebGUI::Session::close();
 print "OK\n" unless ($quiet);
 
+print "\nDon't forget to clear your cache.\n" unless ($quiet);
+
 
 sub recurseTree {
 	my $parentId = shift;
