@@ -470,7 +470,7 @@ sub getRecordTemplateVars {
 	}
 	
 	my @fields;
-	my $sth = $self->session->db->read("select from DataForm_field as a $join $where and a.DataForm_tabId = '0' order by a.sequenceNumber");
+	my $sth = $self->session->db->read("$select from DataForm_field as a $join $where and a.DataForm_tabId = '0' order by a.sequenceNumber");
 	while (%data = $sth->hash) {
 		my $formValue = $self->session->form->process($data{name});
 		if ((not exists $data{value}) && $self->session->form->process("func") ne "editSave" && $self->session->form->process("func") ne "editFieldSave" && defined $formValue) {
