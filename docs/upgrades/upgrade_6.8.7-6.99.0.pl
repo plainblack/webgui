@@ -156,7 +156,7 @@ sub updateCs {
 	$session->db->write("alter table Post_rating add index assetId_ipAddress (assetId,ipAddress);");
 	$session->db->write("delete from Post_read where postId<>threadId");
 	$session->db->write("alter table Post_read drop column postId");
-	$session->db->write("alter table Post_read drop column dateRead");
+	$session->db->write("alter table Post_read drop column readDate");
 	$session->db->write("alter table Post_read rename Thread_read");
 }
 
