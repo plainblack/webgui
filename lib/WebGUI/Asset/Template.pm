@@ -327,7 +327,7 @@ sub processRaw {
 #-------------------------------------------------------------------
 sub www_edit {
         my $self = shift;
-        return $self->session->privilege->nsufficient() unless $self->canEdit;
+        return $self->session->privilege->insufficient() unless $self->canEdit;
 	my $i18n = WebGUI::International->new($self->session, "Asset_Template");
 	$self->getAdminConsole->setHelp("template add/edit","Asset_Template");
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=styleWizard'),$i18n->get("style wizard")) if ($self->get("namespace") eq "style");
