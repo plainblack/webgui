@@ -77,6 +77,7 @@ Returns a hash reference containing operation and package names.
 
 sub getOperations {
 	return {
+	  'clickAd' => 'WebGUI::Operation::AdSpace',
 	  'editVersionTag' => 'WebGUI::Operation::VersionTag',
 	  'editVersionTagSave' => 'WebGUI::Operation::VersionTag',
 	  'commitVersionTag' => 'WebGUI::Operation::VersionTag',

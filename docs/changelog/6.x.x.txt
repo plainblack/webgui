@@ -22,7 +22,9 @@
  - Refactored admin bar to be more dynamic.
  - Removed start/end dates from assets in favor of the workflow system.
  - Readded the purge option to the trash manager.
+ - Added an advertising management system.
  - Added archive/unarchive options to CS threads.
+ - Increased the performance of CS Thread viewing by 500%.
  - Added a database cache option as an alternative to memcached.
  - Converted WebGUI to use a new object oriented session system. More details
    in migation.txt.
@@ -34,7 +36,9 @@
    powerful, easier to use, and more flexible.
  - Added output chunking as an option for asset www_ methods. The net effect
    of this provides a fairly significant performance increase to what would
-   otherwise be slow or complex pages. More details in migration.txt.
+   otherwise be slow or complex pages. More details in migration.txt. The
+   amount of the increase depends upon the complexity of the page, but now
+   complex pages should render almost as fast as simple pages.
  - The SMTP mail backend has been replaced with a new API that's capable of
    sending attachments, HTML messages, and more. This will introduce many new
    options for developers.
@@ -46,9 +50,6 @@
    to the database link properties. (Martin Kamerbeek / Procolix)
  - Converted config file format from PlainConfig to JSON. The new format is
    more powerful and will use slightly less memory.
- - fix [ 1406210 ] 6.9 i18n in create.sql, previous.sql broken.
- - fix [ 1410577 ] WebGUI::Session not included
- - fix [ 1445387 ] 6.9 DataForm add Checkbox List, SellectList broken
  - Strengthened security of Captcha validation.
  - Added Captcha form control type.
  - All IPs used by WebGUI (Settings: debugIp and Group: ipFilter) now accept
@@ -63,8 +64,6 @@
  - The Navigation Asset now allows setting the MIME type of its output so that
    you can generate non-HTML navigations or take advantate of the Google
    SiteMap feature.
- - [ 1433525 ] 6.9: Compilation errors 
- - base36 removed from Utility.t because it no longer exists in WebGUI::Utility.pm
  - Add tests that verify the integrity of the WebGUI Database.
  - Added a karma ranking system to CS threads for conducting popularity
    contests.
@@ -72,12 +71,7 @@
    tabbed view to make scanning for content easier.
  - Help for forms now shows the fields that you should see with your UI level.
    There is a link to show all fields.
- - fix [ 1445393 ] 6.9 WhatNext missing from DataForm editField
- - fix [ 1443378 ] 6.99 Commerce system needs to be sessionized
- - fix [ 1442942 ] 6.99: listLDAPLinks broken
- - fix [ 1430276 ] 6.9: Can't kill active sessions
- - fix [ 1429389 ] 6.9: "1" appended to HTML
- - fix [ 1433508 ] 6.9: isInGroup does not work correctly
+ - fix [ 1410577 ] WebGUI::Session not included
  - fix a bug where a link was provided to become or delete non-existant users.
  - fix bugs with the in-memory session caching of user and group memberships
 

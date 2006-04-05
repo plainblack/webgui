@@ -26,7 +26,7 @@ my $session = start(); # this line required
 
 addWorkflow();
 convertMessageLogToInbox();
-addCsPopularityContest();
+updateCs();
 templateParsers();
 removeFiles();
 addSearchEngine();
@@ -41,8 +41,51 @@ addIndexes();
 addDatabaseCache();
 updateHelpTemplate();
 fixImportNodePrivileges();
+addAdManager();
 
 finish($session); # this line required
+
+#-------------------------------------------------
+sub addAdManager {
+	print "\tAdding advertising management.\n";
+	$session->db->write("create table adSpace (
+		adSpaceId varchar(22) binary not null primary key,
+		name varchar(35) not null unique key,
+		title varchar(255) not null,
+		description text,
+		costPerImpression decimal(11,2) not null default 0,
+		minimumImpressions int not null default 1000,
+		costPerClick decimal(11,2) not null default 0,
+		minimumClicks int not null default 1000,
+		width int not null default 468,
+		height int not null default 60,
+		groupToPurchase varchar(22) binary not null default '3'
+		)");
+	$session->db->write("create table advertisement (
+		adId varchar(22) binary not null primary key,
+		adSpaceId varchar(22) binary not null,
+		ownerUserId varchar(22) binary not null,
+		isActive int not null default 0,
+		title varchar(255) not null,
+		type varchar(15) not null default 'text',
+		storageId varchar(22) binary,
+		filename varchar(255),
+		adText varchar(255),
+		url text,
+		richMedia text,
+		borderColor varchar(7) not null default '#000000',
+		textColor varchar(7) not null default '#000000',
+		backgroundColor varchar(7) not null default '#ffffff',
+		clicks int not null default 0,
+		clicksBought int not null default 0,
+		impressions int not null default 0,
+		impressionsBought int not null default 0,
+		priority int not null default 0,
+		nextInPriority bigint not null default 0,
+		renderedAd text
+		)");
+	$session->db->write("alter table advertisement add index adSpaceId_isActive (adSpaceId, isActive)");
+}
 
 #-------------------------------------------------
 sub fixImportNodePrivileges {
@@ -101,12 +144,20 @@ sub convertMessageLogToInbox {
 }
 
 #-------------------------------------------------
-sub addCsPopularityContest {
-	print "\tAdding collaboration system popularity system based upon karma.\n";
+sub updateCs {
+	print "\tUpdating the Collaboration System.\n";
+	print "\t\tAdding collaboration system popularity system based upon karma.\n";
 	$session->db->write("alter table Collaboration add column defaultKarmaScale integer not null default 1");
 	$session->db->write("alter table Thread add column karma integer not null default 0");
 	$session->db->write("alter table Thread add column karmaScale integer not null default 1");
 	$session->db->write("alter table Thread add column karmaRank decimal(6,6) not null default 0");
+	print "\t\tIncreasing CS performance.\n";
+	$session->db->write("alter table Post_rating add index assetId_userId (assetId,userId);");
+	$session->db->write("alter table Post_rating add index assetId_ipAddress (assetId,ipAddress);");
+	$session->db->write("delete from Post_read where postId<>threadId");
+	$session->db->write("alter table Post_read drop column postId");
+	$session->db->write("alter table Post_read drop column dateRead");
+	$session->db->write("alter table Post_read rename Thread_read");
 }
 
 #-------------------------------------------------

@@ -434,7 +434,7 @@ Returns a boolean indicating whether this thread is marked read for the user.
 sub isMarkedRead {
         my $self = shift;
 	return 1 if $self->isPoster;
-      my ($isRead) = $self->session->db->quickArray("select count(*) from Post_read where userId=".$self->session->db->quote($self->session->user->userId)." and threadId=".$self->session->db->quote($self->getId)." and postId=".$self->session->db->quote($self->get("lastPostId")));
+      	my ($isRead) = $self->session->db->quickArray("select count(*) from Thread_read where threadId=? and userId=?",[$self->getId,$self->session->user->userId]);
         return $isRead;
 }
 
@@ -481,6 +481,19 @@ sub lock {
 
 #-------------------------------------------------------------------
 
+=head2 markRead ( )
+
+Marks this post read for this user.
+
+=cut
+
+sub markRead {
+	my $self = shift;
+        $self->session->db->write("replace into Thread_read (threadId, userId) values (?,?)",[$self->getId,$self->session->user->userId]);
+}
+
+#-------------------------------------------------------------------
+
 =head2 prepareView ( )
 
 See WebGUI::Asset::prepareView() for details.
@@ -512,6 +525,12 @@ sub processPropertiesFromFormPost {
 	}
 }
 
+#-------------------------------------------------------------------
+sub purge {
+	my $self = shift;
+	$self->session->db->write("delete from Thread_read where postId=?",[$self->getId]);
+        return $self->SUPER::purge;
+}
 
 #-------------------------------------------------------------------
 
@@ -669,6 +688,19 @@ Negates the lock method.
 sub unlock {
         my ($self) = @_;
         $self->update({isLocked=>0});
+}
+
+#-------------------------------------------------------------------
+
+=head2 unmarkRead ( )
+
+unmarks this post read for all users.
+
+=cut
+
+sub unmarkRead {
+	my $self = shift;
+        $self->session->db->write("delete from Thread_read where threadId=?",[$self->getId]);
 }
 
 #-------------------------------------------------------------------

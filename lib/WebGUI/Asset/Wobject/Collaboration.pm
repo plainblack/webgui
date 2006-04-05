@@ -47,9 +47,10 @@ sub appendPostListTemplateVars {
 			push(@rating_loop,{'rating_loop.count'=>$i});
 		}
 		my %lastReply;
+		my $hasRead = 0;
 		if ($post->get("className") =~ /Thread/) {
-			my $lastPost = $post->getLastPost();
 			if ($self->get("displayLastReply")) {
+				my $lastPost = $post->getLastPost();
 				%lastReply = (
 					"lastReply.url"=>$lastPost->getUrl.'#'.$lastPost->getId,
                         		"lastReply.title"=>$lastPost->get("title"),
@@ -60,6 +61,7 @@ sub appendPostListTemplateVars {
                         		"lastReply.timeSubmitted.human"=>$self->session->datetime->epochToHuman($lastPost->get("dateSubmitted"),"%Z")
 					);
 			}
+			$hasRead = $post->isMarkedRead;
 		}
 		my $url;
 		if ($post->get("status") eq "pending") {
@@ -88,6 +90,7 @@ sub appendPostListTemplateVars {
                         "isThird"=>(($i+1)%3==0),
                         "isFourth"=>(($i+1)%4==0),
                         "isFifth"=>(($i+1)%5==0),
+			"user.hasRead" => $hasRead,
                 	"user.isPoster"=>$post->isPoster,
                 	"avatar.url"=>$post->getAvatarUrl,
 			%lastReply

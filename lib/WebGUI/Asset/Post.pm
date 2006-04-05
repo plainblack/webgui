@@ -46,7 +46,8 @@ sub addRevision {
         if ($self->get("storageId")) {
                 my $newStorage = WebGUI::Storage->get($self->session,$self->get("storageId"))->copy;
                 $newSelf->update({storageId=>$newStorage->getId});
-        }       
+        }
+	$self->getThread->unmarkRead;
         return $newSelf;
 }  
 
@@ -412,7 +413,6 @@ sub getTemplateVars {
 	$var{'rate.url.4'} = $self->getRateUrl(4);
 	$var{'rate.url.5'} = $self->getRateUrl(5);
 	$var{'hasRated'} = $self->hasRated;
-	$var{'isMarkedRead'} = $self->isMarkedRead;
 	my $gotImage;
 	my $gotAttachment;
 	@{$var{'attachment_loop'}} = ();
@@ -502,9 +502,12 @@ Returns a boolean indicating whether this user has already rated this post.
 sub hasRated {	
 	my $self = shift;
         return 1 if $self->isPoster;
-        my ($flag) = $self->session->db->quickArray("select count(*) from Post_rating where assetId="
-                .$self->session->db->quote($self->getId)." and ((userId=".$self->session->db->quote($self->session->user->userId)." and userId<>'1') or (userId='1' and
-                ipAddress=".$self->session->db->quote($self->session->env->get("REMOTE_ADDR"))."))");
+	my $flag = 0;
+	if ($self->session->user->userId eq "1") {
+        	($flag) = $self->session->db->quickArray("select count(*) from Post_rating where assetId=? and ipAddress=?",[$self->getId, $self->session->env->get("REMOTE_ADDR")]);
+	} else {
+        	($flag) = $self->session->db->quickArray("select count(*) from Post_rating where assetId=? and userId=?",[$self->getId, $self->session->user->userId]);
+	}
         return $flag;
 }
 
@@ -547,21 +550,6 @@ sub incrementViews {
 
 #-------------------------------------------------------------------
 
-=head2 isMarkedRead ( )
-
-Returns a boolean indicating whether this post is marked read for the user.
-
-=cut
-
-sub isMarkedRead {
-        my $self = shift;
-	return 1 if $self->isPoster;
-        my ($isRead) = $self->session->db->quickArray("select count(*) from Post_read where userId=".$self->session->db->quote($self->session->user->userId)." and postId=".$self->session->db->quote($self->getId));
-        return $isRead;
-}
-
-#-------------------------------------------------------------------
-
 =head2 isPoster ( )
 
 Returns a boolean that is true if the current user created this post and is not a visitor.
@@ -587,22 +575,6 @@ sub isReply {
 	return $self->getId ne $self->get("threadId");
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 markRead ( )
-
-Marks this post read for this user.
-
-=cut
-
-sub markRead {
-	my $self = shift;
-        unless ($self->isMarkedRead) {
-                $self->session->db->write("insert into Post_read (userId, postId, threadId, readDate) values (".$self->session->db->quote($self->session->user->userId).",
-                        ".$self->session->db->quote($self->getId).", ".$self->session->db->quote($self->get("threadId")).", ".$self->session->datetime->time().")");
-        }
-}
 
 #-------------------------------------------------------------------
 
@@ -719,8 +691,6 @@ sub purge {
                 $storage->delete if defined $storage;
         }
         $sth->finish;
-	$self->session->db->write("delete from Post_rating where assetId=".$self->session->db->quote($self->getId));
-	$self->session->db->write("delete from Post_read where postId=".$self->session->db->quote($self->getId));
         return $self->SUPER::purge;
 }
 
@@ -838,19 +808,6 @@ sub trash {
 
 #-------------------------------------------------------------------
 
-=head2 unmarkRead ( )
-
-Negates the markRead method.
-
-=cut
-
-sub unmarkRead {
-	my $self = shift;
-        $self->session->db->write("delete from forumRead where userId=".$self->session->db->quote($self->session->user->userId)." and postId=".$self->session->db->quote($self->getId));
-}
-
-#-------------------------------------------------------------------
-
 =head2 update
 
 We overload the update method from WebGUI::Asset in order to handle file system privileges.
@@ -873,7 +830,6 @@ sub update {
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
-	$self->markRead;
 	$self->incrementViews;
 	return $self->getThread->view;
 }
@@ -1120,7 +1076,6 @@ sub www_showConfirmation {
 #-------------------------------------------------------------------
 sub www_view {
 	my $self = shift;
-	$self->markRead;
 	$self->incrementViews;
 	return $self->getThread->www_view;
 }

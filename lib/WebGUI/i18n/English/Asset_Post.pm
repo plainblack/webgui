@@ -224,10 +224,6 @@ URLs that are used to rate this post.  N goes from 1 to 5.
 A conditional that is true if the user has already rated this Post.
 <p>
 
-<b>isMarkedRead</b><br>
-A conditional that is true if the post has been marked as read by the user.
-<p>
-
 <b>image.url</b><br>
 The URL to the first image attached to the Post.
 <p>
