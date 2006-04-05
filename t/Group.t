@@ -18,7 +18,7 @@ use WebGUI::Utility;
 
 use WebGUI::User;
 use WebGUI::Group;
-use Test::More tests => 75; # increment this value for each test you create
+use Test::More tests => 78; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -223,17 +223,26 @@ my $mobUsers = $session->db->buildArrayRef('select userId from myUserTable');
 cmp_bag($mobUsers, [map {$_->userId} @mob], 'verify SQL table built correctly');
 
 is( $gY->databaseLinkId, 0, "Group Y's databaseLinkId is set to WebGUI");
-$gY->dbQuery(q!select 1 from myUserTable where userId='^#();'!);
+$gY->dbQuery(q!select userId from myUserTable!);
 is( $session->stow->get('isInGroup'), undef, 'setting dbQuery clears cached isInGroup');
 
 $session->user({userId => $mob[0]->userId});
 is( $session->user->userId, $mob[0]->userId, 'mob[0] set to be current user');
 $session->errorHandler->warn('checking mob[0] group membership');
 is( $mob[0]->isInGroup($gY->getId), 1, 'mob[0] is in group Y after setting dbQuery');
-$session->user({userId => $mob[1]->userId});
-is( $mob[0]->isInGroup($gZ->getId), 1, 'mob[0] is not in group Z');
+is( $mob[0]->isInGroup($gZ->getId), 1, 'mob[0] isInGroup Z');
 
-ok( !isIn($mob[0]->userId, $gZ->getUsers(1)), 'mob[0] not in list of group Z users');
+ok( isIn($mob[0]->userId, @{ $gY->getUsers() }), 'mob[0] in list of group Y users');
+ok( !isIn($mob[0]->userId, @{ $gZ->getUsers() }), 'mob[0] not in list of group Z users');
+
+$session->errorHandler->warn('getUsers checks');
+$session->errorHandler->warn('mob[0] userId = '. $mob[0]->userId);
+ok( isIn($mob[0]->userId, @{ $gZ->getUsers(1) }), 'mob[0] in list of group Z users, recursively');
+
+SKIP: {
+	skip("need to test expiration date in groupings interacting with recursive or not", 1);
+	ok(undef, "expiration date in groupings for getUser");
+}
 
 END {
 	(defined $gX and ref $gX eq 'WebGUI::Group') and $gX->delete;

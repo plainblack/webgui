@@ -421,6 +421,45 @@ sub expireOffset {
 
 #-------------------------------------------------------------------
 
+=head2 externalUsers ( )
+
+Get the set of users allowed to be in this group via external means, such as database
+queries, LDAP and/or IP filtering.
+
+=cut
+
+sub externalUsers {
+	my $self = shift;
+	my $gid = $self->getId;
+	my @externalUsers = ();
+	my $isInGroup = $self->session->stow->get('isInGroup');
+        ### Check external database
+        if ($self->get("dbQuery") && defined $self->get("databaseLinkId")) {
+		my $dbLink = WebGUI::DatabaseLink->new($self->session,$self->get("databaseLinkId"));
+		my $dbh = $dbLink->db;
+		if (defined $dbh) {
+			my $query = $self->get("dbQuery");
+			WebGUI::Macro::process($self->session,\$query);
+			my $sth = $dbh->unconditionalRead($query);
+			unless ($sth->errorCode < 1) {
+				$self->session->errorHandler->warn("There was a problem with the database query for group ID $gid.");
+			}
+			else {
+				while(my ($userId)=$sth->array) {
+					push @externalUsers, $userId;
+					$isInGroup->{$userId}{$gid} = 1;
+				}
+			}
+			$sth->finish;
+			$dbLink->disconnect;
+                }
+        }
+	$self->session->stow->set("isInGroup",$isInGroup);
+	return \@externalUsers;
+}	
+
+#-------------------------------------------------------------------
+
 =head2 find ( session, name )
 
 An alternative to the constructor "new", use find as a constructor by name rather than id.
@@ -512,6 +551,8 @@ sub getGroupsIn {
 	elsif (!$isRecursive and exists($gotGroupsInGroup->{direct}{$self->getId})) {
 		return $gotGroupsInGroup->{direct}{$self->getId};
 	}
+	##We call updateUsers here because we get a free trip with recursion and many other User and Group
+	##methods call getGroupsIn.
         my $groups = $self->session->db->buildArrayRef("select groupId from groupGroupings where inGroup=?",[$self->getId]);
         if ($isRecursive) {
                 $loopCount++;
@@ -556,6 +597,7 @@ sub getUsers {
 	my $recursive = shift;
 	my $withoutExpired = shift;
 	my $clause;
+	my @externalUsers = ();
 	if ($withoutExpired) {
 		$clause = "expireDate > ".$self->session->datetime->time()." and ";
 	}
@@ -571,9 +613,16 @@ sub getUsers {
 				$clause .= " OR groupId IN (".$self->session->db->quoteAndJoin($groups).")";
 			}
 		}
+		##Have to iterate twice due to the withoutExpired clause.
+		foreach my $groupId (@{ $groups }) {
+			push @externalUsers, @{  WebGUI::Group->new($self->session, $groupId)->externalUsers() };
+		}
 	}
 	$clause .= ")";
-       	return $self->session->db->buildArrayRef("select userId from groupings where $clause");
+	my @localUsers = $self->session->db->buildArray("select userId from groupings where $clause");
+	push @externalUsers,  @{ $self->externalUsers() };
+	my @users = ( @localUsers, @externalUsers );
+	return \@users;
 }
 
 

@@ -208,7 +208,7 @@ sub getGroups {
         if (exists $gotGroupsForUser->{$self->userId}) {
                 return $gotGroupsForUser->{$self->userId};
         } else {
-                my @groups = $self->session->db->buildArray("select groupId from groupings where userId=".$self->session->db->quote($self->userId)." $clause");
+                my @groups = $self->session->db->buildArray("select groupId from groupings where userId=? $clause", [$self->userId]);
 		my $isInGroup = $self->session->stow->get("isInGroup");
                 foreach my $gid (@groups) {	
                         $isInGroup->{$self->userId}{$gid} = 1;
@@ -247,7 +247,6 @@ Returns a boolean (0|1) value signifying that the user has the required privileg
 The group that you wish to verify against the user. Defaults to group with Id 3 (the Admin group).
 
 =cut
-
 sub isInGroup {
         my (@data, $groupId);
         my ($self, $gid, $secondRun) = @_;
@@ -309,42 +308,6 @@ sub isInGroup {
                         return 1;
                 }
         }
-        ### Check external database
-        if ($group->get("dbQuery") && defined $group->get("databaseLinkId")) {
-                # skip if not logged in and query contains a User macro
-                unless ($group->get("dbQuery") =~ /\^User/i && $uid eq '1') {
-                        my $dbLink = WebGUI::DatabaseLink->new($self->session,$group->get("databaseLinkId"));
-                        my $dbh = $dbLink->db;
-                        if (defined $dbh) {
-                                if ($group->get("dbQuery") =~ /select 1/i) {
-					my $query = $group->get("dbQuery");
-					WebGUI::Macro::process($self->session,\$query);
-                                        my $sth = $dbh->unconditionalRead($query);
-                                        unless ($sth->errorCode < 1) {
-                                                $self->session->errorHandler->warn("There was a problem with the database query for group ID $gid.");
-                                        } else {
-                                                my ($result) = $sth->array;
-                                                if ($result == 1) {
-                                                        $isInGroup->{$uid}{$gid} = 1;
-                                                        if ($group->get("dbCacheTimeout") > 0) {
-                                                                $group->deleteUsers([$uid]);
-                                                                $group->addUsers([$uid],$group->get("dbCacheTimeout"));
-                                                        }
-                                                } else {
-                                                        $isInGroup->{$uid}{$gid} = 0;
-                                                        $group->deleteUsers([$uid]) if ($group->get("dbCacheTimeout") > 0);
-                                                }
-                                        }
-                                        $sth->finish;
-                                } else {
-                                        $self->session->errorHandler->warn("Database query for group ID $gid must use 'select 1'");
-                                }
-                                $dbLink->disconnect;
-				$self->session->stow->set("isInGroup",$isInGroup);
-                                return 1 if ($isInGroup->{$uid}{$gid});
-                        }
-                }
-        }
 	 ### Check ldap
         if ($group->get("ldapGroup") && $group->get("ldapGroupProperty")) {
 		   # skip if not logged in
@@ -386,6 +349,14 @@ sub isInGroup {
 		   }
 		}
 		
+        if ($group->get("dbQuery") && defined $group->get("databaseLinkId")) {
+		my @externalUsers = @{ $group->externalUsers() } ;
+		foreach my $extUserId ( @externalUsers ) {
+			$isInGroup->{$extUserId}{$gid} = 1;
+		}
+		$self->session->stow->set("isInGroup",$isInGroup);
+		return 1 if ($isInGroup->{$uid}{$gid});
+	}
         ### Check for groups of groups.
         my $groups = $group->getGroupsIn(1);
         foreach (@{$groups}) {

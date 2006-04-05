@@ -356,8 +356,6 @@ sub errorMessage {
 
 Increments an incrementer of the specified type and returns the value. 
 
-B<NOTE:> This is not a regular method, but is an exported subroutine.
-
 =head3 idName
 
 Specify the name of one of the incrementers in the incrementer table.
