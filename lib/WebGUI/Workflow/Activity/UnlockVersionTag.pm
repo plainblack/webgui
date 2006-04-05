@@ -26,7 +26,7 @@ Package WebGUI::Workflow::Activity::UnlockVersionTag
 
 =head1 DESCRIPTION
 
-This activity commits an open version tag.
+Unlocks a version tag so that users can add more content to it.
 
 =head1 SYNOPSIS
 

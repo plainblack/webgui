@@ -26,7 +26,7 @@ Package WebGUI::Workflow::Activity::NotifyAboutVersionTag
 
 =head1 DESCRIPTION
 
-Ask someone for approval of a version tag. If they approve then the workflow continues. If not, it is cancelled.
+Send a message to a user about a version tag. If this version tag contains only one asset, then a URL to that asset will be included in the message automatically.
 
 =head1 SYNOPSIS
 
