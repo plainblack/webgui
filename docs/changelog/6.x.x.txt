@@ -78,6 +78,7 @@
  - fix bugs with the in-memory session caching of user and group memberships
 
 6.8.8
+ - fix [ 1452466 ] File size not set in File asset (Thanks to Eric S)
  - fix [ 1460992 ] Field Loop in DataForm (Thanks to Beat Boesiger)
  - fix [ 1423434 ] 6.8.5 - Versioning - users can see uncommitted data
  - fix [ 1437186 ] 6.8.7 deploy DataForm package does not copy fields
