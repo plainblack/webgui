@@ -52,18 +52,6 @@ our $HELP = {
                                 description => '85 description',
                                 namespace => 'Asset_Wobject',
                         },
-                        {
-                                title => '895',
-                                description => '895 description',
-                                namespace => 'Asset_Wobject',
-				uiLevel => 8,
-                        },
-                        {
-                                title => '896',
-                                description => '896 description',
-                                namespace => 'Asset_Wobject',
-				uiLevel => 8,
-                        },
 		],
 		related => [
 			{

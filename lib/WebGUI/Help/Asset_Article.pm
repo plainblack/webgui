@@ -6,6 +6,11 @@ our $HELP = {
 		body => '71',
 		fields => [
                         {
+                                title => 'cache timeout',
+                                namespace => 'Asset_Article',
+                                description => 'cache timeout help'
+                        },
+                        {
                                 title => '72',
                                 description => 'article template description',
                                 namespace => 'Asset_Article',

@@ -696,6 +696,20 @@ sub purge {
 
 #-------------------------------------------------------------------
 
+=head2 purgeCache ()
+
+See WebGUI::Asset::purgeCache() for details.
+
+=cut
+
+sub purgeCache {
+	my $self = shift;
+	$self->getThread->purgeCache if $self->isReply;
+	$self->SUPER::purgeCache;
+}
+
+#-------------------------------------------------------------------
+
 sub purgeRevision {
         my $self = shift;
         $self->getStorageLocation->delete;

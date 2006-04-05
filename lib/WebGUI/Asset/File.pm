@@ -16,6 +16,7 @@ package WebGUI::Asset::File;
 
 use strict;
 use WebGUI::Asset;
+use WebGUI::Cache;
 use WebGUI::Storage;
 use WebGUI::SQL;
 
@@ -83,6 +84,14 @@ sub definition {
 		tableName=>'FileAsset',
 		className=>'WebGUI::Asset::File',
 		properties=>{
+			cacheTimeout => {
+				tab => "display",
+				fieldType => "interval",
+				defaultValue => 3600,
+				uiLevel => 8,
+				label => $i18n->get("cache timeout"),
+				hoverHelp => $i18n->get("cache timeout help")
+				},
 			filename=>{
 				noFormPost=>1,
 				fieldType=>'hidden',
@@ -250,6 +259,20 @@ sub purge {
 
 #-------------------------------------------------------------------
 
+=head2 purgeCache ()
+
+See WebGUI::Asset::purgeCache() for details.
+
+=cut
+
+sub purgeCache {
+	my $self = shift;
+	WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
+	$self->SUPER::purgeCache;
+}
+
+#-------------------------------------------------------------------
+
 sub purgeRevision {
 	my $self = shift;
 	$self->getStorageLocation->delete;
@@ -291,11 +314,19 @@ sub update {
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
+	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
+		return $out if $out;
+	}
 	my %var = %{$self->get};
 	$var{controls} = $self->getToolbar;
 	$var{fileUrl} = $self->getFileUrl;
 	$var{fileIcon} = $self->getFileIconUrl;
-	return $self->processTemplate(\%var, undef, $self->{_viewTemplate});
+       	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
+	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("cacheTimeout"));
+	}
+       	return $out;
 }
 
 

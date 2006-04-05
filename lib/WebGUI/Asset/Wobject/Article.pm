@@ -13,6 +13,7 @@ package WebGUI::Asset::Wobject::Article;
 use strict;
 use Tie::IxHash;
 use WebGUI::International;
+use WebGUI::Cache;
 use WebGUI::Paginator;
 use WebGUI::Asset::Wobject;
 
@@ -73,6 +74,14 @@ sub definition {
 	my %properties;
 	tie %properties, 'Tie::IxHash';
 	%properties = (
+			cacheTimeout => {
+				tab => "display",
+				fieldType => "interval",
+				defaultValue => 3600,
+				uiLevel => 8,
+				label => $i18n->get("cache timeout"),
+				hoverHelp => $i18n->get("cache timeout help")
+				},
 			templateId =>{
 				fieldType=>"template",
 				defaultValue=>'PBtmpl0000000000000002',	
@@ -141,6 +150,20 @@ sub prepareView {
 
 #-------------------------------------------------------------------
 
+=head2 purgeCache ()
+
+See WebGUI::Asset::purgeCache() for details.
+
+=cut
+
+sub purgeCache {
+	my $self = shift;
+	WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
+	$self->SUPER::purgeCache;
+}
+
+#-------------------------------------------------------------------
+
 =head2 view ( )
 
 view defines all template variables, processes the template and
@@ -150,6 +173,10 @@ returns the output.
 
 sub view {
 	my $self = shift;
+	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10 && !$self->session->form->process("overrideTemplateId") && !$self->session->form->process("pn") && !$self->session->form->process("makePrintable")) {
+		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
+		return $out if $out;
+	}
 	my %var;
 	my $children = $self->getLineage(["children"],{returnObjects=>1,includeOnlyClasses=>["WebGUI::Asset::File","WebGUI::Asset::File::Image"]});
 	foreach my $child (@{$children}) {
@@ -201,7 +228,11 @@ sub view {
 		$var{description} = $p->getPage;
 	}
 	$p->appendTemplateVars(\%var);
-	return $self->processTemplate(\%var, undef, $self->{_viewTemplate});
+       	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
+	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10 && !$self->session->form->process("overrideTemplateId") && !$self->session->form->process("pn") && !$self->session->form->process("makePrintable")) {
+		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("cacheTimeout"));
+	}
+       	return $out;
 }
 
 1;

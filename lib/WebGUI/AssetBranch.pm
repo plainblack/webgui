@@ -158,22 +158,6 @@ sub www_editBranch {
 		-afterEdit=>'op=editPage;npp='.$self->session->form->process("npp"),
 		-subtext=>'<br />'.$i18n->get("change").' '.WebGUI::Form::yesNo($self->session,{name=>"change_printableStyleTemplateId"})
 		);
-        $tabform->getTab("display")->interval(
-                -name=>"cacheTimeout",
-                -label=>$i18n->get(895),
-		-hoverHelp=>$i18n->get('895 description','Asset_Wobject'),
-                -value=>$self->getValue("cacheTimeout"),
-                -uiLevel=>8,
-		-subtext=>'<br />'.$i18n->get("change").' '.WebGUI::Form::yesNo($self->session,{name=>"change_cacheTimeout"})
-                );
-        $tabform->getTab("display")->interval(
-                -name=>"cacheTimeoutVisitor",
-                -label=>$i18n->get(896),
-		-hoverHelp=>$i18n->get('896 description','Asset_Wobject'),
-                -value=>$self->getValue("cacheTimeoutVisitor"),
-                -uiLevel=>8,
-		-subtext=>'<br />'.$i18n->get("change").' '.WebGUI::Form::yesNo($self->session,{name=>"change_cacheTimeoutVisitor"})
-                );
 	$tabform->addTab("security",$i18n->get(107),6);
         $tabform->getTab("security")->yesNo(
                 -name=>"encryptPage",
@@ -277,8 +261,6 @@ sub www_editBranchSave {
 	$data{displayTitle} = $self->session->form->yesNo("displayTitle") if ($self->session->form->yesNo("change_displayTitle"));
 	$data{styleTemplateId} = $self->session->form->template("styleTemplateId") if ($self->session->form->yesNo("change_styleTemplateId"));
 	$data{printableStyleTemplateId} = $self->session->form->template("printableStyleTemplateId") if ($self->session->form->yesNo("change_printableStyleTemplateId"));
-	$data{cacheTimeout} = $self->session->form->interval("cacheTimeout") if ($self->session->form->yesNo("change_cacheTimeout"));
-	$data{cacheTimeoutVisitor} = $self->session->form->interval("cacheTimeoutVisitor") if ($self->session->form->yesNo("change_cacheTimeoutVisitor"));
 	$data{encryptPage} = $self->session->form->yesNo("encryptPage") if ($self->session->form->yesNo("change_encryptPage"));
 	$data{ownerUserId} = $self->session->form->selectBox("ownerUserId") if ($self->session->form->yesNo("change_ownerUserId"));
 	$data{groupIdView} = $self->session->form->group("groupIdView") if ($self->session->form->yesNo("change_groupIdView"));

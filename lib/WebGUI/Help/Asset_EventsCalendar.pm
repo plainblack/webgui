@@ -6,6 +6,11 @@ our $HELP = {
 		body => '71',
 		fields => [
                         {
+                                title => 'visitor cache timeout',
+                                namespace => 'Asset_EventsCalendar',
+                                description => 'visitor cache timeout help'
+                        },
+                        {
                                 title => '507',
                                 description => '507 description',
                                 namespace => 'Asset_EventsCalendar',

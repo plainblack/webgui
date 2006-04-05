@@ -26,6 +26,8 @@
  - Added archive/unarchive options to CS threads.
  - Increased the performance of CS Thread viewing by 500%.
  - Added a database cache option as an alternative to memcached.
+ - Removed page caching system and added individual asset caches, because not
+   everything should cache in the same way.
  - Converted WebGUI to use a new object oriented session system. More details
    in migation.txt.
  - Added a lot more tests to the test suite.

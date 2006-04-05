@@ -13,6 +13,7 @@ package WebGUI::Asset::Post::Thread;
 use strict;
 use WebGUI::Asset::Template;
 use WebGUI::Asset::Post;
+use WebGUI::Cache;
 use WebGUI::Group;
 use WebGUI::International;
 use WebGUI::Paginator;
@@ -534,6 +535,21 @@ sub purge {
 
 #-------------------------------------------------------------------
 
+=head2 purgeCache ()
+
+See WebGUI::Asset::purgeCache() for details.
+
+=cut
+
+sub purgeCache {
+	my $self = shift;
+	WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
+	$self->SUPER::purgeCache;
+	$self->getParent->purgeCache;
+}
+
+#-------------------------------------------------------------------
+
 =head2 rate ( rating )
 
 Stores a rating against this post.
@@ -736,6 +752,10 @@ sub view {
 	my $self = shift;
         $self->markRead;
         $self->incrementViews unless ($self->session->form->process("func") eq 'rate');
+	if ($self->session->user->userId eq '1' && !$self->session->form->process("layout")) {
+		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
+		return $out if $out;
+	}
         $self->session->scratch->set("discussionLayout",$self->session->form->process("layout"));
         my $var = $self->getTemplateVars;
 	$self->getParent->appendTemplateLabels($var);
@@ -827,7 +847,11 @@ sub view {
         $var->{"collaboration.url"} = $self->getThread->getParent->getUrl;
         $var->{'collaboration.title'} = $self->getParent->get("title");
         $var->{'collaboration.description'} = $self->getParent->get("description");
-	return $self->processTemplate($var,undef,$self->{_viewTemplate});
+       	my $out = $self->processTemplate($var,undef,$self->{_viewTemplate});
+	if ($self->session->user->userId eq '1' && !$self->session->form->process("layout")) {
+		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->getThread->getParent->get("visitorCacheTimeout"));
+	}
+       	return $out;
 }
 
 

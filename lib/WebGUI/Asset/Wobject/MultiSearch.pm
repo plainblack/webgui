@@ -24,6 +24,7 @@ use Tie::IxHash;
 use JSON;
 use WebGUI::International;
 use WebGUI::SQL;
+use WebGUI::Cache;
 use WebGUI::Asset::Wobject;
 use WebGUI::Utility;
 
@@ -43,6 +44,14 @@ sub definition {
 	my $definition = shift;
 	my $i18n = WebGUI::International->new($session, "Asset_MultiSearch");
 	my $properties = {
+			cacheTimeout => {
+				tab => "display",
+				fieldType => "interval",
+				defaultValue => 3600,
+				uiLevel => 8,
+				label => $i18n->get("cache timeout"),
+				hoverHelp => $i18n->get("cache timeout help")
+				},
 		templateId =>{
 			fieldType=>"template",
 			tab=>"display",
@@ -88,6 +97,20 @@ sub prepareView {
 
 
 #-------------------------------------------------------------------
+
+=head2 purgeCache ()
+
+See WebGUI::Asset::purgeCache() for details.
+
+=cut
+
+sub purgeCache {
+	my $self = shift;
+	WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
+	$self->SUPER::purgeCache;
+}
+
+#-------------------------------------------------------------------
 =head2 view ( )
 
 method called by the www_view method.  Returns a processed template
@@ -97,6 +120,10 @@ to be displayed within the page style
 
 sub view {
 	my $self = shift;	
+	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
+		return $out if $out;
+	}
 	my %var = $self->get();
 	my $i18n = WebGUI::International->new($self->session, 'Asset_MultiSearch');
 
@@ -105,7 +132,11 @@ sub view {
 	$var{'search'} = $i18n->get('search');
 	$var{'submit'} = WebGUI::Form::Submit->new({name=>'SearchSubmit',value=>$i18n->get('submit','WebGUI')})->toHtml();
 
-	return $self->processTemplate(\%var, undef, $self->get("templateId"));
+       	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
+	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("cacheTimeout"));
+	}
+       	return $out;
 }
 
 

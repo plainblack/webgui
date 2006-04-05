@@ -16,6 +16,7 @@ package WebGUI::Asset::Wobject::Folder;
 
 use strict;
 use WebGUI::Asset::Wobject;
+use WebGUI::Cache;
 use WebGUI::Utility;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
@@ -65,6 +66,14 @@ sub definition {
                 tableName=>'Folder',
                 className=>'WebGUI::Asset::Wobject::Folder',
                 properties=>{
+			visitorCacheTimeout => {
+				tab => "display",
+				fieldType => "interval",
+				defaultValue => 3600,
+				uiLevel => 8,
+				label => $i18n->get("visitor cache timeout"),
+				hoverHelp => $i18n->get("visitor cache timeout help")
+				},
 			templateId =>{
 				fieldType=>"template",
 				defaultValue=>'PBtmpl0000000000000078'
@@ -88,6 +97,14 @@ sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
 	my $i18n = WebGUI::International->new($self->session,"Asset_Folder");
+ 	$tabform->getTab("display")->interval(
+ 		-name=>"visitorCacheTimeout",
+		-label=>$i18n->get('visitor cache timeout'),
+		-hoverHelp=>$i18n->get('visitor cache timeout help'),
+		-value=>$self->getValue('visitorCacheTimeout'),
+		-uiLevel=>8,
+		-defaultValue=>3600
+	);
    	$tabform->getTab("display")->template(
       		-value=>$self->getValue('templateId'),
       		-label=>$i18n->get('folder template title'),
@@ -125,8 +142,26 @@ sub prepareView {
 
 
 #-------------------------------------------------------------------
+
+=head2 purgeCache ()
+
+See WebGUI::Asset::purgeCache() for details.
+
+=cut
+
+sub purgeCache {
+	my $self = shift;
+	WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
+	$self->SUPER::purgeCache;
+}
+
+#-------------------------------------------------------------------
 sub view {
 	my $self = shift;
+	if ($self->session->user->userId eq '1') {
+		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
+		return $out if $out;
+	}
 	my $children = $self->getLineage( ["children"], { returnObjects=>1 });
 	my %vars;
 	foreach my $child (@{$children}) {
@@ -164,16 +199,12 @@ sub view {
 				});
 		}
 	}
-	return $self->processTemplate(\%vars,undef,$self->{_viewTemplate});
+       	my $out = $self->processTemplate(\%vars,undef,$self->{_viewTemplate});
+	if ($self->session->user->userId eq '1') {
+		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("visitorCacheTimeout"));
+	}
+       	return $out;
 }
-
-
-#sub www_edit {
-#        my $self = shift;
-#	return $self->session->privilege->insufficient() unless $self->canEdit;
-#        $self->getAdminConsole->setHelp("folder add/edit","Asset_Folder");
-#        return $self->getAdminConsole->render($self->getEditForm->print,"Edit Folder");
-#}
 
 
 

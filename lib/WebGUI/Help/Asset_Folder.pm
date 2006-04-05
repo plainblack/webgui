@@ -7,6 +7,11 @@ our $HELP = {
 		body => 'folder add/edit body',
 		fields => [
                         {
+                                title => 'visitor cache timeout',
+                                namespace => 'Asset_Folder',
+                                description => 'visitor cache timeout help'
+                        },
+                        {
                                 title => 'folder template title',
                                 description => 'folder template description',
 				namespace => 'Asset_Folder',

@@ -1,6 +1,16 @@
 package WebGUI::i18n::English::Asset_MessageBoard;
 
 our $I18N = {
+	'visitor cache timeout' => {
+		message => q|Visitor Cache Timeout|,
+		lastUpdated => 0
+		},
+
+	'visitor cache timeout help' => {
+		message => q|Since all visitors will see this asset the same way, we can cache it to increase performance. How long should we cache it?<br /> <br /><b>UI Level: 8</b>|,
+		lastUpdated => 0
+		},
+
 	'74' => {
 		message => q|The following is the list of template variables available in message board templates.
 <p/>

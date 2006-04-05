@@ -13,6 +13,7 @@ package WebGUI::Asset::Wobject::Collaboration;
 use strict;
 use Tie::IxHash;
 use WebGUI::Group;
+use WebGUI::Cache;
 use WebGUI::HTML;
 use WebGUI::International;
 use WebGUI::Paginator;
@@ -248,6 +249,14 @@ sub definition {
                 tableName=>'Collaboration',
                 className=>'WebGUI::Asset::Wobject::Collaboration',
                 properties=>{
+			visitorCacheTimeout => {
+				tab => "display",
+				fieldType => "interval",
+				defaultValue => 3600,
+				uiLevel => 8,
+				label => $i18n->get("visitor cache timeout"),
+				hoverHelp => $i18n->get("visitor cache timeout help")
+				},
 			approvalWorkflow =>{
 				fieldType=>"workflow",
 				defaultValue=>"pbworkflow000000000003"
@@ -410,6 +419,14 @@ sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm;
 	my $i18n = WebGUI::International->new($self->session,"Asset_Collaboration");
+ 	$tabform->getTab("display")->interval(
+ 		-name=>"visitorCacheTimeout",
+		-label=>$i18n->get('visitor cache timeout'),
+		-hoverHelp=>$i18n->get('visitor cache timeout help'),
+		-value=>$self->getValue('visitorCacheTimeout'),
+		-uiLevel=>8,
+		-defaultValue=>3600
+	);
    	$tabform->getTab("display")->yesNo(
       		-value=>$self->getValue('displayLastReply'),
 		-label=>$i18n->get('display last reply'),
@@ -822,6 +839,20 @@ sub purge {
 
 #-------------------------------------------------------------------
 
+=head2 purgeCache ()
+
+See WebGUI::Asset::purgeCache() for details.
+
+=cut
+
+sub purgeCache {
+	my $self = shift;
+	WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
+	$self->SUPER::purgeCache;
+}
+
+#-------------------------------------------------------------------
+
 =head2 recalculateRating ( )
 
 Calculates the rating of this forum from its threads and stores the new value in the forum properties.
@@ -895,6 +926,10 @@ sub unsubscribe {
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
+	if ($self->session->user->userId eq '1' && !$self->session->form->process("sortBy")) {
+		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
+		return $out if $out;
+	}
 	my $scratchSortBy = $self->getId."_sortBy";
 	my $scratchSortOrder = $self->getId."_sortDir";
 	my $sortBy = $self->session->form->process("sortBy") || $self->session->scratch->get($scratchSortBy) || $self->get("sortBy");
@@ -942,7 +977,11 @@ sub view {
 	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->get("threadsPerPage"));
 	$self->appendPostListTemplateVars(\%var, $sql, $p);
 	$self->appendTemplateLabels(\%var);
-	return $self->processTemplate(\%var,undef, $self->{_viewTemplate});
+       	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
+	if ($self->session->user->userId eq '1' && !$self->session->form->process("sortBy")) {
+		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("visitorCacheTimeout"));
+	}
+       	return $out;
 }
 
 #-------------------------------------------------------------------

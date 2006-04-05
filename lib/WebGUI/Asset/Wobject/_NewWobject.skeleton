@@ -186,19 +186,4 @@ adminConsole views.
 #                  WebGUI::International::get("edit_title","NewWobject"));
 #}
 
-#-------------------------------------------------------------------
-=head2 www_view ( )
-
-Override www_view method and call the superclass's object method, passing 
-in a 1 to disable wobject-level cache.  Only use this method if you want 
-to explicitly disable caching, or do something else when /yourWobjectUrl?func=view or just /yourWobjectUrl is requested.
-
-=cut
-
-sub www_view {
-   my $self = shift;
-   return $self->SUPER::www_view(1);
-   # default: return $self->SUPER::www_view();
-}
-
 1;

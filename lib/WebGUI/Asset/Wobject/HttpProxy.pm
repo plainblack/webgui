@@ -54,6 +54,10 @@ sub definition {
 				fieldType=>"yesNo",
 				defaultValue=>1
 				}, 
+			cacheTimeout=>{
+				fieldType=>"interval",
+				defaultValue=>0
+				},
 			filterHtml=>{
 				fieldType=>"filterContent",
 				defaultValue=>"javascript"
@@ -139,6 +143,13 @@ sub getEditForm {
                 -hoverHelp=>$i18n->get('12 description'),
                 -value=>$self->getValue("rewriteUrls")
                 );
+        $tabform->getTab("display")->interval(
+                -name=>"cacheTimeout",
+                -label=>$i18n->get('cache timeout'),
+                -hoverHelp=>$i18n->get('cache timeout description'),
+		-uiLevel => 8,
+                -value=>$self->getValue("cacheTimeout")
+                );
         $tabform->getTab("display")->yesNo(
                 -name=>"removeStyle",
                 -label=>$i18n->get(6),
@@ -198,13 +209,28 @@ sub purge {
 
 
 #-------------------------------------------------------------------
+
+=head2 purgeCache ()
+
+See WebGUI::Asset::purgeCache() for details.
+
+=cut
+
+sub purgeCache {
+	my $self = shift;
+	WebGUI::Cache->new($self->session,$self->get("proxiedUrl"),"URL")->delete;
+	WebGUI::Cache->new($self->session,$self->get("proxiedUrl"),"HEADER")->delete;
+	$self->SUPER::purgeCache;
+}
+
+#-------------------------------------------------------------------
 sub view {
 	my $self = shift;
 	my $cookiebox = $self->session->url->escape($self->session->var->get("sessionId"));
    	$cookiebox =~ s/[^A-Za-z0-9\-\.\_]//g;  #removes all funky characters
    	$cookiebox .= '.cookie';
    	my $jar = HTTP::Cookies->new(File => $self->getCookieJar->getPath($cookiebox), AutoSave => 1, Ignore_Discard => 1);
-   my (%var, %formdata, @formUpload, $redirect, $response, $header, $userAgent, $proxiedUrl, $request, $ttl);
+   my (%var, %formdata, @formUpload, $redirect, $response, $header, $userAgent, $proxiedUrl, $request);
 
    if($self->session->form->process("func")!~/editSave/i) {
       $proxiedUrl = $self->session->form->process("FormAction") || $self->session->form->process("proxiedUrl") || $self->get("proxiedUrl") ;
@@ -338,14 +364,9 @@ sub view {
       $var{content} = "<b>Getting <a href='$proxiedUrl'>$proxiedUrl</a> failed</b>".
    	      "<p><i>GET status line: ".$response->status_line."</i>";
    }
-   if ($self->session->user->userId eq '1') {
-      $ttl = $self->get("cacheTimeoutVisitor");
-      } else {
-          $ttl = $self->get("cacheTimeout");
-      }
-		unless ($self->get("cacheTimeoutVisitor") <= 1 && $self->get("cacheTimeout") <= 1) {
-	   $cachedContent->set($var{content},$ttl);
-	   $cachedHeader->set($var{header},$ttl);
+	unless ($self->get("cacheTimeout") <= 10) {
+	   $cachedContent->set($var{content},$self->get("cacheTimeout"));
+	   $cachedHeader->set($var{header},$self->get("cacheTimeout"));
 	  }
    }
 

@@ -82,22 +82,6 @@ sub definition {
 		hoverHelp=>$i18n->get('174 description'),
 		uiLevel=>5
 	},
-	cacheTimeout=>{
-		fieldType=>'interval',
-		defaultValue=>60,
-		tab=>"display",
-		label=>$i18n->get(895),
-		hoverHelp=>$i18n->get('895 description'),
-		uiLevel=>8
-	},
-	cacheTimeoutVisitor=>{
-		fieldType=>'interval',
-		defaultValue=>600,
-		tab=>"display",
-		label=>$i18n->get(896),
-		hoverHelp=>$i18n->get('896 description'),
-		uiLevel=>8
-	},
 	styleTemplateId=>{
 		fieldType=>'template',
 		defaultValue=>undef,

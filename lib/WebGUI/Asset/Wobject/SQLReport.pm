@@ -18,6 +18,7 @@ use WebGUI::Paginator;
 use WebGUI::SQL;
 use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
+use WebGUI::Cache;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
 
@@ -39,6 +40,10 @@ sub definition {
 			templateId =>{
 				fieldType=>"template",
 				defaultValue=>'PBtmpl0000000000000059'
+				},
+			cacheTimeout=>{
+				fieldType=>"interval",
+				defaultValue=>0
 				},
 			paginateAfter=>{
 				fieldType=>"integer",
@@ -170,6 +175,13 @@ sub getEditForm {
                 -hoverHelp=>$i18n->get('16 description'),
                 -value=>$self->getValue("debugMode")
                 );
+        $tabform->getTab("display")->interval(
+                -name=>"cacheTimeout",
+                -label=>$i18n->get('cache timeout'),
+                -hoverHelp=>$i18n->get('cache timeout description'),
+		-uiLevel => 8,
+                -value=>$self->getValue("cacheTimeout")
+                );
 
 	# Add toggleQuery javascript
 	$tabform->getTab("properties")->raw(qq|
@@ -280,8 +292,26 @@ sub prepareView {
 
 
 #-------------------------------------------------------------------
+
+=head2 purgeCache ()
+
+See WebGUI::Asset::purgeCache() for details.
+
+=cut
+
+sub purgeCache {
+	my $self = shift;
+	WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
+	$self->SUPER::purgeCache;
+}
+
+#-------------------------------------------------------------------
 sub view {
 	my $self = shift;
+	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
+		return $out if $out;
+	}
         # Initiate an empty debug loop
         $self->{_debug_loop} = [] ;
 	
@@ -294,7 +324,11 @@ sub view {
 	# Add debug loop to template vars
 	$var->{'debug_loop'} = $self->{_debug_loop};
 	#use Data::Dumper; return '<pre>'.Dumper($var).'</pre>';
-	return $self->processTemplate($var, undef, $self->{_viewTemplate});
+       	my $out = $self->processTemplate($var,undef,$self->{_viewTemplate});
+	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("visitorCacheTimeout"));
+	}
+       	return $out;
 }
 
 #-------------------------------------------------------------------

@@ -1137,18 +1137,6 @@ sub www_process {
 	}
 }
 
-#-------------------------------------------------------------------
-=head2 www_view ( )
-
-Overwrite www_view method and call the superclass object, passing in a 1 to disable cache
-
-=cut
-
-sub www_view {
-	my $self = shift;
-	$self->SUPER::www_view(1);
-	
-}
 
 1;
 

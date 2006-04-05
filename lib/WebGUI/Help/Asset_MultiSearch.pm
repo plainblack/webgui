@@ -6,6 +6,11 @@ our $HELP = {
 		body => 'multisearch add/edit body',
 		fields => [
                         {
+                                title => 'cache timeout',
+                                namespace => 'Asset_MultiSearch',
+                                description => 'cache timeout help'
+                        },
+                        {
                                 title => 'MultiSearch Template',
                                 description => 'MultiSearch Template description',
                                 namespace => 'Asset_MultiSearch',

@@ -206,6 +206,17 @@ prepareView() in which HTML and HTTP headers must be set. See any of the
 existing assets and wobjects for implementation details.
 
 
+1.9 Removed Page Caching
+
+The page caching system that was cacheTimeout and cacheTimeoutVisitor on
+wobjects has been removed. Not everything caches in the same way and therefore
+we can't use a generic caching mechanism as much as we'd like to. Likewise,
+the www_view(1) cache override that has traditionally been used in wobjects is
+now gone since it's useless. If your asset needs caching, you'll need to add
+it yourself. See one of the dozen or so assets that come with WebGUI for
+ideas. Examples include Article, SQL Report, File, and Folder.
+
+
 
 2. Macro Migration
 -------------------

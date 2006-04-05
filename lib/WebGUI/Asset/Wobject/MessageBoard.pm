@@ -12,6 +12,7 @@ package WebGUI::Asset::Wobject::MessageBoard;
 
 use strict;
 use Tie::IxHash;
+use WebGUI::Cache;
 use WebGUI::Asset::Wobject;
 use WebGUI::International;
 use WebGUI::SQL;
@@ -35,7 +36,15 @@ sub definition {
 				namespace=>"MessageBoard",
                 		label=>$i18n->get(73),
                 		hoverHelp=>$i18n->get('73 description')
-				}
+				},
+			visitorCacheTimeout => {
+				tab => "display",
+				fieldType => "interval",
+				defaultValue => 3600,
+				uiLevel => 8,
+				label => $i18n->get("visitor cache timeout"),
+				hoverHelp => $i18n->get("visitor cache timeout help")
+				},
 		);
 	push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
@@ -65,10 +74,34 @@ sub prepareView {
 	$self->{_viewTemplate} = $template;
 }
 
+#-------------------------------------------------------------------
+
+=head2 purgeCache ()
+
+See WebGUI::Asset::purgeCache() for details.
+
+=cut
+
+sub purgeCache {
+	my $self = shift;
+	WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
+	$self->SUPER::purgeCache;
+}
 
 #-------------------------------------------------------------------
+
+=head2 view ()
+
+See WebGUI::Asset::view() for details.
+
+=cut
+
 sub view {
 	my $self = shift;
+	if ($self->session->user->userId eq '1') {
+		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
+		return $out if $out;
+	}
 	my %var;
 	my $count;
 	my $first;
@@ -123,7 +156,11 @@ sub view {
 	$var{'lastpost.label'} = $i18n->get('lastpost');
 	$var{areMultipleForums} = ($count > 1);
 	$var{forum_loop} = \@forum_loop;
-       	return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
+       	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
+	if ($self->session->user->userId eq '1') {
+		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("visitorCacheTimeout"));
+	}
+       	return $out;
 }
 
 1;

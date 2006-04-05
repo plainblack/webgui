@@ -398,10 +398,6 @@ sub www_setStatus {
 	return $self->www_view;
 }
 
-sub www_view {
-	my $self = shift;
-	$self->SUPER::www_view(1);
-}
 
 #-------------------------------------------------------------------
 sub www_viewReport {

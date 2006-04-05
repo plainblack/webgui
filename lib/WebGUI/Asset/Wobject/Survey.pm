@@ -1214,18 +1214,6 @@ sub www_respond {
 
 
 #-------------------------------------------------------------------
-=head2 www_view ( )
-
-Overwrite www_view method and call the superclass object, passing in a 1 to disable cache
-
-=cut
-
-sub www_view {
-   my $self = shift;
-   $self->SUPER::www_view(1);
-}
-
-#-------------------------------------------------------------------
 sub www_viewGradebook {
 	my $self = shift;
         return "" unless ($self->session->user->isInGroup($self->get("groupToViewReports")));

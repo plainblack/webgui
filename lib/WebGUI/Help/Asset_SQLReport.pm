@@ -11,6 +11,11 @@ our $HELP = {
                                 namespace => 'Asset_SQLReport',
                         },
                         {
+                                title => 'cache timeout',
+                                description => 'cache timeout description',
+                                namespace => 'Asset_SQLReport',
+                        },
+                        {
                                 title => '16',
                                 description => '16 description',
                                 namespace => 'Asset_SQLReport',

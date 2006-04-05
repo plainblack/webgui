@@ -6,6 +6,11 @@ our $HELP = {
 		body => 'collaboration add/edit body',
 		fields => [
                         {
+                                title => 'visitor cache timeout',
+                                namespace => 'Asset_Collaboration',
+                                description => 'visitor cache timeout help'
+                        },
+                        {
                                 title => 'display last reply',
                                 description => 'display last reply description',
                                 namespace => 'Asset_Collaboration',

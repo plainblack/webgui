@@ -1,6 +1,16 @@
 package WebGUI::i18n::English::Asset_HttpProxy;
 
 our $I18N = {
+	'cache timeout description' => {
+		message => q|How long should the proxy cache a page, so that if it's requested again, it won't have to refetch it?|,
+		lastUpdated => 1047837230
+	},
+
+	'cache timeout' => {
+		message => q|Cache Timeout|,
+		lastUpdated => 1047837230
+	},
+
 	'6' => {
 		message => q|Remove style?|,
 		lastUpdated => 1047837230

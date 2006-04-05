@@ -2,6 +2,16 @@ package WebGUI::i18n::English::Asset_Folder;
 
 our $I18N = {
 
+	'visitor cache timeout' => {
+		message => q|Visitor Cache Timeout|,
+		lastUpdated => 0
+		},
+
+	'visitor cache timeout help' => {
+		message => q|Since all visitors will see this asset the same way, we can cache it to increase performance. How long should we cache it?<br /> <br /><b>UI Level: 8</b>|,
+		lastUpdated => 0
+		},
+
         '847' => {
                    message => qq|Go back to the current page.|,
                    lastUpdated => 1039587250,

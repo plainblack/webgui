@@ -12,6 +12,7 @@ package WebGUI::Asset::Wobject::EventsCalendar;
 
 use strict;
 use Tie::CPHash;
+use WebGUI::Cache;
 use WebGUI::International;
 use WebGUI::SQL;
 use WebGUI::Utility;
@@ -45,6 +46,14 @@ sub definition {
 		tableName=>'EventsCalendar',
 		className=>'WebGUI::Asset::Wobject::EventsCalendar',
 		properties=>{
+			visitorCacheTimeout => {
+				tab => "display",
+				fieldType => "interval",
+				defaultValue => 3600,
+				uiLevel => 8,
+				label => $i18n->get("visitor cache timeout"),
+				hoverHelp => $i18n->get("visitor cache timeout help")
+				},
 			templateId =>{
 				fieldType=>"template",
 				defaultValue=>'PBtmpl0000000000000022'
@@ -115,6 +124,14 @@ sub getEditForm {
 			1=>$i18n->get(510),
 			2=>$i18n->get(509),
 		}
+	);
+ 	$tabform->getTab("display")->interval(
+ 		-name=>"visitorCacheTimeout",
+		-label=>$i18n->get('visitor cache timeout'),
+		-hoverHelp=>$i18n->get('visitor cache timeout help'),
+		-value=>$self->getValue('visitorCacheTimeout'),
+		-uiLevel=>8,
+		-defaultValue=>3600
 	);
  	$tabform->getTab("display")->template(
  		-name=>"templateId",
@@ -199,8 +216,26 @@ sub prepareView {
 
 
 #-------------------------------------------------------------------
+
+=head2 purgeCache ()
+
+See WebGUI::Asset::purgeCache() for details.
+
+=cut
+
+sub purgeCache {
+	my $self = shift;
+	WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
+	$self->SUPER::purgeCache;
+}
+
+#-------------------------------------------------------------------
 sub view {
 	my $self = shift;  
+	if ($self->session->user->userId eq '1' && !$self->session->form->process("calMonthStart") && !$self->session->form->process("calMonthEnd")) {
+		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
+		return $out if $out;
+	}
 	my $i18n = WebGUI::International->new($self->session,"Asset_EventsCalendar");
 	#define default view month range.  Note that this could be different from 
 	#the range a user is allowed to view - set by the events calendar limitations.
@@ -466,25 +501,15 @@ sub view {
 		<option value="'.(8+$calMonthStart).'">9 '.$i18n->get(561).'</option>
 		<option value="'.(11+$calMonthStart).'">12 '.$i18n->get(561).'</option></select>
 		<input type="submit" value="Go" name="Go" />';
-	#use Data::Dumper; return '<pre>'.Dumper(\%var).'</pre>';
-	my $vars = \%var;
-	return $self->processTemplate($vars,undef,$self->{_viewTemplate});
+       	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
+	if ($self->session->user->userId eq '1' && !$self->session->form->process("calMonthStart") && !$self->session->form->process("calMonthEnd")) {
+		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("visitorCacheTimeout"));
+	}
+       	return $out;
 	
 }
 
 
-#-------------------------------------------------------------------
-=head2 www_view ( )
-
-Overwrite www_view method and call the superclass object, passing in a 1 to disable cache
-
-=cut
-
-sub www_view {
-	my $self = shift;
-	$self->SUPER::www_view(1);
-	
-}
 
 1;
 

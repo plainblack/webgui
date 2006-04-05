@@ -31,6 +31,11 @@ our $HELP = {
                                 namespace => 'Asset_HttpProxy',
                         },
                         {
+                                title => 'cache timeout',
+                                description => 'cache timeout description',
+                                namespace => 'Asset_HttpProxy',
+                        },
+                        {
                                 title => '6',
                                 description => '6 description',
                                 namespace => 'Asset_HttpProxy',

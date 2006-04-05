@@ -251,6 +251,10 @@ used to show the file to administrators.
 
 sub view {
 	my $self = shift;
+	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
+		return $out if $out;
+	}
 	my %var = %{$self->get};
 	#$self->session->errorHandler->warn($self->getId);
 	$var{controls} = $self->getToolbar;
@@ -266,7 +270,11 @@ sub view {
 	unless($self->get("showPage")) {
 	   $var{pageError} = "true";
 	}
-	return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
+       	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
+	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("cacheTimeout"));
+	}
+       	return $out;
 }
 
 

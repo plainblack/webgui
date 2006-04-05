@@ -12,6 +12,7 @@ package WebGUI::Asset::Wobject::Product;
 
 use strict;
 use Tie::CPHash;
+use WebGUI::Cache;
 use WebGUI::HTMLForm;
 use WebGUI::Storage::Image;
 use WebGUI::SQL;
@@ -101,6 +102,14 @@ sub definition {
 		tableName=>'Product',
 		className=>'WebGUI::Asset::Wobject::Product',
 		properties=>{
+			cacheTimeout => {
+				tab => "display",
+				fieldType => "interval",
+				defaultValue => 3600,
+				uiLevel => 8,
+				label => $i18n->get("cache timeout"),
+				hoverHelp => $i18n->get("cache timeout help")
+				},
 			templateId =>{
 				fieldType=>"template",
 				defaultValue=>'PBtmpl0000000000000056'
@@ -329,6 +338,20 @@ sub purge {
    	$self->session->db->write("delete from Product_feature where assetId=".$self->session->db->quote($self->getId));
    	$self->session->db->write("delete from Product_specification where assetId=".$self->session->db->quote($self->getId));
    	$self->SUPER::purge();
+}
+
+#-------------------------------------------------------------------
+
+=head2 purgeCache ()
+
+See WebGUI::Asset::purgeCache() for details.
+
+=cut
+
+sub purgeCache {
+	my $self = shift;
+	WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
+	$self->SUPER::purgeCache;
 }
 
 #-------------------------------------------------------------------
@@ -737,6 +760,10 @@ sub www_moveSpecificationUp {
 #-------------------------------------------------------------------
 sub view {
    my $self = shift;
+	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
+		return $out if $out;
+	}
    my (%data, $sth, $file, $segment, %var, @featureloop, @benefitloop, @specificationloop, @accessoryloop, @relatedloop);
    tie %data, 'Tie::CPHash';
 	my $brochure = $self->get("brochure");
@@ -879,7 +906,11 @@ sub view {
    }
    $sth->finish;
    $var{relatedproduct_loop} = \@relatedloop;
-   return $self->processTemplate(\%var, undef, $self->{_viewTemplate});
+       	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
+	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("cacheTimeout"));
+	}
+       	return $out;
 }
 
 1;

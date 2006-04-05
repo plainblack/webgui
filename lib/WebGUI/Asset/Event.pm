@@ -13,6 +13,7 @@ package WebGUI::Asset::Event;
 use strict;
 use Tie::CPHash;
 use WebGUI::Form;
+use WebGUI::Cache;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
 use WebGUI::International;
@@ -194,6 +195,21 @@ sub processPropertiesFromFormPost {
 
 #-------------------------------------------------------------------
 
+=head2 purgeCache ()
+
+See WebGUI::Asset::purgeCache() for details.
+
+=cut
+
+sub purgeCache {
+	my $self = shift;
+	WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
+	$self->SUPER::purgeCache;
+	$self->getParent->purgeCache;
+}
+
+#-------------------------------------------------------------------
+
 =head2 setParent ( newParent ) 
 
 We're overloading the setParent in Asset because we don't want events to be able to be posted to anything other than the events calendar.
@@ -214,6 +230,10 @@ sub setParent {
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
+	if ($self->session->user->userId eq '1') {
+		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
+		return $out if $out;
+	}
 	my ($output, $event, $id);
 	my %var = $self->get;
 	my $i18n = WebGUI::International->new($self->session,"Asset_Event");
@@ -245,7 +265,11 @@ sub view {
 			});
 	}
 	$var{others_loop} = \@others;
-	return $self->processTemplate(\%var,undef, $self->{_viewTemplate});
+       	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
+	if ($self->session->user->userId eq '1') {
+		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->getParent->get("visitorCacheTimeout"));
+	}
+       	return $out;
 }
 
 

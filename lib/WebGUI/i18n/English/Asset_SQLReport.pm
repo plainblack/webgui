@@ -1,6 +1,16 @@
 package WebGUI::i18n::English::Asset_SQLReport;
 
 our $I18N = {
+	'cache timeout description' => {
+		message => q|How long should we cache the results of the query before fetching it again?|,
+		lastUpdated => 1047837230
+	},
+
+	'cache timeout' => {
+		message => q|Cache Timeout|,
+		lastUpdated => 1047837230
+	},
+
 	'11' => {
 		message => q|<b>Debug:</b> Error: There was a problem with the query.|,
 		lastUpdated => 1031514049

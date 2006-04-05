@@ -69,6 +69,14 @@ sub definition {
 	tie %properties, 'Tie::IxHash';
 	my $i18n = WebGUI::International->new($session,'Asset_SyndicatedContent');
 	%properties = (
+			cacheTimeout => {
+				tab => "display",
+				fieldType => "interval",
+				defaultValue => 3600,
+				uiLevel => 8,
+				label => $i18n->get("cache timeout"),
+				hoverHelp => $i18n->get("cache timeout help")
+				},
 			templateId =>{
 				tab=>"display",
 				fieldType=>'template',
@@ -485,6 +493,20 @@ sub prepareView {
 }
 
 
+#-------------------------------------------------------------------
+
+=head2 purgeCache ()
+
+See WebGUI::Asset::purgeCache() for details.
+
+=cut
+
+sub purgeCache {
+	my $self = shift;
+	WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
+	$self->SUPER::purgeCache;
+}
+
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 =head2 view()
 
@@ -494,9 +516,11 @@ Returns the rendered output of the wobject.
 
 sub view {
 	my $self = shift;
+	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
+		return $out if $out;
+	}
 	my $rssFlavor = shift;
-	$self->logView() if ($self->session->setting->get("passiveProfilingEnabled"));
-
         my $maxHeadlines = $self->get('maxHeadlines') || 1000000;
         my @urls = split(/\s+/,$self->get('rssUrl'));
 	return $self->processTemplate({},$self->get('templateId')) unless (scalar(@urls));
@@ -535,7 +559,11 @@ sub view {
 	    return $rss;
 
 	} else {
-	    return $self->processTemplate(\%var,undef, $self->{_viewTemplate});
+       		my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
+		if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+			WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("cacheTimeout"));
+		}
+       		return $out;
 	}
 
 }

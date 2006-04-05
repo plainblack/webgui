@@ -27,6 +27,7 @@ my $session = start(); # this line required
 addWorkflow();
 convertMessageLogToInbox();
 updateCs();
+changeCache();
 templateParsers();
 removeFiles();
 addSearchEngine();
@@ -44,6 +45,25 @@ fixImportNodePrivileges();
 addAdManager();
 
 finish($session); # this line required
+
+#-------------------------------------------------
+sub changeCache {
+	print "\tChanging page cache system.\n";
+	$session->db->write("alter table MessageBoard add column visitorCacheTimeout int not null default 3600");
+	$session->db->write("alter table Matrix add column visitorCacheTimeout int not null default 3600");
+	$session->db->write("alter table Collaboration add column visitorCacheTimeout int not null default 3600");
+	$session->db->write("alter table EventsCalendar add column visitorCacheTimeout int not null default 3600");
+	$session->db->write("alter table Folder add column visitorCacheTimeout int not null default 3600");
+	$session->db->write("alter table HttpProxy add column cacheTimeout int not null default 0");
+	$session->db->write("alter table SQLReport add column cacheTimeout int not null default 0");
+	$session->db->write("alter table FileAsset add column cacheTimeout int not null default 3600");
+	$session->db->write("alter table Product add column cacheTimeout int not null default 3600");
+	$session->db->write("alter table SyndicatedContent add column cacheTimeout int not null default 3600");
+	$session->db->write("alter table MultiSearch add column cacheTimeout int not null default 3600");
+	$session->db->write("alter table Article add column cacheTimeout int not null default 3600");
+	$session->db->write("alter table wobject drop column cacheTimeout");
+	$session->db->write("alter table wobject drop column cacheTimeoutVisitor");
+}
 
 #-------------------------------------------------
 sub addAdManager {

@@ -96,7 +96,6 @@ sub exportAsHtml {
 	# Change the stuff we need to change to do the export
 	my $session = WebGUI::Session->open($self->session->config->getWebguiRoot, $self->session->config->getFilename);
 	$session->user({userId=>$userId}) unless ($userId eq $self->session->user->userId);
-	$self->{_properties}{cacheTimeout} = $self->{_properties}{cacheTimeoutVisitor} = 1;
 
 	# Generate the page
 	my $content = $self->www_view;

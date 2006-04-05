@@ -6,6 +6,11 @@ our $HELP = {
 		title => 'file add/edit title',
 		body => 'file add/edit body',
 		fields => [
+                        {
+                                title => 'cache timeout',
+                                namespace => 'Asset_File',
+                                description => 'cache timeout help'
+                        },
 			{
 				title => 'new file',
 				description => 'new file description',

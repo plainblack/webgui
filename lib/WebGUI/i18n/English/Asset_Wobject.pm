@@ -77,15 +77,6 @@ is displayed as part of a Layout Asset, the Layout Asset's <b>Style Template</b>
                 lastUpdated => 1119410887,
         },
 
-        '895 description' => {
-                message => q|The amount of time this page should remain cached for registered users.|,
-                lastUpdated => 1119410887,
-        },
-
-        '896 description' => {
-                message => q|The amount of time this page should remain cached for visitors.|,
-                lastUpdated => 1119410887,
-        },
 
           '42' => {
                     lastUpdated => 1031514049,
@@ -111,14 +102,6 @@ is displayed as part of a Layout Asset, the Layout Asset's <b>Style Template</b>
                     lastUpdated => 1031514049,
                     message => q|Description|
                   },
-          '895' => {
-                     lastUpdated => 1056292971,
-                     message => q|Cache Timeout|
-                   },
-          '896' => {
-                     lastUpdated => 1056292980,
-                     message => q|Cache Timeout (Visitors)|
-                   },
           '664' => {
                      lastUpdated => 1031514049,
                      message => q|Wobject, Delete|

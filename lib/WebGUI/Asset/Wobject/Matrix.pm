@@ -4,6 +4,7 @@ use strict;
 use Tie::IxHash;
 use WebGUI::Form;
 use WebGUI::HTMLForm;
+use WebGUI::Cache;
 use WebGUI::Mail::Send;
 use WebGUI::SQL;
 use WebGUI::User;
@@ -27,6 +28,14 @@ sub definition {
                 className=>'WebGUI::Asset::Wobject::Matrix',
 		assetName=>$i18n->get('assetName'),
                 properties=>{
+			visitorCacheTimeout => {
+				tab => "display",
+				fieldType => "interval",
+				defaultValue => 3600,
+				uiLevel => 8,
+				label => $i18n->get("visitor cache timeout"),
+				hoverHelp => $i18n->get("visitor cache timeout help")
+				},
 			categories=>{
                                 defaultValue=>"Features\nBenefits",
 				fieldType=>"textarea"
@@ -190,6 +199,20 @@ sub purge {
        $self->session->db->write("delete from Matrix_rating where assetId=".$self->session->db->quote($self->getId));
        $self->session->db->write("delete from Matrix_ratingSummary where assetId=".$self->session->db->quote($self->getId));
        $self->SUPER::purge;
+}
+
+#-------------------------------------------------------------------
+
+=head2 purgeCache ()
+
+See WebGUI::Asset::purgeCache() for details.
+
+=cut
+
+sub purgeCache {
+	my $self = shift;
+	WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
+	$self->SUPER::purgeCache;
 }
 
 #-------------------------------------------------------------------
@@ -377,6 +400,14 @@ sub getEditForm {
         my $self = shift;
         my $tabform = $self->SUPER::getEditForm();
 	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
+ 	$tabform->getTab("display")->interval(
+ 		-name=>"visitorCacheTimeout",
+		-label=>$i18n->get('visitor cache timeout'),
+		-hoverHelp=>$i18n->get('visitor cache timeout help'),
+		-value=>$self->getValue('visitorCacheTimeout'),
+		-uiLevel=>8,
+		-defaultValue=>3600
+	);
 	$tabform->getTab("properties")->textarea(
 			-name=>"categories",
 			-label=>$i18n->get('categories'),
@@ -905,6 +936,10 @@ sub www_search {
 #-------------------------------------------------------------------
 sub view {
         my $self = shift;
+	if ($self->session->user->userId eq '1') {
+		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
+		return $out if $out;
+	}
         my (%var);
 	$var{'compare.form'} = $self->getCompareForm;
 	$var{'search.url'} = $self->getUrl("func=search");
@@ -1000,7 +1035,11 @@ sub view {
                         });
         }
         $sth->finish;
-        return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
+       	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
+	if ($self->session->user->userId eq '1') {
+		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("visitorCacheTimeout"));
+	}
+       	return $out;
 }
  
 #-------------------------------------------------------------------
