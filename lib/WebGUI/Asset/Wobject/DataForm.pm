@@ -466,7 +466,7 @@ sub getRecordTemplateVars {
 	}
 	
 	my @fields;
-	my $sth = WebGUI::SQL->read("$select from DataForm_field as a $join $where and a.DataForm_tabId = 0 order by a.sequenceNumber");
+	my $sth = WebGUI::SQL->read("$select from DataForm_field as a $join $where and a.DataForm_tabId = '0' order by a.sequenceNumber");
 	while (%data = $sth->hash) {
 		my $formValue = $session{form}{$data{name}};
 		if ((not exists $data{value}) && $session{form}{func} ne "editSave" && $session{form}{func} ne "editFieldSave" && defined $formValue) {
