@@ -207,6 +207,7 @@ sub processPropertiesFromFormPost {
 		$data{menuTitle} = $filename unless ($session{form}{menuTitle});
 		$data{url} = $self->getParent->get('url').'/'.$filename unless ($session{form}{url});
 		$self->update(\%data);
+		$self->setSize($storage->getFileSize($filename));
 	}
 }
 
