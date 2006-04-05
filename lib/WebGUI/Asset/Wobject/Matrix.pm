@@ -145,7 +145,7 @@ sub getCompareForm {
 		.WebGUI::Form::submit($self->session,{
 			value=>"compare"
 			})
-		."</form>";
+		.WebGUI::Form::formFooter($self->session);
 	return $form;
 }
 
