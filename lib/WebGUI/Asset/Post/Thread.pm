@@ -812,7 +812,6 @@ sub view {
 		$replyVars{depth} = $reply->getLineageLength - $self->getLineageLength;
 		$replyVars{depthX10} = $replyVars{depth}*10;
         	my @depth_loop;
-		#@{$replyVars{indent_loop}} = {};
         	for (my $i=0; $i<$replyVars{depth}; $i++) {
                 	push(@{$replyVars{indent_loop}},{depth=>$i});
         	}
@@ -821,10 +820,8 @@ sub view {
 	$p->appendTemplateVars($var);
         $var->{'add.url'} = $self->getParent->getNewThreadUrl;
  
-	my $previous = $self->getPreviousThread;
-	$var->{"previous.url"} = $previous->getUrl if (defined $previous);
-	my $next = $self->getNextThread;
-	$var->{"next.url"} = $next->getUrl if (defined $next);
+	$var->{"previous.url"} = $self->getUrl("func=previousThread");
+	$var->{"next.url"} = $self->getUrl("func=nextThread");
 
 	$var->{"search.url"} = $self->getParent->getSearchUrl;
         $var->{"collaboration.url"} = $self->getThread->getParent->getUrl;
@@ -860,6 +857,41 @@ sub www_lockThread {
 	my $self = shift;
 	$self->lock if $self->getParent->canEdit;
 	return $self->www_view;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_nextThread ( )
+
+Displays the next logical thread after this one.
+
+=cut
+
+sub www_nextThread {
+	my $self = shift;
+	my $next = $self->getNextThread;
+	if (defined $next) {
+		return $next->www_view;
+	}
+	return $self->getParent->www_view;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 www_previousThread ( )
+
+Displays the previous logical thread before this one.
+
+=cut
+
+sub www_previousThread {
+	my $self = shift;
+	my $previous = $self->getPreviousThread;
+	if (defined $previous) {
+		return $previous->www_view;
+	}
+	return $self->getParent->www_view;
 }
 
 #-------------------------------------------------------------------
