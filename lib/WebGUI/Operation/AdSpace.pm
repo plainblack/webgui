@@ -1,4 +1,4 @@
-package WebGUI::Operation::AdSpace.pm
+package WebGUI::Operation::AdSpace;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2006 Plain Black Corporation.
