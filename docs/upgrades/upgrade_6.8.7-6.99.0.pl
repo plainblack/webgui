@@ -105,6 +105,12 @@ sub addAdManager {
 		renderedAd text
 		)");
 	$session->db->write("alter table advertisement add index adSpaceId_isActive (adSpaceId, isActive)");
+	my $macros = $session->config->get("macros");
+	$macros->{AdSpace} = "AdSpace";
+	$session->config->set("macros",$macros);
+	my $group = WebGUI::Group->new($session, "new", "pbgroup000000000000017");
+	$group->name("Ad Manager");
+	$group->description("These users will be able to manage advertisements.");
 }
 
 #-------------------------------------------------

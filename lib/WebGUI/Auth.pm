@@ -264,8 +264,6 @@ sub createAccountSave {
 		WebGUI::MessageLog::addEntry($self->userId,"",$i18n->get(870),$self->getSetting("welcomeMessage").$authInfo);
 	}
 	$self->session->user({user=>$u});
-	$self->session->var->end($self->session->var->get("sessionId"));
-	$self->session->var->start($userId,$self->session->getId);
 	$self->_logLogin($userId,"success");
 	$self->session->http->setStatus(201,"Account Registration Successful");
 	if ($self->session->setting->get("runOnRegistration")) {
@@ -574,7 +572,6 @@ sub login {
    #Create a new user
    $uid = $self->userId;
    $u = WebGUI::User->new($self->session,$uid);
-   $self->session->user({user=>$u});
    $self->session->var->start($uid,$self->session->getId);
    $u->karma($self->session->setting->get("karmaPerLogin"),"Login","Just for logging in.") if ($self->session->setting->get("useKarma"));
    $self->_logLogin($uid,"success");

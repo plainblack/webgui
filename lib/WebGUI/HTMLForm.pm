@@ -109,6 +109,46 @@ sub DESTROY {
 
 #-------------------------------------------------------------------
 
+=head2 fieldSetEnd ( ) 
+
+Closes a field set that was opened by fieldSetStart();
+
+=cut
+
+sub fieldSetEnd {
+	my $self = shift;
+	my $legend = shift;
+	$self->{_data} .= "</tbody></table>\n"
+		."</fieldset>\n"
+		."<table ".$self->{_tableExtras}.'"><tbody>'
+		."\n";
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 fieldSetStart ( legend ) 
+
+Adds a field set grouping to the form. Note, must be closed with fieldSetEnd().
+
+=head3 legend
+
+A text label to appear with the field set.
+
+=cut
+
+sub fieldSetStart {
+	my $self = shift;
+	my $legend = shift;
+	$self->{_data} .= "</tbody></table>\n"
+		."<fieldset>\n<legend>".$legend."</legend>\n"
+		."<table ".$self->{_tableExtras}.'"><tbody>'
+		."\n";
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 new ( [ action, method, extras, enctype, tableExtras ] )
 
 Constructor.
@@ -150,10 +190,10 @@ sub new {
 		method=>($param{method} || $param{'-method'}),
 		enctype=>($param{enctype} || $param{'-enctype'})
 		});
-	$header .= "\n<table ".$param{tableExtras}.'><tbody>';
+	$header .= "\n<table ".$param{tableExtras}.'"><tbody>';
 	$footer = "</tbody></table>\n" ;
 	$footer .= WebGUI::Form::formFooter($session);
-        bless {_session=>$session, _uiLevelOverride=>$param{uiLevelOverride},  _header => $header, _footer => $footer, _data => ''}, $class;
+        bless {_session=>$session, _tableExtras=>$param{tableExtras}, _uiLevelOverride=>$param{uiLevelOverride},  _header => $header, _footer => $footer, _data => ''}, $class;
 }
 
 #-------------------------------------------------------------------

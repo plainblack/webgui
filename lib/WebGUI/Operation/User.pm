@@ -225,7 +225,6 @@ sub www_becomeUser {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	return unless WebGUI::User->validUserId($session, $session->form->process("uid"));
-	$session->user({userId=>$session->form->process("uid")});
 	$session->var->end($session->var->get("sessionId"));
 	$session->var->start($session->form->process("uid"),$session->getId);
 	return "";

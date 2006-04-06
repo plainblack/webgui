@@ -170,6 +170,15 @@ sub getAdminFunction {
 			op=>"manageWorkflows",
 			group=>"pbgroup000000000000015"
 		},
+		"adSpace"=>{
+			title=>{
+				id=>"topicName",
+				namespace=>"AdSpace"
+			},
+			icon=>"advertising.gif",
+			op=>"manageAdSpaces",
+			group=>"pbgroup000000000000017"
+		},
 		"cron"=>{
 			title=>{
 				id=>"topicName",

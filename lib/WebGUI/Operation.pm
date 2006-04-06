@@ -77,6 +77,13 @@ Returns a hash reference containing operation and package names.
 
 sub getOperations {
 	return {
+	  'deleteAd' => 'WebGUI::Operation::AdSpace',
+	  'deleteAdSpace' => 'WebGUI::Operation::AdSpace',
+	  'editAd' => 'WebGUI::Operation::AdSpace',
+	  'editAdSave' => 'WebGUI::Operation::AdSpace',
+	  'editAdSpace' => 'WebGUI::Operation::AdSpace',
+	  'editAdSpaceSave' => 'WebGUI::Operation::AdSpace',
+	  'manageAdSpaces' => 'WebGUI::Operation::AdSpace',
 	  'clickAd' => 'WebGUI::Operation::AdSpace',
 	  'editVersionTag' => 'WebGUI::Operation::VersionTag',
 	  'editVersionTagSave' => 'WebGUI::Operation::VersionTag',

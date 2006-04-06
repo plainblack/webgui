@@ -598,8 +598,8 @@ sub toHtmlWithWrapper {
 	if ($self->passUiLevelCheck) {
 		my ($fieldClass, $rowClass, $labelClass, $hoverHelp, $subtext)  = $self->prepareWrapper;
 		return '<tr'.$rowClass.'>
-				<td'.$labelClass.$hoverHelp.' valign="top" style="width: 25%;"><label for="'.$self->get("id").'">'.$self->get("label").'</label></td>
-				<td valign="top"'.$fieldClass.' style="width: 75%;">'.$self->toHtml().$subtext."</td>
+				<td'.$labelClass.$hoverHelp.' valign="top" style="width: 180px;"><label for="'.$self->get("id").'">'.$self->get("label").'</label></td>
+				<td valign="top"'.$fieldClass.' style="width: *;">'.$self->toHtml().$subtext."</td>
 			</tr>\n";
 	} else {
 		return $self->toHtmlAsHidden;
