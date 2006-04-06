@@ -1,0 +1,51 @@
+#PBtmplVSC0000000000001
+<tmpl_if cartEmpty>
+<tmpl_var cartEmpty.message>
+<tmpl_else>
+
+<tmpl_var updateForm.header>
+<table>	
+	<tr align="left">
+		<th></th>
+		<th style="border-bottom: 2px solid black">Product</th>
+		<th style="border-bottom: 2px solid black">Quantity</th>
+		<th style="border-bottom: 2px solid black">Price</th>
+	</tr>
+
+	<tmpl_if normalItems>
+	</tmpl_if>
+
+	<tmpl_loop normalItemsLoop>
+	<tr>
+		<td><tmpl_var deleteIcon></td>
+		<td align="left"><tmpl_var name></td>
+		<td align="center"><tmpl_var quantity.form></td>
+		<td align="right"><tmpl_var totalPrice></td>
+	</tr>
+	</tmpl_loop>
+
+	<tmpl_loop recurringItemsLoop>
+	<tr>
+		<td><tmpl_var deleteIcon></td>
+		<td align="left"><tmpl_var name></td>
+		<td align="center"><tmpl_var quantity.form></td>
+		<td align="right"><tmpl_var totalPrice></td>
+	</tr>
+</tmpl_loop>
+	<tr style="border-top: 1px solid black">
+		<td></td>
+		<td style="border-top: 1px solid black">&nbsp;</td>
+		<td align="right" style="border-top: 1px solid black"><b>Total</b></td>
+		<td align="right" colspan="3" style="border-top: 1px solid black"><b><tmpl_var total></b></td>
+	</tr>
+
+</table>
+
+<tmpl_var updateForm.button>
+<tmpl_var updateForm.footer>
+
+<tmpl_var checkoutForm.header>
+<tmpl_var checkoutForm.button>
+<tmpl_var checkoutForm.footer> 
+
+</tmpl_if>
