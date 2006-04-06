@@ -421,19 +421,17 @@ sub expireOffset {
 
 #-------------------------------------------------------------------
 
-=head2 externalUsers ( )
+=head2 getDatabaseUsers ( )
 
-Get the set of users allowed to be in this group via external means, such as database
-queries, LDAP and/or IP filtering.
+Get the set of users allowed to be in this group via a database query.
 
 =cut
 
-sub externalUsers {
+sub getDatabaseUsers {
 	my $self = shift;
+	my @dbUsers = ();
 	my $gid = $self->getId;
-	my @externalUsers = ();
-	my $isInGroup = $self->session->stow->get('isInGroup');
-        ### Check external database
+        ### Check db database
         if ($self->get("dbQuery") && defined $self->get("databaseLinkId")) {
 		my $dbLink = WebGUI::DatabaseLink->new($self->session,$self->get("databaseLinkId"));
 		my $dbh = $dbLink->db;
@@ -446,16 +444,29 @@ sub externalUsers {
 			}
 			else {
 				while(my ($userId)=$sth->array) {
-					push @externalUsers, $userId;
-					$isInGroup->{$userId}{$gid} = 1;
+					push @dbUsers, $userId;
 				}
 			}
 			$sth->finish;
 			$dbLink->disconnect;
                 }
         }
-	$self->session->stow->set("isInGroup",$isInGroup);
-	return \@externalUsers;
+	return \@dbUsers;
+}	
+
+#-------------------------------------------------------------------
+
+=head2 getKarmaUsers ( )
+
+Get the set of users allowed to be in this group via their current karma setting
+and this group's karmaThreshold.  All users with 
+
+=cut
+
+sub getKarmaUsers {
+	my $self = shift;
+	return [] unless $self->session->setting->get('useKarma');
+	return $self->session->db->buildArrayRef('select userId from users where karma >= ?', [$self->karmaThreshold]);
 }	
 
 #-------------------------------------------------------------------
@@ -591,7 +602,6 @@ A boolean value to determine whether the method should return the users directly
 A boolean that if set true will return the users list minus the expired groupings.
 
 =cut
-
 sub getUsers {
 	my $self = shift;
 	my $recursive = shift;
@@ -615,12 +625,19 @@ sub getUsers {
 		}
 		##Have to iterate twice due to the withoutExpired clause.
 		foreach my $groupId (@{ $groups }) {
-			push @externalUsers, @{  WebGUI::Group->new($self->session, $groupId)->externalUsers() };
+			my $extGroup = WebGUI::Group->new($self->session, $groupId);
+			push @externalUsers,
+				@{ $extGroup->getDatabaseUsers() },
+				@{ $extGroup->getKarmaUsers() },
+			;
 		}
 	}
 	$clause .= ")";
 	my @localUsers = $self->session->db->buildArray("select userId from groupings where $clause");
-	push @externalUsers,  @{ $self->externalUsers() };
+	push @externalUsers,
+		@{ $self->getDatabaseUsers() },
+		@{ $self->getKarmaUsers() },
+	;
 	my @users = ( @localUsers, @externalUsers );
 	return \@users;
 }

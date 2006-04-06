@@ -232,6 +232,8 @@ The number of clicks that have been purchased for this ad.
 
 =head4 impressionsBought
 
+The number of times the user has paid for this ad to be displayed on the site.
+
 =cut
 
 sub set {

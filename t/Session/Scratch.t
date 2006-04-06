@@ -31,7 +31,7 @@ for (my $count = 1; $count <= $maxCount; $count++){
 
 
 for (my $count = 1; $count <= $maxCount; $count++){
-   is($scratch->get("Test$count"), $count, "Passed set/get $count\n");
+   is($scratch->get("Test$count"), $count, "Passed set/get $count");
 }
 
 

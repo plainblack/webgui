@@ -289,3 +289,8 @@ WebGUI::Group->new($session, '7')->addUsers([1]);
 
 ok($visitor->isInGroup(1), "Visitor added back to group Visitor");
 ok($visitor->isInGroup(7), "Visitor added back to group Everyone");
+
+END {
+        (defined $user  and ref $user  eq 'WebGUI::User') and $user->delete;
+}
+

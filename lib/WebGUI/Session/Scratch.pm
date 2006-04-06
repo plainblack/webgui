@@ -174,7 +174,7 @@ The current session.
 sub new {
 	my $class = shift;
 	my $session = shift;
-	my $data = $session->db->buildHashRef("select name,value from userSessionScratch where sessionId=".$session->db->quote($session->getId));
+	my $data = $session->db->buildHashRef("select name,value from userSessionScratch where sessionId=?",[$session->getId]);
 	bless {_session=>$session,_sessionId=>$session->getId, _data=>$data}, $class;
 }
 
@@ -215,7 +215,7 @@ sub set {
 	my $value = shift;
 	return undef unless ($name);
 	$self->{_data}{$name} = $value;
-	$self->session->db->write("replace into userSessionScratch (sessionId, name, value) values (".$self->session->db->quoteAndJoin([$self->{_sessionId}, $name, $value]).")");
+	$self->session->db->write("replace into userSessionScratch (sessionId, name, value) values (?,?,?)", [$self->{_sessionId}, $name, $value]);
 }
 
 

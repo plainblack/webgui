@@ -300,14 +300,6 @@ sub isInGroup {
                         }
                 }
         }
-        ### Check karma levels.
-        if ($self->session->setting->get("useKarma")) {
-                if ($self->karma >= $group->get("karmaThreshold")) {
-                        $isInGroup->{$uid}{$gid} = 1;
-			$self->session->stow->set("isInGroup",$isInGroup);
-                        return 1;
-                }
-        }
 	 ### Check ldap
         if ($group->get("ldapGroup") && $group->get("ldapGroupProperty")) {
 		   # skip if not logged in
@@ -349,9 +341,15 @@ sub isInGroup {
 		   }
 		}
 		
-        if ($group->get("dbQuery") && defined $group->get("databaseLinkId")) {
-		my @externalUsers = @{ $group->externalUsers() } ;
-		foreach my $extUserId ( @externalUsers ) {
+        if (my @dbUsers = @{ $group->getDatabaseUsers() }) {
+		foreach my $extUserId ( @dbUsers ) {
+			$isInGroup->{$extUserId}{$gid} = 1;
+		}
+		$self->session->stow->set("isInGroup",$isInGroup);
+		return 1 if ($isInGroup->{$uid}{$gid});
+	}
+        if (my @karmaUsers = @{ $group->getKarmaUsers() }) {
+		foreach my $extUserId ( @karmaUsers ) {
 			$isInGroup->{$extUserId}{$gid} = 1;
 		}
 		$self->session->stow->set("isInGroup",$isInGroup);
@@ -401,8 +399,8 @@ sub karma {
 	if (defined $amount && defined $source && defined $description) {
 		$self->uncache;
 		$self->{_user}{karma} += $amount;
-		$self->session->db->write("update users set karma=karma+".$self->session->db->quote($amount)." where userId=".$self->session->db->quote($self->userId));
-        	$self->session->db->write("insert into karmaLog values (".$self->session->db->quote($self->userId).",$amount,".$self->session->db->quote($source).",".$self->session->db->quote($description).",".$self->session->datetime->time().")");
+		$self->session->db->write("update users set karma=karma+? where userId=?", [$amount, $self->userId]);
+        	$self->session->db->write("insert into karmaLog values (?,?,?,?,?)",[$self->userId, $amount, $source, $description, $self->session->datetime->time()]);
 	}
         return $self->{_user}{karma};
 }
