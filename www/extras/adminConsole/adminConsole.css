@@ -53,6 +53,7 @@ th {
 	background-image: url(bg_console.gif);
 	background-repeat: repeat-x;
 	min-height: 400px;
+	width: 75%;
 }
 /* Hides from non-ie: the holly hack \*/
 * html .adminConsoleWorkArea {
@@ -71,6 +72,7 @@ th {
 	padding: 5px; */
 	font-family: helvetica, arial;
 	font-size: 12px;
+	z-index: 1000;
 	/* background-image: url(bg_console.gif);
 	background-repeat: repeat-x; */
 }
@@ -131,9 +133,9 @@ th {
 
 .adminConsoleHelpIcon {
 	position: absolute;
-	top: 70px;
-	right: 196px;
-	z-index: 1000;
+	top: 72px;
+	left: 17px;
+	z-index: 999;
 }
 
 /* tables */
