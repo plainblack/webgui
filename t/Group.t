@@ -18,8 +18,39 @@ use WebGUI::Utility;
 
 use WebGUI::User;
 use WebGUI::Group;
-use Test::More tests => 82; # increment this value for each test you create
+
+use Test::More;
 use Test::Deep;
+
+my @scratchTests = (
+			{
+				scratch => 'foo=bar',
+				comment => 'wrong name and value',
+				expect  => 0,
+			},
+			{
+				scratch => 'name=Dan',
+				comment => 'wrong value',
+				expect  => 0,
+			},
+			{
+				scratch => 'airport=Tom',
+				comment => 'wrong name',
+				expect  => 0,
+			},
+			{
+				scratch => 'name=Tom',
+				comment => 'right name and value',
+				expect  => 1,
+			},
+			{
+				scratch => 'airport=PDX',
+				comment => 'right name and value',
+				expect  => 1,
+			},
+);
+
+plan tests => (83 + scalar(@scratchTests)); # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -248,9 +279,20 @@ ok( !isIn($mob[0]->userId, @{ $gZ->getUsers() }), 'mob[0] not in list of group Z
 
 ok( isIn($mob[0]->userId, @{ $gZ->getUsers(1) }), 'mob[0] in list of group Z users, recursively');
 
+##Karma tests
+
 my $gK = WebGUI::Group->new($session, "new");
 $gK->name('Group K');
 $gC->addGroups([$gK->getId]);
+
+#		B
+#	       / \
+#	      A   C
+#	      |   |
+#	      Z   K
+#            / \
+#           X   Y
+
 $gK->karmaThreshold(5);
 
 my @chameleons =  ();
@@ -288,7 +330,7 @@ is_deeply(
 	'chameleons 1, 2 and 3 are in group K via karma threshold'
 );
 
-is_deeply(
+cmp_bag(
 	$gK->getKarmaUsers,
 	[ (map { $_->userId() }  @chameleons[1..3]) ],
 	'chameleons 1, 2 and 3 are group K karma users'
@@ -296,17 +338,68 @@ is_deeply(
 
 $session->setting->set('useKarma', $defaultKarmaSetting);
 
+##Scratch tests
+
+my $gS = WebGUI::Group->new($session, "new");
+$gK->name('Group S');
+$gC->addGroups([$gS->getId]);
+
+#		B
+#	       / \
+#	      A   C
+#	      |   | \
+#	      Z   K  S
+#            / \
+#           X   Y
+
+
+$gS->scratchFilter('name=Tom;airport=PDX');
+is ($gS->scratchFilter(), 'name=Tom;airport=PDX', 'checking retrieval of scratchFilter');
+
+my @itchies =  ();
+my @sessionBank = ();
+
+foreach my $idx (0..$#scratchTests) {
+	##Create a new session
+	$sessionBank[$idx] = WebGUI::Session->open(WebGUI::Test->root, WebGUI::Test->file);
+
+	##Create a new user and make this session's default user that user
+	$itchies[$idx] = WebGUI::User->new($sessionBank[$idx], "new");
+	$sessionBank[$idx]->user({user => $itchies[$idx]});
+
+	##Name this user for convenience
+	$itchies[$idx]->username("itchy$idx");
+
+	##Assign this user to this test to be fetched later
+	$scratchTests[$idx]->{user} = $itchies[$idx];
+
+	##Set scratch in the session for this user
+	my @scratchData = split /;/, $scratchTests[$idx]->{scratch};
+	foreach my $item (@scratchData) {
+		my ($name, $value) = split /=/, $item;
+		$sessionBank[$idx]->scratch->set($name, $value);
+	}
+}
+
+foreach my $scratchTest (@scratchTests) {
+	is($scratchTest->{user}->isInGroup($gS->getId), $scratchTest->{expect}, $scratchTest->{comment});
+}
+
 SKIP: {
 	skip("need to test expiration date in groupings interacting with recursive or not", 1);
 	ok(undef, "expiration date in groupings for getUser");
 }
 
 END {
-	foreach my $testGroup ($gX, $gY, $gZ, $gA, $gB, $gC, $g, $gK) {
+	foreach my $testGroup ($gX, $gY, $gZ, $gA, $gB, $gC, $g, $gK, $gS) {
 		$testGroup->delete if (defined $testGroup and ref $testGroup eq 'WebGUI::Group');
 	}
-	foreach my $dude (@crowd, @mob, @chameleons, $user) {
+	foreach my $dude ($user, @crowd, @mob, @chameleons, @itchies) {
 		$dude->delete if (defined $dude and ref $dude eq 'WebGUI::User');
 	}
 	$session->db->dbh->do('DROP TABLE IF EXISTS myUserTable');
+
+	foreach my $subSession (@sessionBank) {
+		$subSession->close() if (defined $subSession and ref $subSession eq 'WebGUI::Session');
+	}
 }

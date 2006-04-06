@@ -459,7 +459,9 @@ sub getDatabaseUsers {
 =head2 getKarmaUsers ( )
 
 Get the set of users allowed to be in this group via their current karma setting
-and this group's karmaThreshold.  All users with 
+and this group's karmaThreshold.  The set is returned as an array ref.
+
+If karma is not enabled for this site, it will return a empty array ref.
 
 =cut
 

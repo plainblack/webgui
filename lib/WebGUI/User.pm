@@ -287,8 +287,8 @@ sub isInGroup {
         	}
 	}
         ### Check Scratch Variables 
-        if ($group->get("scratchFilter")) {
-		my $scratchFilter = $group->get("scratchFilter");
+        if ($group->scratchFilter()) {
+		my $scratchFilter = $group->scratchFilter();
                 $scratchFilter =~ s/\s//g;
                 my @vars = split(";",$scratchFilter);
                 foreach my $var (@vars) {

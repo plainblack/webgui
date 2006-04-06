@@ -1757,8 +1757,13 @@ Having done that, when a user clicks on that link they will have a scratch varia
 To set a scratch filter simply add a line to the scratch filter field that looks like:
 <p>
 <i>www_somename=somevalue</i>
-<p>|,
-                lastUpdated => 1120448672,
+<p>
+Multiple filters can be set by joining name and value pairs with a semicolon:
+<p>
+<i>www_somename=somevalue;otherName=otherValue</i>
+
+|,
+                lastUpdated => 1144345050,
         },
 
         '974 description' => {
