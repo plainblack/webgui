@@ -37,6 +37,7 @@ sub www_formAssetTree {
 	my $base = WebGUI::Asset->newByUrl || WebGUI::Asset->getRoot;
 	my @crumb;
 	my $ancestors = $base->getLineage(["self","ancestors"],{returnObjects=>1});
+	my $i18n = WebGUI::International->new();
 	foreach my $ancestor (@{$ancestors}) {
 		push(@crumb,'<a href="'.$ancestor->getUrl("op=formAssetTree;classLimiter=".$session{form}{classLimiter}.";formId="
                         .$session{form}{formId}).'">'.$ancestor->get("menuTitle").'</a>');
@@ -56,7 +57,7 @@ sub www_formAssetTree {
 			.$session{form}{formId}).'">'.$child->get("menuTitle").'</a>'."<br />\n";	
 	}
 	$session{page}{useEmptyStyle} = 1;
-	return _outputWrapper($i18n->get('choose an asset',$output);
+	return _outputWrapper($i18n->get('choose an asset',$output));
 }
 
 
