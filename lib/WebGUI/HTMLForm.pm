@@ -169,7 +169,7 @@ If you want to add anything special to your form like javascript actions, or sty
 
 =head3 enctype 
 
-The ecapsulation type for this form. This defaults to "multipart/form-data" and should probably never be changed.
+The encapsulation type for this form. This defaults to "multipart/form-data" and should probably never be changed.
 
 =head3 tableExtras
 

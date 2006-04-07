@@ -788,9 +788,11 @@ sub new {
 	my $self = {};
 	$self->{_session} = shift;
 	$self->{_groupId} = shift;
+	return $self->{_session}->{groupData}->{$self->{_groupId}} if $self->{_session}->{groupData}->{$self->{_groupId}};
 	my $override = shift;
 	bless $self, $class;
         $self->_create($override) if ($self->{_groupId} eq "new");
+	$self->{_session}->{groupData}->{$self->{_groupId}} = $self;
 	return $self;
 }
 
@@ -1005,6 +1007,7 @@ sub set {
 	my $value = shift;
 	$self->get("groupId") unless ($self->{_group}); # precache group stuff
 	$self->{_group}{$name} = $value;
+	$self->session->{groupData}->{$self->getId} = undef;
 	$self->session->db->setRow("groups","groupId",{groupId=>$self->getId, $name=>$value, lastUpdated=>$self->session->datetime->time()});
 }
 

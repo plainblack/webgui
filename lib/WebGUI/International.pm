@@ -87,7 +87,7 @@ sub get {
 	my $output = eval($cmd);	
 	$self->session->errorHandler->warn("Couldn't get value from ".$cmd." because ".$@) if ($@);
 	$output = $self->get($id,$namespace,"English") if ($output eq "" && $language ne "English");
-	return $output;
+	return $output || $id;
 }
 
 
@@ -210,7 +210,7 @@ sub new {
 	bless( {
 		_session   => $session,
 		_namespace => $namespace,
-		_language  => $language,
+		_language  => ($language || $session->user->profileField('language')),
 	},$class);
 }
 

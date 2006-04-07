@@ -167,11 +167,13 @@ Gets a hash ref of all the params passed in to this class, and their values. Thi
 sub paramsHashRef {
 	my $self = shift;
 	unless ($self->{_paramsHashRef}) {
-		my $hash;
+		my %hash;
+		tie %hash, "Tie::IxHash";
 		foreach ($self->param) {
-			$hash->{$_} = $self->process($_);
+			my @arr = $self->process($_);
+			$hash{$_} = (scalar(@arr) > 1)?\@arr:$arr[0];
 		}
-		$self->{_paramsHashRef} = $hash;
+		$self->{_paramsHashRef} = \%hash;
 	}
 	return $self->{_paramsHashRef};
 }

@@ -95,7 +95,11 @@ sub contentHandler {
 			my $t = [Time::HiRes::gettimeofday()];
 			$output = page($session);
 			$t = Time::HiRes::tv_interval($t) ;
-			$output =~ s/<\/title>/ : ${t} seconds<\/title>/i;
+			if ($output =~ /<\/title>/) {
+				$output =~ s/<\/title>/ : ${t} seconds<\/title>/i;
+			} else {
+				$session->output->print("\nPage generated in $t seconds.\n");
+			}
 		} else {
 			$output = page($session);
 		}

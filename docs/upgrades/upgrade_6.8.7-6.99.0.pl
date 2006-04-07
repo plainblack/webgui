@@ -547,23 +547,197 @@ sub addEMSTemplates {
 
 ## Display Template ##
 my $template = <<EOT1;
-
 <a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a>
 
 <tmpl_if session.var.adminOn>
-        <p><tmpl_var controls></p>
+        <p><tmpl_var controls></p><br /><br />
 </tmpl_if>
 <tmpl_if canManageEvents>
    <a href='<tmpl_var manageEvents.url>'><tmpl_var manageEvents.label></a>
 </tmpl_if>
-    
 <a href="<tmpl_var checkout.url>"><tmpl_var checkout.label></a>
 
+<style type="text/css">
+	 
+ 
+.datacardtitle {
+	background: #3D5690;
+	color: white;
+	font-family: verdana;
+	font-weight: bold;
+	font-size:13px;
+}
+
+.leftnav{
+	padding: 1px 1px 1px 1px;
+	background: white;
+	color: black;
+	font-family: verdana;
+	font-weight: bold;
+	font-size:11px;
+	border: 2px #3D5690 ridge;
+}
+.leftnavon{
+	padding: 1px 1px 1px 1px;
+	background: yellow;
+	color: black;
+	font-family: verdana;
+	font-weight: bold;
+	font-size:11px;
+	border: 2px #3D5690 ridge;
+}
+.calendartitle {
+	background: #3D5690;
+	color: white;
+	font-family: verdana;
+	font-weight: bold;
+	font-size:11px;
+}
+.filter-select {
+	font-family: verdana;
+	font-size: 10px;
+	font-weight: normal;
+	color: black;
+	width: 105px;
+}
+.compare-select {
+	font-family: verdana;
+	font-size: 10px;
+	font-weight: normal;
+	color: black;
+	width: 76px;
+}
+.filter-text {
+	font-family: verdana;
+	font-size: 10px;
+	font-weight: normal;
+	color: black;
+	width: 114px;
+}
+.smLink {
+   font-family: verdana;
+   font-size: 10px;
+   font-weight: normal;
+   color: blue;
+}
+
+#extendedSearchLayer {display: inline;}
+
+</style>
+
+<script type="text/javascript" src="<tmpl_var ems.wobject.dir>/script/dynamicForms.js"></script>
+<script type="text/javascript">
+   <tmpl_var search.filters.options>   
+   var advanced = 0;
+   var filterCount = 0;
+
+	function setSelectValue(selObj,newValue) {
+		for (var i=0; i<selObj.options.length; i++) {
+			selObj.options[i].selected = (selObj.options[i].value==newValue)?true:false;
+		}
+	}
+	
+   function toggleAdvanced() {
+      var ids = ["cParams","cResults","cSearch"];
+	  var toggle = "";
+	  for (var i = 0; i < ids.length; i++) {
+	     if(advanced == 1) {
+		    toggle = "none";
+		 }
+		 document.getElementById(ids[i]).style.display=toggle;
+	  }
+	  advanced = (advanced == 1)?0:1;
+	  return false;
+   }
+   
+   function toggleTitle(obj) {
+      if (obj.checked) {
+	     document.getElementById('cs_search_title_td').style.display='inline';
+	  } else {
+	     document.getElementById('cs_search_title_td').style.display='none';
+	  }
+   }
+   
+   function openWin (url, name, param) {
+      var newwin = window.open(url, name, param);
+      newwin.focus();
+   }
+   
+   function buildFilterList() {
+      return "Custom Filter";
+   }
+   
+   function stripDelim(value,delim) {
+      value = value.replace(/delim/g,"");
+	  return value;
+   }
+
+	function unset(array, valueToUnset){
+		var output=new Array(0);
+		for(var i in array){
+			if(i==valueToUnset){continue;}
+			output[i]=array[i];
+		}
+		return output;
+	}
+
+</script>
+
+
+
+<div id="basicSearch"<tmpl_if isAdvSearch> style="display:none"</tmpl_if>>
+<tmpl_var basicSearch.formHeader>
+<div style="cursor:pointer" onclick="document.getElementById('basicSearch').style.display='none';document.getElementById('advSearch').style.display='';" ><a href="#">Switch To Advanced Search</a></div>
+<table width="100%" border="0" padding="8"><tr><td>Search Keywords:</td><td><input name="searchKeywords" /></td></tr></table>
+<tmpl_var search.formSubmit>
+<tmpl_var search.formFooter>
+</div>
+
+<div id="advSearch"<tmpl_unless isAdvSearch> style="display:none"</tmpl_unless>>
+<tmpl_var advSearch.formHeader>
+<div style="cursor:pointer" onclick="document.getElementById('basicSearch').style.display='';document.getElementById('advSearch').style.display='none';" ><a href="#">Switch To Basic Search</a></div>
+<table width="100%" border="0" padding="8">
+<tbody id="filterbody">
+<tr><td></td></tr>
+</tbody>
+</table>
+<a href="#" onclick="addField();">Add another Filter Field</a>
+<tmpl_var search.formSubmit>
+<tmpl_var search.formFooter>
+<script type="text/javascript">
+   // load autoSearch fields
+   for (var word in filterList) {
+     if (filterList[word]["autoSearch"]) {
+       var compa = addField();
+       setSelectValue(compa,word);
+       changeToType(word,filterCount);
+     }
+   }
+</script>
+
+</div>
+
+<table width="100%" border="0" padding="8">
+<tr><th><tmpl_var name.label></th>
+<th><tmpl_var starts.label></th>
+<th><tmpl_var ends.label></th>
+<th><tmpl_var seats.label></th>
+<th><tmpl_var price.label></th>
+<th><tmpl_var requirement.label></th>
+<th><tmpl_var addToCart.label></th></tr>
 <tmpl_loop events_loop>
-  <tmpl_var event>
+  <tr><td><tmpl_var title>
+  </td><td><tmpl_var startDate.human>
+  </td><td><tmpl_var endDate.human>
+  </td><td><tmpl_var seatsRemaining>
+  </td><td><tmpl_var price>
+  </td><td><tmpl_var requirement>
+  </td><td><tmpl_unless eventIsFull><a href="<tmpl_var purchase.url>"><tmpl_var purchase.label></a><tmpl_else><tmpl_var purchase.label><br /></tmpl_unless>
+  </td></tr>
 </tmpl_loop>
-      
+</table>
 <tmpl_var paginateBar>
+
 EOT1
 
 ## Event Template ##
@@ -683,6 +857,7 @@ create table EventManagementSystem (
  groupToAddEvents varchar(22),
  groupToApproveEvents varchar(22),
  globalPrerequisites tinyint default 1,
+ globalMetadata tinyint default 1,
 primary key(assetId,revisionDate)
 )
 SQL1
@@ -748,13 +923,42 @@ primary key(prerequisiteEventId)
 )
 SQL6
 
+my $sql7 = <<SQL7;
+
+create table EventManagementSystem_metaField (
+ fieldId varchar(22) not null,
+ assetId varchar(22),
+ name varchar(50),
+ label varchar(100),
+ dataType varchar(20),
+ visible tinyint default 0,
+ required tinyint default 0,
+ possibleValues text,
+ defaultValues text,
+ sequenceNumber int(5),
+ autoSearch tinyint default 0,
+primary key(fieldId)
+)
+SQL7
+
+my $sql8 = <<SQL8;
+
+create table EventManagementSystem_metaData (
+ fieldId varchar(22) not null,
+ productId varchar(22) not null,
+ fieldData text,
+primary key(fieldId,productId)
+)
+SQL8
+
         $session->db->write($sql1);
         $session->db->write($sql2);
         $session->db->write($sql3);
         $session->db->write($sql4);
         $session->db->write($sql5);
         $session->db->write($sql6);
-
+        $session->db->write($sql7);
+        $session->db->write($sql8);
 }
 
 #-------------------------------------------------

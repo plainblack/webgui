@@ -279,6 +279,18 @@ our $I18N = { ##hashref of hashes
 		context => q|Link to add an event to the event manager|,
 	},
 
+	'manage event metadata' => {
+		message => q|Manage Event Metadata|,
+		lastUpdated => 1138908251,
+		context => q|Link to manage event metadata|,
+	},
+
+	'add new event metadata field' => {
+		message => q|Add new Event Metadata Field|,
+		lastUpdated => 1138908251,
+		context => q|In Manage Event Metadata screen|,
+	},
+
 	'null field error' => {
 		message => q|The %s field cannot be blank.|,
 		lastUpdated => 1138908251,
@@ -424,6 +436,36 @@ allows you to edit events,  delete events, or change their order.</p>
 	'assetName' => {
 		message => q|Event Management System|,
 		lastUpdated => 1131394072,
+	},
+
+	'global metadata' => {
+		message => q|Use Global Event Metadata|,
+		lastUpdated => 1140469381,
+	},
+
+	'global metadata description' => {
+		message => q|Whether or not to use all other Event Management Systems Metadata Fields when assigning metadata to events and searching for events.<br /><br />The management screen list of metadata fields for this asset will still remain limited to those created by this EMS asset.<br />|,
+		lastUpdated => 1140469381,
+	},
+
+	'type name here' => {
+		message => q|Type Name Here|,
+		lastUpdated => 1140469381,
+	},
+
+	'type label here' => {
+		message => q|Type Label Here|,
+		lastUpdated => 1140469381,
+	},
+
+	'sold out' => {
+		message => q|Sold Out|,
+		lastUpdated => 1140469381,
+	},
+
+	'confirm delete event metadata' => {
+		message => q|Are you certain you want to delete this metadata field?  The metadata values for this field will be deleted from all events, including events in other EMS wobjects that are set to use global metadata.|,
+		lastUpdated => 1140469381,
 	},
 
 };

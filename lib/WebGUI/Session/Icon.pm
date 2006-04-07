@@ -362,9 +362,13 @@ sub moveDown {
 	 my $self = shift;
         my $urlParams = shift;
         my $pageURL = shift || $self->session->url->getRequestedUrl;
+	my $disabled = shift;
 	my $i18n = WebGUI::International->new($self->session,'Icon');
-        my $output = '<p style="display:inline;vertical-align:middle;"><a href="'.$self->session->url->gateway($pageURL,$urlParams).'">';
-        $output .= '<img src="'.$self->_getBaseURL().'moveDown.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Move Down').'" title="'.$i18n->get('Move Down').'" /></a></p>';
+        my $output = '<p style="display:inline;vertical-align:middle;">';
+        $output .= '<a href="'.$self->session->url->gateway($pageURL,$urlParams).'">' unless $disabled;
+        $output .= '<img src="'.$self->_getBaseURL().'moveDown.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Move Down').'" title="'.$i18n->get('Move Down').'" />';
+        $output .= '</a>' unless $disabled;
+        $output .= '</p>';
         return $output;
 }
 
@@ -466,9 +470,13 @@ sub moveUp {
 	 my $self = shift;
         my $urlParams = shift;
         my $pageURL = shift || $self->session->url->getRequestedUrl;
+	my $disabled = shift;
 	my $i18n = WebGUI::International->new($self->session,'Icon');
-        my $output = '<p style="display:inline;vertical-align:middle;"><a href="'.$self->session->url->gateway($pageURL,$urlParams).'">';
-        $output .= '<img src="'.$self->_getBaseURL().'moveUp.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Move Up').'" title="'.$i18n->get('Move Up').'" /></a></p>';
+        my $output = '<p style="display:inline;vertical-align:middle;">';
+        $output .= '<a href="'.$self->session->url->gateway($pageURL,$urlParams).'">' unless $disabled;
+        $output .= '<img src="'.$self->_getBaseURL().'moveUp.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Move Up').'" title="'.$i18n->get('Move Up').'" />';
+        $output .= '</a>' unless $disabled;
+        $output .= '</p>';
         return $output;
 }
 

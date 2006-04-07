@@ -17,6 +17,7 @@ package WebGUI::Session::ErrorHandler;
 
 use strict;
 use Log::Log4perl;
+use Data::Dumper;
 use Apache2::RequestUtil;
 
 =head1 NAME 
@@ -387,6 +388,8 @@ sub showDebug {
 	my $text = $self->session->stow->get('debug_error');
 	$text =~  s/\n/\<br \/\>\n/g;
 	my $output = '<div style="text-align: left;background-color: #800000;color: #ffffff;">'.$text."</div>\n";
+	$text = $self->session->form->paramsHashRef();
+	$output .= '<div style="text-align: left;background-color: #ffffff;color: #000000;"><pre>Form Variables:'.Dumper($text)."</pre></div>\n" if(scalar(keys %{$text}));
 	$text = $self->session->stow->get('debug_warn'); 
 	$text =~  s/\n/\<br \/\>\n/g;
 	$output .= '<div style="text-align: left;background-color: #ffdddd;color: #000000;">'.$text."</div>\n";

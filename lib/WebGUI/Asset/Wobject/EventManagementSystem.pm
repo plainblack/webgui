@@ -24,6 +24,227 @@ use WebGUI::Commerce::Item;
 use WebGUI::Utility;
 use Data::Dumper;
 
+
+
+#-------------------------------------------------------------------
+sub _getFieldHash {
+	my $self = shift;
+	return $self->{_fieldHash} if ($self->{_fieldHash});
+
+	my %hash;
+	tie %hash, "Tie::IxHash";
+	%hash = (
+		"eventName"=>{
+			name=>"Event Name",
+			type=>"text",
+			compare=>"text",
+			method=>"text",
+			columnName=>"title",
+			tableName=>"p",
+			initial=>1
+		},
+		"eventDescription"=>{
+			name=>"Description",
+			type=>"text",
+			compare=>"text",
+			method=>"text",
+			columnName=>"description",
+			tableName=>"p",
+			initial=>1
+		},
+		"maxAttendees"=>{
+			name=>"Max Attendees",
+			type=>"text",
+			compare=>"numeric",
+			method=>"integer",
+			columnName=>"maximumAttendees",
+			tableName=>"e",
+			initial=>1
+		},
+		"seatsAvailable"=>{
+			name=>"Seats Available",
+			type=>"text",
+			method=>"integer",
+			compare=>"numeric",
+			calculated=>1,
+			initial=>1
+		},
+		"price"=>{
+			name=>"Price",
+			type=>"text",
+			compare=>"numeric",
+			method=>"float",
+			columnName=>"price",
+			tableName=>"p",
+			initial=>1
+		},
+		"startDate"=>{
+			name=>"Starts",
+			type=>"dateTime",
+			compare=>"numeric",
+			method=>"dateTime",
+			columnName=>"startDate",
+			tableName=>"e",
+			initial=>1
+		},
+		"endDate"=>{
+			name=>"Ends",
+			type=>"dateTime",
+			compare=>"numeric",
+			method=>"dateTime",
+			columnName=>"endDate",
+			tableName=>"e",
+			initial=>1
+		},
+		"requirement"=>{
+			name=>"Requirement",
+			type=>"select",
+			list=>{''=>'Select One'},
+		#	list=>$self->_getAllEvents(),
+			compare=>"boolean",
+			method=>"selectList",
+			calculated=>1,
+			initial=>1
+		}
+	);
+	# Add custom metadata fields to the list, matching the types up
+	# automatically.
+	my $fieldList = $self->getEventMetaDataArrayRef;
+	foreach my $field (@{$fieldList}) {
+		my $dataType = $field->{dataType};
+		my $compare = $self->_matchTypes($dataType);
+		my $type;
+		if ($dataType =~ /^date/i) {
+			$type = lcfirst($dataType);
+		} elsif ($compare eq 'text' || $compare eq 'numeric') {
+			$type = 'text';
+		} else {
+			$type = 'select';
+		}
+		$hash{$field->{fieldId}} = {
+			name=>$field->{name},
+			type=>$type,
+			method=>$dataType,
+			initial=>$field->{autoSearch},
+			compare=>$compare,
+			calculated=>1,
+			metadata=>1
+		};
+		if ($hash{$field->{fieldId}}->{type} eq 'select') {
+			$hash{$field->{fieldId}}->{list} = $self->_matchPairs($field->{possibleValues});
+		}
+	}
+	$self->{_fieldHash} = \%hash;
+	return $self->{_fieldHash};
+}
+
+
+#-------------------------------------------------------------------
+
+sub _matchPairs {
+	my $self = shift;
+	my $options = shift;
+	my %hash;
+	tie %hash, 'Tie::IxHash';
+	$hash{''} = 'Select One';
+	foreach (split("\n",$options)) {
+		my $val = $_;
+		$val =~ s/\s//g;
+		$val =~ s/\n//g;
+		$hash{$val} = $val;
+	}
+	return \%hash;
+}
+	
+#-------------------------------------------------------------------
+
+sub _matchTypes {
+	my $self = shift;
+	my $dataType = lc(shift);
+	return 'text' if (
+		WebGUI::Utility::isIn($dataType, qw(
+			codearea
+			email
+			htmlarea
+			phone
+			text
+			textarea
+			url
+			zipcode
+		))
+	);
+	return 'numeric' if (
+		WebGUI::Utility::isIn($dataType, qw(
+			date
+			datetime
+			float
+			integer
+			interval
+		))
+	);
+	return 'boolean' if (
+		WebGUI::Utility::isIn($dataType, qw(
+			checkbox
+			combo
+			selectlist
+			checklist
+			contenttype
+			databaselink
+			fieldtype
+			group
+			ldaplink
+			radio
+			radiolist
+			selectbox
+			selectlist
+			template
+			timezone
+			yesno
+		))
+	);
+	return 'text';
+}
+
+#-------------------------------------------------------------------
+
+sub buildMenu {
+	my $self = shift;
+	my $var = shift;
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
+	my $fields = $self->_getFieldHash();
+	my $counter = 0;
+	my $js = "var filterList = {\n";
+	foreach my $fieldId (keys %{$fields}) {
+		my $field = $fields->{$fieldId};
+		$js .= ",\n" if($counter++ > 0);
+		my $fieldName = $field->{name};
+		my $fieldType = $field->{type};
+		my $compareType = $field->{compare};
+		my $autoSearch = $field->{initial};
+		$js .= qq|"$fieldId": {|;
+		$js .= qq| "name":"$fieldName"|;
+		$js .= qq| ,"type":"$fieldType"|;
+		$js .= qq| ,"compare":"$compareType"|;
+		$js .= qq| ,"autoSearch":"$autoSearch"|;
+		if($fieldType eq "select") {
+			my $list = $field->{list};
+			my $fieldList = "";
+			foreach my $key (keys %{$list}) {
+				$fieldList .= "," if($fieldList ne "");
+				my $value = $list->{$key};
+				$value =~ s/"/\"/g;
+				$fieldList .= qq|"$key":"$value"|
+			}
+			$js .= qq| ,"list":{ $fieldList }|;
+		}
+		$js .= q| }|;
+	}
+	$js .= "\n};\n";
+	
+	$var->{'search.filters.options'} = $js;
+	$var->{'search.data.url'} = $self->getUrl;
+}
+
 #-------------------------------------------------------------------
 
 =head2 checkConflicts ( )
@@ -158,6 +379,13 @@ sub definition {
 				tab=>"properties",
 				label=>$i18n->get('global prerequisite'),
 				hoverHelp=>$i18n->get('global prerequisite description')
+				},
+			globalMetadata  =>{
+				fieldType=>"yesNo",
+				defaultValue=>1,
+				tab=>"properties",
+				label=>$i18n->get('global metadata'),
+				hoverHelp=>$i18n->get('global metadata description')
 				},
 		);
 	push(@{$definition}, {
@@ -344,6 +572,64 @@ sub getPrerequisiteEventList {
 	
 	return $self->session->db->buildHashRef($sql);
 }
+
+
+#------------------------------------------------------------------
+
+=head2 getEventMetaDataArrayRef (  )
+
+Returns an arrayref of hash references of the metadata fields.
+
+Checks $self->get("globalMetadata") by default; otherwise uses the first parameter.
+
+=head3 useGlobalMetadata
+
+Whether or not to use the asset's global setting, and the override.
+
+=cut
+
+sub getEventMetaDataArrayRef {
+	my $self = shift;
+	my $useGlobalMetadata = shift;
+	my $productId = shift;
+	$useGlobalMetadata = ($useGlobalMetadata)?$useGlobalMetadata:$self->get("globalMetadata");
+	my $globalWhere = ($useGlobalMetadata == 0 || $useGlobalMetadata == 'false')?" where assetId='".$self->getId."'":'';
+	return $self->getEventMetaDataFields($productId) if $productId;
+	return $self->session->db->buildArrayRefOfHashRefs("select * from EventManagementSystem_metaField $globalWhere order by sequenceNumber, assetId");
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getEventMetaDataFields ( productId )
+
+Returns a hash reference containing all metadata field properties.
+
+=head3 productId
+
+Which product to get metadata for.
+
+=cut
+
+sub getEventMetaDataFields {
+	my $self = shift;
+	my $productId = shift;
+	my $useGlobalMetadata = shift;
+	my $globalWhere = ($useGlobalMetadata == 0 || $useGlobalMetadata == 'false')?" where f.assetId='".$self->getId."'":'';
+	my $sql = "select f.*, d.fieldData
+		from EventManagementSystem_metaField f
+		left join EventManagementSystem_metaData d on f.fieldId=d.fieldId and d.productId=".$self->session->db->quote($productId)." $globalWhere order by f.sequenceNumber";
+		tie my %hash, 'Tie::IxHash';
+		my $sth = $self->session->db->read($sql);
+		while( my $h = $sth->hashRef) {
+			foreach(keys %$h) {
+				$hash{$h->{fieldId}}{$_} = $h->{$_};
+			}
+		}
+	$sth->finish;
+	return \%hash;
+}
+
 
 #------------------------------------------------------------------
 
@@ -647,6 +933,12 @@ sub validateEditEventForm {
   	"maximumAttendees"	=>	$i18n->get("add/edit event maximum attendees"),
   );
 
+	my $mdFields = $self->getEventMetaDataFields;
+	foreach my $mdField (keys %{$mdFields}) {
+		next unless $mdFields->{$mdField}->{required};
+		$requiredFields{'metadata_'.$mdField} = $mdFields->{$mdField}->{name};
+	}
+
   $errors = $self->checkRequiredFields(\%requiredFields);
   
   #Check price greater than zero
@@ -767,13 +1059,13 @@ sub www_deleteEvent {
 	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
 	
 	#Remove this event as a prerequisite to any other event
-	$self->session->db->write("delete from EventManagementSystem_prerequisiteEvents where requiredProductId=?".
+	$self->session->db->write("delete from EventManagementSystem_prerequisiteEvents where requiredProductId=?",
 				   [$eventId]);
 	$self->deleteOrphans;	
 
 	#Remove the event
 	$self->deleteCollateral('EventManagementSystem_products', 'productId', $eventId);
-	$self->session->db->write("delete from products where productId=?",[$eventId]);
+	$self->deleteCollateral('products','productId',$eventId);
 	$self->reorderCollateral('EventManagementSystem_products', 'productId');
 
 	return $self->www_manageEvents;			  
@@ -799,6 +1091,30 @@ sub www_deletePrerequisite {
 				   [$eventId]);
 	
 	return $self->www_editEvent;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_edit (  )
+
+Edit wobject method.
+
+=cut 
+
+sub www_edit {
+	my $self = shift;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
+	my ($tag) = ($self->get("className") =~ /::(\w+)$/);
+	my $tag2 = $tag;
+	$tag =~ s/([a-z])([A-Z])/$1 $2/g;  #Separate studly caps
+	$tag =~ s/([A-Z]+(?![a-z]))/$1 /g; #Separate acronyms
+	$self->getAdminConsole->setHelp(lc($tag)." add/edit", "Asset_".$tag2);
+	my $i18n = WebGUI::International->new($self->session,'Asset_Wobject');
+	my $addEdit = ($self->session->form->process("func") eq 'add') ? $i18n->get('add') : $i18n->get('edit');
+	my $i18n2 = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n2->get('manage event metadata'));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEvents'), $i18n2->get('manage events'));
+	return $self->getAdminConsole->render($self->getEditForm->print,$addEdit.' '.$self->getName);
 }
 
 #-------------------------------------------------------------------
@@ -918,6 +1234,38 @@ sub www_editEvent {
 		-name  => "approved",
 		-value => 0 || $event->{approved}
 	);
+	
+	# add dynamically added metadata fields.
+	my $meta = {};
+	my $fieldList = $self->getEventMetaDataArrayRef;
+	if ($pid ne 'new') {
+		$meta = $self->getEventMetaDataFields($pid);
+	} else {
+		foreach my $field1 (@{$fieldList}) {
+			$meta->{$field1->{fieldId}} = $field1;
+			$meta->{$field1->{fieldId}}->{fieldData} = $field1->{defaultValues};
+		}
+	}
+	my $i18n3 = WebGUI::International->new($self->session, "Asset");
+	foreach my $field (@{$fieldList}) {
+		my $dataType = $meta->{$field->{fieldId}}{dataType};
+		my $options;
+		# Add a "Select..." option on top of a select list to prevent from
+		# saving the value on top of the list when no choice is made.
+		if($dataType eq "selectList") {
+			$options = {"", $i18n3->get("Select")};
+		}
+		$f->dynamicField(
+			name=>"metadata_".$meta->{$field->{fieldId}}{fieldId},
+			label=>$meta->{$field->{fieldId}}{name},
+			hoverHelp=>$meta->{$field->{fieldId}}{label},
+			value=>($self->session->form->process("metadata_".$meta->{$field->{fieldId}}{fieldId},$dataType) || $meta->{$field->{fieldId}}{fieldData}),
+			extras=>qq/title="$meta->{$field->{fieldId}}{label}"/,
+			possibleValues=>$meta->{$field->{fieldId}}{possibleValues},
+			options=>$options,
+			fieldType=>$dataType
+		);
+	}
 
 	my $prerequisiteList = $self->getPrerequisiteEventList($pid);
         if ( scalar(keys %{$prerequisiteList}) > 0) {
@@ -977,6 +1325,7 @@ sub www_editEvent {
 	my $output = $f->print;
 	$self->getAdminConsole->setHelp('add/edit event','Asset_EventManagementSystem');
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEvents'),$i18n->get("manage events"));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n->get('manage event metadata'));
 	my $addEdit = ($pid eq "new" or !$pid) ? $i18n->get('add', 'Asset_Wobject') : $i18n->get('edit', 'Asset_Wobject');
 	return $self->getAdminConsole->render($output, $addEdit.' '.$i18n->get('event'));
 }
@@ -1005,13 +1354,20 @@ sub www_editEventSave {
 	$pid = $self->setCollateral("EventManagementSystem_products", "productId",
 			    {
 			     productId  => $pid,
-			     startDate  => $self->session->datetime->humanToEpoch($self->session->form->get("startDate")),
-			     endDate	=> $self->session->datetime->humanToEpoch($self->session->form->get("endDate")),
+			     startDate  => $self->session->form->process("startDate",'dateTime'),
+			     endDate	=> $self->session->form->process("endDate",'dateTime'),
 			     maximumAttendees => $self->session->form->get("maximumAttendees"),
 			     approved	=> $self->session->form->get("approved")
 			    },1,1
 			   );
 
+	#Save the event metadata
+	my $mdFields = $self->getEventMetaDataFields;
+	foreach my $mdField (keys %{$mdFields}) {
+		my $value = $self->session->form->process("metadata_".$mdField,$mdFields->{$mdField}->{dataType});
+		$self->session->db->write("insert into EventManagementSystem_metaData values (".$self->session->db->quoteAndJoin([$mdField,$pid,$value]).") on duplicate key update fieldData=".$self->session->db->quote($value));
+	}
+	
 	#Save the standard product data
 	$event = {
 		productId	=> $pid,
@@ -1108,7 +1464,246 @@ sub www_manageEvents {
 	
 	$self->getAdminConsole->setHelp('event management system manage events','Asset_EventManagementSystem');
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editEvent;pid=new'), $i18n->get('add event'));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n->get('manage event metadata'));
 	return $self->getAdminConsole->render($output, $i18n->get("manage events"));
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_manageEventMetadata ( )
+
+Method to display the event metadata management console.
+
+=cut
+
+sub www_manageEventMetadata {
+	my $self = shift;
+
+	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
+
+	my $output;
+	my $metadataFields = $self->getEventMetaDataArrayRef('false');
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
+	my $count = 0;
+	my $number = scalar(@{$metadataFields});
+	foreach my $row1 (@{$metadataFields}) {
+		my %row = %{$row1};
+		$count++;
+		$output .= "<div>".
+		$self->session->icon->delete('func=deleteEventMetaDataField;fieldId='.$row{fieldId},$self->getUrl,$i18n->get('confirm delete event metadata')).
+		$self->session->icon->edit('func=editEventMetaDataField;fieldId='.$row{fieldId}, $self->getUrl).
+		$self->session->icon->moveUp('func=moveEventMetaDataFieldUp;fieldId='.$row{fieldId}, $self->getUrl,($count == 1)?1:0);
+		$output .= $self->session->icon->moveDown('func=moveEventMetaDataFieldDown;fieldId='.$row{fieldId}, $self->getUrl,($count == $number)?1:0).
+		" ".$row{name}." ( ".$row{label}." )</div>";
+	}
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editEventMetaDataField;fieldId=new'), $i18n->get("add new event metadata field"));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEvents'), $i18n->get('manage events'));
+	return $self->getAdminConsole->render($output, $i18n->get("manage event metadata"));
+}
+
+#-------------------------------------------------------------------
+sub www_editEventMetaDataField {
+	my $self = shift;
+	my $fieldId = shift || $self->session->form->process("fieldId");
+	my $error = shift;
+	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
+	my $i18n2 = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
+	my $i18n = WebGUI::International->new($self->session,"WebGUIProfile");
+	my $f = WebGUI::HTMLForm->new($self->session, (
+		action => $self->getUrl."?func=editEventMetaDataFieldSave;fieldId=".$fieldId
+	));
+	my $data = {};
+	if ($error) {
+		# load submitted data.
+		$data = {
+			name => $self->session->form->process("name"),
+			label => $self->session->form->process("label"),
+			dataType => $self->session->form->process("dataType",'fieldType'),
+			visible => $self->session->form->process("visible",'yesNo'),
+			required => $self->session->form->process("required",'yesNo'),
+			possibleValues => $self->session->form->process("possibleValues",'textarea'),
+			defaultValues => $self->session->form->process("defaultValues",'textarea'),
+		};
+		$f->readOnly(
+			-name => 'error',
+			-label => 'Error:',
+			-value => '<span style="color:red;font-weight:bold">'.$error.'</span>',
+		);
+	} elsif ($fieldId ne 'new') {
+		$data = $self->session->db->quickHashRef("select * from EventManagementSystem_metaField where fieldId=?",[$fieldId]);
+	} else {
+		# new field defaults
+		$data = {
+			name => $i18n2->get('type name here'),
+			label => $i18n2->get('type label here'),
+			dataType => 'text',
+			visible => 0,
+			required => 0,
+			autoSearch => 0
+		};
+	}
+	$f->text(
+		-name => "name",
+		-label => $i18n->get(475),
+		-hoverHelp => $i18n->get('475 description'),,
+		-extras=>(($data->{name} eq $i18n2->get('type name here'))?' style="color:#bbbbbb" ':'').' onblur="if(!this.value){this.value=\''.$i18n2->get('type name here').'\';this.style.color=\'#bbbbbb\';}" onfocus="if(this.value == \''.$i18n2->get('type name here').'\'){this.value=\'\';this.style.color=\'\';}"',
+		-value => $data->{name},
+	);
+	$f->text(
+		-name => "label",
+		-label => $i18n->get(472),
+		-hoverHelp => $i18n->get('472 description'),
+		-value => $data->{label},
+		-extras=>(($data->{label} eq $i18n2->get('type label here'))?' style="color:#bbbbbb" ':'').' onblur="if(!this.value){this.value=\''.$i18n2->get('type label here').'\';this.style.color=\'#bbbbbb\';}" onfocus="if(this.value == \''.$i18n2->get('type label here').'\'){this.value=\'\';this.style.color=\'\';}"',
+	);
+	$f->yesNo(
+		-name=>"visible",
+		-label=>$i18n->get('473a'),
+		-hoverHelp=>$i18n->get('473a description'),
+		-value=>$data->{visible}
+	);
+	$f->yesNo(
+		-name=>"required",
+		-label=>$i18n->get(474),
+		-hoverHelp=>$i18n->get('474 description'),
+		-value=>$data->{required}
+	);
+	my $fieldType = WebGUI::Form::FieldType->new($self->session,
+		-name=>"dataType",
+		-label=>$i18n->get(486),
+		-hoverHelp=>$i18n->get('486 description'),
+		-value=>ucfirst $data->{dataType},
+		-defaultValue=>"Text",
+	);
+	my @profileForms = ();
+	foreach my $form ( sort @{ $fieldType->get("types") }) {
+		next if $form eq 'DynamicField';
+		my $cmd = join '::', 'WebGUI::Form', $form;
+		eval "use $cmd";
+		my $w = eval {"$cmd"->new($self->session)};
+		push @profileForms, $form if $w->get("profileEnabled");
+	}
+
+	$fieldType->set("types", \@profileForms);
+	$f->raw($fieldType->toHtmlWithWrapper());
+	$f->textarea(
+		-name => "possibleValues",
+		-label => $i18n->get(487),
+		-hoverHelp => $i18n->get('487 description'),
+		-value => $data->{possibleValues},
+	);
+	$f->textarea(
+		-name => "defaultValues",
+		-label => $i18n->get(488),
+		-hoverHelp => $i18n->get('488 description'),
+		-value => $data->{defaultValues},
+	);
+	$f->yesNo(
+		-name => "autoSearch",
+		-label => 'Initial Search Field',
+		-hoverHelp => 'Make this appear as a Filter Field on the Advanced Search screen by default',
+		-value => $data->{autoSearch},
+	);
+	my %hash;
+	foreach my $category (@{WebGUI::ProfileCategory->getCategories($self->session)}) {
+		$hash{$category->getId} = $category->getLabel;
+	}
+	$f->submit;
+		$self->getAdminConsole->setHelp('event management system manage events','Asset_EventManagementSystem');
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n2->get('manage event metadata'));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editEventMetaDataField;fieldId=new'), $i18n2->get("add new event metadata field"));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEvents'), $i18n->get('manage events'));
+	return $self->getAdminConsole->render($f->print, $i18n2->get("add new event metadata field"));
+}
+
+#-------------------------------------------------------------------
+sub www_editEventMetaDataFieldSave {
+	my $self = shift;
+	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
+	my $error = '';
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
+	foreach ('name','label') {
+		if ($self->session->form->get($_) eq "" || 
+			$self->session->form->get($_) eq $i18n->get('type name here') ||
+			$self->session->form->get($_) eq $i18n->get('type label here')) {
+			$error .= sprintf($i18n->get('null field error'),$_)."<br />";
+		}
+	}
+	return $self->www_editEventMetaDataField(undef,$error) if $error;
+	my $newId = $self->setCollateral("EventManagementSystem_metaField", "fieldId",{
+		fieldId=>$self->session->form->process('fieldId'),
+		name => $self->session->form->process("name"),
+		label => $self->session->form->process("label"),
+		dataType => $self->session->form->process("dataType",'fieldType'),
+		visible => $self->session->form->process("visible",'yesNo'),
+		required => $self->session->form->process("required",'yesNo'),
+		possibleValues => $self->session->form->process("possibleValues",'textarea'),
+		defaultValues => $self->session->form->process("defaultValues",'textarea'),
+		autoSearch => $self->session->form->process("autoSearch",'yesNo')
+	},1,1);
+	return $self->www_manageEventMetadata();
+}
+
+
+
+#-------------------------------------------------------------------
+
+=head2 www_moveEventMetaDataFieldDown ( )
+
+Method to move an event down one position in display order
+
+=cut
+
+sub www_moveEventMetaDataFieldDown {
+	my $self = shift;
+	my $eventId = $self->session->form->get("fieldId");
+	
+	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
+	
+	$self->moveCollateralDown('EventManagementSystem_metaField', 'fieldId', $eventId);
+
+	return $self->www_manageEventMetadata;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_moveEventMetaDataFieldUp ( )
+
+Method to move an event metdata field up one position in display order
+
+=cut
+
+sub www_moveEventMetaDataFieldUp {
+	my $self = shift;
+	my $eventId = $self->session->form->get("fieldId");
+
+	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
+	
+	$self->moveCollateralUp('EventManagementSystem_metaField', 'fieldId', $eventId);
+	
+	return $self->www_manageEventMetadata;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 www_deleteEventMetaDataField ( )
+
+Method to move an event metdata field up one position in display order
+
+=cut
+
+sub www_deleteEventMetaDataField {
+	my $self = shift;
+	my $eventId = $self->session->form->get("fieldId");
+
+	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
+	
+	$self->deleteCollateral('EventManagementSystem_metaField', 'fieldId', $eventId);
+	$self->reorderCollateral('EventManagementSystem_metaField', 'fieldId');
+	$self->deleteCollateral('EventManagementSystem_metaData', 'fieldId', $eventId); # deleteCollateral doesn't care about assetId.
+	
+	return $self->www_manageEventMetadata;
 }
 
 #-------------------------------------------------------------------
@@ -1167,7 +1762,7 @@ sub www_saveRegistration {
 				 city            => $self->session->form->get("city", "text"),
 				 state		 => $self->session->form->get("state", "text"),
 				 zipCode	 => $self->session->form->get("zipCode", "text"),
-				 country	 => $self->session->form->get("country", "selectList"),
+				 country	 => join("\n",$self->session->form->get("country", "selectList")),
 				 phone		 => $self->session->form->get("phoneNumber", "phone"),
 				 email		 => $self->session->form->get("email", "email")
 				},0,0
@@ -1183,7 +1778,6 @@ sub www_saveRegistration {
 		}
 		$counter++;	
 	}	
-	#use Data::Dumper; print "<pre>".Dumper($self->session)."</pre>";
 	return $self->www_view;
 }
 
@@ -1201,6 +1795,12 @@ sub prepareView {
 	my $templateId = $self->get("displayTemplateId");
 	my $template = WebGUI::Asset::Template->new($self->session, $templateId);
 	$template->prepare;
+		my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
+  my $language  = $i18n->getLanguage(undef,"languageAbbreviation");
+	$self->session->style->setScript($self->session->config->get('extrasURL').'/calendar/calendar.js',{ type=>'text/javascript' });
+	$self->session->style->setScript($self->session->config->get('extrasURL').'/calendar/lang/calendar-'.$language.'.js',{ type=>'text/javascript' });
+	$self->session->style->setScript($self->session->config->get('extrasURL').'/calendar/calendar-setup.js',{ type=>'text/javascript' });
+	$self->session->style->setLink($self->session->config->get('extrasURL').'/calendar/calendar-win2k-1.css', { rel=>"stylesheet", type=>"text/css", media=>"all" });
 	$self->{_viewTemplate} = $template;
 }
 
@@ -1208,24 +1808,99 @@ sub prepareView {
 sub view {
 	my $self = shift;
 	my %var;
-	
+	my $keywords = $self->session->form->get("searchKeywords");
+	my @keys;
+	push(@keys,$keywords) if $keywords;
+	unless ($keywords =~ /^".*"$/) {
+		foreach (split(" ",$keywords)) {
+			push(@keys,$_) unless $keywords eq $_;
+		}
+	} else {
+		$keywords =~ s/"//g;
+		@keys = ($keywords);
+	}
+	my $searchPhrases;
+	if (scalar(@keys)) {
+		$searchPhrases = " and ( ";
+		my $count = 0;
+		foreach (@keys) {
+			$count++;
+			$searchPhrases .= ' and ' unless $count == 1;
+			my $val = $self->session->db->quote('%'.$_.'%');
+			$searchPhrases .= "(p.title like $val or p.description like $val)";
+		}
+		$searchPhrases .= " )";
+	}
+	if ($self->session->form->get("advSearch")) {
+		$searchPhrases = '';
+		my $fields = $self->_getFieldHash();
+		my $counter = 0;
+		for (my $cfilter = 1; $cfilter < 30; $cfilter++) {
+			my $value = $self->session->form->get("cfilter_t".$cfilter);
+			my $fieldId = $self->session->form->get("cfilter_s".$cfilter);
+			next if ($fieldId eq 'seatsAvailable' || $fieldId eq 'registration');
+			if ($value && defined $fields->{$fieldId}) {
+				my $compare = $self->session->form->get("cfilter_c".$cfilter);
+				#Format Value with Operator
+				$value =~ s/%//g;
+				my $field = $fields->{$fieldId};
+				if ($field->{type} =~ /^date/i) {
+	        $value = $self->session->datetime->setToEpoch($value);
+				} else {
+					$value = lc($value);
+				}
+				if($compare eq "eq") {
+					$value = "=".$self->session->db->quote($value);
+				} elsif($compare eq "ne"){
+					$value = "<>".$self->session->db->quote($value);
+				} elsif($compare eq "notlike") {
+					$value = "not like ".$self->session->db->quote("%".$value."%");
+				} elsif($compare eq "starts") {
+					$value = "like ".$self->session->db->quote($value."%");
+				} elsif($compare eq "ends") {
+					$value = "like ".$self->session->db->quote("%".$value);
+				} elsif($compare eq "gt") {
+					$value = "> ".$value;
+				} elsif($compare eq "lt") {
+					$value = "< ".$value;
+				} elsif($compare eq "lte") {
+					$value = "<= ".$value;
+				} elsif($compare eq "gte") {
+					$value = ">= ".$value;
+				} elsif($compare eq "like") {
+					$value = " like ".$self->session->db->quote("%".$value."%");
+				}
+				$searchPhrases .= " and" if($counter);
+				$counter++;
+				unless ($compare eq 'numeric') {
+					$searchPhrases .= " lower(".$field->{tableName}.'.'.$field->{columnName}.") ".$value;
+				} else {
+					$searchPhrases .= " ".$field->{tableName}.'.'.$field->{columnName}." ".$value;
+				}
+			}
+		}
+		$searchPhrases &&= " and ( ".$searchPhrases." )";
+	}
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	# Get the products available for sale for this page
-	my $sql = "select p.productId, p.title, p.description, p.price, p.templateId, e.approved, e.maximumAttendees 
+	my $sql = "select p.productId, p.title, p.description, p.price, p.templateId, e.approved, e.maximumAttendees, e.startDate, e.endDate 
 		   from products as p, EventManagementSystem_products as e
 		   where
 		   	p.productId = e.productId and approved=1
-		   	and e.assetId =".$self->session->db->quote($self->get("assetId"))." 
-			and p.productId not in (select distinct(productId) from EventManagementSystem_prerequisites)";		
+		   	and e.assetId =".$self->session->db->quote($self->get("assetId")).$searchPhrases;
+#		   	." 
+#			and p.productId not in (select distinct(productId) from EventManagementSystem_prerequisites)";		
 
+	$var{'basicSearch.formHeader'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl.'?advSearch=0'});
+	$var{'advSearch.formHeader'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl.'?advSearch=1'});
+	$var{isAdvSearch} = $self->session->form->get('advSearch');
+	$var{'search.formFooter'} = WebGUI::Form::formFooter($self->session);
+	$var{'search.formSubmit'} = WebGUI::Form::submit($self->session, {value=>'Filter'});
 	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->get("paginateAfter"));
 	$p->setDataByQuery($sql);
 	my $eventData = $p->getPageData;
 	my @events;
 
-	#We are getting each events information, passing it to the *events* template and processing it
-	#The html returned from each events template is returned to the Event Manager Display Template for arranging
-	#how the events are displayed in relation to one another.
 	foreach my $event (@$eventData) {
 	  my %eventFields;
 	  
@@ -1237,16 +1912,18 @@ sub view {
 	  $eventFields{'numberRegistered'} = $numberRegistered;
 	  $eventFields{'maximumAttendees'} = $event->{'maximumAttendees'};
 	  $eventFields{'seatsRemaining'} = $event->{'maximumAttendees'} - $numberRegistered;
+	  $eventFields{'startDate.human'} = $self->session->datetime->epochToHuman($event->{'startDate'});
+	  $eventFields{'endDate.human'} = $self->session->datetime->epochToHuman($event->{'endDate'});
 	  $eventFields{'eventIsFull'} = ($eventFields{'seatsRemaining'} == 0);
 
 	  if ($eventFields{'eventIsFull'}) {
-	  	$eventFields{'purchase.label'} = "Sold Out";;
+	  	$eventFields{'purchase.label'} = $i18n->get('sold out');
 	  }
 	  else {
 	  	$eventFields{'purchase.url'} = $self->getUrl('func=addToCart;pid='.$event->{'productId'});
 	  	$eventFields{'purchase.label'} = $i18n->get('add to cart');
 	  }
-	  push (@events, {'event' => $self->processTemplate(\%eventFields, $event->{'templateId'}) });	  
+	  push (@events, {'event' => $self->processTemplate(\%eventFields, $event->{'templateId'}), %eventFields });
 	} 
 	$var{'checkout.url'} = $self->getUrl('op=viewCart');
 	$var{'checkout.label'} = "Checkout";
@@ -1261,7 +1938,8 @@ sub view {
 		$var{'canManageEvents'} = 0;
 	}
 	$p->appendTemplateVars(\%var);
-	
+	$self->buildMenu(\%var);
+	$var{'ems.wobject.dir'} = $self->session->config->get("extrasURL")."/wobject/EventManagementSystem";
 	my $templateId = $self->get("displayTemplateId");
 	return $self->processTemplate(\%var, undef, $self->{_viewTemplate});
 }

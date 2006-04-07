@@ -1,0 +1,79 @@
+
+SPAN.bsBtnDefault IMG {vertical-align: bottom; padding: 3px }
+SPAN.bsBtnMouseDown IMG {vertical-align: bottom; padding: 4px 2px 2px 4px }
+DIV.bsBtnDefault IMG {vertical-align: bottom; padding: 3px }
+DIV.bsBtnMouseDown IMG {vertical-align: bottom; padding: 4px 2px 2px 4px }
+
+SPAN.bsBtnDefault {
+/*  line-height: 24px;*/
+  background-color:Menu;
+  margin: 0px;
+  padding-left:0px;
+  padding-top:3px;
+  padding-bottom: 2px;
+  border: 1px solid Menu;
+	font-family: arial, helvetica;
+	font-size: 12px;
+	cursor: default;
+}
+DIV.bsBtnDefault {
+/*  line-height: 24px;*/
+  background-color:Menu;
+  margin: 0px;
+  padding-left:0px;
+  padding-top:3px;
+  padding-bottom: 2px;
+  border: 1px solid Menu;
+	font-family: arial, helvetica;
+	font-size: 12px;
+	cursor: default;
+	display:inline;
+}
+SPAN.bsBtnDefault:hover {
+  border-style: outset;
+}
+DIV.bsBtnDefault:hover {
+  border-style: outset;
+}
+SPAN.bsBtnMouseDown {
+/*  line-height: 24px;*/
+  background-color:Menu;
+  margin: 0px;
+  padding-left:0px;
+  padding-top:3px;
+  padding-bottom: 2px;
+  border: 1px inset Menu;
+	font-family: arial, helvetica;
+	font-size: 12px;
+}
+DIV.bsBtnMouseDown {
+/*  line-height: 24px;*/
+  background-color:Menu;
+  margin: 0px;
+  padding-left:0px;
+  padding-top:3px;
+  padding-bottom: 2px;
+  border: 1px inset Menu;
+	font-family: arial, helvetica;
+	font-size: 12px;
+	display:inline;
+}
+/**
+* vertical separator for a horizontal bar
+*/
+.separatorForHorizontal {
+  line-height: 24px;
+  padding-top: 1px;
+  padding-bottom: 1px;
+  border: 1px inset Menu;
+}
+/**
+* horizontal separator for a vertical bar
+* todo: crap, too much room at the bottom, dunno why.
+*/
+.separatorForVertical {
+  line-height: 1px;
+  line-width: 22px;
+  padding-bottom: 0px;
+  border: 1px inset Menu;
+}
