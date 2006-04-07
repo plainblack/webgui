@@ -70,10 +70,9 @@ th {
 	font-family: helvetica, arial;
 	font-size: 12px;
 	z-index: 1000;
-	opacity: 0.6;
 }
 
-.adminConsoleMenu:hover {
+.adminConsoleMainMenu:hover, .adminConsoleUtilityMenu:hover {
 	opacity: 1.0;
 }
 
@@ -83,6 +82,7 @@ th {
 	margin: 5px;
 	-moz-border-radius: 5px;
 	background-color: #fafafa;
+	opacity: 0.6;
 }
 
 .adminConsoleSubmenu {
@@ -94,6 +94,7 @@ th {
 }
 
 .adminConsoleUtilityMenu {
+	opacity: 0.6;
  	border: 1px solid #D7D7D7;
 	padding: 5px;
 	margin: 5px;
