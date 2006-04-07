@@ -1,0 +1,230 @@
+#PBtmpl0000000000000134
+<tmpl_if displayTitle>
+	<h2><tmpl_var title></h2>
+</tmpl_if>
+
+<tmpl_if description>
+	<p><tmpl_var description></p>
+</tmpl_if>
+
+<tmpl_if session.var.adminOn>
+	<tmpl_var controls>
+</tmpl_if>
+
+
+^JavaScript("<tmpl_var session.config.extrasURL>/coolmenus/coolmenus4.js");
+<script type="text/javascript">
+/*****************************************************************************
+Copyright (c) 2001 Thomas Brattli (webmaster@dhtmlcentral.com)
+
+DHTML coolMenus - Get it at coolmenus.dhtmlcentral.com
+Version 4.0_beta
+This script can be used freely as long as all copyright messages are
+intact.
+
+Extra info - Coolmenus reference/help - Extra links to help files ****
+CSS help: http://coolmenus.dhtmlcentral.com/projects/coolmenus/reference.asp?m=37
+General: http://coolmenus.dhtmlcentral.com/reference.asp?m=35
+Menu properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=47
+Level properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=48
+
+Background bar properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=49
+Item properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=50
+******************************************************************************/
+
+/***
+This is the menu creation code - place it right after you body tag
+Feel free to add this to a stand-alone js file and link it to your page.
+**/
+
+//Menu object creation
+coolmenu=new makeCM("coolmenu") //Making the menu object. Argument: menuname
+
+coolmenu.frames = 0
+
+//Menu properties
+coolmenu.onlineRoot=""
+coolmenu.pxBetween=2
+coolmenu.fromLeft=200	//200
+coolmenu.fromTop=100	//100
+coolmenu.rows=1
+coolmenu.menuPlacement="center"   //The whole menu alignment, left, center, or right
+
+coolmenu.resizeCheck=1
+coolmenu.wait=250
+coolmenu.fillImg="cm_fill.gif"
+coolmenu.zIndex=100
+
+//Background bar properties
+coolmenu.useBar=0
+coolmenu.barWidth="100%"
+coolmenu.barHeight="menu"
+coolmenu.barClass="cBar"
+coolmenu.barX=0
+coolmenu.barY=0
+coolmenu.barBorderX=0
+coolmenu.barBorderY=0
+coolmenu.barBorderClass=""
+
+//Level properties - ALL properties have to be spesified in level 0
+coolmenu.level[0]=new cm_makeLevel() //Add this for each new level
+coolmenu.level[0].width=110
+coolmenu.level[0].height=51
+coolmenu.level[0].regClass="cLevel0"
+coolmenu.level[0].overClass="cLevel0over"
+coolmenu.level[0].borderX=1
+coolmenu.level[0].borderY=1
+coolmenu.level[0].borderClass="cLevel0border"
+
+coolmenu.level[0].offsetX=0
+coolmenu.level[0].offsetY=0
+coolmenu.level[0].rows=0
+coolmenu.level[0].arrow=0
+coolmenu.level[0].arrowWidth=0
+coolmenu.level[0].arrowHeight=0
+coolmenu.level[0].align="bottom"
+
+//EXAMPLE SUB LEVEL[1] PROPERTIES - You have to specify the properties you want different from LEVEL[0] - If you want all items to look the same just remove this
+coolmenu.level[1]=new cm_makeLevel() //Add this for each new level (adding one to the number)
+coolmenu.level[1].width=coolmenu.level[0].width+20
+coolmenu.level[1].height=25
+coolmenu.level[1].regClass="cLevel1"
+coolmenu.level[1].overClass="cLevel1over"
+coolmenu.level[1].borderX=1
+coolmenu.level[1].borderY=1
+coolmenu.level[1].align="right"
+coolmenu.level[1].offsetX=0
+coolmenu.level[1].offsetY=0
+coolmenu.level[1].borderClass="cLevel1border"
+
+//EXAMPLE SUB LEVEL[2] PROPERTIES - You have to specify the properties you want different from LEVEL[1] OR LEVEL[0] - If you want all items to look the same just remove this
+coolmenu.level[2]=new cm_makeLevel() //Add this for each new level (adding one to the number)
+coolmenu.level[2].width=coolmenu.level[0].width+20
+coolmenu.level[2].height=25
+coolmenu.level[2].offsetX=0
+coolmenu.level[2].offsetY=0
+coolmenu.level[2].regClass="cLevel2"
+coolmenu.level[2].overClass="cLevel2over"
+coolmenu.level[2].borderClass="cLevel2border"
+
+//EXAMPLE SUB LEVEL[2] PROPERTIES - You have to specify the properties you want different from LEVEL[1] OR LEVEL[0] - If you want all items to look the same just remove this
+coolmenu.level[3]=new cm_makeLevel() //Add this for each new level (adding one to the number)
+coolmenu.level[3].width=coolmenu.level[0].width+20
+coolmenu.level[3].height=25
+coolmenu.level[3].offsetX=0
+coolmenu.level[3].offsetY=0
+coolmenu.level[3].regClass="cLevel2"
+coolmenu.level[3].overClass="cLevel2over"
+coolmenu.level[3].borderClass="cLevel2border"
+
+<tmpl_loop page_loop>
+coolmenu.makeMenu('coolmenu_<tmpl_var page.assetId escape=JS>'.replace(/\-/g,"a"),'coolmenu_<tmpl_var page.parent.assetId escape=JS>'.replace(/\-/g,"a"),"<tmpl_var page.menuTitle escape=JS>",'<tmpl_var page.url escape=JS>'<tmpl_if page.newWindow>,'_blank'</tmpl_if>);
+</tmpl_loop>
+
+coolmenu.construct();
+
+</script>
+~~~
+<style type="text/css">
+/* CoolMenus 4 - default styles - do not edit */
+.cCMAbs {
+	position: absolute;
+	visibility: hidden;
+	left: 0;
+	top: 0;
+}
+/* CoolMenus 4 - default styles - end */
+
+/*Styles for level 0*/
+.cLevel0,.cLevel0over {
+	position: absolute;
+	padding: 2px;
+	font-family: tahoma, arial, helvetica;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+.cLevel0 {
+	background-color: navy;
+	layer-background-color: navy;
+	color: white;
+	text-align: center;
+}
+
+.cLevel0over {
+	background-color: orange;
+	layer-background-color: navy;
+	color: white;
+	cursor: pointer;
+	cursor: hand;
+	text-align: center;
+}
+
+.cLevel0border {
+	position: absolute;
+	visibility: hidden;
+	background-color: #569635;
+	layer-background-color: #006699;
+}
+
+/*Styles for level 1*/
+.cLevel1, .cLevel1over {
+	position: absolute;
+	padding: 2px;
+	font-family: tahoma, arial, helvetica;
+	font-size: 11px;
+	font-weight:bold;
+}
+
+.cLevel1 {
+	background-color: navy;
+	layer-background-color: navy;
+	color: white;
+}
+
+.cLevel1over {
+	background-color: #336699;
+	layer-background-color: #336699;
+	color: yellow;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.cLevel1border {
+	position: absolute;
+	visibility: hidden;
+	background-color: #006699;
+	layer-background-color: #006699;
+}
+
+/*Styles for level 2*/
+.cLevel2, .cLevel2over {
+	position: absolute;
+	padding: 2px;
+	font-family: tahoma, arial, helvetica;
+	font-size: 10px;
+	font-weight: bold;
+}
+
+.cLevel2 {
+	background-color: navy;
+	layer-background-color: navy;
+	color:white;
+}
+
+.cLevel2over {
+	background-color: #0099cc;
+	layer-background-color: #0099cc;
+	color: yellow;
+	cursor:pointer;
+	cursor:hand;
+}
+
+.cLevel2border {
+	position: absolute;
+	visibility: hidden;
+	background-color: #006699;
+	layer-background-color: #006699;
+}
+
+</style>

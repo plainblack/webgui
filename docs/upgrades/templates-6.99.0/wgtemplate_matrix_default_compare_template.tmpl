@@ -1,0 +1,76 @@
+#matrixtmpl000000000002
+<h2>Comparison</h2>
+<table cellpadding="0" cellspacing="0" border="0" style="font-size: 11px; font-family: helvetica, arial, sans-serif;">
+
+<tr>
+<td valign="top"><tmpl_var compare.form></td>
+<td style="width:10px;">&nbsp;</td>
+<td style="width:3px;background-color:silver;">&nbsp;</td>
+<td style="width:10px;">&nbsp;</td>
+<td valign="top">
+
+<tmpl_if isTooMany>
+You tried to compare too many listings. Please choose <tmpl_var maxCompares> or less at a time.
+</tmpl_if>
+
+<tmpl_if isTooFew>
+You must choose at least two products to compare. Less than two isn't much of a comparison.
+</tmpl_if>
+
+
+<tmpl_unless isTooFew><tmpl_unless isTooMany>
+
+
+<table style="font-size: 11px; font-family: helvetica, arial, sans-serif;" cellpadding="2" cellspacing="2" border="0">
+<tr>
+  <td style="border-bottom:solid gray 1px;font-weight:bold;font-size:13px;">Product</td>
+  <tmpl_loop product_loop>
+    <td style="border-bottom:solid gray 1px;"><a href="<tmpl_var url>"><tmpl_var name> <tmpl_var version></a></td>
+  </tmpl_loop>
+</tr>
+<tr>
+  <td class="lastUpdated">Last Updated</td>
+  <tmpl_loop lastupdated_loop>
+    <td class="lastUpdated" style="text-align:center;"><tmpl_var lastupdated></td>
+  </tmpl_loop>
+</tr>
+
+<tmpl_loop category_loop>
+ <tr><td class="category"><b><tmpl_var category></b></td>
+  <tmpl_loop product_loop>
+    <td align="center"><tmpl_var name></td>
+  </tmpl_loop>
+
+
+</tr>
+  <tmpl_loop row_loop>
+  <tr
+   <tmpl_if __ODD__>
+      class="odd"
+   <tmpl_else>
+      class="even"
+   </tmpl_if>
+   >
+    <tmpl_loop column_loop>
+      <td class="<tmpl_var class>" <tmpl_if description>onmouseover="return escape('<tmpl_var description>')"</tmpl_if>>
+        <tmpl_var value>
+      </td>
+     </tmpl_loop>
+    </tr>
+   </tmpl_loop>
+  </tmpl_loop>
+</table>
+
+
+</tmpl_unless></tmpl_unless>
+
+</td></tr></table>
+~~~
+<style type="text/css">
+	.lastUpdated {
+		background-color:#F0F0F0;
+	}
+	.category {
+		font-size:13px;
+	}
+</style>
