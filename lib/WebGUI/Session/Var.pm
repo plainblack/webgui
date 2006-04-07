@@ -225,8 +225,10 @@ Session id will be generated if not specified. In almost every case you should l
 
 sub start {
 	my $self = shift;
-	my $userId = shift || 1;
-	my $sessionId = shift || $self->session->id->generate;
+	my $userId = shift;
+	$userId = 1 if ($userId eq "");
+	my $sessionId = shift;
+	$sessionId = $self->session->id->generate if ($sessionId eq "");
 	$self->{_var} = {
 		expires=>$self->session->datetime->time() + $self->session->setting->get("sessionTimeout"),
 		lastPageView=>$self->session->datetime->time(),

@@ -561,13 +561,13 @@ sub user {
 	my $option = shift;
 	if (defined $option) {
 		my $userId = $option->{userId} || $option->{user}->userId; 
+   		$self->var->start($userId,$self->getId);
 		if ($self->setting->get("passiveProfilingEnabled")) {
-			$self->db->write("update passiveProfileLog set userId = ".$self->db->quote($userId)." where sessionId = ".$self->db->quote($self->getId));
+			$self->db->write("update passiveProfileLog set userId = ? where sessionId = ?",[$userId,$self->getId]);
 		}	
 		delete $self->{_stow};
 		$self->{_user} = $option->{user} || WebGUI::User->new($self, $userId);
 		$self->request->user($self->{_user}->username) if ($self->request);
-   		$self->var->start($self->{_user}->userId,$self->getId);
 	} elsif (!exists $self->{_user}) {
 		$self->{_user} = WebGUI::User->new($self, $self->var->get('userId'));
 	}

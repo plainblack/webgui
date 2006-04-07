@@ -17,6 +17,7 @@ package WebGUI::Asset::Wobject::Layout;
 use strict;
 use WebGUI::Asset::Wobject;
 use WebGUI::Utility;
+use WebGUI::Cache;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
 
@@ -264,6 +265,34 @@ sub www_setContentPositions {
 #-------------------------------------------------------------------
 sub www_view {
 	my $self = shift;
+	# slashdot / burst protection
+	if ($self->session->var->get("userId") eq "1" && $self->session->form->param("func") eq "" && $self->session->form->param("op") eq "") { 
+		unless ($self->canView) {
+			if ($self->get("state") eq "published") { # no privileges, make em log in
+				return $self->session->privilege->noAccess();
+			} elsif ($self->session->var->get("adminOn") && $self->get("state") =~ /^trash/) { # show em trash
+				$self->session->http->setRedirect($self->getUrl("func=manageTrash"));
+				return undef;
+			} elsif ($self->session->var->get("adminOn") && $self->get("state") =~ /^clipboard/) { # show em clipboard
+				$self->session->http->setRedirect($self->getUrl("func=manageClipboard"));
+				return undef;
+			} else { # tell em it doesn't exist anymore
+				$self->session->http->setStatus("410");
+				return WebGUI::Asset->getNotFound($self->session)->www_view;
+			}
+		}
+		$self->logView();
+		# must find a way to do this next line better
+		$self->session->http->setCookie("wgSession",$self->session->var->{_var}{sessionId}) unless $self->session->var->{_var}{sessionId} eq $self->session->http->getCookies->{"wgSession"};
+		my $cache = WebGUI::Cache->new($self->session, "view_".$self->getId);
+		my $out = $cache->get if defined $cache;
+		unless ($out) {
+			$self->prepareView;
+			$out = $self->processStyle($self->view);
+			$cache->set($out, 60);
+		}
+		return $out;	
+	}
 	$self->{_viewPrintOverride} = 1; # we do this to make it output each easset as it goes, rather than waiting until the end
 	return $self->SUPER::www_view;
 }
