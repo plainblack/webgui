@@ -398,7 +398,6 @@ sub _processQuery {
 	my $dbh = $dbLink->db;
         if (defined $dbh) {
 		if ($dbLink->queryIsAllowed($query)) {
-#                if ($query =~ /^select/i || $query =~ /^show/i || $query =~ /^describe/i) {
                 	# Check and execute prequery statements first
 			foreach (split(/\n/, $self->getValue("prequeryStatements".$nr))) {
 				my $prequeryStatement = $_;
