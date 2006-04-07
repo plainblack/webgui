@@ -1,5 +1,5 @@
 package WebGUI;
-our $VERSION = "6.8.8";
+our $VERSION = "6.8.9";
 our $STATUS = "gamma";
 
 #-------------------------------------------------------------------
