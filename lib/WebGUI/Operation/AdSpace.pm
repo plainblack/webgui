@@ -38,7 +38,7 @@ Handles a click on an advertisement.
 
 sub www_clickAd {
 	my $session = shift;
-	my $id = $session->form->param("adId");
+	my $id = $session->form->param("id");
 	return undef unless $id;
 	my $url = WebGUI::AdSpace->countClick($session, $id);
 	$session->http->setRedirect($url);
@@ -196,6 +196,10 @@ sub www_editAd {
 		hoverHelp=>$i18n->get("image help"),
 		name=>"image"
 		);
+	if (defined $ad && $ad->get("storageId")) {
+		my $storage = WebGUI::Storage::Image->get($session, $ad->get("storageId"));
+		$f->readOnly(value=>'<img src="'.$storage->getUrl($storage->getFiles->[0]).'" style="border: 0px;" />');
+	}
 	$f->fieldSetEnd;
 	$f->fieldSetStart($i18n->get("rich"));
 	my $value = $ad->get("richMedia") if defined $ad;

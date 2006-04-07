@@ -47,10 +47,11 @@ The unique ID of the ad that was clicked.
 =cut
 
 sub countClick {
-	my $self = shift;
+	my $class = shift;
+	my $session = shift;
 	my $id = shift;
-	my ($url) = $self->session->db->quickArray("select url from advertisement where adId=?",[$id]);
-	$self->session->db->write("update advertisement set clicks=clicks+1 where adId=?",[$id]);
+	my ($url) = $session->db->quickArray("select url from advertisement where adId=?",[$id]);
+	$session->db->write("update advertisement set clicks=clicks+1 where adId=?",[$id]);
 	return $url;
 }
 
@@ -124,10 +125,10 @@ sub displayImpression {
 	my $self = shift;
 	my ($id, $ad, $priority, $clicks, $clicksBought, $impressions, $impressionsBought) = $self->session->db->quickArray("select adId, renderedAd, priority, clicks, clicksBought, impressions, impressionsBought from advertisement where adSpaceId=? and isActive=1 order by nextInPriority asc limit 1",[$self->getId]);
 	my $isActive = 1;
-	if ($clicks > $clicksBought && $impressions > $impressionsBought) {
+	if ($clicks >= $clicksBought && $impressions >= $impressionsBought) {
 		$isActive = 0;
 	}
-	$self->session->db->write("update advertisement set impressions=impressions+1, nextInPriority=?, isActive=? where adId=?", [time()+$priority, $id, $isActive]);
+	$self->session->db->write("update advertisement set impressions=impressions+1, nextInPriority=?, isActive=? where adId=?", [time()+$priority, $isActive, $id]);
 	return $ad;
 }
 
