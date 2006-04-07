@@ -286,20 +286,6 @@ sub isInGroup {
                 	return 1;
         	}
 	}
-        ### Check Scratch Variables 
-        if ($group->scratchFilter()) {
-		my $scratchFilter = $group->scratchFilter();
-                $scratchFilter =~ s/\s//g;
-                my @vars = split(";",$scratchFilter);
-                foreach my $var (@vars) {
-                        my ($name, $value) = split(/\=/,$var);
-                        if ($self->session->scratch->get($name) eq $value) {
-                                $isInGroup->{$uid}{$gid} = 1;
-				$self->session->stow->set("isInGroup",$isInGroup);
-                                return 1;
-                        }
-                }
-        }
 	 ### Check ldap
         if ($group->get("ldapGroup") && $group->get("ldapGroupProperty")) {
 		   # skip if not logged in
@@ -350,6 +336,13 @@ sub isInGroup {
 	}
         if (my @karmaUsers = @{ $group->getKarmaUsers() }) {
 		foreach my $extUserId ( @karmaUsers ) {
+			$isInGroup->{$extUserId}{$gid} = 1;
+		}
+		$self->session->stow->set("isInGroup",$isInGroup);
+		return 1 if ($isInGroup->{$uid}{$gid});
+	}
+        if (my @scratchUsers = @{ $group->getScratchUsers() }) {
+		foreach my $extUserId ( @scratchUsers ) {
 			$isInGroup->{$extUserId}{$gid} = 1;
 		}
 		$self->session->stow->set("isInGroup",$isInGroup);

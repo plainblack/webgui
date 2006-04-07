@@ -50,7 +50,7 @@ my @scratchTests = (
 			},
 );
 
-plan tests => (83 + scalar(@scratchTests)); # increment this value for each test you create
+plan tests => (85 + scalar(@scratchTests)); # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -385,6 +385,18 @@ foreach my $scratchTest (@scratchTests) {
 	is($scratchTest->{user}->isInGroup($gS->getId), $scratchTest->{expect}, $scratchTest->{comment});
 }
 
+cmp_bag(
+	$gS->getScratchUsers,
+	[ (map { $_->{user}->userId() }  grep { $_->{expect} } @scratchTests) ],
+	'getScratchUsers'
+);
+
+cmp_bag(
+	$gS->getUsers,
+	[ (map { $_->{user}->userId() }  grep { $_->{expect} } @scratchTests) ],
+	'getUsers for group with scratch'
+);
+
 SKIP: {
 	skip("need to test expiration date in groupings interacting with recursive or not", 1);
 	ok(undef, "expiration date in groupings for getUser");
@@ -399,7 +411,10 @@ END {
 	}
 	$session->db->dbh->do('DROP TABLE IF EXISTS myUserTable');
 
+
 	foreach my $subSession (@sessionBank) {
+		$subSession->db->write("DELETE FROM userSession WHERE sessionId=?",[ $subSession->getId]);
+		$subSession->db->write("DELETE FROM userSessionScratch WHERE sessionId=?",[ $subSession->getId]);
 		$subSession->close() if (defined $subSession and ref $subSession eq 'WebGUI::Session');
 	}
 }

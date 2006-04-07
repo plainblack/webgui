@@ -473,6 +473,46 @@ sub getKarmaUsers {
 
 #-------------------------------------------------------------------
 
+=head2 getScratchUsers ( )
+
+Get the set of users allowed to be in this group via session scratch variable settings
+and this group's scratchFilter.  The set is returned as an array ref.
+
+If no scratchFilter has been set for this group, returns an empty array ref.
+
+=cut
+
+sub getScratchUsers {
+	my $self = shift;
+	my $scratchFilter;
+	return [] unless $scratchFilter = $self->scratchFilter();
+
+	my $sessionId = $self->session->db->quote($self->session->getId());
+	my $time = $self->session->datetime->time();
+
+	$scratchFilter =~ s/\s//g;
+	my @filters = split /;/, $scratchFilter;
+
+	my @scratchClauses = ();
+	my @scratchPlaceholders = ();
+	foreach my $filter (@filters) {
+		my ($name, $value) = split /=/, $filter;
+		push @scratchClauses, "(s.name=? AND s.value=?)";
+		push @scratchPlaceholders, $name, $value;
+	}
+	my $scratchClause = join ' OR ', @scratchClauses;
+
+	my $query = <<EOQ;
+select u.userId from userSession u, userSessionScratch s where
+u.sessionId=s.sessionId AND
+u.expires > $time AND
+	( $scratchClause )
+EOQ
+	return $self->session->db->buildArrayRef($query, [ @scratchPlaceholders ]);
+}	
+
+#-------------------------------------------------------------------
+
 =head2 find ( session, name )
 
 An alternative to the constructor "new", use find as a constructor by name rather than id.
@@ -631,6 +671,7 @@ sub getUsers {
 			push @externalUsers,
 				@{ $extGroup->getDatabaseUsers() },
 				@{ $extGroup->getKarmaUsers() },
+				@{ $extGroup->getScratchUsers() },
 			;
 		}
 	}
@@ -639,6 +680,7 @@ sub getUsers {
 	push @externalUsers,
 		@{ $self->getDatabaseUsers() },
 		@{ $self->getKarmaUsers() },
+		@{ $self->getScratchUsers() },
 	;
 	my @users = ( @localUsers, @externalUsers );
 	return \@users;
