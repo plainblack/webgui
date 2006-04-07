@@ -136,6 +136,7 @@ sub www_editLDAPLink {
    
 	my $i18n = WebGUI::International->new($session,"AuthLDAP");
    $f = WebGUI::HTMLForm->new($session, -extras=>'autocomplete="off"' );
+	$f->submit;
    $f->hidden(
    		-name => "op",
 		-value => "editLDAPLinkSave",

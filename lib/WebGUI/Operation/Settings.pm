@@ -294,9 +294,10 @@ sub www_editSettings {
 		-extras=>"onchange=\"active=operateHidden(this.options[this.selectedIndex].value,active)\""
 		);
 	foreach (@{$session->config->get("authMethods")}) {
+		$tabform->getTab("auth")->fieldSetStart($_);
 		my $authInstance = WebGUI::Operation::Auth::getInstance($session,$_,1);
-		my $style = '" style="display: none;' unless ($_ eq $session->setting->get("authMethod"));
-		$tabform->getTab("auth")->raw('<tr id="'.$_.$style.'"><td colspan="2" width="100%"><table border="0" cellspacing="0" cellpadding="0" width="100%">'.$authInstance->editUserSettingsForm.'<tr><td width="304">&nbsp;</td><td width="496">&nbsp;</td></tr></table></td></tr>');
+		$tabform->getTab("auth")->raw($authInstance->editUserSettingsForm);
+		$tabform->getTab("auth")->fieldSetEnd;
 	}
 	$tabform->submit();
 	my $ac = WebGUI::AdminConsole->new($session,"settings");

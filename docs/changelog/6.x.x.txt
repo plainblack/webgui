@@ -24,6 +24,7 @@
  - Readded the purge option to the trash manager.
  - Added an advertising management system.
  - Added a field set grouping mechanism to HTMLForm and TabForm.
+ - Added save buttons at the top of all the HTML forms for easier access.
  - Added archive/unarchive options to CS threads.
  - Increased the performance of CS Thread viewing by 500%.
  - Added a database cache option as an alternative to memcached.

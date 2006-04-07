@@ -57,6 +57,7 @@ sub www_editCronJob {
 	my $i18n = WebGUI::International->new($session, "Workflow_Cron");
 	my $cron = WebGUI::Workflow::Cron->new($session, $session->form->get("id"));
 	my $f = WebGUI::HTMLForm->new($session);
+	$f->submit;
 	$f->hidden(
 		name=>"op",
 		value=>"editCronJobSave"

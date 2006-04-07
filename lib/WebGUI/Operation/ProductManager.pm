@@ -152,6 +152,7 @@ sub www_editProduct {
 	}
 	
 	$f = WebGUI::HTMLForm->new($session);
+	$f->submit;
 	$f->hidden(
 		-name => 'op', 
 		-value => 'editProductSave'
@@ -286,6 +287,7 @@ sub www_editProductParameter {
 	}
 	
 	$f = WebGUI::HTMLForm->new($session);
+	$f->submit;
 	$f->hidden(
 		-name => 'op',
 		-value => 'editProductParameterSave',
@@ -390,6 +392,7 @@ sub www_editProductParameterOption {
 	}
 
 	$f = WebGUI::HTMLForm->new($session);
+	$f->submit;
 	$f->hidden(
 		-name => 'op',
 		-value => 'editProductParameterOptionSave',
@@ -501,6 +504,7 @@ sub www_editProductVariant {
 	$variant = WebGUI::Product->getByVariantId($session,$variantId)->getVariant($variantId);
 	
 	$f = WebGUI::HTMLForm->new($session);
+	$f->submit;
 	$f->hidden(
 		-name => 'op', 
 		-value => 'editProductVariantSave'
@@ -597,6 +601,7 @@ sub www_editSkuTemplate {
 	$output .= "</ul><br />";
 	
 	$f = WebGUI::HTMLForm->new($session);
+	$f->submit;
 	$f->hidden(
 		-name => 'op', 
 		-value => 'editSkuTemplateSave'

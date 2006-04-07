@@ -157,6 +157,7 @@ sub www_editDatabaseLink {
 	$f = WebGUI::HTMLForm->new($session,
 		-extras=>'autocomplete="off"'
 		);
+	$f->submit;
         $f->hidden(
 		-name => "op",
 		-value => "editDatabaseLinkSave",

@@ -236,9 +236,9 @@ sub print {
                         $tabs .= 'style="display: none;"';
                 }
                 $tabs .= '>'.$self->{_tab}{$key}{label}.'</span> ';
-		$form .= '<div id="tabcontent'.$i.'" class="tabBody"><table>';
+		$form .= '<div id="tabcontent'.$i.'" class="tabBody"><table><tbody>';
 		$form .= $self->{_tab}{$key}{form}->printRowsOnly;
-		$form .= '</table></div>';
+		$form .= '</tbody></table></div>';
 		$i++;
 	}
 	$output .= '<div class="tabs">'.$tabs.$self->{_submit}."&nbsp;&nbsp;".$self->{_cancel}.'</div>';

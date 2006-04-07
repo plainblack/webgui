@@ -133,6 +133,7 @@ sub www_editProfileCategory {
 	my $data = {};
 	my $i18n = WebGUI::International->new($session,"WebGUIProfile");
 	my $f = WebGUI::HTMLForm->new($session);
+	$f->submit;
 	$f->hidden(
 		-name => "op",
 		-value => "editProfileCategorySave",
@@ -213,6 +214,7 @@ sub www_editProfileField {
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my $i18n = WebGUI::International->new($session,"WebGUIProfile");
         my $f = WebGUI::HTMLForm->new($session);
+	$f->submit;
         $f->hidden(
 		-name => "op",
 		-value => "editProfileFieldSave",

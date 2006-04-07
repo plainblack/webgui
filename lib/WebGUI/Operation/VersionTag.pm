@@ -87,6 +87,7 @@ sub www_editVersionTag {
 	my $i18n = WebGUI::International->new($session,"VersionTag");
         $ac->addSubmenuItem($session->url->page('op=manageVersions'), $i18n->get("manage versions"));
 	my $f = WebGUI::HTMLForm->new($session);
+	$f->submit;
 	my $tag = WebGUI::VersionTag->new($session, $tagId);
 	$f->hidden(
 		-name=>"op",
@@ -187,6 +188,7 @@ sub www_commitVersionTag {
 		if (defined $tag && $session->user->isInGroup($tag->get("groupToUse"))) {
 			my $i18n = WebGUI::International->new($session, "VersionTag");
 			my $f = WebGUI::HTMLForm->new($session);
+			$f->submit;
 			$f->readOnly(
 				label=>$i18n->get("version tag name"),
 				value=>$tag->get("name")
@@ -365,6 +367,7 @@ sub www_manageRevisionsInTag {
 		my $instance = WebGUI::Workflow::Instance->new($session, $session->form->param("workflowInstanceId"));
 		if (defined $instance) {
 			my $form = WebGUI::HTMLForm->new($session);
+			$form->submit;
 			$form->hidden(
 				name=>"tagId",
 				value=>$tagId

@@ -342,20 +342,21 @@ sub www_editUser {
 		-options=>$options,
 		-label=>$i18n->get(164),
 		-value=>$u->authMethod,
-		-extras=>"onchange=\"active=operateHidden(this.options[this.selectedIndex].value,active)\""
 		);
 	foreach (@{$session->config->get("authMethods")}) {
+		$tabform->getTab("account")->fieldSetStart($_);
 		my $authInstance = WebGUI::Operation::Auth::getInstance($session,$_,$u->userId);
-		my $style = '" style="display: none;' unless ($_ eq $u->authMethod);
-		$tabform->getTab("account")->raw('<tr id="'.$_.$style.'"><td colspan="2" align="center"><table>'.$authInstance->editUserForm.'<tr><td width="170">&nbsp;</td><td>&nbsp;</td></tr></table></td></tr>');
+		$tabform->getTab("account")->raw($authInstance->editUserForm);
+		$tabform->getTab("account")->fieldSetEnd;
 	}
 	foreach my $category (@{WebGUI::ProfileCategory->getCategories($session)}) {
-		$tabform->getTab("profile")->raw('<tr><td colspan="2" class="tableHeader">'.$category->getLabel.'</td></tr>');
+		$tabform->getTab("profile")->fieldSetStart($category->getLabel);
 		foreach my $field (@{$category->getFields}) {
 			next if $field->getId =~ /contentPositions/;
 			my $label = $field->getLabel . ($field->isRequired ? "*" : '');
 			$tabform->getTab("profile")->raw($field->formField({label=>$label},1,$u));
 		}
+		$tabform->getTab("profile")->fieldSetEnd($category->getLabel);
 	}
 	my @groupsToAdd = $session->form->group("groupsToAdd");
 	my @exclude = $session->db->buildArray("select groupId from groupings where userId=".$session->db->quote($u->userId));
@@ -471,6 +472,7 @@ sub www_editUserKarma {
         my ($output, $f, $a, %user, %data, $method, $values, $category, $label, $default, $previousCategory);
 	my $i18n = WebGUI::International->new($session);
         $f = WebGUI::HTMLForm->new($session);
+	$f->submit;
         $f->hidden(
 		-name => "op",
 		-value => "editUserKarmaSave",

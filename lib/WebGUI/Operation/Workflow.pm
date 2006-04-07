@@ -43,6 +43,7 @@ sub www_addWorkflow {
         return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
 	my $i18n = WebGUI::International->new($session, "Workflow");
 	my $f = WebGUI::HTMLForm->new($session);
+	$f->submit;
 	$f->hidden(
 		name=>"op",
 		value=>"addWorkflowSave"
@@ -160,6 +161,7 @@ sub www_editWorkflow {
 	}	
 	$addmenu .= '</div>';
 	my $f = WebGUI::HTMLForm->new($session);
+	$f->submit;
 	$f->hidden(
 		name=>"op",
 		value=>"editWorkflowSave"

@@ -120,7 +120,7 @@ sub fieldSetEnd {
 	my $legend = shift;
 	$self->{_data} .= "</tbody></table>\n"
 		."</fieldset>\n"
-		."<table ".$self->{_tableExtras}.'"><tbody>'
+		."<table ".$self->{_tableExtras}.'" style="width: 100%;"><tbody>'
 		."\n";
 }
 
@@ -142,7 +142,7 @@ sub fieldSetStart {
 	my $legend = shift;
 	$self->{_data} .= "</tbody></table>\n"
 		."<fieldset>\n<legend>".$legend."</legend>\n"
-		."<table ".$self->{_tableExtras}.'"><tbody>'
+		."<table ".$self->{_tableExtras}.'" style="width: 100%;"><tbody>'
 		."\n";
 }
 
@@ -190,7 +190,7 @@ sub new {
 		method=>($param{method} || $param{'-method'}),
 		enctype=>($param{enctype} || $param{'-enctype'})
 		});
-	$header .= "\n<table ".$param{tableExtras}.'"><tbody>';
+	$header .= "\n<table ".$param{tableExtras}.'" style="width: 100%;"><tbody>';
 	$footer = "</tbody></table>\n" ;
 	$footer .= WebGUI::Form::formFooter($session);
         bless {_session=>$session, _tableExtras=>$param{tableExtras}, _uiLevelOverride=>$param{uiLevelOverride},  _header => $header, _footer => $footer, _data => ''}, $class;

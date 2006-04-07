@@ -270,6 +270,7 @@ sub www_editGroup {
 	}
 	my $i18n = WebGUI::International->new($session);
 	$f = WebGUI::HTMLForm->new($session);
+	$f->submit;
         $f->hidden(
 		-name => "op",
 		-value => "editGroupSave",
@@ -438,6 +439,7 @@ sub www_editGrouping {
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3) || _hasSecondaryPrivilege($session,$session->form->process("gid")));
 	my $i18n = WebGUI::International->new($session);
 	my $f = WebGUI::HTMLForm->new($session);
+	$f->submit;
         $f->hidden(
 		-name => "op",
 		-value => "editGroupingSave"
@@ -607,6 +609,7 @@ sub www_manageGroupsInGroup {
 	my $session = shift;
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3) || _hasSecondaryPrivilege($session,$session->form->process("gid")));
         my $f = WebGUI::HTMLForm->new($session);
+	$f->submit;
         $f->hidden(
 		-name => "op",
 		-value => "addGroupsToGroupSave"
@@ -676,6 +679,7 @@ sub www_manageUsersInGroup {
 	my ($userCount) = $session->db->quickArray("select count(*) from users");
 	return _submenu($session,$output) unless ($session->form->process("doit") || $userCount < 250 || $session->form->process("pn") > 1);
 	my $f = WebGUI::HTMLForm->new($session);
+	$f->submit;
 	$f->hidden(
 		-name => "gid",
 		-value => $session->form->process("gid")

@@ -122,6 +122,7 @@ sub www_createSubscriptionCodeBatch {
 	%subscriptions = $session->db->buildHash("select subscriptionId, name from subscription where deleted != 1 order by name");
 	
 	$f = WebGUI::HTMLForm->new($session);
+	$f->submit;
 	$f->hidden(
 		-name => 'op', 
 		-value => 'createSubscriptionCodeBatchSave'
@@ -312,6 +313,7 @@ sub www_editSubscription {
 	$subscriptionId = $session->form->process("sid") || 'new';
 
 	$f = WebGUI::HTMLForm->new($session);
+	$f->submit;
 	$f->hidden(
 		-name => 'op', 
 		-value => 'editSubscriptionSave'

@@ -99,6 +99,7 @@ sub www_editReplacement {
 	my $data = $session->db->getRow("replacements","replacementId",$session->form->process("replacementId"));
 	my $i18n = WebGUI::International->new($session);
 	my $f = WebGUI::HTMLForm->new($session);
+	$f->submit;
 	$f->hidden(
 		-name=>"op",
 		-value=>"editReplacementSave"
