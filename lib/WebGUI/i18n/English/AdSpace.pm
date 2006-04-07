@@ -2,6 +2,84 @@ package WebGUI::i18n::English::AdSpace;
 
 our $I18N = { 
 
+	'macro code prompt' => {
+		message => q|Use this code to place this ad space:|,
+		lastUpdated => 0,
+		context => q|this is a label for the output of macro code that the user can use to place his/her ad space|
+	},
+
+	'border color' => {
+		message => q|Border Color|,
+		lastUpdated => 0,
+		context => q|a form property in the ad editor|
+	},
+
+	'border color help' => {
+		message => q|The hex value of the color of the border to be used around this text ad.|,
+		lastUpdated => 0,
+		context => q|help for a form property in the ad editor|
+	},
+
+	'text color' => {
+		message => q|Text Color|,
+		lastUpdated => 0,
+		context => q|a form property in the ad editor|
+	},
+
+	'text color help' => {
+		message => q|The hex value of the color of the text in this text ad.|,
+		lastUpdated => 0,
+		context => q|help for a form property in the ad editor|
+	},
+
+	'background color' => {
+		message => q|Background Color|,
+		lastUpdated => 0,
+		context => q|a form property in the ad editor|
+	},
+
+	'background color help' => {
+		message => q|The hex value of the color of the background in this text ad.|,
+		lastUpdated => 0,
+		context => q|help for a form property in the ad editor|
+	},
+
+	'url' => {
+		message => q|URL|,
+		lastUpdated => 0,
+		context => q|a form property in the ad editor|
+	},
+
+	'url help' => {
+		message => q|The URL that this ad will link to. Note that this won't be used for Rich Media ads.|,
+		lastUpdated => 0,
+		context => q|help for a form property in the ad editor|
+	},
+
+	'image help' => {
+		message => q|The image file that will be displayed on each ad impression.|,
+		lastUpdated => 0,
+		context => q|help for a form property in the ad editor|
+	},
+
+	'rich help' => {
+		message => q|Place the code here that will be used to generate the ad to be displayed.|,
+		lastUpdated => 0,
+		context => q|help for a form property in the ad editor|
+	},
+
+	'priority' => {
+		message => q|Priority|,
+		lastUpdated => 0,
+		context => q|a form property in the ad editor|
+	},
+
+	'priority help' => {
+		message => q|A scaling mechanism to determine how often an ad should be displayed. The lower this number the more often it will be displayed. This really has no affect low traffic sites. If ad A has a priority of 0 and ad B has a priority of 10, and the site averages about one impression per second then ad A will be displayed roughly 100 times more frequently than ad B. Note that since this property is a scaling mechanism, it is not an exact ratio. The heavier the traffic is on the site, the more impact priority has.|,
+		lastUpdated => 0,
+		context => q|help for a form property in the ad editor|
+	},
+
 	'ad text' => {
 		message => q|Ad Text|,
 		lastUpdated => 0,

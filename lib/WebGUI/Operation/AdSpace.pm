@@ -16,6 +16,7 @@ use WebGUI::AdSpace::Ad;
 use WebGUI::AdminConsole;
 use WebGUI::International;
 use WebGUI::HTMLForm;
+use WebGUI::Storage::Image;
 
 =head1 NAME
 
@@ -46,6 +47,36 @@ sub www_clickAd {
 
 #-------------------------------------------------------------------
 
+=head2 www_deleteAd ( )
+
+Deletes an ad.
+
+=cut
+
+sub www_deleteAd {
+	my $session = shift;
+	return $session->privilege->insufficient unless ($session->user->isInGroup("pbgroup000000000000017"));
+	WebGUI::AdSpace::Ad->new($session, $session->form->param("adId"))->delete;
+	return www_editAdSpace($session);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_deleteAdSpace ( )
+
+Deletes an ad space.
+
+=cut
+
+sub www_deleteAdSpace {
+	my $session = shift;
+	return $session->privilege->insufficient unless ($session->user->isInGroup("pbgroup000000000000017"));
+	WebGUI::AdSpace->new($session, $session->form->param("adSpaceId"))->delete;
+	return www_manageAdSpaces($session);
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_editAd ( )
 
 Displays form for editing an ad.
@@ -59,7 +90,7 @@ sub www_editAd {
 	my $ac = WebGUI::AdminConsole->new($session,"adSpace");
 	my $i18n = WebGUI::International->new($session,"AdSpace");
 	my $ad = WebGUI::AdSpace::Ad->new($session,$id);
-	$ac->addSubmenuItem($session->url->page("op=editAdSpace;adSpace=".$session->form->param("adSpace")), $i18n->get("edit this ad space"));
+	$ac->addSubmenuItem($session->url->page("op=editAdSpace;adSpaceId=".$session->form->param("adSpaceId")), $i18n->get("edit this ad space"));
 	$ac->addSubmenuItem($session->url->page("op=editAdSpace"), $i18n->get("add ad space"));
 	$ac->addSubmenuItem($session->url->page("op=manageAdSpaces"), $i18n->get("manage ad spaces"));
 	my $f = WebGUI::HTMLForm->new($session);
@@ -67,7 +98,7 @@ sub www_editAd {
 	$f->hidden(name=>"adId", value=>$id);
 	$f->hidden(name=>"adSpaceId", value=> $session->form->param("adSpaceId"));
 	$f->readOnly(label=>$i18n->get("ad id"), value=>$id);
-	$f->hidden(name=>"op", value=>"editAdSpaceSave");
+	$f->hidden(name=>"op", value=>"editAdSave");
 	my $value = $ad->get("isActive") if defined $ad;
 	$f->yesNo(
 		name=>"isActive",
@@ -81,6 +112,20 @@ sub www_editAd {
 		value=>$value,
 		hoverHelp => $i18n->get("title help"),
 		label=>$i18n->get("title")
+		);
+	my $value = $ad->get("url") if defined $ad;
+	$f->url(
+		name=>"url",
+		value=>$value,
+		hoverHelp => $i18n->get("url help"),
+		label=>$i18n->get("url")
+		);
+	my $value = $ad->get("priority") if defined $ad;
+	$f->integer(
+		name=>"priority",
+		value=>$value,
+		hoverHelp => $i18n->get("priority help"),
+		label=>$i18n->get("priority"),
 		);
 	my $value = $ad->get("impressionsBought") if defined $ad;
 	$f->integer(
@@ -108,13 +153,14 @@ sub www_editAd {
 			rich=>$i18n->get("rich"),
 			},
 		defaultValue=>"text",
-		hoverHelp => $i18n->get("top help"),
-		label=>$i18n->get("title")
+		hoverHelp => $i18n->get("type help"),
+		label=>$i18n->get("type")
 		);
 	$f->fieldSetStart($i18n->get("text"));
 	my $value = $ad->get("adText") if defined $ad;
 	$f->text(
 		name=>"adText",
+		size=>60,
 		value=>$value,
 		hoverHelp => $i18n->get("ad text help"),
 		label=>$i18n->get("ad text")
@@ -125,7 +171,7 @@ sub www_editAd {
 		value=>$value,
 		defaultValue=>"#000000",
 		hoverHelp => $i18n->get("border color help"),
-		label=>$i18n->get("border color text")
+		label=>$i18n->get("border color")
 		);
 	my $value = $ad->get("textColor") if defined $ad;
 	$f->color(
@@ -133,7 +179,7 @@ sub www_editAd {
 		value=>$value,
 		defaultValue=>"#000000",
 		hoverHelp => $i18n->get("text color help"),
-		label=>$i18n->get("text color text")
+		label=>$i18n->get("text color")
 		);
 	my $value = $ad->get("backgroundColor") if defined $ad;
 	$f->color(
@@ -141,12 +187,14 @@ sub www_editAd {
 		value=>$value,
 		defaultValue=>"#ffffff",
 		hoverHelp => $i18n->get("background color help"),
-		label=>$i18n->get("background color text")
+		label=>$i18n->get("background color")
 		);
 	$f->fieldSetEnd;
 	$f->fieldSetStart($i18n->get("image"));
 	$f->image(
-		label=>$i18n->get("image")
+		label=>$i18n->get("image"),
+		hoverHelp=>$i18n->get("image help"),
+		name=>"image"
 		);
 	$f->fieldSetEnd;
 	$f->fieldSetStart($i18n->get("rich"));
@@ -164,6 +212,46 @@ sub www_editAd {
 
 #-------------------------------------------------------------------
 
+=head2 www_editAdSave ( )
+
+The save method for www_editAd()
+
+=cut
+
+sub www_editAdSave {
+	my $session = shift;
+	return $session->privilege->insufficient unless ($session->user->isInGroup("pbgroup000000000000017"));
+	my %properties = (
+		type=>$session->form->process("type", "selectBox"),	
+		url=>$session->form->process("url", "url"),	
+		isActive=>$session->form->process("isActive", "yesNo"),	
+		textColor=>$session->form->process("textColor", "color"),	
+		backgroundColor=>$session->form->process("backgroundColor", "color"),	
+		borderColor=>$session->form->process("borderColor", "color"),	
+		title=>$session->form->process("title", "text"),	
+		adText=>$session->form->process("adText", "text"),	
+		richMedia=>$session->form->process("richMedia", "codearea"),	
+		priority=>$session->form->process("priority", "integer"),	
+		impressionsBought=>$session->form->process("impressionsBought", "integer"),	
+		clicksBought=>$session->form->process("clicksBought", "integer"),
+		);
+	my $storageId = $session->form->process("image","image");
+	$properties{storageId} = $storageId if (defined $storageId);
+	if ($session->form->param("adId") eq "new") {
+		WebGUI::AdSpace::Ad->create($session, $session->form->param("adSpaceId"), \%properties);
+	} else {
+		my $ad = WebGUI::AdSpace::Ad->new($session, $session->form->param("adId"));
+		if (defined $storageId && $ad->get("storageId")) {
+			WebGUI::Storage::Image->get($session, $ad->get("storageId"))->delete;
+		}
+		$ad->set(\%properties);
+	}
+	return www_editAdSpace($session);
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 www_editAdSpace ( )
 
 Edit or add an ad space form.
@@ -177,9 +265,10 @@ sub www_editAdSpace {
 	my $ac = WebGUI::AdminConsole->new($session,"adSpace");
 	my $i18n = WebGUI::International->new($session,"AdSpace");
 	my $adSpace = WebGUI::AdSpace->new($session, $id);
-	$ac->addSubmenuItem($session->url->page("op=editAd"), $i18n->get("add an ad")) if defined $adSpace;
+	$ac->addSubmenuItem($session->url->page("op=editAd;adSpaceId=".$id), $i18n->get("add an ad")) if defined $adSpace;
 	$ac->addSubmenuItem($session->url->page("op=manageAdSpaces"), $i18n->get("manage ad spaces"));
 	my $f = WebGUI::HTMLForm->new($session);
+	$f->submit;
 	$f->hidden(name=>"adSpaceId", value=>$id);
 	$f->readOnly(label=>$i18n->get("ad space id"), value=>$id);
 	$f->hidden(name=>"op", value=>"editAdSpaceSave");
@@ -223,12 +312,15 @@ sub www_editAdSpace {
 	$f->submit;
 	my $ads = "";
 	if (defined $adSpace) {
-		my $rs = $session->db->read("select adId, title from advertisement where adId=?",[$id]);
+		$ads .= '<p style="padding: 10px; line-height: 30px; text-align: center; border: 3px outset black; width: 250px; float: right;">'.$i18n->get("macro code prompt").'<br /><b>&#94;AdSpace('.$adSpace->get("name").');</b></p>'
+			."<p>";
+		my $rs = $session->db->read("select adId, title from advertisement where adSpaceId=?",[$id]);
 		while (my ($adId, $title) = $rs->array) {
 			$ads .= $session->icon->delete("op=deleteAd;adSpaceId=".$id.";adId=".$adId, undef, $i18n->get("confirm ad delete"))
 				.$session->icon->edit("op=editAd;adSpaceId=".$id.";adId=".$adId)
 				.' '.$title.'<br />';
 		}
+		$ads .= "</p>";
 	}
 	$ac->render($f->print.$ads, $i18n->get("edit ad space"));
 }
