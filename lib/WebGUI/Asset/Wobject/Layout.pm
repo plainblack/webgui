@@ -15,6 +15,7 @@ package WebGUI::Asset::Wobject::Layout;
 =cut
 
 use strict;
+use WebGUI::AdSpace;
 use WebGUI::Asset::Wobject;
 use WebGUI::Utility;
 use WebGUI::Cache;
@@ -278,12 +279,16 @@ sub www_view {
 			$cache->set($out, 60);
 			$self->session->stow->delete("cacheFixOverride");
 		}
+		# keep those ads rotating
 		while ($out =~ /(\[AD\:(\w+)\])/gs) {
-			my $ad = $1;
-			my $macro = "^AdSpace(".$2.");";
-			$out =~ s/\Q$ad/$macro/ges;
+			my $code = $1;
+			my $adSpace = WebGUI::AdSpace->newByName($self->session, $2);
+			my $ad = $adSpace->displayImpression if (defined $adSpace);
+			$out =~ s/\Q$code/$ad/ges;
 		}
-		return $out;	
+		$self->session->http->getHeader;	
+		$self->session->output->print($out, 1);
+		return "chunked";	
 	}
 	$self->{_viewPrintOverride} = 1; # we do this to make it output each easset as it goes, rather than waiting until the end
 	return $self->SUPER::www_view;

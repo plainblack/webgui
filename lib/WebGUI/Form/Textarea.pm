@@ -54,10 +54,6 @@ The number of rows (in characters) tall the box should be. Defaults to the setti
 
 The number of columns (in characters) wide the box should be. Defaults to the setting textAreaCols or 50 if that's not specified.
 
-=head4 wrap
-
-The style of wrapping this form should use. Defaults to "virtual". Other possible values are "off" and "physical".
-
 =head4 profileEnabled
 
 Flag that tells the User Profile system that this is a valid form element in a User Profile
@@ -79,9 +75,6 @@ sub definition {
 		columns=>{
 			defaultValue=> $session->setting->get("textAreaCols") || 50
 			},
-		wrap=>{
-			defaultValue=>"virtual"
-			},
 		profileEnabled=>{
 			defaultValue=>1
 			},
@@ -100,8 +93,7 @@ Renders an input tag of type text.
 sub toHtml {
 	my $self = shift;
  	my $value = $self->fixMacros($self->fixTags($self->fixSpecialCharacters($self->get("value"))));
-	return '<textarea id="'.$self->get('id').'" name="'.$self->get("name").'" cols="'.$self->get("columns").'" rows="'.$self->get("rows").'" wrap="'.
-                $self->get("wrap").'" '.$self->get("extras").'>'.$value.'</textarea>';
+	return '<textarea id="'.$self->get('id').'" name="'.$self->get("name").'" cols="'.$self->get("columns").'" rows="'.$self->get("rows").'" '.$self->get("extras").'>'.$value.'</textarea>';
 }
 
 

@@ -107,7 +107,9 @@ sub contentHandler {
 		$session->http->getHeader();
 		unless ($session->http->isRedirect()) {
 			$session->output->print($output);
-			$session->output->goodNightAndGoodLuck();
+			if ($session->errorHandler->canShowDebug()) {
+				$session->output->print($session->errorHandler->showDebug(),1);
+			}
 		}
 		WebGUI::Affiliate::grabReferral($session);	# process affilliate tracking request
 	}

@@ -558,9 +558,9 @@ sub www_view {
 	$self->prepareView;
 	my $style = $self->processStyle("~~~");
 	my ($head, $foot) = split("~~~",$style);
-	$self->session->output->print($head);
+	$self->session->output->print($head, 1);
 	$self->session->output->print($self->view);
-	$self->session->output->print($foot);
+	$self->session->output->print($foot, 1);
 	return "chunked";
 }
 

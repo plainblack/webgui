@@ -1184,7 +1184,7 @@ sub www_viewDetail {
 	$f->submit(
 		-extras=>'class="ratingForm"',
 		-value=>"Rate",
-		-label=>'<a href="'.$self->formatURL("rate",$listingId).'">'.$i18n->get('show ratings').'</A>'
+		-label=>'<a href="'.$self->formatURL("rate",$listingId).'">'.$i18n->get('show ratings').'</a>'
 		);
 	if ($hasRated) {
 		$var{'ratings'} = $ratingsTable;

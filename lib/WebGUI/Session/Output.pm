@@ -85,7 +85,7 @@ sub new {
 
 #-------------------------------------------------------------------
 
-=head2 print ( content ) 
+=head2 print ( content, skipMacros ) 
 
 Outputs content to either the web server or standard out, depending on which is available.
 
@@ -93,12 +93,17 @@ Outputs content to either the web server or standard out, depending on which is 
 
 The content to output.
 
+=head3 skipMacros
+
+A boolean indicating whether to skip macro processing on this content.
+
 =cut
 
 sub print {
 	my $self = shift;
 	my $content = shift;
-	WebGUI::Macro::process($self->session, \$content);
+	my $skipMacros = shift;
+	WebGUI::Macro::process($self->session, \$content) unless $skipMacros;
 	print $content;
 }
 
