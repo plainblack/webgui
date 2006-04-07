@@ -232,7 +232,7 @@ sub new {
 				username=>$session->config->get("dbuser"),
 				identifier=>$session->config->get("dbpass"),
 				title=>"WebGUI Database",
-				allowedKeywords=>"select\ndescribe\ndesc\nshow",
+				allowedKeywords=>"select\ndescribe\ndesc\nshow\ncall",
 				);
 		} else {
 			%databaseLink = $session->db->quickHash("select * from databaseLink where databaseLinkId=".$session->db->quote($databaseLinkId));
