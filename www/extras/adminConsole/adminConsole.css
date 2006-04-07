@@ -1,7 +1,7 @@
 body{
 	background-image: url(bg.jpg);
 	background-repeat: repeat-x;
-	border: 5px #515A6A solid; 
+	border: 5px #214A7A solid; 
 	margin:0px;
 	padding:0px;
 	min-height: 700px;
@@ -49,9 +49,8 @@ th {
  	border: 1px solid #D7D7D7;
 	margin: 65px 190px 50px 10px;
 	padding: 15px;
-	/*-moz-border-radius: 10px;*/
-	background-image: url(bg_console.gif);
-	background-repeat: repeat-x;
+	-moz-border-radius: 10px;
+	background-color: #fafafa;
 	min-height: 400px;
 	width: 75%;
 }
@@ -68,40 +67,38 @@ th {
 	top: 65px;
 	right: 10px;
 	width: 180px;
-/* 	border: 1px solid #ddd; 
-	padding: 5px; */
 	font-family: helvetica, arial;
 	font-size: 12px;
 	z-index: 1000;
-	/* background-image: url(bg_console.gif);
-	background-repeat: repeat-x; */
+	opacity: 0.6;
+}
+
+.adminConsoleMenu:hover {
+	opacity: 1.0;
 }
 
 .adminConsoleMainMenu {
  	border: 1px solid #D7D7D7;
 	padding: 5px;
 	margin: 5px;
-	/*-moz-border-radius: 10px;*/
-	background-image: url(bg_console.gif);
-	background-repeat: repeat-x;
+	-moz-border-radius: 5px;
+	background-color: #fafafa;
 }
 
 .adminConsoleSubmenu {
  	border: 1px solid #D7D7D7;
 	padding: 5px;
 	margin: 5px;
-	/*-moz-border-radius: 10px;*/
-	background-image: url(bg_console.gif);
-	background-repeat: repeat-x;
+	-moz-border-radius: 5px;
+	background-color: #fafafa;
 }
 
 .adminConsoleUtilityMenu {
  	border: 1px solid #D7D7D7;
 	padding: 5px;
 	margin: 5px;
-	/*-moz-border-radius: 10px;*/
-	background-image: url(bg_console.gif);
-	background-repeat: repeat-x;
+	-moz-border-radius: 5px;
+	background-color: #fafafa;
 }
 
 .adminConsoleHidden {
@@ -177,7 +174,7 @@ th {
    	border-top: 1px solid #dddddd;
    	border-left: 1px solid #dddddd;
    	background-color: #ffffff; 
-	/*-moz-border-radius: 10px;*/
+	-moz-border-radius: 10px;
 }
 
 div.tabs {
@@ -207,7 +204,7 @@ div.tabs {
 
 a{
 	font-family:  "Lucida Grande", "Lucida Sans Unicode", Tahoma, Verdana, Arial, sans-serif;
-	color: #2F5CAC;
+	color: #0f3ccc;
 	text-decoration: none;
 }
 
