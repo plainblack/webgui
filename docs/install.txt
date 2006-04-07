@@ -36,7 +36,9 @@ PerlRequire /data/WebGUI/sbin/preload.perl
 
 5. Extract WebGUI into your webroot.
 
-6. Run the following Database commands. (You should modify the
+6. Start MySQL.
+
+7. Run the following Database commands. (You should modify the
    commands to match your database, username, and password.)
 
    mysql -e "create database WebGUI"
@@ -44,9 +46,9 @@ PerlRequire /data/WebGUI/sbin/preload.perl
    mysql -e "flush privileges"
    mysql -uwebgui -ppassword WebGUI < docs/create.sql
 
-7. Edit "etc/WebGUI.conf" to match your DB settings and log directory.
+8. Edit "etc/WebGUI.conf" to match your DB settings and log directory.
 
-8. Run the following command from your WebGUI/sbin directory to install
+9. Run the following command from your WebGUI/sbin directory to install
    the required perl modules and determine whether you've configured 
    your system correctly.
 
@@ -54,6 +56,13 @@ PerlRequire /data/WebGUI/sbin/preload.perl
 
    If it returns all "OK" then you're done. 
 
-9. Browse to your site. You'll be guided through a few quick questions
+10. Start Apache.
+
+11. Start Spectre.
+
+	cd /data/WebGUI/sbin
+	perl spectre.pl --daemon
+
+12. Browse to your site. You'll be guided through a few quick questions
    to setup an admin account.
 

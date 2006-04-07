@@ -265,31 +265,23 @@ sub www_setContentPositions {
 #-------------------------------------------------------------------
 sub www_view {
 	my $self = shift;
-	# slashdot / burst protection
+	# slashdot / burst protection hack
 	if ($self->session->var->get("userId") eq "1" && $self->session->form->param("func") eq "" && $self->session->form->param("op") eq "") { 
-		unless ($self->canView) {
-			if ($self->get("state") eq "published") { # no privileges, make em log in
-				return $self->session->privilege->noAccess();
-			} elsif ($self->session->var->get("adminOn") && $self->get("state") =~ /^trash/) { # show em trash
-				$self->session->http->setRedirect($self->getUrl("func=manageTrash"));
-				return undef;
-			} elsif ($self->session->var->get("adminOn") && $self->get("state") =~ /^clipboard/) { # show em clipboard
-				$self->session->http->setRedirect($self->getUrl("func=manageClipboard"));
-				return undef;
-			} else { # tell em it doesn't exist anymore
-				$self->session->http->setStatus("410");
-				return WebGUI::Asset->getNotFound($self->session)->www_view;
-			}
-		}
-		$self->logView();
-		# must find a way to do this next line better
-		$self->session->http->setCookie("wgSession",$self->session->var->{_var}{sessionId}) unless $self->session->var->{_var}{sessionId} eq $self->session->http->getCookies->{"wgSession"};
+		my $check = $self->checkView;
+		return $check if (defined $check);
 		my $cache = WebGUI::Cache->new($self->session, "view_".$self->getId);
 		my $out = $cache->get if defined $cache;
 		unless ($out) {
 			$self->prepareView;
+			$self->session->stow->set("cacheFixOverride", 1);
 			$out = $self->processStyle($self->view);
 			$cache->set($out, 60);
+			$self->session->stow->delete("cacheFixOverride");
+		}
+		while ($out =~ /(\[AD\:(\w+)\])/gs) {
+			my $ad = $1;
+			my $macro = "^AdSpace(".$2.");";
+			$out =~ s/\Q$ad/$macro/ges;
 		}
 		return $out;	
 	}

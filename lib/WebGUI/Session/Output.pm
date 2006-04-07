@@ -50,6 +50,20 @@ sub DESTROY {
 }
 
 
+#-------------------------------------------------------------------
+
+=head2 goodNightAndGoodLuck ( )
+
+This should be called at the end of all possible output HTML output. It handles printing out debug and other maintenance tasks.
+
+=cut
+
+sub goodNightAndGoodLuck {
+	my $self = shift;
+	if ($self->session->errorHandler->canShowDebug()) {
+		print $self->session->errorHandler->showDebug();
+	}
+}
 
 #-------------------------------------------------------------------
 

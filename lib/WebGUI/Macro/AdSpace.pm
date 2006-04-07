@@ -33,6 +33,9 @@ The unique name of an Ad Space.
 sub process {
 	my $session = shift;
 	my $name = shift;
+	if ($session->stow->get("cacheFixOverride")) {
+		return "[AD:".$name."]";
+	}
 	my $adSpace = WebGUI::AdSpace->newByName($session, $name);
 	return undef unless defined $adSpace;
 	return $adSpace->displayImpression;

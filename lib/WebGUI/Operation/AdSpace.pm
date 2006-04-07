@@ -264,11 +264,17 @@ Edit or add an ad space form.
 
 sub www_editAdSpace {
 	my $session = shift;
+	my $adSpace = shift;
 	return $session->privilege->insufficient unless ($session->user->isInGroup("pbgroup000000000000017"));
-	my $id = $session->form->param("adSpaceId") || "new";
+	my $id;
+	if (defined $adSpace) {
+		$id = $adSpace->getId;
+	} else {
+		$id = $session->form->param("adSpaceId") || "new";
+		$adSpace = WebGUI::AdSpace->new($session, $id);
+	}
 	my $ac = WebGUI::AdminConsole->new($session,"adSpace");
 	my $i18n = WebGUI::International->new($session,"AdSpace");
-	my $adSpace = WebGUI::AdSpace->new($session, $id);
 	$ac->addSubmenuItem($session->url->page("op=editAd;adSpaceId=".$id), $i18n->get("add an ad")) if defined $adSpace;
 	$ac->addSubmenuItem($session->url->page("op=manageAdSpaces"), $i18n->get("manage ad spaces"));
 	my $f = WebGUI::HTMLForm->new($session);
@@ -349,7 +355,8 @@ sub www_editAdSpaceSave {
 		height=>$session->form->process("height", "integer"),	
 		);
 	if ($session->form->param("adSpaceId") eq "new") {
-		WebGUI::AdSpace->create($session, \%properties);
+		my $adSpace = WebGUI::AdSpace->create($session, \%properties);
+		return www_editAdSpace($session, $adSpace);
 	} else {
 		my $adSpace = WebGUI::AdSpace->new($session, $session->form->param("adSpaceId"));
 		$adSpace->set(\%properties);

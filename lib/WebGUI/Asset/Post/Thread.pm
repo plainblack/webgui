@@ -1033,22 +1033,8 @@ Renders self->view based upon current style, subject to timeouts. Returns Privil
 sub www_view {
         my $self = shift;
 	return $self->session->privilege->noAccess() unless $self->canView;
-        unless ($self->canView) {
-                if ($self->get("state") eq "published") { # no privileges, make em log in
-                        return $self->session->privilege->noAccess();
-                } elsif ($self->session->var->get("adminOn") && $self->get("state") =~ /^trash/) { # show em trash
-                        $self->session->http->setRedirect($self->getUrl("func=manageTrash"));
-                        return undef;
-                } elsif ($self->session->var->get("adminOn") && $self->get("state") =~ /^clipboard/) { # show em clipboard
-                        $self->session->http->setRedirect($self->getUrl("func=manageClipboard"));
-                        return undef;
-                } else { # tell em it doesn't exist anymore
-                        $self->session->http->setStatus("410");
-                        return WebGUI::Asset->getNotFound($self->session)->www_view;
-                }
-        }
-        # must find a way to do this next line better
-        $self->session->http->setCookie("wgSession",$self->session->var->{_var}{sessionId}) unless $self->session->var->{_var}{sessionId} eq $self->session->http->getCookies->{"wgSession"};
+	my $check = $self->checkView;
+	return $check if (defined $check);
         $self->session->http->getHeader;    
         $self->prepareView;
         my $style = $self->getParent->processStyle("~~~");

@@ -140,6 +140,36 @@ sub canView {
 
 #-------------------------------------------------------------------
 
+=head2 checkView ( )
+
+Returns error messages if a user can't view due to publishing problems, otherwise it sets the cookie and returns undef. This is sort of a hack until we find something better.
+
+=cut
+
+sub checkView {
+	my $self = shift;
+	unless ($self->canView) {
+		if ($self->get("state") eq "published") { # no privileges, make em log in
+			return $self->session->privilege->noAccess();
+		} elsif ($self->session->var->get("adminOn") && $self->get("state") =~ /^trash/) { # show em trash
+			$self->session->http->setRedirect($self->getUrl("func=manageTrash"));
+			return undef;
+		} elsif ($self->session->var->get("adminOn") && $self->get("state") =~ /^clipboard/) { # show em clipboard
+			$self->session->http->setRedirect($self->getUrl("func=manageClipboard"));
+			return undef;
+		} else { # tell em it doesn't exist anymore
+			$self->session->http->setStatus("410");
+			return WebGUI::Asset->getNotFound($self->session)->www_view;
+		}
+	}
+	$self->logView();
+	# must find a way to do this next line better
+	$self->session->http->setCookie("wgSession",$self->session->var->{_var}{sessionId}) unless $self->session->var->{_var}{sessionId} eq $self->session->http->getCookies->{"wgSession"};
+	return undef;
+}
+
+#-------------------------------------------------------------------
+
 =head2 definition ( [ definition ] )
 
 Basic definition of an Asset. Properties, default values. Returns an array reference containing tableName,className,properties

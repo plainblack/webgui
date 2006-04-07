@@ -266,7 +266,11 @@ This method sets the tags from the head block parameter of the template into the
 sub prepare {
 	my $self = shift;
 	$self->{_prepared} = 1;
-	$self->session->style->setRawHeadTags($self->get("headBlock"));
+	if ($self->session->style->sent) {
+		$self->session->output->print($self->get("headBlock"));
+	} else {
+		$self->session->style->setRawHeadTags($self->get("headBlock"));
+	}
 }
 
 

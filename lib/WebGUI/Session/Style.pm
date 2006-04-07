@@ -166,6 +166,7 @@ The unique identifier for the template to retrieve.
 
 sub process {
 	my $self = shift;
+	$self->sent(1);
 	my %var;
 	$var{'body.content'} = shift;
 	my $templateId = shift;
@@ -230,6 +231,28 @@ Returns a reference to the current session.
 sub session {
 	my $self = shift;
 	return $self->{_session};
+}
+
+#-------------------------------------------------------------------
+
+=head2 sent ( boolean )
+
+Returns a boolean indicating whether the style has already been sent. This is important when trying to set things to the HTML head block.
+
+=head3 boolean
+
+Set the value.
+
+=cut
+
+sub sent {
+	my $self = shift;
+	my $boolean = shift;
+	if (defined $boolean) {
+		$self->session->stow->set("styleHeadSent",$boolean);
+		return $boolean;
+	}
+	return $self->session->stow->get("styleHeadSent");
 }
 
 #-------------------------------------------------------------------

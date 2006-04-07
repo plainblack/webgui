@@ -105,7 +105,10 @@ sub contentHandler {
 		}
 		$session->http->setCookie("wgSession",$session->var->{_var}{sessionId}) unless $session->var->{_var}{sessionId} eq $session->http->getCookies->{"wgSession"};
 		$session->http->getHeader();
-		$session->output->print($output) unless ($session->http->isRedirect());
+		unless ($session->http->isRedirect()) {
+			$session->output->print($output);
+			$session->output->goodNightAndGoodLuck();
+		}
 		WebGUI::Affiliate::grabReferral($session);	# process affilliate tracking request
 	}
 	$session->close;
@@ -194,9 +197,6 @@ sub page {
 	}
 	if ($output eq "chunked") {
 		$output = undef;
-	}
-	if ($session->errorHandler->canShowDebug()) {
-		$output .= $session->errorHandler->showDebug();
 	}
 	return $output;
 }
