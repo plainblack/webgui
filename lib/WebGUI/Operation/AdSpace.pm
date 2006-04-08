@@ -321,18 +321,18 @@ sub www_editAdSpace {
 		);
 	$f->submit;
 	my $ads = "";
+	my $code = "";
 	if (defined $adSpace) {
-		$ads .= '<p style="padding: 10px; line-height: 30px; text-align: center; border: 3px outset black; width: 250px; float: right;">'.$i18n->get("macro code prompt").'<br /><b>&#94;AdSpace('.$adSpace->get("name").');</b></p>'
-			."<p>";
-		my $rs = $session->db->read("select adId, title from advertisement where adSpaceId=?",[$id]);
-		while (my ($adId, $title) = $rs->array) {
-			$ads .= $session->icon->delete("op=deleteAd;adSpaceId=".$id.";adId=".$adId, undef, $i18n->get("confirm ad delete"))
+		$code = '<p style="padding: 5px; line-height: 20px; text-align: center; border: 3px outset black; font-family: helvetica; font-size: 11px; width: 200px; float: right;">'.$i18n->get("macro code prompt").'<br /><b>&#94;AdSpace('.$adSpace->get("name").');</b></p>';
+		my $rs = $session->db->read("select adId, title, renderedAd from advertisement where adSpaceId=?",[$id]);
+		while (my ($adId, $title, $ad) = $rs->array) {
+			$ads .= '<div style="margin: 15px; float: left;">'.$session->icon->delete("op=deleteAd;adSpaceId=".$id.";adId=".$adId, undef, $i18n->get("confirm ad delete"))
 				.$session->icon->edit("op=editAd;adSpaceId=".$id.";adId=".$adId)
-				.' '.$title.'<br />';
+				.' '.$title.'<br />'.$ad.'</div>';
 		}
-		$ads .= "</p>";
+		$ads .= '<div style="clear: both;"></div>';
 	}
-	$ac->render($f->print.$ads, $i18n->get("edit ad space"));
+	$ac->render($code.$f->print.$ads, $i18n->get("edit ad space"));
 }
 
 
@@ -380,10 +380,14 @@ sub www_manageAdSpaces {
 	my $output = "";
 	my $rs = $session->db->read("select adSpaceId, title from adSpace order by title");
 	while (my ($id, $title) = $rs->array) {
-		$output .= $session->icon->delete("op=deleteAdSpace;adSpaceId=".$id, undef, $i18n->get("confirm ad space delete"))
+		$output .= '<div style="float: left; margin: 10px;">'
+			.$session->icon->delete("op=deleteAdSpace;adSpaceId=".$id, undef, $i18n->get("confirm ad space delete"))
 			.$session->icon->edit("op=editAdSpace;adSpaceId=".$id)
-			.' '.$title.'<br />';
+			.' '.$title.'<br />'
+			.WebGUI::AdSpace->new($session, $id)->displayImpression(1)
+			.'</div>';
 	}	
+	$output .= '<div style="clear: both;"></div>';
 	$ac->addSubmenuItem($session->url->page("op=editAdSpace"), $i18n->get("add ad space"));
 	return $ac->render($output);
 }

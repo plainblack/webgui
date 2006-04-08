@@ -115,20 +115,28 @@ sub DESTROY {
 
 #-------------------------------------------------------------------
 
-=head2 displayImpression ()
+=head2 displayImpression ( dontCount )
 
 Finds out what the next ad is to display, increments it's impression counter, and returns the HTML to display it.
+
+=head3 dontCount
+
+A boolean that tells the ad system not to count this impression if true.
 
 =cut
 
 sub displayImpression {
 	my $self = shift;
+	my $dontCount = shift;
 	my ($id, $ad, $priority, $clicks, $clicksBought, $impressions, $impressionsBought) = $self->session->db->quickArray("select adId, renderedAd, priority, clicks, clicksBought, impressions, impressionsBought from advertisement where adSpaceId=? and isActive=1 order by nextInPriority asc limit 1",[$self->getId]);
-	my $isActive = 1;
-	if ($clicks >= $clicksBought && $impressions >= $impressionsBought) {
-		$isActive = 0;
+	unless ($dontCount) {
+		my $isActive = 1;
+		if ($clicks >= $clicksBought && $impressions >= $impressionsBought) {
+			$isActive = 0;
+		}
+		$self->session->db->write("update advertisement set impressions=impressions+1, nextInPriority=?, isActive=? where adId=?", 
+			[time()+$priority, $isActive, $id]);
 	}
-	$self->session->db->write("update advertisement set impressions=impressions+1, nextInPriority=?, isActive=? where adId=?", [time()+$priority, $isActive, $id]);
 	return $ad;
 }
 
