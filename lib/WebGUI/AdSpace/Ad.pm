@@ -254,9 +254,9 @@ sub set {
 	my $adSpace = WebGUI::AdSpace->new($self->session, $self->get("adSpaceId"));
 	if ($self->get("type") eq "text") {
 		$self->{_properties}{renderedAd} = '<a href="'.$self->session->url->gateway(undef, "op=clickAd;id=".$self->getId)
-			.'"><div style="overflow: hidden; width: '.$adSpace->get("width")
-			.'px; height: '.$adSpace->get("height").'px; color: '
-			.$self->get("textColor")
+			.'" style="text-decoration: none;"><div style="overflow: hidden; font-size: 13px; font-weight: normal; width: '
+			.($adSpace->get("width") - 2)
+			.'px; padding: 3px; height: '.($adSpace->get("height") - 2).'px; color: '.$self->get("textColor")
 			.'; background-color: '.$self->get("backgroundColor")
 			.'; border: 1px solid '.$self->get("borderColor").';"><b>'
 			.$self->get("title").'</b><br />'.$self->get("adText").'</div></a>';
