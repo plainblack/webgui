@@ -94,9 +94,13 @@ sub execute {
 	$self->session->user({user=>$user});
 	my $message = $self->get("message");
 	WebGUI::Macro::process(\$message);
+	my $to = $self->get("to");
+	WebGUI::Macro::process(\$to);
+	my $subject = $self->get("subject");
+	WebGUI::Macro::process(\$subject);
 	my $mail = WebGUI::Mail::Send->create($self->session, {
-		to=>$self->get("to"),
-		subject=>$self->get("subject")
+		to=>$to,
+		subject=>$subject
 		});
 	$mail->addText($message);
 	$mail->addFooter;
