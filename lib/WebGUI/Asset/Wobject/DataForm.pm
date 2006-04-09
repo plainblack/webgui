@@ -650,6 +650,7 @@ sub sendEmail {
 	if ($to =~ /\@/) {
 		my $mail = WebGUI::Mail::Send->create($self->session,{to=>$to, subject=>$subject, cc=>$cc, from=>$from, bcc=>$bcc});
 		$mail->addText($message);
+		$mail->addFooter;
 		$mail->queue;
 	} else {
                 my ($userId) = $self->session->db->quickArray("select userId from users where username=".$self->session->db->quote($to));
@@ -670,13 +671,14 @@ sub sendEmail {
 				});
                         my $mail =  WebGUI::Mail::Send->create($self->session,{to=>$cc, subject=>$subject, from=>$from});
 			if ($cc) {
-                               
 				$mail->addText($message);
+				$mail->addFooter;
 				$mail->queue;
                         }
                         if ($bcc) {
                                 WebGUI::Mail::Send->create($self->session, {to=>$bcc, subject=>$subject, from=>$from});
 				$mail->addText($message);
+				$mail->addFooter;
 				$mail->queue;
                         }
                 }

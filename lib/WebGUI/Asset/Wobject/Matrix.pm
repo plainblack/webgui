@@ -1058,6 +1058,7 @@ sub www_viewDetail {
 			my $u = WebGUI::User->new($self->session, $listing->{maintainerId});
 			my $mail = WebGUI::Mail::Send->create($self->session, {to=>$u->profileField("email"),subject=>$listing->{productName}." - ".$self->session->form->process("subject"),from=>$self->session->form->process("from")});
 			$mail->addText($self->session->form->process("body"));
+			$mail->addFooter;
 			$mail->queue;
 		}
 		$var{'email.wasSent'} = 1;

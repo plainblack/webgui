@@ -239,6 +239,7 @@ sub createAccountSave {
 			subject=>$i18n->get('email address validation email subject','AuthWebGUI')
 			});
 		$mail->addText($i18n->get('email address validation email body','AuthWebGUI')."\n\n".$self->session->url->getSiteURL().$self->session->url->page("op=auth;method=validateEmail;key=".$key));
+		$mail->addFooter;
 		$mail->send;
 		$self->user->status("Deactivated");
 		$self->session->var->end($self->session->var->get("sessionId"));
@@ -569,6 +570,7 @@ sub recoverPasswordFinish {
 	   $message .= $i18n->get(51).": ".$password."\n";
 	   my $mail = WebGUI::Mail::Send->new($self->session, {to=>$self->session->form->process("email"),subject=>$i18n->get(74)});
 		$mail->addText($message);
+		$mail->addFooter;
 		$mail->send;
 	   $flag++;
 	}

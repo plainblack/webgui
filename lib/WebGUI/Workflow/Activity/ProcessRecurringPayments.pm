@@ -130,6 +130,7 @@ sub execute {
 		subject=>'Daily recurring payments report'
 		});
 	$mail->addText($message);
+	$mail->addFooter;
 	return $mail->send ? $self->COMPLETE : $self->ERROR;
 }
 

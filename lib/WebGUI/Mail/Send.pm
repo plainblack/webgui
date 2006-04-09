@@ -78,6 +78,18 @@ sub addAttachment {
 		);
 }
 
+#-------------------------------------------------------------------
+
+=head2 addFooter ( )
+
+Adds the mail footer as set by the site admin to the end of this message.
+
+=cut
+
+sub addFooter {
+	my $self = shift;
+	$self->addText($self->session->setting->get("mailFooter"));
+}
 
 #-------------------------------------------------------------------
 

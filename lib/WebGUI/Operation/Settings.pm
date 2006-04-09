@@ -180,18 +180,6 @@ sub www_editSettings {
 		-hoverHelp=>$i18n->get('824 description'),
 		-value=>$session->setting->get("mailFooter")
 		);
-        $tabform->getTab("messaging")->yesNo(
-		-name=>"alertOnNewUser",
-		-label=>$i18n->get(534),
-		-hoverHelp=>$i18n->get('534 description'),
-		-value=>$session->setting->get("alertOnNewUser")
-		);
-        $tabform->getTab("messaging")->group(
-		-name=>"onNewUserAlertGroup",
-		-label=>$i18n->get(535),
-		-hoverHelp=>$i18n->get('535 description'),
-		-value=>[$session->setting->get("onNewUserAlertGroup")]
-	);
 	$tabform->getTab("misc")->yesNo(
 		-name=>"preventProxyCache",
 		-label=>$i18n->get(400),

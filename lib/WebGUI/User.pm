@@ -30,7 +30,7 @@ This package provides an object-oriented way of managing WebGUI users as well as
 =head1 SYNOPSIS
 
  use WebGUI::User;
- $u = WebGUI::User->new($session,3); or  $f = WebGUI::User->new($session,"new");
+ $u = WebGUI::User->new($session,3); or  $u = WebGUI::User->new($session,"new"); or $u = WebGUI::User->newByEmail($session, $email);
 
  $authMethod =		$u->authMethod("WebGUI");
  $dateCreated = 	$u->dateCreated;
@@ -468,6 +468,33 @@ sub new {
 	$userData->{_session} = $session;
 	bless $userData, $class;
 }
+
+#-------------------------------------------------------------------
+
+=head2 newByEmail ( session, email )
+
+Instanciates a user by email address. Returns undef if the email address could not be found.
+
+=head3 session
+
+A reference to the current session.
+
+=head3 email
+
+The email address to search for.
+
+=cut
+
+sub newByEmail {
+	my $class = shift;
+	my $session = shift;
+	my $email = shift;
+	my ($id) = $session->dbSlave->quickArray("select userId from userProfileData where fieldName='mail' and fieldData=?",[$email]);
+	my $user = $class->new($session, $id);
+	return undef unless $user->username;
+	return $user;
+}
+
 
 #-------------------------------------------------------------------
 

@@ -538,6 +538,7 @@ sub www_emailGroupSend {
 		if ($email ne "") {
 			my $mail = WebGUI::Mail::Send->create($session, {to=>$email,subject=>$session->form->process("subject"),from=>$session->form->process("from")});
 			$mail->addHtml($session->form->process("message","HTMLArea"));
+			$mail->addFooter;
 			$mail->queue;
 		}
 	}

@@ -104,6 +104,7 @@ sub create {
 		} else {
 			$mail->addText($self->{_properties}{message});
 		}
+		$mail->addFooter;
 		$mail->queue;
 	}
 	$self->{_session} = $session;
