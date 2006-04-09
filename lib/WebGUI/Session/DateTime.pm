@@ -17,6 +17,7 @@ use strict;
 
 use DateTime;
 use DateTime::Format::Strptime;
+use DateTime::Format::Mail;
 use DateTime::TimeZone;
 use Tie::IxHash;
 use WebGUI::International;
@@ -271,6 +272,26 @@ sub epochToHuman {
 	$output =~ s/\%_varmonth_/$temp/g;
   #--- return
 	return $output;
+}
+
+#-------------------------------------------------------------------
+
+=head2 epochToMail ( [ epoch ] )
+
+Formats an epoch date as an RFC2822/822 date, which is what is used in SMTP emails.
+
+=head3 epoch
+
+The date to format. Defaults to now.
+
+=cut
+
+sub epochToMail {
+	my $self = shift;
+	my $epoch = shift || time();
+	my $timeZone = $self->session->user->profileField("timeZone") || "America/Chicago";
+	my $dt = DateTime->from_epoch( epoch =>$epoch, time_zone=>$timeZone);
+	return DateTime::Format::Mail->format_datetime($dt);
 }
 
 #-------------------------------------------------------------------
@@ -566,6 +587,31 @@ sub localtime {
 }
 
 #-------------------------------------------------------------------
+
+=head2 mailToEpoch ( [ date ] )
+
+Converts a mail formatted date into an epoch.
+
+=head3 date
+
+A date formatted according to RFC2822/822.
+
+=cut
+
+sub mailToEpoch {
+	my $self = shift;
+	my $mail = shift;
+	my $parser = DateTime::Format::Mail->new->loose;
+	my $dt =  eval { $parser->parse_datetime($mail)};
+	if ($@) {
+		$self->session->errorHandler->warn($mail." is not a vaild date for email, and is so poorly formatted, we can't even guess what it is.");
+		return undef;
+	}
+	return $dt->epoch;
+}
+
+#-------------------------------------------------------------------
+
 =head2 monthCount ( startEpoch, endEpoch )
 
 Returns the number of months between the start and end dates (inclusive).

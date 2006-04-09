@@ -201,6 +201,7 @@ sub create {
 		Bcc=>$headers->{bcc},
 		"Reply-To"=>$headers->{replyTo},
 		Subject=>$headers->{subject},
+		"Message-Id"=>$headers->{messageId} || "WebGUI-".$session->id->generate,
 		Date=>$session->datetime->epochToHuman("","%W, %d %C %y %j:%n:%s %O"),
 		"X-Mailer"=>"WebGUI"
 		);
@@ -275,7 +276,7 @@ sub retrieve {
 	$session->db->deleteRow("mailQueue","messageId", $messageId);
 	my $parser = MIME::Parser->new;
 	$parser->output_to_core(1);
-	bless {_session=>$session, _message=>$parser->parse_data($data->{messageId}), _toGroup=>$data->{toGroup}}, $class;
+	bless {_session=>$session, _message=>$parser->parse_data($data->{message}), _toGroup=>$data->{toGroup}}, $class;
 }
 
 

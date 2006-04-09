@@ -40,6 +40,8 @@ save you many hours of grief.
 	POE::Component::IKC::Server
 	POE::Component::Client::UserAgent
 	Net::Subnets
+	DateTime::Format::Mail
+	Net::POP3
 
  * The upgrade script is going to convert your WebGUI config files
 	from the current PlainConfig format to the new JSON format.
