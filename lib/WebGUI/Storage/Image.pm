@@ -100,7 +100,7 @@ sub generateThumbnail {
 		return 0;
 	}
 	unless ($self->isImage($filename)) {
-		$self->session->errorHandler->error("Can't generate a thumbnail for something that's not an image.");
+		$self->session->errorHandler->warn("Can't generate a thumbnail for something that's not an image.");
 		return 0;
 	}
         my $image = Image::Magick->new;

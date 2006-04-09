@@ -243,23 +243,6 @@ sub getEditForm {
 
 
 #-------------------------------------------------------------------
-                                                                                                                             
-=head2 logView ( )
-              
-Logs the view of the wobject to the passive profiling mechanism.                                                                                                               
-=cut
-
-sub logView {
-	my $self = shift;
-	if ($self->session->setting->get("passiveProfilingEnabled")) {
-		WebGUI::PassiveProfiling::add($self->session,$self->get("assetId"));
-		WebGUI::PassiveProfiling::addPage($self->session,$self->get("assetId"));	# add wobjects on asset to passive profile log
-	}
-	return;
-}
-
-
-#-------------------------------------------------------------------
 
 =head2 moveCollateralDown ( tableName, keyName, keyValue [ , setName, setValue ] )
 

@@ -2,6 +2,30 @@ package WebGUI::i18n::English::Asset_Collaboration;
 
 our $I18N = {
 
+	'rejected' => {
+		message => q|Rejected|,
+		lastUpdated => 0,
+		context => q|prepended to subject line in rejection emails|
+		},
+
+	'rejected because no user account' => {
+		message => q|You are not allowed to post messages because we could not find your user account. Perhaps you do not have this email address associated with your user account.|,
+		lastUpdated => 0,
+		context => q|rejection letter for posting when a user account could not be looked up|
+		},
+
+	'rejected because not allowed' => {
+		message => q|You are not allowed to post messages because you either have insufficient privileges, or you are not subscribed to this discussion.|,
+		lastUpdated => 0,
+		context => q|rjection letter for posting when not subscribed or not in group to post|
+		},
+
+	'get cs mail' => {
+		message => q|Get Collaboration System Mail|,
+		lastUpdated => 0,
+		context => q|Title of CS Get Mail workflow activity|
+		},
+
 	'visitor cache timeout' => {
 		message => q|Visitor Cache Timeout|,
 		lastUpdated => 0

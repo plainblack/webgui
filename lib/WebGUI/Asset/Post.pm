@@ -47,6 +47,21 @@ sub addRevision {
                 my $newStorage = WebGUI::Storage->get($self->session,$self->get("storageId"))->copy;
                 $newSelf->update({storageId=>$newStorage->getId});
         }
+	my $threadId = $newSelf->get("threadId");
+	my $now = time();
+	if ($threadId eq "") { # new post
+		if ($newSelf->getParent->get("className") eq "WebGUI::Asset::Wobject::Collaboration") {
+			$newSelf->update({threadId=>$newSelf->getId}, dateSubmitted=>$now);
+		} else {
+			$newSelf->update({threadId=>$newSelf->getParent->get("threadId"), dateSubmitted=>$now});
+		}
+	}
+	$newSelf->update({
+		isHidden => 1,
+		dateUpdated=>$now,
+		groupIdView=>$newSelf->getThread->getParent->get("groupIdView"),
+		groupIdEdit=>$newSelf->getThread->getParent->get("groupIdEdit"),
+		});
 	$self->getThread->unmarkRead;
         return $newSelf;
 }  
@@ -106,7 +121,15 @@ sub chopTitle {
 sub commit {
 	my $self = shift;
 	$self->SUPER::commit;
+	$self->getThread->unarchive if ($self->getThread->get("status") eq "archived");
         $self->notifySubscribers;
+	if ($self->isNew) {
+		if ($self->session->setting->get("enableKarma") && $self->getThread->getParent->get("karmaPerPost")) {
+			my $u = WebGUI::User->new($self->session, $self->get("ownerUserId"));
+			$u->addKarma($self->getThread->getParent->get("karmaPerPost"), $self->getId, "Collaboration post");
+		}
+        	$self->getThread->incrementReplies($self->get("dateUpdated"),$self->getId) if ($self->isReply);
+	}
 }
 
 #-------------------------------------------------------------------
@@ -374,10 +397,10 @@ sub getStorageLocation {
 }
 
 #-------------------------------------------------------------------
-sub getSynopsisAndContentFromFormPost {
+sub getSynopsisAndContent {
 	my $self = shift;
-	my $synopsis = $self->session->form->process("synopsis");
-	my $body = $self->session->form->process("content");
+	my $synopsis = shift;
+	my $body = shift;
 	unless ($synopsis) {
         	$body =~ s/\n/\^\-\;/ unless ($body =~ m/\^\-\;/);
        	 	my @content = split(/\^\-\;/,$body);
@@ -550,6 +573,19 @@ sub incrementViews {
 
 #-------------------------------------------------------------------
 
+=head2 isNew ( )
+
+Returns a boolean indicating whether this post is new (not an edit).
+
+=cut
+
+sub isNew {
+	my $self = shift;
+	return $self->get("dateSubmitted") eq $self->get("dateUpdated");
+}
+
+#-------------------------------------------------------------------
+
 =head2 isPoster ( )
 
 Returns a boolean that is true if the current user created this post and is not a visitor.
@@ -596,13 +632,13 @@ sub notifySubscribers {
 	$inbox->addMessage({
 		groupId=>$self->getThread->getParent->get("subscriptionGroupId"),
 		status=>"completed",
-		subject=>$self->get("subject"),
+		subject=>$self->getThread->getParent->get("mailPrefix").$self->get("subject"),
 		message=>$message
 		});
 	$inbox->addMessage({
 		groupId=>$self->getThread->get("subscriptionGroupId"),
 		status=>"completed",
-		subject=>$self->get("subject"),
+		subject=>$self->getThread->getParent->get("mailPrefix").$self->get("subject"),
 		message=>$message
 		});
 }
@@ -613,73 +649,54 @@ sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;	
 	my $i18n = WebGUI::International->new($self->session);
-	my %data;
 	if ($self->session->form->process("assetId") eq "new") {
-		if ($self->getParent->get("className") eq "WebGUI::Asset::Wobject::Collaboration") {
-			$self->update({threadId=>$self->getId});
-		} else {
-			$self->update({threadId=>$self->getParent->get("threadId")});
-		}
-		if ($self->session->setting->get("enableKarma") && $self->getThread->getParent->get("karmaPerPost")) {
-			my $u = WebGUI::User->new($self->session->user->userId);
-			$u->addKarma($self->getThread->getParent->get("karmaPerPost"), $self->getId, "Collaboration post");
-		}
-		%data = (
+		my %data = (
 			ownerUserId => $self->session->user->userId,
 			username => $self->session->form->process("visitorName") || $self->session->user->profileField("alias") || $self->session->user->username,
-			isHidden => 1,
 			);
-		$data{url} = $self->fixUrl($self->getThread->get("url")."/1") if ($self->isReply);
+		$self->update(\%data);
 		if ($self->getThread->getParent->canEdit) {
 			$self->getThread->lock if ($self->session->form->process('lock'));
 			$self->getThread->stick if ($self->session->form->process("stick"));
 		}
-		$self->getThread->unarchive if ($self->getThread->get("status") eq "archived");
-        	$self->getThread->incrementReplies($self->get("dateUpdated"),$self->getId) if ($self->isReply);
 	}
-	$data{groupIdView} =$self->getThread->getParent->get("groupIdView");
-	$data{groupIdEdit} = $self->getThread->getParent->get("groupIdEdit");
-	($data{synopsis}, $data{content}) = $self->getSynopsisAndContentFromFormPost;
-	if ($self->getThread->getParent->get("addEditStampToPosts")) {
-		$data{content} .= "\n\n --- (".$i18n->get('Edited_on','Asset_Post')." ".$self->session->datetime->epochToHuman(undef,"%z %Z [GMT%O]").$i18n->get('By','Asset_Post').$self->session->user->profileField("alias").") --- \n";
-		if ($self->getValue("contentType") eq "mixed" || $self->getValue("contentType") eq "html") {
-			$data{content} = '<p>'.$data{content}.'</p>';
-		}
-	}
-	$self->update(\%data);
         $self->getThread->subscribe if ($self->session->form->process("subscribe"));
  	delete $self->{_storageLocation};
 	my $storage = $self->getStorageLocation;
-	my $filename;
 	my $attachmentLimit = $self->getThread->getParent->get("attachmentsPerPost");
-	$filename = $storage->addFileFromFormPost("file", $attachmentLimit) if $attachmentLimit;
-	if (defined $filename) {
-		$self->setSize($storage->getFileSize($filename));
-		foreach my $file (@{$storage->getFiles}) {
-			if ($storage->isImage($file)) {
-				$storage->generateThumbnail($file,$self->session->setting->get("maxImageSize"));
-				$storage->deleteFile($file);
-				$storage->renameFile('thumb-'.$file,$file);
-				$storage->generateThumbnail($file);
-			}
-		}
-	}
-	# allows us to let the cs post use it's own workflow approval process
-	my $currentTag = WebGUI::VersionTag->getWorking($self->session);
-	if ($currentTag->getAssetCount < 2) {
-		$currentTag->set({workflowId=>$self->getThread->getParent->get("approvalWorkflow")});
-		$currentTag->requestCommit;
-	} else {
-		my $newTag = WebGUI::VersionTag->create($self->session, {
-			name=>$self->getTitle." / ".$self->session->user->username,
-			workflowId=>$self->getThread->getParent->get("approvalWorkflow")
-			});
-		$self->session->db->write("update assetData set tagId=? where assetId=? and tagId=?",[$newTag->getId, $self->getId, $currentTag->getId]);
-		$self->purgeCache;
-		$newTag->requestCommit;
-	}
+	$storage->addFileFromFormPost("file", $attachmentLimit) if $attachmentLimit;
+	$self->postProcess;
+	$self->requestCommit;
 }
 
+
+#-------------------------------------------------------------------
+
+sub postProcess {
+	my $self = shift;
+	my %data = ();
+	($data{synopsis}, $data{content}) = $self->getSynopsisAndContent($self->get("synopsis"), $self->get("content"));
+	my $user = WebGUI::User->new($self->session, $self->get("ownerUserId"));
+	my $i18n = WebGUI::International->new($self->session, "Asset_Post");
+	if ($self->getThread->getParent->get("addEditStampToPosts")) {
+		$data{content} .= "<p>\n\n --- (".$i18n->get('Edited_on')." ".$self->session->datetime->epochToHuman(undef,"%z %Z [GMT%O]")." ".$i18n->get('By')." ".$user->profileField("alias").") --- \n</p>";
+	}
+	$data{url} = $self->fixUrl($self->getThread->get("url")."/1") if ($self->isReply && $self->isNew);
+	$self->update(\%data);
+	my $size = 0;
+	my $storage = $self->getStorageLocation;
+	foreach my $file (@{$storage->getFiles}) {
+		if ($storage->isImage($file)) {
+			$storage->generateThumbnail($file,$self->session->setting->get("maxImageSize"));
+			$storage->deleteFile($file);
+			$storage->renameFile('thumb-'.$file,$file);
+			$storage->generateThumbnail($file);
+		}
+		$size += $storage->getFileSize($file);
+	}
+	$self->setSize($size);
+
+}
 
 #-------------------------------------------------------------------
 
@@ -704,7 +721,7 @@ See WebGUI::Asset::purgeCache() for details.
 
 sub purgeCache {
 	my $self = shift;
-	$self->getThread->purgeCache if $self->isReply;
+	WebGUI::Cache->new($self->session,"view_".$self->getThread->getId)->delete;
 	$self->SUPER::purgeCache;
 }
 
@@ -746,6 +763,24 @@ sub rate {
 	}
 }
 
+#-------------------------------------------------------------------
+# allows us to let the cs post use it's own workflow approval process
+sub requestCommit {
+	my $self = shift;
+	my $currentTag = WebGUI::VersionTag->getWorking($self->session);
+	if ($currentTag->getAssetCount < 2) {
+		$currentTag->set({workflowId=>$self->getThread->getParent->get("approvalWorkflow")});
+		$currentTag->requestCommit;
+	} else {
+		my $newTag = WebGUI::VersionTag->create($self->session, {
+			name=>$self->getTitle." / ".$self->session->user->username,
+			workflowId=>$self->getThread->getParent->get("approvalWorkflow")
+			});
+		$self->session->db->write("update assetData set tagId=? where assetId=? and tagId=?",[$newTag->getId, $self->getId, $currentTag->getId]);
+		$self->purgeCache;
+		$newTag->requestCommit;
+	}
+}
 
 #-------------------------------------------------------------------
 
@@ -831,13 +866,13 @@ We overload the update method from WebGUI::Asset in order to handle file system 
 sub update {
         my $self = shift;
         my %before = (
-                owner => $self->get("ownerUserId"),
+               	owner => $self->get("ownerUserId"),
                 view => $self->get("groupIdView"),
                 edit => $self->get("groupIdEdit")
                 );
         $self->SUPER::update(@_);
         if ($self->get("ownerUserId") ne $before{owner} || $self->get("groupIdEdit") ne $before{edit} || $self->get("groupIdView") ne $before{view}) {
-                $self->getStorageLocation->setPrivileges($self->get("ownerUserId"),$self->get("groupIdView"),$self->get("groupIdEdit"));
+               	$self->getStorageLocation->setPrivileges($self->get("ownerUserId"),$self->get("groupIdView"),$self->get("groupIdEdit"));
         }
 }
 
@@ -945,7 +980,7 @@ sub www_edit {
 	$var{'form.header'} .= WebGUI::Form::hidden($self->session, {name=>"proceed", value=>"showConfirmation"});
 	if ($self->session->form->process("title") || $self->session->form->process("content") || $self->session->form->process("synopsis")) {
 		$var{'preview.title'} = WebGUI::HTML::filter($self->session->form->process("title"),"all");
-		($var{'preview.synopsis'}, $var{'preview.content'}) = $self->getSynopsisAndContentFromFormPost;
+		($var{'preview.synopsis'}, $var{'preview.content'}) = $self->getSynopsisAndContent($self->session->form->process("synopsis","textarea"), $self->session->form->process("content","HTMLArea")); 
 		$var{'preview.content'} = $self->formatContent($var{'preview.content'},$self->session->form->process("contentType"));
 		for my $i (1..5) {	
 			$var{'preview.userDefined'.$i} = WebGUI::HTML::filter($self->session->form->process('userDefined'.$i),"macros");

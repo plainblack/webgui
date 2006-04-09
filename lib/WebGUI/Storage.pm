@@ -176,7 +176,7 @@ sub addFileFromFilesystem {
 
 #-------------------------------------------------------------------
 
-=head2 addFileFromFormPost ( formVariableName )
+=head2 addFileFromFormPost ( formVariableName, attachmentLimit )
 
 Grabs an attachment from a form POST and saves it to this storage location.
 

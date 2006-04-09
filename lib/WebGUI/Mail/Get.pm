@@ -116,6 +116,7 @@ Retrieves the next available message from the server. Returns undef if there are
 	cc => 'joe@example.com',
 	subject => 'This is my message subject',
 	inReplyTo => 'some-message-id',
+	messageId => 'some-message-id',
 	date => 1144536119,
 	parts => [
 		{
@@ -161,12 +162,15 @@ sub getNextMessage {
 	chomp($subject);
 	my $inReplyTo = $head->get("In-Reply-To") || undef;
 	chomp($inReplyTo);
+	my $messageId = $head->get("Message-Id") || undef;
+	chomp($messageId);
 	my %data = (
 		to => $to,
 		from => $from,
 		cc => $cc,
 		subject => $subject,
 		inReplyTo => $inReplyTo,
+		messageId => $messageId,
 		date => $self->session->datetime->mailToEpoch($head->get("Date")),
 		);
 	my @segments = ();

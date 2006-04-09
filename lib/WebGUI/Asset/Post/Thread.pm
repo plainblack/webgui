@@ -529,23 +529,10 @@ sub processPropertiesFromFormPost {
 #-------------------------------------------------------------------
 sub purge {
 	my $self = shift;
+$self->session->errorHandler->warn("Y");
 	$self->session->db->write("delete from Thread_read where postId=?",[$self->getId]);
-        return $self->SUPER::purge;
-}
-
-#-------------------------------------------------------------------
-
-=head2 purgeCache ()
-
-See WebGUI::Asset::purgeCache() for details.
-
-=cut
-
-sub purgeCache {
-	my $self = shift;
-	WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
-	$self->SUPER::purgeCache;
-	$self->getParent->purgeCache;
+$self->session->errorHandler->warn("Z");
+        $self->SUPER::purge;
 }
 
 #-------------------------------------------------------------------

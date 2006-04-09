@@ -182,9 +182,17 @@ A single email address that this message will originate from. Defaults to the co
 
 A single email address that responses to this message will be sent to.
 
-=head contentType
+=head4 contentType
 
 A mime type for the message. Defaults to "multipart/mixed".
+
+=head4 messageId
+
+A unique id for this message, in case you want to see what replies come in for it later. One will be automatically generated if you don't specify this.
+
+=head4 inReplyTo
+
+If this is a reply to a previous message, then you should specify the messageId of the previous message here.
 
 =cut
 
@@ -212,6 +220,7 @@ sub create {
 		Cc=>$headers->{cc},
 		Bcc=>$headers->{bcc},
 		"Reply-To"=>$headers->{replyTo},
+		"In-Reply-To"=>$headers->{inReplyTo},
 		Subject=>$headers->{subject},
 		"Message-Id"=>$headers->{messageId} || "WebGUI-".$session->id->generate,
 		Date=>$session->datetime->epochToHuman("","%W, %d %C %y %j:%n:%s %O"),

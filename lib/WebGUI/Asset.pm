@@ -1025,6 +1025,24 @@ sub indexContent {
 
 
 #-------------------------------------------------------------------
+                                                                                                                             
+=head2 logView ( )
+              
+Logs the view of this asset to the passive profiling mechanism.  
+
+=cut
+
+sub logView {
+	my $self = shift;
+	if ($self->session->setting->get("passiveProfilingEnabled")) {
+		WebGUI::PassiveProfiling::add($self->session,$self->getId);
+		WebGUI::PassiveProfiling::addPage($self->session,$self->getId) if ($self->get("className") eq "WebGUI::Asset::Wobject::Layout");
+	}
+	return;
+}
+
+
+#-------------------------------------------------------------------
 
 =head2 manageAssets ( )
 
