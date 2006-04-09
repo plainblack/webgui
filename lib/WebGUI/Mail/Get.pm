@@ -151,12 +151,22 @@ sub getNextMessage {
 		return undef;
 	}
 	my $head = $parsedMessage->head;
+	my $to = $head->get("To") || undef;
+	chomp($to);
+	my $from = $head->get("From") || undef;
+	chomp($from);
+	my $cc = $head->get("Cc") || undef;
+	chomp($cc);
+	my $subject = $head->get("Subject") || undef;
+	chomp($subject);
+	my $inReplyTo = $head->get("In-Reply-To") || undef;
+	chomp($inReplyTo);
 	my %data = (
-		to => $head->get("To") || undef,
-		from => $head->get("From") || undef,
-		cc => $head->get("Cc") || undef,
-		subject => $head->get("Subject") || undef,
-		inReplyTo => $head->get("In-Reply-To") || undef,
+		to => $to,
+		from => $from,
+		cc => $cc,
+		subject => $subject,
+		inReplyTo => $inReplyTo,
 		date => $self->session->datetime->mailToEpoch($head->get("Date")),
 		);
 	my @segments = ();
