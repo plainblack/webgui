@@ -44,7 +44,7 @@ my $testBlock = [
 
 my $formType = 'textarea';
 
-my $numTests = 13 + scalar @{ $testBlock } + 1;
+my $numTests = 11 + scalar @{ $testBlock } + 1;
 
 diag("Planning on running $numTests tests\n");
 
@@ -77,7 +77,6 @@ is($input->type, $formType, 'Checking input type');
 is($input->value, 'Some text in here', 'Checking default value');
 is($input->{rows}, 5, 'Default number of rows');
 is($input->{cols}, 50, 'Default number of columns');
-is($input->{wrap}, 'virtual', 'Default wrap');
 
 $html = join "\n",
 	$header, 
@@ -86,7 +85,6 @@ $html = join "\n",
 		value => q!Some & text in " here!,
 		rows => 10,
 		columns => 80,
-		wrap => 'off'
 	})->toHtml,
 	$footer;
 
@@ -97,7 +95,6 @@ is($input->name, 'preTestText', 'Checking input name');
 is($input->value, 'Some & text in " here', 'Checking default value');
 is($input->{rows}, 10, 'set number of rows');
 is($input->{cols}, 80, 'set number of columns');
-is($input->{wrap}, 'off', 'set wrap to off');
 
 ##Test Form Output parsing
 
