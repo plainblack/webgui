@@ -116,7 +116,7 @@ sub get {
 	my $self = shift;
 	my $name = shift;
 	if ($name eq "parameters") {
-		my $parameters = JSON::jsonToObj( $self->{_data}{$name});
+		my $parameters = JSON::jsonToObj($self->{_data}{$name});
 		return $parameters->{parameters};
 	}
 	return $self->{_data}{$name};

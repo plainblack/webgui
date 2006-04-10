@@ -314,6 +314,8 @@ sub loadSchedule {
 	my $session = WebGUI::Session->open($self->config->getWebguiRoot, $config);
 	my $result = $session->db->read("select * from WorkflowSchedule");
 	while (my $data = $result->hashRef) {
+		my $params = JSON::jsonToObj($data->{parameters});
+		$data->{parameters} = $params->{parameters};
 		$data->{config} = $config;
 		$data->{sitename} = $session->config->get("sitename")->[0];
 		$kernel->yield("addJob", $data);

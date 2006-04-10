@@ -134,7 +134,7 @@ sub get {
 	my $self = shift;
 	my $name = shift;
 	if ($name eq "parameters") {
-		my $parameters = JSON::jsonToObj( $self->{_data}{$name});
+		my $parameters = JSON::jsonToObj($self->{_data}{$name});
 		return $parameters->{parameters};
 	}
 	return $self->{_data}{$name};
@@ -249,7 +249,6 @@ sub run {
 		return "done";
 	}
 	$self->session->errorHandler->debug("Running workflow activity ".$activity->getId.", which is a ".(ref $activity).", for instance ".$self->getId.".");
-	my $object = {};
 	my $class = $self->get("className");
 	my $method = $self->get("methodName");
 	my $params = $self->get("parameters");
@@ -258,12 +257,16 @@ sub run {
 		my $cmd = "use $class";
 		eval($cmd);
 		if ($@) {
-			$self->session->errorHandler->warn("Error loading activity class $class: ".$@);
+			$self->session->errorHandler->error("Error loading activity class $class: ".$@);
 			return "error";
 		}
-		eval{ $object = $class->$method($self->session, $params) };
+		my $object = eval{ $class->$method($self->session, $params) };
 		if ($@) {
-			$self->session->errorHandler->warn("Error instanciating activity (".$activity->getId.") pass-in object: ".$@);
+			$self->session->errorHandler->error("Error instanciating activity (".$activity->getId.") pass-in object: ".$@);
+			return "error";
+		}
+		unless (defined $object) {
+			$self->session->errorHandler->error("Pass in object came back undefined for activity (".$activity->getId.") using ".$class.", ".$method.", ".$params.".");
 			return "error";
 		}
 		$status = $activity->execute($object, $self);	
