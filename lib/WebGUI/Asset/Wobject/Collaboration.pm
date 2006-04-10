@@ -261,6 +261,30 @@ sub definition {
 				fieldType=>"workflow",
 				defaultValue=>"pbworkflow000000000003"
 				},
+			mailServer=>{
+				fieldType=>"text",
+				defaultValue=>undef
+				},
+			mailAccount=>{
+				fieldType=>"text",
+				defaultValue=>undef
+				},
+			mailPassword=>{
+				fieldType=>"password",
+				defaultValue=>undef
+				},
+			mailAddress=>{
+				fieldType=>"email",
+				defaultValue=>undef
+				},
+			getMail=>{
+				fieldType=>"yesNo",
+				defaultValue=>0
+				},
+			getMailInterval=>{
+				fieldType=>"interval",
+				defaultValue=>300
+				},
 			displayLastReply =>{
 				fieldType=>"yesNo",
 				defaultValue=>0
@@ -419,6 +443,43 @@ sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm;
 	my $i18n = WebGUI::International->new($self->session,"Asset_Collaboration");
+	$tabform->addTab("mail",$i18n->get("mail"), 9);
+	$tabform->getTab("mail")->yesNo(
+		name=>"getMail",
+		value=>$self->getValue("getMail"),
+		label=>$i18n->get("get mail"),
+		hoverHelp=>$i18n->get("get mail help"),
+		);
+	$tabform->getTab("mail")->text(
+		name=>"mailServer",
+		value=>$self->getValue("mailServer"),
+		label=>$i18n->get("mail server"),
+		hoverHelp=>$i18n->get("mail server help"),
+		);
+	$tabform->getTab("mail")->text(
+		name=>"mailAccount",
+		value=>$self->getValue("mailAccount"),
+		label=>$i18n->get("mail account"),
+		hoverHelp=>$i18n->get("mail account help"),
+		);
+	$tabform->getTab("mail")->password(
+		name=>"mailPassword",
+		value=>$self->getValue("mailPassword"),
+		label=>$i18n->get("mail password"),
+		hoverHelp=>$i18n->get("mail password help"),
+		);
+	$tabform->getTab("mail")->email(
+		name=>"mailAddress",
+		value=>$self->getValue("mailAddress"),
+		label=>$i18n->get("mail address"),
+		hoverHelp=>$i18n->get("mail address help"),
+		);
+	$tabform->getTab("mail")->interval(
+		name=>"getMailInterval",
+		value=>$self->getValue("getMailInterval"),
+		label=>$i18n->get("get mail interval"),
+		hoverHelp=>$i18n->get("get mail interval help"),
+		);
  	$tabform->getTab("display")->interval(
  		-name=>"visitorCacheTimeout",
 		-label=>$i18n->get('visitor cache timeout'),

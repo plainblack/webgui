@@ -2,6 +2,84 @@ package WebGUI::i18n::English::Asset_Collaboration;
 
 our $I18N = {
 
+	'get mail interval' => {
+		message => q|Check Mail Every|,
+		lastUpdated => 0,
+		context => q|field label for mail setting|
+		},
+
+	'get mail interval help' => {
+		message => q|How often should we check for mail on the server?|,
+		lastUpdated => 0,
+		context => q|help for mail setting field label|
+		},
+
+	'mail password' => {
+		message => q|Password|,
+		lastUpdated => 0,
+		context => q|field label for mail setting|
+		},
+
+	'mail password help' => {
+		message => q|The password of the account to log in to the server with.|,
+		lastUpdated => 0,
+		context => q|help for mail setting field label|
+		},
+
+	'mail address' => {
+		message => q|Address|,
+		lastUpdated => 0,
+		context => q|field label for mail setting|
+		},
+
+	'mail address help' => {
+		message => q|The email address that users can send messages to in order to post messages.|,
+		lastUpdated => 0,
+		context => q|help for mail setting field label|
+		},
+
+	'mail account' => {
+		message => q|Account|,
+		lastUpdated => 0,
+		context => q|field label for mail setting|
+		},
+
+	'mail account help' => {
+		message => q|The account name (username / email address) to use to log in to the mail server.|,
+		lastUpdated => 0,
+		context => q|help for mail setting field label|
+		},
+
+	'mail server' => {
+		message => q|Server|,
+		lastUpdated => 0,
+		context => q|field label for mail setting|
+		},
+
+	'mail server help' => {
+		message => q|The hostname or IP address of the mail server to fetch mail from.|,
+		lastUpdated => 0,
+		context => q|help for mail setting field label|
+		},
+
+	'get mail' => {
+		message => q|Get mail?|,
+		lastUpdated => 0,
+		context => q|field label for mail setting|
+		},
+
+	'get mail help' => {
+		message => q|Do you want to have this Collaboration System fetch posts from an email account?|,
+		lastUpdated => 0,
+		context => q|help for mail setting field label|
+		},
+
+	'mail' => {
+		message => q|Mail|,
+		lastUpdated => 0,
+		context => q|the name of the email settings tab|
+		},
+
 	'rejected' => {
 		message => q|Rejected|,
 		lastUpdated => 0,

@@ -163,7 +163,7 @@ sub execute {
 		}
 		my $post = undef;
 		if ($message->{inReplyTo}) {
-			$message->{inReplyTo} =~ m/WebGUI\-([\w_-]{22})/;
+			$message->{inReplyTo} =~ m/cs\-([\w_-]{22})/;
 			my $id = $1;	
 			$post = WebGUI::Asset->newByDynamicClass($self->session, $id);
 		}

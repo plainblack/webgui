@@ -633,13 +633,15 @@ sub notifySubscribers {
 		groupId=>$self->getThread->getParent->get("subscriptionGroupId"),
 		status=>"completed",
 		subject=>$self->getThread->getParent->get("mailPrefix").$self->get("subject"),
-		message=>$message
+		message=>$message,
+		messageId=>"cs-".$self->getId
 		});
 	$inbox->addMessage({
 		groupId=>$self->getThread->get("subscriptionGroupId"),
 		status=>"completed",
 		subject=>$self->getThread->getParent->get("mailPrefix").$self->get("subject"),
-		message=>$message
+		message=>$message,
+		messageId=>"cs-".$self->getId
 		});
 }
 

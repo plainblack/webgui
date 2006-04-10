@@ -183,6 +183,14 @@ sub updateCs {
 	$session->db->write("alter table Post_read drop column postId");
 	$session->db->write("alter table Post_read drop column readDate");
 	$session->db->write("alter table Post_read rename Thread_read");
+	print "\t\tAdding email to discussion support.\n";
+	$session->db->write("alter table Collaboration add column mailServer varchar(255)");
+	$session->db->write("alter table Collaboration add column mailAccount varchar(255)");
+	$session->db->write("alter table Collaboration add column mailPassword varchar(255)");
+	$session->db->write("alter table Collaboration add column mailAddress varchar(255)");
+	$session->db->write("alter table Collaboration add column mailPrefix varchar(255)");
+	$session->db->write("alter table Collaboration add column getMail int not null 0");
+	$session->db->write("alter table Collaboration add column getMailInterval int not null default 300");
 }
 
 #-------------------------------------------------
