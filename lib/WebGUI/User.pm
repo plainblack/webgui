@@ -489,7 +489,7 @@ sub newByEmail {
 	my $class = shift;
 	my $session = shift;
 	my $email = shift;
-	my ($id) = $session->dbSlave->quickArray("select userId from userProfileData where fieldName='mail' and fieldData=?",[$email]);
+	my ($id) = $session->dbSlave->quickArray("select userId from userProfileData where fieldName='email' and fieldData=?",[$email]);
 	my $user = $class->new($session, $id);
 	return undef unless $user->username;
 	return $user;
