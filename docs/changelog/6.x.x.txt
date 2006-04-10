@@ -26,6 +26,7 @@
  - Added a field set grouping mechanism to HTMLForm and TabForm.
  - Added save buttons at the top of all the HTML forms for easier access.
  - Added archive/unarchive options to CS threads.
+ - Added a mechanism to send emails to a CS which will accept them as posts.
  - Increased the performance of CS Thread viewing by 500%.
  - Added a database cache option as an alternative to memcached.
  - Removed page caching system and added individual asset caches, because not
