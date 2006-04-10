@@ -98,7 +98,7 @@ sub addPost {
 				my $type = $1;
 				$filename = $self->session->id->generate.".".$type;
 			}	
-			$storage->addFileFromScalar($file->{content}, $filename);
+			$storage->addFileFromScalar($filename, $file->{content});
 		}
 	}
 	$post->postProcess;

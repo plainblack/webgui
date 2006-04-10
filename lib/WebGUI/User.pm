@@ -491,6 +491,7 @@ sub newByEmail {
 	my $email = shift;
 	my ($id) = $session->dbSlave->quickArray("select userId from userProfileData where fieldName='email' and fieldData=?",[$email]);
 	my $user = $class->new($session, $id);
+	return undef if ($user->userId eq "1"); # visitor is never valid for this method
 	return undef unless $user->username;
 	return $user;
 }
