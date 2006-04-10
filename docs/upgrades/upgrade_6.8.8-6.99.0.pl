@@ -191,6 +191,16 @@ sub updateCs {
 	$session->db->write("alter table Collaboration add column mailPrefix varchar(255)");
 	$session->db->write("alter table Collaboration add column getMail int not null default 0");
 	$session->db->write("alter table Collaboration add column getMailInterval int not null default 300");
+	$session->db->write("alter table Collaboration add column getMailCronId varchar(22) binary");
+	my $workflow = WebGUI::Workflow->create($session, {
+			isSerial=>1,
+			type=>"WebGUI::Asset::Wobject::Collaboration",	
+			enabled=>1,
+			description=>"Retrieves mail from a POP3 account for the given Collaboration System.",
+			title=>"Get CS Mail"	
+			}, "csworkflow000000000001");
+	my $activity = $workflow->addActivity("WebGUI::Workflow::Activity::GetCsMail","csactivity000000000001");
+	$activity->set("title","Get the mail");	
 }
 
 #-------------------------------------------------

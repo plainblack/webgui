@@ -19,6 +19,7 @@ use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
+use WebGUI::Workflow::Cron;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
 
@@ -196,6 +197,33 @@ sub canView {
 }
 
 #-------------------------------------------------------------------
+sub commit {
+	my $self = shift;
+	$self->SUPER::commit;
+	my $cron = undef;
+	if ($self->get("getMailCronId")) {
+		$cron = WebGUI::Workflow::Cron->new($self->session, $self->get("getMailCronId"));
+	}
+	my $i18n = WebGUI::International->new($self->session, "Asset_Collaboration");
+	unless (defined $cron) {
+		$cron = WebGUI::Workflow::Cron->create($self->session, {
+			title=>$self->getTitle." ".$i18n->get("mail"),
+			minuteOfHour=>"*/".($self->get("getMailInterval")/60),
+			className=>"WebGUI::Asset::Wobject::Collaboration",
+			methodName=>"new",
+			parameters=>$self->getId,
+			workflowId=>"csworkflow000000000001"
+			});
+		$self->update({getMailCronId=>$cron->getId});
+	}
+	if ($self->get("getMail")) {
+		$cron->set({enabled=>1,title=>$self->getTitle." ".$i18n->get("mail"), minuteOfHour=>"*/".($self->get("getMailInterval")/60)});
+	} else {
+		$cron->set({enabled=>0,title=>$self->getTitle." ".$i18n->get("mail"), minuteOfHour=>"*/".($self->get("getMailInterval")/60)});
+	}
+}
+
+#-------------------------------------------------------------------
 sub createSubscriptionGroup {
 	my $self = shift;
 	my $group = WebGUI::Group->new($self->session, "new");
@@ -276,6 +304,11 @@ sub definition {
 			mailAddress=>{
 				fieldType=>"email",
 				defaultValue=>undef
+				},
+			getMailCronId=>{
+				fieldType=>"hidden",
+				defaultValue=>undef,
+				noFormPost=>1
 				},
 			getMail=>{
 				fieldType=>"yesNo",
@@ -895,6 +928,10 @@ sub purge {
 	my $self = shift;
 	my $group = WebGUI::Group->new($self->session, $self->get("subscriptionGroupId"));
 	$group->delete;
+	if ($self->get("getMailCronId")) {
+		my $cron = WebGUI::Workflow::Cron->new($self->session, $self->get("getMailCronId"));
+		$cron->delete if defined $cron;
+	}
 	$self->SUPER::purge;
 }
 

@@ -18,7 +18,10 @@ package WebGUI::Workflow::Activity::GetCsMail;
 use strict;
 use base 'WebGUI::Workflow::Activity';
 use WebGUI::Mail::Get;
+use WebGUI::Mail::Send;
 use WebGUI::Asset;
+use WebGUI::International;
+use WebGUI::User;
 
 =head1 NAME
 
