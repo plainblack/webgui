@@ -140,9 +140,9 @@ sub execute {
 	return $self->COMPLETE unless ($cs->get("getMail"));
 	my $start = time();
 	my $mail = WebGUI::Mail::Get->connect($self->session,{
-		server=>$cs->get("mailHost"),
+		server=>$cs->get("mailServer"),
 		account=>$cs->get("mailAccount"),
-		password=>$cs->get("mailUser")
+		password=>$cs->get("mailPassword")
 		});
 	return $self->COMPLETE unless (defined $mail);
 	my $i18n = WebGUI::International->new($self->session, "Asset_Collaboration");

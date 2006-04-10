@@ -285,6 +285,7 @@ sub set {
 	$self->session->db->setRow("WorkflowSchedule","taskId",$self->{_data});
 	$spectre->notify("cron/deleteJob",{taskId=>$self->getId,config=>$self->session->config->getFilename});
 	my %params = %{$self->{_data}};
+	$params{parameters} = $self->get("parameters");
 	$params{config} = $self->session->config->getFilename;
 	$params{sitename} = $self->session->config->get("sitename")->[0];
 	$spectre->notify("cron/addJob", \%params);
