@@ -180,6 +180,13 @@ sub www_editSettings {
 		-hoverHelp=>$i18n->get('824 description'),
 		-value=>$session->setting->get("mailFooter")
 		);
+        $tabform->getTab("messaging")->textarea(
+		-name=>"mailReturnPath",
+		-label=>$i18n->get("mail return path"),
+		-hoverHelp=>$i18n->get('mail return path help'),
+		-value=>$session->setting->get("mailReturnPath")
+		);
+# misc
 	$tabform->getTab("misc")->yesNo(
 		-name=>"preventProxyCache",
 		-label=>$i18n->get(400),

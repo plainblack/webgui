@@ -1,6 +1,18 @@
 package WebGUI::i18n::English::WebGUI;
 
 our $I18N = {
+	'mail return path help' => {
+		message => q|To what email address should undeliverable messages be sent?|,
+		lastUpdated => 0,
+		context=>"Settings hover help"
+	},
+
+	'mail return path' => {
+		message => q|Return Path|,
+		lastUpdated => 0,
+		context=>"Settings"
+	},
+
 	'default version tag workflow help' => {
 		message => q|Which workflow should be used by default when user's create their own version tags.|,
 		lastUpdated => 0,

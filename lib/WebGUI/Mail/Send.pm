@@ -213,6 +213,8 @@ sub create {
 			}	
 		}
 	}
+	my $returnPath = $session->setting->get("mailReturnPath");
+	$returnPath = "<".$returnPath.">" if $returnPath;
 	my $message = MIME::Entity->build(
 		Type=>$headers->{contentType} || "multipart/mixed",
 		From=>$headers->{from} || $session->setting->get("companyEmail"),
@@ -221,6 +223,7 @@ sub create {
 		Bcc=>$headers->{bcc},
 		"Reply-To"=>$headers->{replyTo},
 		"In-Reply-To"=>$headers->{inReplyTo},
+		"Return-Path"=>$returnPath,
 		Subject=>$headers->{subject},
 		"Message-Id"=>$headers->{messageId} || "WebGUI-".$session->id->generate,
 		Date=>$session->datetime->epochToHuman("","%W, %d %C %y %j:%n:%s %O"),
