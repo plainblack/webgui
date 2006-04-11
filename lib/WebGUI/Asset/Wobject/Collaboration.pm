@@ -305,6 +305,10 @@ sub definition {
 				fieldType=>"email",
 				defaultValue=>undef
 				},
+			mailPrefix=>{
+				fieldType=>"text",
+				defaultValue=>undef
+				},
 			getMailCronId=>{
 				fieldType=>"hidden",
 				defaultValue=>undef,
@@ -512,6 +516,12 @@ sub getEditForm {
 		value=>$self->getValue("getMailInterval"),
 		label=>$i18n->get("get mail interval"),
 		hoverHelp=>$i18n->get("get mail interval help"),
+		);
+	$tabform->getTab("mail")->text(
+		name=>"mailPrefix",
+		value=>$self->getValue("mailPrefix"),
+		label=>$i18n->get("mail prefix"),
+		hoverHelp=>$i18n->get("mail prefix help"),
 		);
  	$tabform->getTab("display")->interval(
  		-name=>"visitorCacheTimeout",

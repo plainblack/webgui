@@ -2,6 +2,18 @@ package WebGUI::i18n::English::Asset_Collaboration;
 
 our $I18N = {
 
+	'mail prefix' => {
+		message => q|Prefix|,
+		lastUpdated => 0,
+		context => q|field label for mail setting|
+		},
+
+	'mail prefix help' => {
+		message => q|This string will be prepended to the subject line of all emails sent out from this collaboration system.|,
+		lastUpdated => 0,
+		context => q|help for mail setting field label|
+		},
+
 	'get mail interval' => {
 		message => q|Check Mail Every|,
 		lastUpdated => 0,
