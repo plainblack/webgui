@@ -21,8 +21,7 @@ $| = 1;
 use Getopt::Long;
 use strict;
 use WebGUI::Session;
-use WebGUI::SQL;
-
+use WebGUI::Utility;
 
 my $configFile;
 my $help;
@@ -42,7 +41,8 @@ if ($help || $configFile eq ""){
 Usage: perl $0 --configfile=<webguiConfig>
 
 This utility will rebuild your WebGUI Lineage Tree. The lineage tree is an
-index that is used to make WebGUI run faster.
+index that is used to make WebGUI run faster. It will also detect and fix
+orphan data, and detect cirular relationships in your tree.
 
 WARNING: Use this tool only if you know what you're doing. It should only
 be used if somehow your lineage tree has become corrupt (very rare) or if
@@ -66,41 +66,75 @@ STOP
 
 
 print "Starting..." unless ($quiet);
-WebGUI::Session::open($webguiRoot,$configFile);
+my $session = WebGUI::Session->open($webguiRoot,$configFile);
 print "OK\n" unless ($quiet);
 
-print "Rewriting existing lineage...\n" unless ($quiet);
-WebGUI::SQL->write("update asset set lineage=concat('old___',lineage)");
-my ($lineage) = WebGUI::SQL->quickArray("select lineage from asset where assetId='PBasset000000000000001'");
+print "Looking for descendant replationships...\n" unless ($quiet);
+my @found = (); #descendants found
+getDescendants("PBasset000000000000001");
+print "Got the relationships.\n" unless ($quiet);
+print "\nLooking for orphans...\n" unless ($quiet);
+my $orphansFound = 0;
+my $rs = $session->db->read("select assetId from asset order by lineage");
+while (my ($id) = $rs->array) {
+	unless (isIn($id, @found)) {
+		print "\tFound an orphan with an assetId of $id. Moving it to the import node.\n";
+		$session->db->write("update asset set parentId='PBasset000000000000002' where assetId=?",[$id]);
+		getDescendants($id);
+		$orphansFound++;
+	}
+}
+if ($orphansFound) {
+	print "Found and fixed $orphansFound orphan(s).\n" unless ($quiet);
+} else {
+	print "No orphans found.\n" unless ($quiet);
+}
+print "\nRewriting existing lineage...\n" unless ($quiet);
+$session->db->write("update asset set lineage=concat('old___',lineage)");
+my ($lineage) = $session->db->quickArray("select lineage from asset where assetId='PBasset000000000000001'");
 
 print "Rebuilding lineage...\n" unless ($quiet);
-my ($oldRootLineage) = WebGUI::SQL->quickArray("select lineage from asset where assetId='PBasset000000000000001'");
+my ($oldRootLineage) = $session->db->quickArray("select lineage from asset where assetId='PBasset000000000000001'");
 printChange("Asset ID","Old Lineage","New Lineage");
 printChange('PBasset000000000000001',$oldRootLineage,'000001');
-WebGUI::SQL->write("update asset set lineage='000001' where assetId='PBasset000000000000001'");
-recurseTree("PBasset000000000000001","000001");
+$session->db->write("update asset set lineage='000001' where assetId='PBasset000000000000001'");
+recurseAndFixTree("PBasset000000000000001","000001");
 
 print "Cleaning up..." unless ($quiet);
-WebGUI::Session::end($session{var}{sessionId});
-WebGUI::Session::close();
+$session->var->end;
+$session->close;
 print "OK\n" unless ($quiet);
 
 print "\nDon't forget to clear your cache.\n" unless ($quiet);
 
 
-sub recurseTree {
+sub getDescendants {
+	my $parentId = shift;
+	if (isIn($parentId, @found)) {
+		print "\nFound circular relationships involving $parentId. This requires manual intervention.\n" unless ($quiet);
+		exit;
+	}
+	push(@found, $parentId);
+	my $getChildren = $session->db->prepare("select assetId, lineage from asset where parentId=? order by lineage");
+	$getChildren->execute([$parentId]);
+	while (my ($assetId) = $getChildren->array) {
+		getDescendants($assetId);
+	}
+}
+
+sub recurseAndFixTree {
 	my $parentId = shift;
 	my $parentLineage = shift;
 	my $rank = 0;
-	my $getChildren = WebGUI::SQL->prepare("select assetId, lineage from asset where parentId=? order by lineage");
+	my $getChildren = $session->db->prepare("select assetId, lineage from asset where parentId=? order by lineage");
 	$getChildren->execute([$parentId]);
 	while (my ($assetId, $oldLineage) = $getChildren->array) {
 		$rank++;
 		my $newLineage = $parentLineage.sprintf("%06d",$rank);
 		printChange($assetId,$oldLineage,$newLineage);
-		my $setLineage = WebGUI::SQL->prepare("update asset set lineage=? where assetId=?");
+		my $setLineage = $session->db->prepare("update asset set lineage=? where assetId=?");
 		$setLineage->execute([$newLineage,$assetId]);
-		recurseTree($assetId,$newLineage);
+		recurseAndFixTree($assetId,$newLineage);
 	}
 }
 
