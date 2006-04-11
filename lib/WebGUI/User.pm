@@ -261,22 +261,20 @@ sub isInGroup {
 	my $group = WebGUI::Group->new($self->session,$gid);
 	my $isInGroup = $self->session->stow->get("isInGroup");
         ### Look to see if we've already looked up this group. 
-        if ($isInGroup->{$uid}{$gid} eq '1') {
-                return 1;
-        } elsif ($isInGroup->{$uid}{$gid} eq "0") {
-                return 0;
-        }
+	return $isInGroup->{$uid}{$gid} if exists $isInGroup->{$uid}{$gid};
         ### Lookup the actual groupings.
-	unless ($secondRun) {			# don't look up user groups if we've already done it once.
-	        my $groups = $self->getGroups(1);
-	        foreach (@{$groups}) {
-	                $isInGroup->{$uid}{$_} = 1;
-        	}
-        	if ($isInGroup->{$uid}{$gid} eq '1') {
-			$self->session->stow->set("isInGroup",$isInGroup);
-                	return 1;
-        	}
+	unless ($secondRun) {			# don't look up users if we've already done it once.
+		### Check for groups of groups.
+		my $users = $group->getUsers(1);
+		foreach my $user (@{$users}) {
+			$isInGroup->{$user}{$gid} = 1;
+			if ($uid eq $user) {
+				$self->session->stow->set("isInGroup",$isInGroup);
+				return 1;
+			}
+		}
 	}
+
 	 ### Check ldap
         if ($group->get("ldapGroup") && $group->get("ldapGroupProperty")) {
 		   # skip if not logged in
@@ -317,45 +315,6 @@ sub isInGroup {
 			  }
 		   }
 		}
-		
-        if (my @dbUsers = @{ $group->getDatabaseUsers() }) {
-		foreach my $extUserId ( @dbUsers ) {
-			$isInGroup->{$extUserId}{$gid} = 1;
-		}
-		$self->session->stow->set("isInGroup",$isInGroup);
-		return 1 if ($isInGroup->{$uid}{$gid});
-	}
-        if (my @karmaUsers = @{ $group->getKarmaUsers() }) {
-		foreach my $extUserId ( @karmaUsers ) {
-			$isInGroup->{$extUserId}{$gid} = 1;
-		}
-		$self->session->stow->set("isInGroup",$isInGroup);
-		return 1 if ($isInGroup->{$uid}{$gid});
-	}
-        if (my @scratchUsers = @{ $group->getScratchUsers() }) {
-		foreach my $extUserId ( @scratchUsers ) {
-			$isInGroup->{$extUserId}{$gid} = 1;
-		}
-		$self->session->stow->set("isInGroup",$isInGroup);
-		return 1 if ($isInGroup->{$uid}{$gid});
-	}
-        if (my @ipUsers = @{ $group->getIpUsers() }) {
-		foreach my $extUserId ( @ipUsers ) {
-			$isInGroup->{$extUserId}{$gid} = 1;
-		}
-		$self->session->stow->set("isInGroup",$isInGroup);
-		return 1 if ($isInGroup->{$uid}{$gid});
-	}
-        ### Check for groups of groups.
-        my $groups = $group->getGroupsIn(1);
-        foreach (@{$groups}) {
-                $isInGroup->{$uid}{$_} = $self->isInGroup($_, 1);
-                if ($isInGroup->{$uid}{$_}) {
-                        $isInGroup->{$uid}{$gid} = 1; # cache current group also so we don't have to do the group in group check again
-			$self->session->stow->set("isInGroup",$isInGroup);
-                        return 1;
-                }
-        }
         $isInGroup->{$uid}{$gid} = 0;
 	$self->session->stow->set("isInGroup",$isInGroup);
         return 0;
