@@ -255,20 +255,11 @@ sub isInGroup {
         ### The following several checks are to increase performance. If this section were removed, everything would continue to work as normal. 
         return 1 if ($gid eq '7');		# everyone is in the everyone group
         return 1 if ($gid eq '1' && $uid eq '1'); 	# visitors are in the visitors group
+        return 1 if ($gid eq '2' && $uid ne '1'); 	# if you're not a visitor, then you're a registered user
+        return 1 if ($uid eq '3');  #Admin is in every group
         ### Get data for auxillary checks.
 	my $group = WebGUI::Group->new($self->session,$gid);
 	my $isInGroup = $self->session->stow->get("isInGroup");
-        ### Check IP Address
-        if ($group->get("ipFilter")) {
-		my $ipFilter = $group->get("ipFilter");
-                $ipFilter =~ s/\s+//g;
-                my @ips = split(",",$ipFilter);
-		my $ipMatch = WebGUI::Utility::isInSubnet($self->session->env->get("REMOTE_ADDR"), [ @ips ]);
-		return 1 if $ipMatch;
-        }
-        return 0 if ($uid eq '1');  #Visitor is in no other groups
-        return 1 if ($uid eq '3');  #Admin is in every group
-        return 1 if ($gid eq '2' && $uid ne '1'); 	# if you're not a visitor, then you're a registered user
         ### Look to see if we've already looked up this group. 
         if ($isInGroup->{$uid}{$gid} eq '1') {
                 return 1;
@@ -343,6 +334,13 @@ sub isInGroup {
 	}
         if (my @scratchUsers = @{ $group->getScratchUsers() }) {
 		foreach my $extUserId ( @scratchUsers ) {
+			$isInGroup->{$extUserId}{$gid} = 1;
+		}
+		$self->session->stow->set("isInGroup",$isInGroup);
+		return 1 if ($isInGroup->{$uid}{$gid});
+	}
+        if (my @ipUsers = @{ $group->getIpUsers() }) {
+		foreach my $extUserId ( @ipUsers ) {
 			$isInGroup->{$extUserId}{$gid} = 1;
 		}
 		$self->session->stow->set("isInGroup",$isInGroup);

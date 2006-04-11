@@ -487,7 +487,6 @@ sub getScratchUsers {
 	my $scratchFilter;
 	return [] unless $scratchFilter = $self->scratchFilter();
 
-	my $sessionId = $self->session->db->quote($self->session->getId());
 	my $time = $self->session->datetime->time();
 
 	$scratchFilter =~ s/\s//g;
@@ -510,6 +509,42 @@ u.expires > $time AND
 EOQ
 	return $self->session->db->buildArrayRef($query, [ @scratchPlaceholders ]);
 }	
+
+#-------------------------------------------------------------------
+
+=head2 getIpUsers ( )
+
+Get the set of users allowed to be in this group via the lastIP recorded in
+the user's session and this group's IpFilter.  The set is returned as an array ref.
+
+If no IpFilter has been set for this group, returns an empty array ref.
+
+=cut
+
+sub getIpUsers {
+	my $self = shift;
+	my $IpFilter;
+	return [] unless $IpFilter = $self->ipFilter();
+
+	my $time = $self->session->datetime->time();
+
+	$IpFilter =~ s/\s//g;
+	my @filters = split /;/, $IpFilter;
+
+	my $query = "select userId,lastIP from userSession where expires > ?";
+
+	my $sth = $self->session->db->read($query, [ $self->session->datetime->time() ]);
+	my %localCache = ();
+	my @ipUsers = ();
+	while (my ($userId, $lastIP) = $sth->array() ) {
+		if (!exists $localCache{$lastIP}) {
+			$localCache{$lastIP} = isInSubnet($lastIP, \@filters);	
+		}
+		push @ipUsers, $userId if $localCache{$lastIP};
+	}
+	return \@ipUsers;
+}	
+
 
 #-------------------------------------------------------------------
 
@@ -672,6 +707,7 @@ sub getUsers {
 				@{ $extGroup->getDatabaseUsers() },
 				@{ $extGroup->getKarmaUsers() },
 				@{ $extGroup->getScratchUsers() },
+				@{ $extGroup->getIpUsers() },
 			;
 		}
 	}
@@ -681,6 +717,7 @@ sub getUsers {
 		@{ $self->getDatabaseUsers() },
 		@{ $self->getKarmaUsers() },
 		@{ $self->getScratchUsers() },
+		@{ $self->getIpUsers() },
 	;
 	my @users = ( @localUsers, @externalUsers );
 	return \@users;

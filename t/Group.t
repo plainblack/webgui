@@ -50,7 +50,31 @@ my @scratchTests = (
 			},
 );
 
-plan tests => (85 + scalar(@scratchTests)); # increment this value for each test you create
+my @ipTests = (
+			{
+				ip => '192.168.0.2',
+				comment => 'good IP address',
+				expect  => 1,
+			},
+			{
+				ip => '10.0.0.2',
+				comment => 'bad IP address',
+				expect  => 0,
+			},
+			{
+				ip => '192.168.0.128',
+				comment => 'another good IP address',
+				expect  => 1,
+			},
+			{
+				ip => '172.17.10.20',
+				comment => 'another bad IP address',
+				expect  => 0,
+			},
+);
+
+
+plan tests => (87 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -397,6 +421,51 @@ cmp_bag(
 	'getUsers for group with scratch'
 );
 
+foreach my $subSession (@sessionBank) {
+	$subSession->db->write("DELETE FROM userSessionScratch WHERE sessionId=?",[ $subSession->getId]);
+}
+
+@sessionBank = ();
+my @tcps =  ();
+
+foreach my $idx (0..$#ipTests) {
+	##Set the ip to be used by the session for this user
+	my $ip = $ipTests[$idx]->{ip};
+	$ENV{REMOTE_ADDR} = $ip;
+	##Create a new session
+	$sessionBank[$idx] = WebGUI::Session->open(WebGUI::Test->root, WebGUI::Test->file);
+
+	##Create a new user and make this session's default user that user
+	$tcps[$idx] = WebGUI::User->new($sessionBank[$idx], "new");
+	$sessionBank[$idx]->user({user => $tcps[$idx]});
+
+	##Name this user for convenience
+	$tcps[$idx]->username("tcp$idx");
+
+	##Assign this user to this test to be fetched later
+	$ipTests[$idx]->{user} = $tcps[$idx];
+}
+
+my $gI = WebGUI::Group->new($session, "new");
+$gI->name('Group I');
+$gI->ipFilter('192.168.0.0/24');
+
+cmp_bag(
+	$gI->getIpUsers,
+	[ (map { $_->{user}->userId() }  grep { $_->{expect} } @ipTests) ],
+	'getIpUsers'
+);
+
+cmp_bag(
+	$gI->getUsers,
+	[ (map { $_->{user}->userId() }  grep { $_->{expect} } @ipTests) ],
+	'getUsers for group with IP filter'
+);
+
+foreach my $ipTest (@ipTests) {
+	is($ipTest->{user}->isInGroup($gI->getId), $ipTest->{expect}, $ipTest->{comment});
+}
+
 SKIP: {
 	skip("need to test expiration date in groupings interacting with recursive or not", 1);
 	ok(undef, "expiration date in groupings for getUser");
@@ -406,7 +475,7 @@ END {
 	foreach my $testGroup ($gX, $gY, $gZ, $gA, $gB, $gC, $g, $gK, $gS) {
 		$testGroup->delete if (defined $testGroup and ref $testGroup eq 'WebGUI::Group');
 	}
-	foreach my $dude ($user, @crowd, @mob, @chameleons, @itchies) {
+	foreach my $dude ($user, @crowd, @mob, @chameleons, @itchies, @tcps) {
 		$dude->delete if (defined $dude and ref $dude eq 'WebGUI::User');
 	}
 	$session->db->dbh->do('DROP TABLE IF EXISTS myUserTable');
