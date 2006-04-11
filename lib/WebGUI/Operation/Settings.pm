@@ -180,7 +180,7 @@ sub www_editSettings {
 		-hoverHelp=>$i18n->get('824 description'),
 		-value=>$session->setting->get("mailFooter")
 		);
-        $tabform->getTab("messaging")->textarea(
+        $tabform->getTab("messaging")->email(
 		-name=>"mailReturnPath",
 		-label=>$i18n->get("mail return path"),
 		-hoverHelp=>$i18n->get('mail return path help'),
