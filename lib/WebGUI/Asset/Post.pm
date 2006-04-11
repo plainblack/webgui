@@ -21,6 +21,7 @@ use WebGUI::HTML;
 use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Inbox;
+use WebGUI::Mail::Send;
 use WebGUI::Operation;
 use WebGUI::Paginator;
 use WebGUI::SQL;
@@ -55,6 +56,7 @@ sub addRevision {
 		} else {
 			$newSelf->update({threadId=>$newSelf->getParent->get("threadId"), dateSubmitted=>$now});
 		}
+		delete $newSelf->{_thread};
 	}
 	$newSelf->update({
 		isHidden => 1,
@@ -62,7 +64,7 @@ sub addRevision {
 		groupIdView=>$newSelf->getThread->getParent->get("groupIdView"),
 		groupIdEdit=>$newSelf->getThread->getParent->get("groupIdEdit"),
 		});
-	$self->getThread->unmarkRead;
+	$newSelf->getThread->unmarkRead;
         return $newSelf;
 }  
 
@@ -623,26 +625,31 @@ Send notifications to the thread and forum subscribers that a new post has been 
 sub notifySubscribers {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session);
-	my $inbox = WebGUI::Inbox->new($self->session);
 	my $var = $self->getTemplateVars();
 	$self->getThread->getParent->appendTemplateLabels($var);
 	$var->{url} = $self->session->url->getSiteURL().$self->getUrl;
 	$var->{'notify.subscription.message'} = $i18n->get(875,"Asset_Post");
 	my $message = $self->processTemplate($var, $self->getThread->getParent->get("notificationTemplateId"));
-	$inbox->addMessage({
-		groupId=>$self->getThread->getParent->get("subscriptionGroupId"),
-		status=>"completed",
-		subject=>$self->getThread->getParent->get("mailPrefix").$self->get("subject"),
-		message=>$message,
+	my $from = $self->getThread->getParent->get("mailAddress");
+	my $subject = $self->getThread->getParent->get("mailPrefix").$self->get("title");
+	my $mail = WebGUI::Mail::Send->create($self->session, {
+		from=>$from,
+		toGroup=>$self->getThread->getParent->get("subscriptionGroupId"),
+		subject=>$subject,
 		messageId=>"cs-".$self->getId
 		});
-	$inbox->addMessage({
-		groupId=>$self->getThread->get("subscriptionGroupId"),
-		status=>"completed",
-		subject=>$self->getThread->getParent->get("mailPrefix").$self->get("subject"),
-		message=>$message,
+	$mail->addHtml($message);
+	$mail->addFooter;
+	$mail->queue;
+	my $mail = WebGUI::Mail::Send->create($self->session, {
+		from=>$from,
+		toGroup=>$self->getThread->get("subscriptionGroupId"),
+		subject=>$subject,
 		messageId=>"cs-".$self->getId
 		});
+	$mail->addHtml($message);
+	$mail->addFooter;
+	$mail->queue;
 }
 
 
@@ -723,7 +730,7 @@ See WebGUI::Asset::purgeCache() for details.
 
 sub purgeCache {
 	my $self = shift;
-	WebGUI::Cache->new($self->session,"view_".$self->getThread->getId)->delete;
+	WebGUI::Cache->new($self->session,"view_".$self->getThread->getId)->delete if ($self->getThread);
 	$self->SUPER::purgeCache;
 }
 

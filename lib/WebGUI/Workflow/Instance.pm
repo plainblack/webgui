@@ -270,9 +270,17 @@ sub run {
 			$self->session->errorHandler->error("Pass in object came back undefined for activity (".$activity->getId.") using ".$class.", ".$method.", ".$params.".");
 			return "error";
 		}
-		$status = $activity->execute($object, $self);	
+		$status = eval{$activity->execute($object, $self)};
+		if ($@) {
+			$self->session->errorHandler->error("Caught exception executing workflow activity ".$activity->getId." for instance ".$self->getId." which reported ".$@);
+			return "error";
+		}
 	} else {
 		$status = $activity->execute(undef, $self);
+		if ($@) {
+			$self->session->errorHandler->error("Caught exception executing workflow activity ".$activity->getId." for instance ".$self->getId." which reported ".$@);
+			return "error";
+		}
 	}
 	if ($status eq "complete") {
 		$self->set({"currentActivityId"=>$activity->getId, notifySpectre=>0});

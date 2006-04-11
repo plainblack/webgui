@@ -170,7 +170,6 @@ sub error {
 	my $self = shift;
 	my $message = shift;
 	$self->getLogger->error($message);
-	$self->session->output->print("\n\n".$message.":\n".$self->getStackTrace(), 1);
 	$self->getLogger->debug("Stack trace for ERROR ".$message."\n".$self->getStackTrace());
         $self->session->stow->set("debug_error", $self->session->stow->get("debug_error").$message."\n");
 }
@@ -203,6 +202,7 @@ sub fatal {
 	} else {
 		$self->session->output->print("<h1>WebGUI Fatal Error</h1><p>Something unexpected happened that caused this system to fault.</p>\n",1);
 		$self->session->output->print("<p>".$message."</p>\n",1);
+		$self->session->output->print($self->getStackTrace(), 1);
 		$self->session->output->print($self->showDebug(),1);
 	}
 	$self->session->close();

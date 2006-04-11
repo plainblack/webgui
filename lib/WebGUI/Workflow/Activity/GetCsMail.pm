@@ -43,7 +43,7 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 addPost ( parent, class, message, user ) 
+=head2 addPost ( parent, class, message, user, prefix ) 
 
 Adds a post to this collaboration system.
 
@@ -59,6 +59,10 @@ The message retrieved from WebGUI::Mail::Get.
 
 The user doing the posting.
 
+=head3 prefix
+
+The mail prefix for this collaboration system.
+
 =cut
 
 sub addPost {
@@ -66,6 +70,7 @@ sub addPost {
 	my $parent = shift;
 	my $message = shift;
 	my $user = shift;
+	my $prefix = shift;
 	my @attachments = ();
 	my $content = "";
 	my $class = (ref $parent eq "WebGUI::Asset::Wobject::Collaboration") ? "WebGUI::Asset::Post::Thread" : "WebGUI::Asset::Post";
@@ -80,11 +85,26 @@ sub addPost {
 			push(@attachments, $part);
 		}
 	}
+	$prefix =~ s/\\/\\\\/g;
+	$prefix =~ s/\[/\\[/g;
+	$prefix =~ s/\]/\\]/g;
+	$prefix =~ s/\(/\\(/g;
+	$prefix =~ s/\)/\\)/g;
+	$prefix =~ s/\}/\\}/g;
+	$prefix =~ s/\{/\\{/g;
+	$prefix =~ s/\?/\\?/g;
+	$prefix =~ s/\./\\./g;
+	$prefix =~ s/\*/\\*/g;
+	$prefix =~ s/\+/\\+/g;
+	$prefix =~ s/\|/\\|/g;
+	$prefix =~ s/\//\\\//g;
+	my $title = $message->{subject};
+	$title =~ s/$prefix//;
 	my $post = $parent->addChild({
 		className=>$class,
-		title=>$message->{subject},
-		menuTitle => $message->{subject},
-		url=>$message->{subject},
+		title=>$title,
+		menuTitle =>$title,
+		url=>$title,
 		content=>$content,
 		ownerUserId=>$user->userId,
 		username=>$user->profileField("alias") || $user->username,
@@ -171,9 +191,9 @@ sub execute {
 			$post = WebGUI::Asset->newByDynamicClass($self->session, $id);
 		}
 		if (defined $post && $cs->get("allowReplies") && $user->isInGroup($cs->get("postGroupId")) && ($user->isInGroup($cs->get("subscriptionGroupId")) || $user->isInGroup($post->get("subscriptionGroupId")))) {
-			$self->addPost($post, $message, $user);
+			$self->addPost($post, $message, $user, $cs->get("mailPrefix"));
 		} elsif ($user->isInGroup($cs->get("postGroupId")) && $user->isInGroup($cs->get("subscriptionGroupId"))) {
-			$self->addPost($cs, $message, $user);
+			$self->addPost($cs, $message, $user, $cs->get("mailPrefix"));
 		} else {
 			my $send = WebGUI::Mail::Send->create($self->session, {
 				to=>$message->{from},

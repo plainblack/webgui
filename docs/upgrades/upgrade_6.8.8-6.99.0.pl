@@ -487,6 +487,7 @@ sub addWorkflow {
 	$session->setting->remove("onNewUserAlertGroup");
 	$session->setting->set("runOnRegistration","");
 	$session->setting->add("defaultVersionTagWorkflow","pbworkflow000000000003");
+	$session->setting->add("mailReturnPath",undef);
 }
 
 #-------------------------------------------------

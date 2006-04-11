@@ -132,6 +132,7 @@ sub formField {
 	my $properties = shift || {};
 	my $withWrapper = shift;
 	my $u = shift;
+	my $skipDefault = shift;
 	$properties->{label} = $self->getLabel unless $properties->{label};
 	$properties->{fieldType} = $self->get("fieldType");
 	$properties->{name} = $self->getId;
@@ -143,7 +144,8 @@ sub formField {
 	}
 	$properties->{options} = $orderedValues;
 	my $default;
-	if (defined $self->session->form->process($properties->{name})) {
+	if ($skipDefault) {
+	} elsif (defined $self->session->form->process($properties->{name})) {
 		$default = $self->session->form->process($properties->{name});
 	} elsif (defined $u && defined $u->profileField($properties->{name})) {
 		$default = $u->profileField($properties->{name});

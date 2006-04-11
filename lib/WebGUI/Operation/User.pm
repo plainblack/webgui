@@ -298,6 +298,7 @@ sub www_editUser {
 	my $tabform = WebGUI::TabForm->new($session,\%tabs);
 	
 	my $u = WebGUI::User->new($session,($uid eq 'new') ? '' : $uid); #Setting uid to '' when uid is 'new' so visitor defaults prefill field for new user
+	my $username = $u->userId eq '1' ? '' : $u->username;
 	$session->stow->set("editUser_UID", $uid);
 	$session->style->setScript($session->config->get("extrasURL")."/swapLayers.js", {type=>"text/javascript"});
 	$session->style->setRawHeadTags('<script type="text/javascript">var active="'.$u->authMethod.'";</script>');
@@ -311,7 +312,7 @@ sub www_editUser {
     	$tabform->getTab("account")->text(
 		-name=>"username",
 		-label=>$i18n->get(50),
-		-value=>$session->form->process("username")|| $u->username
+		-value=>$username
 		);
 	my %status;
 	tie %status, 'Tie::IxHash';
@@ -354,7 +355,11 @@ sub www_editUser {
 		foreach my $field (@{$category->getFields}) {
 			next if $field->getId =~ /contentPositions/;
 			my $label = $field->getLabel . ($field->isRequired ? "*" : '');
-			$tabform->getTab("profile")->raw($field->formField({label=>$label},1,$u));
+			if ($field->getId eq "alias" && $u->userId eq '1') {
+				$tabform->getTab("profile")->raw($field->formField({label=>$label},1,undef,1));
+			} else {
+				$tabform->getTab("profile")->raw($field->formField({label=>$label},1,$u));
+			}
 		}
 		$tabform->getTab("profile")->fieldSetEnd($category->getLabel);
 	}

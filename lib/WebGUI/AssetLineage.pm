@@ -203,7 +203,7 @@ sub getLastChild {
 
 =head2 getLineage ( relatives,rules )
 
-Returns an array reference of lineages of relatives based upon rules.
+Returns an array reference of relative asset ids based upon rules.
 
 =head3 relatives
 

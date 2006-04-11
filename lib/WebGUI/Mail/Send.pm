@@ -20,6 +20,7 @@ use MIME::Entity;
 use MIME::Parser;
 use LWP::MediaTypes qw(guess_media_type);
 use WebGUI::Group;
+use WebGUI::Macro;
 use WebGUI::User;
 
 =head1 NAME
@@ -88,7 +89,9 @@ Adds the mail footer as set by the site admin to the end of this message.
 
 sub addFooter {
 	my $self = shift;
-	$self->addText($self->session->setting->get("mailFooter"));
+	my $text = "\n\n".$self->session->setting->get("mailFooter");
+	WebGUI::Macro::process($self->session, \$text);
+	$self->addText($text);
 }
 
 #-------------------------------------------------------------------
@@ -215,9 +218,15 @@ sub create {
 	}
 	my $returnPath = $session->setting->get("mailReturnPath");
 	$returnPath = "<".$returnPath.">" if $returnPath;
+	my $from = $headers->{from};
+	$from = $session->setting->get("companyEmail") if ($from eq "");
+	my $type = $headers->{contentType};
+	$type = "multipart/mixed" if ($type eq "");
+	my $id = $headers->{messageId};
+	$id = "WebGUI-".$session->id->generate if ($id eq "");
 	my $message = MIME::Entity->build(
-		Type=>$headers->{contentType} || "multipart/mixed",
-		From=>$headers->{from} || $session->setting->get("companyEmail"),
+		Type=>$type,
+		From=>$from,
 		To=>$headers->{to},
 		Cc=>$headers->{cc},
 		Bcc=>$headers->{bcc},
@@ -225,7 +234,7 @@ sub create {
 		"In-Reply-To"=>$headers->{inReplyTo},
 		"Return-Path"=>$returnPath,
 		Subject=>$headers->{subject},
-		"Message-Id"=>$headers->{messageId} || "WebGUI-".$session->id->generate,
+		"Message-Id"=>$id,
 		Date=>$session->datetime->epochToHuman("","%W, %d %C %y %j:%n:%s %O"),
 		"X-Mailer"=>"WebGUI"
 		);
@@ -344,7 +353,7 @@ sub send {
 	my $group = $self->{_toGroup};
 	delete $self->{_toGroup};
 	if ($group) {
-		my $group = WebGUI::Group->new($self->session, $self->{_toGroup});
+		my $group = WebGUI::Group->new($self->session, $group);
 		$self->{_message}->head->replace("bcc", undef);
 		$self->{_message}->head->replace("cc", undef);
 		foreach my $userId (@{$group->getUsers(1,1)}) {
