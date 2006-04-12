@@ -365,10 +365,18 @@ sub configurationForm {
  	$i18n = WebGUI::International->new($self->session, 'CommercePaymentITransact');
 
 	$f = WebGUI::HTMLForm->new($self->session);
+
 	$f->textarea(
 		-name	=> $self->prepend('emailMessage'),
 		-label	=> $i18n->get('emailMessage'),
 		-value	=> $self->get('emailMessage')
+		);
+
+	$f->yesNo(
+		-name	=> $self->prepend('completeTransaction'),
+		-value 	=> $self->get('completeTransaction') || 1,
+		-label 	=> 'Complete Transaction on Submit?',
+		-hoverHelp => 'When set to \'yes\', the transaction is completed when the user submits payment details.  When set to \'no\', the transaction is set to pending and must be manually set to complete.  This may be useful if you wish to allow site visitors to select the Cash Payment method, but would like to wait for payment to clear before completing the transaction.'
 		);
 		
 	return $self->SUPER::configurationForm($f->printRowsOnly);
@@ -376,7 +384,7 @@ sub configurationForm {
 
 #-------------------------------------------------------------------
 sub confirmTransaction {
-	# This function should never be called with site side payment gateways!
+
 	return 0;
 }
 
@@ -384,7 +392,7 @@ sub confirmTransaction {
 
 =head2 init ( namespace )
 
-Constructor for the ITransact plugin.
+Constructor for the Cash plugin.
 
 =head3 session
 
@@ -408,21 +416,18 @@ sub init {
 sub gatewayId {
 	my $self = shift;
 	
-	return $self->session->id->generate;;
+	return $self->get('paymentMethod').":".$self->session->id->generate;
 }
 
 
 #-------------------------------------------------------------------
 sub errorCode {
-	return undef;
+	my $self = shift;
+	return $self->{_error}->{code};
 }
 
 #-------------------------------------------------------------------
 sub name {
-	my ($self) = shift;
-	#my $i18n = WebGUI::International->new($self->session, "CommercePaymentITransact");
-	#return $i18n->get('module name');
-	
 	return "Cash";
 }
 
@@ -440,16 +445,22 @@ sub normalTransaction {
 
 	if ($normal) {
 		my $i18n = WebGUI::International->new($self->session, 'CommercePaymentITransact');
-		$self->{_recurring} = 0;
 		$self->{_transactionParams} = {
 			AMT		=> sprintf('%.2f', $normal->{amount}),
-			DESCRIPTION	=> $normal->{description}) || $i18n->get('no description'),
+			DESCRIPTION	=> $normal->{description} || $i18n->get('no description'),
 			INVOICENUMBER	=> $normal->{invoiceNumber},
 			ORGID		=> $normal->{id},
 		};
 	}
-
-	return $self->submit;
+	
+	if ($self->get('completeTransaction')) {
+		$self->{_transaction}->{status} = 'complete';
+	}
+	else {
+		$self->{_transaction}->{status} = 'pending';
+		$self->{_error}->{message} = 'Your transaction will be completed upon receipt of payment.';
+		$self->{_error}->{code} = 1;
+	}
 }
 
 #-------------------------------------------------------------------
@@ -465,14 +476,6 @@ sub shippingDescription {
 }
 
 #-------------------------------------------------------------------
-sub submit {
-	my $self = shift;
-
-	# this just needs to set the object properties with the transaction data
-	# since there is no approval or 'submit' process.  Cash transactions always succeed.
-}
-
-#-------------------------------------------------------------------
 sub supports {
 	return {
 		single		=> 1,
@@ -482,19 +485,20 @@ sub supports {
 
 #-------------------------------------------------------------------
 sub transactionCompleted {
-	my ($self) = shift;
-
-	return 1;
+	my $self = shift;
+	return 1 if $self->{_transaction}->{status} eq 'complete';
 }
 
 #-------------------------------------------------------------------
 sub transactionError {
-	return undef;
+	my $self = shift;
+	return $self->{_error}->{message};
 }
 
 #-------------------------------------------------------------------
 sub transactionPending {
-	return 0;
+	my $self = shift;
+	return 1 if $self->{_transaction}->{status} eq 'pending';
 }
 
 #-------------------------------------------------------------------

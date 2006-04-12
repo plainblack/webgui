@@ -850,7 +850,7 @@ sub www_listTransactions {
 	$criteria{shippingStatus} = $session->form->process("sStatus") if ($session->form->process("sStatus"));
 	$criteria{paymentStatus} = $session->form->process("tStatus") if ($session->form->process("tStatus"));
 	
-	@transactions = WebGUI::Commerce::Transaction->getTransactions(\%criteria);
+	@transactions = WebGUI::Commerce::Transaction->new($session)->getTransactions(\%criteria);
 
 	$output .= '<table border="1">';
 	$output .= '<tr><th></th>'.
@@ -912,7 +912,7 @@ sub www_selectPaymentGateway {
 				name		=> $_->name,
 				namespace	=> $_->namespace,
 				formElement	=> WebGUI::Form::radio($session,{name=>'paymentGateway', value=>$_->namespace})
-				});
+				}) if ($session->user->isInGroup($_->get('whoCanUse')));
 		}
 	} elsif (scalar(@$plugins) == 1) {
 		my $paymentGateway = $plugins->[0]->namespace;
@@ -923,7 +923,7 @@ sub www_selectPaymentGateway {
 	$var{message} = $i18n->get('select payment gateway');
 	$var{pluginsAvailable} = @$plugins;
 	$var{noPluginsMessage} = $i18n->get('no payment gateway');
-	$var{formHeader} = WebGUI::Form::formHeader.WebGUI::Form::hidden($session,{name=>'op', value=>'selectPaymentGatewaySave'});
+	$var{formHeader} = WebGUI::Form::formHeader($session).WebGUI::Form::hidden($session,{name=>'op', value=>'selectPaymentGatewaySave'});
 	$var{formSubmit} = WebGUI::Form::submit($session,{value=>$i18n->get('payment gateway select')});
 	$var{formFooter} = WebGUI::Form::formFooter;		
 	
