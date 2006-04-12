@@ -258,20 +258,18 @@ sub isInGroup {
         return 1 if ($gid eq '2' && $uid ne '1'); 	# if you're not a visitor, then you're a registered user
         return 1 if ($uid eq '3');  #Admin is in every group
         ### Get data for auxillary checks.
-	my $group = WebGUI::Group->new($self->session,$gid);
 	my $isInGroup = $self->session->stow->get("isInGroup");
         ### Look to see if we've already looked up this group. 
 	return $isInGroup->{$uid}{$gid} if exists $isInGroup->{$uid}{$gid};
         ### Lookup the actual groupings.
-	unless ($secondRun) {			# don't look up users if we've already done it once.
-		### Check for groups of groups.
-		my $users = $group->getUsers(1);
-		foreach my $user (@{$users}) {
-			$isInGroup->{$user}{$gid} = 1;
-			if ($uid eq $user) {
-				$self->session->stow->set("isInGroup",$isInGroup);
-				return 1;
-			}
+	my $group = WebGUI::Group->new($self->session,$gid);
+	### Check for groups of groups.
+	my $users = $group->getUsers(1);
+	foreach my $user (@{$users}) {
+		$isInGroup->{$user}{$gid} = 1;
+		if ($uid eq $user) {
+			$self->session->stow->set("isInGroup",$isInGroup);
+			return 1;
 		}
 	}
 

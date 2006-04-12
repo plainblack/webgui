@@ -1797,9 +1797,9 @@ Multiple filters can be set by joining name and value pairs with a semicolon:
         },
 
         '1005 description' => {
-                message => q|Many organizations have external databases that map users to groups; for example an HR database might map Employee ID to Health Care Plan.  To validate users against an external database, you need to construct a SQL statement that will return 1 if a user is in the group.  Make sure to begin your statement with "select 1".  You may use macros in this query to access data in a user's profile, such as Employee ID.  Here is an example that checks a user against a fictional HR database.  This assumes you have created an additional WebGUI profile field called employeeId.<br>
+                message => q|Many organizations have external databases that map users to groups; for example an HR database might map Employee ID to Health Care Plan.  To validate users against an external database, you need to construct a SQL statement that will return the list of WebGUI userIds for users in the group.  You may use macros in this query to access data in a user's WebGUI profile, such as Employee ID.  Here is an example that checks a user against a fictional HR database.  This assumes you have created an additional WebGUI profile field called employeeId.<br>
 <br>
-select 1 from employees, health_plans, empl_plan_map<br>
+select userId from employees, health_plans, empl_plan_map<br>
 where employees.employee_id = &#94;User("employeeId");<br>
 and health_plans.plan_name = 'HMO 1'<br>
 and employees.employee_id = empl_plan_map.employee_id<br>
@@ -1807,7 +1807,7 @@ and health_plans.health_plan_id = empl_plan_mp.health_plan_id<br>
 <br>
 This group could then be named "Employees in HMO 1", and would allow you to restrict any page or wobject to only those users who are part of this health plan in the external database.
 <p>|,
-                lastUpdated => 1120448672,
+                lastUpdated => 1144798300,
         },
 
         '1004 description' => {

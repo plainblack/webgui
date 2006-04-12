@@ -536,6 +536,7 @@ sub getIpUsers {
 	my $sth = $self->session->db->read($query, [ $self->session->datetime->time() ]);
 	my %localCache = ();
 	my @ipUsers = ();
+	$self->session->errorHandler->warn("Fetching IP users");
 	while (my ($userId, $lastIP) = $sth->array() ) {
 		if (!exists $localCache{$lastIP}) {
 			$localCache{$lastIP} = isInSubnet($lastIP, \@filters);	
@@ -754,6 +755,8 @@ sub karmaThreshold {
         my $self = shift;
         my $value = shift;
         if (defined $value) {
+		$self->session->stow->delete('isInGroup');
+		$self->session->stow->delete("gotGroupsInGroup");
 		$self->set("karmaThreshold",$value);	
         }
         return $self->get("karmaThreshold");
@@ -776,6 +779,8 @@ sub ipFilter {
         my $self = shift;
         my $value = shift;
         if (defined $value) {
+		$self->session->stow->delete("gotGroupsInGroup");
+		$self->session->stow->delete('isInGroup');
 		$self->set("ipFilter",$value);
         }
         return $self->get("ipFilter");

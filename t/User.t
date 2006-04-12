@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::Utility;
 
 use WebGUI::User;
-use Test::More tests => 80; # increment this value for each test you create
+use Test::More tests => 81; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -227,12 +227,13 @@ is( $cm->getId, 4, "content manager groupId check");
 my $admin = WebGUI::User->new($session, 3);
 my $visitor = WebGUI::User->new($session, 1);
 
-##Manipulate the env object to set up this test
-my $env = $session->{_env};
-$env->{_env}->{"REMOTE_ADDR"} = '192.168.0.101';
+$session->db->write('update userSession set lastIP=? where sessionId=?',['192.168.0.101', $session->getId]);
+
+my ($result) = $session->db->quickArray('select lastIP,sessionId from userSession where sessionId=?',[$session->getId]);
+is ($result, '192.168.0.101', "userSession setup correctly");
 
 ok (!$visitor->isInGroup($cm->getId), "Visitor is not member of group");
-ok ($admin->isInGroup($cm->getId), "Admin is not member of group");
+ok ($admin->isInGroup($cm->getId), "Admin is member of group");
 
 my $origFilter = $cm->ipFilter;
 
@@ -240,9 +241,13 @@ $cm->ipFilter('192.168.0.0/24');
 
 is( $cm->ipFilter, "192.168.0.0/24", "ipFilter assignment to local net, 192.168.0.0/24");
 
+$session->errorHandler->warn("Begin IP lookup");
+
 ok ($visitor->isInGroup($cm->getId), "Visitor is allowed in via IP");
 
-$env->{_env}->{"REMOTE_ADDR"} = '193.168.0.101';
+$session->db->write('update userSession set lastIP=? where sessionId=?',['193.168.0.101', $session->getId]);
+
+$session->stow->delete('isInGroup');
 
 ok (!$visitor->isInGroup($cm->getId), "Visitor is not allowed in via IP");
 
