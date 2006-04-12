@@ -206,6 +206,22 @@ sub _matchTypes {
 }
 
 #-------------------------------------------------------------------
+#
+# Temporary Shopping Cart to store subevent selections for prerequisite and conflict checking
+# Contents are moved to real shopping cart after attendee information is entered and the scratchCart gets emptied.
+#
+sub addToScratchCart {
+	my $self = shift;
+	my $event = shift;
+
+	my @eventsInCart = split('\n',$self->session->scratch->get('EMS_scratch_cart'));
+	push(@eventsInCart, $event);
+
+	$self->session->scratch->set('EMS_scratch_cart', join('\n', @eventsInCart));
+}
+
+
+#-------------------------------------------------------------------
 
 sub buildMenu {
 	my $self = shift;
@@ -256,7 +272,8 @@ whenever two events have overlapping times.
 
 sub checkConflicts {
 	my $self = shift;
-	my $eventsInCart = $self->getEventsInCart;
+#	my $eventsInCart = $self->getEventsInCart;
+	my $eventsInCart = $self->getEventsInScratchCart;
 	my @schedule;
 	
 	# Get schedule info for events in cart and sort asc by start date
@@ -424,6 +441,12 @@ sub deleteOrphans {
 }
 
 #-------------------------------------------------------------------
+sub emptyScratchCart {
+	my $self = shift;	
+	$self->session->scratch->delete('EMS_scratch_cart');
+}
+
+#-------------------------------------------------------------------
 
 =head2 error ( errors, callback )
 
@@ -529,6 +552,15 @@ sub getEventsInCart {
 	my @eventsInCart = map { $_->{item}->id } @{ $cartItems };
 
 	return \@eventsInCart;
+}
+
+#------------------------------------------------------------------
+sub getEventsInScratchCart {
+	my $self = shift;
+	my @eventsInCart = $self->session->scratch->get('EMS_scratch_cart');
+
+	return \@eventsInCart;
+
 }
 
 #------------------------------------------------------------------
@@ -660,7 +692,8 @@ sub getRequiredEventNames {
 sub findSubEvents {
 	my $self = shift;
 	my $eventId = shift;
-	my $eventsInCart = $self->getEventsInCart;
+#	my $eventsInCart = $self->getEventsInCart;
+	my $eventsInCart = $self->getEventsInScratchCart;
 	
 	# Get the prerequisites for the sub events passed in
 	my $subEventPrerequisites = $self->getSubEventPrerequisites($eventId);
@@ -803,7 +836,8 @@ sub getSubEvents {
 	my $eventIds = shift;
 	my $subEvents;
 	my @subEventData;
-	my $eventsInCart = $self->getEventsInCart;
+#	my $eventsInCart = $self->getEventsInCart;
+	my $eventsInCart = $self->getEventsInScratchCart;
 	
 	foreach my $eventId (@$eventIds) {
 	
@@ -868,6 +902,17 @@ sub getSubEventForm {
 	return $output;	
 }
 
+#------------------------------------------------------------------
+sub removeFromScratchCart {
+	my $self = shift;
+	my $event = shift;
+
+	my $events =  $self->session->scratch->get('EMS_scratch_cart');
+	$events =~ s/$event\n//;
+
+	$self->session->scratch->set('EMS_scratch_cart', $events);
+
+}
 #------------------------------------------------------------------
 sub resolveConflictForm {
 	my $self = shift;
@@ -972,11 +1017,12 @@ Method that will add an event to the users shopping cart.
 =cut
 
 sub www_addToCart {
-	my ($self, $pid, @pids, $output, $errors, $conflicts, $errorMessages);
+	my ($self, $pid, @pids, $output, $errors, $conflicts, $errorMessages, $shoppingCart);
 	$self = shift;
 	$conflicts = shift;
 	$pid = shift;
-	
+	$shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
+
 	# Check if conflicts were found that the user needs to fix
 	$output = $conflicts->[0] if defined $conflicts;
 	
@@ -989,9 +1035,11 @@ sub www_addToCart {
 			push(@pids, $self->session->form->get("pid") || $pid);
 		}
 
-		my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
+		#my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
 		foreach my $eventId (@pids) {
-			$shoppingCart->add($eventId, 'Event');
+			#$shoppingCart->add($eventId, 'Event');
+			$self->addToScratchCart($eventId);
+			
 		}
 
 		$output = $self->getSubEventForm(\@pids);
@@ -999,8 +1047,15 @@ sub www_addToCart {
 		$errors = $self->checkConflicts;
 		if (scalar(@$errors) > 0) { return $self->error($errors, "www_addToCart"); }
 		
-		$output = $self->getRegistrationInfo unless ($output);
-		
+		#$output = $self->getRegistrationInfo unless ($output);
+		unless ($output) {
+			$output = $self->getRegistrationInfo;
+			my $events = $self->getEventsInScratchCart;
+			foreach my $eventId (@$events) {
+				$shoppingCart->add($eventId, 'Event');
+			}
+			$self->emptyScratchCart;							
+		}		
 	}
 	return $self->session->style->process($self->processTemplate($output,$self->getValue("checkoutTemplateId")),$self->getValue("styleTemplateId"));
 } 
@@ -1030,11 +1085,14 @@ sub www_deleteCartItem {
 	my $event1 = $self->session->form->get("event1");
 	my $event2 = $self->session->form->get("event2");
 	my $eventUserDeleted = $self->session->form->get("productToRemove");
-	my $cart = WebGUI::Commerce::ShoppingCart->new($self->session);
+	#my $cart = WebGUI::Commerce::ShoppingCart->new($self->session);
 	
 	# Delete all of the subevents last added by the user
-	$cart->delete($event1, 'Event');
-	$cart->delete($event2, 'Event');
+	#$cart->delete($event1, 'Event');
+	#$cart->delete($event2, 'Event');
+
+	$self->removeFromScratchCart($event1);
+	$self->removeFromScratchCart($event2);
 	
 	# Add the subevents back to the cart except for the one the user choose to remove.
 	# This will re-trigger the conflict/sub-event display code correctly
@@ -1747,7 +1805,8 @@ sub www_moveEventUp {
 #-------------------------------------------------------------------
 sub www_saveRegistration {
 	my $self = shift;
-	my $eventsInCart = $self->getEventsInCart;
+#	my $eventsInCart = $self->getEventsInCart;
+	my $eventsInCart = $self->getEventsInScratchCart;
 	my $purchaseId = $self->session->id->generate;
 
 	foreach my $eventId (@$eventsInCart) {
