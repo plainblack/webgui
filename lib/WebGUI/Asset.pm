@@ -1071,6 +1071,8 @@ sub manageAssets {
          assetManager.AddColumn('".$i18n->get("last updated")."','','center','');
          assetManager.AddColumn('".$i18n->get("size")."','','right','');\n
          assetManager.AddColumn('".$i18n->get("locked")."','','center','');\n";
+	$self->session->output->print($output);
+	$output = '';
 	foreach my $child (@{$self->getLineage(["children"],{returnObjects=>1})}) {
 		$output .= 'var contextMenu = new contextMenu_createWithLink("'.$child->getId.'","More");
                 contextMenu.addLink("'.$child->getUrl("func=changeUrl;proceed=manageAssets").'","'.$i18n->get("change url").'");
@@ -1105,6 +1107,8 @@ sub manageAssets {
          	$output .= "assetManager.AddLineSortData('','','','".$title."','".$child->getName
 			."','".$child->get("revisionDate")."','".$child->get("assetSize")."');
 			assetManager.addAssetMetaData('".$child->getUrl."', '".$child->getRank."', '".$title."');\n";
+	$self->session->output->print($output);
+	$output = '';
 	}
 	$output .= '
 		assetManager.AddButton("'.$i18n->get("delete").'","deleteList","manageAssets");
@@ -1123,6 +1127,8 @@ sub manageAssets {
             &nbsp;
         </div>
 		<div style="float: left; padding-right: 30px; font-size: 14px;width: 28%;"><fieldset><legend>'.$i18n->get(1083).'</legend>';
+	$self->session->output->print($output);
+	$output = '';
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets","assetContainers")}) {
 		$output .= '<p style="display:inline;vertical-align:middle;"><img src="'.$link->{'icon.small'}.'" alt="'.$link->{label}.'" style="border: 0px;vertical-align:middle;" /></p> 
 			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
@@ -1130,6 +1136,8 @@ sub manageAssets {
 		$output .= '<br />';
 	}
 	$output .= '<hr />';
+	$self->session->output->print($output);
+	$output = '';
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets")}) {
 		$output .= '<p style="display:inline;vertical-align:middle;"><img src="'.$link->{'icon.small'}.'" alt="'.$link->{label}.'" style="border: 0px;vertical-align:middle;" /></p> 
 			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
@@ -1137,6 +1145,8 @@ sub manageAssets {
 		$output .= '<br />';
 	}
 	$output .= '<hr />';
+	$self->session->output->print($output);
+	$output = '';
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets","utilityAssets")}) {
 		$output .= '<p style="display:inline;vertical-align:middle;"><img src="'.$link->{'icon.small'}.'" alt="'.$link->{label}.'" style="border: 0px;vertical-align:middle;" /></p> 
 			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
@@ -1144,6 +1154,8 @@ sub manageAssets {
 		$output .= '<br />';
 	}
 	$output .= '</fieldset></div>'; 
+	$self->session->output->print($output);
+	$output = '';
 	my %options;
 	tie %options, 'Tie::IxHash';
 	my $hasClips = 0;
@@ -1173,25 +1185,23 @@ sub manageAssets {
 			//]]>
 			</script>';
 	}
-	my $hasPackages = 0;
-	my $packages;
+	$self->session->output->print($output);
+	$output = '';
+	$output .= '<div style="width: 28%;float: left; padding-right: 30px; font-size: 14px;"><fieldset> <legend>'.$i18n->get("packages").'</legend>';
         foreach my $asset (@{$self->getPackageList}) {
-              	$packages  .= '<p style="display:inline;vertical-align:middle;"><img src="'.$asset->getIcon(1).'" alt="'.$asset->getName.'" style="vertical-align:middle;border: 0px;" /></p> 
+              	$output .= '<p style="display:inline;vertical-align:middle;"><img src="'.$asset->getIcon(1).'" alt="'.$asset->getName.'" style="vertical-align:middle;border: 0px;" /></p> 
 			<a href="'.$self->getUrl("func=deployPackage;assetId=".$asset->getId).'">'.$asset->getTitle.'</a> '
 			.$self->session->icon->edit("func=edit;proceed=manageAssets",$asset->get("url"))
+			.$self->session->icon->export("func=exportPackage",$asset->get("url"))
 			.'<br />';
-		$hasPackages = 1;
         }
-	if ($hasPackages) {
-		$output .= '<div style="width: 28%;float: left; padding-right: 30px; font-size: 14px;"><fieldset>
-			<legend>'.$i18n->get("packages").'</legend>
-			'.$packages.' </fieldset></div> ';
-	}
-	$output .= '
+	$output .= ' </fieldset></div> 
     <div class="adminConsoleSpacer">
             &nbsp;
         </div> 
 		';
+	$self->session->output->print($output);
+	$output = '';
 	return $output;
 }
 
@@ -1217,7 +1227,9 @@ sub manageAssetsSearch {
 	$output .= WebGUI::Form::hidden($self->session, {name=>"doit", value=>"1"});
 	$output .= WebGUI::Form::submit($self->session, {value=>"Search"});
 	$output .= WebGUI::Form::formFooter($self->session);
-	return $output unless ($self->session->form->get("doit"));
+	$self->session->output->print($output);
+	$output = '';
+	return undef unless ($self->session->form->get("doit"));
 	my $class = $self->session->form->get("class") eq "any" ? undef : $self->session->form->get("class");
 	my $assets = WebGUI::Search->new($self->session,0)->search({
 		keywords=>$self->session->form->get("keywords"),
@@ -1233,6 +1245,8 @@ sub manageAssetsSearch {
          assetManager.AddColumn('".$i18n->get("last updated")."','','center','');
          assetManager.AddColumn('".$i18n->get("size")."','','right','');
          \n";
+	$self->session->output->print($output);
+	$output = '';
         foreach my $child (@{$assets}) {
 		$output .= 'var contextMenu = new contextMenu_createWithLink("'.$child->getId.'","More");
                 contextMenu.addLink("'.$child->getUrl("func=editBranch").'","'.$i18n->get("edit branch").'");
@@ -1265,6 +1279,8 @@ sub manageAssetsSearch {
          	$output .= "assetManager.AddLineSortData('','','','".$title."','".$child->getName
 			."','".$child->get("revisionDate")."','".$child->get("assetSize")."');
 			assetManager.addAssetMetaData('".$child->getUrl."', '".$child->getRank."', '".$title."');\n";
+		$self->session->output->print($output);
+		$output = '';
 	}
         $output .= 'assetManager.AddButton("'.$i18n->get("delete").'","deleteList","manageAssets");
 		assetManager.AddButton("'.$i18n->get("cut").'","cutList","manageAssets");
@@ -1278,7 +1294,8 @@ sub manageAssetsSearch {
                  }
                  //]]>
                 </script> <div class="adminConsoleSpacer"> &nbsp;</div>';
-	return $output;
+	$self->session->output->print($output);
+	return undef;
 }
 
 #-------------------------------------------------------------------
@@ -1897,18 +1914,23 @@ sub www_manageAssets {
         $self->session->style->setScript($self->session->config->get("extrasURL").'/contextMenu/contextMenu.js', {type=>"text/javascript"});
   	$self->session->style->setLink($self->session->config->get("extrasURL").'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});
         $self->session->style->setScript($self->session->config->get("extrasURL").'/assetManager/assetManager.js', {type=>"text/javascript"});
-	my $output = '<div style="text-align: right;"><a href="'.$self->getUrl("func=manageAssets;manage=1").'">Manage</a> | <a href="'.$self->getUrl("func=manageAssets;search=1").'">Search</a></div>';
 	if ($self->session->form->get("search")) {
 		$self->session->scratch->set("manageAssetsSearchToggle",1);
 	} elsif ($self->session->form->get("manage")) {
 		$self->session->scratch->delete("manageAssetsSearchToggle");
 	}
+	my $out = $self->getAdminConsole->render($self->getAdminConsole->render("~~~"));
+	my ($head, $foot) = split("~~~",$out);
+	$self->session->http->getHeader;
+	$self->session->output->print($head);
+	$self->session->output->print('<div style="text-align: right;"><a href="'.$self->getUrl("func=manageAssets;manage=1").'">Manage</a> | <a href="'.$self->getUrl("func=manageAssets;search=1").'">Search</a></div>',1);
 	if ($self->session->scratch->get("manageAssetsSearchToggle")) {
-		$output .= $self->manageAssetsSearch;
+		$self->manageAssetsSearch;
 	} else {
-		$output .= $self->manageAssets;
+		$self->manageAssets;
 	}
-	return $self->getAdminConsole->render($output);
+	$self->session->output->print($foot);
+	return "chunked";
 }
 
 #-------------------------------------------------------------------
