@@ -61,7 +61,7 @@ sub delete {
 	my $name = shift;
 	return undef unless ($name);
 	delete $self->{_data}{$name};
-	$self->session->db->deleteRow("userSessionScratch","sessionId",$self->{_sessionId});
+	$self->session->db->write("delete from userSessionScratch where name=? and sessionId=?", [$name, $self->{_sessionId}]);
 }
 
 
