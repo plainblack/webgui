@@ -136,9 +136,9 @@ sub importAssetData {
 	} else {
 		$asset = WebGUI::Asset->new($self->session, $id, $class);
 		if (defined $asset) { # create a new revision of an existing asset
-			$asset->addRevision($data->{properties}, $version);
+			$asset = $asset->addRevision($data->{properties}, $version);
 		} else { # add an entirely new asset
-			$self->addChild($data->{properties}, $id, $version);
+			$asset = $self->addChild($data->{properties}, $id, $version);
 		}
 	}
 	return $asset;
@@ -172,8 +172,9 @@ sub importPackage {
 			my $assetStorage = WebGUI::Storage->get($self->session, $storageId);
 			$decompressed->untar($storageId.".storage", $assetStorage);
 		}
-		my $asset = $assets{$data->{parentId}} || $self;
-		$assets{$data->{assetId}} = $asset->importAssetData($data);
+		my $asset = $assets{$data->{properties}{parentId}} || $self;
+		my $newAsset = $asset->importAssetData($data);
+		$assets{$newAsset->getId} = $newAsset;
 	}
 	return undef;
 }
