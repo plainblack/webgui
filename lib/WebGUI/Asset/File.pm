@@ -125,6 +125,22 @@ sub duplicate {
 
 #-------------------------------------------------------------------
 
+=head2 exportAssetData() ( )
+
+See WebGUI::AssetPackage::exportAssetData() for details.
+
+=cut
+
+sub exportAssetData {
+	my $self = shift;
+	my $data = $self->SUPER::exportAssetData;
+	push(@{$data->{storage}}, $self->get("storageId")) if ($self->get("storageId") ne "");
+	return $data;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getEditForm ()
 
 Returns the TabForm object that will be used in generating the edit page for this asset.

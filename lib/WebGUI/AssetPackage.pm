@@ -45,7 +45,7 @@ Converts all the properties of this asset into a hash reference and then returns
 
 =cut
 
-sub exportData {
+sub exportAssetData {
 	my $self = shift;
 	my %data = %{$self->get};
 	my %hash = ( properties => \%data, storage=>[] );
@@ -64,7 +64,7 @@ sub exportPackage {
 	my $self = shift;
 	my $storage = WebGUI::Storage->createTemp($self->session);
 	foreach my $asset (@{$self->getLineage(["self","descendants"],{returnObjects=>1})}) {
-		my $data = $asset->exportData;
+		my $data = $asset->exportAssetData;
 		$storage->addFileFromScalar($data->{properties}{lineage}.".json", JSON::objToJson($data));
 		foreach my $storageId (@{$data->{storage}}) {
 			my $assetStorage = WebGUI::Storage->get($self->session, $storageId);
@@ -160,14 +160,22 @@ sub importPackage {
 	my $self = shift;
 	my $storage = shift;
 	my $decompressed = $storage->untar($storage->getFiles->[0]);
-	foreach my $file (@{$decompressed->getFiles}) {
-		my $data = JSON::jsonToObj($decompressed->getFileContentsAsScalar($file));
+	my %assets = ();
+	foreach my $file (sort(@{$decompressed->getFiles})) {
+		next unless ($decompressed->getFileExtension($file) eq "json");
+		my $data = eval{JSON::jsonToObj($decompressed->getFileContentsAsScalar($file))};
+		if ($@ || $data->{properties}{assetId} eq "" || $data->{properties}{className} eq "" || $data->{properties}{revisionDate} eq "") {
+			$self->session->errorHandler->warn("package corruption: ".$@) if ($@);
+			return "corrupt";
+		}
 		foreach my $storageId (@{$data->{storage}}) {
 			my $assetStorage = WebGUI::Storage->get($self->session, $storageId);
 			$decompressed->untar($storageId.".storage", $assetStorage);
 		}
-		$self->importAssetData($data);
+		my $asset = $assets{$data->{parentId}} || $self;
+		$assets{$data->{assetId}} = $asset->importAssetData($data);
 	}
+	return undef;
 }
 
 #-------------------------------------------------------------------
@@ -183,12 +191,12 @@ sub www_deployPackage {
 	# Must have edit rights to the asset deploying the package.  Also, must be a Content Manager.
 	# This protects against non content managers deploying packages using a post or similar trickery.
 	return $self->session->privilege->insufficient() unless ($self->canEdit && $self->session->user->isInGroup(4));
-	my $packageMasterAssetId = $self->session->form->process("assetId");
+	my $packageMasterAssetId = $self->session->form->param("assetId");
 	if (defined $packageMasterAssetId) {
-		my $packageMasterAsset = WebGUI::Asset->newByDynamicClass($packageMasterAssetId);
+		my $packageMasterAsset = WebGUI::Asset->newByDynamicClass($self->session, $packageMasterAssetId);
 		unless ($packageMasterAsset->getValue('isPackage')) { #only deploy packages
-		 WebGUI::ErrorHandler::security('deploy an asset as a package which was not set as a package.');
-		 return;
+		 	$self->session->errorHandler->security('deploy an asset as a package which was not set as a package.');
+		 	return;
 		}
 		my $masterLineage = $packageMasterAsset->get("lineage");
                 if (defined $packageMasterAsset && $packageMasterAsset->canView && $self->get("lineage") !~ /^$masterLineage/) {
@@ -211,6 +219,7 @@ sub www_exportPackage {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless ($self->get("isPackage") && $self->canEdit && $self->session->user->isInGroup(4));
 	my $storage = $self->exportPackage;
+	my $filename = $storage->getFiles->[0];
 	$self->session->http->setRedirect($storage->getUrl($storage->getFiles->[0]));
 	return "redirect";
 }
@@ -226,7 +235,11 @@ sub www_importPackage {
 	return $self->session->privilege->insufficient() unless ($self->canEdit && $self->session->user->isInGroup(4));
 	my $storage = WebGUI::Storage->createTemp($self->session);
 	$storage->addFileFromFormPost("packageFile",1);
-	$self->importPackage($storage) if ($storage->getFileExtension($storage->getFiles->[0]) eq "wgpkg");
+	my $error = $self->importPackage($storage) if ($storage->getFileExtension($storage->getFiles->[0]) eq "wgpkg");
+	if ($error) {
+		my $i18n = WebGUI::International->new($self->session, "Asset");
+		return $self->session->style->userStyle($i18n->get("package corrupt"));
+	}
 	return $self->www_manageAssets();	
 }
 

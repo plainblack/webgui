@@ -1,6 +1,12 @@
 package WebGUI::i18n::English::Asset;
 
 our $I18N = {
+	'package corrupt' => {
+		message => q|The package you tried to import appears to be corrupt. We imported up to the point where we detected corruption. If you won't want this portion, roll back your current version tag.|,
+		lastUpdated => 0,
+		context => q|error message about package corruption|
+	},
+
 	'import' => {
 		message => q|Import|,
 		lastUpdated => 0,
