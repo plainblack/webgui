@@ -92,7 +92,7 @@ is ($g->expireNotifyOffset(), -14, 'Default expire notify offset time');
 is ($g->deleteOffset(), 14, 'Default delete offset time');
 is ($g->expireNotify(), 0, 'Default expire notify time');
 is ($g->databaseLinkId(), 0, 'Default databaseLinkId');
-is ($g->dbCacheTimeout(), 3600, 'Default external database cache timeout');
+is ($g->groupCacheTimeout(), 3600, 'Default external database cache timeout');
 is ($g->dateCreated(), $g->lastUpdated(), 'lastUpdated = create time');
 is_deeply ($g->getGroupsIn(), [3], 'Admin group added by default to this group');
 is_deeply ($g->getGroupsFor(), [], 'Group not added to any other group');
