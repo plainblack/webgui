@@ -90,7 +90,7 @@ sub _create {
 		deleteOffset=>14,
 		expireNotify=>0,
 		databaseLinkId=>0,
-		dbCacheTimeout=>3600,
+		groupCacheTimeout=>3600,
 		lastUpdated=>$self->session->datetime->time()
 		}, $override);
 	$self->addGroups([3]);
@@ -686,6 +686,9 @@ sub getUsers {
 	my $withoutExpired = shift;
 	my $loopCount = shift;
 	my $expireTime = 0;
+	my $cache = WebGUI::Cache->new($self->session, $self->getId);
+	my $value = $cache->get;
+	return $value if defined $value;
 	if ($withoutExpired) {
 		$expireTime = $self->session->datetime->time();
 	}
@@ -710,6 +713,7 @@ sub getUsers {
 	}
 	my %users = map { $_ => 1 } @users;
 	@users = keys %users;
+	$cache->set(\@users, $self->groupCacheTimeout);
 	return \@users;
 }
 
@@ -961,23 +965,23 @@ sub databaseLinkId {
 
 #-------------------------------------------------------------------
 
-=head2 dbCacheTimeout ( [ value ] )
+=head2 groupCacheTimeout ( [ value ] )
 
-Returns the dbCacheTimeout for this group.
+Returns the groupCacheTimeout for this group.
 
 =head3 value
 
-If specified, the dbCacheTimeout is set to this value.
+If specified, the groupCacheTimeout is set to this value.
 
 =cut
 
-sub dbCacheTimeout {
+sub groupCacheTimeout {
         my $self = shift;
         my $value = shift;
         if (defined $value) {
-                $self->set("dbCacheTimeout",$value);
+                $self->set("groupCacheTimeout",$value);
         }
-        return $self->get("dbCacheTimeout");
+        return $self->get("groupCacheTimeout");
 }
 
 #-------------------------------------------------------------------

@@ -298,13 +298,13 @@ sub isInGroup {
                                         }
                                     if(isIn($connectDn,@peeps)) {	 
 					   $isInGroup->{$uid}{$gid} = 1;
-                       if ($group->{'dbCacheTimeout'} > 10) {
+                       if ($group->{'groupCacheTimeout'} > 10) {
                           $group->deleteUsers([$uid]);
-                          $group->addUsers([$uid],$group->get("dbCacheTimeout"));
+                          $group->addUsers([$uid],$group->get("groupCacheTimeout"));
                        }
 					} else {
 					   $isInGroup->{$uid}{$gid} = 0;
-                       			   $group->deleteUsers([$uid]) if ($group->get("dbCacheTimeout") > 10);
+                       			   $group->deleteUsers([$uid]) if ($group->get("groupCacheTimeout") > 10);
 					}
 					$ldapLink->unbind;
 					$self->session->stow->set("isInGroup",$isInGroup);

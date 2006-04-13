@@ -1525,7 +1525,7 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 	},
 
 	'1004' => {
-		message => q|Cache external groups for how long?|,
+		message => q|Cache groups for how long?|,
 		lastUpdated => 1057208065
 	},
 

@@ -37,6 +37,7 @@ updateTemplates();
 updateDatabaseLinksAndSQLReport();
 ipsToCIDR();
 addDisabletoRichEditor();
+changeDbCacheTimeoutName();
 addNavigationMimeType();
 addIndexes();
 addDatabaseCache();
@@ -1101,6 +1102,12 @@ sub addDisabletoRichEditor {
 	$sth->finish;
 	# only add the column if it doesn't already exist.
 	$session->db->write("alter table RichEdit add column disableRichEditor int(11) default 0") if ($numColumns < 21);
+}
+
+#-------------------------------------------------
+sub addDisabletoRichEditor {
+	print "\tChanging dbCacheTimeout to groupCacheTimeout.\n" unless ($quiet);
+	$session->db->write("alter table groups change dbCacheTimeout groupCacheTimeout int not null default 3600");
 }
 
 #-------------------------------------------------

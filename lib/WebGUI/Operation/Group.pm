@@ -397,10 +397,10 @@ sub www_editGroup {
 		   -value=>$g->ldapRecursiveProperty
 	    );
 	$f->interval(
-		-name=>"dbCacheTimeout",
+		-name=>"groupCacheTimeout",
 		-label=>$i18n->get(1004), 
 		-hoverHelp=>$i18n->get('1004 description'), 
-		-value=>$g->dbCacheTimeout
+		-value=>$g->groupCacheTimeout
 		);
 	$f->submit;
 	$output .= $f->print;
@@ -426,7 +426,7 @@ sub www_editGroupSave {
 	$g->autoDelete($session->form->yesNo("autoDelete"));
 	$g->databaseLinkId($session->form->process("databaseLinkId"));
 	$g->dbQuery($session->form->process("dbQuery"));
-	$g->dbCacheTimeout($session->form->interval("dbCacheTimeout"));
+	$g->groupCacheTimeout($session->form->interval("groupCacheTimeout"));
 	$g->ldapGroup($session->form->text("ldapGroup"));
 	$g->ldapGroupProperty($session->form->text("ldapGroupProperty"));
 	$g->ldapRecursiveProperty($session->form->text("ldapRecursiveProperty"));
