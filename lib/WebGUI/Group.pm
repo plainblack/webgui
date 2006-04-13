@@ -646,7 +646,7 @@ sub getGroupsIn {
         if ($isRecursive) {
                 $loopCount++;
                 if ($loopCount > 99) {
-                        $self->session->errorHandler->fatal("Endless recursive loop detected while determining".  " groups in group.\nRequested groupId: ".$self->getId."\nGroups in that group: ".join(",",@$groups));
+                        $self->session->errorHandler->fatal("Endless recursive loop detected while determining groups in group.\nRequested groupId: ".$self->getId."\nGroups in that group: ".join(",",@$groups));
                 }
                 my @groupsOfGroups = @$groups;
                 foreach my $group (@$groups) {
@@ -684,43 +684,32 @@ sub getUsers {
 	my $self = shift;
 	my $recursive = shift;
 	my $withoutExpired = shift;
-	my $clause;
-	my @externalUsers = ();
+	my $loopCount = shift;
+	my $expireTime = 0;
 	if ($withoutExpired) {
-		$clause = "expireDate > ".$self->session->datetime->time()." and ";
+		$expireTime = $self->session->datetime->time();
 	}
-	$clause .= "(groupId=".$self->session->db->quote($self->getId);
- 	if ($recursive) {
-		my $groups = $self->getGroupsIn(1);
-		if ($#$groups >= 0) {
-			if ($withoutExpired) {
-				foreach my $groupId (@$groups) {
-					$clause .= " OR (groupId = ".$self->session->db->quote($groupId)." AND expireDate > ".$self->session->datetime->time().") ";
-				}
-			} else {
-				$clause .= " OR groupId IN (".$self->session->db->quoteAndJoin($groups).")";
-			}
-		}
-		##Have to iterate twice due to the withoutExpired clause.
-		foreach my $groupId (@{ $groups }) {
-			my $extGroup = WebGUI::Group->new($self->session, $groupId);
-			push @externalUsers,
-				@{ $extGroup->getDatabaseUsers() },
-				@{ $extGroup->getKarmaUsers() },
-				@{ $extGroup->getScratchUsers() },
-				@{ $extGroup->getIpUsers() },
-			;
-		}
-	}
-	$clause .= ")";
-	my @localUsers = $self->session->db->buildArray("select userId from groupings where $clause");
-	push @externalUsers,
+	my @users = $self->session->db->buildArray("select userId from groupings where expireDate > ? and groupId = ?", [$expireTime, $self->getId]);
+	push @users,
 		@{ $self->getDatabaseUsers() },
 		@{ $self->getKarmaUsers() },
 		@{ $self->getScratchUsers() },
 		@{ $self->getIpUsers() },
 	;
-	my @users = ( @localUsers, @externalUsers );
+ 	if ($recursive) {
+		++$loopCount;
+		if ($loopCount > 99) {
+                        $self->session->errorHandler->fatal("Endless recursive loop detected while determining groups in group.\nRequested groupId: ".$self->getId);
+		}
+		my $groups = $self->getGroupsIn();
+		##Have to iterate twice due to the withoutExpired clause.
+		foreach my $groupId (@{ $groups }) {
+			my $subGroup = WebGUI::Group->new($self->session, $groupId);
+			push @users, @{ $subGroup->getUsers(1, $withoutExpired, $loopCount) };
+		}
+	}
+	my %users = map { $_ => 1 } @users;
+	@users = keys %users;
 	return \@users;
 }
 
