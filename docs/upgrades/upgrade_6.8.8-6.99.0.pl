@@ -24,6 +24,7 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
+changeDbCacheTimeoutName();
 addWorkflow();
 convertMessageLogToInbox();
 updateCs();
@@ -37,7 +38,6 @@ updateTemplates();
 updateDatabaseLinksAndSQLReport();
 ipsToCIDR();
 addDisabletoRichEditor();
-changeDbCacheTimeoutName();
 addNavigationMimeType();
 addIndexes();
 addDatabaseCache();
@@ -1105,7 +1105,7 @@ sub addDisabletoRichEditor {
 }
 
 #-------------------------------------------------
-sub addDisabletoRichEditor {
+sub changeDbCacheTimeoutName {
 	print "\tChanging dbCacheTimeout to groupCacheTimeout.\n" unless ($quiet);
 	$session->db->write("alter table groups change dbCacheTimeout groupCacheTimeout int not null default 3600");
 }
