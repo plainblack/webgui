@@ -7,6 +7,7 @@ use WebGUI::HTMLForm;
 use WebGUI::Cache;
 use WebGUI::Mail::Send;
 use WebGUI::SQL;
+use WebGUI::Storage::Image;
 use WebGUI::User;
 use WebGUI::Utility;
 use WebGUI::Inbox;
@@ -362,6 +363,15 @@ sub www_copy {
 }
 
 #-------------------------------------------------------------------
+sub www_deleteField {
+	my $self = shift;
+	my $id = $self->session->form->param("fieldId");
+	$self->session->db->write("delete from Matrix_field where fieldId=?",[$id]);
+	$self->session->db->write("delete from Matrix_listingData where fieldId=?",[$id]);
+	$self->www_listFields();
+}
+
+#-------------------------------------------------------------------
 sub www_deleteListing {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
@@ -540,6 +550,15 @@ sub www_editListing {
 		-label=>$i18n->get('product url'),
 		-hoverHelp=>$i18n->get('product url description'),
 		);
+	$f->image(
+		name=>"screenshot",
+		label=>$i18n->get("screenshot"),
+		hoverHelp=>$i18n->get("screenshot help")
+		);
+	if ($listing->{filename} && $listing->{storageId}) {
+		my $storage = WebGUI::Storage::Image->get($self->session, $listing->{storageId});
+		$f->readOnly(value=>'<img src="'.$storage->getThumbnailUrl($listing->{filename}).'" alt="'.$listing->{filename}.'" />');
+	}
 	$f->text(
 		-name=>"manufacturerName",
 		-value=>$listing->{manufacturerName},
@@ -652,6 +671,18 @@ sub www_editListingSave {
 		description => $self->session->form->process("description"),
 		versionNumber=>$self->session->form->process("versionNumber")
 		);
+	my $storage = undef;
+	if ($listing->{storageId} ne "") {
+		$storage = WebGUI::Storage::Image->get($self->session, $listing->{storageId});
+	} else {
+		$storage = WebGUI::Storage::Image->create($self->session);
+		$data{storageId} = $storage->getId;
+	}
+	my $screenshot = $storage->addFileFromFormPost("screenshot");
+	if (defined $screenshot) {
+		$data{filename} = $screenshot;
+		$storage->generateThumbnail($screenshot);
+	}
 	my $isNew = 0;
 	if ($self->session->form->process("listingId") eq "new") {
 		$data{maintainerId} = $self->session->user->userId if ($self->session->form->process("listingId") eq "new");
@@ -814,7 +845,9 @@ sub www_listFields {
 				$self->getUrl("func=editField;fieldId=new");
 	my $sth = $self->session->db->read("select fieldId, label from Matrix_field where assetId=".$self->session->db->quote($self->getId)." order by label");
 	while (my ($id, $label) = $sth->array) {
-		$output .= '<a href="'.$self->getUrl("func=editField;fieldId=".$id).'">'.$label.'</a><br />';
+		$output .= $self->session->icon->delete("func=deleteField;fieldId=".$id, $self->get("url"), $i18n->get("delete field confirm"))
+			.$self->session->icon->edit("func=editField;fieldId=".$id)
+			.' '.$label."<br />\n";
 	}
 	$sth->finish;
 	return $self->processStyle($output);
@@ -1051,6 +1084,11 @@ sub www_viewDetail {
 	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
 	my $listing = $self->session->db->getRow("Matrix_listing","listingId",$listingId);
 	my $forum = WebGUI::Asset::Wobject::Collaboration->new($self->session, $listing->{forumId});
+	if ($listing->{storageId} && $listing->{filename}) {
+		my $storage = WebGUI::Storage::Image->get($self->session, $listing->{storageId});
+		$var{screenshot} = $storage->getUrl($listing->{filename});
+		$var{thumbnail} = $storage->getThumbnailUrl($listing->{filename});
+	}
 	$var{"discussion"} = $forum->view;
 	$var{'isLoggedIn'} = ($self->session->user->userId ne "1");
 	if ($self->session->form->process("do") eq "sendEmail") {

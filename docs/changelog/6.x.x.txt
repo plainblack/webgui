@@ -35,6 +35,8 @@
    everything should cache in the same way.
  - Converted WebGUI to use a new object oriented session system. More details
    in migation.txt.
+ - Added a screenshot feature to the matrix.
+ - Added an option to delete Matrix fields.
  - Added an API for retrieving email from POP3 servers.
  - The rebuildLineage.pl script now finds and fixes orphans, and tries to
    locate circular relationships as well.

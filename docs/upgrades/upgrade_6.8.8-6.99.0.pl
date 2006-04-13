@@ -44,8 +44,16 @@ addDatabaseCache();
 updateHelpTemplate();
 fixImportNodePrivileges();
 addAdManager();
+updateMatrix();
 
 finish($session); # this line required
+
+#-------------------------------------------------
+sub updateMatrix {
+	print "\tAdding new features to the matrix.\n";
+	$session->db->write("alter table Matrix_listing add column storageId varchar(22) binary");
+	$session->db->write("alter table Matrix_listing add column filename varchar(255)");
+}
 
 #-------------------------------------------------
 sub changeCache {

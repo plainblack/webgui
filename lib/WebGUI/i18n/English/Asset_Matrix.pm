@@ -1,6 +1,24 @@
 package WebGUI::i18n::English::Asset_Matrix;
 
 our $I18N = {
+	'delete field confirm' => {
+		message => q|Are you certain you wish to delete this field and all the data linked to it?|,
+		lastUpdated => 0,
+		context => q|displayed in field manager before delete|
+		},
+
+	'screenshot' => {
+		message => q|Screenshot/Photo|,
+		lastUpdated => 0,
+		context => q|edit listing property|
+		},
+
+	'screenshot help' => {
+		message => q|Upload a picture of the product, or a screen shot if it's a software package.|,
+		lastUpdated => 0,
+		context => q|edit listing property help|
+		},
+
 	'visitor cache timeout' => {
 		message => q|Visitor Cache Timeout|,
 		lastUpdated => 0
@@ -125,14 +143,24 @@ our $I18N = {
         },
 
         'detail template help body' => {
-                lastUpdated => 0,
+                lastUpdated => 1144969331,
                 message => q|<p>The following variables are available in the listing detail template.</p>
 
 		<p>
 		<b>discussion</b><br />
 		The forum attached to this listing.
 		</p>
+
+		<p>
+		<b>screenshot</b><br />
+		The URL to the uploaded photo or screenshot.
+		</p>
 		
+		<p>
+		<b>thumbnail</b><br />
+		The URL to the thumbnail of the uploaded photo or screenshot
+		</p>
+	
 		<p>
 		<b>email.form</b><br />
 
