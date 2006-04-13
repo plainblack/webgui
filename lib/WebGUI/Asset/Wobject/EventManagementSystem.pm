@@ -214,10 +214,10 @@ sub addToScratchCart {
 	my $self = shift;
 	my $event = shift;
 
-	my @eventsInCart = split('\n',$self->session->scratch->get('EMS_scratch_cart'));
-	push(@eventsInCart, $event);
+	my @eventsInCart = split("\n",$self->session->scratch->get('EMS_scratch_cart'));
+	push(@eventsInCart, $event) ;
 
-	$self->session->scratch->set('EMS_scratch_cart', join('\n', @eventsInCart));
+	$self->session->scratch->set('EMS_scratch_cart', join("\n", @eventsInCart));
 }
 
 
@@ -274,6 +274,8 @@ sub checkConflicts {
 	my $self = shift;
 #	my $eventsInCart = $self->getEventsInCart;
 	my $eventsInCart = $self->getEventsInScratchCart;
+	use Data::Dumper;
+	$self->session->errorHandler->warn(Dumper($eventsInCart));
 	my @schedule;
 	
 	# Get schedule info for events in cart and sort asc by start date
@@ -368,6 +370,14 @@ sub definition {
 				namespace=>"EventManagementSystem_checkout",
 				hoverHelp=>'',
 				label=>"Checkout Template"
+				},
+			managePurchasesTemplateId =>{
+				fieldType=>"template",
+				defaultValue=>'EventManagerTmpl000004',
+				tab=>"display",
+				namespace=>"EventManagementSystem_managePurchas",
+				hoverHelp=>'Manage Purchases Template',
+				label=>"Manage Purchases Template"
 				},
 			paginateAfter =>{
 				fieldType=>"integer",
@@ -557,10 +567,8 @@ sub getEventsInCart {
 #------------------------------------------------------------------
 sub getEventsInScratchCart {
 	my $self = shift;
-	my @eventsInCart = $self->session->scratch->get('EMS_scratch_cart');
-
+	my @eventsInCart = split("\n",$self->session->scratch->get('EMS_scratch_cart'));
 	return \@eventsInCart;
-
 }
 
 #------------------------------------------------------------------
@@ -891,8 +899,7 @@ sub getSubEventForm {
 		'title'		=> $eventData->{title},
 		'description'	=> $eventData->{description},
 		'price'		=> $eventData->{price}
-
-	   });	 
+	   });
 	 }
 	}
 	$var{'subevents_loop'} = \@subEventLoop;
@@ -906,13 +913,14 @@ sub getSubEventForm {
 sub removeFromScratchCart {
 	my $self = shift;
 	my $event = shift;
-
-	my $events =  $self->session->scratch->get('EMS_scratch_cart');
-	$events =~ s/$event\n//;
-
-	$self->session->scratch->set('EMS_scratch_cart', $events);
-
+	my $events =  $self->getEventsInScratchCart();
+	my @newArr;
+	foreach (@{$events}) {
+		push (@newArr,$_) unless $_ eq $event;
+	}
+	$self->session->scratch->set('EMS_scratch_cart', join("\n",\@newArr));
 }
+
 #------------------------------------------------------------------
 sub resolveConflictForm {
 	my $self = shift;
@@ -1267,14 +1275,14 @@ sub www_editEvent {
 	
 	$f->dateTime(
 		-name  => "startDate",
-		-value => $self->session->form->get("startDate") || $event->{startDate},
+		-value => $self->session->form->process("startDate",'dateTime') || $event->{startDate},
 		-hoverHelp => $i18n->get('add/edit event start date description'),
 		-label => $i18n->get('add/edit event start date')
 	);
 	
 	$f->dateTime(
 		-name  => "endDate",
-		-value => $self->session->form->get("endDate") || $event->{endDate},
+		-value => $self->session->form->process("endDate",'dateTime') || $event->{endDate},
 		-defaultValue => time()+3600, #one hour from start date
 		-hoverHelp => $i18n->get('add/edit event end date description'),
 		-label => $i18n->get('add/edit event end date')
@@ -1367,7 +1375,7 @@ sub www_editEvent {
 	my $list = $self->getAssignedPrerequisites($pid);
 	foreach my $prerequisiteId (keys %{$list}) {
 	
-		my $line = $self->session->icon->delete('func=deletePrerequisite;id='.$prerequisiteId,
+		my $line = $self->session->icon->delete('func=deletePrerequisite;pid='.$pid.';id='.$prerequisiteId,
 							 $self->getUrl, $i18n->get('confirm delete prerequisite'))." ";
 		
 		my $eventNames = $self->getRequiredEventNames($prerequisiteId);
@@ -1557,6 +1565,36 @@ sub www_manageEventMetadata {
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editEventMetaDataField;fieldId=new'), $i18n->get("add new event metadata field"));
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEvents'), $i18n->get('manage events'));
 	return $self->getAdminConsole->render($output, $i18n->get("manage event metadata"));
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_managePurchases ( )
+
+Method to display list of purchases.  Event admins can see everyone's purchases.
+
+=cut
+
+sub www_managePurchases {
+	my $self = shift;
+	my %var = $self->get();
+	my $isAdmin = $self->session->user->isInGroup($self->get("groupToAddEvents"));
+
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
+	my $whereClause = ($isAdmin)?'':" and userId='".$self->session->user->userId."' and e.endDate > '".$self->session->datetime->time()."'";
+	my $sql = "select distinct(p.purchaseId) as purchaseId, t.initDate as initDate from transaction as t, EventManagementSystem_purchases as p, EventManagementSystem_registrations as r, EventManagementSystem_products as e where p.transactionId=t.transactionId and p.purchaseId=r.purchaseId and r.productId=e.productId $whereClause order by t.initDate";
+	my $sth = $self->session->db->read($sql);
+	my @purchasesLoop;
+	while (my $purchase = $sth->hashRef) {
+		$purchase->{datePurchasedHuman} = $self->session->datetime->epochToHuman($purchase->{initDate});
+		$purchase->{purchaseUrl} = $self->getUrl."?func=viewPurchase;purchaseId=".$purchase->{purchaseId};
+		
+		push(@purchasesLoop,$purchase);
+	}
+	$var{managePurchasesTitle} = 'Manage Purchases';
+	$sth->finish;
+	$var{'purchasesLoop'} = \@purchasesLoop;
+	return $self->session->style->process($self->processTemplate(\%var,$self->getValue("managePurchasesTemplateId")),$self->getValue("styleTemplateId"));
 }
 
 #-------------------------------------------------------------------
