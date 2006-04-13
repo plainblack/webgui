@@ -1107,8 +1107,8 @@ sub manageAssets {
          	$output .= "assetManager.AddLineSortData('','','','".$title."','".$child->getName
 			."','".$child->get("revisionDate")."','".$child->get("assetSize")."');
 			assetManager.addAssetMetaData('".$child->getUrl."', '".$child->getRank."', '".$title."');\n";
-	$self->session->output->print($output);
-	$output = '';
+		$self->session->output->print($output,1);
+		$output = '';
 	}
 	$output .= '
 		assetManager.AddButton("'.$i18n->get("delete").'","deleteList","manageAssets");
@@ -1127,7 +1127,7 @@ sub manageAssets {
             &nbsp;
         </div>
 		<div style="float: left; padding-right: 30px; font-size: 14px;width: 28%;"><fieldset><legend>'.$i18n->get(1083).'</legend>';
-	$self->session->output->print($output);
+	$self->session->output->print($output,1);
 	$output = '';
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets","assetContainers")}) {
 		$output .= '<p style="display:inline;vertical-align:middle;"><img src="'.$link->{'icon.small'}.'" alt="'.$link->{label}.'" style="border: 0px;vertical-align:middle;" /></p> 
@@ -1136,8 +1136,6 @@ sub manageAssets {
 		$output .= '<br />';
 	}
 	$output .= '<hr />';
-	$self->session->output->print($output);
-	$output = '';
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets")}) {
 		$output .= '<p style="display:inline;vertical-align:middle;"><img src="'.$link->{'icon.small'}.'" alt="'.$link->{label}.'" style="border: 0px;vertical-align:middle;" /></p> 
 			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
@@ -1145,8 +1143,6 @@ sub manageAssets {
 		$output .= '<br />';
 	}
 	$output .= '<hr />';
-	$self->session->output->print($output);
-	$output = '';
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets","utilityAssets")}) {
 		$output .= '<p style="display:inline;vertical-align:middle;"><img src="'.$link->{'icon.small'}.'" alt="'.$link->{label}.'" style="border: 0px;vertical-align:middle;" /></p> 
 			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
@@ -1186,8 +1182,7 @@ sub manageAssets {
 			</script>';
 	}
 	$self->session->output->print($output);
-	$output = '';
-	$output .= '<div style="width: 28%;float: left; padding-right: 30px; font-size: 14px;"><fieldset> <legend>'.$i18n->get("packages").'</legend>';
+	$output = '<div style="width: 28%;float: left; padding-right: 30px; font-size: 14px;"><fieldset> <legend>'.$i18n->get("packages").'</legend>';
         foreach my $asset (@{$self->getPackageList}) {
               	$output .= '<p style="display:inline;vertical-align:middle;"><img src="'.$asset->getIcon(1).'" alt="'.$asset->getName.'" style="vertical-align:middle;border: 0px;" /></p> 
 			<a href="'.$self->getUrl("func=deployPackage;assetId=".$asset->getId).'">'.$asset->getTitle.'</a> '
@@ -1195,14 +1190,18 @@ sub manageAssets {
 			.$self->session->icon->export("func=exportPackage",$asset->get("url"))
 			.'<br />';
         }
+	$output .= '<br />'.WebGUI::Form::formHeader($self->session, {action=>$self->getUrl})
+		.WebGUI::Form::hidden($self->session, {name=>"func", value=>"importPackage"})
+		.'<input type="file" name="packageFile" size="10" style="font-size: 10px;" />'
+		.WebGUI::Form::submit($self->session, {value=>$i18n->get("import"), extras=>'style="font-size: 10px;"'})
+		.WebGUI::Form::formFooter($self->session);
 	$output .= ' </fieldset></div> 
     <div class="adminConsoleSpacer">
             &nbsp;
         </div> 
 		';
 	$self->session->output->print($output);
-	$output = '';
-	return $output;
+	return undef;
 }
 
 #-------------------------------------------------------------------
@@ -1279,7 +1278,7 @@ sub manageAssetsSearch {
          	$output .= "assetManager.AddLineSortData('','','','".$title."','".$child->getName
 			."','".$child->get("revisionDate")."','".$child->get("assetSize")."');
 			assetManager.addAssetMetaData('".$child->getUrl."', '".$child->getRank."', '".$title."');\n";
-		$self->session->output->print($output);
+		$self->session->output->print($output,1);
 		$output = '';
 	}
         $output .= 'assetManager.AddButton("'.$i18n->get("delete").'","deleteList","manageAssets");
@@ -1921,6 +1920,7 @@ sub www_manageAssets {
 	}
 	my $out = $self->getAdminConsole->render($self->getAdminConsole->render("~~~"));
 	my ($head, $foot) = split("~~~",$out);
+	$self->session->style->sent(1);
 	$self->session->http->getHeader;
 	$self->session->output->print($head);
 	$self->session->output->print('<div style="text-align: right;"><a href="'.$self->getUrl("func=manageAssets;manage=1").'">Manage</a> | <a href="'.$self->getUrl("func=manageAssets;search=1").'">Search</a></div>',1);

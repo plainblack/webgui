@@ -529,9 +529,7 @@ sub processPropertiesFromFormPost {
 #-------------------------------------------------------------------
 sub purge {
 	my $self = shift;
-$self->session->errorHandler->warn("Y");
-	$self->session->db->write("delete from Thread_read where postId=?",[$self->getId]);
-$self->session->errorHandler->warn("Z");
+	$self->session->db->write("delete from Thread_read where threadId=?",[$self->getId]);
         $self->SUPER::purge;
 }
 

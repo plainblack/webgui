@@ -251,15 +251,6 @@ sub getAdminFunction {
 			op=>"editSettings",
 			group=>"3"
 		},
-	#	"themes"=>{
-	#		title=>{
-	#			id=>"themes",
-	#			namespace=>"WebGUI"
-	#		},
-	#		icon=>"themes.gif",
-	#		op=>"listThemes",
-	#		group=>"9"
-	#	},
 		"help"=>{
 			title=>{
 				id=>"help",

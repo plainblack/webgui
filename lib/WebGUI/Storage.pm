@@ -17,6 +17,7 @@ package WebGUI::Storage;
 use Archive::Tar;
 use File::Copy qw(cp);
 use FileHandle;
+use File::Find;
 use File::Path;
 use POSIX;
 use Storable qw(nstore retrieve);
@@ -38,6 +39,7 @@ This package provides a mechanism for storing and retrieving files that are not 
 
  use WebGUI::Storage;
  $store = WebGUI::Storage->create($self->session);
+ $store = WebGUI::Storage->createTemp($self->session);
  $store = WebGUI::Storage->get($self->session,$id);
 
  $filename = $store->addFileFromFilesystem($pathToFile);
@@ -723,7 +725,7 @@ sub setPrivileges {
 
 #-------------------------------------------------------------------
 
-=head2 tar ( filename )
+=head2 tar ( filename [, storage ] )
 
 Archives this storage location into a tar file and then compresses it with a zlib algorithm. It then returns a new WebGUI::Storage object for the archive.
 
@@ -731,27 +733,33 @@ Archives this storage location into a tar file and then compresses it with a zli
 
 The name of the tar file to be created. Should ideally end with ".tar.gz".
 
+=head3 storage
+
+Pass in a storage location object to create the tar file in, instead of having a temporary one be created. Note that it cannot be the same location that's being tarred.
+
 =cut
 
 sub tar {
 	my $self = shift;
 	my $filename = shift;
+	my $temp = shift || WebGUI::Storage->createTemp($self->session);
 	chdir $self->getPath;
-	my $temp = WebGUI::Node->create;
+	my @files = ();
+	find(sub { push(@files, $File::Find::name)}, ".");
 	if ($Archive::Tar::VERSION eq '0.072') {
 		my $tar = Archive::Tar->new();
-		$tar->add_files($self->getFiles);
+		$tar->add_files(@files);
 		$tar->write($temp->getPath($filename),1);
 		
 	} else {
-		Archive::Tar->create_archive($temp->getPath($filename),1,$self->getFiles);
+		Archive::Tar->create_archive($temp->getPath($filename),1,@files);
 	}
 	return $temp;
 }
 
 #-------------------------------------------------------------------
 
-=head2 untar ( filename )
+=head2 untar ( filename [, storage ] )
 
 Unarchives a file into a new storage location. Returns the new WebGUI::Storage object.
 
@@ -759,15 +767,20 @@ Unarchives a file into a new storage location. Returns the new WebGUI::Storage o
 
 The name of the tar file to be untarred.
 
+=head3 storage
+
+Pass in a storage location object to extract the contents to, instead of having a temporary one be created.
+
 =cut
 
 sub untar {
         my $self = shift;
 	my $filename = shift;
-	my $temp = WebGUI::Node->create;
+	my $temp = shift || WebGUI::Storage->createTemp($self->session);
         chdir $temp->getPath;
 	Archive::Tar->extract_archive($self->getPath($filename),1);
 	$self->_addError(Archive::Tar->error) if (Archive::Tar->error);
+	return $temp;
 }
 
 

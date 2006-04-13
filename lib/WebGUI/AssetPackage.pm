@@ -15,6 +15,8 @@ package WebGUI::Asset;
 =cut
 
 use strict;
+use JSON;
+use WebGUI::Storage;
 
 =head1 NAME
 
@@ -34,6 +36,45 @@ These methods are available from this class:
 
 =cut
 
+
+#-------------------------------------------------------------------
+
+=head2 exportAssetData ( )
+
+Converts all the properties of this asset into a hash reference and then returns the hash reference. This method should be expanded upon by sub classes that have more data than just asset property data. Two nodes will be created: "properties" and "storage". Properties is a hash reference of the asset properties. Storage is an array reference of storage location ids. Storage will initially be empty, but if you have storage locations you want to include in this, then please push their ids onto this list when you override this method.
+
+=cut
+
+sub exportData {
+	my $self = shift;
+	my %data = %{$self->get};
+	my %hash = ( properties => \%data, storage=>[] );
+	return \%hash;
+}
+
+#-------------------------------------------------------------------
+
+=head2 exportPackage ( )
+
+Turns this package into a package file and returns the storage location object of the package file.
+
+=cut
+
+sub exportPackage {
+	my $self = shift;
+	my $storage = WebGUI::Storage->createTemp($self->session);
+	foreach my $asset (@{$self->getLineage(["self","descendants"],{returnObjects=>1})}) {
+		my $data = $asset->exportData;
+		$storage->addFileFromScalar($data->{properties}{lineage}.".json", JSON::objToJson($data));
+		foreach my $storageId (@{$data->{storage}}) {
+			my $assetStorage = WebGUI::Storage->get($self->session, $storageId);
+			$assetStorage->tar($storageId.".storage", $storage);
+		}
+	}
+	my $filename = $self->get("url").".wgpkg";
+	$filename =~ s/\//_/g;
+	return $storage->tar($filename);
+}	
 
 #-------------------------------------------------------------------
 
@@ -63,13 +104,71 @@ sub getPackageList {
 			$sql .= ")) and asset.state='published' group by assetData.assetId order by assetData.title desc";
 	my $sth = $self->session->db->read($sql);
 	while (my ($id, $date, $class) = $sth->array) {
-		my $asset = WebGUI::Asset->new($id,$class);
+		my $asset = WebGUI::Asset->new($self->session, $id,$class);
 		push(@assets, $asset) if ($asset->get("isPackage"));
 	}
 	$sth->finish;
 	return \@assets;
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 importAssetData ( hashRef )
+
+Imports the data exported by the exportAssetData method. If the asset already exists, a new revision will be created with these properties. If it doesn't exist then a child will be added to the current asset. Returns a reference to the created asset.
+
+=head3 hashRef
+
+A hash reference containing the exported data.
+
+=cut
+
+sub importAssetData {
+	my $self = shift;
+	my $data = shift;
+	my $id = $data->{properties}{assetId};
+	my $class = $data->{properties}{className};
+	my $version = $data->{properties}{revisionDate};
+	my $asset = WebGUI::Asset->new($self->session, $id, $class, $version);
+	if (defined $asset) { # update an existing revision
+		$asset->update($data->{properties});
+	} else {
+		$asset = WebGUI::Asset->new($self->session, $id, $class);
+		if (defined $asset) { # create a new revision of an existing asset
+			$asset->addRevision($data->{properties}, $version);
+		} else { # add an entirely new asset
+			$self->addChild($data->{properties}, $id, $version);
+		}
+	}
+	return $asset;
+}
+
+#-------------------------------------------------------------------
+
+=head2 importPackage ( storageLocation )
+
+Imports the data from a webgui package file.
+
+=head3 storageLocation
+
+A reference to a WebGUI::Storage object that contains a webgui package file.
+
+=cut
+
+sub importPackage {
+	my $self = shift;
+	my $storage = shift;
+	my $decompressed = $storage->untar($storage->getFiles->[0]);
+	foreach my $file (@{$decompressed->getFiles}) {
+		my $data = JSON::jsonToObj($decompressed->getFileContentsAsScalar($file));
+		foreach my $storageId (@{$data->{storage}}) {
+			my $assetStorage = WebGUI::Storage->get($self->session, $storageId);
+			$decompressed->untar($storageId.".storage", $assetStorage);
+		}
+		$self->importAssetData($data);
+	}
+}
 
 #-------------------------------------------------------------------
 
@@ -100,6 +199,36 @@ sub www_deployPackage {
 	return "";
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_exportPackage ( )
+
+Returns a tarball file for the user to download containing the package data.
+
+=cut
+
+sub www_exportPackage {
+	my $self = shift;
+	return $self->session->privilege->insufficient() unless ($self->get("isPackage") && $self->canEdit && $self->session->user->isInGroup(4));
+	my $storage = $self->exportPackage;
+	$self->session->http->setRedirect($storage->getUrl($storage->getFiles->[0]));
+	return "redirect";
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_importPackage ( )
+
+=cut
+
+sub www_importPackage {
+	my $self = shift;
+	return $self->session->privilege->insufficient() unless ($self->canEdit && $self->session->user->isInGroup(4));
+	my $storage = WebGUI::Storage->createTemp($self->session);
+	$storage->addFileFromFormPost("packageFile",1);
+	$self->importPackage($storage) if ($storage->getFileExtension($storage->getFiles->[0]) eq "wgpkg");
+	return $self->www_manageAssets();	
+}
 
 1;
 

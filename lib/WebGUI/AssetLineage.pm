@@ -36,7 +36,7 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 addChild ( properties [, id ] )
+=head2 addChild ( properties [, id, revisionDate ] )
 
 Adds a child asset to a parent. Creates a new AssetID for child. Makes the parent know that it has children. Adds a new asset to the asset table. Returns the newly created Asset.
 
@@ -48,12 +48,17 @@ A hash reference containing a list of properties to associate with the child. Th
 
 A unique 22 character ID.  By default WebGUI will generate this and you should almost never specify it. This is mainly here for developers that want to include default templates in their plug-ins.
 
+=head3 revisionDate
+
+An epoch representing the time this asset was created.
+
 =cut
 
 sub addChild {
 	my $self = shift;
 	my $properties = shift;
 	my $id = shift || $self->session->id->generate();
+	my $now = shift || $self->session->datetime->time();
 	# add a few things just in case the creator forgets
 	$properties->{ownerUserId} ||= '3';
 	$properties->{groupIdEdit} ||= '12';
@@ -63,7 +68,6 @@ sub addChild {
 	my $lineage = $self->get("lineage").$self->getNextChildRank;
 	$self->{_hasChildren} = 1;
 	$self->session->db->beginTransaction;
-	my $now =$self->session->datetime->time();
 	$self->session->db->write("insert into asset (assetId, parentId, lineage, creationDate, createdBy, className, state) values (?,?,?,?,?,?,'published')",
 		[$id,$self->getId,$lineage,$now,$self->session->user->userId,$properties->{className}]);
 	my $temp = WebGUI::Asset->newByPropertyHashRef($self->session,{

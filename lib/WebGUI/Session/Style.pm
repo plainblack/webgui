@@ -80,30 +80,12 @@ sub generateAdditionalHeadTags {
 	my $tags = $self->{_raw};
         # generate additional link tags
 	foreach my $url (keys %{$self->{_link}}) {
-		$tags .= '<link href="'.$url.'"';
-		foreach my $name (keys %{$self->{_link}{$url}}) {
-			$tags .= ' '.$name.'="'.$self->{_link}{$url}{$name}.'"';
-		}
-		$tags .= ' />'."\n";
+		$tags .= $self->{_link}{$url};
 	}
 	# generate additional javascript tags
-	foreach my $tag (@{$self->{_javascript}}) {
-		$tags .= '<script';
-		foreach my $name (keys %{$tag}) {
-			$tags .= ' '.$name.'="'.$tag->{$name}.'"';
-		}
-		$tags .= '></script>'."\n";
+	foreach my $url (keys %{$self->{_javascript}}) {
+		$tags .= $self->{_javascript}{$url};
 	}
-	# generate additional meta tags
-	foreach my $tag (@{$self->{_meta}}) {
-		$tags .= '<meta';
-		foreach my $name (keys %{$tag}) {
-			$tags .= ' '.$name.'="'.$tag->{$name}.'"';
-		}
-		$tags .= ' />'."\n";
-	}
-	# append extraHeadTags
-#	$tags .= $self->session->asset->getExtraHeadTags."\n" if ($self->session->asset);
 	delete $self->{_meta};
 	delete $self->{_raw};
 	delete $self->{_javascript};
@@ -275,7 +257,14 @@ sub setLink {
 	my $self = shift;
 	my $url = shift;
 	my $params = shift;
-	$self->{_link}{$url} = $params;
+	return undef if ($self->{_link}{$url});
+	my $tag = '<link href="'.$url.'"';
+	foreach my $name (keys %{$params}) {
+		$tag .= ' '.$name.'="'.$params->{$name}.'"';
+	}
+	$tag .= '/>'."\n";
+	$self->{_link}{$url} = $tag;
+	$self->session->output->print($tag) if ($self->sent);
 }
 
 
@@ -295,7 +284,12 @@ A hash reference containing the parameters of the meta tag.
 sub setMeta {
 	my $self = shift;
 	my $params = shift;
-	push(@{$self->{_meta}},$params);
+	my $tag = '<meta';
+	foreach my $name (keys %{$params}) {
+		$tag .= ' '.$name.'="'.$params->{$name}.'"';
+	}
+	$tag .= ' />'."\n";
+	$self->setRawHeadTags($tag);
 }
 
 
@@ -316,6 +310,7 @@ sub setRawHeadTags {
 	my $self = shift;
 	my $tags = shift;
 	$self->{_raw} .= $tags;
+	$self->session->output->print($tags) if ($self->sent);
 }
 
 
@@ -339,12 +334,14 @@ sub setScript {
 	my $self = shift;
 	my $url = shift;
 	my $params = shift;
-	$params->{src} = $url;
-	my $found = 0;
-	foreach my $script (@{$self->{_javascript}}) {
-		$found = 1 if ($script->{src} eq $url);
+	return undef if ($self->{_javascript}{$url});
+	my $tag = '<script src="'.$url.'"';
+	foreach my $name (keys %{$params}) {
+		$tag .= ' '.$name.'="'.$params->{$name}.'"';
 	}
-	push(@{$self->{_javascript}},$params) unless $found;	
+	$tag .= '></script>'."\n";
+	$self->{_javascript}{$url} = $tag;
+	$self->session->output->print($tag) if ($self->sent);
 }
 
 #-------------------------------------------------------------------

@@ -1,6 +1,12 @@
 package WebGUI::i18n::English::Asset;
 
 our $I18N = {
+	'import' => {
+		message => q|Import|,
+		lastUpdated => 0,
+		context => q|the title on the package import button|
+	},
+
 	'over max assets' => {
 		message => q|Your administrator has limited the number of assets you may place on your site, and you have exceeded the limit. Delete some old assets in order to add more.|,
 		lastUpdated => 0,
