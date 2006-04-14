@@ -702,7 +702,6 @@ sub getAllUsers {
 	my $cache = WebGUI::Cache->new($self->session, $self->getId);
 	my $value = $cache->get;
 	return $value if defined $value;
-	$self->session->errorHandler->warn('GROUP: non-cached lookup for '. $self->name);
 	my @users = ();
 	push @users,
 		@{ $self->getUsers($withoutExpired) },
