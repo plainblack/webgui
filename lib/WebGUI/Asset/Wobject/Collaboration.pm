@@ -28,9 +28,7 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 sub appendPostListTemplateVars {
 	my $self = shift;
 	my $var = shift;
-	my $sql = shift;
 	my $p = shift;
-	$p->setDataByQuery($sql);
 	my $page = $p->getPageData;
 	my $i = 0;
 	foreach my $row (@$page) {
@@ -110,8 +108,6 @@ sub appendTemplateLabels {
 	$var->{"add.label"} = $i18n->get("add");
 	$var->{"addlink.label"} = $i18n->get("addlink");
 	$var->{"addquestion.label"} = $i18n->get("addquestion");
-        $var->{'all.label'} = $i18n->get("all");
-        $var->{'atleastone.label'} = $i18n->get("atleastone");
 	$var->{'answer.label'} = $i18n->get("answer");
 	$var->{'attachment.label'} = $i18n->get("attachment");
 	$var->{"by.label"} = $i18n->get("by");
@@ -123,7 +119,6 @@ sub appendTemplateLabels {
 	$var->{"delete.label"} = $i18n->get("delete");
         $var->{'description.label'} = $i18n->get("description");
 	$var->{"edit.label"} = $i18n->get("edit");
-        $var->{'exactphrase.label'} = $i18n->get("exactPhrase");
 	$var->{'image.label'} = $i18n->get("image");
 	$var->{"job.header.label"} = $i18n->get("edit job");
 	$var->{"job.title.label"} = $i18n->get("job title");
@@ -150,7 +145,6 @@ sub appendTemplateLabels {
 	$var->{"replies.label"} = $i18n->get("replies");
 	$var->{"readmore.label"} = $i18n->get("read more");
 	$var->{"responses.label"} = $i18n->get("responses");
-        $var->{'results.label'} = $i18n->get("results");
         $var->{"search.label"} = $i18n->get("search");
         $var->{'subject.label'} = $i18n->get("subject");
 	$var->{"subscribe.label"} = $i18n->get("subscribe");
@@ -167,7 +161,6 @@ sub appendTemplateLabels {
         $var->{"user.label"} = $i18n->get("user");
 	$var->{"views.label"} = $i18n->get("views");
         $var->{'visitorName.label'} = $i18n->get("visitor");
-        $var->{'without.label'} = $i18n->get("without");
 }
 
 #-------------------------------------------------------------------
@@ -1083,7 +1076,8 @@ sub view {
 			or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")).") 
 		group by assetData.assetId order by Thread.isSticky desc, ".$sortBy." ".$sortOrder;
 	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->get("threadsPerPage"));
-	$self->appendPostListTemplateVars(\%var, $sql, $p);
+	$p->setDataByQuery($sql);
+	$self->appendPostListTemplateVars(\%var, $p);
 	$self->appendTemplateLabels(\%var);
        	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 	if ($self->session->user->userId eq '1' && !$self->session->form->process("sortBy")) {
@@ -1102,126 +1096,29 @@ The web method to display and use the forum search interface.
 
 sub www_search {
 	my $self = shift;
-        $self->session->scratch->set($self->getId."_all",$self->session->form->process("all"));
-        $self->session->scratch->set($self->getId."_atLeastOne",$self->session->form->process("atLeastOne"));
-        $self->session->scratch->set($self->getId."_exactPhrase",$self->session->form->process("exactPhrase"));
-        $self->session->scratch->set($self->getId."_without",$self->session->form->process("without"));
-        $self->session->scratch->set($self->getId."_numResults",$self->session->form->process("numResults"));
 	my $i18n = WebGUI::International->new($self->session, 'Asset_Collaboration');
         my %var;
         $var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
          	.WebGUI::Form::hidden($self->session,{ name=>"func", value=>"search" })
         	.WebGUI::Form::hidden($self->session,{ name=>"doit", value=>1 });
-        $var{'all.form'} = WebGUI::Form::text($self->session,{
-                name=>'all',
-                value=>$self->session->scratch->get($self->getId."_all"),
-                size=>($self->session->setting->get("textBoxSize")-5)
-                });
-        $var{'exactphrase.form'} = WebGUI::Form::text($self->session,{
-                name=>'exactPhrase',
-                value=>$self->session->scratch->get($self->getId."_exactPhrase"),
-                size=>($self->session->setting->get("textBoxSize")-5)
-                });
-        $var{'atleastone.form'} = WebGUI::Form::text($self->session,{
-                name=>'atLeastOne',
-                value=>$self->session->scratch->get($self->getId."_atLeastOne"),
-                size=>($self->session->setting->get("textBoxSize")-5)
-                });
-        $var{'without.form'} = WebGUI::Form::text($self->session,{
-                name=>'without',
-                value=>$self->session->scratch->get($self->getId."_without"),
-                size=>($self->session->setting->get("textBoxSize")-5)
-                });
-        my %results;
-        tie %results, 'Tie::IxHash';
-        %results = (10=>'10', 25=>'25', 50=>'50', 100=>'100');
-        my $numResults = $self->session->scratch->get($self->getId."_numResults") || $self->get("threadsPerPage");
-        $var{'results.form'} = WebGUI::Form::selectBox($self->session,{
-                name=>"numResults",
-                options=>\%results,
-                value=>[$numResults]
+        $var{'query.form'} = WebGUI::Form::text($self->session,{
+                name=>'query',
+                value=>$self->session->form->process("query","text")
                 });
         $var{'form.search'} = WebGUI::Form::submit($self->session,{value=>$i18n->get(170,'WebGUI')});
-        $var{'form.footer'} = WebGUI::Form::formFooter($self->session,);
+        $var{'form.footer'} = WebGUI::Form::formFooter($self->session);
         $var{'back.url'} = $self->getUrl;
 	$self->appendTemplateLabels(\%var);
         $var{doit} = $self->session->form->process("doit");
         if ($self->session->form->process("doit")) {
-                my @fieldsToSearch = qw(assetData.title assetData.synopsis Post.content Post.username Post.userDefined1 Post.userDefined2 Post.userDefined3 Post.userDefined4 Post.userDefined5);
-		my $all;
-		if ($self->session->scratch->get($self->getId."_all") ne "") {
-			$self->session->scratch->get($self->getId."_all") =~ s/,/ /g;
-			$self->session->scratch->get($self->getId."_all") =~ s/\s+/ /g;
-			my @words = split(/ /,$self->session->scratch->get($self->getId."_all"));
-			foreach my $word (@words) {
-				$all .= " and " if ($all ne "");
-				$all .= "(";
-				my $allSub;
-				foreach my $field (@fieldsToSearch) {
-					$allSub .= " or " if ($allSub ne "");
-					$allSub .= " $field like ".$self->session->db->quote("%".$word."%");
-				}
-				$all .= $allSub;
-				$allSub = "";
-				$all .= ")";
-			}
-		}
-		my $exactPhrase;
-	        if ($self->session->scratch->get($self->getId."_exactPhrase") ne "") {
-			foreach my $field (@fieldsToSearch) {
-				$exactPhrase .= " or " if ($exactPhrase ne "");
-       		         	$exactPhrase .= " $field like ".$self->session->db->quote("%".$self->session->scratch->get($self->getId."_exactPhrase")."%");
-			}
-     	  	}
-		my $atLeastOne;
-        	if ($self->session->scratch->get($self->getId."_atLeastOne") ne "") {
-	                $self->session->scratch->get($self->getId."_atLeastOne") =~ s/,/ /g;
-       	         	$self->session->scratch->get($self->getId."_atLeastOne") =~ s/\s+/ /g;
-                	my @words = split(/ /,$self->session->scratch->get($self->getId."_atLeastOne"));
-                	foreach my $word (@words) {
-				foreach my $field (@fieldsToSearch) {
-                        		$atLeastOne .= " or " if ($atLeastOne ne "");
-                        		$atLeastOne .= " $field like ".$self->session->db->quote("%".$word."%");
-				}
-                	}
-        	}
-		my $without;
-        	if ($self->session->scratch->get($self->getId."_without") ne "") {
-                	$self->session->scratch->get($self->getId."_without") =~ s/,/ /g;
-                	$self->session->scratch->get($self->getId."_without") =~ s/\s+/ /g;
-                	my @words = split(/ /,$self->session->scratch->get($self->getId."_without"));
-                	foreach my $word (@words) {
-				foreach my $field (@fieldsToSearch) {
-                        		$without .= " and " if ($without ne "");
-                        		$without .= " $field not like ".$self->session->db->quote("%".$word."%");
-				}
-                	}
-        	}
-		# please note that the SQL generated here-in is not for the feint of heart, mind, or stomach
-		# this is for trained professionals only and should not be attempted at home
-		my $sql = "select asset.assetId, asset.className, max(assetData.revisionDate) as revisionDate
-			from asset
-			left join assetData on assetData.assetId=asset.assetId
-			left join Post on Post.assetId=assetData.assetId and assetData.revisionDate = Post.revisionDate
-			where (asset.className='WebGUI::Asset::Post' or asset.className='WebGUI::Asset::Post::Thread')
-				and asset.lineage  like ".$self->session->db->quote($self->get("lineage").'%')."
-				and asset.assetId<>".$self->session->db->quote($self->getId)."
-				and (
-					assetData.status in ('approved','archived')
-				 or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag"));
-		$sql .= "		or assetData.status='pending'" if ($self->canEdit);
-		$sql .= "		or (assetData.ownerUserId=".$self->session->db->quote($self->session->user->userId)." and assetData.ownerUserId<>'1')
-					) ";
-		$sql .= " and ($all) " if ($all ne "");
-		$sql .= " and " if ($sql ne "" && $exactPhrase ne "");
-		$sql .= " ($exactPhrase) " if ($exactPhrase ne "");
-		$sql .= " and " if ($sql ne "" && $atLeastOne ne "");
-		$sql .= " ($atLeastOne) " if ($atLeastOne ne "");
-		$sql .= " and " if ($sql ne "" && $without ne "");
-		$sql .= " ($without) " if ($without ne "");
-		$sql .= " group by assetData.assetId order by Post.dateSubmitted desc";
-		my $p = WebGUI::Paginator->new($self->session,$self->getUrl("func=search;doit=1"),$numResults);
-		$self->appendPostListTemplateVars(\%var, $sql, $p);
+		my $search = WebGUI::Search->new($self->session);
+		$search->search({
+				keywords=>$self->session->form->process("query","text"),
+				lineage=>[$self->get("lineage")],
+				classes=>["WebGUI::Asset::Post", "WebGUI::Asset::Post::Thread"]
+				});
+		my $p = $search->getPaginatorResultSet($self->getUrl("func=search;doit=1"), $self->get("threadsPerPage"));
+		$self->appendPostListTemplateVars(\%var, $p);
         }
         return  $self->processStyle($self->processTemplate(\%var, $self->get("searchTemplateId")));
 }

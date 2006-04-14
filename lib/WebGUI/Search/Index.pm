@@ -75,8 +75,8 @@ sub addKeywords {
 	my $self = shift;
 	my $text = shift;
 	$text = WebGUI::HTML::filter($text, "all");
-	my $add = $self->session->db->prepare("update assetIndex set keywords=concat(keywords,' ',?) where assetId = ?");
-	$add->execute([$text, $self->getId]);
+	my ($keywords) = $self->session->db->quickArray("select keywords from assetIndex where assetId=?",[$self->getId]);
+	$self->session->db->write("update assetIndex set keywords =? where assetId=?", [$keywords.' '.$text, $self->getId]);
 }
 
 

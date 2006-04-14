@@ -240,16 +240,6 @@ our $I18N = {
 		lastUpdated => 1109618544,
 	},
 
-	'all' => {
-		message => q|All Words|,
-		lastUpdated => 1109618544,
-	},
-
-	'atleastone' => {
-		message => q|At Least One|,
-		lastUpdated => 1109618544,
-	},
-
 	'answer' => {
 		message => q|Answer|,
 		lastUpdated => 1109618544,
@@ -297,11 +287,6 @@ our $I18N = {
 
 	'edit' => {
 		message => q|Edit|,
-		lastUpdated => 1109618544,
-	},
-
-	'exactPhrase' => {
-		message => q|Exact Phrase|,
 		lastUpdated => 1109618544,
 	},
 
@@ -407,11 +392,6 @@ our $I18N = {
 
 	'responses' => {
 		message => q|Responses|,
-		lastUpdated => 1109696029,
-	},
-
-	'results' => {
-		message => q|Results|,
 		lastUpdated => 1109696029,
 	},
 
@@ -522,11 +502,6 @@ our $I18N = {
 
 	'visitor' => {
 		message => q|Visitor Name|,
-		lastUpdated => 1109696029,
-	},
-
-	'without' => {
-		message => q|Without|,
 		lastUpdated => 1109696029,
 	},
 
@@ -669,14 +644,6 @@ our $I18N = {
 ^International("phrase","Asset_Collaboration"); "^International("addquestion","Asset_Collaboration");".
 <p>
 
-<b>all.label</b><br>
-^International("phrase","Asset_Collaboration"); "^International("all","Asset_Collaboration");".
-<p>
-
-<b>atleastone.label</b><br>
-^International("phrase","Asset_Collaboration"); "^International("atleastone","Asset_Collaboration");".
-<p>
-
 <b>answer.label</b><br>
 ^International("word","Asset_Collaboration"); "^International("answer","Asset_Collaboration");".
 <p>
@@ -719,10 +686,6 @@ our $I18N = {
 
 <b>edit.label</b><br>
 ^International("word","Asset_Collaboration"); "^International("edit","Asset_Collaboration");".
-<p>
-
-<b>exactphrase.label</b><br>
-^International("phrase","Asset_Collaboration"); "^International("exactPhrase","Asset_Collaboration");".
 <p>
 
 <b>image.label</b><br>
@@ -829,10 +792,6 @@ our $I18N = {
 ^International("word","Asset_Collaboration"); "^International("responses","Asset_Collaboration");".
 <p>
 
-<b>results.label</b><br>
-^International("word","Asset_Collaboration"); "^International("results","Asset_Collaboration");".
-<p>
-
 <b>search.label</b><br>
 ^International("word","Asset_Collaboration"); "^International("search","Asset_Collaboration");".
 <p>
@@ -897,12 +856,8 @@ our $I18N = {
 ^International("phrase","Asset_Collaboration"); "^International("visitor","Asset_Collaboration");".
 <p>
 
-<b>without.label</b><br>
-^International("word","Asset_Collaboration"); "^International("without","Asset_Collaboration");".
-<p>
-
 |,
-		lastUpdated => 1111532035,
+		lastUpdated => 1145039922
 	},
 	
 	'collaboration add/edit title' => {
@@ -1310,27 +1265,10 @@ A URL for sorting and displaying the list of posts by their ratings.
 <b>form.header</b><br>
 HTML and javascript required to make the form work.
 
+
 <p>
-<b>all.form</b><br>
+<b>query.form</b><br>
 HTML form for adding a field where all input has to be in matched pages.
-
-<p>
-<b>exactphrase.form</b><br>
-An HTML form to enter in a phrase to search for.
-
-<p>
-<b>atleastone.form</b><br>
-An HTML form to enter in a list of words.  Search results will always contain at least one of
-these.
-
-<p>
-<b>without.form</b><br>
-An HTML form to enter in a list of words.  If any word is found on a page it will not be included
-in the search results, even if other fields match.
-
-<p>
-<b>results.form</b><br>
-An HTML form for picking how many results are returned.
 
 <p>
 <b>form.search</b><br>
@@ -1373,7 +1311,7 @@ A URL for sorting and displaying the list of posts by the number of replies to t
 A URL for sorting and displaying the list of posts by their ratings.
 
                 |,
-		lastUpdated => 1114467741,
+		lastUpdated => 1145039922,
 	},
 
 	'enable avatars' => {
