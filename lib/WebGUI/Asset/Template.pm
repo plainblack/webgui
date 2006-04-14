@@ -251,6 +251,7 @@ Making private. See WebGUI::Asset::indexContent() for additonal details.
 sub indexContent {
 	my $self = shift;
 	my $indexer = $self->SUPER::indexContent;
+	$indexer->addKeywords($self->get("namespace"));
 	$indexer->setIsPublic(0);
 }
 

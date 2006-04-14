@@ -1083,8 +1083,8 @@ sub manageAssets {
    //<![CDATA[
      var assetManager = new AssetManager();
          assetManager.AddColumn('".WebGUI::Form::checkbox($self->session,{extras=>'onchange="toggleAssetListSelectAll(this.form);"'})."','','center','form');
+         assetManager.AddColumn('".$i18n->get("rank")."','style=\"cursor:move\"','center','numeric');
          assetManager.AddColumn('&nbsp;','','center','');
-         assetManager.AddColumn('".$i18n->get("rank")."','style=\"cursor:move\"','right','numeric');
          assetManager.AddColumn('".$i18n->get("99")."','','left','');
          assetManager.AddColumn('".$i18n->get("type")."','','left','');
          assetManager.AddColumn('".$i18n->get("last updated")."','','center','');
@@ -1112,14 +1112,16 @@ sub manageAssets {
 			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/unlocked.gif" alt="unlocked" style="border: 0px;" />';
 		}
 		my $lockLink = ", '<a href=\"".$child->getUrl("func=manageRevisions")."\">".$locked."</a>'";
+		my $plus = "'&nbsp;&nbsp;&nbsp;&nbsp;'+";
+		$plus = "'+ '+" if ($child->hasChildren);
          	$output .= "assetManager.AddLine('"
 			.WebGUI::Form::checkbox($self->session,{
 				name=>'assetId',
 				value=>$child->getId
 				})
-			."',".$edit."contextMenu.draw()," 
-			.$child->getRank
-			.",'<a href=\"".$child->getUrl("func=manageAssets")."\">".$title
+			."',".$child->getRank
+			.",".$edit."contextMenu.draw()"
+			.",".$plus."'<a href=\"".$child->getUrl("func=manageAssets")."\">".$title
 			."</a>','<img src=\"".$child->getIcon(1)."\" style=\"border: 0px;\" alt=\"".$child->getName."\" /> ".$child->getName
 			."','".$self->session->datetime->epochToHuman($child->get("revisionDate"))
 			."','".formatBytes($child->get("assetSize"))."'".$lockLink.");\n";
@@ -1289,8 +1291,7 @@ sub manageAssetsSearch {
 				value=>$child->getId
 				})
 			."',".$edit."contextMenu.draw()," 
-			.$child->getRank
-			.",'<a href=\"".$child->getUrl("func=manageAssets&manage=1")."\">".$title
+			."'<a href=\"".$child->getUrl("func=manageAssets&manage=1")."\">".$title
 			."</a>','<img src=\"".$child->getIcon(1)."\" style=\"border: 0px;\" alt=\"".$child->getName."\" /> ".$child->getName
 			."','".$self->session->datetime->epochToHuman($child->get("revisionDate"))
 			."','".formatBytes($child->get("assetSize"))."'".$lockLink.");\n";

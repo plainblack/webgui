@@ -38,6 +38,8 @@
  - Converted WebGUI to use a new object oriented session system. More details
    in migation.txt.
  - Added a sort alphabetically option to the folder asset.
+ - Added a symbol next to items in the asset manager to indicate if they have
+   children or not.
  - Added a screenshot feature to the matrix.
  - Added an option to delete Matrix fields.
  - Added an API for retrieving email from POP3 servers.
