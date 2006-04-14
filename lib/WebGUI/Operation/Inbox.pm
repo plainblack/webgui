@@ -12,6 +12,7 @@ package WebGUI::Operation::Inbox;
 
 use strict qw(vars subs);
 use URI;
+use WebGUI::Inbox;
 use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::SQL;
