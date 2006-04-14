@@ -45,8 +45,15 @@ updateHelpTemplate();
 fixImportNodePrivileges();
 addAdManager();
 updateMatrix();
+updateFolder();
 
 finish($session); # this line required
+
+#-------------------------------------------------
+sub updateFolder {
+	print "\tAdding sort option to folder.\n";
+	$session->db->write("alter table Folder add column sortAlphabetically int not null default 0");
+}
 
 #-------------------------------------------------
 sub updateMatrix {

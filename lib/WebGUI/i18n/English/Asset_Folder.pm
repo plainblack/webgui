@@ -2,6 +2,16 @@ package WebGUI::i18n::English::Asset_Folder;
 
 our $I18N = {
 
+	'sort alphabetically' => {
+		message => q|Sort alphabetically?|,
+		lastUpdated => 0
+		},
+
+	'sort alphabetically help' => {
+		message => q|Do you want to sort the items in this folder alphabetically? If you select no then it will sort according to rank.|,
+		lastUpdated => 0
+		},
+
 	'visitor cache timeout' => {
 		message => q|Visitor Cache Timeout|,
 		lastUpdated => 0

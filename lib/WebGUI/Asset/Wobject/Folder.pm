@@ -74,6 +74,10 @@ sub definition {
 				label => $i18n->get("visitor cache timeout"),
 				hoverHelp => $i18n->get("visitor cache timeout help")
 				},
+			sortAlphabetically => {
+				fieldType=>"yesNo",
+				defaultValue=>0
+				},
 			templateId =>{
 				fieldType=>"template",
 				defaultValue=>'PBtmpl0000000000000078'
@@ -105,6 +109,12 @@ sub getEditForm {
 		-uiLevel=>8,
 		-defaultValue=>3600
 	);
+   	$tabform->getTab("display")->yesNo(
+      		-value=>$self->getValue('sortAlphabetically'),
+      		-label=>$i18n->get('sort alphabetically'),
+      		-hoverHelp=>$i18n->get('sort alphabetically help'),
+		-name=>"sortAlphabetically"
+   		);
    	$tabform->getTab("display")->template(
       		-value=>$self->getValue('templateId'),
       		-label=>$i18n->get('folder template title'),
@@ -162,7 +172,9 @@ sub view {
 		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
 		return $out if $out;
 	}
-	my $children = $self->getLineage( ["children"], { returnObjects=>1 });
+	my %rules = ( returnObjects => 1);
+	$rules{orderByClause} = 'assetData.title' if ($self->get("sortAlphabetically"));
+	my $children = $self->getLineage( ["children"], \%rules);
 	my %vars;
 	foreach my $child (@{$children}) {
 		if (ref($child) eq "WebGUI::Asset::Wobject::Folder") {

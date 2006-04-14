@@ -257,6 +257,10 @@ An array reference containing asset classes to join in. There is no real reason 
 
 A string containing extra where clause information for the query.
 
+=head4 orderByClause 
+
+A string containing an order by clause (without the "order by").
+
 =cut
 
 sub getLineage {
