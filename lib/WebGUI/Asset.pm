@@ -765,6 +765,25 @@ sub getImportNode {
 
 #-------------------------------------------------------------------
 
+=head2 getMedia ( session )
+
+Constructor. Returns the media folder.
+
+=head3 session
+
+A reference to the current session.
+
+=cut
+
+sub getMedia {
+	my $class = shift;
+	my $session = shift;
+	return WebGUI::Asset->new($session, "PBasset000000000000003");
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getMenuTitle ( )
 
 Returns the menu title of this asset. If it's not specified or it's "Untitled" then the asset's name will be returned instead.

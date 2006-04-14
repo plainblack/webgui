@@ -46,8 +46,32 @@ fixImportNodePrivileges();
 addAdManager();
 updateMatrix();
 updateFolder();
+addRichEditUpload();
 
 finish($session); # this line required
+
+#-------------------------------------------------
+sub addRichEditUpload {
+	print "\tAdding the ability to upload from the rich editor.\n";
+	my $root = WebGUI::Asset->getRoot($session);
+	my $media = $root->addChild({
+		url=>"media",
+		title=>"Media",
+		menuTitle=>"Media",
+		className=>"WebGUI::Asset::Wobject::Folder",
+		styleTemplateId=>"PBtmpl0000000000000060",
+		printableStyleTemplateId=>'PBtmpl0000000000000111',
+		templateId=>'PBtmpl0000000000000078',
+		ownerUserId=>'3',
+		groupIdEdit=>'12',
+		groupIdView=>'7',
+		},"PBasset000000000000003");
+	$session->db->write("update asset set isSystem=1 where assetId=?",[$media->getId]);
+	# somehow the import node isn't protected, doing that now
+	$session->db->write("update asset set isSystem=1 where assetId=?",['PBasset000000000000002']);
+	# the failsafe style should be visible
+	$session->db->write("update template set showInForms=1 where assetId=?",['PBtmpl0000000000000060']);
+}
 
 #-------------------------------------------------
 sub updateFolder {
