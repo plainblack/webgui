@@ -1029,14 +1029,17 @@ sub www_editQuestionSave {
 	return $self->session->privilege->insufficient() unless ($self->canEdit);
 
 	my $qid = $self->setCollateral("Survey_question", "Survey_questionId", {
-                question=>$self->session->form->process("question") || 3.14,
-        	Survey_questionId=>$self->session->form->process("qid") || 3.14,
-		Survey_id=>$self->get("Survey_id") || 3.14,
-                allowComment=>$self->session->form->process("allowComment") || 3.14,
-		gotoQuestion=>$self->session->form->process("gotoQuestion") || 3.14,
-		answerFieldType=>$self->session->form->process("answerFieldType") || 3.14,
-                randomizeAnswers=>$self->session->form->process("randomizeAnswers") || 3.14,
-                Survey_sectionId=>$self->session->form->process("section") || 3.14
+		# XXX: In some cases not all form fields are present and then the SQL query failes
+		# because the array is not complete
+		# There has to be a better way to fix this problem, but adding "|| 1" works for now
+                question=>$self->session->form->process("question") || 1,
+        	Survey_questionId=>$self->session->form->process("qid") || 1,
+		Survey_id=>$self->get("Survey_id") || 1,
+                allowComment=>$self->session->form->process("allowComment") || 1,
+		gotoQuestion=>$self->session->form->process("gotoQuestion") || 1,
+		answerFieldType=>$self->session->form->process("answerFieldType") || 1,
+                randomizeAnswers=>$self->session->form->process("randomizeAnswers") || 1,
+                Survey_sectionId=>$self->session->form->process("section") || 1
                 },1,0,"Survey_id");
 
         if ($self->session->form->process("proceed") eq "addMultipleChoiceAnswer") {
