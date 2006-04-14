@@ -64,7 +64,8 @@ This package provides an object-oriented way of managing WebGUI groups and group
  $arrayRef = $group->getGroupsFor();
  $arrayRef = $self->session->user->getGroups($userId);
  $arrayRef = $group->getGroupsIn($recursive);
- $arrayRef = $group->getUsers($recursive);
+ $arrayRef = $group->getUsers();   ##WebGUI defined groups only
+ $arrayRef = $group->getAllUsers();  ##All users in all groups in this group
  $boolean = $self->session->user->isInGroup($groupId);
  $boolean = $group->userIsAdmin($userId,$groupId);
  $epoch = $group->userGroupExpireDate($userId,$groupId);
@@ -113,6 +114,7 @@ not be added to any group.  Groups may not be added to themselves.
 sub addGroups {
 	my $self = shift;
 	my $groups = shift;
+	WebGUI::Cache->new($self->session, $self->getId)->delete;
 	$self->session->stow->delete("isInGroup");
 	foreach my $gid (@{$groups}) {
 		next if ($gid eq '1');
@@ -149,6 +151,7 @@ An override for the default offset of the grouping. Specified in seconds.
 sub addUsers {
 	my $self = shift;
 	my $users = shift;
+	WebGUI::Cache->new($self->session, $self->getId)->delete;
 	$self->session->stow->delete("isInGroup");
 	my $expireOffset = shift || $self->get("expireOffset");
 	foreach my $uid (@{$users}) {
@@ -209,6 +212,21 @@ sub autoDelete {
 
 #-------------------------------------------------------------------
 
+=head2 clearCaches ( )
+
+Clears caches for this group.
+
+=cut
+
+sub clearCaches {
+	my $self = shift;
+	WebGUI::Cache->new($self->session, $self->getId)->delete;
+	$self->session->stow->delete("isInGroup");
+	$self->session->stow->delete("gotGroupsInGroup");
+}
+
+#-------------------------------------------------------------------
+
 =head2 dateCreated ( )
 
 Returns the epoch for when this group was created.
@@ -231,6 +249,7 @@ Deletes this group and all references to it.
 
 sub delete {
 	my $self = shift;
+	$self->clearCaches;
         $self->session->db->write("delete from groups where groupId=?", [$self->getId]);
         $self->session->db->write("delete from groupings where groupId=?", [$self->getId]);
         $self->session->db->write("delete from groupGroupings where inGroup=? or groupId=?", [$self->getId, $self->getId]);
@@ -256,11 +275,10 @@ An array reference containing the list of group ids to delete from.
 sub deleteGroups {
 	my $self = shift;
 	my $groups = shift;
-	$self->session->stow->delete("isInGroup");
+	$self->clearCaches;
         foreach my $gid (@{$groups}) {
         	$self->session->db->write("delete from groupGroupings where groupId=? and inGroup=?",[$gid, $self->getId]);
         }
-	$self->session->stow->delete("gotGroupsInGroup");
 }
 
 
@@ -279,11 +297,10 @@ An array reference containing a list of users.
 sub deleteUsers {
 	my $self = shift;
 	my $users = shift;
-	$self->session->stow->delete("isInGroup");
+	$self->clearCaches;
 	foreach my $uid (@{$users}) {
                	$self->session->db->write("delete from groupings where groupId=? and userId=?",[$self->getId, $uid]);
 	}
-	$self->session->stow->delete("gotGroupsForUser");
 }
 
 #-------------------------------------------------------------------
@@ -667,13 +684,57 @@ sub getGroupsIn {
 
 #-------------------------------------------------------------------
 
-=head2 getUsers ( [ recursive, withoutExpired ] )
+=head2 getAllUsers ( [ withoutExpired ] )
 
-Returns an array reference containing a list of users that belong to this group.
+Returns an array reference containing a list of users that belong to this group
+and in any group that belongs to this group.
 
-=head3 recursive
+=head3 withoutExpired
 
-A boolean value to determine whether the method should return the users directly in the group or to follow the entire groups of groups hierarchy. Defaults to "0".
+A boolean that if set true will return the users list minus the expired groupings.
+
+=cut
+sub getAllUsers {
+	my $self = shift;
+	my $withoutExpired = shift;
+	my $loopCount = shift;
+	my $expireTime = 0;
+	my $cache = WebGUI::Cache->new($self->session, $self->getId);
+	my $value = $cache->get;
+	return $value if defined $value;
+	$self->session->errorHandler->warn('GROUP: non-cached lookup for '. $self->name);
+	my @users = ();
+	push @users,
+		@{ $self->getUsers($withoutExpired) },
+		@{ $self->getDatabaseUsers() },
+		@{ $self->getKarmaUsers() },
+		@{ $self->getScratchUsers() },
+		@{ $self->getIpUsers() },
+	;
+	++$loopCount;
+	if ($loopCount > 99) {
+		$self->session->errorHandler->fatal("Endless recursive loop detected while determining groups in group.\nRequested groupId: ".$self->getId);
+	}
+	my $groups = $self->getGroupsIn();
+	##Have to iterate twice due to the withoutExpired clause.
+	foreach my $groupId (@{ $groups }) {
+		my $subGroup = WebGUI::Group->new($self->session, $groupId);
+		push @users, @{ $subGroup->getAllUsers(1, $withoutExpired, $loopCount) };
+	}
+	my %users = map { $_ => 1 } @users;
+	@users = keys %users;
+	$cache->set(\@users, $self->groupCacheTimeout);
+	return \@users;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getUsers ( [ withoutExpired ] )
+
+Returns an array reference containing a list of users that have been added
+to this WebGUI group directly, rather than by other methods of group membership
+like IP address, LDAP, dbQuery or scratchFilter.
 
 =head3 withoutExpired
 
@@ -682,38 +743,12 @@ A boolean that if set true will return the users list minus the expired grouping
 =cut
 sub getUsers {
 	my $self = shift;
-	my $recursive = shift;
 	my $withoutExpired = shift;
-	my $loopCount = shift;
 	my $expireTime = 0;
-	my $cache = WebGUI::Cache->new($self->session, $self->getId);
-	my $value = $cache->get;
-	return $value if defined $value;
 	if ($withoutExpired) {
 		$expireTime = $self->session->datetime->time();
 	}
 	my @users = $self->session->db->buildArray("select userId from groupings where expireDate > ? and groupId = ?", [$expireTime, $self->getId]);
-	push @users,
-		@{ $self->getDatabaseUsers() },
-		@{ $self->getKarmaUsers() },
-		@{ $self->getScratchUsers() },
-		@{ $self->getIpUsers() },
-	;
- 	if ($recursive) {
-		++$loopCount;
-		if ($loopCount > 99) {
-                        $self->session->errorHandler->fatal("Endless recursive loop detected while determining groups in group.\nRequested groupId: ".$self->getId);
-		}
-		my $groups = $self->getGroupsIn();
-		##Have to iterate twice due to the withoutExpired clause.
-		foreach my $groupId (@{ $groups }) {
-			my $subGroup = WebGUI::Group->new($self->session, $groupId);
-			push @users, @{ $subGroup->getUsers(1, $withoutExpired, $loopCount) };
-		}
-	}
-	my %users = map { $_ => 1 } @users;
-	@users = keys %users;
-	$cache->set(\@users, $self->groupCacheTimeout);
 	return \@users;
 }
 
@@ -748,8 +783,7 @@ sub karmaThreshold {
         my $self = shift;
         my $value = shift;
         if (defined $value) {
-		$self->session->stow->delete('isInGroup');
-		$self->session->stow->delete("gotGroupsInGroup");
+		$self->clearCaches;
 		$self->set("karmaThreshold",$value);	
         }
         return $self->get("karmaThreshold");
@@ -772,8 +806,7 @@ sub ipFilter {
         my $self = shift;
         my $value = shift;
         if (defined $value) {
-		$self->session->stow->delete("gotGroupsInGroup");
-		$self->session->stow->delete('isInGroup');
+		$self->clearCaches;
 		$self->set("ipFilter",$value);
         }
         return $self->get("ipFilter");
@@ -933,9 +966,8 @@ sub dbQuery {
         my $self = shift;
         my $value = shift;
         if (defined $value) {
+		$self->clearCaches;
                 $self->set("dbQuery",$value);
-		$self->session->stow->delete("gotGroupsInGroup");
-		$self->session->stow->delete("isInGroup");
         }
         return $self->get("dbQuery");
 }
@@ -956,9 +988,8 @@ sub databaseLinkId {
         my $self = shift;
         my $value = shift;
         if (defined $value) {
+		$self->clearCaches;
                 $self->set("databaseLinkId",$value);
-		$self->session->stow->delete("gotGroupsInGroup");
-		$self->session->stow->delete("isInGroup");
         }
         return $self->get("databaseLinkId");
 }

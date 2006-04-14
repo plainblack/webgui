@@ -13,6 +13,7 @@ CONTENTS
 4. Scheduler Migration
 5. System Changes Affecting Migration
 6. Automatic list of Assets in Help System.
+7. Group Membership
 
 
 1. Wobject/Asset Migration
@@ -910,3 +911,29 @@ is more flexible, is more reliable, and is compliant with the new mail system.
 6.1 Starting in WebGUI 6.7, there is now an automatic list of all Assets
 in each site's WebGUI configuration file.  For this to work correctly,
 each Asset should have a Help entry named "assetName add/edit".
+
+
+7.  Group Membership
+-------------------------------------
+Starting in WebGUI 7.0, there are several change to how group membership
+works.  The biggest change is that there are two methods for getting
+the users in a group.
+
+$group->getUsers will return all users who have are members via the WebGUI API.
+
+$group->getAllUsers will return a list of all users who are members of the
+current group or any of its subgroups via _any_ method.  Previously, there
+was no way to get a complete list of all users, and you had to request
+a recursive fetch of users.  getAllUsers is always recursive.
+
+So basically, you will want to convert your code to use getAllUsers instead
+of getUsers.
+
+Next, there has been a long standing bug in WebGUI regarding the
+dbCacheTimeout group property.  It didn't work as a timeout, but rather
+as an expiration property for adding users to groups via database queries
+AND LDAP.  In WebGUI 7.0, this property has been renamed groupCacheTimeout
+and it actually functions as a cache timeout.  Note that the timeout may
+extend the amount of time that a member is in a group, so don't set an
+arbitrarily long timeout.
+

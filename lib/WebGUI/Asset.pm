@@ -599,7 +599,7 @@ sub getEditForm {
         my $clause;
         if ($self->session->user->isInGroup(3)) {
         	my $group = WebGUI::Group->new($self->session,4);
-                my $contentManagers = $group->getUsers(1);
+                my $contentManagers = $group->getAllUsers();
                 push (@$contentManagers, $self->session->user->userId);
                 $clause = "userId in (".$self->session->db->quoteAndJoin($contentManagers).")";
         } else {

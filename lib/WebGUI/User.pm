@@ -264,7 +264,7 @@ sub isInGroup {
         ### Lookup the actual groupings.
 	my $group = WebGUI::Group->new($self->session,$gid);
 	### Check for groups of groups.
-	my $users = $group->getUsers(1);
+	my $users = $group->getAllUsers();
 	foreach my $user (@{$users}) {
 		$isInGroup->{$user}{$gid} = 1;
 		if ($uid eq $user) {

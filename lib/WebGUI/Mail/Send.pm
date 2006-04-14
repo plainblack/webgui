@@ -356,7 +356,7 @@ sub send {
 		my $group = WebGUI::Group->new($self->session, $group);
 		$self->{_message}->head->replace("bcc", undef);
 		$self->{_message}->head->replace("cc", undef);
-		foreach my $userId (@{$group->getUsers(1,1)}) {
+		foreach my $userId (@{$group->getAllUsers(1)}) {
 			my $user = WebGUI::User->new($self->session, $userId);
 			if ($user->profileField("email")) {
 				$self->{_message}->head->replace("To",$user->profileField("email"));

@@ -74,7 +74,7 @@ my @ipTests = (
 );
 
 
-plan tests => (87 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
+plan tests => (88 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -97,6 +97,7 @@ is ($g->dateCreated(), $g->lastUpdated(), 'lastUpdated = create time');
 is_deeply ($g->getGroupsIn(), [3], 'Admin group added by default to this group');
 is_deeply ($g->getGroupsFor(), [], 'Group not added to any other group');
 is_deeply ($g->getUsers(), [], 'No users added by default');
+is_deeply ($g->getAllUsers(), [3], 'No users added by default in any method');
 is ($g->autoAdd(), 0, 'auto Add is off by default');
 is ($g->autoDelete(), 0, 'auto Delete is off by default');
 is ($g->isEditable(), 1, 'isEditable is on by default');
@@ -262,10 +263,10 @@ cmp_bag($gA->getUsers, [@aUsers], 'users in group A');
 cmp_bag($gC->getUsers, [@cUsers], 'users in group C');
 cmp_bag($gZ->getUsers, [@zUsers], 'users in group Z');
 
-cmp_bag($gB->getUsers(1), [@bUsers, @aUsers, @cUsers, @zUsers, 3], 'users in group B, recursively');
-cmp_bag($gA->getUsers(1), [@aUsers, @zUsers, 3], 'users in group A, recursively');
-cmp_bag($gC->getUsers(1), [@cUsers, 3], 'users in group C, recursively');
-cmp_bag($gZ->getUsers(1), [@zUsers, 3], 'users in group Z, recursively');
+cmp_bag($gB->getAllUsers(), [@bUsers, @aUsers, @cUsers, @zUsers, 3], 'users in group B, recursively');
+cmp_bag($gA->getAllUsers(), [@aUsers, @zUsers, 3], 'users in group A, recursively');
+cmp_bag($gC->getAllUsers(), [@cUsers, 3], 'users in group C, recursively');
+cmp_bag($gZ->getAllUsers(), [@zUsers, 3], 'users in group Z, recursively');
 
 ##Database based user membership in groups
 
@@ -286,6 +287,7 @@ cmp_bag($mobUsers, [map {$_->userId} @mob], 'verify SQL table built correctly');
 is( $gY->databaseLinkId, 0, "Group Y's databaseLinkId is set to WebGUI");
 $gY->dbQuery(q!select userId from myUserTable!);
 is( $session->stow->get('isInGroup'), undef, 'setting dbQuery clears cached isInGroup');
+WebGUI::Cache->new($session, $gZ->getId)->delete();  ##Delete cached key for testing
 
 my @mobIds = map { $_->userId } @mob;
 
@@ -298,10 +300,10 @@ cmp_bag(
 is( $mob[0]->isInGroup($gY->getId), 1, 'mob[0] is in group Y after setting dbQuery');
 is( $mob[0]->isInGroup($gZ->getId), 1, 'mob[0] isInGroup Z');
 
-ok( isIn($mob[0]->userId, @{ $gY->getUsers() }), 'mob[0] in list of group Y users');
+ok( isIn($mob[0]->userId, @{ $gY->getAllUsers() }), 'mob[0] in list of group Y users');
 ok( !isIn($mob[0]->userId, @{ $gZ->getUsers() }), 'mob[0] not in list of group Z users');
 
-ok( isIn($mob[0]->userId, @{ $gZ->getUsers(1) }), 'mob[0] in list of group Z users, recursively');
+ok( isIn($mob[0]->userId, @{ $gZ->getAllUsers() }), 'mob[0] in list of group Z users, recursively');
 
 ##Karma tests
 
@@ -346,7 +348,7 @@ is_deeply(
 );
 
 $session->setting->set('useKarma', 1);
-$session->stow->delete('isInGroup'); ##Clear cache since previous data is wrong
+$gK->clearCaches; ##Clear cache since previous data is wrong
 
 is_deeply(
 	[ (map { $_->isInGroup($gK->getId) }  @chameleons) ],
@@ -365,7 +367,7 @@ $session->setting->set('useKarma', $defaultKarmaSetting);
 ##Scratch tests
 
 my $gS = WebGUI::Group->new($session, "new");
-$gK->name('Group S');
+$gS->name('Group S');
 $gC->addGroups([$gS->getId]);
 
 #		B
@@ -416,9 +418,9 @@ cmp_bag(
 );
 
 cmp_bag(
-	$gS->getUsers,
-	[ (map { $_->{user}->userId() }  grep { $_->{expect} } @scratchTests) ],
-	'getUsers for group with scratch'
+	$gS->getAllUsers,
+	[ ( (map { $_->{user}->userId() }  grep { $_->{expect} } @scratchTests), 3) ],
+	'getAllUsers for group with scratch'
 );
 
 foreach my $subSession (@sessionBank) {
@@ -457,8 +459,8 @@ cmp_bag(
 );
 
 cmp_bag(
-	$gI->getUsers,
-	[ (map { $_->{user}->userId() }  grep { $_->{expect} } @ipTests) ],
+	$gI->getAllUsers,
+	[ ( (map { $_->{user}->userId() }  grep { $_->{expect} } @ipTests), 3) ],
 	'getUsers for group with IP filter'
 );
 

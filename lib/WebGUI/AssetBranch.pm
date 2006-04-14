@@ -175,7 +175,7 @@ sub www_editBranch {
         }
         my $clause;
         if ($self->session->user->isInGroup(3)) {
-                my $contentManagers = WebGUI::Group->new($self->session,4)->getUsers(1);
+                my $contentManagers = WebGUI::Group->new($self->session,4)->getAllUsers();
                 push (@$contentManagers, $self->session->user->userId);
                 $clause = "userId in (".$self->session->db->quoteAndJoin($contentManagers).")";
         } else {
