@@ -99,10 +99,9 @@ sub _getFieldHash {
 		"requirement"=>{
 			name=>"Requirement",
 			type=>"select",
-			list=>{''=>'Select One'},
-		#	list=>$self->_getAllEvents(),
+			list=>{''=>'Select One',$self->_getAllEvents()},
 			compare=>"boolean",
-			method=>"selectList",
+			method=>"selectBox",
 			calculated=>1,
 			initial=>1
 		}
@@ -196,13 +195,25 @@ sub _matchTypes {
 			radio
 			radiolist
 			selectbox
-			selectlist
 			template
 			timezone
 			yesno
 		))
 	);
 	return 'text';
+}
+
+#-------------------------------------------------------------------
+
+sub _getAllEvents {
+	my $self = shift;
+	my $conditionalWhere;
+	if ($self->get("globalPrerequisites") == 0) {
+		$conditionalWhere = "and e.assetId=".$self->session->db->quote($self->get('assetId'));
+	}
+	my $sql = "select p.productId, p.title from products as p, EventManagementSystem_products as e
+		   where p.productId = e.productId $conditionalWhere";
+	return $self->session->db->buildHash($sql);
 }
 
 #-------------------------------------------------------------------
@@ -220,6 +231,12 @@ sub addToScratchCart {
 	$self->session->scratch->set('EMS_scratch_cart', join("\n", @eventsInCart));
 }
 
+#-------------------------------------------------------------------
+
+sub canApproveEvents {
+	my $self = shift;
+	return $self->session->user->isInGroup($self->get("groupToApproveEvents"));
+}
 
 #-------------------------------------------------------------------
 
@@ -772,7 +789,7 @@ sub getRegistrationInfo {
 	
 	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
 			     .WebGUI::Form::hidden($self->session,{name=>"func",value=>"saveRegistration"});
-
+	$var{'form.message'} = 'Enter Badge/Contact information for the series of events you are currently adding to the cart.  <br /><br />If you are logged in, you can choose to update your own user profile with this information by choosing your name from the drop-down box, and checking the box that says "Update profile".  <br /><br />If you are making a purchase for someone else, select their name or select the "Create New" option from the drop-down box.  If you are adding items to a previous purchase, the person is already selected, and the update checkbox is selected by default.';
 	$var{'form.footer'} = WebGUI::Form::formFooter($self->session);
 	$var{'form.submit'} = WebGUI::Form::submit($self->session);
 	$var{'form.firstName.label'} = "First Name";
@@ -790,8 +807,11 @@ sub getRegistrationInfo {
 	$var{'form.city'} = WebGUI::Form::Text($self->session,{name=>'city'});
 	$var{'form.state'} = WebGUI::Form::Text($self->session,{name=>'state'});
 	$var{'form.zipCode'} = WebGUI::Form::Text($self->session,{name=>'zipCode'});
-	$var{'form.country'} = WebGUI::Form::SelectList($self->session,{name=>'country', options => {'us' => 'UnitedStates'}});
+	$var{'form.country'} = WebGUI::Form::SelectBox($self->session,{name=>'country', options => {'us' => 'UnitedStates'}});
 	$var{'form.phoneNumber'} = WebGUI::Form::Phone($self->session,{name=>'phoneNumber'});
+	$var{'form.badgeId'} = $self->getBadgeSelector;
+	$var{'form.updateProfile'} = WebGUI::Form::Checkbox($self->session,{name=>'updateProfile'});
+	$var{isLoggedIn} = 1 if ($self->session->user->userId ne '1');
 	$var{'form.email'} = WebGUI::Form::Email($self->session,{name=>'email'});
 	$var{'registration'} = 1;	
 	return \%var;
@@ -952,7 +972,7 @@ sub removeFromScratchCart {
 	foreach (@{$events}) {
 		push (@newArr,$_) unless $_ eq $event;
 	}
-	$self->session->scratch->set('EMS_scratch_cart', join("\n",\@newArr));
+	$self->session->scratch->set('EMS_scratch_cart', join("\n",@newArr));
 }
 
 #------------------------------------------------------------------
@@ -1196,18 +1216,19 @@ sub www_addToCart {
 
 =head2 www_approveEvent ( )
 
-Method that will set the status of an event to approved.
+Method that will set the status of some events to approved.
 
 =cut
 
-sub www_approveEvent {
+sub www_approveEvents {
 	my $self = shift;
-	my $eventId = $self->session->form->get("pid");
-	return $self->session->privilege->insuffficent unless ($self->session->user->isInGroup($self->get("groupToApproveEvents")));
-
-	$self->session->db->write("update EventManagementSystem_products set approved=1 where productId=?",
-				   [$eventId]);
-	
+	return $self->session->privilege->insufficient unless ($self->canApproveEvents);
+	my @eventsToCheck = $self->session->form->process('eventIdToCheck','selectList');
+	my @events = $self->session->form->process('eventId','checkList');
+	foreach (@eventsToCheck) {
+		my $isIn = WebGUI::Utility::isIn($_,@events) ? '1' : '0';
+		$self->session->db->write("update EventManagementSystem_products set approved=? where productId=?",[$isIn,$_]);
+	}
 	return $self->www_manageEvents;
 }
 
@@ -1326,7 +1347,7 @@ sub www_editEvent {
 
 	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
 
-	my $pid = $self->session->form->get("pid");
+	my $pid = shift || $self->session->form->get("pid");
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 
 	my $event = $self->session->db->quickHashRef("
@@ -1349,13 +1370,19 @@ sub www_editEvent {
 	$f->hidden( -name=>"assetId", -value=>$self->get("assetId") );
 	$f->hidden( -name=>"func",-value=>"editEventSave" );
 	$f->hidden( -name=>"pid", -value=>$pid );
-	
-	if ($self->session->user->isInGroup($self->get("groupToApproveEvents")) && $pid ne "new") {
-	 unless ($self->eventIsApproved($pid)) {
-	  $f->readOnly(
-		-value  => sprintf "<a href='%s'>%s</a>", $self->getUrl("func=approveEvent;pid=".$pid), $i18n->get('add/edit approve event'),
-	  );
-	 }	
+		
+	if ($self->canApproveEvents) {
+		$f->yesNo(
+			-value => $event->{approved},
+			-name => 'approved',
+			-label => $i18n->get('approve event'),
+			-hoverHelp => $i18n->get('you can approve events so you can submit events already approved or directly edit approval of events')
+		);
+	} else {
+		$f->hidden(
+			-name  => "approved",
+			-value => $event->{approved}
+		);
 	}
 	
 	$f->text(
@@ -1420,10 +1447,6 @@ sub www_editEvent {
 		-label => $i18n->get('add/edit event maximum attendees')
 	);
 	
-	$f->hidden(
-		-name  => "approved",
-		-value => 0 || $event->{approved}
-	);
 	
 	# add dynamically added metadata fields.
 	my $meta = {};
@@ -1442,7 +1465,7 @@ sub www_editEvent {
 		my $options;
 		# Add a "Select..." option on top of a select list to prevent from
 		# saving the value on top of the list when no choice is made.
-		if($dataType eq "selectList") {
+		if($dataType eq "selectList" || $dataType eq "selectBox") {
 			$options = {"", $i18n3->get("Select")};
 		}
 		$f->dynamicField(
@@ -1541,15 +1564,13 @@ sub www_editEventSave {
         my $event;
 
 	#Save the extended product data
-	$pid = $self->setCollateral("EventManagementSystem_products", "productId",
-			    {
-			     productId  => $pid,
-			     startDate  => $self->session->form->process("startDate",'dateTime'),
-			     endDate	=> $self->session->form->process("endDate",'dateTime'),
-			     maximumAttendees => $self->session->form->get("maximumAttendees"),
-			     approved	=> $self->session->form->get("approved")
-			    },1,1
-			   );
+	$pid = $self->setCollateral("EventManagementSystem_products", "productId",{
+		productId  => $pid,
+		startDate  => $self->session->form->process("startDate",'dateTime'),
+		endDate	=> $self->session->form->process("endDate",'dateTime'),
+		maximumAttendees => $self->session->form->get("maximumAttendees"),
+		approved	=> $self->session->form->get("approved")
+	},1,1);
 
 	#Save the event metadata
 	my $mdFields = $self->getEventMetaDataFields;
@@ -1579,7 +1600,7 @@ sub www_editEventSave {
 	
 	# Save the prerequisites
 	my $prerequisiteList = $self->session->form->process("eventList", "checkList");
-
+	my @list = split(/\n/, $prerequisiteList);
 	unless ($prerequisiteList eq "") {
 		my $prerequisiteId = $self->setCollateral("EventManagementSystem_prerequisites", "prerequisiteId",
 				{
@@ -1589,19 +1610,16 @@ sub www_editEventSave {
 				},0,0
 		);
 		
-		my @list = split(/\n/, $prerequisiteList);
 		foreach my $requiredEvent (@list) {
-			$self->setCollateral("EventManagementSystem_prerequisiteEvents", "prerequisiteEventId",
-				{
-				 prerequisiteEventId => "new",
-				 prerequisiteId      => $prerequisiteId,
-				 requiredProductId   => $requiredEvent
-				},0,0
-			);
+			$self->setCollateral("EventManagementSystem_prerequisiteEvents", "prerequisiteEventId",{
+				prerequisiteEventId => "new",
+				prerequisiteId      => $prerequisiteId,
+				requiredProductId   => $requiredEvent
+			},0,0);
 		}
 	}
 	
-	return $self->www_editEvent if ($self->session->form->get("whatNext") eq "addAnotherPrereq");
+	return $self->www_editEvent(undef,$pid) if ($self->session->form->get("whatNext") eq "addAnotherPrereq");
 	return $self->www_manageEvents;
 }
 
@@ -1623,11 +1641,14 @@ sub www_manageEvents {
 				EventManagementSystem_products as pe where p.productId = pe.productId
 				and pe.assetId=? order by sequenceNumber", [$self->get("assetId")]);
 	
+	$output = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl}).WebGUI::Form::hidden($self->session,{name=>"func",value=>"approveEvents"});
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
-	$output = sprintf "<table width='100%'><tr><th>%s</th><th>%s</th><th>%s</th></tr>",
+	$output .= sprintf "<table width='100%'><tr><th>%s</th><th>%s</th><th>%s</th></tr>",
 				$i18n->get('event'),
 				$i18n->get('add/edit event price'),
-				$i18n->get('status');
+				$self->canApproveEvents 
+					? $i18n->get('approval')
+					: $i18n->get('status');
 	while (my %row = $sth->hash) {
 		
 		$output .= "<tr><td>";
@@ -1636,25 +1657,33 @@ sub www_manageEvents {
 			  $self->session->icon->edit('func=editEvent;pid='.$row{productId}, $self->getUrl).
 			  $self->session->icon->moveUp('func=moveEventUp;pid='.$row{productId}, $self->getUrl).
 			  $self->session->icon->moveDown('func=moveEventDown;pid='.$row{productId}, $self->getUrl).
-			  " ".$row{title};
-		$output .= "</td><td>";
-		$output .= $row{price};
-		$output .= "</td><td>";
+			  " ".$row{title}."</td><td>".$row{price}."</td><td>";
 		
-		if ($row{approved} == 0) {
-			$output .= $i18n->get('pending');
+		unless ($self->canApproveEvents) {
+			if ($row{approved} == 0) {
+				$output .= $i18n->get('pending');
+			} else {
+				$output .= $i18n->get('approved');
+			}
+		} else {
+			$output .= WebGUI::Form::checkbox($self->session,{
+				-name => 'eventId',
+				-checked => $row{approved},
+				-value => $row{productId}
+			}).WebGUI::Form::hidden($self->session,{
+				-name => 'eventIdToCheck',
+				-value => $row{productId}
+			});
 		}
-		else {
-			$output .= $i18n->get('approved');
-		}
-		
 		$output .= "</td></tr>";
 	}
-	$output .= "</table>";
+	$output .= '<tr><td>&nbsp;</td><td>&nbsp;</td><td>'.WebGUI::Form::submit($self->session,{-value=>$i18n->get('save approvals')}).'</td></tr>' if $self->canApproveEvents;
+	$output .= "</table>".WebGUI::Form::formFooter($self->session);
 	
 	$self->getAdminConsole->setHelp('event management system manage events','Asset_EventManagementSystem');
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editEvent;pid=new'), $i18n->get('add event'));
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n->get('manage event metadata'));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEvents'), $i18n->get('refresh events list'));
 	return $self->getAdminConsole->render($output, $i18n->get("manage events"));
 }
 
@@ -1708,6 +1737,41 @@ sub www_managePurchases {
 	my $whereClause = ($isAdmin)?'':" and userId='".$self->session->user->userId."' and e.endDate > '".$self->session->datetime->time()."'";
 	my $sql = "select distinct(p.purchaseId) as purchaseId, t.initDate as initDate from transaction as t, EventManagementSystem_purchases as p, EventManagementSystem_registrations as r, EventManagementSystem_products as e where p.transactionId=t.transactionId and p.purchaseId=r.purchaseId and r.productId=e.productId $whereClause order by t.initDate";
 	my $sth = $self->session->db->read($sql);
+	my @purchasesLoop;
+	while (my $purchase = $sth->hashRef) {
+		$purchase->{datePurchasedHuman} = $self->session->datetime->epochToHuman($purchase->{initDate});
+		$purchase->{purchaseUrl} = $self->getUrl."?func=viewPurchase;pid=".$purchase->{purchaseId};
+		
+		push(@purchasesLoop,$purchase);
+	}
+	$var{managePurchasesTitle} = 'Manage Purchases';
+	$sth->finish;
+	$var{'purchasesLoop'} = \@purchasesLoop;
+	return $self->session->style->process($self->processTemplate(\%var,$self->getValue("managePurchasesTemplateId")),$self->getValue("styleTemplateId"));
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_viewPurchase ( )
+
+Method to display a purchase.  From this screen, admins can 
+return the whole purchase, return a whole badge (registration, 
+a.k.a itinerary for a single person), or return a single event
+from an itinerary.  The purchaser can just add events to 
+individual registrations that have at least one event that 
+hasn't occurred yet.
+
+=cut
+
+sub www_viewPurchase {
+	my $self = shift;
+	my %var = $self->get();
+	my $isAdmin = $self->session->user->isInGroup($self->get("groupToAddEvents"));
+	my $pid = $self->session->form->process('pid');
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
+	my $whereClause = ($isAdmin)?'':" and userId='".$self->session->user->userId."' and e.endDate > '".$self->session->datetime->time()."'";
+	my $sql = "select b.firstName, b.lastName, r.registrationId, e.startDate, e.endDate,  from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e where r.productId=e.productId and r.badgeId=b.badgeId and r.purchaseId=? order by b.badgeId, e.startDate";
+	my $sth = $self->session->db->read($sql,[$pid]);
 	my @purchasesLoop;
 	while (my $purchase = $sth->hashRef) {
 		$purchase->{datePurchasedHuman} = $self->session->datetime->epochToHuman($purchase->{initDate});
@@ -1967,29 +2031,63 @@ sub www_moveEventUp {
 #-------------------------------------------------------------------
 sub www_saveRegistration {
 	my $self = shift;
-#	my $eventsInCart = $self->getEventsInCart;
 	my $eventsInCart = $self->getEventsInScratchCart;
 	my $purchaseId = $self->session->id->generate;
-
-	foreach my $eventId (@$eventsInCart) {
-		my $registrationId = $self->setCollateral("EventManagementSystem_registrations", "registrationId",
-				{
-				 registrationId  => "new",
-				 purchaseId	 => $purchaseId,
-				 productId	 => $eventId,
-				 firstName       => $self->session->form->get("firstName", "text"),
-				 lastName	 => $self->session->form->get("lastName", "text"),
-				 address         => $self->session->form->get("address", "text"),
-				 city            => $self->session->form->get("city", "text"),
-				 state		 => $self->session->form->get("state", "text"),
-				 zipCode	 => $self->session->form->get("zipCode", "text"),
-				 country	 => join("\n",$self->session->form->get("country", "selectList")),
-				 phone		 => $self->session->form->get("phoneNumber", "phone"),
-				 email		 => $self->session->form->get("email", "email")
-				},0,0
-		);
-	}
+	my ($myBadgeId) = $self->session->db->quickArray("select badgeId from EventManagementSystem_badges where userId=",[$self->session->user->userId]);
+	$myBadgeId ||= "new"; # if there is no badge for this user yet, have setCollateral create one, assuming thisIsI.
+	my $theirBadgeId = $self->session->form->get('badgeId') || "new";
+	  # ^ if this is "new", the person is not currently logged in, so they 
+	  # get a new badgeId no matter what.  If someone wants to add registrations
+	  # to an existing badge, they need to log in first.
+	my $thisIsI = $theirBadgeId eq 'thisIsI';
+	my $badgeId = $thisIsI ? $myBadgeId : $theirBadgeId;
+	my $userId = $thisIsI ? $self->session->user->userId : '';
+	my $firstName = $self->session->form->get("firstName", "text");
+	my $lastName = $self->session->form->get("lastName", "text");
+	my $address = $self->session->form->get("address", "text");
+	my $city = $self->session->form->get("city", "text");
+	my $state = $self->session->form->get("state", "text");
+	my $zipCode = $self->session->form->get("zipCode", "text");
+	my $country = $self->session->form->get("country", "selectBox");
+	my $phoneNumber = $self->session->form->get("phoneNumber", "phone");
+	my $email = $self->session->form->get("email", "email");
+	my $details = {
+		badgeId => $badgeId, # if this is "new", setCollateral will return the new one.
+		firstName       => $firstName,
+		lastName	 => $lastName,
+		address         => $address,
+		city            => $city,
+		state		 => $state,
+		zipCode	 => $zipCode,
+		country	 => $country,
+		phone		 => $phoneNumber,
+		email		 => $email
+	};
+	$details->{userId} = $userId if $userId;
+	$badgeId = $self->setCollateral("EventManagementSystem_badges", "badgeId",$details,0,0);
 	
+	foreach my $eventId (@$eventsInCart) {
+		my $registrationId = $self->setCollateral("EventManagementSystem_registrations", "registrationId",{
+			registrationId  => "new",
+			purchaseId	 => $purchaseId,
+			productId	 => $eventId,
+			badgeId => $badgeId
+		},0,0);
+	}
+	my ($theirUserId) = $self->session->db->quickArray("select userId from EventManagementSystem_badges where badgeId=",[$badgeId]);
+	$userId = $theirUserId unless $thisIsI;
+	if ($userId) {
+		my $u = WebGUI::User->new($self->session,$userId);
+		$u->profileField('firstName',$firstName);
+		$u->profileField('lastName',$lastName);
+		$u->profileField('homeAddress',$address);
+		$u->profileField('homeCity',$city);
+		$u->profileField('homeState',$state);
+		$u->profileField('homeZipCode',$zipCode);
+		$u->profileField('homeCountry',$country);
+		$u->profileField('homePhone',$phoneNumber);
+		$u->profileField('email',$email);
+	}
 	#Our item plug-in needs to be able to associate these records with the result of the payment attempt
 	my $counter = 0;
 	while (1) {
@@ -2031,6 +2129,9 @@ sub view {
 	my %var;
 	my $keywords = $self->session->form->get("searchKeywords");
 	my @keys;
+	my $joins;
+	my $selects;
+	my @joined;
 	push(@keys,$keywords) if $keywords;
 	unless ($keywords =~ /^".*"$/) {
 		foreach (split(" ",$keywords)) {
@@ -2045,58 +2146,84 @@ sub view {
 		$searchPhrases = " and ( ";
 		my $count = 0;
 		foreach (@keys) {
-			$count++;
-			$searchPhrases .= ' and ' unless $count == 1;
+			$searchPhrases .= ' and ' if $count;
 			my $val = $self->session->db->quote('%'.$_.'%');
 			$searchPhrases .= "(p.title like $val or p.description like $val)";
+			$count++;
 		}
 		$searchPhrases .= " )";
 	}
+	my %reqHash;
+	my $seatsAvailable = 'none';
+	my $seatsCompare;
 	if ($self->session->form->get("advSearch")) {
 		$searchPhrases = '';
 		my $fields = $self->_getFieldHash();
-		my $counter = 0;
-		for (my $cfilter = 1; $cfilter < 30; $cfilter++) {
+		my $count = 0;
+		for (my $cfilter = 1; $cfilter < 50; $cfilter++) {
 			my $value = $self->session->form->get("cfilter_t".$cfilter);
 			my $fieldId = $self->session->form->get("cfilter_s".$cfilter);
-			next if ($fieldId eq 'seatsAvailable' || $fieldId eq 'registration');
-			if ($value && defined $fields->{$fieldId}) {
-				my $compare = $self->session->form->get("cfilter_c".$cfilter);
-				#Format Value with Operator
-				$value =~ s/%//g;
-				my $field = $fields->{$fieldId};
-				if ($field->{type} =~ /^date/i) {
-	        $value = $self->session->datetime->setToEpoch($value);
-				} else {
-					$value = lc($value);
+			if ($fieldId eq 'requirement') {
+				$reqHash{$value} = 1 if $value;
+			}
+			if ($fieldId eq 'seatsAvailable') {
+				$seatsAvailable = $value if ($value || $value eq '0');
+				$seatsCompare = $self->session->form->get("cfilter_c".$cfilter);
+			}
+			# temporary
+			next if ($fieldId eq 'seatsAvailable' || $fieldId eq 'requirement');
+			# end temporary
+			next unless (($value || $value =~ /^0/) && defined $fields->{$fieldId});
+			my $compare = $self->session->form->get("cfilter_c".$cfilter);
+			#Format Value with Operator
+			$value =~ s/%//g;
+			my $field = $fields->{$fieldId};
+			if ($field->{type} =~ /^date/i) {
+        $value = $self->session->datetime->setToEpoch($value);
+			} else {
+				$value = lc($value);
+			}
+			my $compareType = $field->{compare};
+			if($compare eq "eq") {
+				$value = "=".$self->session->db->quote($value);
+			} elsif($compare eq "ne"){
+				$value = "<>".$self->session->db->quote($value);
+			} elsif($compare eq "notlike") {
+				$value = "not like ".$self->session->db->quote("%".$value."%");
+			} elsif($compare eq "starts") {
+				$value = "like ".$self->session->db->quote($value."%");
+			} elsif($compare eq "ends") {
+				$value = "like ".$self->session->db->quote("%".$value);
+			} elsif($compare eq "gt") {
+				$value = "> ".$value;
+			} elsif($compare eq "lt") {
+				$value = "< ".$value;
+			} elsif($compare eq "lte") {
+				$value = "<= ".$value;
+			} elsif($compare eq "gte") {
+				$value = ">= ".$value;
+			} elsif($compare eq "like") {
+				$value = " like ".$self->session->db->quote("%".$value."%");
+			}
+			$searchPhrases .= " and " if($count);
+			$count++;
+			my $isMeta = $field->{metadata};		
+			my $phrase;
+			if ($isMeta) {
+				unless(WebGUI::Utility::isIn($fieldId,@joined)) {
+					$joins .= " left join EventManagementSystem_metaData joinedField$count on e.productId=joinedField$count.productId and joinedField$count.fieldId='$fieldId'";
+					push(@joined,$fieldId);
 				}
-				if($compare eq "eq") {
-					$value = "=".$self->session->db->quote($value);
-				} elsif($compare eq "ne"){
-					$value = "<>".$self->session->db->quote($value);
-				} elsif($compare eq "notlike") {
-					$value = "not like ".$self->session->db->quote("%".$value."%");
-				} elsif($compare eq "starts") {
-					$value = "like ".$self->session->db->quote($value."%");
-				} elsif($compare eq "ends") {
-					$value = "like ".$self->session->db->quote("%".$value);
-				} elsif($compare eq "gt") {
-					$value = "> ".$value;
-				} elsif($compare eq "lt") {
-					$value = "< ".$value;
-				} elsif($compare eq "lte") {
-					$value = "<= ".$value;
-				} elsif($compare eq "gte") {
-					$value = ">= ".$value;
-				} elsif($compare eq "like") {
-					$value = " like ".$self->session->db->quote("%".$value."%");
-				}
-				$searchPhrases .= " and" if($counter);
-				$counter++;
-				unless ($compare eq 'numeric') {
-					$searchPhrases .= " lower(".$field->{tableName}.'.'.$field->{columnName}.") ".$value;
+			#	$selects .= ", joinedField$count.fieldData as joinedField".$count.'a';
+				$phrase = " joinedField".$count.".fieldData ";
+				$searchPhrases .= " ".$phrase." ".$value;
+			} else {
+				# shouldn't need to join anything else
+				$phrase = $field->{tableName}.'.'.$field->{columnName};
+				if ($compareType ne 'numeric') {
+					$searchPhrases .= " lower(".$phrase.") ".$value;
 				} else {
-					$searchPhrases .= " ".$field->{tableName}.'.'.$field->{columnName}." ".$value;
+					$searchPhrases .= " ".$phrase." ".$value;
 				}
 			}
 		}
@@ -2104,8 +2231,9 @@ sub view {
 	}
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	# Get the products available for sale for this page
-	my $sql = "select p.productId, p.title, p.description, p.price, p.templateId, e.approved, e.maximumAttendees, e.startDate, e.endDate 
-		   from products as p, EventManagementSystem_products as e
+	my $sql = "select p.productId, p.title, p.description, p.price, p.templateId, e.approved, e.maximumAttendees, e.startDate, e.endDate $selects
+		   from products as p, EventManagementSystem_products as e 
+		   $joins 
 		   where
 		   	p.productId = e.productId and approved=1
 		   	and e.assetId =".$self->session->db->quote($self->get("assetId")).$searchPhrases;
@@ -2117,14 +2245,50 @@ sub view {
 	$var{isAdvSearch} = $self->session->form->get('advSearch');
 	$var{'search.formFooter'} = WebGUI::Form::formFooter($self->session);
 	$var{'search.formSubmit'} = WebGUI::Form::submit($self->session, {value=>'Filter'});
-	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->get("paginateAfter"));
-	$p->setDataByQuery($sql);
+	my $searchUrl = $self->getUrl("func=view");
+	my $formVars = $self->session->form->paramsHashRef();
+	foreach ($self->session->form->param) {
+		$searchUrl .= ';'.$_.'='.$formVars->{$_} if (($_ ne 'pn') && ($formVars->{$_} || $formVars->{$_} eq '0'));
+	}
+	# my $p = WebGUI::Paginator->new($self->session,$searchUrl,$self->get("paginateAfter"));
+	my $p = WebGUI::Paginator->new($self->session,$searchUrl,1);
+	my (@results, $sth, $data);
+	$sth = $self->session->db->read($sql);
+	while ($data = $sth->hashRef) {
+		my $shouldPush = 1;
+		my $eventId = $data->{productId};
+		my $requiredList = $self->getPrerequisiteEventList($eventId);
+		if ($seatsAvailable ne 'none') {
+			my ($numberRegistered) = $self->session->db->quickArray("select count(*) from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p
+	  	where r.purchaseId = p.purchaseId and r.returned=0 and r.productId=".$self->session->db->quote($eventId));
+	  	if($seatsCompare eq "eq") {
+				$shouldPush = 0 unless ($data->{'maximumAttendees'} - $numberRegistered == $seatsAvailable);
+			} elsif($seatsCompare eq "ne"){
+				$shouldPush = 0 unless ($data->{'maximumAttendees'} - $numberRegistered != $seatsAvailable);
+			} elsif($seatsCompare eq "gt") {
+				$shouldPush = 0 unless ($data->{'maximumAttendees'} - $numberRegistered > $seatsAvailable);
+			} elsif($seatsCompare eq "lt") {
+				$shouldPush = 0 unless ($data->{'maximumAttendees'} - $numberRegistered < $seatsAvailable);
+			} elsif($seatsCompare eq "lte") {
+				$shouldPush = 0 unless ($data->{'maximumAttendees'} - $numberRegistered <= $seatsAvailable);
+			} elsif($seatsCompare eq "gte") {
+				$shouldPush = 0 unless ($data->{'maximumAttendees'} - $numberRegistered >= $seatsAvailable);
+			}
+			
+		}
+		foreach (keys %reqHash) {
+			$shouldPush = 0 unless isIn(keys(%{$requiredList}),$_);
+		}
+		push(@results,$data) if $shouldPush;
+	}
+	$sth->finish;
+	
+	$p->setDataByArrayRef(\@results);
 	my $eventData = $p->getPageData;
 	my @events;
-
 	foreach my $event (@$eventData) {
 	  my %eventFields;
-	  
+	
 	  $eventFields{'title'} = $event->{'title'};
 	  $eventFields{'description'} = $event->{'description'};
 	  $eventFields{'price'} = $event->{'price'};
@@ -2152,6 +2316,10 @@ sub view {
 	$var{'paginateBar'} = $p->getBarTraditional;
 	$var{'manageEvents.url'} = $self->getUrl('func=manageEvents');
 	$var{'manageEvents.label'} = $i18n->get('manage events');
+	$var{'managePurchases.url'} = $self->getUrl('func=managePurchases');
+	$var{'managePurchases.label'} = $i18n->get('manage purchases');
+	
+	
 	if ($self->session->user->isInGroup($self->get("groupToManageEvents"))) {
 		$var{'canManageEvents'} = 1;
 	}
