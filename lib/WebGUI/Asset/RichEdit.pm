@@ -424,7 +424,7 @@ sub getToolbar {
 #-------------------------------------------------------------------
 sub getRichEditor {
 	my $self = shift;
-	return '' if $self->getValue('disableRichEditor');
+	return '' if ($self->getValue('disableRichEditor') || $self->session->env->get("HTTP_USER_AGENT") =~ /Safari/);
 	my $nameId = shift;
 	my @toolbarRow1 = split("\n",$self->getValue("toolbarRow1"));	
 	push(@toolbarRow1,"contextmenu") if ($self->getValue("enableContextMenu"));
