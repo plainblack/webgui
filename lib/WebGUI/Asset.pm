@@ -911,18 +911,22 @@ sub getToolbar {
         $toolbar .= $self->session->icon->cut('func=cut',$self->get("url"))
             	.$self->session->icon->copy('func=copy',$self->get("url"));
         $toolbar .= $self->session->icon->shortcut('func=createShortcut',$self->get("url")) unless ($self->get("className") =~ /Shortcut/);
-	$toolbar .= $self->session->icon->export('func=export',$self->get("url")) if defined ($self->session->config->get("exportPath"));
 	$self->session->style->setLink($self->session->config->get("extrasURL").'/contextMenu/contextMenu.css', {rel=>"stylesheet",type=>"text/css"});
 	$self->session->style->setScript($self->session->config->get("extrasURL").'/contextMenu/contextMenu.js', {type=>"text/javascript"});
 	my $lock = "";
 	if (!$self->isLocked) {
 		$lock = 'contextMenu.addLink("'.$self->getUrl("func=lock").'","'.$i18n->get("lock").'");';
 	}
+	my $export = "";
+	if (defined $self->session->config->get("exportPath")) {
+		$export = 'contextMenu.addLink("'.$self->getUrl("func=export").'","'.$i18n->get("export","Icon").'");';
+	}
 	return '<script type="text/javascript">
 		//<![CDATA[
 		var contextMenu = new contextMenu_createWithImage("'.$self->getIcon(1).'","'.$self->getId.'","'.$self->getName.'");
 		'.$lock.'
 		contextMenu.addLink("'.$self->getUrl("func=changeUrl").'","'.$i18n->get("change url").'");
+		'.$export.'
 		contextMenu.addLink("'.$self->getUrl("func=editBranch").'","'.$i18n->get("edit branch").'");
 		contextMenu.addLink("'.$self->getUrl("func=promote").'","'.$i18n->get("promote").'");
 		contextMenu.addLink("'.$self->getUrl("func=demote").'","'.$i18n->get("demote").'");
