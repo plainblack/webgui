@@ -79,6 +79,7 @@ sub addToArray {
 	my $property = shift;
 	my $value = shift;
 	my $array = $self->get($property);
+	return undef if isIn($value,@{$array});
 	push(@{$array}, $value);
 	$self->set($property, $array);
 }
