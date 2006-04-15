@@ -16,13 +16,9 @@ package WebGUI::Asset::NewAsset;
 
 use strict;
 use Tie::IxHash;
-use WebGUI::Asset;
-use WebGUI::HTMLForm;
-use WebGUI::HTTP;
-use WebGUI::Session;
+use base 'WebGUI::Asset';
 use WebGUI::Utility;
 
-our @ISA = qw(WebGUI::Asset);
 
 
 =head1 NAME
@@ -62,10 +58,13 @@ sub addRevision {
 }
 
 #-------------------------------------------------------------------
-=head2 definition ( definition )
+
+=head2 definition ( session, definition )
 
 defines asset properties for New Asset instances.  You absolutely need 
 this method in your new Assets. 
+
+=head3 session
 
 =head3 definition
 
@@ -75,34 +74,30 @@ A hash reference passed in from a subclass definition.
 
 sub definition {
 	my $class = shift;
+	my $session = shift;
 	my $definition = shift;
 	my %properties;
 	tie %properties, 'Tie::IxHash';
+	my $i18n = WebGUI::International->new($session, "Asset_NewAsset");
 	%properties = (
 		templateId =>{
-			
 			#See the list of field/control types in /lib/WebGUI/Form/
 			fieldType=>"template",  
-			
 			defaultValue=>'NewAssetTmpl0000000001',
 			tab=>"display",
-			
 			#www_editSave will ignore anyone's attempts to update this field if this is set to 1
 			noFormPost=>0,  
-			
 			#This is an option specific to the template fieldType.
 			namespace=>"NewAsset", 
-			
 			#This is what will appear when the user hovers the mouse over the label 
 			# of your form field.
-			hoverHelp=>WebGUI::International::get('templateId label description','Asset_NewAsset'),
-			
+			hoverHelp=>$i18n->get('templateId label description'),
 			# This is the text that will appear to the left of your form field.
-			label=>WebGUI::International::get('templateId label,"Asset_NewAsset")
-		}
+			label=>$i18n->get('templateId label')
+			}
 	);
 	push(@{$definition}, {
-		assetName=>WebGUI::International::get('assetName',"Asset_NewAsset"),
+		assetName=>$i18n->get('assetName'),
 		icon=>'NewAsset.gif',
 		tableName=>'NewAsset',
 		className=>'WebGUI::Asset::NewAsset',
@@ -138,42 +133,24 @@ Returns the TabForm object that will be used in generating the edit page for thi
 =cut
 
 sub getEditForm {
-   my $self = shift;
-   my $tabform = $self->SUPER::getEditForm();
-   $tabform->getTab("display")->template(
-      -value=>$self->getValue("templateId"),
-	  -label=>WebGUI::International::get('template label', 'Asset_NewAsset'),,
-	  -namespace=>"NewAssetAsset"
-   );
-   $tabform->getTab("properties")->text (
-      -name=>"showPage",
-      -label=>WebGUI::International::get('show page', 'Asset_NewAsset'),
-	  -value=>$self->getValue("showPage"),
-	  -hoverHelp=>WebGUI::International::get('show page description', 'Asset_NewAsset'),
-   );
-   return $tabform;
+   	my $self = shift;
+   	my $tabform = $self->SUPER::getEditForm();
+	my $i18n = WebGUI::International->new($self->session, "Asset_NewAsset");
+   	$tabform->getTab("display")->template(
+      		value=>$self->getValue("templateId"),
+	  	label=>$i18n->get('template label'),,
+	  	namespace=>"NewAssetAsset"
+   		);
+   	$tabform->getTab("properties")->text (
+     	 	name=>"showPage",
+      		label=>$i18n->get('show page'),
+	  	value=>$self->getValue("showPage"),
+	  	hoverHelp=>$i18n->get('show page description'),
+   		);
+   	return $tabform;
 }
 
 
-
-#-------------------------------------------------------------------
-
-=head2 getIcon ( small )
-
-Usually, you should leave out this method.  Use it if you want to override
-the default actions of WebGUI::Asset::getIcon().
-
-=cut
-sub getIcon {
-	my $self = shift;
-	my $small = shift;
-	if ($small && ref($self) eq '') {
-		return $session{config}{extrasURL}.'/assets/small/newAsset.gif';
-	} elsif ($small) {
-		return 'nothing.gif';	
-	}
-	return $session{config}{extrasURL}.'/assets/newAsset.gif';
-}
 
 
 #-------------------------------------------------------------------
@@ -281,7 +258,7 @@ Web facing method which is the default edit page
 
 sub www_edit {
    my $self = shift;
-   return WebGUI::Privilege::insufficient() unless $self->canEdit;   
+   return $self->session->privilege->insufficient() unless $self->canEdit;   
    $self->getAdminConsole->setHelp("New Asset add/edit", "New Asset");
    return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get('edit asset',"Asset_NewAsset"));
 }
@@ -297,12 +274,64 @@ Web facing method which is the default view page.  This method does a
 
 sub www_view {
 	my $self = shift;
-	return WebGUI::Privilege::noAccess() unless $self->canView;
-	if ($session{var}{adminOn}) {
+	return $self->session->privilege->noAccess() unless $self->canView;
+	if ($self->session->var->isAdminOn) {
 		return $self->getContainer->www_view;
 	}
-	WebGUI::HTTP::setRedirect($self->getFileUrl($self->getValue("showPage")));
+	$self->session->http->setRedirect($self->getFileUrl($self->getValue("showPage")));
 	return "";
+}
+
+#-------------------------------------------------------------------
+# Everything below here is to make it easier to install your custom
+# asset, but has nothing to do with assets in general
+#-------------------------------------------------------------------
+# cd /data/WebGUI/lib
+# perl -MWebGUI::Asset::NewAsset -e install www.example.com.conf [ /path/to/WebGUI ]
+# 	- or -
+# perl -MWebGUI::Asset::NewAsset -e uninstall www.example.com.conf [ /path/to/WebGUI ]
+#-------------------------------------------------------------------
+
+
+use base 'Exporter';
+our @EXPORT = qw(install uninstall);
+use WebGUI::Session;
+
+#-------------------------------------------------------------------
+sub install {
+	my $config = $ARGV[0];
+	my $home = $ARGV[1] || "/data/WebGUI";
+	die "usage: perl -MWebGUI::Asset::NewAsset -e install www.example.com.conf\n" unless ($home && $config);
+	print "Installing asset.\n";
+	my $session = WebGUI::Session->open($home, $config);
+	$session->config->addToArray("assets","WebGUI::Asset::NewAsset");
+	$session->db->write("create table NewAsset (
+		assetId varchar(22) binary not null,
+		revisionDate bigint not null,
+		primary key (assetId, revisionDate)
+		)");
+	$session->var->end;
+	$session->close;
+	print "Done. Please restart Apache.\n";
+}
+
+#-------------------------------------------------------------------
+sub uninstall {
+	my $config = $ARGV[0];
+	my $home = $ARGV[1] || "/data/WebGUI";
+	die "usage: perl -MWebGUI::Asset::NewAsset -e uninstall www.example.com.conf\n" unless ($home && $config);
+	print "Uninstalling asset.\n";
+	my $session = WebGUI::Session->open($home, $config);
+	$session->config->deleteFromArray("assets","WebGUI::Asset::NewAsset");
+	my $rs = $session->db->read("select assetId from asset where className='WebGUI::Asset::NewAsset'");
+	while (my ($id) = $rs->array) {
+		my $asset = WebGUI::Asset->new($session, $id, "WebGUI::Asset::NewAsset");
+		$asset->purge if defined $asset;
+	}
+	$session->db->write("drop table NewAsset");
+	$session->var->end;
+	$session->close;
+	print "Done. Please restart Apache.\n";
 }
 
 
