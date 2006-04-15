@@ -18,6 +18,7 @@ use WebGUI::Utility;
 
 use WebGUI::User;
 use WebGUI::Group;
+use WebGUI::Cache;
 
 use Test::More;
 use Test::Deep;
@@ -77,6 +78,7 @@ my @ipTests = (
 plan tests => (88 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
+WebGUI::Cache->new($session, 'myKey')->flush();
 
 my $g = WebGUI::Group->new($session, "new");
 

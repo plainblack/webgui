@@ -15,11 +15,14 @@ use lib "$FindBin::Bin/lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Utility;
+use WebGUI::Cache;
 
 use WebGUI::User;
-use Test::More tests => 81; # increment this value for each test you create
+use Test::More tests => 85; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
+
+WebGUI::Cache->new($session, 'myKey')->flush();
 
 my $user;
 my $lastUpdate;
@@ -247,7 +250,7 @@ ok ($visitor->isInGroup($cm->getId), "Visitor is allowed in via IP");
 
 $session->db->write('update userSession set lastIP=? where sessionId=?',['193.168.0.101', $session->getId]);
 
-$session->stow->delete('isInGroup');
+$cm->clearCaches;
 
 ok (!$visitor->isInGroup($cm->getId), "Visitor is not allowed in via IP");
 
@@ -259,6 +262,7 @@ $user = WebGUI::User->new($session, "new");
 
 $user->addToGroups([3]);
 
+$session->errorHandler->warn('userId: '. $user->userId);
 ok($user->isInGroup(3), "addToGroups: New user is in group 3(Admin)");
 ok($user->isInGroup(11), "New user is in group 11(Secondary Admins)");
 ok($user->isInGroup(12), "New user is in group 12(Turn On Admin)");
@@ -267,10 +271,16 @@ ok($user->isInGroup(14), "New user is in group 14(Product Managers)");
 
 $user->deleteFromGroups([3]);
 ok(!$user->isInGroup(3), "deleteFromGroups: New user is not in group 3(Admin)");
-ok(!$user->isInGroup(11), "New user is not in group 11(Secondary Admins)");
-ok(!$user->isInGroup(12), "New user is not in group 12(Turn On Admin)");
-ok(!$user->isInGroup(13), "New user is not in group 13(Export Managers)");
-ok(!$user->isInGroup(14), "New user is not in group 14(Product Managers)");
+ok($user->isInGroup(11), "New user still in group 11 due to caching (Secondary Admins)");
+ok($user->isInGroup(12), "New user still in group 12 due to caching (Turn On Admin)");
+ok($user->isInGroup(13), "New user still in group 13 due to caching (Export Managers)");
+ok($user->isInGroup(14), "New user still in group 14 due to caching (Product Managers)");
+
+WebGUI::Cache->new($session, 'myKey')->flush();
+ok($user->isInGroup(11), "Flush cache, new user not in group 11 (Secondary Admins)");
+ok($user->isInGroup(12), "Flush cache, new user not in group 12 (Turn On Admin)");
+ok($user->isInGroup(13), "Flush cache, new user not in group 13 (Export Managers)");
+ok($user->isInGroup(14), "Flush cache, new user not in group 14 (Product Managers)");
 
 $user->delete;
 

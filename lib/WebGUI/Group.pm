@@ -151,8 +151,7 @@ An override for the default offset of the grouping. Specified in seconds.
 sub addUsers {
 	my $self = shift;
 	my $users = shift;
-	WebGUI::Cache->new($self->session, $self->getId)->delete;
-	$self->session->stow->delete("isInGroup");
+	$self->clearCaches();
 	my $expireOffset = shift || $self->get("expireOffset");
 	foreach my $uid (@{$users}) {
 		next if ($uid eq '1' and !isIn($self->getId, 1, 7));
