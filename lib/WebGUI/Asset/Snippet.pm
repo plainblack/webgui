@@ -18,6 +18,7 @@ use strict;
 use WebGUI::Asset;
 use WebGUI::Asset::Template;
 use WebGUI::Macro;
+use HTTP::Date;
 
 our @ISA = qw(WebGUI::Asset);
 
@@ -71,6 +72,14 @@ sub definition {
                         	fieldType=>'codearea',
                                 defaultValue=>undef
                                 },
+			cacheTimeout => {
+				tab => "display",
+				fieldType => "interval",
+				defaultValue => 3600,
+				uiLevel => 8,
+				label => $i18n->get("cache timeout"),
+				hoverHelp => $i18n->get("cache timeout help")
+				},
  			processAsTemplate=>{
                         	fieldType=>'yesNo',
                                 defaultValue=>0
@@ -157,11 +166,20 @@ sub indexContent {
 sub view {
 	my $self = shift;
 	my $calledAsWebMethod = shift;
+	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+		my $out = WebGUI::Cache->new($self->session,"view_".$calledAsWebMethod."_".$self->getId)->get;
+		return $out if $out;
+	}
 	my $output = $self->get("snippet");
 	WebGUI::Macro::process($self->session,\$output);
 	$output = $self->getToolbar.$output if ($self->session->var->get("adminOn") && !$calledAsWebMethod);
-	return $output unless ($self->getValue("processAsTemplate")); 
-	return WebGUI::Asset::Template->processRaw($self->session, $output);
+	unless ($self->getValue("processAsTemplate")) {
+		$output = WebGUI::Asset::Template->processRaw($self->session, $output);
+	}
+	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+		WebGUI::Cache->new($self->session,"view_".$calledAsWebMethod."_".$self->getId)->set($output,$self->get("cacheTimeout"));
+	}
+       	return $output;
 }
 
 #-------------------------------------------------------------------
@@ -185,6 +203,12 @@ sub www_view {
 	my $self = shift;
 	my $mimeType=$self->getValue('mimeType');
 	$self->session->http->setMimeType($mimeType || 'text/html');
+	my $request = $self->session->request;
+	if (defined $request && $request->protocol =~ /(\d\.\d)/ && $1 >= 1.1){
+    		$request->header_out('Cache-Control', "max-age=" . $self->get("cacheTimeout"));
+  	} elsif (defined $request) {
+    		$request->header_out('Expires', HTTP::Date::time2str(time + $self->get("cacheTimeout")));
+  	}
 	return $self->view(1);
 }
 

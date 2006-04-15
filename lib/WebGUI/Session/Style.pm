@@ -187,6 +187,7 @@ if ($self->session->user->isInGroup(2)) {
 <meta http-equiv="Cache-Control" content="no-cache, must-revalidate, max-age=0" />
 <meta http-equiv="Expires" content="0" />
 ';
+	$self->session->request->no_cache(1) if ($self->session->request);
 }
 	my $style = WebGUI::Asset::Template->new($self->session,$templateId);
 	my $output;

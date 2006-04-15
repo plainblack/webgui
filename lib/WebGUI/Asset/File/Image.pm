@@ -319,7 +319,7 @@ sub www_view {
 	}
 	my $storage = $self->getStorageLocation;
 	$self->session->http->setRedirect($storage->getUrl($self->get("filename")));
-	return "";
+	return "1";
 }
 
 

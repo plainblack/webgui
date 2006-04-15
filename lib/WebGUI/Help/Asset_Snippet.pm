@@ -7,6 +7,11 @@ our $HELP = {
 		body => 'snippet add/edit body',
 		fields => [
                         {
+                                title => 'cache timeout',
+                                namespace => 'Asset_File',
+                                description => 'cache timeout help'
+                        },
+                        {
                                 title => 'assetName',
                                 description => 'snippet description',
                                 namespace => 'Asset_Snippet',

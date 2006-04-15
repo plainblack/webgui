@@ -2,6 +2,16 @@ package WebGUI::i18n::English::Asset_Snippet;
 
 our $I18N = {
 
+	'cache timeout' => {
+		message => q|Cache Timeout|,
+		lastUpdated => 0
+		},
+
+	'cache timeout help' => {
+		message => q|Since all users will see this asset the same way, we can cache it for long periods of time to increase performance. How long should we cache it?<br /> <br /><b>UI Level: 8</b>|,
+		lastUpdated => 0
+		},
+
 	'assetName' => {
 		message => q|Snippet|,
         	lastUpdated => 1128830080,

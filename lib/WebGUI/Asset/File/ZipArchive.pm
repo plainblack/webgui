@@ -309,7 +309,7 @@ sub www_view {
 		return $self->getContainer->www_view;
 	}
 	$self->session->http->setRedirect($self->getFileUrl($self->getValue("showPage")));
-	return "";
+	return "1";
 }
 
 
