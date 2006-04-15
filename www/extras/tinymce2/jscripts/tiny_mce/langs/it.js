@@ -37,5 +37,5 @@ bold_img : "bold.gif",
 italic_img : "italic.gif",
 underline_img : "underline.gif",
 clipboard_msg : 'Copia, Taglia e Incolla non sono disponibili in Mozilla e Firefox.\nVuoi maggiori dettegli su questo problema?',
-popup_blocked : 'Spiacenti, un sistema di blocco popup ha impedito l\'apertura di una finestra necessaria per il funzionamento dell\'editor. Disabilita il blocco popup per questo sito se vuoi utilizzare tutte le funzionalità.'
+popup_blocked : 'Spiacenti, un sistema di blocco popup ha impedito l\'apertura di una finestra necessaria per il funzionamento dell\'editor. Disabilita il blocco popup per questo sito se vuoi utilizzare tutte le funzionalit\u00E0.'
 });
