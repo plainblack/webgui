@@ -1,6 +1,12 @@
 package WebGUI::i18n::English::VersionTag;
 
 our $I18N = {
+	'export version tag to html' => {
+		message => q|Export Version Tag To HTML|,
+		context => q|the title of the workflow activity of the same name|,
+		lastUpdated => 0 
+	},
+
 	'version tags' => {
 		message => q|Version Tags|,
 		lastUpdated => 0 

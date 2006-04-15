@@ -372,7 +372,8 @@ sub addWorkflow {
 		"WebGUI::User"=>["WebGUI::Workflow::Activity::CreateCronJob", "WebGUI::Workflow::Activity::NotifyAboutUser"],
 		"WebGUI::VersionTag"=>["WebGUI::Workflow::Activity::CommitVersionTag", "WebGUI::Workflow::Activity::RollbackVersionTag", 
 			"WebGUI::Workflow::Activity::TrashVersionTag", "WebGUI::Workflow::Activity::CreateCronJob", "WebGUI::Workflow::Activity::UnlockVersionTag",
-			"WebGUI::Workflow::Activity::RequestApprovalForVersionTag", "WebGUI::Workflow::Activity::NotifyAboutVersionTag"]
+			"WebGUI::Workflow::Activity::RequestApprovalForVersionTag", "WebGUI::Workflow::Activity::NotifyAboutVersionTag",
+			"WebGUI::Workflow::Activity::ExportVersionTagAsHtml"]
 		});
 	$session->config->delete("SyncProfilesToLDAP_hour");
 	$session->config->delete("fileCacheSizeLimit");

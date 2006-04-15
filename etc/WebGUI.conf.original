@@ -315,7 +315,7 @@
 		"WebGUI::VersionTag" : ["WebGUI::Workflow::Activity::CommitVersionTag", "WebGUI::Workflow::Activity::RollbackVersionTag", 
 			"WebGUI::Workflow::Activity::TrashVersionTag", "WebGUI::Workflow::Activity::CreateCronJob",
 			"WebGUI::Workflow::Activity::UnlockVersionTag", "WebGUI::Workflow::Activity::NotifyAboutVersionTag",
-                        "WebGUI::Workflow::Activity::RequestApprovalForVersionTag"]
+                        "WebGUI::Workflow::Activity::RequestApprovalForVersionTag", "WebGUI::Workflow::Activity::ExportVersionTagAsHtml"]
 		}
 
 }
