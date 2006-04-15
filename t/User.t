@@ -22,7 +22,7 @@ use Test::More tests => 85; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-my testCache = WebGUI::Cache->new($session, 'myTestKey');
+my $testCache = WebGUI::Cache->new($session, 'myTestKey');
 $testCache->flush;
 
 my $user;
