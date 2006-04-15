@@ -238,6 +238,9 @@ sub updateCs {
 			}, "csworkflow000000000001");
 	my $activity = $workflow->addActivity("WebGUI::Workflow::Activity::GetCsMail","csactivity000000000001");
 	$activity->set("title","Get the mail");	
+	print "\t\tDeleteing old ratings due to new rating system.\n";
+	$session->db->write("delete from Post_rating");
+	$session->db->write("update Post set rating=0");
 }
 
 #-------------------------------------------------

@@ -110,6 +110,8 @@ sub appendTemplateLabels {
 	$var->{"addquestion.label"} = $i18n->get("addquestion");
 	$var->{'answer.label'} = $i18n->get("answer");
 	$var->{'attachment.label'} = $i18n->get("attachment");
+	$var->{'archive.label'} = $i18n->get("archive");
+	$var->{'unarchive.label'} = $i18n->get("unarchive");
 	$var->{"by.label"} = $i18n->get("by");
         $var->{'body.label'} = $i18n->get("body");
 	$var->{"back.label"} = $i18n->get("back");

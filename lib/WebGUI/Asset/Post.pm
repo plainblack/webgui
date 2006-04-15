@@ -447,11 +447,8 @@ sub getTemplateVars {
 	$var{'reply.withquote.url'} = $self->getReplyUrl(1);
 	$var{'url'} = $self->getUrl.'#id'.$self->getId;
 	$var{'rating.value'} = $self->get("rating")+0;
-	$var{'rate.url.1'} = $self->getRateUrl(1);
-	$var{'rate.url.2'} = $self->getRateUrl(2);
-	$var{'rate.url.3'} = $self->getRateUrl(3);
-	$var{'rate.url.4'} = $self->getRateUrl(4);
-	$var{'rate.url.5'} = $self->getRateUrl(5);
+	$var{'rate.url.thumbsUp'} = $self->getRateUrl(1);
+	$var{'rate.url.thumbsDown'} = $self->getRateUrl(-1);
 	$var{'hasRated'} = $self->hasRated;
 	my $gotImage;
 	my $gotAttachment;
@@ -773,16 +770,14 @@ An integer between 1 and 5 (5 being best) to rate this post with.
 
 sub rate {
 	my $self = shift;
-	my $rating = shift || 3;
+	my $rating = shift;
+	return undef unless ($rating == -1 || $rating == 1);
 	unless ($self->hasRated) {
         	$self->session->db->write("insert into Post_rating (assetId,userId,ipAddress,dateOfRating,rating) values ("
                 	.$self->session->db->quote($self->getId).", ".$self->session->db->quote($self->session->user->userId).", ".$self->session->db->quote($self->session->env->get("REMOTE_ADDR")).", 
 			".$self->session->datetime->time().", ".$self->session->db->quote($rating).")");
-        	my ($count) = $self->session->db->quickArray("select count(*) from Post_rating where assetId=".$self->session->db->quote($self->getId));
-        	$count = $count || 1;
         	my ($sum) = $self->session->db->quickArray("select sum(rating) from Post_rating where assetId=".$self->session->db->quote($self->getId));
-        	my $average = WebGUI::Utility::round($sum/$count);
-        	$self->update({rating=>$average});
+        	$self->update({rating=>$sum});
 		$self->getThread->rate($rating);
 	}
 }

@@ -249,6 +249,10 @@ A boolean indicating whether the resulting asset tree should be returned in reve
 
 An array reference containing a list of asset classes to include in the result. If this is specified then no other classes except these will be returned. The opposite of the excludeClasses rule.
 
+=head4 includeArchived
+
+A boolean indicating that we should include archived assets in the result set.
+
 =head4 joinClass
 
 An array reference containing asset classes to join in. There is no real reason to use a joinClass without a whereClause, but it's trivial to use a whereClause if you don't use a joinClass.  You will only be able to filter on the asset table, however.
@@ -340,7 +344,8 @@ sub getLineage {
 		$where = "asset.state='published'";
 	}
 	## get only approved items or those that i'm currently working on
-	$where .= " and (assetData.status='approved' or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")).")";
+	my $archived = " or assetData.status='archived' " if ($rules->{includeArchived});
+	$where .= " and (assetData.status='approved' $archived or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")).")";
 	## class exclusions
 	if (exists $rules->{excludeClasses}) {
 		my @set;
@@ -360,7 +365,7 @@ sub getLineage {
 	}
 	# based upon all available criteria, let's get some assets
 	my $columns = "asset.assetId, asset.className, asset.parentId, assetData.revisionDate";
-	$where .= " and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId and (assetData.status='approved' or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")).")) ";
+	$where .= " and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId and (assetData.status='approved' $archived or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")).")) ";
 	my $sortOrder = ($rules->{invertTree}) ? "asset.lineage desc" : "asset.lineage asc"; 
 	if (exists $rules->{orderByClause}) {
 		$sortOrder = $rules->{orderByClause};

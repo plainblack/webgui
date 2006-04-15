@@ -2,6 +2,18 @@ package WebGUI::i18n::English::Asset_Collaboration;
 
 our $I18N = {
 
+	'archive' => {
+		message => q|Archive|,
+		lastUpdated => 0,
+		context => q|thread link|
+		},
+
+	'unarchive' => {
+		message => q|Unarchive|,
+		lastUpdated => 0,
+		context => q|thread link|
+		},
+
 	'mail prefix' => {
 		message => q|Prefix|,
 		lastUpdated => 0,

@@ -27,6 +27,14 @@ A weighting factor for difficulty, complexity, or handicap in contests.
 This is karma divided by karma scale.
 <p>
 
+<b>thumbsUp.icon.url</b><br>
+The URL to the thumbs up icon.
+<p>
+
+<b>thumbsDown.icon.url</b><br>
+The URL to the thumbs down icon.
+<p>
+
 <b>user.isVisitor</b><br>
 A conditional indicating that the current user is a Visitor.
 <p>
@@ -191,7 +199,7 @@ The description of the collaboration system that this post is a part of.
 <p>
 
 |,
-		lastUpdated => 1141142205,
+		lastUpdated => 1145111313,
 	},
 
         'assetName' => {

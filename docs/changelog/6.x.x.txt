@@ -30,6 +30,8 @@
  - Added archive/unarchive options to CS threads.
  - Added a mechanism to send emails to a CS which will accept them as posts.
  - Increased the performance of CS Thread viewing by 500%.
+ - Changed the CS post rating mechinism to thumbs up/down to be less
+   confusing.
  - Added install/uninstall functions to the asset and wobject skeletons to
    make custom assets easier to distribute.
  - Added a mechanism for importing and exporting packages. This is useful for

@@ -249,7 +249,7 @@ Returns a list of the post objects in this thread, including the thread post its
 
 sub getPosts {
 	my $self = shift;
-	$self->getLineage(["self","descendants"], {returnObjects=>1});	
+	$self->getLineage(["self","descendants"], {returnObjects=>1, includeArchived=>1});	
 }
 
 #-------------------------------------------------------------------
@@ -548,15 +548,13 @@ An integer between 1 and 5 (5 being best) to rate this post with.
 sub rate {
 	my $self = shift;
 	my $rating = shift;
+	return undef unless ($rating == -1 || $rating == 1);
 	unless ($self->hasRated) {
 		$self->session->db->write("insert into Post_rating (assetId,userId,ipAddress,dateOfRating,rating) values ("
 			.$self->session->db->quote($self->getId).", ".$self->session->db->quote($self->session->user->userId).", ".$self->session->db->quote($self->session->env->get("REMOTE_ADDR")).",
 		".$self->session->datetime->time().", ".$self->session->db->quote($rating).")");
-		my ($count) = $self->session->db->quickArray("select count(*) from Post left join asset on Post.assetId=asset.assetId where Post.threadId=".$self->session->db->quote($self->getId)." and Post.rating>0");
-		$count = $count || 1;
 		my ($sum) = $self->session->db->quickArray("select sum(Post.rating) from Post left join asset on Post.assetId=asset.assetId where Post.threadId=".$self->session->db->quote($self->getId)." and Post.rating>0");
-		my $average = round($sum/$count);
-		$self->update({rating=>$average});
+		$self->update({rating=>$sum});
 		if ($self->session->setting->get("useKarma")) {
 			my $poster = WebGUI::User->new($self->session, $self->get("ownerUserId"));
 			$poster->karma($rating*$self->getParent->get("karmaRatingMultiplier"),"collaboration rating","someone rated post ".$self->getId);
@@ -760,6 +758,9 @@ sub view {
         $var->{'user.isSubscribed'} = $self->isSubscribed;
         $var->{'subscribe.url'} = $self->getSubscribeUrl;
         $var->{'unsubscribe.url'} = $self->getUnsubscribeUrl;
+
+	$var->{'thumbsUp.icon.url'} = $self->session->config->get("extrasURL").'/thumbup.gif';
+	$var->{'thumbsDown.icon.url'} = $self->session->config->get("extrasURL").'/thumbdown.gif';
 
         $var->{'isArchived'} = $self->get("status") eq "archived";
         $var->{'archive.url'} = $self->getArchiveUrl;

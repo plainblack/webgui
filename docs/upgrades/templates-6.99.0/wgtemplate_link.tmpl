@@ -9,7 +9,7 @@
 
 <tmpl_if user.isModerator>
 	<div style="float: right; font-size: 11px; border: 1px solid #cccccc; padding: 2px; margin: 2px;">
-		<b><tmpl_var status.label>:</b> <tmpl_var status> &nbsp; &nbsp; [ <a href="<tmpl_var approve.url>"><tmpl_var approve.label></a> | <a href="<tmpl_var deny.url>"><tmpl_var deny.label></a> ]<br />
+		<b><tmpl_var status.label>:</b> <tmpl_var status> &nbsp; &nbsp; [ <tmpl_if isArchived><a href="<tmpl_var unarchive.url>"><tmpl_var unarchive.label></a> <tmpl_else> <a href="<tmpl_var archive.url>"><tmpl_var archive.label></a></tmpl_if> ]<br />
 	</div>
 </tmpl_if>	
 
@@ -88,16 +88,12 @@
 							<b><tmpl_var views.label>:</b> <tmpl_var views><br />
 							<b><tmpl_var rating.label>:</b> <tmpl_var rating>
 								<tmpl_unless hasRated>
-									 &nbsp; &nbsp;<tmpl_var rate.label> [ <a href="<tmpl_var rate.url.1>">1</a>, <a href="<tmpl_var rate.url.2>">2</a>, <a href="<tmpl_var rate.url.3>">3</a>, <a href="<tmpl_var rate.url.4>">4</a>, <a href="<tmpl_var rate.url.5>">5</a> ]
+								&nbsp; &nbsp;<tmpl_var rate.label> [ <p style="display:inline;vertical-align:middle;"><a href="<tmpl_var rate.url.thumbsUp>"><img src="<tmpl_var thumbsUp.icon.url>" alt="+" style="border: 0px;vertical-align:middle;" /></a></p> | <p style="display:inline;vertical-align:middle;"><a href="<tmpl_var rate.url.thumbsDown>"><img src="<tmpl_var thumbsDown.icon.url>" alt="-" style="border: 0px;vertical-align:middle;" /></a></p> ]
 								</tmpl_unless>
 								<br />
-							<tmpl_if user.isModerator>
-								<b><tmpl_var status.label>:</b> <tmpl_var status> &nbsp; &nbsp; [ <a href="<tmpl_var approve.url>"><tmpl_var approve.label></a> | <a href="<tmpl_var deny.url>"><tmpl_var deny.label></a> ]<br />
-							<tmpl_else>	
 								<tmpl_if user.isPoster>
 									<b><tmpl_var status.label>:</b> <tmpl_var status><br />
 								</tmpl_if>	
-							</tmpl_if>	
 						</div>	
 					</div>
 					<div class="postMessage">
@@ -149,16 +145,12 @@
 								<b><tmpl_var views.label>:</b> <tmpl_var views><br />
 								<b><tmpl_var rating.label>:</b> <tmpl_var rating>
 									<tmpl_unless hasRated>
-										 &nbsp; &nbsp;<tmpl_var rate.label> [ <a href="<tmpl_var rate.url.1>">1</a>, <a href="<tmpl_var rate.url.2>">2</a>, <a href="<tmpl_var rate.url.3>">3</a>, <a href="<tmpl_var rate.url.4>">4</a>, <a href="<tmpl_var rate.url.5>">5</a> ]
+								&nbsp; &nbsp;<tmpl_var rate.label> [ <p style="display:inline;vertical-align:middle;"><a href="<tmpl_var rate.url.thumbsUp>"><img src="<tmpl_var thumbsUp.icon.url>" alt="+" style="border: 0px;vertical-align:middle;" /></a></p> | <p style="display:inline;vertical-align:middle;"><a href="<tmpl_var rate.url.thumbsDown>"><img src="<tmpl_var thumbsDown.icon.url>" alt="-" style="border: 0px;vertical-align:middle;" /></a></p> ]
 									</tmpl_unless>
 									<br />
-								<tmpl_if user.isModerator>
-									<b><tmpl_var status.label>:</b> <tmpl_var status> &nbsp; &nbsp; [ <a href="<tmpl_var approve.url>"><tmpl_var approve.label></a> | <a href="<tmpl_var deny.url>"><tmpl_var deny.label></a> ]<br />
-								<tmpl_else>	
 									<tmpl_if user.isPoster>
 										<b><tmpl_var status.label>:</b> <tmpl_var status><br />
 									</tmpl_if>	
-								</tmpl_if>	
 							</div>	
 						</div>
 						<div class="postMessage">

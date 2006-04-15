@@ -216,8 +216,12 @@ The URL for this Post.
 The current rating for this Post.
 <p>
 
-<b>rate.url.<i>N</i></b><br>
-URLs that are used to rate this post.  N goes from 1 to 5.
+<b>rate.url.thumbsUp</b><br>
+A positive rating.
+<p>
+
+<b>rate.url.thumbsDown</b><br>
+A negative rating.
 <p>
 
 <b>hasRated</b><br>
@@ -388,7 +392,7 @@ back the data with a simple &lt;tmpl_var userDefined1&gt;.
 <p>
 
 |,
-		lastUpdated => 1134670360,
+		lastUpdated => 1145111051,
 	},
 
 	'post received' => {
