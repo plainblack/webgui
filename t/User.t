@@ -22,7 +22,8 @@ use Test::More tests => 85; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-WebGUI::Cache->new($session, 'myKey')->flush();
+my testCache = WebGUI::Cache->new($session, 'myTestKey');
+$testCache->flush;
 
 my $user;
 my $lastUpdate;
@@ -307,5 +308,6 @@ ok($visitor->isInGroup(7), "Visitor added back to group Everyone");
 
 END {
         (defined $user  and ref $user  eq 'WebGUI::User') and $user->delete;
+	$testCache->flush;
 }
 

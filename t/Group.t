@@ -78,7 +78,8 @@ my @ipTests = (
 plan tests => (88 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
-WebGUI::Cache->new($session, 'myKey')->flush();
+my testCache = WebGUI::Cache->new($session, 'myTestKey');
+$testCache->flush;
 
 my $g = WebGUI::Group->new($session, "new");
 
@@ -490,4 +491,5 @@ END {
 		$subSession->db->write("DELETE FROM userSessionScratch WHERE sessionId=?",[ $subSession->getId]);
 		$subSession->close() if (defined $subSession and ref $subSession eq 'WebGUI::Session');
 	}
+	$testCache->flush;
 }
