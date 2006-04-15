@@ -40,7 +40,13 @@ This package parses the WebGUI config file.
 
  my $value = $config->get($param);
  $config->set($param,$value);
+
  $config->delete($param);
+ $config->deleteFromHash($name, $key);
+ $config->deleteFromArray($name, $value);
+
+ $config->addToHash($name, $key, $value);
+ $config->addToArray($name, $value);
 
  my $configFileName = $config->getFilename;
  my $webguiRoot = $config->getWebguiRoot;
@@ -50,6 +56,63 @@ This package parses the WebGUI config file.
 These subroutines are available from this package:
 
 =cut
+
+
+#-------------------------------------------------------------------
+
+=head2 addToArray ( property, value )
+
+Adds a value to an array property in the config file.
+
+=head3 property
+
+The name of the array.
+
+=head3 value
+
+The value to add.
+
+=cut
+
+sub addToArray {
+	my $self = shift;
+	my $property = shift;
+	my $value = shift;
+	my $array = $self->get($property);
+	push(@{$array}, $value);
+	$self->set($property, $array);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 addToHash ( property, key, value )
+
+Adds a value to a hash property in the config file.
+
+=head3 property
+
+The name of the hash.
+
+=head3 key
+
+The key to add.
+
+=head3 value
+
+The value to add.
+
+=cut
+
+sub addToHash {
+	my $self = shift;
+	my $property = shift;
+	my $key = shift;
+	my $value = shift;
+	my $hash = $self->get($property);
+	$hash->{$key} = $value;
+	$self->set($property, $hash);
+}
 
 
 #-------------------------------------------------------------------
@@ -71,6 +134,62 @@ sub delete {
 	open(FILE,">".$self->getWebguiRoot.'/etc/'.$self->getFilename);
 	print FILE "# config-file-type: JSON 1\n".objToJson($self->{_config}, {pretty => 1, indent => 2});
 	close(FILE);
+}
+
+#-------------------------------------------------------------------
+
+=head2 deleteFromArray ( property, value )
+
+Deletes a value from an array property in the config file.
+
+=head3 property
+
+The name of the array.
+
+=head3 value
+
+The value to delete.
+
+=cut
+
+sub deleteFromArray {
+	my $self = shift;
+	my $property = shift;
+	my $value = shift;
+	my $array = $self->get($property);
+	for (my $i = 0; $i < scalar(@{$array}); $i++) {
+		if ($array->[$i] eq $value) {
+			splice(@{$array}, $i, 1);
+			last;
+		}
+	}
+	$self->set($property, $array);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 deleteFromHash ( property, key )
+
+Delete a key from a hash property in the config file.
+
+=head3 property
+
+The name of the hash.
+
+=head3 key
+
+The key to delete.
+
+=cut
+
+sub deleteFromHash {
+	my $self = shift;
+	my $property = shift;
+	my $key = shift;
+	my $hash = $self->get($property);
+	delete $hash->{$key};
+	$self->set($property, $hash);
 }
 
 #-------------------------------------------------------------------

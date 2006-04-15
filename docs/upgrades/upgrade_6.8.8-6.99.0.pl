@@ -32,8 +32,7 @@ changeCache();
 templateParsers();
 removeFiles();
 addSearchEngine();
-addEMSTemplates();
-addEMSTables();
+addEMS();
 updateTemplates();
 updateDatabaseLinksAndSQLReport();
 ipsToCIDR();
@@ -144,9 +143,7 @@ sub addAdManager {
 		renderedAd text
 		)");
 	$session->db->write("alter table advertisement add index adSpaceId_isActive (adSpaceId, isActive)");
-	my $macros = $session->config->get("macros");
-	$macros->{AdSpace} = "AdSpace";
-	$session->config->set("macros",$macros);
+	my $macros = $session->config->addToHash("macros","AdSpace","AdSpace");
 	my $group = WebGUI::Group->new($session, "new", "pbgroup000000000000017");
 	$group->name("Ad Manager");
 	$group->description("These users will be able to manage advertisements.");
@@ -600,7 +597,7 @@ sub updateTemplates {
 }
 
 #-------------------------------------------------
-sub addEMSTemplates {
+sub addEMS {
         print "\tAdding Event Management System Templates.\n" unless ($quiet);
 
 ## Display Template ##
@@ -925,11 +922,6 @@ EOT4
 		}, "EventManagerTmpl000004"
 	);
 
-}
-
-#-------------------------------------------------
-sub addEMSTables {
-
         print "\t Creating Event Management System tables.\n" unless ($quiet);
 
 my $sql1 = <<SQL1;
@@ -1046,6 +1038,7 @@ SQL8
         $session->db->write($sql6);
         $session->db->write($sql7);
         $session->db->write($sql8);
+	$session->config->addToArray("assets","WebGUI::Asset::Wobject::EventManagementSystem");
 }
 
 #-------------------------------------------------
