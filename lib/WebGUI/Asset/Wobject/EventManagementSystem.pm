@@ -539,8 +539,14 @@ Id of the event whose prerequisites you want returned
 sub getAssignedPrerequisites {
 	my $self = shift;
 	my $eventId = shift;
+	my $returnProductIdFlag = shift;
 	
-	my $sql = "select prerequisiteId, operator from EventManagementSystem_prerequisites 
+	
+	my $sql = ($returnProductIdFlag) ?
+		"select prerequisiteId, operator from EventManagementSystem_prerequisites 
+		   where productId=".$self->session->db->quote($eventId)
+		:
+		"select prerequisiteId, operator, productId from EventManagementSystem_prerequisites
 		   where productId=".$self->session->db->quote($eventId);
 	
 	return $self->session->db->buildHashRef($sql); 
@@ -700,7 +706,8 @@ sub getRequiredEventNames {
 sub findSubEvents {
 	my $self = shift;
 	my $eventId = shift;
-#	my $eventsInCart = $self->getEventsInCart;
+	my $returnEverythingFlag = shift;
+
 	my $eventsInCart = $self->getEventsInScratchCart;
 	
 	# Get the prerequisites for the sub events passed in
@@ -746,7 +753,9 @@ sub findSubEvents {
 		  push(@failedSubEvents, $productId) unless ($atLeastOneFlag);  
 		}	
 	}
-
+	
+	# Return list of 
+	
 	# Check our list against the failed events, return productIds of valid subevents
 	foreach my $subEvent (keys %{$subEventPrerequisites}) {
 		
@@ -910,6 +919,31 @@ sub getSubEventForm {
 }
 
 #------------------------------------------------------------------
+sub prerequisiteIsMet {
+	my $self = shift;
+	my $operator = shift;
+	my $requiredEvents = shift;
+	my $userSelectedEvents = $self->getEventsInScratchCart;
+	
+	if ($operator eq 'and') { # make sure every required event is in the users cart
+		  foreach my $requiredEvent (@$requiredEvents) {
+ 		    unless ( isIn($requiredEvent, @{$userSelectedEvents}) ) {
+		      return 0;
+		    }
+		  }
+		  return 1;
+	} elsif ($operator eq 'or') { # make sure one of the required events is in the users cart
+		  foreach my $requiredEvent (@$requiredEvents) {
+		    if ( isIn($requiredEvent, @{$userSelectedEvents}) ) {
+		      return 1;
+	 	    }
+		  }
+		  return 0;
+	}	
+}
+
+
+#------------------------------------------------------------------
 sub removeFromScratchCart {
 	my $self = shift;
 	my $event = shift;
@@ -945,7 +979,7 @@ sub resolveConflictForm {
 
 	$var{'form.footer'} = WebGUI::Form::formFooter($self->session);
 	$var{'form.submit'} = WebGUI::Form::Submit($self->session);
-	$var{'message'}	    = $i18n->get('allowed sub events');
+	$var{'message'}	    = $i18n->get('scheduling conflict message');
 
 	my @loop;
 	while (my $data = $sth->hashRef) {
@@ -960,6 +994,95 @@ sub resolveConflictForm {
 	$var{'resolveConflicts'} = 1;
 
 	return \%var;
+}
+
+#------------------------------------------------------------------
+sub verifyAllPrerequisites {
+	my $self = shift;
+	
+	#start with the events in the scratch cart.  See if all prerequisites are met	
+	my $lastResults = $self->verifyEventPrerequisites($self->getEventsInScratchCart);
+	my @allResults;
+	while (1) { #loop forever until we break out	
+		if (scalar(@$lastResults) > 0) {  #we have missing prerequisites
+			foreach (@$lastResults) {
+				push(@allResults, $_);
+			}
+			#Run the check again this time on the events that were reported before as required
+			#This recursive checking allows us to list every required event to attend the events
+			#the user has selected up to this point all the way up the tree.
+
+			$lastResults = $self->verifyEventPrerequisites($lastResults->{'missingEventIds'});
+		}
+		else { #To a point where no prerequisites were reported
+			last;
+		}
+	}
+	return \@allResults;
+}
+
+
+#------------------------------------------------------------------
+sub verifyEventPrerequisites {
+	my $self = shift;
+	my $eventsToCheck = shift;  #array reference of eventIds
+	my @results;
+	
+	foreach my $eventId (@$eventsToCheck) {
+		
+		# Get all prerequisite definitions defined for this event
+		my $prerequisiteDefinitions = $self->session->db->buildHashRef("select prerequisiteId, operator from EventManagementSystem_prerequisites
+										where productId=?",[$eventId]);
+		foreach my $prerequisiteId (keys %{$prerequisiteDefinitions}) {
+			
+			my $operator = $prerequisiteDefinitions->{$prerequisiteId};
+										       
+			# Get the events required for each prerequisite definition (the events required for attending $eventId)
+			my $requiredEvents = $self->session->db->buildArrayRef("select requiredProductId from EventManagementSystem_prerequisiteEvents
+									       where prerequisiteId=?",[$prerequisiteId]);
+
+			unless ($self->prerequisiteIsMet($operator, $requiredEvents)) {
+
+				#compare all the required events to the events in the scratch cart and build a list of the ones
+				#that are required but not currently in the scratch cart.
+				my $scratchCart = $self->getEventsInScratchCart;
+				my @missingEventIds;
+				
+				foreach my $requiredEvent (@$requiredEvents) {
+					push (@missingEventIds, $requiredEvent) unless isIn($requiredEvent, $scratchCart);
+				}
+				
+				my $missingEventNames = $self->getRequiredEventNames($prerequisiteId);
+				my $message = "$eventId requires: ";
+				
+				foreach my $missingEventName (@$missingEventNames) {
+					$message .= "$missingEventName $operator ";
+				}
+				
+				$message =~ s/(and\s|or\s)$//;  #remove trailing 'and' or 'or' from the message
+				
+				push(@results, {'missingEventIds' => \@missingEventIds,
+						'message'	  => $message
+						});
+			}
+		}
+	}
+	return \@results;
+}
+
+#------------------------------------------------------------------
+sub verifyPrerequisitesForm {
+	my $self = shift;
+	my $missingEventData = $self->verifyAllPrerequisites;
+	my %var;
+	
+	#If there is no missing event data, return nothing
+	return if (scalar(@$missingEventData) == 0);
+	
+	#Set the template vars needed to inform the user of the missing prereqs.
+	$var{'prereqsAreMissing'} = 1;
+	
+	return \%var;	
 }
 
 #------------------------------------------------------------------
@@ -1043,21 +1166,22 @@ sub www_addToCart {
 			push(@pids, $self->session->form->get("pid") || $pid);
 		}
 
-		#my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
 		foreach my $eventId (@pids) {
-			#$shoppingCart->add($eventId, 'Event');
 			$self->addToScratchCart($eventId);
-			
 		}
 
-		$output = $self->getSubEventForm(\@pids);
+		# Check to make sure all the prerequisites for this event have been satisfied
+		$output = $self->verifyPrerequisitesForm;
+
+		$output = $self->getSubEventForm(\@pids) unless ($output);
 	
 		$errors = $self->checkConflicts;
 		if (scalar(@$errors) > 0) { return $self->error($errors, "www_addToCart"); }
 		
-		#$output = $self->getRegistrationInfo unless ($output);
 		unless ($output) {
 			$output = $self->getRegistrationInfo;
+
+			#Move our events from the scratch cart to the real shopping cart
 			my $events = $self->getEventsInScratchCart;
 			foreach my $eventId (@$events) {
 				$shoppingCart->add($eventId, 'Event');
