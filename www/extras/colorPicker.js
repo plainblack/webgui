@@ -76,19 +76,19 @@ function HEXcolor2RGB(value){
 }
 
 
-function buildPicker(){
-	htmlStr = "<table border=0 cellpadding=0 cellspacing=0 width="+Math.round((255/bit) * 5)+" height="+Math.round((255/bit) * 5)+"><tr>";
+function buildColorPicker(){
+	htmlStr = "<table border=0 cellpadding=0 cellspacing=0 width="+Math.round((255/bit) * 10)+" height="+Math.round((255/bit) * 10)+"><tr>";
 	//palet
 	for(x=0;x<=255;x=x+bit){
 		for(y=0;y<=255;y=y+bit){
-			htmlStr+= "<td id='"+x+","+y+"' onclick=\"pickColor(picked[clickedPicker],"+x+","+y+")\" unselectable=on width=5 height=5></td>";
+			htmlStr+= "<td id='"+x+","+y+"' onclick=\"pickColor(picked[clickedPicker],"+x+","+y+")\" unselectable=on width=10 height=10></td>";
 		}
 		htmlStr+= "</tr><tr>";
 	}
 	//grays
 	for(x=0;x<=255;x=x+bit){
 		c = dec2hex(x)+dec2hex(x)+dec2hex(x);
-		htmlStr+= "<td bgcolor=\"#"+c+"\" onclick=\"pickColor("+x+","+x+","+x+")\" unselectable=on width=5 height=5></td>";
+		htmlStr+= "<td bgcolor=\"#"+c+"\" onclick=\"pickColor("+x+","+x+","+x+")\" unselectable=on width=10 height=10></td>";
 	} 
 	htmlStr+= "</tr></table>";
 	
@@ -111,10 +111,10 @@ function changePickerHue(){
 	b = 255;
 	gS = 0;
 	bS = 1;
-	htmlStr = "<table border=0 cellpadding=0 cellspacing=0 width=5 height="+((255/bit) * 5)+">";
+	htmlStr = "<table border=0 cellpadding=0 cellspacing=0 width=10 height="+((255/bit) * 10)+">";
 	for(r=0;r<=255;r=r+bit){
 		c = dec2hex(r)+dec2hex(g)+dec2hex(b);
-		htmlStr+= "<tr><td bgcolor=\"#"+c+"\" onclick=\"changePallet("+r+")\" width=5 height=5></td></tr>";
+		htmlStr+= "<tr><td bgcolor=\"#"+c+"\" onclick=\"changePallet("+r+")\" width=10 height=10></td></tr>";
 		
 		if(g == 255) gS = 1;
 		else if(g == 0) gS = 0;
@@ -132,7 +132,7 @@ function changePickerHue(){
 		else
 			b = b - 16;
 	} 
-	htmlStr+= "<tr><td bgcolor=\"#ffffff\" onclick=\"changePallet(255)\" width=5 height=5></td></tr>";
+	htmlStr+= "<tr><td bgcolor=\"#ffffff\" onclick=\"changePallet(255)\" width=10 height=10></td></tr>";
 	htmlStr+= "</table>";
 	
 	return htmlStr;
@@ -154,7 +154,7 @@ function setPickedColorFromForm(obj){
 }
 
 
-function placePickerToolbar(obj){
+function placeColorPickerToolbar(obj){
 	lastClickedPicker = clickedPicker;
 	clickedPicker = obj.id;
 	if(tmr)
@@ -185,9 +185,9 @@ function placePickerToolbar(obj){
 }
 	
 
-function killPicker(sw){
+function killColorPicker(sw){
 	if(sw == 1 && clickedPicker){
-		tmr = setTimeout('placePickerToolbar(document.getElementById(clickedPicker));',300);
+		tmr = setTimeout('placeColorPickerToolbar(document.getElementById(clickedPicker));',300);
 	}else if(tmr){
 		clearTimeout(tmr);
 	}
@@ -195,18 +195,18 @@ function killPicker(sw){
 
 
 function initColorPicker(fieldName,fieldValue){
-	pickerScreen = buildPicker();
+	pickerScreen = buildColorPicker();
 	hueScreen = changePickerHue();
 	if(!fieldValue)
 		fieldValue = "";
 
 	if(donePickerInits == 0){
-		document.write("<div id=colorPickerTools onmouseout=\"killPicker(1)\" onmouseover=\"killPicker(0)\" style=\"z-Index:10000;visibility:hidden;cursor:crosshair;position:absolute;border:1px solid #000000;background-color:#ffffff\"></div>");
+		document.write("<div id=colorPickerTools onmouseout=\"killColorPicker(1)\" onmouseover=\"killColorPicker(0)\" style=\"z-Index:10000;visibility:hidden;cursor:crosshair;position:absolute;border:1px solid #000000;background-color:#ffffff\"></div>");
 		document.getElementById('colorPickerTools').innerHTML = '<table border=0 cellpadding=0 cellspacing=0><tr><td valign=top>'+pickerScreen+'</td><td valign=top style="border-left:1px solid #000000;">'+hueScreen+'</td></tr><tr><td colspan=2><table border=0 cellpadding=0 cellspacing=0 width=100%><tr><td width=50% style="background-color:#ffffff;" onclick="pickColor(255,255,255);" height=5></td><td width=50% style="background-color:#000000;" onclick="pickColor(0,0,0);" height=5></td></tr></table></td></tr></table>';
 	}
 	s = "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
 	s+= "<td>&nbsp;<input type=\"text\" name=\""+fieldName+"\" id=pickedColor"+donePickerInits+"Value value=\""+fieldValue+"\" size=7 style=\"font-size:10px;\" onchange=\"setPickedColorFromForm(this)\"></td>";
-	s+= "<td><div onmouseout=\"killPicker(1)\" onmouseover=\"killPicker(0)\" onclick=\"placePickerToolbar(this)\" style=\"width:15px;height:15px;border: 1px solid #000000;cursor:pointer;background-color:"+fieldValue+";\" id=pickedColor"+donePickerInits+"></div></td>";
+	s+= "<td><div onmouseout=\"killColorPicker(1)\" onmouseover=\"killColorPicker(0)\" onclick=\"placeColorPickerToolbar(this)\" style=\"width:15px;height:15px;border: 1px solid #000000;cursor:pointer;background-color:"+fieldValue+";\" id=pickedColor"+donePickerInits+"></div></td>";
 	s+= "</table>";
 	document.write(s);
 
