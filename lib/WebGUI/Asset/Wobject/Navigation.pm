@@ -361,6 +361,7 @@ sub view {
 	$var->{'currentPage.isHome'} = ($current->getId eq $self->session->setting->get("defaultPage"));
 	$var->{'currentPage.url'} = $current->getUrl;
     	$var->{'currentPage.hasChild'} = $current->hasChildren;
+    	$var->{'currentPage.rank'} = $current->getRank;
 	my $currentLineage = $current->get("lineage");
 	my $lineageToSkip = "noskip";
 	my $absoluteDepthOfLastPage;

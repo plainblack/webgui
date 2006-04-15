@@ -2221,6 +2221,14 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 A link to the first page in the paginator.
 <p> 
 
+<b>pagination.firstPageUrl</b><br>
+The url component of pagination.firstPage broken out.
+<p> 
+
+<b>pagination.firstPageText</b><br>
+The text component of pagination.firstPage broken out.
+<p> 
+
 <b>pagination.isFirstPage</b><br>
 A boolean indicating whether the current page is the first page.
 <p> 
@@ -2228,6 +2236,14 @@ A boolean indicating whether the current page is the first page.
 
 <b>pagination.lastPage</b><br>
 A link to the last page in the paginator.
+<p> 
+
+<b>pagination.lastPageUrl</b><br>
+The url component of pagination.lastPage broken out.
+<p> 
+
+<b>pagination.lastPageText</b><br>
+The text component of pagination.lastPage broken out.
 <p> 
 
 <b>pagination.isLastPage</b><br>
@@ -2238,9 +2254,26 @@ A boolean indicating whether the current page is the last page.
 A link to the next page in the paginator relative to the current page.
 <p> 
 
+<b>pagination.nextPageUrl</b><br>
+The url component of pagination.nextPage broken out.
+<p> 
+
+<b>pagination.nextPageText</b><br>
+The text component of pagination.nextPage broken out.
+<p> 
+
 <b>pagination.previousPage</b><br>
 A link to the previous page in the paginator relative to the current page.
 <p> 
+
+<b>pagination.previousPageUrl</b><br>
+The url component of pagination.previousPage broken out.
+<p> 
+
+<b>pagination.previousPageText</b><br>
+The text component of pagination.previousPage broken out.
+<p> 
+
 
 <b>pagination.pageNumber</b><br>
 The current page number.
@@ -2258,17 +2291,52 @@ A boolean indicating whether there is more than one page.
 A list of links to every page in the paginator.
 <p> 
 
+<b>pagination.pageLoop</b><br>
+Same as pagination.pageList except broken into individual elements.
+<blockquote>
+<b>pagination.url</b><br>
+The URL of page X, where X is the number in the loop we're at.
+<p> 
+<b>pagination.text</b><br>
+The number of page X, where X is the number in the loop we're at.
+<p> 
+</blockquote>
+<p> 
+
 
 <b>pagination.pageList.upTo20</b><br>
 A list of links to the 20 nearest in the paginator relative to the current page. So if you're on page 60, you'll see links for 50-70.
+<p> 
+
+<b>pagination.pageLoop.upTo20</b><br>
+Same as pagination.pageList.upTo20 except broken into individual elements.
+<blockquote>
+<b>pagination.url</b><br>
+The URL of page X, where X is the number in the loop we're at.
+<p> 
+<b>pagination.text</b><br>
+The number of page X, where X is the number in the loop we're at.
+<p> 
+</blockquote>
 <p> 
 
 <b>pagination.pageList.upTo10</b><br>
 A list of links to the 10 nearest in the paginator relative to the current page. So if you're on page 20, you'll see links for 15-25.
 <p> 
 
+<b>pagination.pageLoop.upTo10</b><br>
+Same as pagination.pageList.upTo10 except broken into individual elements.
+<blockquote>
+<b>pagination.url</b><br>
+The URL of page X, where X is the number in the loop we're at.
+<p> 
+<b>pagination.text</b><br>
+The number of page X, where X is the number in the loop we're at.
+<p> 
+</blockquote>
+<p> 
 |,
-		lastUpdated => 1102031794,
+		lastUpdated => 1145060787,
 	},
 
 	'701' => {

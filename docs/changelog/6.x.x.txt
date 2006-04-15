@@ -40,6 +40,9 @@
  - Added a sort alphabetically option to the folder asset.
  - Added a symbol next to items in the asset manager to indicate if they have
    children or not.
+ - Added more templating options to the Paginator thanks to Jukka Raimovaara.
+ - Added the currentPage.rank variable to the nav template thanks to Jukka
+   Raimovaara.
  - Added a screenshot feature to the matrix.
  - Added an option to delete Matrix fields.
  - Added an API for retrieving email from POP3 servers.

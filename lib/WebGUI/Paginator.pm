@@ -73,16 +73,28 @@ sub appendTemplateVars {
 	my $var = shift;
 	$var->{'pagination.isFirstPage'} = ($self->getPageNumber == 1);
 	$var->{'pagination.isLastPage'} = ($self->getPageNumber == $self->getNumberOfPages);
-	$var->{'pagination.firstPage'} = $self->getFirstPageLink;
-	$var->{'pagination.lastPage'} = $self->getLastPageLink;
-	$var->{'pagination.nextPage'} = $self->getNextPageLink;
-	$var->{'pagination.previousPage'} = $self->getPreviousPageLink;
+	($var->{'pagination.firstPageUrl'},
+	$var->{'pagination.firstPageText'},
+	$var->{'pagination.firstPage'}) = $self->getFirstPageLink;
+    
+    ($var->{'pagination.lastPageUrl'},
+    $var->{'pagination.lastPageText'},
+	$var->{'pagination.lastPage'}) = $self->getLastPageLink;
+	
+	($var->{'pagination.nextPageUrl'},
+	$var->{'pagination.nextPageText'},
+	$var->{'pagination.nextPage'}) = $self->getNextPageLink;
+	
+	($var->{'pagination.previousPageUrl'},
+	$var->{'pagination.previousPageText'},
+	$var->{'pagination.previousPage'}) = $self->getPreviousPageLink;
+	
 	$var->{'pagination.pageNumber'} = $self->getPageNumber;
 	$var->{'pagination.pageCount'} = $self->getNumberOfPages;
 	$var->{'pagination.pageCount.isMultiple'} = ($self->getNumberOfPages > 1);
-	$var->{'pagination.pageList'} = $self->getPageLinks;
-	$var->{'pagination.pageList.upTo10'} = $self->getPageLinks(10);
-	$var->{'pagination.pageList.upTo20'} = $self->getPageLinks(20);
+	($var->{'pagination.pageLoop'},$var->{'pagination.pageList'}) = $self->getPageLinks;
+	($var->{'pagination.pageLoop.upTo10'},$var->{'pagination.pageList.upTo10'}) = $self->getPageLinks(10);
+	($var->{'pagination.pageLoop.upTo20'},$var->{'pagination.pageList.upTo20'}) = $self->getPageLinks(20);
 }
 
 
@@ -215,16 +227,16 @@ Returns a link to the first page's data.
 
 sub getFirstPageLink {
 	my ($self) = @_;
-        my ($text, $pn);
+        my ($text, $pn, $ctext);
 	$pn = $self->getPageNumber;
 	my $i18n = WebGUI::International->new($self->session);
-        $text = '|&lt;'.$i18n->get(404);
+        $ctext = $i18n->get(404);
+        $text = '|&lt;'.$ctext;
         if ($pn > 1) {
-                return '<a href="'.
-			$self->session->url->append($self->{_url},($self->{_formVar}.'=1'))
-			.'">'.$text.'</a>';
+			my $url = $self->session->url->append($self->{_url},($self->{_formVar}.'=1'));
+			return wantarray ? ($url,$ctext,'<a href="'.$url.'">'.$text.'</a>') : '<a href="'.$url.'">'.$text.'</a>';
         } else {
-                return $text;
+                return wantarray ? (undef,$ctext,$text) : $text;
         }
 }
 
@@ -239,16 +251,16 @@ Returns a link to the last page's data.
 
 sub getLastPageLink {
 	my ($self) = @_;
-        my ($text, $pn);
+        my ($text, $pn, $ctext);
 	$pn = $self->getPageNumber;
 	my $i18n = WebGUI::International->new($self->session);
-        $text = $i18n->get(405).'&gt;|';
+        $ctext = $i18n->get(405);
+        $text = $ctext.'&gt;|';
         if ($pn != $self->getNumberOfPages) {
-                return '<a href="'.
-			$self->session->url->append($self->{_url},($self->{_formVar}.'='.$self->getNumberOfPages))
-			.'">'.$text.'</a>';
+			my $url = $self->session->url->append($self->{_url},($self->{_formVar}.'='.$self->getNumberOfPages));
+			return wantarray ? ($url,$ctext,'<a href="'.$url.'">'.$text.'</a>') : '<a href="'.$url.'">'.$text.'</a>';
         } else {
-                return $text;
+                return wantarray ? (undef,$ctext,$text) : $text;
         }
 }
 
@@ -263,14 +275,16 @@ Returns a link to the next page's data.
 
 sub getNextPageLink {
 	my ($self) = @_;
-        my ($text, $pn);
+        my ($text, $pn, $ctext);
 	$pn = $self->getPageNumber;
 	my $i18n = WebGUI::International->new($self->session);
-        $text = $i18n->get(92).'&raquo;';
+        $ctext = $i18n->get(92);
+        $text = $ctext.'&raquo;';
         if ($pn < $self->getNumberOfPages) {
-                return '<a href="'.$self->session->url->append($self->{_url},($self->{_formVar}.'='.($pn+1))).'">'.$text.'</a>';
+                my $url = $self->session->url->append($self->{_url},($self->{_formVar}.'='.($pn+1)));
+                return wantarray ? ($url,$ctext,'<a href="'.$url.'">'.$text.'</a>') : '<a href="'.$url.'">'.$text.'</a>';
         } else {
-                return $text;
+                return wantarray ? (undef,$ctext,$text) : $text;
         }
 }
 
@@ -365,11 +379,16 @@ sub getPageLinks {
 	my $limit = shift;
 	my $pn = $self->getPageNumber;
 	my @pages;
+	my @pages_loop;
 	for (my $i=0; $i<$self->getNumberOfPages; $i++) {
 		if ($i+1 == $pn) {
 			push(@pages,($i+1));
+						push(@pages_loop,{ "pagination.url" => '', "pagination.text" => $i+1});
+
 		} else {
 			push(@pages,'<a href="'.$self->session->url->append($self->{_url},($self->{_formVar}.'='.($i+1))).'">'.($i+1).'</a>');
+            push(@pages_loop,{ "pagination.url" => $self->session->url->append($self->{_url},($self->{_formVar}.'='.($i+1))), "pagination.text" => $i+1});
+
 		}
 	}
 	if ($limit) {
@@ -379,15 +398,17 @@ sub getPageLinks {
 		my $maxPage = $minPage + $limit;
 		my $start = ($minPage > 0) ? $minPage : 1;
 		my $end = ($maxPage < $self->getPageNumber) ? $self->getPageNumber : $maxPage;
+		my @temp;
 		foreach my $page (@pages) {
 			if ($i <= $end && $i >= $start) {
 				$output .= $page.' ';
+				push(@temp, $pages_loop[$i-1]);
 			}
 			$i++;
 		}
-		return $output;
+		return wantarray ? (\@temp,$output) : $output;
 	} else {
-		return join(" ",@pages);
+		return wantarray ? (\@pages_loop,join(" ",@pages)) : join(" ",@pages);
 	}
 }
 
@@ -402,14 +423,16 @@ Returns a link to the previous page's data.
 
 sub getPreviousPageLink {
 	my ($self) = @_;
-	my ($text, $pn);
+	my ($text, $pn, $ctext);
 	$pn = $self->getPageNumber;
 	my $i18n = WebGUI::International->new($self->session);
-	$text = '&laquo;'.$i18n->get(91);
+	$ctext = $i18n->get(91);
+	$text = '&laquo;'.$ctext;
 	if ($pn > 1) {
-		return '<a href="'.$self->session->url->append($self->{_url},($self->{_formVar}.'='.($pn-1))).'">'.$text.'</a>';
+		my $url = $self->session->url->append($self->{_url},($self->{_formVar}.'='.($pn-1)));
+		return wantarray ? ($url,$ctext,'<a href="'.$url.'">'.$text.'</a>') : '<a href="'.$url.'">'.$text.'</a>';
         } else {
-        	return $text;
+            return wantarray ? (undef,$ctext,$text) : $text;
         }
 }
 
@@ -572,5 +595,4 @@ sub setDataByQuery {
 }
 
 1;
-
 

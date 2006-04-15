@@ -36,6 +36,7 @@ Contributing Developers..............Peter Beardsley / Appropriate Solutions
                                      Tony Mountifield
                                      Tavis Parker / ParkerOne Consulting
                                      Daniel Quinlan
+                                     Jukka Raimovaara
                                      Alan Ritari / DonorWare
                                      Hal Roberts / Harvard
                                      Steve Simms

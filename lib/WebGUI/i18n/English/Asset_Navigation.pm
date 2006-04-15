@@ -226,6 +226,7 @@ a Google sitemap of your site.
 <P><STRONG>currentPage.title</STRONG><BR>The title of the start page.</P>
 <P><STRONG>currentPage.isHome</STRONG><BR>A conditional indicating whether the base page is the default page for the site.</P>
 <P><STRONG>currentPage.url</STRONG><BR>The URL of the start page.</P>
+<P><STRONG>currentPage.rank</STRONG><BR>The position of the current page compared to its siblings.</P>
 <P><STRONG>currentPage.hasChild</STRONG><BR>A conditional indicating whether the start page has daughters.</P>
 <P><STRONG>currentPage.hasSibling</STRONG><BR>A conditional indicating whether the start page has siblings.</P>
 <P><STRONG>currentPage.hasViewableSiblings</STRONG><BR>A conditional indicating whether the start page has siblings that are viewable by the current user.</P>
@@ -281,7 +282,7 @@ a Google sitemap of your site.
 <P dir=ltr><STRONG>page.parent.synopsis</STRONG><BR>The synopsis of the mother of this page.</P>
 <P dir=ltr><STRONG>page.parent.newWindow</STRONG><BR>A conditional indicating whether the mother of this page should be opened in a new window.</P>
 </BLOCKQUOTE>|,
-		lastUpdated => 1121933073,
+		lastUpdated => 1145060204,
 	},
 
 	'1094' => {
