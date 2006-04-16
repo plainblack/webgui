@@ -70,6 +70,7 @@ sub updateArticle {
 				}
 				foreach my $child (@{$children}) {
 					$child->getStorageLocation->copy($storage);
+					$child->purge;
 				}
 			}
 		}

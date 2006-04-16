@@ -288,6 +288,7 @@ sub view {
 	my %var;
 	if ($self->get("storageId")) {
 		my $storage = $self->getStorageLocation; 
+		my @loop = ();
 		foreach my $file (@{$storage->getFiles}) {
 			if ($storage->isImage($file)) {
 				$var{'image.url'} = $storage->getUrl($file);
@@ -308,7 +309,7 @@ sub view {
 	}
         $var{description} = $self->get("description");
 	if ($self->get("convertCarriageReturns")) {
-		$var{description} =~ s/\n/\<br\>\n/g;
+		$var{description} =~ s/\n/\<br \/\>\n/g;
 	}
 	$var{"new.template"} = $self->getUrl.";overrideTemplateId=";
 	$var{"description.full"} = $var{description};
