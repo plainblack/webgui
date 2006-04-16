@@ -51,5 +51,18 @@
 <tr><td><tmpl_var form.email.label></td><td><tmpl_var form.email></td></tr>
 <tr><td><tmpl_var form.badgeId.label></td><td><tmpl_var form.badgeId></td></tr><tr><td rowspan='2' align='center'><tmpl_var form.submit></td></tr>
 </table>
+<script type="text/javascript">
+
+function swapBadgeInfo(badgeId) {
+	var selector = document.getElementById('badgeId_formId');
+	for (var i in badges[badgeId]) {
+		var field = document.getElementById(i+'_formId');
+		if (field && badges[badgeId][i]) {
+			field.value=badges[badgeId][i];
+		}
+	}
+}	
+	
+</script>
 <tmpl_var form.footer>
 </tmpl_if>
