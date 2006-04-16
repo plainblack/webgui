@@ -62,7 +62,12 @@ function swapBadgeInfo(badgeId) {
 		}
 	}
 }	
-	
+
+var selector1 = document.getElementById('badgeId_formId');
+if (selector1) {
+	swapBadgeInfo(selector1.value);
+}
+
 </script>
 <tmpl_var form.footer>
 </tmpl_if>
