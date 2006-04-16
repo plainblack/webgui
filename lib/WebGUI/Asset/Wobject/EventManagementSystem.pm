@@ -406,6 +406,14 @@ sub definition {
 				hoverHelp=>'Manage Purchases Template',
 				label=>"Manage Purchases Template"
 				},
+			viewPurchaseTemplateId =>{
+				fieldType=>"template",
+				defaultValue=>'EventManagerTmpl000005',
+				tab=>"display",
+				namespace=>"EventManagementSystem_viewPurchase",
+				hoverHelp=>'View Purchase Template',
+				label=>"View Purchase Template"
+				},
 			paginateAfter =>{
 				fieldType=>"integer",
 				defaultValue=>10,
@@ -720,6 +728,9 @@ sub getBadgeSelector {
 	my $isAdmin = $self->canAddEvents;
 	
 	my $badges = {};
+	
+	my $addBadgeId = $self->session->scratch->get('EMS_add_purchase_badgeId');
+	
 	if ($isAdmin) {
 		# all badges in the system.
 		$badges = $self->session->db->buildHashRef("select badgeId, CONCAT(lastName,', ',firstName) from EventManagementSystem_badges order by lastName");
@@ -740,7 +751,9 @@ sub getBadgeSelector {
 	$output .= WebGUI::Form::selectBox($self->session,{
 		name => 'badgeId',
 		options => \%options,
-		extras => 'onchange="swapBadgeInfo(this.value)"'
+		disabled => $addBadgeId ? 1 : 0,
+		value => $addBadgeId,
+		extras => 'onchange="swapBadgeInfo(this.value)" onkeyup="swapBadgeInfo(this.value)"'
 	});
 	
 	return $js.$output;
@@ -1789,12 +1802,12 @@ sub www_managePurchases {
 
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my $whereClause = ($isAdmin)?'':" and userId='".$self->session->user->userId."' and e.endDate > '".$self->session->datetime->time()."'";
-	my $sql = "select distinct(p.purchaseId) as purchaseId, t.initDate as initDate from transaction as t, EventManagementSystem_purchases as p, EventManagementSystem_registrations as r, EventManagementSystem_products as e where p.transactionId=t.transactionId and p.purchaseId=r.purchaseId and r.productId=e.productId $whereClause order by t.initDate";
+	my $sql = "select distinct(t.transactionId) as purchaseId, t.initDate as initDate from transaction as t, EventManagementSystem_purchases as p, EventManagementSystem_registrations as r, EventManagementSystem_products as e where p.transactionId=t.transactionId and p.purchaseId=r.purchaseId and r.productId=e.productId $whereClause order by t.initDate";
 	my $sth = $self->session->db->read($sql);
 	my @purchasesLoop;
 	while (my $purchase = $sth->hashRef) {
 		$purchase->{datePurchasedHuman} = $self->session->datetime->epochToHuman($purchase->{initDate});
-		$purchase->{purchaseUrl} = $self->getUrl."?func=viewPurchase;pid=".$purchase->{purchaseId};
+		$purchase->{purchaseUrl} = $self->getUrl."?func=viewPurchase;tid=".$purchase->{purchaseId};
 		
 		push(@purchasesLoop,$purchase);
 	}
@@ -1821,22 +1834,27 @@ sub www_viewPurchase {
 	my $self = shift;
 	my %var = $self->get();
 	my $isAdmin = $self->canAddEvents;
-	my $pid = $self->session->form->process('pid');
+	my $tid = $self->session->form->process('tid');
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
-	my $whereClause = ($isAdmin)?'':" and userId='".$self->session->user->userId."' and e.endDate > '".$self->session->datetime->time()."'";
-	my $sql = "select b.firstName, b.lastName, r.registrationId, e.startDate, e.endDate,  from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e where r.productId=e.productId and r.badgeId=b.badgeId and r.purchaseId=? order by b.badgeId, e.startDate";
-	my $sth = $self->session->db->read($sql,[$pid]);
+	my $sql = "select distinct(r.purchaseId), b.* from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_purchases as t where r.badgeId=b.badgeId and r.purchaseId=t.purchaseId and t.transactionId=? order by b.lastName";
+	my $sth = $self->session->db->read($sql,[$tid]);
 	my @purchasesLoop;
 	while (my $purchase = $sth->hashRef) {
-		$purchase->{datePurchasedHuman} = $self->session->datetime->epochToHuman($purchase->{initDate});
-		$purchase->{purchaseUrl} = $self->getUrl."?func=viewPurchase;purchaseId=".$purchase->{purchaseId};
-		
+		my $badgeId = $purchase->{badgeId};
+		my $pid = $purchase->{purchaseId};
+		my $sql2 = "select distinct r.registrationId, p.title, p.description, p.price, p.templateId, r.returned, e.approved, e.maximumAttendees, e.startDate, e.endDate from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e, products as p where r.badgeId=? and r.purchaseId=? order by b.lastName";
+		my $sth2 = $self->session->db->read($sql2,[$badgeId,$pid]);
+		$purchase->{regLoop} = [];
+		while (my $reg = $sth2->hashRef) {
+			push(@{$purchase->{regLoop}},$reg);
+		}
 		push(@purchasesLoop,$purchase);
 	}
-	$var{managePurchasesTitle} = $i18n->get('manage purchases');
+	$var{viewPurchaseTitle} = $i18n->get('view purchase');
+	$var{canReturn} = $isAdmin;
 	$sth->finish;
 	$var{'purchasesLoop'} = \@purchasesLoop;
-	return $self->session->style->process($self->processTemplate(\%var,$self->getValue("managePurchasesTemplateId")),$self->getValue("styleTemplateId"));
+	return $self->session->style->process($self->processTemplate(\%var,$self->getValue("viewPurchaseTemplateId")),$self->getValue("styleTemplateId"));
 }
 
 #-------------------------------------------------------------------
@@ -2122,7 +2140,10 @@ sub www_saveRegistration {
 	
 	my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
 	
+	my @addingToPurchase = split("\n",$self->session->scratch->get('EMS_add_purchase_events'));
+	@addingToPurchase = () if ($self->session->scratch->get('EMS_add_purchase_badgeId') && !($self->session->scratch->get('EMS_add_purchase_badgeId') eq $badgeId));
 	foreach my $eventId (@$eventsInCart) {
+		next if isIn($eventId,@addingToPurchase);
 		my $registrationId = $self->setCollateral("EventManagementSystem_registrations", "registrationId",{
 			registrationId  => "new",
 			purchaseId	 => $purchaseId,
@@ -2131,7 +2152,9 @@ sub www_saveRegistration {
 		},0,0);
 		$shoppingCart->add($eventId, 'Event');
 	}
-	$self->emptyScratchCart;	
+	$self->emptyScratchCart;
+	$self->session->scratch->delete('EMS_add_purchase_badgeId');
+	$self->session->scratch->delete('EMS_add_purchase_events');
 	
 	my ($theirUserId) = $self->session->db->quickArray("select userId from EventManagementSystem_badges where badgeId=?",[$badgeId]);
 	$userId = $theirUserId unless $thisIsI;
@@ -2195,6 +2218,8 @@ sub view {
 	# If we're at the view method there is no reason we should have anything in our scratch cart
 	# so let's empty it to prevent strange and awful things from happening
 	$self->emptyScratchCart;
+	$self->session->scratch->delete('EMS_add_purchase_badgeId');
+	$self->session->scratch->delete('EMS_add_purchase_events');
 
 	push(@keys,$keywords) if $keywords;
 	unless ($keywords =~ /^".*"$/) {
