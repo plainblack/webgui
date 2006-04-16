@@ -17,6 +17,7 @@ use File::Path;
 use WebGUI::Workflow;
 use WebGUI::Workflow::Cron;
 use WebGUI::Group;
+use WebGUI::Storage;
 
 my $toVersion = "6.99.0"; # make this match what version you're going to
 my $quiet; # this line required
@@ -54,6 +55,25 @@ finish($session); # this line required
 sub updateArticle {
 	print "\tAllowing articles to have direct attachments.\n";
 	$session->db->write("alter table Article add column storageId varchar(22) binary");
+	my $rs = $session->db->read("select assetId from asset where className='WebGUI::Asset::Wobject::Article'");
+	while (my ($id) = $rs->array) {
+		my $asset = WebGUI::Asset->new($id, "WebGUI::Asset::Wobject::Article");
+		if (defined $asset) {
+			my $children = $asset->getLineage(["children"],{returnObjects=>1, includeOnlyClasses=>["WebGUI::Asset::File","WebGUI::Asset::File::Image"]});
+			if (scalar(@{$children})) {
+				my $storage = undef;
+				if ($asset->get("storageId")) {
+					$storage = WebGUI::Storage->get($session,$asset->get("storageId"));
+				} else {
+					$storage = WebGUI::Storage->create($session);
+					$asset->update({storageId=>$storage->getId});
+				}
+				foreach my $child (@{$children}) {
+					$child->getStorageLocation->copy($storage);
+				}
+			}
+		}
+	}
 }
 
 #-------------------------------------------------

@@ -32,8 +32,7 @@
 </tmpl_if>
 
 <tmpl_if pagination.isLastPage>
-	<tmpl_var attachment.icon> <tmpl_var attachment.name> <tmpl_var attachment.name>
-	<p />
+	<tmpl_if attachment.name><p><p style="display:inline;vertical-align:middle;"><a href="<tmpl_var attachment.url>"><img src="<tmpl_var attachment.icon>" style="vertical-align:middle;border: 0px;" alt="<tmpl_var attachment.name>" /> <tmpl_var attachment.name></a></p></p></tmpl_if>
 </tmpl_if>
 
 <tmpl_if pagination.isFirstPage>

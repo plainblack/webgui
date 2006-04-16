@@ -67,6 +67,24 @@ text will come out formatted as paragraphs.
 =cut
 
 #-------------------------------------------------------------------
+                
+=head2 addRevision
+        
+Override the default method in order to deal with attachments.
+
+=cut
+
+sub addRevision {
+        my $self = shift;
+        my $newSelf = $self->SUPER::addRevision(@_);
+        if ($self->get("storageId")) {
+                my $newStorage = WebGUI::Storage->get($self->session,$self->get("storageId"))->copy;
+                $newSelf->update({storageId=>$newStorage->getId});
+        }
+        return $newSelf;
+}  
+
+#-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
 	my $session = shift;
@@ -164,6 +182,39 @@ sub exportAssetData {
 
 
 #-------------------------------------------------------------------
+sub getStorageLocation {
+	my $self = shift;
+	unless (exists $self->{_storageLocation}) {
+		if ($self->get("storageId") eq "") {
+			$self->{_storageLocation} = WebGUI::Storage::Image->create($self->session);
+			$self->update({storageId=>$self->{_storageLocation}->getId});
+		} else {
+			$self->{_storageLocation} = WebGUI::Storage::Image->get($self->session,$self->get("storageId"));
+		}
+	}
+	return $self->{_storageLocation};
+}
+
+#-------------------------------------------------------------------
+
+=head2 indexContent ( )
+
+Indexing the content of attachments and user defined fields. See WebGUI::Asset::indexContent() for additonal details. 
+
+=cut
+
+sub indexContent {
+	my $self = shift;
+	my $indexer = $self->SUPER::indexContent;
+	$indexer->addKeywords($self->get("linkTitle"));
+	$indexer->addKeywords($self->get("linkUrl"));
+	my $storage = $self->getStorageLocation;
+	foreach my $file (@{$storage->getFiles}) {
+               $indexer->addFile($storage->getPath($file));
+	}
+}
+
+#-------------------------------------------------------------------
 
 =head2 prepareView ( )
 
@@ -186,6 +237,19 @@ sub prepareView {
 
 #-------------------------------------------------------------------
 
+sub purge {
+        my $self = shift;
+        my $sth = $self->session->db->read("select storageId from Articlewhere assetId=?",[$self->getId]);
+        while (my ($storageId) = $sth->array) {
+		my $storage = WebGUI::Storage::Image->get($self->session,$storageId);
+                $storage->delete if defined $storage;
+        }
+        $sth->finish;
+        return $self->SUPER::purge;
+}
+
+#-------------------------------------------------------------------
+
 =head2 purgeCache ()
 
 See WebGUI::Asset::purgeCache() for details.
@@ -196,6 +260,14 @@ sub purgeCache {
 	my $self = shift;
 	WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
 	$self->SUPER::purgeCache;
+}
+
+#-------------------------------------------------------------------
+
+sub purgeRevision {
+        my $self = shift;
+        $self->getStorageLocation->delete;
+        return $self->SUPER::purgeRevision;
 }
 
 #-------------------------------------------------------------------
@@ -215,7 +287,7 @@ sub view {
 	}
 	my %var;
 	if ($self->get("storageId")) {
-		my $storage = WebGUI::Storage::Image->get($self->session, $self->get("storageId"));
+		my $storage = $self->getStorageLocation; 
 		foreach my $file (@{$storage->getFiles}) {
 			if ($storage->isImage($file)) {
 				$var{'image.url'} = $storage->getUrl($file);
@@ -292,7 +364,7 @@ sub www_deleteFile {
 	my $self = shift;
 	return $self->session->privilege->insufficient unless $self->canEdit;
 	if ($self->get("storageId") ne "") {
-		my $storage = WebGUI::Storage::Image->get($self->session, $self->get("storageId"));
+		my $storage = $self->getStorageLocation;
 		$storage->deleteFile($self->session->form->param("filename"));
 	}
 	return $self->www_edit;

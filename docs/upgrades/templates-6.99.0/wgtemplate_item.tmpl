@@ -6,18 +6,12 @@
 </tmpl_if>
 
 <tmpl_if displaytitle>
-	<tmpl_if linkurl>
-		<a href="<tmpl_var linkurl>">
-	</tmpl_if>
-	<span class="itemTitle"><tmpl_var title></span>
-	<tmpl_if linkurl>
-		</a>
-	</tmpl_if>
+	<tmpl_if linkurl><a href="<tmpl_var linkurl>"></tmpl_if><span class="itemTitle"><tmpl_var title></span><tmpl_if linkurl></a></tmpl_if>
 </tmpl_if>
 
 <tmpl_if attachment.name>
 	<tmpl_if displaytitle> - </tmpl_if>
-	<a href="<tmpl_var attachment.url>"><img src="<tmpl_var attachment.Icon>" alt="<tmpl_var attachment.name>" width="16" height="16" border="0" align="middle" /></a>
+	<p style="display:inline;vertical-align:middle;"><a href="<tmpl_var attachment.url>"><img src="<tmpl_var attachment.icon>" style="vertical-align:middle;border: 0px;" alt="<tmpl_var attachment.name>" /></a></p>
 </tmpl_if>
 
 <tmpl_if description>

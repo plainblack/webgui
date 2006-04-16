@@ -156,7 +156,12 @@ sub getValueFromPost {
 	} elsif ($self->session->form->param($self->privateName('action')) eq 'keep') {
 		return $value;
 	} elsif ($self->session->form->param($self->privateName('action')) eq 'upload') {
-		my $storage = WebGUI::Storage::Image->create($self->session);
+		my $storage = undef;
+		if ($self->get("value") ne "") {
+			$storage = WebGUI::Storage::Image->get($self->session, $self->get("value"));
+		} else {
+			$storage = WebGUI::Storage::Image->create($self->session);
+		}
 		$storage->addFileFromFormPost($self->get("name"),1000);
 		my @files = @{ $storage->getFiles };
 		if (scalar(@files) < 1) {

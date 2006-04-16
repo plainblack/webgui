@@ -58,7 +58,7 @@ sub AUTOLOAD {
         our $AUTOLOAD;
 	my $self = shift;
         my $name = ucfirst((split /::/, $AUTOLOAD)[-1]);
-	my $fieldName = shift;
+	my $params = shift;
         my $cmd = "use WebGUI::Form::".$name;
         eval ($cmd);
         if ($@) {
@@ -66,7 +66,7 @@ sub AUTOLOAD {
                 return undef;
         }
         my $class = "WebGUI::Form::".$name;
-        return $class->new($self->session, {name=>$fieldName})->getValueFromPost;
+        return $class->new($self->session, $params)->getValueFromPost;
 }
 
 #-------------------------------------------------------------------
@@ -181,7 +181,7 @@ sub paramsHashRef {
 
 #-------------------------------------------------------------------
 
-=head2 process ( name, type [ , default ] )
+=head2 process ( name, type [ , default, params ] )
 
 Returns whatever would be the expected result of the method type that was specified. This method also checks to make sure that the field is not returning a string filled with nothing but whitespace.
 
@@ -197,21 +197,26 @@ The type of form element this variable came from. Defaults to "text" if not spec
 
 The default value for this variable. If the variable is undefined then the default value will be returned instead.
 
+=head3 params
+
+A full set of form params just as you'd pass into any of the form controls when building it.
+
 =cut
 
 sub process {
-	my ($self, $name, $type, $default) = @_;
+	my ($self, $name, $type, $default, $params) = @_;
 	$type = ucfirst($type);
 	return $self->param($name) if ($type eq "");
+	$params->{name} = $name;	
 	if (wantarray) {	
-		my @values = $self->$type($name);
+		my @values = $self->$type($params);
 		if (scalar(@values) < 1 && ref $default eq "ARRAY") {
 			return @{$default};
 		} else {
 			return @values;
 		}
 	} else {
-		my $value = $self->$type($name);
+		my $value = $self->$type($params);
 		unless (defined $value) {
 			return $default;
 		}

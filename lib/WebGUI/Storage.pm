@@ -289,15 +289,19 @@ sub addFileFromScalar {
 
 #-------------------------------------------------------------------
                                                                                                                                                        
-=head2 copy ( )
+=head2 copy ( [ storage ] )
                                                                                                                                                        
 Copies a storage location and it's contents. Returns a new storage location object. Note that this does not copy privileges or other special filesystem properties.
+
+=head3 storage
+
+Optionally pass in a storage object to copy the data to.
                                                                                                                                                        
 =cut
                                                                                                                                                        
 sub copy {
 	my $self = shift;
-	my $newStorage = WebGUI::Storage->create($self->session);
+	my $newStorage = shift || WebGUI::Storage->create($self->session);
 	my $filelist = $self->getFiles(1);
 	foreach my $file (@{$filelist}) {	
         	my $source = FileHandle->new($self->getPath($file),"r");

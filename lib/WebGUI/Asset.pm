@@ -1536,10 +1536,14 @@ sub processPropertiesFromFormPost {
 				$data{$property} = $definition->{properties}{$property}{defaultValue} if $self->session->form->process("assetId") eq "new";
 				next;
 			}
+			my %params = %{$definition->{properties}{$property}};
+			$params{name} = $property;
+			$params{value} = $self->get($property);
 			$data{$property} = $self->session->form->process(
 				$property,
 				$definition->{properties}{$property}{fieldType},
-				$definition->{properties}{$property}{defaultValue}
+				$definition->{properties}{$property}{defaultValue},
+				\%params
 				);
 		}
 	}
