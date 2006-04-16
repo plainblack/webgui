@@ -640,6 +640,7 @@ create table EventManagementSystem (
  displayTemplateId varchar(22) binary,
  checkoutTemplateId varchar(22) binary,
  managePurchasesTemplateId varchar(22) binary,
+ viewPurchaseTemplateId varchar(22) binary,
  paginateAfter int(11) default 10,
  groupToAddEvents varchar(22) binary,
  groupToApproveEvents varchar(22) binary,
