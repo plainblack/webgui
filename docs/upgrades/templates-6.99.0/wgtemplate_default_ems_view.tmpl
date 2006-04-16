@@ -15,7 +15,63 @@
 <a href='<tmpl_var managePurchases.url>'><tmpl_var managePurchases.label></a><br />
 <a href="<tmpl_var checkout.url>"><tmpl_var checkout.label></a><br />
 
+<script type="text/javascript" src="<tmpl_var ems.wobject.dir>/script/dynamicForms.js"></script>
+<script type="text/javascript">
+   <tmpl_var search.filters.options>   
+   var advanced = 0;
+   var filterCount = 0;
 
+	function setSelectValue(selObj,newValue) {
+		for (var i=0; i<selObj.options.length; i++) {
+			selObj.options[i].selected = (selObj.options[i].value==newValue)?true:false;
+		}
+	}
+	
+   function toggleAdvanced() {
+      var ids = ["cParams","cResults","cSearch"];
+	  var toggle = "";
+	  for (var i = 0; i < ids.length; i++) {
+	     if(advanced == 1) {
+		    toggle = "none";
+		 }
+		 document.getElementById(ids[i]).style.display=toggle;
+	  }
+	  advanced = (advanced == 1)?0:1;
+	  return false;
+   }
+   
+   function toggleTitle(obj) {
+      if (obj.checked) {
+	     document.getElementById('cs_search_title_td').style.display='inline';
+	  } else {
+	     document.getElementById('cs_search_title_td').style.display='none';
+	  }
+   }
+   
+   function openWin (url, name, param) {
+      var newwin = window.open(url, name, param);
+      newwin.focus();
+   }
+   
+   function buildFilterList() {
+      return "Custom Filter";
+   }
+   
+   function stripDelim(value,delim) {
+      value = value.replace(/delim/g,"");
+	  return value;
+   }
+
+	function unset(array, valueToUnset){
+		var output=new Array(0);
+		for(var i in array){
+			if(i==valueToUnset){continue;}
+			output[i]=array[i];
+		}
+		return output;
+	}
+
+</script>
 
 <div id="basicSearch"<tmpl_if isAdvSearch> style="display:none"</tmpl_if>>
 <tmpl_var basicSearch.formHeader>
@@ -136,61 +192,3 @@
 #extendedSearchLayer {display: inline;}
 
 </style>
-
-<script type="text/javascript" src="<tmpl_var ems.wobject.dir>/script/dynamicForms.js"></script>
-<script type="text/javascript">
-   <tmpl_var search.filters.options>   
-   var advanced = 0;
-   var filterCount = 0;
-
-	function setSelectValue(selObj,newValue) {
-		for (var i=0; i<selObj.options.length; i++) {
-			selObj.options[i].selected = (selObj.options[i].value==newValue)?true:false;
-		}
-	}
-	
-   function toggleAdvanced() {
-      var ids = ["cParams","cResults","cSearch"];
-	  var toggle = "";
-	  for (var i = 0; i < ids.length; i++) {
-	     if(advanced == 1) {
-		    toggle = "none";
-		 }
-		 document.getElementById(ids[i]).style.display=toggle;
-	  }
-	  advanced = (advanced == 1)?0:1;
-	  return false;
-   }
-   
-   function toggleTitle(obj) {
-      if (obj.checked) {
-	     document.getElementById('cs_search_title_td').style.display='inline';
-	  } else {
-	     document.getElementById('cs_search_title_td').style.display='none';
-	  }
-   }
-   
-   function openWin (url, name, param) {
-      var newwin = window.open(url, name, param);
-      newwin.focus();
-   }
-   
-   function buildFilterList() {
-      return "Custom Filter";
-   }
-   
-   function stripDelim(value,delim) {
-      value = value.replace(/delim/g,"");
-	  return value;
-   }
-
-	function unset(array, valueToUnset){
-		var output=new Array(0);
-		for(var i in array){
-			if(i==valueToUnset){continue;}
-			output[i]=array[i];
-		}
-		return output;
-	}
-
-</script>
