@@ -336,8 +336,11 @@ A sql statement string.
 
 sub query {
 	my $self = shift;
+	my $query = shift;
+	my $placeholders = shift;
 	$self->{_queryCount}++;
-	$self->debug("query  ".$self->{_queryCount}.':  '.shift);
+	my $plac = scalar(@{$placeholders}) ? "\n&nbsp;&nbsp;with placeholders:&nbsp;&nbsp;['".join("', '",@{$placeholders})."']" : '';
+	$self->debug("query  ".$self->{_queryCount}.':  '.$query.$plac);
 }
 
 

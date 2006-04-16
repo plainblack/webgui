@@ -134,7 +134,7 @@ sub www_viewStatistics {
 	$output .= '<tr><td align="right" class="tableHeader">'.$i18n->get(147).':</td><td class="tableData">'.$data.'</td></tr>';
 	($data) = $session->db->quickArray("select count(distinct assetId) from assetData where isPackage=1");
 	$output .= '<tr><td align="right" class="tableHeader">'.$i18n->get(794).':</td><td class="tableData">'.$data.'</td></tr>';
-	($data) = $session->db->quickArray("select count(*) from template");
+	($data) = $session->db->quickArray("select count(distinct(assetId)) from template");
 	$output .= '<tr><td align="right" class="tableHeader">'.$i18n->get(792).':</td><td class="tableData">'.$data.'</td></tr>';
 	($data) = $session->db->quickArray("select count(*) from userSession");
 	$output .= '<tr><td align="right" class="tableHeader">'.$i18n->get(146).':</td><td class="tableData">'.$data.'</td></tr>';

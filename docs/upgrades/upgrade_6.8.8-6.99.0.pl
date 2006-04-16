@@ -102,7 +102,7 @@ sub changeCache {
 	$session->db->write("alter table Folder add column visitorCacheTimeout int not null default 3600");
 	$session->db->write("alter table HttpProxy add column cacheTimeout int not null default 0");
 	$session->db->write("alter table SQLReport add column cacheTimeout int not null default 0");
-	$session->db->write("alter table Snippet add column cacheTimeout int not null default 3600");
+	$session->db->write("alter table snippet add column cacheTimeout int not null default 3600");
 	$session->db->write("alter table FileAsset add column cacheTimeout int not null default 3600");
 	$session->db->write("alter table Product add column cacheTimeout int not null default 3600");
 	$session->db->write("alter table SyndicatedContent add column cacheTimeout int not null default 3600");
