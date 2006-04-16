@@ -18,6 +18,7 @@ use strict;
 use base 'WebGUI::Asset::Wobject';
 use Tie::IxHash;
 use WebGUI::HTMLForm;
+use JSON;
 use WebGUI::International;
 use WebGUI::Commerce::ShoppingCart;
 use WebGUI::Commerce::Item;
@@ -226,7 +227,7 @@ sub addToScratchCart {
 	my $event = shift;
 
 	my @eventsInCart = split("\n",$self->session->scratch->get('EMS_scratch_cart'));
-	push(@eventsInCart, $event) ;
+	push(@eventsInCart, $event) unless isIn($event,@eventsInCart);
 
 	$self->session->scratch->set('EMS_scratch_cart', join("\n", @eventsInCart));
 }
@@ -237,6 +238,15 @@ sub canApproveEvents {
 	my $self = shift;
 	return $self->session->user->isInGroup($self->get("groupToApproveEvents"));
 }
+
+
+#-------------------------------------------------------------------
+
+sub canAddEvents {
+	my $self = shift;
+	return $self->session->user->isInGroup($self->get("groupToAddEvents"));
+}
+
 
 #-------------------------------------------------------------------
 
@@ -699,23 +709,41 @@ sub getBadgeSelector {
 	my $self = shift;
 	my $output;
 	my $i18n = WebGUI::International->new($self->session, 'Asset_EventManagementSystem');
-	my $selfName = ($self->session->var->get('userId') ne '1') ? $self->session->user->profileField('firstName').' '.$self->session->user->profileField('lastName') : $i18n->get('create a badge for myself');
+	my $selfName = ($self->session->var->get('userId') ne '1') ? $self->session->user->profileField('firstName').' '.$self->session->user->profileField('lastName').' ('.$i18n->get('you').')' : $i18n->get('create a badge for myself');
+	$selfName = $i18n->get('create a badge for myself') if $selfName eq '  ('.$i18n->get('you').')';
 	my %options;
 	tie %options, 'Tie::IxHash';
 	%options = (
 		'thisIsI' => $selfName,
-		'new' => $i18n->get('create a new badge')
+		'new' => $i18n->get('create a badge for someone else')
 	);
-	my $isAdmin = $self->session->user->isInGroup($self->get("groupToAddEvents"));
+	my $isAdmin = $self->canAddEvents;
 	
-	my $badges = $self->session->db->buildHashRef("select badgeId, CONCAT(lastName,' ',firstName) from EventManagementSystem_badges order by lastName");
+	my $badges = {};
+	if ($isAdmin) {
+		# all badges in the system.
+		$badges = $self->session->db->buildHashRef("select badgeId, CONCAT(lastName,', ',firstName) from EventManagementSystem_badges order by lastName");
+	} else {
+		#badges we have purchased.
+		$badges = $self->session->db->buildHashRef("select b.badgeId, CONCAT(b.lastName,', ',b.firstName) from EventManagementSystem_badges as b, EventManagementSystem_registrations as r, transaction as t, EventManagementSystem_purchases as p where (p.transactionId=t.transactionId and p.purchaseId=r.purchaseId and b.badgeId=r.badgeId and t.userId='".$self->session->var->get('userId')."') or b.userId='".$self->session->var->get('userId')."' order by b.lastName");
+	}
+	my $js;
+	my %badgeJS;
+	foreach (keys %$badges) {
+		$badgeJS{$_} = $self->session->db->quickHashRef("select * from EventManagementSystem_badges where badgeId=?",[$_]);
+	}
+	$js = '<script type="text/javascript">
+	var badges = '.objToJson(\%badgeJS).';
+	</script>';
+	
 	%options = (%options,%{$badges});
 	$output .= WebGUI::Form::selectBox($self->session,{
 		name => 'badgeId',
 		options => \%options,
+		extras => 'onchange="swapBadgeInfo(this.value)"'
 	});
 	
-	return $output;
+	return $js.$output;
 }
 
 #------------------------------------------------------------------
@@ -813,7 +841,7 @@ sub getRegistrationInfo {
 	
 	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
 			     .WebGUI::Form::hidden($self->session,{name=>"func",value=>"saveRegistration"});
-	$var{'form.message'} = 'Enter Badge/Contact information for the series of events you are currently adding to the cart.  <br /><br />If you are logged in, you can choose to update your own user profile with this information by choosing your name from the drop-down box, and checking the box that says "Update profile".  <br /><br />If you are making a purchase for someone else, select their name or select the "Create New" option from the drop-down box.  If you are adding items to a previous purchase, the person is already selected, and the update checkbox is selected by default.';
+	$var{'form.message'} = 'Enter Badge/Contact information for the series of events you are currently adding to the cart.  <br /><br />If you are logged in, you can choose to update your own user profile with this information by choosing your name from the drop-down box, or if your name is not listed, choose the option "Create badge for myself".  <br /><br />If you are making a purchase for someone else, select their name or select the "Create New for someone else" option from the drop-down box.  If you are adding items to a previous purchase, that badge is already selected, and cannot be changed.  If you make changes to the fields in this form for a badge that already exists, their information will be updated.';
 	$var{'form.footer'} = WebGUI::Form::formFooter($self->session);
 	$var{'form.submit'} = WebGUI::Form::submit($self->session);
 	$var{'form.firstName.label'} = "First Name";
@@ -833,7 +861,7 @@ sub getRegistrationInfo {
 	$var{'form.state'} = WebGUI::Form::Text($self->session,{name=>'state'});
 	$var{'form.zipCode'} = WebGUI::Form::Text($self->session,{name=>'zipCode'});
 	$var{'form.country'} = WebGUI::Form::SelectBox($self->session,{name=>'country', options => {'us' => 'UnitedStates'}});
-	$var{'form.phoneNumber'} = WebGUI::Form::Phone($self->session,{name=>'phoneNumber'});
+	$var{'form.phoneNumber'} = WebGUI::Form::Phone($self->session,{name=>'phone'});
 	$var{'form.badgeId'} = $self->getBadgeSelector;
 	$var{'form.updateProfile'} = WebGUI::Form::Checkbox($self->session,{name=>'updateProfile'});
 	$var{isLoggedIn} = 1 if ($self->session->user->userId ne '1');
@@ -1225,13 +1253,6 @@ sub www_addToCart {
 		
 		unless ($output) {
 			$output = $self->getRegistrationInfo;
-
-			#Move our events from the scratch cart to the real shopping cart
-			my $events = $self->getEventsInScratchCart;
-			foreach my $eventId (@$events) {
-				$shoppingCart->add($eventId, 'Event');
-			}
-			$self->emptyScratchCart;							
 		}		
 	}
 	return $self->session->style->process($self->processTemplate($output,$self->getValue("checkoutTemplateId")),$self->getValue("styleTemplateId"));
@@ -1292,7 +1313,7 @@ sub www_deleteEvent {
 	my $self = shift;
 	my $eventId = $self->session->form->get("pid");
 
-	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
+	return $self->session->privilege->insufficient unless ($self->canAddEvents);
 	
 	#Remove this event as a prerequisite to any other event
 	$self->session->db->write("delete from EventManagementSystem_prerequisiteEvents where requiredProductId=?",
@@ -1319,7 +1340,7 @@ sub www_deletePrerequisite {
 	my $self = shift;
 	my $eventId = $self->session->form->get("id");
 	
-	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
+	return $self->session->privilege->insufficient unless ($self->canAddEvents);
 	
 	$self->session->db->write("delete from EventManagementSystem_prerequisiteEvents where prerequisiteId=?",
 				   [$eventId]);
@@ -1370,7 +1391,7 @@ sub www_editEvent {
 	my $errors = shift;
 	my $errorMessages;
 
-	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
+	return $self->session->privilege->insufficient unless ($self->canAddEvents);
 
 	my $pid = shift || $self->session->form->get("pid");
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
@@ -1579,7 +1600,7 @@ Method that validates the edit event form and saves its contents to the database
 sub www_editEventSave {
 	my $self = shift;
 
-	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
+	return $self->session->privilege->insufficient unless ($self->canAddEvents);
 
 	my $errors = $self->validateEditEventForm;
         if (scalar(@$errors) > 0) { return $self->error($errors, "www_editEvent"); }
@@ -1659,7 +1680,7 @@ Method to display the event management console.
 sub www_manageEvents {
 	my $self = shift;
 
-	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
+	return $self->session->privilege->insufficient unless ($self->canAddEvents);
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	
 	my $output;
@@ -1727,7 +1748,7 @@ Method to display the event metadata management console.
 sub www_manageEventMetadata {
 	my $self = shift;
 
-	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
+	return $self->session->privilege->insufficient unless ($self->canAddEvents);
 
 	my $output;
 	my $metadataFields = $self->getEventMetaDataArrayRef('false');
@@ -1764,7 +1785,7 @@ Method to display list of purchases.  Event admins can see everyone's purchases.
 sub www_managePurchases {
 	my $self = shift;
 	my %var = $self->get();
-	my $isAdmin = $self->session->user->isInGroup($self->get("groupToAddEvents"));
+	my $isAdmin = $self->canAddEvents;
 
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my $whereClause = ($isAdmin)?'':" and userId='".$self->session->user->userId."' and e.endDate > '".$self->session->datetime->time()."'";
@@ -1799,7 +1820,7 @@ hasn't occurred yet.
 sub www_viewPurchase {
 	my $self = shift;
 	my %var = $self->get();
-	my $isAdmin = $self->session->user->isInGroup($self->get("groupToAddEvents"));
+	my $isAdmin = $self->canAddEvents;
 	my $pid = $self->session->form->process('pid');
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my $whereClause = ($isAdmin)?'':" and userId='".$self->session->user->userId."' and e.endDate > '".$self->session->datetime->time()."'";
@@ -1823,7 +1844,7 @@ sub www_editEventMetaDataField {
 	my $self = shift;
 	my $fieldId = shift || $self->session->form->process("fieldId");
 	my $error = shift;
-	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
+	return $self->session->privilege->insufficient unless ($self->canAddEvents);
 	my $i18n2 = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my $i18n = WebGUI::International->new($self->session,"WebGUIProfile");
 	my $f = WebGUI::HTMLForm->new($self->session, (
@@ -1936,7 +1957,7 @@ sub www_editEventMetaDataField {
 #-------------------------------------------------------------------
 sub www_editEventMetaDataFieldSave {
 	my $self = shift;
-	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
+	return $self->session->privilege->insufficient unless ($self->canAddEvents);
 	my $error = '';
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	foreach ('name','label') {
@@ -1975,7 +1996,7 @@ sub www_moveEventMetaDataFieldDown {
 	my $self = shift;
 	my $eventId = $self->session->form->get("fieldId");
 	
-	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
+	return $self->session->privilege->insufficient unless ($self->canAddEvents);
 	
 	$self->moveCollateralDown('EventManagementSystem_metaField', 'fieldId', $eventId);
 
@@ -1994,7 +2015,7 @@ sub www_moveEventMetaDataFieldUp {
 	my $self = shift;
 	my $eventId = $self->session->form->get("fieldId");
 
-	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
+	return $self->session->privilege->insufficient unless ($self->canAddEvents);
 	
 	$self->moveCollateralUp('EventManagementSystem_metaField', 'fieldId', $eventId);
 	
@@ -2014,7 +2035,7 @@ sub www_deleteEventMetaDataField {
 	my $self = shift;
 	my $eventId = $self->session->form->get("fieldId");
 
-	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
+	return $self->session->privilege->insufficient unless ($self->canAddEvents);
 	
 	$self->deleteCollateral('EventManagementSystem_metaField', 'fieldId', $eventId);
 	$self->reorderCollateral('EventManagementSystem_metaField', 'fieldId');
@@ -2035,7 +2056,7 @@ sub www_moveEventDown {
 	my $self = shift;
 	my $eventId = $self->session->form->get("pid");
 	
-	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
+	return $self->session->privilege->insufficient unless ($self->canAddEvents);
 	
 	$self->moveCollateralDown('EventManagementSystem_products', 'productId', $eventId);
 
@@ -2054,7 +2075,7 @@ sub www_moveEventUp {
 	my $self = shift;
 	my $eventId = $self->session->form->get("pid");
 
-	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
+	return $self->session->privilege->insufficient unless ($self->canAddEvents);
 	
 	$self->moveCollateralUp('EventManagementSystem_products', 'productId', $eventId);
 	
@@ -2074,7 +2095,7 @@ sub www_saveRegistration {
 	  # to an existing badge, they need to log in first.
 	my $thisIsI = $theirBadgeId eq 'thisIsI';
 	my $badgeId = $thisIsI ? $myBadgeId : $theirBadgeId;
-	my $userId = $thisIsI ? $self->session->user->userId : '';
+	my $userId = $thisIsI ? $self->session->var->get('userId') : '';
 	my $firstName = $self->session->form->get("firstName", "text");
 	my $lastName = $self->session->form->get("lastName", "text");
 	my $address = $self->session->form->get("address", "text");
@@ -2082,7 +2103,7 @@ sub www_saveRegistration {
 	my $state = $self->session->form->get("state", "text");
 	my $zipCode = $self->session->form->get("zipCode", "text");
 	my $country = $self->session->form->get("country", "selectBox");
-	my $phoneNumber = $self->session->form->get("phoneNumber", "phone");
+	my $phoneNumber = $self->session->form->get("phone", "phone");
 	my $email = $self->session->form->get("email", "email");
 	my $details = {
 		badgeId => $badgeId, # if this is "new", setCollateral will return the new one.
@@ -2099,6 +2120,8 @@ sub www_saveRegistration {
 	$details->{userId} = $userId if $userId;
 	$badgeId = $self->setCollateral("EventManagementSystem_badges", "badgeId",$details,0,0);
 	
+	my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
+	
 	foreach my $eventId (@$eventsInCart) {
 		my $registrationId = $self->setCollateral("EventManagementSystem_registrations", "registrationId",{
 			registrationId  => "new",
@@ -2106,7 +2129,10 @@ sub www_saveRegistration {
 			productId	 => $eventId,
 			badgeId => $badgeId
 		},0,0);
+		$shoppingCart->add($eventId, 'Event');
 	}
+	$self->emptyScratchCart;	
+	
 	my ($theirUserId) = $self->session->db->quickArray("select userId from EventManagementSystem_badges where badgeId=?",[$badgeId]);
 	$userId = $theirUserId unless $thisIsI;
 	if ($userId) {
@@ -2288,8 +2314,7 @@ sub view {
 	foreach ($self->session->form->param) {
 		$searchUrl .= ';'.$_.'='.$formVars->{$_} if (($_ ne 'pn') && ($formVars->{$_} || $formVars->{$_} eq '0'));
 	}
-	# my $p = WebGUI::Paginator->new($self->session,$searchUrl,$self->get("paginateAfter"));
-	my $p = WebGUI::Paginator->new($self->session,$searchUrl,1);
+	my $p = WebGUI::Paginator->new($self->session,$searchUrl,$self->get("paginateAfter"));
 	my (@results, $sth, $data);
 	$sth = $self->session->db->read($sql);
 	while ($data = $sth->hashRef) {
@@ -2312,7 +2337,6 @@ sub view {
 			} elsif($seatsCompare eq "gte") {
 				$shouldPush = 0 unless ($data->{'maximumAttendees'} - $numberRegistered >= $seatsAvailable);
 			}
-			
 		}
 		foreach (keys %reqHash) {
 			$shouldPush = 0 unless isIn(keys(%{$requiredList}),$_);
