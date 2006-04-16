@@ -851,7 +851,10 @@ my $template3 = <<EOT3;
 
 <tmpl_if registration>
   <tmpl_var form.header>
+  <tmpl_var form.message>
+  <tmpl_var form.chooserJS>
   <table>
+  <tr><td><tmpl_var form.chooser.label></td><td><tmpl_var form.chooser></td></tr>
   <tr><td><tmpl_var form.firstName.label></td><td><tmpl_var form.firstName></td></tr>
 <tr><td><tmpl_var form.lastName.label></td><td><tmpl_var form.lastName></td></tr>
 <tr><td><tmpl_var form.address.label></td><td><tmpl_var form.address></td></tr>
@@ -870,12 +873,15 @@ EOT3
 
 ## Manage Purchases ##
 my $template4 = <<EOT4;
+<tmpl_if session.var.adminOn>
+        <p><tmpl_var controls></p><br /><br />
+</tmpl_if>
 <h1><tmpl_var managePurchasesTitle></h1>
 <table width='100%'>
 <tr><td><tmpl_var purchaseId.label></td><td><tmpl_var datePurchasedHuman.label></td></tr>
 <tmpl_if purchasesLoop>
 <tmpl_loop purchasesLoop>
-<tr><td><a href="<tmpl_var purchaseUrl>"><tmpl_var purchaseId></td><td><tmpl_var datePurchasedHuman</td></tr>
+<tr><td><a href="<tmpl_var purchaseUrl>"><tmpl_var purchaseId></td><td><tmpl_var datePurchasedHuman></td></tr>
 </tmpl_loop>
 <tmpl_else>
 <tr><td><tmpl_var noPurchasesMessage></td></tr>
@@ -883,6 +889,26 @@ my $template4 = <<EOT4;
 </table>
 
 EOT4
+
+## View Purchase ##
+my $template5 = <<EOT5;
+<tmpl_if session.var.adminOn>
+        <p><tmpl_var controls></p><br /><br />
+</tmpl_if>
+<h1><tmpl_var viewPurchaseTitle></h1>
+<tmpl_if canReturn><a href="<tmpl_var returnPurchaseUrl>"><tmpl_var returnPurchaseLabel></a></tmpl_if>
+
+<table width="100%">
+<tr><td><tmpl_var badgeNameLabel></td><td><tmpl_var eventTitle.label></td><td><tmpl_var eventDates.label></td><tmpl_if canReturn><td><tmpl_var returnButton.label></td></tmpl_if></tr></tr><td>
+<tmpl_var registration.firstName> <tmpl_var registrationLastName>
+</td>
+<tmpl_loop registrationLoop>
+<tr><td><tmpl_var registration.title></td><td><tmpl_var registration.startDateHuman> - <tmpl_var registration.endDateHuman></td><tmpl_if canReturn><td><a href="<tmpl_var registration.returnUrl>"><tmpl_var registration.returnLabel></a></td></tmpl_if></tr>
+</tmpl_loop>
+<tmpl_if registration.canAddEvents><tr colspan="<tmpl_if canReturn>3<tmpl_else>2</tmpl_if>"><td><a href="<tmpl_var registration.addEventsUrl>"><tmpl_var addEventsLabel></a></td></tr></tmpl_if>
+</table>
+
+EOT5
 
 ## End Templates
 
@@ -927,19 +953,28 @@ EOT4
 		}, "EventManagerTmpl000004"
 	);
 
-        print "\t Creating Event Management System tables.\n" unless ($quiet);
+	$in->addChild({
+		className=>'WebGUI::Asset::Template',
+		title=>'Default Event Management System View Purchase',
+		menuTitle=>'Default Event Management System View Purchase',
+		url=>'default-ems-manage-view-purchase',
+		template=>$template5,
+		namespace=>'EventManagementSystem_viewPurchase',
+		}, "EventManagerTmpl000005"
+	);
+	print "\t Creating Event Management System tables.\n" unless ($quiet);
 
 my $sql1 = <<SQL1;
 
 create table EventManagementSystem (
- assetId varchar(22) not null,
+ assetId varchar(22) binary not null,
  revisionDate bigint(20) not null,
- displayTemplateId varchar(22),
- checkoutTemplateId varchar(22),
- managePurchasesTemplateId varchar(22),
+ displayTemplateId varchar(22) binary,
+ checkoutTemplateId varchar(22) binary,
+ managePurchasesTemplateId varchar(22) binary,
  paginateAfter int(11) default 10,
- groupToAddEvents varchar(22),
- groupToApproveEvents varchar(22),
+ groupToAddEvents varchar(22) binary,
+ groupToApproveEvents varchar(22) binary,
  globalPrerequisites tinyint default 1,
  globalMetadata tinyint default 1,
 primary key(assetId,revisionDate)
@@ -949,8 +984,8 @@ SQL1
 my $sql2 = <<SQL2;
 
 create table EventManagementSystem_products (
- productId varchar(22) not null,
- assetId varchar(22),
+ productId varchar(22) binary not null,
+ assetId varchar(22) binary,
  startDate bigint(20),
  endDate bigint(20),
  maximumAttendees int(11),
@@ -962,27 +997,18 @@ SQL2
 
 my $sql3 = <<SQL3;
 create table EventManagementSystem_registrations (
- registrationId varchar(22) not null,
- productId varchar(22),
- purchaseId varchar(22),
- firstName varchar(100),
- lastName varchar(100),
- address varchar(100),
- city varchar(100),
- state varchar(50),
- zipCode varchar(15),
- country varchar(255),
- phone varchar(50),
- email varchar(255),
-primary key(registrationId)
-)
+ registrationId varchar(22) binary not null,
+ productId varchar(22) binary,
+ purchaseId varchar(22) binary,
+ badgeId varchar(22) binary,
+ primary key(registrationId))
 SQL3
 
 my $sql4 = <<SQL4;
 
 create table EventManagementSystem_purchases (
- purchaseId varchar(22) not null,
- transactionId varchar(22),
+ purchaseId varchar(22) binary not null,
+ transactionId varchar(22) binary,
 primary key(purchaseId)
 )
 SQL4
@@ -990,8 +1016,8 @@ SQL4
 my $sql5 = <<SQL5;
 
 create table EventManagementSystem_prerequisites (
- prerequisiteId varchar(22) not null,
- productId varchar(22),
+ prerequisiteId varchar(22) binary not null,
+ productId varchar(22) binary,
  operator varchar(100),
 primary key(prerequisiteId)
 )
@@ -1000,9 +1026,9 @@ SQL5
 my $sql6 = <<SQL6;
 
 create table EventManagementSystem_prerequisiteEvents (
- prerequisiteEventId varchar(22) not null,
- prerequisiteId varchar(22),
- requiredProductId varchar(22),
+ prerequisiteEventId varchar(22) binary not null,
+ prerequisiteId varchar(22) binary,
+ requiredProductId varchar(22) binary,
 primary key(prerequisiteEventId)
 )
 SQL6
@@ -1010,8 +1036,8 @@ SQL6
 my $sql7 = <<SQL7;
 
 create table EventManagementSystem_metaField (
- fieldId varchar(22) not null,
- assetId varchar(22),
+ fieldId varchar(22) binary not null,
+ assetId varchar(22) binary,
  name varchar(50),
  label varchar(100),
  dataType varchar(20),
@@ -1028,12 +1054,30 @@ SQL7
 my $sql8 = <<SQL8;
 
 create table EventManagementSystem_metaData (
- fieldId varchar(22) not null,
- productId varchar(22) not null,
+ fieldId varchar(22) binary not null,
+ productId varchar(22) binary not null,
  fieldData text,
 primary key(fieldId,productId)
 )
 SQL8
+
+
+my $sql9 = <<SQL9;
+create table EventManagementSystem_badges (
+ badgeId varchar(22) binary not null,
+ userId varchar(22) binary,
+ firstName varchar(100),
+ lastName varchar(100),
+ address varchar(100),
+ city varchar(100),
+ state varchar(50),
+ zipCode varchar(15),
+ country varchar(255),
+ phone varchar(50),
+ email varchar(255),
+primary key(badgeId)
+)
+SQL9
 
         $session->db->write($sql1);
         $session->db->write($sql2);
@@ -1043,7 +1087,7 @@ SQL8
         $session->db->write($sql6);
         $session->db->write($sql7);
         $session->db->write($sql8);
-	$session->config->addToArray("assets","WebGUI::Asset::Wobject::EventManagementSystem");
+        $session->db->write($sql9);
 }
 
 #-------------------------------------------------
