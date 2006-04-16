@@ -1173,7 +1173,7 @@ sub www_addToCart {
 	$conflicts = shift;
 	$pid = shift;
 	$shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
-
+	
 	# Check if conflicts were found that the user needs to fix
 	$output = $conflicts->[0] if defined $conflicts;
 	
@@ -2132,6 +2132,11 @@ sub view {
 	my $joins;
 	my $selects;
 	my @joined;
+
+	# If we're at the view method there is no reason we should have anything in our scratch cart
+	# so let's empty it to prevent strange and awful things from happening
+	$self->emptyScratchCart;
+
 	push(@keys,$keywords) if $keywords;
 	unless ($keywords =~ /^".*"$/) {
 		foreach (split(" ",$keywords)) {
