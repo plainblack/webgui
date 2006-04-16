@@ -1,0 +1,21 @@
+#EventManagerTmpl000005
+#title:Default Event Management System View Purchase
+#menuTitle:Default Event Management System View Purchase
+#url:default-ems-template-view-purchase
+#namespace:EventManagementSystem_viewPurchase
+#create
+<tmpl_if session.var.adminOn>
+        <p><tmpl_var controls></p><br /><br />
+</tmpl_if>
+<h1><tmpl_var viewPurchaseTitle></h1>
+<tmpl_if canReturn><a href="<tmpl_var returnPurchaseUrl>"><tmpl_var returnPurchaseLabel></a></tmpl_if>
+
+<table width="100%">
+<tr><td><tmpl_var badgeNameLabel></td><td><tmpl_var eventTitle.label></td><td><tmpl_var eventDates.label></td><tmpl_if canReturn><td><tmpl_var returnButton.label></td></tmpl_if></tr></tr><td>
+<tmpl_var registration.firstName> <tmpl_var registrationLastName>
+</td>
+<tmpl_loop registrationLoop>
+<tr><td><tmpl_var registration.title></td><td><tmpl_var registration.startDateHuman> - <tmpl_var registration.endDateHuman></td><tmpl_if canReturn><td><a href="<tmpl_var registration.returnUrl>"><tmpl_var registration.returnLabel></a></td></tmpl_if></tr>
+</tmpl_loop>
+<tmpl_if registration.canAddEvents><tr colspan="<tmpl_if canReturn>3<tmpl_else>2</tmpl_if>"><td><a href="<tmpl_var registration.addEventsUrl>"><tmpl_var addEventsLabel></a></td></tr></tmpl_if>
+</table>

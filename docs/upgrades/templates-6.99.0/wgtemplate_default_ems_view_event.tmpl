@@ -1,0 +1,18 @@
+#EventManagerTmpl000002
+#title:Default Event Management System Product
+#menuTitle:Default Event Management System Product
+#url:default-ems-template-product
+#namespace:EventManagementSystem_product
+#create
+<h1><tmpl_var title></h1><br>
+<tmpl_var description>&nbsp;<tmpl_var price><br>
+
+<tmpl_unless eventIsFull>
+<a href="<tmpl_var purchase.url>"><tmpl_var purchase.label></a>
+<tmpl_else>
+<tmpl_var purchase.label><br />
+</tmpl_unless>
+max attendees:<tmpl_var maximumAttendees><br />
+seats remaining:<tmpl_var seatsRemaining><br />
+number registered:<tmpl_var numberRegistered><br />
+event full?:<tmpl_var eventIsFull<br />

@@ -1,0 +1,20 @@
+#EventManagerTmpl000004
+#title:Default Event Management System Manage Purchases
+#menuTitle:Default Event Management System Manage Purchases
+#url:default-ems-template-manage-purchases
+#namespace:EventManagementSystem_managePurchas
+#create
+<tmpl_if session.var.adminOn>
+        <p><tmpl_var controls></p><br /><br />
+</tmpl_if>
+<h1><tmpl_var managePurchasesTitle></h1>
+<table width='100%'>
+<tr><td><tmpl_var purchaseId.label></td><td><tmpl_var datePurchasedHuman.label></td></tr>
+<tmpl_if purchasesLoop>
+<tmpl_loop purchasesLoop>
+<tr><td><a href="<tmpl_var purchaseUrl>"><tmpl_var purchaseId></td><td><tmpl_var datePurchasedHuman></td></tr>
+</tmpl_loop>
+<tmpl_else>
+<tr><td><tmpl_var noPurchasesMessage></td></tr>
+</tmpl_if>
+</table>
