@@ -57,7 +57,7 @@ sub updateArticle {
 	$session->db->write("alter table Article add column storageId varchar(22) binary");
 	my $rs = $session->db->read("select assetId from asset where className='WebGUI::Asset::Wobject::Article'");
 	while (my ($id) = $rs->array) {
-		my $asset = WebGUI::Asset->new($id, "WebGUI::Asset::Wobject::Article");
+		my $asset = WebGUI::Asset->new($session, $id, "WebGUI::Asset::Wobject::Article");
 		if (defined $asset) {
 			my $children = $asset->getLineage(["children"],{returnObjects=>1, includeOnlyClasses=>["WebGUI::Asset::File","WebGUI::Asset::File::Image"]});
 			if (scalar(@{$children})) {
