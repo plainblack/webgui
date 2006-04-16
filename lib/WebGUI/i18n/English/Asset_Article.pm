@@ -1,6 +1,16 @@
 package WebGUI::i18n::English::Asset_Article;
 
 our $I18N = {
+	'attachments' => {
+		message => q|Attachments|,
+		lastUpdated => 0
+		},
+
+	'attachments help' => {
+		message => q|Attach files and images directly to this Article. Please note that these files will not be accessible through the asset manager to other assets.|,
+		lastUpdated => 0
+		},
+
 	'cache timeout' => {
 		message => q|Cache Timeout|,
 		lastUpdated => 0
@@ -165,6 +175,28 @@ The URL to the thumbnail for the attached image.
 <b>image.url</b><br/>
 The URL to the attached image.
 <p/>
+
+<b>attachment_loop</b><br />
+A loop containing all the attachments.
+<blockquote>
+	<b>filename</b><br />
+	The name of the file.
+	<p />
+	<b>url</b><br />
+	The url to download the file.
+	<p />
+	<b>thumbnailUrl</b><br />
+	The url of the thumbnail of this file.
+	<p />
+	<b>iconUrl</b><br />
+	The url to the file type icon of this file.
+	<p />
+	<b>isImage</b><br />
+	A boolean indicating whether this is an image or not.
+	<p />
+</blockquote>
+<p/>
+
 
 <b>linkTitle</b><br/>
 The title of the link added to the article.

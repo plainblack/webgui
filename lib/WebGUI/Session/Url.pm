@@ -147,7 +147,7 @@ sub gateway {
         my $url = $self->session->config->get("gateway").'/'.$pageUrl;
 	$url =~ s/\/+/\//g;
         if ($self->session->setting->get("preventProxyCache") == 1) {
-                $url = $self->append($url,"noCache=".randint(0,1000).';'.$self->session->datetime->time());
+                $url = $self->append($url,"noCache=".randint(0,1000).','.$self->session->datetime->time());
         }
 	if ($pairs) {
 		$url = $self->append($url,$pairs);
@@ -319,7 +319,7 @@ sub page {
         }
 	$url .= $self->gateway($self->session->asset ? $self->session->asset->get("url") : $self->getRequestedUrl);
         if ($self->session->setting->get("preventProxyCache") == 1 && !$skipPreventProxyCache) {
-                $url = $self->append($url,"noCache=".randint(0,1000).';'.$self->session->datetime->time());
+                $url = $self->append($url,"noCache=".randint(0,1000).','.$self->session->datetime->time());
         }
         if ($pairs) {
                 $url = $self->append($url,$pairs);

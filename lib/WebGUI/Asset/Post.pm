@@ -147,8 +147,7 @@ sub definition {
                 className=>'WebGUI::Asset::Post',
                 properties=>{
 			storageId => {
-				noFormPost=>1,
-				fieldType=>"hidden",
+				fieldType=>"file",
 				defaultValue=>undef
 				},
 			threadId => {
@@ -501,30 +500,6 @@ sub getThumbnailUrl {
 		}
 	}
 	return $url;
-}
-
-
-#-------------------------------------------------------------------
-sub getUploadControl {
-	my $self = shift;
-	my $maxAttachments = $self->getThread->getParent->getValue("attachmentsPerPost");
-	my $uploadControl;
-	return undef unless ($maxAttachments);
-	my $i18n = WebGUI::International->new($self->session);
-	if ($self->get("storageId")) {
-		my $i;
-		foreach my $filename (@{$self->getStorageLocation->getFiles}) {
-			$uploadControl .= $self->session->icon->delete("func=deleteFile;filename=".$filename,$self->get("url"),$i18n->get("delete file warning","Asset_Collaboration"))	
-				.' <a href="'.$self->getStorageLocation->getUrl($filename).'">'.$filename.'</a>'
-				.'<br />';
-			$i++;
-		}
-		return $uploadControl unless ($i < $maxAttachments);
-	}
-	$uploadControl .= WebGUI::Form::file($self->session,
-		maxAttachments=>$maxAttachments
-		);
-	return $uploadControl;
 }
 
 
@@ -1065,7 +1040,11 @@ sub www_edit {
 	$var{'form.preview'} = WebGUI::Form::submit($self->session, {
 		value=>$i18n->get("preview","Asset_Collaboration")
 		});
-	$var{'attachment.form'} = $self->getUploadControl;
+	$var{'attachment.form'} = WebGUI::Form::file($self->session, {
+		value=>$self->get("storageId"),
+		maxAttachments=>$self->getThread->getParent->getValue("attachmentsPerPost"),
+		deleteFileUrl=>$self->getUrl("func=deleteFile;filename=")
+		});
         $var{'contentType.form'} = WebGUI::Form::contentType($self->session, {
                 name=>'contentType',
                 value=>$self->getValue("contentType") || "mixed"

@@ -60,6 +60,10 @@ only supports displaying/deleting 1 attachment.
 
 Flag that tells the User Profile system that this is a valid form element in a User Profile
 
+=head4 deleteFileUrl
+
+A url that will get a filename appended to it and then links to delete the files will be generated automatically.
+
 =cut
 
 sub definition {
@@ -80,6 +84,9 @@ sub definition {
 		profileEnabled=>{
 			defaultValue=>1
 			},
+		deleteFileUrl=>{
+			defaultValue=>undef
+			}
 		});
         return $class->SUPER::definition($session, $definition);
 }
@@ -125,7 +132,7 @@ sub displayValue {
 	return '' unless $self->get("value");
 	my $location = WebGUI::Storage->get($self->session,$self->get("value"));
 	my $file = shift @{ $location->getFiles };
-	my $fileValue = sprintf qq!<img src="%s" />&nbsp;%s!, $location->getFileIconUrl($file), $file; 
+	my $fileValue = sprintf qq|<img src="%s" />&nbsp;%s|, $location->getFileIconUrl($file), $file; 
 	return $fileValue;
 }
 
@@ -146,14 +153,11 @@ sub getValueFromPost {
 		my $storage = WebGUI::Storage->get($self->session,$value);
 		$storage->delete;
 		return '';
-	}
-	elsif ($self->session->form->param($self->privateName('action')) eq 'keep') {
+	} elsif ($self->session->form->param($self->privateName('action')) eq 'keep') {
 		return $value;
-	}
-	elsif ($self->session->form->param($self->privateName('action')) eq 'upload') {
-		my $storage;
-		$storage = WebGUI::Storage::Image->create($self->session);
-		$storage->addFileFromFormPost($self->get("name"), 1);
+	} elsif ($self->session->form->param($self->privateName('action')) eq 'upload') {
+		my $storage = WebGUI::Storage::Image->create($self->session);
+		$storage->addFileFromFormPost($self->get("name"),1000);
 		my @files = @{ $storage->getFiles };
 		if (scalar(@files) < 1) {
 			$storage->delete;
@@ -175,25 +179,42 @@ Renders a file upload control.
 
 sub toHtml {
 	my $self = shift;
-        $self->session->style->setScript($self->session->config->get("extrasURL").'/FileUploadControl.js',{type=>"text/javascript"});
-        my $uploadControl = '<script type="text/javascript">
-                var fileIcons = new Array();
-                ';
-        opendir(DIR,$self->session->config->get("extrasPath").'/fileIcons');
-        my @files = readdir(DIR);
-        closedir(DIR);
-        foreach my $file (@files) {
-                unless ($file eq "." || $file eq "..") {
-                        my $ext = $file;
-                        $ext =~ s/(.*?)\.gif/$1/;
-                        $uploadControl .= 'fileIcons["'.$ext.'"] = "'.$self->session->config->get("extrasURL").'/fileIcons/'.$file.'";'."\n";
-                }
-        }
 	my $i18n = WebGUI::International->new($self->session);
-        $uploadControl .= sprintf q!var uploader = new FileUploadControl("%s", fileIcons, "%s","%d");
-        uploader.addRow();
-        </script>!, $self->get("name"), $i18n->get("removeLabel"), $self->get('maxAttachments');
-	$uploadControl .= WebGUI::Form::Hidden->new($self->session, {-name => $self->privateName('action'), -value => 'upload'})->toHtml();
+	my $uploadControl = undef;
+	my $storage = WebGUI::Storage->get($self->session, $self->get("value")) if ($self->get("value"));
+	my @files = $storage->getFiles if (defined $storage);
+	my $maxFiles = $self->get('maxAttachments') - scalar(@files);
+	if ($maxFiles > 0) {
+        	$self->session->style->setScript($self->session->config->get("extrasURL").'/FileUploadControl.js',{type=>"text/javascript"});
+        	$uploadControl = '<script type="text/javascript">
+                	var fileIcons = new Array();
+                	';
+        	opendir(DIR,$self->session->config->get("extrasPath").'/fileIcons');
+        	my @icons = readdir(DIR);
+        	closedir(DIR);
+        	foreach my $file (@icons) {
+                	unless ($file eq "." || $file eq "..") {
+                        	my $ext = $file;
+	                        $ext =~ s/(.*?)\.gif/$1/;
+        	                $uploadControl .= 'fileIcons["'.$ext.'"] = "'.$self->session->config->get("extrasURL").'/fileIcons/'.$file.'";'."\n";
+                	}
+        	}
+        	$uploadControl .= sprintf q!var uploader = new FileUploadControl("%s", fileIcons, "%s","%d");
+        	uploader.addRow();
+        	</script>!, $self->get("name"), $i18n->get("removeLabel"), $maxFiles;
+		$uploadControl .= WebGUI::Form::Hidden->new($self->session, {-name => $self->privateName('action'), -value => 'upload'})->toHtml()."<br />";
+	}
+	if (scalar(@files)) {
+		foreach my $file (@{$storage->getFiles}) {
+			if ($self->get("deleteFileUrl")) {
+				$uploadControl .= '<p style="display:inline;vertical-align:middle;"><a href="'.$self->get("deleteFileUrl").$file.'">'
+				.'<img src="'.$self->session->icon->_getBaseURL().'delete.gif" style="vertical-align:middle;border: 0px;" alt="x" /></a></p> ';
+			}
+			$uploadControl .= '<p style="display:inline;vertical-align:middle;"><a href="'.$storage->getUrl($file).'">'
+       				.'<img src="'.$storage->getFileIconUrl($file).'" style="vertical-align:middle;border: 0px;" alt="'
+				.$file.'" /> '.$file.'</a></p><br />';
+		}
+	}
         return $uploadControl;
 }
 

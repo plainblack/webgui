@@ -177,11 +177,6 @@ our $I18N = {
 		lastUpdated => 1141142205,
 	},
 
-	'delete file warning' => {
-		message => q|Are you sure you wish to delete this file?|,
-		lastUpdated => 1109618544,
-	},
-
 	'display last reply' => {
 		message => q|Display last reply?|,
 		lastUpdated => 1109618544,

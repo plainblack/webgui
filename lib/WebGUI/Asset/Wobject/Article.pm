@@ -16,6 +16,7 @@ use WebGUI::International;
 use WebGUI::Cache;
 use WebGUI::Paginator;
 use WebGUI::Asset::Wobject;
+use WebGUI::Storage::Image;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
 
@@ -114,6 +115,15 @@ sub definition {
                 		subtext=>' &nbsp; <span style="font-size: 8pt;">'.$i18n->get(11).'</span>',
                 		hoverHelp=>$i18n->get('carriage return description'),
                 		uiLevel=>5
+				},
+			storageId=>{
+				tab=>"properties",
+				fieldType=>"image",
+				deleteFileUrl=>$session->url->page("func=deleteFile;filename="),
+				maxAttachments=>25,
+				defaultValue=>undef,
+				label=>$i18n->get("attachments"),
+				hoverHelp=>$i18n->get("attachments help")
 				}
 		);
 	push(@{$definition}, {
@@ -126,6 +136,32 @@ sub definition {
 		});
         return $class->SUPER::definition($session, $definition);
 }
+
+#-------------------------------------------------------------------
+
+sub duplicate {
+	my $self = shift;
+	my $newAsset = $self->SUPER::duplicate(shift);
+	my $newStorage = $self->getStorageLocation->copy;
+	$newAsset->update({storageId=>$newStorage->getId});
+	return $newAsset;
+}
+
+#-------------------------------------------------------------------
+
+=head2 exportAssetData() ( )
+
+See WebGUI::AssetPackage::exportAssetData() for details.
+
+=cut
+
+sub exportAssetData {
+	my $self = shift;
+	my $data = $self->SUPER::exportAssetData;
+	push(@{$data->{storage}}, $self->get("storageId")) if ($self->get("storageId") ne "");
+	return $data;
+}
+
 
 #-------------------------------------------------------------------
 
@@ -178,15 +214,24 @@ sub view {
 		return $out if $out;
 	}
 	my %var;
-	my $children = $self->getLineage(["children"],{returnObjects=>1,includeOnlyClasses=>["WebGUI::Asset::File","WebGUI::Asset::File::Image"]});
-	foreach my $child (@{$children}) {
-		if (ref $child eq "WebGUI::Asset::File") {
-			$var{"attachment.icon"} = $child->getFileIconUrl;
-			$var{"attachment.url"} = $child->getFileUrl;
-			$var{"attachment.name"} = $child->get("filename");
-		} elsif (ref $child eq "WebGUI::Asset::File::Image") {
-			$var{"image.url"} = $child->getFileUrl;
-			$var{"image.thumbnail"} = $child->getThumbnailUrl; 
+	if ($self->get("storageId")) {
+		my $storage = WebGUI::Storage::Image->get($self->session, $self->get("storageId"));
+		foreach my $file (@{$storage->getFiles}) {
+			if ($storage->isImage($file)) {
+				$var{'image.url'} = $storage->getUrl($file);
+				$var{'image.thumbnail'} = $storage->getThumbnailUrl($file);
+			} else {
+				$var{'attachment.icon'} = $storage->getFileIconUrl($file);
+				$var{'attachment.url'} = $storage->getUrl($file);
+				$var{'attachment.name'} = $file;
+			}
+			push(@{$var{attachment_loop}}, {
+				filename => $file,
+				isImage => $storage->isImage($file),
+				url=> $storage->getUrl($file),
+				thumbnailUrl => $storage->getUrl($file),
+				iconUrl => $storage->getFileIconUrl($file)
+				});
 		}
 	}
         $var{description} = $self->get("description");
@@ -234,6 +279,26 @@ sub view {
 	}
        	return $out;
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_deleteFile ( )
+
+Deletes and attached file.
+
+=cut
+
+sub www_deleteFile {
+	my $self = shift;
+	return $self->session->privilege->insufficient unless $self->canEdit;
+	if ($self->get("storageId") ne "") {
+		my $storage = WebGUI::Storage::Image->get($self->session, $self->get("storageId"));
+		$storage->deleteFile($self->session->form->param("filename"));
+	}
+	return $self->www_edit;
+}
+
+
 
 1;
 

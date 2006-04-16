@@ -46,8 +46,15 @@ addAdManager();
 updateMatrix();
 updateFolder();
 addRichEditUpload();
+updateArticle();
 
 finish($session); # this line required
+
+#-------------------------------------------------
+sub updateArticle {
+	print "\tAllowing articles to have direct attachments.\n";
+	$session->db->write("alter table Article add column storageId varchar(22) binary");
+}
 
 #-------------------------------------------------
 sub addRichEditUpload {

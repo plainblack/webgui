@@ -40,8 +40,8 @@ use WebGUI::Storage::Image;
 These methods are available from this class:
 
 my $boolean = $self->generateThumbnail($filename);
-my $url = $self->getThumbnailUrl;
-my $boolean = $self->isImage;
+my $url = $self->getThumbnailUrl($filename);
+my $boolean = $self->isImage($filename);
 my ($captchaFile, $challenge) = $self->addFileFromCaptcha;
 $self->resize($imageFile, $width, $height);
 

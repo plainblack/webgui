@@ -225,7 +225,7 @@ sub www_editProfileSave {
 	return WebGUI::Operation::Auth::www_auth($session, "init") if ($session->user->userId eq '1');
 	($profile, $error, $warning) = validateProfileData($session);
 	$error .= $warning;
-	return www_editProfile('<ul>'.$error.'</ul>') if($error ne "");
+	return www_editProfile($session, '<ul>'.$error.'</ul>') if($error ne "");
 	foreach $fieldName (keys %{$profile}) {
 		$session->user->profileField($fieldName,$profile->{$fieldName});
 	}

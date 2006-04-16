@@ -17,7 +17,7 @@ package WebGUI::Form::Image;
 use strict;
 use base 'WebGUI::Form::File';
 use WebGUI::International;
-use WebGUI::Storage;
+use WebGUI::Storage::Image;
 use WebGUI::Form::YesNo;
 
 =head1 NAME
@@ -92,7 +92,7 @@ sub displayForm {
 	return $self->toHtml unless $self->get('value');
 	##There are files inside here, for each one, display the image
 	##and another form control for deleting it.
-	my $location = WebGUI::Storage->get($self->session, $self->get('value'));
+	my $location = WebGUI::Storage::Image->get($self->session, $self->get('value'));
 	my $i18n = WebGUI::International->new($self->session);
 	my $fileForm = '';
 	my $file = shift @{ $location->getFiles };
@@ -118,10 +118,83 @@ profile field.
 sub displayValue {
 	my ($self) = @_;
 	return '' unless $self->get("value");
-	my $location = WebGUI::Storage->get($self->session,$self->get("value"));
+	my $location = WebGUI::Storage::Image->get($self->session,$self->get("value"));
 	my $file = shift @{ $location->getFiles };
-	my $fileValue = sprintf qq!<img src="%s" />&nbsp;%s!, $location->getUrl($file), $file; 
+	my $fileValue = sprintf qq|<img src="%s" />&nbsp;%s|, $location->getUrl($file), $file; 
 	return $fileValue;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValueFromFormPost ( )
+
+See WebGUI::Form::File::getValueFromFormPost() for details. Generates a thumbnail.
+
+=cut
+
+sub getValueFromFormPost {
+	my $self = shift;
+	my $id = $self->SUPER::getValueFromFormPost(@_);
+	if (defined $id) {
+		my $storage = WebGUI::Storage::Image->get($self->session, $id);
+		if (defined $storage) {
+			foreach my $file (@{$storage->getFiles}) {
+				$storage->generateThumbnail($file) if ($storage->isImage($file));
+			}
+		}
 	}
+	return $id;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 toHtml ( )
+
+Renders a file upload control.
+
+=cut
+
+sub toHtml {
+	my $self = shift;
+	my $i18n = WebGUI::International->new($self->session);
+	my $uploadControl = undef;
+	my $storage = WebGUI::Storage::Image->get($self->session, $self->get("value")) if ($self->get("value"));
+	my @files = $storage->getFiles if (defined $storage);
+	my $maxFiles = $self->get('maxAttachments') - scalar(@files);
+	if ($maxFiles > 0) {
+        	$self->session->style->setScript($self->session->config->get("extrasURL").'/FileUploadControl.js',{type=>"text/javascript"});
+        	$uploadControl = '<script type="text/javascript">
+                	var fileIcons = new Array();
+                	';
+        	opendir(DIR,$self->session->config->get("extrasPath").'/fileIcons');
+        	my @icons = readdir(DIR);
+        	closedir(DIR);
+        	foreach my $file (@icons) {
+                	unless ($file eq "." || $file eq "..") {
+                        	my $ext = $file;
+	                        $ext =~ s/(.*?)\.gif/$1/;
+        	                $uploadControl .= 'fileIcons["'.$ext.'"] = "'.$self->session->config->get("extrasURL").'/fileIcons/'.$file.'";'."\n";
+                	}
+        	}
+        	$uploadControl .= sprintf q!var uploader = new FileUploadControl("%s", fileIcons, "%s","%d");
+        	uploader.addRow();
+        	</script>!, $self->get("name"), $i18n->get("removeLabel"), $maxFiles;
+		$uploadControl .= WebGUI::Form::Hidden->new($self->session, {-name => $self->privateName('action'), -value => 'upload'})->toHtml()."<br />";
+	}
+	if (scalar(@files)) {
+		foreach my $file (@{$storage->getFiles}) {
+			if ($self->get("deleteFileUrl")) {
+				$uploadControl .= '<p style="display:inline;vertical-align:middle;"><a href="'.$self->get("deleteFileUrl").$file.'">'
+				.'<img src="'.$self->session->icon->_getBaseURL().'delete.gif" style="vertical-align:middle;border: 0px;" alt="x" /></a></p> ';
+			}
+			my $image = $storage->isImage($file) ? $storage->getThumbnailUrl($file) : $storage->getFileIconUrl($file);
+			$uploadControl .= '<p style="display:inline;vertical-align:middle;"><a href="'.$storage->getUrl($file).'">'
+       				.'<img src="'.$image.'" style="vertical-align:middle;border: 0px;" alt="'
+				.$file.'" /> '.$file.'</a></p><br />';
+		}
+	}
+        return $uploadControl;
+}
 
 1;
