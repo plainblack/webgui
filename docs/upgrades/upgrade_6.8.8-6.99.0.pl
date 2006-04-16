@@ -246,7 +246,7 @@ sub updateCs {
 			}, "csworkflow000000000001");
 	my $activity = $workflow->addActivity("WebGUI::Workflow::Activity::GetCsMail","csactivity000000000001");
 	$activity->set("title","Get the mail");	
-	print "\t\tDeleteing old ratings due to new rating system.\n";
+	print "\t\tDeleting old ratings due to new rating system.\n";
 	$session->db->write("delete from Post_rating");
 	$session->db->write("update Post set rating=0");
 }
@@ -565,9 +565,9 @@ sub updateTemplates {
 	my $importNode = WebGUI::Asset->getImportNode($session);
 	my $folder = $importNode->addChild({
 		className=>"WebGUI::Asset::Wobject::Folder",
-		title => "6.9.0 New Templates",
-		menuTitle => "6.9.0 New Templates",
-		url=> "6_9_0_new_templates",
+		title => "7.0.0 New Templates",
+		menuTitle => "7.0.0 New Templates",
+		url=> "7_0_0_new_templates",
 		groupIdView=>"12"
 		});
 	foreach my $file (@files) {
@@ -610,366 +610,6 @@ sub updateTemplates {
 
 #-------------------------------------------------
 sub addEMS {
-        print "\tAdding Event Management System Templates.\n" unless ($quiet);
-
-## Display Template ##
-my $template = <<EOT1;
-<a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a>
-
-<tmpl_if session.var.adminOn>
-        <p><tmpl_var controls></p><br /><br />
-</tmpl_if>
-<tmpl_if canManageEvents>
-   <a href='<tmpl_var manageEvents.url>'><tmpl_var manageEvents.label></a><br />
-</tmpl_if>
-<a href='<tmpl_var managePurchases.url>'><tmpl_var managePurchases.label></a><br />
-<a href="<tmpl_var checkout.url>"><tmpl_var checkout.label></a><br />
-
-<style type="text/css">
-	 
- 
-.datacardtitle {
-	background: #3D5690;
-	color: white;
-	font-family: verdana;
-	font-weight: bold;
-	font-size:13px;
-}
-
-.leftnav{
-	padding: 1px 1px 1px 1px;
-	background: white;
-	color: black;
-	font-family: verdana;
-	font-weight: bold;
-	font-size:11px;
-	border: 2px #3D5690 ridge;
-}
-.leftnavon{
-	padding: 1px 1px 1px 1px;
-	background: yellow;
-	color: black;
-	font-family: verdana;
-	font-weight: bold;
-	font-size:11px;
-	border: 2px #3D5690 ridge;
-}
-.calendartitle {
-	background: #3D5690;
-	color: white;
-	font-family: verdana;
-	font-weight: bold;
-	font-size:11px;
-}
-.filter-select {
-	font-family: verdana;
-	font-size: 10px;
-	font-weight: normal;
-	color: black;
-	width: 105px;
-}
-.compare-select {
-	font-family: verdana;
-	font-size: 10px;
-	font-weight: normal;
-	color: black;
-	width: 76px;
-}
-.filter-text {
-	font-family: verdana;
-	font-size: 10px;
-	font-weight: normal;
-	color: black;
-	width: 114px;
-}
-.smLink {
-   font-family: verdana;
-   font-size: 10px;
-   font-weight: normal;
-   color: blue;
-}
-
-#extendedSearchLayer {display: inline;}
-
-</style>
-
-<script type="text/javascript" src="<tmpl_var ems.wobject.dir>/script/dynamicForms.js"></script>
-<script type="text/javascript">
-   <tmpl_var search.filters.options>   
-   var advanced = 0;
-   var filterCount = 0;
-
-	function setSelectValue(selObj,newValue) {
-		for (var i=0; i<selObj.options.length; i++) {
-			selObj.options[i].selected = (selObj.options[i].value==newValue)?true:false;
-		}
-	}
-	
-   function toggleAdvanced() {
-      var ids = ["cParams","cResults","cSearch"];
-	  var toggle = "";
-	  for (var i = 0; i < ids.length; i++) {
-	     if(advanced == 1) {
-		    toggle = "none";
-		 }
-		 document.getElementById(ids[i]).style.display=toggle;
-	  }
-	  advanced = (advanced == 1)?0:1;
-	  return false;
-   }
-   
-   function toggleTitle(obj) {
-      if (obj.checked) {
-	     document.getElementById('cs_search_title_td').style.display='inline';
-	  } else {
-	     document.getElementById('cs_search_title_td').style.display='none';
-	  }
-   }
-   
-   function openWin (url, name, param) {
-      var newwin = window.open(url, name, param);
-      newwin.focus();
-   }
-   
-   function buildFilterList() {
-      return "Custom Filter";
-   }
-   
-   function stripDelim(value,delim) {
-      value = value.replace(/delim/g,"");
-	  return value;
-   }
-
-	function unset(array, valueToUnset){
-		var output=new Array(0);
-		for(var i in array){
-			if(i==valueToUnset){continue;}
-			output[i]=array[i];
-		}
-		return output;
-	}
-
-</script>
-
-
-
-<div id="basicSearch"<tmpl_if isAdvSearch> style="display:none"</tmpl_if>>
-<tmpl_var basicSearch.formHeader>
-<div style="cursor:pointer" onclick="document.getElementById('basicSearch').style.display='none';document.getElementById('advSearch').style.display='block';" ><a href="#">Switch To Advanced Search</a></div>
-<table width="100%" border="0" padding="8"><tr><td>Search Keywords:</td><td><input name="searchKeywords" /></td></tr></table>
-<tmpl_var search.formSubmit>
-<tmpl_var search.formFooter>
-</div>
-
-<div id="advSearch"<tmpl_unless isAdvSearch> style="display:none"</tmpl_unless>>
-<tmpl_var advSearch.formHeader>
-<div style="cursor:pointer" onclick="document.getElementById('basicSearch').style.display='block';document.getElementById('advSearch').style.display='none';" ><a href="#">Switch To Basic Search</a></div>
-<table width="100%" border="0" padding="8">
-<tbody id="filterbody">
-<tr><td></td></tr>
-</tbody>
-</table>
-<a href="#" onclick="addField();">Add another Filter Field</a>
-<tmpl_var search.formSubmit>
-<tmpl_var search.formFooter>
-<script type="text/javascript">
-   // load autoSearch fields
-   for (var word in filterList) {
-     if (filterList[word]["autoSearch"]) {
-       var compa = addField();
-       setSelectValue(compa,word);
-       changeToType(word,filterCount);
-     }
-   }
-</script>
-
-</div>
-
-<table width="100%" border="0" padding="8">
-<tr><th><tmpl_var name.label></th>
-<th><tmpl_var starts.label></th>
-<th><tmpl_var ends.label></th>
-<th><tmpl_var seats.label></th>
-<th><tmpl_var price.label></th>
-<th><tmpl_var requirement.label></th>
-<th><tmpl_var addToCart.label></th></tr>
-<tmpl_loop events_loop>
-  <tr><td><tmpl_var title>
-  </td><td><tmpl_var startDate.human>
-  </td><td><tmpl_var endDate.human>
-  </td><td><tmpl_var seatsRemaining>
-  </td><td><tmpl_var price>
-  </td><td><tmpl_var requirement>
-  </td><td><tmpl_unless eventIsFull><a href="<tmpl_var purchase.url>"><tmpl_var purchase.label></a><tmpl_else><tmpl_var purchase.label><br /></tmpl_unless>
-  </td></tr>
-</tmpl_loop>
-</table>
-<tmpl_var paginateBar>
-
-EOT1
-
-## Event Template ##
-my $template2 = <<EOT2;
-<h1><tmpl_var title></h1><br>
-<tmpl_var description>&nbsp;<tmpl_var price><br>
-
-<tmpl_unless eventIsFull>
-<a href="<tmpl_var purchase.url>"><tmpl_var purchase.label></a>
-<tmpl_else>
-<tmpl_var purchase.label><br />
-</tmpl_unless>
-max attendees:<tmpl_var maximumAttendees><br />
-seats remaining:<tmpl_var seatsRemaining><br />
-number registered:<tmpl_var numberRegistered><br />
-event full?:<tmpl_var eventIsFull<br />
-EOT2
-
-## Checkout Template ##
-my $template3 = <<EOT3;
-<tmpl_var form.header>
-<table width='100%'>
-<tr><td><tmpl_var message></td></tr>
-
-<tmpl_if chooseSubevents>
- <tmpl_loop subevents_loop>
-  <tr>
-  <td><tmpl_var form.checkBox></td>
-  <td><tmpl_var title></td>
-  <td><tmpl_var description></td>
-  <td><tmpl_var price></td>
-  </tr>
- </tmpl_loop>
-</tmpl_if>
-
-<tmpl_if resolveConflicts>
- <tmpl_loop conflict_loop>
- <tr>
-  <td><tmpl_var form.deleteControl></td>
-  <td><tmpl_var title></td>
-  <td><tmpl_var description></td>
-  <td><tmpl_var price></td>
-  </tr>
- </tmpl_loop>
-</tmpl_if>
-
-<tr><td><tmpl_var form.submit></td></tr>
-</table>
-<tmpl_var form.footer>
-
-<tmpl_if registration>
-  <tmpl_var form.header>
-  <tmpl_var form.message>
-  <tmpl_var form.chooserJS>
-  <table>
-  <tr><td><tmpl_var form.chooser.label></td><td><tmpl_var form.chooser></td></tr>
-  <tr><td><tmpl_var form.firstName.label></td><td><tmpl_var form.firstName></td></tr>
-<tr><td><tmpl_var form.lastName.label></td><td><tmpl_var form.lastName></td></tr>
-<tr><td><tmpl_var form.address.label></td><td><tmpl_var form.address></td></tr>
-<tr><td><tmpl_var form.city.label></td><td><tmpl_var form.city></td></tr>
-<tr><td><tmpl_var form.state.label></td><td><tmpl_var form.state></td></tr>
-<tr><td><tmpl_var form.zipcode.label></td><td><tmpl_var form.zipcode></td></tr>
-<tr><td><tmpl_var form.country.label></td><td><tmpl_var form.country></td></tr>
-<tr><td><tmpl_var form.phoneNumber.label></td><td><tmpl_var form.phoneNumber></td></tr>
-<tr><td><tmpl_var form.email.label></td><td><tmpl_var form.email></td></tr>
-<tr><td rowspan='2' align='center'><tmpl_var form.submit></td></tr>
-</table>
-<tmpl_var form.footer>
-</tmpl_if>
-
-EOT3
-
-## Manage Purchases ##
-my $template4 = <<EOT4;
-<tmpl_if session.var.adminOn>
-        <p><tmpl_var controls></p><br /><br />
-</tmpl_if>
-<h1><tmpl_var managePurchasesTitle></h1>
-<table width='100%'>
-<tr><td><tmpl_var purchaseId.label></td><td><tmpl_var datePurchasedHuman.label></td></tr>
-<tmpl_if purchasesLoop>
-<tmpl_loop purchasesLoop>
-<tr><td><a href="<tmpl_var purchaseUrl>"><tmpl_var purchaseId></td><td><tmpl_var datePurchasedHuman></td></tr>
-</tmpl_loop>
-<tmpl_else>
-<tr><td><tmpl_var noPurchasesMessage></td></tr>
-</tmpl_if>
-</table>
-
-EOT4
-
-## View Purchase ##
-my $template5 = <<EOT5;
-<tmpl_if session.var.adminOn>
-        <p><tmpl_var controls></p><br /><br />
-</tmpl_if>
-<h1><tmpl_var viewPurchaseTitle></h1>
-<tmpl_if canReturn><a href="<tmpl_var returnPurchaseUrl>"><tmpl_var returnPurchaseLabel></a></tmpl_if>
-
-<table width="100%">
-<tr><td><tmpl_var badgeNameLabel></td><td><tmpl_var eventTitle.label></td><td><tmpl_var eventDates.label></td><tmpl_if canReturn><td><tmpl_var returnButton.label></td></tmpl_if></tr></tr><td>
-<tmpl_var registration.firstName> <tmpl_var registrationLastName>
-</td>
-<tmpl_loop registrationLoop>
-<tr><td><tmpl_var registration.title></td><td><tmpl_var registration.startDateHuman> - <tmpl_var registration.endDateHuman></td><tmpl_if canReturn><td><a href="<tmpl_var registration.returnUrl>"><tmpl_var registration.returnLabel></a></td></tmpl_if></tr>
-</tmpl_loop>
-<tmpl_if registration.canAddEvents><tr colspan="<tmpl_if canReturn>3<tmpl_else>2</tmpl_if>"><td><a href="<tmpl_var registration.addEventsUrl>"><tmpl_var addEventsLabel></a></td></tr></tmpl_if>
-</table>
-
-EOT5
-
-## End Templates
-
-        my $in = WebGUI::Asset->getImportNode($session);
-        $in->addChild({
-                 className=>'WebGUI::Asset::Template',
-                 template=>$template,
-		title=>'Default Event Management System',
-		menuTitle=>'Default Event Management System',
-		url=>'default-ems-template',
-                 namespace=>'EventManagementSystem',
-                 }, "EventManagerTmpl000001"
-        );
-        
-        $in->addChild({
-        	className=>'WebGUI::Asset::Template',
-        	template=>$template2,
-		title=>'Default Event Management System Product',
-		menuTitle=>'Default Event Management System Product',
-		url=>'default-ems-product-template',
-        	namespace=>'EventManagementSystem_product',
-        	}, "EventManagerTmpl000002"
-	);
-	
-	$in->addChild({
-		className=>'WebGUI::Asset::Template',
-		title=>'Default Event Management System Checkout',
-		menuTitle=>'Default Event Management System Checkout',
-		url=>'default-ems-checkout-template',
-		template=>$template3,
-		namespace=>'EventManagementSystem_checkout',
-		}, "EventManagerTmpl000003"
-	);
-
-	$in->addChild({
-		className=>'WebGUI::Asset::Template',
-		title=>'Default Event Management System Manage Purchases',
-		menuTitle=>'Default Event Management System Manage Purchases',
-		url=>'default-ems-manage-purchases-template',
-		template=>$template4,
-		namespace=>'EventManagementSystem_managePurchas',
-		}, "EventManagerTmpl000004"
-	);
-
-	$in->addChild({
-		className=>'WebGUI::Asset::Template',
-		title=>'Default Event Management System View Purchase',
-		menuTitle=>'Default Event Management System View Purchase',
-		url=>'default-ems-manage-view-purchase',
-		template=>$template5,
-		namespace=>'EventManagementSystem_viewPurchase',
-		}, "EventManagerTmpl000005"
-	);
-	print "\t Creating Event Management System tables.\n" unless ($quiet);
 
 my $sql1 = <<SQL1;
 
@@ -1008,6 +648,7 @@ create table EventManagementSystem_registrations (
  productId varchar(22) binary,
  purchaseId varchar(22) binary,
  badgeId varchar(22) binary,
+ returned tinyint default 0,
  primary key(registrationId))
 SQL3
 
@@ -1086,15 +727,15 @@ primary key(badgeId)
 )
 SQL9
 
-        $session->db->write($sql1);
-        $session->db->write($sql2);
-        $session->db->write($sql3);
-        $session->db->write($sql4);
-        $session->db->write($sql5);
-        $session->db->write($sql6);
-        $session->db->write($sql7);
-        $session->db->write($sql8);
-        $session->db->write($sql9);
+	$session->db->write($sql1);
+	$session->db->write($sql2);
+	$session->db->write($sql3);
+	$session->db->write($sql4);
+	$session->db->write($sql5);
+	$session->db->write($sql6);
+	$session->db->write($sql7);
+	$session->db->write($sql8);
+	$session->db->write($sql9);
 }
 
 #-------------------------------------------------
