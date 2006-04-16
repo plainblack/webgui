@@ -693,6 +693,30 @@ sub getEventMetaDataFields {
 	return \%hash;
 }
 
+#------------------------------------------------------------------
+
+sub getBadgeSelector {
+	my $self = shift;
+	my $output;
+	my $i18n = WebGUI::International->new($self->session, 'Asset_EventManagementSystem');
+	my $selfName = ($self->session->var->get('userId') ne '1') ? $self->session->user->profileField('firstName').' '.$self->session->user->profileField('lastName') : $i18n->get('create a badge for myself');
+	my %options;
+	tie %options, 'Tie::IxHash';
+	%options = (
+		'thisIsI' => $selfName,
+		'new' => $i18n->get('create a new badge')
+	);
+	my $isAdmin = $self->session->user->isInGroup($self->get("groupToAddEvents"));
+	
+	my $badges = $self->session->db->buildHashRef("select badgeId, CONCAT(lastName,' ',firstName) from EventManagementSystem_badges order by lastName");
+	%options = (%options,%{$badges});
+	$output .= WebGUI::Form::selectBox($self->session,{
+		name => 'badgeId',
+		options => \%options,
+	});
+	
+	return $output;
+}
 
 #------------------------------------------------------------------
 
@@ -801,6 +825,7 @@ sub getRegistrationInfo {
 	$var{'form.country.label'} = "Country";
 	$var{'form.phoneNumber.label'} = "Phone Number";
 	$var{'form.email.label'} = "Email Address";
+	$var{'form.badgeId.label'} = "Which Badge";
 	$var{'form.firstName'} = WebGUI::Form::Text($self->session,{name=>'firstName'});
 	$var{'form.lastName'} = WebGUI::Form::Text($self->session,{name=>'lastName'});
 	$var{'form.address'} = WebGUI::Form::Text($self->session,{name=>'address'});
@@ -1635,50 +1660,54 @@ sub www_manageEvents {
 	my $self = shift;
 
 	return $self->session->privilege->insufficient unless ($self->session->user->isInGroup($self->get("groupToAddEvents")));
-
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
+	
 	my $output;
 	my $sth = $self->session->db->read("select p.productId, p.title, p.price, pe.approved from products as p, 
 				EventManagementSystem_products as pe where p.productId = pe.productId
 				and pe.assetId=? order by sequenceNumber", [$self->get("assetId")]);
 	
+	if ($sth->rows) {
 	$output = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl}).WebGUI::Form::hidden($self->session,{name=>"func",value=>"approveEvents"});
-	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
-	$output .= sprintf "<table width='100%'><tr><th>%s</th><th>%s</th><th>%s</th></tr>",
-				$i18n->get('event'),
-				$i18n->get('add/edit event price'),
-				$self->canApproveEvents 
-					? $i18n->get('approval')
-					: $i18n->get('status');
-	while (my %row = $sth->hash) {
-		
-		$output .= "<tr><td>";
-		$output .= $self->session->icon->delete('func=deleteEvent;pid='.$row{productId}, $self->getUrl,
-						       $i18n->get('confirm delete event')).
-			  $self->session->icon->edit('func=editEvent;pid='.$row{productId}, $self->getUrl).
-			  $self->session->icon->moveUp('func=moveEventUp;pid='.$row{productId}, $self->getUrl).
-			  $self->session->icon->moveDown('func=moveEventDown;pid='.$row{productId}, $self->getUrl).
-			  " ".$row{title}."</td><td>".$row{price}."</td><td>";
-		
-		unless ($self->canApproveEvents) {
-			if ($row{approved} == 0) {
-				$output .= $i18n->get('pending');
+		$output .= sprintf "<table width='100%'><tr><th>%s</th><th>%s</th><th>%s</th></tr>",
+					$i18n->get('event'),
+					$i18n->get('add/edit event price'),
+					$self->canApproveEvents 
+						? $i18n->get('approval')
+						: $i18n->get('status');
+		while (my %row = $sth->hash) {
+			
+			$output .= "<tr><td>";
+			$output .= $self->session->icon->delete('func=deleteEvent;pid='.$row{productId}, $self->getUrl,
+							       $i18n->get('confirm delete event')).
+				  $self->session->icon->edit('func=editEvent;pid='.$row{productId}, $self->getUrl).
+				  $self->session->icon->moveUp('func=moveEventUp;pid='.$row{productId}, $self->getUrl).
+				  $self->session->icon->moveDown('func=moveEventDown;pid='.$row{productId}, $self->getUrl).
+				  " ".$row{title}."</td><td>".$row{price}."</td><td>";
+			
+			unless ($self->canApproveEvents) {
+				if ($row{approved} == 0) {
+					$output .= $i18n->get('pending');
+				} else {
+					$output .= $i18n->get('approved');
+				}
 			} else {
-				$output .= $i18n->get('approved');
+				$output .= WebGUI::Form::checkbox($self->session,{
+					-name => 'eventId',
+					-checked => $row{approved},
+					-value => $row{productId}
+				}).WebGUI::Form::hidden($self->session,{
+					-name => 'eventIdToCheck',
+					-value => $row{productId}
+				});
 			}
-		} else {
-			$output .= WebGUI::Form::checkbox($self->session,{
-				-name => 'eventId',
-				-checked => $row{approved},
-				-value => $row{productId}
-			}).WebGUI::Form::hidden($self->session,{
-				-name => 'eventIdToCheck',
-				-value => $row{productId}
-			});
+			$output .= "</td></tr>";
 		}
-		$output .= "</td></tr>";
+		$output .= '<tr><td>&nbsp;</td><td>&nbsp;</td><td>'.WebGUI::Form::submit($self->session,{-value=>$i18n->get('save approvals')}).'</td></tr>' if $self->canApproveEvents;
+		$output .= "</table>".WebGUI::Form::formFooter($self->session);
+	} else {
+		$output .= $i18n->get('you do not have any events to display');
 	}
-	$output .= '<tr><td>&nbsp;</td><td>&nbsp;</td><td>'.WebGUI::Form::submit($self->session,{-value=>$i18n->get('save approvals')}).'</td></tr>' if $self->canApproveEvents;
-	$output .= "</table>".WebGUI::Form::formFooter($self->session);
 	
 	$self->getAdminConsole->setHelp('event management system manage events','Asset_EventManagementSystem');
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editEvent;pid=new'), $i18n->get('add event'));
@@ -1705,15 +1734,19 @@ sub www_manageEventMetadata {
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my $count = 0;
 	my $number = scalar(@{$metadataFields});
-	foreach my $row1 (@{$metadataFields}) {
-		my %row = %{$row1};
-		$count++;
-		$output .= "<div>".
-		$self->session->icon->delete('func=deleteEventMetaDataField;fieldId='.$row{fieldId},$self->getUrl,$i18n->get('confirm delete event metadata')).
-		$self->session->icon->edit('func=editEventMetaDataField;fieldId='.$row{fieldId}, $self->getUrl).
-		$self->session->icon->moveUp('func=moveEventMetaDataFieldUp;fieldId='.$row{fieldId}, $self->getUrl,($count == 1)?1:0);
-		$output .= $self->session->icon->moveDown('func=moveEventMetaDataFieldDown;fieldId='.$row{fieldId}, $self->getUrl,($count == $number)?1:0).
-		" ".$row{name}." ( ".$row{label}." )</div>";
+	if ($number) {
+		foreach my $row1 (@{$metadataFields}) {
+			my %row = %{$row1};
+			$count++;
+			$output .= "<div>".
+			$self->session->icon->delete('func=deleteEventMetaDataField;fieldId='.$row{fieldId},$self->getUrl,$i18n->get('confirm delete event metadata')).
+			$self->session->icon->edit('func=editEventMetaDataField;fieldId='.$row{fieldId}, $self->getUrl).
+			$self->session->icon->moveUp('func=moveEventMetaDataFieldUp;fieldId='.$row{fieldId}, $self->getUrl,($count == 1)?1:0);
+			$output .= $self->session->icon->moveDown('func=moveEventMetaDataFieldDown;fieldId='.$row{fieldId}, $self->getUrl,($count == $number)?1:0).
+			" ".$row{name}." ( ".$row{label}." )</div>";
+		}
+	} else {
+		$output .= $i18n->get('you do not have any metadata fields to display');
 	}
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editEventMetaDataField;fieldId=new'), $i18n->get("add new event metadata field"));
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEvents'), $i18n->get('manage events'));
@@ -1744,7 +1777,7 @@ sub www_managePurchases {
 		
 		push(@purchasesLoop,$purchase);
 	}
-	$var{managePurchasesTitle} = 'Manage Purchases';
+	$var{managePurchasesTitle} = $i18n->get('manage purchases');
 	$sth->finish;
 	$var{'purchasesLoop'} = \@purchasesLoop;
 	return $self->session->style->process($self->processTemplate(\%var,$self->getValue("managePurchasesTemplateId")),$self->getValue("styleTemplateId"));
@@ -1779,7 +1812,7 @@ sub www_viewPurchase {
 		
 		push(@purchasesLoop,$purchase);
 	}
-	$var{managePurchasesTitle} = 'Manage Purchases';
+	$var{managePurchasesTitle} = $i18n->get('manage purchases');
 	$sth->finish;
 	$var{'purchasesLoop'} = \@purchasesLoop;
 	return $self->session->style->process($self->processTemplate(\%var,$self->getValue("managePurchasesTemplateId")),$self->getValue("styleTemplateId"));
@@ -2033,7 +2066,7 @@ sub www_saveRegistration {
 	my $self = shift;
 	my $eventsInCart = $self->getEventsInScratchCart;
 	my $purchaseId = $self->session->id->generate;
-	my ($myBadgeId) = $self->session->db->quickArray("select badgeId from EventManagementSystem_badges where userId=",[$self->session->user->userId]);
+	my ($myBadgeId) = $self->session->db->quickArray("select badgeId from EventManagementSystem_badges where userId=?",[$self->session->user->userId]);
 	$myBadgeId ||= "new"; # if there is no badge for this user yet, have setCollateral create one, assuming thisIsI.
 	my $theirBadgeId = $self->session->form->get('badgeId') || "new";
 	  # ^ if this is "new", the person is not currently logged in, so they 
@@ -2074,7 +2107,7 @@ sub www_saveRegistration {
 			badgeId => $badgeId
 		},0,0);
 	}
-	my ($theirUserId) = $self->session->db->quickArray("select userId from EventManagementSystem_badges where badgeId=",[$badgeId]);
+	my ($theirUserId) = $self->session->db->quickArray("select userId from EventManagementSystem_badges where badgeId=?",[$badgeId]);
 	$userId = $theirUserId unless $thisIsI;
 	if ($userId) {
 		my $u = WebGUI::User->new($self->session,$userId);
