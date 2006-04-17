@@ -2448,7 +2448,7 @@ sub view {
 			}
 		}
 		foreach (keys %reqHash) {
-			$shouldPush = 0 unless isIn(keys(%{$requiredList}),$_);
+			$shouldPush = 0 unless isIn(@{$requiredList},$_);
 		}
 		push(@results,$data) if $shouldPush;
 	}
