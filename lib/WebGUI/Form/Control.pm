@@ -596,10 +596,11 @@ Renders the form field to HTML as a table row complete with labels, subtext, hov
 sub toHtmlWithWrapper {
 	my $self = shift;
 	if ($self->passUiLevelCheck) {
+		my $rawField = $self->toHtml(); # has to be called before prepareWrapper for some controls, namely captcha.
 		my ($fieldClass, $rowClass, $labelClass, $hoverHelp, $subtext)  = $self->prepareWrapper;
 		return '<tr'.$rowClass.'>
 				<td'.$labelClass.$hoverHelp.' valign="top" style="width: 180px;"><label for="'.$self->get("id").'">'.$self->get("label").'</label></td>
-				<td valign="top"'.$fieldClass.' style="width: *;">'.$self->toHtml().$subtext."</td>
+				<td valign="top"'.$fieldClass.' style="width: *;">'.$rawField.$subtext."</td>
 			</tr>\n";
 	} else {
 		return $self->toHtmlAsHidden;
