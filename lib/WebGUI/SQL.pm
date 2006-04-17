@@ -795,7 +795,7 @@ sub write {
 	my $sql = shift;
 	my $params = shift;
 	my $sth = $self->prepare($sql);
-	$sth->execute($params);
+	$sth->execute(@$params);
 }
 
 
