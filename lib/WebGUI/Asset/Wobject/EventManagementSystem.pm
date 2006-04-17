@@ -1115,8 +1115,8 @@ sub verifyAllPrerequisites {
 	return [] unless $lastResultsSize;
 	until ($currentResultsSize == $lastResultsSize) {
 		$currentResultsSize = $lastResultsSize;
-		my $newMsgLoop = [];
-		($lastResults,$newMsgLoop) = {%$lastResults,%{$self->verifyEventPrerequisites($lastResults,1)}};
+		my (%hashTemp,$newMsgLoop) = %{$self->verifyEventPrerequisites($lastResults,1)}
+		$lastResults = {%$lastResults,%hashTemp};
 		foreach my $newMsg (@$newMsgLoop) {
 			my $add = 1;
 			foreach my $oldMsg (@$msgLoop) {
