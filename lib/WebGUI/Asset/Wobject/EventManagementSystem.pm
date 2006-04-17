@@ -747,7 +747,7 @@ sub getBadgeSelector {
 		$badges = $self->session->db->buildHashRef("select badgeId, CONCAT(lastName,', ',firstName) from EventManagementSystem_badges order by lastName");
 	} else {
 		#badges we have purchased.
-		$badges = $self->session->db->buildHashRef("select b.badgeId, CONCAT(b.lastName,', ',b.firstName) from EventManagementSystem_badges as b, EventManagementSystem_registrations as r, transaction as t, EventManagementSystem_purchases as p where (p.transactionId=t.transactionId and p.purchaseId=r.purchaseId and b.badgeId=r.badgeId and t.userId='".$self->session->var->get('userId')."') or b.userId='".$self->session->var->get('userId')."' order by b.lastName");
+		$badges = $self->session->db->buildHashRef("select b.badgeId, CONCAT(b.lastName,', ',b.firstName) from EventManagementSystem_badges as b, EventManagementSystem_registrations as r, transaction as t, EventManagementSystem_purchases as p where (p.transactionId=t.transactionId and p.purchaseId=r.purchaseId and b.badgeId=r.badgeId and t.userId='".$self->session->var->get('userId')."') or b.userId='".$self->session->var->get('userId')."' or b.createdByUserId='".$self->session->var->get('userId')."' order by b.lastName");
 	}
 	my $js;
 	my %badgeJS;
@@ -2187,7 +2187,7 @@ sub www_saveRegistration {
 	my $self = shift;
 	my $eventsInCart = $self->getEventsInScratchCart;
 	my $purchaseId = $self->session->id->generate;
-	my ($myBadgeId) = $self->session->db->quickArray("select badgeId from EventManagementSystem_badges where userId=?",[$self->session->user->userId]);
+	my ($myBadgeId) = $self->session->db->quickArray("select badgeId from EventManagementSystem_badges where userId=?",[$self->session->var->get('userId')]);
 	$myBadgeId ||= "new"; # if there is no badge for this user yet, have setCollateral create one, assuming thisIsI.
 	my $theirBadgeId = $self->session->form->get('badgeId') || "new";
 	  # ^ if this is "new", the person is not currently logged in, so they 
@@ -2205,6 +2205,7 @@ sub www_saveRegistration {
 	my $country = $self->session->form->get("country", "selectBox");
 	my $phoneNumber = $self->session->form->get("phone", "phone");
 	my $email = $self->session->form->get("email", "email");
+	my $addingNew = ($badgeId eq 'new') ? 1 : 0;
 	my $details = {
 		badgeId => $badgeId, # if this is "new", setCollateral will return the new one.
 		firstName       => $firstName,
@@ -2218,6 +2219,7 @@ sub www_saveRegistration {
 		email		 => $email
 	};
 	$details->{userId} = $userId if $userId;
+	$details->{createdByUserId} = $self->session->var->get('userId') if $addingNew;
 	$badgeId = $self->setCollateral("EventManagementSystem_badges", "badgeId",$details,0,0);
 	
 	my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
