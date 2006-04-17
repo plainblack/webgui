@@ -339,7 +339,13 @@ sub query {
 	my $query = shift;
 	my $placeholders = shift;
 	$self->{_queryCount}++;
-	my $plac = scalar(@{$placeholders}) ? "\n&nbsp;&nbsp;with placeholders:&nbsp;&nbsp;['".join("', '",@{$placeholders})."']" : '';
+	my $plac;
+	if (defined $placeholders and ref $placeholders eq "ARRAY") {
+		$plac = "\n&nbsp;&nbsp;with placeholders:&nbsp;&nbsp;['".join("', '",@{$placeholders})."']";
+	}
+	else {
+		$plac = '';
+	}
 	$self->debug("query  ".$self->{_queryCount}.':  '.$query.$plac);
 }
 
