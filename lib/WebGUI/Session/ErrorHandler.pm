@@ -340,7 +340,7 @@ sub query {
 	my $placeholders = shift;
 	$self->{_queryCount}++;
 	my $plac;
-	if (defined $placeholders and ref $placeholders eq "ARRAY") {
+	if (defined $placeholders and ref $placeholders eq "ARRAY" && scalar(@{$placeholders})) {
 		$plac = "\n&nbsp;&nbsp;with placeholders:&nbsp;&nbsp;['".join("', '",@{$placeholders})."']";
 	}
 	else {
