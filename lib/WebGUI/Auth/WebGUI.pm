@@ -173,7 +173,7 @@ sub createAccount {
 	if ($vars->{useCaptcha}) {
 		use WebGUI::Form::Captcha;
 		my $captcha = WebGUI::Form::Captcha->new($self->session,{"name"=>"authWebGUI.captcha"});
-   		$vars->{'create.form.captcha'} = '<span class="formSubtext">'.$captcha->get('subtext').'</span>';
+   		$vars->{'create.form.captcha'} = $captcha->toHtml.'<span class="formSubtext">'.$captcha->get('subtext').'</span>';
    		$vars->{'create.form.captcha.label'} = $i18n->get("captcha label","AuthWebGUI");
 	}
    $vars->{'create.form.username'} = WebGUI::Form::text($self->session,{"name"=>"authWebGUI.username","value"=>$self->session->form->process("authWebGUI.username")});
