@@ -747,7 +747,7 @@ sub getBadgeSelector {
 		$badges = $self->session->db->buildHashRef("select badgeId, CONCAT(lastName,', ',firstName) from EventManagementSystem_badges order by lastName");
 	} else {
 		#badges we have purchased.
-		$badges = $self->session->db->buildHashRef("select b.badgeId, CONCAT(b.lastName,', ',b.firstName) from EventManagementSystem_badges as b, EventManagementSystem_registrations as r, transaction as t, EventManagementSystem_purchases as p where (p.transactionId=t.transactionId and p.purchaseId=r.purchaseId and b.badgeId=r.badgeId and t.userId='".$self->session->var->get('userId')."') or b.userId='".$self->session->var->get('userId')."' or b.createdByUserId='".$self->session->var->get('userId')."' order by b.lastName");
+		$badges = $self->session->db->buildHashRef("select b.badgeId, CONCAT(b.lastName,', ',b.firstName) from EventManagementSystem_badges as b where b.userId='".$self->session->var->get('userId')."' or b.createdByUserId='".$self->session->var->get('userId')."' order by b.lastName");
 	}
 	my $js;
 	my %badgeJS;
