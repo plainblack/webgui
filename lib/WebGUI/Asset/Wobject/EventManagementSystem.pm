@@ -613,6 +613,17 @@ sub getEventsInScratchCart {
 }
 
 #------------------------------------------------------------------
+sub getEventName {
+	my $self = shift;
+	my $eventId = shift;
+	
+	my ($eventName) = $self->session->db->quickArray("select title from products where productId=?",[$eventId]);
+	
+	return $eventName;
+}
+
+
+#------------------------------------------------------------------
 
 =head2 getPrerequisiteEventList ( eventId )
 
@@ -941,7 +952,8 @@ sub getSubEvents {
 	my @subEventData;
 #	my $eventsInCart = $self->getEventsInCart;
 	my $eventsInCart = $self->getEventsInScratchCart;
-	
+	use Data::Dumper;
+	$self->session->errorHandler->warn("getsubevents: <pre>".Dumper($eventIds)."</pre>");
 	foreach my $eventId (@$eventIds) {
 	
 		$subEvents = $self->findSubEvents($eventId);	
@@ -1085,7 +1097,7 @@ sub resolveConflictForm {
 #------------------------------------------------------------------
 sub verifyAllPrerequisites {
 	my $self = shift;
-	
+	use Data::Dumper;
 	#start with the events in the scratch cart.  See if all prerequisites are met	
 	my $lastResults = $self->verifyEventPrerequisites($self->getEventsInScratchCart);
 	my @allResults;
@@ -1094,16 +1106,19 @@ sub verifyAllPrerequisites {
 			foreach (@$lastResults) {
 				push(@allResults, $_);
 			}
+			$self->session->errorHandler->warn("lastResults 1: <pre>".Dumper($lastResults)."<pre>");
+	
 			#Run the check again this time on the events that were reported before as required
 			#This recursive checking allows us to list every required event to attend the events
 			#the user has selected up to this point all the way up the tree.
-
 			$lastResults = $self->verifyEventPrerequisites($lastResults->{'missingEventIds'});
 		}
 		else { #To a point where no prerequisites were reported
 			last;
 		}
 	}
+	
+	$self->session->errorHandler->warn("verifyAllPrerequisites: <pre>".Dumper(@allResults)."<pre>");
 	return \@allResults;
 }
 
@@ -1139,7 +1154,7 @@ sub verifyEventPrerequisites {
 				}
 				
 				my $missingEventNames = $self->getRequiredEventNames($prerequisiteId);
-				my $message = "$eventId requires: ";
+				my $message = $self->getEventName($eventId)." requires: ";
 				
 				foreach my $missingEventName (@$missingEventNames) {
 					$message .= "$missingEventName $operator ";
@@ -1160,13 +1175,67 @@ sub verifyEventPrerequisites {
 sub verifyPrerequisitesForm {
 	my $self = shift;
 	my $missingEventData = $self->verifyAllPrerequisites;
+	my @message_loop;
+	my @selectedEvents_loop;
+	my @missingEvents_loop;
+	my @usedEventIds;
+	my @missingEventData_loop;
+	my @eventData_loop;
+	my $scratchCart = $self->getEventsInScratchCart;
 	my %var;
-	
+
 	#If there is no missing event data, return nothing
 	return if (scalar(@$missingEventData) == 0);
+
+	my $i18n = WebGUI::International->new($self->session, 'Asset_EventManagementSystem');
 	
+	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
+			     .WebGUI::Form::hidden($self->session,{name=>"func",value=>"addToCart"})
+			     .WebGUI::Form::hidden($self->session,{name=>"method",value=>"addSubEvents"}
+	);
+
+	$var{'form.footer'} = WebGUI::Form::formFooter($self->session);
+	$var{'form.submit'} = WebGUI::Form::Submit($self->session);
+	$var{'message'}	    = "Some of the events you have selected require attendance of another event.  Please satisfy prerequisites from the list below.";	
+		
 	#Set the template vars needed to inform the user of the missing prereqs.
 	$var{'prereqsAreMissing'} = 1;
+	
+	foreach my $data (@$missingEventData) {
+		push (@message_loop, { 'prereq_message' => $data->{'message'} });
+		
+		# Get the details for each event that could be used to fix this prereq problem
+		foreach my $eventId (@{$data->{'missingEventIds'}}) {
+			my $missingEventData = $self->session->db->read("
+				select productId, title, price, description
+				from products
+				where
+				productId = ".$self->session->db->quote($eventId)."
+				and productId not in (".$self->session->db->quoteAndJoin($scratchCart).")"
+			);
+			push(@missingEventData_loop, $missingEventData);
+		}
+
+		foreach my $eventData (@missingEventData_loop) {
+			while (my $eventData = $eventData->hashRef) {
+
+				# Track used event ids so we can prevent listing a subevent more than once.
+				next if (isIn($eventData->{productId}, @usedEventIds));
+				push (@usedEventIds, $eventData->{productId});
+	   
+				push(@eventData_loop, {
+					'form.checkBox' => WebGUI::Form::checkbox($self->session, {
+						value => $eventData->{productId},
+				                name  => "subEventPID"}),
+					'title'		=> $eventData->{title},
+					'description'	=> $eventData->{description},
+					'price'		=> $eventData->{price}
+				});
+			}
+		}
+	}
+	$var{'message_loop'} = \@message_loop;
+	$var{'missingEvents_loop'} = \@eventData_loop;
 	
 	return \%var;	
 }
@@ -1259,8 +1328,9 @@ sub www_addToCart {
 		# Check to make sure all the prerequisites for this event have been satisfied
 		$output = $self->verifyPrerequisitesForm;
 
-		$output = $self->getSubEventForm(\@pids) unless ($output);
-	
+		#$output = $self->getSubEventForm(\@pids) unless ($output);
+		$output = $self->getSubEventForm($self->getEventsInScratchCart) unless ($output);
+		
 		$errors = $self->checkConflicts;
 		if (scalar(@$errors) > 0) { return $self->error($errors, "www_addToCart"); }
 		
