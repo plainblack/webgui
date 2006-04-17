@@ -226,10 +226,10 @@ sub addToScratchCart {
 	my $self = shift;
 	my $event = shift;
 
-	my @eventsInCart = split("\n",$self->session->scratch->get('EMS_scratch_cart'));
+	my @eventsInCart = split("::",$self->session->scratch->get('EMS_scratch_cart'));
 	push(@eventsInCart, $event) unless isIn($event,@eventsInCart);
 
-	$self->session->scratch->set('EMS_scratch_cart', join("\n", @eventsInCart));
+	$self->session->scratch->set('EMS_scratch_cart', join("::", @eventsInCart));
 }
 
 #-------------------------------------------------------------------
@@ -608,7 +608,7 @@ sub getEventsInCart {
 #------------------------------------------------------------------
 sub getEventsInScratchCart {
 	my $self = shift;
-	my @eventsInCart = split("\n",$self->session->scratch->get('EMS_scratch_cart'));
+	my @eventsInCart = split("::",$self->session->scratch->get('EMS_scratch_cart'));
 	return \@eventsInCart;
 }
 
@@ -1052,7 +1052,7 @@ sub removeFromScratchCart {
 	foreach (@{$events}) {
 		push (@newArr,$_) unless $_ eq $event;
 	}
-	$self->session->scratch->set('EMS_scratch_cart', join("\n",@newArr));
+	$self->session->scratch->set('EMS_scratch_cart', join("::",@newArr));
 }
 
 #------------------------------------------------------------------
