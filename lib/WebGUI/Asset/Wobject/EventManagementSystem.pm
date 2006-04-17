@@ -229,6 +229,7 @@ sub addToScratchCart {
 	my @eventsInCart = split("::",$self->session->scratch->get('EMS_scratch_cart'));
 	push(@eventsInCart, $event) unless isIn($event,@eventsInCart);
 
+	$self->session->scratch->delete('EMS_scratch_cart');
 	$self->session->scratch->set('EMS_scratch_cart', join("::", @eventsInCart));
 }
 
