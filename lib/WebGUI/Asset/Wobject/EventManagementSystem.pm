@@ -1020,6 +1020,9 @@ sub getSubEventForm {
 	   });
 	 }
 	}
+	
+	return '' unless scalar(@subEventLoop);
+	
 	my $scratchCart = [split("\n",$self->session->scratch->get('EMS_scratch_cart'))];
 	
 	foreach (@$scratchCart) {
@@ -1040,7 +1043,7 @@ sub getSubEventForm {
 	$var{'subevents_loop'} = \@subEventLoop;
 	$var{'chooseSubevents'} = 1;
 	my $output;
-	$output = \%var if (scalar (@subEventLoop) > 0);
+	$output = \%var if scalar(@subEventLoop);
 	
 	return $output;	
 }
