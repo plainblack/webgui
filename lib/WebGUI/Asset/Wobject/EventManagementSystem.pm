@@ -302,7 +302,7 @@ sub checkConflicts {
 #	my $eventsInCart = $self->getEventsInCart;
 	my $eventsInCart = $self->getEventsInScratchCart;
 	use Data::Dumper;
-	$self->session->errorHandler->warn(Dumper($eventsInCart));
+	# $self->session->errorHandler->warn(Dumper($eventsInCart));
 	my @schedule;
 	
 	# Get schedule info for events in cart and sort asc by start date
@@ -953,7 +953,7 @@ sub getSubEvents {
 #	my $eventsInCart = $self->getEventsInCart;
 	my $eventsInCart = $self->getEventsInScratchCart;
 	use Data::Dumper;
-	$self->session->errorHandler->warn("getsubevents: <pre>".Dumper($eventIds)."</pre>");
+	# $self->session->errorHandler->warn("getsubevents: <pre>".Dumper($eventIds)."</pre>");
 	foreach my $eventId (@$eventIds) {
 	
 		$subEvents = $self->findSubEvents($eventId);	
@@ -1099,93 +1099,130 @@ sub verifyAllPrerequisites {
 	my $self = shift;
 	use Data::Dumper;
 	#start with the events in the scratch cart.  See if all prerequisites are met	
-	my $lastResults = $self->verifyEventPrerequisites($self->getEventsInScratchCart);
-	my @allResults;
-	while (1) { #loop forever until we break out	
-		if (scalar(@$lastResults) > 0) {  #we have missing prerequisites
-			foreach (@$lastResults) {
-				push(@allResults, $_);
-			}
-			$self->session->errorHandler->warn("lastResults 1: <pre>".Dumper($lastResults)."<pre>");
-	
-			#Run the check again this time on the events that were reported before as required
-			#This recursive checking allows us to list every required event to attend the events
-			#the user has selected up to this point all the way up the tree.
-			$lastResults = $self->verifyEventPrerequisites($lastResults->{'missingEventIds'});
-		}
-		else { #To a point where no prerequisites were reported
-			last;
-		}
+	my $startingEvents = {};
+	my $scratchEvents = $self->getEventsInScratchCart;
+	foreach (@$scratchEvents) {
+		$startingEvents->{$_} = $self->getEventDetails($_);
+	}
+	my ($lastResults, $msgLoop) = $self->verifyEventPrerequisites($startingEvents,1);
+	my $lastResultsSize = scalar(keys %$lastResults);
+	my $currentResultsSize = -4;
+	return [] unless $lastResultsSize;
+	until ($currentResultsSize == $lastResultsSize) {
+		$currentResultsSize = $lastResultsSize;
+		$lastResults = {%$lastResults,%{$self->verifyEventPrerequisites($lastResults)}};
+		$lastResultsSize = scalar(keys %$lastResults);
 	}
 	
-	$self->session->errorHandler->warn("verifyAllPrerequisites: <pre>".Dumper(@allResults)."<pre>");
-	return \@allResults;
+	my $rowsLoop = [];
+	foreach (keys %$lastResults) {
+		my $details = $lastResults->{$_};
+		push(@$rowsLoop, {
+			'form.checkBox' => WebGUI::Form::checkbox($self->session, {
+				value => $_,
+				name  => "subEventPID"}
+			),
+			'title'		=> $details->{title},
+			'description'	=> $details->{description},
+			'price'		=> $details->{price}
+		});
+	}
+	$self->session->errorHandler->warn("verifyAllPrerequisites: <pre>".Dumper($msgLoop).Dumper($rowsLoop).Dumper($lastResults)."</pre>");
+	return $msgLoop, $rowsLoop;
 }
-
 
 #------------------------------------------------------------------
 sub verifyEventPrerequisites {
 	my $self = shift;
-	my $eventsToCheck = shift;  #array reference of eventIds
-	my @results;
-	
-	foreach my $eventId (@$eventsToCheck) {
-		
-		# Get all prerequisite definitions defined for this event
-		my $prerequisiteDefinitions = $self->session->db->buildHashRef("select prerequisiteId, operator from EventManagementSystem_prerequisites
-										where productId=?",[$eventId]);
-		foreach my $prerequisiteId (keys %{$prerequisiteDefinitions}) {
-			
-			my $operator = $prerequisiteDefinitions->{$prerequisiteId};
-										       
-			# Get the events required for each prerequisite definition (the events required for attending $eventId)
-			my $requiredEvents = $self->session->db->buildArrayRef("select requiredProductId from EventManagementSystem_prerequisiteEvents
-									       where prerequisiteId=?",[$prerequisiteId]);
-
-			unless ($self->prerequisiteIsMet($operator, $requiredEvents)) {
-
-				#compare all the required events to the events in the scratch cart and build a list of the ones
-				#that are required but not currently in the scratch cart.
-				my $scratchCart = $self->getEventsInScratchCart;
-				my @missingEventIds;
-				
-				foreach my $requiredEvent (@$requiredEvents) {
-					push (@missingEventIds, $requiredEvent) unless isIn($requiredEvent, $scratchCart);
-				}
-				
-				my $missingEventNames = $self->getRequiredEventNames($prerequisiteId);
-				my $message = $self->getEventName($eventId)." requires: ";
-				
-				foreach my $missingEventName (@$missingEventNames) {
-					$message .= "$missingEventName $operator ";
-				}
-				
-				$message =~ s/(and\s|or\s)$//;  #remove trailing 'and' or 'or' from the message
-				
-				push(@results, {'missingEventIds' => \@missingEventIds,
-						'message'	  => $message
-						});
-			}
+	my $lastResults = shift;
+	my $returnMsgLoop = shift;
+	my $msgLoop = [];
+	my $newResults = {};
+	foreach (keys %$lastResults) {
+		my ($required,$messageLoop) = $self->getAllPossibleEventPrerequisites($_);
+		# add in any new ones.
+		foreach my $req (@$required) {
+			$newResults->{$req} = $self->getEventDetails($req);
+		}
+		if ($returnMsgLoop) {
+			my $details = $self->getEventDetails($_);
+			push (@$msgLoop,{%$details,messageLoop=>$messageLoop});
 		}
 	}
-	return \@results;
+	return $newResults,$msgLoop if $returnMsgLoop;
+	return $newResults;
 }
+
+#------------------------------------------------------------------
+sub getAllPossibleEventPrerequisites {
+	my $self = shift;
+	my $eventId = shift;
+	my $required = [];
+	my $messageLoop = [];
+	
+	# Get all prerequisite definitions defined for this event
+	my $prerequisiteDefinitions = $self->session->db->buildHashRef("select prerequisiteId, operator from EventManagementSystem_prerequisites
+									where productId=?",[$eventId]);
+	foreach my $prerequisiteId (keys %{$prerequisiteDefinitions}) {
+		my $message;
+		my $operator = $prerequisiteDefinitions->{$prerequisiteId};
+									       
+		# Get the events required for each prerequisite definition (the events required for attending $eventId)
+		my $requiredEvents = $self->session->db->buildArrayRef("select requiredProductId from EventManagementSystem_prerequisiteEvents
+								       where prerequisiteId=?",[$prerequisiteId]);
+
+		unless ($self->prerequisiteIsMet($operator, $requiredEvents)) {
+
+			#compare all the required events to the events in the scratch cart and build a list of the ones
+			#that are required but not currently in the scratch cart.
+			my $scratchCart = $self->getEventsInScratchCart;
+			my @missingEventIds;
+			
+			foreach my $requiredEvent (@$requiredEvents) {
+				push (@missingEventIds, $requiredEvent) unless isIn($requiredEvent, @$scratchCart);
+			}
+			
+			my $missingEventNames = $self->getRequiredEventNames($prerequisiteId);
+			
+			foreach my $missingEventName (@$missingEventNames) {
+				$message .= "$missingEventName $operator ";
+			}
+			
+			$message =~ s/(\sand\s|\sor\s)$//;  #remove trailing 'and' or 'or' from the message
+			
+			foreach (@missingEventIds) {
+				push(@$required,$_) unless isIn($_,@$required);
+			}
+		}
+		push(@$messageLoop,$message);
+	}	
+	return $required,$messageLoop;
+}
+
+
+#------------------------------------------------------------------
+sub getEventDetails {
+	my $self = shift;
+	my $eventId = shift;
+	return $self->{_eventDetails}{$eventId} if $self->{_eventDetails}{$eventId};
+	$self->{_eventDetails}{$eventId} = $self->session->db->quickHashRef(
+		"select productId, title, price, description from products where productId = ?"
+		,[$eventId]
+	);
+	return $self->{_eventDetails}{$eventId};
+}
+
 
 #------------------------------------------------------------------
 sub verifyPrerequisitesForm {
 	my $self = shift;
-	my $missingEventData = $self->verifyAllPrerequisites;
-	my @message_loop;
-	my @selectedEvents_loop;
-	my @missingEvents_loop;
+	my ($missingEventMessageLoop, $allPrereqsLoop) = $self->verifyAllPrerequisites;
 	my @usedEventIds;
-	my @missingEventData_loop;
-	my @eventData_loop;
 	my $scratchCart = $self->getEventsInScratchCart;
 	my %var;
 
 	#If there is no missing event data, return nothing
-	return if (scalar(@$missingEventData) == 0);
+	return unless scalar(@$missingEventMessageLoop);
 
 	my $i18n = WebGUI::International->new($self->session, 'Asset_EventManagementSystem');
 	
@@ -1200,44 +1237,9 @@ sub verifyPrerequisitesForm {
 		
 	#Set the template vars needed to inform the user of the missing prereqs.
 	$var{'prereqsAreMissing'} = 1;
-	
-	foreach my $data (@$missingEventData) {
-		push (@message_loop, { 'prereq_message' => $data->{'message'} });
-		
-		# Get the details for each event that could be used to fix this prereq problem
-		foreach my $eventId (@{$data->{'missingEventIds'}}) {
-			my $missingEventData = $self->session->db->read("
-				select productId, title, price, description
-				from products
-				where
-				productId = ".$self->session->db->quote($eventId)."
-				and productId not in (".$self->session->db->quoteAndJoin($scratchCart).")"
-			);
-			push(@missingEventData_loop, $missingEventData);
-		}
-
-		foreach my $eventData (@missingEventData_loop) {
-			while (my $eventData = $eventData->hashRef) {
-
-				# Track used event ids so we can prevent listing a subevent more than once.
-				next if (isIn($eventData->{productId}, @usedEventIds));
-				push (@usedEventIds, $eventData->{productId});
-	   
-				push(@eventData_loop, {
-					'form.checkBox' => WebGUI::Form::checkbox($self->session, {
-						value => $eventData->{productId},
-				                name  => "subEventPID"}),
-					'title'		=> $eventData->{title},
-					'description'	=> $eventData->{description},
-					'price'		=> $eventData->{price}
-				});
-			}
-		}
-	}
-	$var{'message_loop'} = \@message_loop;
-	$var{'missingEvents_loop'} = \@eventData_loop;
-	
-	return \%var;	
+	$var{'message_loop'} = $missingEventMessageLoop;
+	$var{'missingEvents_loop'} = $allPrereqsLoop;
+	return \%var;
 }
 
 #------------------------------------------------------------------
@@ -1905,6 +1907,7 @@ sub www_viewPurchase {
 	my %var = $self->get();
 	my $isAdmin = $self->canAddEvents;
 	my $tid = $self->session->form->process('tid');
+	my ($userId) = $self->session->db->quickArray("select userId from transaction where transactionId=?",[$tid]);
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my $sql = "select distinct(r.purchaseId), b.* from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_purchases as t where r.badgeId=b.badgeId and r.purchaseId=t.purchaseId and t.transactionId=? order by b.lastName";
 	my $sth = $self->session->db->read($sql,[$tid]);
@@ -1912,18 +1915,23 @@ sub www_viewPurchase {
 	while (my $purchase = $sth->hashRef) {
 		my $badgeId = $purchase->{badgeId};
 		my $pid = $purchase->{purchaseId};
-		my $sql2 = "select distinct r.registrationId, p.title, p.description, p.price, p.templateId, r.returned, e.approved, e.maximumAttendees, e.startDate, e.endDate from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e, products as p where r.badgeId=? and r.purchaseId=? order by b.lastName";
+		my $sql2 = "select r.registrationId, p.title, p.description, p.price, p.templateId, r.returned, e.approved, e.maximumAttendees, e.startDate, e.endDate from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e, products as p where r.badgeId=? and r.purchaseId=? group by r.registrationId order by b.lastName";
 		my $sth2 = $self->session->db->read($sql2,[$badgeId,$pid]);
 		$purchase->{regLoop} = [];
 		while (my $reg = $sth2->hashRef) {
+			$reg->{startDateHuman} = $self->session->datetime->epochToHuman($reg->{'startDate'});
+			$reg->{endDateHuman} = $self->session->datetime->epochToHuman($reg->{'endDate'});
 			push(@{$purchase->{regLoop}},$reg);
 		}
 		push(@purchasesLoop,$purchase);
 	}
 	$var{viewPurchaseTitle} = $i18n->get('view purchase');
 	$var{canReturn} = $isAdmin;
+	$var{transactionId} = $tid;
+	$var{canAddEvents} = $isAdmin || $userId eq $self->session->var->get('userId');
+	$var{appUrl} = $self->getUrl;
 	$sth->finish;
-	$var{'purchasesLoop'} = \@purchasesLoop;
+	$var{purchasesLoop} = \@purchasesLoop;
 	return $self->session->style->process($self->processTemplate(\%var,$self->getValue("viewPurchaseTemplateId")),$self->getValue("styleTemplateId"));
 }
 
@@ -1971,7 +1979,7 @@ sub www_editEventMetaDataField {
 	$f->text(
 		-name => "name",
 		-label => $i18n->get(475),
-		-hoverHelp => $i18n->get('475 description'),,
+		-hoverHelp => $i18n->get('475 description'),
 		-extras=>(($data->{name} eq $i18n2->get('type name here'))?' style="color:#bbbbbb" ':'').' onblur="if(!this.value){this.value=\''.$i18n2->get('type name here').'\';this.style.color=\'#bbbbbb\';}" onfocus="if(this.value == \''.$i18n2->get('type name here').'\'){this.value=\'\';this.style.color=\'\';}"',
 		-value => $data->{name},
 	);
