@@ -1122,7 +1122,7 @@ sub verifyAllPrerequisites {
 			foreach my $oldMsg (@$msgLoop) {
 				$add = 0 if $oldMsg->{productId} eq $newMsg->{productId};
 			}
-			push (@$msgLoop,$newMsg) if $update;
+			push (@$msgLoop,$newMsg) if $add;
 		}
 		$lastResultsSize = scalar(keys %$lastResults);
 	}
