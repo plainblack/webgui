@@ -1111,6 +1111,7 @@ sub verifyAllPrerequisites {
 	my ($lastResults, $msgLoop) = $self->verifyEventPrerequisites($startingEvents,1);
 	my $lastResultsSize = scalar(keys %$lastResults);
 	my $currentResultsSize = -4;
+	# initial case must not qualify as the base case
 	return [] unless $lastResultsSize;
 	until ($currentResultsSize == $lastResultsSize) {
 		$currentResultsSize = $lastResultsSize;
@@ -1133,7 +1134,7 @@ sub verifyAllPrerequisites {
 			'price'		=> $details->{price}
 		});
 	}
-	$self->session->errorHandler->warn("verifyAllPrerequisites: <pre>".Dumper($msgLoop).Dumper($rowsLoop).Dumper($lastResults)."</pre>");
+	# $self->session->errorHandler->warn("verifyAllPrerequisites: <pre>".Dumper($msgLoop).Dumper($rowsLoop).Dumper($lastResults)."</pre>");
 	return $msgLoop, $rowsLoop;
 }
 
@@ -1226,7 +1227,7 @@ sub verifyPrerequisitesForm {
 	my @usedEventIds;
 	my $scratchCart = $self->getEventsInScratchCart;
 	use Data::Dumper;
-	$self->session->errorHandler->warn("scratch: <pre>".Dumper($scratchCart)."</pre>");
+	# $self->session->errorHandler->warn("scratch: <pre>".Dumper($scratchCart)."</pre>");
 	my %var;
 
 	#If there is no missing event data, return nothing
@@ -1923,7 +1924,7 @@ sub www_viewPurchase {
 	while (my $purchase = $sth->hashRef) {
 		my $badgeId = $purchase->{badgeId};
 		my $pid = $purchase->{purchaseId};
-		my $sql2 = "select r.registrationId, p.title, p.description, p.price, p.templateId, r.returned, e.approved, e.maximumAttendees, e.startDate, e.endDate from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e, products as p where r.badgeId=? and r.purchaseId=? group by r.registrationId order by b.lastName";
+		my $sql2 = "select r.registrationId, p.title, p.description, p.price, p.templateId, r.returned, e.approved, e.maximumAttendees, e.startDate, e.endDate from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e, products as p where and p.productId = r.productId and p.productId = e.productId and r.badgeId=? and r.purchaseId=? group by r.registrationId order by b.lastName";
 		my $sth2 = $self->session->db->read($sql2,[$badgeId,$pid]);
 		$purchase->{regLoop} = [];
 		while (my $reg = $sth2->hashRef) {
