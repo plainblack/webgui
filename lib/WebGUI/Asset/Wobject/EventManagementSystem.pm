@@ -980,6 +980,8 @@ sub getSubEventForm {
 	my $subEvents = $self->getSubEvents($pids);
 	my @usedEventIds;
 	my %var;
+	my @arr = $self->session->form->param("subEventPID");
+	return undef if ($self->session->form->process("method") eq 'addSubEvents' && !scalar(@arr));
 	my $i18n = WebGUI::International->new($self->session, 'Asset_EventManagementSystem');
 	
 	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
@@ -1011,7 +1013,7 @@ sub getSubEventForm {
 	}
 	$var{'subevents_loop'} = \@subEventLoop;
 	$var{'chooseSubevents'} = 1;
-	my $output = \%var if (scalar (@$subEvents) > 0);
+	my $output = \%var if (scalar (@subEventLoop) > 0);
 	
 	return $output;	
 }
@@ -1146,7 +1148,7 @@ sub verifyEventPrerequisites {
 		}
 		if ($returnMsgLoop) {
 			my $details = $self->getEventDetails($_);
-			push (@$msgLoop,{%$details,messageLoop=>$messageLoop});
+			push (@$msgLoop,{%$details,messageLoop=>$messageLoop}) if (scalar(@$messageLoop));
 		}
 	}
 	return $newResults,$msgLoop if $returnMsgLoop;
@@ -1194,7 +1196,7 @@ sub getAllPossibleEventPrerequisites {
 				push(@$required,$_) unless isIn($_,@$required);
 			}
 		}
-		push(@$messageLoop,$message);
+		push(@$messageLoop,{reqmessage=>$message}) if $message;
 	}	
 	return $required,$messageLoop;
 }
@@ -1219,6 +1221,8 @@ sub verifyPrerequisitesForm {
 	my ($missingEventMessageLoop, $allPrereqsLoop) = $self->verifyAllPrerequisites;
 	my @usedEventIds;
 	my $scratchCart = $self->getEventsInScratchCart;
+	use Data::Dumper;
+	$self->session->errorHandler->warn("scratch: <pre>".Dumper($scratchCart)."</pre>");
 	my %var;
 
 	#If there is no missing event data, return nothing
