@@ -1115,7 +1115,15 @@ sub verifyAllPrerequisites {
 	return [] unless $lastResultsSize;
 	until ($currentResultsSize == $lastResultsSize) {
 		$currentResultsSize = $lastResultsSize;
-		$lastResults = {%$lastResults,%{$self->verifyEventPrerequisites($lastResults)}};
+		my $newMsgLoop = [];
+		($lastResults,$newMsgLoop) = {%$lastResults,%{$self->verifyEventPrerequisites($lastResults,1)}};
+		foreach my $newMsg (@$newMsgLoop) {
+			my $add = 1;
+			foreach my $oldMsg (@$msgLoop) {
+				$add = 0 if $oldMsg->{productId} eq $newMsg->{productId};
+			}
+			push (@$msgLoop,$newMsg) if $update;
+		}
 		$lastResultsSize = scalar(keys %$lastResults);
 	}
 	
