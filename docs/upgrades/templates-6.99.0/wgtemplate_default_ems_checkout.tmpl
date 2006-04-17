@@ -71,3 +71,21 @@ if (selector1) {
 </script>
 <tmpl_var form.footer>
 </tmpl_if>
+
+<tmpl_if prereqsAreMissing>
+<tmpl_var form.header>
+<table>
+<tr><td><h1><tmpl_var message></h1></td></tr>
+
+<tmpl_loop message_loop>
+<tr><td><tmpl_var prereq_message></td></tr>
+</tmpl_loop>
+
+<tmpl_loop missingEvents_loop>
+<tr><td><tmpl_var form.checkBox></td><td><tmpl_var title></td><td><tmpl_var description></td><td><tmpl_var price></td></tr>
+</tmpl_loop>
+<tr><td><tmpl_var form.submit></td></tr>
+</table>
+<tmpl_var form.footer>
+
+</tmpl_if>
