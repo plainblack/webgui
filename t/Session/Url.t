@@ -57,7 +57,7 @@ $session->setting->set(preventProxyCache => 1);
 is ( 1, $session->setting->get('preventProxyCache'), 'disable proxy caching');
 
 $url2 = $session->url->gateway('home');
-like ( $url2, qr{/home\?noCache=\d+;\d+$}, 'check proxy prevention setting');
+like ( $url2, qr{/home\?noCache=\d+,\d+$}, 'check proxy prevention setting');
 
 #Enable caching
 $session->setting->set(preventProxyCache => 0);
