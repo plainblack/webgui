@@ -9,11 +9,13 @@
 <tmpl_if session.var.adminOn>
         <p><tmpl_var controls></p><br /><br />
 </tmpl_if>
+<ul>
 <tmpl_if canManageEvents>
-   <a href='<tmpl_var manageEvents.url>'><tmpl_var manageEvents.label></a><br />
+   <li><a href='<tmpl_var manageEvents.url>'><tmpl_var manageEvents.label></a></li>
 </tmpl_if>
-<a href='<tmpl_var managePurchases.url>'><tmpl_var managePurchases.label></a><br />
-<a href="<tmpl_var checkout.url>"><tmpl_var checkout.label></a><br />
+<li><a href='<tmpl_var managePurchases.url>'><tmpl_var managePurchases.label></a></li>
+<li><a href="<tmpl_var checkout.url>"><tmpl_var checkout.label></a></li>
+</ul>
 
 <script type="text/javascript" src="<tmpl_var ems.wobject.dir>/script/dynamicForms.js"></script>
 <script type="text/javascript">
@@ -75,22 +77,26 @@
 
 <div id="basicSearch"<tmpl_if isAdvSearch> style="display:none"</tmpl_if>>
 <tmpl_var basicSearch.formHeader>
-<div style="cursor:pointer" onclick="document.getElementById('basicSearch').style.display='none';document.getElementById('advSearch').style.display='block';" ><a href="#">Switch To Advanced Search</a></div>
-<table width="100%" border="0" padding="8"><tr><td>Search Keywords:</td><td><input name="searchKeywords" /></td></tr></table>
+<div style="cursor:pointer;text-align:right;" onclick="document.getElementById('basicSearch').style.display='none';document.getElementById('advSearch').style.display='block';" ><a href="#">Switch To Advanced Search</a></div>
+<table width="100%" border="0" padding="1" style="border-bottom:double gray 5px;border-top:solid gray 1px;margin-bottom:5px;margin-top:5px;"><tr><td style="font-weight:bold;width:40%;">Search Keywords:</td><td style="width:60%;"><input name="searchKeywords" style="width:100%;" /></td></tr></table>
 <tmpl_var search.formSubmit>
 <tmpl_var search.formFooter>
 </div>
 
 <div id="advSearch"<tmpl_unless isAdvSearch> style="display:none"</tmpl_unless>>
 <tmpl_var advSearch.formHeader>
-<div style="cursor:pointer" onclick="document.getElementById('basicSearch').style.display='block';document.getElementById('advSearch').style.display='none';" ><a href="#">Switch To Basic Search</a></div>
-<table width="100%" border="0" padding="8">
+<div style="cursor:pointer;text-align:right;" onclick="document.getElementById('basicSearch').style.display='block';document.getElementById('advSearch').style.display='none';" ><a href="#">Switch To Basic Search</a></div>
+<table width="100%" border="0" cellpadding="8" style="border-bottom:double gray 5px;border-top:solid gray 1px;margin-bottom:5px;margin-top:5px;">
 <tbody id="filterbody">
 <tr><td></td></tr>
 </tbody>
 </table>
-<a href="#" onclick="addField();">Add another Filter Field</a>
-<tmpl_var search.formSubmit>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr>
+	<td align="left"><tmpl_var search.formSubmit></td>
+	<td align="right" valign="top"><a href="#" onclick="addField();">Add another Filter Field</a></td>
+</tr>
+</table>
 <tmpl_var search.formFooter>
 <script type="text/javascript">
    // load autoSearch fields
@@ -105,7 +111,9 @@
 
 </div>
 
-<table width="100%" border="0" padding="8">
+<br /><br />
+
+<table width="100%" border="0" cellpadding="8" cellspacing="0" style="border-top:solid gray 2px;border-bottom:solid gray 2px;">
 <tr><th><tmpl_var name.label></th>
 <th><tmpl_var starts.label></th>
 <th><tmpl_var ends.label></th>
@@ -114,7 +122,7 @@
 <th><tmpl_var requirement.label></th>
 <th><tmpl_var addToCart.label></th></tr>
 <tmpl_loop events_loop>
-  <tr><td><tmpl_var title>
+  <tr<tmpl_unless __ODD__> class="oddRow"<tmpl_else> class="evenRow"</tmpl_unless>><td><tmpl_var title>
   </td><td><tmpl_var startDate.human>
   </td><td><tmpl_var endDate.human>
   </td><td><tmpl_var seatsRemaining>
@@ -128,6 +136,18 @@
 	
 ~~~
 <style type="text/css">
+tr.oddRow td {
+	background-color:#DADADA;
+	border-right:solid gray 1px;
+}
+tr.evenRow td {
+	background-color:#E8E8E8;
+	border-right:solid gray 1px;
+}
+.manageEvents {
+	margin-top:5px;
+	margin-bottom:5px;
+}
 .datacardtitle {
 	background: #3D5690;
 	color: white;
