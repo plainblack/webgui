@@ -736,6 +736,7 @@ my $sql9 = <<SQL9;
 create table EventManagementSystem_badges (
  badgeId varchar(22) binary not null,
  userId varchar(22) binary,
+ createdByUserId varchar(22) binary,
  firstName varchar(100),
  lastName varchar(100),
  address varchar(100),
