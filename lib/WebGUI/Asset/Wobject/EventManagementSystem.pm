@@ -301,6 +301,7 @@ whenever two events have overlapping times.
 sub checkConflicts {
 	my $self = shift;
 #	my $eventsInCart = $self->getEventsInCart;
+	my $checkSingleEvent = shift;
 	my $eventsInCart = $self->getEventsInScratchCart;
 	use Data::Dumper;
 	# $self->session->errorHandler->warn(Dumper($eventsInCart));
@@ -326,18 +327,25 @@ sub checkConflicts {
 				
 		push(@schedule, $scheduleData);
 	}
+	my $singleData = {};
+	$singleData = $self->session->db->quickHashRef("productId, startDate, endDate from EventManagementSystem_products where productId=?", [$checkSingleEvent]) if $checkSingleEvent;
 	
 	# Check the schedule for conflicts
 	for (my $i=0; $i < scalar(@schedule); $i++) {
-		next if ($i == 0);
-		
-		unless ($schedule[$i]->{startDate} > $schedule[$i-1]->{endDate}) { #conflict
-			return [{ 'event1'    => $schedule[$i]->{productId},
-				  'event2'    => $schedule[$i-1]->{productId},
-				  'type'      => 'conflict'
-			       }]; 	
+		next if ($i == 0 && !$checkSingleEvent);
+		if ($checkSingleEvent) {
+			return 1 if ($singleData->{startDate} < $schedule[$i]->{endDate} && $singleData->{endDate} > $schedule[$i]->{startDate});
+		}	else {
+			unless ($schedule[$i]->{startDate} > $schedule[$i-1]->{endDate}) {
+				 #conflict
+				return [{ 'event1'    => $schedule[$i]->{productId},
+					  'event2'    => $schedule[$i-1]->{productId},
+					  'type'      => 'conflict'
+				       }]; 	
+			}
 		}
 	}
+	return 0 if $checkSingleEvent;
 	return [];
 }
 
@@ -1000,6 +1008,7 @@ sub getSubEventForm {
 
 	   # Track used event ids so we can prevent listing a subevent more than once.
 	   next if (WebGUI::Utility::isIn($eventData->{productId}, @usedEventIds));
+	   next if $self->checkConflicts($eventData->{productId});
 	   push (@usedEventIds, $eventData->{productId});
 	   
 	   push(@subEventLoop, {
@@ -1014,7 +1023,8 @@ sub getSubEventForm {
 	}
 	$var{'subevents_loop'} = \@subEventLoop;
 	$var{'chooseSubevents'} = 1;
-	my $output = \%var if (scalar (@subEventLoop) > 0);
+	my $output;
+	$output = \%var if (scalar (@subEventLoop) > 0);
 	
 	return $output;	
 }
@@ -1328,7 +1338,7 @@ sub www_addToCart {
 	$conflicts = shift;
 	$pid = shift;
 	$shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
-	$self->session->errorHandler->warn("scratch before: <pre>".Dumper($self->getEventsInScratchCart).sleep(2).Dumper($self->session->db->buildHashRef("select name,value from userSessionScratch where sessionId=?",[$self->session->getId]))."</pre>");
+	# $self->session->errorHandler->warn("scratch before: <pre>".Dumper($self->getEventsInScratchCart).Dumper($self->session->db->buildHashRef("select name,value from userSessionScratch where sessionId=?",[$self->session->getId]))."</pre>");
 	# Check if conflicts were found that the user needs to fix
 	$output = $conflicts->[0] if defined $conflicts;
 	
@@ -1359,7 +1369,7 @@ sub www_addToCart {
 			$output = $self->getRegistrationInfo;
 		}		
 	}
-	$self->session->errorHandler->warn("scratch after: <pre>".Dumper($self->getEventsInScratchCart).sleep(2).Dumper($self->session->db->buildHashRef("select name,value from userSessionScratch where sessionId=?",[$self->session->getId]))."</pre>");
+	# $self->session->errorHandler->warn("scratch after: <pre>".Dumper($self->getEventsInScratchCart).Dumper($self->session->db->buildHashRef("select name,value from userSessionScratch where sessionId=?",[$self->session->getId]))."</pre>");
 	return $self->session->style->process($self->processTemplate($output,$self->getValue("checkoutTemplateId")),$self->getValue("styleTemplateId"));
 } 
 
