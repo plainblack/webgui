@@ -1020,6 +1020,23 @@ sub getSubEventForm {
 	   });
 	 }
 	}
+	my $scratchCart = [split("\n",$self->session->scratch->get('EMS_scratch_cart'))];
+	
+	foreach (@$scratchCart) {
+		my $details = $self->getEventDetails($_);
+		push(@subEventLoop, {
+			'form.checkBox' => WebGUI::Form::checkbox($self->session, {
+				value => 1,
+				checked => 1,
+				name  => "subEventDisregard",
+				extras => 'disabled="disabled"',
+			}),
+			'title'		=> $details->{title},
+			'description'	=> $details->{description},
+			'price'		=> $details->{price}
+		});
+	}
+
 	$var{'subevents_loop'} = \@subEventLoop;
 	$var{'chooseSubevents'} = 1;
 	my $output;
