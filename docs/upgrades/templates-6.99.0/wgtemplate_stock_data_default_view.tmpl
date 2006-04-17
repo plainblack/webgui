@@ -1,5 +1,4 @@
 #StockDataTMPL000000001
-
 <a name="<tmpl_var assetId>"></a> 
  
 <tmpl_if session.var.adminOn> 
@@ -33,13 +32,14 @@
 								  case 2: document.getElementById('qm_textChange_7310').innerHTML = '<span class="qmmt_header_text" style="font-weight:normal;"><b>Last Update:&nbsp;</b> <tmpl_var lastUpdate.default> EDT</span>'; 
                                    setTimeout("qm_UpdateText_7310(3)", 5000); 
 								   break;        
-								  case 3: document.getElementById('qm_textChange_7310').innerHTML = '<a href="http://www.quotemedia.com/" target="_top" style="text-decoration:none;"><span class="qmmt_header_text" style="font-weight:normal;">Yahoo Finance</span></a>';
+								  case 3: document.getElementById('qm_textChange_7310').innerHTML = '<a href="http://www.quotemedia.com/" style="text-decoration:none;"><span class="qmmt_header_text" style="font-weight:normal;">Yahoo Finance</span></a>';
                                    setTimeout("qm_UpdateText_7310(1)", 5000); 
 								   break;        
 								}        
 							 }
 							 qm_UpdateText_7310(2);
-						 </script>      
+						 </script> 
+    
 				  </td>       
 				</tr>  
 		     </table>  
