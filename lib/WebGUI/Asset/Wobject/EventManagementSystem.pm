@@ -2429,7 +2429,7 @@ sub view {
 	while ($data = $sth->hashRef) {
 		my $shouldPush = 1;
 		my $eventId = $data->{productId};
-		my $requiredList = $self->getPrerequisiteEventList($eventId);
+		my $requiredList = $self->getAllPossibleEventPrerequisites($eventId);
 		if ($seatsAvailable ne 'none') {
 			my ($numberRegistered) = $self->session->db->quickArray("select count(*) from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p
 	  	where r.purchaseId = p.purchaseId and r.returned=0 and r.productId=".$self->session->db->quote($eventId));
