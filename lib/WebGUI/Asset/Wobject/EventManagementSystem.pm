@@ -774,7 +774,7 @@ sub getBadgeSelector {
 		value => $addBadgeId,
 		extras => 'onchange="swapBadgeInfo(this.value)" onkeyup="swapBadgeInfo(this.value)"'.($addBadgeId ? ' disabled="disabled"' : '')
 	}).($addBadgeId ? WebGUI::Form::hidden($self->session,{
-		name => 'badgeId',value=>$badgeId
+		name => 'badgeId',value=>$addBadgeId
 	}) : '');
 	
 	return $js.$output;
