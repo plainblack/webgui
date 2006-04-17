@@ -1,0 +1,40 @@
+#PBnav00000000000bullet
+#title:Bulleted List
+#menuTitle:Bulleted List
+#url:bulleted_list
+<tmpl_if session.var.adminOn>
+<tmpl_var controls><br />
+</tmpl_if>
+<tmpl_if displayTitle>
+	<h2><tmpl_var title></h2>
+</tmpl_if>
+<tmpl_if description>
+	<p><tmpl_var description></p>
+</tmpl_if>
+
+<tmpl_loop page_loop>
+<tmpl_if __FIRST__>
+	<ul>
+</tmpl_if>
+
+
+<tmpl_loop page.depthDiff_loop>
+   </ul></li>
+</tmpl_loop>
+
+<li><tmpl_var page.menuTitle>
+<tmpl_if page.hasViewableChildren>
+	<ul>
+<tmpl_else>
+	</li>
+</tmpl_if>
+
+<tmpl_if __LAST__> 
+	<tmpl_loop page.indent_loop>
+		<tmpl_unless __first__></li></tmpl_unless>
+       		</ul>
+ 	</tmpl_loop>
+	</li></ul>
+</tmpl_if>
+</tmpl_loop>
+
