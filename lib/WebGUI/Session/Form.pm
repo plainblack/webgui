@@ -58,7 +58,7 @@ sub AUTOLOAD {
         our $AUTOLOAD;
 	my $self = shift;
         my $name = ucfirst((split /::/, $AUTOLOAD)[-1]);
-	my $varName = shift;
+	my $params = shift;
         my $cmd = "use WebGUI::Form::".$name;
         eval ($cmd);
         if ($@) {
@@ -66,7 +66,7 @@ sub AUTOLOAD {
                 return undef;
         }
         my $class = "WebGUI::Form::".$name;
-        return $class->new($self->session, {name=>$varName})->getValueFromPost;
+        return $class->new($self->session, $params)->getValueFromPost;
 }
 
 #-------------------------------------------------------------------
