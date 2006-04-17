@@ -78,7 +78,11 @@ if (selector1) {
 <tr><td><h1><tmpl_var message></h1></td></tr>
 
 <tmpl_loop message_loop>
-<tr><td><tmpl_var prereq_message></td></tr>
+<tr><td><tmpl_var title> requires all of the following:</td><td>
+<tmpl_loop messageLoop>
+<p><tmpl_var reqmessage></p>
+</tmpl_loop></td>
+	</tr>
 </tmpl_loop>
 
 <tmpl_loop missingEvents_loop>
