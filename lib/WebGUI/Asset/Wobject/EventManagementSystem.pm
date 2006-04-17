@@ -1988,6 +1988,8 @@ sub www_addEventsToBadge {
 	my @pastEvents = $self->session->db->buildArray("select productId from EventManagementSystem_registrations where badgeId=?",[$bid]);
 	$self->session->scratch->delete('EMS_add_purchase_events');
 	$self->session->scratch->set('EMS_add_purchase_events',join("\n",@pastEvents));
+	$self->session->scratch->delete('EMS_scratch_cart');
+	$self->session->scratch->set('EMS_scratch_cart',join("\n",@pastEvents));
 	$self->session->http->setRedirect($self->getUrl."?func=addToCart;method=addEventsToBadge");
 	return 1;
 }
