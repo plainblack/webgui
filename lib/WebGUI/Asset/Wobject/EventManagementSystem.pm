@@ -226,11 +226,11 @@ sub addToScratchCart {
 	my $self = shift;
 	my $event = shift;
 
-	my @eventsInCart = split("::",$self->session->scratch->get('EMS_scratch_cart'));
+	my @eventsInCart = split("\n",$self->session->scratch->get('EMS_scratch_cart'));
 	push(@eventsInCart, $event) unless isIn($event,@eventsInCart);
 
 	$self->session->scratch->delete('EMS_scratch_cart');
-	$self->session->scratch->set('EMS_scratch_cart', join("::", @eventsInCart));
+	$self->session->scratch->set('EMS_scratch_cart', join("\n", @eventsInCart));
 }
 
 #-------------------------------------------------------------------
@@ -617,7 +617,7 @@ sub getEventsInCart {
 #------------------------------------------------------------------
 sub getEventsInScratchCart {
 	my $self = shift;
-	my @eventsInCart = split("::",$self->session->scratch->get('EMS_scratch_cart'));
+	my @eventsInCart = split("\n",$self->session->scratch->get('EMS_scratch_cart'));
 	return \@eventsInCart;
 }
 
@@ -1063,7 +1063,7 @@ sub removeFromScratchCart {
 	foreach (@{$events}) {
 		push (@newArr,$_) unless $_ eq $event;
 	}
-	$self->session->scratch->set('EMS_scratch_cart', join("::",@newArr));
+	$self->session->scratch->set('EMS_scratch_cart', join("\n",@newArr));
 }
 
 #------------------------------------------------------------------
@@ -1963,6 +1963,33 @@ sub www_viewPurchase {
 	$sth->finish;
 	$var{purchasesLoop} = \@purchasesLoop;
 	return $self->session->style->process($self->processTemplate(\%var,$self->getValue("viewPurchaseTemplateId")),$self->getValue("styleTemplateId"));
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_addEventsToBadge ( )
+
+Method to display a purchase.  From this screen, admins can 
+return the whole purchase, return a whole badge (registration, 
+a.k.a itinerary for a single person), or return a single event
+from an itinerary.  The purchaser can just add events to 
+individual registrations that have at least one event that 
+hasn't occurred yet.
+
+=cut
+
+sub www_addEventsToBadge {
+	my $self = shift;
+	my %var = $self->get();
+	my $isAdmin = $self->canAddEvents;
+	my $bid = $self->session->form->process('bid');
+	$self->session->scratch->delete('EMS_add_purchase_badgeId');
+	$self->session->scratch->set('EMS_add_purchase_badgeId',$bid);
+	my @pastEvents = $self->session->db->buildArray("select productId from EventManagementSystem_registrations where badgeId=?",[$bid]);
+	$self->session->scratch->delete('EMS_add_purchase_events');
+	$self->session->scratch->set('EMS_add_purchase_events',join("\n",@pastEvents));
+	$self->session->http->setRedirect($self->getUrl."?func=addToCart;method=addEventsToBadge");
+	return 1;
 }
 
 #-------------------------------------------------------------------
