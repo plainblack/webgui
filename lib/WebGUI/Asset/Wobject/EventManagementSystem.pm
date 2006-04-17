@@ -1257,7 +1257,7 @@ sub verifyPrerequisitesForm {
 	
 	foreach (@$scratchCart) {
 		my $details = $self->getEventDetails($_);
-		push(@$missingEventMessageLoop, {
+		push(@$allPrereqsLoop, {
 			'form.checkBox' => WebGUI::Form::checkbox($self->session, {
 				value => 1,
 				checked => 1,
