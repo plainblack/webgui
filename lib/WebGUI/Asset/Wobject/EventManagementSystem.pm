@@ -2028,6 +2028,35 @@ sub www_addEventsToBadge {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_returnItem ( )
+
+Method to set some registrations as returned.
+
+=cut
+
+sub www_returnItem {
+	my $self = shift;
+	my %var = $self->get();
+	my $isAdmin = $self->canAddEvents;
+	my $rid = $self->session->form->process('rid');
+	my $tid = $self->session->form->process('tid');
+	my $pid = $self->session->form->process('pid');
+	my @regs;
+	if ($pid) {
+		@regs = $self->session->db->buildArray("select registrationId from EventManagementSystem_registrations where purchaseId=?",[$pid]);
+	} elsif ($tid) {
+		@regs = $self->session->db->buildArray("select registrationId from EventManagementSystem_purchases as t,EventManagementSystem_registrations as r where r.purchaseId=t.purchaseId and t.transactionId=?",[$tid]);
+	} elsif ($rid) {
+		@regs = ($rid);
+	}
+	foreach (@regs) {
+		$self->session->db->write("update EventManagementSystem_registrations set returned=1 where registrationId=?",[$_]);
+	}
+	return $self->www_managePurchases;
+}
+
+#-------------------------------------------------------------------
 sub www_editEventMetaDataField {
 	my $self = shift;
 	my $fieldId = shift || $self->session->form->process("fieldId");
