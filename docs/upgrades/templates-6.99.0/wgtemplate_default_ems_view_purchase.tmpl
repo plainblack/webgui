@@ -8,17 +8,19 @@
         <p><tmpl_var controls></p><br /><br />
 </tmpl_if>
 <h1><tmpl_var viewPurchaseTitle></h1>
-<tmpl_if canReturn><a href="<tmpl_var returnPurchaseUrl>"><tmpl_var returnPurchaseLabel></a></tmpl_if>
+<tmpl_if canReturn><a href="<tmpl_var appUrl>?func=returnItem;tid=<tmpl_var transactionId>">Return Entire Purchase</a></tmpl_if>
 <tmpl_loop purchasesLoop>
 <table width="100%">
-<tr><td><tmpl_var badgeNameLabel></td><td><tmpl_var eventTitle.label></td><td><tmpl_var eventDates.label></td><tmpl_if canReturn><td><tmpl_var returnButton.label></td></tmpl_if></tr></tr><td>
-<tmpl_var badge.firstName> <tmpl_var badge.lastName>
+<tr><td>Badge Name</td><td>Itinerary<tmpl_if canReturn><a href="<tmpl_var appUrl>?func=returnItem;pid=<tmpl_var purchaseId>">Return Entire Itinerary</a></tmpl_if></td></tr>
+<tr><td>
+<tmpl_var firstName> <tmpl_var lastName>
 </td><td>
-<tmpl_loop regLoop>
 <table width="100%">
-<tr><td>a<tmpl_var registration.title></td><td><tmpl_var registration.startDateHuman> - <tmpl_var registration.endDateHuman></td><tmpl_if canReturn><td><a href="<tmpl_var registration.returnUrl>"><tmpl_var registration.returnLabel></a></td></tmpl_if></tr>
+<tmpl_loop regLoop>
+<tr><td>Event Title</td><td>Event Dates</td><tmpl_if canReturn><td>Return Registration</td></tmpl_if></tr>
+<tr><td><tmpl_var title></td><td><tmpl_var startDateHuman> - <tmpl_var endDateHuman></td><tmpl_if canReturn><td><a href="<tmpl_var appUrl>?func=returnItem;rid=<tmpl_var registrationId>">Return This Registration</a></td></tmpl_if></tr>
 </tmpl_loop>
 </table></td></tr>
-<tmpl_if registration.canAddEvents><tr colspan="<tmpl_if canReturn>3<tmpl_else>2</tmpl_if>"><td><a href="<tmpl_var registration.addEventsUrl>"><tmpl_var addEventsLabel></a></td></tr></tmpl_if>
+<tmpl_if canAddEvents><tr colspan="2"><td><a href="<tmpl_var appUrl>?func=addEventsToBadge;bid=<tmpl_var badgeId>">Add Events To Badge</a></td></tr></tmpl_if>
 </table>
 </tmpl_loop>
