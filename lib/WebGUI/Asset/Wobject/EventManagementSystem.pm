@@ -1968,12 +1968,7 @@ sub www_viewPurchase {
 
 =head2 www_addEventsToBadge ( )
 
-Method to display a purchase.  From this screen, admins can 
-return the whole purchase, return a whole badge (registration, 
-a.k.a itinerary for a single person), or return a single event
-from an itinerary.  The purchaser can just add events to 
-individual registrations that have at least one event that 
-hasn't occurred yet.
+Method to go into badge-addition mode.
 
 =cut
 
@@ -1984,7 +1979,7 @@ sub www_addEventsToBadge {
 	my $bid = $self->session->form->process('bid');
 	$self->session->scratch->delete('EMS_add_purchase_badgeId');
 	$self->session->scratch->set('EMS_add_purchase_badgeId',$bid);
-	my @pastEvents = $self->session->db->buildArray("select productId from EventManagementSystem_registrations where badgeId=?",[$bid]);
+	my @pastEvents = $self->session->db->buildArray("select productId from EventManagementSystem_registrations where returned=0 and badgeId=?",[$bid]);
 	$self->session->scratch->delete('EMS_add_purchase_events');
 	$self->session->scratch->set('EMS_add_purchase_events',join("\n",@pastEvents));
 	$self->session->scratch->delete('EMS_scratch_cart');

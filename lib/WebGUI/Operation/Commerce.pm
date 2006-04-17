@@ -83,7 +83,7 @@ Clears the C<paymentGateway> scratch variable.
 
 sub _clearPaymentScratch {
 	my $session = shift;
-	$session->scratch->set('paymentGateway', '-delete-');
+	$session->scratch->delete('paymentGateway');
 }
 
 #-------------------------------------------------------------------
@@ -96,8 +96,8 @@ Clear the C<shippingMethod> and C<shippingOptions> scratch variables.
 
 sub _clearShippingScratch {
 	my $session = shift;
-	$session->scratch->set('shippingMethod', '-delete-');
-	$session->scratch->set('shippingOptions', '-delete-');
+	$session->scratch->delete('shippingMethod');
+	$session->scratch->delete('shippingOptions');
 }
 
 #-------------------------------------------------------------------
@@ -948,7 +948,7 @@ sub www_selectPaymentGatewaySave {
 	if (WebGUI::Commerce::Payment->load($session, $paymentGateway)->enabled) {
 		$session->scratch->set('paymentGateway', $paymentGateway);
 	} else {
-		$session->scratch->set('paymentGateway', '-delete-');
+		$session->scratch->delete('paymentGateway');
 	}
 
 	return WebGUI::Operation::execute($session,'checkout');
@@ -1024,7 +1024,7 @@ sub www_selectShippingMethodSave {
 		$session->scratch->set('shippingMethod', $shipping->namespace);
 		$session->scratch->set('shippingOptions', Storable::freeze($shipping->getOptions));
 	} else {
-		$session->scratch->set('shippingMethod', '-delete-');
+		$session->scratch->delete('shippingMethod');
 	}
 
 	return WebGUI::Operation::execute($session,'checkout');

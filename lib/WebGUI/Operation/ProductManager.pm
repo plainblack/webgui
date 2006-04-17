@@ -666,7 +666,7 @@ sub www_listProducts {
 	
 	$i18n = WebGUI::International->new($session, 'ProductManager');
 	
-	$session->scratch->set('managingProduct', '-delete-');
+	$session->scratch->delete('managingProduct');
 	
 	$sth = $session->db->read('select * from products order by title');
 
