@@ -90,6 +90,7 @@ sub generateAdditionalHeadTags {
 	delete $self->{_raw};
 	delete $self->{_javascript};
 	delete $self->{_link};
+	WebGUI::Macro::process($self->session,\$tags);
 	return $tags;
 }
 
@@ -148,7 +149,6 @@ The unique identifier for the template to retrieve.
 
 sub process {
 	my $self = shift;
-	$self->sent(1);
 	my %var;
 	$var{'body.content'} = shift;
 	my $templateId = shift;
@@ -197,6 +197,7 @@ if ($self->session->user->isInGroup(2)) {
 		$output = "WebGUI was unable to instantiate your style template.".$var{'body.content'};
 	}
 	WebGUI::Macro::process($self->session,\$output);
+	$self->sent(1);
         my $macroHeadTags = $self->generateAdditionalHeadTags();
         $output =~ s/\<\!--morehead--\>/$macroHeadTags/;	
 	return $output;
