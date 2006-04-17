@@ -1327,7 +1327,7 @@ sub www_addToCart {
 	$conflicts = shift;
 	$pid = shift;
 	$shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
-	$self->session->errorHandler->warn("scratch before: <pre>".Dumper($self->getEventsInScratchCart).Dumper($self->session->db->buildHashRef("select name,value from userSessionScratch where sessionId=?",[$self->session->getId])."</pre>");
+	$self->session->errorHandler->warn("scratch before: <pre>".Dumper($self->getEventsInScratchCart).Dumper($self->session->db->buildHashRef("select name,value from userSessionScratch where sessionId=?",[$self->session->getId]))."</pre>");
 	# Check if conflicts were found that the user needs to fix
 	$output = $conflicts->[0] if defined $conflicts;
 	
@@ -1358,7 +1358,7 @@ sub www_addToCart {
 			$output = $self->getRegistrationInfo;
 		}		
 	}
-	$self->session->errorHandler->warn("scratch after: <pre>".Dumper($self->getEventsInScratchCart).Dumper($self->session->db->buildHashRef("select name,value from userSessionScratch where sessionId=?",[$self->session->getId])."</pre>");
+	$self->session->errorHandler->warn("scratch after: <pre>".Dumper($self->getEventsInScratchCart).Dumper($self->session->db->buildHashRef("select name,value from userSessionScratch where sessionId=?",[$self->session->getId]))."</pre>");
 	return $self->session->style->process($self->processTemplate($output,$self->getValue("checkoutTemplateId")),$self->getValue("styleTemplateId"));
 } 
 
