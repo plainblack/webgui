@@ -1099,6 +1099,7 @@ sub resolveConflictForm {
 #------------------------------------------------------------------
 sub verifyAllPrerequisites {
 	my $self = shift;
+	my $returnArrayFlag = shift;
 	use Data::Dumper;
 	#start with the events in the scratch cart.  See if all prerequisites are met	
 	my $startingEvents = {};
@@ -1106,6 +1107,7 @@ sub verifyAllPrerequisites {
 	foreach (@$scratchEvents) {
 		$startingEvents->{$_} = $self->getEventDetails($_);
 	}
+	$startingEvents = {$returnArrayFlag=>1} if $returnArrayFlag;
 	my ($lastResults, $msgLoop) = $self->verifyEventPrerequisites($startingEvents,1);
 	my $lastResultsSize = scalar(keys %$lastResults);
 	my $currentResultsSize = -4;
@@ -1117,6 +1119,7 @@ sub verifyAllPrerequisites {
 	}
 	
 	my $rowsLoop = [];
+	return keys %$lastResults if $returnArrayFlag;
 	foreach (keys %$lastResults) {
 		my $details = $lastResults->{$_};
 		push(@$rowsLoop, {
@@ -2429,7 +2432,7 @@ sub view {
 	while ($data = $sth->hashRef) {
 		my $shouldPush = 1;
 		my $eventId = $data->{productId};
-		my $requiredList = $self->getAllPossibleEventPrerequisites($eventId);
+		my $requiredList = $self->verifyAllPrerequisites($eventId);
 		if ($seatsAvailable ne 'none') {
 			my ($numberRegistered) = $self->session->db->quickArray("select count(*) from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p
 	  	where r.purchaseId = p.purchaseId and r.returned=0 and r.productId=".$self->session->db->quote($eventId));
