@@ -59,6 +59,7 @@ sub AUTOLOAD {
 	my $self = shift;
         my $name = ucfirst((split /::/, $AUTOLOAD)[-1]);
 	my $params = shift;
+	$params = {name=>$params} if ref ($params) ne "HASH";
         my $cmd = "use WebGUI::Form::".$name;
         eval ($cmd);
         if ($@) {
