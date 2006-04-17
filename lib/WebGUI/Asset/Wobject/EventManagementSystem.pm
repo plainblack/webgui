@@ -1327,7 +1327,7 @@ sub www_addToCart {
 	$conflicts = shift;
 	$pid = shift;
 	$shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
-	
+	$self->session->errorHandler->warn("scratch before: <pre>".Dumper($self->getEventsInScratchCart)."</pre>");
 	# Check if conflicts were found that the user needs to fix
 	$output = $conflicts->[0] if defined $conflicts;
 	
@@ -1337,7 +1337,8 @@ sub www_addToCart {
 			@pids = $self->session->form->process("subEventPID", "checkList");
 		}
 		else {  # A single id, i.e., a master event
-			push(@pids, $self->session->form->get("pid") || $pid);
+			my $newPid = $self->session->form->get("pid") || $pid;
+			push(@pids, $newPid);
 		}
 
 		foreach my $eventId (@pids) {
@@ -1357,6 +1358,7 @@ sub www_addToCart {
 			$output = $self->getRegistrationInfo;
 		}		
 	}
+	$self->session->errorHandler->warn("scratch after: <pre>".Dumper($self->getEventsInScratchCart)."</pre>");
 	return $self->session->style->process($self->processTemplate($output,$self->getValue("checkoutTemplateId")),$self->getValue("styleTemplateId"));
 } 
 
