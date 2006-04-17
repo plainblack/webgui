@@ -215,7 +215,7 @@ sub set {
 	my $value = shift;
 	return undef unless ($name);
 	$self->{_data}{$name} = $value;
-	$self->session->db->write("replace into userSessionScratch (sessionId, name, value) values (?,?,?)", [$self->{_sessionId}, $name, $value]);
+	$self->session->db->write("insert into userSessionScratch (sessionId, name, value) values (?,?,?) on duplicate key update value=VALUES(value)", [$self->{_sessionId}, $name, $value]);
 }
 
 
