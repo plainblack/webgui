@@ -328,7 +328,7 @@ sub checkConflicts {
 		push(@schedule, $scheduleData);
 	}
 	my $singleData = {};
-	$singleData = $self->session->db->quickHashRef("productId, startDate, endDate from EventManagementSystem_products where productId=?", [$checkSingleEvent]) if $checkSingleEvent;
+	$singleData = $self->session->db->quickHashRef("select productId, startDate, endDate from EventManagementSystem_products where productId=?", [$checkSingleEvent]) if $checkSingleEvent;
 	
 	# Check the schedule for conflicts
 	for (my $i=0; $i < scalar(@schedule); $i++) {
