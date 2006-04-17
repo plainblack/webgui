@@ -366,6 +366,7 @@ sub view {
 	my $lineageToSkip = "noskip";
 	my $absoluteDepthOfLastPage;
 	my %lastChildren;
+	my $previousPageData = undef;
 	foreach my $asset (@{$assets}) {
 		# skip pages we shouldn't see
 		my $pageLineage = $asset->get("lineage");
@@ -450,7 +451,9 @@ sub view {
 			$pageData->{"page.isRankedFirst"} = 1 unless exists $lastChildren{$parent->getId};
 			$lastChildren{$parent->getId} = $asset->getId;			
 		}
+		$previousPageData->{"page.hasViewableChildren"} = ($previousPageData->{"page.assetId"} eq $pageData->{"page.parentId"});
 		push(@{$var->{page_loop}}, $pageData);	
+		$previousPageData = $pageData;
 	}
 	my $counter;
 	for($counter=0 ; $counter < scalar( @{$var->{page_loop}} ) ; $counter++) {
