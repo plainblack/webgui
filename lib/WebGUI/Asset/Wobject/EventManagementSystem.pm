@@ -1107,7 +1107,7 @@ sub verifyAllPrerequisites {
 	foreach (@$scratchEvents) {
 		$startingEvents->{$_} = $self->getEventDetails($_);
 	}
-	$startingEvents = {$returnArrayFlag=>1} if $returnArrayFlag;
+	$startingEvents = {$returnArrayFlag=>$self->getEventDetails($returnArrayFlag)} if $returnArrayFlag;
 	my ($lastResults, $msgLoop) = $self->verifyEventPrerequisites($startingEvents,1);
 	my $lastResultsSize = scalar(keys %$lastResults);
 	my $currentResultsSize = -4;
