@@ -769,11 +769,13 @@ sub getBadgeSelector {
 	
 	%options = (%options,%{$badges});
 	$output .= WebGUI::Form::selectBox($self->session,{
-		name => 'badgeId',
+		name => ($addBadgeId ? 'badgeIdWrong' : 'badgeId'),
 		options => \%options,
 		value => $addBadgeId,
 		extras => 'onchange="swapBadgeInfo(this.value)" onkeyup="swapBadgeInfo(this.value)"'.($addBadgeId ? ' disabled="disabled"' : '')
-	});
+	}).($addBadgeId ? WebGUI::Form::hidden($self->session,{
+		name => 'badgeId',value=>$badgeId
+	}) : '');
 	
 	return $js.$output;
 }
