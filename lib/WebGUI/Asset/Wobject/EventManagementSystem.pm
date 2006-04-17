@@ -1253,6 +1253,23 @@ sub verifyPrerequisitesForm {
 
 	my $i18n = WebGUI::International->new($self->session, 'Asset_EventManagementSystem');
 	
+	$scratchCart = [split("\n",$self->session->scratch->get('EMS_scratch_cart'))];
+	
+	foreach (@$scratchCart) {
+		my $details = $self->getEventDetails($_);
+		push(@$missingEventMessageLoop, {
+			'form.checkBox' => WebGUI::Form::checkbox($self->session, {
+				value => 1,
+				checked => 1,
+				name  => "subEventDisregard",
+				extras => 'disabled="disabled"',
+			}),
+			'title'		=> $details->{title},
+			'description'	=> $details->{description},
+			'price'		=> $details->{price}
+		});
+	}
+	
 	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
 			     .WebGUI::Form::hidden($self->session,{name=>"func",value=>"addToCart"})
 			     .WebGUI::Form::hidden($self->session,{name=>"method",value=>"addSubEvents"}
