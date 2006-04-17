@@ -8,19 +8,18 @@
         <p><tmpl_var controls></p><br /><br />
 </tmpl_if>
 <h1><tmpl_var viewPurchaseTitle></h1>
-<tmpl_if canReturn><a href="<tmpl_var appUrl>?func=returnItem;tid=<tmpl_var transactionId>">Return Entire Purchase</a></tmpl_if>
+<tmpl_if canReturn>&nbsp;&nbsp;<a href="<tmpl_var appUrl>?func=returnItem;tid=<tmpl_var transactionId>">Return Entire Purchase</a></tmpl_if>
 <tmpl_loop purchasesLoop>
 <table width="100%">
-<tr><td>Badge Name</td><td>Itinerary<tmpl_if canReturn><a href="<tmpl_var appUrl>?func=returnItem;pid=<tmpl_var purchaseId>">Return Entire Itinerary</a></tmpl_if></td></tr>
+<tr><td>Badge Name</td><td>Itinerary&nbsp;&nbsp;<tmpl_if canReturn><a href="<tmpl_var appUrl>?func=returnItem;pid=<tmpl_var purchaseId>">Return Entire Itinerary</a></tmpl_if></td></tr>
 <tr><td>
-<tmpl_var firstName> <tmpl_var lastName>
+<tmpl_var firstName> <tmpl_var lastName><br /><br /><tmpl_if canAddEvents><a href="<tmpl_var appUrl>?func=addEventsToBadge;bid=<tmpl_var badgeId>">Add Events To Badge</a></tmpl_if>
 </td><td>
 <table width="100%">
-<tmpl_loop regLoop>
 <tr><td>Event Title</td><td>Event Dates</td><tmpl_if canReturn><td>Return Registration</td></tmpl_if></tr>
+<tmpl_loop regLoop>
 <tr><td><tmpl_var title></td><td><tmpl_var startDateHuman> - <tmpl_var endDateHuman></td><tmpl_if canReturn><td><a href="<tmpl_var appUrl>?func=returnItem;rid=<tmpl_var registrationId>">Return This Registration</a></td></tmpl_if></tr>
 </tmpl_loop>
 </table></td></tr>
-<tmpl_if canAddEvents><tr colspan="2"><td><a href="<tmpl_var appUrl>?func=addEventsToBadge;bid=<tmpl_var badgeId>">Add Events To Badge</a></td></tr></tmpl_if>
 </table>
 </tmpl_loop>

@@ -75,10 +75,9 @@ if (selector1) {
 <tmpl_if prereqsAreMissing>
 <tmpl_var form.header>
 <table>
-<tr><td><h1><tmpl_var message></h1></td></tr>
 
 <tmpl_loop message_loop>
-<tr><td><tmpl_var title> requires all of the following:</td><td>
+<tr><td><tmpl_var title> requires all of the following:</td><td colspan="2">
 <tmpl_loop messageLoop>
 <p><tmpl_var reqmessage></p>
 </tmpl_loop></td>
