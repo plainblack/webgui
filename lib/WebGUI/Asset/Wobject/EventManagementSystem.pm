@@ -1119,7 +1119,8 @@ sub verifyAllPrerequisites {
 	}
 	
 	my $rowsLoop = [];
-	return keys %$lastResults if $returnArrayFlag;
+	my @silliness = keys %$lastResults;
+	return \@silliness if $returnArrayFlag;
 	foreach (keys %$lastResults) {
 		my $details = $lastResults->{$_};
 		push(@$rowsLoop, {
