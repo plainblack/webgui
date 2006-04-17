@@ -2279,7 +2279,7 @@ sub www_saveRegistration {
 	my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
 	
 	my @addingToPurchase = split("\n",$self->session->scratch->get('EMS_add_purchase_events'));
-	@addingToPurchase = () if ($self->session->scratch->get('EMS_add_purchase_badgeId') && !($self->session->scratch->get('EMS_add_purchase_badgeId') eq $badgeId));
+	# @addingToPurchase = () if ($self->session->scratch->get('EMS_add_purchase_badgeId') && !($self->session->scratch->get('EMS_add_purchase_badgeId') eq $badgeId));
 	foreach my $eventId (@$eventsInCart) {
 		next if isIn($eventId,@addingToPurchase);
 		my $registrationId = $self->setCollateral("EventManagementSystem_registrations", "registrationId",{
