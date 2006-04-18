@@ -34,9 +34,10 @@ sub _getFieldHash {
 
 	my %hash;
 	tie %hash, "Tie::IxHash";
+	my $i18n = WebGUI::International->new($session,'Asset_EventManagementSystem');
 	%hash = (
 		"eventName"=>{
-			name=>"Event Name",
+			name=>$i18n->get('add/edit event title'),
 			type=>"text",
 			compare=>"text",
 			method=>"text",
@@ -45,7 +46,7 @@ sub _getFieldHash {
 			initial=>1
 		},
 		"eventDescription"=>{
-			name=>"Description",
+			name=>$i18n->get("add/edit event description"),
 			type=>"text",
 			compare=>"text",
 			method=>"text",
@@ -54,7 +55,7 @@ sub _getFieldHash {
 			initial=>1
 		},
 		"maxAttendees"=>{
-			name=>"Max Attendees",
+			name=>$i18n->get("add/edit event maximum attendees"),
 			type=>"text",
 			compare=>"numeric",
 			method=>"integer",
@@ -63,7 +64,7 @@ sub _getFieldHash {
 			initial=>1
 		},
 		"seatsAvailable"=>{
-			name=>"Seats Available",
+			name=>$i18n->get("seats available"),
 			type=>"text",
 			method=>"integer",
 			compare=>"numeric",
@@ -71,7 +72,7 @@ sub _getFieldHash {
 			initial=>1
 		},
 		"price"=>{
-			name=>"Price",
+			name=>$i18n->get("add/edit event price"),
 			type=>"text",
 			compare=>"numeric",
 			method=>"float",
@@ -80,7 +81,7 @@ sub _getFieldHash {
 			initial=>1
 		},
 		"startDate"=>{
-			name=>"Starts",
+			name=>$i18n->get("add/edit event start date"),
 			type=>"dateTime",
 			compare=>"numeric",
 			method=>"dateTime",
@@ -89,7 +90,7 @@ sub _getFieldHash {
 			initial=>1
 		},
 		"endDate"=>{
-			name=>"Ends",
+			name=>$i18n->get("add/edit event end date"),
 			type=>"dateTime",
 			compare=>"numeric",
 			method=>"dateTime",
@@ -98,9 +99,9 @@ sub _getFieldHash {
 			initial=>1
 		},
 		"requirement"=>{
-			name=>"Requirement",
+			name=>$i18n->get('add/edit event required events'),
 			type=>"select",
-			list=>{''=>'Select One',$self->_getAllEvents()},
+			list=>{''=>$i18n->get('select one'),$self->_getAllEvents()},
 			compare=>"boolean",
 			method=>"selectBox",
 			calculated=>1,
@@ -404,24 +405,24 @@ sub definition {
 				defaultValue=>'EventManagerTmpl000003',
 				tab=>"display",
 				namespace=>"EventManagementSystem_checkout",
-				hoverHelp=>'',
-				label=>"Checkout Template"
+                		hoverHelp=>$i18n->get('checkout template description'),
+                		label=>$i18n->get('checkout template')
 				},
 			managePurchasesTemplateId =>{
 				fieldType=>"template",
 				defaultValue=>'EventManagerTmpl000004',
 				tab=>"display",
 				namespace=>"EventManagementSystem_managePurchas",
-				hoverHelp=>'Manage Purchases Template',
-				label=>"Manage Purchases Template"
+                		hoverHelp=>$i18n->get('manage purchases template description'),
+                		label=>$i18n->get('manage purchases template')
 				},
 			viewPurchaseTemplateId =>{
 				fieldType=>"template",
 				defaultValue=>'EventManagerTmpl000005',
 				tab=>"display",
 				namespace=>"EventManagementSystem_viewPurchase",
-				hoverHelp=>'View Purchase Template',
-				label=>"View Purchase Template"
+                		hoverHelp=>$i18n->get('view purchase template description'),
+                		label=>$i18n->get('view purchase template')
 				},
 			paginateAfter =>{
 				fieldType=>"integer",
@@ -1303,7 +1304,7 @@ sub verifyPrerequisitesForm {
 
 	$var{'form.footer'} = WebGUI::Form::formFooter($self->session);
 	$var{'form.submit'} = WebGUI::Form::Submit($self->session);
-	$var{'message'}	    = "Some of the events you have selected require attendance of another event.  Please satisfy prerequisites from the list below.";	
+	$var{'message'}	    = $i18n->get('missing prerequisites message');	
 		
 	#Set the template vars needed to inform the user of the missing prereqs.
 	$var{'prereqsAreMissing'} = 1;
@@ -1525,9 +1526,8 @@ sub www_edit {
 	$self->getAdminConsole->setHelp(lc($tag)." add/edit", "Asset_".$tag2);
 	my $i18n = WebGUI::International->new($self->session,'Asset_Wobject');
 	my $addEdit = ($self->session->form->process("func") eq 'add') ? $i18n->get('add') : $i18n->get('edit');
-	my $i18n2 = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n2->get('manage event metadata'));
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEvents'), $i18n2->get('manage events'));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n->get('manage event metadata', 'Asset_EventManagementSystem'));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEvents'), $i18n->get('manage events', 'Asset_EventManagementSystem'));
 	return $self->getAdminConsole->render($self->getEditForm->print,$addEdit.' '.$self->getName);
 }
 
@@ -2157,8 +2157,8 @@ sub www_editEventMetaDataField {
 	);
 	$f->yesNo(
 		-name => "autoSearch",
-		-label => 'Initial Search Field',
-		-hoverHelp => 'Make this appear as a Filter Field on the Advanced Search screen by default',
+		-label => $i18n->('auto search'),
+		-hoverHelp => $i18n->('auto search description'),
 		-value => $data->{autoSearch},
 	);
 	my %hash;

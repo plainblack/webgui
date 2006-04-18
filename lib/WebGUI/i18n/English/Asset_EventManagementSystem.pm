@@ -26,6 +26,42 @@ our $I18N = { ##hashref of hashes
 		context => q|Describes this template field selector|
 	},
 
+	'checkout template' => { 
+		message => q|Checkout Template|,
+		lastUpdated => 1145400901,
+		context => q|Field label for template selector|
+	},
+
+	'checkout template description' => {
+		message => q|Controls the layout, look, and appearence of the Checkout screen in the Event Management System.|,
+		lastUpdated => 1145400973,
+		context => q|Describes this template field selector|
+	},
+
+	'manage purchases template' => { 
+		message => q|Manage Purchases Template|,
+		lastUpdated => 1145400901,
+		context => q|Field label for template selector|
+	},
+
+	'manage purchases template description' => {
+		message => q|Controls the layout, look, and appearence of the Manage Purchases screen in the Event Management System.|,
+		lastUpdated => 1145400970,
+		context => q|Describes this template field selector|
+	},
+
+	'view purchase template' => { 
+		message => q|View Purchase Template|,
+		lastUpdated => 1145400901,
+		context => q|Field label for template selector|
+	},
+
+	'view purchase template description' => {
+		message => q|Controls the layout, look, and appearence of the View Purchase screen in the Event Management System.|,
+		lastUpdated => 1145401024,
+		context => q|Describes this template field selector|
+	},
+
 	'add/edit event template' => { 
 		message => q|Event Template|,
 		lastUpdated => 1131394070,
@@ -527,6 +563,33 @@ allows you to edit events,  delete events, or change their order.</p>
 	'approval' => {
 		message => q|Approval|,
 		lastUpdated => 1145396293,
+	},
+
+	'auto search' => {
+		message => q|Initial Search Field|,
+		lastUpdated => 1145400186,
+	},
+
+	'auto search description' => {
+		message => q|Make this appear as a Filter Field on the Advanced Search screen by default|,
+		lastUpdated => 1145400186,
+	},
+
+	'select one' => {
+		message => q|Select One|,
+		lastUpdated => 1145400186,
+		context => q|Label to indicate that the user should pick one thing from a list of options|,
+	},
+
+	'seats available' => {
+		message => q|Select One|,
+		lastUpdated => 1145400186,
+		context => q|Label to indicate that the user should pick one thing from a list of options|,
+	},
+
+	'missing prerequisites message' => {
+		message => q|Some of the events you have selected require attendance of another event.  Please satisfy prerequisites from the list below.|,
+		lastUpdated => 1145402683,
 	},
 
 };

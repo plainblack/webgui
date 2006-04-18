@@ -13,6 +13,21 @@ our $HELP = {
                                 namespace => 'Asset_EventManagementSystem',
                         },
                         {
+                                title => 'checkout template',
+                                description => 'checkout template description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'manage purchases template',
+                                description => 'manage purchases template description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'view purchase template',
+                                description => 'view purchase template description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
                                 title => 'paginate after',
                                 description => 'paginate after description',
                                 namespace => 'Asset_EventManagementSystem',
@@ -30,6 +45,11 @@ our $HELP = {
                         {
                                 title => 'global prerequisite',
                                 description => 'global prerequisite description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'global metadata',
+                                description => 'global metadata description',
                                 namespace => 'Asset_EventManagementSystem',
                         },
 		],
