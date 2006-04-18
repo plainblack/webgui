@@ -5,29 +5,41 @@
 #namespace:EventManagementSystem_checkout
 #create
 <tmpl_var form.header>
-<table width='100%'>
+<table width="100%" border="1">
 <tr><td><tmpl_var message></td></tr>
 
 <tmpl_if chooseSubevents>
+<tr>
+	<td>
+		<table width="100%">
  <tmpl_loop subevents_loop>
-  <tr>
-  <td><tmpl_var form.checkBox></td>
-  <td><tmpl_var title></td>
-  <td><tmpl_var description></td>
-  <td><tmpl_var price></td>
-  </tr>
+		<tr<tmpl_unless __ODD__> class="evenRow"<tmpl_else> class="oddRow"</tmpl_unless>>
+			<td><tmpl_var form.checkBox></td>
+			<td><tmpl_var title></td>
+			<td><tmpl_var description></td>
+			<td><tmpl_var price></td>
+		</tr>
  </tmpl_loop>
+		</table>
+	</td>
+</tr>
 </tmpl_if>
 
 <tmpl_if resolveConflicts>
+<tr>
+	<td>
+		<table width="100%">
  <tmpl_loop conflict_loop>
- <tr>
-  <td><tmpl_var form.deleteControl></td>
-  <td><tmpl_var title></td>
-  <td><tmpl_var description></td>
-  <td><tmpl_var price></td>
-  </tr>
+		<tr<tmpl_unless __ODD__> class="evenRow"<tmpl_else> class="oddRow"</tmpl_unless>>
+			<td><tmpl_var form.deleteControl></td>
+			<td><tmpl_var title></td>
+			<td><tmpl_var description></td>
+			<td><tmpl_var price></td>
+		</tr>
  </tmpl_loop>
+		</table>
+	</td>
+</tr> 
 </tmpl_if>
 
 <tr><td><tmpl_var form.submit></td></tr>
@@ -38,7 +50,7 @@
   <tmpl_var form.header>
   <tmpl_var form.message>
   <tmpl_var form.chooserJS>
-  <table>
+  <table style="border-top:solid gray 1px;width:100%;margin-top:5px;">
   <tr><td><tmpl_var form.chooser.label></td><td><tmpl_var form.chooser></td></tr>
   <tr><td><tmpl_var form.firstName.label></td><td><tmpl_var form.firstName></td></tr>
 <tr><td><tmpl_var form.lastName.label></td><td><tmpl_var form.lastName></td></tr>
@@ -49,7 +61,8 @@
 <tr><td><tmpl_var form.country.label></td><td><tmpl_var form.country></td></tr>
 <tr><td><tmpl_var form.phoneNumber.label></td><td><tmpl_var form.phoneNumber></td></tr>
 <tr><td><tmpl_var form.email.label></td><td><tmpl_var form.email></td></tr>
-<tr><td><tmpl_var form.badgeId.label></td><td><tmpl_var form.badgeId></td></tr><tr><td rowspan='2' align='center'><tmpl_var form.submit></td></tr>
+<tr><td><tmpl_var form.badgeId.label></td><td><tmpl_var form.badgeId></td></tr>
+<tr><td colspan="2"><br /><tmpl_var form.submit></td></tr>
 </table>
 <script type="text/javascript">
 
@@ -74,21 +87,37 @@ if (selector1) {
 
 <tmpl_if prereqsAreMissing>
 <tmpl_var form.header>
-<table>
+<table border="1">
 
 <tmpl_loop message_loop>
-<tr><td><tmpl_var title> requires all of the following:</td><td colspan="2">
+<tr>
+	<td colspan="4"><strong><tmpl_var title> requires all of the following:</strong></td>
+</tr>
+<tr>
+	<td colspan="4">
+		<ul>
 <tmpl_loop messageLoop>
-<p><tmpl_var reqmessage></p>
-</tmpl_loop></td>
-	</tr>
+			<li><tmpl_var reqmessage></li>
+</tmpl_loop>
+		</ul>
+	</td>
+</tr>
 </tmpl_loop>
 
 <tmpl_loop missingEvents_loop>
-<tr><td><tmpl_var form.checkBox></td><td><tmpl_var title></td><td><tmpl_var description></td><td><tmpl_var price></td></tr>
+<tr<tmpl_unless __ODD__> class="evenRow"<tmpl_else> class="oddRow"</tmpl_unless>><td><tmpl_var form.checkBox></td><td><tmpl_var title></td><td><tmpl_var description></td><td><tmpl_var price></td></tr>
 </tmpl_loop>
-<tr><td><tmpl_var form.submit></td></tr>
+<tr><td colspan="4"><br /><tmpl_var form.submit></td></tr>
 </table>
 <tmpl_var form.footer>
 
 </tmpl_if>
+~~~
+tr.oddRow td {
+	background-color:#DADADA;
+	border-right:solid gray 1px;
+}
+tr.evenRow td {
+	background-color:#E8E8E8;
+	border-right:solid gray 1px;
+}

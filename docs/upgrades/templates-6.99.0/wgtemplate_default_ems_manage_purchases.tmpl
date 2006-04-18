@@ -7,14 +7,32 @@
 <tmpl_if session.var.adminOn>
         <p><tmpl_var controls></p><br /><br />
 </tmpl_if>
-<h1><tmpl_var managePurchasesTitle></h1>
-<table width='100%'>
-<tr><td><tmpl_var purchaseId.label></td><td><tmpl_var datePurchasedHuman.label></td></tr>
+<h2><tmpl_var managePurchasesTitle></h2>
+<table width="100%" cellspacing="0" cellpadding="2">
+<tr>
+	<td><tmpl_var purchaseId.label></td>
+	<td><tmpl_var datePurchasedHuman.label></td>
+</tr>
 <tmpl_if purchasesLoop>
-<tmpl_loop purchasesLoop>
-<tr><td><a href="<tmpl_var purchaseUrl>"><tmpl_var purchaseId></td><td><tmpl_var datePurchasedHuman></td></tr>
-</tmpl_loop>
+	<tmpl_loop purchasesLoop>
+	<tr<tmpl_unless __ODD__> class="evenRow"<tmpl_else> class="oddRow"</tmpl_unless>>
+		<td><strong><tmpl_var __COUNT__></strong></td>
+		<td>&nbsp;<a href="<tmpl_var purchaseUrl>"><tmpl_var purchaseId></a></td>
+		<td>&nbsp;<tmpl_var datePurchasedHuman></td>
+	</tr>
+	</tmpl_loop>
 <tmpl_else>
-<tr><td><tmpl_var noPurchasesMessage></td></tr>
+<tr>
+	<td><tmpl_var noPurchasesMessage></td>
+</tr>
 </tmpl_if>
 </table>
+~~~
+<style type="text/css">
+tr.oddRow td {
+	background-color:#DADADA;	
+}
+tr.evenRow td {
+	background-color:#E8E8E8;	
+}
+</style>

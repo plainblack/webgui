@@ -7,19 +7,76 @@
 <tmpl_if session.var.adminOn>
         <p><tmpl_var controls></p><br /><br />
 </tmpl_if>
-<h1><tmpl_var viewPurchaseTitle></h1>
-<tmpl_if canReturn>&nbsp;&nbsp;<a href="<tmpl_var appUrl>?func=returnItem;tid=<tmpl_var transactionId>">Return Entire Purchase</a></tmpl_if>
+<h2><tmpl_var viewPurchaseTitle></h2>
+
+<tmpl_if canReturn>
+	<div style="text-align:right;">
+		(<a href="<tmpl_var appUrl>?func=returnItem;tid=<tmpl_var transactionId>">Return Entire Purchase</a>)
+	</div>
+</tmpl_if>
+
 <tmpl_loop purchasesLoop>
-<table width="100%">
-<tr><td>Badge Name</td><td>Itinerary&nbsp;&nbsp;<tmpl_if canReturn><a href="<tmpl_var appUrl>?func=returnItem;pid=<tmpl_var purchaseId>">Return Entire Itinerary</a></tmpl_if></td></tr>
-<tr><td>
-<tmpl_var firstName> <tmpl_var lastName><br /><br /><tmpl_if canAddEvents><a href="<tmpl_var appUrl>?func=addEventsToBadge;bid=<tmpl_var badgeId>">Add Events To Badge</a></tmpl_if>
-</td><td>
-<table width="100%">
-<tr><td>Event Title</td><td>Event Dates</td><tmpl_if canReturn><td>Return Registration</td></tmpl_if></tr>
-<tmpl_loop regLoop>
-<tr><td><tmpl_var title></td><td><tmpl_var startDateHuman> - <tmpl_var endDateHuman></td><tmpl_if canReturn><td><a href="<tmpl_var appUrl>?func=returnItem;rid=<tmpl_var registrationId>">Return This Registration</a></td></tmpl_if></tr>
-</tmpl_loop>
-</table></td></tr>
+<table width="100%" border="0" class="viewPurchase">
+<tr>
+	<td class="badgeTitle">Badge Name</td>
+	<td class="itinerary">
+		Itinerary&nbsp;&nbsp;<tmpl_if canReturn>(<a href="<tmpl_var appUrl>?func=returnItem;pid=<tmpl_var purchaseId>">Return Entire Itinerary</a>)</tmpl_if>
+	</td>
+</tr>
+<tr>
+	<td class="badgeName" valign="top">
+		<tmpl_var firstName> <tmpl_var lastName><br /><br />
+		<tmpl_if canAddEvents><a href="<tmpl_var appUrl>?func=addEventsToBadge;bid=<tmpl_var badgeId>">Add Events To Badge</a></tmpl_if>
+	</td>
+	<td valign="top">
+		<table width="100%">
+		<tr>
+			<td><strong>Event Title</strong></td>
+			<td><strong>Event Dates</strong></td>
+		<tmpl_if canReturn>
+			<td><strong>Return Registration</strong></td>
+		</tmpl_if>
+		</tr>
+	<tmpl_loop regLoop>
+		<tr<tmpl_unless __ODD__> class="evenRow"<tmpl_else> class="oddRow"</tmpl_unless>>
+			<td><tmpl_var title></td>
+			<td><tmpl_var startDateHuman> - <tmpl_var endDateHuman></td>
+		<tmpl_if canReturn>
+			<td><a href="<tmpl_var appUrl>?func=returnItem;rid=<tmpl_var registrationId>">Return This Registration</a></td>
+		</tmpl_if>
+		</tr>
+	</tmpl_loop>
+		</table>
+	</td>
+</tr>
 </table>
 </tmpl_loop>
+~~~
+<style type="text/css">
+.viewPurchase {
+	border-bottom:solid silver 2px;
+}
+.viewPurchase td {
+	font-size:10pt;
+}
+tr.oddRow td {
+	background-color:#DADADA;
+	border-right:solid gray 1px;
+}
+tr.evenRow td {
+	background-color:#E8E8E8;
+	border-right:solid gray 1px;
+}
+td.badgeTitle, td.itinerary   {
+	font-size:9pt;
+	font-weight:bold;	
+	border-bottom:solid gray 1px;
+}
+td.badgeName {
+	font-size:9pt;
+	font-style:italic;
+}
+h2 {
+	margin-bottom:3px;
+}
+</style>
