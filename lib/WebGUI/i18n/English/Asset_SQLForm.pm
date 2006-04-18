@@ -766,6 +766,11 @@ not possible ta add fields. Please add at least one field type by going to|,
 		lastUpdated => 0,
 	},
 
+	's search type' => {
+		message => q|Search Type|,
+		lastUpdated => 0,
+	},
+
 	'_csf only normal' => {
 		message => q|Only normal|,
 		lastUpdated => 0,
@@ -869,12 +874,12 @@ If you do not want to use this feature, simply leave the field blank.</p>|,
 		lastUpdated => 0,
 	},
 
-	'gef show metadata' => {
+	'gef show meta data' => {
 		message => q|Show metadata|,
 		lastUpdated => 0,
 	},
 
-	'gef show metadata description' => {
+	'gef show meta data description' => {
 		message => q|<p>In the SQLForm each record has special meta data
 containing the state of the record. If you want some of this this information to
 be shown in search results, please set this property to yes.</p>|,
@@ -1280,6 +1285,11 @@ query. The following variable is available in this loop:</p>
 		lastUpdated => 0,
 	},
 
+	'cancel' => {
+		message => q|Cancel|,
+		lastUpdated => 0,
+	},
+
 	'gef import table' => {
 		message => q|Import this table|,
 		lastUpdated => 0,
@@ -1314,8 +1324,8 @@ the table.</p>|,
 		message => q|You can view this change by clicking on this url:|,
 		lastUpdated => 0,
 	},
-	
-	
+
+
 };
 
 1;

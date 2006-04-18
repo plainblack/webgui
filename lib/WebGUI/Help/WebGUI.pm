@@ -336,16 +336,6 @@ our $HELP = {
                                 namespace => 'WebGUI',
                         },
                         {
-                                title => '534',
-                                description => '534 description',
-                                namespace => 'WebGUI',
-                        },
-                        {
-                                title => '535',
-                                description => '535 description',
-                                namespace => 'WebGUI',
-                        },
-                        {
                                 title => '400',
                                 description => '400 description',
                                 namespace => 'WebGUI',

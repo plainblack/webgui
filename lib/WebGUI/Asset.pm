@@ -929,7 +929,7 @@ sub getToolbar {
 	}
 	my $export = "";
 	if (defined $self->session->config->get("exportPath")) {
-		$export = 'contextMenu.addLink("'.$self->getUrl("func=export").'","'.$i18n->get("export","Icon").'");';
+		$export = 'contextMenu.addLink("'.$self->getUrl("func=export").'","'.$i18n->get("Export","Icon").'");';
 	}
 	return '<script type="text/javascript">
 		//<![CDATA[

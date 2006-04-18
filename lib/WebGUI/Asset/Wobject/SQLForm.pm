@@ -2868,7 +2868,7 @@ my		$currentRow = '<tr align="left" bgcolor="#bbbbbb">';
 			while (my $currentField = $assetsUsing->hashRef) {
 				$currentRow .= '<li>';
 				$currentRow .= $self->session->icon->edit('func=editField;fid='.$currentField->{fieldId}, $currentField->{url});
-				$currentRow .= $currentField->{title}.' '.$i18n->get('in field').' '.$currentField->{value};
+				$currentRow .= $currentField->{title}.' '.$i18n->get('lr in field').' '.$currentField->{value};
 				$currentRow .= '</li>';
 			}
 			$currentRow .= '</ul></td><tr height="5"></tr>'.'</tr>';

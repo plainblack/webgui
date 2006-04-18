@@ -36,7 +36,7 @@ our $HELP = {
                         },
 
 			{
-                                title =>'show meta data',
+                                title =>'gef show meta data',
                                 description => 'gef show meta data description',
                                 namespace => 'Asset_SQLForm',
                         },
