@@ -1,7 +1,7 @@
 package WebGUI::Help::Asset_SQLForm;
 
 our $HELP = {
-	'sqlform add/edit ' => {
+	'sqlform add/edit' => {
 		title => 'edit sqlform',
 		body => 'sqlform description',
 		fields => [
@@ -340,7 +340,7 @@ our $HELP = {
 			},
 			{
 				tag => 'template language',
-				namespace => 'Asset_SQLForm',
+				namespace => 'Asset_Template',
 			},
 		],
 	},
@@ -355,7 +355,7 @@ our $HELP = {
 			},
 			{
 				tag => 'template language',
-				namespace => 'Asset_SQLForm',
+				namespace => 'Asset_Template',
 			},
 		],
 	},
