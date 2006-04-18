@@ -90,7 +90,7 @@ sub www_richEditPageTree {
 		-value=>$i18n->get('done'),
 		-extras=>'onclick="createLink()"'
 		);
-	$session->style->setScript($session->config->get("extrasURL")."/tinymce/jscripts/tiny_mce/tiny_mce_popup.js",{type=>"text/javascript"});
+	$session->style->setScript($session->config->get("extrasURL")."/tinymce2/jscripts/tiny_mce/tiny_mce_popup.js",{type=>"text/javascript"});
 	my $output = '<fieldset><legend>'.$i18n->get('insert a link').'</legend>
 		<fieldset><legend>'.$i18n->get('insert a link').'</legend>'.$f->print.'</fieldset>
 	<script type="text/javascript">
@@ -100,7 +100,10 @@ function createLink() {
            alert("'.$i18n->get("link enter alert").'");
            document.getElementById("url_formId").focus();
         }
-window.opener.tinyMCE.insertLink("^" + "/" + ";" + document.getElementById("url_formId").value,document.getElementById("target_formId").value);
+	var link = \'<a href="\'+"^" + "/" + ";" + document.getElementById("url_formId").value+\'">\';
+	link += window.opener.tinyMceSelectedText; 
+	link += \'</a>\';
+	window.opener.tinyMCE.execCommand("mceInsertContent",false,link);
      window.close();
     }
 }
@@ -205,7 +208,7 @@ sub www_richEditViewThumbnail {
     		    </script>\n";
 		return $output;
 	}
-	return '<div align="center"><img src="'.$session->config->get("extrasURL").'/tinymce/images/icon.gif" style="border-style:none;" alt="'.$i18n->get('image manager').'" /></div>';
+	return '<div align="center"><img src="'.$session->config->get("extrasURL").'/tinymce2/images/icon.gif" style="border-style:none;" alt="'.$i18n->get('image manager').'" /></div>';
 }
 
 #-------------------------------------------------------------------

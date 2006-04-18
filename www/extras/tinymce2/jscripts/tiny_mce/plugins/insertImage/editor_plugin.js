@@ -7,8 +7,7 @@ tinyMCE.importPluginLanguagePack('insertImage', 'en');
 function TinyMCE_insertImage_getControlHTML(control_name) {
         switch (control_name) {
 		case "insertImage":
-			case "insertdate":
-				return tinyMCE.getButtonHTML(control_name, 'lang_insert_webgui_image', '{$pluginurl}/images/insertImage.gif', 'insertImage');
+			return tinyMCE.getButtonHTML(control_name, 'lang_insert_webgui_image', '{$pluginurl}/images/insertImage.gif', 'insertImage');
 	}
 
 	return "";
