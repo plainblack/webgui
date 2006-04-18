@@ -18,7 +18,6 @@ package WebGUI::Session::Http;
 use strict;
 use Apache2::Cookie;
 use APR::Request::Apache2;
-use HTTP::Date;
 
 =head1 NAME
 
@@ -169,7 +168,8 @@ sub sendHeader {
 		$self->session->request->status(301);
 	} else {
 		$self->session->request->content_type($self->{_http}{mimetype} || "text/html");
-#		$self->session->request->set_last_modified($self->{_http}{lastModified} || time());
+		my $date = $self->session->datetime->epochToHuman(($self->{_http}{lastModified} || time()), "%W, %d %C %y %j:%m:%s %t");
+		$self->session->request->headers_out->set('Last-Modified' => $date);
 		if ($self->session->setting->get("preventProxyCache")) {
 			$self->session->request->headers_out->set(Expires => "-1d");
 		}
@@ -217,7 +217,8 @@ sub setCacheControl {
 		} elsif ($request->protocol =~ /(\d\.\d)/ && $1 >= 1.1){
     			$request->header_out('Cache-Control', "max-age=" . $timeout);
   		} else {
-    			$request->header_out('Expires', HTTP::Date::time2str(time + $self->get("cacheTimeout")));
+			my $date = $self->session->datetime->epochToHuman(time() + $timeout, "%W, %d %C %y %j:%m:%s %t");
+    			$request->header_out('Expires', $date);
   		}
 	}
 }

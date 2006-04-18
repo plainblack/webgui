@@ -213,6 +213,7 @@ A string representing the output format for the date. Defaults to '%z %Z'. You c
  %p = A lower-case am/pm.
  %P = An upper-case AM/PM.
  %s = A two digit second.
+ %t = Time zone name.
  %w = Day of the week. 
  %W = Day of the week abbreviated. 
  %y = A four digit year.
@@ -252,6 +253,7 @@ sub epochToHuman {
 		"m" => "m",
 		"M" => "_varmonth_",
 		"n" => "M",
+		"t" => "Z",
 		"O" => "z",
 		"p" => "P",
 		"P" => "p",
