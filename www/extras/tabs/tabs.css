@@ -7,7 +7,7 @@
          padding: 2px 9px 1px 9px;
          z-index: 100;
          border-bottom-width: 0;
-          border-top-width: 1 !important;
+          border-top-width: 1px !important;
           border-bottom-width: 0px !important;
 }
 
