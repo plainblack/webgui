@@ -542,6 +542,16 @@ sub getEditForm {
 			});
 	}
 	$tabform->addTab("properties",$i18n->get("properties"));
+
+	# process errors
+	my $errors = $self->session->stow->get('editFormErrors');
+print "[$errors]";
+	if ($errors) {
+		$tabform->getTab("properties")->readOnly(
+			-value=>"<p>Some error(s) occurred:<ul><li>".join('</li><li>', @$errors).'</li></ul></p>',
+		)
+	}
+
 	$tabform->getTab("properties")->readOnly(
 		-label=>$i18n->get("asset id"),
 		-value=>$self->get("assetId"),
@@ -1523,7 +1533,9 @@ sub prepareView {
 
 =head2 processPropertiesFromFormPost ( )
 
-Updates current Asset with data from Form.
+Updates current Asset with data from Form. You can feed back errors by returning an
+arrayref containing the error messages. If there is no error you do not have to return
+anything.
 
 =cut
 
@@ -1906,7 +1918,19 @@ sub www_editSave {
                         return $self->getContainer->www_view;
                 }
 	}
-	$object->processPropertiesFromFormPost;
+
+	my $error = $object->processPropertiesFromFormPost;
+	if (ref $error eq 'ARRAY') {
+		$self->session->stow->set('editFormErrors', $error);
+		if ($self->session->form->process('assetId') eq 'new') {
+			$object->purge;
+			return $self->www_add();
+		} else {
+			$object->purgeRevision;
+			return $self->www_edit();
+		}
+	}
+
 	$object->updateHistory("edited");
 	if ($self->session->form->process("proceed") eq "manageAssets") {
 		$self->session->asset($object->getParent);
@@ -1921,6 +1945,7 @@ sub www_editSave {
 		$self->session->asset($object);
 		return $self->session->asset->$method();
 	}
+		
 	$self->session->asset($object->getContainer);
 	return $self->session->asset->www_view;
 }

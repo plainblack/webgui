@@ -105,7 +105,7 @@
  - fix [ 1344665 ] Cache does not remember mimetype
  - fix [ 1172613 ] Header Tag Not Accessibility Friendly
  - fix [ 1340839 ] If can't use item in adminConsole don't display it
-
+ - Added SQL Form and error feedback for asset addition (Martin Kamerbeek/Procolix)
 
 6.8.8
  - fix [ 1452466 ] File size not set in File asset (Thanks to Eric S)

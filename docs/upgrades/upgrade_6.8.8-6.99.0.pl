@@ -17,6 +17,7 @@ use File::Path;
 use WebGUI::Workflow;
 use WebGUI::Workflow::Cron;
 use WebGUI::Group;
+use WebGUI::Utility;
 use WebGUI::Storage;
 
 my $toVersion = "6.99.0"; # make this match what version you're going to
@@ -48,6 +49,7 @@ updateMatrix();
 updateFolder();
 addRichEditUpload();
 updateArticle();
+installSQLForm();
 
 finish($session); # this line required
 
@@ -926,6 +928,82 @@ EOT
 	my $asset = WebGUI::Asset->new($session,"PBtmplHelp000000000001","WebGUI::Asset::Template");
 	$asset->addRevision({template=>$template});
 }
+
+sub installSQLForm {
+	print "\tInstalling SQLForm tables.\n" unless ($quiet);
+	
+	# Skip table creation if the SQLForm is already installed.
+	return "" if WebGUI::Utility::isIn('SQLForm', $session->db->buildArray("show tables"));
+	
+	# Create tables;
+	$session->db->write(<<ENDOFQUERY1
+CREATE TABLE SQLForm (
+  assetId varchar(22) NOT NULL default '',
+  formId varchar(22) default NULL,
+  tableName varchar(255) default NULL,
+  viewTemplateId varchar(22) default NULL,
+  searchTemplateId varchar(22) default NULL,
+  editTemplateId varchar(22) default NULL,
+  submitGroupId varchar(22) default NULL,
+  alterGroupId varchar(22) default NULL,
+  databaseLinkId varchar(22) default '0',
+  maxFileSize bigint(20) default NULL,
+  sendMailTo varchar(255) default NULL,
+  showMetaData tinyint(1) default '1',
+  revisionDate bigint(20) NOT NULL default '0',
+  PRIMARY KEY  (assetId,revisionDate)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+ENDOFQUERY1
+);
+
+	$session->db->write(<<ENDOFQUERY2
+CREATE TABLE SQLForm_fieldDefinitions (
+  fieldId varchar(22) NOT NULL default '',
+  assetId varchar(22) NOT NULL default '',
+  property varchar(255) NOT NULL default '',
+  `value` text,
+  UNIQUE KEY fieldId (fieldId,property)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+ENDOFQUERY2
+);
+
+	$session->db->write(<<ENDOFQUERY3
+CREATE TABLE SQLForm_fieldOrder (
+  assetId varchar(22) NOT NULL default '',
+  fieldId varchar(22) NOT NULL default '',
+  rank int(11) NOT NULL default '0'
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+ENDOFQUERY3
+);
+
+	$session->db->write(<<ENDOFQUERY4
+CREATE TABLE SQLForm_fieldTypes (
+  fieldTypeId varchar(22) NOT NULL default '',
+  dbFieldType varchar(22) NOT NULL default '',
+  formFieldType varchar(22) NOT NULL default '',
+  PRIMARY KEY  (fieldTypeId)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+ENDOFQUERY4
+);
+
+	$session->db->write(<<ENDOFQUERY5
+CREATE TABLE SQLForm_regexes (
+  regexId varchar(22) default NULL,
+  name varchar(255) NOT NULL default '',
+  regex varchar(255) NOT NULL default '',
+  UNIQUE KEY regex (regex)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+ENDOFQUERY5
+);
+
+	# Insert default regexes
+	$session->db->write("insert into SQLForm_regexes (regexId, name, regex) values ('defaultText', 'Text', '^[\\\\w\\\\d\\\\s]*\$')");
+	$session->db->write("insert into SQLForm_regexes (regexId, name, regex) values ('defaultUnsigned', 'Unsigned integer', '^\\\\d+\$')");
+	$session->db->write("insert into SQLForm_regexes (regexId, name, regex) values ('defaultSigned', 'Signed integer', '^-?\\\\d+\$')");
+	$session->db->write("insert into SQLForm_regexes (regexId, name, regex) values ('defaultFloat', 'Floating point number', '^-?\\\\d+(\\.\\\\d+)?\$')");
+}
+
+
 
 # ---- DO NOT EDIT BELOW THIS LINE ----
 

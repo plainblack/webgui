@@ -181,7 +181,8 @@
 	"WebGUI::Asset::Wobject::SyndicatedContent",
 	"WebGUI::Asset::Wobject::InOutBoard",
 	"WebGUI::Asset::File::ZipArchive",
-	"WebGUI::Asset::Wobject::WSClient"
+	"WebGUI::Asset::Wobject::WSClient",
+	"WebGUI::Asset::Wobject::SQLForm"
 	],
 
 # Specify the list assets that are used for utility purposes only
