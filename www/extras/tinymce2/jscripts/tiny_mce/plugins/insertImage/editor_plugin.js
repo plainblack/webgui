@@ -1,4 +1,5 @@
 /* Import theme specific language pack */
+tinyMCE.importPluginLanguagePack('insertImage', 'en');
 
 /**
  * Returns the HTML contents of the emotions control.
@@ -6,7 +7,8 @@
 function TinyMCE_insertImage_getControlHTML(control_name) {
         switch (control_name) {
 		case "insertImage":
-			return '<img id="{$editor_id}_insertImage" src="{$pluginurl}/images/insertImage.gif" title="Insert a WebGUI collateral image" width="20" height="20" class="mceButtonNormal" onmouseover="tinyMCE.switchClass(this,\'mceButtonOver\');" onmouseout="tinyMCE.restoreClass(this);" onmousedown="tinyMCE.restoreAndSwitchClass(this,\'mceButtonDown\');" onclick="tinyMCE.execInstanceCommand(\'{$editor_id}\',\'insertImage\');">';
+			case "insertdate":
+				return tinyMCE.getButtonHTML(control_name, 'lang_insert_webgui_image', '{$pluginurl}/images/insertImage.gif', 'insertImage');
 	}
 
 	return "";
