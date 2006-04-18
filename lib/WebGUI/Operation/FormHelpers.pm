@@ -12,7 +12,10 @@ package WebGUI::Operation::FormHelpers;
 
 use strict;
 use WebGUI::Asset;
+use WebGUI::Asset::Wobject::Folder;
+use WebGUI::Form::Group;
 use WebGUI::HTMLForm;
+use WebGUI::Storage::Image;
 
 =head1 NAME
 
@@ -38,8 +41,8 @@ sub www_formAssetTree {
 	my $ancestors = $base->getLineage(["self","ancestors"],{returnObjects=>1});
 	foreach my $ancestor (@{$ancestors}) {
 		push(@crumb,'<a href="'.$ancestor->getUrl("op=formAssetTree;classLimiter=".$session->form->process("classLimiter").";formId="
-                        .$session->form->process("formId")).'">'.$ancestor->get("menuTitle").'</a>');
-	}	
+			.$session->form->process("formId")).'">'.$ancestor->get("menuTitle").'</a>');
+	}
 	my $output = '<p>'.join(" &gt; ", @crumb)."</p>\n";
 	my $children = $base->getLineage(["children"],{returnObjects=>1});
 	foreach my $child (@{$children}) {
@@ -134,22 +137,41 @@ sub www_richEditImageTree {
 	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
 	my @crumb;
 	my $ancestors = $base->getLineage(["self","ancestors"],{returnObjects=>1});
+	my $media;
+	my @output;
+	my $i18n = WebGUI::International->new($session, 'Operation_FormHelpers');
 	foreach my $ancestor (@{$ancestors}) {
 		push(@crumb,'<a href="'.$ancestor->getUrl("op=richEditImageTree").'">'.$ancestor->get("menuTitle").'</a>');
+		# check if we are in (a subdirectory of) Media
+		if ($ancestor->get('assetId') eq 'PBasset000000000000003') {
+			$media = $ancestor;
+		}
 	}	
-	my $output = '<p>'.join(" &gt; ", @crumb)."</p>\n";
+	if ($media) {
+		# if in (a subdirectory of) Media, give user the ability to create folders or upload images
+		push(@output, '<p>[ <a href="');
+		push(@output, $base->getUrl('op=richEditAddFolder'));
+		push(@output, '">'.$i18n->get('Create new folder').'</a> ] &nbsp; [ <a href="');
+		push(@output, $base->getUrl('op=richEditAddImage'));
+		push(@output, '">'.$i18n->get('Upload new image').'</a> ]</p>');
+	} else {
+		$media = WebGUI::Asset->getMedia($session);
+		# if not in Media, provide a direct link to it
+		push(@output, '<p>[ <a href="'.$media->getUrl('op=richEditImageTree').'">'.$media->get('title').'</a> ]</p>');
+	}
+	push(@output, '<p>'.join(" &gt; ", @crumb)."</p>\n");
 	my $children = $base->getLineage(["children"],{returnObjects=>1});
 	foreach my $child (@{$children}) {
 		next unless $child->canView;
 		if ($child->get("className") =~ /^WebGUI::Asset::File::Image/) {
-			$output .= '<a href="'.$child->getUrl("op=richEditViewThumbnail").'" target="viewer">(&bull;)</a> ';
+			push(@output, '<a href="'.$child->getUrl("op=richEditViewThumbnail").'" target="viewer">(&bull;)</a> ');
 		} else {
-			$output .= "(&bull;) ";
+			push(@output, "(&bull;) ");
 		}
-		$output .= '<a href="'.$child->getUrl("op=richEditImageTree").'">'.$child->get("menuTitle").'</a>'."<br />\n";	
+		push(@output, '<a href="'.$child->getUrl("op=richEditImageTree").'">'.$child->get("menuTitle").'</a>'."<br />\n");
 	}
 	$session->style->useEmptyStyle("1");
-	return $output;
+	return join('', @output);
 }
 
 
@@ -186,8 +208,158 @@ sub www_richEditViewThumbnail {
 	return '<div align="center"><img src="'.$session->config->get("extrasURL").'/tinymce/images/icon.gif" style="border-style:none;" alt="'.$i18n->get('image manager').'" /></div>';
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_richEditAddFolder ( $session )
+
+Returns a form to add a folder using the rich editor. The purpose of this feature is to provide a very simple way for end-users to create a folder from within the rich editor, in stead of having to leave the rich editor and use the asset manager. A very minimal set of options is supplied, all other options should be derived from the current asset.
+
+=cut
+
+sub www_richEditAddFolder {
+	my $session = shift;
+	my $i18n = WebGUI::International->new($session, 'Operation_FormHelpers');
+	my $f = WebGUI::HTMLForm->new($session);
+	$f->hidden(
+		name		=> 'op',
+		value		=> 'richEditAddFolderSave',
+		);
+	$f->text(
+		label		=> $i18n->get('Folder name'),
+		name		=> 'filename',
+		);
+	$f->submit(
+		value		=> $i18n->get('Create'),
+		);
+	$f->button(
+		value		=> $i18n->get('Cancel'),
+		extras		=> 'onclick="history.go(-1);"',
+		);
+	my $html = '<h1>'.$i18n->get('Create new folder').'</h1>'.$f->print;
+	return $session->style->process($html, 'PBtmpl0000000000000137');
+}
 
 
+#-------------------------------------------------------------------
+
+=head2 www_richEditAddFolderSave ( $session )
+
+Creates a directory under the current asset. The filename should be specified in the form. The Edit and View rights from the current asset are used if not specified in the form. All other properties are copied from the current asset.
+
+=cut
+
+sub www_richEditAddFolderSave {
+	my $session = shift;
+	# get base url
+	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
+	# check if user can edit the current asset
+	return WebGUI::Privilege::insufficient() unless $base->canEdit;
+
+	my $filename = $session->form->process('filename') || 'untitled';
+	$base->addChild({
+		# Asset properties
+		title                    => $filename,
+		menuTitle                => $filename,
+		url                      => $base->getUrl.'/'.$filename,
+		groupIdEdit              => $session->form->process('groupIdEdit') || $base->get('groupIdEdit'),
+		groupIdView              => $session->form->process('groupIdView') || $base->get('groupIdView'),
+		ownerUserId              => $session->user->userId,
+		startDate                => $base->get('startDate'),
+		endDate                  => $base->get('endDate'),
+		encryptPage              => $base->get('encryptPage'),
+		isHidden                 => 1,
+		newWindow                => 0,
+
+		# Asset/Wobject properties
+		displayTitle             => 1,
+		cacheTimeout             => $base->get('cacheTimeout'),
+		cacheTimeoutVisitor      => $base->get('cacheTimeoutVisitor'),
+		styleTemplateId          => $base->get('styleTemplateId'),
+		printableStyleTemplateId => $base->get('printableStyleTemplateId'),
+
+		# Asset/Wobject/Folder properties
+		templateId               => 'PBtmpl0000000000000078',
+
+		# Other properties
+		#assetId                  => 'new',
+		className                => 'WebGUI::Asset::Wobject::Folder',
+		#filename                 => $filename,
+		});
+	$session->http->setRedirect($base->getUrl('op=richEditImageTree'));
+	return "";
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_richEditAddImage ( $session )
+
+Returns a form to add an image using the rich editor. The purpose of this feature is to provide a very simple way for end-users to upload new images from within the rich editor, in stead of having to leave the rich editor and use the asset manager. A very minimal set of options is supplied, all other options should be derived from the current asset.
+
+=cut
+
+sub www_richEditAddImage {
+	my $session = shift;
+	my $i18n = WebGUI::International->new($session, 'Operation_FormHelpers');
+	my $f = WebGUI::HTMLForm->new($session);
+	$f->hidden(
+		name		=> 'op',
+		value		=> 'richEditAddImageSave',
+		);
+	$f->file(
+		label		=> $i18n->get('File'),
+		name		=> 'filename',
+		size		=> 10,
+		);
+	$f->submit(
+		value		=> $i18n->get('Upload'),
+		);
+	$f->button(
+		value		=> $i18n->get('Cancel'),
+		extras		=> 'onclick="history.go(-1);"',
+		);
+	my $html = '<h1>'.$i18n->get('Upload new image').'</h1>'.$f->print;
+	return $session->style->process($html, 'PBtmpl0000000000000137');
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_richEditAddImageSave ( $session )
+
+Creates an Image asset under the current asset. The filename should be specified in the form. The Edit and View rights from the current asset are used if not specified in the form. All other properties are copied from the current asset.
+
+=cut
+
+sub www_richEditAddImageSave {
+	my $session = shift;
+	# get base url
+	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
+	#my $base = $session->asset;
+	my $url = $base->getUrl;
+	# check if user can edit the current asset
+	return WebGUI::Privilege::insufficient() unless $base->canEdit;
+
+	my $storage = WebGUI::Storage::Image->create($session);
+	my $filename = $storage->addFileFromFormPost('filename');
+	if ($filename) {
+		$base->addChild({
+			assetId     => 'new',
+			className   => 'WebGUI::Asset::File::Image',
+			storageId   => $storage->getId,
+			filename    => $filename,
+			title       => $filename,
+			menuTitle   => $filename,
+			templateId  => 'PBtmpl0000000000000088',
+			url         => $url.'/'.$filename,
+			groupIdEdit => $session->form->process('groupIdEdit') || $base->get('groupIdEdit'),
+			groupIdView => $session->form->process('groupIdView') || $base->get('groupIdView'),
+			ownerUserId => $session->var->get('userId'),
+			isHidden    => 1,
+			});
+		$storage->generateThumbnail($filename);
+	}
+	$session->http->setRedirect($url.'?op=richEditImageTree');
+	return "";
+}
 
 
 1;
