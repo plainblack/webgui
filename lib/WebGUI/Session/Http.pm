@@ -295,7 +295,7 @@ sub setFilename {
 sub setLastModified {
 	my $self = shift;
 	my $epoch = shift;
-	$self->{_htt}{lastModified} = $epoch;
+	$self->{_http}{lastModified} = $epoch;
 }
 
 #-------------------------------------------------------------------
