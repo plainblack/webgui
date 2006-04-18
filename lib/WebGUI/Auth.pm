@@ -86,9 +86,6 @@ sub _isValidUsername {
    if ($username eq "") {
       $error .= '<li>'.$i18n->get(725).'</li>';
    }
-   unless ($username =~ /^[A-Za-z0-9\-\_\.\,\@]+$/) {
-   	  $error .= '<li>'.$i18n->get(747).'</li>';
-   }
    $self->error($error);
    return $error eq "";
 }

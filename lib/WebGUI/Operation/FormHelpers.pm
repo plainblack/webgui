@@ -45,14 +45,15 @@ sub www_formAssetTree {
 	}
 	my $output = '<p>'.join(" &gt; ", @crumb)."</p>\n";
 	my $children = $base->getLineage(["children"],{returnObjects=>1});
+	my $i18n = WebGUI::International->new($session);
 	foreach my $child (@{$children}) {
 		next unless $child->canView;
 		if ($child->get("className") =~ /^$session->form->process("classLimiter")/) {
 			$output .= '<a href="#" onclick="window.opener.document.getElementById(\''.$session->form->process("formId")
 				.'\').value=\''.$child->getId.'\';window.opener.document.getElementById(\''.
-				$session->form->process("formId").'_display\').value=\''.$child->get("title").'\';window.close();">(&bull;)</a> ';
+				$session->form->process("formId").'_display\').value=\''.$child->get("title").'\';window.close();">['.$i18n->get("select").']</a> ';
 		} else {
-			$output .= "(&bull;) ";
+			$output .= "[".$i18n->get("select")."] ";
 		}
 		$output .= '<a href="'.$child->getUrl("op=formAssetTree;classLimiter=".$session->form->process("classLimiter").";formId="
 			.$session->form->process("formId")).'">'.$child->get("menuTitle").'</a>'."<br />\n";	
@@ -118,7 +119,7 @@ function createLink() {
 	my $children = $base->getLineage(["children"],{returnObjects=>1});
 	foreach my $child (@{$children}) {
 		next unless $child->canView;
-		$output .= '<a href="#" onclick="document.getElementById(\'url_formId\').value=\''.$child->get("url").'\'">(&bull;)</a> <a href="'.$child->getUrl("op=richEditPageTree").'">'.$child->get("menuTitle").'</a>'."<br />\n";	
+		$output .= '<a href="#" onclick="document.getElementById(\'url_formId\').value=\''.$child->get("url").'\'">['.$i18n->get("select").']</a> <a href="'.$child->getUrl("op=richEditPageTree").'">'.$child->get("menuTitle").'</a>'."<br />\n";	
 	}
 	$session->style->useEmptyStyle("1");
 	return $output.'</fieldset></fieldset>';
@@ -167,9 +168,9 @@ sub www_richEditImageTree {
 	foreach my $child (@{$children}) {
 		next unless $child->canView;
 		if ($child->get("className") =~ /^WebGUI::Asset::File::Image/) {
-			push(@output, '<a href="'.$child->getUrl("op=richEditViewThumbnail").'" target="viewer">(&bull;)</a> ');
+			push(@output, '<a href="'.$child->getUrl("op=richEditViewThumbnail").'" target="viewer">['.$i18n->get("select","WebGUI").']</a> ');
 		} else {
-			push(@output, "(&bull;) ");
+			push(@output, "[".$i18n->get("select","WebGUI")."] ");
 		}
 		push(@output, '<a href="'.$child->getUrl("op=richEditImageTree").'">'.$child->get("menuTitle").'</a>'."<br />\n");
 	}

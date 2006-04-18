@@ -1,6 +1,12 @@
 package WebGUI::i18n::English::WebGUI;
 
 our $I18N = {
+	'select' => {
+		message => q|Select|,
+		lastUpdated => 0,
+		context=>"form helpers"
+	},
+
 	'mail return path help' => {
 		message => q|To what email address should undeliverable messages be sent?|,
 		lastUpdated => 0,
@@ -1947,11 +1953,6 @@ default WebGUI groups such as Admin or Content Manager.</p> |,
 	'847' => {
 		message => q|Go back to the current page.|,
 		lastUpdated => 1039587250
-	},
-
-	'747' => {
-		message => q|Usernames must contain only alpha-numeric characters, dashes, underscores, periods, commas or @ signs.|,
-		lastUpdated => 1129431985
 	},
 
 	'159' => {

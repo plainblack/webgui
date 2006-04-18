@@ -49,9 +49,16 @@ updateMatrix();
 updateFolder();
 addRichEditUpload();
 updateArticle();
+updateScratch();
 installSQLForm();
 
 finish($session); # this line required
+
+#-------------------------------------------------
+sub updateScratch {
+	print "\tIncreasing size of scratch variables.\n";
+	$session->db->write("alter table userSessionScratch change value value text");
+}
 
 #-------------------------------------------------
 sub updateArticle {
@@ -929,6 +936,7 @@ EOT
 	$asset->addRevision({template=>$template});
 }
 
+#-------------------------------------------------
 sub installSQLForm {
 	print "\tInstalling SQLForm tables.\n" unless ($quiet);
 	
@@ -1001,6 +1009,7 @@ ENDOFQUERY5
 	$session->db->write("insert into SQLForm_regexes (regexId, name, regex) values ('defaultUnsigned', 'Unsigned integer', '^\\\\d+\$')");
 	$session->db->write("insert into SQLForm_regexes (regexId, name, regex) values ('defaultSigned', 'Signed integer', '^-?\\\\d+\$')");
 	$session->db->write("insert into SQLForm_regexes (regexId, name, regex) values ('defaultFloat', 'Floating point number', '^-?\\\\d+(\\.\\\\d+)?\$')");
+	$session->config->addToArray("assets","WebGUI::Asset::Wobject::SQLForm");
 }
 
 

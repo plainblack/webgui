@@ -98,6 +98,12 @@
  - Help for forms now shows the fields that you should see with your UI level.
    There is a link to show all fields.
  - added [ 732011 ] http header cache setting
+ - added [ 810556 ] larger value field in userSessionScratch table
+ - added [ 881817 ] allowed characters in username
+ - added [ 1231386 ] Insert WebGUI Image
+ - fix [ 1178981 ] IE is in "quirks mode" - multi-column layout templates
+   break
+ - fix [ 999590 ] Rating
  - fix [ 1410577 ] WebGUI::Session not included
  - fix a bug where a link was provided to become or delete non-existant users.
  - fix bugs with the in-memory session caching of user and group memberships
