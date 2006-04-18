@@ -14,7 +14,7 @@ package WebGUI::Commerce::Payment::Cash;
 
 =head1 NAME
 
-Package WebGUI::Payment::ITransact
+Package WebGUI::Payment::Cash
 
 =head1 DESCRIPTION
 
@@ -44,7 +44,7 @@ sub checkoutForm {
 	my ($self, $u, $f, %months, %years, $i18n);
 	$self = shift;
 	
-	$i18n = WebGUI::International->new($self->session, 'CommercePaymentITransact');
+	$i18n = WebGUI::International->new($self->session, 'CommercePaymentCash');
 
 	$u = WebGUI::User->new($self->session,$self->session->user->userId);
 
@@ -52,12 +52,12 @@ sub checkoutForm {
 
 	$f->selectBox(
                 -name=>"paymentMethod",
-                -label=>"Payment Method",
+                -label=>$i18n->get("payment method"),
                 -value=>[$self->session->form->process("paymentMethod")],
                 -defaultValue=>['cash'],
-                -options=> { 'cash' => 'Cash',
-			     'check' => 'Check',
-			     'other' => 'Other'
+                -options=> { 'cash' => $i18n->get('cash'),
+			     'check' => $i18n->get('check'),
+			     'other' => $i18n->get('other'),
 			   }
                 );
 
@@ -362,7 +362,7 @@ sub checkoutForm {
 sub configurationForm {
 	my ($self, $f, $i18n);
 	$self = shift;
- 	$i18n = WebGUI::International->new($self->session, 'CommercePaymentITransact');
+ 	$i18n = WebGUI::International->new($self->session, 'CommercePaymentCash');
 
 	$f = WebGUI::HTMLForm->new($self->session);
 
@@ -375,8 +375,8 @@ sub configurationForm {
 	$f->yesNo(
 		-name	=> $self->prepend('completeTransaction'),
 		-value 	=> $self->get('completeTransaction') || 1,
-		-label 	=> 'Complete Transaction on Submit?',
-		-hoverHelp => 'When set to \'yes\', the transaction is completed when the user submits payment details.  When set to \'no\', the transaction is set to pending and must be manually set to complete.  This may be useful if you wish to allow site visitors to select the Cash Payment method, but would like to wait for payment to clear before completing the transaction.'
+		-label 	=> $i18n->get('complete transaction'),
+		-hoverHelp => $i18n->get('complete transaction description'),
 		);
 		
 	return $self->SUPER::configurationForm($f->printRowsOnly);
@@ -428,7 +428,9 @@ sub errorCode {
 
 #-------------------------------------------------------------------
 sub name {
-	return "Cash";
+	my ($self) = shift;
+	my $i18n = WebGUI::International->new($self->session, "CommercePaymentCash");
+	return $i18n->get('module name');
 }
 
 #-------------------------------------------------------------------
@@ -444,7 +446,7 @@ sub normalTransaction {
 	$normal = shift;
 
 	if ($normal) {
-		my $i18n = WebGUI::International->new($self->session, 'CommercePaymentITransact');
+		my $i18n = WebGUI::International->new($self->session, 'CommercePaymentCash');
 		$self->{_transactionParams} = {
 			AMT		=> sprintf('%.2f', $normal->{amount}),
 			DESCRIPTION	=> $normal->{description} || $i18n->get('no description'),
@@ -506,7 +508,7 @@ sub validateFormData {
 	my ($self, @error, $i18n, $currentYear, $currentMonth);
 	$self = shift;
 
-	$i18n = WebGUI::International->new($self->session,'CommercePaymentITransact');
+	$i18n = WebGUI::International->new($self->session,'CommercePaymentCash');
 
 	push (@error, $i18n->get('invalid firstName')) unless ($self->session->form->process("firstName"));
 	push (@error, $i18n->get('invalid lastName')) unless ($self->session->form->process("lastName"));

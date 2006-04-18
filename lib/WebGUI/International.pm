@@ -51,6 +51,19 @@ These functions/methods are available from this package:
 
 #-------------------------------------------------------------------
 
+=head2 echo ( internationalId [ , namespace, language ] )
+
+This method is used to help developers work with i18n before i18n files
+have been created.  echo simply returns the internationId.
+
+sub echo {
+	my ($self, $id, $namespace, $language) = @_;
+	return $id;
+
+}
+
+#-------------------------------------------------------------------
+
 =head2 get ( internationalId [ , namespace, language ] )
 
 Returns the internationalized message string for the user's language.
@@ -89,8 +102,8 @@ sub get {
 	my $output = eval($cmd);	
 	$self->session->errorHandler->warn("Couldn't get value from ".$cmd." because ".$@) if ($@);
 	$output = $self->get($id,$namespace,"English") if ($output eq "" && $language ne "English");
-	$l10nCache{$language}{$namespace}{$id} = $output || $id;
-	return $output || $id;
+	$l10nCache{$language}{$namespace}{$id} = $output;
+	return $output;
 }
 
 

@@ -271,6 +271,12 @@ our $I18N = {
 		context => q|menu item in ad manager|
 	},
 
+	'confirm ad delete' => {
+		message => q|Are you certain you want to delete this ad?|,
+		lastUpdated => 0,
+		context => q|Message to confirm deletion of an ad in an ad space|
+	},
+
 	'add ad space' => {
 		message => q|Add ad space.|,
 		lastUpdated => 0,
