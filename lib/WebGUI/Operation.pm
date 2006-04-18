@@ -120,6 +120,7 @@ sub getOperations {
 		'editCronJobSave' => 'WebGUI::Operation::Cron',
 		'deleteCronJob' => 'WebGUI::Operation::Cron',
 		'manageCron' => 'WebGUI::Operation::Cron',
+		'runCronJob' => 'WebGUI::Operation::Cron',
 
 		'copyDatabaseLink' => 'WebGUI::Operation::DatabaseLink',
 		'deleteDatabaseLink' => 'WebGUI::Operation::DatabaseLink',

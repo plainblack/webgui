@@ -16,6 +16,8 @@ use WebGUI::AdminConsole;
 use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Workflow::Cron;
+use WebGUI::Workflow::Instance;
+use WebGUI::Utility;
 
 =head1 NAME
 
@@ -238,5 +240,41 @@ sub www_manageCron {
 	$ac->addSubmenuItem($session->url->page("op=editCronJob"), $i18n->get("add a new task"));
 	return $ac->render($output);
 }
+
+
+#-------------------------------------------------------------------
+
+=head2 www_runCronJob ( )
+
+Checks to ensure the requestor is who we think it is, and then executes a cron job and returns the results.
+
+=cut
+
+sub www_runCronJob {
+        my $session = shift;
+	$session->http->setMimeType("text/plain");
+	unless (isInSubnet($session->env->get("REMOTE_ADDR"), $session->config->get("spectreSubnets"))) {
+		$session->errorHandler->security("make a Spectre cron job runner request, but we're only allowed to
+			accept requests from ".join(",",@{$session->config->get("spectreSubnets")}).".");
+        	return "error";
+	}
+	my $taskId = $session->form->param("taskId");
+	if ($taskId) {
+		my $task = WebGUI::Workflow::Cron->new($session, $taskId);
+		return "done" unless (defined $task);
+		my $instance = WebGUI::Workflow::Instance->create($session, {
+			workflowId=>$task->get("workflowId"),
+			className=>$task->get("className"),
+			methodName=>$task->get("methodName"),
+			parameters=>$task->get("parameters"),
+			priority=>$task->get("priority"),
+			});
+		$task->delete(1) if ($task->get("runOnce"));
+		return "done";
+	}
+	$session->errorHandler->warn("No task ID passed to cron job runner.");
+	return "error";
+}
+
 
 1;

@@ -169,7 +169,7 @@ sub sendHeader {
 		$self->session->request->status(301);
 	} else {
 		$self->session->request->content_type($self->{_http}{mimetype} || "text/html");
-		$self->session->request->set_last_modified($self->{_http}{lastModified} || time());
+#		$self->session->request->set_last_modified($self->{_http}{lastModified} || time());
 		if ($self->session->setting->get("preventProxyCache")) {
 			$self->session->request->headers_out->set(Expires => "-1d");
 		}
