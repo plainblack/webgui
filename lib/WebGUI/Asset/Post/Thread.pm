@@ -1021,7 +1021,8 @@ sub www_view {
 	return $self->session->privilege->noAccess() unless $self->canView;
 	my $check = $self->checkView;
 	return $check if (defined $check);
-        $self->session->http->getHeader;    
+	$self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->userId eq "1");
+        $self->session->http->sendHeader;    
         $self->prepareView;
         my $style = $self->getParent->processStyle("~~~");
         my ($head, $foot) = split("~~~",$style);

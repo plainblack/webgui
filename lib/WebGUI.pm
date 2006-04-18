@@ -84,7 +84,7 @@ sub contentHandler {
 	my $session = WebGUI::Session->open($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'),$r, $s);
 	if ($session->env->get("HTTP_X_MOZ") eq "prefetch") { # browser prefetch is a bad thing
 		$session->http->setStatus("403","We don't allow prefetch, because it increases bandwidth, hurts stats, and can break web sites.");
-		$session->http->getHeader;
+		$session->http->sendHeader;
 	} elsif ($session->setting->get("specialState") eq "upgrading") {
 		upgrading($session);
 	} elsif ($session->setting->get("specialState") eq "init") {
@@ -104,7 +104,7 @@ sub contentHandler {
 			$output = page($session);
 		}
 		$session->http->setCookie("wgSession",$session->var->{_var}{sessionId}) unless $session->var->{_var}{sessionId} eq $session->http->getCookies->{"wgSession"};
-		$session->http->getHeader();
+		$session->http->sendHeader();
 		unless ($session->http->isRedirect()) {
 			$session->output->print($output);
 			if ($session->errorHandler->canShowDebug()) {
@@ -255,7 +255,7 @@ The current WebGUI::Session object.
 sub setup {
 	my $session = shift;
 	require WebGUI::Operation::WebGUI;
-	$session->http->getHeader;
+	$session->http->sendHeader;
 	$session->output->print(WebGUI::Operation::WebGUI::www_setup($session));
 }
 
@@ -346,7 +346,7 @@ The current WebGUI::Session object.
 
 sub upgrading {
 	my $session = shift;
-	$session->http->getHeader;
+	$session->http->sendHeader;
 	open(FILE,"<".$session->config->getWebguiRoot."/docs/maintenance.html");
 	while (<FILE>) {
 		$session->output->print($_);

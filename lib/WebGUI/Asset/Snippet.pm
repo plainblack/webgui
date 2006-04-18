@@ -18,7 +18,6 @@ use strict;
 use WebGUI::Asset;
 use WebGUI::Asset::Template;
 use WebGUI::Macro;
-use HTTP::Date;
 
 our @ISA = qw(WebGUI::Asset);
 
@@ -203,12 +202,7 @@ sub www_view {
 	my $self = shift;
 	my $mimeType=$self->getValue('mimeType');
 	$self->session->http->setMimeType($mimeType || 'text/html');
-	my $request = $self->session->request;
-	if (defined $request && $request->protocol =~ /(\d\.\d)/ && $1 >= 1.1){
-    		$request->header_out('Cache-Control', "max-age=" . $self->get("cacheTimeout"));
-  	} elsif (defined $request) {
-    		$request->header_out('Expires', HTTP::Date::time2str(time + $self->get("cacheTimeout")));
-  	}
+	$self->session->http->setCacheControl($self->get("cacheTimeout"));
 	return $self->view(1);
 }
 

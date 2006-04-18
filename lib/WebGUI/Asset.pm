@@ -1949,7 +1949,7 @@ sub www_manageAssets {
 	my $out = $self->getAdminConsole->render($self->getAdminConsole->render("~~~"));
 	my ($head, $foot) = split("~~~",$out);
 	$self->session->style->sent(1);
-	$self->session->http->getHeader;
+	$self->session->http->sendHeader;
 	$self->session->output->print($head);
 	$self->session->output->print('<div style="text-align: right;"><a href="'.$self->getUrl("func=manageAssets;manage=1").'">Manage</a> | <a href="'.$self->getUrl("func=manageAssets;search=1").'">Search</a></div>',1);
 	if ($self->session->scratch->get("manageAssetsSearchToggle")) {

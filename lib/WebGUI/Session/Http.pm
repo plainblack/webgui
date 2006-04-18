@@ -18,6 +18,7 @@ package WebGUI::Session::Http;
 use strict;
 use Apache2::Cookie;
 use APR::Request::Apache2;
+use HTTP::Date;
 
 =head1 NAME
 
@@ -33,8 +34,9 @@ This package allows the manipulation of HTTP protocol information.
 
  my $http = WebGUI::Session::Http->new($session);
 
+ $http->sendHeader();
+
  $cookies = $http->getCookies();
- $header = $http->getHeader();
  $mimetype = $http->getMimeType();
  $code = $http->getStatus();
  $boolean = $http->isRedirect();
@@ -84,37 +86,6 @@ sub getCookies {
 	else {
 		return {};
 	}
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 getHeader ( ) 
-
-Generates an HTTP header.
-
-=cut
-
-sub getHeader {
-	my $self = shift;
-	return undef if ($self->{_http}{noHeader});
-	return undef unless $self->session->request;
-	my %params;
-	if ($self->isRedirect()) {
-		$self->session->request->headers_out->set(Location => $self->{_http}{location});
-		$self->session->request->status(301);
-	} else {
-		$self->session->request->content_type($self->{_http}{mimetype} || "text/html");
-		if ($self->session->setting->get("preventProxyCache")) {
-			$self->session->request->headers_out->set(Expires => "-1d");
-		}
-		if ($self->{_http}{filename}) {
-                        $self->session->request->headers_out->set('Content-Disposition' => qq!attachment; filename="$self->{_http}{filename}"!);
-		}
-	}
-	#$params{"-cookie"} = $self->{_http}{cookie};
-	$self->session->request->status_line($self->getStatus().' '.$self->{_http}{statusDescription});
-	return;
 }
 
 
@@ -182,6 +153,36 @@ sub new {
 
 #-------------------------------------------------------------------
 
+=head2 sendHeader ( ) 
+
+Generates and sends HTTP headers.
+
+=cut
+
+sub sendHeader {
+	my $self = shift;
+	return undef if ($self->{_http}{noHeader});
+	return undef unless $self->session->request;
+	my %params;
+	if ($self->isRedirect()) {
+		$self->session->request->headers_out->set(Location => $self->{_http}{location});
+		$self->session->request->status(301);
+	} else {
+		$self->session->request->content_type($self->{_http}{mimetype} || "text/html");
+		if ($self->session->setting->get("preventProxyCache")) {
+			$self->session->request->headers_out->set(Expires => "-1d");
+		}
+		if ($self->{_http}{filename}) {
+                        $self->session->request->headers_out->set('Content-Disposition' => qq!attachment; filename="$self->{_http}{filename}"!);
+		}
+	}
+	$self->session->request->status_line($self->getStatus().' '.$self->{_http}{statusDescription});
+	return;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 session ( )
 
 Returns the reference to the current session.
@@ -191,6 +192,33 @@ Returns the reference to the current session.
 sub session {
 	my $self = shift;
 	return $self->{_session};
+}
+
+#-------------------------------------------------------------------
+
+=head2 setCacheControl  ( timeout ) 
+
+Sets the cache control headers.
+
+=head3 timeout
+
+Either the number of seconds until the cache expires, or the word "none" to disable cache completely for this request.
+
+=cut
+
+sub setCacheControl {
+	my $self = shift;
+	my $timeout = shift;
+	my $request = $self->session->request;
+	if (defined $request) {
+		if ($timeout eq "none" || $self->session->setting->get("preventProxyCache")) {
+			$self->session->request->no_cache(1);
+		} elsif ($request->protocol =~ /(\d\.\d)/ && $1 >= 1.1){
+    			$request->header_out('Cache-Control', "max-age=" . $timeout);
+  		} else {
+    			$request->header_out('Expires', HTTP::Date::time2str(time + $self->get("cacheTimeout")));
+  		}
+	}
 }
 
 #-------------------------------------------------------------------

@@ -537,7 +537,7 @@ sub www_view {
 	my $self = shift;
 	my $check = $self->checkView;
 	return $check if (defined $check);
-	$self->session->http->getHeader;	
+	$self->session->http->sendHeader;	
 	$self->prepareView;
 	my $style = $self->processStyle("~~~");
 	my ($head, $foot) = split("~~~",$style);

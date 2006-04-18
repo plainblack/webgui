@@ -326,7 +326,7 @@ sub view {
 	#use Data::Dumper; return '<pre>'.Dumper($var).'</pre>';
        	my $out = $self->processTemplate($var,undef,$self->{_viewTemplate});
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("visitorCacheTimeout"));
+		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("cacheTimeout"));
 	}
        	return $out;
 }
@@ -491,5 +491,20 @@ sub _processQuery {
         }
 	return \%var;
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_view ()
+
+See WebGUI::Asset::Wobject::www_view() for details.
+
+=cut
+
+sub www_view {
+	my $self = shift;
+	$self->session->http->setCacheControl($self->get("cacheTimeout"));
+	$self->SUPER::www_view(@_);
+}
+
 1;
 

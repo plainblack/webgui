@@ -1076,6 +1076,20 @@ sub view {
 }
  
 #-------------------------------------------------------------------
+
+=head2 www_view ()
+
+See WebGUI::Asset::Wobject::www_view() for details.
+
+=cut
+
+sub www_view {
+	my $self = shift;
+	$self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->userId eq "1");
+	$self->SUPER::www_view(@_);
+}
+
+#-------------------------------------------------------------------
 sub www_viewDetail {
 	my $self = shift;
 	my $listingId = shift || $self->session->form->process("listingId");

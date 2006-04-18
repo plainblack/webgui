@@ -196,11 +196,11 @@ sub www_exportGenerate {
 	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(13));
 	# This routine is called in an IFRAME and prints status output directly to the browser.
 	$|++;				# Unbuffered data output
-	$self->session->output->print($self->session->http->getHeader());
+	$self->session->http->sendHeader;
 	my $startTime =$self->session->datetime->time();	
 	my $error = $self->checkExportPath();
 	if ($error) {
-		$self->session->output->print($error);
+		$self->session->output->print($error,1);
 		return;
 	}
 	my $i18n = WebGUI::International->new($self->session, 'Asset');

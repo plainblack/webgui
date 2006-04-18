@@ -619,6 +619,20 @@ sub _createRSSURLs{
 }
 
 
+#-------------------------------------------------------------------
+
+=head2 www_view ()
+
+See WebGUI::Asset::Wobject::www_view() for details.
+
+=cut
+
+sub www_view {
+	my $self = shift;
+	$self->session->http->setCacheControl($self->get("cacheTimeout"));
+	$self->SUPER::www_view(@_);
+}
+
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 =head2 www_viewRSS090()
 

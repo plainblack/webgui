@@ -1179,7 +1179,8 @@ sub _xml_encode {
 sub www_view {
 	my $self = shift;
 	my $disableCache = ($self->session->form->process("sortBy") ne "");
-	return $self->SUPER::www_view($disableCache);
+	$self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->userId eq "1" && !$disableCache);
+	return $self->SUPER::www_view(@_);
 }
 
 

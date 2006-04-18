@@ -97,6 +97,7 @@
    tabbed view to make scanning for content easier.
  - Help for forms now shows the fields that you should see with your UI level.
    There is a link to show all fields.
+ - added [ 732011 ] http header cache setting
  - fix [ 1410577 ] WebGUI::Session not included
  - fix a bug where a link was provided to become or delete non-existant users.
  - fix bugs with the in-memory session caching of user and group memberships

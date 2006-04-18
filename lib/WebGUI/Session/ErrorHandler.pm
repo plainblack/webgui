@@ -190,7 +190,7 @@ sub fatal {
 	Apache2::RequestUtil->request->content_type('text/html') if ($self->session->request);
 	$self->getLogger->fatal($message);
 	$self->getLogger->debug("Stack trace for FATAL ".$message."\n".$self->getStackTrace());
-	$self->session->http->getHeader if ($self->session->request);
+	$self->session->http->sendHeader if ($self->session->request);
 	unless ($self->canShowDebug()) {
 		#NOTE: You can't internationalize this because with some types of errors that would cause an infinite loop.
 		$self->session->output->print("<h1>Problem With Request</h1>

@@ -286,7 +286,7 @@ sub www_view {
 			my $ad = $adSpace->displayImpression if (defined $adSpace);
 			$out =~ s/\Q$code/$ad/ges;
 		}
-		$self->session->http->getHeader;	
+		$self->session->http->sendHeader;	
 		$self->session->output->print($out, 1);
 		return "chunked";	
 	}
