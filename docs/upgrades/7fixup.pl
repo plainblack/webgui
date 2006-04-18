@@ -16,10 +16,30 @@ $versionTag->set({name=>"Stuff just for 7.0 installs"});
 addPrototypes();
 rearrangeImportNode();
 addNewStyles();
+addRobots();
 $versionTag->commit;
 purgeOldRevisions();
 
 finish($session); # this line required
+
+#-------------------------------------------------
+sub addRobots {
+	print "\tAdding robots.txt file.\n";
+	my $importNode = WebGUI::Asset->getImportNode($session);
+	$importNode->addChild({
+		title=>"robots.txt",
+		menuTitle=>"robots.txt",
+		url=>"robots.txt",
+		groupIdView=>'7',
+		groupIdEdit=>'12',
+		className=>'WebGUI::Asset::Snippet',
+		assetId=>"new",
+		snippet=>'User-agent: googlebot
+Disallow: *?op=displayLogin
+Disallow: *?op=makePrintable
+'
+		},"pbrobot000000000000001");
+}
 
 
 #-------------------------------------------------

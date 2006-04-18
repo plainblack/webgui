@@ -100,6 +100,11 @@
  - fix [ 1410577 ] WebGUI::Session not included
  - fix a bug where a link was provided to become or delete non-existant users.
  - fix bugs with the in-memory session caching of user and group memberships
+ - fix [ 1465362 ] RichEditor doesn't work on Safari
+ - fix [ 1344665 ] Cache does not remember mimetype
+ - fix [ 1172613 ] Header Tag Not Accessibility Friendly
+ - fix [ 1340839 ] If can't use item in adminConsole don't display it
+
 
 6.8.8
  - fix [ 1452466 ] File size not set in File asset (Thanks to Eric S)

@@ -147,7 +147,7 @@ sub definition {
                 className=>'WebGUI::Asset::Post',
                 properties=>{
 			storageId => {
-				fieldType=>"file",
+				fieldType=>"image",
 				defaultValue=>undef
 				},
 			threadId => {
@@ -657,10 +657,6 @@ sub processPropertiesFromFormPost {
 		}
 	}
         $self->getThread->subscribe if ($self->session->form->process("subscribe"));
- 	delete $self->{_storageLocation};
-	my $storage = $self->getStorageLocation;
-	my $attachmentLimit = $self->getThread->getParent->get("attachmentsPerPost");
-	$storage->addFileFromFormPost("file", $attachmentLimit) if $attachmentLimit;
 	$self->postProcess;
 	$self->requestCommit;
 }
@@ -1040,7 +1036,7 @@ sub www_edit {
 	$var{'form.preview'} = WebGUI::Form::submit($self->session, {
 		value=>$i18n->get("preview","Asset_Collaboration")
 		});
-	$var{'attachment.form'} = WebGUI::Form::file($self->session, {
+	$var{'attachment.form'} = WebGUI::Form::image($self->session, {
 		value=>$self->get("storageId"),
 		maxAttachments=>$self->getThread->getParent->getValue("attachmentsPerPost"),
 		deleteFileUrl=>$self->getUrl("func=deleteFile;filename=")

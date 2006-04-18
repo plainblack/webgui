@@ -267,7 +267,7 @@ sub getAdminFunction {
 			},
 			icon=>"statistics.gif",
 			op=>"viewStatistics",
-			group=>"12"
+			group=>"3"
 		},
 		"contentProfiling"=>{
 			title=>{
@@ -285,7 +285,7 @@ sub getAdminFunction {
 			},
 			icon=>"contentFilters.gif",
 			op=>"listReplacements",
-			group=>"4"
+			group=>"3"
 		},
 		"userProfiling"=>{
 			title=>{
