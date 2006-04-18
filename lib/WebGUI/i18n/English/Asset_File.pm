@@ -39,6 +39,9 @@ our $I18N = {
 	'file template body' => {
                 message => q|<p>The following variables are available in File Templates:</p>
 
+<P><b>fileSize</b><br/>
+The size (in bytes/kilobytes/megabytes, etc) of the file.
+
 <P><b>fileIcon</b><br/>
 The icon which describes the type of file.
 
@@ -62,7 +65,7 @@ The menu title, displayed in navigations, set for the file when it was uploaded,
 
 		|,
 		context => 'Describing the file template variables',
-		lastUpdated => 1130439830,
+		lastUpdated => 1145388974,
 	},
 
 

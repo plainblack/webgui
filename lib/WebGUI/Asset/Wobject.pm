@@ -537,6 +537,7 @@ sub www_view {
 	my $self = shift;
 	my $check = $self->checkView;
 	return $check if (defined $check);
+	$self->session->http->setLastModified($self->get("revisionDate"));
 	$self->session->http->sendHeader;	
 	$self->prepareView;
 	my $style = $self->processStyle("~~~");
