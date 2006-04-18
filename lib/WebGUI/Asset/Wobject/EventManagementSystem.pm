@@ -1579,7 +1579,7 @@ sub www_editEvent {
 			-value => $event->{approved},
 			-name => 'approved',
 			-label => $i18n->get('approve event'),
-			-hoverHelp => $i18n->get('you can approve events so you can submit events already approved or directly edit approval of events')
+			-hoverHelp => $i18n->get('approve event description')
 		);
 	} else {
 		$f->hidden(

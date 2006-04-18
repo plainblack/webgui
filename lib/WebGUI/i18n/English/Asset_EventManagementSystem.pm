@@ -468,6 +468,67 @@ allows you to edit events,  delete events, or change their order.</p>
 		lastUpdated => 1140469381,
 	},
 
+	'manage purchases' => {
+		message => q|Manage Purchases|,
+		lastUpdated => 1145396293,
+	},
+
+	'view purchase' => {
+		message => q|View Purchase|,
+		lastUpdated => 1145396293,
+	},
+
+	'refresh events list' => {
+		message => q|Refresh Events List|,
+		lastUpdated => 1145396293,
+	},
+
+	'you' => {
+		message => q|you|,
+		lastUpdated => 1145396293,
+		context => q|Third person pronoun|,
+	},
+
+	'create a badge for myself' => {
+		message => q|Create a badge for myself|,
+		lastUpdated => 1145396293,
+	},
+
+	'create a badge for someone else' => {
+		message => q|Create a badge for someone else|,
+		lastUpdated => 1145396293,
+	},
+
+	'you do not have any metadata fields to display' => {
+		message => q|You do not have any metadata fields to display.|,
+		lastUpdated => 1145396293,
+	},
+
+	'you do not have any events to display' => {
+		message => q|You do not have any events to display.|,
+		lastUpdated => 1145396293,
+	},
+
+	'save approvals' => {
+		message => q|Save Approvals|,
+		lastUpdated => 1145396293,
+	},
+
+	'approve event' => {
+		message => q|Approve Event|,
+		lastUpdated => 1145396293,
+	},
+
+	'approve event description' => {
+		message => q|You can approve events so you may either submit events already approved or directly edit approval of events|,
+		lastUpdated => 1145396293,
+	},
+
+	'approval' => {
+		message => q|Approval|,
+		lastUpdated => 1145396293,
+	},
+
 };
 
 1;
