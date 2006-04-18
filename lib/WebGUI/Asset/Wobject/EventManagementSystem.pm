@@ -584,16 +584,18 @@ sub getAssignedPrerequisites {
 	my $self = shift;
 	my $eventId = shift;
 	my $returnProductIdFlag = shift;
+	my $sql;
+
+	unless ($returnProductIdFlag) {
+		$sql = "select prerequisiteId, operator from EventManagementSystem_prerequisites 
+			where productId=?";
+	}
+	else {
+		$sql = "select prerequisiteId, operator from EventManagementSystem_prerequisites 
+		   where productId=?";
+	}
 	
-	
-	my $sql = ($returnProductIdFlag) ?
-		"select prerequisiteId, operator from EventManagementSystem_prerequisites 
-		   where productId=".$self->session->db->quote($eventId)
-		:
-		"select prerequisiteId, operator, productId from EventManagementSystem_prerequisites
-		   where productId=".$self->session->db->quote($eventId);
-	
-	return $self->session->db->buildHashRef($sql); 
+	return $self->session->db->buildHashRef($sql,[$eventId]); 
 }
 
 #------------------------------------------------------------------
@@ -795,14 +797,16 @@ Id of the prerequisite group whose assigned event names you want returned
 sub getRequiredEventNames {
 	my $self = shift;
 	my $prerequisiteId = shift;
+	#use Data::Dumper;
+	#$self->session->errorHandler->warn("<pre>".Dumper($prerequisiteId)."</pre>");
 	
 	my $sql = "select title from products as p, EventManagementSystem_prerequisites as pr, EventManagementSystem_prerequisiteEvents as pe
 		   where 
 		     pe.requiredProductId = p.productId 
 		     and pr.prerequisiteId = pe.prerequisiteId 
-		     and pr.prerequisiteId=".$self->session->db->quote($prerequisiteId);
+		     and pr.prerequisiteId=?";
 	
-	return $self->session->db->buildArrayRef($sql);
+	return $self->session->db->buildArrayRef($sql,[$prerequisiteId]);
 }
 
 #------------------------------------------------------------------
@@ -962,7 +966,7 @@ sub getSubEvents {
 	my @subEventData;
 #	my $eventsInCart = $self->getEventsInCart;
 	my $eventsInCart = $self->getEventsInScratchCart;
-	use Data::Dumper;
+	#use Data::Dumper;
 	# $self->session->errorHandler->warn("getsubevents: <pre>".Dumper($eventIds)."</pre>");
 	foreach my $eventId (@$eventIds) {
 	
@@ -1132,7 +1136,7 @@ sub resolveConflictForm {
 sub verifyAllPrerequisites {
 	my $self = shift;
 	my $returnArrayFlag = shift;
-	use Data::Dumper;
+	#use Data::Dumper;
 	#start with the events in the scratch cart.  See if all prerequisites are met	
 	my $startingEvents = {};
 	my $scratchEvents = $self->getEventsInScratchCart;
@@ -1266,7 +1270,7 @@ sub verifyPrerequisitesForm {
 	my ($missingEventMessageLoop, $allPrereqsLoop) = $self->verifyAllPrerequisites;
 	my @usedEventIds;
 	my $scratchCart = $self->getEventsInScratchCart;
-	use Data::Dumper;
+	#use Data::Dumper;
 	# $self->session->errorHandler->warn("scratch: <pre>".Dumper($scratchCart)."</pre>");
 	my %var;
 
@@ -1717,7 +1721,6 @@ sub www_editEvent {
 
 	#Display Currently Assigned Prerequisites if any
 	$f->readOnly( -value => $i18n->get('add/edit event assigned prerequisites'), );
-	
 	my $list = $self->getAssignedPrerequisites($pid);
 	foreach my $prerequisiteId (keys %{$list}) {
 	
@@ -1730,7 +1733,6 @@ sub www_editEvent {
 			$events .= "$event ".$list->{$prerequisiteId}." ";
 		}
 		$events =~ s/(and\s|or\s)$//;
-		
 		$f->readOnly( -value => $line.$events );
 	}
 
