@@ -251,7 +251,7 @@ sub getToolbarOptions {
 	my %options;
 	tie %options, 'Tie::IxHash';
 	my $self = shift;
-	$options{useLanguageDefault} = WebGUI::International->new($self->session,'Icon')->get(1084);
+	$options{useLanguageDefault} = WebGUI::International->new($self->session,'WebGUI')->get(1084);
 	my $dir = $self->session->config->get("extrasPath")."/toolbar";
         opendir (DIR,$dir) or $self->session->errorHandler->warn("Can't open toolbar directory!");
         my @files = readdir(DIR);
