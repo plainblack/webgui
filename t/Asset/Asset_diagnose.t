@@ -30,7 +30,6 @@ my @assets = grep { !isIn($_, qw/WebGUI::Asset::FilePile/) } (
 );
 
 my $numTests = scalar (2*@assets) + 2;
-diag("Testing $numTests assets");
 plan tests => $numTests;
 	
 my $assetIds     = $session->db->buildArrayRef("select distinct(assetId) from asset order by assetId");
@@ -46,7 +45,6 @@ SKIP: {
 }
 
 foreach my $asset ( @assets ) {
-	#diag("Checking $asset");
 	eval "use $asset";
 	my $def = $asset->definition($session);
 	my $tableName = $def->[0]->{tableName};

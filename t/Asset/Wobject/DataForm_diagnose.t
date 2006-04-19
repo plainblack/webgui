@@ -28,14 +28,12 @@ my $session = WebGUI::Test->session;
 
 my $dataFormIds = $session->db->buildArrayRef("select asset.assetId, assetData.revisionDate from DataForm left join asset on asset.assetId=DataForm.assetId left join assetData on assetData.revisionDate=DataForm.revisionDate and assetData.assetId=DataForm.assetId where asset.state='published' and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId and (assetData.status='approved' or assetData.tagId=?)) order by assetData.title");
 
-diag("Checking DataForm tables for orphaned assetIds");
 foreach my $table (qw/DataForm DataForm_field/) {
 	my $tableIds = $session->db->buildArrayRef(sprintf ("select distinct(assetId) from %s", $table));
 	cmp_bag($dataFormIds, $tableIds,
 			sprintf("Orphaned assetIds in %s", $table));
 }
 
-diag("Checking DataForm_tab tables for orphaned assetIds");
 ##DataForm_tab will have a subset of assetIds since not all DataForms have tabs.
 foreach my $table (qw/DataForm_tab/) {
 	my $tableIds = $session->db->buildArrayRef(sprintf ("select distinct(assetId) from %s", $table));
@@ -43,7 +41,6 @@ foreach my $table (qw/DataForm_tab/) {
 			sprintf("Orphaned assetIds in %s", $table));
 }
 
-diag("Checking DataForm tables for orphaned fieldIds");
 my $dataForm_fieldIds = $session->db->buildArrayRef("select distinct(DataForm_fieldId) from DataForm_field");
 foreach my $table (qw/DataForm_tab/) {
 	my $tableIds = $session->db->buildArrayRef(sprintf ("select distinct(assetId) from %s", $table));
