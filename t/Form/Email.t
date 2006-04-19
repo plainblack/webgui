@@ -48,7 +48,6 @@ my $formClass = 'WebGUI::Form::Email';
 
 my $numTests = 11 + scalar @{ $testBlock } + 1;
 
-diag("Planning on running $numTests tests\n");
 
 plan tests => $numTests;
 

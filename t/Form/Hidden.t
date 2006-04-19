@@ -65,7 +65,6 @@ my $formClass = 'WebGUI::Form::Hidden';
 
 my $numTests = 5 + scalar @{ $testBlock } + 1;
 
-diag("Planning on running $numTests tests\n");
 
 plan tests => $numTests;
 

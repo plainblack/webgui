@@ -41,7 +41,6 @@ $numTests = (2 * scalar @formTypes) + 1;
 
 plan tests => $numTests;
 
-diag("Planning on running $numTests tests\n");
 
 foreach my $formType (@formTypes) {
 	my $form = WebGUI::Form::DynamicField->new($session, fieldType => $formType);

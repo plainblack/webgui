@@ -65,7 +65,6 @@ my $formType = 'SelectList';
 
 my $numTests = 11 + scalar @{ $testBlock } + 1;
 
-diag("Planning on running $numTests tests\n");
 
 plan tests => $numTests;
 
@@ -89,7 +88,6 @@ is(scalar @forms, 1, '1 form was parsed');
 
 my $form = $forms[0];
 #use Data::Dumper;
-#diag(Dumper $form);
 my @inputs = $form->inputs;
 is(scalar @inputs, 6, 'The form has 6 inputs');
 

@@ -47,7 +47,6 @@ my $formType = 'Radio';
 
 my $numTests = 7 + scalar @{ $testBlock } + 1;
 
-diag("Planning on running $numTests tests\n");
 
 plan tests => $numTests;
 

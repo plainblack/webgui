@@ -39,7 +39,6 @@ $numTests = scalar @formTypes + 1;
 
 plan tests => $numTests;
 
-diag("Planning on running $numTests tests\n");
 
 my @notEnabled = qw/Asset Button Captcha Color Control List MimeType Submit/;
 

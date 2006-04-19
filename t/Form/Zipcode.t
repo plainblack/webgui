@@ -64,7 +64,6 @@ my $formClass = 'WebGUI::Form::Zipcode';
 
 my $numTests = 12 + scalar @{ $testBlock } + 1;
 
-diag("Planning on running $numTests tests\n");
 
 plan tests => $numTests;
 
