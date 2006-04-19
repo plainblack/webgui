@@ -34,7 +34,7 @@ sub _getFieldHash {
 
 	my %hash;
 	tie %hash, "Tie::IxHash";
-	my $i18n = WebGUI::International->new($session,'Asset_EventManagementSystem');
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	%hash = (
 		"eventName"=>{
 			name=>$i18n->get('add/edit event title'),
@@ -304,7 +304,6 @@ sub checkConflicts {
 #	my $eventsInCart = $self->getEventsInCart;
 	my $checkSingleEvent = shift;
 	my $eventsInCart = $self->getEventsInScratchCart;
-	use Data::Dumper;
 	# $self->session->errorHandler->warn(Dumper($eventsInCart));
 	my @schedule;
 	
@@ -423,6 +422,14 @@ sub definition {
 				namespace=>"EventManagementSystem_viewPurchase",
                 		hoverHelp=>$i18n->get('view purchase template description'),
                 		label=>$i18n->get('view purchase template')
+				},
+			searchTemplateId =>{
+				fieldType=>"template",
+				defaultValue=>'EventManagerTmpl000006',
+				tab=>"display",
+				namespace=>"EventManagementSystem_search",
+                		hoverHelp=>$i18n->get('search template description'),
+                		label=>$i18n->get('search template')
 				},
 			paginateAfter =>{
 				fieldType=>"integer",
@@ -1689,8 +1696,8 @@ sub www_editEvent {
 		-name    => "eventList",
 		-options => $prerequisiteList,
 		-vertical  => 1,
-		-label   => "add/edit event required events",
-		-hoverHelp   => "add/edit event required events description",
+		-label   => $i18n->get("add/edit event required events"),
+		-hoverHelp   => $i18n->get("add/edit event required events description"),
 		-sortByValue => 1
 	 );
 
@@ -2409,7 +2416,7 @@ sub prepareView {
 }
 
 #-------------------------------------------------------------------
-sub view {
+sub www_search {
 	my $self = shift;
 	my %var;
 	my $keywords = $self->session->form->get("searchKeywords");
@@ -2619,8 +2626,83 @@ sub view {
 	$p->appendTemplateVars(\%var);
 	$self->buildMenu(\%var);
 	$var{'ems.wobject.dir'} = $self->session->config->get("extrasURL")."/wobject/EventManagementSystem";
+	
+	return $self->session->style->process($self->processTemplate(\%var,$self->getValue("searchTemplateId")),$self->getValue("styleTemplateId"));
+}
+
+#-------------------------------------------------------------------
+sub view {
+	my $self = shift;
+	my %var;
+	
+	# If we're at the view method there is no reason we should have anything in our scratch cart
+	# so let's empty it to prevent strange and awful things from happening
+	$self->emptyScratchCart;
+	$self->session->scratch->delete('EMS_add_purchase_badgeId');
+	$self->session->scratch->delete('EMS_add_purchase_events');
+	
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
+	# Get the products available for sale for this page
+	my $sql = "select p.productId, p.title, p.description, p.price, p.templateId, e.approved, e.maximumAttendees 
+		   from products as p, EventManagementSystem_products as e
+		   where
+		   	p.productId = e.productId and approved=1
+		   	and e.assetId =".$self->session->db->quote($self->get("assetId"))." 
+			and p.productId not in (select distinct(productId) from EventManagementSystem_prerequisites)";		
+
+	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->get("paginateAfter"));
+	$p->setDataByQuery($sql);
+	my $eventData = $p->getPageData;
+	my @events;
+
+	#We are getting each events information, passing it to the *events* template and processing it
+	#The html returned from each events template is returned to the Event Manager Display Template for arranging
+	#how the events are displayed in relation to one another.
+	foreach my $event (@$eventData) {
+	  my %eventFields;
+	  
+	  $eventFields{'title'} = $event->{'title'};
+	  $eventFields{'description'} = $event->{'description'};
+	  $eventFields{'price'} = $event->{'price'};
+	  my ($numberRegistered) = $self->session->db->quickArray("select count(*) from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p
+	  	where r.purchaseId = p.purchaseId and r.productId=".$self->session->db->quote($event->{'productId'}));
+	  $eventFields{'numberRegistered'} = $numberRegistered;
+	  $eventFields{'maximumAttendees'} = $event->{'maximumAttendees'};
+	  $eventFields{'seatsRemaining'} = $event->{'maximumAttendees'} - $numberRegistered;
+	  $eventFields{'eventIsFull'} = ($eventFields{'seatsRemaining'} == 0);
+
+	  if ($eventFields{'eventIsFull'}) {
+	  	$eventFields{'purchase.label'} = "Sold Out";;
+	  }
+	  else {
+	  	$eventFields{'purchase.url'} = $self->getUrl('func=addToCart;pid='.$event->{'productId'});
+	  	$eventFields{'purchase.label'} = $i18n->get('add to cart');
+	  }
+	  push (@events, {'event' => $self->processTemplate(\%eventFields, $event->{'templateId'}) });	  
+	} 
+	$var{'checkout.url'} = $self->getUrl('op=viewCart');
+	$var{'checkout.label'} = "Checkout";
+	$var{'events_loop'} = \@events;
+	$var{'paginateBar'} = $p->getBarTraditional;
+	$var{'manageEvents.url'} = $self->getUrl('func=manageEvents');
+	$var{'manageEvents.label'} = $i18n->get('manage events');
+	$var{'managePurchases.url'} = $self->getUrl('func=managePurchases');
+	$var{'managePurchases.label'} = $i18n->get('manage purchases');
+	if ($self->session->user->isInGroup($self->get("groupToManageEvents"))) {
+		$var{'canManageEvents'} = 1;
+	}
+	else {
+		$var{'canManageEvents'} = 0;
+	}
+	$p->appendTemplateVars(\%var);
+	
+	my $templateId = $self->get("displayTemplateId");
+
 	return $self->processTemplate(\%var, undef, $self->{_viewTemplate});
 }
+
+
+
 
 
 1;

@@ -1,6 +1,18 @@
 package WebGUI::i18n::English::Asset_EventManagementSystem;
 
 our $I18N = { ##hashref of hashes
+        'search template' => { 
+		message => q|Search Template|,
+		lastUpdated => 1131394070,
+		context => q|Field label for template selector|
+	},
+
+	'search template description' => {
+		message => q|Controls the layout, look, and appearence of the Event Management System Search Page.|,
+		lastUpdated => 1131394072,
+		context => q|Describes this template field selector|
+	},     
+        
 	'add/edit help title' => { 
 		message => q|Add/Edit Event Management System|,
 		lastUpdated => 1131394070,
