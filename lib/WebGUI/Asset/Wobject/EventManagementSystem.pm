@@ -2615,6 +2615,7 @@ sub www_search {
 	$var{'manageEvents.label'} = $i18n->get('manage events');
 	$var{'managePurchases.url'} = $self->getUrl('func=managePurchases');
 	$var{'managePurchases.label'} = $i18n->get('manage purchases');
+	$var{'noSearchDialog'} = ($self->session->form->get('hide') eq "1") ? 1 : 0;
 	
 	
 	if ($self->session->user->isInGroup($self->get("groupToManageEvents"))) {
@@ -2662,6 +2663,7 @@ sub view {
 	  my %eventFields;
 	  
 	  $eventFields{'title'} = $event->{'title'};
+	  $eventFields{'title.url'} = $self->getUrl('func=search;cfilter_s1=requirement;cfilter_c1=eq;advSearch=1;hide=1;cfilter_t1='.$event->{'productId'});
 	  $eventFields{'description'} = $event->{'description'};
 	  $eventFields{'price'} = $event->{'price'};
 	  my ($numberRegistered) = $self->session->db->quickArray("select count(*) from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p

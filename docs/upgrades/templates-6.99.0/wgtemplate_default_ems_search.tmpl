@@ -16,7 +16,7 @@
 <li><a href='<tmpl_var managePurchases.url>'><tmpl_var managePurchases.label></a></li>
 <li><a href="<tmpl_var checkout.url>"><tmpl_var checkout.label></a></li>
 </ul>
-
+<tmpl_unless noSearchDialog>
 <script type="text/javascript" src="<tmpl_var ems.wobject.dir>/script/dynamicForms.js"></script>
 <script type="text/javascript">
    <tmpl_var search.filters.options>   
@@ -110,7 +110,7 @@
 </script>
 
 </div>
-
+</tmpl_unless>
 <br /><br />
 
 <table width="100%" border="0" cellpadding="8" cellspacing="0" style="border-top:solid gray 2px;border-bottom:solid gray 2px;">
