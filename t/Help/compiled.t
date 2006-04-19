@@ -30,8 +30,6 @@ my @helpFileSet = WebGUI::Operation::Help::_getHelpFilesList($session);
 
 $numTests = scalar @helpFileSet; #One for each help compile
 
-diag("Planning on running $numTests tests\n");
-
 plan tests => $numTests;
 
 foreach my $helpSet (@helpFileSet) {

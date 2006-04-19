@@ -169,6 +169,10 @@ our $HELP = {
 				namespace => 'Asset_EventManagementSystem',
 			},
 			{
+				tag => 'pagination template variables',
+				namespace => 'WebGUI',
+			},
+			{
 				tag => 'template language',
 				namespace => 'Asset_Template',
 			},

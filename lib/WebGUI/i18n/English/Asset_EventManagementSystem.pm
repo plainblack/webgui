@@ -375,10 +375,26 @@ This loop contains all events that have been approved so that users can register
 The information for one event that has been processed by its own event template.
 </p>
 
+<p><b>Event template variables</b><br />
+The template variables from the Event template.  This gives you access to the raw
+data for the event.
+
 </blockquote>
+
+<p><b>checkout.url</b><br />
+A URL to take the user the screen that displays the contents of their shopping cart.
+</p>
+
+<p><b>checkout.label</b><br />
+A label to go with checkout.url.  The internationalized word "Checkout".
+</p>
 
 <p><b>paginateBar</b><br />
 A bar to help the user page through sets of Events if several pages of Events exist.
+</p>
+
+<p><b>Pagination variables</b><br />
+Common pagination template variables.
 </p>
 
 <p><b>canManageEvents</b><br />
@@ -393,8 +409,28 @@ A URL to take the user to the screen where Events can be managed (i.e. added, ap
 An internationalized label to dispaly to the user the link for managing events.
 </p>
 
+<p><b>managePurchases.url</b><br />
+A URL to take the user to the screen where purchases can be managed (i.e. added, approved, deleted)
+</p>
+
+<p><b>managePurchases.label</b><br />
+An internationalized label to dispaly to the user the link for managing purchases.
+</p>
+
+<p><b>search.filters.options</b><br />
+Javascript for a search interface for Events based on metadata.
+</p>
+
+<p><b>search.data.url</b><br />
+The URL to this Asset.
+</p>
+
+<p><b>ems.wobject.dir</b><br />
+The URL the EventManagementSystem area in the WebGUI Extras directory.
+</p>
+
 |,
-		lastUpdated => 1140465899,
+		lastUpdated => 1145421686,
 	},
 
 	'event template help title' => {
@@ -419,16 +455,42 @@ The description of this event.
 The price of this event.
 </p>
 
-<p><b>purchase.url</b><br />
-A URL for the user to register for this event and add it to their shopping cart.
+<p><b>numberRegistered</b><br />
+The number of people currently registered for this event.
+</p>
+
+<p><b>maximumAttendees</b><br />
+The number of people allowed to attend this event.
+</p>
+
+<p><b>seatsRemaining</b><br />
+The number of available seats remaining for this event.
+</p>
+
+<p><b>startDate.human</b><br />
+The date and time this event starts, in human readable format.
+</p>
+
+<p><b>endDate.human</b><br />
+The date and time this event ends, in human readable format.
+</p>
+
+<p><b>eventIsFull</b><br />
+A boolean that is true if the there are no available seats remaining in this event.
 </p>
 
 <p><b>purchase.label</b><br />
-An internationalized label to dispaly to the user the link for purchasing this event.
+An internationalized label to display to the user the link for purchasing this event.
+If the event is full, the label will be "Sold out".
+</p>
+
+<p><b>purchase.url</b><br />
+A URL for the user to register for this event and add it to their shopping cart.
+If the event is full, the url will be blank.
 </p>
 
 |,
-		lastUpdated => 1140471404,
+		lastUpdated => 1145421471,
 	},
 
 	'add/edit event help title' => { 
@@ -589,6 +651,11 @@ allows you to edit events,  delete events, or change their order.</p>
 
 	'missing prerequisites message' => {
 		message => q|Some of the events you have selected require attendance of another event.  Please satisfy prerequisites from the list below.|,
+		lastUpdated => 1145402683,
+	},
+
+	'checkout' => {
+		message => q|Checkout|,
 		lastUpdated => 1145402683,
 	},
 

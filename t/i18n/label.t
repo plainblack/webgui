@@ -69,22 +69,13 @@ my @sqlLabels;
 my @libLabels;
 my @objLabels;
 
-diag("Getting Help labels");
 @helpLabels = getHelpLabels();
 
-#diag("Getting SQL labels");
 #@sqlLabels = getSQLLabels();
 
-diag("Getting subroutine labels");
 find(\&label_finder_pm, $lib);
 
-diag("Getting object labels");
 find(\&obj_finder_pm, $lib);
-
-diag ("Checking ". scalar(@helpLabels). " help labels");
-#diag ("Checking ". scalar(@sqlLabels). " SQL labels");
-diag ("Checking ". scalar(@libLabels). " library code labels");
-diag ("Checking ". scalar(@objLabels). " library code labels via object");
 
 $numTests = scalar(@helpLabels)
 #	  + scalar(@sqlLabels)
@@ -92,11 +83,7 @@ $numTests = scalar(@helpLabels)
 	  + scalar(@objLabels)
 ;
 
-diag("Planning on running $numTests tests\n");
-
 plan tests => $numTests;
-
-diag("Help Label tests\n");
 
 my $i18n = WebGUI::International->new($session);
 
@@ -105,7 +92,6 @@ foreach my $label ( @helpLabels ) {
 	sprintf "label: %s->%s inside %s->%s->%s", @{ $label }{'namespace', 'label', 'topic', 'entry', 'tag', });
 }
 
-#diag("SQL Label tests\n");
 #
 #foreach my $label ( @sqlLabels ) {
 #	ok($i18n->get(@{ $label }{qw(label namespace )} ),
@@ -113,14 +99,11 @@ foreach my $label ( @helpLabels ) {
 #}
 #
 ##Subroutine calls are now illegal, everything must be done by object methods.
-diag("Subroutine Call Label tests\n");
 
 foreach my $label ( @libLabels ) {
 	ok(0,
 	sprintf "label: %s->%s inside %s", @{ $label }{'namespace', 'label', 'file', });
 }
-
-diag("Object Method Label tests\n");
 
 foreach my $label ( @objLabels ) {
 	ok($i18n->get(@{ $label }{qw(label namespace )} ),

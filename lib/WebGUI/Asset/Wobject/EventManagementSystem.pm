@@ -2601,7 +2601,7 @@ sub view {
 	  push (@events, {'event' => $self->processTemplate(\%eventFields, $event->{'templateId'}), %eventFields });
 	} 
 	$var{'checkout.url'} = $self->getUrl('op=viewCart');
-	$var{'checkout.label'} = "Checkout";
+	$var{'checkout.label'} = $i18n->get('checkout');
 	$var{'events_loop'} = \@events;
 	$var{'paginateBar'} = $p->getBarTraditional;
 	$var{'manageEvents.url'} = $self->getUrl('func=manageEvents');
@@ -2619,7 +2619,6 @@ sub view {
 	$p->appendTemplateVars(\%var);
 	$self->buildMenu(\%var);
 	$var{'ems.wobject.dir'} = $self->session->config->get("extrasURL")."/wobject/EventManagementSystem";
-	my $templateId = $self->get("displayTemplateId");
 	return $self->processTemplate(\%var, undef, $self->{_viewTemplate});
 }
 

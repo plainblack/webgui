@@ -30,11 +30,7 @@ my @helpFileSet = WebGUI::Operation::Help::_getHelpFilesList($session);
 
 $numTests = scalar @helpFileSet;
 
-diag("Planning on running $numTests tests\n");
-
 plan tests => $numTests;
-
-diag("Check for mandatory lables for Help table of contents");
 
 foreach my $fileSet (@helpFileSet) {
 	my $file = $fileSet->[1];

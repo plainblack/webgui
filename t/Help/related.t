@@ -51,8 +51,6 @@ foreach my $topic ( keys %helpTable ) {
 	}
 }
 
-diag("Planning on running $numTests tests\n");
-
 plan tests => $numTests;
 
 ##Each array element is a hash with two keys, tag (entry) and namespace (topic).
