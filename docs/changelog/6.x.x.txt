@@ -65,6 +65,9 @@
    otherwise be slow or complex pages. More details in migration.txt. The
    amount of the increase depends upon the complexity of the page, but now
    complex pages should render almost as fast as simple pages.
+ - Removed the JavaScript, RawHeadTags, and StyleSheet macros in favor of
+   adding a Head Block parameter to templates. This was needed in order to
+   implement content chunking.
  - The SMTP mail backend has been replaced with a new API that's capable of
    sending attachments, HTML messages, and more. This will introduce many new
    options for developers.

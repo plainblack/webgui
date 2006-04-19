@@ -592,6 +592,9 @@ sub updateDatabaseLinksAndSQLReport {
 #-------------------------------------------------
 sub updateTemplates {
         print "\tUpdating base templates for XHTML compliance, and a cleaner look.\n" unless ($quiet);
+	$session->config->deleteFromHash("macros","JavaScript");
+	$session->config->deleteFromHash("macros","RawHeadTags");
+	$session->config->deleteFromHash("macros","StyleSheet");
 	$session->db->write("alter table template add column headBlock text");
 	my $template = WebGUI::Asset->new($session, "PBtmpl0000000000000003", "WebGUI::Asset::Template");
 	if (defined $template) {
@@ -841,6 +844,15 @@ sub templateParsers {
 #-------------------------------------------------
 sub removeFiles {
 	print "\tRemoving old unneeded files.\n" unless ($quiet);
+	unlink '../../lib/WebGUI/Help/Macro_StyleSheet.pm';
+	unlink '../../lib/WebGUI/Help/Macro_JavaScript.pm';
+	unlink '../../lib/WebGUI/Help/Macro_RawHeadTags.pm';
+	unlink '../../lib/WebGUI/i18n/English/Macro_StyleSheet.pm';
+	unlink '../../lib/WebGUI/i18n/English/Macro_JavaScript.pm';
+	unlink '../../lib/WebGUI/i18n/English/Macro_RawHeadTags.pm';
+	unlink '../../lib/WebGUI/Macro/StyleSheet.pm';
+	unlink '../../lib/WebGUI/Macro/JavaScript.pm';
+	unlink '../../lib/WebGUI/Macro/RawHeadTags.pm';
 	unlink '../../lib/WebGUI/MessageLog.pm';
 	unlink '../../lib/WebGUI/Operation/MessageLog.pm';
 	unlink '../../lib/WebGUI/ErrorHandler.pm';

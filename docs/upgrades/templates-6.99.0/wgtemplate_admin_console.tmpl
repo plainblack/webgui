@@ -1,7 +1,5 @@
 #PBtmpl0000000000000001
 
-^StyleSheet(^Extras;adminConsole/adminConsole.css);
-^JavaScript(^Extras;adminConsole/adminConsole.js);
 
 <div id="application_title">
 	<tmpl_var application.title>
@@ -65,3 +63,8 @@
 <script type="text/javascript" defer="defer">
 	initAdminConsole(<tmpl_if application.title>true<tmpl_else>false</tmpl_if>,<tmpl_if submenu_loop>true<tmpl_else>false</tmpl_if>);
 </script>
+
+~~~
+<link href="^Extras;adminConsole/adminConsole.css" type="text/css" />
+<script src="^Extras;adminConsole/adminConsole.js" type="text/javascript"></script>
+
