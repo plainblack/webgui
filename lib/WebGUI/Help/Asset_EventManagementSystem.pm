@@ -154,6 +154,76 @@ our $HELP = {
 	},
 
 
+	'event management system asset variables' => {
+		title => 'ems asset help title',
+		body => 'ems asset help body',
+		fields => [
+                        {
+                                title => 'display template',
+                                description => 'display template description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'checkout template',
+                                description => 'checkout template description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'manage purchases template',
+                                description => 'manage purchases template description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'view purchase template',
+                                description => 'view purchase template description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'paginate after',
+                                description => 'paginate after description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'group to add events',
+                                description => 'group to add events description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'group to approve events',
+                                description => 'group to approve events description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'global prerequisite',
+                                description => 'global prerequisite description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'global metadata',
+                                description => 'global metadata description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+		],
+		related => [
+			{
+				tag => 'event management system add/edit',
+				namespace => 'Asset_EventManagementSystem',
+			},
+			{
+				tag => 'wobject template',
+				namespace => 'Asset_Wobject',
+			},
+			{
+				tag => 'asset template',
+				namespace => 'Asset',
+			},
+			{
+				tag => 'template language',
+				namespace => 'Asset_Template',
+			},
+		],
+	},
+
 	'event management system template' => {
 		title => 'template help title',
 		body => 'template help body',
@@ -191,6 +261,27 @@ our $HELP = {
 			},
 			{
 				tag => 'event management system template',
+				namespace => 'Asset_EventManagementSystem',
+			},
+			{
+				tag => 'template language',
+				namespace => 'Asset_Template',
+			},
+		],
+	},
+
+	'ems manage purchases template' => {
+		title => 'manage purchases template help title',
+		body => 'manage purchases template help body',
+		fields => [
+		],
+		related => [
+			{
+				tag => 'event management system add/edit',
+				namespace => 'Asset_EventManagementSystem',
+			},
+			{
+				tag => 'event management system asset variables',
 				namespace => 'Asset_EventManagementSystem',
 			},
 			{

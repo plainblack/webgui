@@ -20,7 +20,7 @@ our $I18N = { ##hashref of hashes
 	},
 
 	'add/edit help body' => { 
-		message => q|<p>The Event Management System provides registration and payment for events inside WebGUI.  You can assign two groups who are allowed to do event management, one to add events to the manager and another to approve them.  You will also be able to setup several templates for the display of the list of events and the event checkout form.</p>
+		message => q|<p>The Event Management System (EMS) provides registration and payment for events inside WebGUI.  You can assign two groups who are allowed to do event management, one to add events to the manager and another to approve them.  You will also be able to setup several templates for the display of the list of events and the event checkout form.</p>
 		<p>Each event for sale is a Product from the Commerce System.</p>|,
 		lastUpdated => 1131394070,
 		context => q|Body for Add/Edit Event Managment System Help|
@@ -430,7 +430,7 @@ An internationalized label to dispaly to the user the link for managing purchase
 </p>
 
 <p><b>search.filters.options</b><br />
-Javascript for a search interface for Events based on metadata.
+Javascript for a search interface for Events based on their properties and metadata.
 </p>
 
 <p><b>search.data.url</b><br />
@@ -504,6 +504,60 @@ If the event is full, the url will be blank.
 |,
 		lastUpdated => 1145421471,
 	},
+
+	'manage purchases template help title' => {
+		message => q|EMS Manage Purchases Template|,
+		lastUpdated => 1140465899,
+	},
+
+	'manage purchases template help body' => {
+		message => q|
+<p>This template is used to style the screen of the Event Management System where
+the user can manage their purchases.</p>
+
+<p><b>purchasesLoop</b><br />
+This loop contains all events that have been approved so that users can register.
+</p>
+
+<blockquote>
+
+<p><b>purchaseUrl</b><br />
+A link to view the details of this purchase.
+</p>
+
+<p><b>datePurchasedHuman</b><br />
+The date and time this purchase was started in a human readable format.
+</p>
+
+</blockquote>
+
+<p><b>managePurchasesTitle</b><br />
+An internationalized label to title this screen.
+</p>
+|,
+		lastUpdated => 1145465299,
+	},
+
+	'ems asset help title' => {
+		message => q|EMS Asset Template Variables|,
+		lastUpdated => 1140465899,
+	},
+
+	'ems asset help body' => {
+		message => q|
+<p>The Event Management System Asset inherits all common variables available to Assets
+and Wobjects, as well as these individual variables:</p>
+
+|,
+		lastUpdated => 1145465299,
+	},
+
+
+	'event template help title' => {
+		message => q|Event Management System Event Template|,
+		lastUpdated => 1140465899,
+	},
+
 
 	'add/edit event help title' => { 
 		message => q|Add/Edit Event|,

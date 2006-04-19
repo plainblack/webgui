@@ -301,16 +301,6 @@ our $HELP = {
                                 namespace => 'WebGUI',
                         },
                         {
-                                title => '463',
-                                description => '463 description',
-                                namespace => 'WebGUI',
-                        },
-                        {
-                                title => '464',
-                                description => '464 description',
-                                namespace => 'WebGUI',
-                        },
-                        {
                                 title => '465',
                                 description => '465 description',
                                 namespace => 'WebGUI',
