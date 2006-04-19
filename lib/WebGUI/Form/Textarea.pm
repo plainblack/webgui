@@ -46,17 +46,25 @@ See the super class for additional details.
 
 The following additional parameters have been added via this sub class.
 
-=head4 rows
+=head4 width
 
-The number of rows (in characters) tall the box should be. Defaults to the setting textAreaRows or 5 if that's not specified.
+The width of this control in pixels. Defaults to 400 pixels.
 
-=head4 columns
+=head4 height
 
-The number of columns (in characters) wide the box should be. Defaults to the setting textAreaCols or 50 if that's not specified.
+The height of this control in pixels.  Defaults to 150 pixels.
+
+=head4 style
+
+Style attributes besides width and height which should be specified using the above parameters. Be sure to escape quotes if you use any.
 
 =head4 profileEnabled
 
 Flag that tells the User Profile system that this is a valid form element in a User Profile
+
+=head4 resizeable 
+
+A boolean indicating whether the text area can be reized by users. Defaults to 1.
 
 =cut
 
@@ -69,11 +77,17 @@ sub definition {
 		formName=>{
 			defaultValue=>$i18n->get("476")
 			},
-		rows=>{
-			defaultValue=> $session->setting->get("textAreaRows") || 5
+		height=>{
+			defaultValue=> 150
 			},
-		columns=>{
-			defaultValue=> $session->setting->get("textAreaCols") || 50
+		width=>{
+			defaultValue=> 400
+			},
+		style=>{
+			defaultValue => undef,
+			},
+		resizeable => {
+			defaultValue => 1,
 			},
 		profileEnabled=>{
 			defaultValue=>1
@@ -92,8 +106,15 @@ Renders an input tag of type text.
 
 sub toHtml {
 	my $self = shift;
+	my $resize = undef;
+	if ($self->get("resizeable")) {
+		my $i18n = WebGUI::International->new($self->session, "Form_Textarea");
+		$self->session->style->setScript($self->session->config->get("extrasURL")."/resizeable_textarea.js", {type=>"text/javascript"});
+		$resize = '<img src="'.$self->session->icon->getBaseURL().'/drag.gif" title="'.$i18n->get("drag to resize").'" alt="'.$i18n->get("drag to resize").'" class="draggable" onmousedown="tar_drag_start(event, \''.$self->get('id').'\');" />';
+	}
  	my $value = $self->fixMacros($self->fixTags($self->fixSpecialCharacters($self->get("value"))));
-	return '<textarea id="'.$self->get('id').'" name="'.$self->get("name").'" cols="'.$self->get("columns").'" rows="'.$self->get("rows").'" '.$self->get("extras").'>'.$value.'</textarea>';
+	my $style = "width: ".$self->get('width')."px; height: ".$self->get('height')."px; ".$self->get("style");
+	return '<textarea id="'.$self->get('id').'" name="'.$self->get("name").'" style="'.$style.'" '.$self->get("extras").'>'.$value.'</textarea>'.$resize;
 }
 
 

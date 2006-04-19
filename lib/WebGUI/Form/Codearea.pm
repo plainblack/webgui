@@ -45,6 +45,18 @@ See the super class for additional details.
 
 =head3 additionalTerms
 
+=head4 width
+
+The width of this control in pixels. Defaults to 550 pixels.
+
+=head4 height
+
+The height of this control in pixels.  Defaults to 450 pixels.
+
+=head4 style
+
+Style attributes besides width and height which should be specified using the above parameters. Be sure to escape quotes if you use any.
+
 The following additional parameters have been added via this sub class.
 
 =head4 profileEnabled
@@ -61,6 +73,15 @@ sub definition {
 	push(@{$definition}, {
 		formName=>{
 			defaultValue=>$i18n->get("codearea")
+			},
+		height=>{
+			defaultValue=> 450 
+			},
+		width=>{
+			defaultValue=> 550 
+			},
+		style=>{
+			defaultValue => undef,
 			},
 		profileEnabled=>{
 			defaultValue=>1
@@ -80,7 +101,7 @@ Renders a code area field.
 sub toHtml {
 	my $self = shift;
 	$self->session->style->setScript($self->session->config->get("extrasURL").'/TabFix.js',{type=>"text/javascript"});
-	$self->set("extras", $self->get('extras') . ' style="width: 600px; height: 400px" onkeypress="return TabFix_keyPress(event)" onkeydown="return TabFix_keyDown(event)"');	
+	$self->set("extras", $self->get('extras').' onkeypress="return TabFix_keyPress(event)" onkeydown="return TabFix_keyDown(event)"');	
 	return $self->SUPER::toHtml;
 }
 

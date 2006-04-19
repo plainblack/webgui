@@ -54,13 +54,13 @@ These subroutines are available from this package:
 
 #-------------------------------------------------------------------
 
-=head2 _getBaseURL ( )
+=head2 getBaseURL ( )
 
 Returns the base URL for this user's toolbar icon set.
 
 =cut
 
-sub _getBaseURL {
+sub getBaseURL {
 	my $self = shift;
 	my $url = $self->session->config->get("extrasURL").'/toolbar/';
 	if ($self->session->user->profileField("toolbar") ne "useLanguageDefault") {
@@ -95,7 +95,7 @@ sub copy {
 	my $pageURL = shift || $self->session->url->getRequestedUrl;
 	my $i18n = WebGUI::International->new($self->session,'Icon');
         my $output = '<p style="display:inline;vertical-align:middle;"><a href="'.$self->session->url->gateway($pageURL,$urlParams).'">';
-        $output .= '<img src="'.$self->_getBaseURL().'copy.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Copy').'" title="'.$i18n->get('Copy').'" /></a></p>';
+        $output .= '<img src="'.$self->getBaseURL().'copy.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Copy').'" title="'.$i18n->get('Copy').'" /></a></p>';
         return $output;
 }
 
@@ -121,7 +121,7 @@ sub cut {
         my $pageURL = shift || $self->session->url->getRequestedUrl;
 	my $i18n = WebGUI::International->new($self->session,'Icon');
         my $output = '<p style="display:inline;vertical-align:middle;"><a href="'.$self->session->url->gateway($pageURL,$urlParams).'">';
-        $output .= '<img src="'.$self->_getBaseURL().'cut.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Cut').'" title="'.$i18n->get('Cut').'" /></a></p>';
+        $output .= '<img src="'.$self->getBaseURL().'cut.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Cut').'" title="'.$i18n->get('Cut').'" /></a></p>';
         return $output;
 }
 
@@ -169,7 +169,7 @@ sub delete {
 	}
 	my $i18n = WebGUI::International->new($self->session,'Icon');
         my $output = '<p style="display:inline;vertical-align:middle;"><a href="'.$self->session->url->gateway($pageURL,$urlParams).'" '.$confirmText.'>';
-	$output .= '<img src="'.$self->_getBaseURL().'delete.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Delete').'" title="'.$i18n->get('Delete').'" /></a></p>';
+	$output .= '<img src="'.$self->getBaseURL().'delete.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Delete').'" title="'.$i18n->get('Delete').'" /></a></p>';
 	return $output;
 }
 
@@ -184,7 +184,7 @@ Generates an icon that can be used to drag content.
 sub drag {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session,'Icon');
-        return '<p style="display:inline;vertical-align:middle;"><img id="dragTrigger" class="dragTrigger" src="'.$self->_getBaseURL().'drag.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Drag').'" title="'.$i18n->get('Drag').'" /></p>';
+        return '<p style="display:inline;vertical-align:middle;"><img id="dragTrigger" class="dragTrigger" src="'.$self->getBaseURL().'drag.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Drag').'" title="'.$i18n->get('Drag').'" /></p>';
 }
 
 #-------------------------------------------------------------------
@@ -209,7 +209,7 @@ sub edit {
         my $pageURL = shift || $self->session->url->getRequestedUrl;
 	my $i18n = WebGUI::International->new($self->session,'Icon');
         my $output = '<p style="display:inline;vertical-align:middle;"><a href="'.$self->session->url->gateway($pageURL,$urlParams).'">';
-        $output .= '<img src="'.$self->_getBaseURL().'edit.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Edit').'" title="'.$i18n->get('Edit').'" /></a></p>';
+        $output .= '<img src="'.$self->getBaseURL().'edit.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Edit').'" title="'.$i18n->get('Edit').'" /></a></p>';
         return $output;
 }
 
@@ -235,7 +235,7 @@ sub export {
         my $pageURL = shift || $self->session->url->getRequestedUrl;
 	my $i18n = WebGUI::International->new($self->session,'Icon');
         my $output = '<p style="display:inline;vertical-align:middle;"><a href="'.$self->session->url->gateway($pageURL,$urlParams).'">';
-        $output .= '<img src="'.$self->_getBaseURL().'export.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Export').'" title="'.$i18n->get('Export').'" /></a></p>';
+        $output .= '<img src="'.$self->getBaseURL().'export.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Export').'" title="'.$i18n->get('Export').'" /></a></p>';
         return $output;
 }
 
@@ -286,7 +286,7 @@ sub locked {
         my $pageURL = shift || $self->session->url->getRequestedUrl;
 	my $i18n = WebGUI::International->new($self->session,'Icon');
         my $output = '<p style="display:inline;vertical-align:middle;"><a href="'.$self->session->url->gateway($pageURL,$urlParams).'">';
-        $output .= '<img src="'.$self->_getBaseURL().'locked.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('locked').'" title="'.$i18n->get('locked').'" /></a></p>';
+        $output .= '<img src="'.$self->getBaseURL().'locked.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('locked').'" title="'.$i18n->get('locked').'" /></a></p>';
         return $output;
 }
 
@@ -312,7 +312,7 @@ sub manage {
         my $pageURL = shift || $self->session->url->getRequestedUrl;
 	my $i18n = WebGUI::International->new($self->session,'Icon');
         my $output = '<p style="display:inline;vertical-align:middle;"><a href="'.$self->session->url->gateway($pageURL,$urlParams).'">';
-        $output .= '<img src="'.$self->_getBaseURL().'manage.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Manage').'" title="'.$i18n->get('Manage').'" /></a></p>';
+        $output .= '<img src="'.$self->getBaseURL().'manage.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Manage').'" title="'.$i18n->get('Manage').'" /></a></p>';
         return $output;
 }
 
@@ -338,7 +338,7 @@ sub moveBottom {
         my $pageURL = shift || $self->session->url->getRequestedUrl;
 	my $i18n = WebGUI::International->new($self->session,'Icon');
         my $output = '<p style="display:inline;vertical-align:middle;"><a href="'.$self->session->url->gateway($pageURL,$urlParams).'">';
-        $output .= '<img src="'.$self->_getBaseURL().'moveBottom.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Move To Bottom').'" title="'.$i18n->get('Move To Bottom').'" /></a></p>';
+        $output .= '<img src="'.$self->getBaseURL().'moveBottom.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Move To Bottom').'" title="'.$i18n->get('Move To Bottom').'" /></a></p>';
         return $output;
 }
 
@@ -366,7 +366,7 @@ sub moveDown {
 	my $i18n = WebGUI::International->new($self->session,'Icon');
         my $output = '<p style="display:inline;vertical-align:middle;">';
         $output .= '<a href="'.$self->session->url->gateway($pageURL,$urlParams).'">' unless $disabled;
-        $output .= '<img src="'.$self->_getBaseURL().'moveDown.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Move Down').'" title="'.$i18n->get('Move Down').'" />';
+        $output .= '<img src="'.$self->getBaseURL().'moveDown.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Move Down').'" title="'.$i18n->get('Move Down').'" />';
         $output .= '</a>' unless $disabled;
         $output .= '</p>';
         return $output;
@@ -394,7 +394,7 @@ sub moveLeft {
         my $pageURL = shift || $self->session->url->getRequestedUrl;
 	my $i18n = WebGUI::International->new($self->session,'Icon');
         my $output = '<p style="display:inline;vertical-align:middle;"><a href="'.$self->session->url->gateway($pageURL,$urlParams).'">';
-        $output .= '<img src="'.$self->_getBaseURL().'moveLeft.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Move Left').'" title="'.$i18n->get('Move Left').'" /></a></p>';
+        $output .= '<img src="'.$self->getBaseURL().'moveLeft.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Move Left').'" title="'.$i18n->get('Move Left').'" /></a></p>';
         return $output;
 }
 
@@ -420,7 +420,7 @@ sub moveRight {
         my $pageURL = shift || $self->session->url->getRequestedUrl;
 	my $i18n = WebGUI::International->new($self->session,'Icon');
         my $output = '<p style="display:inline;vertical-align:middle;"><a href="'.$self->session->url->gateway($pageURL,$urlParams).'">';
-        $output .= '<img src="'.$self->_getBaseURL().'moveRight.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Move Right').'" title="'.$i18n->get('Move Right').'" /></a></p>';
+        $output .= '<img src="'.$self->getBaseURL().'moveRight.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Move Right').'" title="'.$i18n->get('Move Right').'" /></a></p>';
         return $output;
 }
 
@@ -446,7 +446,7 @@ sub moveTop {
         my $pageURL = shift || $self->session->url->getRequestedUrl;
 	my $i18n = WebGUI::International->new($self->session,'Icon');
         my $output = '<p style="display:inline;vertical-align:middle;"><a href="'.$self->session->url->gateway($pageURL,$urlParams).'">';
-        $output .= '<img src="'.$self->_getBaseURL().'moveTop.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Move To Top').'" title="'.$i18n->get('Move To Top').'" /></a></p>';
+        $output .= '<img src="'.$self->getBaseURL().'moveTop.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Move To Top').'" title="'.$i18n->get('Move To Top').'" /></a></p>';
         return $output;
 }
 
@@ -474,7 +474,7 @@ sub moveUp {
 	my $i18n = WebGUI::International->new($self->session,'Icon');
         my $output = '<p style="display:inline;vertical-align:middle;">';
         $output .= '<a href="'.$self->session->url->gateway($pageURL,$urlParams).'">' unless $disabled;
-        $output .= '<img src="'.$self->_getBaseURL().'moveUp.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Move Up').'" title="'.$i18n->get('Move Up').'" />';
+        $output .= '<img src="'.$self->getBaseURL().'moveUp.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Move Up').'" title="'.$i18n->get('Move Up').'" />';
         $output .= '</a>' unless $disabled;
         $output .= '</p>';
         return $output;
@@ -536,7 +536,7 @@ sub shortcut {
         my $pageURL = shift || $self->session->url->getRequestedUrl;
 	my $i18n = WebGUI::International->new($self->session,'Icon');
         my $output = '<p style="display:inline;vertical-align:middle;"><a href="'.$self->session->url->gateway($pageURL,$urlParams).'">';
-        $output .= '<img src="'.$self->_getBaseURL().'shortcut.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Create Shortcut').'" title="'.$i18n->get('Create Shortcut').'" /></a></p>';
+        $output .= '<img src="'.$self->getBaseURL().'shortcut.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Create Shortcut').'" title="'.$i18n->get('Create Shortcut').'" /></a></p>';
         return $output;
 }
 
@@ -562,7 +562,7 @@ sub view {
         my $pageURL = shift || $self->session->url->getRequestedUrl;
 	my $i18n = WebGUI::International->new($self->session,'Icon');
         my $output = '<p style="display:inline;vertical-align:middle;"><a href="'.$self->session->url->gateway($pageURL,$urlParams).'">';
-        $output .= '<img src="'.$self->_getBaseURL().'view.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('View').'" title="'.$i18n->get('View').'" /></a></p>';
+        $output .= '<img src="'.$self->getBaseURL().'view.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('View').'" title="'.$i18n->get('View').'" /></a></p>';
         return $output;
 }
 

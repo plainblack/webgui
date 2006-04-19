@@ -213,7 +213,7 @@ sub toHtml {
 		foreach my $file (@{$storage->getFiles}) {
 			if ($self->get("deleteFileUrl")) {
 				$uploadControl .= '<p style="display:inline;vertical-align:middle;"><a href="'.$self->get("deleteFileUrl").$file.'">'
-				.'<img src="'.$self->session->icon->_getBaseURL().'delete.gif" style="vertical-align:middle;border: 0px;" alt="x" /></a></p> ';
+				.'<img src="'.$self->session->icon->getBaseURL().'delete.gif" style="vertical-align:middle;border: 0px;" alt="x" /></a></p> ';
 			}
 			$uploadControl .= '<p style="display:inline;vertical-align:middle;"><a href="'.$storage->getUrl($file).'">'
        				.'<img src="'.$storage->getFileIconUrl($file).'" style="vertical-align:middle;border: 0px;" alt="'

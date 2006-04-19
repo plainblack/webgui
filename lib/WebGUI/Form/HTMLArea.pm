@@ -49,13 +49,17 @@ See the super class for additional details.
 
 The following additional parameters have been added via this sub class.
 
-=head4 rows
+=head4 width
 
-The number of rows (in characters) tall the box should be. Defaults to the setting textAreaRows + 20.
+The width of this control in pixels. Defaults to 500 pixels.
 
-=head4 columns
+=head4 height
 
-The number of columns (in characters) wide the box should be. Defaults to the setting textAreaCols + 10.
+The height of this control in pixels.  Defaults to 400 pixels.
+
+=head4 style
+
+Style attributes besides width and height which should be specified using the above parameters. Be sure to escape quotes if you use any.
 
 =head4 richEditId
 
@@ -76,12 +80,15 @@ sub definition {
                 formName=>{
                         defaultValue=>$i18n->get("477")
                         },
-                rows=>{
-                        defaultValue=> $session->setting->get("textAreaRows")+20
-                        },
-                columns=>{
-                        defaultValue=> $session->setting->get("textAreaCols")+10
-                        },
+		height=>{
+			defaultValue=> 400
+			},
+		width=>{
+			defaultValue=> 500
+			},
+		style=>{
+			defaultValue => undef,
+			},
                 richEditId=>{
                         defaultValue=>$session->setting->get("richEditor") || "PBrichedit000000000001"
                         },
@@ -118,6 +125,7 @@ sub toHtml {
 	my $self = shift;
         $self->session->style->setScript($self->session->config->get("extrasURL").'/textFix.js',{ type=>'text/javascript' });
 	$self->set("extras", $self->get('extras') . ' onblur="fixChars(this.form.'.$self->get("name").')" mce_editable="true" ');
+	$self->set("resizeable", 0);
 	return $self->SUPER::toHtml.WebGUI::Asset::RichEdit->new($self->session,$self->get("richEditId"))->getRichEditor($self->get('id'));
 	my $i18n = WebGUI::International->new($self->session);
 	my $richEdit = WebGUI::Asset::RichEdit->new($self->session,$self->get("richEditId"));

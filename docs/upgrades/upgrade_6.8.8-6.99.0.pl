@@ -51,8 +51,16 @@ addRichEditUpload();
 updateArticle();
 updateScratch();
 installSQLForm();
+addResizableTextareas();
 
 finish($session); # this line required
+
+#-------------------------------------------------
+sub addResizableTextareas {
+	print "\tAllowing user to resize text areas on the fly.\n";
+	$session->setting->remove("textAreaCols");
+	$session->setting->remove("textAreaRows");
+}
 
 #-------------------------------------------------
 sub updateScratch {

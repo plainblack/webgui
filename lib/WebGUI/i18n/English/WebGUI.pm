@@ -137,11 +137,6 @@ our $I18N = {
                 context => q|Title of the statistics viewer for the admin console.|
 	},
 
-	'463' => {
-		message => q|Text Area Rows|,
-		lastUpdated => 1031514049
-	},
-
 	'451' => {
 		message => q|is required.|,
 		lastUpdated => 1031514049
@@ -2557,11 +2552,6 @@ The headings of columns on things like message boards and user contributions.
 		lastUpdated => 1078243385
 	},
 
-	'464' => {
-		message => q|Text Area Columns|,
-		lastUpdated => 1031514049
-	},
-
 	'363' => {
 		message => q|Page Template Position|,
 		lastUpdated => 1034736999
@@ -3522,16 +3512,6 @@ and tracked by WebGUI.|,
 
         'default rich editor description' => {
                 message => q|This is the rich editor configuration that will be used by default when a rich editor is needed. This can be overridden in certain applications such as the Collaboration System.</p>|,
-                lastUpdated => 1120239343,
-        },
-
-        '463 description' => {
-                message => q|How many rows of characters will be displayed in textareas on the site.|,
-                lastUpdated => 1120239343,
-        },
-
-        '464 description' => {
-                message => q|How many columns of characters will be displayed in textareas on the site. |,
                 lastUpdated => 1120239343,
         },
 

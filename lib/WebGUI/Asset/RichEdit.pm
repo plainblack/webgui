@@ -443,6 +443,7 @@ sub getRichEditor {
 		auto_reset_designmode => "true",
     		cleanup_callback => "tinyMCE_WebGUI_Cleanup",
     		urlconvertor_callback => "tinyMCE_WebGUI_URLConvertor",
+		theme_advanced_resizing => "true",
 		theme_advanced_buttons1 => join(",",@toolbarRow1),
 		theme_advanced_buttons2 => join(",",@toolbarRow2),
 		theme_advanced_buttons3 => join(",",@toolbarRow3),
@@ -454,6 +455,7 @@ sub getRichEditor {
 		nowrap => $self->getValue("nowrap") ? "true" : "false",
 		directionality => $self->getValue("directionality"),
 		theme_advanced_toolbar_location => $self->getValue("toolbarLocation"),
+		theme_advanced_statusbar_location => "bottom",
 		valid_elements => $self->getValue("validElements"),
 		);
 	foreach my $button (@toolbarButtons) {

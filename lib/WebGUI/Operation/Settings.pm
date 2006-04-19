@@ -136,18 +136,6 @@ sub www_editSettings {
 		-defaultValue=>["PBrichedit000000000001"]
 		);
         $tabform->getTab("ui")->integer(
-		-name=>"textAreaRows",
-		-label=>$i18n->get(463),
-		-hoverHelp=>$i18n->get('463 description'),
-		-value=>$session->setting->get("textAreaRows")
-		);
-        $tabform->getTab("ui")->integer(
-		-name=>"textAreaCols",
-		-label=>$i18n->get(464),
-		-hoverHelp=>$i18n->get('464 description'),
-		-value=>$session->setting->get("textAreaCols")
-		);
-        $tabform->getTab("ui")->integer(
 		-name=>"textBoxSize",
 		-label=>$i18n->get(465),
 		-hoverHelp=>$i18n->get('465 description'),

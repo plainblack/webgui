@@ -102,6 +102,7 @@
  - added [ 881817 ] allowed characters in username
  - added [ 1231386 ] Insert WebGUI Image
  - added [ 1205807 ] ability to report file size in File template
+ - added [ 1201811 ] resizable textAreas
  - added [ 1376374 ] WebGUI should return a Last-Modified http/1.x header
  - fix [ 1178981 ] IE is in "quirks mode" - multi-column layout templates
    break
