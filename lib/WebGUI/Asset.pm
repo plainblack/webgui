@@ -545,7 +545,6 @@ sub getEditForm {
 
 	# process errors
 	my $errors = $self->session->stow->get('editFormErrors');
-print "[$errors]";
 	if ($errors) {
 		$tabform->getTab("properties")->readOnly(
 			-value=>"<p>Some error(s) occurred:<ul><li>".join('</li><li>', @$errors).'</li></ul></p>',
