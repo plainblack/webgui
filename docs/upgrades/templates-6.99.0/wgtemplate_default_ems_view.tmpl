@@ -17,10 +17,7 @@
 <li><a href="<tmpl_var checkout.url>"><tmpl_var checkout.label></a></li>
 </ul>
 
-
-<br /><br />
-
-<table width="100%" border="0" cellpadding="8" cellspacing="0" style="border-top:solid gray 2px;border-bottom:solid gray 2px;">
+<table width="100%" border="1" cellpadding="8" cellspacing="0" style="border-top:solid gray 2px;border-bottom:solid gray 2px;">
 <tr><th><tmpl_var name.label></th>
 <th><tmpl_var starts.label></th>
 <th><tmpl_var ends.label></th>
@@ -29,7 +26,9 @@
 <th><tmpl_var requirement.label></th>
 <th><tmpl_var addToCart.label></th></tr>
 <tmpl_loop events_loop>
- <tmpl_var event>
+<tr>
+	<td valign="top" colspan="7"><tmpl_var event></td>
+</tr>
 </tmpl_loop>
 </table>
 <tmpl_var paginateBar>
