@@ -1971,7 +1971,7 @@ sub www_manageAssets {
 	} elsif ($self->session->form->get("manage")) {
 		$self->session->scratch->delete("manageAssetsSearchToggle");
 	}
-	my $out = $self->getAdminConsole->render($self->getAdminConsole->render("~~~"));
+	my $out = $self->getAdminConsole->render("~~~");
 	my ($head, $foot) = split("~~~",$out);
 	$self->session->style->sent(1);
 	$self->session->http->sendHeader;
