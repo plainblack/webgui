@@ -2597,6 +2597,12 @@ sub www_search {
 	  $eventFields{'startDate.human'} = $self->session->datetime->epochToHuman($event->{'startDate'});
 	  $eventFields{'endDate.human'} = $self->session->datetime->epochToHuman($event->{'endDate'});
 	  $eventFields{'eventIsFull'} = ($eventFields{'seatsRemaining'} == 0);
+	  
+	  $eventFields{'manageToolbar'} = $self->session->icon->delete('func=deleteEvent;pid='.$event->{productId}, $self->getUrl,
+					  $i18n->get('confirm delete event')).
+					  $self->session->icon->edit('func=editEvent;pid='.$event->{productId}, $self->getUrl).
+					  $self->session->icon->moveUp('func=moveEventUp;pid='.$event->{productId}, $self->getUrl).
+					  $self->session->icon->moveDown('func=moveEventDown;pid='.$event->{productId}, $self->getUrl);
 
 	  if ($eventFields{'eventIsFull'}) {
 	  	$eventFields{'purchase.label'} = $i18n->get('sold out');
@@ -2616,7 +2622,8 @@ sub www_search {
 	$var{'managePurchases.url'} = $self->getUrl('func=managePurchases');
 	$var{'managePurchases.label'} = $i18n->get('manage purchases');
 	$var{'noSearchDialog'} = ($self->session->form->get('hide') eq "1") ? 1 : 0;
-	
+	$var{'addEvent.url'} = $self->getUrl('func=editEvent;pid=new');
+	$var{'addEvent.label'} = $i18n->get('add event');
 	
 	if ($self->session->user->isInGroup($self->get("groupToManageEvents"))) {
 		$var{'canManageEvents'} = 1;
@@ -2686,7 +2693,7 @@ sub view {
 	$var{'checkout.label'} = "Checkout";
 	$var{'events_loop'} = \@events;
 	$var{'paginateBar'} = $p->getBarTraditional;
-	$var{'manageEvents.url'} = $self->getUrl('func=manageEvents');
+	$var{'manageEvents.url'} = $self->getUrl('func=search');
 	$var{'manageEvents.label'} = $i18n->get('manage events');
 	$var{'managePurchases.url'} = $self->getUrl('func=managePurchases');
 	$var{'managePurchases.label'} = $i18n->get('manage purchases');

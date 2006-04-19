@@ -122,7 +122,8 @@
 <th><tmpl_var requirement.label></th>
 <th><tmpl_var addToCart.label></th></tr>
 <tmpl_loop events_loop>
-  <tr<tmpl_unless __ODD__> class="oddRow"<tmpl_else> class="evenRow"</tmpl_unless>><td><tmpl_var title>
+  <tr<tmpl_unless __ODD__> class="oddRow"<tmpl_else> class="evenRow"</tmpl_unless>>
+  <td><tmpl_if canManageEvents><tmpl_var manageToolbar>&nbsp;</tmpl_if><tmpl_var title>
   </td><td><tmpl_var startDate.human>
   </td><td><tmpl_var endDate.human>
   </td><td><tmpl_var seatsRemaining>
