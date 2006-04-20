@@ -77,6 +77,7 @@ sub addNewStyles {
 		foreach my $file (@files) {
 			next if $file eq "..";
 			next if $file eq ".";
+			next if $file eq ".svn";
 			$assetCounter++;
 			print "\t\t\tAdding $file\n";
 			if ($file =~ m/\.[png|jpg|gif]+$/) {
