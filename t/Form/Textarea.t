@@ -44,7 +44,7 @@ my $testBlock = [
 
 my $formType = 'textarea';
 
-my $numTests = 11 + scalar @{ $testBlock } + 1;
+my $numTests = 12 + scalar @{ $testBlock } + 1;
 
 
 plan tests => $numTests;
@@ -74,16 +74,17 @@ my $input = $inputs[0];
 is($input->name, 'TestText', 'Checking input name');
 is($input->type, $formType, 'Checking input type');
 is($input->value, 'Some text in here', 'Checking default value');
-is($input->{rows}, 5, 'Default number of rows');
-is($input->{cols}, 50, 'Default number of columns');
+like($input->{style}, qr/width:\s+\d+px;\s+height:\s+\d+px/, 'basic style format');
+like($input->{style}, qr/height: 150/, 'Default height');
+like($input->{style}, qr/width: 400/, 'Default width');
 
 $html = join "\n",
 	$header, 
 	WebGUI::Form::Textarea->new($session, {
 		name => 'preTestText',
 		value => q!Some & text in " here!,
-		rows => 10,
-		columns => 80,
+		height => 200,
+		width => 500,
 	})->toHtml,
 	$footer;
 
@@ -92,8 +93,8 @@ $html = join "\n",
 $input = $inputs[0];
 is($input->name, 'preTestText', 'Checking input name');
 is($input->value, 'Some & text in " here', 'Checking default value');
-is($input->{rows}, 10, 'set number of rows');
-is($input->{cols}, 80, 'set number of columns');
+like($input->{style}, qr/height: 200/, 'Default height');
+like($input->{style}, qr/width: 500/, 'Default width');
 
 ##Test Form Output parsing
 
