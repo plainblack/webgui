@@ -83,7 +83,6 @@ $testCache->flush;
 
 my $g = WebGUI::Group->new($session, "new");
 
-diag("Object creation and defaults");
 is (ref $g, "WebGUI::Group", "Group object creation");
 my $gid = $g->getId;
 isnt ($gid, "new", "Group assigned new groupId, not new");

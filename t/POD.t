@@ -24,7 +24,6 @@ plan skip_all => 'set TEST_POD to enable this test' unless $ENV{TEST_POD};
 my @modules = ();
 find(\&countModules, File::Spec->catdir( WebGUI::Test->lib, 'WebGUI' ) );
 my $moduleCount = scalar(@modules);
-diag("Planning on running $moduleCount tests\n");
 plan tests => $moduleCount;
 foreach my $package (sort @modules) {
 	my $pc = Pod::Coverage->new(package=>$package);

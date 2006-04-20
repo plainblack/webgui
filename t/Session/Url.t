@@ -28,7 +28,6 @@ $session->setting->set('preventProxyCache', 0) if ($preventProxyCache);
 my $url = 'http://localhost.localdomain/foo';
 my $url2;
 
-diag("append tests");
 
 $url2 = $session->url->append($url,'a=b');
 is( $url2, $url.'?a=b', 'append first pair');
@@ -36,7 +35,6 @@ is( $url2, $url.'?a=b', 'append first pair');
 $url2 = $session->url->append($url2,'c=d');
 is( $url2, $url.'?a=b;c=d', 'append second pair');
 
-diag("gateway tests");
 
 $session->config->{_config}->{'gateway'} = '/';
 
@@ -69,8 +67,6 @@ is( $url2, '/home?a=b', 'append one pair via gateway');
 #Restore original proxy cache setting so downstream tests work with no surprises
 $session->setting->set(preventProxyCache => $preventProxyCache );
 
-diag("site URL tests");
-
 my $sitename = $session->config->get('sitename')->[0];
 is ( $session->url->getSiteURL, 'http://'.$sitename, 'getSiteURL from config');
 
@@ -80,14 +76,10 @@ is ( $session->url->getSiteURL, 'http://webgui.org', 'override config setting wi
 $session->url->setSiteURL('http://'.$sitename);
 is ( $session->url->getSiteURL, 'http://'.$sitename, 'restore config setting');
 
-diag("compliancy tests");
-
 $url  = 'level1 /level2/level3   ';
 $url2 = 'level1-/level2/level3';
 
 is ( $session->url->makeCompliant($url), $url2, 'language specific URL compliance');
-
-diag("getRequestedUrl tests");
 
 my $originalRequest = $session->request;  ##Save the original request
 
@@ -108,8 +100,6 @@ is ($session->url->getRequestedUrl, 'path1/file1', 'getRequestedUrl, fetch');
 
 $requestedUrl = '/path2/file2';
 is ($session->url->getRequestedUrl, 'path1/file1', 'getRequestedUrl, check cache of previous result');
-
-diag("page tests");
 
 is ($session->url->page, '/path1/file1', 'page with no args returns getRequestedUrl through gateway');
 
