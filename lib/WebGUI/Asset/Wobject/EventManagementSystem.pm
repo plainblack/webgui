@@ -2442,7 +2442,7 @@ sub www_search {
 	}
 	my $searchPhrases;
 	if (scalar(@keys)) {
-		$searchPhrases = " and ( ";
+		#$searchPhrases = " and ( ";
 		my $count = 0;
 		foreach (@keys) {
 			$searchPhrases .= ' and ' if $count;
@@ -2450,7 +2450,7 @@ sub www_search {
 			$searchPhrases .= "(p.title like $val or p.description like $val)";
 			$count++;
 		}
-		$searchPhrases .= " )";
+		#$searchPhrases .= " )";
 	}
 	my $basicSearch = $searchPhrases;
 	my %reqHash;
@@ -2460,7 +2460,7 @@ sub www_search {
 		$searchPhrases = '';
 		my $fields = $self->_getFieldHash();
 		my $count = 0;
-		if ($self->session->form->get("subevent")) {
+		if ($self->session->form->get("subSearch")) {
 				$count = 1;
 				$searchPhrases = $basicSearch;
 		}
@@ -2531,8 +2531,10 @@ sub www_search {
 				}
 			}
 		}
-		$searchPhrases &&= " and ( ".$searchPhrases." )";
+		#$searchPhrases &&= " and ( ".$searchPhrases." )";
 	}
+	$searchPhrases &&= " and ( ".$searchPhrases." )";
+	$self->session->errorHandler->warn("searchPhrases: $searchPhrases<br />basicSearch: $basicSearch<br />");
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	# Get the products available for sale for this page
 	my $sql = "select p.productId, p.title, p.description, p.price, p.templateId, e.approved, e.maximumAttendees, e.startDate, e.endDate $selects
@@ -2591,7 +2593,7 @@ sub www_search {
 		push(@results,$data) if $shouldPush;
 	}
 	$sth->finish;
-	
+	@results = () unless ( (scalar(@results) <= 50) || ($self->session->form->get("advSearch") || $self->session->form->get("searchKeywords")));	
 	$p->setDataByArrayRef(\@results);
 	my $eventData = $p->getPageData;
 	my @events;
