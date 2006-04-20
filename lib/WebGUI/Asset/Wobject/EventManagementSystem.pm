@@ -1490,7 +1490,7 @@ sub www_deleteEvent {
 	$self->deleteCollateral('products','productId',$eventId);
 	$self->reorderCollateral('EventManagementSystem_products', 'productId');
 
-	return $self->www_manageEvents;			  
+	return $self->www_search;			  
 }
 
 #-------------------------------------------------------------------
@@ -1745,7 +1745,7 @@ sub www_editEvent {
 
 	my $output = $f->print;
 	$self->getAdminConsole->setHelp('add/edit event','Asset_EventManagementSystem');
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEvents'),$i18n->get("manage events"));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=search'),$i18n->get("manage events"));
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n->get('manage event metadata'));
 	my $addEdit = ($pid eq "new" or !$pid) ? $i18n->get('add', 'Asset_Wobject') : $i18n->get('edit', 'Asset_Wobject');
 	return $self->getAdminConsole->render($output, $addEdit.' '.$i18n->get('event'));
@@ -1828,7 +1828,7 @@ sub www_editEventSave {
 	}
 	
 	return $self->www_editEvent(undef,$pid) if ($self->session->form->get("whatNext") eq "addAnotherPrereq");
-	return $self->www_manageEvents;
+	return $self->www_search;
 }
 
 #-------------------------------------------------------------------
@@ -1932,7 +1932,7 @@ sub www_manageEventMetadata {
 		$output .= $i18n->get('you do not have any metadata fields to display');
 	}
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editEventMetaDataField;fieldId=new'), $i18n->get("add new event metadata field"));
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEvents'), $i18n->get('manage events'));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=search'), $i18n->get('manage events'));
 	return $self->getAdminConsole->render($output, $i18n->get("manage event metadata"));
 }
 
@@ -2286,7 +2286,7 @@ sub www_moveEventDown {
 	
 	$self->moveCollateralDown('EventManagementSystem_products', 'productId', $eventId);
 
-	return $self->www_manageEvents;
+	return $self->www_search;
 }
 
 #-------------------------------------------------------------------
@@ -2305,7 +2305,7 @@ sub www_moveEventUp {
 	
 	$self->moveCollateralUp('EventManagementSystem_products', 'productId', $eventId);
 	
-	return $self->www_manageEvents;
+	return $self->www_search;
 }
 
 #-------------------------------------------------------------------
@@ -2452,14 +2452,18 @@ sub www_search {
 		}
 		$searchPhrases .= " )";
 	}
+	my $basicSearch = $searchPhrases;
 	my %reqHash;
 	my $seatsAvailable = 'none';
 	my $seatsCompare;
-	if ($self->session->form->get("advSearch")) {
+	if ($self->session->form->get("advSearch") || $self->session->form->get("subSearch")) {
 		$searchPhrases = '';
 		my $fields = $self->_getFieldHash();
 		my $count = 0;
-		for (my $cfilter = 1; $cfilter < 50; $cfilter++) {
+		for (my $cfilter = 0; $cfilter < 50; $cfilter++) {
+			if ($self->session->form->get("subevent")) {
+				$searchPhrases = $basicSearch;
+			}
 			my $value = $self->session->form->get("cfilter_t".$cfilter);
 			my $fieldId = $self->session->form->get("cfilter_s".$cfilter);
 			if ($fieldId eq 'requirement') {
@@ -2535,12 +2539,19 @@ sub www_search {
 		   $joins 
 		   where
 		   	p.productId = e.productId and approved=1
-		   	and e.assetId =".$self->session->db->quote($self->get("assetId")).$searchPhrases;
+		   	and e.assetId =".$self->session->db->quote($self->get("assetId")).$searchPhrases. "order by sequenceNumber";
 #		   	." 
 #			and p.productId not in (select distinct(productId) from EventManagementSystem_prerequisites)";		
 
-	$var{'basicSearch.formHeader'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl.'?advSearch=0'});
-	$var{'advSearch.formHeader'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl.'?advSearch=1'});
+	$var{'basicSearch.formHeader'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl("func=search;advSearch=0")}).
+					 WebGUI::Form::hidden($self->session,{name=>"subSearch", value => $self->session->form->get("subSearch")}).
+					 WebGUI::Form::hidden($self->session,{name => "cfilter_s0", value => "requirement"}).
+					 WebGUI::Form::hidden($self->session,{name => "cfilter_c0", value => "eq"}).
+					 WebGUI::Form::hidden($self->session,{name => "cfilter_t0", value => $self->session->form->get("cfilter_t0")});
+	$var{'advSearch.formHeader'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl("func=search;advSearch=1")}).
+				       WebGUI::Form::hidden($self->session,{name => "cfilter_s0", value => "requirement"}).
+				       WebGUI::Form::hidden($self->session,{name => "cfilter_c0", value => "eq"}).
+				       WebGUI::Form::hidden($self->session,{name => "cfilter_t0", value => $self->session->form->get("cfilter_t0")});
 	$var{isAdvSearch} = $self->session->form->get('advSearch');
 	$var{'search.formFooter'} = WebGUI::Form::formFooter($self->session);
 	$var{'search.formSubmit'} = WebGUI::Form::submit($self->session, {value=>'Filter'});
@@ -2656,7 +2667,7 @@ sub view {
 		   where
 		   	p.productId = e.productId and approved=1
 		   	and e.assetId =".$self->session->db->quote($self->get("assetId"))." 
-			and p.productId not in (select distinct(productId) from EventManagementSystem_prerequisites)";		
+			and p.productId not in (select distinct(productId) from EventManagementSystem_prerequisites) order by sequenceNumber";		
 
 	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->get("paginateAfter"));
 	$p->setDataByQuery($sql);
@@ -2670,7 +2681,7 @@ sub view {
 	  my %eventFields;
 	  
 	  $eventFields{'title'} = $event->{'title'};
-	  $eventFields{'title.url'} = $self->getUrl('func=search;cfilter_s1=requirement;cfilter_c1=eq;advSearch=1;hide=1;cfilter_t1='.$event->{'productId'});
+	  $eventFields{'title.url'} = $self->getUrl('func=search;cfilter_s0=requirement;cfilter_c0=eq;subSearch=1;cfilter_t0='.$event->{'productId'});
 	  $eventFields{'description'} = $event->{'description'};
 	  $eventFields{'price'} = $event->{'price'};
 	  my ($numberRegistered) = $self->session->db->quickArray("select count(*) from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p
