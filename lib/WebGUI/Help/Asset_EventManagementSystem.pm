@@ -291,6 +291,44 @@ our $HELP = {
 		],
 	},
 
+	'ems view purchase template' => {
+		title => 'view purchase template help title',
+		body => 'view purchase template help body',
+		fields => [
+		],
+		related => [
+			{
+				tag => 'event management system add/edit',
+				namespace => 'Asset_EventManagementSystem',
+			},
+			{
+				tag => 'event management system asset variables',
+				namespace => 'Asset_EventManagementSystem',
+			},
+			{
+				tag => 'template language',
+				namespace => 'Asset_Template',
+			},
+		],
+	},
+
+
+	'ems search template' => {
+		title => 'search template help title',
+		body => 'search template help body',
+		fields => [
+		],
+		related => [
+			{
+				tag => 'event management system add/edit',
+				namespace => 'Asset_EventManagementSystem',
+			},
+			{
+				tag => 'template language',
+				namespace => 'Asset_Template',
+			},
+		],
+	},
 
 };
 

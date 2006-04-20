@@ -2557,7 +2557,7 @@ sub www_search {
 				       WebGUI::Form::hidden($self->session,{name => "cfilter_t0", value => $self->session->form->get("cfilter_t0")});
 	$var{isAdvSearch} = $self->session->form->get('advSearch');
 	$var{'search.formFooter'} = WebGUI::Form::formFooter($self->session);
-	$var{'search.formSubmit'} = WebGUI::Form::submit($self->session, {value=>'Filter'});
+	$var{'search.formSubmit'} = WebGUI::Form::submit($self->session, {value=>$i18n->get('filter')});
 	my $searchUrl = $self->getUrl("func=view");
 	my $formVars = $self->session->form->paramsHashRef();
 	foreach ($self->session->form->param) {

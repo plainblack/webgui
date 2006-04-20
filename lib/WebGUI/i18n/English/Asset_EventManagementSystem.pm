@@ -516,7 +516,7 @@ If the event is full, the url will be blank.
 the user can manage their purchases.</p>
 
 <p><b>purchasesLoop</b><br />
-This loop contains all events that have been approved so that users can register.
+This loop contains all events that have been approved so that users can view their purchases.
 </p>
 
 <blockquote>
@@ -537,6 +537,257 @@ An internationalized label to title this screen.
 |,
 		lastUpdated => 1145465299,
 	},
+
+	'view purchase template help title' => {
+		message => q|EMS View Purchases Template|,
+		lastUpdated => 1140465899,
+	},
+
+	'view purchase template help body' => {
+		message => q|
+<p>This template is used to style the screen of the Event Management System where
+the users and admins can view or edit a purchase.</p>
+
+<p>In addition to the template variables below, this template also has access to the
+EMS Asset variables.</p>
+
+<p><b>purchasesLoop</b><br />
+This loop contains all events that are included in this purchase.
+</p>
+
+<blockquote>
+
+<p><b>startDateHuman</b><br />
+This event's start date and time in a human readable format.
+</p>
+
+<p><b>endDateHuman</b><br />
+This event's end date and time in a human readable format.
+</p>
+
+<p><b>startDate</b><br />
+This event's start date and time in epoch format.
+</p>
+
+<p><b>endDateHuman</b><br />
+This event's end date and time in epoch format.
+</p>
+
+<p><b>registrationId</b><br />
+The user's registrationId for this event.
+</p>
+
+<p><b>title</b><br />
+The title of this event.
+</p>
+
+<p><b>description</b><br />
+The description of this event.
+</p>
+
+<p><b>price</b><br />
+The price of this event.
+</p>
+
+<p><b>templateId</b><br />
+The template used to style this event if it is to be displayed.
+</p>
+
+<p><b>returned</b><br />
+A boolean that will be 1 if this event has been returned by the user.
+</p>
+
+<p><b>approved</b><br />
+A boolean that will be 1 if this event has been approved.
+</p>
+
+<p><b>templateId</b><br />
+The template used to style this event if it is to be displayed.
+</p>
+
+<p><b>maximumAttendees</b><br />
+The number of people allowed to attend this event.
+</p>
+
+</blockquote>
+
+<p><b>viewPurchaseTitle</b><br />
+An internationalized label to title this screen.
+</p>
+
+<p><b>canReturn</b><br />
+A boolean indicating if the current user may return events in the purchase.
+</p>
+
+<p><b>transactionId</b><br />
+The unique identifier for this transaction in the database.
+</p>
+
+<p><b>canAddEvents</b><br />
+A boolean indicating if the current user can add events to this purchase.
+</p>
+
+<p><b>appUrl</b><br />
+A URL back to the main screen of the Asset.
+</p>
+
+|,
+		lastUpdated => 1145465299,
+	},
+
+	'search template help title' => {
+		message => q|EMS Search Template|,
+		lastUpdated => 1140465899,
+	},
+
+	'search template help body' => {
+		message => q|
+<p>This template is used to style the screen of the Event Management System where
+the users and admins can view or edit a purchase.</p>
+
+<p><b>basicSearch.formHeader</b><br />
+Form header for a basic search.
+</p>
+
+<p><b>advSearch.formHeader</b><br />
+Form header for an advanced search.
+</p>
+
+<p><b>isAdvSearch</b><br />
+Boolean indicating if an advanced search form has been requested.
+</p>
+
+<p><b>search.formFooter</b><br />
+Form footer code for either type of search.
+</p>
+
+<p><b>search.formSubmit</b><br />
+A button to submit the user's search data.  The button will contain the internationalized word "Filter".
+</p>
+
+<p><b>events_loop</b><br />
+This loop contains all events that have been approved so that users can register.
+</p>
+
+<blockquote>
+
+<p><b>event</b><br />
+The information for one event that has been processed by its own event template.
+</p>
+
+<p><b>title</b><br />
+The title of this event.
+</p>
+
+<p><b>description</b><br />
+The description of this event.
+</p>
+
+<p><b>price</b><br />
+The price of this event.
+</p>
+
+<p><b>numberRegistered</b><br />
+The number of people currently registered for this event.
+</p>
+
+<p><b>maximumAttendees</b><br />
+The number of people allowed to attend this event.
+</p>
+
+<p><b>seatsRemaining</b><br />
+The number of available seats remaining for this event.
+</p>
+
+<p><b>startDate.human</b><br />
+The date and time this event starts, in human readable format.
+</p>
+
+<p><b>endDate.human</b><br />
+The date and time this event ends, in human readable format.
+</p>
+
+<p><b>eventIsFull</b><br />
+A boolean that is true if the there are no available seats remaining in this event.
+</p>
+
+<p><b>purchase.label</b><br />
+An internationalized label to display to the user the link for purchasing this event.
+If the event is full, the label will be "Sold out".
+</p>
+
+<p><b>purchase.url</b><br />
+A URL for the user to register for this event and add it to their shopping cart.
+If the event is full, the url will be blank.
+</p>
+
+</blockquote>
+
+<p><b>checkout.url</b><br />
+A URL to take the user the screen that displays the contents of their shopping cart.
+</p>
+
+<p><b>checkout.label</b><br />
+A label to go with checkout.url.  The internationalized word "Checkout".
+</p>
+
+<p><b>paginateBar</b><br />
+A bar to help the user page through sets of Events if several pages of Events exist.
+</p>
+
+<p><b>Pagination variables</b><br />
+Common pagination template variables.
+</p>
+
+<p><b>canManageEvents</b><br />
+A flag to indiciate if the current user is allowed to Manage Events.
+</p>
+
+<p><b>manageEvents.url</b><br />
+A URL to take the user to the screen where Events can be managed (i.e. added, approved, deleted)
+</p>
+
+<p><b>manageEvents.label</b><br />
+An internationalized label to dispaly to the user the link for managing events.
+</p>
+
+<p><b>managePurchases.url</b><br />
+A URL to take the user to the screen where purchases can be managed (i.e. added, approved, deleted)
+</p>
+
+<p><b>managePurchases.label</b><br />
+An internationalized label to dispaly to the user the link for managing purchases.
+</p>
+
+<p><b>noSearchDialog</b><br />
+A boolean that indicates if the user has requested that no search dialog be presented
+by setting the "hide" form variable.
+</p>
+
+<p><b>addEvent.url</b><br />
+A URL to take the user to the screen to add a new event.
+</p>
+
+<p><b>addEvent.label</b><br />
+An internationalized label to dispaly to the user the link for adding an event.
+</p>
+
+<p><b>search.filters.options</b><br />
+Javascript for a search interface for Events based on their properties and metadata.
+</p>
+
+<p><b>search.data.url</b><br />
+The URL to this Asset.
+</p>
+
+<p><b>ems.wobject.dir</b><br />
+The URL the EventManagementSystem area in the WebGUI Extras directory.
+</p>
+
+|,
+		lastUpdated => 1145465299,
+	},
+
 
 	'ems asset help title' => {
 		message => q|EMS Asset Template Variables|,
@@ -723,6 +974,12 @@ allows you to edit events,  delete events, or change their order.</p>
 	'checkout' => {
 		message => q|Checkout|,
 		lastUpdated => 1145402683,
+	},
+
+	'filter' => {
+		message => q|Filter|,
+		lastUpdated => 1145402683,
+		context => q|Button in search form to limit displayed events based on user criteria|,
 	},
 
 };
