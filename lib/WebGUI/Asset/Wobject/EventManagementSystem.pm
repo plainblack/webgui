@@ -2460,10 +2460,11 @@ sub www_search {
 		$searchPhrases = '';
 		my $fields = $self->_getFieldHash();
 		my $count = 0;
-		for (my $cfilter = 0; $cfilter < 50; $cfilter++) {
-			if ($self->session->form->get("subevent")) {
+		if ($self->session->form->get("subevent")) {
+				$count = 1;
 				$searchPhrases = $basicSearch;
-			}
+		}
+		for (my $cfilter = 0; $cfilter < 50; $cfilter++) {
 			my $value = $self->session->form->get("cfilter_t".$cfilter);
 			my $fieldId = $self->session->form->get("cfilter_s".$cfilter);
 			if ($fieldId eq 'requirement') {
