@@ -51,7 +51,9 @@ save you many hours of grief.
  * You no longer need the cron job for runHourly.pl. Instead, you
 	must start sbin/spectre.pl when your server starts up.
 	Spectre is WebGUI's offline execution engine. It triggers
-	scheduled events and executes workflow tasks.
+	scheduled events and executes workflow tasks. Be sure to
+	edit each of your WebGUI config files to set the
+	spectreSubnet setting to match your IP address or IP range.
 
  * If you wish to run the full test suite, you'll need to install
 	these optional modules:

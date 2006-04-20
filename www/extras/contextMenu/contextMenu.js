@@ -33,8 +33,8 @@ var firedobj = ie5?e.srcElement:e.target;
 		var el = document.documentElement;
                posx = e.clientX - xoffset + (ie5? el.scrollLeft : window.pageXOffset);
                posy = e.clientY - yoffset + (ie5? el.scrollTop : window.pageYOffset);
-	menuobj.style.left=posx;
-	menuobj.style.top=posy;
+	menuobj.style.left=posx + "px";
+	menuobj.style.top=posy + "px";
       menuobj.style.visibility="visible"
 	return false
 }

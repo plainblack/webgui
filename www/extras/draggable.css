@@ -16,7 +16,7 @@ div.dragable:hover {
    opacity:0.6;
    -moz-opacity:0.6;
    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=60);
-  cursor: hand;
+  cursor: pointer;
   z-index: 2000; 
 }
 .draggedOverTop{
@@ -34,12 +34,12 @@ div.dragable:hover {
 }
 .blank {
   position: relative;
-  cursor: hand;
+  cursor: pointer;
   background-color: white;
 }
 .blankOver {
   position: relative;
-  cursor: hand;
+  cursor: pointer;
   background-color: black;
 }
 .empty {

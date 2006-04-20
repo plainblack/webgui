@@ -1,16 +1,14 @@
  
 var adminConsoleIsOn = true;
-
+var adminConsoleApplicationSubmenu = false;
 function initAdminConsole (viewAnApplication,hasSubmenu) {
+	adminConsoleApplicationSubmenu = hasSubmenu;	
         if (viewAnApplication) {
                 switchToApplication();
         } else {
                 switchToAdminConsole();
         	document.getElementById("adminConsoleMainMenu").className = "adminConsoleHidden";
         }
-	if (!hasSubmenu) {
-        	document.getElementById("adminConsoleApplicationSubmenu").className = "adminConsoleHidden";
-	}
 }
  
 function switchToApplication () {
@@ -21,7 +19,9 @@ function switchToApplication () {
         document.getElementById("application_help").className = "adminConsoleHelpIcon";
         document.getElementById("application_icon").className = "adminConsoleTitleIcon";
         document.getElementById("application_title").className = "adminConsoleTitle";
-        document.getElementById("adminConsoleApplicationSubmenu").className = "adminConsoleSubmenu";
+	if (adminConsoleApplicationSubmenu) {
+       	 	document.getElementById("adminConsoleApplicationSubmenu").className = "adminConsoleSubmenu";
+	}
         document.getElementById("application_workarea").className = "adminConsoleWorkArea";
         document.getElementById("console_toggle_off").className = "adminConsoleHidden";
         document.getElementById("console_toggle_on").className = "adminConsoleToggle";

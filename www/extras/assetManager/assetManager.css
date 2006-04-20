@@ -48,7 +48,8 @@
         position:absolute;
         display: none;
         border: 1px dashed #405F6E;
-        font-size: 12;}
+        font-size: 12px;
+}
 
 .dragImage {
 	position:absolute;

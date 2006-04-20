@@ -47,12 +47,13 @@ th {
 
 .adminConsoleWorkArea {
  	border: 1px solid #D7D7D7;
-	margin: 65px 190px 50px 10px;
+	margin: 65px 170px 10px 9px;
 	padding: 15px;
 	-moz-border-radius: 10px;
 	background-color: #fafafa;
 	min-height: 400px;
-	width: 75%;
+	width: 78%;
+	z-index: 10;
 }
 /* Hides from non-ie: the holly hack \*/
 * html .adminConsoleWorkArea {
@@ -63,44 +64,59 @@ th {
 
 
 .adminConsoleMenu {
+	z-index: 0;
 	position: absolute;
 	top: 65px;
-	right: 10px;
+	left: 78%;
+	margin-top: 10px;
+	margin-left: 31px;
 	width: 180px;
 	font-family: helvetica, arial;
 	font-size: 12px;
-	z-index: 1000;
 }
 
 .adminConsoleMainMenu:hover, .adminConsoleUtilityMenu:hover {
 	opacity: 1.0;
+	z-index: 10;
 	background-color: #fafafa;
 }
 
 .adminConsoleMainMenu {
- 	border: 1px solid #D7D7D7;
+	z-index: 1;
+ 	border-top: 1px solid #D7D7D7;
+ 	border-bottom: 1px solid #D7D7D7;
+ 	border-right: 1px solid #D7D7D7;
 	padding: 5px;
+	padding-left: 10px;
 	margin: 5px;
 	-moz-border-radius: 5px;
-	background-color: #bbbbbb;
+	background-color: #fafafa;
 	opacity: 0.7;
 }
 
 .adminConsoleSubmenu {
- 	border: 1px solid #D7D7D7;
+	z-index: 10;
+ 	border-top: 1px solid #D7D7D7;
+ 	border-bottom: 1px solid #D7D7D7;
+ 	border-right: 1px solid #D7D7D7;
 	padding: 5px;
+	padding-left: 10px;
 	margin: 5px;
 	-moz-border-radius: 5px;
 	background-color: #fafafa;
 }
 
 .adminConsoleUtilityMenu {
+	z-index: 1;
 	opacity: 0.6;
- 	border: 1px solid #D7D7D7;
+ 	border-top: 1px solid #D7D7D7;
+ 	border-bottom: 1px solid #D7D7D7;
+ 	border-right: 1px solid #D7D7D7;
 	padding: 5px;
+	padding-left: 10px;
 	margin: 5px;
 	-moz-border-radius: 5px;
-	background-color: #bbbbbb;
+	background-color: #fafafa;
 }
 
 .adminConsoleHidden {

@@ -1,24 +1,18 @@
-#slidePanelBar {
+#slidePanel {
 	position:absolute;
-	font:bold 12px Verdana;
+	font: bold 12px sans-serif;
 	line-height:20px;
   	text-align: left;
+	left:0px; 
+	top:0px;
 }
 
-#slidePanelBarHandle {
-	z-index: 100000;
-	position: absolute;
-	top: 0px;
-	right: 3px;
-	line-height: 100px;
-}
-
-.panelButton {
+.slidePanelButton {
 	width:300px;
 	text-align:center; 
-	font-family:arial; 
+	font-family: sans-serif; 
 	font-size:11px; 
-	cursor:hand; 
+	cursor: pointer; 
 	border-width:1px; 	 
 	border-color: #ACACAC; 
 	background-color:#dddddd;
@@ -29,14 +23,14 @@
 	border-style: solid;
 } 
 
-.panelButton A, .panelButton A:visited, .panelButton A:link {
+.slidePanelButton A, .slidePanelButton A:visited, .slidePanelButton A:link {
 	text-decoration: none;
 	color: black;
 }
 
 .scrollPanelUp {
 	position:absolute; 
-	top:40px;
+	top: 40px;
 }
 
 .scrollPanelDown {
@@ -59,24 +53,27 @@
 }
 
 .panelLinkOut {
-	position:absolute; 
+	position: absolute; 
 	overflow: hidden;
 	height: 20px;
-	cursor: hand;
-	left:0px; 
+	cursor: pointer;
+	left: 0px; 
 	font-size: 11px;
-	font-family: helvetica, arial, sans;
+	color: black;
+	font-family: sans-serif;
 }
+
 .panelLinkIn {
 	position:absolute; 
 	cursor: pointer;
 	height: 20px;
 	overflow: hidden;
-	cursor: hand;
+	cursor: pointer;
 	left:0px; 
 	border: 1px solid #DEDCDC;
 	font-size: 11px;
-	font-family: helvetica, arial, sans;
+	font-family: sans-serif;
+	color: black;
 	background-color: #F5F5F5;
 }
 
