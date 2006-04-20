@@ -826,6 +826,7 @@ sub addSearchEngine {
 	}
 	$deleteWobject->finish;
 	$deleteAssetData->finish;
+	$session->config->deleteFromArray("assets","WebGUI::Asset::Wobject::IndexedSearch");
 	$session->db->write("drop table if exists IndexedSearch");
 	$session->db->write("drop table if exists IndexedSearch_default");
 	$session->db->write("drop table if exists IndexedSearch_default_data");

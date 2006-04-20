@@ -36,6 +36,7 @@ form variable C<classLimiter>.  A crumb trail is provided for navigation.
 
 sub www_formAssetTree {
 	my $session = shift;
+	$session->http->setCacheControl("none");
 	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
 	my @crumb;
 	my $ancestors = $base->getLineage(["self","ancestors"],{returnObjects=>1});
@@ -73,6 +74,7 @@ Asset picker for the rich editor.
 
 sub www_richEditPageTree {
 	my $session = shift;
+	$session->http->setCacheControl("none");
 	my $i18n = WebGUI::International->new($session);
 	my $f = WebGUI::HTMLForm->new($session,-action=>"#",-extras=>'name"linkchooser"');
 	$f->text(
@@ -138,6 +140,7 @@ Each link display a thumbnail of the image via www_richEditViewThumbnail.
 
 sub www_richEditImageTree {
 	my $session = shift;
+	$session->http->setCacheControl("none");
 	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
 	my @crumb;
 	my $ancestors = $base->getLineage(["self","ancestors"],{returnObjects=>1});
@@ -190,6 +193,7 @@ URL in the session object is used to determine which Image is used.
 
 sub www_richEditViewThumbnail {
 	my $session = shift;
+	$session->http->setCacheControl("none");
 	my $image = WebGUI::Asset->newByUrl($session);
 	my $i18n = WebGUI::International->new($session);
 	$session->style->useEmptyStyle("1");
@@ -222,6 +226,7 @@ Returns a form to add a folder using the rich editor. The purpose of this featur
 
 sub www_richEditAddFolder {
 	my $session = shift;
+	$session->http->setCacheControl("none");
 	my $i18n = WebGUI::International->new($session, 'Operation_FormHelpers');
 	my $f = WebGUI::HTMLForm->new($session);
 	$f->hidden(
@@ -254,6 +259,7 @@ Creates a directory under the current asset. The filename should be specified in
 
 sub www_richEditAddFolderSave {
 	my $session = shift;
+	$session->http->setCacheControl("none");
 	# get base url
 	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
 	# check if user can edit the current asset
@@ -303,6 +309,7 @@ Returns a form to add an image using the rich editor. The purpose of this featur
 
 sub www_richEditAddImage {
 	my $session = shift;
+	$session->http->setCacheControl("none");
 	my $i18n = WebGUI::International->new($session, 'Operation_FormHelpers');
 	my $f = WebGUI::HTMLForm->new($session);
 	$f->hidden(
@@ -335,6 +342,7 @@ Creates an Image asset under the current asset. The filename should be specified
 
 sub www_richEditAddImageSave {
 	my $session = shift;
+	$session->http->setCacheControl("none");
 	# get base url
 	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
 	#my $base = $session->asset;

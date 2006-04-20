@@ -253,6 +253,7 @@ Checks to ensure the requestor is who we think it is, and then executes a cron j
 sub www_runCronJob {
         my $session = shift;
 	$session->http->setMimeType("text/plain");
+	$session->http->setCacheControl("none");
 	unless (isInSubnet($session->env->get("REMOTE_ADDR"), $session->config->get("spectreSubnets"))) {
 		$session->errorHandler->security("make a Spectre cron job runner request, but we're only allowed to
 			accept requests from ".join(",",@{$session->config->get("spectreSubnets")}).".");

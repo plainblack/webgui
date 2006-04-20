@@ -420,6 +420,7 @@ A string that defaults to _function's title.
 
 sub render {
 	my $self = shift;
+	$self->session->http->setCacheControl("none");
 	my %var;
 	$var{"application.workarea"} = shift;
 	$var{"application.title"} = shift || $self->{_function}{title};

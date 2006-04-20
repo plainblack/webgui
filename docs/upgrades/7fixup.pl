@@ -17,10 +17,18 @@ addPrototypes();
 rearrangeImportNode();
 addNewStyles();
 addRobots();
+#deleteOldContent();
+#addNewContent();
 $versionTag->commit;
 purgeOldRevisions();
 
 finish($session); # this line required
+
+#-------------------------------------------------
+sub deleteOldContent {
+	print "\tDeleting old content\n";
+}
+
 
 #-------------------------------------------------
 sub addRobots {
@@ -70,6 +78,7 @@ sub addNewStyles {
 			next if $file eq "..";
 			next if $file eq ".";
 			$assetCounter++;
+			print "\t\t\tAdding $file\n";
 			if ($file =~ m/\.[png|jpg|gif]+$/) {
 				my $asset = $folder->addChild({
 					className=>"WebGUI::Asset::File::Image",
