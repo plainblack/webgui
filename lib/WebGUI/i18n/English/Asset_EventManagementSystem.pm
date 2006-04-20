@@ -387,9 +387,51 @@ This loop contains all events that have been approved so that users can register
 The information for one event that has been processed by its own event template.
 </p>
 
-<p><b>Event template variables</b><br />
-The template variables from the Event template.  This gives you access to the raw
-data for the event.
+<p><b>title</b><br />
+The title of this event.
+</p>
+
+<p><b>description</b><br />
+The description of this event.
+</p>
+
+<p><b>price</b><br />
+The price of this event.
+</p>
+
+<p><b>numberRegistered</b><br />
+The number of people currently registered for this event.
+</p>
+
+<p><b>maximumAttendees</b><br />
+The number of people allowed to attend this event.
+</p>
+
+<p><b>seatsRemaining</b><br />
+The number of available seats remaining for this event.
+</p>
+
+<p><b>startDate.human</b><br />
+The date and time this event starts, in human readable format.
+</p>
+
+<p><b>endDate.human</b><br />
+The date and time this event ends, in human readable format.
+</p>
+
+<p><b>eventIsFull</b><br />
+A boolean that is true if the there are no available seats remaining in this event.
+</p>
+
+<p><b>purchase.label</b><br />
+An internationalized label to display to the user the link for purchasing this event.
+If the event is full, the label will be "Sold out".
+</p>
+
+<p><b>purchase.url</b><br />
+A URL for the user to register for this event and add it to their shopping cart.
+If the event is full, the url will be blank.
+</p>
 
 </blockquote>
 

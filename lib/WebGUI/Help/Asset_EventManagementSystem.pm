@@ -235,10 +235,6 @@ our $HELP = {
 				namespace => 'Asset_EventManagementSystem',
 			},
 			{
-				tag => 'event management system event template',
-				namespace => 'Asset_EventManagementSystem',
-			},
-			{
 				tag => 'pagination template variables',
 				namespace => 'WebGUI',
 			},
@@ -322,6 +318,10 @@ our $HELP = {
 			{
 				tag => 'event management system add/edit',
 				namespace => 'Asset_EventManagementSystem',
+			},
+			{
+				tag => 'pagination template variables',
+				namespace => 'WebGUI',
 			},
 			{
 				tag => 'template language',
