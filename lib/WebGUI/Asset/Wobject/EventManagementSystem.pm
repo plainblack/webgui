@@ -1696,39 +1696,40 @@ sub www_editEvent {
 		);
 	}
 
-	my $prerequisiteList = $self->getPrerequisiteEventList($pid);
-        if ( scalar(keys %{$prerequisiteList}) > 0) {
-	 $f->checkList(
-		-name    => "eventList",
-		-options => $prerequisiteList,
-		-vertical  => 1,
-		-label   => $i18n->get("add/edit event required events"),
-		-hoverHelp   => $i18n->get("add/edit event required events description"),
-		-sortByValue => 1
-	 );
-
-	 $f->radioList(
-		-name  => "requirement",
-		-options => { 'and' => $i18n->get("and"),
-			      'or'  => $i18n->get("or"),
-			    },
-		-value => 'and',
-		-label => $i18n->get("add/edit event operator"),
-		-hoverHelp => $i18n->get("add/edit event operator description"),
-	 );
+#	my $prerequisiteList = $self->getPrerequisiteEventList($pid);
+#        if ( scalar(keys %{$prerequisiteList}) > 0) {
+#	 $f->checkList(
+#		-name    => "eventList",
+#		-options => $prerequisiteList,
+#		-vertical  => 1,
+#		-label   => $i18n->get("add/edit event required events"),
+#		-hoverHelp   => $i18n->get("add/edit event required events description"),
+#		-sortByValue => 1
+#	 );
+#
+#	 $f->radioList(
+#		-name  => "requirement",
+#		-options => { 'and' => $i18n->get("and"),
+#			      'or'  => $i18n->get("or"),
+#			    },
+#		-value => 'and',
+#		-label => $i18n->get("add/edit event operator"),
+#		-hoverHelp => $i18n->get("add/edit event operator description"),
+#	 );
 
 	 $f->selectBox(
 		-name  => "whatNext",
 		-label => $i18n->get("add/edit event what next"),
 		-hoverHelp => $i18n->get("add/edit event what next"),
 		-options => {
-				"addAnotherPrereq" => $i18n->get("add/edit event add another prerequisite"),
+#				"addAnotherPrereq" => $i18n->get("add/edit event add another prerequisite"),
+				"managePrereqs" => "Manage Prerequisites for this event",
 				"return"	   => $i18n->get("add/edit event return to manage events"),
 			    },
 		-defaultValue => "return"
 	 );
 
-        }
+#        }
 
 	$f->submit;
 
@@ -1813,97 +1814,98 @@ sub www_editEventSave {
 	}
 	
 	# Save the prerequisites
-	my $prerequisiteList = $self->session->form->process("eventList", "checkList");
-	my @list = split(/\n/, $prerequisiteList);
-	unless ($prerequisiteList eq "") {
-		my $prerequisiteId = $self->setCollateral("EventManagementSystem_prerequisites", "prerequisiteId",
-				{
-				 prerequisiteId  => "new",
-				 productId       => $pid,
-				 operator	 => $self->session->form->get("requirement")
-				},0,0
-		);
-		
-		foreach my $requiredEvent (@list) {
-			$self->setCollateral("EventManagementSystem_prerequisiteEvents", "prerequisiteEventId",{
-				prerequisiteEventId => "new",
-				prerequisiteId      => $prerequisiteId,
-				requiredProductId   => $requiredEvent
-			},0,0);
-		}
-	}
+	#my $prerequisiteList = $self->session->form->process("eventList", "checkList");
+	#my @list = split(/\n/, $prerequisiteList);
+	#unless ($prerequisiteList eq "") {
+	#	my $prerequisiteId = $self->setCollateral("EventManagementSystem_prerequisites", "prerequisiteId",
+	#			{
+	#			 prerequisiteId  => "new",
+	#			 productId       => $pid,
+	#			 operator	 => $self->session->form->get("requirement")
+	#			},0,0
+	#	);
+	#	
+	#	foreach my $requiredEvent (@list) {
+	#		$self->setCollateral("EventManagementSystem_prerequisiteEvents", "prerequisiteEventId",{
+	#			prerequisiteEventId => "new",
+	#			prerequisiteId      => $prerequisiteId,
+	#			requiredProductId   => $requiredEvent
+	#		},0,0);
+	#	}
+	#}
 	
-	return $self->www_editEvent(undef,$pid) if ($self->session->form->get("whatNext") eq "addAnotherPrereq");
+#	return $self->www_editEvent(undef,$pid) if ($self->session->form->get("whatNext") eq "addAnotherPrereq");
+	return $self->www_search("managePrereqs",$pid) if ($self->session->form->get("whatNext") eq "managePrereqs");
 	return $self->www_search;
 }
 
-#-------------------------------------------------------------------
-
-=head2 www_manageEvents ( )
-
-Method to display the event management console.
-
-=cut
-
-sub www_manageEvents {
-	my $self = shift;
-
-	return $self->session->privilege->insufficient unless ($self->canAddEvents);
-	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
-	
-	my $output;
-	my $sth = $self->session->db->read("select p.productId, p.title, p.price, pe.approved from products as p, 
-				EventManagementSystem_products as pe where p.productId = pe.productId
-				and pe.assetId=? order by sequenceNumber", [$self->get("assetId")]);
-	
-	if ($sth->rows) {
-	$output = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl}).WebGUI::Form::hidden($self->session,{name=>"func",value=>"approveEvents"});
-		$output .= sprintf "<table width='100%'><tr><th>%s</th><th>%s</th><th>%s</th></tr>",
-					$i18n->get('event'),
-					$i18n->get('add/edit event price'),
-					$self->canApproveEvents 
-						? $i18n->get('approval')
-						: $i18n->get('status');
-		while (my %row = $sth->hash) {
-			
-			$output .= "<tr><td>";
-			$output .= $self->session->icon->delete('func=deleteEvent;pid='.$row{productId}, $self->getUrl,
-							       $i18n->get('confirm delete event')).
-				  $self->session->icon->edit('func=editEvent;pid='.$row{productId}, $self->getUrl).
-				  $self->session->icon->moveUp('func=moveEventUp;pid='.$row{productId}, $self->getUrl).
-				  $self->session->icon->moveDown('func=moveEventDown;pid='.$row{productId}, $self->getUrl).
-				  " ".$row{title}."</td><td>".$row{price}."</td><td>";
-			
-			unless ($self->canApproveEvents) {
-				if ($row{approved} == 0) {
-					$output .= $i18n->get('pending');
-				} else {
-					$output .= $i18n->get('approved');
-				}
-			} else {
-				$output .= WebGUI::Form::checkbox($self->session,{
-					-name => 'eventId',
-					-checked => $row{approved},
-					-value => $row{productId}
-				}).WebGUI::Form::hidden($self->session,{
-					-name => 'eventIdToCheck',
-					-value => $row{productId}
-				});
-			}
-			$output .= "</td></tr>";
-		}
-		$output .= '<tr><td>&nbsp;</td><td>&nbsp;</td><td>'.WebGUI::Form::submit($self->session,{-value=>$i18n->get('save approvals')}).'</td></tr>' if $self->canApproveEvents;
-		$output .= "</table>".WebGUI::Form::formFooter($self->session);
-	} else {
-		$output .= $i18n->get('you do not have any events to display');
-	}
-	
-	$self->getAdminConsole->setHelp('event management system manage events','Asset_EventManagementSystem');
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editEvent;pid=new'), $i18n->get('add event'));
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n->get('manage event metadata'));
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEvents'), $i18n->get('refresh events list'));
-	return $self->getAdminConsole->render($output, $i18n->get("manage events"));
-}
+##-------------------------------------------------------------------
+#
+#=head2 www_manageEvents ( )
+#
+#Method to display the event management console.
+#
+#=cut
+#
+#sub www_manageEvents {
+#	my $self = shift;
+#
+#	return $self->session->privilege->insufficient unless ($self->canAddEvents);
+#	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
+#	
+#	my $output;
+#	my $sth = $self->session->db->read("select p.productId, p.title, p.price, pe.approved from products as p, 
+#				EventManagementSystem_products as pe where p.productId = pe.productId
+#				and pe.assetId=? order by sequenceNumber", [$self->get("assetId")]);
+#	
+#	if ($sth->rows) {
+#	$output = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl}).WebGUI::Form::hidden($self->session,{name=>"func",value=>"approveEvents"});
+#		$output .= sprintf "<table width='100%'><tr><th>%s</th><th>%s</th><th>%s</th></tr>",
+#					$i18n->get('event'),
+#					$i18n->get('add/edit event price'),
+#					$self->canApproveEvents 
+#						? $i18n->get('approval')
+#						: $i18n->get('status');
+#		while (my %row = $sth->hash) {
+#			
+#			$output .= "<tr><td>";
+#			$output .= $self->session->icon->delete('func=deleteEvent;pid='.$row{productId}, $self->getUrl,
+#							       $i18n->get('confirm delete event')).
+#				  $self->session->icon->edit('func=editEvent;pid='.$row{productId}, $self->getUrl).
+#				  $self->session->icon->moveUp('func=moveEventUp;pid='.$row{productId}, $self->getUrl).
+#				  $self->session->icon->moveDown('func=moveEventDown;pid='.$row{productId}, $self->getUrl).
+#				  " ".$row{title}."</td><td>".$row{price}."</td><td>";
+#			
+#			unless ($self->canApproveEvents) {
+#				if ($row{approved} == 0) {
+#					$output .= $i18n->get('pending');
+#				} else {
+#					$output .= $i18n->get('approved');
+#				}
+#			} else {
+#				$output .= WebGUI::Form::checkbox($self->session,{
+#					-name => 'eventId',
+#					-checked => $row{approved},
+#					-value => $row{productId}
+#				}).WebGUI::Form::hidden($self->session,{
+#					-name => 'eventIdToCheck',
+#					-value => $row{productId}
+#				});
+#			}
+#			$output .= "</td></tr>";
+#		}
+#		$output .= '<tr><td>&nbsp;</td><td>&nbsp;</td><td>'.WebGUI::Form::submit($self->session,{-value=>$i18n->get('save approvals')}).'</td></tr>' if $self->canApproveEvents;
+#		$output .= "</table>".WebGUI::Form::formFooter($self->session);
+#	} else {
+#		$output .= $i18n->get('you do not have any events to display');
+#	}
+#	
+#	$self->getAdminConsole->setHelp('event management system manage events','Asset_EventManagementSystem');
+#	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editEvent;pid=new'), $i18n->get('add event'));
+#	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n->get('manage event metadata'));
+#	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEvents'), $i18n->get('refresh events list'));
+#	return $self->getAdminConsole->render($output, $i18n->get("manage events"));
+#}
 
 #-------------------------------------------------------------------
 
@@ -2315,6 +2317,36 @@ sub www_moveEventUp {
 }
 
 #-------------------------------------------------------------------
+sub www_savePrerequisites {
+	my $self = shift;
+	my $eventToAssignPrereqTo = $self->session->form->get("eventToAssignPrereqTo");
+	
+	return $self->session->privilege->insufficient unless ($self->cannAddEvents);
+	
+	my $prerequisiteList = $self->session->form->process("eventList", "checkList");
+	my @list = split(/\n/, $prerequisiteList);
+	unless ($prerequisiteList eq "") {
+		my $prerequisiteId = $self->setCollateral("EventManagementSystem_prerequisites", "prerequisiteId",
+				{
+				 prerequisiteId  => "new",
+				 productId       => $eventToAssignPrereqTo,
+				 operator	 => $self->session->form->get("requirement")
+				},0,0
+		);
+		
+		foreach my $requiredEvent (@list) {
+			$self->setCollateral("EventManagementSystem_prerequisiteEvents", "prerequisiteEventId",{
+				prerequisiteEventId => "new",
+				prerequisiteId      => $prerequisiteId,
+				requiredProductId   => $requiredEvent
+			},0,0);
+		}
+	}
+
+	return $self->www_editEvent($eventToAssignPrereqTo);
+}
+
+#-------------------------------------------------------------------
 sub www_saveRegistration {
 	my $self = shift;
 	my $eventsInCart = $self->getEventsInScratchCart;
@@ -2424,12 +2456,24 @@ sub prepareView {
 #-------------------------------------------------------------------
 sub www_search {
 	my $self = shift;
+	my $managePrereqs = shift || $self->session->form->get("managePrereqs");
+	my $eventToAssignPrereqTo = shift || $self->session->form->get("eventToAssignPrereqTo");
+	my $prerequisiteHash = $self->getPrerequisiteEventList($eventToAssignPrereqTo) if ($eventToAssignPrereqTo);
+	my @prerequisiteList;
 	my %var;
 	my $keywords = $self->session->form->get("searchKeywords");
 	my @keys;
 	my $joins;
 	my $selects;
 	my @joined;
+
+	#Get the eventIds of valid prereqs if we're in prereq mode
+	#Put the productIds of valid prereqs into a list so we can return only valid prereq choices in our search
+	if (scalar(keys %{$prerequisiteHash})) {
+		foreach (keys %{$prerequisiteHash}) {
+			push (@prerequisiteList, $_);
+		}
+	}
 
 	# If we're at the view method there is no reason we should have anything in our scratch cart
 	# so let's empty it to prevent strange and awful things from happening
@@ -2556,11 +2600,15 @@ sub www_search {
 					 WebGUI::Form::hidden($self->session,{name=>"subSearch", value => $self->session->form->get("subSearch")}).
 					 WebGUI::Form::hidden($self->session,{name => "cfilter_s0", value => "requirement"}).
 					 WebGUI::Form::hidden($self->session,{name => "cfilter_c0", value => "eq"}).
-					 WebGUI::Form::hidden($self->session,{name => "cfilter_t0", value => $self->session->form->get("cfilter_t0")});
+					 WebGUI::Form::hidden($self->session,{name => "cfilter_t0", value => $self->session->form->get("cfilter_t0")}).
+					 WebGUI::Form::hidden($self->session,{name => "managePrereqs", value => $managePrereqs}).
+					 WebGUI::Form::hidden($self->session,{name => "eventToAssignPrereqTo", value => $eventToAssignPrereqTo});
 	$var{'advSearch.formHeader'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl("func=search;advSearch=1")}).
 				       WebGUI::Form::hidden($self->session,{name => "cfilter_s0", value => "requirement"}).
 				       WebGUI::Form::hidden($self->session,{name => "cfilter_c0", value => "eq"}).
-				       WebGUI::Form::hidden($self->session,{name => "cfilter_t0", value => $self->session->form->get("cfilter_t0")});
+				       WebGUI::Form::hidden($self->session,{name => "cfilter_t0", value => $self->session->form->get("cfilter_t0")}).
+				       WebGUI::Form::hidden($self->session,{name => "managePrereqs", value => $managePrereqs}).
+				       WebGUI::Form::hidden($self->session,{name => "eventToAssignPrereqTo", value => $eventToAssignPrereqTo});
 	$var{isAdvSearch} = $self->session->form->get('advSearch');
 	$var{'search.formFooter'} = WebGUI::Form::formFooter($self->session);
 	$var{'search.formSubmit'} = WebGUI::Form::submit($self->session, {value=>$i18n->get('filter')});
@@ -2595,6 +2643,9 @@ sub www_search {
 		}
 		foreach (keys %reqHash) {
 			$shouldPush = 0 unless isIn(@{$requiredList},$_);
+		}
+		if ($managePrereqs) { #prereq mode
+			$shouldPush = 0 unless (isIn(@prerequisiteList, $data->{productId})); #include only valid prereqs in results
 		}
 		push(@results,$data) if $shouldPush;
 	}
@@ -2631,20 +2682,45 @@ sub www_search {
 	  	$eventFields{'purchase.url'} = $self->getUrl('func=addToCart;pid='.$event->{'productId'});
 	  	$eventFields{'purchase.label'} = $i18n->get('add to cart');
 	  }
+	  
+	  # Set template vars for managing prerequisites if we're in manage prereqs mode
+	  if ($managePrereqs) {
+		$eventFields{'prereqForm.checkbox'} = WebGUI::Form::checkbox($self->session,{
+						-name => 'eventId',
+						#-checked => $row{approved},
+						-value => $event->{productId}
+					});
+	  }
+	  
 	  push (@events, {'event' => $self->processTemplate(\%eventFields, $event->{'templateId'}), %eventFields });
 	} 
 	$var{'checkout.url'} = $self->getUrl('op=viewCart');
 	$var{'checkout.label'} = $i18n->get('checkout');
 	$var{'events_loop'} = \@events;
 	$var{'paginateBar'} = $p->getBarTraditional;
-	$var{'manageEvents.url'} = $self->getUrl('func=manageEvents');
+	$var{'manageEvents.url'} = $self->getUrl('func=search');
 	$var{'manageEvents.label'} = $i18n->get('manage events');
 	$var{'managePurchases.url'} = $self->getUrl('func=managePurchases');
 	$var{'managePurchases.label'} = $i18n->get('manage purchases');
 	$var{'noSearchDialog'} = ($self->session->form->get('hide') eq "1") ? 1 : 0;
 	$var{'addEvent.url'} = $self->getUrl('func=editEvent;pid=new');
 	$var{'addEvent.label'} = $i18n->get('add event');
-	
+	$var{'managePrereqs'} = ($managePrereqs) ? 1 : 0;
+	$var{'managePrereqsMessage'} = "Use the form below to add prerequisite assignments to ".$self->getEventName($eventToAssignPrereqTo).".";
+	$var{'prereqForm.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl}).
+					      WebGUI::Form::hidden($self->session,{name=>"eventToAssignPrereqTo", value=>$eventToAssignPrereqTo}).
+					      WebGUI::Form::hidden($self->session,{name=>"func", value=>"savePrerequsites"});
+	$var{'prereqForm.submit'} = WebGUI::Form::submit($self->session);
+	$var{'prereqForm.footer'} = WebGUI::Form::formFooter($self->session);
+	$var{'prereqForm.operator'} = WebGUI::Form::radioList(
+					-name  => "requirement",
+					-options => { 'and' => $i18n->get("and"),
+						      'or'  => $i18n->get("or"),
+						    },
+					-value => 'and',
+					-label => $i18n->get("add/edit event operator"),
+					-hoverHelp => $i18n->get("add/edit event operator description")
+					       );
 	if ($self->session->user->isInGroup($self->get("groupToManageEvents"))) {
 		$var{'canManageEvents'} = 1;
 	}

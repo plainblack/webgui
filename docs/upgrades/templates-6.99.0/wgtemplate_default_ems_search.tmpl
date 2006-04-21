@@ -11,6 +11,7 @@
 </tmpl_if>
 <ul>
 <tmpl_if canManageEvents>
+   <li><a href='<tmpl_var addEvent.url>'><tmpl_var addEvent.label></a></li>
    <li><a href='<tmpl_var manageEvents.url>'><tmpl_var manageEvents.label></a></li>
 </tmpl_if>
 <li><a href='<tmpl_var managePurchases.url>'><tmpl_var managePurchases.label></a></li>
@@ -113,8 +114,12 @@
 </tmpl_unless>
 <br /><br />
 
+<tmpl_if managePrereqs><p><tmpl_var managePrereqsMessage></p><tmpl_var prereqForm.header></tmpl_if>
+
 <table width="100%" border="0" cellpadding="8" cellspacing="0" style="border-top:solid gray 2px;border-bottom:solid gray 2px;">
-<tr><th><tmpl_var name.label></th>
+<tr>
+<tmpl_if managePrereqs><th>&nbsp;</th></tmpl_if>
+<th><tmpl_var name.label></th>
 <th><tmpl_var starts.label></th>
 <th><tmpl_var ends.label></th>
 <th><tmpl_var seats.label></th>
@@ -123,7 +128,9 @@
 <th><tmpl_var addToCart.label></th></tr>
 <tmpl_loop events_loop>
   <tr<tmpl_unless __ODD__> class="oddRow"<tmpl_else> class="evenRow"</tmpl_unless>>
-  <td><tmpl_if canManageEvents><tmpl_var manageToolbar>&nbsp;</tmpl_if><tmpl_var title>
+
+  <tmpl_if managePrereqs><td><tmpl_var prereqForm.checkbox></td></tmpl_if>
+  <td nowrap><tmpl_if canManageEvents><tmpl_var manageToolbar>&nbsp;</tmpl_if><tmpl_var title>
   </td><td><tmpl_var startDate.human>
   </td><td><tmpl_var endDate.human>
   </td><td><tmpl_var seatsRemaining>
@@ -132,8 +139,12 @@
   </td><td><tmpl_unless eventIsFull><a href="<tmpl_var purchase.url>"><tmpl_var purchase.label></a><tmpl_else><tmpl_var purchase.label><br /></tmpl_unless>
   </td></tr>
 </tmpl_loop>
+<tmpl_if managePrereqs><tr><td><tmpl_var prereqForm.operator></td></tr></tmpl_if>
 </table>
+<tmpl_if managePrereqs><tmpl_var prereqForm.submit><tmpl_var prereqForm.footer></tmpl_if>
+
 <tmpl_var paginateBar>
+	
 	
 ~~~
 <style type="text/css">
