@@ -55,7 +55,6 @@ foreach my $macro ( @settingMacros ) {
 		$macro->{shortcut} = $macroNames{ $macro->{macro} };
 	}
 	else {
-		diag("Installing macro $macro->{macro} into config");
 		Macro_Config::insert_macro($session, $macro->{macro}, $macro->{macro});
 		$macro->{shortcut} = $macro->{macro};
 	}
@@ -64,8 +63,6 @@ foreach my $macro ( @settingMacros ) {
 my $numTests = $settingMacros;
 
 plan tests => $numTests;
-
-diag("Planning on running $numTests tests\n");
 
 foreach my $macro ( @settingMacros ) {
 	my ($value) = $session->dbSlave->quickArray(

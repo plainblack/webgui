@@ -26,10 +26,8 @@ my $numTests = 2; # increment this value for each test you create
 
 plan tests => $numTests;
 
-diag("Planning on running $numTests tests\n");
 
 unless ($session->config->get('macros')->{'GroupText'}) {
-	diag("Inserting macro into config");
 	Macro_Config::insert_macro($session, 'GroupText', 'GroupText');
 }
 

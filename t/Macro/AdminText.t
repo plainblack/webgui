@@ -26,10 +26,8 @@ my $numTests = 4;
 
 plan tests => $numTests;
 
-diag("Planning on running $numTests tests\n");
 
 unless ($session->config->get('macros')->{'AdminText'}) {
-	diag("Inserting macro into config");
 	Macro_Config::insert_macro($session, 'AdminText', 'AdminText');
 }
 

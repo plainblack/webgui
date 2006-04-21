@@ -41,18 +41,15 @@ my $numTests = scalar @testSets;
 
 plan tests => $numTests;
 
-diag("Planning on running $numTests tests\n");
 
 my $session = WebGUI::Test->session;
 
 unless ($session->config->get('macros')->{'D'}) {
-	diag("Inserting macro into config");
 	Macro_Config::insert_macro($session, 'D', 'Date');
 }
 
 foreach my $testSet (@testSets) {
 	$output = sprintf $macroText, $testSet->{format}, $wgbday;
-	diag("current test: $output");
 	WebGUI::Macro::process($session, \$output);
 	is($output, $testSet->{output}, 'testing '.$testSet->{format});
 }

@@ -26,10 +26,8 @@ my $numTests = 2;
 
 plan tests => $numTests;
 
-diag("Planning on running $numTests tests\n");
 
 unless ($session->config->get('macros')->{'@'}) {
-	diag("Inserting macro into config");
 	Macro_Config::insert_macro($session, '@', 'At_username');
 }
 

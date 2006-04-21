@@ -23,7 +23,6 @@ use Test::More; # increment this value for each test you create
 my $session = WebGUI::Test->session;
 
 unless ($session->config->get('macros')->{'Quote'}) {
-	diag("Inserting macro into config");
 	Macro_Config::insert_macro($session, 'Quote', 'Quote');
 }
 
@@ -50,11 +49,9 @@ my $numTests = scalar @testSets;
 
 plan tests => $numTests;
 
-diag("Planning on running $numTests tests\n");
 
 foreach my $testSet (@testSets) {
 	$output = sprintf $macroText, $testSet->{input};
-	diag("current test: $output");
 	WebGUI::Macro::process($session, \$output);
 	is($output, $testSet->{output}, 'testing '.$testSet->{input});
 }
