@@ -1153,7 +1153,7 @@ sub verifyAllPrerequisites {
 	my $returnArrayFlag = shift;
 	my $cache;
 	if ($returnArrayFlag) {
-		$cache = WebGUI::Cache->new($session,["verifyAllPrerequisites",$returnArrayFlag]);
+		$cache = WebGUI::Cache->new($self->session,["verifyAllPrerequisites",$returnArrayFlag]);
 		my $eventData = $cache->get;
 		return $eventData->{$returnArrayFlag} if defined $eventData->{$returnArrayFlag};
 	}
