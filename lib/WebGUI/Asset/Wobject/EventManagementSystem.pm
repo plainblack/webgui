@@ -758,7 +758,7 @@ sub getBadgeSelector {
 	my $isAdmin = $self->canAddEvents;
 	
 	my $badges = {};
-	
+	my $me = $self->session->var->get('userId');
 	my $addBadgeId = $self->session->scratch->get('EMS_add_purchase_badgeId');
 	
 	if ($isAdmin) {
@@ -766,22 +766,28 @@ sub getBadgeSelector {
 		$badges = $self->session->db->buildHashRef("select badgeId, CONCAT(lastName,', ',firstName) from EventManagementSystem_badges order by lastName");
 	} else {
 		#badges we have purchased.
-		$badges = $self->session->db->buildHashRef("select b.badgeId, CONCAT(b.lastName,', ',b.firstName) from EventManagementSystem_badges as b where b.userId='".$self->session->var->get('userId')."' or b.createdByUserId='".$self->session->var->get('userId')."' order by b.lastName");
+		$badges = $self->session->db->buildHashRef("select b.badgeId, CONCAT(b.lastName,', ',b.firstName) from EventManagementSystem_badges as b where b.userId='".$me."' or b.createdByUserId='".$me."' order by b.lastName");
 	}
 	my $js;
 	my %badgeJS;
+	my $defaultBadge;
 	foreach (keys %$badges) {
 		$badgeJS{$_} = $self->session->db->quickHashRef("select * from EventManagementSystem_badges where badgeId=?",[$_]);
+		$defaultBadge ||= $badgeJS{$_}->{badgeId};
+		if ($badgeJS{$_}->{userId} eq $me) {
+			# we have a match!
+			delete $options{'thisIsI'};
+			$defaultBadge = $badgeJS{$_}->{badgeId};
+		}
 	}
 	$js = '<script type="text/javascript">
 	var badges = '.objToJson(\%badgeJS).';
 	</script>';
-	
 	%options = (%options,%{$badges});
 	$output .= WebGUI::Form::selectBox($self->session,{
 		name => ($addBadgeId ? 'badgeIdWrong' : 'badgeId'),
 		options => \%options,
-		value => $addBadgeId,
+		value => ($addBadgeId ? $addBadgeId : $defaultBadge),
 		extras => 'onchange="swapBadgeInfo(this.value)" onkeyup="swapBadgeInfo(this.value)"'.($addBadgeId ? ' disabled="disabled"' : '')
 	}).($addBadgeId ? WebGUI::Form::hidden($self->session,{
 		name => 'badgeId',value=>$addBadgeId
