@@ -19,6 +19,7 @@ use base 'WebGUI::Asset::Wobject';
 use Tie::IxHash;
 use WebGUI::HTMLForm;
 use JSON;
+use WebGUI::Cache;
 use WebGUI::International;
 use WebGUI::Commerce::ShoppingCart;
 use WebGUI::Commerce::Item;
@@ -1150,6 +1151,12 @@ sub resolveConflictForm {
 sub verifyAllPrerequisites {
 	my $self = shift;
 	my $returnArrayFlag = shift;
+	my $cache;
+	if ($returnArrayFlag) {
+		$cache = WebGUI::Cache->new($session,["verifyAllPrerequisites",$returnArrayFlag]);
+		my $eventData = $cache->get;
+		return $eventData->{$returnArrayFlag} if defined $eventData->{$returnArrayFlag};
+	}
 	#use Data::Dumper;
 	#start with the events in the scratch cart.  See if all prerequisites are met	
 	my $startingEvents = {};
@@ -1178,8 +1185,11 @@ sub verifyAllPrerequisites {
 	}
 	
 	my $rowsLoop = [];
-	my @silliness = keys %$lastResults;
-	return \@silliness if $returnArrayFlag;
+	if ($returnArrayFlag) {
+		my @silliness = keys %$lastResults;
+		$cache->set({$returnArrayFlag=>\@silliness}, 60*60*24*360);
+		return \@silliness;
+	}
 	foreach (keys %$lastResults) {
 		my $details = $lastResults->{$_};
 		push(@$rowsLoop, {
