@@ -4,18 +4,20 @@
 #url:style_02
 #namespace:style
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<title>^c(); - ^Page(title);</title>
-	<tmpl_var head.tags>	
+	<tmpl_var head.tags>
+	<title>^c; - ^Page(title);</title>
+	<link href="/css02.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
-^AdminBar("PBtmpl0000000000000090");
+^AdminBar();
 <table border="0" cellpadding="0" cellspacing="0" width="100%" style="height:100%">
 <tr>
 	<td class="leftColumn" valign="top">
 		<div id="header">
-			<div id="title">^c;</div>
+			<div id="title">^H(^c;);</div>
 			<div id="title_bg">^c;</div>
 		</div>
 		<div id="pageTitleBG">
@@ -29,23 +31,23 @@
 	<td class="rightColumn" valign="top">
 		<div id="pb_wg_bg">
 			<div id="pb_wg">
-				&#160;
+				<a href="http://www.plainblack.com">^AssetProxy(style02/pb.jpg);</a><a href="http://www.plainblack.com/webgui">^AssetProxy(style02/wg.jpg);</a><br />
 			</div>
 		</div>
 		<br />
-		<table style="width:90%;margin-left:auto;margin-right:auto;background: url('^FileUrl(style2/navbar_bg.jpg);') repeat-x;" cellpadding="0" cellspacing="0" border="0">
+		<table style="width:90%;margin-left:auto;margin-right:auto;background: url('^FileUrl(style02/navbar_bg.jpg);') repeat-x;" cellpadding="0" cellspacing="0" border="0">
 		<tr>
-			<td style="background: url('^FileUrl(style2/navbar_left.jpg);') no-repeat left;height:9px;width:10%;" align="left"></td>			
-			<td style="background: url('^FileUrl(style2/navbar_right.jpg);') no-repeat right;height:9px;width:90%;" align="right"></td>
+			<td style="background: url('^FileUrl(style02/navbar_left.jpg);') no-repeat left;height:9px;width:10%;" align="left"></td>			
+			<td style="background: url('^FileUrl(style02/navbar_right.jpg);') no-repeat right;height:9px;width:90%;" align="right"></td>
 		</tr>
 		</table>
 		<div id="nav">
 			^AssetProxy(flexmenu);
 		</div>
-		<table style="width:90%;margin-left:auto;margin-right:auto;background: url('^FileUrl(style2/navbar_bg.jpg);') repeat-x;" cellpadding="0" cellspacing="0" border="0">
+		<table style="width:90%;margin-left:auto;margin-right:auto;background: url('^FileUrl(style02/navbar_bg.jpg);') repeat-x;" cellpadding="0" cellspacing="0" border="0">
 		<tr>
-			<td style="background: url('^FileUrl(style2/navbar_left.jpg);') no-repeat left;height:9px;width:10%;" align="left"></td>			
-			<td style="background: url('^FileUrl(style2/navbar_right.jpg);') no-repeat right;height:9px;width:90%;" align="right"></td>
+			<td style="background: url('^FileUrl(style02/navbar_left.jpg);') no-repeat left;height:9px;width:10%;" align="left"></td>			
+			<td style="background: url('^FileUrl(style02/navbar_right.jpg);') no-repeat right;height:9px;width:90%;" align="right"></td>
 		</tr>
 		</table>
 		<div id="loginStyles">
@@ -57,6 +59,4 @@
 </table>
 
 </body>
-</html>
-~~~
-^AssetProxy(css02.css);	
+</html>	
