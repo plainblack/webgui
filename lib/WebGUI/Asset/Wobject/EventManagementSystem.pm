@@ -2195,8 +2195,8 @@ sub www_editEventMetaDataField {
 	);
 	$f->yesNo(
 		-name => "autoSearch",
-		-label => $i18n->('auto search'),
-		-hoverHelp => $i18n->('auto search description'),
+		-label => $i18n->get('auto search'),
+		-hoverHelp => $i18n->get('auto search description'),
 		-value => $data->{autoSearch},
 	);
 	my %hash;
