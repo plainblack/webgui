@@ -840,8 +840,12 @@ The URL to this Asset.
 The URL the EventManagementSystem area in the WebGUI Extras directory.
 </p>
 
+<p><b>message</b><br />
+Messages from the system about the number and type of results being displayed.
+</p>
+
 |,
-		lastUpdated => 1145465299,
+		lastUpdated => 1145655811,
 	},
 
 
@@ -1036,6 +1040,42 @@ allows you to edit events,  delete events, or change their order.</p>
 		message => q|Filter|,
 		lastUpdated => 1145402683,
 		context => q|Button in search form to limit displayed events based on user criteria|,
+	},
+
+	'managePrereqsMessage' => {
+		message => q|Use the form below to add prerequisite assignments to %s.|,
+		lastUpdated => 1145653451,
+		context => q|Message for search form, that is passed to sprintf to fill in the name|,
+	},
+
+	'Admin manage sub events small resultset' => {
+		message => q|You may manage the events below.  You can narrow the list of events displayed using the basic or advanced filter options above.|,
+		lastUpdated => 1145653452,
+	},
+
+	'User sub events small resultset' => {
+		message => q|You may also choose from the following sub-events.  You can narrow the list of sub-events by using the basic or advanced filter options above.|,
+		lastUpdated => 1145653452,
+	},
+
+	'Admin manage sub events large resultset' => {
+		message => q|You may manage the events below.  Due to the large number of sub-events available none are currently displayed, please narrow the results using the basic or advanced filter options above.|,
+		lastUpdated => 1145653452,
+	},
+
+	'User sub events large resultset' => {
+		message => q|You may also choose from the following sub-events.  Due to the large number of sub-events available none are currently displayed, please narrow the results using the basic or advanced filter options above.|,
+		lastUpdated => 1145653452,
+	},
+
+	'option to narrow' => {
+		message => q|You can narrow the list of prerequisites displayed using the basic or advanced filter options above.|,
+		lastUpdated => 1145653452,
+	},
+
+	'forced narrowing' => {
+		message => q|Due to the large number of prerequisites available none are currently displayed, please narrow the results using the basic or advanced filter options above.|,
+		lastUpdated => 1145653452,
 	},
 
 };

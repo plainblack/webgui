@@ -2735,7 +2735,7 @@ sub www_search {
 	$var{'addEvent.url'} = $self->getUrl('func=editEvent;pid=new');
 	$var{'addEvent.label'} = $i18n->get('add event');
 	$var{'managePrereqs'} = ($managePrereqs) ? 1 : 0;
-	$var{'managePrereqsMessage'} = "Use the form below to add prerequisite assignments to ".$self->getEventName($eventToAssignPrereqTo).".";
+	$var{'managePrereqsMessage'} = sprintf $i18n->get('managePrereqsMessage'), $self->getEventName($eventToAssignPrereqTo);
 	$var{'prereqForm.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl}).
 					      WebGUI::Form::hidden($self->session,{name=>"eventToAssignPrereqTo", value=>$eventToAssignPrereqTo}).
 					      WebGUI::Form::hidden($self->session,{name=>"func", value=>"savePrerequisites"});
@@ -2767,21 +2767,21 @@ sub www_search {
 	#Determine type of search results we're displaying
 	if ($subSearchFlag && !$managePrereqsFlag && ($numSearchResults <= $maxResultsForInitialDisplay || $paginationFlag || $hasSearchedFlag)) {
 		if ($self->canEdit) { #Admin manage sub events small resultset
-			$message = "You may manage the events below.  You can narrow the list of events displayed using the basic or advanced filter options above.";
+			$message = $i18n->get('Admin manage sub events small resultset');
 		} else { #User sub events small resultset
-			$message = "You may also choose from the following sub-events.  You can narrow the list of sub-events by using the basic or advanced filter options above.";
+			$message = $i18n->get("User sub events small resultset");
 		}
 	} elsif ($subSearchFlag && $numSearchResults > $maxResultsForInitialDisplay && !$managePrereqsFlag && !$paginationFlag) {
 		if ($self->canEdit) { #Admin manage sub events large resultset
-			$message = "You may manage the events below.  Due to the large number of sub-events available none are currently displayed, please narrow the results using the basic or advanced filter options above.";   
+			$message = $i18n->get('Admin manage sub events large resultset');   
 		} else { #User sub events large resultset
-			$message = "You may also choose from the following sub-events.  Due to the large number of sub-events available none are currently displayed, please narrow the results using the basic or advanced filter options above.";
+			$message = $i18n->get('User sub events large resultset');   
 		}
 
 	} elsif ($managePrereqsFlag && ($numSearchResults <= $maxResultsForInitialDisplay || $paginationFlag || $hasSearchedFlag)) {
-		$message = "You can narrow the list of prerequisites displayed using the basic or advanced filter options above.";
+		$message = $i18n->get('option to narrow');
 	} elsif ($managePrereqsFlag && $numSearchResults > $maxResultsForInitialDisplay && !$paginationFlag) {
-		$message = "Due to the large number of prerequisites available none are currently displayed, please narrow the results using the basic or advanced filter options above."
+		$message = $i18n->get('forced narrowing');
 	}
 
 	$var{'message'} = $message;
