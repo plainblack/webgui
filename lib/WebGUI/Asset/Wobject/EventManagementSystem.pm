@@ -2635,7 +2635,7 @@ sub www_search {
 	$var{isAdvSearch} = $self->session->form->get('advSearch');
 	$var{'search.formFooter'} = WebGUI::Form::formFooter($self->session);
 	$var{'search.formSubmit'} = WebGUI::Form::submit($self->session, {value=>$i18n->get('filter')});
-	my $searchUrl = $self->getUrl("func=view");
+	my $searchUrl = $self->getUrl();
 	my $formVars = $self->session->form->paramsHashRef();
 	foreach ($self->session->form->param) {
 		$searchUrl .= ';'.$_.'='.$formVars->{$_} if (($_ ne 'pn') && ($formVars->{$_} || $formVars->{$_} eq '0'));
@@ -2668,14 +2668,14 @@ sub www_search {
 			$shouldPush = 0 unless isIn(@{$requiredList},$_);
 		}
 		if ($managePrereqs) { #prereq mode
-			$self->session->errorHandler->warn("prereq list<pre>".Dumper(@prerequisiteList)."</pre>");
-			$self->session->errorHandler->warn("productId<pre>".Dumper($data->{productId})."</pre>");
+			#$self->session->errorHandler->warn("prereq list<pre>".Dumper(@prerequisiteList)."</pre>");
+			#$self->session->errorHandler->warn("productId<pre>".Dumper($data->{productId})."</pre>");
 			$shouldPush = 0 unless (isIn($data->{productId}, @prerequisiteList)); #include only valid prereqs in results
-			$self->session->errorHandler->warn("<pre>".Dumper($shouldPush)."</pre>");
+			#$self->session->errorHandler->warn("<pre>".Dumper($shouldPush)."</pre>");
 		}
 		push(@results,$data) if $shouldPush;
 	}
-	$self->session->errorHandler->warn("<pre>".Dumper(@results)."</pre>");
+	#$self->session->errorHandler->warn("<pre>".Dumper(@results)."</pre>");
 	$sth->finish;
 	@results = () unless ( (scalar(@results) <= 50) || ($self->session->form->get("advSearch") || $self->session->form->get("searchKeywords")));	
 	$p->setDataByArrayRef(\@results);
