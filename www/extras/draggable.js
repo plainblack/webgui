@@ -335,18 +335,18 @@ function dragable_dragStop(e) {
             }                        
 
             for(i=0;i<dragableList.length;i++) {
-                dragableList[i].style.top=0;
-                dragableList[i].style.left=0;
+                dragableList[i].style.top=0+"px";
+                dragableList[i].style.left=0+"px";
                 dragableList[i].className="dragable";    
             }
         
             //this is a ie hack for a render bug
             for(i=0;i<draggableObjectList.length;i++) {
                 if (draggableObjectList[i]) {                                    
-                    draggableObjectList[i].style.top=1;
-                    draggableObjectList[i].style.left=1;                    
-                    draggableObjectList[i].style.top=0;
-                    draggableObjectList[i].style.left=0;                    
+                    draggableObjectList[i].style.top=1+"px";
+                    draggableObjectList[i].style.left=1+"px";                    
+                    draggableObjectList[i].style.top=0+"px";
+                    draggableObjectList[i].style.left=0+"px";                    
                 }
             }
         }
@@ -380,8 +380,8 @@ function dragable_appendBlankRow(parent) {
     blankClone.id = "blank" + new Date().getTime() + blankCount++;
     draggableObjectList[draggableObjectList.length] = blankClone;
     parent.appendChild(blankClone);
-    blankClone.style.top=0;
-    blankClone.style.left=0;
+    blankClone.style.top=0+"px";
+    blankClone.style.left=0+"px";
     blank.className="hidden";
 }
 
