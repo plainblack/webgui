@@ -1564,6 +1564,8 @@ sub www_editEvent {
 	return $self->session->privilege->insufficient unless ($self->canAddEvents);
 
 	my $pid = shift || $self->session->form->get("pid");
+	my ($storageId) = $self->session->db->quickArray("select imageId from EventManagementSystem_products where productId=?",[$pid]) unless ($pid eq "");
+
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 
 	my $event = $self->session->db->quickHashRef("
@@ -1614,6 +1616,13 @@ sub www_editEvent {
 		-hoverHelp => $i18n->get('add/edit event description description'),
 		-label => $i18n->get('add/edit event description')
 	);
+	
+	$f->image(
+		  -name => "image",
+		  -label => "Event Image",
+		  -hoverHelp => "An image representing your event for display to site visitors.",
+		  -value => $storageId
+		 );
 	
 	$f->float(
 		-name  => "price",
@@ -1777,6 +1786,8 @@ sub www_editEventSave {
 	my $pid = $self->session->form->get("pid");
         my $eventIsNew = 1 if ($pid eq "" || $pid eq "new");
         my $event;
+	my $storageId;
+	$storageId = $self->session->form->process("image","image",undef,{name=>"image", value=>$storageId});
 
 	#Save the extended product data
 	$pid = $self->setCollateral("EventManagementSystem_products", "productId",{
@@ -1784,7 +1795,9 @@ sub www_editEventSave {
 		startDate  => $self->session->form->process("startDate",'dateTime'),
 		endDate	=> $self->session->form->process("endDate",'dateTime'),
 		maximumAttendees => $self->session->form->get("maximumAttendees"),
-		approved	=> $self->session->form->get("approved")
+		approved	=> $self->session->form->get("approved"),
+		imageId		=> $storageId
+
 	},1,1);
 
 	#Save the event metadata

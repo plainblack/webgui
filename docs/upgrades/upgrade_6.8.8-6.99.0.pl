@@ -681,6 +681,7 @@ create table EventManagementSystem_products (
  maximumAttendees int(11),
  approved tinyint,
  sequenceNumber int(11),
+ imageId varchar(22) binary,
 primary key(productId)
 )
 SQL2
@@ -771,6 +772,7 @@ primary key(badgeId)
 )
 SQL9
 
+	print "\tAdding the Event Management System.\n" unless ($quiet);
 	$session->db->write($sql1);
 	$session->db->write($sql2);
 	$session->db->write($sql3);
