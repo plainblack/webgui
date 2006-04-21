@@ -2635,7 +2635,7 @@ sub www_search {
 	$var{isAdvSearch} = $self->session->form->get('advSearch');
 	$var{'search.formFooter'} = WebGUI::Form::formFooter($self->session);
 	$var{'search.formSubmit'} = WebGUI::Form::submit($self->session, {value=>$i18n->get('filter')});
-	my $searchUrl = $self->getUrl();
+	my $searchUrl = $self->getUrl("a=1");  #a=1 is a hack to get the ? appended to the url in the right place.  This param/value does nothing.
 	my $formVars = $self->session->form->paramsHashRef();
 	foreach ($self->session->form->param) {
 		$searchUrl .= ';'.$_.'='.$formVars->{$_} if (($_ ne 'pn') && ($formVars->{$_} || $formVars->{$_} eq '0'));
