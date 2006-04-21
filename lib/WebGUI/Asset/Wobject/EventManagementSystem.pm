@@ -1628,11 +1628,11 @@ sub www_editEvent {
 	);
 	
 	$f->image(
-		  -name => "image",
-		  -label => "Event Image",
-		  -hoverHelp => "An image representing your event for display to site visitors.",
-		  -value => $storageId
-		 );
+		-name => "image",
+		-hoverHelp => $i18n->get('add/edit event image description'),
+		-label => $i18n->get('add/edit event image description')
+		-value => $storageId
+	 );
 	
 	$f->float(
 		-name  => "price",

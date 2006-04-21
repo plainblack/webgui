@@ -157,6 +157,16 @@ our $I18N = { ##hashref of hashes
 		lastUpdated => 1138312761,
 	},
 
+	'add/edit event image' => {
+		message => q|Event Image|,
+		lastUpdated => 1145636759,
+	},
+
+	'add/edit event image description' => {
+		message => q|An image representing your event for display to site visitors.|,
+		lastUpdated => 1145636774,
+	},
+
 	'add/edit event description' => {
 		message => q|Description|,
 		lastUpdated => 1138312761,
@@ -393,6 +403,10 @@ The title of this event.
 
 <p><b>description</b><br />
 The description of this event.
+</p>
+
+<p><b>image</b><br />
+The image assigned to represent this event.
 </p>
 
 <p><b>price</b><br />
