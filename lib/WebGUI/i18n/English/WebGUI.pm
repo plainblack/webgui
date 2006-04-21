@@ -3915,6 +3915,27 @@ Message Boards hold forums for users.  There are many different Wobjects in WebG
 		lastUpdated => 1141963573,
 	},
 
+	'webgui tips title' => {
+		message => q|WebGUI Tips|,
+		lastUpdated => 1145658318,
+	},
+
+	'webgui tips body' => {
+		message => q|<p>These are just random useful bits of information about WebGUI that we've collected.</p>
+
+<p><b>Dumping a whole WebGUI site statically.</b><br />
+<em>Len Kranendonk</em>
+Get a copy of wget and use this: <code>wget -p -r --html-extension -k http://the.webgui.site</code><br />
+-p will fetch all page requisites (images, css, etc)<br />
+-r is for recursively downloading all pages<br />
+--html-extension  will add .html to all pages. This is needed to avoid duplicate page /directory names ( /home and /home/contact).<br />
+-k will convert all URLs to local URLs
+</p>
+
+|,
+		lastUpdated => 1145658316,
+	},
+
 
 };
 

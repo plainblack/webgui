@@ -702,6 +702,14 @@ our $HELP = {
                 related => [
                 ],
 	},
+	'webgui tips' => {
+                title => 'webgui tips title',
+                body => 'webgui tips body',
+		fields => [
+		],
+                related => [
+                ],
+	},
 };
 
 1;
