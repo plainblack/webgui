@@ -1369,7 +1369,7 @@ sub validateEditEventForm {
   $errors = $self->checkRequiredFields(\%requiredFields);
   
   #Check price greater than zero
-  if ($self->session->form->get("price") <= 0) {
+  if ($self->session->form->get("price") < 0) {
       push (@{$errors}, {
       	type      => "general",
         message   => $i18n->get("price must be greater than zero"),
@@ -2634,7 +2634,7 @@ sub www_search {
 				       WebGUI::Form::hidden($self->session,{name => "eventToAssignPrereqTo", value => $eventToAssignPrereqTo});
 	$var{isAdvSearch} = $self->session->form->get('advSearch');
 	$var{'search.formFooter'} = WebGUI::Form::formFooter($self->session);
-	$var{'search.formSubmit'} = WebGUI::Form::submit($self->session, {value=>$i18n->get('filter')});
+	$var{'search.formSubmit'} = WebGUI::Form::submit($self->session, {name=>"filter",value=>$i18n->get('filter')});
 	my $searchUrl = $self->getUrl("a=1");  #a=1 is a hack to get the ? appended to the url in the right place.  This param/value does nothing.
 	my $formVars = $self->session->form->paramsHashRef();
 	foreach ($self->session->form->param) {
@@ -2677,7 +2677,9 @@ sub www_search {
 	}
 	#$self->session->errorHandler->warn("<pre>".Dumper(@results)."</pre>");
 	$sth->finish;
-	@results = () unless ( (scalar(@results) <= 50) || ($self->session->form->get("advSearch") || $self->session->form->get("searchKeywords")));	
+	my $maxResultsForInitialDisplay = 1;
+	my $numSearchResults = scalar(@results);
+	@results = () unless ( ($numSearchResults <= $maxResultsForInitialDisplay) || ($self->session->form->get("advSearch") || $self->session->form->get("searchKeywords")));	
 	$p->setDataByArrayRef(\@results);
 	my $eventData = $p->getPageData;
 	my @events;
@@ -2754,6 +2756,37 @@ sub www_search {
 	else {
 		$var{'canManageEvents'} = 0;
 	}
+	my $message;
+	my $subSearchFlag = $self->session->form->get("subSearch") || ($self->session->form->get("func"));
+	my $advSearchFlag = $self->session->form->get("advSearch");
+	my $basicSearchFlag = $self->session->form->get("searchKeywords");
+	my $managePrereqsFlag = $var{'managePrereqs'};
+	my $paginationFlag = $self->session->form->get("pn");# || ($self->get("paginateAfter") < $numSearchResults);
+	my $hasSearchedFlag = ($self->session->form->get("filter"));
+	
+	#Determine type of search results we're displaying
+	if ($subSearchFlag && !$managePrereqsFlag && ($numSearchResults <= $maxResultsForInitialDisplay || $paginationFlag || $hasSearchedFlag)) {
+		if ($self->canEdit) { #Admin manage sub events small resultset
+			$message = "You may manage the events below.  You can narrow the list of events displayed using the basic or advanced filter options above.";
+		} else { #User sub events small resultset
+			$message = "You may also choose from the following sub-events.  You can narrow the list of sub-events by using the basic or advanced filter options above.";
+		}
+	} elsif ($subSearchFlag && $numSearchResults > $maxResultsForInitialDisplay && !$managePrereqsFlag && !$paginationFlag) {
+		if ($self->canEdit) { #Admin manage sub events large resultset
+			$message = "You may manage the events below.  Due to the large number of sub-events available none are currently displayed, please narrow the results using the basic or advanced filter options above.";   
+		} else { #User sub events large resultset
+			$message = "You may also choose from the following sub-events.  Due to the large number of sub-events available none are currently displayed, please narrow the results using the basic or advanced filter options above.";
+		}
+
+	} elsif ($managePrereqsFlag && ($numSearchResults <= $maxResultsForInitialDisplay || $paginationFlag || $hasSearchedFlag)) {
+		$message = "You can narrow the list of prerequisites displayed using the basic or advanced filter options above.";
+	} elsif ($managePrereqsFlag && $numSearchResults > $maxResultsForInitialDisplay && !$paginationFlag) {
+		$message = "Due to the large number of prerequisites available none are currently displayed, please narrow the results using the basic or advanced filter options above."
+	}
+
+	$var{'message'} = $message;
+	$var{'numberOfSearchResults'} = $numSearchResults;
+
 	$p->appendTemplateVars(\%var);
 	$self->buildMenu(\%var);
 	$var{'ems.wobject.dir'} = $self->session->config->get("extrasURL")."/wobject/EventManagementSystem";
