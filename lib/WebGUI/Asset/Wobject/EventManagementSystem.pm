@@ -2321,7 +2321,7 @@ sub www_savePrerequisites {
 	my $self = shift;
 	my $eventToAssignPrereqTo = $self->session->form->get("eventToAssignPrereqTo");
 	
-	return $self->session->privilege->insufficient unless ($self->cannAddEvents);
+	return $self->session->privilege->insufficient unless ($self->canAddEvents);
 	
 	my $prerequisiteList = $self->session->form->process("eventList", "checkList");
 	my @list = split(/\n/, $prerequisiteList);
@@ -2343,7 +2343,7 @@ sub www_savePrerequisites {
 		}
 	}
 
-	return $self->www_editEvent($eventToAssignPrereqTo);
+	return $self->www_editEvent(undef,$eventToAssignPrereqTo);
 }
 
 #-------------------------------------------------------------------
@@ -2645,10 +2645,14 @@ sub www_search {
 			$shouldPush = 0 unless isIn(@{$requiredList},$_);
 		}
 		if ($managePrereqs) { #prereq mode
-			$shouldPush = 0 unless (isIn(@prerequisiteList, $data->{productId})); #include only valid prereqs in results
+			$self->session->errorHandler->warn("prereq list<pre>".Dumper(@prerequisiteList)."</pre>");
+			$self->session->errorHandler->warn("productId<pre>".Dumper($data->{productId})."</pre>");
+			$shouldPush = 0 unless (isIn($data->{productId}, @prerequisiteList)); #include only valid prereqs in results
+			$self->session->errorHandler->warn("<pre>".Dumper($shouldPush)."</pre>");
 		}
 		push(@results,$data) if $shouldPush;
 	}
+	$self->session->errorHandler->warn("<pre>".Dumper(@results)."</pre>");
 	$sth->finish;
 	@results = () unless ( (scalar(@results) <= 50) || ($self->session->form->get("advSearch") || $self->session->form->get("searchKeywords")));	
 	$p->setDataByArrayRef(\@results);
@@ -2686,7 +2690,7 @@ sub www_search {
 	  # Set template vars for managing prerequisites if we're in manage prereqs mode
 	  if ($managePrereqs) {
 		$eventFields{'prereqForm.checkbox'} = WebGUI::Form::checkbox($self->session,{
-						-name => 'eventId',
+						-name => 'eventList',
 						#-checked => $row{approved},
 						-value => $event->{productId}
 					});
@@ -2709,18 +2713,18 @@ sub www_search {
 	$var{'managePrereqsMessage'} = "Use the form below to add prerequisite assignments to ".$self->getEventName($eventToAssignPrereqTo).".";
 	$var{'prereqForm.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl}).
 					      WebGUI::Form::hidden($self->session,{name=>"eventToAssignPrereqTo", value=>$eventToAssignPrereqTo}).
-					      WebGUI::Form::hidden($self->session,{name=>"func", value=>"savePrerequsites"});
+					      WebGUI::Form::hidden($self->session,{name=>"func", value=>"savePrerequisites"});
 	$var{'prereqForm.submit'} = WebGUI::Form::submit($self->session);
 	$var{'prereqForm.footer'} = WebGUI::Form::formFooter($self->session);
-	$var{'prereqForm.operator'} = WebGUI::Form::radioList(
-					-name  => "requirement",
-					-options => { 'and' => $i18n->get("and"),
+	$var{'prereqForm.operator'} = WebGUI::Form::radioList($self->session,{
+					name  => "requirement",
+					options => { 'and' => $i18n->get("and"),
 						      'or'  => $i18n->get("or"),
 						    },
-					-value => 'and',
-					-label => $i18n->get("add/edit event operator"),
-					-hoverHelp => $i18n->get("add/edit event operator description")
-					       );
+					value => 'and',
+					label => $i18n->get("add/edit event operator"),
+					hoverHelp => $i18n->get("add/edit event operator description")
+									     });
 	if ($self->session->user->isInGroup($self->get("groupToManageEvents"))) {
 		$var{'canManageEvents'} = 1;
 	}
