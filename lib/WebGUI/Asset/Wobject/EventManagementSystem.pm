@@ -19,6 +19,7 @@ use base 'WebGUI::Asset::Wobject';
 use Tie::IxHash;
 use WebGUI::HTMLForm;
 use JSON;
+use WebGUI::Workflow::Instance;
 use WebGUI::Cache;
 use WebGUI::International;
 use WebGUI::Commerce::ShoppingCart;
@@ -2365,7 +2366,11 @@ sub www_savePrerequisites {
 			},0,0);
 		}
 	}
-
+	
+	my $instance = WebGUI::Workflow::Instance->create($self->session, {
+		workflowId=>'EMSworkflow00000000001'
+	},'EMSinstance00000000001');
+	
 	return $self->www_editEvent(undef,$eventToAssignPrereqTo);
 }
 
