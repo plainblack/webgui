@@ -17,10 +17,11 @@
 <li><a href='<tmpl_var managePurchases.url>'><tmpl_var managePurchases.label></a></li>
 <li><a href="<tmpl_var checkout.url>"><tmpl_var checkout.label></a></li>
 </ul>
+<tmpl_var calendarJS>
 <tmpl_unless noSearchDialog>
 <script type="text/javascript" src="<tmpl_var ems.wobject.dir>/script/dynamicForms.js"></script>
 <script type="text/javascript">
-   <tmpl_var search.filters.options>   
+   <tmpl_var search.filters.options>
    var advanced = 0;
    var filterCount = 0;
 
