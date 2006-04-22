@@ -393,9 +393,13 @@ A boolean indicating whether this workflow may be executed right now.
 
 A string indicating the type of object this workflow will be operating on. Valid values are "None", or any object type, like "WebGUI::VersionTag".
 
+=head4 isSingleton
+
+A boolean indicating whether this workflow should be run as a singleton. If it's a singleton, then only one instance of the workflow will be allowed to be created at a given time. So if you try to create a new instance of it, and one instance is already created, the create() method will return undef instead of a reference to the object.
+
 =head4 isSerial
 
-A boolean indicating whether this workflow can be run in parallel or serial. If it's serial, then only one instance of the workflow will be allowed to be created at a given time. So if you try to create a new instance of it, and one instance is already created, the create() method will return undef instead of a reference to the object.
+A boolean indicating whether this workflow should be run in serial mode. If it's run in serial, then only one instance of this workflow will be run at a given time, and all other instances of it will queue up.
 
 =cut
 
@@ -411,6 +415,11 @@ sub set {
 		$self->{_data}{isSerial} = 1;
 	} elsif ($properties->{isSerial} == 0) {
 		$self->{_data}{isSerial} = 0;
+	}
+	if ($properties->{isSingleton} == 1) {
+		$self->{_data}{isSingleton} = 1;
+	} elsif ($properties->{isSingleton} == 0) {
+		$self->{_data}{isSingleton} = 0;
 	}
 	$self->{_data}{title} = $properties->{title} || $self->{_data}{title} || "Untitled";
 	$self->{_data}{description} = (exists $properties->{description}) ? $properties->{description} : $self->{_data}{description};

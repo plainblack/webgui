@@ -31,8 +31,20 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
-	'is serial help' => {
+	'is singleton help' => {
 		message => q|If yes is selected then only one instance of this workflow will be allowed to be created at one time. Generally speaking this would be a bad idea for approval workflows, but is probably a good idea for workflows that download emails from a remote server, to avoid getting duplicates.|,
+		context => q|the hover help for the is singleton field|,
+		lastUpdated => 0,
+	},
+
+	'is singleton' => {
+		message => q|Is a singleton?|,
+		context => q|A question that asks the user whether this workflow may be instanciated multiple times concurrently or not.|,
+		lastUpdated => 0,
+	},
+
+	'is serial help' => {
+		message => q|If yes is selected then only one instance of this workflow will be allowed to be run at one time, while new instances get queued up and wait for the running one to complete. This is generally bad for a workflow, but it can be good when multiple instances of workflow have to operate on the same data.|,
 		context => q|the hover help for the is serial field|,
 		lastUpdated => 0,
 	},

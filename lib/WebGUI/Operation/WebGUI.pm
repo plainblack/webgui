@@ -52,6 +52,7 @@ password and email address, as well as some other WebGUI settings.
 #-------------------------------------------------------------------
 sub www_setup {
 	my $session = shift;
+	$session->http->setCacheControl("none");
 	$session->http->setMimeType("text/html");
 	return "" unless ($session->setting->get("specialState") eq "init");
 	my $i18n = WebGUI::International->new($session, "WebGUI");

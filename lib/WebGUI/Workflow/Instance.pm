@@ -63,10 +63,10 @@ sub create {
 	my $session = shift;
 	my $properties = shift;
 	my $id = shift;
-	my ($isSerial) = $session->db->quickArray("select isSerial from Workflow where workflowId=?",[$properties->{workflowId}]);
+	my ($isSingleton) = $session->db->quickArray("select isSingleton from Workflow where workflowId=?",[$properties->{workflowId}]);
 	my $params = (exists $properties->{parameters}) ? JSON::objToJson({parameters => $properties->{parameters}}) : undef;
 	my ($count) = $session->db->quickArray("select count(*) from WorkflowInstance where workflowId=? and parameters=?",[$properties->{workflowId},$params]);
-	return undef if ($isSerial && $count);
+	return undef if ($isSingleton && $count);
 	my $instanceId = $session->db->setRow("WorkflowInstance","instanceId",{instanceId=>"new", runningSince=>time()}, $id);
 	my $self = $class->new($session, $instanceId);
 	$properties->{notifySpectre} = 1 unless ($properties->{notifySpectre} eq "0");
@@ -244,6 +244,10 @@ sub run {
 	my $workflow = $self->getWorkflow;
 	return "undefined" unless (defined $workflow);
 	return "disabled" unless ($workflow->get("enabled"));
+	if ($workflow->get("isSerial")) {
+		my ($firstId) = $self->session->db->quickArray("select workflowId from WorkflowInstance order by runningSince");
+		return "waiting" if ($workflow->getId ne $firstId); # must wait for currently running instance to complete
+	}
 	my $activity = $workflow->getNextActivity($self->get("currentActivityId"));
 	unless  (defined $activity)  {
 		$self->delete;

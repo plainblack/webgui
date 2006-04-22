@@ -198,6 +198,13 @@ sub www_editWorkflow {
 		hoverHelp=>$i18n->get("is enabled help")
 		);
 	$f->yesNo(
+		name=>"isSingleton",
+		value=>$workflow->get("isSingleton"),
+		defaultValue=>0,
+		label=>$i18n->get("is singleton"),
+		hoverHelp=>$i18n->get("is singleton help")
+		);
+	$f->yesNo(
 		name=>"isSerial",
 		value=>$workflow->get("isSerial"),
 		defaultValue=>0,

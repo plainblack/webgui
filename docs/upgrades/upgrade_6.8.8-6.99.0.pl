@@ -276,7 +276,7 @@ sub updateCs {
 	$session->db->write("alter table Collaboration add column getMailInterval int not null default 300");
 	$session->db->write("alter table Collaboration add column getMailCronId varchar(22) binary");
 	my $workflow = WebGUI::Workflow->create($session, {
-			isSerial=>1,
+			isSingleton=>1,
 			type=>"WebGUI::Asset::Wobject::Collaboration",	
 			enabled=>1,
 			description=>"Retrieves mail from a POP3 account for the given Collaboration System.",
@@ -358,6 +358,7 @@ sub addWorkflow {
 		description text,
 		enabled int not null default 0,
 		isSerial int not null default 0,
+		isSingleton int not null default 0,
 		type varchar(255) not null default 'None'
 		)");
 	$session->db->write("create table WorkflowActivity (
@@ -555,7 +556,7 @@ sub addWorkflow {
 		title=>"Send Queued Email Messages",
 		description => "Sends all the messages in the mail queue.",
 		enabled=>1,
-		isSerial=>1,
+		isSingleton=>1,
 		type=>"None"
 		}, "pbworkflow000000000007");
 	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::SendQueuedMailMessages", "pbwfactivity0000000021");
