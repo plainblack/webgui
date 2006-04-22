@@ -782,6 +782,16 @@ SQL9
 	$session->db->write($sql7);
 	$session->db->write($sql8);
 	$session->db->write($sql9);
+	
+	my $workflow = WebGUI::Workflow->create($session, {
+		isSerial=>1,
+		type=>"none",	
+		enabled=>1,
+		description=>"Precaches EMS event prerequisites",
+		title=>"EMS Precache"	
+	}, "EMSworkflow00000000001");
+	my $activity = $workflow->addActivity("WebGUI::Workflow::Activity::CacheEMSPrereqs","EMSactivity00000000001");
+	$activity->set("title","Precache EMS prerequisites");	
 }
 
 #-------------------------------------------------
