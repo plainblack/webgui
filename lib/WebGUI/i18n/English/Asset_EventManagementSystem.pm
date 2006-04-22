@@ -1078,6 +1078,58 @@ allows you to edit events,  delete events, or change their order.</p>
 		lastUpdated => 1145653452,
 	},
 
+	'first name' => {
+		message => q|First Name|,
+		lastUpdated => 1145743634,
+		context => q|Given name|,
+	},
+
+	'last name' => {
+		message => q|Last Name|,
+		lastUpdated => 1145743634,
+		context => q|Family name|,
+	},
+
+	'address' => {
+		message => q|Address|,
+		lastUpdated => 1145743634,
+	},
+
+	'city' => {
+		message => q|City|,
+		lastUpdated => 1145743634,
+	},
+
+	'state' => {
+		message => q|State|,
+		lastUpdated => 1145743634,
+	},
+
+	'zip code' => {
+		message => q|Zip Code|,
+		lastUpdated => 1145743634,
+	},
+
+	'country' => {
+		message => q|Country|,
+		lastUpdated => 1145743634,
+	},
+
+	'phone number' => {
+		message => q|Phone Number|,
+		lastUpdated => 1145743634,
+	},
+
+	'email address' => {
+		message => q|Email Address|,
+		lastUpdated => 1145743634,
+	},
+
+	'which badge' => {
+		message => q|Which Badge|,
+		lastUpdated => 1145743634,
+	},
+
 };
 
 1;

@@ -149,7 +149,7 @@ sub _matchPairs {
 	my $options = shift;
 	my %hash;
 	tie %hash, 'Tie::IxHash';
-	$hash{''} = 'Select One';
+	$hash{''} = $i18n->get('select one');
 	foreach (split("\n",$options)) {
 		my $val = $_;
 		$val =~ s/\s//g;
@@ -573,8 +573,7 @@ Id of event whose approval status you are trying to determine
 sub eventIsApproved {
 	my $self = shift;
 	my $eventId = shift;
-	my ($result) = $self->session->db->quickArray("select approved from EventManagementSystem_products where productId=".
-			      $self->session->db->quote($eventId));
+	my ($result) = $self->session->db->quickArray("select approved from EventManagementSystem_products where productId=?",[$eventId]);
 	return $result;
 }
 
@@ -898,16 +897,16 @@ sub getRegistrationInfo {
 	$var{'form.message'} = 'Enter Badge/Contact information for the series of events you are currently adding to the cart.  <br /><br />If you are logged in, you can choose to update your own user profile with this information by choosing your name from the drop-down box, or if your name is not listed, choose the option "Create badge for myself".  <br /><br />If you are making a purchase for someone else, select their name or select the "Create New for someone else" option from the drop-down box.  If you are adding items to a previous purchase, that badge is already selected, and cannot be changed.  If you make changes to the fields in this form for a badge that already exists, their information will be updated.';
 	$var{'form.footer'} = WebGUI::Form::formFooter($self->session);
 	$var{'form.submit'} = WebGUI::Form::submit($self->session);
-	$var{'form.firstName.label'} = "First Name";
-	$var{'form.lastName.label'} = "Last Name";
-	$var{'form.address.label'} = "Address";
-	$var{'form.city.label'} = "City";
-	$var{'form.state.label'} = "State";
-	$var{'form.zipCode.label'} = "Zip Code";
-	$var{'form.country.label'} = "Country";
-	$var{'form.phoneNumber.label'} = "Phone Number";
-	$var{'form.email.label'} = "Email Address";
-	$var{'form.badgeId.label'} = "Which Badge";
+	$var{'form.firstName.label'} = $i18n->get("first name");
+	$var{'form.lastName.label'} = $i18n->get("last name");
+	$var{'form.address.label'} = $i18n->get("address");
+	$var{'form.city.label'} = $i18n->get("city");
+	$var{'form.state.label'} = $i18n->get("state");
+	$var{'form.zipCode.label'} = $i18n->get("zip code");
+	$var{'form.country.label'} = $i18n->get("country");
+	$var{'form.phoneNumber.label'} = $i18n->get("phone number");
+	$var{'form.email.label'} = $i18n->get("email address");
+	$var{'form.badgeId.label'} = $i18n->get("which badge");
 	$var{'form.firstName'} = WebGUI::Form::Text($self->session,{name=>'firstName'});
 	$var{'form.lastName'} = WebGUI::Form::Text($self->session,{name=>'lastName'});
 	$var{'form.address'} = WebGUI::Form::Text($self->session,{name=>'address'});
@@ -2840,7 +2839,7 @@ sub view {
 	  $eventFields{'eventIsFull'} = ($eventFields{'seatsRemaining'} == 0);
 
 	  if ($eventFields{'eventIsFull'}) {
-	  	$eventFields{'purchase.label'} = "Sold Out";;
+	  	$eventFields{'purchase.label'} = $i18n->get('sold out');
 	  }
 	  else {
 	  	$eventFields{'purchase.url'} = $self->getUrl('func=addToCart;pid='.$event->{'productId'});
@@ -2849,7 +2848,7 @@ sub view {
 	  push (@events, {'event' => $self->processTemplate(\%eventFields, $event->{'templateId'}) });	  
 	} 
 	$var{'checkout.url'} = $self->getUrl('op=viewCart');
-	$var{'checkout.label'} = "Checkout";
+	$var{'checkout.label'} = $i18n->get('checkout');
 	$var{'events_loop'} = \@events;
 	$var{'paginateBar'} = $p->getBarTraditional;
 	$var{'manageEvents.url'} = $self->getUrl('func=search');
