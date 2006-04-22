@@ -74,7 +74,7 @@ sub execute {
 	return $self->COMPLETE unless $emsId;
 	WebGUI::Cache->new($self->session)->deleteChunk(["verifyAllPrerequisites"]);
 	my $ems = WebGUI::Asset->newByDynamicClass($self->session,$emsId);
-	my @events = $self->session->db->buildArray("select productId from EventsManagementSystem_products");
+	my @events = $self->session->db->buildArray("select productId from EventManagementSystem_products");
 	foreach (@events) {
 		$ems->verifyAllPrerequisites($_);
 	}
