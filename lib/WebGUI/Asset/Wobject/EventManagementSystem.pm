@@ -2467,12 +2467,6 @@ sub prepareView {
 	my $templateId = $self->get("displayTemplateId");
 	my $template = WebGUI::Asset::Template->new($self->session, $templateId);
 	$template->prepare;
-		my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
-  my $language  = $i18n->getLanguage(undef,"languageAbbreviation");
-	$self->session->style->setScript($self->session->config->get('extrasURL').'/calendar/calendar.js',{ type=>'text/javascript' });
-	$self->session->style->setScript($self->session->config->get('extrasURL').'/calendar/lang/calendar-'.$language.'.js',{ type=>'text/javascript' });
-	$self->session->style->setScript($self->session->config->get('extrasURL').'/calendar/calendar-setup.js',{ type=>'text/javascript' });
-	$self->session->style->setLink($self->session->config->get('extrasURL').'/calendar/calendar-win2k-1.css', { rel=>"stylesheet", type=>"text/css", media=>"all" });
 	$self->{_viewTemplate} = $template;
 }
 
@@ -2489,7 +2483,11 @@ sub www_search {
 	my $joins;
 	my $selects;
 	my @joined;
-
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
+	
+	my $language  = $i18n->getLanguage(undef,"languageAbbreviation");
+	$var{'calendarJS'} = '<script type="text/javascript" src="'.$self->session->config->get('extrasURL').'/calendar/calendar.js"></script><script type="text/javascript" src="'.$self->session->config->get('extrasURL').'/calendar/lang/calendar-'.$language.'.js"></script><script type="text/javascript" src="'.$self->session->config->get('extrasURL').'/calendar/calendar-setup.js"></script><link href="'.$self->session->config->get('extrasURL').'/calendar/calendar-win2k-1.css" rel="stylesheet" type="text/css" />"';
+	
 	#Get the eventIds of valid prereqs if we're in prereq mode
 	#Put the productIds of valid prereqs into a list so we can return only valid prereq choices in our search
 	if (scalar(keys %{$prerequisiteHash})) {
@@ -2500,10 +2498,10 @@ sub www_search {
 
 	# If we're at the view method there is no reason we should have anything in our scratch cart
 	# so let's empty it to prevent strange and awful things from happening
-	$self->emptyScratchCart;
-	$self->session->scratch->delete('EMS_add_purchase_badgeId');
-	$self->session->scratch->delete('EMS_add_purchase_events');
-
+	unless ($self->session->scratch->get('EMS_add_purchase_badgeId')) {
+		$self->emptyScratchCart;
+		$self->session->scratch->delete('EMS_add_purchase_events');
+	}
 	push(@keys,$keywords) if $keywords;
 	unless ($keywords =~ /^".*"$/) {
 		foreach (split(" ",$keywords)) {
@@ -2608,7 +2606,6 @@ sub www_search {
 	}
 	$searchPhrases &&= " and ( ".$searchPhrases." )";
 	$self->session->errorHandler->warn("searchPhrases: $searchPhrases<br />basicSearch: $basicSearch<br />");
-	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	# Get the products available for sale for this page
 	my $sql = "select p.productId, p.title, p.description, p.price, p.templateId, e.approved, e.maximumAttendees, e.startDate, e.endDate $selects
 		   from products as p, EventManagementSystem_products as e 
@@ -2801,9 +2798,10 @@ sub view {
 	
 	# If we're at the view method there is no reason we should have anything in our scratch cart
 	# so let's empty it to prevent strange and awful things from happening
-	$self->emptyScratchCart;
-	$self->session->scratch->delete('EMS_add_purchase_badgeId');
-	$self->session->scratch->delete('EMS_add_purchase_events');
+	unless ($self->session->scratch->get('EMS_add_purchase_badgeId')) {
+		$self->emptyScratchCart;
+		$self->session->scratch->delete('EMS_add_purchase_events');
+	}
 	
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	# Get the products available for sale for this page
