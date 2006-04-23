@@ -26,13 +26,7 @@
 <tr class="softGray">
 	<td  colspan="2" class="purchase">
 	<tmpl_unless eventIsFull>
-		<a onclick="
-if( confirm('<tmpl_var purchase.message>')) {
-   window.location = '<tmpl_var purchase.wantToSearch.url>';
-}
-else {
-   window.location = '<tmpl_var purchase.wantToContinue.url>';
-}"><tmpl_var purchase.label></a>
+		<a style="cursor:pointer;" href="javascript:void(window.location=(confirm('<tmpl_var purchase.message>'))?'<tmpl_var purchase.wantToSearch.url>':'<tmpl_var purchase.wantToContinue.url>')"><tmpl_var purchase.label></a>
 	<tmpl_else>
 		<tmpl_var purchase.label><br />
 	</tmpl_unless>	

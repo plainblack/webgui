@@ -9,24 +9,24 @@
 </tmpl_if>
 <h2><tmpl_var viewPurchaseTitle></h2>
 
-<tmpl_if canReturn>
+<tmpl_if canReturn><tmpl_if canReturnTransaction>
 	<div style="text-align:right;">
 		(<a href="<tmpl_var appUrl>?func=returnItem;tid=<tmpl_var transactionId>">Return Entire Purchase</a>)
 	</div>
-</tmpl_if>
+</tmpl_if></tmpl_if>
 
 <tmpl_loop purchasesLoop>
 <table width="100%" border="0" class="viewPurchase">
 <tr>
 	<td class="badgeTitle">Badge Name</td>
 	<td class="itinerary">
-		Itinerary&nbsp;&nbsp;<tmpl_if canReturn>(<a href="<tmpl_var appUrl>?func=returnItem;pid=<tmpl_var purchaseId>">Return Entire Itinerary</a>)</tmpl_if>
+	Itinerary&nbsp;&nbsp;<tmpl_if canReturn><tmpl_if canReturnItinerary>(<a href="<tmpl_var appUrl>?func=returnItem;pid=<tmpl_var purchaseId>">Return Entire Itinerary</a>)</tmpl_if></tmpl_if>
 	</td>
 </tr>
 <tr>
 	<td class="badgeName" valign="top">
 		<tmpl_var firstName> <tmpl_var lastName><br /><br />
-		<tmpl_if canAddEvents><a href="<tmpl_var appUrl>?func=addEventsToBadge;bid=<tmpl_var badgeId>">Add Events To Badge</a></tmpl_if>
+		<tmpl_if canAddEvents><tmpl_if canReturnItinerary><a href="<tmpl_var appUrl>?func=addEventsToBadge;bid=<tmpl_var badgeId>">Add Events To Badge</a></tmpl_if></tmpl_if>
 	</td>
 	<td valign="top">
 		<table width="100%">
@@ -42,7 +42,7 @@
 			<td><tmpl_var title></td>
 			<td><tmpl_var startDateHuman> - <tmpl_var endDateHuman></td>
 		<tmpl_if canReturn>
-			<td><a href="<tmpl_var appUrl>?func=returnItem;rid=<tmpl_var registrationId>">Return This Registration</a></td>
+			<td><tmpl_if returned>RETURNED<tmpl_else><a href="<tmpl_var appUrl>?func=returnItem;rid=<tmpl_var registrationId>">Return This Registration</a></tmpl_if></td>
 		</tmpl_if>
 		</tr>
 	</tmpl_loop>

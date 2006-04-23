@@ -74,20 +74,31 @@
 		}
 		return output;
 	}
-
+	function advSearch() {
+		var mee = document.getElementById('basicSearch')
+		if (mee) mee.style.display='none';
+		var pee = document.getElementById('advSearchDiv');
+		if (pee) pee.style.display='block';
+	}
+	function basicSearch() {
+		var vee = document.getElementById('basicSearch');
+		if (vee) vee.style.display='block';
+		var dee = document.getElementById('advSearchDiv');
+		if (dee) dee.style.display='none';
+	}
 </script>
 
-<div id="basicSearch"<tmpl_if isAdvSearch> style="display:none"</tmpl_if>>
+<div id="basicSearch">
 <tmpl_var basicSearch.formHeader>
-<div style="cursor:pointer;text-align:right;" onclick="document.getElementById('basicSearch').style.display='none';document.getElementById('advSearch').style.display='block';" ><a href="#">Switch To Advanced Search</a></div>
+<div style="cursor:pointer;text-align:right;"><a href="javascript:void(advSearch())">Switch To Advanced Search</a></div>
 <table width="100%" border="0" padding="1" style="border-bottom:double gray 5px;border-top:solid gray 1px;margin-bottom:5px;margin-top:5px;"><tr><td style="font-weight:bold;width:40%;">Search Keywords:</td><td style="width:60%;"><input name="searchKeywords" style="width:100%;" /></td></tr></table>
 <tmpl_var search.formSubmit>
 <tmpl_var search.formFooter>
 </div>
 
-<div id="advSearch"<tmpl_unless isAdvSearch> style="display:none"</tmpl_unless>>
+<div id="advSearchDiv">
 <tmpl_var advSearch.formHeader>
-<div style="cursor:pointer;text-align:right;" onclick="document.getElementById('basicSearch').style.display='block';document.getElementById('advSearch').style.display='none';" ><a href="#">Switch To Basic Search</a></div>
+<div style="cursor:pointer;text-align:right;"><a href="javascript:void(basicSearch())">Switch To Basic Search</a></div>
 <table width="100%" border="0" cellpadding="8" style="border-bottom:double gray 5px;border-top:solid gray 1px;margin-bottom:5px;margin-top:5px;">
 <tbody id="filterbody">
 <tr><td></td></tr>
@@ -96,7 +107,7 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
 <tr>
 	<td align="left"><tmpl_var search.formSubmit></td>
-	<td align="right" valign="top"><a href="#" onclick="addField();">Add another Filter Field</a></td>
+	<td align="right" valign="top"><a href="javascript:void(addField())">Add another Filter Field</a></td>
 </tr>
 </table>
 <tmpl_var search.formFooter>
@@ -109,6 +120,7 @@
        changeToType(word,filterCount);
      }
    }
+   <tmpl_if isAdvSearch>advSearch();<tmpl_else>basicSearch();</tmpl_if>
 </script>
 
 </div>
@@ -151,6 +163,7 @@
 <tr><td align="right"><a href='<tmpl_var continue.url>'><tmpl_var continue.label></a></td></tr>
 </table>
 <tmpl_var paginateBar>
+
 
 ~~~
 <style type="text/css">
@@ -230,3 +243,5 @@ tr.evenRow td {
 #extendedSearchLayer {display: inline;}
 
 </style>
+
+<link href="^Extras;/calendar/calendar-win2k-1.css" rel="stylesheet" type="text/css" />
