@@ -149,6 +149,7 @@ sub _matchPairs {
 	my $options = shift;
 	my %hash;
 	tie %hash, 'Tie::IxHash';
+	my $i18n = WebGUI::International->new($self->session, 'Asset_EventManagementSystem');
 	$hash{''} = $i18n->get('select one');
 	foreach (split("\n",$options)) {
 		my $val = $_;
@@ -892,7 +893,7 @@ sub findSubEvents {
 sub getRegistrationInfo {
 	my $self = shift;
 	my %var;
-	
+	my $i18n = WebGUI::International->new($self->session, 'Asset_EventManagementSystem');
 	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
 			     .WebGUI::Form::hidden($self->session,{name=>"func",value=>"saveRegistration"});
 	$var{'form.message'} = 'Enter Badge/Contact information for the series of events you are currently adding to the cart.  <br /><br />If you are logged in, you can choose to update your own user profile with this information by choosing your name from the drop-down box, or if your name is not listed, choose the option "Create badge for myself".  <br /><br />If you are making a purchase for someone else, select their name or select the "Create New for someone else" option from the drop-down box.  If you are adding items to a previous purchase, that badge is already selected, and cannot be changed.  If you make changes to the fields in this form for a badge that already exists, their information will be updated.';
