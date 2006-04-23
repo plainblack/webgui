@@ -107,7 +107,7 @@ sub _getFieldHash {
 			compare=>"boolean",
 			method=>"selectBox",
 			calculated=>1,
-			initial=>1
+			initial=>0
 		}
 	);
 	# Add custom metadata fields to the list, matching the types up
@@ -125,7 +125,7 @@ sub _getFieldHash {
 			$type = 'select';
 		}
 		$hash{$field->{fieldId}} = {
-			name=>$field->{name},
+			name=>$field->{label},
 			type=>$type,
 			method=>$dataType,
 			initial=>$field->{autoSearch},
@@ -263,6 +263,7 @@ sub buildMenu {
 	my $js = "var filterList = {\n";
 	foreach my $fieldId (keys %{$fields}) {
 		my $field = $fields->{$fieldId};
+		next if $fieldId eq 'requirement';
 		$js .= ",\n" if($counter++ > 0);
 		my $fieldName = $field->{name};
 		my $fieldType = $field->{type};
@@ -1717,8 +1718,7 @@ sub www_editEvent {
 		}
 		$f->dynamicField(
 			name=>"metadata_".$meta->{$field->{fieldId}}{fieldId},
-			label=>$meta->{$field->{fieldId}}{name},
-			hoverHelp=>$meta->{$field->{fieldId}}{label},
+			label=>$meta->{$field->{fieldId}}{label},
 			value=>($self->session->form->process("metadata_".$meta->{$field->{fieldId}}{fieldId},$dataType) || $meta->{$field->{fieldId}}{fieldData}),
 			extras=>qq/title="$meta->{$field->{fieldId}}{label}"/,
 			possibleValues=>$meta->{$field->{fieldId}}{possibleValues},
@@ -2207,8 +2207,8 @@ sub www_editEventMetaDataField {
 	);
 	$f->yesNo(
 		-name => "autoSearch",
-		-label => $i18n->get('auto search'),
-		-hoverHelp => $i18n->get('auto search description'),
+		-label => $i18n2->get('auto search'),
+		-hoverHelp => $i18n2->get('auto search description'),
 		-value => $data->{autoSearch},
 	);
 	my %hash;
@@ -2380,7 +2380,7 @@ sub www_savePrerequisites {
 	
 	my $instance = WebGUI::Workflow::Instance->create($self->session, {
 		workflowId=>'EMSworkflow00000000001'
-	},'EMSinstance00000000001');
+	});
 	
 	return $self->www_editEvent(undef,$eventToAssignPrereqTo);
 }
@@ -2531,17 +2531,7 @@ sub www_search {
 
 	# If we're at the view method there is no reason we should have anything in our scratch cart
 	# so let's empty it to prevent strange and awful things from happening
-<<<<<<< .mine
-	#$self->emptyScratchCart;
-	#$self->session->scratch->delete('EMS_add_purchase_badgeId');
-	#$self->session->scratch->delete('EMS_add_purchase_events');
 
-=======
-	unless ($self->session->scratch->get('EMS_add_purchase_badgeId')) {
-		$self->emptyScratchCart;
-		$self->session->scratch->delete('EMS_add_purchase_events');
-	}
->>>>>>> .r1600
 	push(@keys,$keywords) if $keywords;
 	unless ($keywords =~ /^".*"$/) {
 		foreach (split(" ",$keywords)) {
