@@ -2669,7 +2669,7 @@ sub www_search {
 		   $joins 
 		   where
 		   	p.productId = e.productId and approved=1
-		   	and e.assetId =".$self->session->db->quote($self->get("assetId")).$searchPhrases. "order by sequenceNumber";
+		   	and e.assetId =".$self->session->db->quote($self->get("assetId")).$searchPhrases. " order by sequenceNumber";
 #		   	." 
 #			and p.productId not in (select distinct(productId) from EventManagementSystem_prerequisites)";		
 
@@ -2781,8 +2781,7 @@ sub www_search {
 	  
 	  push (@events, {'event' => $self->processTemplate(\%eventFields, $event->{'templateId'}), %eventFields });
 	} 
-	$var{'checkout.url'} = $self->getUrl('op=viewCart');
-	$var{'checkout.label'} = $i18n->get('checkout');
+	
 	$var{'events_loop'} = \@events;
 	$var{'paginateBar'} = $p->getBarTraditional;
 	$var{'manageEvents.url'} = $self->getUrl('func=search');
@@ -2842,11 +2841,11 @@ sub www_search {
 		$message = $i18n->get('forced narrowing');
 	}
 	
-
+	my $somethingInScratch = scalar(@{$self->getEventsInScratchCart});
 	$var{'message'} = $message;
 	$var{'numberOfSearchResults'} = $numSearchResults;
-	$var{'continue.url'} = $self->getUrl('func=addToCart;pid=_noid_');
-	$var{'continue.label'} = "Continue";
+	$var{'continue.url'} = $self->getUrl('func=addToCart;pid=_noid_') unless ($managePrereqsFlag || !$somethingInScratch);
+	$var{'continue.label'} = "Continue" unless ($managePrereqsFlag || !$somethingInScratch);
 	$var{'name.label'} = "Event";
 	$var{'starts.label'} = "Starts";
 	$var{'ends.label'} = "Ends";
