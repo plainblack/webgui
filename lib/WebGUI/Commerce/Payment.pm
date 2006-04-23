@@ -104,7 +104,7 @@ sub configurationForm {
 		);
 	$f->group(
 		-name	=> $self->prepend('whoCanUse'),
-		-value 	=> [1],
+		-value 	=> [$self->get('whoCanUse')],
 		-label 	=> 'Who Can Use?',
 		-hoverHelp => 'Members belonging to this group will see this payment gateway as a choice at the payment gateway selection screen during checkout.'
 		);
