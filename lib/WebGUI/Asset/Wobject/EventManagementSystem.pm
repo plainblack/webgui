@@ -2662,7 +2662,7 @@ sub www_search {
 		#$searchPhrases &&= " and ( ".$searchPhrases." )";
 	}
 	$searchPhrases &&= " and ( ".$searchPhrases." )";
-	$self->session->errorHandler->warn("searchPhrases: $searchPhrases<br />basicSearch: $basicSearch<br />");
+	# $self->session->errorHandler->warn("searchPhrases: $searchPhrases<br />basicSearch: $basicSearch<br />");
 	# Get the products available for sale for this page
 	my $sql = "select p.productId, p.title, p.description, p.price, p.templateId, e.approved, e.maximumAttendees, e.startDate, e.endDate $selects
 		   from products as p, EventManagementSystem_products as e 
@@ -2703,7 +2703,7 @@ sub www_search {
 		my $shouldPush = 1;
 		my $eventId = $data->{productId};
 		my $requiredList = $self->verifyAllPrerequisites($eventId);
-		print "\nrequiredList: ".join(',',@$requiredList)." productId: ".$eventId;
+		# print "\nrequiredList: ".join(',',@$requiredList)." productId: ".$eventId;
 		if ($seatsAvailable ne 'none') {
 			my ($numberRegistered) = $self->session->db->quickArray("select count(*) from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p
 	  	where r.purchaseId = p.purchaseId and r.returned=0 and r.productId=".$self->session->db->quote($eventId));
