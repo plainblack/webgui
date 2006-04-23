@@ -4,28 +4,11 @@
 #url:default-ems-template-checkout
 #namespace:EventManagementSystem_checkout
 #create
+<tmpl_if resolveConflicts>
 <tmpl_var form.header>
 <table width="100%" border="0">
 <tr><td><tmpl_var message></td></tr>
 
-<tmpl_if chooseSubevents>
-<tr>
-	<td>
-		<table width="100%">
- <tmpl_loop subevents_loop>
-		<tr<tmpl_unless __ODD__> class="evenRow"<tmpl_else> class="oddRow"</tmpl_unless>>
-			<td><tmpl_var form.checkBox></td>
-			<td><tmpl_var title></td>
-			<td><tmpl_var description></td>
-			<td><tmpl_var price></td>
-		</tr>
- </tmpl_loop>
-		</table>
-	</td>
-</tr>
-</tmpl_if>
-
-<tmpl_if resolveConflicts>
 <tr>
 	<td>
 		<table width="100%">
@@ -40,11 +23,13 @@
 		</table>
 	</td>
 </tr> 
-</tmpl_if>
-
 <tr><td><tmpl_var form.submit></td></tr>
 </table>
 <tmpl_var form.footer>
+</tmpl_if>
+
+
+
 
 <tmpl_if registration>
   <tmpl_var form.header>

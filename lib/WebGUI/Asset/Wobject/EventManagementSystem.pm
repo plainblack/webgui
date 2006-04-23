@@ -1415,7 +1415,7 @@ sub www_addToCart {
 		}
 		else {  # A single id, i.e., a master event
 			my $newPid = $self->session->form->get("pid") || $pid;
-			push(@pids, $newPid);
+			push(@pids, $newPid) unless ($pid eq "_noid_");
 		}
 
 		foreach my $eventId (@pids) {
@@ -1426,7 +1426,7 @@ sub www_addToCart {
 		$output = $self->verifyPrerequisitesForm;
 
 		#$output = $self->getSubEventForm(\@pids) unless ($output);
-		$output = $self->getSubEventForm($self->getEventsInScratchCart) unless ($output);
+		#$output = $self->getSubEventForm($self->getEventsInScratchCart) unless ($output);
 		
 		$errors = $self->checkConflicts;
 		if (scalar(@$errors) > 0) { return $self->error($errors, "www_addToCart"); }
@@ -1438,6 +1438,18 @@ sub www_addToCart {
 	# $self->session->errorHandler->warn("scratch after: <pre>".Dumper($self->getEventsInScratchCart).Dumper($self->session->db->buildHashRef("select name,value from userSessionScratch where sessionId=?",[$self->session->getId]))."</pre>");
 	return $self->session->style->process($self->processTemplate($output,$self->getValue("checkoutTemplateId")),$self->getValue("styleTemplateId"));
 } 
+
+#-------------------------------------------------------------------
+sub www_addToScratchCart {
+	my $self = shift;	
+	my $pid = $self->session->form->get("pid");
+	my $nameOfEventAdded = $self->getEventName($pid);
+	my $masterEventId = $self->session->form->get("mid");
+	$self->addToScratchCart($pid); #tsc
+	
+	return $self->www_search(undef, undef, $nameOfEventAdded, $masterEventId, "requirement", "eq", $self->session->form->get("pn"));
+}
+
 
 #-------------------------------------------------------------------
 
@@ -2479,6 +2491,23 @@ sub www_search {
 	my $self = shift;
 	my $managePrereqs = shift || $self->session->form->get("managePrereqs");
 	my $eventToAssignPrereqTo = shift || $self->session->form->get("eventToAssignPrereqTo");
+
+	#these allow us to show a specific page of subevents after an add to scratch cart
+	my $eventAdded = shift;
+	my $cfilter_t0 = shift;
+	my $cfilter_s0 = shift;
+	my $cfilter_c0 = shift;
+	my $pn;
+	my $subSearchFlag;
+	my $showAllFlag;
+	my $addToBadgeMessage;
+	if ($cfilter_t0 && $cfilter_s0 && $cfilter_c0) {
+		$pn = shift || 1;
+		$subSearchFlag = 1;
+		$showAllFlag = 1;
+		$addToBadgeMessage = "$eventAdded was added to your badge successfully.";
+	}
+	
 	my $prerequisiteHash = $self->getPrerequisiteEventList($eventToAssignPrereqTo) if ($eventToAssignPrereqTo);
 	my @prerequisiteList;
 	my %var;
@@ -2502,10 +2531,17 @@ sub www_search {
 
 	# If we're at the view method there is no reason we should have anything in our scratch cart
 	# so let's empty it to prevent strange and awful things from happening
+<<<<<<< .mine
+	#$self->emptyScratchCart;
+	#$self->session->scratch->delete('EMS_add_purchase_badgeId');
+	#$self->session->scratch->delete('EMS_add_purchase_events');
+
+=======
 	unless ($self->session->scratch->get('EMS_add_purchase_badgeId')) {
 		$self->emptyScratchCart;
 		$self->session->scratch->delete('EMS_add_purchase_events');
 	}
+>>>>>>> .r1600
 	push(@keys,$keywords) if $keywords;
 	unless ($keywords =~ /^".*"$/) {
 		foreach (split(" ",$keywords)) {
@@ -2531,7 +2567,7 @@ sub www_search {
 	my %reqHash;
 	my $seatsAvailable = 'none';
 	my $seatsCompare;
-	if ($self->session->form->get("advSearch") || $self->session->form->get("subSearch")) {
+	if ($self->session->form->get("advSearch") || $self->session->form->get("subSearch") || $subSearchFlag) {
 		$searchPhrases = '';
 		my $fields = $self->_getFieldHash();
 		my $count = 0;
@@ -2540,8 +2576,24 @@ sub www_search {
 				$searchPhrases = $basicSearch;
 		}
 		for (my $cfilter = 0; $cfilter < 50; $cfilter++) {
-			my $value = $self->session->form->get("cfilter_t".$cfilter);
-			my $fieldId = $self->session->form->get("cfilter_s".$cfilter);
+			my $value;
+			my $fieldId;
+			my $compare;
+			
+			# filter 0 is reserved for passing a search filter via the url
+			# or as parameters to this method call.  All user selectable filters
+			# begin with number 1, i.e., cfilter_t1, cfilter_s1, cfilter_c1
+			#
+			if ($cfilter_t0 && $cfilter_s0 && $cfilter_c0 && $pn) { # a filter was passed as params to the method call
+				if ($cfilter == 0) { #don't want to overwrite the user filters
+					$value = $cfilter_t0;
+					$fieldId = $cfilter_s0;
+					$compare = $cfilter_c0;
+				}
+			}
+			
+			$value = $self->session->form->get("cfilter_t".$cfilter) unless ($value);
+			$fieldId = $self->session->form->get("cfilter_s".$cfilter) unless ($fieldId);
 			if ($fieldId eq 'requirement') {
 				$reqHash{$value} = 1 if $value;
 			}
@@ -2553,7 +2605,7 @@ sub www_search {
 			next if ($fieldId eq 'seatsAvailable' || $fieldId eq 'requirement');
 			# end temporary
 			next unless (($value || $value =~ /^0/) && defined $fields->{$fieldId});
-			my $compare = $self->session->form->get("cfilter_c".$cfilter);
+			$compare = $self->session->form->get("cfilter_c".$cfilter) unless ($compare);
 			#Format Value with Operator
 			$value =~ s/%//g;
 			my $field = $fields->{$fieldId};
@@ -2678,18 +2730,18 @@ sub www_search {
 	}
 	#$self->session->errorHandler->warn("<pre>".Dumper(@results)."</pre>");
 	$sth->finish;
-	my $maxResultsForInitialDisplay = 1;
+	my $maxResultsForInitialDisplay = 50;
 	my $numSearchResults = scalar(@results);
-	@results = () unless ( ($numSearchResults <= $maxResultsForInitialDisplay) || ($self->session->form->get("advSearch") || $self->session->form->get("searchKeywords")));	
+	@results = () unless ( ($numSearchResults <= $maxResultsForInitialDisplay) || ($self->session->form->get("advSearch") || $self->session->form->get("searchKeywords") || $showAllFlag));	
 	$p->setDataByArrayRef(\@results);
-	my $eventData = $p->getPageData;
+	my $eventData = $p->getPageData($pn);
 	my @events;
 	foreach my $event (@$eventData) {
 	  my %eventFields;
 	
 	  $eventFields{'title'} = $event->{'title'};
 	  $eventFields{'description'} = $event->{'description'};
-	  $eventFields{'price'} = $event->{'price'};
+	  $eventFields{'price'} = '$'.$event->{'price'};
 	  my ($numberRegistered) = $self->session->db->quickArray("select count(*) from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p
 	  	where r.purchaseId = p.purchaseId and r.productId=".$self->session->db->quote($event->{'productId'}));
 	  $eventFields{'numberRegistered'} = $numberRegistered;
@@ -2709,7 +2761,8 @@ sub www_search {
 	  	$eventFields{'purchase.label'} = $i18n->get('sold out');
 	  }
 	  else {
-	  	$eventFields{'purchase.url'} = $self->getUrl('func=addToCart;pid='.$event->{'productId'});
+		my $masterEventId = $cfilter_t0 || $self->session->form->get("cfilter_t0");
+	  	$eventFields{'purchase.url'} = $self->getUrl('func=addToScratchCart;pid='.$event->{'productId'}.";mid=".$masterEventId);
 	  	$eventFields{'purchase.label'} = $i18n->get('add to cart');
 	  }
 	  
@@ -2758,11 +2811,11 @@ sub www_search {
 		$var{'canManageEvents'} = 0;
 	}
 	my $message;
-	my $subSearchFlag = $self->session->form->get("subSearch") || ($self->session->form->get("func"));
+	$subSearchFlag = $self->session->form->get("subSearch") || ($self->session->form->get("func"));
 	my $advSearchFlag = $self->session->form->get("advSearch");
 	my $basicSearchFlag = $self->session->form->get("searchKeywords");
 	my $managePrereqsFlag = $var{'managePrereqs'};
-	my $paginationFlag = $self->session->form->get("pn");# || ($self->get("paginateAfter") < $numSearchResults);
+	my $paginationFlag = $self->session->form->get("pn") || $pn;
 	my $hasSearchedFlag = ($self->session->form->get("filter"));
 	
 	#Determine type of search results we're displaying
@@ -2784,9 +2837,18 @@ sub www_search {
 	} elsif ($managePrereqsFlag && $numSearchResults > $maxResultsForInitialDisplay && !$paginationFlag) {
 		$message = $i18n->get('forced narrowing');
 	}
+	
 
 	$var{'message'} = $message;
 	$var{'numberOfSearchResults'} = $numSearchResults;
+	$var{'continue.url'} = $self->getUrl('func=addToCart;pid=_noid_');
+	$var{'continue.label'} = "Continue";
+	$var{'name.label'} = "Event";
+	$var{'starts.label'} = "Starts";
+	$var{'ends.label'} = "Ends";
+	$var{'price.label'} = "Price";
+	$var{'seats.label'} = "Seats Available";
+	$var{'addToBadgeMessage'} = $addToBadgeMessage;
 
 	$p->appendTemplateVars(\%var);
 	$self->buildMenu(\%var);
@@ -2830,24 +2892,28 @@ sub view {
 	  $eventFields{'title'} = $event->{'title'};
 	  $eventFields{'title.url'} = $self->getUrl('func=search;cfilter_s0=requirement;cfilter_c0=eq;subSearch=1;cfilter_t0='.$event->{'productId'});
 	  $eventFields{'description'} = $event->{'description'};
-	  $eventFields{'price'} = $event->{'price'};
+	  $eventFields{'price'} = '$'.$event->{'price'};
 	  my ($numberRegistered) = $self->session->db->quickArray("select count(*) from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p
 	  	where r.purchaseId = p.purchaseId and r.productId=".$self->session->db->quote($event->{'productId'}));
 	  $eventFields{'numberRegistered'} = $numberRegistered;
 	  $eventFields{'maximumAttendees'} = $event->{'maximumAttendees'};
 	  $eventFields{'seatsRemaining'} = $event->{'maximumAttendees'} - $numberRegistered;
 	  $eventFields{'eventIsFull'} = ($eventFields{'seatsRemaining'} == 0);
-
+	  
 	  if ($eventFields{'eventIsFull'}) {
 	  	$eventFields{'purchase.label'} = $i18n->get('sold out');
 	  }
 	  else {
-	  	$eventFields{'purchase.url'} = $self->getUrl('func=addToCart;pid='.$event->{'productId'});
+	  	#$eventFields{'purchase.url'} = $self->getUrl('func=addToCart;isMaster=1;pid='.$event->{'productId'});
+		$eventFields{'purchase.message'} = "Would you like to see available subevents?";
+		$eventFields{'purchase.wantToSearch.url'} = $self->getUrl('func=search;cfilter_s0=requirement;cfilter_c0=eq;subSearch=1;cfilter_t0='.$event->{productId});
+	        $eventFields{'purchase.wantToContinue.url'} = $self->getUrl('func=addToCart;pid='.$event->{productId});
 	  	$eventFields{'purchase.label'} = $i18n->get('add to cart');
 	  }
 	  push (@events, {'event' => $self->processTemplate(\%eventFields, $event->{'templateId'}) });	  
 	} 
-	$var{'checkout.url'} = $self->getUrl('op=viewCart');
+	$var{'checkout.url'} = $self->getUrl('op=viewCart');			
+
 	$var{'checkout.label'} = $i18n->get('checkout');
 	$var{'events_loop'} = \@events;
 	$var{'paginateBar'} = $p->getBarTraditional;
