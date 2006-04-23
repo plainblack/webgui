@@ -318,7 +318,6 @@ sub checkConflicts {
 		order by startDate"
 	);
 	
-	
 	# Build our schedule
 	while (my $scheduleData = $sth->hashRef) {
 	
@@ -771,6 +770,10 @@ sub getBadgeSelector {
 		#badges we have purchased.
 		$badges = $self->session->db->buildHashRef("select b.badgeId, CONCAT(b.lastName,', ',b.firstName) from EventManagementSystem_badges as b where b.userId='".$me."' or b.createdByUserId='".$me."' order by b.lastName");
 	}
+	if ($addBadgeId) {
+		$badges = $self->session->db->buildHashRef("select badgeId, CONCAT(lastName,', ',firstName) from EventManagementSystem_badges where badgeId=?",[$addBadgeId]);
+		%options = ();
+	}
 	my $js;
 	my %badgeJS;
 	my $defaultBadge;
@@ -788,10 +791,10 @@ sub getBadgeSelector {
 	</script>';
 	%options = (%options,%{$badges});
 	$output .= WebGUI::Form::selectBox($self->session,{
-		name => ($addBadgeId ? 'badgeIdWrong' : 'badgeId'),
+		name => 'badgeId',
 		options => \%options,
 		value => ($addBadgeId ? $addBadgeId : $defaultBadge),
-		extras => 'onchange="swapBadgeInfo(this.value)" onkeyup="swapBadgeInfo(this.value)"'.($addBadgeId ? ' disabled="disabled"' : '')
+		extras => 'onchange="swapBadgeInfo(this.value)" onkeyup="swapBadgeInfo(this.value)"'
 	}).($addBadgeId ? WebGUI::Form::hidden($self->session,{
 		name => 'badgeId',value=>$addBadgeId
 	}) : '');
@@ -1417,7 +1420,7 @@ sub www_addToCart {
 		}
 		else {  # A single id, i.e., a master event
 			my $newPid = $self->session->form->get("pid") || $pid;
-			push(@pids, $newPid) unless ($pid eq "_noid_");
+			push(@pids, $newPid) unless ($newPid eq "_noid_");
 		}
 
 		foreach my $eventId (@pids) {
@@ -2033,19 +2036,24 @@ sub www_viewPurchase {
 	my $sql = "select distinct(r.purchaseId), b.* from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_purchases as t where r.badgeId=b.badgeId and r.purchaseId=t.purchaseId and t.transactionId=? order by b.lastName";
 	my $sth = $self->session->db->read($sql,[$tid]);
 	my @purchasesLoop;
+	$var{canReturnTransaction} = 0;
 	while (my $purchase = $sth->hashRef) {
 		my $badgeId = $purchase->{badgeId};
 		my $pid = $purchase->{purchaseId};
 		my $sql2 = "select r.registrationId, p.title, p.description, p.price, p.templateId, r.returned, e.approved, e.maximumAttendees, e.startDate, e.endDate from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e, products as p where p.productId = r.productId and p.productId = e.productId and r.badgeId=? and r.purchaseId=? group by r.registrationId order by b.lastName";
 		my $sth2 = $self->session->db->read($sql2,[$badgeId,$pid]);
 		$purchase->{regLoop} = [];
+		$purchase->{canReturnItinerary} = 0;
 		while (my $reg = $sth2->hashRef) {
 			$reg->{startDateHuman} = $self->session->datetime->epochToHuman($reg->{'startDate'});
 			$reg->{endDateHuman} = $self->session->datetime->epochToHuman($reg->{'endDate'});
+			$purchase->{canReturnItinerary} = 1 unless $reg->{'returned'};
 			push(@{$purchase->{regLoop}},$reg);
 		}
+		$var{canReturnTransaction} = 1 if $purchase->{canReturnItinerary};
 		push(@purchasesLoop,$purchase);
 	}
+	
 	$var{viewPurchaseTitle} = $i18n->get('view purchase');
 	$var{canReturn} = $isAdmin;
 	$var{transactionId} = $tid;
@@ -2076,7 +2084,12 @@ sub www_addEventsToBadge {
 	$self->session->scratch->set('EMS_add_purchase_events',join("\n",@pastEvents));
 	$self->session->scratch->delete('EMS_scratch_cart');
 	$self->session->scratch->set('EMS_scratch_cart',join("\n",@pastEvents));
-	$self->session->http->setRedirect($self->getUrl."?func=addToCart;method=addEventsToBadge");
+	my @mainEvents = $self->session->db->buildArray("select distinct(p.productId) from products as p, EventManagementSystem_products as e where p.productId = e.productId and approved=1 and e.assetId =? and p.productId not in (select distinct(productId) from EventManagementSystem_prerequisites) order by sequenceNumber",[$self->get("assetId")]);
+	my $mainEvent; # here we have to guess as to which main event they bought.
+	foreach(@mainEvents) {
+		$mainEvent = $_ if isIn($_,@pastEvents);
+	}
+	$self->session->http->setRedirect($self->getUrl."?func=search;cfilter_s0=requirement;cfilter_c0=eq;subSearch=1;cfilter_t0=".$mainEvent);
 	return 1;
 }
 
@@ -2520,7 +2533,7 @@ sub www_search {
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	
 	my $language  = $i18n->getLanguage(undef,"languageAbbreviation");
-	$var{'calendarJS'} = '<script type="text/javascript" src="'.$self->session->config->get('extrasURL').'/calendar/calendar.js"></script><script type="text/javascript" src="'.$self->session->config->get('extrasURL').'/calendar/lang/calendar-'.$language.'.js"></script><script type="text/javascript" src="'.$self->session->config->get('extrasURL').'/calendar/calendar-setup.js"></script><link href="'.$self->session->config->get('extrasURL').'/calendar/calendar-win2k-1.css" rel="stylesheet" type="text/css" />"';
+	$var{'calendarJS'} = '<script type="text/javascript" src="'.$self->session->config->get('extrasURL').'/calendar/calendar.js"></script><script type="text/javascript" src="'.$self->session->config->get('extrasURL').'/calendar/lang/calendar-'.$language.'.js"></script><script type="text/javascript" src="'.$self->session->config->get('extrasURL').'/calendar/calendar-setup.js"></script>';
 	
 	#Get the eventIds of valid prereqs if we're in prereq mode
 	#Put the productIds of valid prereqs into a list so we can return only valid prereq choices in our search
@@ -2529,9 +2542,6 @@ sub www_search {
 			push (@prerequisiteList, $_);
 		}
 	}
-
-	# If we're at the view method there is no reason we should have anything in our scratch cart
-	# so let's empty it to prevent strange and awful things from happening
 
 	push(@keys,$keywords) if $keywords;
 	unless ($keywords =~ /^".*"$/) {
@@ -2693,6 +2703,7 @@ sub www_search {
 		my $shouldPush = 1;
 		my $eventId = $data->{productId};
 		my $requiredList = $self->verifyAllPrerequisites($eventId);
+		print "\nrequiredList: ".join(',',@$requiredList)." productId: ".$eventId;
 		if ($seatsAvailable ne 'none') {
 			my ($numberRegistered) = $self->session->db->quickArray("select count(*) from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p
 	  	where r.purchaseId = p.purchaseId and r.returned=0 and r.productId=".$self->session->db->quote($eventId));
@@ -2711,7 +2722,7 @@ sub www_search {
 			}
 		}
 		foreach (keys %reqHash) {
-			$shouldPush = 0 unless isIn(@{$requiredList},$_);
+			$shouldPush = 0 unless isIn($_,@{$requiredList});
 		}
 		if ($managePrereqs) { #prereq mode
 			#$self->session->errorHandler->warn("prereq list<pre>".Dumper(@prerequisiteList)."</pre>");
@@ -2887,7 +2898,7 @@ sub view {
 	  $eventFields{'description'} = $event->{'description'};
 	  $eventFields{'price'} = '$'.$event->{'price'};
 	  my ($numberRegistered) = $self->session->db->quickArray("select count(*) from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p
-	  	where r.purchaseId = p.purchaseId and r.productId=".$self->session->db->quote($event->{'productId'}));
+	  	where r.purchaseId = p.purchaseId and r.returned=0 and r.productId=".$self->session->db->quote($event->{'productId'}));
 	  $eventFields{'numberRegistered'} = $numberRegistered;
 	  $eventFields{'maximumAttendees'} = $event->{'maximumAttendees'};
 	  $eventFields{'seatsRemaining'} = $event->{'maximumAttendees'} - $numberRegistered;
