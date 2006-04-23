@@ -143,7 +143,9 @@ sub doUserSearch {
 	}
 }
 
-=head2 doUserSearchForm ( $session, $op, $params )
+#-------------------------------------------------------------------
+
+=head2 doUserSearchForm ( session, op, params, noStatus )
 
 Form front-end and display for searching for users.
 
@@ -155,13 +157,17 @@ The name of the calling operation, passed so that pagination links work correctl
 
 Hashref.  A set of key,value pairs that will be hidden in the user search form.
 
+=head3 noStatus
+
+Don't display the status filter.
+
 =cut
 
-#-------------------------------------------------------------------
 sub getUserSearchForm {
 	my $session = shift;
 	my $op = shift;
 	my $params = shift;
+	my $noStatus = shift;
 	$session->scratch->set("userSearchKeyword",$session->form->process("keyword"));
 	$session->scratch->set("userSearchStatus",$session->form->process("status"));
 	$session->scratch->set("userSearchModifier",$session->form->process("modifier"));
@@ -195,18 +201,25 @@ sub getUserSearchForm {
 		-name=>"keyword",
 		-value=>$session->scratch->get("userSearchKeyword"),
 		-size=>15
-		)
-	.WebGUI::Form::selectBox($session,
-		-name	=> "status",
-		-value	=> ($session->scratch->get("userSearchStatus") || "users.status like '%'"),
-		-options=> { 
-			""		=> $i18n->get(821),
-			Active		=> $i18n->get(817),
-			Deactivated	=> $i18n->get(818),
-			Selfdestructed	=> $i18n->get(819)
-			}
-	)
-	.WebGUI::Form::submit($session,value=>$i18n->get(170))
+		);
+	if ($noStatus) {	
+		$output .= WebGUI::Form::hidden($session,
+                        name => "status",
+                        value => "Active"
+                        );
+	} else {
+		$output .= WebGUI::Form::selectBox($session,
+			-name	=> "status",
+			-value	=> ($session->scratch->get("userSearchStatus") || "users.status like '%'"),
+			-options=> { 
+				""		=> $i18n->get(821),
+				Active		=> $i18n->get(817),
+				Deactivated	=> $i18n->get(818),
+				Selfdestructed	=> $i18n->get(819)
+				}
+		);
+	}
+	$output .= WebGUI::Form::submit($session,value=>$i18n->get(170))
 	.WebGUI::Form::formFooter($session,);
 	$output .= '</div>';
 	return $output;
@@ -510,6 +523,33 @@ sub www_editUserKarmaSave {
         $u->karma($session->form->process("amount"),$session->user->username." (".$session->user->userId.")",$session->form->process("description"));
         return www_editUser();
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_formUsers ( $session )
+
+Form helper to pick a user from the system.
+
+=cut
+
+sub www_formUsers {
+	my $session = shift;
+	$session->http->setCacheControl("none");
+	return $session->privilege->insufficient() unless $session->user->isInGroup(12);
+	$session->style->useEmptyStyle("1");
+	my $output = getUserSearchForm($session,"formUsers",undef,1);
+	my ($userCount) = $session->db->quickArray("select count(*) from users");
+	return $output unless ($session->form->process("doit") || $userCount<250 || $session->form->process("pn") > 1);
+	$output .= '<ul>';
+	my $p = doUserSearch($session,"formUsers",1);
+	foreach my $data (@{$p->getPageData}) {
+		$output .= '<li><a href="#" onclick="window.opener.document.getElementById(\''.$session->form->process("formId").'\').value=\''.$data->{userId}.'\';window.opener.document.getElementById(\''.$session->form->process("formId").'_display\').value=\''.$data->{username}.'\';window.close();">'.$data->{username}.'</a></li>';
+	}
+        $output .= '</ul>';
+        $output .= $p->getBarTraditional;
+	return $output;
+}
+
 
 #-------------------------------------------------------------------
 sub www_listUsers {

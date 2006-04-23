@@ -221,7 +221,7 @@ sub definition {
                                         defaultValue=>'7'
                                         },
                                 ownerUserId=>{
-                                        fieldType=>'selectBox',
+                                        fieldType=>'user',
                                         defaultValue=>'3'
                                         },
 				status=>{
@@ -605,22 +605,11 @@ sub getEditForm {
         } else {
                  $subtext = "";
         }
-        my $clause;
-        if ($self->session->user->isInGroup(3)) {
-        	my $group = WebGUI::Group->new($self->session,4);
-                my $contentManagers = $group->getAllUsers();
-                push (@$contentManagers, $self->session->user->userId);
-                $clause = "userId in (".$self->session->db->quoteAndJoin($contentManagers).")";
-        } else {
-                $clause = "userId=".$self->session->db->quote($self->get("ownerUserId"));
-        }
-        my $users = $self->session->db->buildHashRef("select userId,username from users where $clause order by username");
-        $tabform->getTab("security")->selectBox(
+        $tabform->getTab("security")->user(
                -name=>"ownerUserId",
-               -options=>$users,
                -label=>$i18n->get(108),
 		-hoverHelp=>$i18n->get('108 description'),
-               -value=>[$self->get("ownerUserId")],
+               -value=>$self->get("ownerUserId"),
                -subtext=>$subtext,
                -uiLevel=>6
                );

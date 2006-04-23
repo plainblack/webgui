@@ -40,7 +40,7 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 create ( session, properties [, id ] ) 
+=head2 create ( session, properties ) 
 
 Creates a new workflow instance and returns a reference to the object. Will return undef if the workflow specified is serial and an instance of it already exists.
 
@@ -52,22 +52,17 @@ A reference to the current session.
 
 The settable properties of the workflow instance. See the set() method for details.
 
-=head3 id
-
-Normally an ID will be generated for you, but if you want to override this and provide your own 22 character id, then you can specify it here.
-
 =cut
 
 sub create {
 	my $class = shift;
 	my $session = shift;
 	my $properties = shift;
-	my $id = shift;
 	my ($isSingleton) = $session->db->quickArray("select isSingleton from Workflow where workflowId=?",[$properties->{workflowId}]);
 	my $params = (exists $properties->{parameters}) ? JSON::objToJson({parameters => $properties->{parameters}}) : undef;
 	my ($count) = $session->db->quickArray("select count(*) from WorkflowInstance where workflowId=? and parameters=?",[$properties->{workflowId},$params]);
 	return undef if ($isSingleton && $count);
-	my $instanceId = $session->db->setRow("WorkflowInstance","instanceId",{instanceId=>"new", runningSince=>time()}, $id);
+	my $instanceId = $session->db->setRow("WorkflowInstance","instanceId",{instanceId=>"new", runningSince=>time()});
 	my $self = $class->new($session, $instanceId);
 	$properties->{notifySpectre} = 1 unless ($properties->{notifySpectre} eq "0");
 	$self->set($properties);

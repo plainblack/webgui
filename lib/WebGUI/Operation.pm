@@ -265,6 +265,7 @@ sub getOperations {
 		'editUserSave' => 'WebGUI::Operation::User',
 		'editUserKarma' => 'WebGUI::Operation::User',
 		'editUserKarmaSave' => 'WebGUI::Operation::User',
+		'formUsers' => 'WebGUI::Operation::User',
 		'listUsers' => 'WebGUI::Operation::User',
 
 		'approveVersionTag' => 'WebGUI::Operation::VersionTag',

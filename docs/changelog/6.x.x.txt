@@ -44,6 +44,7 @@
  - Converted WebGUI to use a new object oriented session system. More details
    in migation.txt.
  - Added a sort alphabetically option to the folder asset.
+ - Added a User form field type.
  - Added a symbol next to items in the asset manager to indicate if they have
    children or not.
  - Added more templating options to the Paginator thanks to Jukka Raimovaara.

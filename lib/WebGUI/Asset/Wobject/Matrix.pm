@@ -576,8 +576,7 @@ sub www_editListing {
 		-label=>$i18n->get('description'),
 		);
         if ($self->canEdit) {
-		$f->selectBox(
-			options=>$self->session->db->buildHashRef("select userId,username from users order by username"),
+		$f->user(
 			name=>"maintainerId",
 			value=>$listing->{maintainerId},
 			label=>$i18n->get('listing maintainer'),
