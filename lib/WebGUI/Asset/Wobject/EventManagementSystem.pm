@@ -2681,8 +2681,10 @@ sub www_search {
 	$var{'search.formSubmit'} = WebGUI::Form::submit($self->session, {name=>"filter",value=>$i18n->get('filter')});
 	my $searchUrl = $self->getUrl("a=1");  #a=1 is a hack to get the ? appended to the url in the right place.  This param/value does nothing.
 	my $formVars = $self->session->form->paramsHashRef();
+	my @paramsUsed;
 	foreach ($self->session->form->param) {
-		$searchUrl .= ';'.$_.'='.$formVars->{$_} if (($_ ne 'pn') && ($formVars->{$_} || $formVars->{$_} eq '0'));
+		$searchUrl .= ';'.$_.'='.$formVars->{$_} if (($_ ne 'pn') && ($formVars->{$_} || $formVars->{$_} eq '0') && !isIn(@paramsUsed, $_) && $_ ne "a");
+		push (@paramsUsed, $_);
 	}
 	my $p = WebGUI::Paginator->new($self->session,$searchUrl,$self->get("paginateAfter"));
 	my (@results, $sth, $data);
