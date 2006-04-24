@@ -174,7 +174,7 @@ sub www_editProfile {
 	return WebGUI::Operation::Auth::www_auth($session,"init") if($session->user->userId eq '1');
 	my $i18n = WebGUI::International->new($session);
 	my $vars = {};
-	$vars->{displayTitle} .= '<h1>'.$i18n->get(338).'</h1>';
+	$vars->{displayTitle} .= $i18n->get(338);
 	$vars->{'profile.message'} = $_[0] if($_[0]);
 	$vars->{'profile.form.header'} = "\n\n".WebGUI::Form::formHeader($session,{});
 	$vars->{'profile.form.footer'} = WebGUI::Form::formFooter($session,);
@@ -248,7 +248,7 @@ sub www_viewProfile {
 	my $u = WebGUI::User->new($session,$session->form->process("uid"));
 	my $i18n = WebGUI::International->new($session);
 	my $vars = {};
-	$vars->{displayTitle} = '<h1>'.$i18n->get(347).' '.$u->username.'</h1>';
+	$vars->{displayTitle} = $i18n->get(347).' '.$u->username;
 
 	return $session->privilege->notMember() if($u->username eq "");
 
