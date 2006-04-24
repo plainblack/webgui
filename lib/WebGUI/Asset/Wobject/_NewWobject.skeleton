@@ -14,16 +14,9 @@ $VERSION = "1.0.0";
 
 use strict;
 use Tie::IxHash;
-use WebGUI::ErrorHandler;
 use WebGUI::International;
-use WebGUI::Privilege;
-use WebGUI::Session;
-use WebGUI::SQL;
-use WebGUI::URL;
 use WebGUI::Utility;
-use WebGUI::Asset::Wobject;
-
-our @ISA = qw(WebGUI::Asset::Wobject);
+use base 'WebGUI::Asset::Wobject';
 
 #-------------------------------------------------------------------
 =head2 definition
