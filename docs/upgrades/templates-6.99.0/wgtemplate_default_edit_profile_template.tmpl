@@ -1,0 +1,55 @@
+#PBtmpl0000000000000051
+<tmpl_var displayTitle>
+
+<tmpl_if profile.message>
+   <tmpl_var profile.message>
+</tmpl_if>
+
+<tmpl_var profile.form.header>
+<tmpl_var profile.form.hidden>
+<table >
+<tmpl_loop profile.form.elements>
+     <tr>
+       <td class="tableHeader" valign="top" colspan="2">
+         <tmpl_var profile.form.category>
+       </td>
+     </tr>
+ 
+ <tmpl_loop profile.form.category.loop>
+   <tr>
+    <td class="formDescription" valign="top">
+      <tmpl_var profile.form.element.label>
+    </td>
+    <td class="tableData">
+      <tmpl_var profile.form.element>
+      <tmpl_if profile.form.element.subtext>
+        <span class="formSubtext">
+         <tmpl_var profile.form.element.subtext>
+        </span>
+      </tmpl_if>
+    </td>
+   </tr>
+ </tmpl_loop>
+</tmpl_loop>
+<tmpl_loop create.form.profile>
+<tr>
+   <td class="formDescription" valign="top"><tmpl_var profile.formElement.label></td>
+   <td class="tableData"><tmpl_var profile.formElement></td>
+</tr>
+</tmpl_loop>
+<tr>
+ <td class="formDescription" valign="top"></td>
+ <td class="tableData">
+     <tmpl_var profile.form.submit>
+ </td>
+</tr>
+</table>
+<tmpl_var profile.form.footer>
+
+<div class="accountOptions">
+   <ul>
+      <tmpl_loop profile.accountOptions>
+         <li><tmpl_var options.display></li>
+      </tmpl_loop>
+   </ul>
+</div>

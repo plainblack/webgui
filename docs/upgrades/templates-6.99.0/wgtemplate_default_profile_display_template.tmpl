@@ -1,0 +1,49 @@
+#PBtmpl0000000000000052
+<tmpl_var displayTitle>
+
+<table>
+  <tmpl_loop profile.elements>
+
+    <tmpl_if profile.category>
+	<tr>
+	  <td colspan="2">&nbsp;</td>
+	</tr>
+	<tr>
+      <td colspan="2" class="tableHeader">
+        <tmpl_var profile.category>
+      </td>
+	</tr>
+    <tmpl_else>
+	<tr>
+      <td class="tableCategory">
+         <tmpl_var profile.label>
+      </td>
+      <td class="tableData">
+         <tmpl_var profile.value>
+      </td>    
+	</tr>
+    </tmpl_if>   
+
+  </tmpl_loop>
+</table>
+<div class="accountOptions">
+   <ul>
+      <tmpl_loop profile.accountOptions>
+         <li><tmpl_var options.display></li>
+      </tmpl_loop>
+   </ul>
+</div>
+~~~
+<style type="text/css">
+.tableHeader {
+	background-color:#F0F0F0;
+	border-bottom:solid gray 1px;
+	font-weight:bold;	
+}
+.tableCategory {
+	background-color:#F0F0F0;	
+}
+.tableData {
+	border-bottom:solid #F0F0F0 1px;
+}
+</style>
