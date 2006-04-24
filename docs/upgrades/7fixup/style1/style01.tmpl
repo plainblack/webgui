@@ -4,18 +4,23 @@
 #url:style_01
 #namespace:style
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<title>^Page(title);</title>
 	<tmpl_var head.tags>	
+	<link href="/css01.css" rel="stylesheet" type="text/css" />	
 </head>
 <body>
-	^AdminBar("PBtmpl0000000000000090");
+	^AdminBar();
 	<div id="main">
 		<div id="mainHeader">
 			<div id="title">
-				^c();
+				^H(^c(););
 			</div>
+			
+			<div id="copyright">
+				&copy; ^D(%y); ^c;
+			</div>			
 		</div>
 
 		<div id="mainContent">
@@ -39,11 +44,9 @@
 		<div id="gui">
 			^L("","","PBtmpl0000000000000044");
 			<div style="clear:both;padding-right:12px;">^AdminToggle;</div>
-			^AssetProxy(style1/gui_bottom.jpg);<br />
-			<a href="http://www.webgui.org"><img src="^FileUrl(style1/webgui_btn.jpg);" style="border:none;" alt="WebGUI Button" /></a>
+			^AssetProxy(style01/gui_bottom.jpg);<br />
+			<a href="http://www.plainblack.com/webgui"><img src="^FileUrl(style01/webgui_btn.jpg);" style="border:none;" alt="WebGUI Button" /></a>
 		</div>
 	</div>
 </body>
 </html>	
-~~~
-^AssetProxy(style01.css);
