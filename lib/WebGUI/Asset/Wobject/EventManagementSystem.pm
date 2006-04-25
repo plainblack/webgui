@@ -2435,8 +2435,8 @@ sub www_saveRegistration {
 		phone		 => $phoneNumber,
 		email		 => $email
 	};
-	$details->{userId} = $userId if $userId;
-	$details->{createdByUserId} = $self->session->var->get('userId') if $addingNew;
+	$details->{userId} = $userId if ($userId && $userId ne '1');
+	$details->{createdByUserId} = $self->session->var->get('userId') (if $addingNew && $userId ne '1');
 	$badgeId = $self->setCollateral("EventManagementSystem_badges", "badgeId",$details,0,0);
 	
 	my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
@@ -2459,7 +2459,7 @@ sub www_saveRegistration {
 	
 	my ($theirUserId) = $self->session->db->quickArray("select userId from EventManagementSystem_badges where badgeId=?",[$badgeId]);
 	$userId = $theirUserId unless $thisIsI;
-	if ($userId) {
+	if ($userId && $userId ne '1') {
 		my $u = WebGUI::User->new($self->session,$userId);
 		$u->profileField('firstName',$firstName);
 		$u->profileField('lastName',$lastName);
