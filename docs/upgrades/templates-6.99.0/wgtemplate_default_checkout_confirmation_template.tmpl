@@ -1,7 +1,8 @@
 #PBtmpl0000000000000016
 <a href="<tmpl_var viewShoppingCart.url>"><tmpl_var viewShoppingCart.label></a> &middot;
-<a href="<tmpl_var changePayment.url>"><tmpl_var changePayment.label></a> &middot; 
-<a href="<tmpl_var changeShipping.url>"><tmpl_var changeShipping.label></a><br />
+<a href="<tmpl_var changePayment.url>"><tmpl_var changePayment.label></a>
+<tmpl_if hasMultipleShipping>&middot;<a href="<tmpl_var changeShipping.url>"><tmpl_var changeShipping.label></a></tmpl_if>
+<br />
 <br>
 
 <tmpl_var title><br>
