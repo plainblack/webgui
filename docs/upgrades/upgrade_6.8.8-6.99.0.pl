@@ -909,6 +909,8 @@ sub changeDbCacheTimeoutName {
 
 #-------------------------------------------------
 sub addScratchKeys {
+	print "\tClearing user session scratch table to add keys.\n";
+	$session->db->write("delete from userSessionScratch");
 	print "\tAssigning keys to userSessionScratch.\n" unless ($quiet);
 	$session->db->write("alter table userSessionScratch ADD PRIMARY KEY (sessionId, name)");
 }

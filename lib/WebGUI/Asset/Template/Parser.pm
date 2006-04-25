@@ -43,7 +43,7 @@ sub addSessionVars {
 	$vars->{"session.setting.anonymousRegistration"} = $self->session->setting->get("anonymousRegistration");
 	my $forms = $self->session->form->paramsHashRef();
 	foreach my $field (keys %$forms) {
-		if $forms->{$field} {
+		if ($forms->{$field}) {
 			$vars->{"session.form.".$field} = 
 				(ref($forms->{$field}) eq 'ARRAY')
 					?$forms->{$field}[$forms->{$field}[-1]]

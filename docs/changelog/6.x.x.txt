@@ -124,6 +124,7 @@
  - fix [ 1340839 ] If can't use item in adminConsole don't display it
  - Added SQL Form and error feedback for asset addition (Martin Kamerbeek/Procolix)
  - Added file upload ability to the rich text editor (Wouter van Oijen/ProcoliX)
+ - fix [ 1473937 ] scratch->set not taking.
 
 6.8.8
  - fix [ 1452466 ] File size not set in File asset (Thanks to Eric S)
