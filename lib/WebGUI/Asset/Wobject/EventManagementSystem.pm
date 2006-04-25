@@ -153,7 +153,8 @@ sub _matchPairs {
 	$hash{''} = $i18n->get('select one');
 	foreach (split("\n",$options)) {
 		my $val = $_;
-		$val =~ s/\s//g;
+		#$val =~ s/\s//g;
+		$val =~ s/\r//g;
 		$val =~ s/\n//g;
 		$hash{$val} = $val;
 	}
