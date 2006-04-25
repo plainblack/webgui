@@ -52,6 +52,7 @@ updateArticle();
 updateScratch();
 installSQLForm();
 addResizableTextareas();
+addScratchKeys();
 
 finish($session); # this line required
 
@@ -904,6 +905,12 @@ sub addDisabletoRichEditor {
 sub changeDbCacheTimeoutName {
 	print "\tChanging dbCacheTimeout to groupCacheTimeout.\n" unless ($quiet);
 	$session->db->write("alter table groups change dbCacheTimeout groupCacheTimeout int not null default 3600");
+}
+
+#-------------------------------------------------
+sub addScratchKeys {
+	print "\tAssigning keys to userSessionScratch.\n" unless ($quiet);
+	$session->db->write("alter table userSessionScratch ADD PRIMARY KEY (sessionId, name)");
 }
 
 #-------------------------------------------------
