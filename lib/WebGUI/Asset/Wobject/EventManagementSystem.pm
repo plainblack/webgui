@@ -2567,7 +2567,7 @@ sub www_search {
 		foreach (@keys) {
 			$searchPhrases .= ' and ' if $count;
 			my $val = $self->session->db->quote('%'.$_.'%');
-			$searchPhrases .= "(p.title like $val or p.description like $val)";
+			$searchPhrases .= "(p.title like $val or p.description like $val or p.sku like $val)";
 			$count++;
 		}
 		#$searchPhrases .= " )";
@@ -2577,12 +2577,10 @@ sub www_search {
 	my $seatsAvailable = 'none';
 	my $seatsCompare;
 	if ($self->session->form->get("advSearch") || $self->session->form->get("subSearch") || $subSearchFlag) {
-		$searchPhrases = '';
 		my $fields = $self->_getFieldHash();
 		my $count = 0;
-		if ($self->session->form->get("subSearch")) {
-				$count = 1;
-				$searchPhrases = $basicSearch;
+		if ($basicSearch ne "") {
+		   $count = 1;
 		}
 		for (my $cfilter = 0; $cfilter < 50; $cfilter++) {
 			my $value;
