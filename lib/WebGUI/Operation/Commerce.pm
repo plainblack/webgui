@@ -305,8 +305,14 @@ sub www_checkoutConfirm {
 	
 	$var{'changePayment.url'} = $session->url->page('op=selectPaymentGateway');
 	$var{'changePayment.label'} = $i18n->get('change payment gateway');
-	$var{'changeShipping.url'} = $session->url->page('op=selectShippingMethod');
-	$var{'changeShipping.label'} = $i18n->get('change shipping method');
+	
+	my $plugins = WebGUI::Commerce::Shipping->getEnabledPlugins($session);
+    if (scalar(@$plugins) > 1) {
+       $var{'changeShipping.url'} = $session->url->page('op=selectShippingMethod');
+       $var{'changeShipping.label'} = $i18n->get('change shipping method');
+       $var{'hasMultipleShipping'} = "true";
+    }
+	
 	$var{'viewShoppingCart.url'} = $session->url->page('op=viewCart');
 	$var{'viewShoppingCart.label'} = $i18n->get('view shopping cart');
 
@@ -1090,13 +1096,14 @@ sub www_viewCart {
 
 	foreach (@$normal) {
 		$_->{deleteIcon} = $session->icon->delete('op=deleteCartItem;itemId='.$_->{item}->id.';itemType='.$_->{item}->type);
-		$_->{'quantity.form'} = WebGUI::Form::integer($session,{
+		$_->{'quantity.form'} = WebGUI::Form::integer($session, {
 			name	=> 'quantity~'.$_->{item}->type.'~'.$_->{item}->id,
 			value	=> $_->{quantity},
 			size	=> 3,
 		});
 		$total += $_->{totalPrice};
 	}
+	
 	foreach (@$recurring) {
 		$_->{deleteIcon} = $session->icon->delete('op=deleteCartItem;itemId='.$_->{item}->id.';itemType='.$_->{item}->type);
 		$_->{'quantity.form'} = WebGUI::Form::integer($session,{
