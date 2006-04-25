@@ -114,6 +114,7 @@ sub _getFieldHash {
 	# automatically.
 	my $fieldList = $self->getEventMetaDataArrayRef;
 	foreach my $field (@{$fieldList}) {
+	    next unless $field->{visible};
 		my $dataType = $field->{dataType};
 		my $compare = $self->_matchTypes($dataType);
 		my $type;
