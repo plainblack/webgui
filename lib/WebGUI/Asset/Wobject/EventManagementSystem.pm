@@ -1721,10 +1721,17 @@ sub www_editEvent {
 		if($dataType eq "selectList" || $dataType eq "selectBox") {
 			$options = {"", $i18n3->get("Select")};
 		}
+		
+		my $val = $self->session->form->process("metadata_".$meta->{$field->{fieldId}}{fieldId},$dataType);
+		
+		if(!$val || (ref $val eq "ARRAY" && scalar(@{$val}) == 0 ) ) {
+		  $val = $meta->{$field->{fieldId}}{fieldData};
+		}
+		
 		$f->dynamicField(
 			name=>"metadata_".$meta->{$field->{fieldId}}{fieldId},
 			label=>$meta->{$field->{fieldId}}{label},
-			value=>($self->session->form->process("metadata_".$meta->{$field->{fieldId}}{fieldId},$dataType) || $meta->{$field->{fieldId}}{fieldData}),
+			value=>$val,
 			extras=>qq/title="$meta->{$field->{fieldId}}{label}"/,
 			possibleValues=>$meta->{$field->{fieldId}}{possibleValues},
 			options=>$options,
