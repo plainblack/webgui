@@ -1,0 +1,8 @@
+#title:Style3 Coolmenu
+#menuTitle:Style3 Coolmenu
+#url:style3_coolmenu
+#startPointType:relativeToRoot
+#startPoint:1
+#relativesToInclude:descendants
+#descendantEndPoint:infinity
+#templateId:stevecoolmenu000000001
