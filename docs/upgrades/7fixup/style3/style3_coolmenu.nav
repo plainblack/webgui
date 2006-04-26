@@ -4,5 +4,7 @@
 #startPointType:relativeToRoot
 #startPoint:1
 #relativesToInclude:descendants
-#descendantEndPoint:infinity
+#descendantEndPoint:55
+#displayTitle:0
+#ancestorEndPoint:55
 #templateId:stevecoolmenu000000001
