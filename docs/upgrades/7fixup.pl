@@ -30,6 +30,9 @@ sub addNewContent {
 	my $home = WebGUI::Asset->getDefault($session);
 	$home->addChild({
 		className=>"WebGUI::Asset::Wobject::Article",
+		styleTemplateId=>"stevestyle000000000003",
+		printableStyleTemplateId=>"stevestyle000000000003",
+		isHidden=>1,
 		title=>"Welcome",
 		menuTitle=>"Welcome",
 		url=>"home/welcome",
@@ -43,8 +46,11 @@ sub addNewContent {
 		});
 	$home->addChild({
 		className=>"WebGUI::Asset::Wobject::Article",
+		styleTemplateId=>"stevestyle000000000003",
+		printableStyleTemplateId=>"stevestyle000000000003",
 		title=>"Key Benefits",
 		menuTitle=>"Key Benefits",
+		isHidden=>1,
 		url=>"home/key-benefits",
 		ownerUserId=>'3',
 		groupIdView=>'7',
@@ -71,7 +77,10 @@ sub addNewContent {
 	my $gs = WebGUI::Asset->new($session,"_iHetEvMQUOoxS-T2CM0sQ","WebGUI::Asset::Wobject::Layout");
 	$gs->addChild({
 		className=>"WebGUI::Asset::Wobject::Article",
+		styleTemplateId=>"stevestyle000000000003",
+		printableStyleTemplateId=>"stevestyle000000000003",
 		title=>"Getting Started",
+		isHidden=>1,
 		menuTitle=>"Getting Started",
 		url=>"getting_started/getting-started",
 		ownerUserId=>'3',
@@ -105,8 +114,11 @@ Enjoy your new WebGUI site!
 	my $yns = WebGUI::Asset->new($session, "8Bb8gu-me2mhL3ljFyiWLg", "WebGUI::Asset::Wobject::Layout");
 	$yns->addChild({
 		className=>"WebGUI::Asset::Wobject::Article",
+		styleTemplateId=>"stevestyle000000000003",
+		printableStyleTemplateId=>"stevestyle000000000003",
 		title=>"Talk to the Experts",
-		menuTitle=>"Talk to the Expoerts",
+		menuTitle=>"Talk to the Experts",
+		isHidden=>1,
 		url=>"yns/experts",
 		ownerUserId=>'3',
 		groupIdView=>'7',
@@ -117,7 +129,10 @@ Enjoy your new WebGUI site!
 	$yns->addChild({
 		className=>"WebGUI::Asset::Wobject::Article",
 		title=>"Get Documentation",
+		styleTemplateId=>"stevestyle000000000003",
+		printableStyleTemplateId=>"stevestyle000000000003",
 		menuTitle=>"Get Documentation",
+		isHidden=>1,
 		url=>"yns/docs",
 		ownerUserId=>'3',
 		groupIdView=>'7',
@@ -127,8 +142,11 @@ Enjoy your new WebGUI site!
 		});
 	$yns->addChild({
 		className=>"WebGUI::Asset::Wobject::Article",
+		styleTemplateId=>"stevestyle000000000003",
+		printableStyleTemplateId=>"stevestyle000000000003",
 		title=>"Get Support",
 		menuTitle=>"Get Support",
+		isHidden=>1,
 		url=>"yns/support",
 		ownerUserId=>'3',
 		groupIdView=>'7',
@@ -138,7 +156,10 @@ Enjoy your new WebGUI site!
 		});
 	$yns->addChild({
 		className=>"WebGUI::Asset::Wobject::Article",
+		styleTemplateId=>"stevestyle000000000003",
+		printableStyleTemplateId=>"stevestyle000000000003",
 		title=>"Get Hosting",
+		isHidden=>1,
 		menuTitle=>"Get Hosting",
 		url=>"yns/hosting",
 		ownerUserId=>'3',
@@ -149,7 +170,10 @@ Enjoy your new WebGUI site!
 		});
 	$yns->addChild({
 		className=>"WebGUI::Asset::Wobject::Article",
+		styleTemplateId=>"stevestyle000000000003",
+		printableStyleTemplateId=>"stevestyle000000000003",
 		title=>"Get Style",
+		isHidden=>1,
 		menuTitle=>"Get Style",
 		url=>"yns/style",
 		ownerUserId=>'3',
@@ -161,6 +185,9 @@ Enjoy your new WebGUI site!
 	$yns->addChild({
 		className=>"WebGUI::Asset::Wobject::Article",
 		title=>"Get Features",
+		styleTemplateId=>"stevestyle000000000003",
+		printableStyleTemplateId=>"stevestyle000000000003",
+		isHidden=>1,
 		menuTitle=>"Get Features",
 		url=>"yns/features",
 		ownerUserId=>'3',
@@ -172,6 +199,9 @@ Enjoy your new WebGUI site!
 	$yns->addChild({
 		className=>"WebGUI::Asset::Wobject::Article",
 		title=>"Get Translated",
+		styleTemplateId=>"stevestyle000000000003",
+		printableStyleTemplateId=>"stevestyle000000000003",
+		isHidden=>1,
 		menuTitle=>"Get Translated",
 		url=>"yns/translated",
 		ownerUserId=>'3',
@@ -182,8 +212,11 @@ Enjoy your new WebGUI site!
 		});
 	$yns->addChild({
 		className=>"WebGUI::Asset::Wobject::Article",
+		styleTemplateId=>"stevestyle000000000003",
+		printableStyleTemplateId=>"stevestyle000000000003",
 		title=>"Get Promoted",
 		menuTitle=>"Get Promoted",
+		isHidden=>1,
 		url=>"yns/promotion",
 		ownerUserId=>'3',
 		groupIdView=>'7',
@@ -196,7 +229,7 @@ Enjoy your new WebGUI site!
 #-------------------------------------------------
 sub deleteOldContent {
 	print "\tDeleting old content\n";
-	foreach my $id (qw(TKzUMeIxRLrZ3NAEez6CXQ sWVXMZGibxHe2Ekj1DCldA x_WjMvFmilhX-jvZuIpinw  DC1etlIaBRQitXnchZKvUw wCIc38CvNHUK7aY92Ww4SQ)) {
+	foreach my $id (qw(PBtmpl0000000000000071 PBtmpl0000000000000075 f2bihDeMoI-Ojt2dutJNQA KZ2UytxNpbF-3Eg3RNvQQQ G0wlShbk_XruYVfbXqWq_w TKzUMeIxRLrZ3NAEez6CXQ sWVXMZGibxHe2Ekj1DCldA x_WjMvFmilhX-jvZuIpinw  DC1etlIaBRQitXnchZKvUw wCIc38CvNHUK7aY92Ww4SQ)) {
 		my $asset = WebGUI::Asset->newByDynamicClass($session, $id);
 		$asset->purge if (defined $asset);
 	}
