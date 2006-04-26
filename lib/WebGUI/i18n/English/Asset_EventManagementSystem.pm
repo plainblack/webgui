@@ -1130,6 +1130,23 @@ allows you to edit events,  delete events, or change their order.</p>
 		lastUpdated => 1145743634,
 	},
 
+	'registration info message' => {
+		message => q|<p>Enter Badge/Contact information for the series of events you are currently adding to the cart.</p>
+<p>If you are logged in, you can choose to update your own user profile with this information by choosing your name from the drop-down box, or if your name is not listed, choose the option "Create badge for myself".</p>
+<p>If you are making a purchase for someone else, select their name or select the "Create New for someone else" option from the drop-down box.  If you are adding items to a previous purchase, that badge is already selected, and cannot be changed.  If you make changes to the fields in this form for a badge that already exists, their information will be updated.</p>|,
+		lastUpdated => 1146074906,
+	},
+
+	'manage prerequisites' => {
+		message => q|Manage Prerequisites for this event|,
+		lastUpdated => 1146075135,
+	},
+
+	'add to badge message' => {
+		message => q|%s was added to your badge successfully.|,
+		lastUpdated => 1146075135,
+	},
+
 };
 
 1;

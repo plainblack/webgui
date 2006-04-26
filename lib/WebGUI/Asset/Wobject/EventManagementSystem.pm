@@ -901,7 +901,7 @@ sub getRegistrationInfo {
 	my $i18n = WebGUI::International->new($self->session, 'Asset_EventManagementSystem');
 	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
 			     .WebGUI::Form::hidden($self->session,{name=>"func",value=>"saveRegistration"});
-	$var{'form.message'} = 'Enter Badge/Contact information for the series of events you are currently adding to the cart.  <br /><br />If you are logged in, you can choose to update your own user profile with this information by choosing your name from the drop-down box, or if your name is not listed, choose the option "Create badge for myself".  <br /><br />If you are making a purchase for someone else, select their name or select the "Create New for someone else" option from the drop-down box.  If you are adding items to a previous purchase, that badge is already selected, and cannot be changed.  If you make changes to the fields in this form for a badge that already exists, their information will be updated.';
+	$var{'form.message'} = $i18n->get('registration info message');
 	$var{'form.footer'} = WebGUI::Form::formFooter($self->session);
 	$var{'form.submit'} = WebGUI::Form::submit($self->session);
 	$var{'form.firstName.label'} = $i18n->get("first name");
@@ -1779,7 +1779,7 @@ sub www_editEvent {
 		-hoverHelp => $i18n->get("add/edit event what next"),
 		-options => {
 #				"addAnotherPrereq" => $i18n->get("add/edit event add another prerequisite"),
-				"managePrereqs" => "Manage Prerequisites for this event",
+				"managePrereqs" => $i18n->get("manage prerequisites"),
 				"return"	   => $i18n->get("add/edit event return to manage events"),
 			    },
 		-defaultValue => "return"
@@ -2535,12 +2535,13 @@ sub www_search {
 	my $pn;
 	my $subSearchFlag;
 	my $showAllFlag;
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my $addToBadgeMessage;
 	if ($cfilter_t0 && $cfilter_s0 && $cfilter_c0) {
 		$pn = shift || 1;
 		$subSearchFlag = 1;
 		$showAllFlag = 1;
-		$addToBadgeMessage = "$eventAdded was added to your badge successfully.";
+		$addToBadgeMessage = sprintf $i18n->get('add to badge message'), $eventAdded;
 	}
 	
 	my $prerequisiteHash = $self->getPrerequisiteEventList($eventToAssignPrereqTo) if ($eventToAssignPrereqTo);
@@ -2551,7 +2552,6 @@ sub www_search {
 	my $joins;
 	my $selects;
 	my @joined;
-	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	
 	my $language  = $i18n->getLanguage(undef,"languageAbbreviation");
 	$var{'calendarJS'} = '<script type="text/javascript" src="'.$self->session->config->get('extrasURL').'/calendar/calendar.js"></script><script type="text/javascript" src="'.$self->session->config->get('extrasURL').'/calendar/lang/calendar-'.$language.'.js"></script><script type="text/javascript" src="'.$self->session->config->get('extrasURL').'/calendar/calendar-setup.js"></script>';
@@ -2962,9 +2962,4 @@ sub view {
 	return $self->processTemplate(\%var, undef, $self->{_viewTemplate});
 }
 
-
-
-
-
 1;
-
