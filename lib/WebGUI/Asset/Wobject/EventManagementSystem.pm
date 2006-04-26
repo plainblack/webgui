@@ -2901,7 +2901,7 @@ sub view {
 		   where
 		   	p.productId = e.productId and approved=1
 		   	and e.assetId =".$self->session->db->quote($self->get("assetId"))."
-			and p.prerequisiteId is NULL";
+			and e.prerequisiteId is NULL";
 			#and p.productId not in (select distinct(productId) from EventManagementSystem_prerequisites) order by sequenceNumber";		
 
 	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->get("paginateAfter"));
