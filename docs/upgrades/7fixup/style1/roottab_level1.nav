@@ -1,9 +1,9 @@
 #title:RootTab Level 1
 #menuTitle:RootTab Level 1
 #url:roottab_level1
-#startPointType:relativeToRoot
+#startType:relativeToRoot
 #startPoint:2
-#relativesToInclude:descendants
+#assetsToInclude:descendants
 #descendantEndPoint:1
 #templateId:PBnav000000style01lvl2
 #displayTitle:0

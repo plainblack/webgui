@@ -300,7 +300,7 @@ sub addNewStyles {
 					},"7.0-style".sprintf("%013d",$assetCounter));
 				$asset->getStorageLocation->addFileFromFilesystem("7fixup/".$style."/".$file);
 				$asset->getStorageLocation->generateThumbnail($file);
-			} elsif ($file =~ m/.tmpl$/) {
+			} elsif ($file =~ m/\.tmpl$/) {
 				open(FILE,"<7fixup/".$style."/".$file);
 				my $first = 1;
 				my $head = 0;
@@ -323,23 +323,17 @@ sub addNewStyles {
 				}
 				close(FILE);
 				my $template = $folder->addChild(\%properties, $properties{id});
-			} elsif ($file =~ m/.nav$/) {
+			} elsif ($file =~ m/\.nav$/) {
 				open(FILE,"<"."7fixup/".$style."/".$file);
-				my $first = 1;
-				my $head = 0;
 				my %properties = (className=>"WebGUI::Asset::Wobject::Navigation", styleTemplateId=>'PBtmpl0000000000000060');
 				while (my $line = <FILE>) {
-					if ($first) {
-						$line =~ m/^\#(.*)$/;
-						$properties{id} = $1;
-						$first = 0;
-					} elsif ($line =~ m/^\#(.*):(.*)$/) {
+					if ($line =~ m/^\#(.*):(.*)$/) {
 						$properties{$1} = $2;
 					}
 				}
 				close(FILE);
-				my $template = $folder->addChild(\%properties, "7.0-style".sprintf("%013d",$assetCounter));
-			} elsif ($file =~ m/.snippet$/) {
+				$folder->addChild(\%properties, "7.0-style".sprintf("%013d",$assetCounter));
+			} elsif ($file =~ m/\.snippet$/) {
 				open(FILE,"<7fixup/".$style."/".$file);
 				my $head = 0;
 				my %properties = (className=>"WebGUI::Asset::Snippet");
@@ -351,7 +345,7 @@ sub addNewStyles {
 					}
 				}
 				close(FILE);
-				my $template = $folder->addChild(\%properties, "7.0-style".sprintf("%013d",$assetCounter));
+				$folder->addChild(\%properties, "7.0-style".sprintf("%013d",$assetCounter));
 			}
 		}
 	}
