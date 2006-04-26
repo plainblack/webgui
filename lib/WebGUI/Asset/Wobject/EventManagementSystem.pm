@@ -325,8 +325,8 @@ sub checkConflicts {
 	
 		# make sure it's a subevent... 
 		my ($isSubEvent) = $self->session->db->quickArray("
-			select count(*) from EventManagementSystem_prerequisites
-			where productId=?", [$scheduleData->{productId}]
+			select count(*) from EventManagementSystem_products
+			where prerequisiteId is not null and productId=?", [$scheduleData->{productId}]
 		);
 		next unless ($isSubEvent);
 				
@@ -832,67 +832,67 @@ sub getRequiredEventNames {
 }
 
 #------------------------------------------------------------------
-sub findSubEvents {
-	my $self = shift;
-	my $eventId = shift;
-	my $returnEverythingFlag = shift;
-
-	my $eventsInCart = $self->getEventsInScratchCart;
-	
-	# Get the prerequisites for the sub events passed in
-	my $subEventPrerequisites = $self->getSubEventPrerequisites($eventId);
-	
-	# Now we need to see if the prerequisites are satisfied
-	my @failedSubEvents;
-	my @subEvents;
-	foreach my $subEventPrerequisite (keys %{$subEventPrerequisites}) {
-		
-		my ($prerequisiteId, $productId) = split(':',$subEventPrerequisite);
-		
-		# Is this an 'And' or an 'Or' prerequisite
-		my $operator = $subEventPrerequisites->{$subEventPrerequisite};
-
-		# All of the required events per this prerequisite definition
-		my @requiredEventList = $self->session->db->buildArray("
-			select requiredProductId from EventManagementSystem_prerequisiteEvents
-			where prerequisiteId=".$self->session->db->quote($prerequisiteId)
-		);
-		
-		# Check to see that every required prerequisite is met
-		#
-		# If a sub-event fails one of it's prerequisites we'll push the productId onto a failure list
-		# At the end, we'll only return events whos productId is not in the failure list.
-		#
-		if ($operator eq 'and') { # make sure every required event is in the users cart
-		  foreach my $requiredEvent (@requiredEventList) {
- 		    unless ( WebGUI::Utility::isIn($requiredEvent, @{$eventsInCart}) ) {
-		      push (@failedSubEvents, $productId);
-		      last;
-		    }
-		  }
-		} elsif ($operator eq 'or') { # make sure one of the required events is in the users cart
-
-		  my $atLeastOneFlag = 0;
-		  foreach my $requiredEvent (@requiredEventList) {
-		    if ( WebGUI::Utility::isIn($requiredEvent, @{$eventsInCart}) ) {
-		      $atLeastOneFlag = 1;
-		      last;
-	 	    }
-		  }
-		  push(@failedSubEvents, $productId) unless ($atLeastOneFlag);  
-		}	
-	}
-	
-	# Return list of 
-	
-	# Check our list against the failed events, return productIds of valid subevents
-	foreach my $subEvent (keys %{$subEventPrerequisites}) {
-		
-		my ($prerequisiteId, $productId) = split(':', $subEvent);
-		push (@subEvents, $productId) unless (WebGUI::Utility::isIn($productId, @failedSubEvents));
-	}
-	return \@subEvents;	
-}
+#sub findSubEvents {
+#	my $self = shift;
+#	my $eventId = shift;
+#	my $returnEverythingFlag = shift;
+#
+#	my $eventsInCart = $self->getEventsInScratchCart;
+#	
+#	# Get the prerequisites for the sub events passed in
+#	my $subEventPrerequisites = $self->getSubEventPrerequisites($eventId);
+#	
+#	# Now we need to see if the prerequisites are satisfied
+#	my @failedSubEvents;
+#	my @subEvents;
+#	foreach my $subEventPrerequisite (keys %{$subEventPrerequisites}) {
+#		
+#		my ($prerequisiteId, $productId) = split(':',$subEventPrerequisite);
+#		
+#		# Is this an 'And' or an 'Or' prerequisite
+#		my $operator = $subEventPrerequisites->{$subEventPrerequisite};
+#
+#		# All of the required events per this prerequisite definition
+#		my @requiredEventList = $self->session->db->buildArray("
+#			select requiredProductId from EventManagementSystem_prerequisiteEvents
+#			where prerequisiteId=".$self->session->db->quote($prerequisiteId)
+#		);
+#		
+#		# Check to see that every required prerequisite is met
+#		#
+#		# If a sub-event fails one of it's prerequisites we'll push the productId onto a failure list
+#		# At the end, we'll only return events whos productId is not in the failure list.
+#		#
+#		if ($operator eq 'and') { # make sure every required event is in the users cart
+#		  foreach my $requiredEvent (@requiredEventList) {
+# 		    unless ( WebGUI::Utility::isIn($requiredEvent, @{$eventsInCart}) ) {
+#		      push (@failedSubEvents, $productId);
+#		      last;
+#		    }
+#		  }
+#		} elsif ($operator eq 'or') { # make sure one of the required events is in the users cart
+#
+#		  my $atLeastOneFlag = 0;
+#		  foreach my $requiredEvent (@requiredEventList) {
+#		    if ( WebGUI::Utility::isIn($requiredEvent, @{$eventsInCart}) ) {
+#		      $atLeastOneFlag = 1;
+#		      last;
+#	 	    }
+#		  }
+#		  push(@failedSubEvents, $productId) unless ($atLeastOneFlag);  
+#		}	
+#	}
+#	
+#	# Return list of 
+#	
+#	# Check our list against the failed events, return productIds of valid subevents
+#	foreach my $subEvent (keys %{$subEventPrerequisites}) {
+#		
+#		my ($prerequisiteId, $productId) = split(':', $subEvent);
+#		push (@subEvents, $productId) unless (WebGUI::Utility::isIn($productId, @failedSubEvents));
+#	}
+#	return \@subEvents;	
+#}
 
 #------------------------------------------------------------------
 sub getRegistrationInfo {
@@ -931,150 +931,150 @@ sub getRegistrationInfo {
 }
 
 #------------------------------------------------------------------
-sub getSubEventPrerequisites {
-	my $self = shift;
-	my $eventId = shift;
-
-	# All prerequisiteIds, and operators where eventId is listed as a requiredEvent
-	# 
-	# This will give us the prerequisite definitions which require the eventId passed in.
-	
-	my $prerequisites = $self->session->db->buildHashRef("
-		    select distinct(pe.prerequisiteId), pr.productId, pr.operator 
-		    from EventManagementSystem_prerequisiteEvents as pe, EventManagementSystem_prerequisites as pr
-		    where
-			pe.requiredProductId=".$self->session->db->quote($eventId)."
-			and pe.prerequisiteId = pr.prerequisiteId"
-	);
-
-	# A subevent can have more than one prerequisite definition and the second or third, etc
-	# may require other events before they should be listed as a sub-event to the parentId passed in.
-	# So, we can't search for them the way we did above.
-	#
-	# We need to look up these prerequisites by getting the productId from the prerequisites table 
-	# for all of the prerequisiteIds returned above and use it to search the prerequisites table again
-	# for any more entries that contain that productId.  The productId is the id of the parent event.
-	# This gives us all prerequistes defined for the parent product.
-	#
-	
-	# Make a copy of the $prerequisites hash so we can use it for itteration and insert any newly found
-	# prerequisites into the $prerequisites hash.  Apparently looping through a hash and adding keys to it
-	# is a no no.
-	my %tempHash = %{$prerequisites};
-	
-	foreach my $prerequisiteId (keys %tempHash) {
-		
-		$prerequisiteId =~ s/^(.*):.*$/$1/;  #strip the productId from the key for our query
-		
-		my $otherPrerequisites = $self->session->db->buildHashRef("
-			select prerequisiteId, productId, operator from EventManagementSystem_prerequisites
-			where productId = 
-		                (select productId from EventManagementSystem_prerequisites
-				 where prerequisiteId =".$self->session->db->quote($prerequisiteId).")
-		");
-		
-		foreach my $otherPrerequisiteId (keys %{$otherPrerequisites}) {
-			$prerequisites->{$otherPrerequisiteId} = $otherPrerequisites->{$otherPrerequisiteId};
-		}
-	}
-	return $prerequisites;
-}
-
-#------------------------------------------------------------------
-sub getSubEvents {
-	my $self = shift;
-	my $eventIds = shift;
-	my $subEvents;
-	my @subEventData;
-#	my $eventsInCart = $self->getEventsInCart;
-	my $eventsInCart = $self->getEventsInScratchCart;
-	#use Data::Dumper;
-	# $self->session->errorHandler->warn("getsubevents: <pre>".Dumper($eventIds)."</pre>");
-	foreach my $eventId (@$eventIds) {
-	
-		$subEvents = $self->findSubEvents($eventId);	
-		foreach my $subEventId (@$subEvents) {	
-			# Query to get event details
-			my $subEventFields = $self->session->db->read("
-				select productId, title, price, description
-				from products
-				where
-				productId = ".$self->session->db->quote($subEventId)."
-				and productId not in (".$self->session->db->quoteAndJoin($eventsInCart).")"
-			);
-			push (@subEventData, $subEventFields);
-		}
-	}
-
-	return \@subEventData;
-}
+#sub getSubEventPrerequisites {
+#	my $self = shift;
+#	my $eventId = shift;
+#
+#	# All prerequisiteIds, and operators where eventId is listed as a requiredEvent
+#	# 
+#	# This will give us the prerequisite definitions which require the eventId passed in.
+#	
+#	my $prerequisites = $self->session->db->buildHashRef("
+#		    select distinct(pe.prerequisiteId), pr.productId, pr.operator 
+#		    from EventManagementSystem_prerequisiteEvents as pe, EventManagementSystem_prerequisites as pr
+#		    where
+#			pe.requiredProductId=".$self->session->db->quote($eventId)."
+#			and pe.prerequisiteId = pr.prerequisiteId"
+#	);
+#
+#	# A subevent can have more than one prerequisite definition and the second or third, etc
+#	# may require other events before they should be listed as a sub-event to the parentId passed in.
+#	# So, we can't search for them the way we did above.
+#	#
+#	# We need to look up these prerequisites by getting the productId from the prerequisites table 
+#	# for all of the prerequisiteIds returned above and use it to search the prerequisites table again
+#	# for any more entries that contain that productId.  The productId is the id of the parent event.
+#	# This gives us all prerequistes defined for the parent product.
+#	#
+#	
+#	# Make a copy of the $prerequisites hash so we can use it for itteration and insert any newly found
+#	# prerequisites into the $prerequisites hash.  Apparently looping through a hash and adding keys to it
+#	# is a no no.
+#	my %tempHash = %{$prerequisites};
+#	
+#	foreach my $prerequisiteId (keys %tempHash) {
+#		
+#		$prerequisiteId =~ s/^(.*):.*$/$1/;  #strip the productId from the key for our query
+#		
+#		my $otherPrerequisites = $self->session->db->buildHashRef("
+#			select prerequisiteId, productId, operator from EventManagementSystem_prerequisites
+#			where productId = 
+#		                (select productId from EventManagementSystem_prerequisites
+#				 where prerequisiteId =".$self->session->db->quote($prerequisiteId).")
+#		");
+#		
+#		foreach my $otherPrerequisiteId (keys %{$otherPrerequisites}) {
+#			$prerequisites->{$otherPrerequisiteId} = $otherPrerequisites->{$otherPrerequisiteId};
+#		}
+#	}
+#	return $prerequisites;
+#}
 
 #------------------------------------------------------------------
-sub getSubEventForm {
-	my $self = shift;
-	my $pids = shift;
-	my $subEvents = $self->getSubEvents($pids);
-	my @usedEventIds;
-	my %var;
-	my @arr = $self->session->form->param("subEventPID");
-	return undef if ($self->session->form->process("method") eq 'addSubEvents' && !scalar(@arr));
-	my $i18n = WebGUI::International->new($self->session, 'Asset_EventManagementSystem');
-	
-	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
-			     .WebGUI::Form::hidden($self->session,{name=>"func",value=>"addToCart"})
-			     .WebGUI::Form::hidden($self->session,{name=>"method",value=>"addSubEvents"}
-	);
+#sub getSubEvents {
+#	my $self = shift;
+#	my $eventIds = shift;
+#	my $subEvents;
+#	my @subEventData;
+##	my $eventsInCart = $self->getEventsInCart;
+#	my $eventsInCart = $self->getEventsInScratchCart;
+#	#use Data::Dumper;
+#	# $self->session->errorHandler->warn("getsubevents: <pre>".Dumper($eventIds)."</pre>");
+#	foreach my $eventId (@$eventIds) {
+#	
+#		$subEvents = $self->findSubEvents($eventId);	
+#		foreach my $subEventId (@$subEvents) {	
+#			# Query to get event details
+#			my $subEventFields = $self->session->db->read("
+#				select productId, title, price, description
+#				from products
+#				where
+#				productId = ".$self->session->db->quote($subEventId)."
+#				and productId not in (".$self->session->db->quoteAndJoin($eventsInCart).")"
+#			);
+#			push (@subEventData, $subEventFields);
+#		}
+#	}
+#
+#	return \@subEventData;
+#}
 
-	$var{'form.footer'} = WebGUI::Form::formFooter($self->session);
-	$var{'form.submit'} = WebGUI::Form::Submit($self->session);
-	$var{'message'}	    = $i18n->get('allowed sub events');
-
-	my @subEventLoop;
-	foreach my $subEvent (@$subEvents) {
-	 while (my $eventData = $subEvent->hashRef) {
-
-	   # Track used event ids so we can prevent listing a subevent more than once.
-	   next if (WebGUI::Utility::isIn($eventData->{productId}, @usedEventIds));
-	   next if $self->checkConflicts($eventData->{productId});
-	   push (@usedEventIds, $eventData->{productId});
-	   
-	   push(@subEventLoop, {
-	   	'form.checkBox' => WebGUI::Form::checkbox($self->session, {
-					value => $eventData->{productId},
-	   	                        name  => "subEventPID"}),
-		'title'		=> $eventData->{title},
-		'description'	=> $eventData->{description},
-		'price'		=> $eventData->{price}
-	   });
-	 }
-	}
-	
-	return '' unless scalar(@subEventLoop);
-	
-	my $scratchCart = [split("\n",$self->session->scratch->get('EMS_scratch_cart'))];
-	
-	foreach (@$scratchCart) {
-		my $details = $self->getEventDetails($_);
-		push(@subEventLoop, {
-			'form.checkBox' => WebGUI::Form::checkbox($self->session, {
-				value => 1,
-				checked => 1,
-				name  => "subEventDisregard",
-				extras => 'disabled="disabled"',
-			}),
-			'title'		=> $details->{title},
-			'description'	=> $details->{description},
-			'price'		=> $details->{price}
-		});
-	}
-
-	$var{'subevents_loop'} = \@subEventLoop;
-	$var{'chooseSubevents'} = 1;
-	my $output;
-	$output = \%var if scalar(@subEventLoop);
-	
-	return $output;	
-}
+#------------------------------------------------------------------
+#sub getSubEventForm {
+#	my $self = shift;
+#	my $pids = shift;
+#	my $subEvents = $self->getSubEvents($pids);
+#	my @usedEventIds;
+#	my %var;
+#	my @arr = $self->session->form->param("subEventPID");
+#	return undef if ($self->session->form->process("method") eq 'addSubEvents' && !scalar(@arr));
+#	my $i18n = WebGUI::International->new($self->session, 'Asset_EventManagementSystem');
+#	
+#	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
+#			     .WebGUI::Form::hidden($self->session,{name=>"func",value=>"addToCart"})
+#			     .WebGUI::Form::hidden($self->session,{name=>"method",value=>"addSubEvents"}
+#	);
+#
+#	$var{'form.footer'} = WebGUI::Form::formFooter($self->session);
+#	$var{'form.submit'} = WebGUI::Form::Submit($self->session);
+#	$var{'message'}	    = $i18n->get('allowed sub events');
+#
+#	my @subEventLoop;
+#	foreach my $subEvent (@$subEvents) {
+#	 while (my $eventData = $subEvent->hashRef) {
+#
+#	   # Track used event ids so we can prevent listing a subevent more than once.
+#	   next if (WebGUI::Utility::isIn($eventData->{productId}, @usedEventIds));
+#	   next if $self->checkConflicts($eventData->{productId});
+#	   push (@usedEventIds, $eventData->{productId});
+#	   
+#	   push(@subEventLoop, {
+#	   	'form.checkBox' => WebGUI::Form::checkbox($self->session, {
+#					value => $eventData->{productId},
+#	   	                        name  => "subEventPID"}),
+#		'title'		=> $eventData->{title},
+#		'description'	=> $eventData->{description},
+#		'price'		=> $eventData->{price}
+#	   });
+#	 }
+#	}
+#	
+#	return '' unless scalar(@subEventLoop);
+#	
+#	my $scratchCart = [split("\n",$self->session->scratch->get('EMS_scratch_cart'))];
+#	
+#	foreach (@$scratchCart) {
+#		my $details = $self->getEventDetails($_);
+#		push(@subEventLoop, {
+#			'form.checkBox' => WebGUI::Form::checkbox($self->session, {
+#				value => 1,
+#				checked => 1,
+#				name  => "subEventDisregard",
+#				extras => 'disabled="disabled"',
+#			}),
+#			'title'		=> $details->{title},
+#			'description'	=> $details->{description},
+#			'price'		=> $details->{price}
+#		});
+#	}
+#
+#	$var{'subevents_loop'} = \@subEventLoop;
+#	$var{'chooseSubevents'} = 1;
+#	my $output;
+#	$output = \%var if scalar(@subEventLoop);
+#	
+#	return $output;	
+#}
 
 #------------------------------------------------------------------
 sub prerequisiteIsMet {
@@ -1752,34 +1752,13 @@ sub www_editEvent {
 		);
 	}
 
-#	my $prerequisiteList = $self->getPrerequisiteEventList($pid);
-#        if ( scalar(keys %{$prerequisiteList}) > 0) {
-#	 $f->checkList(
-#		-name    => "eventList",
-#		-options => $prerequisiteList,
-#		-vertical  => 1,
-#		-label   => $i18n->get("add/edit event required events"),
-#		-hoverHelp   => $i18n->get("add/edit event required events description"),
-#		-sortByValue => 1
-#	 );
-#
-#	 $f->radioList(
-#		-name  => "requirement",
-#		-options => { 'and' => $i18n->get("and"),
-#			      'or'  => $i18n->get("or"),
-#			    },
-#		-value => 'and',
-#		-label => $i18n->get("add/edit event operator"),
-#		-hoverHelp => $i18n->get("add/edit event operator description"),
-#	 );
-
 	 $f->selectBox(
 		-name  => "whatNext",
 		-label => $i18n->get("add/edit event what next"),
 		-hoverHelp => $i18n->get("add/edit event what next"),
 		-options => {
 #				"addAnotherPrereq" => $i18n->get("add/edit event add another prerequisite"),
-				"managePrereqs" => $i18n->get("manage prerequisites"),
+				#"managePrereqs" => $i18n->get("manage prerequisites"),
 				"return"	   => $i18n->get("add/edit event return to manage events"),
 			    },
 		-defaultValue => "return"
@@ -1794,8 +1773,10 @@ sub www_editEvent {
 	my $list = $self->getAssignedPrerequisites($pid);
 	foreach my $prerequisiteId (keys %{$list}) {
 	
-		my $line = $self->session->icon->delete('func=deletePrerequisite;pid='.$pid.';id='.$prerequisiteId,
-							 $self->getUrl, $i18n->get('confirm delete prerequisite'))." ";
+
+		# Disable until the new prereq UI is in place
+		#my $line = $self->session->icon->delete('func=deletePrerequisite;pid='.$pid.';id='.$prerequisiteId,
+		#					 $self->getUrl, $i18n->get('confirm delete prerequisite'))." ";
 		
 		my $eventNames = $self->getRequiredEventNames($prerequisiteId);
 		my $events;
@@ -1803,7 +1784,11 @@ sub www_editEvent {
 			$events .= "$event ".$list->{$prerequisiteId}." ";
 		}
 		$events =~ s/(and\s|or\s)$//;
-		$f->readOnly( -value => $line.$events );
+
+		#Disable until the new prereq UI is in place
+		#
+		#$f->readOnly( -value => $line.$events );
+		$f->readOnly( -value => $events );
 	}
 
 	my $output = $f->print;
@@ -1873,99 +1858,10 @@ sub www_editEventSave {
 		$self->session->db->setRow("products", "productId", $event);
 	}
 	
-	# Save the prerequisites
-	#my $prerequisiteList = $self->session->form->process("eventList", "checkList");
-	#my @list = split(/\n/, $prerequisiteList);
-	#unless ($prerequisiteList eq "") {
-	#	my $prerequisiteId = $self->setCollateral("EventManagementSystem_prerequisites", "prerequisiteId",
-	#			{
-	#			 prerequisiteId  => "new",
-	#			 productId       => $pid,
-	#			 operator	 => $self->session->form->get("requirement")
-	#			},0,0
-	#	);
-	#	
-	#	foreach my $requiredEvent (@list) {
-	#		$self->setCollateral("EventManagementSystem_prerequisiteEvents", "prerequisiteEventId",{
-	#			prerequisiteEventId => "new",
-	#			prerequisiteId      => $prerequisiteId,
-	#			requiredProductId   => $requiredEvent
-	#		},0,0);
-	#	}
-	#}
-	
-#	return $self->www_editEvent(undef,$pid) if ($self->session->form->get("whatNext") eq "addAnotherPrereq");
 	return $self->www_search("managePrereqs",$pid) if ($self->session->form->get("whatNext") eq "managePrereqs");
 	return $self->www_search;
 }
 
-##-------------------------------------------------------------------
-#
-#=head2 www_manageEvents ( )
-#
-#Method to display the event management console.
-#
-#=cut
-#
-#sub www_manageEvents {
-#	my $self = shift;
-#
-#	return $self->session->privilege->insufficient unless ($self->canAddEvents);
-#	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
-#	
-#	my $output;
-#	my $sth = $self->session->db->read("select p.productId, p.title, p.price, pe.approved from products as p, 
-#				EventManagementSystem_products as pe where p.productId = pe.productId
-#				and pe.assetId=? order by sequenceNumber", [$self->get("assetId")]);
-#	
-#	if ($sth->rows) {
-#	$output = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl}).WebGUI::Form::hidden($self->session,{name=>"func",value=>"approveEvents"});
-#		$output .= sprintf "<table width='100%'><tr><th>%s</th><th>%s</th><th>%s</th></tr>",
-#					$i18n->get('event'),
-#					$i18n->get('add/edit event price'),
-#					$self->canApproveEvents 
-#						? $i18n->get('approval')
-#						: $i18n->get('status');
-#		while (my %row = $sth->hash) {
-#			
-#			$output .= "<tr><td>";
-#			$output .= $self->session->icon->delete('func=deleteEvent;pid='.$row{productId}, $self->getUrl,
-#							       $i18n->get('confirm delete event')).
-#				  $self->session->icon->edit('func=editEvent;pid='.$row{productId}, $self->getUrl).
-#				  $self->session->icon->moveUp('func=moveEventUp;pid='.$row{productId}, $self->getUrl).
-#				  $self->session->icon->moveDown('func=moveEventDown;pid='.$row{productId}, $self->getUrl).
-#				  " ".$row{title}."</td><td>".$row{price}."</td><td>";
-#			
-#			unless ($self->canApproveEvents) {
-#				if ($row{approved} == 0) {
-#					$output .= $i18n->get('pending');
-#				} else {
-#					$output .= $i18n->get('approved');
-#				}
-#			} else {
-#				$output .= WebGUI::Form::checkbox($self->session,{
-#					-name => 'eventId',
-#					-checked => $row{approved},
-#					-value => $row{productId}
-#				}).WebGUI::Form::hidden($self->session,{
-#					-name => 'eventIdToCheck',
-#					-value => $row{productId}
-#				});
-#			}
-#			$output .= "</td></tr>";
-#		}
-#		$output .= '<tr><td>&nbsp;</td><td>&nbsp;</td><td>'.WebGUI::Form::submit($self->session,{-value=>$i18n->get('save approvals')}).'</td></tr>' if $self->canApproveEvents;
-#		$output .= "</table>".WebGUI::Form::formFooter($self->session);
-#	} else {
-#		$output .= $i18n->get('you do not have any events to display');
-#	}
-#	
-#	$self->getAdminConsole->setHelp('event management system manage events','Asset_EventManagementSystem');
-#	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editEvent;pid=new'), $i18n->get('add event'));
-#	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n->get('manage event metadata'));
-#	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEvents'), $i18n->get('refresh events list'));
-#	return $self->getAdminConsole->render($output, $i18n->get("manage events"));
-#}
 
 #-------------------------------------------------------------------
 
@@ -2387,38 +2283,41 @@ sub www_moveEventUp {
 }
 
 #-------------------------------------------------------------------
-sub www_savePrerequisites {
-	my $self = shift;
-	my $eventToAssignPrereqTo = $self->session->form->get("eventToAssignPrereqTo");
-	
-	return $self->session->privilege->insufficient unless ($self->canAddEvents);
-	
-	my $prerequisiteList = $self->session->form->process("eventList", "checkList");
-	my @list = split(/\n/, $prerequisiteList);
-	unless ($prerequisiteList eq "") {
-		my $prerequisiteId = $self->setCollateral("EventManagementSystem_prerequisites", "prerequisiteId",
-				{
-				 prerequisiteId  => "new",
-				 productId       => $eventToAssignPrereqTo,
-				 operator	 => $self->session->form->get("requirement")
-				},0,0
-		);
-		
-		foreach my $requiredEvent (@list) {
-			$self->setCollateral("EventManagementSystem_prerequisiteEvents", "prerequisiteEventId",{
-				prerequisiteEventId => "new",
-				prerequisiteId      => $prerequisiteId,
-				requiredProductId   => $requiredEvent
-			},0,0);
-		}
-	}
-	
-	my $instance = WebGUI::Workflow::Instance->create($self->session, {
-		workflowId=>'EMSworkflow00000000001'
-	});
-	
-	return $self->www_editEvent(undef,$eventToAssignPrereqTo);
-}
+# Disable until new prerequ UI is in place
+#
+#
+#sub www_savePrerequisites {
+#	my $self = shift;
+#	my $eventToAssignPrereqTo = $self->session->form->get("eventToAssignPrereqTo");
+#	
+#	return $self->session->privilege->insufficient unless ($self->canAddEvents);
+#	
+#	my $prerequisiteList = $self->session->form->process("eventList", "checkList");
+#	my @list = split(/\n/, $prerequisiteList);
+#	unless ($prerequisiteList eq "") {
+#		my $prerequisiteId = $self->setCollateral("EventManagementSystem_prerequisites", "prerequisiteId",
+#				{
+#				 prerequisiteId  => "new",
+#				 productId       => $eventToAssignPrereqTo,
+#				 operator	 => $self->session->form->get("requirement")
+#				},0,0
+#		);
+#		
+#		foreach my $requiredEvent (@list) {
+#			$self->setCollateral("EventManagementSystem_prerequisiteEvents", "prerequisiteEventId",{
+#				prerequisiteEventId => "new",
+#				prerequisiteId      => $prerequisiteId,
+#				requiredProductId   => $requiredEvent
+#			},0,0);
+#		}
+#	}
+#	
+#	my $instance = WebGUI::Workflow::Instance->create($self->session, {
+#		workflowId=>'EMSworkflow00000000001'
+#	});
+#	
+#	return $self->www_editEvent(undef,$eventToAssignPrereqTo);
+#}
 
 #-------------------------------------------------------------------
 sub www_saveRegistration {
