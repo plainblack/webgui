@@ -999,7 +999,7 @@ CREATE TABLE SQLForm (
   assetId varchar(22) NOT NULL default '',
   formId varchar(22) default NULL,
   tableName varchar(255) default NULL,
-  viewTemplateId varchar(22) default NULL,
+  defaultView varchar(22) default NULL,
   searchTemplateId varchar(22) default NULL,
   editTemplateId varchar(22) default NULL,
   submitGroupId varchar(22) default NULL,

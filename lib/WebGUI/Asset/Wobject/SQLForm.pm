@@ -838,6 +838,10 @@ sub definition {
 				fieldType	=> 'databaseLink',
 				defaultValue	=> 0,
 			},
+			defaultView	=> {
+				fieldType	=> 'selectBox',
+				defaultValue	=> 'normalSearch',
+			},
 		}
 	});
 	return $class->SUPER::definition($session, $definition);
@@ -963,6 +967,17 @@ sub getEditForm {
 		-hoverHelp	=> $i18n->get('gef search template description'),
 		-value		=> $self->get('searchTemplateId'),
 		-namespace	=> 'SQLForm/Search',
+	);
+	$tabform->getTab('display')->selectBox(
+		-name		=> 'defaultView',
+		-label		=> $i18n->get('gef default view'),
+		-hoverHelp	=> $i18n->get('gef default view description'),
+		-value		=> [$self->get('defaultView')],
+		-options	=> {
+			'normalSearch' => $i18n->get('s normal search'), 
+			'superSearch' => $i18n->get('s advanced search')
+		},
+		-multiple	=> 0,
 	);
 	$tabform->getTab('security')->group(
 		-name		=> 'submitGroupId',
@@ -1282,8 +1297,11 @@ sub view {
 	my $self = shift;
 	my ($output, @links);
 
-	
-	return $output .$self->www_search;
+	if ($self->get('defaultView') eq 'superSearch') {
+		return $output .$self->www_superSearch;
+	}else{
+		return $output .$self->www_search;
+	}
 }
 
 #-------------------------------------------------------------------
@@ -3382,7 +3400,6 @@ sub _constructSearchForm {
 		2 => $i18n->get('_csf normal and trash')
 	);
 
-	$self->session->style->setScript($self->session->config->get("extrasURL").'/'.'wobject/SQLForm/SQLFormSearch.js', {type => 'text/javascript'});	
 
 my	$searchType = $self->session->form->process("searchType") || $self->session->scratch->get('SQLForm_'.$self->getId.'searchType') || 'or';
 
@@ -3486,6 +3503,7 @@ my		$cmd = "WebGUI::Form::$searchElement".'($self->session, $parameters)';
 	$form .= '<td>'.WebGUI::Form::submit($self->session, {value => $i18n->get('s search button')}).'</td>';
 	$form .= '</table>';
 	$form .= WebGUI::Form::formFooter($self->session);
+	$form .= '<script src="'.$self->session->config->get("extrasURL").'/wobject/SQLForm/SQLFormSearch.js" type="text/javascript"></script>';
 	$form .= '<script type="text/javascript">'.$js.'</script>';
 
 	return $form;
@@ -3838,6 +3856,8 @@ my		$sth = $dbLink->db->unconditionalRead($sql);
 	$var->{showMetaData} = $self->get('showMetaData');
 	$var->{managementLinks} = $self->_getManagementLinks;	
 
+	# Only process style if search is called directly;
+	return $self->processTemplate($var, $self->getValue('searchTemplateId')) unless ($self->session->form->process("func") eq 'superSearch');
 	return $self->processStyle($self->processTemplate($var, $self->getValue('searchTemplateId')));
 }
 

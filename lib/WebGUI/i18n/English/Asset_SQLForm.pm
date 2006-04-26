@@ -829,7 +829,7 @@ not possible ta add fields. Please add at least one field type by going to|,
 	'gef table name description' => {
 		message => q|<p>This is the name the table you want to attach
 should get in the database, or if you want to attach the SQLForm to an existing
-table, the nam of that table.</p>|,
+table, the name of that table.</p>|,
 		lastUpdated => 0,
 	},
 
@@ -908,6 +908,16 @@ search results.</p>|,
 		lastUpdated => 0,
 	},
 
+	'gef default view' => {
+		message => q|Default view|,
+		lastUpdated => 0,
+	},
+		
+	'gef default view description' => {
+		message => q|<p>This property switches the default view between normal and advanced search.</p>|,
+		lastUpdated => 0,
+	},
+												
 	'gef submit group' => {
 		message => q|Group to submit records|,
 		lastUpdated => 0,
