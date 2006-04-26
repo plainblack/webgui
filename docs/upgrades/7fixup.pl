@@ -68,6 +68,129 @@ sub addNewContent {
 |,
 		templateId=>'PBtmpl0000000000000002'
 		});
+	my $gs = WebGUI::Asset->new($session,"_iHetEvMQUOoxS-T2CM0sQ","WebGUI::Asset::Wobject::Layout");
+	$gs->addChild({
+		className=>"WebGUI::Asset::Wobject::Article",
+		title=>"Getting Started",
+		menuTitle=>"Getting Started",
+		url=>"getting_started/getting-started",
+		ownerUserId=>'3',
+		groupIdView=>'7',
+		groupIdEdit=>'4',
+		description=>q|
+<p>
+If you're reading this message that means you've successfully installed and configured WebGUI. Great job!
+</p>
+<p>
+Now you should <a href="^/;?op=auth">log in</a> and <a href="^LoginToggle(linkonly);">go into admin mode</a>. The default username is "admin" and the default password is "123qwe", but you probably customized both of those when you visited this site for the very first time.
+</p>
+<p>
+Now that you're logged in, we recommend <a href="^/;?op=listUsers">creating a secondary account</a> for yourself with admin privileges just in case you forget the login information for your primary admin account. Don't worry if you lock yourself out, you can always contact <a href="http://www.plainblack.com">Plain Black</a> support to get instructions to get back in.
+</p>
+<p>
+No doubt after you enabled admin mode you saw a menu along the left side of the screen, that's called the Admin Bar. Use that to add content and access administrative functions. To get started with managing content, watch the short instructional video below.
+</p>
+<p>
+[wink flash video here]
+</p>
+<p>
+For more information about services related to WebGUI <a href="http://www.plainblack.com/services">click here</a>.
+</p>
+<p>
+Enjoy your new WebGUI site!
+</p>
+|,
+		templateId=>'PBtmpl0000000000000002'
+		});
+	my $yns = WebGUI::Asset->new($session, "8Bb8gu-me2mhL3ljFyiWLg", "WebGUI::Asset::Wobject::Layout");
+	$yns->addChild({
+		className=>"WebGUI::Asset::Wobject::Article",
+		title=>"Talk to the Experts",
+		menuTitle=>"Talk to the Expoerts",
+		url=>"yns/experts",
+		ownerUserId=>'3',
+		groupIdView=>'7',
+		groupIdEdit=>'4',
+		description=>q|<p>Plain Black created WebGUI and is here to answer your questions and provide you with services to make sure your WebGUI implementation is entirely successful. We bend over backwards to make sure you're a success. <a href="http://www.plainblack.com/contact_us">Contact us</a> today to see how we can help you.</p>|,
+		templateId=>'PBtmpl0000000000000002'
+		});
+	$yns->addChild({
+		className=>"WebGUI::Asset::Wobject::Article",
+		title=>"Get Documentation",
+		menuTitle=>"Get Documentation",
+		url=>"yns/docs",
+		ownerUserId=>'3',
+		groupIdView=>'7',
+		groupIdEdit=>'4',
+		description=>q|<p><a href="http://www.plainblack.com/services/wdr">WebGUI Done Right</a> is the ultimate compendium to WebGUI. It is more than just documentation, it's also a library of hundreds of videos that show you exactly how to get stuff done. This is a must for anyone working in WebGUI, and Plain Black offers vast bulk discounts so you can give it to everyone in your organization.</p>|,
+		templateId=>'PBtmpl0000000000000002'
+		});
+	$yns->addChild({
+		className=>"WebGUI::Asset::Wobject::Article",
+		title=>"Get Support",
+		menuTitle=>"Get Support",
+		url=>"yns/support",
+		ownerUserId=>'3',
+		groupIdView=>'7',
+		groupIdEdit=>'4',
+		description=>q|<p>Plain Black provides <a href="http://www.plainblack.com/services/support">support packages</a> to fit any budget or need. Start out with online support which costs only $500 per year! And grow support as your needs grow. We build custom support packages to match our client's needs. And no matter what level of support you purchase, you get WebGUI Done Right included in your purchase.</p>|,
+		templateId=>'PBtmpl0000000000000002'
+		});
+	$yns->addChild({
+		className=>"WebGUI::Asset::Wobject::Article",
+		title=>"Get Hosting",
+		menuTitle=>"Get Hosting",
+		url=>"yns/hosting",
+		ownerUserId=>'3',
+		groupIdView=>'7',
+		groupIdEdit=>'4',
+		description=>q|<p>Who better to host your WebGUI sites than Plain Black. Let us deal with upgrades, security, and server management. Doing so lets you focus on building your WebGUI site, which is where your time and expertise should be spent. And when you <a href="http://www.plainblack.com/services/hosting">sign up with hosting</a>, online support and WebGUI Done Right are both included!</p>|,
+		templateId=>'PBtmpl0000000000000002'
+		});
+	$yns->addChild({
+		className=>"WebGUI::Asset::Wobject::Article",
+		title=>"Get Style",
+		menuTitle=>"Get Style",
+		url=>"yns/style",
+		ownerUserId=>'3',
+		groupIdView=>'7',
+		groupIdEdit=>'4',
+		description=>q|<p>Not a designer? No problem! Plain Black's professional <a href="http://www.plainblack.com/services/design">design</a> team can make your site look great. Our team is fast, easy to work with, and can even migrate your existing content into your new WebGUI site.</p>|,
+		templateId=>'PBtmpl0000000000000002'
+		});
+	$yns->addChild({
+		className=>"WebGUI::Asset::Wobject::Article",
+		title=>"Get Features",
+		menuTitle=>"Get Features",
+		url=>"yns/features",
+		ownerUserId=>'3',
+		groupIdView=>'7',
+		groupIdEdit=>'4',
+		description=>q|<p>What's that you say? WebGUI's thousands of features are still missing some important ones? No problem, our professional development team can <a href="http://www.plainblack.com/services/development">add any features you need</a> for your site. We've built hundreds of custom apps for people. From simple macros, to custom single sign on systems, to applications that will manage your entire company, our team can do it.</p>|,
+		templateId=>'PBtmpl0000000000000002'
+		});
+	$yns->addChild({
+		className=>"WebGUI::Asset::Wobject::Article",
+		title=>"Get Translated",
+		menuTitle=>"Get Translated",
+		url=>"yns/translated",
+		ownerUserId=>'3',
+		groupIdView=>'7',
+		groupIdEdit=>'4',
+		description=>q|<p>Let our team of professional translators bring your site to new customers by <a href="http://www.plainblack.com/services/translation">translating your content</a> into additional languages. Our translation services are never machine automated. They're always done by professional translators that have years of experience reading, writing, and speaking many languages.</p>|,
+		templateId=>'PBtmpl0000000000000002'
+		});
+	$yns->addChild({
+		className=>"WebGUI::Asset::Wobject::Article",
+		title=>"Get Promoted",
+		menuTitle=>"Get Promoted",
+		url=>"yns/promotion",
+		ownerUserId=>'3',
+		groupIdView=>'7',
+		groupIdEdit=>'4',
+		description=>q|<p>Now that you have a brilliant WebGUI site, you need to get people to visit it. We can help there too. Our marketing specialists can work with you to develop and execute the right combination of search engine placement, advertising buys, and affilliate programs to <a href="http://www.plainblack.com/services/promotion">ensure your site gets the traffic it needs</a>.</p>|,
+		templateId=>'PBtmpl0000000000000002'
+		});
 }
 
 #-------------------------------------------------

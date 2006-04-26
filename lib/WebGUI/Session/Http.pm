@@ -215,10 +215,10 @@ sub setCacheControl {
 		if ($timeout eq "none" || $self->session->setting->get("preventProxyCache")) {
 			$self->session->request->no_cache(1);
 		} elsif ($request->protocol =~ /(\d\.\d)/ && $1 >= 1.1){
-    			$request->header_out('Cache-Control', "max-age=" . $timeout);
+    			$request->headers_out->set('Cache-Control' => "max-age=" . $timeout);
   		} else {
 			my $date = $self->session->datetime->epochToHuman(time() + $timeout, "%W, %d %C %y %j:%m:%s %t");
-    			$request->header_out('Expires', $date);
+    			$request->headers_out->set('Expires' => $date);
   		}
 	}
 }
