@@ -91,8 +91,14 @@ sub updateArticle {
 					$child->purge;
 				}
 			}
+			if ($asset->get("convertCarriageReturns")) {
+				my $description = $asset->get("description");
+				$description =~ s/\n/\<br \/\>\n/g;
+				$asset->update({description=>$description});
+			}
 		}
 	}
+	$session->db->write("alter table Article drop column convertCarriageReturns");
 }
 
 #-------------------------------------------------

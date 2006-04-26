@@ -57,11 +57,6 @@ ID of a tempate from the Article namespace to display the contents of the Articl
 
 The text displayed to the user as a hyperlink to the linkURL.
 
-=item convertCarriageReturns
-
-A boolean.  If set to true, all newlines will be converted to Break tags so that simple
-text will come out formatted as paragraphs.
-
 =back
 
 =cut
@@ -124,15 +119,6 @@ sub definition {
 				label=>$i18n->get(7),
                 		hoverHelp=>$i18n->get('link title description'),
                 		uiLevel=>3
-				},
-			convertCarriageReturns=>{
-				tab=>"display",
-				fieldType=>'yesNo',
-				defaultValue=>0,
-				label=>$i18n->get(10),
-                		subtext=>' &nbsp; <span style="font-size: 8pt;">'.$i18n->get(11).'</span>',
-                		hoverHelp=>$i18n->get('carriage return description'),
-                		uiLevel=>5
 				},
 			storageId=>{
 				tab=>"properties",
@@ -239,7 +225,7 @@ sub prepareView {
 
 sub purge {
         my $self = shift;
-        my $sth = $self->session->db->read("select storageId from Articlewhere assetId=?",[$self->getId]);
+        my $sth = $self->session->db->read("select storageId from Article where assetId=?",[$self->getId]);
         while (my ($storageId) = $sth->array) {
 		my $storage = WebGUI::Storage::Image->get($self->session,$storageId);
                 $storage->delete if defined $storage;
@@ -308,9 +294,6 @@ sub view {
 		}
 	}
         $var{description} = $self->get("description");
-	if ($self->get("convertCarriageReturns")) {
-		$var{description} =~ s/\n/\<br \/\>\n/g;
-	}
 	$var{"new.template"} = $self->getUrl.";overrideTemplateId=";
 	$var{"description.full"} = $var{description};
 	$var{"description.full"} =~ s/\^\-\;//g;

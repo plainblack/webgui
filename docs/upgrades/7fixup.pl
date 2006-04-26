@@ -17,16 +17,66 @@ addPrototypes();
 rearrangeImportNode();
 addNewStyles();
 addRobots();
-#deleteOldContent();
-#addNewContent();
+deleteOldContent();
+addNewContent();
 $versionTag->commit;
 purgeOldRevisions();
 
 finish($session); # this line required
 
 #-------------------------------------------------
+sub addNewContent {
+	print "\tAdding new content.\n";
+	my $home = WebGUI::Asset->getDefault($session);
+	$home->addChild({
+		className=>"WebGUI::Asset::Wobject::Article",
+		title=>"Welcome",
+		menuTitle=>"Welcome",
+		url=>"home/welcome",
+		ownerUserId=>'3',
+		groupIdView=>'7',
+		groupIdEdit=>'4',
+		description=>q|<p>The <a href="http://www.webgui.org">WebGUI Content Engine</a> is a powerful and easy to use system for managing web sites, and building web applications. It provides thousands of features out of the box, and lots of plug-in points so you can extend it to match your needs. It's easy enough for the average business user, but powerful enough for any large enterprise.</p>
+
+<p>There are thousands of <a href="http://www.jeffmillerphotography.com">small</a> and <a href="http://www.brunswicknt.com">large</a> businesses, <a href="http://phila.k12.pa.us">schools</a>, <a href="http://www.csumathsuccess.org">universities</a>, <a href="http://beijing.usembassy.gov/">governments</a>, <a href="http://www.gama.org">associations</a>, <a href="http://www.monashwushu.com">clubs</a>, <a href="http://www.sunsetpres.org">churches</a>, <a href="http://www.k3b.org">projects</a>, and <a href="http://www.comparehangouts.com">communities</a> using WebGUI all over the world today. A brief list of some of them can be found <a href="http://www.plainblack.com/webgui/campaigns/sightings">here</a>. Your site should be on that list.</p>|,
+		templateId=>'PBtmpl0000000000000002'
+		});
+	$home->addChild({
+		className=>"WebGUI::Asset::Wobject::Article",
+		title=>"Key Benefits",
+		menuTitle=>"Key Benefits",
+		url=>"home/key-benefits",
+		ownerUserId=>'3',
+		groupIdView=>'7',
+		groupIdEdit=>'4',
+		description=>q|
+<p>
+<b>Easy To Use</b> - WebGUI is absolutely easy to use. WebGUI 7 has a completely revamped user interface to make it even easier to use. There are lots of visual cues, consistent icons, helper apps, and a huge repository of built-in help files.
+</p>
+<p>
+<b>Workflow &amp; Versioning</b> - Never again worry about content getting put on your site that you don't want there. Never again lose your old content after making an edit. And never again push out new changes until you're absolutely ready to release them. WebGUI's workflow and versioning system if fast, flexible, powerful, and easy to use.
+</p>
+<p>
+<b>Everything's a Template</b> - Worry nevermore about your CMS forcing you into a mould that doesn't suit you. With WebGUI everything a site visitor can see is a customizable template, so you can make it look exactly how you want. Moreover if you're the type that strives for excellence rest in the knowledge that all the templates that come with WebGUI are XHTML 1.0 strict compliant.
+</p>
+<p>
+<b>Localization</b> - WebGUI's entire user interface is set up to be internationalized. Visit one of the WebGUI Worldwide member sites to get translations for your language. Stay there to get support and services in your native language. Feel confident in the knowledge that WebGUI will work with your native characters because it's UTF-8 compliant. On top of that WebGUI allows you to customize dates, currency, and weights to match your locale. 
+</p>
+<p>
+<b>Pluggable By Design</b> - With WebGUI 7 you have many plug-in points to add your own functionality. And best of all, the API is stable and standardized. Write it today and it will still work years from now and survive all upgrades.
+</p>
+|,
+		templateId=>'PBtmpl0000000000000002'
+		});
+}
+
+#-------------------------------------------------
 sub deleteOldContent {
 	print "\tDeleting old content\n";
+	foreach my $id (qw(TKzUMeIxRLrZ3NAEez6CXQ sWVXMZGibxHe2Ekj1DCldA x_WjMvFmilhX-jvZuIpinw  DC1etlIaBRQitXnchZKvUw wCIc38CvNHUK7aY92Ww4SQ)) {
+		my $asset = WebGUI::Asset->newByDynamicClass($session, $id);
+		$asset->purge if (defined $asset);
+	}
 }
 
 
@@ -150,7 +200,8 @@ sub addNewStyles {
 		}
 	}
 	print "\t\tSetting all pages to use new style.\n";
-	$session->db->write("update wobject set styleTemplateId='stevestyle000000000001' where styleTemplateId in ('B1bNjWVtzSjsvGZh9lPz_A','9tBSOV44a9JPS8CcerOvYw')");
+	$session->db->write("update wobject set styleTemplateId='stevestyle000000000003' where styleTemplateId in ('B1bNjWVtzSjsvGZh9lPz_A','9tBSOV44a9JPS8CcerOvYw')");
+	$session->setting->set("userFunctionStyleId","stevestyle000000000003");
 	print "\t\tDeleting old styles.\n";
 	my $asset = WebGUI::Asset->new($session,'9tBSOV44a9JPS8CcerOvYw');
 	$asset->purge if defined $asset;

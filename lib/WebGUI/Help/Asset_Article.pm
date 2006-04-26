@@ -27,12 +27,6 @@ our $HELP = {
                                 namespace => 'Asset_Article',
 				uiLevel => 3,
                         },
-                        {
-                                title => '10',
-                                description => 'carriage return description',
-                                namespace => 'Asset_Article',
-				uiLevel => 5,
-                        },
 		],
 		related => [
 			{

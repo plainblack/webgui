@@ -21,11 +21,6 @@ our $I18N = {
 		lastUpdated => 0
 		},
 
-	'11' => {
-		message => q|(Select "Yes" only if you aren't adding &lt;br&gt; manually.)|,
-		lastUpdated => 1031514049
-	},
-
 	'71' => {
 		message => q|<P>Articles are the Swiss Army knife of WebGUI. Most pieces of static content can be added via the Article.  Articles are Wobjects, so they inherit the properties of both Wobjects and Assets.
 <P>
@@ -232,17 +227,6 @@ The URL to view the replies to this article.
 	'24' => {
 		message => q|Post Response|,
 		lastUpdated => 1031514049
-	},
-
-	'10' => {
-		message => q|Convert carriage returns?|,
-		lastUpdated => 1031514049
-	},
-
-	'carriage return description' => {
-		message => q|
-If you're publishing HTML there's generally no need to check this option, but if you aren't using HTML and you want a carriage return every place you hit your "Enter" key, then check this option.|,
-		lastUpdated => 1119066524
 	},
 
 
