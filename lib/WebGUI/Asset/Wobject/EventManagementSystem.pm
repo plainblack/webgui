@@ -1243,7 +1243,7 @@ sub getAllPossibleEventPrerequisites {
 	my $messageLoop = [];
 	
 	# Get all prerequisite definitions defined for this event
-	my $prerequisiteDefinitions = $self->session->db->buildHashRef("select prereqs.prerequisiteId, prereqs.operator from EventManagementSystem_prerequisites as prereqs, EventManagementSystem_products as p,
+	my $prerequisiteDefinitions = $self->session->db->buildHashRef("select prereqs.prerequisiteId, prereqs.operator from EventManagementSystem_prerequisites as prereqs, EventManagementSystem_products as p
 									where prereqs.prerequisiteId = p.prerequisiteId and p.productId=?",[$eventId]);
 	foreach my $prerequisiteId (keys %{$prerequisiteDefinitions}) {
 		my $message;
