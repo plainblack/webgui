@@ -690,6 +690,7 @@ create table EventManagementSystem_products (
  approved tinyint,
  sequenceNumber int(11),
  imageId varchar(22) binary,
+ prerequisiteId varchar(22) binary,
 primary key(productId)
 )
 SQL2
@@ -717,7 +718,6 @@ my $sql5 = <<SQL5;
 
 create table EventManagementSystem_prerequisites (
  prerequisiteId varchar(22) binary not null,
- productId varchar(22) binary,
  operator varchar(100),
 primary key(prerequisiteId)
 )

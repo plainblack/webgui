@@ -2900,8 +2900,9 @@ sub view {
 		   from products as p, EventManagementSystem_products as e
 		   where
 		   	p.productId = e.productId and approved=1
-		   	and e.assetId =".$self->session->db->quote($self->get("assetId"))." 
-			and p.productId not in (select distinct(productId) from EventManagementSystem_prerequisites) order by sequenceNumber";		
+		   	and e.assetId =".$self->session->db->quote($self->get("assetId"))."
+			and p.prerequisiteId is NULL";
+			#and p.productId not in (select distinct(productId) from EventManagementSystem_prerequisites) order by sequenceNumber";		
 
 	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->get("paginateAfter"));
 	$p->setDataByQuery($sql);
