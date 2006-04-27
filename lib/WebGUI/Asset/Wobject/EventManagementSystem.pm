@@ -1159,10 +1159,12 @@ sub verifyAllPrerequisites {
 	my $self = shift;
 	my $returnArrayFlag = shift;
 	my $cache;
+	my $pId;
 	if ($returnArrayFlag) {
-		$cache = WebGUI::Cache->new($self->session,["verifyAllPrerequisites",$returnArrayFlag]);
+		$pId = $self->getEventDetails($returnArrayFlag)->{prerequisiteId};
+		$cache = WebGUI::Cache->new($self->session,["verifyAllPrerequisites",$pId]);
 		my $eventData = $cache->get;
-		return $eventData->{$returnArrayFlag} if defined $eventData->{$returnArrayFlag};
+		return $eventData->{$pId} if defined $eventData->{$pId};
 	}
 	#use Data::Dumper;
 	#start with the events in the scratch cart.  See if all prerequisites are met	
@@ -1194,7 +1196,7 @@ sub verifyAllPrerequisites {
 	my $rowsLoop = [];
 	if ($returnArrayFlag) {
 		my @silliness = keys %$lastResults;
-		$cache->set({$returnArrayFlag=>\@silliness}, 60*60*24*360);
+		$cache->set({$pId=>\@silliness}, 60*60*24*360);
 		return \@silliness;
 	}
 	foreach (keys %$lastResults) {
