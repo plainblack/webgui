@@ -1305,6 +1305,8 @@ sub getAllPossibleRequiredEvents {
 
 	# Get all required events for this event (base case)
 	my $lastResults = $self->session->db->buildArrayRef("select distinct(r.requiredProductId) from EventManagementSystem_prerequisiteEvents as r where r.prerequisiteId = ?",[$pId]);
+	$cache->set({$pId=>$lastResults}, 60*60*24*360);
+	return $lastResults;
 	my $lastResultsSize = scalar(@$lastResults);
 	my $currentResultsSize = -4;
 	# initial case must not qualify as the base case
