@@ -89,7 +89,6 @@ sub execute {
 			$status = $self->WAITING;
 			last;
 		} 
-		$self->session->errorHandler->warn('EMS Cacher Running '.$event);
 		$ems->verifyAllPrerequisites($event);
 	}
 	$self->session->errorHandler->warn('EMS Cacher Ran! Status: '.$status);
