@@ -247,8 +247,6 @@ foreach my $filename (keys %config) {
 	my $dumpcmd = $config{$filename}{mysqlDump} || $mysqldump;
 	my $backupTo = $config{$filename}{backupPath} || $backupDir;
 	mkdir($backupTo);
-	print ("sql:".$upgrade{$config{$filename}{version}}{sql}."\n");
-	print ("pl:".$upgrade{$config{$filename}{version}}{pl}."\n");
 	while ($upgrade{$config{$filename}{version}}{sql} ne "" || $upgrade{$config{$filename}{version}}{pl} ne "") {
 		my $upgrade = $upgrade{$config{$filename}{version}}{from};
 		unless ($skipBackup) {
