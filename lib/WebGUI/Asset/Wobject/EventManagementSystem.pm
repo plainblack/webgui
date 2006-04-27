@@ -494,6 +494,8 @@ Utility method that checks for prerequisite groupings that no longer have any ev
 sub deleteOrphans {
 	my $self = shift;
 	
+	# MSW Note - as this is on 4/27/2006, I don't think query will ever return any results.
+	
 	#Check for orphaned prerequisite definitions
 	my @orphans = $self->session->db->quickArray("select p.prerequisiteId from EventManagementSystem_prerequisites as p 
 							left join EventManagementSystem_prerequisiteEvents as pe 
@@ -1162,23 +1164,27 @@ sub resolveConflictForm {
 #------------------------------------------------------------------
 sub verifyAllPrerequisites {
 	my $self = shift;
-	my $returnArrayFlag = shift;
+#	my $returnArrayFlag = shift;
 	my $cache;
 	my $pId;
-	if ($returnArrayFlag) {
-		$pId = $self->getEventDetails($returnArrayFlag)->{prerequisiteId};
-		$cache = WebGUI::Cache->new($self->session,["verifyAllPrerequisites",$pId]);
-		my $eventData = $cache->get;
-		return $eventData->{$pId} if defined $eventData->{$pId};
-	}
+#	if ($returnArrayFlag) {
+#		$pId = $self->getEventDetails($returnArrayFlag)->{prerequisiteId};
+#		$cache = WebGUI::Cache->new($self->session,["verifyAllPrerequisites",$pId]);
+#		my $eventData = $cache->get;
+#		return $eventData->{$pId} if defined $eventData->{$pId};
+#	}
 	#use Data::Dumper;
 	#start with the events in the scratch cart.  See if all prerequisites are met	
 	my $startingEvents = {};
-	my $scratchEvents = $self->getEventsInScratchCart;
-	foreach (@$scratchEvents) {
-		$startingEvents->{$_} = $self->getEventDetails($_);
-	}
-	$startingEvents = {$returnArrayFlag=>$self->getEventDetails($returnArrayFlag)} if $returnArrayFlag;
+	my $scratchEvents;
+#	if ($returnArrayFlag) {
+#		$startingEvents = {$returnArrayFlag=>$self->getEventDetails($returnArrayFlag)};
+#	} else {
+		$scratchEvents = $self->getEventsInScratchCart;
+		foreach (@$scratchEvents) {
+			$startingEvents->{$_} = $self->getEventDetails($_);
+		}
+#	}
 	my ($lastResults, $msgLoop) = $self->verifyEventPrerequisites($startingEvents,1);
 	my $lastResultsSize = scalar(keys %$lastResults);
 	my $currentResultsSize = -4;
@@ -1199,11 +1205,11 @@ sub verifyAllPrerequisites {
 	}
 	
 	my $rowsLoop = [];
-	if ($returnArrayFlag) {
-		my @silliness = keys %$lastResults;
-		$cache->set({$pId=>\@silliness}, 60*60*24*360);
-		return \@silliness;
-	}
+#	if ($returnArrayFlag) {
+#		my @silliness = keys %$lastResults;
+#		$cache->set({$pId=>\@silliness}, 60*60*24*360);
+#		return \@silliness;
+#	}
 	foreach (keys %$lastResults) {
 		my $details = $lastResults->{$_};
 		push(@$rowsLoop, {
@@ -1286,6 +1292,30 @@ sub getAllPossibleEventPrerequisites {
 		push(@$messageLoop,{reqmessage=>$message}) if $message;
 	}	
 	return $required,$messageLoop;
+}
+
+
+#------------------------------------------------------------------
+sub getAllPossibleRequiredEvents {
+	my $self = shift;
+	my $pId = shift;
+	$cache = WebGUI::Cache->new($self->session,["gAPRE",$pId]);
+	my $eventData = $cache->get;
+	return $eventData->{$pId} if defined $eventData->{$pId};
+
+	# Get all required events for this event (base case)
+	my $lastResults = $self->session->db->buildArrayRef("select distinct(r.requiredProductId) from EventManagementSystem_prerequisiteEvents as r where r.prerequisiteId = ?",[$pId]);
+	my $lastResultsSize = scalar(@$lastResults);
+	my $currentResultsSize = -4;
+	# initial case must not qualify as the base case
+	return [] unless $lastResultsSize;
+	until ($currentResultsSize == $lastResultsSize) {
+		$currentResultsSize = $lastResultsSize;
+		$lastResults = $self->session->db->buildArrayRef("select distinct(r.requiredProductId) from EventManagementSystem_prerequisiteEvents as r, EventManagementSystem_products as p where r.prerequisiteId = p.prerequisiteId and p.productId in (".$self->session->db->quoteAndJoin($lastResults).")");
+		$lastResultsSize = scalar(@$lastResults);
+	}
+	$cache->set({$pId=>$lastResults}, 60*60*24*360);
+	return $lastResults;
 }
 
 
@@ -2589,7 +2619,7 @@ sub www_search {
 	$searchPhrases &&= " and ( ".$searchPhrases." )";
 	# $self->session->errorHandler->warn("searchPhrases: $searchPhrases<br />basicSearch: $basicSearch<br />");
 	# Get the products available for sale for this page
-	my $sql = "select p.productId, p.title, p.description, p.price, p.templateId, p.weight, p.sku, p.skuTemplate, e.approved, e.maximumAttendees, e.startDate, e.endDate $selects
+	my $sql = "select p.productId, p.title, p.description, p.price, p.templateId, p.weight, p.sku, p.skuTemplate, e.approved, e.maximumAttendees, e.startDate, e.endDate, e.prerequisiteId $selects
 		   from products as p, EventManagementSystem_products as e 
 		   $joins 
 		   where
@@ -2627,8 +2657,10 @@ sub www_search {
 	while ($data = $sth->hashRef) {
 		my $shouldPush = 1;
 		my $eventId = $data->{productId};
-		my $requiredList = $self->verifyAllPrerequisites($eventId);
-		# print "\nrequiredList: ".join(',',@$requiredList)." productId: ".$eventId;
+		my $requiredList = 
+			($data->{prerequisiteId})
+			?$self->getAllPossibleRequiredEvents($data->{prerequisiteId})
+			:[];
 		if ($seatsAvailable ne 'none') {
 			my ($numberRegistered) = $self->session->db->quickArray("select count(*) from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p
 	  	where r.purchaseId = p.purchaseId and r.returned=0 and r.productId=".$self->session->db->quote($eventId));
