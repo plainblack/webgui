@@ -103,6 +103,21 @@ our $HELP = {
                                 namespace => 'Asset_EventManagementSystem',
                         },
                         {
+                                title => 'weight',
+                                description => 'weight description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'sku',
+                                description => 'sku description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'sku template',
+                                description => 'sku template',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
                                 title => 'add/edit event start date',
                                 description => 'add/edit event start date description',
                                 namespace => 'Asset_EventManagementSystem',
