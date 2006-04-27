@@ -2623,11 +2623,12 @@ sub www_search {
 	$searchPhrases &&= " and ( ".$searchPhrases." )";
 	# $self->session->errorHandler->warn("searchPhrases: $searchPhrases<br />basicSearch: $basicSearch<br />");
 	# Get the products available for sale for this page
+	my $approvalPhrase = ($self->canApproveEvents)?' ':' and approved=1';
 	my $sql = "select p.productId, p.title, p.description, p.price, p.templateId, p.weight, p.sku, p.skuTemplate, e.approved, e.maximumAttendees, e.startDate, e.endDate, e.prerequisiteId $selects
 		   from products as p, EventManagementSystem_products as e 
 		   $joins 
 		   where
-		   	p.productId = e.productId and approved=1
+		   	p.productId = e.productId $approvalPhrase
 		   	and e.assetId =".$self->session->db->quote($self->get("assetId")).$searchPhrases. " order by sequenceNumber";
 #		   	." 
 #			and p.productId not in (select distinct(productId) from EventManagementSystem_prerequisites)";		
