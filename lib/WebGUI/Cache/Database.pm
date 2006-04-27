@@ -108,6 +108,22 @@ sub get {
 
 #-------------------------------------------------------------------
 
+=head2 getNamespaceSize ( )
+
+Returns the size (in bytes) of the current cache under this namespace. Consequently it also cleans up expired cache items.
+
+=cut
+
+sub getNamespaceSize {
+        my $self = shift;
+        my $expiresModifier = shift || 0;
+	$self->session->db->write("delete from cache where expires < ?",[time()+$expiresModifier]);
+	my ($size) = $self->session->db->quickArray("select sum(size) from cache where namepsace=?",[$self->{_namespace}]);
+	return $size;
+}
+
+#-------------------------------------------------------------------
+
 =head2 new ( session, key [, namespace ]  )
 
 Constructor.

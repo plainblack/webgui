@@ -420,7 +420,7 @@ sub addWorkflow {
 			"WebGUI::Workflow::Activity::ExpireGroupings", "WebGUI::Workflow::Activity::PurgeOldAssetRevisions",
 			"WebGUI::Workflow::Activity::ExpireSubscriptionCodes", "WebGUI::Workflow::Activity::PurgeOldTrash", 
 			"WebGUI::Workflow::Activity::GetSyndicatedContent", "WebGUI::Workflow::Activity::ProcessRecurringPayments",
-			"WebGUI::Workflow::Activity::SendQueuedMailMessages",
+			"WebGUI::Workflow::Activity::SendQueuedMailMessages", "WebGUI::Workflow::Activity::CleanDatabaseCache",
 			"WebGUI::Workflow::Activity::SyncProfilesToLdap", "WebGUI::Workflow::Activity::SummarizePassiveProfileLog"],
 		"WebGUI::User"=>["WebGUI::Workflow::Activity::CreateCronJob", "WebGUI::Workflow::Activity::NotifyAboutUser"],
 		"WebGUI::VersionTag"=>["WebGUI::Workflow::Activity::CommitVersionTag", "WebGUI::Workflow::Activity::RollbackVersionTag", 
@@ -452,7 +452,10 @@ sub addWorkflow {
 	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::ProcessRecurringPayments", "pbwfactivity0000000013");
 	$activity->set("title", "Process Recurring Payments");
 	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::CleanFileCache", "pbwfactivity0000000002");
-	$activity->set("title","Prune cache larger than 100MB");
+	$activity->set("title","Prune file cache larger than 100MB");
+	$activity->set("sizeLimit", 1000000000);
+	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::CleanDatabaseCache", "pbwfactivity0000000022");
+	$activity->set("title","Prune database cache larger than 100MB");
 	$activity->set("sizeLimit", 1000000000);
 	$activity = $workflow->addActivity("WebGUI::Workflow::Activity::ArchiveOldThreads", "pbwfactivity0000000005");
 	$activity->set("title", "Archive old CS threads");
