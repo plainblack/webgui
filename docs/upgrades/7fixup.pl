@@ -39,7 +39,7 @@ sub addNewContent {
 		ownerUserId=>'3',
 		groupIdView=>'7',
 		groupIdEdit=>'4',
-		description=>q|<p>The <a href="http://www.webgui.org">WebGUI Content Engine</a> is a powerful and easy to use system for managing web sites, and building web applications. It provides thousands of features out of the box, and lots of plug-in points so you can extend it to match your needs. It's easy enough for the average business user, but powerful enough for any large enterprise.</p>
+		description=>q|<p>The <a href="http://www.webgui.org">WebGUI Content Engine&reg;</a> is a powerful and easy to use system for managing web sites, and building web applications. It provides thousands of features out of the box, and lots of plug-in points so you can extend it to match your needs. It's easy enough for the average business user, but powerful enough for any large enterprise.</p>
 
 <p>There are thousands of <a href="http://www.jeffmillerphotography.com">small</a> and <a href="http://www.brunswicknt.com">large</a> businesses, <a href="http://phila.k12.pa.us">schools</a>, <a href="http://www.csumathsuccess.org">universities</a>, <a href="http://beijing.usembassy.gov/">governments</a>, <a href="http://www.gama.org">associations</a>, <a href="http://www.monashwushu.com">clubs</a>, <a href="http://www.sunsetpres.org">churches</a>, <a href="http://www.k3b.org">projects</a>, and <a href="http://www.comparehangouts.com">communities</a> using WebGUI all over the world today. A brief list of some of them can be found <a href="http://www.plainblack.com/webgui/campaigns/sightings">here</a>. Your site should be on that list.</p>|,
 		templateId=>'PBtmpl0000000000000002'
@@ -88,13 +88,13 @@ sub addNewContent {
 		groupIdEdit=>'4',
 		description=>q|
 <p>
-If you're reading this message that means you've successfully installed and configured WebGUI. Great job!
+If you're reading this message that means you've successfully installed and configured the WebGUI Content Engine&reg;. Great job!
 </p>
 <p>
 Now you should <a href="^/;?op=auth">log in</a> and <a href="^LoginToggle(linkonly);">go into admin mode</a>. The default username is "admin" and the default password is "123qwe", but you probably customized both of those when you visited this site for the very first time.
 </p>
 <p>
-Now that you're logged in, we recommend <a href="^/;?op=listUsers">creating a secondary account</a> for yourself with admin privileges just in case you forget the login information for your primary admin account. Don't worry if you lock yourself out, you can always contact <a href="http://www.plainblack.com">Plain Black</a> support to get instructions to get back in.
+Now that you're logged in, we recommend <a href="^/;?op=listUsers">creating a secondary account</a> for yourself with admin privileges just in case you forget the login information for your primary admin account. Don't worry if you lock yourself out, you can always contact <a href="http://www.plainblack.com">Plain Black&reg;</a> support to get instructions to get back in.
 </p>
 <p>
 No doubt after you enabled admin mode you saw a menu along the left side of the screen, that's called the Admin Bar. Use that to add content and access administrative functions. To get started with managing content, watch the short instructional video below.
@@ -123,7 +123,7 @@ Enjoy your new WebGUI site!
 		ownerUserId=>'3',
 		groupIdView=>'7',
 		groupIdEdit=>'4',
-		description=>q|<p>Plain Black created WebGUI and is here to answer your questions and provide you with services to make sure your WebGUI implementation is entirely successful. We bend over backwards to make sure you're a success. <a href="http://www.plainblack.com/contact_us">Contact us</a> today to see how we can help you.</p>|,
+		description=>q|<p>Plain Black&reg; created the WebGUI Content Engine&reg; and is here to answer your questions and provide you with services to make sure your WebGUI implementation is entirely successful. We bend over backwards to make sure you're a success. <a href="http://www.plainblack.com/contact_us">Contact us</a> today to see how we can help you.</p>|,
 		templateId=>'PBtmpl0000000000000002'
 		});
 	$yns->addChild({
@@ -335,12 +335,13 @@ sub addNewStyles {
 				$folder->addChild(\%properties, "7.0-style".sprintf("%013d",$assetCounter));
 			} elsif ($file =~ m/\.snippet$/) {
 				open(FILE,"<7fixup/".$style."/".$file);
-				my $head = 0;
+				my $head = 1;
 				my %properties = (className=>"WebGUI::Asset::Snippet");
 				while (my $line = <FILE>) {
-					if ($line =~ m/^\#(.*):(.*)$/) {
+					if ($head && $line =~ m/^\#(\w+):(.*)$/) {
 						$properties{$1} = $2;
 					} else {
+						$head = 0;
 						$properties{snippet} .= $line;	
 					}
 				}

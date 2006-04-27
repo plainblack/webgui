@@ -528,7 +528,7 @@ sub www_view {
 	my $self = shift;
 	my $mimeType = $self->getValue('mimeType') || 'text/html';
 	if ($mimeType eq 'text/html') {
-		return $self->SUPER->www_view();
+		return $self->SUPER::www_view();
 	}
 	else {
 		$self->prepareView();
