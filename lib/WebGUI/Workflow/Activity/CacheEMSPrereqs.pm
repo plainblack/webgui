@@ -74,11 +74,11 @@ sub execute {
 	my $instance = shift;
 	my ($emsId) = $self->session->db->quickArray("select assetId from asset where className='WebGUI::Asset::Wobject::EventManagementSystem' limit 1");
 	return $self->COMPLETE unless $emsId;
-	WebGUI::Cache->new($self->session)->deleteChunk(["verifyAllPrerequisites"]);
 	my $ems = WebGUI::Asset->newByDynamicClass($self->session,$emsId);
 	my $start = time();
 	my $leftOff = $instance->getScratch("emsleftoff");
 	my $skip = ($leftOff ne "") ? 1 : 0;
+	WebGUI::Cache->new($self->session)->deleteChunk(["verifyAllPrerequisites"]) unless ($skip);
 	my $status = $self->COMPLETE;
 	my @events = $self->session->db->buildArray("select productId from EventManagementSystem_products");
 	foreach my $event (@events) {
