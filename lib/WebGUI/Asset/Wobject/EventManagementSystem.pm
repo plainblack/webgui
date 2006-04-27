@@ -599,12 +599,12 @@ sub getAssignedPrerequisites {
 	my $sql;
 
 	unless ($returnProductIdFlag) {
-		$sql = "select prerequisiteId, operator from EventManagementSystem_prerequisites 
-			where productId=?";
+		$sql = "select prereqs.prerequisiteId, prereqs.operator from EventManagementSystem_prerequisites as prereqs, EventManagementSystem_products as p 
+			where prereqs.prerequisiteId = p.prerequisiteId and p.productId=?";
 	}
 	else {
-		$sql = "select prerequisiteId, operator from EventManagementSystem_prerequisites 
-		   where productId=?";
+		$sql = "select prereqs.prerequisiteId, prereqs.operator from EventManagementSystem_prerequisites as prereqs, EventManagementSystem_products as p 
+		   where where prereqs.prerequisiteId = p.prerequisiteId and p.productId=?";
 	}
 	
 	return $self->session->db->buildHashRef($sql,[$eventId]); 
