@@ -78,9 +78,9 @@ sub execute {
 	my $start = time();
 	my $leftOff = $instance->getScratch("emsleftoff");
 	my $skip = ($leftOff ne "") ? 1 : 0;
-	WebGUI::Cache->new($self->session)->deleteChunk(["verifyAllPrerequisites"]) unless ($skip);
+	WebGUI::Cache->new($self->session)->deleteChunk(["gAPRE"]) unless ($skip);
 	my $status = $self->COMPLETE;
-	my @events = $self->session->db->buildArray("select productId from EventManagementSystem_products");
+	my @events = $self->session->db->buildArray("select distinct(prerequisiteId) from EventManagementSystem_products");
 	foreach my $event (@events) {
 		$skip = 0 if ($leftOff eq $event);
 		next if $skip;
@@ -89,7 +89,7 @@ sub execute {
 			$status = $self->WAITING;
 			last;
 		} 
-		$ems->verifyAllPrerequisites($event);
+		$ems->getAllPossibleRequiredEvents($event) if $event;
 	}
 	$self->session->errorHandler->warn('EMS Cacher Ran! Status: '.$status);
 	return $status;
