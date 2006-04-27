@@ -118,13 +118,13 @@ sub definition {
 				},
 			karmaRank => {
 				noFormPost=>1,
-				fieldType=>"hidden",
+				fieldType=>"float",
 				defaultValue=>0
 				},
 			karmaScale => {
 				noFormPost=>1,
 				fieldType=>"integer",
-				defaultValue=>1
+				defaultValue=>10
 				}
 			},
 		});
@@ -521,8 +521,9 @@ sub processPropertiesFromFormPost {
         	$self->getParent->incrementThreads($self->get("dateUpdated"),$self->getId) unless ($self->isReply);
 	}
 	if ($self->getParent->canEdit) {
-		my $karmaScale = $self->session->form("karmaScale","integer") || 1;
-		$self->update({karmaScale=>$karmaScale, karmaRank=>$self->get("karma")/$karmaScale});
+		my $karmaScale = $self->session->form->process("karmaScale","integer") || $self->getParent->get("defaultKarmaScale");
+		my $karmaRank = $self->get("karma")/$karmaScale;
+		$self->update({karmaScale=>$karmaScale, karmaRank=>$karmaRank});
 	}
 }
 
@@ -742,7 +743,7 @@ sub view {
         $self->session->scratch->set("discussionLayout",$self->session->form->process("layout"));
         my $var = $self->getTemplateVars;
 	$self->getParent->appendTemplateLabels($var);
-
+	$var->{karmaIsEnabled} = $self->session->setting->get("useKarma");
         $var->{'user.isVisitor'} = ($self->session->user->userId eq '1');
         $var->{'user.isModerator'} = $self->getParent->canEdit;
         $var->{'user.canPost'} = $self->getParent->canPost;
@@ -947,7 +948,8 @@ sub www_transferKarma {
 	if ($amount <= $self->session->user->karma) {
 		$self->session->user->karma($amount, "Thread ".$self->getId, "Transferring karma to a thread.");
 		my $newKarma = $self->get("karma")+$amount;
-		$self->update({karma=>$newKarma,karmaRank=>$newKarma/$self->get("karmaScale")});
+		my $karmaScale = $self->get("karmaScale") || 1;
+		$self->update({karma=>$newKarma,karmaRank=>$newKarma/$karmaScale});
 	}
 	return $self->www_view;
 }

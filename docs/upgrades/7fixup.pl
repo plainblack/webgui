@@ -485,6 +485,24 @@ sub addPrototypes {
 		threadTemplateId=>"PBtmpl0000000000000067",
 		postFormTemplateId=>"PBtmpl0000000000000068"	
 		},"pbproto000000000000001");
+	$importNode->addChild({
+		title=>"Request Tracker",
+		menuTitle=>"Request Tracker",
+		url=>"request-tracker-prototype",
+		groupIdView=>'7',
+		groupIdEdit=>'12',
+		className=>'WebGUI::Asset::Wobject::Collaboration',
+		assetId=>"new",
+		allowReplies=>1,
+		attachmentsPerPost=>10,
+		isPrototype=>1,
+		usePreview=>0,
+		archiveAfter=>60*60*24*30,
+		defaultKarmaScale=>100,
+		collaborationTemplateId=>"PBtmpl0000000000000208",
+		threadTemplateId=>"PBtmpl0000000000000209",
+		postFormTemplateId=>"PBtmpl0000000000000210"	
+		},"pbproto000000000000001");
 }
 
 

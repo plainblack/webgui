@@ -687,7 +687,6 @@ sub postProcess {
 		$size += $storage->getFileSize($file);
 	}
 	$self->setSize($size);
-
 }
 
 #-------------------------------------------------------------------
@@ -946,6 +945,7 @@ sub www_edit {
                 $content .= "\n\n".$self->session->user->profileField("signature") if ($self->session->user->profileField("signature") && !$self->session->form->process("content"));
 	} else { # edit
 		return $self->session->privilege->insufficient() unless ($self->canEdit);
+		$var{isThread} = !$self->isReply;
         	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
 			.WebGUI::Form::hidden($self->session, {
                 		name=>"func",
@@ -1030,9 +1030,10 @@ sub www_edit {
 		});
 	$var{'karmaScale.form'} = WebGUI::Form::integer($self->session, {
 		name=>"karmaScale",
+		defaultValue=>$self->getThread->getParent->get("defaultKarmaScale"),
 		value=>$self->getValue("karmaScale"),
-		defaultValue=>1
 		});
+	$var{karmaIsEnabled} = $self->session->setting->get("useKarma");
 	$var{'form.preview'} = WebGUI::Form::submit($self->session, {
 		value=>$i18n->get("preview","Asset_Collaboration")
 		});

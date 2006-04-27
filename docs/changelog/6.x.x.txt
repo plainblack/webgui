@@ -32,6 +32,7 @@
  - Increased the performance of CS Thread viewing by 500%.
  - Changed the CS post rating mechinism to thumbs up/down to be less
    confusing.
+ - Added CS templates to run a request tracker (trouble ticket) style system.
  - Updated TinyMCE rich text editor to version 2.0.5.1.
  - Disabled the rich editor for Safari because it doesn't work correctly.
  - Added install/uninstall functions to the asset and wobject skeletons to

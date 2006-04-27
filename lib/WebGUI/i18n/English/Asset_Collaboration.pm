@@ -272,8 +272,53 @@ our $I18N = {
 		lastUpdated => 1109618544,
 	},
 
-	'contentType' => {
-		message => q|Content Type|,
+	'open' => {
+		message => q|Open|,
+		lastUpdated => 1109618544,
+	},
+
+	'closed' => {
+		message => q|Closed|,
+		lastUpdated => 1109618544,
+	},
+
+	'transfer karma' => {
+		message => q|Transfer Karma|,
+		lastUpdated => 1109618544,
+	},
+
+	'karma scale' => {
+		message => q|Karma Scale|,
+		lastUpdated => 1109618544,
+	},
+
+	'close' => {
+		message => q|Close|,
+		lastUpdated => 1109618544,
+	},
+
+	'critical' => {
+		message => q|Critical (mostly not working)|,
+		lastUpdated => 1109618544,
+	},
+
+	'cosmetic' => {
+		message => q|Cosmetic (misspelling, formatting problems)|,
+		lastUpdated => 1109618544,
+	},
+
+	'minor' => {
+		message => q|Minor (annoying, but not harmful)|,
+		lastUpdated => 1109618544,
+	},
+
+	'fatal' => {
+		message => q|Fatal (can't continue until this is resolved)|,
+		lastUpdated => 1109618544,
+	},
+
+	'severity' => {
+		message => q|Severity|,
 		lastUpdated => 1109618544,
 	},
 
@@ -675,8 +720,36 @@ our $I18N = {
 ^International("word","Asset_Collaboration"); "^International("compensation","Asset_Collaboration");".
 <p>
 
-<b>contentType.label</b><br>
-^International("phrase","Asset_Collaboration"); "^International("contentType","Asset_Collaboration");".
+<b>open.label</b><br>
+^International("word","Asset_Collaboration"); "^International("open","Asset_Collaboration");".
+<p>
+
+<b>close.label</b><br>
+^International("word","Asset_Collaboration"); "^International("close","Asset_Collaboration");".
+<p>
+
+<b>closed.label</b><br>
+^International("word","Asset_Collaboration"); "^International("closed","Asset_Collaboration");".
+<p>
+
+<b>critical.label</b><br>
+^International("word","Asset_Collaboration"); "^International("critical","Asset_Collaboration");".
+<p>
+
+<b>minor.label</b><br>
+^International("word","Asset_Collaboration"); "^International("minor","Asset_Collaboration");".
+<p>
+
+<b>cosmetic.label</b><br>
+^International("word","Asset_Collaboration"); "^International("cosmetic","Asset_Collaboration");".
+<p>
+
+<b>fatal.label</b><br>
+^International("word","Asset_Collaboration"); "^International("fatal","Asset_Collaboration");".
+<p>
+
+<b>severity.label</b><br>
+^International("word","Asset_Collaboration"); "^International("severity","Asset_Collaboration");".
 <p>
 
 <b>date.label</b><br>
@@ -864,7 +937,7 @@ our $I18N = {
 <p>
 
 |,
-		lastUpdated => 1145039922
+		lastUpdated => 1146153770
 	},
 	
 	'collaboration add/edit title' => {
@@ -1229,6 +1302,14 @@ the Collaboration Asset, the user will be notified.
 A URL for unsubscribing the current user from this Asset.
 
 <p>
+<b>karmaIsEnabled</b><br>
+A boolean indicating whether the use of karma is enabled or not.
+
+<p>
+<b>sortby.karmaRank.url</b><br>
+A URL for sorting and displaying the list of posts by the amount of karma users have transfered to the thread.
+
+<p>
 <b>sortby.title.url</b><br>
 A URL for sorting and displaying the list of posts by title.
 
@@ -1257,7 +1338,7 @@ A URL for sorting and displaying the list of posts by the number of replies to t
 A URL for sorting and displaying the list of posts by their ratings.
 
                 |,
-		lastUpdated => 1114466583,
+		lastUpdated => 1146150802,
 	},
 
 	'collaboration search template title' => {

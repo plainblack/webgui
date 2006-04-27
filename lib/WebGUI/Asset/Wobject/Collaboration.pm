@@ -105,6 +105,16 @@ sub appendTemplateLabels {
 	my $self = shift;
 	my $var = shift;
 	my $i18n = WebGUI::International->new($self->session, "Asset_Collaboration");
+	$var->{"transferkarma.label"} = $i18n->get("transfer karma");
+	$var->{"karmaScale.label"} = $i18n->get("karma scale");
+	$var->{"close.label"} = $i18n->get("close");
+	$var->{"closed.label"} = $i18n->get("closed");
+	$var->{"open.label"} = $i18n->get("open");
+	$var->{"critical.label"} = $i18n->get("critical");
+	$var->{"cosmetic.label"} = $i18n->get("cosmetic");
+	$var->{"minor.label"} = $i18n->get("minor");
+	$var->{"fatal.label"} = $i18n->get("fatal");
+	$var->{"severity.label"} = $i18n->get("severity");
 	$var->{"add.label"} = $i18n->get("add");
 	$var->{"addlink.label"} = $i18n->get("addlink");
 	$var->{"addquestion.label"} = $i18n->get("addquestion");
@@ -126,6 +136,7 @@ sub appendTemplateLabels {
 	$var->{"job.title.label"} = $i18n->get("job title");
 	$var->{"job.description.label"} = $i18n->get("job description");
 	$var->{"job.requirements.label"} = $i18n->get("job requirements");
+	$var->{"karmaRank.label"} = $i18n->get("karma rank");
 	$var->{"location.label"} = $i18n->get("location");
 	$var->{"layout.flat.label"} = $i18n->get("flatLayout");
 	$var->{'link.header.label'} = $i18n->get("edit link");
@@ -614,14 +625,16 @@ sub getEditForm {
 			);
                 $tabform->getTab("properties")->integer(
 			-name=>"karmaRatingMultiplier",
-			$i18n->get('karma rating multiplier'),
+			-label=>$i18n->get('karma rating multiplier'),
 			-hoverHelp=>$i18n->get('karma rating multiplier description'),
+			-defaultValue=>1,
 			-value=>$self->getValue("karmaRatingMultiplier")
 			);
                 $tabform->getTab("properties")->integer(
 			-name=>"defaultKarmaScale",
-			$i18n->get("default karma scale"),
+			-label=>$i18n->get("default karma scale"),
 			-hoverHelp=>$i18n->get('default karma scale help'),
+			-defaultValue=>10,
 			-value=>$self->getValue("defaultKarmaScale")
 			);
         } else {
@@ -1058,6 +1071,8 @@ sub view {
 	$var{'user.isSubscribed'} = $self->isSubscribed;
 	$var{'sortby.title.url'} = $self->getSortByUrl("title");
 	$var{'sortby.username.url'} = $self->getSortByUrl("username");
+	$var{'karmaIsEnabled'} = $self->session->setting->get("useKarma");
+	$var{'sortby.karmaRank.url'} = $self->getSortByUrl("karmaRank");
 	$var{'sortby.date.url'} = $self->getSortByUrl("dateSubmitted");
 	$var{'sortby.lastreply.url'} = $self->getSortByUrl("lastPostDate");
 	$var{'sortby.views.url'} = $self->getSortByUrl("views");
