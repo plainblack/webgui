@@ -170,7 +170,7 @@ function sp_draw() {
     	if (cookie)
       		this.showPanel(cookie);
         else
-      		this.showPanel(0);
+      		this.showPanel(this.panels.length-1);
 	//float the panel as someone scrolls
         startY = 0;
         var d = document;
