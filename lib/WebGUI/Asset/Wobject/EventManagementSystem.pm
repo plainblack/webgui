@@ -326,7 +326,7 @@ sub checkConflicts {
 		# make sure it's a subevent... 
 		my ($isSubEvent) = $self->session->db->quickArray("
 			select count(*) from EventManagementSystem_products
-			where prerequisiteId is not null and productId=?", [$scheduleData->{productId}]
+			where (prerequisiteId is not null or prerequisiteId != '') and productId=?", [$scheduleData->{productId}]
 		);
 		next unless ($isSubEvent);
 				
@@ -2800,7 +2800,7 @@ sub view {
 		   where
 		   	p.productId = e.productId and approved=1
 		   	and e.assetId =".$self->session->db->quote($self->get("assetId"))."
-			and e.prerequisiteId is NULL";
+			and (e.prerequisiteId is NULL or e.prerequisiteId = '')";
 			#and p.productId not in (select distinct(productId) from EventManagementSystem_prerequisites) order by sequenceNumber";		
 
 	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->get("paginateAfter"));
