@@ -1311,7 +1311,9 @@ sub getAllPossibleRequiredEvents {
 	return [] unless $lastResultsSize;
 	until ($currentResultsSize == $lastResultsSize) {
 		$currentResultsSize = $lastResultsSize;
-		$lastResults = $self->session->db->buildArrayRef("select distinct(r.requiredProductId) from EventManagementSystem_prerequisiteEvents as r, EventManagementSystem_products as p where r.prerequisiteId = p.prerequisiteId and p.productId in (".$self->session->db->quoteAndJoin($lastResults).")");
+		my $newResults = $self->session->db->buildArrayRef("select distinct(r.requiredProductId) from EventManagementSystem_prerequisiteEvents as r, EventManagementSystem_products as p where r.prerequisiteId = p.prerequisiteId and p.productId in (".$self->session->db->quoteAndJoin($lastResults).")");
+		return $lastResults unless scalar(@$newResults);
+		$lastResults = $newResults;
 		$lastResultsSize = scalar(@$lastResults);
 	}
 	$cache->set({$pId=>$lastResults}, 60*60*24*360);
