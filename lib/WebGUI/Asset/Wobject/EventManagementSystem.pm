@@ -1299,7 +1299,7 @@ sub getAllPossibleEventPrerequisites {
 sub getAllPossibleRequiredEvents {
 	my $self = shift;
 	my $pId = shift;
-	$cache = WebGUI::Cache->new($self->session,["gAPRE",$pId]);
+	my $cache = WebGUI::Cache->new($self->session,["gAPRE",$pId]);
 	my $eventData = $cache->get;
 	return $eventData->{$pId} if defined $eventData->{$pId};
 
