@@ -1951,6 +1951,7 @@ Method to display list of purchases.  Event admins can see everyone's purchases.
 
 sub www_managePurchases {
 	my $self = shift;
+	return $self->session->privilege->insufficient if $self->session->var->get('userId') eq '1';
 	my %var = $self->get();
 	my $isAdmin = $self->canAddEvents;
 
