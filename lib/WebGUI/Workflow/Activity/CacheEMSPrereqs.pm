@@ -70,16 +70,30 @@ See WebGUI::Workflow::Activity::execute() for details.
 
 sub execute {
 	my $self = shift;
+	my $object = shift;
+	my $instance = shift;
 	my ($emsId) = $self->session->db->quickArray("select assetId from asset where className='WebGUI::Asset::Wobject::EventManagementSystem' limit 1");
 	return $self->COMPLETE unless $emsId;
 	WebGUI::Cache->new($self->session)->deleteChunk(["verifyAllPrerequisites"]);
 	my $ems = WebGUI::Asset->newByDynamicClass($self->session,$emsId);
+	my $start = time();
+	my $leftOff = $instance->getScratch("emsleftoff");
+	my $skip = ($leftOff ne "") ? 1 : 0;
+	my $status = $self->COMPLETE;
 	my @events = $self->session->db->buildArray("select productId from EventManagementSystem_products");
-	foreach (@events) {
-		$ems->verifyAllPrerequisites($_);
+	foreach my $event (@events) {
+		$skip = 0 if ($leftOff eq $event);
+		next if $skip;
+		if ((time() - $start) > 60) { # give up so something else can run for a while
+			$instance->setScratch("emsleftoff",$event);	
+			$status = $self->WAITING;
+			last;
+		} 
+		$self->session->errorHandler->warn('EMS Cacher Running '.$event);
+		$ems->verifyAllPrerequisites($event);
 	}
-	$self->session->errorHandler->warn('EMS Cacher Ran!');
-	return $self->COMPLETE;
+	$self->session->errorHandler->warn('EMS Cacher Ran! Status: '.$status);
+	return $status;
 }
 
 
