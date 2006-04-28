@@ -520,9 +520,10 @@ sub processPropertiesFromFormPost {
 #-------------------------------------------------------------------
 sub www_editBenefit {
    my $self = shift;
+	my $bid = shift || $self->session->form->process("bid");
    return $self->session->privilege->insufficient() unless ($self->canEdit);
    my ($data, $f, $benefits);
-   $data = $self->getCollateral("Product_benefit","Product_benefitId",$self->session->form->process("bid"));
+   $data = $self->getCollateral("Product_benefit","Product_benefitId",$bid);
 	my $i18n = WebGUI::International->new($self->session,'Asset_Product');
    $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
    $f->hidden(
@@ -554,23 +555,22 @@ sub www_editBenefit {
 sub www_editBenefitSave {
    my $self = shift;
    return $self->session->privilege->insufficient() unless ($self->canEdit);
-   $self->session->form->process("benefit") = $self->session->form->process("benefit_new") if ($self->session->form->process("benefit_new") ne "");
    $self->setCollateral("Product_benefit", "Product_benefitId", {
 		                                          Product_benefitId => $self->session->form->process("bid"),
-		                                          benefit => $self->session->form->process("benefit")
+		                                          benefit => $self->session->form->process("benefit","combo")
 		                                        });
    
    return "" unless($self->session->form->process("proceed"));
-   $self->session->form->process("bid") = "new";
-   return $self->www_editBenefit();
+   return $self->www_editBenefit("new");
 }
 
 #-------------------------------------------------------------------
 sub www_editFeature {
    my $self = shift;
+	my $fid = shift || $self->session->form->process("fid");
    return $self->session->privilege->insufficient() unless ($self->canEdit);
    my ($data, $f, $features);
-   $data = $self->getCollateral("Product_feature","Product_featureId",$self->session->form->process("fid"));
+   $data = $self->getCollateral("Product_feature","Product_featureId",$fid);
 	my $i18n = WebGUI::International->new($self->session,'Asset_Product');
    $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
    $f->hidden(
@@ -602,23 +602,22 @@ sub www_editFeature {
 sub www_editFeatureSave {
    my $self = shift;
    return $self->session->privilege->insufficient() unless ($self->canEdit);
-   $self->session->form->process("feature") = $self->session->form->process("feature_new") if ($self->session->form->process("feature_new") ne "");
    $self->setCollateral("Product_feature", "Product_featureId", {
                                               Product_featureId => $self->session->form->process("fid"),
-                                              feature => $self->session->form->process("feature")
+                                              feature => $self->session->form->process("feature","combo")
                                              });
    return "" unless($self->session->form->process("proceed"));
-   $self->session->form->process("fid") = "new";
-   return $self->www_editFeature();
+   return $self->www_editFeature("new");
 }
 
 #-------------------------------------------------------------------
 sub www_editSpecification {
    my $self = shift;
+	my $sid = shift || $self->session->form->process("sid");
    return $self->session->privilege->insufficient() unless ($self->canEdit);
    my ($data, $f, $hashRef);
 	my $i18n = WebGUI::International->new($self->session,'Asset_Product');
-   $data = $self->getCollateral("Product_specification","Product_specificationId",$self->session->form->process("sid"));
+   $data = $self->getCollateral("Product_specification","Product_specificationId",$sid);
    $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
    $f->hidden(
 		-name => "sid",
@@ -663,18 +662,15 @@ sub www_editSpecification {
 sub www_editSpecificationSave {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless ($self->canEdit);
-	$self->session->form->process("name") = $self->session->form->process("name_new") if ($self->session->form->process("name_new") ne "");
-	$self->session->form->process("units") = $self->session->form->process("units_new") if ($self->session->form->process("units_new") ne "");
 	$self->setCollateral("Product_specification", "Product_specificationId", {
 		Product_specificationId => $self->session->form->process("sid"),
 		name => $self->session->form->process("name"),
-		value => $self->session->form->process("value"),
-		units => $self->session->form->process("units")
+		value => $self->session->form->process("value","combo"),
+		units => $self->session->form->process("units","combo")
 	});
 
 	return "" unless($self->session->form->process("proceed"));
-	$self->session->form->process("sid") = "new";
-	return $self->www_editSpecification();
+	return $self->www_editSpecification("new");
 }
 
 #-------------------------------------------------------------------

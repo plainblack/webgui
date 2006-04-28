@@ -296,9 +296,6 @@ sub getListTemplateVars {
 	my @fieldLoop;
 	$var->{"back.url"} = $self->getFormUrl;
 	$var->{"back.label"} = $i18n->get('go to form');
-	#$var->{"entryId"} = $self->getId;
-	#$var->{"delete.url"} = $self->getUrl.";func=deleteAllEntries";
-	#$var->{"delete.label"} = $i18n->get(91);
 	my $fields = $self->session->db->read("select DataForm_fieldId,name,label,isMailField,type from DataForm_field
 			where assetId=".$self->session->db->quote($self->getId)." order by sequenceNumber");
 	while (my $field = $fields->hashRef) {
@@ -385,7 +382,6 @@ sub getRecordTemplateVars {
 	my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
 	$var->{error_loop} = [] unless (exists $var->{error_loop});
 	$var->{canEdit} = ($self->canEdit);
-	#$var->{"entryList.url"} = $self->getUrl('func=view;entryId=list');
 	$var->{"entryList.url"} = $self->getListUrl;
 	$var->{"entryList.label"} = $i18n->get(86);
 	$var->{"export.tab.url"} = $self->getUrl('func=exportTab');
@@ -530,9 +526,10 @@ sub prepareView {
 	# this one is so nutz that we don't even bother preparing, we just execute the whole thing
 	my $passedVars = shift;
 	##Priority encoding
-	if ( $self->session->form->process("mode") eq "form") {
+	my $mode = $self->session->stow->get("mode") || $self->session->form->param("mode");
+	if ( $mode eq "form") {
 		$self->{_view} = $self->viewForm($passedVars);
-	} elsif ( $self->session->form->process("mode") eq "list") {
+	} elsif ( $mode eq "list") {
 		$self->{_view} = $self->viewList;
 	} elsif( $self->defaultViewForm ) {
 		$self->{_view} = $self->viewForm($passedVars);
@@ -717,8 +714,7 @@ sub www_deleteAllEntries {
 	return $self->session->privilege->insufficient() unless $self->canEdit;
         my $assetId = $self->session->form->process("entryId");
 	$self->deleteCollateral("DataForm_entry","assetId",$assetId);
-        $self->session->form->process("entryId") = 'list';
-        return "";
+	$self->session->stow->set("mode","list");
 }
 
 #-------------------------------------------------------------------
@@ -736,8 +732,7 @@ sub www_deleteEntry {
 	return $self->session->privilege->insufficient() unless $self->canEdit;
         my $entryId = $self->session->form->process("entryId");
 	$self->deleteCollateral("DataForm_entry","DataForm_entryId",$entryId);
-        $self->session->form->process("entryId") = 'list';
-        return "";
+	$self->session->stow->set("mode","list");
 }
 
 #-------------------------------------------------------------------

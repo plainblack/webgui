@@ -161,6 +161,8 @@ sub authenticate {
 #-------------------------------------------------------------------
 sub createAccount {
    my $self = shift;
+	my $message = shift;
+	my $confirm = shift || $self->session->form->process("confirm");
    my $vars;
    if ($self->session->user->userId ne "1") {
       return $self->displayAccount;
@@ -168,7 +170,7 @@ sub createAccount {
  	  return $self->displayLogin;
    } 
 	my $i18n = WebGUI::International->new($self->session);
-   $vars->{'create.message'} = $_[0] if ($_[0]);
+   $vars->{'create.message'} = $message if ($message);
 	$vars->{useCaptcha} = $self->session->setting->get("webguiUseCaptcha");
 	if ($vars->{useCaptcha}) {
 		use WebGUI::Form::Captcha;
@@ -182,7 +184,7 @@ sub createAccount {
    $vars->{'create.form.password.label'} = $i18n->get(51);
    $vars->{'create.form.passwordConfirm'} = WebGUI::Form::password($self->session,{"name"=>"authWebGUI.identifierConfirm"});
    $vars->{'create.form.passwordConfirm.label'} = $i18n->get(2,'AuthWebGUI');
-   $vars->{'create.form.hidden'} = WebGUI::Form::hidden($self->session,{"name"=>"confirm","value"=>$self->session->form->process("confirm")});
+   $vars->{'create.form.hidden'} = WebGUI::Form::hidden($self->session,{"name"=>"confirm","value"=>$confirm});
  	$vars->{'recoverPassword.isAllowed'} = $self->getSetting("passwordRecovery");
 	   $vars->{'recoverPassword.url'} = $self->session->url->page('op=auth;method=recoverPassword');
 	   $vars->{'recoverPassword.label'} = $i18n->get(59);
@@ -221,8 +223,7 @@ sub createAccountSave {
    
    #If Email address is not unique, a warning is displayed
    if($warning ne "" && !$self->session->form->process("confirm")){
-      $self->session->form->process("confirm") = 1;
-      return $self->createAccount('<li>'.$i18n->get(1078).'</li>');
+      return $self->createAccount('<li>'.$i18n->get(1078).'</li>', 1);
    }
 
    my $properties;
@@ -499,9 +500,8 @@ sub login {
    if($self->getSetting("passwordTimeout") && $userData->{passwordTimeout}){
       my $expireTime = $userData->{passwordLastUpdated} + $userData->{passwordTimeout};
       if ($self->session->datetime->time() >= $expireTime){
-         $self->session->form->process("uid") = $self->userId;
 		 $self->logout;
-   	     return $self->resetExpiredPassword;
+   	     return $self->resetExpiredPassword($self->userId);
       }  
    }
       
@@ -585,6 +585,7 @@ sub recoverPasswordFinish {
 #-------------------------------------------------------------------
 sub resetExpiredPassword {
     my $self = shift;
+	my $uid = shift || $self->session->form->process("uid");
 	my $vars;
 	
 	my $i18n = WebGUI::International->new($self->session);
@@ -593,7 +594,7 @@ sub resetExpiredPassword {
     $vars->{'expired.form.header'} = "\n\n".WebGUI::Form::formHeader($self->session,{});
     $vars->{'expired.form.hidden'} = WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"});
 	$vars->{'expired.form.hidden'} .= WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>"resetExpiredPasswordSave"});
-   	$vars->{'expired.form.hidden'} .= WebGUI::Form::hidden($self->session,{"name"=>"uid","value"=>$self->session->form->process("uid")});
+   	$vars->{'expired.form.hidden'} .= WebGUI::Form::hidden($self->session,{"name"=>"uid","value"=>$uid});
     
     $vars->{'expired.form.oldPassword'} = WebGUI::Form::password($self->session,{"name"=>"oldPassword"});
     $vars->{'expired.form.oldPassword.label'} = $i18n->get(10,'AuthWebGUI');
@@ -614,7 +615,6 @@ sub resetExpiredPasswordSave {
    
    $u = WebGUI::User->new($self->session,$self->session->form->process("uid"));
 	my $i18n = WebGUI::International->new($self->session);
-   $self->session->form->process("username") = $u->username;
    
    $error .= $self->error if(!$self->authenticate($u->username,$self->session->form->process("oldPassword")));
    $error .= '<li>'.$i18n->get(5,'AuthWebGUI').'</li>' if($self->session->form->process("identifier") eq "password");
@@ -695,7 +695,6 @@ sub updateAccount {
    if(!$error){
       if($username){
 	     $u->username($username);
-         $self->session->form->process("uid") = $u->userId;
 	  }
 	  if($password){
 	     my $userData = $self->getParams;

@@ -198,6 +198,8 @@ sub authenticate {
 #-------------------------------------------------------------------
 sub createAccount {
     my $self = shift;
+	my $message = shift;
+	my $confirm = shift || $self->session->form->process("confirm");
     my $vars;
     if ($self->session->user->userId ne "1") {
        return $self->displayAccount;
@@ -210,7 +212,7 @@ sub createAccount {
 	   $self->{_connection} = WebGUI::LDAPLink->new($self->session,$self->session->form->process("connection"))->get; 
 	}
 	my $connection = $self->{_connection};
-	$vars->{'create.message'} = $_[0] if ($_[0]);
+	$vars->{'create.message'} = $message if ($message);
 	my $i18n = WebGUI::International->new($self->session,"AuthLDAP");
 	$vars->{'create.form.ldapConnection.label'} = $i18n->get("ldapConnection");
 	
@@ -226,7 +228,7 @@ sub createAccount {
     $vars->{'create.form.password'} = WebGUI::Form::password($self->session,{"name"=>"authLDAP_identifier","value"=>$self->session->form->process("authLDAP_identifier")});
     $vars->{'create.form.password.label'} = $connection->{ldapPasswordName};
     
-    $vars->{'create.form.hidden'} = WebGUI::Form::hidden($self->session,{"name"=>"confirm","value"=>$self->session->form->process("confirm")});
+    $vars->{'create.form.hidden'} = WebGUI::Form::hidden($self->session,{"name"=>"confirm","value"=>$confirm});
     return $self->SUPER::createAccount("createAccountSave",$vars);
 }
 
@@ -274,8 +276,7 @@ sub createAccountSave {
    return $self->createAccount("<h1>".$i18n->get(70)."</h1>".$error) unless ($error eq "");
    #If Email address is not unique, a warning is displayed
    if($warning ne "" && !$self->session->form->process("confirm")){
-      $self->session->form->process("confirm") = 1;
-      return $self->createAccount('<li>'.$i18n->get(1078).'</li>');
+      return $self->createAccount('<li>'.$i18n->get(1078).'</li>', 1);
    }
    
    my $properties;

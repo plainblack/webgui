@@ -98,7 +98,6 @@ sub www_copyLDAPLink {
 	$db{ldapLinkId} = "new";
 	$db{ldapLinkName} = "Copy of ".$db{ldapLinkName};
 	$session->db->setRow("ldapLink","ldapLinkId",\%db);
-	$session->form->process("op") = "listLDAPLinks";
 	return www_listLDAPLinks($session);
 }
 

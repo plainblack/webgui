@@ -238,9 +238,9 @@ sub www_editMetaDataFieldSave {
 		return $ac->render($i18n->get("errorEmptyField"),$i18n->get('Edit Metadata'));
 	}
 	if($self->session->form->process("fid") eq 'new') {
-		$self->session->form->process("fid") = $self->session->id->generate();
+		my $fid = $self->session->id->generate();
 		$self->session->db->write("insert into metaData_properties (fieldId, fieldName, defaultValue, description, fieldType, possibleValues) values (".
-					$self->session->db->quote($self->session->form->process("fid")).",".
+					$self->session->db->quote($fid).",".
 					$self->session->db->quote($self->session->form->process("fieldName")).",".
 					$self->session->db->quote($self->session->form->process("defaultValue")).",".
 					$self->session->db->quote($self->session->form->process("description")).",".

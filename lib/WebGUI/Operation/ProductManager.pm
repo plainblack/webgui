@@ -253,8 +253,7 @@ sub www_editProductSave {
 		skuTemplate	=> $session->form->process("skuTemplate"),
 	});
 	
-	$session->form->process("productId") = $product->get('productId');
-	return WebGUI::Operation::execute($session,'manageProduct');
+	return www_manageProduct($session, $product->get('productId'));
 }
 		
 #-------------------------------------------------------------------
@@ -803,13 +802,13 @@ The current WebGUI session object.
 
 sub www_manageProduct {
 	my $session = shift;
-	my ($productId, $product, $output, $parameter, $option, $optionId, $i18n);
+	my ($product, $output, $parameter, $option, $optionId, $i18n);
 
 	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
 
 	$i18n = WebGUI::International->new($session, "ProductManager");
 	
-	$productId = $session->form->process("productId") || $session->scratch->get('managingProduct');
+	my $productId = shift || $session->form->process("productId") || $session->scratch->get('managingProduct');
 	return WebGUI::Operation::execute($session,'listProducts') if ($productId eq 'new' || !$productId);
 	$session->scratch->set('managingProduct', $productId);
 

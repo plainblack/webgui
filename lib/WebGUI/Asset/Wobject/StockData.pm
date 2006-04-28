@@ -130,19 +130,6 @@ sub _appendZero {
 }
 
 #-------------------------------------------------------------------
-=head2 _clearStockEditSession ( )
-
-Clears the session variables from session used by the stock list edit form
-
-=cut
-
-sub _clearStockEditSession {
-   my $self = shift;
-   $self->session->form->process("symbol") = "";
-   $self->session->form->process("stockId") = "";
-}
-
-#-------------------------------------------------------------------
 =head2 _convertToEpoch (date,time)
 
 Converts the date and time returned by Finance::Quote to an epoch
