@@ -2362,14 +2362,18 @@ sub www_editRecord {
 			-value		=> $formElement
 		);
 		
+		my $fieldValue = $self->_getFieldValue($field, $properties, !$canEditRecord);
+		
 		# Add element to the form loop
 		push(@formLoop, {
 			'field.label'		=> $field->{displayName},
 			'field.formElement'	=> $formElement,
+			'field.value'		=> $fieldValue,
 		});
 		
 		$var->{'field.'.$field->{fieldName}.'.formElement'} = $formElement;
 		$var->{'field.'.$field->{fieldName}.'.label'} = $field->{displayName};
+		$var->{'field.'.$field->{fieldName}.'.value'} = $fieldValue;
 	}
 
 	if ($canEditRecord) {
@@ -3268,6 +3272,36 @@ my	@fields = $self->session->db->buildArray("select distinct fieldId from SQLFor
 
 	$var->{'headerLoop'} = \@headerLoop;
 
+        $var->{searchFormHeader} = WebGUI::Form::formHeader($self->session,
+		{action => $self->getUrl}).
+	        WebGUI::Form::hidden($self->session, {name=>'func', value=>'search'}).
+		WebGUI::Form::hidden($self->session, {name=>'searchType', value=>'or'});
+
+	$var->{'searchFormQuery.label'} = $i18n->get('s query');
+	$var->{'searchFormQuery.form'} = WebGUI::Form::text($self->session,{
+                name=>'searchQuery',
+                value=>$query
+               });
+        $var->{'searchFormMode.label'} = $i18n->get('s mode');
+        $var->{'searchFormMode.form'} = WebGUI::Form::radioList($self->session,{
+                name=>'searchMode',
+                value=>$useRegex,
+                options=> {'normal' => 'Normal search', 'regexp' => 'Regex search'},
+               });
+        $var->{'searchFormSearchIn.label'} = $i18n->get('s search in fields');
+        $var->{'searchFormSearchIn.form'} = WebGUI::Form::checkList($self->session,{
+                name=>'searchIn',
+                value=>\@searchIn,
+                options=> \%searchableFields,
+               });
+        $var->{'searchFormTrash.label'} = $i18n->get('s location');
+        $var->{'searchFormTrash.form'} = WebGUI::Form::radioList($self->session,{
+                name=>'searchInTrash',
+                value=>$searchInTrash,
+                options=> \%searchInTrashOptions,
+               });
+        $var->{searchFormSubmit} = WebGUI::Form::submit($self->session,{value => $i18n->get('s search button')});
+        $var->{searchFormFooter} = WebGUI::Form::formFooter($self->session);
 
 	if (@searchIn && ($query || $searchInTrash)) {
 my		$sql = $self->_constructSearchQuery(\@searchIn, \@showFields, \%fieldProperties, $query);
@@ -3389,6 +3423,7 @@ Hashref containing the properties of the fields that are in the search.
 sub _constructSearchForm {
 	my ($form, $js, %searchInTrashOptions, $i18n);
 	my $self = shift;
+	my $var = shift;
 	my $fieldList = shift;
 	my $fieldProperties = shift;
 
@@ -3400,35 +3435,45 @@ sub _constructSearchForm {
 		2 => $i18n->get('_csf normal and trash')
 	);
 
-
 my	$searchType = $self->session->form->process("searchType") || $self->session->scratch->get('SQLForm_'.$self->getId.'searchType') || 'or';
 
 my	$searchInTrash = $self->session->form->process("searchInTrash");
 	$searchInTrash = $self->session->scratch->get('SQLForm_'.$self->getId.'searchInTrash') unless (defined $self->session->form->process("searchInTrash"));
 	$searchInTrash ||= '0';
 
-	$form = WebGUI::Form::formHeader($self->session);
-	$form .= WebGUI::Form::hidden($self->session, {name => 'func', value => 'superSearch'});
-	$form .= WebGUI::Form::hidden($self->session, {name => 'searchQueried', value => 1});
+	$var->{searchFormHeader} = WebGUI::Form::formHeader($self->session ,{action => $self->getUrl});
+	$var->{searchFormHeader} .= WebGUI::Form::hidden($self->session, {name => 'func', value => 'superSearch'});
+	$var->{searchFormHeader} .= WebGUI::Form::hidden($self->session, {name => 'searchQueried', value => 1});
+	
+	$form = $var->{searchFormHeader};
 	$form .= '<table>';
 	$form .= '<tr valign="top">';
-	$form .= '<td><b>'.$i18n->get('s location').'</b></td><td colspan="2">'.WebGUI::Form::radioList($self->session, {
-		name	=> "searchInTrash",
-		options	=> \%searchInTrashOptions,
-		value	=> $searchInTrash,
+	
+	$var->{'searchFormTrash.label'} = $i18n->get('s location');
+        $var->{'searchFormTrash.form'} = WebGUI::Form::radioList($self->session, {
+	       name    => "searchInTrash",
+	       options => \%searchInTrashOptions,
+	       value   => $searchInTrash,
 	});
+								 
+	$form .= '<td><b>'.$var->{'searchFormTrash.label'}.'</b></td><td colspan="2">'.$var->{'searchFormTrash.form'};
 	$form .= '</td></tr>';
-	$form .= '<td><b>'.$i18n->get('s search type').'</b></td><td colspan="2">'.WebGUI::Form::radioList($self->session, {
-		name	=> "searchType",
-		options	=> {'or' => $i18n->get('or'), 'and' => $i18n->get('and')},
-		value	=> $searchType,
+	$var->{'searchFormType.label'} = $i18n->get('s search type');
+	$var->{'searchFormType.form'} = WebGUI::Form::radioList($self->session, {
+                name    => "searchType",
+                options => {'or' => $i18n->get('or'), 'and' => $i18n->get('and')},
+	        value   => $searchType,
 	});
+							
+	$form .= '<td><b>'.$var->{'searchFormType.label'}.'</b></td><td colspan="2">'.$var->{'searchFormType.form'};
 	$form .= '</td></tr>';
 
 	$self->session->scratch->set('SQLForm_'.$self->getId.'searchType', $searchType);
 	$self->session->scratch->set('SQLForm_'.$self->getId.'searchInTrash', $searchInTrash);
-	
+
+	my @field_loop;
 	foreach (@$fieldList) {
+		my ($searchForm1, $searchForm2, $conditionalForm);
 		if ($self->session->form->process("searchQueried")) {
 			$self->session->scratch->delete('SQLForm_'.$self->getId.'---'.$_.'v1');
 			$self->session->scratch->delete('SQLForm_'.$self->getId.'---'.$_.'v2');
@@ -3457,7 +3502,7 @@ my		$conditional = $self->session->form->process('_'.$_.'_conditional') || $self
 
 		$form .= '<td>';
 		if (exists $types->{$fieldProperties->{$_}->{type}}) {
-			$form .= WebGUI::Form::selectList($self->session, {
+			$conditionalForm = WebGUI::Form::selectList($self->session, {
 				name	=> '_'.$_.'_conditional',
 				value	=> [ $conditional || '' ],
 				options	=> $types->{$fieldProperties->{$_}->{type}},
@@ -3467,6 +3512,7 @@ my		$conditional = $self->session->form->process('_'.$_.'_conditional') || $self
 			});
 			$js .= $typeFunctions->{$fieldProperties->{$_}->{type}}."('".$conditional."', '$_');";
 		}
+		$form .= $conditionalForm;
 		$form .= '</td>';		
 		$form .= '<td>';
 
@@ -3479,7 +3525,8 @@ my		$conditional = $self->session->form->process('_'.$_.'_conditional') || $self
 my 		$searchElement = $fieldProperties->{$_}->{searchElement};
 		$searchElement = 'text' if ($searchElement eq 'selectList');
 my		$cmd = "WebGUI::Form::$searchElement".'($self->session, $parameters)';
-		$form .= eval($cmd);
+		$searchForm1 = eval($cmd);
+		$form .= $searchForm1;
 
 		unless ($fieldProperties->{$_}->{type} eq 'text') {
 			$searchElement = $fieldProperties->{$_}->{searchElement};
@@ -3494,19 +3541,38 @@ my		$cmd = "WebGUI::Form::$searchElement".'($self->session, $parameters)';
 			}
 	
 			$cmd = "WebGUI::Form::$searchElement".'($self->session, $parameters)';
-			$form .= eval($cmd);
+			$searchForm2 = eval($cmd);
+			$form .= $searchForm2;
 		}
 
 		$form .= '</td>';
 		$form .= '</tr>';
+	
+                push (@field_loop, {
+	                        'field.'.$fieldProperties->{$_}->{fieldName}.'.id' => $_,
+	                        'field.label' => $fieldProperties->{$_}->{displayName},
+	                        'field.conditionalForm' => $conditionalForm,
+	                        'field.searchForm1' => $searchForm1,
+	                        'field.searchForm2' => $searchForm2,
+	                        'field.formValue1' => $formValue1,
+	                        'field.formValue2' => $formValue2,
+	                        'field.conditional' => $conditional,
+	                        });
+	
 	}
-	$form .= '<td>'.WebGUI::Form::submit($self->session, {value => $i18n->get('s search button')}).'</td>';
-	$form .= '</table>';
-	$form .= WebGUI::Form::formFooter($self->session);
-	$form .= '<script src="'.$self->session->config->get("extrasURL").'/wobject/SQLForm/SQLFormSearch.js" type="text/javascript"></script>';
-	$form .= '<script type="text/javascript">'.$js.'</script>';
+	$var->{'searchForm.field_loop'} = \@field_loop;
 
-	return $form;
+	$var->{searchFormSubmit} = WebGUI::Form::submit($self->session, {value => $i18n->get('s search button')});
+	$var->{searchFormFooter} = WebGUI::Form::formFooter($self->session);
+	$var->{searchFormJavascript} = '<script src="'.$self->session->config->get("extrasURL").'/wobject/SQLForm/SQLFormSearch.js" type="text/javascript"></script>'; 
+	$var->{searchFormJavascript} .= '<script type="text/javascript">'.$js.'</script>';
+	
+	$form .= '<td>'.$var->{searchFormSubmit}.'</td>';
+	$form .= '</table>';
+	$form .= $var->{searchFormFooter};
+	$form .= $var->{searchFormJavascript};
+
+	$var->{searchForm} = $form;
 }
 
 #-------------------------------------------------------------------
@@ -3816,7 +3882,7 @@ my 	@showFields;
 
 	
 	# Construct search form
-	$var->{searchForm} = $self->_constructSearchForm(\@searchableFields, \%fieldProperties);
+	$self->_constructSearchForm($var, \@searchableFields, \%fieldProperties);
 
 	# Build search query
 my	$sql = $self->_constructSearchQuery(\@searchableFields, \@showFields, \%fieldProperties);

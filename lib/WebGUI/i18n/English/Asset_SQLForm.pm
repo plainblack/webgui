@@ -1059,8 +1059,8 @@ seperate form header, footer or anything else.</p>
 
 <p><b>formLoop</b><br />
 A loop containing each field. Using
-this loop will allow you to use a different layout that that of
-c<b>ompleteForm</b>. The <b>formLoop</b> loop provides the following
+this loop will allow you to use a different layout than that of
+<b>completeForm</b>. The <b>formLoop</b> loop provides the following
 variables:</p>
 
 <blockquote>
@@ -1069,7 +1069,14 @@ The display name of the field.</p>
 
 
 <p>	<b>field.formElement</b><br />
+The form Element for the field<br />
+In view mode this is the same as <b>field.value</b>.
+</p>
+
+<p>     <b>field.value</b><br />
 The value of the field</p>
+
+
 </blockquote>
 
 <p>Finally there is the option of placing
@@ -1085,7 +1092,9 @@ variables:</p>
 <p><b>field.&lt;fieldname&gt;.formElement</b><br />
 Contains the form element of the field
 &lt;fieldname&gt;. You must substitute &lt;fieldname&gt; with the
-field name of the field you intend to place.</p>
+field name of the field you intend to place.<br />
+In view mode this is the same as <b>field&lt;fieldname&gt;.value</b>.
+</p>
 
 
 <p><b>field.&lt;fieldname&gt;.label</b><br />
@@ -1093,9 +1102,14 @@ Contains the display name of the field
 &lt;fieldname&gt;. You must substitute &lt;fieldname&gt; with the
 field name of the field you intend to place.</p>
 
+<p><b>field.&lt;fieldname&gt;.value</b><br />
+Contains the value of the field
+&lt;fieldname&gt;. You must substitute &lt;fieldname&gt; with the
+field name of the field you intend to place.</p>
+
 
 <p><b>formHeader</b><br />
-The header of the the form. If you are
+The header of the form. If you are
 not using the <b>completeForm</b> You must include this variable
 before any other form variable. If you do use the <b>completeForm
 </b>variable, however, you must not use the <b>formHeader</b>
@@ -1103,9 +1117,9 @@ variable.</p>
 
 
 <p><b>formFooter</b><br />
-The footer of the the form. If you are
+The footer of the form. If you are
 not using the <b>completeForm</b> You must include this variable
-before any other form variable. If you do use the <b>completeForm</b>
+after every other form variable. If you do use the <b>completeForm</b>
 variable, however, you must not use the <b>formFooter</b> variable.</p>
 
 <p>This template also provides some other
@@ -1142,7 +1156,7 @@ this record.</p>
 
 <p><b>managementLinks</b><br />
 A string of links to all of the
-management fucntions.</p>|,
+management functions.</p>|,
 		lastUpdated => 0,
 	},
 
@@ -1157,7 +1171,8 @@ provides you with a way to customize the looks of the search
 functionality that the SQLForm offers.</p>
 
 <p>There are two separate search methods, being normal and advanced search, but
-both use the same template.</p>
+both use the same template. In both cases a complete <b>searchForm</b> is available. 
+The individual form Elements are also available, but note that different form Elements are used for normal and advanced search.</p>
 
 <p>The following template variable are available to you:</p>
 
@@ -1167,7 +1182,102 @@ In other words, this is false if every field is configured not to be displayed
 in the search results.</p>
 
 <p><b>searchForm</b><br />
-Contains the form which allows users to search.</p>
+Contains the complete form which allows users to search.</p>
+
+<p><b>searchFormHeader</b><br />
+The header of the form, available in normal and advanced search. If you are
+not using the complete <b>searchForm</b> You must include this variable
+before any other form variable. If you do use the complete <b>searchForm
+</b> variable, however, you must not use the <b>searchFormHeader</b>
+variable.</p>
+
+<p><b>searchFormTrash.label</b><br />
+The label for the search in trash option. Available in normal and advanced search. Only use this if you are
+not using the complete <b>searchForm</b>.</p>                                                                                                                                                             
+<p><b>searchFormTrash.form</b><br />
+The form Element for the search in trash option. Available in normal and advanced search. Only use this if you are
+not using the complete <b>searchForm</b>.</p>
+
+<p><b>searchFormMode.label</b><br />
+The label for the search mode option (with regex or not). Available in normal search. Only use this if you are
+not using the complete <b>searchForm</b>.</p>                                                                                                                                                              
+<p><b>searchFormMode.form</b><br />
+The form Element for the search mode option (with regex or not). Available in normal search. Only use this if you are
+not using the complete <b>searchForm</b>.</p>
+
+<p><b>searchFormQuery.label</b><br />
+The label for the search query. Available in normal search. Only use this if you are
+not using the complete <b>searchForm</b>.</p>                                                                                                                                                              
+<p><b>searchFormQuery.form</b><br />
+The form Element for the search query. Available in normal search. Only use this if you are
+not using the complete <b>searchForm</b>.</p>
+
+<p><b>searchFormSearchIn.label</b><br />
+The label for the search in fields select list. Available in normal search. Only use this if you are
+not using the complete <b>searchForm</b>.</p>                                                                                                                                                              
+<p><b>searchFormSearchIn.form</b><br />
+The form Element for the search in fields select list. Available in normal search. Only use this if you are
+not using the complete <b>searchForm</b>.</p>
+
+<p><b>searchFormType.label</b><br />
+The label for the search type option (or/and). Available in advanced search. Only use this if you are
+not using the complete <b>searchForm</b>.</p>                                                                                                                                                              
+<p><b>searchFormType.form</b><br />
+The form Element for the search type option (or/and). Available in advanced search. Only use this if you are
+not using the complete <b>searchForm</b>.</p>
+                                                                                                                                                             
+<p><b>searchFormFooter</b><br />
+The footer of the form, available in normal and advanced search. If you are
+not using the complete <b>searchForm</b> You must use this variable
+after every other searchForm variable. If you do use the complete <b>searchForm</b>
+variable, however, you must not use the <b>searchFormFooter</b> variable.</p>
+
+<p><b>searchFormSubmit</b><br />
+The submit button of the form, available in normal and advanced search. Only use this if you are
+not using the complete <b>searchForm</b>.</p>
+
+<p><b>searchFormJavascript</b><br />
+Only used for advanced search. This links the SQLFormSearch.js file and contains some inline javascript that is used by advanced search. If you are
+not using the complete <b>searchForm</b> you must include this variable
+for advanced search. If you do use the complete <b>searchForm</b>
+variable, however, you must not use the <b>searchFormJavascript</b> variable.</p>
+
+<p><b>searchForm.field_loop</b><br />
+A loop containing each field, only available in advanced search. 
+The <b>field_loop</b> provides the following
+variables:</p>
+                                                                                                                                                             
+<blockquote>
+<p>     <b>field.label</b><br />
+The display name of the field.</p>
+                                                                                                                                                             
+<p>     <b>field.conditionalForm</b><br />
+The form Element for the conditional for this field</p>
+
+<p>     <b>field.conditional</b><br />
+The value of the conditional form Element for this field</p>
+                                                                                                                                                             
+<p>     <b>field.searchForm1</b><br />
+The first search form Element for this field</p>
+
+<p>     <b>field.searchForm1</b><br />
+The second search form Element for this field</p>                                                                                                                                                             
+<p>     <b>field.formValue1</b><br />
+The value of first search form Element for this field</p>
+
+<p>     <b>field.formValue2</b><br />
+The value of second search form Element for this field</p>
+
+<p>	<b>field.&lt;fieldname&gt;.id</b><br />
+Contains the id of the field
+&lt;fieldname&gt;. You must substitute &lt;fieldname&gt; with the
+field name of the field.<br />
+You can use this if you want to create a custom Advanced search form that completely overrides the default search form.
+</p>
+
+</blockquote>
+
+<p>The template provides variables for the search results that are the same for normal and advanced search.
 
 <p><b>headerLoop</b><br />
 A loop containing the display names of each field, inclding sort controls. The
@@ -1198,7 +1308,7 @@ Contains the form footer for the search results batch functions. Put this
 template variable somewhere after the searchResults loop.</p>
 
 <p><b>searchResults.actionButtons</b><br />
-Contains the the restore and purge buttons for the batch operations. Put this
+Contains the restore and purge buttons for the batch operations. Put this
 variable between searchResults.header and searchResults.footer.</p>
 
 <p><b>searchResults.recordLoop</b><br />

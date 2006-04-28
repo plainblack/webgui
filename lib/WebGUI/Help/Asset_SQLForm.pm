@@ -53,11 +53,12 @@ our $HELP = {
                                 namespace => 'Asset_SQLForm',
                         },
 
-			 {
-			        title => 'gef default view',
+                        {
+				title => 'gef default view',
 				description => 'gef default view description',
                                 namespace => 'Asset_SQLForm',
-															                         },
+                        },
+
 
  			{
                                 title => 'gef submit group',
