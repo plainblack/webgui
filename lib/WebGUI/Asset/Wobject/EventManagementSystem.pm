@@ -2720,7 +2720,7 @@ sub www_search {
 	  $eventFields{'startDate.human'} = $self->session->datetime->epochToHuman($event->{'startDate'});
 	  $eventFields{'endDate.human'} = $self->session->datetime->epochToHuman($event->{'endDate'});
 	  $eventFields{'eventIsFull'} = ($eventFields{'seatsRemaining'} == 0);
-	  
+	  $eventFields{'eventIsApproved'} = $event->{'approved'};
 	  $eventFields{'manageToolbar'} = $self->session->icon->delete('func=deleteEvent;pid='.$event->{productId}, $self->getUrl,
 					  $i18n->get('confirm delete event')).
 					  $self->session->icon->edit('func=editEvent;pid='.$event->{productId}, $self->getUrl).
@@ -2872,6 +2872,7 @@ sub view {
 	  $eventFields{'maximumAttendees'} = $event->{'maximumAttendees'};
 	  $eventFields{'seatsRemaining'} = $event->{'maximumAttendees'} - $numberRegistered;
 	  $eventFields{'eventIsFull'} = ($eventFields{'seatsRemaining'} == 0);
+	  $eventFields{'eventIsApproved'} = $event->{'approved'};
 	  
 	  if ($eventFields{'eventIsFull'}) {
 	  	$eventFields{'purchase.label'} = $i18n->get('sold out');
