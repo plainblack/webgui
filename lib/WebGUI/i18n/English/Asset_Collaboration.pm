@@ -272,6 +272,11 @@ our $I18N = {
 		lastUpdated => 1109618544,
 	},
 
+	'contentType' => {
+		message => q|Content Type|,
+		lastUpdated => 1109618544,
+	},
+
 	'open' => {
 		message => q|Open|,
 		lastUpdated => 1109618544,
