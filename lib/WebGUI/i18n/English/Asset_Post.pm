@@ -57,6 +57,11 @@ A yes/no button to set the thread to be sticky, so that it stays at the top of t
 A yes/no button to lock the thread, so that no posts can be added or edited.
 <p>
 
+<b>isThread</b><br>
+A conditional that is true if the user is editing the main post for a thread, as opposed to
+a reply in the thread.
+<p>
+
 <b>isEdit</b><br>
 A conditional that is true if the user is editing an existing post.
 <p>

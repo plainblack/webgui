@@ -12,11 +12,6 @@ our $HELP = {
                                 namespace => 'Asset_Layout',
                         },
                         {
-                                title => '498',
-                                description => '498 description',
-                                namespace => 'Asset_FilePile',
-                        },
-                        {
                                 title => 'assets to hide',
                                 description => 'assets to hide description',
                                 namespace => 'Asset_Layout',
