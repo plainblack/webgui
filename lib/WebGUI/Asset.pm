@@ -1084,7 +1084,7 @@ sub manageAssets {
    <script type=\"text/javascript\">
    //<![CDATA[
      var assetManager = new AssetManager();
-         assetManager.AddColumn('".WebGUI::Form::checkbox($self->session,{extras=>'onchange="toggleAssetListSelectAll(this.form);"'})."','','center','form');
+         assetManager.AddColumn('".WebGUI::Form::checkbox($self->session,{name=>"checkAllAssetIds", extras=>'onchange="toggleAssetListSelectAll(this.form);"'})."','','center','form');
          assetManager.AddColumn('".$i18n->get("rank")."','style=\"cursor:move\"','center','numeric');
          assetManager.AddColumn('&nbsp;','','center','');
          assetManager.AddColumn('".$i18n->get("99")."','','left','');
@@ -1260,7 +1260,7 @@ sub manageAssetsSearch {
       	$output .= "<script type=\"text/javascript\">
    //<![CDATA[
      var assetManager = new AssetManager();
-         assetManager.AddColumn('".WebGUI::Form::checkbox($self->session,{extras=>'onchange="toggleAssetListSelectAll(this.form);"'})."','','center','form');
+         assetManager.AddColumn('".WebGUI::Form::checkbox($self->session,{name=>"checkAllAssetIds", extras=>'onchange="toggleAssetListSelectAll(this.form);"'})."','','center','form');
          assetManager.AddColumn('&nbsp;','','center','');
          assetManager.AddColumn('".$i18n->get("99")."','','left','');
          assetManager.AddColumn('".$i18n->get("type")."','','left','');
