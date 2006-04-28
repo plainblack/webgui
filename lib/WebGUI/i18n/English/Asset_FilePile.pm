@@ -29,18 +29,6 @@ have the following properties:
                 lastUpdated => 1119214815,
         },
 
-        '497 description' => {
-                message => q|The date when users may begin viewing this page. Before this date only Content Managers with the rights to edit this page will see it.
-</p>|,
-                lastUpdated => 1119214815,
-        },
-
-        '498 description' => {
-                message => q|The date when users will stop viewing this page. After this date only Content Managers with the rights to edit this page will see it.
-</p>|,
-                lastUpdated => 1119214815,
-        },
-
         '108 description' => {
                 message => q|The owner of a page is usually the person who created the page. This user always has full edit and viewing rights on the page.
 </p>|,
@@ -103,30 +91,6 @@ have the following properties:
 
         '940 description' => {
                 message => q|Select yes to open this asset in a new window.<br>
-<i>UI level: 6</i>
-</p>|,
-                lastUpdated => 1119149899,
-        },
-
-        '497' => {
-                   lastUpdated => 1031514049,
-                   message => q|Start Date|
-                 },
-
-        '497 description' => {
-                message => q|The date when users may begin viewing this asset. Before this date only Content Managers with the rights to edit this asset will see it<br>
-<i>UI level: 6</i>.
-</p>|,
-                lastUpdated => 1119149899,
-        },
-
-        '498' => {
-                   lastUpdated => 1031514049,
-                   message => q|End Date|
-                 },
-
-        '498 description' => {
-                message => q|The date when users will stop viewing this asset. After this date only Content Managers with the rights to edit this asset will see it.<br>
 <i>UI level: 6</i>
 </p>|,
                 lastUpdated => 1119149899,

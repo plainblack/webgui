@@ -12,13 +12,13 @@ our $HELP = {
                                 description => 'cache timeout help'
                         },
 			{
-				title => 'new file',
-				description => 'new file description',
+				title => 'current file',
+				description => 'current file description',
 				namespace => 'Asset_File',
 			},
 			{
-				title => 'current file',
-				description => 'current file description',
+				title => 'new file',
+				description => 'new file description',
 				namespace => 'Asset_File',
 			},
                         {

@@ -6,37 +6,27 @@ our $HELP = {
 		title => 'file pile add/edit title',
 		body => 'file pile add/edit body',
 		fields => [
-                        {
+                        {	#isHidden
                                 title => '886',
                                 description => '886 description',
                                 namespace => 'Asset_FilePile',
                         },
-                        {
+                        {	#newWindow
                                 title => '940',
                                 description => '940 description',
                                 namespace => 'Asset_FilePile',
                         },
-                        {
-                                title => '497',
-                                description => '497 description',
-                                namespace => 'Asset_FilePile',
-                        },
-                        {
-                                title => '498',
-                                description => '498 description',
-                                namespace => 'Asset_FilePile',
-                        },
-                        {
+                        {	#ownerUserId
                                 title => '108',
                                 description => '108 description',
                                 namespace => 'Asset_FilePile',
                         },
-                        {
+                        {	#groupIdView
                                 title => '872',
                                 description => '872 description',
                                 namespace => 'Asset_FilePile',
                         },
-                        {
+                        {	#groupIdEdit
                                 title => '871',
                                 description => '871 description',
                                 namespace => 'Asset_FilePile',
