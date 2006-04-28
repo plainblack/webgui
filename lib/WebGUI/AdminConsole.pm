@@ -69,8 +69,8 @@ sub _formatFunction {
 	my $i18n = WebGUI::International->new($self->session);
 	return {
 		title=>$i18n->get($function->{title}{id}, $function->{title}{namespace}),
-		icon=>$self->session->config->get("extrasURL")."/adminConsole/".$function->{icon},
-		'icon.small'=>$self->session->config->get("extrasURL")."/adminConsole/small/".$function->{icon},
+		icon=>$self->session->url->extras("/adminConsole/".$function->{icon}),
+		'icon.small'=>$self->session->url->extras("adminConsole/small/".$function->{icon}),
 		url=>$url,
 		canUse=>$self->session->user->isInGroup($function->{group}),
 		isCurrentOpFunc=>($self->session->form->process("op") eq $function->{op} || $self->session->form->process("func") eq $function->{func})
@@ -123,7 +123,7 @@ sub getAdminConsoleParams {
 	return { 'title' => $i18n->get("admin console","AdminConsole"),
 		url => $self->session->url->page("op=adminConsole"),
 		canUse => $self->session->user->isInGroup("12"),
-		icon => $self->session->config->get("extrasURL")."/adminConsole/adminConsole.gif"
+		icon => $self->session->url->extras("adminConsole/adminConsole.gif")
 		};
 }
 

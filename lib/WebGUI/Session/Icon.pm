@@ -62,7 +62,7 @@ Returns the base URL for this user's toolbar icon set.
 
 sub getBaseURL {
 	my $self = shift;
-	my $url = $self->session->config->get("extrasURL").'/toolbar/';
+	my $url = $self->session->url->extras('toolbar/');
 	if ($self->session->user->profileField("toolbar") ne "useLanguageDefault") {
 		$url .= $self->session->user->profileField("toolbar");
 	} else {
