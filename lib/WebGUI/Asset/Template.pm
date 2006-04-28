@@ -368,16 +368,66 @@ sub www_styleWizard {
 		$f->hidden(name=>"proceed", value=>"manageAssets") if ($form->get("proceed"));
 		$f->hidden(name=>"step", value=>3);
 		$f->hidden(name=>"layout", value=>$form->get("layout"));
-		$f->text(name=>"heading", value=>"My Site", label=>"Site Name");
-		$f->file(name=>"logo", label=>"Logo", subtext=>"<br />JPEG, GIF, or PNG thats less than 200 pixels wide and 100 pixels tall");
-		$f->color(name=>"pageBackgroundColor", value=>"#ccccdd", label=>"Page Background Color");
-		$f->color(name=>"headingBackgroundColor", value=>"#ffffff", label=>"Header Background Color");
-		$f->color(name=>"headingForegroundColor", value=>"#000000", label=>"Header Text Color");
-		$f->color(name=>"bodyBackgroundColor", value=>"#ffffff", label=>"Body Background Color");
-		$f->color(name=>"bodyForegroundColor", value=>"#000000", label=>"Body Text Color");
-		$f->color(name=>"menuBackgroundColor", value=>"#eeeeee", label=>"Menu Background Color");
-		$f->color(name=>"linkColor", value=>"#0000ff", label=>"Link Color");
-		$f->color(name=>"visitedLinkColor", value=>"#ff00ff", label=>"Visited Link Color");
+		$f->text(
+			name=>"heading",
+			value=>"My Site",
+			label=>$i18n->get("site name"),
+			hoverHelp=>$i18n->get("site name description")
+		);
+		$f->file(
+			name=>"logo",
+			label=>$i18n->get("logo"),
+			hoverHelp=>$i18n->get("logo description"),
+			subtext=>$i18n->get("logo subtext")
+		);
+		$f->color(
+			name=>"pageBackgroundColor",
+			value=>"#ccccdd",
+			label=>$i18n->get("page background color"),
+			hoverHelp=>$i18n->get("page background color description"),
+		);
+		$f->color(
+			name=>"headingBackgroundColor",
+			value=>"#ffffff",
+			label=>$i18n->get("header background color"),
+			hoverHelp=>$i18n->get("header background color description"),
+		);
+		$f->color(
+			name=>"headingForegroundColor",
+			value=>"#000000",
+			label=>$i18n->get("header text color"),
+			hoverHelp=>$i18n->get("header text color description"),
+		);
+		$f->color(
+			name=>"bodyBackgroundColor",
+			value=>"#ffffff",
+			label=>$i18n->get("body background color"),
+			hoverHelp=>$i18n->get("body background color description"),
+		);
+		$f->color(
+			name=>"bodyForegroundColor",
+			value=>"#000000",
+			label=>$i18n->get("body text color"),
+			hoverHelp=>$i18n->get("body text color description"),
+		);
+		$f->color(
+			name=>"menuBackgroundColor",
+			value=>"#eeeeee",
+			label=>$i18n->get("menu background color"),
+			hoverHelp=>$i18n->get("menu background color description"),
+		);
+		$f->color(
+			name=>"linkColor",
+			value=>"#0000ff",
+			label=>$i18n->get("link color"),
+			hoverHelp=>$i18n->get("link color description"),
+		);
+		$f->color(
+			name=>"visitedLinkColor",
+			value=>"#ff00ff",
+			label=>$i18n->get("visited link color"),
+			hoverHelp=>$i18n->get("visited link color description"),
+		);
 		$f->submit;
 		$output = $f->print;
 	} elsif ($form->get("step") == 3) {
@@ -387,9 +437,9 @@ sub www_styleWizard {
 			my $storage = WebGUI::Storage::Image->get($self->session,$storageId);
 			$logo = $self->addChild({
 				className=>"WebGUI::Asset::File::Image",
-				title=>$form->get("heading")." Logo",
-				menuTitle=>$form->get("heading")." Logo",
-				url=>$form->get("heading")." Logo",
+				title=>join(' ', $form->get("heading"), $i18n->get('logo')),
+				menuTitle=>join(' ', $form->get("heading"), $i18n->get('logo')),
+				url=>join(' ', $form->get("heading"), $i18n->get('logo')),
 				storageId=>$storage->getId,
 				filename=>@{$storage->getFiles}[0],
 				templateId=>"PBtmpl0000000000000088"
@@ -524,17 +574,27 @@ $style .= '
 			.representation, .representation td { font-size: 12px; width: 120px; border: 1px solid black; } 
 			.representation { height: 130px; }
 			</style>';
-		$output .= "<p>Choose a layout for this style:</p>";
+		$output .= $i18n->get('choose a layout');
 		$output .= WebGUI::Form::hidden($self->session,{name=>"step", value=>2});
-		$output .= '<div class="chooser">'.WebGUI::Form::radio($self->session,{name=>"layout", value=>1, checked=>1}).q|<table class="representation"><tbody>
-			<tr><td>Logo</td><td>Heading</td></tr>
-			<tr><td>Menu</td><td>Body content goes here.</td></tr>
-			</tbody></table></div>|;
-		$output .= '<div class="chooser">'.WebGUI::Form::radio($self->session,{name=>"layout", value=>2}).q|<table class="representation"><tbody>
-			<tr><td>Logo</td><td>Heading</td></tr>
-			<tr><td style="text-align: center;" colspan="2">Menu</td></tr>
-			<tr><td colspan="2">Body content goes here.</td></tr>
-			</tbody></table></div>|;
+		$output .= '<div class="chooser">'.WebGUI::Form::radio($self->session,{name=>"layout", value=>1, checked=>1}).sprintf(q|<table class="representation"><tbody>
+			<tr><td>%s</td><td>%s</td></tr>
+			<tr><td>%s</td><td>%s</td></tr>
+			</tbody></table></div>|,
+			$i18n->get('logo'),
+			$i18n->get('heading'),
+			$i18n->get('menu'),
+			$i18n->get('body content'),
+			);
+		$output .= '<div class="chooser">'.WebGUI::Form::radio($self->session,{name=>"layout", value=>2}).sprintf(q|<table class="representation"><tbody>
+			<tr><td>%s</td><td>%s</td></tr>
+			<tr><td style="text-align: center;" colspan="2">%s</td></tr>
+			<tr><td colspan="2">%s</td></tr>
+			</tbody></table></div>|,
+			$i18n->get('logo'),
+			$i18n->get('heading'),
+			$i18n->get('menu'),
+			$i18n->get('body content'),
+			);
 		$output .= WebGUI::Form::submit($self->session);
 		$output .= WebGUI::Form::formFooter($self->session);
 	}

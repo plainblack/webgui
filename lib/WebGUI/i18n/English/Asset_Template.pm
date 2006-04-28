@@ -276,6 +276,152 @@ has been set to some other language you will need to consult the documentation f
 		lastUpdated => 1146243514,
 	},
 
+	'site name' => {
+		message => q|Site Name|,
+		lastUpdated => 1146244474,
+		context => q|Label for the field to enter in the name of a web site in the Style Wizard|,
+	},
+
+	'site name description' => {
+		message => q|The name of your website|,
+		lastUpdated => 1146244474,
+	},
+
+	'heading' => {
+		message => q|Heading|,
+		lastUpdated => 1146244520,
+		context => q|Label for the top part of a page|,
+	},
+
+	'menu' => {
+		message => q|Menu|,
+		lastUpdated => 1146244520,
+		context => q|Label for part of a page where a navigation menu will be displayed.|,
+	},
+
+	'body content' => {
+		message => q|Body content goes here.|,
+		lastUpdated => 1146244520,
+		context => q|Label for the part of a page that holds the content.|,
+	},
+
+	'logo' => {
+		message => q|Logo|,
+		lastUpdated => 1146244520,
+		context => q|Label for the field to upload a graphical logo in the Style Wizard|,
+	},
+
+	'logo description' => {
+		message => q|You can use this field to upload a graphical logo in your style.  The logo should be less than 200 pixels wide and 100 pixels tall.|,
+		lastUpdated => 1146244520,
+	},
+
+	'logo subtext' => {
+		message => q|<br />The logo should be less than 200 pixels wide and 100 pixels tall.|,
+		context => q|subtext for the field to upload a graphical logo in the Style Wizard|,
+		lastUpdated => 1146244520,
+	},
+
+	'page background color' => {
+		message => q|Page Background Color|,
+		lastUpdated => 1146244520,
+	},
+
+	'page background color description' => {
+		message => q|The background color for the entire page.|,
+		lastUpdated => 1146244520,
+	},
+
+	'header background color' => {
+		message => q|Header Background Color|,
+		lastUpdated => 1146244520,
+	},
+
+	'header background color description' => {
+		message => q|The background color for the header or banner part of the page.|,
+		lastUpdated => 1146244520,
+	},
+
+	'header text color' => {
+		message => q|Header Text Color|,
+		lastUpdated => 1146244520,
+	},
+
+	'header text color description' => {
+		message => q|Color for text in the header.|,
+		lastUpdated => 1146244520,
+	},
+
+	'body background color' => {
+		message => q|Body Background Color|,
+		lastUpdated => 1146244520,
+	},
+
+	'body background color description' => {
+		message => q|The background color for the body of the page.|,
+		lastUpdated => 1146244520,
+	},
+
+	'body text color' => {
+		message => q|Body Text Color|,
+		lastUpdated => 1146244520,
+	},
+
+	'body text color description' => {
+		message => q|The color of text in the body.|,
+		lastUpdated => 1146244520,
+	},
+
+	'menu background color' => {
+		message => q|Menu Background Color|,
+		lastUpdated => 1146244520,
+	},
+
+	'menu background color description' => {
+		message => q|The background color for the menu part of the page.|,
+		lastUpdated => 1146244520,
+	},
+
+	'link color' => {
+		message => q|Link Color|,
+		lastUpdated => 1146244520,
+	},
+
+	'link color description' => {
+		message => q|The color of links on the page.  The default is blue.|,
+		lastUpdated => 1146244520,
+	},
+
+	'visited link color' => {
+		message => q|Visited Link Color|,
+		lastUpdated => 1146244520,
+	},
+
+	'visited link color description' => {
+		message => q|The color of visited links on the page.  The default is purple.|,
+		lastUpdated => 1146244520,
+	},
+
+	'choose a layout' => {
+		message => q|"<p>Choose a layout for this style:</p>"|,
+		lastUpdated => 1146244520,
+	},
+
+	'style wizard help' => {
+		message => q|<p>The Style Wizard can help you create simple CSS based page style templates for your website
+with your choice of two layouts and navigation styles, and configurable colors.  To access the Style
+Wizard edit a template in the "style" namespace.  A link to open the Style Wizard will
+be on the right side of the page.</p>
+<p>Creating a style template is a three step process:
+<ol>
+<li>Select one of the layouts.</li>
+<li>Enter your site name, upload a logo and configure the colors.</li>
+<li>Make customizations to the generated template.</li>
+</p>
+|,
+		lastUpdated => 1146244520,
+	},
+
 };
 
 1;
