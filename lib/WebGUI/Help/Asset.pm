@@ -12,32 +12,27 @@ our $HELP = {
                                 namespace => 'Asset',
                                 description => 'asset id description'
                         },
-                        {
+                        {	#title
                                 title => '99',
                                 description => '99 description',
                                 namespace => 'Asset',
                         },
-                        {
+                        {	#menuTitle
                                 title => '411',
                                 description => '411 description',
                                 namespace => 'Asset',
                         },
-                        {
+                        {	#url
                                 title => '104',
                                 description => '104 description',
                                 namespace => 'Asset',
                         },
-                        {
-                                title => '412',
-                                description => '412 description',
-                                namespace => 'Asset',
-                        },
-                        {
+                        {	#isHidden
                                 title => '886',
                                 description => '886 description',
                                 namespace => 'Asset',
                         },
-                        {
+                        {	#newWindow
                                 title => '940',
                                 description => '940 description',
                                 namespace => 'Asset',
@@ -47,22 +42,22 @@ our $HELP = {
                                 description => 'encrypt page description',
                                 namespace => 'Asset',
                         },
-                        {
+                        {	#ownerUserId
                                 title => '108',
                                 description => '108 description',
                                 namespace => 'Asset',
                         },
-                        {
+                        {	#groupIdView
                                 title => '872',
                                 description => '872 description',
                                 namespace => 'Asset',
                         },
-                        {
+                        {	#groupIdEdit
                                 title => '871',
                                 description => '871 description',
                                 namespace => 'Asset',
                         },
-                        {
+                        {	#synopsis
                                 title => '412',
                                 description => '412 description',
                                 namespace => 'Asset',

@@ -199,6 +199,35 @@ sub definition {
                                         fieldType=>'text',
                                         defaultValue=>undef
                                         },
+                                url=>{
+                                        fieldType=>'text',
+                                        defaultValue=>undef,
+					filter=>'fixUrl'
+                                        },
+				isHidden=>{
+					fieldType=>'yesNo',
+					defaultValue=>0
+					},
+				newWindow=>{
+					fieldType=>'yesNo',
+					defaultValue=>0
+					},
+				encryptPage=>{
+					fieldType=>'yesNo',
+					defaultValue=>0
+					},
+                                ownerUserId=>{
+                                        fieldType=>'user',
+                                        defaultValue=>'3'
+                                        },
+                                groupIdView=>{
+                                        fieldType=>'group',
+                                        defaultValue=>'7'
+                                        },
+                                groupIdEdit=>{
+                                        fieldType=>'group',
+                                        defaultValue=>'4'
+                                        },
                                 synopsis=>{
                                         fieldType=>'textarea',
                                         defaultValue=>undef
@@ -207,23 +236,14 @@ sub definition {
                                         fieldType=>'textarea',
                                         defaultValue=>undef
                                         },
-                                url=>{
-                                        fieldType=>'text',
-                                        defaultValue=>undef,
-					filter=>'fixUrl'
-                                        },
-                                groupIdEdit=>{
-                                        fieldType=>'group',
-                                        defaultValue=>'4'
-                                        },
-                                groupIdView=>{
-                                        fieldType=>'group',
-                                        defaultValue=>'7'
-                                        },
-                                ownerUserId=>{
-                                        fieldType=>'user',
-                                        defaultValue=>'3'
-                                        },
+				isPackage=>{
+					fieldType=>'yesNo',
+					defaultValue=>0
+					},
+				isPrototype=>{
+					fieldType=>'yesNo',
+					defaultValue=>0
+					},
 				status=>{
 					noFormPost=>1,
 					fieldType=>'hidden',
@@ -234,26 +254,6 @@ sub definition {
 					fieldType=>'hidden',
 					defaultValue=>0
 					},
-				encryptPage=>{
-					fieldType=>'yesNo',
-					defaultValue=>0
-					},
-				isPackage=>{
-					fieldType=>'yesNo',
-					defaultValue=>0
-					},
-				isPrototype=>{
-					fieldType=>'yesNo',
-					defaultValue=>0
-					},
-				isHidden=>{
-					fieldType=>'yesNo',
-					defaultValue=>0
-					},
-				newWindow=>{
-					fieldType=>'yesNo',
-					defaultValue=>0
-					}
                         }
                 });
         return $definition;
