@@ -504,7 +504,7 @@ sub getRichEditor {
 		$language = $i18n->getLanguage("English","languageAbbreviation");
 	}
 	$config{language} = $language;
-	$config{content_css} = $self->getValue("cssFile") || $self->session->config->get("extrasURL").'/tinymce2/defaultcontent.css';
+	$config{content_css} = $self->getValue("cssFile") || $self->session->url->extras('tinymce2/defaultcontent.css');
 	$config{width} = $self->getValue("editorWidth") if ($self->getValue("editorWidth") > 0);
 	$config{height} = $self->getValue("editorHeight") if ($self->getValue("editorHeight") > 0);
 	$config{plugins} = join(",",@plugins);
@@ -516,8 +516,8 @@ sub getRichEditor {
 			push(@directives,$key." : '".$config{$key}."'");
 		}
 	}
-	$self->session->style->setScript($self->session->config->get("extrasURL")."/tinymce2/jscripts/tiny_mce/tiny_mce.js",{type=>"text/javascript"});
-	$self->session->style->setScript($self->session->config->get("extrasURL")."/tinymce2/jscripts/webgui.js",{type=>"text/javascript"});
+	$self->session->style->setScript($self->session->url->extras('tinymce2/jscripts/tiny_mce/tiny_mce.js'),{type=>"text/javascript"});
+	$self->session->style->setScript($self->session->url->extras("tinymce2/jscripts/webgui.js"),{type=>"text/javascript"});
 	return '<script type="text/javascript">
 		tinyMCE.init({
 			'.join(",\n    ",@directives).'

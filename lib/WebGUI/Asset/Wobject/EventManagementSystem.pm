@@ -1125,8 +1125,7 @@ sub resolveConflictForm {
 	my $self = shift;
 	my $event1 = shift;
 	my $event2 = shift;
-	my $extrasURL = $self->session->config->get("extrasURL");
-	my $deleteIcon = $extrasURL."/toolbar/bullet/delete.gif";
+	my $deleteIcon = $self->session->icon->getBaseURL()."delete.gif";
 	my %var;
 	my $sth = $self->session->db->read("
 		select productId, title, price, description
@@ -2495,7 +2494,7 @@ sub www_search {
 	my @joined;
 	
 	my $language  = $i18n->getLanguage(undef,"languageAbbreviation");
-	$var{'calendarJS'} = '<script type="text/javascript" src="'.$self->session->config->get('extrasURL').'/calendar/calendar.js"></script><script type="text/javascript" src="'.$self->session->config->get('extrasURL').'/calendar/lang/calendar-'.$language.'.js"></script><script type="text/javascript" src="'.$self->session->config->get('extrasURL').'/calendar/calendar-setup.js"></script>';
+	$var{'calendarJS'} = '<script type="text/javascript" src="'.$self->session->url->extras('calendar/calendar.js').'"></script><script type="text/javascript" src="'.$self->session->url->extras('calendar/lang/calendar-'.$language.'.js').'"></script><script type="text/javascript" src="'.$self->session->url->extras('calendar/calendar-setup.js').'"></script>';
 	
 	#Get the eventIds of valid prereqs if we're in prereq mode
 	#Put the productIds of valid prereqs into a list so we can return only valid prereq choices in our search
@@ -2821,7 +2820,7 @@ sub www_search {
 
 	$p->appendTemplateVars(\%var);
 	$self->buildMenu(\%var);
-	$var{'ems.wobject.dir'} = $self->session->config->get("extrasURL")."/wobject/EventManagementSystem";
+	$var{'ems.wobject.dir'} = $self->session->url->extras("wobject/EventManagementSystem");
 	
 	return $self->session->style->process($self->processTemplate(\%var,$self->getValue("searchTemplateId")),$self->getValue("styleTemplateId"));
 }

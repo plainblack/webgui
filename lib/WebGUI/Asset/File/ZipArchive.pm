@@ -109,7 +109,8 @@ sub definition {
    push(@{$definition}, {
       assetName=>$i18n->get('assetName'),
       tableName=>'ZipArchiveAsset',
-      className=>'WebGUI::Asset::File',
+	icon=>'ziparchive.gif',
+      className=>'WebGUI::Asset::File::ZipArchive',
       properties=>{
          showPage=>{
 	        fieldType=>'text',
@@ -164,25 +165,6 @@ sub getEditForm {
 	  -hoverHelp=>$i18n->get('show page description'),
    );
    return $tabform;
-}
-
-
-#-------------------------------------------------------------------
-=head2 getIcon ( [small] )
-
-Returns the icons to be associated with this asset
-
-=head3 small
-
-If this evaluates to True, then the smaller icon is returned.
-
-=cut
-
-sub getIcon {
-	my $self = shift;
-	my $small = shift;
-	return $self->session->config->get("extrasURL").'/assets/ziparchive.gif' unless ($small);
-    return $self->session->config->get("extrasURL").'/assets/small/ziparchive.gif';
 }
 
 

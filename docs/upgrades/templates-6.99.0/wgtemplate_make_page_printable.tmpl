@@ -4,8 +4,8 @@
 		<head>
 			<title>^Page(title); - <tmpl_var session.setting.companyName></title>
 				
-	<link rel="icon" href="^Extras;favicon.png" type="image/png" />
-	<link rel="SHORTCUT ICON" href="^Extras;favicon.ico" />
+	<link rel="icon" href="^Extras(favicon.png);" type="image/png" />
+	<link rel="SHORTCUT ICON" href="^Extras(favicon.ico);" />
 	<tmpl_var head.tags>
 	
 		<style type="text/css">
@@ -94,7 +94,7 @@ A {
 		^AdminBar("");
 
 <body onload="window.print()">
-<div style="text-align:center;"><a href="^PageUrl;"><img src="^Extras;plainblack.gif" style="border-style:none;" alt="" /></a></div>
+<div style="text-align:center;"><a href="^PageUrl;"><img src="^Extras(plainblack.gif);" style="border-style:none;" alt="" /></a></div>
 
 <div>
 			<tmpl_var body.content>

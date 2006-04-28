@@ -109,12 +109,12 @@ sub toHtml {
         my $self = shift;
 	my $value = $self->session->datetime->secondsToTime($self->get("value"));
 	my $i18n = WebGUI::International->new($self->session);
-	$self->session->style->setScript($self->session->config->get("extrasURL").'/inputCheck.js',{ type=>'text/javascript' });
+	$self->session->style->setScript($self->session->url->extras('inputCheck.js'),{ type=>'text/javascript' });
 	$self->set("extras", $self->get('extras') . ' onkeyup="doInputCheck(this.form.'.$self->get("name").',\'0123456789:\')"');
 	return $self->SUPER::toHtml
 		.WebGUI::Form::Button->new($self->session,
 			id=>$self->get('id'),
-			extras=>'style="font-size: 8pt;" onclick="window.timeField = this.form.'.$self->get("name").';clockSet = window.open(\''.$self->session->config->get("extrasURL"). '/timeChooser.html\',\'timeChooser\',\'WIDTH=230,HEIGHT=100\');return false"',
+			extras=>'style="font-size: 8pt;" onclick="window.timeField = this.form.'.$self->get("name").';clockSet = window.open(\''.$self->session->url->extras('timeChooser.html').'\',\'timeChooser\',\'WIDTH=230,HEIGHT=100\');return false"',
 			value=>$i18n->get(970)
 			)->toHtml;
 }

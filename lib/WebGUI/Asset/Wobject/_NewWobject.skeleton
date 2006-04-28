@@ -154,7 +154,7 @@ sub view {
 	my $var = $self->get;
 	
 	 #This is where you will store your wobject's extras files, any javascript, css, or any other files your wobject may use.
-	$var->{'extrasFolder'} = $session{config}{extrasURL}."/wobject/NewWobject"; 
+	$var->{'extrasFolder'} = $session->url->extras("/wobject/NewWobject"); 
 	
 	#This is an example of debugging code to help you diagnose problems.
 	#WebGUI::ErrorHandler::warn($self->get("templateId")); 

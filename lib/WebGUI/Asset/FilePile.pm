@@ -179,9 +179,9 @@ sub getIcon {
 	my $self = shift;
 	my $small = shift;
 	if ($small) {
-		return $self->session->config->get("extrasURL").'/assets/small/filePile.gif';
+		return $self->session->url->extras('assets/small/filePile.gif');
 	}
-	return $self->session->config->get("extrasURL").'/assets/filePile.gif';
+	return $self->session->url->extras('assets/filePile.gif');
 }
 
 

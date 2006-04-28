@@ -704,8 +704,8 @@ sub viewForm {
 	my $self = shift;
 	my $passedVars = shift;
 	my $var;
-	$self->session->style->setLink($self->session->config->get("extrasURL").'/tabs/tabs.css', {"type"=>"text/css"});
-	$self->session->style->setScript($self->session->config->get("extrasURL").'/tabs/tabs.js', {"type"=>"text/javascript"});
+	$self->session->style->setLink($self->session->url->extras('tabs/tabs.css'), {"type"=>"text/css"});
+	$self->session->style->setScript($self->session->url->extras('tabs/tabs.js'), {"type"=>"text/javascript"});
 	$var->{entryId} = $self->session->form->process("entryId") if ($self->canEdit);
 	$var = $passedVars || $self->getRecordTemplateVars($var);
 	return $self->processTemplate($var,$self->get("templateId"));

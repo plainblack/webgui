@@ -107,7 +107,7 @@ Renders a URL field.
 
 sub toHtml {
         my $self = shift;
-	$self->session->style->setScript($self->session->config->get("extrasURL").'/addHTTP.js',{ type=>'text/javascript' });
+	$self->session->style->setScript($self->session->url->extras('addHTTP.js'),{ type=>'text/javascript' });
 	$self->set("extras", $self->get('extras') . ' onblur="addHTTP(this.form.'.$self->get("name").')"');
 	return $self->SUPER::toHtml;
 }

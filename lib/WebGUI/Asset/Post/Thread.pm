@@ -760,8 +760,8 @@ sub view {
         $var->{'subscribe.url'} = $self->getSubscribeUrl;
         $var->{'unsubscribe.url'} = $self->getUnsubscribeUrl;
 
-	$var->{'thumbsUp.icon.url'} = $self->session->config->get("extrasURL").'/thumbup.gif';
-	$var->{'thumbsDown.icon.url'} = $self->session->config->get("extrasURL").'/thumbdown.gif';
+	$var->{'thumbsUp.icon.url'} = $self->session->url->extras('thumbup.gif');
+	$var->{'thumbsDown.icon.url'} = $self->session->url->extras('thumbdown.gif');
 
         $var->{'isArchived'} = $self->get("status") eq "archived";
         $var->{'archive.url'} = $self->getArchiveUrl;

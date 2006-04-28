@@ -1044,20 +1044,6 @@ sub getIndexerParams {
 }
 
 #-------------------------------------------------------------------
-=head1 getIcon 
-
-Returns the icon of the SQLForm asset.
-
-=cut
-
-sub getIcon {
-	my $self = shift;
-	my $small = shift;
-	return $self->session->config->get("extrasURL").'/assets/small/sqlform.gif' if ($small);
-	return $self->session->config->get("extrasURL").'/assets/sqlform.gif';
-}
-
-#-------------------------------------------------------------------
 =head1 getName
 
 Return the internationalized name of the SQLForm.
@@ -1730,9 +1716,9 @@ my		$message = $i18n->get('change field warning');
 	);
 
 	# This js file contains code to handle the dynamics of this form.
-	$self->session->style->setScript($self->session->config->get("extrasURL").'/'.'wobject/SQLForm/SQLFormJoinSelector.js', {type => 'text/javascript'});
-	$self->session->style->setScript($self->session->config->get("extrasURL").'/'.'js/at/AjaxRequest.js', {type => 'text/javascript'});
-	$self->session->style->setScript($self->session->config->get("extrasURL").'/'.'wobject/SQLForm/SQLFormEditField.js', {type => 'text/javascript'});
+	$self->session->style->setScript($self->session->url->extras('wobject/SQLForm/SQLFormJoinSelector.js'), {type => 'text/javascript'});
+	$self->session->style->setScript($self->session->url->extras('js/at/AjaxRequest.js'), {type => 'text/javascript'});
+	$self->session->style->setScript($self->session->url->extras('wobject/SQLForm/SQLFormEditField.js'), {type => 'text/javascript'});
 		
 my 	$jsDatabases = '[' . join(',', map {"{key : '$_', value : '$_'}"} $dbLink->db->buildArray('show databases')) . ']';
 my 	$jsInitJoinSelector;

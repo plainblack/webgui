@@ -82,7 +82,7 @@ Renders a color picker control.
 
 sub toHtml {
 	my $self = shift;
-	$self->session->style->setScript($self->session->config->get("extrasURL").'/colorPicker.js',{ type=>'text/javascript' });
+	$self->session->style->setScript($self->session->url->extras('colorPicker.js'),{ type=>'text/javascript' });
         return '<script type="text/javascript">initColorPicker("'.$self->get("name").'","'.($self->get("value")).'");</script>';
 }
 

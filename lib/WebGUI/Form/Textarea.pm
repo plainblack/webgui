@@ -109,7 +109,7 @@ sub toHtml {
 	my $resize = undef;
 	if ($self->get("resizeable")) {
 		my $i18n = WebGUI::International->new($self->session, "Form_Textarea");
-		$self->session->style->setScript($self->session->config->get("extrasURL")."/resizeable_textarea.js", {type=>"text/javascript"});
+		$self->session->style->setScript($self->session->url->extras("resizeable_textarea.js"), {type=>"text/javascript"});
 		$resize = '<img src="'.$self->session->icon->getBaseURL().'/drag.gif" title="'.$i18n->get("drag to resize").'" alt="'.$i18n->get("drag to resize").'" class="draggable" onmousedown="tar_drag_start(event, \''.$self->get('id').'\');" />';
 	}
  	my $value = $self->fixMacros($self->fixTags($self->fixSpecialCharacters($self->get("value"))));

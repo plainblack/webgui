@@ -190,7 +190,7 @@ sub toHtml {
 	my @files = $storage->getFiles if (defined $storage);
 	my $maxFiles = $self->get('maxAttachments') - scalar(@files);
 	if ($maxFiles > 0) {
-        	$self->session->style->setScript($self->session->config->get("extrasURL").'/FileUploadControl.js',{type=>"text/javascript"});
+        	$self->session->style->setScript($self->session->url->extras('FileUploadControl.js'),{type=>"text/javascript"});
         	$uploadControl = '<script type="text/javascript">
                 	var fileIcons = new Array();
                 	';
@@ -201,7 +201,7 @@ sub toHtml {
                 	unless ($file eq "." || $file eq "..") {
                         	my $ext = $file;
 	                        $ext =~ s/(.*?)\.gif/$1/;
-        	                $uploadControl .= 'fileIcons["'.$ext.'"] = "'.$self->session->config->get("extrasURL").'/fileIcons/'.$file.'";'."\n";
+        	                $uploadControl .= 'fileIcons["'.$ext.'"] = "'.$self->session->url->extras('fileIcons/'.$file).'";'."\n";
                 	}
         	}
         	$uploadControl .= sprintf q!var uploader = new FileUploadControl("%s", fileIcons, "%s","%d");

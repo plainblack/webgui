@@ -202,12 +202,12 @@ sub prepareView {
 	if ($vars{showAdmin}) {
 		# under normal circumstances we don't put HTML stuff in our code, but this will make it much easier
 		# for end users to work with our templates
-		$self->session->style->setScript($self->session->config->get("extrasURL")."/draggable.js",{ type=>"text/javascript" });
-		$self->session->style->setLink($self->session->config->get("extrasURL")."/draggable.css",{ type=>"text/css", rel=>"stylesheet", media=>"all" });
+		$self->session->style->setScript($self->session->url->extras("draggable.js"),{ type=>"text/javascript" });
+		$self->session->style->setLink($self->session->url->extras("draggable.css"),{ type=>"text/css", rel=>"stylesheet", media=>"all" });
 		$self->session->style->setRawHeadTags('
 			<style type="text/css">
 			.dragging, .empty {
-				  background-image: url("'.$self->session->config->get("extrasURL").'/opaque.gif");
+				  background-image: url("'.$self->session->url->extras('opaque.gif').'");
 			}
 			</style>
 			');
@@ -222,7 +222,7 @@ sub view {
 		# for end users to work with our templates
 		$self->{_viewVars}{"dragger.icon"} = $self->session->icon->drag();
 		$self->{_viewVars}{"dragger.init"} = '
-			<iframe id="dragSubmitter" style="display: none;" src="'.$self->session->config->get("extrasURL").'/spacer.gif"></iframe>
+			<iframe id="dragSubmitter" style="display: none;" src="'.$self->session->url->extras('spacer.gif').'"></iframe>
 			<script type="text/javascript">
 				dragable_init("'.$self->getUrl("func=setContentPositions;map=").'");
 			</script>

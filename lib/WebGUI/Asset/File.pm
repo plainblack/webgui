@@ -188,11 +188,11 @@ sub getIcon {
 	my $self = shift;
 	my $small = shift;
 	if ($small && $self->get("dummy")) {
-		return $self->session->config->get("extrasURL").'/assets/small/file.gif';
+		return $self->session->url->extras('assets/small/file.gif');
 	} elsif ($small) {
 		return $self->getFileIconUrl;	
 	}
-	return $self->session->config->get("extrasURL").'/assets/file.gif';
+	return $self->session->url->extras('assets/file.gif');
 }
 
 

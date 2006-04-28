@@ -100,7 +100,7 @@ Renders a code area field.
 
 sub toHtml {
 	my $self = shift;
-	$self->session->style->setScript($self->session->config->get("extrasURL").'/TabFix.js',{type=>"text/javascript"});
+	$self->session->style->setScript($self->session->url->extras('TabFix.js'),{type=>"text/javascript"});
 	$self->set("extras", $self->get('extras').' onkeypress="return TabFix_keyPress(event)" onkeydown="return TabFix_keyDown(event)"');	
 	return $self->SUPER::toHtml;
 }

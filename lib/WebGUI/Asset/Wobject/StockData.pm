@@ -399,7 +399,7 @@ sub view {
 	my $self = shift;
     my $var = {};
 	#Set some template variables
-	$var->{'extrasFolder'} = $self->session->config->get("extrasURL")."/wobject/StockData";
+	$var->{'extrasFolder'} = $self->session->url->extras("wobject/StockData");
 	$var->{'editUrl'} = $self->getUrl("func=editStocks");
 	$var->{'isVisitor'} = $self->session->user->userId eq 1;
 	$var->{'stock.display.url'} = $self->getUrl("func=displayStock;symbol=");
@@ -448,7 +448,7 @@ sub www_displayStock {
    my $var = {};
    return $self->session->privilege->noAccess() unless $self->canView();
    
-   $var->{'extrasFolder'} = $self->session->config->get("extrasURL")."/wobject/StockData";
+   $var->{'extrasFolder'} = $self->session->url->extras("wobject/StockData");
    
    my $symbol = $self->session->form->process("symbol");
    my $data = $self->_getStocks([$symbol]);

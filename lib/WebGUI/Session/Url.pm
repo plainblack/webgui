@@ -38,6 +38,7 @@ This package provides URL writing functionality. It is important that all WebGUI
 
  $string = $url->append($base, $pairs);
  $string = $url->escape($string);
+ $string = $url->extras($path);
  $string = $url->gateway($pageUrl, $pairs);
  $string = $url->getRequestedUrl;
  $string = $url->getSiteURL;
@@ -121,6 +122,26 @@ sub escape {
 	return uri_escape(shift);
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 extras ( path )
+
+Combinds the base extrasURL defined in the config file with a specfied path.
+
+=head3 path
+
+The path to the thing in the extras folder that you're referencing. Note that the preceding / is not necessary.
+
+=cut
+
+sub extras {
+	my $self = shift;
+	my $path = shift;
+        my $url = $self->session->config->get("extrasURL").'/'.$path;
+	$url =~ s/\/+/\//g;
+	return $url;
+}
 
 #-------------------------------------------------------------------
 

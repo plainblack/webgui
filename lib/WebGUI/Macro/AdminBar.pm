@@ -103,7 +103,7 @@ sub process {
 		push(@tags, {
 			url=>$session->url->page("op=commitVersionTag;tagId=".$workingId),
 			title=>$i18n->get("commit my changes"),
-			icon=>$session->config->get("extrasURL").'/adminConsole/small/versionTags.gif'
+			icon=>$session->url->extras('adminConsole/small/versionTags.gif')
 			});
 	}
 	my $rs = $session->db->read("select tagId, name, groupToUse from assetVersionTag where isCommitted=0 and isLocked=0 order by name");
@@ -112,7 +112,7 @@ sub process {
 		push(@tags, {
 			url=>$session->url->page("op=setWorkingVersionTag;backToSite=1;tagId=".$id),
 			title=>($id eq $workingId) ?  '<span style="color: #000080;">* '.$name.'</span>' : $name,
-			icon=>$session->config->get("extrasURL").'/spacer.gif'
+			icon=>$session->url->extras('spacer.gif')
 			});
 	}
 	if (scalar(@tags)) {
@@ -131,7 +131,7 @@ sub process {
 				url=>$asset->{url}
 				});
 		}
-		push(@assets, {icon=>$session->config->get("extrasURL").'/spacer.gif',label=>'<hr />'});
+		push(@assets, {icon=>$session->url->extras('spacer.gif'),label=>'<hr />'});
 		foreach my $asset (@{$session->asset->getAssetAdderLinks}) {
 			push(@assets, {
 				title=>$asset->{label},

@@ -23,14 +23,15 @@ file.
 
 =head2 process
 
-Returns the extrasURL.  A trailing slash '/' is appended to the URL.
+Returns the extrasURL.  A trailing slash '/' is appended to the URL. Will also accept a path parameter.
 
 =cut
 
 #-------------------------------------------------------------------
 sub process {
 	my $session = shift;
-        return $session->config->get("extrasURL")."/";
+	my $path = shift;
+        return $session->url->extras($path);
 }
 
 1;

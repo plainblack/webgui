@@ -100,7 +100,7 @@ sub _getLocationData {
 			cityState => $1 || $location,
 			sky => $2 || 'N/A',
 			tempF => $3 || 'N/A',
-			iconUrl => $self->session->config->get("extrasURL").'/wobject/WeatherData/'.$self->_chooseWeatherConditionsIcon($2).'.jpg'
+			iconUrl => $self->session->url->extras("wobject/WeatherData/".$self->_chooseWeatherConditionsIcon($2).'.jpg')
 		};
 	$cache->set($locData, 60*60) if $locData->{sky} ne 'NULL';
 	}

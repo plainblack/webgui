@@ -68,10 +68,9 @@ sub _drawQueryBuilder {
 	);
 
 	# html
+	$self->session->style->setScript($self->session->url->extras('wobject/Shortcut/querybuilder.js'), {type=>"text/javascript"});
+	$self->session->style->setLink($self->session->url->extras('wobject/Shortcut/querybuilder.css'), {type=>"text/css", rel=>"stylesheet"});
 	my $output;
-	$output .= '<script type="text/javascript" src="'.
-	$self->session->config->get("extrasURL").'/wobject/Shortcut/querybuilder.js"></script>';
-	$output .= '<link href="'.$self->session->config->get("extrasURL").
 	'/wobject/Shortcut/querybuilder.css" type="text/css" rel="stylesheet">';
 	$output .= qq|<table cellspacing="0" cellpadding="0" border="0"><tr><td colspan="5" align="right">$shortcutCriteriaField</td></tr><tr><td></td><td></td><td></td><td></td><td class="qbtdright"></td></tr><tr><td></td><td></td><td></td><td></td><td class="qbtdright">$conjunctionField</td></tr>|;
 

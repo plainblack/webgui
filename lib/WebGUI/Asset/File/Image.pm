@@ -67,6 +67,7 @@ sub definition {
 		assetName=>$i18n->get('assetName'),
                 tableName=>'ImageAsset',
                 className=>'WebGUI::Asset::File::Image',
+		icon=>'image.gif',
                 properties=>{
                                 thumbnailSize=>{
                                         fieldType=>'integer',
@@ -144,14 +145,6 @@ sub getEditForm {
 	return $tabform;
 }
 
-
-#-------------------------------------------------------------------
-sub getIcon {
-	my $self = shift;
-	my $small = shift;
-	return $self->session->config->get("extrasURL").'/assets/image.gif' unless ($small);
-	$self->SUPER::getIcon(1);
-}
 
 
 #-------------------------------------------------------------------
