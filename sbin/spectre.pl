@@ -19,19 +19,21 @@ use WebGUI::Config;
 $|=1; # disable output buffering
 my $help;
 my $shutdown;
+my $ping;
 my $daemon;
 my $run;
 my $debug;
 
 GetOptions(
 	'help'=>\$help,
+	'ping'=>\$ping,
 	'shutdown'=>\$shutdown,
 	'daemon'=>\$daemon,
 	'debug' =>\$debug,
 	'run' => \$run
 	);
 
-if ($help || !($shutdown||$daemon||$run)) {
+if ($help || !($ping||$shutdown||$daemon||$run)) {
 	print <<STOP;
 
 	S.P.E.C.T.R.E. is the Supervisor of Perplexing Event-handling Contraptions for 
@@ -48,6 +50,8 @@ if ($help || !($shutdown||$daemon||$run)) {
 	--debug		If specified at startup, Spectre will provide verbose
 			debug to standard out so that you can see exactly what
 			it's doing.
+
+	--ping		Checks to see if Spectre is alive.
 
 	--run		Starts Spectre without forking it as a daemon.
 
@@ -80,6 +84,18 @@ if ($shutdown) {
 	die $POE::Component::IKC::ClientLite::error unless $remote;
 	my $result = $remote->post('admin/shutdown');
 	die $POE::Component::IKC::ClientLite::error unless defined $result;
+	undef $remote;
+} elsif ($ping) {
+	my $remote = create_ikc_client(
+	        port=>$config->get("port"),
+	        ip=>'127.0.0.1',
+	        name=>rand(100000),
+        	timeout=>10
+        	);
+	die $POE::Component::IKC::ClientLite::error unless $remote;
+	my $result = $remote->post_respond('admin/ping');
+	die $POE::Component::IKC::ClientLite::error unless defined $result;
+	print "Spectre is Alive!\n" if ($result eq "pong");
 	undef $remote;
 } elsif ($run) {
 	Spectre::Admin->new($config, $debug);

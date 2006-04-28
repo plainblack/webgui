@@ -502,7 +502,7 @@ sub addPrototypes {
 		collaborationTemplateId=>"PBtmpl0000000000000208",
 		threadTemplateId=>"PBtmpl0000000000000209",
 		postFormTemplateId=>"PBtmpl0000000000000210"	
-		},"pbproto000000000000001");
+		},"pbproto000000000000002");
 }
 
 

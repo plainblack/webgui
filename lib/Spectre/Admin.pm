@@ -15,6 +15,8 @@ package Spectre::Admin;
 =cut
 
 use strict;
+use HTTP::Request;
+use LWP::UserAgent;
 use POE;
 use POE::Component::IKC::Server;
 use POE::Component::IKC::Specifier;
@@ -86,6 +88,23 @@ sub debug {
 
 #-------------------------------------------------------------------
 
+=head2 error ( output )
+
+Prints out error information.
+
+=head3 
+
+=cut 
+
+sub error {
+	my $self = shift;
+	my $output = shift;
+	print "ADMIN: ".$output."\n";
+	$self->getLogger->error("ADMIN: ".$output);
+}
+
+#-------------------------------------------------------------------
+
 =head3 getLogger ( )
 
 Returns a reference to the logger.
@@ -122,19 +141,70 @@ sub new {
 	my $logger = Log::Log4perl->get_logger($config->getFilename);
 	my $self = {_debug=>$debug, _config=>$config, _logger=>$logger};
 	bless $self, $class;
+	$self->runTests();
 	create_ikc_server(
         	port => $config->get("port"),
        	 	name => 'Spectre',
         	);
 	POE::Session->create(
-		object_states => [ $self => {_start=>"_start", _stop=>"_stop", "shutdown"=>"_stop"} ],
-		args=>[["shutdown"]]
+		object_states => [ $self => {_start=>"_start", _stop=>"_stop", "shutdown"=>"_stop", "ping"=>"ping"} ],
+		args=>[["shutdown","ping"]]
         	);
 	$self->{_workflow} = Spectre::Workflow->new($config, $logger, $debug);
 	$self->{_cron} = Spectre::Cron->new($config, $logger, $self->{_workflow}, $debug);
 	POE::Kernel->run();
 }
 	
+#-------------------------------------------------------------------
+
+=head2 ping ( )
+
+Check to see if Spectre is alive. Returns "pong".
+
+=cut
+
+sub ping {
+ 	my ($kernel, $request) = @_[KERNEL,ARG0];
+        my ($data, $rsvp) = @$request;
+        $kernel->call(IKC=>post=>$rsvp,"pong");
+}
+
+#-------------------------------------------------------------------
+
+=head2 runTests ( )
+
+Executes a test to see if Spectre can establish a connection to WebGUI and get back a valid response.
+
+=cut
+
+sub runTests {
+	my $self = shift;
+	my $config = shift;
+	$self->debug("Running connectivity tests.");
+	my $configs = WebGUI::Config->readAllConfigs($self->config->getWebguiRoot);
+	foreach my $config (keys %{$configs}) {
+		$self->debug("Testing $config");
+		 my $userAgent = new LWP::UserAgent;
+        	$userAgent->agent("Spectre");
+        	$userAgent->timeout(30);
+		my $url = "http://".$configs->{$config}->get("sitename")->[0].":".$self->config->get("webguiPort")."/?op=spectreTest";
+        	my $request = new HTTP::Request (GET => $url);
+        	my $response = $userAgent->request($request);
+        	if ($response->is_error) {
+			$self->error("Couldn't connect to WebGUI site $config");
+        	} else {
+                	my $response = $response->content;
+			if ($response eq "subnet") {
+				$self->error("Spectre cannot communicate with WebGUI for $config, perhaps you need to adjust thhe spectreSubnets setting in this config file.");
+			} elsif ($response eq "spectre") {
+				$self->error("WebGUI connot communicate with Spectre for $config, perhaps you need to adjust the spectreIp or spectrePort setting the this config file.");
+			} elsif ($response ne "success") {
+				$self->error("Spectre received an invalid response from WebGUI while testing $config");
+			}
+        	}
+	}	
+	$self->debug("Tests completed.");	
+}
 
 
 1;

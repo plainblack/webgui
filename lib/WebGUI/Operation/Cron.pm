@@ -255,8 +255,7 @@ sub www_runCronJob {
 	$session->http->setMimeType("text/plain");
 	$session->http->setCacheControl("none");
 	unless (isInSubnet($session->env->get("REMOTE_ADDR"), $session->config->get("spectreSubnets"))) {
-		$session->errorHandler->security("make a Spectre cron job runner request, but we're only allowed to
-			accept requests from ".join(",",@{$session->config->get("spectreSubnets")}).".");
+		$session->errorHandler->security("make a Spectre cron job runner request, but we're only allowed to accept requests from ".join(",",@{$session->config->get("spectreSubnets")}).".");
         	return "error";
 	}
 	my $taskId = $session->form->param("taskId");

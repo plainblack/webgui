@@ -219,6 +219,8 @@ sub getOperations {
 		'editSettings' => 'WebGUI::Operation::Settings',
 		'saveSettings' => 'WebGUI::Operation::Settings',
 
+		'spectreTest' => 'WebGUI::Operation::Spectre',
+
 		'viewStatistics' => 'WebGUI::Operation::Statistics',
 
 		'makePrintable' => 'WebGUI::Operation::Style',
@@ -237,21 +239,6 @@ sub getOperations {
 		'listSubscriptions' => 'WebGUI::Operation::Subscription',
 		'purchaseSubscription' => 'WebGUI::Operation::Subscription',
 		'redeemSubscriptionCode' => 'WebGUI::Operation::Subscription',
-
-		'addThemeComponent' => 'WebGUI::Operation::Theme',
-		'addThemeComponentSave' => 'WebGUI::Operation::Theme',
-		'deleteTheme' => 'WebGUI::Operation::Theme',
-		'deleteThemeConfirm' => 'WebGUI::Operation::Theme',
-		'deleteThemeComponent' => 'WebGUI::Operation::Theme',
-		'deleteThemeComponentConfirm' => 'WebGUI::Operation::Theme',
-		'editTheme' => 'WebGUI::Operation::Theme',
-		'editThemeSave' => 'WebGUI::Operation::Theme',
-		'exportTheme' => 'WebGUI::Operation::Theme',
-		'importTheme' => 'WebGUI::Operation::Theme',
-		'importThemeSave' => 'WebGUI::Operation::Theme',
-		'importThemeValidate' => 'WebGUI::Operation::Theme',
-		'listThemes' => 'WebGUI::Operation::Theme',
-		'viewTheme' => 'WebGUI::Operation::Theme',
 
 		'cancelRecurringTransaction' => 'WebGUI::Operation::TransactionLog',
 		'deleteTransaction' => 'WebGUI::Operation::TransactionLog',
