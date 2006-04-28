@@ -103,7 +103,6 @@ sub toHtml {
 	my $workflowList = WebGUI::Workflow->getList($self->session, $self->get("type"));
 	$workflowList->{""} = "None" if ($self->get("none"));
 	$self->set("options", $workflowList);
-	$self->setManageIcons();
 	return $self->SUPER::toHtml();
 }
 
@@ -117,24 +116,12 @@ Renders the form field to HTML as a table row complete with labels, subtext, hov
 
 sub toHtmlWithWrapper {
 	my $self = shift;
-	$self->setManageIcons();
+        my $returnUrl = ";proceed=goBackToPage;returnUrl=".$self->session->url->escape($self->session->asset->getUrl) if $self->session->asset;
+        my $buttons = $self->session->icon->edit("op=editWorkflow;workflowId=".$self->get("value").$returnUrl) if ($self->get("value"));
+        $buttons .= $self->session->icon->manage("op=manageWorkflows".$returnUrl);
+	$self->set("subtext",$buttons . $self->get("subtext"));
 	return $self->SUPER::toHtmlWithWrapper;
 }
 
-#-------------------------------------------------------------------
-
-=head2 setManageIcons ( )
-
-Adds code to the subtext field of the form so that buttons for managing or editing the template show up if the user is allowed to do that.
-
-=cut
-
-sub setManageIcons {
-	my $self = shift;
-        my $returnUrl = ";proceed=goBackToPage;returnUrl=".$self->session->url->escape($self->session->asset->getUrl) if $self->session->asset;
-        my $buttons = $self->session->icon->edit("op=editWorkflow;workflowId=".$self->get("workflowId").$returnUrl) if ($self->get("workflowId"));
-        $buttons .= $self->session->icon->manage("op=manageWorkflows".$returnUrl);
-	$self->set("subtext",$buttons . $self->get("subtext"));
-}
 
 1;

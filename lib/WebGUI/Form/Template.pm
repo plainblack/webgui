@@ -102,7 +102,6 @@ sub toHtml {
           	}
         }
 	$self->set("options", $templateList);
-	$self->setManageIcons();
 	return $self->SUPER::toHtml();
 }
 
@@ -116,21 +115,6 @@ Renders the form field to HTML as a table row complete with labels, subtext, hov
 
 sub toHtmlWithWrapper {
 	my $self = shift;
-	$self->setManageIcons();
-	return $self->SUPER::toHtmlWithWrapper;
-}
-
-#-------------------------------------------------------------------
-
-=head2 setManageIcons ( )
-
-Adds code to the extras field of the form so that buttons for managing or
-editing the template show up if the user is allowed to do that.
-
-=cut
-
-sub setManageIcons {
-	my $self = shift;
 	my $template = WebGUI::Asset::Template->new($self->session,$self->get('value'));
         if (defined $template && $template->canEdit) {
                 my $returnUrl;
@@ -141,6 +125,7 @@ sub setManageIcons {
                 $buttons .= $self->session->icon->manage("func=manageAssets",$template->getParent->get("url"));
 		$self->set("subtext",$buttons . $self->get("subtext"));
 	}
+	return $self->SUPER::toHtmlWithWrapper;
 }
 
 1;
