@@ -208,7 +208,7 @@ sub page {
 
 =head2 processOperations ( session )
 
-Calls the operation dispatcher using the requested operation.  Currently only handles one operation per request.
+Calls the operation dispatcher using the requested operation. 
 
 =head3 session
 
@@ -220,22 +220,9 @@ sub processOperations {
 	my $session = shift;
 	my $output = "";
 	my $op = $session->form->process("op");
-#	my $opNumber = shift || 1;
 	if ($op) {
 		$output = WebGUI::Operation::execute($session,$op);
 	}
-#	$opNumber++;
-#	if ($output eq "" && $session->form->process("op".$opNumber)) {
-#		my $urlString = $session->url->unescape($session->form->process("op".$opNumber));
-#		my @pairs = split(/\;/,$urlString);
-#		my %form;
-#		foreach my $pair (@pairs) {
-#			my @param = split(/\=/,$pair);
-#			$form{$param[0]} = $param[1];
-#		}
-#		$session{form} = \%form;
-#		$output = processOperations($session,$opNumber);
-#	}
 	return $output;
 }
 
