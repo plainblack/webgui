@@ -145,7 +145,7 @@ sub www_setup {
 		$output .= $f->print; 
 	}
 	$output .= '</fieldset></div>
-		<img src="'.$session->config->get("extrasURL").'/background.jpg" style="border-style:none;position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5;" />
+		<img src="'.$session->url->extras('background.jpg').'" style="border-style:none;position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5;" />
 	</body>
 </html>';
 	return $output;

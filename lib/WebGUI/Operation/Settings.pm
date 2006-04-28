@@ -262,8 +262,6 @@ sub www_editSettings {
                 -extras=>'onchange="alert(\''.$i18n->get("Illegal Warning").'\')" '
         );
 # auth settings 
-	$session->style->setScript($session->config->get("extrasURL")."/swapLayers.js",{type=>"text/javascript"});
-	$session->style->setRawHeadTags('<script type="text/javascript" >var active="'.$session->setting->get("authMethod").'";</script>');
    	my $options;
    	foreach (@{$session->config->get("authMethods")}) {
       		$options->{$_} = $_;

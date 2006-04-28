@@ -123,7 +123,7 @@ Renders an HTML area field.
 
 sub toHtml {
 	my $self = shift;
-        $self->session->style->setScript($self->session->config->get("extrasURL").'/textFix.js',{ type=>'text/javascript' });
+        $self->session->style->setScript($self->session->url->extras('textFix.js'),{ type=>'text/javascript' });
 	$self->set("extras", $self->get('extras') . ' onblur="fixChars(this.form.'.$self->get("name").')" mce_editable="true" ');
 	$self->set("resizeable", 0);
 	return $self->SUPER::toHtml.WebGUI::Asset::RichEdit->new($self->session,$self->get("richEditId"))->getRichEditor($self->get('id'));

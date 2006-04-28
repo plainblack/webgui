@@ -505,9 +505,9 @@ sub getFileIconUrl {
 	my $extension = $self->getFileExtension($filename);	
 	my $path = $self->session->config->get("extrasPath").'/fileIcons/'.$extension.".gif";
 	if (-e $path) {
-		return $self->session->config->get("extrasURL")."/fileIcons/".$extension.".gif";
+		return $self->session->url->extras("fileIcons/".$extension.".gif");
 	}
-	return $self->session->config->get("extrasURL")."/fileIcons/unknown.gif";
+	return $self->session->url->extras("fileIcons/unknown.gif");
 }
 
 

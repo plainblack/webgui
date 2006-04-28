@@ -194,7 +194,7 @@ sub new {
 	my $class = shift;
 	my $session = shift;
 	my $startingTabs = shift;
-	my $css = shift || $session->config->get("extrasURL").'/tabs/tabs.css';
+	my $css = shift || $session->url->extras('tabs/tabs.css');
 	my $cancelUrl = shift || $session->url->page();
 	my $uiLevelOverride = shift;
 	my %tabs;
@@ -223,7 +223,7 @@ Returns an HTML string with all the necessary components to draw the tab form.
 
 sub print {
 	my $self = shift;
-	$self->session->style->setScript($self->session->config->get("extrasURL").'/tabs/tabs.js',{type=>"text/javascript"});
+	$self->session->style->setScript($self->session->url->extras('tabs/tabs.js'),{type=>"text/javascript"});
 	$self->session->style->setLink($self->{_css},{rel=>"stylesheet", rev=>"stylesheet",type=>"text/css"});
 	my $output = $self->{_form};
 	$output .= $self->{_hidden};
@@ -245,7 +245,7 @@ sub print {
 	$output .= $form;
 	$output .= WebGUI::Form::formFooter($self->session,);
 	$output .= '<script type="text/javascript">var numberOfTabs = '.($i-1).'; initTabs();</script>';
-	$output .= '<script type="text/javascript" src="'.$self->session->config->get("extrasURL").'/wz_tooltip.js"></script>';
+	$output .= '<script type="text/javascript" src="'.$self->session->url->extras('wz_tooltip.js').'"></script>';
 	return $output;
 }
 

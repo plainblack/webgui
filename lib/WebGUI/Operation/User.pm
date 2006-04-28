@@ -313,8 +313,6 @@ sub www_editUser {
 	my $u = WebGUI::User->new($session,($uid eq 'new') ? '' : $uid); #Setting uid to '' when uid is 'new' so visitor defaults prefill field for new user
 	my $username = $u->userId eq '1' ? '' : $u->username;
 	$session->stow->set("editUser_UID", $uid);
-	$session->style->setScript($session->config->get("extrasURL")."/swapLayers.js", {type=>"text/javascript"});
-	$session->style->setRawHeadTags('<script type="text/javascript">var active="'.$u->authMethod.'";</script>');
     	$tabform->hidden({name=>"op",value=>"editUserSave"});
     	$tabform->hidden({name=>"uid",value=>$uid});
     	$tabform->getTab("account")->raw('<tr><td width="170">&nbsp;</td><td>&nbsp;</td></tr>');

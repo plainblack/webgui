@@ -93,7 +93,7 @@ sub www_richEditPageTree {
 		-value=>$i18n->get('done'),
 		-extras=>'onclick="createLink()"'
 		);
-	$session->style->setScript($session->config->get("extrasURL")."/tinymce2/jscripts/tiny_mce/tiny_mce_popup.js",{type=>"text/javascript"});
+	$session->style->setScript($session->url->extras('tinymce2/jscripts/tiny_mce/tiny_mce_popup.js'),{type=>"text/javascript"});
 	my $output = '<fieldset><legend>'.$i18n->get('insert a link').'</legend>
 		<fieldset><legend>'.$i18n->get('insert a link').'</legend>'.$f->print.'</fieldset>
 	<script type="text/javascript">
@@ -213,7 +213,7 @@ sub www_richEditViewThumbnail {
     		    </script>\n";
 		return $output;
 	}
-	return '<div align="center"><img src="'.$session->config->get("extrasURL").'/tinymce2/images/icon.gif" style="border-style:none;" alt="'.$i18n->get('image manager').'" /></div>';
+	return '<div align="center"><img src="'.$session->url->extras('tinymce2/images/icon.gif').'" style="border-style:none;" alt="'.$i18n->get('image manager').'" /></div>';
 }
 
 #-------------------------------------------------------------------

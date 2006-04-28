@@ -173,7 +173,7 @@ $var{'head.tags'} = '
 <script type="text/javascript">
 function getWebguiProperty (propName) {
 var props = new Array();
-props["extrasURL"] = "'.$self->session->config->get("extrasURL").'";
+props["extrasURL"] = "'.$self->session->url->extras().'";
 props["pageURL"] = "'.$self->session->url->page(undef, undef, 1).'";
 return props[propName];
 }

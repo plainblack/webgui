@@ -698,7 +698,7 @@ sub www_editCommerceSettings {
 
 	$tabform->submit;
 
-	$session->style->setScript($session->config->get("extrasURL").'/swapLayers.js',{type=>"text/javascript"});
+	$session->style->setScript($session->url->extras('swapLayers.js'),{type=>"text/javascript"});
 	
 	return _submenu($session,$tabform->print, 'edit commerce settings title', 'commerce manage');
 }
