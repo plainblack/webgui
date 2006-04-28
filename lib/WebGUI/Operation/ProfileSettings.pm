@@ -71,9 +71,9 @@ sub _submenu {
         }
 	$ac->addSubmenuItem($session->url->page("op=editProfileCategory;cid=new"), $i18n->get(490));
 	$ac->addSubmenuItem($session->url->page("op=editProfileField;fid=new"), $i18n->get(491));
-        if ((($session->form->process("op") eq "editProfileField" && $session->form->process("fid") ne "new") || $session->form->process("op") eq "deleteProfileField") && $session->form->process("cid") eq "") {
+        if ((($session->form->process("op") eq "editProfileField" && $session->form->process("fid") ne "new") || $session->form->process("op") eq "deleteProfileFieldConfirm") && $session->form->process("cid") eq "") {
 		$ac->addSubmenuItem($session->url->page('op=editProfileField;fid='.$session->form->process("fid")), $i18n->get(787));
-		$ac->addSubmenuItem($session->url->page('op=deleteProfileField;fid='.$session->form->process("fid")), $i18n->get(788));
+		$ac->addSubmenuItem($session->url->page('op=deleteProfileFieldConfirm;fid='.$session->form->process("fid")), $i18n->get(788));
 	}
         if ((($session->form->process("op") eq "editProfileCategory" && $session->form->process("cid") ne "new") || $session->form->process("op") eq "deleteProfileCategory") && $session->form->process("fid") eq "") {
 		$ac->addSubmenuItem($session->url->page('op=editProfileCategory;cid='.$session->form->process("cid")), $i18n->get(789));
