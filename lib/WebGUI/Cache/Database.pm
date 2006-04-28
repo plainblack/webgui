@@ -118,7 +118,7 @@ sub getNamespaceSize {
         my $self = shift;
         my $expiresModifier = shift || 0;
 	$self->session->db->write("delete from cache where expires < ?",[time()+$expiresModifier]);
-	my ($size) = $self->session->db->quickArray("select sum(size) from cache where namepsace=?",[$self->{_namespace}]);
+	my ($size) = $self->session->db->quickArray("select sum(size) from cache where namespace=?",[$self->{_namespace}]);
 	return $size;
 }
 

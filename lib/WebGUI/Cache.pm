@@ -95,7 +95,7 @@ sub get {
 
 #-------------------------------------------------------------------
 
-=head2 new ( session, key, [ namepsace ] )
+=head2 new ( session, key, [ namespace ] )
 
 The new method will return a handler for the configured caching mechanism.  Defaults to WebGUI::Cache::FileCache. You must override this method when building your own cache plug-in.
 
