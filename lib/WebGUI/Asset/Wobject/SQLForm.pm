@@ -3550,7 +3550,7 @@ my		$cmd = "WebGUI::Form::$searchElement".'($self->session, $parameters)';
 
 	$var->{searchFormSubmit} = WebGUI::Form::submit($self->session, {value => $i18n->get('s search button')});
 	$var->{searchFormFooter} = WebGUI::Form::formFooter($self->session);
-	$var->{searchFormJavascript} = '<script src="'.$self->session->config->get("extrasURL").'/wobject/SQLForm/SQLFormSearch.js" type="text/javascript"></script>'; 
+	$var->{searchFormJavascript} = '<script src="'.$self->session->url->extras('wobject/SQLForm/SQLFormSearch.js').'" type="text/javascript"></script>'; 
 	$var->{searchFormJavascript} .= '<script type="text/javascript">'.$js.'</script>';
 	
 	$form .= '<td>'.$var->{searchFormSubmit}.'</td>';
@@ -3764,7 +3764,7 @@ my 	@recordLoop;
 			if ($row{__deleted}) {
 				$recordControls = WebGUI::Form::checkbox($self->session, {name=>'rid', value=>$row{__recordId}});
 				$recordControls .= '<a href="'.$self->getUrl('func=editRecord;rid='.$row{__recordId}).'">'.
-					'<img src="'.$self->session->config->get("extrasURL").'/wobject/SQLForm/SQLFormViewButton.gif'.'"'.
+					'<img src="'.$self->session->url->extras('wobject/SQLForm/SQLFormViewButton.gif').'"'.
 					'alt="View" title="View" align="middle" border="0" /></a>';
 			} else {
 				$recordControls = $self->session->icon->delete('func=deleteRecord'.';rid='.$row{__recordId},$self->get("url"),
@@ -3776,7 +3776,7 @@ my 	@recordLoop;
 		}
 		
 		$record{'record.controls'} .= '<a href="'.$self->getUrl('func=editRecord;viewOnly=1;rid='.$row{__recordId}).'">'.
-				'<img src="'.$self->session->config->get("extrasURL").'/wobject/SQLForm/SQLFormViewButton.gif'.'"'.
+				'<img src="'.$self->session->url->extras('wobject/SQLForm/SQLFormViewButton.gif').'"'.
 				'alt="View" title="View" align="middle" border="0" /></a>';
 		
 		if ($searchInTrash) {

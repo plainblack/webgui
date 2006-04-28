@@ -320,8 +320,8 @@ sub www_manageClipboard {
 			'onclick="return window.confirm(\''.$i18n->get(951,"WebGUI").'\')"',"Asset");
 		$limit = 1;
 	}
-$self->session->style->setLink($self->session->config->get("extrasURL").'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});
-        $self->session->style->setScript($self->session->config->get("extrasURL").'/assetManager/assetManager.js', {type=>"text/javascript"});
+$self->session->style->setLink($self->session->url->extras('assetManager/assetManager.css'), {rel=>"stylesheet",type=>"text/css"});
+        $self->session->style->setScript($self->session->url->extras('assetManager/assetManager.js'), {type=>"text/javascript"});
         my $output = "
    <script type=\"text/javascript\">
    //<![CDATA[

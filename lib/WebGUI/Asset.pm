@@ -723,8 +723,8 @@ sub getIcon {
 	my $small = shift;
 	my $definition = $self->definition($self->session);
 	my $icon = $definition->[0]{icon} || "assets.gif";
-	return $self->session->config->get("extrasURL").'/assets/small/'.$icon if ($small);
-	return $self->session->config->get("extrasURL").'/assets/'.$icon;
+	return $self->session->url->extras('assets/small/'.$icon) if ($small);
+	return $self->session->url->extras('assets/'.$icon);
 }
 
 #-------------------------------------------------------------------
@@ -909,8 +909,8 @@ sub getToolbar {
         $toolbar .= $self->session->icon->cut('func=cut',$self->get("url"))
             	.$self->session->icon->copy('func=copy',$self->get("url"));
         $toolbar .= $self->session->icon->shortcut('func=createShortcut',$self->get("url")) unless ($self->get("className") =~ /Shortcut/);
-	$self->session->style->setLink($self->session->config->get("extrasURL").'/contextMenu/contextMenu.css', {rel=>"stylesheet",type=>"text/css"});
-	$self->session->style->setScript($self->session->config->get("extrasURL").'/contextMenu/contextMenu.js', {type=>"text/javascript"});
+	$self->session->style->setLink($self->session->url->extras('contextMenu/contextMenu.css'), {rel=>"stylesheet",type=>"text/css"});
+	$self->session->style->setScript($self->session->url->extras('contextMenu/contextMenu.js'), {type=>"text/javascript"});
 	my $lock = "";
 	if (!$self->isLocked) {
 		$lock = 'contextMenu.addLink("'.$self->getUrl("func=lock").'","'.$i18n->get("lock").'");';
@@ -1107,11 +1107,11 @@ sub manageAssets {
 		my $locked;
 		my $edit;
 		if ($child->isLocked) {
-			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/locked.gif" alt="locked" style="border: 0px;" />';
+			$locked = '<img src="'.$self->session->url->extras('assetManager/locked.gif').'" alt="locked" style="border: 0px;" />';
 			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+" if ($child->canEditIfLocked);
 		} else {
 			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+";
-			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/unlocked.gif" alt="unlocked" style="border: 0px;" />';
+			$locked = '<img src="'.$self->session->url->extras('assetManager/unlocked.gif').'" alt="unlocked" style="border: 0px;" />';
 		}
 		my $lockLink = ", '<a href=\"".$child->getUrl("func=manageRevisions")."\">".$locked."</a>'";
 		my $plus = "'&nbsp;&nbsp;&nbsp;&nbsp;'+";
@@ -1280,11 +1280,11 @@ sub manageAssetsSearch {
 		my $locked;
 		my $edit;
 		if ($child->isLocked) {
-			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/locked.gif" alt="locked" style="border: 0px;" />';
+			$locked = '<img src="'.$self->session->url->extras('assetManager/locked.gif').'" alt="locked" style="border: 0px;" />';
 			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+" if ($child->canEditIfLocked);
 		} else {
 			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+";
-			$locked = '<img src="'.$self->session->config->get("extrasURL").'/assetManager/unlocked.gif" alt="unlocked" style="border: 0px;" />';
+			$locked = '<img src="'.$self->session->url->extras('assetManager/unlocked.gif').'" alt="unlocked" style="border: 0px;" />';
 		}
 		my $lockLink = ", '<a href=\"".$child->getUrl("func=manageRevisions")."\">".$locked."</a>'";
          	$output .= "assetManager.AddLine('"
@@ -1950,10 +1950,10 @@ Main page to manage/search assets. Renders an AdminConsole with a list of assets
 sub www_manageAssets {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
-  	$self->session->style->setLink($self->session->config->get("extrasURL").'/contextMenu/contextMenu.css', {rel=>"stylesheet",type=>"text/css"});
-        $self->session->style->setScript($self->session->config->get("extrasURL").'/contextMenu/contextMenu.js', {type=>"text/javascript"});
-  	$self->session->style->setLink($self->session->config->get("extrasURL").'/assetManager/assetManager.css', {rel=>"stylesheet",type=>"text/css"});
-        $self->session->style->setScript($self->session->config->get("extrasURL").'/assetManager/assetManager.js', {type=>"text/javascript"});
+  	$self->session->style->setLink($self->session->url->extras('contextMenu/contextMenu.css'), {rel=>"stylesheet",type=>"text/css"});
+        $self->session->style->setScript($self->session->url->extras('contextMenu/contextMenu.js'), {type=>"text/javascript"});
+  	$self->session->style->setLink($self->session->url->extras('assetManager/assetManager.css'), {rel=>"stylesheet",type=>"text/css"});
+        $self->session->style->setScript($self->session->url->extras('assetManager/assetManager.js'), {type=>"text/javascript"});
 	if ($self->session->form->get("search")) {
 		$self->session->scratch->set("manageAssetsSearchToggle",1);
 	} elsif ($self->session->form->get("manage")) {
