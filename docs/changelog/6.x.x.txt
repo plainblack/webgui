@@ -110,6 +110,7 @@
  - added [ 1201811 ] resizable textAreas
  - added [ 1376374 ] WebGUI should return a Last-Modified http/1.x header
  - added [ 1216059 ] Admin Bar Made Sticky
+ - fix [ 1471218 ] 6.8.8: Unable to change Default Home Page
  - fix [ 1463411 ] Denied content not getting expired or trashed
  - fix [ 1461522 ] 6.8.7 Linking items in the page tree (PDF and other files)
  - fix [ 1465280 ] BR Tag in Outlook

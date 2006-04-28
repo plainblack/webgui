@@ -41,24 +41,59 @@ sub www_formAssetTree {
 	my @crumb;
 	my $ancestors = $base->getLineage(["self","ancestors"],{returnObjects=>1});
 	foreach my $ancestor (@{$ancestors}) {
-		push(@crumb,'<a href="'.$ancestor->getUrl("op=formAssetTree;classLimiter=".$session->form->process("classLimiter").";formId="
-			.$session->form->process("formId")).'">'.$ancestor->get("menuTitle").'</a>');
+		my $url = $ancestor->getUrl("op=formAssetTree;formId=".$session->form->process("formId"));
+		$url .= ";classLimiter=".$session->form->process("classLimiter") if ($session->form->process("classLimiter"));
+		push(@crumb,'<a href="'.$url.'" class="crumb">'.$ancestor->get("menuTitle").'</a>');
 	}
-	my $output = '<p>'.join(" &gt; ", @crumb)."</p>\n";
+	my $output = '
+		<html><head>
+		<style type="text/css">
+		.base {
+        		font-family:  "Lucida Grande", "Lucida Sans Unicode", Tahoma, Verdana, Arial, sans-serif;
+			font-size: 12px;
+		}
+		a {
+        		color: #0f3ccc;
+        		text-decoration: none;
+		}
+		a:hover {
+			color: #000080;
+			text-decoration: underline;	
+		}
+		.selectLink {
+			color: #cc7700;
+		}
+		.crumb {
+			color: orange;
+		}
+		.crumbTrail {
+			padding: 3px;
+			background-color: #eeeeee;
+			-moz-border-radius: 10px;
+		}
+		.traverse {
+			font-size: 15px;
+		}
+		</style></head><body>
+		<div class="base">
+		<div class="crumbTrail">'.join(" &gt; ", @crumb)."</div><br />\n";
 	my $children = $base->getLineage(["children"],{returnObjects=>1});
 	my $i18n = WebGUI::International->new($session);
+	my $limit = $session->form->process("classLimiter");
 	foreach my $child (@{$children}) {
 		next unless $child->canView;
-		if ($child->get("className") =~ /^$session->form->process("classLimiter")/) {
-			$output .= '<a href="#" onclick="window.opener.document.getElementById(\''.$session->form->process("formId")
+		if ($limit eq "" || $child->get("className") =~ /^$limit/) {
+			$output .= '<a href="#" class="selectLink" onclick="window.opener.document.getElementById(\''.$session->form->process("formId")
 				.'\').value=\''.$child->getId.'\';window.opener.document.getElementById(\''.
 				$session->form->process("formId").'_display\').value=\''.$child->get("title").'\';window.close();">['.$i18n->get("select").']</a> ';
 		} else {
-			$output .= "[".$i18n->get("select")."] ";
+			$output .= '<span class="selectLink">['.$i18n->get("select").']</span> ';
 		}
-		$output .= '<a href="'.$child->getUrl("op=formAssetTree;classLimiter=".$session->form->process("classLimiter").";formId="
-			.$session->form->process("formId")).'">'.$child->get("menuTitle").'</a>'."<br />\n";	
+		my $url = $child->getUrl("op=formAssetTree;formId=".$session->form->process("formId"));
+		$url .= ";classLimiter=".$session->form->process("classLimiter") if ($session->form->process("classLimiter"));
+		$output .= '<a href="'.$url.'" class="traverse">'.$child->get("menuTitle").'</a>'."<br />\n";	
 	}
+	$output .= '</div></body></html>';
 	$session->style->useEmptyStyle("1");
 	return $output;
 }

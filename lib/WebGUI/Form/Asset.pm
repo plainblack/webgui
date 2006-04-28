@@ -96,6 +96,8 @@ Renders an asset selector.
 sub toHtml {
 	my $self = shift;
         my $asset = WebGUI::Asset->newByDynamicClass($self->session, $self->get("value")) || WebGUI::Asset->getRoot($self->session);
+	my $url = $asset->getUrl("op=formAssetTree;formId=".$self->get('id'));
+	$url .= ";classLimiter=".$self->get("class") if ($self->get("class"));
         return WebGUI::Form::Hidden->new($self->session,
                         name=>$self->get("name"),
                         extras=>$self->get("extras"),
@@ -110,7 +112,7 @@ sub toHtml {
                         )->toHtml
                 .WebGUI::Form::Button->new($self->session,
                         value=>"...",
-                        extras=>'onclick="window.open(\''.$asset->getUrl("op=formAssetTree;classLimiter=".$self->get("class").";formId=".$self->get('id')).'\',\'assetPicker\',\'toolbar=no, location=no, status=no, directories=no, width=400, height=400\');"'
+                        extras=>'onclick="window.open(\''.$url.'\',\'assetPicker\',\'toolbar=no, location=no, status=no, directories=no, width=400, height=400\');"'
                         )->toHtml;
 }
 
