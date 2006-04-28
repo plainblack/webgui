@@ -214,8 +214,11 @@ Loops come with special condition variables of their own. They are __FIRST__, __
    &lt;/TMPL_LOOP&gt;
 </pre>
 
-</p>|,
-		lastUpdated =>1130959765,
+</p>
+<p><i>NOTE: This only documents WebGUI's default template language, HTML::Template.  If the Template Type
+has been set to some other language you will need to consult the documentation for it.</i></p>.
+|,
+		lastUpdated =>1146243644,
 	},
 
 	'template variable title' => {
@@ -233,37 +236,44 @@ The version of WebGUI on your site.
 The release status for this version of WebGUI, stable, beta, gamma, etc.
 </p>
 
-<p>
-<b>Session Variables</b><br />
-In addition to any variables defined in a given template, the session variables are made available to you with this syntax:
+<p><b>session.user.username</b><br />
+The current user's username.
 </p>
 
-<p>&lt;tmpl_var session.<i>section</i>.<i>variable</i>&gt;</p>
+<p><b>session.user.firstDayOfWeek</b><br />
+From the current user's profile, the day they selected to be the first day of the week.
+</p>
 
-<p>Some common, useful session variables are:</p>
+<p><b>session.config.extrasurl</b><br />
+From the WebGUI config, the URL for the extras directory.
+</p>
 
 <p><b>session.var.adminOn</b><br />
 This variable will be true if the user is in Admin mode.
 </p>
 
-<p><b>session.var.userId</b><br />
-The userId for the current user.
+<p><b>session.setting.companyName</b><br />
+From the WebGUI settings, the company name.
 </p>
 
-<p><b>session.user.username</b><br />
-The current user's username.
+<p><b>session.setting.anonymousRegistration</b><br />
+From the WebGUI settings, whether or not anonymous registration has been enabled.
 </p>
 
-<p><b>session.user.language</b><br />
-The current user's preferred language (the default is English).
+<p>
+<b>Session Form Variables</b><br />
+Any form variables will be available in the template with this syntax:
 </p>
 
-<p><b>session.user.karma</b><br />
-The user's karma.
-</p>
+<p>&lt;tmpl_var session.form.<i>variable</i>&gt;</p>
+
+<p>If there is more than 1 value in a form variable, only the last will be returned</p>
+
+<p><i>NOTE: The syntax for these variables is shown in WebGUI's default template language, HTML::Template.  If the Template Type
+has been set to some other language you will need to consult the documentation for the appropriate syntax for its variables.</i></p>.
 
 		|,
-		lastUpdated => 1130978466,
+		lastUpdated => 1146243514,
 	},
 
 };

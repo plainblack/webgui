@@ -21,6 +21,16 @@ our $HELP = {
                                 description => 'template description',
                                 namespace => 'Asset_Template',
                         },
+                        {
+                                title => 'head block',
+                                description => 'head block description',
+                                namespace => 'Asset_Template',
+                        },
+                        {
+                                title => 'parser',
+                                description => 'parser description',
+                                namespace => 'Asset_Template',
+                        },
 		],
 		related => [
 		]
