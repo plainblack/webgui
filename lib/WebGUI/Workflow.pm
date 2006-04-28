@@ -107,7 +107,7 @@ sub delete {
 	}
 	# delete instances
 	$self->session->db->deleteRow("Workflow","workflowId",$self->getId);
-	$self->undef;
+	$self = undef;
 }
 
 #-------------------------------------------------------------------

@@ -97,7 +97,7 @@ sub www_deleteWorkflow {
         return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
 	my $workflow = WebGUI::Workflow->new($session, $session->form->get("workflowId"));
 	$workflow->delete if defined $workflow;
-	return www_manageWorkflow($session);
+	return www_manageWorkflows($session);
 }
 
 #-------------------------------------------------------------------
