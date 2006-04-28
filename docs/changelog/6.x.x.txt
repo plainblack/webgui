@@ -112,6 +112,7 @@
  - added [ 1216059 ] Admin Bar Made Sticky
  - fix [ 1471218 ] 6.8.8: Unable to change Default Home Page
  - fix [ 1445002 ] Field(s) fail to delete
+ - fix [ 1344318 ] utf8 support for uri_escape/URL::Escape
  - fix [ 1463411 ] Denied content not getting expired or trashed
  - fix [ 1461522 ] 6.8.7 Linking items in the page tree (PDF and other files)
  - fix [ 1465280 ] BR Tag in Outlook
