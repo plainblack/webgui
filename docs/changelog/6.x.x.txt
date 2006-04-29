@@ -102,6 +102,8 @@
    tabbed view to make scanning for content easier.
  - Help for forms now shows the fields that you should see with your UI level.
    There is a link to show all fields.
+ - Added SQL Form and error feedback for asset addition (Martin Kamerbeek/Procolix)
+ - Added file upload ability to the rich text editor (Wouter van Oijen/ProcoliX)
  - added [ 732011 ] http header cache setting
  - added [ 810556 ] larger value field in userSessionScratch table
  - added [ 881817 ] allowed characters in username
@@ -113,6 +115,7 @@
  - fix [ 1471218 ] 6.8.8: Unable to change Default Home Page
  - fix [ 1445002 ] Field(s) fail to delete
  - fix [ 1344318 ] utf8 support for uri_escape/URL::Escape
+ - fix [ 1466255 ] 6.8.8 Typo in package WebGUI::Operation::FormHelpers
  - fix [ 1463411 ] Denied content not getting expired or trashed
  - fix [ 1461522 ] 6.8.7 Linking items in the page tree (PDF and other files)
  - fix [ 1465280 ] BR Tag in Outlook
@@ -126,8 +129,6 @@
  - fix [ 1344665 ] Cache does not remember mimetype
  - fix [ 1172613 ] Header Tag Not Accessibility Friendly
  - fix [ 1340839 ] If can't use item in adminConsole don't display it
- - Added SQL Form and error feedback for asset addition (Martin Kamerbeek/Procolix)
- - Added file upload ability to the rich text editor (Wouter van Oijen/ProcoliX)
  - fix [ 1473937 ] scratch->set not taking.
 
 6.8.8

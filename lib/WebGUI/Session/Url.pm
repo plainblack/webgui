@@ -119,7 +119,7 @@ The string to escape.
 
 sub escape {
 	my $self = shift;
-	return uri_escape_utf8(shift);
+	return URI::Escape::uri_escape_utf8(shift);
 }
 
 

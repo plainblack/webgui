@@ -7,7 +7,7 @@ use WebGUI::Session;
 use WebGUI::VersionTag;
 use WebGUI::Asset;
 use WebGUI::Utility;
-
+use WebGUI::Storage::Image;
 
 my $session = start(); # this line required
 
@@ -41,9 +41,9 @@ sub addNewContent {
 		groupIdEdit=>'4',
 		description=>q|<p>The <a href="http://www.webgui.org">WebGUI Content Engine&reg;</a> is a powerful and easy to use system for managing web sites, and building web applications. It provides thousands of features out of the box, and lots of plug-in points so you can extend it to match your needs. It's easy enough for the average business user, but powerful enough for any large enterprise.</p>
 
-<p>If you're new to WebGUI, <a href="^/;getting_started">click here to learn how to get started</a>. If you're getting up to speed, <a href="^/;your_next_step">check out some ways you can do more faster</a>. If this is all old hat to you, then check out <a href="^/;the_latest_news">the latest news</a>. No matter what level you're at <a href="^/;tell_a_friend">tell your friends</a> about WebGUI.</p>
+<p>There are thousands of <a href="http://www.jeffmillerphotography.com">small</a> and <a href="http://www.brunswicknt.com">large</a> businesses, <a href="http://phila.k12.pa.us">schools</a>, <a href="http://www.csumathsuccess.org">universities</a>, <a href="http://beijing.usembassy.gov/">governments</a>, <a href="http://www.gama.org">associations</a>, <a href="http://www.monashwushu.com">clubs</a>, <a href="http://www.sunsetpres.org">churches</a>, <a href="http://www.k3b.org">projects</a>, and <a href="http://www.comparehangouts.com">communities</a> using WebGUI all over the world today. A brief list of some of them can be found <a href="http://www.plainblack.com/webgui/campaigns/sightings">here</a>. Your site should be on that list.</p>
 
-<p>There are thousands of <a href="http://www.jeffmillerphotography.com">small</a> and <a href="http://www.brunswicknt.com">large</a> businesses, <a href="http://phila.k12.pa.us">schools</a>, <a href="http://www.csumathsuccess.org">universities</a>, <a href="http://beijing.usembassy.gov/">governments</a>, <a href="http://www.gama.org">associations</a>, <a href="http://www.monashwushu.com">clubs</a>, <a href="http://www.sunsetpres.org">churches</a>, <a href="http://www.k3b.org">projects</a>, and <a href="http://www.comparehangouts.com">communities</a> using WebGUI all over the world today. A brief list of some of them can be found <a href="http://www.plainblack.com/webgui/campaigns/sightings">here</a>. Your site should be on that list.</p>|,
+<p>If you're new to WebGUI, <a href="^/;getting_started">click here to learn how to get started</a>. If you're getting up to speed, <a href="^/;your_next_step">check out some ways you can do more faster</a>. If this is all old hat to you, then check out <a href="^/;the_latest_news">the latest news</a>. No matter what level you're at <a href="^/;tell_a_friend">tell your friends</a> about WebGUI.</p>|,
 		templateId=>'PBtmpl0000000000000002'
 		});
 	$home->addChild({
@@ -114,7 +114,7 @@ Enjoy your new WebGUI site!
 		templateId=>'PBtmpl0000000000000002'
 		});
 	my $yns = WebGUI::Asset->new($session, "8Bb8gu-me2mhL3ljFyiWLg", "WebGUI::Asset::Wobject::Layout");
-	$yns->addChild({
+	my $asset = $yns->addChild({
 		className=>"WebGUI::Asset::Wobject::Article",
 		styleTemplateId=>"stevestyle000000000003",
 		printableStyleTemplateId=>"stevestyle000000000003",
@@ -128,13 +128,18 @@ Enjoy your new WebGUI site!
 		description=>q|<p>Plain Black&reg; created the WebGUI Content Engine&reg; and is here to answer your questions and provide you with services to make sure your WebGUI implementation is entirely successful. We bend over backwards to make sure you're a success. <a href="http://www.plainblack.com/contact_us">Contact us</a> today to see how we can help you.</p>|,
 		templateId=>'PBtmpl0000000000000002'
 		});
-	$yns->addChild({
+	my $contentPositions = $asset->getId.".";
+	my $storage = WebGUI::Storage::Image->create($session);
+	$storage->addFileFromFilesystem("7fixup/book02.jpg");
+	$storage->generateThumbnail("book02.jpg");
+	$asset = $yns->addChild({
 		className=>"WebGUI::Asset::Wobject::Article",
 		title=>"Get Documentation",
 		styleTemplateId=>"stevestyle000000000003",
 		printableStyleTemplateId=>"stevestyle000000000003",
 		menuTitle=>"Get Documentation",
 		isHidden=>1,
+		storageId=>$storage->getId,
 		url=>"yns/docs",
 		ownerUserId=>'3',
 		groupIdView=>'7',
@@ -142,7 +147,8 @@ Enjoy your new WebGUI site!
 		description=>q|<p><a href="http://www.plainblack.com/services/wdr">WebGUI Done Right</a> is the ultimate compendium to WebGUI. It is more than just documentation, it's also a library of hundreds of videos that show you exactly how to get stuff done. This is a must for anyone working in WebGUI, and Plain Black offers vast bulk discounts so you can give it to everyone in your organization.</p>|,
 		templateId=>'PBtmpl0000000000000002'
 		});
-	$yns->addChild({
+	$contentPositions .= $asset->getId.",";
+	$asset = $yns->addChild({
 		className=>"WebGUI::Asset::Wobject::Article",
 		styleTemplateId=>"stevestyle000000000003",
 		printableStyleTemplateId=>"stevestyle000000000003",
@@ -156,12 +162,17 @@ Enjoy your new WebGUI site!
 		description=>q|<p>Plain Black provides <a href="http://www.plainblack.com/services/support">support packages</a> to fit any budget or need. Start out with online support which costs only $500 per year! And grow support as your needs grow. We build custom support packages to match our client's needs. And no matter what level of support you purchase, you get WebGUI Done Right included in your purchase.</p>|,
 		templateId=>'PBtmpl0000000000000002'
 		});
-	$yns->addChild({
+	$contentPositions .= $asset->getId.",";
+	my $storage = WebGUI::Storage::Image->create($session);
+	$storage->addFileFromFilesystem("7fixup/server01.jpg");
+	$storage->generateThumbnail("book01.jpg");
+	$asset = $yns->addChild({
 		className=>"WebGUI::Asset::Wobject::Article",
 		styleTemplateId=>"stevestyle000000000003",
 		printableStyleTemplateId=>"stevestyle000000000003",
 		title=>"Get Hosting",
 		isHidden=>1,
+		storageId=>$storage->getId,
 		menuTitle=>"Get Hosting",
 		url=>"yns/hosting",
 		ownerUserId=>'3',
@@ -170,21 +181,8 @@ Enjoy your new WebGUI site!
 		description=>q|<p>Who better to host your WebGUI sites than Plain Black. Let us deal with upgrades, security, and server management. Doing so lets you focus on building your WebGUI site, which is where your time and expertise should be spent. And when you <a href="http://www.plainblack.com/services/hosting">sign up with hosting</a>, online support and WebGUI Done Right are both included!</p>|,
 		templateId=>'PBtmpl0000000000000002'
 		});
-	$yns->addChild({
-		className=>"WebGUI::Asset::Wobject::Article",
-		styleTemplateId=>"stevestyle000000000003",
-		printableStyleTemplateId=>"stevestyle000000000003",
-		title=>"Get Style",
-		isHidden=>1,
-		menuTitle=>"Get Style",
-		url=>"yns/style",
-		ownerUserId=>'3',
-		groupIdView=>'7',
-		groupIdEdit=>'4',
-		description=>q|<p>Not a designer? No problem! Plain Black's professional <a href="http://www.plainblack.com/services/design">design</a> team can make your site look great. Our team is fast, easy to work with, and can even migrate your existing content into your new WebGUI site.</p>|,
-		templateId=>'PBtmpl0000000000000002'
-		});
-	$yns->addChild({
+	$contentPositions .= $asset->getId.".";
+	$asset = $yns->addChild({
 		className=>"WebGUI::Asset::Wobject::Article",
 		title=>"Get Features",
 		styleTemplateId=>"stevestyle000000000003",
@@ -198,7 +196,27 @@ Enjoy your new WebGUI site!
 		description=>q|<p>What's that you say? WebGUI's thousands of features are still missing some important ones? No problem, our professional development team can <a href="http://www.plainblack.com/services/development">add any features you need</a> for your site. We've built hundreds of custom apps for people. From simple macros, to custom single sign on systems, to applications that will manage your entire company, our team can do it.</p>|,
 		templateId=>'PBtmpl0000000000000002'
 		});
-	$yns->addChild({
+	$contentPositions .= $asset->getId.",";
+	my $storage = WebGUI::Storage::Image->create($session);
+	$storage->addFileFromFilesystem("7fixup/profile01.jpg");
+	$storage->generateThumbnail("profile01.jpg");
+	$asset = $yns->addChild({
+		className=>"WebGUI::Asset::Wobject::Article",
+		styleTemplateId=>"stevestyle000000000003",
+		printableStyleTemplateId=>"stevestyle000000000003",
+		title=>"Get Style",
+		isHidden=>1,
+		storageId=>$storage->getId,
+		menuTitle=>"Get Style",
+		url=>"yns/style",
+		ownerUserId=>'3',
+		groupIdView=>'7',
+		groupIdEdit=>'4',
+		description=>q|<p>Not a designer? No problem! Plain Black's professional <a href="http://www.plainblack.com/services/design">design</a> team can make your site look great. Our team is fast, easy to work with, and can even migrate your existing content into your new WebGUI site.</p>|,
+		templateId=>'PBtmpl0000000000000002'
+		});
+	$contentPositions .= $asset->getId.",";
+	$asset = $yns->addChild({
 		className=>"WebGUI::Asset::Wobject::Article",
 		title=>"Get Translated",
 		styleTemplateId=>"stevestyle000000000003",
@@ -212,7 +230,8 @@ Enjoy your new WebGUI site!
 		description=>q|<p>Let our team of professional translators bring your site to new customers by <a href="http://www.plainblack.com/services/translation">translating your content</a> into additional languages. Our translation services are never machine automated. They're always done by professional translators that have years of experience reading, writing, and speaking many languages.</p>|,
 		templateId=>'PBtmpl0000000000000002'
 		});
-	$yns->addChild({
+	$contentPositions .= $asset->getId.",";
+	$asset = $yns->addChild({
 		className=>"WebGUI::Asset::Wobject::Article",
 		styleTemplateId=>"stevestyle000000000003",
 		printableStyleTemplateId=>"stevestyle000000000003",
@@ -226,6 +245,8 @@ Enjoy your new WebGUI site!
 		description=>q|<p>Now that you have a brilliant WebGUI site, you need to get people to visit it. We can help there too. Our marketing specialists can work with you to develop and execute the right combination of search engine placement, advertising buys, and affilliate programs to <a href="http://www.plainblack.com/services/promotion">ensure your site gets the traffic it needs</a>.</p>|,
 		templateId=>'PBtmpl0000000000000002'
 		});
+	$contentPositions .= $asset->getId.".";
+	$yns->update({templateId=>"PBtmpl0000000000000094", contentPositions=>$contentPositions});
 }
 
 #-------------------------------------------------
