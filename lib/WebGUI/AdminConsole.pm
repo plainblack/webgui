@@ -20,7 +20,7 @@ use WebGUI::Asset::Template;
 
 =head1 NAME
 
-Package WebGUI::Asset
+Package WebGUI::AdminConsole
 
 =head1 DESCRIPTION
 
