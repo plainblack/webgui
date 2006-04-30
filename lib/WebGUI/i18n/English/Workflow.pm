@@ -1,6 +1,12 @@
 package WebGUI::i18n::English::Workflow;
 
 our $I18N = { 
+	'show running workflows' => {
+		message => q|Show running workflows.|,
+		context => q|A label used to get to a display of running workflows.|,
+		lastUpdated => 0,
+	},
+
 	'no object' => {
 		message => q|No Object|,
 		context => q|used when selecting an object type to be passed through a workflow|,

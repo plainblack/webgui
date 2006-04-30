@@ -237,11 +237,20 @@ Executes the next iteration in this workflow. Returns a status code based upon w
 sub run {
 	my $self = shift;
 	my $workflow = $self->getWorkflow;
-	return "undefined" unless (defined $workflow);
-	return "disabled" unless ($workflow->get("enabled"));
+	unless (defined $workflow) {
+		$self->set({lastStatus=>"undefined", notifySpectre=>0});
+		return "undefined";
+	}
+	unless ($workflow->get("enabled")) {
+		$self->set({lastStatus=>"disabled", notifySpectre=>0});
+		return "disabled";
+	}
 	if ($workflow->get("isSerial")) {
 		my ($firstId) = $self->session->db->quickArray("select workflowId from WorkflowInstance order by runningSince");
-		return "waiting" if ($workflow->getId ne $firstId); # must wait for currently running instance to complete
+		if ($workflow->getId ne $firstId) { # must wait for currently running instance to complete
+			$self->set({lastStatus=>"waiting", notifySpectre=>0});
+			return "waiting";
+		}
 	}
 	my $activity = $workflow->getNextActivity($self->get("currentActivityId"));
 	unless  (defined $activity)  {
@@ -258,31 +267,38 @@ sub run {
 		eval($cmd);
 		if ($@) {
 			$self->session->errorHandler->error("Error loading activity class $class: ".$@);
+			$self->set({lastStatus=>"error", notifySpectre=>0});
 			return "error";
 		}
 		my $object = eval{ $class->$method($self->session, $params) };
 		if ($@) {
 			$self->session->errorHandler->error("Error instanciating activity (".$activity->getId.") pass-in object: ".$@);
+			$self->set({lastStatus=>"error", notifySpectre=>0});
 			return "error";
 		}
 		unless (defined $object) {
 			$self->session->errorHandler->error("Pass in object came back undefined for activity (".$activity->getId.") using ".$class.", ".$method.", ".$params.".");
+			$self->set({lastStatus=>"error", notifySpectre=>0});
 			return "error";
 		}
 		$status = eval{$activity->execute($object, $self)};
 		if ($@) {
 			$self->session->errorHandler->error("Caught exception executing workflow activity ".$activity->getId." for instance ".$self->getId." which reported ".$@);
+			$self->set({lastStatus=>"error", notifySpectre=>0});
 			return "error";
 		}
 	} else {
 		$status = $activity->execute(undef, $self);
 		if ($@) {
 			$self->session->errorHandler->error("Caught exception executing workflow activity ".$activity->getId." for instance ".$self->getId." which reported ".$@);
+			$self->set({lastStatus=>"error", notifySpectre=>0});
 			return "error";
 		}
 	}
 	if ($status eq "complete") {
-		$self->set({"currentActivityId"=>$activity->getId, notifySpectre=>0});
+		$self->set({lastStatus=>"complete", "currentActivityId"=>$activity->getId, notifySpectre=>0});
+	} else {
+		$self->set({lastStatus=>"error", notifySpectre=>0});
 	}
 	return $status;
 }
@@ -335,12 +351,17 @@ The parameters to be passed into the constructor. Note that the system will alwa
 
 The unique id of the activity in the workflow that needs to be executed next. If blank, it will execute the first activity in the workflow.
 
+=head4 lastStatus
+
+See the run() method for a description of statuses.
+
 =cut
 
 sub set {
 	my $self = shift;
 	my $properties = shift;
 	$self->{_data}{priority} = $properties->{priority} || $self->{_data}{priority} || 2;
+	$self->{_data}{lastStatus} = $properties->{lastStatus} || $self->{_data}{lastStatus};
 	$self->{_data}{workflowId} = $properties->{workflowId} || $self->{_data}{workflowId};
 	$self->{_data}{className} = (exists $properties->{className}) ? $properties->{className} : $self->{_data}{className};
 	$self->{_data}{methodName} = (exists $properties->{methodName}) ? $properties->{methodName} : $self->{_data}{methodName};

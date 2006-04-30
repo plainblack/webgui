@@ -282,6 +282,7 @@ sub getOperations {
 		'manageWorkflows' => 'WebGUI::Operation::Workflow',
 		'promoteWorkflowActivity' => 'WebGUI::Operation::Workflow',
 		'runWorkflow' => 'WebGUI::Operation::Workflow',
+		'showRunningWorkflows' => 'WebGUI::Operation::Workflow',
 	};
 }
 

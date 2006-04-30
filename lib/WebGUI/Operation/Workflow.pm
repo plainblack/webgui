@@ -330,6 +330,7 @@ sub www_manageWorkflows {
 	$output .= '</table>';
 	my $ac = WebGUI::AdminConsole->new($session,"workflow");
 	$ac->addSubmenuItem($session->url->page("op=addWorkflow"), $i18n->get("add a new workflow"));
+	$ac->addSubmenuItem($session->url->page("op=showRunningWorkflows"), $i18n->get("show running workflows"));
 	return $ac->render($output);
 }
 
@@ -381,5 +382,46 @@ sub www_runWorkflow {
 	$session->errorHandler->warn("No instance ID passed to workflow runner.");
 	return "error";
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_showRunningWorkflows ( )
+
+Display a list of the running workflow instances.
+
+=cut
+
+sub www_showRunningWorkflows {
+	my $session = shift;
+        return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
+	my $i18n = WebGUI::International->new($session, "Workflow");
+	my $output = '<style>
+		.waiting { color: #808000; }
+		.complete { color: #008000; }
+		.error { color: #800000; }
+		.disabled { color: #808000; }
+		.done { color: #008000; }
+		.undefined { color: #800000; }
+		</style><table width="100%">'; 
+	my $rs = $session->db->read("select Workflow.title, WorkflowInstance.lastStatus, WorkflowInstance.runningSince, WorkflowInstance.lastUpdate  from WorkflowInstance left join Workflow on WorkflowInstance.workflowId=Workflow.workflowId order by WorkflowInstance.runningSince desc");
+	while (my ($title, $status, $runningSince, $lastUpdate) = $rs->array) {
+		my $class = $status || "complete";
+		$output .= '<tr class="'.$class.'">'
+			.'<td>'.$title.'</td>'
+			.'<td>'.$session->datetime->epochToHuman($runningSince).'</td>';
+		if ($status) {
+			$output .= '<td>'
+				.$status.' / '.$session->datetime->epochToHuman($lastUpdate)
+				.'</td>';
+		}
+		$output .= "</tr>\n";
+	}
+	$output .= '</table>';
+	my $ac = WebGUI::AdminConsole->new($session,"workflow");
+	$ac->addSubmenuItem($session->url->page("op=addWorkflow"), $i18n->get("add a new workflow"));
+	$ac->addSubmenuItem($session->url->page("op=manageWorkflows"), $i18n->get("manage workflows"));
+	return $ac->render($output);
+}
+
 
 1;

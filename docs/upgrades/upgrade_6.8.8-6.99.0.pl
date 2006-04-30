@@ -351,7 +351,8 @@ sub addWorkflow {
 		methodName varchar(255),
 		parameters text,
 		runningSince bigint,
-		lastUpdate bigint
+		lastUpdate bigint,
+		lastStatus varchar(15)
 		)");
 	$session->db->write("create table WorkflowInstanceScratch (
 		instanceId varchar(22) binary not null,
