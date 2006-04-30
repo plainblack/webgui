@@ -101,7 +101,6 @@ sub getMimeType {
 	return $self->{_http}{mimetype} || "text/html";
 }
 
-
 #-------------------------------------------------------------------
 
 =head2 getStatus ( ) {
@@ -114,6 +113,20 @@ sub getStatus {
 	my $self = shift;
 	$self->{_http}{statusDescription} = $self->{_http}{statusDescription} || "OK";
 	return $self->{_http}{status} || "200";
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getStreamedFile ( ) {
+
+Returns the location of a file to be streamed thru mod_perl, if one has been set.
+
+=cut
+
+sub getStreamedFile {
+	my $self = shift;
+	return $self->{_http}{streamlocation} || undef;
 }
 
 
@@ -376,6 +389,20 @@ sub setStatus {
 	$self->{_http}{status} = shift;
 	$self->{_http}{statusDescription} = shift;
 }
+
+#-------------------------------------------------------------------
+
+=head2 setStreamedFile ( ) {
+
+Set a file to be streamed thru mod_perl.
+
+=cut
+
+sub setStreamedFile {
+	my $self = shift;
+	$self->{_http}{streamlocation} = shift;
+}
+
 
 1;
 

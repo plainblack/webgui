@@ -171,6 +171,7 @@ sub getEditForm {
 #-------------------------------------------------------------------
 sub getFileUrl {
 	my $self = shift;
+	#return $self->get("url");
 	return $self->getStorageLocation->getUrl($self->get("filename"));
 }
 
@@ -373,6 +374,7 @@ sub www_view {
 		return $self->getContainer->www_view;
 	}
 	$self->session->http->setRedirect($self->getFileUrl);
+    $self->session->http->setStreamedFile($self->getStorageLocation->getPath($self->get("filename")));
 	return '1';
 }
 

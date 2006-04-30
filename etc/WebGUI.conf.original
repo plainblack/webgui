@@ -237,6 +237,11 @@
 
 "soapHttpHeaderOverride" : 0,
 
+# Enable streaming Image and File assets thru mod_perl process instead of 
+# simple redirect. WARNING has impact on performance.
+
+"enableStreamingUploads" : "0",
+
 # Specify the list of macros you wish to be processed on each page.
 
 "macros" : {

@@ -362,6 +362,7 @@ sub view {
 	$var->{'currentPage.url'} = $current->getUrl;
     	$var->{'currentPage.hasChild'} = $current->hasChildren;
     	$var->{'currentPage.rank'} = $current->getRank;
+    	$var->{'currentPage.rankIs'.$current->getRank} = 1;
 	my $currentLineage = $current->get("lineage");
 	my $lineageToSkip = "noskip";
 	my $absoluteDepthOfLastPage;

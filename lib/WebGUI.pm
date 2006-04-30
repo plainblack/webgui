@@ -29,6 +29,7 @@ use Apache2::RequestRec ();
 use Apache2::RequestIO ();
 use Apache2::Const -compile => qw(OK DECLINED NOT_FOUND DIR_MAGIC_TYPE);
 use Apache2::ServerUtil ();
+use File::MMagic;
 
 #-------------------------------------------------------------------
 
@@ -104,6 +105,21 @@ sub contentHandler {
 			$output = page($session);
 		}
 		$session->http->setCookie("wgSession",$session->var->{_var}{sessionId}) unless $session->var->{_var}{sessionId} eq $session->http->getCookies->{"wgSession"};
+		my $filename = $session->http->getStreamedFile();
+#        print STDERR "file $filename and setting ".$session->config->get("enableStreamingUploads")."!\n";
+		if ((defined $filename) && ($session->config->get("enableStreamingUploads") eq "1")) {
+            #my $subr = $r->lookup_file($filename,$r->output_filters);
+            my $mm = new File::MMagic;
+            my $ct = $mm->checktype_filename($filename);
+            my $oldContentType = $r->content_type($ct);
+#            print STDERR "contenttype ".$r->content_type()."!\n";
+            if ($r->sendfile($filename) ) {
+    			return Apache2::Const::OK();
+			} else {
+                $r->content_type($oldContentType);
+			}
+		}
+
 		$session->http->sendHeader();
 		unless ($session->http->isRedirect()) {
 			$session->output->print($output);
