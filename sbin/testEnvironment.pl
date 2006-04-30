@@ -89,6 +89,7 @@ checkModule("POE::Component::Client::UserAgent", 0.06);
 checkModule("Data::Structure::Util",0.11);
 checkModule("Apache2::Request",2.06);
 checkModule("Cache::Memcached",1.15,2);
+checkModule("File::MMagic",1.26);
 
 ###################################
 # Checking WebGUI
