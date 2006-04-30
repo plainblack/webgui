@@ -252,7 +252,7 @@ sub www_commitVersionTagConfirm {
 
 =head2 www_manageCommittedVersions ( session )
 
-Shows a list of the currently available asset version tags.
+Shows a list of the committed asset version tags.
 
 =head3 session
 
@@ -269,7 +269,8 @@ sub www_manageCommittedVersions {
 	my $rollbackPrompt = $i18n->get('rollback version tag confirm');
         $ac->addSubmenuItem($session->url->page('op=editVersionTag'), $i18n->get("add a version tag"));
         $ac->addSubmenuItem($session->url->page('op=manageVersions'), $i18n->get("manage versions"));
-        my $output = '<table width=100% class="content">
+	$ac->addSubmenuItem($session->url->page('op=managePendingVersions'), $i18n->get("manage pending versions")) if ($session->user->isInGroup(3));
+        my $output = '<table width="100%" class="content">
         <tr><th>'.$i18n->get("version tag name").'</th><th>'.$i18n->get("committed on").'</th><th>'.$i18n->get("committed by").'</th><th></th></tr> ';
         my $sth = $session->db->read("select tagId,name,commitDate,committedBy from assetVersionTag where isCommitted=1");
         while (my ($id,$name,$date,$by) = $sth->array) {
@@ -283,6 +284,39 @@ sub www_manageCommittedVersions {
         $sth->finish;
         $output .= '</table>';
         return $ac->render($output,$i18n->get("committed versions"));
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_managePendingVersions ( session )
+
+Shows a list of the pending asset version tags.
+
+=head3 session
+
+A reference to the current session.
+
+=cut
+
+sub www_managePendingVersions {
+        my $session = shift;
+        return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+        my $ac = WebGUI::AdminConsole->new($session,"versions");
+        my $i18n = WebGUI::International->new($session,"VersionTag");
+        $ac->addSubmenuItem($session->url->page('op=editVersionTag'), $i18n->get("add a version tag"));
+        $ac->addSubmenuItem($session->url->page('op=manageVersions'), $i18n->get("manage versions"));
+	$ac->addSubmenuItem($session->url->page('op=manageCommittedVersions'), $i18n->get("manage committed versions")) if ($session->user->isInGroup(3));
+        my $output = '<table width="100%" class="content">
+        <tr><th>'.$i18n->get("version tag name").'</th></tr> ';
+        my $sth = $session->db->read("select tagId,name,commitDate,committedBy from assetVersionTag where isCommitted=0 and isLocked=1");
+        while (my ($id,$name) = $sth->array) {
+                $output .= '<tr>
+			<td><a href="'.$session->url->page("op=manageRevisionsInTag;tagId=".$id).'">'.$name.'</a></td>
+			</tr>';
+        }
+        $sth->finish;
+        $output .= '</table>';
+        return $ac->render($output,$i18n->get("pending versions"));
 }
 
 
@@ -305,6 +339,7 @@ sub www_manageVersions {
 	my $i18n = WebGUI::International->new($session,"VersionTag");
 	$ac->setHelp("versions manage");
 	$ac->addSubmenuItem($session->url->page('op=editVersionTag'), $i18n->get("add a version tag"));
+	$ac->addSubmenuItem($session->url->page('op=managePendingVersions'), $i18n->get("manage pending versions")) if ($session->user->isInGroup(3));
 	$ac->addSubmenuItem($session->url->page('op=manageCommittedVersions'), $i18n->get("manage committed versions")) if ($session->user->isInGroup(3));
 	my ($tag,$workingTagId) = $session->db->quickArray("select name,tagId from assetVersionTag where tagId=?",[$session->scratch->get("versionTag")]);
 	$tag ||= "None";
@@ -313,7 +348,7 @@ sub www_manageVersions {
 	my $setTag = $i18n->get("set tag");
 	my $rollbackPrompt = $i18n->get("rollback version tag confirm");
 	my $commitPrompt = $i18n->get("commit version tag confirm");
-	my $output = '<p>'.$i18n->get("current tag is called").': <b>'.$tag.'</b>.</p><table width=100% class="content">
+	my $output = '<p>'.$i18n->get("current tag is called").': <b>'.$tag.'</b>.</p><table width="100%" class="content">
 	<tr><th></th><th>'.$i18n->get("version tag name").'</th><th>'.$i18n->get("created on").'</th><th>'.$i18n->get("created by").'</th><th></th></tr> ';
 	my $sth = $session->db->read("select tagId,name,creationDate,createdBy,groupToUse from assetVersionTag where isCommitted=0 and isLocked=0");
 	while (my ($id,$name,$date,$by,$group) = $sth->array) {
@@ -400,7 +435,7 @@ sub www_manageRevisionsInTag {
 		$comments =~ s/\n/<br \/>/g;
 		$output .= $comments;
 	}
-	$output .= '<table width=100% class="content">
+	$output .= '<table width="100%" class="content">
         <tr><th></th><th>'.$i18n->get(99,"Asset").'</th><th>'.$i18n->get("type","Asset").'</th><th>'.$i18n->get("revision date","Asset").'</th><th>'.$i18n->get("revised by","Asset").'</th></tr> ';
 	my $p = WebGUI::Paginator->new($session,$session->url->page("op=manageRevisionsInTag;tagId=".$tag->getId));
 	$p->setDataByQuery("select assetData.revisionDate, users.username, asset.assetId, asset.className from assetData 

@@ -246,6 +246,12 @@ our $I18N = {
 		context => q|Menu item in version tag manager.|
 	},
 
+	'manage pending versions' => {
+		message => q|Manage pending versions.|,
+		lastUpdated => 0,
+		context => q|Menu item in version tag manager.|
+	},
+
 	'manage committed versions' => {
 		message => q|Manage committed versions.|,
 		lastUpdated => 0,
@@ -277,6 +283,12 @@ our $I18N = {
 
 	'committed versions' => {
 		message => q|Committed Versions|,
+		lastUpdated => 0,
+		context => q|Admin console label.|
+	},
+
+	'pending versions' => {
+		message => q|Pending Versions|,
 		lastUpdated => 0,
 		context => q|Admin console label.|
 	},

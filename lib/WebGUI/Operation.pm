@@ -261,6 +261,7 @@ sub getOperations {
 		'editVersionTag' => 'WebGUI::Operation::VersionTag',
 		'editVersionTagSave' => 'WebGUI::Operation::VersionTag',
 		'manageCommittedVersions' => 'WebGUI::Operation::VersionTag',
+		'managePendingVersions' => 'WebGUI::Operation::VersionTag',
 		'manageRevisionsInTag' => 'WebGUI::Operation::VersionTag',
 		'manageVersions' => 'WebGUI::Operation::VersionTag',
 		'rollbackVersionTag' => 'WebGUI::Operation::VersionTag',
