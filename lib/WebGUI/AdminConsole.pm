@@ -359,6 +359,15 @@ sub getAdminFunction {
                         op=>"manageCache",
                         group=>"3"
                 },
+		"graphics"=>{
+			title=>{
+				id=>"manage graphics",
+				namespace=>"Graphics",
+			},
+			icon=>"graphics.gif",
+			op=>"listGraphicsOptions",
+			group=>"3",
+		},
 	};
 	if ($id) {
 		return $self->_formatFunction($functions->{$id});

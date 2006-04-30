@@ -27,16 +27,20 @@
 	<tmpl_var form.submit>
 	<tmpl_var form.end>
 <tmpl_else>
-	<tmpl_loop answer_loop>
-		<span class="pollAnswer"><tmpl_var answer.text><br /></span>
-		<table cellpadding=0 cellspacing=0 border=0>
-		<tr>
-			<td width="<tmpl_var answer.graphWidth>" class="pollColor">^Spacer(1,1);</td>
-			<td class="pollAnswer">&nbsp;&nbsp;<tmpl_var answer.percent>% (<tmpl_var answer.total>)</td>
-		</tr>
-		</table>
-	</tmpl_loop>
-	<span class="pollAnswer"><hr size="1"><b><tmpl_var responses.label>:</b> <tmpl_var responses.total></span>
+	<tmpl_if hasImageGraph>
+		<img src="<tmpl_var graphUrl>" />
+	<tmpl_else>
+		<tmpl_loop answer_loop>
+			<span class="pollAnswer"><tmpl_var answer.text><br /></span>
+			<table cellpadding=0 cellspacing=0 border=0>
+			<tr>
+				<td width="<tmpl_var answer.graphWidth>" class="pollColor">^Spacer(1,1);</td>
+				<td class="pollAnswer">&nbsp;&nbsp;<tmpl_var answer.percent>% (<tmpl_var answer.total>)</td>
+			</tr>
+			</table>
+		</tmpl_loop>
+		<span class="pollAnswer"><hr size="1"><b><tmpl_var responses.label>:</b> <tmpl_var responses.total></span>
+	</tmpl_if>
 </tmpl_if>
 </div>
 

@@ -284,6 +284,21 @@ sub getOperations {
 		'promoteWorkflowActivity' => 'WebGUI::Operation::Workflow',
 		'runWorkflow' => 'WebGUI::Operation::Workflow',
 		'showRunningWorkflows' => 'WebGUI::Operation::Workflow',
+
+		'addColorToPalette' => 'WebGUI::Operation::Graphics',
+		'addColorToPaletteSave' => 'WebGUI::Operation::Graphics',
+		'deleteFont' => 'WebGUI::Operation::Graphics',
+		'deletePalette' => 'WebGUI::Operation::Graphics',
+		'editColor' => 'WebGUI::Operation::Graphics',
+		'editColorSave' => 'WebGUI::Operation::Graphics',
+		'editFont' => 'WebGUI::Operation::Graphics',
+		'editFontSave' => 'WebGUI::Operation::Graphics',
+		'editPalette' => 'WebGUI::Operation::Graphics',
+		'editPaletteSave' => 'WebGUI::Operation::Graphics',
+		'listGraphicsOptions' => 'WebGUI::Operation::Graphics',
+		'listFonts' => 'WebGUI::Operation::Graphics',
+		'listPalettes' => 'WebGUI::Operation::Graphics',
+		'removeColorFromPalette' => 'WebGUI::Operation::Graphics',
 	};
 }
 

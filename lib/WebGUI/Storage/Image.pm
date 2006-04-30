@@ -65,9 +65,9 @@ sub addFileFromCaptcha {
 	my $image = Image::Magick->new();
 	$image->Set(size=>'105x26');
 	$image->ReadImage('xc:white');
-	$image->AddNoise(noise=>"Multiplicative");
+#	$image->AddNoise(noise=>"Multiplicative");
 	$image->Annotate(font=>$self->session->config->getWebguiRoot."/lib/default.ttf", pointsize=>30, skewY=>0, skewX=>0, gravity=>'center', fill=>'white', antialias=>'true', text=>$challenge);
-	$image->Blur(geometry=>"1");
+#	$image->Blur(geometry=>"1");
 	$image->Set(type=>"Grayscale");
 	$image->Border(fill=>'black', width=>1, height=>1);
 	$image->Write($self->getPath($filename));

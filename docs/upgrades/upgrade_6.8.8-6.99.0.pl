@@ -53,6 +53,7 @@ updateScratch();
 installSQLForm();
 addResizableTextareas();
 addScratchKeys();
+addGraphing();
 
 finish($session); # this line required
 
@@ -1066,7 +1067,82 @@ ENDOFQUERY5
 	$session->config->addToArray("assets","WebGUI::Asset::Wobject::SQLForm");
 }
 
+sub addGraphing {
+	print "\tAdding graphing system.\n" unless ($quiet);
+	
+	# Create palette and color manager tables.
+	$session->db->write(<<GRAPH1
+create table imageColor (
+	colorId			varchar(22) binary not null primary key,
+	name			varchar(255) not null default 'untitled',
+	fillTriplet		char(7) not null default '#000000',
+	fillAlpha		char(2) not null default '00',
+	strokeTriplet		char(7) not null default '#000000',
+	strokeAlpha		char(2) not null default '00'
+);
+GRAPH1
+);
 
+	$session->db->write(<<GRAPH2
+create table imagePalette (
+	paletteId		varchar(22) binary not null primary key,
+	name			varchar(255) not null default 'untitled'
+);
+GRAPH2
+);
+	
+	$session->db->write(<<GRAPH3
+create table imagePaletteColors (
+	paletteId		varchar(22) binary not null,
+	colorId			varchar(22) binary not null,
+	paletteOrder		int(11) not null,
+	primary key(paletteId, paletteOrder)
+);
+GRAPH3
+);
+
+	# Insert default palette
+	$session->db->write(<<GR1
+INSERT INTO `imageColor` VALUES 
+	('UVL-iDSq7VTks3RCH2FEWg','Green','#31ca31','99','#31ca31','00'),
+	('3Tf0W_tkAjR902FJcGZxCg','Blue','#007dff','99','#007dff','00'),
+	('fuFripVJ4es4bUBPOq3ENQ','Yellow','#ffda08','99','#ffda08','00'),
+	('n3yfk8JGilmChSer2xuZ0w','Orange','#FF8000','99','#FF8000','00'),
+	('W683fO6r8uHgZ-Z-VodY7w','Red','#FF2000','99','#FF2000','00'),
+	('pSnxDIInB9r0n06q6kKV3w','Purple','#FF00B0','99','#FF00B0','00');
+GR1
+);
+
+	$session->db->write(q|INSERT INTO `imagePalette` VALUES ('defaultPalette','Default palette')|);
+
+	$session->db->write(<<GR2
+INSERT INTO `imagePaletteColors` VALUES 
+	('defaultPalette','UVL-iDSq7VTks3RCH2FEWg',1),
+	('defaultPalette','3Tf0W_tkAjR902FJcGZxCg',2),
+	('defaultPalette','fuFripVJ4es4bUBPOq3ENQ',3),
+	('defaultPalette','n3yfk8JGilmChSer2xuZ0w',4),
+	('defaultPalette','W683fO6r8uHgZ-Z-VodY7w',5),
+	('defaultPalette','pSnxDIInB9r0n06q6kKV3w',6);
+GR2
+);	
+
+	# Create fontmanager tables.
+	$session->db->write(<<GRAPH4
+create table imageFont (
+	fontId 			varchar(22) binary not null primary key, 
+	name 			varchar(255), 
+	storageId 		varchar(22), 
+	filename 		varchar(255)
+);
+GRAPH4
+);
+
+	$session->db->write(q|insert into imageFont (fontId, name, filename) values ('defaultFont', 'WebGUI default font', 'default.ttf')|);
+
+	# Update Poll table.
+	$session->db->write('alter table Poll add column graphConfiguration text');
+	$session->db->write('alter table Poll add column generateGraph tinyint(1)');
+}
 
 # ---- DO NOT EDIT BELOW THIS LINE ----
 

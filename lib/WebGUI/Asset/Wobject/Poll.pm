@@ -18,6 +18,8 @@ use WebGUI::SQL;
 use WebGUI::User;
 use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
+use WebGUI::Image::Graph;
+use WebGUI::Storage::Image;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
 
@@ -149,7 +151,15 @@ sub definition {
 			a20=>{
                                 fieldType=>"hidden",
                                 defaultValue=>undef
-                                } 
+                                },
+			graphConfiguration=>{
+				fieldType=>"hidden",
+				defaultValue=>undef,
+				},
+			generateGraph=>{
+				fieldType=>"yesNo",
+				defaultValue=>0,
+				},
 			}
 		});
         return $class->SUPER::definition($session, $definition);
@@ -239,6 +249,22 @@ sub getEditForm {
 		-label=>$i18n->get(10),
 		-hoverHelp=>$i18n->get('10 description')
 		) if $self->session->form->process("func") ne 'add';
+
+
+	my $config = {};
+	if ($self->get('graphConfiguration')) {
+		$config = Storable::thaw($self->get('graphConfiguration'));
+	}
+
+	$tabform->addTab('graph', 'Graphing');
+	$tabform->getTab('graph')->yesNo(
+		-name		=> 'generateGraph',
+		-label		=> $i18n->get('generate graph'),
+		-hoverHelp	=> $i18n->get('generate graph description'),
+		-value		=> $self->getValue('generateGraph'),
+	);
+	$tabform->getTab('graph')->raw(WebGUI::Image::Graph->getGraphingTab($self->session, $config));
+
 	return $tabform;
 }
 
@@ -283,6 +309,10 @@ sub processPropertiesFromFormPost {
         for ($i=1; $i<=20; $i++) {
              	$property->{'a'.$i} = $answer[($i-1)];
         }
+
+	my $graph = WebGUI::Image::Graph->processConfigurationForm($self->session);
+	$property->{graphConfiguration} = Storable::freeze($graph->getConfiguration);
+
 	$self->update($property);
 	$self->session->db->write("delete from Poll_answer where assetId=".$self->session->db->quote($self->getId)) if ($self->session->form->process("resetVotes"));
 }
@@ -308,7 +338,7 @@ sub setVote {
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
-	my (%var, $answer, @answers, $showPoll, $f);
+	my (%var, $answer, @answers, $showPoll, $f, @dataset, @labels);
         $var{question} = $self->get("question");
 	if ($self->get("active") eq "0") {
 		$showPoll = 0;
@@ -343,11 +373,33 @@ sub view {
 				"answer.percent"=>round(100*$tally/$totalResponses),
 				"answer.total"=>($tally+0)
                         	});
-		
+			push(@dataset, ($tally+0));
+			push(@labels, $self->get('a'.$i));
                 }
 	}
 	randomizeArray(\@answers) if ($self->get("randomizeAnswers"));
 	$var{answer_loop} = \@answers;
+
+	if ($self->getValue('generateGraph')) {
+		my $config = {};
+		if ($self->get('graphConfiguration')) {
+			$config = Storable::thaw($self->get('graphConfiguration'));
+		
+			my $graph = WebGUI::Image::Graph->loadByConfiguration($self->session, $config);
+			$graph->addDataset(\@dataset);
+			$graph->setLabels(\@labels);
+
+			$graph->draw;
+
+			my $storage = WebGUI::Storage::Image->createTemp($self->session);
+			my $filename = 'poll'.$self->session->id->generate.".png";
+			$graph->saveToStorageLocation($storage, $filename);
+
+			$var{graphUrl} = $storage->getUrl($filename);
+			$var{hasImageGraph} = 1;
+		}
+	}
+	
 	return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 }
 

@@ -198,6 +198,16 @@ width is 150 pixels.|,
 		lastUpdated => 1031514049
 	},
 
+	'generate graph' => {
+		message => q|Generate image graph|,
+		lastUpdated => 1031514049,
+	},
+
+	'generate graph description' => {
+		message => q|Set this switch to 'on' to enable generation of
+an image graph.|,
+		lastUpdated => 1031514049,
+	},
 };
 
 1;
