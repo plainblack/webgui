@@ -9,7 +9,8 @@ our $HELP = {
                         {
                                 title => 'visitor cache timeout',
                                 namespace => 'Asset_Folder',
-                                description => 'visitor cache timeout help'
+                                description => 'visitor cache timeout help',
+				uiLevel => 8,
                         },
                         {
                                 title => 'folder template title',

@@ -7,7 +7,7 @@ our $I18N = {
 		},
 
 	'cache timeout help' => {
-		message => q|Since all users will see this asset the same way, we can cache it for long periods of time to increase performance. How long should we cache it?<br /> <br /><b>UI Level: 8</b>|,
+		message => q|Since all users will see this asset the same way, we can cache it for long periods of time to increase performance. How long should we cache it?|,
 		lastUpdated => 0
 		},
 
@@ -389,82 +389,67 @@ The WebGUI management controls for this related product.
 	},
 
         '51 description' => {
-                message => q|You may enter a new benefit, or select from one you've already entered.
-<p>|,
+                message => q|You may enter a new benefit, or select from one you've already entered.|,
                 lastUpdated => 1120337226,
         },
 
         '52 description' => {
-                message => q|If you'd like to add another benefit right away, select "Yes".
-<p>|,
+                message => q|If you'd like to add another benefit right away, select "Yes".|,
                 lastUpdated => 1120337226,
         },
 
 	'50' => {
-		message => q|Benefits are typically the result of the features of your product. They are why your product is so good. If you add benefits, you may also wish to consider adding some features.
-<p>
-|,
+		message => q|Benefits are typically the result of the features of your product. They are why your product is so good. If you add benefits, you may also wish to consider adding some features.|,
 		lastUpdated => 1120337252
 	},
 
         '62 description' => {
-                message => q|Select a layout for this product.
-<p/>|,
+                message => q|Select a layout for this product.|,
                 lastUpdated => 1120332527,
         },
 
         '10 description' => {
-                message => q|The price of this product. You may optionally enter text like "call for pricing" if you wish, or you may leave it blank.
-<p>|,
+                message => q|The price of this product. You may optionally enter text like "call for pricing" if you wish, or you may leave it blank.|,
                 lastUpdated => 1120332527,
         },
 
         '11 description' => {
-                message => q|The product number, SKU, ISBN, or other identifier for this product.
-<p>|,
+                message => q|The product number, SKU, ISBN, or other identifier for this product.|,
                 lastUpdated => 1120332527,
         },
 
         '7 description' => {
-                message => q|An image of this product.
-<p>|,
+                message => q|An image of this product.|,
                 lastUpdated => 1120332527,
         },
 
         '8 description' => {
-                message => q|An image of this product.
-<p>|,
+                message => q|An image of this product.|,
                 lastUpdated => 1120332527,
         },
 
         '9 description' => {
-                message => q|An image of this product.
-<p>|,
+                message => q|An image of this product.|,
                 lastUpdated => 1120332527,
         },
 
         '13 description' => {
-                message => q|The brochure for this product.
-<p>|,
+                message => q|The brochure for this product.|,
                 lastUpdated => 1120332527,
         },
 
         '14 description' => {
-                message => q|The product, user, or service manual for this product.
-<p>|,
+                message => q|The product, user, or service manual for this product.|,
                 lastUpdated => 1120332527,
         },
 
         '15 description' => {
-                message => q|The warranty for this product.
-<p>|,
+                message => q|The warranty for this product.|,
                 lastUpdated => 1120332527,
         },
 
 	'39' => {
-		message => q|WebGUI has a product management system built in to enable you to publish your products and services to your site quickly and easily.
-<p>
-|,
+		message => q|WebGUI has a product management system built in to enable you to publish your products and services to your site quickly and easily.|,
 		lastUpdated => 1120332572
 	},
 
@@ -489,21 +474,17 @@ The WebGUI management controls for this related product.
 	},
 
         '23 description' => {
-                message => q|You may enter a new feature, or select one you entered for another product in the system.
-<p>|,
+                message => q|You may enter a new feature, or select one you entered for another product in the system.|,
                 lastUpdated => 1120335791,
         },
 
         '24 description' => {
-                message => q|If you'd like to add another feature right away, select "Yes".
-<p>|,
+                message => q|If you'd like to add another feature right away, select "Yes".|,
                 lastUpdated => 1120335791,
         },
 
 	'41' => {
-		message => q|Features are selling points for a product. IE: Reasons to buy your product. Features often result in benefits, so you may want to also add some benefits to this product.
-<p>
-|,
+		message => q|Features are selling points for a product. IE: Reasons to buy your product. Features often result in benefits, so you may want to also add some benefits to this product.|,
 		lastUpdated => 1120335841
 	},
 
@@ -513,22 +494,17 @@ The WebGUI management controls for this related product.
 	},
 
         '20 description' => {
-                message => q|Choose from the list of products you've already entered.
-<p>|,
+                message => q|Choose from the list of products you've already entered.|,
                 lastUpdated => 1120337083,
         },
 
         '21 description' => {
-                message => q|Select "Yes" if you have another related product to add.
-<p>|,
+                message => q|Select "Yes" if you have another related product to add.|,
                 lastUpdated => 1120337083,
         },
 
 	'47' => {
-		message => q|Related products are products that are comparable or complementary to other products.
-<p>
-
-|,
+		message => q|Related products are products that are comparable or complementary to other products.|,
 		lastUpdated => 1041876679
 	},
 
@@ -573,22 +549,17 @@ The WebGUI management controls for this related product.
 	},
 
         '17 description' => {
-                message => q|Choose from the list of products you've already entered.
-<p>|,
+                message => q|Choose from the list of products you've already entered.|,
                 lastUpdated => 1120336412,
         },
 
         '18 description' => {
-                message => q|Select "Yes" if you have another accessory to add.
-<p>|,
+                message => q|Select "Yes" if you have another accessory to add.|,
                 lastUpdated => 1120336412,
         },
 
 	'45' => {
-		message => q|Accessories are products that enhance other products.
-<p>
-
-|,
+		message => q|Accessories are products that enhance other products.|,
 		lastUpdated => 1031514049
 	},
 
@@ -598,32 +569,27 @@ The WebGUI management controls for this related product.
 	},
 
         '26 description' => {
-                message => q|The type of specification. For instance, height, weight,   or color. You may select one you've entered for another product, or type in a new specification.
-<p>|,
+                message => q|The type of specification. For instance, height, weight,   or color. You may select one you've entered for another product, or type in a new specification.|,
                 lastUpdated => 1120336437,
         },
 
         '27 description' => {
-                message => q|The actual specification value. For instance, if you chose height as the Label, then you'd enter a numeric value like "18".
-<p>|,
+                message => q|The actual specification value. For instance, if you chose height as the Label, then you'd enter a numeric value like "18".|,
                 lastUpdated => 1120336120,
         },
 
         '29 description' => {
-                message => q|The unit of measurement for this specification. For instance, if you chose height for your label, perhaps the units would be "meters".
-<p>|,
+                message => q|The unit of measurement for this specification. For instance, if you chose height for your label, perhaps the units would be "meters".|,
                 lastUpdated => 1120336120,
         },
 
         '28 description' => {
-                message => q|If you'd like to add another specification, select "Yes".
-<p>|,
+                message => q|If you'd like to add another specification, select "Yes".|,
                 lastUpdated => 1120336120,
         },
 
 	'43' => {
-		message => q|Specifications are the technical details of your product.
-<p>|,
+		message => q|Specifications are the technical details of your product.|,
 		lastUpdated => 1120336146
 	},
 

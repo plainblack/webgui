@@ -27,15 +27,14 @@ Assets also have these unique properties:</p>|,
 
         'template description' => {
                 message => q|Choose a template from the list to display the contents of the Page Layout Asset and
-its children.
-<p/>|,
-                lastUpdated => 1119410080,
+its children.|,
+                lastUpdated => 1146455452,
         },
 
         'assets to hide description' => {
                 message => q|This list contains one checkbox for each child Asset of the Page Layout.  Select the
 checkbox for any Asset that you do not want displayed in the Page Layout Asset.
-<p/>|,
+|,
                 lastUpdated => 1119410080,
         },
 

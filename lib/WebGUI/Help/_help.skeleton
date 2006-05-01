@@ -14,6 +14,7 @@ our $HELP = {  ##hashref of hashes
                                 title => 'form label 1',
                                 description => 'form description 1',
                                 namespace => 'namespace',  #The namespace is called out explicitly
+                                uiLevel => 9,  #Documenting non-default ui levels on a field
                         },
                         {
                                 title => 'form label 2',

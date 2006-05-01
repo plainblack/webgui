@@ -93,21 +93,18 @@ Give this template a descriptive name so that you'll know what it is when you're
 	},
 
         'namespace description' => {
-                message => q|What type of template is this?
-<p/>|,
-                lastUpdated => 1119979645,
+                message => q|What type of template is this?|,
+                lastUpdated => 1146455494,
         },
 
         'show in forms description' => {
-                message => q|Should this template be shown in the list of template from this namespace?
-<p/>|,
-                lastUpdated => 1119979645,
+                message => q|Should this template be shown in the list of template from this namespace?|,
+                lastUpdated => 1146455503,
         },
 
         'template description' => {
-                message => q|Create your template by using template commands and variables, macros, and HTML.
-<p/>|,
-                lastUpdated => 1119979645,
+                message => q|Create your template by using template commands and variables, macros, and HTML.|,
+                lastUpdated => 1146455505,
         },
 
         'parser' => {
@@ -116,9 +113,8 @@ Give this template a descriptive name so that you'll know what it is when you're
         },
 
         'parser description' => {
-                message => q|If your configuration file lists multiple template engines, then select which type of template this is so that WebGUI can send it to the correct one.
-<p/>|,
-                lastUpdated => 1119979645,
+                message => q|If your configuration file lists multiple template engines, then select which type of template this is so that WebGUI can send it to the correct one.|,
+                lastUpdated => 1146455514,
         },
 
 	'825' => {
@@ -403,8 +399,8 @@ has been set to some other language you will need to consult the documentation f
 	},
 
 	'choose a layout' => {
-		message => q|"<p>Choose a layout for this style:</p>"|,
-		lastUpdated => 1146244520,
+		message => q|<p>Choose a layout for this style:</p>|,
+		lastUpdated => 1146455484,
 	},
 
 	'style wizard help' => {

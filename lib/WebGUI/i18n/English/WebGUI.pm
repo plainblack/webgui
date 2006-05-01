@@ -562,8 +562,8 @@ Be aware that any database links you create here will be available to all conten
         },
 
 	'edit user karma body' => {
-		message => q|Most karma adjustments are done automatically based on what the user does on your website.  However, karma can also be adjusted by Admins<p/>|,
-		lastUpdated => 1120768627
+		message => q|<p>Most karma adjustments are done automatically based on what the user does on your website.  However, karma can also be adjusted by Admins</p>|,
+		lastUpdated => 1146455436
 	},
 
 	'12' => {
@@ -3538,9 +3538,8 @@ Optionally, if you are running a sendmail server on the same machine as WebGUI, 
         },
 
         '824 description' => {
-                message => q|This footer will be processed for macros and attached to every email sent from this WebGUI instance.
-<p/>|,
-                lastUpdated => 1120239343,
+                message => q|This footer will be processed for macros and attached to every email sent from this WebGUI instance.|,
+                lastUpdated => 1146455404,
         },
 
         '400 description' => {

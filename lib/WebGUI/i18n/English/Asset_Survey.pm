@@ -696,93 +696,77 @@ The default label for survey.url.
 	},
 
 	'4' => {
-		message => q|Surveys allow you to gather information from your users. In the case of WebGUI surveys, you can also use them to test your user's knowledge.
-<p/>
-Surveys are Wobjects and Assets, so they have the properties of both.  Survery have these unique properties:<p/>
+		message => q|<p>Surveys allow you to gather information from your users. In the case of WebGUI surveys, you can also use them to test your user's knowledge.</p>
+<p>Surveys are Wobjects and Assets, so they have the properties of both.  Survery have these unique properties:</p>
 |,
 		lastUpdated => 1119849727
 	},
 
         'view template description' => {
-                message => q|This template is used to display the Survey itself.
-<p/>|,
-                lastUpdated => 1119849705,
+                message => q|This template is used to display the Survey itself.|,
+                lastUpdated => 1146455534,
         },
 
         'response template description' => {
-                message => q|This template is used to display the questions and answers for the user to pick.
-<p/>|,
-                lastUpdated => 1119849705,
+                message => q|This template is used to display the questions and answers for the user to pick.|,
+                lastUpdated => 1146455536,
         },
 
         'gradebook template description' => {
                 message => q|This template is used to display, on a user-by-user basis how many questions they got
-correct and what percentage answered were correct.
-<p/>|,
-                lastUpdated => 1119849705,
+correct and what percentage answered were correct.|,
+                lastUpdated => 1146455538,
         },
 
         'overview template description' => {
-                message => q|This template is used to display a statistical overview of the all responses
-to the Survey.
-<p/>|,
-                lastUpdated => 1119849705,
+                message => q|This template is used to display a statistical overview of the all responses to the Survey.|,
+                lastUpdated => 1146455541,
         },
 
         '8 description' => {
-                message => q|The order the questions will be asked. Sequential displays the questions in the order you create them. Random displays the questions randomly. Response driven displays the questions in order based on the responses of the users.
-<p/>|,
-                lastUpdated => 1119849705,
+                message => q|The order the questions will be asked. Sequential displays the questions in the order you create them. Random displays the questions randomly. Response driven displays the questions in order based on the responses of the users.|,
+                lastUpdated => 1146455543,
         },
 
         '83 description' => {
-                message => q|The number of questions that will be displayed per page.  The default is 1.
-<p/>|,
-                lastUpdated => 1119849705,
+                message => q|The number of questions that will be displayed per page.  The default is 1.|,
+                lastUpdated => 1146455544,
         },
 
         '11 description' => {
-                message => q|By default the Survey is in survey mode. This allows it to ask questions of your users. However, if you switch to Quiz mode, you can have a self-correcting test of your user's knowledge.
-<p/>|,
-                lastUpdated => 1119849705,
+                message => q|By default the Survey is in survey mode. This allows it to ask questions of your users. However, if you switch to Quiz mode, you can have a self-correcting test of your user's knowledge.|,
+                lastUpdated => 1146455546,
         },
 
         '81 description' => {
-                message => q|Select whether or not the survey will record and display information that can identify a user and their responses.  If left at the default value of "No", the survey will record the user's IP address as well as their WebGUI User ID and Username if logged in.  This info will then be available in the survey's reports.  If set to "Yes", these three fields will contain scrambled data that can not be traced to a particular user.
-<p/>|,
-                lastUpdated => 1119849705,
+                message => q|Select whether or not the survey will record and display information that can identify a user and their responses.  If left at the default value of "No", the survey will record the user's IP address as well as their WebGUI User ID and Username if logged in.  This info will then be available in the survey's reports.  If set to "Yes", these three fields will contain scrambled data that can not be traced to a particular user.|,
+                lastUpdated => 1146455548,
         },
 
         '84 description' => {
-                message => q|The number of times the user can attempt to get the correct answer on each question.  The
-default is 1.
-<p/>|,
-                lastUpdated => 1119849705,
+                message => q|The number of times the user can attempt to get the correct answer on each question.  The default is 1.|,
+                lastUpdated => 1146455549,
         },
 
         '85 description' => {
-                message => q|How many questions are given to each user?
-<p/>|,
-                lastUpdated => 1119849705,
+                message => q|How many questions are given to each user?|,
+                lastUpdated => 1146455551,
         },
 
         '12 description' => {
-                message => q|Which users can participate in the survey?
-<p/>|,
-                lastUpdated => 1119849705,
+                message => q|Which users can participate in the survey?|,
+                lastUpdated => 1146455552,
         },
 
         '13 description' => {
-                message => q|Who can view the results of the survey?
-<p/>|,
-                lastUpdated => 1119849705,
+                message => q|Who can view the results of the survey?|,
+                lastUpdated => 1146455553,
         },
 
         'what next description' => {
                 message => q|After creating a new Survey, you may either starting adding questions or go back to the page where
-the survey was added.
-<p/>|,
-                lastUpdated => 1132357041,
+the survey was added.|,
+                lastUpdated => 1146455560,
         },
 
 
@@ -1136,28 +1120,24 @@ A comment.
 	},
 
         '14 description' => {
-                message => q|This is the question that the user will be asked.
-</p>|,
-                lastUpdated => 1119851108,
+                message => q|This is the question that the user will be asked.|,
+                lastUpdated => 1146455568,
         },
 
         '15 description' => {
-                message => q|If set to Yes, then the user will be allowed to add a comment to their response to this question.
-</p>|,
-                lastUpdated => 1119851108,
+                message => q|If set to Yes, then the user will be allowed to add a comment to their response to this question.|,
+                lastUpdated => 1146455578,
         },
 
         '16 description' => {
-                message => q|If set to Yes, then the answers will be shuffled for each user.
-</p>|,
-                lastUpdated => 1119851108,
+                message => q|If set to Yes, then the answers will be shuffled for each user.|,
+                lastUpdated => 1146455581,
         },
 
         '21 description' => {
                 message => q|Used to define the question that follows this one when the question order for the survey
-is set to "response".
-</p>|,
-                lastUpdated => 1119851108,
+is set to "response".|,
+                lastUpdated => 1146455589,
         },
 
         'what next question description' => {
@@ -1168,9 +1148,8 @@ is set to "response".
 <li>Frequency</li>
 <li>Opinion</li>
 <li>Or you may return to the survey</li>
-</ul>
-</p>|,
-                lastUpdated => 1119982880,
+</ul>|,
+                lastUpdated => 1146455594,
         },
 
 	'744' => {
@@ -1198,7 +1177,7 @@ is correct or not.|,
                 message => q|After defining the answer, you can add an answer to this question, addi
 		another question, edit the current question or go back to the page containing the
 		Survey|,
-                lastUpdated => 1119993846,
+                lastUpdated => 1146455600,
         },
 
 };

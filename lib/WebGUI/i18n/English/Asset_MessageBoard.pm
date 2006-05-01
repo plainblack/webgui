@@ -7,8 +7,8 @@ our $I18N = {
 		},
 
 	'visitor cache timeout help' => {
-		message => q|Since all visitors will see this asset the same way, we can cache it to increase performance. How long should we cache it?<br /> <br /><b>UI Level: 8</b>|,
-		lastUpdated => 0
+		message => q|Since all visitors will see this asset the same way, we can cache it to increase performance. How long should we cache it?|,
+		lastUpdated => 1146454744
 		},
 
 	'74' => {
