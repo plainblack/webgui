@@ -8,7 +8,8 @@ our $HELP = {
                         {
                                 title => 'visitor cache timeout',
                                 namespace => 'Asset_Collaboration',
-                                description => 'visitor cache timeout help'
+                                description => 'visitor cache timeout help',
+				uiLevel => 8,
                         },
                         {
                                 title => 'display last reply',

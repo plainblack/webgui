@@ -168,8 +168,9 @@ all of the classes of pages that should be included:<br>
 <dt>Descendents</dt>
 <dd>Pages lower than the current page in the tree.</dd>
 <dt>Pedigree</dt>
-<dd>When using a different start page, this option selects the Ancestors, Siblings and Descendents of that page.</dd>|,
-                lastUpdated => 1121969610,
+<dd>When using a different start page, this option selects the Ancestors, Siblings and Descendents of that page.</dd>
+</dl>|,
+                lastUpdated => 1146456217,
         },
 
         'Descendant End Point description' => {

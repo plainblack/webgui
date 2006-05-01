@@ -8,7 +8,8 @@ our $HELP = {
                         {
                                 title => 'cache timeout',
                                 namespace => 'Asset_SyndicatedContent',
-                                description => 'cache timeout help'
+                                description => 'cache timeout help',
+				uiLevel => 8,
                         },
                         {
                                 title => '72',

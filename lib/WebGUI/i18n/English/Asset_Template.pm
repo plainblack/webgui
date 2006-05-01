@@ -413,9 +413,10 @@ be on the right side of the page.</p>
 <li>Select one of the layouts.</li>
 <li>Enter your site name, upload a logo and configure the colors.</li>
 <li>Make customizations to the generated template.</li>
+</ol>
 </p>
 |,
-		lastUpdated => 1146244520,
+		lastUpdated => 1146456174,
 	},
 
 };
