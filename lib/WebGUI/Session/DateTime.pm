@@ -50,6 +50,7 @@ This package provides easy to use date math functions, which are normally a comp
  $day = $dt->getDayName($dayInteger);
  $integer = $dt->getDaysInMonth($epoch);
  $integer = $dt->getDaysInInterval($start, $end);
+ $integer = $dt->monthCount($start, $end);
  $integer = $dt->getFirstDayInMonthPosition($epoch);
  $month = $dt->getMonthName($monthInteger);
  $seconds = $dt->getSecondsFromEpoch($seconds);
