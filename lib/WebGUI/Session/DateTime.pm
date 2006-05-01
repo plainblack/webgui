@@ -359,6 +359,26 @@ sub getDayName {
 
 #-------------------------------------------------------------------
 
+=head2 getDayOfWeek ( epoch) {
+
+Returns the position (1 - 7) of the day of the week of the epoch passed in. 1 is Monday, 2 is Tuesday, etc
+
+=head3 epoch
+
+An epoch date.
+
+=cut
+
+sub getDayOfWeek {
+	my $self = shift;
+	my $dt = DateTime->from_epoch( epoch => shift );
+	$dt->set_time_zone($self->session->user->profileField("timeZone")|| "America/Chicago"); # assign the user's timezone
+	return $dt->day_of_week;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getDaysInMonth ( epoch )
 
 Returns the total number of days in the month.
