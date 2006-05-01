@@ -4,7 +4,8 @@ body{
 	border: 5px #214A7A solid; 
 	margin:0px;
 	padding:0px;
-	min-height: 700px;
+	min-height: 590px;
+	_height: 590px;
 }
 
 th {
@@ -52,6 +53,7 @@ th {
 	-moz-border-radius: 10px;
 	background-color: #fafafa;
 	min-height: 400px;
+	_height: 400px;
 	width: 78%;
 	z-index: 10;
 }
