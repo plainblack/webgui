@@ -652,8 +652,12 @@ The number of seconds since January 1, 1970.
 
 sub monthStartEnd {
 	my $self = shift;
-	my $dt = DateTime->from_epoch( epoch => shift);
-	my $end = DateTime->last_day_of_month(year=>$dt->year, month=>$dt->month);	
+	my $epoch = shift;
+	my $dt = DateTime->from_epoch( epoch => $epoch);
+	my $end = DateTime->last_day_of_month(year=>$dt->year, month=>$dt->month);
+	$dt->set_time_zone($self->session->user->profileField("timeZone")|| "America/Chicago"); # assign the user's timezone
+	$end->set_time_zone($self->session->user->profileField("timeZone")|| "America/Chicago"); # assign the user's timezone
+	
 	$dt->set_day(1);
 	$dt->set_hour(0);
 	$dt->set_minute(0);
@@ -661,7 +665,8 @@ sub monthStartEnd {
 	$end->set_hour(23);
 	$end->set_minute(59);
 	$end->set_second(59);
-        return ($dt->epoch, $end->epoch);
+    
+	return ($dt->epoch, $end->epoch);
 }
 
 #-------------------------------------------------------------------
