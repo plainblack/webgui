@@ -44,12 +44,14 @@ This package provides easy to use date math functions, which are normally a comp
 
  $epoch = $dt-$self->session->datetime->addToDate($epoch, $years, $months, $days);
  $epoch = $dt-$self->session->datetime->addToTime($epoch, $hours, $minutes, $seconds);
+ $epoch = $dt-$self->session->datetime->addToDateTime($epoch, $years, $months, $days, $hours, $minutes, $seconds);
  ($startEpoch, $endEpoch) = $dt->dayStartEnd($epoch);
  $dateString = $dt-$self->session->datetime->epochToHuman($epoch, $formatString);
  $setString = $dt-$self->session->datetime->epochToSet($epoch);
  $day = $dt->getDayName($dayInteger);
  $integer = $dt->getDaysInMonth($epoch);
  $integer = $dt->getDaysInInterval($start, $end);
+ $integer-> $dt->getDayOfWeek($epoch);
  $integer = $dt->monthCount($start, $end);
  $integer = $dt->getFirstDayInMonthPosition($epoch);
  $month = $dt->getMonthName($monthInteger);
@@ -105,6 +107,58 @@ sub addToDate {
 	my $currentTimeZone = $date->time_zone->name;
 	$date->set_time_zone('UTC'); # do this to prevent date math errors due to daylight savings time shifts
 	$date->add(years=>$years, months=>$months, days=>$days);
+	$date->set_time_zone($currentTimeZone);
+	return $date->epoch;
+}
+
+#-------------------------------------------------------------------
+
+=head2 addToDateTime ( epoch [ , years, months, days, hours, minutes, seconds ] )
+
+Returns an epoch date with the amount of time added.
+
+=head3 epoch
+
+The number of seconds since January 1, 1970.
+
+=head3 years
+
+The number of years to add to the epoch.
+
+=head3 months
+
+The number of months to add to the epoch.
+
+=head3 days
+
+The number of days to add to the epoch. 
+
+=head3 hours
+
+The number of hours to add to the epoch.
+
+=head3 minutes
+
+The number of minutes to add to the epoch.
+
+=head3 seconds
+
+The number of seconds to add to the epoch.
+
+=cut
+
+sub addToDateTime {
+	my $self = shift;
+	my $date		= DateTime->from_epoch( epoch =>shift);
+	my $years 		= shift || 0;
+	my $months 	    = shift || 0;
+	my $days	 	= shift || 0;
+	my $hours 		= shift || 0;
+	my $mins	 	= shift || 0;
+	my $secs	 	= shift || 0;
+	my $currentTimeZone = $date->time_zone->name;
+	$date->set_time_zone('UTC'); # do this to prevent date math errors due to daylight savings time shifts
+	$date->add(years=>$years, months=>$months, days=>$days, hours=>$hours, minutes=>$mins, seconds=>$secs);
 	$date->set_time_zone($currentTimeZone);
 	return $date->epoch;
 }
