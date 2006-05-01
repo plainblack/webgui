@@ -14,6 +14,7 @@ my $session = start(); # this line required
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Stuff just for 7.0 installs"});
 addPrototypes();
+addTemplates();
 rearrangeImportNode();
 addNewStyles();
 addRobots();
@@ -23,6 +24,29 @@ $versionTag->commit;
 purgeOldRevisions();
 
 finish($session); # this line required
+
+#-------------------------------------------------
+sub addTemplates {
+	print "\tAdding new templates specific to WebGUI 7.\n";
+	my $import = WebGUI::Asset->getImportNode($session);
+	$import->addChild({
+		className=>"WebGUI::Asset::Template",
+		template=>q|
+<tmpl_if session.var.adminOn><tmpl_if controls><p><tmpl_var controls></p></tmpl_if></tmpl_if>
+<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0" width="100%" height="*" align="middle">
+<param name="allowScriptAccess" value="sameDomain" />
+<param name="movie" value="<tmpl_var fileUrl>" /><param name="quality" value="high" /><param name="bgcolor" value="#ff6600" /><embed src="<tmpl_var fileUrl>" quality="high" bgcolor="#ff6600" width="100%" height="*" align="middle" allowScriptAccess="sameDomain" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" />
+</object>
+		|,
+		title=>"Flash Template",
+		menuTitle=>"Flash Template",
+		url=>"flash-template",
+		groupIdView=>'7',
+		groupIdEdit=>'12',
+		namespace=>"FileAsset",
+		ownerUserId=>'3'	
+		},"pbtmpl0000000000000220");
+}
 
 #-------------------------------------------------
 sub addNewContent {
@@ -45,6 +69,21 @@ sub addNewContent {
 
 <p>If you're new to WebGUI, <a href="^/;getting_started">click here to learn how to get started</a>. If you're getting up to speed, <a href="^/;your_next_step">check out some ways you can do more faster</a>. If this is all old hat to you, then check out <a href="^/;the_latest_news">the latest news</a>. No matter what level you're at <a href="^/;tell_a_friend">tell your friends</a> about WebGUI.</p>|,
 		templateId=>'PBtmpl0000000000000002'
+		});
+	my $storage = WebGUI::Storage->create($session);
+	$storage->addFileFromFilesystem("7fixup/advert01.swf");
+	$home->addChild({
+		className=>"WebGUI::Asset::File",
+		templateId=>"pbtmpl0000000000000220",
+		title=>"Ad",
+                menuTitle=>"Ad",
+		storageId=>$storage->getId,
+		filename=>"advert01.swf",
+                isHidden=>1,
+                url=>"home/ad",
+                ownerUserId=>'3',
+                groupIdView=>'7',
+                groupIdEdit=>'4'
 		});
 	$home->addChild({
 		className=>"WebGUI::Asset::Wobject::Article",
@@ -140,6 +179,7 @@ Enjoy your new WebGUI site!
 		menuTitle=>"Get Documentation",
 		isHidden=>1,
 		storageId=>$storage->getId,
+		filename=>"book02.jpg",
 		url=>"yns/docs",
 		ownerUserId=>'3',
 		groupIdView=>'7',
@@ -165,7 +205,7 @@ Enjoy your new WebGUI site!
 	$contentPositions .= $asset->getId.",";
 	my $storage = WebGUI::Storage::Image->create($session);
 	$storage->addFileFromFilesystem("7fixup/server01.jpg");
-	$storage->generateThumbnail("book01.jpg");
+	$storage->generateThumbnail("server01.jpg");
 	$asset = $yns->addChild({
 		className=>"WebGUI::Asset::Wobject::Article",
 		styleTemplateId=>"stevestyle000000000003",
@@ -173,6 +213,7 @@ Enjoy your new WebGUI site!
 		title=>"Get Hosting",
 		isHidden=>1,
 		storageId=>$storage->getId,
+		filename=>"server01.jpg",
 		menuTitle=>"Get Hosting",
 		url=>"yns/hosting",
 		ownerUserId=>'3',
@@ -207,6 +248,7 @@ Enjoy your new WebGUI site!
 		title=>"Get Style",
 		isHidden=>1,
 		storageId=>$storage->getId,
+		filename=>"profile01.jpg",
 		menuTitle=>"Get Style",
 		url=>"yns/style",
 		ownerUserId=>'3',
