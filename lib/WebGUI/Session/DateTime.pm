@@ -464,29 +464,6 @@ sub getMonthName {
 }
 
 #-------------------------------------------------------------------
-=head2 getMonthsInInterval ( start, end )
-
-Returns the number of months between two epoch dates.
-
-=head3 start
-
-An epoch date.
-
-=head3 end
-
-An epoch date.
-
-=cut
-
-sub getMonthsInInterval {
-	my $self = shift;
-	my $start = DateTime->from_epoch( epoch =>shift);
-	my $end = DateTime->from_epoch( epoch =>shift);
-	my $duration = $end - $start;
-	return $duration->delta_months;
-}
-
-#-------------------------------------------------------------------
 
 =head2 getSecondsFromEpoch ( epoch )
 
