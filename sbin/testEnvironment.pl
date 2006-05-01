@@ -47,7 +47,7 @@ checkModule("HTTP::Request",1.40);
 checkModule("HTTP::Headers",1.61);
 checkModule("Test::More",0.61,1);
 checkModule("Test::MockObject",1.02,1);
-checkModule("Test::Deep",0.093,1);
+checkModule("Test::Deep",0.095,1);
 checkModule("Pod::Coverage",0.17,2);
 checkModule("Text::Balanced",1.95,1);
 checkModule("Digest::MD5",2.20);
