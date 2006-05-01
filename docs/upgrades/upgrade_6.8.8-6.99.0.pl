@@ -1142,6 +1142,14 @@ GRAPH4
 	# Update Poll table.
 	$session->db->write('alter table Poll add column graphConfiguration text');
 	$session->db->write('alter table Poll add column generateGraph tinyint(1)');
+
+	# Add plugins to the config file
+	$session->config->set('graphingPlugins', [
+		"WebGUI::Image::Graph::XYGraph::Bar",
+		"WebGUI::Image::Graph::XYGraph::Line",
+		"WebGUI::Image::Graph::Pie",
+	]);
+ 
 }
 
 # ---- DO NOT EDIT BELOW THIS LINE ----

@@ -322,7 +322,14 @@
 			"WebGUI::Workflow::Activity::TrashVersionTag", "WebGUI::Workflow::Activity::CreateCronJob",
 			"WebGUI::Workflow::Activity::UnlockVersionTag", "WebGUI::Workflow::Activity::NotifyAboutVersionTag",
                         "WebGUI::Workflow::Activity::RequestApprovalForVersionTag", "WebGUI::Workflow::Activity::ExportVersionTagAsHtml"]
-		}
+		},
 
+# Enter the graphing plugins that you want to enable for your site.
+
+"graphingPlugins" : [
+	"WebGUI::Image::Graph::Pie",
+	"WebGUI::Image::Graph::XYGraph::Bar",
+	"WebGUI::Image::Graph::XYGraph::Line"
+	];
 }
 
