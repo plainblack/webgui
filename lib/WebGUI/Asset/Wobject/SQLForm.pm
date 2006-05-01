@@ -1852,7 +1852,7 @@ my			$databaseName = $self->session->form->process("database$joinNumber");
 					$processed->{"table$joinNumber"} = $tableName;
 
 					
-my					@columns = $self->dbLink->db->buildArray("describe $databaseName.$tableName");
+my					@columns = $dbLink->db->buildArray("describe $databaseName.$tableName");
 					if (isIn('__deleted', @columns) && isIn('__archived', @columns)) {
 						push(@columnConstraints, "table$joinNumber.__deleted=0 and table$joinNumber.__archived=0") if ($joinNumber == 1);
 						$fingerprint{$joinNumber} = 1;
@@ -1879,8 +1879,8 @@ my $joinBDatabaseName;
 							push(@error, $i18n->get('efs right join column error').$joinNumber.".");
 						}
 						if ($joinATableName && $joinBTableName &&
-						    isIn($joinAColumnName, $self->dbLink->db->buildArray("describe $joinADatabaseName.$joinATableName")) &&
-						    isIn($joinBColumnName, $self->dbLink->db->buildArray("describe $joinBDatabaseName.$joinBTableName"))) {
+						    isIn($joinAColumnName, $dbLink->db->buildArray("describe $joinADatabaseName.$joinATableName")) &&
+						    isIn($joinBColumnName, $dbLink->db->buildArray("describe $joinBDatabaseName.$joinBTableName"))) {
 							if ($self->session->form->process("joinFunction$joinNumber") eq 'difference') {
 my								$subSelect = "select $joinAColumnName from $joinADatabaseName.$joinATableName";
 								$subSelect .= " where __deleted=0 and __archived=0" if ($joinAIsSQLForm);
@@ -2227,6 +2227,7 @@ sub _getFormElement {
 	$fieldParameters->{name} 			= $field->{fieldName};
 	$fieldParameters->{value}			= $fieldValue;
 	$fieldParameters->{options}			= $field->{options} if ($field->{hasOptions});
+	$fieldParameters->{options}->{''}		= '-leave empty-' if (!$field->{isRequired});
 	$fieldParameters->{multiple}			= $field->{multipleAllowed} == 1;
 	$fieldParameters->{$field->{widthParam}}	= $field->{formFieldWidth} if ($field->{formFieldWidth});
 	$fieldParameters->{$field->{heightParam}}	= $field->{formFieldHeight} if ($field->{formFieldHeight});
@@ -2288,7 +2289,8 @@ param 'viewOnly' is set to a non-zero value.
 =cut
 
 sub www_editRecord {
-	my ($recordId, $fieldType, $canEditRecord, @fields, $properties, $f, $field, @fieldParameters, $cmd, $var, @formLoop, $formElement, $numberOfFields, $i18n);
+	my ($recordId, $fieldType, $canEditRecord, @fields, $properties, $f, $field, @fieldParameters, $cmd, $var, @formLoop, 
+		$formElement, $numberOfFields, $i18n, $recordControls);
 	my $self = shift;
 	my $errors = shift || [];
 
@@ -2366,6 +2368,18 @@ sub www_editRecord {
 		$f->submit;
 		push(@formLoop, {'field.formElement' => WebGUI::Form::submit($self->session)});
 	}
+
+	if ($self->_canEditRecord) {
+		unless ($properties->{__deleted}) {
+			$recordControls = $self->session->icon->delete('func=deleteRecord'.';rid='.$properties->{__recordId},$self->get("url"),
+				$i18n->get('_psq confirm delete message', 'Asset_SQLForm'));
+			$recordControls .= $self->session->icon->edit('func=editRecord;rid='.$properties->{__recordId},$self->get("url"));
+			$recordControls .= $self->session->icon->copy('func=editRecord;rid=new;copyRecordId='.$properties->{__recordId},$self->get("url"));
+		}
+
+		$var->{'record.controls'} = $recordControls;
+	}
+
 	
 	$var->{formHeader} = WebGUI::Form::formHeader($self->session).
 		WebGUI::Form::hidden($self->session, {name=>'func', value=>'editRecordSave'}).
@@ -3201,10 +3215,25 @@ my	@fields = $self->session->db->buildArray("select distinct fieldId from SQLFor
 	$self->session->scratch->set('SQLForm_'.$self->getId.'searchInTrash', $searchInTrash);
 	$self->session->scratch->set('SQLForm_'.$self->getId.'searchType', 'or');
 
-
-	
 	tie %searchInTrashOptions, "Tie::IxHash";
 	%searchInTrashOptions = (0 => 'Only normal', 1 => 'Only trash', 2 => 'Normal and trash');
+
+	my $elementCounter = 0;
+	my $searchInFormElement = '<table border="0"><tr>';
+	foreach (keys %searchableFields) {
+		$elementCounter++;
+		$searchInFormElement .= '<td>';
+		$searchInFormElement .= WebGUI::Form::Checkbox($self->session, { 
+			-name	=> 'searchIn',
+			-value	=> $_,
+			-checked=> WebGUI::Utility::isIn($_, @searchIn),
+		});
+		$searchInFormElement .= " $searchableFields{$_}</td>";
+		$searchInFormElement .= '</tr><tr>' if ($elementCounter % 2 == 0);
+	}
+	$searchInFormElement .= '</tr><tr><td>';
+	$searchInFormElement .= '<input type="checkbox" name="checkAllSerachIns" onchange="switchCheckboxen(this.form.searchIn, this.checked)"> <b>All</b>';
+	$searchInFormElement .= '</td></tr></table>';
 	
 	$f = WebGUI::HTMLForm->new($self->session,
 		-action	=> $self->getUrl
@@ -3228,11 +3257,9 @@ my	@fields = $self->session->db->buildArray("select distinct fieldId from SQLFor
 		-value	=> $useRegex ,
 		-options=> {'normal' => 'Normal search', 'regexp' => 'Regex search'},
 	);
-	$f->checkList(
-		-name	=> 'searchIn',
+	$f->readOnly(
 		-label	=> $i18n->get('s search in fields'),
-		-options=> \%searchableFields,
-		-value	=> \@searchIn,
+		-value	=> $searchInFormElement,
 	);
 	$f->radioList(
 		-name	=> 'searchInTrash',
@@ -3244,7 +3271,14 @@ my	@fields = $self->session->db->buildArray("select distinct fieldId from SQLFor
 		-value	=> $i18n->get('s search button'),
 	);
 
-	$var->{searchForm} = $f->print;
+	$var->{searchForm} = qq|
+	<script type="text/javascript">
+	function switchCheckboxen(elem,setValue ){
+		for(var i = 0; i < elem.length; i++) {
+			elem[i].checked = setValue;
+		}
+	};
+	</script>|.$f->print;
 
 	foreach (@showFields) {
 		$fieldProperties{$_} = $self->_getFieldProperties($_);
@@ -3662,7 +3696,10 @@ my					$joinStatement = $currentFieldProperties->{"database$joinCounter"}.'.'.
 					} else {
 						$joinStatement .= " on ".
 							$fullFieldName." = ".$prepend.$currentFieldProperties->{selectField1};
+						$joinStatement .= " or ".$fullFieldName." = ''" if (!$currentFieldProperties->{isRequired});
+							
 					}
+					push(@joinConstraints, $prepend."table$joinCounter.__archived='0'");
 					push(@joinSequence, $joinStatement);
 				}
 				if ($conditional == 100) {	
@@ -3700,13 +3737,15 @@ my	$searchType = ($self->session->form->process("searchType") || $self->session-
 	return undef if (!@constraints);
 
 	# Construct the search query
-my	$sql = " select t1.__recordId, t1.__deletionDate, t1.__deletedBy, t1.__initDate, t1.__userId, t1.__deleted, t1.__archived, t1.__revision ";
+my	$sql = " select distinct t1.__recordId, t1.__deletionDate, t1.__deletedBy, t1.__initDate, t1.__userId, t1.__deleted, t1.__archived, t1.__revision ";
 	$sql .= ", ".join(", \n", map {"t1.".$fieldProperties->{$_}->{fieldName}} @$showFields)."\n";
 	$sql .= " from ".$self->get('tableName').' as t1 ';
 	$sql .= " left join ".join(" left join \n", @joinSequence)."\n" if (@joinSequence);
 	$sql .= " where ";
 	$sql .= "(".join(" $searchType \n", @constraints).")\n" if (@constraints);
 	$sql .= " and " if (@constraints);
+	$sql .= "(".join(" and \n", @joinConstraints).")\n" if (@joinConstraints);
+	$sql .= " and " if (@joinConstraints);
 	$sql .= " t1.__archived=0 ";
 	$sql .= " and t1.__deleted=".$self->session->db->quote($searchInTrash) if ($searchInTrash < 2);
 

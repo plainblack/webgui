@@ -1156,7 +1156,11 @@ this record.</p>
 
 <p><b>managementLinks</b><br />
 A string of links to all of the
-management functions.</p>|,
+management functions.</p>
+
+<p><b>record.controls</b><br />
+Delete, edit and copy buttons for theis record. Only available if the user is 
+allowed to edit the record.</p>|,
 		lastUpdated => 0,
 	},
 
