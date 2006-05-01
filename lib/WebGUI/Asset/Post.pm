@@ -1012,13 +1012,13 @@ sub www_edit {
 		name=>"title",
 		value=>$title
 		});
-	$var{'synopsis.form'} = WebGUI::Form::textarea($self->session, {
-		name=>"synopsis",
-		value=>WebGUI::HTML::filter($self->getValue("synopsis"),"all")
-		});
 	$var{'title.form.textarea'} = WebGUI::Form::textarea($self->session, {
 		name=>"title",
 		value=>$title
+		});
+	$var{'synopsis.form'} = WebGUI::Form::textarea($self->session, {
+		name=>"synopsis",
+		value=>WebGUI::HTML::filter($self->getValue("synopsis"),"all")
 		});
 	$var{'content.form'} = WebGUI::Form::HTMLArea($self->session, {
 		name=>"content",
