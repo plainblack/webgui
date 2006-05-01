@@ -37,6 +37,10 @@ our $I18N = {
 		message => q|Graph type|,
 		lastUpdated => 1131394070,
 	},
+	'no graphing plugins' => {
+		message => q|No graphing plugins found|,
+		lastUpdated => 1146451962,
+	},
 };
 
 1;
