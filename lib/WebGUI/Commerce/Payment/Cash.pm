@@ -346,8 +346,8 @@ sub checkoutForm {
 	$f->phone(
 		-name=>"phone",
 		-label=>$i18n->get("phone"),
+		-defaultValue=>$u->profileField("homePhone"),
 		-value=>$self->session->form->process("phone"),
-		-defaultValue=>$u->profileField("homePhone")
 	);
 	$f->email(
 		-name	=> 'email',
