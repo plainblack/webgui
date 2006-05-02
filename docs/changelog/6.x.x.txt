@@ -134,6 +134,8 @@
  - fix [ 1471909 ] createAccountSave not called - no validate email (Martin
    Kamerbeek / Procolix)
  - fix [ 1479779 ] enable select box in dataform (Martin Kamerbeek / Procolix)
+ - fix [ 1478585 ] purgeRevision without warning or confirmation (Martin 
+   Kamerbee / Procolix)
  - Added a graphing engine and tied it into the Poll asset (Martin Kamerbeek / Procolix)
 
 6.8.8
