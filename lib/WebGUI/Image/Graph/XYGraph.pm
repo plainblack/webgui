@@ -9,6 +9,13 @@ use POSIX;
 our @ISA = qw(WebGUI::Image::Graph);
 
 #-------------------------------------------------------------------
+=head1 configurationForm
+
+The configuration form part for this object. See WebGUI::Image::Graph for
+documentation.
+
+=cut
+
 sub configurationForm {
 	my ($configForms, $f);
 	my $self = shift;
@@ -75,6 +82,12 @@ sub configurationForm {
 }
 
 #-------------------------------------------------------------------
+=head1 draw
+
+Draws the graph.
+
+=cut
+
 sub draw {
 	my $self = shift;
 
@@ -92,6 +105,12 @@ sub draw {
 }
 
 #-------------------------------------------------------------------
+=head1 drawAxis
+
+Draws the axis.
+
+=cut
+
 sub drawAxis {
 	my $self = shift;
 
@@ -107,6 +126,12 @@ sub drawAxis {
 }
 
 #-------------------------------------------------------------------
+=head1 drawLabels
+
+Draws the labels.
+
+=cut
+
 sub drawLabels {
 	my $self = shift;
 	my $location = shift;
@@ -116,14 +141,13 @@ sub drawLabels {
 	# Draw x-axis labels
 	foreach (@{$self->getLabel}) {
 		my $text = $self->wrapLabelToWidth($_, $self->getAnchorSpacing->{x});
-		$self->drawLabel(
-			text	 	=> $text,
+		$self->drawLabel($text, (
 			alignHorizontal	=> 'center',
 			alignVertical	=> 'top',
 			align		=> 'Center',
 			x		=> $anchorPoint{x},
 			y		=> $anchorPoint{y},
-		);
+		));
 
 		$anchorPoint{x} += $self->getAnchorSpacing->{x}; #$groupWidth + $self->getGroupSpacing;
 		$anchorPoint{y} += $self->getAnchorSpacing->{y};
@@ -134,18 +158,23 @@ sub drawLabels {
 	$anchorPoint{y} = $self->getChartOffset->{y} + $self->getChartHeight;
 #	for (1 .. $self->getYRange / $self->getYGranularity) {
 	foreach (@{$self->getYLabels}) {
-		$self->drawLabel(
-			text	 	=> $_,
+		$self->drawLabel($_, (
 			alignHorizontal	=> 'right',
 			alignVertical	=> 'center',
 			x		=> $anchorPoint{x}, #$self->getChartOffset->{x} - $self->getLabelOffset,
 			y		=> $anchorPoint{y}, #$self->getChartOffset->{y} + $self->getChartHeight - $self->getPixelsPerUnit * $_*$self->getYGranularity,
-		);
+		));
 		$anchorPoint{y} -= $self->getPixelsPerUnit * $self->getYGranularity
 	}
 }
 
 #-------------------------------------------------------------------
+=head drawRulers
+
+Draws the rulers.
+
+=cut
+
 sub drawRulers {
 	my $self = shift;
 
@@ -164,6 +193,13 @@ sub drawRulers {
 }
 
 #-------------------------------------------------------------------
+=head1 formNamespace
+
+Extends the form namespace for this object. See WebGUI::Image::Graph for
+documentation.
+
+=cut
+
 sub formNamespace {
 	my $self = shift;
 
@@ -171,6 +207,12 @@ sub formNamespace {
 }
 
 #-------------------------------------------------------------------
+=head1 getAxisColor
+
+Returns the color triplet for the axis. Defaults to '#222222'.
+
+=cut
+
 sub getAxisColor {
 	my $self = shift;
 
@@ -178,13 +220,26 @@ sub getAxisColor {
 }
 	
 #-------------------------------------------------------------------
+=head1 getChartHeight
+
+Returns the height of the chart. Defaults to 200.
+
+=cut
+
 sub getChartHeight {
 	my $self = shift;
 
-	return $self->{_properties}->{chartHeight};
+	return $self->{_properties}->{chartHeight} || 200;
 }
 
 #-------------------------------------------------------------------
+=head1 getChartOffset
+
+Returns the coordinates of the top-left corner of the chart. he coordinates are
+contained in a hasref with keys 'x' and 'y'.
+
+=cut
+
 sub getChartOffset {
 	my $self = shift;
 
@@ -192,13 +247,25 @@ sub getChartOffset {
 }
 
 #-------------------------------------------------------------------
+=head1 getChartWidth
+
+Returns the width of the chart. Defaults to 200.
+
+=cut
+
 sub getChartWidth {
 	my $self = shift;
 
-	return $self->{_properties}->{chartWidth};
+	return $self->{_properties}->{chartWidth} || 200;
 }
 
 #-------------------------------------------------------------------
+=head1 getConfiguration
+
+Returns a configuration hashref. See WebGUI::Image::Graph for documentation.
+
+=cut
+
 sub getConfiguration {
 	my $self = shift;
 
@@ -216,6 +283,13 @@ sub getConfiguration {
 }
 
 #-------------------------------------------------------------------
+=head1 getDrawMode
+
+Returns the drawmode. Currently supported are 'stacked' and 'sideBySide'.
+Defaults to 'sideBySide'.
+
+=cut
+
 sub getDrawMode {
 	my $self = shift;
 
@@ -223,6 +297,13 @@ sub getDrawMode {
 }
 
 #-------------------------------------------------------------------
+=head1 getPixelsPerUnit
+
+Returns the number of pixels that correspond with one unit of the dataset
+values.
+
+=cut
+
 sub getPixelsPerUnit {
 	my $self = shift;
 	
@@ -230,6 +311,12 @@ sub getPixelsPerUnit {
 }
 
 #-------------------------------------------------------------------
+=head1 getRulerColor
+
+Returns the color triplet of the rulers in the graph. Defaults to '#777777'.
+
+=cut
+
 sub getRulerColor {
 	my $self = shift;
 
@@ -237,13 +324,27 @@ sub getRulerColor {
 }
 
 #-------------------------------------------------------------------
+=head1 getYGranularity
+
+Returns the granularity of the labels and rulers in the Y direction. Defaults to
+10. This is value is in terms of the values in the dataset and has no direct
+relation to pixels.
+
+=cut
+
 sub getYGranularity {
 	my $self = shift;
 
-	return $self->{_properties}->{yGranularity} || 50;
+	return $self->{_properties}->{yGranularity} || 10;
 }
 
 #-------------------------------------------------------------------
+=head1 getYLabels
+
+Returns an arrayref containing the labels for the Y axis.
+
+=cut
+
 sub getYLabels {
 	my $self = shift;
 
@@ -256,6 +357,13 @@ sub getYLabels {
 }
 
 #-------------------------------------------------------------------
+=head1 getYRange
+
+Returns the maxmimal value of the range that contains a whole number of times
+the y granularity and is bigger than the maximum value in the dataset.
+
+=cut
+
 sub getYRange {
 	my $self = shift;
 
@@ -263,6 +371,17 @@ sub getYRange {
 }
 
 #-------------------------------------------------------------------
+=head1 setAxisColor ( color )
+
+Sets the color of the axis to the supplied value.
+
+=head2 color
+
+The triplet of the color you want to set the axis to. Must have the following
+form: #ffffff.
+
+=cut
+
 sub setAxisColor {
 	my $self = shift;
 	my $color = shift;
@@ -271,6 +390,16 @@ sub setAxisColor {
 }
 
 #-------------------------------------------------------------------
+=head1 setChartHeight ( height )
+
+Sets the height of the chart to the specified value.
+
+=head2 height
+
+The desired height in pixels.
+
+=cut
+
 sub setChartHeight {
 	my $self = shift;
 	my $height = shift;
@@ -279,6 +408,17 @@ sub setChartHeight {
 }
 
 #-------------------------------------------------------------------
+=head1 setChartOffset ( location )
+
+Sets the location of the top-left corner of the graph within the image.
+
+=head2 location
+
+A hashref containing the desired location. Use the 'x' and 'y' as keys for the x
+and y coordinate respectively.
+
+=cut
+
 sub setChartOffset {
 	my $self = shift;
 	my $point = shift;
@@ -287,6 +427,16 @@ sub setChartOffset {
 }
 
 #-------------------------------------------------------------------
+=head1 setChartHeight ( width )
+
+Sets the width of the chart to the specified value.
+
+=head2 width
+
+The desired width in pixels.
+
+=cut
+
 sub setChartWidth {
 	my $self = shift;
 	my $width = shift;
@@ -295,6 +445,17 @@ sub setChartWidth {
 }
 
 #-------------------------------------------------------------------
+=head1 setConfiguration ( config )
+
+Applies the settings in the given configuration hash. See WebGUI::Image::Graph
+for more information.
+
+=head2 config
+
+A configuration hash.
+
+=cut
+
 sub setConfiguration {
 	my $self = shift;
 	my $config = shift;
@@ -315,6 +476,18 @@ sub setConfiguration {
 }
 
 #-------------------------------------------------------------------
+=head1 setDrawMode ( mode )
+
+Set the way the datasets are drawn. Currently supported are 'stacked' and
+'sideBySide' which correspond to respectivly cumulative drawing and normal
+processing.
+
+=head2 mode
+
+The desired mode. Can be 'sideBySide' or 'stacked'.
+
+=cut
+
 sub setDrawMode {
 	my $self = shift;
 	my $mode = shift;
@@ -327,6 +500,17 @@ sub setDrawMode {
 }
 
 #-------------------------------------------------------------------
+=head1 setRulerColor ( color )
+
+Set the color of the rulers.
+
+=head2 color
+
+The triplet of the desired ruler color. Must be in the following format:
+'#ffffff'.
+
+=cut
+
 sub setRulerColor {
 	my $self = shift;
 	my $color = shift;
@@ -335,6 +519,16 @@ sub setRulerColor {
 }
 
 #-------------------------------------------------------------------
+=head1 setShowAxis ( boolean )
+
+Set whether or not to draw the axis.
+
+=head2 boolean
+
+If set to false the axis won't be drawn.
+
+=cut
+
 sub setShowAxis {
 	my $self = shift;
 	my $yesNo = shift;
@@ -343,6 +537,16 @@ sub setShowAxis {
 }
 
 #-------------------------------------------------------------------
+=head1 setShowLabels ( boolean )
+
+Set whether or not to draw the labels.
+
+=head2 boolean
+
+If set to false the labels won't be drawn.
+
+=cut
+
 sub setShowLabels {
 	my $self = shift;
 	my $yesNo = shift;
@@ -351,6 +555,16 @@ sub setShowLabels {
 }
 
 #-------------------------------------------------------------------
+=head1 setShowRulers ( boolean )
+
+Set whether or not to draw the rulers.
+
+=head2 boolean
+
+If set to false the rulers won't be drawn.
+
+=cut
+
 sub setShowRulers {
 	my $self = shift;
 	my $yesNo = shift;
@@ -359,6 +573,16 @@ sub setShowRulers {
 }
 
 #-------------------------------------------------------------------
+=head1 setYGranularity ( value )
+
+Sets the y granularity. See getYGranularity for explanation of this concept.
+
+=head2 value
+
+The granularity in dataset units, not pixels.
+
+=cut
+
 sub setYGranularity {
 	my $self = shift;
 	my $granularity = shift;
@@ -367,6 +591,12 @@ sub setYGranularity {
 }
 
 #-------------------------------------------------------------------
+=head1 showAxis
+
+Returns a boolean indicating whether to draw the axis.
+
+=cut
+
 sub showAxis {
 	my $self = shift;
 
@@ -375,6 +605,12 @@ sub showAxis {
 }
 
 #-------------------------------------------------------------------
+=head1 showLabels
+
+Returns a boolean indicating whether to draw the labels.
+
+=cut
+
 sub showLabels {
 	my $self = shift;
 
@@ -383,6 +619,12 @@ sub showLabels {
 }
 
 #-------------------------------------------------------------------
+=head1 showRulers
+
+Returns a boolean indicating whether to draw the rulers.
+
+=cut
+
 sub showRulers {
 	my $self = shift;
 

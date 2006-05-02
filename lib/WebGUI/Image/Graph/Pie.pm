@@ -466,14 +466,13 @@ sub drawLabel {
 	my $maxWidth = $anchorX;
 	$maxWidth = $self->getImageWidth - $anchorX if ($slice->{avgAngle} > 1.5 * pi || $slice->{avgAngle} < 0.5 * pi);
 	
-	$self->SUPER::drawLabel(
-		text	 	=> $self->wrapLabelToWidth($text, $maxWidth),
+	$self->SUPER::drawLabel($self->wrapLabelToWidth($text, $maxWidth), (
 		alignHorizontal	=> $horizontalAlign,
 		align		=> $align,
 		alignVertical	=> $verticalAlign,
 		x		=> $anchorX,
 		y		=> $endPointY,
-	);
+	));
 }
 
 #-------------------------------------------------------------------

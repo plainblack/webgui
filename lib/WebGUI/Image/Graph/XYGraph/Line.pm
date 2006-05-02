@@ -9,6 +9,12 @@ use Data::Dumper;
 our @ISA = qw(WebGUI::Image::Graph::XYGraph);
 
 #-------------------------------------------------------------------
+=head1 drawGraph
+
+Draws all the lines.
+
+=cut
+
 sub drawGraph {
 	my ($currentBar, %location);
 	my $self = shift;
@@ -27,6 +33,28 @@ sub drawGraph {
 }
 
 #-------------------------------------------------------------------
+=head1 drawLine ( line, location, interval )
+
+Draws a bar defined by bar and with width barWidth at location.
+
+=head2 line
+
+A hashref defining the line. Must contain keys 'strokeColor' and
+'dataset', the latter one being an arrayref containing all points of the line.
+
+=head2 location
+
+A hashref containing the location of the bottom-left corner of the line's 
+origin. Keys 'x' and 'y' must specify the x- and y-coordinates respectively.
+
+=head2 interval
+
+The distance between x-axis anchors in pixels.
+
+=cut
+
+
+
 sub drawLine {
 	my $self = shift;
 	my $line = shift;
@@ -54,6 +82,13 @@ sub drawLine {
 }
 
 #-------------------------------------------------------------------
+=head1 formNamespace
+
+Returns the form namespace of this plugin. See WegBUI::Image::Graph for
+more elaborate information.
+
+=cut
+
 sub formNamespace {
 	my $self = shift;
 
@@ -61,6 +96,13 @@ sub formNamespace {
 }
 
 #-------------------------------------------------------------------
+=head1 getAnchorSpacing
+
+Returns the distance in pixels between two anchors on the x axis that define teh
+placement of bars and labels.
+
+=cut
+
 sub getAnchorSpacing {
 	my $self = shift;
 
@@ -75,6 +117,13 @@ sub getAnchorSpacing {
 }
 
 #-------------------------------------------------------------------
+=head1 getFirstAnchorLocation
+
+Returns a hashref containing the location of the leftmost x-axis anchor.
+Location coordinates are encoded in keys 'x' and 'y'.
+
+=cut
+
 sub getFirstAnchorLocation {
 	my $self = shift;
 
@@ -84,15 +133,17 @@ sub getFirstAnchorLocation {
 	}
 }
 
-# palette nog laten werken!
 #-------------------------------------------------------------------
+=head1 processDataset
+
+Processes the dataset. Used by drawGraph.
+
+=cut
+
 sub processDataSet {
 	my ($barProperties);
 	my $self = shift;
 	
-#	my $maxElements = List::Util::max(map {scalar @$_} @{$self->{_datasets}});
-#	my $numberOfDatasets = scalar @{$self->{_datasets}};
-
 	my $palette = $self->getPalette;
 	foreach (@{$self->{_datasets}}) {
 		push (@{$self->{_lines}}, {

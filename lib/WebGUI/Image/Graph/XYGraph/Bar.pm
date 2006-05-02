@@ -9,6 +9,13 @@ use Data::Dumper;
 our @ISA = qw(WebGUI::Image::Graph::XYGraph);
 
 #-------------------------------------------------------------------
+=head1 configurationForm
+
+Creates the configuration form for this plugin. See WebGUI::Image::Graph for
+more information.
+
+=cut
+
 sub configurationForm {
 	my $self = shift;
 
@@ -34,6 +41,26 @@ my	$f = WebGUI::HTMLForm->new($self->session);
 }
 
 #-------------------------------------------------------------------
+=head1 drawBar ( bar, location, barWidth )
+
+Draws a bar defined by bar and with width barWidth at location.
+
+=head2 bar
+
+A hashref defining the bar. Must contain keys 'height', 'strokeColor' and
+'fillColor'.
+
+=head2 location
+
+A hashref containing the location of the bottom-left corner of the bar. Keys 'x'
+and 'y' must specify the x- and y-coordinates respectively.
+
+=head2 barWidth
+
+The width of the bar in pixels.
+
+=cut
+
 sub drawBar {
 	my $self = shift;
 	my $bar = shift;
@@ -55,6 +82,12 @@ sub drawBar {
 }
 
 #-------------------------------------------------------------------
+=head1 drawGraph
+
+Draws all the bars.
+
+=cut
+
 sub drawGraph {
 	my ($currentBar, %location);
 	my $self = shift;
@@ -82,6 +115,26 @@ sub drawGraph {
 }
 
 #-------------------------------------------------------------------
+=head1 drawSideBySide ( bars, location, barWidth )
+
+Draws the bars in side by side mode. Meaning that per datsetindex the bars
+representing a single dataset are grouped.
+
+=head2 bars
+
+An arrayref containing all the bar description hashrefs as described in drawBar.
+
+=head2 location
+
+Hashref containing the initial coordinates of the lower-left corner of the
+chart. Pass coords in keys 'x' and 'y'.
+
+=head2 barWidth
+
+The width of each bar in pixels.
+
+=cut
+
 sub drawSideBySideBar {
 	my $self = shift;
 	my $bars = shift;
@@ -97,6 +150,28 @@ sub drawSideBySideBar {
 }
 
 #-------------------------------------------------------------------
+=head1 drawStacked ( bars, location, barWidth )
+
+Draws the bars in side by side mode. Meaning that per datset-index the bars
+representing a single dataset are stacked on top of each other.
+
+=head2 bars
+
+An arrayref containing all the bar description hashrefs as described in drawBar.
+
+=head2 location
+
+Hashref containing the initial coordinates of the lower-left corner of the
+chart. Pass coords in keys 'x' and 'y'.
+
+=head2 barWidth
+
+The width of each bar in pixels.
+
+=cut
+
+
+
 sub drawStackedBar {
 	my $self = shift;
 	my $bars = shift;
@@ -112,6 +187,13 @@ sub drawStackedBar {
 }
 
 #-------------------------------------------------------------------
+=head1 formNamespace
+
+Returns the form namespace of this plugin. See WegBUI::Image::Graph for
+more elaborate information.
+
+=cut
+
 sub formNamespace {
 	my $self = shift;
 
@@ -119,6 +201,13 @@ sub formNamespace {
 }
 
 #-------------------------------------------------------------------
+=head1 getAnchorSpacing
+
+Returns the distance in pixels between two anchors on the x axis that define teh
+placement of bars and labels.
+
+=cut
+
 sub getAnchorSpacing {
 	my $self = shift;
 
@@ -133,6 +222,12 @@ sub getAnchorSpacing {
 }
 
 #-------------------------------------------------------------------
+=head1 getBarSpacing
+
+Returns the width of the gap between two bars within a group in pixels.
+
+=cut
+
 sub getBarSpacing {
 	my $self = shift;
 
@@ -140,6 +235,13 @@ sub getBarSpacing {
 }
 
 #-------------------------------------------------------------------
+=head1 getConfiguration
+
+Returns the configuration hashref for this plugin. Refer to WebGUI::IMage::Graph
+for a more detailed description.
+
+=cut
+
 sub getConfiguration {
 	my $self = shift;
 
@@ -152,6 +254,12 @@ sub getConfiguration {
 }
 
 #-------------------------------------------------------------------
+=head1 getGroupSpacing
+
+Returns the width of the gap between two groups of bars in pixels.
+
+=cut
+
 sub getGroupSpacing {
 	my $self = shift;
 
@@ -159,6 +267,13 @@ sub getGroupSpacing {
 }
 
 #-------------------------------------------------------------------
+=head1 getFirstAnchorLocation
+
+Returns a hashref containing the location of the leftmost x-axis anchor.
+Location coordinates are encoded in keys 'x' and 'y'.
+
+=cut
+
 sub getFirstAnchorLocation {
 	my $self = shift;
 
@@ -169,6 +284,12 @@ sub getFirstAnchorLocation {
 }
 
 #-------------------------------------------------------------------
+=head1 processDataset
+
+Processes the dataset. Used by drawGraph.
+
+=cut
+
 sub processDataSet {
 	my ($barProperties);
 	my $self = shift;
@@ -192,6 +313,16 @@ sub processDataSet {
 }
 
 #-------------------------------------------------------------------
+=head1 setBarSpacing ( gap )
+
+Sets the distance between two bars in a group in pixels.
+
+=head2 gap
+
+The distance in pixels.
+
+=cut
+
 sub setBarSpacing {
 	my $self = shift;
 	my $gap = shift;
@@ -200,6 +331,17 @@ sub setBarSpacing {
 }
 
 #-------------------------------------------------------------------
+=head1 setConfiguration ( config )
+
+Applies the given configuration hash to this plugin. See WebGUI::Image::Graph
+for more info.
+
+=head2 config
+
+The configuration hash.
+
+=cut
+
 sub setConfiguration {
 	my $self = shift;
 	my $config = shift;
@@ -213,6 +355,16 @@ sub setConfiguration {
 }
 
 #-------------------------------------------------------------------
+=head1 setGroupSpacing ( gap )
+
+Sets the distance between two groups of bars in pixels.
+
+=head2 gap
+
+The distance in pixels.
+
+=cut
+
 sub setGroupSpacing {
 	my $self = shift;
 	my $gap = shift;

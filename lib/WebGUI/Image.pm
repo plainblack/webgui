@@ -5,6 +5,12 @@ use Image::Magick;
 use WebGUI::Image::Palette;
 
 #-------------------------------------------------------------------
+=head1 getBackgroundColor
+
+Returns the background color triplet. Defaults to #ffffff (white).
+
+=cut
+
 sub getBackgroundColor {
 	my $self = shift;
 
@@ -12,6 +18,12 @@ sub getBackgroundColor {
 }
 
 #-------------------------------------------------------------------
+=head1 getImageHeight
+
+Returns the height of the image in pixels.
+
+=cut
+
 sub getImageHeight {
 	my $self = shift;
 
@@ -19,6 +31,12 @@ sub getImageHeight {
 }
 
 #-------------------------------------------------------------------
+=head1 getImageWidth
+
+Returns the width in pixels of the image.
+
+=cut
+
 sub getImageWidth {
 	my $self = shift;
 
@@ -26,6 +44,12 @@ sub getImageWidth {
 }
 
 #-------------------------------------------------------------------
+=head1 getPalette
+
+Returns the palette object this image is set to. Defaults to the default palette.
+
+=cut
+
 sub getPalette {
 	my $self = shift;
 
@@ -37,6 +61,13 @@ sub getPalette {
 }
 
 #-------------------------------------------------------------------
+=head1 getXOffset
+
+Returns the horizontal offset of the center, relative to which the image is drawn. 
+Defaults to the physical center of the image.
+
+=cut
+
 sub getXOffset {
 	my $self = shift;
 
@@ -44,6 +75,13 @@ sub getXOffset {
 }
 
 #-------------------------------------------------------------------
+=head1 getYOffset
+
+Returns the vertical offset of the center, relative to which the image is drawn.
+Defaults to the physical center of the image.
+
+=cut
+
 sub getYOffset {
 	my $self = shift;
 
@@ -51,6 +89,12 @@ sub getYOffset {
 }
 
 #-------------------------------------------------------------------
+=head1 image
+
+Returns the imagemagick object containing this image.
+
+=cut
+
 sub image {
 	my $self = shift;
 	
@@ -58,6 +102,24 @@ sub image {
 }
 
 #-------------------------------------------------------------------
+=head1 new ( session, [ width, height ] )
+
+Constructor for an image. Optionally you can pass the size of the image.
+
+=head2 session
+
+The webgui session object.
+
+=head2 width
+
+The width of the image in pixels. Defaults to 300.
+
+=head2 height
+
+The height of the image in pixels. Defaults to 300.
+
+=cut
+
 sub new {
 	my $class = shift;
 	my $session = shift;
@@ -76,6 +138,12 @@ sub new {
 }
 
 #-------------------------------------------------------------------
+=head1 session
+
+Returns the the session object.
+
+=cut
+
 sub session {
 	my $self  = shift;
 
@@ -83,6 +151,18 @@ sub session {
 }
 
 #-------------------------------------------------------------------
+=head1 setBackgroundColor ( colorTriplet )
+
+Sets the backgroundcolor. Using this method will erase everything that is
+already on the image.
+
+=head2 colorTriplet
+
+The color for the background. Supply as a html color triplet of the form
+#ffffff.
+
+=cut
+
 sub setBackgroundColor {
 	my $self = shift;
 	my $colorTriplet = shift;
@@ -92,6 +172,16 @@ sub setBackgroundColor {
 }
 
 #-------------------------------------------------------------------
+=head1 setImageHeight ( height)
+
+Set the height of the image.
+
+=head2 height
+
+The height of the image in pixels.
+
+=cut
+
 sub setImageHeight {
 	my $self = shift;
 	my $height = shift;
@@ -103,6 +193,16 @@ sub setImageHeight {
 }
 
 #-------------------------------------------------------------------
+=head1 setImageWidth ( width )
+
+Set the width of the image.
+
+=head2 width
+
+Teh width of the image in pixels.
+
+=cut
+
 sub setImageWidth {
 	my $self = shift;
 	my $width = shift;
@@ -114,6 +214,16 @@ sub setImageWidth {
 }
 
 #-------------------------------------------------------------------
+=head1 setPalette ( palette )
+
+Set the palette object this image will use.
+
+=head2 palette
+
+An instanciated WebGUI::Image::Palette object.
+
+=cut
+
 sub setPalette {
 	my $self = shift;
 	my $palette = shift;
@@ -122,6 +232,21 @@ sub setPalette {
 }
 
 #-------------------------------------------------------------------
+=head1 saveToFileSystem ( path, [ filename ] );
+
+Saves the image to the specified path and filename.
+
+=head2 path
+
+The directory where the image should be saved.
+
+=head2 filename
+
+The filename the image should get. If not passed it will default to the name set
+by the setFilename method.
+
+=cut
+
 sub saveToFileSystem {
 	my $self = shift;
 	my $path = shift;
@@ -132,6 +257,14 @@ sub saveToFileSystem {
 
 # This doesn't seem to work...
 #-------------------------------------------------------------------
+=head1 saveToScalar
+
+Returns a scalar containing the image contents.
+
+NOTE: This method does not work properly at the moment!
+
+=cut
+
 sub saveToScalar {
 	my $imageContents;
 	my $self = shift;
@@ -144,6 +277,21 @@ sub saveToScalar {
 }
 
 #-------------------------------------------------------------------
+=head1 saveToStorageLocation ( storage, [ filename ] )
+
+Save the image to the specified storage location.
+
+=head2 storage
+
+An instanciated WebGUI::Storage::Image object.
+
+=head2 filename
+
+The filename the image should get. If not passed it will default to the name set
+by the setFilename method.
+
+=cut
+
 sub saveToStorageLocation {
 	my $self = shift;
 	my $storage = shift;
@@ -152,53 +300,70 @@ sub saveToStorageLocation {
 	$self->image->Write($storage->getPath($filename));
 }
 
-
 #-------------------------------------------------------------------
+=head1 text ( properties )
+
+Extend the imagemagick Annotate method so alignment can be controlled better.
+
+=head2 properties
+
+A hash containing the imagemagick Annotate properties of your choice.
+Additionally you can specify:
+
+	alignHorizontal : The horizontal alignment for the text. Valid values
+		are: 'left', 'center' and 'right'. Defaults to 'left'.
+	alignVertical : The vertical alignment for the text. Valid values are:
+		'top', 'center' and 'bottom'. Defaults to 'top'.
+
+You can use the align property to set the text justification.
+
+=cut
+
 sub text {
 	my $self = shift;
-	my %props = @_;
+	my %properties = @_;
 
-	my $anchorX = $props{x};
-	my $anchorY = $props{y};
+	my $anchorX = $properties{x};
+	my $anchorY = $properties{y};
 
 
-	my ($x_ppem, $y_ppem, $ascender, $descender, $width, $height, $max_advance) = $self->image->QueryMultilineFontMetrics(%props);
+	my ($x_ppem, $y_ppem, $ascender, $descender, $width, $height, $max_advance) = $self->image->QueryMultilineFontMetrics(%properties);
 
 	# Process horizontal alignment
-	if ($props{alignHorizontal} eq 'center') {
-		$props{x} -= ($width / 2);
+	if ($properties{alignHorizontal} eq 'center') {
+		$properties{x} -= ($width / 2);
 	}
-	elsif ($props{alignHorizontal} eq 'right') {
-		$props{x} -= $width;
+	elsif ($properties{alignHorizontal} eq 'right') {
+		$properties{x} -= $width;
 	}
 
 	# Process vertical alignment
-	if ($props{alignVertical} eq 'center') {
-		$props{y} -= ($height / 2);
+	if ($properties{alignVertical} eq 'center') {
+		$properties{y} -= ($height / 2);
 	}
-	elsif ($props{alignVertical} eq 'bottom') {
-		$props{y} -= $height;
+	elsif ($properties{alignVertical} eq 'bottom') {
+		$properties{y} -= $height;
 	}
 
 	# Compensate for ImageMagicks 'ignore gravity when align is set' behaviour...
-	if ($props{align} eq 'Center') {
-		$props{x} += ($width / 2);
+	if ($properties{align} eq 'Center') {
+		$properties{x} += ($width / 2);
 	}
-	elsif ($props{align} eq 'Right') {
-		$props{x} += $width;
+	elsif ($properties{align} eq 'Right') {
+		$properties{x} += $width;
 	}
 
 	# Compensate for ImageMagick's 'put all text a line up when align is set' behaviour...
-	$props{y} += $y_ppem;
+	$properties{y} += $y_ppem;
 
 	# We must delete these keys or else placement can go wrong for some reason...
-	delete($props{alignHorizontal});
-	delete($props{alignVertical});
+	delete($properties{alignHorizontal});
+	delete($properties{alignVertical});
 
 	$self->image->Annotate(
 		#Leave align => 'Left' here as a default or all text will be overcompensated.
 		align		=> 'Left',
-		%props,
+		%properties,
 		gravity		=> 'NorthWest',
 		antialias	=> 'true',
 	);

@@ -8,6 +8,17 @@ use List::Util;
 
 our @ISA = qw(WebGUI::Image);
 
+=head1 addDataset ( dataset )
+
+Adds a dataset to the graph. Please not that not all graph types can handle
+multiple datasets and will therefore ignore any dataset but the first.
+
+=head2 dataset
+
+An arrayref containg the values of the data. The dat must be numeric.
+
+=cut
+
 #-------------------------------------------------------------------
 sub addDataset {
 	my $self = shift;
@@ -15,6 +26,20 @@ sub addDataset {
 	
 	push(@{$self->{_datasets}}, $dataset);
 }
+
+=head1 configurationForm
+
+Returns a hashref containing the form where the properties of your graph type
+can be set. Your pluging should extend this method by append the form to the
+hashref returned by the super method and returning the reference.
+
+The key for this entry must be unique, so use the namespace of your plugin
+without the WebGUI::Image part; the :: converted to and underscore and
+everything in lowercase.
+
+Check some of the plugins that come with WebGUI for examples.
+
+=cut
 
 #-------------------------------------------------------------------
 sub configurationForm {
@@ -71,11 +96,28 @@ sub configurationForm {
 }
 
 #-------------------------------------------------------------------
+=head1 drawLabel ( label, [ properties ] )
+
+Draws a label with your preferred properties. Defaults the font, font size and
+color which you can override.
+
+=head2 label
+
+The text of the label you want to print.
+
+=head2 properties
+
+A hash containing imagemagick Annotate properties.
+
+=cut
+
 sub drawLabel {
 	my $self = shift;
+	my $label = shift;
 	my %properties = @_;
 	
 	$self->text(
+		text		=> $label,
 		font		=> $self->getLabelFont->getFile,
 		fill		=> $self->getLabelColor,
 		style		=> 'Normal',
@@ -85,11 +127,34 @@ sub drawLabel {
 }
 
 #-------------------------------------------------------------------
+=head1 formNamespace
+
+Returns the namespace used in the configuration form. You must extend this
+method by concatenating an underscore and the last part of your namespace to the
+output of the SUPER method.
+
+For examples please see the implementation in the plugins that come with WebGUI.
+
+=cut
+
 sub formNamespace {
 	return "Graph";
 }
 
 #-------------------------------------------------------------------
+=head1 getConfiguration
+
+Returns the configuration hashref of the plugin. You must extend this method by
+adding your configuration keys to the hashref returned by the SUPER method. To
+avoid conflicts prepend your configuration keys with the namespace of your
+plugin, encoded as follows: take the part of the namespace without
+WebGUI::Image, convert it to lowercase and substitute the :: with a single
+underscore.
+
+Check out the plugins that are shipped with WebGUI for examples.
+
+=cut
+
 sub getConfiguration {
 	my $self = shift;
 
@@ -107,6 +172,22 @@ sub getConfiguration {
 }
 
 #-------------------------------------------------------------------
+=head1 getGraphingTab ( session, [ config ] )
+
+Returns the contents of the graphing tab you can add to your asset. 
+
+This is a class method, and therefore you must pass the WebGUI session object.
+
+=head2 session 
+
+An instanciated WebGUI session object.
+
+=head2 config
+
+Optionally you can pass a configuration hash to populate the form
+
+=cut
+
 sub getGraphingTab {
 	my (%configForms, $output);
 	my $class = shift;
@@ -211,6 +292,18 @@ EOS
 }
 
 #-------------------------------------------------------------------
+=head1 getDataset ( [ index ] )
+
+Returns the dataset indicated by index.
+
+=head2 index
+
+The index of the array containing the datasets. The first dataset is indicated
+by index 0. If ommitted this method returns an arrayref of arrayrefs containing
+all datasets.
+
+=cut
+
 sub getDataset {
 	my $self = shift;
 	my $index = shift;
@@ -223,6 +316,17 @@ sub getDataset {
 }
 
 #-------------------------------------------------------------------
+=head1 getLabel ( [ index ] )
+
+Returns the index'th label or an arrayref containing all labels.
+
+=head2 index
+
+The index of label to return. Numbering starts at 0. If omitted an arrayref
+containing all labels is returned.
+
+=cut
+
 sub getLabel {
 	my $self = shift;
 	my $index = shift;
@@ -232,6 +336,12 @@ sub getLabel {
 }
 	
 #-------------------------------------------------------------------
+=head1 getLabelColor
+
+Returns the triplet of the label color. Defaults to '#333333'.
+
+=cut
+
 sub getLabelColor {
 	my $self = shift;
 
@@ -239,6 +349,21 @@ sub getLabelColor {
 }
 
 #-------------------------------------------------------------------
+=head1 getLabelDimensions ( text, [ properties ] )
+
+Returns a hashref containg the width and height in pixels of the passed text.
+Width and height are referenced by the keys 'width' and 'height' respectively.
+
+=head2 text
+
+The text you want to know the dimensions of.
+
+=head2 properties
+
+Optionally you can pass a hashref containing imagemagick's Annotate properties.
+
+=cut
+
 sub getLabelDimensions {
 	my $self = shift;
 	my $text = shift;
@@ -258,6 +383,13 @@ sub getLabelDimensions {
 }
 
 #-------------------------------------------------------------------
+=head1 getLabelFont
+
+Returns the WebGUI::Image::Font object this image is set to. Defaults to the
+default font.
+
+=cut
+
 sub getLabelFont {
 	my $self = shift;
 
@@ -265,6 +397,12 @@ sub getLabelFont {
 }
 
 #-------------------------------------------------------------------
+=head1 getLabelFontSize
+
+Returns the font size of the labels. Defaults to 20.
+
+=cut
+
 sub getLabelFontSize {
 	my $self = shift;
 
@@ -272,14 +410,26 @@ sub getLabelFontSize {
 }
 
 #-------------------------------------------------------------------
+=head1 getLabelOffset
+
+Returns the label offset. This is the distance between the label and the axis.
+Defaults to 10 pixels.
+
+=cut
+
 sub getLabelOffset {
 	my $self = shift;
 
 	return $self->{_labels}->{labelOffset} || 10;
 }
 
-
 #-------------------------------------------------------------------
+=head1 getMaxValueFromDataset
+
+Returns the highest value of all added datasets.
+
+=cut
+
 sub getMaxValueFromDataset {
 	my $self = shift;
 	
@@ -306,6 +456,20 @@ sub getMaxValueFromDataset {
 }
 
 #-------------------------------------------------------------------
+=head1 load ( session, namespace )
+
+Instanciates an WebGUI::Graph object with the given namespace.
+
+=head2 session
+
+A WebGUI::Session object.
+
+=head2 namespace
+
+The full namespace of the plugin you want to load.
+
+=cut
+
 sub load {
 	my $self = shift;
 	my $session = shift;
@@ -320,6 +484,20 @@ sub load {
 }
 
 #-------------------------------------------------------------------
+=head1 loadByConfiguration ( session, configuration )
+
+Loads a plugin defined by a configuration hash.
+
+=head2 session
+
+A WebGUI::Session object.
+
+=head2 configuration
+
+A configuration hashref.
+
+=cut
+
 sub loadByConfiguration {
 	my $self = shift;
 	my $session = shift;
@@ -337,6 +515,17 @@ sub loadByConfiguration {
 }
 
 #-------------------------------------------------------------------
+=head1 processConfigurationForm ( session )
+
+Processes the configuration form that is submitted and returns the correct
+instanciated graphing plugin.
+
+=head2 session
+
+The WebGUI session object.
+
+=cut
+
 sub processConfigurationForm {
 	my $self = shift;
 	my $session = shift;
@@ -352,14 +541,18 @@ my	$graph = $self->load($session, $namespace);
 }
 
 #-------------------------------------------------------------------
-sub setBackground {
-	my $self = shift;
-	my $backgroundColor = shift;
-	
-	$self->{_properties}->{backgroundColor} = $backgroundColor;
-}
+=head1 setConfiguration ( config )
 
-#-------------------------------------------------------------------
+Configures the pluging according to the configuration hashref that is passed.
+You must extend this method by calling the SUPER method with the configuration
+hashref and processing your part of the configuration options.
+
+=head2 config
+
+The configuration hashref.
+
+=cut
+
 sub setConfiguration {
 	my $self = shift;
 	my $config = shift;
@@ -376,6 +569,16 @@ sub setConfiguration {
 };
 
 #-------------------------------------------------------------------
+=head1 setLabelColor ( color )
+
+Sets the color triplet of the labels.
+
+=head2 color 
+
+The triplet defining the color. The triplet should be in the form of '#ffffff'.
+
+=cut
+
 sub setLabelColor {
 	my $self = shift;
 	my $color = shift;
@@ -384,6 +587,16 @@ sub setLabelColor {
 }
 
 #-------------------------------------------------------------------
+=head1 setLabelFont ( font )
+
+Set the label font.
+
+=head2 font
+
+A WebGUI::Image::Font object.
+
+=cut
+
 sub setLabelFont {
 	my $self = shift;
 	my $font = shift;
@@ -392,6 +605,16 @@ sub setLabelFont {
 }
 
 #-------------------------------------------------------------------
+=head1 setLabelFontSize ( size )
+
+Sets the font size of the labels.
+
+=head2 size
+
+The desired font size.
+
+=cut
+
 sub setLabelFontSize {
 	my $self = shift;
 	my $size = shift;
@@ -400,6 +623,17 @@ sub setLabelFontSize {
 }
 
 #-------------------------------------------------------------------
+=head1 setLabelOffset ( offset )
+
+Sets the label offset. This is the distance in pixels between the labels and the
+axis.
+
+=head2 offset
+
+The label offset.
+
+=cut
+
 sub setLabelOffset {
 	my $self = shift;
 	my $offset = shift;
@@ -408,6 +642,16 @@ sub setLabelOffset {
 }
 
 #-------------------------------------------------------------------
+=head1 setLabels ( labels )
+
+Sets the labels for the datasets.
+
+=head2 labels
+
+An arrayref containig the labels.
+
+=cut
+
 sub setLabels {
 	my $self = shift;
 	my $labels = shift || [];
@@ -416,6 +660,24 @@ sub setLabels {
 }
 
 #-------------------------------------------------------------------
+=head1 wrapLabelToWidth ( text, maxWidth, [ properties ] )
+
+Wraps a text string onto multiple lines having a width of maxWidth.
+
+=head2 text
+
+The text you want to wrap.
+
+=head2 maxWidth
+
+The width the string should have after wrapping/
+
+=head2 properties
+
+An optional hashref containing imagemagick's Annotate properties.
+
+=cut
+
 sub wrapLabelToWidth {
 	my (@words, $part, @lines);
 	my $self = shift;
@@ -446,5 +708,4 @@ sub wrapLabelToWidth {
 }
 
 1;
-
 
