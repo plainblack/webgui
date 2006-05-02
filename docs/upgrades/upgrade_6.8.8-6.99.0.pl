@@ -54,6 +54,7 @@ installSQLForm();
 addResizableTextareas();
 addScratchKeys();
 addGraphing();
+dropShortcutDescription();
 
 finish($session); # this line required
 
@@ -62,6 +63,12 @@ sub addResizableTextareas {
 	print "\tAllowing user to resize text areas on the fly.\n";
 	$session->setting->remove("textAreaCols");
 	$session->setting->remove("textAreaRows");
+}
+
+#-------------------------------------------------
+sub dropShortcutDescription {
+	print "\tRemoving unused description column from Shortcut.  Unused since Dashboard was added.\n";
+	$session->db->write("ALTER TABLE Shortcut DROP COLUMN description;");
 }
 
 #-------------------------------------------------
