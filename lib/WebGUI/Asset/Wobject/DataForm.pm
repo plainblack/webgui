@@ -45,7 +45,7 @@ sub _createField {
 	if ($data->{type} eq "checkbox") {
 		$param{value} = ($data->{defaultValue} =~ /checked/i) ? 1 : "";
 	}
-	if (isIn($data->{type},qw(selectList checkList))) {
+	if (isIn($data->{type},qw(selectList checkList selectBox))) {
 		my @defaultValues;
 		if ($self->session->form->param($name)) {
                 	@defaultValues = $self->session->form->selectList($name);
@@ -57,7 +57,7 @@ sub _createField {
                 }
 		$param{value} = \@defaultValues;
 	}
-	if (isIn($data->{type},qw(selectList checkList radioList))) {
+	if (isIn($data->{type},qw(selectList selectBox checkList radioList))) {
 		delete $param{size};
 		my %options;
                 tie %options, 'Tie::IxHash';
@@ -829,7 +829,7 @@ sub www_editField {
 		-label=>$i18n->get(23),
 		-hoverHelp=>$i18n->get('23 description'),
 		-value=>$field{type} || "text",
-		-types=>[qw(dateTime TimeField float zipcode text textarea HTMLArea url date email phone integer yesNo selectList radioList checkList)]
+		-types=>[qw(dateTime TimeField float zipcode text textarea HTMLArea url date email phone integer yesNo selectList radioList checkList selectBox)]
 		);
 	$f->integer(
 		-name=>"width",
@@ -1075,7 +1075,7 @@ sub www_process {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canView;
 	my $entryId = $self->setCollateral("DataForm_entry","DataForm_entryId",{
-		DataForm_entryId=>$self->session->form->process("entryId"),
+		DataForm_entryId=>$self->session->form->process("entryId") || undef,
                 assetId=>$self->getId,
                 userId=>$self->session->user->userId,
                 username=>$self->session->user->username,
