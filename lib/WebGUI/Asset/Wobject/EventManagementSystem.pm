@@ -1955,8 +1955,8 @@ sub www_managePurchases {
 	my $isAdmin = $self->canAddEvents;
 
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
-	my $whereClause = ($isAdmin)?'':" and userId='".$self->session->user->userId."' and e.endDate > '".$self->session->datetime->time()."'";
-	my $sql = "select distinct(t.transactionId) as purchaseId, t.initDate as initDate from transaction as t, EventManagementSystem_purchases as p, EventManagementSystem_registrations as r, EventManagementSystem_products as e where p.transactionId=t.transactionId and p.purchaseId=r.purchaseId and r.productId=e.productId $whereClause order by t.initDate";
+	my $whereClause = ($isAdmin)?'':" and (t.userId='".$self->session->user->userId."' or b.userId='".$self->session->user->userId."' or b.createdByUserId='".$self->session->user->userId."') and e.endDate > '".$self->session->datetime->time()."'";
+	my $sql = "select distinct(t.transactionId) as purchaseId, t.initDate as initDate from transaction as t, EventManagementSystem_purchases as p, EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e where p.transactionId=t.transactionId and b.badgeId=r.badgeId and p.purchaseId=r.purchaseId and r.productId=e.productId $whereClause order by t.initDate";
 	my $sth = $self->session->db->read($sql);
 	my @purchasesLoop;
 	while (my $purchase = $sth->hashRef) {
