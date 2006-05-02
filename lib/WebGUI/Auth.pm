@@ -29,7 +29,7 @@ use WebGUI::User;
 use WebGUI::Operation::Shared;
 use WebGUI::Operation::Profile;
 use WebGUI::Workflow::Instance;
-
+use WebGUI::Inbox;
 
 =head1 NAME
 
@@ -258,7 +258,11 @@ sub createAccountSave {
 		my $authInfo = "\n\n".$i18n->get(50).": ".$username;
 		$authInfo .= "\n".$i18n->get(51).": ".$password if($password);
 		$authInfo .= "\n\n";
-		WebGUI::MessageLog::addEntry($self->userId,"",$i18n->get(870),$self->getSetting("welcomeMessage").$authInfo);
+		WebGUI::Inbox->new($self->session)->addMessage({
+			message	=> $self->getSetting("welcomeMessage").$authInfo,
+			subject	=> $i18n->get(870),
+			userId	=> $self->userId,
+		});
 	}
 	$self->session->user({user=>$u});
 	$self->_logLogin($userId,"success");

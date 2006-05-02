@@ -15,6 +15,7 @@ package WebGUI::Inbox;
 =cut
 
 use strict;
+use WebGUI::Inbox::Message;
 
 =head1 NAME
 

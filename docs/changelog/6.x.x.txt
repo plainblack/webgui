@@ -131,6 +131,8 @@
  - fix [ 1172613 ] Header Tag Not Accessibility Friendly
  - fix [ 1340839 ] If can't use item in adminConsole don't display it
  - fix [ 1473937 ] scratch->set not taking.
+ - fix [ 1471909 ] createAccountSave not called - no validate email (Martin
+   Kamerbeek / Procolix)
  - Added a graphing engine and tied it into the Poll asset (Martin Kamerbeek / Procolix)
 
 6.8.8

@@ -195,7 +195,7 @@ sub createAccount {
 sub createAccountSave {
    my $self = shift;
    my $i18n = WebGUI::International->new($self->session);
- 
+
   return $self->displayAccount if ($self->session->user->userId ne "1");
 
    #Make sure anonymous registration is enabled 
@@ -208,7 +208,6 @@ sub createAccountSave {
    my $passConfirm = $self->session->form->process('authWebGUI.identifierConfirm');
    
    my $error;
-	
    $error = $self->error unless($self->validUsername($username));
 	if ($self->session->setting->get("webguiUseCaptcha")) {
 		unless ($self->session->form->process('authWebGUI.captcha', "Captcha")) {
@@ -220,7 +219,6 @@ sub createAccountSave {
    $error .= $temp;
    
    return $self->createAccount($error) unless ($error eq "");
-   
    #If Email address is not unique, a warning is displayed
    if($warning ne "" && !$self->session->form->process("confirm")){
       return $self->createAccount('<li>'.$i18n->get(1078).'</li>', 1);
