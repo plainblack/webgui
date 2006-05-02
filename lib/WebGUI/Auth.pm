@@ -321,7 +321,7 @@ sub deactivateAccountConfirm {
    my $u = $self->user;
    $u->status("Selfdestructed");
    $self->session->var->end();
-   $self->session->var->start(1);   
+   $self->session->user({userId=>'1'});
 }
 
 #-------------------------------------------------------------------
@@ -594,7 +594,7 @@ Superclass method that performs standard logout routines.
 sub logout {
 	my $self = shift;
    $self->session->var->end($self->session->var->get("sessionId"));
-   $self->session->var->start(1,$self->session->getId);
+   $self->session->user({userId=>'1'});
 	my $u = WebGUI::User->new($self->session,1);
 	$self->{user} = $u;
    return "";
