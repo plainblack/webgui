@@ -128,15 +128,15 @@ Now, go back to manage Overrides, and it should show the original value, new val
         },
 
         'Resolve Multiples description' => {
-                message => q|Sets the order to use when multiple assets are selected. Random means that if multiple assets match the shortcut criteria then the shortcut will select a random asset.<br>
+                message => q|Sets the order to use when multiple assets are selected. Random means that if multiple assets match the shortcut criteria then the shortcut will select a random asset.<br />
 Most Recent will select the most recent asset that match the shortcut criteria.|,
-                lastUpdated => 1127959329,
+                lastUpdated => 1146540399,
         },
 
         'Criteria description' => {
-                message => q|A statement to determinate what to mirror, in the form of "color = blue and weight != heavy". Multiple expressions may be joined with "and" and "or". <br>
+                message => q|A statement to determinate what to mirror, in the form of "color = blue and weight != heavy". Multiple expressions may be joined with "and" and "or". <br />
 A property or value must be quoted if it contains spaces. Feel free to use the criteria builder to build your statements.|,
-                lastUpdated => 1119905806,
+                lastUpdated => 1146540405,
         },
 
 
@@ -212,16 +212,18 @@ A property or value must be quoted if it contains spaces. Feel free to use the c
 
 	'shortcut template body' => {
 		message => q|<p>These variables are available in Shortcut Templates:</p>
-<p><b>shortcut.content</b><br>
+<p><b>shortcut.content</b><br />
 The content from the mirrored Asset.  If any overrides were enabled in the Shortcut then the override content will be used instead of the content from the mirrored Asset.</p>
-<p><b>originalURL</b><br>
+<p><b>originalURL</b><br />
 The URL to the Asset being mirrored by this Shortcut.</p>
-<p><b>isShortcut</b><br>
+<p><b>isShortcut</b><br />
 A boolean indicating that this Asset is a Shortcut.  This can be used in conjuction with another boolean for Admin mode to quickly show Content Managers that this is a Shortcut Asset.</p>
-<p><b>shortcut.label</b><br>
+<p><b>shortcut.label</b><br />
 The word "Shortcut".</p>
+<p><b>shortcut.<b>properties</b><br />
+Any properties assigned to this shortcut will be available in the template by their name.</p>
                 |,
-		lastUpdated => 1109525761,
+		lastUpdated => 1146540530,
 	},
 
 	'The unique name of a user preference parameter you are inventing' => {
@@ -410,8 +412,10 @@ The word "Shortcut".</p>
 		lastUpdated => 1133619940,
 	},
 
-
-
+	'no metadata yet' => {
+		message => q|No metadata defined yet. <a href="%s">Click here</a> to define metadata attributes.|,
+		lastUpdated => 1146539258,
+	},
 
 };
 

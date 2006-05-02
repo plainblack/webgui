@@ -6,8 +6,8 @@ our $HELP = {
 		body => '6',
 		fields => [
 			{
-				title => '85',
-				description => '85 description',
+				title => '1',
+				description => '1 description',
 				namespace => 'Asset_Shortcut',
 			},
 			{
@@ -16,8 +16,8 @@ our $HELP = {
 				namespace => 'Asset_Shortcut',
 			},
 			{
-				title => '1',
-				description => '1 description',
+				title => '85',
+				description => '85 description',
 				namespace => 'Asset_Shortcut',
 			},
 			{

@@ -46,9 +46,7 @@ sub _drawQueryBuilder {
 	my $fieldCount = scalar(keys %$fields);
 
 	unless ($fieldCount) {	# No fields found....
-		return 'No metadata defined yet.
-		<a href="'.$self->session->url->page('func=manageMetaData').
-		'">Click here</a> to define metadata attributes.';
+		return sprintf $i18n->get('no metadata yet'), $self->session->url->page('func=manageMetaData');
 	}
 
 	# Static form fields
@@ -71,7 +69,6 @@ sub _drawQueryBuilder {
 	$self->session->style->setScript($self->session->url->extras('wobject/Shortcut/querybuilder.js'), {type=>"text/javascript"});
 	$self->session->style->setLink($self->session->url->extras('wobject/Shortcut/querybuilder.css'), {type=>"text/css", rel=>"stylesheet"});
 	my $output;
-	'/wobject/Shortcut/querybuilder.css" type="text/css" rel="stylesheet">';
 	$output .= qq|<table cellspacing="0" cellpadding="0" border="0"><tr><td colspan="5" align="right">$shortcutCriteriaField</td></tr><tr><td></td><td></td><td></td><td></td><td class="qbtdright"></td></tr><tr><td></td><td></td><td></td><td></td><td class="qbtdright">$conjunctionField</td></tr>|;
 
 	# Here starts the field loop
@@ -783,9 +780,13 @@ sub www_editOverride {
 		-value=>$overrides{overrides}{$fieldName}{newValue},
 		-hoverHelp=>$i18n->get("Place something in this box if you dont want to use the automatically generated field")
 	);
-	$f->readOnly(-label=>$i18n->get("Replacement Value"),-value=>$overrides{overrides}{$fieldName}{parsedValue},-hoverHelp=>$i18n->get("This is the example output of the field when parsed for user preference macros")) if $self->isDashlet;
-  $f->submit;
-  $output .= $f->print;
+	$f->readOnly(
+		-label=>$i18n->get("Replacement Value"),
+		-value=>$overrides{overrides}{$fieldName}{parsedValue},
+		-hoverHelp=>$i18n->get("This is the example output of the field when parsed for user preference macros")
+	) if $self->isDashlet;
+	$f->submit;
+	$output .= $f->print;
 	return $self->_submenu($output,$i18n->get('Edit Override'));
 }
 
