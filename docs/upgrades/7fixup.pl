@@ -35,7 +35,7 @@ sub addTemplates {
 <tmpl_if session.var.adminOn><tmpl_if controls><p><tmpl_var controls></p></tmpl_if></tmpl_if>
 <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0" width="100%" height="*" align="middle">
 <param name="allowScriptAccess" value="sameDomain" />
-<param name="movie" value="<tmpl_var fileUrl>" /><param name="quality" value="high" /><param name="bgcolor" value="#ff6600" /><embed src="<tmpl_var fileUrl>" quality="high" bgcolor="#ff6600" width="100%" height="*" align="middle" allowScriptAccess="sameDomain" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" />
+<param name="movie" value="<tmpl_var fileUrl>" /><param name="quality" value="high" /><embed src="<tmpl_var fileUrl>" quality="high" width="100%" height="*" align="middle" allowScriptAccess="sameDomain" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" />
 </object>
 		|,
 		title=>"Flash Template",
@@ -46,6 +46,23 @@ sub addTemplates {
 		namespace=>"FileAsset",
 		ownerUserId=>'3'	
 		},"pbtmpl0000000000000220");
+	$import->addChild({
+		className=>"WebGUI::Asset::Template",
+		template=>q|
+<tmpl_if session.var.adminOn><tmpl_if controls><p><tmpl_var controls></p></tmpl_if></tmpl_if>
+<p><object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0" width="800" height="600" align="middle">
+<param name="allowScriptAccess" value="sameDomain" />
+<param name="movie" value="<tmpl_var fileUrl>" /><param name="quality" value="high" /><embed src="<tmpl_var fileUrl>" quality="high" width="800" height="600" align="middle" allowScriptAccess="sameDomain" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" />
+</object></p>
+		|,
+		title=>"Flash Tutorial Template",
+		menuTitle=>"Flash Tutorial Template",
+		url=>"flash-tutorial-template",
+		groupIdView=>'7',
+		groupIdEdit=>'12',
+		namespace=>"FileAsset",
+		ownerUserId=>'3'	
+		},"pbtmpl0000000000000221");
 }
 
 #-------------------------------------------------
@@ -140,9 +157,37 @@ Now that you're logged in, we recommend <a href="^/;?op=listUsers">creating a se
 <p>
 No doubt after you enabled admin mode you saw a menu along the left side of the screen, that's called the Admin Bar. Use that to add content and access administrative functions. To get started with managing content, watch the short instructional video below.
 </p>
-<p>
-[wink flash video here]
-</p>
+|,
+		templateId=>'PBtmpl0000000000000002'
+		});
+	$storage = WebGUI::Storage->create($session);
+	$storage->addFileFromFilesystem("7fixup/Tutorial.swf");
+	$gs->addChild({
+		className=>"WebGUI::Asset::File",
+		templateId=>"pbtmpl0000000000000221",
+		title=>"Ad",
+                menuTitle=>"Ad",
+		storageId=>$storage->getId,
+		filename=>"Tutorial.swf",
+                isHidden=>1,
+                url=>"home/ad",
+                ownerUserId=>'3',
+                groupIdView=>'7',
+                groupIdEdit=>'4'
+		});
+	$gs->addChild({
+		className=>"WebGUI::Asset::Wobject::Article",
+		styleTemplateId=>"stevestyle000000000003",
+		printableStyleTemplateId=>"stevestyle000000000003",
+		title=>"Getting Started (part 2)",
+		isHidden=>1,
+		menuTitle=>"Getting Started (part 2)",
+		url=>"getting_started/getting-started-part2",
+		ownerUserId=>'3',
+		groupIdView=>'7',
+		displayTitle=>0,
+		groupIdEdit=>'4',
+		description=>q|
 <p>
 For more information about services related to WebGUI <a href="http://www.plainblack.com/services">click here</a>.
 </p>
