@@ -14,7 +14,7 @@ our $I18N = {
 
 	'env body' => {
 		message => q|
-<b>&#94;Env()</b><br>
+<b>&#94;Env()</b><br />
 Can be used to display a web server environment variable on a page. The environment variables available on each server are different, but you can find out which ones your web server has by going to: http://www.yourwebguisite.com/env.pl
 <p>
 

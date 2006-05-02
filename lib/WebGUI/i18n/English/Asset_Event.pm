@@ -64,59 +64,59 @@ our $I18N = {
 		message => q|The following is the list of template variables available in when displaying an event from the calendar.
 <p/>
 
-<b>title</b><br/>
+<b>title</b><br />
 The title of this event.
 <p/>
 
-<b>start.label</b><br/>
+<b>start.label</b><br />
 The translated label for the start date.
 <p/>
 
-<b>start.date</b><br/>
+<b>start.date</b><br />
 The date this event starts.
 <p/>
 
-<b>start.time</b><br/>
+<b>start.time</b><br />
 The time this event starts.
 <p/>
 
-<b>end.date</b><br/>
+<b>end.date</b><br />
 The date this event ends.
 <p/>
 
-<b>end.time</b><br/>
+<b>end.time</b><br />
 The time this event ends.
 <p/>
 
-<b>end.label</b><br/>
+<b>end.label</b><br />
 The translated label for the end date.
 <p/>
 
-<b>canEdit</b><br/>
+<b>canEdit</b><br />
 A condition indicating whether the current user can edit an event.
 <p/>
 
-<b>edit.url</b><br/>
+<b>edit.url</b><br />
 The URL to edit this event.
 <p/>
 
-<b>edit.label</b><br/>
+<b>edit.label</b><br />
 The translated label for the edit URL.
 <p/>
 
-<b>delete.url</b><br/>
+<b>delete.url</b><br />
 The URL to delete this event.
 <p/>
 
-<b>delete.label</b><br/>
+<b>delete.label</b><br />
 The translated label for the delete URL.
 <p/>
 
-<b>description</b><br/>
+<b>description</b><br />
 The description of this event.
 <p/>
 
-<b>eventLocation</b><br/>
+<b>eventLocation</b><br />
 Where the event will occur.
 <p/>
 

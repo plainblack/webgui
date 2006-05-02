@@ -104,95 +104,96 @@ to validate any input that the user may supply.|,
 	},
 
 	'637' => {
-		message => q|<b>First Name</b><br>
+		message => q|<p><b>First Name</b><br />
 The given name of this user.
-<p>
+</p>
 
-<b>Middle Name</b><br>
+<p><b>Middle Name</b><br />
 The middle name of this user.
-<p>
+</p>
 
-<b>Last Name</b><br>
+<p><b>Last Name</b><br />
 The surname (or family name) of this user.
-<p>
+</p>
 
-<b>Email Address</b><br>
+<p><b>Email Address</b><br />
 The user's email address. This must only be specified if the user will partake in functions that require email.
-<p>
+</p>
 
-<b>ICQ UIN</b><br>
+<p><b>ICQ UIN</b><br />
 The <a href="http://www.icq.com/">ICQ</a> UIN is the "User ID Number" on the ICQ network. ICQ is a very popular instant messaging platform.
-<p>
+</p>
 
-<b>AIM Id</b><br>
+<p><b>AIM Id</b><br />
 The account id for the <a href="http://www.aim.com/">AOL Instant Messenger</a> system.
-<p>
+</p>
 
-<b>MSN Messenger Id</b><br>
+<p><b>MSN Messenger Id</b><br />
 The account id for the <a href="http://messenger.msn.com/">Microsoft Network Instant Messenger</a> system.
-<p>
+</p>
 
-<b>Yahoo! Messenger Id</b><br>
+<p><b>Yahoo! Messenger Id</b><br />
 The account id for the <a href="http://messenger.yahoo.com/">Yahoo! Instant Messenger</a> system.
-<p>
+</p>
 
-<b>Cell Phone</b><br>
+<p><b>Cell Phone</b><br />
 This user's cellular telephone number.
-<p>
+</p>
 
-<b>Pager</b><br>
+<p><b>Pager</b><br />
 This user's pager telephone number.
-<p>
+</p>
 
-<b>Email To Pager Gateway</b><br>
+<p><b>Email To Pager Gateway</b><br />
 This user's text pager email address.
-<p>
+</p>
 
-<b>Home Information</b><br>
+<p><b>Home Information</b><br />
 The postal (or street) address for this user's home.
-<p>
+</p>
 
-<b>Work Information</b><br>
+<p><b>Work Information</b><br />
 The postal (or street) address for this user's company.
-<p>
+</p>
 
-<b>Gender</b><br>
+<p><b>Gender</b><br />
 This user's sex.
-<p>
+</p>
 
-<b>Birth Date</b><br>
+<p><b>Birth Date</b><br />
 This user's date of birth.
-<p>
+</p>
 
-<b>Language</b><br>
+<p><b>Language</b><br />
 The language used to display system related messages.
-<p>
+</p>
 
-<b>Time Offset</b><br>
+<p><b>Time Offset</b><br />
 A number of hours (plus or minus) different this user's time is from the server. This is used to adjust for time zones.
-<p>
+</p>
 
-<b>First Day Of Week</b><br>
+<p><b>First Day Of Week</b><br />
 The first day of the week on this user's local calendar. For instance, in the United States the first day of the week is Sunday, but in many places in Europe, the first day of the week is Monday.
-<p>
+</p>
 
-<b>Date Format</b><br>
+<p><b>Date Format</b><br />
 What format should dates on this site appear in?
-<p>
+</p>
 
-<b>Time Format</b><br>
+<p><b>Time Format</b><br />
 What format should times on this site appear in? 
-<p>
+</p>
 
-<b>Discussion Layout</b><br>
+<p><b>Discussion Layout</b><br />
 Should discussions be laid out flat or threaded? Flat puts all replies on one page in the order they were created. Threaded shows the hierarchical list of replies as they were created.
-<p>
+</p>
 
-<b>Inbox Notifications</b><br>
+<p><b>Inbox Notifications</b><br />
 How should this user be notified when they get a new WebGUI message?
+</p>
 
 |,
-		lastUpdated => 1111449957,
+		lastUpdated => 1146526248,
 	},
 
 

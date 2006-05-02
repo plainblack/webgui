@@ -15,12 +15,12 @@ our $I18N = {
 	'url encode body' => {
 		message => q|
 
-<b>&#94;URLEncode();</b><br>
+<p><b>&#94;URLEncode();</b><br />
 This macro is mainly useful in SQL reports, but it could be useful elsewhere as well. It takes the input of a string and URL Encodes it so that the string can be passed through a URL. It's syntax looks like this: &#94;URLEncode("Is this my string?");
-<p>
+</p>
 
 |,
-		lastUpdated => 1112466919,
+		lastUpdated => 1146607207,
 	},
 };
 

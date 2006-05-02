@@ -15,13 +15,13 @@ our $I18N = {
 	'thumbnail body' => {
 		message => q|
 
-<b>&#94;Thumbnail(<i>url</i>);</b><br>
+<p><b>&#94;Thumbnail(<i>url</i>);</b><br />
 This macro will allow you to fetch the thumbnail for any File or Image Asset by its
 url.
-<p>
+</p>
 
 |,
-		lastUpdated => 1112566767,
+		lastUpdated => 1146607225,
 	},
 };
 

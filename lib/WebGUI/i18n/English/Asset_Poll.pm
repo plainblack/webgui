@@ -5,63 +5,63 @@ our $I18N = {
 		message => q|The following variables are available to the poll template:
 <p>
 
-<b>canVote</b><br>
+<b>canVote</b><br />
 A condition indicating whether the user has the right to vote on this poll.
 <p>
 
-<b>question</b><br>
+<b>question</b><br />
 The poll question.
 <p>
 
-<b>form.start</b><br>
+<b>form.start</b><br />
 The beginning of the poll form.
 <p>
 
-<b>answer_loop</b><br>
+<b>answer_loop</b><br />
 A loop containing information about the answers in the poll.
 <p>
 
 <blockquote>
 
-<b>answer.form</b><br>
+<b>answer.form</b><br />
 The radio button for this answer.
 <p>
 
-<b>answer.text</b><br>
+<b>answer.text</b><br />
 The text of the answer.
 <p>
 
-<b>answer.number</b><br>
+<b>answer.number</b><br />
 The number of this answer. As in 1, 2, 3, etc.
 <p>
 
-<b>answer.graphWidth</b><br>
+<b>answer.graphWidth</b><br />
 The width that the graph should be rendered for this answer. Based upon a percentage of the total graph size.
 <p>
 
-<b>answer.percent</b><br>
+<b>answer.percent</b><br />
 The percentage of the vote that this answer has received.
 <p>
 
-<b>answer.total</b><br>
+<b>answer.total</b><br />
 The total number of votes that this answer has received.
 <p>
 
 </blockquote>
 
-<b>form.submit</b><br>
+<b>form.submit</b><br />
 The submit button for the poll form.
 <p>
 
-<b>form.end</b><br>
+<b>form.end</b><br />
 The end of the poll form.
 <p>
 
-<b>responses.label</b><br>
+<b>responses.label</b><br />
 The label for the total responses. "Total Votes"
 <p>
 
-<b>responses.total</b><br>
+<b>responses.total</b><br />
 The total number of votes that have been placed on this poll.
 <p>
 

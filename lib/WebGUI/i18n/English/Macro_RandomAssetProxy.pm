@@ -14,9 +14,9 @@ our $I18N = {
 
 	'random asset proxy body' => {
 		message => q|
-<P><B>&#94;RandomAssetProxy</B>();<BR>
-<B>&#94;RandomAssetProxy</B>(<i>Asset URL</i>);<BR>
-This macro works similarly to the &#94;<B>AssetProxy</B>(); macro except instead of displaying the
+<P><b>&#94;RandomAssetProxy</b>();<br />
+<b>&#94;RandomAssetProxy</b>(<i>Asset URL</i>);<br />
+This macro works similarly to the &#94;<b>AssetProxy</b>(); macro except instead of displaying the
 Asset, it picks a random Asset from the descendents of the Asset whose URL is supplied as the
 argument.
 		|,

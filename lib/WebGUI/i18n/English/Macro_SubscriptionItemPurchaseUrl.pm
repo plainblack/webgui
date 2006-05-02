@@ -15,11 +15,11 @@ our $I18N = {
 	'subscription item purchase url body' => {
 		message => q|
 
-<b>&#94;SubscriptionItemPurchaseUrl(<i>subscriptionId</i>);</b><br>
+<p><b>&#94;SubscriptionItemPurchaseUrl(<i>subscriptionId</i>);</b><br />
 This macro fetches the URL to purchase a subscription item identified
-by its subscriptionId.
+by its subscriptionId.</p>
 |,
-		lastUpdated => 1112548242,
+		lastUpdated => 1146607246,
 	},
 };
 

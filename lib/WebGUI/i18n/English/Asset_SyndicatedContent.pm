@@ -56,32 +56,32 @@ these unique properties:
                      'lastUpdated' => 1047855526,
                      'message' => 'The following are the template variables available to the Syndicated Content template.
 
-<b>channel.title</b><br>
+<b>channel.title</b><br />
 The title of this piece of syndicated content. This will be the same as the title of the Syndicated Content object when you\'re creating an aggregate feed.
 <p>
 
-<b>channel.description</b><br>
+<b>channel.description</b><br />
 A description of the content available through this channel. This will be the same as the description of the Syndicated Content object when you\'re creating an aggregate feed.
 <p>
 
-<b>channel.link</b><br>
+<b>channel.link</b><br />
 A URL back to the originating site of this channel. This variable *will not* exist when you\'re creating an aggregate feed, because there\'s no single channel to link to.
 <p>
 
-<b>rss.url</b><br>
+<b>rss.url</b><br />
 This is the URL to use to get the contents of this Syndicated Content wobject as an RSS 2.0 feed. Additionally, you can specify RSS versions via the following template variables:
 
 <blockquote>
-<b>rss.url.0.9</b><br>
+<b>rss.url.0.9</b><br />
 The contents of this wobject as an RSS 0.9 feed.
 <p>
-<b>rss.url.0.91</b><br>
+<b>rss.url.0.91</b><br />
 The contents of this wobject as an RSS 0.91 feed.
 <p>
-<b>rss.url.1.0</b><br>
+<b>rss.url.1.0</b><br />
 The contents of this wobject as an RSS 1.0 feed.
 <p>
-<b>rss.url.2.0</b><br>
+<b>rss.url.2.0</b><br />
 The contents of this wobject as an RSS 2.0 feed.
 <p>
 </blockquote>
@@ -89,29 +89,29 @@ The contents of this wobject as an RSS 2.0 feed.
 Additionally, RSS feeds are transformed into HTML via XSLT stylesheets for "friendly" in-browser viewing. These XSLT stylesheets are stored in the WebGUI collateral system as snippets.
 </p>
 
-<b>item_loop</b><br>
+<b>item_loop</b><br />
 A loop containing the data from this channel.
 
 <blockquote>
 
-<b>site_title</b><br>
+<b>site_title</b><br />
 The title of the RSS feed this item comes from
 <p>
 
-<b>site_link</b><br>
+<b>site_link</b><br />
 Link to the source RSS feed.
 <p>
 
-<b>new_rss_site</b><br>
+<b>new_rss_site</b><br />
 A "boolean" variable (suitable for using in a &lt;tmpl_if&gt; tag) that indicates we\'ve started outputting items from a source RSS feed different than the previous item. This is most useful when you\'re viewing feeds in "grouped" mode- it gives you a hook to output <b>site_title</b> and <b>site_link</b> at the right time.
 <p>
 
 
-<b>title</b><br>
+<b>title</b><br />
 The title of a piece of content. If you\'re filtering on terms, this field will be inspected.
 <p>
 
-<b>description</b><br>
+<b>description</b><br />
 The description of the content. If you\'re filtering on terms, this field will be inspected as well.
 <p>
 
@@ -126,7 +126,7 @@ A URL directly to the content of the item.
                                  },
            'displayModeSubtext' => {
                                      'lastUpdated' => 1047855526,
-                                     'message' => '<br></br>"Interleaved" means items from all feeds are lumped together, "Grouped by Feed" means items are grouped by the feed they came from. Either setting is fine if you\'re only bringing in a single feed.'
+                                     'message' => '<br /></br>"Interleaved" means items from all feeds are lumped together, "Grouped by Feed" means items are grouped by the feed they came from. Either setting is fine if you\'re only bringing in a single feed.'
                                    },
            'grouped' => {
                           'lastUpdated' => 1047855526,
@@ -159,7 +159,7 @@ A URL directly to the content of the item.
         },
 
         'hasTermsLabel description' => {
-                message => q|Enter terms (separated by commas) that you'd like to filter the feeds on. For instance, if you enter:<br>
+                message => q|Enter terms (separated by commas) that you'd like to filter the feeds on. For instance, if you enter:<br />
 <blockquote><b>linux, windows development, blogs</b></blockquote>
 The Syndicated Content web object will display items containing "linux", "windows development" or "blogs" (in the title or description of the item) from all the feeds you're aggregating together.|,
                 lastUpdated => 1119977659,
@@ -167,7 +167,7 @@ The Syndicated Content web object will display items containing "linux", "window
 
         '1 description' => {
                 message => q|Provide the exact URL (starting with http://) to the syndicated content's RDF or RSS file. The syndicated content will be downloaded from this URL hourly.
-<br><br>
+<br /><br />
 You can find syndicated content at the following locations:
 </p><ul>
 <li><a href="http://www.newsisfree.com/">http://www.newsisfree.com</a>

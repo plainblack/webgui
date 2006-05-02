@@ -19,7 +19,7 @@ our $I18N = {
 
     'asset proxy body' => {
         message => q|
-<P><B>&#94;AssetProxy</B>(<i>Asset URL</i>);<BR>
+<P><b>&#94;AssetProxy</b>(<i>Asset URL</i>);<br />
 This macro is used to render an Asset and display it inline according
 to its template.  Any Asset can be displayed, including Navigations,
 images, links to files for downloading or for snippets.

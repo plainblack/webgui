@@ -30,7 +30,7 @@ our $I18N = {
 	'include body' => {
 		message => q|
 
-<b>&#94;Include();</b><br>
+<b>&#94;Include();</b><br />
 Allows a content manager or administrator to include a file from the local filesystem. 
 <p/>
 <i>Example:</i> &#94;Include("/this/file.html");

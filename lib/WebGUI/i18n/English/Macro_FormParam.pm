@@ -15,7 +15,7 @@ our $I18N = {
 	'form param body' => {
 		message => q|
 
-<b>&#94;FormParam();</b><br>
+<b>&#94;FormParam();</b><br />
 This macro is mainly used in generating dynamic queries in SQL Reports. Using this macro you can pull the value of any form field simply by specifying the name of the form field, like this: &#94;FormParam("phoneNumber");
 <p>
 

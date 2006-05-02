@@ -374,11 +374,10 @@ our $I18N = {
 
 	'1000' => {
 		message => q|<p>
-Database Links enable a WebGUI administrator to add commonly used databases for use in SQL Reports.  This frees the SQL Report author from having to know or enter a DSN, user, or password.<br>
-<br>
-Be aware that any database links you create here will be available to all content authors.  While they will not be able to see the database connection info, they will be able to execute any select, show, or describe commands on the database.
-<p>|,
-		lastUpdated => 1056151382
+Database Links enable a WebGUI administrator to add commonly used databases for use in SQL Reports.  This frees the SQL Report author from having to know or enter a DSN, user, or password.</p>
+<p>Be aware that any database links you create here will be available to all content authors.  While they will not be able to see the database connection info, they will be able to execute any select, show, or describe commands on the database.
+</p>|,
+		lastUpdated => 1146526290
 	},
 
 	'43' => {
@@ -883,25 +882,25 @@ to add or remove users from their groups.
 	},
 
 	'1074' => {
-		message => q|Style templates are a special kind of template in WebGUI. They allow you to keep your content separated from the look and feel of your site. The following are the template variables available in style templates:
+		message => q|<p>Style templates are a special kind of template in WebGUI. They allow you to keep your content separated from the look and feel of your site. The following are the template variables available in style templates:
+</p>
 
-<p>
-
-<b>body.content</b><br>
+<p><b>body.content</b><br />
 The the content on the current page.
-<p>
+</p>
 
-<b>head.tags</b><br>
+<p><b>head.tags</b><br />
 Tags that WebGUI automatically generates for you so that caching works the way it should, search engines can find you better, and other useful automated functionality. This should go in the &lt;head&gt; &lt;/head&gt; section of your style.
+</p>
 
-<p>
-We suggest using something like this in the &lt;title&gt; &lt;/title&gt; portion of your style:
-<p>
+<p>We suggest using something like this in the &lt;title&gt; &lt;/title&gt; portion of your style:
+</p>
 
-&lt;tmpl_var session.page.title&gt; - &lt;tmpl_var session.setting.companyName&gt;
+<p>&lt;tmpl_var session.page.title&gt; - &lt;tmpl_var session.setting.companyName&gt;
+</p>
 
-<p>
-That particular example will help you get good ranking on search engines.
+<p>That particular example will help you get good ranking on search engines.
+</p>
 
 |,
 		lastUpdated => 1102702313,
@@ -1089,29 +1088,29 @@ removed from the system after a set period of time.  That period of time is set 
         },
 
         '993 description' => {
-                message => q|<b>D</b>ata <b>S</b>ource <b>N</b>ame is the unique identifier that Perl uses to describe the location of your database. It takes the format of
+                message => q|<p><b>D</b>ata <b>S</b>ource <b>N</b>ame is the unique identifier that Perl uses to describe the location of your database. It takes the format of
 <blockquote>DBI:[driver]:[database name]:[host].</blockquote>
+</p>
+<p><i>Example:</i> DBI:mysql:WebGUI:localhost</p>
 <p>
-<i>Example:</i> DBI:mysql:WebGUI:localhost
-<p>
-Here are some examples for other databases.<br>
+Here are some examples for other databases.<br />
 <dl>
 <dt><a href="http://search.cpan.org/author/TIMB/DBD-Oracle-1.14/Oracle.pm#CONNECTING_TO_ORACLE">Oracle</a>:</dt>
-<dd>DBI:Oracle:SID<br>
-DBD::Oracle must be installed.<br>
+<dd>DBI:Oracle:SID<br />
+DBD::Oracle must be installed.<br />
 You must be using mod_perl and configure <b>PerlSetEnv ORACLE_HOME /home/oracle/product/8.1.7</b> in httpd.conf. Without setting ORACLE_HOME, you can connect using DBI:Oracle:host=myhost.com;sid=SID
 </dd>
 <dt><a href="http://search.cpan.org/author/OYAMA/DBD-PgPP-0.04/PgPP.pm#THE_DBI_CLASS">PostgreSQL</a>:</dt>
-<dd>DBI:PgPP:dbname=DBNAME[;host=hOST]<br>
+<dd>DBI:PgPP:dbname=DBNAME[;host=hOST]<br />
 DBD::PgPP must be installed.
 </dd>
 <dt><a href="http://search.cpan.org/author/MEWP/DBD-Sybase-1.00/Sybase.pm#Specifying_other_connection_specific_parameters">Sybase</a>:</dt>
-<dd>DBI:Sybase:[server=SERVERNAME][database=DATABASE]<br>
-DBD::Sybase must be installed.<br>
+<dd>DBI:Sybase:[server=SERVERNAME][database=DATABASE]<br />
+DBD::Sybase must be installed.<br />
 You must be using mod_perl and configure <b>PerlSetEnv SYBASE /opt/sybase/11.0.2</b> in httpd.conf.
 </dd>
-</dl>|,
-                lastUpdated => 1122070396,
+</dl></p>|,
+                lastUpdated => 1146526394,
         },
 
         '994 description' => {
@@ -1188,50 +1187,50 @@ The following fields make up a Database Link.
 	},
 
 	'610' => {
-		message => q|See <b>Manage Users</b> for additional details.
-<p>
+		message => q|<p>See <b>Manage Users</b> for additional details.</p>
 
-<b>Username</b><br>
+<p><b>Username</b><br />
 Username is a unique identifier for a user. Sometimes called a handle, it is also how the user will be known on the site. (<i>Note:</i> Administrators have unlimited power in the WebGUI system. This also means they are capable of breaking the system. If you rename or create a user, be careful not to use a username already in existence.)
-<p>
+</p>
 
-<b>Authentication Method</b><br>
+<p><b>Authentication Method</b><br />
 See <i>Edit Settings</i> for details.
-<p>
+</p>
 
-<b>Password</b> *W<br>
+<p><b>Password</b> *W<br />
 A password is used to ensure that the user is who s/he says s/he is.
-<p>
+</p>
 
-<b>Password Timeout</b> *W<br>
+<p><b>Password Timeout</b> *W<br />
 Length of time before this user's password expires, forcing it to be changed
-<p>
+</p>
 
-<b>Allow User to Change Username?</b> *W<br>
+<p><b>Allow User to Change Username?</b> *W<br />
 Should this user be allowed to change his username?
-<p>
+</p>
 
-<b>Allow User to Change Password?</b> *W<br>
+<p><b>Allow User to Change Password?</b> *W<br />
 Should this user be allowed to change his password?
-<p>
+</p>
 
-<b>LDAP Connection</b> *L<br>
+<p><b>LDAP Connection</b> *L<br />
 Select one of the available LDAP connections to authenticate this user.
-<p>
+</p>
 
-<b>LDAP URL</b> *L<br>
+<p><b>LDAP URL</b> *L<br />
 See <i>Edit Settings</i> for details.
-<p>
+</p>
 
-<b>Connect DN</b> *L<br>
+<p><b>Connect DN</b> *L<br />
 The Connect DN is the <b>cn</b> (or common name) of a given user in your LDAP database. It should be specified as <b>cn=John Doe</b>. This is, in effect, the username that will be used to authenticate this user against your LDAP server.
-<p>
+</p>
 
-*W available in WebGUI authentication<br>
+<p>*W available in WebGUI authentication<br />
 *L available in LDAP authentication.
+</p>
 
 |,
-		lastUpdated => 1118546483,
+		lastUpdated => 1146526452,
 	},
 
 	'514' => {
@@ -1245,63 +1244,63 @@ The Connect DN is the <b>cn</b> (or common name) of a given user in your LDAP da
 	},
 
 	'groups default body' => {
-		message => q|There are several groups built into WebGUI:
-<p>
+		message => q|<p>There are several groups built into WebGUI:</p>
 
-<b>Admins</b><br>
+<p><b>Admins</b><br />
 Admins are users who have unlimited privileges within WebGUI. A user should only be added to the admin group if they oversee the system. Usually only one to three people will be added to this group.  Once a person has been added to this group, their UI level is automatically updated to 9.
-<p>
+</p>
 
-<b>Content Managers</b><br>
+<p><b>Content Managers</b><br />
 Content managers are users who have privileges to add, edit, and delete content from various areas on the site. The content managers group should not be used to control individual content areas within the site, but to determine whether a user can edit content at all. You should set up additional groups to separate content areas on the site.
-<p>
+</p>
 
-<b>Everyone</b><br>
+<p><b>Everyone</b><br />
 Everyone is a magic group in that no one is ever physically inserted into it, but yet all members of the site are part of it. If you want to open up your site to both visitors and registered users, use this group to do it.
-<p>
+</p>
 
-<b>Export Managers</b><br>
+<p><b>Export Managers</b><br />
 Members of this group are allowed to export pages to disk.
-<p>
+</p>
 
-<b>Package Managers</b><br>
+<p><b>Package Managers</b><br />
 Users that have privileges to add, edit, and delete packages of wobjects and pages to deploy.
-<p>
+</p>
 
-<b>Registered Users</b><br>
+<p><b>Registered Users</b><br />
 When users are added to the system they are put into the registered users group. A user should only be removed from this group if their account is deleted or if you wish to punish a troublemaker.
-<p>
+</p>
 
-<b>Secondary Admins</b><br> Users in the Secondary Admins group may
+<p><b>Secondary Admins</b><br /> Users in the Secondary Admins group may
 add new users, but cannot edit users.
-<p>
+</p>
 
-<b>Style Managers</b><br>
+<p><b>Style Managers</b><br />
 Users that have privileges to edit styles for this site. These privileges do not allow the user to assign styles to a page, just define them to be used.
-<p>
+</p>
 
-<b>Template Managers</b><br>
+<p><b>Template Managers</b><br />
 Users that have privileges to edit templates for this site.
-<p>
+</p>
 
-<b>Turn Admin On</b><br>
+<p><b>Turn Admin On</b><br />
 These users are allowed to turn on Admin mode.
-<p>
+</p>
 
-<b>Visitors</b><br>
+<p><b>Visitors</b><br />
 Visitors are users who are not logged in using an account on the system. Also, if you wish to punish a registered user you could remove him/her from the Registered Users group and insert him/her into the Visitors group.
-<p>
+</p>
 |,
-		lastUpdated => 1126539068
+		lastUpdated => 1146592032
 	},
 
 	'615' => {
-		message => q|Groups are used to subdivide privileges and responsibilities within the WebGUI system. For instance, you may be building a site for a classroom situation. In that case you might set up a different group for each class that you teach. You would then apply those groups to the pages that are designed for each class.
+		message => q|<p>Groups are used to subdivide privileges and responsibilities within the WebGUI system. For instance, you may be building a site for a classroom situation. In that case you might set up a different group for each class that you teach. You would then apply those groups to the pages that are designed for each class.
+</p>
 <p>
 The Groups page displays all groups that you are allowed to edit.  The form on the page allows you to display a subset of those groups.  The search engine uses SQL wildcards like '%' instead of the familiar ones used by internet search engines.
-<p>
+</p>
 |,
-		lastUpdated => 1100224416
+		lastUpdated => 1146592059
 	},
 
 	'50' => {
@@ -1798,17 +1797,18 @@ Multiple filters can be set by joining name and value pairs with a semicolon:
         },
 
         '1005 description' => {
-                message => q|Many organizations have external databases that map users to groups; for example an HR database might map Employee ID to Health Care Plan.  To validate users against an external database, you need to construct a SQL statement that will return the list of WebGUI userIds for users in the group.  You may use macros in this query to access data in a user's WebGUI profile, such as Employee ID.  Here is an example that checks a user against a fictional HR database.  This assumes you have created an additional WebGUI profile field called employeeId.<br>
-<br>
-select userId from employees, health_plans, empl_plan_map<br>
-where employees.employee_id = &#94;User("employeeId");<br>
-and health_plans.plan_name = 'HMO 1'<br>
-and employees.employee_id = empl_plan_map.employee_id<br>
-and health_plans.health_plan_id = empl_plan_mp.health_plan_id<br>
-<br>
+                message => q|<p>Many organizations have external databases that map users to groups; for example an HR database might map Employee ID to Health Care Plan.  To validate users against an external database, you need to construct a SQL statement that will return the list of WebGUI userIds for users in the group.  You may use macros in this query to access data in a user's WebGUI profile, such as Employee ID.  Here is an example that checks a user against a fictional HR database.  This assumes you have created an additional WebGUI profile field called employeeId.</p>
+<p>
+select userId from employees, health_plans, empl_plan_map<br />
+where employees.employee_id = &#94;User("employeeId");<br />
+and health_plans.plan_name = 'HMO 1'<br />
+and employees.employee_id = empl_plan_map.employee_id<br />
+and health_plans.health_plan_id = empl_plan_mp.health_plan_id<br />
+</p>
+<p>
 This group could then be named "Employees in HMO 1", and would allow you to restrict any page or wobject to only those users who are part of this health plan in the external database.
-<p>|,
-                lastUpdated => 1144798300,
+</p>|,
+                lastUpdated => 1146592080,
         },
 
         '1004 description' => {
@@ -2063,38 +2063,36 @@ You can find out more about karma in <a href="http://www.plainblack.com/ruling_w
 	},
 
 	'890' => {
-		message => q|WebGUI has a sub-system that can create tabs. You'll see these in complex forms such as page editing. In order to make the tabs system look good and match your site, you'll need to add a section to your style's style sheet specifically for the tabs. 
+		message => q|<p>WebGUI has a sub-system that can create tabs. You'll see these in complex forms such as page editing. In order to make the tabs system look good and match your site, you'll need to add a section to your style's style sheet specifically for the tabs. 
+</p>
 <p>
 The following style sheet classes are available:
-<p>
+</p>
 
-<b>.tab</b><br>
+<p><b>.tab</b><br />
 The default look of each tab.
-<p>
+</p>
 
-<b>div.tabs</b><br>
+<p><b>div.tabs</b><br />
 This also sets some properties for all of the tabs. This should be used for the text labels in the tabs.
-<p>
+</p>
 
-
-<b>.tabBody</b><br>
+<p><b>.tabBody</b><br />
 The content area for each tab. This is where the form will show up. Note that for best results the background color of this should match the background color of .tabActive.
-<p>
+</p>
 
-
-<b>.tabHover</b><br>
+<p><b>.tabHover</b><br />
 The look of a tab as the mouse hovers over it.
-<p>
+</p>
 
-<b>.tabActive</b><br>
+<p><b>.tabActive</b><br />
 The look of the tab that is currently visible.
-<p>
+</p>
 
-
-
-<i>Examples</i><br>
+<p><i>Examples</i><br />
 You can use these instead of creating your own if you wish. Or just use these as guidelines for creating your own.
-<p>
+</p>
+
 <table width="100%"><tr><td valign="top">
 <b>White or Light Colored Styles</b>
 <pre>
@@ -2145,10 +2143,8 @@ div.tabs {
 </pre>
 </td></tr></table>
 
-
-
 |,
-		lastUpdated => 1046067380
+		lastUpdated => 1146592150
 	},
 
 	'440' => {
@@ -2209,128 +2205,137 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 	},
 
 	'1086' => {
-		message => q|Many wobjects have pagination features. Though some wobjects define their own pagination variables, most use a common set of pagination variables:
+		message => q|<p>Many wobjects have pagination features. Though some wobjects define their own pagination variables, most use a common set of pagination variables:</p>
 
-<p>
-
-<b>pagination.firstPage</b><br>
+<p><b>pagination.firstPage</b><br />
 A link to the first page in the paginator.
-<p> 
+</p> 
 
-<b>pagination.firstPageUrl</b><br>
+<p><b>pagination.firstPageUrl</b><br />
 The url component of pagination.firstPage broken out.
-<p> 
+</p> 
 
-<b>pagination.firstPageText</b><br>
+<p><b>pagination.firstPageText</b><br />
 The text component of pagination.firstPage broken out.
-<p> 
+</p> 
 
-<b>pagination.isFirstPage</b><br>
+<p><b>pagination.isFirstPage</b><br />
 A boolean indicating whether the current page is the first page.
-<p> 
+</p> 
 
 
-<b>pagination.lastPage</b><br>
+<p><b>pagination.lastPage</b><br />
 A link to the last page in the paginator.
-<p> 
+</p> 
 
-<b>pagination.lastPageUrl</b><br>
+<p><b>pagination.lastPageUrl</b><br />
 The url component of pagination.lastPage broken out.
-<p> 
+</p> 
 
-<b>pagination.lastPageText</b><br>
+<p><b>pagination.lastPageText</b><br />
 The text component of pagination.lastPage broken out.
-<p> 
+</p> 
 
-<b>pagination.isLastPage</b><br>
+<p><b>pagination.isLastPage</b><br />
 A boolean indicating whether the current page is the last page.
-<p> 
+</p> 
 
-<b>pagination.nextPage</b><br>
+<p><b>pagination.nextPage</b><br />
 A link to the next page in the paginator relative to the current page.
-<p> 
+</p> 
 
-<b>pagination.nextPageUrl</b><br>
+<p><b>pagination.nextPageUrl</b><br />
 The url component of pagination.nextPage broken out.
-<p> 
+</p> 
 
-<b>pagination.nextPageText</b><br>
+<p><b>pagination.nextPageText</b><br />
 The text component of pagination.nextPage broken out.
-<p> 
+</p> 
 
-<b>pagination.previousPage</b><br>
+<p><b>pagination.previousPage</b><br />
 A link to the previous page in the paginator relative to the current page.
-<p> 
+</p> 
 
-<b>pagination.previousPageUrl</b><br>
+<p><b>pagination.previousPageUrl</b><br />
 The url component of pagination.previousPage broken out.
-<p> 
+</p> 
 
-<b>pagination.previousPageText</b><br>
+<b>pagination.previousPageText</b><br />
 The text component of pagination.previousPage broken out.
 <p> 
 
 
-<b>pagination.pageNumber</b><br>
+<p><b>pagination.pageNumber</b><br />
 The current page number.
-<p> 
+</p> 
 
-<b>pagination.pageCount</b><br>
+<p><b>pagination.pageCount</b><br />
 The total number of pages.
-<p> 
+</p> 
 
-<b>pagination.pageCount.isMultiple</b><br>
+<p><b>pagination.pageCount.isMultiple</b><br />
 A boolean indicating whether there is more than one page.
-<p> 
+</p> 
 
-<b>pagination.pageList</b><br>
+<p><b>pagination.pageList</b><br />
 A list of links to every page in the paginator.
-<p> 
+</p> 
 
-<b>pagination.pageLoop</b><br>
+<blockquote <b>pagination.pageLoop</b><br />
 Same as pagination.pageList except broken into individual elements.
-<blockquote>
-<b>pagination.url</b><br>
-The URL of page X, where X is the number in the loop we're at.
-<p> 
-<b>pagination.text</b><br>
-The number of page X, where X is the number in the loop we're at.
-<p> 
 </blockquote>
-<p> 
+
+<p><b>pagination.url</b><br />
+The URL of page X, where X is the number in the loop we're at.
+</p> 
+
+<p><b>pagination.text</b><br />
+The number of page X, where X is the number in the loop we're at.
+</p> 
+
+</blockquote>
 
 
-<b>pagination.pageList.upTo20</b><br>
+<p><b>pagination.pageList.upTo20</b><br />
 A list of links to the 20 nearest in the paginator relative to the current page. So if you're on page 60, you'll see links for 50-70.
-<p> 
+</p> 
 
-<b>pagination.pageLoop.upTo20</b><br>
+<p><b>pagination.pageLoop.upTo20</b><br />
 Same as pagination.pageList.upTo20 except broken into individual elements.
-<blockquote>
-<b>pagination.url</b><br>
-The URL of page X, where X is the number in the loop we're at.
-<p> 
-<b>pagination.text</b><br>
-The number of page X, where X is the number in the loop we're at.
-<p> 
-</blockquote>
-<p> 
+</p> 
 
-<b>pagination.pageList.upTo10</b><br>
+<blockquote>
+
+<p><b>pagination.url</b><br />
+The URL of page X, where X is the number in the loop we're at.
+</p> 
+
+<p><b>pagination.text</b><br />
+The number of page X, where X is the number in the loop we're at.
+</p> 
+
+</blockquote>
+
+<p><b>pagination.pageList.upTo10</b><br />
 A list of links to the 10 nearest in the paginator relative to the current page. So if you're on page 20, you'll see links for 15-25.
-<p> 
+</p> 
 
-<b>pagination.pageLoop.upTo10</b><br>
+<p><b>pagination.pageLoop.upTo10</b><br />
 Same as pagination.pageList.upTo10 except broken into individual elements.
+</p> 
+
 <blockquote>
-<b>pagination.url</b><br>
+
+<p><b>pagination.url</b><br />
 The URL of page X, where X is the number in the loop we're at.
-<p> 
-<b>pagination.text</b><br>
+</p> 
+
+<p><b>pagination.text</b><br />
 The number of page X, where X is the number in the loop we're at.
-<p> 
+</p> 
+
 </blockquote>
-<p> 
+
 |,
 		lastUpdated => 1145060787,
 	},
@@ -2466,80 +2471,64 @@ The number of page X, where X is the number in the loop we're at.
 	},
 
 	'623' => {
-		message => q|<a href="http://www.w3.org/Style/CSS/">Cascading Style Sheets (CSS)</a> are a great way to manage the look and feel of any web site. They are used extensively in WebGUI.
+		message => q|<p><a href="http://www.w3.org/Style/CSS/">Cascading Style Sheets (CSS)</a> are a great way to manage the look and feel of any web site. They are used extensively in WebGUI.
+</p>
+
 <p>
-
-
 If you are unfamiliar with how to use CSS, <a href="http://www.plainblack.com/">Plain Black</a> provides training classes on XHTML and CSS. Alternatively, Bradsoft makes an excellent CSS editor called <a href="http://www.bradsoft.com/topstyle/index.asp">Top Style</a>.
+</p>
+
 <p>
-
-
 The following is a list of classes used to control the default look of WebGUI. These of course can be overridden or replaced in the various templates that generate them.
+</p>
+
 <p>
-
-
-<b>A</b><br>
+<b>A</b><br />
 The links throughout the style.
-<p>
+</p>
 
-
-<b>BODY</b><br>
+<p><b>BODY</b><br />
 The default setup of all pages within a style.
-<p>
+</p>
 
-
-<b>H1</b><br>
+<p><b>H1</b><br />
 The headers on every page.
-<p>
+</p>
 
-
-<b>.content</b><br>
+<p><b>.content</b><br />
 The main content area on all pages of the style.
-<p>
+</p>
 
-
-<b>.formDescription </b><br>
+<p><b>.formDescription </b><br />
 The tags on all forms next to the form elements. 
-<p>
+</p>
 
-
-<b>.formSubtext </b><br>
+<p><b>.formSubtext </b><br />
 The tags below some form elements.
-<p>
+</p>
 
-
-<b>.highlight </b><br>
+<p><b>.highlight </b><br />
 Denotes a highlighted item, such as which message you are viewing within a list.
-<p>
+</p>
 
-
-
-
-<b>.pagination </b><br>
+<p><b>.pagination </b><br />
 The Previous and Next links on pages with pagination.
-<p>
+</p>
 
-
-
-
-<b>.tableData </b><br>
+<p><b>.tableData </b><br />
 The data rows on things like message boards and user contributions.
-<p>
+</p>
 
-
-<b>.tableHeader </b><br>
+<p><b>.tableHeader </b><br />
 The headings of columns on things like message boards and user contributions.
-<p>
+</p>
 
-
-
-
-<b>NOTE:</b> Some wobjects and macros have their own unique styles sheet classes, which are documented in their individual help files.
-<p>
+<p><b>NOTE:</b> Some wobjects and macros have their own unique styles sheet classes, which are documented in their individual help files.
+</p>
 
 
 |,
-		lastUpdated => 1070030223
+		lastUpdated => 1146592967
 	},
 
 	'328' => {
@@ -2894,21 +2883,21 @@ the default replacements that ship with WebGUI for examples.</p>
 		message => q|<p>Users are the accounts in the system that are given rights to do certain things. There are two default users built into the system: Admin and Visitor.
 </p>
 
-<p><i>Admin</i><br>
+<p><i>Admin</i><br />
 Admin is exactly what you'd expect. It is a user with unlimited rights in the WebGUI environment. If it can be done, this user has the rights to do it.
 </p>
 
-<p><i>Visitor</i><br>
+<p><i>Visitor</i><br />
 Visitor is exactly the opposite of Admin. Visitor has no rights what-so-ever. By default any user who is not logged in is seen as the user Visitor.
 </p>
 
-<p><b>Add a new user.</b><br>
+<p><b>Add a new user.</b><br />
 Click on this to go to the add user screen.
 </p>
 
-<p><b>Search</b><br>
+<p><b>Search</b><br />
 You can search users based on username and email address. You can do partial searches too if you like.</p>|,
-		lastUpdated => 1102660904,
+		lastUpdated => 1146592990,
 	},
 
 	'1043' => {
@@ -3038,13 +3027,21 @@ that Asset and all Assets below it.</p>
 	},
 
 	'958' => {
-		message => q|The clipboard is a special system location to which content may be temporarily cut or copied.  Items in the clipboard may then be pasted to a new location.
-<p>The clipboard contents may be managed individually. You may delete or paste an item by selecting the appropriate icon.  You may also empty the entire contents of the clipboard to the trash by choosing the Empty clipboard menu option.
-<p><b>Title</b><br>The name of the item in the clipboard.  You may view the item by selecting the title.
-<p><b>Type</b><br>The type of content.  For instance, a Page, Article, EventsCalendar, etc.
-<p><b>Clipboard Date</b><br>The date and time the item was added to the clipboard
-<p><b>Previous Location</b><br>The location where the item was previously found.  You may view the previous location by selecting the location.<p><b>Username</b><br>The username of the individual who placed the item in the clipboard.  This optional field is only visible in shared clipboard environments or when an administrator is managing the system clipboard.|,
-		lastUpdated => 1101775494,
+		message => q|<p>The clipboard is a special system location to which content may be temporarily cut or copied.  Items in the clipboard may then be pasted to a new location.</p>
+
+<p>The clipboard contents may be managed individually. You may delete or paste an item by selecting the appropriate icon.  You may also empty the entire contents of the clipboard to the trash by choosing the Empty clipboard menu option.</p>
+
+<p><b>Title</b><br />The name of the item in the clipboard.  You may view the item by selecting the title.</p>
+
+<p><b>Type</b><br />The type of content.  For instance, a Page, Article, EventsCalendar, etc.</p>
+
+<p><b>Clipboard Date</b><br />The date and time the item was added to the clipboard.</p>
+
+<p><b>Previous Location</b><br />The location where the item was previously found.  You may view the previous location by selecting the location.</p>
+
+<p><b>Username</b><br />The username of the individual who placed the item in the clipboard.  This optional field is only visible in shared clipboard environments or when an administrator is managing the system clipboard.</p>|,
+
+		lastUpdated => 1146593054,
 	},
 
 	'419' => {
@@ -3621,81 +3618,82 @@ Depending upon what authentication modules you have installed in your system you
 
 <h2>WebGUI Authentication Options</h2>
 
-<b>Minimum Password Length</b><br>
+<p><b>Minimum Password Length</b><br />
 Set the minimum length that passwords can be.  If set to 0, there is no minimum length.
-<p>
+</p>
 
-<b>Password Timeout</b><br>
+<p><b>Password Timeout</b><br />
 Set how long before a user's password expires and has to change it.
-<p>
+</p>
 
-<b>Expire passwords on user creation?</b><br>
+<p><b>Expire passwords on user creation?</b><br />
 Should a user's password be expired when he is created by an administrator forcing a change?
-<p>
+</p>
 
-<b>Send welcome message?</b><br>
+<p><b>Send welcome message?</b><br />
 Do you wish WebGUI to automatically send users a welcome message when they register for your site? 
-<p>
-<b>NOTE:</b> In addition to the message you specify below, the user's account information will be included in the message.
-<p>
+</p>
 
-<b>Welcome Message</b> <br>
+<p><b>NOTE:</b> In addition to the message you specify below, the user's account information will be included in the message.
+</p>
+
+<p><b>Welcome Message</b> <br />
 Type the message that you'd like to be sent to users upon registration.
-<p>
+</p>
 
-<b>Allow Users to Change Username?</b><br>
+<p><b>Allow Users to Change Username?</b><br />
 Should users be allowed to change their Usernames?
-<p>
+</p>
 
-<b>Allow Users to Change Passwords?</b><br>
+<p><b>Allow Users to Change Passwords?</b><br />
 Should users be allowed to change their Passwords?
-<p>
+</p>
 
-<b>Allow Password Recovery?</b><br>
+<p><b>Allow Password Recovery?</b><br />
 Can users recover their passwords?
-<p>
+</p>
 
-<b>Recover Password Message</b><br>
+<p><b>Recover Password Message</b><br />
 Type a message that will be sent to your users if they try to recover their WebGUI password.
-<p>
+</p>
 
-<b>Validate email addresses</b><br>
+<p><b>Validate email addresses</b><br />
 Before a user's account is activated, require that they click on a link sent to their email
 account.
-<p>
+</p>
 
-<b>Use captcha image</b><br>
+<p><b>Use captcha image</b><br />
 Require the user to enter in the data from a captcha image before activating an account.
-<p>
+</p>
 
-<b>Account Template</b><br>
+<p><b>Account Template</b><br />
 Template to be used to display a user's account.
-<p>
+</p>
 
-<b>Create Account Template</b><br>
+<p><b>Create Account Template</b><br />
 Template to be used to show the form for creating an account.
-<p>
+</p>
 
-<b>Expired Password Template</b><br>
+<p><b>Expired Password Template</b><br />
 Template used to inform user that their password has expired.
-<p>
+</p>
 
-<b>Login Template</b><br>
+<b>Login Template</b><br />
 Template used to display login information to the user as an operation as opposed to inside of a page via a macro.
 <p>
 
-<b>Password Recovery Template</b><br>
+<p><b>Password Recovery Template</b><br />
 Template used to display a form to the user to recover their password, if the feature is enabled.
-<p>
+</p>
 
 <h2>LDAP Authentication Options</h2>
 
-<b>LDAP Connection</b><br>
+<p><b>LDAP Connection</b><br />
 Select which of the configured LDAP connections to use to authenticate users.
-<p>
+</p>
 
 |,
-		lastUpdated => 1089039511
+		lastUpdated => 1146593115
 	},
 
 	'Enable passive profiling' => {

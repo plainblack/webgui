@@ -200,7 +200,7 @@ By default you'll only be able to accept MasterCard and Visa. If you want to acc
 
 <hr />
 
-This plugin expects that you set up the following recipe's in your CDG account. Be very careful to enter the recipe names exactly as given below.<br>
+This plugin expects that you set up the following recipe's in your CDG account. Be very careful to enter the recipe names exactly as given below.<br />
 <table border="0" cellpadding="3" cellspacing="0">
   <tr>
     <td align="right"><b>weekly</b></td>
@@ -237,14 +237,14 @@ This plugin expects that you set up the following recipe's in your CDG account. 
     <td> -> </td>
     <td align="left">365 days</td>
   </tr>
-</table><br>
-Please note that some of these recipe's are only roughly correct. They don't 'fit' exactly in a whole year. Below the affected recipe's are given together with their difference on a year's basis. <br>
+</table><br />
+Please note that some of these recipe's are only roughly correct. They don't 'fit' exactly in a whole year. Below the affected recipe's are given together with their difference on a year's basis. <br />
 <ul>
   <li><b>monthly</b> (differs 5 days each year, 6 days each leap year)</li>
   <li><b>quarterly</b> (differs 1 day each year, 2 days each leap year)</li>
   <li><b>halfyearly</b> (differs 1 day each year, 2 days each leap year)</li>
   <li><b>yearly</b> (differs 1 day each leap year)</li>
-</ul><br>
+</ul><br />
 Also set the 'RECURRING POST-BACK URL' field in the Account Settings part of the virtual terminal to:|,
 		lastUpdated => 1112200925,
 		context => q|An informational message that's shown in the configuration form of this plugin.|

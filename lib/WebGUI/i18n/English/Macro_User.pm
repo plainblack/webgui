@@ -15,12 +15,12 @@ our $I18N = {
 	'user body' => {
 		message => q|
 
-<b>&#94;User();</b><br>
+<p><b>&#94;User();</b><br />
 This macro will allow you to display any information from a user's account or profile. For instance, if you wanted to display a user's email address you'd create this macro: &#94;User("email");
-<p>
+</p>
 
 |,
-		lastUpdated => 1112466919,
+		lastUpdated => 1146607187,
 	},
 };
 

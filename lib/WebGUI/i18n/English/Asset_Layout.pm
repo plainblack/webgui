@@ -46,35 +46,35 @@ checkbox for any Asset that you do not want displayed in the Page Layout Asset.
 	'layout template body' => {
                 message => q|<p>The following variables are available in Page Layout Templates:</p>
 
-<P><b>showAdmin</b><br/>
+<P><b>showAdmin</b><br />
 A conditional showing if the current user has turned on Admin Mode and can edit this Asset.
 
-<P><b>dragger.icon</b><br/>
+<P><b>dragger.icon</b><br />
 An icon that can be used to change the Asset's position with the mouse via a click and
 drag interface.  If showAdmin is false, this variable is empty.
 
-<P><b>dragger.init</b><br/>
+<P><b>dragger.init</b><br />
 HTML and Javascript required to make the click and drag work. If showAdmin is false, this variable is empty.
 
-<P><b>position1_loop, position2_loop, ... positionN_loop</b><br/>
+<P><b>position1_loop, position2_loop, ... positionN_loop</b><br />
 Each position in the template has a loop which has the set of Assets
 which are to be displayed inside of it.  Assets that have not been
 specifically placed are put inside of position 1.
 
 <blockquote>
 
-<P><b>id</b><br/>
+<P><b>id</b><br />
 The Asset ID of the Asset.
 
-<P><b>content</b><br/>
+<P><b>content</b><br />
 The rendered content of the Asset.
 
 </blockquote>
 
-<P><b>attachment.size</b><br/>
+<P><b>attachment.size</b><br />
 The size of the file.
 
-<P><b>attachment.type</b><br/>
+<P><b>attachment.type</b><br />
 The type of the file (PDF, etc.)
 
 		|,

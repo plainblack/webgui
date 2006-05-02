@@ -15,13 +15,13 @@ our $I18N = {
 	'group delete body' => {
 		message => q|
 
-<b>&#94;GroupDelete();</b><br>
+<b>&#94;GroupDelete();</b><br />
 Using this macro you can allow users to delete themselves from a group. The first parameter is the name of the group this user should be deleted from. The second parameter is a text string for the user to click on to delete themselves from this group. The third parameter allows you to specify the name of a template in the Macro/GroupDelete namespace to replace the default template.  These variables are available in the template:
 <p/>
-<b>group.url</b><br/>
+<b>group.url</b><br />
 The URL with the action to add the user to the group.
 <p/>
-<b>group.text</b><br/>
+<b>group.text</b><br />
 The supplied text string for the user to click on.
 
 <p>

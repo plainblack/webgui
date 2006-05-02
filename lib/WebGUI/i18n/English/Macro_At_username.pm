@@ -15,7 +15,7 @@ our $I18N = {
 	'username body' => {
 		message => q|
 
-<b>&#94;@; - Username</b><br>
+<b>&#94;@; - Username</b><br />
 The username of the currently logged in user.
 <p>
 

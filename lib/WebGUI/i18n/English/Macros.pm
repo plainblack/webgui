@@ -41,15 +41,15 @@ our $I18N = {
 	},
 
 	'macros using body' => {
-		message => q|WebGUI macros are used to create dynamic content within otherwise static content. For instance, you may wish to show which user is logged in on every page, or you may wish to have a dynamically built menu or crumb trail. 
-<p>
+		message => q|<p>WebGUI macros are used to create dynamic content within otherwise static content. For instance, you may wish to show which user is logged in on every page, or you may wish to have a dynamically built menu or crumb trail. 
+</p>
 
-Macros always begin with a caret (&#94;) and follow with at least one other character and ended with a semicolon (;). Some macros can be extended/configured by taking the format of <b>&#94;x</b>("<i>config text</i>");.  When providing  multiple arguments to a macro, they should be separated by only commas:<br>
+<p>Macros always begin with a caret (&#94;) and follow with at least one other character and ended with a semicolon (;). Some macros can be extended/configured by taking the format of <b>&#94;x</b>("<i>config text</i>");.  When providing  multiple arguments to a macro, they should be separated by only commas:<br />
 <b>&#94;x</b>(<i>"First argument",2</i>);
-<p>
+</p>
 
 |,
-		lastUpdated => 1101885876,
+		lastUpdated => 1146608624,
         },
 
 	'topicName' => {

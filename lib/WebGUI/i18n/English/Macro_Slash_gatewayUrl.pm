@@ -14,8 +14,8 @@ our $I18N = {
 
 	'gateway url body' => {
 		message => q|
-<P><B>&#94;/; - System URL</B><BR>
-The URL to the gateway script (example: <I>/index.pl/</I>). 
+<P><b>&#94;/; - System URL</b><br />
+The URL to the gateway script (example: </i>/index.pl/</i>). 
 |,
 		lastUpdated => 1112466919,
 	},

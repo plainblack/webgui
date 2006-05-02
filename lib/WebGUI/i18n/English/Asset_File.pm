@@ -39,28 +39,28 @@ our $I18N = {
 	'file template body' => {
                 message => q|<p>The following variables are available in File Templates:</p>
 
-<P><b>fileSize</b><br/>
+<P><b>fileSize</b><br />
 The size (in bytes/kilobytes/megabytes, etc) of the file.
 
-<P><b>fileIcon</b><br/>
+<P><b>fileIcon</b><br />
 The icon which describes the type of file.
 
-<P><b>fileUrl</b><br/>
+<P><b>fileUrl</b><br />
 The URL to the file.
 
-<P><b>controls</b><br/>
+<P><b>controls</b><br />
 A toolbar for working with the file.
 
-<P><b>filename</b><br/>
+<P><b>filename</b><br />
 The name of the file.
 
-<P><b>storageId</b><br/>
+<P><b>storageId</b><br />
 The internal storage ID used for the file.
 
-<P><b>title</b><br/>
+<P><b>title</b><br />
 The title set for the file when it was uploaded, or the filename if none was entered.
 
-<P><b>menuTitle</b><br/>
+<P><b>menuTitle</b><br />
 The menu title, displayed in navigations, set for the file when it was uploaded, or the filename if none was entered.
 
 		|,

@@ -18,7 +18,7 @@ our $I18N = {
 
 	'71' => {
 		message => q|SQL Reports are perhaps the most powerful wobject in the WebGUI arsenal. They allow a user to query data from any database that they have access to. This is great for getting sales figures from your Accounting database or even summarizing all the message boards on your web site.
-<p><b>Nested query support</b><br>
+<p><b>Nested query support</b><br />
 The SQL Report wobject supports up to 5 nested queries (1 base query and 4 subqueries). Each subsequent query is executed for each row in the previous query results. For example, if you have two queries: query1 and query2, then query2 will be executed once for each row returned in query1. You can use placeholder parameters to compose subqueries with data from prior queries. 
 <p>
 SQL Reports are Wobjects and Assets, so they share the properties of both.  SQL Reports also have these unique properties:
@@ -42,14 +42,14 @@ SQL Reports are Wobjects and Assets, so they share the properties of both.  SQL 
                 message => q|<p>Placeholders, also called parameter markers, are used to indicate values in a SQL query that will be supplied later, before the statement is executed.</p>
 There are four input types:
 <ul>
-<li><b>Integer</b><br>A simple number</li>
-<li><b>Form</b><br>Form fields begin with "form:".</li>
-<li><b>Query results</b><br>Query results begin with "query1:" through "query4:". Query results are populated with data from prior queries. So when the second query is initiated, it can used the results returned by query1. When query 5 is initiated it can use the results from queries 1 through 4.</li>
-<li><b>String</b><br>Anything else is a string</li>
+<li><b>Integer</b><br />A simple number</li>
+<li><b>Form</b><br />Form fields begin with "form:".</li>
+<li><b>Query results</b><br />Query results begin with "query1:" through "query4:". Query results are populated with data from prior queries. So when the second query is initiated, it can used the results returned by query1. When query 5 is initiated it can use the results from queries 1 through 4.</li>
+<li><b>String</b><br />Anything else is a string</li>
 </ul></p>
 <p>Example:
 <blockquote>
-Query: select * from some_table where some_field = ? and some_other_field &lt; ?<br>
+Query: select * from some_table where some_field = ? and some_other_field &lt; ?<br />
 Placeholder Parameters: query1:pageId<br />form:field1
 </blockquote>
 In this example the first question mark will contain the field value of pageId in query1,

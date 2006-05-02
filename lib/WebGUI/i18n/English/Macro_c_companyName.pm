@@ -14,7 +14,7 @@ our $I18N = {
 
 	'company name body' => {
 		message => q|
-<b>&#94;c;</b><br>
+<b>&#94;c;</b><br />
 The name of your company specified in the settings by your Administrator.
 <p>
 

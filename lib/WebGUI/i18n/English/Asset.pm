@@ -270,7 +270,7 @@ our $I18N = {
         '99 description' => {
                 message => q|<p>The title of the asset.  This should be descriptive, but not very long.  If left
 blank, this will be set to "Untitled".</p>
-<P><I>Note:</I> You should always specify a title, even if the Asset template will not use it. In various places on the site, like the Page Tree, Clipboard and Trash, the <B>Title</B> is used to distinguish this Asset from others.</p>|,
+<P></i>Note:</i> You should always specify a title, even if the Asset template will not use it. In various places on the site, like the Page Tree, Clipboard and Trash, the <b>Title</b> is used to distinguish this Asset from others.</p>|,
                 lastUpdated => 1127426207,
         },
 
@@ -310,7 +310,7 @@ a URL will be made from the parent's URL and the <b>Menu Title</b>.<br />
         },
 
         '108 description' => {
-                message => q|The owner of a asset is usually the person who created the asset. This user always has full edit and viewing rights on the asset.<br>
+                message => q|The owner of a asset is usually the person who created the asset. This user always has full edit and viewing rights on the asset.<br />
 <i>UI level: 6</i>
 </p>
 <p> <b>NOTE:</b> The owner can only be changed by an administrator.
@@ -319,28 +319,28 @@ a URL will be made from the parent's URL and the <b>Menu Title</b>.<br />
         },
 
         '872 description' => {
-                message => q|Choose which group can view this asset. If you want both visitors and registered users to be able to view the asset then you should choose the "Everybody" group.<br>
+                message => q|Choose which group can view this asset. If you want both visitors and registered users to be able to view the asset then you should choose the "Everybody" group.<br />
 <i>UI level: 6</i>
 </p>|,
                 lastUpdated => 1119149899,
         },
 
         '871 description' => {
-                message => q|Choose the group that can edit this asset. The group assigned editing rights can also always view the asset.<br>
+                message => q|Choose the group that can edit this asset. The group assigned editing rights can also always view the asset.<br />
 <i>UI level: 6</i>
 </p>|,
                 lastUpdated => 1119149899,
         },
 
         '412 description' => {
-                message => q|A short description of this Asset.<br>
+                message => q|A short description of this Asset.<br />
 <i>UI level: 3</i>
 </p>|,
                 lastUpdated => 1119149899,
         },
 
         'extra head tags description' => {
-                message => q|These tags will be added to the &lt;head&gt; section of each page that the asset appears on.<br>
+                message => q|These tags will be added to the &lt;head&gt; section of each page that the asset appears on.<br />
 <i>UI level: 5</i>
 </p>|,
                 lastUpdated => 1126471216,
@@ -349,7 +349,7 @@ a URL will be made from the parent's URL and the <b>Menu Title</b>.<br />
         'make package description' => {
                 message => q|Many WebGUI tasks are very repetitive.  Automating such tasks in Webgui, such as
 creating an Asset, or sets of Assets, is done by creating a package that can be reused
-through the site.  Check yes if you want this Asset to be available as a package.<br>
+through the site.  Check yes if you want this Asset to be available as a package.<br />
 <i>UI level: 7</i>
 </p>|,
                 lastUpdated => 1119149899,
@@ -382,7 +382,7 @@ default Asset in the menu.</p>|,
         'asset template body' => {
                 message => q|
 <p>This variable is inserted into every template:</p>
-<P><b>controls</b><BR>
+<P><b>controls</b><br />
 These are the icons and URLs that allow editing, cutting, copying, deleting and reordering the Asset.</P>
 
         |,
@@ -475,7 +475,7 @@ These are the icons and URLs that allow editing, cutting, copying, deleting and 
 	},
 
         'Field Name description' => {
-                message => q|The name of this metadata property.It must be unique. <br>
+                message => q|The name of this metadata property.It must be unique. <br />
 It is advisable to use only letters (a-z), numbers (0-9) or underscores (_) for
 the field names.</p>|,
                 lastUpdated => 1129329870,
@@ -523,26 +523,26 @@ each asset under the tab &quot;Meta&quot; in the asset properties.</p>
 <p>Before you can use metadata in WebGUI, you have to enable metadata in the WebGUI Settings (Content tab)</p>
 <p>Usage of metadata:</p>
 <ul>
-  <li><p><b>Passive Profiling</b><br>
+  <li><p><b>Passive Profiling</b><br />
     When passive profiling is switched on, every wobject viewed by a user will
     be logged.  The WebGUI scheduler summarizes the profiling information on a regular
     basis.
     This is basically content
-    ranking based upon the user's Areas of Interest (AOI).<br>
+    ranking based upon the user's Areas of Interest (AOI).<br />
     By default the summarizer runs once a day. However you can change that by
     setting: <b>passiveProfileInterval = &lt;number of seconds&gt;</b> in the
     WebGUI config file.</p>
   </li>
-  <li><p><b>Areas of Interest Ranking</b><br>
+  <li><p><b>Areas of Interest Ranking</b><br />
     Metadata in combination with passive profiling produces AOI (Areas of
     Interest) information. You can retrieve the value of a metadata property
     with the &#94;AOIRank(); and &#AOIHits(); macros.</p>
   </li>
-  <li><p><b>Show content based upon criteria<br>
+  <li><p><b>Show content based upon criteria<br />
     </b>The Wobject Proxy allows you to select content based upon criteria like:<blockquote>
     contenttype = sport AND source != newspaper</blockquote>
     You can use the AOI macro's described above in the criteria, so you can
-    present content based upon the users Areas of Interest. Example:<br>
+    present content based upon the users Areas of Interest. Example:<br />
     type = &#94;AOIRank(contenttype);</p></li>
 	<li><p><b>Display</b><br />
 	Metadata fields are exposed to the asset templates as their property name. So you can actually display the metadata

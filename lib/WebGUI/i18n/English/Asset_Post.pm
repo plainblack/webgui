@@ -12,148 +12,148 @@ our $I18N = {
 ! : This variable is required for the Post to function correctly.<p/>
 <p>
 
-<b>form.header</b> !<br>
+<b>form.header</b> !<br />
 Code required to start the form for the Post.
 <p>
 
-<b>isNewPost</b><br>
+<b>isNewPost</b><br />
 A conditional that is true if the user is adding a new Post, as opposed to
 editing an existing Post.
 <p>
 
-<b>isReply</b><br>
+<b>isReply</b><br />
 A conditional that is true if the user is replying to an existing Post.
 <p>
 
-<b>reply.title</b><br>
+<b>reply.title</b><br />
 The title of the Post that is being replied to.
 <p>
 
-<b>reply.synopsis</b><br>
+<b>reply.synopsis</b><br />
 The synopsis of the Post that is being replied to.
 <p>
 
-<b>reply.content</b><br>
+<b>reply.content</b><br />
 The content of the Post that is being replied to.
 <p>
 
-<b>reply.userDefined<i>N</i></b><br>
+<b>reply.userDefined<i>N</i></b><br />
 The contents of user defined fields for the Post that is being replied to, where N is from 1 to 5.
 <p>
 
-<b>subscribe.form</b><br>
+<b>subscribe.form</b><br />
 A yes/no button to allow the user to subscribe to the thread this post belongs to.
 <p>
 
-<b>isNewThread</b><br>
+<b>isNewThread</b><br />
 A conditional that is true if the user is adding a new thread.
 <p>
 
-<b>sticky.form</b><br>
+<b>sticky.form</b><br />
 A yes/no button to set the thread to be sticky, so that it stays at the top of the forum listing.
 <p>
 
-<b>lock.form</b><br>
+<b>lock.form</b><br />
 A yes/no button to lock the thread, so that no posts can be added or edited.
 <p>
 
-<b>isThread</b><br>
+<b>isThread</b><br />
 A conditional that is true if the user is editing the main post for a thread, as opposed to
 a reply in the thread.
 <p>
 
-<b>isEdit</b><br>
+<b>isEdit</b><br />
 A conditional that is true if the user is editing an existing post.
 <p>
 
-<b>preview.title</b><br>
+<b>preview.title</b><br />
 The web safe title for previewing a post.
 <p>
 
-<b>preview.synopsis</b><br>
+<b>preview.synopsis</b><br />
 The synopsis when previewing a post.
 <p>
 
-<b>preview.content</b><br>
+<b>preview.content</b><br />
 The content when previewing a post.
 <p>
 
-<b>preview.userDefined<i>N</i></b><br>
+<b>preview.userDefined<i>N</i></b><br />
 The contents of user defined fields for the Post without WebGUI Macros being processed, where N is from 1 to 5.
 <p>
 
-<b>form.footer</b> !<br>
+<b>form.footer</b> !<br />
 Code for the end of the form.
 <p>
 
-<b>usePreview</b> !<br>
+<b>usePreview</b> !<br />
 A conditional indicating that posts to the thread will be previewed before being submitted.
 <p>
 
-<b>user.isModerator</b><br>
+<b>user.isModerator</b><br />
 A conditional indicating if the current user is a moderator.
 <p>
 
-<b>user.isVisitor</b><br>
+<b>user.isVisitor</b><br />
 A conditional indicating if the current user is a visitor.
 <p>
 
-<b>visitorName.form</b><br>
+<b>visitorName.form</b><br />
 A form where the user can enter their name, even if they are a visitor.
 <p>
 
-<b>userDefined<i>N</i>.{form,form.yesNo,form.textarea,form.htmlarea,form.float}</b><br>
+<b>userDefined<i>N</i>.{form,form.yesNo,form.textarea,form.htmlarea,form.float}</b><br />
 For each of the 5 User Defined fields, which can be form widgets for a single line of text, a yes/no
 field, a text area, a WYSIWIG HTML area, or a float.
 <p>
 
-<b>title.form</b><br>
+<b>title.form</b><br />
 A 1-line text form field to enter or edit the title, stripped of all HTML and macros disabled.
 Use this <b>OR</b> title.form.textarea.
 <p>
 
-<b>title.form.textarea</b><br>
+<b>title.form.textarea</b><br />
 A text area field to enter or edit the title, stripped of all HTML and macros disabled.
 Use this <b>OR</b> title.form.
 <p>
 
-<b>synopsis.form</b><br>
+<b>synopsis.form</b><br />
 A form field to enter or edit the synopsis.
 <p>
 
-<b>content.form</b><br>
+<b>content.form</b><br />
 A field to enter or edit the content, with all macros disabled.  If the discussion
 board allows rich content, then this will be a WYSIWIG HTML area.  Otherwise it
 will be a plain text area.
 <p>
 
-<b>form.submit</b><br>
+<b>form.submit</b><br />
 A button to submit the post.
 <p>
 
-<b>karmaScale.form</b><br>
+<b>karmaScale.form</b><br />
 A form element that allows moderators to set the scale of an individual thread. This is only available for threads.
 <p>
 
-<b>karmaIsEnabled</b><br>
+<b>karmaIsEnabled</b><br />
 A conditional that is true if karma has been enabled in the WebGUI settings in the Admin Console for this site.
 <p>
 
-<b>form.preview</b><br>
+<b>form.preview</b><br />
 A button to preview the post.
 <p>
 
-<b>attachment.form</b><br>
+<b>attachment.form</b><br />
 Code to allow an attachment to be added to the post.
 <p>
 
-<b>contentType.form</b><br>
+<b>contentType.form</b><br />
 A form field that will describe how the content of the post is formatted, HTML, text, code or mixed.
 Defaults to mixed.
 <p>
 
 |,
-		lastUpdated => 1146505217,
+		lastUpdated => 1146505625,
 	},
 
 	'post template variables title' => {
@@ -447,17 +447,17 @@ back the data with a simple &lt;tmpl_var userDefined1&gt;.
 All variables from the Post Template Variables.
 <p>
 
-<b>url</b><br>
+<b>url</b><br />
 The URL to the post that triggered the notification.
 <p>
 
-<b>notification.subscription.message</b><br>
+<b>notification.subscription.message</b><br />
 Internationalized message that a new message has been posted to a thread that the
 user subscribed to.
 <p>
 
 |,
-		lastUpdated => 1111465141,
+		lastUpdated => 1146505593,
 	},
 
         '875' => {

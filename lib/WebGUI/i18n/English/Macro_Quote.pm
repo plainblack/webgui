@@ -14,13 +14,11 @@ our $I18N = {
 
 	'quote body' => {
 		message => q|
-
-<b>&#94;Quote();</b><br>
+<p><b>&#94;Quote();</b><br />
 Use this to escape a string before using it in a database query.
-<p>
-
+</p>
 |,
-		lastUpdated => 1112466919,
+		lastUpdated => 1146609178,
 	},
 };
 

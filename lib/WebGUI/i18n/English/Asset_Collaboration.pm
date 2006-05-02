@@ -689,255 +689,255 @@ our $I18N = {
 		message => q|These labels are available in the templates of several Assets and Wobjects, but all of them may not be useful.   Please consult the template documentation for the Asset or Wobject to see which are used.
 <p>
 
-<b>add.label</b><br>
+<b>add.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("add","Asset_Collaboration");".
 <p>
 
-<b>addlink.label</b><br>
+<b>addlink.label</b><br />
 ^International("phrase","Asset_Collaboration"); "^International("addlink","Asset_Collaboration");".
 <p>
 
-<b>addquestion.label</b><br>
+<b>addquestion.label</b><br />
 ^International("phrase","Asset_Collaboration"); "^International("addquestion","Asset_Collaboration");".
 <p>
 
-<b>answer.label</b><br>
+<b>answer.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("answer","Asset_Collaboration");".
 <p>
 
-<b>attachment.label</b><br>
+<b>attachment.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("attachment","Asset_Collaboration");".
 <p>
 
-<b>by.label</b><br>
+<b>by.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("by","Asset_Collaboration");".
 <p>
 
-<b>body.label</b><br>
+<b>body.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("body","Asset_Collaboration");".
 <p>
 
-<b>back.label</b><br>
+<b>back.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("back","Asset_Collaboration");".
 <p>
 
-<b>compensation.label</b><br>
+<b>compensation.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("compensation","Asset_Collaboration");".
 <p>
 
-<b>open.label</b><br>
+<b>open.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("open","Asset_Collaboration");".
 <p>
 
-<b>close.label</b><br>
+<b>close.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("close","Asset_Collaboration");".
 <p>
 
-<b>closed.label</b><br>
+<b>closed.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("closed","Asset_Collaboration");".
 <p>
 
-<b>critical.label</b><br>
+<b>critical.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("critical","Asset_Collaboration");".
 <p>
 
-<b>minor.label</b><br>
+<b>minor.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("minor","Asset_Collaboration");".
 <p>
 
-<b>cosmetic.label</b><br>
+<b>cosmetic.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("cosmetic","Asset_Collaboration");".
 <p>
 
-<b>fatal.label</b><br>
+<b>fatal.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("fatal","Asset_Collaboration");".
 <p>
 
-<b>severity.label</b><br>
+<b>severity.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("severity","Asset_Collaboration");".
 <p>
 
-<b>date.label</b><br>
+<b>date.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("date","Asset_Collaboration");".
 <p>
 
-<b>delete.label</b><br>
+<b>delete.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("delete","Asset_Collaboration");".
 <p>
 
-<b>description.label</b><br>
+<b>description.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("description","Asset_Collaboration");".
 <p>
 
-<b>edit.label</b><br>
+<b>edit.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("edit","Asset_Collaboration");".
 <p>
 
-<b>image.label</b><br>
+<b>image.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("image","Asset_Collaboration");".
 <p>
 
-<b>job.header.label</b><br>
+<b>job.header.label</b><br />
 ^International("phrase","Asset_Collaboration"); "^International("edit job","Asset_Collaboration");".
 <p>
 
-<b>job.title.label</b><br>
+<b>job.title.label</b><br />
 ^International("phrase","Asset_Collaboration"); "^International("job title","Asset_Collaboration");".
 <p>
 
-<b>job.description.label</b><br>
+<b>job.description.label</b><br />
 ^International("phrase","Asset_Collaboration"); "^International("job description","Asset_Collaboration");".
 <p>
 
-<b>job.requirements.label</b><br>
+<b>job.requirements.label</b><br />
 ^International("phrase","Asset_Collaboration"); "^International("job requirements","Asset_Collaboration");".
 <p>
 
-<b>location.label</b><br>
+<b>location.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("location","Asset_Collaboration");".
 <p>
 
-<b>layout.flat.label</b><br>
+<b>layout.flat.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("flatLayout","Asset_Collaboration");".
 <p>
 
-<b>link.header.label</b><br>
+<b>link.header.label</b><br />
 ^International("phrase","Asset_Collaboration"); "^International("edit link","Asset_Collaboration");".
 <p>
 
-<b>lastReply.label</b><br>
+<b>lastReply.label</b><br />
 ^International("phrase","Asset_Collaboration"); "^International("lastReply","Asset_Collaboration");".
 <p>
 
-<b>lock.label</b><br>
+<b>lock.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("lock","Asset_Collaboration");".
 <p>
 
-<b>layout.label</b><br>
+<b>layout.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("layout","Asset_Collaboration");".
 <p>
 
-<b>message.header.label</b><br>
+<b>message.header.label</b><br />
 ^International("phrase","Asset_Collaboration"); "^International("edit message","Asset_Collaboration");".
 <p>
 
-<b>message.label</b><br>
+<b>message.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("message","Asset_Collaboration");".
 <p>
 
-<b>next.label</b><br>
+<b>next.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("next","Asset_Collaboration");".
 <p>
 
-<b>newWindow.label</b><br>
+<b>newWindow.label</b><br />
 ^International("phrase","Asset_Collaboration"); "^International("new window","Asset_Collaboration");".
 <p>
 
-<b>layout.nested.label</b><br>
+<b>layout.nested.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("nested","Asset_Collaboration");".
 <p>
 
-<b>previous.label</b><br>
+<b>previous.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("previous","Asset_Collaboration");".
 <p>
 
-<b>post.label</b><br>
+<b>post.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("post","Asset_Collaboration");".
 <p>
 
-<b>question.label</b><br>
+<b>question.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("question","Asset_Collaboration");".
 <p>
 
-<b>question.header.label</b><br>
+<b>question.header.label</b><br />
 ^International("phrase","Asset_Collaboration"); "^International("edit question","Asset_Collaboration");".
 <p>
 
-<b>rating.label</b><br>
+<b>rating.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("rating","Asset_Collaboration");".
 <p>
 
-<b>rate.label</b><br>
+<b>rate.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("rate","Asset_Collaboration");".
 <p>
 
-<b>reply.label</b><br>
+<b>reply.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("reply","Asset_Collaboration");".
 <p>
 
-<b>replies.label</b><br>
+<b>replies.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("replies","Asset_Collaboration");".
 <p>
 
-<b>readmore.label</b><br>
+<b>readmore.label</b><br />
 ^International("phrase","Asset_Collaboration"); "^International("read more","Asset_Collaboration");".
 <p>
 
-<b>responses.label</b><br>
+<b>responses.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("responses","Asset_Collaboration");".
 <p>
 
-<b>search.label</b><br>
+<b>search.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("search","Asset_Collaboration");".
 <p>
 
-<b>subject.label</b><br>
+<b>subject.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("subject","Asset_Collaboration");".
 <p>
 
-<b>subscribe.label</b><br>
+<b>subscribe.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("subscribe","Asset_Collaboration");".
 <p>
 
-<b>submission.header.label</b><br>
+<b>submission.header.label</b><br />
 ^International("phrase","Asset_Collaboration"); "^International("edit submission","Asset_Collaboration");".
 <p>
 
-<b>stick.label</b><br>
+<b>stick.label</b><br />
 ^International("phrase","Asset_Collaboration"); "^International("sticky","Asset_Collaboration");".
 <p>
 
-<b>status.label</b><br>
+<b>status.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("status","Asset_Collaboration");".
 <p>
 
-<b>synopsis.label</b><br>
+<b>synopsis.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("synopsis","Asset_Collaboration");".
 <p>
 
-<b>thumbnail.label</b><br>
+<b>thumbnail.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("thumbnail","Asset_Collaboration");".
 <p>
 
-<b>title.label</b><br>
+<b>title.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("title","Asset_Collaboration");".
 <p>
 
-<b>unlock.label</b><br>
+<b>unlock.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("unlock","Asset_Collaboration");".
 <p>
 
-<b>unstick.label</b><br>
+<b>unstick.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("unstick","Asset_Collaboration");".
 <p>
 
-<b>unsubscribe.label</b><br>
+<b>unsubscribe.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("unsubscribe","Asset_Collaboration");".
 <p>
 
-<b>url.label</b><br>
+<b>url.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("url","Asset_Collaboration");".
 <p>
 
-<b>user.label</b><br>
+<b>user.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("user","Asset_Collaboration");".
 <p>
 
-<b>views.label</b><br>
+<b>views.label</b><br />
 ^International("word","Asset_Collaboration"); "^International("views","Asset_Collaboration");".
 <p>
 
-<b>visitorName.label</b><br>
+<b>visitorName.label</b><br />
 ^International("phrase","Asset_Collaboration"); "^International("visitor","Asset_Collaboration");".
 <p>
 
@@ -1111,148 +1111,148 @@ the preview is displayed, the Post can either be edited or canceled.|,
 used by Collaboration Assets:<p>
 
 <p>
-<b>post_loop</b><br>
+<b>post_loop</b><br />
 A list of posts for this Collateral Asset.
 
 <blockquote>
 
 <p>
-<b>Asset variables</b><br>
+<b>Asset variables</b><br />
 The variables common to all Assets, such as <b>title</b>, <b>menuTitle</b>, etc.
 
 <p>
-<b>Post variables</b><br>
+<b>Post variables</b><br />
 All template variables from the Post template.  Some of those variables will be duplicates
 of the ones below.
 
 <p>
-<b>id</b><br>
+<b>id</b><br />
 The AssetId of this Post.
 
 <p>
-<b>url</b><br>
+<b>url</b><br />
 The URL of this Post.
 
 <p>
-<b>rating_loop</b><br>
+<b>rating_loop</b><br />
 A loop that runs once for each point of <b>rating</b> that the Post has
 
 <blockquote>
 
 <p>
-<b>rating_loop.count</b><br>
+<b>rating_loop.count</b><br />
 The index variable for the <b>rating_loop</b>.
 
 </blockquote>
 
 <p>
-<b>content</b><br>
+<b>content</b><br />
 The formatted content of this Post.
 
 <p>
-<b>status</b><br>
+<b>status</b><br />
 The status of this Post.
 
 <p>
-<b>thumbnail</b><br>
+<b>thumbnail</b><br />
 If this Post has attachments, the URL for the thumbnail of the first image attachment.
 
 <p>
-<b>image.url</b><br>
+<b>image.url</b><br />
 If this Post has attachments, the URL for the first image attachment.
 
 <p>
-<b>dateSubmitted.human</b><br>
+<b>dateSubmitted.human</b><br />
 The date this Post was submitted, in a human readable format.
 
 <p>
-<b>dateUpdated.human</b><br>
+<b>dateUpdated.human</b><br />
 The date this Post was last updated, in a human readable format.
 
 <p>
-<b>timeSubmitted.human</b><br>
+<b>timeSubmitted.human</b><br />
 The time this Post was submitted, in a human readable format.
 
 <p>
-<b>timeUpdated.human</b><br>
+<b>timeUpdated.human</b><br />
 The time this Post was last updated, in a human readable format.
 
 <p>
-<b>userProfile.url</b><br>
+<b>userProfile.url</b><br />
 The URL to the Profile of the User who submitted this Post.
 
 <p>
-<b>user.isVisitor</b><br>
+<b>user.isVisitor</b><br />
 A conditional that is true if the poster is a visitor.
 
 <p>
-<b>edit.url</b><br>
+<b>edit.url</b><br />
 The URL to edit this Post.
 
 <p>
-<b>controls</b><br>
+<b>controls</b><br />
 A set of editing icons to delete or re-order this Post.
 
 <p>
-<b>isSecond</b><br>
+<b>isSecond</b><br />
 A conditional indicating that is true if this Post is the second in this Collaboration Asset.
 
 <p>
-<b>isThird</b><br>
+<b>isThird</b><br />
 A conditional indicating that is true if this Post is the third in this Collaboration Asset.
 
 <p>
-<b>isFourth</b><br>
+<b>isFourth</b><br />
 A conditional indicating that is true if this Post is the fourth in this Collaboration Asset.
 
 <p>
-<b>isFifth</b><br>
+<b>isFifth</b><br />
 A conditional indicating that is true if this Post is the fifth in this Collaboration Asset.
 
 <p>
-<b>user.isPoster</b><br>
+<b>user.isPoster</b><br />
 A conditional indicating that is true if the current user submitted this Post.
 
 <p>
-<b>user.hasRead</b><br>
+<b>user.hasRead</b><br />
 A conditional indicating whether a user has read this thread.
 
 <p>
-<b>avatar.url</b><br>
+<b>avatar.url</b><br />
 A URL to the avatar for the owner of the Post, if avatars are enabled and the
 user has an avatar.
 
 <p>
-<b>lastReply.*</b><br>
+<b>lastReply.*</b><br />
 These variables are only defined if the <b>Display last reply</b> property is set to true
 in the Collaboration Asset.
 
 <p>
-<b>lastReply.url</b><br>
+<b>lastReply.url</b><br />
 The URL to the last reply to this Post.
 
 <p>
-<b>lastReply.title</b><br>
+<b>lastReply.title</b><br />
 The title of the last reply.
 
 <p>
-<b>lastReply.user.isVisitor</b><br>
+<b>lastReply.user.isVisitor</b><br />
 A conditional that is true if the poster of the last reply is a visitor.
 
 <p>
-<b>lastReply.username</b><br>
+<b>lastReply.username</b><br />
 The name of user who submitted the last reply.
 
 <p>
-<b>lastReply.userProfile.url</b><br>
+<b>lastReply.userProfile.url</b><br />
 The URL to the Profile of the User who submitted this Post.
 
 <p>
-<b>lastReply.dateSubmitted.human</b><br>
+<b>lastReply.dateSubmitted.human</b><br />
 The date the last reply was submitted, in a human readable format.
 
 <p>
-<b>lastReply.timeSubmitted.human</b><br>
+<b>lastReply.timeSubmitted.human</b><br />
 The time the last reply was submitted, in a human readable format.
 
 </blockquote>
@@ -1270,76 +1270,76 @@ The time the last reply was submitted, in a human readable format.
 		message => q|These variables are available in the Collaboration Template:<p>
 
 <p>
-<b>user.canPost</b><br>
+<b>user.canPost</b><br />
 A conditional that is true if the current user can add posts to this Collaboration Asset.
 
 <p>
-<b>user.isModerator</b><br>
+<b>user.isModerator</b><br />
 A conditional that is true if the current user is a moderator for this Asset.
 
 <p>
-<b>user.isVisitor</b><br>
+<b>user.isVisitor</b><br />
 A conditional that is true if the current user is a Visitor.
 
 <p>
-<b>user.isSubscribed</b><br>
+<b>user.isSubscribed</b><br />
 A conditional that is true if the current user is subscribed to this Collaboration Asset.
 
 <p>
-<b>add.url</b><br>
+<b>add.url</b><br />
 A URL for adding a new thread.
 
 <p>
-<b>rss.url</b><br>
+<b>rss.url</b><br />
 A URL for downloading the RSS summary of this Asset.
 
 <p>
-<b>search.url</b><br>
+<b>search.url</b><br />
 A URL for accessing the search form for this Collaboration Asset.
 
 <p>
-<b>subscribe.url</b><br>
+<b>subscribe.url</b><br />
 A URL for subscribing the current user to this Collaboration Asset.  When new content is submitted to
 the Collaboration Asset, the user will be notified.
 
 <p>
-<b>unsubscribe.url</b><br>
+<b>unsubscribe.url</b><br />
 A URL for unsubscribing the current user from this Asset.
 
 <p>
-<b>karmaIsEnabled</b><br>
+<b>karmaIsEnabled</b><br />
 A boolean indicating whether the use of karma is enabled or not.
 
 <p>
-<b>sortby.karmaRank.url</b><br>
+<b>sortby.karmaRank.url</b><br />
 A URL for sorting and displaying the list of posts by the amount of karma users have transfered to the thread.
 
 <p>
-<b>sortby.title.url</b><br>
+<b>sortby.title.url</b><br />
 A URL for sorting and displaying the list of posts by title.
 
 <p>
-<b>sortby.username.url</b><br>
+<b>sortby.username.url</b><br />
 A URL for sorting and displaying the list of posts by username.
 
 <p>
-<b>sortby.date.url</b><br>
+<b>sortby.date.url</b><br />
 A URL for sorting and displaying the list of posts by the date they were submitted.
 
 <p>
-<b>sortby.lastreply.url</b><br>
+<b>sortby.lastreply.url</b><br />
 A URL for sorting and displaying the list of posts by the date they were last updated.
 
 <p>
-<b>sortby.views.url</b><br>
+<b>sortby.views.url</b><br />
 A URL for sorting and displaying the list of posts by the number of times each has been read.
 
 <p>
-<b>sortby.replies.url</b><br>
+<b>sortby.replies.url</b><br />
 A URL for sorting and displaying the list of posts by the number of replies to the post.
 
 <p>
-<b>sortby.rating.url</b><br>
+<b>sortby.rating.url</b><br />
 A URL for sorting and displaying the list of posts by their ratings.
 
                 |,
@@ -1355,52 +1355,52 @@ A URL for sorting and displaying the list of posts by their ratings.
 		message => q|These variables are available in the Collaboration Search Template:<p>
 
 <p>
-<b>form.header</b><br>
+<b>form.header</b><br />
 HTML and javascript required to make the form work.
 
 
 <p>
-<b>query.form</b><br>
+<b>query.form</b><br />
 HTML form for adding a field where all input has to be in matched pages.
 
 <p>
-<b>form.search</b><br>
+<b>form.search</b><br />
 A button to add to the form to begin searching.
 
 <p>
-<b>back.url</b><br>
+<b>back.url</b><br />
 A URL for returning to the main view for this Collaboration Asset.
 
 <p>
-<b>unsubscribe.url</b><br>
+<b>unsubscribe.url</b><br />
 A URL for unsubscribing the current user from this Asset.
 
 <p>
-<b>sortby.title.url</b><br>
+<b>sortby.title.url</b><br />
 A URL for sorting and displaying the list of posts by title.
 
 <p>
-<b>sortby.username.url</b><br>
+<b>sortby.username.url</b><br />
 A URL for sorting and displaying the list of posts by username.
 
 <p>
-<b>sortby.date.url</b><br>
+<b>sortby.date.url</b><br />
 A URL for sorting and displaying the list of posts by the date they were submitted.
 
 <p>
-<b>sortby.lastreply.url</b><br>
+<b>sortby.lastreply.url</b><br />
 A URL for sorting and displaying the list of posts by the date they were last updated.
 
 <p>
-<b>sortby.views.url</b><br>
+<b>sortby.views.url</b><br />
 A URL for sorting and displaying the list of posts by the number of times each has been read.
 
 <p>
-<b>sortby.replies.url</b><br>
+<b>sortby.replies.url</b><br />
 A URL for sorting and displaying the list of posts by the number of replies to the post.
 
 <p>
-<b>sortby.rating.url</b><br>
+<b>sortby.rating.url</b><br />
 A URL for sorting and displaying the list of posts by their ratings.
 
                 |,
@@ -1426,63 +1426,63 @@ A URL for sorting and displaying the list of posts by their ratings.
 		message => q|The Collaboration RSS template is available to allow configuration of the XML produced as an RSS feed for a collaboration.  To produce a valid rss feed, this template must adhere to the <a href="http://blogs.law.harvard.edu/tech/rss">RSS 2.0 Specification.</a>  These variables are available in the Collaboration RSS Template:<p>
 
 <p>
-<b>title</b><br>
+<b>title</b><br />
 The title of the rss feed (comes from the collaboration title).
 
 <p>
-<b>link</b><br>
+<b>link</b><br />
 The url to the collaboration.
 
 <p>
-<b>description</b><br>
+<b>description</b><br />
 The description of the rss feed (comes from the collaboration description).
 
 <p>
-<b>generator</b><br>
+<b>generator</b><br />
 The program used to generate the rss feed, i.e. WebGUI plus version information. (optional field)
 <p>
-<b>webMaster</b><br>
+<b>webMaster</b><br />
 The email address of the person responsible for the technical issues relating to this rss feed. (optional field)
 <p>
-<b>docs</b><br>
+<b>docs</b><br />
 The url of documentation about the format of this file, RSS 2.0 (optional field)
 <p>
-<b>lastBuildDate</b><br>
+<b>lastBuildDate</b><br />
 The date that this feed was last updated. (optional field)
 
 <p>
-<b>item_loop</b><br>
+<b>item_loop</b><br />
 Loops over the posts to be transmitted in this RSS feed.
 <blockquote>
-<b>author</b><br>
+<b>author</b><br />
 The username of the person who submitted the post.
 <p>
-<b>title</b><br>
+<b>title</b><br />
 The title of the item (post).
 <p>
-<b>link</b><br>
+<b>link</b><br />
 The url to the full text of the item.
 <p>
-<b>description</b><br>
+<b>description</b><br />
 A synopsis of the item.
 <p>
-<b>guid</b><br>
+<b>guid</b><br />
 A unique identifier for this item.
 <p>
-<b>pubDate</b><br>
+<b>pubDate</b><br />
 The date the item was published.
 <p>
-<b>attachmentLoop</b><br>
+<b>attachmentLoop</b><br />
 A loop containg all attachements to this item (post).
 <blockquote>
 <p>
-<b>attachment.url</b><br>
+<b>attachment.url</b><br />
 The URL to this attachment.
 <p>
-<b>attachment.path</b><br>
+<b>attachment.path</b><br />
 The path in the filesystem to this attachment.
 <p>
-<b>attachment.length</b><br>
+<b>attachment.length</b><br />
 The length in this attachment, in bytes.
 </blockquote>
 </blockquote>

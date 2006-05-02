@@ -291,247 +291,247 @@ The ID of the current entry being viewed.  This variable is undefined
 unless the user can edit the Data Form (<b>canEdit</b> it true).
 <p>
 
-<b>form.start</b> !<br>
+<b>form.start</b> !<br />
 The beginning of the form.
 <p>
 
-<b>entryList.url</b><br>
+<b>entryList.url</b><br />
 Following this URL will display a list of all the record entries in this data form.
 <p>
 
-<b>entryList.label</b><br>
+<b>entryList.label</b><br />
 The default label for the entryList.url variable.
 <p>
 
-<b>export.tab.url</b><br>
+<b>export.tab.url</b><br />
 Following this URL will export the data stored to this data form as a tab delimited file.
 <p>
 
-<b>export.tab.label</b><br>
+<b>export.tab.label</b><br />
 The default label for the export.tab.url variable.
 <p>
 
-<b>back.url</b><br>
+<b>back.url</b><br />
 A url that will take you back to the default page in the form.
 <p>
 
-<b>back.label</b><br>
+<b>back.label</b><br />
 The default label for the back.url variable.
 <p>
 
-<b>addField.url</b><br>
+<b>addField.url</b><br />
 The URL that content managers will visit to add a new field to the form.
 <p>
 
-<b>addField.label</b><br>
+<b>addField.label</b><br />
 The default label for the addField.url variable.
 <p>
 
-<b>addTab.url</b><br>
+<b>addTab.url</b><br />
 The URL that content managers will visit to add a new tab to the form.
 <p>
 
-<b>addTab.label</b><br>
+<b>addTab.label</b><br />
 The default label for the addTab.url variable.
 <p>
 
-<b>tab.init</b>!<br>
+<b>tab.init</b>!<br />
 Code to enable tabs to work correctly.
 <p>
 
-<b>username</b> *<br>
+<b>username</b> *<br />
 The username of the user that submitted the data.
 <p>
 
-<b>userId</b> *<br>
+<b>userId</b> *<br />
 The user id of the user that submitted the data.
 <p>
 
-<b>date</b> *<br>
+<b>date</b> *<br />
 The date that this data was submitted or last updated formatted as the user's preferred date/time format.
 <p>
 
-<b>epoch</b> *<br>
+<b>epoch</b> *<br />
 The date that this data was submitted or last updated formatted as an epoch date.
 <p>
 
-<b>ipAddress</b> *<br>
+<b>ipAddress</b> *<br />
 The IP address of the user that submitted the data.
 <p>
 
-<b>edit.url</b> *<br>
+<b>edit.url</b> *<br />
 The URL to the page to edit this entry.
 <p>
 
-<b>error_loop</b> *<br>
+<b>error_loop</b> *<br />
 A loop containing error information, for instance if someone doesn't fill out a required field.
 <p>
 
 <blockquote>
 
-<b>error.message</b> *<br>
+<b>error.message</b> *<br />
 An error message indicating what the user might have done wrong.
 
 </blockquote>
 
-<b>tab_loop</b><br>
+<b>tab_loop</b><br />
 A loop containing information about tabs that may have been defined for this Data Form.
 <p>
 
 <blockquote>
 
-<b>tab.start</b> !<br>
+<b>tab.start</b> !<br />
 Code to start the tab.
 <p>
 
-<b>tab.sequence</b><br>
+<b>tab.sequence</b><br />
 A number indicating which tab this is (first, second, etc.).
 <p>
 
-<b>tab.label</b><br>
+<b>tab.label</b><br />
 The label for this tab.
 <p>
 
-<b>tab.tid</b><br>
+<b>tab.tid</b><br />
 This tab's ID.
 <p>
 
-<b>tab.subtext</b><br>
+<b>tab.subtext</b><br />
 A description of this tab that can explain more the tab contents than the label.
 <p>
 
-<b>tab.controls</b> !<br>
+<b>tab.controls</b> !<br />
 Editing icons for this tab.
 <p>
 
-<b>tab.field_loop</b> !<br>
+<b>tab.field_loop</b> !<br />
 A loop containing all the fields for this tab.  See the <b>field_loop</b> description
 below to see which template variables may be used inside this loop.
 <p>
 
 <blockquote>
 
-<b>tab.field.form</b> !<br>
+<b>tab.field.form</b> !<br />
 The form element for this field.
 <p>
 
-<b>tab.field.name</b><br>
+<b>tab.field.name</b><br />
 The name of this field.
 <p>
 
-<b>tab.field.tid</b><br>
+<b>tab.field.tid</b><br />
 The ID of the Tab that this field is in.
 <p>
 
-<b>tab.field.value</b><br>
+<b>tab.field.value</b><br />
 The value of this field. If this is new data, then the default value will be used.
 <p>
 
-<b>tab.field.label</b><br>
+<b>tab.field.label</b><br />
 The text label for this field.
 <p>
 
-<b>tab.field.isHidden</b><br>
+<b>tab.field.isHidden</b><br />
 A conditional indicating whether this field is supposed to be hidden. 
 <p>
 
-<b>tab.field.isDisplayed</b><br>
+<b>tab.field.isDisplayed</b><br />
 A conditional indicating whether this field is supposed to be displayed. 
 <p>
 
-<b>tab.field.isRequired</b><br>
+<b>tab.field.isRequired</b><br />
 A conditional indicating whether this field is required. 
 <p>
 
-<b>tab.field.isMailField</b><br>
+<b>tab.field.isMailField</b><br />
 A conditional indicating whether this field is present only to facilitate sending an email. 
 <p>
 
-<b>tab.field.subtext</b><br>
+<b>tab.field.subtext</b><br />
 A description of the field so that users know what to put in the field.
 <p>
 
-<b>tab.field.controls</b><br>
+<b>tab.field.controls</b><br />
 WebGUI's administrative controls for editing this field.
 <p>
 
 </blockquote>
 
-<b>tab.end</b> !<br>
+<b>tab.end</b> !<br />
 Code to end the tab.
 <p>
 
 </blockquote>
 
-<b>field_loop</b><br>
+<b>field_loop</b><br />
 A loop containing all of the field information.
 <p>
 
 <blockquote>
 
-<b>field.form</b> !<br>
+<b>field.form</b> !<br />
 The form element for this field.
 <p>
 
-<b>field.name</b><br>
+<b>field.name</b><br />
 The name of this field.
 <p>
 
-<b>field.tid</b><br>
+<b>field.tid</b><br />
 The ID of the Tab that this field is in.
 <p>
 
-<b>field.inTab</b><br>
+<b>field.inTab</b><br />
 A conditional indicating if the field is inside of a tab.
 <p>
 
-<b>field.value</b><br>
+<b>field.value</b><br />
 The value of this field. If this is new data, then the default value will be used.
 <p>
 
-<b>field.label</b><br>
+<b>field.label</b><br />
 The text label for this field.
 <p>
 
-<b>field.isHidden</b><br>
+<b>field.isHidden</b><br />
 A conditional indicating whether this field is supposed to be hidden. 
 <p>
 
-<b>field.isDisplayed</b><br>
+<b>field.isDisplayed</b><br />
 A conditional indicating whether this field is supposed to be displayed. 
 <p>
 
-<b>field.isRequired</b><br>
+<b>field.isRequired</b><br />
 A conditional indicating whether this field is required. 
 <p>
 
-<b>field.isMailField</b><br>
+<b>field.isMailField</b><br />
 A conditional indicating whether this field is present only to facilitate sending an email. 
 <p>
 
-<b>field.subtext</b><br>
+<b>field.subtext</b><br />
 A description of the field so that users know what to put in the field.
 <p>
 
-<b>field.controls</b><br>
+<b>field.controls</b><br />
 WebGUI's administrative controls for editing this field.
 <p>
 
 </blockquote>
 
-<b>field.noloop.<i>fieldName</i>.<i>property</i></b><br>
+<b>field.noloop.<i>fieldName</i>.<i>property</i></b><br />
 From outside the <b>field_loop</b> it's also possible to access all form fields directly. To accomplish this you should use these variables. Call them with <b>field.noloop.<i>fieldName</i>.<i>property</i></b>, where fieldName is the name of the field (not the label) and property is anyone of the properties supplied by the <b>field_loop</b>. If you want the form tag of field 'name' you should use <b>field.noloop.name.form</b> anywhere in your template. If you want to know if the field is required use <b>field.noloop.name.isRequired</b>.
 <p>
 
-<b>form.send</b> !<br>
+<b>form.send</b> !<br />
 A form button with the internationalized word "send" printed on it.
 <p>
 
-<b>form.save</b> !<br>
+<b>form.save</b> !<br />
 A form button to submit the form data.
 <p>
 
-<b>form.end</b> !<br>
+<b>form.end</b> !<br />
 The end of the form.
 <p>
 
@@ -578,106 +578,106 @@ The end of the form.
 		message => q|The following variables are available to the Data Form List template:
 <p>
 
-<b>back.url</b><br>
+<b>back.url</b><br />
 The URL to go back to the Data Form data entry page.
 <p>
 
-<b>back.label</b><br>
+<b>back.label</b><br />
 The default label for the back.url.
 <p>
 
-<b>field_loop</b><br>
+<b>field_loop</b><br />
 A loop containing information about the fields in this Data Form.
 <p
 <blockquote>
 
-<b>field.name</b><br>
+<b>field.name</b><br />
 The web safe name of this field.
 <p>
 
-<b>field.label</b><br>
+<b>field.label</b><br />
 The human readable label for this field.
 <p>
 
-<b>field.id</b><br>
+<b>field.id</b><br />
 A unique identifier representing this field in the database.
 <p>
 
-<b>field.isMailField</b><br>
+<b>field.isMailField</b><br />
 A conditional indicating whether this field exists for the mail subsystem of the data form.
 <p>
 
-<b>field.type</b><br>
+<b>field.type</b><br />
 The data type associated with this field.
 <p>
 
 </blockquote>
 
-<b>record_loop</b><br>
+<b>record_loop</b><br />
 A loop containing the record entries of this data form.
 <p>
 
 <blockquote>
 
-<b>record.entryId</b><br>
+<b>record.entryId</b><br />
 A unique identifier for this record entry.
 <p>
 
-<b>record.ipAddress</b><br>
+<b>record.ipAddress</b><br />
 The IP Address of the user that submitted this record entry.
 <p>
 
-<b>record.edit.url</b><br>
+<b>record.edit.url</b><br />
 The URL to edit this record.
 <p>
 
-<b>record.edit.icon</b><br>
+<b>record.edit.icon</b><br />
 An icon and associated URL for editing this record.
 <p>
 
-<b>record.delete.url</b><br>
+<b>record.delete.url</b><br />
 The URL to delete this record.
 <p>
 
-<b>record.delete.icon</b><br>
+<b>record.delete.icon</b><br />
 An icon and associated URL for deleting this record.
 <p>
 
-<b>record.username</b><br>
+<b>record.username</b><br />
 The username of the person that submitted this record entry.
 <p>
 
-<b>record.userId</b><br>
+<b>record.userId</b><br />
 The user id of the person that submitted this record entry.
 <p>
 
-<b>record.submissionDate.epoch</b><br>
+<b>record.submissionDate.epoch</b><br />
 The epoch datestamp for this record entry.
 <p>
 
-<b>record.submissionDate.human</b><br>
+<b>record.submissionDate.human</b><br />
 A human readable date stamp, based upon the user's preferences, for this record entry.
 <p>
 
-<b>record.data_loop</b><br>
+<b>record.data_loop</b><br />
 A loop containing the data submitted by the user for each field in this data form.
 <p>
 
 <blockquote>
 
-<b>record.data.name</b><br>
+<b>record.data.name</b><br />
 The web safe name of this field.
 <p>
 
-<b>record.data.label</b><br>
+<b>record.data.label</b><br />
 The human readable label for this field.
 <p>
 
-<b>record.data.value</b><br>
+<b>record.data.value</b><br />
 The value submitted by the user for this field in this record entry.
 <p>
 
-<b>record.data.isMailField</b><br>
+<b>record.data.isMailField</b><br />
 A conditional indicating whether this field exists for the mail subsystem of the data form.
 <p>
 

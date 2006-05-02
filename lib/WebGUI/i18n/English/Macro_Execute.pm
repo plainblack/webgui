@@ -20,7 +20,7 @@ our $I18N = {
 	'execute body' => {
 		message => q|
 
-<b>&#94;Execute();</b><br>
+<b>&#94;Execute();</b><br />
 Allows a content manager or administrator to execute an external program. Takes the format of <b>&#94;Execute("/this/file.sh");</b>.
 <p>
 |,

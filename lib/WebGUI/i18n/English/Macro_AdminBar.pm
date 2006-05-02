@@ -10,15 +10,15 @@ our $I18N = {
 	'admin bar body' => {
 		message => q|
 
-<b>&#94;AdminBar;</b><br>
-<b>&#94;AdminBar(<i>custom template ID</i>);</b><br>
+<b>&#94;AdminBar;</b><br />
+<b>&#94;AdminBar(<i>custom template ID</i>);</b><br />
 Places the administrative tool bar on the page. Omitting this macro will prevent you from adding content, pasting
 content from the clipboard, accessing the help system and other administrative functions.
 <p>
 The macro may take one optional argument, an alternate template in the Macro/AdminBar namespace for generating the AdminBar.  The following variables are available in the template:
 
 <p/>
-<b>adminbar_loop</b><br/>
+<b>adminbar_loop</b><br />
 A loop containing the various lists of data to display.
 <blockquote>
 <b>label</b><br />

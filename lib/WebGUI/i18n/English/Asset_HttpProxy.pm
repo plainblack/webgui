@@ -33,22 +33,22 @@ our $I18N = {
 
 	'http proxy template body' => {
 		message => q|<p>The following variables are available in templates for HTTP Proxies:</p>
-<p><b>header</b><br>
+<p><b>header</b><br />
 The header from the proxied URL.
 
-<p><b>content</b><br>
+<p><b>content</b><br />
 The content from the proxied URL.  If the <b>Search for</b> or <b>Stop at</b> properties are used, then the content will not contain either of those.
 
-<p><b>search.for</b><br>
+<p><b>search.for</b><br />
 The string used to start the content search.
 
-<p><b>stop.at</b><br>
+<p><b>stop.at</b><br />
 The string used to stop the content search.
 
-<p><b>content.leading</b><br>
+<p><b>content.leading</b><br />
 Any text before the <b>Search For</b> string.
 
-<p><b>content.trailing</b><br>
+<p><b>content.trailing</b><br />
 Any text after the <b>Stop At</b> string.
 
 </p>

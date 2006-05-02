@@ -15,8 +15,8 @@ our $I18N = {
 	'date body' => {
 		message => q|
 
-<b>&#94;D();</b><br>
-<b>&#94;D([<i>date formatting code</i>],[<i>epoch date</i>]);</b><br>
+<b>&#94;D();</b><br />
+<b>&#94;D([<i>date formatting code</i>],[<i>epoch date</i>]);</b><br />
 The current date and time.
 <p>
 

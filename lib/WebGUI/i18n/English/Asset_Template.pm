@@ -59,7 +59,7 @@ our $I18N = {
 <p>There are two ways to edit templates, via the Display tab of the Asset Edit screen or via the Asset Manager.  In either case, you will need to be an Admin or a Template Admin.
 </p>
 
-<p><b>Display tab of the Asset Edit screen</b><br/>
+<p><b>Display tab of the Asset Edit screen</b><br />
 <ul>
 <li>Turn on Admin mode.</li>
 <li>Click on the Edit icon for an Asset.</li>
@@ -74,7 +74,7 @@ our $I18N = {
 </ul>
 </p>
 
-<p><b>Asset Manager</b><br/>
+<p><b>Asset Manager</b><br />
 <ul>
 <li>Turn on Admin mode.</li>
 <li>Click on the "Assets" icon in the Admin bar.</li>
@@ -84,7 +84,7 @@ our $I18N = {
 </ul>
 </p>
 
-<b>Template Name</b><br/>
+<b>Template Name</b><br />
 Give this template a descriptive name so that you'll know what it is when you're applying a template to content.
 <p/>
 <b>NOTE:</b> You should never edit the default templates that come with WebGUI as they are subject to change with each new release. Instead, copy the template you wish to edit, and edit the copy.

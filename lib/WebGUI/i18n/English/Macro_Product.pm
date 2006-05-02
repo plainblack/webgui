@@ -34,8 +34,7 @@ our $I18N = {
 	'product body' => {
 		message => q|
 
-<p>
-<b>&#94;Product(<i>SKU or productId</i>, [<i>templateId</i>]);</b><br>
+<p><b>&#94;Product(<i>SKU or productId</i>, [<i>templateId</i>]);</b><br />
 This macro looks up a Product in the Product Manager by SKU or productId and
 allows information about it to be displayed.  If the SKU or productId cannot
 be found, the message ^International("cannot find product","Macro_Product"); will
@@ -50,13 +49,13 @@ The internationalized text "^International("available product configurations","M
 A loop containing information about all variants about the Product.
 </p>
 
-<quote>
+<blockquote>
 
 <p><b>variant.compositionLoop</b><br />
 A loop containing information about all variants about the Product.
 </p>
 
-<quote>
+<blockquote>
 
 <p><b>parameter</b><br />
 The parameter that defines this variant, for example, size.
@@ -66,7 +65,7 @@ The parameter that defines this variant, for example, size.
 The value of the parameter, for the example of size, XL.
 </p>
 
-</quote>
+</blockquote>
 
 <p><b>variant.variantId</b><br />
 The Id for this variant of the Product.
@@ -94,7 +93,7 @@ to display to the user for adding this variant
 of the Product to their shopping cart.
 </p>
 
-</quote>
+</blockquote>
 
 <p><b>productId</b><br />
 The unique identifier of this Product.</p>
@@ -119,7 +118,7 @@ The Product's base SKU.
 </p>
 
 |,
-		lastUpdated => 1128986411,
+		lastUpdated => 1146609252,
 	},
 
 };

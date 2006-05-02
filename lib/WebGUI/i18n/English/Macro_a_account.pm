@@ -10,8 +10,8 @@ our $I18N = {
 	'account body' => {
 		message => q|
 
-<b>&#94;a();</b><br>
-<b>&#94;a([<i>link text</i>], [<i>template name</i>]);</b><br>
+<b>&#94;a();</b><br />
+<b>&#94;a([<i>link text</i>], [<i>template name</i>]);</b><br />
 This macro creates a link to the current user's account information. The
 Macro takes two optional arguments, the text that is displayed with the
 link and a template from the Macro/a_account namespace to be used to
@@ -20,11 +20,11 @@ display the link and text.  If the <i>link text</i> is set to the word
 
 The following is a list of variables available in the template:
 <p/>
-<b>account.url</b><br/>
+<b>account.url</b><br />
 The URL to the account page.
 
 <p/>
-<b>account.text</b><br/>
+<b>account.text</b><br />
 The translated label for the account link, or the text that you supply to the macro.
 <p/>
 

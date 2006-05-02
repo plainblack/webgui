@@ -15,12 +15,12 @@ our $I18N = {
 	'company url body' => {
 		message => q|
 
-<b>&#94;u; - Company URL</b><br>
+<p><b>&#94;u; - Company URL</b><br />
 The URL for your company specified in the settings by your Administrator.
-<p>
+</p>
 
 |,
-		lastUpdated => 1112466919,
+		lastUpdated => 1146607213,
 	},
 };
 

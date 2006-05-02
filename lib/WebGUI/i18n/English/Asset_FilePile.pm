@@ -78,7 +78,7 @@ have the following properties:
                  },
 
         '886 description' => {
-                message => q|Whether or not this asset will be hidden from the navigation menu and site maps.<br>
+                message => q|Whether or not this asset will be hidden from the navigation menu and site maps.<br />
 <i>UI level: 6</i>
 </p>|,
                 lastUpdated => 1119149899,
@@ -90,7 +90,7 @@ have the following properties:
                  },
 
         '940 description' => {
-                message => q|Select yes to open this asset in a new window.<br>
+                message => q|Select yes to open this asset in a new window.<br />
 <i>UI level: 6</i>
 </p>|,
                 lastUpdated => 1119149899,
@@ -102,7 +102,7 @@ have the following properties:
                  },
 
         '108 description' => {
-                message => q|The owner of a asset is usually the person who created the asset. This user always has full edit and viewing rights on the asset.<br>
+                message => q|The owner of a asset is usually the person who created the asset. This user always has full edit and viewing rights on the asset.<br />
 <i>UI level: 6</i>
 </p>
 <p> <b>NOTE:</b> The owner can only be changed by an administrator.
@@ -116,7 +116,7 @@ have the following properties:
                  },
 
         '872 description' => {
-                message => q|Choose which group can view this asset. If you want both visitors and registered users to be able to view the asset then you should choose the "Everybody" group.<br>
+                message => q|Choose which group can view this asset. If you want both visitors and registered users to be able to view the asset then you should choose the "Everybody" group.<br />
 <i>UI level: 6</i>
 </p>|,
                 lastUpdated => 1119149899,
@@ -128,7 +128,7 @@ have the following properties:
                  },
 
         '871 description' => {
-                message => q|Choose the group that can edit this asset. The group assigned editing rights can also always view the asset.<br>
+                message => q|Choose the group that can edit this asset. The group assigned editing rights can also always view the asset.<br />
 <i>UI level: 6</i>
 </p>|,
                 lastUpdated => 1119149899,

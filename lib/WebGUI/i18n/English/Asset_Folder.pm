@@ -63,79 +63,79 @@ to do you want to go to the new Folder?</p>|,
 
 	'folder template body' => {
 		message => q|The following variables are available in Folder Templates:
-<p><b>subfolder_loop</b><br>
+<p><b>subfolder_loop</b><br />
 A loop containing all Folder assets which are children of the Folder.
 
 <blockquote>
 
-<p><b>id</b><br>
+<p><b>id</b><br />
 The assetId of the Folder.
 
-<p><b>url</b><br>
+<p><b>url</b><br />
 The url of the Folder.
 
-<p><b>title</b><br>
+<p><b>title</b><br />
 The title of the Folder.
 
-<p><b>icon.small</b><br>
+<p><b>icon.small</b><br />
 The URL to a small icon of the appropriate type for this Asset.
 
-<p><b>icon.big</b><br>
+<p><b>icon.big</b><br />
 The URL to a big icon of the appropriate type for this Asset.
 
 </blockquote>
 
-<p><b>file_loop</b><br>
+<p><b>file_loop</b><br />
 A loop containing all non-Folder assets which are children of the Folder.
 
 <blockquote>
 
-<p><b>id</b><br>
+<p><b>id</b><br />
 The assetId of the Asset.
 
-<p><b>canView</b><br>
+<p><b>canView</b><br />
 A conditional indicating if the current user can view this Asset.
 
-<p><b>title</b><br>
+<p><b>title</b><br />
 The title of the Asset.
 
-<p><b>synopsis</b><br>
+<p><b>synopsis</b><br />
 The synopsis of the Asset.
 
-<p><b>size</b><br>
+<p><b>size</b><br />
 The size of the Asset, formatted.
 
-<p><b>date.epoch</b><br>
+<p><b>date.epoch</b><br />
 The date the Asset was last updated, relative to the epoch.
 
-<p><b>icon.small</b><br>
+<p><b>icon.small</b><br />
 A URL to a small icon that represents the Asset.
 
-<p><b>icon.big</b><br>
+<p><b>icon.big</b><br />
 A URL to an icon that represents the Asset.
 
-<p><b>type</b><br>
+<p><b>type</b><br />
 The type of this Asset.
 
-<p><b>url</b><br>
+<p><b>url</b><br />
 The URL of the Asset.
 
-<p><b>isImage</b><br>
+<p><b>isImage</b><br />
 A conditional indicating if this Asset is an Image Asset.
 
-<p><b>canEdit</b><br>
+<p><b>canEdit</b><br />
 A conditional indicating if this Asset can be edited by the current user.
 
-<p><b>controls</b><br>
+<p><b>controls</b><br />
 The editing control bar for this child
 
-<p><b>isFile</b><br>
+<p><b>isFile</b><br />
 A conditional indicating if this Asset is a File Asset.
 
-<p><b>thumbnail.url</b><br>
+<p><b>thumbnail.url</b><br />
 If this Asset is an Image, the URL to the thumbnail for it.
 
-<p><b>file.url</b><br>
+<p><b>file.url</b><br />
 If this Asset is a File Asset (File, Image or Zip Archive), the URL to the actual file for downloading.  Otherwise,
 this variable will be empty
 

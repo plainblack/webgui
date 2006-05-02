@@ -15,8 +15,8 @@ our $I18N = {
 	'aoi hits body' => {
 		message => q|
 
-<b>&#94;AOIHits();</b><br>
-<b>&#94;AOIHits(<i>metadata property</i>, <i>metadata value</i>);</b><br>
+<b>&#94;AOIHits();</b><br />
+<b>&#94;AOIHits(<i>metadata property</i>, <i>metadata value</i>);</b><br />
 This macro is for displaying Areas of Interest Hits, which is based on passive profiling
 of which wobjects are viewed by users, on a per user basis.  The macro takes two arguments,
 a metadata property and metadata value, and returns how many times the current user has

@@ -15,15 +15,15 @@ our $I18N = {
 	'page title body' => {
 		message => q|
 
-<b>&#94;PageTitle;</b><br>
+<p><b>&#94;PageTitle;</b><br />
 Displays the title of the current page.
-<p>
+</p>
 
-<B>NOTE:</b> If you begin using admin functions or the in-depth functions of any wobject, the page title will become a link that will quickly bring you back to the page.
-<p>
+<p><b>NOTE:</b> If you begin using admin functions or the in-depth functions of any wobject, the page title will become a link that will quickly bring you back to the page.
+</p>
 
 |,
-		lastUpdated => 1112504006,
+		lastUpdated => 1146609765,
 	},
 };
 

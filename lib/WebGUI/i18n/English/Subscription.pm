@@ -347,14 +347,14 @@ characters long.<p>|,
         },
 
         'batch description description' => {
-                message => q|Description of the batch.<br>|,
+                message => q|Description of the batch.|,
                 lastUpdated => 1120858265,
         },
 
 	
 	'help create batch body' => {
-		message => q|Generate a batch of subscription codes.<p> |,
-		lastUpdated => 1120858203,
+		message => q|<p>Generate a batch of subscription codes.</p>|,
+		lastUpdated => 1146593246,
 		context => q|The content of the Create Subscription code batch help page.|
 	},
 
@@ -397,17 +397,17 @@ characters long.<p>|,
 	},
 
 	'help redeem code template body' => {
-		message => q|The following template variables are available through this template:<br>
-<br>
-<b>batchDescription</b><br>
-The description of the batch tied to the subscription code.<br>
-<br>
-<b>message</b><br>
-The message that gives the result of your action. Depending on what you've done it says that you can enter a code, you've entered the wrong code, or you've successfully redeemed your code.<br>
-<br>
+		message => q|The following template variables are available through this template:<br />
+<br />
+<b>batchDescription</b><br />
+The description of the batch tied to the subscription code.<br />
+<br />
+<b>message</b><br />
+The message that gives the result of your action. Depending on what you've done it says that you can enter a code, you've entered the wrong code, or you've successfully redeemed your code.<br />
+<br />
 <b>codeForm</b>
-The form in which the user can enter his subscription code.<br>|,
-		lastUpdated => 1101752050,
+The form in which the user can enter his subscription code.<br />|,
+		lastUpdated => 1146593261,
 		context => q|The body of the help page of the code redemption template.|
 	},
 	'help redeem code template title' => {

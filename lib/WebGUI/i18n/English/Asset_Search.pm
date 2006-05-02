@@ -52,23 +52,23 @@ our $I18N = { ##hashref of hashes
 	'search template body' => {
 		message => q|<p>The following template variables are available for Search Asset templates.  All of these variables are required.</p>
 
-<p><b>form_header*</b><br>
+<p><b>form_header*</b><br />
 HTML Code to begin the search form
 </p>
 
-<p><b>form_footer*</b><br>
+<p><b>form_footer*</b><br />
 HTML Code to end the search form
 </p>
 
-<p><b>form_submit*</b><br>
+<p><b>form_submit*</b><br />
 A button to allow the user to submit a search.
 </p>
 
-<p><b>form_keywords*</b><br>
+<p><b>form_keywords*</b><br />
 A form to let the user enter in keywords for the search.
 </p>
 
-<p><b>result_set*</b><br>
+<p><b>result_set*</b><br />
 Paginated search results with pagination controls.
 </p>
 |,

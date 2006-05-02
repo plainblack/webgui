@@ -264,7 +264,7 @@ our $I18N = { ##hashref of hashes
 	},
 
 	'add/edit event assigned prerequisites' => {
-		message => q|<br>Assigned Prerequisites<br><br>|,
+		message => q|<br />Assigned Prerequisites<br /><br />|,
 		lastUpdated => 1138312761,
 		context => q|Label for displaying required events|,
 	},

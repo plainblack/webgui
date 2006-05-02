@@ -14,8 +14,8 @@ our $I18N = {
 
     'file url body' => {
         message => q|
-<P><B>&#94;FileUrl</B>();<BR>
-<B>&#94;FileUrl</B>(<i>Asset URL</i>);<BR>
+<P><b>&#94;FileUrl</b>();<br />
+<b>&#94;FileUrl</b>(<i>Asset URL</i>);<br />
 This macro is used to return a filesystem URL to an File, Image or Snippet Asset identified by its Asset URL.
         |,
         lastUpdated => 1112315914,
