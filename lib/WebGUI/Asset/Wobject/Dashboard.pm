@@ -24,14 +24,14 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 #-------------------------------------------------------------------
 sub canManage {
 	my $self = shift;
-	return 0 if $self->session->user->userId == 1;
+	return 0 if $self->session->user->userId eq '1';
 	return $self->session->user->isInGroup($self->get("adminsGroupId"));
 }
 
 #-------------------------------------------------------------------
 sub canPersonalize {
 	my $self = shift;
-	return 0 if $self->session->user->userId == 1;
+	return 0 if $self->session->user->userId eq '1';
 	return $self->session->user->isInGroup($self->get("usersGroupId"));
 }
 
