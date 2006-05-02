@@ -101,7 +101,7 @@ if (!document.all) {
 /**
  * Initializes popup code on load.	
  */
-function initPopUp(closeImage) {
+function initPopUp() {
 	// Add the HTML to the body
 	body = document.getElementsByTagName('body')[0];
 	popmask = document.createElement('div');
@@ -113,7 +113,7 @@ function initPopUp(closeImage) {
 			'<div id="popupTitleBar">' +
 				'<div id="popupTitle"></div>' +
 				'<div id="popupControls">' +
-					'<img src="'+closeImage+'" onclick="hidePopWin(false);" />' +
+					'<img src="'+closeImage()+'" onclick="hidePopWin(false);" />' +
 				'</div>' +
 			'</div>' +
 			'<div id="popupFrame"></div>' +
