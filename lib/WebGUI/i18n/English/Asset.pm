@@ -270,94 +270,73 @@ our $I18N = {
         '99 description' => {
                 message => q|<p>The title of the asset.  This should be descriptive, but not very long.  If left
 blank, this will be set to "Untitled".</p>
-<P></i>Note:</i> You should always specify a title, even if the Asset template will not use it. In various places on the site, like the Page Tree, Clipboard and Trash, the <b>Title</b> is used to distinguish this Asset from others.</p>|,
-                lastUpdated => 1127426207,
+<P><i>Note:</i> You should always specify a title, even if the Asset template will not use it. In various places on the site, like the Page Tree, Clipboard and Trash, the <b>Title</b> is used to distinguish this Asset from others.</p>|,
+                lastUpdated => 1146629119,
         },
 
         '411 description' => {
                 message => q|<p>A shorter title that will appear in navigation. If left blank,
-this will default to the <b>Title</b>.<br />
-<i>UI level: 1</i></p>|,
-                lastUpdated => 1127426204,
+this will default to the <b>Title</b>.</p>|,
+                lastUpdated => 1146629570,
         },
 
         '104 description' => {
                 message => q|<p>The URL for this asset.  It must be unique.  If this field is left blank, then
-a URL will be made from the parent's URL and the <b>Menu Title</b>.<br />
-<i>UI level: 3</i></p>|,
-                lastUpdated => 1127426200,
+a URL will be made from the parent's URL and the <b>Menu Title</b>.</p>|,
+                lastUpdated => 1146629543,
         },
 
         '886 description' => {
-                message => q|<p>Whether or not this asset will be hidden from the navigation menu and site maps.<br />
-<i>UI level: 6</i>
-</p>|,
-                lastUpdated => 1127426198,
+                message => q|<p>Whether or not this asset will be hidden from the navigation menu and site maps.</p>|,
+                lastUpdated => 1146629520,
         },
 
         '940 description' => {
-                message => q|<p>Select yes to open this asset in a new window. Note that there are potentially many problems with this. It may not work in some navigations, or if the user turns off Javascript, or it may be blocked by some pop-up blockers. Use this feature with care.<br />
-<i>UI level: 9</i>
-</p>|,
+                message => q|<p>Select yes to open this asset in a new window. Note that there are potentially many problems with this. It may not work in some navigations, or if the user turns off Javascript, or it may be blocked by some pop-up blockers. Use this feature with care.</p>|,
                 lastUpdated => 1143218834,
         },
 
         'encrypt page description' => {
-                message => q|<p>Should the page containing this asset be served over SSL?<br />
-<i>UI level: 6</i>
-</p>|,
-                lastUpdated => 1127426194,
+                message => q|<p>Should the page containing this asset be served over SSL?</p>|,
+                lastUpdated => 1146629489,
         },
 
         '108 description' => {
-                message => q|The owner of a asset is usually the person who created the asset. This user always has full edit and viewing rights on the asset.<br />
-<i>UI level: 6</i>
-</p>
-<p> <b>NOTE:</b> The owner can only be changed by an administrator.
+                message => q|<p>The owner of a asset is usually the person who created the asset. This user always has full edit and viewing rights on the asset.</p>
+<p><b>NOTE:</b> The owner can only be changed by an administrator.
 </p>|,
-                lastUpdated => 1119149899,
+                lastUpdated => 1146629493,
         },
 
         '872 description' => {
-                message => q|Choose which group can view this asset. If you want both visitors and registered users to be able to view the asset then you should choose the "Everybody" group.<br />
-<i>UI level: 6</i>
-</p>|,
-                lastUpdated => 1119149899,
+                message => q|<p>Choose which group can view this asset. If you want both visitors and registered users to be able to view the asset then you should choose the "Everybody" group.</p>|,
+                lastUpdated => 1146629267,
         },
 
         '871 description' => {
-                message => q|Choose the group that can edit this asset. The group assigned editing rights can also always view the asset.<br />
-<i>UI level: 6</i>
-</p>|,
-                lastUpdated => 1119149899,
+                message => q|<p>Choose the group that can edit this asset. The group assigned editing rights can also always view the asset.</p>|,
+                lastUpdated => 1146629269,
         },
 
         '412 description' => {
-                message => q|A short description of this Asset.<br />
-<i>UI level: 3</i>
-</p>|,
-                lastUpdated => 1119149899,
+                message => q|<p>A short description of this Asset.</p>|,
+                lastUpdated => 1146629271,
         },
 
         'extra head tags description' => {
-                message => q|These tags will be added to the &lt;head&gt; section of each page that the asset appears on.<br />
-<i>UI level: 5</i>
-</p>|,
+                message => q|<p>These tags will be added to the &lt;head&gt; section of each page that the asset appears on.</p>|,
                 lastUpdated => 1126471216,
         },
 
         'make package description' => {
-                message => q|Many WebGUI tasks are very repetitive.  Automating such tasks in Webgui, such as
+                message => q|<p>Many WebGUI tasks are very repetitive.  Automating such tasks in Webgui, such as
 creating an Asset, or sets of Assets, is done by creating a package that can be reused
-through the site.  Check yes if you want this Asset to be available as a package.<br />
-<i>UI level: 7</i>
-</p>|,
+through the site.  Check yes if you want this Asset to be available as a package.</p>|,
                 lastUpdated => 1119149899,
         },
 
         'make prototype description' => {
-                message => q|Set this Asset to be a Content Prototype so that others can use it on your site.
-<i>UI level: 9</i>|,
+                message => q|<p>Set this Asset to be a Content Prototype so that others can use it on your site.</p>|,
                 lastUpdated => 1119149899,
         },
 
@@ -536,12 +515,14 @@ each asset under the tab &quot;Meta&quot; in the asset properties.</p>
   <li><p><b>Areas of Interest Ranking</b><br />
     Metadata in combination with passive profiling produces AOI (Areas of
     Interest) information. You can retrieve the value of a metadata property
-    with the &#94;AOIRank(); and &#AOIHits(); macros.</p>
+    with the &#94;AOIRank(); and &#94;AOIHits(); macros.</p>
   </li>
-  <li><p><b>Show content based upon criteria<br />
-    </b>The Wobject Proxy allows you to select content based upon criteria like:<blockquote>
-    contenttype = sport AND source != newspaper</blockquote>
-    You can use the AOI macro's described above in the criteria, so you can
+  <li><p><b>Show content based upon criteria</b><br />
+    The Wobject Proxy allows you to select content based upon criteria like:</p>
+    <blockquote>
+    contenttype = sport AND source != newspaper
+    </blockquote>
+    <p>You can use the AOI macro's described above in the criteria, so you can
     present content based upon the users Areas of Interest. Example:<br />
     type = &#94;AOIRank(contenttype);</p></li>
 	<li><p><b>Display</b><br />

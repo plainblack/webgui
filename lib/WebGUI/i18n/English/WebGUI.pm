@@ -1088,12 +1088,12 @@ removed from the system after a set period of time.  That period of time is set 
         },
 
         '993 description' => {
-                message => q|<p><b>D</b>ata <b>S</b>ource <b>N</b>ame is the unique identifier that Perl uses to describe the location of your database. It takes the format of
+                message => q|<p><b>D</b>ata <b>S</b>ource <b>N</b>ame is the unique identifier that Perl uses to describe the location of your database. It takes the format of</p>
 <blockquote>DBI:[driver]:[database name]:[host].</blockquote>
-</p>
 <p><i>Example:</i> DBI:mysql:WebGUI:localhost</p>
 <p>
-Here are some examples for other databases.<br />
+Here are some examples for other databases.</p>
+<div>
 <dl>
 <dt><a href="http://search.cpan.org/author/TIMB/DBD-Oracle-1.14/Oracle.pm#CONNECTING_TO_ORACLE">Oracle</a>:</dt>
 <dd>DBI:Oracle:SID<br />
@@ -1109,8 +1109,8 @@ DBD::PgPP must be installed.
 DBD::Sybase must be installed.<br />
 You must be using mod_perl and configure <b>PerlSetEnv SYBASE /opt/sybase/11.0.2</b> in httpd.conf.
 </dd>
-</dl></p>|,
-                lastUpdated => 1146526394,
+</dl></div>|,
+                lastUpdated => 1146630103,
         },
 
         '994 description' => {

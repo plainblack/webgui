@@ -94,9 +94,9 @@ our $I18N = {
 
 	'71' => {
 		message => q|<p>Events calendars are used on many intranets to keep track of internal dates that affect a whole organization. Also, Events Calendars on consumer sites are a great way to let your customers know what events you'll be attending and what promotions you'll be having.</p>
+<hr size="1" />
 
 <p>
-<hr size="1">
 <i><b>Note:</b></i> The following style is specific to the Events Calendar.
 </p>
 
@@ -105,7 +105,7 @@ our $I18N = {
 The title of an individual event.
 </p>
 |,
-		lastUpdated => 1129669045,
+		lastUpdated => 1146630287,
 	},
 
 

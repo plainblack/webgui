@@ -10,45 +10,44 @@ our $I18N = {
                 message => q|<P>File Pile Assets allow you to upload lots of files to your site all at once.  This is the only function that File Piles have.  If you want to display the files that have been uploaded, you'll need to use another Asset or Wobject.</P>
 
 <P>Unlike most Assets, File Piles do not share the base set of Asset properties.  All File Piles
-have the following properties:
+have the following properties:</p>
 
 |,
 		context => 'Describing file pile add/edit form specific fields',
-		lastUpdated => 1119214836,
+		lastUpdated => 1146630312,
 	},
 
         '886 description' => {
-                message => q|Whether or not this asset will be hidden from the navigation menu and site maps.
-</p>|,
+                message => q|<p>Whether or not this asset will be hidden from the navigation menu and site maps.</p>|,
                 lastUpdated => 1119214815,
         },
 
         '940 description' => {
-                message => q|Select yes to open this asset in a new window.
+                message => q|<p>Select yes to open this asset in a new window.
 </p>|,
                 lastUpdated => 1119214815,
         },
 
         '108 description' => {
-                message => q|The owner of a page is usually the person who created the page. This user always has full edit and viewing rights on the page.
+                message => q|<p>The owner of a page is usually the person who created the page. This user always has full edit and viewing rights on the page.
 </p>|,
                 lastUpdated => 1119214815,
         },
 
         '872 description' => {
-                message => q|Choose which group can view this page. If you want both visitors and registered users to be able to view the page then you should choose the "Everybody" group.
+                message => q|<p>Choose which group can view this page. If you want both visitors and registered users to be able to view the page then you should choose the "Everybody" group.
 </p>|,
                 lastUpdated => 1119214815,
         },
 
         '871 description' => {
-                message => q|Choose the group that can edit this page. The group assigned editing rights can also always view the page.
+                message => q|<p>Choose the group that can edit this page. The group assigned editing rights can also always view the page.
 </p>|,
                 lastUpdated => 1119214815,
         },
 
         'upload files description' => {
-                message => q|This is where files can be uploaded from your computer.  You can upload to to 100 files at a time.
+                message => q|<p>This is where files can be uploaded from your computer.  You can upload to to 100 files at a time.
 </p>|,
                 lastUpdated => 1139206282,
         },
@@ -78,9 +77,7 @@ have the following properties:
                  },
 
         '886 description' => {
-                message => q|Whether or not this asset will be hidden from the navigation menu and site maps.<br />
-<i>UI level: 6</i>
-</p>|,
+                message => q|<p>Whether or not this asset will be hidden from the navigation menu and site maps.</p>|,
                 lastUpdated => 1119149899,
         },
 
@@ -90,9 +87,7 @@ have the following properties:
                  },
 
         '940 description' => {
-                message => q|Select yes to open this asset in a new window.<br />
-<i>UI level: 6</i>
-</p>|,
+                message => q|<p>Select yes to open this asset in a new window.</p>|,
                 lastUpdated => 1119149899,
         },
 
@@ -102,8 +97,7 @@ have the following properties:
                  },
 
         '108 description' => {
-                message => q|The owner of a asset is usually the person who created the asset. This user always has full edit and viewing rights on the asset.<br />
-<i>UI level: 6</i>
+                message => q|The owner of a asset is usually the person who created the asset. This user always has full edit and viewing rights on the asset.
 </p>
 <p> <b>NOTE:</b> The owner can only be changed by an administrator.
 </p>|,
@@ -116,9 +110,7 @@ have the following properties:
                  },
 
         '872 description' => {
-                message => q|Choose which group can view this asset. If you want both visitors and registered users to be able to view the asset then you should choose the "Everybody" group.<br />
-<i>UI level: 6</i>
-</p>|,
+                message => q|Choose which group can view this asset. If you want both visitors and registered users to be able to view the asset then you should choose the "Everybody" group.</p>|,
                 lastUpdated => 1119149899,
         },
 
@@ -128,9 +120,7 @@ have the following properties:
                  },
 
         '871 description' => {
-                message => q|Choose the group that can edit this asset. The group assigned editing rights can also always view the asset.<br />
-<i>UI level: 6</i>
-</p>|,
+                message => q|Choose the group that can edit this asset. The group assigned editing rights can also always view the asset.</p>|,
                 lastUpdated => 1119149899,
         },
         

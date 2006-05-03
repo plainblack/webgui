@@ -196,7 +196,7 @@ A loop containing all the attachments.
 
 </blockquote>
 
-<p/><b>linkTitle</b><br />
+<p><b>linkTitle</b><br />
 The title of the link added to the article.
 </p>
 

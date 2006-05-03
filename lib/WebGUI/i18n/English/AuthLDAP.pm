@@ -562,11 +562,11 @@ Default text for password form field.
         },
 
         'LDAPLink_994 description' => {
-                message => q|DN = Distinguished Name. A DN is a unique path to a particular object within an LDAP
+                message => q|<p>DN = Distinguished Name. A DN is a unique path to a particular object within an LDAP
 directory. In this case, the "Connect DN" is the DN that points to the user account
 record. Usually that will look something like:</p>
-<p>cn=Joe Shmoe,ou=people,dc=example,dc=com|,
-                lastUpdated => 1120172492,
+<p>cn=Joe Shmoe,ou=people,dc=example,dc=com</p>|,
+                lastUpdated => 1146630168,
         },
 
         'LDAPLink_995 description' => {
@@ -575,11 +575,11 @@ record. Usually that will look something like:</p>
         },
 
         '9 description' => {
-                message => q|RDN is a relative distinguished name. It means that we're looking at only part of the
+                message => q|<p>RDN is a relative distinguished name. It means that we're looking at only part of the
 path. In this case, the "User RDN" is the path to where user records can be found.
 Usually the RDN looks something like:</p>
-<p>ou=people,dc=example,dc=com|,
-                lastUpdated => 1120164594,
+<p>ou=people,dc=example,dc=com</p>|,
+                lastUpdated => 1146630220,
         },
 
         '6 description' => {

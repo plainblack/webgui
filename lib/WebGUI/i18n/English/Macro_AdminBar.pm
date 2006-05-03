@@ -10,47 +10,52 @@ our $I18N = {
 	'admin bar body' => {
 		message => q|
 
-<b>&#94;AdminBar;</b><br />
+<p><b>&#94;AdminBar;</b><br />
 <b>&#94;AdminBar(<i>custom template ID</i>);</b><br />
 Places the administrative tool bar on the page. Omitting this macro will prevent you from adding content, pasting
-content from the clipboard, accessing the help system and other administrative functions.
+content from the clipboard, accessing the help system and other administrative functions.</p>
 <p>
-The macro may take one optional argument, an alternate template in the Macro/AdminBar namespace for generating the AdminBar.  The following variables are available in the template:
+The macro may take one optional argument, an alternate template in the Macro/AdminBar namespace for generating the AdminBar.  The following variables are available in the template:</p>
 
-<p/>
+<p>
 <b>adminbar_loop</b><br />
 A loop containing the various lists of data to display.
+</p>
+
 <blockquote>
+<p>
 <b>label</b><br />
 A heading label for this category.
-<p />
+</p>
 
+<p>
 <b>name</b><br />
 A javascript friendly name for this category.
-<p />
+</p>
 
-<b>items</b>
+<p><b>items</b><br />
 A loop containing the list if items in this category.
+</p>
+
 <blockquote>
 
-<b>title</b><br />
+<p><b>title</b><br />
 The displayable link title for this item.
-<p />
+</p>
 
-<b>url</b><br />
+<p><b>url</b><br />
 The link URL for this item.
-<p />
+</p>
 
-<b>icon</b><br />
+<p><b>icon</b><br />
 The URL of an icon to associate with this item.
-<p />
+</p>
 
 </blockquote>
 
 </blockquote>
-<p/>
 |,
-		lastUpdated => 1141328392,
+		lastUpdated => 1146631148,
 	},
 
 	'376' => {

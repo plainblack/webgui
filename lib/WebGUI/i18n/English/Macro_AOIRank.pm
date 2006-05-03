@@ -22,10 +22,10 @@ of which wobjects are viewed most frequently by users, on a per user basis.  The
 takes up to two arguments, a metadata property and the rank of the metadata value to
 be returned.  If the rank is left out, it defaults to 1, the highest rank.<br />
 &#94;AOIRank(contenttype); would display "sport" if the current user has looked at content tagged "contenttype = sport" the most.<br />
-&#94;AOIRank(contenttype, 2); would return the second highest ranked value for contenttype.
+&#94;AOIRank(contenttype, 2); would return the second highest ranked value for contenttype.</p>
 
 |,
-		lastUpdated => 1112560105,
+		lastUpdated => 1146627736,
 	},
 };
 

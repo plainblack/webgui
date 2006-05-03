@@ -8,11 +8,6 @@ our $I18N = {
 		context=> q|asset property|
 	},
 
-	'85' => {
-		message => q|Description|,
-		lastUpdated => 1031514049
-	},
-
 	'Criteria' => {
 		message => q|Criteria|,
 		lastUpdated => 1053183804
@@ -76,11 +71,6 @@ Now, go back to manage Overrides, and it should show the original value, new val
 |,
 		lastUpdated => 1133619940,
 	},
-
-        '85 description' => {
-                message => q|Content for this shortcut.  This is normally not used.|,
-                lastUpdated => 1133619940,
-        },
 
         'shortcut template title description' => {
                 message => q|Select a template from the list to display the Shortcut.|,
@@ -373,7 +363,7 @@ Any properties assigned to this shortcut will be available in the template by th
 	},
 
 	'field add/edit body' => {
-		message => q|<p>User Preferences are the key to personalization of a Shortcut, and the key to creating a personalized dashboard.  You can create a user preference field of one of four types: text, textArea, checkList, and selectList.  If yours is a list type, you can put the possible choices in the Possible Choices box, and each one will be its own entry in a list of that type (select: choose one, or check: choose none or any or all).  </p><p>You can use a user preference field to generate a list of templates from which the user can pick, a choice of some kind of other preference, such as US or metric units format, or any other kind of user preference.  User Preference fields are asset-(shortcut-)specific, whereas user profile fields are site-wide.  The user preference fields will be exposed to your override fields in the format ##userPref:myUserPrefField##, and will be exposed everywhere else as normal template variables (<tmpl_var myUserPrefField>).</p>|,
+		message => q|<p>User Preferences are the key to personalization of a Shortcut, and the key to creating a personalized dashboard.  You can create a user preference field of one of four types: text, textArea, checkList, and selectList.  If yours is a list type, you can put the possible choices in the Possible Choices box, and each one will be its own entry in a list of that type (select: choose one, or check: choose none or any or all).  </p><p>You can use a user preference field to generate a list of templates from which the user can pick, a choice of some kind of other preference, such as US or metric units format, or any other kind of user preference.  User Preference fields are asset-(shortcut-)specific, whereas user profile fields are site-wide.  The user preference fields will be exposed to your override fields in the format ##userPref:myUserPrefField##, and will be exposed everywhere else as normal template variables (&lt;tmpl_var myUserPrefField&gt;).</p>|,
 		lastUpdated => 1133619940,
 	},
 
