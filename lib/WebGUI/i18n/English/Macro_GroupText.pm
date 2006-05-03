@@ -14,15 +14,13 @@ our $I18N = {
 
 	'group text body' => {
 		message => q|
-
-<b>&#94;GroupText();</b><br />
+<p><b>&#94;GroupText();</b><br />
 Displays a small text message to the user if they belong to the specified group. And you can specify an alternate message to those who are not in the group.
-<p>
-<i>Example:</i> &#94;GroupText("Visitors","You need an account to do anything cool on this site!","We value our registered users!");
-<p>
-
+</p>
+<p><i>Example:</i> &#94;GroupText("Visitors","You need an account to do anything cool on this site!","We value our registered users!");
+</p>
 |,
-		lastUpdated => 1112466919,
+		lastUpdated => 1146686292,
 	},
 };
 

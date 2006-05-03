@@ -14,14 +14,13 @@ our $I18N = {
 
 	'date body' => {
 		message => q|
-
-<b>&#94;D();</b><br />
+<p><b>&#94;D();</b><br />
 <b>&#94;D([<i>date formatting code</i>],[<i>epoch date</i>]);</b><br />
 The current date and time.
-<p>
+</p>
 
-You can configure the date by using date formatting symbols. For instance, if you created a macro like this <b>&#94;D("%c %D, %y");</b> it would output <b>September 26, 2001</b>. The following are the available date formatting symbols:
-<p>
+<p>You can configure the date by using date formatting symbols. For instance, if you created a macro like this <b>&#94;D("%c %D, %y");</b> it would output <b>September 26, 2001</b>. The following are the available date formatting symbols:
+</p>
 
 <table><tbody>
 <tr><td>%%</td><td>A literal percent sign '%'</td></tr>
@@ -48,13 +47,14 @@ You can configure the date by using date formatting symbols. For instance, if yo
 <tr><td>%z</td><td>The current user's date format preference, (default: '%H:%n %p').</td></tr>
 <tr><td>%Z</td><td>The current user's time format preference, (default: '%M/%D/%y')</td></tr>
 </tbody></table>
-<p>
-The default format code is %z %Z.
-<p>
-You can also pass in an epoch date into this macro as a secondary parameter. If no date is specified then today's date and time will be used.
+
+<p>The default format code is %z %Z.
+</p>
+
+<p>You can also pass in an epoch date into this macro as a secondary parameter. If no date is specified then today's date and time will be used.</p>
 
 |,
-		lastUpdated => 1112466919,
+		lastUpdated => 1146679159,
 	},
 };
 

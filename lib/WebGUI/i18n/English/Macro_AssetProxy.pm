@@ -19,17 +19,17 @@ our $I18N = {
 
     'asset proxy body' => {
         message => q|
-<P><b>&#94;AssetProxy</b>(<i>Asset URL</i>);<br />
+<p><b>&#94;AssetProxy</b>(<i>Asset URL</i>);<br />
 This macro is used to render an Asset and display it inline according
 to its template.  Any Asset can be displayed, including Navigations,
-images, links to files for downloading or for snippets.
+images, links to files for downloading or for snippets.</p>
 
 <p>It can also be like a Shortcut Asset, displaying content from another
 part of the site on this page.  Unlike a Shortcut, it cannot override
-any part of the original Asset.
+any part of the original Asset.</p>
 
         |,
-        lastUpdated => 1112583827,
+        lastUpdated => 1146679031,
     },
 
 };

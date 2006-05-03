@@ -15,11 +15,11 @@ our $I18N = {
 	'extras body' => {
 		message => q|
 
-<b>&#94;Extras; or &#94;Extras(path/to/something/in/extras/folder);</b><br />
+<p><b>&#94;Extras; or &#94;Extras(path/to/something/in/extras/folder);</b><br />
 Returns the path to the WebGUI "extras" folder, which contains things like WebGUI icons.
-<p>
+</p>
 |,
-		lastUpdated => 1146245155,
+		lastUpdated => 1146679288,
 	},
 };
 

@@ -14,11 +14,11 @@ our $I18N = {
 
 	'company email body' => {
 		message => q|
-<b>&#94;e;</b><br />
+<p><b>&#94;e;</b><br />
 The email address for your company specified in the settings by your Administrator.
-<p>
+</p>
 |,
-		lastUpdated => 1112466411,
+		lastUpdated => 1146679191,
 	},
 };
 

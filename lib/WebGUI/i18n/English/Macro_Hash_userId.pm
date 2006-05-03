@@ -14,13 +14,11 @@ our $I18N = {
 
 	'user id body' => {
 		message => q|
-
-<b>&#94;#; - User ID</b><br />
+<p><b>&#94;#; - User ID</b><br />
 The user id of the currently logged in user.
-<p>
-
+</p>
 |,
-		lastUpdated => 1112466919,
+		lastUpdated => 1146686310,
 	},
 };
 

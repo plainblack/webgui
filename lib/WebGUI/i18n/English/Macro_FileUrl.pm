@@ -14,11 +14,11 @@ our $I18N = {
 
     'file url body' => {
         message => q|
-<P><b>&#94;FileUrl</b>();<br />
+<p><b>&#94;FileUrl</b>();<br />
 <b>&#94;FileUrl</b>(<i>Asset URL</i>);<br />
-This macro is used to return a filesystem URL to an File, Image or Snippet Asset identified by its Asset URL.
+This macro is used to return a filesystem URL to an File, Image or Snippet Asset identified by its Asset URL.</p>
         |,
-        lastUpdated => 1112315914,
+        lastUpdated => 1146679314,
     },
 
     'invalid url' => {

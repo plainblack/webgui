@@ -19,16 +19,14 @@ our $I18N = {
 
 	'last modified body' => {
 		message => q|
-
-<b>&#94;LastModified;</b><br />
+<p><b>&#94;LastModified;</b><br />
 <b>&#94;LastModified(<i>"text"</i>,<i>"date format"</i>);</b><br />
 Displays the date that the current page was last modified based upon the wobjects on the page. By default, the date is displayed based upon the user's date preferences. Optionally, it can take two parameters. The first is text to display before the date. The second is a date format string (see the date macro, &#94;D;, for details.
-<p>
-<i>Example:</i> &#94;LastModified("Updated: ","%c %D, %y");
-<p>
-
+</p>
+<p><i>Example:</i> &#94;LastModified("Updated: ","%c %D, %y");
+</p>
 |,
-		lastUpdated => 1112466919,
+		lastUpdated => 1146686444,
 	},
 };
 
