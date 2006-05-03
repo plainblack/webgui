@@ -86,21 +86,30 @@ if ($shutdown) {
 	die $POE::Component::IKC::ClientLite::error unless defined $result;
 	undef $remote;
 } elsif ($ping) {
+	my $res = ping();
+	print "Spectre is Alive!\n" unless $res;
+	print "Spectre is not responding.\n".$res if $res;
+} elsif ($run) {
+	Spectre::Admin->new($config, $debug);
+} elsif ($daemon) {
+	my $res = ping();
+	print "Spectre is already running.\n" unless $res;
+	exit unless $res;
+	fork and exit(sleep(1) and print((ping())?"Spectre failed to start!\n":"Spectre started successfully!\n"));
+	Spectre::Admin->new($config, $debug);
+}
+
+sub ping {
 	my $remote = create_ikc_client(
 	        port=>$config->get("port"),
 	        ip=>'127.0.0.1',
 	        name=>rand(100000),
         	timeout=>10
         	);
-	die $POE::Component::IKC::ClientLite::error unless $remote;
+	return $POE::Component::IKC::ClientLite::error unless $remote;
 	my $result = $remote->post_respond('admin/ping');
-	die $POE::Component::IKC::ClientLite::error unless defined $result;
-	print "Spectre is Alive!\n" if ($result eq "pong");
+	return $POE::Component::IKC::ClientLite::error unless defined $result;
 	undef $remote;
-} elsif ($run) {
-	Spectre::Admin->new($config, $debug);
-} elsif ($daemon) {
-	fork and exit;
-	Spectre::Admin->new($config, $debug);
+	return 0 if ($result eq "pong");
+	return 1;
 }
-
