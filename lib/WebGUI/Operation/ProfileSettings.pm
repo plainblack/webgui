@@ -334,9 +334,8 @@ sub www_editProfileFieldSave {
 	my $categoryId = $session->form->selectBox("profileCategoryId");
 	if ($session->form->process("new")) {
 		my $field = WebGUI::ProfileField->create($session,$session->form->text("fid"), \%data, $categoryId);
-		$session->stow->set("editSavedFid",$field->getId);
 	} else {
-		my $field = WebGUI::ProfileField->new($session,$session->stow->get("editSavedFid"));
+		my $field = WebGUI::ProfileField->new($session,	$session->form->process("fid"));
 		$field->set(\%data);
 		$field->setCategory($categoryId);
 	}

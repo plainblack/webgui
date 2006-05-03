@@ -543,6 +543,9 @@ sub setCategory {
 	my $categoryId = shift;
 	return undef unless ($categoryId);
 	my $currentCategoryId = $self->get("profileCategoryId");
+
+	return undef if ($categoryId eq $currentCategoryId);
+
         my ($sequenceNumber) = $self->session->db->quickArray("select max(sequenceNumber) from userProfileField where profileCategoryId=".$self->session->db->quote($categoryId));
 	$self->session->db->setRow("userProfileField","fieldName",{fieldName=>$self->getId, profileCategoryId=>$categoryId, sequenceNumber=>$sequenceNumber+1});
 	$self->{_property}{profileCategoryId} = $categoryId;
