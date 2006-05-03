@@ -33,10 +33,9 @@ sub addTemplates {
 		className=>"WebGUI::Asset::Template",
 		template=>q|
 <tmpl_if session.var.adminOn><tmpl_if controls><p><tmpl_var controls></p></tmpl_if></tmpl_if>
-<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0" width="100%" height="*" align="middle">
-<param name="allowScriptAccess" value="sameDomain" />
-<param name="movie" value="<tmpl_var fileUrl>" /><param name="quality" value="high" /><embed src="<tmpl_var fileUrl>" quality="high" width="100%" height="*" align="middle" allowScriptAccess="sameDomain" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" />
-</object>
+<div><object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0" width="100%" height="*">
+<param name="movie" value="<tmpl_var fileUrl>" /><param name="quality" value="high" /><embed src="<tmpl_var fileUrl>" quality="high" width="100%" height="*" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" />
+</object></div>
 		|,
 		title=>"Flash Template",
 		menuTitle=>"Flash Template",

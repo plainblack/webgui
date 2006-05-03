@@ -195,10 +195,10 @@ sub fatal {
 		#NOTE: You can't internationalize this because with some types of errors that would cause an infinite loop.
 		$self->session->output->print("<h1>Problem With Request</h1>
 		We have encountered a problem with your request. Please use your back button and try again.
-		If this problem persists, please contact us with what you were trying to do and the time and date of the problem.",1);
-		$self->session->output->print('<br />'.$self->session->setting("companyName"),1);
-		$self->session->output->print('<br />'.$self->session->setting("companyEmail"),1);
-		$self->session->output->print('<br />'.$self->session->setting("companyURL"),1);
+		If this problem persists, please contact us with what you were trying to do and the time and date of the problem.<br />",1);
+		$self->session->output->print('<br />'.$self->session->setting->get("companyName"),1);
+		$self->session->output->print('<br />'.$self->session->setting->get("companyEmail"),1);
+		$self->session->output->print('<br />'.$self->session->setting->get("companyURL"),1);
 	} else {
 		$self->session->output->print("<h1>WebGUI Fatal Error</h1><p>Something unexpected happened that caused this system to fault.</p>\n",1);
 		$self->session->output->print("<p>".$message."</p>\n",1);
@@ -206,7 +206,7 @@ sub fatal {
 		$self->session->output->print($self->showDebug(),1);
 	}
 	$self->session->close();
-	die $message;
+	exit;
 }
 
 

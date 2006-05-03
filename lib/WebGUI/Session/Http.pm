@@ -184,7 +184,7 @@ sub sendHeader {
 		my $date = $self->session->datetime->epochToHuman(($self->{_http}{lastModified} || time()), "%W, %d %C %y %j:%m:%s %t");
 		$self->session->request->headers_out->set('Last-Modified' => $date);
 		if ($self->session->setting->get("preventProxyCache")) {
-			$self->session->request->headers_out->set(Expires => "-1d");
+			$self->setCacheControl(-60*60*24*365);
 		}
 		if ($self->{_http}{filename}) {
                         $self->session->request->headers_out->set('Content-Disposition' => qq!attachment; filename="$self->{_http}{filename}"!);
