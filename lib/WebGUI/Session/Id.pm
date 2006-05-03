@@ -70,9 +70,6 @@ sub generate {
 	my $id = Digest::MD5::md5_base64($v);
 	$id =~ s/\+/_/g;
 	$id =~ s/\//-/g;
-	if ($id =~ /^0/) { # Can't start with 0 because that can cause problems with 0x (hex) and 0b (bin) in perl
-		$id = $self->generate();
-	}
 	return $id;
 }
 

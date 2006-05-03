@@ -877,6 +877,7 @@ sub templateParsers {
 #-------------------------------------------------
 sub removeFiles {
 	print "\tRemoving old unneeded files.\n" unless ($quiet);
+	unlink '../migration.txt';
 	unlink '../../lib/WebGUI/Help/Macro_StyleSheet.pm';
 	unlink '../../lib/WebGUI/Help/Macro_JavaScript.pm';
 	unlink '../../lib/WebGUI/Help/Macro_RawHeadTags.pm';

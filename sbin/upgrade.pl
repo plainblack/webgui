@@ -421,6 +421,6 @@ sub convertPlainconfigToJson {
         	$config{$param} = $value;
 	}
 	open(FILE,">".$configFile);
-	print FILE "# config-file-type: JSON 1\n".objToJson(\%config, {pretty => 1, indent => 2});
+	print FILE "# config-file-type: JSON 1\n".objToJson(\%config, {pretty => 1, indent => 4, autoconv=>0, skipinvalid=>1});
 	close(FILE);
 }

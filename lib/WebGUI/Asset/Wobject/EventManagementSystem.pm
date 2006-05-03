@@ -795,7 +795,7 @@ sub getBadgeSelector {
 		}
 	}
 	$js = '<script type="text/javascript">
-	var badges = '.objToJson(\%badgeJS).';
+	var badges = '.objToJson(\%badgeJS,{pretty => 1, indent => 4, autoconv=>0, skipinvalid=>1}).';
 	</script>';
 	%options = (%options,%{$badges});
 	$output .= WebGUI::Form::selectBox($self->session,{

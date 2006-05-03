@@ -133,7 +133,7 @@ sub delete {
 	my $param = shift;
 	delete $self->{_config}{$param};
 	open(FILE,">".$self->getWebguiRoot.'/etc/'.$self->getFilename);
-	print FILE "# config-file-type: JSON 1\n".objToJson($self->{_config}, {pretty => 1, indent => 2});
+	print FILE "# config-file-type: JSON 1\n".objToJson($self->{_config}, {pretty => 1, indent => 4, autoconv=>0, skipinvalid=>1});
 	close(FILE);
 }
 
@@ -376,7 +376,7 @@ sub set {
 	my $value = shift;
 	$self->{_config}{$param} = $value;
 	open(FILE,">".$self->getWebguiRoot.'/etc/'.$self->getFilename);
-	print FILE "# config-file-type: JSON 1\n".objToJson($self->{_config}, {pretty => 1, indent => 2});
+	print FILE "# config-file-type: JSON 1\n".objToJson($self->{_config}, {pretty => 1, indent => 4, autoconv=>0, skipinvalid=>1});
 	close(FILE);
 }
 

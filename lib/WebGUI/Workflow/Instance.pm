@@ -59,7 +59,7 @@ sub create {
 	my $session = shift;
 	my $properties = shift;
 	my ($isSingleton) = $session->db->quickArray("select isSingleton from Workflow where workflowId=?",[$properties->{workflowId}]);
-	my $params = (exists $properties->{parameters}) ? JSON::objToJson({parameters => $properties->{parameters}}) : undef;
+	my $params = (exists $properties->{parameters}) ? JSON::objToJson({parameters => $properties->{parameters}}, {pretty => 1, indent => 4, autoconv=>0, skipinvalid=>1}) : undef;
 	my ($count) = $session->db->quickArray("select count(*) from WorkflowInstance where workflowId=? and parameters=?",[$properties->{workflowId},$params]);
 	return undef if ($isSingleton && $count);
 	my $instanceId = $session->db->setRow("WorkflowInstance","instanceId",{instanceId=>"new", runningSince=>time()});
@@ -366,7 +366,7 @@ sub set {
 	$self->{_data}{className} = (exists $properties->{className}) ? $properties->{className} : $self->{_data}{className};
 	$self->{_data}{methodName} = (exists $properties->{methodName}) ? $properties->{methodName} : $self->{_data}{methodName};
 	if (exists $properties->{parameters}) {
-		$self->{_data}{parameters} = JSON::objToJson({parameters => $properties->{parameters}});
+		$self->{_data}{parameters} = JSON::objToJson({parameters => $properties->{parameters}}, {pretty => 1, indent => 4, autoconv=>0, skipinvalid=>1});
 	}
 	$self->{_data}{currentActivityId} = (exists $properties->{currentActivityId}) ? $properties->{currentActivityId} : $self->{_data}{currentActivityId};
 	$self->{_data}{lastUpdate} = time();

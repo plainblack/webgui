@@ -278,7 +278,7 @@ sub set {
 	$self->{_data}{className} = (exists $properties->{className}) ? $properties->{className} : $self->{_data}{className};
 	$self->{_data}{methodName} = (exists $properties->{methodName}) ? $properties->{methodName} : $self->{_data}{methodName};
 	if (exists $properties->{parameters}) {
-		$self->{_data}{parameters} = JSON::objToJson({parameters => $properties->{parameters}});
+		$self->{_data}{parameters} = JSON::objToJson({parameters => $properties->{parameters}},{pretty => 1, indent => 4, autoconv=>0, skipinvalid=>1});
 	}
 	$self->{_data}{enabled} = 0 unless ($self->{_data}{workflowId});
 	my $spectre = WebGUI::Workflow::Spectre->new($self->session);

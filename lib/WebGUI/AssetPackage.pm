@@ -65,7 +65,7 @@ sub exportPackage {
 	my $storage = WebGUI::Storage->createTemp($self->session);
 	foreach my $asset (@{$self->getLineage(["self","descendants"],{returnObjects=>1})}) {
 		my $data = $asset->exportAssetData;
-		$storage->addFileFromScalar($data->{properties}{lineage}.".json", JSON::objToJson($data));
+		$storage->addFileFromScalar($data->{properties}{lineage}.".json", JSON::objToJson($data,{pretty => 1, indent => 4, autoconv=>0, skipinvalid=>1}));
 		foreach my $storageId (@{$data->{storage}}) {
 			my $assetStorage = WebGUI::Storage->get($self->session, $storageId);
 			$assetStorage->tar($storageId.".storage", $storage);
