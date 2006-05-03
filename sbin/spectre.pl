@@ -95,7 +95,8 @@ if ($shutdown) {
 	my $res = ping();
 	print "Spectre is already running.\n" unless $res;
 	exit unless $res;
-	fork and exit(sleep(1) and print((ping())?"Spectre failed to start!\n":"Spectre started successfully!\n"));
+	#fork and exit(sleep(1) and print((ping())?"Spectre failed to start!\n":"Spectre started successfully!\n"));  #Can't have right now.
+	fork and exit;
 	Spectre::Admin->new($config, $debug);
 }
 
