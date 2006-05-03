@@ -1,3 +1,4 @@
+#PBtmpl0000000000000078
 <a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a>
 
 <tmpl_if session.var.adminOn> <p><tmpl_var controls></p> </tmpl_if>
@@ -6,7 +7,7 @@
 		
 <tmpl_if description> <tmpl_var description> </tmpl_if>
 			
-<tmpl_if session.var.adminOn> <p><a href="<tmpl_var url>?func=add&class=WebGUI::Asset::FilePile">Add files.</a></p> </tmpl_if>
+<tmpl_if session.var.adminOn> <p><a href="<tmpl_var addFile.url>"><tmpl_var addFile.label></a></p> </tmpl_if>
 				
 <table width="100%" cellpadding="3" cellspacing="0" class="content"> 
 <tmpl_loop subfolder_loop> 

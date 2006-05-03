@@ -135,7 +135,9 @@
    Kamerbeek / Procolix)
  - fix [ 1479779 ] enable select box in dataform (Martin Kamerbeek / Procolix)
  - fix [ 1478585 ] purgeRevision without warning or confirmation (Martin 
-   Kamerbee / Procolix)
+   Kamerbeek / Procolix)
+ - fix [ 1480536 ] "Add Files" link in Folder template doesn't work (Martin
+   Kamerbeek / Procolix)
  - Added a graphing engine and tied it into the Poll asset (Martin Kamerbeek / Procolix)
 
 6.8.8

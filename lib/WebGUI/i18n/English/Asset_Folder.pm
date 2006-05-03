@@ -63,6 +63,12 @@ to do you want to go to the new Folder?</p>|,
 
 	'folder template body' => {
 		message => q|The following variables are available in Folder Templates:
+<p><b>addFile.url</b><br />
+The url for adding files to the Folder.</p>
+
+<p><b>addFile.label</b><br />
+The internationalized label for adding files to the Folder.</p>
+
 <p><b>subfolder_loop</b><br />
 A loop containing all Folder assets which are children of the Folder.
 
@@ -141,7 +147,7 @@ this variable will be empty
 
 </blockquote>
 		|,
-        	lastUpdated => 1121790331,
+        	lastUpdated => 1146649269,
 	},
 
 	'assetName' => {
@@ -150,6 +156,10 @@ this variable will be empty
 		lastUpdated => 1121703567,
 	},
 
+	'add file label' => {
+		message => q|Add files.|,
+		lastUpdated => 1146649269,
+	},
 };
 
 1;

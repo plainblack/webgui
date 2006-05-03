@@ -168,6 +168,9 @@ sub purgeCache {
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
+
+	my $i18n = WebGUI::International->new($self->session, 'Asset_Folder');
+	
 	if ($self->session->user->userId eq '1') {
 		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
 		return $out if $out;
@@ -211,6 +214,10 @@ sub view {
 				});
 		}
 	}
+	
+	$vars{'addFile.label'} = $i18n->get('add file label');
+	$vars{'addFile.url'} = $self->getUrl('func=add&class=WebGUI::Asset::FilePile');
+	
        	my $out = $self->processTemplate(\%vars,undef,$self->{_viewTemplate});
 	if ($self->session->user->userId eq '1') {
 		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("visitorCacheTimeout"));
