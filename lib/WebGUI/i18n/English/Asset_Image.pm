@@ -145,40 +145,48 @@ shown here.|,
 
 <p><b>fileIcon</b><br />
 The icon which describes the type of file.
+</p>
 
 <p><b>fileUrl</b><br />
 The URL to the file.
+</p>
 
 <p><b>controls</b><br />
 A toolbar for working with the file.
+</p>
 
 <p><b>thumbnail</b><br />
 A URL to the thumbnail of the image;
+</p>
 
 <p><b>thumbnailSize</b><br />
 An integer representing the length of the longest side 
+</p>
 
 <p><b>parameters</b><br />
 Any additional IMG tag parameters that were entered with the image was uploaded.
+</p>
 
 <p><b>filename</b><br />
 The name of the image.
+</p>
 
 <p><b>storageId</b><br />
 The internal storage ID used for the file.
+</p>
 
 <p><b>title</b><br />
 The title set for the file when it was uploaded, or the filename if none was entered.
+</p>
 
 <p><b>menuTitle</b><br />
 The menu title, displayed in navigations, set for the image when it was uploaded, or the filename if none was entered.
+</p>
 
 		|,
 		context => 'Describing the image template variables',
-		lastUpdated => 1130456281,
+		lastUpdated => 1146775844,
 	},
-
-	
 
 };
 

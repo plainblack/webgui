@@ -994,11 +994,11 @@ our $I18N = {
         'delete listing confirmation' => {
                 lastUpdated => 1135289632,
                 message => q|<h1>Confirm Delete</h1>
-	Are you absolutely sure you wish to delete this listing? This operation cannot be undone.
+	<p>Are you absolutely sure you wish to delete this listing? This operation cannot be undone.</p>
 	<p>
 	<a href="%s">Yes!</a>
-	<p>
-	<a href="%s">No, I made a mistake.</a>|,
+	</p>
+	<p><a href="%s">No, I made a mistake.</a></p>|,
         },
 
         'list fields' => {

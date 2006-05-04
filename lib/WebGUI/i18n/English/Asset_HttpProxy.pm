@@ -17,13 +17,12 @@ our $I18N = {
 	},
 
 	'11' => {
-		message => q|The HTTP Proxy wobject is a very powerful tool. It enables you to embed external sites and applications into your site. For example, if you have a web mail system that you wish your staff could access through the intranet, then you could use the HTTP Proxy to accomplish that.
-<p>
+		message => q|<p>The HTTP Proxy wobject is a very powerful tool. It enables you to embed external sites and applications into your site. For example, if you have a web mail system that you wish your staff could access through the intranet, then you could use the HTTP Proxy to accomplish that.
+</p>
 
-<i>Note: The <b>Search for</b> and <b>Stop at</b> strings are included in the content in the default template. You can change this by creating your own template.</i>
-<p>
+<p><i>Note: The <b>Search for</b> and <b>Stop at</b> strings are included in the content in the default template. You can change this by creating your own template.</i></p>
 |,
-		lastUpdated => 1119244182,
+		lastUpdated => 1146775758,
 	},
 
 	'http proxy template title' => {
@@ -35,25 +34,29 @@ our $I18N = {
 		message => q|<p>The following variables are available in templates for HTTP Proxies:</p>
 <p><b>header</b><br />
 The header from the proxied URL.
+</p>
 
 <p><b>content</b><br />
 The content from the proxied URL.  If the <b>Search for</b> or <b>Stop at</b> properties are used, then the content will not contain either of those.
+</p>
 
 <p><b>search.for</b><br />
 The string used to start the content search.
+</p>
 
 <p><b>stop.at</b><br />
 The string used to stop the content search.
+</p>
 
 <p><b>content.leading</b><br />
 Any text before the <b>Search For</b> string.
+</p>
 
 <p><b>content.trailing</b><br />
 Any text after the <b>Stop At</b> string.
-
 </p>
 |,
-		lastUpdated => 1109714266,
+		lastUpdated => 1146775775,
 	},
 
         '1 description' => {

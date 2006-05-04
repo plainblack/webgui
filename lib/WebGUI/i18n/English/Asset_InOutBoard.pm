@@ -40,49 +40,63 @@ A boolean indicating whether or not the </i>rows_loop</i> variable will be set.<
 
 <p><b>form</b><br />
 A variable that contains an HTML form for limiting the scope, by date or department, of the report.
+</p>
 
 <p><b>username.label</b><br />
 Internationalized label for the "Username" column of the report.
+</p>
 
 <p><b>status.label</b><br />
 Internationalized label for the "Status" column of the report.
+</p>
 
 <p><b>date.label</b><br />
 Internationalized label for the "Date" column of the report.
+</p>
 
 <p><b>message.label</b><br />
 Internationalized label for the "Message" column of the report.
+</p>
 
 <p><b>updatedBy.label</b><br />
 Internationalized label for the "Updated By" column of the report.
+</p>
 
 <p><b>rows_loop</b><br />
 A loop containing the rows of data for the In/Out Board Report&nbsp;</p>
+</p>
 
-<BLOCKQUOTE>
+<blockquote>
 
 <p><b>deptHasChanged</b><br />
 A boolean value indicating whether or not this row of data is for a department that is differnet than the previous rows</p>
+</p>
 
 <p><b>username</b><br />
 A variable that returns the user's name. If the first and last name fields are defined in the user profile, that is what is returned. Otherwise, the users WebGUI username is returned. i.e., "John Doe" vs "Jdoe".</p>
+</p>
 
 <p><b>department</b><br />
 A variable that returns the user's department. If no department has been assigned to this user, an internationalized label for "No Department" will be used.</p>
+</p>
 
 <p><b>status</b><br />
 A variable that returns the user's status. The status of a user is defined by the Status List in the Wobject Properties. If no status is set for the current user 'Never Checked In' is returned.</p>
+</p>
 
 <p><b>dateStamp</b><br />
 A variable that returns the date the status of the user was last updated.</p>
+</p>
 
 <p><b>message</b><br />
 A variable that returns what the user entered in the "What's going on?" field when updating their status.</p>
+</p>
 
 <p><b>createdBy</b><br />
 A variable that returns which user, either the user himself or a delegate, changed the status for this user.
+</p>
 
-</BLOCKQUOTE>
+</blockquote>
 
 <p><b>paginateBar</b><br />
 A variable that returns the HTML necessary to create a Traditional Pagination Bar. i.e., &lt;&lt; First, 1, 2, Last &gt;&gt;</p>
@@ -143,7 +157,8 @@ their status for them.</p>
 	},
 
 	'21' => {
-		message => q|The following variables are made available from In/Out Board:
+		message => q|<p>The following variables are made available from In/Out Board:</p>
+
 <p><b>canViewReport</b><br />
 A boolean indicating whether or not the <i>viewReportURL</i> variable will be set.</p>
 

@@ -27,18 +27,18 @@ our $I18N = {
 	},
 
 	'71' => {
-		message => q|This Asset creates a simple multipurpose data-entry and
-                display form.
-  You
-can add additional fields to the DataForm, create multiple tabs, use the DataForm
-as a web form to email gateway, or easily create tables on your website with it.
+		message => q|
+<p>This Asset creates a simple multipurpose data-entry and display
+form.  You can add additional fields to the DataForm, create multiple
+tabs, use the DataForm as a web form to email gateway, or easily
+create tables on your website with it.</p>
 
 <p>The Data Form Wobject is special in that some of the controls for it
 are only available from the template.  Be sure to read the documentation
 for the Data Form Template and to include the variables that enable those
-functions.
+functions.</p>
 
-<p> Dataforms are Wobjects, so they inherit the properties of both Wobjects and Assets.  They also have these unique properties:
+<p> Dataforms are Wobjects, so they inherit the properties of both Wobjects and Assets.  They also have these unique properties:</p>
 |,
 		lastUpdated => 1119071111,
 	},
@@ -49,11 +49,11 @@ functions.
         },
 
         '74 description' => {
-                message => q|If set to yes, some additional fields will be added to your form for dealing with email. These fields will then be used to email any data entered into the form to a person of your choice.  By default the new fields are "Hidden" so that
-they can't be edited by the user.
+                message => q|<p>If set to yes, some additional fields will be added to your form for dealing with email. These fields will then be used to email any data entered into the form to a person of your choice.  By default the new fields are "Hidden" so that
+they can't be edited by the user.</p>
 <p>
-<b>NOTE:</b> The "To" field that is added as a result of setting this to yes can accept a standard email address, or a WebGUI username or a WebGUI group name.  To send an email to more than one address, separate them by commas.|,
-                lastUpdated => 1119071283,
+<b>NOTE:</b> The "To" field that is added as a result of setting this to yes can accept a standard email address, or a WebGUI username or a WebGUI group name.  To send an email to more than one address, separate them by commas.</p>|,
+                lastUpdated => 1146763307,
         },
 
 
@@ -162,7 +162,7 @@ or return to the page where the it was created.|,
 	},
 
 	'72' => {
-		message => q|<p>You may add as many additional fields to your Data Form as you like.<p>|,
+		message => q|<p>You may add as many additional fields to your Data Form as you like.</p>|,
 		lastUpdated => 1119156650,
 	},
 

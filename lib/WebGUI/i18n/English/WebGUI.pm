@@ -2281,7 +2281,9 @@ A boolean indicating whether there is more than one page.
 A list of links to every page in the paginator.
 </p> 
 
-<blockquote <b>pagination.pageLoop</b><br />
+<blockquote>
+
+<b>pagination.pageLoop</b><br />
 Same as pagination.pageList except broken into individual elements.
 </blockquote>
 

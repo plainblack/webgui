@@ -70,84 +70,84 @@ The url for adding files to the Folder.</p>
 The internationalized label for adding files to the Folder.</p>
 
 <p><b>subfolder_loop</b><br />
-A loop containing all Folder assets which are children of the Folder.
+A loop containing all Folder assets which are children of the Folder.</p>
 
 <blockquote>
 
 <p><b>id</b><br />
-The assetId of the Folder.
+The assetId of the Folder.</p>
 
 <p><b>url</b><br />
-The url of the Folder.
+The url of the Folder.</p>
 
 <p><b>title</b><br />
-The title of the Folder.
+The title of the Folder.</p>
 
 <p><b>icon.small</b><br />
-The URL to a small icon of the appropriate type for this Asset.
+The URL to a small icon of the appropriate type for this Asset.</p>
 
 <p><b>icon.big</b><br />
-The URL to a big icon of the appropriate type for this Asset.
+The URL to a big icon of the appropriate type for this Asset.</p>
 
 </blockquote>
 
 <p><b>file_loop</b><br />
-A loop containing all non-Folder assets which are children of the Folder.
+A loop containing all non-Folder assets which are children of the Folder.</p>
 
 <blockquote>
 
 <p><b>id</b><br />
-The assetId of the Asset.
+The assetId of the Asset.</p>
 
 <p><b>canView</b><br />
-A conditional indicating if the current user can view this Asset.
+A conditional indicating if the current user can view this Asset.</p>
 
 <p><b>title</b><br />
-The title of the Asset.
+The title of the Asset.</p>
 
 <p><b>synopsis</b><br />
-The synopsis of the Asset.
+The synopsis of the Asset.</p>
 
 <p><b>size</b><br />
-The size of the Asset, formatted.
+The size of the Asset, formatted.</p>
 
 <p><b>date.epoch</b><br />
-The date the Asset was last updated, relative to the epoch.
+The date the Asset was last updated, relative to the epoch.</p>
 
 <p><b>icon.small</b><br />
-A URL to a small icon that represents the Asset.
+A URL to a small icon that represents the Asset.</p>
 
 <p><b>icon.big</b><br />
-A URL to an icon that represents the Asset.
+A URL to an icon that represents the Asset.</p>
 
 <p><b>type</b><br />
-The type of this Asset.
+The type of this Asset.</p>
 
 <p><b>url</b><br />
-The URL of the Asset.
+The URL of the Asset.</p>
 
 <p><b>isImage</b><br />
-A conditional indicating if this Asset is an Image Asset.
+A conditional indicating if this Asset is an Image Asset.</p>
 
 <p><b>canEdit</b><br />
-A conditional indicating if this Asset can be edited by the current user.
+A conditional indicating if this Asset can be edited by the current user.</p>
 
 <p><b>controls</b><br />
-The editing control bar for this child
+The editing control bar for this child</p>
 
 <p><b>isFile</b><br />
-A conditional indicating if this Asset is a File Asset.
+A conditional indicating if this Asset is a File Asset.</p>
 
 <p><b>thumbnail.url</b><br />
-If this Asset is an Image, the URL to the thumbnail for it.
+If this Asset is an Image, the URL to the thumbnail for it.</p>
 
 <p><b>file.url</b><br />
 If this Asset is a File Asset (File, Image or Zip Archive), the URL to the actual file for downloading.  Otherwise,
-this variable will be empty
+this variable will be empty</p>
 
 </blockquote>
 		|,
-        	lastUpdated => 1146649269,
+        	lastUpdated => 1146775736,
 	},
 
 	'assetName' => {

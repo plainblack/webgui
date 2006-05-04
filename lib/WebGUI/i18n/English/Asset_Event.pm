@@ -61,67 +61,67 @@ our $I18N = {
 	},
 
 	'97' => {
-		message => q|The following is the list of template variables available in when displaying an event from the calendar.
-<p/>
+		message => q|<p>The following is the list of template variables available in when displaying an event from the calendar.
+</p>
 
-<b>title</b><br />
+<p><b>title</b><br />
 The title of this event.
-<p/>
+</p>
 
-<b>start.label</b><br />
+<p><b>start.label</b><br />
 The translated label for the start date.
-<p/>
+</p>
 
-<b>start.date</b><br />
+<p><b>start.date</b><br />
 The date this event starts.
-<p/>
+</p>
 
-<b>start.time</b><br />
+<p><b>start.time</b><br />
 The time this event starts.
-<p/>
+</p>
 
-<b>end.date</b><br />
+<p><b>end.date</b><br />
 The date this event ends.
-<p/>
+</p>
 
-<b>end.time</b><br />
+<p><b>end.time</b><br />
 The time this event ends.
-<p/>
+</p>
 
-<b>end.label</b><br />
+<p><b>end.label</b><br />
 The translated label for the end date.
-<p/>
+</p>
 
-<b>canEdit</b><br />
+<p><b>canEdit</b><br />
 A condition indicating whether the current user can edit an event.
-<p/>
+</p>
 
-<b>edit.url</b><br />
+<p><b>edit.url</b><br />
 The URL to edit this event.
-<p/>
+</p>
 
-<b>edit.label</b><br />
+<p><b>edit.label</b><br />
 The translated label for the edit URL.
-<p/>
+</p>
 
-<b>delete.url</b><br />
+<p><b>delete.url</b><br />
 The URL to delete this event.
-<p/>
+</p>
 
-<b>delete.label</b><br />
+<p><b>delete.label</b><br />
 The translated label for the delete URL.
-<p/>
+</p>
 
-<b>description</b><br />
+<p><b>description</b><br />
 The description of this event.
-<p/>
+</p>
 
-<b>eventLocation</b><br />
+<p><b>eventLocation</b><br />
 Where the event will occur.
-<p/>
+</p>
 
 |,
-		lastUpdated => 1130293978,
+		lastUpdated => 1146763452,
 	},
 
           '519' => {

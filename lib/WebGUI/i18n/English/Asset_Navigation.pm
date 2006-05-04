@@ -233,7 +233,7 @@ a Google sitemap of your site.
 <p><strong>currentPage.hasViewableSiblings</strong><br />A conditional indicating whether the start page has siblings that are viewable by the current user.</p>
 <p><strong>currentPage.hasViewableChildren</strong><br />A conditional indicating whether the start page has children that are viewable by the current user.</p>
 <p><strong>page_loop</strong><br />A loop containing page information in nested, hierarchical order.</p>
-<BLOCKQUOTE dir=ltr style="MARGIN-RIGHT: 0px">
+<blockquote dir=ltr style="MARGIN-RIGHT: 0px">
 <P dir=ltr><strong>page.assetId</strong><br />The assetId of this page.</p>
 <P dir=ltr><strong>page.parentId</strong><br />The assetId of the parent of this page.</p>
 <P dir=ltr><strong>page.ownerUserId</strong><br />The userId of the owner of this page.</p>
@@ -252,8 +252,8 @@ a Google sitemap of your site.
 <P dir=ltr><strong>page.url</strong><br />The complete URL to this page.</p>
 <p><strong>page.indent</strong><br />A variable containing the indent for the current page. The default indent is three spaces. Use the <strong>page.indent_loop</strong> if you need a more flexible indent.</p>
 <p><strong>page.indent_loop</strong><br />A loop that runs <strong>page.relDepth</strong> times.</p>
-<BLOCKQUOTE dir=ltr style="MARGIN-RIGHT: 0px">
-<p><strong>indent</strong><br />A number representing the loop count. </p></BLOCKQUOTE>
+<blockquote dir=ltr style="MARGIN-RIGHT: 0px">
+<p><strong>indent</strong><br />A number representing the loop count. </p></blockquote>
 <P dir=ltr><strong>page.isBranchRoot</strong><br />A conditional indicating whether this page is a root page.</p>
 <P dir=ltr><strong>page.isTopOfBranch</strong><br />A conditional indicating whether this page is a top page (daughter of root).</p>
 <P dir=ltr><strong>page.isChild</strong><br />A conditional indicating whether this page is a daughter of the base page.</p>
@@ -283,7 +283,7 @@ a Google sitemap of your site.
 <P dir=ltr><strong>page.parent.ownerUserId</strong><br />The userId of the owner of the mother of this page.</p>
 <P dir=ltr><strong>page.parent.synopsis</strong><br />The synopsis of the mother of this page.</p>
 <P dir=ltr><strong>page.parent.newWindow</strong><br />A conditional indicating whether the mother of this page should be opened in a new window.</p>
-</BLOCKQUOTE>|,
+</blockquote>|,
 		lastUpdated => 1145060204,
 	},
 
@@ -295,10 +295,10 @@ a Google sitemap of your site.
 	'1095' => {
 		message => q|<p>The general idea behind the navigation system is that instead of hardwiring all the various choices you might make into the code, the system manages a 'library' of these styles, just the way it does with Snippets, Images, Templates, Page Styles, and other types of reusable information.  You can create a new 'Navigation menu style', give it a name, and then use it anywhere on your site that you like.</p>
 <p>The navigation system consists of two parts:</p>
-<OL>
-<LI>The <strong>&#94;Navigation();</strong> macro, which determines which files may be included in the menu and which template to use.</LI>
-<LI>The Navigation Template, which creates the menu and presents it to the user.</LI>
-</OL>
+<ol>
+<li>The <strong>&#94;Navigation();</strong> macro, which determines which files may be included in the menu and which template to use.</li>
+<li>The Navigation Template, which creates the menu and presents it to the user.</li>
+</ol>
 <p>To create a new menu for your site, place a <b>&#94;Navigation(myMenu);</b> macro into a style. An "edit myMenu" link will be displayed if "myMenu" is not defined. </p>
 <p>Note: In this example "myMenu" is used, but you can pick any name, as long as it is unique.</p>|,
 		lastUpdated => 1101774239

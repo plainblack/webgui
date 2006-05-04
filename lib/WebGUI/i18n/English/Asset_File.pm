@@ -41,31 +41,39 @@ our $I18N = {
 
 <p><b>fileSize</b><br />
 The size (in bytes/kilobytes/megabytes, etc) of the file.
+</p>
 
 <p><b>fileIcon</b><br />
 The icon which describes the type of file.
+</p>
 
 <p><b>fileUrl</b><br />
 The URL to the file.
+</p>
 
 <p><b>controls</b><br />
 A toolbar for working with the file.
+</p>
 
 <p><b>filename</b><br />
 The name of the file.
+</p>
 
 <p><b>storageId</b><br />
 The internal storage ID used for the file.
+</p>
 
 <p><b>title</b><br />
 The title set for the file when it was uploaded, or the filename if none was entered.
+</p>
 
 <p><b>menuTitle</b><br />
 The menu title, displayed in navigations, set for the file when it was uploaded, or the filename if none was entered.
+</p>
 
 		|,
 		context => 'Describing the file template variables',
-		lastUpdated => 1145388974,
+		lastUpdated => 1146775676,
 	},
 
 
