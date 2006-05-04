@@ -16,11 +16,6 @@ our $HELP = {
 				namespace => 'Asset_Shortcut',
 			},
 			{
-				title => '85',
-				description => '85 description',
-				namespace => 'Asset_Shortcut',
-			},
-			{
 				title => 'Shortcut by alternate criteria',
 				description => 'Shortcut by alternate criteria description',
 				namespace => 'Asset_Shortcut',

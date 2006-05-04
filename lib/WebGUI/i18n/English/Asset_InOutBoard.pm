@@ -35,28 +35,28 @@ our $I18N = {
 	'23' => {
 		message => q|<p>The following variables are available from In/Out Board Report template:</p>
 
-<P><b>showReport</b><br />
+<p><b>showReport</b><br />
 A boolean indicating whether or not the </i>rows_loop</i> variable will be set.</p>
 
-<P><b>form</b><br />
+<p><b>form</b><br />
 A variable that contains an HTML form for limiting the scope, by date or department, of the report.
 
-<P><b>username.label</b><br />
+<p><b>username.label</b><br />
 Internationalized label for the "Username" column of the report.
 
-<P><b>status.label</b><br />
+<p><b>status.label</b><br />
 Internationalized label for the "Status" column of the report.
 
-<P><b>date.label</b><br />
+<p><b>date.label</b><br />
 Internationalized label for the "Date" column of the report.
 
-<P><b>message.label</b><br />
+<p><b>message.label</b><br />
 Internationalized label for the "Message" column of the report.
 
-<P><b>updatedBy.label</b><br />
+<p><b>updatedBy.label</b><br />
 Internationalized label for the "Updated By" column of the report.
 
-<P><b>rows_loop</b><br />
+<p><b>rows_loop</b><br />
 A loop containing the rows of data for the In/Out Board Report&nbsp;</p>
 
 <BLOCKQUOTE>

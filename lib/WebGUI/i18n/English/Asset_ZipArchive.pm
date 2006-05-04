@@ -69,16 +69,16 @@ our $I18N = {
 	 'zip archive template body' => {
                 message => q|<p>The following variables are available in Zip Archive Templates:</p>
 
-<P><b>controls</b><br />
+<p><b>controls</b><br />
 Asset controls for administrators.
 
-<P><b>error</b><br />
+<p><b>error</b><br />
 Any errors reported during upload or unzip
 
-<P><b>fileUrl</b><br />
+<p><b>fileUrl</b><br />
 URL to the initial file
 
-<P><b>fileIcon</b><br />
+<p><b>fileIcon</b><br />
 Initial file file type icon
 		|,
 		context => 'Describing the zip archive template variables',

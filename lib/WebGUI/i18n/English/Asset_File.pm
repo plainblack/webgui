@@ -17,9 +17,9 @@ our $I18N = {
 	},
 
 	'file add/edit body' => {
-                message => q|<P>File Assets are files on your site that are available for users to download. If you would like to have multiple files available, try using a FilePile Asset.</P>
+                message => q|<p>File Assets are files on your site that are available for users to download. If you would like to have multiple files available, try using a FilePile Asset.</p>
 
-<P>Since Files are Assets, so they have all the properties that Assets do.  Below are the properties that are specific to Image Assets:</P>
+<p>Since Files are Assets, so they have all the properties that Assets do.  Below are the properties that are specific to Image Assets:</p>
 
 |,
 		context => 'Describing file add/edit form specific fields',
@@ -39,28 +39,28 @@ our $I18N = {
 	'file template body' => {
                 message => q|<p>The following variables are available in File Templates:</p>
 
-<P><b>fileSize</b><br />
+<p><b>fileSize</b><br />
 The size (in bytes/kilobytes/megabytes, etc) of the file.
 
-<P><b>fileIcon</b><br />
+<p><b>fileIcon</b><br />
 The icon which describes the type of file.
 
-<P><b>fileUrl</b><br />
+<p><b>fileUrl</b><br />
 The URL to the file.
 
-<P><b>controls</b><br />
+<p><b>controls</b><br />
 A toolbar for working with the file.
 
-<P><b>filename</b><br />
+<p><b>filename</b><br />
 The name of the file.
 
-<P><b>storageId</b><br />
+<p><b>storageId</b><br />
 The internal storage ID used for the file.
 
-<P><b>title</b><br />
+<p><b>title</b><br />
 The title set for the file when it was uploaded, or the filename if none was entered.
 
-<P><b>menuTitle</b><br />
+<p><b>menuTitle</b><br />
 The menu title, displayed in navigations, set for the file when it was uploaded, or the filename if none was entered.
 
 		|,

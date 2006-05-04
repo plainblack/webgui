@@ -185,10 +185,6 @@ sub definition {
 				fieldType=>"template",
 				defaultValue=>"PBtmpl0000000000000140"
 			},
-			description=>{
-				fieldType=>"HTMLArea",
-				defaultValue=>undef
-			},
 			prefFieldsToShow=>{
 				fieldType=>"checkList",
 				defaultValue=>undef

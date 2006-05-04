@@ -35,16 +35,16 @@ our $I18N = {
 
 	'redirect add/edit body' => {
 		message => q|
-<P>The Redirect Asset causes the user's browser to be redirected to
+<p>The Redirect Asset causes the user's browser to be redirected to
 another page.   The new page can be part of your site, or it can be on
 another site altogether.  The redirection happens when the Redirect
 Assets own URL is accessed, either by a link from a page, or from a
 Navigation, or if the Asset's URL is entered into the browser directly.
 However, if it is viewed as an element of a Page Asset, or proxied via
-a macro onto a page, then no redirection will take place.</P>
+a macro onto a page, then no redirection will take place.</p>
 
-<P><b>NOTE:</b>The redirection will be disabled while in admin mode in order to
-allow editing the properties of the Asset.</P>
+<p><b>NOTE:</b>The redirection will be disabled while in admin mode in order to
+allow editing the properties of the Asset.</p>
 
 |,
         	lastUpdated => 1139251653,

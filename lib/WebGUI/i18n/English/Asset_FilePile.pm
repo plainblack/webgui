@@ -7,9 +7,9 @@ our $I18N = {
 	},
 
 	'file pile add/edit body' => {
-                message => q|<P>File Pile Assets allow you to upload lots of files to your site all at once.  This is the only function that File Piles have.  If you want to display the files that have been uploaded, you'll need to use another Asset or Wobject.</P>
+                message => q|<p>File Pile Assets allow you to upload lots of files to your site all at once.  This is the only function that File Piles have.  If you want to display the files that have been uploaded, you'll need to use another Asset or Wobject.</p>
 
-<P>Unlike most Assets, File Piles do not share the base set of Asset properties.  All File Piles
+<p>Unlike most Assets, File Piles do not share the base set of Asset properties.  All File Piles
 have the following properties:</p>
 
 |,

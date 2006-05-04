@@ -39,7 +39,7 @@ our $I18N = {
 
 	'folder add/edit body' => {
 		message => q|<p>Folder Assets are used to display lists of Assets and subfolders just like a file browser in an operating system.</p>
-<P>Folders are Wobjects, so they have all the same properties as Wobjects and Assets.  Folders also have these unique properties and functions:</p>
+<p>Folders are Wobjects, so they have all the same properties as Wobjects and Assets.  Folders also have these unique properties and functions:</p>
 
 |,
         	lastUpdated => 1126238060,

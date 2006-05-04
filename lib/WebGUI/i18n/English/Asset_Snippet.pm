@@ -35,9 +35,9 @@ our $I18N = {
 	},
 
 	'snippet add/edit body' => {
-                message => q|<P>Snippets are bits of text that may be reused on your site. Things like java scripts, cascading style sheets, HTML segments, XML or company slogans can all be used as snippets. Best of all, if you need to change the text, you need change it in only one location to update the snippet whereever it is used.</P>
+                message => q|<p>Snippets are bits of text that may be reused on your site. Things like java scripts, cascading style sheets, HTML segments, XML or company slogans can all be used as snippets. Best of all, if you need to change the text, you need change it in only one location to update the snippet whereever it is used.</p>
 
-<P>Since Snippets are Assets, so they have all the properties that Assets do.</P>
+<p>Since Snippets are Assets, so they have all the properties that Assets do.</p>
 |,
                 context => 'Describing snippets',
         	lastUpdated => 1130880179,

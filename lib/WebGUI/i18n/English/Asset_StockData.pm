@@ -104,7 +104,7 @@ our $I18N = {
 	},
 
 	'help_add_edit_stocklist_body' => {
-		message => q|<P>Stock Lists allow users to track stocks on your site.  Data is retrieved from various sources on the internet and displayed in tabluar format.  This application allows any registered user to configure stock lists as well as to set a default stock list for visitors or for users who have not configured one themselves<P>|,
+		message => q|<p>Stock Lists allow users to track stocks on your site.  Data is retrieved from various sources on the internet and displayed in tabluar format.  This application allows any registered user to configure stock lists as well as to set a default stock list for visitors or for users who have not configured one themselves<p>|,
 		lastUpdated => 1119066571,
 	},
 

@@ -8,10 +8,10 @@ our $I18N = {
 	},
 
 	'image add/edit body' => {
-                message => q|<P>Image Assets are used to store images that you want displayed on your site.</P>
+                message => q|<p>Image Assets are used to store images that you want displayed on your site.</p>
 
-<P>Since Images are a subset of File Assets, they have the properties that all Assets do as well
-as File Assets.  Below are the properties that are specific to Image Assets:</P>|,
+<p>Since Images are a subset of File Assets, they have the properties that all Assets do as well
+as File Assets.  Below are the properties that are specific to Image Assets:</p>|,
 		context => 'Describing image add/edit form specific fields',
 		lastUpdated => 1119409764,
 	},
@@ -143,34 +143,34 @@ shown here.|,
 	'image template body' => {
                 message => q|<p>The following variables are available in Image Templates:</p>
 
-<P><b>fileIcon</b><br />
+<p><b>fileIcon</b><br />
 The icon which describes the type of file.
 
-<P><b>fileUrl</b><br />
+<p><b>fileUrl</b><br />
 The URL to the file.
 
-<P><b>controls</b><br />
+<p><b>controls</b><br />
 A toolbar for working with the file.
 
-<P><b>thumbnail</b><br />
+<p><b>thumbnail</b><br />
 A URL to the thumbnail of the image;
 
-<P><b>thumbnailSize</b><br />
+<p><b>thumbnailSize</b><br />
 An integer representing the length of the longest side 
 
-<P><b>parameters</b><br />
+<p><b>parameters</b><br />
 Any additional IMG tag parameters that were entered with the image was uploaded.
 
-<P><b>filename</b><br />
+<p><b>filename</b><br />
 The name of the image.
 
-<P><b>storageId</b><br />
+<p><b>storageId</b><br />
 The internal storage ID used for the file.
 
-<P><b>title</b><br />
+<p><b>title</b><br />
 The title set for the file when it was uploaded, or the filename if none was entered.
 
-<P><b>menuTitle</b><br />
+<p><b>menuTitle</b><br />
 The menu title, displayed in navigations, set for the image when it was uploaded, or the filename if none was entered.
 
 		|,

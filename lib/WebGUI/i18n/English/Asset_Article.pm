@@ -22,9 +22,9 @@ our $I18N = {
 		},
 
 	'71' => {
-		message => q|<P>Articles are the Swiss Army knife of WebGUI. Most pieces of static content can be added via the Article.  Articles are Wobjects, so they inherit the properties of both Wobjects and Assets.</p>
+		message => q|<p>Articles are the Swiss Army knife of WebGUI. Most pieces of static content can be added via the Article.  Articles are Wobjects, so they inherit the properties of both Wobjects and Assets.</p>
 
-<P>NOTE: You can create a multi-paged article by placing the separator macro (&#94;-;) at various places through-out your article.  This works unless you are using a Make Page Printable style.</p>
+<p>NOTE: You can create a multi-paged article by placing the separator macro (&#94;-;) at various places through-out your article.  This works unless you are using a Make Page Printable style.</p>
 
 |,
 		lastUpdated => 1146514077,
@@ -92,7 +92,9 @@ use templates from the "page" namespace.|,
 		message => q|<p>The following template variables are available for article templates.</p>
 
 <p><b>new.template</b><br />
-Articles have the special ability to change their template so that you can allow users to see different views of the article. You do this by creating a link with a URL like this (replace 999 with the template Id you wish to use):<p>
+Articles have the special ability to change their template so that you can allow users to see different views of the article. You do this by creating a link with a URL like this (replace 999 with the template Id you wish to use):
+</p>
+<p>
 &lt;a href="&lt;tmpl_var new.template&gt;999"&gt;Read more...&lt;/a&gt;
 </p>
 

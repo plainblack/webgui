@@ -263,14 +263,14 @@ our $I18N = {
         },
 
         'asset id description' => {
-                message => q|<p>This is the unique identifier WebGUI uses to keep track of this Asset instance. Normal users should never need to be concerned with the Asset ID, but some advanced users may need to know it for things like SQL Reports. The Asset ID is not editable.</P>|,
+                message => q|<p>This is the unique identifier WebGUI uses to keep track of this Asset instance. Normal users should never need to be concerned with the Asset ID, but some advanced users may need to know it for things like SQL Reports. The Asset ID is not editable.</p>|,
                 lastUpdated => 1127426210,
         },
 
         '99 description' => {
                 message => q|<p>The title of the asset.  This should be descriptive, but not very long.  If left
 blank, this will be set to "Untitled".</p>
-<P><i>Note:</i> You should always specify a title, even if the Asset template will not use it. In various places on the site, like the Page Tree, Clipboard and Trash, the <b>Title</b> is used to distinguish this Asset from others.</p>|,
+<p><i>Note:</i> You should always specify a title, even if the Asset template will not use it. In various places on the site, like the Page Tree, Clipboard and Trash, the <b>Title</b> is used to distinguish this Asset from others.</p>|,
                 lastUpdated => 1146629119,
         },
 
@@ -361,8 +361,8 @@ default Asset in the menu.</p>|,
         'asset template body' => {
                 message => q|
 <p>This variable is inserted into every template:</p>
-<P><b>controls</b><br />
-These are the icons and URLs that allow editing, cutting, copying, deleting and reordering the Asset.</P>
+<p><b>controls</b><br />
+These are the icons and URLs that allow editing, cutting, copying, deleting and reordering the Asset.</p>
 
         |,
         lastUpdated => 1113357523,
@@ -709,7 +709,7 @@ each asset under the tab &quot;Meta&quot; in the asset properties.</p>
 
 	'asset list body' => {
 		 lastUpdated => 1112291919,
-		 message => q|These Assets are available for use at your site:<p>|
+		 message => q|<p>These Assets are available for use at your site:</p>|
 	       },
 
 	'directory index' => {

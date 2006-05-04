@@ -959,7 +959,7 @@ However, it is not possible to restore the children of the Post directly, withou
 Post that was originally deleted.
 </p>
 
-<P>Collaboration Assets have the properties of Assets and Wobjects, as well as the
+<p>Collaboration Assets have the properties of Assets and Wobjects, as well as the
 properties listed below:</p>
                 |,
 		lastUpdated => 1113974026,
