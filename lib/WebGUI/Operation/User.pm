@@ -309,7 +309,7 @@ sub www_editUser {
 		"groups"=> { label=>$i18n->get('89')},
 		);
 	my $tabform = WebGUI::TabForm->new($session,\%tabs);
-	
+	$tabform->formHeader({extras=>'autocomplete="off"'});	
 	my $u = WebGUI::User->new($session,($uid eq 'new') ? '' : $uid); #Setting uid to '' when uid is 'new' so visitor defaults prefill field for new user
 	my $username = $u->userId eq '1' ? '' : $u->username;
 	$session->stow->set("editUser_UID", $uid);
