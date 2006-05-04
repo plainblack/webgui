@@ -1256,7 +1256,7 @@ sub getAllPossibleEventPrerequisites {
 	
 	# Get all prerequisite definitions defined for this event
 	my $prerequisiteDefinitions = $self->session->db->buildHashRef("select prereqs.prerequisiteId, prereqs.operator from EventManagementSystem_prerequisites as prereqs, EventManagementSystem_products as p
-									where prereqs.prerequisiteId = p.prerequisiteId and p.productId=?",[$eventId]);
+									where prereqs.prerequisiteId = p.prerequisiteId and p.approved=1 and p.productId=?",[$eventId]);
 	foreach my $prerequisiteId (keys %{$prerequisiteDefinitions}) {
 		my $message;
 		my $operator = $prerequisiteDefinitions->{$prerequisiteId};
@@ -1312,7 +1312,7 @@ sub getAllPossibleRequiredEvents {
 	return [] unless $lastResultsSize;
 	until ($currentResultsSize == $lastResultsSize) {
 		$currentResultsSize = $lastResultsSize;
-		my $newResults = $self->session->db->buildArrayRef("select distinct(r.requiredProductId) from EventManagementSystem_prerequisiteEvents as r, EventManagementSystem_products as p where r.prerequisiteId = p.prerequisiteId and p.productId in (".$self->session->db->quoteAndJoin($lastResults).")");
+		my $newResults = $self->session->db->buildArrayRef("select distinct(r.requiredProductId) from EventManagementSystem_prerequisiteEvents as r, EventManagementSystem_products as p where r.prerequisiteId = p.prerequisiteId and p.approved=1 and p.productId in (".$self->session->db->quoteAndJoin($lastResults).")");
 		return $lastResults unless scalar(@$newResults);
 		$lastResults = $newResults;
 		$lastResultsSize = scalar(@$lastResults);
@@ -1998,7 +1998,7 @@ sub www_viewPurchase {
 	while (my $purchase = $sth->hashRef) {
 		my $badgeId = $purchase->{badgeId};
 		my $pid = $purchase->{purchaseId};
-		my $sql2 = "select r.registrationId, p.title, p.description, p.price, p.templateId, r.returned, e.approved, e.maximumAttendees, e.startDate, e.endDate from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e, products as p where p.productId = r.productId and p.productId = e.productId and r.badgeId=? and r.purchaseId=? group by r.registrationId order by b.lastName";
+		my $sql2 = "select r.registrationId, p.title, p.description, p.price, p.templateId, r.returned, e.approved, e.maximumAttendees, e.startDate, e.endDate, b.userId, b.createdByUserId from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e, products as p where p.productId = r.productId and p.productId = e.productId and r.badgeId=? and r.purchaseId=? group by r.registrationId order by b.lastName";
 		my $sth2 = $self->session->db->read($sql2,[$badgeId,$pid]);
 		$purchase->{regLoop} = [];
 		$purchase->{canReturnItinerary} = 0;
@@ -2006,6 +2006,7 @@ sub www_viewPurchase {
 			$reg->{startDateHuman} = $self->session->datetime->epochToHuman($reg->{'startDate'});
 			$reg->{endDateHuman} = $self->session->datetime->epochToHuman($reg->{'endDate'});
 			$purchase->{canReturnItinerary} = 1 unless $reg->{'returned'};
+			$purchase->{canAddEvents} = 1 if ($isAdmin || ($userId eq $self->session->var->get('userId')) || ($reg->{userId} eq $self->session->var->get('userId'))  || ($reg->{createdByUserId} eq $self->session->var->get('userId')));
 			push(@{$purchase->{regLoop}},$reg);
 		}
 		$var{canReturnTransaction} = 1 if $purchase->{canReturnItinerary};
@@ -2015,7 +2016,6 @@ sub www_viewPurchase {
 	$var{viewPurchaseTitle} = $i18n->get('view purchase');
 	$var{canReturn} = $isAdmin;
 	$var{transactionId} = $tid;
-	$var{canAddEvents} = $isAdmin || $userId eq $self->session->var->get('userId');
 	$var{appUrl} = $self->getUrl;
 	$sth->finish;
 	$var{purchasesLoop} = \@purchasesLoop;
