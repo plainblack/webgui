@@ -13,8 +13,8 @@ our $I18N = {
 	},
 
 	'random thread body' => {
-		message => q|<b>&#94;RandomThread( [ startURL, relatives, templateURL ] );</b><br />
-<p>The Collaboration System can be used for much more than just a forum. A few examples of its 
+		message => q|<p><b>&#94;RandomThread( [ startURL, relatives, templateURL ] );</b><br />
+The Collaboration System can be used for much more than just a forum. A few examples of its 
 possible usages are a FAQ, photo gallery, job listings, quotes database or weblog. For these 
 applications (and others that you might think of) it can be nice to display a random entry 
 from such a CS somewhere on your site. That is exactly the functionality that this macro provides.</p>
@@ -27,6 +27,7 @@ the template variables that are normally available in a CS Post template are ava
 <p>Although all the parameters can be omitted, it usually makes sense specify them all. If you
 want to display a random thread from a single CS, we suggest you use the URL of the CS as the <i>startURL</i>
 and &quot;self&quot; as <i>relatives</i>.</p>
+<div>
 <dl>
 <dt><i>startURL</i></dt>
 <dd>URL of the asset you want to use as the starting point for finding a random CS. If omitted 
@@ -43,8 +44,10 @@ are used. Allowed values for this parameter are 'siblings', 'children', 'ancesto
 available template variables. Since you almost certainly will not want this output in a 
 production-environment, it makes sense to not omit this parameter.</dd>
 </dl>
+</div>
 
-<p><b>Examples</b></p>
+<p><b>Examples:</b></p>
+<div>
 <dl>
 <dt><tt>&#94;RandomThread(home/photo_album, descendants, templates/randomPhoto);</tt></dt>
 <dd>If you have a page with many subpages with photo galleries, you can use the parameters above
@@ -58,8 +61,9 @@ of questions), then the example above can be used to display a random question f
 <dt><tt>&#94;RandomThread;</tt></dt>
 <dd>Gets a random post from all Collaboration Systems in root 'home' with debug output.</dd>
 </dl>
+</div>
 |,
-		lastUpdated => 1132970060,
+		lastUpdated => 1146760592,
 	},
 };
 

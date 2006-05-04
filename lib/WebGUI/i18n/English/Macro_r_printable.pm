@@ -14,7 +14,6 @@ our $I18N = {
 
 	'printable body' => {
 		message => q|
-
 <p><b>&#94;r(<i>link text</i>)</b><br />
 <b>&#94;r("",<i>custom style name</i>)</b><br />
 <b>&#94;r("",<i>custom style name</i>,<i>custom template name</i>)</b><br />
@@ -27,7 +26,7 @@ Creates a link to alter the style from a page to make it printable.
 <p>Normally, the default style to make the page printable is the "Make Page Printable" style.  The second argument specifies that a different style than the default be used to make the page printable: <b>&#94;r("Print!","WebGUI");</b>.
 </p>
 
-<p>The third argument allows a different template be used to generate the HTML code for presenting the link and text, by specifying the name of the template.  The following variables are available in the template:
+<p>The third argument allows a different template be used to generate the HTML code for presenting the link and text, by specifying the name of the template.  The following variables are available in the template:</p>
 
 <p><b>printable.url</b><br />
 The URL to make the page printable.
@@ -41,7 +40,7 @@ The translated label for the printable link, or the text that you supply to the 
 </p>
 
 |,
-		lastUpdated => 1146608731,
+		lastUpdated => 1146760682,
 	},
 
 	'53' => {
