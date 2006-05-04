@@ -5,7 +5,8 @@
 WebGUI is Copyright 2001-2006 Plain Black Corporation. All rights 
 reserved.
 
-WebGUI is a trademark of Plain Black Corporation.
+WebGUI Content Engine, WebGUI Runtime Environment, and Plain Black 
+are registered trademarks of Plain Black Corporation.
 
 WebGUI is free software; you can redistribute it and/or modify it 
 under the terms of the GNU General Public License (version 2) as 

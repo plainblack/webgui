@@ -238,7 +238,7 @@ sub getLatestWebguiVersion {
         my $referer = "http://".`hostname`."/webgui-cli-version";
         chomp $referer;
         $header->referer($referer);
-        my $currentversionRequest = new HTTP::Request (GET => "http://www.plainblack.com/downloads/latest-version.txt", $header);
+        my $currentversionRequest = new HTTP::Request (GET => "http://update.webgui.org/latest-version.txt", $header);
         my $currentversionResponse = $currentversionUserAgent->request($currentversionRequest);
         my $version = $currentversionResponse->content;
         chomp $version;

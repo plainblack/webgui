@@ -115,7 +115,7 @@ sub www_viewStatistics {
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
         my ($output, $data);
 	my $i18n = WebGUI::International->new($session);
-	my $url = "http://www.plainblack.com/downloads/latest-version.txt";
+	my $url = "http://update.webgui.org/latest-version.txt";
 	my $cache = WebGUI::Cache->new($session,$url,"URL");
 	my $version = $cache->get;
 	if (not defined $version) {
@@ -127,7 +127,7 @@ sub www_viewStatistics {
 	if ($version ne $WebGUI::VERSION) {
 		my @rev = split(/\./,$version);
 		
-		$version = '<a href="http://files.plainblack.com/downloads/'.$rev[0].'.x.x/webgui-'.$version.'.tar.gz">'.$version.'</a>';
+		$version = '<a href="http://update.webgui.org/'.$rev[0].'.x.x/webgui-'.$version.'.tar.gz">'.$version.'</a>';
 	}
 	$output .= '<tr><td align="right" class="tableHeader">'.$i18n->get(349).':</td><td class="tableData">'.$version.'</td></tr>';
 	($data) = $session->db->quickArray("select count(*) from asset where state='published'");

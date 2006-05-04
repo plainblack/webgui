@@ -216,7 +216,7 @@ sub view {
 	}
 	
 	$vars{'addFile.label'} = $i18n->get('add file label');
-	$vars{'addFile.url'} = $self->getUrl('func=add&class=WebGUI::Asset::FilePile');
+	$vars{'addFile.url'} = $self->getUrl('func=add;class=WebGUI::Asset::FilePile');
 	
        	my $out = $self->processTemplate(\%vars,undef,$self->{_viewTemplate});
 	if ($self->session->user->userId eq '1') {
