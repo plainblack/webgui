@@ -110,7 +110,7 @@ sub toHtml {
 	my $value = $self->session->datetime->secondsToTime($self->get("value"));
 	my $i18n = WebGUI::International->new($self->session);
 	$self->session->style->setScript($self->session->url->extras('inputCheck.js'),{ type=>'text/javascript' });
-	$self->set("extras", $self->get('extras') . ' onkeyup="doInputCheck(this.form.'.$self->get("name").',\'0123456789:\')"');
+	$self->set("extras", $self->get('extras') . ' onkeyup="doInputCheck(document.getElementById(\''.$self->get("id").'\'),\'0123456789:\')"');
 	return $self->SUPER::toHtml
 		.WebGUI::Form::Button->new($self->session,
 			id=>$self->get('id'),
