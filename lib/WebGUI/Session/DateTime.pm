@@ -42,12 +42,12 @@ This package provides easy to use date math functions, which are normally a comp
  $dt = WebGUI::Session::DateTime->new($session);
  $session = $dt->session;
 
- $epoch = $dt-$self->session->datetime->addToDate($epoch, $years, $months, $days);
- $epoch = $dt-$self->session->datetime->addToTime($epoch, $hours, $minutes, $seconds);
- $epoch = $dt-$self->session->datetime->addToDateTime($epoch, $years, $months, $days, $hours, $minutes, $seconds);
+ $epoch = $dt->addToDate($epoch, $years, $months, $days);
+ $epoch = $dt->addToTime($epoch, $hours, $minutes, $seconds);
+ $epoch = $dt->addToDateTime($epoch, $years, $months, $days, $hours, $minutes, $seconds);
  ($startEpoch, $endEpoch) = $dt->dayStartEnd($epoch);
- $dateString = $dt-$self->session->datetime->epochToHuman($epoch, $formatString);
- $setString = $dt-$self->session->datetime->epochToSet($epoch);
+ $dateString = $dt->epochToHuman($epoch, $formatString);
+ $setString = $dt->epochToSet($epoch);
  $day = $dt->getDayName($dayInteger);
  $integer = $dt->getDaysInMonth($epoch);
  $integer = $dt->getDaysInInterval($start, $end);
@@ -57,14 +57,14 @@ This package provides easy to use date math functions, which are normally a comp
  $month = $dt->getMonthName($monthInteger);
  $seconds = $dt->getSecondsFromEpoch($seconds);
  $zones = $dt->getTimeZones();
- $epoch = $dt-$self->session->datetime->humanToEpoch($dateString);
+ $epoch = $dt->humanToEpoch($dateString);
  $seconds = $dt->intervalToSeconds($interval, $units);
- @date = $dt-$self->session->datetime->loca$self->session->datetime->time($epoch);
- ($startEpoch, $endEpoch) = $dt-$self->session->datetime->monthStartEnd($epoch);
+ @date = $dt->time($epoch);
+ ($startEpoch, $endEpoch) = $dt->monthStartEnd($epoch);
  ($interval, $units) = $dt->secondsToInterval($seconds);
  $timeString = $dt->secondsToTime($seconds);
- $epoch = $dt-$self->session->datetime->setToEpoch($setString);
- $epoch = $dt-$self->time();
+ $epoch = $dt->setToEpoch($setString);
+ $epoch = $dt->time();
  $seconds = $dt->timeToSeconds($timeString);
 
 =head1 METHODS
@@ -215,6 +215,8 @@ sub dayStartEnd {
 	my $self = shift;
 	my $dt = DateTime->from_epoch( epoch => shift);
 	my $end = $dt->clone;	
+	$dt->set_time_zone($self->session->user->profileField("timeZone")|| "America/Chicago"); # assign the user's timezone
+	$end->set_time_zone($self->session->user->profileField("timeZone")|| "America/Chicago"); # assign the user's timezone
 	$dt->set_hour(0);
 	$dt->set_minute(0);
 	$dt->set_second(0);
