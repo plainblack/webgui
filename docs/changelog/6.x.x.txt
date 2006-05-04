@@ -114,6 +114,7 @@
  - added [ 1376374 ] WebGUI should return a Last-Modified http/1.x header
  - added [ 1216059 ] Admin Bar Made Sticky
  - fix [ 1471218 ] 6.8.8: Unable to change Default Home Page
+ - fix [ 1481787 ] autocomplete in user editing screens
  - fix [ 1445002 ] Field(s) fail to delete
  - fix [ 1344318 ] utf8 support for uri_escape/URL::Escape
  - fix [ 1466255 ] 6.8.8 Typo in package WebGUI::Operation::FormHelpers

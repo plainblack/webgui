@@ -1898,6 +1898,7 @@ sub www_editSave {
 	my $object;
 	if ($self->session->form->process("assetId") eq "new") {
 		$object = $self->addChild({className=>$self->session->form->process("class")});	
+		return $self->www_view unless defined $object;
 		$object->{_parent} = $self;
 	} else {
 		if ($self->canEditIfLocked) {
