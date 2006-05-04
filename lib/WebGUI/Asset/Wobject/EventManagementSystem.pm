@@ -2006,7 +2006,7 @@ sub www_viewPurchase {
 			$reg->{startDateHuman} = $self->session->datetime->epochToHuman($reg->{'startDate'});
 			$reg->{endDateHuman} = $self->session->datetime->epochToHuman($reg->{'endDate'});
 			$purchase->{canReturnItinerary} = 1 unless $reg->{'returned'};
-			$purchase->{canAddEvents} = 1 if ($isAdmin || ($userId eq $self->session->var->get('userId')) || ($reg->{userId} eq $self->session->var->get('userId'))  || ($reg->{createdByUserId} eq $self->session->var->get('userId')));
+			$var{canAddEvents} = 1 if ($isAdmin || ($userId eq $self->session->var->get('userId')) || ($reg->{userId} eq $self->session->var->get('userId'))  || ($reg->{createdByUserId} eq $self->session->var->get('userId')));
 			push(@{$purchase->{regLoop}},$reg);
 		}
 		$var{canReturnTransaction} = 1 if $purchase->{canReturnItinerary};
