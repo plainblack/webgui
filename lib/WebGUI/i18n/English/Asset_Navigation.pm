@@ -184,10 +184,10 @@ all of the classes of pages that should be included:<br />
         },
 
         '31 description' => {
-                message => q|Should the menus include pages which are marked as Hidden? Similar to
+                message => q|<p>Should the menus include pages which are marked as Hidden? Similar to
 System Pages, if you want certain groups to be able to see Hidden Pages, then select Yes and use
 the Navigation Template to determine who can see them in the menu.</p>
-<p>NOTE: Any user in Admin mode will automatically be able to see all pages that they can edit regardless of whether they are hidden or the value of this property.|,
+<p>NOTE: Any user in Admin mode will automatically be able to see all pages that they can edit regardless of whether they are hidden or the value of this property.</p>|,
                 lastUpdated => 1121969610,
         },
 
@@ -205,7 +205,7 @@ vertical, horizontal and crumbtrail.  These templates can often be styled via CS
 of rewriting the templates.</p>
 <p>The Navigation Asset can also be used to generate XML output by creating a
 template and setting the MIME Type appropriately.  This could be useful for building
-a Google sitemap of your site.
+a Google sitemap of your site.</p>
 |,
 
 		lastUpdated => 1140139614,

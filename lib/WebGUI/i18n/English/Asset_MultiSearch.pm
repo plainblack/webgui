@@ -44,7 +44,8 @@ our $I18N = {
 
 	'multisearch template body' => {
 		message => q|<p>The MultiSearch template has all the template variables used by Wobjects,
-as well as these:
+as well as these:</p>
+
 <p><b>search</b><br />
 Internationalized label for the word "search"
 </p>
@@ -58,7 +59,7 @@ Submit button with internationalized label for "Submit".
 </p>
 
 |,
-		lastUpdated => 1133619940,
+		lastUpdated => 1146784875,
 	},
 
 	'for' => {

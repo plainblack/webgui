@@ -17,13 +17,14 @@ our $I18N = {
 	},
 
 	'71' => {
-		message => q|SQL Reports are perhaps the most powerful wobject in the WebGUI arsenal. They allow a user to query data from any database that they have access to. This is great for getting sales figures from your Accounting database or even summarizing all the message boards on your web site.
+		message => q|<p>SQL Reports are perhaps the most powerful wobject in the WebGUI arsenal. They allow a user to query data from any database that they have access to. This is great for getting sales figures from your Accounting database or even summarizing all the message boards on your web site.</p>
 <p><b>Nested query support</b><br />
 The SQL Report wobject supports up to 5 nested queries (1 base query and 4 subqueries). Each subsequent query is executed for each row in the previous query results. For example, if you have two queries: query1 and query2, then query2 will be executed once for each row returned in query1. You can use placeholder parameters to compose subqueries with data from prior queries. 
+</p>
 <p>
 SQL Reports are Wobjects and Assets, so they share the properties of both.  SQL Reports also have these unique properties:
-<p>|,
-		lastUpdated => 1119841674,
+</p>|,
+		lastUpdated => 1146785522,
 	},
 
         '72 description' => {
@@ -47,16 +48,16 @@ There are four input types:
 <li><b>Query results</b><br />Query results begin with "query1:" through "query4:". Query results are populated with data from prior queries. So when the second query is initiated, it can used the results returned by query1. When query 5 is initiated it can use the results from queries 1 through 4.</li>
 <li><b>String</b><br />Anything else is a string</li>
 </ul></p>
-<p>Example:
+<p>Example:</p>
 <blockquote>
-Query: select * from some_table where some_field = ? and some_other_field &lt; ?<br />
-Placeholder Parameters: query1:pageId<br />form:field1
+<p>Query: select * from some_table where some_field = ? and some_other_field &lt; ?<br />
+Placeholder Parameters: query1:pageId<br />form:field1</p>
 </blockquote>
-In this example the first question mark will contain the field value of pageId in query1,
+<p>In this example the first question mark will contain the field value of pageId in query1,
 while the second question mark will contain the form variable "field1".</p>
 <p>Place one Placeholder Parameter on each line.</p>
 |,
-                lastUpdated => 1140308175,
+                lastUpdated => 1146785541,
         },
 
         '15 description' => {
@@ -73,8 +74,8 @@ while the second question mark will contain the form variable "field1".</p>
         },
 
         '14 description' => {
-                message => q|How many rows should be displayed before splitting the results into separate pages? In other words, how many rows should be displayed per page?
-<p>|,
+                message => q|<p>How many rows should be displayed before splitting the results into separate pages? In other words, how many rows should be displayed per page?
+</p>|,
                 lastUpdated => 1119841649,
         },
 
@@ -133,144 +134,150 @@ while the second question mark will contain the form variable "field1".</p>
 	},
 
 	'73' => {
-		message => q|The following variables are made available in SQL Reports:
-<p>
+		message => q|<p>The following variables are made available in SQL Reports:
+</p>
 
-<b>columns_loop</b><br />
+<p><b>columns_loop</b><br />
 A loop containing information about each column.
-<br /><br />
+</p>
+
 <blockquote>
 
-<b>column.number</b><br />
+<p><b>column.number</b><br />
 An integer starting with 1 and counting through the number of columns.
-<br /><br />
+</p>
 
-<b>column.name</b><br />
+<p><b>column.name</b><br />
 The name of this column as returned by the query.
-<br /><br />
+</p>
 
 </blockquote>
 
-<b>rows.count</b><br />
+<p><b>rows.count</b><br />
 The total number of rows returned by the query.
-<br /><br />
+</p>
 
-<b>rows.count.isZero</b><br />
+<p><b>rows.count.isZero</b><br />
 A boolean indicating that the query returned zero rows.
-<br /><br />
+</p>
 
-<b>rows.count.isZero.label</b><br />
+<p><b>rows.count.isZero.label</b><br />
 The default label for rows.count.isZero.
-<br /><br />
+</p>
 
-<b>rows_loop</b><br />
+<p><b>rows_loop</b><br />
 A loop containing the data returned from the query.
-<br /><br />
+</p>
+
 <blockquote>
 
-<b>row.number</b><br />
+<p><b>row.number</b><br />
 An integer starting with 1 and counting through the total list of rows.
-<br /><br />
+</p>
 
-<b>row.field.<b><i>NAME</i></b>.value</b><br />
+<p><b>row.field.<b><i>NAME</i></b>.value</b><br />
 The data for a given field in this row where NAME is the name of the field as it is returned by the query.
-<br /><br />
+</p>
 
-<b>row.field_loop</b><br />
+<p><b>row.field_loop</b><br />
 A loop containing all of the fields for this row.
-<br /><br />
+</p>
+
 <blockquote>
 
-<b>field.number</b><br />
+<p><b>field.number</b><br />
 An integer starting with 1 and counting through the number of fields in this row. This is the same as column.number in the column_loop.
-<br /><br />
+</p>
 
-<b>field.name</b><br />
+<p><b>field.name</b><br />
 The name of the field as it is returned by the query.
-<br /><br />
+</p>
 
-<b>field.value</b><br />
+<p><b>field.value</b><br />
 The data in this field.
-<br /><br />
+</p>
 
 </blockquote>
 </blockquote>
 
-<b>hasNest</b><br />
+<p><b>hasNest</b><br />
 A boolean indicating whether query2 has returned any results.
-<br /><br />
+</p>
 
-Any subqueries will have exactly the same format as the loops
+<p>Any subqueries will have exactly the same format as the loops
 and variables above, but will be prefixed with queryN where N
-goes from 2 to 5.<br /><br />
+goes from 2 to 5.</p>
 
-<b>queryN.columns_loop</b><br />
+<p><b>queryN.columns_loop</b><br />
 A loop containing information about each column for queryN.
-<br /><br />
+</p>
+
 <blockquote>
 
-<b>column.number</b><br />
+<p><b>column.number</b><br />
 An integer starting with 1 and counting through the number of columns.
-<br /><br />
+</p>
 
-<b>column.name</b><br />
+<p><b>column.name</b><br />
 The name of this column as returned by the query.
-<br /><br />
+</p>
+
 </blockquote>
 
-<b>queryN.rows.count</b><br />
+<p><b>queryN.rows.count</b><br />
 The total number of rows returned by queryN.
-<br /><br />
+</p>
 
-<b>queryN.count.isZero</b><br />
+<p><b>queryN.count.isZero</b><br />
 A boolean indicating that queryN returned zero rows.
-<br /><br />
+</p>
 
-<b>queryN.rows.count.isZero.label</b><br />
+<p><b>queryN.rows.count.isZero.label</b><br />
 The default label for rows.count.isZero.
-<br /><br />
+</p>
 
-<b>queryN.rows_loop</b><br />
+<blockquote><b>queryN.rows_loop</b><br />
 A loop containing the data returned from queryN.
-<br /><br />
-<blockquote>
+<p>
+</blockquote>
 
-<b>queryN.row.number</b><br />
+<p><b>queryN.row.number</b><br />
 An integer starting with 1 and counting through the total list of rows.
-<br /><br />
+</p>
 
 <b>queryN.row.field.<b><i>NAME</i></b>.value</b><br />
 The data for a given field in this row where NAME is the name of the field as it is returned by the query.
-<br /><br />
+<p>
 
-<b>queryN.row.field_loop</b><br />
+<p><b>queryN.row.field_loop</b><br />
 A loop containing all of the fields for this row.
-<br /><br />
+</p>
+
 <blockquote>
 
-<b>field.number</b><br />
+<p><b>field.number</b><br />
 An integer starting with 1 and counting through the number of fields in this row. This is the same as column.number in the column_loop.
-<br /><br />
+</p>
 
-<b>field.name</b><br />
+<p><b>field.name</b><br />
 The name of the field as it is returned by the query.
-<br /><br />
+</p>
 
-<b>field.value</b><br />
+<p><b>field.value</b><br />
 The data in this field.
-<br /><br />
+</p>
 
 </blockquote>
 
 </blockquote>
 
-<b>queryN.hasNest</b><br />
+<p><b>queryN.hasNest</b><br />
 A boolean indicating whether the queryN+1 has returned any results.  This variable
 will always be false for query5.
-<br /><br />
+</p>
 
 |,
-		lastUpdated => 1110004844,
+		lastUpdated => 1146785660,
 	},
 
 	'16' => {

@@ -104,7 +104,7 @@ our $I18N = {
 	},
 
 	'help_add_edit_stocklist_body' => {
-		message => q|<p>Stock Lists allow users to track stocks on your site.  Data is retrieved from various sources on the internet and displayed in tabluar format.  This application allows any registered user to configure stock lists as well as to set a default stock list for visitors or for users who have not configured one themselves<p>|,
+		message => q|<p>Stock Lists allow users to track stocks on your site.  Data is retrieved from various sources on the internet and displayed in tabluar format.  This application allows any registered user to configure stock lists as well as to set a default stock list for visitors or for users who have not configured one themselves</p>|,
 		lastUpdated => 1119066571,
 	},
 
@@ -155,186 +155,192 @@ our $I18N = {
 
 	'help_stock_list_template_description' => {
 		message => q|<p>The following describes the list of available template variables for building StockList templates</p>
-		<b>extrasFolder</b><br />
-		The url to the extras folder containing css files and images used by the Stock List application
-		<p>
-		<b>editUrl</b><br />
-		The url to the page where users can customize stocks
-		<p>
 
-		<b>isVisitor</b><br />
-		Whether or not the current user is a visitor.  This returns true if the users is authenticated against the system
-		<p>
+<p><b>extrasFolder</b><br />
+The url to the extras folder containing css files and images used by the Stock List application
+</p>
 
-		<b>stock.display.url</b><br />
-		General url to the page that displays details for individual stocks.  A stock symbol must be added to the end of this url
-		<p>
+<p><b>editUrl</b><br />
+The url to the page where users can customize stocks
+</p>
 
-		<b>lastUpdate.default</b><br />
-		default date and time format for the date and time stocks were updated by the returning sources
-		<p>
+<p><b>isVisitor</b><br />
+Whether or not the current user is a visitor.  This returns true if the users is authenticated against the system
+</p>
 
-		<b>lastUpdate.intl</b><br />
-		international date and time format for the date and time stocks were updated by the returning sources
-		<p>
+<p><b>stock.display.url</b><br />
+General url to the page that displays details for individual stocks.  A stock symbol must be added to the end of this url
+</p>
 
-		<b>lastUpdate.us</b><br />
-		US date and time format for the date and time stocks were updated by the returning sources
-		<p>
+<p><b>lastUpdate.default</b><br />
+default date and time format for the date and time stocks were updated by the returning sources
+</p>
 
-		<b>stocks.loop</b><br />
-		Loop containing all default or personalized stocks
-		<p>
+<p><b>lastUpdate.intl</b><br />
+international date and time format for the date and time stocks were updated by the returning sources
+</p>
 
-		<dd><b>stocks.symbol</b><br />
-		<dd>Stock Symbol
-		<p>
+<p><b>lastUpdate.us</b><br />
+US date and time format for the date and time stocks were updated by the returning sources
+</p>
 
-		<dd><b>stocks.name</b><br />
-		<dd>Company or Mutual Fund Name
-		<p>
+<p><b>stocks.loop</b><br />
+Loop containing all default or personalized stocks
+</p>
 
-		<dd><b>stocks.last</b><br />
-		<dd>Last Price
-		<p>
+<blockquote>
 
-		<dd><b>stocks.high</b><br />
-		<dd>Highest trade today
-		<p>
+<p><b>stocks.symbol</b><br />
+Stock Symbol
+</p>
 
-		<dd><b>stocks.low</b><br />
-		<dd>Lowest trade today
-		<p>
+<p><b>stocks.name</b><br />
+Company or Mutual Fund Name
+</p>
 
-		<dd><b>stocks.date</b><br />
-		<dd>Last Trade Date  (MM/DD/YY format)
-		<p>
+<p><b>stocks.last</b><br />
+Last Price
+</p>
 
-		<dd><b>stocks.time</b><br />
-		<dd>Last Trade Time
-		<p>
+<p><b>stocks.high</b><br />
+Highest trade today
+</p>
 
-		<dd><b>stocks.net</b><br />
-		<dd>Net Change
-		<p>
+<p><b>stocks.low</b><br />
+Lowest trade today
+</p>
 
-		<dd><b>stocks.net.isDown</b><br />
-		<dd>Net Change is negative
-		<p>
+<p><b>stocks.date</b><br />
+Last Trade Date  (MM/DD/YY format)
+</p>
 
-		<dd><b>stocks.net.isUp</b><br />
-		<dd>Net Change is positive
-		<p>
+<p><b>stocks.time</b><br />
+Last Trade Time
+</p>
 
-		<dd><b>stocks.net.noChange</b><br />
-		<dd>Net Change is zero
-		<p>
+<p><b>stocks.net</b><br />
+Net Change
+</p>
 
-		<dd><b>stocks.net.icon</b><br />
-		<dd>Icon associated with net change (up, down, even)
-		<p>
+<p><b>stocks.net.isDown</b><br />
+Net Change is negative
+</p>
 
-		<dd><b>stocks.p_change</b><br />
-		<dd>Percent Change from previous day's close
-		<p>
+<p><b>stocks.net.isUp</b><br />
+Net Change is positive
+</p>
 
-		<dd><b>stocks.volume</b><br />
-		<dd>Day's Volume
-		<p>
+<p><b>stocks.net.noChange</b><br />
+Net Change is zero
+</p>
 
-		<dd><b>stocks.volume.millions</b><br />
-		<dd>Day's Volume In Millions
-		<p>
+<p><b>stocks.net.icon</b><br />
+Icon associated with net change (up, down, even)
+</p>
 
-		<dd><b>stocks.avg_vol</b><br />
-		<dd>Average Daily Vol
-		<p>
+<p><b>stocks.p_change</b><br />
+Percent Change from previous day's close
+</p>
 
-		<dd><b>stocks.bid</b><br />
-		<dd>Bid
-		<p>
+<p><b>stocks.volume</b><br />
+Day's Volume
+</p>
 
-		<dd><b>stocks.ask</b><br />
-		<dd>Ask
-		<p>
+<p><b>stocks.volume.millions</b><br />
+Day's Volume In Millions
+</p>
 
-		<dd><b>stocks.close</b><br />
-		<dd>Previous Close
-		<p>
+<p><b>stocks.avg_vol</b><br />
+Average Daily Vol
+</p>
 
-		<dd><b>stocks.open</b><br />
-		<dd>Today's Open
-		<p>
+<p><b>stocks.bid</b><br />
+Bid
+</p>
 
-		<dd><b>stocks.day_range</b><br />
-		<dd>Day's Range
-		<p>
+<p><b>stocks.ask</b><br />
+Ask
+</p>
 
-		<dd><b>stocks.year_range</b><br />
-		<dd>52-Week Range
-		<p>
+<p><b>stocks.close</b><br />
+Previous Close
+</p>
 
-		<dd><b>stocks.year_high</b><br />
-		<dd>52-Week High
-		<p>
+<p><b>stocks.open</b><br />
+Today's Open
+</p>
 
-		<dd><b>stocks.year_low</b><br />
-		<dd>52-Week Low
-		<p>
+<p><b>stocks.day_range</b><br />
+Day's Range
+</p>
 
-		<dd><b>stocks.eps</b><br />
-		<dd>Earnings per Share
-		<p>
+<p><b>stocks.year_range</b><br />
+52-Week Range
+</p>
 
-		<dd><b>stocks.pe</b><br />
-		<dd>P/E Ratio
-		<p>
+<p><b>stocks.year_high</b><br />
+52-Week High
+</p>
 
-		<dd><b>stocks.div_date</b><br />
-		<dd>Dividend Pay Date
-		<p>
+<p><b>stocks.year_low</b><br />
+52-Week Low
+</p>
 
-		<dd><b>stocks.div</b><br />
-		<dd>Dividend per Share
-		<p>
+<p><b>stocks.eps</b><br />
+Earnings per Share
+</p>
 
-		<dd><b>stocks.div_yield</b><br />
-		<dd>Dividend Yield
-		<p>
+<p><b>stocks.pe</b><br />
+P/E Ratio
+</p>
 
-		<dd><b>stocks.cap</b><br />
-		<dd>Market Capitalization
-		<p>
+<p><b>stocks.div_date</b><br />
+Dividend Pay Date
+</p>
 
-		<dd><b>stocks.ex_div</b><br />
-		<dd>Ex-Dividend Date.
-		<p>
+<p><b>stocks.div</b><br />
+Dividend per Share
+</p>
 
-		<dd><b>stocks.nav</b><br />
-		<dd>Net Asset Value
-		<p>
+<p><b>stocks.div_yield</b><br />
+Dividend Yield
+</p>
 
-		<dd><b>stocks.yield</b><br />
-		<dd>Yield (usually 30 day avg)
-		<p>
+<p><b>stocks.cap</b><br />
+Market Capitalization
+</p>
 
-		<dd><b>stocks.exchange</b><br />
-		<dd>The exchange the information was obtained from.
-		<p>
+<p><b>stocks.ex_div</b><br />
+Ex-Dividend Date.
+</p>
 
-		<dd><b>stocks.success</b><br />
-		<dd>Did the stock successfully return information? (true/false)
-		<p>
+<p><b>stocks.nav</b><br />
+Net Asset Value
+</p>
 
-		<dd><b>stocks.errormsg</b><br />
-		<dd>If success is false, this field may contain the reason why.
-		<p>
+<p><b>stocks.yield</b><br />
+Yield (usually 30 day avg)
+</p>
 
-		<dd><b>stocks.method</b><br />
-		<dd>The module (as could be passed to fetch) which found this information.
-		<p>
+<p><b>stocks.exchange</b><br />
+The exchange the information was obtained from.
+</p>
+
+<p><b>stocks.success</b><br />
+Did the stock successfully return information? (true/false)
+</p>
+
+<p><b>stocks.errormsg</b><br />
+If success is false, this field may contain the reason why.
+</p>
+
+<p><b>stocks.method</b><br />
+The module (as could be passed to fetch) which found this information.
+</p>
+
+</blockquote>
 		|,
-		lastUpdated => 1119066250
+		lastUpdated => 1146785833
 	},
 
 	'help_stock_list_display_template' => {
@@ -344,167 +350,169 @@ our $I18N = {
 
 	'help_stock_list_display_template_description' => {
 		message => q|<p>The following describes the list of available template variables for building StockList templates</p>
-		<b>extrasFolder</b><br />
-		The url to the extras folder containing css files and images used by the Stock List application
-		<p>
 
-		<b>lastUpdate.intl</b><br />
-		international date and time format for the date and time stocks were updated by the returning sources
-		<p>
+<p><b>extrasFolder</b><br />
+The url to the extras folder containing css files and images used by the Stock List application
+</p>
 
-		<b>lastUpdate.us</b><br />
-		US date and time format for the date and time stocks were updated by the returning sources
-		<p>
+<p><b>lastUpdate.intl</b><br />
+international date and time format for the date and time stocks were updated by the returning sources
+</p>
 
-		<b>stocks.symbol</b><br />
-		Stock Symbol
-		<p>
+<p><b>lastUpdate.us</b><br />
+US date and time format for the date and time stocks were updated by the returning sources
+</p>
 
-		<b>stocks.name</b><br />
-		Company or Mutual Fund Name
-		<p>
+<p><b>stocks.symbol</b><br />
+Stock Symbol
+</p>
 
-		<b>stocks.last</b><br />
-		Last Price
-		<p>
+<p><b>stocks.name</b><br />
+Company or Mutual Fund Name
+</p>
 
-		<b>stocks.high</b><br />
-		Highest trade today
-		<p>
+<p><b>stocks.last</b><br />
+Last Price
+</p>
 
-		<b>stocks.low</b><br />
-		Lowest trade today
-		<p>
+<p><b>stocks.high</b><br />
+Highest trade today
+</p>
 
-		<b>stocks.date</b><br />
-		Last Trade Date  (MM/DD/YY format)
-		<p>
+<p><b>stocks.low</b><br />
+Lowest trade today
+</p>
 
-		<b>stocks.time</b><br />
-		Last Trade Time
-		<p>
+<p><b>stocks.date</b><br />
+Last Trade Date  (MM/DD/YY format)
+</p>
 
-		<b>stocks.net</b><br />
-		Net Change
-		<p>
+<p><b>stocks.time</b><br />
+Last Trade Time
+</p>
 
-		<b>stocks.net.isDown</b><br />
-		Net Change is negative
-		<p>
+<p><b>stocks.net</b><br />
+Net Change
+</p>
 
-		<b>stocks.net.isUp</b><br />
-		Net Change is positive
-		<p>
+<p><b>stocks.net.isDown</b><br />
+Net Change is negative
+</p>
 
-		<b>stocks.net.noChange</b><br />
-		Net Change is zero
-		<p>
+<p><b>stocks.net.isUp</b><br />
+Net Change is positive
+</p>
 
-		<b>stocks.net.icon</b><br />
-		Icon associated with net change (up, down, even)
-		<p>
+<p><b>stocks.net.noChange</b><br />
+Net Change is zero
+</p>
 
-		<b>stocks.p_change</b><br />
-		Percent Change from previous day's close
-		<p>
+<p><b>stocks.net.icon</b><br />
+Icon associated with net change (up, down, even)
+</p>
 
-		<b>stocks.volume</b><br />
-		Day's Volume
-		<p>
+<p><b>stocks.p_change</b><br />
+Percent Change from previous day's close
+</p>
 
-		<b>stocks.volume.millions</b><br />
-		Day's Volume In Millions
-		<p>
+<p><b>stocks.volume</b><br />
+Day's Volume
+</p>
 
-		<b>stocks.avg_vol</b><br />
-		Average Daily Vol
-		<p>
+<p><b>stocks.volume.millions</b><br />
+Day's Volume In Millions
+</p>
 
-		<b>stocks.bid</b><br />
-		Bid
-		<p>
+<p><b>stocks.avg_vol</b><br />
+Average Daily Vol
+</p>
 
-		<b>stocks.ask</b><br />
-		Ask
-		<p>
+<p><b>stocks.bid</b><br />
+Bid
+</p>
 
-		<b>stocks.close</b><br />
-		Previous Close
-		<p>
+<p><b>stocks.ask</b><br />
+Ask
+</p>
 
-		<b>stocks.open</b><br />
-		Today's Open
-		<p>
+<p><b>stocks.close</b><br />
+Previous Close
+</p>
 
-		<b>stocks.day_range</b><br />
-		Day's Range
-		<p>
+<p><b>stocks.open</b><br />
+Today's Open
+</p>
 
-		<b>stocks.year_range</b><br />
-		52-Week Range
-		<p>
+<p><b>stocks.day_range</b><br />
+Day's Range
+</p>
 
-		<b>stocks.year_high</b><br />
-		52-Week High
-		<p>
+<p><b>stocks.year_range</b><br />
+52-Week Range
+</p>
 
-		<b>stocks.year_low</b><br />
-		52-Week Low
-		<p>
+<p><b>stocks.year_high</b><br />
+52-Week High
+</p>
 
-		<b>stocks.eps</b><br />
-		Earnings per Share
-		<p>
+<p><b>stocks.year_low</b><br />
+52-Week Low
+</p>
 
-		<b>stocks.pe</b><br />
-		P/E Ratio
-		<p>
+<p><b>stocks.eps</b><br />
+Earnings per Share
+</p>
 
-		<b>stocks.div_date</b><br />
-		Dividend Pay Date
-		<p>
+<p><b>stocks.pe</b><br />
+P/E Ratio
+</p>
 
-		<b>stocks.div</b><br />
-		Dividend per Share
-		<p>
+<p><b>stocks.div_date</b><br />
+Dividend Pay Date
+</p>
 
-		<b>stocks.div_yield</b><br />
-		Dividend Yield
-		<p>
+<p><b>stocks.div</b><br />
+Dividend per Share
+</p>
 
-		<b>stocks.cap</b><br />
-		Market Capitalization
-		<p>
+<p><b>stocks.div_yield</b><br />
+Dividend Yield
+</p>
 
-		<b>stocks.ex_div</b><br />
-		Ex-Dividend Date.
-		<p>
+<p><b>stocks.cap</b><br />
+Market Capitalization
+</p>
 
-		<b>stocks.nav</b><br />
-		Net Asset Value
-		<p>
+<p><b>stocks.ex_div</b><br />
+Ex-Dividend Date.
+</p>
 
-		<b>stocks.yield</b><br />
-		Yield (usually 30 day avg)
-		<p>
+<p><b>stocks.nav</b><br />
+Net Asset Value
+</p>
 
-		<b>stocks.exchange</b><br />
-		The exchange the information was obtained from.
-		<p>
+<p><b>stocks.yield</b><br />
+Yield (usually 30 day avg)
+</p>
 
-		<b>stocks.success</b><br />
-		Did the stock successfully return information? (true/false)
-		<p>
+<p><b>stocks.exchange</b><br />
+The exchange the information was obtained from.
+</p>
 
-		<b>stocks.errormsg</b><br />
-		If success is false, this field may contain the reason why.
-		<p>
+<p><b>stocks.success</b><br />
+Did the stock successfully return information? (true/false)
+</p>
 
-		<b>stocks.method</b><br />
-		The module (as could be passed to fetch) which found this information.
-		<p>
+<p><b>stocks.errormsg</b><br />
+If success is false, this field may contain the reason why.
+</p>
+
+<p><b>stocks.method</b><br />
+The module (as could be passed to fetch) which found this information.
+</p>
+
 		|,
-		lastUpdated => 1119066250
+		lastUpdated => 1146786317
 	},
 
 };

@@ -22,200 +22,206 @@ our $I18N = {
 	},
 
 	'63' => {
-		message => q|The following is the list of template variables available in product templates.
-<p/>
+		message => q|<p>The following is the list of template variables available in product templates.
+</p>
 
-<b>brochure.icon</b><br />
+<p><b>brochure.icon</b><br />
 The URL to the icon for the brochure.
-<p/>
+</p>
 
-<b>brochure.url</b><br />
+<p><b>brochure.url</b><br />
 The URL to download the brochure.
-<p/>
+</p>
 
-<b>brochure.label</b><br />
+<p><b>brochure.label</b><br />
 The translated label for the brochure URL.
-<p/>
+</p>
 
-<b>manual.icon</b><br />
+<p><b>manual.icon</b><br />
 The URL to the icon for the manual.
-<p/>
+</p>
 
-<b>manual.url</b><br />
+<p><b>manual.url</b><br />
 The URL to download the manual.
-<p/>
+</p>
 
-<b>manual.label</b><br />
+<p><b>manual.label</b><br />
 The translated label for the manual URL.
-<p/>
+</p>
 
-<b>warranty.icon</b><br />
+<p><b>warranty.icon</b><br />
 The URL to the icon for the warranty.
-<p/>
+</p>
 
 
-<b>warranty.url</b><br />
+<p><b>warranty.url</b><br />
 The URL to download the warranty.
-<p/>
+</p>
 
-<b>warranty.label</b><br />
+<p><b>warranty.label</b><br />
 The label for the warranty URL.
-<p/>
+</p>
 
-<b>image1</b><br />
+<p><b>image1</b><br />
 The URL to the first image uploaded to this product.
-<p/>
+</p>
 
-<b>thumbnail1</b><br />
+<p><b>thumbnail1</b><br />
 The URL to the thumbnail of the first image uploaded to this product.
-<p/>
+</p>
 
-<b>image2</b><br />
+<p><b>image2</b><br />
 The URL to the second image uploaded to this product.
-<p/>
+</p>
 
-<b>thumbnail2</b><br />
+<p><b>thumbnail2</b><br />
 The URL to the thumbnail of the second image uploaded to this product.
-<p/>
+</p>
 
-<b>image3</b><br />
+<p><b>image3</b><br />
 The URL to the third image uploaded to this product.
-<p/>
+</p>
 
-<b>thumbnail3</b><br />
+<p><b>thumbnail3</b><br />
 The URL to the thumbnail of the third image uploaded to this product.
-<p/>
+</p>
 
 
-<b>addfeature.url</b><br />
+<p><b>addfeature.url</b><br />
 The URL to add a feature to this product.
-<p/>
+</p>
 
-<b>addfeature.label</b><br />
+<p><b>addfeature.label</b><br />
 The translated label for the add feature link.
-<p/>
+</p>
 
-<b>feature_loop</b><br />
+<p><b>feature_loop</b><br />
 This loop contains all of the features associated with this product.
+</p>
+
 <blockquote>
-<b>feature.controls</b><br />
+
+<p><b>feature.controls</b><br />
 The WebGUI management controls for this feature.
-<p/>
+</p>
 
-<b>feature.feature</b><br />
+<p><b>feature.feature</b><br />
 The text of the feature itself.
-<p/>
-</blockquote>
-<p/>
+</p>
 
-<b>addbenefit.url</b><br />
+</blockquote>
+
+<p><b>addbenefit.url</b><br />
 The URL to add a benefit to this product.
-<p/>
+</p>
 
-<b>addbenefit.label</b><br />
+<p><b>addbenefit.label</b><br />
 The translated label for the add benefit link.
-<p/>
+</p>
 
-<b>benefit_loop</b><br />
+<p><b>benefit_loop</b><br />
 This loop contains the benefits for this product.
+</p>
+
 <blockquote>
 
-<b>benefit.benefit</b><br />
+<p><b>benefit.benefit</b><br />
 The benefit text itself.
-<p/>
+</p>
 
-<b>benefit.controls</b><br />
+<p><b>benefit.controls</b><br />
 The WebGUI management controls for this benefit.
-<p/>
+</p>
 
 </blockquote>
-<p/>
 
-<b>addspecification.url</b><br />
+<p><b>addspecification.url</b><br />
 The URL to add a specification to this product.
-<p/>
+</p>
 
-<b>addspecification.label</b><br />
+<p><b>addspecification.label</b><br />
 The translated label for the add specification link.
-<p/>
+</p>
 
-<b>specification_loop</b><br />
+<blockquote><b>specification_loop</b><br />
 The list of specifications associated with this product.
-<blockquote>
+</blockquote>
 
-<b>specification.controls</b><br />
+<p><b>specification.controls</b><br />
 The WebGUI management controls for this specification.
-<p/>
+</p>
 
-<b>specification.specification</b><br />
+<p><b>specification.specification</b><br />
 The text of the specification itself.
-<p/>
+</p>
 
-<b>specification.units</b><br />
+<p><b>specification.units</b><br />
 The units for this specification. ex: meters
-<p/>
+</p>
 
-<b>specification.label</b><br />
+<p><b>specification.label</b><br />
 The label for this specification. ex: height
-<p/>
+</p>
 
 </blockquote>
-<p/>
 
-<b>addaccessory.url</b><br />
+<p><b>addaccessory.url</b><br />
 The URL to add an accessory to this product.
-<p/>
+</p>
 
-<b>addaccessory.label</b><br />
+<p><b>addaccessory.label</b><br />
 The translated label for the add accessory link.
-<p/>
+</p>
 
-<b>accessory_loop</b><br />
+<p><b>accessory_loop</b><br />
 This loop contains all of the accessories associated with this product.
+</p>
+
 <blockquote>
 
-<b>accessory.url</b><br />
+<p><b>accessory.url</b><br />
 The URL to the linked accessory.
-<p/>
+</p>
 
-<b>accessory.title</b><br />
+<p><b>accessory.title</b><br />
 The title of the linked accessory.
-<p/>
+</p>
 
-<b>accessory.controls</b><br />
+<p><b>accessory.controls</b><br />
 The WebGUI management controls for this accessory.
-<p/>
+</p>
 
 </blockquote>
-<p/>
 
-<b>addRelatedProduct.url</b><br />
+<p><b>addRelatedProduct.url</b><br />
 The URL to add a related product to this product.
-<p/>
+</p>
 
-<b>addRelatedProduct.label</b><br />
+<p><b>addRelatedProduct.label</b><br />
 The translated label for the add related product link.
-<p/>
+</p>
 
-<b>relatedproduct.loop</b><br />
+<p><b>relatedproduct.loop</b><br />
 This loop contains all of the products related to this product.
-<p/>
+</p>
 
 <blockquote>
-<b>relatedproduct.url</b><br />
+
+<p><b>relatedproduct.url</b><br />
 The URL to the related product.
-<p/>
+</p>
 
-<b>relatedproduct.title</b><br />
+<p><b>relatedproduct.title</b><br />
 The title of the related product.
-<p/>
+</p>
 
-<b>relatedproduct.controls</b><br />
+<p><b>relatedproduct.controls</b><br />
 The WebGUI management controls for this related product.
-<p/>
+</p>
+
 </blockquote>
 |,
-		lastUpdated => 1102661764,
+		lastUpdated => 1146785294,
 	},
 
 	'21' => {

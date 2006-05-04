@@ -1001,7 +1001,7 @@ of perl-style regular expressions can be found <a
 href="http://perldoc.perl.org/perlretut.html">here</a>. To ensure data integrity, 
 regular expressions can only be deleted if they're not is use by any SQLForm in
 the system. Please note this also includes SQLForm that are in the trash and not
-have been purged yet.|,
+have been purged yet.</p>|,
 		lastUpdated => 0,
 	},
 

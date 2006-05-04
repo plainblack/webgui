@@ -2,71 +2,71 @@ package WebGUI::i18n::English::Asset_Poll;
 
 our $I18N = {
 	'74' => {
-		message => q|The following variables are available to the poll template:
-<p>
+		message => q|<p>The following variables are available to the poll template:
+</p>
 
-<b>canVote</b><br />
+<p><b>canVote</b><br />
 A condition indicating whether the user has the right to vote on this poll.
-<p>
+</p>
 
-<b>question</b><br />
+<p><b>question</b><br />
 The poll question.
-<p>
+</p>
 
-<b>form.start</b><br />
+<p><b>form.start</b><br />
 The beginning of the poll form.
-<p>
+</p>
 
-<b>answer_loop</b><br />
+<p><b>answer_loop</b><br />
 A loop containing information about the answers in the poll.
-<p>
+</p>
 
 <blockquote>
 
-<b>answer.form</b><br />
+<p><b>answer.form</b><br />
 The radio button for this answer.
-<p>
+</p>
 
-<b>answer.text</b><br />
+<p><b>answer.text</b><br />
 The text of the answer.
-<p>
+</p>
 
-<b>answer.number</b><br />
+<p><b>answer.number</b><br />
 The number of this answer. As in 1, 2, 3, etc.
-<p>
+</p>
 
-<b>answer.graphWidth</b><br />
+<p><b>answer.graphWidth</b><br />
 The width that the graph should be rendered for this answer. Based upon a percentage of the total graph size.
-<p>
+</p>
 
-<b>answer.percent</b><br />
+<p><b>answer.percent</b><br />
 The percentage of the vote that this answer has received.
-<p>
+</p>
 
-<b>answer.total</b><br />
+<p><b>answer.total</b><br />
 The total number of votes that this answer has received.
-<p>
+</p>
 
 </blockquote>
 
-<b>form.submit</b><br />
+<p><b>form.submit</b><br />
 The submit button for the poll form.
-<p>
+</p>
 
-<b>form.end</b><br />
+<p><b>form.end</b><br />
 The end of the poll form.
-<p>
+</p>
 
-<b>responses.label</b><br />
+<p><b>responses.label</b><br />
 The label for the total responses. "Total Votes"
-<p>
+</p>
 
-<b>responses.total</b><br />
+<p><b>responses.total</b><br />
 The total number of votes that have been placed on this poll.
-<p>
+</p>
 
 |,
-		lastUpdated => 1102115797,
+		lastUpdated => 1146785056,
 	},
 
 	'6' => {
