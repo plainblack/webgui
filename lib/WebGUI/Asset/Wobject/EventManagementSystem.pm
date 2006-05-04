@@ -2037,7 +2037,7 @@ sub www_addEventsToBadge {
 	my $bid = $self->session->form->process('bid');
 	$self->session->scratch->delete('EMS_add_purchase_badgeId');
 	$self->session->scratch->set('EMS_add_purchase_badgeId',$bid);
-	my @pastEvents = $self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, where r.returned=0 and r.badgeId=? and p.purchaseId=r.purchaseId group by productId",[$bid]);
+	my @pastEvents = $self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p where r.returned=0 and r.badgeId=? and p.purchaseId=r.purchaseId group by productId",[$bid]);
 	$self->session->scratch->delete('EMS_add_purchase_events');
 	$self->session->scratch->set('EMS_add_purchase_events',join("\n",@pastEvents));
 	$self->session->scratch->delete('EMS_scratch_cart');
