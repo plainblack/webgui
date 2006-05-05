@@ -40,7 +40,7 @@ The namespace to pull the label from.
 
 #-------------------------------------------------------------------
 sub process {
-	my ($self, $session, $key, $namespace) = @_;
+	my ($session, $key, $namespace) = @_;
 	my $i18n = WebGUI::International->new($session);
 	return $i18n->get($key, $namespace);
 }
