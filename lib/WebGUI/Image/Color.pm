@@ -4,6 +4,12 @@ use strict;
 use Color::Calc;
 
 #-------------------------------------------------------------------
+=head1 canDelete
+
+Returns true if this color can be deleted.
+
+=cut
+
 sub canDelete {
 	my $self = shift;
 	
@@ -11,6 +17,14 @@ sub canDelete {
 }
 
 #-------------------------------------------------------------------
+=head1 copy
+
+Returns a new WebGUI::Image::Color object being an exact copy of this color,
+except for the persistency. This means that the new copy will not be stored in
+the database. To accomplish that use the save method on the copy.
+
+=cut
+
 sub copy {
 	my $self = shift;
 
@@ -18,6 +32,14 @@ sub copy {
 }
 
 #-------------------------------------------------------------------
+=head1 darken
+
+Returns a new WebGUI::Image::Color object with the same properties but the
+colors darkened. This object will not be saved to the database automatically.
+Use the save method on it if you want to do so.
+
+=cut
+
 sub darken {
 	my $self = shift;
 	
@@ -32,6 +54,13 @@ sub darken {
 }
 
 #-------------------------------------------------------------------
+=head1 delete
+
+Deletes the color from the database. It will only delete if canDelete returns
+true.
+
+=cut
+
 sub delete {
 	my $self = shift;
 	if ($self->canDelete) {
@@ -42,6 +71,13 @@ sub delete {
 }
 
 #-------------------------------------------------------------------
+=head1 getFillColor
+
+Returns the the quartet of th fill color. The quartet consists of R, G, B and
+Alpha values respectively in HTML format: '#rrggbbaa'.
+
+=cut
+
 sub getFillColor {
 	my $self = shift;
 	
@@ -49,6 +85,12 @@ sub getFillColor {
 }
 
 #-------------------------------------------------------------------
+=head1 getFillTriplet
+
+Returns the RGB triplet of the fill color in HTML format: '#rrggbb'.
+
+=cut
+
 sub getFillTriplet {
 	my $self = shift;
 
@@ -56,6 +98,12 @@ sub getFillTriplet {
 }
 
 #-------------------------------------------------------------------
+=head1 getFillAlpha
+
+Returns the hex value of the Alpha channel in this color.
+
+=cut
+
 sub getFillAlpha {
 	my $self = shift;
 
@@ -63,6 +111,12 @@ sub getFillAlpha {
 }
 
 #-------------------------------------------------------------------
+=head1 getId
+
+Returns the GUID of this color.
+
+=cut
+
 sub getId {
 	my $self = shift;
 
@@ -70,6 +124,12 @@ sub getId {
 }
 
 #-------------------------------------------------------------------
+=head1 getName
+
+Returns the name assigned to this color.
+
+=cut
+
 sub getName {
 	my $self = shift;
 
@@ -77,6 +137,13 @@ sub getName {
 }
 
 #-------------------------------------------------------------------
+=head1 getStrokeColor
+
+Returns the the quartet of the stroke color. The quartet consists of R, G, B and
+Alpha values respectively in HTML format: '#rrggbbaa'.
+
+=cut
+
 sub getStrokeColor {
 	my $self = shift;
 	
@@ -84,6 +151,12 @@ sub getStrokeColor {
 }
 
 #-------------------------------------------------------------------
+=head1 getStrokeTriplet
+
+Returns the RGB triplet of the stroke color in HTML format: '#rrggbb'.
+
+=cut
+
 sub getStrokeTriplet {
 	my $self = shift;
 
@@ -91,6 +164,12 @@ sub getStrokeTriplet {
 }
 
 #-------------------------------------------------------------------
+=head1 getStrokeAlpha
+
+Returns the hex value of the Alpha channel in the stroke color.
+
+=cut
+
 sub getStrokeAlpha {
 	my $self = shift;
 
@@ -98,6 +177,46 @@ sub getStrokeAlpha {
 }
 
 #-------------------------------------------------------------------
+=head1 new ( session, colorId, [ properties ] )
+
+Constructor for this class.
+
+=head2 session
+
+A WebGUI::Session object.
+
+=head2 colorId
+
+The id of the color you want to instanciate. If you're creating a new color
+please use 'new' as id.
+
+=head2 properties
+
+A hashref containing configuration options to set this object to. All are also
+available through methods.
+
+=head3 name
+
+The color name.
+
+=head3 fillTriplet
+
+The RGB triplet for the fill color. See setFillTriplet.
+
+=head3 fillAlpha
+
+The alpha value for the fill color. See setFillAlpha.
+
+=head3 strokeTriplet
+
+The RGB triplet for the stroke color. See setStrokeTriplet.
+
+=head3 strokeAlpha
+
+The alpha value for the stroke color. See setStrokeAlpha.
+
+=cut
+
 sub new {
 	my $class = shift;
 	my $session = shift;
@@ -123,6 +242,21 @@ sub new {
 }
 
 #-------------------------------------------------------------------
+=head1 newByPalette ( session, paletteId )
+
+Returns an arrayref containg instanciated WebGUI::Image::Color objects for each
+color in the sepcified palette.
+
+=head2 session
+
+A WebGUI::Session object.
+
+=head2 paletteId
+
+The id of the palette that is to be loaded.
+
+=cut
+
 sub newByPalette {
 	my ($sth, $row, @colors);
 	my $class = shift;
@@ -142,6 +276,12 @@ sub newByPalette {
 }
 
 #-------------------------------------------------------------------
+=head1 session
+
+Returns the WebGUI::Session object;
+
+=cut
+
 sub session {
 	my $self = shift;
 
@@ -149,6 +289,16 @@ sub session {
 }
 
 #-------------------------------------------------------------------
+=head1 setFillColor ( quartet )
+
+Sets the the fill color to the specified quartet.
+
+=head2 quartet
+
+The quartet consists of R, G, B and Alpha values respectively in HTML format: '#rrggbbaa'.
+
+=cut
+
 sub setFillColor {
 	my $self = shift;
 	my $color = shift;
@@ -162,6 +312,16 @@ sub setFillColor {
 }
 
 #-------------------------------------------------------------------
+=head1 setFillTriplet ( triplet )
+
+Sets the RGB triplet of the fill color.
+
+=head2 triplet
+
+The RGB triplet in HTML format: '#rrggbb'.
+
+=cut
+
 sub setFillTriplet {
 	my $self = shift;
 	my $triplet = shift;
@@ -175,6 +335,16 @@ sub setFillTriplet {
 }
 
 #-------------------------------------------------------------------
+=head1 setFillAlpha ( alpha )
+
+Sets the alpha channel for the fill color.
+
+=head2 alpha
+
+The alpha value in hexadecimal notation: 'ff';
+
+=cut
+
 sub setFillAlpha {
 	my $self = shift;
 	my $alpha = shift;
@@ -188,6 +358,16 @@ sub setFillAlpha {
 }
 
 #-------------------------------------------------------------------
+=head1 setName ( name )
+
+Sets the name of this color.
+
+=head2 name
+
+A scalar containing the name of this color.
+
+=cut
+
 sub setName {
 	my $self = shift;
 	my $name = shift;
@@ -197,6 +377,16 @@ sub setName {
 }
 
 #-------------------------------------------------------------------
+=head1 setStrokeColor ( quartet )
+
+Sets the the stroke color to the specified quartet.
+
+=head2 quartet
+
+The quartet consists of R, G, B and Alpha values respectively in HTML format: '#rrggbbaa'.
+
+=cut
+
 sub setStrokeColor {
 	my $self = shift;
 	my $color = shift;
@@ -210,6 +400,16 @@ sub setStrokeColor {
 }
 
 #-------------------------------------------------------------------
+=head1 setStrokeTriplet ( triplet )
+
+Sets the RGB triplet of the stroke color.
+
+=head2 triplet
+
+The RGB triplet in HTML format: '#rrggbb'.
+
+=cut
+
 sub setStrokeTriplet {
 	my $self = shift;
 	my $triplet = shift;
@@ -223,6 +423,16 @@ sub setStrokeTriplet {
 }
 
 #-------------------------------------------------------------------
+=head1 setStrokeAlpha ( alpha )
+
+Sets the alpha channel for the stroke color.
+
+=head2 alpha
+
+The alpha value in hexadecimal notation: 'ff';
+
+=cut
+
 sub setStrokeAlpha {
 	my $self = shift;
 	my $alpha = shift;
@@ -236,6 +446,14 @@ sub setStrokeAlpha {
 }
 
 #-------------------------------------------------------------------
+=head1 update
+
+Will update the database to the current state of the object. If your object has
+not yet been saved to the database, you must first use the save method, which
+has the same functionality.
+
+=cut
+
 sub update {
 	my $self = shift;
 	
@@ -250,6 +468,14 @@ sub update {
 }
 
 #-------------------------------------------------------------------
+=head1 save
+
+Will save the state of the object to the database if the color is not yet in the
+database. If it already is in the database this method will do exactly the same
+as update.
+
+=cut
+
 sub save {
 	my $self = shift;
 	

@@ -51,7 +51,7 @@ sub _getColorForm {
 		-maxlength => 7,
 		-size	=> 7,
 	);
-	$f->text(
+	$f->hexSlider(
 		-name	=> 'fillAlpha',
 		-value	=> $color->getFillAlpha,
 		-label	=> $i18n->get('fill alpha'),
@@ -291,8 +291,10 @@ sub www_editPalette {
 		foreach $color (@{$palette->getColorsInPalette}) {
 			$output .= '<tr>';
 			$output .= '<td>';
-			$output .= $session->icon->delete('op=removeColorFromPalette&pid='.$palette->getId.'&cid='.$color->getId);
-			$output .= $session->icon->edit('op=editColor&pid='.$palette->getId.'&cid='.$color->getId);
+			$output .= $session->icon->delete('op=removeColorFromPalette;pid='.$palette->getId.';index='.$palette->getColorIndex($color));
+			$output .= $session->icon->edit('op=editColor;pid='.$palette->getId.';cid='.$color->getId);
+			$output .= $session->icon->moveUp('op=moveColorUp;pid='.$palette->getId.';index='.$palette->getColorIndex($color));
+			$output .= $session->icon->moveDown('op=moveColorDown;pid='.$palette->getId.';index='.$palette->getColorIndex($color));
 			$output .= '</td>';
 			$output .= '<td width="30" border="1" height="30" bgcolor="'.$color->getFillTriplet.'"></td>';
 			$output .= '<td width="30" border="1" height="30" bgcolor="'.$color->getStrokeTriplet.'"></td>';
@@ -363,6 +365,36 @@ sub www_listPalettes {
 }
 
 #-------------------------------------------------------------------
+sub www_moveColorDown {
+	my ($palette, $index);
+	my $session = shift;
+
+	$palette = WebGUI::Image::Palette->new($session, $session->form->process('pid'));
+	$index = $session->form->process('index');
+	
+	if ($index < ($palette->getNumberOfColors - 1) && $index >=0) {
+		$palette->swapColors($index, $index + 1);
+	}
+
+	return www_editPalette($session, $session->form->process('pid'));
+}
+
+#-------------------------------------------------------------------
+sub www_moveColorUp {
+	my ($palette, $index);
+	my $session = shift;
+
+	$palette = WebGUI::Image::Palette->new($session, $session->form->process('pid'));
+	$index = $session->form->process('index');
+
+	if ($index <= ($palette->getNumberOfColors - 1) && $index > 0) {
+		$palette->swapColors($index, $index - 1);
+	}
+
+	return www_editPalette($session, $session->form->process('pid'));
+}
+
+#-------------------------------------------------------------------
 sub www_listFonts {
 	my ($output);
 	my $session = shift;
@@ -398,7 +430,7 @@ sub www_removeColorFromPalette {
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
 	my $palette = WebGUI::Image::Palette->new($session, $session->form->process('pid'));
-	$palette->removeColor(WebGUI::Image::Color->new($session, $session->form->process('cid')));
+	$palette->removeColor($session->form->process('index'));
 
 	return www_editPalette($session, $session->form->process('pid'));
 }

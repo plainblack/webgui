@@ -298,6 +298,8 @@ sub getOperations {
 		'listGraphicsOptions' => 'WebGUI::Operation::Graphics',
 		'listFonts' => 'WebGUI::Operation::Graphics',
 		'listPalettes' => 'WebGUI::Operation::Graphics',
+		'moveColorDown' => 'WebGUI::Operation::Graphics',
+		'moveColorUp' => 'WebGUI::Operation::Graphics',
 		'removeColorFromPalette' => 'WebGUI::Operation::Graphics',
 	};
 }
