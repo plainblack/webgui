@@ -24,7 +24,7 @@ our $I18N = {
 
         '507 description' => {
                 message => q|Sets the scope of the events displayed by this calendar.
-<blockquote>
+<div class="helpIndent">
 <dl>
 <dt>Regular</dt>
 <dd>This calendar will display its own events.</dd>
@@ -33,7 +33,7 @@ our $I18N = {
 <dt>Master</dt>
 <dd>The calendar will display events from every calendar below it in the hierarchy.</dd>
 </dl>
-</blockquote>|,
+</div>|,
                 lastUpdated => 1129668992,
         },
 
@@ -49,7 +49,7 @@ our $I18N = {
 
         '81 description' => {
                 message => q|Choose the start month for your calendar.
-<blockquote>
+<div class="helpIndent">
 <dl>
 <dt>First in the calendar</dt>
 <dd>The calendar will start at whatever the earliest date in the calendar is.</dd>
@@ -60,13 +60,13 @@ our $I18N = {
 <dt>January</dt>
 <dd>The calendar will always start on January of the current year.</dd>
 </dl>
-</blockquote>|,
+</div>|,
                 lastUpdated => 1129668992,
         },
 
         '84 description' => {
                 message => q|Choose the end month for your calendar.
-<blockquote>
+<div class="helpIndent">
 <dl>
 <dt>Last in the calendar</dt>
 <dd>The calendar will end at the last date in the calendar.</dd>
@@ -78,7 +78,7 @@ our $I18N = {
 <dt>Current</dt>
 <dd>The calendar will always end on the current month.</dd>
 </dl>
-</blockquote>|,
+</div>|,
                 lastUpdated => 1129668992,
         },
 
@@ -267,7 +267,7 @@ The first initial of the label for "Saturday".
 A loop containing all the months in the calendar.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>daysInMonth</b><br />
 The number of days in this month.
@@ -277,7 +277,7 @@ The number of days in this month.
 A loop containing all the days in the month.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>dayOfWeek</b><br />
 The day number for the day in the week.
@@ -303,7 +303,7 @@ A boolean indicating that this day is today.
 A loop containing all of the events in this day.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>description</b><br />
 The description or detail of this event.
@@ -397,37 +397,37 @@ The length of this event in days.
 The URL to view this event in detail.
 </p>
 
-</blockquote>
+</div>
 
 <p><b>url</b><br />
 A URL to today's events.
 </p>
 
-</blockquote>
+</div>
 
 <p><b>prepad_loop</b><br />
 A loop containing info to prepad the days in the month before the start day.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>count</b><br />
 The day of the week for this pad.
 </p>
 
-</blockquote>
+</div>
 
 <p><b>postpad_loop</b><br />
 A loop containing the info to postpad the days in the month after the last day.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>count</b><br />
 The day of the week for this pad.
 </p>
 
-</blockquote>
+</div>
 
 <p><b>month</b><br />
 The name of this month, internationalized.
@@ -437,7 +437,7 @@ The name of this month, internationalized.
 The 4 digit year in the current month of the month_loop.
 </p>
 
-</blockquote>
+</div>
 
 |,
 		lastUpdated => 1146775609

@@ -230,7 +230,7 @@ the SOAP call.  Within the loop, you may access specific data elements by the
 names set for them by the SOAP server (i.e. perhaps "localTime" for a time query).  In addition, there are a number of special template variables:
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>numResults</b><br />
 Number of rows found by the client, if an array was returned.</p>
@@ -252,7 +252,7 @@ Number of rows found by the client, if an array was returned.</p>
 <p><b>pageNumber</b><br />Current page number in a paginated set.
 </p>
 
-</blockquote>|,
+</div>|,
 		lastUpdated => 1111122637
 	},
 

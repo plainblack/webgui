@@ -22,7 +22,7 @@ The macro may take one optional argument, an alternate template in the Macro/Adm
 A loop containing the various lists of data to display.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 <p>
 <b>label</b><br />
 A heading label for this category.
@@ -37,7 +37,7 @@ A javascript friendly name for this category.
 A loop containing the list if items in this category.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>title</b><br />
 The displayable link title for this item.
@@ -51,9 +51,9 @@ The link URL for this item.
 The URL of an icon to associate with this item.
 </p>
 
-</blockquote>
+</div>
 
-</blockquote>
+</div>
 |,
 		lastUpdated => 1146631148,
 	},

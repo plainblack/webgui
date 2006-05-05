@@ -367,10 +367,10 @@ price, weight and sku values and set availability of a product variant.
 	},
 
 	'help edit product body' => {
-		message => q|The properties section shows the base values for your product. Every
+		message => q|<p>The properties section shows the base values for your product. Every
 product configuration you sell is based on these values. Modifiers set
 in options are relative to these values. The properties of a product
-are:<p>
+are:</p>
 |,
 		lastUpdated => 1120449342,
 		context => q|The body of the edit product help page|
@@ -398,7 +398,7 @@ screen after clicking 'Save'.</p>
 	},
 
         'edit parameter name description' => {
-                message => q|The name of this parameter.<p>|,
+                message => q|<p>The name of this parameter.</p>|,
                 lastUpdated => 1122609059,
         },
 
@@ -416,7 +416,7 @@ screen after clicking 'Save'.</p>
 		context => q|The body of the edit option help page|
 	},
         'edit option value description' => {
-                message => q|The value of this option (ie. 'Blue').<p>|,
+                message => q|<p>The value of this option (ie. 'Blue').</p>|,
                 lastUpdated => 1122609417,
         },
 
@@ -427,14 +427,14 @@ default price for product variants containig this option.</p>|,
         },
 
         'edit option weight modifier description' => {
-                message => q|The weight this option adds to the
-default weight for product variants consisting of this option.<p>|,
+                message => q|<p>The weight this option adds to the
+default weight for product variants consisting of this option.</p>|,
                 lastUpdated => 1122609417,
         },
 
         'edit option sku modifier description' => {
-                message => q|The value that the template variable of
-the parameter this is an option of in the SKU template takes.<p>|,
+                message => q|<p>The value that the template variable of
+the parameter this is an option of in the SKU template takes.</p>|,
                 lastUpdated => 1122609417,
         },
 	'help list variants title' => {

@@ -15,14 +15,13 @@ our $I18N = {
 	'sql body' => {
 		message => q|
 <p><b>&#94;SQL();</b><br />
-A one line SQL report. Sometimes you just need to pull something back from the database quickly. This macro is also useful in extending the SQL Report wobject. It uses the numeric macros (&#94;0; &#94;1; &#94;2; etc) to position data and can also use the &#94;&#94;rownum; macro just like the SQL Report wobject. Examples:<p>
- &#94;SQL("select count(*) from users","There are &#94;0; users on this system.");
+A one line SQL report. Sometimes you just need to pull something back from the database quickly. This macro is also useful in extending the SQL Report wobject. It uses the numeric macros (&#94;0; &#94;1; &#94;2; etc) to position data and can also use the &#94;&#94;rownum; macro just like the SQL Report wobject. Examples:</p>
+<p>&#94;SQL("select count(*) from users","There are &#94;0; users on this system.");
 </p>
 <p>&#94;SQL("select userId,username from users order by username","&lt;a href='&#94;/;?op=viewProfile&amp;uid=&#94;0;'&gt;&#94;1;&lt;/a&gt;&lt;br /&gt;");
 </p>
-
 |,
-		lastUpdated => 1146608153,
+		lastUpdated => 1146805799,
 	},
 
 	'illegal query' => {

@@ -66,7 +66,7 @@ Internationalized label for the "Updated By" column of the report.
 A loop containing the rows of data for the In/Out Board Report&nbsp;
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>deptHasChanged</b><br />
 A boolean value indicating whether or not this row of data is for a department that is differnet than the previous rows
@@ -96,7 +96,7 @@ A variable that returns what the user entered in the "What's going on?" field wh
 A variable that returns which user, either the user himself or a delegate, changed the status for this user.
 </p>
 
-</blockquote>
+</div>
 
 <p><b>paginateBar</b><br />
 A variable that returns the HTML necessary to create a Traditional Pagination Bar. i.e., &lt;&lt; First, 1, 2, Last &gt;&gt;</p>
@@ -178,7 +178,7 @@ A variable that contains the HTML for displaying the In/Out Entry Form to update
 <p><b>rows_loop</b><br />
 A loop containing the rows of data for the In/Out Board</p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>deptHasChanged</b><br />
 A boolean value indicating whether or not this row of data is for a department that is differnet than the previous rows</p>
@@ -194,7 +194,7 @@ A variable that returns the date the status of the user was last updated.</p>
 
 <p><b>message</b><br />
 A variable that returns what the user entered in the "What's going on?" field when updating their status.</p>
-</blockquote>
+</div>
 
 <p><b>paginateBar</b><br />
 A variable that returns the HTML necessary to create a Traditional Pagination Bar.  i.e., &gt;&gt; First, 1, 2, Last &lt;&lt;</p>

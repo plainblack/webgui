@@ -109,43 +109,43 @@ our $I18N = {
 	},
 
         'subscription name description' => {
-                message => q|Name of the subscription.<p>|,
+                message => q|<p>Name of the subscription.</p>|,
                 lastUpdated => 1120861450,
         },
 
         'subscription price description' => {
-                message => q|Price to pay for the subscription.<p>|,
+                message => q|<p>Price to pay for the subscription.</p>|,
                 lastUpdated => 1120861450,
         },
 
         'subscription description description' => {
-                message => q|Detailed description of the subscription.<p>|,
+                message => q|<p>Detailed description of the subscription.</p>|,
                 lastUpdated => 1120861450,
         },
 
         'subscription group description' => {
-                message => q|When a user payed the fee, he/she will be added to this group.<p>|,
+                message => q|<p>When a user payed the fee, he/she will be added to this group.</p>|,
                 lastUpdated => 1120861450,
         },
 
         'subscription duration description' => {
-                message => q|This sets the length of one subscription term. ie. You pay every month, or every half year.<p>|,
+                message => q|<p>This sets the length of one subscription term. ie. You pay every month, or every half year.</p>|,
                 lastUpdated => 1120861450,
         },
 
         'execute on subscription description' => {
-                message => q|A (Perl) script to call when someone has subscribed and payed.<p>|,
+                message => q|<p>A (Perl) script to call when someone has subscribed and payed.</p>|,
                 lastUpdated => 1120861450,
         },
 
         'subscription karma description' => {
-                message => q|The amount of karma which is added to the user after he/she subscribes.<p>|,
+                message => q|<p>The amount of karma which is added to the user after he/she subscribes.</p>|,
                 lastUpdated => 1120861450,
         },
 
 	'help edit subscription body' => {
-		message => q|A subscription will allow the user a piece of content which he/she has
-payed for. The following is the list of properties attached to each Description.<p>
+		message => q|<p>A subscription will allow the user a piece of content which he/she has
+payed for. The following is the list of properties attached to each Description.</p>
 |,
 		lastUpdated => 1120861475,
 		context => q|The Add/Edit subscription help page text.|
@@ -326,23 +326,23 @@ payed for. The following is the list of properties attached to each Description.
 	},
 
         'noc description' => {
-                message => q|Number of codes to create<p>|,
+                message => q|<p>Number of codes to create</p>|,
                 lastUpdated => 1120858265,
         },
 
         'code length description' => {
-                message => q|The number of characters in the generated codes.  Codes must be at least 10
-characters long.<p>|,
+                message => q|<p>The number of characters in the generated codes.  Codes must be at least 10
+characters long.</p>|,
                 lastUpdated => 1120858265,
         },
 
         'codes expire description' => {
-                message => q|The code must be used before this date.<p>|,
+                message => q|<p>The code must be used before this date.</p>|,
                 lastUpdated => 1132353871,
         },
 
         'association description' => {
-                message => q|Which subscription(s) are made with the generated codes.<p>|,
+                message => q|<p>Which subscription(s) are made with the generated codes.</p>|,
                 lastUpdated => 1120858265,
         },
 

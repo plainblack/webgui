@@ -333,7 +333,7 @@ lists and check lists.</p>
 the database in which the table of your choice resides and, of course, the table
 itself. You can add more tables by clicking on the join button that appears
 below the table selection. In order to do this you must choose the columns that
-connect the tables you have selected and the type of that connection. 
+connect the tables you have selected and the type of that connection.</p>
 
 <p>These columns should identify the rows they are in in exectly the same way so
 that the SQLForm knows which record in one table belongs to a record in another.
@@ -858,7 +858,7 @@ kilobytes.</p>
 <p>Please note that WebGUI also has a system wide maximum file size setting,
 which cannot be overridden by this property. In other words, if you set this
 property to a larger value than that of the system wide setting, the maximum
-upload size will be the system wide.|,
+upload size will be the system wide.</p>|,
 		lastUpdated => 0,
 	},
 
@@ -1063,7 +1063,7 @@ this loop will allow you to use a different layout than that of
 <b>completeForm</b>. The <b>formLoop</b> loop provides the following
 variables:</p>
 
-<blockquote>
+<div class="helpIndent">
 <p>	<b>field.label</b><br />
 The display name of the field.</p>
 
@@ -1077,7 +1077,7 @@ In view mode this is the same as <b>field.value</b>.
 The value of the field</p>
 
 
-</blockquote>
+</div>
 
 <p>Finally there is the option of placing
 each seperate field by hand. This allows you to define the order and
@@ -1134,10 +1134,10 @@ occurred in the submitted data.</p>
 <p><b>errorLoop</b><br />
 Loop containing the errors.</p>
 
-<blockquote>
+<div class="helpIndent">
 <p>	<b>error.message</b><br />
 The actual error message.</p>
-</blockquote>
+</div>
 
 <p><b>isNew</b><br />
 Conditional idicating whether the user
@@ -1251,7 +1251,7 @@ A loop containing each field, only available in advanced search.
 The <b>field_loop</b> provides the following
 variables:</p>
                                                                                                                                                              
-<blockquote>
+<div class="helpIndent">
 <p>     <b>field.label</b><br />
 The display name of the field.</p>
                                                                                                                                                              
@@ -1279,15 +1279,15 @@ field name of the field.<br />
 You can use this if you want to create a custom Advanced search form that completely overrides the default search form.
 </p>
 
-</blockquote>
+</div>
 
-<p>The template provides variables for the search results that are the same for normal and advanced search.
+<p>The template provides variables for the search results that are the same for normal and advanced search.</p>
 
 <p><b>headerLoop</b><br />
 A loop containing the display names of each field, inclding sort controls. The
 following variables are provided within this loop:</p>
 
-<blockquote>
+<div class="helpIndent">
 	<p><b>header.title</b><br />
 	The display name of the current field.</p>
 	
@@ -1301,7 +1301,7 @@ following variables are provided within this loop:</p>
 	<p><b>header.sort.ascending</b><br />
 	Conditional indicating whether the search results are sorted ascending
 	or descending.</p>
-</blockquote>
+</div>
 
 <p><b>searchResults.header</b><br />
 Contains the form header for the batch restore and purge functions in the search
@@ -1320,7 +1320,7 @@ The loop containg the results of the search query. This should be between
 searchResults.header and searchResults.footer. Within this loop the following
 variables are available for use:</p>
 
-<blockquote>
+<div class="helpIndent">
 	<p><b>record.controls</b><br />
 	Contains the edit/view, delete and purge restore controls for this
 	record.</p>
@@ -1344,7 +1344,7 @@ variables are available for use:</p>
 	A loop containing the values for each field of this record. This loop
 	provides the following variables:</p>
 	
-	<blockquote>
+	<div class="helpIndent">
 		<p><b>record.value</b><br />
 		The value the record has for this field.</p>
 		
@@ -1358,8 +1358,8 @@ variables are available for use:</p>
 		<p><b>record.value.downloadUrl</b><br />
 		The url to download the uploaded file in this field. Only
 		available for files and images.</p>
-	</blockquote>
-</blockquote>
+	</div>
+</div>
 
 <p><b>superSearch.url</b><br />
 The url to the advanced search mode.</p>
@@ -1387,10 +1387,10 @@ Conditional which is true if some error happened while processing the search que
 A loop containing the errors that have occurred while processing the search
 query. The following variable is available in this loop:</p>
 
-<blockquote>
+<div class="helpIndent">
 	<p><b>error.message</b><br />
 	Contains the actual error message.</p>
-</blockquote>|,
+</div>|,
 		lastUpdated => 0,
 	},
 

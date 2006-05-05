@@ -66,7 +66,7 @@ which are to be displayed inside of it.  Assets that have not been
 specifically placed are put inside of position 1.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>id</b><br />
 The Asset ID of the Asset.
@@ -76,7 +76,7 @@ The Asset ID of the Asset.
 The rendered content of the Asset.
 </p>
 
-</blockquote>
+</div>
 
 <p><b>attachment.size</b><br />
 The size of the file.

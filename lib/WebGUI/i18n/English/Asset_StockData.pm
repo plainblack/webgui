@@ -188,7 +188,7 @@ US date and time format for the date and time stocks were updated by the returni
 Loop containing all default or personalized stocks
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>stocks.symbol</b><br />
 Stock Symbol
@@ -338,7 +338,7 @@ If success is false, this field may contain the reason why.
 The module (as could be passed to fetch) which found this information.
 </p>
 
-</blockquote>
+</div>
 		|,
 		lastUpdated => 1146785833
 	},

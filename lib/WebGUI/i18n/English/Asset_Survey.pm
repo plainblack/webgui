@@ -145,165 +145,163 @@ our $I18N = {
 	},
 
 	'89' => {
-		message => q|The following template variables are available for the Survey.
-<p>
+		message => q|<p>The following template variables are available for the Survey.
+</p>
 
-<b>question.add.url</b><br />
+<p><b>question.add.url</b><br />
 The URL to add a new question to the survey.
-<p>
+</p>
 
-<b>question.add.label</b><br />
+<p><b>question.add.label</b><br />
 The default label for question.add.url.
-<p>
+</p>
 
-<b>user.canTakeSurvey</b><br />
+<p><b>user.canTakeSurvey</b><br />
 A boolean indicating whether the current user has the rights to take the survey.
-<p>
+</p>
 
-<b>form.header</b><br />
+<p><b>form.header</b><br />
 The required form elements that go at the top of the survey questions.
-<p>
+</p>
 
-<b>form.footer</b><br />
+<p><b>form.footer</b><br />
 The required form elements that go after the survey questions.
-<p>
+</p>
 
-<b>form.submit</b><br />
+<p><b>form.submit</b><br />
 The default submit button for the survey response.
-<p>
+</p>
 
-<b>questions.sofar.label</b><br />
+<p><b>questions.sofar.label</b><br />
 The default label for indicating how many questions have been answered to this point in the survey.
-<p>
+</p>
 
-<b>start.newresponse.label</b><br />
+<p><b>start.newresponse.label</b><br />
 The default label for start.newresponse.url.
-<p>
+</p>
 
-<b>start.newresponse.url</b><br />
+<p><b>start.newresponse.url</b><br />
 The URL to start a new response to the survey after the user has already taken the survey once.
-<p>
+</p>
 
-<b>thanks.survey.label</b><br />
+<p><b>thanks.survey.label</b><br />
 A message thanking the user for completing the survey.
-<p>
+</p>
 
-<b>thanks.quiz.label</b><br />
+<p><b>thanks.quiz.label</b><br />
 A message thanking the user for completing the quiz.
-<p>
+</p>
 
-<b>questions.total</b><br />
+<p><b>questions.total</b><br />
 The total number of questions in the survey.
-<p>
+</p>
 
-<b>questions.correct.count.label</b><br />
+<p><b>questions.correct.count.label</b><br />
 The default label for questions.correct.count.
-<p>
+</p>
 
-<b>questions.correct.percent.label</b><br />
+<p><b>questions.correct.percent.label</b><br />
 The default label for questions.correct.percent.
-<p>
+</p>
 
-<b>mode.isSurvey</b><br />
+<p><b>mode.isSurvey</b><br />
 A boolean indicating whether we are in survey mode or quiz mode.
-<p>
+</p>
 
-<b>survey.noprivs.label</b><br />
+<p><b>survey.noprivs.label</b><br />
 A message telling the user that they do not have the privileges necessary  to take this survey.
-<p>
+</p>
 
-<b>quiz.noprivs.label</b><br />
+<p><b>quiz.noprivs.label</b><br />
 A message telling the user that they do not have the privileges necessary to take the quiz.
-<p>
+</p>
 
-<b>response.id</b><br />
+<p><b>response.id</b><br />
 The unique id for the current response for this user.
-<p>
+</p>
 
-
-<b>response.count</b><br />
+<p><b>response.count</b><br />
 The number of responses this user has provided for this survey.
-<p>
+</p>
 
-
-<b>user.isFirstResponse</b><br />
+<p><b>user.isFirstResponse</b><br />
 A boolean indicating whether this is the first response for this user.
-<p>
+</p>
 
-<b>user.canRespondAgain</b><br />
+<p><b>user.canRespondAgain</b><br />
 A boolean indicating whether the user is allowed to respond to this survey again.
-<p>
+</p>
 
-<b>questions.sofar.count</b><br />
+<p><b>questions.sofar.count</b><br />
 The number of questions that have been answered to this point in the survey.
-<p>
+</p>
 
-<b>questions.correct.count</b><br />
+<p><b>questions.correct.count</b><br />
 The number of questions the user has correct in the quiz to this point.
-<p>
+</p>
 
-<b>questions.correct.percent</b><br />
+<p><b>questions.correct.percent</b><br />
 The percentage of questions that the user has correct in the quiz to this point.
-<p>
+</p>
 
-<b>response.isComplete</b><br />
+<p><b>response.isComplete</b><br />
 A boolean indicating whether the user has answered all of the questions for this survey response.
-<p>
+</p>
 
-
-<b>question_loop</b><br />
+<p><b>question_loop</b><br />
 A loop which contains the questions for this survey response.
-<p>
+</p>
 
 
-<blockquote>
-<b>question.question</b><br />
+<div class="helpIndent">
+
+<p><b>question.question</b><br />
 The survey question itself.
-<p>
+</p>
 
-<b>question.allowComment</b><br />
+<p><b>question.allowComment</b><br />
 A boolean indicating whether this question allows comments or not.
-<p>
+</p>
 
-<b>question.id</b><br />
+<p><b>question.id</b><br />
 The unique id for this question.
-<p>
+</p>
 
-<b>question.comment.field</b><br />
+<p><b>question.comment.field</b><br />
 The form field to enter comments for this question.
-<p>
+</p>
 
-<b>question.comment.label</b><br />
+<p><b>question.comment.label</b><br />
 The default label for question.comment.field.
-<p>
+</p>
 
-<b>question.answer.field</b><br />
+<p><b>question.answer.field</b><br />
 The form field containing the possible answers for this question.
-<p>
+</p>
 
-</blockquote>
+</div>
 
-
-<b>question.edit_loop</b><br />
+<p><b>question.edit_loop</b><br />
 A loop containing all the questions in the survey with edit controls.
-<p>
+</p>
 
-<blockquote>
-<b>question.edit.controls</b><br />
+<div class="helpIndent">
+
+<p><b>question.edit.controls</b><br />
 A toolbar to use to edit this question.
-<p>
+</p>
 
-<b>question.edit.question</b><br />
+<p><b>question.edit.question</b><br />
 The question to be edited.
-<p>
+</p>
 
-<b>question.edit.id</b><br />
+<p><b>question.edit.id</b><br />
 The unique id for this question.
-<p>
+</p>
 
-</blockquote>
+</div>
 |,
-		lastUpdated => 1078223096
+		lastUpdated => 1146806995
 	},
 
 	'10' => {
@@ -327,77 +325,78 @@ The unique id for this question.
 	},
 
 	'91' => {
-		message => q|The following template variables are available in all survey templates.<p>
+		message => q|<p>The following template variables are available in all survey templates.</p>
 
-<b>user.canViewReports</b><br />
+<p><b>user.canViewReports</b><br />
 A boolean indicating whether the user has the privileges to view survey reports.
-<p>
+</p>
 
-<b>delete.all.responses.url</b><br />
+<p><b>delete.all.responses.url</b><br />
 This URL will delete all of the responses to this survey.
-<p>
+</p>
 
-<b>delete.all.responses.label</b><br />
+<p><b>delete.all.responses.label</b><br />
 The default label for delete.all.responses.url.
-<p>
+</p>
 
-<b>export.answers.url</b><br />
+<p><b>export.answers.url</b><br />
 The URL to create a tab delimited file containing all of the answers to the questions in this survey.
-<p>
+</p>
 
-<b>export.answers.label</b><br />
+<p><b>export.answers.label</b><br />
 The default label for export.answers.url.
-<p>
+</p>
 
-<b>export.questions.url</b><br />
+<p><b>export.questions.url</b><br />
 The URL to create a tab delimited file containing all of the questions in this survey.
-<p>
+</p>
 
-<b>export.questions.label</b><br />
+<p><b>export.questions.label</b><br />
 The default label for export.questions.url.
-<p>
+</p>
 
-<b>export.responses.url</b><br />
+<p><b>export.responses.url</b><br />
 The  URL to create a tab delimited file containing all of the responses to the questions in this survey.
-<p>
+</p>
 
-<b>export.responses.label</b><br />
+<p><b>export.responses.label</b><br />
 The default label for export.responses.url
-<p>
+</p>
 
-<b>export.composite.url</b><br />
+<p><b>export.composite.url</b><br />
 The URL to create a tab delimited file containing a composite view of all of the data in this survey.
-<p>
+</p>
 
-<b>export.composite.label</b><br />
+<p><b>export.composite.label</b><br />
 The default label for export.composite.url.
-<p>
+</p>
 
-<b>report.gradebook.url</b><br />
+<p><b>report.gradebook.url</b><br />
 The URL to view the gradebook report for this quiz.
-<p>
+</p>
 
-<b>report.gradebook.label</b><br />
+<p><b>report.gradebook.label</b><br />
 The default label for report.gradebook.url.
-<p>
+</p>
 
-<b>report.overview.url</b><br />
+<p><b>report.overview.url</b><br />
 The URL to view statistical overview report for this survey.
-<p>
+</p>
 
-<b>report.overview.label</b><br />
+<p><b>report.overview.label</b><br />
 The default label for report.overview.url.
-<p>
+</p>
 
-<b>survey.url</b><br />
+<p><b>survey.url</b><br />
 The URL to view the survey. Usually used to get back to the survey after looking at a report.
-<p>
+</p>
 
-<b>survey.label</b><br />
+<p><b>survey.label</b><br />
 The default label for survey.url.
-<p>
+</p>
+
 |,
-		lastUpdated => 1078223067
+		lastUpdated => 1146807023
 	},
 
 	'78' => {
@@ -802,52 +801,52 @@ the survey was added.|,
 	},
 
 	'1088' => {
-		message => q|The following template variables are available in the survey's gradebook report:
-<p>
+		message => q|<p>The following template variables are available in the survey's gradebook report:
+</p>
 
-<b>title</b><br />
+<p><b>title</b><br />
 The default title of the report.
-<p>
+</p>
 
-<b>question.count</b><br />
+<p><b>question.count</b><br />
 The number of questions in the survey.
-<p>
+</p>
 
-<b>response.user.label</b><br />
+<p><b>response.user.label</b><br />
 The default label for response.user.name.
-<p>
+</p>
 
-<b>response.count.label</b><br />
+<p><b>response.count.label</b><br />
 The default label for response.count.correct.
-<p>
+</p>
 
-<b>response.percent.label</b><br />
+<p><b>response.percent.label</b><br />
 The default label for response.percent.
-<p>
+</p>
 
-<b>response_loop</b><br />
+<p><b>response_loop</b><br />
 A loop containing a list of responses.
-<p>
+</p>
 
-<blockquote>
+<div class="helpIndent">
 
-<b>response.url</b><br />
+<p><b>response.url</b><br />
 The URL to view this response.
-<p>
+</p>
 
-<b>response.user.name</b><br />
+<p><b>response.user.name</b><br />
 The username of the user that gave this response.
-<p>
+</p>
 
-<b>response.count.correct</b><br />
+<p><b>response.count.correct</b><br />
 The total number of questions that this user got correct.
-<p>
+</p>
 
-<b>response.percent</b><br />
+<p><b>response.percent</b><br />
 The percentage of correct questions.
-<p>
+</p>
 
-</blockquote>|,
+</div>|,
 		lastUpdated => 1078513217
 	},
 
@@ -857,126 +856,121 @@ The percentage of correct questions.
 	},
 
 	'1090' => {
-		message => q|The following are the variables available to display the individual response.
-<p>
+		message => q|<p>The following are the variables available to display the individual response.
+</p>
 
-<b>title</b><br />
+<p><b>title</b><br />
 The default title for this report.
-<p>
+</p>
 
-<b>delete.url</b><br />
+<p><b>delete.url</b><br />
 The URL to delete this response.
-<p>
+</p>
 
-<b>delete.label</b><br />
+<p><b>delete.label</b><br />
 The default label for delete.url.
-<p>
+</p>
 
-<b>start.date.label</b><br />
+<p><b>start.date.label</b><br />
 The default label for start.date.human.
-<p>
+</p>
 
-<b>start.date.epoch</b><br />
+<p><b>start.date.epoch</b><br />
 The epoch representation of when the user started the survey response.
-<p>
+</p>
 
-<b>start.date.human</b><br />
+<p><b>start.date.human</b><br />
 The human representation of the date when the user started the response.
-<p>
+</p>
 
-<b>start.time.human</b><br />
+<p><b>start.time.human</b><br />
 The human representation of the time when the user started the response.
-<p>
+</p>
 
-<b>end.date.label</b><br />
+<p><b>end.date.label</b><br />
 The default label for end.date.human.
-<p>
+</p>
 
-
-<b>end.date.epoch</b><br />
+<p><b>end.date.epoch</b><br />
 The epoch representation of the date when the user completed this response.
-<p>
+</p>
 
-<b>end.date.human</b><br />
+<p><b>end.date.human</b><br />
 The human representation of the date when the user completed this response.
-<p>
+</p>
 
-<b>end.time.human</b><br />
+<p><b>end.time.human</b><br />
 The human representation of the time when the user completed this response.
-<p>
+</p>
 
-<b>duration.label</b><br />
+<p><b>duration.label</b><br />
 The default label for the duration.
-<p>
+</p>
 
-<b>duration.minutes</b><br />
+<p><b>duration.minutes</b><br />
 The number of minutes it took to complete the survey.
-<p>
+</p>
 
-<b>duration.minutes.label</b><br />
+<p><b>duration.minutes.label</b><br />
 A label for "minutes".
-<p>
+</p>
 
-
-<b>duration.seconds</b><br />
+<p><b>duration.seconds</b><br />
 The remainder seconds the duration.minutes calculations.
-<p>
+</p>
 
-<b>duration.seconds.label</b><br />
+<p><b>duration.seconds.label</b><br />
 A label for "seconds".
-<p>
+</p>
 
-
-<b>answer.label</b><br />
+<p><b>answer.label</b><br />
 The default label for question.answer.
-<p>
+</p>
 
-
-<b>response.label</b><br />
+<p><b>response.label</b><br />
 The default label for question.label.
-<p>
+</p>
 
-<b>comment.label</b><br />
+<p><b>comment.label</b><br />
 The default label for question.comment.
-<p>
+</p>
 
-<b>question_loop</b><br />
+<p><b>question_loop</b><br />
 A loop that includes the list of questions in this response.
-<p>
+</p>
 
-<blockquote>
+<div class="helpIndent">
 
-<b>question</b><br />
+<p><b>question</b><br />
 The question itself.
-<p>
+</p>
 
-<b>question.id</b><br />
+<p><b>question.id</b><br />
 The unique identifier for this question.
-<p>
+</p>
 
-<b>question.isRadioList</b><br />
+<p><b>question.isRadioList</b><br />
 A boolean indicating whether this question's answers are a radio list.
-<p>
+</p>
 
-<b>question.response</b><br />
+<p><b>question.response</b><br />
 The user's response to this question.
-<p>
+</p>
 
-<b>question.comment</b><br />
+<p><b>question.comment</b><br />
 The user's comment on this question (if any).
-<p>
+</p>
 
-<b>question.isCorrect</b><br />
+<p><b>question.isCorrect</b><br />
 A boolean indicating whether the user got this question correct.
-<p>
+</p>
 
-
-<b>question.answer</b><br />
+<p><b>question.answer</b><br />
 The correct answer for this question.
-<p>
+</p>
 
 
-</blockquote>|,
+</div>|,
 		lastUpdated => 1078515839
 	},
 
@@ -986,98 +980,97 @@ The correct answer for this question.
 	},
 
 	'1092' => {
-		message => q|The following are the variables available in this template:
-<p>
+		message => q|<p>The following are the variables available in this template:
+</p>
 
-<b>title</b><br />
+<p><b>title</b><br />
 The default title for this report.
-<p>
+</p>
 
-<b>answer.label</b><br />
+<p><b>answer.label</b><br />
 The default label for answer_loop.
-<p>
+</p>
 
-<b>response.count.label</b><br />
+<p><b>response.count.label</b><br />
 The default label for response.count.
-<p>
+</p>
 
-<b>response.percent.label</b><br />
+<p><b>response.percent.label</b><br />
 The default label for response.percent.
-<p>
+</p>
 
-<b>show.responses.label</b><br />
+<p><b>show.responses.label</b><br />
 The default label that will display responses.
-<p>
+</p>
 
-<b>show.comments.label</b><br />
+<p><b>show.comments.label</b><br />
 The default label that will display comments.
-<p>
+</p>
 
-<b>question_loop</b><br />
+<p><b>question_loop</b><br />
 A loop containing questions.
-<p>
+</p>
 
-<blockquote>
+<div class="helpIndent">
 
-<b>question</b><br />
+<p><b>question</b><br />
 The question itself.
-<p>
+</p>
 
-<b>question.id</b><br />
+<p><b>question.id</b><br />
 The unique identifier for this question.
-<p>
+</p>
 
-<b>question.isRadioList</b><br />
+<p><b>question.isRadioList</b><br />
 A boolean indicating whether the answer for this question is a radio list.
-<p>
+</p>
 
-<b>question.response.total</b><br />
+<p><b>question.response.total</b><br />
 The total number of responses for this answer.
-<p>
+</p>
 
-<b>question.allowComment</b><br />
+<p><b>question.allowComment</b><br />
 A boolean indicating whether this question allows comments.
-<p>
+</p>
 
-<b>answer_loop</b><br />
+<p><b>answer_loop</b><br />
 A loop containing the answers and responses for this question.
-<p>
-<blockquote>
+</p>
 
-<b>answer.isCorrect</b><br />
+<div class="helpIndent">
+
+<p><b>answer.isCorrect</b><br />
 A boolean indicating whether this answer is marked correct.
-<p>
+</p>
 
-<b>answer</b><br />
+<p><b>answer</b><br />
 The answer itself.
-<p>
+</p>
 
-<b>answer.response.count</b><br />
+<p><b>answer.response.count</b><br />
 The total number of responses given for this answer.
-<p>
+</p>
 
-<b>answer.response.percent</b><br />
+<p><b>answer.response.percent</b><br />
 The percent of responses to this question that went to this answer.
-<p>
+</p>
 
-
-<b>comment_loop</b><br />
+<p><b>comment_loop</b><br />
 A loop that contains all of the comments for this answer.
-<p>
+</p>
 
-<blockquote>
-<b>answer.comment</b><br />
+<div class="helpIndent">
+
+<p><b>answer.comment</b><br />
 A comment.
-<p>
+</p>
 
+</div>
 
-</blockquote>
+</div>
 
-</blockquote>
-
-
-</blockquote>|,
-		lastUpdated => 1078517114
+</div>|,
+		lastUpdated => 1146804179
 	},
 
 	'overview template' => {
@@ -1141,15 +1134,15 @@ is set to "response".|,
         },
 
         'what next question description' => {
-                message => q|After defining the question, you may supply an answer:
-<ul>
+                message => q|<p>After defining the question, you may supply an answer:</p>
+<div><ul>
 <li>Multiple Choice</li>
 <li>Text</li>
 <li>Frequency</li>
 <li>Opinion</li>
 <li>Or you may return to the survey</li>
-</ul>|,
-                lastUpdated => 1146455594,
+</ul></div>|,
+                lastUpdated => 1146804196,
         },
 
 	'744' => {

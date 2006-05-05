@@ -53,60 +53,62 @@ our $I18N = {
 	},
 
 	'auth login template body' => {
-		message => q|The following template variables are available for LDAP Authentication Login templates. 
+		message => q|<p>The following template variables are available for LDAP Authentication Login templates.
+</p>
 
-<p>
-<b>login.form.header</b><br />
+<p><b>login.form.header</b><br />
 The required form elements that go at the top of the login page.
+</p>
 
-<p>
-<b>login.form.hidden</b><br />
+<p><b>login.form.hidden</b><br />
 Hidden form fields required for form submission.
+</p>
 
-<p>
-<b>login.form.footer</b><br />
-The required form elements that go after the login page form.</p>
+<p><b>login.form.footer</b><br />
+The required form elements that go after the login page form.
+</p>
 
-<p>
-<b>login.form.submit</b><br />
+<p><b>login.form.submit</b><br />
 The default submit button for the login form.
+</p>
 
-<p>
-<b>login.form.username</b><br />
+<p><b>login.form.username</b><br />
 Default username form field.
+</p>
 
-<p>
-<b>login.form.username.label</b><br />
+<p><b>login.form.username.label</b><br />
 Default text for username form field.
+</p>
 
-<p>
-<b>login.form.password</b><br />
+<p><b>login.form.password</b><br />
 Default password form field.
+</p>
 
-<p>
-<b>login.form.password.label</b><br />
+<p><b>login.form.password.label</b><br />
 Default text for password form field.
+</p>
 
-<p>
-<b>title</b><br />
+<p><b>title</b><br />
 Default page title.
+</p>
 
-<p>
-<b>login.message</b><br />
+<p><b>login.message</b><br />
 Any message returned by the system.  Usually displays after the form is submitted.
+</p>
 
-<p>
-<b>anonymousRegistration.isAllowed</b><br />
+<p><b>anonymousRegistration.isAllowed</b><br />
 Flag indicating whether or not anonymous registrations are allowed.
+</p>
 
-<p>
-<b>createAccount.url</b><br />
+<p><b>createAccount.url</b><br />
 URL for the anonymous registration page.
+</p>
 
-<p>
-<b>createAccount.label</b><br />
+<p><b>createAccount.label</b><br />
 Default label for the anonymous registration link.
-<p>|,
+</p>
+
+|,
 		lastUpdated => 1101771743
 	},
 
@@ -156,29 +158,30 @@ Default label for the anonymous registration link.
 	},
 
 	'display account template body' => {
-		message => q|The following template variables are available for the LDAP Authentication Display Account templates. 
-<p>
-<b>account.form.karma</b><br />
+		message => q|<p>The following template variables are available for the LDAP Authentication Display Account templates.</p>
+
+<p><b>account.form.karma</b><br />
 A read only form property displaying the amount of karma a user has.  Karma is a configurable user setting that is turned off by default.
+</p>
 
-<p>
-<b>account.form.karma.label</b><br />
+<p><b>account.form.karma.label</b><br />
 Internationalized text label for the karma form value.
+</p>
 
-<p>
-<b>account.options</b><br />
+<p><b>account.options</b><br />
 Links list of options which allow users to turn on Admin, view and edit profile, view the inbox, etc.
+</p>
 
-<p>
-<b>displayTitle</b><br />
+<p><b>displayTitle</b><br />
 Page title.
+</p>
 
-<p>
-<b>account.message</b><br />
+<p><b>account.message</b><br />
 Any message returned by the system.  Usually displays after the form is submitted.
+</p>
 
-<p>|,
-		lastUpdated => 1100227017
+|,
+		lastUpdated => 1146804908
 	},
 
 	'10' => {
@@ -187,72 +190,74 @@ Any message returned by the system.  Usually displays after the form is submitte
 	},
 
 	'anon reg template body' => {
-		message => q|The following template variables are available for LDAP Authentication Anonymous Registration templates.
+		message => q|<p>The following template variables are available for LDAP Authentication Anonymous Registration templates.</p>
 
-<p>
-<b>create.form.header</b><br />
+<p><b>create.form.header</b><br />
 The required form elements that go at the top of the anonymous registration page.
+</p>
 
-<p>
-<b>create.form.hidden</b><br />
+<p><b>create.form.hidden</b><br />
 Hidden form fields required for form submittal.
+</p>
 
-<p>
-<b>create.form.footer</b><br />
+<p><b>create.form.footer</b><br />
 The required form elements that go after the anonymous registration page form. 
+</p>
 
-<p>
-<b>create.form.submit</b><br />
+<p><b>create.form.submit</b><br />
 The default submit button for the anonymous registration form.
+</p>
 
-<p>
-<b>title</b><br />
+<p><b>title</b><br />
 Default page title.
+</p>
 
-<p>
-<b>create.form.profile</b><br />
+<p><b>create.form.profile</b><br />
 A loop containing visible and required profile fields for registration.
-<blockquote>
+</p>
 
-<p>
-<b>profile.formElement</b><br />
+<div class="helpIndent">
+
+<p><b>profile.formElement</b><br />
 Form element for visible or required profile field.
+</p>
 
-<p>
-<b>profile.formElement.label</b><br />
+<p><b>profile.formElement.label</b><br />
 Default text label for profile form element.
-</blockquote>
+</p>
 
-<p>
-<b>login.url</b><br />
+</div>
+
+<p><b>login.url</b><br />
 URL for the login page.
+</p>
 
-<p>
-<b>login.label</b><br />
+<p><b>login.label</b><br />
 Default text label for login page link.
+</p>
 
-<p>
-<b>create.message</b><br />
+<p><b>create.message</b><br />
 Any message returned by the system.  Usually displays after the form is submitted.
+</p>
 
-<p>
-<b>create.form.ldapId</b><br />
+<p><b>create.form.ldapId</b><br />
 Default ldapId form field.
+</p>
 
-<p>
-<b>create.form.ldapId.label</b><br />
+<p><b>create.form.ldapId.label</b><br />
 Default text for ldapId form field.
+</p>
 
-<p>
-<b>create.form.password</b><br />
+<p><b>create.form.password</b><br />
 Default password form field.
+</p>
 
-<p>
-<b>create.form.password.label</b><br />
+<p><b>create.form.password.label</b><br />
 Default text for password form field.
-<p>
+</p>
+
 |,
-		lastUpdated => 1100227052
+		lastUpdated => 1146804934
 	},
 
 	'5' => {
@@ -598,9 +603,10 @@ Usually the RDN looks something like:</p>
         },
 
         '868 description' => {
-                message => q|Do you wish WebGUI to automatically send users a welcome message when they register for your site? 
+                message => q|<p>Do you wish WebGUI to automatically send users a welcome message when they register for your site? 
+</p>
 <p>
-<b>NOTE:</b> In addition to the message you specify below, the user's account information will be included in the message.|,
+<b>NOTE:</b> In addition to the message you specify below, the user's account information will be included in the message.</p>|,
                 lastUpdated => 1120164594,
         },
 

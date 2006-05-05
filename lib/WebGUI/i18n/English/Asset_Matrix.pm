@@ -55,7 +55,7 @@ our $I18N = {
 		A loop containing the product information (not contained in categories) for this listing.
 		</p>
 
-		<blockquote>
+		<div class="helpIndent">
 		<p>
 		<b>name</b><br />
 		The name of the product.
@@ -71,27 +71,27 @@ our $I18N = {
 		The URL to the details page for this listing.
 		</p>
 
-		</blockquote>
+		</div>
 
 		<p>
 		<b>lastupdated_loop</b><br />
 		A loop containing the last updated dates for each listing.
 		</p>
 
-		<blockquote>
+		<div class="helpIndent">
 		<p>
 		<b>lastUpdated</b><br />
 
 		The human readable date that this product was last updated.
 		</p>
-		</blockquote>
+		</div>
 
 		<p>
 		<b>category_loop</b><br />
 		A loop containing all of the category information for each listing.
 		</p>
 
-		<blockquote>
+		<div class="helpIndent">
 
 		<p>
 		<b>category</b><br />
@@ -108,14 +108,14 @@ our $I18N = {
 		A loop containing the product data for this field in this category. 
 		</p>
 
-		<blockquote>
+		<div class="helpIndent">
 		<p>
 		<b>column_loop</b><br />
 
 		A loop containing the value data for this field for this product. The first value in this loop is always the field name.
 		</p>
 
-		<blockquote>
+		<div class="helpIndent">
 		<p>
 		<b>value</b><br />
 		The value of this field.
@@ -131,10 +131,10 @@ our $I18N = {
 		<b>description</b><br />
 		The description for this field.
 		</p>
-		</blockquote>
+		</div>
 
-		</blockquote>
-		</blockquote> |
+		</div>
+		</div> |
         },
 
         'comparison template help title' => {
@@ -293,7 +293,7 @@ our $I18N = {
 		A loop is created for each category in this matrix. The name of the loop is the category name with spaces replaced with hypens and a _loop added to the end. So if you have a category called "Bells and Whistles" then the loop would be called "bells-and-whistles_loop".
 		</p>
 
-		<blockquote>
+		<div class="helpIndent">
 		<p>
 
 		<b>value</b><br />
@@ -326,7 +326,7 @@ our $I18N = {
 		<b>class</b><br />
 		The stylesheet class name for this field. The class is the field value with spaces replaced with underscores and all non alphanumeric characters removed.
 		</p>
-		</blockquote>
+		</div>
 |
         },
 
@@ -399,7 +399,7 @@ The name of the listing that has the most clicks.
 A loop containing all of the categories for this matrix and their best ratings.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>url</b><br />
 The URL of the listing that has the best rating for this category.
@@ -425,13 +425,13 @@ The median (or middle) rating of the best listing in this category.
 The sum of all the votes of the best listing in this category.
 </p>
 
-</blockquote>
+</div>
 
 <p><b>worst_rating_loop</b><br />
 A loop containing all of the categories for this matrix and their worst ratings.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>url</b><br />
 The URL of the listing that has the worst rating for this category.
@@ -457,7 +457,7 @@ The median (or middle) rating of the worst listing in this category.
 The sum of all the votes of the worst listing in this category.
 </p>
 
-</blockquote>
+</div>
 
 <p><b>ratings.details.url</b><br />
 The URL to the ratings details page.
@@ -483,7 +483,7 @@ The name of the listing that was most recently updated.
 A loop containing the 20 most recently updated listings.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 	<p><b>url</b><br />
 	The URL to view this listing.
@@ -497,7 +497,7 @@ A loop containing the 20 most recently updated listings.
 	The date this listing was updated.
 	</p>
 
-</blockquote>
+</div>
 
 <p><b>user.count</b><br />
 The total number of registered users on the site.
@@ -515,7 +515,7 @@ The number of listings in this matrix.
 A loop containing the list of pending listing.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 	<p><b>url</b><br />
 	The URL to the pending listing.
@@ -525,7 +525,7 @@ A loop containing the list of pending listing.
 	The product title of the pending listing.	
 	</p>
 
-</blockquote>
+</div>
 |
         },
 
@@ -548,7 +548,7 @@ A loop containing the list of pending listing.
 		This loop contains a list of the categories in this matrix.
 		</p>
 
-		<blockquote>
+		<div class="helpIndent">
 
 		<p>
 		<b>category</b><br />
@@ -560,7 +560,7 @@ A loop containing the list of pending listing.
 		A loop containing a list of listings who have had at least 10 ratings votes and are listed in order by average rating from highest to lowest.
 		</p>
 
-		<blockquote>
+		<div class="helpIndent">
 		<p>
 		<b>url</b><br />
 		The URL to the detail page for this listing.
@@ -587,8 +587,8 @@ A loop containing the list of pending listing.
 		<b>name</b><br />
 		The name of this listing.
 		</p>
-		</blockquote>
-		</blockquote> |
+		</div>
+		</div> |
         },
 
         'search template help body' => {
@@ -622,7 +622,7 @@ A loop containing the list of pending listing.
 		A loop is created for each category in this matrix. The category name is "<i>category</i>_loop" where category is the name of the category with spaces replaced with hyphens. So if you had a category called "Bells And Whistles" the loop would be called "bells-and-whistles_loop".
 		</p>
 
-		<blockquote>
+		<div class="helpIndent">
 
 		<p>
 		<b>name</b><br />
@@ -649,7 +649,7 @@ A loop containing the list of pending listing.
 		The form element representing this field.
 		</p>
 
-		</blockquote>|
+		</div>|
         },
 
         'search template help title' => {
@@ -1069,6 +1069,7 @@ A loop containing the list of pending listing.
         'field type description' => {
                 lastUpdated => 1135279558,
                 message => q|<p>The type of field you are creating.  Please select the type from the following options in the drop-down list.</p>
+		<div>
 		<dl>
 		<dt>Good Bad</dt>
 		<dd>Defines availability of a feature, has it, doesn't have it, limited functionality, free add on, etc.</dd>
@@ -1080,7 +1081,7 @@ A loop containing the list of pending listing.
 		<dd>A URL.</dd>
 		<dt>Combo</dt>
 		<dd>A combination Text box and drop down list.</dd>
-		</dl>|
+		</dl></div>|
         },
 
         'field description' => {
@@ -1098,7 +1099,7 @@ A loop containing the list of pending listing.
                 lastUpdated => 1135279558,
                 message => q|<p>Enter in a default value for the field that will be used if the user leaves the field blank.</p>
 		<p>For the GoodBad field, the possible values are "No", "Yes", "Free Add On", "Costs Extra", "Limited".  While the displayed labels are internationalized, these values are not.</p>
-		<p>For the Combo field, you may only enter in 1 value, but the user will be allowed to select any value entered in by other users.  In other words, the drop-down list will contain all values entered in by users who enter unique data into this field.|
+		<p>For the Combo field, you may only enter in 1 value, but the user will be allowed to select any value entered in by other users.  In other words, the drop-down list will contain all values entered in by users who enter unique data into this field.</p>|
         },
 
         'category description' => {

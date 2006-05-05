@@ -52,7 +52,7 @@ The default label for the last post column.
 A loop containing the data for each of the forums contained in this message board.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>forum.controls</b><br />
 The editing controls for this forum.
@@ -139,7 +139,7 @@ A conditional indicating whether the user can post to this forum.
 </p>
 
 
-</blockquote>
+</div>
 
 <p><b>default.listing</b><br />
 A full forum rendered using the forum template.

@@ -112,10 +112,73 @@ our $I18N = {
 	},
 
 	'login template body' => {
-		message => q|The following template variables are available for WebGUI Authentication Login templates. 
-<p><strong>login.form.header</strong><br />The required form elements that go at the top of the login page.<br /><br /><strong>login.form.hidden</strong><br />Hidden form fields required for form submission<br /><br /><strong>login.form.footer</strong><br />The required form elements that go after the login page form.</p>
-<p><strong>login.form.submit<br /></strong>The default submit button for the login form. <br /><br /><strong>login.form.username<br /></strong>Default username form field<br /><br /><strong>login.form.username.label<br /></strong>Default text for username form field<br /><br /><strong>login.form.password<br /></strong>Default password form field<br /><br /><strong>login.form.password.label<br /></strong>Default text for password form field<br /><br /><strong>title<br /></strong>Default page title 
-<p><strong>login.message</strong><br />Any message returned by the system.  Usually displays after the form is submitted.<br /><br /><strong>anonymousRegistration.isAllowed<br /></strong>Flag indicating whether or not anonymous registrations are allowed<br /><br /><strong>createAccount.url</strong><br />URL for the anonymous registration page<br /><br /><strong>createAccount.label<br /></strong>Default label for the anonymous registration link<br /><br /><strong>recoverPassword.isAllowed</strong><br />Flag indicating whether or not password recovery is enabled<br /><br /><strong>recoverPassword.url<br /></strong>URL for the password recovery page.<br /><br /><strong>recoverPassword.label<br /></strong>Default label for the password recovery link</p>|,
+		message => q|<p>The following template variables are available for WebGUI Authentication Login templates. 
+</p>
+<p><strong>login.form.header</strong><br />
+The required form elements that go at the top of the login page.
+</p>
+
+<p><strong>login.form.hidden</strong><br />
+Hidden form fields required for form submission
+</p>
+
+<p><strong>login.form.footer</strong><br />
+The required form elements that go after the login page form.
+</p>
+
+<p><strong>login.form.submit</strong><br />
+The default submit button for the login form.
+</p>
+
+<p><strong>login.form.username</strong><br />
+Default username form field
+</p>
+
+<p><strong>login.form.username.label</strong><br />
+Default text for username form field
+</p>
+
+<p><strong>login.form.password</strong><br />
+Default password form field
+</p>
+
+<p><strong>login.form.password.label</strong><br />
+Default text for password form field
+</p>
+
+<p><strong>title</strong><br />
+Default page title 
+</p>
+
+<p><strong>login.message</strong><br />
+Any message returned by the system.  Usually displays after the form is submitted.
+</p>
+
+<p><strong>anonymousRegistration.isAllowed</strong><br />
+Flag indicating whether or not anonymous registrations are allowed
+</p>
+
+<p><strong>createAccount.url</strong><br />
+URL for the anonymous registration page
+</p>
+
+<p><strong>createAccount.label</strong><br />
+Default label for the anonymous registration link
+</p>
+
+<p><strong>recoverPassword.isAllowed</strong><br />
+Flag indicating whether or not password recovery is enabled
+</p>
+
+<p><strong>recoverPassword.url</strong><br />
+URL for the password recovery page.
+</p>
+
+<p><strong>recoverPassword.label</strong><br />
+Default label for the password recovery link
+</p>
+|,
+
 		lastUpdated => 1101772000
 	},
 

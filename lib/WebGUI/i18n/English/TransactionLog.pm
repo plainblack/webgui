@@ -21,7 +21,7 @@ A message with an error concerning the cancellation of recurring payment.<br />
 <br />
 <b>historyLoop</b><br />
 A loop containing the transactions in the transaction history. Within this loop these variables are also available:<br />
-<blockquote>
+<div class="helpIndent">
 	<b>amount</b><br />
 	The total amount of this transaction.<br />
 	<br />
@@ -60,7 +60,7 @@ A loop containing the transactions in the transaction history. Within this loop 
 	<br />
 	<b>itemLoop</b>
 	This loop contains all items the transaction consists of. These variables are available:<br />
-	<blockquote>
+	<div class="helpIndent">
 		<b>amount</b><br />
 		The amount of this item.<br />
 		<br />
@@ -75,8 +75,8 @@ A loop containing the transactions in the transaction history. Within this loop 
 		<br />
 		<b>quantity</b><br />
 		The quantity in which this item is bought.<br />
-	</blockquote>
-</blockquote>|,
+	</div>
+</div>|,
 		lastUpdated => 1101753027,
 		context => q|The body of the help page of the purchase history template.|
 	},

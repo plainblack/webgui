@@ -99,7 +99,7 @@ The translated label for the add feature link.
 This loop contains all of the features associated with this product.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>feature.controls</b><br />
 The WebGUI management controls for this feature.
@@ -109,7 +109,7 @@ The WebGUI management controls for this feature.
 The text of the feature itself.
 </p>
 
-</blockquote>
+</div>
 
 <p><b>addbenefit.url</b><br />
 The URL to add a benefit to this product.
@@ -123,7 +123,7 @@ The translated label for the add benefit link.
 This loop contains the benefits for this product.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>benefit.benefit</b><br />
 The benefit text itself.
@@ -133,7 +133,7 @@ The benefit text itself.
 The WebGUI management controls for this benefit.
 </p>
 
-</blockquote>
+</div>
 
 <p><b>addspecification.url</b><br />
 The URL to add a specification to this product.
@@ -147,7 +147,7 @@ The translated label for the add specification link.
 The list of specifications associated with this product.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>specification.controls</b><br />
 The WebGUI management controls for this specification.
@@ -165,7 +165,7 @@ The units for this specification. ex: meters
 The label for this specification. ex: height
 </p>
 
-</blockquote>
+</div>
 
 <p><b>addaccessory.url</b><br />
 The URL to add an accessory to this product.
@@ -179,7 +179,7 @@ The translated label for the add accessory link.
 This loop contains all of the accessories associated with this product.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>accessory.url</b><br />
 The URL to the linked accessory.
@@ -193,7 +193,7 @@ The title of the linked accessory.
 The WebGUI management controls for this accessory.
 </p>
 
-</blockquote>
+</div>
 
 <p><b>addRelatedProduct.url</b><br />
 The URL to add a related product to this product.
@@ -207,7 +207,7 @@ The translated label for the add related product link.
 This loop contains all of the products related to this product.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>relatedproduct.url</b><br />
 The URL to the related product.
@@ -221,7 +221,7 @@ The title of the related product.
 The WebGUI management controls for this related product.
 </p>
 
-</blockquote>
+</div>
 |,
 		lastUpdated => 1146798062,
 	},

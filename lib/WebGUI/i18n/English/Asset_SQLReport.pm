@@ -28,14 +28,14 @@ SQL Reports are Wobjects and Assets, so they share the properties of both.  SQL 
 	},
 
         '72 description' => {
-                message => q|Select a template to display the results of your SQL Report.
-<p>|,
+                message => q|<p>Select a template to display the results of your SQL Report.
+</p>|,
                 lastUpdated => 1119841649,
         },
 
         '16 description' => {
-                message => q|If you want to display debugging and error messages on the page, check this box.
-<p>|,
+                message => q|<p>If you want to display debugging and error messages on the page, check this box.
+</p>|,
                 lastUpdated => 1119841649,
         },
 
@@ -50,10 +50,10 @@ SQL Reports are Wobjects and Assets, so they share the properties of both.  SQL 
 <li><b>String</b><br />Anything else is a string</li>
 </ul></div>
 <p>Example:</p>
-<blockquote>
+<div class="helpIndent">
 <p>Query: select * from some_table where some_field = ? and some_other_field &lt; ?<br />
 Placeholder Parameters: query1:pageId<br />form:field1</p>
-</blockquote>
+</div>
 <p>In this example the first question mark will contain the field value of pageId in query1,
 while the second question mark will contain the form variable "field1".</p>
 <p>Place one Placeholder Parameter on each line.</p>
@@ -62,8 +62,8 @@ while the second question mark will contain the form variable "field1".</p>
         },
 
         '15 description' => {
-                message => q|If you're using WebGUI macros in your query you'll want to check this box.
-<p>|,
+                message => q|<p>If you're using WebGUI macros in your query you'll want to check this box.
+</p>|,
                 lastUpdated => 1119841649,
         },
 
@@ -141,7 +141,7 @@ while the second question mark will contain the form variable "field1".</p>
 A loop containing information about each column.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>column.number</b><br />
 An integer starting with 1 and counting through the number of columns.
@@ -151,7 +151,7 @@ An integer starting with 1 and counting through the number of columns.
 The name of this column as returned by the query.
 </p>
 
-</blockquote>
+</div>
 
 <p><b>rows.count</b><br />
 The total number of rows returned by the query.
@@ -169,7 +169,7 @@ The default label for rows.count.isZero.
 A loop containing the data returned from the query.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>row.number</b><br />
 An integer starting with 1 and counting through the total list of rows.
@@ -183,7 +183,7 @@ The data for a given field in this row where NAME is the name of the field as it
 A loop containing all of the fields for this row.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>field.number</b><br />
 An integer starting with 1 and counting through the number of fields in this row. This is the same as column.number in the column_loop.
@@ -197,9 +197,9 @@ The name of the field as it is returned by the query.
 The data in this field.
 </p>
 
-</blockquote>
+</div>
 
-</blockquote>
+</div>
 
 <p><b>hasNest</b><br />
 A boolean indicating whether query2 has returned any results.
@@ -213,7 +213,7 @@ goes from 2 to 5.</p>
 A loop containing information about each column for queryN.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>column.number</b><br />
 An integer starting with 1 and counting through the number of columns.
@@ -223,7 +223,7 @@ An integer starting with 1 and counting through the number of columns.
 The name of this column as returned by the query.
 </p>
 
-</blockquote>
+</div>
 
 <p><b>queryN.rows.count</b><br />
 The total number of rows returned by queryN.
@@ -241,21 +241,21 @@ The default label for rows.count.isZero.
 A loop containing the data returned from queryN.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>queryN.row.number</b><br />
 An integer starting with 1 and counting through the total list of rows.
 </p>
 
-<b>queryN.row.field.</b><i>NAME</i><b>.value</b><br />
+<p><b>queryN.row.field.</b><i>NAME</i><b>.value</b><br />
 The data for a given field in this row where NAME is the name of the field as it is returned by the query.
-<p>
+</p>
 
 <p><b>queryN.row.field_loop</b><br />
 A loop containing all of the fields for this row.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>field.number</b><br />
 An integer starting with 1 and counting through the number of fields in this row. This is the same as column.number in the column_loop.
@@ -269,9 +269,9 @@ The name of the field as it is returned by the query.
 The data in this field.
 </p>
 
-</blockquote>
+</div>
 
-</blockquote>
+</div>
 
 <p><b>queryN.hasNest</b><br />
 A boolean indicating whether the queryN+1 has returned any results.  This variable
@@ -313,7 +313,7 @@ will always be false for query5.
 	},
 	'Prequery statements description' => {
 		message => q|<p>Prequery statements are sql statements executed before the real query. You can use prequery statements for instance to set variables that you want to use in the real query. For example:</p>
-		<blockquote>set @myVariable := 1</blockquote>
+		<div class="helpIndent">set @myVariable := 1</div>
 <p>The prequery statements are seperated from each other by returns and cannot use placeholders. You can use macro's within the prequery statements, however. Please note that prequery statements are only visible in the query they belong to and that you can only use statements that are allowed by the database link.</p>|,
 		lastUpdated => 0,
 	},

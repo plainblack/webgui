@@ -21,7 +21,7 @@ The beginning of the poll form.
 A loop containing information about the answers in the poll.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>answer.form</b><br />
 The radio button for this answer.
@@ -47,7 +47,7 @@ The percentage of the vote that this answer has received.
 The total number of votes that this answer has received.
 </p>
 
-</blockquote>
+</div>
 
 <p><b>form.submit</b><br />
 The submit button for the poll form.

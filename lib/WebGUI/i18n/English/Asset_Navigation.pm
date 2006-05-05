@@ -233,57 +233,57 @@ a Google sitemap of your site.</p>
 <p><strong>currentPage.hasViewableSiblings</strong><br />A conditional indicating whether the start page has siblings that are viewable by the current user.</p>
 <p><strong>currentPage.hasViewableChildren</strong><br />A conditional indicating whether the start page has children that are viewable by the current user.</p>
 <p><strong>page_loop</strong><br />A loop containing page information in nested, hierarchical order.</p>
-<blockquote dir=ltr style="MARGIN-RIGHT: 0px">
-<P dir=ltr><strong>page.assetId</strong><br />The assetId of this page.</p>
-<P dir=ltr><strong>page.parentId</strong><br />The assetId of the parent of this page.</p>
-<P dir=ltr><strong>page.ownerUserId</strong><br />The userId of the owner of this page.</p>
-<P dir=ltr><strong>page.synopsis</strong><br />The synopsis of this page.</p>
-<P dir=ltr><strong>page.newWindow</strong><br />A conditional indicating whether this page should be opened in a new window.</p>
-<P dir=ltr><strong>page.menuTitle</strong><br />The menu title of this page.</p>
-<P dir=ltr><strong>page.title</strong><br />The title of this page.</p>
-<P dir=ltr><strong>page.rank</strong><br />The rank of this page compared with is siblings.</p>
-<P dir=ltr><strong>page.absDepth</strong><br />The absolute depth of this page (relative to nameless root).</p>
+<div class="helpIndent">
+<p><strong>page.assetId</strong><br />The assetId of this page.</p>
+<p><strong>page.parentId</strong><br />The assetId of the parent of this page.</p>
+<p><strong>page.ownerUserId</strong><br />The userId of the owner of this page.</p>
+<p><strong>page.synopsis</strong><br />The synopsis of this page.</p>
+<p><strong>page.newWindow</strong><br />A conditional indicating whether this page should be opened in a new window.</p>
+<p><strong>page.menuTitle</strong><br />The menu title of this page.</p>
+<p><strong>page.title</strong><br />The title of this page.</p>
+<p><strong>page.rank</strong><br />The rank of this page compared with is siblings.</p>
+<p><strong>page.absDepth</strong><br />The absolute depth of this page (relative to nameless root).</p>
 <p><strong>page.relDepth</strong><br />The relative depth of this page (relative to starting point).</p>
 <p><strong>page.isSystem</strong><br />A conditional indicating whether this page is a system page (Trash, Clipboard, etc).</p>
 <p><strong>page.isHidden</strong><br />A conditional indicating whether this page is a hidden page.</p>
 <p><strong>page.isContainer</strong><br />A conditional indicating whether this page a container asset.</p>
 <p><strong>page.isUtility</strong><br />A conditional indicating whether this page is a utility asset.</p>
 <p><strong>page.isViewable</strong><br />A conditional indicating whether the user has permission to view it.</p>
-<P dir=ltr><strong>page.url</strong><br />The complete URL to this page.</p>
+<p><strong>page.url</strong><br />The complete URL to this page.</p>
 <p><strong>page.indent</strong><br />A variable containing the indent for the current page. The default indent is three spaces. Use the <strong>page.indent_loop</strong> if you need a more flexible indent.</p>
 <p><strong>page.indent_loop</strong><br />A loop that runs <strong>page.relDepth</strong> times.</p>
-<blockquote dir=ltr style="MARGIN-RIGHT: 0px">
-<p><strong>indent</strong><br />A number representing the loop count. </p></blockquote>
-<P dir=ltr><strong>page.isBranchRoot</strong><br />A conditional indicating whether this page is a root page.</p>
-<P dir=ltr><strong>page.isTopOfBranch</strong><br />A conditional indicating whether this page is a top page (daughter of root).</p>
-<P dir=ltr><strong>page.isChild</strong><br />A conditional indicating whether this page is a daughter of the base page.</p>
-<P dir=ltr><strong>page.isParent</strong><br />A conditional indicating whether this page is the mother of the base page.</p>
-<P dir=ltr><strong>page.isCurrent</strong><br />A conditional indicating whether this page is the base page.</p>
-<P dir=ltr><strong>page.isDescendent</strong><br />A conditional indicating whether this page is a descendant of the base page.</p>
-<P dir=ltr><strong>page.isAncestor</strong><br />A conditional indicating whether this page is an ancestor of the base page.</p>
-<P dir=ltr><strong>page.inBranchRoot</strong><br />This conditional is true if this page is a descendant of the root page of the base page.</p>
-<P dir=ltr><strong>page.isSibling</strong><br />A conditional indicating whether this page is the sister of the base page.</p>
-<P dir=ltr><strong>page.inBranch</strong><br />A conditional that is the logical OR of <strong>isAncestor</strong>, <strong>isSister</strong>, <strong>isBasepage</strong> and <strong>isDescendent</strong>.</p>
-<P dir=ltr><strong>page.hasChild</strong><br />A conditional indicating whether this page has a daughter. In other words, it evaluates to true if this page is a mother.</p>
-<P dir=ltr><strong>page.hasViewableChildren</strong><br />A conditional indicating whether this page has a viewable child.</p>
-<P dir=ltr><strong>page.depthIs1 , page.depthIs2 , page.depthIs3 , page.depthIs4 , page.depthIsN<br /></strong>A conditional indicating whether the depth of this page is N. This variable is useful if you want to style a certain level.</p>
-<P dir=ltr>&lt;tmpl_if page.depthIs1&gt;<br />&nbsp;&nbsp; &lt;img src="level1.gif"&gt;<br />&lt;tmpl_else&gt;<br />&nbsp;&nbsp; &lt;img src="defaultBullet.gif"&gt;<br />&lt;/tmpl_if&gt;</p>
-<P dir=ltr><strong>page.relativeDepthIs1 , page.relativeDepthIs2 , page.relativeDepthIs3 , page.relativeDepthIsN</strong><br />A conditional indicating whether the depth of this page is N, relative to the starting page.</p>
-<P dir=ltr><strong>page.depthDiff</strong><br />The difference in depth between the previous page and this page, parent.absDepth - page.absDepth, although parent.absDepth is not a template variable.</p>
-<P dir=ltr><strong>page.depthDiffIs1, page.depthDiffIs2, page.depthDiffIs3, page.depthDiffIsN</strong><br />True if the <strong>page.depthDiff</strong> variable is N.  N can be positive or negative.</p>
-<P dir=ltr><strong>page.depthDiff_loop</strong><br />A loop that runs <strong>page.depthDiff</strong> times, if <strong>page.depthDiff</strong> &gt; 0. This loop contains no loop variables.</p>
-<P dir=ltr><strong>page.isRankedFirst</strong><br />This property is true if this page is the first within this level. ie. has no left sister.</p>
-<P dir=ltr><strong>page.isRankedLast</strong><br />This property is true if this page is the last within this level. ie. has no right sister.</p>
-<P dir=ltr><strong>page.parent.*</strong><br />These variables will be undefined if the page is a root.</p>
-<P dir=ltr><strong>page.parent.menuTitle</strong><br />The menu title of the mother of this page.</p>
-<P dir=ltr><strong>page.parent.title</strong><br />The title of the mother of this page.</p>
-<P dir=ltr><strong>page.parent.url</strong><br />The urlized title of the mother of this page.</p>
-<P dir=ltr><strong>page.parent.assetId</strong><br />The assetId of the mother of this page.</p>
-<P dir=ltr><strong>page.parent.parentId</strong><br />The assetId of the grandmother of this page.</p>
-<P dir=ltr><strong>page.parent.ownerUserId</strong><br />The userId of the owner of the mother of this page.</p>
-<P dir=ltr><strong>page.parent.synopsis</strong><br />The synopsis of the mother of this page.</p>
-<P dir=ltr><strong>page.parent.newWindow</strong><br />A conditional indicating whether the mother of this page should be opened in a new window.</p>
-</blockquote>|,
+<div class="helpIndent">
+<p><strong>indent</strong><br />A number representing the loop count. </p></div>
+<p><strong>page.isBranchRoot</strong><br />A conditional indicating whether this page is a root page.</p>
+<p><strong>page.isTopOfBranch</strong><br />A conditional indicating whether this page is a top page (daughter of root).</p>
+<p><strong>page.isChild</strong><br />A conditional indicating whether this page is a daughter of the base page.</p>
+<p><strong>page.isParent</strong><br />A conditional indicating whether this page is the mother of the base page.</p>
+<p><strong>page.isCurrent</strong><br />A conditional indicating whether this page is the base page.</p>
+<p><strong>page.isDescendent</strong><br />A conditional indicating whether this page is a descendant of the base page.</p>
+<p><strong>page.isAncestor</strong><br />A conditional indicating whether this page is an ancestor of the base page.</p>
+<p><strong>page.inBranchRoot</strong><br />This conditional is true if this page is a descendant of the root page of the base page.</p>
+<p><strong>page.isSibling</strong><br />A conditional indicating whether this page is the sister of the base page.</p>
+<p><strong>page.inBranch</strong><br />A conditional that is the logical OR of <strong>isAncestor</strong>, <strong>isSister</strong>, <strong>isBasepage</strong> and <strong>isDescendent</strong>.</p>
+<p><strong>page.hasChild</strong><br />A conditional indicating whether this page has a daughter. In other words, it evaluates to true if this page is a mother.</p>
+<p><strong>page.hasViewableChildren</strong><br />A conditional indicating whether this page has a viewable child.</p>
+<p><strong>page.depthIs1 , page.depthIs2 , page.depthIs3 , page.depthIs4 , page.depthIsN<br /></strong>A conditional indicating whether the depth of this page is N. This variable is useful if you want to style a certain level.</p>
+<p>&lt;tmpl_if page.depthIs1&gt;<br />&nbsp;&nbsp; &lt;img src="level1.gif"&gt;<br />&lt;tmpl_else&gt;<br />&nbsp;&nbsp; &lt;img src="defaultBullet.gif"&gt;<br />&lt;/tmpl_if&gt;</p>
+<p><strong>page.relativeDepthIs1 , page.relativeDepthIs2 , page.relativeDepthIs3 , page.relativeDepthIsN</strong><br />A conditional indicating whether the depth of this page is N, relative to the starting page.</p>
+<p><strong>page.depthDiff</strong><br />The difference in depth between the previous page and this page, parent.absDepth - page.absDepth, although parent.absDepth is not a template variable.</p>
+<p><strong>page.depthDiffIs1, page.depthDiffIs2, page.depthDiffIs3, page.depthDiffIsN</strong><br />True if the <strong>page.depthDiff</strong> variable is N.  N can be positive or negative.</p>
+<p><strong>page.depthDiff_loop</strong><br />A loop that runs <strong>page.depthDiff</strong> times, if <strong>page.depthDiff</strong> &gt; 0. This loop contains no loop variables.</p>
+<p><strong>page.isRankedFirst</strong><br />This property is true if this page is the first within this level. ie. has no left sister.</p>
+<p><strong>page.isRankedLast</strong><br />This property is true if this page is the last within this level. ie. has no right sister.</p>
+<p><strong>page.parent.*</strong><br />These variables will be undefined if the page is a root.</p>
+<p><strong>page.parent.menuTitle</strong><br />The menu title of the mother of this page.</p>
+<p><strong>page.parent.title</strong><br />The title of the mother of this page.</p>
+<p><strong>page.parent.url</strong><br />The urlized title of the mother of this page.</p>
+<p><strong>page.parent.assetId</strong><br />The assetId of the mother of this page.</p>
+<p><strong>page.parent.parentId</strong><br />The assetId of the grandmother of this page.</p>
+<p><strong>page.parent.ownerUserId</strong><br />The userId of the owner of the mother of this page.</p>
+<p><strong>page.parent.synopsis</strong><br />The synopsis of the mother of this page.</p>
+<p><strong>page.parent.newWindow</strong><br />A conditional indicating whether the mother of this page should be opened in a new window.</p>
+</div>|,
 		lastUpdated => 1145060204,
 	},
 

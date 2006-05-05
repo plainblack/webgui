@@ -49,13 +49,13 @@ The internationalized text "^International("available product configurations","M
 A loop containing information about all variants about the Product.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>variant.compositionLoop</b><br />
 A loop containing information about all variants about the Product.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>parameter</b><br />
 The parameter that defines this variant, for example, size.
@@ -65,7 +65,7 @@ The parameter that defines this variant, for example, size.
 The value of the parameter, for the example of size, XL.
 </p>
 
-</blockquote>
+</div>
 
 <p><b>variant.variantId</b><br />
 The Id for this variant of the Product.
@@ -93,7 +93,7 @@ to display to the user for adding this variant
 of the Product to their shopping cart.
 </p>
 
-</blockquote>
+</div>
 
 <p><b>productId</b><br />
 The unique identifier of this Product.</p>

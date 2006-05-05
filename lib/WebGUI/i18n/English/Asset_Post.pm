@@ -269,7 +269,7 @@ The name of the first attachment found on the Post.
 A loop containing all file and image attachments to this Post.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>url</b><br />
 The URL to download this attachment.
@@ -291,7 +291,7 @@ A thumbnail of this attachment, if applicable.
 A conditional indicating whether this attachment is an image.
 </p>
 
-</blockquote>
+</div>
 
 <p><b>storageId</b><br />
 The Asset ID of the storage node for the Post, where the attachments are kept.
@@ -384,7 +384,7 @@ Post Form template you can use those variables like
 this to collect data:
 </p>
 
-<blockquote>
+<div class="helpIndent">
 &lt;tmpl_var userDefined1.form&gt; (text)<br />
 
 &lt;tmpl_var userDefined1.form.yesNo&gt; (yes / no) <br />
@@ -395,7 +395,7 @@ this to collect data:
 
 &lt;tmpl_var userDefined1.form.float&gt; (float field) <br />
 
-</blockquote>
+</div>
 
 <p>Then in the Thread and Main CS templates you can call
 back the data with a simple &lt;tmpl_var userDefined1&gt;.</p>
@@ -442,7 +442,7 @@ back the data with a simple &lt;tmpl_var userDefined1&gt;.</p>
 
 	'notification template body' => {
 		message => q|<p>In addition to the common Post Template variables, the Notification Template has these variables:
-<p/>
+</p>
 
 <p>All variables from the Post Template Variables.
 </p>

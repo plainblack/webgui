@@ -519,9 +519,9 @@ each asset under the tab &quot;Meta&quot; in the asset properties.</p>
   </li>
   <li><p><b>Show content based upon criteria</b><br />
     The Wobject Proxy allows you to select content based upon criteria like:</p>
-    <blockquote>
+    <div class="helpIndent">
     contenttype = sport AND source != newspaper
-    </blockquote>
+    </div>
     <p>You can use the AOI macro's described above in the criteria, so you can
     present content based upon the users Areas of Interest. Example:<br />
     type = &#94;AOIRank(contenttype);</p></li>

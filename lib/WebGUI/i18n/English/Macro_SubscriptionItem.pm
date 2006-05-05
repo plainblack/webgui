@@ -29,6 +29,7 @@ The URL to purchase a subscription to this item.
 
 <p><b>name</b><br />
 The name of the item.
+</p>
 
 <p><b>description</b><br />
 The description of the item.

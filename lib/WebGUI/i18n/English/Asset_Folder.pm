@@ -73,7 +73,7 @@ The internationalized label for adding files to the Folder.</p>
 <p><b>subfolder_loop</b><br />
 A loop containing all Folder assets which are children of the Folder.</p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>id</b><br />
 The assetId of the Folder.</p>
@@ -90,12 +90,12 @@ The URL to a small icon of the appropriate type for this Asset.</p>
 <p><b>icon.big</b><br />
 The URL to a big icon of the appropriate type for this Asset.</p>
 
-</blockquote>
+</div>
 
 <p><b>file_loop</b><br />
 A loop containing all non-Folder assets which are children of the Folder.</p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>id</b><br />
 The assetId of the Asset.</p>
@@ -146,7 +146,7 @@ If this Asset is an Image, the URL to the thumbnail for it.</p>
 If this Asset is a File Asset (File, Image or Zip Archive), the URL to the actual file for downloading.  Otherwise,
 this variable will be empty</p>
 
-</blockquote>
+</div>
 		|,
         	lastUpdated => 1146775736,
 	},

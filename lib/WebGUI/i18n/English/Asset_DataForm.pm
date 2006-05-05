@@ -367,18 +367,18 @@ The URL to the page to edit this entry.
 A loop containing error information, for instance if someone doesn't fill out a required field.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <b>error.message</b> *<br />
 An error message indicating what the user might have done wrong.
 
-</blockquote>
+</div>
 
 <p><b>tab_loop</b><br />
 A loop containing information about tabs that may have been defined for this Data Form.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>tab.start</b> !<br />
 Code to start the tab.
@@ -409,7 +409,7 @@ A loop containing all the fields for this tab.  See the <b>field_loop</b> descri
 below to see which template variables may be used inside this loop.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>tab.field.form</b> !<br />
 The form element for this field.
@@ -455,19 +455,19 @@ A description of the field so that users know what to put in the field.
 WebGUI's administrative controls for editing this field.
 </p>
 
-</blockquote>
+</div>
 
 <p><b>tab.end</b> !<br />
 Code to end the tab.
 </p>
 
-</blockquote>
+</div>
 
 <p><b>field_loop</b><br />
 A loop containing all of the field information.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>field.form</b> !<br />
 The form element for this field.
@@ -517,7 +517,7 @@ A description of the field so that users know what to put in the field.
 WebGUI's administrative controls for editing this field.
 </p>
 
-</blockquote>
+</div>
 
 <p><b>field.noloop.<i>fieldName</i>.<i>property</i></b><br />
 From outside the <b>field_loop</b> it's also possible to access all form fields directly. To accomplish this you should use these variables. Call them with <b>field.noloop.<i>fieldName</i>.<i>property</i></b>, where fieldName is the name of the field (not the label) and property is anyone of the properties supplied by the <b>field_loop</b>. If you want the form tag of field 'name' you should use <b>field.noloop.name.form</b> anywhere in your template. If you want to know if the field is required use <b>field.noloop.name.isRequired</b>.
@@ -575,8 +575,8 @@ The end of the form.
 	},
 
 	'89' => {
-		message => q|The following variables are available to the Data Form List template:
-<p>
+		message => q|<p>The following variables are available to the Data Form List template:
+</p>
 
 <p><b>back.url</b><br />
 The URL to go back to the Data Form data entry page.
@@ -590,7 +590,7 @@ The default label for the back.url.
 A loop containing information about the fields in this Data Form.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>field.name</b><br />
 The web safe name of this field.
@@ -612,13 +612,13 @@ A conditional indicating whether this field exists for the mail subsystem of the
 The data type associated with this field.
 </p>
 
-</blockquote>
+</div>
 
 <p><b>record_loop</b><br />
 A loop containing the record entries of this data form.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>record.entryId</b><br />
 A unique identifier for this record entry.
@@ -664,7 +664,7 @@ A human readable date stamp, based upon the user's preferences, for this record 
 A loop containing the data submitted by the user for each field in this data form.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>record.data.name</b><br />
 The web safe name of this field.
@@ -682,9 +682,9 @@ The value submitted by the user for this field in this record entry.
 A conditional indicating whether this field exists for the mail subsystem of the data form.
 </p>
 
-</blockquote>
+</div>
 
-</blockquote>|,
+</div>|,
 		lastUpdated => 1146630002,
 	},
 

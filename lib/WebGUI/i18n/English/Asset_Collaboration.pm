@@ -1114,7 +1114,7 @@ used by Collaboration Assets:</p>
 A list of posts for this Collateral Asset.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>Asset variables</b><br />
 The variables common to all Assets, such as <b>title</b>, <b>menuTitle</b>, etc.
@@ -1137,13 +1137,13 @@ The URL of this Post.
 A loop that runs once for each point of <b>rating</b> that the Post has
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>rating_loop.count</b><br />
 The index variable for the <b>rating_loop</b>.
 </p>
 
-</blockquote>
+</div>
 
 <p><b>content</b><br />
 The formatted content of this Post.
@@ -1255,7 +1255,7 @@ The date the last reply was submitted, in a human readable format.
 The time the last reply was submitted, in a human readable format.
 </p>
 
-</blockquote>
+</div>
 
                 |,
 		lastUpdated => 1120083131,
@@ -1361,7 +1361,7 @@ HTML and javascript required to make the form work.
 
 <p><b>query.form</b><br />
 HTML form for adding a field where all input has to be in matched pages.
-/
+</p>
 
 <p><b>form.search</b><br />
 A button to add to the form to begin searching.
@@ -1457,7 +1457,7 @@ The date that this feed was last updated. (optional field)
 Loops over the posts to be transmitted in this RSS feed.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>author</b><br />
 The username of the person who submitted the post.
@@ -1487,7 +1487,7 @@ The date the item was published.
 A loop containg all attachements to this item (post).
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>attachment.url</b><br />
 The URL to this attachment.
@@ -1501,9 +1501,9 @@ The path in the filesystem to this attachment.
 The length in this attachment, in bytes.
 </p>
 
-</blockquote>
+</div>
 
-</blockquote>
+</div>
 
                 |,
 		lastUpdated => 1146762108,

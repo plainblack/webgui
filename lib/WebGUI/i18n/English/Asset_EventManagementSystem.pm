@@ -391,7 +391,7 @@ in the system.</p>
 This loop contains all events that have been approved so that users can register.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>event</b><br />
 The information for one event that has been processed by its own event template.
@@ -451,7 +451,7 @@ A URL for the user to register for this event and add it to their shopping cart.
 If the event is full, the url will be blank.
 </p>
 
-</blockquote>
+</div>
 
 <p><b>checkout.url</b><br />
 A URL to take the user the screen that displays the contents of their shopping cart.
@@ -579,7 +579,7 @@ the user can manage their purchases.</p>
 This loop contains all events that have been approved so that users can view their purchases.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>purchaseUrl</b><br />
 A link to view the details of this purchase.
@@ -589,7 +589,7 @@ A link to view the details of this purchase.
 The date and time this purchase was started in a human readable format.
 </p>
 
-</blockquote>
+</div>
 
 <p><b>managePurchasesTitle</b><br />
 An internationalized label to title this screen.
@@ -615,7 +615,7 @@ EMS Asset variables.</p>
 This loop contains all events that are included in this purchase.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>startDateHuman</b><br />
 This event's start date and time in a human readable format.
@@ -669,7 +669,7 @@ The template used to style this event if it is to be displayed.
 The number of people allowed to attend this event.
 </p>
 
-</blockquote>
+</div>
 
 <p><b>viewPurchaseTitle</b><br />
 An internationalized label to title this screen.
@@ -729,7 +729,7 @@ A button to submit the user's search data.  The button will contain the internat
 This loop contains all events that have been approved so that users can register.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>event</b><br />
 The information for one event that has been processed by its own event template.
@@ -781,7 +781,7 @@ A URL for the user to register for this event and add it to their shopping cart.
 If the event is full, the url will be blank.
 </p>
 
-</blockquote>
+</div>
 
 <p><b>checkout.url</b><br />
 A URL to take the user the screen that displays the contents of their shopping cart.

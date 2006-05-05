@@ -1089,7 +1089,7 @@ removed from the system after a set period of time.  That period of time is set 
 
         '993 description' => {
                 message => q|<p><b>D</b>ata <b>S</b>ource <b>N</b>ame is the unique identifier that Perl uses to describe the location of your database. It takes the format of</p>
-<blockquote>DBI:[driver]:[database name]:[host].</blockquote>
+<div class="helpIndent">DBI:[driver]:[database name]:[host].</div>
 <p><i>Example:</i> DBI:mysql:WebGUI:localhost</p>
 <p>
 Here are some examples for other databases.</p>
@@ -1126,7 +1126,7 @@ You must be using mod_perl and configure <b>PerlSetEnv SYBASE /opt/sybase/11.0.2
 	'1001' => {
 		message => q|<p>
 The following fields make up a Database Link.
-<p>
+</p>
 |,
 		lastUpdated => 1122070424
 	},
@@ -1517,10 +1517,13 @@ be in HTML format, and no attachments can be included.|,
 	},
 
 	'620' => {
-		message => q|As this function suggests you'll be deleting a group and removing all users from the group. Be careful not to restrict users from pages they should have access to by deleting a group that is in use.
-<p>
+		message => q|<p>As this function suggests you'll be deleting a group and removing all users from the group. Be careful not to restrict users from pages they should have access to by deleting a group that is in use.
+</p>
 
-As with any delete operation, you are prompted to be sure you wish to proceed with the delete. If you answer yes, the delete will proceed and there is no recovery possible. If you answer no you'll be returned to the prior screen.|,
+<p>As with any delete operation, you are prompted to be sure you wish to proceed with the delete. If you answer yes, the delete will proceed and there is no recovery possible. If you answer no you'll be returned to the prior screen.
+</p>
+
+|,
 		lastUpdated => 1100154599
 	},
 
@@ -1702,97 +1705,99 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 	},
 
         '84 description' => {
-                message => q|A name for the group. It is best if the name is descriptive so you know what it is at a glance.
-<p>|,
+                message => q|<p>A name for the group. It is best if the name is descriptive so you know what it is at a glance.
+</p>|,
                 lastUpdated => 1120448672,
         },
 
         '85 description' => {
-                message => q|A longer description of the group so that other admins and content managers (or you if you forget) will know what the purpose of this group is.
-<p>|,
+                message => q|<p>A longer description of the group so that other admins and content managers (or you if you forget) will know what the purpose of this group is.
+</p>|,
                 lastUpdated => 1120448672,
         },
 
         '367 description' => {
-                message => q|The amount of time that a user will belong to this group before s/he is expired (or removed) from it. This is very useful for membership sites where users have certain privileges for a specific period of time. 
-<p>
-<b>NOTE:</b> This can be overridden on a per-user basis.
-<p>|,
+                message => q|<p>The amount of time that a user will belong to this group before s/he is expired (or removed) from it. This is very useful for membership sites where users have certain privileges for a specific period of time. 
+</p>
+<p><b>NOTE:</b> This can be overridden on a per-user basis.
+</p>|,
                 lastUpdated => 1120448672,
         },
 
         '865 description' => {
-                message => q|Set this value to yes if you want WebGUI to contact the user when they are about to be expired from the group.
-<p>|,
+                message => q|<p>Set this value to yes if you want WebGUI to contact the user when they are about to be expired from the group.
+</p>|,
                 lastUpdated => 1120448672,
         },
 
         '864 description' => {
-                message => q|The difference in the number of days from the expiration to the notification. You may set this to any valid integer. For instance, set this to "0" if you wish the notification to be sent on the same day that the grouping expires. Set it to "-7" if you want the notification to go out 7 days <b>before</b> the grouping expires. Set it to "7" if you wish the notification to be sent 7 days after the expiration.
-<p>|,
+                message => q|<p>The difference in the number of days from the expiration to the notification. You may set this to any valid integer. For instance, set this to "0" if you wish the notification to be sent on the same day that the grouping expires. Set it to "-7" if you want the notification to go out 7 days <b>before</b> the grouping expires. Set it to "7" if you wish the notification to be sent 7 days after the expiration.
+</p>|,
                 lastUpdated => 1120448672,
         },
 
         '866 description' => {
-                message => q|Type the message you wish to be sent to the user telling them about the expiration.
-<p>|,
+                message => q|<p>Type the message you wish to be sent to the user telling them about the expiration.
+</p>|,
                 lastUpdated => 1120448672,
         },
 
         '863 description' => {
-                message => q|The difference in the number of days from the expiration to the grouping being deleted from the system. You may set this to any valid integer. For instance, set this to "0" if you wish the grouping to be deleted on the same day that the grouping expires. Set it to "-7" if you want the grouping to be deleted 7 days <b>before</b> the grouping expires. Set it to "7" if you wish the grouping to be deleted 7 days after the expiration.
-<p>|,
+                message => q|<p>The difference in the number of days from the expiration to the grouping being deleted from the system. You may set this to any valid integer. For instance, set this to "0" if you wish the grouping to be deleted on the same day that the grouping expires. Set it to "-7" if you want the grouping to be deleted 7 days <b>before</b> the grouping expires. Set it to "7" if you wish the grouping to be deleted 7 days after the expiration.
+</p>|,
                 lastUpdated => 1120448672,
         },
 
         '538 description' => {
-                message => q|If you've enabled Karma, then you'll be able to set this value. Karma Threshold is the amount of karma a user must have to be considered part of this group.
-<p>|,
+                message => q|<p>If you've enabled Karma, then you'll be able to set this value. Karma Threshold is the amount of karma a user must have to be considered part of this group.
+</p>|,
                 lastUpdated => 1120448672,
         },
 
         '857 description' => {
-                message => q|Specify IP addresses in CIDR format.  Multiple addresses can be entered if they are separated by commas.  Spaces, tabs and carriage returns and newlines will be ignored.
+                message => q|<p>Specify IP addresses in CIDR format.  Multiple addresses can be entered if they are separated by commas.  Spaces, tabs and carriage returns and newlines will be ignored.
+</p>
 <p>
 <i>IP Mask Example:</i> 10.0.0.32/27, 192.168.0.1/30
-<p>|,
+</p>|,
                 lastUpdated => 1139955354,
         },
 
         '945 description' => {
-                message => q|A user can be dynamically bound to a group by a scratch variable in their session. Scratch variables can be set programatically, or via the web. To set a scratch variable via the web, tack the following on to the end of any URL:
-<p>
-<i>?op=setScratch&amp;scratchName=somename&amp;scratchValue=somevalue</i>
-<p>
-Having done that, when a user clicks on that link they will have a scratch variable added to their session with a name of "www_somename" and a value of "somevalue". The "www_" is prefixed to prevent web requests from overwriting scratch variables that were set programatically.
-<p>
-To set a scratch filter simply add a line to the scratch filter field that looks like:
-<p>
-<i>www_somename=somevalue</i>
-<p>
-Multiple filters can be set by joining name and value pairs with a semicolon:
-<p>
-<i>www_somename=somevalue;otherName=otherValue</i>
+                message => q|<p>A user can be dynamically bound to a group by a scratch variable in their session. Scratch variables can be set programatically, or via the web. To set a scratch variable via the web, tack the following on to the end of any URL:
+</p>
+<p><i>?op=setScratch&amp;scratchName=somename&amp;scratchValue=somevalue</i>
+</p>
+<p>Having done that, when a user clicks on that link they will have a scratch variable added to their session with a name of "www_somename" and a value of "somevalue". The "www_" is prefixed to prevent web requests from overwriting scratch variables that were set programatically.
+</p>
+<p>To set a scratch filter simply add a line to the scratch filter field that looks like:
+</p>
+<p><i>www_somename=somevalue</i>
+</p>
+<p>Multiple filters can be set by joining name and value pairs with a semicolon:
+</p>
+<p><i>www_somename=somevalue;otherName=otherValue</i>
+</p>
 
 |,
                 lastUpdated => 1144345050,
         },
 
         '974 description' => {
-                message => q|Do you wish to let users add themselves to this group? See the GroupAdd macro for more info.
-<p>|,
+                message => q|<p>Do you wish to let users add themselves to this group? See the GroupAdd macro for more info.
+</p>|,
                 lastUpdated => 1120448672,
         },
 
         '975 description' => {
-                message => q|Do you wish to let users remove themselves from this group? See the GroupDelete macro for more info.
-<p>|,
+                message => q|<p>Do you wish to let users remove themselves from this group? See the GroupDelete macro for more info.
+</p>|,
                 lastUpdated => 1120448672,
         },
 
         '1075 description' => {
-                message => q|If you'd like to have this group validate users using an external database, choose the database link to use.
-<p>|,
+                message => q|<p>If you'd like to have this group validate users using an external database, choose the database link to use.
+</p>|,
                 lastUpdated => 1120448672,
         },
 
@@ -1812,7 +1817,7 @@ This group could then be named "Employees in HMO 1", and would allow you to rest
         },
 
         '1004 description' => {
-                message => q|Large sites using external group data will be making many calls to the external database.  To help reduce the load, you may select how long you'd like to cache the results of the external database query within the WebGUI database.  More advanced background caching may be included in a future version of WebGUI.|,
+                message => q|<p>Large sites using external group data will be making many calls to the external database.  To help reduce the load, you may select how long you'd like to cache the results of the external database query within the WebGUI database.  More advanced background caching may be included in a future version of WebGUI.</p>|,
                 lastUpdated => 1120448672,
         },
 
@@ -1821,12 +1826,14 @@ This group could then be named "Employees in HMO 1", and would allow you to rest
 		message => q|
 <p>Here you will define a new group or edit an existing group.
 Group membership is very flexible, determined from any or all of the following:</p>
+<div>
 <ul>
 <li>Add users directly to a group.</li>
 <li>Via membership in an LDAP group.</li>
 <li>From a database query.</li>
 <li>By IP address.</li>
 </ul>
+</div>
 <p>Groups can also be setup to that
 users can add or remove themselves from the group, although it is
 strongly recommended that you not allow users to add themselves to
@@ -2001,13 +2008,14 @@ default WebGUI groups such as Admin or Content Manager.</p> |,
 	},
 
 	'698' => {
-		message => q|Karma is a method of tracking the activity of your users, and potentially rewarding or punishing them for their level of activity. Once karma has been enabled, you'll notice that the menus of many things in WebGUI change to reflect karma.
-<p>
+		message => q|<p>Karma is a method of tracking the activity of your users, and potentially rewarding or punishing them for their level of activity. Once karma has been enabled, you'll notice that the menus of many things in WebGUI change to reflect karma.
+</p>
 
-You can track whether users are logging in, and how much they contribute to your site. And you can allow them access to additional features by the level of their karma.
-<p>
+<p>You can track whether users are logging in, and how much they contribute to your site. And you can allow them access to additional features by the level of their karma.
+</p>
 
-You can find out more about karma in <a href="http://www.plainblack.com/ruling_webgui">Ruling WebGUI</a>.|,
+<p>You can find out more about karma in <a href="http://www.plainblack.com/ruling_webgui">Ruling WebGUI</a>.</p>|,
+
 		lastUpdated => 1031514049
 	},
 
@@ -2065,8 +2073,8 @@ You can find out more about karma in <a href="http://www.plainblack.com/ruling_w
 	'890' => {
 		message => q|<p>WebGUI has a sub-system that can create tabs. You'll see these in complex forms such as page editing. In order to make the tabs system look good and match your site, you'll need to add a section to your style's style sheet specifically for the tabs. 
 </p>
-<p>
-The following style sheet classes are available:
+
+<p>The following style sheet classes are available:
 </p>
 
 <p><b>.tab</b><br />
@@ -2183,12 +2191,11 @@ div.tabs {
 	},
 
 	'612' => {
-		message => q|There is no need to ever actually delete a user. If you are concerned with locking out a user, then simply change their password. If you truly wish to delete a user, then please keep in mind that there are consequences. If you delete a user any content that they added to the site via wobjects (like message boards and user contributions) will remain on the site. However, if another user tries to visit the deleted user's profile they will get an error message. Also if the user ever is welcomed back to the site, there is no way to give him/her access to his/her old content items except by re-adding the user to the users table manually.
-<p>
+		message => q|<p>There is no need to ever actually delete a user. If you are concerned with locking out a user, then simply change their password. If you truly wish to delete a user, then please keep in mind that there are consequences. If you delete a user any content that they added to the site via wobjects (like message boards and user contributions) will remain on the site. However, if another user tries to visit the deleted user's profile they will get an error message. Also if the user ever is welcomed back to the site, there is no way to give him/her access to his/her old content items except by re-adding the user to the users table manually.
+</p>
 
-
-As with any delete operation, you are prompted to be sure you wish to proceed with the delete. If you answer yes, the delete will proceed and there is no recovery possible. If you answer no you'll be returned to the prior screen.
-<p>
+<p>As with any delete operation, you are prompted to be sure you wish to proceed with the delete. If you answer yes, the delete will proceed and there is no recovery possible. If you answer no you'll be returned to the prior screen.
+</p>
 
 |,
 		lastUpdated => 1101775447,
@@ -2260,9 +2267,9 @@ A link to the previous page in the paginator relative to the current page.
 The url component of pagination.previousPage broken out.
 </p> 
 
-<b>pagination.previousPageText</b><br />
+<p><b>pagination.previousPageText</b><br />
 The text component of pagination.previousPage broken out.
-<p> 
+</p> 
 
 <p><b>pagination.pageNumber</b><br />
 The current page number.
@@ -2280,7 +2287,7 @@ A boolean indicating whether there is more than one page.
 A list of links to every page in the paginator.
 </p> 
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>pagination.pageLoop</b><br />
 Same as pagination.pageList except broken into individual elements.
@@ -2294,7 +2301,7 @@ The URL of page X, where X is the number in the loop we're at.
 The number of page X, where X is the number in the loop we're at.
 </p> 
 
-</blockquote>
+</div>
 
 
 <p><b>pagination.pageList.upTo20</b><br />
@@ -2305,7 +2312,7 @@ A list of links to the 20 nearest in the paginator relative to the current page.
 Same as pagination.pageList.upTo20 except broken into individual elements.
 </p> 
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>pagination.url</b><br />
 The URL of page X, where X is the number in the loop we're at.
@@ -2315,7 +2322,7 @@ The URL of page X, where X is the number in the loop we're at.
 The number of page X, where X is the number in the loop we're at.
 </p> 
 
-</blockquote>
+</div>
 
 <p><b>pagination.pageList.upTo10</b><br />
 A list of links to the 10 nearest in the paginator relative to the current page. So if you're on page 20, you'll see links for 15-25.
@@ -2325,7 +2332,7 @@ A list of links to the 10 nearest in the paginator relative to the current page.
 Same as pagination.pageList.upTo10 except broken into individual elements.
 </p> 
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>pagination.url</b><br />
 The URL of page X, where X is the number in the loop we're at.
@@ -2335,7 +2342,7 @@ The URL of page X, where X is the number in the loop we're at.
 The number of page X, where X is the number in the loop we're at.
 </p> 
 
-</blockquote>
+</div>
 
 |,
 		lastUpdated => 1145060787,
@@ -2367,7 +2374,7 @@ The number of page X, where X is the number in the loop we're at.
 	},
 
 	'422' => {
-		message => q|<h1>Login Failed</h1>The information supplied does not match the account.|,
+		message => q|<h1>Login Failed</h1><p>The information supplied does not match the account.</p>|,
 		lastUpdated => 1031514049
 	},
 
@@ -2475,16 +2482,13 @@ The number of page X, where X is the number in the loop we're at.
 		message => q|<p><a href="http://www.w3.org/Style/CSS/">Cascading Style Sheets (CSS)</a> are a great way to manage the look and feel of any web site. They are used extensively in WebGUI.
 </p>
 
-<p>
-If you are unfamiliar with how to use CSS, <a href="http://www.plainblack.com/">Plain Black</a> provides training classes on XHTML and CSS. Alternatively, Bradsoft makes an excellent CSS editor called <a href="http://www.bradsoft.com/topstyle/index.asp">Top Style</a>.
+<p>If you are unfamiliar with how to use CSS, <a href="http://www.plainblack.com/">Plain Black</a> provides training classes on XHTML and CSS. Alternatively, Bradsoft makes an excellent CSS editor called <a href="http://www.bradsoft.com/topstyle/index.asp">Top Style</a>.
 </p>
 
-<p>
-The following is a list of classes used to control the default look of WebGUI. These of course can be overridden or replaced in the various templates that generate them.
+<p>The following is a list of classes used to control the default look of WebGUI. These of course can be overridden or replaced in the various templates that generate them.
 </p>
 
-<p>
-<b>A</b><br />
+<p><b>A</b><br />
 The links throughout the style.
 </p>
 
@@ -2526,8 +2530,6 @@ The headings of columns on things like message boards and user contributions.
 
 <p><b>NOTE:</b> Some wobjects and macros have their own unique styles sheet classes, which are documented in their individual help files.
 </p>
-
-
 |,
 		lastUpdated => 1146592967
 	},
@@ -2593,13 +2595,13 @@ The headings of columns on things like message boards and user contributions.
 	},
 
 	'608' => {
-		message => q|Deleting a page can create a big mess if you are uncertain about what you are doing. When you delete a page you are also deleting the content it contains, all sub-pages connected to this page, and all the content they contain. Be certain that you have already moved all the content you wish to keep before you delete a page.
-<p>
+		message => q|<p>Deleting a page can create a big mess if you are uncertain about what you are doing. When you delete a page you are also deleting the content it contains, all sub-pages connected to this page, and all the content they contain. Be certain that you have already moved all the content you wish to keep before you delete a page.
+</p>
 
-As with any delete operation, you are prompted to be sure you wish to proceed with the delete. If you answer yes, the delete will proceed and there is no recovery possible. If you answer no you'll be returned to the prior screen.
-<p>
+<p>As with any delete operation, you are prompted to be sure you wish to proceed with the delete. If you answer yes, the delete will proceed and there is no recovery possible. If you answer no you'll be returned to the prior screen.
+</p>
 |,
-		lastUpdated => 1031514049
+		lastUpdated => 1146804549
 	},
 
 	'169' => {
@@ -2833,7 +2835,7 @@ As with any delete operation, you are prompted to be sure you wish to proceed wi
 	},
 
 	'319' => {
-		message => q|<a href="http://messenger.msn.com/">MSN Messenger</a> Id|,
+		message => q|<p><a href="http://messenger.msn.com/">MSN Messenger</a> Id</p>|,
 		lastUpdated => 1031514049
 	},
 
@@ -2949,13 +2951,15 @@ Managers group or in the Admins group.</p>
 any Asset's Add/Edit form and select "Make package?".  The Package will consist of
 that Asset and all Assets below it.</p>
 
-<p>To deploy a Package:
+<p>To deploy a Package:</p>
+<div>
 <ol>
 <li>Point your browser at a page on the site where you want to deploy the Package.</li>
 <li>Enable Admin mode.</li>
 <li>Select the Package tab from the Admin Bar.</li>
 <li>Click on the name of the Package to deploy.</li>
 </ol>
+</div>
 
 <p>All Asset URLs in the Package will be made unique after being deployed.</p>
 |,
@@ -3483,7 +3487,10 @@ that Asset and all Assets below it.</p>
         },
 
         'url extension description' => {
-                message => q|Add an extension such as "html", "php", or "asp" to each new page URL as it is created. <p><b>NOTE:</b> Do NOT include the dot "." in this. So the field should look like "html" not ".html".|,
+                message => q|<p>Add an extension such as "html", "php", or "asp" to each new page URL as it is created.
+</p>
+<p><b>NOTE:</b> Do NOT include the dot "." in this. So the field should look like "html" not ".html".
+</p>|,
                 lastUpdated => 1120239343,
         },
 

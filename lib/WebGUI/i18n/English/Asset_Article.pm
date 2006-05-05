@@ -174,7 +174,7 @@ The URL to the attached image.
 A loop containing all the attachments.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 	<p><b>filename</b><br />
 	The name of the file.
@@ -196,7 +196,7 @@ A loop containing all the attachments.
 	A boolean indicating whether this is an image or not.
 	</p>
 
-</blockquote>
+</div>
 
 <p><b>linkTitle</b><br />
 The title of the link added to the article.

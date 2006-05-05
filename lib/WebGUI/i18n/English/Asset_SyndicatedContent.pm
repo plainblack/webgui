@@ -79,7 +79,7 @@ A URL back to the originating site of this channel. This variable *will not* exi
 This is the URL to use to get the contents of this Syndicated Content wobject as an RSS 2.0 feed. Additionally, you can specify RSS versions via the following template variables:
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>rss.url.0.9</b><br />
 The contents of this wobject as an RSS 0.9 feed.
@@ -97,7 +97,7 @@ The contents of this wobject as an RSS 1.0 feed.
 The contents of this wobject as an RSS 2.0 feed.
 </p>
 
-</blockquote>
+</div>
 
 <p>Additionally, RSS feeds are transformed into HTML via XSLT stylesheets for "friendly" in-browser viewing. These XSLT stylesheets are stored in the WebGUI collateral system as snippets.
 </p>
@@ -106,7 +106,7 @@ The contents of this wobject as an RSS 2.0 feed.
 A loop containing the data from this channel.
 </p>
 
-<blockquote>
+<div class="helpIndent">
 
 <p><b>site_title</b><br />
 The title of the RSS feed this item comes from
@@ -132,7 +132,7 @@ The description of the content. If you're filtering on terms, this field will be
 A URL directly to the content of the item.
 </p>
 
-</blockquote>|,
+</div>|,
                    },
 
 	'displayModeLabel' => {
@@ -182,7 +182,7 @@ A URL directly to the content of the item.
 
         'hasTermsLabel description' => {
                 message => q|<p>Enter terms (separated by commas) that you'd like to filter the feeds on. For instance, if you enter:</p>
-<blockquote><b>linux, windows development, blogs</b></blockquote>
+<div class="helpIndent"><b>linux, windows development, blogs</b></div>
 <p>The Syndicated Content web object will display items containing "linux", "windows development" or "blogs" (in the title or description of the item) from all the feeds you're aggregating together.</p>|,
                 lastUpdated => 1119977659,
         },
