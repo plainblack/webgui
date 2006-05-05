@@ -1104,7 +1104,7 @@ sub www_viewDetail {
 	}
 	$var{"discussion"} = $forum->view;
 	$var{'isLoggedIn'} = ($self->session->user->userId ne "1");
-	if ($self->session->form->process("do") eq "sendEmail") {
+	if ($self->session->form->process("do") eq "sendEmail" && $self->session->form->process("verify","captcha")) {
 		if ($self->session->form->process("body") ne "") {
 			my $u = WebGUI::User->new($self->session, $listing->{maintainerId});
 			my $mail = WebGUI::Mail::Send->create($self->session, {to=>$u->profileField("email"),subject=>$listing->{productName}." - ".$self->session->form->process("subject"),from=>$self->session->form->process("from")});
@@ -1148,6 +1148,9 @@ sub www_viewDetail {
 	$f->hidden(
 		-name=>"listingId",
 		-value=>$listingId
+		);
+	$f->captcha(
+		-name=>"verify"
 		);
 	$f->email(
 		-extras=>'class="content"',

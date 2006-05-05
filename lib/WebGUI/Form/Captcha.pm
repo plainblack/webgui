@@ -47,6 +47,10 @@ See the super class for additional details.
 
 The following additional parameters have been added via this sub class.
 
+=head3 label
+
+Defaults to "Verify Your Humanity"
+
 =head4 profileEnabled
 
 Flag that tells the User Profile system that this is a valid form element in a User Profile
@@ -61,6 +65,9 @@ sub definition {
 	push(@{$definition}, {
 		formName=>{
 			defaultValue=>$i18n->get("topicName")
+			},
+		label => {
+			defaultValue=>$i18n->get("verify your humanity")
 			},
 		profileEnabled=>{
 			defaultValue=>0
@@ -100,8 +107,7 @@ sub toHtml {
         $self->set("size", 6);
 	$self->set("maxlength", 6);
 	$self->session->scratch->set("captcha_".$self->get("name"), $challenge);
-	$self->set("subtext", '<p style="display:inline;vertical-align:middle;"><img src="'.$storage->getUrl($filename).'" style="border-style:none;vertical-align:middle;" alt="captcha" /></p>'.$self->get("subtext"));
-	return $self->SUPER::toHtml;
+	return $self->SUPER::toHtml.'<p style="display:inline;vertical-align:middle;"><img src="'.$storage->getUrl($filename).'" style="border-style:none;vertical-align:middle;" alt="captcha" /></p>';
 }
 
 1;
