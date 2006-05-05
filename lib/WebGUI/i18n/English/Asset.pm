@@ -454,25 +454,25 @@ These are the icons and URLs that allow editing, cutting, copying, deleting and 
 	},
 
         'Field Name description' => {
-                message => q|The name of this metadata property.It must be unique. <br />
+                message => q|<p>The name of this metadata property.It must be unique. <br />
 It is advisable to use only letters (a-z), numbers (0-9) or underscores (_) for
 the field names.</p>|,
                 lastUpdated => 1129329870,
         },
 
         'Metadata Description description' => {
-                message => q|An optional description for this metadata property. This text is displayed
+                message => q|<p>An optional description for this metadata property. This text is displayed
 as mouseover text in the asset properties tab.</p>|,
                 lastUpdated => 1129329870,
         },
 
         'Data Type description' => {
-                message => q|Choose the type of form element for this field.</p>|,
+                message => q|<p>Choose the type of form element for this field.</p>|,
                 lastUpdated => 1129329870,
         },
 
         'Possible Values description' => {
-                message => q|This field is used only for the Radio List and Select List data types. Enter
+                message => q|<p>This field is used only for the Radio List and Select List data types. Enter
 the values you wish to appear, one per line.</p>|,
                 lastUpdated => 1129329870,
         },
@@ -718,29 +718,29 @@ each asset under the tab &quot;Meta&quot; in the asset properties.</p>
 	       },
 
         'Depth description' => {
-                message => q|Sets the depth of the page tree to export. Use a depth of 0 to export only the current page. </p>|,
+                message => q|<p>Sets the depth of the page tree to export. Use a depth of 0 to export only the current page. </p>|,
                 lastUpdated => 1121361557,
         },
 
         'Export as user description' => {
-                message => q|Run the export as this user. Defaults to Visitor.</p>|,
+                message => q|<p>Run the export as this user. Defaults to Visitor.</p>|,
                 lastUpdated => 1121361557,
         },
 
         'directory index description' => {
-                message => q|If the URL of the Asset to be exported looks like a directory, the directory index will
+                message => q|<p>If the URL of the Asset to be exported looks like a directory, the directory index will
 be appended to it.</p>|,
                 lastUpdated => 1121361557,
         },
 
         'Extras URL description' => {
-                message => q|Sets the Extras URL. Defaults to the configured extrasURL in the WebGUI
+                message => q|<p>Sets the Extras URL. Defaults to the configured extrasURL in the WebGUI
 config file.</p>|,
                 lastUpdated => 1121361557,
         },
 
         'Uploads URL description' => {
-                message => q|Sets the Uploads URL. Defaults to the configured uploadsURL in the WebGUI config file.</p>|,
+                message => q|<p>Sets the Uploads URL. Defaults to the configured uploadsURL in the WebGUI config file.</p>|,
                 lastUpdated => 1121361557,
         },
 

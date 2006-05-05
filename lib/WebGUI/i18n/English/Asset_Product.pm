@@ -143,9 +143,11 @@ The URL to add a specification to this product.
 The translated label for the add specification link.
 </p>
 
-<blockquote><b>specification_loop</b><br />
+<p><b>specification_loop</b><br />
 The list of specifications associated with this product.
-</blockquote>
+</p>
+
+<blockquote>
 
 <p><b>specification.controls</b><br />
 The WebGUI management controls for this specification.
@@ -221,7 +223,7 @@ The WebGUI management controls for this related product.
 
 </blockquote>
 |,
-		lastUpdated => 1146785294,
+		lastUpdated => 1146798062,
 	},
 
 	'21' => {

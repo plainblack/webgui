@@ -14,7 +14,7 @@ our $I18N = {
 
 	'login toggle body' => {
 		message => q|
-<po><b>&#94;LoginToggle; or &#94;LoginToggle();</b><br />
+<p><b>&#94;LoginToggle; or &#94;LoginToggle();</b><br />
 Displays a "Login" or "Logout" message depending upon whether the user is logged in or not. You can optionally specify other labels like this: &#94;LoginToggle("Click here to log in.","Click here to log out.");. You can also use the special case &#94;LoginToggle(linkonly); to return only the URL with no label.
 </p>
 

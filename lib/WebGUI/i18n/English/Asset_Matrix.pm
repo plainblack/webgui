@@ -339,238 +339,194 @@ our $I18N = {
                 lastUpdated => 0,
                 message => q|<p>The following variables are available in the main Matrix template.</p>
 
-		<p>
-		<b>compare.form</b><br />
-		The checkbox form that lists all of the comparable items in this matrix.
-		</p>
+<p><b>compare.form</b><br />
+The checkbox form that lists all of the comparable items in this matrix.
+</p>
 
-		<p>
+<p><b>search.url</b><br />
+The URL to the matrix search page.
+</p>
 
-		<b>search.url</b><br />
-		The URL to the matrix search page.
-		</p>
+<p><b>isLoggedIn</b><br />
+A condition indicating whether the current user is logged in to the site.
+</p>
 
-		<p>
-		<b>isLoggedIn</b><br />
-		A condition indicating whether the current user is logged in to the site.
-		</p>
+<p><b>field.list.url</b><br />
+The URL to the page where you configure new fields for this matrix.
+</p>
 
-		<p>
+<p><b>listing.add.url</b><br />
+The URL to the page where a user can add a new listing to the matrix.
+</p>
 
-		<b>field.list.url</b><br />
-		The URL to the page where you configure new fields for this matrix.
-		</p>
+<p><b>best.views.url</b><br />
+The URL to the listing that has the most views.
+</p>
 
-		<p>
-		<b>listing.add.url</b><br />
-		The URL to the page where a user can add a new listing to the matrix.
-		</p>
+<p><b>best.views.count</b><br />
+The total number of views of the listing that has the most views.
+</p>
 
-		<p>
+<p><b>best.views.name</b><br />
+The name of the listing that has the most views.
+</p>
 
-		<b>best.views.url</b><br />
-		The URL to the listing that has the most views.
-		</p>
+<p><b>best.compares.url</b><br />
+The URL to the listing that has the most compares.
+</p>
 
-		<p>
-		<b>best.views.count</b><br />
-		The total number of views of the listing that has the most views.
-		</p>
+<p><b>best.compares.count</b><br />
+The number of compares of the listing that has the most compares.
+</p>
 
-		<p>
+<p><b>best.compares.name</b><br />
+The name of the listing that has the most compares.
+</p>
 
-		<b>best.views.name</b><br />
-		The name of the listing that has the most views.
-		</p>
+<p><b>best.clicks.url</b><br />
+The URL of the listing that has the most clicks.
+</p>
 
-		<p>
-		<b>best.compares.url</b><br />
-		The URL to the listing that has the most compares.
-		</p>
+<p><b>best.clicks.count</b><br />
+The number of clicks of the listing that has the most clicks.
+</p>
 
-		<p>
+<p><b>best.clicks.name</b><br />
+The name of the listing that has the most clicks.
+</p>
 
-		<b>best.compares.count</b><br />
-		The number of compares of the listing that has the most compares.
-		</p>
+<p><b>best_rating_loop</b><br />
+A loop containing all of the categories for this matrix and their best ratings.
+</p>
 
-		<p>
-		<b>best.compares.name</b><br />
-		The name of the listing that has the most compares.
-		</p>
+<blockquote>
 
-		<p>
+<p><b>url</b><br />
+The URL of the listing that has the best rating for this category.
+</p>
 
-		<b>best.clicks.url</b><br />
-		The URL of the listing that has the most clicks.
-		</p>
+<p><b>category</b><br />
+The name of this cateogry.
+</p>
 
-		<p>
-		<b>best.clicks.count</b><br />
-		The number of clicks of the listing that has the most clicks.
-		</p>
+<p><b>name</b><br />
+The name of the listing that has the best rating for this category.
+</p>
 
-		<p>
+<p><b>mean</b><br />
+The mean (or average) rating of the best listing in this category.
+</p>
 
-		<b>best.clicks.name</b><br />
-		The name of the listing that has the most clicks.
-		</p>
+<p><b>median</b><br />
+The median (or middle) rating of the best listing in this category.
+</p>
 
-		<p>
-		<b>best_rating_loop</b><br />
-		A loop containing all of the categories for this matrix and their best ratings.
-		</p>
+<p><b>count</b><br />
+The sum of all the votes of the best listing in this category.
+</p>
 
-		<blockquote>
+</blockquote>
 
-		<p>
-		<b>url</b><br />
-		The URL of the listing that has the best rating for this category.
-		</p>
+<p><b>worst_rating_loop</b><br />
+A loop containing all of the categories for this matrix and their worst ratings.
+</p>
 
-		<p>
-		<b>category</b><br />
-		The name of this cateogry.
-		</p>
+<blockquote>
 
-		<p>
-		<b>name</b><br />
-		The name of the listing that has the best rating for this category.
-		</p>
+<p><b>url</b><br />
+The URL of the listing that has the worst rating for this category.
+</p>
 
-		<p>
-		<b>mean</b><br />
-		The mean (or average) rating of the best listing in this category.
-		</p>
+<p><b>category</b><br />
+The name of this cateogry.
+</p>
 
-		<p>
-		<b>median</b><br />
-		The median (or middle) rating of the best listing in this category.
-		</p>
+<p><b>name</b><br />
+The name of the listing that has the worst rating for this category.
+</p>
 
-		<p>
-		<b>count</b><br />
-		The sum of all the votes of the best listing in this category.
-		</p>
+<p><b>mean</b><br />
+The mean (or average) rating of the worst listing in this category.
+</p>
 
-		</blockquote>
-		
-		<p>
-		<b>worst_rating_loop</b><br />
-		A loop containing all of the categories for this matrix and their worst ratings.
-		</p>
+<p><b>median</b><br />
+The median (or middle) rating of the worst listing in this category.
+</p>
 
-		<blockquote>
-		<p>
-		<b>url</b><br />
+<p><b>count</b><br />
+The sum of all the votes of the worst listing in this category.
+</p>
 
-		The URL of the listing that has the worst rating for this category.
-		</p>
+</blockquote>
 
-		<p>
-		<b>category</b><br />
-		The name of this cateogry.
-		</p>
+<p><b>ratings.details.url</b><br />
+The URL to the ratings details page.
+</p>
 
-		<p>
-		<b>name</b><br />
+<p><b>best.posts.url</b><br />
+The URL to the listing that has the most forum posts.
+</p>
 
-		The name of the listing that has the worst rating for this category.
-		</p>
+<p><b>best.updated.url</b><br />
+The URL to the listing that was updated most recently.
+</p>
 
-		<p>
-		<b>mean</b><br />
-		The mean (or average) rating of the worst listing in this category.
-		</p>
+<p><b>best.updated.date</b><br />
+The date of the most recently updated listing.
+</p>
 
-		<p>
-		<b>median</b><br />
+<p><b>best.updated.name</b><br />
+The name of the listing that was most recently updated.
+</p>
 
-		The median (or middle) rating of the worst listing in this category.
-		</p>
+<p><b>last_update_loop</b><br />
+A loop containing the 20 most recently updated listings.
+</p>
 
-		<p>
-		<b>count</b><br />
-		The sum of all the votes of the worst listing in this category.
-		</p>
-		</blockquote>
+<blockquote>
 
-		<p>
+	<p><b>url</b><br />
+	The URL to view this listing.
+	</p>
 
-		<b>ratings.details.url</b><br />
-		The URL to the ratings details page.
-		</p>
+	<p><b>name</b><br />
+	The name of the product.
+	</p>
 
-		<p>
-		<b>best.posts.url</b><br />
-		The URL to the listing that has the most forum posts.
-		</p>
+	<p><b>lastUpdated</b><br />
+	The date this listing was updated.
+	</p>
 
-		<p>
-		<b>best.updated.url</b><br />
-		The URL to the listing that was updated most recently.
-		</p>
+</blockquote>
 
-		<p>
-		<b>best.updated.date</b><br />
-		The date of the most recently updated listing.
-		</p>
+<p><b>user.count</b><br />
+The total number of registered users on the site.
+</p>
 
-		<p>
+<p><b>current.user.count</b><br />
+The number of users browsing the site right now.
+</p>
 
-		<b>best.updated.name</b><br />
-		The name of the listing that was most recently updated.
-		</p>
-		
-		<p>
-		<b>last_update_loop</b><br />
-		A loop containing the 20 most recently updated listings.
-		<blockquote>
-			<p>
-			<b>url</b><br />
-			The URL to view this listing.
-			</p>
-			<p>
-			<b>name</b><br />
-			The name of the product.
-			</p>
-			<p>
-			<b>lastUpdated</b><br />
-			The date this listing was updated.
-			</p>
-		</blockquote>
-		</p>
+<p><b>listing.count</b><br />
+The number of listings in this matrix.
+</p>
 
-		<p>
-		<b>user.count</b><br />
-		The total number of registered users on the site.
-		</p>
+<p><b>pending_list</b><br />
+A loop containing the list of pending listing.
+</p>
 
-		<p>
+<blockquote>
 
-		<b>current.user.count</b><br />
-		The number of users browsing the site right now.
-		</p>
+	<p><b>url</b><br />
+	The URL to the pending listing.
+	</p>
+	
+	<p><b>productName</b><br />
+	The product title of the pending listing.	
+	</p>
 
-		<p>
-		<b>listing.count</b><br />
-		The number of listings in this matrix.
-		</p>
-		
-		<p>
-		<b>pending_list</b><br />
-		A loop containing the list of pending listing.
-                <blockquote>
-			<p>
-			<b>url</b><br />
-			The URL to the pending listing.
-			</p>
-			<p>
-                        <b>productName</b><br />
-			The product title of the pending listing.	
-			</p>
-		</blockquote>
-		</p> |
+</blockquote>
+|
         },
 
         'matrix template help title' => {

@@ -42,7 +42,7 @@ If this wobject is a shortcut, then this URL will direct you to the original ass
                    },
           '632' => {
                      lastUpdated => 1119410914,
-                     message => q|<p>You can add wobjects by selecting from the </i>^International("1","WebGUI");</i> pulldown menu. You can edit them by clicking on the "Edit" button that appears directly above an instance of a particular wobject while in Admin mode.</p>
+                     message => q|<p>You can add wobjects by selecting from the <i>^International("1","WebGUI");</i> pulldown menu. You can edit them by clicking on the "Edit" button that appears directly above an instance of a particular wobject while in Admin mode.</p>
 <p>Wobjects are Assets, so they have all of the properties that Assets do.  Additionally, most Wobjects share some basic properties. Those properties are:</p>|
                    },
           '626' => {

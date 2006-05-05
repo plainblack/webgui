@@ -59,22 +59,24 @@ our $I18N = {
 <p>There are two ways to edit templates, via the Display tab of the Asset Edit screen or via the Asset Manager.  In either case, you will need to be an Admin or a Template Admin.
 </p>
 
-<p><b>Display tab of the Asset Edit screen</b><br />
+<p><b>Display tab of the Asset Edit screen</b></p>
+<div>
 <ul>
 <li>Turn on Admin mode.</li>
 <li>Click on the Edit icon for an Asset.</li>
 <li>Select the "Display" tab for the Asset.</li>
-<li>Next to the template that the Asset uses will be two icons.</li>
+<li>Next to the template that the Asset uses will be two icons.
 	<dl>
 	<dt>Edit</dt>
 	<dd>This will allow you to edit the currently selected template.</dd>
 	<dt>Manage</dt>
 	<dd>This will take you to the Folder in the Asset Manager that contains this template.</dd>
 	</dl>
-</ul>
-</p>
+</li></ul>
+</div>
 
-<p><b>Asset Manager</b><br />
+<p><b>Asset Manager</b></p>
+<div>
 <ul>
 <li>Turn on Admin mode.</li>
 <li>Click on the "Assets" icon in the Admin bar.</li>
@@ -82,14 +84,15 @@ our $I18N = {
 <li>Then click on Asset titled, "Import Node".</li>
 <li>Most default WebGUI templates are stored by type in folders inside the Template Folder.</li>
 </ul>
-</p>
+</div>
 
-<b>Template Name</b><br />
+<p><b>Template Name</b><br />
 Give this template a descriptive name so that you'll know what it is when you're applying a template to content.
-<p/>
-<b>NOTE:</b> You should never edit the default templates that come with WebGUI as they are subject to change with each new release. Instead, copy the template you wish to edit, and edit the copy.
+</p>
+<p>
+<b>NOTE:</b> You should never edit the default templates that come with WebGUI as they are subject to change with each new release. Instead, copy the template you wish to edit, and edit the copy.</p>
 |,
-		lastUpdated => 1143755587
+		lastUpdated => 1146800528
 	},
 
         'namespace description' => {
@@ -155,14 +158,15 @@ To programmers conditions are nothing new, but to designers they can often be co
 <i>Example:</i> &lt;tmpl_if isTrue&gt; It was true!&lt;tmpl_else&gt; It was false! &lt;/tmpl_if&gt;
 </p>
 
-<p>Truth or falsehood is determined by the following rules:
+<p>Truth or falsehood is determined by the following rules:</p>
+<div>
 <ul>
 <li><p>Variables not used in this template are false.</p></li>
 <li><p>Variables which are undefined are false.</p></li>
 <li><p>Variables which are empty are false.</p></li>
 <li><p>Variables which are equal to zero are false.</p></li>
 <li><p>All other variables are true.</p></li>
-</ul></p>
+</ul></div>
 
 <p><b>Loops</b><br />
 Loops iterate over a list of data output for each pass in the loop. Loops are slightly more complicated to use than plain variables, but are considerably more powerful.
@@ -184,8 +188,8 @@ Loops iterate over a list of data output for each pass in the loop. Loops are sl
 Loops come with special condition variables of their own. They are __FIRST__, __ODD__, __INNER__, and __LAST__.
 </p>
 
-<p>
-<i>Examples:</i><br />
+<p><i>Examples:</i></p>
+
 <pre>
    &lt;TMPL_LOOP FOO&gt;
       &lt;TMPL_IF __FIRST__&gt;
@@ -210,7 +214,6 @@ Loops come with special condition variables of their own. They are __FIRST__, __
    &lt;/TMPL_LOOP&gt;
 </pre>
 
-</p>
 <p><i>NOTE: This only documents WebGUI's default template language, HTML::Template.  If the Template Type
 has been set to some other language you will need to consult the documentation for it.</i></p>.
 |,
@@ -408,13 +411,14 @@ has been set to some other language you will need to consult the documentation f
 with your choice of two layouts and navigation styles, and configurable colors.  To access the Style
 Wizard edit a template in the "style" namespace.  A link to open the Style Wizard will
 be on the right side of the page.</p>
-<p>Creating a style template is a three step process:
+<p>Creating a style template is a three step process:</p>
+<div>
 <ol>
 <li>Select one of the layouts.</li>
 <li>Enter your site name, upload a logo and configure the colors.</li>
 <li>Make customizations to the generated template.</li>
 </ol>
-</p>
+</div>
 |,
 		lastUpdated => 1146456174,
 	},

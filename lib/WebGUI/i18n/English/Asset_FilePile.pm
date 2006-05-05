@@ -97,7 +97,7 @@ have the following properties:</p>
                  },
 
         '108 description' => {
-                message => q|The owner of a asset is usually the person who created the asset. This user always has full edit and viewing rights on the asset.
+                message => q|<p>The owner of a asset is usually the person who created the asset. This user always has full edit and viewing rights on the asset.
 </p>
 <p> <b>NOTE:</b> The owner can only be changed by an administrator.
 </p>|,
@@ -110,7 +110,7 @@ have the following properties:</p>
                  },
 
         '872 description' => {
-                message => q|Choose which group can view this asset. If you want both visitors and registered users to be able to view the asset then you should choose the "Everybody" group.</p>|,
+                message => q|<p>Choose which group can view this asset. If you want both visitors and registered users to be able to view the asset then you should choose the "Everybody" group.</p>|,
                 lastUpdated => 1119149899,
         },
 
@@ -120,7 +120,7 @@ have the following properties:</p>
                  },
 
         '871 description' => {
-                message => q|Choose the group that can edit this asset. The group assigned editing rights can also always view the asset.</p>|,
+                message => q|<p>Choose the group that can edit this asset. The group assigned editing rights can also always view the asset.</p>|,
                 lastUpdated => 1119149899,
         },
         

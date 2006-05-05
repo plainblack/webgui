@@ -59,17 +59,23 @@ our $I18N = {
 <p><b>NOTES:</b><br />
 The shortcut is not available through the Add Content menu, but instead through the shortcut icon on each Asset's toolbar.
 </p>
+
 <p><b>Overrides</b><br />
 You can also create overrides and user preferences.  The 6.8 upgrade automatically converted your previous override settings to overrides.  These are shown on the Overrides tab.  You can also view them by clicking "Manage overrides" on the right menu bar while editing a Shortcut.  The list of fields is the list of the shortcutted asset's properties.  If one is overridden, its values are displayed to the right, and you may edit or delete the override by clicking on the icons.  if there is no override, you can click Edit to edit that property.</p>
+
 <p><b>User Preference Fields</b><br />
 You may also create User Preference fields, which autogenerate form fields for your users to customize settings on Dashlets on a Dashboard.  These are displayed when the dashboard user clicks the (default) green Edit hoverbutton on the titlebar of a Dashlet.  You can choose from the form field types: text, textlist (multiline text box), selectList (choose one from a drop-down list), and checkList (choose one or more from a list of checkboxes).  You can set the possibleValues while editing a User Preference field.  You can also directly create an override by creating a User Preference field whose unique fieldName corresponds to a field on the shortcutted asset.</p>
+
 <p><b>Chaining</b><br />
-In an override's New Value field, you can put a substitution call for the value of a User Preference Field.  This is helpful for the Dashboard container, primarily.  Let's say you create a user preference selectList field named myFavColor, with possible values blue, green, red, and yellow.  Then you want to override the shorcutted asset's Title with: "My Favorite Color is XXXX."  You create an override for "title", and in the New Value box, place the following text:<br />
-<pre>My Favorite Color is ##userPref:myFavColor##.</pre><br />  Make sure to create a default Value under the myFavColor user preference field.<br /><br />
-Now, go back to manage Overrides, and it should show the original value, new value, and the parsed/replaced value.  You can use this for all kinds of choices: templateIds, formats, or any other kind of preference.  </p>
+In an override's New Value field, you can put a substitution call for the value of a User Preference Field.  This is helpful for the Dashboard container, primarily.  Let's say you create a user preference selectList field named myFavColor, with possible values blue, green, red, and yellow.  Then you want to override the shorcutted asset's Title with: "My Favorite Color is XXXX."  You create an override for "title", and in the New Value box, place the following text:</p>
+
+<pre>My Favorite Color is ##userPref:myFavColor##.</pre>
+
+<p>Make sure to create a default Value under the myFavColor user preference field.</p>
+<p>Now, go back to manage Overrides, and it should show the original value, new value, and the parsed/replaced value.  You can use this for all kinds of choices: templateIds, formats, or any other kind of preference.</p>
 <p><b>Fields</b></p>
 |,
-		lastUpdated => 1133619940,
+		lastUpdated => 1146799562,
 	},
 
         'shortcut template title description' => {
@@ -210,7 +216,7 @@ The URL to the Asset being mirrored by this Shortcut.</p>
 A boolean indicating that this Asset is a Shortcut.  This can be used in conjuction with another boolean for Admin mode to quickly show Content Managers that this is a Shortcut Asset.</p>
 <p><b>shortcut.label</b><br />
 The word "Shortcut".</p>
-<p><b>shortcut.<b>properties</b><br />
+<p><b>shortcut.properties</b><br />
 Any properties assigned to this shortcut will be available in the template by their name.</p>
                 |,
 		lastUpdated => 1146540530,

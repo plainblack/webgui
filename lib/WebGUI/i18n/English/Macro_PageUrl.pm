@@ -15,7 +15,7 @@ our $I18N = {
 	'page url body' => {
 		message => q|
 <p><b>&#94;PageUrl;</b><br />
-The URL to the current page (example: </i>/index.pl/pagename</i>). 
+The URL to the current page (example: <i>/index.pl/pagename</i>). 
 </p>
 |,
 		lastUpdated => 1146759407,

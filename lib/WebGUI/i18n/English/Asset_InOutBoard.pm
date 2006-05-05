@@ -36,7 +36,7 @@ our $I18N = {
 		message => q|<p>The following variables are available from In/Out Board Report template:</p>
 
 <p><b>showReport</b><br />
-A boolean indicating whether or not the </i>rows_loop</i> variable will be set.</p>
+A boolean indicating whether or not the <i>rows_loop</i> variable will be set.</p>
 
 <p><b>form</b><br />
 A variable that contains an HTML form for limiting the scope, by date or department, of the report.
@@ -63,33 +63,33 @@ Internationalized label for the "Updated By" column of the report.
 </p>
 
 <p><b>rows_loop</b><br />
-A loop containing the rows of data for the In/Out Board Report&nbsp;</p>
+A loop containing the rows of data for the In/Out Board Report&nbsp;
 </p>
 
 <blockquote>
 
 <p><b>deptHasChanged</b><br />
-A boolean value indicating whether or not this row of data is for a department that is differnet than the previous rows</p>
+A boolean value indicating whether or not this row of data is for a department that is differnet than the previous rows
 </p>
 
 <p><b>username</b><br />
-A variable that returns the user's name. If the first and last name fields are defined in the user profile, that is what is returned. Otherwise, the users WebGUI username is returned. i.e., "John Doe" vs "Jdoe".</p>
+A variable that returns the user's name. If the first and last name fields are defined in the user profile, that is what is returned. Otherwise, the users WebGUI username is returned. i.e., "John Doe" vs "Jdoe".
 </p>
 
 <p><b>department</b><br />
-A variable that returns the user's department. If no department has been assigned to this user, an internationalized label for "No Department" will be used.</p>
+A variable that returns the user's department. If no department has been assigned to this user, an internationalized label for "No Department" will be used.
 </p>
 
 <p><b>status</b><br />
-A variable that returns the user's status. The status of a user is defined by the Status List in the Wobject Properties. If no status is set for the current user 'Never Checked In' is returned.</p>
+A variable that returns the user's status. The status of a user is defined by the Status List in the Wobject Properties. If no status is set for the current user 'Never Checked In' is returned.
 </p>
 
 <p><b>dateStamp</b><br />
-A variable that returns the date the status of the user was last updated.</p>
+A variable that returns the date the status of the user was last updated.
 </p>
 
 <p><b>message</b><br />
-A variable that returns what the user entered in the "What's going on?" field when updating their status.</p>
+A variable that returns what the user entered in the "What's going on?" field when updating their status.
 </p>
 
 <p><b>createdBy</b><br />

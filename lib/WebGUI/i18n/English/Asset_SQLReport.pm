@@ -41,13 +41,14 @@ SQL Reports are Wobjects and Assets, so they share the properties of both.  SQL 
 
         'Placeholder Parameters description' => {
                 message => q|<p>Placeholders, also called parameter markers, are used to indicate values in a SQL query that will be supplied later, before the statement is executed.</p>
-There are four input types:
+<p>There are four input types:</p>
+<div>
 <ul>
 <li><b>Integer</b><br />A simple number</li>
 <li><b>Form</b><br />Form fields begin with "form:".</li>
 <li><b>Query results</b><br />Query results begin with "query1:" through "query4:". Query results are populated with data from prior queries. So when the second query is initiated, it can used the results returned by query1. When query 5 is initiated it can use the results from queries 1 through 4.</li>
 <li><b>String</b><br />Anything else is a string</li>
-</ul></p>
+</ul></div>
 <p>Example:</p>
 <blockquote>
 <p>Query: select * from some_table where some_field = ? and some_other_field &lt; ?<br />
@@ -78,7 +79,6 @@ while the second question mark will contain the form variable "field1".</p>
 </p>|,
                 lastUpdated => 1119841649,
         },
-
 
 	'61' => {
 		message => q|SQL Report, Add/Edit|,
@@ -175,7 +175,7 @@ A loop containing the data returned from the query.
 An integer starting with 1 and counting through the total list of rows.
 </p>
 
-<p><b>row.field.<b><i>NAME</i></b>.value</b><br />
+<p><b>row.field.</b><i>NAME</i><b>.value</b><br />
 The data for a given field in this row where NAME is the name of the field as it is returned by the query.
 </p>
 
@@ -198,6 +198,7 @@ The data in this field.
 </p>
 
 </blockquote>
+
 </blockquote>
 
 <p><b>hasNest</b><br />
@@ -236,16 +237,17 @@ A boolean indicating that queryN returned zero rows.
 The default label for rows.count.isZero.
 </p>
 
-<blockquote><b>queryN.rows_loop</b><br />
+<p><b>queryN.rows_loop</b><br />
 A loop containing the data returned from queryN.
-<p>
-</blockquote>
+</p>
+
+<blockquote>
 
 <p><b>queryN.row.number</b><br />
 An integer starting with 1 and counting through the total list of rows.
 </p>
 
-<b>queryN.row.field.<b><i>NAME</i></b>.value</b><br />
+<b>queryN.row.field.</b><i>NAME</i><b>.value</b><br />
 The data for a given field in this row where NAME is the name of the field as it is returned by the query.
 <p>
 

@@ -2264,7 +2264,6 @@ The url component of pagination.previousPage broken out.
 The text component of pagination.previousPage broken out.
 <p> 
 
-
 <p><b>pagination.pageNumber</b><br />
 The current page number.
 </p> 
@@ -2283,9 +2282,9 @@ A list of links to every page in the paginator.
 
 <blockquote>
 
-<b>pagination.pageLoop</b><br />
+<p><b>pagination.pageLoop</b><br />
 Same as pagination.pageList except broken into individual elements.
-</blockquote>
+</p>
 
 <p><b>pagination.url</b><br />
 The URL of page X, where X is the number in the loop we're at.
@@ -3510,7 +3509,7 @@ and tracked by WebGUI.|,
         },
 
         'default rich editor description' => {
-                message => q|This is the rich editor configuration that will be used by default when a rich editor is needed. This can be overridden in certain applications such as the Collaboration System.</p>|,
+                message => q|<p>This is the rich editor configuration that will be used by default when a rich editor is needed. This can be overridden in certain applications such as the Collaboration System.</p>|,
                 lastUpdated => 1120239343,
         },
 
@@ -3530,9 +3529,8 @@ and tracked by WebGUI.|,
         },
 
         '135 description' => {
-                message => q|This is the address of your local mail server. It is needed for all features that use the Internet email system (such as password recovery).
-<p>
-Optionally, if you are running a sendmail server on the same machine as WebGUI, you can also specify a path to your sendmail executable. On most Linux systems this can be found at "/usr/lib/sendmail".|,
+                message => q|<p>This is the address of your local mail server. It is needed for all features that use the Internet email system (such as password recovery).</p>
+<p>Optionally, if you are running a sendmail server on the same machine as WebGUI, you can also specify a path to your sendmail executable. On most Linux systems this can be found at "/usr/lib/sendmail".</p>|,
                 lastUpdated => 1120239343,
         },
 
@@ -3598,13 +3596,13 @@ a user.|,
         },
 
         '164 description' => {
-                message => q|Set the default authentication method for new accounts.  The two available options by default are WebGUI and LDAP. WebGUI authentication means that the users will authenticate against the username and password stored in the WebGUI database. LDAP authentication means that users will authenticate against an external LDAP server.  Other methods can be provided by writing a custom authentication plug-in.
-<p>
-<i>NOTES:</i><p>
-Authentication settings can be customized on a per user basis.
-<p>
-Depending upon what authentication modules you have installed in your system you'll see any number of options after this point.|,
-                lastUpdated => 1128549239,
+                message => q|<p>Set the default authentication method for new accounts.  The two available options by default are WebGUI and LDAP. WebGUI authentication means that the users will authenticate against the username and password stored in the WebGUI database. LDAP authentication means that users will authenticate against an external LDAP server.  Other methods can be provided by writing a custom authentication plug-in.</p>
+<p><i>NOTES:</i>
+</p>
+<p>Authentication settings can be customized on a per user basis.
+</p>
+<p>Depending upon what authentication modules you have installed in your system you'll see any number of options after this point.</p>|,
+                lastUpdated => 1146799413,
         },
 
 	
@@ -3729,9 +3727,10 @@ Select which of the configured LDAP connections to use to authenticate users.
 		message => q|<p>WebGUI has many features to accept content from outside sources, such as users posting to message boards or pulling data from external websites via the HttpProxy or SyndicatedContent Assets.  However, this can expose pose a risk to your site, for example, through cross-site scripting attacks.</p>
 <p>To help solve this problem
 many Assets have a <b>^International("418","WebGUI");</b> property that performs various leveling
-of filtering on content.  Each one is pretty self-explanatory:
+of filtering on content.  Each one is pretty self-explanatory:</p>
+<div>
 <dl>
-<dt>^International("420","WebGUI");</dd>
+<dt>^International("420","WebGUI");</dt>
 <dd>No filtering will be done.  All original content will be displayed.</dd>
 <dt>^International("891","WebGUI");</dt>
 <dd>Negates WebGUI Macros.  Instead of displaying Macro output, the Macro itself
@@ -3743,7 +3742,7 @@ JavaScript fields from HTML tags.</dd>
 <dd>Removes everything except for bold, italics, breaks, etc.</dd>
 <dt>^International("419","WebGUI");</dt>
 <dd>Strips everything that it can, returning just plain old, safe text.</dd>
-</dl></p>
+</dl></div>
 |,
 		lastUpdated => 1113681314,
 	},

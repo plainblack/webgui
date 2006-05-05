@@ -187,7 +187,7 @@ value of this property will be used to put in the database.</p>
 
 <p>You can use macro's for this property, to make your default value dynamic.
 For instance, if you want a field to default to the username of the person
-adding a record, you can use <i>&hat;User(username);</i> in this property.</p>
+adding a record, you can use <i>&#94;User(username);</i> in this property.</p>
 
 <p>If the field is set to autoincrement, the default value property is
 neglected.</p>|,

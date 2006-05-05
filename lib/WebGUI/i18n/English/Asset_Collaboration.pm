@@ -1141,7 +1141,7 @@ A loop that runs once for each point of <b>rating</b> that the Post has
 
 <p><b>rating_loop.count</b><br />
 The index variable for the <b>rating_loop</b>.
-</b>rating_loop.count</b><br />
+</p>
 
 </blockquote>
 
@@ -1427,7 +1427,7 @@ A URL for sorting and displaying the list of posts by their ratings.
 
 <p><b>title</b><br />
 The title of the rss feed (comes from the collaboration title).
-</b>title</b><br />
+</p>
 
 <p><b>link</b><br />
 The url to the collaboration.
@@ -1477,7 +1477,7 @@ A synopsis of the item.
 
 <p><b>guid</b><br />
 A unique identifier for this item.
-</b>guid</b><br />
+</p>
 
 <p><b>pubDate</b><br />
 The date the item was published.

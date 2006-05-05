@@ -23,13 +23,13 @@ our $I18N = {
 		},
 
         '847' => {
-                   message => qq|Go back to the current page.|,
-                   lastUpdated => 1039587250,
+		message => qq|Go back to the current page.|,
+		lastUpdated => 1039587250,
                  },
 
         '823' => {
-                   message => qq|Go to the new page.|,
-                   lastUpdated => 1038706332,
+		message => qq|Go to the new page.|,
+		lastUpdated => 1038706332,
                  },
 
 	'folder add/edit title' => {
@@ -42,18 +42,18 @@ our $I18N = {
 <p>Folders are Wobjects, so they have all the same properties as Wobjects and Assets.  Folders also have these unique properties and functions:</p>
 
 |,
-        	lastUpdated => 1126238060,
+		lastUpdated => 1126238060,
 	},
 
         'folder template description' => {
-                message => q|This menu permits you to select a template to style the display of the Folder contents</p>|,
-                lastUpdated => 1127278558,
+                message => q|<p>This menu permits you to select a template to style the display of the Folder contents</p>|,
+                lastUpdated => 1146797271,
         },
 
         'What Next description' => {
-                message => q|After creating a new Folder, do you wish to go back to the original page where you created the Folder
+                message => q|<p>After creating a new Folder, do you wish to go back to the original page where you created the Folder
 to do you want to go to the new Folder?</p>|,
-                lastUpdated => 1127959255,
+                lastUpdated => 1146797272,
         },
 
 	'folder template title' => {
@@ -62,7 +62,8 @@ to do you want to go to the new Folder?</p>|,
 	},
 
 	'folder template body' => {
-		message => q|The following variables are available in Folder Templates:
+		message => q|<p>The following variables are available in Folder Templates:</p>
+
 <p><b>addFile.url</b><br />
 The url for adding files to the Folder.</p>
 
