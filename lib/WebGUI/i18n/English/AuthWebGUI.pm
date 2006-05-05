@@ -188,10 +188,59 @@ Default label for the password recovery link
 	},
 
 	'expired template body' => {
-		message => q|The following template variables are available for WebGUI Authentication Password Expiration templates. <br /><br /><strong>expired.form.header</strong><br />The required form elements that go at the top of the password expiration page.<br /><br /><strong>expired.form.hidden<br /></strong>Hidden form fields required for form submittal<br /><br /><strong>expired.form.footer</strong><br />The required form elements that go after the password expiration page form. 
-<p><strong>expired.form.submit<br /></strong>The default submit button for the password expiration form. <br /><br /><strong>displayTitle<br /></strong>Default page title 
-<p><strong>expired.message</strong><br />Any message returned by the system.  Usually displays after the form is submitted.<br /><br /><strong>create.form.oldPassword</strong><br />Default old password form field<br /><br /><strong>create.form.oldPassword.label</strong><br />Default text for old password form field<br /><br /><strong>expired.form.password<br /></strong>Default password form field<br /><br /><strong>expired.form.password.label<br /></strong>Default text for password form field<br /><br /><strong>expired.form.passwordConfirm</strong><br />Default password confirm form field<br /><br /><strong>expired.form.passwordConfirm.label<br /></strong>Default text for password confirm form field</p>|,
-		lastUpdated => 1101772005
+		message => q|
+	<p>The following template variables are available for WebGUI Authentication Password Expiration templates.</p>
+	
+<p><strong>expired.form.header</strong><br />
+The required form elements that go at the top of the password expiration page.
+</p>
+
+<p><strong>expired.form.hidden</strong><br />
+Hidden form fields required for form submittal.
+</p>
+
+<p><strong>expired.form.footer</strong><br />
+The required form elements that go after the password expiration page form. 
+</p>
+
+<p><strong>expired.form.submit</strong><br />
+The default submit button for the password expiration form.
+</p>
+
+<p><strong>displayTitle</strong><br />
+Default page title.
+</p>
+
+<p><strong>expired.message</strong><br />
+Any message returned by the system.  Usually displays after the form is submitted.
+</p>
+
+<p><strong>create.form.oldPassword</strong><br />
+Default old password form field.
+</p>
+
+<p><strong>create.form.oldPassword.label</strong><br />
+Default text for old password form field.
+</p>
+
+<p><strong>expired.form.password</strong><br />
+Default password form field.
+</p>
+
+<p><strong>expired.form.password.label</strong><br />
+Default text for password form field.
+</p>
+
+<p><strong>expired.form.passwordConfirm</strong><br />
+Default password confirm form field.
+</p>
+
+<p><strong>expired.form.passwordConfirm.label</strong><br />
+Default text for password confirm form field
+</p>
+
+|,
+		lastUpdated => 1146848431
 	},
 
 	'16' => {
@@ -230,10 +279,62 @@ Default label for the password recovery link
 	},
 
 	'recovery template body' => {
-		message => q|The following template variables are available for WebGUI Authentication Password Recovery templates. 
-<p><strong>recover.form.header</strong><br />The required form elements that go at the top of the password recovery page.<br /><br /><strong>recover.form.hidden</strong><br />Hidden form fields required for form submission<br /><br /><strong>recover.form.footer</strong><br />The required form elements that go after the password recovery page form.</p>
-<p><strong>recover.form.submit<br /></strong>The default submit button for the password recovery form. <br /><br /><strong>login.form.email<br /></strong>Default email form field<br /><br /><strong>login.form.email.label<br /></strong>Default text for email form field<br /><br /><strong>title<br /></strong>Default page title 
-<p><strong>recover.message</strong><br />Any message returned by the system.  Usually displays after the form is submitted.<br /><br /><strong>anonymousRegistration.isAllowed<br /></strong>Flag indicating whether or not anonymous registrations are allowed<br /><br /><strong>createAccount.url</strong><br />URL for the anonymous registration page<br /><br /><strong>createAccount.label<br /></strong>Default label for the anonymous registration link<br /><br /><strong>login.url<br /></strong>URL for the login page<br /><br /><strong>login.label</strong><br />Default text label for login page link.</p>|,
+		message => q|<p>The following template variables are available for WebGUI Authentication Password Recovery templates.</p>
+
+<p><strong>recover.form.header</strong><br />
+The required form elements that go at the top of the password recovery page.
+</p>
+
+<p><strong>recover.form.hidden</strong><br />
+Hidden form fields required for form submission.
+</p>
+
+<p><strong>recover.form.footer</strong><br />
+The required form elements that go after the password recovery page form.
+</p>
+
+<p><strong>recover.form.submit</strong><br />
+The default submit button for the password recovery form. 
+</p>
+
+<p><strong>login.form.email</strong><br />
+Default email form field.
+</p>
+
+<p><strong>login.form.email.label</strong><br />
+Default text for email form field
+</p>
+
+<p><strong>title</strong><br />
+Default page title.
+</p> 
+
+<p><strong>recover.message</strong><br />
+Any message returned by the system.  Usually displays after the form is submitted.
+</p>
+
+<p><strong>anonymousRegistration.isAllowed</strong><br />
+Flag indicating whether or not anonymous registrations are allowed.
+</p>
+
+<p><strong>createAccount.url</strong><br />
+URL for the anonymous registration page.
+</p>
+
+<p><strong>createAccount.label</strong><br />
+Default label for the anonymous registration link.
+</p>
+
+<p><strong>login.url</strong><br />
+URL for the login page.
+</p>
+
+<p><strong>login.label</strong><br />
+Default text label for login page link.
+</p>
+
+|,
+
 		lastUpdated => 1101772010
 	},
 
@@ -268,19 +369,160 @@ Default label for the password recovery link
 	},
 
 	'display account template body' => {
-		message => q|The following template variables are available for WebGUI Authentication Display Account templates. 
-<p><strong>account.form.header</strong><br />The required form elements that go at the top of the display account page.<br /><br /><strong>account.form.footer</strong><br />The required form elements that go after the display account page form. </p>
-<p><strong>account.form.karma</strong><br />A read only form property displaying the amount of karma a user has.  Karma is a configurable user setting that is turned off by default  
-<p><strong>account.form.karma.label</strong><br />Internationalized text label for the karma form value  
-<p><strong>account.form.submit<br /></strong>The default submit button for the display account form. <br /><br /><strong>account.options</strong><br />Links list of options which allow users to turn on Admin, view and edit profile, view the inbox, etc.  <br /><br /><strong>displayTitle<br /></strong>Page title
-<p><strong>account.message</strong><br />Any message returned by the system.  Usually displays after the form is submitted.<br /><br /><strong>account.form.username</strong><br />Default username form field<br /><br /><strong>account.form.username.label</strong><br />Default text for username form field<br /><br /><strong>account.form.password<br /></strong>Default password form field<br /><br /><strong>account.form.password.label<br /></strong>Default text for password form field<br /><br /><strong>account.form.passwordConfirm</strong><br />Default password confirm form field<br /><br /><strong>account.form.passwordConfirm.label<br /></strong>Default text for password confirm form field<br /><br /><strong>account.noform</strong><br />Indicates whether or not the display account form has any visible fields<br /><br /><strong>account.nofields<br /></strong>Default display in the case that there are no form elements to display</p>|,
+		message => q|<p>The following template variables are available for WebGUI Authentication Display Account templates. </p>
+
+<p><strong>account.form.header</strong><br />
+The required form elements that go at the top of the display account page.
+</p>
+
+<p><strong>account.form.footer</strong><br />
+The required form elements that go after the display account page form.
+</p>
+
+<p><strong>account.form.karma</strong><br />
+A read only form property displaying the amount of karma a user has.  Karma is a configurable user setting that is turned off by default  
+</p>
+
+<p><strong>account.form.karma.label</strong><br />
+Internationalized text label for the karma form value.
+</p>
+
+<p><strong>account.form.submit</strong><br />
+The default submit button for the display account form. 
+</p>
+
+<p><strong>account.options</strong><br />
+Links list of options which allow users to turn on Admin, view and edit profile, view the inbox, etc.  
+</p>
+
+<p><strong>displayTitle<br /></strong>
+Page title.
+</p>
+
+<p><strong>account.message</strong><br />
+Any message returned by the system.  Usually displays after the form is submitted.
+</p>
+
+<p><strong>account.form.username</strong><br />
+Default username form field.
+</p>
+
+<p><strong>account.form.username.label</strong><br />
+Default text for username form field.
+</p>
+
+<p><strong>account.form.password</strong><br />
+Default password form field.
+</p>
+
+<p><strong>account.form.password.label</strong><br />
+Default text for password form field.
+</p>
+
+<p><strong>account.form.passwordConfirm</strong><br />
+Default password confirm form field.
+</p>
+
+<p><strong>account.form.passwordConfirm.label</strong><br />
+Default text for password confirm form field.
+</p>
+
+<p><strong>account.noform</strong><br />
+Indicates whether or not the display account form has any visible fields.
+</p>
+
+<p><strong>account.nofields</strong><br />
+Default display in the case that there are no form elements to display.
+</p>
+
+|,
 		lastUpdated => 1101772016
 	},
 
 	'anon reg template body' => {
-		message => q|The following template variables are available for WebGUI Authentication Anonymous Registration templates. <br /><br /><strong>create.form.header</strong><br />The required form elements that go at the top of the anonymous registration page.<br /><br /><strong>create.form.hidden<br /></strong>Hidden form fields required for form submittal<br /><br /><strong>create.form.footer</strong><br />The required form elements that go after the anonymous registration page form. 
-<p><strong>create.form.submit<br /></strong>The default submit button for the anonymous registration form. <br /><br /><strong>title<br /></strong>Default page title 
-<p><strong>create.form.profile<br /></strong>A loop containing visible and required profile fields for anonymous registration<br /><br />         <strong>profile.formElement</strong><br />         Form element for visible or required profile field<br /><br />         <strong>profile.formElement.label</strong><br /><strong>           </strong>Default text label for profile form element<br /><br /><br /><strong>login.url<br /></strong>URL for the login page<br /><br /><strong>login.label</strong><br />Default text label for login page link.<br /><br /><strong>create.message</strong><br />Any message returned by the system.  Usually displays after the form is submitted.<br /><br /><strong>create.form.username</strong><br />Default username form field<br /><br /><strong>create.form.username.label</strong><br />Default text for username form field<br /><br /><strong>create.form.password<br /></strong>Default password form field<br /><br /><strong>create.form.password.label<br /></strong>Default text for password form field<br /><br /><strong>create.form.passwordConfirm</strong><br />Default password confirm form field<br /><br /><strong>create.form.passwordConfirm.label<br /></strong>Default text for password confirm form field<br /><br /><strong>recoverPassword.isAllowed<br /></strong>Flag indicating whether or not password recovery is enabled<br /><br /><strong>recoverPassword.url<br /></strong>URL for the password recovery page.<br /><br /><strong>recoverPassword.label<br /></strong>Default label for the password recovery link</p>|,
+		message => q|<p>The following template variables are available for WebGUI Authentication Anonymous Registration templates. </p>
+
+<p><strong>create.form.header</strong><br />
+The required form elements that go at the top of the anonymous registration page.
+</p>
+
+<p><strong>create.form.hidden</strong><br />
+Hidden form fields required for form submittal.
+</p>
+
+<p><strong>create.form.footer</strong><br />
+The required form elements that go after the anonymous registration page form. 
+</p>
+
+<p><strong>create.form.submit</strong><br />
+The default submit button for the anonymous registration form. 
+</p>
+
+<p><strong>title</strong><br />
+Default page title.
+</p>
+
+<p><strong>create.form.profile</strong><br />
+A loop containing visible and required profile fields for anonymous registration.
+</p>
+
+<p><strong>profile.formElement</strong><br />
+Form element for visible or required profile field.
+</p>
+
+<p><strong>profile.formElement.label</strong><br />
+Default text label for profile form element.
+</p>
+
+<p><strong>login.url</strong><br />
+URL for the login page.
+</p>
+
+<p><strong>login.label</strong><br />
+Default text label for login page link.
+</p>
+
+<p><strong>create.message</strong><br />
+Any message returned by the system.  Usually displays after the form is submitted.
+</p>
+
+<p><strong>create.form.username</strong><br />
+Default username form field.
+</p>
+
+<p><strong>create.form.username.label</strong><br />
+Default text for username form field.
+</p>
+
+<p><strong>create.form.password<br />
+</strong>Default password form field.
+</p>
+
+<p><strong>create.form.password.label</strong><br />
+Default text for password form field.
+</p>
+
+<p><strong>create.form.passwordConfirm</strong><br />
+Default password confirm form field.
+</p>
+
+<p><strong>create.form.passwordConfirm.label</strong><br />
+Default text for password confirm form field.
+</p>
+
+<p><strong>recoverPassword.isAllowed</strong><br />
+Flag indicating whether or not password recovery is enabled.
+</p>
+
+<p><strong>recoverPassword.url</strong><br />
+URL for the password recovery page.
+</p>
+
+<p><strong>recoverPassword.label</strong><br />
+Default label for the password recovery link.
+</p>
+
+|,
 		lastUpdated => 1101772020
 	},
 

@@ -71,18 +71,22 @@ our $I18N = {
 
 <p><b>controls</b><br />
 Asset controls for administrators.
+</p>
 
 <p><b>error</b><br />
 Any errors reported during upload or unzip
+</p>
 
 <p><b>fileUrl</b><br />
 URL to the initial file
+</p>
 
 <p><b>fileIcon</b><br />
 Initial file file type icon
+</p>
 		|,
 		context => 'Describing the zip archive template variables',
-		lastUpdated => 1109287834,
+		lastUpdated => 1146852386,
 	},
      
 

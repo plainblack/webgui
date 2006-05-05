@@ -4,31 +4,31 @@ our $I18N = {
 
           '828' => {
                      lastUpdated => 1053469640,
-                     message => q|Most wobjects have templates that allow you to change the layout of the wobject's user interface. Those wobjects that do have templates all have a common set of template variables that you can use for layout, as well as their own custom variables. The following is a list of the common template variables shared among all wobjects.
+                     message => q|<p>Most wobjects have templates that allow you to change the layout of the wobject's user interface. Those wobjects that do have templates all have a common set of template variables that you can use for layout, as well as their own custom variables. The following is a list of the common template variables shared among all wobjects.</p>
 
-<p/>
-<b>title</b><br />
+<p><b>title</b><br />
 The title for this wobject.
+</p>
 
-<p/>
-<b>displayTitle</b><br />
+<p><b>displayTitle</b><br />
 A conditional variable for whether or not the title should be displayed.
+</p>
 
-<p/>
-<b>description</b><br />
+<p><b>description</b><br />
 The description of this wobject.
+</p>
 
-<p/>
-<b>assetId</b><br />
+<p><b>assetId</b><br />
 The unique identifier that WebGUI uses to control this asset.
+</p>
 
-<p/>
-<b>isShortcut</b><br />
+<p><b>isShortcut</b><br />
 A conditional indicating if this wobject is a shortcut to an original asset.
+</p>
 
-<p />
-<b>originalURL</b><br />
+<p><b>originalURL</b><br />
 If this wobject is a shortcut, then this URL will direct you to the original asset.
+</p>
 
 |
                    },
@@ -45,14 +45,15 @@ If this wobject is a shortcut, then this URL will direct you to the original ass
                      message => q|<p>You can add wobjects by selecting from the <i>^International("1","WebGUI");</i> pulldown menu. You can edit them by clicking on the "Edit" button that appears directly above an instance of a particular wobject while in Admin mode.</p>
 <p>Wobjects are Assets, so they have all of the properties that Assets do.  Additionally, most Wobjects share some basic properties. Those properties are:</p>|
                    },
-          '626' => {
-                     lastUpdated => 1101775387,
-                     message => q|Wobjects are the true power of WebGUI. Wobjects are tiny pluggable applications built to run under WebGUI. Articles, message boards and polls are examples of wobjects.
-Wobjects can be standalone pages all by themselves, or can be individual parts of pages.
-<p>
 
-To add a wobject to a page, first go to that page, then select <b>Add Content...</b> from the upper left corner of your screen. Each wobject has it's own help so be sure to read the help if you're not sure how to use it.
-<p>
+          '626' => {
+                     lastUpdated => 1146852133,
+                     message => q|<p>Wobjects are the true power of WebGUI. Wobjects are tiny pluggable applications built to run under WebGUI. Articles, message boards and polls are examples of wobjects.
+Wobjects can be standalone pages all by themselves, or can be individual parts of pages.
+</p>
+
+<p>To add a wobject to a page, first go to that page, then select <b>Add Content...</b> from the upper left corner of your screen. Each wobject has it's own help so be sure to read the help if you're not sure how to use it.
+</p>
 |
                    },
 
@@ -72,7 +73,7 @@ is displayed as part of a Layout Asset, the Layout Asset's <b>Style Template</b>
                 lastUpdated => 1119410887,
         },
 
-        '85 description' => {
+	'85 description' => {
                 message => q|A content area in which you can place as much content as you wish. For instance, even before a FAQ there is usually a paragraph describing what is contained in the FAQ. |,
                 lastUpdated => 1119410887,
         },
@@ -107,28 +108,31 @@ is displayed as part of a Layout Asset, the Layout Asset's <b>Style Template</b>
                      message => q|Wobject, Delete|
                    },
           '619' => {
-                     lastUpdated => 1031514049,
-                     message => q|This function permanently deletes the selected wobject from a page. If you are unsure whether you wish to delete this content you may be better served to cut the content to the clipboard until you are certain you wish to delete it.
-<p>
+                     lastUpdated => 1146852148,
+                     message => q|<p>This function permanently deletes the selected wobject from a page. If you are unsure whether you wish to delete this content you may be better served to cut the content to the clipboard until you are certain you wish to delete it.
+</p>
 
-
-As with any delete operation, you are prompted to be sure you wish to proceed with the delete. If you answer yes, the delete will proceed and there is no recovery possible. If you answer no you'll be returned to the prior screen.
-<p>
+<p>As with any delete operation, you are prompted to be sure you wish to proceed with the delete. If you answer yes, the delete will proceed and there is no recovery possible. If you answer no you'll be returned to the prior screen.
+</p>
 
 |
                    },
-          '45' => {
-                    lastUpdated => 1031514049,
-                    message => q|No, I made a mistake.|
-                  },
-          '671' => {
-                     lastUpdated => 1047858549,
-                     message => q|Wobjects, Using|
-                   },
-          'assetName' => {
-                     message => q|Wobject|,
-                     lastUpdated => 1128830333,
-                   },
+
+	'45' => {
+		lastUpdated => 1031514049,
+		message => q|No, I made a mistake.|
+	},
+
+	'671' => {
+		lastUpdated => 1047858549,
+		message => q|Wobjects, Using|
+	},
+
+	'assetName' => {
+		message => q|Wobject|,
+		lastUpdated => 1128830333,
+	},
+
 
         'add' => {
                 message => q|Add|,
