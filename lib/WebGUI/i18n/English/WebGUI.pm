@@ -3915,6 +3915,12 @@ Message Boards hold forums for users.  There are many different Wobjects in WebG
 		lastUpdated => 1141963463,
 	},
 
+	'webgui' => {
+		message => q|WebGUI|,
+		lastUpdated => 1141963573,
+		context => q|Test key for International macro test.  DO NOT TRANSLATE|,
+	},
+
 	'pages' => {
 		message => q|Pages|,
 		lastUpdated => 1141963573,
