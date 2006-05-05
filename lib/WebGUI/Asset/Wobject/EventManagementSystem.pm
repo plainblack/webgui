@@ -795,7 +795,7 @@ sub getBadgeSelector {
 		}
 	}
 	$js = '<script type="text/javascript">
-	var badges = '.objToJson(\%badgeJS,{pretty => 1, indent => 4, autoconv=>0, skipinvalid=>1}).';
+	var badges = '.objToJson(\%badgeJS,{autoconv=>0, skipinvalid=>1}).';
 	</script>';
 	%options = (%options,%{$badges});
 	$output .= WebGUI::Form::selectBox($self->session,{
@@ -2030,6 +2030,9 @@ Method to go into badge-addition mode.
 
 =cut
 
+# remember to account for editing the purchase from the commerce cart
+# after calling this method...
+
 sub www_addEventsToBadge {
 	my $self = shift;
 	my %var = $self->get();
@@ -2696,7 +2699,7 @@ sub www_search {
 	}
 	#$self->session->errorHandler->warn("<pre>".Dumper(@results)."</pre>");
 	$sth->finish;
-	my $maxResultsForInitialDisplay = 50;
+	my $maxResultsForInitialDisplay = 50000;
 	my $numSearchResults = scalar(@results);
 	@results = () unless ( ($numSearchResults <= $maxResultsForInitialDisplay) || ($self->session->form->get("advSearch") || $self->session->form->get("searchKeywords") || $showAllFlag));	
 	$p->setDataByArrayRef(\@results);
