@@ -101,6 +101,7 @@ The number of days to add to the epoch.
 sub addToDate {
 	my $self = shift;
 	my $date		= DateTime->from_epoch( epoch =>shift);
+	#$date->set_time_zone($self->session->user->profileField("timeZone")|| "America/Chicago"); # assign the user's timezone
 	my $years 		= shift || 0;
 	my $months 	= shift || 0;
 	my $days	 	= shift || 0;
@@ -371,8 +372,10 @@ A boolean indicating that the time should be added to the output, thust turning 
 
 sub epochToSet {
 	my $self = shift;
+	my $epoch = shift;
+	return undef unless $epoch;
 	my $timeZone = $self->session->user->profileField("timeZone") || "America/Chicago";
-	my $dt = DateTime->from_epoch( epoch =>shift, time_zone=>$timeZone);
+	my $dt = DateTime->from_epoch( epoch =>$epoch, time_zone=>$timeZone);
 	my $withTime = shift;
 	if ($withTime) {
 		return $dt->strftime("%Y-%m-%d %H:%M:%S");
@@ -471,10 +474,18 @@ An epoch date.
 
 sub getDaysInInterval {
 	my $self = shift;
-	my $start = DateTime->from_epoch( epoch =>shift);
-	my $end = DateTime->from_epoch( epoch =>shift);
-	my $duration = $end - $start;
-	return $duration->delta_days;
+	my $start = shift;
+	my $end = shift;
+	my $eh = $self->session->errorHandler;
+	#$eh->warn("start: ".$self->epochToSet($start));
+	#$eh->warn("end:".$self->epochToSet($end));
+	my $start = DateTime->from_epoch( epoch =>$start);
+	my $end = DateTime->from_epoch( epoch =>$end);
+	$start->set_time_zone($self->session->user->profileField("timeZone")|| "America/Chicago"); # assign the user's timezone
+	$end->set_time_zone($self->session->user->profileField("timeZone")|| "America/Chicago"); # assign the user's timezone
+	#my $duration = $end - $start;
+	#return $duration->delta_days;
+	return $end->delta_days($start)->delta_days;
 }
 
 
@@ -710,6 +721,7 @@ sub monthCount {
 	my $start = DateTime->from_epoch( epoch => shift );
 	my $end = DateTime->from_epoch( epoch => shift );
 	my $duration = $end - $start;
+	#return $end->delta_months($start)->delta_months;
 	return $duration->delta_months;
 }
 
