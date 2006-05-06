@@ -56,6 +56,8 @@ These functions/methods are available from this package:
 This method is used to help developers work with i18n before i18n files
 have been created.  echo simply returns the internationId.
 
+=cut
+
 sub echo {
 	my ($self, $id, $namespace, $language) = @_;
 	return $id;
