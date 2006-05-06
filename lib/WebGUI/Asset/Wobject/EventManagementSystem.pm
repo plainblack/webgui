@@ -3016,7 +3016,7 @@ sub www_editPrereqSetSave {
 		prerequisiteId=>$psid,
 		name => $self->session->form->process("name"),
 		operator => $self->session->form->process("operator",'radioList')
-	},1,1);
+	},0,0);
 	$self->session->db->write("delete from EventManagementSystem_prerequisiteEvents where prerequisiteId=?",[$psid]);
 	my @newRequiredEvents = $self->session->form->process('requiredEvents','checkList');
 	foreach (@newRequiredEvents) {
