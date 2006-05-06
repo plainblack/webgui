@@ -155,12 +155,6 @@ sub _acWrapper {
 	return $self->getAdminConsole->render($html,$title);
 }
 
-	my $output = $f->print;
-	$self->getAdminConsole->setHelp('add/edit event','Asset_EventManagementSystem');
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=search'),$i18n->get("manage events"));
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n->get('manage event metadata'));
-	my $addEdit = ($pid eq "new" or !$pid) ? $i18n->get('add', 'Asset_Wobject') : $i18n->get('edit', 'Asset_Wobject');
-	return $self->getAdminConsole->render($output, $addEdit.' '.$i18n->get('event'));
 	
 #-------------------------------------------------------------------
 
