@@ -146,8 +146,8 @@ sub _getFieldHash {
 sub _acWrapper {
 	my $self = shift;
 	my $html = shift;
-	my $title = shift
-	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');;
+	my $title = shift;
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	$self->getAdminConsole->setHelp('add/edit event','Asset_EventManagementSystem');
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=search'),$i18n->get("manage events"));
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n->get('manage event metadata'));
