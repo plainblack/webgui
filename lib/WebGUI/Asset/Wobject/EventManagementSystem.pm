@@ -1769,7 +1769,7 @@ sub www_editEvent {
 	tie %prereqSets, 'Tie::IxHash';
 	%prereqSets = $self->session->db->buildHash("select prerequisiteId, name from EventManagementSystem_prerequisites order by name");
 	my %prereqMemberships = $self->session->db->buildHash("select prerequisiteId, requiredProductId from EventManagementSystem_prerequisiteEvents where requiredProductId=?",[$pid]);
-	if (scalar(keys(%prereqSets)) && !scalar(keys(%prereqSets))) {
+	if (scalar(keys(%prereqSets)) && (scalar(keys(%prereqMemberships)) == 0)) {
 		#there are some prereq sets entered into the system, and 
 		#this event is not a member of any of them.
 		%prereqSets = (''=>$i18n->echo('select one'),%prereqSets);
