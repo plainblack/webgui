@@ -2938,7 +2938,7 @@ sub www_managePrereqSets {
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	
 	my $output;
-	my $sth = $self->session->db->read("select distinct(prerequisiteId) from EventManagementSystem_prerequisites order by name");
+	my $sth = $self->session->db->read("select prerequisiteId, name from EventManagementSystem_prerequisites order by name");
 	
 	if ($sth->rows) {
 
