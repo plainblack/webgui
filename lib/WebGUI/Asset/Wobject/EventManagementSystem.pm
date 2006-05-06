@@ -3004,14 +3004,14 @@ sub www_editPrereqSet {
 		-value=>$data->{operator}
 	);
 	$f->checkList(
-		-name=>"operator",
+		-name=>"requiredEvents",
 		-vertical=>1,
 		-label=>$i18n->echo('events required by this prerequisite set'),
 		-hoverHelp => $i18n->echo('place a check beside the events that are part of this prerequisite set'),
 		-options=>$self->session->db->buildHashRef("select p.productId, p.title
 		   from products as p, EventManagementSystem_products as e
 		   where
-		   	p.productId = e.productId and approved=1
+		   	p.productId = e.productId 
 			and (e.prerequisiteId is NULL or e.prerequisiteId = '')"),
 		-value=>$self->session->db->buildArrayRef("select requiredProductId from EventManagementSystem_prerequisiteEvents where prerequisiteId=?",[$psid])
 	);
@@ -3020,31 +3020,30 @@ sub www_editPrereqSet {
 }
 
 #-------------------------------------------------------------------
-sub www_editEventMetaDataFieldSave {
+sub www_editPrereqSetSave {
 	my $self = shift;
 	return $self->session->privilege->insufficient unless ($self->canAddEvents);
 	my $error = '';
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
-	foreach ('name','label') {
+	foreach ('name') {
 		if ($self->session->form->get($_) eq "" || 
-			$self->session->form->get($_) eq $i18n->get('type name here') ||
-			$self->session->form->get($_) eq $i18n->get('type label here')) {
+			$self->session->form->get($_) eq $i18n->get('type name here')) {
 			$error .= sprintf($i18n->get('null field error'),$_)."<br />";
 		}
 	}
-	return $self->www_editEventMetaDataField(undef,$error) if $error;
-	my $newId = $self->setCollateral("EventManagementSystem_metaField", "fieldId",{
-		fieldId=>$self->session->form->process('fieldId'),
+	return $self->www_editPrereqSet(undef,$error) if $error;
+	my $psid = $self->session->form->process('psid');
+	$psid = $self->setCollateral("EventManagementSystem_prerequisites", "prerequisiteId",{
+		prerequisiteId=>$psid,
 		name => $self->session->form->process("name"),
-		label => $self->session->form->process("label"),
-		dataType => $self->session->form->process("dataType",'fieldType'),
-		visible => $self->session->form->process("visible",'yesNo'),
-		required => $self->session->form->process("required",'yesNo'),
-		possibleValues => $self->session->form->process("possibleValues",'textarea'),
-		defaultValues => $self->session->form->process("defaultValues",'textarea'),
-		autoSearch => $self->session->form->process("autoSearch",'yesNo')
+		operator => $self->session->form->process("operator",'radioList')
 	},1,1);
-	return $self->www_manageEventMetadata();
+	$self->session->db->write("delete from EventManagementSystem_prerequisiteEvents where prerequisiteId=?",[$psid]);
+	my @newRequiredEvents = $self->session->form->process('requiredEvents','checkList');
+	foreach (@newRequiredEvents) {
+		$self->session->db->write("insert into EventManagementSystem_prerequisiteEvents values (?,?)",[$psid,$_]);
+	}
+	return $self->www_managePrereqSets();
 }
 
 
