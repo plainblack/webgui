@@ -142,7 +142,26 @@ sub _getFieldHash {
 	return $self->{_fieldHash};
 }
 
+#-------------------------------------------------------------------
+sub _acWrapper {
+	my $self = shift;
+	my $html = shift;
+	my $title = shift
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');;
+	$self->getAdminConsole->setHelp('add/edit event','Asset_EventManagementSystem');
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=search'),$i18n->get("manage events"));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n->get('manage event metadata'));
+		$self->getAdminConsole->addSubmenuItem($self->getUrl('func=managePrereqSets'), $i18n->echo('manage prerequisite sets'));
+	return $self->getAdminConsole->render($html,$title);
+}
 
+	my $output = $f->print;
+	$self->getAdminConsole->setHelp('add/edit event','Asset_EventManagementSystem');
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=search'),$i18n->get("manage events"));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n->get('manage event metadata'));
+	my $addEdit = ($pid eq "new" or !$pid) ? $i18n->get('add', 'Asset_Wobject') : $i18n->get('edit', 'Asset_Wobject');
+	return $self->getAdminConsole->render($output, $addEdit.' '.$i18n->get('event'));
+	
 #-------------------------------------------------------------------
 
 sub _matchPairs {
@@ -1936,8 +1955,7 @@ sub www_manageEventMetadata {
 		$output .= $i18n->get('you do not have any metadata fields to display');
 	}
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editEventMetaDataField;fieldId=new'), $i18n->get("add new event metadata field"));
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=search'), $i18n->get('manage events'));
-	return $self->getAdminConsole->render($output, $i18n->get("manage event metadata"));
+	return $self->_acWrapper($output, $i18n->get("manage event metadata"));
 }
 
 #-------------------------------------------------------------------
@@ -2192,10 +2210,8 @@ sub www_editEventMetaDataField {
 	}
 	$f->submit;
 		$self->getAdminConsole->setHelp('event management system manage events','Asset_EventManagementSystem');
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n2->get('manage event metadata'));
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editEventMetaDataField;fieldId=new'), $i18n2->get("add new event metadata field"));
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEvents'), $i18n->get('manage events'));
-	return $self->getAdminConsole->render($f->print, $i18n2->get("add new event metadata field"));
+	return $self->_acWrapper($f->print, $i18n2->get("add new event metadata field"));
 }
 
 #-------------------------------------------------------------------
@@ -2912,5 +2928,40 @@ sub view {
 
 	return $self->processTemplate(\%var, undef, $self->{_viewTemplate});
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_managePrereqSets ( )
+
+Method to display the prereq set management console.
+
+=cut
+
+sub www_managePrereqSets {
+	my $self = shift;
+
+	return $self->session->privilege->insufficient unless ($self->canAddEvents);
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
+	
+	my $output;
+	my $sth = $self->session->db->read("select distinct(prerequisiteId) from EventManagementSystem_prerequisites order by name");
+	
+	if ($sth->rows) {
+
+		while (my %row = $sth->hash) {
+			$output .= "<div>";
+			$output .= $self->session->icon->delete('func=deletePrereqSet;psid='.$row{prerequisiteId}, $self->getUrl,
+							       $i18n->echo('are you sure you want to delete this prerequisite set  this will also unlink any events that are currently set to require this prerequisite set')).
+				  $self->session->icon->edit('func=editPrereqSet;psid='.$row{prerequisiteId}, $self->getUrl).
+				  " ".$row{name}."<div>";
+		}
+	} else {
+		$output .= $i18n->echo('you do not have any prerequisite sets to display');
+	}
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editPrereqSet;psid=new'), $i18n->echo('add prerequisite set'));
+
+	return $self->_acWrapper($output, $i18n->echo("manage prerequisite sets"));
+}
+
 
 1;
