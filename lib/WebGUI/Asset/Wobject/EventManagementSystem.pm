@@ -2947,7 +2947,7 @@ sub www_managePrereqSets {
 			$output .= $self->session->icon->delete('func=deletePrereqSet;psid='.$row{prerequisiteId}, $self->getUrl,
 							       $i18n->echo('are you sure you want to delete this prerequisite set  this will also unlink any events that are currently set to require this prerequisite set')).
 				  $self->session->icon->edit('func=editPrereqSet;psid='.$row{prerequisiteId}, $self->getUrl).
-				  " ".$row{name}."<div>";
+				  " ".$row{name}."</div>";
 		}
 	} else {
 		$output .= $i18n->echo('you do not have any prerequisite sets to display');
@@ -2956,6 +2956,98 @@ sub www_managePrereqSets {
 
 	return $self->_acWrapper($output, $i18n->echo("manage prerequisite sets"));
 }
+
+
+#-------------------------------------------------------------------
+sub www_editPrereqSet {
+	my $self = shift;
+	my $psid = shift || $self->session->form->process("psid") || 'new';
+	my $error = shift;
+	return $self->session->privilege->insufficient unless ($self->canAddEvents);
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
+	my $f = WebGUI::HTMLForm->new($self->session, (
+		action => $self->getUrl."?func=editPrereqSetSave;psid=".$psid
+	));
+	my $data = {};
+	if ($error) {
+		# load submitted data.
+		$data = {
+			name => $self->session->form->process("name"),
+			requiredEvents => $self->session->form->process("requiredEvents",'selectList'),
+		};
+		$f->readOnly(
+			-name => 'error',
+			-label => 'Error:',
+			-value => '<span style="color:red;font-weight:bold">'.$error.'</span>',
+		);
+	} elsif ($psid eq 'new') {
+		$data->{name} = $i18n->get('type name here')
+	} else {
+		$data = $self->session->db->quickHashRef("select * from EventManagementSystem_prerequisites where prequisiteId=?",[$psid]);
+	}
+	$f->text(
+		-name => "name",
+		-label => $i18n->echo('prereq set name field label'),
+		-hoverHelp => $i18n->echo('prereq set name field description'),
+		-extras=>(($data->{name} eq $i18n->get('type name here'))?' style="color:#bbbbbb" ':'').' onblur="if(!this.value){this.value=\''.$i18n->get('type name here').'\';this.style.color=\'#bbbbbb\';}" onfocus="if(this.value == \''.$i18n->get('type name here').'\'){this.value=\'\';this.style.color=\'\';}"',
+		-value => $data->{name},
+	);
+	$f->radioList(
+		-name=>"operator",
+		-vertical=>1,
+		-label=>$i18n->echo('operator type'),
+		-hoverHelp => $i18n->echo('whether any or all of the selected events should be required'),
+		-options=>{
+			'or'=>'any',
+			'and'=>'all'
+		},
+		-value=>$data->{operator}
+	);
+	$f->checkList(
+		-name=>"operator",
+		-vertical=>1,
+		-label=>$i18n->echo('events required by this prerequisite set'),
+		-hoverHelp => $i18n->echo('place a check beside the events that are part of this prerequisite set'),
+		-options=>$self->session->db->buildHashRef("select p.productId, p.title
+		   from products as p, EventManagementSystem_products as e
+		   where
+		   	p.productId = e.productId and approved=1
+			and (e.prerequisiteId is NULL or e.prerequisiteId = '')"),
+		-value=>$self->session->db->buildArrayRef("select requiredProductId from EventManagementSystem_prerequisiteEvents where prerequisiteId=?",[$psid])
+	);
+	$f->submit;
+	return $self->_acWrapper($f->print, $i18n->get("edit event metadata field"));
+}
+
+#-------------------------------------------------------------------
+sub www_editEventMetaDataFieldSave {
+	my $self = shift;
+	return $self->session->privilege->insufficient unless ($self->canAddEvents);
+	my $error = '';
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
+	foreach ('name','label') {
+		if ($self->session->form->get($_) eq "" || 
+			$self->session->form->get($_) eq $i18n->get('type name here') ||
+			$self->session->form->get($_) eq $i18n->get('type label here')) {
+			$error .= sprintf($i18n->get('null field error'),$_)."<br />";
+		}
+	}
+	return $self->www_editEventMetaDataField(undef,$error) if $error;
+	my $newId = $self->setCollateral("EventManagementSystem_metaField", "fieldId",{
+		fieldId=>$self->session->form->process('fieldId'),
+		name => $self->session->form->process("name"),
+		label => $self->session->form->process("label"),
+		dataType => $self->session->form->process("dataType",'fieldType'),
+		visible => $self->session->form->process("visible",'yesNo'),
+		required => $self->session->form->process("required",'yesNo'),
+		possibleValues => $self->session->form->process("possibleValues",'textarea'),
+		defaultValues => $self->session->form->process("defaultValues",'textarea'),
+		autoSearch => $self->session->form->process("autoSearch",'yesNo')
+	},1,1);
+	return $self->www_manageEventMetadata();
+}
+
+
 
 
 1;
