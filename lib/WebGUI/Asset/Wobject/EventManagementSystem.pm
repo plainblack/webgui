@@ -1652,7 +1652,7 @@ sub www_editEvent {
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 
 	my $event = $self->session->db->quickHashRef("
-		select p.productId, p.title, p.description, p.price, p.weight, p.sku, p.templateId, p.skuTemplate,
+		select p.productId, p.title, p.description, p.price, p.weight, p.sku, p.templateId, p.skuTemplate, e.prerequisiteId,
 		       e.startDate, e.endDate, e.maximumAttendees, e.approved
 		from
 		       products as p, EventManagementSystem_products as e
@@ -1765,7 +1765,20 @@ sub www_editEvent {
 		-hoverHelp => $i18n->get('add/edit event maximum attendees description'),
 		-label => $i18n->get('add/edit event maximum attendees')
 	);
+	my %prereqSets;
+	tie %prereqSets, 'Tie::IxHash';
+	%prereqSets = $self->session->db->buildHash("select prerequisiteId, name from EventManagementSystem_prerequisites order by name");
 	
+	if (scalar(keys(%prereqSets))) {
+		%prereqSets = (''=>$i18n->echo('select one'),%prereqSets);
+		$f->selectBox(
+			-name=>'prerequisiteId',
+			-options=>\%prereqSets,
+			-label=>$i18n->echo('Assigned Prerequisite Set'),
+			-hoverHelp=>$i18n->echo('Which Prerequisite Set this event requires in order to be added to a badge.'),
+			-value=>$self->session->form->get("prerequisiteId") || $event->{prerequisiteId}
+		);
+	}
 	
 	# add dynamically added metadata fields.
 	my $meta = {};
@@ -1805,44 +1818,7 @@ sub www_editEvent {
 		);
 	}
 
-	 $f->selectBox(
-		-name  => "whatNext",
-		-label => $i18n->get("add/edit event what next"),
-		-hoverHelp => $i18n->get("add/edit event what next"),
-		-options => {
-#				"addAnotherPrereq" => $i18n->get("add/edit event add another prerequisite"),
-				#"managePrereqs" => $i18n->get("manage prerequisites"),
-				"return"	   => $i18n->get("add/edit event return to manage events"),
-			    },
-		-defaultValue => "return"
-	 );
-
-#        }
-
 	$f->submit;
-
-	#Display Currently Assigned Prerequisites if any
-	$f->readOnly( -value => $i18n->get('add/edit event assigned prerequisites'), );
-	my $list = $self->getAssignedPrerequisites($pid);
-	foreach my $prerequisiteId (keys %{$list}) {
-	
-
-		# Disable until the new prereq UI is in place
-		#my $line = $self->session->icon->delete('func=deletePrerequisite;pid='.$pid.';id='.$prerequisiteId,
-		#					 $self->getUrl, $i18n->get('confirm delete prerequisite'))." ";
-		
-		my $eventNames = $self->getRequiredEventNames($prerequisiteId);
-		my $events;
-		foreach my $event (@$eventNames) {
-			$events .= "$event ".$list->{$prerequisiteId}." ";
-		}
-		$events =~ s/(and\s|or\s)$//;
-
-		#Disable until the new prereq UI is in place
-		#
-		#$f->readOnly( -value => $line.$events );
-		$f->readOnly( -value => $events );
-	}
 
 	my $output = $f->print;
 	$self->getAdminConsole->setHelp('add/edit event','Asset_EventManagementSystem');
@@ -1881,8 +1857,8 @@ sub www_editEventSave {
 		endDate	=> $self->session->form->process("endDate",'dateTime'),
 		maximumAttendees => $self->session->form->get("maximumAttendees"),
 		approved	=> $self->session->form->get("approved"),
-		imageId		=> $storageId
-
+		imageId		=> $storageId,
+		prerequisiteId => $self->session->form->process("prerequisiteId","selectBox")
 	},1,1);
 
 	#Save the event metadata
@@ -2981,7 +2957,8 @@ sub www_editPrereqSet {
 			-value => '<span style="color:red;font-weight:bold">'.$error.'</span>',
 		);
 	} elsif ($psid eq 'new') {
-		$data->{name} = $i18n->get('type name here')
+		$data->{name} = $i18n->get('type name here');
+		$data->{operator} = 'or';
 	} else {
 		$data = $self->session->db->quickHashRef("select * from EventManagementSystem_prerequisites where prerequisiteId=?",[$psid]);
 	}
