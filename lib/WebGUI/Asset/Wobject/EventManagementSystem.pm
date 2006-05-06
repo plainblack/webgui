@@ -2983,7 +2983,7 @@ sub www_editPrereqSet {
 	} elsif ($psid eq 'new') {
 		$data->{name} = $i18n->get('type name here')
 	} else {
-		$data = $self->session->db->quickHashRef("select * from EventManagementSystem_prerequisites where prequisiteId=?",[$psid]);
+		$data = $self->session->db->quickHashRef("select * from EventManagementSystem_prerequisites where prerequisiteId=?",[$psid]);
 	}
 	$f->text(
 		-name => "name",
