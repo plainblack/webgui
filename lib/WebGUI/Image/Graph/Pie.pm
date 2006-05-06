@@ -2,9 +2,7 @@ package WebGUI::Image::Graph::Pie;
 
 use strict;
 use WebGUI::Image::Graph;
-use Data::Dumper::Simple;
 use constant pi => 3.14159265358979;
-use Data::Dumper;
 
 our @ISA = qw(WebGUI::Image::Graph);
 
