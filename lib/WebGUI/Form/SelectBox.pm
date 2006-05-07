@@ -77,6 +77,9 @@ sub definition {
 		size=>{
 			defaultValue=>1,
 			},
+		defaultValue=>{
+			defaultValue=>'',
+			},
 		profileEnabled=>{
 			defaultValue=>1,
 			},
