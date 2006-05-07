@@ -811,7 +811,7 @@ sub getBadgeSelector {
 	}
 	if (!$IHaveOne && !$isAdmin && $me ne '1') {
 		$defaultBadge = 'thisIsI';
-		my $meUser = WebGUI::User->new($me);
+		my $meUser = WebGUI::User->new($self->session,$me);
 		$badgeJS{'thisIsI'} = {
 			firstName=>$meUser->profileField('firstName'),
 			lastName=>$meUser->profileField('lastName'),
