@@ -50,6 +50,7 @@ updateFolder();
 addRichEditUpload();
 updateArticle();
 updateScratch();
+updateProfileListFields();
 installSQLForm();
 addResizableTextareas();
 addScratchKeys();
@@ -731,6 +732,7 @@ my $sql5 = <<SQL5;
 create table EventManagementSystem_prerequisites (
  prerequisiteId varchar(22) binary not null,
  operator varchar(100),
+ name varchar(40),
 primary key(prerequisiteId)
 )
 SQL5
@@ -738,10 +740,9 @@ SQL5
 my $sql6 = <<SQL6;
 
 create table EventManagementSystem_prerequisiteEvents (
- prerequisiteEventId varchar(22) binary not null,
- prerequisiteId varchar(22) binary,
- requiredProductId varchar(22) binary,
-primary key(prerequisiteEventId)
+ prerequisiteId varchar(22) binary not null,
+ requiredProductId varchar(22) binary not null,
+primary key(prerequisiteId,requiredProductId)
 )
 SQL6
 
@@ -1159,6 +1160,24 @@ GRAPH4
 	]);
  
 }
+
+sub updateProfileListFields {
+	foreach ("UPDATE userProfileField SET fieldType='selectBox' WHERE fieldType='selectList' and fieldName in ('language','gender','dateFormat','timeFormat','discussionLayout','INBOXNotifications','firstDayOfWeek','uiLevel','toolbar')",
+	"UPDATE userProfileField SET dataDefault='\'English\'' WHERE fieldName='language'",
+"UPDATE userProfileField SET dataDefault='\'neuter\'' WHERE fieldName='gender'",
+"UPDATE userProfileField SET dataDefault='\'%M/%D/%Y\'' WHERE fieldName='dateFormat'",
+"UPDATE userProfileField SET dataDefault='\'%H:%n %p\'' WHERE fieldName='timeFormat'",
+"UPDATE userProfileField SET dataDefault='\'nested\'' WHERE fieldName='discussionLayout'",
+"UPDATE userProfileField SET dataDefault='\'email\'' WHERE fieldName='INBOXNotifications'",
+"UPDATE userProfileField SET dataDefault='\'0\'' WHERE fieldName='firstDayOfWeek'",
+"UPDATE userProfileField SET dataDefault='\'5\'' WHERE fieldName='uiLevel'",
+"UPDATE userProfileField SET dataDefault='\'useLanguageDefault\'' WHERE fieldName='toolbar'") {
+		$session->db->write($_);
+	}
+}
+
+
+
 
 # ---- DO NOT EDIT BELOW THIS LINE ----
 
