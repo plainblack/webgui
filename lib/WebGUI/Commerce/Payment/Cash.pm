@@ -339,19 +339,19 @@ sub checkoutForm {
 	$f->selectBox(
 		-name=>"country",
 		-label=>$i18n->get("country"),
-		-value=>($self->session->form->process("country") || $u->profileField("homeCountry")),
+		-value=>($self->session->form->process("country",'selectBox') || $u->profileField("homeCountry")),
 		-options=>\%countries
 		);
 	$f->phone(
 		-name=>"phone",
 		-label=>$i18n->get("phone"),
 		-defaultValue=>$u->profileField("homePhone"),
-		-value=>$self->session->form->process("phone"),
+		-value=>$self->session->form->process("phone",'phone'),
 	);
 	$f->email(
 		-name	=> 'email',
 		-label	=> $i18n->get('email'),
-		-value	=> $self->session->form->process("email") || $u->profileField('email')
+		-value	=> $self->session->form->process("email",'email') || $u->profileField('email')
 	);
 
 	return $f->printRowsOnly;	
