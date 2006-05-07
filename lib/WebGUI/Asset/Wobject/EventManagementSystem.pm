@@ -151,7 +151,8 @@ sub _acWrapper {
 	$self->getAdminConsole->setHelp('add/edit event','Asset_EventManagementSystem');
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=search'),$i18n->get("manage events"));
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n->get('manage event metadata'));
-		$self->getAdminConsole->addSubmenuItem($self->getUrl('func=managePrereqSets'), $i18n->echo('manage prerequisite sets'));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=managePrereqSets'), $i18n->echo('manage prerequisite sets'));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageRegistrants'), $i18n->echo('manage registrants'));
 	return $self->getAdminConsole->render($html,$title);
 }
 
@@ -1776,7 +1777,7 @@ sub www_addToScratchCart {
 	my $masterEventId = $self->session->form->get("mid");
 	$self->addToScratchCart($pid); #tsc
 	
-	return $self->www_search(undef, undef, $nameOfEventAdded, $masterEventId, "requirement", "eq", $self->session->form->get("pn"));
+	return $self->www_search($nameOfEventAdded, $masterEventId, "requirement", "eq", $self->session->form->get("pn"));
 }
 
 
@@ -2092,10 +2093,8 @@ sub www_editEvent {
 
 	my $output = $f->print;
 	$self->getAdminConsole->setHelp('add/edit event','Asset_EventManagementSystem');
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=search'),$i18n->get("manage events"));
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n->get('manage event metadata'));
 	my $addEdit = ($pid eq "new" or !$pid) ? $i18n->get('add', 'Asset_Wobject') : $i18n->get('edit', 'Asset_Wobject');
-	return $self->getAdminConsole->render($output, $addEdit.' '.$i18n->get('event'));
+	return $self->_acWrapper($output, $addEdit.' '.$i18n->get('event'));
 }
 
 #-------------------------------------------------------------------
@@ -2157,7 +2156,6 @@ sub www_editEventSave {
 		$self->session->db->setRow("products", "productId", $event);
 	}
 	
-	return $self->www_search("managePrereqs",$pid) if ($self->session->form->get("whatNext") eq "managePrereqs");
 	return $self->www_search;
 }
 
@@ -2723,9 +2721,7 @@ sub prepareView {
 #-------------------------------------------------------------------
 sub www_search {
 	my $self = shift;
-	my $managePrereqs = shift || $self->session->form->get("managePrereqs");
-	my $eventToAssignPrereqTo = shift || $self->session->form->get("eventToAssignPrereqTo");
-
+	
 	#these allow us to show a specific page of subevents after an add to scratch cart
 	my $eventAdded = shift;
 	my $cfilter_t0 = shift;
@@ -2897,14 +2893,11 @@ sub www_search {
 					 WebGUI::Form::hidden($self->session,{name => "cfilter_s0", value => "requirement"}).
 					 WebGUI::Form::hidden($self->session,{name => "cfilter_c0", value => "eq"}).
 					 WebGUI::Form::hidden($self->session,{name => "cfilter_t0", value => $self->session->form->get("cfilter_t0")}).
-					 WebGUI::Form::hidden($self->session,{name => "managePrereqs", value => $managePrereqs}).
 					 WebGUI::Form::hidden($self->session,{name => "eventToAssignPrereqTo", value => $eventToAssignPrereqTo});
 	$var{'advSearch.formHeader'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl("func=search;advSearch=1")}).
 				       WebGUI::Form::hidden($self->session,{name => "cfilter_s0", value => "requirement"}).
 				       WebGUI::Form::hidden($self->session,{name => "cfilter_c0", value => "eq"}).
-				       WebGUI::Form::hidden($self->session,{name => "cfilter_t0", value => $self->session->form->get("cfilter_t0")}).
-				       WebGUI::Form::hidden($self->session,{name => "managePrereqs", value => $managePrereqs}).
-				       WebGUI::Form::hidden($self->session,{name => "eventToAssignPrereqTo", value => $eventToAssignPrereqTo});
+				       WebGUI::Form::hidden($self->session,{name => "cfilter_t0", value => $self->session->form->get("cfilter_t0")});
 	$var{isAdvSearch} = $self->session->form->get('advSearch');
 	$var{'search.formFooter'} = WebGUI::Form::formFooter($self->session);
 	$var{'search.formSubmit'} = WebGUI::Form::submit($self->session, {name=>"filter",value=>$i18n->get('filter')});
@@ -2944,12 +2937,6 @@ sub www_search {
 		}
 		foreach (keys %reqHash) {
 			$shouldPush = 0 unless isIn($_,@{$requiredList});
-		}
-		if ($managePrereqs) { #prereq mode
-			#$self->session->errorHandler->warn("prereq list<pre>".Dumper(@prerequisiteList)."</pre>");
-			#$self->session->errorHandler->warn("productId<pre>".Dumper($data->{productId})."</pre>");
-			$shouldPush = 0 unless (isIn($data->{productId}, @prerequisiteList)); #include only valid prereqs in results
-			#$self->session->errorHandler->warn("<pre>".Dumper($shouldPush)."</pre>");
 		}
 		push(@results,$data) if $shouldPush;
 	}
@@ -2997,15 +2984,6 @@ sub www_search {
 	  	$eventFields{'purchase.label'} = $i18n->get('add to cart');
 	  }
 	  
-	  # Set template vars for managing prerequisites if we're in manage prereqs mode
-	  if ($managePrereqs) {
-		$eventFields{'prereqForm.checkbox'} = WebGUI::Form::checkbox($self->session,{
-						-name => 'eventList',
-						#-checked => $row{approved},
-						-value => $event->{productId}
-					});
-	  }
-	  
 	  push (@events, {'event' => $self->processTemplate(\%eventFields, $event->{'templateId'}), %eventFields });
 	} 
 	
@@ -3013,27 +2991,11 @@ sub www_search {
 	$var{'paginateBar'} = $p->getBarTraditional;
 	$var{'manageEvents.url'} = $self->getUrl('func=search');
 	$var{'manageEvents.label'} = $i18n->get('manage events');
-	$var{'managePurchases.url'} = $self->getUrl('func=managePurchases');
+	$var{'managePurchases.url'} = $self->getUrl('func=managePurchases') if $self->session->var->get('userId') ne '1';
 	$var{'managePurchases.label'} = $i18n->get('manage purchases');
 	$var{'noSearchDialog'} = ($self->session->form->get('hide') eq "1") ? 1 : 0;
 	$var{'addEvent.url'} = $self->getUrl('func=editEvent;pid=new');
 	$var{'addEvent.label'} = $i18n->get('add event');
-	$var{'managePrereqs'} = ($managePrereqs) ? 1 : 0;
-	$var{'managePrereqsMessage'} = sprintf $i18n->get('managePrereqsMessage'), $self->getEventName($eventToAssignPrereqTo);
-	$var{'prereqForm.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl}).
-					      WebGUI::Form::hidden($self->session,{name=>"eventToAssignPrereqTo", value=>$eventToAssignPrereqTo}).
-					      WebGUI::Form::hidden($self->session,{name=>"func", value=>"savePrerequisites"});
-	$var{'prereqForm.submit'} = WebGUI::Form::submit($self->session);
-	$var{'prereqForm.footer'} = WebGUI::Form::formFooter($self->session);
-	$var{'prereqForm.operator'} = WebGUI::Form::radioList($self->session,{
-					name  => "requirement",
-					options => { 'and' => $i18n->get("and"),
-						      'or'  => $i18n->get("or"),
-						    },
-					value => 'and',
-					label => $i18n->get("add/edit event operator"),
-					hoverHelp => $i18n->get("add/edit event operator description")
-									     });
 	if ($self->session->user->isInGroup($self->get("groupToManageEvents"))) {
 		$var{'canManageEvents'} = 1;
 	}
@@ -3044,35 +3006,34 @@ sub www_search {
 	$subSearchFlag = $self->session->form->get("subSearch") || ($self->session->form->get("func"));
 	my $advSearchFlag = $self->session->form->get("advSearch");
 	my $basicSearchFlag = $self->session->form->get("searchKeywords");
-	my $managePrereqsFlag = $var{'managePrereqs'};
 	my $paginationFlag = $self->session->form->get("pn") || $pn;
 	my $hasSearchedFlag = ($self->session->form->get("filter"));
 	
 	#Determine type of search results we're displaying
-	if ($subSearchFlag && !$managePrereqsFlag && ($numSearchResults <= $maxResultsForInitialDisplay || $paginationFlag || $hasSearchedFlag)) {
+	if ($subSearchFlag && ($numSearchResults <= $maxResultsForInitialDisplay || $paginationFlag || $hasSearchedFlag)) {
 		if ($self->canEdit) { #Admin manage sub events small resultset
 			$message = $i18n->get('Admin manage sub events small resultset');
 		} else { #User sub events small resultset
 			$message = $i18n->get("User sub events small resultset");
 		}
-	} elsif ($subSearchFlag && $numSearchResults > $maxResultsForInitialDisplay && !$managePrereqsFlag && !$paginationFlag) {
+	} elsif ($subSearchFlag && $numSearchResults > $maxResultsForInitialDisplay && !$paginationFlag) {
 		if ($self->canEdit) { #Admin manage sub events large resultset
 			$message = $i18n->get('Admin manage sub events large resultset');   
 		} else { #User sub events large resultset
 			$message = $i18n->get('User sub events large resultset');   
 		}
 
-	} elsif ($managePrereqsFlag && ($numSearchResults <= $maxResultsForInitialDisplay || $paginationFlag || $hasSearchedFlag)) {
+	} elsif ($numSearchResults <= $maxResultsForInitialDisplay || $paginationFlag || $hasSearchedFlag) {
 		$message = $i18n->get('option to narrow');
-	} elsif ($managePrereqsFlag && $numSearchResults > $maxResultsForInitialDisplay && !$paginationFlag) {
+	} elsif ($numSearchResults > $maxResultsForInitialDisplay && !$paginationFlag) {
 		$message = $i18n->get('forced narrowing');
 	}
 	
 	my $somethingInScratch = scalar(@{$self->getEventsInScratchCart});
 	$var{'message'} = $message;
 	$var{'numberOfSearchResults'} = $numSearchResults;
-	$var{'continue.url'} = $self->getUrl('func=addToCart;pid=_noid_') unless ($managePrereqsFlag || !$somethingInScratch);
-	$var{'continue.label'} = "Continue" unless ($managePrereqsFlag || !$somethingInScratch);
+	$var{'continue.url'} = $self->getUrl('func=addToCart;pid=_noid_') if $somethingInScratch;
+	$var{'continue.label'} = "Continue" if $somethingInScratch;
 	$var{'name.label'} = "Event";
 	$var{'starts.label'} = "Starts";
 	$var{'ends.label'} = "Ends";
@@ -3309,7 +3270,9 @@ sub www_manageRegistrants {
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	
 	my $output;
-	my $sth = "select * from EventManagementSystem_badges order by lastName";
+	my $sql = "select * from EventManagementSystem_badges order by lastName";
+	my $p = WebGUI::Paginator->new($self->session,$self->getUrl('func=manageRegistrants'));
+	$p->setDataByArrayRef($self->session->db->buildArrayRefOfHashRefs($sql));
 	
 
 	while (my %row = $sth->hash) {
