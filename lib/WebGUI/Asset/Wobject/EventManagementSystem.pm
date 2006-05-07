@@ -3309,7 +3309,7 @@ sub www_manageRegistrants {
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	
 	my $output;
-	my $sql = "select * from EventManagementSystem_badges order by lastName";
+	my $sth = "select * from EventManagementSystem_badges order by lastName";
 	
 
 	while (my %row = $sth->hash) {
