@@ -339,8 +339,7 @@ sub checkoutForm {
 	$f->selectBox(
 		-name=>"country",
 		-label=>$i18n->get("country"),
-		-value=>$self->session->form->process("country"),
-		-defaultValue=>$u->profileField("homeCountry"),
+		-value=>($self->session->form->process("country") || $u->profileField("homeCountry")),
 		-options=>\%countries
 		);
 	$f->phone(
