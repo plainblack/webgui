@@ -29,7 +29,7 @@ Package that paginates rows of arbitrary data for display on the web.
 =head1 SYNOPSIS
 
  use WebGUI::Paginator;
- $p = WebGUI::Paginator->new($self->session,"/index.pl/page_name?this=that");
+ $p = WebGUI::Paginator->new($self->session,$self->getUrl('thisParameter=thatValue'));
  $p->setDataByArrayRef(\@array);
  $p->setDataByQuery($sql);
 
