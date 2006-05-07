@@ -100,16 +100,16 @@ sub buildArray {
 	my $self = shift;
 	my $sql = shift;
 	my $params = shift;
-        my ($sth, $data, @array, $i);
-        $sth = $self->prepare($sql);
+	my ($sth, $data, @array, $i);
+	$sth = $self->prepare($sql);
 	$sth->execute($params);
 	$i=0;
-        while (($data) = $sth->array) {
-                $array[$i] = $data;
+	while (($data) = $sth->array) {
+		$array[$i] = $data;
 		$i++;
-        }
-        $sth->finish;
-        return @array;
+	}
+	$sth->finish;
+	return @array;
 }
 
 
@@ -160,15 +160,15 @@ sub buildHash {
 	my $params = shift;
 	my ($sth, %hash, @data);
 	tie %hash, "Tie::IxHash";
-        $sth = $self->prepare($sql);
+	$sth = $self->prepare($sql);
 	$sth->execute($params);
-        while (@data = $sth->array) {
+	while (@data = $sth->array) {
 		my $value = pop @data;
 		my $key = join(":",@data); # if more than two columns is selected, join them together with :
 		$key = $value unless ($key); # if only one column is selected, then it is both the key and the value
-               	$hash{$key} = $value;
-        }
-        $sth->finish;
+		$hash{$key} = $value;
+	}
+	$sth->finish;
 	return %hash;
 }
 
@@ -193,10 +193,10 @@ sub buildHashRef {
 	my $self = shift;
 	my $sql = shift;
 	my $params = shift;
-        my ($sth, %hash);
-        tie %hash, "Tie::IxHash";
+	my ($sth, %hash);
+	tie %hash, "Tie::IxHash";
 	%hash = $self->buildHash($sql, $params);
-        return \%hash;
+	return \%hash;
 }
 
 
@@ -220,8 +220,8 @@ An array reference containing values for any placeholder params used in the SQL 
 sub buildArrayRefOfHashRefs {
 	my @array;
 	my $sth = $_[0]->read($_[1],$_[2]);
-	while (my $data = $sth->hashRef) {
-		push(@array,$data);
+	while ($sth->hashRef) {
+		push(@array,$_);
 	}
 	$sth->finish;
 	return \@array;
@@ -315,8 +315,8 @@ The value to search for in the key column.
 =cut
 
 sub deleteRow {
-        my ($self, $table, $key, $keyValue) = @_;
-        my $sth = $self->write("delete from $table where ".$key."=?", [$keyValue]);
+	my ($self, $table, $key, $keyValue) = @_;
+	my $sth = $self->write("delete from $table where ".$key."=?", [$keyValue]);
 }
 
 
@@ -393,12 +393,12 @@ Specify the name of one of the incrementers in the incrementer table.
 sub getNextId {
 	my $self = shift;
 	my $name = shift;
-        my ($id);
+	my ($id);
 	$self->beginTransaction;
-        ($id) = $self->quickArray("select nextValue from incrementer where incrementerId=?", [$name]);
-        $self->write("update incrementer set nextValue=nextValue+1 where incrementerId=?",[$name]);
+	($id) = $self->quickArray("select nextValue from incrementer where incrementerId=?", [$name]);
+	$self->write("update incrementer set nextValue=nextValue+1 where incrementerId=?",[$name]);
 	$self->commit;
-        return $id;
+	return $id;
 }
 
 #-------------------------------------------------------------------
@@ -467,7 +467,7 @@ sub quickArray {
 	my $sql = shift;
 	my $params = shift;
 	my ($sth, @data);
-        $sth = $self->prepare($sql);
+	$sth = $self->prepare($sql);
 	$sth->execute($params);
 	@data = $sth->array;
 	$sth->finish;
@@ -528,13 +528,13 @@ sub quickHash {
 	my $self = shift;
 	my $sql = shift;
 	my $params = shift;
-        my ($sth, $data);
-        $sth = $self->prepare($sql);
+	my ($sth, $data);
+	$sth = $self->prepare($sql);
 	$sth->execute($params);
-        $data = $sth->hashRef;
-        $sth->finish;
+	$data = $sth->hashRef;
+	$sth->finish;
 	if (defined $data) {
-        	return %{$data};
+		return %{$data};
 	} else {
 		return ();
 	}
@@ -560,13 +560,13 @@ sub quickHashRef {
 	my $self = shift;
 	my $sql = shift;
 	my $params = shift;
-        my $sth = $self->prepare($sql);
-        $sth->execute($params);
-        my $data = $sth->hashRef;
-        $sth->finish;
-        if (defined $data) {
-                return $data;
-        } else {
+	my $sth = $self->prepare($sql);
+	$sth->execute($params);
+	my $data = $sth->hashRef;
+	$sth->finish;
+	if (defined $data) {
+		return $data;
+	} else {
 		return {};
 	}
 }
@@ -591,15 +591,15 @@ sub quickTab {
 	my $self = shift;
 	my $sql = shift;
 	my $params = shift;
-        my ($sth, $output, @data);
-        $sth = $self->prepare($sql);
+	my ($sth, $output, @data);
+	$sth = $self->prepare($sql);
 	$sth->execute($params);
 	$output = join("\t",$sth->getColumnNames)."\n";
 	while (@data = $sth->array) {
-                makeArrayTabSafe(\@data);
-                $output .= join("\t",@data)."\n";
-        }
-        $sth->finish;
+		makeArrayTabSafe(\@data);
+		$output .= join("\t",@data)."\n";
+	}
+	$sth->finish;
 	return $output;
 }
 
@@ -639,7 +639,7 @@ An array reference containing strings to be quoted.
 
 sub quoteAndJoin {
 	my $self = shift;
-        my $arrayRef = shift;
+	my $arrayRef = shift;
 	my @newArray;
 	foreach my $value (@$arrayRef) {
  		push(@newArray,$self->quote($value));
@@ -729,22 +729,22 @@ Use this ID to create a new row. Same as setting the key value to "new" except t
 =cut
 
 sub setRow {
-        my ($self, $table, $keyColumn, $data, $id) = @_;
-        if ($data->{$keyColumn} eq "new" || $id) {
-                $data->{$keyColumn} = $id || $self->session->id->generate();
-                $self->write("replace into $table ($keyColumn) values (?)",[$data->{$keyColumn}]);
-        }
-        my @fields = ();
+	my ($self, $table, $keyColumn, $data, $id) = @_;
+	if ($data->{$keyColumn} eq "new" || $id) {
+		$data->{$keyColumn} = $id || $self->session->id->generate();
+		$self->write("replace into $table ($keyColumn) values (?)",[$data->{$keyColumn}]);
+	}
+	my @fields = ();
 	my @data = ();
-        foreach my $key (keys %{$data}) {
-                unless ($key eq $keyColumn) {
-                        push(@fields, $key.'=?');
+	foreach my $key (keys %{$data}) {
+		unless ($key eq $keyColumn) {
+			push(@fields, $key.'=?');
 			push(@data,$data->{$key});
-                }
-        }
+		}
+	}
 	if ($fields[0] ne "") {
 		push(@data,$data->{$keyColumn});
-        	$self->write("update $table set ".join(", ", @fields)." where ".$keyColumn."=?",\@data);
+		$self->write("update $table set ".join(", ", @fields)." where ".$keyColumn."=?",\@data);
 	}
 	return $data->{$keyColumn};
 }
