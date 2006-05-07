@@ -957,7 +957,7 @@ sub getRegistrationInfo {
 	$var{'form.city'} = WebGUI::Form::Text($self->session,{name=>'city'});
 	$var{'form.state'} = WebGUI::Form::Text($self->session,{name=>'state'});
 	$var{'form.zipCode'} = WebGUI::Form::Text($self->session,{name=>'zipCode'});
-	$var{'form.country'} = WebGUI::Form::SelectBox($self->session,{name=>'country', options => $self->getCountries});
+	$var{'form.country'} = WebGUI::Form::SelectBox($self->session,{name=>'country', options => $self->getCountries, value=>'United States'});
 	$var{'form.phoneNumber'} = WebGUI::Form::Phone($self->session,{name=>'phone'});
 	$var{'form.badgeId'} = $self->getBadgeSelector;
 	$var{'form.updateProfile'} = WebGUI::Form::Checkbox($self->session,{name=>'updateProfile'});
