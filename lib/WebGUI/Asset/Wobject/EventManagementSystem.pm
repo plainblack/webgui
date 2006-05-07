@@ -2821,7 +2821,7 @@ sub view {
 	  	$eventFields{'purchase.label'} = $i18n->get('sold out');
 	  }
 	  else {
-	  	#$eventFields{'purchase.url'} = $self->getUrl('func=addToCart;isMaster=1;pid='.$event->{'productId'});
+	  	$eventFields{'purchase.url'} = $self->getUrl('func=addToScratchCart;mid='.$event->{'productId'}.';pid='.$event->{'productId'});
 		$eventFields{'purchase.message'} = "Would you like to see available subevents?";
 		$eventFields{'purchase.wantToSearch.url'} = $self->getUrl('func=search;cfilter_s0=requirement;cfilter_c0=eq;subSearch=1;cfilter_t0='.$event->{productId});
 	        $eventFields{'purchase.wantToContinue.url'} = $self->getUrl('func=addToCart;pid='.$event->{productId});
