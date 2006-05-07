@@ -411,13 +411,12 @@ sub checkoutForm {
 		-label=>$i18n->get("country"),
 		-value=>($self->session->form->process("country") || $u->profileField("homeCountry") || 'United States'),
 		-options=>\%countries
-		);
-    #For some odd reason, defaultValue needs to come before value here or value displays the text "-defaultValue".  Bug is reported.
-	$f->phone(
+	);
+  $f->phone(
 		-name=>"phone",
 		-label=>$i18n->get("phone"),
 		-defaultValue=>$u->profileField("homePhone"),
-		-value=>$self->session->form->process("phone"),
+		-value=>$self->session->form->process("phone",'phone'),
 	);
 	$f->email(
 		-name	=> 'email',
