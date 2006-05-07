@@ -220,8 +220,9 @@ An array reference containing values for any placeholder params used in the SQL 
 sub buildArrayRefOfHashRefs {
 	my @array;
 	my $sth = $_[0]->read($_[1],$_[2]);
-	while ($sth->hashRef) {
-		push(@array,$_);
+	my $data;
+	while ($data = $sth->hashRef) {
+		push(@array,$data);
 	}
 	$sth->finish;
 	return \@array;
