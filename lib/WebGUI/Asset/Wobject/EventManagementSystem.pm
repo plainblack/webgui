@@ -798,14 +798,31 @@ sub getBadgeSelector {
 	my $js;
 	my %badgeJS;
 	my $defaultBadge;
+	my $IHaveOne = 0;
 	foreach (keys %$badges) {
 		$badgeJS{$_} = $self->session->db->quickHashRef("select * from EventManagementSystem_badges where badgeId=?",[$_]);
 		$defaultBadge ||= $badgeJS{$_}->{badgeId};
 		if ($badgeJS{$_}->{userId} eq $me) {
 			# we have a match!
+			$IHaveOne = 1;
 			delete $options{'thisIsI'};
 			$defaultBadge = $badgeJS{$_}->{badgeId};
 		}
+	}
+	if (!$IHaveOne && !$isAdmin && $me ne '1') {
+		$defaultBadge = 'thisIsI';
+		my $meUser = WebGUI::User->new($me);
+		$badgeJS{'thisIsI'} = {
+			firstName=>$meUser->profileField('firstName'),
+			lastName=>$meUser->profileField('lastName'),
+			'address'=>$meUser->profileField('homeAddress'),
+			city=>$meUser->profileField('homeCity'),
+			state=>$meUser->profileField('homeState'),
+			zipCode=>$meUser->profileField('homeZip'),
+			country=>$meUser->profileField('homeCountry'),
+			phone=>$meUser->profileField('homePhone'),
+			email=>$meUser->profileField('email')
+		};
 	}
 	$js = '<script type="text/javascript">
 	var badges = '.objToJson(\%badgeJS,{autoconv=>0, skipinvalid=>1}).';
@@ -1120,6 +1137,257 @@ sub prerequisiteIsMet {
 	}	
 }
 
+
+#------------------------------------------------------------------
+sub getCountries {
+	my $self = shift;
+	my %countries;
+	tie %countries, 'Tie::IxHash';
+	%countries = (
+'Afghanistan' => 'Afghanistan',
+'Albania' => 'Albania',
+'Algeria' => 'Algeria',
+'American Samoa' => 'American Samoa',
+'Andorra' => 'Andorra',
+'Anguilla' => 'Anguilla',
+'Antarctica' => 'Antarctica',
+'Antigua And Barbuda' => 'Antigua And Barbuda',
+'Argentina' => 'Argentina',
+'Armenia' => 'Armenia',
+'Aruba' => 'Aruba',
+'Australia' => 'Australia',
+'Austria' => 'Austria',
+'Azerbaijan' => 'Azerbaijan',
+'Bahamas' => 'Bahamas',
+'Bahrain' => 'Bahrain',
+'Bangladesh' => 'Bangladesh',
+'Barbados' => 'Barbados',
+'Belarus' => 'Belarus',
+'Belgium' => 'Belgium',
+'Belize' => 'Belize',
+'Benin' => 'Benin',
+'Bermuda' => 'Bermuda',
+'Bhutan' => 'Bhutan',
+'Bolivia' => 'Bolivia',
+'Bosnia and Herzegovina' => 'Bosnia and Herzegovina',
+'Botswana' => 'Botswana',
+'Bouvet Island' => 'Bouvet Island',
+'Brazil' => 'Brazil',
+'British Indian Ocean Territory' => 'British Indian Ocean Territory',
+'Brunei Darussalam' => 'Brunei Darussalam',
+'Bulgaria' => 'Bulgaria',
+'Burkina Faso' => 'Burkina Faso',
+'Burundi' => 'Burundi',
+'Cambodia' => 'Cambodia',
+'Cameroon' => 'Cameroon',
+'Canada' => 'Canada',
+'Cape Verde' => 'Cape Verde',
+'Cayman Islands' => 'Cayman Islands',
+'Central African Republic' => 'Central African Republic',
+'Chad' => 'Chad',
+'Chile' => 'Chile',
+'China' => 'China',
+'Christmas Island' => 'Christmas Island',
+'Cocos (Keeling) Islands' => 'Cocos (Keeling) Islands',
+'Colombia' => 'Colombia',
+'Comoros' => 'Comoros',
+'Congo' => 'Congo',
+'Congo, the Democratic Republic of the' => 'Congo, the Democratic Republic of the',
+'Cook Islands' => 'Cook Islands',
+'Costa Rica' => 'Costa Rica',
+'Cote d\'Ivoire' => 'Cote d\'Ivoire',
+'Croatia' => 'Croatia',
+'Cyprus' => 'Cyprus',
+'Czech Republic' => 'Czech Republic',
+'Denmark' => 'Denmark',
+'Djibouti' => 'Djibouti',
+'Dominica' => 'Dominica',
+'Dominican Republic' => 'Dominican Republic',
+'East Timor' => 'East Timor',
+'Ecuador' => 'Ecuador',
+'Egypt' => 'Egypt',
+'El Salvador' => 'El Salvador',
+'England' => 'England',
+'Equatorial Guinea' => 'Equatorial Guinea',
+'Eritrea' => 'Eritrea',
+'Espana' => 'Espana',
+'Estonia' => 'Estonia',
+'Ethiopia' => 'Ethiopia',
+'Falkland Islands' => 'Falkland Islands',
+'Faroe Islands' => 'Faroe Islands',
+'Fiji' => 'Fiji',
+'Finland' => 'Finland',
+'France' => 'France',
+'French Guiana' => 'French Guiana',
+'French Polynesia' => 'French Polynesia',
+'French Southern Territories' => 'French Southern Territories',
+'Gabon' => 'Gabon',
+'Gambia' => 'Gambia',
+'Georgia' => 'Georgia',
+'Germany' => 'Germany',
+'Ghana' => 'Ghana',
+'Gibraltar' => 'Gibraltar',
+'Great Britain' => 'Great Britain',
+'Greece' => 'Greece',
+'Greenland' => 'Greenland',
+'Grenada' => 'Grenada',
+'Guadeloupe' => 'Guadeloupe',
+'Guam' => 'Guam',
+'Guatemala' => 'Guatemala',
+'Guinea' => 'Guinea',
+'Guinea-Bissau' => 'Guinea-Bissau',
+'Guyana' => 'Guyana',
+'Haiti' => 'Haiti',
+'Heard and Mc Donald Islands' => 'Heard and Mc Donald Islands',
+'Honduras' => 'Honduras',
+'Hong Kong' => 'Hong Kong',
+'Hungary' => 'Hungary',
+'Iceland' => 'Iceland',
+'India' => 'India',
+'Indonesia' => 'Indonesia',
+'Ireland' => 'Ireland',
+'Israel' => 'Israel',
+'Italy' => 'Italy',
+'Jamaica' => 'Jamaica',
+'Japan' => 'Japan',
+'Jordan' => 'Jordan',
+'Kazakhstan' => 'Kazakhstan',
+'Kenya' => 'Kenya',
+'Kiribati' => 'Kiribati',
+'Korea, Republic of' => 'Korea, Republic of',
+'Korea (South)' => 'Korea (South)',
+'Kuwait' => 'Kuwait',
+'Kyrgyzstan' => 'Kyrgyzstan',
+"Lao People's Democratic Republic" => "Lao People's Democratic Republic",
+'Latvia' => 'Latvia',
+'Lebanon' => 'Lebanon',
+'Lesotho' => 'Lesotho',
+'Liberia' => 'Liberia',
+'Libya' => 'Libya',
+'Liechtenstein' => 'Liechtenstein',
+'Lithuania' => 'Lithuania',
+'Luxembourg' => 'Luxembourg',
+'Macau' => 'Macau',
+'Macedonia' => 'Macedonia',
+'Madagascar' => 'Madagascar',
+'Malawi' => 'Malawi',
+'Malaysia' => 'Malaysia',
+'Maldives' => 'Maldives',
+'Mali' => 'Mali',
+'Malta' => 'Malta',
+'Marshall Islands' => 'Marshall Islands',
+'Martinique' => 'Martinique',
+'Mauritania' => 'Mauritania',
+'Mauritius' => 'Mauritius',
+'Mayotte' => 'Mayotte',
+'Mexico' => 'Mexico',
+'Micronesia, Federated States of' => 'Micronesia, Federated States of',
+'Moldova, Republic of' => 'Moldova, Republic of',
+'Monaco' => 'Monaco',
+'Mongolia' => 'Mongolia',
+'Montserrat' => 'Montserrat',
+'Morocco' => 'Morocco',
+'Mozambique' => 'Mozambique',
+'Myanmar' => 'Myanmar',
+'Namibia' => 'Namibia',
+'Nauru' => 'Nauru',
+'Nepal' => 'Nepal',
+'Netherlands' => 'Netherlands',
+'Netherlands Antilles' => 'Netherlands Antilles',
+'New Caledonia' => 'New Caledonia',
+'New Zealand' => 'New Zealand',
+'Nicaragua' => 'Nicaragua',
+'Niger' => 'Niger',
+'Nigeria' => 'Nigeria',
+'Niue' => 'Niue',
+'Norfolk Island' => 'Norfolk Island',
+'Northern Ireland' => 'Northern Ireland',
+'Northern Mariana Islands' => 'Northern Mariana Islands',
+'Norway' => 'Norway',
+'Oman' => 'Oman',
+'Pakistan' => 'Pakistan',
+'Palau' => 'Palau',
+'Panama' => 'Panama',
+'Papua New Guinea' => 'Papua New Guinea',
+'Paraguay' => 'Paraguay',
+'Peru' => 'Peru',
+'Philippines' => 'Philippines',
+'Pitcairn' => 'Pitcairn',
+'Poland' => 'Poland',
+'Portugal' => 'Portugal',
+'Puerto Rico' => 'Puerto Rico',
+'Qatar' => 'Qatar',
+'Reunion' => 'Reunion',
+'Romania' => 'Romania',
+'Russia' => 'Russia',
+'Russian Federation' => 'Russian Federation',
+'Rwanda' => 'Rwanda',
+'Saint Kitts and Nevis' => 'Saint Kitts and Nevis',
+'Saint Lucia' => 'Saint Lucia',
+'Saint Vincent and the Grenadines' => 'Saint Vincent and the Grenadines',
+'Samoa (Independent)' => 'Samoa (Independent)',
+'San Marino' => 'San Marino',
+'Sao Tome and Principe' => 'Sao Tome and Principe',
+'Saudi Arabia' => 'Saudi Arabia',
+'Scotland' => 'Scotland',
+'Senegal' => 'Senegal',
+'Serbia and Montenegro' => 'Serbia and Montenegro',
+'Seychelles' => 'Seychelles',
+'Sierra Leone' => 'Sierra Leone',
+'Singapore' => 'Singapore',
+'Slovakia' => 'Slovakia',
+'Slovenia' => 'Slovenia',
+'Solomon Islands' => 'Solomon Islands',
+'Somalia' => 'Somalia',
+'South Africa' => 'South Africa',
+'South Georgia and the South Sandwich Islands' => 'South Georgia and the South Sandwich Islands',
+'South Korea' => 'South Korea',
+'Spain' => 'Spain',
+'Sri Lanka' => 'Sri Lanka',
+'St. Helena' => 'St. Helena',
+'St. Pierre and Miquelon' => 'St. Pierre and Miquelon',
+'Suriname' => 'Suriname',
+'Svalbard and Jan Mayen Islands' => 'Svalbard and Jan Mayen Islands',
+'Swaziland' => 'Swaziland',
+'Sweden' => 'Sweden',
+'Switzerland' => 'Switzerland',
+'Taiwan' => 'Taiwan',
+'Tajikistan' => 'Tajikistan',
+'Tanzania' => 'Tanzania',
+'Thailand' => 'Thailand',
+'Togo' => 'Togo',
+'Tokelau' => 'Tokelau',
+'Tonga' => 'Tonga',
+'Trinidad' => 'Trinidad',
+'Trinidad and Tobago' => 'Trinidad and Tobago',
+'Tunisia' => 'Tunisia',
+'Turkey' => 'Turkey',
+'Turkmenistan' => 'Turkmenistan',
+'Turks and Caicos Islands' => 'Turks and Caicos Islands',
+'Tuvalu' => 'Tuvalu',
+'Uganda' => 'Uganda',
+'Ukraine' => 'Ukraine',
+'United Arab Emirates' => 'United Arab Emirates',
+'United Kingdom' => 'United Kingdom',
+'United States' => 'United States',
+'United States Minor Outlying Islands' => 'United States Minor Outlying Islands',
+'Uruguay' => 'Uruguay',
+'Uzbekistan' => 'Uzbekistan',
+'Vanuatu' => 'Vanuatu',
+'Vatican City State (Holy See)' => 'Vatican City State (Holy See)',
+'Venezuela' => 'Venezuela',
+'Viet Nam' => 'Viet Nam',
+'Virgin Islands (British)' => 'Virgin Islands (British)',
+'Virgin Islands (U.S.)' => 'Virgin Islands (U.S.)',
+'Wales' => 'Wales',
+'Wallis and Futuna Islands' => 'Wallis and Futuna Islands',
+'Western Sahara' => 'Western Sahara',
+'Yemen' => 'Yemen',
+'Zambia' => 'Zambia',
+'Zimbabwe' => 'Zimbabwe'
+	);
+	return \%countries;
+}
 
 #------------------------------------------------------------------
 sub removeFromScratchCart {
@@ -1860,7 +2128,7 @@ sub www_editEventSave {
 		maximumAttendees => $self->session->form->get("maximumAttendees"),
 		approved	=> $self->session->form->get("approved"),
 		imageId		=> $storageId,
-		prerequisiteId => $self->session->form->process("prerequisiteId","selectBox")
+		prerequisiteId => $self->session->form->process("prerequisiteId",'selectBox')
 	},1,1);
 
 	#Save the event metadata
@@ -2418,7 +2686,7 @@ sub www_saveRegistration {
 		$u->profileField('homeAddress',$address);
 		$u->profileField('homeCity',$city);
 		$u->profileField('homeState',$state);
-		$u->profileField('homeZipCode',$zipCode);
+		$u->profileField('homeZip',$zipCode);
 		$u->profileField('homeCountry',$country);
 		$u->profileField('homePhone',$phoneNumber);
 		$u->profileField('email',$email);
@@ -3023,6 +3291,38 @@ sub www_editPrereqSetSave {
 		$self->session->db->write("insert into EventManagementSystem_prerequisiteEvents values (?,?)",[$psid,$_]);
 	}
 	return $self->www_managePrereqSets();
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 www_manageRegistrants ( )
+
+Method to display the registrant management console.
+
+=cut
+
+sub www_manageRegistrants {
+	my $self = shift;
+
+	return $self->session->privilege->insufficient unless ($self->canAddEvents);
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
+	
+	my $output;
+	my $sql = "select * from EventManagementSystem_badges order by lastName";
+	
+
+	while (my %row = $sth->hash) {
+		$output .= "<div>";
+	#	$output .= $self->session->icon->delete('func=deleteRegistrant;psid='.$row{prerequisiteId}, $self->getUrl,
+	#					       $i18n->echo('are you sure you want to delete this prerequisite set  this will also unlink any events that are currently set to require this prerequisite set'));
+		$output .= $self->session->icon->edit('func=editRegistrant;badgeId='.$row{badgeId}, $self->getUrl).
+			"&nbsp;&nbsp;".$row{lastName}.",&nbsp;".$row{firstName}."(&nbsp;".$row{email}.")</div>";
+	}
+	
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editPrereqSet;psid=new'), $i18n->echo('add prerequisite set'));
+
+	return $self->_acWrapper($output, $i18n->echo("manage registrants"));
 }
 
 
