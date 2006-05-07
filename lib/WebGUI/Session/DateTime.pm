@@ -867,13 +867,17 @@ A string in the format of YYYY-MM-DD or YYYY-MM-DD HH:MM:SS.
 
 sub setToEpoch {
 	my $self = shift;
-        my $set = shift;
-        return undef unless $set;
+    my $set = shift;
+    return undef unless $set;
 	my $parser = DateTime::Format::Strptime->new( pattern => '%Y-%m-%d %H:%M:%S' );
 	my $dt = $parser->parse_datetime($set);
 	unless ($dt) {
 		$parser = DateTime::Format::Strptime->new( pattern => '%Y-%m-%d' );
 		$dt = $parser->parse_datetime($set);
+	}
+	unless ($dt) {
+	   $self->session->errorHandler->warn("Could not format date $set for epoch.  Returning current time");
+	   return $self->time() 
 	}
 	# in epochToSet we apply the user's time zone, so now we have to remove it.
 	$dt->set_time_zone($self->session->user->profileField("timeZone")|| "America/Chicago"); # assign the user's timezone
