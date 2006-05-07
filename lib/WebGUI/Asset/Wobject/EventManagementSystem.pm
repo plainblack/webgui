@@ -782,17 +782,17 @@ sub getBadgeSelector {
 	
 	if ($isAdmin) {
 		# all badges in the system.
-		$badges = $self->session->db->buildHashRef("select badgeId, CONCAT(lastName,', ',firstName) from EventManagementSystem_badges order by lastName");
+		$badges = $self->session->db->buildHashRef("select badgeId, CONCAT(lastName,', ',firstName,' (',email,')') from EventManagementSystem_badges order by lastName");
 	} elsif ($me eq '1') {
 		#none
 		$badges = {};
 		%options = ();
 	} else {
 		#badges we have purchased.
-		$badges = $self->session->db->buildHashRef("select b.badgeId, CONCAT(b.lastName,', ',b.firstName) from EventManagementSystem_badges as b where b.userId='".$me."' or b.createdByUserId='".$me."' order by b.lastName");
+		$badges = $self->session->db->buildHashRef("select b.badgeId, CONCAT(b.lastName,', ',b.firstName,' (',email,')') from EventManagementSystem_badges as b where b.userId='".$me."' or b.createdByUserId='".$me."' order by b.lastName");
 	}
 	if ($addBadgeId) {
-		$badges = $self->session->db->buildHashRef("select badgeId, CONCAT(lastName,', ',firstName) from EventManagementSystem_badges where badgeId=?",[$addBadgeId]);
+		$badges = $self->session->db->buildHashRef("select badgeId, CONCAT(lastName,', ',firstName,' (',email,')') from EventManagementSystem_badges where badgeId=?",[$addBadgeId]);
 		%options = ();
 	}
 	my $js;
