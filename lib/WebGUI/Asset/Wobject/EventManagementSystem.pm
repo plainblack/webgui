@@ -2994,7 +2994,7 @@ sub www_manageRegistrants {
 	my $sql = "select * from EventManagementSystem_badges order by lastName";
 	my $p = WebGUI::Paginator->new($self->session,$self->getUrl('func=manageRegistrants'));
 	$p->setDataByArrayRef($self->session->db->buildArrayRefOfHashRefs($sql));
-	
+	my $sth;
 
 	while (my %row = $sth->hash) {
 		$output .= "<div>";
