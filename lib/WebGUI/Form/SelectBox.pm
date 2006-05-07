@@ -75,6 +75,9 @@ sub definition {
 		formName=>{
 			defaultValue=>$i18n->get("487"),
 			},
+		defaultValue=>{
+			defaultValue=>'', # gotta be a scalar, not an arrayref.
+			},
 		size=>{
 			defaultValue=>1,
 			},
