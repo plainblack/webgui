@@ -409,8 +409,8 @@ sub checkoutForm {
 	$f->selectBox(
 		-name=>"country",
 		-label=>$i18n->get("country"),
-		-value=>[$self->session->form->process("country")],
-		-defaultValue=>[$u->profileField("homeCountry")],
+		-value=>$self->session->form->process("country"),
+		-defaultValue=>$u->profileField("homeCountry"),
 		-options=>\%countries
 		);
     #For some odd reason, defaultValue needs to come before value here or value displays the text "-defaultValue".  Bug is reported.
