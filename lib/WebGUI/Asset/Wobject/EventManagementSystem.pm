@@ -3016,7 +3016,7 @@ sub www_editRegistrant {
 			userId => $self->session->var->get('userId'),
 			firstName => $self->session->form->get("firstName", "text"),
 			lastName => $self->session->form->get("lastName", "text"),
-			address = $self->session->form->get("address", "text"),
+			'address' = $self->session->form->get("address", "text"),
 			city = $self->session->form->get("city", "text"),
 			state = $self->session->form->get("state", "text"),
 			zipCode = $self->session->form->get("zipCode", "text"),
