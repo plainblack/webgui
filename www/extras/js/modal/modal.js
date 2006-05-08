@@ -105,13 +105,14 @@ function initPopUp() {
 	// Add the HTML to the body
 	body = document.getElementsByTagName('body')[0];
 	popmask = document.createElement('div');
+    if (!popTitle) popTitle = "";
 	popmask.id = 'popupMask';
 	popcont = document.createElement('div');
 	popcont.id = 'popupContainer';
 	popcont.innerHTML = '' +
 		'<div id="popupInner">' +
 			'<div id="popupTitleBar">' +
-				'<div id="popupTitle"></div>' +
+				'<div id="popupTitle">' + popTitle + '</div>' +
 				'<div id="popupControls">' +
 					'<img src="'+closeImage()+'" onclick="hidePopWin(false);" />' +
 				'</div>' +
@@ -152,6 +153,7 @@ function initPopUp() {
 			}
 		}
 	}
+	hidePopWin();
 }
 
 
@@ -196,7 +198,7 @@ function showPopWin(url, width, height, returnFunc) {
 		hideSelectBoxes();
 	}
 	
-	window.setTimeout("setPopTitle();", 600);
+//	window.setTimeout("setPopTitle();", 600);
 }
 
 //
@@ -227,9 +229,9 @@ function centerPopWin(width, height) {
 		
 		var titleBarHeight = parseInt(document.getElementById("popupTitleBar").offsetHeight, 10);
 		
-		gPopupContainer.style.top = (scTop + ((fullHeight - (height+titleBarHeight)) / 2)) + "px";
-		gPopupContainer.style.left =  (scLeft + ((fullWidth - width) / 2)) + "px";
-		//alert(fullWidth + " " + width + " " + gPopupContainer.style.left);
+		gPopupContainer.style.top = "100px"; //(scTop + ((fullHeight - (height+titleBarHeight)) / 2)) + "px";
+		gPopupContainer.style.left =  "100px"; //(scLeft + ((fullWidth - width) / 4)) + "px";
+		//alert(scTop + " " + fullWidth + " " + height + " " + " " + titleBarHeight + " " + gPopupContainer.style.top);
 	}
 }
 addEvent(window, "resize", centerPopWin);
