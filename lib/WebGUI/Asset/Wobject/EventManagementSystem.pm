@@ -1692,7 +1692,7 @@ sub www_editEvent {
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 
 	my $event = $self->session->db->quickHashRef("
-		select p.productId, p.title, p.description, p.price, p.weight, p.sku, p.templateId, p.skuTemplate, e.prerequisiteId,
+		select p.productId, p.title, p.description, p.price, p.weight, p.sku, p.templateId, p.skuTemplate, e.prerequisiteId, e.passType, e.passId,
 		       e.startDate, e.endDate, e.maximumAttendees, e.approved
 		from
 		       products as p, EventManagementSystem_products as e
