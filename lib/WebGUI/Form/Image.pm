@@ -126,15 +126,15 @@ sub displayValue {
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromFormPost ( )
+=head2 getValueFromPost ( )
 
-See WebGUI::Form::File::getValueFromFormPost() for details. Generates a thumbnail.
+See WebGUI::Form::File::getValueFromPost() for details. Generates a thumbnail.
 
 =cut
 
-sub getValueFromFormPost {
+sub getValueFromPost {
 	my $self = shift;
-	my $id = $self->SUPER::getValueFromFormPost(@_);
+	my $id = $self->SUPER::getValueFromPost(@_);
 	if (defined $id) {
 		my $storage = WebGUI::Storage::Image->get($self->session, $id);
 		if (defined $storage) {
