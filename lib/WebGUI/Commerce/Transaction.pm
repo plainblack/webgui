@@ -339,7 +339,7 @@ sub getTransactions {
 	
 	$sql = 'select transactionId from transaction';
 	$sql .= ' where '.join(' and ', @constraints) if (@constraints);
-	
+	$sql .= ' order by initDate desc';
 	@transactionIds = $self->session->db->buildArray($sql);
 
 	foreach (@transactionIds) {
