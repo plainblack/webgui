@@ -1837,7 +1837,7 @@ sub www_editEvent {
 		$f->radioList(
 			-name=>'passType',
 			-options=>\%passOptions,
-			-vertical=1,
+			-vertical=>1,
 			-extras=>' onclick="changePassType();" ',
 			-subtext=>'<script type="text/javascript">
 var passIdRow = document.getElementById("passIdRow");
