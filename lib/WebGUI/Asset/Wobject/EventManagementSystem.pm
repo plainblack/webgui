@@ -2582,11 +2582,9 @@ sub www_search {
 					$joins .= " left join EventManagementSystem_metaData joinedField$count on e.productId=joinedField$count.productId and joinedField$count.fieldId='$fieldId'";
 					push(@joined,$fieldId);
 				}
-			#	$selects .= ", joinedField$count.fieldData as joinedField".$count.'a';
 				$phrase = " joinedField".$count.".fieldData ";
 				$searchPhrases .= " ".$phrase." ".$value;
 			} else {
-				# shouldn't need to join anything else
 				$phrase = $field->{tableName}.'.'.$field->{columnName};
 				if ($compareType ne 'numeric') {
 					$searchPhrases .= " lower(".$phrase.") ".$value;
@@ -2595,10 +2593,8 @@ sub www_search {
 				}
 			}
 		}
-		#$searchPhrases &&= " and ( ".$searchPhrases." )";
 	}
 	$searchPhrases &&= " and ( ".$searchPhrases." )";
-	# $self->session->errorHandler->warn("searchPhrases: $searchPhrases<br />basicSearch: $basicSearch<br />");
 	# Get the products available for sale for this page
 	my $approvalPhrase = ($self->canApproveEvents)?' ':' and approved=1';
 	my $sql = "select p.productId, p.title, p.description, p.price, p.templateId, p.weight, p.sku, p.skuTemplate, e.approved, e.maximumAttendees, e.startDate, e.endDate, e.prerequisiteId $selects
@@ -2607,9 +2603,6 @@ sub www_search {
 		   where
 		   	p.productId = e.productId $approvalPhrase
 		   	and e.assetId =".$self->session->db->quote($self->get("assetId")).$searchPhrases. " order by sequenceNumber";
-#		   	." 
-#			and p.productId not in (select distinct(productId) from EventManagementSystem_prerequisites)";		
-
 	$var{'basicSearch.formHeader'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl("func=search;advSearch=0")}).
 					 WebGUI::Form::hidden($self->session,{name=>"subSearch", value => $self->session->form->get("subSearch")}).
 					 WebGUI::Form::hidden($self->session,{name => "cfilter_s0", value => "requirement"}).
@@ -2661,7 +2654,6 @@ sub www_search {
 		}
 		push(@results,$data) if $shouldPush;
 	}
-	#$self->session->errorHandler->warn("<pre>".Dumper(@results)."</pre>");
 	$sth->finish;
 	my $maxResultsForInitialDisplay = 50000;
 	my $numSearchResults = scalar(@results);
@@ -2743,7 +2735,6 @@ sub www_search {
 		} else { #User sub events large resultset
 			$message = $i18n->get('User sub events large resultset');   
 		}
-
 	} elsif ($numSearchResults <= $maxResultsForInitialDisplay || $paginationFlag || $hasSearchedFlag) {
 		$message = $i18n->get('option to narrow');
 	} elsif ($numSearchResults > $maxResultsForInitialDisplay && !$paginationFlag) {
@@ -2754,12 +2745,12 @@ sub www_search {
 	$var{'message'} = $message;
 	$var{'numberOfSearchResults'} = $numSearchResults;
 	$var{'continue.url'} = $self->getUrl('func=addToCart;pid=_noid_') if $somethingInScratch;
-	$var{'continue.label'} = "Continue" if $somethingInScratch;
-	$var{'name.label'} = "Event";
-	$var{'starts.label'} = "Starts";
-	$var{'ends.label'} = "Ends";
-	$var{'price.label'} = "Price";
-	$var{'seats.label'} = "Seats Available";
+	$var{'continue.label'} = $i18n->echo("Continue") if $somethingInScratch;
+	$var{'name.label'} = $i18n->echo("Event");
+	$var{'starts.label'} = $i18n->echo("Starts");
+	$var{'ends.label'} = $i18n->echo("Ends");
+	$var{'price.label'} = $i18n->echo("Price");
+	$var{'seats.label'} = $i18n->echo("Seats Available");
 	$var{'addToBadgeMessage'} = $addToBadgeMessage;
 
 	$p->appendTemplateVars(\%var);
@@ -2789,7 +2780,6 @@ sub view {
 		   	p.productId = e.productId and approved=1
 		   	and e.assetId =".$self->session->db->quote($self->get("assetId"))."
 			and (e.prerequisiteId is NULL or e.prerequisiteId = '')";
-			#and p.productId not in (select distinct(productId) from EventManagementSystem_prerequisites) order by sequenceNumber";		
 
 	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->get("paginateAfter"));
 	$p->setDataByQuery($sql);
@@ -2992,20 +2982,17 @@ sub www_manageRegistrants {
 	
 	my $output;
 	my $sql = "select * from EventManagementSystem_badges order by lastName";
-	my $p = WebGUI::Paginator->new($self->session,$self->getUrl('func=manageRegistrants'));
+	my $p = WebGUI::Paginator->new($self->session,$self->getUrl('func=manageRegistrants'),50);
 	$p->setDataByArrayRef($self->session->db->buildArrayRefOfHashRefs($sql));
-	my $sth;
-
-	while (my %row = $sth->hash) {
+	my $data = $p->getPageData;
+	foreach (@$data) {
 		$output .= "<div>";
-	#	$output .= $self->session->icon->delete('func=deleteRegistrant;psid='.$row{prerequisiteId}, $self->getUrl,
-	#					       $i18n->echo('are you sure you want to delete this prerequisite set  this will also unlink any events that are currently set to require this prerequisite set'));
-		$output .= $self->session->icon->edit('func=editRegistrant;badgeId='.$row{badgeId}, $self->getUrl).
-			"&nbsp;&nbsp;".$row{lastName}.",&nbsp;".$row{firstName}."(&nbsp;".$row{email}.")</div>";
+	#	$output .= $self->session->icon->delete('func=deleteRegistrant;psid='.$_->{badgeId}, $self->getUrl);
+		$output .= $self->session->icon->edit('func=editRegistrant;badgeId='.$_->{badgeId}, $self->getUrl).
+			"&nbsp;&nbsp;".$_->{lastName}.",&nbsp;".$_->{firstName}."(&nbsp;".$_->{email}.")</div>";
 	}
-	
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editPrereqSet;psid=new'), $i18n->echo('add prerequisite set'));
-
+	$output .= '<div>'.$p->getBarAdvanced.'</div>';
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editRegistrant;badgeId=new'), $i18n->echo('add registrant'));
 	return $self->_acWrapper($output, $i18n->echo("manage registrants"));
 }
 
