@@ -3045,6 +3045,7 @@ sub www_editRegistrant {
 		subtext=>'<script type="text/javascript">
 var userField = document.getElementById("userId_formId");
 var userFieldDisplay = document.getElementById("userId_formId_display");
+if (userField.value == "1") userFieldDisplay.value="";
 function clearUserField() {
 	userField.value="";
 	userFieldDisplay.value="";
