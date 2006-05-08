@@ -57,6 +57,10 @@ The name of the field. Defaults to "userId".
 
 Defaults to "User".
 
+=head4 readOnly
+
+Defaults to 0.  Use for displaying a read-only user field.
+
 =cut
 
 sub definition {
@@ -73,6 +77,9 @@ sub definition {
 			},
 		name=>{
 			defaultValue=>"userId",
+			},
+		readOnly=>{
+			defaultValue=>0,
 			},
 		});
         return $class->SUPER::definition($session, $definition);
@@ -101,10 +108,10 @@ sub toHtml {
                         value=>$user->username,
 			id=>$self->get('id')."_display"
                         )->toHtml
-                .WebGUI::Form::Button->new($self->session,
+                .($self->get('readOnly')?'':WebGUI::Form::Button->new($self->session,
                         value=>"...",
                         extras=>'onclick="window.open(\''.$self->session->url->page("op=formUsers;formId=".$self->get('id')).'\',\'userPicker\',\'toolbar=no, location=no, status=no, directories=no, width=400, height=400\');"'
-                        )->toHtml;
+                        )->toHtml);
 }
 
 1;
