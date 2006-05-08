@@ -1588,7 +1588,7 @@ sub www_editEvent {
 			-options=>\%discountPasses,
 			-label=>$i18n->get('assigned discount pass'),
 			-hoverHelp=>$i18n->get('assigned discount pass description'),
-			-value=>$self->session->form->get("passId") || $event->{passId},
+			-value=>scalar($self->session->form->process("passId",'selectList'))?[($self->session->form->process("passId",'selectList'))]:[split(/::/,$event->{passId})],
 			-subtext=>'<script type="text/javascript">
 function getChosenType() {
 	var i = 0;
@@ -1604,6 +1604,14 @@ function changePassType() {
 	if (passType == "") {
 		passIdRow.style.display="none";
 	} else {
+		passIdRow.style.display="none";
+		var passIdChooser = document.getElementById("passId_formId");
+		if (passType == "member") {
+			passIdChooser.multiple=1;
+			passIdChooser.size=5;
+		} else {
+			passIdChooser.multiple=0;
+		}
 		passIdRow.style.display="";
 	}
 }
@@ -1686,7 +1694,7 @@ sub www_editEventSave {
 		endDate	=> $self->session->form->process("endDate",'dateTime'),
 		maximumAttendees => $self->session->form->get("maximumAttendees"),
 		approved	=> $self->session->form->get("approved"),
-		passId	=> $self->session->form->process("passId",'selectBox'),
+		passId	=> join('::',$self->session->form->process("passId",'selectList')),
 		passType	=> $self->session->form->get("passType",'radioList'),
 		imageId		=> $storageId,
 		prerequisiteId => $self->session->form->process("prerequisiteId",'selectBox')
