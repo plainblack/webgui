@@ -3054,41 +3054,49 @@ function setUserNew() {
 <input type="button" onclick="clearUserField();" value="'.$i18n->echo('Unlink User').'" /><input type="button" onclick="setUserNew();" value="'.$i18n->echo('Create New User').'" />');
 	$f->text(
 		name=>'firstName',
-		label=>$i18n->get("first name")
+		label=>$i18n->get("first name"),
+		value=>$data->{firstName}
 	);
 	$f->text(
 		name=>'lastName',
-		label=>$i18n->get("last name")
+		label=>$i18n->get("last name"),
+		value=>$data->{lastName}
 	);
 	$f->text(
 		name=>'address',
-		label=>$i18n->get("address")
+		label=>$i18n->get("address"),
+		value=>$data->{address}
 	);
 	$f->text(
 		name=>'city',
-		label=>$i18n->get("city")
+		label=>$i18n->get("city"),
+		value=>$data->{city}
 	);
 	$f->text(
 		name=>'state',
-		label=>$i18n->get("state")
+		label=>$i18n->get("state"),
+		value=>$data->{state}
 	);
 	$f->text(
 		name=>'zipCode',
-		label=>$i18n->get("zip code")
+		label=>$i18n->get("zip code"),
+		value=>$data->{zipCode}
 	);
 	$f->selectBox(
 		name=>'country',
 		options => $self->getCountries,
-		value=>'United States',
-		label=>$i18n->get("country")
+		label=>$i18n->get("country"),
+		value=>$data->{country} || 'United States'
 	);
 	$f->phone(
 		name=>'phone',
-		label=>$i18n->get("phone number")
+		label=>$i18n->get("phone number"),
+		value=>$data->{phone}
 	);
 	$f->email(
 		name=>'email',
-		label=>$i18n->get("email address")
+		label=>$i18n->get("email address"),
+		value=>$data->{email}
 	);
 	$f->submit;
 	return $self->_acWrapper($f->print, $i18n->echo("edit registrant"));
