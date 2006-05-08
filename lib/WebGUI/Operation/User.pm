@@ -535,7 +535,7 @@ sub www_formUsers {
 	$session->http->setCacheControl("none");
 	return $session->privilege->insufficient() unless $session->user->isInGroup(12);
 	$session->style->useEmptyStyle("1");
-	my $output = getUserSearchForm($session,"formUsers",undef,1);
+my $output = getUserSearchForm($session,"formUsers",{formId=>$session->form->process("formId")},1);
 	my ($userCount) = $session->db->quickArray("select count(*) from users");
 	return $output unless ($session->form->process("doit") || $userCount<250 || $session->form->process("pn") > 1);
 	$output .= '<ul>';
