@@ -49,7 +49,7 @@ The following additional parameters have been added via this sub class.
 
 =head4 name
 
-The identifier for this field. Defaults to "templateId".
+The identifier for this field. Defaults to "country".
 
 =cut
 
@@ -79,7 +79,7 @@ sub definition {
 
 =head2 toHtml ( )
 
-Renders a template picker control.
+Renders a country picker control.
 
 =cut
 
