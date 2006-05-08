@@ -1,4 +1,4 @@
-package WebGUI::Form::HexSlider;
+package WebGUI::Form::SelectSlider;
 
 =head1 LEGAL
 
@@ -36,39 +36,6 @@ The following methods are specifically available from this class. Check the supe
 
 =cut
 
-#-------------------------------------------------------------------
-
-=head2 definition ( [ additionalTerms ] )
-
-See the super class for additional details.
-
-=head3 additionalTerms
-
-The following additional parameters have been added via this sub class.
-
-=head4 maximum
-
-Defaults to "ff". The maximum that the slider can go to.
-
-=head4 minimum
-
-Defaults to "00". The minimum value that the slider can go to.
-
-=head4 size
-
-The length of the input box.
-
-=head4 padLength
-
-Pad the value to padLength characters by adding zeros in front if necesarry.
-
-=head4 profileEnabled
-
-Flag that tells the User Profile system that this is a valid form element in a User Profile
-
-
-=cut
-
 sub definition {
 	my $class = shift;
 	my $session = shift;
@@ -76,25 +43,32 @@ sub definition {
 	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
 		formName=>{
-			defaultValue=> $i18n->get("hex slider")
+			defaultValue=> $i18n->get("select slider")
 			},
-		maximum=>{
-			defaultValue=> "ff",
+		options =>{
+			defaultValue=>{},
 			},
-		minimum=>{
-			defaultValue=> "00",
-			},
-		size=>{
-			defaultValue=>11,
-			},
-		padLength=>{
-			defaultValue=>"2",
-			},
+		value	=>{
+			defaultValue=>[],
+		},
 		profileEnabled=>{
 			defaultValue=>1
 			},
 		});
         return $class->SUPER::definition($session, $definition);
+}
+
+#-------------------------------------------------------------------
+=head2 getDisplayValue
+
+Returns the value that should be displayed initially.
+
+=cut
+
+sub getDisplayValue {
+	my $self = shift;
+
+	return $self->get('options')->{$self->get('value')->[0]};
 }
 
 #-------------------------------------------------------------------
@@ -107,11 +81,12 @@ Returns the form element used for manual input.
 sub getInputElement {
 	my $self = shift;
 
-	return WebGUI::Form::hexadecimal($self->session, {
-		name	=> $self->get('name'),
-		value	=> $self->get('value'),
-		size	=> $self->get('size'),
-		id	=> 'view-'.$self->get('id'),
+	return WebGUI::Form::selectList($self->session, {
+		-name	=> $self->get('name'),
+		-value	=> $self->get('value'),
+		-options=> $self->get('options'),
+		-id	=> 'view-'.$self->get('id'),
+		-size	=> 1,
 	});
 }
 
@@ -126,14 +101,9 @@ change of the imput element.
 sub getOnChangeInputElement {
 	my $self = shift;
 	
-	my $padLength = $self->get('padLength');
-	
 	return 
-		'while (this.value.length < '.$padLength.') { '.
-			'this.value = \'0\' + this.value'.
-		'};'.
-		$self->getSliderVariable.'.setValue(parseInt(this.value,16));'.
-		$self->getDisplayVariable.'.innerHTML = this.value';
+		$self->getSliderVariable.'.setValue(this.selectedIndex);'.
+		$self->getDisplayVariable.'.innerHTML = this.options[this.selectedIndex].text;';
 }
 
 #-------------------------------------------------------------------
@@ -146,14 +116,9 @@ Returns the javascript code to update the form on a change of slider position.
 sub getOnChangeSlider {
 	my $self = shift;
 	
-	my $padLength = $self->get('padLength');
-	
 	return 
-		$self->getInputVariable.'.value = this.getValue().toString(16);'.
-		'while ('.$self->getInputVariable.'.value.length < '.$padLength.') { '.
-			$self->getInputVariable.'.value = \'0\' + '.$self->getInputVariable.'.value'.
-		'};'.
-		$self->getDisplayVariable.'.innerHTML = this.getValue().toString(16);';
+		$self->getInputVariable.'.selectedIndex = this.getValue();'.
+		$self->getDisplayVariable.'.innerHTML = '.$self->getInputVariable.'.options[this.getValue()].text;';
 }
 
 #-------------------------------------------------------------------
@@ -170,20 +135,7 @@ sub getSliderMaximum {
 }
 
 #-------------------------------------------------------------------
-=head2 getSliderMaximum
-
-Returns the minimum value the slider can be set to in slider units.
-
-=cut
-
-sub getSliderMaximum {
-	my $self = shift;
-
-	return hex($self->get('maximum'));
-}
-
-#-------------------------------------------------------------------
-=head2 getSliderMaximum
+=head2 getSliderMinimum
 
 Returns the minimum value the slider can be set to in slider units.
 
@@ -192,7 +144,7 @@ Returns the minimum value the slider can be set to in slider units.
 sub getSliderMinimum {
 	my $self = shift;
 
-	return hex($self->get('minimum'));
+	return '0';
 }
 
 #-------------------------------------------------------------------
@@ -205,27 +157,39 @@ Returns the initial position of the slider in slider units.
 sub getSliderValue {
 	my $self = shift;
 
-	return hex($self->get('value'));
+	my @keys = keys %{$self->get('options')};
+	for (my $i = 0; $i < @keys; $i++) {
+		return $i if $keys[$i] eq $self->get('value')->[0];
+	}
+
+	return undef;
 }
 
 #-------------------------------------------------------------------
+
 =head2 getValueFromPost ( )
 
-Retrieves a value from a form GET or POST and returns it. If the value comes back as undef, this method will return the defaultValue instead.  Strip newlines/carriage returns from the value.
+Retrieves a value from a form GET or POST and returns it. If the value comes
+back as undef, this method will return the defaultValue instead. Strip
+newlines/carriage returns from the value.
 
 =cut
 
 sub getValueFromPost {
 	my $self = shift;
 
-	my $properties = {
-		name	=> $self->get('name'),
-		value	=> $self->get('value'),
-		size	=> $self->get('size'),
-		id	=> 'view-'.$self->get('id'),
+	my $properties =  {
+		-name	=> $self->get('name'),
+		-value	=> $self->get('value'),
+		-options=> $self->get('options'),
+		-id	=> 'view-'.$self->get('id'),
+		-size	=> 1,
 	};
-	
-	return WebGUI::Form::hexadecimal->new($self->session, $properties)->getValueFromPost;
+
+	return WebGUI::Form::selectList->new($self->session, $properties)->getValueFromPost;
 }
 
+
+
 1;
+

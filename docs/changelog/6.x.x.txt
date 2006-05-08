@@ -141,6 +141,8 @@
  - fix [ 1480536 ] "Add Files" link in Folder template doesn't work (Martin
    Kamerbeek / Procolix)
  - Added a graphing engine and tied it into the Poll asset (Martin Kamerbeek / Procolix)
+ - Added Slider form controls (IntSlider, HexSlider and SelectSlider) (Martin
+   Kamerbeek / Procolix)
 
 6.8.8
  - fix [ 1452466 ] File size not set in File asset (Thanks to Eric S)

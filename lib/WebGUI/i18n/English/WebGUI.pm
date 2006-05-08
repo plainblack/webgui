@@ -3947,6 +3947,25 @@ Get a copy of wget and use this: <code>wget -p -r --html-extension -k http://the
 		lastUpdated => 1145658316,
 	},
 
+	'hex slider' => {
+		message => q|Hex slider|,
+		lastUpdated => 0,
+	},
+
+	'int slider' => {
+		message => q|Int slider|,
+		lastUpdated => 0,
+	},
+
+	'select slider' => {
+		message => q|Select slider|,
+		lastUpdated => 0,
+	},
+
+	'hexadecimal' => {
+		message => q|Hexadecimal|,
+		lastUpdated => 0,
+	},
 
 };
 
