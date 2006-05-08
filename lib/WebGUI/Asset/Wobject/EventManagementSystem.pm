@@ -3016,13 +3016,13 @@ sub www_editRegistrant {
 			userId => $self->session->var->get('userId'),
 			firstName => $self->session->form->get("firstName", "text"),
 			lastName => $self->session->form->get("lastName", "text"),
-			'address' = $self->session->form->get("address", "text"),
-			city = $self->session->form->get("city", "text"),
-			state = $self->session->form->get("state", "text"),
-			zipCode = $self->session->form->get("zipCode", "text"),
-			country = $self->session->form->get("country", "selectBox"),
-			phoneNumber = $self->session->form->get("phone", "phone"),
-			email = $self->session->form->get("email", "email")
+			'address' => $self->session->form->get("address", "text"),
+			city => $self->session->form->get("city", "text"),
+			state => $self->session->form->get("state", "text"),
+			zipCode => $self->session->form->get("zipCode", "text"),
+			country => $self->session->form->get("country", "selectBox"),
+			phoneNumber => $self->session->form->get("phone", "phone"),
+			email => $self->session->form->get("email", "email")
 		};
 		$f->readOnly(
 			-name => 'error',
