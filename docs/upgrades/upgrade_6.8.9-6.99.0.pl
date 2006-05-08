@@ -705,6 +705,8 @@ create table EventManagementSystem_products (
  sequenceNumber int(11),
  imageId varchar(22) binary,
  prerequisiteId varchar(22) binary,
+ passId varchar(22) binary,
+ passType varchar(10),
 primary key(productId)
 )
 SQL2
@@ -794,6 +796,17 @@ primary key(badgeId)
 )
 SQL9
 
+
+my $sql10 = <<SQL10;
+create table EventManagementSystem_discountPasses (
+ passId varchar(22) binary not null,
+ name varchar(100),
+ amount varchar(22),
+ type int(4),
+primary key(passId)
+)
+SQL10
+
 	print "\tAdding the Event Management System.\n" unless ($quiet);
 	$session->db->write($sql1);
 	$session->db->write($sql2);
@@ -804,6 +817,7 @@ SQL9
 	$session->db->write($sql7);
 	$session->db->write($sql8);
 	$session->db->write($sql9);
+	$session->db->write($sql10);
 	
 	my $workflow = WebGUI::Workflow->create($session, {
 		isSerial=>1,
