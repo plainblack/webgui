@@ -74,7 +74,7 @@ sub _getFieldHash {
 			initial=>1
 		},
 		"price"=>{
-			name=>$i18n->get("add/edit event price"),
+			name=>$i18n->get("price"),
 			type=>"text",
 			compare=>"numeric",
 			method=>"float",
@@ -151,8 +151,8 @@ sub _acWrapper {
 	$self->getAdminConsole->setHelp('add/edit event','Asset_EventManagementSystem');
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=search'),$i18n->get("manage events"));
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n->get('manage event metadata'));
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=managePrereqSets'), $i18n->echo('manage prerequisite sets'));
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageRegistrants'), $i18n->echo('manage registrants'));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=managePrereqSets'), $i18n->get('manage prerequisite sets'));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageRegistrants'), $i18n->get('manage registrants'));
 	return $self->getAdminConsole->render($html,$title);
 }
 
@@ -1454,7 +1454,7 @@ sub validateEditEventForm {
   %requiredFields  = (
   	"title"	   		=>	$i18n->get("add/edit event title"),
   	"description" 		=> 	$i18n->get("add/edit event description"),
-  	"price"			=>	$i18n->get("add/edit event price"),
+  	"price"			=>	$i18n->get("price"),
   	"maximumAttendees"	=>	$i18n->get("add/edit event maximum attendees"),
 	"sku"			=>	$i18n->get("sku"),
   );
@@ -1749,7 +1749,7 @@ sub www_editEvent {
 		-name  => "price",
 		-value => $self->session->form->get("price") || $event->{price},
 		-hoverHelp => $i18n->get('add/edit event price description'),		
-		-label => $i18n->get('add/edit event price')
+		-label => $i18n->get('price')
 	);
 	
 	$f->template(
@@ -2745,12 +2745,12 @@ sub www_search {
 	$var{'message'} = $message;
 	$var{'numberOfSearchResults'} = $numSearchResults;
 	$var{'continue.url'} = $self->getUrl('func=addToCart;pid=_noid_') if $somethingInScratch;
-	$var{'continue.label'} = $i18n->echo("Continue") if $somethingInScratch;
-	$var{'name.label'} = $i18n->echo("Event");
-	$var{'starts.label'} = $i18n->echo("Starts");
-	$var{'ends.label'} = $i18n->echo("Ends");
-	$var{'price.label'} = $i18n->echo("Price");
-	$var{'seats.label'} = $i18n->echo("Seats Available");
+	$var{'continue.label'} = $i18n->get("continue") if $somethingInScratch;
+	$var{'name.label'} = $i18n->get("event");
+	$var{'starts.label'} = $i18n->get("starts");
+	$var{'ends.label'} = $i18n->get("ends");
+	$var{'price.label'} = $i18n->get("price");
+	$var{'seats.label'} = $i18n->get("seats available");
 	$var{'addToBadgeMessage'} = $addToBadgeMessage;
 
 	$p->appendTemplateVars(\%var);
@@ -3035,12 +3035,13 @@ sub www_editRegistrant {
 	}
 	$f->readOnly(
 		name=>'nullBadge',
-		label=>'badgeId',
+		label=>$i18n->get('badge id'),
 		value=>$badgeId
 	);
 	$f->user(
 		name=>'userId',
-		label=>$i18n->echo('associated user'),
+		label=>$i18n->get('associated user'),
+		hoverHelp=>$i18n->get('associated user description'),
 		value=>$data->{userId},
 		subtext=>'<script type="text/javascript">
 var userField = document.getElementById("userId_formId");
@@ -3052,10 +3053,10 @@ function clearUserField() {
 }
 function setUserNew() {
 	userField.value="new";
-	userFieldDisplay.value="'.$i18n->echo('create new user').'";
+	userFieldDisplay.value="'.$i18n->get('create new user').'";
 }
 </script>
-<input type="button" onclick="clearUserField();" value="'.$i18n->echo('Unlink User').'" /><input type="button" onclick="setUserNew();" value="'.$i18n->echo('Create New User').'" />'
+<input type="button" onclick="clearUserField();" value="'.$i18n->get('Unlink User').'" /><input type="button" onclick="setUserNew();" value="'.$i18n->get('create new user').'" />'
 	);
 	$f->text(
 		name=>'firstName',
@@ -3104,7 +3105,7 @@ function setUserNew() {
 		value=>$data->{email}
 	);
 	$f->submit;
-	return $self->_acWrapper($f->print, $i18n->echo("edit registrant"));
+	return $self->_acWrapper($f->print, $i18n->get("edit registrant"));
 }
 
 #-------------------------------------------------------------------

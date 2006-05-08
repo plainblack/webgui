@@ -97,7 +97,7 @@ our $HELP = {
                                 namespace => 'Asset_EventManagementSystem',
                         },
                         {
-                                title => 'add/edit event price',
+                                title => 'price',
                                 description => 'add/edit event price description',
                                 namespace => 'Asset_EventManagementSystem',
                         },

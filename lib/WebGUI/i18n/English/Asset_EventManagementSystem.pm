@@ -177,7 +177,7 @@ our $I18N = { ##hashref of hashes
 		lastUpdated => 1138312761,
 	},
 
-	'add/edit event price' => {
+	'price' => {
 		message => q|Price|,
 		lastUpdated => 1138312761,
 	},
@@ -967,9 +967,8 @@ for this event.</p>
 	},
 
 	'seats available' => {
-		message => q|Select One|,
+		message => q|Seats Available|,
 		lastUpdated => 1145400186,
-		context => q|Label to indicate that the user should pick one thing from a list of options|,
 	},
 
 	'missing prerequisites message' => {
@@ -1224,6 +1223,11 @@ normal templates.|,
                 lastUpdated => 1147050958,
         },
 
+        'edit registrant' => {
+                message => q|Edit Registrant|,
+                lastUpdated => 1147050958,
+        },
+
         'see available subevents' => {
                 message => q|Would you like to see available subevents?|,
                 lastUpdated => 1147050958,
@@ -1232,6 +1236,51 @@ normal templates.|,
         'manage events' => {
                 message => q|Manage Events|,
                 lastUpdated => 1147050958,
+        },
+
+        'associated user' => {
+                message => q|Associated User|,
+                lastUpdated => 1147050958,
+        },
+
+        'associated user description' => {
+                message => q|The user that will be set up to use this badge.|,
+                lastUpdated => 1147050958,
+        },
+
+        'badge id' => {
+                message => q|badgeId|,
+                lastUpdated => 1147050958,
+        },
+
+        'create new user' => {
+                message => q|Create New User|,
+                lastUpdated => 1147050958,
+        },
+
+        'Unlink User' => {
+                message => q|Unlink User|,
+                lastUpdated => 1147050958,
+        },
+
+        'continue' => {
+                message => q|Continue|,
+                lastUpdated => 1147050958,
+        },
+
+        'event' => {
+                message => q|event|,
+                lastUpdated => 1147050958,
+        },
+
+        'starts' => {
+                message => q|Starts|,
+                lastUpdated => 1147058497,
+        },
+
+        'ends' => {
+                message => q|Ends|,
+                lastUpdated => 1147058499,
         },
 
 };
