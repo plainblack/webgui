@@ -173,6 +173,7 @@ our $HELP = {
 	},
 
 	'event management system event template' => {
+		source => 'sub www_editEvent',
 		title => 'event template help title',
 		body => 'event template help body',
 		fields => [
@@ -194,6 +195,7 @@ our $HELP = {
 	},
 
 	'ems manage purchases template' => {
+		source => 'sub www_managePurchases',
 		title => 'manage purchases template help title',
 		body => 'manage purchases template help body',
 		fields => [
@@ -211,6 +213,7 @@ our $HELP = {
 	},
 
 	'ems view purchase template' => {
+		source => 'sub www_viewPurchases',
 		title => 'view purchase template help title',
 		body => 'view purchase template help body',
 		fields => [
@@ -229,6 +232,7 @@ our $HELP = {
 
 
 	'ems search template' => {
+		source => 'sub www_search',
 		title => 'search template help title',
 		body => 'search template help body',
 		fields => [

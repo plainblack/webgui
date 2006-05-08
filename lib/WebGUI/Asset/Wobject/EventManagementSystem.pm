@@ -2703,6 +2703,7 @@ sub www_search {
 	$var{'events_loop'} = \@events;
 	$p->setAlphabeticalKey('title');
 	$var{'paginateBar'} = $p->getBarTraditional;
+	$p->appendTemplateVars(\%var);
 	$var{'manageEvents.url'} = $self->getUrl('func=search');
 	$var{'manageEvents.label'} = $i18n->get('manage events');
 	$var{'managePurchases.url'} = $self->getUrl('func=managePurchases') if $self->session->var->get('userId') ne '1';
@@ -2754,7 +2755,6 @@ sub www_search {
 	$var{'seats.label'} = $i18n->get("seats available");
 	$var{'addToBadgeMessage'} = $addToBadgeMessage;
 
-	$p->appendTemplateVars(\%var);
 	$self->buildMenu(\%var);
 	$var{'ems.wobject.dir'} = $self->session->url->extras("wobject/EventManagementSystem");
 	

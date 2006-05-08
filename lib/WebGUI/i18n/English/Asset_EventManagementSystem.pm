@@ -585,17 +585,27 @@ the users and admins can view or edit a purchase.</p>
 EMS Asset variables.</p>
 
 <p><b>purchasesLoop</b><br />
-This loop contains all events that are included in this purchase.
+This loop contains all registrations that are included in this purchase.
+</p>
+
+<div class="helpIndent">
+
+<p><b>regLoop</b><br />
+This loop contains all events that are included in this registration.
 </p>
 
 <div class="helpIndent">
 
 <p><b>startDateHuman</b><br />
-This event's start date and time in a human readable format.
+The start date in a human readable format for this event.
+</p>
+
+<p><b>startDateHuman</b><br />
+The start date in a human readable format for this event.
 </p>
 
 <p><b>endDateHuman</b><br />
-This event's end date and time in a human readable format.
+The end date in a human readable format for this event.
 </p>
 
 <p><b>startDate</b><br />
@@ -642,22 +652,43 @@ The template used to style this event if it is to be displayed.
 The number of people allowed to attend this event.
 </p>
 
+<p><b>userId</b><br />
+The Id of the user set to use this badge.
+</p>
+
+<p><b>createdByUserId</b><br />
+The Id of the user who created this badge.
+</p>
+
 </div>
+
+<p><b>canReturnItinerary</b><br />
+A boolean indicating whether or not this event can be returned.
+</p>
+
+<p><b>canAddEvents</b><br />
+A boolean indicating whether or not the current user is allowed to add events.  Admins, the owner
+of the transaction, the user who created the registration or the user who the registration is
+for are allowed to add events.
+</p>
+
+</div>
+
+<p><b>canReturnTransaction</b><br />
+A boolean that is true if any purchase can be returned.
+</p>
 
 <p><b>viewPurchaseTitle</b><br />
 An internationalized label to title this screen.
 </p>
 
 <p><b>canReturn</b><br />
-A boolean indicating if the current user may return events in the purchase.
+A boolean indicating if the current user may return events in the purchase.  Users who can add events 
+fall into this group.
 </p>
 
 <p><b>transactionId</b><br />
 The unique identifier for this transaction in the database.
-</p>
-
-<p><b>canAddEvents</b><br />
-A boolean indicating if the current user can add events to this purchase.
 </p>
 
 <p><b>appUrl</b><br />
@@ -665,7 +696,7 @@ A URL back to the main screen of the Asset.
 </p>
 
 |,
-		lastUpdated => 1145465299,
+		lastUpdated => 1147060455,
 	},
 
 	'search template help title' => {
@@ -677,6 +708,10 @@ A URL back to the main screen of the Asset.
 		message => q|
 <p>This template is used to style the screen of the Event Management System where
 the users and admins can view or edit a purchase.</p>
+
+<p><b>calendarJS</b><br />
+Script tag to set up the javascript calendar picker.
+</p>
 
 <p><b>basicSearch.formHeader</b><br />
 Form header for a basic search.
@@ -720,6 +755,18 @@ The description of this event.
 The price of this event.
 </p>
 
+<p><b>sku</b><br />
+The SKU for this event.
+</p>
+
+<p><b>sku template</b><br />
+The SKU templates used to generate the SKU for this event.
+</p>
+
+<p><b>weight</b><br />
+The weight associated with materials for this event.
+</p>
+
 <p><b>numberRegistered</b><br />
 The number of people currently registered for this event.
 </p>
@@ -736,12 +783,32 @@ The number of available seats remaining for this event.
 The date and time this event starts, in human readable format.
 </p>
 
+<p><b>startDate</b><br />
+The date and time this event starts, in epoch format.
+</p>
+
 <p><b>endDate.human</b><br />
 The date and time this event ends, in human readable format.
 </p>
 
+<p><b>endDate</b><br />
+The date and time this event ends, in epoch format.
+</p>
+
+<p><b>productId</b><br />
+The unique identifier for this product.
+</p>
+
 <p><b>eventIsFull</b><br />
 A boolean that is true if the there are no available seats remaining in this event.
+</p>
+
+<p><b>eventIsApproved</b><br />
+A boolean that is true if this event has been approved.
+</p>
+
+<p><b>manageToolbar</b><br />
+Code for an toolbar with icons to delete, edit and reorder events.
 </p>
 
 <p><b>purchase.label</b><br />
@@ -756,24 +823,12 @@ If the event is full, the url will be blank.
 
 </div>
 
-<p><b>checkout.url</b><br />
-A URL to take the user the screen that displays the contents of their shopping cart.
-</p>
-
-<p><b>checkout.label</b><br />
-A label to go with checkout.url.  The internationalized word "Checkout".
-</p>
-
 <p><b>paginateBar</b><br />
 A bar to help the user page through sets of Events if several pages of Events exist.
 </p>
 
 <p><b>Pagination variables</b><br />
 Common pagination template variables.
-</p>
-
-<p><b>canManageEvents</b><br />
-A flag to indiciate if the current user is allowed to Manage Events.
 </p>
 
 <p><b>manageEvents.url</b><br />
@@ -805,6 +860,50 @@ A URL to take the user to the screen to add a new event.
 An internationalized label to dispaly to the user the link for adding an event.
 </p>
 
+<p><b>canManageEvents</b><br />
+A flag to indiciate if the current user is in the group to manage events.
+</p>
+
+<p><b>message</b><br />
+Messages from the system about the number and type of results being displayed.
+</p>
+
+<p><b>numberOfSearchResults</b><br />
+The number of results returned by the current search.
+</p>
+
+<p><b>continue.url</b><br />
+A url to add this event to the cart.
+</p>
+
+<p><b>continue.label</b><br />
+The internationalized label, "Continue" to go with continue.url.
+</p>
+
+<p><b>name.label</b><br />
+The internationalized label, "Event".
+</p>
+
+<p><b>starts.label</b><br />
+The internationalized label, "Starts".
+</p>
+
+<p><b>ends.label</b><br />
+The internationalized label, "Ends".
+</p>
+
+<p><b>price.label</b><br />
+The internationalized label, "Price".
+</p>
+
+<p><b>seats.label</b><br />
+The internationalized label, "Seats".
+</p>
+
+<p><b>addToBadgeMessage</b><br />
+A message from the system if a badge was successfully added to this transaction.
+</p>
+
 <p><b>search.filters.options</b><br />
 Javascript for a search interface for Events based on their properties and metadata.
 </p>
@@ -817,12 +916,8 @@ The URL to this Asset.
 The URL the EventManagementSystem area in the WebGUI Extras directory.
 </p>
 
-<p><b>message</b><br />
-Messages from the system about the number and type of results being displayed.
-</p>
-
 |,
-		lastUpdated => 1145655811,
+		lastUpdated => 1147061558,
 	},
 
 	'event template help title' => {
@@ -1265,11 +1360,6 @@ normal templates.|,
 
         'continue' => {
                 message => q|Continue|,
-                lastUpdated => 1147050958,
-        },
-
-        'event' => {
-                message => q|event|,
                 lastUpdated => 1147050958,
         },
 
