@@ -154,6 +154,7 @@ sub _acWrapper {
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n->get('manage event metadata'));
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=managePrereqSets'), $i18n->get('manage prerequisite sets'));
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageRegistrants'), $i18n->get('manage registrants'));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageDiscountPasses'), $i18n->echo('manage discount passes'));
 	return $self->getAdminConsole->render($html,$title);
 }
 
@@ -1834,22 +1835,24 @@ sub www_editEvent {
 	if (scalar(keys(%discountPasses))) {
 		#there are some discount passes entered into the system
 		%discountPasses = (''=>$i18n->get('select one'),%discountPasses);
-		$f->selectBox(
-			-name=>'passId',
-			-rowClass=>'" id="passIdRow', # tricky little hack.
-			-options=>\%discountPasses,
-			-label=>$i18n->echo('assigned discount pass'),
-			-hoverHelp=>$i18n->echo('Which Discount Pass will be applied to this event.'),
-			-value=>$self->session->form->get("passId") || $event->{passId}
-		);
 		$f->radioList(
 			-name=>'passType',
 			-options=>\%passOptions,
 			-value=>$self->session->form->get("passType") || $event->{passType} || '',
 			-vertical=>1,
 			-extras=>' onclick="changePassType();" ',
+			-label=>$i18n->echo('assigned discount pass'),
+			-hoverHelp=>$i18n->echo('Which Discount Pass will be applied to this event.'),
+			-value=>$self->session->form->get("passId") || $event->{passId}
+		);
+		$f->selectBox(
+			-name=>'passId',
+			-rowClass=>'" id="passIdRow', # tricky little hack.
+			-options=>\%discountPasses,
+			-label=>$i18n->echo('assigned discount pass'),
+			-hoverHelp=>$i18n->echo('Which Discount Pass will be applied to this event.'),
+			-value=>$self->session->form->get("passId") || $event->{passId},
 			-subtext=>'<script type="text/javascript">
-var passIdRow = document.getElementById("passIdRow");
 function getChosenType() {
 	var i = 0;
 	while(document.forms[0].passType[i]) {
@@ -1859,6 +1862,7 @@ function getChosenType() {
 	return "";
 }
 function changePassType() {
+	var passIdRow = document.getElementById("passIdRow");
 	var passType = getChosenType();
 	if (passType == "") {
 		passIdRow.style.display="none";
@@ -1867,10 +1871,7 @@ function changePassType() {
 	}
 }
 changePassType();
-</script>',
-			-label=>$i18n->echo('assigned discount pass'),
-			-hoverHelp=>$i18n->echo('Which Discount Pass will be applied to this event.'),
-			-value=>$self->session->form->get("passId") || $event->{passId}
+</script>'
 		);
 	}
 	
@@ -1948,6 +1949,8 @@ sub www_editEventSave {
 		endDate	=> $self->session->form->process("endDate",'dateTime'),
 		maximumAttendees => $self->session->form->get("maximumAttendees"),
 		approved	=> $self->session->form->get("approved"),
+		passId	=> $self->session->form->process("passId",'selectBox'),
+		passType	=> $self->session->form->get("passType",'radioList'),
 		imageId		=> $storageId,
 		prerequisiteId => $self->session->form->process("prerequisiteId",'selectBox')
 	},1,1);
