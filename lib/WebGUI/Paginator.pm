@@ -383,7 +383,11 @@ sub getPageLinks {
 	for (my $i=0; $i<$self->getNumberOfPages; $i++) {
 		my $altTag;
 		if ($self->{abKey}) {
-			$altTag = ' title="'.substr($self->{_rowRef}[($i * $self->{_rpp})+1]->{$self->{abKey}},0,1).'-'.substr($self->{_rowRef}[(($i+1) * $self->{_rpp})-1]->{$self->{abKey}},0,1).'"';
+			if ($self->{abInitialOnly}) {
+				$altTag = ' title="'.substr($self->{_rowRef}[($i * $self->{_rpp})+1]->{$self->{abKey}},0,1).'-'.substr($self->{_rowRef}[(($i+1) * $self->{_rpp})-1]->{$self->{abKey}},0,1).'"';
+			} else {
+				$altTag = ' title="'.$self->{_rowRef}[($i * $self->{_rpp})+1]->{$self->{abKey}}.' - '.$self->{_rowRef}[(($i+1) * $self->{_rpp})-1]->{$self->{abKey}}.'"';
+			}
 		}
 		if ($i+1 == $pn) {
 			push(@pages,($i+1));
@@ -598,7 +602,7 @@ sub setDataByQuery {
 
 #-------------------------------------------------------------------
 
-=head2 setAlphabeticalKey ( string )
+=head2 setAlphabeticalKey ( string, abInitialOnly )
 
 Provide the paginator with a key of your data so it can display 
 alphabetic helpers in the "alt" tag of the page links.
@@ -608,11 +612,16 @@ alphabetic helpers in the "alt" tag of the page links.
 The name of the key your data is ordered by. This is assuming that
 your pageData is an arrayRef of hashRefs.
 
+=head3 abInitialOnly
+
+A boolean indicating whether to abbreviate the key to the initial letter.
+
 =cut
 
 sub setAlphabeticalKey {
 	my $self = shift;
 	$self->{abKey} = shift;
+	$self->{abInitialOnly} = shift;
 	return 1;
 }
 
