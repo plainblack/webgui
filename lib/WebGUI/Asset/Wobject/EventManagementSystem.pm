@@ -101,6 +101,15 @@ sub _getFieldHash {
 			tableName=>"e",
 			initial=>1
 		},
+		"sku"=>{
+			name=>$i18n->echo("Event Number"),
+			type=>"text",
+			compare=>"numeric",
+			method=>"text",
+			columnName=>"sku",
+			tableName=>"p",
+			initial=>1
+		},
 		"requirement"=>{
 			name=>$i18n->get('add/edit event required events'),
 			type=>"select",
