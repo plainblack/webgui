@@ -3037,10 +3037,8 @@ sub www_editRegistrant {
 	$f->user(
 		name=>'userId',
 		label=>$i18n->echo('associated user'),
-		value=>$data->{userId}
-	);
-	$f->raw(
-		'<script type="text/javascript">
+		value=>$data->{userId},
+		subtext=>'<script type="text/javascript">
 var userField = document.getElementById("userId_formId");
 var userFieldDisplay = document.getElementById("userId_formId_display");
 function clearUserField() {
@@ -3052,7 +3050,8 @@ function setUserNew() {
 	userFieldDisplay.value="'.$i18n->echo('create new user').'";
 }
 </script>
-<input type="button" onclick="clearUserField();" value="'.$i18n->echo('Unlink User').'" /><input type="button" onclick="setUserNew();" value="'.$i18n->echo('Create New User').'" />');
+<input type="button" onclick="clearUserField();" value="'.$i18n->echo('Unlink User').'" /><input type="button" onclick="setUserNew();" value="'.$i18n->echo('Create New User').'" />'
+	);
 	$f->text(
 		name=>'firstName',
 		label=>$i18n->get("first name"),
