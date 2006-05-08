@@ -381,14 +381,16 @@ sub getPageLinks {
 	my @pages;
 	my @pages_loop;
 	for (my $i=0; $i<$self->getNumberOfPages; $i++) {
+		my $altTag;
+		if ($self->{abKey}) {
+			$altTag = ' title="'.subst($self->{_rowRef}[($i * $self->{_rpp})+1]->{$self->{abKey}},0,1).'-'.subst($self->{_rowRef}[(($i+1) * $self->{_rpp})+1]->{$self->{abKey}},0,1).'"';
+		}
 		if ($i+1 == $pn) {
 			push(@pages,($i+1));
-						push(@pages_loop,{ "pagination.url" => '', "pagination.text" => $i+1});
-
+			push(@pages_loop,{ "pagination.url" => '', "pagination.text" => $i+1});
 		} else {
-			push(@pages,'<a href="'.$self->session->url->append($self->{_url},($self->{_formVar}.'='.($i+1))).'">'.($i+1).'</a>');
-            push(@pages_loop,{ "pagination.url" => $self->session->url->append($self->{_url},($self->{_formVar}.'='.($i+1))), "pagination.text" => $i+1});
-
+			push(@pages,'<a href="'.$self->session->url->append($self->{_url},($self->{_formVar}.'='.($i+1))).'"'.$altTag.'>'.($i+1).'</a>');
+			push(@pages_loop,{ "pagination.url" => $self->session->url->append($self->{_url},($self->{_formVar}.'='.($i+1))), "pagination.text" => $i+1});
 		}
 	}
 	if ($limit) {
@@ -592,6 +594,26 @@ sub setDataByQuery {
 	$sth->finish;
 	$self->{_rowRef} = \@row;
 	return "";
+}
+
+#-------------------------------------------------------------------
+
+=head2 setAlphabeticalKey ( string )
+
+Provide the paginator with a key of your data so it can display 
+alphabetic helpers in the "alt" tag of the page links.
+
+=head3 keyName
+
+The name of the key your data is ordered by. This is assuming that
+your pageData is an arrayRef of hashRefs.
+
+=cut
+
+sub setAlphabeticalKey {
+	my $self = shift;
+	$self->{abKey} = shift;
+	return 1;
 }
 
 1;
