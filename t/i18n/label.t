@@ -147,15 +147,17 @@ sub obj_finder_pm {
 	close $pmf;
 	##Advance pos to first subroutine
 	while ( my $subBody = extract_codeblock($libFile, '{}', qr/(?ms).*?^sub (\w+)\s*/) ) {
-		next unless $subBody =~ /(\w+)\s*=\s*WebGUI::International->new\($sess_arg(?:,\s*($quotelike))?\)/;
-		my ($obj, $namespace) = ($1,$2);
-		while ( $subBody =~ /$obj\->get\(($sub_args)\)/msgc ) {
-			my ($label, $local_name) = split /,\s*/, $1;
-			push @objLabels, {
-				file=>$File::Find::name,
-				label=>$label,
-				namespace=>$local_name || $namespace || 'WebGUI',
-			};
+		while ( $subBody =~ /(\w+)\s*=\s*WebGUI::International->new\($sess_arg(?:,\s*($quotelike))?\)/msgc) {
+			my $objBody = $subBody;
+			my ($obj, $namespace) = ($1,$2);
+			while ( $objBody =~ /$obj\->get\(($sub_args)\)/msgc ) {
+				my ($label, $local_name) = split /,\s*/, $1;
+				push @objLabels, {
+					file=>$File::Find::name,
+					label=>$label,
+					namespace=>$local_name || $namespace || 'WebGUI',
+				};
+			}
 		}
 	}
 }
