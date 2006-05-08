@@ -1821,6 +1821,46 @@ sub www_editEvent {
 		);
 	}
 	
+	my %discountPasses;
+	tie %discountPasses, 'Tie::IxHash';
+	%discountPasses = $self->session->db->buildHash("select passId, name from EventManagementSystem_discountPasses order by name");
+	if (scalar(keys(%discountPasses))) {
+		#there are some discount passes entered into the system
+		%discountPasses = (''=>$i18n->get('select one'),%discountPasses);
+		$f->radioList(
+			-name=>'passType',
+			-options=>{
+				''=>$i18n->echo('None'),
+				'member'=>$i18n->echo('<strong>This event is a member of a discount pass.</strong><br />  The selected discount pass should be applied to this event if both are in the user\'s cart.'),
+				'defines'=>$i18n->echo('<strong>This event defines a discount pass.</strong><br />  If the user adds this event to his/her cart, the associated discount will be applied (upon checkout) to any events that are members of this discount pass.')
+			},
+			-extras=>' onclick="changePassType();" ',
+			-subtext=>'<script type="text/javascript">
+var passTypeField = document.getElementById("passType_formId");
+var passIdRow = document.getElementById("passIdRow");
+if (passTypeField.value == "") passIdRow.style.display="none";
+function changePassType() {
+	if (passTypeField.value == "") {
+		passIdRow.style.display="none";
+	} else {
+		passIdRow.style.display="";
+	}
+}
+</script>',
+			-label=>$i18n->echo('assigned discount pass'),
+			-hoverHelp=>$i18n->echo('Which Discount Pass will be applied to this event.'),
+			-value=>$self->session->form->get("passId") || $event->{passId}
+		);
+		$f->selectBox(
+			-name=>'passId',
+			-rowClass=>' id="passIdRow"',
+			-options=>\%discountPasses,
+			-label=>$i18n->echo('assigned discount pass'),
+			-hoverHelp=>$i18n->echo('Which Discount Pass will be applied to this event.'),
+			-value=>$self->session->form->get("passId") || $event->{passId}
+		);
+	}
+	
 	# add dynamically added metadata fields.
 	my $meta = {};
 	my $fieldList = $self->getEventMetaDataArrayRef;
@@ -2991,7 +3031,7 @@ sub www_manageRegistrants {
 		$output .= "<div>";
 	#	$output .= $self->session->icon->delete('func=deleteRegistrant;psid='.$_->{badgeId}, $self->getUrl);
 		$output .= $self->session->icon->edit('func=editRegistrant;badgeId='.$_->{badgeId}, $self->getUrl).
-			"&nbsp;&nbsp;".$_->{lastName}.",&nbsp;".$_->{firstName}."(&nbsp;".$_->{email}.")</div>";
+			"&nbsp;&nbsp;".$_->{lastName}.",&nbsp;".$_->{firstName}."&nbsp;&nbsp;(&nbsp;".$_->{email}."&nbsp;)</div>";
 	}
 	$output .= '<div>'.$p->getBarAdvanced.'</div>';
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editRegistrant;badgeId=new'), $i18n->get('add registrant'));
@@ -3067,8 +3107,17 @@ function resetToInitial() {
 	userFieldDisplay.value="'.$username.'";
 }
 </script>
-<input type="button" onclick="clearUserField();" value="'.$i18n->get('Unlink User').'" /><input type="button" onclick="setUserNew();" value="'.$i18n->get('create new user').'" />'
+<input type="button" onclick="clearUserField();" value="'.$i18n->get('Unlink User').'" /><input type="button" onclick="setUserNew();" value="'.$i18n->get('create new user').'" /><input type="button" onclick="resetToInitial();" value="'.$i18n->echo('reset user').'" />'
 	);
+	if ($data->{userId} ne 'new' && $data->{createdByUserId} && $data->{createdByUserId} ne '1') {
+		$f->user(
+			name=>'createdByUserId',
+			label=>$i18n->echo('user that created this registrant identity'),
+			hoverHelp=>$i18n->echo('createdByUserId description'),
+			readOnly=>1,
+			value=>$data->{createdByUserId}
+		);
+	}
 	$f->text(
 		name=>'firstName',
 		label=>$i18n->get("first name"),
@@ -3125,7 +3174,7 @@ sub www_editRegistrantSave {
 	return $self->session->privilege->insufficient unless ($self->canAddEvents);
 	my $error = '';
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
-	foreach ('firstName','lastName') {
+	foreach ('firstName','lastName','email') {
 		if ($self->session->form->get($_) eq "") {
 			$error .= sprintf($i18n->get('null field error'),$_)."<br />";
 		}
@@ -3188,20 +3237,137 @@ sub www_editRegistrantSave {
 			}
 			$authprops->{identifier} = Digest::MD5::md5_base64($password);
 			$auth->saveParams($u->userId,"WebGUI",$authprops);
+			$self->setCollateral("EventManagementSystem_badges", "badgeId",{badgeId=>$badgeId,userId=>$u->userId},0,0);
 		} else {
 			$u = WebGUI::User->new($self->session,$userId);
 		}
-		$u->profileField('firstName',$firstName);
-		$u->profileField('lastName',$lastName);
-		$u->profileField('homeAddress',$address);
-		$u->profileField('homeCity',$city);
-		$u->profileField('homeState',$state);
-		$u->profileField('homeZip',$zipCode);
-		$u->profileField('homeCountry',$country);
-		$u->profileField('homePhone',$phoneNumber);
-		$u->profileField('email',$email);
+		if (ref($u) eq 'WebGUI::User') {
+			$u->profileField('firstName',$firstName);
+			$u->profileField('lastName',$lastName);
+			$u->profileField('homeAddress',$address);
+			$u->profileField('homeCity',$city);
+			$u->profileField('homeState',$state);
+			$u->profileField('homeZip',$zipCode);
+			$u->profileField('homeCountry',$country);
+			$u->profileField('homePhone',$phoneNumber);
+			$u->profileField('email',$email);
+		}
 	}
 	return $self->www_manageRegistrants();
+}
+
+
+
+#-------------------------------------------------------------------
+
+=head2 www_manageDiscountPasses ( )
+
+Method to display the discount pass management console.
+
+=cut
+
+sub www_manageDiscountPasses {
+	my $self = shift;
+
+	return $self->session->privilege->insufficient unless ($self->canAddEvents);
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
+	
+	my $output;
+	my $sql = "select * from EventManagementSystem_discountPasses order by name";
+	
+	foreach (@$data) {
+		$output .= "<div>";
+	#	$output .= $self->session->icon->delete('func=deleteDiscountPass;psid='.$_->{pasId}, $self->getUrl);
+		$output .= $self->session->icon->edit('func=editDiscountPass;passId='.$_->{pasId}, $self->getUrl).
+			"&nbsp;&nbsp;".$_->{lastName}.",&nbsp;".$_->{firstName}."&nbsp;&nbsp;(&nbsp;".$_->{email}."&nbsp;)</div>";
+	}
+	$output .= '<div>'.$p->getBarAdvanced.'</div>';
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editDiscountPass;passId=new'), $i18n->echo('add discount pass'));
+	return $self->_acWrapper($output, $i18n->echo("manage discount passes"));
+}
+
+
+#-------------------------------------------------------------------
+sub www_editDiscountPass {
+	my $self = shift;
+	my $passId = shift || $self->session->form->process("passId") || 'new';
+	my $error = shift;
+	return $self->session->privilege->insufficient unless ($self->canAddEvents);
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
+	my $f = WebGUI::HTMLForm->new($self->session, (
+		action => $self->getUrl."?func=editDiscountPassSave;passId=".$passId
+	));
+	my $data = {};
+	if ($error) {
+		# load submitted data.
+		$data = {
+			name => $self->session->var->get('name'),
+			type => $self->session->form->get("type", "radioList"),
+			amount => $self->session->form->get("amount", "text")
+		};
+		$f->readOnly(
+			-name => 'error',
+			-label => $i18n->get('error'),
+			-value => '<span style="color:red;font-weight:bold">'.$error.'</span>',
+		);
+	} elsif ($passId eq 'new') {
+		#
+	} else {
+		$data = $self->session->db->quickHashRef("select * from EventManagementSystem_discountPasses where passId=?",[$passId]);
+	}
+	$f->readOnly(
+		name=>'nullPass',
+		label=>$i18n->echo('discount pass id'),
+		value=>$passId
+	);
+	$f->text(
+		name=>'name',
+		label=>$i18n->echo("name"),
+		value=>$data->{name}
+	);
+	$f->radioList(
+		name=>'type',
+		options=>{
+			percentOff => $i18n->echo("percent off"),
+			newPrice => $i18n->echo("new price"),
+			amountOff => $i18n->echo("amount off")
+		},
+		label=>$i18n->echo("discount pass type"),
+		hoverHelp=>$i18n->echo("The Discount Pass can be one of several types.  The 'Percent Off' type reduces the price on applied products by the given percentage.  The 'New Price' type sets the price of the product to the given amount.  The 'Amount Off' type reduces the price by the given absolute amount.  The default type is 'New Price'."),
+		value=>$data->{type} || 'newPrice'
+	);
+	$f->float(
+		name=>'amount',
+		label=>$i18n->echo("discount(ed) amount"),
+		hoverHelp=>$i18n->echo("The amount field can be in one of several unit types, depending on the discount pass type.  The 'Percent Off' type is in percent units (for 10% reduction, enter '10').  The 'New Price' and 'Amount Off' types are in an absolute amount of currency.  The default value is '0.00'."),
+		value=>$data->{amount} || '0.00'
+	);
+	$f->submit;
+	return $self->_acWrapper($f->print, $i18n->echo("edit discount pass"));
+}
+
+#-------------------------------------------------------------------
+sub www_editDiscountPassSave {
+	my $self = shift;
+	return $self->session->privilege->insufficient unless ($self->canAddEvents);
+	my $error = '';
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
+	foreach ('name','type') {
+		if ($self->session->form->get($_) eq "") {
+			$error .= sprintf($i18n->get('null field error'),$_)."<br />";
+		}
+	}
+	return $self->www_editDiscountPass(undef,$error) if $error;
+	my $passId = $self->session->form->process('passId');
+	my $type = $self->session->form->get("type", "radioList");
+	my $amount = $self->session->form->get("amount", "float");
+	my $details = {
+		passId => $passId, # if this is "new", setCollateral will return the new one.
+		type       => $type,
+		amount	 => $amount
+	};
+	$passId = $self->setCollateral("EventManagementSystem_discountPasses", "passId",$details,0,0);
+	return $self->www_manageDiscountPasses();
 }
 
 
