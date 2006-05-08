@@ -4,6 +4,7 @@ package WebGUI::Help::Asset_EventManagementSystem; ## Be sure to change the pack
 
 our $HELP = {
 	'event management system add/edit' => {
+		source => 'sub definition',
 		title => 'add/edit help title',
 		body => 'add/edit help body',
 		fields => [
@@ -25,6 +26,11 @@ our $HELP = {
                         {
                                 title => 'view purchase template',
                                 description => 'view purchase template description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'search template',
+                                description => 'search template description',
                                 namespace => 'Asset_EventManagementSystem',
                         },
                         {
@@ -55,14 +61,6 @@ our $HELP = {
 		],
 		related => [
 			{
-				tag => 'event management system manage events',
-				namespace => 'Asset_EventManagementSystem',
-			},
-			{
-				tag => 'event management system template',
-				namespace => 'Asset_EventManagementSystem',
-			},
-			{
 				tag => 'wobjects using',
 				namespace => 'Asset_Wobject'
 			},
@@ -74,9 +72,15 @@ our $HELP = {
 	},
 
 	'add/edit event' => {
+		source => 'sub www_editEvent',
 		title => 'add/edit event help title',
 		body => 'add/edit event help body',
 		fields => [
+                        {
+                                title => 'approve event',
+                                description => 'approve event description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
                         {
                                 title => 'add/edit event title',
                                 description => 'add/edit event title description',
@@ -133,18 +137,8 @@ our $HELP = {
                                 namespace => 'Asset_EventManagementSystem',
                         },
                         {
-                                title => 'add/edit event required events',
-                                description => 'add/edit event required events description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'add/edit event operator',
-                                description => 'add/edit event title description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'add/edit event what next',
-                                description => 'add/edit event what next description',
+                                title => 'assigned prerequisite set',
+                                description => 'assigned prerequisite set description',
                                 namespace => 'Asset_EventManagementSystem',
                         },
 		],
@@ -152,99 +146,12 @@ our $HELP = {
 			{
 				tag => 'event management system add/edit',
 				namespace => 'Asset_EventManagementSystem',
-			},
-		],
-	},
-
-	'event management system manage events' => {
-		title => 'manage events',
-		body => 'manage events help body',
-		fields => [
-		],
-		related => [
-			{
-				tag => 'add/edit event',
-				namespace => 'Asset_EventManagementSystem',
-			},
-			{
-				tag => 'event management system add/edit',
-				namespace => 'Asset_EventManagementSystem',
-			},
-		],
-	},
-
-
-	'event management system asset variables' => {
-		title => 'ems asset help title',
-		body => 'ems asset help body',
-		fields => [
-                        {
-                                title => 'display template',
-                                description => 'display template description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'checkout template',
-                                description => 'checkout template description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'manage purchases template',
-                                description => 'manage purchases template description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'view purchase template',
-                                description => 'view purchase template description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'paginate after',
-                                description => 'paginate after description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'group to add events',
-                                description => 'group to add events description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'group to approve events',
-                                description => 'group to approve events description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'global prerequisite',
-                                description => 'global prerequisite description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'global metadata',
-                                description => 'global metadata description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-		],
-		related => [
-			{
-				tag => 'event management system add/edit',
-				namespace => 'Asset_EventManagementSystem',
-			},
-			{
-				tag => 'wobject template',
-				namespace => 'Asset_Wobject',
-			},
-			{
-				tag => 'asset template',
-				namespace => 'Asset',
-			},
-			{
-				tag => 'template language',
-				namespace => 'Asset_Template',
 			},
 		],
 	},
 
 	'event management system template' => {
+		source => 'sub view',
 		title => 'template help title',
 		body => 'template help body',
 		fields => [
@@ -297,10 +204,6 @@ our $HELP = {
 				namespace => 'Asset_EventManagementSystem',
 			},
 			{
-				tag => 'event management system asset variables',
-				namespace => 'Asset_EventManagementSystem',
-			},
-			{
 				tag => 'template language',
 				namespace => 'Asset_Template',
 			},
@@ -315,10 +218,6 @@ our $HELP = {
 		related => [
 			{
 				tag => 'event management system add/edit',
-				namespace => 'Asset_EventManagementSystem',
-			},
-			{
-				tag => 'event management system asset variables',
 				namespace => 'Asset_EventManagementSystem',
 			},
 			{

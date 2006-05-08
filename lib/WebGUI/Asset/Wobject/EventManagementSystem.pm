@@ -1831,14 +1831,13 @@ sub www_editEvent {
 			$meta->{$field1->{fieldId}}->{fieldData} = $field1->{defaultValues};
 		}
 	}
-	my $i18n3 = WebGUI::International->new($self->session, "Asset");
 	foreach my $field (@{$fieldList}) {
 		my $dataType = $meta->{$field->{fieldId}}{dataType};
 		my $options;
 		# Add a "Select..." option on top of a select list to prevent from
 		# saving the value on top of the list when no choice is made.
 		if($dataType eq "selectList" || $dataType eq "selectBox") {
-			$options = {"", $i18n3->get("Select")};
+			$options = {"", $i18n->get("Select", "Asset")};
 		}
 		
 		my $val = $self->session->form->process("metadata_".$meta->{$field->{fieldId}}{fieldId},$dataType);
@@ -2813,7 +2812,7 @@ sub view {
 	  }
 	  else {
 	  	$eventFields{'purchase.url'} = $self->getUrl('func=addToScratchCart;mid='.$event->{'productId'}.';pid='.$event->{'productId'});
-		$eventFields{'purchase.message'} = "Would you like to see available subevents?";
+		$eventFields{'purchase.message'} = $i18n->get('see available subevents');
 		$eventFields{'purchase.wantToSearch.url'} = $self->getUrl('func=search;cfilter_s0=requirement;cfilter_c0=eq;subSearch=1;cfilter_t0='.$event->{productId});
 	        $eventFields{'purchase.wantToContinue.url'} = $self->getUrl('func=addToCart;pid='.$event->{productId});
 	  	$eventFields{'purchase.label'} = $i18n->get('add to cart');

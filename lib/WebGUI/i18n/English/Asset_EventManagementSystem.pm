@@ -269,11 +269,6 @@ our $I18N = { ##hashref of hashes
 		context => q|Label for displaying required events|,
 	},
 
-	'manage events' => {
-		message => q|Manage Events|,
-		lastUpdated => 1138903982,
-	},
-
 	'add/edit event error' => {
 		message => q|ERROR|,
 		lastUpdated => 1138903982,
@@ -387,6 +382,14 @@ our $I18N = { ##hashref of hashes
 products are displayed to the user as well as providing a link for managing events
 in the system.</p>
 
+<p><b>checkout.url</b><br />
+A URL to take the user the screen that displays the contents of their shopping cart.
+</p>
+
+<p><b>checkout.label</b><br />
+A label to go with checkout.url.  The internationalized word "Checkout".
+</p>
+
 <p><b>events_loop</b><br />
 This loop contains all events that have been approved so that users can register.
 </p>
@@ -397,69 +400,7 @@ This loop contains all events that have been approved so that users can register
 The information for one event that has been processed by its own event template.
 </p>
 
-<p><b>title</b><br />
-The title of this event.
-</p>
-
-<p><b>title.url</b><br />
-A URL to display a list of events that have this event
-</p>
-
-<p><b>description</b><br />
-The description of this event.
-</p>
-
-<p><b>image</b><br />
-The image assigned to represent this event.
-</p>
-
-<p><b>price</b><br />
-The price of this event.
-</p>
-
-<p><b>numberRegistered</b><br />
-The number of people currently registered for this event.
-</p>
-
-<p><b>maximumAttendees</b><br />
-The number of people allowed to attend this event.
-</p>
-
-<p><b>seatsRemaining</b><br />
-The number of available seats remaining for this event.
-</p>
-
-<p><b>startDate.human</b><br />
-The date and time this event starts, in human readable format.
-</p>
-
-<p><b>endDate.human</b><br />
-The date and time this event ends, in human readable format.
-</p>
-
-<p><b>eventIsFull</b><br />
-A boolean that is true if the there are no available seats remaining in this event.
-</p>
-
-<p><b>purchase.label</b><br />
-An internationalized label to display to the user the link for purchasing this event.
-If the event is full, the label will be "Sold out".
-</p>
-
-<p><b>purchase.url</b><br />
-A URL for the user to register for this event and add it to their shopping cart.
-If the event is full, the url will be blank.
-</p>
-
 </div>
-
-<p><b>checkout.url</b><br />
-A URL to take the user the screen that displays the contents of their shopping cart.
-</p>
-
-<p><b>checkout.label</b><br />
-A label to go with checkout.url.  The internationalized word "Checkout".
-</p>
 
 <p><b>paginateBar</b><br />
 A bar to help the user page through sets of Events if several pages of Events exist.
@@ -489,20 +430,8 @@ A URL to take the user to the screen where purchases can be managed (i.e. added,
 An internationalized label to dispaly to the user the link for managing purchases.
 </p>
 
-<p><b>search.filters.options</b><br />
-Javascript for a search interface for Events based on their properties and metadata.
-</p>
-
-<p><b>search.data.url</b><br />
-The URL to this Asset.
-</p>
-
-<p><b>ems.wobject.dir</b><br />
-The URL the EventManagementSystem area in the WebGUI Extras directory.
-</p>
-
 |,
-		lastUpdated => 1145421686,
+		lastUpdated => 1147057198,
 	},
 
 	'event template help title' => {
@@ -519,12 +448,32 @@ user.</p>
 The title of this event.
 </p>
 
+<p><b>title.url</b><br />
+A URL to display a list of events that have this event
+</p>
+
 <p><b>description</b><br />
 The description of this event.
 </p>
 
+<p><b>image</b><br />
+The image assigned to represent this event.
+</p>
+
 <p><b>price</b><br />
 The price of this event.
+</p>
+
+<p><b>sku</b><br />
+The SKU for this event.
+</p>
+
+<p><b>sku template</b><br />
+The SKU templates used to generate the SKU for this event.
+</p>
+
+<p><b>weight</b><br />
+The weight associated with materials for this event.
 </p>
 
 <p><b>numberRegistered</b><br />
@@ -539,16 +488,20 @@ The number of people allowed to attend this event.
 The number of available seats remaining for this event.
 </p>
 
+<p><b>eventIsFull</b><br />
+A boolean that is true if the there are no available seats remaining in this event.
+</p>
+
+<p><b>eventIsApproved</b><br />
+A boolean that is true if the event has been approved.
+</p>
+
 <p><b>startDate.human</b><br />
 The date and time this event starts, in human readable format.
 </p>
 
 <p><b>endDate.human</b><br />
 The date and time this event ends, in human readable format.
-</p>
-
-<p><b>eventIsFull</b><br />
-A boolean that is true if the there are no available seats remaining in this event.
 </p>
 
 <p><b>purchase.label</b><br />
@@ -561,8 +514,28 @@ A URL for the user to register for this event and add it to their shopping cart.
 If the event is full, the url will be blank.
 </p>
 
+<p><b>purchase.message</b><br />
+A message to ask the user whether or not they'd like to see subevents for this event.
+If the event is full, this variable will be blank.
+</p>
+
+<p><b>purchase.wantToSearch.url</b><br />
+A URL to search for events that are requirements for this event.
+If the event is full, this variable will be blank.
+</p>
+
+<p><b>purchase.wantToContinue.url</b><br />
+A URL to add this event to the cart.
+If the event is full, this variable will be blank.
+</p>
+
+<p><b>purchase.label</b><br />
+The internationalized label "Add To Cart".
+If the event is full, this variable will be blank.
+</p>
+
 |,
-		lastUpdated => 1145421471,
+		lastUpdated => 1147056988,
 	},
 
 	'manage purchases template help title' => {
@@ -852,27 +825,10 @@ Messages from the system about the number and type of results being displayed.
 		lastUpdated => 1145655811,
 	},
 
-
-	'ems asset help title' => {
-		message => q|EMS Asset Template Variables|,
-		lastUpdated => 1140465899,
-	},
-
-	'ems asset help body' => {
-		message => q|
-<p>The Event Management System Asset inherits all common variables available to Assets
-and Wobjects, as well as these individual variables:</p>
-
-|,
-		lastUpdated => 1145465299,
-	},
-
-
 	'event template help title' => {
 		message => q|Event Management System Event Template|,
 		lastUpdated => 1140465899,
 	},
-
 
 	'add/edit event help title' => { 
 		message => q|Add/Edit Event|,
@@ -894,20 +850,6 @@ for this event.</p>
 		lastUpdated => 1140470450,
 		context => q|Body for Add/Edit Event Help|
 	},
-
-	'manage events help body' => { 
-		message => q|
-<p>As the name implies, this screen allows you to manage the events in this instance
-of the Event Management System.</p>
-<p>The table of events will provide you with a quick overview of the events in the system,
-by title, price and status (approved or pending approval).  The icon bar for each event
-allows you to edit events,  delete events, or change their order.</p>
-<p>The link, Add Event, will allow you to add new events.</p>
-|,
-		lastUpdated => 1140475291,
-		context => q|Body for Add/Edit Event Help|
-	},
-
 
 	#If the help file documents an Asset, it must include an assetName key
 	#If the help file documents an Macro, it must include an macroName key
@@ -1279,6 +1221,16 @@ normal templates.|,
 
         'add registrant' => {
                 message => q|Add Registrant|,
+                lastUpdated => 1147050958,
+        },
+
+        'see available subevents' => {
+                message => q|Would you like to see available subevents?|,
+                lastUpdated => 1147050958,
+        },
+
+        'manage events' => {
+                message => q|Manage Events|,
                 lastUpdated => 1147050958,
         },
 
