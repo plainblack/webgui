@@ -85,7 +85,7 @@ sub definition {
 			},
 		defaultValue>{
 			defaultValue=>''
-			},
+			}
 		});
         return $class->SUPER::definition($session, $definition);
 }
