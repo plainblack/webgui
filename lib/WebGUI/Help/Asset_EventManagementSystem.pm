@@ -150,6 +150,64 @@ our $HELP = {
 		],
 	},
 
+	'edit event metadata field' => {
+		source => 'sub www_editEventMetaDataField',
+		title => 'add/edit event metadata field',
+		body => 'add/edit event metadata field body',
+		fields => [
+                        {
+                                title => '475',
+                                description => '475 description',
+                                namespace => 'WebGUIProfile',
+                        },
+                        {
+                                title => '472',
+                                description => '472 description',
+                                namespace => 'WebGUIProfile',
+                        },
+                        {
+                                title => '473a',
+                                description => '473a description',
+                                namespace => 'WebGUIProfile',
+                        },
+                        {
+                                title => '474',
+                                description => '474 description',
+                                namespace => 'WebGUIProfile',
+                        },
+                        {
+                                title => '486',
+                                description => '486 description',
+                                namespace => 'WebGUIProfile',
+                        },
+                        {
+                                title => '487',
+                                description => '487 description',
+                                namespace => 'WebGUIProfile',
+                        },
+                        {
+                                title => '488',
+                                description => '488 description',
+                                namespace => 'WebGUIProfile',
+                        },
+                        {
+                                title => 'auto search',
+                                description => 'auto search description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+		],
+		related => [
+			{
+				tag => 'event management system add/edit',
+				namespace => 'Asset_EventManagementSystem',
+			},
+			{
+				tag => 'add/edit event',
+				namespace => 'Asset_EventManagementSystem',
+			},
+		],
+	},
+
 	'event management system template' => {
 		source => 'sub view',
 		title => 'template help title',

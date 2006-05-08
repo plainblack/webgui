@@ -3967,6 +3967,11 @@ Get a copy of wget and use this: <code>wget -p -r --html-extension -k http://the
 		lastUpdated => 0,
 	},
 
+	'country' => {
+		message => q|Country|,
+		lastUpdated => 0,
+	},
+
 };
 
 1;

@@ -344,6 +344,17 @@ our $I18N = { ##hashref of hashes
 		context => q|In Manage Event Metadata screen|,
 	},
 
+	'add/edit event metadata field' => {
+		message => q|Add/Edit Event Metadata Field|,
+		lastUpdated => 1138908251,
+		context => q|In Manage Event Metadata screen|,
+	},
+
+	'add/edit event metadata field body' => {
+		message => q|<p>This screen allows you to add a new metadata field to an event or to reconfigure existing metadata fields.</p>|,
+		lastUpdated => 1138908251,
+	},
+
 	'null field error' => {
 		message => q|The %s field cannot be blank.|,
 		lastUpdated => 1138908251,

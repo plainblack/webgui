@@ -2022,9 +2022,9 @@ sub www_editEventMetaDataField {
 		$hash{$category->getId} = $category->getLabel;
 	}
 	$f->submit;
-		$self->getAdminConsole->setHelp('event management system manage events','Asset_EventManagementSystem');
+	$self->getAdminConsole->setHelp('edit event metadata field','Asset_EventManagementSystem');
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editEventMetaDataField;fieldId=new'), $i18n2->get("add new event metadata field"));
-	return $self->_acWrapper($f->print, $i18n2->get("add new event metadata field"));
+	return $self->_acWrapper($f->print, $i18n2->get("add/edit event metadata field"));
 }
 
 #-------------------------------------------------------------------
