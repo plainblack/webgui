@@ -1834,6 +1834,14 @@ sub www_editEvent {
 	if (scalar(keys(%discountPasses))) {
 		#there are some discount passes entered into the system
 		%discountPasses = (''=>$i18n->get('select one'),%discountPasses);
+		$f->selectBox(
+			-name=>'passId',
+			-rowClass=>'" id="passIdRow', # tricky little hack.
+			-options=>\%discountPasses,
+			-label=>$i18n->echo('assigned discount pass'),
+			-hoverHelp=>$i18n->echo('Which Discount Pass will be applied to this event.'),
+			-value=>$self->session->form->get("passId") || $event->{passId}
+		);
 		$f->radioList(
 			-name=>'passType',
 			-options=>\%passOptions,
@@ -1859,14 +1867,6 @@ function changePassType() {
 }
 changePassType();
 </script>',
-			-label=>$i18n->echo('assigned discount pass'),
-			-hoverHelp=>$i18n->echo('Which Discount Pass will be applied to this event.'),
-			-value=>$self->session->form->get("passId") || $event->{passId}
-		);
-		$f->selectBox(
-			-name=>'passId',
-			-rowClass=>' id="passIdRow"',
-			-options=>\%discountPasses,
 			-label=>$i18n->echo('assigned discount pass'),
 			-hoverHelp=>$i18n->echo('Which Discount Pass will be applied to this event.'),
 			-value=>$self->session->form->get("passId") || $event->{passId}
