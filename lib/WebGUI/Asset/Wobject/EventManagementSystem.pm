@@ -3361,11 +3361,13 @@ sub www_editDiscountPassSave {
 	return $self->www_editDiscountPass(undef,$error) if $error;
 	my $passId = $self->session->form->process('passId');
 	my $type = $self->session->form->get("type", "radioList");
+	my $name = $self->session->form->get("name", "text");
 	my $amount = $self->session->form->get("amount", "float");
 	my $details = {
 		passId => $passId, # if this is "new", setCollateral will return the new one.
 		type       => $type,
-		amount	 => $amount
+		amount	 => $amount,
+		name => $name
 	};
 	$passId = $self->setCollateral("EventManagementSystem_discountPasses", "passId",$details,0,0);
 	return $self->www_manageDiscountPasses();
