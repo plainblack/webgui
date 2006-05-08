@@ -1607,10 +1607,11 @@ function changePassType() {
 		passIdRow.style.display="none";
 		var passIdChooser = document.getElementById("passId_formId");
 		if (passType == "member") {
-			passIdChooser.multiple=1;
+			passIdChooser.multiple=true;
 			passIdChooser.size=5;
 		} else {
-			passIdChooser.multiple=0;
+			passIdChooser.size=1;
+			passIdChooser.multiple=false;
 		}
 		passIdRow.style.display="";
 	}
