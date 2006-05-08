@@ -427,9 +427,7 @@ sub errorCode {
 
 #-------------------------------------------------------------------
 sub name {
-	my ($self) = shift;
-	my $i18n = WebGUI::International->new($self->session, "CommercePaymentCash");
-	return $i18n->get('module name');
+	return 'Cash';
 }
 
 #-------------------------------------------------------------------

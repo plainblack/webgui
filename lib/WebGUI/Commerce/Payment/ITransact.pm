@@ -599,9 +599,7 @@ sub errorCode {
 
 #-------------------------------------------------------------------
 sub name {
-	my ($self) = shift;
-	my $i18n = WebGUI::International->new($self->session, "CommercePaymentITransact");
-	return $i18n->get('module name');
+	return 'ITransact';
 }
 
 #-------------------------------------------------------------------
