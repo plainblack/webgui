@@ -1820,6 +1820,13 @@ sub www_editEvent {
 			-value=>$self->session->form->get("prerequisiteId") || $event->{prerequisiteId}
 		);
 	}
+	my %passOptions;
+	tie %passOptions, 'Tie::IxHash';
+	%passOptions = (
+		''=>$i18n->echo('None'),
+		'member'=>$i18n->echo('<strong>This event is a member of a discount pass.</strong><br />  The selected discount pass should be applied to this event if both are in the user\'s cart.'),
+		'defines'=>$i18n->echo('<strong>This event defines a discount pass.</strong><br />  If the user adds this event to his/her cart, the associated discount will be applied (upon checkout) to any events that are members of this discount pass.')
+	);
 	
 	my %discountPasses;
 	tie %discountPasses, 'Tie::IxHash';
@@ -1829,23 +1836,28 @@ sub www_editEvent {
 		%discountPasses = (''=>$i18n->get('select one'),%discountPasses);
 		$f->radioList(
 			-name=>'passType',
-			-options=>{
-				''=>$i18n->echo('None'),
-				'member'=>$i18n->echo('<strong>This event is a member of a discount pass.</strong><br />  The selected discount pass should be applied to this event if both are in the user\'s cart.'),
-				'defines'=>$i18n->echo('<strong>This event defines a discount pass.</strong><br />  If the user adds this event to his/her cart, the associated discount will be applied (upon checkout) to any events that are members of this discount pass.')
-			},
+			-options=>\%passOptions,
+			-vertical=1,
 			-extras=>' onclick="changePassType();" ',
 			-subtext=>'<script type="text/javascript">
-var passTypeField = document.getElementById("passType_formId");
 var passIdRow = document.getElementById("passIdRow");
-if (passTypeField.value == "") passIdRow.style.display="none";
+function getChosenType() {
+	var i = 0;
+	while(document.forms[0].passType[i]) {
+	  if (document.forms[0].passType[i].checked) return document.forms[0].passType[i].value;
+	  i++;
+	}
+	return undef;
+}
 function changePassType() {
-	if (passTypeField.value == "") {
-		passIdRow.style.display="none";
+	var passType = getChosenType();
+	if (passType == '') {
+		passIdRow.style.display='none';
 	} else {
-		passIdRow.style.display="";
+		passIdRow.style.display='';
 	}
 }
+changePassType();
 </script>',
 			-label=>$i18n->echo('assigned discount pass'),
 			-hoverHelp=>$i18n->echo('Which Discount Pass will be applied to this event.'),
