@@ -151,8 +151,8 @@ sub _acWrapper {
 	$self->getAdminConsole->setHelp('add/edit event','Asset_EventManagementSystem');
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=search'),$i18n->get("manage events"));
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n->get('manage event metadata'));
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=managePrereqSets'), $i18n->get('manage prerequisite sets'));
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageRegistrants'), $i18n->get('manage registrants'));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=managePrereqSets'), $i18n->echo('manage prerequisite sets'));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageRegistrants'), $i18n->echo('manage registrants'));
 	return $self->getAdminConsole->render($html,$title);
 }
 
@@ -3077,7 +3077,7 @@ sub www_editRegistrant {
 		label=>$i18n->get("email address")
 	);
 	$f->submit;
-	return $self->_acWrapper($f->print, $i18n->get("edit prerequisite set"));
+	return $self->_acWrapper($f->print, $i18n->echo("edit registrant"));
 }
 
 #-------------------------------------------------------------------
