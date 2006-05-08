@@ -151,8 +151,8 @@ sub _acWrapper {
 	$self->getAdminConsole->setHelp('add/edit event','Asset_EventManagementSystem');
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=search'),$i18n->get("manage events"));
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n->get('manage event metadata'));
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=managePrereqSets'), $i18n->echo('manage prerequisite sets'));
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageRegistrants'), $i18n->echo('manage registrants'));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=managePrereqSets'), $i18n->get('manage prerequisite sets'));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageRegistrants'), $i18n->get('manage registrants'));
 	return $self->getAdminConsole->render($html,$title);
 }
 
@@ -1810,12 +1810,12 @@ sub www_editEvent {
 	if (scalar(keys(%prereqSets)) && (scalar(keys(%prereqMemberships)) == 0)) {
 		#there are some prereq sets entered into the system, and 
 		#this event is not a member of any of them.
-		%prereqSets = (''=>$i18n->echo('select one'),%prereqSets);
+		%prereqSets = (''=>$i18n->get('select one'),%prereqSets);
 		$f->selectBox(
 			-name=>'prerequisiteId',
 			-options=>\%prereqSets,
-			-label=>$i18n->echo('Assigned Prerequisite Set'),
-			-hoverHelp=>$i18n->echo('Which Prerequisite Set this event requires in order to be added to a badge.'),
+			-label=>$i18n->get('assigned prerequisite set'),
+			-hoverHelp=>$i18n->get('assigned prerequisite set description'),
 			-value=>$self->session->form->get("prerequisiteId") || $event->{prerequisiteId}
 		);
 	}
@@ -2133,7 +2133,7 @@ sub www_editEventMetaDataField {
 		};
 		$f->readOnly(
 			-name => 'error',
-			-label => 'Error:',
+			-label => $i18n2->get('error'),
 			-value => '<span style="color:red;font-weight:bold">'.$error.'</span>',
 		);
 	} elsif ($fieldId ne 'new') {
@@ -2863,16 +2863,16 @@ sub www_managePrereqSets {
 		while (my %row = $sth->hash) {
 			$output .= "<div>";
 			$output .= $self->session->icon->delete('func=deletePrereqSet;psid='.$row{prerequisiteId}, $self->getUrl,
-							       $i18n->echo('are you sure you want to delete this prerequisite set  this will also unlink any events that are currently set to require this prerequisite set')).
+							       $i18n->get('confirm delete prerequisite set')).
 				  $self->session->icon->edit('func=editPrereqSet;psid='.$row{prerequisiteId}, $self->getUrl).
 				  " ".$row{name}."</div>";
 		}
 	} else {
-		$output .= $i18n->echo('you do not have any prerequisite sets to display');
+		$output .= $i18n->get('no sets to display');
 	}
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editPrereqSet;psid=new'), $i18n->echo('add prerequisite set'));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editPrereqSet;psid=new'), $i18n->get('add prerequisite set'));
 
-	return $self->_acWrapper($output, $i18n->echo("manage prerequisite sets"));
+	return $self->_acWrapper($output, $i18n->get("manage prerequisite sets"));
 }
 
 
@@ -2895,7 +2895,7 @@ sub www_editPrereqSet {
 		};
 		$f->readOnly(
 			-name => 'error',
-			-label => 'Error:',
+			-label => $i18n->get('error'),
 			-value => '<span style="color:red;font-weight:bold">'.$error.'</span>',
 		);
 	} elsif ($psid eq 'new') {
@@ -2906,27 +2906,27 @@ sub www_editPrereqSet {
 	}
 	$f->text(
 		-name => "name",
-		-label => $i18n->echo('prereq set name field label'),
-		-hoverHelp => $i18n->echo('prereq set name field description'),
+		-label => $i18n->get('prereq set name field label'),
+		-hoverHelp => $i18n->get('prereq set name field description'),
 		-extras=>(($data->{name} eq $i18n->get('type name here'))?' style="color:#bbbbbb" ':'').' onblur="if(!this.value){this.value=\''.$i18n->get('type name here').'\';this.style.color=\'#bbbbbb\';}" onfocus="if(this.value == \''.$i18n->get('type name here').'\'){this.value=\'\';this.style.color=\'\';}"',
 		-value => $data->{name},
 	);
 	$f->radioList(
 		-name=>"operator",
 		-vertical=>1,
-		-label=>$i18n->echo('operator type'),
-		-hoverHelp => $i18n->echo('whether any or all of the selected events should be required'),
+		-label=>$i18n->get('operator type'),
+		-hoverHelp => $i18n->get('operator type description'),
 		-options=>{
-			'or'=>'any',
-			'and'=>'all'
+			'or'=>$i18n->get('any'),
+			'and'=>$i18n->get('all'),
 		},
 		-value=>$data->{operator}
 	);
 	$f->checkList(
 		-name=>"requiredEvents",
 		-vertical=>1,
-		-label=>$i18n->echo('events required by this prerequisite set'),
-		-hoverHelp => $i18n->echo('place a check beside the events that are part of this prerequisite set'),
+		-label=>$i18n->get('events required by this prerequisite set'),
+		-hoverHelp => $i18n->get('events required by description'),
 		-options=>$self->session->db->buildHashRef("select p.productId, p.title
 		   from products as p, EventManagementSystem_products as e
 		   where
@@ -2935,7 +2935,7 @@ sub www_editPrereqSet {
 		-value=>$self->session->db->buildArrayRef("select requiredProductId from EventManagementSystem_prerequisiteEvents where prerequisiteId=?",[$psid])
 	);
 	$f->submit;
-	return $self->_acWrapper($f->print, $i18n->get("edit event metadata field"));
+	return $self->_acWrapper($f->print, $i18n->get("edit prerequisite set"));
 }
 
 #-------------------------------------------------------------------
@@ -2992,8 +2992,8 @@ sub www_manageRegistrants {
 			"&nbsp;&nbsp;".$_->{lastName}.",&nbsp;".$_->{firstName}."(&nbsp;".$_->{email}.")</div>";
 	}
 	$output .= '<div>'.$p->getBarAdvanced.'</div>';
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editRegistrant;badgeId=new'), $i18n->echo('add registrant'));
-	return $self->_acWrapper($output, $i18n->echo("manage registrants"));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editRegistrant;badgeId=new'), $i18n->get('add registrant'));
+	return $self->_acWrapper($output, $i18n->get("manage registrants"));
 }
 
 

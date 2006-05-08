@@ -1197,6 +1197,91 @@ normal templates.|,
                 lastUpdated => 1146170930,
         },
 
+        'manage prerequisite sets' => {
+                message => q|Manage Prerequisite Sets|,
+                lastUpdated => 1147050475,
+        },
+
+        'edit prerequisite set' => {
+                message => q|Edit Prerequisite Set|,
+                lastUpdated => 1147050475,
+        },
+
+        'assigned prerequisite set' => {
+                message => q|Assigned Prerequisite Set|,
+                lastUpdated => 1147050475,
+        },
+
+        'assigned prerequisite set description' => {
+                message => q|The Prerequisite Set this event requires in order to be added to a badge.|,
+                lastUpdated => 1147050475,
+        },
+
+        'confirm delete prerequisite set' => {
+                message => q|Are you sure you want to delete this prerequisite set?  This will also unlink any events that require this prerequisite set.|,
+                lastUpdated => 1147050475,
+        },
+
+        'no sets to display' => {
+                message => q|You do not have any prerequisite sets to display.|,
+                lastUpdated => 1147050475,
+        },
+
+        'add prerequisite set' => {
+                message => q|Add Prerequisite Set|,
+                lastUpdated => 1147050475,
+        },
+
+        'prereq set name field label' => {
+                message => q|Prerequisite Set Name|,
+                lastUpdated => 1147050475,
+        },
+
+        'prereq set name field description' => {
+                message => q|A descriptive name for this prerequisite set|,
+                lastUpdated => 1147050475,
+        },
+
+        'operator type' => {
+                message => q|Operator Type|,
+                lastUpdated => 1147050475,
+        },
+
+        'operator type description' => {
+                message => q|Whether any or all of the selected events should be required.|,
+                lastUpdated => 1147050958,
+        },
+
+        'any' => {
+                message => q|Any|,
+                lastUpdated => 1147050958,
+        },
+
+        'all' => {
+                message => q|All|,
+                lastUpdated => 1147050958,
+        },
+
+        'events required by this prerequisite set' => {
+                message => q|Events required by this prerequisite set.|,
+                lastUpdated => 1147050958,
+        },
+
+        'events required by description' => {
+                message => q|Place a check beside the events that are part of this prerequisite set.|,
+                lastUpdated => 1147050958,
+        },
+
+        'manage registrants' => {
+                message => q|Manage Registrants|,
+                lastUpdated => 1147050958,
+        },
+
+        'add registrant' => {
+                message => q|Add Registrant|,
+                lastUpdated => 1147050958,
+        },
+
 };
 
 1;
