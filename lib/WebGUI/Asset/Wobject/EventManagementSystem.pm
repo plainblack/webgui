@@ -2982,7 +2982,7 @@ sub www_manageRegistrants {
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	
 	my $output;
-	my $sql = "select * from EventManagementSystem_badges order by lastName";
+	my $sql = "select * from EventManagementSystem_badges order by lastName, firstName";
 	my $p = WebGUI::Paginator->new($self->session,$self->getUrl('func=manageRegistrants'),50);
 	$p->setDataByArrayRef($self->session->db->buildArrayRefOfHashRefs($sql));
 	my $data = $p->getPageData;
@@ -3036,7 +3036,8 @@ sub www_editRegistrant {
 	}
 	$f->user(
 		name=>'userId',
-		label=>$i18n->echo('associated user')
+		label=>$i18n->echo('associated user'),
+		value=>$data->{userId}
 	);
 	$f->raw(
 		'<script type="text/javascript">
