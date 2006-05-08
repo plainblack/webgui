@@ -1313,6 +1313,11 @@ normal templates.|,
                 lastUpdated => 1147050958,
         },
 
+        'manage discount passes' => {
+                message => q|Manage Discount Passes|,
+                lastUpdated => 1147050958,
+        },
+
         'add registrant' => {
                 message => q|Add Registrant|,
                 lastUpdated => 1147050958,
@@ -1358,6 +1363,11 @@ normal templates.|,
                 lastUpdated => 1147050958,
         },
 
+        'reset user' => {
+                message => q|Reset User|,
+                lastUpdated => 1147050958,
+        },
+
         'continue' => {
                 message => q|Continue|,
                 lastUpdated => 1147050958,
@@ -1371,6 +1381,115 @@ normal templates.|,
         'ends' => {
                 message => q|Ends|,
                 lastUpdated => 1147058499,
+        },
+
+        'Event Number' => {
+                message => q|Event Number|,
+                lastUpdated => 1147058499,
+                context => q|Synonym for SKU|,
+        },
+
+        'created by' => {
+                message => q|Created by|,
+                lastUpdated => 1147058499,
+        },
+
+        'created by description' => {
+                message => q|The user that created this registrant identity.|,
+                lastUpdated => 1147058499,
+        },
+
+        'add discount pass' => {
+                message => q|Add Discount Pass|,
+                lastUpdated => 1147108858,
+        },
+
+        'discount pass id' => {
+                message => q|Discount Pass ID|,
+                lastUpdated => 1147108858,
+        },
+
+        'discount pass type' => {
+                message => q|Discount Pass Type|,
+                lastUpdated => 1147108858,
+        },
+
+        'discount pass type description' => {
+                message => q|The Discount Pass can be one of several types.  The 'Percent Off' type reduces the price on applied products by the given percentage.  The 'New Price' type sets the price of the product to the given amount.  The 'Amount Off' type reduces the price by the given absolute amount.  The default type is 'New Price'.|,
+                lastUpdated => 1147108858,
+        },
+
+        'pass name' => {
+                message => q|Discount Pass Name|,
+                lastUpdated => 1147108858,
+        },
+
+        'percent off' => {
+                message => q|Percent Off|,
+                lastUpdated => 1147108858,
+        },
+
+        'amount off' => {
+                message => q|Amount Off|,
+                lastUpdated => 1147108858,
+        },
+
+        'new price' => {
+                message => q|New Price|,
+                lastUpdated => 1147108858,
+        },
+
+        'discount amount' => {
+                message => q|Discount(ed) Amount|,
+                lastUpdated => 1147108858,
+        },
+
+        'discount amount description' => {
+                message => q|The amount field can be in one of several unit types, depending on the discount pass type.  The 'Percent Off' type is in percent units (for 10% reduction, enter '10').  The 'New Price' and 'Amount Off' types are in an absolute amount of currency.  The default value is '0.00'.|,
+                lastUpdated => 1147108858,
+        },
+
+        'edit discount pass' => {
+                message => q|Edit Discount Pass|,
+                lastUpdated => 1147108858,
+        },
+
+        'None' => {
+                message => q|None|,
+                lastUpdated => 1147108858,
+        },
+
+        'discount pass member' => {
+                message => q|<strong>This event is a member of a discount pass.</strong><br />  The selected discount pass should be applied to this event if both are in the user's cart|,
+                lastUpdated => 1147108858,
+        },
+
+        'defines discount pass' => {
+                message => q|<strong>This event defines a discount pass.</strong><br />  If the user adds this event to his/her cart, the associated discount will be applied (upon checkout) to any events that are members of this discount pass.|,
+                lastUpdated => 1147108858,
+        },
+
+        'discount pass type' => {
+                message => q|Discount Pass Type|,
+                lastUpdated => 1147108858,
+        },
+
+        'discount pass type description' => {
+                message => q|Define if this event uses a discount pass, and if it does, whether it is one or
+is a member of a group that uses a discount pass.  For example, you could create a discount pass event called
+Attend All Sessions for fifty dollars.  Each session may cost twenty-five dollars, but be eligible to be
+added to the user's cart and would be discounted if the Attend All Sessions event is also purchased.|,
+                lastUpdated => 1147108858,
+        },
+
+        'assigned discount pass' => {
+                message => q|Assigned Discount Pass|,
+                lastUpdated => 1147108858,
+        },
+
+        'assigned discount pass description' => {
+                message => q|The Discount Pass, if any, that will be applied to this event.|,
+                lastUpdated => 1147108858,
         },
 
 };

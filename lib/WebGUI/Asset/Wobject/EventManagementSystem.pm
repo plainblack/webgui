@@ -102,7 +102,7 @@ sub _getFieldHash {
 			initial=>1
 		},
 		"sku"=>{
-			name=>$i18n->echo("Event Number"),
+			name=>$i18n->get("Event Number"),
 			type=>"text",
 			compare=>"numeric",
 			method=>"text",
@@ -163,7 +163,7 @@ sub _acWrapper {
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n->get('manage event metadata'));
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=managePrereqSets'), $i18n->get('manage prerequisite sets'));
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageRegistrants'), $i18n->get('manage registrants'));
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageDiscountPasses'), $i18n->echo('manage discount passes'));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageDiscountPasses'), $i18n->get('manage discount passes'));
 	return $self->getAdminConsole->render($html,$title);
 }
 
@@ -1833,9 +1833,9 @@ sub www_editEvent {
 	my %passOptions;
 	tie %passOptions, 'Tie::IxHash';
 	%passOptions = (
-		''=>$i18n->echo('None'),
-		'member'=>$i18n->echo('<strong>This event is a member of a discount pass.</strong><br />  The selected discount pass should be applied to this event if both are in the user\'s cart.'),
-		'defines'=>$i18n->echo('<strong>This event defines a discount pass.</strong><br />  If the user adds this event to his/her cart, the associated discount will be applied (upon checkout) to any events that are members of this discount pass.')
+		''=>$i18n->get('None'),
+		'member'=>$i18n->get('discount pass member'),
+		'defines'=>$i18n->get('defines discount pass')
 	);
 	
 	my %discountPasses;
@@ -1850,15 +1850,15 @@ sub www_editEvent {
 			-value=>$self->session->form->get("passType") || $event->{passType} || '',
 			-vertical=>1,
 			-extras=>' onclick="changePassType();" ',
-			-label=>$i18n->echo('assigned discount pass'),
-			-hoverHelp=>$i18n->echo('Which Discount Pass will be applied to this event.')
+			-label=>$i18n->get('discount pass type'),
+			-hoverHelp=>$i18n->get('discount pass type description')
 		);
 		$f->selectBox(
 			-name=>'passId',
 			-rowClass=>'" id="passIdRow', # tricky little hack.
 			-options=>\%discountPasses,
-			-label=>$i18n->echo('assigned discount pass'),
-			-hoverHelp=>$i18n->echo('Which Discount Pass will be applied to this event.'),
+			-label=>$i18n->get('assigned discount pass'),
+			-hoverHelp=>$i18n->get('assigned discount pass description'),
 			-value=>$self->session->form->get("passId") || $event->{passId},
 			-subtext=>'<script type="text/javascript">
 function getChosenType() {
@@ -3131,13 +3131,13 @@ function resetToInitial() {
 	userFieldDisplay.value="'.$username.'";
 }
 </script>
-<input type="button" onclick="clearUserField();" value="'.$i18n->get('Unlink User').'" /><input type="button" onclick="setUserNew();" value="'.$i18n->get('create new user').'" /><input type="button" onclick="resetToInitial();" value="'.$i18n->echo('reset user').'" />'
+<input type="button" onclick="clearUserField();" value="'.$i18n->get('Unlink User').'" /><input type="button" onclick="setUserNew();" value="'.$i18n->get('create new user').'" /><input type="button" onclick="resetToInitial();" value="'.$i18n->get('reset user').'" />'
 	);
 	if ($data->{userId} ne 'new' && $data->{createdByUserId} && $data->{createdByUserId} ne '1') {
 		$f->user(
 			name=>'createdByUserId',
-			label=>$i18n->echo('user that created this registrant identity'),
-			hoverHelp=>$i18n->echo('createdByUserId description'),
+			label=>$i18n->get('created by'),
+			hoverHelp=>$i18n->get('created by description'),
 			readOnly=>1,
 			value=>$data->{createdByUserId}
 		);
@@ -3307,8 +3307,8 @@ sub www_manageDiscountPasses {
 				"&nbsp;&nbsp;".$data->{name}."&nbsp;&nbsp;(".$data->{type}."&nbsp;".$data->{amount}."&nbsp;)</div>";
 		}
 	}
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editDiscountPass;passId=new'), $i18n->echo('add discount pass'));
-	return $self->_acWrapper($output, $i18n->echo("manage discount passes"));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editDiscountPass;passId=new'), $i18n->get('add discount pass'));
+	return $self->_acWrapper($output, $i18n->get("manage discount passes"));
 }
 
 
@@ -3342,33 +3342,33 @@ sub www_editDiscountPass {
 	}
 	$f->readOnly(
 		name=>'nullPass',
-		label=>$i18n->echo('discount pass id'),
+		label=>$i18n->get('discount pass id'),
 		value=>$passId
 	);
 	$f->text(
 		name=>'name',
-		label=>$i18n->echo("name"),
+		label=>$i18n->get("pass name"),
 		value=>$data->{name}
 	);
 	$f->radioList(
 		name=>'type',
 		options=>{
-			percentOff => $i18n->echo("percent off"),
-			newPrice => $i18n->echo("new price"),
-			amountOff => $i18n->echo("amount off")
+			percentOff => $i18n->get("percent off"),
+			newPrice => $i18n->get("new price"),
+			amountOff => $i18n->get("amount off")
 		},
-		label=>$i18n->echo("discount pass type"),
-		hoverHelp=>$i18n->echo("The Discount Pass can be one of several types.  The 'Percent Off' type reduces the price on applied products by the given percentage.  The 'New Price' type sets the price of the product to the given amount.  The 'Amount Off' type reduces the price by the given absolute amount.  The default type is 'New Price'."),
+		label=>$i18n->get("discount pass type"),
+		hoverHelp=>$i18n->get("discount pass type description"),
 		value=>$data->{type} || 'newPrice'
 	);
 	$f->float(
 		name=>'amount',
-		label=>$i18n->echo("discount(ed) amount"),
-		hoverHelp=>$i18n->echo("The amount field can be in one of several unit types, depending on the discount pass type.  The 'Percent Off' type is in percent units (for 10% reduction, enter '10').  The 'New Price' and 'Amount Off' types are in an absolute amount of currency.  The default value is '0.00'."),
+		label=>$i18n->get("discount amount"),
+		hoverHelp=>$i18n->get("discount amount description"),
 		value=>$data->{amount} || '0.00'
 	);
 	$f->submit;
-	return $self->_acWrapper($f->print, $i18n->echo("edit discount pass"));
+	return $self->_acWrapper($f->print, $i18n->get("edit discount pass"));
 }
 
 #-------------------------------------------------------------------
