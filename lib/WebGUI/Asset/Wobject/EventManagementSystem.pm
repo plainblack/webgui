@@ -1851,10 +1851,10 @@ function getChosenType() {
 }
 function changePassType() {
 	var passType = getChosenType();
-	if (passType == '') {
-		passIdRow.style.display='none';
+	if (passType == "") {
+		passIdRow.style.display="none";
 	} else {
-		passIdRow.style.display='';
+		passIdRow.style.display="";
 	}
 }
 changePassType();
