@@ -383,10 +383,13 @@ sub getPageLinks {
 	for (my $i=0; $i<$self->getNumberOfPages; $i++) {
 		my $altTag;
 		if ($self->{abKey}) {
+			my $first = $i * $self->{_rpp};
+			my $last = (($i+1) * $self->{_rpp})-1;
+			$last = $self->{_totalRows} - 1 if $last >= $self->{_totalRows};
 			if ($self->{abInitialOnly}) {
-				$altTag = ' title="'.substr($self->{_rowRef}[($i * $self->{_rpp})+1]->{$self->{abKey}},0,1).'-'.substr($self->{_rowRef}[(($i+1) * $self->{_rpp})-1]->{$self->{abKey}},0,1).'"';
+				$altTag = ' title="'.substr($self->{_rowRef}[$first]->{$self->{abKey}},0,1).'-'.substr($self->{_rowRef}[$last]->{$self->{abKey}},0,1).'"';
 			} else {
-				$altTag = ' title="'.$self->{_rowRef}[($i * $self->{_rpp})+1]->{$self->{abKey}}.' - '.$self->{_rowRef}[(($i+1) * $self->{_rpp})-1]->{$self->{abKey}}.'"';
+				$altTag = ' title="'.$self->{_rowRef}[$first]->{$self->{abKey}}.' - '.$self->{_rowRef}[$last]->{$self->{abKey}}.'"';
 			}
 		}
 		if ($i+1 == $pn) {
