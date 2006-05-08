@@ -3034,15 +3034,35 @@ sub www_editRegistrant {
 	} else {
 		$data = $self->session->db->quickHashRef("select * from EventManagementSystem_badges where badgeId=?",[$badgeId]);
 	}
-	$f->user({name=>'userId'});
-	$f->text({name=>'firstName'});
-	$f->text({name=>'lastName'});
-	$f->text({name=>'address'});
-	$f->text({name=>'city'});
-	$f->text({name=>'state'});
-	$f->text({name=>'zipCode'});
-	$f->selectBox({name=>'country', options => $self->getCountries, value=>'United States'});
-	$f->phone({name=>'phone'});
+	$f->user(
+		name=>'userId'
+	);
+	$f->text(
+		name=>'firstName'
+	);
+	$f->text(
+		name=>'lastName'
+	);
+	$f->text(
+		name=>'address'
+	);
+	$f->text(
+		name=>'city'
+	);
+	$f->text(
+		name=>'state'
+	);
+	$f->text(
+		name=>'zipCode'
+	);
+	$f->selectBox(
+		name=>'country',
+		options => $self->getCountries,
+		value=>'United States'
+	);
+	$f->phone(
+		name=>'phone'
+	);
 	$f->submit;
 	return $self->_acWrapper($f->print, $i18n->get("edit prerequisite set"));
 }
