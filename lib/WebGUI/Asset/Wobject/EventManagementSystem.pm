@@ -1845,6 +1845,7 @@ sub www_editEvent {
 		$f->radioList(
 			-name=>'passType',
 			-options=>\%passOptions,
+			-value=>$self->session->form->get("passType") || $event->{passType} || '',
 			-vertical=>1,
 			-extras=>' onclick="changePassType();" ',
 			-subtext=>'<script type="text/javascript">
@@ -1855,7 +1856,7 @@ function getChosenType() {
 	  if (document.forms[0].passType[i].checked) return document.forms[0].passType[i].value;
 	  i++;
 	}
-	return undef;
+	return "";
 }
 function changePassType() {
 	var passType = getChosenType();
