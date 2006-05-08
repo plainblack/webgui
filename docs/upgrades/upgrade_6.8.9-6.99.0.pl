@@ -1163,15 +1163,15 @@ GRAPH4
 
 sub updateProfileListFields {
 	foreach ("UPDATE userProfileField SET fieldType='selectBox' WHERE fieldType='selectList' and fieldName in ('language','gender','dateFormat','timeFormat','discussionLayout','INBOXNotifications','firstDayOfWeek','uiLevel','toolbar')",
-	"UPDATE userProfileField SET dataDefault='\'English\'' WHERE fieldName='language'",
-"UPDATE userProfileField SET dataDefault='\'neuter\'' WHERE fieldName='gender'",
-"UPDATE userProfileField SET dataDefault='\'%M/%D/%Y\'' WHERE fieldName='dateFormat'",
-"UPDATE userProfileField SET dataDefault='\'%H:%n %p\'' WHERE fieldName='timeFormat'",
-"UPDATE userProfileField SET dataDefault='\'nested\'' WHERE fieldName='discussionLayout'",
-"UPDATE userProfileField SET dataDefault='\'email\'' WHERE fieldName='INBOXNotifications'",
-"UPDATE userProfileField SET dataDefault='\'0\'' WHERE fieldName='firstDayOfWeek'",
-"UPDATE userProfileField SET dataDefault='\'5\'' WHERE fieldName='uiLevel'",
-"UPDATE userProfileField SET dataDefault='\'useLanguageDefault\'' WHERE fieldName='toolbar'") {
+	"UPDATE userProfileField SET dataDefault='\\'English\\'' WHERE fieldName='language'",
+"UPDATE userProfileField SET dataDefault='\\'neuter\\'' WHERE fieldName='gender'",
+"UPDATE userProfileField SET dataDefault='\\'%M/%D/%Y\\'' WHERE fieldName='dateFormat'",
+"UPDATE userProfileField SET dataDefault='\\'%H:%n %p\\'' WHERE fieldName='timeFormat'",
+"UPDATE userProfileField SET dataDefault='\\'nested\\'' WHERE fieldName='discussionLayout'",
+"UPDATE userProfileField SET dataDefault='\\'email\\'' WHERE fieldName='INBOXNotifications'",
+"UPDATE userProfileField SET dataDefault='\\'0\\'' WHERE fieldName='firstDayOfWeek'",
+"UPDATE userProfileField SET dataDefault='\\'5\\'' WHERE fieldName='uiLevel'",
+"UPDATE userProfileField SET dataDefault='\\'useLanguageDefault\\'' WHERE fieldName='toolbar'") {
 		$session->db->write($_);
 	}
 }
