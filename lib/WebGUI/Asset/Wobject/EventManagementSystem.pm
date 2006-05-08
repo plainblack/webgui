@@ -2985,6 +2985,7 @@ sub www_manageRegistrants {
 	my $p = WebGUI::Paginator->new($self->session,$self->getUrl('func=manageRegistrants'),50);
 	$p->setDataByArrayRef($self->session->db->buildArrayRefOfHashRefs($sql));
 	my $data = $p->getPageData;
+	$p->setAlphabeticalKey('lastName');
 	foreach (@$data) {
 		$output .= "<div>";
 	#	$output .= $self->session->icon->delete('func=deleteRegistrant;psid='.$_->{badgeId}, $self->getUrl);
