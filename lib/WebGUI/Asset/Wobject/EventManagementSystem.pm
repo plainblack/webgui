@@ -1609,9 +1609,11 @@ function changePassType() {
 		if (passType == "member") {
 			passIdChooser.multiple=true;
 			passIdChooser.size=5;
+			passIdChooser[0].text="'.$i18n->echo('Select one or more').'";
 		} else {
 			passIdChooser.size=1;
 			passIdChooser.multiple=false;
+			passIdChooser[0].text="'.$i18n->get('select one').'";
 		}
 		passIdRow.style.display="";
 	}
