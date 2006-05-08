@@ -83,7 +83,7 @@ sub definition {
 		profileEnabled=>{
 			defaultValue=>1
 			},
-		defaultValue>{
+		defaultValue=>{
 			defaultValue=>''
 			}
 		});
