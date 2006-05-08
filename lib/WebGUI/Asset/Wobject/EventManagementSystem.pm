@@ -3273,15 +3273,16 @@ sub www_manageDiscountPasses {
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	
 	my $output;
-	my $sql = "select * from EventManagementSystem_discountPasses order by name";
+	my $sth = $self->session->db->read("select * from EventManagementSystem_discountPasses order by name");
 	
-	foreach (@$data) {
-		$output .= "<div>";
-	#	$output .= $self->session->icon->delete('func=deleteDiscountPass;psid='.$_->{pasId}, $self->getUrl);
-		$output .= $self->session->icon->edit('func=editDiscountPass;passId='.$_->{pasId}, $self->getUrl).
-			"&nbsp;&nbsp;".$_->{lastName}.",&nbsp;".$_->{firstName}."&nbsp;&nbsp;(&nbsp;".$_->{email}."&nbsp;)</div>";
+	if ($sth->rows) {
+		while (my $data = $sth->hashRef) {
+			$output .= "<div>";
+		#	$output .= $self->session->icon->delete('func=deleteDiscountPass;psid='.$data->{passId}, $self->getUrl);
+			$output .= $self->session->icon->edit('func=editDiscountPass;passId='.$data->{passId}, $self->getUrl).
+				"&nbsp;&nbsp;".$data->{name}."&nbsp;&nbsp;(".$data->{type}."&nbsp;".$data->{amount}."&nbsp;)</div>";
+		}
 	}
-	$output .= '<div>'.$p->getBarAdvanced.'</div>';
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editDiscountPass;passId=new'), $i18n->echo('add discount pass'));
 	return $self->_acWrapper($output, $i18n->echo("manage discount passes"));
 }
