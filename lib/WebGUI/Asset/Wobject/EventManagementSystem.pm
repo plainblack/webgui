@@ -3165,14 +3165,14 @@ sub www_editRegistrantSave {
 			$u = WebGUI::User->new($self->session,'new');
 			my $uid = lc($firstName).".".lc($lastName);
 			$uid =~ s/\s//g; # fix potential space problems in UID.
-			my ($uidIsTaken) = $self->session->db->quickArray("select count(userId) from users where username=".quote($uid));
+			my ($uidIsTaken) = $self->session->db->quickArray("select count(userId) from users where username=?",[$uid]);
 			while($uidIsTaken) {
 				if($uid =~ /(.*)(\d+$)/){
 					$uid = $1.($2+1);
 				} else {
 					$uid .= "1";
 				}
-				($uidIsTaken) = $self->session->db->quickArray("select count(userId) from users where username=".quote($uid));
+				($uidIsTaken) = $self->session->db->quickArray("select count(userId) from users where username=?",[$uid]);
 			}
 			$u->username($uid);
 			$u->authMethod("WebGUI");
