@@ -2999,6 +2999,82 @@ sub www_manageRegistrants {
 }
 
 
+#-------------------------------------------------------------------
+sub www_editRegistrant {
+	my $self = shift;
+	my $badgeId = shift || $self->session->form->process("badgeId") || 'new';
+	my $error = shift;
+	return $self->session->privilege->insufficient unless ($self->canAddEvents);
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
+	my $f = WebGUI::HTMLForm->new($self->session, (
+		action => $self->getUrl."?func=editRegistrantSave;badgeId=".$badgeId
+	));
+	my $data = {};
+	if ($error) {
+		# load submitted data.
+		$data = {
+			userId => $self->session->var->get('userId'),
+			firstName => $self->session->form->get("firstName", "text"),
+			lastName => $self->session->form->get("lastName", "text"),
+			address = $self->session->form->get("address", "text"),
+			city = $self->session->form->get("city", "text"),
+			state = $self->session->form->get("state", "text"),
+			zipCode = $self->session->form->get("zipCode", "text"),
+			country = $self->session->form->get("country", "selectBox"),
+			phoneNumber = $self->session->form->get("phone", "phone"),
+			email = $self->session->form->get("email", "email")
+		};
+		$f->readOnly(
+			-name => 'error',
+			-label => $i18n->get('error'),
+			-value => '<span style="color:red;font-weight:bold">'.$error.'</span>',
+		);
+	} elsif ($badgeId eq 'new') {
+		#
+	} else {
+		$data = $self->session->db->quickHashRef("select * from EventManagementSystem_badges where badgeId=?",[$badgeId]);
+	}
+	$f->user({name=>'userId'});
+	$f->text({name=>'firstName'});
+	$f->text({name=>'lastName'});
+	$f->text({name=>'address'});
+	$f->text({name=>'city'});
+	$f->text({name=>'state'});
+	$f->text({name=>'zipCode'});
+	$f->selectBox({name=>'country', options => $self->getCountries, value=>'United States'});
+	$f->phone({name=>'phone'});
+	$f->submit;
+	return $self->_acWrapper($f->print, $i18n->get("edit prerequisite set"));
+}
+
+#-------------------------------------------------------------------
+sub www_editPrereqSetSave {
+	my $self = shift;
+	return $self->session->privilege->insufficient unless ($self->canAddEvents);
+	my $error = '';
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
+	foreach ('name') {
+		if ($self->session->form->get($_) eq "" || 
+			$self->session->form->get($_) eq $i18n->get('type name here')) {
+			$error .= sprintf($i18n->get('null field error'),$_)."<br />";
+		}
+	}
+	return $self->www_editPrereqSet(undef,$error) if $error;
+	my $psid = $self->session->form->process('psid');
+	$psid = $self->setCollateral("EventManagementSystem_prerequisites", "prerequisiteId",{
+		prerequisiteId=>$psid,
+		name => $self->session->form->process("name"),
+		operator => $self->session->form->process("operator",'radioList')
+	},0,0);
+	$self->session->db->write("delete from EventManagementSystem_prerequisiteEvents where prerequisiteId=?",[$psid]);
+	my @newRequiredEvents = $self->session->form->process('requiredEvents','checkList');
+	foreach (@newRequiredEvents) {
+		$self->session->db->write("insert into EventManagementSystem_prerequisiteEvents values (?,?)",[$psid,$_]);
+	}
+	return $self->www_managePrereqSets();
+}
+
+
 
 
 1;
