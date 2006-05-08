@@ -603,6 +603,7 @@ sub www_listUsers {
 		$output .= '</tr>';
 	}
         $output .= '</table>';
+        $p->setAlphabeticalKey('username');
         $output .= $p->getBarTraditional;
 	return _submenu($session,$output,undef,"users manage");
 }
