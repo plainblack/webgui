@@ -19,6 +19,7 @@ use base 'WebGUI::Asset::Wobject';
 use Tie::IxHash;
 use WebGUI::HTMLForm;
 use JSON;
+use Digest::MD5;
 use WebGUI::Workflow::Instance;
 use WebGUI::Cache;
 use WebGUI::International;
@@ -3038,6 +3039,12 @@ sub www_editRegistrant {
 		label=>$i18n->get('badge id'),
 		value=>$badgeId
 	);
+	my $u;
+	my $username;
+	if ($data->{userId}) {
+		$u = WebGUI::User->new($self->session,$data->{userId});
+		$username = $u->username;
+	}
 	$f->user(
 		name=>'userId',
 		label=>$i18n->get('associated user'),
@@ -3054,6 +3061,10 @@ function clearUserField() {
 function setUserNew() {
 	userField.value="new";
 	userFieldDisplay.value="'.$i18n->get('create new user').'";
+}
+function resetToInitial() {
+	userField.value="'.$data->{userId}.'";
+	userFieldDisplay.value="'.$username.'";
 }
 </script>
 <input type="button" onclick="clearUserField();" value="'.$i18n->get('Unlink User').'" /><input type="button" onclick="setUserNew();" value="'.$i18n->get('create new user').'" />'
@@ -3109,30 +3120,88 @@ function setUserNew() {
 }
 
 #-------------------------------------------------------------------
-sub www_editPrereqSetSave {
+sub www_editRegistrantSave {
 	my $self = shift;
 	return $self->session->privilege->insufficient unless ($self->canAddEvents);
 	my $error = '';
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
-	foreach ('name') {
-		if ($self->session->form->get($_) eq "" || 
-			$self->session->form->get($_) eq $i18n->get('type name here')) {
+	foreach ('firstName','lastName') {
+		if ($self->session->form->get($_) eq "") {
 			$error .= sprintf($i18n->get('null field error'),$_)."<br />";
 		}
 	}
-	return $self->www_editPrereqSet(undef,$error) if $error;
-	my $psid = $self->session->form->process('psid');
-	$psid = $self->setCollateral("EventManagementSystem_prerequisites", "prerequisiteId",{
-		prerequisiteId=>$psid,
-		name => $self->session->form->process("name"),
-		operator => $self->session->form->process("operator",'radioList')
-	},0,0);
-	$self->session->db->write("delete from EventManagementSystem_prerequisiteEvents where prerequisiteId=?",[$psid]);
-	my @newRequiredEvents = $self->session->form->process('requiredEvents','checkList');
-	foreach (@newRequiredEvents) {
-		$self->session->db->write("insert into EventManagementSystem_prerequisiteEvents values (?,?)",[$psid,$_]);
+	return $self->www_editRegistrant(undef,$error) if $error;
+	my $badgeId = $self->session->form->process('badgeId');
+	my $userId = $self->session->form->get("userId", "user");
+	my $firstName = $self->session->form->get("firstName", "text");
+	my $lastName = $self->session->form->get("lastName", "text");
+	my $address = $self->session->form->get("address", "text");
+	my $city = $self->session->form->get("city", "text");
+	my $state = $self->session->form->get("state", "text");
+	my $zipCode = $self->session->form->get("zipCode", "text");
+	my $country = $self->session->form->get("country", "selectBox");
+	my $phoneNumber = $self->session->form->get("phone", "phone");
+	my $email = $self->session->form->get("email", "email");
+	$userId = '' if $userId eq '1';
+	my $addingNew = ($userId eq 'new') ? 1 : 0;
+	my $details = {
+		badgeId => $badgeId, # if this is "new", setCollateral will return the new one.
+		firstName       => $firstName,
+		lastName	 => $lastName,
+		'address'         => $address,
+		city            => $city,
+		state		 => $state,
+		zipCode	 => $zipCode,
+		country	 => $country,
+		phone		 => $phoneNumber,
+		email		 => $email
+	};
+	$details->{userId} = $userId;
+	$details->{createdByUserId} = $self->session->var->get('userId') if ($addingNew && $userId);
+	$badgeId = $self->setCollateral("EventManagementSystem_badges", "badgeId",$details,0,0);
+	if ($userId) {
+		my $u;
+		if ($addingNew) {
+			$u = WebGUI::User->new($self->session,'new');
+			my $uid = lc($firstName).".".lc($lastName);
+			$uid =~ s/\s//g; # fix potential space problems in UID.
+			my ($uidIsTaken) = $self->session->db->quickArray("select count(userId) from users where username=".quote($uid));
+			while($uidIsTaken) {
+				if($uid =~ /(.*)(\d+$)/){
+					$uid = $1.($2+1);
+				} else {
+					$uid .= "1";
+				}
+				($uidIsTaken) = $self->session->db->quickArray("select count(userId) from users where username=".quote($uid));
+			}
+			$u->username($uid);
+			$u->authMethod("WebGUI");
+			my $auth = WebGUI::Auth::WebGUI->new($self->session,"WebGUI",$u->userId);
+			my $authprops = {};
+			$authprops->{changePassword} = 1;
+			$authprops->{changeUsername} = 0;
+			my $len = $self->session->setting->get("webguiPasswordLength") || 6;
+			my $password = "";
+			srand();
+			for(my $i = 0; $i < $len; $i++) {
+				$password .= chr(ord('A') + randint(32));
+			}
+			$authprops->{identifier} = Digest::MD5::md5_base64($password);
+			$auth->saveParams($u->userId,"WebGUI",$authprops);
+		} else {
+			$u = WebGUI::User->new($self->session,$userId);
+		}
+		$u->profileField('firstName',$firstName);
+		$u->profileField('lastName',$lastName);
+		$u->profileField('homeAddress',$address);
+		$u->profileField('homeCity',$city);
+		$u->profileField('homeState',$state);
+		$u->profileField('homeZip',$zipCode);
+		$u->profileField('homeCountry',$country);
+		$u->profileField('homePhone',$phoneNumber);
+		$u->profileField('email',$email);
 	}
-	return $self->www_managePrereqSets();
+	return $self->www_manageRegistrants();
 }
 
 
