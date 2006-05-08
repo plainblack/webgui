@@ -35,6 +35,7 @@ templateParsers();
 removeFiles();
 addSearchEngine();
 addEMS();
+addPM();
 updateTemplates();
 updateDatabaseLinksAndSQLReport();
 ipsToCIDR();
@@ -813,6 +814,70 @@ SQL9
 	}, "EMSworkflow00000000001");
 	my $activity = $workflow->addActivity("WebGUI::Workflow::Activity::CacheEMSPrereqs","EMSactivity00000000001");
 	$activity->set("title","Precache EMS prerequisites");	
+}
+
+#-------------------------------------------------
+sub addPM {
+   my $tableList = [
+            "create table PM_wobject (
+			   assetId varchar(22) binary not null,
+			   projectDashboardTemplateId varchar(22) binary not null default 'ProjectManagerTMPL0001',
+			   projectDisplayTemplateId varchar(22) binary not null default 'ProjectManagerTMPL0002',
+			   ganttChartTemplateId varchar(22) binary not null default 'ProjectManagerTMPL0003',
+			   editTaskTemplateId varchar(22) binary not null default 'ProjectManagerTMPL0004',
+			   groupToAdd varchar(22) binary not null default 3,
+			   revisionDate bigint(20) not null,
+			   primary key (assetId, revisionDate)
+			)",
+			
+			"create table PM_project (
+			    projectId varchar(22) binary not null,
+				assetId varchar(22) binary,
+				name varchar(255) not null,
+				description text,				
+				startDate bigint(20),
+				endDate bigint(20),
+				projectManager varchar(22) binary,
+				durationUnits enum('hours','days') default 'hours',
+				hoursPerDay float default null,
+				targetBudget float(15,2) default 0.00,
+				percentComplete float not null default 0,
+				parentId varchar(22) binary default NULL,
+				creationDate bigint(20) not null,
+				createdBy varchar(22) binary not null,
+				lastUpdatedBy varchar(22) binary not null,
+				lastUpdateDate bigint(20) not null,
+				primary key (projectId)
+			)",
+			
+			"create table PM_task (
+			    taskId varchar(22) binary not null,
+				projectId varchar(22) binary not null,
+				taskName varchar(255) not null,
+				duration bigint(20) default 0,
+				startDate bigint(20),
+				endDate bigint(20),
+				dependants varchar(50),
+				parentId varchar(22) binary default NULL,
+				isMilestone integer not null default 0,
+				percentComplete float not null default 0,
+				sequenceNumber integer not null default 1,
+				resourceId varchar(22) binary default NULL,
+				creationDate bigint(20) not null,
+				createdBy varchar(22) binary not null,
+				lastUpdatedBy varchar(22) binary not null,
+				lastUpdateDate bigint(20) not null,
+				primary key (taskId)
+			)",
+			
+          ];
+
+
+   print "\tAdding the Project Management System.\n" unless ($quiet);
+   foreach (@{$tableList}) {
+      $session->db->write($_);
+   }
+
 }
 
 #-------------------------------------------------
