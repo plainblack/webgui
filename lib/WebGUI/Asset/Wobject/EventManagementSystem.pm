@@ -1582,7 +1582,7 @@ sub www_editEvent {
 			-label=>$i18n->get('discount pass type'),
 			-hoverHelp=>$i18n->get('discount pass type description')
 		);
-		$f->selectBox(
+		$f->selectList(
 			-name=>'passId',
 			-rowClass=>'" id="passIdRow', # tricky little hack.
 			-options=>\%discountPasses,
