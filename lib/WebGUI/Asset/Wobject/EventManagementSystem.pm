@@ -1612,6 +1612,7 @@ function changePassType() {
 		} else {
 			passIdChooser.size=1;
 			passIdChooser.multiple=false;
+			passIdChooser.selectedIndex=0;
 		}
 		passIdRow.style.display="";
 	}
