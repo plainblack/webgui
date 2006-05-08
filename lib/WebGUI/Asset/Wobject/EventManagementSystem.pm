@@ -2701,6 +2701,7 @@ sub www_search {
 	} 
 	
 	$var{'events_loop'} = \@events;
+	$p->setAlphabeticalKey('title');
 	$var{'paginateBar'} = $p->getBarTraditional;
 	$var{'manageEvents.url'} = $self->getUrl('func=search');
 	$var{'manageEvents.label'} = $i18n->get('manage events');
