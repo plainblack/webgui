@@ -83,6 +83,9 @@ sub definition {
 		profileEnabled=>{
 			defaultValue=>1
 			},
+		defaultValue>{
+			defaultValue=>''
+			},
 		});
         return $class->SUPER::definition($session, $definition);
 }
