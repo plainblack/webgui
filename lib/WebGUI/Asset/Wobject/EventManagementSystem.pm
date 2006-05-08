@@ -1842,8 +1842,7 @@ sub www_editEvent {
 			-vertical=>1,
 			-extras=>' onclick="changePassType();" ',
 			-label=>$i18n->echo('assigned discount pass'),
-			-hoverHelp=>$i18n->echo('Which Discount Pass will be applied to this event.'),
-			-value=>$self->session->form->get("passId") || $event->{passId}
+			-hoverHelp=>$i18n->echo('Which Discount Pass will be applied to this event.')
 		);
 		$f->selectBox(
 			-name=>'passId',
