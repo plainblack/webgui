@@ -3033,6 +3033,11 @@ sub www_editRegistrant {
 	} else {
 		$data = $self->session->db->quickHashRef("select * from EventManagementSystem_badges where badgeId=?",[$badgeId]);
 	}
+	$f->readOnly(
+		name=>'nullBadge',
+		label=>'badgeId',
+		value=>$badgeId
+	);
 	$f->user(
 		name=>'userId',
 		label=>$i18n->echo('associated user'),
