@@ -164,7 +164,7 @@ sub checkoutForm {
 	$f->country(
 		-name=>"country",
 		-label=>$i18n->get("country"),
-		-value=>($self->session->form->process("country") || $u->profileField("homeCountry") || 'United States')
+		-value=>($self->session->form->process("country",'country') || $u->profileField("homeCountry") || 'United States')
 	);
   $f->phone(
 		-name=>"phone",
