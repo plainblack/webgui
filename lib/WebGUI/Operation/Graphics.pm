@@ -31,7 +31,7 @@ sub _submenu {
 #### hoverhelp
 #-------------------------------------------------------------------
 sub _getColorForm {
-	my ($f, $color, %hoppa);
+	my ($f, $color, %transparencies);
 	my $session = shift;
 	my $colorId = shift;
 
@@ -40,12 +40,12 @@ sub _getColorForm {
 	$color = WebGUI::Image::Color->new($session, $colorId);
 
 	# Create transparencies in 5% increments
-	tie %hoppa, 'Tie::IxHash';
-	$hoppa{'00'} = 'Opaque';
+	tie %transparencies, 'Tie::IxHash';
+	$transparencies{'00'} = 'Opaque';
 	for (1 .. 19) {
-		$hoppa{unpack('H*', pack('C', $_*255/20))} = 5*$_.'% Transparent';
+		$transparencies{unpack('H*', pack('C', $_*255/20))} = 5*$_.'% Transparent';
 	}
-	$hoppa{'ff'} = 'Invisible';
+	$transparencies{'ff'} = 'Invisible';
 
 	my $f = WebGUI::HTMLForm->new($session);
 	$f->text(
@@ -63,7 +63,7 @@ sub _getColorForm {
 	$f->selectSlider(
 		-name	=> 'fillAlpha',
 		-value	=> [ $color->getFillAlpha ],
-		-options=> \%hoppa, 
+		-options=> \%transparencies, 
 		-label	=> $i18n->get('fill alpha'),
 		-maxlength => 2,
 		-editable=>0,
@@ -79,7 +79,7 @@ sub _getColorForm {
 	$f->selectSlider(
 		-name	=> 'strokeAlpha',
 		-value	=> [ $color->getStrokeAlpha ],
-		-options=> \%hoppa,
+		-options=> \%transparencies,
 		-label	=> $i18n->get('stroke alpha'),
 		-maxlength => 2,
 		-editable => 0,
