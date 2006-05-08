@@ -172,6 +172,7 @@
 	"WebGUI::Asset::Wobject::Matrix", 
 	"WebGUI::Asset::Wobject::Poll", 
 	"WebGUI::Asset::Wobject::Product", 
+	"WebGUI::Asset::Wobject::ProjectManager",
 	"WebGUI::Asset::Wobject::SQLReport", 
 	"WebGUI::Asset::Wobject::Search",
 	"WebGUI::Asset::Wobject::Survey", 
