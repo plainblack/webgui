@@ -7,8 +7,29 @@ use POSIX;
 
 our @ISA = qw(WebGUI::Image::Graph::XYGraph);
 
+=head1 NAME
+
+Package WebGUI::Image::Graph::XYGraph::Line
+
+=head1 DESCRIPTION
+
+Package for creating line graphs.
+
+=head1 SYNOPSIS
+
+This package privides the logic for drawing 2d line graphs, 3d lines are in the
+pipeline but not yet ready for prime time. 
+
+The possibilities are quite limited for now but will be enhanced upon in the future.
+
+=head1 METHODS
+
+These methods are available from this class:
+
+=cut
+
 #-------------------------------------------------------------------
-=head1 drawGraph
+=head2 drawGraph
 
 Draws all the lines.
 
@@ -32,21 +53,21 @@ sub drawGraph {
 }
 
 #-------------------------------------------------------------------
-=head1 drawLine ( line, location, interval )
+=head2 drawLine ( line, location, interval )
 
 Draws a bar defined by bar and with width barWidth at location.
 
-=head2 line
+=head3 line
 
 A hashref defining the line. Must contain keys 'strokeColor' and
 'dataset', the latter one being an arrayref containing all points of the line.
 
-=head2 location
+=head3 location
 
 A hashref containing the location of the bottom-left corner of the line's 
 origin. Keys 'x' and 'y' must specify the x- and y-coordinates respectively.
 
-=head2 interval
+=head3 interval
 
 The distance between x-axis anchors in pixels.
 
@@ -81,7 +102,7 @@ sub drawLine {
 }
 
 #-------------------------------------------------------------------
-=head1 formNamespace
+=head2 formNamespace
 
 Returns the form namespace of this plugin. See WegBUI::Image::Graph for
 more elaborate information.
@@ -95,7 +116,7 @@ sub formNamespace {
 }
 
 #-------------------------------------------------------------------
-=head1 getAnchorSpacing
+=head2 getAnchorSpacing
 
 Returns the distance in pixels between two anchors on the x axis that define teh
 placement of bars and labels.
@@ -116,7 +137,7 @@ sub getAnchorSpacing {
 }
 
 #-------------------------------------------------------------------
-=head1 getFirstAnchorLocation
+=head2 getFirstAnchorLocation
 
 Returns a hashref containing the location of the leftmost x-axis anchor.
 Location coordinates are encoded in keys 'x' and 'y'.
@@ -133,7 +154,7 @@ sub getFirstAnchorLocation {
 }
 
 #-------------------------------------------------------------------
-=head1 processDataset
+=head2 processDataset
 
 Processes the dataset. Used by drawGraph.
 

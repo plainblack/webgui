@@ -6,7 +6,43 @@ use constant pi => 3.14159265358979;
 
 our @ISA = qw(WebGUI::Image::Graph);
 
+=head1 NAME
+
+Package WebGUI::Image::Graph::Pie
+
+=head1 DESCRIPTION
+
+Package to create pie charts, both 2d and 3d.
+
+=head1 SYNOPSIS
+
+Pie charts have a top height, bottom height which are the amounts of pixels the
+top and bottom rise above and below the z = 0 plane respectively. These
+properties can be used to create stepping effect.
+
+Also xeplosion and scaling of individual pie slices is possible. Labels can be
+connected via sticks and aligned to top, bottom and center of the pie.
+
+The package automatically desides whether to draw in 2d or 3d mode based on the
+angle by which the pie is tilted.
+
+=head1 METHODS
+
+These methods are available from this class:
+
+=cut
+
 #-------------------------------------------------------------------
+=head2 _mod2pi ( angle )
+
+Returns the angle modulo 2*pi.
+
+=head3 angle
+
+The angle you want the modulo of.
+
+=cut
+
 sub _mod2pi {
 	my $angle = shift;
 
@@ -222,6 +258,17 @@ sub addSlice {
 }
 
 #-------------------------------------------------------------------
+=head2 calcCoordinates ( slice )
+
+Calcs the coordinates of the corners of the given pie slice.
+
+=head3 slice
+
+Hashref containing the information that defines the slice. Must be formatted
+like the slices built by addSlice.
+
+=cut
+
 sub calcCoordinates {
 	my ($pieHeight, $pieWidth, $offsetX, $offsetY, $coords);
 	my $self = shift;
@@ -249,6 +296,13 @@ sub calcCoordinates {
 }
 
 #-------------------------------------------------------------------
+=head2 configurationForm
+
+The configuration form part for this object. See WebGUI::Image::Graph for
+documentation.
+
+=cut
+
 sub configurationForm {
 	my $self = shift;
 	
@@ -324,6 +378,12 @@ my	$configForms = $self->SUPER::configurationForm;
 }
 
 #-------------------------------------------------------------------
+=head2 draw
+
+Draws the pie chart.
+
+=cut
+
 sub draw {
 	my ($currentSlice, $coordinates, $sliceData, $leftPlaneVisible, $rightPlaneVisible);
 	my $self = shift;
@@ -383,6 +443,16 @@ sub draw {
 }
 
 #-------------------------------------------------------------------
+=head2 drawBottom ( slice )
+
+Draws the bottom of the given pie slice.
+
+=head3 slice
+
+A slice hashref. See addSlice for more information.
+
+=cut
+
 sub drawBottom {
 	my $self = shift;
 	my $slice = shift;
@@ -391,6 +461,16 @@ sub drawBottom {
 }
 
 #-------------------------------------------------------------------
+=head2 drawLabel ( slice )
+
+Draws the label including stick if needed for the given pie slice.
+
+=head3 slice
+
+A slice properties hashref.
+
+=cut
+
 sub drawLabel {
 	my ($startRadius, $stopRadius, $pieHeight, $pieWidth, $startPointX, $startPointY, 
 		$endPointX, $endPointY);
@@ -474,6 +554,16 @@ sub drawLabel {
 }
 
 #-------------------------------------------------------------------
+=head2 drawLeftSide ( slice )
+
+Draws the side connected to the startpoint of the slice.
+
+=head3 slice
+
+A slice properties hashref.
+
+=cut
+
 sub drawLeftSide {
 	my $self = shift;
 	my $slice = shift;
@@ -482,6 +572,25 @@ sub drawLeftSide {
 }
 
 #-------------------------------------------------------------------
+=head2 drawPieSlice ( slice, offset, fillColor )
+
+Draws a pie slice shape, ie. the bottom or top of a slice.
+
+=head3 slice
+
+A slice properties hashref.
+
+=head3 offset
+
+The offset in pixels for the y-direction. This is used to create the thickness
+of the pie.
+
+=head3 fillColor
+
+The color with which the slice should be filled.
+
+=cut
+
 sub drawPieSlice {
 	my (%tip, %startCorner, %endCorner, $pieWidth, $pieHeight, $bigCircle,
 		$strokePath);
@@ -520,6 +629,16 @@ sub drawPieSlice {
 }
 
 #-------------------------------------------------------------------
+=head2 drawRightSide ( slice )
+
+Draws the side connected to the endpoint of the slice.
+
+=head3 slice
+
+A slice properties hashref.
+
+=cut
+
 sub drawRightSide {
 	my $self = shift;
 	my $slice = shift;
@@ -528,6 +647,16 @@ sub drawRightSide {
 }
 
 #-------------------------------------------------------------------
+=head2 drawRim ( slice )
+
+Draws the rim of the slice.
+
+=head3 slice
+
+A slice properties hashref.
+
+=cut
+
 sub drawRim {
 	my (%startSideTop, %startSideBottom, %endSideTop, %endSideBottom,
 		$pieWidth, $pieHeight, $bigCircle);
@@ -570,6 +699,27 @@ sub drawRim {
 }
 
 #-------------------------------------------------------------------
+=head2 drawSide ( slice, [ cornerName ], [ fillColor ] )
+
+Draws the sides connecting the rim and tip of a pie slice.
+
+=head3 slice
+
+A slice properties hashref.
+
+=head3 cornerName
+
+Specifies which side you want to draw, identified by the name of the corner that
+attaches it to the rim. Can be either 'startCorner' or 'endCorner'. If ommitted
+it will default to 'startCorner'.
+
+=head3 fillColor
+
+The color with which the side should be filled. If not passed the color for the
+'startCorner' side will be defaulted to.
+
+=cut
+
 sub drawSide {
 	my (%tipTop, %tipBottom, %rimTop, %rimBottom);
 	my $self = shift;
@@ -608,6 +758,16 @@ sub drawSide {
 }
 
 #-------------------------------------------------------------------
+=head2 drawBottom ( slice )
+
+Draws the bottom of the given pie slice.
+
+=head3 slice
+
+A slice hashref. See addSlice for more information.
+
+=cut
+
 sub drawTop {
 	my $self = shift;
 	my $slice = shift;
@@ -616,6 +776,13 @@ sub drawTop {
 }
 
 #-------------------------------------------------------------------
+=head2 formNamespace
+
+Extends the form namespace for this object. See WebGUI::Image::Graph for
+documentation.
+
+=cut
+
 sub formNamespace {
 	my $self = shift;
 
@@ -623,6 +790,12 @@ sub formNamespace {
 }
 
 #-------------------------------------------------------------------
+=head2 getBottomHeight
+
+Returns the thickness of the bottom. Defaults to 0.
+
+=cut
+
 sub getBottomHeight {
 	my $self = shift;
 
@@ -630,6 +803,12 @@ sub getBottomHeight {
 }
 
 #-------------------------------------------------------------------
+=head2 getConfiguration
+
+Returns a configuration hashref. See WebGUI::Image::Graph for documentation.
+
+=cut
+
 sub getConfiguration {
 	my $self = shift;
 
@@ -649,6 +828,13 @@ sub getConfiguration {
 }
 
 #-------------------------------------------------------------------
+=head2 getDataset
+
+Returns the first dataset that is added. Pie charts can only handle one dataset
+and therefore the first added dataset is used.
+
+=cut
+
 sub getDataset {
 	my $self = shift;
 
@@ -656,6 +842,13 @@ sub getDataset {
 }
 
 #-------------------------------------------------------------------
+=head2 getExplosionLength
+
+Returns the explosion length. This value indicates how much a slice will be
+shifted from the center of the pie. Defaults to 0.
+
+=cut
+
 sub getExplosionLength {
 	my $self = shift;
 
@@ -663,6 +856,12 @@ sub getExplosionLength {
 }
 
 #-------------------------------------------------------------------
+=head2 getLabels
+
+Returns an arrayref containing the labels that belong to the slices.
+
+=cut
+
 sub getLabels {
 	my $self = shift;
 
@@ -670,6 +869,13 @@ sub getLabels {
 }
 
 #-------------------------------------------------------------------
+=head2 getLabelPosition
+
+Returns the position of the labels relative to the thickness of the pie.
+Allowed positions are 'bottom', 'center' and 'top'. Defaults to 'top'.
+
+=cut
+
 sub getLabelPosition {
 	my $self = shift;
 
@@ -677,6 +883,15 @@ sub getLabelPosition {
 }
 
 #-------------------------------------------------------------------
+=head2 getPieMode
+
+Returns the mode in which the pie is drawn. Currently available are 'normal' and
+'stepped'. The latter mode draws each pie slice with a smaller thickness,
+creating a stairs like pie chart. Defaults to 'normal' which will cause the
+graph to be drawn as a vanilla pie chart.
+
+=cut
+
 sub getPieMode {
 	my $self = shift;
 
@@ -684,6 +899,12 @@ sub getPieMode {
 }
 
 #-------------------------------------------------------------------
+=head2 getRadius
+
+Returns the radius of the pie in pixels. Defaults to 80.
+
+=cut
+
 sub getRadius {
 	my $self = shift;
 
@@ -691,6 +912,16 @@ sub getRadius {
 }
 
 #-------------------------------------------------------------------
+=head2 getScaleFactor
+
+Returns the factor with which the pies that are added afterwards should be
+scaled. In effect this will cause the radius of the slice to grow or shrink, and
+thus make slices stick out. 
+
+Defaults to 1.
+
+=cut
+
 sub getScaleFactor {
 	my $self = shift;
 
@@ -698,6 +929,16 @@ sub getScaleFactor {
 }
 
 #-------------------------------------------------------------------
+=head2 getSlice ( [ sliceNumber ] )
+
+Returns the sliceNumber'th slice properties hashref. Defaults to the slice last
+added.
+
+=head3 sliceNumber
+
+The index of the slice you want.
+
+=cut
 sub getSlice {
 	my $self = shift;
 	my $slice = shift || (scalar(@{$self->{_slices}}) - 1);
@@ -706,6 +947,13 @@ sub getSlice {
 }
 
 #-------------------------------------------------------------------
+=head2 getStartAngle
+
+Rteurn the initial angle of the first slice. In effect all slices are rotated by
+this value.
+
+=cut
+
 sub getStartAngle {
 	my $self = shift;
 
@@ -713,6 +961,12 @@ sub getStartAngle {
 }
 
 #-------------------------------------------------------------------
+=head2 getStickColor
+
+Returns the color of the sticks connecting pie and labels. Defaults to #333333.
+
+=cut
+
 sub getStickColor {
 	my $self = shift;
 
@@ -720,6 +974,13 @@ sub getStickColor {
 }
 
 #-------------------------------------------------------------------
+=head2 getStickLength
+
+Return the length of the sticks connecting the labels with the pie. Defaults to
+0.
+
+=cut
+
 sub getStickLength {
 	my $self = shift;
 
@@ -727,6 +988,12 @@ sub getStickLength {
 }
 
 #-------------------------------------------------------------------
+=head2 getStickOffset
+
+Returns the distance between the label sticks and the pie. Defaults to 0.
+
+=cut
+
 sub getStickOffset {
 	my $self = shift;
 
@@ -734,6 +1001,14 @@ sub getStickOffset {
 }
 
 #-------------------------------------------------------------------
+=head2 getTiltAngle
+
+Returns the angle between the screen and the pie chart. Valid angles are 0 to 90
+degrees. Zero degrees results in a 2d pie where other values will generate a 3d
+pie chart. Defaults to 55 degrees.
+
+=cut
+
 sub getTiltAngle {
 	my $self = shift;
 	my $angle = shift;
@@ -742,6 +1017,12 @@ sub getTiltAngle {
 }
 
 #-------------------------------------------------------------------
+=head2 getTopHeight
+
+Returns the thickness of the top of the pie in pixels. Defaults to 20 pixels.
+
+=cut
+
 sub getTopHeight {
 	my $self = shift;
 
@@ -749,6 +1030,13 @@ sub getTopHeight {
 }
 
 #-------------------------------------------------------------------
+=head2 hasShadedSides
+
+A boolean value indicating whether the sides and the rim of the pie should be
+drawn with a darkened color.
+
+=cut
+
 sub hasShadedSides {
 	my $self = shift;
 
@@ -756,6 +1044,12 @@ sub hasShadedSides {
 }
 
 #-------------------------------------------------------------------
+=head2 new
+
+Contstructor. See SUPER classes for additional parameters.
+
+=cut
+
 sub new {
 	my $class = shift;
 	
@@ -766,6 +1060,12 @@ sub new {
 }
 
 #-------------------------------------------------------------------
+=head2 processDataset
+
+Takes the dataset and takes the necesarry steps for the pie to be drawn.
+
+=cut
+
 sub processDataset {
 	my $self = shift;
 	my $total = 0;
@@ -792,6 +1092,16 @@ sub processDataset {
 }
 
 #-------------------------------------------------------------------
+=head2 setBottomHeight ( thickness )
+
+Sets the thickness of the bottom.
+
+=head3 thickness
+
+The thickness of the bottom.
+
+=cut
+
 sub setBottomHeight {
 	my $self = shift;
 	my $height = shift;
@@ -800,6 +1110,20 @@ sub setBottomHeight {
 }
 
 #-------------------------------------------------------------------
+=head2 setCenter( [ xOffset ], [ yOffset ] )
+
+Sets the offset of the center of the graph relative to the center of the image.
+
+=head3 xOffset
+
+The offset in the x direction. Defaults to 0.
+
+=head3 yOffset
+
+The offset in the y direction. Defaults to 0.
+
+=cut
+
 sub setCenter {
 	my $self = shift;
 	my $xCenter = shift || 0;
@@ -810,6 +1134,17 @@ sub setCenter {
 }
 
 #-------------------------------------------------------------------
+=head2 setConfiguration ( config )
+
+Applies the settings in the given configuration hash. See WebGUI::Image::Graph
+for more information.
+
+=head2 config
+
+A configuration hash.
+
+=cut
+
 sub setConfiguration {
 	my $self = shift;
 	my $config = shift;
@@ -831,6 +1166,17 @@ sub setConfiguration {
 }
 
 #-------------------------------------------------------------------
+=head2 setExplosionLength ( length )
+
+Sets the explosion length. This value indicates how much a slice will be
+shifted from the center of the pie. Defaults to 0.
+
+=head3 length
+
+The amount by which the slices should be exploded.
+
+=cut
+
 sub setExplosionLength {
 	my $self = shift;
 	my $offset = shift;
@@ -839,6 +1185,17 @@ sub setExplosionLength {
 }
 
 #-------------------------------------------------------------------
+=head2 setLabelPosition ( position )
+
+Sets the position of the labels relative to the thickness of the pie.
+Allowed positions are 'bottom', 'center' and 'top'. Defaults to 'top'.
+
+=head3 position
+
+The position of the labels.
+
+=cut
+
 sub setLabelPosition {
 	my $self = shift;
 	my $position = shift;
@@ -847,6 +1204,19 @@ sub setLabelPosition {
 }
 
 #-------------------------------------------------------------------
+=head2 setPieMode ( mode )
+
+Sets the mode in which the pie is drawn. Currently available are 'normal' and
+'stepped'. The latter mode draws each pie slice with a smaller thickness,
+creating a stairs like pie chart. Defaults to 'normal' which will cause the
+graph to be drawn as a vanilla pie chart.
+
+=head3 mode
+
+The mode. Either 'normal' or 'stepped'.
+
+=cut
+
 sub setPieMode {
 	my $self = shift;
 	my $mode = shift;
@@ -855,6 +1225,16 @@ sub setPieMode {
 }
 
 #-------------------------------------------------------------------
+=head2 setRadius ( radius )
+
+Sets the radius of the pie in pixels. Defaults to 80.
+
+=head3 radius
+
+The desired radius.
+
+=cut
+
 sub setRadius {
 	my $self = shift;
 	my $radius = shift;
@@ -865,6 +1245,39 @@ sub setRadius {
 }
 
 #-------------------------------------------------------------------
+=head2 setScaleFactor ( multiplier )
+
+Sets the factor with which the pies that are added afterwards should be
+scaled. In effect this will cause the radius of the slice to grow or shrink, and
+thus make slices stick out. 
+
+Defaults to 1.
+
+=head3 multiplier
+
+The figure with which the the normal radius if the slices should be multiplied. 
+
+=cut
+
+sub getScaleFactor {
+	my $self = shift;
+	my $scaleFactor = shift;
+	
+	$self->{_pieProperties}->{scaleFactor} = $scaleFactor;
+}
+
+#-------------------------------------------------------------------
+=head2 setStartAngle ( angle )
+
+Sets the initial angle of the first slice. In effect all slices are rotated by
+this value.
+
+=head3 angle
+
+The desired start angle in degrees.
+
+=cut
+
 sub setStartAngle {
 	my $self = shift;
 	my $angle = shift;
@@ -873,6 +1286,17 @@ sub setStartAngle {
 }
 
 #-------------------------------------------------------------------
+=head2 setShadedSides ( shaded )
+
+A boolean value indicating whether the sides and the rim of the pie should be
+drawn with a darkened color.
+
+=head3 shaded
+
+The boolean switch. Set to 0 for normal sides. Set to 1 for shaded sides.
+
+=cut
+
 sub setShadedSides {
 	my $self = shift;
 	my $onOff = shift;
@@ -881,6 +1305,16 @@ sub setShadedSides {
 }
 
 #-------------------------------------------------------------------
+=head2 setStickColor ( color )
+
+Sets the color of the sticks connecting pie and labels. Defaults to #333333.
+
+=head3 color
+
+The desired color value.
+
+=cut
+
 sub setStickColor {
 	my $self = shift;
 	my $color = shift;
@@ -889,6 +1323,17 @@ sub setStickColor {
 }
 
 #-------------------------------------------------------------------
+=head2 setStickLength ( length )
+
+Sets the length of the sticks connecting the labels with the pie. Defaults to
+0.
+
+=head3 length
+
+The length in pixels.
+
+=cut
+
 sub setStickLength {
 	my $self = shift;
 	my $length = shift;
@@ -897,6 +1342,16 @@ sub setStickLength {
 }
 
 #-------------------------------------------------------------------
+=head2 setStickOffset ( offset )
+
+Sets the distance between the label sticks and the pie. Defaults to 0.
+
+=head3 offset
+
+The distance in pixels.
+
+=cut
+
 sub setStickOffset {
 	my $self = shift;
 	my $offset = shift || 0;
@@ -905,6 +1360,20 @@ sub setStickOffset {
 }
 
 #-------------------------------------------------------------------
+=head2 setTiltAngle ( angle )
+
+Sets the angle between the screen and the pie chart. Valid angles are 0 to 90
+degrees. Zero degrees results in a 2d pie where other values will generate a 3d
+pie chart. Defaults to 55 degrees.
+
+=head3 angle
+
+The tilt angle. Must be in the range from  0 to 90. If a value less than zero is
+passed the angle will be set to 0. If a value greater than 90 is passed the
+angle will be set to 90.
+
+=cut
+
 sub setTiltAngle {
 	my $self = shift;
 	my $angle = shift;
@@ -916,6 +1385,16 @@ sub setTiltAngle {
 }
 
 #-------------------------------------------------------------------
+=head2 setTopHeight ( thickness )
+
+Sets the thickness of the top of the pie in pixels. Defaults to 20 pixels.
+
+=head3 thickness
+
+The thickness of the top in pixels.
+
+=cut
+
 sub setTopHeight {
 	my $self = shift;
 	my $height = shift;
@@ -924,6 +1403,13 @@ sub setTopHeight {
 }
 
 #-------------------------------------------------------------------
+=head2 sortSlices
+
+A sort routine for sorting the slices in drawing order. Must be run from within
+the sort command.
+
+=cut
+
 sub sortSlices {
 	my ($startA, $stopA, $startB, $stopB, $distA, $distB);
 	my $self = shift;

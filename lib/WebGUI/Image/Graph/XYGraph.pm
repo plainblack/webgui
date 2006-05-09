@@ -8,8 +8,31 @@ use POSIX;
 
 our @ISA = qw(WebGUI::Image::Graph);
 
+=head1 NAME
+
+Package WebGUI::Image::Graph::XYGraph
+
+=head1 DESCRIPTION
+
+Base class for flat xy charts.
+
+=head1 SYNOPSIS
+
+XY charts are graphs that have a x and a y coordinate. Examples are Line and Bar
+graphs. 
+
+This package provides basics needs for such graphs like methods for drawing
+axis, labels, rulers and the likes. Also it has methods to set parameters
+belonging to xy charts in general such as setting chart width.
+
+=head1 METHODS
+
+These methods are available from this class:
+
+=cut
+
 #-------------------------------------------------------------------
-=head1 configurationForm
+=head2 configurationForm
 
 The configuration form part for this object. See WebGUI::Image::Graph for
 documentation.
@@ -82,7 +105,7 @@ sub configurationForm {
 }
 
 #-------------------------------------------------------------------
-=head1 draw
+=head2 draw
 
 Draws the graph.
 
@@ -105,7 +128,7 @@ sub draw {
 }
 
 #-------------------------------------------------------------------
-=head1 drawAxis
+=head2 drawAxis
 
 Draws the axis.
 
@@ -126,7 +149,7 @@ sub drawAxis {
 }
 
 #-------------------------------------------------------------------
-=head1 drawLabels
+=head2 drawLabels
 
 Draws the labels.
 
@@ -193,7 +216,7 @@ sub drawRulers {
 }
 
 #-------------------------------------------------------------------
-=head1 formNamespace
+=head2 formNamespace
 
 Extends the form namespace for this object. See WebGUI::Image::Graph for
 documentation.
@@ -207,7 +230,7 @@ sub formNamespace {
 }
 
 #-------------------------------------------------------------------
-=head1 getAxisColor
+=head2 getAxisColor
 
 Returns the color triplet for the axis. Defaults to '#222222'.
 
@@ -220,7 +243,7 @@ sub getAxisColor {
 }
 	
 #-------------------------------------------------------------------
-=head1 getChartHeight
+=head2 getChartHeight
 
 Returns the height of the chart. Defaults to 200.
 
@@ -233,7 +256,7 @@ sub getChartHeight {
 }
 
 #-------------------------------------------------------------------
-=head1 getChartOffset
+=head2 getChartOffset
 
 Returns the coordinates of the top-left corner of the chart. he coordinates are
 contained in a hasref with keys 'x' and 'y'.
@@ -247,7 +270,7 @@ sub getChartOffset {
 }
 
 #-------------------------------------------------------------------
-=head1 getChartWidth
+=head2 getChartWidth
 
 Returns the width of the chart. Defaults to 200.
 
@@ -260,7 +283,7 @@ sub getChartWidth {
 }
 
 #-------------------------------------------------------------------
-=head1 getConfiguration
+=head2 getConfiguration
 
 Returns a configuration hashref. See WebGUI::Image::Graph for documentation.
 
@@ -283,7 +306,7 @@ sub getConfiguration {
 }
 
 #-------------------------------------------------------------------
-=head1 getDrawMode
+=head2 getDrawMode
 
 Returns the drawmode. Currently supported are 'stacked' and 'sideBySide'.
 Defaults to 'sideBySide'.
@@ -297,7 +320,7 @@ sub getDrawMode {
 }
 
 #-------------------------------------------------------------------
-=head1 getPixelsPerUnit
+=head2 getPixelsPerUnit
 
 Returns the number of pixels that correspond with one unit of the dataset
 values.
@@ -311,7 +334,7 @@ sub getPixelsPerUnit {
 }
 
 #-------------------------------------------------------------------
-=head1 getRulerColor
+=head2 getRulerColor
 
 Returns the color triplet of the rulers in the graph. Defaults to '#777777'.
 
@@ -324,7 +347,7 @@ sub getRulerColor {
 }
 
 #-------------------------------------------------------------------
-=head1 getYGranularity
+=head2 getYGranularity
 
 Returns the granularity of the labels and rulers in the Y direction. Defaults to
 10. This is value is in terms of the values in the dataset and has no direct
@@ -339,7 +362,7 @@ sub getYGranularity {
 }
 
 #-------------------------------------------------------------------
-=head1 getYLabels
+=head2 getYLabels
 
 Returns an arrayref containing the labels for the Y axis.
 
@@ -357,7 +380,7 @@ sub getYLabels {
 }
 
 #-------------------------------------------------------------------
-=head1 getYRange
+=head2 getYRange
 
 Returns the maxmimal value of the range that contains a whole number of times
 the y granularity and is bigger than the maximum value in the dataset.
@@ -371,11 +394,11 @@ sub getYRange {
 }
 
 #-------------------------------------------------------------------
-=head1 setAxisColor ( color )
+=head2 setAxisColor ( color )
 
 Sets the color of the axis to the supplied value.
 
-=head2 color
+=head3 color
 
 The triplet of the color you want to set the axis to. Must have the following
 form: #ffffff.
@@ -390,11 +413,11 @@ sub setAxisColor {
 }
 
 #-------------------------------------------------------------------
-=head1 setChartHeight ( height )
+=head2 setChartHeight ( height )
 
 Sets the height of the chart to the specified value.
 
-=head2 height
+=head3 height
 
 The desired height in pixels.
 
@@ -408,11 +431,11 @@ sub setChartHeight {
 }
 
 #-------------------------------------------------------------------
-=head1 setChartOffset ( location )
+=head2 setChartOffset ( location )
 
 Sets the location of the top-left corner of the graph within the image.
 
-=head2 location
+=head3 location
 
 A hashref containing the desired location. Use the 'x' and 'y' as keys for the x
 and y coordinate respectively.
@@ -427,11 +450,11 @@ sub setChartOffset {
 }
 
 #-------------------------------------------------------------------
-=head1 setChartHeight ( width )
+=head2 setChartHeight ( width )
 
 Sets the width of the chart to the specified value.
 
-=head2 width
+=head3 width
 
 The desired width in pixels.
 
@@ -445,12 +468,12 @@ sub setChartWidth {
 }
 
 #-------------------------------------------------------------------
-=head1 setConfiguration ( config )
+=head2 setConfiguration ( config )
 
 Applies the settings in the given configuration hash. See WebGUI::Image::Graph
 for more information.
 
-=head2 config
+=head3 config
 
 A configuration hash.
 
@@ -476,13 +499,13 @@ sub setConfiguration {
 }
 
 #-------------------------------------------------------------------
-=head1 setDrawMode ( mode )
+=head2 setDrawMode ( mode )
 
 Set the way the datasets are drawn. Currently supported are 'stacked' and
 'sideBySide' which correspond to respectivly cumulative drawing and normal
 processing.
 
-=head2 mode
+=head3 mode
 
 The desired mode. Can be 'sideBySide' or 'stacked'.
 
@@ -500,11 +523,11 @@ sub setDrawMode {
 }
 
 #-------------------------------------------------------------------
-=head1 setRulerColor ( color )
+=head2 setRulerColor ( color )
 
 Set the color of the rulers.
 
-=head2 color
+=head3 color
 
 The triplet of the desired ruler color. Must be in the following format:
 '#ffffff'.
@@ -519,11 +542,11 @@ sub setRulerColor {
 }
 
 #-------------------------------------------------------------------
-=head1 setShowAxis ( boolean )
+=head2 setShowAxis ( boolean )
 
 Set whether or not to draw the axis.
 
-=head2 boolean
+=head3 boolean
 
 If set to false the axis won't be drawn.
 
@@ -537,11 +560,11 @@ sub setShowAxis {
 }
 
 #-------------------------------------------------------------------
-=head1 setShowLabels ( boolean )
+=head2 setShowLabels ( boolean )
 
 Set whether or not to draw the labels.
 
-=head2 boolean
+=head3 boolean
 
 If set to false the labels won't be drawn.
 
@@ -555,11 +578,11 @@ sub setShowLabels {
 }
 
 #-------------------------------------------------------------------
-=head1 setShowRulers ( boolean )
+=head2 setShowRulers ( boolean )
 
 Set whether or not to draw the rulers.
 
-=head2 boolean
+=head3 boolean
 
 If set to false the rulers won't be drawn.
 
@@ -573,11 +596,11 @@ sub setShowRulers {
 }
 
 #-------------------------------------------------------------------
-=head1 setYGranularity ( value )
+=head2 setYGranularity ( value )
 
 Sets the y granularity. See getYGranularity for explanation of this concept.
 
-=head2 value
+=head3 value
 
 The granularity in dataset units, not pixels.
 
@@ -591,7 +614,7 @@ sub setYGranularity {
 }
 
 #-------------------------------------------------------------------
-=head1 showAxis
+=head2 showAxis
 
 Returns a boolean indicating whether to draw the axis.
 
@@ -605,7 +628,7 @@ sub showAxis {
 }
 
 #-------------------------------------------------------------------
-=head1 showLabels
+=head2 showLabels
 
 Returns a boolean indicating whether to draw the labels.
 
@@ -619,7 +642,7 @@ sub showLabels {
 }
 
 #-------------------------------------------------------------------
-=head1 showRulers
+=head2 showRulers
 
 Returns a boolean indicating whether to draw the rulers.
 

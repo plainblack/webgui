@@ -3,6 +3,39 @@ package WebGUI::Image::Color;
 use strict;
 use Color::Calc;
 
+=head1 NAME
+
+Package WebGUI::Image::Color
+
+=head1 DESCRIPTION
+
+Package for managing WebGUI colors.
+
+=head1 SYNOPSIS
+
+Colors actually consist of two colors: fill color and stroke color. Stroke color
+is the color for lines and the border of areas, while the fill color is the
+color that is used to fill that area. Fill color thus have no effect on lines.
+
+Each fill and stroke color consists of a Red, Green, Blue and Alpha component.
+These values are given in hexadecimal notation. A concatenation of the Red,
+Greean and Blue values, prepended with a '#' sign is called a triplet. A similar
+combination that also includes the Alpha values at the end is called a quarted.
+
+Alpha value are used to define the transparency of the color. The higher the
+value the more transparent the color is. If the alpha value = 00 the color is
+opaque, where the color is completely invisible for an alpha value of ff.
+
+Colors are not saved to the database by default. If you want to do this you must
+do so manually using the save and/or update methods.
+
+=head1 METHODS
+
+These methods are available from this class:
+
+=cut
+
+
 #-------------------------------------------------------------------
 =head1 canDelete
 

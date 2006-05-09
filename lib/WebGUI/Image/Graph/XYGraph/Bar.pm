@@ -7,8 +7,37 @@ use POSIX;
 
 our @ISA = qw(WebGUI::Image::Graph::XYGraph);
 
+=head1 NAME
+
+Package WebGUI::Image::Graph::XYGraph::Bar
+
+=head1 DESCRIPTION
+
+Package for creating bar graphs.
+
+=head1 SYNOPSIS
+
+This package privides the logic for drawing 2d bar graphs, 3d bars are in the
+pipeline but not yet ready for prime time. 
+
+This module can draw bar graph in two forms: Stacked and Side by Side. The
+diffrence is noticable only if more multiple dataset is used, the behaviour is
+thus identical in case of one dataset.
+
+Stacked graphs place the bars belonging the same index within diffrent datasets
+on top of each other given a grand total for all datasets.
+
+Sid by side graphs place bars with the same index next to each other, grouped by
+index. This displays a better comaprison between datasets.
+
+=head1 METHODS
+
+These methods are available from this class:
+
+=cut
+
 #-------------------------------------------------------------------
-=head1 configurationForm
+=head2 configurationForm
 
 Creates the configuration form for this plugin. See WebGUI::Image::Graph for
 more information.
@@ -40,21 +69,21 @@ my	$f = WebGUI::HTMLForm->new($self->session);
 }
 
 #-------------------------------------------------------------------
-=head1 drawBar ( bar, location, barWidth )
+=head2 drawBar ( bar, location, barWidth )
 
 Draws a bar defined by bar and with width barWidth at location.
 
-=head2 bar
+=head3 bar
 
 A hashref defining the bar. Must contain keys 'height', 'strokeColor' and
 'fillColor'.
 
-=head2 location
+=head3 location
 
 A hashref containing the location of the bottom-left corner of the bar. Keys 'x'
 and 'y' must specify the x- and y-coordinates respectively.
 
-=head2 barWidth
+=head3 barWidth
 
 The width of the bar in pixels.
 
@@ -81,7 +110,7 @@ sub drawBar {
 }
 
 #-------------------------------------------------------------------
-=head1 drawGraph
+=head2 drawGraph
 
 Draws all the bars.
 
@@ -114,21 +143,21 @@ sub drawGraph {
 }
 
 #-------------------------------------------------------------------
-=head1 drawSideBySide ( bars, location, barWidth )
+=head2 drawSideBySide ( bars, location, barWidth )
 
 Draws the bars in side by side mode. Meaning that per datsetindex the bars
 representing a single dataset are grouped.
 
-=head2 bars
+=head3 bars
 
 An arrayref containing all the bar description hashrefs as described in drawBar.
 
-=head2 location
+=head3 location
 
 Hashref containing the initial coordinates of the lower-left corner of the
 chart. Pass coords in keys 'x' and 'y'.
 
-=head2 barWidth
+=head3 barWidth
 
 The width of each bar in pixels.
 
@@ -149,21 +178,21 @@ sub drawSideBySideBar {
 }
 
 #-------------------------------------------------------------------
-=head1 drawStacked ( bars, location, barWidth )
+=head2 drawStacked ( bars, location, barWidth )
 
 Draws the bars in side by side mode. Meaning that per datset-index the bars
 representing a single dataset are stacked on top of each other.
 
-=head2 bars
+=head3 bars
 
 An arrayref containing all the bar description hashrefs as described in drawBar.
 
-=head2 location
+=head3 location
 
 Hashref containing the initial coordinates of the lower-left corner of the
 chart. Pass coords in keys 'x' and 'y'.
 
-=head2 barWidth
+=head3 barWidth
 
 The width of each bar in pixels.
 
@@ -186,7 +215,7 @@ sub drawStackedBar {
 }
 
 #-------------------------------------------------------------------
-=head1 formNamespace
+=head2 formNamespace
 
 Returns the form namespace of this plugin. See WegBUI::Image::Graph for
 more elaborate information.
@@ -200,7 +229,7 @@ sub formNamespace {
 }
 
 #-------------------------------------------------------------------
-=head1 getAnchorSpacing
+=head2 getAnchorSpacing
 
 Returns the distance in pixels between two anchors on the x axis that define teh
 placement of bars and labels.
@@ -221,7 +250,7 @@ sub getAnchorSpacing {
 }
 
 #-------------------------------------------------------------------
-=head1 getBarSpacing
+=head2 getBarSpacing
 
 Returns the width of the gap between two bars within a group in pixels.
 
@@ -234,7 +263,7 @@ sub getBarSpacing {
 }
 
 #-------------------------------------------------------------------
-=head1 getConfiguration
+=head2 getConfiguration
 
 Returns the configuration hashref for this plugin. Refer to WebGUI::IMage::Graph
 for a more detailed description.
@@ -253,7 +282,7 @@ sub getConfiguration {
 }
 
 #-------------------------------------------------------------------
-=head1 getGroupSpacing
+=head2 getGroupSpacing
 
 Returns the width of the gap between two groups of bars in pixels.
 
@@ -266,7 +295,7 @@ sub getGroupSpacing {
 }
 
 #-------------------------------------------------------------------
-=head1 getFirstAnchorLocation
+=head2 getFirstAnchorLocation
 
 Returns a hashref containing the location of the leftmost x-axis anchor.
 Location coordinates are encoded in keys 'x' and 'y'.
@@ -283,7 +312,7 @@ sub getFirstAnchorLocation {
 }
 
 #-------------------------------------------------------------------
-=head1 processDataset
+=head2 processDataset
 
 Processes the dataset. Used by drawGraph.
 
@@ -312,11 +341,11 @@ sub processDataSet {
 }
 
 #-------------------------------------------------------------------
-=head1 setBarSpacing ( gap )
+=head2 setBarSpacing ( gap )
 
 Sets the distance between two bars in a group in pixels.
 
-=head2 gap
+=head3 gap
 
 The distance in pixels.
 
@@ -330,12 +359,12 @@ sub setBarSpacing {
 }
 
 #-------------------------------------------------------------------
-=head1 setConfiguration ( config )
+=head2 setConfiguration ( config )
 
 Applies the given configuration hash to this plugin. See WebGUI::Image::Graph
 for more info.
 
-=head2 config
+=head3 config
 
 The configuration hash.
 
@@ -354,11 +383,11 @@ sub setConfiguration {
 }
 
 #-------------------------------------------------------------------
-=head1 setGroupSpacing ( gap )
+=head2 setGroupSpacing ( gap )
 
 Sets the distance between two groups of bars in pixels.
 
-=head2 gap
+=head3 gap
 
 The distance in pixels.
 

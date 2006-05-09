@@ -8,18 +8,42 @@ use List::Util;
 
 our @ISA = qw(WebGUI::Image);
 
-=head1 addDataset ( dataset )
+=head1 NAME
+
+Package WebGUI::Image::Graph
+
+=head1 DESCRIPTION
+
+Base class for graphs.
+
+=head1 SYNOPSIS
+
+This package provides the basic needs for creating graphs.
+
+Among others this package provides the base methods for configuration forms,
+dataset addition, loading plugins, and setting general parameters like
+backgraound color.
+
+=cut
+
+=head1 METHODS
+
+These methods are available from this class:
+
+=cut
+
+#-------------------------------------------------------------------
+=head2 addDataset ( dataset )
 
 Adds a dataset to the graph. Please not that not all graph types can handle
 multiple datasets and will therefore ignore any dataset but the first.
 
-=head2 dataset
+=head3 dataset
 
 An arrayref containg the values of the data. The dat must be numeric.
 
 =cut
 
-#-------------------------------------------------------------------
 sub addDataset {
 	my $self = shift;
 	my $dataset = shift;
@@ -27,7 +51,8 @@ sub addDataset {
 	push(@{$self->{_datasets}}, $dataset);
 }
 
-=head1 configurationForm
+#-------------------------------------------------------------------
+=head2 configurationForm
 
 Returns a hashref containing the form where the properties of your graph type
 can be set. Your pluging should extend this method by append the form to the
@@ -41,7 +66,6 @@ Check some of the plugins that come with WebGUI for examples.
 
 =cut
 
-#-------------------------------------------------------------------
 sub configurationForm {
 	my $self = shift;
 
@@ -96,16 +120,16 @@ sub configurationForm {
 }
 
 #-------------------------------------------------------------------
-=head1 drawLabel ( label, [ properties ] )
+=head2 drawLabel ( label, [ properties ] )
 
 Draws a label with your preferred properties. Defaults the font, font size and
 color which you can override.
 
-=head2 label
+=head3 label
 
 The text of the label you want to print.
 
-=head2 properties
+=head3 properties
 
 A hash containing imagemagick Annotate properties.
 
@@ -127,7 +151,7 @@ sub drawLabel {
 }
 
 #-------------------------------------------------------------------
-=head1 formNamespace
+=head2 formNamespace
 
 Returns the namespace used in the configuration form. You must extend this
 method by concatenating an underscore and the last part of your namespace to the
@@ -142,7 +166,7 @@ sub formNamespace {
 }
 
 #-------------------------------------------------------------------
-=head1 getConfiguration
+=head2 getConfiguration
 
 Returns the configuration hashref of the plugin. You must extend this method by
 adding your configuration keys to the hashref returned by the SUPER method. To
@@ -172,17 +196,17 @@ sub getConfiguration {
 }
 
 #-------------------------------------------------------------------
-=head1 getGraphingTab ( session, [ config ] )
+=head2 getGraphingTab ( session, [ config ] )
 
 Returns the contents of the graphing tab you can add to your asset. 
 
 This is a class method, and therefore you must pass the WebGUI session object.
 
-=head2 session 
+=head3 session 
 
 An instanciated WebGUI session object.
 
-=head2 config
+=head3 config
 
 Optionally you can pass a configuration hash to populate the form
 
@@ -292,11 +316,11 @@ EOS
 }
 
 #-------------------------------------------------------------------
-=head1 getDataset ( [ index ] )
+=head2 getDataset ( [ index ] )
 
 Returns the dataset indicated by index.
 
-=head2 index
+=head3 index
 
 The index of the array containing the datasets. The first dataset is indicated
 by index 0. If ommitted this method returns an arrayref of arrayrefs containing
@@ -316,11 +340,11 @@ sub getDataset {
 }
 
 #-------------------------------------------------------------------
-=head1 getLabel ( [ index ] )
+=head2 getLabel ( [ index ] )
 
 Returns the index'th label or an arrayref containing all labels.
 
-=head2 index
+=head3 index
 
 The index of label to return. Numbering starts at 0. If omitted an arrayref
 containing all labels is returned.
@@ -336,7 +360,7 @@ sub getLabel {
 }
 	
 #-------------------------------------------------------------------
-=head1 getLabelColor
+=head2 getLabelColor
 
 Returns the triplet of the label color. Defaults to '#333333'.
 
@@ -349,16 +373,16 @@ sub getLabelColor {
 }
 
 #-------------------------------------------------------------------
-=head1 getLabelDimensions ( text, [ properties ] )
+=head2 getLabelDimensions ( text, [ properties ] )
 
 Returns a hashref containg the width and height in pixels of the passed text.
 Width and height are referenced by the keys 'width' and 'height' respectively.
 
-=head2 text
+=head3 text
 
 The text you want to know the dimensions of.
 
-=head2 properties
+=head3 properties
 
 Optionally you can pass a hashref containing imagemagick's Annotate properties.
 
@@ -383,7 +407,7 @@ sub getLabelDimensions {
 }
 
 #-------------------------------------------------------------------
-=head1 getLabelFont
+=head2 getLabelFont
 
 Returns the WebGUI::Image::Font object this image is set to. Defaults to the
 default font.
@@ -397,7 +421,7 @@ sub getLabelFont {
 }
 
 #-------------------------------------------------------------------
-=head1 getLabelFontSize
+=head2 getLabelFontSize
 
 Returns the font size of the labels. Defaults to 20.
 
@@ -410,7 +434,7 @@ sub getLabelFontSize {
 }
 
 #-------------------------------------------------------------------
-=head1 getLabelOffset
+=head2 getLabelOffset
 
 Returns the label offset. This is the distance between the label and the axis.
 Defaults to 10 pixels.
@@ -424,7 +448,7 @@ sub getLabelOffset {
 }
 
 #-------------------------------------------------------------------
-=head1 getMaxValueFromDataset
+=head2 getMaxValueFromDataset
 
 Returns the highest value of all added datasets.
 
@@ -456,15 +480,15 @@ sub getMaxValueFromDataset {
 }
 
 #-------------------------------------------------------------------
-=head1 load ( session, namespace )
+=head2 load ( session, namespace )
 
 Instanciates an WebGUI::Graph object with the given namespace.
 
-=head2 session
+=head3 session
 
 A WebGUI::Session object.
 
-=head2 namespace
+=head3 namespace
 
 The full namespace of the plugin you want to load.
 
@@ -484,15 +508,15 @@ sub load {
 }
 
 #-------------------------------------------------------------------
-=head1 loadByConfiguration ( session, configuration )
+=head2 loadByConfiguration ( session, configuration )
 
 Loads a plugin defined by a configuration hash.
 
-=head2 session
+=head3 session
 
 A WebGUI::Session object.
 
-=head2 configuration
+=head3 configuration
 
 A configuration hashref.
 
@@ -515,12 +539,12 @@ sub loadByConfiguration {
 }
 
 #-------------------------------------------------------------------
-=head1 processConfigurationForm ( session )
+=head2 processConfigurationForm ( session )
 
 Processes the configuration form that is submitted and returns the correct
 instanciated graphing plugin.
 
-=head2 session
+=head3 session
 
 The WebGUI session object.
 
@@ -541,13 +565,13 @@ my	$graph = $self->load($session, $namespace);
 }
 
 #-------------------------------------------------------------------
-=head1 setConfiguration ( config )
+=head2 setConfiguration ( config )
 
 Configures the pluging according to the configuration hashref that is passed.
 You must extend this method by calling the SUPER method with the configuration
 hashref and processing your part of the configuration options.
 
-=head2 config
+=head3 config
 
 The configuration hashref.
 
@@ -569,11 +593,11 @@ sub setConfiguration {
 };
 
 #-------------------------------------------------------------------
-=head1 setLabelColor ( color )
+=head2 setLabelColor ( color )
 
 Sets the color triplet of the labels.
 
-=head2 color 
+=head3 color 
 
 The triplet defining the color. The triplet should be in the form of '#ffffff'.
 
@@ -587,11 +611,11 @@ sub setLabelColor {
 }
 
 #-------------------------------------------------------------------
-=head1 setLabelFont ( font )
+=head2 setLabelFont ( font )
 
 Set the label font.
 
-=head2 font
+=head3 font
 
 A WebGUI::Image::Font object.
 
@@ -605,11 +629,11 @@ sub setLabelFont {
 }
 
 #-------------------------------------------------------------------
-=head1 setLabelFontSize ( size )
+=head2 setLabelFontSize ( size )
 
 Sets the font size of the labels.
 
-=head2 size
+=head3 size
 
 The desired font size.
 
@@ -623,12 +647,12 @@ sub setLabelFontSize {
 }
 
 #-------------------------------------------------------------------
-=head1 setLabelOffset ( offset )
+=head2 setLabelOffset ( offset )
 
 Sets the label offset. This is the distance in pixels between the labels and the
 axis.
 
-=head2 offset
+=head3 offset
 
 The label offset.
 
@@ -642,11 +666,11 @@ sub setLabelOffset {
 }
 
 #-------------------------------------------------------------------
-=head1 setLabels ( labels )
+=head2 setLabels ( labels )
 
 Sets the labels for the datasets.
 
-=head2 labels
+=head3 labels
 
 An arrayref containig the labels.
 
@@ -660,19 +684,19 @@ sub setLabels {
 }
 
 #-------------------------------------------------------------------
-=head1 wrapLabelToWidth ( text, maxWidth, [ properties ] )
+=head2 wrapLabelToWidth ( text, maxWidth, [ properties ] )
 
 Wraps a text string onto multiple lines having a width of maxWidth.
 
-=head2 text
+=head3 text
 
 The text you want to wrap.
 
-=head2 maxWidth
+=head3 maxWidth
 
 The width the string should have after wrapping/
 
-=head2 properties
+=head3 properties
 
 An optional hashref containing imagemagick's Annotate properties.
 

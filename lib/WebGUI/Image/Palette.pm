@@ -3,13 +3,36 @@ package WebGUI::Image::Palette;
 use strict;
 use WebGUI::Image::Color;
 
+=head1 NAME
+
+Package WebGUI::Image::Palette
+
+=head1 DESCRIPTION
+
+Package for managing WebGUI palettes.
+
+=head1 SYNOPSIS
+
+Palettes are a list of WebGUI::Image::Color objects. Selecting a specific color
+can be done by either passing a palette index, or by an API that cyles through
+the palette.
+
+Along with methods for these operations methods for editing palettes are
+provided from this class.
+
+=head1 METHODS
+
+These methods are available from this class:
+
+=cut
+
 #-------------------------------------------------------------------
-=head1 addColor ( color )
+=head2 addColor ( color )
 
 Adds a color to this palette. The color will be automatically saved or updated
 to the database.
 
-=head2 color
+=head3 color
 
 A WebGUI::Image::Color object.
 
@@ -31,7 +54,7 @@ sub addColor {
 }
 
 #-------------------------------------------------------------------
-=head1 canDelete
+=head2 canDelete
 
 Returns true if this palette can be deleted.
 
@@ -45,7 +68,7 @@ sub canDelete {
 }
 
 #-------------------------------------------------------------------
-=head1 canEdit
+=head2 canEdit
 
 Returns true if this palette can be edited.
 
@@ -58,7 +81,7 @@ sub canEdit {
 }
 
 #-------------------------------------------------------------------
-=head1 delete
+=head2 delete
 
 Deletes the palette from the database. This is only possible if the canDelete
 method returns true.
@@ -81,7 +104,7 @@ sub delete {
 }
 
 #-------------------------------------------------------------------
-=head1 getColor ( [ index ] )
+=head2 getColor ( [ index ] )
 
 Returns the color at index in the palette. If index is not passed it will return
 the color at the index specified by the internal palette index counter, ie. the
@@ -97,12 +120,12 @@ sub getColor {
 }
 
 #-------------------------------------------------------------------
-=head1 getColorIndex ( color )
+=head2 getColorIndex ( color )
 
 Returns the index of color. If the color is not in the palette it will return
 undef.
 
-=head2 color
+=head3 color
 
 A WebGUI::Image::Color object.
 
@@ -123,7 +146,7 @@ sub getColorIndex {
 }
 
 #-------------------------------------------------------------------
-=head1 getColorsInPalette
+=head2 getColorsInPalette
 
 Returns a arrayref containing all color objects in the palette.
 
@@ -137,7 +160,7 @@ sub getColorsInPalette {
 }
 
 #-------------------------------------------------------------------
-=head1 getDefaultPaletteId
+=head2 getDefaultPaletteId
 
 Returns the id of the default palette.
 
@@ -150,7 +173,7 @@ sub getDefaultPaletteId {
 }
 
 #-------------------------------------------------------------------
-=head1 getId
+=head2 getId
 
 Returns the guid of this palette.
 
@@ -163,7 +186,7 @@ sub getId {
 }
 
 #-------------------------------------------------------------------
-=head1 getName
+=head2 getName
 
 Returns the name of this palette.
 
@@ -176,7 +199,7 @@ sub getName {
 }
 
 #-------------------------------------------------------------------
-=head1 getNextColor
+=head2 getNextColor
 
 Returns the next color in the palette relative to the internal palette index
 counter, and increases this counter to that color. If the counter already is at
@@ -196,7 +219,7 @@ sub getNextColor {
 }
 
 #-------------------------------------------------------------------
-=head1 getNumberOfColors
+=head2 getNumberOfColors
 
 Returns the number of colors in the palette.
 
@@ -209,7 +232,7 @@ sub getNumberOfColors {
 }
 
 #-------------------------------------------------------------------
-=head1 getPaletteIndex
+=head2 getPaletteIndex
 
 Returns the index the internal palette index counter is set to. Ie. it returns
 the current color.
@@ -223,7 +246,7 @@ sub getPaletteIndex {
 }
 
 #-------------------------------------------------------------------
-=head1 getPaletteList
+=head2 getPaletteList
 
 Returns a hashref containing a list of all available palettes. The keys are the
 palette id's and the value are the names of the palettes.
@@ -238,7 +261,7 @@ sub getPaletteList {
 }
 
 #-------------------------------------------------------------------
-=head1 getPreviousColor
+=head2 getPreviousColor
 
 Returns the previous color in the palette relative to the internal palette index
 counter, and decreases this counter to that color. If the counter already is at
@@ -258,20 +281,20 @@ sub getPreviousColor {
 }
 
 #-------------------------------------------------------------------
-=head1 new ( session, paletteId, [ name ])
+=head2 new ( session, paletteId, [ name ])
 
 Constructor for this class. 
 
-=head2 session
+=head3 session
 
 A WebGUI::Session object.
 
-=head2 paletteId
+=head3 paletteId
 
 The guid of the palette you want to instanciate. If you want to create a new
 palette use 'new' for this value.
 
-=head2 name
+=head3 name
 
 The name of this palette. If not given it will default to 'untitled'. You can
 also adjust this parameter through the setName method.
@@ -315,14 +338,14 @@ sub new {
 }
 
 #-------------------------------------------------------------------
-=head1 removeColor ( index )
+=head2 removeColor ( index )
 
 Removes color at index.
 
 NOTE: This method does not delete the color from the database. If you want to do
 this you must do it manually.
 
-=head2 index
+=head3 index
 
 The index of the color you want to remove. If not given nothing will happen.
 
@@ -350,7 +373,7 @@ sub removeColor {
 }
 
 #-------------------------------------------------------------------
-=head1 session
+=head2 session
 
 Returns the WebGUI::Session object.
 
@@ -363,17 +386,17 @@ sub session {
 }
 
 #-------------------------------------------------------------------
-=head1 setColor ( index, color )
+=head2 setColor ( index, color )
 
 Sets palette position index to color. This method will automatically save or
 update the color. Index must be within the current palette. To add additional
 colors use the addColor method.
 
-=head2 index
+=head3 index
 
 The index within the palette where you want to put the color.
 
-=head2 color
+=head3 color
 
 The WebGUI::Image::Color object.
 
@@ -405,7 +428,7 @@ sub setColor {
 
 Set the name of this palette.
 
-=head2 name
+=head3 name
 
 A scalar containing the desired name.
 
@@ -424,13 +447,13 @@ sub setName {
 }
 
 #-------------------------------------------------------------------
-=head1 setPaletteIndex ( index )
+=head2 setPaletteIndex ( index )
 
 Set the internal palette index counter. In other words, it sets the current
 color to the specified index. If index exceeds the maximum index number it will
 be set to the maximum index.
 
-=head2 index
+=head3 index
 
 The index you want to set the counter to.
 
@@ -449,15 +472,15 @@ sub setPaletteIndex {
 }
 
 #-------------------------------------------------------------------
-=head1 swapColors ( firstIndex, secondIndex )
+=head2 swapColors ( firstIndex, secondIndex )
 
 Swaps the position of two colors within the palette.
 
-=head2 firstIndex
+=head3 firstIndex
 
 The index of one of the colors to swap.
 
-=head2 secondIndex
+=head3 secondIndex
 
 The index of the other color to swap.
 

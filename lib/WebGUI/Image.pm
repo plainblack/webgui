@@ -4,8 +4,28 @@ use strict;
 use Image::Magick;
 use WebGUI::Image::Palette;
 
+=head1 NAME
+
+Package WebGUI::Image
+
+=head1 DESCRIPTION
+
+Base class for image manipulations.
+
+=head1 SYNOPSIS
+
+This package purpous for now is to serve the basic needs of the graphing engine
+built on top of this class. However, in the future this can be extended to allow
+for all kinds of image manipulations within the WebGUI framework.
+
+=head1 METHODS
+
+These methods are available from this class:
+
+=cut
+
 #-------------------------------------------------------------------
-=head1 getBackgroundColor
+=head2 getBackgroundColor
 
 Returns the background color triplet. Defaults to #ffffff (white).
 
@@ -18,7 +38,7 @@ sub getBackgroundColor {
 }
 
 #-------------------------------------------------------------------
-=head1 getImageHeight
+=head2 getImageHeight
 
 Returns the height of the image in pixels.
 
@@ -31,7 +51,7 @@ sub getImageHeight {
 }
 
 #-------------------------------------------------------------------
-=head1 getImageWidth
+=head2 getImageWidth
 
 Returns the width in pixels of the image.
 
@@ -44,7 +64,7 @@ sub getImageWidth {
 }
 
 #-------------------------------------------------------------------
-=head1 getPalette
+=head2 getPalette
 
 Returns the palette object this image is set to. Defaults to the default palette.
 
@@ -61,7 +81,7 @@ sub getPalette {
 }
 
 #-------------------------------------------------------------------
-=head1 getXOffset
+=head2 getXOffset
 
 Returns the horizontal offset of the center, relative to which the image is drawn. 
 Defaults to the physical center of the image.
@@ -75,7 +95,7 @@ sub getXOffset {
 }
 
 #-------------------------------------------------------------------
-=head1 getYOffset
+=head2 getYOffset
 
 Returns the vertical offset of the center, relative to which the image is drawn.
 Defaults to the physical center of the image.
@@ -89,7 +109,7 @@ sub getYOffset {
 }
 
 #-------------------------------------------------------------------
-=head1 image
+=head2 image
 
 Returns the imagemagick object containing this image.
 
@@ -102,19 +122,19 @@ sub image {
 }
 
 #-------------------------------------------------------------------
-=head1 new ( session, [ width, height ] )
+=head2 new ( session, [ width, height ] )
 
 Constructor for an image. Optionally you can pass the size of the image.
 
-=head2 session
+=head3 session
 
 The webgui session object.
 
-=head2 width
+=head3 width
 
 The width of the image in pixels. Defaults to 300.
 
-=head2 height
+=head3 height
 
 The height of the image in pixels. Defaults to 300.
 
@@ -138,7 +158,7 @@ sub new {
 }
 
 #-------------------------------------------------------------------
-=head1 session
+=head2 session
 
 Returns the the session object.
 
@@ -151,12 +171,12 @@ sub session {
 }
 
 #-------------------------------------------------------------------
-=head1 setBackgroundColor ( colorTriplet )
+=head2 setBackgroundColor ( colorTriplet )
 
 Sets the backgroundcolor. Using this method will erase everything that is
 already on the image.
 
-=head2 colorTriplet
+=head3 colorTriplet
 
 The color for the background. Supply as a html color triplet of the form
 #ffffff.
@@ -172,11 +192,11 @@ sub setBackgroundColor {
 }
 
 #-------------------------------------------------------------------
-=head1 setImageHeight ( height)
+=head2 setImageHeight ( height)
 
 Set the height of the image.
 
-=head2 height
+=head3 height
 
 The height of the image in pixels.
 
@@ -193,11 +213,11 @@ sub setImageHeight {
 }
 
 #-------------------------------------------------------------------
-=head1 setImageWidth ( width )
+=head2 setImageWidth ( width )
 
 Set the width of the image.
 
-=head2 width
+=head3 width
 
 Teh width of the image in pixels.
 
@@ -214,11 +234,11 @@ sub setImageWidth {
 }
 
 #-------------------------------------------------------------------
-=head1 setPalette ( palette )
+=head2 setPalette ( palette )
 
 Set the palette object this image will use.
 
-=head2 palette
+=head3 palette
 
 An instanciated WebGUI::Image::Palette object.
 
@@ -232,15 +252,15 @@ sub setPalette {
 }
 
 #-------------------------------------------------------------------
-=head1 saveToFileSystem ( path, [ filename ] );
+=head2 saveToFileSystem ( path, [ filename ] );
 
 Saves the image to the specified path and filename.
 
-=head2 path
+=head3 path
 
 The directory where the image should be saved.
 
-=head2 filename
+=head3 filename
 
 The filename the image should get. If not passed it will default to the name set
 by the setFilename method.
@@ -257,7 +277,7 @@ sub saveToFileSystem {
 
 # This doesn't seem to work...
 #-------------------------------------------------------------------
-=head1 saveToScalar
+=head2 saveToScalar
 
 Returns a scalar containing the image contents.
 
@@ -277,15 +297,15 @@ sub saveToScalar {
 }
 
 #-------------------------------------------------------------------
-=head1 saveToStorageLocation ( storage, [ filename ] )
+=head2 saveToStorageLocation ( storage, [ filename ] )
 
 Save the image to the specified storage location.
 
-=head2 storage
+=head3 storage
 
 An instanciated WebGUI::Storage::Image object.
 
-=head2 filename
+=head3 filename
 
 The filename the image should get. If not passed it will default to the name set
 by the setFilename method.
@@ -301,11 +321,11 @@ sub saveToStorageLocation {
 }
 
 #-------------------------------------------------------------------
-=head1 text ( properties )
+=head2 text ( properties )
 
 Extend the imagemagick Annotate method so alignment can be controlled better.
 
-=head2 properties
+=head3 properties
 
 A hash containing the imagemagick Annotate properties of your choice.
 Additionally you can specify:
