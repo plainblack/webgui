@@ -500,11 +500,11 @@ my	%transactionData = %{$self->{_transactionParams}};
 	$items = WebGUI::Commerce::Transaction->new($self->session, $transactionData{ORGID})->getItems;
 	foreach (@{$items}) {
 		my $data = $_->{itemName};
-		$data =~ s/&/&amp;/sg;
-		$data =~ s/</&lt;/sg;
-		$data =~ s/>/&gt;/sg;
-		$data =~ s/"/&quot;/sg;
-
+	#	$data =~ s/&/&amp;/sg;
+	#	$data =~ s/</&lt;/sg;
+	#	$data =~ s/>/&gt;/sg;
+	#	$data =~ s/"/&quot;/sg;
+		$data =~ tr/A-Za-z0-9 //dc;
 		$xml .= 
 "   <Item>
         <Description>".$data."</Description>
