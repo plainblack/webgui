@@ -392,7 +392,7 @@ sub www_checkoutSubmit {
 			my $priceLineItem = ($_->{item}->{priceLineItem})
 					# pass in the quantity and the normal items in the cart.
 				?($_->{item}->priceLineItem($_->{quantity},\@copyOfNormal))
-				:undef);
+				:undef;
 			$transaction->addItem($_->{item}, $_->{quantity},$priceLineItem);
 			# use the item plugin's lineItem method for price override
 			# situations.	
