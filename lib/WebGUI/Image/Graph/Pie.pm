@@ -1027,7 +1027,8 @@ Returns the thickness of the top of the pie in pixels. Defaults to 20 pixels.
 sub getTopHeight {
 	my $self = shift;
 
-	return $self->{_pieProperties}->{topHeight} || 20;
+	return 20 unless (defined $self->{_pieProperties}->{topHeight});
+	return $self->{_pieProperties}->{topHeight};
 }
 
 #-------------------------------------------------------------------
