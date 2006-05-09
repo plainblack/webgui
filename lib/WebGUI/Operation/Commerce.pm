@@ -389,12 +389,15 @@ sub www_checkoutSubmit {
 		$transaction = WebGUI::Commerce::Transaction->new($session, 'new');
 		
 		foreach (@{$currentPurchase->{items}}) {
-			$transaction->addItem($_->{item}, $_->{quantity});		
-			# use the item plugin's lineItem method for price override
-			# situations.	
-			$amount += ($_->{item}->{priceLineItem})
+			my $priceLineItem = ($_->{item}->{priceLineItem})
 					# pass in the quantity and the normal items in the cart.
 				?($_->{item}->priceLineItem($_->{quantity},\@copyOfNormal))
+				:undef);
+			$transaction->addItem($_->{item}, $_->{quantity},$priceLineItem);
+			# use the item plugin's lineItem method for price override
+			# situations.	
+			$amount += ($priceLineItem)
+				?($priceLineItem)
 				:($_->{item}->price * $_->{quantity});
 			$var->{purchaseDescription} .= $_->{quantity}.' x '.$_->{item}->name.'<br />';
 		}
