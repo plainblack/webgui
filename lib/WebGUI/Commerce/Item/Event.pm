@@ -147,7 +147,7 @@ sub priceLineItem {
 		my $numberOfThisPass = $passesInCart{$passId};
 		# calculate discount.
 		if ($pass->{type} eq 'newPrice') {
-			$discountedPrice = (0 + $pass->{amount}) if ($discountedPrice > (0 + $pass->{amount}));
+			$discountedPrice = (0 + $pass->{amount}) if ($discountedPrice < (0 + $pass->{amount}));
 		} elsif ($pass->{type} eq 'amountOff') {
 			# not yet implemented!
 		} elsif ($pass->{type} eq 'percentOff') {
