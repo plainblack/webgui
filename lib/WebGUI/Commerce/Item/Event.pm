@@ -109,11 +109,12 @@ sub priceLineItem {
 	# this is the output of ShoppingCart->getItems (the \@normal arrayref).
 	my $cartItems = shift;
 	use Data::Dumper;
-	$self->session->errorHandler->warn('normal contents: '.Dumper($cartItems));
+	# $self->session->errorHandler->warn('normal contents: '.Dumper($cartItems));
 	# this is the default price of this event.
 	my $price = $self->{_event}->{price};
 	# get the list of discount passes that this event is "under"
 	my @discountPasses = split(/::/,$self->{_event}->{passId});
+	$self->session->errorHandler->warn('normal contents: '.Dumper(\@discountPasses));
 	# return the default behavior if this event does not have a pass assigned.
 	return ($price * $quantity) unless scalar(@discountPasses);
 	# keep a running total of this line item.
