@@ -499,9 +499,15 @@ my	%transactionData = %{$self->{_transactionParams}};
 
 	$items = WebGUI::Commerce::Transaction->new($self->session, $transactionData{ORGID})->getItems;
 	foreach (@{$items}) {
+		my $data = $_->{itemName};
+		$data =~ s/&/&amp;/sg;
+		$data =~ s/</&lt;/sg;
+		$data =~ s/>/&gt;/sg;
+		$data =~ s/"/&quot;/sg;
+
 		$xml .= 
 "   <Item>
-        <Description>".$self->session->url->escape($_->{itemName})."</Description>
+        <Description>".$data."</Description>
 	<Cost>".sprintf('%.2f', $_->{amount})."</Cost>
 	<Qty>".$_->{quantity}."</Qty>
       </Item>\n";
