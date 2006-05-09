@@ -1013,7 +1013,8 @@ sub getTiltAngle {
 	my $self = shift;
 	my $angle = shift;
 
-	return $self->{_pieProperties}->{tiltAngle} || 55;
+	return 55 unless (defined $self->{_pieProperties}->{tiltAngle});
+	return $self->{_pieProperties}->{tiltAngle};
 }
 
 #-------------------------------------------------------------------
