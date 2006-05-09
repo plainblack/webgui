@@ -359,7 +359,7 @@ sub www_checkoutSubmit {
 	$plugin = WebGUI::Commerce::Payment->load($session, $session->scratch->get('paymentGateway'));
 	$shoppingCart = WebGUI::Commerce::ShoppingCart->new($session);
 	($normal, $recurring) = $shoppingCart->getItems;
-
+	my @copyOfNormal = @$normal;
 	# Check if shoppingcart contains any items. If not the user probably clicked reload, so we redirect to the current page.
 	unless (@$normal || @$recurring) {
 		$session->http->setRedirect($session->url->page);
@@ -394,7 +394,7 @@ sub www_checkoutSubmit {
 			# situations.	
 			$amount += ($_->{item}->{priceLineItem})
 					# pass in the quantity and the normal items in the cart.
-				?($_->{item}->priceLineItem($_->{quantity},$normal))
+				?($_->{item}->priceLineItem($_->{quantity},\@copyOfNormal))
 				:($_->{item}->price * $_->{quantity});
 			$var->{purchaseDescription} .= $_->{quantity}.' x '.$_->{item}->name.'<br />';
 		}
