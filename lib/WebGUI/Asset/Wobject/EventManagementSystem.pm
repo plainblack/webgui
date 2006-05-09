@@ -351,7 +351,7 @@ sub checkConflicts {
 		# make sure it's a subevent... 
 		my ($isSubEvent) = $self->session->db->quickArray("
 			select count(*) from EventManagementSystem_products
-			where (prerequisiteId is not null or prerequisiteId != '') and productId=?", [$scheduleData->{productId}]
+			where (prerequisiteId is not null and prerequisiteId != '') and productId=?", [$scheduleData->{productId}]
 		);
 		next unless ($isSubEvent);
 				
