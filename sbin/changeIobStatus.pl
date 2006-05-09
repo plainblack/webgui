@@ -116,13 +116,13 @@ print "Searching for users with a status of $currentStatus ...\n" unless ($quiet
 my $userList;
 my $now = $session->datetime->time();
 my $inbox = WebGUI::Inbox->new($session);
-my $sth = WebGUI::SQL->read("select userId,assetId from InOutBoard_status where status=?",[$currentStatus]);
+my $sth = $session->db->read("select userId,assetId from InOutBoard_status where status=?",[$currentStatus]);
 while (my ($userId,$assetId) = $sth->array) {
 	my $user = WebGUI::User->new($session, $userId);
 	print "\tFound user ".$user->username."\n" unless ($quiet);
 	$userList .= $user->username." (".$userId.")\n";
-	WebGUI::SQL->write("update InOutBoard_status set dateStamp=?, message=?, status=? where userId=? and assetId=?",[$now, $whatsHappening, $newStatus, $userId, $assetId]);
-	WebGUI::SQL->write("insert into InOutBoard_statusLog (userId, createdBy, dateStamp, message, status, assetId) values (?,?,?,?,?,?)",
+	$session->db->write("update InOutBoard_status set dateStamp=?, message=?, status=? where userId=? and assetId=?",[$now, $whatsHappening, $newStatus, $userId, $assetId]);
+	$session->db->write("insert into InOutBoard_statusLog (userId, createdBy, dateStamp, message, status, assetId) values (?,?,?,?,?,?)",
 		[$userId,3,$now, $whatsHappening, $newStatus, $assetId]);
 	$inbox->addMessage({
 		userId=>$userId,

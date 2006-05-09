@@ -18,10 +18,8 @@ BEGIN {
 use Digest::MD5;
 use Getopt::Long;
 use strict;
-use WebGUI::DateTime;
-use WebGUI::Grouping;
+use WebGUI::Group;
 use WebGUI::Session;
-use WebGUI::SQL;
 use WebGUI::User;
 use WebGUI::Utility;
 
@@ -198,15 +196,15 @@ if (!($^O =~ /^Win/i) && $> != 0 && !$override) {
 
 
 print "Starting up..." unless ($quiet);
-WebGUI::Session::open($webguiRoot,$configFile);
-WebGUI::Session::refreshUserInfo(3); # The script should run as admin.
+my $session = WebGUI::Session->open($webguiRoot,$configFile);
+$session->user({userId=>3});
 open(FILE,"<".$usersFile);
 print "OK\n" unless ($quiet);
 
 my $first = 1;
 my $lineNumber = 0;
 my @field;
-my @profileFields = WebGUI::SQL->buildArray("select fieldName from userProfileField");
+my @profileFields = $session->db->buildArray("select fieldName from userProfileField");
 while(<FILE>) {
 	$lineNumber++;
   	chomp;
@@ -231,7 +229,6 @@ while(<FILE>) {
     			$i++;
   		}
 
-		# deal with defaults and overridescate) = WebGUI::SQL->quickArray("select userid from users where username=".quote($user{username}));
 		if ($user{username} eq "" && $user{firstName} ne "" && $user{lastName} ne "") {
 			$user{username} = $user{firstName}.".".$user{lastName};
 		}
@@ -254,67 +251,59 @@ while(<FILE>) {
                                $user{changePassword} = 0;
                        }
                }
-
 		# process user
                my $u;
                my $queryHandler;
-       #       my ($duplicate) = WebGUI::SQL->quickArray("select count(*) from users where username=".quote($user{username}));
-               my ($duplicate) = WebGUI::SQL->quickArray("select userid from users where username=".quote($user{username}));
-
-               if ($user{username} eq "") { print "Skipping line $lineNumber.\n" unless ($quiet); }
-               else
-               {
+               my ($duplicate) = $session->db->quickArray("select userid from users where username=?",[$user{username}]);
+               if ($user{username} eq "") { 
+			print "Skipping line $lineNumber.\n" unless ($quiet); 
+		} else {
                        # update only
-                       if ($update)
-                       {
-                               if ($duplicate)
-                               {
+                       if ($update) {
+                               if ($duplicate) {
                                        print "Updating user $user{username}\n" unless ($quiet);
-                                       $u = WebGUI::User->new($duplicate);
-                                       if ($replaceGroups and ($user{groups} ne ""))
-                                       {
-                                               $queryHandler = WebGUI::SQL->prepare("delete from groupings where userid=".quote($duplicate));
+                                       $u = WebGUI::User->new($session, $duplicate);
+                                       if ($replaceGroups and ($user{groups} ne "")) {
+                                               $queryHandler = $session->db->prepare("delete from groupings where userid=?",[$duplicate]);
                                                if ($queryHandler) { $queryHandler->execute(); }
                                        }
-                                       my ($pw) = WebGUI::SQL->quickArray("select authentication.fieldData from authentication,users where authentication.authMethod='WebGUI' and users.username=".quote($user{username})." and users.userId=authentication.userId and authentication.fieldName='identifier'");
+                                       my ($pw) = $session->db->quickArray("select authentication.fieldData from authentication,users where authentication.authMethod='WebGUI' and users.username=? and users.userId=authentication.userId and authentication.fieldName='identifier'",[$user{username}]);
                                        $user{identifier} = $pw;
-                               }
-                               else { print "User $user{username} not found. Skipping.\n" unless ($quiet); }
-                       }
-                       elsif ($updateAdd)      # update and add users
-                       {
-                               if ($duplicate)
-                               {
+                               } else { 
+					print "User $user{username} not found. Skipping.\n" unless ($quiet); 
+				}
+                       } elsif ($updateAdd) {     # update and add users 
+                               if ($duplicate) {
                                        print "Updating user $user{username}\n" unless ($quiet);
-                                       $u = WebGUI::User->new($duplicate);
-                                       if ($replaceGroups and ($user{groups} ne ""))
-                                       {
-                                               $queryHandler = WebGUI::SQL->prepare("delete from groupings where userid=".quote($duplicate));
+                                       $u = WebGUI::User->new($session, $duplicate);
+                                       if ($replaceGroups and ($user{groups} ne "")) {
+                                               $queryHandler = $session->db->prepare("delete from groupings where userid=?",[$duplicate]);
                                                if ($queryHandler) { $queryHandler->execute(); }
                                        }
-                                       my ($pw) = WebGUI::SQL->quickArray("select authentication.fieldData from authentication,users where authentication.authMethod='WebGUI' and users.username=".quote($user{username})." and users.userId=authentication.userId and authentication.fieldName='identifier'");
+                                       my ($pw) = $session->db->quickArray("select authentication.fieldData from authentication,users where authentication.authMethod='WebGUI' and users.username=? and users.userId=authentication.userId and authentication.fieldName='identifier'",[$user{username}]);
                                        $user{identifier} = $pw;
-                               }
-                               else { $u = WebGUI::User->new("new"); print "Adding user $user{username}\n" unless ($quiet); }
-                       }
-                       else    # add users only
-                       {
-                               if ($duplicate) { print "User $user{username} already exists. Skipping.\n" unless ($quiet); }
-                               else { $u = WebGUI::User->new("new"); print "Adding user $user{username}\n" unless ($quiet); }
+                               } else { 
+					$u = WebGUI::User->new($session, "new"); 
+					print "Adding user $user{username}\n" unless ($quiet); 
+				}
+                       } else {    # add users only 
+                               if ($duplicate) { 
+					print "User $user{username} already exists. Skipping.\n" unless ($quiet); 
+                               	} else { 
+					$u = WebGUI::User->new($session, "new"); 
+					print "Adding user $user{username}\n" unless ($quiet); 
+				}
                        }
                }
-
-               if ($u)
-               {
-               #       my $u = WebGUI::User->new("new");
+               if ($u) {
  			$u->username($user{username});
 			$u->authMethod($user{authMethod});
 			$u->status($user{status});
 			my $cmd = "WebGUI::Auth::".$authMethod;
         		my $load = "use ".$cmd;
-        		WebGUI::ErrorHandler::fatal("Authentication module failed to compile: $cmd.".$@) if($@);
+        		$session->errorHandler->fatal("Authentication module failed to compile: $cmd.".$@) if($@);
         		eval($load);
-    			my $auth = eval{$cmd->new($authMethod,$u->userId)};
+    			my $auth = eval{$cmd->new($session, $authMethod,$u->userId)};
 			$auth->saveParams($u->userId,"WebGUI",{identifier=>$user{identifier}});
 			$auth->saveParams($u->userId,"LDAP",{
 				ldapUrl=>$user{ldapUrl},
@@ -336,8 +325,8 @@ while(<FILE>) {
 }
 print "Cleaning up..." unless ($quiet);
 close(FILE);
-WebGUI::Session::end($session{var}{sessionId});
-WebGUI::Session::close();
+$session->var->end;
+$session->close;
 print "OK\n" unless ($quiet);
 
 
@@ -356,13 +345,13 @@ sub calculateExpireOffset {
 		}
 	}
         if ($units eq "fixed") {
-                my $seconds = (($offset - WebGUI::DateTime::time()));
+                my $seconds = (($offset - $session->datetime->time()));
                 if ($seconds < 1) {
                         return undef;
                 } else {
                         return int($seconds);
                 }
         }
-	return WebGUI::DateTime::intervalToSeconds($offset, $units)
+	return $session->datetime->intervalToSeconds($offset, $units)
 }
 

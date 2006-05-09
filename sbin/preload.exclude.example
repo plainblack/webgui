@@ -1,4 +1,5 @@
 WebGUI::Cache::Memcached
+WebGUI::Cache::Database
 WebGUI::Auth::LDAP
 WebGUI::Asset::Wobject::WSClient
 WebGUI::Asset::File::ZipArchive
@@ -9,6 +10,12 @@ WebGUI::Asset::Wobject::HttpProxy
 WebGUI::Asset::Wobject::Product
 WebGUI::Asset::Wobject::Survey
 WebGUI::Asset::Wobject::InOutBoard
+WebGUI::Asset::Wobject::Dashboard
+WebGUI::Asset::Wobject::EventsManagementSystem
+WebGUI::Asset::Wobject::ProjectManager
+WebGUI::Asset::Wobject::SyndicatedContent
+WebGUI::Asset::Wobject::WSClient
+WebGUI::Asset::Wobject::MultiSearch
 WebGUI::Commerce
 WebGUI::Commerce::Item
 WebGUI::Commerce::Item::Product
@@ -25,7 +32,6 @@ WebGUI::Subscription
 WebGUI::Operation::TransactionLog
 WebGUI::Operation::Commerce
 WebGUI::Operation::Subscription
-WebGUI::Asset::Wobject::IndexedSearch::Search
 WebGUI::Macro::AOIHits
 WebGUI::Macro::AOIRank
 WebGUI::Macro::AdminText
