@@ -241,6 +241,44 @@ our $HELP = {
 		],
 	},
 
+	'edit discount pass' => {
+		source => 'sub www_editDiscountPass',
+		title => 'edit discount pass',
+		body => 'edit discount pass body',
+		fields => [
+                        {
+                                title => 'discount pass id',
+                                description => 'discount pass id description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'pass name',
+                                description => 'pass name description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'discount pass type',
+                                description => 'discount pass type description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'discount amount',
+                                description => 'discount amount description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+		],
+		related => [
+			{
+				tag => 'event management system add/edit',
+				namespace => 'Asset_EventManagementSystem',
+			},
+			{
+				tag => 'add/edit event',
+				namespace => 'Asset_EventManagementSystem',
+			},
+		],
+	},
+
 	'event management system template' => {
 		source => 'sub view',
 		title => 'template help title',

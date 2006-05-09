@@ -361,6 +361,12 @@ our $I18N = { ##hashref of hashes
 		lastUpdated => 1147146318,
 	},
 
+	'edit discount pass body' => {
+		message => q|<p>This screen allows you to create new discount passes that can be purchased, or to edit existing passes.</p>
+|,
+		lastUpdated => 1147146318,
+	},
+
 	'null field error' => {
 		message => q|The %s field cannot be blank.|,
 		lastUpdated => 1138908251,
@@ -1426,6 +1432,11 @@ normal templates.|,
                 lastUpdated => 1147108858,
         },
 
+        'discount pass id description' => {
+                message => q|A unique identifier used internally for this discount pass.  When a new discount pass is created, this will be the word "new".|,
+                lastUpdated => 1147108858,
+        },
+
         'discount pass type' => {
                 message => q|Discount Pass Type|,
                 lastUpdated => 1147108858,
@@ -1438,6 +1449,11 @@ normal templates.|,
 
         'pass name' => {
                 message => q|Discount Pass Name|,
+                lastUpdated => 1147108858,
+        },
+
+        'pass name description' => {
+                message => q|The name of your discount pass.  This will be used in the system to refer to this pass and the discounts that it provides so be sure to pick a descriptive name.  This field cannot be left blank.|,
                 lastUpdated => 1147108858,
         },
 

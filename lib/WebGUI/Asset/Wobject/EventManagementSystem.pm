@@ -3085,11 +3085,13 @@ sub www_editDiscountPass {
 	$f->readOnly(
 		name=>'nullPass',
 		label=>$i18n->get('discount pass id'),
+		hoverHelp=>$i18n->get('discount pass id description'),
 		value=>$passId
 	);
 	$f->text(
 		name=>'name',
 		label=>$i18n->get("pass name"),
+		hoverHelp=>$i18n->get("pass name description"),
 		value=>$data->{name}
 	);
 	$f->radioList(
