@@ -2587,7 +2587,7 @@ sub view {
 		   where
 		   	p.productId = e.productId and approved=1
 		   	and e.assetId =".$self->session->db->quote($self->get("assetId"))."
-			and (e.prerequisiteId is NULL or e.prerequisiteId = '')";
+			and (e.prerequisiteId is NULL or e.prerequisiteId = '') order by sequenceNumber";
 
 	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->get("paginateAfter"));
 	$p->setDataByQuery($sql);
