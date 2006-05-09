@@ -355,6 +355,12 @@ our $I18N = { ##hashref of hashes
 		lastUpdated => 1138908251,
 	},
 
+	'edit prerequisite set body' => {
+		message => q|<p>This screen allows you to define prerequisites for an event or edit an event's current prerequisites.</p>
+<p>With respect to prerequisites, there are basically two classes of Events.  There are those that have prerequisites (Select Events) and those that do not (Master Events).  Only Master Events can serve as prerequisites.  Adding a prerequisite to a Master Event will make it become a Select Event, and it may no longer be used as a Master Event.</p>|,
+		lastUpdated => 1147146318,
+	},
+
 	'null field error' => {
 		message => q|The %s field cannot be blank.|,
 		lastUpdated => 1138908251,

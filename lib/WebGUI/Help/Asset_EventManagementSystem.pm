@@ -208,6 +208,39 @@ our $HELP = {
 		],
 	},
 
+	'edit event prerequisite set' => {
+		source => 'sub www_editPrereqSet',
+		title => 'edit prerequisite set',
+		body => 'edit prerequisite set body',
+		fields => [
+                        {
+                                title => 'prereq set name field label',
+                                description => 'prereq set name field description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'operator type',
+                                description => 'operator type description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'events required by this prerequisite set',
+                                description => 'events required by description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+		],
+		related => [
+			{
+				tag => 'event management system add/edit',
+				namespace => 'Asset_EventManagementSystem',
+			},
+			{
+				tag => 'add/edit event',
+				namespace => 'Asset_EventManagementSystem',
+			},
+		],
+	},
+
 	'event management system template' => {
 		source => 'sub view',
 		title => 'template help title',
