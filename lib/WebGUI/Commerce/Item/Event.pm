@@ -131,6 +131,7 @@ sub priceLineItem {
 			);
 		}
 		if ($numberOfPasses) {
+			$self->session->errorHandler->debug('adding a discount pass.');
 			$passesInCart{$passId} = $numberOfPasses;
 			$totalPassesInCart += $numberOfPasses;
 		}
@@ -149,6 +150,7 @@ sub priceLineItem {
 		}
 		# while we still have passes and items left to discount.
 		while ($numberOfThisPass && $quantity) {
+			$self->session->errorHandler->debug('applying a discount pass.');
 			$totalPrice += $discountedPrice;
 			$quantity--;
 			$numberOfThisPass--;
