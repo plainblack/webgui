@@ -26,6 +26,7 @@ to be part of the Commerce system.
 use strict;
 
 our @ISA = qw(WebGUI::Commerce::Item);
+use WebGUI::Utility;
 
 #-------------------------------------------------------------------
 sub available {
@@ -83,11 +84,11 @@ sub new {
 	$session = shift;
 	$eventId = shift;
 
-	my $eventData = $session->db->quickHashRef("select p.productId, p.title, p.description, p.price, e.approved
+	my $eventData = $session->db->quickHashRef("select p.productId, p.title, p.description, p.price, e.approved, e.passId, e.passType
                    from EventManagementSystem_products as e, products as p
 		   where p.productId = e.productId and p.productId=".$session->db->quote($eventId)); 	
 	
-	bless {_event => $eventData, _session => $session }, $class;
+	bless {_event => $eventData, _session => $session, priceLineItem => 1}, $class;
 }
 
 #-------------------------------------------------------------------
@@ -98,6 +99,63 @@ sub needsShipping {
 #-------------------------------------------------------------------
 sub price {
 	return $_[0]->{_event}->{price};
+}
+
+#-------------------------------------------------------------------
+sub priceLineItem {
+	my $self = shift;
+	# this will become the total number of normally-priced events.
+	my $quantity = shift;
+	# this is the output of ShoppingCart->getItems (the \@normal arrayref).
+	my $cartItems = shift;
+	# this is the default price of this event.
+	my $price = $self->{_event}->{price};
+	# get the list of discount passes that this event is "under"
+	my @discountPasses = split(/::/,$self->{_event}->{passId});
+	# return the default behavior if this event does not have a pass assigned.
+	return ($price * $quantity) unless scalar(@discountPasses);
+	# keep a running total of this line item.
+	my $totalPrice = 0;
+	# build the list of passes in our cart.
+	my %passesInCart; # key: passId, value: quantity in cart
+	my $totalPassesInCart;
+	foreach my $passId (@discountPasses) {
+		# get a list of events that define this pass
+		my @passEvents = $self->session->db->buildArray("select productId from EventManagementSystem_products where passType='defines' and passId=?",[$passId]);
+		my $numberOfPasses = 0;
+		# find out if we have any of this pass's events in our cart.
+		foreach my $item (@$cartItems) {
+			$numberOfPasses += $item->{item}->{_event}->{productId} if (
+				$item->{item}->type eq 'Event'
+				&& isIn($item->{item}->{_event}->{productId},@passEvents)
+			);
+		}
+		if ($numberOfPasses) {
+			$passesInCart{$passId} = $numberOfPasses;
+			$totalPassesInCart += $numberOfPasses;
+		}
+	}
+	foreach my $passId (keys(%passesInCart)) {
+		my $pass = $self->session->db->quickHashRef("select * from EventManagementSystem_discountPasses where passId=?",[$passId]);
+		my $discountedPrice = $price;
+		my $numberOfThisPass = $passesInCart{$passId};
+		# calculate discount.
+		if ($pass->{type} eq 'newPrice') {
+			$discountedPrice = (0 + $pass->{amount}) if ($discountedPrice > (0 + $pass->{amount}));
+		} elsif ($pass->{type} eq 'amountOff') {
+			# not yet implemented!
+		} elsif ($pass->{type} eq 'percentOff') {
+			# not yet implemented!
+		}
+		# while we still have passes and items left to discount.
+		while ($numberOfThisPass && $quantity) {
+			$totalPrice += $discountedPrice;
+			$quantity--;
+			$numberOfThisPass--;
+		}
+	}
+	# return the total of the discounted items plus the total of the non discounted items.
+	return ($totalPrice + ($quantity * $price));
 }
 
 #-------------------------------------------------------------------
