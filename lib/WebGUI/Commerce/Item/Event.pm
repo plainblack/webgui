@@ -114,9 +114,9 @@ sub priceLineItem {
 	my $price = $self->{_event}->{price};
 	# get the list of discount passes that this event is "under"
 	my @discountPasses = split(/::/,$self->{_event}->{passId});
-	$self->session->errorHandler->warn('normal contents: '.Dumper(\@discountPasses));
+	$self->session->errorHandler->warn('discount passes: '.Dumper(\@discountPasses));
 	# return the default behavior if this event does not have a pass assigned.
-	return ($price * $quantity) unless scalar(@discountPasses);
+	return ($price * $quantity) unless (scalar(@discountPasses) && ($self->{_event}->{passType} eq 'member'));
 	# keep a running total of this line item.
 	my $totalPrice = 0;
 	# build the list of passes in our cart.
@@ -125,17 +125,18 @@ sub priceLineItem {
 	foreach my $passId (@discountPasses) {
 		# get a list of events that define this pass
 		my @passEvents = $self->session->db->buildArray("select productId from EventManagementSystem_products where passType='defines' and passId=?",[$passId]);
+		$self->session->errorHandler->warn('pass events: '.Dumper(\@passEvents));
 		my $numberOfPasses = 0;
 		# find out if we have any of this pass's events in our cart.
 		foreach my $item (@$cartItems) {
-			$self->session->errorHandler->debug('quantity of this pass event: '.$item->{quantity});
+			$self->session->errorHandler->warn('quantity of this pass event: '.$item->{quantity});
 			$numberOfPasses += $item->{quantity} if (
 				$item->{item}->type eq 'Event'
 				&& isIn($item->{item}->{_event}->{productId},@passEvents)
 			);
 		}
 		if ($numberOfPasses) {
-			$self->session->errorHandler->debug('adding a discount pass.');
+			$self->session->errorHandler->warn('adding a discount pass.');
 			$passesInCart{$passId} = $numberOfPasses;
 			$totalPassesInCart += $numberOfPasses;
 		}
@@ -154,7 +155,7 @@ sub priceLineItem {
 		}
 		# while we still have passes and items left to discount.
 		while ($numberOfThisPass && $quantity) {
-			$self->session->errorHandler->debug('applying a discount pass.');
+			$self->session->errorHandler->warn('applying a discount pass.');
 			$totalPrice += $discountedPrice;
 			$quantity--;
 			$numberOfThisPass--;
