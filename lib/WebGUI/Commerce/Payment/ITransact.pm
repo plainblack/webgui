@@ -502,7 +502,7 @@ my	%transactionData = %{$self->{_transactionParams}};
 		$xml .= 
 "   <Item>
         <Description>".$_->{itemName}."</Description>
-	<Cost>".$_->{amount}."</Cost>
+	<Cost>".sprintf('%.2f', $_->{amount})."</Cost>
 	<Qty>".$_->{quantity}."</Qty>
       </Item>\n";
 	}
