@@ -1,4 +1,12 @@
-#!/usr/bin/perl
+#-------------------------------------------------------------------
+# WebGUI is Copyright 2001-2005 Plain Black Corporation.
+#-------------------------------------------------------------------
+# Please read the legal notices (docs/legal.txt) and the license
+# (docs/license.txt) that came with this distribution before using
+# this software.
+#-------------------------------------------------------------------
+# http://www.plainblack.com                     info@plainblack.com
+#-------------------------------------------------------------------
 
 our ($webguiRoot);
 
@@ -9,10 +17,7 @@ BEGIN {
 
 use Getopt::Long;
 use strict;
-use WebGUI::DateTime;
-use WebGUI::MessageLog;
 use WebGUI::Session;
-use WebGUI::SQL;
 use WebGUI::User;
 
 $|=1;
@@ -86,7 +91,7 @@ STOP
 
 
 print "Starting up...\n" unless ($quiet);
-WebGUI::Session::open($webguiRoot,$configFile);
+my $session = WebGUI::Session->open($webguiRoot,$configFile);
 
 if ($userMessageFile) {
 	print "Opening message file.." unless ($quiet);
@@ -109,28 +114,35 @@ if ($userMessageFile) {
 
 print "Searching for users with a status of $currentStatus ...\n" unless ($quiet);
 my $userList;
-my $now = WebGUI::DateTime::time();
-my $sth = WebGUI::SQL->read("select userId,assetId from InOutBoard_status where status=".quote($currentStatus));
+my $now = $session->datetime->time();
+my $inbox = WebGUI::Inbox->new($session);
+my $sth = WebGUI::SQL->read("select userId,assetId from InOutBoard_status where status=?",[$currentStatus]);
 while (my ($userId,$assetId) = $sth->array) {
-	my $user = WebGUI::User->new($userId);
+	my $user = WebGUI::User->new($session, $userId);
 	print "\tFound user ".$user->username."\n" unless ($quiet);
 	$userList .= $user->username." (".$userId.")\n";
-	WebGUI::SQL->write("update InOutBoard_status set dateStamp=".$now.", message=".quote($whatsHappening).",
-		status=".quote($newStatus)." where userId=".quote($userId)." and assetId=".quote($assetId));
-	WebGUI::SQL->write("insert into InOutBoard_statusLog (userId, createdBy, dateStamp, message, status, assetId) values (
-		".quote($userId).", ".quote(3).", ".$now.", ".quote($whatsHappening).", ".quote($newStatus).", ".quote($assetId).")");
-	WebGUI::MessageLog::addEntry($userId,undef,"IOB Update",$userMessage);
+	WebGUI::SQL->write("update InOutBoard_status set dateStamp=?, message=?, status=? where userId=? and assetId=?",[$now, $whatsHappening, $newStatus, $userId, $assetId]);
+	WebGUI::SQL->write("insert into InOutBoard_statusLog (userId, createdBy, dateStamp, message, status, assetId) values (?,?,?,?,?,?)",
+		[$userId,3,$now, $whatsHappening, $newStatus, $assetId]);
+	$inbox->addMessage({
+		userId=>$userId,
+		subject=>"IOB Update",
+		message=>$userMessage
+		});
 }
-$sth->finish;
 
 if (length($userList) > 0) {
 	print "Alerting admins of changes\n" unless ($quiet);
 	my $message = "The following users had their status changed:\n\n".$userList;
-	WebGUI::MessageLog::addEntry(undef,"3","IOB Update",$message);
+	$inbox->addMessage({
+		groupId=>3,
+		subject=>"IOB Update",
+		message=>$userMessage
+		});
 }
 	
 print "Cleaning up..." unless ($quiet);
-WebGUI::Session::end($session{var}{sessionId});
-WebGUI::Session::close();
+$session->var->end;
+$session->close;
 print "OK\n" unless ($quiet);
 
