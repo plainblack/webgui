@@ -103,7 +103,7 @@ sub addSlice {
 		topHeight	=> $self->getTopHeight,
 		bottomHeight	=> $self->getBottomHeight,
 		explosionLength	=> $self->getExplosionLength,
-		scaleFactor	=> $self->getScaleFactor || 1,
+		scaleFactor	=> $self->getScaleFactor,
 
 		# keep the slice number for debugging properties
 		sliceNr		=> scalar(@{$self->{_slices}}),
@@ -925,7 +925,6 @@ Defaults to 1.
 sub getScaleFactor {
 	my $self = shift;
 
-	return 1 unless (defined $self->{_pieProperties}->{scaleFactor});
 	return $self->{_pieProperties}->{scaleFactor} || '1';
 }
 
@@ -1078,8 +1077,6 @@ sub processDataset {
 
 	my $stepsize = ($self->getTopHeight + $self->getBottomHeight) / scalar(@{$self->getDataset});
 	foreach (@{$self->getDataset}) {
-		$dataIndex;
-
 		$self->addSlice({
 			percentage	=> $_ / $total, 
 			label		=> $self->getLabel($dataIndex),
@@ -1260,7 +1257,7 @@ The figure with which the the normal radius if the slices should be multiplied.
 
 =cut
 
-sub getScaleFactor {
+sub setScaleFactor {
 	my $self = shift;
 	my $scaleFactor = shift;
 	
