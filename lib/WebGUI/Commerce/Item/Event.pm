@@ -125,7 +125,7 @@ sub priceLineItem {
 		my $numberOfPasses = 0;
 		# find out if we have any of this pass's events in our cart.
 		foreach my $item (@$cartItems) {
-			$numberOfPasses += $item->{item}->{_event}->{productId} if (
+			$numberOfPasses += $item->{quantity} if (
 				$item->{item}->type eq 'Event'
 				&& isIn($item->{item}->{_event}->{productId},@passEvents)
 			);
