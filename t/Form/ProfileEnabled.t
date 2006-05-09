@@ -40,7 +40,7 @@ $numTests = scalar @formTypes + 1;
 plan tests => $numTests;
 
 
-my @notEnabled = qw/Asset Button Captcha Color Control List MimeType Submit User/;
+my @notEnabled = qw/Asset Button Captcha Color Control List MimeType Slider Submit User/;
 
 foreach my $formType (@formTypes) {
 	my $form = WebGUI::Form::DynamicField->new($session, fieldType => $formType);
