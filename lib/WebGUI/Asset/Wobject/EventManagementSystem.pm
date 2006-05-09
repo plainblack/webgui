@@ -2195,7 +2195,7 @@ sub www_saveRegistration {
 	$details->{createdByUserId} = $self->session->var->get('userId') if ($addingNew && $userId ne '1');
 	$badgeId = $self->setCollateral("EventManagementSystem_badges", "badgeId",$details,0,0);
 	
-	#my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
+	my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
 	
 	my @addingToPurchase = split("\n",$self->session->scratch->get('EMS_add_purchase_events'));
 	# @addingToPurchase = () if ($self->session->scratch->get('EMS_add_purchase_badgeId') && !($self->session->scratch->get('EMS_add_purchase_badgeId') eq $badgeId));
@@ -2207,9 +2207,9 @@ sub www_saveRegistration {
 			productId	 => $eventId,
 			badgeId => $badgeId
 		},0,0);
-		#$shoppingCart->add($eventId, 'Event');
+		$shoppingCart->add($eventId, 'Event');
 	}
-	#$self->emptyScratchCart;
+	$self->emptyScratchCart;
 	$self->session->scratch->delete('EMS_add_purchase_badgeId');
 	$self->session->scratch->delete('EMS_add_purchase_events');
 	
@@ -2228,36 +2228,6 @@ sub www_saveRegistration {
 		$u->profileField('email',$email);
 	}
 	#Our item plug-in needs to be able to associate these records with the result of the payment attempt
-	#my $counter = 0;
-	#while (1) {
-	#	unless ($self->session->scratch->get("purchaseId".$counter)) {
-	#		$self->session->scratch->set("purchaseId".$counter, $purchaseId);
-	#		last;
-	#	}
-	#	$counter++;	
-	#}	
-	$self->session->scratch->set("purchaseId", $purchaseId);
-
-	# Take them to the new badge edit screen
-	return $self->www_search;
-}
-
-#-------------------------------------------------------------------
-#
-# This method will be called by www_search from it's badge edit mode to put the events making up the badge into their commerce cart.
-#
-sub addBadgeToCart {
-	my $self = shift;
-	my $purchaseId = $self->session->scratch->get("purchaseId");
-	my $eventsInBadge = $self->getEventsInScratchCart;	
-	my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
-	
-	foreach my $eventId (@$eventsInBadge) {
-		$shoppingCart->add($eventId, 'Event');
-	}
-	
-	$self->emptyScratchCart;
-	
 	my $counter = 0;
 	while (1) {
 		unless ($self->session->scratch->get("purchaseId".$counter)) {
@@ -2265,8 +2235,7 @@ sub addBadgeToCart {
 			last;
 		}
 		$counter++;	
-	}
-
+	}	
 	return $self->www_view;
 }
 
