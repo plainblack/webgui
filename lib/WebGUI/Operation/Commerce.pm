@@ -393,7 +393,8 @@ sub www_checkoutSubmit {
 			# use the item plugin's lineItem method for price override
 			# situations.	
 			$amount += ($_->{item}->{priceLineItem})
-				?($_->{item}->priceLineItem($_->{quantity},$shoppingCart))
+					# pass in the quantity and the normal items in the cart.
+				?($_->{item}->priceLineItem($_->{quantity},$normal))
 				:($_->{item}->price * $_->{quantity});
 			$var->{purchaseDescription} .= $_->{quantity}.' x '.$_->{item}->name.'<br />';
 		}
