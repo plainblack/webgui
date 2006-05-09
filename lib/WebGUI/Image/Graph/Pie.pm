@@ -61,12 +61,12 @@ sub addSlice {
 	my $properties = shift;
 
 	my $percentage = $properties->{percentage};
-	
+
 	# Work around a bug in imagemagick where an A path with the same start and end point will segfault.
 	if ($percentage == 1) { 
-		$percentage = 0.9999999;
+		$percentage = 0.999999999;
 	}
-	
+
 	my $label = $properties->{label};
 	my $color = $properties->{color};
 	
@@ -103,7 +103,7 @@ sub addSlice {
 		topHeight	=> $self->getTopHeight,
 		bottomHeight	=> $self->getBottomHeight,
 		explosionLength	=> $self->getExplosionLength,
-		scaleFactor	=> $self->getScaleFactor,
+		scaleFactor	=> $self->getScaleFactor || 1,
 
 		# keep the slice number for debugging properties
 		sliceNr		=> scalar(@{$self->{_slices}}),
@@ -387,7 +387,7 @@ Draws the pie chart.
 sub draw {
 	my ($currentSlice, $coordinates, $sliceData, $leftPlaneVisible, $rightPlaneVisible);
 	my $self = shift;
-
+	
 	$self->processDataset;
 
 	# Draw slices in the correct order or you'll get an MC Escher.
@@ -925,7 +925,8 @@ Defaults to 1.
 sub getScaleFactor {
 	my $self = shift;
 
-	return $self->{_pieProperties}->{scaleFactor} || 1;
+	return 1 unless (defined $self->{_pieProperties}->{scaleFactor});
+	return $self->{_pieProperties}->{scaleFactor} || '1';
 }
 
 #-------------------------------------------------------------------
