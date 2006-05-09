@@ -501,7 +501,7 @@ my	%transactionData = %{$self->{_transactionParams}};
 	foreach (@{$items}) {
 		$xml .= 
 "   <Item>
-        <Description>".$_->{itemName}."</Description>
+        <Description>".$self->session->url->escape($_->{itemName})."</Description>
 	<Cost>".sprintf('%.2f', $_->{amount})."</Cost>
 	<Qty>".$_->{quantity}."</Qty>
       </Item>\n";
