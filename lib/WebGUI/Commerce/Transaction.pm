@@ -36,14 +36,23 @@ The number of items that are tobe added.
 =cut
 
 sub addItem {
-	my ($self, $item, $quantity);
+	my ($self, $item, $quantity, $lineItemAmount);
 	$self = shift;
 	$item = shift;
 	$quantity = shift;
+	$lineItemAmount = shift;
 	
 	$self->session->db->write("insert into transactionItem ".
 		"(transactionId, itemName, amount, quantity, itemId, itemType) values ".
-		"(".$self->session->db->quote($self->{_transactionId}).",".$self->session->db->quote($item->name).",".$self->session->db->quote($item->price).",".$self->session->db->quote($quantity).",".
+		"(".$self->session->db->quote($self->{_transactionId}).",".$self->session->db->quote($item->name).",".$self->session->db->quote(
+			($lineItemAmount)
+				?($lineItemAmount)
+				:($item->price)
+			).",".$self->session->db->quote(
+				($lineItemAmount)
+				?('1')
+				:($quantity)
+			).",".
 		$self->session->db->quote($item->id).",".$self->session->db->quote($item->type).")");
 	# Adjust total amount in the transaction table.
 	$self->session->db->write("update transaction set amount=amount+".($item->price * $quantity)." where transactionId=".$self->session->db->quote($self->{_transactionId}));
