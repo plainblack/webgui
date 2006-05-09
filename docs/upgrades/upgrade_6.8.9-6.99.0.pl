@@ -705,7 +705,7 @@ create table EventManagementSystem_products (
  sequenceNumber int(11),
  imageId varchar(22) binary,
  prerequisiteId varchar(22) binary,
- passId varchar(22) binary,
+ passId text,
  passType varchar(10),
 primary key(productId)
 )
@@ -802,7 +802,7 @@ create table EventManagementSystem_discountPasses (
  passId varchar(22) binary not null,
  name varchar(100),
  amount varchar(22),
- type int(4),
+ type varchar(10),
 primary key(passId)
 )
 SQL10
