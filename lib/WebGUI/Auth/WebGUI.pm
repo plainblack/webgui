@@ -568,7 +568,7 @@ sub recoverPasswordFinish {
 	   $message = $self->session->setting->get("webguiRecoverPasswordEmail");
 	   $message .= "\n".$i18n->get(50).": ".$username."\n";
 	   $message .= $i18n->get(51).": ".$password."\n";
-	   my $mail = WebGUI::Mail::Send->new($self->session, {to=>$self->session->form->process("email"),subject=>$i18n->get(74)});
+	   my $mail = WebGUI::Mail::Send->create($self->session, {to=>$self->session->form->process("email"),subject=>$i18n->get(74)});
 		$mail->addText($message);
 		$mail->addFooter;
 		$mail->send;
