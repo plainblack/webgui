@@ -27,7 +27,6 @@ use POSIX;
 use strict;
 use WebGUI::Asset::File;
 use WebGUI::Asset::File::Image;
-use WebGUI::DateTime;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Utility;
@@ -169,9 +168,7 @@ EXIT STATUS
 STOP
 }
 
-# TB : Unable to use $session{os}{slash} variable.
-# Define $slash variable local for the script.
-my $slash = ($^O =~ /Win/i) ? "\\" : "/";
+my $slash = ($^O =~ /^Win/i) ? "\\" : "/";
 
 if (!($^O =~ /^Win/i) && $> != 0 && !$override) {
 	print "You must be the super user to use this utility.\n";
@@ -182,10 +179,10 @@ if (!($^O =~ /^Win/i) && $> != 0 && !$override) {
 my %ListAssetExists;
 my %filelisthash;
 print "Starting..." unless ($quiet);
-WebGUI::Session::open($webguiRoot,$configFile);
-WebGUI::Session::refreshUserInfo(3);
+my $session = WebGUI::Session->open($webguiRoot,$configFile);
+$session->user({userId=>3});
 print "OK\n" unless ($quiet);
-my $parent = WebGUI::Asset::File->newByDynamicClass($parentAssetId);
+my $parent = WebGUI::Asset::File->newByDynamicClass($session, $parentAssetId);
 if (defined $parent) {
   &buildListAssetExists($parent);
 } else {
@@ -198,8 +195,8 @@ print "End of the childs detection\n" unless ($quiet);
 &setPrivileges();
 
 print "Cleaning up..." unless ($quiet);
-WebGUI::Session::end($session{var}{sessionId});
-WebGUI::Session::close();
+$session->var->end();
+$session->close();
 print "OK\n" unless ($quiet);
 exit 0;
 
@@ -227,14 +224,14 @@ sub addFiles {
     if ($replaceAsset == 1) {
       # TB : If the Asset exists, just copy the file.
       # To be check.
-      my $storage = WebGUI::Storage->get($replaceAssetId);
+      my $storage = WebGUI::Storage->get($session, $replaceAssetId);
       print "\t\tAsset exists already. Replace the file.\n" unless ($quiet);
       my $filename = $storage->addFileFromFilesystem("$pathToFiles$slash$file->{relpath}$slash$file->{filename}");
       $child->generateThumbnail if ($class eq 'WebGUI::Asset::File::Image');
       $child->setSize($storage->getFileSize($filename));
     } else {
       print "\t\tCreate the new asset.\n" unless ($quiet);
-      my $storage = WebGUI::Storage->create;
+      my $storage = WebGUI::Storage->create($session);
       my $filename = $storage->addFileFromFilesystem("$pathToFiles$slash$file->{relpath}$slash$file->{filename}");
       # TB : possibly remove the extension if the ignoreExtInName feature enabled.
       my $filenameTitle = $filename;
@@ -265,8 +262,8 @@ sub addFiles {
 #-----------------------------------------
 sub setPrivileges {
   print "Setting filesystem privileges.\n" unless ($quiet);
-  if ($session{os}{type} = "Linuxish") {
-    unless (system("chown -R ".$webUser." ".$session{config}{uploadsPath})) {
+  if ($session->os->get("type") = "Linuxish") {
+    unless (system("chown -R ".$webUser." ".$session->config->get("uploadsPath"))) {
       print "Privileges set.\n" unless ($quiet);
     } else {
       print "Could not set privileges.\n";
@@ -409,7 +406,7 @@ sub buildListAssetExists {
   my ($parent) = @_;
   my @allelement = $parent->getLineage();
   foreach my $elem ( @{$allelement[0]} ) {
-    my $child = WebGUI::Asset::File->newByDynamicClass($elem);
+    my $child = WebGUI::Asset::File->newByDynamicClass($session,$elem);
     if (defined $child) {
       $ListAssetExists{$child->getUrl} = $child;
     }
