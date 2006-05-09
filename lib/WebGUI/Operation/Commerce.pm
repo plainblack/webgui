@@ -374,8 +374,6 @@ sub www_checkoutSubmit {
 	map {push(@transactions, {recurring => 1, items => [$_]})} @$recurring;
 	push(@transactions, {recurring => 0, items => [@$normal]}) if (@$normal);
 	
-	$shoppingCart->empty;
-
 	foreach $currentPurchase (@transactions) {
 		$amount = 0;
 		$var = {};
@@ -391,8 +389,12 @@ sub www_checkoutSubmit {
 		$transaction = WebGUI::Commerce::Transaction->new($session, 'new');
 		
 		foreach (@{$currentPurchase->{items}}) {
-			$transaction->addItem($_->{item}, $_->{quantity});			
-			$amount += ($_->{item}->price * $_->{quantity});
+			$transaction->addItem($_->{item}, $_->{quantity});		
+			# use the item plugin's lineItem method for price override
+			# situations.	
+			$amount += ($_->{item}->{priceLineItem})
+				?($_->{item}->priceLineItem($_->{quantity},$shoppingCart))
+				:($_->{item}->price * $_->{quantity});
 			$var->{purchaseDescription} .= $_->{quantity}.' x '.$_->{item}->name.'<br />';
 		}
 		$transaction->shippingCost($shippingCost);
@@ -450,6 +452,8 @@ sub www_checkoutSubmit {
 		
 		push(@resultLoop, $var);
 	}
+
+	$shoppingCart->empty;
 
 	$param{title} = $i18n->get('transaction error title');
 	$param{statusExplanation} = $i18n->get('status codes information');
