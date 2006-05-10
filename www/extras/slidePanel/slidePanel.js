@@ -189,7 +189,7 @@ function sp_draw() {
 		}
 		//var pY = document.body.scrollTop;
                 var pY = docElement.scrollTop;
-		ftlObj.y += (pY + startY - ftlObj.y)/8;
+		ftlObj.y += (pY + startY - ftlObj.y)/1;
 		if (ftlObj.y < 0) {
 			ftlObj.y = 0
 		}
