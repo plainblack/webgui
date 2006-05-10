@@ -258,6 +258,19 @@ sub addToScratchCart {
 	my $event = shift;
 
 	my @eventsInCart = split("\n",$self->session->scratch->get('EMS_scratch_cart'));
+	my ($isApproved) = $self->session->db->quickArray("select approved from EventManagementSystem_products where productId = ?",[$event]);
+	return undef unless $isApproved;
+	if (scalar(@eventsInCart) == 0) {
+		# the cart is empty, so check if this is a master event or not.
+		my ($isChild) = $self->session->db->quickArray("select p.productId from EventManagementSystem_products where productId = ? and (e.prerequisiteId is NULL or e.prerequisiteId = '')",[$eventId]);
+		return undef if $isChild;
+		$self->session->scratch->set('currentMainEvent',$event);
+		push(@eventsInCart, $event) unless isIn($event,@eventsInCart);
+
+		$self->session->scratch->set('EMS_scratch_cart', join("\n", @eventsInCart));
+		return $event;
+	}
+
 	push(@eventsInCart, $event) unless isIn($event,@eventsInCart);
 
 	$self->session->scratch->delete('EMS_scratch_cart');
@@ -883,7 +896,7 @@ sub getRegistrationInfo {
 	my %var;
 	my $i18n = WebGUI::International->new($self->session, 'Asset_EventManagementSystem');
 	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
-			     .WebGUI::Form::hidden($self->session,{name=>"func",value=>"saveRegistration"});
+			     .WebGUI::Form::hidden($self->session,{name=>"func",value=>"saveRegistrantInfo"});
 	$var{'form.message'} = $i18n->get('registration info message');
 	$var{'form.footer'} = WebGUI::Form::formFooter($self->session);
 	$var{'form.submit'} = WebGUI::Form::submit($self->session);
@@ -1291,8 +1304,8 @@ sub www_addToCart {
 		if (scalar(@$errors) > 0) { return $self->error($errors, "www_addToCart"); }
 		
 		unless ($output) {
-			$output = $self->getRegistrationInfo;
-		}		
+			return $self->saveRegistration;
+		}
 	}
 	# $self->session->errorHandler->warn("scratch after: <pre>".Dumper($self->getEventsInScratchCart).Dumper($self->session->db->buildHashRef("select name,value from userSessionScratch where sessionId=?",[$self->session->getId]))."</pre>");
 	return $self->session->style->process($self->processTemplate($output,$self->getValue("checkoutTemplateId")),$self->getValue("styleTemplateId"));
@@ -1304,9 +1317,10 @@ sub www_addToScratchCart {
 	my $pid = $self->session->form->get("pid");
 	my $nameOfEventAdded = $self->getEventName($pid);
 	my $masterEventId = $self->session->form->get("mid");
-	$self->addToScratchCart($pid); #tsc
 	
-	return $self->www_search($nameOfEventAdded, $masterEventId, "requirement", "eq", $self->session->form->get("pn"));
+	my $mainEvent = $self->addToScratchCart($pid); #tsc
+	return $self->session->style->process($self->getRegistrationInfo(),$self->getValue("styleTemplateId")) if $mainEvent;
+	return $self->www_search($nameOfEventAdded);
 }
 
 
@@ -2156,10 +2170,74 @@ sub www_moveEventUp {
 }
 
 #-------------------------------------------------------------------
-sub www_saveRegistration {
+sub saveRegistration {
 	my $self = shift;
 	my $eventsInCart = $self->getEventsInScratchCart;
 	my $purchaseId = $self->session->id->generate;
+	my $badgeId = $self->session->scratch->get('currentBadgeId');
+	
+	my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
+	
+	my @addingToPurchase = split("\n",$self->session->scratch->get('EMS_add_purchase_events'));
+	# @addingToPurchase = () if ($self->session->scratch->get('EMS_add_purchase_badgeId') && !($self->session->scratch->get('EMS_add_purchase_badgeId') eq $badgeId));
+	my @badgeEvents = $self->session->db->quickArray("select distinct(e.productId) from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e, products as p where p.productId = r.productId and p.productId = e.productId and r.badgeId=b.badgeId and r.badgeId=? and r.purchaseId !='' and r.purchaseId is not null",[$badgeId]);
+	foreach my $eventId (@$eventsInCart) {
+		next if isIn($eventId,@addingToPurchase);
+		next if isIn($eventId,@badgeEvents);
+		my $registrationId = $self->setCollateral("EventManagementSystem_registrations", "registrationId",{
+			registrationId  => "new",
+			purchaseId	 => $purchaseId,
+			productId	 => $eventId,
+			badgeId => $badgeId
+		},0,0);
+		$shoppingCart->add($eventId, 'Event');
+	}
+	$self->emptyScratchCart;
+	$self->session->scratch->delete('EMS_add_purchase_badgeId');
+	$self->session->scratch->delete('EMS_add_purchase_events');
+	$self->session->scratch->delete('currentBadgeId');
+	$self->session->scratch->delete('currentMainEvent');
+	
+	my ($theirUserId) = $self->session->db->quickArray("select userId from EventManagementSystem_badges where badgeId=?",[$badgeId]);
+	$userId = $theirUserId unless $thisIsI;
+	if ($userId && $userId ne '1') {
+		my $u = WebGUI::User->new($self->session,$userId);
+		$u->profileField('firstName',$firstName);
+		$u->profileField('lastName',$lastName);
+		$u->profileField('homeAddress',$address);
+		$u->profileField('homeCity',$city);
+		$u->profileField('homeState',$state);
+		$u->profileField('homeZip',$zipCode);
+		$u->profileField('homeCountry',$country);
+		$u->profileField('homePhone',$phoneNumber);
+		$u->profileField('email',$email);
+	}
+	#Our item plug-in needs to be able to associate these records with the result of the payment attempt
+	my $counter = 0;
+	while (1) {
+		unless ($self->session->scratch->get("purchaseId".$counter)) {
+			$self->session->scratch->set("purchaseId".$counter, $purchaseId);
+			last;
+		}
+		$counter++;	
+	}	
+	$self->session->http->setRedirect($self->getUrl("op=viewCart"));
+	return 1;
+}
+
+#-------------------------------------------------------------------
+sub www_resetScratchCart {
+	my $self = shift;
+	$self->emptyScratchCart;
+	$self->session->scratch->delete('EMS_add_purchase_badgeId');
+	$self->session->scratch->delete('EMS_add_purchase_events');
+	$self->session->scratch->delete('currentMainEvent');
+	$self->session->scratch->delete('currentBadgeId');
+	return $self->www_view();
+}
+#-------------------------------------------------------------------
+sub www_saveRegistrantInfo {
+	my $self = shift;
 	my ($myBadgeId) = $self->session->db->quickArray("select badgeId from EventManagementSystem_badges where userId=?",[$self->session->var->get('userId')]);
 	$myBadgeId ||= "new"; # if there is no badge for this user yet, have setCollateral create one, assuming thisIsI.
 	my $theirBadgeId = $self->session->form->get('badgeId') || "new";
@@ -2194,48 +2272,7 @@ sub www_saveRegistration {
 	$details->{userId} = $userId if ($userId && $userId ne '1');
 	$details->{createdByUserId} = $self->session->var->get('userId') if ($addingNew && $userId ne '1');
 	$badgeId = $self->setCollateral("EventManagementSystem_badges", "badgeId",$details,0,0);
-	
-	my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
-	
-	my @addingToPurchase = split("\n",$self->session->scratch->get('EMS_add_purchase_events'));
-	# @addingToPurchase = () if ($self->session->scratch->get('EMS_add_purchase_badgeId') && !($self->session->scratch->get('EMS_add_purchase_badgeId') eq $badgeId));
-	foreach my $eventId (@$eventsInCart) {
-		next if isIn($eventId,@addingToPurchase);
-		my $registrationId = $self->setCollateral("EventManagementSystem_registrations", "registrationId",{
-			registrationId  => "new",
-			purchaseId	 => $purchaseId,
-			productId	 => $eventId,
-			badgeId => $badgeId
-		},0,0);
-		$shoppingCart->add($eventId, 'Event');
-	}
-	$self->emptyScratchCart;
-	$self->session->scratch->delete('EMS_add_purchase_badgeId');
-	$self->session->scratch->delete('EMS_add_purchase_events');
-	
-	my ($theirUserId) = $self->session->db->quickArray("select userId from EventManagementSystem_badges where badgeId=?",[$badgeId]);
-	$userId = $theirUserId unless $thisIsI;
-	if ($userId && $userId ne '1') {
-		my $u = WebGUI::User->new($self->session,$userId);
-		$u->profileField('firstName',$firstName);
-		$u->profileField('lastName',$lastName);
-		$u->profileField('homeAddress',$address);
-		$u->profileField('homeCity',$city);
-		$u->profileField('homeState',$state);
-		$u->profileField('homeZip',$zipCode);
-		$u->profileField('homeCountry',$country);
-		$u->profileField('homePhone',$phoneNumber);
-		$u->profileField('email',$email);
-	}
-	#Our item plug-in needs to be able to associate these records with the result of the payment attempt
-	my $counter = 0;
-	while (1) {
-		unless ($self->session->scratch->get("purchaseId".$counter)) {
-			$self->session->scratch->set("purchaseId".$counter, $purchaseId);
-			last;
-		}
-		$counter++;	
-	}	
+	$self->session->scratch->set('currentBadgeId',$badgeId);
 	return $self->www_view;
 }
 
@@ -2261,6 +2298,11 @@ sub www_search {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canView;
 	
+	my %var;
+	my $scratchCart = $self->getEventsInScratchCart();
+	$var{badgeSelected} if scalar(@$scratchCart);
+	$var{resetScratchCartUrl} = $self->getUrl("func=resetScratchCart");
+	
 	#these allow us to show a specific page of subevents after an add to scratch cart
 	my $eventAdded = shift;
 	my $cfilter_t0 = shift;
@@ -2271,19 +2313,25 @@ sub www_search {
 	my $showAllFlag;
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my $addToBadgeMessage;
-	if ($cfilter_t0 && $cfilter_s0 && $cfilter_c0) {
-		$pn = shift || 1;
-		$subSearchFlag = 1;
+	if ($eventAdded) {
 		$showAllFlag = 1;
 		$addToBadgeMessage = sprintf $i18n->get('add to badge message'), $eventAdded;
 	}
+	if ($var{badgeSelected}) {
+		# always filter by a main event if we have one selected.
+		$cfilter_t0 = $self->session->scratch->get('currentMainEvent');
+		$subSearchFlag = 1;
+		$cfilter_s0 = "requirement";
+		$cfilter_c0 = "eq";
+	}
 	
-	my %var;
 	my $keywords = $self->session->form->get("searchKeywords");
 	my @keys;
 	my $joins;
 	my $selects;
 	my @joined;
+
+	
 	
 	my $language  = $i18n->getLanguage(undef,"languageAbbreviation");
 	$var{'calendarJS'} = '<script type="text/javascript" src="'.$self->session->url->extras('calendar/calendar.js').'"></script><script type="text/javascript" src="'.$self->session->url->extras('calendar/lang/calendar-'.$language.'.js').'"></script><script type="text/javascript" src="'.$self->session->url->extras('calendar/calendar-setup.js').'"></script>';
@@ -2462,7 +2510,7 @@ sub www_search {
 		push(@results,$data) if $shouldPush;
 	}
 	$sth->finish;
-	my $maxResultsForInitialDisplay = 50000;
+	my $maxResultsForInitialDisplay = 500;
 	my $numSearchResults = scalar(@results);
 	@results = () unless ( ($numSearchResults <= $maxResultsForInitialDisplay) || ($self->session->form->get("advSearch") || $self->session->form->get("searchKeywords") || $showAllFlag));	
 	$p->setDataByArrayRef(\@results);
@@ -2554,6 +2602,7 @@ sub www_search {
 	$var{'message'} = $message;
 	$var{'numberOfSearchResults'} = $numSearchResults;
 	$var{'continue.url'} = $self->getUrl('func=addToCart;pid=_noid_') if $somethingInScratch;
+	$var{'checkoutNow.url'} = $self->getUrl('func=addToCart;pid=_noid_;checkoutNow=1') if $somethingInScratch;
 	$var{'continue.label'} = $i18n->get("continue") if $somethingInScratch;
 	$var{'name.label'} = $i18n->get("event");
 	$var{'starts.label'} = $i18n->get("starts");
@@ -2575,10 +2624,10 @@ sub view {
 	
 	# If we're at the view method there is no reason we should have anything in our scratch cart
 	# so let's empty it to prevent strange and awful things from happening
-	unless ($self->session->scratch->get('EMS_add_purchase_badgeId')) {
-		$self->emptyScratchCart;
-		$self->session->scratch->delete('EMS_add_purchase_events');
-	}
+#	unless ($self->session->scratch->get('EMS_add_purchase_badgeId')) {
+#		$self->emptyScratchCart;
+#		$self->session->scratch->delete('EMS_add_purchase_events');
+#	}
 	
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	# Get the products available for sale for this page
@@ -2620,8 +2669,8 @@ sub view {
 	  }
 	  else {
 	  	$eventFields{'purchase.url'} = $self->getUrl('func=addToScratchCart;mid='.$event->{'productId'}.';pid='.$event->{'productId'});
-		$eventFields{'purchase.message'} = $i18n->get('see available subevents');
-		$eventFields{'purchase.wantToSearch.url'} = $self->getUrl('func=search;cfilter_s0=requirement;cfilter_c0=eq;subSearch=1;cfilter_t0='.$event->{productId});
+			$eventFields{'purchase.message'} = $i18n->get('see available subevents');
+			$eventFields{'purchase.wantToSearch.url'} = $self->getUrl('func=search;cfilter_s0=requirement;cfilter_c0=eq;subSearch=1;cfilter_t0='.$event->{productId});
 	        $eventFields{'purchase.wantToContinue.url'} = $self->getUrl('func=addToCart;pid='.$event->{productId});
 	  	$eventFields{'purchase.label'} = $i18n->get('add to cart');
 	  }
