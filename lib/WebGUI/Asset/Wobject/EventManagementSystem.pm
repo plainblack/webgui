@@ -2305,7 +2305,9 @@ sub prepareView {
 sub www_search {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canView;
-	$self->session->errorHandler->warn("In Search");
+	if($self->session->getId eq "u2Eox-ktFRPu6xiw77H8gg") {
+	   $self->session->errorHandler->warn("In Search");
+	}
 	my %var;
 	$var{badgeSelected} = $self->session->scratch->get('currentMainEvent');
 	$var{resetScratchCartUrl} = $self->getUrl("func=resetScratchCart");
@@ -2620,7 +2622,10 @@ sub www_search {
 
 	$self->buildMenu(\%var);
 	$var{'ems.wobject.dir'} = $self->session->url->extras("wobject/EventManagementSystem");
-	$self->session->errorHandler->warn("Building Template");
+	
+	if($self->session->getId eq "u2Eox-ktFRPu6xiw77H8gg") {
+		$self->session->errorHandler->warn("Building Template");
+	}
 	return $self->session->style->process($self->processTemplate(\%var,$self->getValue("searchTemplateId")),$self->getValue("styleTemplateId"));
 }
 
