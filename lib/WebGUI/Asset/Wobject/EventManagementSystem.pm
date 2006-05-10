@@ -2379,6 +2379,12 @@ sub www_search {
 	my %var;
 	$var{badgeSelected} = $self->session->scratch->get('currentMainEvent');
 	$var{resetScratchCartUrl} = $self->getUrl("func=resetScratchCart");
+	my $masterEventId = $var{badgeSelected};
+	my $badgeHolderId = $self->session->scratch->get("currentBadgeId");  # primary key to EMS_badges containing all the attendees info
+	
+	# Get all the attendees details
+	my $badgeHolderInfo = $self->session->db->buildArrayRefOfHashRefs("select * from EventManagementSystem_badges where badgeId=?",[$badgeHolderId]);
+	$var{badgeHolderInfo_loop} = $badgeHolderInfo->[0];
 	
 	#these allow us to show a specific page of subevents after an add to scratch cart
 	my $eventAdded = shift;
