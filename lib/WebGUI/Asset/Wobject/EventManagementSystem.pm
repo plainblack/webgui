@@ -2207,7 +2207,8 @@ sub saveRegistration {
 		}
 		$counter++;	
 	}	
-	$self->session->http->setRedirect($self->getUrl("op=viewCart"));
+	$self->session->http->setRedirect($self->getUrl("op=viewCart")) if $self->session->form->get('checkoutNow');
+	$self->session->http->setRedirect($self->getUrl("func=view"));
 	return 1;
 }
 
