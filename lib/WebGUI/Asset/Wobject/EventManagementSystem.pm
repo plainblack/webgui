@@ -1842,7 +1842,7 @@ sub www_viewPurchase {
 	while (my $purchase = $sth->hashRef) {
 		my $badgeId = $purchase->{badgeId};
 		my $pid = $purchase->{purchaseId};
-		my $sql2 = "select r.registrationId, p.title, p.description, p.price, p.templateId, r.returned, e.approved, e.maximumAttendees, e.startDate, e.endDate, b.userId, b.createdByUserId, e.productId from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e, EventManagementSystem_purchases as z, products as p, transaction where p.productId = r.productId and p.productId = e.productId and r.badgeId=b.badgeId and r.purchaseId=z.purchaseId and r.badgeId=? and r.purchaseId=? and transaction.transactionId=z.transactionId group by r.registrationId order by b.lastName";
+		my $sql2 = "select r.registrationId, p.title, p.description, p.price, p.templateId, r.returned, e.approved, e.maximumAttendees, e.startDate, e.endDate, b.userId, b.createdByUserId, e.productId from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e, EventManagementSystem_purchases as z, products as p, transaction where p.productId = r.productId and p.productId = e.productId and r.badgeId=b.badgeId and r.purchaseId=z.purchaseId and r.badgeId=? and r.purchaseId=? and transaction.transactionId=z.transactionId and transaction.status='Completed' group by r.registrationId order by b.lastName";
 		my $sth2 = $self->session->db->read($sql2,[$badgeId,$pid]);
 		$purchase->{regLoop} = [];
 		$purchase->{canReturnItinerary} = 0;
