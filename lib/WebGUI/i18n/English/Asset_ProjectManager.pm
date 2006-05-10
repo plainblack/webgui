@@ -336,13 +336,13 @@ our $I18N = {
 		lastUpdated => 0
 		},
 		
-	 '' => {
-		message => q||,
+	 'pm add/edit title' => {
+		message => q|Add/Edit Project Manager|,
 		lastUpdated => 0
 		},
 		
-	 '' => {
-		message => q||,
+	 'pm add/edit body' => {
+		message => q|<p>The Project Manager provides an interface for you to create a project, add tasks to it and monitor its status as it progresses.</p>|,
 		lastUpdated => 0
 		},
 		
