@@ -2620,7 +2620,7 @@ sub www_search {
 
 	$self->buildMenu(\%var);
 	$var{'ems.wobject.dir'} = $self->session->url->extras("wobject/EventManagementSystem");
-	
+	$self->session->errorHandler->warn("Building Template");
 	return $self->session->style->process($self->processTemplate(\%var,$self->getValue("searchTemplateId")),$self->getValue("styleTemplateId"));
 }
 
