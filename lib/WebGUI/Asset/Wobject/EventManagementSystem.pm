@@ -2621,11 +2621,11 @@ sub www_search {
 	$self->buildMenu(\%var);
 	$var{'ems.wobject.dir'} = $self->session->url->extras("wobject/EventManagementSystem");
 	
-	if($self->session->getId eq "u2Eox-ktFRPu6xiw77H8gg") {
-		$self->session->errorHandler->warn("Building Template");
-		my $template = $self->processTemplate(\%var,$self->getValue("searchTemplateId"));
-		$self->session->errorHandler->warn($self->session->style->process($template,$self->getValue("styleTemplateId")));
-	}
+	#if($self->session->getId eq "u2Eox-ktFRPu6xiw77H8gg") {
+	#	$self->session->errorHandler->warn("Building Template");
+	#	my $template = $self->processTemplate(\%var,$self->getValue("searchTemplateId"));
+	#	$self->session->errorHandler->warn($self->session->style->process($template,$self->getValue("styleTemplateId")));
+	#}
 	return $self->session->style->process($self->processTemplate(\%var,$self->getValue("searchTemplateId")),$self->getValue("styleTemplateId"));
 }
 
