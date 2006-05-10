@@ -2207,6 +2207,7 @@ sub saveRegistration {
 		}
 		$counter++;	
 	}	
+	srand;
 	$self->session->http->setRedirect($self->getUrl("op=viewCart;something=".rand(44345552))) if $self->session->form->get('checkoutNow');
 	return 1 if $self->session->form->get('checkoutNow');
 	return $self->www_view();
