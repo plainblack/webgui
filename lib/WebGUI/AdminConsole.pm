@@ -34,6 +34,7 @@ The admin console is a menuing system to manage webgui's administrative function
  addSubmenuItem
  getAdminConsoleParams
  getAdminFunction
+ getHelp
  new
  render
  setHelp

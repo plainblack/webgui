@@ -47,6 +47,7 @@ This package provides a mechanism for storing and retrieving files that are not 
  $filename = $store->addFileFromHashref($filename,$hashref);
  $filename = $store->addFileFromScalar($filename,$content);
 
+ $arrayref = $store->getErrors;
  $integer = $store->getErrorCount;
  $hashref = $store->getFileContentsAsHashref($filename);
  $string = $store->getFileContentsAsScalar($filename);
@@ -420,7 +421,7 @@ sub get {
 	my $id = shift;
 	return undef unless $id;
 	$id =~ m/^(.{2})(.{2})/;
-	my $self = {_session=>$session, _id => $id, _part1 => $1, _part2 => $2};
+	my $self = {_session=>$session, _id => $id, _part1 => $1, _part2 => $2, _errors => []};
 	bless $self, ref($class)||$class;
 	$self->_makePath unless (-e $self->getPath); # create the folder in case it got deleted somehow
 	return $self;
@@ -438,6 +439,20 @@ sub getErrorCount {
 	my $self = shift;
 	my $count = scalar(@{$self->{_errors}});
 	return $count;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getErrors ( )
+
+Returns an arrayref with all errors for this object
+
+=cut
+
+sub getErrors {
+	my $self = shift;
+	return $self->{_errors};
 }
 
 
