@@ -2183,7 +2183,7 @@ sub saveRegistration {
 	my @badgeEvents = $self->session->db->quickArray("select distinct(e.productId) from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e, products as p where p.productId = r.productId and p.productId = e.productId and r.badgeId=b.badgeId and r.badgeId=? and r.purchaseId !='' and r.purchaseId is not null",[$badgeId]);
 	foreach my $eventId (@$eventsInCart) {
 		next if isIn($eventId,@addingToPurchase);
-	#	next if isIn($eventId,@badgeEvents);
+		next if isIn($eventId,@badgeEvents);
 		my $registrationId = $self->setCollateral("EventManagementSystem_registrations", "registrationId",{
 			registrationId  => "new",
 			purchaseId	 => $purchaseId,
