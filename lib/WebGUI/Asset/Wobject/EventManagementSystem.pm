@@ -2638,7 +2638,6 @@ sub view {
 #		$self->emptyScratchCart;
 #		$self->session->scratch->delete('EMS_add_purchase_events');
 #	}
-	return $self->www_search() if $self->session->scratch->get('currentMainEvent');
 	
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	# Get the products available for sale for this page
@@ -3201,6 +3200,21 @@ sub www_editDiscountPassSave {
 	return $self->www_manageDiscountPasses();
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 www_view ( )
+
+Returns the view() method of the asset object if the requestor canView.
+
+=cut
+
+sub www_view {
+	my $self = shift;
+	return $self->session->privilege->noAccess() unless $self->canView;
+	return $self->www_search() if $self->session->scratch->get('currentMainEvent');
+	return $self->session->style->process($self->view,$self->getValue("styleTemplateId"));
+}
 
 
 
