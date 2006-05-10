@@ -1084,6 +1084,12 @@ for this event.</p>
 		context => q|Label to indicate that the user should pick one thing from a list of options|,
 	},
 
+	'select one or more' => {
+		message => q|Select one or more|,
+		lastUpdated => 1147293240,
+		context => q|Label to indicate that the user should pick one or more things from a list of options|,
+	},
+
 	'seats available' => {
 		message => q|Seats Available|,
 		lastUpdated => 1145400186,
