@@ -1318,7 +1318,7 @@ sub www_addToScratchCart {
 	my $masterEventId = $self->session->form->get("mid");
 	
 	my $mainEvent = $self->addToScratchCart($pid); #tsc
-	return $self->session->style->process($self->getRegistrationInfo(),$self->getValue("styleTemplateId")) if $mainEvent;
+	return $self->session->style->process($self->processTemplate($self->getRegistrationInfo(),$self->getValue("checkoutTemplateId")),$self->getValue("styleTemplateId")) if $mainEvent;
 	return $self->www_search($nameOfEventAdded);
 }
 
