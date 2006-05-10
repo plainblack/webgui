@@ -1,4 +1,4 @@
-package WebGUI::i18n::English::ProjectManager;
+package WebGUI::i18n::English::Asset_ProjectManager;
 
 our $I18N = {
 	'projectDashboardTemplate hoverhelp' => {
