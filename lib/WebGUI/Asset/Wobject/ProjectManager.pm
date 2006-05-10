@@ -78,7 +78,7 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,'ProjectManager');
+	my $i18n = WebGUI::International->new($session,'Asset_ProjectManager');
 	my %properties;
 	tie %properties, 'Tie::IxHash';
 	%properties = (
@@ -177,7 +177,7 @@ sub purge {
 sub setSessionVars {
    my $self = shift;
    my $session = $self->session;
-   my $i18n = WebGUI::International->new($session,'ProjectManager');
+   my $i18n = WebGUI::International->new($session,'Asset_ProjectManager');
    
    return ($session,$session->privilege,$session->form,$session->db,$session->datetime,$i18n,$session->user);
 }
