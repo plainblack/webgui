@@ -2280,7 +2280,7 @@ sub saveRegistration {
 	   $self->session->http->setRedirect($self->getUrl("op=viewCart;something=".rand(44345552)));
 	}
 	return 1 if $self->session->form->get('checkoutNow');
-	return $self->www_view();
+	return "";
 }
 
 #-------------------------------------------------------------------
@@ -2291,7 +2291,7 @@ sub www_resetScratchCart {
 	$self->session->scratch->delete('EMS_add_purchase_events');
 	$self->session->scratch->delete('currentMainEvent');
 	$self->session->scratch->delete('currentBadgeId');
-	return $self->www_view();
+	return "";
 }
 #-------------------------------------------------------------------
 sub www_saveRegistrantInfo {
@@ -2704,7 +2704,7 @@ sub www_search {
 sub view {
 	my $self = shift;
 	my %var;
-	
+	return $self->session->privilege->noAccess() unless $self->canView;
 	# If we're at the view method there is no reason we should have anything in our scratch cart
 	# so let's empty it to prevent strange and awful things from happening
 #	unless ($self->session->scratch->get('EMS_add_purchase_badgeId')) {
