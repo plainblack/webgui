@@ -493,6 +493,19 @@ sub setHelp {
 
 #-------------------------------------------------------------------
 
+=head2 getHelp ( )
+
+Returns the help topic, if any, that has been set for this adminConsole.
+
+=cut
+
+sub getHelp {
+	my $self = shift;
+	return (exists $self->{_helpUrl} ? $self->{_helpUrl} : '');
+}
+
+#-------------------------------------------------------------------
+
 sub session {
 	my $self = shift;
 	return $self->{_session};

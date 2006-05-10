@@ -1357,6 +1357,11 @@ normal templates.|,
                 lastUpdated => 1147050958,
         },
 
+        'edit registrant body' => {
+                message => q|<p></p>|,
+                lastUpdated => 1147050958,
+        },
+
         'see available subevents' => {
                 message => q|Would you like to see available subevents?|,
                 lastUpdated => 1147050958,
@@ -1373,7 +1378,7 @@ normal templates.|,
         },
 
         'associated user description' => {
-                message => q|The user that will be set up to use this badge.|,
+                message => q|It is possible to link up this registrant with a user from the WebGUI user database and to synchronize their registrant information with their WebGUI profile.  You may also create a new WebGUI user with their profile information started with their registrant information.|,
                 lastUpdated => 1147050958,
         },
 
@@ -1528,6 +1533,11 @@ added to the user's cart and would be discounted if the Attend All Sessions even
 
         'assigned discount pass description' => {
                 message => q|The Discount Pass, if any, that will be applied to this event.|,
+                lastUpdated => 1147108858,
+        },
+
+        'manage discount pass body' => {
+                message => q|<p>The Manage Discount Passes screen allows you to manage Discount Passes on any Event Management System asset on your site.  Any user who is allowed to add events to the EMS also has access this screen.  Using the list of displayed passes, you may delete or edit any pass.  Use the link to the right to create a new discount pass.</p>|,
                 lastUpdated => 1147108858,
         },
 

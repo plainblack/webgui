@@ -158,13 +158,15 @@ sub _acWrapper {
 	my $html = shift;
 	my $title = shift;
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
-	$self->getAdminConsole->setHelp('add/edit event','Asset_EventManagementSystem');
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=search'),$i18n->get("manage events"));
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n->get('manage event metadata'));
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=managePrereqSets'), $i18n->get('manage prerequisite sets'));
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageRegistrants'), $i18n->get('manage registrants'));
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageDiscountPasses'), $i18n->get('manage discount passes'));
-	return $self->getAdminConsole->render($html,$title);
+	my $ac = $self->getAdminConsole;
+	$ac->setHelp('add/edit event','Asset_EventManagementSystem')
+		unless $ac->getHelp;
+	$ac->addSubmenuItem($self->getUrl('func=search'),$i18n->get("manage events"));
+	$ac->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n->get('manage event metadata'));
+	$ac->addSubmenuItem($self->getUrl('func=managePrereqSets'), $i18n->get('manage prerequisite sets'));
+	$ac->addSubmenuItem($self->getUrl('func=manageRegistrants'), $i18n->get('manage registrants'));
+	$ac->addSubmenuItem($self->getUrl('func=manageDiscountPasses'), $i18n->get('manage discount passes'));
+	return $ac->render($html,$title);
 }
 
 	
@@ -3084,6 +3086,7 @@ function resetToInitial() {
 	);
 	$f->submit;
 	$f->raw($self->www_viewPurchase('noStyle',$badgeId));
+	$self->getAdminConsole->setHelp('edit registrant','Asset_EventManagementSystem');
 	return $self->_acWrapper($f->print, $i18n->get("edit registrant"));
 }
 
@@ -3202,6 +3205,7 @@ sub www_manageDiscountPasses {
 				"&nbsp;&nbsp;".$data->{name}."&nbsp;&nbsp;(".$data->{type}."&nbsp;".$data->{amount}."&nbsp;)</div>";
 		}
 	}
+	$self->getAdminConsole->setHelp('manage discount passes', 'Asset_EventManagementSystem');
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editDiscountPass;passId=new'), $i18n->get('add discount pass'));
 	return $self->_acWrapper($output, $i18n->get("manage discount passes"));
 }
@@ -3265,6 +3269,7 @@ sub www_editDiscountPass {
 		value=>$data->{amount} || '0.00'
 	);
 	$f->submit;
+	$self->getAdminConsole->setHelp('edit discount pass', 'Asset_EventManagementSystem');
 	return $self->_acWrapper($f->print, $i18n->get("edit discount pass"));
 }
 

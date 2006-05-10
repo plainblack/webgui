@@ -279,6 +279,52 @@ our $HELP = {
 		],
 	},
 
+	'manage discount passes' => {
+		source => 'sub www_manageDiscountPass',
+		title => 'manage discount passes',
+		body => 'manage discount pass body',
+		fields => [
+		],
+		related => [
+			{
+				tag => 'edit discount pass',
+				namespace => 'Asset_EventManagementSystem',
+			},
+			{
+				tag => 'event management system add/edit',
+				namespace => 'Asset_EventManagementSystem',
+			},
+		],
+	},
+
+	'edit registrant' => {
+		source => 'sub www_editRegistrant',
+		title => 'edit registrant',
+		body => 'edit registrant body',
+		fields => [
+                        {
+                                title => 'associated user',
+                                description => 'associated user description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'created by',
+                                description => 'created by description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+		],
+		related => [
+			{
+				tag => 'event management system add/edit',
+				namespace => 'Asset_EventManagementSystem',
+			},
+			{
+				tag => 'add/edit event',
+				namespace => 'Asset_EventManagementSystem',
+			},
+		],
+	},
+
 	'event management system template' => {
 		source => 'sub view',
 		title => 'template help title',
