@@ -1889,7 +1889,7 @@ sub www_addEventsToBadge {
 	$self->session->scratch->set('EMS_add_purchase_events',join("\n",@pastEvents));
 	$self->session->scratch->delete('EMS_scratch_cart');
 	$self->session->scratch->set('EMS_scratch_cart',join("\n",@pastEvents));
-	my @mainEvents = $self->session->db->buildArray("select e.productId from EventManagementSystem_products as e where p.productId = e.productId and (e.prerequisiteId is NULL or e.prerequisiteId = '')");
+	my @mainEvents = $self->session->db->buildArray("select e.productId from EventManagementSystem_products as e where (e.prerequisiteId is NULL or e.prerequisiteId = '')");
 	my $mainEvent; # here we have to guess as to which main event they bought.
 	foreach(@mainEvents) {
 		$mainEvent = $_ if isIn($_,@pastEvents);
