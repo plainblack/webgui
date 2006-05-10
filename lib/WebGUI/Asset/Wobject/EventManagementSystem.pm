@@ -2627,7 +2627,7 @@ sub www_search {
 	#	$self->session->errorHandler->warn($self->session->style->process($template,$self->getValue("styleTemplateId")));
 	#}
 	my $output = $self->session->style->process($template,$self->getValue("styleTemplateId"));
-	return $output;
+	return $self->session->style->process($template,$self->getValue("styleTemplateId"));;
 }
 
 #-------------------------------------------------------------------
