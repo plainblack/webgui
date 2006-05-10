@@ -2207,8 +2207,10 @@ sub saveRegistration {
 		}
 		$counter++;	
 	}	
-	srand;
-	$self->session->http->setRedirect($self->getUrl("op=viewCart;something=".rand(44345552))) if $self->session->form->get('checkoutNow');
+	if $self->session->form->get('checkoutNow') {
+	   srand;
+	   $self->session->http->setRedirect($self->getUrl("op=viewCart;something=".rand(44345552)));
+	}
 	return 1 if $self->session->form->get('checkoutNow');
 	return $self->www_view();
 }
@@ -2303,7 +2305,7 @@ sub prepareView {
 sub www_search {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canView;
-	
+	$self->session->errorHandler->warn("In Search");
 	my %var;
 	$var{badgeSelected} = $self->session->scratch->get('currentMainEvent');
 	$var{resetScratchCartUrl} = $self->getUrl("func=resetScratchCart");
