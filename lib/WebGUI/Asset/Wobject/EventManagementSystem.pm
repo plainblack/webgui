@@ -2276,7 +2276,8 @@ sub www_saveRegistrantInfo {
 	}
 	
 	$self->session->scratch->set('currentBadgeId',$badgeId);
-	return $self->www_view;
+	my $nameOfEventAdded = $self->getEventName($self->session->scratch->get('currentMainEvent'));
+	return $self->www_search($nameOfEventAdded);
 }
 
 #-------------------------------------------------------------------
