@@ -2303,8 +2303,7 @@ sub www_search {
 	return $self->session->privilege->insufficient() unless $self->canView;
 	
 	my %var;
-	my $scratchCart = $self->getEventsInScratchCart();
-	$var{badgeSelected} if scalar(@$scratchCart);
+	$var{badgeSelected} = $self->session->scratch->get('currentMainEvent');
 	$var{resetScratchCartUrl} = $self->getUrl("func=resetScratchCart");
 	
 	#these allow us to show a specific page of subevents after an add to scratch cart
