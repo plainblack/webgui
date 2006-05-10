@@ -3063,7 +3063,7 @@ function resetToInitial() {
 		value=>$data->{email}
 	);
 	$f->submit;
-	$f->raw($self->www_viewPurchase('noStyle',$badgeId);
+	$f->raw($self->www_viewPurchase('noStyle',$badgeId));
 	return $self->_acWrapper($f->print, $i18n->get("edit registrant"));
 }
 
