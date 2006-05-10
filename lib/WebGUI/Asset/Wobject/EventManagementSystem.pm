@@ -1830,7 +1830,8 @@ hasn't occurred yet.
 sub www_viewPurchase {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canView;
-	my $badgeId = $self->session->form->process('badgeId');
+	my $returnWoStyle = shift;
+	my $badgeId = shift || $self->session->form->process('badgeId');
 	my $tid = $self->session->form->process('tid');
 	if ($badgeId) {
 		my %var = $self->session->db->quickHash("select * from EventManagementSystem_badges where badgeId=?",[$badgeId]);
@@ -1860,6 +1861,7 @@ sub www_viewPurchase {
 		$var{transactionId} = $tid;
 		$var{appUrl} = $self->getUrl;
 		$var{purchasesLoop} = \@purchasesLoop;
+		return $self->processTemplate(\%var,$self->getValue("viewPurchaseTemplateId")) if $returnWoStyle;
 		return $self->session->style->process($self->processTemplate(\%var,$self->getValue("viewPurchaseTemplateId")),$self->getValue("styleTemplateId"));
 	} elsif($tid) {
 		my %var = $self->get();
@@ -3061,6 +3063,7 @@ function resetToInitial() {
 		value=>$data->{email}
 	);
 	$f->submit;
+	$f->raw($self->www_viewPurchase('noStyle',$badgeId);
 	return $self->_acWrapper($f->print, $i18n->get("edit registrant"));
 }
 
