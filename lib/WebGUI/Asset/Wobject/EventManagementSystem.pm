@@ -2705,7 +2705,7 @@ sub view {
 	
 	my $templateId = $self->get("displayTemplateId");
 
-	return $self->processTemplate(\%var, undef, $self->{_viewTemplate});
+	return $self->processTemplate(\%var, $templateId);
 }
 
 #-------------------------------------------------------------------
