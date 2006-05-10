@@ -1858,7 +1858,6 @@ sub www_viewPurchase {
 		$var{canReturn} = $isAdmin;
 		$var{transactionId} = $tid;
 		$var{appUrl} = $self->getUrl;
-		$sth->finish;
 		$var{purchasesLoop} = \@purchasesLoop;
 		return $self->session->style->process($self->processTemplate(\%var,$self->getValue("viewPurchaseTemplateId")),$self->getValue("styleTemplateId"));
 	} elsif($tid) {
