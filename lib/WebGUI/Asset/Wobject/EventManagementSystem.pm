@@ -2623,6 +2623,7 @@ sub www_search {
 	
 	if($self->session->getId eq "u2Eox-ktFRPu6xiw77H8gg") {
 		$self->session->errorHandler->warn("Building Template");
+		$self->session->errorHandler->warn($self->processTemplate(\%var,$self->getValue("searchTemplateId")));
 	}
 	return $self->session->style->process($self->processTemplate(\%var,$self->getValue("searchTemplateId")),$self->getValue("styleTemplateId"));
 }
