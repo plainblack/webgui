@@ -1796,7 +1796,7 @@ sub www_managePurchases {
 	return $self->session->privilege->insufficient if $self->session->var->get('userId') eq '1';
 	my %var = $self->get();
 	my $isAdmin = $self->canAddEvents;
-
+	return $self->www_viewPurchase unless $isAdmin;
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my $whereClause = ($isAdmin)?'':" and (t.userId='".$self->session->user->userId."' or b.userId='".$self->session->user->userId."' or b.createdByUserId='".$self->session->user->userId."') and e.endDate > '".$self->session->datetime->time()."'";
 	my $sql = "select distinct(t.transactionId) as purchaseId, t.initDate as initDate from transaction as t, EventManagementSystem_purchases as p, EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e where p.transactionId=t.transactionId and b.badgeId=r.badgeId and t.status='Completed' and p.purchaseId=r.purchaseId and r.productId=e.productId $whereClause order by t.initDate";
@@ -1831,10 +1831,10 @@ sub www_viewPurchase {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canView;
 	my $badgeId = $self->session->form->process('badgeId');
+	my $tid = $self->session->form->process('tid');
 	if ($badgeId) {
 		my %var = $self->get();
 		my $isAdmin = $self->canAddEvents;
-		my $tid = $self->session->form->process('tid');
 		my ($userId) = $self->session->db->quickArray("select userId from transaction where transactionId=?",[$tid]);
 		my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 		my @purchasesLoop;
@@ -1853,8 +1853,43 @@ sub www_viewPurchase {
 			$purchase->{purchaseEventId} = $reg->{productId} if $isMainEvent;
 			push(@{$purchase->{regLoop}},$reg);
 			}
-		$var{canReturnTransaction} = 1 if $purchase->{canReturnItinerary};
 		push(@purchasesLoop,$purchase);
+		
+		$var{viewPurchaseTitle} = $i18n->get('view purchase');
+		$var{canReturn} = $isAdmin;
+		$var{transactionId} = $tid;
+		$var{appUrl} = $self->getUrl;
+		$sth->finish;
+		$var{purchasesLoop} = \@purchasesLoop;
+		return $self->session->style->process($self->processTemplate(\%var,$self->getValue("viewPurchaseTemplateId")),$self->getValue("styleTemplateId"));
+	} elsif($tid) {
+		my %var = $self->get();
+		my $isAdmin = $self->canAddEvents;
+		my ($userId) = $self->session->db->quickArray("select userId from transaction where transactionId=?",[$tid]);
+		my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
+		my $sql = "select distinct(r.purchaseId), b.* from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_purchases as t, transaction where r.badgeId=b.badgeId and r.purchaseId=t.purchaseId and transaction.transactionId=t.transactionId and t.transactionId=? and transaction.status='Completed' order by b.lastName";
+		my $sth = $self->session->db->read($sql,[$tid]);
+		my @purchasesLoop;
+		$var{canReturnTransaction} = 0;
+		while (my $purchase = $sth->hashRef) {
+			$badgeId = $purchase->{badgeId};
+			my $pid = $purchase->{purchaseId};
+			my $sql2 = "select r.registrationId, p.title, p.description, p.price, p.templateId, r.returned, e.approved, e.maximumAttendees, e.startDate, e.endDate, b.userId, b.createdByUserId, e.productId from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e, EventManagementSystem_purchases as z, products as p, transaction where p.productId = r.productId and p.productId = e.productId and r.badgeId=b.badgeId and r.purchaseId=z.purchaseId and r.badgeId=? and r.purchaseId=? and transaction.transactionId=z.transactionId and transaction.status='Completed' group by r.registrationId order by b.lastName";
+			my $sth2 = $self->session->db->read($sql2,[$badgeId,$pid]);
+			$purchase->{regLoop} = [];
+			$purchase->{canReturnItinerary} = 0;
+			while (my $reg = $sth2->hashRef) {
+				$reg->{startDateHuman} = $self->session->datetime->epochToHuman($reg->{'startDate'});
+				$reg->{endDateHuman} = $self->session->datetime->epochToHuman($reg->{'endDate'});
+				$purchase->{canReturnItinerary} = 1 unless $reg->{'returned'};
+				$purchase->{canAddEvents} = 1 if ($isAdmin || ($userId eq $self->session->var->get('userId')) || ($reg->{userId} eq $self->session->var->get('userId'))  || ($reg->{createdByUserId} eq $self->session->var->get('userId')));
+				my ($isMainEvent) = $self->session->db->quickArray("select productId from EventManagementSystem_products where productId = ? and (prerequisiteId is NULL or prerequisiteId = '')",[$reg->{productId}]);
+				$purchase->{purchaseEventId} = $reg->{productId} if $isMainEvent;
+				push(@{$purchase->{regLoop}},$reg);
+			}
+			$var{canReturnTransaction} = 1 if $purchase->{canReturnItinerary};
+			push(@purchasesLoop,$purchase);
+		}
 		
 		$var{viewPurchaseTitle} = $i18n->get('view purchase');
 		$var{canReturn} = $isAdmin;
@@ -1866,11 +1901,10 @@ sub www_viewPurchase {
 	} else {
 		my %var = $self->get();
 		my $isAdmin = $self->canAddEvents;
-		my $tid = $self->session->form->process('tid');
-		my ($userId) = $self->session->db->quickArray("select userId from transaction where transactionId=?",[$tid]);
 		my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
-		my $sql = "select distinct(r.purchaseId), b.* from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_purchases as t, transaction where r.badgeId=b.badgeId and r.purchaseId=t.purchaseId and transaction.transactionId=t.transactionId and t.transactionId=? and transaction.status='Completed' order by b.lastName";
-		my $sth = $self->session->db->read($sql,[$tid]);
+		my $sql = "select distinct(r.purchaseId), b.* from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_purchases as t, transaction where r.badgeId=b.badgeId and r.purchaseId=t.purchaseId and transaction.transactionId=t.transactionId and transaction.status='Completed' and (b.userId=? or transaction.userId=? or b.createdByUserId=?) order by b.lastName";
+		my $userId = $self->session->var->get('userId');
+		my $sth = $self->session->db->read($sql,[$userId,$userId,$userId]);
 		my @purchasesLoop;
 		$var{canReturnTransaction} = 0;
 		while (my $purchase = $sth->hashRef) {
