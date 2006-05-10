@@ -48,6 +48,11 @@ sub handler {
 		my $purchaseId;
 		if ($purchaseId = $self->session->scratch->get("purchaseId".$counter)) {
 			$self->session->db->setRow('EventManagementSystem_purchases', 'purchaseId', {'purchaseId'=>$purchaseId, 'transactionId'=>$transactionId}, $purchaseId);
+			my $theseRegs = $self->session->db->buildArrayRefOfHashRefs("select * from EventManagementSystem_registrations where purchaseId=?",[$purchaseId]);
+			foreach (@$theseRegs) {
+				# clean up the duplicate registrations, if any.
+				$self->session->db->write("delete from EventManagementSystem_registrations where badgeId=? and productId=? and registrationId!=?,[$_->{badgeId},$_->{productId},$_->{registrationId}]);
+			}
 			$self->session->scratch->delete("purchaseId".$counter);
 			$counter++;
 		}
