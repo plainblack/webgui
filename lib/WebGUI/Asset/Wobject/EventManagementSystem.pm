@@ -1833,7 +1833,7 @@ sub www_viewPurchase {
 	my $badgeId = $self->session->form->process('badgeId');
 	my $tid = $self->session->form->process('tid');
 	if ($badgeId) {
-		my %var = $self->session->quickHash("select * from EventManagementSystem_badges where badgeId=?",[$badgeId]);
+		my %var = $self->session->db->quickHash("select * from EventManagementSystem_badges where badgeId=?",[$badgeId]);
 		my $isAdmin = $self->canAddEvents;
 		my ($userId) = $self->session->db->quickArray("select userId from transaction where transactionId=?",[$tid]);
 		my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
