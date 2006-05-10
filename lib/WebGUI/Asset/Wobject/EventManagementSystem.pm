@@ -1835,14 +1835,14 @@ sub www_viewPurchase {
 	my $tid = $self->session->form->process('tid');
 	my ($userId) = $self->session->db->quickArray("select userId from transaction where transactionId=?",[$tid]);
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
-	my $sql = "select distinct(r.purchaseId), b.* from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_purchases as t where r.badgeId=b.badgeId and r.purchaseId=t.purchaseId and t.transactionId=? order by b.lastName";
+	my $sql = "select distinct(r.purchaseId), b.* from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_purchases as t, transaction where r.badgeId=b.badgeId and r.purchaseId=t.purchaseId and transaction.transactionId=t.transactionId and t.transactionId=? order by b.lastName";
 	my $sth = $self->session->db->read($sql,[$tid]);
 	my @purchasesLoop;
 	$var{canReturnTransaction} = 0;
 	while (my $purchase = $sth->hashRef) {
 		my $badgeId = $purchase->{badgeId};
 		my $pid = $purchase->{purchaseId};
-		my $sql2 = "select r.registrationId, p.title, p.description, p.price, p.templateId, r.returned, e.approved, e.maximumAttendees, e.startDate, e.endDate, b.userId, b.createdByUserId from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e, products as p where p.productId = r.productId and p.productId = e.productId and r.badgeId=b.badgeId and r.badgeId=? and r.purchaseId=? group by r.registrationId order by b.lastName";
+		my $sql2 = "select r.registrationId, p.title, p.description, p.price, p.templateId, r.returned, e.approved, e.maximumAttendees, e.startDate, e.endDate, b.userId, b.createdByUserId, e.productId from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e, EventManagementSystem_purchases as z, products as p, transaction where p.productId = r.productId and p.productId = e.productId and r.badgeId=b.badgeId and r.purchaseId=z.purchaseId and r.badgeId=? and r.purchaseId=? and transaction.transactionId=z.transactionId group by r.registrationId order by b.lastName";
 		my $sth2 = $self->session->db->read($sql2,[$badgeId,$pid]);
 		$purchase->{regLoop} = [];
 		$purchase->{canReturnItinerary} = 0;
@@ -1851,6 +1851,8 @@ sub www_viewPurchase {
 			$reg->{endDateHuman} = $self->session->datetime->epochToHuman($reg->{'endDate'});
 			$purchase->{canReturnItinerary} = 1 unless $reg->{'returned'};
 			$purchase->{canAddEvents} = 1 if ($isAdmin || ($userId eq $self->session->var->get('userId')) || ($reg->{userId} eq $self->session->var->get('userId'))  || ($reg->{createdByUserId} eq $self->session->var->get('userId')));
+			my ($isMainEvent) = $self->session->db->quickArray("select productId from EventManagementSystem_products where productId = ? and (prerequisiteId is NULL or prerequisiteId = '')",[$reg->{productId}]);
+			$purchase->{purchaseEventId} = $reg->{productId} if $isMainEvent;
 			push(@{$purchase->{regLoop}},$reg);
 		}
 		$var{canReturnTransaction} = 1 if $purchase->{canReturnItinerary};
@@ -1882,6 +1884,7 @@ sub www_addEventsToBadge {
 	my %var = $self->get();
 	my $isAdmin = $self->canAddEvents;
 	my $bid = $self->session->form->process('bid');
+	my $eventId = $self->session->form->process('eventId');
 	$self->session->scratch->delete('EMS_add_purchase_badgeId');
 	$self->session->scratch->set('EMS_add_purchase_badgeId',$bid);
 	my @pastEvents = $self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p where r.returned=0 and r.badgeId=? and p.purchaseId=r.purchaseId group by productId",[$bid]);
@@ -1889,12 +1892,7 @@ sub www_addEventsToBadge {
 	$self->session->scratch->set('EMS_add_purchase_events',join("\n",@pastEvents));
 	$self->session->scratch->delete('EMS_scratch_cart');
 	$self->session->scratch->set('EMS_scratch_cart',join("\n",@pastEvents));
-	my @mainEvents = $self->session->db->buildArray("select e.productId from EventManagementSystem_products as e where (e.prerequisiteId is NULL or e.prerequisiteId = '')");
-	my $mainEvent; # here we have to guess as to which main event they bought.
-	foreach(@mainEvents) {
-		$mainEvent = $_ if isIn($_,@pastEvents);
-	}
-	$self->session->scratch->set('currentMainEvent',$mainEvent);
+	$self->session->scratch->set('currentMainEvent',$eventId);
 	return $self->www_search();
 }
 
@@ -2334,7 +2332,7 @@ sub www_search {
 		$cfilter_c0 = "eq";
 	}
 	
-	my $keywords = $self->session->form->get("searchKeywords");
+	my $keywords = $self->session->form->process("searchKeywords",'text');
 	my @keys;
 	my $joins;
 	my $selects;
@@ -2640,6 +2638,7 @@ sub view {
 #		$self->emptyScratchCart;
 #		$self->session->scratch->delete('EMS_add_purchase_events');
 #	}
+	return $self->www_search() if $self->session->scratch->get('currentMainEvent');
 	
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	# Get the products available for sale for this page
