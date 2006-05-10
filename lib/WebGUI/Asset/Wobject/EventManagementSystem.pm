@@ -262,7 +262,7 @@ sub addToScratchCart {
 	return undef unless $isApproved;
 	if (scalar(@eventsInCart) == 0) {
 		# the cart is empty, so check if this is a master event or not.
-		my ($isChild) = $self->session->db->quickArray("select p.productId from EventManagementSystem_products where productId = ? and (e.prerequisiteId is NULL or e.prerequisiteId = '')",[$eventId]);
+		my ($isChild) = $self->session->db->quickArray("select p.productId from EventManagementSystem_products where productId = ? and (e.prerequisiteId is NULL or e.prerequisiteId = '')",[$event]);
 		return undef if $isChild;
 		$self->session->scratch->set('currentMainEvent',$event);
 		push(@eventsInCart, $event) unless isIn($event,@eventsInCart);
@@ -2175,7 +2175,8 @@ sub saveRegistration {
 	my $eventsInCart = $self->getEventsInScratchCart;
 	my $purchaseId = $self->session->id->generate;
 	my $badgeId = $self->session->scratch->get('currentBadgeId');
-	
+
+	my $theirUserId;
 	my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
 	
 	my @addingToPurchase = split("\n",$self->session->scratch->get('EMS_add_purchase_events'));
@@ -2197,21 +2198,7 @@ sub saveRegistration {
 	$self->session->scratch->delete('EMS_add_purchase_events');
 	$self->session->scratch->delete('currentBadgeId');
 	$self->session->scratch->delete('currentMainEvent');
-	
-	my ($theirUserId) = $self->session->db->quickArray("select userId from EventManagementSystem_badges where badgeId=?",[$badgeId]);
-	$userId = $theirUserId unless $thisIsI;
-	if ($userId && $userId ne '1') {
-		my $u = WebGUI::User->new($self->session,$userId);
-		$u->profileField('firstName',$firstName);
-		$u->profileField('lastName',$lastName);
-		$u->profileField('homeAddress',$address);
-		$u->profileField('homeCity',$city);
-		$u->profileField('homeState',$state);
-		$u->profileField('homeZip',$zipCode);
-		$u->profileField('homeCountry',$country);
-		$u->profileField('homePhone',$phoneNumber);
-		$u->profileField('email',$email);
-	}
+
 	#Our item plug-in needs to be able to associate these records with the result of the payment attempt
 	my $counter = 0;
 	while (1) {
@@ -2272,6 +2259,23 @@ sub www_saveRegistrantInfo {
 	$details->{userId} = $userId if ($userId && $userId ne '1');
 	$details->{createdByUserId} = $self->session->var->get('userId') if ($addingNew && $userId ne '1');
 	$badgeId = $self->setCollateral("EventManagementSystem_badges", "badgeId",$details,0,0);
+	
+		
+	my ($theirUserId) = $self->session->db->quickArray("select userId from EventManagementSystem_badges where badgeId=?",[$badgeId]);
+	$userId = $theirUserId unless $thisIsI;
+	if ($userId && $userId ne '1') {
+		my $u = WebGUI::User->new($self->session,$userId);
+		$u->profileField('firstName',$firstName);
+		$u->profileField('lastName',$lastName);
+		$u->profileField('homeAddress',$address);
+		$u->profileField('homeCity',$city);
+		$u->profileField('homeState',$state);
+		$u->profileField('homeZip',$zipCode);
+		$u->profileField('homeCountry',$country);
+		$u->profileField('homePhone',$phoneNumber);
+		$u->profileField('email',$email);
+	}
+	
 	$self->session->scratch->set('currentBadgeId',$badgeId);
 	return $self->www_view;
 }
