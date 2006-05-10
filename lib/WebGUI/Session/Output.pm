@@ -52,21 +52,6 @@ sub DESTROY {
 
 #-------------------------------------------------------------------
 
-=head2 goodNightAndGoodLuck ( )
-
-This should be called at the end of all possible output HTML output. It handles printing out debug and other maintenance tasks.
-
-=cut
-
-sub goodNightAndGoodLuck {
-	my $self = shift;
-	if ($self->session->errorHandler->canShowDebug()) {
-		print $self->session->errorHandler->showDebug();
-	}
-}
-
-#-------------------------------------------------------------------
-
 =head2 new ( session )
 
 Constructor. 
@@ -104,7 +89,11 @@ sub print {
 	my $content = shift;
 	my $skipMacros = shift;
 	WebGUI::Macro::process($self->session, \$content) unless $skipMacros;
-	print $content;
+	if (exists $self->{_handle}) {
+		print $self->{_handle};
+	} else {
+		print $content;
+	}
 }
 
 #-------------------------------------------------------------------
@@ -120,6 +109,23 @@ sub session {
 	return $self->{_session};
 }
 
+#-------------------------------------------------------------------
+
+=head2 setHandle ( handle ) 
+
+Sets a handle to print the content to. If we're running in command line mode, WebGUI assumes we're printing to standard out, and if we were called through mod_perl it assumes we're printing to that. 
+
+=head3 handle
+
+An open FILE handle that WebGUI can print to.
+
+=cut
+
+sub setHandle {
+	my $self = shift;
+	my $handle = shift;
+	$self->{_handle} = $handle;
+}
 
 
 1;

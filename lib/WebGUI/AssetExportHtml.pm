@@ -16,6 +16,7 @@ package WebGUI::Asset;
 
 use strict;
 use File::Path;
+use FileHandle;
 
 =head1 NAME
 
@@ -69,46 +70,6 @@ sub checkExportPath {
 
 #-------------------------------------------------------------------
 
-=head2 exportAsHtml ( hashref )
-
-Executes the export and returns html content.
-
-=head3 params
-
-A hashref containing one of the following properties:
-
-=head4 stripHtml
-
-A boolean indicating whether the resulting output should be stripped of HTML tags.
-
-=head4 userId
-
-The unique id of the user to become when exporting this page. Defaults to '1' (Visitor).
-
-=cut
-
-sub exportAsHtml {
-	my $self = shift;
-	my $params = shift;
-	my $userId = $params->{userId} || 1;
-	my $stripHtml = $params->{stripHtml} || undef;
-
-	# Change the stuff we need to change to do the export
-	my $session = WebGUI::Session->open($self->session->config->getWebguiRoot, $self->session->config->getFilename);
-	$session->user({userId=>$userId}) unless ($userId eq $self->session->user->userId);
-
-	# Generate the page
-	my $content = $self->www_view;
-	if($stripHtml) {
-		$content = WebGUI::HTML::html2text($content);
-	}
-
-	return $content;
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 www_export
 
 Displays the export page administrative interface
@@ -144,18 +105,6 @@ sub www_export {
 			-name=>"index",
 			-value=>"index.html"
 		);
-	$f->text(
-			-label=>$i18n->get('Extras URL'),
-			-hoverHelp=>$i18n->get('Extras URL description'),
-			-name=>"extrasURL",
-			-value=>$self->session->config->get("extrasURL")
-		);
-	$f->text(
-                        -label=>$i18n->get('Uploads URL'),
-                        -hoverHelp=>$i18n->get('Uploads URL description'),
-                        -name=>"uploadsURL",
-                        -value=>$self->session->config->get("uploadsURL")
-                );
         $f->submit;
         $self->getAdminConsole->render($self->checkExportPath.$f->print,$i18n->get('Export Page'));
 }
@@ -177,8 +126,6 @@ sub www_exportStatus {
 	$iframeUrl = $self->session->url->append($iframeUrl, 'index='.$self->session->form->process("index"));
 	$iframeUrl = $self->session->url->append($iframeUrl, 'depth='.$self->session->form->process("depth"));
 	$iframeUrl = $self->session->url->append($iframeUrl, 'userId='.$self->session->form->process("userId"));
-	$iframeUrl = $self->session->url->append($iframeUrl, 'extrasURL='.$self->session->form->process("extrasURL"));
-	$iframeUrl = $self->session->url->append($iframeUrl, 'uploadsURL='.$self->session->form->process("uploadsURL"));
 	my $output = '<iframe src="'.$iframeUrl.'" title="'.$i18n->get('Page Export Status').'" width="410" height="200"></iframe>';
         $self->getAdminConsole->render($output,$i18n->get('Page Export Status'),"Asset");
 }
@@ -205,10 +152,12 @@ sub www_exportGenerate {
 	}
 	my $i18n = WebGUI::International->new($self->session, 'Asset');
 	my $userId = $self->session->form->process("userId");
-	my $extrasURL = $self->session->form->process("extrasURL");
-	my $uploadsURL = $self->session->form->process("uploadsURL");
 	my $index = $self->session->form->process("index");
-	my $assets = $self->getLineage(["self","descendants"],{returnObjects=>1,endingLineageLength=>$self->getLineageLength+$self->session->form->process("depth")});
+	# Change the stuff we need to change to do the export
+	my $newSession = WebGUI::Session->open($self->session->config->getWebguiRoot, $self->session->config->getFilename);
+	my $newSelf = WebGUI::Asset->new($newSession, $self->getId, $self->get("className"), $self->get("revisionDate"));
+	my $assets = $newSelf->getLineage(["self","descendants"],{returnObjects=>1,endingLineageLength=>$newSelf->getLineageLength+$self->session->form->process("depth")});
+	$newSession->user({userId=>$userId});
 	foreach my $asset (@{$assets}) {
 		my $url = $asset->get("url");
 		$self->session->output->printf( $i18n->get('exporting page'), $url);
@@ -234,22 +183,28 @@ sub www_exportGenerate {
 			$path = $self->session->config->get("exportPath") . "/" . $path;
 			eval { mkpath($path) };
 			if($@) {
-				$self->session->output->printf($i18n->get('could not create path'), $path, $@);
+				$self->session->output->print(printf($i18n->get('could not create path'), $path, $@), 1);
 				return;
 			}
 		} 
 		$path .= "/".$filename;
-                eval { open(FILE, "> $path") or die "$!" };
+                my $file = eval { FileHandle->new(">".$path) or die "$!" };
 		if ($@) {
-			$self->session->output->printf($i18n->get('could not open path'), $path, $@);
+			$self->session->output->print(printf($i18n->get('could not open path'), $path, $@),1);
 			return;
 		} else {
-			print FILE $asset->exportAsHtml({userId=>$userId,extrasUrl=>$extrasURL,uploadsUrl=>$uploadsURL});
-			close(FILE);
+			$newSession->output->setHandle($file);
+			my $content = $asset->www_view;
+			unless ($content eq "chunked") {
+				$newSession->output->print($content);
+			}
+			$file->close;
 		}
 		$self->session->output->print($i18n->get('done'));
 	}
-	$self->session->output->printf($i18n->get('export information'), scalar(@{$assets}), ($self->session->datetime->time()-$startTime));
+	$newSession->var->end;
+	$newSession->close;
+	$self->session->output->print(printf($i18n->get('export information'), scalar(@{$assets}), ($self->session->datetime->time()-$startTime)),1);
 	$self->session->output->print('<a target="_parent" href="'.$self->getUrl.'">'.$i18n->get(493,'WebGUI').'</a>');
 	return;
 }

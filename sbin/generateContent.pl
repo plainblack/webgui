@@ -17,14 +17,15 @@ BEGIN {
 }
 
 use DBI;
+use FileHandle;
 use Getopt::Long;
 use strict qw(subs vars);
-use WebGUI;
 use WebGUI::Session;
+use WebGUI::Asset;
 
 $|=1;
 
-my ($configFile, $assetId, $userId, $styleId, $toFile, $stripHtml, $help, $relativeUrls);
+my ($configFile, $assetId, $userId, $styleId, $toFile, $help);
 $userId = 1;
 my $url = "";
 
@@ -33,9 +34,8 @@ GetOptions(
 	'assetId:s'=>\$assetId,
 	'userId:s'=>\$userId,
 	'toFile:s'=>\$toFile,
-	'stripHtml'=>\$stripHtml,
 	'help'=>\$help,
-	'relativeUrls'=>\$relativeUrls,
+	'styleId:s'=>\$styleId,
 	'url=s'=>\$url
 );
 
@@ -54,12 +54,6 @@ Options:
 
         --help		Displays this message.
 
-	--stripHtml	A flag indicating that WebGUI should
-			strip all the HTML from the document and
-			output only text. NOTE: The resulting
-			text may have formatting problems as a
-			result.
-
 	--styleId	Set an alternate style for the page.
 			Defaults to asset's default style.
 
@@ -77,8 +71,10 @@ STOP
 
 # Open WebGUI session
 my $session = WebGUI::Session->open($webguiRoot,$configFile);
+$session->user({userId=>$userId}) if (defined $userId);
+$session->scratch->set("personalStyleId", $styleId) if (defined $styleId);
 
-my $asset = "";
+my $asset = undef;
 
 if ($url) {
 	$asset = WebGUI::Asset->newByUrl($session,$url);
@@ -87,16 +83,17 @@ if ($url) {
 }
 
 if (defined $asset) {
-	#$asset->{_properties}{styleTemplateId} = $styleId if ($styleId);
-	#my $content = $asset->exportAsHtml({stripHtml => $stripHtml});
-	my $content = $asset->www_view;
+	my $file = undef;
 	if ($toFile) {
-        	open (TOFILE, ">$toFile") or die "Can't open file $toFile for writing. $!";
-		print TOFILE $content;
-		close (TOFILE);
-	} else {
-		print $content;
+		$file = FileHandle->new(">$toFile") or die "Can't open file $toFile for writing. $!";
+		$session->output->setHandle($file);
 	}
+	my $content = $asset->www_view;
+	unless ($content eq "chunked") {
+		$session->output->print($content);	
+		$session->output->setHandle(undef);
+	}
+	$file->close if (defined $file);
 } else {
 	print "Asset not defined!!\n";
 }
