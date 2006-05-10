@@ -262,7 +262,7 @@ sub addToScratchCart {
 	return undef unless $isApproved;
 	if (scalar(@eventsInCart) == 0) {
 		# the cart is empty, so check if this is a master event or not.
-		my ($isChild) = $self->session->db->quickArray("select p.productId from EventManagementSystem_products where productId = ? and (e.prerequisiteId is NULL or e.prerequisiteId = '')",[$event]);
+		my ($isChild) = $self->session->db->quickArray("select productId from EventManagementSystem_products where productId = ? and (prerequisiteId is NULL or prerequisiteId = '')",[$event]);
 		return undef if $isChild;
 		$self->session->scratch->set('currentMainEvent',$event);
 		push(@eventsInCart, $event) unless isIn($event,@eventsInCart);
