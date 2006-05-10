@@ -260,6 +260,7 @@ sub addToScratchCart {
 	my @eventsInCart = split("\n",$self->session->scratch->get('EMS_scratch_cart'));
 	my ($isApproved) = $self->session->db->quickArray("select approved from EventManagementSystem_products where productId = ?",[$event]);
 	return undef unless $isApproved;
+	$self->session->warn("got here");
 	if (scalar(@eventsInCart) == 0) {
 		# the cart is empty, so check if this is a master event or not.
 		my ($isParent) = $self->session->db->quickArray("select productId from EventManagementSystem_products where productId = ? and (prerequisiteId is not NULL and prerequisiteId != '')",[$event]);
