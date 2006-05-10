@@ -2386,6 +2386,20 @@ sub www_search {
 	my $badgeHolderInfo = $self->session->db->buildArrayRefOfHashRefs("select * from EventManagementSystem_badges where badgeId=?",[$badgeHolderId]);
 	$var{badgeHolderInfo_loop} = $badgeHolderInfo;
 	
+	# Get all the events they have in the badge so far
+	my $eventsInBadge = $self->getEventsInScratchCart;
+	
+	# Get all the info about these events and set the template vars
+	my @selectedEvents_loop;
+	foreach my $eventId (@$eventsInBadge) {
+		my $eventData = $self->session->db->quickHashRef("select p.productId, p.title, p.description, p.price, p.weight, p.sku, p.skuTemplate, e.startDate, e.endDate, e.maximumAttendees, e.approved
+								  from products as p, EventManagementSystem_products as e where p.productId = e.productId and p.productId=?",[$eventId]);
+		$eventData->{'startDate'} = $self->session->datetime->epochToHuman($eventData->{'startDate'});
+		$eventData->{'endDate'} = $self->session->datetime->epochToHuman($eventData->{'endDate'});
+		
+		push(@selectedEvents_loop, $eventData);	
+	}
+	$var{'eventsInBadge_loop'} = \@selectedEvents_loop;
 	#these allow us to show a specific page of subevents after an add to scratch cart
 	my $eventAdded = shift;
 	my $cfilter_t0 = shift;
