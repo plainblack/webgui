@@ -1894,8 +1894,8 @@ sub www_addEventsToBadge {
 	foreach(@mainEvents) {
 		$mainEvent = $_ if isIn($_,@pastEvents);
 	}
-	$self->session->http->setRedirect($self->getUrl."?func=search;cfilter_s0=requirement;cfilter_c0=eq;subSearch=1;cfilter_t0=".$mainEvent);
-	return 1;
+	$self->session->scratch->set('currentMainEvent',$mainEvent);
+	return $self->www_search();
 }
 
 #-------------------------------------------------------------------
