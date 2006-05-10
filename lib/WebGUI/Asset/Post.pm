@@ -97,7 +97,7 @@ sub canAdd {
 #-------------------------------------------------------------------
 sub canEdit {
 	my $self = shift;
-	return (($self->session->form->process("func") eq "add" || ($self->session->form->process("assetId") eq "new" && $self->session->form->process("func") eq "editSave" && $self->session->form->process("class") eq "WebGUI::Asset::Post")) && $self->getThread->getParent->canPost) || # account for new posts
+	return (($self->session->form->process("func") eq "add" || ($self->session->form->process("assetId") eq "new" && $self->session->form->process("func") eq "editSave" && $self->session->form->process("class","className") eq "WebGUI::Asset::Post")) && $self->getThread->getParent->canPost) || # account for new posts
 
 		($self->isPoster && $self->getThread->getParent->get("editTimeout") > ($self->session->datetime->time() - $self->get("dateUpdated"))) ||
 		$self->getThread->getParent->canEdit;
@@ -919,12 +919,12 @@ sub www_edit {
 				})
 			.WebGUI::Form::hidden($self->session, {
 				name=>"class",
-				value=>$self->session->form->process("class")
+				value=>$self->session->form->process("class","className")
 				});
         	$var{'isNewPost'} = 1;
 		$content = $self->session->form->process("content");
 		$title = $self->session->form->process("title");
-		if ($self->session->form->process("class") eq "WebGUI::Asset::Post") { # new reply
+		if ($self->session->form->process("class","className") eq "WebGUI::Asset::Post") { # new reply
 			$self->{_thread} = $self->getParent->getThread;
 			return $self->session->privilege->insufficient() unless ($self->getThread->canReply);
 			$var{isReply} = 1;
@@ -943,7 +943,7 @@ sub www_edit {
 				name=>"subscribe",
 				value=>$self->session->form->process("subscribe")
 				});
-		} elsif ($self->session->form->process("class") eq "WebGUI::Asset::Post::Thread") { # new thread
+		} elsif ($self->session->form->process("class","className") eq "WebGUI::Asset::Post::Thread") { # new thread
 			return $self->session->privilege->insufficient() unless ($self->getThread->getParent->canPost);
 			$var{isNewThread} = 1;
                 	if ($self->getThread->getParent->canEdit) {

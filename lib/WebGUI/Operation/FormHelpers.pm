@@ -42,7 +42,7 @@ sub www_formAssetTree {
 	my $ancestors = $base->getLineage(["self","ancestors"],{returnObjects=>1});
 	foreach my $ancestor (@{$ancestors}) {
 		my $url = $ancestor->getUrl("op=formAssetTree;formId=".$session->form->process("formId"));
-		$url .= ";classLimiter=".$session->form->process("classLimiter") if ($session->form->process("classLimiter"));
+		$url .= ";classLimiter=".$session->form->process("classLimiter","className") if ($session->form->process("classLimiter","className"));
 		push(@crumb,'<a href="'.$url.'" class="crumb">'.$ancestor->get("menuTitle").'</a>');
 	}
 	my $output = '
@@ -79,7 +79,7 @@ sub www_formAssetTree {
 		<div class="crumbTrail">'.join(" &gt; ", @crumb)."</div><br />\n";
 	my $children = $base->getLineage(["children"],{returnObjects=>1});
 	my $i18n = WebGUI::International->new($session);
-	my $limit = $session->form->process("classLimiter");
+	my $limit = $session->form->process("classLimiter","className");
 	foreach my $child (@{$children}) {
 		next unless $child->canView;
 		if ($limit eq "" || $child->get("className") =~ /^$limit/) {
@@ -90,7 +90,7 @@ sub www_formAssetTree {
 			$output .= '<span class="selectLink">['.$i18n->get("select").']</span> ';
 		}
 		my $url = $child->getUrl("op=formAssetTree;formId=".$session->form->process("formId"));
-		$url .= ";classLimiter=".$session->form->process("classLimiter") if ($session->form->process("classLimiter"));
+		$url .= ";classLimiter=".$session->form->process("classLimiter","className") if ($session->form->process("classLimiter","className"));
 		$output .= '<a href="'.$url.'" class="traverse">'.$child->get("menuTitle").'</a>'."<br />\n";	
 	}
 	$output .= '</div></body></html>';

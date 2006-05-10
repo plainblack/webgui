@@ -525,7 +525,7 @@ sub getEditForm {
 			});
 		$tabform->hidden({
 			name=>"class",
-			value=>$self->session->form->process("class")
+			value=>$self->session->form->process("class","className")
 			});
 	} else {
 		my $ac = $self->getAdminConsole;
@@ -1244,7 +1244,7 @@ sub manageAssetsSearch {
 	tie %classes, "Tie::IxHash";
 	%classes = ("any"=>"Any Class", $self->session->db->buildHash("select distinct(className) from asset"));
 	delete $classes{"WebGUI::Asset"}; # don't want to search for the root asset
-	$output .= WebGUI::Form::selectBox($self->session, {name=>"class", value=>$self->session->form->get("class","selectBox"), defaultValue=>"any", options=>\%classes});
+	$output .= WebGUI::Form::selectBox($self->session, {name=>"class", value=>$self->session->form->process("class","className"), defaultValue=>"any", options=>\%classes});
 	$output .= WebGUI::Form::hidden($self->session, {name=>"func", value=>"manageAssets"});
 	$output .= WebGUI::Form::hidden($self->session, {name=>"doit", value=>"1"});
 	$output .= WebGUI::Form::submit($self->session, {value=>"Search"});
@@ -1252,7 +1252,7 @@ sub manageAssetsSearch {
 	$self->session->output->print($output);
 	$output = '';
 	return undef unless ($self->session->form->get("doit"));
-	my $class = $self->session->form->get("class") eq "any" ? undef : $self->session->form->get("class");
+	my $class = $self->session->form->process("class","className") eq "any" ? undef : $self->session->form->process("class","className");
 	my $assets = WebGUI::Search->new($self->session,0)->search({
 		keywords=>$self->session->form->get("keywords"),
 		classes=>[$class]
@@ -1766,7 +1766,7 @@ Adds a new Asset based upon the class of the current form. Returns the Asset cal
 sub www_add {
 	my $self = shift;
 	my %prototypeProperties; 
-	my $class = $self->session->form->process("class");
+	my $class = $self->session->form->process("class","className");
 	unless ($class =~ m/^[A-Za-z0-9\:]+$/) {
 		$self->session->errorHandler->security("tried to call an invalid class ".$class);
 		return "";
@@ -1897,7 +1897,7 @@ sub www_editSave {
 	}
 	my $object;
 	if ($self->session->form->process("assetId") eq "new") {
-		$object = $self->addChild({className=>$self->session->form->process("class")});	
+		$object = $self->addChild({className=>$self->session->form->process("class","className")});	
 		return $self->www_view unless defined $object;
 		$object->{_parent} = $self;
 	} else {

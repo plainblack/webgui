@@ -264,8 +264,8 @@ sub www_editWorkflowActivity {
 	my $session = shift;
         return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
 	my $activity = '';
-	if ($session->form->get("className")) {
-		$activity = WebGUI::Workflow::Activity->newByPropertyHashRef($session, {activityId=>"new",className=>$session->form->get("className")});
+	if ($session->form->process("className","className")) {
+		$activity = WebGUI::Workflow::Activity->newByPropertyHashRef($session, {activityId=>"new",className=>$session->form->process("className","className")});
 	} else {
 		$activity = WebGUI::Workflow::Activity->new($session, $session->form->get("activityId"));
 	}
@@ -296,7 +296,7 @@ sub www_editWorkflowActivitySave {
 		my $activityId = $session->form->get("activityId");
 		my $activity = '';
 		if ($activityId eq "new") {
-			$activity = $workflow->addActivity($session->form->get("className"));
+			$activity = $workflow->addActivity($session->form->process("className","className"));
 		} else {
 			$activity = $workflow->getActivity($activityId);
 		}
