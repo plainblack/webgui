@@ -66,7 +66,7 @@ This package provides easy to use date math functions, which are normally a comp
  $epoch = $dt->setToEpoch($setString);
  $epoch = $dt->time();
  $seconds = $dt->timeToSeconds($timeString);
- $epoch = $dt->incrementMonth($epoch);
+ $integer = $dt->getMonthDiff($epoch);
 
 =head1 METHODS
 
@@ -228,33 +228,24 @@ sub dayStartEnd {
 
 #-------------------------------------------------------------------
 
-=head2 incrementMonth ( epoch )
+=head2 getMonthDiff ( epoch1, epoch2 )
 
-Increments the month of this date. Overflow from december to january is
-handled correctly, but days are ignored. Use this function only if you're
-sure that incrementing the month will result in a valid date (for example
-if the day is less than or equal to 28). Otherwise, result is undefined.
+Returns the difference in months between two dates. Days are ignored, so if the two dates are in the same month the result is 0. If epoch1 is in January and epoch2 in February of the same year, the results is 1. Negative numbers are also possible if epoch1 is greater than epoch2.
 
-=head3 epoch
+=head3 epoch1, epoch2
 
 The number of seconds since January 1, 1970.
 
 =cut
 
-sub incrementMonth {
+sub getMonthDiff {
 	my $self = shift;
-	my $epoch = shift;
-	my $time_zone = $self->session->user->profileField('timeZone') || 'America/Chicago';
-	my $dt = DateTime->from_epoch(epoch=>$epoch, time_zone=>$time_zone);
-	my $month = $dt->month;
-	if ($month < 12) {
-		$dt->set_month($month+1);
-	} else {
-		my $year = $dt->year;
-		$dt->set_month(1);
-		$dt->set_year($year+1);
-	}
-        return $dt->epoch;
+	my $epoch1 = shift;
+	my $epoch2 = shift;
+
+	my ($year1, $month1) = split(' ', $self->session->datetime->epochToHuman($epoch1, '%y %M'));
+	my ($year2, $month2) = split(' ', $self->session->datetime->epochToHuman($epoch2, '%y %M'));
+	return 12 * ($year2 - $year1) + ($month2 - $month1);
 }
 
 #-------------------------------------------------------------------
