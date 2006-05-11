@@ -678,7 +678,8 @@ sub getUrl {
                                                                                                                                                        
 =head2 renameFile ( filename, newFilename )
 
-Renames an file's filename.
+Renames an file's filename.  Returns true if the rename succeeded and false
+if it didn't.
 
 =head3 filename
 

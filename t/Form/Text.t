@@ -40,6 +40,12 @@ my $testBlock = [
 		expected  => "some user valuewithwhitespace",
 		comment   => 'Embedded whitespace is stripped',
 	},
+	{
+		key => 'Text3',
+		testValue => 'conCatenatedText',
+		expected  => 'EQUAL',
+		comment   => 'single word',
+	},
 ];
 
 my $formType = 'text';

@@ -71,7 +71,7 @@ Returns a class name which has been taint checked.
 sub getValueFromPost {
 	my $self = shift;
 	my $value = $self->session->form->param($self->get("name"));
-	$value =~ s/[^\w\d\s:]//g;
+	$value =~ s/[^\w:]//g;
         return $value;
 }
 

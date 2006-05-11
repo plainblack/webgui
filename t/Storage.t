@@ -18,7 +18,7 @@ use WebGUI::Storage;
 
 use Test::More;
 
-plan tests => 6; # increment this value for each test you create
+plan tests => 7; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -37,6 +37,8 @@ $storage1 = WebGUI::Storage->get($session, 'foobar');
 is( ref $storage1, "WebGUI::Storage", "storage will accept non GUID arguments");
 
 is( $storage1->getErrorCount, 0, "No errors during path creation");
+
+is( $storage1->getLastError, undef, "No errors during path creation");
 
 my $storageDir1 = join '/', $uploadDir, 'fo', 'ob', 'foobar';
 
