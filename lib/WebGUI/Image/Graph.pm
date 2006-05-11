@@ -77,20 +77,24 @@ sub configurationForm {
 		-name	=> 'graph_imageWidth',
 		-value	=> $self->getImageWidth,
 		-label	=> $i18n->get('image width'),
+		-hoverHelp => $i18n->get('image width description'),
 	);
 	$f->integer(
 		-name	=> 'graph_imageHeight',
 		-value	=> $self->getImageHeight,
 		-label	=> $i18n->get('image height'),
+		-hoverHelp => $i18n->get('image height description'),
 	);
 	$f->color(
 		-name	=> 'graph_backgroundColor',
 		-value	=> $self->getBackgroundColor,
 		-label	=> $i18n->get('background color'),
+		-hoverHelp => $i18n->get('background color description'),
 	);
 	$f->selectBox(
 		-name	=> 'graph_paletteId',
 		-label	=> $i18n->get('palette'),
+		-hoverHelp => $i18n->get('palette description'),
 		-value	=> [ $self->getPalette->getId ],
 		-options=> $self->getPalette->getPaletteList,
 	);
@@ -98,22 +102,26 @@ sub configurationForm {
 		-name	=> 'graph_labelOffset',
 		-value	=> $self->getLabelOffset,
 		-label	=> $i18n->get('label offset'),
+		-hoverHelp => $i18n->get('label offset description'),
 	);
 	$f->selectBox(
 		-name	=> 'graph_labelFontId',
 		-value	=> [ $self->getLabelFont->getId ],
 		-label	=> $i18n->get('label font'),
+		-hoverHelp => $i18n->get('label font description'),
 		-options=> WebGUI::Image::Font->getFontList($self->session),
 	);
 	$f->color(
 		-name	=> 'graph_labelColor',
 		-value	=> $self->getLabelColor,
 		-label	=> $i18n->get('label color'),
+		-hoverHelp => $i18n->get('label color description'),
 	);
 	$f->integer(
 		-name	=> 'graph_labelFontSize',
 		-value	=> $self->getLabelFontSize,
 		-label	=> $i18n->get('label fontsize'),
+		-hoverHelp => $i18n->get('label fontsize description'),
 	);
 	
 	return {'graph' => $f->printRowsOnly};
@@ -289,8 +297,7 @@ EOS
 			-name		=> 'graphingPlugin',
 			-options	=> \%graphingPlugins,
 			-label		=> $i18n->get('graph type'),
-#### hoverhelp
-			-hoverHelp	=> 'Graph type hover',
+			-hoverHelp	=> $i18n->get('graph type description'),
 			-id		=> 'graphTypeSelector',
 			-value		=> [ $config->{graph_formNamespace} ],
 			-extras		=> 'onchange="switchGraphingFormElements(this, this.value)"'

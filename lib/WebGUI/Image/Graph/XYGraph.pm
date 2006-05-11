@@ -53,41 +53,49 @@ sub configurationForm {
 		name	=> 'xyGraph_chartWidth',
 		value	=> $self->getChartWidth,
 		label	=> $i18n->get('chart width'),
+		hoverHelp => $i18n->get('chart width description'),
 	);
 	$f->integer(
 		name	=> 'xyGraph_chartHeight',
 		value	=> $self->getChartHeight,
 		label	=> $i18n->get('chart height'),
+		hoverHelp => $i18n->get('chart height description'),
 	);
 	$f->yesNo(
 		name	=> 'xyGraph_drawLabels',
 		value	=> $self->showLabels,
 		label	=> $i18n->get('draw labels'),
+		hoverHelp => $i18n->get('draw labels description'),
 	);
 	$f->yesNo(
 		name	=> 'xyGraph_drawAxis',
 		value	=> $self->showAxis,
 		label	=> $i18n->get('draw axis'),
+		hoverHelp => $i18n->get('draw axis description'),
 	);
 	$f->color(
 		name	=> 'xyGraph_axisColor',
 		value	=> $self->getAxisColor,
 		label	=> $i18n->get('axis color'),
+		hoverHelp => $i18n->get('axis color description'),
 	);
 	$f->yesNo(
 		name	=> 'xyGraph_drawRulers',
 		value	=> $self->showRulers,
 		label	=> $i18n->get('draw rulers'),
+		hoverHelp => $i18n->get('draw rulers description'),
 	);
 	$f->color(
 		name	=> 'xyGraph_rulerColor',
 		value	=> $self->getRulerColor,
 		label	=> $i18n->get('ruler color'),
+		hoverHelp => $i18n->get('ruler color description'),
 	);
 	$f->selectBox(
 		name	=> 'xyGraph_drawMode',
 		value	=> [ $self->getDrawMode ],
 		label	=> $i18n->get('draw mode'),
+		hoverHelp => $i18n->get('draw mode description'),
 		multiple=> 0,
 		options	=> {
 			sideBySide	=> 'Side by side',
@@ -98,6 +106,7 @@ sub configurationForm {
 		name	=> 'xyGraph_yGranularity',
 		value	=> $self->getYGranularity,
 		label	=> $i18n->get('y granularity'),	
+		hoverHelp => $i18n->get('y granularity description'),
 	);
 	
 	$configForms->{'graph_xygraph'} = $f->printRowsOnly;

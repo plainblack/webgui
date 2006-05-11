@@ -51,12 +51,14 @@ sub _getColorForm {
 	$f->text(
 		-name	=> 'colorName',
 		-value	=> $color->getName,
+		-hoverHelp => $i18n->get('color name description'),
 		-label	=> $i18n->get('color name'),
 	);
 	$f->color(
 		-name	=> 'fillTriplet',
 		-value	=> $color->getFillTriplet,
 		-label	=> $i18n->get('fill color'),
+		-hoverHelp => $i18n->get('fill color description'),
 		-maxlength => 7,
 		-size	=> 7,
 	);
@@ -65,6 +67,7 @@ sub _getColorForm {
 		-value	=> [ $color->getFillAlpha ],
 		-options=> \%transparencies, 
 		-label	=> $i18n->get('fill alpha'),
+		-hoverHelp => $i18n->get('fill alpha description'),
 		-maxlength => 2,
 		-editable=>0,
 		-size	=> 2,
@@ -73,6 +76,7 @@ sub _getColorForm {
 		-name	=> 'strokeTriplet',
 		-value	=> $color->getStrokeTriplet,
 		-label	=> $i18n->get('stroke color'),
+		-hoverHelp => $i18n->get('stroke color description'),
 		-maxlength => 7,
 		-size	=> 7,
 	);
@@ -81,6 +85,7 @@ sub _getColorForm {
 		-value	=> [ $color->getStrokeAlpha ],
 		-options=> \%transparencies,
 		-label	=> $i18n->get('stroke alpha'),
+		-hoverHelp => $i18n->get('stroke alpha description'),
 		-maxlength => 2,
 		-editable => 0,
 		-size	=> 2,
@@ -235,10 +240,12 @@ sub www_editFont {
 		-name	=> 'fontName',
 		-value	=> $fontName,
 		-label	=> $i18n->get('font name'),
+		-hoverHelp => $i18n->get('font name description'),
 	);
 	$f->file(
 		-name	=> 'fontFile',
 		-label	=> $i18n->get('font file'),
+		-hoverHelp => $i18n->get('font file description'),
 	);
 	$f->submit;
 
@@ -293,6 +300,7 @@ sub www_editPalette {
 		-name	=> 'paletteName',
 		-value	=> $name,
 		-label	=> $i18n->get('palette name'),
+		-hoverHelp => $i18n->get('palette name description'),
 	);
 	$f->submit;
 	$output = $f->print;

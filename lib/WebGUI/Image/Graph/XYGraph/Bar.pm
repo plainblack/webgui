@@ -56,11 +56,13 @@ my	$f = WebGUI::HTMLForm->new($self->session);
 		name	=> 'xyGraph_bar_barSpacing',
 		value	=> $self->getBarSpacing,
 		label	=> $i18n->get('bar spacing'),
+		hoverHelp => $i18n->get('bar spacing description'),
 	);
 	$f->float(
 		name	=> 'xyGraph_bar_groupSpacing',
 		value	=> $self->getGroupSpacing,
 		label	=> $i18n->get('group spacing'),
+		hoverHelp => $i18n->get('group spacing description'),
 	);
 
 	$configForms->{'graph_xygraph_bar'} = $f->printRowsOnly;
