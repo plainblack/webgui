@@ -1855,7 +1855,8 @@ sub www_viewPurchase {
 		my @purchasesLoop;
 		$var{registrantView} = 1;
 		$var{canReturnTransaction} = 0;
-		my $sql2 = "select r.registrationId, p.title, p.description, p.price, p.templateId, r.returned, e.approved, e.maximumAttendees, e.startDate, e.endDate, b.userId, b.createdByUserId, e.productId from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e, EventManagementSystem_purchases as z, products as p, transaction where p.productId = r.productId and p.productId = e.productId and r.badgeId=b.badgeId and r.purchaseId=z.purchaseId and r.badgeId=? and transaction.transactionId=z.transactionId and transaction.status='Completed' group by r.registrationId order by e.startDate";
+		my $filter = ($isAdmin)?'':' and r.returned=0 ';
+		my $sql2 = "select r.registrationId, p.title, p.description, p.price, p.templateId, r.returned, e.approved, e.maximumAttendees, e.startDate, e.endDate, b.userId, b.createdByUserId, e.productId from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e, EventManagementSystem_purchases as z, products as p, transaction where p.productId = r.productId and p.productId = e.productId and r.badgeId=b.badgeId and r.purchaseId=z.purchaseId and r.badgeId=? and transaction.transactionId=z.transactionId and transaction.status='Completed' $filter group by r.registrationId order by e.startDate";
 		my $sth2 = $self->session->db->read($sql2,[$badgeId]);
 		my $purchase = {};
 		$purchase->{regLoop} = [];
@@ -1882,14 +1883,15 @@ sub www_viewPurchase {
 		my $isAdmin = $self->canAddEvents;
 		my ($userId) = $self->session->db->quickArray("select userId from transaction where transactionId=?",[$tid]);
 		my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
-		my $sql = "select distinct(r.purchaseId), b.* from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_purchases as t, transaction where r.badgeId=b.badgeId and r.purchaseId=t.purchaseId and transaction.transactionId=t.transactionId and t.transactionId=? and transaction.status='Completed' order by b.lastName";
+		my $filter = ($isAdmin)?'':' and r.returned=0 ';
+		my $sql = "select distinct(r.purchaseId), b.* from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_purchases as t, transaction where r.badgeId=b.badgeId and r.purchaseId=t.purchaseId and transaction.transactionId=t.transactionId and t.transactionId=? and transaction.status='Completed' $filter order by b.lastName";
 		my $sth = $self->session->db->read($sql,[$tid]);
 		my @purchasesLoop;
 		$var{canReturnTransaction} = 0;
 		while (my $purchase = $sth->hashRef) {
 			$badgeId = $purchase->{badgeId};
 			my $pid = $purchase->{purchaseId};
-			my $sql2 = "select r.registrationId, p.title, p.description, p.price, p.templateId, r.returned, e.approved, e.maximumAttendees, e.startDate, e.endDate, b.userId, b.createdByUserId, e.productId from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e, EventManagementSystem_purchases as z, products as p, transaction where p.productId = r.productId and p.productId = e.productId and r.badgeId=b.badgeId and r.purchaseId=z.purchaseId and r.badgeId=? and r.purchaseId=? and transaction.transactionId=z.transactionId and transaction.status='Completed' group by r.registrationId order by b.lastName";
+			my $sql2 = "select r.registrationId, p.title, p.description, p.price, p.templateId, r.returned, e.approved, e.maximumAttendees, e.startDate, e.endDate, b.userId, b.createdByUserId, e.productId from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e, EventManagementSystem_purchases as z, products as p, transaction where p.productId = r.productId and p.productId = e.productId and r.badgeId=b.badgeId and r.purchaseId=z.purchaseId and r.badgeId=? and r.purchaseId=? $filter and transaction.transactionId=z.transactionId and transaction.status='Completed' group by r.registrationId order by b.lastName";
 			my $sth2 = $self->session->db->read($sql2,[$badgeId,$pid]);
 			$purchase->{regLoop} = [];
 			$purchase->{canReturnItinerary} = 0;
@@ -1916,16 +1918,17 @@ sub www_viewPurchase {
 	} else {
 		my %var = $self->get();
 		my $isAdmin = $self->canAddEvents;
+		my $filter = ($isAdmin)?'':' and r.returned=0 ';
 		my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
-		my $sql = "select distinct(r.purchaseId), b.* from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_purchases as t, transaction where r.badgeId=b.badgeId and r.purchaseId=t.purchaseId and transaction.transactionId=t.transactionId and transaction.status='Completed' and (b.userId=? or transaction.userId=? or b.createdByUserId=?) order by b.lastName";
-		my $userId = $self->session->var->get('userId');
+		my $sql = "select distinct(r.purchaseId), b.* from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_purchases as t, transaction where r.badgeId=b.badgeId and r.purchaseId=t.purchaseId and transaction.transactionId=t.transactionId and transaction.status='Completed' and (b.userId=? or transaction.userId=? or b.createdByUserId=?) $filter order by b.lastName";
+		my $userId = $self->session->form->get('userId') || $self->session->var->get('userId');
 		my $sth = $self->session->db->read($sql,[$userId,$userId,$userId]);
 		my @purchasesLoop;
 		$var{canReturnTransaction} = 0;
 		while (my $purchase = $sth->hashRef) {
 			$badgeId = $purchase->{badgeId};
 			my $pid = $purchase->{purchaseId};
-			my $sql2 = "select r.registrationId, p.title, p.description, p.price, p.templateId, r.returned, e.approved, e.maximumAttendees, e.startDate, e.endDate, b.userId, b.createdByUserId, e.productId from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e, EventManagementSystem_purchases as z, products as p, transaction where p.productId = r.productId and p.productId = e.productId and r.badgeId=b.badgeId and r.purchaseId=z.purchaseId and r.badgeId=? and r.purchaseId=? and transaction.transactionId=z.transactionId and transaction.status='Completed' group by r.registrationId order by b.lastName";
+			my $sql2 = "select r.registrationId, p.title, p.description, p.price, p.templateId, r.returned, e.approved, e.maximumAttendees, e.startDate, e.endDate, b.userId, b.createdByUserId, e.productId from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e, EventManagementSystem_purchases as z, products as p, transaction where p.productId = r.productId and p.productId = e.productId and r.badgeId=b.badgeId and r.purchaseId=z.purchaseId and r.badgeId=? and r.purchaseId=? and transaction.transactionId=z.transactionId and transaction.status='Completed' $filter group by r.registrationId order by b.lastName";
 			my $sth2 = $self->session->db->read($sql2,[$badgeId,$pid]);
 			$purchase->{regLoop} = [];
 			$purchase->{canReturnItinerary} = 0;
@@ -2266,7 +2269,7 @@ sub saveRegistration {
 	foreach my $eventId (@$eventsInCart) {
 		next if isIn($eventId,@addingToPurchase);
 		next if isIn($eventId,@badgeEvents);
-		my $registrationId = $self->setCollateral("EventManagementSystem_registrations", "registrationId",{
+		$my $registrationId = $self->setCollateral("EventManagementSystem_registrations", "registrationId",{
 			registrationId  => "new",
 			purchaseId	 => $purchaseId,
 			productId	 => $eventId,
