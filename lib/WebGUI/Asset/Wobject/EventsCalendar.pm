@@ -261,16 +261,26 @@ sub view {
 		$events = WebGUI::Asset::getRoot($session)->getLineage(['descendants'],
 			{returnObjects=>1,includeOnlyClasses=>['WebGUI::Asset::Event']});
 	}
+	# Sort events by startDate, then endDate
+	my @sortedEvents = sort {
+		my $x = int($a->get('eventStartDate'));
+		my $y = int($b->get('eventStartDate'));
+		if ($x == $y) {
+			$x = int($a->get('eventEndDate'));
+			$y = int($b->get('eventEndDate'));
+		}
+		return $x cmp $y;
+	} @{$events};
 
 	# Get first/last event date
 	my $firstEventDate = 2147483647; # far into the future (~2038)
 	my $lastEventDate = 0;           # far into the past (~1970)
-	foreach my $event (@{$events}) {
-		my $eventStartDate = $event->get('eventStartDate');
-		my $eventEndDate = $event->get('eventEndDate');
-
+	foreach my $event (@sortedEvents) {
 		# ignore events we can't view
 		next unless $event->canView;
+
+		my $eventStartDate = $event->get('eventStartDate');
+		my $eventEndDate = $event->get('eventEndDate');
 
 		# update first and last event date
 		$firstEventDate = $eventStartDate if ($eventStartDate < $firstEventDate);
@@ -320,13 +330,14 @@ sub view {
 	# Filter events
 	my %filteredEvents;
 	my $previousDate;
-	foreach my $event (@{$events}) {
-		my $eventStartDate = $event->get('eventStartDate');
-		my $eventEndDate = $event->get('eventEndDate');
-
+	foreach my $event (@sortedEvents) {
 		# ignore events we're not allowed to see
 		next unless $event->canView;
+		# get and check start date
+		my $eventStartDate = $event->get('eventStartDate');
 		next if ($eventStartDate > $maxDate);
+		# get and check end date
+		my $eventEndDate = $event->get('eventEndDate');
 		next if ($eventEndDate < $minDate);
 
 		# get date/time info
@@ -334,8 +345,6 @@ sub view {
 				split '_', $dt->epochToHuman($eventStartDate, '%y_%c_%D_%z_%Z_%w_%M');
 		my ($endYear, $endMonth, $endDay, $endDateHuman, $endTimeHuman, $endDayOfWeek) =
 				split '_', $dt->epochToHuman($eventEndDate, '%y_%c_%D_%z_%Z_%w');
-		# remove leading space before startDay
-		$startDay =~ s/ (.*)/$1/;
 
 		# set first and last day to start of those days (to make comparison of days easier)
 		my ($firstDay, $lastDay);
@@ -378,8 +387,6 @@ sub view {
 			});
 		}
 		$previousDate = "$firstDay-$lastDay";
-		# NOTE: This currently does not work as intended, because the
-		# events are not sorted. This still has to be done.
 	}
 
 	# Set view range
