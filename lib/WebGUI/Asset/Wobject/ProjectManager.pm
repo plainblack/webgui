@@ -451,22 +451,21 @@ sub www_editTask {
    my $seq = $task->{sequenceNumber};
    my $extras = ($isMilestone)?" disabled":"";
    $var->{'form.header'} = WebGUI::Form::formHeader($session,{
-                                                               action=>$self->getUrl,
-															   extras=>q|name="editTaskForm"|
-													       });
+				action=>$self->getUrl,
+				extras=>q|name="editTaskForm"|
+				});
    $var->{'form.header'} .= WebGUI::Form::hidden($session, {
-                                                             -name=>"func",
-															 -value=>"editTaskSave"
-														   });
+				-name=>"func",
+				-value=>"editTaskSave"
+				});
    $var->{'form.header'} .= WebGUI::Form::hidden($session, {
-                                                             -name=>"projectId",
-															 -value=>$projectId
-														   });
+				-name=>"projectId",
+				-value=>$projectId
+				});
    $var->{'form.header'} .= WebGUI::Form::hidden($session, {
-                                                             -name=>"taskId",
-															 -value=>$taskId
-														   });
-														   
+				-name=>"taskId",
+				-value=>$taskId
+				});
    #Set some hidden variables to make it easy to reset data in javascript
    my $duration = $task->{duration};
    my $start = $dt->epochToSet($task->{startDate});
@@ -474,103 +473,103 @@ sub www_editTask {
    my $dependant = $task->{dependants};
    														   
    $var->{'form.header'} .= WebGUI::Form::hidden($session, {
-                                                             -name=>"orig_duration",
-															 -value=>$duration
-														   });
+				-name=>"orig_duration",
+				-value=>$duration
+				});
    $var->{'form.header'} .= WebGUI::Form::hidden($session, {
-                                                             -name=>"orig_start",
-															 -value=>$start
-														   });
+				-name=>"orig_start",
+				-value=>$start
+				});
    $var->{'form.header'} .= WebGUI::Form::hidden($session, {
-                                                             -name=>"orig_end",
-															 -value=>$end
-														   }); 
+				-name=>"orig_end",
+				-value=>$end
+				}); 
    $var->{'form.header'} .= WebGUI::Form::hidden($session, {
-                                                             -name=>"orig_dependant",
-															 -value=>$dependant
-														   });														   
+				-name=>"orig_dependant",
+				-value=>$dependant
+				});														   
    $var->{'form.name'} = WebGUI::Form::text($session,{
-		                                                -name=>"name",
-														-value=>$task->{taskName}, 
-														-extras=>q|style="width:95%;"|
-													   });
+				-name=>"name",
+				-value=>$task->{taskName}, 
+				-extras=>q|style="width:95%;"|
+				});
   
    
    $var->{'form.duration'} = WebGUI::Form::float($session,{
-		                                                -name=>"duration",
-														-value=>$task->{duration}, 
-														-extras=>qq|style="width:70%;" onchange="adjustTaskTimeFromDuration(this.form.start,this.form.end,this,true,this.form.dependants,this.form.orig_start,this.form.orig_end,$seq)"  onblur="if(this.value == 0){ adjustTaskTimeFromDuration(this.form.start,this.form.end,this,true) }" $extras|
-													   });
+				-name=>"duration",
+				-value=>$task->{duration}, 
+				-extras=>qq|style="width:70%;" onchange="adjustTaskTimeFromDuration(this.form.start,this.form.end,this,true,this.form.dependants,this.form.orig_start,this.form.orig_end,$seq)"  onblur="if(this.value == 0){ adjustTaskTimeFromDuration(this.form.start,this.form.end,this,true) }" $extras|
+				});
    $var->{'form.duration.units'} = $self->_getDurationUnitHashAbbrev->{$project->{durationUnits}};
    $var->{'form.start'} = WebGUI::Form::text($session,{
-		                                               -name=>"start",
-													   -value=>$start,
-													   -size=>"10",
-													   -maxlength=>"10",
-													   -extras=>qq|onfocus="doCalendar(this.id);" onblur="adjustTaskTimeFromDate(this.form.start,this.form.end,this.form.duration,this,true,this.form.dependants,this.form.orig_start,this.form.orig_end,$seq);" onblur="if(this.form.milestone.checked==true){ this.form.end.value=this.value; }" style="width:88%;"|
-		                                            });
+				-name=>"start",
+				-value=>$start,
+				-size=>"10",
+				-maxlength=>"10",
+				-extras=>qq|onfocus="doCalendar(this.id);" onblur="adjustTaskTimeFromDate(this.form.start,this.form.end,this.form.duration,this,true,this.form.dependants,this.form.orig_start,this.form.orig_end,$seq);" onblur="if(this.form.milestone.checked==true){ this.form.end.value=this.value; }" style="width:88%;"|
+				});
 													
    $var->{'form.end'} = WebGUI::Form::text($session,{
-		                                               -name=>"end",
-													   -value=>$end,
-													   -size=>"10",
-													   -maxlength=>"10",
-													   -extras=>qq|onfocus="doCalendar(this.id);" style="width:88%;" onblur="adjustTaskTimeFromDate(this.form.start,this.form.end,this.form.duration,this,true,this.form.dependants,this.form.orig_start,this.form.orig_end,$seq);" $extras|
-		                                            });
+				-name=>"end",
+				-value=>$end,
+				-size=>"10",
+				-maxlength=>"10",
+				-extras=>qq|onfocus="doCalendar(this.id);" style="width:88%;" onblur="adjustTaskTimeFromDate(this.form.start,this.form.end,this.form.duration,this,true,this.form.dependants,this.form.orig_start,this.form.orig_end,$seq);" $extras|
+				});
 
    $var->{'form.dependants'} = WebGUI::Form::integer($session,{
-		                                                -name=>"dependants",
-														-value=>$dependant || "",
-														-defaultValue=>"",
-														-size=>4,
-														-maxlength=>10, 
-														-extras=>qq|style="width:50%;" onchange="validateDependant(this,this.form.orig_dependant,'$seq',this.form.start,this.form.end,this.form.duration,true,true,this.form.orig_start,this.form.orig_end);"|
-													   });
+				-name=>"dependants",
+				-value=>$dependant || "",
+				-defaultValue=>"",
+				-size=>4,
+				-maxlength=>10, 
+				-extras=>qq|style="width:50%;" onchange="validateDependant(this,this.form.orig_dependant,'$seq',this.form.start,this.form.end,this.form.duration,true,true,this.form.orig_start,this.form.orig_end);"|
+				});
+
    tie my %users, "Tie::IxHash";
    %users = $db->buildHash("select userId,username from users where userId not in (1,3)");
    %users = (""=>$i18n->get("resource none"),%users);
    $var->{'form.resource'} = WebGUI::Form::selectBox($session, {
-                                                         -name=>"resource",
-														 -options=>\%users,
-														 -value=>[$task->{resourceId}],
-														 -extras=>$extras
-													   });
+				-name=>"resource",
+				-options=>\%users,
+				-value=>[$task->{resourceId}],
+				-extras=>$extras
+				});
    $var->{'form.milestone'} = WebGUI::Form::checkbox($session, {
-                                                         -name=>"milestone",
-														 -value=>1,
-														 -checked=>$task->{isMilestone},
-														 -extras=>q|onclick="configureMilestone(this)"|
-													});
+				-name=>"milestone",
+				-value=>1,
+				-checked=>$task->{isMilestone},
+				-extras=>q|onclick="configureMilestone(this)"|
+				});
    $var->{'form.percentComplete'} = WebGUI::Form::float($session, {
-                                                         -name=>"percentComplete",
-														 -value=>$task->{percentComplete},
-														 -extras=>$extras
-												
-													});
+				-name=>"percentComplete",
+				-value=>$task->{percentComplete},
+				-extras=>$extras
+				});
    $var->{'form.save'} = WebGUI::Form::submit($session, { 
-                                                            -value=>"Save", 
-															-extras=>q|name="subbutton"| 
-														   });													   	
-   $var->{'form.footer'} = WebGUI::Form::formFooter($session);
-   
-   $var->{'extras'} = $config->get("extrasURL");
-   
-   return $self->processTemplate($var,$self->getValue("editTaskTemplateId"))
+				-value=>"Save", 
+				-extras=>q|name="subbutton"| 
+				});													   	
+$var->{'form.footer'} = WebGUI::Form::formFooter($session);
+
+$var->{'extras'} = $config->get("extrasURL");
+
+return $self->processTemplate($var,$self->getValue("editTaskTemplateId"))
 }
 
 #-------------------------------------------------------------------
 sub www_editTaskSave {
-   my $self = shift;
-   my $var = {};
-   #Set Method Helpers
-   my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
-   my $config = $session->config;
-   
-   my $projectId = $form->get("projectId");
-   my $project = $db->quickHashRef("select * from PM_project where projectId=".$db->quote($projectId));
-   
-   #Check Privileges
-   return $privilege->insufficient unless ($user->isInGroup($project->{projectManager}));
+my $self = shift;
+my $var = {};
+#Set Method Helpers
+my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
+my $config = $session->config;
+
+my $projectId = $form->get("projectId");
+my $project = $db->quickHashRef("select * from PM_project where projectId=".$db->quote($projectId));
+
+#Check Privileges
+return $privilege->insufficient unless ($user->isInGroup($project->{projectManager}));
    
    my $isMilestone = $form->process("milestone","checkbox");
    
