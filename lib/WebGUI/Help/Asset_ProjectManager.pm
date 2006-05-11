@@ -34,6 +34,58 @@ our $HELP = {
                         },
 		],
 		related => [
+                        {
+                                tag => 'project add/edit',
+                                namespace => 'Asset_ProjectManager',
+                        },
+		],
+	},
+
+	'project add/edit' => {
+		title => 'edit project',
+		body => 'project edit body',
+		fields => [
+                        {
+                                title => 'project id',
+                                description => 'project id',
+                                namespace => 'Asset_ProjectManager',
+                        },
+                        {
+                                title => 'project name label',
+                                description => 'project name hoverhelp',
+                                namespace => 'Asset_ProjectManager',
+                        },
+                        {
+                                title => 'project description label',
+                                description => 'project description hoverhelp',
+                                namespace => 'Asset_ProjectManager',
+                        },
+                        {
+                                title => 'project manager label',
+                                description => 'project manager hoverhelp',
+                                namespace => 'Asset_ProjectManager',
+                        },
+                        {
+                                title => 'duration units label',
+                                description => 'duration units hoverhelp',
+                                namespace => 'Asset_ProjectManager',
+                        },
+                        {
+                                title => 'hours per day label',
+                                description => 'hours per day hoverhelp',
+                                namespace => 'Asset_ProjectManager',
+                        },
+                        {
+                                title => 'target budget label',
+                                description => 'target budget hoverhelp',
+                                namespace => 'Asset_ProjectManager',
+                        },
+		],
+		related => [
+                        {
+                                tag => 'project manager add/edit',
+                                namespace => 'Asset_ProjectManager',
+                        },
 		],
 	},
 

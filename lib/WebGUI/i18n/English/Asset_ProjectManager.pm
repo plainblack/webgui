@@ -70,6 +70,11 @@ our $I18N = {
 		message => q|Project Id|,
 		lastUpdated => 0
 		},
+	 
+	 'project id hoverhelp' => {
+		message => q|A unique identifier used internally by WebGUI to reference this project.|,
+		lastUpdated => 0
+		},
 
 	 'project name hoverhelp' => {
 		message => q|Enter the name of the project|,
@@ -112,7 +117,7 @@ our $I18N = {
 		},
 
 	 'duration units hoverhelp' => {
-		message => q|Choose the unit by which you wish to track a project.  This will determine how you will enter the time each task takes.|,
+		message => q|Choose the unit of time by which you wish to track a project.  This will determine how you will enter the time each task takes.|,
 		lastUpdated => 0
 		},
 	 
@@ -346,8 +351,8 @@ our $I18N = {
 		lastUpdated => 0
 		},
 		
-	 '' => {
-		message => q||,
+	 'project edit body' => {
+		message => q|<p>In the Edit Project screen, you will define a new project or edit an existing project by giving general information about the project, including a name, a description, the group of users who are allowed to manage the project and the target budget.</p>|,
 		lastUpdated => 0
 		},
 		

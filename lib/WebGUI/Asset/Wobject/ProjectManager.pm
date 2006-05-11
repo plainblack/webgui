@@ -288,8 +288,9 @@ sub www_editProject {
                -value=>$projectId 
    );
    $f->readOnly(
-               -label=>$i18n->get("project id"),
-			   -value=>$projectId
+		-label=>$i18n->get("project id"),
+		-hoverHelp => $i18n->get('project name hoverhelp'),
+		-value=>$projectId
    );
    $f->text(
 		   -name  => "name",
