@@ -140,6 +140,16 @@
    Kamerbeek / Procolix)
  - fix [ 1480536 ] "Add Files" link in Folder template doesn't work (Martin
    Kamerbeek / Procolix)
+ - fix [ 1443373 ] 6.8.7 Events Calendar Dates Incorrect (Wouter van Oijen /
+   ProcoliX)
+ - fix [ 1444918 ] 6.8.7 Events Calendar - Year old events show in list view
+   (Wouter van Oijen / ProcoliX)
+ - fix [ 1452552 ] Events Calendar starting from the wrong day with Now!
+   (Wouter van Oijen / ProcoliX)
+ - fix [ 1452719 ] Event calendar, wrong day of week for date (Wouter van Oijen
+   / ProcoliX)
+ - fix [ 1470410 ] Problems with Calendar (Wouter van Oijen / ProcoliX)
+ - fixed a caching bug for Events Calendar (Wouter van Oijen / ProcoliX)
  - Added a graphing engine and tied it into the Poll asset (Martin Kamerbeek / Procolix)
  - Added Slider form controls (IntSlider, HexSlider and SelectSlider) (Martin
    Kamerbeek / Procolix)

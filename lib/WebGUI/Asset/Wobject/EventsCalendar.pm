@@ -231,282 +231,316 @@ sub purgeCache {
 
 #-------------------------------------------------------------------
 sub view {
-	my $self = shift;  
-	if ($self->session->user->userId eq '1' && !$self->session->form->process("calMonthStart") && !$self->session->form->process("calMonthEnd")) {
-		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
+	my $self = shift;
+	my $session = $self->session;
+
+	# Cache lookup for visitors with default view only
+	my $t_calMonthStart = $session->form->process('calMonthStart');
+	my $t_calMonthEnd = $session->form->process('calMonthEnd');
+	if ($session->user->userId eq '1' && !$t_calMonthStart && !$t_calMonthEnd) {
+		my $out = WebGUI::Cache->new($session, 'view_'.$self->getId)->get;
 		return $out if $out;
 	}
-	my $i18n = WebGUI::International->new($self->session,"Asset_EventsCalendar");
-	#define default view month range.  Note that this could be different from 
-	#the range a user is allowed to view - set by the events calendar limitations.
-	my $monthRangeLength = int($self->get("paginateAfter"));
-	# Let's limit the range to 72 for now; later we can make it definable in the calendar itself.
-	$monthRangeLength = 1 if ($monthRangeLength < 0);
-	$monthRangeLength = 72 if ($monthRangeLength > 72);
-	#monthRangeLength is the number of months the user wishes to view
-	# or the default number of the months per page the wobject is set to display.
-	my $calMonthStart = $self->session->form->process("calMonthStart") || 1;
-	$calMonthStart = int($calMonthStart);
-	my $calMonthEnd = $self->session->form->process("calMonthEnd") || ($calMonthStart + $monthRangeLength - 1);
-	$calMonthEnd = int($calMonthEnd);
-	$calMonthEnd =  ($calMonthStart + 72) if ($calMonthStart < $calMonthEnd - 72);
-	$calMonthEnd = $calMonthStart if ($calMonthEnd < $calMonthStart);
-	#used for pagination
-	$monthRangeLength = $calMonthEnd - $calMonthStart + 1;
 
-	my ( $junk, $sameDate, $p, @list, $date, $flag, %previous, $maxDate, $minDate);  
-	my $monthloop;
-	my $scope = $self->getValue("scope");
-	my $children;
-	if ($scope == 0) { #calendar's scope is regular (immediate descendants)
-		$children = $self->getLineage(["children"],{returnObjects=>1,
-			includeOnlyClasses=>["WebGUI::Asset::Event"]});
-	} elsif ($scope == 2) { #calendar is master
-		$children = $self->getLineage(["descendants"],{returnObjects=>1,
-			includeOnlyClasses=>["WebGUI::Asset::Event"]});
-	} elsif ($scope == 1) { #calendar is global
-		$children = WebGUI::Asset::getRoot($self->session)->getLineage(["descendants"],{returnObjects=>1,
-			includeOnlyClasses=>["WebGUI::Asset::Event"]}); 
+	my $i18n = WebGUI::International->new($session, 'Asset_EventsCalendar');
+	my $dt = $session->datetime;
+	my $now = $dt->time();
+	my ($startOfDay, $dummy) = $dt->dayStartEnd($now);
+	my ($startOfMonth, $endOfMonth) = $dt->monthStartEnd($now);
+
+	# Get events
+	my $scope = $self->get('scope');
+	my $events;
+	if ($scope == 0) { # Calendar Scope is Regular
+		$events = $self->getLineage(['children'],
+			{returnObjects=>1,includeOnlyClasses=>['WebGUI::Asset::Event']});
+	} elsif ($scope == 2) { # Calendar Scope is Master
+		$events = $self->getLineage(['descendants'],
+			{returnObjects=>1,includeOnlyClasses=>['WebGUI::Asset::Event']});
+	} elsif ($scope == 1) { # Calendar Scope is Global
+		$events = WebGUI::Asset::getRoot($session)->getLineage(['descendants'],
+			{returnObjects=>1,includeOnlyClasses=>['WebGUI::Asset::Event']});
 	}
 
-	my $startMonth = $self->getValue("startMonth");
-	#define range of allowed months from the wobject settings.
-	if ($startMonth eq "first") {
-		#Don't really do anything - leading months will not be pushed if there are no events.
-		$minDate = $self->session->datetime->time();
-	} elsif ($startMonth eq "january") {
-		$minDate = $self->session->datetime->humanToEpoch($self->session->datetime->epochToHuman("","%y")."-01-01 00:00:00");
+	# Get first/last event date
+	my $firstEventDate = 2147483647; # far into the future (~2038)
+	my $lastEventDate = 0;           # far into the past (~1970)
+	foreach my $event (@{$events}) {
+		my $eventStartDate = $event->get('eventStartDate');
+		my $eventEndDate = $event->get('eventEndDate');
+
+		# ignore events we can't view
+		next unless $event->canView;
+
+		# update first and last event date
+		$firstEventDate = $eventStartDate if ($eventStartDate < $firstEventDate);
+		$lastEventDate = $eventEndDate if ($eventEndDate > $lastEventDate);
+	}
+	# Check if no events were found
+	if ($lastEventDate == 0) {
+		# set first and last event date to now, to prevent an
+		# empty calendar to start at somewhere in 2038
+		$firstEventDate = $now;
+		$lastEventDate = $now;
+	}
+
+	# Set limits for event filter (minDate/maxDate)
+	my $t_startMonth = $self->get('startMonth');
+	my $minDate;
+	if ($t_startMonth eq 'first') {
+		# choose start of day, to make comparisons later on easier
+		($minDate, $dummy) = $dt->dayStartEnd($firstEventDate);
+	} elsif ($t_startMonth eq 'now') {
+		$minDate = $now;
+	} elsif ($t_startMonth eq 'today') {
+		$minDate = $startOfDay;
+	} elsif ($t_startMonth eq 'current') {
+		$minDate = $startOfMonth;
+	} elsif ($t_startMonth eq 'january') {
+		$minDate = $dt->humanToEpoch($dt->epochToHuman($now, '%y-01-01 00:00:00'));
+	}
+
+	my $t_endMonth = $self->get('endMonth');
+	my $maxDate;
+	if ($t_endMonth eq 'last') {
+		# choose end of day, to make comparisons later on easier
+		($dummy, $maxDate) = $dt->dayStartEnd($lastEventDate);
+	} elsif ($t_endMonth eq 'after12') {
+		$maxDate = $dt->addToDate($minDate, 0, 12, 0) - 1;
+	} elsif ($t_endMonth eq 'after9') {
+		$maxDate = $dt->addToDate($minDate, 0, 9, 0) - 1;
+	} elsif ($t_endMonth eq 'after6') {
+		$maxDate = $dt->addToDate($minDate, 0, 6, 0) - 1;
+	} elsif ($t_endMonth eq 'after3') {
+		$maxDate = $dt->addToDate($minDate, 0, 3, 0) - 1;
+	} elsif ($t_endMonth eq 'current') {
+		$maxDate = $endOfMonth;
+	}
+
+	# Filter events
+	my %filteredEvents;
+	my $previousDate;
+	foreach my $event (@{$events}) {
+		my $eventStartDate = $event->get('eventStartDate');
+		my $eventEndDate = $event->get('eventEndDate');
+
+		# ignore events we're not allowed to see
+		next unless $event->canView;
+		next if ($eventStartDate > $maxDate);
+		next if ($eventEndDate < $minDate);
+
+		# get date/time info
+		my ($startYear, $startMonth, $startDay, $startDateHuman, $startTimeHuman, $startDayOfWeek, $startM) =
+				split '_', $dt->epochToHuman($eventStartDate, '%y_%c_%D_%z_%Z_%w_%M');
+		my ($endYear, $endMonth, $endDay, $endDateHuman, $endTimeHuman, $endDayOfWeek) =
+				split '_', $dt->epochToHuman($eventEndDate, '%y_%c_%D_%z_%Z_%w');
+		# remove leading space before startDay
+		$startDay =~ s/ (.*)/$1/;
+
+		# set first and last day to start of those days (to make comparison of days easier)
+		my ($firstDay, $lastDay);
+		($firstDay, $dummy) = $dt->dayStartEnd($eventStartDate);
+		($lastDay, $dummy) = $dt->dayStartEnd($eventEndDate);
+
+		# quick & dirty way to count number of days in the interval
+		my $daysInEvent = 0;
+		for (my $day = $firstDay; $day <= $lastDay; $day = $dt->addToDate($day, 0, 0, 1)) {
+			$daysInEvent++;
+		}
+		# add event to each day it takes place
+		for (my $day = $firstDay; $day <= $lastDay; $day = $dt->addToDate($day, 0, 0, 1)) {
+			next if ($day < $minDate);
+			next if ($day > $maxDate);
+			push (@{$filteredEvents{$day}}, {
+				'description'          => $event->get('description'),
+				'name'                 => $event->get('title'),
+				'start.date.human'     => $startDateHuman,
+				'start.time.human'     => $startTimeHuman,
+				'start.date.epoch'     => $eventStartDate,
+				'start.year'           => $startYear,
+				'start.month'          => $startMonth,
+				'start.day'            => $startDay,
+				'start.day.dayOfWeek'  => $startDayOfWeek,
+				'end.date.human'       => $endDateHuman,
+				'end.time.human'       => $endTimeHuman,
+				'end.date.epoch'       => $eventEndDate,
+				'end.year'             => $endYear,
+				'end.month'            => $endMonth,
+				'end.day'              => $endDay,
+				'end.day.dayOfWeek'    => $endDayOfWeek,
+				'startEndYearMatch'    => ($startYear eq $endYear),
+				'startEndMonthMatch'   => ($startYear eq $endYear) && ($startMonth eq $endMonth),
+				'startEndDayMatch'     => ($firstDay eq $lastDay),
+				'isFirstDayOfEvent'    => $day == $firstDay,
+				'dateIsSameAsPrevious' => "$firstDay-$lastDay" eq $previousDate,
+				'daysInEvent'          => $daysInEvent,
+				'url'                  => $event->getUrl()
+			});
+		}
+		$previousDate = "$firstDay-$lastDay";
+		# NOTE: This currently does not work as intended, because the
+		# events are not sorted. This still has to be done.
+	}
+
+	# Set view range
+	my $firstMonth;
+	if (defined $t_calMonthStart) {
+		$firstMonth = $dt->addToDate($startOfMonth, 0, int($t_calMonthStart), 0);
 	} else {
-		$minDate = $self->session->datetime->time();
-	}
-	my $startsNow = 0;
-	unless ($self->get("startMonth") eq "now") {
-		($minDate,$junk) = $self->session->datetime->monthStartEnd($minDate);
-	} else { $startsNow = 1;}
-	tie %previous, 'Tie::CPHash'; 
-	#This merely limits the months to publish.  Month's processing is skipped if 
-	#the month is after the maxDate.
-	my $endMonth = $self->getValue("endMonth");
-	if ($endMonth eq "last") {
-		$maxDate = $self->session->datetime->addToDate($minDate,99,0,0);
-	} elsif ($endMonth eq "after12") {
-		$maxDate = $self->session->datetime->addToDate($minDate,1,0,0); 
-	} elsif ($endMonth eq "after9") {
-		$maxDate = $self->session->datetime->addToDate($minDate,0,9,0); 
-	} elsif ($endMonth eq "after6") {
-		$maxDate = $self->session->datetime->addToDate($minDate,0,6,0); 
-	} elsif ($endMonth eq "after3") {
-		$maxDate = $self->session->datetime->addToDate($minDate,0,3,0);
-	} elsif ($endMonth eq "current") {
-		$maxDate = $self->session->datetime->addToDate($minDate,0,1,0);
-	}
-	#$self->session->errorHandler->warn("calMonthStart:".$calMonthStart." calMonthEnd:".$calMonthEnd);
-	my @now = $self->epochToArray($self->session->datetime->time());
-	my $calHasEvent = 0;
-	#monthcount minus i is the number of months remaining to be processed.
-	for (my $i=$calMonthStart;$i<=$calMonthEnd;$i++) {
-		#for each month, do the following....
-		my $monthHasEvent = 0;
-		my $thisMonth = $self->session->datetime->addToDate($minDate,0,($i-1),0);
-		my ($monthStart, $monthEnd) = $self->session->datetime->monthStartEnd($thisMonth);
-		my @thisMonthDate = $self->epochToArray($thisMonth);
-		#Check month to see if it is in the allowed month range. End loop if it's not.
-		if ($thisMonth > $maxDate) {
-			$i = $calMonthEnd;
-			next;
+		my $t_defaultMonth = $self->get('defaultMonth');
+		if ($t_defaultMonth eq 'first') {
+			($firstMonth, $dummy) = $dt->monthStartEnd($firstEventDate);
+		} elsif ($t_defaultMonth eq 'last') {
+			($firstMonth, $dummy) = $dt->monthStartEnd($lastEventDate);
+		} else { # 'current'
+			$firstMonth = $startOfMonth; # $dt->monthStartEnd($now);
 		}
-		
-		my %events;
-		my %previous;
+	}
 
-		foreach my $event (@{$children}) {
-			if (ref $event eq "WebGUI::Asset::Event") {
-				my $eventStartDate = $event->get("eventStartDate");
-				my $eventEndDate = $event->get("eventEndDate");
-				if ($eventStartDate > $eventEndDate) {
-					#Fix bad data.  Everything that has a beginning must have an end [no earlier than its beginning].
-					$event->update({ "eventEndDate"=>$eventStartDate });
-				}
-				#Prune events that don't appear in this month.
-				next if (($eventStartDate > $monthEnd) || ($eventEndDate < $monthStart));
-				#Prune events that have already ended if $startsNow
-				next if (($eventEndDate < $minDate) && $startsNow);
-				#Hide this event unless we are allowed to see it.  Funny that each event has 4 date/time pairs.
-				next unless $event->canView; 
-				my $eventLength = $self->session->datetime->getDaysInInterval($eventStartDate,$eventEndDate);
-				my ($startYear, $startMonth, $startDay, $startDate, $startTime, $startAmPm, $startDayOfWeek) = split " ", 
-					$self->session->datetime->epochToHuman($eventStartDate, "%y %c %D %z %Z %w");
-				my ($endYear, $endMonth, $endDay, $endDate, $endTime, $endAmPm, $endDayOfWeek) = split " ", 
-					$self->session->datetime->epochToHuman($eventEndDate, "%y %c %D %z %Z %w");
-				my $eventCycleStart = 0;
-				# Fast-Forward Event Cycle to this month (for events spanning multiple months)
-				$eventCycleStart = ($self->session->datetime->getDaysInInterval($eventStartDate,$monthStart) - 1) if ($eventStartDate < $monthStart);
-				# also, skip leading days of this event if $startsNow is true.  Doesn't work in Events List.  Oh well.
-		#		$eventCycleStart = ($self->session->datetime->getDaysInInterval($eventStartDate,time)) if (($eventStartDate < time) && ($startsNow));
-				# by default, stop processing this event at the end of its length.
-				my $eventCycleStop = ($eventLength);
-				#cycle through each day in the event, pushing the event's day listing into the proper day.
-				for (my $i=$eventCycleStart; $i<=$eventCycleStop; $i++) {
-					#create an array for the specific day in the event.
-					my @date = $self->epochToArray($self->session->datetime->addToDate($eventStartDate,0,0,$i));
-					# if the event goes past the end of this month, halt the loop.  
-					# No need to continue processing days that aren't in this month.
-					if ($monthEnd < ($self->session->datetime->addToDate($eventStartDate,0,0,$i) - 1)) {
-						$i = ($eventCycleStop + 2);
-						next;
-					}
-					#this conditional used to only test if we are in the proper month... 
-					#Now also test to see if we're at the maxDate yet and after the minDate.
-					if (($date[1] == $thisMonthDate[1])  && ($self->session->datetime->addToDate($eventStartDate,0,0,$i) <= ($maxDate + 2678400))){
-						push(@{$events{$date[2]}}, {
-							description=>$event->get("description"),
-							name=>$event->get("title"),
-							'start.date.human'=>$startDate,
-							'start.time.human'=>$startTime." ".$startAmPm,
-							'start.date.epoch'=>$eventStartDate,
-							'start.year'=>$startYear,
-							'start.month'=>$startMonth,
-							'start.day'=>$startDay,
-							'start.day.dayOfWeek'=>$startDayOfWeek,
-							'end.date.human'=>$endDate,
-							'end.time.human'=>$endTime." ".$endAmPm,
-							'end.date.epoch'=>$eventEndDate,
-							'end.year'=>$endYear,
-							'end.month'=>$endMonth,
-							'end.day'=>$endDay,
-							'end.day.dayOfWeek'=>$endDayOfWeek,
-							'startEndYearMatch'=>($startYear eq $endYear),
-							'startEndMonthMatch'=>($startMonth eq $endMonth),
-							'startEndDayMatch'=>($startDay eq $endDay),
-							isFirstDayOfEvent=>($i == 0),
-							dateIsSameAsPrevious=>($startYear."-".$startMonth."-".$startDay eq $previous{start} 
-								&& $endYear."-".$endMonth."-".$endDay eq $previous{end}),
-							daysInEvent=>($eventLength+1),
-							url=>$event->getUrl()
-						});
-						$monthHasEvent = 1;
-						$calHasEvent = 1;
-					}
-				}
+	my $lastMonth;
+	if (defined $t_calMonthEnd) {
+		$lastMonth = $dt->addToDate($startOfMonth, 0, int($t_calMonthEnd), 0);
+	} else {
+		$lastMonth = $dt->addToDate($firstMonth, 0, int($self->get('paginateAfter'))-1, 0);
+	}
 
-				$previous{start} = $startYear."-".$startMonth."-".$startDay;
-				$previous{end} = $endYear."-".$endMonth."-".$endDay;
-			}
-		}
-	#	if (($startsNow || ($startMonth eq "first")) && ($calHasEvent == 0)) {
-			#Let's process an extra month if this month had no events, 
-			#and if we're at the beginning of the calendar, and if 
-			#the calendar is supposed to start with the first event or now.
-	#		$calMonthEnd++ unless $monthHasEvent;
-	#		next unless $monthHasEvent;
-	#	}
-		my $dayOfWeekCounter = 1;
-		my $firstDayInFirstWeek = $self->session->datetime->getFirstDayInMonthPosition($thisMonth);
-		my $daysInMonth = $self->session->datetime->getDaysInMonth($thisMonth);
+	# Sanity checks
+	$lastMonth = $firstMonth if ($lastMonth < $firstMonth);
+	$lastMonth = $dt->addToDate($firstMonth, 3, 0, 0) if $dt->monthCount($firstMonth, $lastMonth) > 72;
+
+	# Set first/last day of week, depending on user profile
+	my ($userFirstDayOfWeek, $userLastDayOfWeek);
+	if ($session->user->profileField('firstDayOfWeek')) {
+		$userFirstDayOfWeek = 1;
+		$userLastDayOfWeek = 7;
+	} else {
+		$userFirstDayOfWeek = 7;
+		$userLastDayOfWeek = 6;
+	}
+	# Process the months that will be displayed
+	my $monthloop;
+	for (my $month = $firstMonth; $month <= $lastMonth; $month = $dt->addToDate($month, 0, 1, 0)) {
+		my $daysInMonth = $dt->getDaysInMonth($month);
+		my ($year, $monthName) = split(' ', $dt->epochToHuman($month, '%y %c'));
+
+		# Generate prepad
 		my @prepad;
-		while (($dayOfWeekCounter <= $firstDayInFirstWeek) and $firstDayInFirstWeek != 7) {
-			push(@prepad,{
-				count => $dayOfWeekCounter
-			});
-			$dayOfWeekCounter++;
-		}
-		my @date = $self->epochToArray($thisMonth);
-		my @dayloop;
-		for (my $dayCounter=1; $dayCounter <= $daysInMonth; $dayCounter++) {
-			#----------------------------------------------------------------------------
-			#sort each day's events here - still needs to be done!
-			#----------------------------------------------------------------------------
-			push(@dayloop, {
-				dayOfWeek => $dayOfWeekCounter,
-				day=>$dayCounter,
-				isStartOfWeek=>($dayOfWeekCounter==1),
-				isEndOfWeek=>($dayOfWeekCounter==7),
-				isToday=>($date[0]."-".$date[1]."-".$dayCounter eq $now[0]."-".$now[1]."-".$now[2]),
-				hasEvents=>(exists $events{$dayCounter}),
-				event_loop=>\@{$events{$dayCounter}},
-				url=>$events{$dayCounter}->[0]->{url}
-			});
-			if ($dayOfWeekCounter == 7) {
-				$dayOfWeekCounter = 1;
+		my $firstDayInMonthPosition = $dt->getFirstDayInMonthPosition($month);
+		my $dayOfWeek = $userFirstDayOfWeek;
+		while ($dayOfWeek != $firstDayInMonthPosition) {
+			push(@prepad, { 'count' => $dayOfWeek });
+			if ($dayOfWeek < 7) {
+				$dayOfWeek++;
 			} else {
-				$dayOfWeekCounter++;
+				$dayOfWeek = 1;
 			}
 		}
-		my @postpad;
-		while ($dayOfWeekCounter <= 7 && $dayOfWeekCounter > 1) {
-			push(@postpad,{
-				count => $dayOfWeekCounter
+
+		# Generate dayloop
+		my @dayloop;
+		for (my $d = 1; $d <= $daysInMonth; $d++) {
+			my $day = $dt->addToDate($month, 0, 0, $d-1);
+
+			push(@dayloop, {
+				'dayOfWeek'     => $dayOfWeek,
+				'day'           => $d,
+				'isStartOfWeek' => ($dayOfWeek == $userFirstDayOfWeek),
+				'isEndOfWeek'   => ($dayOfWeek == $userLastDayOfWeek),
+				'isToday'       => ($day == $startOfDay),
+				'hasEvents'     => scalar($filteredEvents{$day}) > 0,
+				'event_loop'    => \@{$filteredEvents{$day}},
+				'url'           => $filteredEvents{$day}->[0]->{url}
 			});
-			$dayOfWeekCounter++;
+
+			if ($dayOfWeek < 7) {
+				$dayOfWeek++;
+			} else {
+				$dayOfWeek = 1;
+			}
 		}
+
+		# Generate postpad
+		my @postpad;
+		while ($dayOfWeek != $userFirstDayOfWeek) {
+			push(@postpad, { 'count' => $dayOfWeek});
+			if ($dayOfWeek < 7) {
+				$dayOfWeek++;
+			} else {
+				$dayOfWeek = 1;
+			}
+		}
+
 		push(@$monthloop, {
-			'daysInMonth'=>$daysInMonth,
-			'day_loop'=>\@dayloop,
-			'prepad_loop'=>\@prepad,
-			'postpad_loop'=>\@postpad,
-			'month'=>$self->session->datetime->getMonthName($date[1]),
-			'year'=>$date[0]
+			'daysInMonth'  => $daysInMonth,
+			'day_loop'     => \@dayloop,
+			'prepad_loop'  => \@prepad,
+			'postpad_loop' => \@postpad,
+			'month'        => $monthName,
+			'year'         => $year
 		});
 	}
+
+	# Set all template variables
 	my %var;
-	$var{month_loop} = \@$monthloop;
 	$var{"addevent.url"} = $self->getUrl().'?func=add;class=WebGUI::Asset::Event';
 	$var{"addevent.label"} = $i18n->get(20);
-	$var{'sunday.label'} = $self->session->datetime->getDayName(7);
-	$var{'monday.label'} = $self->session->datetime->getDayName(1);
-	$var{'tuesday.label'} = $self->session->datetime->getDayName(2);
-	$var{'wednesday.label'} = $self->session->datetime->getDayName(3);
-	$var{'thursday.label'} = $self->session->datetime->getDayName(4);
-	$var{'friday.label'} = $self->session->datetime->getDayName(5);
-	$var{'saturday.label'} = $self->session->datetime->getDayName(6);
-	$var{'sunday.label.short'} = substr($self->session->datetime->getDayName(7),0,1);
-	$var{'monday.label.short'} = substr($self->session->datetime->getDayName(1),0,1);
-	$var{'tuesday.label.short'} = substr($self->session->datetime->getDayName(2),0,1);
-	$var{'wednesday.label.short'} = substr($self->session->datetime->getDayName(3),0,1);
-	$var{'thursday.label.short'} = substr($self->session->datetime->getDayName(4),0,1);
-	$var{'friday.label.short'} = substr($self->session->datetime->getDayName(5),0,1);
-	$var{'saturday.label.short'} = substr($self->session->datetime->getDayName(6),0,1);
+	$var{'sunday.label'} = $dt->getDayName(7);
+	$var{'monday.label'} = $dt->getDayName(1);
+	$var{'tuesday.label'} = $dt->getDayName(2);
+	$var{'wednesday.label'} = $dt->getDayName(3);
+	$var{'thursday.label'} = $dt->getDayName(4);
+	$var{'friday.label'} = $dt->getDayName(5);
+	$var{'saturday.label'} = $dt->getDayName(6);
+	$var{'sunday.label.short'} = substr($dt->getDayName(7),0,1);
+	$var{'monday.label.short'} = substr($dt->getDayName(1),0,1);
+	$var{'tuesday.label.short'} = substr($dt->getDayName(2),0,1);
+	$var{'wednesday.label.short'} = substr($dt->getDayName(3),0,1);
+	$var{'thursday.label.short'} = substr($dt->getDayName(4),0,1);
+	$var{'friday.label.short'} = substr($dt->getDayName(5),0,1);
+	$var{'saturday.label.short'} = substr($dt->getDayName(6),0,1);
+	$var{month_loop} = \@$monthloop;
 	# Create pagination variables.
-	$var{'pagination.pageCount.isMultiple'} = 1 if (($calMonthStart > 1) || ($maxDate > $self->session->datetime->addToDate($minDate,0,($monthRangeLength-1),0)));
-	my $prevCalMonthStart = $calMonthStart - $monthRangeLength;
-	my $nextCalMonthStart = $calMonthStart + $monthRangeLength;
-	my $prevCalMonthEnd = $calMonthEnd - $monthRangeLength;
-	my $nextCalMonthEnd = $calMonthEnd + $monthRangeLength;
+	my $calMonthStart = $dt->getMonthDiff($startOfMonth, $firstMonth);
+	my $calMonthEnd = $dt->getMonthDiff($startOfMonth, $lastMonth);
+	my $monthRangeLength = $calMonthEnd - $calMonthStart + 1;
 	my $monthLabel;
 	if ($monthRangeLength == 1) {
 		$monthLabel = $i18n->get(560);
 	} else {
 		$monthLabel = $i18n->get(561);
 	}
-	$var{'pagination.previousPageUrl'} = 
-		$self->getUrl.'?calMonthStart='.$prevCalMonthStart.';calMonthEnd='.$prevCalMonthEnd;
-	$var{'pagination.previousPage'} = '<form method="GET" style="inline;" action="'.
-		$self->getUrl.'?calMonthStart='.$calMonthStart.
-		';reload='.$self->session->id->generate().'"><a href="'.$self->getUrl.
-		'?calMonthStart='.$prevCalMonthStart.';calMonthEnd='.$prevCalMonthEnd.'">'.
-		$i18n->get(558)." ".$monthRangeLength." ".
-		$monthLabel.'</a>';
-	$var{'pagination.nextPageUrl'} = $self->getUrl.
-		'?calMonthStart='.$nextCalMonthStart.';calMonthEnd='.$nextCalMonthEnd;
-	$var{'pagination.nextPage'} = '<a href="'.$self->getUrl.
-		'?calMonthStart='.$nextCalMonthStart.';calMonthEnd='.$nextCalMonthEnd.'">'.
-		$i18n->get(559)." ".$monthRangeLength." ".
-		$monthLabel.'</a></form>';
-	$var{'pagination.pageList.upTo20'} = '<select size="1" name="calMonthEnd">
-		<option value="'.($calMonthStart).'">1 '.$i18n->get(560).'</option>
-		<option value="'.(1+$calMonthStart).'">2 '.$i18n->get(561).'</option>
-		<option value="'.(2+$calMonthStart).'">3 '.$i18n->get(561).'</option>
-		<option value="'.(3+$calMonthStart).'">4 '.$i18n->get(561).'</option>
-		<option value="'.(5+$calMonthStart).'">6 '.$i18n->get(561).'</option>
-		<option value="'.(8+$calMonthStart).'">9 '.$i18n->get(561).'</option>
-		<option value="'.(11+$calMonthStart).'">12 '.$i18n->get(561).'</option></select>
-		<input type="submit" value="Go" name="Go" />';
-       	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-	if ($self->session->user->userId eq '1' && !$self->session->form->process("calMonthStart") && !$self->session->form->process("calMonthEnd")) {
-		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("visitorCacheTimeout"));
+	$var{'pagination.pageCount.isMultiple'} = 1;
+	$var{'pagination.previousPageUrl'} = $self->getUrl.'?calMonthStart='.$calMonthStart-$monthRangeLength.';calMonthEnd='.$calMonthEnd-$monthRangeLength;
+	$var{'pagination.previousPage'} = '<a href="'.$self->getUrl.'?calMonthStart='.($calMonthStart-$monthRangeLength).';calMonthEnd='.($calMonthEnd-$monthRangeLength).'">'.$i18n->get(558).' '.$monthRangeLength.' '.$monthLabel.'</a>';
+	$var{'pagination.nextPageUrl'} = $self->getUrl.'?calMonthEnd='.$calMonthStart+$monthRangeLength.';calMonthEnd='.$calMonthEnd+$monthRangeLength;
+	$var{'pagination.nextPage'} = '<a href="'.$self->getUrl.'?calMonthStart='.($calMonthStart+$monthRangeLength).';calMonthEnd='.($calMonthEnd+$monthRangeLength).'">'.$i18n->get(559).' '.$monthRangeLength.' '.$monthLabel.'</a>';
+	$var{'pagination.pageList.upTo20'} = '
+	<form method="GET" style="display: inline;" action="'.$self->getUrl.'">
+	<input type="hidden" name="calMonthStart" value="'.$calMonthStart.'">
+	<select size="1" name="calMonthEnd">
+	<option value="'.($calMonthStart).'">1 '.$i18n->get(560).'</option>
+	<option value="'.(1+$calMonthStart).'">2 '.$i18n->get(561).'</option>
+	<option value="'.(2+$calMonthStart).'">3 '.$i18n->get(561).'</option>
+	<option value="'.(3+$calMonthStart).'">4 '.$i18n->get(561).'</option>
+	<option value="'.(5+$calMonthStart).'">6 '.$i18n->get(561).'</option>
+	<option value="'.(8+$calMonthStart).'">9 '.$i18n->get(561).'</option>
+	<option value="'.(11+$calMonthStart).'">12 '.$i18n->get(561).'</option>
+	</select>
+	<input type="submit" value="Go" name="Go" /></form>';
+
+	# Process template
+	my $out = $self->processTemplate(\%var, undef, $self->{_viewTemplate});
+
+	# Store in cache (only if visitor and default view)
+	if ($session->user->userId eq '1' && !$t_calMonthStart && !$t_calMonthEnd) {
+		my $visitorCacheTimeout = $self->get('visitorCacheTimeout');
+		my $timeTillEndOfMonth = $endOfMonth - $now;
+		# Never cache longer than till the end of the month
+		my $ttl = ($visitorCacheTimeout < $timeTillEndOfMonth) ? $visitorCacheTimeout : $timeTillEndOfMonth;
+		WebGUI::Cache->new($session, 'view_'.$self->getId)->set($out, $ttl);
 	}
-       	return $out;
-	
+
+	return $out;
 }
 
 #-------------------------------------------------------------------
