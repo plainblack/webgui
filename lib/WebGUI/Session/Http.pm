@@ -174,23 +174,33 @@ Generates and sends HTTP headers.
 sub sendHeader {
 	my $self = shift;
 	return undef if ($self->{_http}{noHeader});
-	return undef unless $self->session->request;
+	my $request = $self->session->request;
+	return undef unless $request;
 	my %params;
 	if ($self->isRedirect()) {
-		$self->session->request->headers_out->set(Location => $self->{_http}{location});
-		$self->session->request->status(301);
+		$request->headers_out->set(Location => $self->{_http}{location});
+		$request->status(301);
 	} else {
-		$self->session->request->content_type($self->{_http}{mimetype} || "text/html");
+		$request->content_type($self->{_http}{mimetype} || "text/html");
 		my $date = $self->session->datetime->epochToHuman(($self->{_http}{lastModified} || time()), "%W, %d %C %y %j:%m:%s %t");
-		$self->session->request->headers_out->set('Last-Modified' => $date);
-		if ($self->session->setting->get("preventProxyCache")) {
-			$self->setCacheControl(-60*60*24*365);
-		}
+		$request->headers_out->set('Last-Modified' => $date);
+		if ($self->{_http}{cacheControl} eq "none" || $self->session->setting->get("preventProxyCache") || ($self->{_http}{cacheControl} eq "" && $self->session->var->get("userId") ne "1")) {
+			$request->headers_out->set("Cache-Control" => "private");
+			$request->no_cache(1);
+		} elsif ($self->{_http}{cacheControl} ne "" && $request->protocol =~ /(\d\.\d)/ && $1 >= 1.1){
+			my $extras = "";
+			$extras .= ", private" unless ($self->session->var->get("userId") eq "1");
+    			$request->headers_out->set('Cache-Control' => "max-age=" . $self->{_http}{cacheControl}.$extras);
+  		} elsif ($self->{_http}{cacheControl} ne "") {
+			$request->headers_out->set("Cache-Control" => "private") unless ($self->session->var->get("userId") eq "1");
+			my $date = $self->session->datetime->epochToHuman(time() + $self->{_http}{cacheControl}, "%W, %d %C %y %j:%m:%s %t");
+    			$request->headers_out->set('Expires' => $date);
+  		}
 		if ($self->{_http}{filename}) {
-                        $self->session->request->headers_out->set('Content-Disposition' => qq!attachment; filename="$self->{_http}{filename}"!);
+                        $request->headers_out->set('Content-Disposition' => qq!attachment; filename="$self->{_http}{filename}"!);
 		}
 	}
-	$self->session->request->status_line($self->getStatus().' '.$self->{_http}{statusDescription});
+	$request->status_line($self->getStatus().' '.$self->{_http}{statusDescription});
 	return;
 }
 
@@ -223,17 +233,7 @@ Either the number of seconds until the cache expires, or the word "none" to disa
 sub setCacheControl {
 	my $self = shift;
 	my $timeout = shift;
-	my $request = $self->session->request;
-	if (defined $request) {
-		if ($timeout eq "none" || $self->session->setting->get("preventProxyCache")) {
-			$self->session->request->no_cache(1);
-		} elsif ($request->protocol =~ /(\d\.\d)/ && $1 >= 1.1){
-    			$request->headers_out->set('Cache-Control' => "max-age=" . $timeout);
-  		} else {
-			my $date = $self->session->datetime->epochToHuman(time() + $timeout, "%W, %d %C %y %j:%m:%s %t");
-    			$request->headers_out->set('Expires' => $date);
-  		}
-	}
+	$self->{_http}{cacheControl};
 }
 
 #-------------------------------------------------------------------
@@ -362,9 +362,11 @@ The URL to redirect to.
 
 sub setRedirect {
 	my $self = shift;
-	$self->{_http}{location} = shift;
+	my $url = shift;
+	return undef if ($url eq $self->session->url->page()); # prevent redirecting to self
+	$self->{_http}{location} = $url;
 	$self->setStatus("302", "Redirect");
-	$self->session->style->setMeta({"http-equiv"=>"refresh",content=>"0; URL=".$self->{_http}{location}});
+	$self->session->style->setMeta({"http-equiv"=>"refresh",content=>"0; URL=".$url});
 }
 
 

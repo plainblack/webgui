@@ -184,7 +184,7 @@ if ($self->session->user->isInGroup(2)) {
 	# This "triple incantation" panders to the delicate tastes of various browsers for reliable cache suppression.
 	$var{'head.tags'} .= '
 <meta http-equiv="Pragma" content="no-cache" />
-<meta http-equiv="Cache-Control" content="no-cache, must-revalidate, max-age=0" />
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate, max-age=0, private" />
 <meta http-equiv="Expires" content="0" />
 ';
 	$self->session->http->setCacheControl("none");
