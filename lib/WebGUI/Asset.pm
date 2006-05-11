@@ -1441,14 +1441,16 @@ sub www_editSave {
 		$self->addVersionTag;
 	}
 	if ($session{form}{assetId} eq "new") {
-		$object = $self->addChild({className=>$session{form}{class}});	
+		my $className = $session{form}{class};
+		$className =~ s/[^\w:]//g;
+		$object = $self->addChild({className=>$className});	
 		$object->{_parent} = $self;
 	} else {
 		if ($self->canEditIfLocked || !$self->isLocked) {
-                        $object = $self->addRevision;
-                } else {
-                        return $self->getContainer->www_view;
-                }
+			$object = $self->addRevision;
+		} else {
+			return $self->getContainer->www_view;
+		}
 	}
 	$object->processPropertiesFromFormPost;
 	$object->updateHistory("edited");
