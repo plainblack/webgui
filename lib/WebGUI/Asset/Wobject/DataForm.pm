@@ -873,8 +873,10 @@ sub www_editFieldSave {
 	$session{form}{name} = $session{form}{label} if ($session{form}{name} eq "");
 	$session{form}{tid} = "0" if ($session{form}{tid} eq "");
 	$session{form}{name} = WebGUI::URL::urlize($session{form}{name});
-        $session{form}{name} =~ s/\-//g;
-        $session{form}{name} =~ s/\///g;
+	$session{form}{name} =~ s/\-//g;
+	$session{form}{name} =~ s/\///g;
+	my $formType = $session{form}{type};
+	$formType =~ s/[^\w:]//g;
 	$self->setCollateral("DataForm_field","DataForm_fieldId",{
 		DataForm_fieldId=>$session{form}{fid},
 		width=>$session{form}{width},
@@ -882,7 +884,7 @@ sub www_editFieldSave {
 		label=>$session{form}{label},
 		DataForm_tabId=>$session{form}{tid},
 		status=>$session{form}{status},
-		type=>$session{form}{type},
+		type=>$formType,
 		possibleValues=>$session{form}{possibleValues},
 		defaultValue=>$session{form}{defaultValue},
 		subtext=>$session{form}{subtext},
@@ -895,11 +897,11 @@ sub www_editFieldSave {
 					" where DataForm_fieldId=".quote($session{form}{fid}));
 	}
 	$self->reorderCollateral("DataForm_field","DataForm_fieldId", _tonull("DataForm_tabId",$session{form}{tid})) if ($session{form}{fid} ne "new");
-        if ($session{whatNext} eq "editField" || $session{form}{proceed} eq "editField") {
-            $session{form}{fid} = "new";
-            return $self->www_editField;
-        }
-        return "";
+	if ($session{whatNext} eq "editField" || $session{form}{proceed} eq "editField") {
+		$session{form}{fid} = "new";
+		return $self->www_editField;
+	}
+	return "";
 }
 
 #-------------------------------------------------------------------
