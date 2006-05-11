@@ -2291,12 +2291,12 @@ sub saveRegistration {
 		}
 		$counter++;	
 	}	
-	if ($self->session->form->get('checkoutNow')) {
-	   srand;
-	   $self->session->http->setRedirect($self->getUrl("op=viewCart;something=".rand(44345552)));
-	}
-	return 1 if $self->session->form->get('checkoutNow');
-	return "";
+#	if ($self->session->form->get('checkoutNow')) {
+#	   srand;
+#	   $self->session->http->setRedirect($self->getUrl("op=viewCart;something=".rand(44345552)));
+#	}
+#	return 1 if $self->session->form->get('checkoutNow');
+	return $self->www_view;
 }
 
 #-------------------------------------------------------------------
@@ -2307,7 +2307,7 @@ sub www_resetScratchCart {
 	$self->session->scratch->delete('EMS_add_purchase_events');
 	$self->session->scratch->delete('currentMainEvent');
 	$self->session->scratch->delete('currentBadgeId');
-	return "";
+	return $self->www_view;
 }
 #-------------------------------------------------------------------
 sub www_saveRegistrantInfo {
