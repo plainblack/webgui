@@ -320,6 +320,7 @@ sub www_view {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless ($self->canView);
 	$self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->userId eq "1");
+	$self->prepareView;
 	return $self->session->style->process($self->view,$self->getParent->getValue("styleTemplateId"));
 }
 
