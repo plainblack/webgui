@@ -143,6 +143,7 @@
  - Added a graphing engine and tied it into the Poll asset (Martin Kamerbeek / Procolix)
  - Added Slider form controls (IntSlider, HexSlider and SelectSlider) (Martin
    Kamerbeek / Procolix)
+ - Fixed a number of bugs in DateTime.pm
 
 6.8.8
  - fix [ 1452466 ] File size not set in File asset (Thanks to Eric S)
