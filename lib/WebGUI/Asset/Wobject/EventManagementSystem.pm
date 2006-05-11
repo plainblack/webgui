@@ -2269,7 +2269,7 @@ sub saveRegistration {
 	foreach my $eventId (@$eventsInCart) {
 		next if isIn($eventId,@addingToPurchase);
 		next if isIn($eventId,@badgeEvents);
-		$my $registrationId = $self->setCollateral("EventManagementSystem_registrations", "registrationId",{
+		my $registrationId = $self->setCollateral("EventManagementSystem_registrations", "registrationId",{
 			registrationId  => "new",
 			purchaseId	 => $purchaseId,
 			productId	 => $eventId,
