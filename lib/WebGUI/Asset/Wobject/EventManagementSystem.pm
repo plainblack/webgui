@@ -258,16 +258,15 @@ sub _getAllEvents {
 sub addToScratchCart {
 	my $self = shift;
 	my $event = shift;
-
-	my @eventsInCart = split("\n",$self->session->scratch->get('EMS_scratch_cart'));
+	my $scratchCart = $self->session->scratch->get('EMS_scratch_cart');
+	my @eventsInCart = split("\n",$scratchCart);
 	my ($isApproved) = $self->session->db->quickArray("select approved from EventManagementSystem_products where productId = ?",[$event]);
 	return undef unless $isApproved;
-	if (scalar(@eventsInCart) == 0) {
+	unless (scalar(@eventsInCart) || $scratchCart) {
 		# the cart is empty, so check if this is a master event or not.
-		my ($isParent) = $self->session->db->quickArray("select productId from EventManagementSystem_products where productId = ? and (prerequisiteId is NULL or prerequisiteId = '')",[$event]);
-		return undef unless $isParent;
+		my ($isChild) = $self->session->db->quickArray("select prerequisiteId from EventManagementSystem_products where productId = ?",[$event]);
+		return undef if $isChild;
 		$self->session->scratch->set('currentMainEvent',$event);
-
 		$self->session->scratch->set('EMS_scratch_cart', $event);
 		return $event;
 	}
@@ -1332,7 +1331,7 @@ sub www_addToScratchCart {
 	my $masterEventId = $self->session->form->get("mid");
 	
 	my $mainEvent = $self->addToScratchCart($pid); #tsc
-	return $self->session->style->process($self->processTemplate($self->getRegistrationInfo(),$self->getValue("checkoutTemplateId")),$self->getValue("styleTemplateId")) if $mainEvent;
+	return $self->session->style->process($self->processTemplate($self->getRegistrationInfo(),$self->getValue("checkoutTemplateId")),$self->getValue("styleTemplateId")) if $masterEventId eq $pid;
 	return $self->www_search($nameOfEventAdded);
 }
 
