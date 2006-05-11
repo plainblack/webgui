@@ -965,6 +965,18 @@ sub removeFromScratchCart {
 }
 
 #------------------------------------------------------------------
+sub www_removeFromScratchCart {
+	my $self = shift;
+	return $self->session->privilege->noAccess() unless $self->canView;
+
+	my $pid = $self->session->form->get("pid");
+	$self->removeFromScratchCart($pid);
+	
+	return $self->www_search;
+}
+	
+
+#------------------------------------------------------------------
 sub resolveConflictForm {
 	my $self = shift;
 	my $event1 = shift;
@@ -2398,7 +2410,7 @@ sub www_search {
 								  from products as p, EventManagementSystem_products as e where p.productId = e.productId and p.productId=?",[$eventId]);
 		$eventData->{'startDate'} = $self->session->datetime->epochToHuman($eventData->{'startDate'});
 		$eventData->{'endDate'} = $self->session->datetime->epochToHuman($eventData->{'endDate'});
-		
+		$eventData->{'removeEventFromBadge.url'} = $self->getUrl("func=removeFromScratchCart;pid=".$eventData->{'productId'});
 		push(@selectedEvents_loop, $eventData);	
 	}
 	$var{'eventsInBadge_loop'} = \@selectedEvents_loop;
