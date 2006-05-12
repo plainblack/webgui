@@ -15,8 +15,9 @@ use lib "$FindBin::Bin/lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use Data::Dumper;
+use Test::Deep;
 
-use Test::More tests => 42; # increment this value for each test you create
+use Test::More tests => 46; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -194,3 +195,38 @@ $sth2->finish;
 
 $session->db->dbh->do('DROP TABLE IF EXISTS testTable');
 
+$session->db->dbh->do('CREATE TABLE testTable (myIndex int(8) NOT NULL default 0, message varchar(64), myKey varchar(32), PRIMARY KEY(myIndex)) TYPE=InnoDB');
+
+my @tableData = (
+	[ 0, 'zero',  'A' ],
+	[ 1, 'one',   'A' ],
+	[ 2, 'two',   'A' ],
+	[ 3, 'three', 'A' ],
+	[ 4, 'four',  'B' ],
+	[ 5, 'five',  'B' ],
+	[ 6, 'six',   'B' ],
+	[ 7, 'seven', 'B' ],
+);
+
+my $tsth = $session->db->prepare('insert into testTable (myIndex,message,myKey) VALUES (?,?,?)');
+foreach my $trow ( @tableData ) {
+	$tsth->execute($trow);
+}
+
+my $arefHref = $session->db->buildArrayRefOfHashRefs('select message from testTable order by myIndex',[]);
+my @expected = map { { 'message' => $_->[1] } } @tableData;
+cmp_deeply($arefHref, \@expected, 'buildArrayOfHashRefs, 1 column, no params');
+
+my $arefHref = $session->db->buildArrayRefOfHashRefs('select message, myIndex from testTable order by myIndex',[]);
+my @expected = map { { 'message' => $_->[1],
+			'myIndex' => $_->[0] } } @tableData;
+cmp_deeply($arefHref, \@expected, 'buildArrayOfHashRefs, 2 columns, no params');
+
+my $arefHref = $session->db->buildArrayRefOfHashRefs('select myIndex, message from testTable order by myIndex',[]);
+cmp_deeply($arefHref, \@expected, 'buildArrayOfHashRefs, 2 columns, different column order, no params');
+
+my $arefHref = $session->db->buildArrayRefOfHashRefs('select message, myIndex from testTable where myKey=? order by myIndex',['A']);
+my @expected = map { { 'message' => $_->[1],
+			'myIndex' => $_->[0] } }
+		grep { $_->[2] eq 'A'} @tableData;
+cmp_deeply($arefHref, \@expected, 'buildArrayOfHashRefs, 2 columns, params');
