@@ -176,6 +176,7 @@ sub sendHeader {
 	return undef if ($self->{_http}{noHeader});
 	my $request = $self->session->request;
 	return undef unless $request;
+	$self->{_http}{noHeader} = 1;
 	my %params;
 	if ($self->isRedirect()) {
 		$request->headers_out->set(Location => $self->{_http}{location});
