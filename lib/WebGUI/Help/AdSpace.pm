@@ -123,7 +123,25 @@ our $HELP = {
 		],
                 related => [
                         {
+                                tag => 'manage ad spaces',
+                                namespace => 'AdSpace',
+                        },
+                        {
                                 tag => 'edit ad',
+                                namespace => 'AdSpace',
+                        },
+                ],
+	},
+
+	'manage ad spaces' => {
+                title => 'add ad space',
+                body => 'add ad space body',
+		source => 'www_manageAdSpaces',
+		fields => [
+		],
+                related => [
+                        {
+                                tag => 'edit ad space',
                                 namespace => 'AdSpace',
                         },
                 ],

@@ -391,6 +391,7 @@ sub www_manageAdSpaces {
 	}	
 	$output .= '<div style="clear: both;"></div>';
 	$ac->addSubmenuItem($session->url->page("op=editAdSpace"), $i18n->get("add ad space"));
+	$ac->setHelp('manage ad spaces', 'AdSpace');
 	return $ac->render($output);
 }
 

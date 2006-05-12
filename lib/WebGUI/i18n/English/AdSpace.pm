@@ -298,6 +298,11 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
+	'add ad space body' => {
+		message => q|<p>This screen provides you with a list of all ad spaces that have been created in WebGUI.  The icons next to each ad space allow you to edit or delete an ad space.  There is also a link on the screen to add new ad spaces.</p>|,
+		lastUpdated => 0,
+	},
+
 };
 
 1;
