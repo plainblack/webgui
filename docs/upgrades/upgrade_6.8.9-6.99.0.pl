@@ -241,25 +241,26 @@ sub convertMessageLogToInbox {
 		message mediumtext
 		)");	
 	$session->db->write("alter table Matrix_listing add column approvalMessageId varchar(22) binary");
-	my $prepared = $session->db->prepare("insert into inbox (messageId, status, dateStamp, completedOn, completedBy, userId, subject, message) 
-		values ( ?,?,?,?,?,?,?,? )");
-	my $rs = $session->db->read("select * from messageLog");
-	while (my $data = $rs->hashRef) {
-		$prepared->execute([
-			$session->id->generate,
-			'completed',
-			$data->{dateOfEntry},
-			time(),
-			'3',
-			$data->{userId},
-			$data->{subject},
-			$data->{message}
-			]);	
-	}
+# not migrating cuz it's not useful, but leaving this code here in case someone decides they need the data migrated
+#	my $prepared = $session->db->prepare("insert into inbox (messageId, status, dateStamp, completedOn, completedBy, userId, subject, message) 
+#		values ( ?,?,?,?,?,?,?,? )");
+#	my $rs = $session->db->read("select * from messageLog");
+#	while (my $data = $rs->hashRef) {
+#		$prepared->execute([
+#			$session->id->generate,
+#			'completed',
+#			$data->{dateOfEntry},
+#			time(),
+#			'3',
+#			$data->{userId},
+#			$data->{subject} || "No Subject",
+#			$data->{message}
+#			]);	
+#	}
 	$session->db->write("delete from userProfileField where fieldname='INBOXNotifications'");
 	$session->db->write("delete from userProfileData where fieldname='INBOXNotifications'");
 	$session->db->write("drop table if exists messageLog");
-	$rs = $session->db->read("select distinct assetId from template where namespace='Operation/MessageLog/View' or namespace='Operation/MessageLog/Message'");
+	my $rs = $session->db->read("select distinct assetId from template where namespace='Operation/MessageLog/View' or namespace='Operation/MessageLog/Message'");
 	while (my ($id) = $rs->array) {
 		my $asset = WebGUI::Asset->new($session, $id, "WebGUI::Asset::Template");
 		if (defined $asset) {
@@ -407,7 +408,7 @@ sub addWorkflow {
 	my $rs = $session->db->read("select assetId from assetData where status='denied'");
 	while (my ($id) = $rs->array) {
 		my $asset = WebGUI::Asset->newByDynamicClass($session, $id);
-		if ($asset->get("status") eq "denied") {
+		if (defined $asset && $asset->get("status") eq "denied") {
 			$asset->purge;
 		}
 	}
@@ -933,12 +934,13 @@ sub addSearchEngine {
 	my $deleteWobject = $session->db->prepare("delete from wobject where assetId=?");
 	my $deleteAssetData = $session->db->prepare("delete from assetData where assetId=?");
 	foreach my $id (@searchIds) {
-		$deleteWobject->execute($id);
-		$deleteAssetData->execute($id);
+		$deleteWobject->execute([$id]);
+		$deleteAssetData->execute([$id]);
 	}
 	$deleteWobject->finish;
 	$deleteAssetData->finish;
 	$session->config->deleteFromArray("assets","WebGUI::Asset::Wobject::IndexedSearch");
+	$session->config->addToArray("assets","WebGUI::Asset::Wobject::Search");
 	$session->db->write("drop table if exists IndexedSearch");
 	$session->db->write("drop table if exists IndexedSearch_default");
 	$session->db->write("drop table if exists IndexedSearch_default_data");

@@ -9,9 +9,16 @@ save you many hours of grief.
 
 6.99.0
 --------------------------------------------------------------------
+
  * The 6.99 series is the last round of changes before 7.0.0 is
 	released. It will serve as the beta, gamma, and release
 	candidates for 7.0.0.
+
+ * The "messageLog" table will be deleted during the upgrade process,
+	and all of the messages in it. This is because the messages
+	contained in there are no longer useful because they won't
+	work with the new workflow system. If you need the data in
+	that table, you should save it before performing the upgrade.
 
  * The session system has been replaced by a new object-oriented one,
 	which has caused massive API changes. Please consult
