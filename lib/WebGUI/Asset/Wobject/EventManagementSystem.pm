@@ -824,8 +824,9 @@ sub getBadgeSelector {
 	my %badgeJS;
 	my $defaultBadge;
 	my $IHaveOne = 0;
+	my $allBadgeInfo = $self->session->db->buildHashRefOfHashRefs("select * from EventManagementSystem_badges where badgeId=?",[$_],'badgeId');
 	foreach (keys %$badges) {
-		$badgeJS{$_} = $self->session->db->quickHashRef("select * from EventManagementSystem_badges where badgeId=?",[$_]);
+		$badgeJS{$_} = 
 		$defaultBadge ||= $badgeJS{$_}->{badgeId};
 		if ($badgeJS{$_}->{userId} eq $me) {
 			# we have a match!
@@ -1320,7 +1321,7 @@ sub www_addToCart {
 		}
 	}
 	# $self->session->errorHandler->warn("scratch after: <pre>".Dumper($self->getEventsInScratchCart).Dumper($self->session->db->buildHashRef("select name,value from userSessionScratch where sessionId=?",[$self->session->getId]))."</pre>");
-	return $self->session->style->process($self->processTemplate($output,$self->getValue("checkoutTemplateId")),$self->getValue("styleTemplateId"));
+	return $self->processStyle($self->processTemplate($output,$self->getValue("checkoutTemplateId")));
 } 
 
 #-------------------------------------------------------------------
@@ -1331,7 +1332,7 @@ sub www_addToScratchCart {
 	my $masterEventId = $self->session->form->get("mid");
 	
 	my $mainEvent = $self->addToScratchCart($pid); #tsc
-	return $self->session->style->process($self->processTemplate($self->getRegistrationInfo(),$self->getValue("checkoutTemplateId")),$self->getValue("styleTemplateId")) if $masterEventId eq $pid;
+	return $self->processStyle($self->processTemplate($self->getRegistrationInfo(),$self->getValue("checkoutTemplateId"))) if $masterEventId eq $pid;
 	return $self->www_search($nameOfEventAdded);
 }
 
@@ -1824,7 +1825,7 @@ sub www_managePurchases {
 	$var{managePurchasesTitle} = $i18n->get('manage purchases');
 	$sth->finish;
 	$var{'purchasesLoop'} = \@purchasesLoop;
-	return $self->session->style->process($self->processTemplate(\%var,$self->getValue("managePurchasesTemplateId")),$self->getValue("styleTemplateId"));
+	return $self->processStyle($self->processTemplate(\%var,$self->getValue("managePurchasesTemplateId")));
 }
 
 #-------------------------------------------------------------------
@@ -1876,7 +1877,7 @@ sub www_viewPurchase {
 		$var{appUrl} = $self->getUrl;
 		$var{purchasesLoop} = \@purchasesLoop;
 		return $self->processTemplate(\%var,$self->getValue("viewPurchaseTemplateId")) if $returnWoStyle;
-		return $self->session->style->process($self->processTemplate(\%var,$self->getValue("viewPurchaseTemplateId")),$self->getValue("styleTemplateId"));
+		return $self->processStyle($self->processTemplate(\%var,$self->getValue("viewPurchaseTemplateId")));
 	} elsif($tid) {
 		my %var = $self->get();
 		my $isAdmin = $self->canAddEvents;
@@ -1913,7 +1914,7 @@ sub www_viewPurchase {
 		$var{appUrl} = $self->getUrl;
 		$sth->finish;
 		$var{purchasesLoop} = \@purchasesLoop;
-		return $self->session->style->process($self->processTemplate(\%var,$self->getValue("viewPurchaseTemplateId")),$self->getValue("styleTemplateId"));
+		return $self->processStyle($self->processTemplate(\%var,$self->getValue("viewPurchaseTemplateId")));
 	} else {
 		my %var = $self->get();
 		my $isAdmin = $self->canAddEvents;
@@ -1950,7 +1951,7 @@ sub www_viewPurchase {
 		$var{appUrl} = $self->getUrl;
 		$sth->finish;
 		$var{purchasesLoop} = \@purchasesLoop;
-		return $self->session->style->process($self->processTemplate(\%var,$self->getValue("viewPurchaseTemplateId")),$self->getValue("styleTemplateId"));
+		return $self->processStyle($self->processTemplate(\%var,$self->getValue("viewPurchaseTemplateId")));
 	}
 }
 
@@ -2388,10 +2389,7 @@ sub prepareView {
 #-------------------------------------------------------------------
 sub www_search {
 	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canView;
-	if($self->session->getId eq "u2Eox-ktFRPu6xiw77H8gg") {
-	   $self->session->errorHandler->warn("In Search");
-	}
+	return $self->session->privilege->noAccess() unless $self->canView;
 	my %var;
 	$var{badgeSelected} = $self->session->scratch->get('currentMainEvent');
 	$var{resetScratchCartUrl} = $self->getUrl("func=resetScratchCart");
@@ -2727,13 +2725,7 @@ sub www_search {
 	$self->buildMenu(\%var);
 	$var{'ems.wobject.dir'} = $self->session->url->extras("wobject/EventManagementSystem");
 	
-	#if($self->session->getId eq "u2Eox-ktFRPu6xiw77H8gg") {
-	#	$self->session->errorHandler->warn("Building Template");
-	my $template = $self->processTemplate(\%var,$self->getValue("searchTemplateId"));
-	#	$self->session->errorHandler->warn($self->session->style->process($template,$self->getValue("styleTemplateId")));
-	#}
-	my $output = $self->session->style->process($template,$self->getValue("styleTemplateId"));
-	return $self->session->style->process($template,$self->getValue("styleTemplateId"));;
+	return $self->processStyle($self->processTemplate(\%var,$self->getValue("searchTemplateId")));
 }
 
 #-------------------------------------------------------------------
@@ -2812,9 +2804,9 @@ sub view {
 	}
 	$p->appendTemplateVars(\%var);
 	
-	my $templateId = $self->get("displayTemplateId");
+#	my $templateId = $self->get("displayTemplateId");
 
-	return $self->processTemplate(\%var, $templateId);
+	return $self->processTemplate(\%var, undef, $self->{_viewTemplate});
 }
 
 #-------------------------------------------------------------------
@@ -3324,9 +3316,18 @@ Returns the view() method of the asset object if the requestor canView.
 
 sub www_view {
 	my $self = shift;
-	return $self->session->privilege->noAccess() unless $self->canView;
 	return $self->www_search() if $self->session->scratch->get('currentMainEvent');
-	return $self->session->style->process($self->view,$self->getValue("styleTemplateId"));
+	my $check = $self->checkView;
+	return $check if (defined $check);
+	$self->session->http->setLastModified($self->get("revisionDate"));
+	$self->session->http->sendHeader;	
+	$self->prepareView;
+	my $style = $self->processStyle("~~~");
+	my ($head, $foot) = split("~~~",$style);
+	$self->session->output->print($head, 1);
+	$self->session->output->print($self->view);
+	$self->session->output->print($foot, 1);
+	return "chunked";
 }
 
 
