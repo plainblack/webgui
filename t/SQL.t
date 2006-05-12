@@ -17,7 +17,7 @@ use WebGUI::Session;
 use Data::Dumper;
 use Test::Deep;
 
-use Test::More tests => 46; # increment this value for each test you create
+use Test::More tests => 49; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -217,16 +217,32 @@ my $arefHref = $session->db->buildArrayRefOfHashRefs('select message from testTa
 my @expected = map { { 'message' => $_->[1] } } @tableData;
 cmp_deeply($arefHref, \@expected, 'buildArrayOfHashRefs, 1 column, no params');
 
-my $arefHref = $session->db->buildArrayRefOfHashRefs('select message, myIndex from testTable order by myIndex',[]);
+$arefHref = $session->db->buildArrayRefOfHashRefs('select message, myIndex from testTable order by myIndex',[]);
 my @expected = map { { 'message' => $_->[1],
 			'myIndex' => $_->[0] } } @tableData;
 cmp_deeply($arefHref, \@expected, 'buildArrayOfHashRefs, 2 columns, no params');
 
-my $arefHref = $session->db->buildArrayRefOfHashRefs('select myIndex, message from testTable order by myIndex',[]);
+$arefHref = $session->db->buildArrayRefOfHashRefs('select myIndex, message from testTable order by myIndex',[]);
+##Note that expected array didn't change
 cmp_deeply($arefHref, \@expected, 'buildArrayOfHashRefs, 2 columns, different column order, no params');
 
-my $arefHref = $session->db->buildArrayRefOfHashRefs('select message, myIndex from testTable where myKey=? order by myIndex',['A']);
-my @expected = map { { 'message' => $_->[1],
+$arefHref = $session->db->buildArrayRefOfHashRefs('select message, myIndex from testTable where myKey=? order by myIndex',['A']);
+@expected = map { { 'message' => $_->[1],
 			'myIndex' => $_->[0] } }
 		grep { $_->[2] eq 'A'} @tableData;
-cmp_deeply($arefHref, \@expected, 'buildArrayOfHashRefs, 2 columns, params');
+cmp_deeply($arefHref, \@expected, 'buildArrayOfHashRefs, 2 columns, 1 param');
+
+my $hrefHref = $session->db->buildHashRefOfHashRefs('select message from testTable order by myIndex',[], 'message');
+my %expected = map { $_->[1] => { 'message' => $_->[1] } } @tableData;
+cmp_deeply($hrefHref, \%expected, 'buildHashRefOfHashRefs, 1 column, no params');
+
+$hrefHref = $session->db->buildHashRefOfHashRefs('select message, myIndex from testTable order by myIndex',[], 'myIndex');
+%expected = map { $_->[0] => { 'message' => $_->[1],
+				'myIndex' => $_->[0] } } @tableData;
+cmp_deeply($hrefHref, \%expected, 'buildHashRefOfHashRefs, 2 columns, no params');
+
+$hrefHref = $session->db->buildHashRefOfHashRefs('select message, myIndex from testTable where myKey=? order by myIndex',['B'], 'myIndex');
+%expected = map { $_->[0] => { 'message' => $_->[1],
+				'myIndex' => $_->[0] } }
+		grep { $_->[2] eq 'B' } @tableData;
+cmp_deeply($hrefHref, \%expected, 'buildHashRefOfHashRefs, 2 columns, 1 param');
