@@ -824,9 +824,9 @@ sub getBadgeSelector {
 	my %badgeJS;
 	my $defaultBadge;
 	my $IHaveOne = 0;
-	my $allBadgeInfo = $self->session->db->buildHashRefOfHashRefs("select * from EventManagementSystem_badges where badgeId=?",[$_],'badgeId');
+	my $allBadgeInfo = $self->session->db->buildHashRefOfHashRefs("select * from EventManagementSystem_badges",undef,'badgeId');
 	foreach (keys %$badges) {
-		$badgeJS{$_} = 
+		$badgeJS{$_} = $allBadgeInfo->{$_};
 		$defaultBadge ||= $badgeJS{$_}->{badgeId};
 		if ($badgeJS{$_}->{userId} eq $me) {
 			# we have a match!
