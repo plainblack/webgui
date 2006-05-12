@@ -825,8 +825,6 @@ sub getBadgeSelector {
 	my $defaultBadge;
 	my $IHaveOne = 0;
 	my $allBadgeInfo = $self->session->db->buildHashRefOfHashRefs("select * from EventManagementSystem_badges",undef,'badgeId');
-	use Data::Dumper;
-	$self->session->errorHandler->warn(Dumper($allBadgeInfo));
 	foreach (keys %$badges) {
 		$badgeJS{$_} = $allBadgeInfo->{$_};
 		$defaultBadge ||= $badgeJS{$_}->{badgeId};
