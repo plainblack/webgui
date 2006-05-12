@@ -2662,8 +2662,8 @@ sub www_search {
 	  	$eventFields{'purchase.url'} = $self->getUrl('func=addToScratchCart;pid='.$event->{'productId'}.";mid=".$masterEventId);
 	  	$eventFields{'purchase.label'} = $i18n->get('add to cart');
 	  }
-	  
-	  push (@events, {'event' => $self->processTemplate(\%eventFields, $event->{'templateId'}), %eventFields });
+	  %eventFields = ('event' => $self->processTemplate(\%eventFields, $event->{'templateId'}), %eventFields) if ($self->{_calledFromView} && $self->session->form->process('func') eq 'view');
+	  push (@events, \%eventFields);
 	} 
 	
 	$var{'events_loop'} = \@events;
@@ -3317,6 +3317,7 @@ Returns the view() method of the asset object if the requestor canView.
 sub www_view {
 	my $self = shift;
 	return $self->www_search() if $self->session->scratch->get('currentMainEvent');
+	$self->{_calledFromView} = 1;
 	my $check = $self->checkView;
 	return $check if (defined $check);
 	$self->session->http->setLastModified($self->get("revisionDate"));
