@@ -252,14 +252,15 @@ Which column of the result set to use as the key when creating the hashref.
 =cut
 
 sub buildHashRefOfHashRefs {
-	my $hashRef;
+	my %hash;
 	my $sth = $_[0]->read($_[1],$_[2]);
 	my $data;
+	tie %hash, "Tie::IxHash";
 	while ($data = $sth->hashRef) {
-		$hashRef->{$data->{$_[3]}} = $data;
+		$hash{$data->{$_[3]}} = $data;
 	}
 	$sth->finish;
-	return $hashRef;
+	return \%hash;
 }
 
                                                                               
