@@ -2569,12 +2569,12 @@ sub www_search {
 		   where
 		   	p.productId = e.productId $approvalPhrase
 		   	and e.assetId =".$self->session->db->quote($self->get("assetId")).$searchPhrases. " order by sequenceNumber";
-	$var{'basicSearch.formHeader'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl("func=search;advSearch=0")}).
+	$var{'basicSearch.formHeader'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl("func=search;advSearch=0",method=>'GET')}).
 					 WebGUI::Form::hidden($self->session,{name=>"subSearch", value => $self->session->form->get("subSearch")}).
 					 WebGUI::Form::hidden($self->session,{name => "cfilter_s0", value => "requirement"}).
 					 WebGUI::Form::hidden($self->session,{name => "cfilter_c0", value => "eq"}).
 					 WebGUI::Form::hidden($self->session,{name => "cfilter_t0", value => ($self->session->form->get("cfilter_t0") || $cfilter_t0)});
-	$var{'advSearch.formHeader'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl("func=search;advSearch=1")}).
+	$var{'advSearch.formHeader'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl("func=search;advSearch=1"),method=>'GET'}).
 				       WebGUI::Form::hidden($self->session,{name => "cfilter_s0", value => "requirement"}).
 				       WebGUI::Form::hidden($self->session,{name => "cfilter_c0", value => "eq"}).
 				       WebGUI::Form::hidden($self->session,{name => "cfilter_t0", value => ($self->session->form->get("cfilter_t0") || $cfilter_t0)});
