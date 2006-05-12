@@ -228,7 +228,41 @@ sub buildArrayRefOfHashRefs {
 	return \@array;
 }
 
-                                                                                                                                                             
+
+#-------------------------------------------------------------------
+
+=head2 buildHashRefOfHashRefs ( sql )
+
+Builds a hash reference of hash references of data 
+from a series of rows.  Useful for returning many rows at once.
+Assigns the data to a hash
+
+=head3 sql
+
+An SQL query. The query must select at least two columns of data, the first being the key for the hash, the second being the value. If the query selects more than two columns, then the last column will be the value and the remaining columns will be joined together by a colon ":" to form a complex key. If the query selects only one column, then the key and the value will be the same.
+
+=head3 params
+
+An array reference containing values for any placeholder params used in the SQL query.
+
+=head3 key
+
+Which column of the result set to use as the key when creating the hashref.
+
+=cut
+
+sub buildHashRefOfHashRefs {
+	my $hashRef;
+	my $sth = $_[0]->read($_[1],$_[2]);
+	my $data;
+	while ($data = $sth->hashRef) {
+		$hashRef->{$data->{$_[3]}} = $data;
+	}
+	$sth->finish;
+	return $hashRef;
+}
+
+                                                                              
 #-------------------------------------------------------------------
 
 =head2 commit ( )
