@@ -201,12 +201,12 @@ The namespace of the plugin.
 
 sub load {
 	my ($class, $namespace, $load, $cmd, $plugin);
-    	$class = shift;
+	$class = shift;
 	$namespace = shift;
 
 	WebGUI::ErrorHandler::fatal('No namespace passed to load.') unless ($namespace);
-	
-    	$cmd = "WebGUI::Commerce::Shipping::$namespace";
+	$namespace =~ s/[^\w:]//g;	
+	$cmd = "WebGUI::Commerce::Shipping::$namespace";
 	$load = "use $cmd";
 	eval($load);
 	WebGUI::ErrorHandler::warn("Shipping plugin failed to compile: $cmd.".$@) if($@);

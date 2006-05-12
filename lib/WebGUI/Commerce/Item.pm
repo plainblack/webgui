@@ -156,14 +156,14 @@ The type (namespace) of the item you want.
 
 sub new {
 	my ($class, $namespace, $load, $cmd, $plugin);
-    	$class = shift;
+	$class = shift;
 	$id = shift;
 	$namespace = shift;
 	
 	WebGUI::ErrorHandler::fatal('No namespace') unless ($namespace);
 	WebGUI::ErrorHandler::fatal('No ID') unless ($id);
-	
-    	$cmd = "WebGUI::Commerce::Item::$namespace";
+	$namespace =~ s/[^\w:]//g;
+	$cmd = "WebGUI::Commerce::Item::$namespace";
 	$load = "use $cmd";
 	eval($load);
 	WebGUI::ErrorHandler::warn("Item plugin failed to compile: $cmd.".$@) if($@);

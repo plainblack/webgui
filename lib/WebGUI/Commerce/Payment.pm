@@ -272,8 +272,8 @@ sub load {
 	my ($class, $namespace, $load, $cmd, $plugin);
     	$class = shift;
 	$namespace = shift;
-	
-    	$cmd = "WebGUI::Commerce::Payment::$namespace";
+	$namespace =~ s/[^\w:]//g;
+	$cmd = "WebGUI::Commerce::Payment::$namespace";
 	$load = "use $cmd";
 	eval($load);
 	WebGUI::ErrorHandler::warn("Payment plugin failed to compile: $cmd.".$@) if($@);
