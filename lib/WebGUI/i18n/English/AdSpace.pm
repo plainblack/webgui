@@ -288,6 +288,16 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
+	'edit advertisement body' => {
+		message => q|<p>In this screen, you'll configure an advertisement to go into the adspace.  You can set physical properties such as colors, images, displayed text and url, define how often the advertisement is shown and activate or deactivate the ad.  Ads are local to a particular ad space.</p>|,
+		lastUpdated => 0,
+	},
+
+	'edit ad space body' => {
+		message => q|<p>In this screen, you will configure an area that holds an ad (an ad space) to embed in a page via the Ad Space macro (<b>&#94;AdSpace();</b>).  When editing an existing ad space, a preview of the ad space is shown, along with a list of ads to be shown in the space.  The icons in the list of ads allow ads to be edited or deleted.</p>|,
+		lastUpdated => 0,
+	},
+
 };
 
 1;

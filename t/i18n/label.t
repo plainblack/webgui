@@ -131,7 +131,7 @@ sub label_finder_pm {
 }
 
 sub obj_finder_pm {
-	next unless /\.pm$/;
+	return unless /\.pm$/;
 	if ($File::Find::name =~ m#(?:Help|i18n)/?$#) {
 		warn "Pruned $File::Find::name\n";
 		$File::Find::prune=1;
