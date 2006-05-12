@@ -896,7 +896,7 @@ sub getRegistrationInfo {
 	my $self = shift;
 	my %var;
 	my $i18n = WebGUI::International->new($self->session, 'Asset_EventManagementSystem');
-	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
+	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl,method=>'GET'})
 			     .WebGUI::Form::hidden($self->session,{name=>"func",value=>"saveRegistrantInfo"});
 	$var{'form.message'} = $i18n->get('registration info message');
 	$var{'form.footer'} = WebGUI::Form::formFooter($self->session);
