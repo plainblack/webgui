@@ -239,7 +239,7 @@ Assigns the data to a hash
 
 =head3 sql
 
-An SQL query. The query must select at least two columns of data, the first being the key for the hash, the second being the value. If the query selects more than two columns, then the last column will be the value and the remaining columns will be joined together by a colon ":" to form a complex key. If the query selects only one column, then the key and the value will be the same.
+An SQL query. The query must select at least one column of data, including the one you choose as the key for the hashRef to be returned.  Each row is returned as its own hashRef as the value of its corresponding key, keyed by the key column, below.
 
 =head3 params
 
