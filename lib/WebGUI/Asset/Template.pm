@@ -18,7 +18,7 @@ use strict;
 use base 'WebGUI::Asset';
 use WebGUI::International;
 use WebGUI::Asset::Template::HTMLTemplate;
-
+use WebGUI::Utility;
 
 
 =head1 NAME
@@ -267,11 +267,16 @@ This method sets the tags from the head block parameter of the template into the
 sub prepare {
 	my $self = shift;
 	$self->{_prepared} = 1;
-	if ($self->session->style->sent) {
-		$self->session->output->print($self->get("headBlock"));
-	} else {
-		$self->session->style->setRawHeadTags($self->get("headBlock"));
+	my @sent = @{$self->session->stow->get("templateHeadersSent")};
+	unless (isIn($self->getId, @sent)) { # don't send head block if we've already sent it for this template
+		if ($self->session->style->sent) {
+			$self->session->output->print($self->get("headBlock"));
+		} else {
+			$self->session->style->setRawHeadTags($self->get("headBlock"));
+		}
 	}
+	push(@sent, $self->getId);
+	$self->session->stow->set("templateHeadersSent", \@sent);
 }
 
 
