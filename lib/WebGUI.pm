@@ -122,7 +122,7 @@ sub contentHandler {
 				$session->output->print($session->errorHandler->showDebug(),1);
 			}
 		}
-		WebGUI::Affiliate::grabReferral($session);	# process affilliate tracking request
+		WebGUI::Affiliate::grabReferral($session);	# process affiliate tracking request
 	}
 	$session->close;
 	return Apache2::Const::OK;
