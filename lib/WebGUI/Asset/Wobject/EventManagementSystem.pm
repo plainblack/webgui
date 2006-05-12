@@ -331,7 +331,7 @@ sub buildMenu {
 	$js .= "\n};\n";
 	
 	$var->{'search.filters.options'} = $js;
-	$var->{'search.data.url'} = $self->getUrl;
+	$var->{'search.data.url'} = $self->getUrl("func=search");
 }
 
 #-------------------------------------------------------------------
