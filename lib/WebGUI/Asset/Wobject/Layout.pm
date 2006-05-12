@@ -291,7 +291,7 @@ sub www_view {
 		$self->session->output->print($out, 1);
 		return "chunked";	
 	}
-	$self->{_viewPrintOverride} = 1; # we do this to make it output each easset as it goes, rather than waiting until the end
+	$self->{_viewPrintOverride} = 1; # we do this to make it output each asset as it goes, rather than waiting until the end
 	return $self->SUPER::www_view;
 }
 
