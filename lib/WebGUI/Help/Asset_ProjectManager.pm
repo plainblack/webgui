@@ -89,6 +89,18 @@ our $HELP = {
 		],
 	},
 
+	'task edit template' => {
+		title => 'edit task template vars title',
+		body => 'edit task template vars body',
+		fields => [ ],
+		related => [
+                        {
+                                tag => 'project manager add/edit',
+                                namespace => 'Asset_ProjectManager',
+                        },
+		],
+	},
+
 };
 
 1;  ##All perl modules must return true

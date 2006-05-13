@@ -356,13 +356,69 @@ our $I18N = {
 		lastUpdated => 0
 		},
 		
-	 '' => {
-		message => q||,
+	 'edit task template vars title' => {
+		message => q|Edit Task Template Variables|,
 		lastUpdated => 0
 		},
 		
-	 '' => {
-		message => q||,
+	 'edit task template vars body' => {
+		message => q|<p>The Edit Task template has these template variables</p>
+<p>! : This variable is required for the Data Form to function correctly.</p>
+
+<p><b>form.header</b> ! <br />
+Code to setup the Edit Task form.  Leaving out this variable will prevent the form
+from working.
+</p>
+
+<p><b>form.name</b> ! <br />
+Form element for the user to enter/edit the name of the task.
+</p>
+
+<p><b>form.duration</b> ! <br />
+Form element for the duration of the task.
+</p>
+
+<p><b>form.duration.units</b> ! <br />
+Form element for the units of duration for the task.
+</p>
+
+<p><b>form.start</b> ! <br />
+Form element for the starting date for the task.
+</p>
+
+<p><b>form.end</b> ! <br />
+Form element for the ending date for the task.
+</p>
+
+<p><b>form.dependants</b> ! <br />
+Form element for something I really don't understand.
+</p>
+
+<p><b>form.resource</b> ! <br />
+Form element for selecting a user to accomplish this task.
+</p>
+
+<p><b>form.milestone</b> ! <br />
+Form element for setting this task to be a milestone in the project.
+</p>
+
+<p><b>form.percentComplete</b> ! <br />
+Form element for entering in how much of the project has been completed, as a percentage.
+</p>
+
+<p><b>form.save</b> ! <br />
+A button to save data entered into the form.
+</p>
+
+<p><b>form.footer</b> ! <br />
+Code to end the form.
+</p>
+
+<p><b>extras</b> ! <br />
+The URL to the Extras directory.
+</p>
+
+|,
 		lastUpdated => 0
 		},
 		

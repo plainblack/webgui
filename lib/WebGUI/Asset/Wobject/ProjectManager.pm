@@ -830,61 +830,60 @@ sub www_viewProject {
 		  my $origDepFieldId = $origDepField."_formId";
 		  my $origEndField = "orig_end_$id";
 		  my $origEndFieldId = $origEndField."_formId";
-		  
+
 	      $hash->{'task.start'} = WebGUI::Form::text($session,{
-		                                               -name=>"start_$id",
-													   -value=>$startDate,
-													   -size=>"10",
-													   -maxlength=>"10",
-													   -extras=>qq|onfocus="doCalendar(this.id);" class="taskdate" onblur="adjustTaskTimeFromDate(this,document.getElementById('$endId'),document.getElementById('$durId'),this,false,document.getElementById('$predId'),document.getElementById('$origStartFieldId'),document.getElementById('$origEndFieldId'),$seq);"|
-		                                            });
-		  
+			-name=>"start_$id",
+			-value=>$startDate,
+			-size=>"10",
+			-maxlength=>"10",
+			-extras=>qq|onfocus="doCalendar(this.id);" class="taskdate" onblur="adjustTaskTimeFromDate(this,document.getElementById('$endId'),document.getElementById('$durId'),this,false,document.getElementById('$predId'),document.getElementById('$origStartFieldId'),document.getElementById('$origEndFieldId'),$seq);"|
+			});
+
 		  $hash->{'task.start'} .= WebGUI::Form::hidden($session,{
-		                                                -name=>$origStartField,
-														-value=>$startDate,
-														-extras=>qq|id="$origStartFieldId"|
-												    });
-		  
-		 
+			-name=>$origStartField,
+			-value=>$startDate,
+			-extras=>qq|id="$origStartFieldId"|
+			});
+
 		  $hash->{'task.dependants'} = WebGUI::Form::integer($session,{
-		                                                -name=>"dependants_$id",
-														-value=>$row->{dependants} || "",
-														-defaultValue=>"", 
-														-extras=>qq|class="taskdependant" onchange="validateDependant(this,document.getElementById('$origDepFieldId'),'$seq',document.getElementById('$startId'),document.getElementById('$endId'),document.getElementById('$durId'),false,document.getElementById('$origStartFieldId'),document.getElementById('$origEndFieldId'));"|
-												    });
+			-name=>"dependants_$id",
+			-value=>$row->{dependants} || "",
+			-defaultValue=>"", 
+			-extras=>qq|class="taskdependant" onchange="validateDependant(this,document.getElementById('$origDepFieldId'),'$seq',document.getElementById('$startId'),document.getElementById('$endId'),document.getElementById('$durId'),false,document.getElementById('$origStartFieldId'),document.getElementById('$origEndFieldId'));"|
+			});
 		  $hash->{'task.dependants'} .= WebGUI::Form::hidden($session,{
-		                                                -name=>$origDepField,
-														-value=>$row->{dependants},
-														-extras=>qq|id="$origDepFieldId"|
-												    });
-		  
+			-name=>$origDepField,
+			-value=>$row->{dependants},
+			-extras=>qq|id="$origDepFieldId"|
+			});
+
 		  $hash->{'task.end'} = WebGUI::Form::text($session,{
-		                                               -name=>"end_$id",
-													   -value=>$endDate,
-													   -size=>"10",
-													   -maxlength=>"10",
-													   -extras=>qq|class="taskdate" onfocus="doCalendar(this.id);" onblur="adjustTaskTimeFromDate(document.getElementById('$startId'),this,document.getElementById('$durId'),this,false,document.getElementById('$predId'),document.getElementById('$origStartFieldId'),document.getElementById('$origEndFieldId'),$seq);"|
-		                                            });
-		  
+			-name=>"end_$id",
+			-value=>$endDate,
+			-size=>"10",
+			-maxlength=>"10",
+			-extras=>qq|class="taskdate" onfocus="doCalendar(this.id);" onblur="adjustTaskTimeFromDate(document.getElementById('$startId'),this,document.getElementById('$durId'),this,false,document.getElementById('$predId'),document.getElementById('$origStartFieldId'),document.getElementById('$origEndFieldId'),$seq);"|
+			});
+
 		  $hash->{'task.end'} .= WebGUI::Form::hidden($session,{
-		                                                -name=>$origEndField,
-														-value=>$endDate,
-														-extras=>qq|id="$origEndFieldId"|
-												    });
+			-name=>$origEndField,
+			-value=>$endDate,
+			-extras=>qq|id="$origEndFieldId"|
+			});
 		  #Don't display uneditable fields if the task is a milestone.
 		  if($isMilestone) {
-		     $hash->{'task.duration'} = $row->{duration};
+			$hash->{'task.duration'} = $row->{duration};
 			 $hash->{'task.duration'} .= WebGUI::Form::hidden($session,{
-		                                                -name=>"duration_$id",
-														-value=>$duration,
-														-extras=>qq|id="$durId"|
-												    });
+				-name=>"duration_$id",
+				-value=>$duration,
+				-extras=>qq|id="$durId"|
+				});
 		  } else {
 	         $hash->{'task.duration'} = WebGUI::Form::float($session,{
-		                                                -name=>"duration_$id",
-														-value=>$duration, 
-														-extras=>qq|class="taskduration" onchange="adjustTaskTimeFromDuration(document.getElementById('$startId'),document.getElementById('$endId'),this,false,document.getElementById('$predId'),document.getElementById('$origStartFieldId'),document.getElementById('$origEndFieldId'),$seq);" |
-													   });
+				-name=>"duration_$id",
+				-value=>$duration, 
+				-extras=>qq|class="taskduration" onchange="adjustTaskTimeFromDuration(document.getElementById('$startId'),document.getElementById('$endId'),this,false,document.getElementById('$predId'),document.getElementById('$origStartFieldId'),document.getElementById('$origEndFieldId'),$seq);" |
+				});
 			 
 	      }
 	   } else {
@@ -910,28 +909,27 @@ sub www_viewProject {
 	if($canEdit) {
 	   #Build Form for submitting on the fly updates
 	   $var->{'form.header'} = WebGUI::Form::formHeader($session,{
-                                                               action=>$self->getUrl,
-															   extras=>q|name="editAll"|
-													       });
+			action=>$self->getUrl,
+			extras=>q|name="editAll"|
+			});
        $var->{'form.header'} .= WebGUI::Form::hidden($session, {
-                                                             -name=>"func",
-															 -value=>"saveExistingTasks"
-														   });
+			-name=>"func",
+			-value=>"saveExistingTasks"
+			});
        $var->{'form.header'} .= WebGUI::Form::hidden($session, {
-                                                              -name=>"projectId",
-															 -value=>$projectId
-														   });												   
-	   $var->{'form.footer'} = WebGUI::Form::formFooter($session);
-       $var->{'project.canEdit'} = "true";
-	   $var->{'task.resources.label'} = $i18n->get("task resources label");
-	   $var->{'task.resources.url'} = $self->getUrl("func=manageResources");
-	   
+			-name=>"projectId",
+			-value=>$projectId
+			});												   
+		$var->{'form.footer'} = WebGUI::Form::formFooter($session);
+		$var->{'project.canEdit'} = "true";
+		$var->{'task.resources.label'} = $i18n->get("task resources label");
+		$var->{'task.resources.url'} = $self->getUrl("func=manageResources");
 	}
 
 	if($canAddTask) {
-	   $var->{'task.add.label'} = $i18n->get("add task label");
-	   $var->{'task.add.url'} = $self->getUrl("func=editTask;projectId=$projectId;taskId=new");
-	   $var->{'task.canAdd'} = "true";
+		$var->{'task.add.label'} = $i18n->get("add task label");
+		$var->{'task.add.url'} = $self->getUrl("func=editTask;projectId=$projectId;taskId=new");
+		$var->{'task.canAdd'} = "true";
 	}
 	
 	
@@ -950,9 +948,9 @@ sub www_viewProject {
 sub www_drawGanttChart {
 	my $self = shift;
 	my $var = {};
-    #Set Method Helpers
-    my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
-    my $config = $session->config;
+	#Set Method Helpers
+	my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
+	my $config = $session->config;
 	my $style = $session->style;
 	my $eh = $session->errorHandler;
 	
