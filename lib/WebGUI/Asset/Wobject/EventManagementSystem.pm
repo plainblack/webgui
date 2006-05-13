@@ -2490,7 +2490,7 @@ sub www_search {
 	
 	# Get all the info about these events and set the template vars
 	my @selectedEvents_loop;
-	my @pastEvents = $self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, transaction as t where r.returned=0 and r.badgeId=? t.transactionId=p.transactionId and t.status='Completed' and p.purchaseId=r.purchaseId group by productId",[$badgeHolderId]);
+	my @pastEvents = $self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, transaction as t where r.returned=0 and r.badgeId=? and t.transactionId=p.transactionId and t.status='Completed' and p.purchaseId=r.purchaseId group by productId",[$badgeHolderId]);
 	foreach my $eventId (@$eventsInBadge) {
 		if ($eventId eq $masterEventId) {
 			$var{'mainEventTitle'} = $self->getEventName($eventId);
