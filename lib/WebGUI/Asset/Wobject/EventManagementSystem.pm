@@ -1354,17 +1354,17 @@ sub addCartVars {
 		my $purchase = {};
 		$purchase->{purchaseId} = $self->session->scratch->get("purchaseId".$i);
 		next unless $purchase->{purchaseId};
+		$purchase->{badgeId} = $self->session->scratch->get("badgeId".$i);
 		# so we don't show the badge we're currently editing
 		next if ($i eq $self->session->scratch->get("currentPurchaseCounter"));
-		my $theseRegs = $self->session->db->buildArrayRefOfHashRefs("select r.*, p.price, q.passId, q.passType from EventManagementSystem_registrations as r, EventManagementSystem_products as q, products as p where r.purchaseId=? and p.productId=r.productId and q.productId=r.productId",[$purchase->{purchaseId}]);
+		my $theseRegs = $self->session->db->buildArrayRefOfHashRefs("select r.*, p.price, q.passId, q.passType from EventManagementSystem_registrations as r, EventManagementSystem_products as q, products as p where r.purchaseId=? and p.productId=r.productId and r.badgeId=? and q.productId=r.productId",[$purchase->{purchaseId},$purchase->{badgeId}]);
 		my @currentEvents;
 		foreach (@$theseRegs) {
 			my ($isChild) = $self->session->db->quickArray("select prerequisiteId from EventManagementSystem_products where productId = ?",[$_->{productId}]);
 			$purchase->{'purchase.mainEventTitle'} = $self->getEventName($_->{productId}) unless $isChild;
 			($purchase->{alreadyPurchasedBadge}) = $self->session->db->quickArray("select p.transactionId from EventManagementSystem_purchases as p, transaction as t where p.purchaseId = ? and t.transactionId=p.transactionId and t.status='Completed'",[$_->{productId}]) unless $isChild;
-			unless ($purchase->{badgeId}) {
-				$purchase->{badgeId} = $_->{badgeId};
-				$purchase->{registrantInfoLoop} = $self->session->db->buildArrayRefOfHashRefs("select * from EventManagementSystem_badges where badgeId=?",[$_->{badgeId}]);
+			unless ($purchase->{registrantInfoLoop}) {
+				$purchase->{registrantInfoLoop} = $self->session->db->buildArrayRefOfHashRefs("select * from EventManagementSystem_badges where badgeId=?",[$purchase->{badgeId}]);
 			}
 			push(@currentEvents,$_->{productId});
 		}
@@ -1412,6 +1412,7 @@ sub www_emptyCart {
 	$shoppingCart->empty;
 	foreach (0..25) {
 		$self->session->scratch->delete('purchaseId'.$_);
+		$self->session->scratch->delete('badgeId'.$_);
 	}
 	return $self->www_resetScratchCart();
 }
@@ -2062,7 +2063,7 @@ sub www_addEventsToBadge {
 		if ($purchaseCounter ne "") {
 			# if we're loading a badge that's in the cart, put its stuff in the scratch cart along with the already-purchased events for this badgeId.
 			$self->session->scratch->set("currentPurchaseCounter",$purchaseCounter);
-			my $theseRegs = $self->session->db->buildArrayRefOfHashRefs("select r.*, p.price, q.prerequisiteId from EventManagementSystem_registrations as r, EventManagementSystem_products as q, products as p where r.purchaseId=? and p.productId=r.productId and q.productId=r.productId",[$self->session->scratch->get("purchaseId".$purchaseCounter)]);
+			my $theseRegs = $self->session->db->buildArrayRefOfHashRefs("select r.*, p.price, q.prerequisiteId from EventManagementSystem_registrations as r, EventManagementSystem_products as q, products as p where r.purchaseId=? and p.productId=r.productId and q.productId=r.productId and r.badgeId=?",[$self->session->scratch->get("purchaseId".$purchaseCounter),$self->session->scratch->get("badgeId".$purchaseCounter)]);
 			foreach (@$theseRegs) {
 				push(@pastEvents,$_->{productId}) unless isIn($_->{productId},@pastEvents);
 				$eventId = $_->{productId} unless $_->{prerequisiteId};
@@ -2075,6 +2076,7 @@ sub www_addEventsToBadge {
 			while (1) {
 				unless ($self->session->scratch->get("purchaseId".$counter)) {
 					$self->session->scratch->set("purchaseId".$counter, $purchaseId);
+					$self->session->scratch->set("badgeId".$counter, $bid);
 					$self->session->scratch->set("currentPurchaseCounter",$counter);
 					last;
 				}
@@ -2107,7 +2109,8 @@ Method to remove some items from the cart
 sub removePurchaseFromCart {
 	my $self = shift;
 	my $purchaseId = shift;
-	my @eventsToSubtract = $self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p where r.purchaseId=? and (p.transactionId='' or p.transactionId is null) and p.purchaseId=r.purchaseId",[$purchaseId]);
+	my $badgeId = shift;
+	my @eventsToSubtract = $self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p where r.purchaseId=? and (p.transactionId='' or p.transactionId is null) and p.purchaseId=r.purchaseId and r.badgeId=?",[$purchaseId,$badgeId]);
 	my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
 	my ($items, $nothing) = $shoppingCart->getItems;
 	foreach my $event (@eventsToSubtract) {
@@ -2419,6 +2422,7 @@ sub saveRegistration {
 		while (1) {
 			unless ($self->session->scratch->get("purchaseId".$counter)) {
 				$self->session->scratch->set("purchaseId".$counter, $purchaseId);
+				$self->session->scratch->set("badgeId".$counter, $badgeId);
 				last;
 			}
 			$counter++;	
