@@ -111,8 +111,10 @@ Returns either what's posted or if nothing comes back it returns "text".
 =cut
 
 sub getValueFromPost {
-        my $self = shift;
-        return $session{req}->param($self->{name}) || "text";
+	my $self = shift;
+	my $fieldType = $session{req}->param($self->{name});
+	$fieldType =~ s/[^\w]//g;
+	return $fieldType || "text";
 }
 
 #-------------------------------------------------------------------
