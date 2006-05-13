@@ -1406,7 +1406,7 @@ sub www_checkout {
 #-------------------------------------------------------------------
 sub www_emptyCart {
 	my $self = shift;	
-	my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($session);
+	my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
 	$shoppingCart->empty;
 	return $self->www_view();
 }
