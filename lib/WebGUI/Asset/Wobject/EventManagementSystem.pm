@@ -2063,7 +2063,7 @@ sub www_addEventsToBadge {
 		if ($purchaseCounter ne "") {
 			# if we're loading a badge that's in the cart, put its stuff in the scratch cart along with the already-purchased events for this badgeId.
 			$self->session->scratch->set("currentPurchaseCounter",$purchaseCounter);
-			my $theseRegs = $self->session->db->buildArrayRefOfHashRefs("select r.*, p.price, q.prerequisiteId from EventManagementSystem_registrations as r, EventManagementSystem_products as q, products as p where r.purchaseId=? and p.productId=r.productId and q.productId=r.productId and r.badgeId=?",[$self->session->scratch->get("purchaseId".$purchaseCounter),$self->session->scratch->get("badgeId".$purchaseCounter)]);
+			my $theseRegs = $self->session->db->buildArrayRefOfHashRefs("select r.*, p.price, q.prerequisiteId from EventManagementSystem_registrations as r, EventManagementSystem_products as q, products as p where p.productId=r.productId and q.productId=r.productId and r.badgeId=?",[$self->session->scratch->get("badgeId".$purchaseCounter)]);
 			foreach (@$theseRegs) {
 				push(@pastEvents,$_->{productId}) unless isIn($_->{productId},@pastEvents);
 				$eventId = $_->{productId} unless $_->{prerequisiteId};
@@ -2071,7 +2071,7 @@ sub www_addEventsToBadge {
 			$self->removePurchaseFromCart($self->session->scratch->get("purchaseId".$purchaseCounter));
 		} else {
 			# gotta use the existing purchaseId, b/c we're loading a completed purchase.
-			my ($purchaseId) = $self->session->db->quickArray("select purchaseId from EventManagementSystem_registrations where badgeId=? and productId=? limit 1",[$bid,$eventId]);
+			my ($purchaseId) = $self->session->db->quickArray("select purchaseId from EventManagementSystem_registrations where badgeId=? and productId=? and purchaseId != '' and purchaseId is not null limit 1",[$bid,$eventId]);
 			my $counter = 0;
 			while (1) {
 				unless ($self->session->scratch->get("purchaseId".$counter)) {
