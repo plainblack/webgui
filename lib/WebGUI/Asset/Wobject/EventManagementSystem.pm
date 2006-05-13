@@ -1348,7 +1348,8 @@ sub addCartVars {
 	my $self = shift;
 	my $var = shift;
 	$var->{'cart.purchaseLoop'} = [];
-	for (my $i = 0;$i < 25;$i++) {
+	my $i;
+	for ( $i=0; $i < 25;$i++) {
 		my $purchase = {};
 		$self->session->errorHandler->warn("got here!");
 		$purchase->{purchaseId} = $self->session->scratch->get("purchaseId".$i);
