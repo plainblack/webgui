@@ -1408,7 +1408,7 @@ sub www_emptyCart {
 	my $self = shift;	
 	my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
 	$shoppingCart->empty;
-	foreach (1..25) {
+	foreach (0..25) {
 		$self->session->scratch->delete('purchaseId'.$_);
 	}
 	return $self->www_resetScratchCart();
