@@ -2093,7 +2093,7 @@ sub www_addEventsToBadge {
 			my ($items, $nothing) = $shoppingCart->getItems;
 			foreach my $event (@eventsToSubtract) {
 				foreach my $item (@$items) {
-					if ($item->{item}->{productId} eq $event}) {
+					if ($item->{item}->{productId} eq $event) {
 						$shoppingCart->setQuantity($event,'Event',($item->{item} - 1));
 					}
 				}
