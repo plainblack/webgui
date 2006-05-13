@@ -2493,6 +2493,8 @@ sub www_search {
 		return $self->www_editRegistrantInfo();
 	}
 	
+	$self->addCartVars(\%var);
+	
 	# Get all the attendees details
 	$var{badgeHolderInfo_loop} = $self->session->db->buildArrayRefOfHashRefs("select * from EventManagementSystem_badges where badgeId=?",[$badgeHolderId]);
 	
