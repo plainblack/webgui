@@ -1322,7 +1322,7 @@ sub www_addToCart {
 		if (scalar(@$errors) > 0) { return $self->error($errors, "www_addToCart"); }
 		
 		unless ($output) {
-			return $self->saveRegistration if scalar($self->getEventsInScratchCart);
+			return $self->saveRegistration;
 		}
 	}
 	# $self->session->errorHandler->warn("scratch after: <pre>".Dumper($self->getEventsInScratchCart).Dumper($self->session->db->buildHashRef("select name,value from userSessionScratch where sessionId=?",[$self->session->getId]))."</pre>");
@@ -2404,6 +2404,7 @@ sub saveRegistration {
 	my @addingToPurchase = split("\n",$self->session->scratch->get('EMS_add_purchase_events'));
 	# @addingToPurchase = () if ($self->session->scratch->get('EMS_add_purchase_badgeId') && !($self->session->scratch->get('EMS_add_purchase_badgeId') eq $badgeId));
 	my @badgeEvents = $self->session->db->quickArray("select distinct(e.productId) from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e, EventManagementSystem_purchases as z, products as p, transaction where p.productId = r.productId and p.productId = e.productId and r.badgeId=b.badgeId and r.badgeId=? and r.purchaseId !='' and r.purchaseId=z.purchaseId and z.transactionId=transaction.transactionId and r.purchaseId is not null and transaction.status='Completed' ",[$badgeId]);
+	my $addedAny = 0;
 	foreach my $eventId (@$eventsInCart) {
 		next if isIn($eventId,@addingToPurchase);
 		next if isIn($eventId,@badgeEvents);
@@ -2414,26 +2415,27 @@ sub saveRegistration {
 			badgeId => $badgeId
 		},0,0);
 		$shoppingCart->add($eventId, 'Event');
+		$addedAny = 1;
 	}
-
-	#Our item plug-in needs to be able to associate these records with the result of the payment attempt
-	my $counter = 0;
-	while (1) {
-		unless ($self->session->scratch->get("purchaseId".$counter)) {
-			$self->session->scratch->set("purchaseId".$counter, $purchaseId);
-			$self->session->scratch->set("badgeId".$counter, $badgeId);
-			$self->session->scratch->delete('purchaseId'.$self->session->scratch->get('currentPurchaseCounter'));
-			last;
+	if ($addedAny) {
+		#Our item plug-in needs to be able to associate these records with the result of the payment attempt
+		my $counter = 0;
+		while (1) {
+			unless ($self->session->scratch->get("purchaseId".$counter)) {
+				$self->session->scratch->set("purchaseId".$counter, $purchaseId);
+				$self->session->scratch->set("badgeId".$counter, $badgeId);
+				$self->session->scratch->delete('purchaseId'.$self->session->scratch->get('currentPurchaseCounter'));
+				last;
+			}
+			$counter++;	
 		}
-		$counter++;	
+		$self->emptyScratchCart;
+		$self->session->scratch->delete('EMS_add_purchase_badgeId');
+		$self->session->scratch->delete('EMS_add_purchase_events');
+		$self->session->scratch->delete('currentBadgeId');
+		$self->session->scratch->delete('currentMainEvent');
+		$self->session->scratch->delete('currentPurchaseCounter');
 	}
-	$self->emptyScratchCart;
-	$self->session->scratch->delete('EMS_add_purchase_badgeId');
-	$self->session->scratch->delete('EMS_add_purchase_events');
-	$self->session->scratch->delete('currentBadgeId');
-	$self->session->scratch->delete('currentMainEvent');
-	$self->session->scratch->delete('currentPurchaseCounter');
-
 #	if ($self->session->form->get('checkoutNow')) {
 #	   srand;
 #	   $self->session->http->setRedirect($self->getUrl("op=viewCart;something=".rand(44345552)));
