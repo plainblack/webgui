@@ -1351,7 +1351,6 @@ sub addCartVars {
 	my $i;
 	for ( $i=0; $i < 25;$i++) {
 		my $purchase = {};
-		$self->session->errorHandler->warn("got here!");
 		$purchase->{purchaseId} = $self->session->scratch->get("purchaseId".$i);
 		next unless $purchase->{purchaseId};
 		# so we don't show the badge we're currently editing
@@ -1392,8 +1391,8 @@ sub addCartVars {
 				$purchase->{newPrice} += $_->{price};
 			}
 		}
-		$purchase->{editUrl} = $self->getUrl("func=addEventsToBadge;bid=".$purchase->{badgeId}.";purchaseCounter=".$i);
-		$purchase->{deleteUrl} = $self->getUrl("func=addEventsToBadge;bid=none;purchaseCounter=".$i);
+		$purchase->{editIcon} = $self->session->icon->edit("func=addEventsToBadge;bid=".$purchase->{badgeId}.";purchaseCounter=".$i, $self->getUrl());
+		$purchase->{deleteIcon} = $self->session->icon->delete("func=addEventsToBadge;bid=none;purchaseCounter=".$i,$self->getUrl,$i18n->echo('Are you sure you want to delete this item from your cart?  Any changes you have made to the current badge you are editing will also be lost.'));
 		push(@{$var->{'cart.purchaseLoop'}},$purchase);
 	}
 	$var->{'checkoutUrl'} = $self->getUrl("func=checkout");
