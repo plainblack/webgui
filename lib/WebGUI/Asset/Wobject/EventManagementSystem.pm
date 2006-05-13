@@ -1346,6 +1346,7 @@ sub www_addToScratchCart {
 #-------------------------------------------------------------------
 sub addCartVars {
 	my $self = shift;
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my $var = shift;
 	$var->{'cart.purchaseLoop'} = [];
 	my $i;
