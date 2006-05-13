@@ -2416,7 +2416,6 @@ sub saveRegistration {
 		$shoppingCart->add($eventId, 'Event');
 		$addedAny = 1;
 	}
-	if ($addedAny) {
 		#Our item plug-in needs to be able to associate these records with the result of the payment attempt
 		my $counter = 0;
 		while (1) {
@@ -2434,7 +2433,7 @@ sub saveRegistration {
 		$self->session->scratch->delete('currentBadgeId');
 		$self->session->scratch->delete('currentMainEvent');
 		$self->session->scratch->delete('currentPurchaseCounter');
-	}
+
 #	if ($self->session->form->get('checkoutNow')) {
 #	   srand;
 #	   $self->session->http->setRedirect($self->getUrl("op=viewCart;something=".rand(44345552)));
