@@ -2355,7 +2355,7 @@ sub www_moveEventUp {
 sub saveRegistration {
 	my $self = shift;
 	my $eventsInCart = $self->getEventsInScratchCart;
-	my $purchaseId = $self->session->id->generate;
+	my $purchaseId = 	$self->session->scratch->get('currentPurchaseId') || $self->session->id->generate;
 	my $badgeId = $self->session->scratch->get('currentBadgeId');
 
 	my $theirUserId;
@@ -2380,6 +2380,7 @@ sub saveRegistration {
 	$self->session->scratch->delete('EMS_add_purchase_events');
 	$self->session->scratch->delete('currentBadgeId');
 	$self->session->scratch->delete('currentMainEvent');
+	$self->session->scratch->delete('currentPurchaseId');
 
 	#Our item plug-in needs to be able to associate these records with the result of the payment attempt
 	my $counter = 0;
