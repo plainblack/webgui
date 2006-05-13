@@ -2075,7 +2075,7 @@ sub www_addEventsToBadge {
 	} else {
 		my $purchaseCounter = $self->session->form->process('purchaseCounter');
 		if ($purchaseCounter ne "") {
-			$self->session->scratch->delete('purchaseId',$purchaseCounter);
+			$self->session->scratch->delete('purchaseId'.$purchaseCounter);
 		}
 	}
 	return $self->www_resetScratchCart();
