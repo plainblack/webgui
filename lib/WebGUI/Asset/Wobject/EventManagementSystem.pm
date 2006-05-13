@@ -23,6 +23,7 @@ use Digest::MD5;
 use WebGUI::Workflow::Instance;
 use WebGUI::Cache;
 use WebGUI::International;
+use WebGUI::Operation::Commerce;
 use WebGUI::Commerce::ShoppingCart;
 use WebGUI::Commerce::Item;
 use WebGUI::Utility;
@@ -270,8 +271,8 @@ sub addToScratchCart {
 		$self->session->scratch->set('EMS_scratch_cart', $event);
 		return $event;
 	}
-
-	push(@eventsInCart, $event) unless isIn($event,@eventsInCart);
+	my @pastEvents = $self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, transaction as t where r.returned=0 and r.badgeId=? t.transactionId=p.transactionId and t.status='Completed' and p.purchaseId=r.purchaseId group by productId",[$bid]);
+	push(@eventsInCart, $event) unless (isIn($event,@eventsInCart) || isIn($event,@pastEvents));
 
 	$self->session->scratch->delete('EMS_scratch_cart');
 	$self->session->scratch->set('EMS_scratch_cart', join("\n", @eventsInCart));
@@ -956,6 +957,9 @@ sub prerequisiteIsMet {
 sub removeFromScratchCart {
 	my $self = shift;
 	my $event = shift;
+	if ($event eq $self->session->get('currentMainEvent')) {
+		return $self->resetScratchCart();
+	}
 	my $events =  $self->getEventsInScratchCart();
 	my @newArr;
 	foreach (@{$events}) {
@@ -1332,10 +1336,77 @@ sub www_addToScratchCart {
 	my $masterEventId = $self->session->form->get("mid");
 	
 	my $mainEvent = $self->addToScratchCart($pid); #tsc
-	return $self->processStyle($self->processTemplate($self->getRegistrationInfo(),$self->getValue("checkoutTemplateId"))) if $masterEventId eq $pid;
+	if ($masterEventId eq $pid) {
+		return $self->processStyle($self->processTemplate($self->getRegistrationInfo(),$self->getValue("checkoutTemplateId")));
+	}
 	return $self->www_search($nameOfEventAdded);
 }
 
+#-------------------------------------------------------------------
+sub addCartVars {
+	my $self = shift;
+	my $var = shift;
+	$var->{cart.purchaseLoop} = [];
+	for (my $i = 0;$i < 25;$i++) {
+		my $purchase = {};
+		$purchase->{'purchase.purchaseId'} = $self->session->scratch->get("purchaseId".$i);
+		next unless $purchase->{purchaseId};
+		# so we don't show the badge we're currently editing
+		next if ($i eq $self->session->scratch->get("currentPurchaseCounter");
+		my $theseRegs = $self->session->db->buildArrayRefOfHashRefs("select r.*, p.price, q.passId, q.passType from EventManagementSystem_registrations as r, EventManagementSystem_products as q, products as p where r.purchaseId=? and p.productId=r.productId and q.productId=r.productId",[$purchaseId]);
+		my @currentEvents;
+		foreach (@$theseRegs) {
+			my ($isChild) = $self->session->db->quickArray("select prerequisiteId from EventManagementSystem_products where productId = ?",[$_->{productId}]);
+			$purchase->{'purchase.mainEventTitle'} = $self->getEventName($_->{productId}) unless $isChild;
+			($purchase->{alreadyPurchasedBadge}) = $self->session->db->quickArray("select p.transactionId from EventManagementSystem_purchases as p, transaction as t where p.purchaseId = ? and t.transactionId=p.transactionId and t.status='Completed'",[$_->{productId}]) unless $isChild;
+			unless ($purchase->{badgeId}) {
+				$purchase->{badgeId} = $_->{badgeId};
+				$purchase->{registrantInfoLoop} = $self->session->db->buildArrayRefOfHashRefs("select * from EventManagementSystem_badges where badgeId=?",[$_->{badgeId}]);
+			}
+			push(@currentEvents,$_->{productId});
+		}
+		my @pastEvents = $self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, transaction as t where r.returned=0 and r.badgeId=? t.transactionId=p.transactionId and t.status='Completed' and p.purchaseId=r.purchaseId group by productId",[$bid]);
+		push(@currentEvents,@pastEvents);
+		$purchase->{newPrice} = 0;
+		foreach (@$theseRegs) {
+			my @discountPasses = split(/::/,$_->{passId});
+			if (scalar(@discountPasses) && ($_->{passType} eq 'member')) {
+				my $addlPrice = $_->{price};
+				foreach my $eligiblePass (@discountPasses) {
+					my @passEvents = $self->session->db->buildArray("select productId from EventManagementSystem_products where passType='defines' and passId=?",[$eligiblePass]);
+					next unless isIn($eligiblePass,@currentEvents);
+					my $pass = $self->session->db->quickHashRef("select * from EventManagementSystem_discountPasses where passId=?",[$eligiblePass]);
+					if ($pass->{type} eq 'newPrice') {
+						$addlPrice = (0 + $pass->{amount}) if ($addlPrice > (0 + $pass->{amount}));
+					} elsif ($pass->{type} eq 'amountOff') {
+						# not yet implemented!
+					} elsif ($pass->{type} eq 'percentOff') {
+						# not yet implemented!
+					}
+				}
+				$purchase->{newPrice} += $addlPrice;
+			} else {
+				$purchase->{newPrice} += $_->{price};
+			}
+		}
+		$purchase->{editUrl} = $self->getUrl("func=addEventsToBadge;bid=".$purchase->{badgeId}.";purchaseCounter=".$i);
+		$purchase->{deleteUrl} = $self->getUrl("func=addEventsToBadge;bid=none;purchaseCounter=".$i);
+		push(@$purchaseLoop,$purchase);
+	}
+	$var->{'checkoutUrl'} = $self->getUrl("func=checkout");
+}
+
+#-------------------------------------------------------------------
+sub www_checkout {
+	my $self = shift;	
+	return WebGUI::Operation::Commerce::www_checkout($self->session);
+}
+
+#-------------------------------------------------------------------
+sub www_editRegistrantInfo {
+	my $self = shift;	
+	return $self->processStyle($self->processTemplate($self->getRegistrationInfo(),$self->getValue("checkoutTemplateId")));
+}
 
 #-------------------------------------------------------------------
 sub www_deleteCartItem {
@@ -1963,24 +2034,31 @@ Method to go into badge-addition mode.
 
 =cut
 
-# remember to account for editing the purchase from the commerce cart
-# after calling this method...
-
 sub www_addEventsToBadge {
 	my $self = shift;
 	my %var = $self->get();
 	my $isAdmin = $self->canAddEvents;
-	my $bid = $self->session->form->process('bid');
+	my $bid = $self->session->form->process('bid') || 'none';
 	my $eventId = $self->session->form->process('eventId');
-	$self->session->scratch->delete('EMS_add_purchase_badgeId');
-	$self->session->scratch->set('EMS_add_purchase_badgeId',$bid);
-	my @pastEvents = $self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p where r.returned=0 and r.badgeId=? and p.purchaseId=r.purchaseId group by productId",[$bid]);
-	$self->session->scratch->delete('EMS_add_purchase_events');
-	$self->session->scratch->set('EMS_add_purchase_events',join("\n",@pastEvents));
-	$self->session->scratch->delete('EMS_scratch_cart');
-	$self->session->scratch->set('EMS_scratch_cart',join("\n",@pastEvents));
-	$self->session->scratch->set('currentMainEvent',$eventId);
-	return $self->www_search();
+	unless ($bid eq 'none') {
+		$self->session->scratch->set('EMS_add_purchase_badgeId',$bid);
+		my @pastEvents = $self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, transaction as t where r.returned=0 and r.badgeId=? t.transactionId=p.transactionId and t.status='Completed' and p.purchaseId=r.purchaseId group by productId",[$bid]);
+		my $purchaseCounter = $self->session->form->process('purchaseCounter');
+		$self->session->scratch->set('EMS_add_purchase_events',join("\n",@pastEvents));
+		if ($purchaseCounter ne "") {
+			# if we're loading a badge that's in the cart, put its stuff in the scratch cart along with the already-purchased events for this badgeId.
+			$self->session->scratch->set("currentPurchaseCounter",$purchaseCounter);
+			my $theseRegs = $self->session->db->buildArrayRefOfHashRefs("select r.*, p.price, q.prerequisiteId from EventManagementSystem_registrations as r, EventManagementSystem_products as q, products as p where r.purchaseId=? and p.productId=r.productId and q.productId=r.productId",[$self->session->scratch->get("purchaseId".$purchaseCounter)]);
+			foreach (@$theseRegs) {
+				push(@pastEvents,$_->{productId}) unless isIn($_->{productId},@pastEvents);
+				$eventId = $_->{productId} unless $_->{prerequisiteId};
+			}
+		}
+		$self->session->scratch->set('EMS_scratch_cart',join("\n",@pastEvents));
+		$self->session->scratch->set('currentMainEvent',$eventId);
+		return $self->www_search();
+	}
+	return $self->www_resetScratchCart();
 }
 
 #-------------------------------------------------------------------
@@ -2308,8 +2386,11 @@ sub www_resetScratchCart {
 	$self->session->scratch->delete('EMS_add_purchase_events');
 	$self->session->scratch->delete('currentMainEvent');
 	$self->session->scratch->delete('currentBadgeId');
+	$self->session->scratch->delete('purchaseId'.$self->session->scratch->get('currentPurchaseCounter'));
+	$self->session->scratch->delete('currentPurchaseCounter');
 	return $self->www_view;
 }
+
 #-------------------------------------------------------------------
 sub www_saveRegistrantInfo {
 	my $self = shift;
@@ -2348,7 +2429,6 @@ sub www_saveRegistrantInfo {
 	$details->{createdByUserId} = $self->session->var->get('userId') if ($addingNew && $userId ne '1');
 	$badgeId = $self->setCollateral("EventManagementSystem_badges", "badgeId",$details,0,0);
 	
-		
 	my ($theirUserId) = $self->session->db->quickArray("select userId from EventManagementSystem_badges where badgeId=?",[$badgeId]);
 	$userId = $theirUserId unless $thisIsI;
 	if ($userId && $userId ne '1') {
@@ -2366,7 +2446,7 @@ sub www_saveRegistrantInfo {
 	
 	$self->session->scratch->set('currentBadgeId',$badgeId);
 	my $nameOfEventAdded = $self->getEventName($self->session->scratch->get('currentMainEvent'));
-	return "";
+	return $self->www_view();
 }
 
 #-------------------------------------------------------------------
@@ -2396,22 +2476,31 @@ sub www_search {
 	my $masterEventId = $var{badgeSelected};
 	my $badgeHolderId = $self->session->scratch->get("currentBadgeId");  # primary key to EMS_badges containing all the attendees info
 	
+	if ($masterEventId && !$badgeHolderId) {
+		# something is wrong; they must have skipped the badge choice step.
+		return $self->editRegistrantInfo();
+	}
+	
 	# Get all the attendees details
-	my $badgeHolderInfo = $self->session->db->buildArrayRefOfHashRefs("select * from EventManagementSystem_badges where badgeId=?",[$badgeHolderId]);
-	$var{badgeHolderInfo_loop} = $badgeHolderInfo;
+	$var{badgeHolderInfo_loop} = $self->session->db->buildArrayRefOfHashRefs("select * from EventManagementSystem_badges where badgeId=?",[$badgeHolderId]);
 	
 	# Get all the events they have in the badge so far
 	my $eventsInBadge = $self->getEventsInScratchCart;
 	
 	# Get all the info about these events and set the template vars
 	my @selectedEvents_loop;
+	my @pastEvents = $self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, transaction as t where r.returned=0 and r.badgeId=? t.transactionId=p.transactionId and t.status='Completed' and p.purchaseId=r.purchaseId group by productId",[$badgeHolderId]);
 	foreach my $eventId (@$eventsInBadge) {
+		if ($eventId eq $masterEventId) {
+			$var{'mainEventTitle'} = $self->getEventName($eventId);
+			next;
+		}
 		my $eventData = $self->session->db->quickHashRef("select p.productId, p.title, p.description, p.price, p.weight, p.sku, p.skuTemplate, e.startDate, e.endDate, e.maximumAttendees, e.approved
 								  from products as p, EventManagementSystem_products as e where p.productId = e.productId and p.productId=?",[$eventId]);
-		$eventData->{'startDate'} = $self->session->datetime->epochToHuman($eventData->{'startDate'});
-		$eventData->{'endDate'} = $self->session->datetime->epochToHuman($eventData->{'endDate'});
-		$eventData->{'removeEventFromBadge.url'} = $self->getUrl("func=removeFromScratchCart;pid=".$eventData->{'productId'});
-		push(@selectedEvents_loop, $eventData);	
+		$eventData->{'startDateHuman'} = $self->session->datetime->epochToHuman($eventData->{'startDate'});
+		$eventData->{'endDateHuman'} = $self->session->datetime->epochToHuman($eventData->{'endDate'});
+		$eventData->{'removeEventFromBadge.url'} = $self->getUrl("func=removeFromScratchCart;pid=".$eventData->{'productId'}) unless isIn($eventData->{'productId'},@pastEvents);
+		push(@selectedEvents_loop, $eventData);
 	}
 	$var{'eventsInBadge_loop'} = \@selectedEvents_loop;
 	#these allow us to show a specific page of subevents after an add to scratch cart
