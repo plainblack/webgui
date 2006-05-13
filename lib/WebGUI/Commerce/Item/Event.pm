@@ -130,7 +130,7 @@ sub priceLineItem {
 	foreach my $passId (@discountPasses) {
 		# get a list of events that define this pass
 		my @passEvents = $self->session->db->buildArray("select productId from EventManagementSystem_products where passType='defines' and passId=?",[$passId]);
-		$self->session->errorHandler->warn('pass events: '.Dumper(\@passEvents));
+		# $self->session->errorHandler->warn('pass events: '.Dumper(\@passEvents));
 		my $numberOfPasses = 0;
 		# find out if we have any of this pass's events in our cart.
 		foreach my $item (@$cartItems) {
