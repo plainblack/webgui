@@ -1357,7 +1357,7 @@ sub addCartVars {
 		$purchase->{badgeId} = $self->session->scratch->get("badgeId".$i);
 		# so we don't show the badge we're currently editing
 		next if ($i eq $self->session->scratch->get("currentPurchaseCounter"));
-		my $theseRegs = $self->session->db->buildArrayRefOfHashRefs("select r.*, p.price, q.passId, q.passType from EventManagementSystem_registrations as r, EventManagementSystem_products as q, products as p where p.productId=r.productId and r.badgeId=? and q.productId=r.productId",[$purchase->{badgeId}]);
+		my $theseRegs = $self->session->db->buildArrayRefOfHashRefs("select r.*, p.price, q.passId, q.passType from EventManagementSystem_registrations as r, EventManagementSystem_products as q, products as p where p.productId=r.productId and r.badgeId=? and r.purchaseId=? and q.productId=r.productId",[$purchase->{purchaseId},$purchase->{badgeId}]);
 		my @currentEvents;
 		foreach (@$theseRegs) {
 			my ($isChild) = $self->session->db->quickArray("select prerequisiteId from EventManagementSystem_products where productId = ?",[$_->{productId}]);
