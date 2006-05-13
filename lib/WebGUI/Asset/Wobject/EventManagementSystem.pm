@@ -2107,7 +2107,7 @@ Method to remove some items from the cart
 sub removePurchaseFromCart {
 	my $self = shift;
 	my $purchaseId = shift;
-	my @eventsToSubtract = $self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, where r.purchaseId=? and (p.transactionId='' or p.transactionId is null) and p.purchaseId=r.purchaseId",[$purchaseIdToDelete]);
+	my @eventsToSubtract = $self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, where r.purchaseId=? and (p.transactionId='' or p.transactionId is null) and p.purchaseId=r.purchaseId",[$purchaseId]);
 	my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
 	my ($items, $nothing) = $shoppingCart->getItems;
 	foreach my $event (@eventsToSubtract) {
