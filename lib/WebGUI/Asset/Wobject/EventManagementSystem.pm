@@ -271,7 +271,8 @@ sub addToScratchCart {
 		$self->session->scratch->set('EMS_scratch_cart', $event);
 		return $event;
 	}
-	my @pastEvents = $self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, transaction as t where r.returned=0 and r.badgeId=? t.transactionId=p.transactionId and t.status='Completed' and p.purchaseId=r.purchaseId group by productId",[$bid]);
+	my $bid = $self->session->scratch->get('currentBadgeId');
+	my @pastEvents = ($bid)?$self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, transaction as t where r.returned=0 and r.badgeId=? t.transactionId=p.transactionId and t.status='Completed' and p.purchaseId=r.purchaseId group by productId",[$bid]):();
 	push(@eventsInCart, $event) unless (isIn($event,@eventsInCart) || isIn($event,@pastEvents));
 
 	$self->session->scratch->delete('EMS_scratch_cart');
@@ -1352,7 +1353,7 @@ sub addCartVars {
 		$purchase->{'purchase.purchaseId'} = $self->session->scratch->get("purchaseId".$i);
 		next unless $purchase->{purchaseId};
 		# so we don't show the badge we're currently editing
-		next if ($i eq $self->session->scratch->get("currentPurchaseCounter");
+		next if ($i eq $self->session->scratch->get("currentPurchaseCounter"));
 		my $theseRegs = $self->session->db->buildArrayRefOfHashRefs("select r.*, p.price, q.passId, q.passType from EventManagementSystem_registrations as r, EventManagementSystem_products as q, products as p where r.purchaseId=? and p.productId=r.productId and q.productId=r.productId",[$purchaseId]);
 		my @currentEvents;
 		foreach (@$theseRegs) {
@@ -1365,7 +1366,7 @@ sub addCartVars {
 			}
 			push(@currentEvents,$_->{productId});
 		}
-		my @pastEvents = $self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, transaction as t where r.returned=0 and r.badgeId=? t.transactionId=p.transactionId and t.status='Completed' and p.purchaseId=r.purchaseId group by productId",[$bid]);
+		my @pastEvents = $self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, transaction as t where r.returned=0 and r.badgeId=? t.transactionId=p.transactionId and t.status='Completed' and p.purchaseId=r.purchaseId group by productId",[$purchase->{badgeId}]);
 		push(@currentEvents,@pastEvents);
 		$purchase->{newPrice} = 0;
 		foreach (@$theseRegs) {
@@ -1391,7 +1392,7 @@ sub addCartVars {
 		}
 		$purchase->{editUrl} = $self->getUrl("func=addEventsToBadge;bid=".$purchase->{badgeId}.";purchaseCounter=".$i);
 		$purchase->{deleteUrl} = $self->getUrl("func=addEventsToBadge;bid=none;purchaseCounter=".$i);
-		push(@$purchaseLoop,$purchase);
+		push(@{$var->{cart.purchaseLoop}},$purchase);
 	}
 	$var->{'checkoutUrl'} = $self->getUrl("func=checkout");
 }
