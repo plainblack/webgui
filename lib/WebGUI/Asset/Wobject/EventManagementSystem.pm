@@ -2087,7 +2087,19 @@ sub www_addEventsToBadge {
 	} else {
 		my $purchaseCounter = $self->session->form->process('purchaseCounter');
 		if ($purchaseCounter ne "") {
+			my $purchaseIdToDelete = $self->session->scratch->get('purchaseId'.$purchaseCounter);
+			my @eventsToSubtract = $self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, where r.purchaseId=? and (p.transactionId='' or p.transactionId is null) and p.purchaseId=r.purchaseId",[$purchaseIdToDelete]);
+			my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
+			my ($items, $nothing) = $shoppingCart->getItems;
+			foreach my $event (@eventsToSubtract) {
+				foreach my $item (@$items) {
+					if ($item->{item}->{productId} eq $event}) {
+						$shoppingCart->setQuantity($event,'Event',($item->{item} - 1));
+					}
+				}
+			}
 			$self->session->scratch->delete('purchaseId'.$purchaseCounter);
+			
 		}
 	}
 	return $self->www_resetScratchCart();
