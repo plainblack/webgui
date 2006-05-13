@@ -1347,7 +1347,7 @@ sub www_addToScratchCart {
 sub addCartVars {
 	my $self = shift;
 	my $var = shift;
-	$var->{cart.purchaseLoop} = [];
+	$var->{'cart.purchaseLoop'} = [];
 	for (my $i = 0;$i < 25;$i++) {
 		my $purchase = {};
 		$purchase->{purchaseId} = $self->session->scratch->get("purchaseId".$i);
@@ -1392,7 +1392,7 @@ sub addCartVars {
 		}
 		$purchase->{editUrl} = $self->getUrl("func=addEventsToBadge;bid=".$purchase->{badgeId}.";purchaseCounter=".$i);
 		$purchase->{deleteUrl} = $self->getUrl("func=addEventsToBadge;bid=none;purchaseCounter=".$i);
-		push(@{$var->{cart.purchaseLoop}},$purchase);
+		push(@{$var->{'cart.purchaseLoop'}},$purchase);
 	}
 	$var->{'checkoutUrl'} = $self->getUrl("func=checkout");
 }
