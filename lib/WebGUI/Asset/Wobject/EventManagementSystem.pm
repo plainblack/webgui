@@ -2395,7 +2395,7 @@ sub www_moveEventUp {
 sub saveRegistration {
 	my $self = shift;
 	my $eventsInCart = $self->getEventsInScratchCart;
-	my $purchaseId = 	$self->session->scratch->get('purchaseId'.$self->session->scratch->get('currentPurchaseCounter')) || $self->session->id->generate;
+	my $purchaseId = 	$self->session->id->generate;
 	my $badgeId = $self->session->scratch->get('currentBadgeId');
 
 	my $theirUserId;
@@ -2417,16 +2417,15 @@ sub saveRegistration {
 	}
 
 	#Our item plug-in needs to be able to associate these records with the result of the payment attempt
-	if ($self->session->scratch->get('purchaseId'.$self->session->scratch->get('currentPurchaseCounter')) ne $purchaseId) {
-		my $counter = 0;
-		while (1) {
-			unless ($self->session->scratch->get("purchaseId".$counter)) {
-				$self->session->scratch->set("purchaseId".$counter, $purchaseId);
-				$self->session->scratch->set("badgeId".$counter, $badgeId);
-				last;
-			}
-			$counter++;	
+	my $counter = 0;
+	while (1) {
+		unless ($self->session->scratch->get("purchaseId".$counter)) {
+			$self->session->scratch->set("purchaseId".$counter, $purchaseId);
+			$self->session->scratch->set("badgeId".$counter, $badgeId);
+			$self->session->scratch->delete('purchaseId'.$self->session->scratch->get('currentPurchaseCounter'));
+			last;
 		}
+		$counter++;	
 	}
 	$self->emptyScratchCart;
 	$self->session->scratch->delete('EMS_add_purchase_badgeId');
