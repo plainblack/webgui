@@ -2070,6 +2070,7 @@ sub www_addEventsToBadge {
 		}
 		$self->session->scratch->set('EMS_scratch_cart',join("\n",@pastEvents));
 		$self->session->scratch->set('currentMainEvent',$eventId);
+		$self->session->scratch->set('currentBadgeId',$bid);
 		return $self->www_search();
 	}
 	return $self->www_resetScratchCart();
