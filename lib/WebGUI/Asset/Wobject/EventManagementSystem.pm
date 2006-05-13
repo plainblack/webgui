@@ -272,7 +272,7 @@ sub addToScratchCart {
 		return $event;
 	}
 	my $bid = $self->session->scratch->get('currentBadgeId');
-	my @pastEvents = ($bid)?$self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, transaction as t where r.returned=0 and r.badgeId=? t.transactionId=p.transactionId and t.status='Completed' and p.purchaseId=r.purchaseId group by productId",[$bid]):();
+	my @pastEvents = ($bid)?$self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, transaction as t where r.returned=0 and r.badgeId=? and t.transactionId=p.transactionId and t.status='Completed' and p.purchaseId=r.purchaseId group by productId",[$bid]):();
 	push(@eventsInCart, $event) unless (isIn($event,@eventsInCart) || isIn($event,@pastEvents));
 
 	$self->session->scratch->delete('EMS_scratch_cart');
@@ -1366,7 +1366,7 @@ sub addCartVars {
 			}
 			push(@currentEvents,$_->{productId});
 		}
-		my @pastEvents = $self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, transaction as t where r.returned=0 and r.badgeId=? t.transactionId=p.transactionId and t.status='Completed' and p.purchaseId=r.purchaseId group by productId",[$purchase->{badgeId}]);
+		my @pastEvents = $self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, transaction as t where r.returned=0 and r.badgeId=? and t.transactionId=p.transactionId and t.status='Completed' and p.purchaseId=r.purchaseId group by productId",[$purchase->{badgeId}]);
 		push(@currentEvents,@pastEvents);
 		$purchase->{newPrice} = 0;
 		foreach (@$theseRegs) {
@@ -1401,6 +1401,14 @@ sub addCartVars {
 sub www_checkout {
 	my $self = shift;	
 	return WebGUI::Operation::Commerce::www_checkout($self->session);
+}
+
+#-------------------------------------------------------------------
+sub www_emptyCart {
+	my $self = shift;	
+	my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($session);
+	$shoppingCart->empty;
+	return $self->www_view();
 }
 
 #-------------------------------------------------------------------
@@ -2043,7 +2051,7 @@ sub www_addEventsToBadge {
 	my $eventId = $self->session->form->process('eventId');
 	unless ($bid eq 'none') {
 		$self->session->scratch->set('EMS_add_purchase_badgeId',$bid);
-		my @pastEvents = $self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, transaction as t where r.returned=0 and r.badgeId=? t.transactionId=p.transactionId and t.status='Completed' and p.purchaseId=r.purchaseId group by productId",[$bid]);
+		my @pastEvents = $self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, transaction as t where r.returned=0 and r.badgeId=? and t.transactionId=p.transactionId and t.status='Completed' and p.purchaseId=r.purchaseId group by productId",[$bid]);
 		my $purchaseCounter = $self->session->form->process('purchaseCounter');
 		$self->session->scratch->set('EMS_add_purchase_events',join("\n",@pastEvents));
 		if ($purchaseCounter ne "") {
