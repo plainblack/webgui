@@ -2074,6 +2074,7 @@ sub www_addEventsToBadge {
 			while (1) {
 				unless ($self->session->scratch->get("purchaseId".$counter)) {
 					$self->session->scratch->set("purchaseId".$counter, $purchaseId);
+					$self->session->scratch->set("currentPurchaseCounter",$counter);
 					last;
 				}
 				$counter++;	
