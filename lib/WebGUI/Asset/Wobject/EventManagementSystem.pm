@@ -2115,7 +2115,8 @@ sub removePurchaseFromCart {
 	foreach my $event (@eventsToSubtract) {
 		$self->session->errorHandler->warn("trying event ".$event);
 				foreach my $item (@$items) {
-		$self->session->errorHandler->warn("trying item ".$item->{item}->{productId});
+					use Data::Dumper;
+		$self->session->errorHandler->warn(Dumper($item));
 			if ($item->{item}->{productId} eq $event) {
 				$shoppingCart->setQuantity($event,'Event',($item->{item} - 1));
 			}
