@@ -2844,6 +2844,8 @@ sub view {
 #		$self->session->scratch->delete('EMS_add_purchase_events');
 #	}
 	
+	$self->addCartVars(\%var);
+	
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	# Get the products available for sale for this page
 	my $sql = "select p.productId, p.title, p.description, p.price, p.weight, p.sku, p.skuTemplate, p.templateId, e.approved, e.maximumAttendees 
