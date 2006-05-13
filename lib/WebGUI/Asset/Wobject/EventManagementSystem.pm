@@ -2067,6 +2067,17 @@ sub www_addEventsToBadge {
 				push(@pastEvents,$_->{productId}) unless isIn($_->{productId},@pastEvents);
 				$eventId = $_->{productId} unless $_->{prerequisiteId};
 			}
+		} else {
+			# gotta use the existing purchaseId, b/c we're loading a completed purchase.
+			my ($purchaseId) = $self->session->db->quickArray("select purchaseId from EventManagementSystem_registrations where badgeId=? and productId=? limit 1",[$bid,$eventId]);
+			my $counter = 0;
+			while (1) {
+				unless ($self->session->scratch->get("purchaseId".$counter)) {
+					$self->session->scratch->set("purchaseId".$counter, $purchaseId);
+					last;
+				}
+				$counter++;	
+			}	
 		}
 		$self->session->scratch->set('EMS_scratch_cart',join("\n",@pastEvents));
 		$self->session->scratch->set('currentMainEvent',$eventId);
