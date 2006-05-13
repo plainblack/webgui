@@ -2115,7 +2115,7 @@ sub removePurchaseFromCart {
 	foreach my $event (@eventsToSubtract) {
 		foreach my $item (@$items) {
 			if ($item->{item}->{_event}->{productId} eq $event) {
-				$shoppingCart->setQuantity($event,'Event',($item->{item} - 1));
+				$shoppingCart->setQuantity($event,'Event',($item->{quantity} - 1));
 			}
 		}
 	}
