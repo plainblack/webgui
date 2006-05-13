@@ -1359,13 +1359,11 @@ sub addCartVars {
 		next if ($i eq $self->session->scratch->get("currentPurchaseCounter"));
 		my $theseRegs = $self->session->db->buildArrayRefOfHashRefs("select r.*, p.price, q.passId, q.passType from EventManagementSystem_registrations as r, EventManagementSystem_products as q, products as p where p.productId=r.productId and r.badgeId=? and r.purchaseId=? and q.productId=r.productId",[$purchase->{badgeId},$purchase->{purchaseId}]);
 		my @currentEvents;
+		$purchase->{registrantInfoLoop} = $self->session->db->buildArrayRefOfHashRefs("select * from EventManagementSystem_badges where badgeId=?",[$purchase->{badgeId}]);
 		foreach (@$theseRegs) {
 			my ($isChild) = $self->session->db->quickArray("select prerequisiteId from EventManagementSystem_products where productId = ?",[$_->{productId}]);
 			$purchase->{'purchase.mainEventTitle'} = $self->getEventName($_->{productId}) unless $isChild;
 			($purchase->{alreadyPurchasedBadge}) = $self->session->db->quickArray("select p.transactionId from EventManagementSystem_purchases as p, transaction as t where p.purchaseId = ? and t.transactionId=p.transactionId and t.status='Completed'",[$_->{productId}]) unless $isChild;
-			unless ($purchase->{registrantInfoLoop}) {
-				$purchase->{registrantInfoLoop} = $self->session->db->buildArrayRefOfHashRefs("select * from EventManagementSystem_badges where badgeId=?",[$purchase->{badgeId}]);
-			}
 			push(@currentEvents,$_->{productId});
 		}
 		my @pastEvents = $self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, transaction as t where r.returned=0 and r.badgeId=? and t.transactionId=p.transactionId and t.status='Completed' and p.purchaseId=r.purchaseId group by productId",[$purchase->{badgeId}]);
