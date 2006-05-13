@@ -1541,6 +1541,11 @@ added to the user's cart and would be discounted if the Attend All Sessions even
                 lastUpdated => 1147108858,
         },
 
+        'confirm delete purchase' => {
+                message => q|Are you sure you want to delete this item from your cart?  Any changes you have made to the current badge you are editing will also be lost.|,
+                lastUpdated => 1147108858,
+        },
+
 };
 
 1;

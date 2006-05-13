@@ -38,6 +38,14 @@ our $HELP = {
                                 tag => 'project add/edit',
                                 namespace => 'Asset_ProjectManager',
                         },
+                        {
+                                tag => 'task edit template',
+                                namespace => 'Asset_ProjectManager',
+                        },
+                        {
+                                tag => 'view project template',
+                                namespace => 'Asset_ProjectManager',
+                        },
 		],
 	},
 
@@ -92,6 +100,18 @@ our $HELP = {
 	'task edit template' => {
 		title => 'edit task template vars title',
 		body => 'edit task template vars body',
+		fields => [ ],
+		related => [
+                        {
+                                tag => 'project manager add/edit',
+                                namespace => 'Asset_ProjectManager',
+                        },
+		],
+	},
+
+	'view project template' => {
+		title => 'view project template vars title',
+		body => 'view project template vars body',
 		fields => [ ],
 		related => [
                         {

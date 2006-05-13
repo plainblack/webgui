@@ -1391,7 +1391,7 @@ sub addCartVars {
 			}
 		}
 		$purchase->{editIcon} = $self->session->icon->edit("func=addEventsToBadge;bid=".$purchase->{badgeId}.";purchaseCounter=".$i, $self->getUrl());
-		$purchase->{deleteIcon} = $self->session->icon->delete("func=addEventsToBadge;bid=none;purchaseCounter=".$i,$self->getUrl,$i18n->echo('Are you sure you want to delete this item from your cart?  Any changes you have made to the current badge you are editing will also be lost.'));
+		$purchase->{deleteIcon} = $self->session->icon->delete("func=addEventsToBadge;bid=none;purchaseCounter=".$i,$self->getUrl,$i18n->echo('confirm delete purchase'));
 		push(@{$var->{'cart.purchaseLoop'}},$purchase);
 	}
 	$var->{'checkoutUrl'} = $self->getUrl("func=checkout");
