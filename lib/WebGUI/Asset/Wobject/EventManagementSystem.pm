@@ -2487,7 +2487,7 @@ sub www_search {
 	
 	if ($masterEventId && !$badgeHolderId) {
 		# something is wrong; they must have skipped the badge choice step.
-		return $self->editRegistrantInfo();
+		return $self->www_editRegistrantInfo();
 	}
 	
 	# Get all the attendees details
