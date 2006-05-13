@@ -1322,7 +1322,7 @@ sub www_addToCart {
 		if (scalar(@$errors) > 0) { return $self->error($errors, "www_addToCart"); }
 		
 		unless ($output) {
-			return $self->saveRegistration;
+			return $self->saveRegistration if scalar($self->getEventsInScratchCart);
 		}
 	}
 	# $self->session->errorHandler->warn("scratch after: <pre>".Dumper($self->getEventsInScratchCart).Dumper($self->session->db->buildHashRef("select name,value from userSessionScratch where sessionId=?",[$self->session->getId]))."</pre>");
