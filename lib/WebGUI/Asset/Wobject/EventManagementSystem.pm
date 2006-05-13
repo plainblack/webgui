@@ -2113,11 +2113,8 @@ sub removePurchaseFromCart {
 	my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
 	my ($items, $nothing) = $shoppingCart->getItems;
 	foreach my $event (@eventsToSubtract) {
-		$self->session->errorHandler->warn("trying event ".$event);
-				foreach my $item (@$items) {
-					use Data::Dumper;
-		$self->session->errorHandler->warn(Dumper($item));
-			if ($item->{item}->{productId} eq $event) {
+		foreach my $item (@$items) {
+			if ($item->{item}->{_event}->{productId} eq $event) {
 				$shoppingCart->setQuantity($event,'Event',($item->{item} - 1));
 			}
 		}
