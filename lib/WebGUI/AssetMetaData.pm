@@ -236,6 +236,8 @@ sub www_editMetaDataFieldSave {
 	if($session{form}{fieldName} eq "") {
 		return $ac->render(WebGUI::International::get("errorEmptyField", "Asset"),WebGUI::International::get('Edit Metadata',"Asset"));
 	}
+	my $fieldType = $session{form}{fieldType};
+	$fieldType =~ s/[^\w]//g;	
 	if($session{form}{fid} eq 'new') {
 		$session{form}{fid} = WebGUI::Id::generate();
 		WebGUI::SQL->write("insert into metaData_properties (fieldId, fieldName, defaultValue, description, fieldType, possibleValues) values (".
@@ -243,13 +245,13 @@ sub www_editMetaDataFieldSave {
 					quote($session{form}{fieldName}).",".
 					quote($session{form}{defaultValue}).",".
 					quote($session{form}{description}).",".
-					quote($session{form}{fieldType}).",".
+					quote($fieldType).",".
 					quote($session{form}{possibleValues}).")");
 	} else {
                 WebGUI::SQL->write("update metaData_properties set fieldName = ".quote($session{form}{fieldName}).", ".
 					"defaultValue = ".quote($session{form}{defaultValue}).", ".
 					"description = ".quote($session{form}{description}).", ".
-					"fieldType = ".quote($session{form}{fieldType}).", ".
+					"fieldType = ".quote($fieldType).", ".
 					"possibleValues = ".quote($session{form}{possibleValues}).
 					" where fieldId = ".quote($session{form}{fid}));
 	}
