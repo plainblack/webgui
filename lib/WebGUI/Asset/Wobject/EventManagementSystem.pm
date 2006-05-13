@@ -2072,6 +2072,11 @@ sub www_addEventsToBadge {
 		$self->session->scratch->set('currentMainEvent',$eventId);
 		$self->session->scratch->set('currentBadgeId',$bid);
 		return $self->www_search();
+	} else {
+		my $purchaseCounter = $self->session->form->process('purchaseCounter');
+		if ($purchaseCounter ne "") {
+			$self->session->scratch->delete('purchaseId',$purchaseCounter);
+		}
 	}
 	return $self->www_resetScratchCart();
 }
