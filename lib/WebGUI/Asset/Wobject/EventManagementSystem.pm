@@ -2067,6 +2067,7 @@ sub www_addEventsToBadge {
 				push(@pastEvents,$_->{productId}) unless isIn($_->{productId},@pastEvents);
 				$eventId = $_->{productId} unless $_->{prerequisiteId};
 			}
+			$self->removePurchaseFromCart($self->session->scratch->get("purchaseId".$purchaseCounter));
 		} else {
 			# gotta use the existing purchaseId, b/c we're loading a completed purchase.
 			my ($purchaseId) = $self->session->db->quickArray("select purchaseId from EventManagementSystem_registrations where badgeId=? and productId=? limit 1",[$bid,$eventId]);
@@ -2088,23 +2089,35 @@ sub www_addEventsToBadge {
 		my $purchaseCounter = $self->session->form->process('purchaseCounter');
 		if ($purchaseCounter ne "") {
 			my $purchaseIdToDelete = $self->session->scratch->get('purchaseId'.$purchaseCounter);
-			my @eventsToSubtract = $self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, where r.purchaseId=? and (p.transactionId='' or p.transactionId is null) and p.purchaseId=r.purchaseId",[$purchaseIdToDelete]);
-			my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
-			my ($items, $nothing) = $shoppingCart->getItems;
-			foreach my $event (@eventsToSubtract) {
-				foreach my $item (@$items) {
-					if ($item->{item}->{productId} eq $event) {
-						$shoppingCart->setQuantity($event,'Event',($item->{item} - 1));
-					}
-				}
-			}
+			$self->removePurchaseFromCart($purchaseIdToDelete);
 			$self->session->scratch->delete('purchaseId'.$purchaseCounter);
-			
 		}
 	}
 	return $self->www_resetScratchCart();
 }
 
+#-------------------------------------------------------------------
+
+=head2 removePurchaseFromCart ( )
+
+Method to remove some items from the cart
+
+=cut
+
+sub removePurchaseFromCart {
+	my $self = shift;
+	my $purchaseId = shift;
+	my @eventsToSubtract = $self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, where r.purchaseId=? and (p.transactionId='' or p.transactionId is null) and p.purchaseId=r.purchaseId",[$purchaseIdToDelete]);
+	my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
+	my ($items, $nothing) = $shoppingCart->getItems;
+	foreach my $event (@eventsToSubtract) {
+		foreach my $item (@$items) {
+			if ($item->{item}->{productId} eq $event) {
+				$shoppingCart->setQuantity($event,'Event',($item->{item} - 1));
+			}
+		}
+	}
+}
 #-------------------------------------------------------------------
 
 =head2 www_returnItem ( )
