@@ -2412,6 +2412,18 @@ sub saveRegistration {
 		},0,0);
 		$shoppingCart->add($eventId, 'Event');
 	}
+
+	#Our item plug-in needs to be able to associate these records with the result of the payment attempt
+	if ($self->session->scratch->get('purchaseId'.$self->session->scratch->get('currentPurchaseCounter')) ne $purchaseId) {
+		my $counter = 0;
+		while (1) {
+			unless ($self->session->scratch->get("purchaseId".$counter)) {
+				$self->session->scratch->set("purchaseId".$counter, $purchaseId);
+				last;
+			}
+			$counter++;	
+		}
+	}
 	$self->emptyScratchCart;
 	$self->session->scratch->delete('EMS_add_purchase_badgeId');
 	$self->session->scratch->delete('EMS_add_purchase_events');
@@ -2419,15 +2431,6 @@ sub saveRegistration {
 	$self->session->scratch->delete('currentMainEvent');
 	$self->session->scratch->delete('currentPurchaseCounter');
 
-	#Our item plug-in needs to be able to associate these records with the result of the payment attempt
-	my $counter = 0;
-	while (1) {
-		unless ($self->session->scratch->get("purchaseId".$counter)) {
-			$self->session->scratch->set("purchaseId".$counter, $purchaseId);
-			last;
-		}
-		$counter++;	
-	}	
 #	if ($self->session->form->get('checkoutNow')) {
 #	   srand;
 #	   $self->session->http->setRedirect($self->getUrl("op=viewCart;something=".rand(44345552)));
