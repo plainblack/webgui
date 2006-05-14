@@ -259,7 +259,7 @@ sub www_editProject {
 		-hoverHelp => $i18n->get('edit project resource hoverhelp'),
 		-label => $i18n->get('edit project resource label')
     );
-	
+	my $ac = $self->getAdminConsole;
 	return return $ac->render($f->print,$i18n->get("edit project screen label"));
 	
 }	
