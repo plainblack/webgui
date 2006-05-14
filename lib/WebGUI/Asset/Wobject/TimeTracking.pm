@@ -260,7 +260,7 @@ sub www_editProject {
 		-label => $i18n->get('edit project resource label')
     );
 	
-	return $f->print;
+	return return $ac->render($f->print,$i18n->get("edit project screen label"));
 	
 }	
 
