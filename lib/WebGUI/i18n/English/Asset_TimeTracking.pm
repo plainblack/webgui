@@ -116,8 +116,42 @@ our $I18N = {
 		lastUpdated => 0
 		},			
 	
-	'' => {
-		message => q||,
+	'edit project name label' => {
+		message => q|Project Name|,
+		lastUpdated => 0
+		},
+
+	'edit project name hoverhelp' => {
+		message => q|Enter the name of the project you wish to show up in the projects drop down menu for this time tracker|,
+		lastUpdated => 0
+		},
+	
+	'edit project id label' => {
+		message => q|Project Id|,
+		lastUpdated => 0
+		},
+		
+	'edit project id hoverhelp' => {
+		message => q|Project Identifier|,
+		lastUpdated => 0
+		},		
+	'edit project resource hoverhelp' => {
+		message => q|Choose the resources you would like to be able to log time to this project|,
+		lastUpdated => 0
+		},
+
+	'edit project resource label' => {
+		message => q|Project Resource|,
+		lastUpdated => 0
+		},
+		
+	'edit project tasks label' => {
+		message => q|Project Tasks|,
+		lastUpdated => 0
+		},			
+		
+	edit project tasks hoverhelp'' => {
+		message => q|Enter the project tasks, one per line, that you would like to track time against for this project|,
 		lastUpdated => 0
 		},
 
@@ -134,7 +168,7 @@ our $I18N = {
 	'' => {
 		message => q||,
 		lastUpdated => 0
-		},				
+		},							
 };
 
 1;
