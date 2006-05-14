@@ -122,7 +122,7 @@ sub purge {
 sub setSessionVars {
    my $self = shift;
    my $session = $self->session;
-   my $i18n = WebGUI::International->new($session,'Asset_ProjectManager');
+   my $i18n = WebGUI::International->new($session,'Asset_TimeTracking');
    
    return ($session,$session->privilege,$session->form,$session->db,$session->datetime,$i18n,$session->user);
 }
