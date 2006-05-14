@@ -210,9 +210,63 @@ sub view {
 }
 
 #-------------------------------------------------------------------
+sub www_editProject {
+	my $self = shift;
+    my ($session,$privilege,$form,$db,$dt,$i18n,$user,$eh) = $self->getSessionVars("privilege","form","db","datetime","i18n","user","errorHandler");    
+	
+	#Check Privileges
+    return $privilege->insufficient unless ($user->isInGroup($self->get("groupToManage")));
+    my $projectId = $form->get("projectId") || "new";
+	
+	my $project = $db->
+	#Build Form
+    my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl, -extras=>q|onsubmit="return checkform(this);"|);
+    $f->hidden( 
+       -name=>"func",
+	   -value=>"editProjectSave" 
+    );
+    $f->hidden( 
+       -name=>"projectId", 
+       -value=>$projectId 
+    );
+    $f->readOnly(
+		-label=>$i18n->get("edit project id label"),
+		-hoverHelp => $i18n->get('edit project id hoverhelp'),
+		-value=>$projectId
+    );
+    $f->text(
+		-name  => "projectName",
+		-value => $form->get("projectName") || $project->{projectName},
+		-hoverHelp => $i18n->get('edit project name hoverhelp'),
+		-label => $i18n->get('edit project name label')
+    );
+	
+	$f->textarea(
+		-name  => "taskList",
+		-value => $project->{taskList},
+		-hoverHelp => $i18n->get('edit project tasks hoverhelp'),
+		-label => $i18n->get('edit project tasks label')
+    );
+	
+	tie my %users, "Tie::IxHash";
+	%users = $db->buildHash("select userId,username from users where userId not in (1,3)");
+	my $resources = $db->buildArrayRef("select resourceId from TT_projectResourceList where projectId=".$db->quote($projectId));
+	
+	$f->selectList(
+		-name  => "resources",
+		-options => \%users,
+		-value => $resources,
+		-hoverHelp => $i18n->get('edit project resource hoverhelp'),
+		-label => $i18n->get('edit project resource label')
+    );
+	
+	return $output;
+	
+}	
+
+#-------------------------------------------------------------------
 sub www_manageProjects {
 	my $self = shift;
-	my $var = $_[0];
     my ($session,$privilege,$form,$db,$dt,$i18n,$user,$eh) = $self->getSessionVars("privilege","form","db","datetime","i18n","user","errorHandler");    
 	
 	#Check Privileges
@@ -237,7 +291,7 @@ sub www_manageProjects {
 	   my $projectName = $project->{projectName};
 	   my $projectId = $project->{projectId};
 	   my @tasks = $db->buildArray("select taskName from TT_projectTasks where projectId=".$db->quote($projectId));
-	   my $taskList = join("<br>",@tasks);
+	   my $taskList = join("<br />",@tasks);
 	   my @resources = $db->buildArray("select resourceId from TT_projectResourceList where projectId=".$db->quote($projectId));
   	   for(my $i = 0; $i < scalar(@resources); $i++) {
 	      my $u = WebGUI::User->new($session,$resources[$i]);
@@ -249,18 +303,26 @@ sub www_manageProjects {
 		  }
 		  $resources[$i] = $r;
 	   }
-	   my $resourceList = join("<br>",@resources);
+	   my $resourceList = join("<br />",@resources);
+	   my $editLink = "";
+	   my $deleteLink = "";
 	   $output .= qq|
 	     <tr>
 		    <td class="tableData">$projectName</td>
 			<td class="tableData">$taskList</td>
 			<td class="tableData">$resourceList</td>
+			<td class="tableData">$editLink.$deleteLink</td>
 		 </tr>
 	   |;
 	}
+	if(scalar(keys %{$projects}) == 0) {
+	   my $noProjects = sprintf($i18n->get("no project message"),$self->getUrl("func=editProject;projectId=new"));
+	   $output .= qq|<tr><td class="tableData" colspan="4"></td></tr>|
+	}
+	
 	$output .= "</tbody></table>";
 	my $ac = $self->getAdminConsole;
-	$ac->addSubmenuItem($self->getUrl('func=editProject'),$i18n->get("edit project label"));
+	$ac->addSubmenuItem($self->getUrl('func=editProject;projectId=new'),$i18n->get("add project label"));
 	return $ac->render($output,$i18n->get("manage projects screen label"));
 }
 
