@@ -119,6 +119,30 @@ sub purge {
 }
 
 #-------------------------------------------------------------------
+sub getDaysInWeek {
+	my $self = shift;
+	my $week = $_[0];
+	return [] unless $week;
+	
+	my ($session,$dt,$i18n,$eh) = $self->getSessionVars("datetime","i18n","errorHandler");
+	
+    #Week View Below
+	my ($dayStart,$dayEnd) = $dt->dayStartEnd($week);
+    my $dayOfWeek = $dt->getDayOfWeek($dayStart);
+    my $sundayAdjust = (7 - $dayOfWeek);
+    
+	my $weekStart = $dt->addToDateTime($dayStart,0,0,$sundayAdjust,1);
+	
+	tie my %hash, "Tie::IxHash";
+	$hash{"0"} = $weekStart;
+	for (my $i = 1; $i < 7; $i++) {
+	   $hash{$i} = $dt->addToDate($weekStart,0,0,$i);
+	}
+	
+	return \%hash;
+}
+
+#-------------------------------------------------------------------
 sub setSessionVars {
    my $self = shift;
    my $session = $self->session;
@@ -130,18 +154,20 @@ sub setSessionVars {
 #-------------------------------------------------------------------
 sub getSessionVars {
    my $self = shift;
-   my $vars = $_[0];
-   return () unless $vars;
+   my @vars = @_;
+   my $session = $self->session;
+   return ($session) unless (scalar(@vars) > 0);
    
    my @list = ();
    my $session = $self->session;
    push(@list, $session);
    
-   foreach my $var (@{$vars}) {
+   foreach my $var (@vars) {
       if($var eq "i18n") {
-	     push(@list,WebGUI::International->new($session,'Asset_ProjectManager'));
-	  }
-      push(@list, $session->$var);
+	     push(@list,WebGUI::International->new($session,'Asset_TimeTracking'));
+	  } else {
+         push(@list, $session->$var);
+      }
    }   
    return @list;
 }
@@ -173,8 +199,18 @@ sub _buildUserView {
 	my $self = shift;
 	my $var = $_[0];
 	
-	my @vars = ("privilege","form","db","datetime","i18n","user","eh");
-	my ($session,$privilege,$form,$db,$dt,$i18n,$user,$eh) = $self->getSessionVars(\@vars);
+	my ($session,$privilege,$form,$db,$dt,$i18n,$user,$eh) = $self->getSessionVars("privilege","form","db","datetime","i18n","user","errorHandler");
+	my $pmAssetId = $self->getValue("pmAssetId");
+	
+	if($user->isInGroup($self->get("groupToManage"))) {
+	   if($pmAssetId) {
+	      #Add link to project dashboard
+		  $var->{'project.manage.url'} = "";
+	   } else {
+	      $var->{'project.manage.url'} = $self->getUrl("func=manageProjects");
+	   }
+	   $var->{'project.manage.label'} = $i18n->get("project manage label");
+	}
 	
 	$var->{'form.header'} = WebGUI::Form::formHeader($session,{
 				action=>$self->getUrl,
@@ -189,7 +225,6 @@ sub _buildUserView {
 	
 	$var->{'form.timetracker'} = $self->_buildTimeTable($var);
 	
-	return;
 }
 
 #-------------------------------------------------------------------
@@ -199,8 +234,7 @@ sub _buildTimeTable {
 	my $var = {};
 	
 	$var->{'extras'} = $viewVar->{'extras'}; 
-	my @vars = ("datetime","i18n","eh","form","db","user");
-	my ($session,$dt,$i18n,$eh,$form,$db,$user) = $self->getSessionVars(\@vars);
+	my ($session,$dt,$i18n,$eh,$form,$db,$user) = $self->getSessionVars("datetime","i18n","errorHandler","form","db","user");
 	
 	my $week = $form->get("week") || $dt->time;
 	my $daysInWeek = $self->getDaysInWeek($week);
@@ -217,16 +251,24 @@ sub _buildTimeTable {
 	my $weekStart = $daysInWeek->{"0"};
 	my ($junk,$weekEnd) = $dt->dayStartEnd($daysInWeek->{"6"});
 	
-	my $entries = $db->buildArrayRefOfHashRefs("select * from TT_timeEntry where resourceId=".$db->quote($user->userId)." and date >= ".$db->quote($weekStart)." and date <=".$db->quote($weekEnd));
+	#Rebuild days in week hash to contain set values
+	tie my %setDaysHash,"Tie::IxHash";
+	foreach my $day (keys %{$daysInWeek}) {
+	   $setDaysHash{$day} = $dt->epochToSet($daysInWeek->{$day});
+	}
+	
+	#Build Entries Loop
+	my $entries = $db->buildArrayRefOfHashRefs("select * from TT_timeEntry where resourceId=".$db->quote($user->userId)." and taskDate >= ".$db->quote($weekStart)." and taskDate <=".$db->quote($weekEnd));
 	my $rowCount = 1;
 	my @timeEntries = ();
+	
 	foreach my $entry (@{$entries}) {
-	   push (@timeEntries,$self->_buildRow($entry,$rowCount++));
+	   push (@timeEntries,$self->_buildRow($entry,$rowCount++,\%setDaysHash));
 	}
 	
 	#Seed time tracker with 10 empty rows
 	for( my $i = $rowCount; $i < ($rowCount + 10); $i++) {
-	   push(@timeEntries,$self->_buildRow(undef,$i));
+	   push(@timeEntries,$self->_buildRow(undef,$i,\%setDaysHash));
 	}
 	
 	$var->{'time.entry.loop'} = \@timeEntries;
@@ -238,11 +280,12 @@ sub _buildTimeTable {
 #-------------------------------------------------------------------
 sub _buildRow {
 	my $self = shift;
-	my ($session,$dt,$i18n,$eh,$form,$db,$user) = $self->getSessionVars(("datetime","i18n","eh","form","db","user"));
+	my ($session,$dt,$i18n,$eh,$form,$db,$user) = $self->getSessionVars("datetime","i18n","errorHandler","form","db","user");
 	
 	my $var = {};
 	my $entry = $_[0] || {};
 	my $rowCount = $_[1];
+	my $daysInWeek = $_[2];
 	
 	my $entryId = $entry->{entryId};
 	$var->{'row.id'} = "row_$rowCount";
@@ -253,9 +296,12 @@ sub _buildRow {
 	my $pmAssetId = $self->getValue("pmAssetId");
 	
 	#Entry Date
-	$var->{'form.date'} = WebGUI::Form::date($session,{
+	tie my %days, "Tie::IxHash";
+	%days = (""=>"Choose One", %{$daysInWeek});
+	$var->{'form.date'} = WebGUI::Form::selectBox($session,{
 				-name=>"taskDate_$rowCount",
-				-value=>$entry->{taskDate}
+				-value=>$entry->{taskDate},
+				-options=>\%days
 				});
 	
 	#Entry Project
@@ -263,8 +309,13 @@ sub _buildRow {
 	if($pmAssetId) {
 	   #Build project list and task lists from project management app
 	} else {
-	   %projectList = $db->buildHashRef("select a.projectId, a.projectName from TT_projectList a, TT_projectResourceList b where a.projectId=b.projectId and b.resourceId=".$db->quote($user->userId));
+	   %projectList = $db->buildHash("select a.projectId, a.projectName from TT_projectList a, TT_projectResourceList b where a.projectId=b.projectId and b.resourceId=".$db->quote($user->userId));
 	}
+
+	#if(scalar(keys %projectList) == 0) {
+	%projectList = (""=>"Choose One",%projectList);
+	#}
+	
 	$var->{'form.project'} = WebGUI::Form::selectBox($session,{
 	            -name=>"projectId_$rowCount",
 				-options=>\%projectList,
@@ -277,11 +328,12 @@ sub _buildRow {
 	   if($pmAssetId) {
 	      #Build task list for project from project managmenet app
 	   } else {
-	      %taskList = $db->buildHashRef("select taskName, taskId from TT_projectTasks where projectId=".$db->quote($projectId));
+	      %taskList = $db->buildHash("select taskName, taskId from TT_projectTasks where projectId=".$db->quote($projectId));
 	   }
-	} else {
-	   %taskList = ("","Choose One");
 	}
+	
+	%taskList = (""=>"Choose One",%taskList);
+	
 	$var->{'form.task'} = WebGUI::Form::selectBox($session,{
 	            -name=>"taskId_$rowCount",
 				-options=>\%taskList,
@@ -291,7 +343,8 @@ sub _buildRow {
 	#Entry Hours
 	$var->{'form.hours'} = WebGUI::Form::float($session, {
 				-name=>"hours_$rowCount",
-				-value=>$entry->{hours}
+				-value=>$entry->{hours},
+				-size=>5
 				});
 	
 	#Entry Comments
@@ -304,30 +357,6 @@ sub _buildRow {
 	$var->{'delete.url'} = "";	
 	return $var;
 
-}
-
-#-------------------------------------------------------------------
-sub getDaysInWeek {
-	my $self = shift;
-	my $week = $_[0];
-	return [] unless $week;
-	
-	my ($session,$dt,$i18n,$eh) = $self->getSessionVars(("datetime","i18n","eh"));
-	
-    #Week View Below
-	my ($dayStart,$dayEnd) = $dt->dayStartEnd($week);
-    my $dayOfWeek = $dt->getDayOfWeek($dayStart);
-    my $sundayAdjust = (7 - $dayOfWeek);
-    
-	my $weekStart = $dt->addToDateTime($dayStart,0,0,$sundayAdjust,1);
-	
-	tie my %hash, "Tie::IxHash";
-	$hash{"0"} = $weekStart;
-	for (my $i = 1; $i < 7; $i++) {
-	   $hash{$i} = $dt->addToDate($weekStart,0,0,$i);
-	}
-	
-	return \%hash;
 }
 
 1;
