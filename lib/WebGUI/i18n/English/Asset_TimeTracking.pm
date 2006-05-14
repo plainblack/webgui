@@ -1,4 +1,4 @@
-package WebGUI::i18n::English::Asset_TimeTracker;
+package WebGUI::i18n::English::Asset_TimeTracking;
 
 our $I18N = {
 	'userViewTemplate hoverhelp' => {
