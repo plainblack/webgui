@@ -244,7 +244,7 @@ sub www_manageProjects {
 	   |;
 	}
 	$output .= "</tbody></table>";
-	return $output
+	return $self->_acWrapper($output, $i18n->get("manage projects screen label"));
 }
 
 #-------------------------------------------------------------------
