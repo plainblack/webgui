@@ -156,6 +156,21 @@ sub isManaging {
 	return 0;
 }
 
+#-------------------------------------------------------------------
+
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView;
+	my $children = $self->getLineage( ["children"], { returnObjects=>1, excludeClasses=>["WebGUI::Asset::Wobject::Layout","WebGUI::Asset::Wobject::Dashboard"] });
+	my @hidden = split("\n",$self->get("assetsToHide"));
+	foreach my $child (@{$children}) {
+		unless (isIn($child,@hidden) || !($child->canView)) {
+			$self->session->style->setRawHeadTags($child->getExtraHeadTags);
+			$child->prepareView;
+		}
+	}
+}
+
 
 #-------------------------------------------------------------------
 sub processPropertiesFromFormPost {
