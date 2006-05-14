@@ -41,7 +41,6 @@ during the load.
 sub _load {
 	my $session = shift;
 	my $namespace = shift;
-	$namespace =~ s/[^\w\d\s]//g;
 	my $cmd = "WebGUI::Help::".$namespace;
         my $load = sprintf 'use %-s; $%-s::HELP;', $cmd, $cmd;
 	my $hash = eval($load);
@@ -244,7 +243,7 @@ sub www_viewHelp {
 	my $session = shift;
 	return $session->privilege->insufficient() unless ($session->user->isInGroup(7));
 	my $ac = WebGUI::AdminConsole->new($session,"help");
-	my $namespace = $session->form->process("namespace") || "WebGUI";
+	my $namespace = $session->form->process("namespace","className") || "WebGUI";
         my $i18n = WebGUI::International->new($session, $namespace);
 	my $help = _get($session,$session->form->process("hid"),$namespace);
 	my @related = _related($session, $help->{related});
@@ -416,7 +415,7 @@ the form paramter "namespace".
 sub www_viewHelpChapter {
 	my $session = shift;
 	return $session->privilege->insufficient() unless ($session->user->isInGroup(7));
-	my $namespace = $session->form->process("namespace");
+	my $namespace = $session->form->process("namespace","className");
 	my $help = _load($session,$namespace);
 	my @entries = sort keys %{ $help };
 	my $output = '';
