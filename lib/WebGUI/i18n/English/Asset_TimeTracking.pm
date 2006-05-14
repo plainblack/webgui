@@ -150,7 +150,7 @@ our $I18N = {
 		lastUpdated => 0
 		},			
 		
-	edit project tasks hoverhelp'' => {
+	'edit project tasks hoverhelp' => {
 		message => q|Enter the project tasks, one per line, that you would like to track time against for this project|,
 		lastUpdated => 0
 		},
