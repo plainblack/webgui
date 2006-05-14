@@ -20,6 +20,21 @@ use WebGUI::Utility;
 use POSIX qw(ceil floor);
 use base 'WebGUI::Asset::Wobject';
 
+#-------------------------------------------------------------------
+sub _acWrapper {
+	my $self = shift;
+	my $html = shift;
+	my $title = shift;
+	my $i18n = WebGUI::International->new($self->session,'Asset_TimeTracking');
+	my $ac = $self->getAdminConsole;
+	$ac->setHelp('add/edit event','Asset_EventManagementSystem') unless $ac->getHelp;
+	$ac->addSubmenuItem($self->getUrl('func=search'),$i18n->get("manage events"));
+	$ac->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n->get('manage event metadata'));
+	$ac->addSubmenuItem($self->getUrl('func=managePrereqSets'), $i18n->get('manage prerequisite sets'));
+	$ac->addSubmenuItem($self->getUrl('func=manageRegistrants'), $i18n->get('manage registrants'));
+	$ac->addSubmenuItem($self->getUrl('func=manageDiscountPasses'), $i18n->get('manage discount passes'));
+	return $ac->render($html,$title);
+}
 
 #-------------------------------------------------------------------
 sub definition {
@@ -244,7 +259,7 @@ sub www_manageProjects {
 	   |;
 	}
 	$output .= "</tbody></table>";
-	return $self->_acWrapper($output, $i18n->get("manage projects screen label"));
+	return $self->getAdminConsole->render($output,$i18n->get("manage projects screen label"));
 }
 
 #-------------------------------------------------------------------
