@@ -106,13 +106,13 @@ our $I18N = {
 		lastUpdated => 0
 		},
 	
-	'' => {
-		message => q||,
+	'add project label' => {
+		message => q|Add New Project|,
 		lastUpdated => 0
 		},
 		
-	'' => {
-		message => q||,
+	'edit project label' => {
+		message => q|Edit Project|,
 		lastUpdated => 0
 		},			
 	
