@@ -158,8 +158,12 @@ sub purgeRevision {
 	if ($self->getRevisionCount > 1) {
 		$self->session->db->beginTransaction;
         	foreach my $definition (@{$self->definition($self->session)}) {                
-			$self->session->db->write("delete from ".$definition->{tableName}." where assetId=".$self->session->db->quote($self->getId)." and revisionDate=".$self->session->db->quote($self->get("revisionDate")));
-        	}       
+			$self->session->db->write("delete from ".$definition->{tableName}." where assetId=? and revisionDate=?",[$self->getId, $self->get("revisionDate")]);
+        	}
+		my ($count) = $self->session->db->quickArray("select count(*) from assetData where assetId=? and status='pending'",[$self->getId]);
+		if ($count < 1) {
+			$self->session->db->write("update asset set isLockedBy=null where assetId=?",[$self->getId]);
+		}
         	$self->session->db->commit;
 		$self->purgeCache;
 		$self->updateHistory("purged revision ".$self->get("revisionDate"));
