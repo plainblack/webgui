@@ -195,6 +195,58 @@ sub view {
 }
 
 #-------------------------------------------------------------------
+sub www_manageProjects {
+	my $self = shift;
+	my $var = $_[0];
+    my ($session,$privilege,$form,$db,$dt,$i18n,$user,$eh) = $self->getSessionVars("privilege","form","db","datetime","i18n","user","errorHandler");    
+	
+	#Check Privileges
+    return $privilege->insufficient unless ($user->isInGroup($self->get("groupToManage")));
+	
+	my $pnLabel = $i18n->get("manage project name label");
+	my $atLabel = $i18n->get("manage project available task label");
+	my $resLabel = $i18n->get("manage project resource label");
+	
+	my $output = q|<table cellspacing="0" cellpadding="2" border="1">
+	   <tbody>
+	      <tr>
+	         <td class="tableHeader">$pnLabel</td>
+		     <td class="tableHeader">$atLabel</td>
+		     <td class="tableHeader">$resLabel</td>
+		     <td class="tableHeader">&#160;</td>
+	      </tr>
+	|;
+	my $projects = $db->buildHashRef("select projectId, projectName from TT_projectList where assetId=".$db->quote($self->getId));
+	
+	foreach my $project (@{$projects}) {
+	   my $projectName = $project->{projectName};
+	   my @tasks = $db->buildArray("select taskName from TT_projectTasks where projectId=".$db->quote($projectId));
+	   my $taskList = join("<br>",@tasks);
+	   my @resources = $db->buildArray("select resourceId from TT_projectResourceList where projectId=".$db->quote($projectId));
+  	   for(my $i = 0; $i < scalar(@resources) $i++) {
+	      my $u = WebGUI::User->new($session,$resources[$i]);
+		  my $fname = $u->profileField("firstName");
+		  my $lname = $u->profileField("lastName");
+		  my $r = $u->username;
+		  if($fname && $lname) {
+		    $r = $fname." ".$lname;
+		  }
+		  $resources[$i] = $r;
+	   }
+	   my $resourceList = join("<br>",@resources);
+	   $output .= qq|
+	     <tr>
+		    <td class="tableData">$projectName</td>
+			<td class="tableData">$taskList</td>
+			<td class="tableData">$resourceList</td>
+		 </tr>
+	   |;
+	}
+	$output .= "</tbody></table>";
+	return $output
+}
+
+#-------------------------------------------------------------------
 sub _buildUserView {
 	my $self = shift;
 	my $var = $_[0];
@@ -309,7 +361,7 @@ sub _buildRow {
 	if($pmAssetId) {
 	   #Build project list and task lists from project management app
 	} else {
-	   %projectList = $db->buildHash("select a.projectId, a.projectName from TT_projectList a, TT_projectResourceList b where a.projectId=b.projectId and b.resourceId=".$db->quote($user->userId));
+	   %projectList = $db->buildHash("select a.projectId, a.projectName from TT_projectList a, TT_projectResourceList b where a.assetId=".$db->quote($self->getId)." and a.projectId=b.projectId and b.resourceId=".$db->quote($user->userId));
 	}
 
 	#if(scalar(keys %projectList) == 0) {
