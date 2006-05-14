@@ -218,9 +218,9 @@ sub www_editProject {
     return $privilege->insufficient unless ($user->isInGroup($self->get("groupToManage")));
     my $projectId = $form->get("projectId") || "new";
 	
-	my $project = $db->
+	my $project = $db->quickHashRef("select * from TT_projectList where projectId=".$db->quote($projectId));
 	#Build Form
-    my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl, -extras=>q|onsubmit="return checkform(this);"|);
+    my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
     $f->hidden( 
        -name=>"func",
 	   -value=>"editProjectSave" 
