@@ -43,7 +43,6 @@ addDisabletoRichEditor();
 addNavigationMimeType();
 addIndexes();
 addDatabaseCache();
-updateHelpTemplate();
 fixImportNodePrivileges();
 addAdManager();
 updateMatrix();
@@ -1056,30 +1055,6 @@ sub ip2cidr {
 	return $ip;
 }
 
-
-#-------------------------------------------------
-sub updateHelpTemplate {
-	print "\tUpdating Help template.\n" unless ($quiet);
-	my $template = <<EOT;
-<p><tmpl_var body></p>
-
-<tmpl_if fields>
-<dl>
-<tmpl_loop fields>
-
-   <dt><tmpl_var title></dt>
-         <dd><tmpl_var description>
-<tmpl_if uiLevel>
-	<br /><i><tmpl_var uiLevelLabel>:</i><tmpl_var uiLevel>
-</tmpl_if>
-</dd>
-	 </tmpl_loop>
-	 </dl>
-	 </tmpl_if>
-EOT
-	my $asset = WebGUI::Asset->new($session,"PBtmplHelp000000000001","WebGUI::Asset::Template");
-	$asset->addRevision({template=>$template});
-}
 
 #-------------------------------------------------
 sub installSQLForm {

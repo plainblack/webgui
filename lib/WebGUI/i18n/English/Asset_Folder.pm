@@ -62,93 +62,158 @@ to do you want to go to the new Folder?</p>|,
 	},
 
 	'folder template body' => {
-		message => q|<p>The following variables are available in Folder Templates:</p>
-
-<p><b>addFile.url</b><br />
-The url for adding files to the Folder.</p>
-
-<p><b>addFile.label</b><br />
-The internationalized label for adding files to the Folder.</p>
-
-<p><b>subfolder_loop</b><br />
-A loop containing all Folder assets which are children of the Folder.</p>
-
-<div class="helpIndent">
-
-<p><b>id</b><br />
-The assetId of the Folder.</p>
-
-<p><b>url</b><br />
-The url of the Folder.</p>
-
-<p><b>title</b><br />
-The title of the Folder.</p>
-
-<p><b>icon.small</b><br />
-The URL to a small icon of the appropriate type for this Asset.</p>
-
-<p><b>icon.big</b><br />
-The URL to a big icon of the appropriate type for this Asset.</p>
-
-</div>
-
-<p><b>file_loop</b><br />
-A loop containing all non-Folder assets which are children of the Folder.</p>
-
-<div class="helpIndent">
-
-<p><b>id</b><br />
-The assetId of the Asset.</p>
-
-<p><b>canView</b><br />
-A conditional indicating if the current user can view this Asset.</p>
-
-<p><b>title</b><br />
-The title of the Asset.</p>
-
-<p><b>synopsis</b><br />
-The synopsis of the Asset.</p>
-
-<p><b>size</b><br />
-The size of the Asset, formatted.</p>
-
-<p><b>date.epoch</b><br />
-The date the Asset was last updated, relative to the epoch.</p>
-
-<p><b>icon.small</b><br />
-A URL to a small icon that represents the Asset.</p>
-
-<p><b>icon.big</b><br />
-A URL to an icon that represents the Asset.</p>
-
-<p><b>type</b><br />
-The type of this Asset.</p>
-
-<p><b>url</b><br />
-The URL of the Asset.</p>
-
-<p><b>isImage</b><br />
-A conditional indicating if this Asset is an Image Asset.</p>
-
-<p><b>canEdit</b><br />
-A conditional indicating if this Asset can be edited by the current user.</p>
-
-<p><b>controls</b><br />
-The editing control bar for this child</p>
-
-<p><b>isFile</b><br />
-A conditional indicating if this Asset is a File Asset.</p>
-
-<p><b>thumbnail.url</b><br />
-If this Asset is an Image, the URL to the thumbnail for it.</p>
-
-<p><b>file.url</b><br />
-If this Asset is a File Asset (File, Image or Zip Archive), the URL to the actual file for downloading.  Otherwise,
-this variable will be empty</p>
-
-</div>
-		|,
+		message => q|The following variables are available in Folder Templates: |,
         	lastUpdated => 1146775736,
+	},
+
+	'addFile.url' => {
+		message => q|The url for adding files to the Folder.|,
+		lastupdated => 0,
+		context => q|Template variable description.|
+	},
+
+	'addFile.label' => {
+		message => q|The internationalized label for adding files to the Folder.|,
+		lastupdated => 0,
+		context => q|Template variable description.|
+	},
+
+	'subfolder_loop' => {
+		message => q|A loop containing all Folder assets which are children of the Folder.|,
+		lastupdated => 0,
+		context => q|Template variable description.|
+	},
+
+	'folder id' => {
+		message => q|The assetId of the Folder.|,
+		lastupdated => 0,
+		context => q|Template variable description.|
+	},
+
+	'folder url' => {
+		message => q|The url of the Folder.|,
+		lastupdated => 0,
+		context => q|Template variable description.|
+	},
+
+	'folder title' => {
+		message => q|The title of the Folder.|,
+		lastupdated => 0,
+		context => q|Template variable description.|
+	},
+
+	'folder icon.small' => {
+		message => q|The URL to a small icon of the appropriate type for this Asset.|,
+		lastupdated => 0,
+		context => q|Template variable description.|
+	},
+
+	'folder icon.big' => {
+		message => q|The URL to a big icon of the appropriate type for this Asset.|,
+		lastupdated => 0,
+		context => q|Template variable description.|
+	},
+
+	'file_loop' => {
+		message => q|A loop containing all non-Folder assets which are children of the Folder.|,
+		lastupdated => 0,
+		context => q|Template variable description.|
+	},
+
+	'id' => {
+		message => q|The assetId of the Asset.|,
+		lastupdated => 0,
+		context => q|Template variable description.|
+	},
+
+	'canView' => {
+		message => q|A conditional indicating if the current user can view this Asset.|,
+		lastupdated => 0,
+		context => q|Template variable description.|
+	},
+
+	'title' => {
+		message => q|The title of the Asset.|,
+		lastupdated => 0,
+		context => q|Template variable description.|
+	},
+
+	'synopsis' => {
+		message => q|The synopsis of the Asset.|,
+		lastupdated => 0,
+		context => q|Template variable description.|
+	},
+
+	'size' => {
+		message => q|The size of the Asset, formatted.|,
+		lastupdated => 0,
+		context => q|Template variable description.|
+	},
+
+	'date.epoch' => {
+		message => q|The date the Asset was last updated, relative to the epoch.|,
+		lastupdated => 0,
+		context => q|Template variable description.|
+	},
+
+	'icon.small' => {
+		message => q|A URL to a small icon that represents the Asset.|,
+		lastupdated => 0,
+		context => q|Template variable description.|
+	},
+
+	'icon.big' => {
+		message => q|A URL to an icon that represents the Asset.|,
+		lastupdated => 0,
+		context => q|Template variable description.|
+	},
+
+	'type' => {
+		message => q|The type of this Asset.|,
+		lastupdated => 0,
+		context => q|Template variable description.|
+	},
+
+	'url' => {
+		message => q|The URL of the Asset.|,
+		lastupdated => 0,
+		context => q|Template variable description.|
+	},
+
+	'isImage' => {
+		message => q|A conditional indicating if this Asset is an Image Asset.|,
+		lastupdated => 0,
+		context => q|Template variable description.|
+	},
+
+	'canEdit' => {
+		message => q|A conditional indicating if this Asset can be edited by the current user.|,
+		lastupdated => 0,
+		context => q|Template variable description.|
+	},
+
+	'controls' => {
+		message => q|The editing control bar for this child.|,
+		lastupdated => 0,
+		context => q|Template variable description.|
+	},
+
+	'isFile' => {
+		message => q|A conditional indicating if this Asset is a File Asset.|,
+		lastupdated => 0,
+		context => q|Template variable description.|
+	},
+
+	'thumbnail.url' => {
+		message => q|If this Asset is an Image, the URL to the thumbnail for it.|,
+		lastupdated => 0,
+		context => q|Template variable description.|
+	},
+
+	'file.url' => {
+		message => q|If this Asset is a File Asset (File, Image or Zip Archive), the URL to the actual file for downloading.  Otherwise, this variable will be empty.|,
+		lastupdated => 0,
+		context => q|Template variable description.|
 	},
 
 	'assetName' => {

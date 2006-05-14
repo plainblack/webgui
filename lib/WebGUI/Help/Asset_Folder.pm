@@ -37,7 +37,70 @@ our $HELP = {
         'folder template' => {
 		title => 'folder template title',
 		body => 'folder template body',
-		fields => [
+		fields => [ ],
+		variables => [
+			{
+				name => 'addFile.url',
+			}, {
+				name => "addFile.label",
+			}, {
+				name => "subfolder_loop",
+				variables => [
+					{
+						name => "id",
+						description => "folder id"
+					}, {
+						name => "url",
+						description => "folder url"
+					}, {
+						name => "title",
+						description => "folder title"
+					}, {
+						name => "icon.small",
+						description => "folder icon.small"
+					}, {
+						name => "icon.big",
+						description => "folder icon.big"
+					}
+				]
+			}, {
+				name => "file_loop",
+				variables => [
+					{
+						name => "id",
+					}, {
+						name => "canView",
+					}, {
+						name => "title",
+					}, {
+						name => "synopsis",
+					}, {
+						name => "size",
+					}, {
+						name => "date.epoch",
+					}, {
+						name => "icon.small",
+					}, {
+						name => "icon.big",
+					}, {
+						name => "type",
+					}, {
+						name => "url",
+					}, {
+						name => "isImage",
+					}, {
+						name => "canEdit",
+					}, {
+						name => "controls",
+					}, {
+						name => "isFile",
+					}, {
+						name => "thumbnail.url",
+					}, {
+						name => "file.url",
+					}
+				],	
+			}
 		],
 		related => [
 			{
