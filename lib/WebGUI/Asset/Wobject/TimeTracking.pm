@@ -222,7 +222,7 @@ sub www_manageProjects {
 	my $atLabel = $i18n->get("manage project available task label");
 	my $resLabel = $i18n->get("manage project resource label");
 	
-	my $output = q|<table cellspacing="0" cellpadding="2" border="1">
+	my $output = qq|<table cellspacing="0" cellpadding="2" border="1">
 	   <tbody>
 	      <tr>
 	         <td class="tableHeader">$pnLabel</td>
@@ -259,7 +259,9 @@ sub www_manageProjects {
 	   |;
 	}
 	$output .= "</tbody></table>";
-	return $self->getAdminConsole->render($output,$i18n->get("manage projects screen label"));
+	my $ac = $self->getAdminConsole;
+	$ac->addSubmenuItem($self->getUrl('func=editProject'),$i18n->get("edit project label"));
+	return $ac->render($output,$i18n->get("manage projects screen label"));
 }
 
 #-------------------------------------------------------------------
