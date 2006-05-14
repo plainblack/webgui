@@ -192,6 +192,8 @@ sub _related {
 	}
 }
 
+#-------------------------------------------------------------------
+
 =head2 _columnar ( $session, $columns, $list )
 
 Utility routine for taking a list of data and returning it multiple columns.
