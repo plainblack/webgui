@@ -265,6 +265,17 @@ sub www_editProject {
 }	
 
 #-------------------------------------------------------------------
+sub www_editProjectSave {
+	my $self = shift;
+    my ($session,$privilege,$form,$db,$dt,$i18n,$user,$eh) = $self->getSessionVars("privilege","form","db","datetime","i18n","user","errorHandler");    
+	
+	#Check Privileges
+    return $privilege->insufficient unless ($user->isInGroup($self->get("groupToManage")));
+ 
+  
+}
+
+#-------------------------------------------------------------------
 sub www_manageProjects {
 	my $self = shift;
     my ($session,$privilege,$form,$db,$dt,$i18n,$user,$eh) = $self->getSessionVars("privilege","form","db","datetime","i18n","user","errorHandler");    
