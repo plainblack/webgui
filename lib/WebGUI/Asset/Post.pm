@@ -554,6 +554,7 @@ Returns a boolean indicating whether this post is marked read for the user.
 =cut
 
 sub isMarkedRead {
+	return 1;
         my $self = shift;
 	return 1 if $self->isPoster;
         my ($isRead) = WebGUI::SQL->quickArray("select count(*) from Post_read where userId=".quote($session{user}{userId})." and postId=".quote($self->getId));
@@ -789,8 +790,7 @@ Sets the post to approved and sends any necessary notifications.
 sub setStatusApproved {
 	my $self = shift;
         $self->commit;
-        $self->getThread->incrementReplies($self->get("dateUpdated"),$self->getId) if ($self->isReply && ($session{form}{assetId} eq
-"new"));
+        $self->getThread->incrementReplies($self->get("dateUpdated"),$self->getId) if ($self->isReply && ($session{form}{assetId} eq "new"));
         unless ($self->isPoster) {
                 WebGUI::MessageLog::addInternationalizedEntry($self->get("ownerUserId"),'',WebGUI::URL::getSiteURL().'/'.$self->getUrl,579);
         }

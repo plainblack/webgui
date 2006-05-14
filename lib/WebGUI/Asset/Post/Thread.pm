@@ -374,6 +374,7 @@ Returns a boolean indicating whether this thread is marked read for the user.
 =cut
 
 sub isMarkedRead {
+	return 1;
         my $self = shift;
 	return 1 if $self->isPoster;
       my ($isRead) = WebGUI::SQL->quickArray("select count(*) from Post_read where userId=".quote($session{user}{userId})." and threadId=".quote($self->getId)." and postId=".quote($self->get("lastPostId")));

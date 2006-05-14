@@ -16,6 +16,7 @@ use WebGUI::Cache::FileCache;
 
 #-------------------------------------------------------------------
 sub process {
+	return undef;
 	my $size = $session{config}{fileCacheSizeLimit} + 10;
 	my $expiresModifier = 0;
 	my $cache = WebGUI::Cache::FileCache->new;
