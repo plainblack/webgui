@@ -218,7 +218,7 @@ sub www_manageProjects {
 	|;
 	my $projects = $db->buildHashRef("select projectId, projectName from TT_projectList where assetId=".$db->quote($self->getId));
 	
-	foreach my $project (@{$projects}) {
+	foreach my $project (keys %{$projects}) {
 	   my $projectName = $project->{projectName};
 	   my $projectId = $project->{projectId};
 	   my @tasks = $db->buildArray("select taskName from TT_projectTasks where projectId=".$db->quote($projectId));
