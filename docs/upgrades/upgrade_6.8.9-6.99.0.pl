@@ -36,6 +36,7 @@ removeFiles();
 addSearchEngine();
 addEMS();
 addPM();
+addTT();
 updateTemplates();
 updateDatabaseLinksAndSQLReport();
 ipsToCIDR();
@@ -888,6 +889,71 @@ sub addPM {
 
 
    print "\tAdding the Project Management System.\n" unless ($quiet);
+   foreach (@{$tableList}) {
+      $session->db->write($_);
+   }
+
+}
+
+#-------------------------------------------------
+sub addTT {
+   my $tableList = [
+            "create table TT_wobject (
+			   assetId varchar(22) binary not null,
+			   userViewTemplateId varchar(22) binary not null default 'TimeTrackingTMPL000001',
+			   managerViewTemplateId varchar(22) binary not null default 'TimeTrackingTMPL000002',
+			   timeRowTemplateId varchar(22) binary not null default 'TimeTrackingTMPL000003',
+			   pmAssetId varchar(22) binary default NULL,
+			   groupToManage varchar(22) binary not null default 3,
+			   revisionDate bigint(20) not null,
+			   primary key (assetId, revisionDate)
+			)",
+			
+			#This table stores projects to use if the time tracker is not associated with a project management asset
+			"create table TT_projectList (
+			    projectId varchar(22) binary not null,
+				assetId varchar(22) binary,
+				projectName varchar(255) not null,
+				creationDate bigint(20) not null,
+				createdBy varchar(22) binary not null,
+				lastUpdatedBy varchar(22) binary not null,
+				lastUpdateDate bigint(20) not null,
+				primary key (projectId)
+			)",
+			
+			"create table TT_projectResourceList (
+			    projectId varchar(22) binary not null,
+				resourceId varchar(22) binary,
+				primary key (projectId,resourceId)
+			)",
+			
+			"create table TT_projectTasks (
+				taskId varchar(22) binary not null,
+			    projectId varchar(22) binary not null,
+				taskName varchar(255) not null,
+				primary key (taskId)
+			)",
+			
+			"create table TT_timeEntry (
+			    entryId varchar(22) binary not null,
+				projectId varchar(22) binary not null,
+				taskId varchar(22) binary not null,
+				resourceId varchar(22) not null,
+				taskDate bigint not null,
+				hours float default 0,
+				comments text,
+				completed integer not null default 0,
+				creationDate bigint(20) not null,
+				createdBy varchar(22) binary not null,
+				lastUpdatedBy varchar(22) binary not null,
+				lastUpdateDate bigint(20) not null,
+				primary key (entryId)
+			)",
+			
+          ];
+
+
+   print "\tAdding the Time Tracking System.\n" unless ($quiet);
    foreach (@{$tableList}) {
       $session->db->write($_);
    }
