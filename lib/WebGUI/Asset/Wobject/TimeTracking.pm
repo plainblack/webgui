@@ -220,10 +220,11 @@ sub www_manageProjects {
 	
 	foreach my $project (@{$projects}) {
 	   my $projectName = $project->{projectName};
+	   my $projectId = $project->{projectId};
 	   my @tasks = $db->buildArray("select taskName from TT_projectTasks where projectId=".$db->quote($projectId));
 	   my $taskList = join("<br>",@tasks);
 	   my @resources = $db->buildArray("select resourceId from TT_projectResourceList where projectId=".$db->quote($projectId));
-  	   for(my $i = 0; $i < scalar(@resources) $i++) {
+  	   for(my $i = 0; $i < scalar(@resources); $i++) {
 	      my $u = WebGUI::User->new($session,$resources[$i]);
 		  my $fname = $u->profileField("firstName");
 		  my $lname = $u->profileField("lastName");
