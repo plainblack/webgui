@@ -86,18 +86,18 @@ our $I18N = {
 		lastUpdated => 0
 		},
 	
-	'' => {
-		message => q||,
+	'manage project name label' => {
+		message => q|Project Name|,
 		lastUpdated => 0
 		},
 		
-	'' => {
-		message => q||,
+	'manage project available task label' => {
+		message => q|Available Tasks|,
 		lastUpdated => 0
 		},			
 	
-	'' => {
-		message => q||,
+	'manage project resource label' => {
+		message => q|Available Resources|,
 		lastUpdated => 0
 		},
 
