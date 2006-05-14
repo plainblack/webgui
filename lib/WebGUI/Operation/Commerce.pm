@@ -170,8 +170,7 @@ The number of items to add. Defaults to 1 if quantity is not given.
 
 sub www_addToCart {
 	my $session = shift;
-	WebGUI::Commerce::ShoppingCart->new($session)->add($session->form->process("itemId"), $session->form->process("itemType"), $session->form->process("quantity"));
-
+	WebGUI::Commerce::ShoppingCart->new($session)->add($session->form->process("itemId"), $session->form->process("itemType","className"), $session->form->process("quantity"));
 	return WebGUI::Operation::execute($session,'viewCart');
 }
 
@@ -505,7 +504,7 @@ sub www_confirmRecurringTransaction {
 	my $session = shift;
 	my($plugin, %var);
 	
-	$plugin = WebGUI::Commerce::Payment->load($session, $session->form->process("gateway"));
+	$plugin = WebGUI::Commerce::Payment->load($session, $session->form->process("gateway","className"));
 	if ($plugin) {
 		$plugin->confirmRecurringTransaction;
 	}
@@ -523,7 +522,7 @@ transaction, but only if the plugin's C<confirmTransaction> returns true.
 sub www_confirmTransaction {
 	my $session = shift;
 	my($plugin, %var);
-	$plugin = WebGUI::Commerce::Payment->load($session, $session->form->process("pg"));
+	$plugin = WebGUI::Commerce::Payment->load($session, $session->form->process("pg","className"));
 
 	if ($plugin->confirmTransaction) {
 		WebGUI::Commerce::Transaction->new($session, $plugin->getTransactionId)->completeTransaction;
@@ -958,7 +957,7 @@ Returns the user to the operation C<checkout> when it is done.
 
 sub www_selectPaymentGatewaySave {
 	my $session = shift;
-	my $paymentGateway = shift || $session->form->process("paymentGateway");
+	my $paymentGateway = shift || $session->form->process("paymentGateway","className");
 	if (WebGUI::Commerce::Payment->load($session, $paymentGateway)->enabled) {
 		$session->scratch->set('paymentGateway', $paymentGateway);
 	} else {
