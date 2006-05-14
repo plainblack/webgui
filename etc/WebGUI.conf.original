@@ -176,6 +176,7 @@
 	"WebGUI::Asset::Wobject::SQLReport", 
 	"WebGUI::Asset::Wobject::Search",
 	"WebGUI::Asset::Wobject::Survey", 
+	"WebGUI::Asset::Wobject::TimeTracking",
 	"WebGUI::Asset::Wobject::WeatherData",
 	"WebGUI::Asset::Wobject::MultiSearch",
 	"WebGUI::Asset::Wobject::StockData",
