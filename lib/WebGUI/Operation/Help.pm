@@ -46,6 +46,23 @@ sub _load {
         my $load = sprintf 'use %-s; $%-s::HELP;', $cmd, $cmd;
 	my $hash = eval($load);
 	unless ($@) {
+		foreach my $tag (keys %{$hash}) {
+			if ($hash->{$tag}{isa}{namespace}) {
+				my $other = _load($session, $hash->{$tag}{isa}{namespace});
+				my $add = $other->{$hash->{$tag}{isa}{tag}}{fields};
+				@{$hash->{$tag}{fields}} = (@{$hash->{$tag}{fields}}, @{$add});
+				my $add = $other->{$hash->{$tag}{isa}{tag}}{related};
+				@{$hash->{$tag}{related}} = (@{$hash->{$tag}{related}}, @{$add});
+				my $add = $other->{$hash->{$tag}{isa}{tag}}{variables};
+				foreach my $row (@{$add}) {
+					push(@{$hash->{$tag}{variables}}, {
+						name=> $row->{name},
+						description => $row->{description},
+						namespace => $row->{namespace} || $hash->{$tag}{isa}{namespace}
+						});
+				}
+			}
+		}
 		return $hash
 	}
 	else {
@@ -260,6 +277,14 @@ sub www_viewHelp {
 		);
 }
 
+#-------------------------------------------------------------------
+
+=head2 _getTemplateVars ( )
+
+Generates help template vars for a template help file.
+
+=cut
+
 sub _getTemplateVars {
 	my $session = shift;
 	my $level = shift;
@@ -276,7 +301,7 @@ sub _getTemplateVars {
 		}	
 		push ( @{$template}, {
 			title => $row->{name}, 
-			description=> $i18n->get($row->{description} || $row->{name}),
+			description=> $i18n->get($row->{description} || $row->{name}, $row->{namespace}),
 			$label => $indent
 			});
 	}	

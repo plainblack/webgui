@@ -20,6 +20,9 @@
  - Added a wiki-like feature that will automatically bring a user to the
    create a page form if they are in admin mode, and click on a link to
    a page that doesn't exist yet.
+ - Help is now capable of using inheritance.
+ - Template help can/should now be broken out as seperate fields going
+   forward.
  - Many changes for better XHTML compliance.
  - Refactored admin bar to be more dynamic.
  - Removed start/end dates from assets in favor of the workflow system.

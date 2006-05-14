@@ -30,6 +30,10 @@ our $HELP = {
 	'wobject add/edit' => {
 		title => '677',
 		body => '632',
+		isa => 	{
+				tag => 'asset fields',
+				namespace => 'Asset'
+			},
 		fields => [
                         {
                                 title => '174',
@@ -54,10 +58,6 @@ our $HELP = {
                         },
 		],
 		related => [
-			{
-				tag => 'asset fields',
-				namespace => 'Asset'
-			},
 			{
 				tag => 'wobjects using',
 				namespace => 'Asset_Wobject'
