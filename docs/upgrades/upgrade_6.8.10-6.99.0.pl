@@ -914,6 +914,7 @@ sub addTT {
 			    projectId varchar(22) binary not null,
 				assetId varchar(22) binary,
 				projectName varchar(255) not null,
+				taskList text default null,
 				creationDate bigint(20) not null,
 				createdBy varchar(22) binary not null,
 				lastUpdatedBy varchar(22) binary not null,
@@ -926,18 +927,12 @@ sub addTT {
 				resourceId varchar(22) binary,
 				primary key (projectId,resourceId)
 			)",
-			
-			"create table TT_projectTasks (
-				taskId varchar(22) binary not null,
-			    projectId varchar(22) binary not null,
-				taskName varchar(255) not null,
-				primary key (taskId)
-			)",
-			
+						
 			"create table TT_timeEntry (
 			    entryId varchar(22) binary not null,
 				projectId varchar(22) binary not null,
-				taskId varchar(22) binary not null,
+				taskId varchar(255) binary not null,
+				assetId varchar(22) binary not null,
 				resourceId varchar(22) not null,
 				taskDate bigint not null,
 				hours float default 0,
