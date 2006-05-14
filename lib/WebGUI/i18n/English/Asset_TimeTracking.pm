@@ -81,8 +81,8 @@ our $I18N = {
 		lastUpdated => 0
 		},
 		
-	'' => {
-		message => q||,
+	'project manage label' => {
+		message => q|Manage Projects|,
 		lastUpdated => 0
 		},
 	
