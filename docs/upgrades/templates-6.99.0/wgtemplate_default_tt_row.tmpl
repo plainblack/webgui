@@ -1,0 +1,51 @@
+#TimeTrackingTMPL000002
+#title:Default Time Tracking Row Template
+#menuTitle:Default Time Tracking Row Template
+#url:default-tt-template-row
+#namespace:TimeTracking_row
+#create
+
+<table class="timeTracking02" cellpadding="3" cellspacing="0">
+   <tr class="title">
+      <td colspan="3" align="left"><tmpl_var time.report.header></td>
+	  <td colspan="2" align="right"><tmpl_var time.report.hours.label> <b style="color:red;">0</b></td>
+   </tr>
+   <tr class="header" id="header">
+      <td width="10%"><tmpl_var time.report.date.label>Date</td>
+	  <td width="20%"><tmpl_var time.report.project.label>Project</td>
+	  <td width="20%"><tmpl_var time.report.task.label>Task</td>
+	  <td width="10%"><tmpl_var time.report.hours.label>Hours</td>
+	  <td width="40%"><tmpl_var time.report.comments.label>Comments</td>
+	  <td>&#160;</td>
+   </tr>
+   <tmpl_loop time.entry.loop>
+      <tr id="<tmpl_var row.id>">
+         <td class="cell"><input type="text" size="10"></td>
+         <td class="cell"><select><option>Choose One</option></select></td>
+         <td class="cell"><select><option>Choose One</option></select></td>
+         <td class="cell"><input type="text" size="10" /></td>
+         <td class="cell"><input type="text" size="53" /></td>
+         <td><img src="images/delete.gif" /></td>
+      </tr>
+   </tmpl_loop>
+   <tr class="empty">
+      <td colspan="5" style="border-top:solid gray 2px;">
+	      <table width="100%">
+		     <tr>
+			    <td width="60%" align="left">
+				   Report Complete<input type="checkbox" /> 
+				</td>
+				<td width="40%" align="right">
+					<input type="button" value="Add Row" /> &#160; <input type="button" value="Save" />
+			    </td>			
+		     </tr>
+	      </table>		
+	   </td>
+   </tr>
+</table>
+
+
+
+
+~~~
+	
