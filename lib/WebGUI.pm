@@ -54,9 +54,9 @@ sub handler {
 	}
 	my $uploads = $config->get("uploadsURL");
 	if ($r->uri =~ m/^$uploads/) {
-		$r->push_handlers(PerlAccessHandler => \&uploadsHandler);
+		$r->push_handlers(PerlAccessHandler => sub { return uploadsHandler($r, $configFile); } );
 	} else {
-		$r->push_handlers(PerlResponseHandler => \&contentHandler);
+		$r->push_handlers(PerlResponseHandler => sub { return contentHandler($r, $configFile); } );
 		$r->push_handlers(PerlTransHandler => sub { return Apache2::Const::OK });
 	}
 	return Apache2::Const::DECLINED;
@@ -80,10 +80,11 @@ The Apache2::RequestRec object passed in by Apache's mod_perl.
 sub contentHandler {
 	### inherit Apache request.
 	my $r = shift;
+	my $configFile = shift || $r->dir_config('WebguiConfig');
 	### Instantiate the API for this httpd instance.
 	my $s = Apache2::ServerUtil->server;
 	### Open new or existing user session based on user-agent's cookie.
-	my $session = WebGUI::Session->open($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'),$r, $s);
+	my $session = WebGUI::Session->open($s->dir_config('WebguiRoot'),$configFile,$r, $s);
 	if ($session->env->get("HTTP_X_MOZ") eq "prefetch") { # browser prefetch is a bad thing
 		$session->http->setStatus("403","We don't allow prefetch, because it increases bandwidth, hurts stats, and can break web sites.");
 		$session->http->sendHeader;
@@ -299,6 +300,7 @@ The Apache2::RequestRec object passed in by handler().
 
 sub uploadsHandler {
 	my $r = shift;
+	my $configFile = shift || $r->dir_config('WebguiConfig');
 	my $ok = Apache2::Const::OK;
 	my $notfound = Apache2::Const::NOT_FOUND;
 	if (-e $r->filename) {
@@ -314,7 +316,7 @@ sub uploadsHandler {
 			my @privs = split("\n",$fileContents);
 			unless ($privs[1] eq "7" || $privs[1] eq "1") {
 				my $s = Apache2::ServerUtil->server;
-				my $session = WebGUI::Session->open($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'),$r, $s);
+				my $session = WebGUI::Session->open($s->dir_config('WebguiRoot'),$configFile,$r, $s);
 				my $hasPrivs = ($session->var->get("userId") eq $privs[0] || $session->user->isInGroup($privs[1]) || $session->user->isInGroup($privs[2]));
 				$session->close();
 				if ($hasPrivs) {
