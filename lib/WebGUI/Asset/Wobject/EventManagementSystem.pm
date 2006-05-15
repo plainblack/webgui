@@ -958,8 +958,18 @@ sub prerequisiteIsMet {
 sub removeFromScratchCart {
 	my $self = shift;
 	my $event = shift;
-	if ($event eq $self->session->get('currentMainEvent')) {
-		return $self->resetScratchCart();
+#	if ($event eq $self->session->scratch->get('currentMainEvent')) {
+#		return $self->resetScratchCart();
+#	}
+	my $currentPurchase = $self->session->scratch->get('purchaseId'.$self->session->scratch->get('currentPurchaseCounter'));
+	if ($currentPurchase ne "") {
+		my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
+		my ($items, $nothing) = $shoppingCart->getItems;
+		foreach my $item (@$items) {
+			if ($item->{item}->{_event}->{productId} eq $event) {
+				$shoppingCart->setQuantity($event,'Event',($item->{quantity} - 1));
+			}
+		}
 	}
 	my $events =  $self->getEventsInScratchCart();
 	my @newArr;
@@ -1964,6 +1974,7 @@ sub www_viewPurchase {
 		return $self->processStyle($self->processTemplate(\%var,$self->getValue("viewPurchaseTemplateId")));
 	} elsif($tid) {
 		my %var = $self->get();
+		my $showAll = $self->session->
 		my $isAdmin = $self->canAddEvents;
 		my ($userId) = $self->session->db->quickArray("select userId from transaction where transactionId=?",[$tid]);
 		my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
