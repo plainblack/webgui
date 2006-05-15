@@ -20,7 +20,7 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-fixTypos();
+fixTypos($session);
 
 finish($session); # this line required
 
