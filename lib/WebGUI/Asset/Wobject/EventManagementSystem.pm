@@ -2803,7 +2803,7 @@ sub www_search {
 	  $eventFields{'skuTemplate'} = $event->{'skuTemplate'};
 	  $eventFields{'weight'} = $event->{'weight'};
 	  my ($numberRegistered) = $self->session->db->quickArray("select count(*) from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p
-	  	where r.purchaseId = p.purchaseId and r.productId=".$self->session->db->quote($event->{'productId'}));
+	  	where r.purchaseId = p.purchaseId and returned=0 and r.productId=".$self->session->db->quote($event->{'productId'}));
 	  $eventFields{'numberRegistered'} = $numberRegistered;
 	  $eventFields{'maximumAttendees'} = $event->{'maximumAttendees'};
 	  $eventFields{'seatsRemaining'} = $event->{'maximumAttendees'} - $numberRegistered;
