@@ -1,6 +1,7 @@
 6.99.1
  - Bugfixes on dashboard to fix template errors.
  - Bug fixes to make WebGUI work with the WRE demo system.
+ - Fixed a typo in the activities in the config file.
 
 6.99.0
  - Added a workflow system.

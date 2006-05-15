@@ -20,19 +20,24 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-# upgrade functions go here
+fixTypos();
 
 finish($session); # this line required
 
 
-##-------------------------------------------------
-#sub exampleFunction {
-#	my $session = shift;
-#	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
-#	# and here's our code
-#}
-
-
+#-------------------------------------------------
+sub fixTypos {
+	my $session = shift;
+	print "\tFixing typos.\n" unless ($quiet);
+	my $activities = $session->config->get("workflowActivities");
+	my $versionTag = $activities->{"WebGUI::VersionTag"};
+	my @newStuff = ("WebGUI::Workflow::Activity::ExportVersionTagToHtml");
+	foreach my $value (@{$versionTag}) {
+		push(@newStuff, $value);
+	}
+	$activities->{"WebGUI::VersionTag"} = \@newStuff;
+	$session->config->set("workflowActivities",$activities);
+}
 
 # ---- DO NOT EDIT BELOW THIS LINE ----
 
