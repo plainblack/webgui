@@ -2,6 +2,7 @@
  - Bugfixes on dashboard to fix template errors.
  - Bug fixes to make WebGUI work with the WRE demo system.
  - Fixed a typo in the activities in the config file.
+ - fixed a bug that caused threadId's to be empty in new posts
 
 6.99.0
  - Added a workflow system.

@@ -1533,7 +1533,9 @@ sub processPropertiesFromFormPost {
 	foreach my $definition (@{$self->definition($self->session)}) {
 		foreach my $property (keys %{$definition->{properties}}) {
 			if ($definition->{properties}{$property}{noFormPost}) {
-				$data{$property} = $definition->{properties}{$property}{defaultValue} if $self->session->form->process("assetId") eq "new";
+				if ($self->session->form->process("assetId") eq "new" && $self->get($property) eq "") {
+					$data{$property} = $definition->{properties}{$property}{defaultValue};
+				}
 				next;
 			}
 			my %params = %{$definition->{properties}{$property}};
