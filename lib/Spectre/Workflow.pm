@@ -87,6 +87,7 @@ sub addInstance {
 	$self->{_instances}{$params->{instanceId}} = {
 		sitename=>$params->{sitename},
 		instanceId=>$params->{instanceId},
+		gateway => $params->{gateway},
 		status=>"waiting",
 		priority=>$params->{priority}
 		};
@@ -261,7 +262,7 @@ sub loadWorkflows {
 	my $session = WebGUI::Session->open($config->getWebguiRoot, $config->getFilename);
 	my $result = $session->db->read("select instanceId,priority from WorkflowInstance");
 	while (my ($id, $priority) = $result->array) {
-		$kernel->yield("addInstance", {sitename=>$config->get("sitename")->[0], instanceId=>$id, priority=>$priority});
+		$kernel->yield("addInstance", {gateway=>$config->get("gateway"), sitename=>$config->get("sitename")->[0], instanceId=>$id, priority=>$priority});
 	}
 	$session->close;
 }
@@ -333,7 +334,7 @@ sub runWorker {
 	my ($kernel, $self, $instance, $session) = @_[KERNEL, OBJECT, ARG0, SESSION];
 	$self->debug("Preparing to run workflow instance ".$instance->{instanceId}.".");
 	POE::Component::Client::UserAgent->new;
-	my $url = "http://".$instance->{sitename}.':'.$self->config->get("webguiPort").'/';
+	my $url = "http://".$instance->{sitename}.':'.$self->config->get("webguiPort").$instance->{gateway};
 	my $request = POST $url, [op=>"runWorkflow", instanceId=>$instance->{instanceId}];
 	my $cookie = $self->{_cookies}{$instance->{sitename}};
 	$request->header("Cookie","wgSession=".$cookie) if (defined $cookie);

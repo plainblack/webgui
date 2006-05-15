@@ -45,8 +45,9 @@ The Apache2::RequestRec object passed in by Apache's mod_perl.
 
 sub handler {
 	my $r = shift;
+	my $configFile = shift || $r->dir_config('WebguiConfig');
 	my $s = Apache2::ServerUtil->server;
-	my $config = WebGUI::Config->new($s->dir_config('WebguiRoot'),$r->dir_config('WebguiConfig'));
+	my $config = WebGUI::Config->new($s->dir_config('WebguiRoot'), $configFile);
 	$r->push_handlers(PerlFixupHandler => \&fixupHandler) if (defined $config->get("passthruUrls"));
 	foreach my $url ($config->get("extrasURL"), @{$config->get("passthruUrls")}) {
 		return Apache2::Const::DECLINED if ($r->uri =~ m/^$url/);

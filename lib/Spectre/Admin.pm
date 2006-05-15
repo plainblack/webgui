@@ -187,7 +187,7 @@ sub runTests {
 		 my $userAgent = new LWP::UserAgent;
         	$userAgent->agent("Spectre");
         	$userAgent->timeout(30);
-		my $url = "http://".$configs->{$config}->get("sitename")->[0].":".$self->config->get("webguiPort")."/?op=spectreTest";
+		my $url = "http://".$configs->{$config}->get("sitename")->[0].":".$self->config->get("webguiPort").$configs->{$config}->get("gateway")."?op=spectreTest";
         	my $request = new HTTP::Request (GET => $url);
         	my $response = $userAgent->request($request);
         	if ($response->is_error) {

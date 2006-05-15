@@ -288,6 +288,7 @@ sub set {
 	$params{parameters} = $self->get("parameters");
 	$params{config} = $self->session->config->getFilename;
 	$params{sitename} = $self->session->config->get("sitename")->[0];
+	$params{gateway} = $self->session->config->get("gateway");
 	$spectre->notify("cron/addJob", \%params);
 }
 

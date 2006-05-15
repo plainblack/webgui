@@ -140,6 +140,7 @@ sub addJob {
 	$self->{_jobs}{$params->{config}}{$params->{taskId}} = {
 		taskId=>$params->{taskId},
 		config=>$params->{config},
+		gateway=>$params->{gateway},
 		sitename=>$params->{sitename},
 		schedule=>join(" ", $params->{minuteOfHour}, $params->{hourOfDay}, $params->{dayOfMonth}, $params->{monthOfYear}, $params->{dayOfWeek}),
 		runOnce=>$params->{runOnce},
@@ -311,6 +312,7 @@ sub loadSchedule {
 		my $params = JSON::jsonToObj($data->{parameters});
 		$data->{parameters} = $params->{parameters};
 		$data->{config} = $config;
+		$data->{gateway} = $session->config->get("gateway");
 		$data->{sitename} = $session->config->get("sitename")->[0];
 		$kernel->yield("addJob", $data);
 	}
@@ -373,7 +375,7 @@ sub runJob {
 		$self->error("Warning: A scheduled task has corrupt information and is nat able to be run. Skipping execution.");
 		$kernel->yield("deleteJob",{config=>$job->{config}, taskId=>$job->{taskId}}) if ($job->{config} ne "" && $job->{taskId} ne "");
 	} else {
-		my $url = "http://".$job->{sitename}.':'.$self->config->get("webguiPort").'/';
+		my $url = "http://".$job->{sitename}.':'.$self->config->get("webguiPort").$job->{gateway};
 		my $request = POST $url, [op=>"runCronJob", taskId=>$job->{taskId}];
 		my $cookie = $self->{_cookies}{$job->{sitename}};
 		$request->header("Cookie","wgSession=".$cookie) if (defined $cookie);
@@ -395,7 +397,7 @@ This method is called when the response from the runJob() method is received.
 =cut
 
 sub runJobResponse {
-	my ($self, $kernel) = @_[OBJECT, KERNEL];
+	my ($self, $kernel) = @_[OBJECT, KERNEL];	
 	$self->debug("Retrieving response from scheduled job.");
         my ($request, $response, $entry) = @{$_[ARG1]};
 	my $taskId = $request->header("X-taskId");	# got to figure out how to get this from the request, cuz the response may die
