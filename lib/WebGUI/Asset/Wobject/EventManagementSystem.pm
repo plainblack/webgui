@@ -1974,12 +1974,13 @@ sub www_viewPurchase {
 		return $self->processStyle($self->processTemplate(\%var,$self->getValue("viewPurchaseTemplateId")));
 	} elsif($tid) {
 		my %var = $self->get();
-		my $showAll = $self->session->
+		my $showAll = $self->session->form->get('showAll');
 		my $isAdmin = $self->canAddEvents;
 		my ($userId) = $self->session->db->quickArray("select userId from transaction where transactionId=?",[$tid]);
 		my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 		my $filter = ($isAdmin)?'':' and r.returned=0 ';
 		my $sql = "select distinct(r.purchaseId), b.* from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_purchases as t, transaction where r.badgeId=b.badgeId and r.purchaseId=t.purchaseId and transaction.transactionId=t.transactionId and t.transactionId=? and transaction.status='Completed' $filter order by b.lastName";
+		$sql = "select distinct(r.purchaseId) from EventManagementSystem_registrations as r,  EventManagementSystem_purchases as t, transaction where r.purchaseId=t.purchaseId and transaction.transactionId=t.transactionId and t.transactionId=? and transaction.status='Completed' $filter order by b.lastName" if $showAll;
 		my $sth = $self->session->db->read($sql,[$tid]);
 		my @purchasesLoop;
 		$var{canReturnTransaction} = 0;
@@ -1987,6 +1988,7 @@ sub www_viewPurchase {
 			$badgeId = $purchase->{badgeId};
 			my $pid = $purchase->{purchaseId};
 			my $sql2 = "select r.registrationId, p.title, p.description, p.price, p.templateId, r.returned, e.approved, e.maximumAttendees, e.startDate, e.endDate, b.userId, b.createdByUserId, e.productId from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e, EventManagementSystem_purchases as z, products as p, transaction where p.productId = r.productId and p.productId = e.productId and r.badgeId=b.badgeId and r.purchaseId=z.purchaseId and r.badgeId=? and r.purchaseId=? $filter and transaction.transactionId=z.transactionId and transaction.status='Completed' group by r.registrationId order by b.lastName";
+			$sql2 = "select r.registrationId, p.title, p.description, p.price, p.templateId, r.returned, e.approved, e.maximumAttendees, e.startDate, e.endDate, e.productId from EventManagementSystem_registrations as r, EventManagementSystem_products as e, EventManagementSystem_purchases as z, products as p, transaction where p.productId = r.productId and p.productId = e.productId and r.purchaseId=z.purchaseId and and r.purchaseId=? $filter and transaction.transactionId=z.transactionId and transaction.status='Completed' group by r.registrationId" if $showAll;
 			my $sth2 = $self->session->db->read($sql2,[$badgeId,$pid]);
 			$purchase->{regLoop} = [];
 			$purchase->{canReturnItinerary} = 0;
