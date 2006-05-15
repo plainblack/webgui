@@ -431,6 +431,28 @@ The URL to the Extras directory.
 		message => q|<p>The View Project template has these template variables</p>
 <p>! : This variable is required for the form to function correctly.</p>
 
+<p><b>form.header</b><br />
+If the user is in the group to add projects, then this variable will contain HTML form code
+to make on the fly editing of tasks work.
+</p>
+
+<p><b>form.footer</b><br />
+If the user is in the group to add projects, then this variable will contain HTML form code
+to make on the fly editing of tasks work.
+</p>
+
+<p><b>project.canEdit</b><br />
+A conditional indicating whether or not this user is a member of the group to add projects.
+</p>
+
+<p><b>project.resources.url</b><br />
+If the user is in the group to add projects, this will be the URL to the Manage Resources screen.
+</p>
+
+<p><b>project.resources.label</b><br />
+If the user is in the group to add projects, this will be internationalized label to be used with <b>project.resources.label</b>.
+</p>
+
 <p><b>extras</b><br />
 The URL to the Extras directory for the Project Manager.
 </p>
@@ -476,7 +498,100 @@ An internationalized error message for a missing task name.
 </p>
 
 <p><b>form.start.error</b><br />
-An internationalized error message for a missing task name.
+An internationalized error message for not entering an start date.
+</p>
+
+<p><b>form.start.error</b><br />
+An internationalized error message for not entering an end date.
+</p>
+
+<p><b>form.greaterThan.error</b><br />
+An internationalized error message for entering a start date after the end date.
+</p>
+
+<p><b>form.previousPredecessor.error</b><br />
+An internationalized error message for choosing a predecessor that is not a previous task.
+</p>
+
+<p><b>form.previousPredecessor.error</b><br />
+An internationalized error message for choosing a predecessor task that does not exist.
+</p>
+
+<p><b>form.invalidMove.error</b><br />
+An internationalized error message for choosing a task that is invalid as a predecessor because the end date is after the start date of this task.
+</p>
+
+<p><b>task.loop</b><br />
+A loop containing all tasks for this project, in sequence order.
+</p>
+
+<div class="helpIndent">
+
+<p><b>task.number</b><br />
+The sequence number for this task.
+</p>
+
+<p><b>task.number.id</b><br />
+A unique identifier used internally by WebGUI for this task.
+</p>
+
+<p><b>task.name</b><br />
+The name of this task.
+</p>
+
+<p><b>task.start</b><br />
+If the user is in the group to add projects, then this will be a form field to edit the start date
+for this task.  Otherwise, just the start date will be displayed as text.
+</p>
+
+<p><b>task.dependants</b><br />
+If the user is in the group to add projects, then this will be a form field to edit the dependants
+for this task.  Otherwise, just the list of dependants will be displayed as text.
+</p>
+
+<p><b>task.end</b><br />
+If the user is in the group to add projects, then this will be a form field to edit the end date
+for this task.  Otherwise, just the end date will be displayed as text.
+</p>
+
+<p><b>task.duration</b><br />
+If the user is in the group to add projects, and this task is not a milestone, then a this variable
+will be a form field to edit the duration.  
+Otherwise, just the duration will be displayed as text.
+</p>
+
+<p><b>task.duration.units</b><br />
+The units for the duration, typically hours or days.
+</p>
+
+<p><b>task.isMilestone</b><br />
+A conditiional indicating whether or not this task is a milestone.
+</p>
+
+<p><b>task.edit.url</b><br />
+If the user can add tasks to this project, then this will be a URL to take them to the Add Task screen.
+</p>
+
+<p><b>task.edit.url</b><br />
+If the user can add tasks to this project, then this will contain an internationalized label to go with <b>task.edit.url</b>.
+</p>
+
+</div>
+
+<p><b>project.gaant.rowspan</b><br />
+The number of rows for the Gannt chart, 4 + the number of tasks.
+</p>
+
+<p><b>project.ganttChart</b><br />
+The Gannt chart for this project and its tasks.
+</p>
+
+<p><b>task.back.url</b><br />
+A link back to this screen.
+</p>
+
+<p><b>task.back.label</b><br />
+A label to go with the link back to this screen.
 </p>
 
 |,
