@@ -43,8 +43,9 @@ sub handler {
 	my $self = shift;
 	my $transactionId = shift;
 	#mark all purchaseIds as paid
-	my $counter = 0;
-	while (1) {
+	my $counter;
+	
+	for ($counter = 0 ; $counter < 50 ; $counter++ ) {
 		my $purchaseId;
 		if ($purchaseId = $self->session->scratch->get("purchaseId".$counter)) {
 			$self->session->db->setRow('EventManagementSystem_purchases', 'purchaseId', {'purchaseId'=>$purchaseId, 'transactionId'=>$transactionId}, $purchaseId);
@@ -56,7 +57,6 @@ sub handler {
 			$self->session->scratch->delete("purchaseId".$counter);
 			$counter++;
 		}
-		else { last; }
 	}
 }
 
