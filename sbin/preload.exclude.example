@@ -11,7 +11,7 @@ WebGUI::Asset::Wobject::Product
 WebGUI::Asset::Wobject::Survey
 WebGUI::Asset::Wobject::InOutBoard
 WebGUI::Asset::Wobject::Dashboard
-WebGUI::Asset::Wobject::EventsManagementSystem
+WebGUI::Asset::Wobject::EventManagementSystem
 WebGUI::Asset::Wobject::ProjectManager
 WebGUI::Asset::Wobject::SyndicatedContent
 WebGUI::Asset::Wobject::WSClient
