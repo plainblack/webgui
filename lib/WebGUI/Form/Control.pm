@@ -600,7 +600,7 @@ sub toHtmlWithWrapper {
 		my ($fieldClass, $rowClass, $labelClass, $hoverHelp, $subtext)  = $self->prepareWrapper;
 		return '<tr'.$rowClass.'>
 				<td'.$labelClass.$hoverHelp.' valign="top" style="width: 180px;"><label for="'.$self->get("id").'">'.$self->get("label").'</label></td>
-				<td valign="top"'.$fieldClass.' style="width: *;">'.$rawField.$subtext."</td>
+				<td valign="top"'.$fieldClass.'>'.$rawField.$subtext."</td>
 			</tr>\n";
 	} else {
 		return $self->toHtmlAsHidden;
