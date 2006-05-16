@@ -2966,7 +2966,7 @@ sub view {
 	$var{'manageEvents.label'} = $i18n->get('manage events');
 	$var{'managePurchases.url'} = $self->getUrl('func=managePurchases');
 	$var{'managePurchases.label'} = $i18n->get('manage purchases');
-	if ($self->session->user->isInGroup($self->get("groupToManageEvents"))) {
+	if ($self->session->user->isInGroup($self->get("groupToApproveEvents"))) {
 		$var{'canManageEvents'} = 1;
 	}
 	else {
