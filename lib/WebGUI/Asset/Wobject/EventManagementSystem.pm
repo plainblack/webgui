@@ -2943,6 +2943,7 @@ sub view {
 	  $eventFields{'maximumAttendees'} = $event->{'maximumAttendees'};
 	  $eventFields{'seatsRemaining'} = $event->{'maximumAttendees'} - $numberRegistered;
 	  $eventFields{'eventIsFull'} = ($eventFields{'seatsRemaining'} <= 0);
+	  $eventFields{'canManageEvents'} = $self->canApproveEvents;
 	  $eventFields{'eventIsApproved'} = $event->{'approved'};
 	  
 	  if ($eventFields{'eventIsFull'}) {
