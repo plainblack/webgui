@@ -17,7 +17,7 @@ package WebGUI::International;
 
 use strict qw(vars subs);
 
-our %l10nCache;
+our %i18nCache;
 
 =head1 NAME
 
@@ -95,7 +95,7 @@ sub get {
 	$id =~ s/$safeRe//g;
 	$language =~ s/$safeRe//g;
 	$namespace =~ s/$safeRe//g;
-	return $l10nCache{$language}{$namespace}{$id} if $l10nCache{$language}{$namespace}{$id};
+	return $i18nCache{$language}{$namespace}{$id}{message} if $i18nCache{$language}{$namespace}{$id}{message};
 	my $cmd = "WebGUI::i18n::".$language."::".$namespace;
 	my $load = "use ".$cmd;
 	eval($load);
@@ -104,7 +104,7 @@ sub get {
 	my $output = eval($cmd);	
 	$self->session->errorHandler->warn("Couldn't get value from ".$cmd." because ".$@) if ($@);
 	$output = $self->get($id,$namespace,"English") if ($output eq "" && $language ne "English");
-	$l10nCache{$language}{$namespace}{$id} = $output;
+	$i18nCache{$language}{$namespace}{$id}{message} = $output;
 	return $output;
 }
 
@@ -225,13 +225,13 @@ Specify a default language. Defaults to user preference or "English".
 
 sub new {
 	my ($class, $session, $namespace, $language) = @_;
-	return $l10nCache{namespaces}{$namespace} if $l10nCache{namespaces}{$namespace};
+	return $i18nCache{namespaces}{$namespace} if $i18nCache{namespaces}{$namespace};
 	my $self = bless( {
 		_session   => $session,
 		_namespace => $namespace,
 		_language  => ($language || $session->user->profileField('language')),
 	},$class);
-	$l10nCache{namespaces}{$namespace} = $self;
+	$i18nCache{namespaces}{$namespace} = $self;
 	return $self;
 }
 

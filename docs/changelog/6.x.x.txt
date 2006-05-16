@@ -17,9 +17,13 @@
  - fix [ 1486788 ] karma isn't working on forums
  - fix [ 1489094 ] DataForm Record edit link wrong for list mode (Michelle LaMar)
  - fix [ 1488663 ] Add new subscription broken (Martin Kamerbeek / Procolix)
+ - Added a 2.7% speed increase by precaching i18n messages. This should also
+   help increase shared memory amongst Apache children. (Matt Wilson)
  - fix [ 1488921 ] Help: Commerce, Manage
 
 6.99.0
+ - Added an Events Management System asset that can help people run
+   conferences, conventions, and large meetings.
  - Added a workflow system.
  - Added a workflow scheduler system.
  - Converted the runHourly.pl scripts to run as scheduled workflows. 
