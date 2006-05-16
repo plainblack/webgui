@@ -235,7 +235,7 @@ sub create {
 		"Return-Path"=>$returnPath,
 		Subject=>$headers->{subject},
 		"Message-Id"=>$id,
-		Date=>$session->datetime->epochToHuman("","%W, %d %C %y %j:%n:%s %O"),
+		Date=>$session->datetime->epochToMail,
 		"X-Mailer"=>"WebGUI"
 		);
 	if ($session->config->get("emailOverride")) {
