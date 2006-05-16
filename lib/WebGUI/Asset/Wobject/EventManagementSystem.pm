@@ -271,6 +271,11 @@ sub addToScratchCart {
 		$self->session->scratch->set('EMS_scratch_cart', $event);
 		return $event;
 	}
+	# check if event is actually available.
+	my ($numberRegistered) = $self->session->db->quickArray("select count(*) from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, transaction as t where t.transactionId=p.transactionId and t.status='Completed' and r.purchaseId = p.purchaseId and r.returned=0 and r.productId=?",[$event]);
+	my ($maxAttendees) = $self->session->db->quickArray("select maximumAttendees from EventManagementSystem_products where productId=?",[$event]);
+	return undef unless ($self->canApproveEvents || ($maxAttendees - $numberRegistered > 0));
+	
 	my $bid = $self->session->scratch->get('currentBadgeId');
 	my @pastEvents = ($bid)?$self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, transaction as t where r.returned=0 and r.badgeId=? and t.transactionId=p.transactionId and t.status='Completed' and p.purchaseId=r.purchaseId group by productId",[$bid]):();
 	push(@eventsInCart, $event) unless (isIn($event,@eventsInCart) || isIn($event,@pastEvents));
@@ -2765,8 +2770,7 @@ sub www_search {
 			?$self->getAllPossibleRequiredEvents($data->{prerequisiteId})
 			:[];
 		if ($seatsAvailable ne 'none') {
-			my ($numberRegistered) = $self->session->db->quickArray("select count(*) from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p
-	  	where r.purchaseId = p.purchaseId and r.returned=0 and r.productId=".$self->session->db->quote($eventId));
+			my ($numberRegistered) = $self->session->db->quickArray("select count(*) from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, transaction as t where t.transactionId=p.transactionId and t.status='Completed' and r.purchaseId = p.purchaseId and r.returned=0 and r.productId=".$self->session->db->quote($eventId));
 	  	if($seatsCompare eq "eq") {
 				$shouldPush = 0 unless ($data->{'maximumAttendees'} - $numberRegistered == $seatsAvailable);
 			} elsif($seatsCompare eq "ne"){
@@ -2802,8 +2806,7 @@ sub www_search {
 	  $eventFields{'sku'} = $event->{'sku'};
 	  $eventFields{'skuTemplate'} = $event->{'skuTemplate'};
 	  $eventFields{'weight'} = $event->{'weight'};
-	  my ($numberRegistered) = $self->session->db->quickArray("select count(*) from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p
-	  	where r.purchaseId = p.purchaseId and returned=0 and r.productId=".$self->session->db->quote($event->{'productId'}));
+	  my ($numberRegistered) = $self->session->db->quickArray("select count(*) from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, transaction as t where t.transactionId=p.transactionId and t.status='Completed' and r.purchaseId = p.purchaseId and r.returned=0 and r.productId=".$self->session->db->quote($event->{'productId'}));
 	  $eventFields{'numberRegistered'} = $numberRegistered;
 	  $eventFields{'maximumAttendees'} = $event->{'maximumAttendees'};
 	  $eventFields{'seatsRemaining'} = $event->{'maximumAttendees'} - $numberRegistered;
@@ -2935,8 +2938,7 @@ sub view {
 	  $eventFields{'sku'} = $event->{'sku'};
 	  $eventFields{'skuTemplate'} = $event->{'skuTemplate'};
 	  $eventFields{'weight'} = $event->{'weight'};
-	  my ($numberRegistered) = $self->session->db->quickArray("select count(*) from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p
-	  	where r.purchaseId = p.purchaseId and r.returned=0 and r.productId=".$self->session->db->quote($event->{'productId'}));
+	  my ($numberRegistered) = $self->session->db->quickArray("select count(*) from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, transaction as t where t.transactionId=p.transactionId and t.status='Completed' and r.purchaseId = p.purchaseId and returned=0 and r.productId=".$self->session->db->quote($event->{'productId'}));
 	  $eventFields{'numberRegistered'} = $numberRegistered;
 	  $eventFields{'maximumAttendees'} = $event->{'maximumAttendees'};
 	  $eventFields{'seatsRemaining'} = $event->{'maximumAttendees'} - $numberRegistered;
