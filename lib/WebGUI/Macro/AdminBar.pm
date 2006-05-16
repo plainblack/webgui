@@ -52,7 +52,7 @@ sub process {
 			title=>$item->{title},
 			icon=>$item->{'icon.small'},
 			url=>$item->{url}
-			});
+			}) if ($item->{canUse});
 	}
 	push(@adminbar, {
 		label => $i18n->get("admin console","AdminConsole"),
