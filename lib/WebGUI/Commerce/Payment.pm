@@ -460,7 +460,8 @@ The period you want the name for.
 =cut
 
 sub recurringPeriodValues {
-	my ($session) = @_;
+	my $class = shift;
+	my $session = shift;
 	my ($i18n, %periods);
 	$i18n = WebGUI::International->new($session, 'Commerce');
 	tie %periods, "Tie::IxHash";	

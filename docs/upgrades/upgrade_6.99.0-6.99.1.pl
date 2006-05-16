@@ -21,9 +21,59 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 fixTypos($session);
+updateTemplates();
 
 finish($session); # this line required
 
+#-------------------------------------------------
+sub updateTemplates {
+        print "\tFixing template problems\n" unless ($quiet);
+	opendir(DIR,"templates-6.99.1");
+	my @files = readdir(DIR);
+	closedir(DIR);
+	my $importNode = WebGUI::Asset->getImportNode($session);
+	my $folder = $importNode->addChild({
+		className=>"WebGUI::Asset::Wobject::Folder",
+		title => "7.0.0 New Templates",
+		menuTitle => "7.0.0 New Templates",
+		url=> "7_0_0_new_templates",
+		groupIdView=>"12"
+		});
+	foreach my $file (@files) {
+		next unless ($file =~ /\.tmpl$/);
+		open(FILE,"<templates-6.99.1/".$file);
+		my $first = 1;
+		my $create = 0;
+		my $head = 0;
+		my %properties = (className=>"WebGUI::Asset::Template");
+		while (my $line = <FILE>) {
+			if ($first) {
+				$line =~ m/^\#(.*)$/;
+				$properties{id} = $1;
+				$first = 0;
+			} elsif ($line =~ m/^\#create$/) {
+				$create = 1;
+			} elsif ($line =~ m/^\#(.*):(.*)$/) {
+				$properties{$1} = $2;
+			} elsif ($line =~ m/^~~~$/) {
+				$head = 1;
+			} elsif ($head) {
+				$properties{headBlock} .= $line;
+			} else {
+				$properties{template} .= $line;	
+			}
+		}
+		close(FILE);
+		if ($create) {
+			my $template = $folder->addChild(\%properties, $properties{id});
+		} else {
+			my $template = WebGUI::Asset->new($session,$properties{id}, "WebGUI::Asset::Template");
+			if (defined $template) {
+				my $newRevision = $template->addRevision(\%properties);
+			}
+		}
+	}
+}
 
 #-------------------------------------------------
 sub fixTypos {

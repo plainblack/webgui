@@ -107,6 +107,14 @@ sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
 	my $i18n = WebGUI::International->new($self->session,"Asset_Snippet");
+	$tabform->getTab("display")->interval(
+		name => "cacheTimeout",
+		defaultValue => 3600,
+		uiLevel => 8,
+		label => $i18n->get("cache timeout"),
+                hoverHelp => $i18n->get("cache timeout help"),
+		value=> $self->getValue("cacheTimeout")
+		);
         $tabform->getTab("properties")->codearea(
                 -name=>"snippet",
                 -label=>$i18n->get('assetName'),

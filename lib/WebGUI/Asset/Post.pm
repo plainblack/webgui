@@ -145,9 +145,9 @@ sub commit {
 	$self->getThread->unarchive if ($self->getThread->get("status") eq "archived");
         $self->notifySubscribers;
 	if ($self->isNew) {
-		if ($self->session->setting->get("enableKarma") && $self->getThread->getParent->get("karmaPerPost")) {
+		if ($self->session->setting->get("useKarma") && $self->getThread->getParent->get("karmaPerPost")) {
 			my $u = WebGUI::User->new($self->session, $self->get("ownerUserId"));
-			$u->addKarma($self->getThread->getParent->get("karmaPerPost"), $self->getId, "Collaboration post");
+			$u->karma($self->getThread->getParent->get("karmaPerPost"), $self->getId, "Collaboration post");
 		}
         	$self->getThread->incrementReplies($self->get("dateUpdated"),$self->getId) if ($self->isReply);
 	}

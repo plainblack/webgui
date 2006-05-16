@@ -309,7 +309,6 @@ sub www_editSubscription {
 	unless ($session->form->process("sid") eq 'new') {
 		$properties = WebGUI::Subscription->new($session,$session->form->process("sid"))->get;
 	}
-
 	$subscriptionId = $session->form->process("sid") || 'new';
 
 	$f = WebGUI::HTMLForm->new($session);

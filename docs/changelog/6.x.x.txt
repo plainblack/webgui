@@ -1,11 +1,20 @@
 6.99.1
  - Bugfixes on dashboard to fix template errors.
+ - fix [ 1488849 ] Can't instantiate template (Dashboard)
  - Bug fixes to make WebGUI work with the WRE demo system.
  - Fixed a typo in the activities in the config file.
  - fixed a bug that caused threadId's to be empty in new posts
  - fix [ 1489123 ] problem with graphing (Martin Kamerbeek / Procolix) 
  - Fixed a problem where anybody could see the complete list of admin console
    functions in the adminbar, even though they couldn't actually use them.
+ - fix [ 1488598 ] edit workflow broken
+ - fix [ 1488561 ] webggui
+ - fix [ 1488557 ] new styles are missing ^/; in link
+ - fix [ 1488530 ] search has no toolbar
+ - fix [ 1488663 ] Add new subscription broken
+ - fix [ 1485461 ] Internationalized the Date in Mail headers
+ - fix [ 1488518 ] Snippet has no cacheTimeout field
+ - fix [ 1486788 ] karma isn't working on forums
  - fix [ 1489094 ] DataForm Record edit link wrong for list mode (Michelle LaMar)
  - fix [ 1488663 ] Add new subscription broken (Martin Kamerbeek / Procolix)
 
