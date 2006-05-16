@@ -120,13 +120,19 @@ our $I18N = {
 		lastUpdated => 0,
 		context => q|manage revisions in tag|
 	},
-	
+
 	'revision date' => {
 		message => q|Revision Date|,
 		lastUpdated => 0,
 		context => q|manage revisions in tag|
 	},
-	
+
+	'tag name' => {
+		message => q|Tag Name|,
+		lastUpdated => 0,
+		context => q|manage revisions in tag|
+	},
+
 	'type' => {
 		message => q|Type|,
 		lastUpdated => 0,
@@ -793,6 +799,17 @@ Couldn't open %-s because %-s <br />
 	'done' => {
 		message => q|DONE<br />|,
 		lastUpdated => 1129420080,
+	},
+
+	'committed versions' => {
+		message => q|Committed Versions|,
+		lastUpdated => 0,
+		context => q|Admin console label for manage versions.|
+	},
+
+	'manage versions body' => {
+		message => q|<p>This screen displays a list of all versions for the current Asset, showing the date it was committed or opened, who owns the tag for that version, and the name of the version tag.  Icons will allow you purge a revision and remove it from the system or to view that particular version of the  Asset.  The version tag name is a link that will take you to the Manage Revisions in Tag screen.|,
+		lastUpdated => 0,
 	},
 
 	'topicName' => {

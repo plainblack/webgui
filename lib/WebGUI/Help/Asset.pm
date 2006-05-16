@@ -173,6 +173,7 @@ our $HELP = {
 			},
 		],
 	},
+
 	'metadata edit property' => {
                 title => 'metadata edit property',
                 body => 'metadata edit property body',
@@ -217,6 +218,15 @@ our $HELP = {
                         },
                 ],
         },
+
+	'manage versions' => {
+		title => 'committed versions',
+		body => 'manage versions body',
+		fields => [
+		],
+		related => [
+		]
+	},
 
 	'asset list' => {
 		title => 'asset list title',
