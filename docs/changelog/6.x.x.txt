@@ -3,6 +3,7 @@
  - Bug fixes to make WebGUI work with the WRE demo system.
  - Fixed a typo in the activities in the config file.
  - fixed a bug that caused threadId's to be empty in new posts
+ - fix [ 1489123 ] problem with graphing (Martin Kamerbeek / Procolix) 
 
 6.99.0
  - Added a workflow system.

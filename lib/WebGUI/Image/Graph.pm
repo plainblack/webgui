@@ -5,6 +5,7 @@ use WebGUI::Image;
 use WebGUI::Image::Palette;
 use WebGUI::Image::Font;
 use List::Util;
+use WebGUI::Utility;
 
 our @ISA = qw(WebGUI::Image);
 
@@ -231,6 +232,14 @@ sub getGraphingTab {
 	my $i18n = WebGUI::International->new($session, 'Image_Graph');
 		
 	my $f = WebGUI::HTMLForm->new($session);
+
+	unless ($session->config->get("graphingPlugins")) {
+		$f->readOnly(
+			-value	=> "No graphing plugins are enabled in the config file."
+		);
+
+		return $f->printRowsOnly;
+	}
 	
 	foreach (@{$session->config->get("graphingPlugins")}) {
 my		$plugin = WebGUI::Image::Graph->load($session, $_);
@@ -487,6 +496,20 @@ sub getMaxValueFromDataset {
 }
 
 #-------------------------------------------------------------------
+=head2 getPluginList
+
+Returns an arrayref containing the namespaces of the enabled graphing plugins.
+
+=cut
+
+sub getPluginList {
+	my $self = shift;
+	my $session = shift || $self->session;
+	
+	return $session->config->get("graphingPlugins");
+}
+
+#-------------------------------------------------------------------
 =head2 load ( session, namespace )
 
 Instanciates an WebGUI::Graph object with the given namespace.
@@ -558,13 +581,17 @@ The WebGUI session object.
 =cut
 
 sub processConfigurationForm {
-	my $self = shift;
+	my $class = shift;
 	my $session = shift;
+
+	return undef unless ($class->getPluginList($session));
 	
 	my $namespace = "WebGUI::Image::".$session->form->process('graphingPlugin');
 	$namespace =~ s/_/::/g;
 
-my	$graph = $self->load($session, $namespace);
+	return undef unless (isIn($namespace, @{$class->getPluginList($session)}));
+
+my	$graph = $class->load($session, $namespace);
 	
 	$graph->setConfiguration($session->form->paramsHashRef);
 

@@ -251,19 +251,21 @@ sub getEditForm {
 		) if $self->session->form->process("func") ne 'add';
 
 
-	my $config = {};
-	if ($self->get('graphConfiguration')) {
-		$config = Storable::thaw($self->get('graphConfiguration'));
-	}
+	if (WebGUI::Image::Graph->getPluginList($self->session)) {
+		my $config = {};
+		if ($self->get('graphConfiguration')) {
+			$config = Storable::thaw($self->get('graphConfiguration'));
+		}
 
-	$tabform->addTab('graph', 'Graphing');
-	$tabform->getTab('graph')->yesNo(
-		-name		=> 'generateGraph',
-		-label		=> $i18n->get('generate graph'),
-		-hoverHelp	=> $i18n->get('generate graph description'),
-		-value		=> $self->getValue('generateGraph'),
-	);
-	$tabform->getTab('graph')->raw(WebGUI::Image::Graph->getGraphingTab($self->session, $config));
+		$tabform->addTab('graph', 'Graphing');
+		$tabform->getTab('graph')->yesNo(
+			-name		=> 'generateGraph',
+			-label		=> $i18n->get('generate graph'),
+			-hoverHelp	=> $i18n->get('generate graph description'),
+			-value		=> $self->getValue('generateGraph'),
+		);
+		$tabform->getTab('graph')->raw(WebGUI::Image::Graph->getGraphingTab($self->session, $config));
+	}
 
 	return $tabform;
 }
@@ -310,8 +312,10 @@ sub processPropertiesFromFormPost {
              	$property->{'a'.$i} = $answer[($i-1)];
         }
 
-	my $graph = WebGUI::Image::Graph->processConfigurationForm($self->session);
-	$property->{graphConfiguration} = Storable::freeze($graph->getConfiguration);
+	if (WebGUI::Image::Graph->getPluginList($self->session)) {
+		my $graph = WebGUI::Image::Graph->processConfigurationForm($self->session);
+		$property->{graphConfiguration} = Storable::freeze($graph->getConfiguration);
+	}
 
 	$self->update($property);
 	$self->session->db->write("delete from Poll_answer where assetId=".$self->session->db->quote($self->getId)) if ($self->session->form->process("resetVotes"));
