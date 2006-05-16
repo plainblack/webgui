@@ -219,7 +219,10 @@ An array reference containing values for any placeholder params used in the SQL 
 
 sub buildArrayRefOfHashRefs {
 	my @array;
-	my $sth = $_[0]->read($_[1],$_[2]);
+	my $class = shift;
+	my $sql = shift;
+	my $params = shift;
+	my $sth = $class->read($sql,$params);
 	my $data;
 	while ($data = $sth->hashRef) {
 		push(@array,$data);
@@ -253,11 +256,15 @@ Which column of the result set to use as the key when creating the hashref.
 
 sub buildHashRefOfHashRefs {
 	my %hash;
-	my $sth = $_[0]->read($_[1],$_[2]);
+	my $class = shift;
+	my $sql = shift;
+	my $params = shift;
+	my $key = shift;
+	my $sth = $class->read($sql,$params);
 	my $data;
 	tie %hash, "Tie::IxHash";
 	while ($data = $sth->hashRef) {
-		$hash{$data->{$_[3]}} = $data;
+		$hash{$data->{$key}} = $data;
 	}
 	$sth->finish;
 	return \%hash;
