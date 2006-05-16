@@ -3802,6 +3802,11 @@ to give them full access to the site controls.
 WebGUI usernames cannot start or begin with any kind of space (spaces, tabs, etc.) and can only be made of letters, numbers, or dashes, underscores, periods, commas or @ signs.
 </p>
 
+<p><b>Version Tag</b><br />
+Every version in WebGUI is assigned a tag.  In the default version control setup, the tag is the date and time
+the tag was requested.
+</p>
+
 <p><b>Wobjects</b><br />
 If you think of Assets as "things" inside of WebGUI, then Wobject are
 "things" that "do stuff".  Articles are used to display content, DataForms
