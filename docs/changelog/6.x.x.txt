@@ -6,6 +6,7 @@
  - fix [ 1489123 ] problem with graphing (Martin Kamerbeek / Procolix) 
  - Fixed a problem where anybody could see the complete list of admin console
    functions in the adminbar, even though they couldn't actually use them.
+ - fix [ 1489094 ] DataForm Record edit link wrong for list mode (Michelle LaMar)
 
 6.99.0
  - Added a workflow system.
