@@ -1917,7 +1917,7 @@ sub www_managePurchases {
 	my @purchasesLoop;
 	while (my $purchase = $sth->hashRef) {
 		$purchase->{datePurchasedHuman} = $self->session->datetime->epochToHuman($purchase->{initDate});
-		$purchase->{purchaseUrl} = $self->getUrl."?func=viewPurchase;tid=".$purchase->{purchaseId};
+		$purchase->{purchaseUrl} = $self->getUrl("?func=viewPurchase;tid=".$purchase->{purchaseId});
 		
 		push(@purchasesLoop,$purchase);
 	}
