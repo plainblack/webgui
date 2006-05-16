@@ -1960,7 +1960,7 @@ sub www_viewPurchase {
 			$reg->{endDateHuman} = $self->session->datetime->epochToHuman($reg->{'endDate'});
 			$purchase->{canAddEvents} = 1 if ($isAdmin || ($userId eq $self->session->var->get('userId')) || ($reg->{userId} eq $self->session->var->get('userId'))  || ($reg->{createdByUserId} eq $self->session->var->get('userId')));
 			my ($isMainEvent) = $self->session->db->quickArray("select productId from EventManagementSystem_products where productId = ? and (prerequisiteId is NULL or prerequisiteId = '')",[$reg->{productId}]);
-			$purchase->{purchaseEventId} = $reg->{productId} if $isMainEvent;
+			$purchase->{purchaseEventId} = $reg->{productId} if ($isMainEvent && $reg->{'returned'} eq '0');
 			push(@{$purchase->{regLoop}},$reg);
 			}
 		push(@purchasesLoop,$purchase);
@@ -1998,7 +1998,7 @@ sub www_viewPurchase {
 				$purchase->{canReturnItinerary} = 1 unless $reg->{'returned'};
 				$purchase->{canAddEvents} = 1 if ($isAdmin || ($userId eq $self->session->var->get('userId')) || ($reg->{userId} eq $self->session->var->get('userId'))  || ($reg->{createdByUserId} eq $self->session->var->get('userId')));
 				my ($isMainEvent) = $self->session->db->quickArray("select productId from EventManagementSystem_products where productId = ? and (prerequisiteId is NULL or prerequisiteId = '')",[$reg->{productId}]);
-				$purchase->{purchaseEventId} = $reg->{productId} if $isMainEvent;
+				$purchase->{purchaseEventId} = $reg->{productId} if ($isMainEvent && $reg->{'returned'} eq '0');
 				push(@{$purchase->{regLoop}},$reg);
 			}
 			$var{canReturnTransaction} = 1 if $purchase->{canReturnItinerary};
@@ -2035,7 +2035,7 @@ sub www_viewPurchase {
 				$purchase->{canReturnItinerary} = 1 unless $reg->{'returned'};
 				$purchase->{canAddEvents} = 1 if ($isAdmin || ($userId eq $self->session->var->get('userId')) || ($reg->{userId} eq $self->session->var->get('userId'))  || ($reg->{createdByUserId} eq $self->session->var->get('userId')));
 				my ($isMainEvent) = $self->session->db->quickArray("select productId from EventManagementSystem_products where productId = ? and (prerequisiteId is NULL or prerequisiteId = '')",[$reg->{productId}]);
-				$purchase->{purchaseEventId} = $reg->{productId} if $isMainEvent;
+				$purchase->{purchaseEventId} = $reg->{productId} if ($isMainEvent && $reg->{'returned'} eq '0');
 				push(@{$purchase->{regLoop}},$reg);
 			}
 			$var{canReturnTransaction} = 1 if $purchase->{canReturnItinerary};
