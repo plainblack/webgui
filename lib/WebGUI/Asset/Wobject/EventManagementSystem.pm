@@ -2824,10 +2824,10 @@ sub www_search {
 	  	$eventFields{'purchase.label'} = $i18n->get('sold out');
 	  }
 	  else {
-		my $masterEventId = $cfilter_t0 || $self->session->form->get("cfilter_t0");
-	  	$eventFields{'purchase.url'} = $self->getUrl('func=addToScratchCart;pid='.$event->{'productId'}.";mid=".$masterEventId);
 	  	$eventFields{'purchase.label'} = $i18n->get('add to cart');
 	  }
+		my $masterEventId = $cfilter_t0 || $self->session->form->get("cfilter_t0");
+	  $eventFields{'purchase.url'} = $self->getUrl('func=addToScratchCart;pid='.$event->{'productId'}.";mid=".$masterEventId);
 	  %eventFields = ('event' => $self->processTemplate(\%eventFields, $event->{'templateId'}), %eventFields) if ($self->{_calledFromView} && $self->session->form->process('func') eq 'view');
 	  push (@events, \%eventFields);
 	} 
