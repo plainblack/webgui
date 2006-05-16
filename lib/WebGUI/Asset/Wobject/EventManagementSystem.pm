@@ -2950,12 +2950,13 @@ sub view {
 	  	$eventFields{'purchase.label'} = $i18n->get('sold out');
 	  }
 	  else {
-	  	$eventFields{'purchase.url'} = $self->getUrl('func=addToScratchCart;mid='.$event->{'productId'}.';pid='.$event->{'productId'});
-			$eventFields{'purchase.message'} = $i18n->get('see available subevents');
-			$eventFields{'purchase.wantToSearch.url'} = $self->getUrl('func=search;cfilter_s0=requirement;cfilter_c0=eq;subSearch=1;cfilter_t0='.$event->{productId});
-	        $eventFields{'purchase.wantToContinue.url'} = $self->getUrl('func=addToCart;pid='.$event->{productId});
 	  	$eventFields{'purchase.label'} = $i18n->get('add to cart');
 	  }
+  	$eventFields{'purchase.url'} = $self->getUrl('func=addToScratchCart;mid='.$event->{'productId'}.';pid='.$event->{'productId'});
+		$eventFields{'purchase.message'} = $i18n->get('see available subevents');
+		$eventFields{'purchase.wantToSearch.url'} = $self->getUrl('func=search;cfilter_s0=requirement;cfilter_c0=eq;subSearch=1;cfilter_t0='.$event->{productId});
+	  $eventFields{'purchase.wantToContinue.url'} = $self->getUrl('func=addToCart;pid='.$event->{productId});
+	  	
 	  push (@events, {'event' => $self->processTemplate(\%eventFields, $event->{'templateId'}) });	  
 	} 
 	$var{'checkout.url'} = $self->getUrl('op=viewCart');			
