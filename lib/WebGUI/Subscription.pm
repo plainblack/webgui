@@ -167,7 +167,7 @@ been set.
 
 =head3 Valid Object properties
 
-name price description subscriptionGroup duration executeOnSubscribe karma
+name price description subscriptionGroup duration executeOnSubscription karma
 
 =cut
 
@@ -177,7 +177,7 @@ sub set {
 	$properties = shift;
 
 	foreach (keys(%{$properties})) {
-		if (isIn($_, qw(name price description subscriptionGroup duration executeOnSubscribe karma))) {
+		if (isIn($_, qw(name price description subscriptionGroup duration executeOnSubscription karma))) {
 			$self->{_properties}{$_} = $value;
 			push(@fieldsToUpdate, $_);
 		}

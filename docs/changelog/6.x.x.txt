@@ -7,6 +7,7 @@
  - Fixed a problem where anybody could see the complete list of admin console
    functions in the adminbar, even though they couldn't actually use them.
  - fix [ 1489094 ] DataForm Record edit link wrong for list mode (Michelle LaMar)
+ - fix [ 1488663 ] Add new subscription broken (Martin Kamerbeek / Procolix)
 
 6.99.0
  - Added a workflow system.

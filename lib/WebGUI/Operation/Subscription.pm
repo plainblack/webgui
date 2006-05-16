@@ -355,7 +355,7 @@ sub www_editSubscription {
 		-label	=> $i18n->get('subscription duration'),
 		-hoverHelp	=> $i18n->get('subscription duration description'),
 		-value	=> [$properties->{duration} || 'Monthly'],
-		-options=> WebGUI::Commerce::Payment->recurringPeriodValues($session),
+		-options=> WebGUI::Commerce::Payment::recurringPeriodValues($session),
 		);
 	$f->text(
 		-name	=> 'executeOnSubscription',
@@ -393,8 +393,13 @@ sub www_editSubscriptionSave {
 	my (@relevantFields);
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
+	my $properties = {};
 	@relevantFields = qw(subscriptionId name price description subscriptionGroup duration executeOnSubscription karma);
-	WebGUI::Subscription->new($session,$session->form->process("sid"))->set({map {$_ => $session->form->process($_)} @relevantFields});
+	foreach (@relevantFields) {
+		$properties->{$_} = $session->form->process($_) if (defined $session->form->process($_));
+	}
+
+	WebGUI::Subscription->new($session,$session->form->process("sid"))->set($properties);
 	return www_listSubscriptions($session);
 }
 
