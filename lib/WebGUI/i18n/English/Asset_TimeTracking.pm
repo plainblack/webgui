@@ -31,7 +31,7 @@ our $I18N = {
 		lastUpdated => 0
 		},
     
-	'timeRowTemplateId hoverHelp' => {
+	'timeRowTemplateId hoverhelp' => {
 		message => q|Template to user for building rows in the time tracker|,
 		lastUpdated => 0
 		},			
