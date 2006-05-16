@@ -455,6 +455,11 @@ Default text for password form field.
 		lastUpdated => 1078854953
 	},
 
+	'LDAPLink_70' => {
+		message => q|The results of the request are too large (69)|,
+		lastUpdated => 1147799577
+	},
+
 	'LDAPLink_71' => {
 		message => q|Affects Multiple DSAs (71)|,
 		lastUpdated => 1078854953
