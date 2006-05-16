@@ -17,6 +17,7 @@
  - fix [ 1486788 ] karma isn't working on forums
  - fix [ 1489094 ] DataForm Record edit link wrong for list mode (Michelle LaMar)
  - fix [ 1488663 ] Add new subscription broken (Martin Kamerbeek / Procolix)
+ - fix [ 1488921 ] Help: Commerce, Manage
 
 6.99.0
  - Added a workflow system.

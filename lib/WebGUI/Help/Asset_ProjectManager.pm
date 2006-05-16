@@ -118,6 +118,22 @@ our $HELP = {
                                 tag => 'project manager add/edit',
                                 namespace => 'Asset_ProjectManager',
                         },
+                        {
+                                tag => 'gantt chart template',
+                                namespace => 'Asset_ProjectManager',
+                        },
+		],
+	},
+
+	'gantt chart template' => {
+		title => 'gantt chart template vars title',
+		body => 'gantt chart template vars body',
+		fields => [ ],
+		related => [
+                        {
+                                tag => 'project manager add/edit',
+                                namespace => 'Asset_ProjectManager',
+                        },
 		],
 	},
 

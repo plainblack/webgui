@@ -131,28 +131,8 @@ our $I18N = {
 
         'payment plugin description' => {
                 message => q|<p>You can select the payment plugin to use here. Please note that you have to enable the plugins you want to choose from in the WebGUI configuration file. If you don't do this they won't show up here.</p>
-
-<h3>PayflowPro</h3>
-
-<p>This is the plugin for Verisign Payflow Pro. This plugin is disabled by default in the configuration file because it depends on proprietary software from Verisign that can't be shipped with WebGUI.</p>
-
-<p><b>Partner</b><br />
-Your partner id.
-</p>
-
-<p><b>Vendor</b><br />
-Here you should enter your vendor id.
-</p>
-
-<p><b>Login</b><br />
-Your login to Verisign PayflowPro.
-</p>
-
-<p><b>Password</b><br />
-Your password.
-</p>
 |,
-                lastUpdated => 1138922899,
+                lastUpdated => 1147797861,
         },
 
 

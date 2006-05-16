@@ -356,12 +356,12 @@ our $I18N = {
 		lastUpdated => 0
 		},
 
-	 'edit task template vars title' => {
+	'edit task template vars title' => {
 		message => q|Edit Task Template Variables|,
 		lastUpdated => 0
-		},
+	},
 
-	 'edit task template vars body' => {
+	'edit task template vars body' => {
 		message => q|<p>The Edit Task template has these template variables</p>
 <p>! : This variable is required for the form to function correctly.</p>
 
@@ -420,12 +420,12 @@ The URL to the Extras directory.
 
 |,
 		lastUpdated => 0
-		},
+	},
 
-	 'view project template vars title' => {
+	'view project template vars title' => {
 		message => q|View Project Template Variables|,
 		lastUpdated => 0
-		},
+	},
 
 	 'view project template vars body' => {
 		message => q|<p>The View Project template has these template variables</p>
@@ -596,8 +596,80 @@ A label to go with the link back to this screen.
 
 |,
 		lastUpdated => 0
-		},
+	},
 
+	'gantt chart template vars title' => {
+		message => q|Gantt Chart Template Variables|,
+		lastUpdated => 0
+	},
+
+	'gantt chart template vars body' => {
+		message => q|<p>These variables are available in the Gantt Chart Template:</p>
+
+<p><b>extras</b><br />
+The URL to the Extras directory for the Project Manager.
+</p>
+
+<p><b>sunday.label</b><br />
+The initial of the day for Sunday, internationalized.
+</p>
+
+<p><b>monday.label</b><br />
+The initial of the day for Monday, internationalized.
+</p>
+
+<p><b>tuesday.label</b><br />
+The initial of the day for Tuesday, internationalized.
+</p>
+
+<p><b>wednesday.label</b><br />
+The initial of the day for Wednesday, internationalized.
+</p>
+
+<p><b>thursday.label</b><br />
+The initial of the day for Thursday, internationalized.
+</p>
+
+<p><b>friday.label</b><br />
+The initial of the day for Friday, internationalized.
+</p>
+
+<p><b>saturday.label</b><br />
+The initial of the day for Saturday, internationalized.
+</p>
+
+<p><b>daysLoop</b><br />
+The initial of the day for Saturday, internationalized.
+</p>
+
+<div class="helpIndent">
+
+<p><b>month.name</b><br />
+The name of the current month
+</p>
+
+<p><b>saturday.label</b><br />
+The initial of the day for Saturday, internationalized.
+</p>
+
+<p><b>daysLoop</b><br />
+The initial of the day for Saturday, internationalized.
+</p>
+
+<div class="helpIndent">
+
+<p><b>day.number</b><br />
+The ordinal number for this day of the week, an integer between 1 and 7
+</p>
+
+</div>
+
+</div>
+
+
+		|,
+		lastUpdated => 0
+	},
 
 };
 
