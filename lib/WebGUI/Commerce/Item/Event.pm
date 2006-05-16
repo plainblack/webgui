@@ -72,7 +72,7 @@ sub isRecurring {
 
 #-------------------------------------------------------------------
 sub name {
-	return $_[0]->{_event}->{title};
+	return $_[0]->{_event}->{sku}."  ".$_[0]->{_event}->{title};
 }
 
 #-------------------------------------------------------------------
@@ -89,7 +89,7 @@ sub new {
 	$session = shift;
 	$eventId = shift;
 
-	my $eventData = $session->db->quickHashRef("select p.productId, p.title, p.description, p.price, e.approved, e.passId, e.passType
+	my $eventData = $session->db->quickHashRef("select p.productId, p.title, p.description, p.price, p.sku, e.approved, e.passId, e.passType
                    from EventManagementSystem_products as e, products as p
 		   where p.productId = e.productId and p.productId=".$session->db->quote($eventId)); 	
 	
