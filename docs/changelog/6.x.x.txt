@@ -20,6 +20,7 @@
  - Added a 2.7% speed increase by precaching i18n messages. This should also
    help increase shared memory amongst Apache children. (Matt Wilson)
  - fix [ 1488921 ] Help: Commerce, Manage
+ - fix [ Add user to group ]  typo in www_manageUsersInGroup
  - Added two new mail posting properties to the collaboration system to get
    around a couple of problems clients have brought up.
 

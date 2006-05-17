@@ -654,7 +654,7 @@ sub www_manageUsersInGroup {
 			value=>"deleteGrouping"
 			});
         $output .= '<table border="1" cellpadding="2" cellspacing="0"><tr><td class="tableHeader"><input type="image" src="'
-		.$session->icon->_getBaseURL().'delete.gif" border="0"></td>
+		.$session->icon->getBaseURL().'delete.gif" border="0"></td>
                 <td class="tableHeader">'.$i18n->get(50).'</td>
                 <td class="tableHeader">'.$i18n->get(369).'</td></tr>';
 	my $p = WebGUI::Paginator->new($session,$session->url->page("op=manageUsersInGroup;gid=".$session->form->process("gid")));
