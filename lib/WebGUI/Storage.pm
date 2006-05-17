@@ -369,7 +369,7 @@ sub createTemp {
 
 =head2 delete ( )
 
-Deletes this storage location and its contents (if any) from the filesystem and destroy's the object.
+Deletes this storage location and its contents (if any) from the filesystem.
 
 =cut
 
@@ -377,7 +377,7 @@ sub delete {
 	my $self = shift;
 	my $path = $self->getPath;
         rmtree($path) if ($path);
-	undef $self;
+	return;
 }
 
 #-------------------------------------------------------------------
