@@ -53,6 +53,16 @@ sub canSubscribe {
 }
 
 #-------------------------------------------------------------------
+
+sub commit {
+	my $self = shift;
+	$self->SUPER::commit;
+	if ($self->isNew) {
+        	$self->getParent->incrementThreads($self->get("dateUpdated"),$self->getId);
+	}
+}
+
+#-------------------------------------------------------------------
 sub createSubscriptionGroup {
 	my $self = shift;
 	return if ($self->get("subscriptionGroupId"));
@@ -524,9 +534,6 @@ sub prepareView {
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;	
-	if ($self->session->form->process("assetId") eq "new") {
-        	$self->getParent->incrementThreads($self->get("dateUpdated"),$self->getId) unless ($self->isReply);
-	}
 	if ($self->getParent->canEdit) {
 		my $karmaScale = $self->session->form->process("karmaScale","integer") || $self->getParent->get("defaultKarmaScale");
 		my $karmaRank = $self->get("karma")/$karmaScale;
