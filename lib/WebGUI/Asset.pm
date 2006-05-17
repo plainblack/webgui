@@ -1769,10 +1769,6 @@ sub www_add {
 	my $self = shift;
 	my %prototypeProperties; 
 	my $class = $self->session->form->process("class","className");
-	unless ($class =~ m/^[A-Za-z0-9\:]+$/) {
-		$self->session->errorHandler->security("tried to call an invalid class ".$class);
-		return "";
-	}
 	if ($self->session->form->process('prototype')) {
 		my $prototype = WebGUI::Asset->new($self->session, $self->session->form->process("prototype"),$class);
 		foreach my $definition (@{$prototype->definition($self->session)}) { # cycle through rather than copying properties to avoid grabbing stuff we shouldn't grab
