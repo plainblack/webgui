@@ -119,13 +119,13 @@ sub new {
 
 #-------------------------------------------------------------------
 
-=head2 param ( field )
+=head2 param ( [ field ] )
 
-Retrieves a form field post from the HTTP request.
+Returns all the fields from a form post as an array.
 
 =head3 field
 
-The name of the field to retrieve.
+The name of the field to retrieve if you want to retrieve just one specific field.
 
 =cut
 

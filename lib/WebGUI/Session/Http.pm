@@ -184,17 +184,18 @@ sub sendHeader {
 	} else {
 		$request->content_type($self->{_http}{mimetype} || "text/html");
 		my $date = $self->session->datetime->epochToHuman(($self->{_http}{lastModified} || time()), "%W, %d %C %y %j:%m:%s %t");
+		my $cc = $self->{_http}{cacheControl};
 		$request->headers_out->set('Last-Modified' => $date);
-		if ($self->{_http}{cacheControl} eq "none" || $self->session->setting->get("preventProxyCache") || ($self->{_http}{cacheControl} eq "" && $self->session->var->get("userId") ne "1")) {
+		if ($cc eq "none" || $self->session->setting->get("preventProxyCache") || ($cc eq "" && $self->session->var->get("userId") ne "1")) {
 			$request->headers_out->set("Cache-Control" => "private");
 			$request->no_cache(1);
-		} elsif ($self->{_http}{cacheControl} ne "" && $request->protocol =~ /(\d\.\d)/ && $1 >= 1.1){
+		} elsif ($cc ne "" && $request->protocol =~ /(\d\.\d)/ && $1 >= 1.1){
 			my $extras = "";
 			$extras .= ", private" unless ($self->session->var->get("userId") eq "1");
-    			$request->headers_out->set('Cache-Control' => "max-age=" . $self->{_http}{cacheControl}.$extras);
-  		} elsif ($self->{_http}{cacheControl} ne "") {
+    			$request->headers_out->set('Cache-Control' => "max-age=" . $cc.$extras);
+  		} elsif ($cc ne "") {
 			$request->headers_out->set("Cache-Control" => "private") unless ($self->session->var->get("userId") eq "1");
-			my $date = $self->session->datetime->epochToHuman(time() + $self->{_http}{cacheControl}, "%W, %d %C %y %j:%m:%s %t");
+			my $date = $self->session->datetime->epochToHuman(time() + $cc, "%W, %d %C %y %j:%m:%s %t");
     			$request->headers_out->set('Expires' => $date);
   		}
 		if ($self->{_http}{filename}) {
@@ -234,7 +235,7 @@ Either the number of seconds until the cache expires, or the word "none" to disa
 sub setCacheControl {
 	my $self = shift;
 	my $timeout = shift;
-	$self->{_http}{cacheControl};
+	$self->{_http}{cacheControl} = $timeout;
 }
 
 #-------------------------------------------------------------------
@@ -364,7 +365,8 @@ The URL to redirect to.
 sub setRedirect {
 	my $self = shift;
 	my $url = shift;
-	return undef if ($url eq $self->session->url->page()); # prevent redirecting to self
+	my @params = $self->session->form->param;
+	return undef if ($url eq $self->session->url->page() && scalar(@params) < 1); # prevent redirecting to self
 	$self->{_http}{location} = $url;
 	$self->setStatus("302", "Redirect");
 	$self->session->style->setMeta({"http-equiv"=>"refresh",content=>"0; URL=".$url});

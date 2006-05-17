@@ -255,8 +255,7 @@ The current WebGUI::Session object.
 sub setup {
 	my $session = shift;
 	require WebGUI::Operation::WebGUI;
-	$session->http->sendHeader;
-	$session->output->print(WebGUI::Operation::WebGUI::www_setup($session));
+	WebGUI::Operation::WebGUI::www_setup($session);
 }
 
 

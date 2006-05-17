@@ -28,6 +28,8 @@
  - fix [ 1488850 ] Collaboration front page slow to load
  - The CS main listing is now 863% faster.
  - Fixed a problem where last reply column wasn't being updated in the thread.
+ - fix [ 1488556 ] blank page after setup
+
 
 6.99.0
  - Added an Events Management System asset that can help people run

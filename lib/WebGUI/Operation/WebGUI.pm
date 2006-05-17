@@ -41,6 +41,7 @@ sub www_genesis {
 	return $output;
 }
 
+#-------------------------------------------------------------------
 =head2 www_setup ( )
 
 Initial setup for a brand new WebGUI install.  Sets the administrator name,
@@ -49,11 +50,8 @@ password and email address, as well as some other WebGUI settings.
 =cut
 
 
-#-------------------------------------------------------------------
 sub www_setup {
 	my $session = shift;
-	$session->http->setCacheControl("none");
-	$session->http->setMimeType("text/html");
 	return "" unless ($session->setting->get("specialState") eq "init");
 	my $i18n = WebGUI::International->new($session, "WebGUI");
 	my $output = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -109,7 +107,7 @@ sub www_setup {
 		$session->setting->set('companyEmail',$session->form->email("companyEmail"));
 		$session->http->setRedirect($session->url->gateway());
 		$session->http->sendHeader;
-		return "";
+		return undef;
 	} else {
 		$output .= '<legend align="left">Admin Account</legend>';
 		my $u = WebGUI::User->new($session,'3');
@@ -148,7 +146,10 @@ sub www_setup {
 		<img src="'.$session->url->extras('background.jpg').'" style="border-style:none;position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5;" />
 	</body>
 </html>';
-	return $output;
+	$session->http->setCacheControl("none");
+	$session->http->setMimeType("text/html");
+	$session->http->sendHeader;
+	$session->output->print($output);
 }
 
 
