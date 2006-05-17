@@ -211,6 +211,7 @@ sub www_copyList {
 
 sub www_createShortcut () {
 	my $self = shift;
+	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(4));	
 	my $isOnDashboard = ref $self->getParent eq 'WebGUI::Asset::Wobject::Dashboard';
 	my $target = $isOnDashboard ? $self->getParent : $self;
 	my $child = $target->addChild({
