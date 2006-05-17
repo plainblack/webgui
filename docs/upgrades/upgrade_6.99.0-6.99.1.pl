@@ -22,8 +22,16 @@ my $session = start(); # this line required
 
 fixTypos($session);
 updateTemplates();
+csFixes();
 
 finish($session); # this line required
+
+#-------------------------------------------------
+sub csFixes {
+        print "\tFixing CS stuff.\n" unless ($quiet);
+	$session->db->write("alter table Collaboration add column autoSubscribeToThread int not null default 1");
+        $session->db->write("alter table Collaboration add column requireSubscriptionForEmailPosting int not null default 1");
+}
 
 #-------------------------------------------------
 sub updateTemplates {

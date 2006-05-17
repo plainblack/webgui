@@ -14,6 +14,30 @@ our $I18N = {
 		context => q|thread link|
 		},
 
+	'require subscription for email posting' => {
+		message => q|Require subscription for email posts?|,
+		lastUpdated => 0,
+		context => q|field label for mail setting|
+		},
+
+	'require subscription for email posting help' => {
+		message => q|If this is set to yes, then the user not only has to be in the group to post, but must also be subscribed to the collaboration system or thread in order to post to it.|,
+		lastUpdated => 0,
+		context => q|help for mail setting field label|
+		},
+
+	'auto subscribe to thread' => {
+		message => q|Auto subscribe to thread?|,
+		lastUpdated => 0,
+		context => q|field label for mail setting|
+		},
+
+	'auto subscribe to thread help' => {
+		message => q|If the user is not subscribed to a thread, nor the collaboration system, and they post to the CS via email, should the be subscribed to the thread? If this is set to yes, they will be. Note that this option only works if the 'Require subscription for email posts?' field is set to 'no'.|,
+		lastUpdated => 0,
+		context => q|help for mail setting field label|
+		},
+
 	'mail prefix' => {
 		message => q|Prefix|,
 		lastUpdated => 0,

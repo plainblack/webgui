@@ -23,6 +23,16 @@ use WebGUI::Utility;
 our @ISA = qw(WebGUI::Asset::Post);
 
 #-------------------------------------------------------------------
+sub addRevision {
+        my $self = shift;
+        my $newSelf = $self->SUPER::addRevision(@_);
+	if ($newSelf->get("subscriptionGroupId") eq "") {
+		$newSelf->createSubscriptionGroup;
+	}
+        return $newSelf;
+}
+
+#-------------------------------------------------------------------
 sub archive {
 	my $self = shift;
 	foreach my $post (@{$self->getPosts}) {
@@ -514,9 +524,6 @@ sub prepareView {
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;	
-	if ($self->get("subscriptionGroupId") eq "") {
-		$self->createSubscriptionGroup;
-	}
 	if ($self->session->form->process("assetId") eq "new") {
         	$self->getParent->incrementThreads($self->get("dateUpdated"),$self->getId) unless ($self->isReply);
 	}
@@ -526,6 +533,7 @@ sub processPropertiesFromFormPost {
 		$self->update({karmaScale=>$karmaScale, karmaRank=>$karmaRank});
 	}
 }
+
 
 #-------------------------------------------------------------------
 sub purge {

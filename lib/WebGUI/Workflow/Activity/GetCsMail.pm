@@ -123,6 +123,7 @@ sub addPost {
 	}
 	$post->postProcess;
 	$post->requestCommit;
+	return $post;
 }
 
 #-------------------------------------------------------------------
@@ -190,10 +191,16 @@ sub execute {
 			my $id = $1;	
 			$post = WebGUI::Asset->newByDynamicClass($self->session, $id);
 		}
-		if (defined $post && $cs->get("allowReplies") && $user->isInGroup($cs->get("postGroupId")) && ($user->isInGroup($cs->get("subscriptionGroupId")) || $user->isInGroup($post->get("subscriptionGroupId")))) {
+		if (defined $post && $cs->get("allowReplies") && $user->isInGroup($cs->get("postGroupId")) && (!$cs->get("requireSubscriptionForEmailPosting") || $user->isInGroup($cs->get("subscriptionGroupId")) || $user->isInGroup($post->get("subscriptionGroupId")))) {
 			$self->addPost($post, $message, $user, $cs->get("mailPrefix"));
-		} elsif ($user->isInGroup($cs->get("postGroupId")) && $user->isInGroup($cs->get("subscriptionGroupId"))) {
-			$self->addPost($cs, $message, $user, $cs->get("mailPrefix"));
+			if ($cs->get("autoSubscribeToThread") && !($user->isInGroup($cs->get("subscriptionGroupId")) || $user->isInGroup($post->get("subscriptionGroupId")))) {
+				$user->addToGroups([$post->getThread->get("subscriptionGroupId")]);
+			}
+		} elsif ($user->isInGroup($cs->get("postGroupId")) && (!$cs->get("requireSubscriptionForEmailPosting") || $user->isInGroup($cs->get("subscriptionGroupId")))) {
+			my $thread = $self->addPost($cs, $message, $user, $cs->get("mailPrefix"));
+			if ($cs->get("autoSubscribeToThread") && !$user->isInGroup($cs->get("subscriptionGroupId"))) {
+				$user->addToGroups([$thread->get("subscriptionGroupId")]);
+			}
 		} else {
 			my $send = WebGUI::Mail::Send->create($self->session, {
 				to=>$message->{from},

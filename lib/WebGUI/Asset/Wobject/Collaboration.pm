@@ -304,6 +304,14 @@ sub definition {
 				label => $i18n->get("visitor cache timeout"),
 				hoverHelp => $i18n->get("visitor cache timeout help")
 				},
+			autoSubscribeToThread => {
+				fieldType=>"yesNo",
+				defaultValue=>1
+				},
+			requireSubscriptionForEmailPosting => {
+				fieldType=>"yesNo",
+				defaultValue=>1
+				},
 			approvalWorkflow =>{
 				fieldType=>"workflow",
 				defaultValue=>"pbworkflow000000000003"
@@ -542,7 +550,19 @@ sub getEditForm {
 		label=>$i18n->get("mail prefix"),
 		hoverHelp=>$i18n->get("mail prefix help"),
 		);
- 	$tabform->getTab("display")->interval(
+	$tabform->getTab("mail")->yesNo(
+		name=>"autoSubscribeToThread",
+		value=>$self->getValue("autoSubscribeToThread"),
+		label=>$i18n->get("auto subscribe to thread"),
+		hoverHelp=>$i18n->get("auto subscribe to thread help"),
+		);
+	$tabform->getTab("mail")->yesNo(
+		name=>"requireSubscriptionForEmailPosting",
+		value=>$self->getValue("requireSubscriptionForEmailPosting"),
+		label=>$i18n->get("require subscription for email posting"),
+		hoverHelp=>$i18n->get("require subscription for email posting help"),
+		);
+  	$tabform->getTab("display")->interval(
  		-name=>"visitorCacheTimeout",
 		-label=>$i18n->get('visitor cache timeout'),
 		-hoverHelp=>$i18n->get('visitor cache timeout help'),

@@ -256,7 +256,6 @@ sub isInGroup {
         return 1 if ($gid eq '7');		# everyone is in the everyone group
         return 1 if ($gid eq '1' && $uid eq '1'); 	# visitors are in the visitors group
         return 1 if ($gid eq '2' && $uid ne '1'); 	# if you're not a visitor, then you're a registered user
-        return 1 if ($uid eq '3');  #Admin is in every group
         ### Get data for auxillary checks.
 	my $isInGroup = $self->session->stow->get("isInGroup");
         ### Look to see if we've already looked up this group. 
