@@ -115,7 +115,6 @@ sub addGroups {
 	my $self = shift;
 	my $groups = shift;
 	WebGUI::Cache->new($self->session, $self->getId)->delete;
-	$self->session->stow->delete("isInGroup");
 	foreach my $gid (@{$groups}) {
 		next if ($gid eq '1');
 		next if ($gid eq $self->getId);
@@ -126,7 +125,7 @@ sub addGroups {
 			$self->session->db->write("insert into groupGroupings (groupId,inGroup) values (?,?)",[$gid, $self->getId]);
 		}
 	}
-	$self->session->stow->delete("gotGroupsInGroup");
+	$self->clearCaches();
 	return 1;
 }
 
@@ -219,7 +218,11 @@ Clears caches for this group.
 
 sub clearCaches {
 	my $self = shift;
-	WebGUI::Cache->new($self->session, $self->getId)->delete;
+	##Clear my cache and the cache of all groups above me.
+	my $groups = $self->getGroupsFor();
+	foreach my $group ( $self->getId, @{ $groups } ) {
+		WebGUI::Cache->new($self->session, $group)->delete;
+	}
 	$self->session->stow->delete("isInGroup");
 	$self->session->stow->delete("gotGroupsInGroup");
 }
@@ -781,7 +784,6 @@ sub karmaThreshold {
         my $self = shift;
         my $value = shift;
         if (defined $value) {
-		$self->clearCaches;
 		$self->set("karmaThreshold",$value);	
         }
         return $self->get("karmaThreshold");
@@ -804,7 +806,6 @@ sub ipFilter {
         my $self = shift;
         my $value = shift;
         if (defined $value) {
-		$self->clearCaches;
 		$self->set("ipFilter",$value);
         }
         return $self->get("ipFilter");
@@ -964,7 +965,6 @@ sub dbQuery {
         my $self = shift;
         my $value = shift;
         if (defined $value) {
-		$self->clearCaches;
                 $self->set("dbQuery",$value);
         }
         return $self->get("dbQuery");
@@ -986,7 +986,6 @@ sub databaseLinkId {
         my $self = shift;
         my $value = shift;
         if (defined $value) {
-		$self->clearCaches;
                 $self->set("databaseLinkId",$value);
         }
         return $self->get("databaseLinkId");
@@ -1103,7 +1102,7 @@ The name of a property to set.
 
 =head3 value
 
-THe value of a property to set.
+The value of a property to set.
 
 =cut
 
@@ -1115,6 +1114,7 @@ sub set {
 	$self->{_group}{$name} = $value;
 	$self->session->{groupData}->{$self->getId} = undef;
 	$self->session->db->setRow("groups","groupId",{groupId=>$self->getId, $name=>$value, lastUpdated=>$self->session->datetime->time()});
+	$self->clearCaches;
 }
 
 #-------------------------------------------------------------------

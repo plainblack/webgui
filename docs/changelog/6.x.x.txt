@@ -21,6 +21,7 @@
    help increase shared memory amongst Apache children. (Matt Wilson)
  - fix [ 1488921 ] Help: Commerce, Manage
  - fix [ Add user to group ]  typo in www_manageUsersInGroup
+ - fix [ 1489152 ] user to group doesn't give proper privs
  - Added two new mail posting properties to the collaboration system to get
    around a couple of problems clients have brought up.
  - fix [ 1435382 ] 6.8.6 always "unsubscribe" link for Admin

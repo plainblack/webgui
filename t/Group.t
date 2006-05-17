@@ -75,7 +75,7 @@ my @ipTests = (
 );
 
 
-plan tests => (88 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
+plan tests => (90 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 my $testCache = WebGUI::Cache->new($session, 'myTestKey');
@@ -470,6 +470,16 @@ foreach my $ipTest (@ipTests) {
 	is($ipTest->{user}->isInGroup($gI->getId), $ipTest->{expect}, $ipTest->{comment});
 }
 
+##Cache check.
+
+my $cacheDude = WebGUI::User->new($session, "new");
+$cacheDude->username('Cache Dude');
+
+$gY->addUsers([$cacheDude->userId]);
+
+ok( $cacheDude->isInGroup($gY->getId), "Cache dude added to group Y");
+ok( $cacheDude->isInGroup($gZ->getId), "Cache dude is a member of group Z by group membership");
+
 SKIP: {
 	skip("need to test expiration date in groupings interacting with recursive or not", 1);
 	ok(undef, "expiration date in groupings for getUser");
@@ -479,7 +489,7 @@ END {
 	foreach my $testGroup ($gX, $gY, $gZ, $gA, $gB, $gC, $g, $gK, $gS) {
 		$testGroup->delete if (defined $testGroup and ref $testGroup eq 'WebGUI::Group');
 	}
-	foreach my $dude ($user, @crowd, @mob, @chameleons, @itchies, @tcps) {
+	foreach my $dude ($user, @crowd, @mob, @chameleons, @itchies, @tcps, $cacheDude) {
 		$dude->delete if (defined $dude and ref $dude eq 'WebGUI::User');
 	}
 	$session->db->dbh->do('DROP TABLE IF EXISTS myUserTable');
