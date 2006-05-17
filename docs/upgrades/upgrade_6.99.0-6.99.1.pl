@@ -31,6 +31,7 @@ sub csFixes {
         print "\tFixing CS stuff.\n" unless ($quiet);
 	$session->db->write("alter table Collaboration add column autoSubscribeToThread int not null default 1");
         $session->db->write("alter table Collaboration add column requireSubscriptionForEmailPosting int not null default 1");
+        $session->db->write("alter table Thread_read add index threadId_userId (threadId,userId)");
 }
 
 #-------------------------------------------------
