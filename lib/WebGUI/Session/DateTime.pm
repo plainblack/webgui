@@ -261,6 +261,26 @@ sub DESTROY {
         undef $self;
 }
 
+#-------------------------------------------------------------------
+
+=head2 epochToHttp ( epcoh ) 
+
+Converts and epoch date into an HTTP formatted date.
+
+=head3 epoch
+
+An epoch date. Defaults to now.
+
+=cut
+
+sub epochToHttp {
+	my $self = shift;
+	my $epoch = shift || time();
+	my $timeZone = $self->session->user->profileField("timeZone") || "America/Chicago";
+	my $dt = DateTime->from_epoch( epoch=>$epoch, time_zone=>$timeZone);
+	$dt->set_time_zone("GMT");
+	return $dt->strftime("%a, %d %b %Y %H:%m:%S GMT");
+}
 
 #-------------------------------------------------------------------
 

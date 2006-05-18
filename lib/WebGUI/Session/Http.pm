@@ -183,7 +183,7 @@ sub sendHeader {
 		$request->status(301);
 	} else {
 		$request->content_type($self->{_http}{mimetype} || "text/html");
-		my $date = $self->session->datetime->epochToHuman(($self->{_http}{lastModified} || time()), "%W, %d %C %y %j:%m:%s %t");
+		my $date = $self->session->datetime->epochToHttp($self->{_http}{lastModified});
 		my $cc = $self->{_http}{cacheControl};
 		$request->headers_out->set('Last-Modified' => $date);
 		if ($cc eq "none" || $self->session->setting->get("preventProxyCache") || ($cc eq "" && $self->session->var->get("userId") ne "1")) {
@@ -195,7 +195,7 @@ sub sendHeader {
     			$request->headers_out->set('Cache-Control' => "max-age=" . $cc.$extras);
   		} elsif ($cc ne "") {
 			$request->headers_out->set("Cache-Control" => "private") unless ($self->session->var->get("userId") eq "1");
-			my $date = $self->session->datetime->epochToHuman(time() + $cc, "%W, %d %C %y %j:%m:%s %t");
+			my $date = $self->session->datetime->epochToHttp(time() + $cc);
     			$request->headers_out->set('Expires' => $date);
   		}
 		if ($self->{_http}{filename}) {
