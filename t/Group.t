@@ -75,7 +75,7 @@ my @ipTests = (
 );
 
 
-plan tests => (90 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
+plan tests => (96 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 my $testCache = WebGUI::Cache->new($session, 'myTestKey');
@@ -480,13 +480,32 @@ $gY->addUsers([$cacheDude->userId]);
 ok( $cacheDude->isInGroup($gY->getId), "Cache dude added to group Y");
 ok( $cacheDude->isInGroup($gZ->getId), "Cache dude is a member of group Z by group membership");
 
+$gY->deleteUsers([$cacheDude->userId]);
+
+ok( !$cacheDude->isInGroup($gY->getId), "Cache dude removed from group Y");
+ok( !$cacheDude->isInGroup($gZ->getId), "Cache dude removed from group Z too");
+
+my $gCache = WebGUI::Group->new($session, "new");
+
+$gCache->addUsers([$cacheDude->userId]);
+
+$gY->addGroups([$gCache->getId]);
+
+ok( $cacheDude->isInGroup($gY->getId), "Cache dude is a member of group Y by group membership");
+ok( $cacheDude->isInGroup($gZ->getId), "Cache dude is a member of group Z by group membership");
+
+$gY->deleteGroups([$gCache->getId]);
+
+ok( !$cacheDude->isInGroup($gY->getId), "Cache dude is not a member of group Y");
+ok( !$cacheDude->isInGroup($gZ->getId), "Cache dude is not a member of group Z");
+
 SKIP: {
 	skip("need to test expiration date in groupings interacting with recursive or not", 1);
 	ok(undef, "expiration date in groupings for getUser");
 }
 
 END {
-	foreach my $testGroup ($gX, $gY, $gZ, $gA, $gB, $gC, $g, $gK, $gS) {
+	foreach my $testGroup ($gX, $gY, $gZ, $gA, $gB, $gC, $g, $gK, $gS, $gCache) {
 		$testGroup->delete if (defined $testGroup and ref $testGroup eq 'WebGUI::Group');
 	}
 	foreach my $dude ($user, @crowd, @mob, @chameleons, @itchies, @tcps, $cacheDude) {
