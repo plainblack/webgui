@@ -33,7 +33,10 @@
  - Added the quick() convenience method to WebGUI::Session.
  - fix [ 1487054 ] 6.99 Orphaning ads in AdSpace
  - fix [ 1490336 ] all versions - deleting a user fails to existing sessions
-
+ - fix [ 1451684 ] Post/Thread isMarkedRead doesn't work well
+ - fix [ 1475305 ] 6.8.8 - SQL Lookup for group membership fails - bugfix
+   incl. 
+ - fix [ 1475205 ] newly created users' group memberships aren't effective
 
 6.99.0
  - Added an Events Management System asset that can help people run
