@@ -268,15 +268,15 @@ sub www_editAdSpace {
 	my $adSpace = shift;
 	return $session->privilege->insufficient unless ($session->user->isInGroup("pbgroup000000000000017"));
 	my $id;
+	my $i18n = WebGUI::International->new($session,"AdSpace");
+	my $ac = WebGUI::AdminConsole->new($session,"adSpace");
 	if (defined $adSpace) {
 		$id = $adSpace->getId;
+		$ac->addSubmenuItem($session->url->page("op=editAd;adSpaceId=".$id), $i18n->get("add an ad")) if defined $adSpace;
 	} else {
 		$id = $session->form->param("adSpaceId") || "new";
 		$adSpace = WebGUI::AdSpace->new($session, $id);
 	}
-	my $ac = WebGUI::AdminConsole->new($session,"adSpace");
-	my $i18n = WebGUI::International->new($session,"AdSpace");
-	$ac->addSubmenuItem($session->url->page("op=editAd;adSpaceId=".$id), $i18n->get("add an ad")) if defined $adSpace;
 	$ac->addSubmenuItem($session->url->page("op=manageAdSpaces"), $i18n->get("manage ad spaces"));
 	my $f = WebGUI::HTMLForm->new($session);
 	$f->submit;
