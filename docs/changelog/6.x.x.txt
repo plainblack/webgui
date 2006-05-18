@@ -1,6 +1,9 @@
 6.99.2
  - Data Forms now send email as HTML. 
  - Added full drag bar to the top of each asset as discussed in Community IRC.
+ - fixed a bug in the project management app that was causing a no privilege error when trying to display the view.
+ - fixed various bugs in the project management app.
+ - added right click ment to project management app.
 
 6.99.1
  - Bugfixes on dashboard to fix template errors.
