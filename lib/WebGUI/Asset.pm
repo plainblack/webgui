@@ -1811,6 +1811,7 @@ Returns the view() method of the asset object if the requestor canView.
 sub www_ajaxInlineView {
 	my $self = shift;
 	return $self->session->privilege->noAccess() unless $self->canView;
+	$self->prepareView;
 	return $self->view;
 }
 
