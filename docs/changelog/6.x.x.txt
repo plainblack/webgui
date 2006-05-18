@@ -30,6 +30,7 @@
  - Fixed a problem where last reply column wasn't being updated in the thread.
  - fix [ 1488556 ] blank page after setup
  - fix [ 1489528 ] HTTP header contains invalid time-stamp
+ - Added the quick() convenience method to WebGUI::Session.
 
 
 6.99.0

@@ -53,10 +53,10 @@ B<NOTE:> It is important to distinguish the difference between a WebGUI session 
 
  $session = WebGUI::Session->open($webguiRoot, $configFile);
  $sessionId = $session->getId;
+ ($form, $db, $user) = $session->quick("form", "db", "user");
  $session->close;
 
  $session->asset
- $session->close
  $session->config
  $session->datetime
  $session->db
@@ -64,11 +64,9 @@ B<NOTE:> It is important to distinguish the difference between a WebGUI session 
  $session->env
  $session->errorHandler
  $session->form
- $session->getId
  $session->http
  $session->icon
  $session->id
- $session->open
  $session->output
  $session->os
  $session->privilege
@@ -428,6 +426,28 @@ sub privilege {
 		$self->{_privilege} = WebGUI::Session::Privilege->new($self);
 	}
 	return $self->{_privilege};
+}
+
+#-------------------------------------------------------------------
+
+=head2 quick ( methods )
+
+A convenience method that returns a list of object references.
+
+=head3 methods
+
+An array of method names of the objects you want returned.
+
+=cut
+
+sub quick {
+	my $self = shift;
+	my @methods = shift;
+	my @list = ();
+	foreach my $method (@methods) {
+		push(@list, $self->$method);
+	}
+	return @list;
 }
 
 #-------------------------------------------------------------------
