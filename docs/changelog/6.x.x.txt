@@ -32,6 +32,7 @@
  - fix [ 1489528 ] HTTP header contains invalid time-stamp
  - Added the quick() convenience method to WebGUI::Session.
  - fix [ 1487054 ] 6.99 Orphaning ads in AdSpace
+ - fix [ 1490336 ] all versions - deleting a user fails to existing sessions
 
 
 6.99.0

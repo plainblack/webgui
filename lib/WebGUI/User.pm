@@ -148,6 +148,11 @@ sub delete {
 	require WebGUI::Operation::Auth;
 	my $authMethod = WebGUI::Operation::Auth::getInstance($self->session,$self->authMethod,$self->{_userId});
 	$authMethod->deleteParams($self->{_userId});
+	my $rs = $self->session->db->read("select sessionId from userSession where userId=?",[$self->{_userId}]);
+	while (my ($id) = $rs->array) {
+        	$self->session->db->write("delete from userSessionScratch where sessionId=?",[$id]);
+	}
+        $self->session->db->write("delete from userSession where userId=?",[$self->{_userId}]);
         $self->session->db->write("delete from userProfileData where userId=?",[$self->{_userId}]);
         $self->session->db->write("delete from users where userId=?",[$self->{_userId}]);
 }
