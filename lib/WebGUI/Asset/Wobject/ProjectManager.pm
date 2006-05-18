@@ -498,7 +498,7 @@ sub www_editTask {
    $var->{'form.duration'} = WebGUI::Form::float($session,{
 				-name=>"duration",
 				-value=>$task->{duration}, 
-				-extras=>qq|style="width:70%;" onchange="adjustTaskTimeFromDuration(this.form.start,this.form.end,this,true,this.form.dependants,this.form.orig_start,this.form.orig_end,$seq)"  onblur="if(this.value == 0){ adjustTaskTimeFromDuration(this.form.start,this.form.end,this,true) }" $extras|
+				-extras=>qq|style="width:70%;" onchange="adjustTaskTimeFromDuration(this.form.start,this.form.end,this,true,this.form.dependants,this.form.orig_start,this.form.orig_end,'$seq')"  onblur="if(this.value == 0){ adjustTaskTimeFromDuration(this.form.start,this.form.end,this,true) }" $extras|
 				});
    $var->{'form.duration.units'} = $self->_getDurationUnitHashAbbrev->{$project->{durationUnits}};
    $var->{'form.start'} = WebGUI::Form::text($session,{
@@ -506,7 +506,7 @@ sub www_editTask {
 				-value=>$start,
 				-size=>"10",
 				-maxlength=>"10",
-				-extras=>qq|onfocus="doCalendar(this.id);" onblur="adjustTaskTimeFromDate(this.form.start,this.form.end,this.form.duration,this,true,this.form.dependants,this.form.orig_start,this.form.orig_end,$seq);" onblur="if(this.form.milestone.checked==true){ this.form.end.value=this.value; }" style="width:88%;"|
+				-extras=>qq|onfocus="doCalendar(this.id);" onblur="adjustTaskTimeFromDate(this.form.start,this.form.end,this.form.duration,this,true,this.form.dependants,this.form.orig_start,this.form.orig_end,'$seq');" onblur="if(this.form.milestone.checked==true){ this.form.end.value=this.value; }" style="width:88%;"|
 				});
 													
    $var->{'form.end'} = WebGUI::Form::text($session,{
@@ -514,7 +514,7 @@ sub www_editTask {
 				-value=>$end,
 				-size=>"10",
 				-maxlength=>"10",
-				-extras=>qq|onfocus="doCalendar(this.id);" style="width:88%;" onblur="adjustTaskTimeFromDate(this.form.start,this.form.end,this.form.duration,this,true,this.form.dependants,this.form.orig_start,this.form.orig_end,$seq);" $extras|
+				-extras=>qq|onfocus="doCalendar(this.id);" style="width:88%;" onblur="adjustTaskTimeFromDate(this.form.start,this.form.end,this.form.duration,this,true,this.form.dependants,this.form.orig_start,this.form.orig_end,'$seq');" $extras|
 				});
 
    $var->{'form.dependants'} = WebGUI::Form::integer($session,{
@@ -766,7 +766,7 @@ sub www_viewProject {
 	my $projectId = $_[0] || $form->get("projectId");
 		
 	#Check Privileges
-    return $privilege->insufficient unless ($user->isInGroup($self->canView));
+    return $privilege->insufficient unless ($self->canView);
 	
 	$var->{'extras'} = $config->get("extrasURL")."/wobject/ProjectManager";
 	$var->{'extras.base'} = $config->get("extrasURL");
@@ -836,7 +836,7 @@ sub www_viewProject {
 			-value=>$startDate,
 			-size=>"10",
 			-maxlength=>"10",
-			-extras=>qq|onfocus="doCalendar(this.id);" class="taskdate" onblur="adjustTaskTimeFromDate(this,document.getElementById('$endId'),document.getElementById('$durId'),this,false,document.getElementById('$predId'),document.getElementById('$origStartFieldId'),document.getElementById('$origEndFieldId'),$seq);"|
+			-extras=>qq|onfocus="doCalendar(this.id);" class="taskdate" onblur="adjustTaskTimeFromDate(this,document.getElementById('$endId'),document.getElementById('$durId'),this,false,document.getElementById('$predId'),document.getElementById('$origStartFieldId'),document.getElementById('$origEndFieldId'),'$seq');"|
 			});
 
 		  $hash->{'task.start'} .= WebGUI::Form::hidden($session,{
@@ -862,7 +862,7 @@ sub www_viewProject {
 			-value=>$endDate,
 			-size=>"10",
 			-maxlength=>"10",
-			-extras=>qq|class="taskdate" onfocus="doCalendar(this.id);" onblur="adjustTaskTimeFromDate(document.getElementById('$startId'),this,document.getElementById('$durId'),this,false,document.getElementById('$predId'),document.getElementById('$origStartFieldId'),document.getElementById('$origEndFieldId'),$seq);"|
+			-extras=>qq|class="taskdate" onfocus="doCalendar(this.id);" onblur="adjustTaskTimeFromDate(document.getElementById('$startId'),this,document.getElementById('$durId'),this,false,document.getElementById('$predId'),document.getElementById('$origStartFieldId'),document.getElementById('$origEndFieldId'),'$seq');"|
 			});
 
 		  $hash->{'task.end'} .= WebGUI::Form::hidden($session,{
@@ -882,7 +882,7 @@ sub www_viewProject {
 	         $hash->{'task.duration'} = WebGUI::Form::float($session,{
 				-name=>"duration_$id",
 				-value=>$duration, 
-				-extras=>qq|class="taskduration" onchange="adjustTaskTimeFromDuration(document.getElementById('$startId'),document.getElementById('$endId'),this,false,document.getElementById('$predId'),document.getElementById('$origStartFieldId'),document.getElementById('$origEndFieldId'),$seq);" |
+				-extras=>qq|class="taskduration" onchange="adjustTaskTimeFromDuration(document.getElementById('$startId'),document.getElementById('$endId'),this,false,document.getElementById('$predId'),document.getElementById('$origStartFieldId'),document.getElementById('$origEndFieldId'),'$seq');" |
 				});
 			 
 	      }
@@ -955,7 +955,7 @@ sub www_drawGanttChart {
 	my $eh = $session->errorHandler;
 	
 	#Check Privileges
-    return $privilege->insufficient unless ($user->isInGroup($self->canView));
+    return $privilege->insufficient unless ($self->canView);
 	
 	#Set up some the task data
 	my $projectId = $_[0];
