@@ -375,13 +375,15 @@ sub www_editProjectSave {
 	my $self = shift;
     #Set Method Helpers
     my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
-
+    my $eh = $session->errorHandler;
+	
     #Check Privileges
     return $privilege->insufficient unless ($user->isInGroup($self->get("groupToAdd")));
     
 	my $now = $dt->time();
 	my $uid = $user->userId;
 	my $projectId = $form->process("projectId","hidden");
+	my $origProjId = $projectId;
 	
 	#Set Properties
 	my $props = {};
@@ -408,7 +410,7 @@ sub www_editProjectSave {
 	#Save the extended project data
 	my $projectId = $self->setCollateral("PM_project","projectId",$props,0,1);
 	
-	if($projectId eq "new") {
+	if($origProjId eq "new") {
 	   #Create Project Start Milestone Task for new projects
 	   $props = {};
 	   $props->{taskId} = "new";
@@ -498,7 +500,7 @@ sub www_editTask {
    $var->{'form.duration'} = WebGUI::Form::float($session,{
 				-name=>"duration",
 				-value=>$task->{duration}, 
-				-extras=>qq|style="width:70%;" onchange="adjustTaskTimeFromDuration(this.form.start,this.form.end,this,true,this.form.dependants,this.form.orig_start,this.form.orig_end,'$seq')"  onblur="if(this.value == 0){ adjustTaskTimeFromDuration(this.form.start,this.form.end,this,true) }" $extras|
+				-extras=>qq|style="width:70%;" onchange="adjustTaskTimeFromDuration(this.form.start,this.form.end,this,true,this.form.dependants,this.form.orig_start,this.form.orig_end,'$seq')"  onblur="if(this.value == 0){ adjustTaskTimeFromDuration(this.form.start,this.form.end,this,true,this.form.dependants,this.form.orig_start,this.form.orig_end,'$seq') }" $extras|
 				});
    $var->{'form.duration.units'} = $self->_getDurationUnitHashAbbrev->{$project->{durationUnits}};
    $var->{'form.start'} = WebGUI::Form::text($session,{
@@ -506,7 +508,7 @@ sub www_editTask {
 				-value=>$start,
 				-size=>"10",
 				-maxlength=>"10",
-				-extras=>qq|onfocus="doCalendar(this.id);" onblur="adjustTaskTimeFromDate(this.form.start,this.form.end,this.form.duration,this,true,this.form.dependants,this.form.orig_start,this.form.orig_end,'$seq');" onblur="if(this.form.milestone.checked==true){ this.form.end.value=this.value; }" style="width:88%;"|
+				-extras=>qq|onfocus="doCalendar(this.id);" onblur="if(this.form.milestone.checked==true) this.form.end.value=this.value; adjustTaskTimeFromDate(this.form.start,this.form.end,this.form.duration,this,true,this.form.dependants,this.form.orig_start,this.form.orig_end,'$seq');" style="width:88%;"|
 				});
 													
    $var->{'form.end'} = WebGUI::Form::text($session,{
@@ -527,7 +529,7 @@ sub www_editTask {
 				});
 
    tie my %users, "Tie::IxHash";
-   %users = $db->buildHash("select userId,username from users where userId not in (1,3)");
+   %users = $db->buildHash("select userId,username from users where userId not in ('1','3') order by userId");
    %users = (""=>$i18n->get("resource none"),%users);
    $var->{'form.resource'} = WebGUI::Form::selectBox($session, {
 				-name=>"resource",
@@ -621,7 +623,7 @@ sub _updateProject {
       $complete += ($task->{duration} * ($task->{percentComplete}/100));   
    }
    
-   my $projectComplete = (($complete / $projectTotal) * 100);
+   my $projectComplete = ($projectTotal == 0)?0:(($complete / $projectTotal) * 100);
    
    $db->write("update PM_project set startDate=?, endDate=?, percentComplete=? where projectId=?",[$minStart,$maxEnd,$projectComplete,$projectId]);
 }
@@ -749,7 +751,7 @@ sub www_saveExistingTasks {
    
    #Rearrange predecessors
    #$self->_arrangePredecessors($project);
-   
+   $self->_updateProject($projectId);
    return $self->www_drawGanttChart();
    
 }
@@ -768,12 +770,26 @@ sub www_viewProject {
 	#Check Privileges
     return $privilege->insufficient unless ($self->canView);
 	
-	$var->{'extras'} = $config->get("extrasURL")."/wobject/ProjectManager";
-	$var->{'extras.base'} = $config->get("extrasURL");
+	my $extras = $config->get("extrasURL");
+	my $assetExtras = $config->get("extrasURL")."/wobject/ProjectManager";
 	
-    #Set Some Style stuff
-	$style->setLink($var->{'extras'}."/subModal.css",{rel=>"stylesheet",type=>"text/css"});
-	$style->setLink($var->{'extras.base'}."/calendar/calendar-win2k-1.css",{rel=>"stylesheet",type=>"text/css"});
+	$var->{'extras'} = $assetExtras;
+	$var->{'extras.base'} = $extras;
+	
+    #Set Some Style stuff	
+	$style->setLink($assetExtras."/subModal.css",{rel=>"stylesheet",type=>"text/css"});
+	$style->setLink($extras."/calendar/calendar-win2k-1.css",{rel=>"stylesheet",type=>"text/css"});
+	$style->setLink($assetExtras."/office_xp.css",{rel=>"stylesheet",type=>"text/css"});
+	
+	$style->setScript($assetExtras."/jsdomenu.js",{ type=>"text/javascript" });
+    $style->setScript($assetExtras."/movtableInc.js",{ type=>"text/javascript" });
+	$style->setScript($assetExtras."/locale_EN.js",{ type=>"text/javascript" });
+    $style->setScript($extras."/js/at/AjaxRequest.js",{ type=>"text/javascript" });
+	$style->setScript($extras."/js/modal/modal.js",{ type=>"text/javascript" });
+	$style->setScript($extras."/calendar/calendar.js",{ type=>"text/javascript" });
+	$style->setScript($extras."/contextMenu/contextMenu.js",{ type=>"text/javascript" });
+	$style->setScript($extras."/calendar/lang/calendar-en.js",{ type=>"text/javascript" });
+	$style->setScript($extras."/calendar/calendar-setup.js",{ type=>"text/javascript" });
 	
 	#Get Project Data
 	my $project = $db->quickHashRef("select * from PM_project where projectId=".$db->quote($projectId));
@@ -816,7 +832,7 @@ sub www_viewProject {
 	   my $duration = $row->{duration};
 	   
 	   $hash->{'task.number'} = $seq;
-	   $hash->{'task.number.id'} = "task~~".$id."~~rowId";
+	   $hash->{'task.row.id'} = "taskrow::$id";
 	   $hash->{'task.name'} = $row->{taskName};
 	   	  
 	   if($canEdit) {
@@ -832,13 +848,13 @@ sub www_viewProject {
 		  my $origEndFieldId = $origEndField."_formId";
 
 	      $hash->{'task.start'} = WebGUI::Form::text($session,{
-			-name=>"start_$id",
-			-value=>$startDate,
-			-size=>"10",
-			-maxlength=>"10",
-			-extras=>qq|onfocus="doCalendar(this.id);" class="taskdate" onblur="adjustTaskTimeFromDate(this,document.getElementById('$endId'),document.getElementById('$durId'),this,false,document.getElementById('$predId'),document.getElementById('$origStartFieldId'),document.getElementById('$origEndFieldId'),'$seq');"|
-			});
-
+		                                               -name=>"start_$id",
+													   -value=>$startDate,
+													   -size=>"10",
+													   -maxlength=>"10",
+													   -extras=>qq|onfocus="doCalendar(this.id);" class="taskdate" onblur="adjustTaskTimeFromDate(this,document.getElementById('$endId'),document.getElementById('$durId'),this,false,document.getElementById('$predId'),document.getElementById('$origStartFieldId'),document.getElementById('$origEndFieldId'),'$seq');"|
+		                                            });
+		  
 		  $hash->{'task.start'} .= WebGUI::Form::hidden($session,{
 			-name=>$origStartField,
 			-value=>$startDate,
@@ -858,13 +874,12 @@ sub www_viewProject {
 			});
 
 		  $hash->{'task.end'} = WebGUI::Form::text($session,{
-			-name=>"end_$id",
-			-value=>$endDate,
-			-size=>"10",
-			-maxlength=>"10",
-			-extras=>qq|class="taskdate" onfocus="doCalendar(this.id);" onblur="adjustTaskTimeFromDate(document.getElementById('$startId'),this,document.getElementById('$durId'),this,false,document.getElementById('$predId'),document.getElementById('$origStartFieldId'),document.getElementById('$origEndFieldId'),'$seq');"|
-			});
-
+		                                               -name=>"end_$id",
+													   -value=>$endDate,
+													   -size=>"10",
+													   -maxlength=>"10",
+													   -extras=>qq|class="taskdate" onfocus="doCalendar(this.id);" onblur="adjustTaskTimeFromDate(document.getElementById('$startId'),this,document.getElementById('$durId'),this,false,document.getElementById('$predId'),document.getElementById('$origStartFieldId'),document.getElementById('$origEndFieldId'),'$seq');"|
+		                                            });
 		  $hash->{'task.end'} .= WebGUI::Form::hidden($session,{
 			-name=>$origEndField,
 			-value=>$endDate,
