@@ -37,6 +37,7 @@
  - fix [ 1475305 ] 6.8.8 - SQL Lookup for group membership fails - bugfix
    incl. 
  - fix [ 1475205 ] newly created users' group memberships aren't effective
+ - fix [ 1489150 ] message board template hosed (Martin Kamerbeek / Procolix)
 
 6.99.0
  - Added an Events Management System asset that can help people run

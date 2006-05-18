@@ -130,6 +130,7 @@ sub view {
 				'forum.lastPost.user.isVisitor' => ($lastPost->get("ownerUserId") eq '1')
 				);
 		}
+
 		push(@forum_loop, {
 			%lastPostVars,
 			'forum.controls' => $child->getToolbar,
@@ -145,7 +146,10 @@ sub view {
 			'forum.user.canPost' => $child->canPost
 			});
 	}
-	$var{'default.listing'} = $first->view if ($count == 1 && defined $first);
+	if ($count == 1 && defined $first) {
+		$first->prepareView;
+		$var{'default.listing'} = $first->view;
+	}
 	$var{'forum.add.url'} = $self->getUrl("func=add;class=WebGUI::Asset::Wobject::Collaboration");
 	$var{'forum.add.label'} = $i18n->get(75);
 	$var{'title.label'} = $i18n->get('title');
@@ -156,7 +160,8 @@ sub view {
 	$var{'lastpost.label'} = $i18n->get('lastpost');
 	$var{areMultipleForums} = ($count > 1);
 	$var{forum_loop} = \@forum_loop;
-       	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
+
+	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 	if ($self->session->user->userId eq '1') {
 		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("visitorCacheTimeout"));
 	}
