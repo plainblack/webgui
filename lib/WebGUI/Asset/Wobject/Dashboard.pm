@@ -237,6 +237,7 @@ sub view {
 							$newStuff .= 'available_dashlets["'.$child->getId.'"]=\''.$child->getUrl.'\';';
 
 						} else {
+							$child->prepareView;
 							push(@{$vars{"position".$i."_loop"}},{
 								id=>$child->getId,
 								content=>$child->view,
@@ -322,6 +323,7 @@ sub www_view {
                 }
         }
         $self->logView();
+        $self->prepareView;
         my $style = $self->processStyle($self->view);
 }
 
