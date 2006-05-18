@@ -175,16 +175,21 @@ sub delete {
 
 #-------------------------------------------------------------------
 
-=head2 drag ( )
+=head2 drag ( extras )
 
 Generates an icon that can be used to drag content.
+
+=head2 extras
+
+Classes, Ids, Javascript triggers, or whatever else you need to add to the image to make it a drag trigger.
 
 =cut
 
 sub drag {
 	my $self = shift;
+	my $extras = shift;
 	my $i18n = WebGUI::International->new($self->session,'Icon');
-        return '<p style="display:inline;vertical-align:middle;"><img id="dragTrigger" class="dragTrigger" src="'.$self->getBaseURL().'drag.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Drag').'" title="'.$i18n->get('Drag').'" /></p>';
+        return '<p style="display:inline;vertical-align:middle;"><img '.$extras.' src="'.$self->getBaseURL().'drag.gif" style="vertical-align:middle;border: 0px;" alt="'.$i18n->get('Drag').'" title="'.$i18n->get('Drag').'" /></p>';
 }
 
 #-------------------------------------------------------------------

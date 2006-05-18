@@ -6,10 +6,19 @@ div.dragable:hover {
 	border: 1px dotted #cccccc; 
 }
 .dragTrigger{
-  position: absolute;
   cursor: move;
-  right: 0px;
-  top: 0px;
+  padding: 0px;
+  margin: 0px;
+}
+#dragTrigger{
+  width: 100%;
+  height: 18px;
+  font-size: 10px;
+  color: #888888;
+  background-color: #cccccc;
+  border: 1px solid #888888;
+  opacity: 0.5;
+  text-align: right;
 }
 .dragging{
   position: relative;

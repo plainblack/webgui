@@ -1,5 +1,6 @@
 6.99.2
-
+ - Data Forms now send email as HTML. 
+ - Added full drag bar to the top of each asset as discussed in Community IRC.
 
 6.99.1
  - Bugfixes on dashboard to fix template errors.
