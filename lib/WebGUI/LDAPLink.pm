@@ -66,41 +66,41 @@ sub bind {
 	my $connectDn = $self->{_ldapLink}->{connectDn};
 	my $identifier = $self->{_ldapLink}->{identifier};
 		
-	if($ldapUrl eq "") {
-	   $self->{_error} = 100;
-	   return 0;
+	if ($ldapUrl eq "") {
+		$self->{_error} = 100;
+		return 0;
 	} elsif ($connectDn eq "") {
-	   $self->{_error} = 101;
-	   return 0;
+		$self->{_error} = 101;
+		return 0;
 	} elsif ($identifier eq "") {
-	   $self->{_error} = 102;
-	   return 0;
+		$self->{_error} = 102;
+		return 0;
 	}
 	
-	if($uri = URI->new($ldapUrl)) {
-	   unless($ldap = Net::LDAP->new($uri->host, (port=>($uri->port || 389)))){
-	      $self->{_error} = 103;
-		  return 0;
-	   }
-	   
-	   $auth = $ldap->bind(dn=>$connectDn, password=>$identifier);
-       if ($auth->code == 48 || $auth->code == 49){
-		  $self->{_error} = 104;
-	   }elsif($auth->code > 0){
-	      $self->{_error} = $auth->code;
-	   }
-	   $self->{_connection} = $ldap;
-	}else{
-	   $self->{_error} = 105;
-	   return 0;
+	if ($uri = URI->new($ldapUrl)) {
+		unless ($ldap = Net::LDAP->new($uri->host, (port=>($uri->port || 389)))) {
+			$self->{_error} = 103;
+			return 0;
+		}
+	
+		$auth = $ldap->bind(dn=>$connectDn, password=>$identifier);
+		if ($auth->code == 48 || $auth->code == 49) {
+			$self->{_error} = 104;
+		} elsif($auth->code > 0) {
+			$self->{_error} = $auth->code;
+		}
+		$self->{_connection} = $ldap;
+	} else {
+		$self->{_error} = 105;
+		return 0;
 	}
 	return $self->{_connection};
 }
 
 #-------------------------------------------------------------------
 sub DESTROY {
-   my $self = shift;
-   $self->unbind;
+	my $self = shift;
+	$self->unbind;
 	undef $self;
 }
 
@@ -131,7 +131,7 @@ A valid ldap error code.
 
 sub getErrorMessage {
    my $self = shift;
-   my $errorCode = $_[0] || $self->{_error};
+   my $errorCode = shift || $self->{_error};
    return "" unless $errorCode;
    my $i18nCode = "LDAPLink_".$errorCode;
    my $i18n = WebGUI::International->new($self->session,"AuthLDAP");
@@ -193,14 +193,28 @@ The ldapLinkId of the ldapLink you're creating an object reference for.
 =cut
 
 sub new {
-    my ( $ldapLinkId, $ldapLink);
-    my $class = shift;
+	my ($ldapLinkId, $ldapLink);
+	my $class = shift;
 	my $session = shift;
 	$ldapLinkId = shift;
 	return undef unless $ldapLinkId;
 	$ldapLink = $session->db->quickHashRef("select * from ldapLink where ldapLinkId=".$session->db->quote($ldapLinkId));
-	bless {_session=>$session, _ldapLinkId => $ldapLinkId, _ldapLink => $ldapLink }, $class;
+	bless {_session=>$session, _ldapLinkId=>$ldapLinkId, _ldapLink=>$ldapLink }, $class;
 }
+
+#-------------------------------------------------------------------
+
+=head2 session ( )
+
+Returns a reference to the current session.
+
+=cut
+
+sub session {
+	my $self = shift;
+	return $self->{_session};
+}
+
 
 #-------------------------------------------------------------------
 
@@ -219,22 +233,22 @@ sub new {
 =cut
 
 sub getProperty {
-   my $self = shift;
-   my $ldap = $self->bind;
-   my $dn = shift;
-   my $property = shift;
-   return [] unless($ldap && $dn && $property);
-   my $results = [];
-   my $msg = $ldap->search( 
-                             base   => $dn,
-                             scope  => 'sub',
-                             filter => "&(objectClass=*)"
-                          );
-   if(!$msg->code && $msg->count > 0 ){
-      my $entry = $msg->entry(($msg->count)-1);
-      $results = $entry->get_value($property,asref => 1);
-   }
-   return $results;
+	my $self = shift;
+	my $ldap = $self->bind;
+	my $dn = shift;
+	my $property = shift;
+	return [] unless($ldap && $dn && $property);
+	my $results = [];
+	my $msg = $ldap->search( 
+			base   => $dn,
+			scope  => 'sub',
+			filter => "&(objectClass=*)"
+			);
+	if (!$msg->code && $msg->count > 0) {
+		my $entry = $msg->entry(($msg->count)-1);
+		$results = $entry->get_value($property,asref => 1);
+	}
+	return $results;
 }
 
 #-------------------------------------------------------------------
@@ -246,42 +260,42 @@ sub getProperty {
 =cut
 
 sub recurseProperty {
-   my $self = shift;
-   my $ldap = $self->bind;
-   my $base = $_[0];
-   my $array = $_[1] || [];
-   my $property = $_[2];
-   my $recProperty = $_[3] || $property;
-   my $count = $_[4] || 0;
-   return unless($ldap && $base && $property);
-   
-   #Prevent infinate recursion
-   $count++;
-   return if $count == 99;
-   
-   #search the base
-   my $msg = $ldap->search( 
-                                 base   => $base,
-                                 scope  => 'sub',
-                                 filter => "&(objectClass=*)"
-                              );
-   #return if nothing found
-   return if($msg->code || $msg->count == 0);
-   #loop through the results
-   for (my $i = 0; $i < $msg->count; $i++) {
-	my $entry = $msg->entry($i);
-	#push all the values stored in the property on to the array stack
-	my $properties = $entry->get_value($property,asref => 1);
-	$properties = [] unless ref $properties eq "ARRAY";
-	push(@{$array},@{$properties});
-	#Loop through the recursive keys
-	if($property ne $recProperty) {
-		$properties = $entry->get_value($recProperty,asref => 1);
+	my $self = shift;
+	my $ldap = $self->bind;
+	my $base = $_[0];
+	my $array = $_[1] || [];
+	my $property = $_[2];
+	my $recProperty = $_[3] || $property;
+	my $count = $_[4] || 0;
+	return unless($ldap && $base && $property);
+
+	#Prevent infinate recursion
+	$count++;
+	return if $count == 99;
+
+	#search the base
+	my $msg = $ldap->search( 
+			base   => $base,
+			scope  => 'sub',
+			filter => "&(objectClass=*)"
+			);
+	#return if nothing found
+	return if($msg->code || $msg->count == 0);
+	#loop through the results
+	for (my $i = 0; $i < $msg->count; $i++) {
+		my $entry = $msg->entry($i);
+		#push all the values stored in the property on to the array stack
+		my $properties = $entry->get_value($property,asref => 1);
+		$properties = [] unless ref $properties eq "ARRAY";
+		push(@{$array},@{$properties});
+		#Loop through the recursive keys
+		if ($property ne $recProperty) {
+			$properties = $entry->get_value($recProperty,asref => 1);
+		}
+		foreach my $prop (@{$properties}) {
+			$self->recurseProperty($prop,$array,$property,$recProperty,$count);
+		}
 	}
-	foreach my $prop (@{$properties}) {
-		$self->recurseProperty($prop,$array,$property,$recProperty,$count);
-	}
-   }  
 }
 
 1;
