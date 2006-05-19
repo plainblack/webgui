@@ -105,7 +105,7 @@ sub addToDate {
 	my $years = shift || 0;
 	my $months = shift || 0;
 	my $days = shift || 0;
-	my $time_zone = $self->session->user->profileField('timeZone') || 'America/Chicago';
+	my $time_zone = $self->getTimeZone;
 	my $date = DateTime->from_epoch(epoch=>$epoch, time_zone=>$time_zone);
 	$date->add(years=>$years, months=>$months, days=>$days);
 	return $date->epoch;
@@ -156,7 +156,7 @@ sub addToDateTime {
 	my $hours = shift || 0;
 	my $mins = shift || 0;
 	my $secs = shift || 0;
-	my $time_zone = $self->session->user->profileField('timeZone') || 'America/Chicago';
+	my $time_zone = $self->getTimeZone;
 	my $date = DateTime->from_epoch(epoch=>$epoch, time_zone=>$time_zone);
 	$date->add(years=>$years, months=>$months, days=>$days, hours=>$hours, minutes=>$mins, seconds=>$secs);
 	return $date->epoch;
@@ -193,7 +193,7 @@ sub addToTime {
 	my $hours = shift || 0;
 	my $mins = shift || 0;
 	my $secs = shift || 0;
-	my $time_zone = $self->session->user->profileField('timeZone') || 'America/Chicago';
+	my $time_zone = $self->getTimeZone;
 	my $date = DateTime->from_epoch(epoch=>$epoch, time_zone=>$time_zone);
 	$date->add(hours=>$hours, minutes=>$mins, seconds=>$secs);
 	return $date->epoch;
@@ -214,7 +214,7 @@ The number of seconds since January 1, 1970.
 sub dayStartEnd {
 	my $self = shift;
 	my $epoch = shift;
-	my $time_zone = $self->session->user->profileField('timeZone') || 'America/Chicago';
+	my $time_zone = $self->getTimeZone;
 	my $dt = DateTime->from_epoch(epoch=>$epoch, time_zone=>$time_zone);
 	my $end = $dt->clone;
 	$dt->set_hour(0);
@@ -416,7 +416,7 @@ sub epochToSet {
 	my $epoch = shift;
 	my $withTime = shift;
 	return undef unless $epoch;
-	my $time_zone = $self->session->user->profileField('timeZone') || 'America/Chicago';
+	my $time_zone = $self->getTimeZone;
 	my $dt = DateTime->from_epoch(epoch=>$epoch, time_zone=>$time_zone);
 	if ($withTime) {
 		return $dt->strftime('%Y-%m-%d %H:%M:%S');
@@ -472,7 +472,7 @@ An epoch date.
 sub getDayOfWeek {
 	my $self = shift;
 	my $epoch = shift;
-	my $time_zone = $self->session->user->profileField('timeZone') || 'America/Chicago';
+	my $time_zone = $self->getTimeZone;
 	my $dt = DateTime->from_epoch(epoch=>$epoch, time_zone=>$time_zone);
 	return $dt->day_of_week;
 }
@@ -492,7 +492,7 @@ An epoch date.
 sub getDaysInMonth {
 	my $self = shift;
 	my $epoch = shift;
-	my $time_zone = $self->session->user->profileField('timeZone') || 'America/Chicago';
+	my $time_zone = $self->getTimeZone;
 	my $dt = DateTime->from_epoch(epoch=>$epoch, time_zone=>$time_zone);
 	my $last = DateTime->last_day_of_month(year=>$dt->year, month=>$dt->month);
 	return $last->day;
@@ -519,7 +519,7 @@ sub getDaysInInterval {
 	my $self = shift;
 	my $start = shift;
 	my $end = shift;
-	my $time_zone = $self->session->user->profileField('timeZone') || 'America/Chicago';
+	my $time_zone = $self->getTimeZone;
 	$start = DateTime->from_epoch(epoch=>$start, time_zone=>$time_zone);
 	$end = DateTime->from_epoch(epoch=>$end, time_zone=>$time_zone);
 	return $end->delta_days($start)->delta_days;
@@ -541,7 +541,7 @@ An epoch date.
 sub getFirstDayInMonthPosition {
 	my $self = shift;
 	my $epoch = shift;
-	my $time_zone = $self->session->user->profileField('timeZone') || 'America/Chicago';
+	my $time_zone = $self->getTimeZone;
 	my $dt = DateTime->from_epoch(epoch=>$epoch, time_zone=>$time_zone);
 	$dt->set_day(1);
 	return $dt->day_of_week;
@@ -606,7 +606,7 @@ The number of seconds since January 1, 1970 00:00:00.
 sub getSecondsFromEpoch {
 	my $self = shift;
 	my $epoch = shift;
-	my $time_zone = $self->session->user->profileField('timeZone') || 'America/Chicago';
+	my $time_zone = $self->getTimeZone;
 	my $dt = DateTime->from_epoch(epoch=>$epoch, time_zone=>$time_zone);
 	my $start = $dt->clone;
 	$start->set_hour(0);
@@ -640,6 +640,33 @@ sub getTimeZones {
 
 #-------------------------------------------------------------------
 
+=head2 getTimeZone ( ) 
+
+Returns the timezone for this user, in DateTime::TimeZone format.  Checks to make sure we are sending DateTime::TimeZone a valid one!
+
+=cut
+
+sub getTimeZone {
+	my $self = shift;
+	return $self->session->user->{_timeZone} if $self->session->user->{_timeZone};
+	my @zones = @{DateTime::TimeZone::all_names()};
+	my $zone = $self->session->user->profileField('timeZone');
+	$zone =~ s/ /\_/g;
+	if ($zone) {
+		foreach (@zones) {
+			if ($_ eq $zone) {
+				$self->session->user->{_timeZone} = $zone;
+				return $zone;
+			}
+		}
+	}
+	$self->session->user->{_timeZone} = 'America/Chicago';
+	return $self->session->user->{_timeZone};
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 humanToEpoch ( date )
 
 Returns an epoch date derived from the human date.
@@ -652,7 +679,7 @@ The human date string. YYYY-MM-DD HH:MM:SS
 
 sub humanToEpoch {
 	my $self = shift;
-	my $time_zone = $self->session->user->profileField('timeZone') || 'America/Chicago';
+	my $time_zone = $self->getTimeZone;
 	my ($dateString,$timeString) = split(/ /,shift);
 	my @date = split(/-/,$dateString);
 	my @time = split(/:/,$timeString);
@@ -781,7 +808,7 @@ The number of seconds since January 1, 1970.
 sub monthStartEnd {
 	my $self = shift;
 	my $epoch = shift;
-	my $time_zone = $self->session->user->profileField('timeZone') || 'America/Chicago';
+	my $time_zone = $self->getTimeZone;
 	my $dt = DateTime->from_epoch(epoch=>$epoch, time_zone=>$time_zone);
 	my $end = DateTime->last_day_of_month(year=>$dt->year, month=>$dt->month);	
 	$dt->set_day(1);
@@ -918,7 +945,7 @@ sub setToEpoch {
 	   return $self->time() 
 	}
 	# in epochToSet we apply the user's time zone, so now we have to remove it.
-	my $time_zone = $self->session->user->profileField('timeZone') || 'America/Chicago';
+	my $time_zone = $self->getTimeZone;
 	$dt->set_time_zone($time_zone);
 	return $dt->epoch;
 }
