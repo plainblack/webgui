@@ -92,7 +92,7 @@ Renders a select list form control.
 
 sub toHtml {
 	my $self = shift;
-	my $multiple = ' multiple="1"' if ($self->get("multiple"));
+	my $multiple = ' multiple="multiple"' if ($self->get("multiple"));
 	my $output = '<select name="'.$self->get("name").'" size="'.$self->get("size").'" id="'.$self->get('id').'" '.$self->get("extras").$multiple.'>';
 	my %options;
 	tie %options, 'Tie::IxHash';
