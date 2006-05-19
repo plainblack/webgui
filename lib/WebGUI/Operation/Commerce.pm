@@ -456,7 +456,7 @@ sub www_checkoutSubmit {
 		push(@resultLoop, $var);
 	}
 
-	$shoppingCart->empty;
+	$shoppingCart->empty unless ($checkoutError);
 
 	$param{title} = $i18n->get('transaction error title');
 	$param{statusExplanation} = $i18n->get('status codes information');
