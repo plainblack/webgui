@@ -22,8 +22,8 @@ sub _submenu {
         }
 	$ac->addSubmenuItem($session->url->page('op=listPalettes'), $i18n->get('manage palettes'));
 	$ac->addSubmenuItem($session->url->page('op=listFonts'), $i18n->get('manage fonts'));
-	$ac->addSubmenuItem($session->url->page('op=editPalette&pid=new'), $i18n->get('add palette'));
-	$ac->addSubmenuItem($session->url->page('op=editFont&fid=new'), $i18n->get('add font')); 
+	$ac->addSubmenuItem($session->url->page('op=editPalette;pid=new'), $i18n->get('add palette'));
+	$ac->addSubmenuItem($session->url->page('op=editFont;fid=new'), $i18n->get('add font')); 
 
         return $ac->render($workarea, $i18n->get('manage graphics'));
 }
@@ -31,7 +31,7 @@ sub _submenu {
 #### hoverhelp
 #-------------------------------------------------------------------
 sub _getColorForm {
-	my ($f, $color, %transparencies);
+	my ($color, %transparencies);
 	my $session = shift;
 	my $colorId = shift;
 
@@ -128,6 +128,7 @@ sub www_addColorToPaletteSave {
 
 my	$color = WebGUI::Image::Color->new($session, $session->form->process('cid'));
 	if ($session->form->process('cid') eq 'new') {
+		$color->setName($session->form->process('colorName'));
 		$color->setFillTriplet($session->form->process('fillTriplet'));
 		$color->setFillAlpha($session->form->process('fillAlpha'));
 		$color->setStrokeTriplet($session->form->process('strokeTriplet'));
@@ -308,7 +309,7 @@ sub www_editPalette {
 		my $palette = WebGUI::Image::Palette->new($session, $paletteId);
 
 		$output .= '<table>';
-		$output .= '<th><td>'.$i18n->get('fill color').'</td><td>'.$i18n->get('stroke color').'</td></th>';
+		$output .= '<tr><th></th><th>'.$i18n->get('fill color').'</th><th>'.$i18n->get('stroke color').'</th></tr>';
 		foreach $color (@{$palette->getColorsInPalette}) {
 			$output .= '<tr>';
 			$output .= '<td>';
@@ -323,7 +324,7 @@ sub www_editPalette {
 		}
 		$output .= '</table>';
 
-		$output .= '<a href="'.$session->url->page('op=addColorToPalette&cid=new&pid='.$palette->getId).'">'.$i18n->get('add color').'</a><br>';
+		$output .= '<a href="'.$session->url->page('op=addColorToPalette;cid=new;pid='.$palette->getId).'">'.$i18n->get('add color').'</a><br />';
 	}
 		
 	return _submenu($session, $output);
@@ -368,19 +369,19 @@ sub www_listPalettes {
 	my $palettes = WebGUI::Image::Palette->getPaletteList($session);
 	
 	$output .= '<table>';
-	$output .= '<th><td>'.$i18n->get('palette name').'</td></th>';
+	$output .= '<tr><th></th><th>'.$i18n->get('palette name').'</th></tr>';
 	foreach (keys %$palettes) {
 		$output .= '<tr>';
 		$output .= '<td>';
-		$output .= $session->icon->delete('op=deletePalette&pid='.$_);
-		$output .= $session->icon->edit('op=editPalette&pid='.$_);
+		$output .= $session->icon->delete('op=deletePalette;pid='.$_);
+		$output .= $session->icon->edit('op=editPalette;pid='.$_);
 		$output .= '</td>';
 		$output .= '<td>'.$palettes->{$_}.'</td>';
 		$output .= '</tr>';
 	}
 	$output .= '</table>';
 
-	$output .= '<a href="'.$session->url->page('op=editPalette&pid=new').'">'.$i18n->get('add color').'</a><br>';
+	$output .= '<a href="'.$session->url->page('op=editPalette;pid=new').'">'.$i18n->get('add palette').'</a><br />';
 
 	return _submenu($session, $output);
 }
@@ -427,19 +428,19 @@ sub www_listFonts {
 	my %fonts = $session->db->buildHash('select fontId, name from imageFont');
 	
 	$output .= '<table>';
-	$output .= '<th><td></td><td>'.$i18n->get('font name').'</td></th>';
+	$output .= '<tr><th></th><th>'.$i18n->get('font name').'</th></tr>';
 	foreach (keys %fonts) {
 		$output .= '<tr>';
 		$output .= '<td>';
-		$output .= $session->icon->delete('op=deleteFont&fid='.$_);
-#		$output .= $session->icon->edit('op=editFont&fid='.$_);
+		$output .= $session->icon->delete('op=deleteFont;fid='.$_);
+#		$output .= $session->icon->edit('op=editFont;fid='.$_);
 		$output .= '</td>';
 		$output .= '<td>'.$fonts{$_}.'</td>';
 		$output .= '</tr>';
 	}
 	$output .= '</table>';
 
-	$output .= '<a href="'.$session->url->page('op=editFont&fid=new').'">'.$i18n->get('add font').'</a><br>';
+	$output .= '<a href="'.$session->url->page('op=editFont;fid=new').'">'.$i18n->get('add font').'</a><br />';
 
 	return _submenu($session, $output);
 }

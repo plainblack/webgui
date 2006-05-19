@@ -296,7 +296,7 @@ sub newByPalette {
 	my $session = shift;
 	my $paletteId = shift;
 
-	my $sth = $session->db->read('select imageColor.* from imageColor, imagePaletteColors where '.
+	$sth = $session->db->read('select imageColor.* from imageColor, imagePaletteColors where '.
 		' imageColor.colorId=imagePaletteColors.colorId and paletteId=?', [
 		$paletteId
 	]);

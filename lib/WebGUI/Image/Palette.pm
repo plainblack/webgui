@@ -136,7 +136,7 @@ sub getColorIndex {
 	my $self = shift;
 	my $color = shift;
 	
-	my @palette = @{$self->getColorsInPalette};
+	@palette = @{$self->getColorsInPalette};
 	
 	for ($index = 0; $index < scalar(@palette); $index++) {
 		return $index if ($self->getColor($index)->getId eq $color->getId);
