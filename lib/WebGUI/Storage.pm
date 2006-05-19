@@ -376,7 +376,19 @@ Deletes this storage location and its contents (if any) from the filesystem.
 sub delete {
 	my $self = shift;
 	my $path = $self->getPath;
-        rmtree($path) if ($path);
+	if ($path) {
+		rmtree($path) if ($path);
+		foreach my $subDir ($self->{_part1}.'/'.$self->{_part2}, $self->{_part1}) {
+			my $uDir = $self->session->config->get('uploadsPath') . '/' . $subDir;
+			opendir my $DH, $uDir or
+				$self->session->errorHandler->fatal("Unable to open $uDir for directory reading");
+			my @dirs = grep { !/^\.+$/ } readdir($DH);
+			if (scalar @dirs == 0) {
+				rmtree($uDir);
+			}
+			close $DH;
+		}
+	}
 	return;
 }
 

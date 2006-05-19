@@ -18,6 +18,7 @@ use strict;
 use base 'WebGUI::Form::Control';
 use WebGUI::International;
 use WebGUI::Storage;
+use WebGUI::Form::Hidden;
 
 =head1 NAME
 

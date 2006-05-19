@@ -4,12 +4,15 @@
  - fixed a bug in the project management app that was causing a no privilege error when trying to display the view.
  - fixed various bugs in the project management app.
  - added right click ment to project management app.
+ - If a storage object is deleted, it will prune the directory structure
+   upward if the directories are empty, until it reaches the uploads dir.
  - fix [ 1489017 ] Changing default time zone can disable site
  - fix [ 1490812 ] Events cannot be purged.
  - fix [ 1466902 ] $u->status('Deactivated') does not expire existing sessions
  - fix - msgs with only text/html not accepted as such
  - fix - getCsMail doesn't recognize References
  - Added duplicate button in asset manager as discussed in Community IRC.
+ - fix - WebGUI::Form::File doesn't use WebGUI::Form::Hidden
 
 6.99.1
  - Bugfixes on dashboard to fix template errors.

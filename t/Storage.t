@@ -11,6 +11,7 @@
 use FindBin;
 use strict;
 use lib "$FindBin::Bin/lib";
+our $todo;
 
 use WebGUI::Test;
 use WebGUI::Session;
@@ -18,7 +19,7 @@ use WebGUI::Storage;
 
 use Test::More;
 
-plan tests => 8; # increment this value for each test you create
+plan tests => 9; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -47,6 +48,13 @@ ok( (-e $storageDir1 and -d $storageDir1), "Storage location created and is a di
 $storage1->delete;
 
 ok( !(-e $storageDir1), "Storage location deleted");
+
+undef $storage1;
+
+TODO: {
+	local $TODO = "Tests to make later";
+	ok(0, 'Create object with 1 character GUID');
+}
 
 END {
 	ref $storage1 eq "WebGUI::Storage" and $storage1->delete;
