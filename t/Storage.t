@@ -18,7 +18,7 @@ use WebGUI::Storage;
 
 use Test::More;
 
-plan tests => 7; # increment this value for each test you create
+plan tests => 8; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -45,6 +45,8 @@ my $storageDir1 = join '/', $uploadDir, 'fo', 'ob', 'foobar';
 ok( (-e $storageDir1 and -d $storageDir1), "Storage location created and is a directory");
 
 $storage1->delete;
+
+ok( !(-e $storageDir1), "Storage location deleted");
 
 END {
 	ref $storage1 eq "WebGUI::Storage" and $storage1->delete;
