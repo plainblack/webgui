@@ -175,6 +175,12 @@ our $I18N = {
 		context => q|Used in asset context menus.|
 	},
 	
+	'duplicate' => {
+		message => q|Duplicate|,
+		lastUpdated => 0,
+		context => q|Used in asset context menus.|
+	},
+	
 	'copy' => {
 		message => q|Copy|,
 		lastUpdated => 0,

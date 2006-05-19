@@ -4,6 +4,7 @@
  - fixed a bug in the project management app that was causing a no privilege error when trying to display the view.
  - fixed various bugs in the project management app.
  - added right click ment to project management app.
+ - Added duplicate button in asset manager as discussed in Community IRC.
 
 6.99.1
  - Bugfixes on dashboard to fix template errors.

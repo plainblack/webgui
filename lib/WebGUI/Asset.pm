@@ -1137,6 +1137,7 @@ sub manageAssets {
 		assetManager.AddButton("'.$i18n->get("delete").'","deleteList","manageAssets");
 		assetManager.AddButton("'.$i18n->get("cut").'","cutList","manageAssets");
 		assetManager.AddButton("'.$i18n->get("copy").'","copyList","manageAssets");
+		assetManager.AddButton("'.$i18n->get("duplicate").'","duplicateList","manageAssets");
 		assetManager.initializeDragEventHandlers();
 		assetManager.Write();        
                 var assetListSelectAllToggle = false;

@@ -278,6 +278,32 @@ sub www_cutList {
 
 #-------------------------------------------------------------------
 
+=head2 www_duplicateList ( )
+
+Creates a bunch of duplicate assets under the same parent.
+
+=cut
+
+sub www_duplicateList {
+	my $self = shift;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
+	foreach my $assetId ($self->session->form->param("assetId")) {
+		my $asset = WebGUI::Asset->newByDynamicClass($self->session,$assetId);
+		if ($asset->canEdit) {
+			my $newAsset = $asset->duplicate;
+			$newAsset->update({ title=>$newAsset->getTitle.' (copy)'});
+			$newAsset->setParent($asset->getParent);
+		}
+	}
+	if ($self->session->form->process("proceed") ne "") {
+                my $method = "www_".$self->session->form->process("proceed");
+                return $self->$method();
+        }
+	return $self->www_manageAssets();
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_emptyClipboard ( )
 
 Moves assets in clipboard to trash. Returns www_manageClipboard() when finished. If isInGroup(4) returns False, insufficient privilege is rendered.
