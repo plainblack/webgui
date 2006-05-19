@@ -679,7 +679,7 @@ sub processPropertiesFromFormPost {
 	delete $self->{_storageLocation};
 	my $storage = $self->getStorageLocation;
 	my $attachmentLimit = $self->getThread->getParent->get("attachmentsPerPost");
-	$storage->addFileFromFormPost("file", $attachmentLimit) if $attachmentLimit;
+	$storage->addFileFromFormPost("image", $attachmentLimit) if $attachmentLimit;
 	$self->postProcess;
 	$self->requestCommit;
 }
