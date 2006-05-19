@@ -111,7 +111,7 @@ sub www_richEditPageTree {
 	my $session = shift;
 	$session->http->setCacheControl("none");
 	my $i18n = WebGUI::International->new($session);
-	my $f = WebGUI::HTMLForm->new($session,-action=>"#",-extras=>'name"linkchooser"');
+	my $f = WebGUI::HTMLForm->new($session,-action=>"#",-extras=>'name="linkchooser"');
 	$f->text(
 		-name=>"url",
 		-label=>$i18n->get(104),
@@ -132,6 +132,7 @@ sub www_richEditPageTree {
 	my $output = '<fieldset><legend>'.$i18n->get('insert a link').'</legend>
 		<fieldset><legend>'.$i18n->get('insert a link').'</legend>'.$f->print.'</fieldset>
 	<script type="text/javascript">
+//<![CDATA[
 function createLink() {
     if (window.opener) {        
         if (document.getElementById("url_formId").value == "") {
@@ -145,6 +146,7 @@ function createLink() {
      window.close();
     }
 }
+//]]>
 </script><fieldset><legend>'.$i18n->get('pages').'</legend> ';
 	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
 	my @crumb;
@@ -158,8 +160,8 @@ function createLink() {
 		next unless $child->canView;
 		$output .= '<a href="#" onclick="document.getElementById(\'url_formId\').value=\''.$child->get("url").'\'">['.$i18n->get("select").']</a> <a href="'.$child->getUrl("op=richEditPageTree").'">'.$child->get("menuTitle").'</a>'."<br />\n";	
 	}
-	$session->style->useEmptyStyle("1");
-	return $output.'</fieldset></fieldset>';
+	$output .= '</fieldset></fieldset>';
+	return $session->style->process($output, 'PBtmpl0000000000000137');
 }
 
 
@@ -212,8 +214,7 @@ sub www_richEditImageTree {
 		}
 		push(@output, '<a href="'.$child->getUrl("op=richEditImageTree").'">'.$child->get("menuTitle").'</a>'."<br />\n");
 	}
-	$session->style->useEmptyStyle("1");
-	return join('', @output);
+	return $session->style->process(join('', @output), 'PBtmpl0000000000000137');
 }
 
 
@@ -231,24 +232,27 @@ sub www_richEditViewThumbnail {
 	$session->http->setCacheControl("none");
 	my $image = WebGUI::Asset->newByUrl($session);
 	my $i18n = WebGUI::International->new($session);
-	$session->style->useEmptyStyle("1");
+	my $output;
 	if ($image->get("className") =~ /WebGUI::Asset::File::Image/) {
-		my $output = '<div align="center">';
+		$output = '<div align="center">';
 		$output .= '<img src="'.$image->getThumbnailUrl.'" style="border-style:none;" alt="'.$i18n->get('preview').'" />';
 		$output .= '<br />';
 		$output .= $image->get("filename");
 		$output .= '</div>';
 		$output .= '<script type="text/javascript">';
+		$output .= "//<![CDATA[\n";
 		$output .= "\nvar src = '".$image->getFileUrl."';\n";
 		$output .= "if(src.length > 0) {
 				var manager=window.parent;
    				if(manager)		      	
 		      		manager.document.getElementById('txtFileName').value = src;
     			}
+                    //]]>
     		    </script>\n";
-		return $output;
+	} else {
+		$output = '<div align="center"><img src="'.$session->url->extras('tinymce2/images/icon.gif').'" style="border-style:none;" alt="'.$i18n->get('image manager').'" /></div>';
 	}
-	return '<div align="center"><img src="'.$session->url->extras('tinymce2/images/icon.gif').'" style="border-style:none;" alt="'.$i18n->get('image manager').'" /></div>';
+	return $session->style->process($output, 'PBtmpl0000000000000137');
 }
 
 #-------------------------------------------------------------------
