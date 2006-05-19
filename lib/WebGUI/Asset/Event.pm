@@ -203,9 +203,11 @@ See WebGUI::Asset::purgeCache() for details.
 
 sub purgeCache {
 	my $self = shift;
-	WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
+	my $cache = WebGUI::Cache->new($self->session,"view_".$self->getId);
+	$cache->delete if $cache;
 	$self->SUPER::purgeCache;
-	$self->getParent->purgeCache;
+	my $parent = $self->getParent;
+	$parent->purgeCache if defined $parent;
 }
 
 #-------------------------------------------------------------------
