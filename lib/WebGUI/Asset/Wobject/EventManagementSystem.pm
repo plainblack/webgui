@@ -1917,13 +1917,14 @@ sub www_managePurchases {
 	my @purchasesLoop;
 	while (my $purchase = $sth->hashRef) {
 		$purchase->{datePurchasedHuman} = $self->session->datetime->epochToHuman($purchase->{initDate});
-		$purchase->{purchaseUrl} = $self->getUrl("?func=viewPurchase;tid=".$purchase->{purchaseId});
+		$purchase->{purchaseUrl} = $self->getUrl("func=viewPurchase;tid=".$purchase->{purchaseId});
 		
 		push(@purchasesLoop,$purchase);
 	}
 	$var{managePurchasesTitle} = $i18n->get('manage purchases');
 	$sth->finish;
 	$var{'purchasesLoop'} = \@purchasesLoop;
+
 	return $self->processStyle($self->processTemplate(\%var,$self->getValue("managePurchasesTemplateId")));
 }
 
@@ -1955,7 +1956,7 @@ sub www_viewPurchase {
 		$var{registrantView} = 1;
 		$var{canReturnTransaction} = 0;
 		my $filter = ($isAdmin)?'':' and r.returned=0 ';
-		my $sql2 = "select r.registrationId, p.title, p.description, p.price, p.templateId, r.returned, e.approved, e.maximumAttendees, e.startDate, e.endDate, b.userId, b.createdByUserId, e.productId from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e, EventManagementSystem_purchases as z, products as p, transaction where p.productId = r.productId and p.productId = e.productId and r.badgeId=b.badgeId and r.purchaseId=z.purchaseId and r.badgeId=? and transaction.transactionId=z.transactionId and transaction.status='Completed' $filter group by r.registrationId order by e.startDate";
+		my $sql2 = "select r.registrationId, p.title, p.description, p.price, p.templateId, p.sku, r.returned, e.approved, e.maximumAttendees, e.startDate, e.endDate, b.userId, b.createdByUserId, e.productId from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e, EventManagementSystem_purchases as z, products as p, transaction where p.productId = r.productId and p.productId = e.productId and r.badgeId=b.badgeId and r.purchaseId=z.purchaseId and r.badgeId=? and transaction.transactionId=z.transactionId and transaction.status='Completed' $filter group by r.registrationId order by e.startDate";
 		my $sth2 = $self->session->db->read($sql2,[$badgeId]);
 		my $purchase = {};
 		$purchase->{regLoop} = [];
@@ -1969,6 +1970,51 @@ sub www_viewPurchase {
 			push(@{$purchase->{regLoop}},$reg);
 			}
 		push(@purchasesLoop,$purchase);
+		
+		if ($self->canAddEvents) {  #Build list of badges made that weren't actually purchased and provide an interface for attaching them to purchases
+			my @incompleteTransactions;
+
+			# All transactionIds associated with this person (badge)
+			my $transactionIds = $self->session->db->buildHashRef("select distinct(c.transactionId) from EventManagementSystem_registrations a
+									  join products b on a.productId=b.productId
+									  left join EventManagementSystem_purchases d on a.purchaseId=d.purchaseId
+									  left join transaction c on d.transactionId=c.transactionId where c.transactionId is not NULL and a.badgeId=?",[$badgeId]);
+			
+			# All purchaseIds associated with this person (badge)
+			my @purchaseIds = $self->session->db->buildArray("select distinct(a.purchaseId) from EventManagementSystem_registrations a
+									  join products b on a.productId=b.productId
+									  left join EventManagementSystem_purchases d on a.purchaseId=d.purchaseId
+									  left join transaction c on d.transactionId=c.transactionId where c.transactionId is null and a.badgeId=?",[$badgeId]);
+			
+			
+			foreach my $purchaseId (@purchaseIds) {
+				my %data;
+				my $loop = $self->session->db->buildArrayRefOfHashRefs("select a.registrationid, b.title, a.returned, c.transactionId, c.status as transactionStatus, b.sku 
+						    from EventManagementSystem_registrations a join products b on a.productId=b.productId 
+						    left join EventManagementSystem_purchases d on a.purchaseId=d.purchaseId 
+						    left join transaction c on d.transactionId=c.transactionId where (a.badgeId is NULL or c.transactionId is NULL or d.purchaseId is NULL)
+						    and a.badgeId=? and a.purchaseId=?",[$badgeId, $purchaseId]);
+				
+				
+				$data{'purchaseId'} = $purchaseId;
+				$data{'form.transactionSelect'} = ($purchaseId) ? WebGUI::Form::SelectBox($self->session, {name=>"transactionId", options=>$transactionIds}) : "";
+				$data{'form.header'} = WebGUI::Form::formHeader($self->session, {action=>$self->getUrl("func=linkTransactionToPurchase")}).
+						       WebGUI::Form::hidden($self->session, {name=>"purchaseId", value=>$purchaseId}).
+						       WebGUI::Form::hidden($self->session, {name=>"badgeId", value=>$badgeId});
+				$data{'form.footer'} = WebGUI::Form::formFooter($self->session);
+				$data{'form.submit'} = ($purchaseId) ? WebGUI::Form::Submit($self->session, {value=>"Assign Selected Transaction to this Purchase"}) : "Purchase Id is Null and cannot be linked to any transactions!";
+				$data{'unpurchased_loop'} = $loop;
+				$data{'deleteRegistration.url'} = $self->getUrl("func=deleteRegistrationsByPurchaseId;pid=".$purchaseId).";bid=".$badgeId;
+				$data{'deleteRegistration.label'} = "Delete ALL Registrations associated with this PurchaseId PERMANENTLY";
+				$data{'canDeleteRegistration'} =  ($purchaseId);
+				
+				push(@incompleteTransactions,\%data);
+			}
+	
+			$var{'badgeId'} = $badgeId;
+			$var{'incompleteTransactions_loop'} = \@incompleteTransactions;
+			$var{'hasIncompleteTransactions'} = scalar(@incompleteTransactions);
+		}
 		
 		$var{viewPurchaseTitle} = $i18n->get('view purchase');
 		$var{canReturn} = $isAdmin;
@@ -1992,7 +2038,7 @@ sub www_viewPurchase {
 		while (my $purchase = $sth->hashRef) {
 			$badgeId = $purchase->{badgeId};
 			my $pid = $purchase->{purchaseId};
-			my $sql2 = "select r.registrationId, p.title, p.description, p.price, p.templateId, r.returned, e.approved, e.maximumAttendees, e.startDate, e.endDate, b.userId, b.createdByUserId, e.productId from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e, EventManagementSystem_purchases as z, products as p, transaction where p.productId = r.productId and p.productId = e.productId and r.badgeId=b.badgeId and r.purchaseId=z.purchaseId and r.badgeId=? and r.purchaseId=? $filter and transaction.transactionId=z.transactionId and transaction.status='Completed' group by r.registrationId order by b.lastName";
+			my $sql2 = "select r.registrationId, p.title, p.description, p.price, p.templateId, p.sku, r.returned, e.approved, e.maximumAttendees, e.startDate, e.endDate, b.userId, b.createdByUserId, e.productId from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_products as e, EventManagementSystem_purchases as z, products as p, transaction where p.productId = r.productId and p.productId = e.productId and r.badgeId=b.badgeId and r.purchaseId=z.purchaseId and r.badgeId=? and r.purchaseId=? $filter and transaction.transactionId=z.transactionId and transaction.status='Completed' group by r.registrationId order by b.lastName";
 			$sql2 = "select r.registrationId, p.title, p.description, p.price, p.templateId, r.returned, e.approved, e.maximumAttendees, e.startDate, e.endDate, e.productId from EventManagementSystem_registrations as r, EventManagementSystem_products as e, EventManagementSystem_purchases as z, products as p, transaction where p.productId = r.productId and p.productId = e.productId and r.purchaseId=z.purchaseId and and r.purchaseId=? $filter and transaction.transactionId=z.transactionId and transaction.status='Completed' group by r.registrationId" if $showAll;
 			my $sth2 = $self->session->db->read($sql2,[$badgeId,$pid]);
 			$purchase->{regLoop} = [];
@@ -2055,6 +2101,53 @@ sub www_viewPurchase {
 		$var{purchasesLoop} = \@purchasesLoop;
 		return $self->processStyle($self->processTemplate(\%var,$self->getValue("viewPurchaseTemplateId")));
 	}
+}
+
+#-------------------------------------------------------------------
+=head2 www_deleteRegistrationsByPurchaseId
+
+Method to delete all entries in EMS_registrations associated with a particular purchaseId
+
+RLJ -- This method is a stop gap to allow GAMA to clean up bad data introduced by early bugs in the system
+
+=cut
+
+sub www_deleteRegistrationsByPurchaseId {
+	my $self = shift;
+	my $purchaseId = $self->session->form->get("pid");
+	my $badgeId = $self->session->form->get("bid");
+	
+	return $self->session->privilege->insufficient unless ($self->canAddEvents);
+	
+	$self->session->db->write("delete from EventManagementSystem_registrations where purchaseId=?",[$purchaseId]);
+	
+	return $self->www_viewPurchase(undef, $badgeId);	
+}
+
+#-------------------------------------------------------------------
+=head2 www_linkTransactionToPurchase
+
+Method to create entry in EMS_purchases based on user selected transactionId for a purchaseId
+
+RLJ -- This method is a stop gap to allow GAMA to clean up bad data introduced by early bugs in the system
+
+=cut
+
+sub www_linkTransactionToPurchase {
+	my $self = shift;
+	my $transactionId = $self->session->form->process("transactionId", "selectBox");
+	my $purchaseId = $self->session->form->get("purchaseId");
+	my $badgeId = $self->session->form->get("badgeId");
+	
+	return $self->session->privilege->insufficent unless ($self->canAddEvents);
+	
+	$self->session->db->setRow("EventManagementSystem_purchases", "purchaseId",
+				   { purchaseId    => "new",
+				     transactionId => $transactionId,
+				   }, $purchaseId);
+	
+	return $self->www_viewPurchase(undef, $badgeId);
+	
 }
 
 #-------------------------------------------------------------------
