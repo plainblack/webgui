@@ -540,16 +540,23 @@ If specified, the status is set to this value.  Possible values are 'Active', 'S
 =cut
 
 sub status {
-        my $self = shift;
-        my $value = shift;
-        if (defined $value) {
+	my $self = shift;
+	my $value = shift;
+	if (defined $value) {
 		$self->uncache;
-                $self->{_user}{"status"} = $value;
-                $self->{_user}{"lastUpdated"} =$self->session->datetime->time();
-                $self->session->db->write("update users set status=".$self->session->db->quote($value).",
-                        lastUpdated=".$self->session->datetime->time()." where userId=".$self->session->db->quote($self->userId));
-        }
-        return $self->{_user}{"status"};
+		$self->{_user}{"status"} = $value;
+		$self->{_user}{"lastUpdated"} =$self->session->datetime->time();
+		$self->session->db->write("update users set status=".$self->session->db->quote($value).",
+		lastUpdated=".$self->session->datetime->time()." where userId=".$self->session->db->quote($self->userId));
+		if ($value eq 'Deactivated') {
+			my $rs = $self->session->db->read("select sessionId from userSession where userId=?",[$self->{_userId}]);
+			while (my ($id) = $rs->array) {
+				$self->session->db->write("delete from userSessionScratch where sessionId=?",[$id]);
+			}
+			$self->session->db->write("delete from userSession where userId=?",[$self->{_userId}]);
+		}
+	}
+	return $self->{_user}{"status"};
 }
 
 #-------------------------------------------------------------------
