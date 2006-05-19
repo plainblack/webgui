@@ -7,6 +7,11 @@ our $I18N = {
 		lastUpdated => 0 
 	},
 
+	'back to home' => {
+		message => q|Back to home.|,
+		lastUpdated => 0 
+	},
+
 	'version tags' => {
 		message => q|Version Tags|,
 		lastUpdated => 0 

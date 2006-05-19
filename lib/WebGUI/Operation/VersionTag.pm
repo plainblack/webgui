@@ -239,7 +239,7 @@ sub www_commitVersionTagConfirm {
 			return $ac->render(
 				'<p>'.$i18n->get("commit accepted").'</p>'
 				.'<ul>
-				<li><a href="'.$default->getUrl.'">'.$i18n->get("493","WebGUI").'</a></li>
+				<li><a href="'.$default->getUrl.'">'.$i18n->get("back to home").'</a></li>
 				<li><a href="'.$default->getUrl("op=manageVersions").'">'.$i18n->get("manage versions").'</a></li>
 				</ul>'	
 				);
