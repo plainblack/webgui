@@ -75,7 +75,7 @@ sub addPost {
 	my $content = "";
 	my $class = (ref $parent eq "WebGUI::Asset::Wobject::Collaboration") ? "WebGUI::Asset::Post::Thread" : "WebGUI::Asset::Post";
 	foreach my $part (@{$message->{parts}}) {
-		if (($part->{type} eq "text/plain" || $part->{type} eq "text/html") && $part->{filename} eq "") {
+		if (($part->{type} =~ /^text\/plain/ || $part->{type} =~ /^text\/html/) && $part->{filename} eq "") {
 			my $text = $part->{content};
 			if ($part->{type} eq "text/plain") {
 				$text =~ s/\n/\<br \/\>/g;
