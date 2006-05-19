@@ -675,7 +675,11 @@ sub processPropertiesFromFormPost {
 			$self->getThread->stick if ($self->session->form->process("stick"));
 		}
 	}
-        $self->getThread->subscribe if ($self->session->form->process("subscribe"));
+	$self->getThread->subscribe if ($self->session->form->process("subscribe"));
+	delete $self->{_storageLocation};
+	my $storage = $self->getStorageLocation;
+	my $attachmentLimit = $self->getThread->getParent->get("attachmentsPerPost");
+	$storage->addFileFromFormPost("file", $attachmentLimit) if $attachmentLimit;
 	$self->postProcess;
 	$self->requestCommit;
 }
