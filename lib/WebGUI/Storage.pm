@@ -701,7 +701,7 @@ sub renameFile {
 
 #-------------------------------------------------------------------
 
-=head3 session ( )
+=head2 session ( )
 
 Returns a reference to the current session.
 
