@@ -161,7 +161,7 @@ sub getNextMessage {
 	chomp($cc);
 	my $subject = $head->get("Subject") || undef;
 	chomp($subject);
-	my $inReplyTo = $head->get("In-Reply-To") || undef;
+	my $inReplyTo = $head->get("In-Reply-To") || $head->get("References") || undef; 
 	chomp($inReplyTo);
 	my $messageId = $head->get("Message-Id") || undef;
 	chomp($messageId);
