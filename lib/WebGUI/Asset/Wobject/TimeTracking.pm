@@ -21,22 +21,6 @@ use POSIX qw(ceil floor);
 use base 'WebGUI::Asset::Wobject';
 
 #-------------------------------------------------------------------
-sub _acWrapper {
-	my $self = shift;
-	my $html = shift;
-	my $title = shift;
-	my $i18n = WebGUI::International->new($self->session,'Asset_TimeTracking');
-	my $ac = $self->getAdminConsole;
-	$ac->setHelp('add/edit event','Asset_EventManagementSystem') unless $ac->getHelp;
-	$ac->addSubmenuItem($self->getUrl('func=search'),$i18n->get("manage events"));
-	$ac->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n->get('manage event metadata'));
-	$ac->addSubmenuItem($self->getUrl('func=managePrereqSets'), $i18n->get('manage prerequisite sets'));
-	$ac->addSubmenuItem($self->getUrl('func=manageRegistrants'), $i18n->get('manage registrants'));
-	$ac->addSubmenuItem($self->getUrl('func=manageDiscountPasses'), $i18n->get('manage discount passes'));
-	return $ac->render($html,$title);
-}
-
-#-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
 	my $session = shift;
@@ -144,26 +128,15 @@ sub getDaysInWeek {
     #Week View Below
 	my ($dayStart,$dayEnd) = $dt->dayStartEnd($week);
     my $dayOfWeek = $dt->getDayOfWeek($dayStart);
-    my $sundayAdjust = (7 - $dayOfWeek);
-    
+    my $sundayAdjust = ((7 - $dayOfWeek) - 7);
 	my $weekStart = $dt->addToDateTime($dayStart,0,0,$sundayAdjust,1);
-	
 	tie my %hash, "Tie::IxHash";
-	$hash{"0"} = $weekStart;
+	$hash{"0"} = $dt->epochToSet($weekStart);
 	for (my $i = 1; $i < 7; $i++) {
-	   $hash{$i} = $dt->addToDate($weekStart,0,0,$i);
+	   $hash{$i} = $dt->epochToSet($dt->addToDate($weekStart,0,0,$i));
 	}
 	
 	return \%hash;
-}
-
-#-------------------------------------------------------------------
-sub setSessionVars {
-   my $self = shift;
-   my $session = $self->session;
-   my $i18n = WebGUI::International->new($session,'Asset_TimeTracking');
-   
-   return ($session,$session->privilege,$session->form,$session->db,$session->datetime,$i18n,$session->user);
 }
 
 #-------------------------------------------------------------------
@@ -193,9 +166,7 @@ sub view {
 	my $self = shift;
 	my $var = $self->get;
 	
-	my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
-	my $config = $session->config;
-	my $eh = $session->errorHandler;
+	my ($session,$privilege,$form,$db,$dt,$i18n,$user,$eh,$config) = $self->getSessionVars("privilege","form","db","datetime","i18n","user","errorHandler","config");    
 	
 	$var->{'extras'} = $config->get("extrasURL")."/wobject/TimeTracking"; 
 	
@@ -210,13 +181,88 @@ sub view {
 }
 
 #-------------------------------------------------------------------
-sub www_editProject {
-	my $self = shift;
-    my ($session,$privilege,$form,$db,$dt,$i18n,$user,$eh) = $self->getSessionVars("privilege","form","db","datetime","i18n","user","errorHandler");    
+sub www_editTimeEntrySave {
+   	my $self = shift;
+    my ($session,$privilege,$form,$db,$user,$eh,$dt) = $self->getSessionVars("privilege","form","db","user","errorHandler","datetime");
+    
+	return $privilege->insufficient unless ($self->canView);
+	
+	my $now = $dt->time();
+	my $currUser = $user->userId;
+	
+	my $props = {};
+	my $reportId = $form->get("reportId");
+	
+	$props->{reportId} = $reportId;
+	$props->{startDate} = $form->process("startDate","hidden");
+	$props->{endDate} = $form->process("endDate","hidden");
+	$props->{reportComplete} = $form->process("isComplete","checkbox") || 0;
+	$props->{resourceId} = $form->process("resourceId","hidden"); 
+	if($reportId eq "new") {
+       $props->{creationDate} = $now;
+	   $props->{createdBy} = $currUser;
+	}
+	$props->{lastUpdatedBy} = $currUser;
+	$props->{lastUpdateDate} = $now;
+	$reportId = $self->setCollateral("TT_report","reportId",$props,0,1);
+	
+	my @tasks = ();
+	
+	my $rowTotal = $form->get("rowTotal");
+	for(my $i = 1; $i <= $rowTotal; $i++) {
+	   my $taskEntryId = $form->get("taskEntryId_$i");
+	   next unless ($taskEntryId);
+	   $props = {};
+	   $props->{entryId} = $taskEntryId;
+	   $props->{reportId} = $reportId;
+	   $props->{taskDate} = $form->process("taskDate_$i","selectBox");
+	   $props->{projectId} = $form->process("projectId_$i","selectBox");
+	   $props->{taskId} = $form->process("taskId_$i","selectBox");
+	   $props->{hours} = $form->process("hours_$i","float");
+	   $props->{comments} = $form->process("comments_$i","text");
+	   if ($props->{taskDate} && $props->{projectId} && $props->{taskId} && $props->{hours}) {
+	      $taskEntryId = $self->setCollateral("TT_timeEntry","entryId",$props,0,0);
+   	      push(@tasks,$taskEntryId);	   
+	   }
+	}
+	
+	#Delete anything not in the task list
+    $db->write("delete from TT_timeEntry where reportId=? and entryId not in (".$db->quoteAndJoin(\@tasks).")",[$reportId]);
+	
+	return "";
+}
+
+#-------------------------------------------------------------------
+sub www_deleteProject {
+   	my $self = shift;
+    my ($session,$privilege,$form,$db,$i18n,$user,$eh,$config) = $self->getSessionVars("privilege","form","db","i18n","user","errorHandler","config");
 	
 	#Check Privileges
     return $privilege->insufficient unless ($user->isInGroup($self->get("groupToManage")));
-    my $projectId = $form->get("projectId") || "new";
+    my $projectId = $form->get("projectId");
+	my ($count) = $db->quickArray("select count(*) from TT_timeEntry where projectId=".$db->quote($projectId));
+    
+	if($count > 0) {
+	   my $error = $i18n->echo("This project cannot be deleted as it is currently being used by existing time entry records and would corrupt this data.  The records must be deleted if you wish to remove this project");
+	   return $self->www_manageProjects($error);
+	}
+	
+	$db->write("delete from TT_projectResourceList where projectId=".$db->quote($projectId));
+	$db->write("delete from TT_projectTasks where projectId=".$db->quote($projectId));
+	$db->write("delete from TT_projectList where projectId=".$db->quote($projectId));
+	return $self->www_manageProjects();
+}
+
+#-------------------------------------------------------------------
+sub www_editProject {
+	my $self = shift;
+    my ($session,$privilege,$form,$db,$i18n,$user,$eh,$config) = $self->getSessionVars("privilege","form","db","i18n","user","errorHandler","config");
+	
+	#Check Privileges
+    return $privilege->insufficient unless ($user->isInGroup($self->get("groupToManage")));
+    my $projectId = $_[0] || $form->get("projectId") || "new";
+	my $taskError = qq|<br><span style="color:red;font-weight:bold">$_[1]</span>| if($_[1]);
+	my $extras = $config->get("extrasURL")."/wobject/TimeTracking"; 
 	
 	my $project = $db->quickHashRef("select * from TT_projectList where projectId=".$db->quote($projectId));
 	#Build Form
@@ -228,6 +274,10 @@ sub www_editProject {
     $f->hidden( 
        -name=>"projectId", 
        -value=>$projectId 
+    );
+	$f->hidden( 
+       -name=>"action", 
+       -value=>"post"
     );
     $f->readOnly(
 		-label=>$i18n->get("edit project id label"),
@@ -241,15 +291,8 @@ sub www_editProject {
 		-label => $i18n->get('edit project name label')
     );
 	
-	$f->textarea(
-		-name  => "taskList",
-		-value => $project->{taskList},
-		-hoverHelp => $i18n->get('edit project tasks hoverhelp'),
-		-label => $i18n->get('edit project tasks label')
-    );
-	
 	tie my %users, "Tie::IxHash";
-	%users = $db->buildHash("select userId,username from users where userId not in (1,3)");
+	%users = $db->buildHash("select userId,username from users where userId not in ('1','3')");
 	my $resources = $db->buildArrayRef("select resourceId from TT_projectResourceList where projectId=".$db->quote($projectId));
 	
 	$f->selectList(
@@ -259,8 +302,53 @@ sub www_editProject {
 		-hoverHelp => $i18n->get('edit project resource hoverhelp'),
 		-label => $i18n->get('edit project resource label')
     );
+	
+	#Add Tasks
+	my $taskNameLabel = $i18n->echo("New Task Name");
+	my $taskAddButtonLabel = $i18n->echo("Add");
+	my $taskTitleLabel = $i18n->echo("Tasks");
+	my $taskDeletePrompt = $i18n->echo("Are you sure you want to delete this activity?");
+	$taskDeletePrompt =~ s/'/\\'/g;
+	my $taskLabel = $i18n->get("edit project tasks label");
+	
+	my $taskLoop = "";
+	tie my %tasks, "Tie::IxHash";
+	%tasks = $db->buildHash("select taskId,taskName from TT_projectTasks where projectId=".$db->quote($projectId));
+	foreach my $taskId (keys %tasks) {
+	   my $deleteUrl = $self->getUrl("func=editProjectSave;taskId=".$taskId.";action=deleteTask");
+	   my $taskName = $tasks{$taskId};
+	   $taskLoop .= qq|
+	      <tr>
+	         <td width="95%" class="listItem">$taskName</td>
+		     <td width="5%">
+			    <span style="cursor:pointer;" onclick="if(confirm('$taskDeletePrompt')){window.location.href='$deleteUrl';}">
+			       <img border="0" src="$extras/delete.gif" />
+				</span>
+		     </td>
+	      </tr>|;
+	}
+	
+	my $html = qq|
+	   <table id="resources">
+	      <tbody>
+	      <tr>
+	         <td colspan="2">
+		        <input type="text" name="newTaskName" value="$taskNameLabel" style="font-size:8pt" onclick="if(this.value=='$taskNameLabel'){this.value='';}" /> 
+				<input type="submit" value="$taskAddButtonLabel" style="font-size:8pt" onclick="this.form.action.value='addTask'" />$taskError
+		     </td>
+	      </tr>
+	      <tr>
+		     <td colspan="2" style="background-color:#F0F0F0;font-size:9pt;border-bottom:solid silver 2px;font-weight:bold;letter-spacing:2px;text-align:center;">$taskTitleLabel</td>	
+   	      </tr>
+		  $taskLoop
+		 </tbody>
+	   </table>|;
+    $f->raw(qq|<tr><td class="formDescription">$taskLabel</td><td class="tableData">$html</td></tr>|);
+	$f->submit();
 	my $ac = $self->getAdminConsole;
-	return return $ac->render($f->print,$i18n->get("edit project screen label"));
+	my $newProjectUrl = $self->getUrl('func=editProject;projectId=new');
+	$ac->addSubmenuItem($newProjectUrl,$i18n->get("add project label"));
+	return $ac->render($f->print,$i18n->get("edit project screen label"));
 	
 }	
 
@@ -271,14 +359,62 @@ sub www_editProjectSave {
 	
 	#Check Privileges
     return $privilege->insufficient unless ($user->isInGroup($self->get("groupToManage")));
- 
+	
+	my $action = $form->get("action");
+		
+	if ($action eq "deleteTask") {
+	   my $taskId = $form->get("taskId");
+	   my ($pid) = $db->quickArray("select projectId from TT_projectTasks where taskId=".$db->quote($taskId));
+	   $db->write("delete from TT_projectTasks where taskId=".$db->quote($taskId));
+	   return $self->www_editProject($pid);
+	}
+	
+	#Add Project
+	my $projectId = $form->process("projectId","hidden") || "new";
+	my $props = {};
+	$props->{projectId} = $projectId;
+	$props->{projectName} = $form->process("projectName","text") || "Not Named";
+	if($projectId eq "new") {
+       $props->{creationDate} = $dt->time();
+       $props->{createdBy} = $user->userId;
+    }
+	$props->{lastUpdatedBy} = $user->userId;
+    $props->{lastUpdateDate} = $dt->time();
+	$projectId = $self->setCollateral("TT_projectList","projectId",$props,0,1);
+	
+	#Add Resources
+	$db->write("delete from TT_projectResourceList where projectId=".$db->quote($projectId));
+	my @resources = $form->process("resources","selectList");
+	foreach (@resources) {
+	   $db->write("insert into TT_projectResourceList (projectId,resourceId) values (".$db->quote($projectId).",".$db->quote($_).")");
+	}
+	
+	#Add Tasks
+	my $newTaskLabel = $i18n->echo("New Task Name");
+	my $newTaskValue = $form->process("newTaskName","text");
+	my $newTaskId = "";
+	if($newTaskValue ne $newTaskLabel && $newTaskValue ne "") {
+	   $props = {};
+	   $props->{taskId} = "new";
+	   $props->{projectId} = $projectId;
+	   $props->{taskName} = $newTaskValue;
+	   $newTaskId = $self->setCollateral("TT_projectTasks","taskId",$props,0,0);
+	}
+	
+	if($action eq "addTask") {
+	   my $taskError = "";
+	   $taskError = $i18n->echo("No  name was entered for new task") if($newTaskId eq "");
+	   return $self->www_editProject($projectId,$taskError);
+	}
+	
+	return $self->www_manageProjects();
   
 }
 
 #-------------------------------------------------------------------
 sub www_manageProjects {
 	my $self = shift;
-    my ($session,$privilege,$form,$db,$dt,$i18n,$user,$eh) = $self->getSessionVars("privilege","form","db","datetime","i18n","user","errorHandler");    
+    my ($session,$privilege,$form,$db,$dt,$i18n,$user,$eh,$config) = $self->getSessionVars("privilege","form","db","datetime","i18n","user","errorHandler","config");    
 	
 	#Check Privileges
     return $privilege->insufficient unless ($user->isInGroup($self->get("groupToManage")));
@@ -286,21 +422,28 @@ sub www_manageProjects {
 	my $pnLabel = $i18n->get("manage project name label");
 	my $atLabel = $i18n->get("manage project available task label");
 	my $resLabel = $i18n->get("manage project resource label");
+	my $extras = $config->get("extrasURL")."/wobject/TimeTracking"; 
+	my $errorMessage = "";
+	$errorMessage = qq|<span style="color:red;font-weight:bold">$_[0]</span>| if($_[0]);
 	
-	my $output = qq|<table cellspacing="0" cellpadding="2" border="1">
-	   <tbody>
-	      <tr>
-	         <td class="tableHeader">$pnLabel</td>
-		     <td class="tableHeader">$atLabel</td>
-		     <td class="tableHeader">$resLabel</td>
-		     <td class="tableHeader">&#160;</td>
-	      </tr>
+	 my $output .= qq|
+       $errorMessage;
+	   <div id="wrapper">
+	      <table id="mainDash">
+	         <tbody>
+	            <tr>
+	               <td class="header" width="31%">$pnLabel</td>
+		           <td class="header" width="31%">$atLabel</td>
+		           <td class="header" width="31%">$resLabel</td>
+		           <td width="7%">&#160;</td>
+	            </tr>
 	|;
 	my $projects = $db->buildHashRef("select projectId, projectName from TT_projectList where assetId=".$db->quote($self->getId));
 	
-	foreach my $project (keys %{$projects}) {
-	   my $projectName = $project->{projectName};
-	   my $projectId = $project->{projectId};
+	my $count = 0;
+	foreach my $projectId (keys %{$projects}) {
+	   my $projectName = $projects->{$projectId};
+	   my $projectId = $projectId;
 	   my @tasks = $db->buildArray("select taskName from TT_projectTasks where projectId=".$db->quote($projectId));
 	   my $taskList = join("<br />",@tasks);
 	   my @resources = $db->buildArray("select resourceId from TT_projectResourceList where projectId=".$db->quote($projectId));
@@ -315,25 +458,74 @@ sub www_manageProjects {
 		  $resources[$i] = $r;
 	   }
 	   my $resourceList = join("<br />",@resources);
-	   my $editLink = "";
-	   my $deleteLink = "";
+	   
+	   my $editUrl = $self->getUrl("func=editProject;projectId=".$projectId);
+	   my $editLink = qq|<a href="$editUrl"><img src="$extras/edit.gif" border="0" /></a>|;
+	   my $deletePrompt = $i18n->echo("Deleting this project will also delete all associated resources and tasks.  Are you sure you'd like to continue?");
+	   $deletePrompt =~ s/'/\\'/g;
+	   my $deleteUrl = $self->getUrl("func=deleteProject;projectId=".$projectId);
+	   my $deleteLink = qq|<span style="cursor:pointer;" onclick="if(confirm('$deletePrompt')){window.location.href='$deleteUrl';}"><img src="$extras/delete.gif" border="0" /></span>|;
+	   
+	   my $cl = "";
+	   $cl = q|class="alt"| if($count++ % 2 eq 0);
+	   	   
 	   $output .= qq|
-	     <tr>
-		    <td class="tableData">$projectName</td>
-			<td class="tableData">$taskList</td>
-			<td class="tableData">$resourceList</td>
-			<td class="tableData">$editLink.$deleteLink</td>
+	     <tr $cl>
+		    <td>$projectName</td>
+			<td>$taskList</td>
+			<td>$resourceList</td>
+			<td>$editLink &#160; $deleteLink</td>
 		 </tr>
 	   |;
 	}
+	
+	my $newProjectUrl = $self->getUrl('func=editProject;projectId=new');
 	if(scalar(keys %{$projects}) == 0) {
-	   my $noProjects = sprintf($i18n->get("no project message"),$self->getUrl("func=editProject;projectId=new"));
-	   $output .= qq|<tr><td class="tableData" colspan="4"></td></tr>|
+	   my $noProjects = sprintf($i18n->get("no project message"),$newProjectUrl);
+	   $output .= qq|<tr><td class="tableData" colspan="4">$noProjects</td></tr>|
 	}
 	
 	$output .= "</tbody></table>";
+	
+	my $css = q|
+	   <style type="text/css">
+	      #wrapper {
+		     width:645px;
+	      }
+	      #wrapper div.title {
+		     width:100%;
+		     font-size:13pt;
+		     font-weight:bold;
+		     font-variant:small-caps;
+		     text-align:left;
+		     font-family:arial;		
+		     border-bottom:solid gray 2px;
+		     margin-bottom:5px;
+	      }
+		  #mainDash {			
+			border-top:solid gray 3px;
+			border-bottom:solid gray 3px;
+			margin:0px;									
+			width:100%;
+		  }
+		  #mainDash td {
+			font-family:arial;
+			font-size:9pt;
+		  }	
+		  #mainDash td.header {
+		    border-bottom:solid silver 2px;
+			font-weight:bold;
+		  }
+		  #mainDash td.alt {
+		     background-color:#F0F0F0;
+		  }
+       </style>
+	|;
+	
+	$output = $css.$output;
+	
 	my $ac = $self->getAdminConsole;
-	$ac->addSubmenuItem($self->getUrl('func=editProject;projectId=new'),$i18n->get("add project label"));
+	$ac->addSubmenuItem($newProjectUrl,$i18n->get("add project label"));
 	return $ac->render($output,$i18n->get("manage projects screen label"));
 }
 
@@ -357,65 +549,161 @@ sub _buildUserView {
 	
 	$var->{'form.header'} = WebGUI::Form::formHeader($session,{
 				action=>$self->getUrl,
-				extras=>q|name="editTimeForm"|
+				extras=>q|name="editTimeForm" onsubmit="return validateForm(this);"|
 				});
 	$var->{'form.header'} .= WebGUI::Form::hidden($session, {
 				-name=>"func",
 				-value=>"editTimeEntrySave"
 				});
-				
+	$var->{'form.header'} .= WebGUI::Form::hidden($session, {
+				-name=>"rowTotal",
+				-value=>""
+				});
+
 	$var->{'form.footer'} = WebGUI::Form::formFooter($session);
 	
-	$var->{'form.timetracker'} = $self->_buildTimeTable($var);
+	$var->{'js.alert.removeRow.error'} = $i18n->echo("There must be at least one row.  Please add more rows if you wish to delete this one");
+	$var->{'js.alert.validate.hours.error'} = $i18n->echo("You may not submit more hours than are available during any given week.");
+	$var->{'js.alert.validate.incomplete.error'} = $i18n->echo("The highlighted fields are required if you wish to submit this form.");
+	
+	$var->{'form.timetracker'} = $self->www_buildTimeTable($var);
+	
+	
 	
 }
 
 #-------------------------------------------------------------------
-sub _buildTimeTable {
+sub www_buildTimeTable {
    	my $self = shift;
 	my $viewVar = $_[0];
-	my $var = {};
-	
+	my $var = {};	
 	$var->{'extras'} = $viewVar->{'extras'}; 
-	my ($session,$dt,$i18n,$eh,$form,$db,$user) = $self->getSessionVars("datetime","i18n","errorHandler","form","db","user");
+	my ($session,$dt,$i18n,$eh,$form,$db,$user,$privilege) = $self->getSessionVars("datetime","i18n","errorHandler","form","db","user","privilege");
+	
+	return $privilege->insufficient unless ($self->canView);
+	
+	my $pmAssetId = $self->getValue("pmAssetId");
 	
 	my $week = $form->get("week") || $dt->time;
 	my $daysInWeek = $self->getDaysInWeek($week);
-	my $endOfWeek = $dt->epochToSet($daysInWeek->{"6"});
 	
-	$var->{'time.report.header'} = sprintf($i18n->get("time report header"),$endOfWeek);
+	my $weekStart = $daysInWeek->{"0"};	
+	my $weekEnd = $daysInWeek->{"6"};
+	
+	$var->{'time.report.header'} = sprintf($i18n->get("time report header"),$weekEnd);
 	$var->{'time.report.hours.label'} = $i18n->get("total hours label");
 	$var->{'time.report.date.label'} = $i18n->get("time report date label");
 	$var->{'time.report.project.label'} = $i18n->get("time report project label");
 	$var->{'time.report.task.label'} = $i18n->get("time report task label");
 	$var->{'time.report.hours.label'} = $i18n->get("time report hours label");
 	$var->{'time.report.comments.label'} = $i18n->get("time report comments label");
-
-	my $weekStart = $daysInWeek->{"0"};
-	my ($junk,$weekEnd) = $dt->dayStartEnd($daysInWeek->{"6"});
+	$var->{'time.add.row.label'} = $i18n->echo("Add Row");
+	$var->{'time.save.label'} = $i18n->echo("Save");
+	$var->{'time.report.complete.label'} = $i18n->echo("Report Complete");
+	
+	
+	#my ($junk,$weekEnd) = $dt->dayStartEnd($daysInWeek->{"6"});
 	
 	#Rebuild days in week hash to contain set values
 	tie my %setDaysHash,"Tie::IxHash";
 	foreach my $day (keys %{$daysInWeek}) {
-	   $setDaysHash{$day} = $dt->epochToSet($daysInWeek->{$day});
+	   my $set = $daysInWeek->{$day};
+	   $setDaysHash{$set} = $set;
 	}
 	
+	#Build Project List
+	tie my %projectList, "Tie::IxHash";
+	if($pmAssetId) {
+	   #Build project list and task lists from project management app
+	} else {
+	   %projectList = $db->buildHash("select a.projectId, a.projectName from TT_projectList a, TT_projectResourceList b where a.assetId=? and a.projectId=b.projectId and b.resourceId=? order by a.projectName",[$self->getId,$user->userId]);
+	}
+	
+	my $chooseLabel = $i18n->echo("Choose One");
+	#Build Task Lists based on Project Ids
+	tie my %taskList, "Tie::IxHash";
+	#Build task list javascript:
+	my $counter = 0;
+	my $js = "{\n";
+	foreach my $projectId (keys %projectList) {
+	   if($pmAssetId) {
+	      #Build task hash for project management app
+	   } else {
+	      tie my %taskHash, "Tie::IxHash";
+		  %taskHash = $db->buildHash("select taskId, taskName from TT_projectTasks where projectId=?",[$projectId]);
+		  %taskHash = (""=>$chooseLabel,%taskHash);
+	      $taskList{$projectId} = \%taskHash;
+		  #Build JavaScript Hash
+		  $js .= ",\n" if($counter++ > 0);
+          $js .= qq|"$projectId": {|;
+	      my $ind = 0;
+		  foreach my $taskId (keys %taskHash) {
+		     next if ($taskId eq "");
+		     my $taskName = $taskHash{$taskId};
+		     $js .= ",\n" if($ind++ > 0);
+			 $js .= qq| "$taskId":"$taskName"|;
+		  }
+	      $js .= q| }|;
+	   }   
+	}
+	$js .= "\n};\n";
+	
+	$viewVar->{'project.task.array'} = $js;
+	
+	#Set default project for project list
+	%projectList = (""=>$chooseLabel,%projectList);
+	
+	my $resourceIdFromForm = $form->get("resourceId");
+	my $resourceId = ($user->isInGroup($self->get("groupToManage")) && $resourceIdFromForm)?$resourceIdFromForm:$user->userId;
+	#Build Report Info
+	my $report = $db->quickHashRef("select * from TT_report where resourceId=? and startDate=? and endDate=?",[$resourceId,$weekStart,$weekEnd]);	
+	my $reportId = $report->{reportId};
+	$eh->warn($reportId);
+	#Add Report Stuff to form header
+	$viewVar->{'form.header'} .= WebGUI::Form::hidden($session, {
+				-name=>"reportId",
+				-value=>$reportId || "new"
+				});
+				
+	$viewVar->{'form.header'} .= WebGUI::Form::hidden($session, {
+				-name=>"startDate",
+				-value=>$weekStart
+				});
+				
+	$viewVar->{'form.header'} .= WebGUI::Form::hidden($session, {
+				-name=>"endDate",
+				-value=>$weekEnd
+				});
+				
+	$viewVar->{'form.header'} .= WebGUI::Form::hidden($session, {
+				-name=>"resourceId",
+				-value=>$resourceId
+				});
+				
+	$viewVar->{'form.isComplete'} = WebGUI::Form::checkbox($session, {
+	              -name=>"isComplete",
+				  -value=>1,
+				  -checked=>$report->{reportComplete}
+				});			
+
 	#Build Entries Loop
-	my $entries = $db->buildArrayRefOfHashRefs("select * from TT_timeEntry where resourceId=".$db->quote($user->userId)." and taskDate >= ".$db->quote($weekStart)." and taskDate <=".$db->quote($weekEnd));
+	my $entries = $db->buildArrayRefOfHashRefs("select * from TT_timeEntry where reportId=? order by taskDate",[$reportId]);
 	my $rowCount = 1;
 	my @timeEntries = ();
 	
 	foreach my $entry (@{$entries}) {
-	   push (@timeEntries,$self->_buildRow($entry,$rowCount++,\%setDaysHash));
+	   push (@timeEntries,$self->_buildRow($entry,$rowCount++,\%setDaysHash, \%projectList, \%taskList));
 	}
 	
 	#Seed time tracker with 10 empty rows
 	for( my $i = $rowCount; $i < ($rowCount + 10); $i++) {
-	   push(@timeEntries,$self->_buildRow(undef,$i,\%setDaysHash));
+	   push(@timeEntries,$self->_buildRow(undef,$i,\%setDaysHash, \%projectList, \%taskList));
 	}
 	
+	$self->_buildRow(undef,"x",\%setDaysHash, \%projectList, \%taskList,$var);
+	
 	$var->{'time.entry.loop'} = \@timeEntries;
-	$viewVar->{'time.report.rows.total'} = scalar(@timeEntries);
+	$viewVar->{'time.report.rows.total'} = (scalar(@timeEntries)+1);
 	
     return $self->processTemplate($var,$self->getValue("timeRowTemplateId"));
 }
@@ -429,72 +717,70 @@ sub _buildRow {
 	my $entry = $_[0] || {};
 	my $rowCount = $_[1];
 	my $daysInWeek = $_[2];
+	my $projectList = $_[3];
+	my $taskList = $_[4];
+	my $var = $_[5] || {};
 	
-	my $entryId = $entry->{entryId};
+	my $entryId = $entry->{entryId} || "new";
 	$var->{'row.id'} = "row_$rowCount";
-	$var->{'row.id'} .= "_$entryId" if($entryId);
+	#$var->{'row.id'} .= "_$entryId" if($entryId);
 	my $projectId = $entry->{projectId};
 	my $taskId = $entry->{taskId};
 	
-	my $pmAssetId = $self->getValue("pmAssetId");
+	#Task Entry Id
+	$var->{'form.taskEntryId'} = WebGUI::Form::hidden($session,{
+	                           -name=>"taskEntryId_$rowCount",
+							   -value=>$entryId
+							});
 	
 	#Entry Date
+	my $chooseLabel = $i18n->echo("Choose One");
+	
 	tie my %days, "Tie::IxHash";
-	%days = (""=>"Choose One", %{$daysInWeek});
+	%days = (""=>$chooseLabel, %{$daysInWeek});
 	$var->{'form.date'} = WebGUI::Form::selectBox($session,{
 				-name=>"taskDate_$rowCount",
 				-value=>$entry->{taskDate},
-				-options=>\%days
+				-options=>\%days,
+				-extras=>qq|class="date-select"|
 				});
 	
-	#Entry Project
-	tie my %projectList, "Tie::IxHash";
-	if($pmAssetId) {
-	   #Build project list and task lists from project management app
-	} else {
-	   %projectList = $db->buildHash("select a.projectId, a.projectName from TT_projectList a, TT_projectResourceList b where a.assetId=".$db->quote($self->getId)." and a.projectId=b.projectId and b.resourceId=".$db->quote($user->userId));
-	}
-
-	#if(scalar(keys %projectList) == 0) {
-	%projectList = (""=>"Choose One",%projectList);
-	#}
-	
+	my $taskName = "taskId_$rowCount";
+	my $taskId = "taskId_".$rowCount."_formId";
 	$var->{'form.project'} = WebGUI::Form::selectBox($session,{
 	            -name=>"projectId_$rowCount",
-				-options=>\%projectList,
-				-value=>$projectId
+				-options=>$projectList,
+				-value=>$projectId,
+				-extras=>qq|onchange="changeOptions(this,document.getElementById('$taskId'));" class="pt-select"|
 	            });
 	
 	#Entry Task
-	tie my %taskList, "Tie::IxHash";
-	if($entryId) {
-	   if($pmAssetId) {
-	      #Build task list for project from project managmenet app
-	   } else {
-	      %taskList = $db->buildHash("select taskName, taskId from TT_projectTasks where projectId=".$db->quote($projectId));
-	   }
-	}
-	
-	%taskList = (""=>"Choose One",%taskList);
+	tie my %taskHash, "Tie::IxHash";
+	%taskHash = (""=>$chooseLabel,%taskHash);
+	if($projectId) {
+	   %taskHash = %{$taskList->{$projectId}};
+	}	
 	
 	$var->{'form.task'} = WebGUI::Form::selectBox($session,{
-	            -name=>"taskId_$rowCount",
-				-options=>\%taskList,
-				-value=>$taskId
+	            -name=>$taskName,
+				-options=>\%taskHash,
+				-value=>$entry->{taskId},
+				-extras=>qq|class="pt-select"|
 	            });
 	
 	#Entry Hours
 	$var->{'form.hours'} = WebGUI::Form::float($session, {
 				-name=>"hours_$rowCount",
 				-value=>$entry->{hours},
-				-size=>5
+				-size=>5,
+				-extras=>qq|onchange="recalcHours();"|
 				});
 	
 	#Entry Comments
 	$var->{'form.comments'} = WebGUI::Form::text($session, {
 	             -name=>"comments_$rowCount",
 				 -value=>$entry->{comments},
-				 -size=>53
+				 -size=>40
 				});
 	
 	$var->{'delete.url'} = "";	
