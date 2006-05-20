@@ -97,7 +97,7 @@ my @options = $form->find_input('ListMultiple');
 
 is( scalar(grep {$_->type ne 'option'} @options), 0, 'All inputs are of type option');
 
-is( scalar(grep {$_->{multiple} ne '1'} @options), 0, 'All inputs have multiple');
+is( scalar(grep {$_->{multiple} ne 'multiple'} @options), 0, 'All inputs have multiple');
 
 my @names = map { $_->name } @options;
 cmp_deeply( [@names], bag(('ListMultiple')x6), 'correct number of names and names');
