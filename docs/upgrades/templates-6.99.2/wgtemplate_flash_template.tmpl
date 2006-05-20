@@ -1,0 +1,13 @@
+#pbtmpl0000000000000220
+<tmpl_if session.var.adminOn>
+	<tmpl_if controls>
+		<p><tmpl_var controls></p>
+	</tmpl_if>
+</tmpl_if>
+
+
+<div>
+	<object type="application/x-shockwave-flash" data="<tmpl_var fileUrl>" style="height:auto;min-height:100px;width:100%;display:block;">
+		<param name="movie" value="<tmpl_var fileUrl>" />		
+	</object>
+</div>
