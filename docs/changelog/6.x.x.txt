@@ -15,7 +15,8 @@
  - fix - WebGUI::Form::File doesn't use WebGUI::Form::Hidden
  - fixed various bugs in the time tracking app
  - fixed a few bugs in the graphic system
- - fix - Link to a page in the Webgui Page Tree
+ - fix - Link to a page in the Webgui Page Tree not working in IE
+ - fix - Event calendar SCOPE doesn't work!! (Wouter van Oijen / ProcoliX)
  - better HTML compliancy
  - fixed a lot of POD
 

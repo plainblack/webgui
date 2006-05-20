@@ -258,7 +258,7 @@ sub view {
 		$events = $self->getLineage(['descendants'],
 			{returnObjects=>1,includeOnlyClasses=>['WebGUI::Asset::Event']});
 	} elsif ($scope == 1) { # Calendar Scope is Global
-		$events = WebGUI::Asset::getRoot($session)->getLineage(['descendants'],
+		$events = WebGUI::Asset->getRoot($session)->getLineage(['descendants'],
 			{returnObjects=>1,includeOnlyClasses=>['WebGUI::Asset::Event']});
 	}
 	# Sort events by startDate, then endDate

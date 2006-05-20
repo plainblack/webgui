@@ -27,14 +27,14 @@ our @ISA = qw(WebGUI::Asset);
 sub definition {
 	my $class = shift;
 	my $session = shift;
-  my $definition = shift;
+	my $definition = shift;
 	my $i18n = WebGUI::International->new($session,"Asset_Event");
-  push(@{$definition}, {
-	assetName=>$i18n->get('assetName'),
-	icon=>'calendar.gif',
-    tableName=>'EventsCalendar_event',
-    className=>'WebGUI::Asset::Event',
-    properties=>{
+	push(@{$definition}, {
+		assetName=>$i18n->get('assetName'),
+		icon=>'calendar.gif',
+		tableName=>'EventsCalendar_event',
+		className=>'WebGUI::Asset::Event',
+		properties=>{
 			description => {
 				fieldType=>"HTMLArea",
 				defaultValue=>undef
@@ -195,7 +195,7 @@ sub processPropertiesFromFormPost {
 
 #-------------------------------------------------------------------
 
-=head2 purgeCache ()
+=head2 purgeCache ( )
 
 See WebGUI::Asset::purgeCache() for details.
 
@@ -236,40 +236,65 @@ sub view {
 		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
 		return $out if $out;
 	}
-	my ($output, $event, $id);
+	my ($output, $id);
 	my %var = $self->get;
+	my $dt = $self->session->datetime;
 	my $i18n = WebGUI::International->new($self->session,"Asset_Event");
-	$event = $self;
-	$var{title} = $event->getValue("title");
-	$var{"start.label"} =  $i18n->get(14);
-	$var{"start.date"} =$self->session->datetime->epochToHuman($self->getValue("eventStartDate"),"%z");
-	$var{"start.time"} =$self->session->datetime->epochToHuman($self->getValue("eventStartDate"),"%Z");
-	$var{"end.label"} = $i18n->get(15);
-	$var{"end.date"} =$self->session->datetime->epochToHuman($self->getValue("eventEndDate"),"%z");
-	$var{"end.time"} =$self->session->datetime->epochToHuman($self->getValue("eventEndDate"),"%Z");
-	$var{canEdit} = $self->canEdit;
-	$var{"edit.url"} = $self->session->url->page('func=edit');
-	$var{"edit.label"} = $i18n->get(575);
-	$var{"delete.url"} = $self->session->url->page('func=deleteEvent;rid='.$self->getValue("EventsCalendar_recurringId"));
-	$var{"delete.label"} = $i18n->get(576);
+	$var{'title'} = $self->getValue('title');
+	$var{'start.label'} =  $i18n->get(14);
+	$var{'start.date'} = $dt->epochToHuman($self->getValue('eventStartDate'),"%z");
+	$var{'start.time'} = $dt->epochToHuman($self->getValue('eventStartDate'),"%Z");
+	$var{'end.label'} = $i18n->get(15);
+	$var{'end.date'} = $dt->epochToHuman($self->getValue('eventEndDate'),'%z');
+	$var{'end.time'} = $dt->epochToHuman($self->getValue('eventEndDate'),'%Z');
+	$var{'canEdit'} = $self->canEdit;
+	$var{'edit.url'} = $self->session->url->page('func=edit');
+	$var{'edit.label'} = $i18n->get(575);
+	$var{'delete.url'} = $self->session->url->page('func=deleteEvent;rid='.$self->getValue('EventsCalendar_recurringId'));
+	$var{'delete.label'} = $i18n->get(576);
 	my @others;
 	my ($start, $garbage, $end);
-	($start, $garbage) = $self->session->datetime->dayStartEnd($self->get("eventStartDate"));
-	($garbage, $end) = $self->session->datetime->dayStartEnd($self->get("eventEndDate"));
-	my $sth = $self->session->db->read("select assetId from EventsCalendar_event where ((eventStartDate >= $start and eventStartDate <= $end) or (eventEndDate >= $start and eventEndDate <= $end)) and assetId<>".$self->session->db->quote($self->getId));
-	while (my ($assetId) = $sth->array) {
-		my $asset = WebGUI::Asset::Event->new($self->session, $assetId);
-		# deal with multiple versions of the same event with conflicting dates
-		next unless (($asset->get("eventStartDate") >= $start && $asset->get("eventStartDate") <= $end) || ($asset->get("eventEndDate") >= $start && $asset->get("eventEndDate") <= $end));
+	($start, $garbage) = $dt->dayStartEnd($self->get('eventStartDate'));
+	($garbage, $end) = $dt->dayStartEnd($self->get('eventEndDate'));
+
+	my $calendar = $self->getParent();
+	my $scope = $calendar->get('scope');
+	my $events;
+	if ($scope == 0) { # Calendar Scope is Regular
+		$events = $calendar->getLineage(['children'],
+				{returnObjects=>1,
+				includeOnlyClasses=>['WebGUI::Asset::Event']});
+	} elsif ($scope == 2) { # Calendar Scope is Master
+		$events = $calendar->getLineage(['descendants'],
+				{returnObjects=>1,
+				includeOnlyClasses=>['WebGUI::Asset::Event']});
+	} elsif ($scope == 1) { # Calendar Scope is Global
+		my $root = WebGUI::Asset->getRoot($self->session);
+		$events = $root->getLineage(['descendants'],
+				{returnObjects=>1,
+				includeOnlyClasses=>['WebGUI::Asset::Event']});
+	}
+
+	foreach my $event (@{$events}) {
+		# skip events that are already ended
+		next if ($event->get('eventEndDate') < $start);
+		# skip events that are in the future
+		next if ($event->get('eventStartDate') > $end);
+		# skip events we are not allowed to see
+		next unless ($event->canView);
+		# skip self
+		next if ($event->get('assetId') eq $self->get('assetId'));
+
 		push(@others,{
-			url=>$asset->getUrl,
-			title=>$asset->getTitle,
+			url=>$event->getUrl,
+			title=>$event->getTitle,
 			});
 	}
 	$var{others_loop} = \@others;
        	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 	if ($self->session->user->userId eq '1') {
-		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->getParent->get("visitorCacheTimeout"));
+		my $cache = WebGUI::Cache->new($self->session,'view_'.$self->getId);
+		$cache->set($out,$self->getParent->get('visitorCacheTimeout'));
 	}
        	return $out;
 }
