@@ -21,6 +21,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+updateTT();
 
 finish($session); # this line required
 
@@ -50,6 +51,47 @@ sub start {
 	$versionTag->set({name=>"Upgrade to ".$toVersion});
 	$session->db->write("insert into webguiVersion values (".$session->db->quote($toVersion).",'upgrade',".$session->datetime->time().")");
 	return $session;
+}
+
+#-------------------------------------------------
+sub updateTT {
+   my $tableList = [
+            "create table TT_projectTasks (
+                taskId varchar(22) binary not null,
+                projectId varchar(22) binary not null,
+                taskName varchar(255) not null,
+                primary key (taskId)
+            )",
+			"alter table TT_timeEntry modify taskId varchar(22) binary not null",
+			"alter table TT_projectList drop column taskList",
+			"create table TT_report (
+			   reportId varchar(22) binary not null,
+			   assetId varchar(22) not null,
+			   startDate varchar(10) not null,
+			   endDate varchar(10) not null,
+			   reportComplete integer not null default 0,
+			   resourceId varchar(22) binary not null,
+			   creationDate bigint not null,
+			   createdBy varchar(22) binary not null,
+			   lastUpdatedBy varchar(22) binary not null,
+			   lastUpdateDate bigint not null
+			)",
+			"alter table TT_timeEntry add reportId varchar(22) binary not null",
+			"alter table TT_timeEntry modify taskDate varchar(10) not null",
+			"alter table TT_timeEntry drop column assetId",
+			"alter table TT_timeEntry drop column resourceId",
+			"alter table TT_timeEntry drop column completed",
+			"alter table TT_timeEntry drop column creationDate",
+			"alter table TT_timeEntry drop column createdBy",
+			"alter table TT_timeEntry drop column lastUpdatedBy",
+			"alter table TT_timeEntry drop column lastUpdateDate"
+          ];
+
+   print "\tUpdating the Time Tracking System.\n" unless ($quiet);
+   foreach (@{$tableList}) {
+      $session->db->write($_);
+   }
+
 }
 
 #-------------------------------------------------
