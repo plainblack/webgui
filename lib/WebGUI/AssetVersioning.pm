@@ -46,27 +46,27 @@ Adds a revision of an existing asset. Note that programmers should almost never 
 
 =head3 properties
 
-A hash reference containing a list of properties to associate with the child. 
-        
+A hash reference containing a list of properties to associate with the child.
+
 =head3 revisionDate
 
 An epoch date representing the date/time stamp that this revision was created. Defaults to$self->session->datetime->time().
-        
-=cut    
-        
+
+=cut
+
 sub addRevision {
         my $self = shift;
         my $properties = shift;
 	my $now = shift ||$self->session->datetime->time();
 	my $workingTag = WebGUI::VersionTag->getWorking($self->session);
-	$self->session->db->write("insert into assetData (assetId, revisionDate, revisedBy, tagId, status, url,  
-		ownerUserId, groupIdEdit, groupIdView) values (?, ?, ?, ?, 'pending', ?, '3','3','7')", 
+	$self->session->db->write("insert into assetData (assetId, revisionDate, revisedBy, tagId, status, url,
+		ownerUserId, groupIdEdit, groupIdView) values (?, ?, ?, ?, 'pending', ?, '3','3','7')",
 		[$self->getId, $now, $self->session->user->userId, $workingTag->getId, $self->getId] );
         foreach my $definition (@{$self->definition($self->session)}) {
                 unless ($definition->{tableName} eq "assetData") {
                         $self->session->db->write("insert into ".$definition->{tableName}." (assetId,revisionDate) values (?,?)", [$self->getId, $now]);
                 }
-        }               
+        }
         my $newVersion = WebGUI::Asset->new($self->session,$self->getId, $self->get("className"), $now);
         $newVersion->updateHistory("created revision");
 	$newVersion->update($self->get);
@@ -157,7 +157,7 @@ sub purgeRevision {
 	my $self = shift;
 	if ($self->getRevisionCount > 1) {
 		$self->session->db->beginTransaction;
-        	foreach my $definition (@{$self->definition($self->session)}) {                
+        	foreach my $definition (@{$self->definition($self->session)}) {
 			$self->session->db->write("delete from ".$definition->{tableName}." where assetId=? and revisionDate=?",[$self->getId, $self->get("revisionDate")]);
         	}
 		my ($count) = $self->session->db->quickArray("select count(*) from assetData where assetId=? and status='pending'",[$self->getId]);
@@ -175,7 +175,7 @@ sub purgeRevision {
 
 #-------------------------------------------------------------------
 
-=head2 setVersionLock ( ) 
+=head2 setVersionLock ( )
 
 Sets the versioning lock to "on" so that this piece of content may not be edited by anyone else now that it has been edited.
 
@@ -191,7 +191,7 @@ sub setVersionLock {
 
 #-------------------------------------------------------------------
 
-=head2 unsetVersionLock ( ) 
+=head2 unsetVersionLock ( )
 
 Sets the versioning lock to "off" so that this piece of content may be edited once again.
 
@@ -232,7 +232,7 @@ sub updateHistory {
 
 #-------------------------------------------------------------------
 
-=head2 www_lock () 
+=head2 www_lock ()
 
 This is the same as doing an www_editSave without changing anything. It's here so that users can lock assets if they're planning on working on them, or they're working on some of the content offline.
 
@@ -267,7 +267,7 @@ sub www_manageRevisions {
         my $output = sprintf '<table width=100% class="content">
         <tr><th></th><th>%s</th><th>%s</th><th>%s</th></tr> ',
 	$i18n->get('revision date'), $i18n->get('revised by'), $i18n->get('tag name');
-        my $sth = $self->session->db->read("select assetData.revisionDate, users.username, assetVersionTag.name,assetData.tagId from assetData 
+        my $sth = $self->session->db->read("select assetData.revisionDate, users.username, assetVersionTag.name,assetData.tagId from assetData
 		left join assetVersionTag on assetData.tagId=assetVersionTag.tagId left join users on assetData.revisedBy=users.userId
 		where assetData.assetId=".$self->session->db->quote($self->getId));
         while (my ($date,$by,$tag,$tagId) = $sth->array) {

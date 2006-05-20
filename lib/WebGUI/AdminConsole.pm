@@ -39,7 +39,7 @@ The admin console is a menuing system to manage webgui's administrative function
  render
  setHelp
  setIcon
-  
+
 =head1 METHODS
 
 These methods are available from this class:
@@ -527,7 +527,7 @@ A string representing the location of the icon.
 sub setIcon {
 	my $self = shift;
 	my $icon = shift;
-	if ($icon) { 
+	if ($icon) {
 		$self->{_function}{icon} = $icon;
 	}
 }

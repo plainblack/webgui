@@ -31,7 +31,7 @@ Creates a template chooser control.
 
 This is a subclass of WebGUI::Form::SelectBox.
 
-=head1 METHODS 
+=head1 METHODS
 
 The following methods are specifically available from this class. Check the superclass for additional methods.
 
@@ -51,10 +51,10 @@ The following additional parameters have been added via this sub class.
 
 The identifier for this field. Defaults to "templateId".
 
-=head4 namespace        
-                
+=head4 namespace
+
 The namespace for the list of templates to return. If this is omitted, all templates will be displayed.
-                
+
 =head4 label
 
 A text label that will be displayed if toHtmlWithWrapper() is called. Defaults to getName().

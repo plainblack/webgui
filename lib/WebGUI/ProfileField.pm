@@ -48,15 +48,15 @@ sub _reorderFields {
         my ($sth, $i, $id);
         $sth = $self->session->db->read("select fieldName from userProfileField where profileCategoryId=".$self->session->db->quote($category)." order by sequenceNumber");
         while (($id) = $sth->array) {
-                $i++;   
+                $i++;
                 $self->session->db->write("update userProfileField set sequenceNumber='$i' where fieldName=".$self->session->db->quote($id));
-        }               
-        $sth->finish;   
-}    
+        }
+        $sth->finish;
+}
 
 #-------------------------------------------------------------------
 
-=head2 create ( session, fieldName [, properties, categoryId] ) 
+=head2 create ( session, fieldName [, properties, categoryId] )
 
 Add a new field to the system. Returns a WebGUI::ProfileField object if created successfully, otherwise returns undef.
 
@@ -261,12 +261,12 @@ sub getFields {
 
 =head2 getId ()
 
-Returns the unique fieldName for this field. 
+Returns the unique fieldName for this field.
 
 B<NOTE:> This method is named getId for consistency amongst other packages even though technically profile fields have field names rather than ids.
-        
-=cut    
-        
+
+=cut
+
 sub getId {
         my $self = shift;
         return $self->get("fieldName");
@@ -278,8 +278,8 @@ sub getId {
 
 Returns the eval'd label for this field.
 
-=cut    
-        
+=cut
+
 sub getLabel {
         my $self = shift;
         return WebGUI::Operation::Shared::secureEval($self->session,$self->get("label"));
@@ -498,7 +498,7 @@ A scalar containing a hash reference declaration of possible values. Only used f
 
 =head4 dataDefault
 
-A scalar containing an array reference or scalar declaration of defaultly selected value(s). 
+A scalar containing an array reference or scalar declaration of defaultly selected value(s).
 
 =cut
 

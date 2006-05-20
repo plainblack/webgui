@@ -68,15 +68,15 @@ sub cleanSegment {
 	$html =~ s/\<meta.*?\>//ixsg;
 	# remove link tags
 	$html =~ s/\<link.*?\>//ixsg;
-	# remove title tags 
+	# remove title tags
 	$html =~ s/\<title\>.*?\<\/title\>//ixsg;
-	# remove head tags 
+	# remove head tags
 	$html =~ s/\<head.*?\>//ixsg;
 	$html =~ s/\<\/head>//ixsg;
-	# remove body tags 
+	# remove body tags
 	$html =~ s/\<body.*?\>//ixsg;
 	$html =~ s/\<\/body>//ixsg;
-	# remove html tags 
+	# remove html tags
 	$html =~ s/\<html>//ixsg;
 	$html =~ s/\<\/html>//ixsg;
 	return $html;
@@ -220,31 +220,31 @@ sub html2text {
 }
 
 #-------------------------------------------------------------------
-                                                                                                                             
+
 =head2 makeAbsolute ( session, html , [ baseURL ] )
-                                                                                                                             
+
 Returns html with all relative links converted to absolute.
 
 =head3 session
 
 A reference to the current session.
-                                                                                                                             
+
 =head3 html
-                                                                                                                             
+
 The html to be made absolute.
-                                       
+
 =head3 baseURL
 
-The base URL to use. Defaults to current page's url.                                                                                      
+The base URL to use. Defaults to current page's url.
 
 =cut
 
 my $absolute = "";
-                                                                                                 
+
 sub makeAbsolute {
 	my $session = shift;
 	my $html = shift;
-	my $baseURL = shift; 
+	my $baseURL = shift;
 
 	$absolute = "";
 
@@ -306,7 +306,7 @@ sub makeAbsolute {
 
 #-------------------------------------------------------------------
 
-=head2 processReplacements ( session, content ) 
+=head2 processReplacements ( session, content )
 
 Processes text using the WebGUI replacements system.
 

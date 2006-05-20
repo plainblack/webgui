@@ -61,8 +61,8 @@ sub DESTROY {
 
 
 #-------------------------------------------------------------------
-        
-=head2 end ( ) 
+
+=head2 end ( )
 
 Removes the specified user session from memory and database.
 
@@ -78,7 +78,7 @@ sub end {
 
 #-------------------------------------------------------------------
 
-=head2 get( varName ) 
+=head2 get ( varName )
 
 Retrieves the current value of a session variable.
 
@@ -133,9 +133,9 @@ sub getId {
 
 
 #-------------------------------------------------------------------
-        
+
 =head2 isAdminOn  ( )
-        
+
 Returns a boolean indicating whether admin mode is on or not.
 
 =cut
@@ -208,9 +208,9 @@ sub session {
 
 
 #-------------------------------------------------------------------
-                
+
 =head2 start ( [ userId, sessionId ] )
-                
+
 Start a new user session. Returns the session id.
 
 =head3 userId
@@ -268,7 +268,6 @@ sub switchAdminOn {
         $self->{_var}{adminOn} = 1;
         $self->session->db->setRow("userSession","sessionId", $self->{_var});
 }
-
 
 
 1;

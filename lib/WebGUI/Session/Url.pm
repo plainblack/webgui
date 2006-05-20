@@ -46,10 +46,9 @@ This package provides URL writing functionality. It is important that all WebGUI
  $string = $url->makeAbsolute($string);
  $string = $url->page($string, $pairs);
  $string = $url->unescape($string);
- $string = $url->urlize($string); 
+ $string = $url->urlize($string);
 
  $url->setSiteURL($string);
-
 
 =head1 METHODS
 
@@ -61,7 +60,7 @@ These subroutines are available from this package:
 
 #-------------------------------------------------------------------
 
-=head2 append ( url, pairs ) 
+=head2 append ( url, pairs )
 
 Returns a URL after adding some information to the end of it.
 
@@ -182,7 +181,7 @@ sub gateway {
 
 Returns the URL of the page this request was refered from (no gateway, no query params, just the page url). Returns undef if there was no referer.
 
-=cut 
+=cut
 
 sub getRefererUrl {
 	my $self = shift;
@@ -205,7 +204,7 @@ sub getRefererUrl {
 
 Returns the URL of the page requested (no gateway, no query params, just the page url).
 
-=cut 
+=cut
 
 sub getRequestedUrl {
 	my $self = shift;
@@ -227,7 +226,7 @@ Returns a constructed site url. The returned value can be overridden using the s
 
 =cut
 
-sub getSiteURL { 
+sub getSiteURL {
 	my $self = shift;
 	unless ($self->{_siteUrl}) {
 		my $site = "";
@@ -248,21 +247,21 @@ sub getSiteURL {
 
 
 #-------------------------------------------------------------------
-                                                                                                                             
+
 =head2 makeAbsolute ( url , [ baseURL ] )
-                                                                                                                             
+
 Returns an absolute url.
-                                                                                                                             
+
 =head3 url
-                                                                                                                             
+
 The url to make absolute.
-                                                                                                                            
+
 =head3 baseURL
 
 The base URL to use. This defaults to current page url.
- 
+
 =cut
-                                                                                                                             
+
 sub makeAbsolute {
 	my $self = shift;
 	my $url = shift;
@@ -280,7 +279,7 @@ Returns a string that has made into a WebGUI compliant URL based upon the langua
 
 The string to make compliant. This is usually a page title or a filename.
 
-=cut 
+=cut
 
 sub makeCompliant {
 	my $self = shift;
@@ -291,7 +290,7 @@ sub makeCompliant {
 
 #-------------------------------------------------------------------
 
-=head2 new ( session ) 
+=head2 new ( session )
 
 Constructor.
 
@@ -366,7 +365,7 @@ sub session {
 
 =head2 setSiteURL ( )
 
-Sets an alternate site url. 
+Sets an alternate site url.
 
 =cut
 

@@ -62,9 +62,9 @@ The text displayed to the user as a hyperlink to the linkURL.
 =cut
 
 #-------------------------------------------------------------------
-                
+
 =head2 addRevision
-        
+
 Override the default method in order to deal with attachments.
 
 =cut
@@ -77,7 +77,7 @@ sub addRevision {
                 $newSelf->update({storageId=>$newStorage->getId});
         }
         return $newSelf;
-}  
+}
 
 #-------------------------------------------------------------------
 sub definition {
@@ -185,7 +185,7 @@ sub getStorageLocation {
 
 =head2 indexContent ( )
 
-Indexing the content of attachments and user defined fields. See WebGUI::Asset::indexContent() for additonal details. 
+Indexing the content of attachments and user defined fields. See WebGUI::Asset::indexContent() for additonal details.
 
 =cut
 
@@ -236,7 +236,7 @@ sub purge {
 
 #-------------------------------------------------------------------
 
-=head2 purgeCache ()
+=head2 purgeCache ( )
 
 See WebGUI::Asset::purgeCache() for details.
 
@@ -273,7 +273,7 @@ sub view {
 	}
 	my %var;
 	if ($self->get("storageId")) {
-		my $storage = $self->getStorageLocation; 
+		my $storage = $self->getStorageLocation;
 		my @loop = ();
 		foreach my $file (@{$storage->getFiles}) {
 			if ($storage->isImage($file)) {
@@ -356,7 +356,7 @@ sub www_deleteFile {
 
 #-------------------------------------------------------------------
 
-=head2 www_view ()
+=head2 www_view ( )
 
 See WebGUI::Asset::Wobject::www_view() for details.
 

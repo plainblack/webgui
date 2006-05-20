@@ -68,19 +68,19 @@ sub add {
 }
 
 #-------------------------------------------------------------------
-                                                                                                                             
+
 =head2 addPage ( session, assetId )
-                                                                                                                             
-Adds all wobjects on current page to the passive profile log.  
+
+Adds all wobjects on current page to the passive profile log.
 
 =head3 session
 
 A reference to the current session.
-                                                                                                                             
+
 =head3 assetId
-                                                                                                                             
+
 The assetId of the page you want to log.
-                                                                                                                             
+
 =cut
 
 sub addPage {
@@ -101,7 +101,7 @@ sub addPage {
 Summarizes passive profile log data using the metadata attributes. An entry
 is logged in the passiveProfileAOI table.
 
-=head3 session 
+=head3 session
 
 A reference to the session.
 
@@ -115,18 +115,18 @@ sub summarizeAOI {
 	my $session = shift;
 	my $data = shift;
 	my $sql = "
-		select f.fieldName, 
-			f.fieldType, 
-			d.fieldId, 
-			d.assetId, 
-			d.value 
-		from metaData_values d , metaData_properties f 
-		where f.fieldId = d.fieldId 
+		select f.fieldName,
+			f.fieldType,
+			d.fieldId,
+			d.assetId,
+			d.value
+		from metaData_values d , metaData_properties f
+		where f.fieldId = d.fieldId
 			and d.assetId = ".$session->db->quote($data->{assetId});
 
         my $sth = $session->db->read($sql);
         while (my $field = $sth->hashRef) {
-		my $aoi = $session->db->quickHashRef("select * from passiveProfileAOI 
+		my $aoi = $session->db->quickHashRef("select * from passiveProfileAOI
 						where userId=".$session->db->quote($data->{userId})."
 						and fieldId=".$session->db->quote($field->{fieldId})." and
 						value=".$session->db->quote($field->{value}));
@@ -142,7 +142,7 @@ sub summarizeAOI {
 		$session->db->write("update passiveProfileAOI set count=".$session->db->quote($count)."
 					where userId=".$session->db->quote($data->{userId})."
                                         and fieldId=".$session->db->quote($field->{fieldId})." and
-                                        value=".$session->db->quote($field->{value})); 
+                                        value=".$session->db->quote($field->{value}));
 	}
 	$sth->finish;
 }

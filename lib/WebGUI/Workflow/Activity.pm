@@ -66,7 +66,7 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 create ( session, workflowId [, id, classname  ] ) 
+=head2 create ( session, workflowId [, id, classname  ] )
 
 Creates a new instance of this activity in a workflow.
 
@@ -97,9 +97,9 @@ sub create {
 	my ($sequenceNumber) = $session->db->quickArray("select count(*) from WorkflowActivity where workflowId=?", [$workflowId]);
 	$sequenceNumber++;
 	my $activityId = $session->db->setRow("WorkflowActivity","activityId", {
-		sequenceNumber=>$sequenceNumber, 
-		activityId=>"new", 
-		className=>$classname || $class, 
+		sequenceNumber=>$sequenceNumber,
+		activityId=>"new",
+		className=>$classname || $class,
 		workflowId=>$workflowId
 		}, $id);
 	return $class->new($session, $activityId, $classname);
@@ -188,7 +188,7 @@ A reference to some object that will be passed in to this activity for an action
 
 =head2 instance
 
-A reference to the workflow instance object. 
+A reference to the workflow instance object.
 
 =cut
 
@@ -202,7 +202,7 @@ sub execute {
 
 #-------------------------------------------------------------------
 
-=head2 get ( name ) 
+=head2 get ( name )
 
 Returns the value for a given property.
 
@@ -215,13 +215,13 @@ sub get {
 }
 
 #-------------------------------------------------------------------
-        
+
 =head2 getEditForm ()
-                
+
 Returns the form that will be used to edit the properties of an activity.
- 
-=cut            
-        
+
+=cut
+
 sub getEditForm {
         my $self = shift;
 	my $form = WebGUI::HTMLForm->new($self->session);
@@ -264,7 +264,7 @@ sub getId {
 
 =head2 getName ( )
 
-Returns the name of the activity. 
+Returns the name of the activity.
 
 =cut
 
@@ -284,7 +284,7 @@ Constructor.
 
 A reference to the current session.
 
-=head3 activityId 
+=head3 activityId
 
 A unique id refering to an instance of an activity.
 
@@ -300,10 +300,10 @@ sub new {
         my $cmd = "use ".$class;
         eval ($cmd);
         if ($@) {
-                $session->errorHandler->error("Couldn't compile workflow activity package: ".$class.". Root cause: ".$@); 
-		return undef;                
+                $session->errorHandler->error("Couldn't compile workflow activity package: ".$class.". Root cause: ".$@);
+		return undef;
 	}
-	my $sub = $session->db->buildHashRef("select name,value from WorkflowActivityData where activityId=?",[$activityId]); 
+	my $sub = $session->db->buildHashRef("select name,value from WorkflowActivityData where activityId=?",[$activityId]);
 	my %data = (%{$main}, %{$sub});
 	bless {_session=>$session, _id=>$activityId, _data=>\%data}, $class;
 }
@@ -312,18 +312,18 @@ sub new {
 
 =head2 newByPropertyHashRef ( session,  properties )
 
-Constructor. 
+Constructor.
 
 =head3 session
-        
+
 A reference to the current session.
-        
+
 =head3 properties
-                
+
 A properties hash reference. The className of the properties hash must be valid.
-                        
-=cut                    
-                
+
+=cut
+
 sub newByPropertyHashRef {
         my $class = shift;
         my $session = shift;
@@ -332,13 +332,13 @@ sub newByPropertyHashRef {
         return undef unless exists $properties->{className};
         my $className = $properties->{className};
         my $cmd = "use ".$className;
-        eval ($cmd);    
+        eval ($cmd);
         if ($@) {
                 $session->errorHandler->warn("Couldn't compile activity package: ".$className.". Root cause: ".$@);
                 return undef;
-        }               
+        }
         bless {_session=>$session, _id=>$properties->{activityId}, _data => $properties}, $className;
-} 
+}
 
 #-------------------------------------------------------------------
 
@@ -369,7 +369,7 @@ sub processPropertiesFromFormPost {
 
 #-------------------------------------------------------------------
 
-=head2 session ( ) 
+=head2 session ( )
 
 Returns a reference to the current session.
 
