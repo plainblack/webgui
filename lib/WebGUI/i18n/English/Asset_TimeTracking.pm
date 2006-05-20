@@ -160,8 +160,8 @@ our $I18N = {
 		lastUpdated => 0
 		},
 	
-	'' => {
-		message => q||,
+	'no project message' => {
+		message => q|No projects created.  Click <a href="%s">here</a> to add a new project|,
 		lastUpdated => 0
 		},
 		
