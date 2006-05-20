@@ -1,6 +1,6 @@
 package WebGUI::Storage;
 
-=head1 LEGAL 
+=head1 LEGAL
 
  -------------------------------------------------------------------
   WebGUI is Copyright 2001-2006 Plain Black Corporation.
@@ -234,21 +234,21 @@ sub addFileFromFormPost {
 
 
 #-------------------------------------------------------------------
-                                                                                                                                                       
+
 =head2 addFileFromHashref ( filename, hashref )
-                                                                                                                                                       
+
 Stores a hash reference as a file and returns a URL compliant filename. Retrieve the data with getFileContentsAsHashref.
 
 =head3 filename
 
 The name of the file to create.
-                                                                                                                                                       
+
 =head3 hashref
-                                                                                                                                                       
+
 A hash reference containing the data you wish to persist to the filesystem.
-                                                                                                                                                       
+
 =cut
-                                                                                                                                                       
+
 sub addFileFromHashref {
 	my $self = shift;
 	my $filename = $self->session->url->makeCompliant(shift);
@@ -289,17 +289,17 @@ sub addFileFromScalar {
 
 
 #-------------------------------------------------------------------
-                                                                                                                                                       
+
 =head2 copy ( [ storage ] )
-                                                                                                                                                       
+
 Copies a storage location and it's contents. Returns a new storage location object. Note that this does not copy privileges or other special filesystem properties.
 
 =head3 storage
 
 Optionally pass in a storage object to copy the data to.
-                                                                                                                                                       
+
 =cut
-                                                                                                                                                       
+
 sub copy {
 	my $self = shift;
 	my $newStorage = shift || WebGUI::Storage->create($self->session);
@@ -323,7 +323,7 @@ sub copy {
 #-------------------------------------------------------------------
 
 =head2 create ( session )
- 
+
 Creates a new storage location on the file system.
 
 =head3 session
@@ -336,16 +336,16 @@ sub create {
 	my $class = shift;
 	my $session = shift;
 	my $id = $session->id->generate();
-	my $self = $class->get($session,$id); 
+	my $self = $class->get($session,$id);
 	$self->_makePath;
-	return $self; 
+	return $self;
 }
 
 
 #-------------------------------------------------------------------
 
 =head2 createTemp ( session )
- 
+
 Creates a temporary storage location on the file system.
 
 =head3 session
@@ -362,7 +362,7 @@ sub createTemp {
 	my $self = {_session=>$session, _id => $id, _part1 => 'temp', _part2 => $1};
 	bless $self, ref($class)||$class;
 	$self->_makePath;
-	return $self; 
+	return $self;
 }
 
 #-------------------------------------------------------------------
@@ -393,17 +393,17 @@ sub delete {
 }
 
 #-------------------------------------------------------------------
-                                                                                                                                                       
+
 =head2 deleteFile ( filename )
-                                                                                                                                                       
+
 Deletes a file from it's storage location.
 
 =head3 filename
 
 The name of the file to delete.
-                                                                                                                                                       
+
 =cut
-                                                                                                                                                       
+
 sub deleteFile {
 	my $self = shift;
 	my $filename = shift;
@@ -421,7 +421,7 @@ Returns a WebGUI::Storage object.
 
 A reference to the current sesion.
 
-=head3 id 
+=head3 id
 
 The unique identifier for this file system storage location.
 
@@ -494,17 +494,17 @@ sub getFileContentsAsScalar {
 
 
 #-------------------------------------------------------------------
-                                                                                                                                                       
+
 =head2 getFileExtension ( filename )
-                                                                                                                                                       
+
 Returns the extension or type of this file.
 
 =head3 filename
 
 The filename of the file you wish to find out the type for.
-                                                                                                                                                       
+
 =cut
-                                                                                                                                                       
+
 sub getFileExtension {
 	my $self = shift;
 	my $filename = shift;
@@ -516,7 +516,7 @@ sub getFileExtension {
 
 #-------------------------------------------------------------------
 
-=head2 getFileIconUrl ( filename ) 
+=head2 getFileIconUrl ( filename )
 
 Returns the icon associated with this type of file.
 
@@ -539,13 +539,13 @@ sub getFileIconUrl {
 
 
 #-------------------------------------------------------------------
-                                                                                                                                                       
+
 =head2 getFileSize ( filename )
-                                                                                                                                                       
+
 Returns the size of this file.
-                                                                                                                                                       
+
 =cut
-                                                                                                                                                       
+
 sub getFileSize {
 	my $self = shift;
 	my $filename = shift;
@@ -586,17 +586,17 @@ sub getFiles {
 
 
 #-------------------------------------------------------------------
-                                                                                                                                                       
+
 =head2 getFileContentsAsHashref ( filename )
-                                                                                                                                                       
+
 Returns a hash reference from the file. Must be used in conjunction with a file that was saved using the addFileFromHashref method.
 
 =head3 filename
 
 The file to retrieve the data from.
-                                                                                                                                                       
+
 =cut
-                                                                                                                                                       
+
 sub getHashref {
 	my $self = shift;
 	my $filename = shift;
@@ -685,9 +685,8 @@ sub getUrl {
 	return $url;
 }
 
-                                                                                                                                                       
 #-------------------------------------------------------------------
-                                                                                                                                                       
+
 =head2 renameFile ( filename, newFilename )
 
 Renames an file's filename.  Returns true if the rename succeeded and false
@@ -696,13 +695,13 @@ if it didn't.
 =head3 filename
 
 The name of the file you wish to rename.
-                                                                                                               
+
 =head3 newFilename
 
 Define the new filename a specified file.
 
 =cut
-                                                                                                                                                       
+
 sub renameFile {
 	my $self = shift;
 	my $filename = shift;
@@ -817,5 +816,3 @@ sub untar {
 
 
 1;
-
-

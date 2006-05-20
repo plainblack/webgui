@@ -72,28 +72,28 @@ Validates the username passed in.
 =cut
 
 sub _isValidUsername {
-   my $self = shift;
-   my $username = shift;
-   my $error = "";
-   
-   return 1 if($self->userId ne "1" && $self->session->user->username eq $username);
+	my $self = shift;
+	my $username = shift;
+	my $error = "";
 
-   my $i18n = WebGUI::International->new($self->session);
-   
-   if ($username =~ /^\s/ || $username =~ /\s$/) {
-      $error .= '<li>'.$i18n->get(724).'</li>';
-   }
-   if ($username eq "") {
-      $error .= '<li>'.$i18n->get(725).'</li>';
-   }
-   $self->error($error);
-   return $error eq "";
+	return 1 if($self->userId ne "1" && $self->session->user->username eq $username);
+
+	my $i18n = WebGUI::International->new($self->session);
+
+	if ($username =~ /^\s/ || $username =~ /\s$/) {
+		$error .= '<li>'.$i18n->get(724).'</li>';
+	}
+	if ($username eq "") {
+		$error .= '<li>'.$i18n->get(725).'</li>';
+	}
+	$self->error($error);
+	return $error eq "";
 }
 
 #-------------------------------------------------------------------
 sub _logLogin {
 	my $self = shift;
-   $self->session->db->write("insert into userLoginLog values (".$self->session->db->quote($_[0]).",".$self->session->db->quote($_[1]).",".$self->session->datetime->time().","
+	$self->session->db->write("insert into userLoginLog values (".$self->session->db->quote($_[0]).",".$self->session->db->quote($_[1]).",".$self->session->datetime->time().","
 	.$self->session->db->quote($self->session->env->get("REMOTE_ADDR")).",".$self->session->db->quote($self->session->env->get("HTTP_USER_AGENT")).")");
 }
 
@@ -106,7 +106,7 @@ Creates elements for the add user form specific to this Authentication Method.
 =cut
 
 sub addUserForm {
-   #Added for interface purposes only.  Needs to be implemented in the subclass.
+	#Added for interface purposes only.  Needs to be implemented in the subclass.
 }
 
 #-------------------------------------------------------------------
@@ -118,8 +118,8 @@ Saves user elements unique to this authentication method
 =cut
 
 sub addUserFormSave {
-   my $self = shift;
-   $self->saveParams(($_[1] || $self->userId),$self->authMethod,$_[0]);
+	my $self = shift;
+	$self->saveParams(($_[1] || $self->userId),$self->authMethod,$_[0]);
 }
 
 #-------------------------------------------------------------------
@@ -131,24 +131,24 @@ Superclass method that performs standard login routines.  This method returns tr
 =cut
 
 sub authenticate {
-   my $self = shift;
-   my $username = shift;
-   my $i18n = WebGUI::International->new($self->session);
-   my $user = $self->session->db->quickHashRef("select userId,authMethod,status from users where username=".$self->session->db->quote($username));
-   my $uid = $user->{userId};
-   #If userId does not exist or is not active, fail login
-   if(!$uid){
-      $self->error($i18n->get(68));
-	  return 0;
-   } elsif($user->{status} ne 'Active'){
-      $self->error($i18n->get(820));
-	  $self->_logLogin($uid, "failure");
-	  return 0;
-   }
-   
-   #Set User Id
-   $self->user(WebGUI::User->new($self->session,$uid));
-   return 1;
+	my $self = shift;
+	my $username = shift;
+	my $i18n = WebGUI::International->new($self->session);
+	my $user = $self->session->db->quickHashRef("select userId,authMethod,status from users where username=".$self->session->db->quote($username));
+	my $uid = $user->{userId};
+	#If userId does not exist or is not active, fail login
+	if (!$uid) {
+		$self->error($i18n->get(68));
+		return 0;
+	} elsif($user->{status} ne 'Active') {
+		$self->error($i18n->get(820));
+		$self->_logLogin($uid, "failure");
+		return 0;
+	}
+
+	#Set User Id
+	$self->user(WebGUI::User->new($self->session,$uid));
+	return 1;
 }
 
 #-------------------------------------------------------------------
@@ -164,9 +164,9 @@ Gets or sets the authMethod in the Auth Object
 =cut
 
 sub authMethod {
-   my $self = shift;
-   return $self->{authMethod} if(!$_[0]);
-   $self->{authMethod} = $_[0];
+	my $self = shift;
+	return $self->{authMethod} if(!$_[0]);
+	$self->{authMethod} = $_[0];
 }
 
 #-------------------------------------------------------------------
@@ -178,11 +178,11 @@ Superclass method that performs general functionality for creating new accounts.
 =head3 method
 
 Auth method that the form for creating users should call
-   
+
 =head3 vars
-   
+
 Array ref of template vars from subclass
-   
+
 =cut
 
 sub createAccount {
@@ -200,10 +200,10 @@ sub createAccount {
 	$vars->{'create.form.profile'} = WebGUI::Operation::Profile::getRequiredProfileFields($self->session);
 	
 	$vars->{'create.form.submit'} = WebGUI::Form::submit($self->session,{});
-    $vars->{'create.form.footer'} = WebGUI::Form::formFooter($self->session,);
-	
-    $vars->{'login.url'} = $self->session->url->page('op=auth;method=init');
-    $vars->{'login.label'} = $i18n->get(58);
+	$vars->{'create.form.footer'} = WebGUI::Form::formFooter($self->session,);
+
+	$vars->{'login.url'} = $self->session->url->page('op=auth;method=init');
+	$vars->{'login.label'} = $i18n->get(58);
 
 	$vars->{'login.url'} = $self->session->url->page('op=auth;method=init');
 	$vars->{'login.label'} = $i18n->get(58);
@@ -220,19 +220,19 @@ Superclass method that performs general functionality for saving new accounts.
 =head3 username
 
 Username for the account being created
-   
+
 =head3 properties
-   
+
 Properties from the subclass that should be saved as authentication parameters
-   
+
 =head3 password
 
 Password entered by the user.  This is only used in for sending the user a notification by email of his/her username/password
 
 =head3 profile
-   
+
 Hashref of profile values returned by the function WebGUI::Operation::Profile::validateProfileData($self->session)
-   
+
 =cut
 
 sub createAccountSave {
@@ -288,7 +288,7 @@ Superclass method that displays a confirm message for deactivating a user's acco
 =head3 method
 
 Auth method that the form for creating users should call
-   
+
 =cut
 
 sub deactivateAccount {
@@ -297,7 +297,7 @@ sub deactivateAccount {
 	return $self->session->privilege->vitalComponent() if($self->userId eq '1' || $self->userId eq '3');
 	return $self->session->privilege->adminOnly() if(!$self->session->setting->get("selfDeactivation"));
 	my $i18n = WebGUI::International->new($self->session);
-	my %var; 
+	my %var;
   	$var{title} = $i18n->get(42);
    	$var{question} =  $i18n->get(60);
    	$var{'yes.url'} = $self->session->url->page('op=auth;method='.$method);
@@ -312,7 +312,7 @@ sub deactivateAccount {
 =head2 deactivateAccount ( method )
 
 Superclass method that performs general functionality for deactivating accounts.
-  
+
 =cut
 
 sub deactivateAccountConfirm {
@@ -333,8 +333,8 @@ Removes the user's authentication parameters from the database for all authentic
 =cut
 
 sub deleteParams {
-   my $self = shift;
-   $self->session->db->write("delete from authentication where userId=".$self->session->db->quote($self->userId));
+	my $self = shift;
+	$self->session->db->write("delete from authentication where userId=".$self->session->db->quote($self->userId));
 }
 
 #-------------------------------------------------------------------
@@ -346,33 +346,33 @@ Superclass method that performs general functionality for viewing editable field
 =head3 method
 
 Auth method that the form for updating a user's account should call
-   
+
 =head3 vars
-   
+
 Array ref of template vars from subclass
-   
+
 =cut
 
 sub displayAccount {
-   my $self = shift;
-   my $method = $_[0];
-   my $vars = $_[1];
-   
+	my $self = shift;
+	my $method = $_[0];
+	my $vars = $_[1];
+
 	my $i18n = WebGUI::International->new($self->session);
    $vars->{title} = $i18n->get(61);
-   
-   $vars->{'account.form.header'} = WebGUI::Form::formHeader($self->session,{});
-   $vars->{'account.form.header'} .= WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"});
-   $vars->{'account.form.header'} .= WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>$method});
-   if($self->session->setting->get("useKarma")){
-	$vars->{'account.form.karma'} = $self->session->user->karma;
-	$vars->{'account.form.karma.label'} = $i18n->get(537);
-   }
-   $vars->{'account.form.submit'} = WebGUI::Form::submit($self->session,{});
-   $vars->{'account.form.footer'} = WebGUI::Form::formFooter($self->session,);
-   
-   $vars->{'account.options'} = WebGUI::Operation::Shared::accountOptions($self->session);
-   return WebGUI::Asset::Template->new($self->session,$self->getAccountTemplateId)->process($vars);
+
+	$vars->{'account.form.header'} = WebGUI::Form::formHeader($self->session,{});
+	$vars->{'account.form.header'} .= WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"});
+	$vars->{'account.form.header'} .= WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>$method});
+	if ($self->session->setting->get("useKarma")) {
+		$vars->{'account.form.karma'} = $self->session->user->karma;
+		$vars->{'account.form.karma.label'} = $i18n->get(537);
+	}
+	$vars->{'account.form.submit'} = WebGUI::Form::submit($self->session,{});
+	$vars->{'account.form.footer'} = WebGUI::Form::formFooter($self->session,);
+
+	$vars->{'account.options'} = WebGUI::Operation::Shared::accountOptions($self->session);
+	return WebGUI::Asset::Template->new($self->session,$self->getAccountTemplateId)->process($vars);
 }
 
 #-------------------------------------------------------------------
@@ -384,11 +384,11 @@ Superclass method that performs general functionality for creating new accounts.
 =head3 method
 
 Auth method that the form for performing the login routine should call
-   
+
 =head3 vars
-   
+
 Array ref of template vars from subclass
-   
+
 =cut
 
 sub displayLogin {
@@ -429,7 +429,7 @@ Creates user form elements specific to this Auth Method.
 =cut
 
 sub editUserForm {
-   #Added for interface purposes only.  Needs to be implemented in the subclass.
+	#Added for interface purposes only.  Needs to be implemented in the subclass.
 }
 
 #-------------------------------------------------------------------
@@ -441,8 +441,8 @@ Saves user elements unique to this authentication method
 =cut
 
 sub editUserFormSave {
-   my $self = shift;
-   $self->saveParams($self->userId,$self->authMethod,$_[0]);
+	my $self = shift;
+	$self->saveParams($self->userId,$self->authMethod,$_[0]);
 }
 
 #-------------------------------------------------------------------
@@ -454,9 +454,9 @@ Sets or returns the error currently stored in the object
 =cut
 
 sub error {
-   my $self = shift;
-   return $self->{error} if (!$_[0]);
-   $self->{error} = $_[0];
+	my $self = shift;
+	return $self->{error} if (!$_[0]);
+	$self->{error} = $_[0];
 }
 
 #-------------------------------------------------------------------
@@ -504,7 +504,7 @@ Returns a hash reference with the user's authentication information.  This metho
 =cut
 
 sub getParams {
-    my $self = shift;
+	my $self = shift;
 	my $userId = $_[0] || $self->userId;
 	my $authMethod = $_[1] || $self->authMethod;
 	return $self->session->db->buildHashRef("select fieldName, fieldData from authentication where userId=".$self->session->db->quote($userId)." and authMethod=".$self->session->db->quote($authMethod));
@@ -539,8 +539,8 @@ Override this method in your subclass to change the initialization for custom au
 =cut
 
 sub init {
-   my $self = shift;
-   return $self->displayLogin;
+	my $self = shift;
+	return $self->displayLogin;
 }
 
 #-------------------------------------------------------------------
@@ -552,8 +552,8 @@ Returns whether or not a method is callable
 =cut
 
 sub isCallable {
-   my $self = shift;
-   return isIn($_[0],@{$self->{callable}})
+	my $self = shift;
+	return isIn($_[0],@{$self->{callable}})
 }
 
 
@@ -567,20 +567,20 @@ Authentication should always happen in the subclass routine.
 =cut
 
 sub login {
-   my $self = shift;
-   my ($cmd, $uid, $u, $authMethod,$msg,$userData,$expireDate);
-   
-   #Create a new user
-   $uid = $self->userId;
-   $u = WebGUI::User->new($self->session,$uid);
+	my $self = shift;
+	my ($cmd, $uid, $u, $authMethod,$msg,$userData,$expireDate);
+
+	#Create a new user
+	$uid = $self->userId;
+	$u = WebGUI::User->new($self->session,$uid);
    	$self->session->user({user=>$u});
-   $u->karma($self->session->setting->get("karmaPerLogin"),"Login","Just for logging in.") if ($self->session->setting->get("useKarma"));
-   $self->_logLogin($uid,"success");
-   if ($self->session->scratch->get("redirectAfterLogin")) {
+	$u->karma($self->session->setting->get("karmaPerLogin"),"Login","Just for logging in.") if ($self->session->setting->get("useKarma"));
+	$self->_logLogin($uid,"success");
+	if ($self->session->scratch->get("redirectAfterLogin")) {
 		$self->session->http->setRedirect($self->session->scratch->get("redirectAfterLogin"));
 	  	$self->session->scratch->delete("redirectAfterLogin");
-   }
-   return "";
+	}
+	return "";
 }
 
 #-------------------------------------------------------------------
@@ -593,11 +593,11 @@ Superclass method that performs standard logout routines.
 
 sub logout {
 	my $self = shift;
-   $self->session->var->end($self->session->var->get("sessionId"));
-   $self->session->user({userId=>'1'});
+	$self->session->var->end($self->session->var->get("sessionId"));
+	$self->session->user({userId=>'1'});
 	my $u = WebGUI::User->new($self->session,1);
 	$self->{user} = $u;
-   return "";
+	return "";
 }
 
 #-------------------------------------------------------------------
@@ -609,16 +609,16 @@ Constructor.
 =head3 session
 
 =head3 authMethod
-  
+
 This object's authentication method
-  
+
 =head3 userId
 
 userId for the user requesting authentication.  This defaults to $self->session->user->userId
-  
+
 =head3 callable
 
-Array reference of methods allowed to be called externally;  
+Array reference of methods allowed to be called externally;
 
 =cut
 
@@ -650,12 +650,10 @@ Sets or returns the Profile hash for a user.
 =cut
 
 sub profile {
-  my $self = shift;
-  return $self->{profile} if ($_[0]);
-  $self->{profile} = $_[0];
+	my $self = shift;
+	return $self->{profile} if ($_[0]);
+	$self->{profile} = $_[0];
 }
-
-
 
 #-------------------------------------------------------------------
 
@@ -678,9 +676,9 @@ Array reference containing a list of methods for this authentication instance th
 =cut
 
 sub setCallable {
-   my $self = shift;
-   my @callable = @{$self->{callable}};
-   @callable = (@callable,@{$_[0]});
+	my $self = shift;
+	my @callable = @{$self->{callable}};
+	@callable = (@callable,@{$_[0]});
 }
 
 #-------------------------------------------------------------------
@@ -704,12 +702,12 @@ A hash reference containing parameter names and values to be saved.
 =cut
 
 sub saveParams {
-    my $self = shift;
+	my $self = shift;
 	my ($uid, $authMethod, $data) = @_;
 	foreach (keys %{$data}) {
-       $self->session->db->write("delete from authentication where userId=".$self->session->db->quote($uid)." and authMethod=".$self->session->db->quote($authMethod)." and fieldName=".$self->session->db->quote($_));
-   	   $self->session->db->write("insert into authentication (userId,authMethod,fieldData,fieldName) values (".$self->session->db->quote($uid).",".$self->session->db->quote($authMethod).",".$self->session->db->quote($data->{$_}).",".$self->session->db->quote($_).")");
-    }
+		$self->session->db->write("delete from authentication where userId=".$self->session->db->quote($uid)." and authMethod=".$self->session->db->quote($authMethod)." and fieldName=".$self->session->db->quote($_));
+		$self->session->db->write("insert into authentication (userId,authMethod,fieldData,fieldName) values (".$self->session->db->quote($uid).",".$self->session->db->quote($authMethod).",".$self->session->db->quote($data->{$_}).",".$self->session->db->quote($_).")");
+	}
 }
 
 #-------------------------------------------------------------------
@@ -721,9 +719,9 @@ Sets or Returns the user object stored in the wobject
 =cut
 
 sub user {
-   my $self = shift;
-   return $self->{user} if (!$_[0]);
-   $self->{user} = $_[0];
+	my $self = shift;
+	return $self->{user} if (!$_[0]);
+	$self->{user} = $_[0];
 }
 
 #-------------------------------------------------------------------
@@ -735,9 +733,9 @@ Returns the userId currently stored in the object
 =cut
 
 sub userId {
-   my $self = shift;
-   my $u = $self->user;
-   return $u->userId;
+	my $self = shift;
+	my $u = $self->user;
+	return $u->userId;
 }
 
 #-------------------------------------------------------------------
@@ -749,9 +747,9 @@ Returns the username currently stored in the object
 =cut
 
 sub username {
-   my $self = shift;
-   my $u = $self->user;
-   return $u->username;
+	my $self = shift;
+	my $u = $self->user;
+	return $u->username;
 }
 
 #-------------------------------------------------------------------
@@ -763,21 +761,21 @@ Validates the a username.
 =cut
 
 sub validUsername {
-   my $self = shift;
+	my $self = shift;
 	my $username = shift;
-   WebGUI::Macro::negate(\$username);
-   my $error = "";
-   
-   if($self->_isDuplicateUsername($username)){
-      $error .= $self->error;
-   }
-   
-   if(!$self->_isValidUsername($username)){
-      $error .= $self->error;
-   }
-   
-   $self->error($error);
-   return $error eq "";
+	WebGUI::Macro::negate(\$username);
+	my $error = "";
+
+	if ($self->_isDuplicateUsername($username)) {
+		$error .= $self->error;
+	}
+
+	if (!$self->_isValidUsername($username)) {
+		$error .= $self->error;
+	}
+
+	$self->error($error);
+	return $error eq "";
 }
 
 #-------------------------------------------------------------------
@@ -789,9 +787,9 @@ Sets or Returns a warning in the object
 =cut
 
 sub warning {
-   my $self = shift;
-   return $self->{warning} if (!$_[0]);
-   $self->{warning} = $_[0];
+	my $self = shift;
+	return $self->{warning} if (!$_[0]);
+	$self->{warning} = $_[0];
 }
 
 1;
