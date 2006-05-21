@@ -50,15 +50,23 @@ sub checkModules {
 	return scalar(@failedModules);
 }
 
+#---------------------------------------------------------------------
+# Note: this test checks for non-empty lines before POD commands
+# which are not detected by podchecker, but are causing problems
+# for pod2html (might be a bug in the latter). This results in badly
+# formatted and invalid API documentation.
+#---------------------------------------------------------------------
 sub checkContent {
 	my $content = shift;
 	my @content = @{$content};
 
-	my $badEnd = 0;
+	my $podAllowed = 0;
 	foreach my $line (@content) {
+		chomp $line;
 		my $isPodWord = ($line =~ m/^=/);
-		return 1 if ($isPodWord && $badEnd);
-		$badEnd = ($line =~ m/[ \t]$/);
+		return 1 if ($isPodWord && !$podAllowed);
+		# POD is allowed on next line if current line is empty
+		$podAllowed = ($line eq '');
 	}
 
 	return 0;
