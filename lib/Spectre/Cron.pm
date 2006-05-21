@@ -372,7 +372,7 @@ sub runJob {
 	$self->debug("Preparing to run a scheduled job ".$job->{taskId}.".");
 	POE::Component::Client::UserAgent->new;
 	if ($job->{sitename} eq "" || $job->{config} eq "" || $job->{taskId} eq "") {
-		$self->error("Warning: A scheduled task has corrupt information and is nat able to be run. Skipping execution.");
+		$self->error("Warning: A scheduled task has corrupt information and is not able to be run. Skipping execution.");
 		$kernel->yield("deleteJob",{config=>$job->{config}, taskId=>$job->{taskId}}) if ($job->{config} ne "" && $job->{taskId} ne "");
 	} else {
 		my $url = "http://".$job->{sitename}.':'.$self->config->get("webguiPort").$job->{gateway};
@@ -422,7 +422,7 @@ sub runJobResponse {
 			$self->debug("Got an error response for scheduled task $config / $taskId, will try again in ".$self->config->get("suspensionDelay")." seconds.");
 			$kernel->delay_set("runJob",$self->config->get("suspensionDelay"),$job);
 		} else {
-			$self->error("Something bad happened on the return of scheduled task $config / $taskId, will try again in ".$self->config->get("suspensionDelay").". ".$response->error_as_HTML);
+			$self->error("Something bad happened on the return of scheduled task $config / $taskId, will try again in ".$self->config->get("suspensionDelay")." seconds. ".$response->error_as_HTML);
 			$kernel->delay_set("runJob",$self->config->get("suspensionDelay"),$job);
 		}
 	} elsif ($response->is_redirect) {

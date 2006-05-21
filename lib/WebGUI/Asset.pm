@@ -354,7 +354,7 @@ sub get {
 
 #-------------------------------------------------------------------
 
-=head2 getAdminConsole ()
+=head2 getAdminConsole ( )
 
 Returns a reference to a WebGUI::AdminConsole object.
 
@@ -401,7 +401,7 @@ sub getAssetAdderLinks {
 		#use Data::Dumper; print Dumper($newAsset);
 		my $uiLevel = eval{$newAsset->getUiLevel()};
 		if ($@) {
-			$self->session->errorHandler->error("Couldn't get UI level of ".$class."because ".$@);
+			$self->session->errorHandler->error("Couldn't get UI level of ".$class.". Root cause: ".$@);
 			next;
 		} else {
 			next if ($uiLevel > $self->session->user->profileField("uiLevel") && !$self->session->user->isInGroup(3));
@@ -463,7 +463,7 @@ sub getAssetAdderLinks {
 
 #-------------------------------------------------------------------
 
-=head2 getContainer  ()
+=head2 getContainer ( )
 
 Returns a reference to the container asset. If this asset is a container it returns a reference to itself. If this asset is not attached to a container it returns its parent.
 

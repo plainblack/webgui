@@ -56,10 +56,6 @@ sub DESTROY {
 
 Sends a message to Spectre.
 
-=head3 session
-
-A reference to the current session.
-
 =head3 module
 
 The module/method pair you wish to communicate with in Spectre. 
