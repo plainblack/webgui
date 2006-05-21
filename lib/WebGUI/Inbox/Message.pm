@@ -72,8 +72,6 @@ A userId of a user attached to this message.
 
 A groupId of a group attached to this message.
 
-=head
-
 =cut
 
 sub create {
@@ -113,9 +111,9 @@ sub create {
 
 #-------------------------------------------------------------------
 
-=head2 delete
+=head2 delete ( )
 
-Deletes  this message from the inbox.
+Deletes this message from the inbox.
 
 =cut
 
@@ -171,7 +169,7 @@ sub get {
 
 #-------------------------------------------------------------------
 
-=head2 getId ()
+=head2 getId ( )
 
 Returns the ID of this message.
 

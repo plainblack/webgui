@@ -39,7 +39,6 @@ containing related items.  An asset setting will set the launch point of the arc
 
 use WebGUI::Asset::ZipArchive;
 
-
 =head1 METHODS
 
 These methods are available from this class:
@@ -48,36 +47,37 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 sub unzip {
-   my $self = shift;
-   my $storage = $_[0];
-   my $filename = $_[1];
+	my $self = shift;
+	my $storage = shift;
+	my $filename = shift;
    
-   my $filepath = $storage->getPath();
-   chdir $filepath;
+	my $filepath = $storage->getPath();
+	chdir $filepath;
    
 	my $i18n = WebGUI::International->new($self->session,"Asset_ZipArchive");
-   if($filename =~ m/\.zip/i){
-	  my $zip = Archive::Zip->new();
-	  unless ($zip->read($filename) == $zip->AZ_OK){
-	     $self->session->errorHandler->warn($i18n->get("zip_error"));
-		 return 0;
-	  }
-	  $zip->extractTree();  
-   } elsif($filename =~ m/\.tar/i){
-      Archive::Tar->extract_archive($filepath.'/'.$filename,1);
-	  if (Archive::Tar->error){
-         $self->session->errorHandler->warn(Archive::Tar->error);
-	     return 0;
-	  }
-   } else{
-      $self->session->errorHandler->warn($i18n->get("bad_archive"));
-   }
-   
-   return 1;
+	if ($filename =~ m/\.zip/i) {
+		my $zip = Archive::Zip->new();
+		unless ($zip->read($filename) == $zip->AZ_OK){
+			$self->session->errorHandler->warn($i18n->get("zip_error"));
+			return 0;
+		}
+		$zip->extractTree();  
+	} elsif ($filename =~ m/\.tar/i) {
+		Archive::Tar->extract_archive($filepath.'/'.$filename,1);
+		if (Archive::Tar->error) {
+			$self->session->errorHandler->warn(Archive::Tar->error);
+			return 0;
+		}
+	} else {
+		$self->session->errorHandler->warn($i18n->get("bad_archive"));
+	}
+
+	return 1;
 }
 
 #-------------------------------------------------------------------
-=head2 addRevision
+
+=head2 addRevision ( )
 
    This method exists for demonstration purposes only.  The superclass
    handles revisions to ZipArchive Assets.
@@ -91,6 +91,7 @@ sub addRevision {
 }
 
 #-------------------------------------------------------------------
+
 =head2 definition ( definition )
 
 Defines the properties of this asset.
@@ -102,32 +103,33 @@ A hash reference passed in from a subclass definition.
 =cut
 
 sub definition {
-   my $class = shift;
-   my $session = shift;
-   my $definition = shift;
+	my $class = shift;
+	my $session = shift;
+	my $definition = shift;
 	my $i18n = WebGUI::International->new($session,"Asset_ZipArchive");
-   push(@{$definition}, {
-      assetName=>$i18n->get('assetName'),
-      tableName=>'ZipArchiveAsset',
-	icon=>'ziparchive.gif',
-      className=>'WebGUI::Asset::File::ZipArchive',
-      properties=>{
-         showPage=>{
-	        fieldType=>'text',
-            defaultValue=>'index.html'
-         },
-		 templateId=>{
-		    fieldType=>'template',
-		    defaultValue=>''
-		 },
-      }
-   });
-   return $class->SUPER::definition($session,$definition);
+	push(@{$definition}, {
+		assetName=>$i18n->get('assetName'),
+		tableName=>'ZipArchiveAsset',
+		icon=>'ziparchive.gif',
+		className=>'WebGUI::Asset::File::ZipArchive',
+		properties=>{
+			showPage=>{
+			fieldType=>'text',
+			defaultValue=>'index.html'
+		},
+		templateId=>{
+			fieldType=>'template',
+			defaultValue=>''
+			},
+		}
+	});
+	return $class->SUPER::definition($session,$definition);
 }
 
 
 #-------------------------------------------------------------------
-=head2 duplicate
+
+=head2 duplicate ( )
 
    This method exists for demonstration purposes only.  The superclass
    handles duplicating ZipArchive Assets.  This method will be called 
@@ -143,30 +145,30 @@ sub duplicate {
 
 
 #-------------------------------------------------------------------
-=head2 getEditForm ()
+
+=head2 getEditForm ( )
 
 Returns the TabForm object that will be used in generating the edit page for this asset.
 
 =cut
 
 sub getEditForm {
-   my $self = shift;
-   my $tabform = $self->SUPER::getEditForm();
+	my $self = shift;
+	my $tabform = $self->SUPER::getEditForm();
 	my $i18n = WebGUI::International->new($self->session,"Asset_ZipArchive");
-   $tabform->getTab("display")->template(
-      -value=>$self->getValue("templateId"),
-	  -label=>$i18n->get('template label'),
-	  -namespace=>"ZipArchiveAsset"
-   );
-   $tabform->getTab("properties")->text (
-      -name=>"showPage",
-      -label=>$i18n->get('show page'),
-	  -value=>$self->getValue("showPage"),
-	  -hoverHelp=>$i18n->get('show page description'),
-   );
-   return $tabform;
+	$tabform->getTab("display")->template(
+		-value=>$self->getValue("templateId"),
+		-label=>$i18n->get('template label'),
+		-namespace=>"ZipArchiveAsset"
+	);
+	$tabform->getTab("properties")->text (
+		-name=>"showPage",
+		-label=>$i18n->get('show page'),
+		-value=>$self->getValue("showPage"),
+		-hoverHelp=>$i18n->get('show page description'),
+	);
+	return $tabform;
 }
-
 
 #-------------------------------------------------------------------
 
@@ -186,6 +188,7 @@ sub prepareView {
 
 
 #-------------------------------------------------------------------
+
 =head2 processPropertiesFromFormPost ( )
 
 Used to process properties from the form posted.  In this asset, we use
@@ -203,30 +206,31 @@ sub processPropertiesFromFormPost {
 	
 	#return unless $file;
 	my $i18n = WebGUI::International->new($self->session, 'Asset_ZipArchive');
-    unless($self->session->form->process("showPage")) {
-	   $storage->delete;
-	   $self->session->db->write("update FileAsset set filename=NULL where assetId=".$self->session->db->quote($self->getId));
-	   $self->session->scratch->set("za_error",$i18n->get("za_show_error"));
-	   return;
+	unless ($self->session->form->process("showPage")) {
+		$storage->delete;
+		$self->session->db->write("update FileAsset set filename=NULL where assetId=".$self->session->db->quote($self->getId));
+		$self->session->scratch->set("za_error",$i18n->get("za_show_error"));
+		return;
 	}
 	
-	unless($file =~ m/\.tar/i || $file =~ m/\.zip/i) {
-	   $storage->delete;
-	   $self->session->db->write("update FileAsset set filename=NULL where assetId=".$self->session->db->quote($self->getId));
-	   $self->session->scratch->set("za_error",$i18n->get("za_error"));
-	   return;
+	unless ($file =~ m/\.tar/i || $file =~ m/\.zip/i) {
+		$storage->delete;
+		$self->session->db->write("update FileAsset set filename=NULL where assetId=".$self->session->db->quote($self->getId));
+		$self->session->scratch->set("za_error",$i18n->get("za_error"));
+		return;
 	}
 	
 	unless ($self->unzip($storage,$self->get("filename"))) {
-	   $self->session->errorHandler->warn($i18n->get("unzip_error"));
+		$self->session->errorHandler->warn($i18n->get("unzip_error"));
 	}
 }
 
 
 #-------------------------------------------------------------------
+
 =head2 view ( )
 
-method called by the container www_view method.  In this asset, this is
+Method called by the container www_view method.  In this asset, this is
 used to show the file to administrators.
 
 =cut
@@ -261,6 +265,7 @@ sub view {
 
 
 #-------------------------------------------------------------------
+
 =head2 www_edit ( )
 
 Web facing method which is the default edit page
@@ -277,6 +282,7 @@ sub www_edit {
 }
 
 #-------------------------------------------------------------------
+
 =head2 www_view ( )
 
 Web facing method which is the default view page.  This method does a 

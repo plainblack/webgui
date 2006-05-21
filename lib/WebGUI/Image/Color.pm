@@ -37,7 +37,8 @@ These methods are available from this class:
 
 
 #-------------------------------------------------------------------
-=head1 canDelete
+
+=head2 canDelete ( )
 
 Returns true if this color can be deleted.
 
@@ -50,7 +51,8 @@ sub canDelete {
 }
 
 #-------------------------------------------------------------------
-=head1 copy
+
+=head2 copy ( )
 
 Returns a new WebGUI::Image::Color object being an exact copy of this color,
 except for the persistency. This means that the new copy will not be stored in
@@ -65,7 +67,8 @@ sub copy {
 }
 
 #-------------------------------------------------------------------
-=head1 darken
+
+=head2 darken ( )
 
 Returns a new WebGUI::Image::Color object with the same properties but the
 colors darkened. This object will not be saved to the database automatically.
@@ -87,7 +90,8 @@ sub darken {
 }
 
 #-------------------------------------------------------------------
-=head1 delete
+
+=head2 delete ( )
 
 Deletes the color from the database. It will only delete if canDelete returns
 true.
@@ -104,7 +108,8 @@ sub delete {
 }
 
 #-------------------------------------------------------------------
-=head1 getFillColor
+
+=head2 getFillColor ( )
 
 Returns the the quartet of th fill color. The quartet consists of R, G, B and
 Alpha values respectively in HTML format: '#rrggbbaa'.
@@ -118,7 +123,8 @@ sub getFillColor {
 }
 
 #-------------------------------------------------------------------
-=head1 getFillTriplet
+
+=head2 getFillTriplet ( )
 
 Returns the RGB triplet of the fill color in HTML format: '#rrggbb'.
 
@@ -131,7 +137,8 @@ sub getFillTriplet {
 }
 
 #-------------------------------------------------------------------
-=head1 getFillAlpha
+
+=head2 getFillAlpha ( )
 
 Returns the hex value of the Alpha channel in this color.
 
@@ -144,7 +151,8 @@ sub getFillAlpha {
 }
 
 #-------------------------------------------------------------------
-=head1 getId
+
+=head2 getId ( )
 
 Returns the GUID of this color.
 
@@ -157,7 +165,8 @@ sub getId {
 }
 
 #-------------------------------------------------------------------
-=head1 getName
+
+=head2 getName ( )
 
 Returns the name assigned to this color.
 
@@ -170,7 +179,8 @@ sub getName {
 }
 
 #-------------------------------------------------------------------
-=head1 getStrokeColor
+
+=head2 getStrokeColor ( )
 
 Returns the the quartet of the stroke color. The quartet consists of R, G, B and
 Alpha values respectively in HTML format: '#rrggbbaa'.
@@ -184,7 +194,8 @@ sub getStrokeColor {
 }
 
 #-------------------------------------------------------------------
-=head1 getStrokeTriplet
+
+=head2 getStrokeTriplet ( )
 
 Returns the RGB triplet of the stroke color in HTML format: '#rrggbb'.
 
@@ -197,7 +208,8 @@ sub getStrokeTriplet {
 }
 
 #-------------------------------------------------------------------
-=head1 getStrokeAlpha
+
+=head2 getStrokeAlpha ( )
 
 Returns the hex value of the Alpha channel in the stroke color.
 
@@ -210,41 +222,42 @@ sub getStrokeAlpha {
 }
 
 #-------------------------------------------------------------------
-=head1 new ( session, colorId, [ properties ] )
+
+=head2 new ( session, colorId, [ properties ] )
 
 Constructor for this class.
 
-=head2 session
+=head3 session
 
 A WebGUI::Session object.
 
-=head2 colorId
+=head3 colorId
 
 The id of the color you want to instanciate. If you're creating a new color
 please use 'new' as id.
 
-=head2 properties
+=head3 properties
 
 A hashref containing configuration options to set this object to. All are also
 available through methods.
 
-=head3 name
+=head4 name
 
 The color name.
 
-=head3 fillTriplet
+=head4 fillTriplet
 
 The RGB triplet for the fill color. See setFillTriplet.
 
-=head3 fillAlpha
+=head4 fillAlpha
 
 The alpha value for the fill color. See setFillAlpha.
 
-=head3 strokeTriplet
+=head4 strokeTriplet
 
 The RGB triplet for the stroke color. See setStrokeTriplet.
 
-=head3 strokeAlpha
+=head4 strokeAlpha
 
 The alpha value for the stroke color. See setStrokeAlpha.
 
@@ -275,16 +288,17 @@ sub new {
 }
 
 #-------------------------------------------------------------------
-=head1 newByPalette ( session, paletteId )
+
+=head2 newByPalette ( session, paletteId )
 
 Returns an arrayref containg instanciated WebGUI::Image::Color objects for each
 color in the sepcified palette.
 
-=head2 session
+=head3 session
 
 A WebGUI::Session object.
 
-=head2 paletteId
+=head3 paletteId
 
 The id of the palette that is to be loaded.
 
@@ -309,7 +323,8 @@ sub newByPalette {
 }
 
 #-------------------------------------------------------------------
-=head1 session
+
+=head2 session ( )
 
 Returns the WebGUI::Session object;
 
@@ -322,11 +337,12 @@ sub session {
 }
 
 #-------------------------------------------------------------------
-=head1 setFillColor ( quartet )
+
+=head2 setFillColor ( quartet )
 
 Sets the the fill color to the specified quartet.
 
-=head2 quartet
+=head3 quartet
 
 The quartet consists of R, G, B and Alpha values respectively in HTML format: '#rrggbbaa'.
 
@@ -345,11 +361,12 @@ sub setFillColor {
 }
 
 #-------------------------------------------------------------------
-=head1 setFillTriplet ( triplet )
+
+=head2 setFillTriplet ( triplet )
 
 Sets the RGB triplet of the fill color.
 
-=head2 triplet
+=head3 triplet
 
 The RGB triplet in HTML format: '#rrggbb'.
 
@@ -368,11 +385,12 @@ sub setFillTriplet {
 }
 
 #-------------------------------------------------------------------
-=head1 setFillAlpha ( alpha )
+
+=head2 setFillAlpha ( alpha )
 
 Sets the alpha channel for the fill color.
 
-=head2 alpha
+=head3 alpha
 
 The alpha value in hexadecimal notation: 'ff';
 
@@ -391,11 +409,12 @@ sub setFillAlpha {
 }
 
 #-------------------------------------------------------------------
-=head1 setName ( name )
+
+=head2 setName ( name )
 
 Sets the name of this color.
 
-=head2 name
+=head3 name
 
 A scalar containing the name of this color.
 
@@ -410,11 +429,12 @@ sub setName {
 }
 
 #-------------------------------------------------------------------
-=head1 setStrokeColor ( quartet )
+
+=head2 setStrokeColor ( quartet )
 
 Sets the the stroke color to the specified quartet.
 
-=head2 quartet
+=head3 quartet
 
 The quartet consists of R, G, B and Alpha values respectively in HTML format: '#rrggbbaa'.
 
@@ -433,11 +453,12 @@ sub setStrokeColor {
 }
 
 #-------------------------------------------------------------------
-=head1 setStrokeTriplet ( triplet )
+
+=head2 setStrokeTriplet ( triplet )
 
 Sets the RGB triplet of the stroke color.
 
-=head2 triplet
+=head3 triplet
 
 The RGB triplet in HTML format: '#rrggbb'.
 
@@ -456,11 +477,12 @@ sub setStrokeTriplet {
 }
 
 #-------------------------------------------------------------------
-=head1 setStrokeAlpha ( alpha )
+
+=head2 setStrokeAlpha ( alpha )
 
 Sets the alpha channel for the stroke color.
 
-=head2 alpha
+=head3 alpha
 
 The alpha value in hexadecimal notation: 'ff';
 
@@ -479,7 +501,8 @@ sub setStrokeAlpha {
 }
 
 #-------------------------------------------------------------------
-=head1 update
+
+=head2 update ( )
 
 Will update the database to the current state of the object. If your object has
 not yet been saved to the database, you must first use the save method, which
@@ -501,7 +524,8 @@ sub update {
 }
 
 #-------------------------------------------------------------------
-=head1 save
+
+=head2 save ( )
 
 Will save the state of the object to the database if the color is not yet in the
 database. If it already is in the database this method will do exactly the same

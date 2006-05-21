@@ -92,7 +92,8 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
-=head2 getDisplayValue
+
+=head2 getDisplayValue ( )
 
 Returns the value that should be displayed initially.
 
@@ -105,7 +106,8 @@ sub getDisplayValue {
 }
 
 #-------------------------------------------------------------------
-=head2 getDisplayVariable
+
+=head2 getDisplayVariable ( )
 
 Returns the javascript variable for the td element used for display of the
 slider value.
@@ -122,7 +124,8 @@ sub getDisplayVariable {
 }
 
 #-------------------------------------------------------------------
-=head2 getInputElement
+
+=head2 getInputElement ( )
 
 Returns the form element used for manual input. You must overload this method.
 
@@ -135,7 +138,8 @@ sub getInputElement {
 }
 
 #-------------------------------------------------------------------
-=head2 getInputVariable
+
+=head2 getInputVariable ( )
 
 Returns the javascript variable for the input element tied to the slider.
 
@@ -151,7 +155,8 @@ sub getInputVariable {
 }
 
 #-------------------------------------------------------------------
-=head2 getOnChangeInputElement
+
+=head2 getOnChangeInputElement ( )
 
 This method should return the javascript code that should be executed on an
 onchange event of the input element. This should at the very least include
@@ -171,7 +176,8 @@ sub getOnChangeInputElement {
 }
 
 #-------------------------------------------------------------------
-=head2 getOnChangeSlider
+
+=head2 getOnChangeSlider ( )
 
 This method should return the javascript code that should be executed on an
 onchange event of the slider. This should at the very least include
@@ -191,7 +197,8 @@ sub getOnChangeSlider {
 }
 
 #-------------------------------------------------------------------
-=head2 getSliderMaximum
+
+=head2 getSliderMaximum ( )
 
 Returns the maximum value the slider can be set to in slider units.
 
@@ -204,7 +211,8 @@ sub getSliderMaximum {
 }
 
 #-------------------------------------------------------------------
-=head2 getSliderMinimum
+
+=head2 getSliderMinimum ( )
 
 Returns the minimum value the slider can be set to in slider units.
 
@@ -217,7 +225,8 @@ sub getSliderMinimum {
 }
 
 #-------------------------------------------------------------------
-=head2 getSliderValue
+
+=head2 getSliderValue ( )
 
 Returns the initial position of the slider in slider units.
 
@@ -230,7 +239,8 @@ sub getSliderValue {
 }
 
 #-------------------------------------------------------------------
-=head2 getSliderVariable
+
+=head2 getSliderVariable ( )
 
 Returns the javascript variable for the slider.
 

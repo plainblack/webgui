@@ -25,7 +25,8 @@ These methods are available from this class:
 =cut
 
 #-------------------------------------------------------------------
-=head2 getBackgroundColor
+
+=head2 getBackgroundColor ( )
 
 Returns the background color triplet. Defaults to #ffffff (white).
 
@@ -38,7 +39,8 @@ sub getBackgroundColor {
 }
 
 #-------------------------------------------------------------------
-=head2 getImageHeight
+
+=head2 getImageHeight ( )
 
 Returns the height of the image in pixels.
 
@@ -51,7 +53,8 @@ sub getImageHeight {
 }
 
 #-------------------------------------------------------------------
-=head2 getImageWidth
+
+=head2 getImageWidth ( )
 
 Returns the width in pixels of the image.
 
@@ -64,7 +67,8 @@ sub getImageWidth {
 }
 
 #-------------------------------------------------------------------
-=head2 getPalette
+
+=head2 getPalette ( )
 
 Returns the palette object this image is set to. Defaults to the default palette.
 
@@ -81,9 +85,10 @@ sub getPalette {
 }
 
 #-------------------------------------------------------------------
-=head2 getXOffset
 
-Returns the horizontal offset of the center, relative to which the image is drawn. 
+=head2 getXOffset ( )
+
+Returns the horizontal offset of the center, relative to which the image is drawn.
 Defaults to the physical center of the image.
 
 =cut
@@ -95,7 +100,8 @@ sub getXOffset {
 }
 
 #-------------------------------------------------------------------
-=head2 getYOffset
+
+=head2 getYOffset ( )
 
 Returns the vertical offset of the center, relative to which the image is drawn.
 Defaults to the physical center of the image.
@@ -109,7 +115,8 @@ sub getYOffset {
 }
 
 #-------------------------------------------------------------------
-=head2 image
+
+=head2 image ( )
 
 Returns the imagemagick object containing this image.
 
@@ -122,6 +129,7 @@ sub image {
 }
 
 #-------------------------------------------------------------------
+
 =head2 new ( session, [ width, height ] )
 
 Constructor for an image. Optionally you can pass the size of the image.
@@ -158,7 +166,8 @@ sub new {
 }
 
 #-------------------------------------------------------------------
-=head2 session
+
+=head2 session ( )
 
 Returns the the session object.
 
@@ -171,6 +180,7 @@ sub session {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setBackgroundColor ( colorTriplet )
 
 Sets the backgroundcolor. Using this method will erase everything that is
@@ -192,7 +202,8 @@ sub setBackgroundColor {
 }
 
 #-------------------------------------------------------------------
-=head2 setImageHeight ( height)
+
+=head2 setImageHeight ( height )
 
 Set the height of the image.
 
@@ -213,6 +224,7 @@ sub setImageHeight {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setImageWidth ( width )
 
 Set the width of the image.
@@ -234,6 +246,7 @@ sub setImageWidth {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setPalette ( palette )
 
 Set the palette object this image will use.
@@ -252,7 +265,8 @@ sub setPalette {
 }
 
 #-------------------------------------------------------------------
-=head2 saveToFileSystem ( path, [ filename ] );
+
+=head2 saveToFileSystem ( path, [ filename ] )
 
 Saves the image to the specified path and filename.
 
@@ -277,7 +291,8 @@ sub saveToFileSystem {
 
 # This doesn't seem to work...
 #-------------------------------------------------------------------
-=head2 saveToScalar
+
+=head2 saveToScalar ( )
 
 Returns a scalar containing the image contents.
 
@@ -297,6 +312,7 @@ sub saveToScalar {
 }
 
 #-------------------------------------------------------------------
+
 =head2 saveToStorageLocation ( storage, [ filename ] )
 
 Save the image to the specified storage location.
@@ -321,6 +337,7 @@ sub saveToStorageLocation {
 }
 
 #-------------------------------------------------------------------
+
 =head2 text ( properties )
 
 Extend the imagemagick Annotate method so alignment can be controlled better.

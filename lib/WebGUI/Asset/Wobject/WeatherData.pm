@@ -33,7 +33,8 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 
 
 #-------------------------------------------------------------------
-=head2 definition
+
+=head2 definition ( )
 
 defines wobject properties for WeatherData instances
 
@@ -73,7 +74,8 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
-=head2 _getLocationData
+
+=head2 _getLocationData ( )
 
 Accepts an array ref of locations, and returns 
 
@@ -108,6 +110,7 @@ sub _getLocationData {
 }
 
 #-------------------------------------------------------------------
+
 =head2 _chooseWeatherConditionsIcon ( currentSkyConditionsEnglish )
 
 Accepts a string that represents the current sky conditions.  Taken
@@ -146,7 +149,8 @@ if (isIn($currCond,'Haze')) {return 'mist';}
 }
 
 #-------------------------------------------------------------------
-=head2 _na( string )
+
+=head2 _na ( string )
 
 If string passed in is empty, returns N/A
 
@@ -165,6 +169,7 @@ sub _na {
 }
 	   
 #-------------------------------------------------------------------
+
 =head2 _trim (str)
 
    Trims whitespace form front and end of a string
@@ -201,6 +206,7 @@ sub prepareView {
 
 
 #-------------------------------------------------------------------
+
 =head2 view ( )
 
 method called by the www_view method.  Returns a processed template

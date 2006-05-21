@@ -106,28 +106,28 @@ sub www_editAd {
 		hoverHelp => $i18n->get("is active help"),
 		label=>$i18n->get("is active")
 		);
-	my $value = $ad->get("title") if defined $ad;
+	$value = $ad->get("title") if defined $ad;
 	$f->text(
 		name=>"title",
 		value=>$value,
 		hoverHelp => $i18n->get("title help"),
 		label=>$i18n->get("title")
 		);
-	my $value = $ad->get("url") if defined $ad;
+	$value = $ad->get("url") if defined $ad;
 	$f->url(
 		name=>"url",
 		value=>$value,
 		hoverHelp => $i18n->get("url help"),
 		label=>$i18n->get("url")
 		);
-	my $value = $ad->get("priority") if defined $ad;
+	$value = $ad->get("priority") if defined $ad;
 	$f->integer(
 		name=>"priority",
 		value=>$value,
 		hoverHelp => $i18n->get("priority help"),
 		label=>$i18n->get("priority"),
 		);
-	my $value = $ad->get("impressionsBought") if defined $ad;
+	$value = $ad->get("impressionsBought") if defined $ad;
 	$f->integer(
 		name=>"impressionsBought",
 		value=>$value,
@@ -135,7 +135,7 @@ sub www_editAd {
 		label=>$i18n->get("impressions bought"),
 		subtext=> defined $ad ? $i18n->get("used").": ".$ad->get("impressions") : undef
 		);
-	my $value = $ad->get("clicksBought") if defined $ad;
+	$value = $ad->get("clicksBought") if defined $ad;
 	$f->integer(
 		name=>"clicksBought",
 		value=>$value,
@@ -143,7 +143,7 @@ sub www_editAd {
 		label=>$i18n->get("clicks bought"),
 		subtext=> defined $ad ? $i18n->get("used").": ".$ad->get("clicks") : undef
 		);
-	my $value = $ad->get("type") if defined $ad;
+	$value = $ad->get("type") if defined $ad;
 	$f->selectBox(
 		name=>"type",
 		value=>$value,
@@ -157,7 +157,7 @@ sub www_editAd {
 		label=>$i18n->get("type")
 		);
 	$f->fieldSetStart($i18n->get("text"));
-	my $value = $ad->get("adText") if defined $ad;
+	$value = $ad->get("adText") if defined $ad;
 	$f->text(
 		name=>"adText",
 		size=>60,
@@ -165,7 +165,7 @@ sub www_editAd {
 		hoverHelp => $i18n->get("ad text help"),
 		label=>$i18n->get("ad text")
 		);
-	my $value = $ad->get("borderColor") if defined $ad;
+	$value = $ad->get("borderColor") if defined $ad;
 	$f->color(
 		name=>"borderColor",
 		value=>$value,
@@ -173,7 +173,7 @@ sub www_editAd {
 		hoverHelp => $i18n->get("border color help"),
 		label=>$i18n->get("border color")
 		);
-	my $value = $ad->get("textColor") if defined $ad;
+	$value = $ad->get("textColor") if defined $ad;
 	$f->color(
 		name=>"textColor",
 		value=>$value,
@@ -181,7 +181,7 @@ sub www_editAd {
 		hoverHelp => $i18n->get("text color help"),
 		label=>$i18n->get("text color")
 		);
-	my $value = $ad->get("backgroundColor") if defined $ad;
+	$value = $ad->get("backgroundColor") if defined $ad;
 	$f->color(
 		name=>"backgroundColor",
 		value=>$value,
@@ -202,7 +202,7 @@ sub www_editAd {
 	}
 	$f->fieldSetEnd;
 	$f->fieldSetStart($i18n->get("rich"));
-	my $value = $ad->get("richMedia") if defined $ad;
+	$value = $ad->get("richMedia") if defined $ad;
 	$f->codearea(
 		name=>"richMedia",
 		label=>$i18n->get("rich"),
@@ -290,21 +290,21 @@ sub www_editAdSpace {
 		hoverHelp => $i18n->get("name help"),
 		label=>$i18n->get("name")
 		);
-	my $value = $adSpace->get("title") if defined $adSpace;
+	$value = $adSpace->get("title") if defined $adSpace;
 	$f->text(
 		name=>"title",
 		value=>$value,
 		hoverHelp => $i18n->get("title help"),
 		label=>$i18n->get("title")
 		);
-	my $value = $adSpace->get("description") if defined $adSpace;
+	$value = $adSpace->get("description") if defined $adSpace;
 	$f->textarea(
 		name=>"description",
 		value=>$value,
 		hoverHelp => $i18n->get("description help"),
 		label=>$i18n->get("description")
 		);
-	my $value = $adSpace->get("width") if defined $adSpace;
+	$value = $adSpace->get("width") if defined $adSpace;
 	$f->integer(
 		name=>"width",
 		value=>$value,
@@ -312,7 +312,7 @@ sub www_editAdSpace {
 		hoverHelp => $i18n->get("width help"),
 		label=>$i18n->get("width")
 		);
-	my $value = $adSpace->get("height") if defined $adSpace;
+	$value = $adSpace->get("height") if defined $adSpace;
 	$f->integer(
 		name=>"height",
 		value=>$value,
@@ -340,7 +340,7 @@ sub www_editAdSpace {
 
 #-------------------------------------------------------------------
 
-=head2 www_editAdSpaceSave ()
+=head2 www_editAdSpaceSave ( )
 
 Save the www_editAdSpace method.
 

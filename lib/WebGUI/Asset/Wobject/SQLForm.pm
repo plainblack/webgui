@@ -27,6 +27,12 @@ use Tie::IxHash;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
 
+=head1 NAME
+
+Package WebGUI::Asset::Wobject::SQLForm
+
+=cut
+
 #-------------------------------------------------------------------
 # This hash contains the allowed database field types. Keys indicate the MySQL name of the field type and 
 # the values are the the way they are showed in the form.
@@ -476,9 +482,15 @@ my $typeFunctions = {
 	list		=> 'switchListField',
 };
 
+=head1 METHODS
+
+These methods are available from this class:
+
+=cut
 
 #-------------------------------------------------------------------
-=head1 _canAlterTable
+
+=head2 _canAlterTable ( )
 
 Returns a boolean indicating whether the user is allowed to change (alter) the table structure. Ie. manage field etc.
 
@@ -491,7 +503,8 @@ sub _canAlterTable {
 }
 
 #-------------------------------------------------------------------
-=head1 _canEditRecord
+
+=head2 _canEditRecord ( )
 
 Returns a boolean indicating whether the user is allowed to edit, delete and restore records.
 
@@ -504,7 +517,8 @@ sub _canEditRecord {
 }
 
 #-------------------------------------------------------------------
-=head1 _canPurge
+
+=head2 _canPurge ( )
 
 Returns a boolean indictating whether the user is allowed to purge deleted records.
 
@@ -517,11 +531,12 @@ sub _canPurge {
 }
 
 #-------------------------------------------------------------------
-=head1 _constructColumnType ( fieldProperties )
+
+=head2 _constructColumnType ( fieldProperties )
 
 Will construct a MySQL column definition string from the field properties passed as argument.
 
-=head2 fieldProperties
+=head3 fieldProperties
 
 A hashref containing the properties of the field for which this column definition is made. Properties
 taken into account are: 
@@ -562,15 +577,16 @@ sub _constructColumnType {
 }
 
 #-------------------------------------------------------------------
-=head1 _createFieldType ( dbFieldType, formFieldType )
+
+=head2 _createFieldType ( dbFieldType, formFieldType )
 
 Inserts a new field type into the SQLForm_fieldTypes table.
 
-=head2 dbFieldType
+=head3 dbFieldType
 
 The column type connected to this field type.
 
-=head2 formFieldType
+=head3 formFieldType
 
 The form element to be used for this field type.
 
@@ -590,7 +606,8 @@ sub _createFieldType {
 }
 
 #-------------------------------------------------------------------
-=head1 _getDbLink
+
+=head2 _getDbLink ( )
 
 Returns a WebGUI::DatabaseLink object for the database the SQLForm table is in.
 
@@ -603,11 +620,12 @@ sub _getDbLink {
 }
 
 #-------------------------------------------------------------------
-=head1 _getFieldProperties ( fieldId )
+
+=head2 _getFieldProperties ( fieldId )
 
 Returns a hashref containing the properties of the field indicated by fieldId. 
 
-=head2 fieldId
+=head3 fieldId
 
 The id of the field of which the properties should be returned.
 
@@ -665,7 +683,8 @@ my		$sth = $dbLink->db->unconditionalRead($definition{sqlQuery}." order by ".$de
 }
 
 #-------------------------------------------------------------------
-=head1 _getDatabaseInfo
+
+=head2 _getDatabaseInfo ( )
 
 Returns a hashref containing all tables and columns including column properties in the database in which the SQLForm 
 resides.
@@ -702,7 +721,8 @@ sub _getDatabaseInfo {
 }
 
 #-------------------------------------------------------------------
-=head1 _getManagementLinks
+
+=head2 _getManagementLinks ( )
 
 Returns a string containg all of the management function the user is allowed to use.
 
@@ -724,16 +744,17 @@ sub _getManagementLinks {
 }
 
 #-------------------------------------------------------------------
-=head1 _matchField ( string, regexId )
+
+=head2 _matchField ( string, regexId )
 
 Excutes the regex identified by regexId on the string passed as first argument and return a boolean indicating 
 whether it is a match or not. Will return true if no regex id or a non-existing regex id is passed.
 
-=head2 string
+=head3 string
 
 The string to be matched.
 
-=head2 regexId
+=head3 regexId
 
 The id of the regex to used.
 
@@ -758,11 +779,12 @@ sub _matchField {
 }
 
 #-------------------------------------------------------------------
-=head1 _resolveFieldConstraintType ( type ) {
+
+=head2 _resolveFieldConstraintType ( type )
 
 Translates the numerical value used in field constraint types to a perl operator.
 
-=head2 type
+=head3 type
 
 The numerical id for the operator. If omitted this method will return a hasref containing
 all numerical <-> operator mappings.
@@ -782,7 +804,8 @@ sub _resolveFieldConstraintType {
 }
 
 #-------------------------------------------------------------------
-=head1 definition
+
+=head2 definition ( )
 
 The asset definition of the SQLForm.
 
@@ -848,7 +871,8 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
-=head1 uiLevel
+
+=head2 uiLevel ( )
 
 The uiLevel of the SQLForm asset. It is a power tool so the uiLevel is set to 9.
 
@@ -859,7 +883,8 @@ sub uiLevel {
 }
 
 #-------------------------------------------------------------------
-=head1 getAdminConsoleWithSubmenu
+
+=head2 getAdminConsoleWithSubmenu ( )
 
 Return the adminconsole but adds three submenu items for manage fields/field types/regexes.
 
@@ -879,7 +904,8 @@ sub getAdminConsoleWithSubmenu {
 }
 
 #-------------------------------------------------------------------
-=head1 getEditForm
+
+=head2 getEditForm ( )
 
 Creates the edit form of the SQLForm asset.
 
@@ -996,7 +1022,8 @@ sub getEditForm {
 }
 
 #-------------------------------------------------------------------
-=head1 getIndexerParams
+
+=head2 getIndexerParams ( )
 
 Should index the data in the table of this SQLForm. Not functional in 6.8.x due to a crippled 
 search framework.
@@ -1044,7 +1071,8 @@ sub getIndexerParams {
 }
 
 #-------------------------------------------------------------------
-=head1 getName
+
+=head2 getName ( )
 
 Return the internationalized name of the SQLForm.
 
@@ -1057,7 +1085,8 @@ sub getName {
 }
 
 #-------------------------------------------------------------------
-=head1 processPropertiesFromFormPost
+
+=head2 processPropertiesFromFormPost ( )
 
 Processes the data in the edit form of the SQLForm asset. In WebGUI 6.8.x there's no way to feed back any errors on 
 asset addition. Therefore if something is wrong this method will use die to stop the processing. This will heave the 
@@ -1171,7 +1200,7 @@ sub processPropertiesFromFormPost {
 			# __recordId and __revision are always unique and hence the pk.
 my %dropKeys;
 my $hasPrimaryKey = 0;
-			my $sth = $dbLink->db->read("show keys from $tableName");
+			$sth = $dbLink->db->read("show keys from $tableName");
 			while (my %row = $sth->hash) {
 				if ($row{Key_name} eq 'PRIMARY') {
 					$hasPrimaryKey = 1;
@@ -1257,7 +1286,8 @@ my $hasPrimaryKey = 0;
 }
 
 #-------------------------------------------------------------------
-=head1 purge
+
+=head2 purge ( )
 
 This method purges the Asset completely from the WebGUI instance.
 
@@ -1273,7 +1303,8 @@ sub purge {
 }
 
 #-------------------------------------------------------------------
-=head1 view
+
+=head2 view ( )
 
 The view function of the Asset.
 
@@ -1291,7 +1322,8 @@ sub view {
 }
 
 #-------------------------------------------------------------------
-=head1 www_deleteFieldType
+
+=head2 www_deleteFieldType ( )
 
 This will delete the field type with the id that is passed in a form param called 'ftid'.
 
@@ -1318,7 +1350,8 @@ sub www_deleteFieldType {
 }
 
 #-------------------------------------------------------------------
-=head1 www_deleteRecord
+
+=head2 www_deleteRecord ( )
 
 Will put the record with the id given by the form param 'rid', in the trash of the SQLForm.
 
@@ -1342,7 +1375,8 @@ sub www_deleteRecord {
 }
 
 #-------------------------------------------------------------------
-=head1 www_deleteRegex
+
+=head2 www_deleteRegex ( )
 
 Deletes the regex with the id given in the form param 'regexId'.
 
@@ -1363,7 +1397,8 @@ sub www_deleteRegex {
 }
 
 #-------------------------------------------------------------------
-=head1 www_disableField
+
+=head2 www_disableField ( )
 
 Will mark the field indicated by the id given by the form param 'fid' as deleted. This means
 that the field is not included in searches and edits. No data is actually purged though.
@@ -1385,7 +1420,8 @@ sub www_disableField {
 }
 
 #-------------------------------------------------------------------
-=head1 www_enableField
+
+=head2 www_enableField ( )
 
 Will mark the 'deleted' field identified by the id given in the form param 'fid' as normal again.
 
@@ -1401,7 +1437,8 @@ sub www_enableField {
 }
 
 #-------------------------------------------------------------------
-=head1 www_editField
+
+=head2 www_editField ( )
 
 Returns the 'edit field properties' form of the field attached to the id given in form param 'fid'. If fid is set
 to 'new' it will add a new field. The form generated relies heavily on three javascript files included in the 
@@ -1471,7 +1508,7 @@ my	%fieldTypes = $self->session->db->buildHash('select fieldTypeId, concat(formF
 		);
 	}
 	
-my	$tabForm = WebGUI::TabForm->new($self->session, undef, undef, $self->getUrl('func=listFields'));
+	$tabForm = WebGUI::TabForm->new($self->session, undef, undef, $self->getUrl('func=listFields'));
 	$tabForm->hidden({
 		name	=> 'func', 
 		value	=> 'editFieldSave'
@@ -1756,7 +1793,8 @@ my	$js = "<script type=\"text/javascript\">\n";
 }
 
 #-------------------------------------------------------------------
-=head1 www_editFieldSave
+
+=head2 www_editFieldSave ( )
 
 Processes and stores the field properties, and will alter the table according to these properties.
 
@@ -2028,7 +2066,8 @@ my		$regexName = $self->session->form->process("regex_name") || 'untitled';
 }
 
 #-------------------------------------------------------------------
-=head1 www_editFieldType
+
+=head2 www_editFieldType ( )
 
 Returns the form for editing field types. Only allows editing of field types that are not in use by 
 any SQLForm asset withing the instance. Pass the field type id through the form param 'ftid'. Pass
@@ -2104,7 +2143,8 @@ sub www_editFieldType {
 }
 
 #-------------------------------------------------------------------
-=head1 www_editFieldTypeSave
+
+=head2 www_editFieldTypeSave ( )
 
 Saves the field type properties entered in the form returned by www_editFieldType to the database. The form 
 param 'ftid' is used to pass the field type id. Setting the id to 'new' will create a new field type.
@@ -2127,21 +2167,22 @@ sub www_editFieldTypeSave {
 }
 		
 #-------------------------------------------------------------------
-=head1 _getFieldValue ( field, recordValues, readOnly )
+
+=head2 _getFieldValue ( field, recordValues, readOnly )
 
 Returns the the value for the field represented by the field hashref for the current record, If the record 
 has no value for this field it will return the default value. The returned value has the correct data type
 for the for element that belongs to the field.
 
-=head2 field
+=head3 field
 
 A hashref containing the field properties of this field.
 
-=head2 recordValues
+=head3 recordValues
 
 A hasref containg the values of this record.
 
-=head2
+=head3 readOnly
 
 A boolean indicating the value should be outputted in read only mode.
 
@@ -2187,28 +2228,27 @@ sub _getFieldValue {
 }
 
 #-------------------------------------------------------------------
-=head1 _getFormElement ( field, recordValues, readOnly )
+
+=head2 _getFormElement ( field, recordValues, readOnly )
 
 Returns the for element tied to this field.
 
-=head2 field
+=head3 field
 
 A hashref containing the field properties of this field.
 
-=head2 recordValues
+=head3 recordValues
 
 A hasref containg the values of this record.
 
-=head2
+=head3 readOnly
 
 A boolean indicating the value should be outputted in read only mode.
 
-
 =cut
 
-
 sub _getFormElement {
-	my ($fieldValue, $readOnly, $fieldParameters, $maxLength, $fieldType, $formElement, $cmd, $i18n);
+	my ($fieldValue, $fieldParameters, $maxLength, $fieldType, $formElement, $cmd, $i18n);
 	my $self = shift;
 	my $field = shift;
 	my $recordValues = shift;
@@ -2279,7 +2319,8 @@ sub _getFormElement {
 }
 
 #-------------------------------------------------------------------
-=head1 www_editRecord
+
+=head2 www_editRecord ( )
 
 Generates the record edit form for the record with the id given by the form param 'rid'. Setting rid to 'new' will
 cause a new record to be added. If the user is not allowed to edit but can view, this method will output in view
@@ -2404,7 +2445,8 @@ sub www_editRecord {
 }
 
 #-------------------------------------------------------------------
-=head1 www_editRecordSave
+
+=head2 www_editRecordSave ( )
 
 Will process and save the record data inputted in the form generated by www_editRecord. In errors occur they will 
 be fed back to www_editRecord. Set the record id using the form param 'rid', and use 'new' as id to add a new 
@@ -2608,7 +2650,8 @@ my 				$cmd = '$result = 0 if ($fieldValueCompare '.$self->_resolveFieldConstrai
 }
 
 #-------------------------------------------------------------------
-=head1 www_editRegex
+
+=head2 www_editRegex ( )
 
 Returns the form for editing regexes. Pass the id of the regex you want to edit in the form param 'regexId'. To 
 add a new regex pass 'new' for the regex id.
@@ -2676,7 +2719,8 @@ sub www_editRegex {
 }
 
 #-------------------------------------------------------------------
-=head1 www_editRegexSave
+
+=head2 www_editRegexSave ( )
 
 Saves the regex properties entered in the form generated by www_editRegex to the database. Pass the regex id 
 in the form param 'regexId'. Set the id to 'new' to add a regex.
@@ -2710,7 +2754,8 @@ sub www_editRegexSave {
 }
 	
 #-------------------------------------------------------------------
-=head1 www_listFields
+
+=head2 www_listFields ( )
 
 Shows the list of fields, including edit and delete buttons.
 
@@ -2763,7 +2808,8 @@ sub www_listFields {
 }
 
 #-------------------------------------------------------------------
-=head1 www_listFieldTypes
+
+=head2 www_listFieldTypes ( )
 
 Shows the list of field types.
 
@@ -2840,7 +2886,8 @@ my		$currentRow = '<tr align="left" bgcolor="#bbbbbb">';
 }
 
 #-------------------------------------------------------------------
-=head1 www_listRegexes
+
+=head2 www_listRegexes ( )
 
 Displays the list of regexes.
 
@@ -2917,7 +2964,8 @@ my		$currentRow = '<tr align="left" bgcolor="#bbbbbb">';
 }
 
 #-------------------------------------------------------------------
-=head1 www_moveFieldDown
+
+=head2 www_moveFieldDown ( )
 
 Moves the field one position to the end in the field ordering. The field id should be passed in the form param 'fid'.
 
@@ -2948,7 +2996,8 @@ sub www_moveFieldDown {
 }
 
 #-------------------------------------------------------------------
-=head1 www_moveFieldUp
+
+=head2 www_moveFieldUp ( )
 
 Moves the field one position to the beginning in the field ordering. The field id should be passed in the form param 'fid'.
 
@@ -2979,7 +3028,8 @@ sub www_moveFieldUp {
 }
 
 #-------------------------------------------------------------------
-=head1 www_purgeRecord
+
+=head2 www_purgeRecord ( )
 
 Will purge a record from the record trash. The id of the record must be passed in form param 'rid'.
 
@@ -3002,11 +3052,13 @@ sub www_purgeRecord {
 }
 
 #-------------------------------------------------------------------
-=head1 www_purgeTrash
+
+=head2 www_purgeTrash ( )
 
 Purges every record that is in the record trash.
 
 =cut
+
 sub www_purgeTrash {
 	my $self = shift;
 
@@ -3020,7 +3072,8 @@ sub www_purgeTrash {
 }
 
 #-------------------------------------------------------------------
-=head1 www_viewHistory
+
+=head2 www_viewHistory ( )
 
 Shows the history of a record. The record id should be passed through the form param 'rid'.
 
@@ -3082,7 +3135,8 @@ sub www_viewHistory {
 }
 
 #-------------------------------------------------------------------
-=head1 www_viewFile
+
+=head2 www_viewFile ( )
 
 Returns the file saved in a file upolad field, and sets the mime-type to the correct value. Pass the record id
 via form param 'rid' and the field id of the upload field through form param 'fid'. Optionally you can pass the 
@@ -3126,7 +3180,8 @@ sub www_viewFile {
 }
 
 #-------------------------------------------------------------------
-=head1 www_restoreRecord
+
+=head2 www_restoreRecord ( )
 
 Restores a record in the record trash. Pass the record id through for param 'rid'.
 
@@ -3154,7 +3209,8 @@ sub www_restoreRecord {
 }
 
 #-------------------------------------------------------------------
-=head1 www_search
+
+=head2 www_search ( )
 
 Generates the normal search form.
 
@@ -3368,7 +3424,8 @@ my		$sql = $self->_constructSearchQuery(\@searchIn, \@showFields, \%fieldPropert
 }
 
 #-------------------------------------------------------------------
-=head1 www_processAjaxRequest
+
+=head2 www_processAjaxRequest ( )
 
 Returns an XML string containing database information, depending on the form params passed. If you pass a database
 name in form param 'dbName' only, this method will return an XML string containing the tables available within that
@@ -3426,15 +3483,16 @@ my		@zut;
 }
 
 #-------------------------------------------------------------------
-=head1 _constructSearchForm ( fieldList, fieldProperties )
+
+=head2 _constructSearchForm ( fieldList, fieldProperties )
 
 Returns the form for super search.
 
-=head2 fieldList
+=head3 fieldList
 
 Arrayref containing the field that should be included in the search.
 
-=head2 fieldProperties
+=head3 fieldProperties
 
 Hashref containing the properties of the fields that are in the search.
 
@@ -3596,19 +3654,20 @@ my		$cmd = "WebGUI::Form::$searchElement".'($self->session, $parameters)';
 }
 
 #-------------------------------------------------------------------
-=head1 _constructSearchQuery ( searchInFields, showFields, fieldProperties )
+
+=head2 _constructSearchQuery ( searchInFields, showFields, fieldProperties )
 
 Constructs an SQL query from the search query
 
-=head2 searchInFields
+=head3 searchInFields
 
 Arrayref containing the field id's that should be included in the search.
 
-=head2 showFields
+=head3 showFields
 
 List of field id's that should be shown in the results.
 
-=head2 fieldProperties
+=head3 fieldProperties
 
 Hashref containing the properties of the fields that are in the search.
 
@@ -3766,19 +3825,20 @@ my	$sortAscending = $self->session->form->process("sortAscending");
 }
 
 #-------------------------------------------------------------------
-=head1 _processSearchQuery ( sth, showFields, fieldProperties )
+
+=head2 _processSearchQuery ( sth, showFields, fieldProperties )
 
 Processes the results of a search query and returns an arrayref suitable for use as a template loop.
 
-=head2 sth
+=head3 sth
 
 Statement handle of the executed query.
 
-=head2 showFields
+=head3 showFields
 
 List of field id's that should be shown in the results.
 
-=head2 fieldProperties
+=head3 fieldProperties
 
 Hashref containing the properties of the fields that are in the search.
 
@@ -3862,7 +3922,8 @@ my			$value;
 }
 
 #-------------------------------------------------------------------
-=head1 www_superSearch
+
+=head2 www_superSearch
 
 Returns the super search.
 

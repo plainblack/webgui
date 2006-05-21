@@ -35,7 +35,6 @@ use WebGUI::Session::Stow;
 use WebGUI::Session::Style;
 use WebGUI::Session::Url;
 use WebGUI::Session::Var;
-use Data::Dumper;
 
 =head1 NAME
 
@@ -145,7 +144,7 @@ sub config {
 
 #-------------------------------------------------------------------
 
-=head2 datetime ()
+=head2 datetime ( )
 
 Returns a WebGUI::Session::DateTime object.
 

@@ -53,7 +53,6 @@ This package provides an object-oriented way of managing WebGUI groups and group
  $string =     	$g->name("Nerds");
  $string =     	$g->scratchFilter("www_location=International;somesetting=1");
  $boolean = 	$g->showInForms(1);
- 
 
  $g->addGroups(\@arr);
  $g->addUsers(\@arr, $expireOffset);
@@ -696,6 +695,7 @@ and in any group that belongs to this group.
 A boolean that if set true will return the users list minus the expired groupings.
 
 =cut
+
 sub getAllUsers {
 	my $self = shift;
 	my $withoutExpired = shift;
@@ -742,6 +742,7 @@ like IP address, LDAP, dbQuery or scratchFilter.
 A boolean that if set true will return the users list minus the expired groupings.
 
 =cut
+
 sub getUsers {
 	my $self = shift;
 	my $withoutExpired = shift;

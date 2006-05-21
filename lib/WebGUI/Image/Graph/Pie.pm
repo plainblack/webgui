@@ -33,6 +33,7 @@ These methods are available from this class:
 =cut
 
 #-------------------------------------------------------------------
+
 =head2 _mod2pi ( angle )
 
 Returns the angle modulo 2*pi.
@@ -258,6 +259,7 @@ sub addSlice {
 }
 
 #-------------------------------------------------------------------
+
 =head2 calcCoordinates ( slice )
 
 Calcs the coordinates of the corners of the given pie slice.
@@ -296,7 +298,8 @@ sub calcCoordinates {
 }
 
 #-------------------------------------------------------------------
-=head2 configurationForm
+
+=head2 configurationForm ( )
 
 The configuration form part for this object. See WebGUI::Image::Graph for
 documentation.
@@ -387,7 +390,8 @@ my	$configForms = $self->SUPER::configurationForm;
 }
 
 #-------------------------------------------------------------------
-=head2 draw
+
+=head2 draw ( )
 
 Draws the pie chart.
 
@@ -452,6 +456,7 @@ sub draw {
 }
 
 #-------------------------------------------------------------------
+
 =head2 drawBottom ( slice )
 
 Draws the bottom of the given pie slice.
@@ -470,6 +475,7 @@ sub drawBottom {
 }
 
 #-------------------------------------------------------------------
+
 =head2 drawLabel ( slice )
 
 Draws the label including stick if needed for the given pie slice.
@@ -563,6 +569,7 @@ sub drawLabel {
 }
 
 #-------------------------------------------------------------------
+
 =head2 drawLeftSide ( slice )
 
 Draws the side connected to the startpoint of the slice.
@@ -581,6 +588,7 @@ sub drawLeftSide {
 }
 
 #-------------------------------------------------------------------
+
 =head2 drawPieSlice ( slice, offset, fillColor )
 
 Draws a pie slice shape, ie. the bottom or top of a slice.
@@ -638,6 +646,7 @@ sub drawPieSlice {
 }
 
 #-------------------------------------------------------------------
+
 =head2 drawRightSide ( slice )
 
 Draws the side connected to the endpoint of the slice.
@@ -656,6 +665,7 @@ sub drawRightSide {
 }
 
 #-------------------------------------------------------------------
+
 =head2 drawRim ( slice )
 
 Draws the rim of the slice.
@@ -708,6 +718,7 @@ sub drawRim {
 }
 
 #-------------------------------------------------------------------
+
 =head2 drawSide ( slice, [ cornerName ], [ fillColor ] )
 
 Draws the sides connecting the rim and tip of a pie slice.
@@ -767,6 +778,7 @@ sub drawSide {
 }
 
 #-------------------------------------------------------------------
+
 =head2 drawBottom ( slice )
 
 Draws the bottom of the given pie slice.
@@ -785,7 +797,8 @@ sub drawTop {
 }
 
 #-------------------------------------------------------------------
-=head2 formNamespace
+
+=head2 formNamespace ( )
 
 Extends the form namespace for this object. See WebGUI::Image::Graph for
 documentation.
@@ -799,7 +812,8 @@ sub formNamespace {
 }
 
 #-------------------------------------------------------------------
-=head2 getBottomHeight
+
+=head2 getBottomHeight ( )
 
 Returns the thickness of the bottom. Defaults to 0.
 
@@ -812,7 +826,8 @@ sub getBottomHeight {
 }
 
 #-------------------------------------------------------------------
-=head2 getConfiguration
+
+=head2 getConfiguration ( )
 
 Returns a configuration hashref. See WebGUI::Image::Graph for documentation.
 
@@ -837,7 +852,8 @@ sub getConfiguration {
 }
 
 #-------------------------------------------------------------------
-=head2 getDataset
+
+=head2 getDataset ( )
 
 Returns the first dataset that is added. Pie charts can only handle one dataset
 and therefore the first added dataset is used.
@@ -851,7 +867,8 @@ sub getDataset {
 }
 
 #-------------------------------------------------------------------
-=head2 getExplosionLength
+
+=head2 getExplosionLength ( )
 
 Returns the explosion length. This value indicates how much a slice will be
 shifted from the center of the pie. Defaults to 0.
@@ -865,7 +882,8 @@ sub getExplosionLength {
 }
 
 #-------------------------------------------------------------------
-=head2 getLabels
+
+=head2 getLabels ( )
 
 Returns an arrayref containing the labels that belong to the slices.
 
@@ -878,7 +896,8 @@ sub getLabels {
 }
 
 #-------------------------------------------------------------------
-=head2 getLabelPosition
+
+=head2 getLabelPosition ( )
 
 Returns the position of the labels relative to the thickness of the pie.
 Allowed positions are 'bottom', 'center' and 'top'. Defaults to 'top'.
@@ -892,7 +911,8 @@ sub getLabelPosition {
 }
 
 #-------------------------------------------------------------------
-=head2 getPieMode
+
+=head2 getPieMode ( )
 
 Returns the mode in which the pie is drawn. Currently available are 'normal' and
 'stepped'. The latter mode draws each pie slice with a smaller thickness,
@@ -908,7 +928,8 @@ sub getPieMode {
 }
 
 #-------------------------------------------------------------------
-=head2 getRadius
+
+=head2 getRadius ( )
 
 Returns the radius of the pie in pixels. Defaults to 80.
 
@@ -921,7 +942,8 @@ sub getRadius {
 }
 
 #-------------------------------------------------------------------
-=head2 getScaleFactor
+
+=head2 getScaleFactor ( )
 
 Returns the factor with which the pies that are added afterwards should be
 scaled. In effect this will cause the radius of the slice to grow or shrink, and
@@ -938,6 +960,7 @@ sub getScaleFactor {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getSlice ( [ sliceNumber ] )
 
 Returns the sliceNumber'th slice properties hashref. Defaults to the slice last
@@ -948,6 +971,7 @@ added.
 The index of the slice you want.
 
 =cut
+
 sub getSlice {
 	my $self = shift;
 	my $slice = shift || (scalar(@{$self->{_slices}}) - 1);
@@ -956,7 +980,8 @@ sub getSlice {
 }
 
 #-------------------------------------------------------------------
-=head2 getStartAngle
+
+=head2 getStartAngle ( )
 
 Rteurn the initial angle of the first slice. In effect all slices are rotated by
 this value.
@@ -970,7 +995,8 @@ sub getStartAngle {
 }
 
 #-------------------------------------------------------------------
-=head2 getStickColor
+
+=head2 getStickColor ( )
 
 Returns the color of the sticks connecting pie and labels. Defaults to #333333.
 
@@ -983,7 +1009,8 @@ sub getStickColor {
 }
 
 #-------------------------------------------------------------------
-=head2 getStickLength
+
+=head2 getStickLength ( )
 
 Return the length of the sticks connecting the labels with the pie. Defaults to
 0.
@@ -997,7 +1024,8 @@ sub getStickLength {
 }
 
 #-------------------------------------------------------------------
-=head2 getStickOffset
+
+=head2 getStickOffset ( )
 
 Returns the distance between the label sticks and the pie. Defaults to 0.
 
@@ -1010,7 +1038,8 @@ sub getStickOffset {
 }
 
 #-------------------------------------------------------------------
-=head2 getTiltAngle
+
+=head2 getTiltAngle ( )
 
 Returns the angle between the screen and the pie chart. Valid angles are 0 to 90
 degrees. Zero degrees results in a 2d pie where other values will generate a 3d
@@ -1027,7 +1056,8 @@ sub getTiltAngle {
 }
 
 #-------------------------------------------------------------------
-=head2 getTopHeight
+
+=head2 getTopHeight ( )
 
 Returns the thickness of the top of the pie in pixels. Defaults to 20 pixels.
 
@@ -1041,7 +1071,8 @@ sub getTopHeight {
 }
 
 #-------------------------------------------------------------------
-=head2 hasShadedSides
+
+=head2 hasShadedSides ( )
 
 A boolean value indicating whether the sides and the rim of the pie should be
 drawn with a darkened color.
@@ -1055,7 +1086,8 @@ sub hasShadedSides {
 }
 
 #-------------------------------------------------------------------
-=head2 new
+
+=head2 new ( )
 
 Contstructor. See SUPER classes for additional parameters.
 
@@ -1071,7 +1103,8 @@ sub new {
 }
 
 #-------------------------------------------------------------------
-=head2 processDataset
+
+=head2 processDataset ( )
 
 Takes the dataset and takes the necesarry steps for the pie to be drawn.
 
@@ -1101,6 +1134,7 @@ sub processDataset {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setBottomHeight ( thickness )
 
 Sets the thickness of the bottom.
@@ -1119,6 +1153,7 @@ sub setBottomHeight {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setCenter( [ xOffset ], [ yOffset ] )
 
 Sets the offset of the center of the graph relative to the center of the image.
@@ -1143,6 +1178,7 @@ sub setCenter {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setConfiguration ( config )
 
 Applies the settings in the given configuration hash. See WebGUI::Image::Graph
@@ -1175,6 +1211,7 @@ sub setConfiguration {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setExplosionLength ( length )
 
 Sets the explosion length. This value indicates how much a slice will be
@@ -1194,6 +1231,7 @@ sub setExplosionLength {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setLabelPosition ( position )
 
 Sets the position of the labels relative to the thickness of the pie.
@@ -1213,6 +1251,7 @@ sub setLabelPosition {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setPieMode ( mode )
 
 Sets the mode in which the pie is drawn. Currently available are 'normal' and
@@ -1234,6 +1273,7 @@ sub setPieMode {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setRadius ( radius )
 
 Sets the radius of the pie in pixels. Defaults to 80.
@@ -1254,6 +1294,7 @@ sub setRadius {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setScaleFactor ( multiplier )
 
 Sets the factor with which the pies that are added afterwards should be
@@ -1276,6 +1317,7 @@ sub setScaleFactor {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setStartAngle ( angle )
 
 Sets the initial angle of the first slice. In effect all slices are rotated by
@@ -1295,6 +1337,7 @@ sub setStartAngle {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setShadedSides ( shaded )
 
 A boolean value indicating whether the sides and the rim of the pie should be
@@ -1314,6 +1357,7 @@ sub setShadedSides {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setStickColor ( color )
 
 Sets the color of the sticks connecting pie and labels. Defaults to #333333.
@@ -1332,6 +1376,7 @@ sub setStickColor {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setStickLength ( length )
 
 Sets the length of the sticks connecting the labels with the pie. Defaults to
@@ -1351,6 +1396,7 @@ sub setStickLength {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setStickOffset ( offset )
 
 Sets the distance between the label sticks and the pie. Defaults to 0.
@@ -1369,6 +1415,7 @@ sub setStickOffset {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setTiltAngle ( angle )
 
 Sets the angle between the screen and the pie chart. Valid angles are 0 to 90
@@ -1394,6 +1441,7 @@ sub setTiltAngle {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setTopHeight ( thickness )
 
 Sets the thickness of the top of the pie in pixels. Defaults to 20 pixels.
@@ -1412,6 +1460,7 @@ sub setTopHeight {
 }
 
 #-------------------------------------------------------------------
+
 =head2 sortSlices
 
 A sort routine for sorting the slices in drawing order. Must be run from within

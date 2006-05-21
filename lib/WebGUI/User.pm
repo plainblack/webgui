@@ -252,6 +252,7 @@ Returns a boolean (0|1) value signifying that the user has the required privileg
 The group that you wish to verify against the user. Defaults to group with Id 3 (the Admin group).
 
 =cut
+
 sub isInGroup {
         my (@data, $groupId);
         my ($self, $gid, $secondRun) = @_;
@@ -458,7 +459,7 @@ sub newByEmail {
 
 #-------------------------------------------------------------------
 
-=head2 profileField ( fieldName [ value ] )
+=head2 profileField ( fieldName [, value ] )
 
 Returns a profile field's value. If "value" is specified, it also sets the field to that value. 
 

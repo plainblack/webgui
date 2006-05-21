@@ -147,7 +147,6 @@ sub getSessionVars {
    return ($session) unless (scalar(@vars) > 0);
    
    my @list = ();
-   my $session = $self->session;
    push(@list, $session);
    
    foreach my $var (@vars) {
@@ -713,7 +712,6 @@ sub _buildRow {
 	my $self = shift;
 	my ($session,$dt,$i18n,$eh,$form,$db,$user) = $self->getSessionVars("datetime","i18n","errorHandler","form","db","user");
 	
-	my $var = {};
 	my $entry = $_[0] || {};
 	my $rowCount = $_[1];
 	my $daysInWeek = $_[2];
@@ -746,7 +744,7 @@ sub _buildRow {
 				});
 	
 	my $taskName = "taskId_$rowCount";
-	my $taskId = "taskId_".$rowCount."_formId";
+	$taskId = "taskId_".$rowCount."_formId";
 	$var->{'form.project'} = WebGUI::Form::selectBox($session,{
 	            -name=>"projectId_$rowCount",
 				-options=>$projectList,

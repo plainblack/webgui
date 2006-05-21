@@ -59,7 +59,8 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
-=head2 getDisplayValue
+
+=head2 getDisplayValue ( )
 
 Returns the value that should be displayed initially.
 
@@ -72,7 +73,8 @@ sub getDisplayValue {
 }
 
 #-------------------------------------------------------------------
-=head2 getInputElement
+
+=head2 getInputElement ( )
 
 Returns the form element used for manual input.
 
@@ -91,7 +93,8 @@ sub getInputElement {
 }
 
 #-------------------------------------------------------------------
-=head2 getOnChangeInputElement
+
+=head2 getOnChangeInputElement ( )
 
 Returns the javascript code to update the slider and other form elements on a
 change of the imput element.
@@ -107,7 +110,8 @@ sub getOnChangeInputElement {
 }
 
 #-------------------------------------------------------------------
-=head2 getOnChangeSlider
+
+=head2 getOnChangeSlider ( )
 
 Returns the javascript code to update the form on a change of slider position.
 
@@ -122,7 +126,8 @@ sub getOnChangeSlider {
 }
 
 #-------------------------------------------------------------------
-=head2 getSliderMaximum
+
+=head2 getSliderMaximum ( )
 
 Returns the maximum value the slider can be set to in slider units.
 
@@ -135,7 +140,8 @@ sub getSliderMaximum {
 }
 
 #-------------------------------------------------------------------
-=head2 getSliderMinimum
+
+=head2 getSliderMinimum ( )
 
 Returns the minimum value the slider can be set to in slider units.
 
@@ -148,7 +154,8 @@ sub getSliderMinimum {
 }
 
 #-------------------------------------------------------------------
-=head2 getSliderValue
+
+=head2 getSliderValue ( )
 
 Returns the initial position of the slider in slider units.
 
@@ -188,7 +195,6 @@ sub getValueFromPost {
 
 	return WebGUI::Form::selectList->new($self->session, $properties)->getValueFromPost;
 }
-
 
 
 1;

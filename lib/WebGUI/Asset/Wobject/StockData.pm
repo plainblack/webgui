@@ -19,6 +19,7 @@ use Finance::Quote;
 our @ISA = qw(WebGUI::Asset::Wobject);
 
 #-------------------------------------------------------------------
+
 =head2 _appendStockVars ( hash, data, symbol )
 
 Appends stock variables for the symbol passed in to the hash passed in
@@ -91,7 +92,8 @@ sub _appendStockVars {
 }
 
 #-------------------------------------------------------------------
-=head2 _na( string )
+
+=head2 _na ( string )
 
 If string passed in is empty, returns N/A
 
@@ -110,7 +112,8 @@ sub _na {
 }
 	   
 #-------------------------------------------------------------------
-=head2 _appendZero( intger )
+
+=head2 _appendZero( integer )
 
 Appends a zero to an integer if it is 0-9
 
@@ -130,7 +133,8 @@ sub _appendZero {
 }
 
 #-------------------------------------------------------------------
-=head2 _convertToEpoch (date,time)
+
+=head2 _convertToEpoch ( date, time )
 
 Converts the date and time returned by Finance::Quote to an epoch
 
@@ -163,13 +167,14 @@ sub _convertToEpoch {
 }
 
 #-------------------------------------------------------------------
+
 =head2 _getStocks ( stocks )
 
 Private method which retrieves stock information from the Finance::Quote package
 
 =head3 stocks
 
-list of stock symbols to find passed in as an array reference.  stock symbols should all be uppercase
+List of stock symbols to find passed in as an array reference.  Stock symbols should all be uppercase.
 
 =cut
 
@@ -187,6 +192,7 @@ sub _getStocks {
 }
 
 #-------------------------------------------------------------------
+
 =head2 _getStockSources (  )
 
 Private method which retrieves the list of available stock sources from Finance::Quote package
@@ -211,9 +217,10 @@ sub _getStockSources {
 }
 
 #-------------------------------------------------------------------
+
 =head2 _submenu
 
-renders the admin console view
+Renders the admin console view
 
 =cut
 
@@ -229,9 +236,10 @@ sub _submenu {
 }
 
 #-------------------------------------------------------------------
-=head2 _trim (str)
 
-   Trims whitespace form front and end of a string
+=head2 _trim ( str )
+
+Trims whitespace form front and end of a string
 
 =head3 str
 
@@ -248,7 +256,8 @@ sub _trim {
 }
 
 #-------------------------------------------------------------------
-=head2 definition
+
+=head2 definition ( )
 
 defines wobject properties for Stock Data instances
 
@@ -292,9 +301,10 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getEditForm
 
-returns the tabform object that will be used in generating the edit page for Stock Lists
+Returns the tabform object that will be used in generating the edit page for Stock Lists
 
 =cut
 
@@ -362,6 +372,7 @@ sub prepareView {
 
 
 #-------------------------------------------------------------------
+
 =head2 purge ( )
 
 removes collateral data associated with a StockData when the system
@@ -375,6 +386,7 @@ sub purge {
 }
 
 #-------------------------------------------------------------------
+
 =head2 view ( )
 
 method called by the www_view method.  Returns a processed template
@@ -424,6 +436,7 @@ sub view {
 }
 
 #-------------------------------------------------------------------
+
 =head2 www_displayStock ( )
 
 Web facing method which allows users to view details about their stocks

@@ -8,7 +8,6 @@ use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::SQL;
 use WebGUI::Asset::Wobject;
-use Data::Dumper;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
 

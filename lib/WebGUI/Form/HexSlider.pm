@@ -66,7 +66,6 @@ Pad the value to padLength characters by adding zeros in front if necesarry.
 
 Flag that tells the User Profile system that this is a valid form element in a User Profile
 
-
 =cut
 
 sub definition {
@@ -98,7 +97,8 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
-=head2 getInputElement
+
+=head2 getInputElement ( )
 
 Returns the form element used for manual input.
 
@@ -116,7 +116,8 @@ sub getInputElement {
 }
 
 #-------------------------------------------------------------------
-=head2 getOnChangeInputElement
+
+=head2 getOnChangeInputElement ( )
 
 Returns the javascript code to update the slider and other form elements on a
 change of the imput element.
@@ -137,7 +138,8 @@ sub getOnChangeInputElement {
 }
 
 #-------------------------------------------------------------------
-=head2 getOnChangeSlider
+
+=head2 getOnChangeSlider ( )
 
 Returns the javascript code to update the form on a change of slider position.
 
@@ -157,20 +159,22 @@ sub getOnChangeSlider {
 }
 
 #-------------------------------------------------------------------
-=head2 getSliderMaximum
 
-Returns the maximum value the slider can be set to in slider units.
-
-=cut
-
-sub getSliderMaximum {
-	my $self = shift;
-
-	return scalar(keys %{$self->get('options')}) - 1;
-}
+#=head2 getSliderMaximum ( )
+#
+#Returns the maximum value the slider can be set to in slider units.
+#
+#=cut
+#
+#sub getSliderMaximum {
+#	my $self = shift;
+#
+#	return scalar(keys %{$self->get('options')}) - 1;
+#}
 
 #-------------------------------------------------------------------
-=head2 getSliderMaximum
+
+=head2 getSliderMaximum ( )
 
 Returns the minimum value the slider can be set to in slider units.
 
@@ -183,7 +187,8 @@ sub getSliderMaximum {
 }
 
 #-------------------------------------------------------------------
-=head2 getSliderMaximum
+
+=head2 getSliderMinimum ( )
 
 Returns the minimum value the slider can be set to in slider units.
 
@@ -196,7 +201,8 @@ sub getSliderMinimum {
 }
 
 #-------------------------------------------------------------------
-=head2 getSliderValue
+
+=head2 getSliderValue ( )
 
 Returns the initial position of the slider in slider units.
 
@@ -209,6 +215,7 @@ sub getSliderValue {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getValueFromPost ( )
 
 Retrieves a value from a form GET or POST and returns it. If the value comes back as undef, this method will return the defaultValue instead.  Strip newlines/carriage returns from the value.

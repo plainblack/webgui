@@ -34,6 +34,7 @@ These methods are available from this class:
 =cut
 
 #-------------------------------------------------------------------
+
 =head2 addDataset ( dataset )
 
 Adds a dataset to the graph. Please not that not all graph types can handle
@@ -53,7 +54,8 @@ sub addDataset {
 }
 
 #-------------------------------------------------------------------
-=head2 configurationForm
+
+=head2 configurationForm ( )
 
 Returns a hashref containing the form where the properties of your graph type
 can be set. Your pluging should extend this method by append the form to the
@@ -129,6 +131,7 @@ sub configurationForm {
 }
 
 #-------------------------------------------------------------------
+
 =head2 drawLabel ( label, [ properties ] )
 
 Draws a label with your preferred properties. Defaults the font, font size and
@@ -160,7 +163,8 @@ sub drawLabel {
 }
 
 #-------------------------------------------------------------------
-=head2 formNamespace
+
+=head2 formNamespace ( )
 
 Returns the namespace used in the configuration form. You must extend this
 method by concatenating an underscore and the last part of your namespace to the
@@ -175,7 +179,8 @@ sub formNamespace {
 }
 
 #-------------------------------------------------------------------
-=head2 getConfiguration
+
+=head2 getConfiguration ( )
 
 Returns the configuration hashref of the plugin. You must extend this method by
 adding your configuration keys to the hashref returned by the SUPER method. To
@@ -205,6 +210,7 @@ sub getConfiguration {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getGraphingTab ( session, [ config ] )
 
 Returns the contents of the graphing tab you can add to your asset. 
@@ -332,6 +338,7 @@ EOS
 }
 
 #-------------------------------------------------------------------
+
 =head2 getDataset ( [ index ] )
 
 Returns the dataset indicated by index.
@@ -356,6 +363,7 @@ sub getDataset {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getLabel ( [ index ] )
 
 Returns the index'th label or an arrayref containing all labels.
@@ -376,6 +384,7 @@ sub getLabel {
 }
 	
 #-------------------------------------------------------------------
+
 =head2 getLabelColor
 
 Returns the triplet of the label color. Defaults to '#333333'.
@@ -389,6 +398,7 @@ sub getLabelColor {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getLabelDimensions ( text, [ properties ] )
 
 Returns a hashref containg the width and height in pixels of the passed text.
@@ -423,7 +433,8 @@ sub getLabelDimensions {
 }
 
 #-------------------------------------------------------------------
-=head2 getLabelFont
+
+=head2 getLabelFont ( )
 
 Returns the WebGUI::Image::Font object this image is set to. Defaults to the
 default font.
@@ -437,7 +448,8 @@ sub getLabelFont {
 }
 
 #-------------------------------------------------------------------
-=head2 getLabelFontSize
+
+=head2 getLabelFontSize ( )
 
 Returns the font size of the labels. Defaults to 20.
 
@@ -450,7 +462,8 @@ sub getLabelFontSize {
 }
 
 #-------------------------------------------------------------------
-=head2 getLabelOffset
+
+=head2 getLabelOffset ( )
 
 Returns the label offset. This is the distance between the label and the axis.
 Defaults to 10 pixels.
@@ -464,7 +477,8 @@ sub getLabelOffset {
 }
 
 #-------------------------------------------------------------------
-=head2 getMaxValueFromDataset
+
+=head2 getMaxValueFromDataset ( )
 
 Returns the highest value of all added datasets.
 
@@ -496,7 +510,8 @@ sub getMaxValueFromDataset {
 }
 
 #-------------------------------------------------------------------
-=head2 getPluginList
+
+=head2 getPluginList ( )
 
 Returns an arrayref containing the namespaces of the enabled graphing plugins.
 
@@ -510,6 +525,7 @@ sub getPluginList {
 }
 
 #-------------------------------------------------------------------
+
 =head2 load ( session, namespace )
 
 Instanciates an WebGUI::Graph object with the given namespace.
@@ -538,6 +554,7 @@ sub load {
 }
 
 #-------------------------------------------------------------------
+
 =head2 loadByConfiguration ( session, configuration )
 
 Loads a plugin defined by a configuration hash.
@@ -569,6 +586,7 @@ sub loadByConfiguration {
 }
 
 #-------------------------------------------------------------------
+
 =head2 processConfigurationForm ( session )
 
 Processes the configuration form that is submitted and returns the correct
@@ -599,6 +617,7 @@ my	$graph = $class->load($session, $namespace);
 }
 
 #-------------------------------------------------------------------
+
 =head2 setConfiguration ( config )
 
 Configures the pluging according to the configuration hashref that is passed.
@@ -627,6 +646,7 @@ sub setConfiguration {
 };
 
 #-------------------------------------------------------------------
+
 =head2 setLabelColor ( color )
 
 Sets the color triplet of the labels.
@@ -645,6 +665,7 @@ sub setLabelColor {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setLabelFont ( font )
 
 Set the label font.
@@ -663,6 +684,7 @@ sub setLabelFont {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setLabelFontSize ( size )
 
 Sets the font size of the labels.
@@ -681,6 +703,7 @@ sub setLabelFontSize {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setLabelOffset ( offset )
 
 Sets the label offset. This is the distance in pixels between the labels and the
@@ -700,6 +723,7 @@ sub setLabelOffset {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setLabels ( labels )
 
 Sets the labels for the datasets.
@@ -718,6 +742,7 @@ sub setLabels {
 }
 
 #-------------------------------------------------------------------
+
 =head2 wrapLabelToWidth ( text, maxWidth, [ properties ] )
 
 Wraps a text string onto multiple lines having a width of maxWidth.

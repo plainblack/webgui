@@ -32,6 +32,7 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 
 
 #-------------------------------------------------------------------
+
 =head2 definition
 
 defines wobject properties for MultiSearch instances
@@ -98,7 +99,7 @@ sub prepareView {
 
 #-------------------------------------------------------------------
 
-=head2 purgeCache ()
+=head2 purgeCache ( )
 
 See WebGUI::Asset::purgeCache() for details.
 
@@ -111,6 +112,7 @@ sub purgeCache {
 }
 
 #-------------------------------------------------------------------
+
 =head2 view ( )
 
 method called by the www_view method.  Returns a processed template
@@ -139,10 +141,9 @@ sub view {
        	return $out;
 }
 
-
 #-------------------------------------------------------------------
 
-=head2 www_view ()
+=head2 www_view ( )
 
 See WebGUI::Asset::Wobject::www_view() for details.
 

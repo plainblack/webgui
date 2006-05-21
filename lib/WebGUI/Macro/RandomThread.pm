@@ -1,4 +1,5 @@
 package WebGUI::Macro::RandomThread;
+
 =head1 LEGAL
 
  -------------------------------------------------------------------
@@ -18,7 +19,7 @@ use WebGUI::Asset;
 use WebGUI::Asset::Template;
 use WebGUI::Utility;
 
-=head1 NAME 
+=head1 NAME
 
 Package WebGUI::Macro::RandomThread
 

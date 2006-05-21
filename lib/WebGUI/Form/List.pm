@@ -62,6 +62,7 @@ sub alignmentSeparator {
 
 Parse a string for a list of options to present to the user.  This method
 will mainly be called from WebGUI::Form::DynamicField.
+
 =cut
 
 sub correctOptions {

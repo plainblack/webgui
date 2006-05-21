@@ -27,6 +27,7 @@ These methods are available from this class:
 =cut
 
 #-------------------------------------------------------------------
+
 =head2 addColor ( color )
 
 Adds a color to this palette. The color will be automatically saved or updated
@@ -54,7 +55,8 @@ sub addColor {
 }
 
 #-------------------------------------------------------------------
-=head2 canDelete
+
+=head2 canDelete ( )
 
 Returns true if this palette can be deleted.
 
@@ -68,7 +70,8 @@ sub canDelete {
 }
 
 #-------------------------------------------------------------------
-=head2 canEdit
+
+=head2 canEdit ( )
 
 Returns true if this palette can be edited.
 
@@ -81,7 +84,8 @@ sub canEdit {
 }
 
 #-------------------------------------------------------------------
-=head2 delete
+
+=head2 delete ( )
 
 Deletes the palette from the database. This is only possible if the canDelete
 method returns true.
@@ -104,6 +108,7 @@ sub delete {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getColor ( [ index ] )
 
 Returns the color at index in the palette. If index is not passed it will return
@@ -120,6 +125,7 @@ sub getColor {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getColorIndex ( color )
 
 Returns the index of color. If the color is not in the palette it will return
@@ -146,7 +152,8 @@ sub getColorIndex {
 }
 
 #-------------------------------------------------------------------
-=head2 getColorsInPalette
+
+=head2 getColorsInPalette ( )
 
 Returns a arrayref containing all color objects in the palette.
 
@@ -160,7 +167,8 @@ sub getColorsInPalette {
 }
 
 #-------------------------------------------------------------------
-=head2 getDefaultPaletteId
+
+=head2 getDefaultPaletteId ( )
 
 Returns the id of the default palette.
 
@@ -173,7 +181,8 @@ sub getDefaultPaletteId {
 }
 
 #-------------------------------------------------------------------
-=head2 getId
+
+=head2 getId ( )
 
 Returns the guid of this palette.
 
@@ -186,7 +195,8 @@ sub getId {
 }
 
 #-------------------------------------------------------------------
-=head2 getName
+
+=head2 getName ( )
 
 Returns the name of this palette.
 
@@ -199,7 +209,8 @@ sub getName {
 }
 
 #-------------------------------------------------------------------
-=head2 getNextColor
+
+=head2 getNextColor ( )
 
 Returns the next color in the palette relative to the internal palette index
 counter, and increases this counter to that color. If the counter already is at
@@ -219,7 +230,8 @@ sub getNextColor {
 }
 
 #-------------------------------------------------------------------
-=head2 getNumberOfColors
+
+=head2 getNumberOfColors ( )
 
 Returns the number of colors in the palette.
 
@@ -232,7 +244,8 @@ sub getNumberOfColors {
 }
 
 #-------------------------------------------------------------------
-=head2 getPaletteIndex
+
+=head2 getPaletteIndex ( )
 
 Returns the index the internal palette index counter is set to. Ie. it returns
 the current color.
@@ -246,7 +259,8 @@ sub getPaletteIndex {
 }
 
 #-------------------------------------------------------------------
-=head2 getPaletteList
+
+=head2 getPaletteList ( )
 
 Returns a hashref containing a list of all available palettes. The keys are the
 palette id's and the value are the names of the palettes.
@@ -261,7 +275,8 @@ sub getPaletteList {
 }
 
 #-------------------------------------------------------------------
-=head2 getPreviousColor
+
+=head2 getPreviousColor ( )
 
 Returns the previous color in the palette relative to the internal palette index
 counter, and decreases this counter to that color. If the counter already is at
@@ -281,7 +296,8 @@ sub getPreviousColor {
 }
 
 #-------------------------------------------------------------------
-=head2 new ( session, paletteId, [ name ])
+
+=head2 new ( session, paletteId, [ name ] )
 
 Constructor for this class. 
 
@@ -338,6 +354,7 @@ sub new {
 }
 
 #-------------------------------------------------------------------
+
 =head2 removeColor ( index )
 
 Removes color at index.
@@ -373,7 +390,8 @@ sub removeColor {
 }
 
 #-------------------------------------------------------------------
-=head2 session
+
+=head2 session ( )
 
 Returns the WebGUI::Session object.
 
@@ -386,6 +404,7 @@ sub session {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setColor ( index, color )
 
 Sets palette position index to color. This method will automatically save or
@@ -424,7 +443,8 @@ sub setColor {
 }
 
 #-------------------------------------------------------------------
-=head setName ( name )
+
+=head2 setName ( name )
 
 Set the name of this palette.
 
@@ -447,6 +467,7 @@ sub setName {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setPaletteIndex ( index )
 
 Set the internal palette index counter. In other words, it sets the current
@@ -472,6 +493,7 @@ sub setPaletteIndex {
 }
 
 #-------------------------------------------------------------------
+
 =head2 swapColors ( firstIndex, secondIndex )
 
 Swaps the position of two colors within the palette.

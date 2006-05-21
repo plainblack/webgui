@@ -41,7 +41,6 @@ Displays items and channels from RSS feeds.
 
 use WebGUI::Asset::Wobject::SyndicatedWobject;
 
-
 =head1 METHODS
 
 These methods are available from this class:
@@ -144,7 +143,7 @@ sub definition {
 
 sub _strip_html {
         #my ($data) = @_;
-        
+
         if (ref($_[0]) eq 'HASH') {
                 keys(%{$_[0]});
                 while (my ($name, $val) = each (%{$_[0]})) {
@@ -164,7 +163,7 @@ sub _strip_html {
 			$_[0] =~ s/\&amp;(?=(#[0-9]+|#x[0-9a-fA-F]+|\w+);)/&/g;
                 }
         }
-        
+
         return $_[0];
 }
 
@@ -174,7 +173,7 @@ sub _strip_html {
 
 sub _find_record {
         my ($data, $regex) = @_;
-        
+
         if (ref($data) eq 'HASH') {
                 # reset the hash before calling each()
                 keys(%{$data});
@@ -212,11 +211,11 @@ sub _find_record {
 
 sub _normalize_items {
         #my ($items) = @_;
-        
+
         # max number of words to take from description to fill in an empty 
         # title
         my $max_words = 10;
-        
+
         for my $item (@{$_[0]}) {
                 if ($item->{guid} && ($item->{guid} =~ /^http:\/\//i)) {
                         $item->{link} = $item->{guid};
@@ -230,7 +229,7 @@ sub _normalize_items {
                                   ' ...';
                         }
                 }
-                
+
                 # IE doesn't recognize &apos;
                 $item->{title} =~ s/&apos;/\'/;
                 $item->{description} =~ s/&apos;/\'/;
@@ -241,7 +240,7 @@ sub _normalize_items {
 sub _get_rss_data {
 	my $session = shift;
         my $url = shift;
-        
+
 	my $cache = WebGUI::Cache->new($session,'url:' . $url, 'RSS');
         my $rss_serial = $cache->get;
         my $rss = {};
@@ -268,7 +267,7 @@ sub _get_rss_data {
 			}
 				
 		}
-                
+
                 my $rss_lite = {};
                 eval {
                         XML::RSSLite::parseXML($rss_lite, \$xml);
@@ -279,7 +278,7 @@ sub _get_rss_data {
 			#but it SHOULDN'T have a major effect.
 			return undef;
                 }
-                
+
                 # make sure that the {channel} points to the channel 
                 # description record and that {items} points to the list 
                 # of items.  without this voodoo, different versions of 
@@ -295,7 +294,7 @@ sub _get_rss_data {
                         $session->errorHandler->warn("unable to find item info for url $url");
                         $rss->{items} = [];
 		}
-                
+
                 _strip_html($rss);
                  $rss->{items} = [ $rss->{items} ] unless (ref $rss->{items} eq 'ARRAY');
 
@@ -309,7 +308,7 @@ sub _get_rss_data {
                 #Default to an hour timeout
                 $cache->set(Storable::freeze($rss), 3600);
         }
-        
+
         return $rss;
 }
 
@@ -321,7 +320,7 @@ sub _get_rss_data {
 sub _assign_rss_dates {
 	my $session = shift;
         my ($items) = @_;
-        
+
         for my $item (@{$items}) {
                 my $key = 'dates:' . ($item->{guid} || $item->{title} || 
                                       $item->{description} || $item->{link});
@@ -343,20 +342,20 @@ sub _assign_rss_dates {
 # is the order the items are output.
 
 sub _create_grouped_items{
-    my($items,$rss_feeds,$maxHeadlines,$hasTermsRegex)=@_;
-    
-    _create_interleaved_items($items,$rss_feeds,$maxHeadlines,$hasTermsRegex);
-    
-    @$items=sort{$a->{'site_title'} cmp $b->{'site_title'}} @$items;
-    
-    #Loop through the items and output the "site_
-    my $siteTitleTracker;
-    foreach(@$items){
-	if($siteTitleTracker ne $_->{site_title}){
-	    $_->{new_rss_site}=1;
+	my($items,$rss_feeds,$maxHeadlines,$hasTermsRegex)=@_;
+
+	_create_interleaved_items($items,$rss_feeds,$maxHeadlines,$hasTermsRegex);
+
+	@$items=sort{$a->{'site_title'} cmp $b->{'site_title'}} @$items;
+
+	#Loop through the items and output the "site_
+	my $siteTitleTracker;
+	foreach (@$items) {
+		if ($siteTitleTracker ne $_->{site_title}) {
+			$_->{new_rss_site} = 1;
+		}
+		$siteTitleTracker = $_->{site_title};
 	}
-	$siteTitleTracker=$_->{site_title};
-    }
 }
 
 
@@ -365,7 +364,7 @@ sub _create_grouped_items{
 # and push in the items in "interleaved mode"
 # No need to return because we're doing everything by reference.
 
-sub _create_interleaved_items{
+sub _create_interleaved_items {
     my($items,$rss_feeds,$maxHeadlines,$hasTermsRegex)=@_;
     my $items_remain = 1;
     while((@$items < $maxHeadlines) && $items_remain){
@@ -379,7 +378,7 @@ sub _create_interleaved_items{
 		$item->{site_link}=$rss->{channel}->{link};
 		if(! $hasTermsRegex || _check_hasTerms($item,$hasTermsRegex)){
 		    push @{$items},$item;
-		} 
+		}
 		if (@{$rss->{items}}) {
 		    $items_remain = 1;
 		}
@@ -395,20 +394,20 @@ sub _create_interleaved_items{
 #
 
 sub _check_hasTerms{
-    my($item,$hasTermsRegex)=@_;
-    my $to_check=$item->{title}.$item->{description};
-    if( $to_check =~ /$hasTermsRegex/gism){
-	return 1;
-    } else {
-	return 0;
-    }
+	my($item,$hasTermsRegex)=@_;
+	my $to_check=$item->{title}.$item->{description};
+	if ($to_check =~ /$hasTermsRegex/gism) {
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 sub _make_regex{
-    my $terms=shift;
-    my @terms=split(/,/,$terms);
-    return join('|',@terms);
+	my $terms = shift;
+	my @terms = split(/,/,$terms);
+	return join('|',@terms);
 }
 
 
@@ -437,7 +436,7 @@ sub _get_items {
 	my $self = shift;
 	my $urls = shift;
 	my $maxHeadlines = shift || $self->getValue('maxHeadlines');
-        
+
 	my $displayMode=$self->getValue('displayMode');
 
 	my $hasTermsRegex=_make_regex($self->getValue('hasTerms'));
@@ -449,7 +448,7 @@ sub _get_items {
 	my @rss_feeds;
         if (!$items) {
                 $items = [];
-                
+
                 for my $url (@{$urls}) {
 		    my $rss_info=_get_rss_data($self->session,$url);
 		    push(@rss_feeds, $rss_info) if($rss_info);
@@ -463,12 +462,12 @@ sub _get_items {
 		} else {
 		    _create_interleaved_items($items,\@rss_feeds,$maxHeadlines,$hasTermsRegex);
 		}
-                
+
                 #@{$items} = sort { $b->{date} <=> $a->{date} } @{$items};
-                
+
                 $cache->set(Storable::freeze($items), 3600);
 	    }
-        
+
 	#So return the item loop and the first RSS feed, because 
 	#when we're parsing a single feed we can use that feed's title and 
 	#description for channel.title, channel.link, and channel.description
@@ -495,7 +494,7 @@ sub prepareView {
 
 #-------------------------------------------------------------------
 
-=head2 purgeCache ()
+=head2 purgeCache ( )
 
 See WebGUI::Asset::purgeCache() for details.
 
@@ -507,8 +506,9 @@ sub purgeCache {
 	$self->SUPER::purgeCache;
 }
 
-#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-=head2 view()
+#-------------------------------------------------------------------
+
+=head2 view ( )
 
 Returns the rendered output of the wobject.
 
@@ -572,14 +572,14 @@ sub view {
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 sub _constructRSSHeadTitleLink{
 	my $self = shift;
-    my($var,$rssTitle)=@_;
+	my($var,$rssTitle)=@_;
 	my $i18n = WebGUI::International->new($self->session,'Asset_SyndicatedContent');
-    my $rssFeedSuffix=$i18n->get('RSS Feed Title Suffix');
-    my $title = ($rssTitle) ? ($rssTitle." ".$rssFeedSuffix) : $rssFeedSuffix;
+	my $rssFeedSuffix=$i18n->get('RSS Feed Title Suffix');
+	my $title = ($rssTitle) ? ($rssTitle." ".$rssFeedSuffix) : $rssFeedSuffix;
 	$title =~ s/\"/&quot;/g;
-    $self->session->style->setLink($var->{'rss.url'},
-			   { rel=>	'alternate', 
-			     type=>	'application/rss+xml', 
+	$self->session->style->setLink($var->{'rss.url'},
+			   { rel=>	'alternate',
+			     type=>	'application/rss+xml',
 			     title=> ($rssTitle) ? ($rssTitle." ".$rssFeedSuffix) : $rssFeedSuffix }
 			  );
 }
@@ -610,18 +610,18 @@ sub _constructRSS{
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 sub _createRSSURLs{
-    my $self=shift;
-    my $var=shift;
-    foreach({ver=>'1.0',param=>'10'},{ver=>'0.9',param=>'090'},{ver=>'0.91',param=>'091'},{ver=>'2.0',param=>'20'}){
+	my $self=shift;
+	my $var=shift;
+	foreach({ver=>'1.0',param=>'10'},{ver=>'0.9',param=>'090'},{ver=>'0.91',param=>'091'},{ver=>'2.0',param=>'20'}){
 	$var->{'rss.url.'.$_->{ver}}=$self->getUrl('func=viewRSS'.$_->{param});
-    }
-    $var->{'rss.url'}=$self->getUrl('func=viewRSS20');
+	}
+	$var->{'rss.url'}=$self->getUrl('func=viewRSS20');
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 www_view ()
+=head2 www_view ( )
 
 See WebGUI::Asset::Wobject::www_view() for details.
 
@@ -633,55 +633,59 @@ sub www_view {
 	$self->SUPER::www_view(@_);
 }
 
-#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-=head2 www_viewRSS090()
+#-------------------------------------------------------------------
+
+=head2 www_viewRSS090 ( )
 
 Emit an RSS 0.9 feed.
 
 =cut
 
-sub www_viewRSS090{
+sub www_viewRSS090 {
     my $self=shift;
     return $self->view('0.9');
 }
 
 
-#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-=head2 www_viewRSS091()
+#-------------------------------------------------------------------
+
+=head2 www_viewRSS091 ( )
 
 Emit an RSS 0.91 feed.
 
 =cut
 
-sub www_viewRSS091{
-    my $self=shift;
-    return $self->view('0.91');
+sub www_viewRSS091 {
+	my $self=shift;
+	return $self->view('0.91');
 }
 
 
-#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-=head2 www_viewRSS10()
+#-------------------------------------------------------------------
+
+=head2 www_viewRSS10 ( )
 
 Emit an RSS 1.0 feed.
 
 =cut
 
-sub www_viewRSS10{
-    my $self=shift;
-    return $self->view('1.0');
+sub www_viewRSS10 {
+	my $self=shift;
+	return $self->view('1.0');
 }
 
 
-#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-=head2 www_viewRSS20()
+#-------------------------------------------------------------------
+
+=head2 www_viewRSS20 ( )
 
 Emit an RSS 2.0 feed.
 
 =cut
 
-sub www_viewRSS20{
-    my $self=shift;
-    return $self->view('2.0');
+sub www_viewRSS20 {
+	my $self=shift;
+	return $self->view('2.0');
 }
 
 

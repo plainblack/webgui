@@ -76,7 +76,8 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
-=head2 getInputElement
+
+=head2 getInputElement ( )
 
 Returns the form element used for manual input.
 
@@ -94,7 +95,8 @@ sub getInputElement {
 }
 
 #-------------------------------------------------------------------
-=head2 getOnChangeInputElement
+
+=head2 getOnChangeInputElement ( )
 
 Returns the javascript code to update the slider and other form elements on a
 change of the imput element.
@@ -109,7 +111,8 @@ sub getOnChangeInputElement {
 }
 
 #-------------------------------------------------------------------
-=head2 getOnChangeSlider
+
+=head2 getOnChangeSlider ( )
 
 Returns the javascript code to update the form on a change of slider position.
 

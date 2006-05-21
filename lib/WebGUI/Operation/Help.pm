@@ -50,9 +50,9 @@ sub _load {
 				my $other = _load($session, $hash->{$tag}{isa}{namespace});
 				my $add = $other->{$hash->{$tag}{isa}{tag}}{fields};
 				@{$hash->{$tag}{fields}} = (@{$hash->{$tag}{fields}}, @{$add});
-				my $add = $other->{$hash->{$tag}{isa}{tag}}{related};
+				$add = $other->{$hash->{$tag}{isa}{tag}}{related};
 				@{$hash->{$tag}{related}} = (@{$hash->{$tag}{related}}, @{$add});
-				my $add = $other->{$hash->{$tag}{isa}{tag}}{variables};
+				$add = $other->{$hash->{$tag}{isa}{tag}}{variables};
 				foreach my $row (@{$add}) {
 					push(@{$hash->{$tag}{variables}}, {
 						name=> $row->{name},
