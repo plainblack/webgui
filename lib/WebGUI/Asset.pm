@@ -44,7 +44,7 @@ Package to manipulate items in WebGUI's asset system. Replaces Collateral.
 An asset is the basic class of content in WebGUI. This handles security, urls, and other basic information common to all content items.
 
 A lineage is a concatenated series of sequence numbers, each six digits long, that explain an asset's position in its familiy tree. Lineage describes who the asset's ancestors are, how many ancestors the asset has in its family tree (lineage length), and the asset's position (rank) amongst its siblings. In addition, lineage provides enough information about an asset to generate a list of its siblings and descendants.
- 
+
  use WebGUI::Asset;
 
 =head1 METHODS
@@ -66,7 +66,7 @@ The session variable.
 
 =head3 userId
 
-Unique hash identifier for a user. If not supplied, current user. 
+Unique hash identifier for a user. If not supplied, current user.
 
 =head3 groupId
 
@@ -94,7 +94,7 @@ Verifies group and user permissions to be able to edit asset. Returns 1 if owner
 
 =head3 userId
 
-Unique hash identifier for a user. If not supplied, current user. 
+Unique hash identifier for a user. If not supplied, current user.
 
 =cut
 
@@ -792,7 +792,7 @@ sub getMenuTitle {
 	my $self = shift;
 	if ($self->get("menuTitle") eq "" || lc($self->get("menuTitle")) eq "untitled") {
 		return $self->getName;
-	} 
+	}
 	return $self->get("menuTitle");
 }
 
@@ -880,7 +880,7 @@ sub getTitle {
 	my $self = shift;
 	if ($self->get("title") eq "" || lc($self->get("title")) eq "untitled") {
 		return $self->getName;
-	} 
+	}
 	return $self->get("title");
 }
 
@@ -956,8 +956,8 @@ sub getToolbarState {
 
 Returns the UI Level specified in the asset definition or from the config file if it's overridden. And if neither of those is specified, then it returns 1.
 
-=cut    
-        
+=cut
+
 sub getUiLevel {
 	my $self = shift;
 	my $definition = $self->get("className")->definition($self->session);
@@ -1031,7 +1031,7 @@ sub getValue {
 
 #-------------------------------------------------------------------
 
-=head2 indexContent ( ) 
+=head2 indexContent ( )
 
 Returns an indexer object for this asset. When this method is called the asset's base content gets stored in the index. This method is often overloaded so that a particular asset can insert additional content other than the basic properties. Such uses include indexing attached files or collateral data.
 
@@ -1046,10 +1046,10 @@ sub indexContent {
 
 
 #-------------------------------------------------------------------
-                                                                                                                             
+
 =head2 logView ( )
-              
-Logs the view of this asset to the passive profiling mechanism.  
+
+Logs the view of this asset to the passive profiling mechanism.
 
 =cut
 
@@ -1139,7 +1139,7 @@ sub manageAssets {
 		assetManager.AddButton("'.$i18n->get("copy").'","copyList","manageAssets");
 		assetManager.AddButton("'.$i18n->get("duplicate").'","duplicateList","manageAssets");
 		assetManager.initializeDragEventHandlers();
-		assetManager.Write();        
+		assetManager.Write();
                 var assetListSelectAllToggle = false;
                 function toggleAssetListSelectAll(form){
                         assetListSelectAllToggle = assetListSelectAllToggle ? false : true;
@@ -1154,26 +1154,26 @@ sub manageAssets {
 	$self->session->output->print($output,1);
 	$output = '';
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets","assetContainers")}) {
-		$output .= '<p style="display:inline;vertical-align:middle;"><img src="'.$link->{'icon.small'}.'" alt="'.$link->{label}.'" style="border: 0px;vertical-align:middle;" /></p> 
+		$output .= '<p style="display:inline;vertical-align:middle;"><img src="'.$link->{'icon.small'}.'" alt="'.$link->{label}.'" style="border: 0px;vertical-align:middle;" /></p>
 			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
 		$output .= $self->session->icon->edit("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
 		$output .= '<br />';
 	}
 	$output .= '<hr />';
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets")}) {
-		$output .= '<p style="display:inline;vertical-align:middle;"><img src="'.$link->{'icon.small'}.'" alt="'.$link->{label}.'" style="border: 0px;vertical-align:middle;" /></p> 
+		$output .= '<p style="display:inline;vertical-align:middle;"><img src="'.$link->{'icon.small'}.'" alt="'.$link->{label}.'" style="border: 0px;vertical-align:middle;" /></p>
 			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
 		$output .= $self->session->icon->edit("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
 		$output .= '<br />';
 	}
 	$output .= '<hr />';
 	foreach my $link (@{$self->getAssetAdderLinks("proceed=manageAssets","utilityAssets")}) {
-		$output .= '<p style="display:inline;vertical-align:middle;"><img src="'.$link->{'icon.small'}.'" alt="'.$link->{label}.'" style="border: 0px;vertical-align:middle;" /></p> 
+		$output .= '<p style="display:inline;vertical-align:middle;"><img src="'.$link->{'icon.small'}.'" alt="'.$link->{label}.'" style="border: 0px;vertical-align:middle;" /></p>
 			<a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
 		$output .= $self->session->icon->edit("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
 		$output .= '<br />';
 	}
-	$output .= '</fieldset></div>'; 
+	$output .= '</fieldset></div>';
 	$self->session->output->print($output);
 	$output = '';
 	my %options;
@@ -1208,7 +1208,7 @@ sub manageAssets {
 	$self->session->output->print($output);
 	$output = '<div style="width: 28%;float: left; padding-right: 30px; font-size: 14px;"><fieldset> <legend>'.$i18n->get("packages").'</legend>';
         foreach my $asset (@{$self->getPackageList}) {
-              	$output .= '<p style="display:inline;vertical-align:middle;"><img src="'.$asset->getIcon(1).'" alt="'.$asset->getName.'" style="vertical-align:middle;border: 0px;" /></p> 
+              	$output .= '<p style="display:inline;vertical-align:middle;"><img src="'.$asset->getIcon(1).'" alt="'.$asset->getName.'" style="vertical-align:middle;border: 0px;" /></p>
 			<a href="'.$self->getUrl("func=deployPackage;assetId=".$asset->getId).'">'.$asset->getTitle.'</a> '
 			.$self->session->icon->edit("func=edit;proceed=manageAssets",$asset->get("url"))
 			.$self->session->icon->export("func=exportPackage",$asset->get("url"))
@@ -1219,10 +1219,10 @@ sub manageAssets {
 		.'<input type="file" name="packageFile" size="10" style="font-size: 10px;" />'
 		.WebGUI::Form::submit($self->session, {value=>$i18n->get("import"), extras=>'style="font-size: 10px;"'})
 		.WebGUI::Form::formFooter($self->session);
-	$output .= ' </fieldset></div> 
+	$output .= ' </fieldset></div>
     <div class="adminConsoleSpacer">
             &nbsp;
-        </div> 
+        </div>
 		';
 	$self->session->output->print($output);
 	return undef;
@@ -1293,7 +1293,7 @@ sub manageAssetsSearch {
 				name=>'assetId',
 				value=>$child->getId
 				})
-			."',".$edit."contextMenu.draw()," 
+			."',".$edit."contextMenu.draw(),"
 			."'<a href=\"".$child->getUrl("func=manageAssets&manage=1")."\">".$title
 			."</a>','<img src=\"".$child->getIcon(1)."\" style=\"border: 0px;\" alt=\"".$child->getName."\" /> ".$child->getName
 			."','".$self->session->datetime->epochToHuman($child->get("revisionDate"))
@@ -1307,7 +1307,7 @@ sub manageAssetsSearch {
         $output .= 'assetManager.AddButton("'.$i18n->get("delete").'","deleteList","manageAssets");
 		assetManager.AddButton("'.$i18n->get("cut").'","cutList","manageAssets");
 		assetManager.AddButton("'.$i18n->get("copy").'","copyList","manageAssets");
-                assetManager.Write();        
+                assetManager.Write();
                 var assetListSelectAllToggle = false;
                 function toggleAssetListSelectAll(form){
                         assetListSelectAllToggle = assetListSelectAllToggle ? false : true;
@@ -1332,13 +1332,13 @@ A reference to the current session.
 
 =head3 assetId
 
-The assetId of the asset you're creating an object reference for. Must not be blank. 
+The assetId of the asset you're creating an object reference for. Must not be blank.
 
 =head3 className
 
 By default we'll use whatever class it is called by like WebGUI::Asset::File->new(), so WebGUI::Asset::File would be used.
 
-=head3 revisionDate 
+=head3 revisionDate
 
 An epoch date that represents a specific version of an asset. By default the most recent version will be used.
 
@@ -1353,8 +1353,8 @@ sub new {
 	my $assetRevision = $session->stow->get("assetRevision");
 	my $revisionDate = shift || $assetRevision->{$assetId}{$session->scratch->get("versionTag")||'_'};
 	unless ($revisionDate) {
-		($revisionDate) = $session->db->quickArray("select max(revisionDate) from assetData where assetId=? and  
-			(status='approved' or status='archived' or tagId=?) order by assetData.revisionDate", 
+		($revisionDate) = $session->db->quickArray("select max(revisionDate) from assetData where assetId=? and
+			(status='approved' or status='archived' or tagId=?) order by assetData.revisionDate",
 			[$assetId, $session->scratch->get("versionTag")]);
 		$assetRevision->{$assetId}{$session->scratch->get("versionTag")||'_'} = $revisionDate;
 		$session->stow->set("assetRevision",$assetRevision);
@@ -1373,7 +1373,7 @@ sub new {
 	my $properties = $cache->get;
 	if (exists $properties->{assetId}) {
 		# got properties from cache
-	} else { 
+	} else {
 		my $sql = "select * from asset";
 		foreach my $definition (@{$class->definition($session)}) {
 			$sql .= " left join ".$definition->{tableName}." on asset.assetId="
@@ -1434,7 +1434,7 @@ sub newByDynamicClass {
 
 =head2 newByPropertyHashRef ( session,  properties )
 
-Constructor. 
+Constructor.
 
 =head3 session
 
@@ -1474,7 +1474,7 @@ A reference to the current session.
 
 =head3 url
 
-Optional string representing a URL. 
+Optional string representing a URL.
 
 =head3 revisionDate
 
@@ -1570,7 +1570,7 @@ sub processPropertiesFromFormPost {
 
 #-------------------------------------------------------------------
 
-=head2 processTemplate ( vars, templateId, template ) 
+=head2 processTemplate ( vars, templateId, template )
 
 Returns the content generated from this template.
 
@@ -1580,7 +1580,7 @@ A hash reference containing variables and loops to pass to the template engine.
 
 =head3 templateId
 
-An id referring to a particular template in the templates table. 
+An id referring to a particular template in the templates table.
 
 =head3 template
 
@@ -1691,7 +1691,7 @@ sub setSize {
 
 #-------------------------------------------------------------------
 
-=head2 toggleToolbar ( ) 
+=head2 toggleToolbar ( )
 
 Toggles a toolbar to a special state so that custom toolbars can be rendered under special circumstances. This is mostly useful for macros that wish to proxy an asset but not display the toolbar.
 
@@ -1768,7 +1768,7 @@ Adds a new Asset based upon the class of the current form. Returns the Asset cal
 
 sub www_add {
 	my $self = shift;
-	my %prototypeProperties; 
+	my %prototypeProperties;
 	my $class = $self->session->form->process("class","className");
 	if ($self->session->form->process('prototype')) {
 		my $prototype = WebGUI::Asset->new($self->session, $self->session->form->process("prototype"),$class);
