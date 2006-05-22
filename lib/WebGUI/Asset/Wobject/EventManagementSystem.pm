@@ -2167,7 +2167,7 @@ sub www_addEventsToBadge {
 	my $bid = $self->session->form->process('bid') || 'none';
 	my $eventId = $self->session->form->process('eventId');
 	unless ($bid eq 'none') {
-		my ($userId,$createdByUserId) = $self->session->db->quickArray("select userId, createdByUserId from EventManagementSystem_badges where badgeId=".quote($bid));
+		my ($userId,$createdByUserId) = $self->session->db->quickArray("select userId, createdByUserId from EventManagementSystem_badges where badgeId=?",[$bid]);
 	    unless($isAdmin || $userId eq $self->session->user->userId || $createdByUserId eq $self->session->user->userId) {
 	      return $self->session->privilege->insufficient();
 	    }
