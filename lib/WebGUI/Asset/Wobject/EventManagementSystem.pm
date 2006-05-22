@@ -2167,6 +2167,10 @@ sub www_addEventsToBadge {
 	my $bid = $self->session->form->process('bid') || 'none';
 	my $eventId = $self->session->form->process('eventId');
 	unless ($bid eq 'none') {
+		my ($userId,$createdByUserId) = $self->session->db->quickArray("select userId, createdByUserId from EventManagementSystem_badges where badgeId=".quote($bid));
+	    unless($isAdmin || $userId eq $self->session->user->userId || $createdByUserId eq $self->session->user->userId) {
+	      return $self->session->privilege->insufficient();
+	    }
 		$self->session->scratch->set('EMS_add_purchase_badgeId',$bid);
 		my @pastEvents = $self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, transaction as t where r.returned=0 and r.badgeId=? and t.transactionId=p.transactionId and t.status='Completed' and p.purchaseId=r.purchaseId group by productId",[$bid]);
 		my $purchaseCounter = $self->session->form->process('purchaseCounter');
