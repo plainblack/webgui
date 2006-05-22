@@ -29,6 +29,7 @@ These methods are available from this class:
 =cut
 
 #-------------------------------------------------------------------
+
 =head2 drawGraph
 
 Draws all the lines.
@@ -43,7 +44,7 @@ sub drawGraph {
 
 	my $numberOfGroups = List::Util::max(map {scalar @$_} @{$self->{_datasets}});
 	my $interval = $self->getChartWidth / ($numberOfGroups - 1);
-	
+
 	%location = %{$self->getChartOffset};
 	$location{y} += $self->getChartHeight;
 
@@ -53,6 +54,7 @@ sub drawGraph {
 }
 
 #-------------------------------------------------------------------
+
 =head2 drawLine ( line, location, interval )
 
 Draws a bar defined by bar and with width barWidth at location.
@@ -89,10 +91,10 @@ sub drawLine {
 	foreach (@{$line->{dataset}}) {
 		$path .= ($dataCounter++) ? " L " : " M ";
 		$path .= $currentLocation{x}.",".($currentLocation{y} - $_*$self->getPixelsPerUnit);
-		
+
 		$currentLocation{x} += $interval;
 	}
-	
+
 	$self->image->Draw(
 		primitive	=> 'Path',
 		stroke		=> $line->{strokeColor},
@@ -102,6 +104,7 @@ sub drawLine {
 }
 
 #-------------------------------------------------------------------
+
 =head2 formNamespace
 
 Returns the form namespace of this plugin. See WegBUI::Image::Graph for
@@ -116,6 +119,7 @@ sub formNamespace {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getAnchorSpacing
 
 Returns the distance in pixels between two anchors on the x axis that define teh
@@ -137,6 +141,7 @@ sub getAnchorSpacing {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getFirstAnchorLocation
 
 Returns a hashref containing the location of the leftmost x-axis anchor.
@@ -154,6 +159,7 @@ sub getFirstAnchorLocation {
 }
 
 #-------------------------------------------------------------------
+
 =head2 processDataset
 
 Processes the dataset. Used by drawGraph.
@@ -163,7 +169,7 @@ Processes the dataset. Used by drawGraph.
 sub processDataSet {
 	my ($barProperties);
 	my $self = shift;
-	
+
 	my $palette = $self->getPalette;
 	foreach (@{$self->{_datasets}}) {
 		push (@{$self->{_lines}}, {

@@ -37,6 +37,7 @@ These methods are available from this class:
 =cut
 
 #-------------------------------------------------------------------
+
 =head2 configurationForm
 
 Creates the configuration form for this plugin. See WebGUI::Image::Graph for
@@ -48,7 +49,7 @@ sub configurationForm {
 	my $self = shift;
 
 	my $i18n = WebGUI::International->new($self->session, 'Image_Graph_XYGraph_Bar');
-	
+
 	my $configForms = $self->SUPER::configurationForm;
 my	$f = WebGUI::HTMLForm->new($self->session);
 	$f->trClass('Graph_XYGraph_Bar');
@@ -66,11 +67,12 @@ my	$f = WebGUI::HTMLForm->new($self->session);
 	);
 
 	$configForms->{'graph_xygraph_bar'} = $f->printRowsOnly;
-	
+
 	return $configForms;
 }
 
 #-------------------------------------------------------------------
+
 =head2 drawBar ( bar, location, barWidth )
 
 Draws a bar defined by bar and with width barWidth at location.
@@ -98,7 +100,7 @@ sub drawBar {
 	my $barWidth = shift;
 
 	my $barHeight = $bar->{height} * $self->getPixelsPerUnit;
-		
+
 	$self->image->Draw(
 		primitive	=> 'Path',
 		stroke		=> $bar->{strokeColor},
@@ -112,6 +114,7 @@ sub drawBar {
 }
 
 #-------------------------------------------------------------------
+
 =head2 drawGraph
 
 Draws all the bars.
@@ -130,7 +133,7 @@ sub drawGraph {
 
 	my $barWidth = $groupWidth;
 	$barWidth = ($groupWidth - ($numberOfDatasets - 1) * $self->getBarSpacing) / $numberOfDatasets if ($self->getDrawMode eq 'sideBySide');
-		
+
 	$location{x} = $self->getChartOffset->{x} ;
 	$location{y} = $self->getChartOffset->{y} + $self->getChartHeight;
 	foreach $currentBar (@{$self->{_bars}}) {
@@ -139,12 +142,13 @@ sub drawGraph {
 		} else {
 			$self->drawSideBySideBar($currentBar, \%location, $barWidth);
 		}
-		
+
 		$location{x} += $groupWidth + $self->getGroupSpacing;
 	}	
 }
 
 #-------------------------------------------------------------------
+
 =head2 drawSideBySide ( bars, location, barWidth )
 
 Draws the bars in side by side mode. Meaning that per datsetindex the bars
@@ -172,7 +176,7 @@ sub drawSideBySideBar {
 	my $barWidth = shift;
 
 	my %thisLocation = %$location;
-	
+
 	foreach (@$bars) {
 		$self->drawBar($_, \%thisLocation, $barWidth);
 		$thisLocation{x} += $barWidth + $self->getBarSpacing;
@@ -180,6 +184,7 @@ sub drawSideBySideBar {
 }
 
 #-------------------------------------------------------------------
+
 =head2 drawStacked ( bars, location, barWidth )
 
 Draws the bars in side by side mode. Meaning that per datset-index the bars
@@ -213,10 +218,11 @@ sub drawStackedBar {
 		$self->drawBar($_, \%thisLocation, $barWidth);
 		$thisLocation{y} -= $_->{height} * $self->getPixelsPerUnit;
 	}
-	
+
 }
 
 #-------------------------------------------------------------------
+
 =head2 formNamespace
 
 Returns the form namespace of this plugin. See WegBUI::Image::Graph for
@@ -231,6 +237,7 @@ sub formNamespace {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getAnchorSpacing
 
 Returns the distance in pixels between two anchors on the x axis that define teh
@@ -252,6 +259,7 @@ sub getAnchorSpacing {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getBarSpacing
 
 Returns the width of the gap between two bars within a group in pixels.
@@ -265,6 +273,7 @@ sub getBarSpacing {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getConfiguration
 
 Returns the configuration hashref for this plugin. Refer to WebGUI::IMage::Graph
@@ -279,11 +288,12 @@ sub getConfiguration {
 
 	$config->{xyGraph_bar_barSpacing}	= $self->getBarSpacing;
 	$config->{xyGraph_bar_groupSpacing}	= $self->getGroupSpacing;
-	
+
 	return $config;
 }
 
 #-------------------------------------------------------------------
+
 =head2 getGroupSpacing
 
 Returns the width of the gap between two groups of bars in pixels.
@@ -297,6 +307,7 @@ sub getGroupSpacing {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getFirstAnchorLocation
 
 Returns a hashref containing the location of the leftmost x-axis anchor.
@@ -314,6 +325,7 @@ sub getFirstAnchorLocation {
 }
 
 #-------------------------------------------------------------------
+
 =head2 processDataset
 
 Processes the dataset. Used by drawGraph.
@@ -325,7 +337,7 @@ sub processDataSet {
 	my $self = shift;
 
 	my $palette = $self->getPalette;
-	
+
 	my $maxElements = List::Util::max(map {scalar @$_} @{$self->{_datasets}});
 	my $numberOfDatasets = scalar @{$self->{_datasets}};
 
@@ -343,6 +355,7 @@ sub processDataSet {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setBarSpacing ( gap )
 
 Sets the distance between two bars in a group in pixels.
@@ -356,11 +369,12 @@ The distance in pixels.
 sub setBarSpacing {
 	my $self = shift;
 	my $gap = shift;
-	
+
 	$self->{_barProperties}->{barSpacing} = $gap;
 }
 
 #-------------------------------------------------------------------
+
 =head2 setConfiguration ( config )
 
 Applies the given configuration hash to this plugin. See WebGUI::Image::Graph
@@ -380,11 +394,12 @@ sub setConfiguration {
 
 	$self->setBarSpacing($config->{xyGraph_bar_barSpacing});
 	$self->setGroupSpacing($config->{xyGraph_bar_groupSpacing});
-	
+
 	return $config;
 }
 
 #-------------------------------------------------------------------
+
 =head2 setGroupSpacing ( gap )
 
 Sets the distance between two groups of bars in pixels.
@@ -398,7 +413,7 @@ The distance in pixels.
 sub setGroupSpacing {
 	my $self = shift;
 	my $gap = shift;
-	
+
 	$self->{_barProperties}->{groupSpacing} = $gap;
 }
 

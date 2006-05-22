@@ -32,6 +32,7 @@ These methods are available from this class:
 =cut
 
 #-------------------------------------------------------------------
+
 =head2 configurationForm
 
 The configuration form part for this object. See WebGUI::Image::Graph for
@@ -44,9 +45,9 @@ sub configurationForm {
 	my $self = shift;
 
 	my $i18n = WebGUI::International->new($self->session, 'Image_Graph_XYGraph');
-	
+
 	$configForms = $self->SUPER::configurationForm;
-	
+
 	$f = WebGUI::HTMLForm->new($self->session);
 	$f->trClass('Graph_XYGraph');
 	$f->integer(
@@ -108,12 +109,13 @@ sub configurationForm {
 		label	=> $i18n->get('y granularity'),	
 		hoverHelp => $i18n->get('y granularity description'),
 	);
-	
+
 	$configForms->{'graph_xygraph'} = $f->printRowsOnly;
 	return $configForms;
 }
 
 #-------------------------------------------------------------------
+
 =head2 draw
 
 Draws the graph.
@@ -129,7 +131,7 @@ sub draw {
 		x=> $maxYLabelWidth + 2*$self->getLabelOffset,
 		y=> $self->getLabelOffset
 	});
-	
+
 	$self->drawRulers if ($self->showRulers);
 	$self->drawGraph;
 	$self->drawAxis if ($self->showAxis);
@@ -137,6 +139,7 @@ sub draw {
 }
 
 #-------------------------------------------------------------------
+
 =head2 drawAxis
 
 Draws the axis.
@@ -158,6 +161,7 @@ sub drawAxis {
 }
 
 #-------------------------------------------------------------------
+
 =head2 drawLabels
 
 Draws the labels.
@@ -201,6 +205,7 @@ sub drawLabels {
 }
 
 #-------------------------------------------------------------------
+
 =head drawRulers
 
 Draws the rulers.
@@ -225,6 +230,7 @@ sub drawRulers {
 }
 
 #-------------------------------------------------------------------
+
 =head2 formNamespace
 
 Extends the form namespace for this object. See WebGUI::Image::Graph for
@@ -239,6 +245,7 @@ sub formNamespace {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getAxisColor
 
 Returns the color triplet for the axis. Defaults to '#222222'.
@@ -250,8 +257,9 @@ sub getAxisColor {
 
 	return $self->{_axisProperties}->{axisColor} || '#222222';
 }
-	
+
 #-------------------------------------------------------------------
+
 =head2 getChartHeight
 
 Returns the height of the chart. Defaults to 200.
@@ -265,6 +273,7 @@ sub getChartHeight {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getChartOffset
 
 Returns the coordinates of the top-left corner of the chart. he coordinates are
@@ -279,6 +288,7 @@ sub getChartOffset {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getChartWidth
 
 Returns the width of the chart. Defaults to 200.
@@ -292,6 +302,7 @@ sub getChartWidth {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getConfiguration
 
 Returns a configuration hashref. See WebGUI::Image::Graph for documentation.
@@ -310,11 +321,12 @@ sub getConfiguration {
 	$config->{xyGraph_drawRulers}	= $self->showRulers;
 	$config->{xyGraph_drawMode}	= $self->getDrawMode;
 	$config->{xyGraph_yGranularity}	= $self->getYGranularity;
-	
+
 	return $config;
 }
 
 #-------------------------------------------------------------------
+
 =head2 getDrawMode
 
 Returns the drawmode. Currently supported are 'stacked' and 'sideBySide'.
@@ -329,6 +341,7 @@ sub getDrawMode {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getPixelsPerUnit
 
 Returns the number of pixels that correspond with one unit of the dataset
@@ -338,11 +351,12 @@ values.
 
 sub getPixelsPerUnit {
 	my $self = shift;
-	
+
 	return $self->getChartHeight / $self->getYRange;
 }
 
 #-------------------------------------------------------------------
+
 =head2 getRulerColor
 
 Returns the color triplet of the rulers in the graph. Defaults to '#777777'.
@@ -356,6 +370,7 @@ sub getRulerColor {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getYGranularity
 
 Returns the granularity of the labels and rulers in the Y direction. Defaults to
@@ -371,6 +386,7 @@ sub getYGranularity {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getYLabels
 
 Returns an arrayref containing the labels for the Y axis.
@@ -389,6 +405,7 @@ sub getYLabels {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getYRange
 
 Returns the maxmimal value of the range that contains a whole number of times
@@ -403,6 +420,7 @@ sub getYRange {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setAxisColor ( color )
 
 Sets the color of the axis to the supplied value.
@@ -417,11 +435,12 @@ form: #ffffff.
 sub setAxisColor {
 	my $self = shift;
 	my $color = shift;
-	
+
 	$self->{_axisProperties}->{axisColor} = $color;
 }
 
 #-------------------------------------------------------------------
+
 =head2 setChartHeight ( height )
 
 Sets the height of the chart to the specified value.
@@ -440,6 +459,7 @@ sub setChartHeight {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setChartOffset ( location )
 
 Sets the location of the top-left corner of the graph within the image.
@@ -459,6 +479,7 @@ sub setChartOffset {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setChartHeight ( width )
 
 Sets the width of the chart to the specified value.
@@ -477,6 +498,7 @@ sub setChartWidth {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setConfiguration ( config )
 
 Applies the settings in the given configuration hash. See WebGUI::Image::Graph
@@ -503,11 +525,12 @@ sub setConfiguration {
 	$self->setYGranularity($config->{xyGraph_yGranularity});
 	$self->setAxisColor($config->{xyGraph_axisColor});
 	$self->setRulerColor($config->{xyGraph_rulerColor});
-	
+
 	return $config;
 }
 
 #-------------------------------------------------------------------
+
 =head2 setDrawMode ( mode )
 
 Set the way the datasets are drawn. Currently supported are 'stacked' and
@@ -532,6 +555,7 @@ sub setDrawMode {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setRulerColor ( color )
 
 Set the color of the rulers.
@@ -546,11 +570,12 @@ The triplet of the desired ruler color. Must be in the following format:
 sub setRulerColor {
 	my $self = shift;
 	my $color = shift;
-	
+
 	$self->{_axisProperties}->{rulerColor} = $color;
 }
 
 #-------------------------------------------------------------------
+
 =head2 setShowAxis ( boolean )
 
 Set whether or not to draw the axis.
@@ -569,6 +594,7 @@ sub setShowAxis {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setShowLabels ( boolean )
 
 Set whether or not to draw the labels.
@@ -587,6 +613,7 @@ sub setShowLabels {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setShowRulers ( boolean )
 
 Set whether or not to draw the rulers.
@@ -605,6 +632,7 @@ sub setShowRulers {
 }
 
 #-------------------------------------------------------------------
+
 =head2 setYGranularity ( value )
 
 Sets the y granularity. See getYGranularity for explanation of this concept.
@@ -618,11 +646,12 @@ The granularity in dataset units, not pixels.
 sub setYGranularity {
 	my $self = shift;
 	my $granularity = shift;
-	
+
 	$self->{_properties}->{yGranularity} = $granularity;
 }
 
 #-------------------------------------------------------------------
+
 =head2 showAxis
 
 Returns a boolean indicating whether to draw the axis.
@@ -637,6 +666,7 @@ sub showAxis {
 }
 
 #-------------------------------------------------------------------
+
 =head2 showLabels
 
 Returns a boolean indicating whether to draw the labels.
@@ -651,6 +681,7 @@ sub showLabels {
 }
 
 #-------------------------------------------------------------------
+
 =head2 showRulers
 
 Returns a boolean indicating whether to draw the rulers.

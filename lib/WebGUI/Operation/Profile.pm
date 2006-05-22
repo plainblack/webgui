@@ -59,6 +59,7 @@ sub getRequiredProfileFields {
 }
 
 #-------------------------------------------------------------------
+
 =head2 isDuplicateEmail ( )
 
 Checks the value of the email address passed in to see if it is
@@ -206,6 +207,7 @@ sub www_editProfile {
 }
 
 #-------------------------------------------------------------------
+
 =head2 www_editProfileSave ( $session )
 
 Validates all data submitted by www_editProfile.  If errors or warnings are present, 
@@ -272,7 +274,7 @@ sub www_viewProfile {
 	if ($session->user->userId eq $session->form->process("uid")) {
 		$vars->{'profile.accountOptions'} = WebGUI::Operation::Shared::accountOptions($session);
 	}
-	
+
 	return $session->style->userStyle(WebGUI::Asset::Template->new($session,"PBtmpl0000000000000052")->process($vars));
 }
 

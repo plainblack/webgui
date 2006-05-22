@@ -81,6 +81,7 @@ sub _submenu {
 }
 
 #-------------------------------------------------------------------
+
 =head2 www_copyLDAPLink ( $session )
 
 Copies the requested LDAP link in the form variable C<llid>.  Adds the words

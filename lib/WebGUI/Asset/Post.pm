@@ -53,9 +53,9 @@ sub addChild {
 }
 
 #-------------------------------------------------------------------
-                
+
 =head2 addRevision
-        
+
 Override the default method in order to deal with attachments.
 
 =cut
