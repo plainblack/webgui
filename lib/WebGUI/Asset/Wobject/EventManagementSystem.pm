@@ -2650,6 +2650,7 @@ sub www_search {
 	my $self = shift;
 	return $self->session->privilege->noAccess() unless $self->canView;
 	my %var;
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	$var{badgeSelected} = $self->session->scratch->get('currentMainEvent');
 	$var{resetScratchCartUrl} = $self->getUrl("func=resetScratchCart");
 	my $masterEventId = $var{badgeSelected};
@@ -2661,6 +2662,42 @@ sub www_search {
 	}
 
 	$self->addCartVars(\%var);
+
+	# Get the current sort order and persist it until the user changes it
+	my $sortKey = $self->session->form->get("sortKey") || $self->session->scratch->get("EMS_sortKey") || "sequenceNumber";
+	$self->session->scratch->set("EMS_sortKey", $sortKey);
+	
+	# Parse our sort key into some mysql friendly lingo
+	my ($orderBy, $direction) = split('_',$sortKey);
+	
+	# Build our sort list
+	my %sortSelect;
+	tie %sortSelect, 'Tie::IxHash';
+	
+	%sortSelect = (
+		       'sequenceNumber' => $i18n->echo('Default'),
+		       'title' 	    	=> $i18n->echo('Alphabetical A to Z'),
+		       'title_desc' 	=> $i18n->echo('Alphabetical Z to A'),
+		       'startDate'  	=> $i18n->echo('Earliest Start Times to Latest'),
+		       'startDate_desc' => $i18n->echo('Latest Start Times to Earliest'),
+		       'endDate'	=> $i18n->echo('Earliest End Times to Latest'),
+		       'endDate_desc'	=> $i18n->echo('Latest End Times to Earliest'),
+		       'price'		=> $i18n->echo('Lowest Price to Highest'),
+		       'price_desc'	=> $i18n->echo('Highest Price to Lowest'),
+		      );
+	
+	$var{'sortForm.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl()}).
+				  WebGUI::Form::hidden($self->session,{name=>"func", value=>"search"}).
+				  WebGUI::Form::hidden($self->session,{name=>"searchKeywords", value=>$self->session->form->get("searchKeywords")}).
+				  #WebGUI::Form::hidden($self->session,{name=>"pn", value=>$self->session->form->get("pn")}).
+				  WebGUI::Form::hidden($self->session,{name=>"cfilter_s0", value=>$self->session->form->get("cfilter_s0")}).
+				  WebGUI::Form::hidden($self->session,{name=>"cfilter_c0", value=>$self->session->form->get("cfilter_c0")}).
+				  WebGUI::Form::hidden($self->session,{name=>"cfilter_t0", value=>$self->session->form->get("cfilter_t0")}).
+				  WebGUI::Form::hidden($self->session,{name=>"advSearch", value=>1});
+	$var{'sortForm.selectBox'} = WebGUI::Form::selectBox($self->session,{name=>'sortKey', options=>\%sortSelect, value => $sortKey});
+	$var{'sortForm.selectBox.label'} = $i18n->echo('Sort By');
+	$var{'sortForm.submit'} = WebGUI::Form::submit($self->session,{value=>$i18n->echo('Sort')});
+	$var{'sortForm.footer'} = WebGUI::Form::formFooter($self->session);
 
 	# Get all the attendees details
 	$var{badgeHolderInfo_loop} = $self->session->db->buildArrayRefOfHashRefs("select * from EventManagementSystem_badges where badgeId=?",[$badgeHolderId]);
@@ -2680,7 +2717,9 @@ sub www_search {
 								  from products as p, EventManagementSystem_products as e where p.productId = e.productId and p.productId=?",[$eventId]);
 		$eventData->{'startDateHuman'} = $self->session->datetime->epochToHuman($eventData->{'startDate'});
 		$eventData->{'endDateHuman'} = $self->session->datetime->epochToHuman($eventData->{'endDate'});
-		$eventData->{'removeEventFromBadge.url'} = $self->getUrl("func=removeFromScratchCart;pid=".$eventData->{'productId'}) unless isIn($eventData->{'productId'},@pastEvents);
+		$eventData->{'removeEventFromBadge.url'} = $self->getUrl("func=removeFromScratchCart;pid=".$eventData->{'productId'}.
+								         ";searchKeywords=".$self->session->form->get("searchKeywords").
+									 ";pn=".$self->session->form->get("pn")) unless isIn($eventData->{'productId'},@pastEvents);
 		push(@selectedEvents_loop, $eventData);
 	}
 	$var{'eventsInBadge_loop'} = \@selectedEvents_loop;
@@ -2692,7 +2731,6 @@ sub www_search {
 	my $pn;
 	my $subSearchFlag;
 	my $showAllFlag;
-	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my $addToBadgeMessage;
 	if ($eventAdded) {
 		$showAllFlag = 1;
@@ -2704,6 +2742,7 @@ sub www_search {
 		$subSearchFlag = 1;
 		$cfilter_s0 = "requirement";
 		$cfilter_c0 = "eq";
+		$pn = $self->session->form->get("pn");
 	}
 
 	my $keywords = $self->session->form->process("searchKeywords",'text');
@@ -2838,7 +2877,7 @@ sub www_search {
 		   $joins 
 		   where
 		   	p.productId = e.productId $approvalPhrase
-		   	and e.assetId =".$self->session->db->quote($self->get("assetId")).$searchPhrases. " order by sequenceNumber";
+		   	and e.assetId =".$self->session->db->quote($self->get("assetId")).$searchPhrases. " order by $orderBy $direction";
 	$var{'basicSearch.formHeader'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl("func=search;advSearch=0",method=>'GET')}).
 					 WebGUI::Form::hidden($self->session,{name=>"subSearch", value => $self->session->form->get("subSearch")}).
 					 WebGUI::Form::hidden($self->session,{name => "cfilter_s0", value => "requirement"}).
@@ -2929,7 +2968,7 @@ sub www_search {
 	  	$eventFields{'purchase.label'} = $i18n->get('add to cart');
 	  }
 		my $masterEventId = $cfilter_t0 || $self->session->form->get("cfilter_t0");
-	  $eventFields{'purchase.url'} = $self->getUrl('func=addToScratchCart;pid='.$event->{'productId'}.";mid=".$masterEventId);
+	  $eventFields{'purchase.url'} = $self->getUrl('func=addToScratchCart;pid='.$event->{'productId'}.";mid=".$masterEventId.";pn=".$self->session->form->get("pn"));
 	  %eventFields = ('event' => $self->processTemplate(\%eventFields, $event->{'templateId'}), %eventFields) if ($self->{_calledFromView} && $self->session->form->process('func') eq 'view');
 	  push (@events, \%eventFields);
 	} 
