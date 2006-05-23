@@ -19,6 +19,7 @@
  - fix - Event calendar SCOPE doesn't work!! (Wouter van Oijen / ProcoliX)
  - better HTML compliancy
  - fixed a lot of POD
+ - fix - Changing rank ot the asset (Martin kamerbeek / Procolix)
 
 6.99.1
  - Bugfixes on dashboard to fix template errors.

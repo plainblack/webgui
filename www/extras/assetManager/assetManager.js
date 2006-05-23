@@ -145,7 +145,7 @@ function AssetManager_Write() {
 				document.write("<td "+this.Columns[j].td+">"+open_div+this.Lines[i][j].text+close_div+"</td>");
 				
 				//added for dragging to map draggable objects and meta data objects
-				if (j==2) {
+				if (j==1) {
 					this.draggableObjects[i] = document.getElementById(div_name);
 					if (this.metaData && this.metaData[i]) {
 						this.draggableObjects[i].metaData = this.metaData[i];
