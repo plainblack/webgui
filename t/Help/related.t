@@ -16,9 +16,11 @@ use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Operation::Help;
 
+use Data::Dumper;
+
 #The goal of this test is to verify that all entries in the lib/WebGUI/Help
 #directory correctly resolve to other Help entries.  The total number of
-#tests will be dynamic, based on how many "related" entries are set up
+#tests will be dynamic, based on how many "related" and "isa" entries are set up
 #in the Help files.  Calling Test::plan will be delayed.
 
 use Test::More;
@@ -39,23 +41,35 @@ foreach my $helpSet (@helpFileSet) {
 ##Scan #1, how many tests do we expect?
 
 my @relatedHelp = ();
+my @isaHelp = ();
 foreach my $topic ( keys %helpTable ) {
 	foreach my $entry ( keys %{ $helpTable{$topic} }) {
 		my @related = WebGUI::Operation::Help::_related($session, $helpTable{$topic}{$entry}{related});
-		foreach my $relHash (@related) {
+		foreach my $relHash (@related) { ##Inplace modify
 			$relHash->{parentEntry} = $entry;
 			$relHash->{parentTopic} = $topic;
 		}
 		push @relatedHelp, @related;
-		$numTests += scalar @related;
+		if ( scalar keys %{ $helpTable{$topic}{$entry}{isa} } > 0 ) {
+			my $isaHash = $helpTable{$topic}{$entry}{isa};
+			$isaHash->{parentEntry} = $entry;
+			$isaHash->{parentTopic} = $topic;
+			push @isaHelp, $isaHash;
+		}
 	}
 }
 
-plan tests => $numTests;
+
+plan tests => scalar @relatedHelp + scalar @isaHelp;
 
 ##Each array element is a hash with two keys, tag (entry) and namespace (topic).
 
 foreach my $related (@relatedHelp) {
 	my ($topic, $entry, $parentTopic, $parentEntry) = @{ $related }{'namespace', 'tag', 'parentTopic', 'parentEntry'};
+	ok( exists $helpTable{$topic}{$entry}, "Help entry: $topic -> $entry from $parentTopic -> $parentEntry");
+}
+
+foreach my $isa (@isaHelp) {
+	my ($topic, $entry, $parentTopic, $parentEntry) = @{ $isa }{'namespace', 'tag', 'parentTopic', 'parentEntry'};
 	ok( exists $helpTable{$topic}{$entry}, "Help entry: $topic -> $entry from $parentTopic -> $parentEntry");
 }
