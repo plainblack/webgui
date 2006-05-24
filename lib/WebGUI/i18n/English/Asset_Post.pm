@@ -405,7 +405,7 @@ back the data with a simple &lt;tmpl_var userDefined1&gt;.</p>
 	},
 
 	'post received' => {
-		message => q|Your post has been received and is pending approval.|,
+		message => q|Your post has been received and is being processed so it can be added to the site. Please be patient.|,
 		context => q|Displayed after someone posts a new message.|,
 		lastUpdated => 0,
 	},

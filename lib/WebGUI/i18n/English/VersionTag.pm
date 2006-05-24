@@ -18,7 +18,7 @@ our $I18N = {
 	},
 
 	'commit accepted' => {
-		message => q|Your tag has been submitted for approval and commit. It may take some time before it appears live on the site. Where would you like to go next?|,
+		message => q|Your tag has been submitted for processing and commit. It may take some time before it appears live on the site. Where would you like to go next?|,
 		lastUpdated => 0,
 		context => q|label on the manage revisions in tag page during the approval process|
 	},
