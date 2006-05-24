@@ -19,6 +19,10 @@ our $HELP = {
 				tag => 'manage committed versions',
 				namespace => 'VersionTag'
 			},
+			{
+				tag => 'edit version tag',
+				namespace => 'VersionTag'
+			},
 		],
 	},
 
@@ -34,6 +38,10 @@ our $HELP = {
 			},
 			{
 				tag => 'manage committed versions',
+				namespace => 'VersionTag'
+			},
+			{
+				tag => 'edit version tag',
 				namespace => 'VersionTag'
 			},
 		],
@@ -63,6 +71,10 @@ our $HELP = {
 				tag => 'manage committed versions',
 				namespace => 'VersionTag'
 			},
+			{
+				tag => 'edit version tag',
+				namespace => 'VersionTag'
+			},
 		],
 	},
 
@@ -70,6 +82,38 @@ our $HELP = {
 		title => 'manage committed versions',
 		body => 'manage committed versions body',
 		fields => [
+		],
+		related => [
+			{
+				tag => 'versions manage',
+				namespace => 'VersionTag'
+			},
+			{
+				tag => 'manage committed versions',
+				namespace => 'VersionTag'
+			},
+		],
+	},
+
+	'edit version tag' => {
+		title => 'edit version tag',
+		body => 'edit version tag body',
+		fields => [
+                        {
+                                title => 'version tag name',
+                                description => 'version tag name description',
+                                namespace => 'VersionTag',
+                        },
+                        {
+                                title => 'workflow',
+                                description => 'workflow help',
+                                namespace => 'VersionTag',
+                        },
+                        {
+                                title => 'group to use',
+                                description => 'group to use help',
+                                namespace => 'VersionTag',
+                        },
 		],
 		related => [
 			{

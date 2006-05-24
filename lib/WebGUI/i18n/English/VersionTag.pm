@@ -326,6 +326,16 @@ our $I18N = {
 		lastUpdated => 1148359381,
 	},
 
+	'workflow' => {
+		message => q|Workflow|,
+		lastUpdated => 1148445024,
+	},
+
+	'workflow help' => {
+		message => q|Choose a workflow to handle your version tag.|,
+		lastUpdated => 1148445024,
+	},
+
 	'manage version tags body' => {
 		message => q|<p>This screen lists all uncommitted version tags in WebGUI, their status and an interface to manage them.  If you are currently working under a tag, the name of the tag is prominently displayed for reference.</p>
 <p>The icons next to each tag allow each tag to be edited, or deleted.  The name of the tag is a link to manage work done in the tag.  The date the tag was created and the username of the user who created are shown as well.  A link is provided so that the tag can be committed</p>
@@ -347,6 +357,12 @@ our $I18N = {
 
 	'commit version tag body' => {
 		message => q|<p>Committing the version tag will make it the current version that is used and displayed on your website.</p>
+|,
+		lastUpdated => 1148444236,
+	},
+
+	'edit version tag body' => {
+		message => q|<p>In this screen you will create a new version tag for use on the site, or edit an existing version tag.  Members of the Manage Version Tag group will have the additionaly ability to define how the version tag is handled via a workflow and which group is allowed to make edits under the tag.</p>
 |,
 		lastUpdated => 1148444236,
 	},

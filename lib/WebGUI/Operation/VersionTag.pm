@@ -130,6 +130,7 @@ sub www_editVersionTag {
 			);
 	}
 	$f->submit;
+	$ac->setHelp('edit version tag', 'VersionTag');
         return $ac->render($f->print,$i18n->get("edit version tag"));	
 }
 
