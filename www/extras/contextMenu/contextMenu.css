@@ -17,7 +17,7 @@
         border-right: 3px groove #999999;
         border-left: 0px groove #999999;
 }
-.contextMenu_skin A {
+.contextMenu_skin A, .contextMenu_skin A:link, .contextMenu_skin A:visited {
 	font-weight: normal;
         width: 100%;
         color: black;

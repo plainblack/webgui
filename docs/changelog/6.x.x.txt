@@ -20,6 +20,10 @@
  - better HTML compliancy
  - fixed a lot of POD
  - fix - Changing rank ot the asset (Martin kamerbeek / Procolix)
+ - Fixed a bug where context menu links would take on the properties of the
+   page.
+ - Added a context menu to the last item in the crumb trail in the asset
+   manager as discussed in Community IRC.
 
 6.99.1
  - Bugfixes on dashboard to fix template errors.

@@ -1077,9 +1077,25 @@ sub manageAssets {
 	my $ancestors = $self->getLineage(["self","ancestors"],{returnObjects=>1});
         my @crumbtrail;
         foreach my $ancestor (@{$ancestors}) {
-                push(@crumbtrail,'<a href="'.$ancestor->getUrl("func=manageAssets").'">'.$ancestor->getTitle.'</a>');
+		if ($ancestor->getId eq $self->getId) {
+			my $title = $self->getTitle;
+			$title =~ s/\'/\\\'/g;
+			my $more = '<script type="text/javascript">
+				var ct_contextMenu = new contextMenu_createWithLink("ct_'.$self->getId.'","'.$title.'");
+               		 	ct_contextMenu.addLink("'.$self->getUrl("func=changeUrl;proceed=manageAssets").'","'.$i18n->get("change url").'");
+                		ct_contextMenu.addLink("'.$self->getUrl("func=editBranch").'","'.$i18n->get("edit branch").'");
+                		ct_contextMenu.addLink("'.$self->getUrl("func=createShortcut;proceed=manageAssets").'","'.$i18n->get("create shortcut").'");
+				ct_contextMenu.addLink("'.$self->getUrl("func=manageRevisions").'","'.$i18n->get("revisions").'");
+                		ct_contextMenu.addLink("'.$self->getUrl.'","'.$i18n->get("view").'"); '."\n";
+			$more .= 'ct_contextMenu.addLink("'.$self->getUrl("func=edit;proceed=manageAssets").'","'.$i18n->get("edit").'");' unless ($self->isLocked);
+			$more .= 'ct_contextMenu.addLink("'.$self->getUrl("func=lock;proceed=manageAssets").'","'.$i18n->get("lock").'");' unless ($self->isLocked);
+			$more .= "\nct_contextMenu.print();\n</script>\n";
+                	push(@crumbtrail,$more);
+		} else {
+                	push(@crumbtrail,'<a href="'.$ancestor->getUrl("func=manageAssets").'">'.$ancestor->getTitle.'</a>');
+		}
         }
-	my $output = '<div class="am-crumbtrail">'.join(" > ",@crumbtrail).'</div>';
+	my $output = '<div class="am-crumbtrail">'.join(" &gt; ",@crumbtrail).'</div>';
 	$output .= "
    <script type=\"text/javascript\">
    //<![CDATA[
