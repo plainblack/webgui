@@ -35,6 +35,12 @@ our $I18N = {
 		context => q|hover help for the comments field|
 	},
 
+	'comments description commit' => {
+		message => q|Attach any comments or feedback to this tag that you wish. They will be available to anyone looking at this tag in the future as reference.|,
+		lastUpdated => 0,
+		context => q|hover help for the comments field|
+	},
+
 	'deny' => {
 		message => q|Deny|,
 		lastUpdated => 0,
@@ -280,6 +286,11 @@ our $I18N = {
 		lastUpdated => 1129403469,
 	},
 
+	'version tag name description commit' => {
+		message => q|<p>The name of the version tag you are about to commit.</p>|,
+		lastUpdated => 1129403469,
+	},
+
 	'content versioning' => {
 		message => q|Content Versioning|,
 		lastUpdated => 0,
@@ -332,6 +343,12 @@ our $I18N = {
 <p>The name of the tag is a link to display what work was performed in the tag.  The date the tag was committed and the username of the user who committed the tag are shown as well.  A link is provided so that the tag can be rolled back.</p>
 |,
 		lastUpdated => 1148359381,
+	},
+
+	'commit version tag body' => {
+		message => q|<p>Committing the version tag will make it the current version that is used and displayed on your website.</p>
+|,
+		lastUpdated => 1148444236,
 	},
 
 	'topicName' => {

@@ -8,6 +8,10 @@ our $HELP = {
 		],
 		related => [
 			{
+				tag => 'commit version tag',
+				namespace => 'VersionTag'
+			},
+			{
 				tag => 'manage pending versions',
 				namespace => 'VersionTag'
 			},
@@ -22,6 +26,33 @@ our $HELP = {
 		title => 'manage pending versions',
 		body => 'manage pending versions body',
 		fields => [
+		],
+		related => [
+			{
+				tag => 'versions manage',
+				namespace => 'VersionTag'
+			},
+			{
+				tag => 'manage committed versions',
+				namespace => 'VersionTag'
+			},
+		],
+	},
+
+	'commit version tag' => {
+		title => 'commit version tag',
+		body => 'commit version tag body',
+		fields => [
+                        {
+                                title => 'version tag name',
+                                description => 'version tag name description commit',
+                                namespace => 'VersionTag',
+                        },
+                        {
+                                title => 'comments',
+                                description => 'comments description commit',
+                                namespace => 'VersionTag',
+                        },
 		],
 		related => [
 			{

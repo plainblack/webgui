@@ -191,6 +191,7 @@ sub www_commitVersionTag {
 			$f->submit;
 			$f->readOnly(
 				label=>$i18n->get("version tag name"),
+				hoverHelp=>$i18n->get("version tag name description commit"),
 				value=>$tag->get("name")
 				);
 			$f->hidden(
@@ -204,9 +205,11 @@ sub www_commitVersionTag {
 			$f->textarea(
 				name=>"comments",
 				label=>$i18n->get("comments")
+				hoverHelp=>$i18n->get("comments description commit")
 				);
 			$f->submit;
         		my $ac = WebGUI::AdminConsole->new($session,"versions");
+        		$ac->setHelp('commit version tag', 'VersionTag');
 			return $ac->render($f->print);
 		}
 	}
