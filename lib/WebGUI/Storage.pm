@@ -432,10 +432,17 @@ sub get {
 	my $session = shift;
 	my $id = shift;
 	return undef unless $id;
-	$id =~ m/^(.{2})(.{2})/;
-	my $self = {_session=>$session, _id => $id, _part1 => $1, _part2 => $2, _errors => []};
+	my $self;
+	$self = {_session=>$session, _id => $id, _errors => []};
 	bless $self, ref($class)||$class;
-	$self->_makePath unless (-e $self->getPath); # create the folder in case it got deleted somehow
+	if (my ($part1, $part2) = $id =~ m/^(.{2})(.{2})/) {
+		$self->{_part1} = $part1;
+		$self->{_part2} = $part2;
+		$self->_makePath unless (-e $self->getPath); # create the folder in case it got deleted somehow
+	}
+	else {
+		$self->_addError("Illegal ID: $id");
+	}
 	return $self;
 }
 

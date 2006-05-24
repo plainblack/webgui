@@ -310,6 +310,23 @@ our $I18N = {
 		context => q|The prompt for purging a revision from the manage revisios screen.|
 	},
 
+	'manage version tags' => {
+		message => q|Manage Version Tags|,
+		lastUpdated => 1148359381,
+	},
+
+	'manage version tags body' => {
+		message => q|<p>This screen lists all uncommitted version tags in WebGUI, their status and an interface to manage them.  If you are currently working under a tag, the name of the tag is prominently displayed for reference.</p>
+<p>The icons next to each tag allow each tag to be edited, or deleted.  The name of the tag is a link to manage work done in the tag.  The date the tag was created and the username of the user who created are shown as well.  A link is provided so that the tag can be committed</p>
+<p>Links are also provided to set any version tag that is not your version tag your new current working version tag.  From that point forward, all work will be done under the new tag.</p>|,
+		lastUpdated => 1148359381,
+	},
+
+	'topicName' => {
+		message => q|Version Control|,
+		lastUpdated => 1148360141,
+	},
+
 };
 
 1;

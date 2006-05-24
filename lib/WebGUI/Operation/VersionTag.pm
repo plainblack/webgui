@@ -337,7 +337,7 @@ sub www_manageVersions {
         return $session->privilege->insufficient() unless ($session->user->isInGroup(12));
         my $ac = WebGUI::AdminConsole->new($session,"versions");
 	my $i18n = WebGUI::International->new($session,"VersionTag");
-	$ac->setHelp("versions manage");
+	$ac->setHelp("versions manage", "VersionTag");
 	$ac->addSubmenuItem($session->url->page('op=editVersionTag'), $i18n->get("add a version tag"));
 	$ac->addSubmenuItem($session->url->page('op=managePendingVersions'), $i18n->get("manage pending versions")) if ($session->user->isInGroup(3));
 	$ac->addSubmenuItem($session->url->page('op=manageCommittedVersions'), $i18n->get("manage committed versions")) if ($session->user->isInGroup(3));
