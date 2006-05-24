@@ -316,6 +316,7 @@ sub www_managePendingVersions {
         }
         $sth->finish;
         $output .= '</table>';
+	$ac->setHelp('manage pending versions', 'VersionTag');
         return $ac->render($output,$i18n->get("pending versions"));
 }
 

@@ -7,6 +7,23 @@ our $HELP = {
 		fields => [
 		],
 		related => [
+			{
+				tag => 'manage pending versions',
+				namespace => 'VersionTag'
+			},
+		],
+	},
+
+	'manage pending versions' => {
+		title => 'manage pending versions',
+		body => 'manage pending versions body',
+		fields => [
+		],
+		related => [
+			{
+				tag => 'versions manage',
+				namespace => 'VersionTag'
+			},
 		],
 	},
 

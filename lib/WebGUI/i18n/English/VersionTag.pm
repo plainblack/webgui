@@ -322,6 +322,11 @@ our $I18N = {
 		lastUpdated => 1148359381,
 	},
 
+	'manage pending versions body' => {
+		message => q|<p>This screen presents a list of pending version tags by name.  Each name is a link to display the list of revisions in this tag.</p>|,
+		lastUpdated => 0,
+	},
+
 	'topicName' => {
 		message => q|Version Control|,
 		lastUpdated => 1148360141,
