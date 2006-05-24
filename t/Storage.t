@@ -19,7 +19,35 @@ use WebGUI::Storage;
 
 use Test::More;
 
-plan tests => 26; # increment this value for each test you create
+my $extensionTests = [
+	{
+		filename => 'filename',
+		extension => undef,
+		comment => 'no extension',
+	},
+	{
+		filename => 'filename.',
+		extension => '',
+		comment => 'dot, but no extension',
+	},
+	{
+		filename => 'filename.txt',
+		extension => 'txt',
+		comment => 'simple extension',
+	},
+	{
+		filename => 'filename.TXT',
+		extension => 'txt',
+		comment => 'extensions are all lowercase',
+	},
+	{
+		filename => 'filename.FOO.BAR',
+		extension => 'bar',
+		comment => 'multiple extensions return last extension',
+	},
+];
+
+plan tests => 27 + scalar @{ $extensionTests }; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -120,9 +148,25 @@ is (-s $filePath, length $content, 'file is the right size');
 
 is ($storage1->getFileSize($filename), length $content, 'getFileSize returns correct size');
 
+open my $fcon, "< ".$filePath or
+	die "Unable to open $filePath for reading: $!\n";
+my $fileContents;
+{
+	local undef $/;
+	$fileContents = <$fcon>;
+}
+close $fcon;
+
+is ($fileContents, $content, 'file contents match');
+
+is ($storage1->getFileContentsAsScalar($filename), $content, 'getFileContentsAsScalar matches');
+
+foreach my $extTest (@{ $extensionTests }) {
+	is( $storage1->getFileExtension($extTest->{filename}), $extTest->{extension}, $extTest->{comment} );
+}
+
 TODO: {
 	local $TODO = "Tests to make later";
-	ok(0, 'Add a file to the storage location via addFileFromFilesystem');
 	ok(0, 'Add a file to the storage location via addFileFromHashref');
 	ok(0, 'Test renaming of files inside of a storage location');
 }

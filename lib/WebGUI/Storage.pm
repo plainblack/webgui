@@ -504,7 +504,8 @@ sub getFileContentsAsScalar {
 
 =head2 getFileExtension ( filename )
 
-Returns the extension or type of this file.
+Returns the extension or type of this file.  If there's no extension, will either return
+undef or the empty string, dependent on the absence or presence of a dot.
 
 =head3 filename
 
@@ -515,8 +516,8 @@ The filename of the file you wish to find out the type for.
 sub getFileExtension {
 	my $self = shift;
 	my $filename = shift;
-        my $extension = lc($filename);
-        $extension =~ s/.*\.(.*?)$/$1/;
+	$filename = lc $filename;
+        my ($extension) = $filename =~ /\.([^.]*)$/;
         return $extension;
 }
 
