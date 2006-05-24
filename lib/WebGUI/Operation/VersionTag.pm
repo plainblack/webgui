@@ -205,7 +205,7 @@ sub www_commitVersionTag {
 				);
 			$f->textarea(
 				name=>"comments",
-				label=>$i18n->get("comments")
+				label=>$i18n->get("comments"),
 				hoverHelp=>$i18n->get("comments description commit")
 				);
 			$f->submit;
