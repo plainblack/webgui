@@ -344,7 +344,7 @@ our $I18N = {
 	},
 
 	'manage pending versions body' => {
-		message => q|<p>This screen presents a list of pending version tags by name.  Each name is a link to display the list of revisions in this tag.</p>|,
+		message => q|<p>This screen presents a list of pending version tags by name.  Version tags are pending after they have been committed and before they have been approved and/or processed, or if they are in the process of becoming unlocked to be re-edited.  Each name is a link to display the list of revisions in this tag.</p>|,
 		lastUpdated => 0,
 	},
 
