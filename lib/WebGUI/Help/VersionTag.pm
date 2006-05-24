@@ -11,6 +11,10 @@ our $HELP = {
 				tag => 'manage pending versions',
 				namespace => 'VersionTag'
 			},
+			{
+				tag => 'manage committed versions',
+				namespace => 'VersionTag'
+			},
 		],
 	},
 
@@ -22,6 +26,27 @@ our $HELP = {
 		related => [
 			{
 				tag => 'versions manage',
+				namespace => 'VersionTag'
+			},
+			{
+				tag => 'manage committed versions',
+				namespace => 'VersionTag'
+			},
+		],
+	},
+
+	'manage committed versions' => {
+		title => 'manage committed versions',
+		body => 'manage committed versions body',
+		fields => [
+		],
+		related => [
+			{
+				tag => 'versions manage',
+				namespace => 'VersionTag'
+			},
+			{
+				tag => 'manage committed versions',
 				namespace => 'VersionTag'
 			},
 		],

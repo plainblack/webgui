@@ -283,6 +283,7 @@ sub www_manageCommittedVersions {
         }
         $sth->finish;
         $output .= '</table>';
+	$ac->setHelp('manage committed versions', 'VersionTag');
         return $ac->render($output,$i18n->get("committed versions"));
 }
 

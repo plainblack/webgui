@@ -327,6 +327,13 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
+	'manage committed versions body' => {
+		message => q|<p>This screen lists all committed version tags in WebGUI, information about the tags and an interface to manage them.</p>
+<p>The name of the tag is a link to display what work was performed in the tag.  The date the tag was committed and the username of the user who committed the tag are shown as well.  A link is provided so that the tag can be rolled back.</p>
+|,
+		lastUpdated => 1148359381,
+	},
+
 	'topicName' => {
 		message => q|Version Control|,
 		lastUpdated => 1148360141,
