@@ -19,7 +19,7 @@ use WebGUI::Storage;
 
 use Test::More;
 
-plan tests => 22; # increment this value for each test you create
+plan tests => 26; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -93,11 +93,35 @@ SKIP: {
 	ok(!(-e $dir3 and -d $dir3), 'No directories created for short guid');
 }
 
+undef $storage3;
+
+$storage1 = WebGUI::Storage->create($session);
+
+is( ref $storage1, "WebGUI::Storage", "create returns a WebGUI Storage object");
+
+is( $storage1->getErrorCount, 0, "No errors during object creation");
+
+ok ((-e $storage1->getPath and -d $storage1->getPath), 'directory created correctly');
+
+my $content = <<EOCON;
+Hi, I'm a file.
+I have two lines.
+EOCON
+
+my $filename = $storage1->addFileFromScalar('content', $content);
+
+is ($filename, 'content', 'processed filename returned by addFileFromScalar');
+
+my $filePath = $storage1->getPath($filename);
+
+ok ((-e $filePath and -T $filePath), 'file was created as a text file');
+
+is (-s $filePath, length $content, 'file is the right size');
+
+is ($storage1->getFileSize($filename), length $content, 'getFileSize returns correct size');
+
 TODO: {
 	local $TODO = "Tests to make later";
-	ok(0, 'Create object with 1 character GUID');
-	ok(0, 'Add a file to the storage location via addFileFromScalar');
-	ok(0, 'getSize works correctly');
 	ok(0, 'Add a file to the storage location via addFileFromFilesystem');
 	ok(0, 'Add a file to the storage location via addFileFromHashref');
 	ok(0, 'Test renaming of files inside of a storage location');
