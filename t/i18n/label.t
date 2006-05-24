@@ -10,6 +10,7 @@
 
 use FindBin;
 use strict;
+use warnings;
 use lib "$FindBin::Bin/../lib"; ##t/lib
 
 use WebGUI::Test;
@@ -17,7 +18,6 @@ use WebGUI::Operation::Help;
 use WebGUI::International;
 use WebGUI::Session;
 use Text::Balanced qw(extract_codeblock);
-use Data::Dumper;
 use File::Find;
 
 #The goal of this test is to locate all of the international labels that it
@@ -111,7 +111,7 @@ foreach my $label ( @objLabels ) {
 }
 
 sub label_finder_pm {
-	next unless /\.pm$/;
+	return unless /\.pm$/;
 	open my $pmf, $_
 		or die "unable to open file $File::Find::name: $!\n";
 	my $libFile = '';
@@ -194,9 +194,41 @@ sub getHelpLabels {
 					label=>$field->{description},
 				},;
 			}
+			my $variableEntries = getHelpVariables($helpTable{$topic}{$entry}{variables});
+			foreach my $variable ( @{ $variableEntries } ) {
+				my $namespace = exists $variable->{namespace} ?  $variable->{namespace} : $topic;
+				my $one = {
+					topic=>$topic,
+					entry=>$entry,
+					tag=>'variables',
+					namespace=>$namespace,
+					label=>$variable->{name},
+				};
+				push @helpLabels, $one;
+				push @helpLabels, {
+					topic=>$topic,
+					entry=>$entry,
+					tag=>'fields',
+					namespace=>$namespace,
+					label=>$variable->{description},
+				} if exists $variable->{description};
+			}
 		}
 	}
 	return @helpLabels;
+}
+
+sub getHelpVariables {
+	my ($variables) = @_; ##An arrayref of variables, possibly with nested variables in loops
+	my $tmplVars;
+	foreach my $var ( @{ $variables } ) {
+		if ( exists $var->{variables} ) {
+			push @{ $tmplVars }, @{ getHelpVariables($var->{variables}) };
+			delete $var->{variables};
+		}
+		push @{ $tmplVars }, $var;
+	}
+	return $tmplVars;
 }
 
 sub getSQLLabels {
