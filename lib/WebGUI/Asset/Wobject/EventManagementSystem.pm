@@ -2688,12 +2688,17 @@ sub www_search {
 	
 	$var{'sortForm.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl()}).
 				  WebGUI::Form::hidden($self->session,{name=>"func", value=>"search"}).
-				  WebGUI::Form::hidden($self->session,{name=>"searchKeywords", value=>$self->session->form->get("searchKeywords")}).
+				  WebGUI::Form::hidden($self->session,{name=>"searchKeywords", value=>$self->session->form->get("searchKeywords")});
 				  #WebGUI::Form::hidden($self->session,{name=>"pn", value=>$self->session->form->get("pn")}).
-				  WebGUI::Form::hidden($self->session,{name=>"cfilter_s0", value=>$self->session->form->get("cfilter_s0")}).
-				  WebGUI::Form::hidden($self->session,{name=>"cfilter_c0", value=>$self->session->form->get("cfilter_c0")}).
-				  WebGUI::Form::hidden($self->session,{name=>"cfilter_t0", value=>$self->session->form->get("cfilter_t0")}).
-				  WebGUI::Form::hidden($self->session,{name=>"advSearch", value=>1});
+
+				for (0..25) {
+					if ($self->session->form->get("cfilter_s".$_) ne "") {
+						$var{'sortForm.header'} .= WebGUI::Form::hidden($self->session,{name=>"cfilter_s".$_, value=>$self->session->form->get("cfilter_s".$_)}).
+						WebGUI::Form::hidden($self->session,{name=>"cfilter_c".$_, value=>$self->session->form->get("cfilter_c".$_)}).
+						WebGUI::Form::hidden($self->session,{name=>"cfilter_t".$_, value=>$self->session->form->get("cfilter_t".$_)});
+					}
+				}
+	$var{'sortForm.header'} .= WebGUI::Form::hidden($self->session,{name=>"advSearch", value=>1});
 	$var{'sortForm.selectBox'} = WebGUI::Form::selectBox($self->session,{name=>'sortKey', options=>\%sortSelect, value => $sortKey});
 	$var{'sortForm.selectBox.label'} = $i18n->echo('Sort By');
 	$var{'sortForm.submit'} = WebGUI::Form::submit($self->session,{value=>$i18n->echo('Sort')});
