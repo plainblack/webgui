@@ -74,13 +74,24 @@ ok (!(-e $storageDir2), "Storage2 cleaned up properly");
 
 undef $storage2;
 
-my $storage3 = WebGUI::Storage->get($session, 'bad');
+my @dirOptions = qw/bad bAd Bad BAd/;
+my $skipDirCheck = 0;
+
+my ($dir3, $dirOpt);
+
+CHECKDIR: while ($dirOpt = pop @dirOptions) {
+	$dir3 = join '/', $uploadDir, substr $dirOpt,0,2;
+	last CHECKDIR if !-e $dir3;
+}
+
+my $storage3 = WebGUI::Storage->get($session, $dirOpt);
 
 is( $storage3->getErrorCount, 1, 'Error during creation of object due to short GUID');
 
-my $dir3 = join '/', $uploadDir, 'ba';
-
-ok(!(-e $dir3 and -d $dir3), 'No directories created for short guid');
+SKIP: {
+	skip 'All directory names already exist', 1 unless $dirOpt;
+	ok(!(-e $dir3 and -d $dir3), 'No directories created for short guid');
+}
 
 TODO: {
 	local $TODO = "Tests to make later";
