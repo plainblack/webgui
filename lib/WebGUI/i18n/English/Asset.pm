@@ -124,6 +124,11 @@ our $I18N = {
 		context => q|Context menu item.|
 	},
 
+	'revisions help' => {
+		message => q|Show a list of all revisions of this Asset.|,
+		lastUpdated => 0,
+	},
+
 	'rank' => {
 		message => q|Rank|,
 		lastUpdated => 0,
@@ -171,19 +176,29 @@ our $I18N = {
 		lastUpdated => 0,
 		context => q|Used in asset context menus.|
 	},
-	
+
 	'promote' => {
 		message => q|Promote|,
 		lastUpdated => 0,
 		context => q|Used in asset context menus.|
 	},
-	
+
+	'promote help' => {
+		message => q|Move this Asset up one spot on the page.|,
+		lastUpdated => 0,
+	},
+
 	'demote' => {
 		message => q|Demote|,
 		lastUpdated => 0,
 		context => q|Used in asset context menus.|
 	},
-	
+
+	'demote help' => {
+		message => q|Move this Asset down one spot on the page.|,
+		lastUpdated => 0,
+	},
+
 	'cut' => {
 		message => q|Cut|,
 		lastUpdated => 0,
@@ -207,13 +222,18 @@ our $I18N = {
 		lastUpdated => 0,
 		context => q|Used in asset context menus.|
 	},
-	
+
 	'view' => {
 		message => q|View|,
 		lastUpdated => 0,
 		context => q|Used in asset context menus.|
 	},
-	
+
+	'view help' => {
+		message => q|Most Assets are viewed as part of a container Asset like a Page or Folder.  This option will allow you to view the Asset standalone.|,
+		lastUpdated => 0,
+	},
+
 	'delete' => {
 		message => q|Delete|,
 		lastUpdated => 0,
@@ -225,13 +245,24 @@ our $I18N = {
 		lastUpdated => 0,
 		context => q|Used in asset context menus.|
 	},
-	
+
+	'manage help' => {
+		message => q|Bring up the Asset Manager displaying this Asset's children, if any.|,
+		lastUpdated => 0,
+	},
+
 	'edit branch' => {
 		message => q|Edit Branch|,
 		lastUpdated => 0,
 		context => q|Used in asset context menus.|
 	},
-	
+
+	'edit branch help' => {
+		message => q|Bring up the Edit Branch interface, to make changes to this Asset and all Assets below it|,
+		lastUpdated => 0,
+		context => q|Used in asset context menus.|
+	},
+
 	'edit' => {
 		message => q|Edit|,
 		lastUpdated => 0,

@@ -163,8 +163,62 @@ our $HELP = {
                                 namespace => 'Asset',
 				uiLevel => 9,
                         },
+                        {
+                                title => 'Export',
+                                description => 'Export help',
+                                namespace => 'Icon',
+				uiLevel => 9,
+                        },
+                        {
+                                title => 'edit branch',
+                                description => 'edit branch help',
+                                namespace => 'Asset',
+				uiLevel => 9,
+                        },
+                        {
+                                title => 'promote',
+                                description => 'promote help',
+                                namespace => 'Asset',
+				uiLevel => 3,
+                        },
+                        {
+                                title => 'demote',
+                                description => 'demote help',
+                                namespace => 'Asset',
+				uiLevel => 3,
+                        },
+                        {
+                                title => 'manage',
+                                description => 'manage help',
+                                namespace => 'Asset',
+				uiLevel => 5,
+                        },
+                        {
+                                title => 'revisions',
+                                description => 'revisions help',
+                                namespace => 'Asset',
+				uiLevel => 5,
+                        },
+                        {
+                                title => 'view',
+                                description => 'view help',
+                                namespace => 'Asset',
+				uiLevel => 1,
+                        },
 		],
 		related => [
+			{
+				tag => 'change url',
+				namespace => 'Asset',
+			},
+			{
+				tag => 'page export',
+				namespace => 'Asset',
+			},
+			{
+				tag => 'manage versions',
+				namespace => 'Asset',
+			},
 		]
 	},
 

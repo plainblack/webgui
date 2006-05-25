@@ -121,6 +121,11 @@ our $I18N = {
 		lastUpdated => 1096319561
 	},
 
+	'Export help' => {
+		message => q|Bring up the Export as HTML screen for this Asset.|,
+		lastUpdated => 1096319561
+	},
+
 };
 
 1;
