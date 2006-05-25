@@ -1135,7 +1135,13 @@ Shows a confirmation message letting the user know their post has been submitted
 sub www_showConfirmation {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session, "Asset_Post");
-	return $self->getThread->getParent->processStyle('<p>'.$i18n->get("post received").'</p><p><a href="'.$self->getThread->getParent->getUrl.'">'.$i18n->get("493","WebGUI").'</a></p>');
+	my $url = undef;
+	if ($self->isReply) {
+		$url = $self->getThread->getUrl;
+	} else {
+		$url = $self->getThread->getParent->getUrl;
+	}
+	return $self->getThread->getParent->processStyle('<p>'.$i18n->get("post received").'</p><p><a href="'.$url.'">'.$i18n->get("493","WebGUI").'</a></p>');
 }
 
 

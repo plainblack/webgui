@@ -1,6 +1,8 @@
 6.99.2
  - Added UI Levels to asset toolbar icons, as discussed in Community IRC.
  - Data Forms now send email as HTML. 
+ - The back to site link generated after a CS post now leads back to the
+   thread if the new post is a reply to a thread as discussed in Community IRC.
  - Added full drag bar to the top of each asset as discussed in Community IRC.
  - fixed a bug in the project management app that was causing a no privilege error when trying to display the view.
  - fixed various bugs in the project management app.
