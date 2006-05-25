@@ -268,7 +268,6 @@ sub getOperations {
 		'setWorkingVersionTag' => 'WebGUI::Operation::VersionTag',
 
 		'genesis' => 'WebGUI::Operation::WebGUI',
-		'setup' => 'WebGUI::Operation::WebGUI',
 		'theWg' => 'WebGUI::Operation::WebGUI',
 
 		'addWorkflow' => 'WebGUI::Operation::Workflow',

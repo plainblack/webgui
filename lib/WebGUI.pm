@@ -19,9 +19,11 @@ use WebGUI::Affiliate;
 use WebGUI::Asset;
 use WebGUI::Cache;
 use WebGUI::Config;
+use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Operation;
 use WebGUI::Session;
+use WebGUI::User;
 use WebGUI::Utility;
 use WebGUI::PassiveProfiling;
 use Apache2::Request;
@@ -90,11 +92,14 @@ sub contentHandler {
 		$session->http->sendHeader;
 	} elsif ($session->setting->get("specialState") eq "upgrading") {
 		upgrading($session);
-	} elsif ($session->setting->get("specialState") eq "init") {
-		setup($session);
 	} else {
-		my $output = "";
-		if ($session->errorHandler->canShowPerformanceIndicators) {
+		my $output = processOperations($session);
+		if ($output ne "") {
+			# do nothing because we have operation output to display
+			$output = undef if ($output eq "chunked");
+		} elsif ($session->setting->get("specialState") eq "init") {
+			$output = setup($session);
+		} elsif ($session->errorHandler->canShowPerformanceIndicators) {
 			my $t = [Time::HiRes::gettimeofday()];
 			$output = page($session);
 			$t = Time::HiRes::tv_interval($t) ;
@@ -175,24 +180,22 @@ Optionally pass in a URL to be loaded.
 sub page {
 	my $session = shift;
 	my $assetUrl = shift || $session->url->getRequestedUrl;
-	my $output = processOperations($session);
-	if ($output eq "") {
-		my $asset = eval{WebGUI::Asset->newByUrl($session,$assetUrl,$session->form->process("revision"))};
-		if ($@) {
-			$session->errorHandler->warn("Couldn't instantiate asset for url: ".$assetUrl." Root cause: ".$@);
-		}
-		if (defined $asset) {
-			my $method = "view";
-			if ($session->form->process("func")) {
-				$method = $session->form->process("func");
-				unless ($method =~ /^[A-Za-z]+$/) {
-					$session->errorHandler->security("to call a non-existent method $method on $assetUrl");
-					$method = "view";
-				}
+	my $asset = eval{WebGUI::Asset->newByUrl($session,$assetUrl,$session->form->process("revision"))};
+	if ($@) {
+		$session->errorHandler->warn("Couldn't instantiate asset for url: ".$assetUrl." Root cause: ".$@);
+	}
+	my $output = undef;
+	if (defined $asset) {
+		my $method = "view";
+		if ($session->form->process("func")) {
+			$method = $session->form->process("func");
+			unless ($method =~ /^[A-Za-z]+$/) {
+				$session->errorHandler->security("to call a non-existent method $method on $assetUrl");
+				$method = "view";
 			}
-			$output = tryAssetMethod($session,$asset,$method);
-			$output = tryAssetMethod($session,$asset,"view") unless ($output || ($method eq "view"));
 		}
+		$output = tryAssetMethod($session,$asset,$method);
+		$output = tryAssetMethod($session,$asset,"view") unless ($output || ($method eq "view"));
 	}
 	if (defined($output) and $output eq "") {
 		if ($session->var->isAdminOn) { # they're expecting it to be there, so let's help them add it
@@ -254,8 +257,93 @@ The current WebGUI::Session object.
 
 sub setup {
 	my $session = shift;
-	require WebGUI::Operation::WebGUI;
-	WebGUI::Operation::WebGUI::www_setup($session);
+	my $i18n = WebGUI::International->new($session, "WebGUI");
+	my $output = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>WebGUI Initial Configuration</title>
+		<style type="text/css">
+		a { color: black; }
+		a:visited { color: black;}
+		</style>
+	</head>
+	<body><div style="font-family: georgia, helvetica, arial, sans-serif; color: white; z-index: 10; width: 550px; height: 400px; top: 20%; left: 20%; position: absolute;"><h1>WebGUI Initial Configuration</h1><fieldset>';
+	if ($session->form->process("step") eq "2") {
+		$output .= '<legend align="left">Company Information</legend>';
+		my $u = WebGUI::User->new($session,"3");
+		$u->username($session->form->process("username","text","Admin"));
+		$u->profileField("email",$session->form->email("email"));
+		$u->identifier(Digest::MD5::md5_base64($session->form->process("identifier","password","123qwe")));
+		my $f = WebGUI::HTMLForm->new($session,action=>$session->url->gateway());
+		$f->hidden(
+			-name=>"step",
+			-value=>"3"
+			);
+		$f->text(
+			-name=>"companyName",
+			-value=>$session->setting->get("companyName"),
+			-label=>$i18n->get(125),
+			-hoverHelp=>$i18n->get('125 description'),
+			);
+		$f->email(
+			-name=>"companyEmail",
+			-value=>$session->setting->get("companyEmail"),
+			-label=>$i18n->get(126),
+			-hoverHelp=>$i18n->get('126 description'),
+			);
+		$f->url(
+			-name=>"companyURL",
+			-value=>$session->setting->get("companyURL"),
+			-label=>$i18n->get(127),
+			-hoverHelp=>$i18n->get('127 description'),
+			);
+		$f->submit;
+		$output .= $f->print;
+	} elsif ($session->form->process("step") eq "3") {
+		$session->setting->remove('specialState');
+		$session->setting->set('companyName',$session->form->text("companyName"));
+		$session->setting->set('companyURL',$session->form->url("companyURL"));
+		$session->setting->set('companyEmail',$session->form->email("companyEmail"));
+		$session->http->setRedirect($session->url->gateway());
+		return undef;
+	} else {
+		$output .= '<legend align="left">Admin Account</legend>';
+		my $u = WebGUI::User->new($session,'3');
+		my $f = WebGUI::HTMLForm->new($session,action=>$session->url->gateway());
+		$f->hidden(
+			-name=>"step",
+			-value=>"2"
+			);
+		$f->text(
+			-name=>"username",
+			-value=>$u->username,
+			-label=>$i18n->get(50),
+			-hoverHelp=>$i18n->get('50 setup description'),
+			);
+		$f->text(
+			-name=>"identifier",
+			-value=>"123qwe",
+			-label=>$i18n->get(51),
+			-hoverHelp=>$i18n->get('51 description'),
+			-subtext=>'<div style=\"font-size: 10px;\">('.$i18n->get("password clear text").')</div>'
+			);
+		$f->email(
+			-name=>"email",
+			-value=>$u->profileField("email"),
+			-label=>$i18n->get(56),
+			-hoverHelp=>$i18n->get('56 description'),
+			);
+		$f->submit;
+		$output .= $f->print; 
+	}
+	$output .= '</fieldset></div>
+		<img src="'.$session->url->extras('background.jpg').'" style="border-style:none;position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5;" />
+	</body>
+</html>';
+	$session->http->setCacheControl("none");
+	$session->http->setMimeType("text/html");
+	return $output;
 }
 
 
