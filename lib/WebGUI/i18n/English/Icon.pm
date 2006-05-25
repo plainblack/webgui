@@ -6,6 +6,11 @@ our $I18N = {
 		lastUpdated => 1096319549
 	},
 
+	'locked help' => {
+		message => q|Show a list of all revisions of this Asset.  This icon is only available if the asset isn't locked, or if it is locked and you are using the tag is was edited under.|,
+		lastUpdated => 1148591578
+	},
+
 	'Move Up' => {
 		message => q|Move Up|,
 		lastUpdated => 1096319549
@@ -36,9 +41,19 @@ our $I18N = {
 		lastUpdated => 1096319531
 	},
 
+	'Create Shortcut help' => {
+		message => q|Create a Shortcut to this Asset and put the Shortcut on the Clipboard.  Since you can not create a Shortcut to another Shortcut, this icon will not be shown for any type of Shortcut Asset.|,
+		lastUpdated => 1096319531
+	},
+
 	'Cut' => {
 		message => q|Cut|,
 		lastUpdated => 1096319564
+	},
+
+	'Cut help' => {
+		message => q|Cut this asset and place it into the clipboard.|,
+		lastUpdated => 1148591672
 	},
 
 	'Move To Top' => {
@@ -51,6 +66,11 @@ our $I18N = {
 		lastUpdated => 1096319563
 	},
 
+	'Delete help' => {
+		message => q|Delete this asset and put a copy in the trash.  This icon is only available if the asset isn't locked, or if it is locked and you are using the tag is was edited under.|,
+		lastUpdated => 1148591221
+	},
+
 	'Wobject Settings' => {
 		message => q|Wobject Settings|,
 		lastUpdated => 1096319543
@@ -61,9 +81,19 @@ our $I18N = {
 		lastUpdated => 1096319529
 	},
 
+	'Copy help' => {
+		message => q|Place a copy of this Asset into the Clipboard.|,
+		lastUpdated => 1148591693
+	},
+
 	'Edit' => {
 		message => q|Edit|,
 		lastUpdated => 1096319562
+	},
+
+	'Edit help' => {
+		message => q|Edit the properties of this Asset.  This icon is only available if the asset isn't locked, or if it is locked and you are using the tag is was edited under.|,
+		lastUpdated => 1148591273
 	},
 
 	'Manage' => {

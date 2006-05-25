@@ -37,6 +37,16 @@ our $I18N = {
 		context => q|the title of the change url function|
 	},
 
+	'change url help' => {
+		message => q|Bring up the Change URL screen for this Asset.|,
+		lastUpdated => 0,
+	},
+
+	'change url body' => {
+		message => q|<p>Suppose that you want to put a new Asset in the place of an old Asset and to use the old Asset's URL for the new Asset.  Normally, to do this you would have to change the URL in the latest revision of the Asset and then purge each and every revision of the old Asset (since the old revisions of the old Asset have the same URL).  Change URL allows you to do this easily.  Enter in the new URL for the old Asset, and it will perform all the work for you.</p>|,
+		lastUpdated => 0,
+	},
+
 	'ago' => {
 		message => q|ago|,
 		lastUpdated => 0,
@@ -95,6 +105,11 @@ our $I18N = {
 		message => q|Lock|,
 		lastUpdated => 0,
 		context => q|A context menu item to lock an asset for editing.|
+	},
+
+	'lock help' => {
+		message => q|Grab a copy of this Asset for editing, which locks the Asset to anyone not using your current version tag.  This option is only displayed if the Asset isn't currently locked.|,
+		lastUpdated => 0,
 	},
 
 	'locked' => {
@@ -815,6 +830,28 @@ Couldn't open %-s because %-s <br />
 
 	'manage versions body' => {
 		message => q|<p>This screen displays a list of all versions for the current Asset, showing the date it was committed or opened, who owns the tag for that version, and the name of the version tag.  Icons will allow you purge a revision and remove it from the system or to view that particular version of the  Asset.  The version tag name is a link that will take you to the Manage Revisions in Tag screen.|,
+		lastUpdated => 0,
+	},
+
+	'asset toolbar title' => {
+		message => q|Asset Toolbar|,
+		lastUpdated => 0,
+	},
+
+	'asset toolbar body' => {
+		message => q|<p>When you are viewing an asset, and you have editing privileges for that asset
+and you have Admin mode turned on, the assets will display an toolbar with icons that allow you
+to edit or modify that asset.</p>|,
+		lastUpdated => 0,
+	},
+
+	'Class Icon' => {
+		message => q|Class Icon|,
+		lastUpdated => 0,
+	},
+
+	'Class Icon help' => {
+		message => q|Each Asset will also display a class icon.  Most Class Icons are unique to an Asset, and are smaller versions of the Icons diplayed in the Admin Console to add a new Asset to your site.  Clicking on the Class Icon will show a drop-down menu with additional editing options.|,
 		lastUpdated => 0,
 	},
 

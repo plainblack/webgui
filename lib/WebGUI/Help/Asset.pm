@@ -106,6 +106,87 @@ our $HELP = {
 		]
 	},
 
+	'asset toolbar' => {
+		title => 'asset toolbar title',
+		body => 'asset toolbar body',
+		fields => [
+                        {
+                                title => 'Delete',
+                                description => 'Delete help',
+                                namespace => 'Icon',
+				uiLevel => 1,
+                        },
+                        {
+                                title => 'Edit',
+                                description => 'Edit help',
+                                namespace => 'Icon',
+				uiLevel => 1,
+                        },
+                        {
+                                title => 'locked',
+                                description => 'locked help',
+                                namespace => 'Icon',
+				uiLevel => 5,
+                        },
+                        {
+                                title => 'Cut',
+                                description => 'Cut help',
+                                namespace => 'Icon',
+				uiLevel => 1,
+                        },
+                        {
+                                title => 'Copy',
+                                description => 'Copy help',
+                                namespace => 'Icon',
+				uiLevel => 1,
+                        },
+                        {
+                                title => 'Create Shortcut',
+                                description => 'Create Shortcut help',
+                                namespace => 'Icon',
+				uiLevel => 5,
+                        },
+                        {
+                                title => 'Class Icon',
+                                description => 'Class Icon help',
+                                namespace => 'Asset',
+                        },
+                        {
+                                title => 'lock',
+                                description => 'lock help',
+                                namespace => 'Asset',
+				uiLevel => 5,
+                        },
+                        {
+                                title => 'change url',
+                                description => 'change url help',
+                                namespace => 'Asset',
+				uiLevel => 9,
+                        },
+		],
+		related => [
+		]
+	},
+
+	'change url' => {
+		title => 'change url',
+		body => 'change url body',
+		fields => [
+                        {
+                                title => '104',
+                                description => '104 description',
+                                namespace => 'Asset',
+                        },
+                        {
+                                title => 'confirm change',
+                                description => 'confirm change url message',
+                                namespace => 'Asset',
+                        },
+		],
+		related => [
+		]
+	},
+
 	'content prototypes' => {
 		title => 'prototype using title',
 		body => 'prototype using body',

@@ -1864,6 +1864,7 @@ sub www_changeUrl {
 	$f->text(name=>"url", value=>$self->get('url'), label=>$i18n->get("104"), hoverHelp=>$i18n->get('104 description'));
 	$f->yesNo(name=>"confirm", value=>0, label=>$i18n->get("confirm change"), hoverHelp=>$i18n->get("confirm change url message"), subtext=>'<br />'.$i18n->get("confirm change url message"));
 	$f->submit;
+	$self->getAdminConsole->setHelp('change url', 'Asset');
 	return $self->getAdminConsole->render($f->print,$i18n->get("change url"));
 }
 
