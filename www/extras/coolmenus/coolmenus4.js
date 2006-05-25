@@ -175,7 +175,7 @@ makeCM.prototype.makeMenu=function(name,parent,txt,lnk,targ,w,h,img1,img2,cl,cl2
   if(img1){m.img1 = new Image(); m.img1.src=c.root+img1; if(!img2) img2=img1; m.img2 = new Image(); m.img2.src=c.root+img2;
     m.cl="clCMAbs"; m.txt=''; if(!bw.reuse&&!nolink) m.txt = '<a href="#" onmouseover="'+c.name+'.showsub(\''+name+'\')" onmouseout="'+c.name+'.mout(\''+name+'\')" onclick="'+c.name+'.onclck(\''+name+'\'); return false">';;
     m.txt+='<img alt="" src="'+c.root+img1+'" width="'+m.w+'" height="'+m.h+'" id="img'+m.name+'" '
-    if(bw.dom&&!nolink) m.txt+='style="cursor:pointer; cursor:hand"'; if(!bw.reuse){if(!bw.dom) m.txt+='name="img'+m.name+'"'; m.txt+=' border="0"'}; m.txt+=' />'; if(!bw.reuse&&!nolink) m.txt+='</a>'
+    if(bw.dom&&!nolink) m.txt+='style="cursor:pointer;"'; if(!bw.reuse){if(!bw.dom) m.txt+='name="img'+m.name+'"'; m.txt+=' border="0"'}; m.txt+=' />'; if(!bw.reuse&&!nolink) m.txt+='</a>'
   }else{m.img1=0; m.img2=0}; 
   if(l==0||create) c.l[l].str+=cm_getLayerStr(m,c.l[l].app,c.name,c.fillImg,c.l[l].borderClass,c.l[l].arrow,c.l[l].arrowWidth,c.l[l].arrowHeight,c.root)
   if(l==0){if(m.w>c.maxw) c.maxw=m.w; if(m.h>c.maxh) c.maxh=m.h; c.totw+=c.pxBetween+m.w+c.l[0].borderX;c.toth+=c.pxBetween+m.h+c.l[0].borderY}
@@ -242,7 +242,7 @@ makeCM.prototype.showsub=function(el){ //Changed v4.06
           o.evnt.onmouseout=new Function(c.name+".mout('"+m.name+"')") //Added v4.05
           o.evnt.onclick=new Function(c.name+".onclck('"+m.name+"')")
           if(o.oldcursor){o.css.cursor=o.oldcursor; o.oldcursor=0;}
-        }else{o.evnt.onmouseover=''; o.evnt.onclick='';  if(o.css.cursor=='') o.oldcursor=bw.ns6?"pointer":"hand"; else o.oldcursor=o.css.cursor; o.css.cursor="auto"}        
+        }else{o.evnt.onmouseover=''; o.evnt.onclick='';  if(o.css.cursor=='') o.oldcursor="pointer"; else o.oldcursor=o.css.cursor; o.css.cursor="auto"}        
       }if(m.arr){o.arr=c.l[l].arr[cn]; o.arr.moveIt(x + m.w-c.l[l].arrowWidth-3,y+m.h/2-(c.l[l].arrowHeight/2)); 
       o.arr.css.visibility="inherit"; cn++;} else o.arr=0
       if(!rows){y+=m.h+by; if(m.w>maxw) maxw=m.w; maxh=y}

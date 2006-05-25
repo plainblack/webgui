@@ -1,13 +1,13 @@
 6.99.2
- - fix demo.plainblack.com getting started
+ - fix - demo.plainblack.com getting started
  - Added UI Levels to asset toolbar icons, as discussed in Community IRC.
  - Data Forms now send email as HTML. 
  - The back to site link generated after a CS post now leads back to the
    thread if the new post is a reply to a thread as discussed in Community IRC.
- - fix create.sql / style3
- - fix Spectre memory consumption
- - fix password vidible in debug mode
- - fix No way to add an advertisment to an adspace.
+ - fix - create.sql / style3
+ - fix - Spectre memory consumption
+ - fix - password vidible in debug mode
+ - fix - No way to add an advertisment to an adspace.
  - Added full drag bar to the top of each asset as discussed in Community IRC.
  - fixed a bug in the project management app that was causing a no privilege error when trying to display the view.
  - fixed various bugs in the project management app.
@@ -15,6 +15,7 @@
  - If a storage object is deleted, it will prune the directory structure
    upward if the directories are empty, until it reaches the uploads dir.
  - fix [ 1489017 ] Changing default time zone can disable site
+ - fix - demo.plainblack.com I beam cursor on menu
  - fix [ 1490812 ] Events cannot be purged.
  - fix [ 1466902 ] $u->status('Deactivated') does not expire existing sessions
  - fix - msgs with only text/html not accepted as such
