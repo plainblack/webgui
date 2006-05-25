@@ -99,7 +99,7 @@ Prints out error information.
 sub error {
 	my $self = shift;
 	my $output = shift;
-	print "ADMIN: ".$output."\n";
+	print "ADMIN: [Error] ".$output."\n";
 	$self->getLogger->error("ADMIN: ".$output);
 }
 
@@ -183,6 +183,7 @@ sub runTests {
 	$self->debug("Running connectivity tests.");
 	my $configs = WebGUI::Config->readAllConfigs($self->config->getWebguiRoot);
 	foreach my $config (keys %{$configs}) {
+		next if $config =~ m/^demo/;
 		$self->debug("Testing $config");
 		 my $userAgent = new LWP::UserAgent;
         	$userAgent->agent("Spectre");

@@ -36,6 +36,7 @@ sub _start {
 	$self->debug("Reading workflow configs.");
 	my $configs = WebGUI::Config->readAllConfigs($self->config->getWebguiRoot);
 	foreach my $config (keys %{$configs}) {
+		next if $config =~ m/^demo/;
 		$kernel->yield("loadWorkflows", $configs->{$config});
 	}
         $kernel->yield("checkInstances");
@@ -211,7 +212,7 @@ sub error {
 	my $self = shift;
 	my $output = shift;
 	if ($self->{_debug}) {
-		print "WORKFLOW: ".$output."\n";
+		print "WORKFLOW: [Error] ".$output."\n";
 	}
 	$self->getLogger->error("WORKFLOW: ".$output);
 }
@@ -355,17 +356,22 @@ Suspends a workflow instance for a number of seconds defined in the config file,
 
 sub suspendInstance {
 	my ($self, $instanceId, $kernel) = @_[OBJECT, ARG0, KERNEL];
-	$self->debug("Suspending workflow instance ".$instanceId." for ".$self->config->get("suspensionDelay")." seconds.");
-	# normally this is taken care of by the returnInstanceToQueue method, but we want to free up the running count
-	# so that other things can be run while this thing is suspended
-	if ($self->{_instances}{$instanceId}) {
-		for (my $i=0; $i < scalar(@{$self->{_runningInstances}}); $i++) {
-			if ($self->{_runningInstances}[$i] eq $instanceId) {
-				splice(@{$self->{_runningInstances}}, $i, 1);
+	if ($self->{_errorCount}{$instanceId} >= 5) {
+		$self->error("Workflow instance $instanceId has failed to execute ".$self->{_errorCount}{$instanceId}." times in a row and will no longer attempt to execute.");
+		$kernel->yield("deleteInstance",$instanceId);
+	} else {
+		$self->debug("Suspending workflow instance ".$instanceId." for ".$self->config->get("suspensionDelay")." seconds.");
+		# normally this is taken care of by the returnInstanceToQueue method, but we want to free up the running count
+		# so that other things can be run while this thing is suspended
+		if ($self->{_instances}{$instanceId}) {
+			for (my $i=0; $i < scalar(@{$self->{_runningInstances}}); $i++) {
+				if ($self->{_runningInstances}[$i] eq $instanceId) {
+					splice(@{$self->{_runningInstances}}, $i, 1);
+				}
 			}
 		}
+		$kernel->delay_set("returnInstanceToQueue",$self->config->get("suspensionDelay"), $instanceId);
 	}
-	$kernel->delay_set("returnInstanceToQueue",$self->config->get("suspensionDelay"), $instanceId);
 }
 
 #-------------------------------------------------------------------
@@ -392,30 +398,36 @@ sub workerResponse {
 		}
 		my $state = $response->content; 
 		if ($state eq "waiting") {
+			$self->{_errorCount}{$instanceId}=0;
 			$self->debug("Was told to wait on $instanceId because we're still waiting on some external event.");
 			$kernel->yield("suspendInstance",$instanceId);
 		} elsif ($state eq "complete") {
+			$self->{_errorCount}{$instanceId}=0;
 			$self->debug("Workflow instance $instanceId ran one of it's activities successfully.");
 			$kernel->yield("returnInstanceToQueue",$instanceId);
 		} elsif ($state eq "disabled") {
+			$self->{_errorCount}{$instanceId}=0;
 			$self->debug("Workflow instance $instanceId is disabled.");
 			$kernel->yield("suspendInstance",$instanceId);			
 		} elsif ($state eq "done") {
+			$self->{_errorCount}{$instanceId}=0;
 			$self->debug("Workflow instance $instanceId is now complete.");
 			$kernel->yield("deleteInstance",$instanceId);			
 		} elsif ($state eq "error") {
+			$self->{_errorCount}{$instanceId}++;
 			$self->debug("Got an error response for $instanceId.");
 			$kernel->yield("suspendInstance",$instanceId);
 		} else {
+			$self->{_errorCount}{$instanceId}++;
 			$self->error("Something bad happened on the return of $instanceId. ".$response->error_as_HTML);
 			$kernel->yield("suspendInstance",$instanceId);
 		}
 	} elsif ($response->is_redirect) {
-		$self->debug("Response for $instanceId was redirected.");
+		$self->error("Response for $instanceId was redirected. This should never happen if configured properly!!!");
 	} elsif ($response->is_error) {	
+		$self->{_errorCount}{$instanceId}++;
 		$self->error("Response for $instanceId had a communications error. ".$response->error_as_HTML);
 		$kernel->yield("suspendInstance",$instanceId)
-		# we should probably log something
 	}
 }
 

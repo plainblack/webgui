@@ -403,7 +403,13 @@ sub showDebug {
 	$text = $self->session->stow->get('debug_info'); 
 	$text =~  s/\n/\<br \/\>\n/g;
 	$output .= '<div style="text-align: left;background-color: #ffffdd;color: #000000;">'.$text."</div>\n";
-	$text = JSON::objToJson($self->session->form->paramsHashRef(), {pretty => 1, indent => 4, autoconv=>0, skipinvalid=>1});
+	my $form = $self->session->form->paramsHashRef();
+	foreach my $key (keys %{$form}) {
+		if ($key eq "password" || $key eq "identifier") {
+			$form->{$key} = "********";
+		}
+	}
+	$text = JSON::objToJson($form, {pretty => 1, indent => 4, autoconv=>0, skipinvalid=>1});
 	$text =~ s/&/&amp;/xsg;
 	$text =~ s/>/&gt;/xsg;
 	$text =~ s/</&lt;/xsg;

@@ -272,11 +272,11 @@ sub www_editAdSpace {
 	my $ac = WebGUI::AdminConsole->new($session,"adSpace");
 	if (defined $adSpace) {
 		$id = $adSpace->getId;
-		$ac->addSubmenuItem($session->url->page("op=editAd;adSpaceId=".$id), $i18n->get("add an ad")) if defined $adSpace;
 	} else {
 		$id = $session->form->param("adSpaceId") || "new";
 		$adSpace = WebGUI::AdSpace->new($session, $id);
 	}
+	$ac->addSubmenuItem($session->url->page("op=editAd;adSpaceId=".$id), $i18n->get("add an ad")) if defined $adSpace;
 	$ac->addSubmenuItem($session->url->page("op=manageAdSpaces"), $i18n->get("manage ad spaces"));
 	my $f = WebGUI::HTMLForm->new($session);
 	$f->submit;

@@ -40,6 +40,7 @@ sub _start {
 	$self->debug("Loading the schedules from all the sites.");
 	my $configs = WebGUI::Config->readAllConfigs($self->config->getWebguiRoot);
 	foreach my $config (keys %{$configs}) {
+		next if $config =~ m/^demo/;
 		$kernel->yield("loadSchedule", $config);
 	}
         $kernel->yield("checkSchedules");
@@ -273,7 +274,7 @@ sub error {
 	my $self = shift;
 	my $output = shift;
 	if ($self->{_debug}) {
-		print "CRON: ".$output."\n";
+		print "CRON: [Error] ".$output."\n";
 	}
 	$self->getLogger->error("CRON: ".$output);
 }
@@ -372,8 +373,11 @@ sub runJob {
 	$self->debug("Preparing to run a scheduled job ".$job->{taskId}.".");
 	POE::Component::Client::UserAgent->new;
 	if ($job->{sitename} eq "" || $job->{config} eq "" || $job->{taskId} eq "") {
-		$self->error("Warning: A scheduled task has corrupt information and is not able to be run. Skipping execution.");
+		$self->error("A scheduled task has corrupt information and is not able to be run. Skipping execution.");
 		$kernel->yield("deleteJob",{config=>$job->{config}, taskId=>$job->{taskId}}) if ($job->{config} ne "" && $job->{taskId} ne "");
+	} elsif ($self->{_errorCount}{$job->{config}}{$job->{taskId}} >= 5) {
+		$self->error("Scheduled task ".$job->{config}." / ".$job->{taskId}." has failed ".$self->{_errorCount}{$job->{config}}{$job->{taskId}}." times in a row and will no longer attempt to execute.");
+		$kernel->yield("deleteJob",{config=>$job->{config}, taskId=>$job->{taskId}});
 	} else {
 		my $url = "http://".$job->{sitename}.':'.$self->config->get("webguiPort").$job->{gateway};
 		my $request = POST $url, [op=>"runCronJob", taskId=>$job->{taskId}];
@@ -414,23 +418,26 @@ sub runJobResponse {
 		}
 		my $state = $response->content; 
 		if ($state eq "done") {
+			$self->{_errorCount}{$config}{$taskId} = 0;
 			$self->debug("Scheduled task $config / $taskId is now complete.");
 			if ($job->{runOnce}) {
 				$kernel->yield("deleteJob",{config=>$job->{config}, taskId=>$job->{taskId}});
 			}
 		} elsif ($state eq "error") {
+			$self->{_errorCount}{$config}{$taskId}++;
 			$self->debug("Got an error response for scheduled task $config / $taskId, will try again in ".$self->config->get("suspensionDelay")." seconds.");
 			$kernel->delay_set("runJob",$self->config->get("suspensionDelay"),$job);
 		} else {
+			$self->{_errorCount}{$config}{$taskId}++;
 			$self->error("Something bad happened on the return of scheduled task $config / $taskId, will try again in ".$self->config->get("suspensionDelay")." seconds. ".$response->error_as_HTML);
 			$kernel->delay_set("runJob",$self->config->get("suspensionDelay"),$job);
 		}
 	} elsif ($response->is_redirect) {
-		$self->debug("Response for $config / $taskId was redirected.");
+		$self->error("Response for $config / $taskId was redirected. This should never happen if configured properly!!!");
 	} elsif ($response->is_error) {	
 		$self->error("Response for scheduled task $config / $taskId had a communications error. ".$response->error_as_HTML);
+		$self->{_errorCount}{$config}{$taskId}++;
 		$kernel->delay_set("runJob",$self->config->get("suspensionDelay"),$job);
-		# we should probably log something
 	}
 }
 
