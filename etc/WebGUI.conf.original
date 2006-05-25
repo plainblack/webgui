@@ -218,6 +218,25 @@
 #	"WebGUI::Asset::RichEdit" : 4
 #	},
 
+# Configure the UI Levels of the asset toolbar links.
+
+"assetToolbarUiLevel" : {
+	"edit" : 1,
+	"delete" : 1,
+	"cut" : 1,
+	"copy" : 1,
+	"shortcut" : 5,
+	"editBranch" : 9,
+	"lock" : 5,
+	"export" : 9,
+	"changeUrl" : 9,
+	"promote" : 3,
+	"demote" : 3,
+	"manage" : 5,
+	"revisions" : 5,
+	"view" : 1
+	},
+
 # You can override the UI Levels of any field in the edit form of
 # any asset using the following variables. Basically just take the
 # class name of the asset separated by underscores, and append

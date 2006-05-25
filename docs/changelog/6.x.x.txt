@@ -1,4 +1,5 @@
 6.99.2
+ - Added UI Levels to asset toolbar icons, as discussed in Community IRC.
  - Data Forms now send email as HTML. 
  - Added full drag bar to the top of each asset as discussed in Community IRC.
  - fixed a bug in the project management app that was causing a no privilege error when trying to display the view.
@@ -24,7 +25,7 @@
    page.
  - Added a context menu to the last item in the crumb trail in the asset
    manager as discussed in Community IRC.
- - Login boxes are now Section 508 compliant.
+ - Login boxes are now Section 508 compliant as discussed in Community IRC.
 
 6.99.1
  - Bugfixes on dashboard to fix template errors.

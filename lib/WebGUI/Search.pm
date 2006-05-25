@@ -83,6 +83,10 @@ sub getAssets {
 	my @assets = ();
 	while (my ($id, $class, $version) = $rs->array) {
 		my $asset = WebGUI::Asset->new($self->session, $id, $class, $version);
+		unless (defined $asset) {
+			$self->session->errorHandler->warn("Search index contains assetId $id even though it no longer exists.");
+			next;
+		}
 		push(@assets, $asset);		
 	}
 	return \@assets;

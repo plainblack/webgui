@@ -82,7 +82,6 @@ function contextMenu_draw(){
 		output += '<img src="' + this.imagePath + '" id="contextMenu_' + this.id + '" onclick="return contextMenu_renderLeftClick(\'contextMenu_' + this.id + '_menu\',event)" alt="' + this.name + '" title="' + this.name + '" align="absmiddle" />';
 	} else {
 		output += '<a href="#" id="contextMenu_' + this.id + '" onclick="return contextMenu_renderLeftClick(\'contextMenu_' + this.id + '_menu\',event)">' + this.name + '</a>';
-		//output += '<a href="javascript:contextMenu_renderLeftClick(\'contextMenu_' + this.id + '_menu\',event)" id="contextMenu_' + this.id + '">' + this.name + '</a>';
 	}
 	return output;
 }

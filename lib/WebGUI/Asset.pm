@@ -897,43 +897,56 @@ sub getToolbar {
 	my $self = shift;
 	return undef unless $self->canEdit;
 	return $self->{_toolbar} if (exists $self->{_toolbar});
+	my $userUiLevel = $self->session->user->profileField("uiLevel");
+	my $uiLevels = $self->session->config->get("assetToolbarUiLevel");
 	my $i18n = WebGUI::International->new($self->session, "Asset");
 	my $toolbar = "";
 	my $commit;
 	if ($self->canEditIfLocked) {
-		$toolbar .= $self->session->icon->delete('func=delete',$self->get("url"),$i18n->get(43));
-        	$toolbar .= $self->session->icon->edit('func=edit',$self->get("url"));
+		$toolbar .= $self->session->icon->delete('func=delete',$self->get("url"),$i18n->get(43)) if ($userUiLevel >= $uiLevels->{"delete"});
+        	$toolbar .= $self->session->icon->edit('func=edit',$self->get("url")) if ($userUiLevel >= $uiLevels->{"edit"});
 	} else {
-		$toolbar .= $self->session->icon->locked('func=manageRevisions',$self->get("url"));
+		$toolbar .= $self->session->icon->locked('func=manageRevisions',$self->get("url")) if ($userUiLevel >= $uiLevels->{"revisions"});
 	}
-        $toolbar .= $self->session->icon->cut('func=cut',$self->get("url"))
-            	.$self->session->icon->copy('func=copy',$self->get("url"));
-        $toolbar .= $self->session->icon->shortcut('func=createShortcut',$self->get("url")) unless ($self->get("className") =~ /Shortcut/);
+        $toolbar .= $self->session->icon->cut('func=cut',$self->get("url"))  if ($userUiLevel >= $uiLevels->{"cut"});
+        $toolbar .= $self->session->icon->copy('func=copy',$self->get("url")) if ($userUiLevel >= $uiLevels->{"copy"});
+        $toolbar .= $self->session->icon->shortcut('func=createShortcut',$self->get("url")) if ($userUiLevel >= $uiLevels->{"shortcut"} && !($self->get("className") =~ /Shortcut/));
 	$self->session->style->setLink($self->session->url->extras('contextMenu/contextMenu.css'), {rel=>"stylesheet",type=>"text/css"});
 	$self->session->style->setScript($self->session->url->extras('contextMenu/contextMenu.js'), {type=>"text/javascript"});
-	my $lock = "";
-	if (!$self->isLocked) {
-		$lock = 'contextMenu.addLink("'.$self->getUrl("func=lock").'","'.$i18n->get("lock").'");';
+	my $output = '<script type="text/javascript">
+                //<![CDATA[
+                var contextMenu = new contextMenu_createWithImage("'.$self->getIcon(1).'","'.$self->getId.'","'.$self->getName.'");';
+	if ($userUiLevel >= $uiLevels->{"lock"} && !$self->isLocked) {
+		$output .= 'contextMenu.addLink("'.$self->getUrl("func=lock").'","'.$i18n->get("lock").'");';
 	}
-	my $export = "";
-	if (defined $self->session->config->get("exportPath")) {
-		$export = 'contextMenu.addLink("'.$self->getUrl("func=export").'","'.$i18n->get("Export","Icon").'");';
+	if ($userUiLevel >= $uiLevels->{"changeUrl"}) {
+		$output .= 'contextMenu.addLink("'.$self->getUrl("func=changeUrl").'","'.$i18n->get("change url").'");';
 	}
-	return '<script type="text/javascript">
-		//<![CDATA[
-		var contextMenu = new contextMenu_createWithImage("'.$self->getIcon(1).'","'.$self->getId.'","'.$self->getName.'");
-		'.$lock.'
-		contextMenu.addLink("'.$self->getUrl("func=changeUrl").'","'.$i18n->get("change url").'");
-		'.$export.'
-		contextMenu.addLink("'.$self->getUrl("func=editBranch").'","'.$i18n->get("edit branch").'");
-		contextMenu.addLink("'.$self->getUrl("func=promote").'","'.$i18n->get("promote").'");
-		contextMenu.addLink("'.$self->getUrl("func=demote").'","'.$i18n->get("demote").'");
-		contextMenu.addLink("'.$self->getUrl("func=manageAssets").'","'.$i18n->get("manage").'");
-		contextMenu.addLink("'.$self->getUrl("func=manageRevisions").'","'.$i18n->get("revisions").'");
-		contextMenu.addLink("'.$self->getUrl.'","'.$i18n->get("view").'");
-		contextMenu.print();
-		//]]>
-		</script>'.$toolbar;
+	if ($userUiLevel >= $uiLevels->{"export"} && defined $self->session->config->get("exportPath")) {
+		$output .= 'contextMenu.addLink("'.$self->getUrl("func=export").'","'.$i18n->get("Export","Icon").'");';
+	}
+	if ($userUiLevel >= $uiLevels->{"editBranch"}) {
+		$output .= 'contextMenu.addLink("'.$self->getUrl("func=editBranch").'","'.$i18n->get("edit branch").'");';
+	}
+	if ($userUiLevel >= $uiLevels->{"promote"}) {
+		$output .= 'contextMenu.addLink("'.$self->getUrl("func=promote").'","'.$i18n->get("promote").'");';
+	}
+	if ($userUiLevel >= $uiLevels->{"demote"}) {
+		$output .= 'contextMenu.addLink("'.$self->getUrl("func=demote").'","'.$i18n->get("demote").'");';
+	}
+	if ($userUiLevel >= $uiLevels->{"manage"}) {
+		$output .= 'contextMenu.addLink("'.$self->getUrl("func=manageAssets").'","'.$i18n->get("manage").'");';
+	}
+	if ($userUiLevel >= $uiLevels->{"revisions"}) {
+		$output .= 'contextMenu.addLink("'.$self->getUrl("func=manageRevisions").'","'.$i18n->get("revisions").'");';
+	}
+	if ($userUiLevel >= $uiLevels->{"view"}) {
+		$output .= 'contextMenu.addLink("'.$self->getUrl.'","'.$i18n->get("view").'");';
+	}
+	$output .= 'contextMenu.print();
+                //]]>
+                </script>'.$toolbar;
+	return $output;
 }
 
 #-------------------------------------------------------------------
@@ -1268,7 +1281,7 @@ sub manageAssetsSearch {
 	$output .= WebGUI::Form::formFooter($self->session);
 	$self->session->output->print($output);
 	$output = '';
-	return undef unless ($self->session->form->get("doit"));
+	return undef unless ($self->session->form->get("doit") && $self->session->form->get("keywords") ne "");
 	my $class = $self->session->form->process("class","className") eq "any" ? undef : $self->session->form->process("class","className");
 	my $assets = WebGUI::Search->new($self->session,0)->search({
 		keywords=>$self->session->form->get("keywords"),

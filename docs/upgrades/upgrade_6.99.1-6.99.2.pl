@@ -22,12 +22,35 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 updateTT();
+addToolbarUiLevels();
 
 finish($session); # this line required
 
 
 #-------------------------------------------------
+sub addToolbarUiLevels {
+   	print "\tAdding asset toolbar UI levels.\n" unless ($quiet);
+	$session->config->set("assetToolbarUiLevel", {
+        "edit" => 1,
+        "delete" => 1,
+        "cut" => 1,
+        "copy" => 1,
+        "shortcut" => 5,
+        "editBranch" => 9,
+        "lock" => 5,
+        "export" => 9,
+        "changeUrl" => 9,
+        "promote" => 3,
+        "demote" => 3,
+        "manage" => 5,
+        "revisions" => 5,
+        "view" => 1
+        });
+}
+
+#-------------------------------------------------
 sub updateTT {
+   print "\tUpdating the Time Tracking System.\n" unless ($quiet);
    my $tableList = [
             "create table TT_projectTasks (
                 taskId varchar(22) binary not null,
@@ -60,7 +83,6 @@ sub updateTT {
 			"alter table TT_timeEntry drop column lastUpdateDate"
           ];
 
-   print "\tUpdating the Time Tracking System.\n" unless ($quiet);
    foreach (@{$tableList}) {
       $session->db->write($_);
    }
