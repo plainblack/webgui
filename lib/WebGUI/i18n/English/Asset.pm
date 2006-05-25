@@ -263,6 +263,12 @@ our $I18N = {
 		context => q|Used in asset context menus.|
 	},
 
+	'edit branch body' => {
+		message => q| |,
+		lastUpdated => 0,
+		context => q|Used in asset help.|
+	},
+
 	'edit' => {
 		message => q|Edit|,
 		lastUpdated => 0,
@@ -883,6 +889,26 @@ to edit or modify that asset.</p>|,
 
 	'Class Icon help' => {
 		message => q|Each Asset will also display a class icon.  Most Class Icons are unique to an Asset, and are smaller versions of the Icons diplayed in the Admin Console to add a new Asset to your site.  Clicking on the Class Icon will show a drop-down menu with additional editing options.|,
+		lastUpdated => 0,
+	},
+
+	'parent url' => {
+		message => q|Parent URL|,
+		lastUpdated => 0,
+	},
+
+	'specified base' => {
+		message => q|Specified Base|,
+		lastUpdated => 0,
+	},
+
+	'none' => {
+		message => q|None|,
+		lastUpdated => 0,
+	},
+
+	'current url' => {
+		message => q|Current URL|,
 		lastUpdated => 0,
 	},
 

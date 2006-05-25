@@ -93,16 +93,16 @@ sub www_editBranch {
 			extras=>'onchange="toggleSpecificBaseUrl()"',
 			id=>"baseUrlBy",
 			options=>{
-				parentUrl=>"Parent URL",
-				specifiedBase=>"Specified Base",
-				none=>"None"
+				parentUrl=>$i18n->get("parent url"),
+				specifiedBase=>$i18n->get("specified base"),
+				none=>$i18n->get("none")
 				}
 			}).'<span id="baseUrl"></span> / '.WebGUI::Form::selectBox($self->session, {
 				name=>"endOfUrl",
 				options=>{
 					menuTitle=>$i18n->get(411),
 					title=>$i18n->get(99),
-					currentUrl=>"Current URL"
+					currentUrl=>$i18n->get("current url"),
 					}
 				})."<script type=\"text/javascript\">
 			function toggleSpecificBaseUrl () {

@@ -222,6 +222,15 @@ our $HELP = {
 		]
 	},
 
+	'edit branch' => {
+		title => 'edit branch',
+		body => 'edit branch body',
+		fields => [
+		],
+		related => [
+		]
+	},
+
 	'change url' => {
 		title => 'change url',
 		body => 'change url body',
