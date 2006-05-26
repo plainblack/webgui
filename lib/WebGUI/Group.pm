@@ -211,14 +211,14 @@ sub autoDelete {
 
 =head2 clearCaches ( )
 
-Clears caches for this group.
+Clears all caches for this group and any ancestor groups of the group.
 
 =cut
 
 sub clearCaches {
 	my $self = shift;
 	##Clear my cache and the cache of all groups above me.
-	my $groups = $self->getGroupsFor();
+	my $groups = $self->getAllGroupsFor();
 	foreach my $group ( $self->getId, @{ $groups } ) {
 		WebGUI::Cache->new($self->session, $group)->delete;
 	}
@@ -614,6 +614,25 @@ sub get {
 }
 
 
+
+#-------------------------------------------------------------------
+
+=head2 getAllGroupsFor ( )
+
+Returns an array reference containing a list of all groups this group is in, recursively.
+
+=cut
+
+sub getAllGroupsFor {
+	my $self = shift;
+	my $groups = $self->getGroupsFor();
+	foreach my $gid (@{ $groups }) {
+		push @{ $groups }, @{ WebGUI::Group->new($self->session, $gid)->getAllGroupsFor() };
+	}
+	my %unique = map { $_ => 1 } @{ $groups };
+	$groups = [ keys %unique ];
+	return $groups;
+}
 
 #-------------------------------------------------------------------
 

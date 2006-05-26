@@ -238,7 +238,7 @@ sub www_deleteGroupGrouping {
 Deletes a set of users from a set of groups.  Only Admins may perform this function.
 The user and group lists are expected to
 be found in form fields names uid and gid, respectively.  Visitors are not allowed to
-perform this operation, and the 
+perform this operation.
 
 =cut
 

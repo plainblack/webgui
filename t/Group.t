@@ -75,7 +75,7 @@ my @ipTests = (
 );
 
 
-plan tests => (96 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
+plan tests => (103 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 my $testCache = WebGUI::Cache->new($session, 'myTestKey');
@@ -197,6 +197,10 @@ cmp_bag($gB->getGroupsIn(1), [$gA->getId, $gC->getId, $gZ->getId, $gY->getId, $g
 
 $gX->addGroups([$gA->getId]);
 cmp_bag($gX->getGroupsIn(), [3], 'Not able to add B tree under Z tree under X');
+
+cmp_bag($gX->getAllGroupsFor(), [ map {$_->getId} ($gZ, $gA, $gB) ], 'getAllGroupsFor X');
+cmp_bag($gY->getAllGroupsFor(), [ map {$_->getId} ($gZ, $gA, $gB) ], 'getAllGroupsFor Y');
+cmp_bag($gZ->getAllGroupsFor(), [ map {$_->getId} ($gA, $gB) ], 'getAllGroupsFor Z');
 
 my $user = WebGUI::User->new($session, "new");
 $gX->userIsAdmin($user->userId, "yes");
@@ -493,11 +497,15 @@ $gY->addGroups([$gCache->getId]);
 
 ok( $cacheDude->isInGroup($gY->getId), "Cache dude is a member of group Y by group membership");
 ok( $cacheDude->isInGroup($gZ->getId), "Cache dude is a member of group Z by group membership");
+ok( $cacheDude->isInGroup($gA->getId), "Cache dude is a member of group A by group membership");
+ok( $cacheDude->isInGroup($gB->getId), "Cache dude is a member of group B by group membership");
 
 $gY->deleteGroups([$gCache->getId]);
 
 ok( !$cacheDude->isInGroup($gY->getId), "Cache dude is not a member of group Y");
 ok( !$cacheDude->isInGroup($gZ->getId), "Cache dude is not a member of group Z");
+ok( !$cacheDude->isInGroup($gA->getId), "Cache dude is not a member of group A");
+ok( !$cacheDude->isInGroup($gB->getId), "Cache dude is not a member of group B");
 
 SKIP: {
 	skip("need to test expiration date in groupings interacting with recursive or not", 1);
