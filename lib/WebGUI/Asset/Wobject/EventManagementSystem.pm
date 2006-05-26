@@ -1824,9 +1824,9 @@ sub www_editEventSave {
 		maximumAttendees => $self->session->form->get("maximumAttendees"),
 		approved	=> $self->session->form->get("approved"),
 		passId	=> join('::',$self->session->form->process("passId",'selectList')),
-		passType	=> $self->session->form->get("passType",'radioList'),
 		imageId		=> $storageId,
-		prerequisiteId => $self->session->form->process("prerequisiteId",'selectBox')
+		prerequisiteId => $self->session->form->process("prerequisiteId",'selectBox'),
+		passType	=> $self->session->form->get("passType",'radioList'),
 	},1,1);
 
 	#Save the event metadata

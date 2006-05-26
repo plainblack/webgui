@@ -961,7 +961,7 @@ sub www_transferKarma {
 	my $amount = $self->session->form->get("karma","integer");
 	# cant have them giving more karma then they have
 	if ($amount <= $self->session->user->karma) {
-		$self->session->user->karma($amount, "Thread ".$self->getId, "Transferring karma to a thread.");
+		$self->session->user->karma(-$amount, "Thread ".$self->getId, "Transferring karma to a thread.");
 		my $newKarma = $self->get("karma")+$amount;
 		my $karmaScale = $self->get("karmaScale") || 1;
 		$self->update({karma=>$newKarma,karmaRank=>$newKarma/$karmaScale});

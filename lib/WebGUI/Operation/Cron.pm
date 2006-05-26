@@ -66,13 +66,13 @@ sub www_editCronJob {
 		);
 	$f->hidden(
 		name=>"id",
-		value=>$session->form->get("id"),
 		defaultValue=>"new",
+		value=>$session->form->get("id"),
 		);
 	$f->readOnly(
 		label=>$i18n->get("id"),
+		defaultValue=>"new",
 		value=>$session->form->get("id"),
-		defaultValue=>"new"
 		);
 	my $value = $cron->get("title") if defined $cron;
 	$f->text(
