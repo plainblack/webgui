@@ -258,15 +258,16 @@ our $I18N = {
 	},
 
 	'edit branch help' => {
-		message => q|Bring up the Edit Branch interface, to make changes to this Asset and all Assets below it|,
+		message => q|Bring up the Edit Branch interface, to make changes to this Asset and Assets below it|,
 		lastUpdated => 0,
 		context => q|Used in asset context menus.|
 	},
 
 	'edit branch body' => {
-		message => q| |,
+		message => q|<p>Edit Branch allows you to make changes to entire trees of Assets.  You can change who can view Assets, who can edit Assets or you can change the templates or other display features such as SSL or whether to hide the Asset from navigations.  The form will not give you editing privileges for Assets that you don't have.</p>
+<p>Each field has a Yes/No button to confirm that you want to change it recursively.  Simply edit the fields that you want to change and select Yes from its change confirmation, and then hit save when you're all done.</p>|,
 		lastUpdated => 0,
-		context => q|Used in asset help.|
+		context => q|Used in edit branch help.|
 	},
 
 	'edit' => {
@@ -909,6 +910,34 @@ to edit or modify that asset.</p>|,
 
 	'current url' => {
 		message => q|Current URL|,
+		lastUpdated => 0,
+	},
+
+	'edit branch url help' => {
+		message => q|<p>You can change the URL via two parts, the base URL (the left field) and the file url (the right field).  For the base URL, there are three options:</p>
+<div>
+<dl>
+<dt>Parent URL</dt>
+<dd>Start this URL with the URL of the parent.</dd>
+<dt>Specified Base</dt>
+<dd>Enter in a new base URL via the field that appears when Specified Base is selected.</dd>
+<dt>None</dt>
+<dd>Make all Assets have a "top-level" URL.</dd>
+</dl>
+</div>
+<p>There are also three options for the file URL:</p>
+<div>
+<dl>
+<dt>Menu Title</dt>
+<dd>The new URL will be based on the Asset's Menu Title field.</dd>
+<dt>Title</dt>
+<dd>The new URL will be based on the Asset's Title field.</dd>
+<dt>Current URL</dt>
+<dd>The new URL will be based on the Asset's present URL.</dd>
+</dl>
+</div>
+<p>New URLs will be passed through the makeUrlCompliant function that is specific to the default language for your site.</p>
+|,
 		lastUpdated => 0,
 	},
 

@@ -226,6 +226,72 @@ our $HELP = {
 		title => 'edit branch',
 		body => 'edit branch body',
 		fields => [
+                        {
+                                title => '104',
+                                description => 'edit branch url help',
+                                namespace => 'Asset',
+				uiLevel => 9,
+                        },
+                        {
+                                title => '886',
+                                description => '886 description',
+                                namespace => 'Asset',
+				uiLevel => 6,
+                        },
+                        {
+                                title => '940',
+                                description => '940 description',
+                                namespace => 'Asset',
+				uiLevel => 6,
+                        },
+                        {
+                                title => '174',
+                                description => '174 description',
+                                namespace => 'Asset_Wobject',
+				uiLevel => 5,
+                        },
+                        {
+                                title => '1073',
+                                description => '1073 description',
+                                namespace => 'Asset_Wobject',
+				uiLevel => 5,
+                        },
+                        {
+                                title => '1079',
+                                description => '1079 description',
+                                namespace => 'Asset_Wobject',
+				uiLevel => 5,
+                        },
+                        {
+                                title => 'encrypt page',
+                                description => 'encrypt page description',
+                                namespace => 'Asset',
+				uiLevel => 6,
+                        },
+                        {
+                                title => '108',
+                                description => '108 description',
+                                namespace => 'Asset',
+				uiLevel => 6,
+                        },
+                        {
+                                title => '872',
+                                description => '872 description',
+                                namespace => 'Asset',
+				uiLevel => 6,
+                        },
+                        {
+                                title => '871',
+                                description => '871 description',
+                                namespace => 'Asset',
+				uiLevel => 6,
+                        },
+                        {
+                                title => 'extra head tags',
+                                description => 'extra head tags description',
+                                namespace => 'Asset',
+				uiLevel => 5,
+                        },
 		],
 		related => [
 		]

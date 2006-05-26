@@ -80,12 +80,14 @@ sub www_editBranch {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new($self->session,"assets");
 	my $i18n = WebGUI::International->new($self->session,"Asset");
+	my $i18n2 = WebGUI::International->new($self->session,"Asset_Wobject");
 	return $self->session->privilege->insufficient() unless ($self->canEdit);
 	my $tabform = WebGUI::TabForm->new($self->session);
 	$tabform->hidden({name=>"func",value=>"editBranchSave"});
 	$tabform->addTab("properties",$i18n->get("properties"),9);
         $tabform->getTab("properties")->readOnly(
                 -label=>$i18n->get(104),
+                -hoverHelp=>$i18n->get('edit branch url help'),
                 -uiLevel=>9,
 		-subtext=>'<br />'.$i18n->get("change").' '.WebGUI::Form::yesNo($self->session,{name=>"change_url"}),
 		-value=>WebGUI::Form::selectBox($self->session, {
@@ -121,7 +123,7 @@ sub www_editBranch {
                 -value=>$self->get("isHidden"),
                 -label=>$i18n->get(886),
                 -uiLevel=>6,
-		-subtext=>'<br />'.$i18n->get("change").' '.WebGUI::Form::yesNo($self->session,{name=>"change_isHidden"})
+		-subtext=>'<br />'.$i18n->get("change").' '.WebGUI::Form::yesNo($self->session,{name=>"change_isHidden"}),
 		-hoverHelp=>$i18n->get('886 description',"Asset"),
                 );
         $tabform->getTab("display")->yesNo(
@@ -134,25 +136,25 @@ sub www_editBranch {
                 );
 	$tabform->getTab("display")->yesNo(
                 -name=>"displayTitle",
-                -label=>$i18n->get(174),
-		-hoverHelp=>$i18n->get('174 description','Asset_Wobject'),
+                -label=>$i18n2->get(174),
+		-hoverHelp=>$i18n2->get('174 description'),
                 -value=>$self->getValue("displayTitle"),
                 -uiLevel=>5,
 		-subtext=>'<br />'.$i18n->get("change").' '.WebGUI::Form::yesNo($self->session,{name=>"change_displayTitle"})
                 );
          $tabform->getTab("display")->template(
 		-name=>"styleTemplateId",
-		-label=>$i18n->get(1073),
+		-label=>$i18n2->get(1073),
 		-value=>$self->getValue("styleTemplateId"),
-		-hoverHelp=>$i18n->get('1073 description','Asset_Wobject'),
+		-hoverHelp=>$i18n2->get('1073 description'),
 		-namespace=>'style',
 		-afterEdit=>'op=editPage;npp='.$self->session->form->process("npp"),
 		-subtext=>'<br />'.$i18n->get("change").' '.WebGUI::Form::yesNo($self->session,{name=>"change_styleTemplateId"})
 		);
          $tabform->getTab("display")->template(
 		-name=>"printableStyleTemplateId",
-		-label=>$i18n->get(1079),
-		-hoverHelp=>$i18n->get('1079 description','Asset_Wobject'),
+		-label=>$i18n2->get(1079),
+		-hoverHelp=>$i18n2->get('1079 description'),
 		-value=>$self->getValue("printableStyleTemplateId"),
 		-namespace=>'style',
 		-afterEdit=>'op=editPage;npp='.$self->session->form->process("npp"),
@@ -241,6 +243,7 @@ sub www_editBranch {
                                 );
                 }
         }	
+	$ac->setHelp('edit branch', 'Asset');
 	return $ac->render($tabform->print, $i18n->get('edit branch','Asset'));
 }
 
