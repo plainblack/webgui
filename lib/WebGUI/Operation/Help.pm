@@ -120,6 +120,8 @@ sub _linkTOC {
 	return $session->url->page('op=viewHelpChapter;namespace='.$_[0]);
 }
 
+#-------------------------------------------------------------------
+
 =head2 _getHelpFilesList ( $session )
 
 Utility routine for returning a list of all Help files in the lib/WebGUI/Help folder.
@@ -302,7 +304,7 @@ sub _getTemplateVars {
 		}	
 		push ( @{$template}, {
 			title => $row->{name}, 
-			description=> $i18n->get($row->{description} || $row->{name}, $row->{namespace}),
+			description=> $i18n->get(($row->{description} || $row->{name}), $row->{namespace}),
 			$label => $indent
 			});
 	}	

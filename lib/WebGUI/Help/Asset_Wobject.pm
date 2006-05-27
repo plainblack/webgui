@@ -83,6 +83,26 @@ our $HELP = {
 		body => '828',
 		fields => [
 		],
+		variables => [
+			{
+				'name' => 'title'
+			},
+			{
+				'name' => 'displayTitle'
+			},
+			{
+				'name' => 'description'
+			},
+			{
+				'name' => 'assetId'
+			},
+			{
+				'name' => 'isShortcut'
+			},
+			{
+				'name' => 'originalURL'
+			},
+		],
 		related => [
 			{
 				tag => 'pagination template variables',

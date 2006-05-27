@@ -2,35 +2,40 @@ package WebGUI::i18n::English::Asset_Wobject;
 
 our $I18N = {
 
-          '828' => {
-                     lastUpdated => 1053469640,
-                     message => q|<p>Most wobjects have templates that allow you to change the layout of the wobject's user interface. Those wobjects that do have templates all have a common set of template variables that you can use for layout, as well as their own custom variables. The following is a list of the common template variables shared among all wobjects.</p>
+	'title' => {
+		message => q|The title for this wobject.|,
+		lastUpdated => 1148750705,
+	},
 
-<p><b>title</b><br />
-The title for this wobject.
-</p>
+	'displayTitle' => {
+		message => q|A conditional variable for whether or not the title should be displayed.|,
+		lastUpdated => 1148750705,
+	},
 
-<p><b>displayTitle</b><br />
-A conditional variable for whether or not the title should be displayed.
-</p>
+	'description' => {
+		message => q|The description of this wobject.|,
+		lastUpdated => 1148750705,
+	},
 
-<p><b>description</b><br />
-The description of this wobject.
-</p>
+	'assetId' => {
+		message => q|The unique identifier that WebGUI uses to control this asset.|,
+		lastUpdated => 1148750705,
+	},
 
-<p><b>assetId</b><br />
-The unique identifier that WebGUI uses to control this asset.
-</p>
+	'isShortcut' => {
+		message => q|A conditional indicating if this wobject is a shortcut to an original asset.|,
+		lastUpdated => 1148750705,
+	},
 
-<p><b>isShortcut</b><br />
-A conditional indicating if this wobject is a shortcut to an original asset.
-</p>
+	'originalURL' => {
+		message => q|If this wobject is a shortcut, then this URL will direct you to the original asset.|,
+		lastUpdated => 1148750705,
+	},
 
-<p><b>originalURL</b><br />
-If this wobject is a shortcut, then this URL will direct you to the original asset.
-</p>
-
-|
+	'828' => {
+		message => q|<p>Most wobjects have templates that allow you to change the layout of the wobject's user interface. Those wobjects that do have templates all have a common set of template variables that you can use for layout, as well as their own custom variables. The following is a list of the common template variables shared among all wobjects.</p>
+|,
+		lastUpdated => 1148750840,
                    },
           '1079' => {
                       lastUpdated => 1073152790,
@@ -40,6 +45,7 @@ If this wobject is a shortcut, then this URL will direct you to the original ass
                      lastUpdated => 1052046436,
                      message => q|Wobject Template|
                    },
+
           '632' => {
                      lastUpdated => 1119410914,
                      message => q|<p>You can add wobjects by selecting from the <i>^International("1","WebGUI");</i> pulldown menu. You can edit them by clicking on the "Edit" button that appears directly above an instance of a particular wobject while in Admin mode.</p>
