@@ -18,6 +18,7 @@ use WebGUI::Asset::Template;
 use WebGUI::Macro;
 use WebGUI::Utility;
 use WebGUI::TabForm;
+use Storable qw/dclone/;
 
 =head1 NAME
 
@@ -44,30 +45,32 @@ sub _load {
 	my $cmd = "WebGUI::Help::".$namespace;
         my $load = sprintf 'use %-s; $%-s::HELP;', $cmd, $cmd;
 	my $hash = eval($load);
-	my %help = %{$hash};
-	unless ($@) {
-		foreach my $tag (keys %help) {
-			if ($help{$tag}{isa}{namespace}) {
-				my $other = _load($session, $help{$tag}{isa}{namespace});
-				my $add = $other->{$help{$tag}{isa}{tag}}{fields};
-				@{$help{$tag}{fields}} = (@{$help{$tag}{fields}}, @{$add});
-				$add = $other->{$help{$tag}{isa}{tag}}{related};
-				@{$help{$tag}{related}} = (@{$help{$tag}{related}}, @{$add});
-				$add = $other->{$help{$tag}{isa}{tag}}{variables};
-				foreach my $row (@{$add}) {
-					push(@{$help{$tag}{variables}}, {
-						name=> $row->{name},
-						description => $row->{description},
-						namespace => $row->{namespace} || $help{$tag}{isa}{namespace}
-						});
-				}
-			}
-		}
-		return \%help;
-	} else {
+	if ($@) {
 		$session->errorHandler->error("Help failed to compile: $namespace. ".$@);
 		return {};
 	}
+	local $Storable::Deparse = 1;
+	local $Storable::Eval = 1;
+	my $help = dclone($hash);
+	foreach my $tag (keys %{ $help }) {
+		$help->{$tag}{related} = [ _related($session, $help->{$tag}{related}) ];
+		if ($help->{$tag}{isa}{namespace}) {
+			my $other = _load($session, $help->{$tag}{isa}{namespace});
+			my $add = $other->{$help->{$tag}{isa}{tag}}{fields};
+			@{$help->{$tag}{fields}} = (@{$help->{$tag}{fields}}, @{$add});
+			$add = $other->{$help->{$tag}{isa}{tag}}{related};
+			@{$help->{$tag}{related}} = (@{ $help->{$tag}{related} }, @{ $add });
+			$add = $other->{$help->{$tag}{isa}{tag}}{variables};
+			foreach my $row (@{$add}) {
+				push(@{$help->{$tag}{variables}}, {
+					name=> $row->{name},
+					description => $row->{description},
+					namespace => $row->{namespace} || $help->{$tag}{isa}{namespace}
+					});
+			}
+		}
+	}
+	return $help;
 }
 
 #-------------------------------------------------------------------
@@ -250,7 +253,7 @@ sub www_viewHelp {
 	my $namespace = $session->form->process("namespace","className") || "WebGUI";
         my $i18n = WebGUI::International->new($session, $namespace);
 	my $help = _get($session,$session->form->process("hid"),$namespace);
-	my @related = _related($session, $help->{related});
+	my @related = @{ $help->{related} };
 	foreach my $row (@related) {
 		my $relatedHelp = _get($session,$row->{tag},$row->{namespace});
 		$ac->addSubmenuItem(_link($session,$row->{tag},$row->{namespace}),$i18n->get($relatedHelp->{title},$row->{namespace}));
