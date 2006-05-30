@@ -2835,8 +2835,8 @@ The headings of columns on things like message boards and user contributions.
 	},
 
 	'319' => {
-		message => q|<p><a href="http://messenger.msn.com/">MSN Messenger</a> Id</p>|,
-		lastUpdated => 1031514049
+		message => q|<a href="http://messenger.msn.com/">MSN Messenger</a> Id|,
+		lastUpdated => 1149003146
 	},
 
 	'1052' => {

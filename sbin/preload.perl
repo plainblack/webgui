@@ -84,7 +84,7 @@ sub getWebGUIModules {
         my $filename = $File::Find::dir."/".$_;
         return unless $filename =~ m/\.pm$/;
         my $package = $filename;
-        $package =~ s/^\/data\/WebGUI\/lib\/(.*)\.pm$/$1/;
+        $package =~ s/^$webguiRoot\/lib\/(.*)\.pm$/$1/;
         $package =~ s/\//::/g;
         push(@modules,$package);
 }

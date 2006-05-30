@@ -146,7 +146,8 @@ sub prepareView {
 	# I'm sure there's a more efficient way to do this. We'll figure it out someday.
 	my @positions = split(/\./,$self->get("contentPositions"));
 	my @hidden = split("\n",$self->get("assetsToHide"));
-	my @placeHolder = ();
+	my @placeHolder1 = ();
+	my @placeHolderN = ();
 	my $i = 1;
 	my $template = WebGUI::Asset->new($self->session,$self->get("templateId"),"WebGUI::Asset::Template");
 	my $templateContent = $template->get("template");
@@ -164,13 +165,14 @@ sub prepareView {
 					unless (isIn($asset,@hidden) || !($child->canView)) {
 						$self->session->style->setRawHeadTags($child->getExtraHeadTags);
 						$child->prepareView;
-						push(@placeHolder, $child);
-						if ($i > $numPositions) {
+						if ($i > $numPositions || $i==1) {
+							push(@placeHolder1, $child);
 							push(@{$vars{"position1_loop"}},{
 								id=>$child->getId,
 								content=>"~~~"
 							});
 						} else {
+							push(@placeHolderN, $child);
 							push(@{$vars{"position".$i."_loop"}},{
 								id=>$child->getId,
 								content=>"~~~"
@@ -188,7 +190,7 @@ sub prepareView {
 		unless (isIn($child->getId, @found)||isIn($child->getId,@hidden)) {
 			if ($child->canView) {
 				$child->prepareView;
-				push(@placeHolder, $child);
+				push(@placeHolder1, $child);
 				push(@{$vars{"position1_loop"}},{
 					id=>$child->getId,
 					content=>"~~~"
@@ -196,7 +198,7 @@ sub prepareView {
 			}
 		}
 	}
-	$self->{_viewPlaceholders} = \@placeHolder;
+	@{$self->{_viewPlaceholders}} = (@placeHolder1, @placeHolderN);
 	$vars{showAdmin} = ($self->session->var->isAdminOn && $self->canEdit);
 	$self->{_viewVars} = \%vars;
 	if ($vars{showAdmin}) {
@@ -220,9 +222,7 @@ sub view {
 	if ($self->{_viewVars}{showAdmin} && $self->canEditIfLocked) {
 		# under normal circumstances we don't put HTML stuff in our code, but this will make it much easier
 		# for end users to work with our templates
-		#$self->{_viewVars}{"dragger.icon"} = $self->session->icon->drag();
 		$self->{_viewVars}{"dragger.icon"} = '<div id="dragTrigger" class="dragTrigger">'.$self->session->icon->drag('class="dragTrigger"').'</div></div>';
-		#$self->{_viewVars}{"dragger.icon"} = '<div id="dragTrigger" class="dragTrigger dragTriggerFormatting"> / / / / / / / / / / </div>';
 		$self->{_viewVars}{"dragger.init"} = '
 			<iframe id="dragSubmitter" style="display: none;" src="'.$self->session->url->extras('spacer.gif').'"></iframe>
 			<script type="text/javascript">

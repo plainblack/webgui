@@ -1,6 +1,12 @@
 6.99.3
  - Someone removed the status from the submission templates. That has been
    fixed.
+ - fix: Column Layout seems a little messed up
+ - Fixed the EMS default templates to expose all functionality.
+ - Fixed a problem in the EMS where it wouldn't let you add any events.
+ - fix: FieldName incorrect after adding profile field
+ - fix: preload.perl for other roots than /data/WebGUI
+ - Fixed a bug where polls weren't distributing karma.
 
 6.99.2
  - fix - demo.plainblack.com getting started

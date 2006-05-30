@@ -86,7 +86,7 @@ sub create {
 	my $categoryId = shift || "1";
 	my ($fieldNameExists) = $session->db->quickArray("select count(*) from userProfileField where fieldName=".$session->db->quote($fieldName));
 	return undef if ($fieldNameExists);
-        my $id = $session->db->setRow("userProfileField","fieldName",{fieldName=>"new"},undef,$fieldName);
+        my $id = $session->db->setRow("userProfileField","fieldName",{fieldName=>"new"},$fieldName);
         my $self = $class->new($session,$id);
 	$self->setCategory($categoryId);
         $self->set($properties);

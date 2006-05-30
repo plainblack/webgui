@@ -414,8 +414,7 @@ sub www_vote {
         if ($self->session->form->process("answer") ne "" && $self->session->user->isInGroup($self->get("voteGroup")) && !($self->_hasVoted())) {
         	$self->setVote($self->session->form->process("answer"),$self->session->user->userId,$self->session->env->get("REMOTE_ADDR"));
 		if ($self->session->setting->get("useKarma")) {
-			$u = WebGUI::User->new($self->session->user->userId);
-			$u->karma($self->get("karmaPerVote"),"Poll (".$self->getId.")","Voted on this poll.");
+			$self->session->user->karma($self->get("karmaPerVote"),"Poll (".$self->getId.")","Voted on this poll.");
 		}
 		$self->getContainer->purgeCache;
 	}
