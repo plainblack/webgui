@@ -142,7 +142,9 @@ sub new {
 	my $self = {_debug=>$debug, _config=>$config, _logger=>$logger};
 	bless $self, $class;
 	$self->runTests();
+	$self->debug("Trying to bind to ".$config->get("ip").":".$config->get("port"));
 	create_ikc_server(
+		ip => $config->get("ip"),
         	port => $config->get("port"),
        	 	name => 'Spectre',
         	);

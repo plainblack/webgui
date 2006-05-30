@@ -56,6 +56,32 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
+=head2 addMissing ( url )
+
+Displays a message to the admin that they have requested a non-existent page and give them an option to create it.
+
+=head3 url
+
+The missing URL.
+
+=cut
+
+sub addMissing {
+	my $self = shift;
+	my $assetUrl = shift;
+	return undef unless ($self->session->var->isAdminOn);
+	my $ac = $self->getAdminConsole;
+	my $i18n = WebGUI::International->new($self->session, "Asset");
+	my $output = $i18n->get("missing page query");
+	$output .= '<ul>
+			<li><a href="'.$self->getUrl("func=add;class=WebGUI::Asset::Wobject::Layout;url=".$assetUrl).'">'.$i18n->get("add the missing page").'</a></li>
+			<li><a href="'.$self->getUrl.'">'.$i18n->get("493","WebGUI").'</a></li>
+			</ul>';
+	return $ac->render($output);
+}
+
+#-------------------------------------------------------------------
+
 =head2 canAdd ( session, [userId, groupId] )
 
 Verifies that the user has the privileges necessary to add this type of asset. Return a boolean.
@@ -478,7 +504,6 @@ sub getContainer {
 		return $self->getParent;
 	}
 }
-
 
 #-------------------------------------------------------------------
 
@@ -916,17 +941,23 @@ sub getToolbar {
 	my $output = '<script type="text/javascript">
                 //<![CDATA[
                 var contextMenu = new contextMenu_createWithImage("'.$self->getIcon(1).'","'.$self->getId.'","'.$self->getName.'");';
-	if ($userUiLevel >= $uiLevels->{"lock"} && !$self->isLocked) {
-		$output .= 'contextMenu.addLink("'.$self->getUrl("func=lock").'","'.$i18n->get("lock").'");';
-	}
 	if ($userUiLevel >= $uiLevels->{"changeUrl"}) {
 		$output .= 'contextMenu.addLink("'.$self->getUrl("func=changeUrl").'","'.$i18n->get("change url").'");';
 	}
-	if ($userUiLevel >= $uiLevels->{"export"} && defined $self->session->config->get("exportPath")) {
-		$output .= 'contextMenu.addLink("'.$self->getUrl("func=export").'","'.$i18n->get("Export","Icon").'");';
-	}
 	if ($userUiLevel >= $uiLevels->{"editBranch"}) {
 		$output .= 'contextMenu.addLink("'.$self->getUrl("func=editBranch").'","'.$i18n->get("edit branch").'");';
+	}
+	if ($userUiLevel >= $uiLevels->{"revisions"}) {
+		$output .= 'contextMenu.addLink("'.$self->getUrl("func=manageRevisions").'","'.$i18n->get("revisions").'");';
+	}
+	if ($userUiLevel >= $uiLevels->{"view"}) {
+		$output .= 'contextMenu.addLink("'.$self->getUrl.'","'.$i18n->get("view").'");';
+	}
+	if ($userUiLevel >= $uiLevels->{"lock"} && !$self->isLocked) {
+		$output .= 'contextMenu.addLink("'.$self->getUrl("func=lock").'","'.$i18n->get("lock").'");';
+	}
+	if ($userUiLevel >= $uiLevels->{"export"} && defined $self->session->config->get("exportPath")) {
+		$output .= 'contextMenu.addLink("'.$self->getUrl("func=export").'","'.$i18n->get("Export","Icon").'");';
 	}
 	if ($userUiLevel >= $uiLevels->{"promote"}) {
 		$output .= 'contextMenu.addLink("'.$self->getUrl("func=promote").'","'.$i18n->get("promote").'");';
@@ -936,12 +967,6 @@ sub getToolbar {
 	}
 	if ($userUiLevel >= $uiLevels->{"manage"}) {
 		$output .= 'contextMenu.addLink("'.$self->getUrl("func=manageAssets").'","'.$i18n->get("manage").'");';
-	}
-	if ($userUiLevel >= $uiLevels->{"revisions"}) {
-		$output .= 'contextMenu.addLink("'.$self->getUrl("func=manageRevisions").'","'.$i18n->get("revisions").'");';
-	}
-	if ($userUiLevel >= $uiLevels->{"view"}) {
-		$output .= 'contextMenu.addLink("'.$self->getUrl.'","'.$i18n->get("view").'");';
 	}
 	$output .= 'contextMenu.print();
                 //]]>
@@ -1828,7 +1853,6 @@ sub www_add {
 	return $self->session->privilege->insufficient() unless ($newAsset->canAdd($self->session));
 	return $newAsset->www_edit();
 }
-
 
 #-------------------------------------------------------------------
 

@@ -1,6 +1,18 @@
 package WebGUI::i18n::English::Asset;
 
 our $I18N = {
+	'add the missing page' => {
+		message => q|Add the missing page.|,
+		lastUpdated => 0,
+		context => q|the question asked of the admin when they click on a missing page|
+	},
+
+	'missing page query' => {
+		message => q|The page you have requested does not exist. What would you like to do?|,
+		lastUpdated => 0,
+		context => q|the question asked of the admin when they click on a missing page|
+	},
+
 	'package corrupt' => {
 		message => q|The package you tried to import appears to be corrupt. We imported up to the point where we detected corruption. If you won't want this portion, roll back your current version tag.|,
 		lastUpdated => 0,

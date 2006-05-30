@@ -149,7 +149,7 @@ sub walkGroups {
 			.$session->icon->delete('op=deleteGroupGrouping;gid='.$parentId.';delete='.$id)
 			.$session->icon->edit('op=editGroup;gid='.$id)
 			.' '.$name.'<br />';
-                $output .= $session->walkGroups($id,$indent."&nbsp; &nbsp; ");
+                $output .= walkGroups($session, $id,$indent."&nbsp; &nbsp; ");
         }
         $sth->finish;
 	return $output;
@@ -159,7 +159,7 @@ sub walkGroups {
 sub www_addGroupsToGroupSave {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3) || _hasSecondaryPrivilege($session,$session->form->process("gid")));
-	my $group = WebGUI::Group->new($session,$_[0]);
+	my $group = WebGUI::Group->new($session,$session->form->process("gid"));
 	my @groups = $session->form->group('groups');
 	$group->addGroups(\@groups);
 	return www_manageGroupsInGroup($session);
@@ -635,7 +635,7 @@ sub www_manageGroupsInGroup {
         $f->submit;
         my $output = $f->print;
 	$output .= '<p />';
-	$output .= $session->walkGroups($session->form->process("gid"));
+	$output .= walkGroups($session, $session->form->process("gid"));
 	return _submenu($session,$output,'813');
 }
 

@@ -22,9 +22,17 @@ my $session = start(); # this line required
 
 fixCs();
 fixCss();
+fixSpectre();
 
 finish($session); # this line required
 
+
+#-------------------------------------------------
+sub fixSpectre {
+	print "\tAdding more security to Spectre.\n" unless ($quiet);
+	my $config = WebGUI::Config->new("../..","spectre.conf");
+	$config->set("ip","127.0.0.1");
+}
 
 #-------------------------------------------------
 sub fixCss {

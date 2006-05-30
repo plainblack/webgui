@@ -3,10 +3,15 @@
    fixed.
  - fix: Column Layout seems a little messed up
  - Fixed the EMS default templates to expose all functionality.
- - Fixed a problem in the EMS where it wouldn't let you add any events.
  - fix: FieldName incorrect after adding profile field
  - fix: preload.perl for other roots than /data/WebGUI
  - Fixed a bug where polls weren't distributing karma.
+ - fix: Asset menu
+ - fix: Event Manager - can't add event
+ - fix: v6.99.1, security: Spectre listens to INADDR_ANY (profo)
+ - fix: Manage groups in this group doesn't work
+ - Fixed a problem where the not found page would not display.
+ - fix: New page layout instead of not found
 
 6.99.2
  - fix - demo.plainblack.com getting started
