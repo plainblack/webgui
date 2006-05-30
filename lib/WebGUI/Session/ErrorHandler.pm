@@ -44,7 +44,6 @@ This package provides simple but effective error handling, debugging,  and loggi
 
  $logger = $errorHandler->getLogger;
 
- $text = $errorHandler->getSessionVars;
  $text = $errorHandler->getStackTrace;
  $html = $errorHandler->showDebug;
 
@@ -134,7 +133,7 @@ sub debug {
 	my $self = shift;
 	my $message = shift;
 	$self->getLogger->debug($message);
-        $self->session->stow->set("debug_debug", $self->session->stow->get("debug_debug").$message."\n");
+        $self->{_debug_debug} .= $message."\n";
 }
 
 
@@ -171,7 +170,7 @@ sub error {
 	my $message = shift;
 	$self->getLogger->error($message);
 	$self->getLogger->debug("Stack trace for ERROR ".$message."\n".$self->getStackTrace());
-        $self->session->stow->set("debug_error", $self->session->stow->get("debug_error").$message."\n");
+        $self->{_debug_error} .= $message."\n";
 }
 
 
@@ -226,41 +225,6 @@ sub getLogger {
 
 #-------------------------------------------------------------------
 
-=head2 getSessionVars ( )
-
-Returns a text message containing all of the session variables.
-
-=cut
-
-sub getSessionVars {
-	my $self = shift;
-	my $data;
-	while (my ($section, $hash) = each %{$self->session}) {
-		if (ref $hash eq 'HASH') {
-			while (my ($key, $value) = each %$hash) {
-				if (ref $value eq 'ARRAY') {
-					$value = '['.join(', ',@$value).']';
-				} elsif (ref $value eq 'HASH') {
-					$value = '{'.join(', ',map {"$_ => $value->{$_}"} keys %$value).'}';
-				}
-				unless (lc($key) eq "password" || lc($key) eq "identifier" || lc($key) eq "dbpass") {
-					$data .= "\t".$section.'.'.$key.' = '.$value."\n";
-				}
-			}
-		} elsif (ref $hash eq 'ARRAY') {
-			my $i = 1;
-			foreach (@$hash) {
-				$data .= "\t".$section.'.'.$i.' = '.$_."\n";
-				$i++;
-			}
-		}
-	}
-	return $data;
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 getStackTrace ( )
 
 Returns a text formatted message containing the current stack trace.
@@ -296,7 +260,7 @@ sub info {
 	my $self = shift;
 	my $message = shift;
 	$self->getLogger->info($message);
-        $self->session->stow->set("debug_info", $self->session->stow->get("debug_info").$message."\n");
+        $self->{_debug_info} .= $message."\n";
 }
 
 #-------------------------------------------------------------------
@@ -394,13 +358,13 @@ Creates an HTML formatted string
 
 sub showDebug {
 	my $self = shift;
-	my $text = $self->session->stow->get('debug_error');
+	my $text = $self->{_debug_error};
 	$text =~  s/\n/\<br \/\>\n/g;
 	my $output = '<div style="text-align: left;background-color: #800000;color: #ffffff;">'.$text."</div>\n";
-	$text = $self->session->stow->get('debug_warn'); 
+	$text = $self->{_debug_warn}; 
 	$text =~  s/\n/\<br \/\>\n/g;
 	$output .= '<div style="text-align: left;background-color: #ffdddd;color: #000000;">'.$text."</div>\n";
-	$text = $self->session->stow->get('debug_info'); 
+	$text = $self->{_debug_info}; 
 	$text =~  s/\n/\<br \/\>\n/g;
 	$output .= '<div style="text-align: left;background-color: #ffffdd;color: #000000;">'.$text."</div>\n";
 	my $form = $self->session->form->paramsHashRef();
@@ -416,12 +380,9 @@ sub showDebug {
 	$text =~  s/\n/\<br \/\>\n/g;
 	$text =~  s/    /&nbsp; &nbsp; /g;
 	$output .= '<div style="text-align: left;background-color: #cccccc;color: #000000;">'.$text."</div>\n";
-	$text = $self->session->stow->get('debug_debug'); 
+	$text = $self->{_debug_debug}; 
 	$text =~  s/\n/\<br \/\>\n/g;
 	$output .= '<div style="text-align: left;background-color: #dddddd;color: #000000;">'.$text."</div>\n";
-	$text = $self->getSessionVars();
-	$text =~  s/\n/\<br \/\>\n/g;
-	$output .= '<div style="text-align: left;background-color: #ffffff;color: #000000;">'.$text."</div>\n";
 	return $output;
 }
 
@@ -443,7 +404,7 @@ sub warn {
 	my $self = shift;
 	my $message = shift;
 	$self->getLogger->warn($message);
-        $self->session->stow->set("debug_warn", $self->session->stow->get("debug_warn").$message."\n");
+        $self->{_debug_warn} .= $message."\n";
 }
 
 

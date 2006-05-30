@@ -209,6 +209,9 @@ sub toHtml {
         	uploader.addRow();
         	</script>!, $self->get("name"), $i18n->get("removeLabel"), $maxFiles;
 		$uploadControl .= WebGUI::Form::Hidden->new($self->session, {-name => $self->privateName('action'), -value => 'upload'})->toHtml()."<br />";
+	} else {
+		$uploadControl .= WebGUI::Form::Hidden->new($self->session, {-name => $self->get("name"), -value => $self->get("value")})->toHtml()."<br />";
+		$uploadControl .= WebGUI::Form::Hidden->new($self->session, {-name => $self->privateName('action'), -value => 'keep'})->toHtml()."<br />";
 	}
 	if (scalar(@files)) {
 		foreach my $file (@{$storage->getFiles}) {

@@ -12,6 +12,7 @@ package WebGUI::Asset::Wobject::Product;
 
 use strict;
 use Tie::CPHash;
+use Tie::IxHash;
 use WebGUI::Cache;
 use WebGUI::HTMLForm;
 use WebGUI::Storage::Image;
@@ -23,28 +24,6 @@ use WebGUI::Asset::Wobject;
 our @ISA = qw(WebGUI::Asset::Wobject);
 
 #-------------------------------------------------------------------
-sub _addFileTab {
-	my $self = shift;
-	my $tabform = $_[0];
-	my $column = $_[1];
-	my $internationalId = $_[2];
-	my $i18n = WebGUI::International->new($self->session,"Asset_Product");
-	unless ($self->get($column)){
-		$tabform->getTab("properties")->file(
-		-name=>$column,
-		-label=>$i18n->get($internationalId),
-		);
-		return;
-	}
-
-	my $file = WebGUI::Storage->get($self->session,$self->get($column));
-	$tabform->getTab("properties")->readOnly(
-	-value=>'<a href="'.$self->getUrl('func=deleteFileConfirm&file='.$column).'">'.$i18n->get("deleteImage").'</a>',
-	-label=>$i18n->get($internationalId),
-	);
-}
-
-#-------------------------------------------------------------------
 sub _duplicateFile {
    my $self = shift;
    my $newAsset = $_[0];
@@ -54,19 +33,6 @@ sub _duplicateFile {
 	  my $newstore = $file->copy;
 	  $newAsset->update({ $column=>$newstore->getId });
    }
-}
-
-#-------------------------------------------------------------------
-sub _save {
-	my $self = shift;
-	my $file = WebGUI::Storage::Image->create($self->session);
-	my $filename = $file->addFileFromFormPost($_[0]);
-	unless ($filename) {
-		$file->delete;
-		return "";
-	}
-	$file->generateThumbnail($filename);
-	$self->session->db->write("update Product set $_[0]=".$self->session->db->quote($file->getId)." where assetId=".$self->session->db->quote($self->getId)." and revisionDate=".$self->session->db->quote($self->get("revisionDate")));
 }
 
 #-------------------------------------------------------------------
@@ -84,7 +50,6 @@ sub addRevision {
 		if ($self->get($field)) {
 			my $newStorage = WebGUI::Storage->get($self->session,$self->get($field))->copy;
 			$newSelf->update({$field=>$newStorage->getId});
-			$self->session->db->write("update Product set $field=".$self->session->db->quote($newStorage->getId)." where assetId=".$self->session->db->quote($newSelf->getId)." and revisionDate=".$self->session->db->quote($newSelf->get("revisionDate")));
 		}
 	}
 	return $newSelf;
@@ -96,12 +61,9 @@ sub definition {
 	my $session = shift;
 	my $definition = shift;
 	my $i18n = WebGUI::International->new($session,"Asset_Product");
-	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		icon=>'product.gif',
-		tableName=>'Product',
-		className=>'WebGUI::Asset::Wobject::Product',
-		properties=>{
+	my %properties;
+	tie %properties, 'Tie::IxHash';
+	%properties = (
 			cacheTimeout => {
 				tab => "display",
 				fieldType => "interval",
@@ -112,42 +74,83 @@ sub definition {
 				},
 			templateId =>{
 				fieldType=>"template",
+				tab => "display",
+      				namespace=>"Product",
+				label=>$i18n->get(62),
+				hoverHelp=>$i18n->get('62 description'),
 				defaultValue=>'PBtmpl0000000000000056'
 			},
 			price=>{
+				label=>$i18n->get(10),
+				hoverHelp=>$i18n->get('10 description'),
+				tab => "properties",
 				fieldType=>"text",
 				defaultValue=>undef
 			},
 			productNumber=>{
+				tab => "properties",
+				label=>$i18n->get(11),
+				hoverHelp=>$i18n->get('11 description'),
 				fieldType=>"text",
 				defaultValue=>undef
 			},
-#			image1=>{
-#				fieldType=>"text",
-#				defaultValue=>undef
-#			},
-#			image2=>{
-#				fieldType=>"text",
-#				defaultValue=>undef
-#			},
-#			image3=>{
-#				fieldType=>"text",
-#				defaultValue=>undef
-#			},
-#			brochure=>{
-#				fieldType=>"text",
-#				defaultValue=>undef
-#			},
-#			manual=>{
-#				fieldType=>"text",
-#				defaultValue=>undef
-#			},
-#			warranty=>{
-#				fieldType=>"text",
-#				defaultValue=>undef
-#			},
-		}
-	});
+			image1=>{
+				tab => "properties",
+				fieldType=>"image",
+				defaultValue=>undef,
+				maxAttachments=>1,
+				label=>$i18n->get(7),
+				deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=image1;filename=")
+			},
+			image2=>{
+				tab => "properties",
+				fieldType=>"image",
+				maxAttachments=>1,
+				label=>$i18n->get(8),
+				deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=image2;filename="),
+				defaultValue=>undef
+			},
+			image3=>{
+				tab => "properties",
+				fieldType=>"image",
+				maxAttachments=>1,
+				label=>$i18n->get(9),
+				deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=image3;filename="),
+				defaultValue=>undef
+			},
+			brochure=>{
+				tab => "properties",
+				fieldType=>"file",
+				maxAttachments=>1,
+				label=>$i18n->get(13),
+				deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=brochure;filename="),
+				defaultValue=>undef
+			},
+			manual=>{
+				tab => "properties",
+				fieldType=>"file",
+				maxAttachments=>1,
+				label=>$i18n->get(14),
+				deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=manual;filename="),
+				defaultValue=>undef
+			},
+			warranty=>{
+				tab => "properties",
+				fieldType=>"file",
+				maxAttachments=>1,
+				label=>$i18n->get(15),
+				deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=warranty;filename="),
+				defaultValue=>undef
+			},
+		);
+	push(@{$definition}, {
+		assetName=>$i18n->get('assetName'),
+		autoGenerateForms=>1,
+		icon=>'product.gif',
+		tableName=>'Product',
+		className=>'WebGUI::Asset::Wobject::Product',
+		properties=>\%properties
+		});
         return $class->SUPER::definition($session, $definition);
 }
 
@@ -204,38 +207,6 @@ sub duplicate {
    return $newAsset;
 }
 
-#-------------------------------------------------------------------
-sub getEditForm {
-	my $self = shift;
-	my ($file);
-	my $i18n = WebGUI::International->new($self->session,"Asset_Product");
-	my $tabform = $self->SUPER::getEditForm();
-	$tabform->getTab("display")->template(
-      		-value=>$self->getValue('templateId'),
-      		-namespace=>"Product",
-		-label=>$i18n->get(62),
-		-hoverHelp=>$i18n->get('62 description'),
-   		);
-	$tabform->getTab("properties")->text(
-		-name=>"price",
-		-label=>$i18n->get(10),
-		-hoverHelp=>$i18n->get('10 description'),
-		-value=>$self->getValue("price")
-		);
-    $tabform->getTab("properties")->text(
-		-name=>"productNumber",
-		-label=>$i18n->get(11),
-		-hoverHelp=>$i18n->get('11 description'),
-		-value=>$self->getValue("productNumber")
-		);
-    $self->_addFileTab($tabform,"image1",7);
-	$self->_addFileTab($tabform,"image2",8);
-	$self->_addFileTab($tabform,"image3",9);
-	$self->_addFileTab($tabform,"brochure",13);
-	$self->_addFileTab($tabform,"manual",14);
-	$self->_addFileTab($tabform,"warranty",15);
-	return $tabform;
-}
 
 #-------------------------------------------------------------------
 sub getFileIconUrl {
@@ -356,7 +327,7 @@ sub purgeCache {
 
 #-------------------------------------------------------------------
 
-sub	purgeRevision	{
+sub purgeRevision	{
 	my $self = shift;
 	WebGUI::Storage->get($self->session,$self->get("image1"))->delete if	($self->get("image1"));
 	WebGUI::Storage->get($self->session,$self->get("image2"))->delete if	($self->get("image2"));
@@ -477,12 +448,13 @@ sub www_deleteFeatureConfirm {
 #-------------------------------------------------------------------
 sub www_deleteFileConfirm {
    my $self = shift;
-   my $column = $self->session->form->process("file");
    return $self->session->privilege->insufficient() unless ($self->canEdit);
+   my $column = $self->session->form->process("file");
+	return $self->www_edit  unless (isIn($column, qw(image1 image2 image3 manual warranty brochure)));
    my $store = $self->get($column);
    my $file = WebGUI::Storage->get($self->session,$store);
-   $file->delete;
-	$self->update({$column => ''});
+   $file->delete if defined $file;
+	$self->update({$column=>''});
    return $self->www_edit;
 }
 
@@ -504,18 +476,6 @@ sub www_deleteSpecificationConfirm {
    return "";
 }
 
-#-------------------------------------------------------------------
-sub processPropertiesFromFormPost {
-	my $self = shift;
-	$self->SUPER::processPropertiesFromFormPost;
-	$self->_save("image1");
-	$self->_save("image2");
-	$self->_save("image3");
-	$self->_save("brochure");
-	$self->_save("manual");
-	$self->_save("warranty");
-	return "";
-}
 
 #-------------------------------------------------------------------
 sub www_editBenefit {

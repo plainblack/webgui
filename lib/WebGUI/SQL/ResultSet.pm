@@ -117,8 +117,9 @@ sub execute {
 	my $self = shift;
 	my $placeholders = shift || [];
 	my $sql = $self->{_sql};
-	$self->db->session->errorHandler->query($sql,$placeholders);
-	$self->sth->execute(@{ $placeholders }) or $self->db->session->errorHandler->fatal("Couldn't execute prepared statement: $sql : With place holders: ".join(", ", @{$placeholders}).".  Root cause: ". $self->errorMessage);
+	my $errorHandler = $self->db->session->errorHandler;
+	$errorHandler->query($sql,$placeholders);
+	$self->sth->execute(@{ $placeholders }) or $errorHandler->fatal("Couldn't execute prepared statement: $sql : With place holders: ".join(", ", @{$placeholders}).".  Root cause: ". $self->errorMessage);
 }
 
 
@@ -292,10 +293,11 @@ sub unconditionalRead {
 	my $sql = shift;
 	my $db = shift;
 	my $placeholders = shift;
-	$db->session->errorHandler->query($sql,$placeholders);
-        my $sth = $db->dbh->prepare($sql) or $db->session->errorHandler->warn("Unconditional read failed: ".$sql." : ".$db->dbh->errstr);
+	my $errorHandler = $db->session->errorHandler;
+	$errorHandler->query($sql,$placeholders);
+        my $sth = $db->dbh->prepare($sql) or $errorHandler->warn("Unconditional read failed: ".$sql." : ".$db->dbh->errstr);
         if ($sth) {
-        	$sth->execute(@$placeholders) or $db->session->errorHandler->warn("Unconditional read failed: ".$sql." : ".$sth->errstr);
+        	$sth->execute(@$placeholders) or $errorHandler->warn("Unconditional read failed: ".$sql." : ".$sth->errstr);
 		bless {_sql=>$sql, _db=>$db, _sth=>$sth}, $class;
         }  else {
 		return undef;

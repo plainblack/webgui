@@ -222,6 +222,7 @@ sub clearCaches {
 	foreach my $group ( $self->getId, @{ $groups } ) {
 		WebGUI::Cache->new($self->session, $group)->delete;
 	}
+	$self->session->stow->delete("groupObj");
 	$self->session->stow->delete("isInGroup");
 	$self->session->stow->delete("gotGroupsInGroup");
 }
@@ -439,134 +440,6 @@ sub expireOffset {
 
 #-------------------------------------------------------------------
 
-=head2 getDatabaseUsers ( )
-
-Get the set of users allowed to be in this group via a database query.
-
-=cut
-
-sub getDatabaseUsers {
-	my $self = shift;
-	my @dbUsers = ();
-	my $gid = $self->getId;
-        ### Check db database
-        if ($self->get("dbQuery") && defined $self->get("databaseLinkId")) {
-		my $dbLink = WebGUI::DatabaseLink->new($self->session,$self->get("databaseLinkId"));
-		my $dbh = $dbLink->db;
-		if (defined $dbh) {
-			my $query = $self->get("dbQuery");
-			WebGUI::Macro::process($self->session,\$query);
-			my $sth = $dbh->unconditionalRead($query);
-			unless ($sth->errorCode < 1) {
-				$self->session->errorHandler->warn("There was a problem with the database query for group ID $gid.");
-			}
-			else {
-				while(my ($userId)=$sth->array) {
-					push @dbUsers, $userId;
-				}
-			}
-			$sth->finish;
-			$dbLink->disconnect;
-                }
-        }
-	return \@dbUsers;
-}	
-
-#-------------------------------------------------------------------
-
-=head2 getKarmaUsers ( )
-
-Get the set of users allowed to be in this group via their current karma setting
-and this group's karmaThreshold.  The set is returned as an array ref.
-
-If karma is not enabled for this site, it will return a empty array ref.
-
-=cut
-
-sub getKarmaUsers {
-	my $self = shift;
-	return [] unless $self->session->setting->get('useKarma');
-	return $self->session->db->buildArrayRef('select userId from users where karma >= ?', [$self->karmaThreshold]);
-}	
-
-#-------------------------------------------------------------------
-
-=head2 getScratchUsers ( )
-
-Get the set of users allowed to be in this group via session scratch variable settings
-and this group's scratchFilter.  The set is returned as an array ref.
-
-If no scratchFilter has been set for this group, returns an empty array ref.
-
-=cut
-
-sub getScratchUsers {
-	my $self = shift;
-	my $scratchFilter;
-	return [] unless $scratchFilter = $self->scratchFilter();
-
-	my $time = $self->session->datetime->time();
-
-	$scratchFilter =~ s/\s//g;
-	my @filters = split /;/, $scratchFilter;
-
-	my @scratchClauses = ();
-	my @scratchPlaceholders = ();
-	foreach my $filter (@filters) {
-		my ($name, $value) = split /=/, $filter;
-		push @scratchClauses, "(s.name=? AND s.value=?)";
-		push @scratchPlaceholders, $name, $value;
-	}
-	my $scratchClause = join ' OR ', @scratchClauses;
-
-	my $query = <<EOQ;
-select u.userId from userSession u, userSessionScratch s where
-u.sessionId=s.sessionId AND
-u.expires > $time AND
-	( $scratchClause )
-EOQ
-	return $self->session->db->buildArrayRef($query, [ @scratchPlaceholders ]);
-}	
-
-#-------------------------------------------------------------------
-
-=head2 getIpUsers ( )
-
-Get the set of users allowed to be in this group via the lastIP recorded in
-the user's session and this group's IpFilter.  The set is returned as an array ref.
-
-If no IpFilter has been set for this group, returns an empty array ref.
-
-=cut
-
-sub getIpUsers {
-	my $self = shift;
-	my $IpFilter;
-	return [] unless $IpFilter = $self->ipFilter();
-
-	my $time = $self->session->datetime->time();
-
-	$IpFilter =~ s/\s//g;
-	my @filters = split /;/, $IpFilter;
-
-	my $query = "select userId,lastIP from userSession where expires > ?";
-
-	my $sth = $self->session->db->read($query, [ $self->session->datetime->time() ]);
-	my %localCache = ();
-	my @ipUsers = ();
-	$self->session->errorHandler->warn("Fetching IP users");
-	while (my ($userId, $lastIP) = $sth->array() ) {
-		if (!exists $localCache{$lastIP}) {
-			$localCache{$lastIP} = isInSubnet($lastIP, \@filters);	
-		}
-		push @ipUsers, $userId if $localCache{$lastIP};
-	}
-	return \@ipUsers;
-}	
-
-
-#-------------------------------------------------------------------
-
 =head2 find ( session, name )
 
 An alternative to the constructor "new", use find as a constructor by name rather than id.
@@ -633,6 +506,87 @@ sub getAllGroupsFor {
 	$groups = [ keys %unique ];
 	return $groups;
 }
+
+#-------------------------------------------------------------------
+
+=head2 getAllUsers ( [ withoutExpired ] )
+
+Returns an array reference containing a list of users that belong to this group
+and in any group that belongs to this group.
+
+=head3 withoutExpired
+
+A boolean that if set true will return the users list minus the expired groupings.
+
+=cut
+
+sub getAllUsers {
+	my $self = shift;
+	my $withoutExpired = shift;
+	my $loopCount = shift;
+	my $expireTime = 0;
+	my $cache = WebGUI::Cache->new($self->session, $self->getId);
+	my $value = $cache->get;
+	return $value if defined $value;
+	my @users = ();
+	push @users,
+		@{ $self->getUsers($withoutExpired) },
+		@{ $self->getDatabaseUsers() },
+		@{ $self->getKarmaUsers() },
+		@{ $self->getScratchUsers() },
+		@{ $self->getIpUsers() },
+	;
+	++$loopCount;
+	if ($loopCount > 99) {
+		$self->session->errorHandler->fatal("Endless recursive loop detected while determining groups in group.\nRequested groupId: ".$self->getId);
+	}
+	my $groups = $self->getGroupsIn();
+	##Have to iterate twice due to the withoutExpired clause.
+	foreach my $groupId (@{ $groups }) {
+		my $subGroup = WebGUI::Group->new($self->session, $groupId);
+		push @users, @{ $subGroup->getAllUsers(1, $withoutExpired, $loopCount) };
+	}
+	my %users = map { $_ => 1 } @users;
+	@users = keys %users;
+	$cache->set(\@users, $self->groupCacheTimeout);
+	return \@users;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getDatabaseUsers ( )
+
+Get the set of users allowed to be in this group via a database query.
+
+=cut
+
+sub getDatabaseUsers {
+	my $self = shift;
+	my @dbUsers = ();
+	my $gid = $self->getId;
+        ### Check db database
+        if ($self->get("dbQuery") && defined $self->get("databaseLinkId")) {
+		my $dbLink = WebGUI::DatabaseLink->new($self->session,$self->get("databaseLinkId"));
+		my $dbh = $dbLink->db;
+		if (defined $dbh) {
+			my $query = $self->get("dbQuery");
+			WebGUI::Macro::process($self->session,\$query);
+			my $sth = $dbh->unconditionalRead($query);
+			unless ($sth->errorCode < 1) {
+				$self->session->errorHandler->warn("There was a problem with the database query for group ID $gid.");
+			}
+			else {
+				while(my ($userId)=$sth->array) {
+					push @dbUsers, $userId;
+				}
+			}
+			$sth->finish;
+			$dbLink->disconnect;
+                }
+        }
+	return \@dbUsers;
+}	
 
 #-------------------------------------------------------------------
 
@@ -704,49 +658,110 @@ sub getGroupsIn {
 
 #-------------------------------------------------------------------
 
-=head2 getAllUsers ( [ withoutExpired ] )
+=head2 getId ( )
 
-Returns an array reference containing a list of users that belong to this group
-and in any group that belongs to this group.
-
-=head3 withoutExpired
-
-A boolean that if set true will return the users list minus the expired groupings.
+Returns the groupId for this group.
 
 =cut
 
-sub getAllUsers {
+sub getId {
 	my $self = shift;
-	my $withoutExpired = shift;
-	my $loopCount = shift;
-	my $expireTime = 0;
-	my $cache = WebGUI::Cache->new($self->session, $self->getId);
-	my $value = $cache->get;
-	return $value if defined $value;
-	my @users = ();
-	push @users,
-		@{ $self->getUsers($withoutExpired) },
-		@{ $self->getDatabaseUsers() },
-		@{ $self->getKarmaUsers() },
-		@{ $self->getScratchUsers() },
-		@{ $self->getIpUsers() },
-	;
-	++$loopCount;
-	if ($loopCount > 99) {
-		$self->session->errorHandler->fatal("Endless recursive loop detected while determining groups in group.\nRequested groupId: ".$self->getId);
-	}
-	my $groups = $self->getGroupsIn();
-	##Have to iterate twice due to the withoutExpired clause.
-	foreach my $groupId (@{ $groups }) {
-		my $subGroup = WebGUI::Group->new($self->session, $groupId);
-		push @users, @{ $subGroup->getAllUsers(1, $withoutExpired, $loopCount) };
-	}
-	my %users = map { $_ => 1 } @users;
-	@users = keys %users;
-	$cache->set(\@users, $self->groupCacheTimeout);
-	return \@users;
+        return $self->{_groupId};
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 getIpUsers ( )
+
+Get the set of users allowed to be in this group via the lastIP recorded in
+the user's session and this group's IpFilter.  The set is returned as an array ref.
+
+If no IpFilter has been set for this group, returns an empty array ref.
+
+=cut
+
+sub getIpUsers {
+	my $self = shift;
+	my $IpFilter;
+	return [] unless $IpFilter = $self->ipFilter();
+
+	my $time = $self->session->datetime->time();
+
+	$IpFilter =~ s/\s//g;
+	my @filters = split /;/, $IpFilter;
+
+	my $query = "select userId,lastIP from userSession where expires > ?";
+
+	my $sth = $self->session->db->read($query, [ $self->session->datetime->time() ]);
+	my %localCache = ();
+	my @ipUsers = ();
+	$self->session->errorHandler->warn("Fetching IP users");
+	while (my ($userId, $lastIP) = $sth->array() ) {
+		if (!exists $localCache{$lastIP}) {
+			$localCache{$lastIP} = isInSubnet($lastIP, \@filters);	
+		}
+		push @ipUsers, $userId if $localCache{$lastIP};
+	}
+	return \@ipUsers;
+}	
+
+
+#-------------------------------------------------------------------
+
+=head2 getKarmaUsers ( )
+
+Get the set of users allowed to be in this group via their current karma setting
+and this group's karmaThreshold.  The set is returned as an array ref.
+
+If karma is not enabled for this site, it will return a empty array ref.
+
+=cut
+
+sub getKarmaUsers {
+	my $self = shift;
+	return [] unless $self->session->setting->get('useKarma');
+	return $self->session->db->buildArrayRef('select userId from users where karma >= ?', [$self->karmaThreshold]);
+}	
+
+#-------------------------------------------------------------------
+
+=head2 getScratchUsers ( )
+
+Get the set of users allowed to be in this group via session scratch variable settings
+and this group's scratchFilter.  The set is returned as an array ref.
+
+If no scratchFilter has been set for this group, returns an empty array ref.
+
+=cut
+
+sub getScratchUsers {
+	my $self = shift;
+	my $scratchFilter;
+	return [] unless $scratchFilter = $self->scratchFilter();
+
+	my $time = $self->session->datetime->time();
+
+	$scratchFilter =~ s/\s//g;
+	my @filters = split /;/, $scratchFilter;
+
+	my @scratchClauses = ();
+	my @scratchPlaceholders = ();
+	foreach my $filter (@filters) {
+		my ($name, $value) = split /=/, $filter;
+		push @scratchClauses, "(s.name=? AND s.value=?)";
+		push @scratchPlaceholders, $name, $value;
+	}
+	my $scratchClause = join ' OR ', @scratchClauses;
+
+	my $query = <<EOQ;
+select u.userId from userSession u, userSessionScratch s where
+u.sessionId=s.sessionId AND
+u.expires > $time AND
+	( $scratchClause )
+EOQ
+	return $self->session->db->buildArrayRef($query, [ @scratchPlaceholders ]);
+}	
 
 #-------------------------------------------------------------------
 
@@ -771,20 +786,6 @@ sub getUsers {
 	}
 	my @users = $self->session->db->buildArray("select userId from groupings where expireDate > ? and groupId = ?", [$expireTime, $self->getId]);
 	return \@users;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 getId ( )
-
-Returns the groupId for this group.
-
-=cut
-
-sub getId {
-	my $self = shift;
-        return $self->{_groupId};
 }
 
 
@@ -917,11 +918,13 @@ sub new {
 	my $self = {};
 	$self->{_session} = shift;
 	$self->{_groupId} = shift;
-	return $self->{_session}->{groupData}->{$self->{_groupId}} if $self->{_session}->{groupData}->{$self->{_groupId}};
 	my $override = shift;
+	my $cached = $self->{_session}->stow->get("groupObj");
+	return $cached->{$self->{_groupId}} if ($cached->{$self->{_groupId}});
 	bless $self, $class;
         $self->_create($override) if ($self->{_groupId} eq "new");
-	$self->{_session}->{groupData}->{$self->{_groupId}} = $self;
+	$cached->{$self->{_groupId}} = $self;
+	$self->{_session}->stow->set("groupObj", $cached);
 	return $self;
 }
 
@@ -1132,7 +1135,6 @@ sub set {
 	my $value = shift;
 	$self->get("groupId") unless ($self->{_group}); # precache group stuff
 	$self->{_group}{$name} = $value;
-	$self->session->{groupData}->{$self->getId} = undef;
 	$self->session->db->setRow("groups","groupId",{groupId=>$self->getId, $name=>$value, lastUpdated=>$self->session->datetime->time()});
 	$self->clearCaches;
 }

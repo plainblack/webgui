@@ -397,6 +397,7 @@ sub www_manageRevisionsInTag {
 	my $session = shift;
 	my $tagId = $session->form->get("tagId");
 	my $tag = WebGUI::VersionTag->new($session, $tagId);
+	return www_manageVersions($session) unless (defined $tag);
         return $session->privilege->insufficient() unless ($session->user->isInGroup($tag->get("groupToUse")));
 	my $ac = WebGUI::AdminConsole->new($session,"versions");
         my $i18n = WebGUI::International->new($session,"VersionTag");

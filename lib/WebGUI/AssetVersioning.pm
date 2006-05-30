@@ -291,17 +291,21 @@ sub www_manageRevisions {
 
 sub www_purgeRevision {
 	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	my $revisionDate = $self->session->form->process("revisionDate");
+	my $session = $self->session;
+	return $session->privilege->insufficient() unless $self->canEdit;
+	my $revisionDate = $session->form->process("revisionDate");
 	return undef unless $revisionDate;
-	
-	my $asset = WebGUI::Asset->new($self->session,$self->getId,$self->get("className"),$revisionDate);
+	my $asset = WebGUI::Asset->new($session,$self->getId,$self->get("className"),$revisionDate);
 	return undef if ($asset->get('revisionDate') != $revisionDate);
-
+	my $parent = $asset->getParent;
 	$asset->purgeRevision;
-	if ($self->session->form->process("proceed") eq "manageRevisionsInTag") {
-		$self->session->http->setRedirect($self->getUrl("op=manageRevisionsInTag"));
+	if ($session->form->process("proceed") eq "manageRevisionsInTag") {
+		my $working = (defined $self) ? $self : $parent;
+		$session->http->setRedirect($working->getUrl("op=manageRevisionsInTag"));
 		return "";
+	}
+	unless (defined $self) {
+		return $parent->www_view;
 	}
 	return $self->www_manageRevisions;
 }

@@ -12,6 +12,9 @@
  - fix: Manage groups in this group doesn't work
  - Fixed a problem where the not found page would not display.
  - fix: New page layout instead of not found
+ - fix: Rollback
+ - fix: debug output
+ - fix: Can't delete images at product asset
 
 6.99.2
  - fix - demo.plainblack.com getting started
