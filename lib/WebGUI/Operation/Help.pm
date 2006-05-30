@@ -44,27 +44,27 @@ sub _load {
 	my $cmd = "WebGUI::Help::".$namespace;
         my $load = sprintf 'use %-s; $%-s::HELP;', $cmd, $cmd;
 	my $hash = eval($load);
+	my %help = %{$hash};
 	unless ($@) {
-		foreach my $tag (keys %{$hash}) {
-			if ($hash->{$tag}{isa}{namespace}) {
-				my $other = _load($session, $hash->{$tag}{isa}{namespace});
-				my $add = $other->{$hash->{$tag}{isa}{tag}}{fields};
-				@{$hash->{$tag}{fields}} = (@{$hash->{$tag}{fields}}, @{$add});
-				$add = $other->{$hash->{$tag}{isa}{tag}}{related};
-				@{$hash->{$tag}{related}} = (@{$hash->{$tag}{related}}, @{$add});
-				$add = $other->{$hash->{$tag}{isa}{tag}}{variables};
+		foreach my $tag (keys %help) {
+			if ($help{$tag}{isa}{namespace}) {
+				my $other = _load($session, $help{$tag}{isa}{namespace});
+				my $add = $other->{$help{$tag}{isa}{tag}}{fields};
+				@{$help{$tag}{fields}} = (@{$help{$tag}{fields}}, @{$add});
+				$add = $other->{$help{$tag}{isa}{tag}}{related};
+				@{$help{$tag}{related}} = (@{$help{$tag}{related}}, @{$add});
+				$add = $other->{$help{$tag}{isa}{tag}}{variables};
 				foreach my $row (@{$add}) {
-					push(@{$hash->{$tag}{variables}}, {
+					push(@{$help{$tag}{variables}}, {
 						name=> $row->{name},
 						description => $row->{description},
-						namespace => $row->{namespace} || $hash->{$tag}{isa}{namespace}
+						namespace => $row->{namespace} || $help{$tag}{isa}{namespace}
 						});
 				}
 			}
 		}
-		return $hash
-	}
-	else {
+		return \%help;
+	} else {
 		$session->errorHandler->error("Help failed to compile: $namespace. ".$@);
 		return {};
 	}
