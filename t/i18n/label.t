@@ -19,6 +19,7 @@ use WebGUI::International;
 use WebGUI::Session;
 use Text::Balanced qw(extract_codeblock);
 use File::Find;
+use Data::Dumper;
 
 #The goal of this test is to locate all of the international labels that it
 #can and verify that they exist in all loaded language models
@@ -68,6 +69,7 @@ my @helpLabels;
 my @sqlLabels;
 my @libLabels;
 my @objLabels;
+
 
 @helpLabels = getHelpLabels();
 
@@ -208,10 +210,10 @@ sub getHelpLabels {
 				push @helpLabels, {
 					topic=>$topic,
 					entry=>$entry,
-					tag=>'fields',
+					tag=>'variables',
 					namespace=>$namespace,
 					label=>$variable->{description},
-				} if exists $variable->{description};
+				} if $variable->{description};
 			}
 		}
 	}
