@@ -197,6 +197,12 @@ sub canEdit {
 }
 
 #-------------------------------------------------------------------
+sub canModerate {
+	my $self = shift;
+	return $self->SUPER::canEdit;
+}
+
+#-------------------------------------------------------------------
 sub canPost {
 	my $self = shift;
 	return $self->session->user->isInGroup($self->get("postGroupId")) || $self->canEdit;
@@ -1099,7 +1105,7 @@ sub view {
 	$var{'user.canPost'} = $self->canPost;
         $var{"add.url"} = $self->getNewThreadUrl;
         $var{"rss.url"} = $self->getRssUrl;
-        $var{'user.isModerator'} = $self->canEdit;
+        $var{'user.isModerator'} = $self->canModerate;
         $var{'user.isVisitor'} = ($self->session->user->userId eq '1');
 	$var{'user.isSubscribed'} = $self->isSubscribed;
 	$var{'sortby.title.url'} = $self->getSortByUrl("title");

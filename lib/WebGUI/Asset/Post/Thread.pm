@@ -760,7 +760,7 @@ sub view {
 	$self->getParent->appendTemplateLabels($var);
 	$var->{karmaIsEnabled} = $self->session->setting->get("useKarma");
         $var->{'user.isVisitor'} = ($self->session->user->userId eq '1');
-        $var->{'user.isModerator'} = $self->getParent->canEdit;
+        $var->{'user.isModerator'} = $self->getParent->canModerate;
         $var->{'user.canPost'} = $self->getParent->canPost;
         $var->{'user.canReply'} = $self->canReply;
         $var->{'repliesAllowed'} = $self->getParent->get("allowReplies");

@@ -1001,7 +1001,7 @@ sub www_edit {
 	}
 	$var{'form.footer'} = WebGUI::Form::formFooter($self->session,);
 	$var{usePreview} = $self->getThread->getParent->get("usePreview");
-	$var{'user.isModerator'} = $self->getThread->getParent->canEdit;
+	$var{'user.isModerator'} = $self->getThread->getParent->canModerate;
 	$var{'user.isVisitor'} = ($self->session->user->userId eq '1');
 	$var{'visitorName.form'} = WebGUI::Form::text($self->session, {
 		name=>"visitorName",
