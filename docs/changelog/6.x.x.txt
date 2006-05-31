@@ -10,11 +10,14 @@
  - fix: Event Manager - can't add event
  - fix: v6.99.1, security: Spectre listens to INADDR_ANY (profo)
  - fix: Manage groups in this group doesn't work
- - Fixed a problem where the not found page would not display.
  - fix: New page layout instead of not found
  - fix: Rollback
  - fix: debug output
  - fix: Can't delete images at product asset
+ - fix: Link to page in Webgui Page Tree not working in IE
+ - fix: Not Found page not working
+ - Made debug output more colorful, and set queries as info rather than debug.
+
 
 6.99.2
  - fix - demo.plainblack.com getting started
