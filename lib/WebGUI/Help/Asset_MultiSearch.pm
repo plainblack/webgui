@@ -32,11 +32,28 @@ our $HELP = {
 	'multisearch template' => {
 		title => 'multisearch template title',
 		body => 'multisearch template body',
+		isa => {
+			namespace => "Asset_Template",
+			tag => "template variables"
+			},
+		variables => [
+		          {
+		            'name' => 'search',
+		            'description' => 'search.variable'
+		          },
+		          {
+		            'name' => 'for',
+		            'description' => 'for.variable'
+		          },
+		          {
+		            'name' => 'submit'
+		          }
+		],
 		fields => [
 		],
 		related => [
 			{
-				tag => 'multisearch template',
+				tag => 'multi search add/edit',
 				namespace => 'Asset_MultiSearch'
 			},
 			{

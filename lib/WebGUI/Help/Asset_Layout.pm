@@ -37,6 +37,38 @@ our $HELP = {
         'layout template' => {
 		title => 'layout template title',
 		body => 'layout template body',
+		isa => {
+			namespace => "Asset_Template",
+			tag => "template variables"
+			},
+		variables => [
+		          {
+		            'name' => 'showAdmin'
+		          },
+		          {
+		            'name' => 'dragger.icon'
+		          },
+		          {
+		            'name' => 'dragger.init'
+		          },
+		          {
+		            'name' => 'position1_loop',
+		            'variables' => [
+		                             {
+		                               'name' => 'id'
+		                             },
+		                             {
+		                               'name' => 'content'
+		                             }
+		                           ]
+		          },
+		          {
+		            'name' => 'attachment.size'
+		          },
+		          {
+		            'name' => 'attachment.type'
+		          }
+		],
 		fields => [
 		],
 		related => [

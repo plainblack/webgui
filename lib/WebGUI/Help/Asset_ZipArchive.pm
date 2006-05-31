@@ -42,8 +42,26 @@ our $HELP = {
     'zip archive template' => {
 		title => 'zip archive template title',
 		body => 'zip archive template body',
+		isa => {
+			namespace => "Asset_Template",
+			tag => "template variables"
+			},
 		fields => [
 		],
+		variables => [
+		          {
+		            'name' => 'controls'
+		          },
+		          {
+		            'name' => 'error'
+		          },
+		          {
+		            'name' => 'fileUrl'
+		          },
+		          {
+		            'name' => 'fileIcon'
+		          }
+		        ],
 		related => [
 			{
 				tag => 'template language',

@@ -55,17 +55,19 @@ sub _load {
 	foreach my $tag (keys %{ $help }) {
 		$help->{$tag}{related} = [ _related($session, $help->{$tag}{related}) ];
 		if ($help->{$tag}{isa}{namespace}) {
-			my $other = _load($session, $help->{$tag}{isa}{namespace});
-			my $add = $other->{$help->{$tag}{isa}{tag}}{fields};
+			my $isa = $hash->{$tag}{isa};
+			my $other = _load($session, $isa->{namespace});
+			my $otherHelp = $other->{ $isa->{tag} };
+			my $add = $otherHelp->{fields};
 			@{$help->{$tag}{fields}} = (@{$help->{$tag}{fields}}, @{$add});
-			$add = $other->{$help->{$tag}{isa}{tag}}{related};
+			$add = $otherHelp->{related};
 			@{$help->{$tag}{related}} = (@{ $help->{$tag}{related} }, @{ $add });
-			$add = $other->{$help->{$tag}{isa}{tag}}{variables};
+			$add = $otherHelp->{variables};
 			foreach my $row (@{$add}) {
 				push(@{$help->{$tag}{variables}}, {
 					name=> $row->{name},
 					description => $row->{description},
-					namespace => $row->{namespace} || $help->{$tag}{isa}{namespace}
+					namespace => $row->{namespace} || $isa->{namespace}
 					});
 			}
 		}

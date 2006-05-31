@@ -89,6 +89,11 @@ our $HELP = {
 				uiLevel => 9,
                         },
 		],
+		variables => [
+			{
+				'name' => 'controls'
+			}
+		],
 		related => [
 			{
 				tag => 'template language',

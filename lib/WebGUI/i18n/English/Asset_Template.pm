@@ -225,54 +225,61 @@ has been set to some other language you will need to consult the documentation f
 		lastUpdated => 1130972019,
 	},
 
+	'webgui.version' => {
+		message => q|The version of WebGUI on your site.|,
+		lastUpdated => 1148951191,
+	},
+
+	'webgui.status' => {
+		message => q|The release status for this version of WebGUI, stable, beta, gamma, etc.|,
+		lastUpdated => 1148951191,
+	},
+
+	'session.user.username' => {
+		message => q|The current user's username.|,
+		lastUpdated => 1148951191,
+	},
+
+	'session.user.firstDayOfWeek' => {
+		message => q|From the current user's profile, the day they selected to be the first day of the week.|,
+		lastUpdated => 1148951191,
+	},
+
+	'session.config.extrasurl' => {
+		message => q|From the WebGUI config, the URL for the extras directory.|,
+		lastUpdated => 1148951191,
+	},
+
+	'session.var.adminOn' => {
+		message => q|This variable will be true if the user is in Admin mode.|,
+		lastUpdated => 1148951191,
+	},
+
+	'session.setting.companyName' => {
+		message => q|From the WebGUI settings, the company name.|,
+		lastUpdated => 1148951191,
+	},
+
+	'session.setting.anonymousRegistration' => {
+		message => q|From the WebGUI settings, whether or not anonymous registration has been enabled.|,
+		lastUpdated => 1148951191,
+	},
+
+	'session form variables' => {
+		message => q|<b>Session Form Variables</b><br />
+Any form variables will be available in the template with this syntax:<br/>
+&lt;tmpl_var session.form.<i>variable</i>&gt;<br />
+If there is more than 1 value in a form variable, only the last will be returned.|,
+		lastUpdated => 1148951191,
+	},
+
 	'template variable body' => {
 		message => q|
-<p><b>webgui.version</b><br />
-The version of WebGUI on your site.
-</p>
-
-<p><b>webgui.status</b><br />
-The release status for this version of WebGUI, stable, beta, gamma, etc.
-</p>
-
-<p><b>session.user.username</b><br />
-The current user's username.
-</p>
-
-<p><b>session.user.firstDayOfWeek</b><br />
-From the current user's profile, the day they selected to be the first day of the week.
-</p>
-
-<p><b>session.config.extrasurl</b><br />
-From the WebGUI config, the URL for the extras directory.
-</p>
-
-<p><b>session.var.adminOn</b><br />
-This variable will be true if the user is in Admin mode.
-</p>
-
-<p><b>session.setting.companyName</b><br />
-From the WebGUI settings, the company name.
-</p>
-
-<p><b>session.setting.anonymousRegistration</b><br />
-From the WebGUI settings, whether or not anonymous registration has been enabled.
-</p>
-
-<p>
-<b>Session Form Variables</b><br />
-Any form variables will be available in the template with this syntax:
-</p>
-
-<p>&lt;tmpl_var session.form.<i>variable</i>&gt;</p>
-
-<p>If there is more than 1 value in a form variable, only the last will be returned</p>
-
 <p><i>NOTE: The syntax for these variables is shown in WebGUI's default template language, HTML::Template.  If the Template Type
-has been set to some other language you will need to consult the documentation for the appropriate syntax for its variables.</i></p>.
+has been set to some other language you will need to consult that template's documentation for the appropriate syntax for its variables.</i></p>.
 
 		|,
-		lastUpdated => 1146243514,
+		lastUpdated => 1148951237,
 	},
 
 	'site name' => {

@@ -33,6 +33,10 @@ our $HELP = {
         'folder template' => {
 		title => 'folder template title',
 		body => 'folder template body',
+		isa => {
+			namespace => "Asset_Wobject",
+			tag => "wobject template"
+			},
 		fields => [ ],
 		variables => [
 			{

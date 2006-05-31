@@ -206,20 +206,36 @@ A property or value must be quoted if it contains spaces. Feel free to use the c
 		lastUpdated => 1109525763,
 	},
 
+	'shortcut.content' => {
+		message => q|The content from the mirrored Asset.  If any overrides were enabled in the Shortcut then the override content will be used instead of the content from the mirrored Asset.|,
+		lastUpdated => 1148953116,
+	},
+
+	'originalURL' => {
+		message => q|The URL to the Asset being mirrored by this Shortcut.|,
+		lastUpdated => 1148953116,
+	},
+
+	'isShortcut' => {
+		message => q|A boolean indicating that this Asset is a Shortcut.  This can be used in conjuction with another boolean for Admin mode to quickly show Content Managers that this is a Shortcut Asset.|,
+		lastUpdated => 1148953116,
+	},
+
+	'shortcut.label' => {
+		message => q|The word "Shortcut".|,
+		lastUpdated => 1148953116,
+	},
+
+	'shortcut.properties' => {
+		message => q|Any properties assigned to this shortcut will be available in the template by their name.|,
+		lastUpdated => 1148953116,
+	},
+
+
 	'shortcut template body' => {
 		message => q|<p>These variables are available in Shortcut Templates:</p>
-<p><b>shortcut.content</b><br />
-The content from the mirrored Asset.  If any overrides were enabled in the Shortcut then the override content will be used instead of the content from the mirrored Asset.</p>
-<p><b>originalURL</b><br />
-The URL to the Asset being mirrored by this Shortcut.</p>
-<p><b>isShortcut</b><br />
-A boolean indicating that this Asset is a Shortcut.  This can be used in conjuction with another boolean for Admin mode to quickly show Content Managers that this is a Shortcut Asset.</p>
-<p><b>shortcut.label</b><br />
-The word "Shortcut".</p>
-<p><b>shortcut.properties</b><br />
-Any properties assigned to this shortcut will be available in the template by their name.</p>
                 |,
-		lastUpdated => 1146540530,
+		lastUpdated => 1148953146,
 	},
 
 	'The unique name of a user preference parameter you are inventing' => {

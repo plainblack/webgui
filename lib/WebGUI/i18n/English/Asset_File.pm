@@ -36,46 +36,52 @@ our $I18N = {
         	lastUpdated => 1140196488,
 	},
 
-	'file template body' => {
-                message => q|<p>The following variables are available in File Templates:</p>
-
-<p><b>fileSize</b><br />
-The size (in bytes/kilobytes/megabytes, etc) of the file.
-</p>
-
-<p><b>fileIcon</b><br />
-The icon which describes the type of file.
-</p>
-
-<p><b>fileUrl</b><br />
-The URL to the file.
-</p>
-
-<p><b>controls</b><br />
-A toolbar for working with the file.
-</p>
-
-<p><b>filename</b><br />
-The name of the file.
-</p>
-
-<p><b>storageId</b><br />
-The internal storage ID used for the file.
-</p>
-
-<p><b>title</b><br />
-The title set for the file when it was uploaded, or the filename if none was entered.
-</p>
-
-<p><b>menuTitle</b><br />
-The menu title, displayed in navigations, set for the file when it was uploaded, or the filename if none was entered.
-</p>
-
-		|,
-		context => 'Describing the file template variables',
-		lastUpdated => 1146775676,
+	'fileSize' => {
+		message => q|The size (in bytes/kilobytes/megabytes, etc) of the file.|,
+		lastUpdated => 1148952092,
 	},
 
+	'fileIcon' => {
+		message => q|The icon which describes the type of file.|,
+		lastUpdated => 1148952092,
+	},
+
+	'fileUrl' => {
+		message => q|The URL to the file.|,
+		lastUpdated => 1148952092,
+	},
+
+	'controls' => {
+		message => q|A toolbar for working with the file.|,
+		lastUpdated => 1148952092,
+	},
+
+	'filename' => {
+		message => q|The name of the file.|,
+		lastUpdated => 1148952092,
+	},
+
+	'storageId' => {
+		message => q|The internal storage ID used for the file.|,
+		lastUpdated => 1148952092,
+	},
+
+	'title' => {
+		message => q|The title set for the file when it was uploaded, or the filename if none was entered.|,
+		lastUpdated => 1148952092,
+	},
+
+	'menuTitle' => {
+		message => q|The menu title, displayed in navigations, set for the file when it was uploaded, or the filename if none was entered.|,
+		lastUpdated => 1148952092,
+	},
+
+	'file template body' => {
+                message => q|<p>The following variables are available in File Templates:</p>
+		|,
+		context => 'Describing the file template variables',
+		lastUpdated => 1148952146,
+	},
 
 	'current file' => {
 		message => q|Current file|,
@@ -88,7 +94,6 @@ The menu title, displayed in navigations, set for the file when it was uploaded,
 		lastUpdated => 1119068809
 	},
 
-
 	'new file' => {
 		message => q|New file to upload|,
 		context => q|label for File asset form|,
@@ -100,12 +105,11 @@ The menu title, displayed in navigations, set for the file when it was uploaded,
                 context => q|label for Asset Manager, getName|,
                 lastUpdated => 1128640132,
         },
-                                                                                                                              
+
 	'new file description' => {
 		message => q|Enter the path to a file, or use the "Browse" button to find a file on your local hard drive that you would like to be uploaded.|,
 		lastUpdated => 1119068745
 	},
-
 
 };
 

@@ -435,11 +435,14 @@ default Asset in the menu.</p>|,
 	    lastUpdated => 1113357557,
 	},
 
+	'controls' => {
+		message => q|These are the icons and URLs that allow editing, cutting, copying, deleting and reordering the Asset.|,
+		lastUpdated => 1148840768,
+	},
+
         'asset template body' => {
                 message => q|
 <p>This variable is inserted into every template:</p>
-<p><b>controls</b><br />
-These are the icons and URLs that allow editing, cutting, copying, deleting and reordering the Asset.</p>
 
         |,
         lastUpdated => 1113357523,

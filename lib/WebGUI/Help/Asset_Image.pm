@@ -50,8 +50,46 @@ our $HELP = {
         'image template' => {
 		title => 'image template title',
 		body => 'image template body',
+		isa => {
+			namespace => "Asset_Template",
+			tag => "template variables"
+			},
 		fields => [
 		],
+		variables => [
+			  {
+			    'name' => 'fileIcon'
+			  },
+			  {
+			    'name' => 'fileUrl'
+			  },
+			  {
+			    'name' => 'controls'
+			  },
+			  {
+			    'name' => 'thumbnail',
+			    'description' => 'thumbnail variable'
+			  },
+			  {
+			    'name' => 'thumbnailSize'
+			  },
+			  {
+			    'name' => 'parameters',
+			    'description' => 'parameters variable'
+			  },
+			  {
+			    'name' => 'filename'
+			  },
+			  {
+			    'name' => 'storageId'
+			  },
+			  {
+			    'name' => 'title'
+			  },
+			  {
+			    'name' => 'menuTitle'
+			  }
+			],
 		related => [
 			{
 				tag => 'image add/edit',

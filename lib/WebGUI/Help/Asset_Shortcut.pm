@@ -60,6 +60,27 @@ our $HELP = {
 	'shortcut template' => {
 		title => 'shortcut template title',
 		body => 'shortcut template body',
+		isa => {
+			namespace => "Asset_Template",
+			tag => "template variables"
+			},
+		variables => [
+			  {
+			    'name' => 'shortcut.content'
+			  },
+			  {
+			    'name' => 'originalURL'
+			  },
+			  {
+			    'name' => 'isShortcut'
+			  },
+			  {
+			    'name' => 'shortcut.label'
+			  },
+			  {
+			    'name' => 'shortcut.properties'
+			  }
+			],
 		fields => [
 		],
 		related => [
@@ -77,6 +98,7 @@ our $HELP = {
 			},
 		]
 	},
+
 	'field add/edit' => {
 		title => 'field add/edit title',
 		body => 'field add/edit body',
@@ -94,6 +116,7 @@ our $HELP = {
 
 		]
 	},
+
 };
 
 1;

@@ -87,147 +87,174 @@ use templates from the "page" namespace.|,
 		lastUpdated => 1146508836
 	},
 
+	'new.template' => {
+		message => q|Articles have the special ability to change their template so that you can allow users to see different views of the article. You do this by creating a link with a URL like this (replace 999 with the template Id you wish to use):
+</p>
+<p>
+&lt;a href="&lt;tmpl_var new.template&gt;999"&gt;Read more...&lt;/a&gt;|,
+		lastUpdated => 1148960553,
+	},
+
+	'description' => {
+		message => q|The paginated description.|,
+		lastUpdated => 1148960553,
+	},
+
+	'description.full' => {
+		message => q|The full description without any pagination.|,
+		lastUpdated => 1148960553,
+	},
+
+	'description.first.100words' => {
+		message => q|The first 100 words in the description. Words are defined as characters separated by whitespace, so HTML entities and tags count as words.|,
+		lastUpdated => 1148960553,
+	},
+
+	'description.first.75words' => {
+		message => q|The first 75 words in the description. Words are defined as characters separated by whitespace, so HTML entities and tags count as words.|,
+		lastUpdated => 1148960553,
+	},
+
+	'description.first.50words' => {
+		message => q|The first 50 words in the description. Words are defined as characters separated by whitespace, so HTML entities and tags count as words.|,
+		lastUpdated => 1148960553,
+	},
+
+	'description.first.25words' => {
+		message => q|The first 25 words in the description. Words are defined as characters separated by whitespace, so HTML entities and tags count as words.|,
+		lastUpdated => 1148960553,
+	},
+
+	'description.first.10words' => {
+		message => q|The first 10 words in the description. Words are defined as characters separated by whitespace, so HTML entities and tags count as words.|,
+		lastUpdated => 1148960553,
+	},
+
+	'description.first.paragraph' => {
+		message => q|The first paragraph of the description. The first paragraph is determined by the first carriage return found in the text.|,
+		lastUpdated => 1148960553,
+	},
+
+	'description.first.2paragraphs' => {
+		message => q|The first two paragraphs of the description. A paragraph is determined by counting the carriage returns found in the text.|,
+		lastUpdated => 1148960553,
+	},
+
+	'description.first.sentence' => {
+		message => q|The first sentence in the description. A sentence is determined by counting the periods found in the text.|,
+		lastUpdated => 1148960553,
+	},
+
+	'description.first.2sentences' => {
+		message => q|The first two sentences in the description. A sentence is determined by counting the periods found in the text.|,
+		lastUpdated => 1148960553,
+	},
+
+	'description.first.3sentences' => {
+		message => q|The first three sentences in the description. A sentence is determined by counting the periods found in the text.|,
+		lastUpdated => 1148960553,
+	},
+
+	'description.first.4sentences' => {
+		message => q|The first four sentences in the description. A sentence is determined by counting the periods found in the text.|,
+		lastUpdated => 1148960553,
+	},
+
+	'attachment.icon' => {
+		message => q|The URL to the icon image for this attachment type.|,
+		lastUpdated => 1148960553,
+	},
+
+	'attachment.name' => {
+		message => q|The filename for this attachment.|,
+		lastUpdated => 1148960553,
+	},
+
+	'attachment.url' => {
+		message => q|The URL to download this attachment.|,
+		lastUpdated => 1148960553,
+	},
+
+	'image.thumbnail' => {
+		message => q|The URL to the thumbnail for the attached image.|,
+		lastUpdated => 1148960553,
+	},
+
+	'image.url' => {
+		message => q|The URL to the attached image.|,
+		lastUpdated => 1148960553,
+	},
+
+	'attachment_loop' => {
+		message => q|A loop containing all the attachments.|,
+		lastUpdated => 1148960553,
+	},
+
+	'filename' => {
+		message => q|	The name of the file.|,
+		lastUpdated => 1148960553,
+	},
+
+	'url' => {
+		message => q|	The url to download the file.|,
+		lastUpdated => 1148960553,
+	},
+
+	'thumbnailUrl' => {
+		message => q|	The url of the thumbnail of this file.|,
+		lastUpdated => 1148960553,
+	},
+
+	'iconUrl' => {
+		message => q|	The url to the file type icon of this file.|,
+		lastUpdated => 1148960553,
+	},
+
+	'isImage' => {
+		message => q|	A boolean indicating whether this is an image or not.|,
+		lastUpdated => 1148960553,
+	},
+
+	'linkTitle' => {
+		message => q|The title of the link added to the article.|,
+		lastUpdated => 1148960553,
+	},
+
+	'linkURL' => {
+		message => q|The URL for the link added to the article.|,
+		lastUpdated => 1148960553,
+	},
+
+	'post.label' => {
+		message => q|The translated label to add a comment to this article.|,
+		lastUpdated => 1148960553,
+	},
+
+	'post.URL' => {
+		message => q|The URL to add a comment to this article.|,
+		lastUpdated => 1148960553,
+	},
+
+	'replies.count' => {
+		message => q|The number of comments attached to this article.|,
+		lastUpdated => 1148960553,
+	},
+
+	'replies.label' => {
+		message => q|The translated text indicating that you can view the replies.|,
+		lastUpdated => 1148960553,
+	},
+
+	'replies.url' => {
+		message => q|The URL to view the replies to this article.|,
+		lastUpdated => 1148960553,
+	},
+
 
 	'73' => {
 		message => q|<p>The following template variables are available for article templates.</p>
-
-<p><b>new.template</b><br />
-Articles have the special ability to change their template so that you can allow users to see different views of the article. You do this by creating a link with a URL like this (replace 999 with the template Id you wish to use):
-</p>
-<p>
-&lt;a href="&lt;tmpl_var new.template&gt;999"&gt;Read more...&lt;/a&gt;
-</p>
-
-<p><b>description</b><br />
-The paginated description.
-</p>
-
-<p><b>description.full</b><br />
-The full description without any pagination.
-</p>
-
-<p><b>description.first.100words</b><br />
-The first 100 words in the description. Words are defined as characters separated by whitespace, so HTML entities and tags count as words.
-</p>
-
-<p><b>description.first.75words</b><br />
-The first 75 words in the description. Words are defined as characters separated by whitespace, so HTML entities and tags count as words.
-</p>
-
-<p><b>description.first.50words</b><br />
-The first 50 words in the description. Words are defined as characters separated by whitespace, so HTML entities and tags count as words.
-</p>
-
-<p><b>description.first.25words</b><br />
-The first 25 words in the description. Words are defined as characters separated by whitespace, so HTML entities and tags count as words.
-</p>
-
-<p><b>description.first.10words</b><br />
-The first 10 words in the description. Words are defined as characters separated by whitespace, so HTML entities and tags count as words.
-</p>
-
-<p><b>description.first.paragraph</b><br />
-The first paragraph of the description. The first paragraph is determined by the first carriage return found in the text.
-</p>
-
-<p><b>description.first.2paragraphs</b><br />
-The first two paragraphs of the description. A paragraph is determined by counting the carriage returns found in the text.
-</p>
-
-<p><b>description.first.sentence</b><br />
-The first sentence in the description. A sentence is determined by counting the periods found in the text.
-</p>
-
-<p><b>description.first.2sentences</b><br />
-The first two sentences in the description. A sentence is determined by counting the periods found in the text.
-</p>
-
-<p><b>description.first.3sentences</b><br />
-The first three sentences in the description. A sentence is determined by counting the periods found in the text.
-</p>
-
-<p><b>description.first.4sentences</b><br />
-The first four sentences in the description. A sentence is determined by counting the periods found in the text.
-</p>
-
-<p><b>attachment.icon</b><br />
-The URL to the icon image for this attachment type.
-</p>
-
-<p><b>attachment.name</b><br />
-The filename for this attachment.
-</p>
-
-<p><b>attachment.url</b><br />
-The URL to download this attachment.
-</p>
-
-<p><b>image.thumbnail</b><br />
-The URL to the thumbnail for the attached image.
-</p>
-
-<p><b>image.url</b><br />
-The URL to the attached image.
-</p>
-
-<p><b>attachment_loop</b><br />
-A loop containing all the attachments.
-</p>
-
-<div class="helpIndent">
-
-	<p><b>filename</b><br />
-	The name of the file.
-	</p>
-
-	<p><b>url</b><br />
-	The url to download the file.
-	</p>
-
-	<p><b>thumbnailUrl</b><br />
-	The url of the thumbnail of this file.
-	</p>
-
-	<p><b>iconUrl</b><br />
-	The url to the file type icon of this file.
-	</p>
-
-	<p><b>isImage</b><br />
-	A boolean indicating whether this is an image or not.
-	</p>
-
-</div>
-
-<p><b>linkTitle</b><br />
-The title of the link added to the article.
-</p>
-
-<p><b>linkURL</b><br />
-The URL for the link added to the article.
-</p>
-
-<p><b>post.label</b><br />
-The translated label to add a comment to this article.
-</p>
-
-<p><b>post.URL</b><br />
-The URL to add a comment to this article.
-</p>
-
-<p><b>replies.count</b><br />
-The number of comments attached to this article.
-</p>
-
-<p><b>replies.label</b><br />
-The translated text indicating that you can view the replies.
-</p>
-
-<p><b>replies.url</b><br />
-The URL to view the replies to this article.
-</p>
-
 |,
-		lastUpdated => 1146514046
+		lastUpdated => 1148960667
 	},
 
 	'24' => {

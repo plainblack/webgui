@@ -42,24 +42,26 @@ our $I18N = {
 		lastUpdated => 1133619940,
 	},
 
+	'search.variable' => {
+		message => q|Internationalized label for the word "search"|,
+		lastUpdated => 1148962481,
+	},
+
+	'for.variable' => {
+		message => q|Internationalized label for the word "for"|,
+		lastUpdated => 1148962481,
+	},
+
+	'submit' => {
+		message => q|Submit button with internationalized label for "Submit".|,
+		lastUpdated => 1148962481,
+	},
+
 	'multisearch template body' => {
 		message => q|<p>The MultiSearch template has all the template variables used by Wobjects,
 as well as these:</p>
-
-<p><b>search</b><br />
-Internationalized label for the word "search"
-</p>
-
-<p><b>for</b><br />
-Internationalized label for the word "for"
-</p>
-
-<p><b>submit</b><br />
-Submit button with internationalized label for "Submit".
-</p>
-
 |,
-		lastUpdated => 1146784875,
+		lastUpdated => 1148962572,
 	},
 
 	'for' => {

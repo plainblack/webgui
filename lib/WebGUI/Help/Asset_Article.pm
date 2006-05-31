@@ -47,8 +47,112 @@ our $HELP = {
 	'article template' => {
 		title => '72',
 		body => '73',
+		isa => {
+			namespace => "Asset_Template",
+			tag => "template variables"
+			},
 		fields => [
 		],
+		variables => [
+		          {
+		            'name' => 'new.template'
+		          },
+		          {
+		            'name' => 'description'
+		          },
+		          {
+		            'name' => 'description.full'
+		          },
+		          {
+		            'name' => 'description.first.100words'
+		          },
+		          {
+		            'name' => 'description.first.75words'
+		          },
+		          {
+		            'name' => 'description.first.50words'
+		          },
+		          {
+		            'name' => 'description.first.25words'
+		          },
+		          {
+		            'name' => 'description.first.10words'
+		          },
+		          {
+		            'name' => 'description.first.paragraph'
+		          },
+		          {
+		            'name' => 'description.first.2paragraphs'
+		          },
+		          {
+		            'name' => 'description.first.sentence'
+		          },
+		          {
+		            'name' => 'description.first.2sentences'
+		          },
+		          {
+		            'name' => 'description.first.3sentences'
+		          },
+		          {
+		            'name' => 'description.first.4sentences'
+		          },
+		          {
+		            'name' => 'attachment.icon'
+		          },
+		          {
+		            'name' => 'attachment.name'
+		          },
+		          {
+		            'name' => 'attachment.url'
+		          },
+		          {
+		            'name' => 'image.thumbnail'
+		          },
+		          {
+		            'name' => 'image.url'
+		          },
+		          {
+		            'name' => 'attachment_loop',
+		            'variables' => [
+		                             {
+		                               'name' => 'filename'
+		                             },
+		                             {
+		                               'name' => 'url'
+		                             },
+		                             {
+		                               'name' => 'thumbnailUrl'
+		                             },
+		                             {
+		                               'name' => 'iconUrl'
+		                             },
+		                             {
+		                               'name' => 'isImage'
+		                             }
+		                           ]
+		          },
+		          {
+		            'name' => 'linkTitle'
+		          },
+		          {
+		            'name' => 'linkURL'
+		          },
+		          {
+		            'name' => 'post.label'
+		          },
+		          {
+		            'name' => 'post.URL'
+		          },
+		          {
+		            'name' => 'replies.count'
+		          },
+		          {
+		            'name' => 'replies.label'
+		          },
+		          {
+		            'name' => 'replies.url'
+		          }
+		        ],
 		related => [
 			{
 				tag => 'article add/edit',

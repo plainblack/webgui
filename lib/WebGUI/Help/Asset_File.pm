@@ -43,6 +43,36 @@ our $HELP = {
         'file template' => {
 		title => 'file template title',
 		body => 'file template body',
+		isa => {
+			namespace => "Asset_Template",
+			tag => "template variables"
+			},
+		variables => [
+			  {
+			    'name' => 'fileSize'
+			  },
+			  {
+			    'name' => 'fileIcon'
+			  },
+			  {
+			    'name' => 'fileUrl'
+			  },
+			  {
+			    'name' => 'controls'
+			  },
+			  {
+			    'name' => 'filename'
+			  },
+			  {
+			    'name' => 'storageId'
+			  },
+			  {
+			    'name' => 'title'
+			  },
+			  {
+			    'name' => 'menuTitle'
+			  }
+			],
 		fields => [
 		],
 		related => [

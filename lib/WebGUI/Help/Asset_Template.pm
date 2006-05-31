@@ -54,6 +54,38 @@ our $HELP = {
 		body => 'template variable body',
 		fields => [
 		],
+		variables => [
+			  {
+			    'name' => 'webgui.version'
+			  },
+			  {
+			    'name' => 'webgui.version'
+			  },
+			  {
+			    'name' => 'webgui.status'
+			  },
+			  {
+			    'name' => 'session.user.username'
+			  },
+			  {
+			    'name' => 'session.user.firstDayOfWeek'
+			  },
+			  {
+			    'name' => 'session.config.extrasurl'
+			  },
+			  {
+			    'name' => 'session.var.adminOn'
+			  },
+			  {
+			    'name' => 'session.setting.companyName'
+			  },
+			  {
+			    'name' => 'session.setting.anonymousRegistration'
+			  },
+			  {
+			    'name' => 'session form variables'
+			  }
+		],
 		related => [
 		]
 	},
