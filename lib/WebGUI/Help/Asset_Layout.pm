@@ -37,10 +37,16 @@ our $HELP = {
         'layout template' => {
 		title => 'layout template title',
 		body => 'layout template body',
-		isa => {
-			namespace => "Asset_Template",
-			tag => "template variables"
+		isa => [
+			{
+				namespace => "Asset_Template",
+				tag => "template variables"
 			},
+			{
+				namespace => "Asset",
+				tag => "asset template"
+			},
+		],
 		variables => [
 		          {
 		            'name' => 'showAdmin'

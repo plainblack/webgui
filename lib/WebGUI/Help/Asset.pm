@@ -105,6 +105,11 @@ our $HELP = {
 	'asset template' => {
 		title => 'asset template title',
 		body => 'asset template body',
+		variables => [
+			{
+				name => 'controls',
+			}, 
+		],
 		fields => [
 		],
 		related => [

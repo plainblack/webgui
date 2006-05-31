@@ -5,10 +5,12 @@ our $HELP = {
         'login box' => {
 		title => 'login box title',
 		body => 'login box body',
-		isa => {
-			namespace => "Asset_Template",
-			tag => "template variables"
+		isa => [
+			{
+				namespace => "Asset_Template",
+				tag => "template variables"
 			},
+		],
 		variables => [
 		          {
 		            'name' => 'user.isVisitor'

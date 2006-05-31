@@ -54,8 +54,12 @@ sub _load {
 	my $help = dclone($hash);
 	foreach my $tag (keys %{ $help }) {
 		$help->{$tag}{related} = [ _related($session, $help->{$tag}{related}) ];
-		if ($help->{$tag}{isa}{namespace}) {
-			my $isa = $hash->{$tag}{isa};
+		##Add an ISA link unless it already exists.
+		##This simplifies handling later.
+		unless (exists $help->{$tag}{isa} and ref $help->{$tag}{isa} eq 'ARRAY') {
+			$help->{$tag}{isa} = [];
+		}
+		foreach my $isa ( @{ $help->{$tag}{isa} } ) {
 			my $other = _load($session, $isa->{namespace});
 			my $otherHelp = $other->{ $isa->{tag} };
 			my $add = $otherHelp->{fields};

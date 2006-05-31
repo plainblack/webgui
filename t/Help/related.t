@@ -44,18 +44,18 @@ my @relatedHelp = ();
 my @isaHelp = ();
 foreach my $topic ( keys %helpTable ) {
 	foreach my $entry ( keys %{ $helpTable{$topic} }) {
-		my @related = WebGUI::Operation::Help::_related($session, $helpTable{$topic}{$entry}{related});
+		my @related = @{ $helpTable{$topic}{$entry}{related} };
 		foreach my $relHash (@related) { ##Inplace modify
 			$relHash->{parentEntry} = $entry;
 			$relHash->{parentTopic} = $topic;
 		}
 		push @relatedHelp, @related;
-		if ( scalar keys %{ $helpTable{$topic}{$entry}{isa} } > 0 ) {
-			my $isaHash = $helpTable{$topic}{$entry}{isa};
+		my @isas = @{ $helpTable{$topic}{$entry}{isa} };
+		foreach my $isaHash ( @isas ) {
 			$isaHash->{parentEntry} = $entry;
 			$isaHash->{parentTopic} = $topic;
-			push @isaHelp, $isaHash;
 		}
+		push @isaHelp, @isas;
 	}
 }
 

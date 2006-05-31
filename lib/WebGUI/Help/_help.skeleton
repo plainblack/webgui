@@ -9,11 +9,13 @@ our $HELP = {  ##hashref of hashes
 
 		title => 'help article title',  #The title and body are looked up in the
 		body => 'help article title',	#i18n file of the same name
-		# use the following to inherit stuff from another help entry
-		isa => {
+		# use the following to inherit stuff other help entries
+		isa => [
+			{
 			tag => 'some other help tag',
 			namespace => 'some other help file',
 			},
+		];
 		fields => [	#This array is used to list hover help for form fields.
                         {
                                 title => 'form label 1',
@@ -31,6 +33,7 @@ our $HELP = {  ##hashref of hashes
 			{
 				name => "template.variable.name",
 				description => "international tag in this namespace describing this var"
+				required => "is this variable required for the template to work correctly?"
 			},
 		],
 		related => [  ##This lists other help articles that are related to this one

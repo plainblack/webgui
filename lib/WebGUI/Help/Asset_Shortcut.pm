@@ -60,10 +60,16 @@ our $HELP = {
 	'shortcut template' => {
 		title => 'shortcut template title',
 		body => 'shortcut template body',
-		isa => {
-			namespace => "Asset_Template",
-			tag => "template variables"
+		isa => [
+			{
+				namespace => "Asset_Template",
+				tag => "template variables"
 			},
+			{
+				namespace => "Asset",
+				tag => "asset template"
+			},
+		],
 		variables => [
 			  {
 			    'name' => 'shortcut.content'

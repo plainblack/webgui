@@ -43,10 +43,16 @@ our $HELP = {
         'file template' => {
 		title => 'file template title',
 		body => 'file template body',
-		isa => {
-			namespace => "Asset_Template",
-			tag => "template variables"
+		isa => [
+			{
+				namespace => "Asset_Template",
+				tag => "template variables"
 			},
+			{
+				namespace => "Asset",
+				tag => "asset template"
+			},
+		],
 		variables => [
 			  {
 			    'name' => 'fileSize'

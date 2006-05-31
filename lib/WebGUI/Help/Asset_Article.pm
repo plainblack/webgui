@@ -47,10 +47,16 @@ our $HELP = {
 	'article template' => {
 		title => '72',
 		body => '73',
-		isa => {
-			namespace => "Asset_Template",
-			tag => "template variables"
+		isa => [
+			{
+				namespace => "Asset_Template",
+				tag => "template variables"
 			},
+			{
+				namespace => "Asset",
+				tag => "asset template"
+			},
+		],
 		fields => [
 		],
 		variables => [

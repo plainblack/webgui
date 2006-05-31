@@ -5,10 +5,12 @@ our $HELP = {
         'folder add/edit' => {
 		title => 'folder add/edit title',
 		body => 'folder add/edit body',
-		isa => {
-			namespace => "Asset_Wobject",
-			tag => "wobject add/edit"
+		isa => [
+			{
+				namespace => "Asset_Wobject",
+				tag => "wobject add/edit",
 			},
+		],
 		fields => [
                         {
                                 title => 'visitor cache timeout',
@@ -33,10 +35,16 @@ our $HELP = {
         'folder template' => {
 		title => 'folder template title',
 		body => 'folder template body',
-		isa => {
-			namespace => "Asset_Wobject",
-			tag => "wobject template"
+		isa => [
+			{
+				namespace => "Asset_Wobject",
+				tag => "wobject template"
 			},
+			{
+				namespace => "Asset",
+				tag => "asset template",
+			},
+		],
 		fields => [ ],
 		variables => [
 			{

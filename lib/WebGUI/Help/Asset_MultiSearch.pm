@@ -32,10 +32,16 @@ our $HELP = {
 	'multisearch template' => {
 		title => 'multisearch template title',
 		body => 'multisearch template body',
-		isa => {
-			namespace => "Asset_Template",
-			tag => "template variables"
+		isa => [
+			{
+				namespace => "Asset_Template",
+				tag => "template variables"
 			},
+			{
+				namespace => "Asset",
+				tag => "asset template"
+			},
+		],
 		variables => [
 		          {
 		            'name' => 'search',

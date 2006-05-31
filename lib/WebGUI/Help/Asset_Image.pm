@@ -50,10 +50,16 @@ our $HELP = {
         'image template' => {
 		title => 'image template title',
 		body => 'image template body',
-		isa => {
-			namespace => "Asset_Template",
-			tag => "template variables"
+		isa => [
+			{
+				namespace => "Asset_Template",
+				tag => "template variables"
 			},
+			{
+				namespace => "Asset",
+				tag => "asset template"
+			},
+		],
 		fields => [
 		],
 		variables => [

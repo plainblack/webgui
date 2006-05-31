@@ -42,10 +42,16 @@ our $HELP = {
     'zip archive template' => {
 		title => 'zip archive template title',
 		body => 'zip archive template body',
-		isa => {
-			namespace => "Asset_Template",
-			tag => "template variables"
+		isa => [
+			{
+				namespace => "Asset_Template",
+				tag => "template variables"
 			},
+			{
+				namespace => "Asset",
+				tag => "asset template"
+			},
+		],
 		fields => [
 		],
 		variables => [
