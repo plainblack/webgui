@@ -110,16 +110,23 @@ sub definition {
 	push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
 		tableName=>'ZipArchiveAsset',
+		autoGenerateForms=>1,
 		icon=>'ziparchive.gif',
 		className=>'WebGUI::Asset::File::ZipArchive',
 		properties=>{
 			showPage=>{
-			fieldType=>'text',
-			defaultValue=>'index.html'
-		},
-		templateId=>{
-			fieldType=>'template',
-			defaultValue=>''
+				tab=>"properties",
+				label=>$i18n->get('show page'),
+				hoverHelp=>$i18n->get('show page description'),
+				fieldType=>'text',
+				defaultValue=>'index.html'
+			},
+			templateId=>{
+				tab=>"display",
+				label=>$i18n->get('template label'),
+				namespace=>"ZipArchiveAsset",
+				fieldType=>'template',
+				defaultValue=>''
 			},
 		}
 	});
@@ -141,33 +148,6 @@ sub duplicate {
 	my $self = shift;
 	my $newAsset = $self->SUPER::duplicate(shift);
 	return $newAsset;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 getEditForm ( )
-
-Returns the TabForm object that will be used in generating the edit page for this asset.
-
-=cut
-
-sub getEditForm {
-	my $self = shift;
-	my $tabform = $self->SUPER::getEditForm();
-	my $i18n = WebGUI::International->new($self->session,"Asset_ZipArchive");
-	$tabform->getTab("display")->template(
-		-value=>$self->getValue("templateId"),
-		-label=>$i18n->get('template label'),
-		-namespace=>"ZipArchiveAsset"
-	);
-	$tabform->getTab("properties")->text (
-		-name=>"showPage",
-		-label=>$i18n->get('show page'),
-		-value=>$self->getValue("showPage"),
-		-hoverHelp=>$i18n->get('show page description'),
-	);
-	return $tabform;
 }
 
 #-------------------------------------------------------------------

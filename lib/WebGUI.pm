@@ -263,6 +263,7 @@ sub setup {
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<title>WebGUI Initial Configuration</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<style type="text/css">
 		a { color: black; }
 		a:visited { color: black;}

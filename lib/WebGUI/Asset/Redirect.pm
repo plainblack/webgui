@@ -62,40 +62,21 @@ sub definition {
         push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
 		uiLevel => 9,
+		autoGenerateForms=>1,
 		icon=>'redirect.gif',
                 tableName=>'redirect',
                 className=>'WebGUI::Asset::Redirect',
                 properties=>{
                                 redirectUrl=>{
+					tab=>"properties",
+                			label=>$i18n->get('redirect url'),
+                			hoverHelp=>$i18n->get('redirect url description'),
                                         fieldType=>'url',
                                         defaultValue=>undef
                                         }
                         }
                 });
         return $class->SUPER::definition($session,$definition);
-}
-
-
-
-#-------------------------------------------------------------------
-
-=head2 getEditForm ()
-
-Returns the TabForm object that will be used in generating the edit page for this asset.
-
-=cut
-
-sub getEditForm {
-	my $self = shift;
-	my $tabform = $self->SUPER::getEditForm();
-	my $i18n = WebGUI::International->new($self->session, 'Asset_Redirect');
-        $tabform->getTab("properties")->url(
-                -name=>"redirectUrl",
-                -label=>$i18n->get('redirect url'),
-                -hoverHelp=>$i18n->get('redirect url description'),
-                -value=>$self->getValue("redirectUrl")
-                );
-	return $tabform;
 }
 
 

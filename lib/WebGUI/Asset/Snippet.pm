@@ -60,15 +60,14 @@ sub definition {
         my $session = shift;
         my $definition = shift;
 	my $i18n = WebGUI::International->new($session,"Asset_Snippet");
-        push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		uiLevel => 5,
-		icon=>'snippet.gif',
-                tableName=>'snippet',
-                className=>'WebGUI::Asset::Snippet',
-                properties=>{
+	my %properties;
+	tie %properties, 'Tie::IxHash';
+	%properties = (
  			snippet=>{
                         	fieldType=>'codearea',
+				tab=>"properties",
+				label=>$i18n->get('assetName'),
+				hoverHelp=>$i18n->get('snippet description'),
                                 defaultValue=>undef
                                 },
 			cacheTimeout => {
@@ -81,62 +80,31 @@ sub definition {
 				},
  			processAsTemplate=>{
                         	fieldType=>'yesNo',
+				label=>$i18n->get('process as template'),
+				hoverHelp=>$i18n->get('mimeType description'),
+				tab=>"properties",
                                 defaultValue=>0
                                 },
 			mimeType=>{
+				tab=>"properties",
+				hoverHelp=>$i18n->get('mimeType description'),
+				label=>$i18n->get('mimeType'),
                         	fieldType=>'mimeType',
                                 defaultValue=>'text/html'
                                 }
 
-                        }
+                        );
+        push(@{$definition}, {
+		assetName=>$i18n->get('assetName'),
+		uiLevel => 5,
+		icon=>'snippet.gif',
+		autoGenerateForms=>1,
+                tableName=>'snippet',
+                className=>'WebGUI::Asset::Snippet',
+                properties=>\%properties
                 });
         return $class->SUPER::definition($session,$definition);
 }
-
-
-
-#-------------------------------------------------------------------
-
-=head2 getEditForm ()
-
-Returns the TabForm object that will be used in generating the edit page for this asset.
-
-=cut
-
-sub getEditForm {
-	my $self = shift;
-	my $tabform = $self->SUPER::getEditForm();
-	my $i18n = WebGUI::International->new($self->session,"Asset_Snippet");
-	$tabform->getTab("display")->interval(
-		name => "cacheTimeout",
-		defaultValue => 3600,
-		uiLevel => 8,
-		label => $i18n->get("cache timeout"),
-                hoverHelp => $i18n->get("cache timeout help"),
-		value=> $self->getValue("cacheTimeout")
-		);
-        $tabform->getTab("properties")->codearea(
-                -name=>"snippet",
-                -label=>$i18n->get('assetName'),
-                -hoverHelp=>$i18n->get('snippet description'),
-                -value=>$self->getValue("snippet")
-                );
-        $tabform->getTab("properties")->yesNo(
-                -name=>"processAsTemplate",
-                -label=>$i18n->get('process as template'),
-                -hoverHelp=>$i18n->get('process as template description'),
-                -value=>$self->getValue("processAsTemplate")
-                );
-        $tabform->getTab("properties")->mimeType(
-                -name=>"mimeType",
-                -label=>$i18n->get('mimeType'),
-                -hoverHelp=>$i18n->get('mimeType description'),
-                -value=>[$self->getValue('mimeType')],
-                );
-
-	return $tabform;
-}
-
 
 
 #-------------------------------------------------------------------

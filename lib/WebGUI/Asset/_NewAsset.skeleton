@@ -80,11 +80,12 @@ sub definition {
 	tie %properties, 'Tie::IxHash';
 	my $i18n = WebGUI::International->new($session, "Asset_NewAsset");
 	%properties = (
-		templateId =>{
+		templateId => {
+			# Determines which tab this property appears in
+			tab=>"display",
 			#See the list of field/control types in /lib/WebGUI/Form/
 			fieldType=>"template",  
 			defaultValue=>'NewAssetTmpl0000000001',
-			tab=>"display",
 			#www_editSave will ignore anyone's attempts to update this field if this is set to 1
 			noFormPost=>0,  
 			#This is an option specific to the template fieldType.
@@ -94,11 +95,19 @@ sub definition {
 			hoverHelp=>$i18n->get('templateId label description'),
 			# This is the text that will appear to the left of your form field.
 			label=>$i18n->get('templateId label')
+			},
+		foo => {
+			tab=>"properties",
+			fieldType=>"text",
+			defaultValue=>undef,
+			label=>$i18n->get("foo label"),
+			hoverHelp=>$i18n->get("foo label help")
 			}
 	);
 	push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
 		icon=>'NewAsset.gif',
+		autoGenerateForms=>1,
 		tableName=>'NewAsset',
 		className=>'WebGUI::Asset::NewAsset',
 		properties=>\%properties
@@ -122,35 +131,6 @@ sub duplicate {
 	my $newAsset = $self->SUPER::duplicate(shift);
 	return $newAsset;
 }
-
-
-#-------------------------------------------------------------------
-
-=head2 getEditForm ()
-
-Returns the TabForm object that will be used in generating the edit page for this asset.
-
-=cut
-
-sub getEditForm {
-   	my $self = shift;
-   	my $tabform = $self->SUPER::getEditForm();
-	my $i18n = WebGUI::International->new($self->session, "Asset_NewAsset");
-   	$tabform->getTab("display")->template(
-      		value=>$self->getValue("templateId"),
-	  	label=>$i18n->get('template label'),,
-	  	namespace=>"NewAssetAsset"
-   		);
-   	$tabform->getTab("properties")->text (
-     	 	name=>"showPage",
-      		label=>$i18n->get('show page'),
-	  	value=>$self->getValue("showPage"),
-	  	hoverHelp=>$i18n->get('show page description'),
-   		);
-   	return $tabform;
-}
-
-
 
 
 #-------------------------------------------------------------------
