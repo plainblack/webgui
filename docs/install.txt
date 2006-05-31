@@ -30,7 +30,7 @@ PerlRequire /data/WebGUI/sbin/preload.perl
         PerlSetVar WebguiConfig www.example.com.conf
 </VirtualHost>
 
-3. Install MySQL 5.0 or higher.
+3. Install MySQL 5.0.10 or higher.
 
 4. Install Image Magick 6.0 or higher.
 

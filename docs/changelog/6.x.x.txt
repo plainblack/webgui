@@ -22,6 +22,8 @@
  - fix: WebGUI creating bad Live Bookmarks for all SyndicatedObjects
  - fix: RSS Feeds Don't Combine
  - fix: Suspicious code in SyndicatedContent.pm
+ - fix: MySQL5.0.9 bug
+ - fix: DataForm corrupts text area fields
 
 6.99.2
  - fix - demo.plainblack.com getting started
