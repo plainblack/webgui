@@ -187,9 +187,9 @@ sub page {
 	my $output = undef;
 	if (defined $asset) {
 		my $method = "view";
-		if ($session->form->process("func")) {
-			$method = $session->form->process("func");
-			unless ($method =~ /^[A-Za-z]+$/) {
+		if ($session->form->param("func")) {
+			$method = $session->form->param("func");
+			unless ($method =~ /^[A-Za-z0-9]+$/) {
 				$session->errorHandler->security("to call a non-existent method $method on $assetUrl");
 				$method = "view";
 			}

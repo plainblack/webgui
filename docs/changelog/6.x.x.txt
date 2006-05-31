@@ -17,7 +17,11 @@
  - fix: Link to page in Webgui Page Tree not working in IE
  - fix: Not Found page not working
  - Made debug output more colorful, and set queries as info rather than debug.
-
+ - fix: 6.8.7 - CSS layout templates still don't work right in IE
+ - fix: 6.8 - Unable to change Home page or Not Found [...] blank
+ - fix: WebGUI creating bad Live Bookmarks for all SyndicatedObjects
+ - fix: RSS Feeds Don't Combine
+ - fix: Suspicious code in SyndicatedContent.pm
 
 6.99.2
  - fix - demo.plainblack.com getting started

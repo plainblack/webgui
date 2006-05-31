@@ -47,6 +47,40 @@ These methods are available from this class:
 
 =cut
 
+#-------------------------------------------------------------------
+sub _constructRSS {
+    my($self,$rssObject,$var)=@_;
+    #They've chosen to emit this as an RSS feed, in one of the four flavors we support.
+    $rssObject->channel(
+			title=>$var->{'channel.title'} || $self->get('title'),
+			link=>$self->session->url->page('',1),
+			description=>$var->{'channel.description'} || ''
+		       );
+    foreach my $item (@{$var->{item_loop}}) {
+	# I know this seems kludgy, but because XML::RSSLite parses
+	# feeds loosely, sometimes it returns a data structure when it shouldn't.
+	# So we're only pushing in attributes when they AREN'T a reference to 
+	# a data structure.
+	my %attributes;
+	foreach my $attribute(keys %$item){
+	    $attributes{$attribute}=$item->{$attribute} if (! ref($item->{$attribute}));
+	}
+	$rssObject->add_item(%attributes);
+    }
+}
+
+
+#-------------------------------------------------------------------
+sub _createRSSURLs {
+	my $self=shift;
+	my $var=shift;
+	foreach({ver=>'1.0',param=>'10'},{ver=>'0.9',param=>'090'},{ver=>'0.91',param=>'091'},{ver=>'2.0',param=>'20'}){
+	$var->{'rss.url.'.$_->{ver}}=$self->getUrl('func=viewRSS'.$_->{param});
+	}
+	$var->{'rss.url'}=$self->getUrl('func=viewRSS20');
+}
+
+
 
 #-------------------------------------------------------------------
 
@@ -403,7 +437,7 @@ sub _check_hasTerms{
 	}
 }
 
-#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#-------------------------------------------------------------------
 sub _make_regex{
 	my $terms = shift;
 	my @terms = split(/,/,$terms);
@@ -489,6 +523,11 @@ sub prepareView {
 	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
 	$template->prepare;
 	$self->{_viewTemplate} = $template;
+	my $i18n = WebGUI::International->new($self->session,'Asset_SyndicatedContent');
+	my $rssFeedSuffix=$i18n->get('RSS Feed Title Suffix');
+	my $title = $self->get("title")." ".$rssFeedSuffix;
+	$title =~ s/\"/&quot;/g;
+	$self->session->style->setLink($self->getUrl("func=viewRSS20"), { rel=>'alternate', type=>'application/rss+xml', title=>$title });
 }
 
 
@@ -516,11 +555,11 @@ Returns the rendered output of the wobject.
 
 sub view {
 	my $self = shift;
-	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+	my $rssFlavor = shift;
+	if ($rssFlavor eq "" && !$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
 		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
 		return $out if $out;
 	}
-	my $rssFlavor = shift;
         my $maxHeadlines = $self->get('maxHeadlines') || 1000000;
         my @urls = split(/\s+/,$self->get('rssUrl'));
 	return $self->processTemplate({},$self->get('templateId')) unless (scalar(@urls));
@@ -531,7 +570,7 @@ sub view {
 
         my %var;
 	
-	my($item_loop,$rss_feeds)=$self->_get_items(\@urls, $maxHeadlines,$rssObject);
+	my($item_loop,$rss_feeds)=$self->_get_items(\@urls, $maxHeadlines);
 	if(@$rss_feeds > 1){
 	    #If there is more than one (valid) feed in this wobject, put in the wobject description info.
 	    $var{'channel.title'} = $title;
@@ -545,8 +584,6 @@ sub view {
 	$self->_createRSSURLs(\%var);
         $var{item_loop} = $item_loop;
 
-	#Construct the title for the link.
-	$self->_constructRSSHeadTitleLink(\%var,$title || $var{'channel.title'});
 	if ($rssObject) {
 	    $self->_constructRSS($rssObject,\%var);
 	    my $rss=$rssObject->as_string;
@@ -566,56 +603,6 @@ sub view {
        		return $out;
 	}
 
-}
-
-
-#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-sub _constructRSSHeadTitleLink{
-	my $self = shift;
-	my($var,$rssTitle)=@_;
-	my $i18n = WebGUI::International->new($self->session,'Asset_SyndicatedContent');
-	my $rssFeedSuffix=$i18n->get('RSS Feed Title Suffix');
-	my $title = ($rssTitle) ? ($rssTitle." ".$rssFeedSuffix) : $rssFeedSuffix;
-	$title =~ s/\"/&quot;/g;
-	$self->session->style->setLink($var->{'rss.url'},
-			   { rel=>	'alternate',
-			     type=>	'application/rss+xml',
-			     title=> ($rssTitle) ? ($rssTitle." ".$rssFeedSuffix) : $rssFeedSuffix }
-			  );
-}
-
-
-#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-sub _constructRSS{
-    my($self,$rssObject,$var)=@_;
-    #They've chosen to emit this as an RSS feed, in one of the four flavors we support.
-    $rssObject->channel(
-			title=>$var->{'channel.title'} || $self->get('title'),
-			link=>$self->session->url->page('',1),
-			description=>$var->{'channel.description'} || ''
-		       );
-    foreach my $item (@{$var->{item_loop}}) {
-	# I know this seems kludgy, but because XML::RSSLite parses
-	# feeds loosely, sometimes it returns a data structure when it shouldn't.
-	# So we're only pushing in attributes when they AREN'T a reference to 
-	# a data structure.
-	my %attributes;
-	foreach my $attribute(keys %$item){
-	    $attributes{$attribute}=$item->{$attribute} if (! ref($item->{$attribute}));
-	}
-	$rssObject->add_item(%attributes);
-    }
-}
-
-
-#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-sub _createRSSURLs{
-	my $self=shift;
-	my $var=shift;
-	foreach({ver=>'1.0',param=>'10'},{ver=>'0.9',param=>'090'},{ver=>'0.91',param=>'091'},{ver=>'2.0',param=>'20'}){
-	$var->{'rss.url.'.$_->{ver}}=$self->getUrl('func=viewRSS'.$_->{param});
-	}
-	$var->{'rss.url'}=$self->getUrl('func=viewRSS20');
 }
 
 
