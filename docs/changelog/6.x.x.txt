@@ -24,6 +24,8 @@
  - fix: Suspicious code in SyndicatedContent.pm
  - fix: MySQL5.0.9 bug
  - fix: DataForm corrupts text area fields
+ - All assets now have an autoGenerateForms property just like wobjects per the
+   rough edges discussions in Community IRC.
 
 6.99.2
  - fix - demo.plainblack.com getting started

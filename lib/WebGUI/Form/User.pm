@@ -96,6 +96,10 @@ Renders a user selector.
 sub toHtml {
 	my $self = shift;
         my $user = WebGUI::User->new($self->session, $self->get("value"));
+	my $manage = undef;
+        if ($self->session->user->isInGroup(3)) {
+                 $manage = " ".$self->session->icon->manage('op=listUsers');
+        }
         return WebGUI::Form::Hidden->new($self->session,
                         name=>$self->get("name"),
                         extras=>$self->get("extras"),
@@ -111,7 +115,7 @@ sub toHtml {
                 .($self->get('readOnly')?'':WebGUI::Form::Button->new($self->session,
                         value=>"...",
                         extras=>'onclick="window.open(\''.$self->session->url->page("op=formUsers;formId=".$self->get('id')).'\',\'userPicker\',\'toolbar=no, location=no, status=no, directories=no, width=400, height=400\');"'
-                        )->toHtml);
+                        )->toHtml).$manage;
 }
 
 1;

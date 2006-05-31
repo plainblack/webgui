@@ -211,62 +211,111 @@ sub definition {
         my $session = shift;
         my $definition = shift || [];
 	my $i18n = WebGUI::International->new($session, "Asset");
-        push(@{$definition}, {
-		assetName=>$i18n->get("asset"),
-                tableName=>'assetData',
-                className=>'WebGUI::Asset',
-		icon=>'assets.gif',
-                properties=>{
+	my %properties;
+	tie %properties, 'Tie::IxHash';
+	%properties = (
                                 title=>{
+					tab=>"properties",
+					label=>$i18n->get(99),
+					hoverHelp=>$i18n->get('99 description'),
                                         fieldType=>'text',
                                         defaultValue=>undef
                                         },
                                 menuTitle=>{
+					tab=>"properties",
+					label=>$i18n->get(411),
+					hoverHelp=>$i18n->get('411 description'),
+					uiLevel=>1,
                                         fieldType=>'text',
                                         defaultValue=>undef
                                         },
                                 url=>{
+					tab=>"properties",
+					label=>$i18n->get(104),
+					hoverHelp=>$i18n->get('104 description'),
+					uiLevel=>3,
                                         fieldType=>'text',
                                         defaultValue=>undef,
 					filter=>'fixUrl'
                                         },
 				isHidden=>{
+					tab=>"display",
+					label=>$i18n->get(886),
+					hoverHelp=>$i18n->get('886 description'),
+					uiLevel=>6,
 					fieldType=>'yesNo',
 					defaultValue=>0
 					},
 				newWindow=>{
+					tab=>"display",
+					label=>$i18n->get(940),
+					hoverHelp=>$i18n->get('940 description'),
+					uiLevel=>9,
 					fieldType=>'yesNo',
 					defaultValue=>0
 					},
 				encryptPage=>{
 					fieldType=>'yesNo',
+					tab=>"security",
+					label=>$i18n->get('encrypt page'),
+					hoverHelp=>$i18n->get('encrypt page description'),
+					uiLevel=>6,
 					defaultValue=>0
 					},
                                 ownerUserId=>{
+					tab=>"security",
+					label=>$i18n->get(108),
+					hoverHelp=>$i18n->get('108 description'),
+					uiLevel=>6,
                                         fieldType=>'user',
                                         defaultValue=>'3'
                                         },
                                 groupIdView=>{
+					tab=>"security",
+					label=>$i18n->get(872),
+					hoverHelp=>$i18n->get('872 description'),
+					uiLevel=>6,
                                         fieldType=>'group',
                                         defaultValue=>'7'
                                         },
                                 groupIdEdit=>{
+					tab=>"security",
+					label=>$i18n->get(871),
+					excludeGroups=>[1,7],
+					hoverHelp=>$i18n->get('871 description'),
+					uiLevel=>6,
                                         fieldType=>'group',
                                         defaultValue=>'4'
                                         },
                                 synopsis=>{
+					tab=>"meta",
+					label=>$i18n->get(412),
+					hoverHelp=>$i18n->get('412 description'),
+					uiLevel=>3,
                                         fieldType=>'textarea',
                                         defaultValue=>undef
                                         },
                                 extraHeadTags=>{
+					tab=>"meta",
+					label=>$i18n->get("extra head tags"),
+					hoverHelp=>$i18n->get('extra head tags description'),
+					uiLevel=>5,
                                         fieldType=>'textarea',
                                         defaultValue=>undef
                                         },
 				isPackage=>{
+					label=>$i18n->get("make package"),
+					tab=>"meta",
+					hoverHelp=>$i18n->get('make package description'),
+					uiLevel=>7,
 					fieldType=>'yesNo',
 					defaultValue=>0
 					},
 				isPrototype=>{
+					tab=>"meta",
+					label=>$i18n->get("make prototype"),
+					hoverHelp=>$i18n->get('make prototype description'),
+					uiLevel=>9,
 					fieldType=>'yesNo',
 					defaultValue=>0
 					},
@@ -280,7 +329,14 @@ sub definition {
 					fieldType=>'hidden',
 					defaultValue=>0
 					},
-                        }
+                        );
+        push(@{$definition}, {
+		assetName=>$i18n->get("asset"),
+                tableName=>'assetData',
+		autoGenerateForms=>1,
+                className=>'WebGUI::Asset',
+		icon=>'assets.gif',
+                properties=>\%properties
                 });
         return $definition;
 }
@@ -525,7 +581,7 @@ sub getDefault {
 
 #-------------------------------------------------------------------
 
-=head2 getEditForm ( )
+=head2 getEditForm ()
 
 Creates and returns a tabform to edit parameters of an Asset.
 
@@ -566,8 +622,11 @@ sub getEditForm {
 			value=>$self->session->form->process("proceed")
 			});
 	}
+	# create tabs
 	$tabform->addTab("properties",$i18n->get("properties"));
-
+	$tabform->addTab("display",$i18n->get(105),5);
+	$tabform->addTab("security",$i18n->get(107),6);
+	$tabform->addTab("meta",$i18n->get("Metadata"),3);
 	# process errors
 	my $errors = $self->session->stow->get('editFormErrors');
 	if ($errors) {
@@ -575,113 +634,26 @@ sub getEditForm {
 			-value=>"<p>Some error(s) occurred:<ul><li>".join('</li><li>', @$errors).'</li></ul></p>',
 		)
 	}
-
 	$tabform->getTab("properties")->readOnly(
 		-label=>$i18n->get("asset id"),
 		-value=>$self->get("assetId"),
 		-hoverHelp=>$i18n->get('asset id description'),
 		);
-	$tabform->getTab("properties")->text(
-		-label=>$i18n->get(99),
-		-name=>"title",
-		-hoverHelp=>$i18n->get('99 description'),
-		-value=>$self->get("title")
-		);
-	$tabform->getTab("properties")->text(
-		-label=>$i18n->get(411),
-		-name=>"menuTitle",
-		-value=>$self->get("menuTitle"),
-		-hoverHelp=>$i18n->get('411 description'),
-		-uiLevel=>1
-		);
-        $tabform->getTab("properties")->text(
-                -name=>"url",
-                -label=>$i18n->get(104),
-                -value=>$self->get("url"),
-		-hoverHelp=>$i18n->get('104 description'),
-                -uiLevel=>3
-                );
-	$tabform->addTab("display",$i18n->get(105),5);
-	$tabform->getTab("display")->yesNo(
-                -name=>"isHidden",
-                -value=>$self->get("isHidden"),
-                -label=>$i18n->get(886),
-		-hoverHelp=>$i18n->get('886 description'),
-                -uiLevel=>6
-                );
-        $tabform->getTab("display")->yesNo(
-                -name=>"newWindow",
-                -value=>$self->get("newWindow"),
-                -label=>$i18n->get(940),
-		-hoverHelp=>$i18n->get('940 description'),
-                -uiLevel=>9
-                );
-	$tabform->addTab("security",$i18n->get(107),6);
-        $tabform->getTab("security")->yesNo(
-                -name=>"encryptPage",
-                -value=>$self->get("encryptPage"),
-                -label=>$i18n->get('encrypt page'),
-		-hoverHelp=>$i18n->get('encrypt page description'),
-                -uiLevel=>6
-                );
-	my $subtext;
-        if ($self->session->user->isInGroup(3)) {
-                 $subtext = $self->session->icon->manage('op=listUsers');
-        } else {
-                 $subtext = "";
-        }
-        $tabform->getTab("security")->user(
-               -name=>"ownerUserId",
-               -label=>$i18n->get(108),
-		-hoverHelp=>$i18n->get('108 description'),
-               -value=>$self->get("ownerUserId"),
-               -subtext=>$subtext,
-               -uiLevel=>6
-               );
-        $tabform->getTab("security")->group(
-               -name=>"groupIdView",
-               -label=>$i18n->get(872),
-		-hoverHelp=>$i18n->get('872 description'),
-               -value=>[$self->get("groupIdView")],
-               -uiLevel=>6
-               );
-        $tabform->getTab("security")->group(
-               -name=>"groupIdEdit",
-               -label=>$i18n->get(871),
-		-hoverHelp=>$i18n->get('871 description'),
-               -value=>[$self->get("groupIdEdit")],
-               -excludeGroups=>[1,7],
-               -uiLevel=>6
-               );
-	$tabform->addTab("meta",$i18n->get("Metadata"),3);
-        $tabform->getTab("meta")->textarea(
-                -name=>"synopsis",
-                -label=>$i18n->get(412),
-		-hoverHelp=>$i18n->get('412 description'),
-                -value=>$self->get("synopsis"),
-                -uiLevel=>3
-                );
-        $tabform->getTab("meta")->textarea(
-                -name=>"extraHeadTags",
-		-label=>$i18n->get("extra head tags"),
-		-hoverHelp=>$i18n->get('extra head tags description'),
-                -value=>$self->get("extraHeadTags"),
-                -uiLevel=>5
-                );
-	$tabform->getTab("meta")->yesNo(
-		-name=>"isPackage",
-		-label=>$i18n->get("make package"),
-		-hoverHelp=>$i18n->get('make package description'),
-		-value=>$self->getValue("isPackage"),
-		-uiLevel=>7
-		);
-	$tabform->getTab("meta")->yesNo(
-		-name=>"isPrototype",
-		-label=>$i18n->get("make prototype"),
-		-hoverHelp=>$i18n->get('make prototype description'),
-		-value=>$self->getValue("isPrototype"),
-		-uiLevel=>9
-		);
+	foreach my $definition (reverse @{$self->definition($self->session)}) {
+		my $properties = $definition->{properties};
+		next unless ($definition->{autoGenerateForms});
+		foreach my $fieldname (keys %{$properties}) {
+			my %params;
+			foreach my $key (keys %{$properties->{$fieldname}}) {
+				next if ($key eq "tab");
+				$params{$key} = $properties->{$fieldname}{$key};
+			}
+			$params{value} = $self->getValue($fieldname);
+			$params{name} = $fieldname;
+			my $tab = $properties->{$fieldname}{tab} || "properties";
+			$tabform->getTab($tab)->dynamicField(%params);
+		}
+	}
         if ($self->session->setting->get("metaDataEnabled")) {
                 my $meta = $self->getMetaDataFields();
                 foreach my $field (keys %$meta) {
@@ -715,6 +687,7 @@ sub getEditForm {
         }
 	return $tabform;
 }
+
 
 
 #-------------------------------------------------------------------

@@ -212,38 +212,6 @@ sub getCollateral {
 
 #-------------------------------------------------------------------
 
-=head2 getEditForm ()
-
-Returns the TabForm object that will be used in generating the edit page for this wobject.
-
-=cut
-
-sub getEditForm {
-	my $self = shift;
-	my $tabform = $self->SUPER::getEditForm();
-	foreach my $definition (reverse @{$self->definition($self->session)}) {
-		my $properties = $definition->{properties};
-		next unless ($definition->{autoGenerateForms});
-		foreach my $fieldname (keys %{$properties}) {
-			my %params;
-			foreach my $key (keys %{$properties->{$fieldname}}) {
-				next if ($key eq "tab");
-				$params{$key} = $properties->{$fieldname}{$key};
-			}
-			$params{value} = $self->getValue($fieldname);
-			$params{name} = $fieldname;
-			my $tab = $properties->{$fieldname}{tab} || "properties";
-			$tabform->getTab($tab)->dynamicField(%params);
-		}
-	}
-	return $tabform;
-}
-
-
-
-
-#-------------------------------------------------------------------
-
 =head2 moveCollateralDown ( tableName, keyName, keyValue [ , setName, setValue ] )
 
 Moves a collateral data item down one position. This assumes that the collateral data table has a column called "assetId" that identifies the wobject, and a column called "sequenceNumber" that determines the position of the data item.
