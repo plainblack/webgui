@@ -45,8 +45,10 @@ sub www_formAssetTree {
 		$url .= ";classLimiter=".$session->form->process("classLimiter","className") if ($session->form->process("classLimiter","className"));
 		push(@crumb,'<a href="'.$url.'" class="crumb">'.$ancestor->get("menuTitle").'</a>');
 	}
-	my $output = '
-		<html><head>
+	my $output = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<style type="text/css">
 		.base {
         		font-family:  "Lucida Grande", "Lucida Sans Unicode", Tahoma, Verdana, Arial, sans-serif;
@@ -87,7 +89,7 @@ sub www_formAssetTree {
 				.'\').value=\''.$child->getId.'\';window.opener.document.getElementById(\''.
 				$session->form->process("formId").'_display\').value=\''.$child->get("title").'\';window.close();">['.$i18n->get("select").']</a> ';
 		} else {
-			$output .= '<span class="selectLink">['.$i18n->get("select").']</span> ';
+			$output .= '['.$i18n->get("select").'] ';
 		}
 		my $url = $child->getUrl("op=formAssetTree;formId=".$session->form->process("formId"));
 		$url .= ";classLimiter=".$session->form->process("classLimiter","className") if ($session->form->process("classLimiter","className"));
@@ -110,8 +112,38 @@ Asset picker for the rich editor.
 sub www_richEditPageTree {
 	my $session = shift;
 	$session->http->setCacheControl("none");
+	$session->style->setRawHeadTags(q|<style type="text/css">
+                .base {
+                        font-family:  "Lucida Grande", "Lucida Sans Unicode", Tahoma, Verdana, Arial, sans-serif;
+                        font-size: 12px;
+                }
+                a {
+                        color: #0f3ccc;
+                        text-decoration: none;
+                }
+                a:hover {
+                        color: #000080;
+                        text-decoration: underline;     
+                }
+                .selectLink {
+                        color: #cc7700;
+                }
+                .crumb {
+                        color: orange;
+                }
+                .crumbTrail {
+                        padding: 3px;
+                        background-color: #eeeeee;
+                        -moz-border-radius: 10px;
+                }
+                .traverse {
+                        font-size: 15px;
+                }
+                </style>
+		|);
+	$session->style->setScript($session->url->extras('tinymce2/jscripts/tiny_mce/tiny_mce_popup.js'),{type=>"text/javascript"});
 	my $i18n = WebGUI::International->new($session);
-	my $f = WebGUI::HTMLForm->new($session,-action=>"#",-extras=>'name="linkchooser"');
+	my $f = WebGUI::HTMLForm->new($session,-action=>"#");
 	$f->text(
 		-name=>"url",
 		-label=>$i18n->get(104),
@@ -125,12 +157,11 @@ sub www_richEditPageTree {
 		           "_blank"=>$i18n->get('link in new window')},
 		);
 	$f->button(
+		-name=>"button",
 		-value=>$i18n->get('done'),
 		-extras=>'onclick="createLink()"'
 		);
-	$session->style->setScript($session->url->extras('tinymce2/jscripts/tiny_mce/tiny_mce_popup.js'),{type=>"text/javascript"});
-	my $output = '<fieldset><legend>'.$i18n->get('insert a link').'</legend>
-		<fieldset><legend>'.$i18n->get('insert a link').'</legend>'.$f->print.'</fieldset>
+	my $output = ' <fieldset><legend>'.$i18n->get('insert a link').'</legend>'.$f->print.'</fieldset>
 	<script type="text/javascript">
 //<![CDATA[
 function createLink() {
@@ -147,20 +178,22 @@ function createLink() {
     }
 }
 //]]>
-</script><fieldset><legend>'.$i18n->get('pages').'</legend> ';
+</script>
+	<fieldset><legend>'.$i18n->get('pages').'</legend> ';
+	$output .= '<div class="base">';
 	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
 	my @crumb;
 	my $ancestors = $base->getLineage(["self","ancestors"],{returnObjects=>1});
 	foreach my $ancestor (@{$ancestors}) {
-		push(@crumb,'<a href="'.$ancestor->getUrl("op=richEditPageTree").'">'.$ancestor->get("menuTitle").'</a>');
+		push(@crumb,'<a href="'.$ancestor->getUrl("op=richEditPageTree").'" class="crumb">'.$ancestor->get("menuTitle").'</a>');
 	}	
-	$output .= '<p>'.join(" &gt; ", @crumb)."</p>\n";
+	$output .= '<div class="crumbTrail">'.join(" &gt; ", @crumb)."</div><br />\n";
 	my $children = $base->getLineage(["children"],{returnObjects=>1});
 	foreach my $child (@{$children}) {
 		next unless $child->canView;
-		$output .= '<a href="#" onclick="document.getElementById(\'url_formId\').value=\''.$child->get("url").'\'">['.$i18n->get("select").']</a> <a href="'.$child->getUrl("op=richEditPageTree").'">'.$child->get("menuTitle").'</a>'."<br />\n";	
+		$output .= '<a href="#" class="selectLink" onclick="document.getElementById(\'url_formId\').value=\''.$child->get("url").'\'">['.$i18n->get("select").']</a> <a href="'.$child->getUrl("op=richEditPageTree").'" class="traverse">'.$child->get("menuTitle").'</a>'."<br />\n";	
 	}
-	$output .= '</fieldset></fieldset>';
+	$output .= '</div></fieldset>';
 	return $session->style->process($output, 'PBtmpl0000000000000137');
 }
 
@@ -178,14 +211,43 @@ Each link display a thumbnail of the image via www_richEditViewThumbnail.
 sub www_richEditImageTree {
 	my $session = shift;
 	$session->http->setCacheControl("none");
+	$session->style->setRawHeadTags(q| <style type="text/css">
+                .base {
+                        font-family:  "Lucida Grande", "Lucida Sans Unicode", Tahoma, Verdana, Arial, sans-serif;
+                        font-size: 12px;
+                }
+                a {
+                        color: #0f3ccc;
+                        text-decoration: none;
+                }
+                a:hover {
+                        color: #000080;
+                        text-decoration: underline;     
+                }
+                .selectLink {
+                        color: #cc7700;
+                }
+                .crumb {
+                        color: orange;
+                }
+                .crumbTrail {
+                        padding: 3px;
+                        background-color: #eeeeee;
+                        -moz-border-radius: 10px;
+                }
+                .traverse {
+                        font-size: 15px;
+                }
+                </style>|);
 	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
 	my @crumb;
 	my $ancestors = $base->getLineage(["self","ancestors"],{returnObjects=>1});
 	my $media;
 	my @output;
+	push(@output, '<div class="base">');
 	my $i18n = WebGUI::International->new($session, 'Operation_FormHelpers');
 	foreach my $ancestor (@{$ancestors}) {
-		push(@crumb,'<a href="'.$ancestor->getUrl("op=richEditImageTree").'">'.$ancestor->get("menuTitle").'</a>');
+		push(@crumb,'<a class="crumb" href="'.$ancestor->getUrl("op=richEditImageTree").'">'.$ancestor->get("menuTitle").'</a>');
 		# check if we are in (a subdirectory of) Media
 		if ($ancestor->get('assetId') eq 'PBasset000000000000003') {
 			$media = $ancestor;
@@ -203,17 +265,18 @@ sub www_richEditImageTree {
 		# if not in Media, provide a direct link to it
 		push(@output, '<p>[ <a href="'.$media->getUrl('op=richEditImageTree').'">'.$media->get('title').'</a> ]</p>');
 	}
-	push(@output, '<p>'.join(" &gt; ", @crumb)."</p>\n");
+	push(@output, '<div class="crumbTrail">'.join(" &gt; ", @crumb)."</div><br />\n");
 	my $children = $base->getLineage(["children"],{returnObjects=>1});
 	foreach my $child (@{$children}) {
 		next unless $child->canView;
 		if ($child->get("className") =~ /^WebGUI::Asset::File::Image/) {
-			push(@output, '<a href="'.$child->getUrl("op=richEditViewThumbnail").'" target="viewer">['.$i18n->get("select","WebGUI").']</a> ');
+			push(@output, '<a class="selectLink" href="'.$child->getUrl("op=richEditViewThumbnail").'" target="viewer">['.$i18n->get("select","WebGUI").']</a> ');
 		} else {
-			push(@output, "[".$i18n->get("select","WebGUI")."] ");
+			push(@output, ' ['.$i18n->get("select","WebGUI")."] ");
 		}
-		push(@output, '<a href="'.$child->getUrl("op=richEditImageTree").'">'.$child->get("menuTitle").'</a>'."<br />\n");
+		push(@output, '<a class="traverse" href="'.$child->getUrl("op=richEditImageTree").'">'.$child->get("menuTitle").'</a>'."<br />\n");
 	}
+	push(@output, '</div>');
 	return $session->style->process(join('', @output), 'PBtmpl0000000000000137');
 }
 
