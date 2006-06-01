@@ -270,7 +270,7 @@ sub indexContent {
 	$indexer->addKeywords(join(" ", @data));
 	@data = $self->session->db->buildArray("select benefit from Product_benefit where assetId=".$self->session->db->quote($self->getId));
 	$indexer->addKeywords(join(" ", @data));
-	@data = $self->session->db->buildArray("select concat(name,' ',value,' ', units') from Product_specification where assetId=".$self->session->db->quote($self->getId));
+	@data = $self->session->db->buildArray("select concat(name,' ',value,' ', units) from Product_specification where assetId=".$self->session->db->quote($self->getId));
 	$indexer->addKeywords(join(" ", @data));
 }
 

@@ -156,6 +156,35 @@ sub formatRank {
 
 #-------------------------------------------------------------------
 
+=head2 getChildCount ( )
+
+Returns the number of children this asset has. This excludes assets in the trash or clipbaord.
+
+=cut
+
+sub getChildCount {
+	my $self = shift;
+	my ($count) = $self->session->db->quickArray("select count(*) from asset where state in ('published','archived') and parentId=?", [$self->getId]);
+	return $count;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getDescendantCount ( )
+
+Returns the number of descendants this asset has. This excludes assets in the trash or clipboard.
+
+=cut
+
+sub getDescendantCount {
+	my $self = shift;
+	my ($count) = $self->session->db->quickArray("select count(*) from asset where state in ('published', 'archived') and lineage like ?", [$self->get("lineage")."%"]);
+	$count--; # have to subtract self
+	return $count;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getFirstChild ( )
 
 Returns the highest rank, top of the highest rank Asset under current Asset.
@@ -498,7 +527,7 @@ sub getRank {
 
 =head2 hasChildren ( )
 
-Returns 1 or the count of Assets with the same parentId as current Asset (Which may be zero).
+Returns 1 or the count of Assets with the same parentId as current Asset's assetId (Which may be zero).
 
 =cut
 
@@ -510,8 +539,7 @@ sub hasChildren {
 		} elsif (exists $self->{_lastChild}) {
 			$self->{_hasChildren} = 1;
 		} else {
-			my ($hasChildren) = $self->session->db->quickArray("select count(*) from asset where parentId=".$self->session->db->quote($self->getId));
-			$self->{_hasChildren} = $hasChildren;
+			$self->{_hasChildren} = $self->getChildCount;
 		}
 	}
 	return $self->{_hasChildren};

@@ -27,7 +27,12 @@
 				<tmpl_var title>
 			</div>
 			<div class="postData">
-				<div style="float: left; width: 50%">
+<tmpl_if avatar.url>
+<div style="float: left; padding-right: 10px;">
+<img src="<tmpl_var avatar.url>" alt="<tmpl_var username>" />
+</div>
+</tmpl_if>
+				<div style="float: left; padding-right: 25px;">
 					<b><tmpl_var user.label>:</b> 
 						<tmpl_if user.isVisitor>
 							<tmpl_var username>
@@ -87,7 +92,12 @@
 					<tmpl_var title>
 				</div>
 				<div class="postData">
-					<div style="float: left; width: 50%">
+<tmpl_if avatar.url>
+<div style="float: left; padding-right: 10px;">
+<img src="<tmpl_var avatar.url>" alt="<tmpl_var username>" />
+</div>
+</tmpl_if>
+					<div style="float: left; padding-right: 25px;">
 						<b><tmpl_var user.label>:</b> 
 							<tmpl_if user.isVisitor>
 								<tmpl_var username>

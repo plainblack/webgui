@@ -78,20 +78,6 @@ sub createSubscriptionGroup {
 }
 
 #-------------------------------------------------------------------
-
-=head2 decrementReplies ( )
-
-Deccrements this reply counter.
-
-=cut
-
-sub decrementReplies {
-        my $self = shift;
-	$self->update({replies=>$self->get("replies")-1});
-	$self->getParent->decrementReplies;
-}
-
-#-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
 	my $session = shift;
@@ -426,7 +412,7 @@ The id of the reply that caused the replies counter to be incremented.
 
 sub incrementReplies {
         my ($self, $dateOfReply, $replyId) = @_;
-        $self->update({replies=>$self->get("replies")+1, lastPostId=>$replyId, lastPostDate=>$dateOfReply});
+        $self->update({replies=>$self->getDescendantCount, lastPostId=>$replyId, lastPostDate=>$dateOfReply});
         $self->getParent->incrementReplies($dateOfReply,$replyId);
 }
 
@@ -659,16 +645,30 @@ sub subscribe {
 
 #-------------------------------------------------------------------
 
+=head2 sumReplies ( )
+
+Calculates the number of replies to this thread and updates the counter to reflect that. Also triggers a count in the collaboration system.
+
+=cut
+
+sub sumReplies {
+        my $self = shift;
+	$self->update({replies=>$self->getDescendantCount});
+	$self->getParent->sumReplies;
+}
+
+#-------------------------------------------------------------------
+
 =head2 trash
 
-Moves thread to the trash and decrements reply counter on thread.
+Moves thread to the trash and updates reply counter on thread.
 
 =cut
 
 sub trash {
         my $self = shift;
         $self->SUPER::trash;
-        $self->getParent->decrementThreads;
+        $self->getParent->sumReplies;
         if ($self->getParent->get("lastPostId") eq $self->getId) {
                 my $parentLineage = $self->getThread->get("lineage");
                 my ($id, $date) = $self->session->db->quickArray("select Post.assetId, Post.dateSubmitted from Post, asset where asset.lineage like ".$self->session->db->quote($parentLineage.'%')." and Post.assetId<>".$self->session->db->quote($self->getId)." and Post.assetId=asset.assetId and asset.state='published' order by Post.dateSubmitted desc");

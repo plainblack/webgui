@@ -311,7 +311,7 @@ sub www_editUser {
 	my $tabform = WebGUI::TabForm->new($session,\%tabs);
 	$tabform->formHeader({extras=>'autocomplete="off"'});	
 	my $u = WebGUI::User->new($session,($uid eq 'new') ? '' : $uid); #Setting uid to '' when uid is 'new' so visitor defaults prefill field for new user
-	my $username = $u->userId eq '1' ? '' : $u->username;
+	my $username = ($u->userId eq '1' && $uid ne "1") ? '' : $u->username;
 	$session->stow->set("editUser_UID", $uid);
     	$tabform->hidden({name=>"op",value=>"editUserSave"});
     	$tabform->hidden({name=>"uid",value=>$uid});
@@ -519,7 +519,7 @@ sub www_editUserKarmaSave {
         my ($u);
         $u = WebGUI::User->new($session,$session->form->process("uid"));
         $u->karma($session->form->process("amount"),$session->user->username." (".$session->user->userId.")",$session->form->process("description"));
-        return www_editUser();
+        return www_editUser($session);
 }
 
 #-------------------------------------------------------------------

@@ -20,12 +20,18 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
+addAssetIndex();
 fixCs();
 fixCss();
 fixSpectre();
 
 finish($session); # this line required
 
+#-------------------------------------------------
+sub addAssetIndex {
+	print "\tAdding a new asset index.\n" unless ($quiet);
+	$session->db->write("alter table asset add index state_lineage (state,lineage)");
+}
 
 #-------------------------------------------------
 sub fixSpectre {

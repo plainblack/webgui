@@ -8,6 +8,11 @@
 <h2><tmpl_var title></h2>
 
 <div class="defaultSubmissionDetails">
+<tmpl_if avatar.url>
+<div style="width: 100%; text-align: center;">
+<img src="<tmpl_var avatar.url>" alt="<tmpl_var username>" />
+</div>
+</tmpl_if>	
 	<b><tmpl_var user.label>:</b> 
 		<tmpl_if user.isVisitor>
 			<tmpl_var username>
@@ -96,7 +101,12 @@
 						<table cellpadding="0" cellspacing="0">
 						<tbody>
 						<tr>
-							<td style="width:50%;text-align:left;">
+<tmpl_if avatar.url>
+<td style="padding-right: 10px;">
+<img src="<tmpl_var avatar.url>" alt="<tmpl_var username>" />
+</td>
+</tmpl_if>
+							<td style="padding-right: 25px;text-align:left;">
 								<b><tmpl_var user.label>:</b> 
 									<tmpl_if user.isVisitor>
 										<tmpl_var username>
@@ -106,11 +116,12 @@
 									<br />
 								<b><tmpl_var date.label>:</b> <tmpl_var dateSubmitted.human>
 							</td>
-							<td style="width:50%;text-align:left;">
+							<td style="text-align:left;">
 								<b><tmpl_var rating.label>:</b> <tmpl_var rating>
 								<tmpl_unless hasRated>
 								&nbsp; &nbsp;<tmpl_var rate.label> [ <p style="display:inline;vertical-align:middle;"><a href="<tmpl_var rate.url.thumbsUp>"><img src="<tmpl_var thumbsUp.icon.url>" alt="+" style="border: 0px;vertical-align:middle;" /></a></p> | <p style="display:inline;vertical-align:middle;"><a href="<tmpl_var rate.url.thumbsDown>"><img src="<tmpl_var thumbsDown.icon.url>" alt="-" style="border: 0px;vertical-align:middle;" /></a></p> ]
-								</tmpl_unless>														
+								</tmpl_unless>	
+								<br />									
 							</td>
 						</tr>
 						</table>
@@ -155,7 +166,12 @@
 						<table cellpadding="0" cellspacing="0">
 						<tbody>
 						<tr>
-							<td style="width:50%;text-align:left;">
+<tmpl_if avatar.url>
+<td style="padding-right: 10px;">
+<img src="<tmpl_var avatar.url>" alt="<tmpl_var username>" />
+</td>
+</tmpl_if>
+							<td style="padding-right: 25px;text-align:left;">
 								<b><tmpl_var user.label>:</b> 
 									<tmpl_if user.isVisitor>
 										<tmpl_var username>
@@ -165,11 +181,12 @@
 									<br />
 								<b><tmpl_var date.label>:</b> <tmpl_var dateSubmitted.human>
 							</td>
-							<td style="width:50%;text-align:left;">
+							<td style="text-align:left;">
 								<b><tmpl_var rating.label>:</b> <tmpl_var rating>
 								<tmpl_unless hasRated>
 								&nbsp; &nbsp;<tmpl_var rate.label> [ <p style="display:inline;vertical-align:middle;"><a href="<tmpl_var rate.url.thumbsUp>"><img src="<tmpl_var thumbsUp.icon.url>" alt="+" style="border: 0px;vertical-align:middle;" /></a></p> | <p style="display:inline;vertical-align:middle;"><a href="<tmpl_var rate.url.thumbsDown>"><img src="<tmpl_var thumbsDown.icon.url>" alt="-" style="border: 0px;vertical-align:middle;" /></a></p> ]
-								</tmpl_unless>														
+								</tmpl_unless>	
+								<br />
 							</td>
 						</tr>
 						</table>	

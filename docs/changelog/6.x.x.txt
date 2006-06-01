@@ -29,6 +29,13 @@
  - fix: not set UTF-8 in setup page
  - fix: 6.99 nothing write to assetData.groupIdView & assetData.groupIdEdit
  - fix: Insert A Link page has no head & body tags has no style
+ - fix: Username blank when editing user Visitor
+ - fix: Thread Count is off in the Collaboration system
+ - Fixed an indexing problem with Product assets.
+ - fix: Reply count off when restoring from trash
+ - fix: Karma not spent properly
+ - fix: Avatar Message Board Template Not Working
+
 
 6.99.2
  - fix - demo.plainblack.com getting started

@@ -263,34 +263,6 @@ sub createSubscriptionGroup {
 }
 
 #-------------------------------------------------------------------
-
-=head2 decrementReplies ( )
-
-Deccrements this reply counter.
-
-=cut
-
-sub decrementReplies {
-        my $self = shift;
-	$self->update({replies=>$self->get("replies")-1});
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 decrementThreads ( )
-
-Deccrements this thread counter.
-
-=cut
-
-sub decrementThreads {
-        my $self = shift;
-	$self->update({threads=>$self->get("threads")-1});
-}
-
-
-#-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
 	my $session = shift;
@@ -892,7 +864,9 @@ The unique identifier of the post being added.
 
 sub incrementReplies {
         my ($self, $lastPostDate, $lastPostId) = @_;
-        $self->update({replies=>$self->get("replies")+1, lastPostId=>$lastPostId, lastPostDate=>$lastPostDate});
+	my $threads = $self->getChildCount;
+        my $replies = $self->getDescendantCount - $threads;
+        $self->update({replies=>$replies, threads=>$threads, lastPostId=>$lastPostId, lastPostDate=>$lastPostDate});
 }
 
 #-------------------------------------------------------------------
@@ -913,7 +887,7 @@ The unique identifier of the post that was just added.
 
 sub incrementThreads {
         my ($self, $lastPostDate, $lastPostId) = @_;
-        $self->update({threads=>$self->get("threads")+1, lastPostId=>$lastPostId, lastPostDate=>$lastPostDate});
+        $self->update({threads=>$self->getChildCount, lastPostId=>$lastPostId, lastPostDate=>$lastPostDate});
 }
 
 #-------------------------------------------------------------------
@@ -1047,6 +1021,34 @@ sub setLastPost {
         my $id = shift;
         my $date = shift;
         $self->update({lastPostId=>$id, lastPostDate=>$date});
+}
+
+#-------------------------------------------------------------------
+
+=head2 sumReplies ( )
+
+Calculates the number of replies to this collaboration system and updates the counter to reflect that. Also updates thread count since it needs to know that to calculate reply count.
+
+=cut
+
+sub sumReplies {
+        my $self = shift;
+	my $threads = $self->getChildCount;
+	my $replies = $self->getDescendantCount - $threads;
+	$self->update({replies=>$replies, threads=>$threads});
+}
+
+#-------------------------------------------------------------------
+
+=head2 sumThreads ( )
+
+Calculates the number of threads in this collaboration system and updates the counter to reflect that.
+
+=cut
+
+sub sumThreads {
+        my $self = shift;
+	$self->update({threads=>$self->getChildCount});
 }
 
 #-------------------------------------------------------------------

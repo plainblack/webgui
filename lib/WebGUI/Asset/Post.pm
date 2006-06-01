@@ -714,6 +714,13 @@ sub postProcess {
 
 #-------------------------------------------------------------------
 
+sub publish {
+	my $self = shift;
+	$self->getThread->sumReplies;
+}
+
+#-------------------------------------------------------------------
+
 sub purge {
         my $self = shift;
         my $sth = $self->session->db->read("select storageId from Post where assetId=".$self->session->db->quote($self->getId));
@@ -772,6 +779,11 @@ sub rate {
         	my ($sum) = $self->session->db->quickArray("select sum(rating) from Post_rating where assetId=".$self->session->db->quote($self->getId));
         	$self->update({rating=>$sum});
 		$self->getThread->rate($rating);
+		if ($self->session->setting->get("useKarma")) {
+			$self->session->user->karma(-$self->getThread->getParent->get("karmaSpentToRate"), "Rated Post ".$self->getId, "Rated a CS Post.");
+			my $u = WebGUI::User->new($self->session, $self->get("ownerUserId"));
+			$u->karma($self->getThread->getParent->get("karmaRatingMultiplier"), "Post ".$self->getId." Rated by ".$self->session->user->userId, "Had post rated.");
+		}
 	}
 }
 
@@ -847,14 +859,14 @@ sub setStatusUnarchived {
 
 =head2 trash
 
-Moves post to the trash and decrements reply counter on thread.
+Moves post to the trash and updates reply counter on thread.
 
 =cut
 
 sub trash {
         my $self = shift;
         $self->SUPER::trash;
-        $self->getThread->decrementReplies if ($self->isReply);
+        $self->getThread->sumReplies if ($self->isReply);
         if ($self->getThread->get("lastPostId") eq $self->getId) {
                 my $threadLineage = $self->getThread->get("lineage");
                 my ($id, $date) = $self->session->db->quickArray("select Post.assetId, Post.dateSubmitted from Post, asset where asset.lineage like ".$self->session->db->quote($threadLineage.'%')." and Post.assetId<>".$self->session->db->quote($self->getId)." and asset.assetId=Post.assetId and asset.state='published' order by Post.dateSubmitted desc");
