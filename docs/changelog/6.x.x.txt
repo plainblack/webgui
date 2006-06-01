@@ -27,6 +27,7 @@
  - All assets now have an autoGenerateForms property just like wobjects per the
    rough edges discussions in Community IRC.
  - fix: not set UTF-8 in setup page
+ - fix: 6.99 nothing write to assetData.groupIdView & assetData.groupIdEdit
 
 6.99.2
  - fix - demo.plainblack.com getting started

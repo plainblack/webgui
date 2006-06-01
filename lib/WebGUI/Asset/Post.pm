@@ -80,8 +80,6 @@ sub addRevision {
 	$newSelf->update({
 		isHidden => 1,
 		dateUpdated=>$now,
-		groupIdView=>$newSelf->getThread->getParent->get("groupIdView"),
-		groupIdEdit=>$newSelf->getThread->getParent->get("groupIdEdit"),
 		});
 	$newSelf->getThread->unmarkRead;
         return $newSelf;
@@ -697,6 +695,8 @@ sub postProcess {
 		$data{content} .= "<p>\n\n --- (".$i18n->get('Edited_on')." ".$self->session->datetime->epochToHuman(undef,"%z %Z [GMT%O]")." ".$i18n->get('By')." ".$user->profileField("alias").") --- \n</p>";
 	}
 	$data{url} = $self->fixUrl($self->getThread->get("url")."/1") if ($self->isReply && $self->isNew);
+	$data{groupIdView} = $self->getThread->getParent->get("groupIdView");
+	$data{groupIdEdit} = $self->getThread->getParent->get("groupIdEdit");
 	$self->update(\%data);
 	my $size = 0;
 	my $storage = $self->getStorageLocation;
