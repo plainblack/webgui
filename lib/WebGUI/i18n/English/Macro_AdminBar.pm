@@ -2,10 +2,46 @@ package WebGUI::i18n::English::Macro_AdminBar;
 
 our $I18N = {
 
-    'admin bar title' => {
-        message => q|Admin Bar Macro|,
-        lastUpdated => 1112374923,
-    },
+	'admin bar title' => {
+		message => q|Admin Bar Macro|,
+		lastUpdated => 1112374923,
+	},
+
+	'adminbar_loop' => {
+		message => q|A loop containing the various lists of data to display.|,
+		lastUpdated => 1149178356,
+	},
+
+	'label' => {
+		message => q|A heading label for this category.|,
+		lastUpdated => 1149178356,
+	},
+
+	'name' => {
+		message => q|A javascript friendly name for this category.|,
+		lastUpdated => 1149178356,
+	},
+
+	'items' => {
+		message => q|A loop containing the list if items in this category.|,
+		lastUpdated => 1149178356,
+	},
+
+	'title' => {
+		message => q|The displayable link title for this item.|,
+		lastUpdated => 1149178356,
+	},
+
+	'url' => {
+		message => q|The link URL for this item.|,
+		lastUpdated => 1149178356,
+	},
+
+	'icon' => {
+		message => q|The URL of an icon to associate with this item.|,
+		lastUpdated => 1149178356,
+	},
+
 
 	'admin bar body' => {
 		message => q|
@@ -16,46 +52,8 @@ Places the administrative tool bar on the page. Omitting this macro will prevent
 content from the clipboard, accessing the help system and other administrative functions.</p>
 <p>
 The macro may take one optional argument, an alternate template in the Macro/AdminBar namespace for generating the AdminBar.  The following variables are available in the template:</p>
-
-<p>
-<b>adminbar_loop</b><br />
-A loop containing the various lists of data to display.
-</p>
-
-<div class="helpIndent">
-<p>
-<b>label</b><br />
-A heading label for this category.
-</p>
-
-<p>
-<b>name</b><br />
-A javascript friendly name for this category.
-</p>
-
-<p><b>items</b><br />
-A loop containing the list if items in this category.
-</p>
-
-<div class="helpIndent">
-
-<p><b>title</b><br />
-The displayable link title for this item.
-</p>
-
-<p><b>url</b><br />
-The link URL for this item.
-</p>
-
-<p><b>icon</b><br />
-The URL of an icon to associate with this item.
-</p>
-
-</div>
-
-</div>
 |,
-		lastUpdated => 1146631148,
+		lastUpdated => 1149178399,
 	},
 
 	'376' => {

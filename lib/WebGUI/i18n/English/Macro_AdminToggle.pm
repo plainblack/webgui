@@ -12,6 +12,16 @@ our $I18N = {
         lastUpdated => 1112466408,
     },
 
+	'toggle.url' => {
+		message => q|The URL to activate or deactivate Admin mode.|,
+		lastUpdated => 1149178440,
+	},
+
+	'toggle.text' => {
+		message => q|The Internationalized label for turning on or off Admin (depending on the state of the macro), or the text that you supply to the macro.|,
+		lastUpdated => 1149178440,
+	},
+
 	'admin toggle body' => {
 		message => q|
 
@@ -23,16 +33,8 @@ Places a link on the page which is only visible to content managers and administ
 The following variables are available in the template:
 </p>
 
-<p><b>toggle.url</b><br />
-The URL to activate or deactivate Admin mode.
-</p>
-
-<p><b>toggle.text</b><br />
-The Internationalized label for turning on or off Admin (depending on the state of the macro), or the text that you supply to the macro.
-</p>
-
 |,
-		lastUpdated => 1146679000,
+		lastUpdated => 1149178461,
 	},
 
 	'516' => {

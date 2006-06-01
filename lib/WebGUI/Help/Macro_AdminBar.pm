@@ -7,6 +7,33 @@ our $HELP = {
 		body => 'admin bar body',
 		fields => [
 		],
+		variables => [
+		          {
+		            'name' => 'adminbar_loop',
+		            'variables' => [
+		                             {
+		                               'name' => 'label'
+		                             },
+		                             {
+		                               'name' => 'name'
+		                             },
+		                             {
+		                               'name' => 'items',
+		                               'variables' => [
+		                                                {
+		                                                  'name' => 'title'
+		                                                },
+		                                                {
+		                                                  'name' => 'url'
+		                                                },
+		                                                {
+		                                                  'name' => 'icon'
+		                                                }
+		                                              ]
+		                             }
+		                           ]
+		          }
+		],
 		related => [
 			{
 				tag => 'macros using',

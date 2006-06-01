@@ -5,6 +5,14 @@ our $HELP = {
         'admin toggle' => {
 		title => 'admin toggle title',
 		body => 'admin toggle body',
+		variables => [
+		          {
+		            'name' => 'toggle.url'
+		          },
+		          {
+		            'name' => 'toggle.text'
+		          }
+		],
 		fields => [
 		],
 		related => [

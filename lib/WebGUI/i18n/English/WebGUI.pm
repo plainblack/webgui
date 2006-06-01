@@ -881,29 +881,28 @@ to add or remove users from their groups.
 		lastUpdated => 1031514049
 	},
 
+	'body.content' => {
+		message => q|The the content on the current page.|,
+		lastUpdated => 1149182155,
+	},
+
+	'head.tags' => {
+		message => q|Tags that WebGUI automatically generates for you so that caching works the way it should, search engines can find you better, and other useful automated functionality. This should go in the &lt;head&gt; &lt;/head&gt; section of your style.
+</p>
+<p>We suggest using something like this in the &lt;title&gt; &lt;/title&gt; portion of your style:
+</p>
+<p>&lt;tmpl_var session.page.title&gt; - &lt;tmpl_var session.setting.companyName&gt;
+</p>
+<p>That particular example will help you get good ranking on search engines.|,
+		lastUpdated => 1149182155,
+	},
+
 	'1074' => {
 		message => q|<p>Style templates are a special kind of template in WebGUI. They allow you to keep your content separated from the look and feel of your site. The following are the template variables available in style templates:
 </p>
 
-<p><b>body.content</b><br />
-The the content on the current page.
-</p>
-
-<p><b>head.tags</b><br />
-Tags that WebGUI automatically generates for you so that caching works the way it should, search engines can find you better, and other useful automated functionality. This should go in the &lt;head&gt; &lt;/head&gt; section of your style.
-</p>
-
-<p>We suggest using something like this in the &lt;title&gt; &lt;/title&gt; portion of your style:
-</p>
-
-<p>&lt;tmpl_var session.page.title&gt; - &lt;tmpl_var session.setting.companyName&gt;
-</p>
-
-<p>That particular example will help you get good ranking on search engines.
-</p>
-
 |,
-		lastUpdated => 1102702313,
+		lastUpdated => 1149182205,
 	},
 
 	'860' => {
@@ -2211,141 +2210,156 @@ div.tabs {
 		lastUpdated => 1031514049
 	},
 
+	'pagination.firstPage' => {
+		message => q|A link to the first page in the paginator.|,
+		lastUpdated => 1149182026,
+	},
+
+	'pagination.firstPageUrl' => {
+		message => q|The url component of pagination.firstPage broken out.|,
+		lastUpdated => 1149182026,
+	},
+
+	'pagination.firstPageText' => {
+		message => q|The text component of pagination.firstPage broken out.|,
+		lastUpdated => 1149182026,
+	},
+
+	'pagination.isFirstPage' => {
+		message => q|A boolean indicating whether the current page is the first page.|,
+		lastUpdated => 1149182026,
+	},
+
+	'pagination.lastPage' => {
+		message => q|A link to the last page in the paginator.|,
+		lastUpdated => 1149182026,
+	},
+
+	'pagination.lastPageUrl' => {
+		message => q|The url component of pagination.lastPage broken out.|,
+		lastUpdated => 1149182026,
+	},
+
+	'pagination.lastPageText' => {
+		message => q|The text component of pagination.lastPage broken out.|,
+		lastUpdated => 1149182026,
+	},
+
+	'pagination.isLastPage' => {
+		message => q|A boolean indicating whether the current page is the last page.|,
+		lastUpdated => 1149182026,
+	},
+
+	'pagination.nextPage' => {
+		message => q|A link to the next page in the paginator relative to the current page.|,
+		lastUpdated => 1149182026,
+	},
+
+	'pagination.nextPageUrl' => {
+		message => q|The url component of pagination.nextPage broken out.|,
+		lastUpdated => 1149182026,
+	},
+
+	'pagination.nextPageText' => {
+		message => q|The text component of pagination.nextPage broken out.|,
+		lastUpdated => 1149182026,
+	},
+
+	'pagination.previousPage' => {
+		message => q|A link to the previous page in the paginator relative to the current page.|,
+		lastUpdated => 1149182026,
+	},
+
+	'pagination.previousPageUrl' => {
+		message => q|The url component of pagination.previousPage broken out.|,
+		lastUpdated => 1149182026,
+	},
+
+	'pagination.previousPageText' => {
+		message => q|The text component of pagination.previousPage broken out.|,
+		lastUpdated => 1149182026,
+	},
+
+	'pagination.pageNumber' => {
+		message => q|The current page number.|,
+		lastUpdated => 1149182026,
+	},
+
+	'pagination.pageCount' => {
+		message => q|The total number of pages.|,
+		lastUpdated => 1149182026,
+	},
+
+	'pagination.pageCount.isMultiple' => {
+		message => q|A boolean indicating whether there is more than one page.|,
+		lastUpdated => 1149182026,
+	},
+
+	'pagination.pageList' => {
+		message => q|A list of links to every page in the paginator.|,
+		lastUpdated => 1149182026,
+	},
+
+	'pagination.pageLoop' => {
+		message => q|Same as pagination.pageList except broken into individual elements.|,
+		lastUpdated => 1149182026,
+	},
+
+	'pagination.url' => {
+		message => q|The URL of page X, where X is the number in the loop we're at.|,
+		lastUpdated => 1149182026,
+	},
+
+	'pagination.text' => {
+		message => q|The number of page X, where X is the number in the loop we're at.|,
+		lastUpdated => 1149182026,
+	},
+
+	'pagination.pageList.upTo20' => {
+		message => q|A list of links to the 20 nearest in the paginator relative to the current page. So if you're on page 60, you'll see links for 50-70.|,
+		lastUpdated => 1149182026,
+	},
+
+	'pagination.pageLoop.upTo20' => {
+		message => q|Same as pagination.pageList.upTo20 except broken into individual elements.|,
+		lastUpdated => 1149182026,
+	},
+
+	'pagination.url' => {
+		message => q|The URL of page X, where X is the number in the loop we're at.|,
+		lastUpdated => 1149182026,
+	},
+
+	'pagination.text' => {
+		message => q|The number of page X, where X is the number in the loop we're at.|,
+		lastUpdated => 1149182026,
+	},
+
+	'pagination.pageList.upTo10' => {
+		message => q|A list of links to the 10 nearest in the paginator relative to the current page. So if you're on page 20, you'll see links for 15-25.|,
+		lastUpdated => 1149182026,
+	},
+
+	'pagination.pageLoop.upTo10' => {
+		message => q|Same as pagination.pageList.upTo10 except broken into individual elements.|,
+		lastUpdated => 1149182026,
+	},
+
+	'pagination.url' => {
+		message => q|The URL of page X, where X is the number in the loop we're at.|,
+		lastUpdated => 1149182026,
+	},
+
+	'pagination.text' => {
+		message => q|The number of page X, where X is the number in the loop we're at.|,
+		lastUpdated => 1149182026,
+	},
+
+
 	'1086' => {
 		message => q|<p>Many wobjects have pagination features. Though some wobjects define their own pagination variables, most use a common set of pagination variables:</p>
-
-<p><b>pagination.firstPage</b><br />
-A link to the first page in the paginator.
-</p> 
-
-<p><b>pagination.firstPageUrl</b><br />
-The url component of pagination.firstPage broken out.
-</p> 
-
-<p><b>pagination.firstPageText</b><br />
-The text component of pagination.firstPage broken out.
-</p> 
-
-<p><b>pagination.isFirstPage</b><br />
-A boolean indicating whether the current page is the first page.
-</p> 
-
-
-<p><b>pagination.lastPage</b><br />
-A link to the last page in the paginator.
-</p> 
-
-<p><b>pagination.lastPageUrl</b><br />
-The url component of pagination.lastPage broken out.
-</p> 
-
-<p><b>pagination.lastPageText</b><br />
-The text component of pagination.lastPage broken out.
-</p> 
-
-<p><b>pagination.isLastPage</b><br />
-A boolean indicating whether the current page is the last page.
-</p> 
-
-<p><b>pagination.nextPage</b><br />
-A link to the next page in the paginator relative to the current page.
-</p> 
-
-<p><b>pagination.nextPageUrl</b><br />
-The url component of pagination.nextPage broken out.
-</p> 
-
-<p><b>pagination.nextPageText</b><br />
-The text component of pagination.nextPage broken out.
-</p> 
-
-<p><b>pagination.previousPage</b><br />
-A link to the previous page in the paginator relative to the current page.
-</p> 
-
-<p><b>pagination.previousPageUrl</b><br />
-The url component of pagination.previousPage broken out.
-</p> 
-
-<p><b>pagination.previousPageText</b><br />
-The text component of pagination.previousPage broken out.
-</p> 
-
-<p><b>pagination.pageNumber</b><br />
-The current page number.
-</p> 
-
-<p><b>pagination.pageCount</b><br />
-The total number of pages.
-</p> 
-
-<p><b>pagination.pageCount.isMultiple</b><br />
-A boolean indicating whether there is more than one page.
-</p> 
-
-<p><b>pagination.pageList</b><br />
-A list of links to every page in the paginator.
-</p> 
-
-<div class="helpIndent">
-
-<p><b>pagination.pageLoop</b><br />
-Same as pagination.pageList except broken into individual elements.
-</p>
-
-<p><b>pagination.url</b><br />
-The URL of page X, where X is the number in the loop we're at.
-</p> 
-
-<p><b>pagination.text</b><br />
-The number of page X, where X is the number in the loop we're at.
-</p> 
-
-</div>
-
-
-<p><b>pagination.pageList.upTo20</b><br />
-A list of links to the 20 nearest in the paginator relative to the current page. So if you're on page 60, you'll see links for 50-70.
-</p> 
-
-<p><b>pagination.pageLoop.upTo20</b><br />
-Same as pagination.pageList.upTo20 except broken into individual elements.
-</p> 
-
-<div class="helpIndent">
-
-<p><b>pagination.url</b><br />
-The URL of page X, where X is the number in the loop we're at.
-</p> 
-
-<p><b>pagination.text</b><br />
-The number of page X, where X is the number in the loop we're at.
-</p> 
-
-</div>
-
-<p><b>pagination.pageList.upTo10</b><br />
-A list of links to the 10 nearest in the paginator relative to the current page. So if you're on page 20, you'll see links for 15-25.
-</p> 
-
-<p><b>pagination.pageLoop.upTo10</b><br />
-Same as pagination.pageList.upTo10 except broken into individual elements.
-</p> 
-
-<div class="helpIndent">
-
-<p><b>pagination.url</b><br />
-The URL of page X, where X is the number in the loop we're at.
-</p> 
-
-<p><b>pagination.text</b><br />
-The number of page X, where X is the number in the loop we're at.
-</p> 
-
-</div>
-
 |,
-		lastUpdated => 1145060787,
+		lastUpdated => 1149182066,
 	},
 
 	'701' => {

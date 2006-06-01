@@ -2,10 +2,20 @@ package WebGUI::i18n::English::Macro_a_account;
 
 our $I18N = {
 
-    'account title' => {
-        message => q|Account Macro|,
-        lastUpdated => 1112466408,
-    },
+	'account title' => {
+		message => q|Account Macro|,
+		lastUpdated => 1112466408,
+	},
+
+	'account.url' => {
+		message => q|The URL to the account page.|,
+		lastUpdated => 1149177662,
+	},
+
+	'account.text' => {
+		message => q|The translated label for the account link, or the text that you supply to the macro.|,
+		lastUpdated => 1149177662,
+	},
 
 	'account body' => {
 		message => q|
@@ -18,21 +28,13 @@ link and a template from the Macro/a_account namespace to be used to
 display the link and text.  If the <i>link text</i> is set to the word
 "linkonly" then only the URL will be returned.</p>
 
-<p>The following is a list of variables available in the template:</p>
-
-<p><b>account.url</b><br />
-The URL to the account page.
-</p>
-
-<p><b>account.text</b><br />
-The translated label for the account link, or the text that you supply to the macro.
-</p>
-
 <p><b>NOTES:</b> The .myAccountLink style sheet class is tied to this macro.
 </p>
 
+<p>The following is a list of variables available in the template:</p>
+
 |,
-		lastUpdated => 1146627819,
+		lastUpdated => 1149177708,
 	},
 
 	'46' => {

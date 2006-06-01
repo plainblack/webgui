@@ -7,6 +7,14 @@ our $HELP = {
 		body => 'account body',
 		fields => [
 		],
+		variables => [
+		          {
+		            'name' => 'account.url'
+		          },
+		          {
+		            'name' => 'account.text'
+		          }
+		],
 		related => [
 			{
 				tag => 'macros using',
