@@ -67,6 +67,11 @@ our $HELP = {
 	'cancel template' => {
 		title => 'help cancel checkout template title',
 		body => 'help cancel checkout template body',
+		variables => [
+		          {
+		            'name' => 'message'
+		          }
+		],
 		fields => [
 		],
 		related => [
@@ -82,6 +87,43 @@ our $HELP = {
 		body => 'help checkout confirm template body',
 		fields => [
 		],
+		variables => [
+		          {
+		            'name' => 'title'
+		          },
+		          {
+		            'name' => 'normalItems'
+		          },
+		          {
+		            'name' => 'normalItemLoop',
+		            'variables' => [
+		                             {
+		                               'name' => 'quantity'
+		                             },
+		                             {
+		                               'name' => 'period'
+		                             },
+		                             {
+		                               'name' => 'name'
+		                             },
+		                             {
+		                               'name' => 'price'
+		                             },
+		                             {
+		                               'name' => 'totalPrice'
+		                             }
+		                           ]
+		          },
+		          {
+		            'name' => 'recurringItems'
+		          },
+		          {
+		            'name' => 'recurringItemLoop'
+		          },
+		          {
+		            'name' => 'form'
+		          }
+		],
 		related => [
 			{
 				tag => 'template language',
@@ -95,6 +137,31 @@ our $HELP = {
 		body => 'help checkout error template body',
 		fields => [
 		],
+		variables => [
+		          {
+		            'name' => 'title',
+		          },
+		          {
+		            'name' => 'statusExplanation'
+		          },
+		          {
+		            'name' => 'resultLoop',
+		            'variables' => [
+		                             {
+		                               'name' => 'purchaseDescription'
+		                             },
+		                             {
+		                               'name' => 'status'
+		                             },
+		                             {
+		                               'name' => 'error'
+		                             },
+		                             {
+		                               'name' => 'errorCode'
+		                             }
+		                           ]
+		          }
+		],
 		related => [
 			{
 				tag => 'template language',
@@ -107,6 +174,42 @@ our $HELP = {
 		title => 'help select payment template title',
 		body => 'help select payment template body',
 		fields => [
+		],
+		variables => [
+		          {
+		            'name' => 'message',
+		            'description' => 'gateway message'
+		          },
+		          {
+		            'name' => 'pluginsAvailable'
+		          },
+		          {
+		            'name' => 'noPluginsMessage'
+		          },
+		          {
+		            'name' => 'formHeader'
+		          },
+		          {
+		            'name' => 'formFooter'
+		          },
+		          {
+		            'name' => 'formSubmit'
+		          },
+		          {
+		            'name' => 'pluginLoop',
+		            'variables' => [
+		                             {
+		                               'name' => 'name',
+		                               'description' => 'plugin name'
+		                             },
+		                             {
+		                               'name' => 'namespace'
+		                             },
+		                             {
+		                               'name' => 'formElement'
+		                             }
+		                           ]
+		          }
 		],
 		related => [
 			{
