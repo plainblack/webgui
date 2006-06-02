@@ -109,6 +109,12 @@ save you many hours of grief.
 
 6.8.0
 --------------------------------------------------------------------
+
+NOTE: If you're upgrading from MySQL 4 to 5 you MUST do a mysqldump on your
+databases from 4 and then after upgrading to 5, reimport them. If you do not
+do this your databases will become corrupted.
+
+
  * Before upgrading you must install the following new Perl modules:
 	DateTime
 	DateTime::Format::Strptime

@@ -71,75 +71,6 @@ sub _logSecurityMessage {
 }
 
 #-------------------------------------------------------------------
-
-=head2 addUserForm ( )
-
-  Creates user form elements specific to this Auth Method.
-
-=cut
-
-sub addUserForm {
-   my $self = shift;
-   my $userData = $self->getParams;
-   my $f = WebGUI::HTMLForm->new($self->session);
-	my $i18n = WebGUI::International->new($self->session);
-   $f->password(
-	name=>"authWebGUI.identifier",
-	label=>$i18n->get(51),
-	value=>"password"
-	);
-   $f->interval(
-	-name=>"authWebGUI.passwordTimeout",
-	-label=>$i18n->get(16,'AuthWebGUI'),
-	-value=>$userData->{passwordTimeout},
-	-defaultValue=>$self->session->setting->get("webguiPasswordTimeout")
-	);
-   my $userChange = $self->session->setting->get("webguiChangeUsername");
-   if($userChange || $userChange eq "0"){
-      $userChange = $userData->{changeUsername};
-   }
-   $f->yesNo(
-                -name=>"authWebGUI.changeUsername",
-                -value=>$userChange,
-                -label=>$i18n->get(21,'AuthWebGUI')
-             );
-   my $passwordChange = $self->session->setting->get("webguiChangePassword");
-   if($passwordChange || $passwordChange eq "0"){
-      $passwordChange = $userData->{changePassword};
-   }
-   $f->yesNo(
-                -name=>"authWebGUI.changePassword",
-                -value=>$passwordChange,
-                -label=>$i18n->get(20,'AuthWebGUI')
-             );
-   return $f->printRowsOnly;
-}
-
-#-------------------------------------------------------------------
-
-=head2 addUserFormSave ( )
-
-  Saves user elements unique to this authentication method
-
-=cut
-
-sub addUserFormSave {
-   my $self = shift;
-   my $properties;
-   unless ($self->session->form->process('authWebGUI.identifier') eq "password") {
-      $properties->{identifier} = Digest::MD5::md5_base64($self->session->form->process('authWebGUI.identifier'));
-   }
-   $properties->{changeUsername} = $self->session->form->process('authWebGUI.changeUsername');
-   $properties->{changePassword} = $self->session->form->process('authWebGUI.changePassword');
-   $properties->{passwordTimeout} =  $self->session->form->interval('authWebGUI.passwordTimeout');
-   $properties->{passwordLastUpdated} =$self->session->datetime->time();
-   if($self->session->setting->get("webguiExpirePasswordOnCreation")){
-      $properties->{passwordLastUpdated} =$self->session->datetime->time() - $properties->{passwordTimeout};   
-   }
-   $self->SUPER::addUserFormSave($properties);
-}
-
-#-------------------------------------------------------------------
 sub authenticate {
     my $self = shift;
 	my ($identifier, $userData, $auth);
@@ -322,7 +253,39 @@ sub displayLogin {
 
 sub editUserForm {
    my $self = shift;
-   return $self->addUserForm;
+   my $userData = $self->getParams;
+   my $f = WebGUI::HTMLForm->new($self->session);
+	my $i18n = WebGUI::International->new($self->session);
+   $f->password(
+	name=>"authWebGUI.identifier",
+	label=>$i18n->get(51),
+	value=>"password"
+	);
+   $f->interval(
+	-name=>"authWebGUI.passwordTimeout",
+	-label=>$i18n->get(16,'AuthWebGUI'),
+	-value=>$userData->{passwordTimeout},
+	-defaultValue=>$self->session->setting->get("webguiPasswordTimeout")
+	);
+   my $userChange = $self->session->setting->get("webguiChangeUsername");
+   if($userChange || $userChange eq "0"){
+      $userChange = $userData->{changeUsername};
+   }
+   $f->yesNo(
+                -name=>"authWebGUI.changeUsername",
+                -value=>$userChange,
+                -label=>$i18n->get(21,'AuthWebGUI')
+             );
+   my $passwordChange = $self->session->setting->get("webguiChangePassword");
+   if($passwordChange || $passwordChange eq "0"){
+      $passwordChange = $userData->{changePassword};
+   }
+   $f->yesNo(
+                -name=>"authWebGUI.changePassword",
+                -value=>$passwordChange,
+                -label=>$i18n->get(20,'AuthWebGUI')
+             );
+   return $f->printRowsOnly;
 }
 
 #-------------------------------------------------------------------
@@ -347,6 +310,12 @@ sub editUserFormSave {
    $properties->{passwordTimeout} = $self->session->form->interval('authWebGUI.passwordTimeout');
    $properties->{changeUsername} = $self->session->form->process('authWebGUI.changeUsername');
    $properties->{changePassword} = $self->session->form->process('authWebGUI.changePassword');
+   	if($userId eq "new") {
+   		$properties->{passwordLastUpdated} =$self->session->datetime->time();
+		if ($self->session->setting->get("webguiExpirePasswordOnCreation")){
+      			$properties->{passwordLastUpdated} =$self->session->datetime->time() - $properties->{passwordTimeout};   
+		}
+   	}
    
    $self->SUPER::editUserFormSave($properties);
 }
@@ -498,8 +467,9 @@ sub login {
    if($self->getSetting("passwordTimeout") && $userData->{passwordTimeout}){
       my $expireTime = $userData->{passwordLastUpdated} + $userData->{passwordTimeout};
       if ($self->session->datetime->time() >= $expireTime){
+		my $userId = $self->userId;
 		 $self->logout;
-   	     return $self->resetExpiredPassword($self->userId);
+   	     return $self->resetExpiredPassword($userId);
       }  
    }
       
@@ -619,19 +589,14 @@ sub resetExpiredPasswordSave {
    $error .= '<li>'.$i18n->get(12,'AuthWebGUI').'</li>' if ($self->session->form->process("oldPassword") eq $self->session->form->process("identifier"));
    $error .= $self->error if(!$self->_isValidPassword($self->session->form->process("identifier"),$self->session->form->process("identifierConfirm")));
    
-   return $self->resetExpiredPassword("<h1>".$i18n->get(70)."</h1>".$error) if($error ne "");
+   return $self->resetExpiredPassword($u->userId, "<h1>".$i18n->get(70)."</h1>".$error) if($error ne "");
    
    $properties->{identifier} = Digest::MD5::md5_base64($self->session->form->process("identifier"));
    $properties->{passwordLastUpdated} =$self->session->datetime->time();
    
    $self->saveParams($u->userId,$self->authMethod,$properties);
    $self->_logSecurityMessage();
-   
-   $msg = $self->login;
-   if($msg eq ""){
-      $msg = "<li>".$i18n->get(17,'AuthWebGUI').'</li>';
-   }
-   return $self->displayLogin($msg);
+   return $self->SUPER::login();
 }
 
 #-------------------------------------------------------------------

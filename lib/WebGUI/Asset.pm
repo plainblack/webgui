@@ -152,9 +152,9 @@ Unique hash identifier for a user. If not specified, uses current userId.
 
 sub canView {
 	my $self = shift;
-	my $userId = shift || $self->session->user->userId;
-	my $user = WebGUI::User->new($self->session, $userId);
-	return 0 unless ($self->get("state") eq "published");
+	my $userId = shift;
+	my $user =  $self->session->user;
+	$user = WebGUI::User->new($self->session, $userId) if (defined $userId);
 	if ($userId eq $self->get("ownerUserId")) {
                 return 1;
         } elsif ($user->isInGroup($self->get("groupIdView"))) {
@@ -174,19 +174,18 @@ Returns error messages if a user can't view due to publishing problems, otherwis
 
 sub checkView {
 	my $self = shift;
-	unless ($self->canView) {
-		if ($self->get("state") eq "published") { # no privileges, make em log in
-			return $self->session->privilege->noAccess();
-		} elsif ($self->session->var->get("adminOn") && $self->get("state") =~ /^trash/) { # show em trash
-			$self->session->http->setRedirect($self->getUrl("func=manageTrash"));
-			return undef;
-		} elsif ($self->session->var->get("adminOn") && $self->get("state") =~ /^clipboard/) { # show em clipboard
-			$self->session->http->setRedirect($self->getUrl("func=manageClipboard"));
-			return undef;
-		} else { # tell em it doesn't exist anymore
-			$self->session->http->setStatus("410");
-			return WebGUI::Asset->getNotFound($self->session)->www_view;
-		}
+	return $self->session->privilege->noAccess() unless $self->canView;
+	if ($self->session->var->isAdminOn && $self->get("state") =~ /^trash/) { # show em trash
+		$self->session->http->setRedirect($self->getUrl("func=manageTrash"));
+		return "redirect";
+	} elsif ($self->session->var->isAdminOn && $self->get("state") =~ /^clipboard/) { # show em clipboard
+		$self->session->http->setRedirect($self->getUrl("func=manageClipboard"));
+		return "redirect";
+	} elsif ($self->get("state") ne "published" && $self->get("state") ne "archived") { # tell em it doesn't exist anymore
+		$self->session->http->setStatus("410");
+		my $notFound = WebGUI::Asset->getNotFound($self->session);
+		$self->session->asset($notFound);
+		return $notFound->www_view;
 	}
 	$self->logView();
 	# must find a way to do this next line better
@@ -2012,7 +2011,8 @@ Returns the view() method of the asset object if the requestor canView.
 
 sub www_view {
 	my $self = shift;
-	return $self->session->privilege->noAccess() unless $self->canView;
+	my $check = $self->checkView;
+	return $check if (defined $check);
 	$self->prepareView;
 	$self->session->output->print($self->view);
 	return undef;

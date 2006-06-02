@@ -146,6 +146,51 @@ our $HELP = {
                                 description => 'enable avatars description',
                                 namespace => 'Asset_Collaboration',
                         },
+                        {
+                                title => 'get mail',
+                                description => 'get mail help',
+                                namespace => 'Asset_Collaboration',
+                        },
+                        {
+                                title => 'mail server',
+                                description => 'mail server help',
+                                namespace => 'Asset_Collaboration',
+                        },
+                        {
+                                title => 'mail account',
+                                description => 'mail account help',
+                                namespace => 'Asset_Collaboration',
+                        },
+                        {
+                                title => 'mail password',
+                                description => 'mail password help',
+                                namespace => 'Asset_Collaboration',
+                        },
+                        {
+                                title => 'mail address',
+                                description => 'mail address help',
+                                namespace => 'Asset_Collaboration',
+                        },
+                        {
+                                title => 'get mail interval',
+                                description => 'get mail interval help',
+                                namespace => 'Asset_Collaboration',
+                        },
+                        {
+                                title => 'mail prefix',
+                                description => 'mail prefix help',
+                                namespace => 'Asset_Collaboration',
+                        },
+                        {
+                                title => 'auto subscribe to thread',
+                                description => 'auto subscribe to thread help',
+                                namespace => 'Asset_Collaboration',
+                        },
+                        {
+                                title => 'require subscription for email posting',
+                                description => 'require subscription for email posting help',
+                                namespace => 'Asset_Collaboration',
+                        },
 		],
 		related => [
 			{

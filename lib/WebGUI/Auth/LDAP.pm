@@ -76,78 +76,6 @@ sub _isValidLDAPUser {
   $self->error($error);
   return $error eq "";
 }
-#-------------------------------------------------------------------
-
-=head2 addUserForm ( )
-
-  Creates user form elements specific to this Auth Method.
-
-=cut
-
-sub addUserForm {
-    my $self = shift;
-    my $userData = $self->getParams;
-	my $connection = $self->{_connection};
-    my $ldapUrl = $self->session->form->process('authLDAP_ldapUrl') || $userData->{ldapUrl} || $connection->{ldapURL};
-	my $connectDN = $self->session->form->process('authLDAP_connectDN') || $userData->{connectDN};
-	my $ldapConnection = $self->session->form->process('authLDAP_ldapConnection') || $userData->{ldapConnection};
-	my $ldapLinks = $self->session->db->buildHashRef("select ldapLinkId,ldapUrl from ldapLink");
-	my $f = WebGUI::HTMLForm->new($self->session);
-	my $jscript = "";
-	my $i18n = WebGUI::International->new($self->session,'AuthLDAP');
-	if(scalar(keys %{$ldapLinks}) > 0) {
-	   my $jsArray = "";
-	   foreach my $key (keys %{$ldapLinks}) {
-	      next unless ($key);
-	      $jsArray .= 'ldapValue["'.$key.'"]="'.$ldapLinks->{$key}.'";'."\n";
-	   }
-	   $jsArray .= 'ldapValue["0"]="'.$ldapUrl.'";'."\n";
-	   $jscript = qq|
-	   <script type="text/javascript">
-	      <!--
-	        var ldapValue = new Array();
-		    $jsArray
-	      //-->
-	   </script>|;
-	   $f->selectBox(
-	                -name=>"authLDAP_ldapConnection",
-					-label=>$i18n->get("ldapConnection"),
-					-hoverHelp=>$i18n->get("ldapConnection description"),
-					-options=>WebGUI::LDAPLink->getList($self->session,),
-					-value=>[$ldapConnection],
-					-extras=>q|onchange="this.form.authLDAP_ldapUrl.value=ldapValue[this.options[this.selectedIndex].value];"|
-				  );
-	}
-	$f->url(
-		-name => "authLDAP_ldapUrl",
-		-label => $i18n->get(3),
-		-value => $ldapUrl,
-	);
-	$f->text(
-		-name => "authLDAP_connectDN",
-		-label => $i18n->get(4),
-		-value => $connectDN,
-	);
-	$self->session->style->setRawHeadTags($jscript);
-	return $f->printRowsOnly;
-}
-
-#-------------------------------------------------------------------
-
-=head2 addUserFormSave ( )
-
-  Saves user elements unique to this authentication method
-
-=cut
-
-sub addUserFormSave {
-   my $self = shift;
-   my $properties;
-   $properties->{connectDN} = $self->session->form->process('authLDAP_connectDN');
-   $properties->{ldapUrl} = $self->session->form->process('authLDAP_ldapUrl');
-   $properties->{ldapConnection} = $self->session->form->process('authLDAP_ldapConnection');
-   $self->SUPER::addUserFormSave($properties); 
-}
 
 #-------------------------------------------------------------------
 sub authenticate {
@@ -335,7 +263,50 @@ sub displayLogin {
 
 sub editUserForm {
    my $self = shift;
-   return $self->addUserForm;  
+    my $userData = $self->getParams;
+	my $connection = $self->{_connection};
+    my $ldapUrl = $self->session->form->process('authLDAP_ldapUrl') || $userData->{ldapUrl} || $connection->{ldapURL};
+	my $connectDN = $self->session->form->process('authLDAP_connectDN') || $userData->{connectDN};
+	my $ldapConnection = $self->session->form->process('authLDAP_ldapConnection') || $userData->{ldapConnection};
+	my $ldapLinks = $self->session->db->buildHashRef("select ldapLinkId,ldapUrl from ldapLink");
+	my $f = WebGUI::HTMLForm->new($self->session);
+	my $jscript = "";
+	my $i18n = WebGUI::International->new($self->session,'AuthLDAP');
+	if(scalar(keys %{$ldapLinks}) > 0) {
+	   my $jsArray = "";
+	   foreach my $key (keys %{$ldapLinks}) {
+	      next unless ($key);
+	      $jsArray .= 'ldapValue["'.$key.'"]="'.$ldapLinks->{$key}.'";'."\n";
+	   }
+	   $jsArray .= 'ldapValue["0"]="'.$ldapUrl.'";'."\n";
+	   $jscript = qq|
+	   <script type="text/javascript">
+	      <!--
+	        var ldapValue = new Array();
+		    $jsArray
+	      //-->
+	   </script>|;
+	   $f->selectBox(
+	                -name=>"authLDAP_ldapConnection",
+					-label=>$i18n->get("ldapConnection"),
+					-hoverHelp=>$i18n->get("ldapConnection description"),
+					-options=>WebGUI::LDAPLink->getList($self->session,),
+					-value=>[$ldapConnection],
+					-extras=>q|onchange="this.form.authLDAP_ldapUrl.value=ldapValue[this.options[this.selectedIndex].value];"|
+				  );
+	}
+	$f->url(
+		-name => "authLDAP_ldapUrl",
+		-label => $i18n->get(3),
+		-value => $ldapUrl,
+	);
+	$f->text(
+		-name => "authLDAP_connectDN",
+		-label => $i18n->get(4),
+		-value => $connectDN,
+	);
+	$self->session->style->setRawHeadTags($jscript);
+	return $f->printRowsOnly;
 }
 
 #-------------------------------------------------------------------
@@ -348,7 +319,11 @@ sub editUserForm {
 
 sub editUserFormSave {
    my $self = shift;
-   return $self->addUserFormSave;
+   my $properties;
+   $properties->{connectDN} = $self->session->form->process('authLDAP_connectDN');
+   $properties->{ldapUrl} = $self->session->form->process('authLDAP_ldapUrl');
+   $properties->{ldapConnection} = $self->session->form->process('authLDAP_ldapConnection');
+   $self->SUPER::editUserFormSave($properties); 
 }
 
 #-------------------------------------------------------------------

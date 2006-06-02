@@ -531,18 +531,10 @@ sub www_emailGroup {
 sub www_emailGroupSend {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3) || _hasSecondaryPrivilege($session,$session->form->process("gid")));
-	my ($sth, $email);
-	$sth = $session->db->read("select b.fieldData from groupings a left join userProfileData b 
-		on a.userId=b.userId and b.fieldName='email' where a.groupId=".$session->db->quote($session->form->process("gid")));
-	while (($email) = $sth->array) {
-		if ($email ne "") {
-			my $mail = WebGUI::Mail::Send->create($session, {to=>$email,subject=>$session->form->process("subject"),from=>$session->form->process("from")});
-			$mail->addHtml($session->form->process("message","HTMLArea"));
-			$mail->addFooter;
-			$mail->queue;
-		}
-	}
-	$sth->finish;
+	my $mail = WebGUI::Mail::Send->create($session, {toGroup=>$session->form->process("gid"),subject=>$session->form->process("subject"),from=>$session->form->process("from")});
+	$mail->addHtml($session->form->process("message","HTMLArea"));
+	$mail->addFooter;
+	$mail->queue;
 	my $i18n = WebGUI::International->new($session);
 	return _submenu($session,$i18n->get(812));
 }

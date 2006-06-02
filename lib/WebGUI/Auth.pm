@@ -97,30 +97,6 @@ sub _logLogin {
 	.$self->session->db->quote($self->session->env->get("REMOTE_ADDR")).",".$self->session->db->quote($self->session->env->get("HTTP_USER_AGENT")).")");
 }
 
-#-------------------------------------------------------------------
-
-=head2 addUserForm ( userId )
-
-Creates elements for the add user form specific to this Authentication Method.
-
-=cut
-
-sub addUserForm {
-	#Added for interface purposes only.  Needs to be implemented in the subclass.
-}
-
-#-------------------------------------------------------------------
-
-=head2 addUserFormSave ( properties [,userId] )
-
-Saves user elements unique to this authentication method
-
-=cut
-
-sub addUserFormSave {
-	my $self = shift;
-	$self->saveParams(($_[1] || $self->userId),$self->authMethod,$_[0]);
-}
 
 #-------------------------------------------------------------------
 

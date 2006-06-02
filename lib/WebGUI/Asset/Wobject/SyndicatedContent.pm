@@ -562,7 +562,11 @@ sub view {
 	}
         my $maxHeadlines = $self->get('maxHeadlines') || 1000000;
         my @urls = split(/\s+/,$self->get('rssUrl'));
-	return $self->processTemplate({},$self->get('templateId')) unless (scalar(@urls));
+	my @validatedUrls = ();
+	foreach my $url (@urls) {
+		push(@validatedUrls, $url) if ($url =~ m/^http/);
+	}
+	return $self->processTemplate({},$self->get('templateId')) unless (scalar(@validatedUrls));
 	my $title=$self->get('title');
 
 	#We came into this subroutine as
@@ -570,7 +574,7 @@ sub view {
 
         my %var;
 	
-	my($item_loop,$rss_feeds)=$self->_get_items(\@urls, $maxHeadlines);
+	my($item_loop,$rss_feeds)=$self->_get_items(\@validatedUrls, $maxHeadlines);
 	if(@$rss_feeds > 1){
 	    #If there is more than one (valid) feed in this wobject, put in the wobject description info.
 	    $var{'channel.title'} = $title;

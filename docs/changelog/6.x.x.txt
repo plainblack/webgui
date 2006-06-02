@@ -35,6 +35,13 @@
  - fix: Reply count off when restoring from trash
  - fix: Karma not spent properly
  - fix: Avatar Message Board Template Not Working
+ - Added a check to Syndicated Content asset to throw out urls that are not
+   fully qualified.
+ - fix: Deleted items are still partially accessible.
+ - fix: Help is missing style
+ - fix: Setting expire password on user creation does nothing
+ - fix: Collaboration settings in help
+ - Lots of template fixes.
  - fixed another Events Calendar bug
  - added template variable 'owner' for Events Calendar templates
 

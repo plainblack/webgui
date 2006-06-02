@@ -256,6 +256,7 @@ sub www_viewHelp {
 	my $session = shift;
 	return $session->privilege->insufficient() unless ($session->user->isInGroup(7));
 	my $ac = WebGUI::AdminConsole->new($session,"help");
+	$session->style->setLink($session->url->extras("/help.css"), {rel=>"stylesheet", type=>"text/css"});
 	my $namespace = $session->form->process("namespace","className") || "WebGUI";
         my $i18n = WebGUI::International->new($session, $namespace);
 	my $help = _get($session,$session->form->process("hid"),$namespace);

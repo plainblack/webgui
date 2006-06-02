@@ -294,7 +294,7 @@ sub view {
 		}
 	}
         $var{description} = $self->get("description");
-	$var{"new.template"} = $self->getUrl.";overrideTemplateId=";
+	$var{"new.template"} = $self->getUrl("func=view").";overrideTemplateId=";
 	$var{"description.full"} = $var{description};
 	$var{"description.full"} =~ s/\^\-\;//g;
 	$var{"description.first.100words"} = $var{"description.full"};
