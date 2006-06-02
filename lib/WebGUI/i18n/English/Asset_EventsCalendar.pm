@@ -12,6 +12,11 @@ our $I18N = {
 		lastUpdated => 1146456063
 		},
 
+	'today' => {
+		message => q|Today|,
+		lastUpdated => 0
+	},
+
 	'january' => {
 		message => q|January|,
 		lastUpdated => 1133711787
@@ -55,13 +60,15 @@ our $I18N = {
 <dd>The calendar will start at whatever the earliest date in the calendar is.</dd>
 <dt>Now!</dt>
 <dd>The calendar will start on the current date and time.  It will advance and not show events that have already passed.</dd>
+<dt>Today</dt>
+<dd>The calendar will start on the begin of the current date.</dd>
 <dt>Current</dt>
 <dd>The calendar will always start on the current month.  It is similar to "Now!" but advances from month to month.  This allows events in the current month that have passed to still be displayed.</dd>
 <dt>January</dt>
 <dd>The calendar will always start on January of the current year.</dd>
 </dl>
 </div>|,
-                lastUpdated => 1129668992,
+                lastUpdated => 1148169600,
         },
 
         '84 description' => {
@@ -397,6 +404,10 @@ The length of this event in days.
 The URL to view this event in detail.
 </p>
 
+<p><b>owner</b><br />
+The username of the owner of the event.
+</p>
+
 </div>
 
 <p><b>url</b><br />
@@ -440,7 +451,7 @@ The 4 digit year in the current month of the month_loop.
 </div>
 
 |,
-		lastUpdated => 1146775609
+		lastUpdated => 1149238798
 	},
 
           '509' => {

@@ -89,24 +89,24 @@ sub definition {
 
 
 #-------------------------------------------------------------------
-
-=head2 epochToArray ( epoch )
-
-Returns an array date. 
-
-=head3 epoch
-
-The number of seconds since January 1, 1970.
-
-=cut
-
-sub epochToArray {
-	my $self = shift;
-	my $timeZone = $self->session->user->profileField("timeZone") || "America/Chicago";
-	use DateTime;
-	return map {$_ += 0} split / /, DateTime->from_epoch( epoch =>shift, time_zone=>$timeZone)->strftime("%Y %m %d %H %M %S");
-}
-
+#
+#=head2 epochToArray ( epoch )
+#
+#Returns an array date. 
+#
+#=head3 epoch
+#
+#The number of seconds since January 1, 1970.
+#
+#=cut
+#
+#sub epochToArray {
+#	my $self = shift;
+#	my $timeZone = $self->session->user->profileField("timeZone") || "America/Chicago";
+#	use DateTime;
+#	return map {$_ += 0} split / /, DateTime->from_epoch( epoch =>shift, time_zone=>$timeZone)->strftime("%Y %m %d %H %M %S");
+#}
+#
 
 
 #-------------------------------------------------------------------
@@ -152,6 +152,7 @@ sub getEditForm {
 		-options=>{
 			"january"=>$i18n->get('january'),
 			"now"=>$i18n->get(98),
+			"today"=>$i18n->get('today'),
 			"current"=>$i18n->get(82),
 			"first"=>$i18n->get(83)
 		},
@@ -217,7 +218,7 @@ sub prepareView {
 
 #-------------------------------------------------------------------
 
-=head2 purgeCache ()
+=head2 purgeCache ( )
 
 See WebGUI::Asset::purgeCache() for details.
 
@@ -329,6 +330,7 @@ sub view {
 
 	# Filter events
 	my %filteredEvents;
+	my %userNames;
 	my $previousDate;
 	foreach my $event (@sortedEvents) {
 		# ignore events we're not allowed to see
@@ -357,9 +359,17 @@ sub view {
 			$daysInEvent++;
 		}
 		# add event to each day it takes place
-		for (my $day = $firstDay; $day <= $lastDay; $day = $dt->addToDate($day, 0, 0, 1)) {
-			next if ($day < $minDate);
-			next if ($day > $maxDate);
+		my $firstViewableDay = $firstDay;
+		my $lastViewableDay = $lastDay;
+		($firstViewableDay, $dummy) = $dt->dayStartEnd($minDate) if ($firstViewableDay < $minDate);
+		($lastViewableDay, $dummy) = $dt->dayStartEnd($maxDate) if ($lastViewableDay > $maxDate);
+		my $ownerUserId = $event->get('ownerUserId');
+		unless ($userNames{$ownerUserId}) {
+			my $owner = WebGUI::User->new($session, $ownerUserId);
+			$userNames{$ownerUserId} = $owner->username();
+		}
+		my $ownerName = $userNames{$ownerUserId};
+		for (my $day = $firstViewableDay; $day <= $lastViewableDay; $day = $dt->addToDate($day, 0, 0, 1)) {
 			push (@{$filteredEvents{$day}}, {
 				'description'          => $event->get('description'),
 				'name'                 => $event->get('title'),
@@ -383,7 +393,8 @@ sub view {
 				'isFirstDayOfEvent'    => $day == $firstDay,
 				'dateIsSameAsPrevious' => "$firstDay-$lastDay" eq $previousDate,
 				'daysInEvent'          => $daysInEvent,
-				'url'                  => $event->getUrl()
+				'url'                  => $event->getUrl(),
+				'owner'                => $ownerName
 			});
 		}
 		$previousDate = "$firstDay-$lastDay";
@@ -522,8 +533,8 @@ sub view {
 	$var{'pagination.nextPageUrl'} = $self->getUrl.'?calMonthEnd='.$calMonthStart+$monthRangeLength.';calMonthEnd='.$calMonthEnd+$monthRangeLength;
 	$var{'pagination.nextPage'} = '<a href="'.$self->getUrl.'?calMonthStart='.($calMonthStart+$monthRangeLength).';calMonthEnd='.($calMonthEnd+$monthRangeLength).'">'.$i18n->get(559).' '.$monthRangeLength.' '.$monthLabel.'</a>';
 	$var{'pagination.pageList.upTo20'} = '
-	<form method="GET" style="display: inline;" action="'.$self->getUrl.'">
-	<input type="hidden" name="calMonthStart" value="'.$calMonthStart.'">
+	<form method="get" style="display: inline;" action="'.$self->getUrl.'">
+	<input type="hidden" name="calMonthStart" value="'.$calMonthStart.'" />
 	<select size="1" name="calMonthEnd">
 	<option value="'.($calMonthStart).'">1 '.$i18n->get(560).'</option>
 	<option value="'.(1+$calMonthStart).'">2 '.$i18n->get(561).'</option>
@@ -552,7 +563,7 @@ sub view {
 
 #-------------------------------------------------------------------
 
-=head2 www_view ()
+=head2 www_view ( )
 
 See WebGUI::Asset::Wobject::www_view() for details.
 
