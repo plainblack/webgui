@@ -12,6 +12,16 @@ our $I18N = {
         lastUpdated => 1112466408,
     },
 
+	'toggle.url' => {
+		message => q|The URL to activate or deactivate Admin mode.|,
+		lastUpdated => 1149218423,
+	},
+
+	'toggle.text' => {
+		message => q|The Internationalized label for turning on or off Admin (depending on the state of the macro), or the text that you supply to the macro.|,
+		lastUpdated => 1149218423,
+	},
+
 	'editable toggle body' => {
 		message => q|
 <p><b>&#94;EditableToggle; or &#94;EditableToggle();</b><br />
@@ -21,15 +31,8 @@ Exactly the same as AdminToggle, except that the toggle is only displayed if the
 <p>The following variables are available in the template:
 </p>
 
-<p><b>toggle.url</b><br />
-The URL to activate or deactivate Admin mode.
-</p>
-
-<p><b>toggle.text</b><br />
-The Internationalized label for turning on or off Admin (depending on the state of the macro), or the text that you supply to the macro.
-</p>
 |,
-		lastUpdated => 1146679223,
+		lastUpdated => 1149218452,
 	},
 
 	'516' => {

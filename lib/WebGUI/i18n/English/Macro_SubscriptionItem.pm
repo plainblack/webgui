@@ -12,6 +12,26 @@ our $I18N = {
 		lastUpdated => 1112547248,
 	},
 
+	'url' => {
+		message => q|The URL to purchase a subscription to this item.|,
+		lastUpdated => 1149217400,
+	},
+
+	'name' => {
+		message => q|The name of the item.|,
+		lastUpdated => 1149217400,
+	},
+
+	'description' => {
+		message => q|The description of the item.|,
+		lastUpdated => 1149217400,
+	},
+
+	'price' => {
+		message => q|The price of the item.|,
+		lastUpdated => 1149217400,
+	},
+
 	'subscription item body' => {
 		message => q|
 
@@ -22,25 +42,8 @@ template to use instead of the default template, specified by a template Id
 from the Macro/SubscriptionItem namespace.</p>
 
 <p>These variables are available in the template:</p>
-
-<p><b>url</b><br />
-The URL to purchase a subscription to this item.
-</p>
-
-<p><b>name</b><br />
-The name of the item.
-</p>
-
-<p><b>description</b><br />
-The description of the item.
-</p>
-
-<p><b>price</b><br />
-The price of the item.
-</p>
-
 |,
-		lastUpdated => 1146607323,
+		lastUpdated => 1149217429,
 	},
 };
 

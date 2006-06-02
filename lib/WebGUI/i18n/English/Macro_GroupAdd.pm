@@ -11,20 +11,22 @@ our $I18N = {
 		message => q|Group Add Macro|,
 		lastUpdated => 1112466408,
 	},
+	'group.url' => {
+		message => q|The URL with the action to add the user to the group.|,
+		lastUpdated => 1149218343,
+	},
+
+	'group.text' => {
+		message => q|The supplied text string for the user to click on.|,
+		lastUpdated => 1149218343,
+	},
+
 
 	'group add body' => {
 		message => q|
 
 <p><b>&#94;GroupAdd();</b><br />
-Using this macro you can allow users to add themselves to a group. The first parameter is the name of the group this user should be added to. The second parameter is a text string for the user to click on to add themselves to this group. The third parameter allows you to specify the name of a template in the Macro/GroupAdd namespace to replace the default template.  These variables are available in the template:</p>
-
-<p><b>group.url</b><br />
-The URL with the action to add the user to the group.
-</p>
-
-<p><b>group.text</b><br />
-The supplied text string for the user to click on.
-</p>
+Using this macro you can allow users to add themselves to a group. The first parameter is the name of the group this user should be added to. The second parameter is a text string for the user to click on to add themselves to this group. The third parameter allows you to specify the name of a template in the Macro/GroupAdd namespace to replace the default template.</p>
 
 <p><b>NOTE:</b> All these conditions must be met for the link to be displayed:
 </p>
@@ -37,8 +39,11 @@ The supplied text string for the user to click on.
 <li>The group must be set up to allow auto adds.</li>
 </ul>
 </div>
+
+<p>These variables are available in the template:</p>
+ 
 |,
-		lastUpdated => 1146679385,
+		lastUpdated => 1149218365,
 	},
 };
 

@@ -5,6 +5,14 @@ our $HELP = {
         'printable' => {
 		title => 'printable title',
 		body => 'printable body',
+		variables => [
+		          {
+		            'name' => 'printable.url'
+		          },
+		          {
+		            'name' => 'printable.text'
+		          }
+		],
 		fields => [
 		],
 		related => [

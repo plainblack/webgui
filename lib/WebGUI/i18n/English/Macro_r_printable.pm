@@ -12,6 +12,16 @@ our $I18N = {
 		lastUpdated => 1112503983,
 	},
 
+	'printable.url' => {
+		message => q|The URL to make the page printable.|,
+		lastUpdated => 1149217459,
+	},
+
+	'printable.text' => {
+		message => q|The translated label for the printable link, or the text that you supply to the macro.|,
+		lastUpdated => 1149217459,
+	},
+
 	'printable body' => {
 		message => q|
 <p><b>&#94;r(<i>link text</i>)</b><br />
@@ -28,19 +38,11 @@ Creates a link to alter the style from a page to make it printable.
 
 <p>The third argument allows a different template be used to generate the HTML code for presenting the link and text, by specifying the name of the template.  The following variables are available in the template:</p>
 
-<p><b>printable.url</b><br />
-The URL to make the page printable.
-</p>
-
-<p><b>printable.text</b><br />
-The translated label for the printable link, or the text that you supply to the macro.
-</p>
-
 <p><b>NOTES:</b>The <i>.makePrintableLink</i> style sheet class is tied to the default template for this macro.
 </p>
 
 |,
-		lastUpdated => 1146760682,
+		lastUpdated => 1149217505,
 	},
 
 	'53' => {
