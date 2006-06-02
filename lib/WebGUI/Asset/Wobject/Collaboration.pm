@@ -577,7 +577,7 @@ sub getEditForm {
                 );
         $tabform->getTab("display")->template(
                 -name=>"searchTemplateId",
-                -value=>$self->getValue("SearchTemplateId"),
+                -value=>$self->getValue("searchTemplateId"),
                 -namespace=>"Collaboration/Search",
 		-label=>$i18n->get('search template'),
 		-hoverHelp=>$i18n->get('search template description'),
