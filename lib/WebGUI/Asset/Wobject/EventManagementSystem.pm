@@ -1922,6 +1922,8 @@ sub www_managePurchases {
 		push(@purchasesLoop,$purchase);
 	}
 	$var{managePurchasesTitle} = $i18n->get('manage purchases');
+	$var{'purchaseId.label'} = $i18n->echo('Purchase Id');
+	$var{'datePurchasedHuman.label'} = $i18n->echo('Purchase Date');
 	$sth->finish;
 	$var{'purchasesLoop'} = \@purchasesLoop;
 
@@ -3033,6 +3035,10 @@ sub www_search {
 	$var{'price.label'} = $i18n->get("price");
 	$var{'seats.label'} = $i18n->get("seats available");
 	$var{'addToBadgeMessage'} = $addToBadgeMessage;
+	$var{'manageRegistrants'} = $self->getUrl("func=manageRegistrants");
+	$var{'emptyCart.url'} = $self->getUrl("func=emptyCart");
+	$var{'checkout.url'} = $self->getUrl("func=checkout");
+	
 
 	$self->buildMenu(\%var);
 	$var{'ems.wobject.dir'} = $self->session->url->extras("wobject/EventManagementSystem");
@@ -3102,8 +3108,7 @@ sub view {
 
 	  push (@events, {'event' => $self->processTemplate(\%eventFields, $event->{'templateId'}) });	  
 	} 
-	$var{'checkout.url'} = $self->getUrl('op=viewCart');			
-
+	$var{'checkout.url'} = $self->getUrl('func=checkout');			
 	$var{'checkout.label'} = $i18n->get('checkout');
 	$var{'events_loop'} = \@events;
 	$var{'paginateBar'} = $p->getBarTraditional;
@@ -3112,6 +3117,10 @@ sub view {
 	$var{'managePurchases.url'} = $self->getUrl('func=managePurchases');
 	$var{'managePurchases.label'} = $i18n->get('manage purchases');
 	$var{'canManageEvents'} = $self->canApproveEvents;
+	$var{'manageRegistrants.url'} = $self->getUrl("func=manageRegistrants");
+	$var{'emptyCart.url'} = $self=>getUrl("func=emptyCart");
+
+	
 	$p->appendTemplateVars(\%var);
 
 #	my $templateId = $self->get("displayTemplateId");
