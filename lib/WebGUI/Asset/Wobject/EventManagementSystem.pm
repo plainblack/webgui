@@ -1407,6 +1407,8 @@ sub addCartVars {
 		}
 		$purchase->{editIcon} = $self->session->icon->edit("func=addEventsToBadge;bid=".$purchase->{badgeId}.";purchaseCounter=".$i, $self->getUrl());
 		$purchase->{deleteIcon} = $self->session->icon->delete("func=addEventsToBadge;bid=none;purchaseCounter=".$i,$self->getUrl,$i18n->get('confirm delete purchase'));
+		$purchase->{'edit.url'} = $self->getUrl("func=addEventsToBadge;bid=".$purchase->{badgeId}.";purchaseCounter=".$i);
+		$purchase->{'delete.url'} = $self->getUrl("func=addEventsToBadge;bid=none;purchaseCounter=".$i);
 		push(@{$var->{'cart.purchaseLoop'}},$purchase);
 	}
 	$var->{'checkoutUrl'} = $self->getUrl("func=checkout");
@@ -3118,7 +3120,7 @@ sub view {
 	$var{'managePurchases.label'} = $i18n->get('manage purchases');
 	$var{'canManageEvents'} = $self->canApproveEvents;
 	$var{'manageRegistrants.url'} = $self->getUrl("func=manageRegistrants");
-	$var{'emptyCart.url'} = $self=>getUrl("func=emptyCart");
+	$var{'emptyCart.url'} = $self->getUrl("func=emptyCart");
 
 	
 	$p->appendTemplateVars(\%var);

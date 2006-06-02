@@ -44,7 +44,7 @@
  - Lots of template fixes.
  - fixed another Events Calendar bug
  - added template variable 'owner' for Events Calendar templates
-
+ - added template variables to the EventManagementSystem
 
 6.99.2
  - fix - demo.plainblack.com getting started
