@@ -374,7 +374,7 @@ our $I18N = { ##hashref of hashes
 	},
 
 	'add to cart' => {
-		message => q|Add To Cart|,
+		message => q|Add To Badge|,
 		lastUpdated => 1140466438,
 		context => q|Label to invite the user to purchase this event and add it to their shopping cart.|,
 	},

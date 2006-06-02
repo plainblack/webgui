@@ -11,7 +11,6 @@
 <tmpl_if purchasesLoop>
 	<tmpl_loop purchasesLoop>
 	<tr<tmpl_unless __ODD__> class="evenRow"<tmpl_else> class="oddRow"</tmpl_unless>>
-		<td><strong><tmpl_var __COUNT__></strong></td>
 		<td>&nbsp;<a href="<tmpl_var purchaseUrl>"><tmpl_var purchaseId></a></td>
 		<td>&nbsp;<tmpl_var datePurchasedHuman></td>
 	</tr>

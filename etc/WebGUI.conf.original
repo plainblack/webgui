@@ -120,7 +120,7 @@
 # List the merchant gateways you have installed and wish to be
 # available on this site.
 
-"paymentPlugins" : ["ITransact"],
+"paymentPlugins" : ["ITransact","Cash"],
 
 # List the shipping plugins you have installed and wish to be
 # available for configuration on the site.

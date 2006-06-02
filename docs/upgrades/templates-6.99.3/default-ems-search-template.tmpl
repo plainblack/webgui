@@ -59,8 +59,8 @@
 				
 				<tr>
 					<td style="width:43%;text-align:left;"><tmpl_var title></td>
-					<td style="width:42%;text-align:right;">^D("%W %Z",<tmpl_var startDate>);</td>
-					<td style="width:15%;text-align:right;"><tmpl_if removeEventFromBadge.url><a href="<tmpl_var removeEventFromBadge.url>">Remove</a></tmpl_if></td>
+					<td style="width:40%;text-align:right;">^D("%W %Z",<tmpl_var startDate>);</td>
+					<td style="width:17%;text-align:right;"><tmpl_if removeEventFromBadge.url><a href="<tmpl_var removeEventFromBadge.url>">Remove</a></tmpl_if></td>
 				</tr>
 				
 				</tbody>
@@ -290,10 +290,10 @@ eval("page" + id + " = window.open(URL, '" + id + "', 'toolbar=0,scrollbars=1,lo
 <ul>
 <tmpl_if canManageEvents>
    <li><a href="<tmpl_var addEvent.url>"><tmpl_var addEvent.label></a></li>
-   <li><a href="<tmpl_var manageRegistrants.url>"></a> Manage Registrants (Event Directors and Staff)</li>
+   <li><a href="<tmpl_var manageRegistrants>">Manage Registrants</a> (Event Directors and Staff)</li>
    <li><a href="<tmpl_var manageEvents.url>">Manage Events</a> (Event Directors and Staff)</li></tmpl_if>
 <tmpl_unless badgeSelected>
-   <li><a href="<tmpl_var view.url>">Return To Badge List to begin a badge purchase</a></li></tmpl_unless>
+   <li><a href="^PageUrl;">Return To Badge List to begin a badge purchase</a></li></tmpl_unless>
 </ul>
 
 <tmpl_if badgeSelected>
