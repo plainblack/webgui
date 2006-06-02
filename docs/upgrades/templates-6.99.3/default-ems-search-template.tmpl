@@ -362,7 +362,7 @@ eval("page" + id + " = window.open(URL, '" + id + "', 'toolbar=0,scrollbars=1,lo
 <p><span style="font-style: italic; font-weight: bold">Basic Search</span> - This is the events search screen. There is a basic search box which allows you to search by event number, event title, and event description.
 
 <p><span style="font-style: italic; font-weight: bold">Advanced Search</span> - Click on <span style="color: blue">Advanced Search</span> and you will see a pull-down list appear in the search area. Select which event characteristic you would like to search by and then in the next drop-down box specify what type of search to do (equals, contains, is not, not like, starts with, ends with). Most searches will likely be "<span style="font-style: italic;">contains</span>."
-<p><a href="javascript:popUp('https://events.originsgames.com/home/more-tips')">More tips...</a></p>
+
 <table width="100%" border="0" cellpadding="1" style="border-bottom:double gray 5px;border-top:solid gray 1px;margin-bottom:5px;margin-top:5px;">
    <tbody id="filterbody">
    <tr>
@@ -431,13 +431,11 @@ eval("page" + id + " = window.open(URL, '" + id + "', 'toolbar=0,scrollbars=1,lo
   </td><tmpl_if badgeSelected>
     <td style="text-align: center;">
       <tmpl_if canManageEvents>
-        <a href="<tmpl_var purchase.url>">^AssetProxy(media/icons/icon-cart_available.png);</a><br />
-        <tmpl_else>
-          <tmpl_unless eventIsFull>
-            <a href="<tmpl_var purchase.url>">^AssetProxy(media/icons/icon-cart_available.png);</a><br />
-            <tmpl_else>
-            ^AssetProxy(media/icons/icon-sold_out.png);<br />
-          </tmpl_unless>
+		<tmpl_unless eventIsFull>
+			<a href="<tmpl_var purchase.url>"><tmpl_var purchase.label></a>
+		<tmpl_else>
+			<tmpl_var purchase.label>
+		</tmpl_unless>
       </tmpl_if>
   </td>
     </tmpl_if></tr>
