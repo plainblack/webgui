@@ -52,64 +52,72 @@ our $I18N = {
 		lastUpdated => 1039450730
 	},
 
+	'login.form.header' => {
+		message => q|The required form elements that go at the top of the login page.|,
+		lastUpdated => 1149219946,
+	},
+
+	'login.form.hidden' => {
+		message => q|Hidden form fields required for form submission.|,
+		lastUpdated => 1149219946,
+	},
+
+	'login.form.footer' => {
+		message => q|The required form elements that go after the login page form.|,
+		lastUpdated => 1149219946,
+	},
+
+	'login.form.submit' => {
+		message => q|The default submit button for the login form.|,
+		lastUpdated => 1149219946,
+	},
+
+	'login.form.username' => {
+		message => q|Default username form field.|,
+		lastUpdated => 1149219946,
+	},
+
+	'login.form.username.label' => {
+		message => q|Default text for username form field.|,
+		lastUpdated => 1149219946,
+	},
+
+	'login.form.password' => {
+		message => q|Default password form field.|,
+		lastUpdated => 1149219946,
+	},
+
+	'login.form.password.label' => {
+		message => q|Default text for password form field.|,
+		lastUpdated => 1149219946,
+	},
+
+	'login.message' => {
+		message => q|Any message returned by the system.  Usually displays after the form is submitted.|,
+		lastUpdated => 1149219946,
+	},
+
+	'anonymousRegistration.isAllowed' => {
+		message => q|Flag indicating whether or not anonymous registrations are allowed.|,
+		lastUpdated => 1149219946,
+	},
+
+	'createAccount.url' => {
+		message => q|URL for the anonymous registration page.|,
+		lastUpdated => 1149219946,
+	},
+
+	'createAccount.label' => {
+		message => q|Default label for the anonymous registration link.|,
+		lastUpdated => 1149219946,
+	},
+
+
 	'auth login template body' => {
 		message => q|<p>The following template variables are available for LDAP Authentication Login templates.
 </p>
-
-<p><b>login.form.header</b><br />
-The required form elements that go at the top of the login page.
-</p>
-
-<p><b>login.form.hidden</b><br />
-Hidden form fields required for form submission.
-</p>
-
-<p><b>login.form.footer</b><br />
-The required form elements that go after the login page form.
-</p>
-
-<p><b>login.form.submit</b><br />
-The default submit button for the login form.
-</p>
-
-<p><b>login.form.username</b><br />
-Default username form field.
-</p>
-
-<p><b>login.form.username.label</b><br />
-Default text for username form field.
-</p>
-
-<p><b>login.form.password</b><br />
-Default password form field.
-</p>
-
-<p><b>login.form.password.label</b><br />
-Default text for password form field.
-</p>
-
-<p><b>title</b><br />
-Default page title.
-</p>
-
-<p><b>login.message</b><br />
-Any message returned by the system.  Usually displays after the form is submitted.
-</p>
-
-<p><b>anonymousRegistration.isAllowed</b><br />
-Flag indicating whether or not anonymous registrations are allowed.
-</p>
-
-<p><b>createAccount.url</b><br />
-URL for the anonymous registration page.
-</p>
-
-<p><b>createAccount.label</b><br />
-Default label for the anonymous registration link.
-</p>
-
 |,
-		lastUpdated => 1101771743
+		lastUpdated => 1149220017
 	},
 
 	'13' => {
@@ -157,31 +165,35 @@ Default label for the anonymous registration link.
 		lastUpdated => 1031514049
 	},
 
+	'account.form.karma' => {
+		message => q|A read only form property displaying the amount of karma a user has.  Karma is a configurable user setting that is turned off by default.|,
+		lastUpdated => 1149219846,
+	},
+
+	'account.form.karma.label' => {
+		message => q|Internationalized text label for the karma form value.|,
+		lastUpdated => 1149219846,
+	},
+
+	'account.options' => {
+		message => q|Links list of options which allow users to turn on Admin, view and edit profile, view the inbox, etc.|,
+		lastUpdated => 1149219846,
+	},
+
+	'displayTitle' => {
+		message => q|Page title.|,
+		lastUpdated => 1149219846,
+	},
+
+	'account.message' => {
+		message => q|Any message returned by the system.  Usually displays after the form is submitted.|,
+		lastUpdated => 1149219846,
+	},
+
 	'display account template body' => {
 		message => q|<p>The following template variables are available for the LDAP Authentication Display Account templates.</p>
-
-<p><b>account.form.karma</b><br />
-A read only form property displaying the amount of karma a user has.  Karma is a configurable user setting that is turned off by default.
-</p>
-
-<p><b>account.form.karma.label</b><br />
-Internationalized text label for the karma form value.
-</p>
-
-<p><b>account.options</b><br />
-Links list of options which allow users to turn on Admin, view and edit profile, view the inbox, etc.
-</p>
-
-<p><b>displayTitle</b><br />
-Page title.
-</p>
-
-<p><b>account.message</b><br />
-Any message returned by the system.  Usually displays after the form is submitted.
-</p>
-
 |,
-		lastUpdated => 1146804908
+		lastUpdated => 1149219877
 	},
 
 	'10' => {
@@ -189,75 +201,85 @@ Any message returned by the system.  Usually displays after the form is submitte
 		lastUpdated => 1071845113
 	},
 
+	'create.form.header' => {
+		message => q|The required form elements that go at the top of the anonymous registration page.|,
+		lastUpdated => 1149219898,
+	},
+
+	'create.form.hidden' => {
+		message => q|Hidden form fields required for form submittal.|,
+		lastUpdated => 1149219898,
+	},
+
+	'create.form.footer' => {
+		message => q|The required form elements that go after the anonymous registration page form. |,
+		lastUpdated => 1149219898,
+	},
+
+	'create.form.submit' => {
+		message => q|The default submit button for the anonymous registration form.|,
+		lastUpdated => 1149219898,
+	},
+
+	'title' => {
+		message => q|Default page title.|,
+		lastUpdated => 1149219898,
+	},
+
+	'create.form.profile' => {
+		message => q|A loop containing visible and required profile fields for registration.|,
+		lastUpdated => 1149219898,
+	},
+
+	'profile.formElement' => {
+		message => q|Form element for visible or required profile field.|,
+		lastUpdated => 1149219898,
+	},
+
+	'profile.formElement.label' => {
+		message => q|Default text label for profile form element.|,
+		lastUpdated => 1149219898,
+	},
+
+	'login.url' => {
+		message => q|URL for the login page.|,
+		lastUpdated => 1149219898,
+	},
+
+	'login.label' => {
+		message => q|Default text label for login page link.|,
+		lastUpdated => 1149219898,
+	},
+
+	'create.message' => {
+		message => q|Any message returned by the system.  Usually displays after the form is submitted.|,
+		lastUpdated => 1149219898,
+	},
+
+	'create.form.ldapId' => {
+		message => q|Default ldapId form field.|,
+		lastUpdated => 1149219898,
+	},
+
+	'create.form.ldapId.label' => {
+		message => q|Default text for ldapId form field.|,
+		lastUpdated => 1149219898,
+	},
+
+	'create.form.password' => {
+		message => q|Default password form field.|,
+		lastUpdated => 1149219898,
+	},
+
+	'create.form.password.label' => {
+		message => q|Default text for password form field.|,
+		lastUpdated => 1149219898,
+	},
+
 	'anon reg template body' => {
 		message => q|<p>The following template variables are available for LDAP Authentication Anonymous Registration templates.</p>
-
-<p><b>create.form.header</b><br />
-The required form elements that go at the top of the anonymous registration page.
-</p>
-
-<p><b>create.form.hidden</b><br />
-Hidden form fields required for form submittal.
-</p>
-
-<p><b>create.form.footer</b><br />
-The required form elements that go after the anonymous registration page form. 
-</p>
-
-<p><b>create.form.submit</b><br />
-The default submit button for the anonymous registration form.
-</p>
-
-<p><b>title</b><br />
-Default page title.
-</p>
-
-<p><b>create.form.profile</b><br />
-A loop containing visible and required profile fields for registration.
-</p>
-
-<div class="helpIndent">
-
-<p><b>profile.formElement</b><br />
-Form element for visible or required profile field.
-</p>
-
-<p><b>profile.formElement.label</b><br />
-Default text label for profile form element.
-</p>
-
-</div>
-
-<p><b>login.url</b><br />
-URL for the login page.
-</p>
-
-<p><b>login.label</b><br />
-Default text label for login page link.
-</p>
-
-<p><b>create.message</b><br />
-Any message returned by the system.  Usually displays after the form is submitted.
-</p>
-
-<p><b>create.form.ldapId</b><br />
-Default ldapId form field.
-</p>
-
-<p><b>create.form.ldapId.label</b><br />
-Default text for ldapId form field.
-</p>
-
-<p><b>create.form.password</b><br />
-Default password form field.
-</p>
-
-<p><b>create.form.password.label</b><br />
-Default text for password form field.
-</p>
-
 |,
-		lastUpdated => 1146804934
+		lastUpdated => 1149219931
 	},
 
 	'5' => {
