@@ -19,6 +19,7 @@ use WebGUI::International;
 use WebGUI::Utility;
 use POSIX qw(ceil floor);
 use base 'WebGUI::Asset::Wobject';
+use WebGUI::Asset::Wobject::ProjectManager;
 
 #-------------------------------------------------------------------
 sub definition {
@@ -59,7 +60,14 @@ sub definition {
 			tab=>"security",
 			hoverHelp=>$i18n->get('groupToManage hoverhelp'),
 			label=>$i18n->get('groupToManage label')
-		}
+		},
+		pmIntegration => {
+		    fieldType=>"yesNo",
+			defaultValue=>0,
+			tab=>"properties",
+			hoverHelp=>$i18n->echo("Choose yes to pull projects and task information from the various project management assets on your site"),
+			label=>$i18n->echo("Project Management Integration")
+		},
 	);
 	push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
@@ -170,11 +178,30 @@ sub view {
 	$var->{'extras'} = $config->get("extrasURL")."/wobject/TimeTracking"; 
 	
 	if($user->isInGroup($self->get("groupToManage"))) {
-	   #Return manager screen
-	   #$self->_buildManagerView($var);
+	   $var->{'project.manage.url'} = $self->getUrl("func=manageProjects");
+	   $var->{'project.manage.label'} = $i18n->get("project manage label");
 	}
 	
-	$self->_buildUserView($var);
+	$var->{'form.header'} = WebGUI::Form::formHeader($session,{
+				action=>$self->getUrl,
+				extras=>q|name="editTimeForm" onsubmit="return validateForm(this);"|
+				});
+	$var->{'form.header'} .= WebGUI::Form::hidden($session, {
+				-name=>"func",
+				-value=>"editTimeEntrySave"
+				});
+	$var->{'form.header'} .= WebGUI::Form::hidden($session, {
+				-name=>"rowTotal",
+				-value=>""
+				});
+
+	$var->{'form.footer'} = WebGUI::Form::formFooter($session);
+	
+	$var->{'js.alert.removeRow.error'} = $i18n->echo("There must be at least one row.  Please add more rows if you wish to delete this one");
+	$var->{'js.alert.validate.hours.error'} = $i18n->echo("You may not submit more hours than are available during any given week.");
+	$var->{'js.alert.validate.incomplete.error'} = $i18n->echo("The highlighted fields are required if you wish to submit this form.");
+	
+	$var->{'form.timetracker'} = $self->www_buildTimeTable($var);
 	
 	return $self->processTemplate($var, undef, $self->{_viewTemplate});
 }
@@ -206,6 +233,7 @@ sub www_editTimeEntrySave {
 	$reportId = $self->setCollateral("TT_report","reportId",$props,0,1);
 	
 	my @tasks = ();
+	my $tasksToUpdate = {};
 	
 	my $rowTotal = $form->get("rowTotal");
 	for(my $i = 1; $i <= $rowTotal; $i++) {
@@ -221,13 +249,29 @@ sub www_editTimeEntrySave {
 	   $props->{comments} = $form->process("comments_$i","text");
 	   if ($props->{taskDate} && $props->{projectId} && $props->{taskId} && $props->{hours}) {
 	      $taskEntryId = $self->setCollateral("TT_timeEntry","entryId",$props,0,0);
-   	      push(@tasks,$taskEntryId);	   
+   	      push(@tasks,$taskEntryId);
+		  $tasksToUpdate->{$taskEntryId} = { taskId=>$props->{taskId}, projectId=>$props->{projectId} };
 	   }
 	}
 	
 	#Delete anything not in the task list
     $db->write("delete from TT_timeEntry where reportId=? and entryId not in (".$db->quoteAndJoin(\@tasks).")",[$reportId]);
 	
+	
+	#Update Project Management App if integrated
+	if($self->getValue("pmIntegration")) {
+	   foreach my $eid (@tasks) {
+	      my $task = $tasksToUpdate->{$eid};
+          my $taskId = $task->{taskId};
+	      my $projectId = $task->{projectId};
+	      my $pmAsset = WebGUI::Asset::Wobject::ProjectManager->getProjectInstance($session,$projectId);
+	      if($pmAsset) {
+	         my ($totalHours) = $db->quickArray("select sum(hours) from TT_timeEntry where taskId=?",[$taskId]);
+		     $pmAsset->updateProjectTask($taskId,$projectId,$totalHours);
+	      }
+	   }
+    }
+		  
 	return "";
 }
 
@@ -529,49 +573,6 @@ sub www_manageProjects {
 }
 
 #-------------------------------------------------------------------
-sub _buildUserView {
-	my $self = shift;
-	my $var = $_[0];
-	
-	my ($session,$privilege,$form,$db,$dt,$i18n,$user,$eh) = $self->getSessionVars("privilege","form","db","datetime","i18n","user","errorHandler");
-	my $pmAssetId = $self->getValue("pmAssetId");
-	
-	if($user->isInGroup($self->get("groupToManage"))) {
-	   if($pmAssetId) {
-	      #Add link to project dashboard
-		  $var->{'project.manage.url'} = "";
-	   } else {
-	      $var->{'project.manage.url'} = $self->getUrl("func=manageProjects");
-	   }
-	   $var->{'project.manage.label'} = $i18n->get("project manage label");
-	}
-	
-	$var->{'form.header'} = WebGUI::Form::formHeader($session,{
-				action=>$self->getUrl,
-				extras=>q|name="editTimeForm" onsubmit="return validateForm(this);"|
-				});
-	$var->{'form.header'} .= WebGUI::Form::hidden($session, {
-				-name=>"func",
-				-value=>"editTimeEntrySave"
-				});
-	$var->{'form.header'} .= WebGUI::Form::hidden($session, {
-				-name=>"rowTotal",
-				-value=>""
-				});
-
-	$var->{'form.footer'} = WebGUI::Form::formFooter($session);
-	
-	$var->{'js.alert.removeRow.error'} = $i18n->echo("There must be at least one row.  Please add more rows if you wish to delete this one");
-	$var->{'js.alert.validate.hours.error'} = $i18n->echo("You may not submit more hours than are available during any given week.");
-	$var->{'js.alert.validate.incomplete.error'} = $i18n->echo("The highlighted fields are required if you wish to submit this form.");
-	
-	$var->{'form.timetracker'} = $self->www_buildTimeTable($var);
-	
-	
-	
-}
-
-#-------------------------------------------------------------------
 sub www_buildTimeTable {
    	my $self = shift;
 	my $viewVar = $_[0];
@@ -581,13 +582,21 @@ sub www_buildTimeTable {
 	
 	return $privilege->insufficient unless ($self->canView);
 	
-	my $pmAssetId = $self->getValue("pmAssetId");
+	my $pmIntegration = $self->getValue("pmIntegration");
 	
 	my $week = $form->get("week") || $dt->time;
+	
+	my $nextWeek = $dt->addToDate($week,0,0,7);
+	my $lastWeek = $dt->addToDate($week,0,0,-7);
+	
 	my $daysInWeek = $self->getDaysInWeek($week);
 	
 	my $weekStart = $daysInWeek->{"0"};	
 	my $weekEnd = $daysInWeek->{"6"};
+	
+	#It's this week, don't allow next week url to be seen
+    $var->{'report.nextWeek.url'} = $self->getUrl("func=view;week=$nextWeek");
+	$var->{'report.lastWeek.url'} = $self->getUrl("func=view;week=$lastWeek");
 	
 	$var->{'time.report.header'} = sprintf($i18n->get("time report header"),$weekEnd);
 	$var->{'time.report.hours.label'} = $i18n->get("total hours label");
@@ -612,11 +621,18 @@ sub www_buildTimeTable {
 	
 	#Build Project List
 	tie my %projectList, "Tie::IxHash";
-	if($pmAssetId) {
+	%projectList = $db->buildHash("select a.projectId, a.projectName from TT_projectList a, TT_projectResourceList b where a.assetId=? and a.projectId=b.projectId and b.resourceId=? order by a.projectName",[$self->getId,$user->userId]);
+	
+	my $pmAsset;
+	if($pmIntegration) {
 	   #Build project list and task lists from project management app
-	} else {
-	   %projectList = $db->buildHash("select a.projectId, a.projectName from TT_projectList a, TT_projectResourceList b where a.assetId=? and a.projectId=b.projectId and b.resourceId=? order by a.projectName",[$self->getId,$user->userId]);
-	}
+	   my ($pmAssetId) = $db->quickArray("select a.assetId from PM_wobject a, asset b where a.assetId=b.assetId and b.state not like 'trash%'");   
+	   if($pmAssetId) {
+	      $pmAsset = WebGUI::Asset->newByDynamicClass($session,$pmAssetId);
+	      my %pmProjectList = %{$pmAsset->getProjectList($user->userId)};
+		  %projectList = WebGUI::Utility::sortHash((%projectList,%pmProjectList));
+	   }
+	} 
 	
 	my $chooseLabel = $i18n->echo("Choose One");
 	#Build Task Lists based on Project Ids
@@ -625,25 +641,25 @@ sub www_buildTimeTable {
 	my $counter = 0;
 	my $js = "{\n";
 	foreach my $projectId (keys %projectList) {
-	   if($pmAssetId) {
-	      #Build task hash for project management app
-	   } else {
-	      tie my %taskHash, "Tie::IxHash";
-		  %taskHash = $db->buildHash("select taskId, taskName from TT_projectTasks where projectId=?",[$projectId]);
-		  %taskHash = (""=>$chooseLabel,%taskHash);
-	      $taskList{$projectId} = \%taskHash;
-		  #Build JavaScript Hash
-		  $js .= ",\n" if($counter++ > 0);
-          $js .= qq|"$projectId": {|;
-	      my $ind = 0;
-		  foreach my $taskId (keys %taskHash) {
-		     next if ($taskId eq "");
-		     my $taskName = $taskHash{$taskId};
-		     $js .= ",\n" if($ind++ > 0);
-			 $js .= qq| "$taskId":"$taskName"|;
-		  }
-	      $js .= q| }|;
-	   }   
+	   tie my %taskHash, "Tie::IxHash";
+	   %taskHash = $db->buildHash("select taskId, taskName from TT_projectTasks where projectId=?",[$projectId]);
+	   if($pmAsset && scalar(keys %taskHash) == 0) {
+	      my $pmTaskRef = $pmAsset->getTaskList($projectId,$user->userId) || {};
+		  %taskHash = %{$pmTaskRef};
+	   }
+	   %taskHash = (""=>$chooseLabel,%taskHash);
+	   $taskList{$projectId} = \%taskHash;
+	   #Build JavaScript Hash
+	   $js .= ",\n" if($counter++ > 0);
+       $js .= qq|"$projectId": {|;
+	   my $ind = 0;
+	   foreach my $taskId (keys %taskHash) {
+	      next if ($taskId eq "");
+		  my $taskName = $taskHash{$taskId};
+		  $js .= ",\n" if($ind++ > 0);
+	      $js .= qq| "$taskId":"$taskName"|;
+	   }
+	   $js .= q| }|;   
 	}
 	$js .= "\n};\n";
 	
@@ -657,7 +673,7 @@ sub www_buildTimeTable {
 	#Build Report Info
 	my $report = $db->quickHashRef("select * from TT_report where resourceId=? and startDate=? and endDate=?",[$resourceId,$weekStart,$weekEnd]);	
 	my $reportId = $report->{reportId};
-	$eh->warn($reportId);
+	#$eh->warn($reportId);
 	#Add Report Stuff to form header
 	$viewVar->{'form.header'} .= WebGUI::Form::hidden($session, {
 				-name=>"reportId",
@@ -675,14 +691,20 @@ sub www_buildTimeTable {
 				});
 				
 	$viewVar->{'form.header'} .= WebGUI::Form::hidden($session, {
+				-name=>"week",
+				-value=>$week
+				});
+							
+	$viewVar->{'form.header'} .= WebGUI::Form::hidden($session, {
 				-name=>"resourceId",
 				-value=>$resourceId
 				});
-				
+	
+	my $reportComplete = $report->{reportComplete};
 	$viewVar->{'form.isComplete'} = WebGUI::Form::checkbox($session, {
 	              -name=>"isComplete",
 				  -value=>1,
-				  -checked=>$report->{reportComplete}
+				  -checked=>$reportComplete
 				});			
 
 	#Build Entries Loop
@@ -690,16 +712,24 @@ sub www_buildTimeTable {
 	my $rowCount = 1;
 	my @timeEntries = ();
 	
+	my $totalHours = 0;
 	foreach my $entry (@{$entries}) {
-	   push (@timeEntries,$self->_buildRow($entry,$rowCount++,\%setDaysHash, \%projectList, \%taskList));
+	   my $hash = {};
+	   push (@timeEntries,$self->_buildRow($entry,$rowCount++,\%setDaysHash, \%projectList, \%taskList,$hash,$reportComplete));
+	   $totalHours += $hash->{'entry.hours'};
 	}
 	
-	#Seed time tracker with 10 empty rows
-	for( my $i = $rowCount; $i < ($rowCount + 10); $i++) {
-	   push(@timeEntries,$self->_buildRow(undef,$i,\%setDaysHash, \%projectList, \%taskList));
-	}
+	$var->{'report.isComplete'} = $reportComplete;
+	$var->{'time.totalHours'} = $totalHours;
 	
-	$self->_buildRow(undef,"x",\%setDaysHash, \%projectList, \%taskList,$var);
+	#Seed time tracker with 10 empty rows and build the dummy row
+	unless($reportComplete) {
+	   for( my $i = $rowCount; $i < ($rowCount + 10); $i++) {
+	      push(@timeEntries,$self->_buildRow(undef,$i,\%setDaysHash, \%projectList, \%taskList));
+	   }
+    
+	   $self->_buildRow(undef,"x",\%setDaysHash, \%projectList, \%taskList,$var);
+	}
 	
 	$var->{'time.entry.loop'} = \@timeEntries;
 	$viewVar->{'time.report.rows.total'} = (scalar(@timeEntries)+1);
@@ -718,6 +748,7 @@ sub _buildRow {
 	my $projectList = $_[3];
 	my $taskList = $_[4];
 	my $var = $_[5] || {};
+	my $reportComplete = $_[6] || 0;
 	
 	my $entryId = $entry->{entryId} || "new";
 	$var->{'row.id'} = "row_$rowCount";
@@ -733,54 +764,65 @@ sub _buildRow {
 	
 	#Entry Date
 	my $chooseLabel = $i18n->echo("Choose One");
-	
-	tie my %days, "Tie::IxHash";
-	%days = (""=>$chooseLabel, %{$daysInWeek});
-	$var->{'form.date'} = WebGUI::Form::selectBox($session,{
+	$var->{'entry.hours'} = $entry->{hours};
+	if($reportComplete) {
+	   $var->{'form.date'} = $entry->{taskDate};
+	   $var->{'form.project'} = $projectList->{$projectId};
+	   
+	   my $taskHash = $taskList->{$projectId};
+	   $var->{'form.task'} = $taskHash->{$entry->{taskId}};
+	   $var->{'form.hours'} = $var->{'entry.hours'};
+	   $var->{'form.comments'} = $entry->{comments};
+	   
+	} else {
+	   tie my %days, "Tie::IxHash";
+	   %days = (""=>$chooseLabel, %{$daysInWeek});
+	   $var->{'form.date'} = WebGUI::Form::selectBox($session,{
 				-name=>"taskDate_$rowCount",
 				-value=>$entry->{taskDate},
 				-options=>\%days,
 				-extras=>qq|class="date-select"|
 				});
 	
-	my $taskName = "taskId_$rowCount";
-	$taskId = "taskId_".$rowCount."_formId";
-	$var->{'form.project'} = WebGUI::Form::selectBox($session,{
+	   my $taskName = "taskId_$rowCount";
+	   $taskId = "taskId_".$rowCount."_formId";
+	   $var->{'form.project'} = WebGUI::Form::selectBox($session,{
 	            -name=>"projectId_$rowCount",
 				-options=>$projectList,
 				-value=>$projectId,
 				-extras=>qq|onchange="changeOptions(this,document.getElementById('$taskId'));" class="pt-select"|
 	            });
 	
-	#Entry Task
-	tie my %taskHash, "Tie::IxHash";
-	%taskHash = (""=>$chooseLabel,%taskHash);
-	if($projectId) {
-	   %taskHash = %{$taskList->{$projectId}};
-	}	
+	   #Entry Task
+	   tie my %taskHash, "Tie::IxHash";
+	   %taskHash = (""=>$chooseLabel,%taskHash);
+	   if($projectId) {
+	      #$eh->warn($projectId);
+	      %taskHash = %{$taskList->{$projectId}};
+	   }	
 	
-	$var->{'form.task'} = WebGUI::Form::selectBox($session,{
+	   $var->{'form.task'} = WebGUI::Form::selectBox($session,{
 	            -name=>$taskName,
 				-options=>\%taskHash,
 				-value=>$entry->{taskId},
 				-extras=>qq|class="pt-select"|
 	            });
 	
-	#Entry Hours
-	$var->{'form.hours'} = WebGUI::Form::float($session, {
+	   #Entry Hours
+	   $var->{'form.hours'} = WebGUI::Form::float($session, {
 				-name=>"hours_$rowCount",
-				-value=>$entry->{hours},
+				-value=>$var->{'entry.hours'},
 				-size=>5,
 				-extras=>qq|onchange="recalcHours();"|
 				});
 	
-	#Entry Comments
-	$var->{'form.comments'} = WebGUI::Form::text($session, {
+	   #Entry Comments
+ 	   $var->{'form.comments'} = WebGUI::Form::text($session, {
 	             -name=>"comments_$rowCount",
 				 -value=>$entry->{comments},
 				 -size=>40
 				});
-	
+	}
 	$var->{'delete.url'} = "";	
 	return $var;
 
