@@ -247,7 +247,7 @@ eval("page" + id + " = window.open(URL, '" + id + "', 'toolbar=0,scrollbars=1,lo
 				<tr>
 					<td style="width:9%;white-space:nowrap" class="left">
 						<tmpl_if canManageEvents><tmpl_var manageToolbar>
-						<tmpl_unless eventIsApproved><span style="color:red;font-size:9pt;font-weight:bold;">&bull; Not Approved</span><tmpl_else><span style="color:red;font-size:9pt;font-weight:bold;">&bull; Approved</span></tmpl_unless></tmpl_if>
+						<tmpl_unless eventIsApproved><span style="color:red;font-size:9pt;font-weight:bold;">&bull; Not Approved</span><tmpl_else><span style="color:green;font-size:9pt;font-weight:bold;">&bull; Approved</span></tmpl_unless></tmpl_if>
 					</td>
 					<td style="width:25%;"><tmpl_var title></td>
 					<td style="width:14%;">^D("%W %Z",<tmpl_var startDate>);</td>
@@ -422,7 +422,7 @@ eval("page" + id + " = window.open(URL, '" + id + "', 'toolbar=0,scrollbars=1,lo
 
   <td style="white-space:nowrap;">
     <tmpl_if canManageEvents><tmpl_var manageToolbar>
-        <tmpl_unless eventIsApproved><span style="color:red;font-size:9pt;font-weight:bold;">&bull; Not Approved</span><tmpl_else><span style="color:red;font-size:9pt;font-weight:bold;">&bull; Approved</span></tmpl_unless></tmpl_if>
+        <tmpl_unless eventIsApproved><span style="color:red;font-size:9pt;font-weight:bold;">&bull; Not Approved</span><tmpl_else><span style="color:green;font-size:9pt;font-weight:bold;">&bull; Approved</span></tmpl_unless></tmpl_if>
   </td><td><tmpl_var title>
   </td><td>^D("%W %Z",<tmpl_var startDate>);
   </td><td>^D("%W %Z",<tmpl_var endDate>);
