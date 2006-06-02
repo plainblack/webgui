@@ -24,6 +24,7 @@ addAssetIndex();
 fixCs();
 fixCss();
 fixSpectre();
+fixTT();
 
 finish($session); # this line required
 
@@ -212,7 +213,18 @@ sub fixCs {
 	$session->db->write("update Thread set karmaRank=karma/karmaScale");
 }
 
+#-------------------------------------------------
+sub fixTT {
+   print "\tUpdating the Time Tracking System.\n" unless ($quiet);
+   my $tableList = [
+			"alter table TT_wobject add pmIntegration integer not null default 0"
+          ];
 
+   foreach (@{$tableList}) {
+      $session->db->write($_);
+   }
+
+}
 
 # ---- DO NOT EDIT BELOW THIS LINE ----
 
