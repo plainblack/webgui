@@ -5,8 +5,8 @@
 <h2><tmpl_var managePurchasesTitle></h2>
 <table width="100%" cellspacing="2" cellpadding="2" class="EMS_purchase">
 <tr class="header">
-	<td>Transaction ID<!--<tmpl_var purchaseId.label>--></td>
-	<td>Transaction Date<!--<tmpl_var datePurchasedHuman.label>--></td>
+	<td><tmpl_var purchaseId.label></td>
+	<td><tmpl_var datePurchasedHuman.label></td>
 </tr>
 <tmpl_if purchasesLoop>
 	<tmpl_loop purchasesLoop>

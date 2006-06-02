@@ -99,7 +99,7 @@
 				</tmpl_loop>
 				<!-- OEOS -->
 				<div style="text-align:right;margin:0px;">
-					<a href="/oeos?func=emptyCart">Empty Cart</a> &bull; <a href="/oeos?func=checkout">Checkout</a>
+					<a href="<tmpl_var emptyCart.url>">Empty Cart</a> &bull; <a href="<tmpl_var checkout.url>">Checkout</a>
 				</div>
 			</div>
 			</tmpl_if>
@@ -287,14 +287,13 @@ eval("page" + id + " = window.open(URL, '" + id + "', 'toolbar=0,scrollbars=1,lo
 </table>
 
 <tmpl_else>
-<!-- BEGIN UGLY CODE -->
 <ul>
 <tmpl_if canManageEvents>
    <li><a href="<tmpl_var addEvent.url>"><tmpl_var addEvent.label></a></li>
-   <li><a href="^PageUrl;?func=manageRegistrants">Manage Registrants (Event Directors and Staff)</a></li>
-   <li><a href="^PageUrl;?func=search">Manage Events (Event Directors and Staff)</a></li></tmpl_if>
+   <li><a href="<tmpl_var manageRegistrants.url>"></a> Manage Registrants (Event Directors and Staff)</li>
+   <li><a href="<tmpl_var manageEvents.url>">Manage Events</a> (Event Directors and Staff)</li></tmpl_if>
 <tmpl_unless badgeSelected>
-   <li><a href="^PageUrl;?func=view">Return To Badge List to begin a badge purchase</a></li></tmpl_unless>
+   <li><a href="<tmpl_var view.url>">Return To Badge List to begin a badge purchase</a></li></tmpl_unless>
 </ul>
 
 <tmpl_if badgeSelected>
@@ -399,7 +398,7 @@ eval("page" + id + " = window.open(URL, '" + id + "', 'toolbar=0,scrollbars=1,lo
 <div style="text-align: center;"><tmpl_var pagination.firstPage>&nbsp;&nbsp;<tmpl_var pagination.previousPage>&nbsp;&nbsp;<tmpl_var pagination.pageList.upTo20>&nbsp;&nbsp;<tmpl_var pagination.nextPage>&nbsp;&nbsp;<tmpl_var pagination.lastPage> of <tmpl_var pagination.pageCount></div><br />
 
 <!-- Sort Form -->
-<div style='align: right;'>
+<div style="align: right;">
 <tmpl_var sortForm.header>
 <tmpl_var sortForm.selectBox.label>&nbsp;
 <tmpl_var sortForm.selectBox>
@@ -422,9 +421,9 @@ eval("page" + id + " = window.open(URL, '" + id + "', 'toolbar=0,scrollbars=1,lo
   <tr<tmpl_unless __ODD__> class="oddRow"<tmpl_else> class="evenRow"</tmpl_unless>>
 
   <td style="white-space:nowrap;">
-    <tmpl_if canManageEvents><tmpl_var manageToolbar>&nbsp;
-        <tmpl_unless eventIsApproved>^AssetProxy(media/icons/icon-pending.png);<tmpl_else>^AssetProxy(media/icons/icon-approved.png);</tmpl_unless></tmpl_if>&nbsp;<tmpl_var sku>
-  </td><td><A HREF="javascript:popUp('https://events.originsgames.com/home/event-detail?pid=<tmpl_var productId>')"><tmpl_var title></a>
+    <tmpl_if canManageEvents><tmpl_var manageToolbar>
+        <tmpl_unless eventIsApproved><span style="color:red;font-size:9pt;font-weight:bold;">&bull; Not Approved</span><tmpl_else><span style="color:red;font-size:9pt;font-weight:bold;">&bull; Approved</span></tmpl_unless></tmpl_if>
+  </td><td><tmpl_var title>
   </td><td>^D("%W %Z",<tmpl_var startDate>);
   </td><td>^D("%W %Z",<tmpl_var endDate>);
   </td><td style="text-align: center;"><tmpl_var seatsRemaining>/<tmpl_var maximumAttendees>
@@ -448,7 +447,7 @@ eval("page" + id + " = window.open(URL, '" + id + "', 'toolbar=0,scrollbars=1,lo
 
 <div style="text-align: center;"><tmpl_var pagination.firstPage>&nbsp;&nbsp;<tmpl_var pagination.previousPage>&nbsp;&nbsp;<tmpl_var pagination.pageList.upTo20>&nbsp;&nbsp;<tmpl_var pagination.nextPage>&nbsp;&nbsp;<tmpl_var pagination.lastPage> of <tmpl_var pagination.pageCount></div>
 
-<!-- END UGLY CODE -->
+
 
 </tmpl_if>
 ~~~

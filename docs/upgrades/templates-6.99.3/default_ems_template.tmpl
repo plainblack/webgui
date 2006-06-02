@@ -17,17 +17,17 @@
 		<br />
 		<table cellpadding="5" cellspacing="0" style="width:100%">
 		<tr style="height:30px;">
-			<td valign="top" style="width:190px;"><a href='<tmpl_var manageEvents.url>'>Manage Events</a></td>
+			<td valign="top" style="width:190px;"><a href="<tmpl_var manageEvents.url>">Manage Events</a></td>
 			<td>(Event Directors and Staff)</td>
 		</tr>
 		<tr style="height:30px">
-			<td valign="top" style="width:190px;"><a href='/oeos?func=manageRegistrants'>Manage Registrants</a></td>
+			<td valign="top" style="width:190px;"><a href="<tmpl_var manageRegistrants.url>">Manage Registrants</a></td>
 			<td>(Event Directors and Staff)</td>
 		</tr>
 		</tmpl_if>
 		
 		<tr style="height:30px">
-			<td valign="top" style="width:190px;"><a href='<tmpl_var managePurchases.url>'>Modify Existing Badge</a></td>
+			<td valign="top" style="width:190px;"><a href="<tmpl_var managePurchases.url>">Modify Existing Badge</a></td>
 			<td>Add Events to a Badge you've already purchased</td>
 		</tr>
 		</table>
@@ -63,7 +63,7 @@
 			</div>
 			</tmpl_loop>
 			
-			<a href="/oeos?func=emptyCart">Empty Cart</a><br /><a href="/oeos?func=checkout">Checkout</a>
+			<a href="<tmpl_var emptyCart.url>">Empty Cart</a><br /><a href="<tmpl_var checkout.url>">Checkout</a>
 		</div>
 		</tmpl_if>
 	</td>
