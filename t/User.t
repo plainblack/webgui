@@ -39,7 +39,7 @@ ok(scalar %{$user->{_profile}} > 0, 'new("new") -- profile property contains at 
 $lastUpdate = time();
 $user->username("bill_lumberg");
 is($user->username, "bill_lumberg", 'username() method');
-is($user->lastUpdated, $lastUpdate, 'lastUpdated() -- username change');
+ok(abs($user->lastUpdated-$lastUpdate) < 1, 'lastUpdated() -- username change');
 
 #Let's check the UID and make sure it's sane
 ok($user->userId =~ m/[A-Za-z0-9\-\_]{22}/, 'userId() returns sane value');
@@ -53,7 +53,7 @@ foreach my $groupId (2,7) {
 $lastUpdate = time();
 $user->status('Active');
 is($user->status, "Active", 'status("Active")');
-is($user->lastUpdated, $lastUpdate, 'lastUpdated() -- status change');
+ok(abs($user->lastUpdated-$lastUpdate) < 1, 'lastUpdated() -- status change');
 
 $user->status('Selfdestructed');
 is($user->status, "Selfdestructed", 'status("Selfdestructed")');
@@ -65,7 +65,7 @@ is($user->status, "Deactivated", 'status("Deactivated")');
 $lastUpdate = time();
 $user->profileField("firstName", "Bill");
 is($user->profileField("firstName"), "Bill", 'profileField() get/set');
-is($user->lastUpdated, $lastUpdate, 'lastUpdated() -- profileField');
+ok(abs($user->lastUpdated-$lastUpdate) < 1, 'lastUpdated() -- profileField');
 
 #Let's check the auth methods
 
@@ -78,7 +78,7 @@ $user->authMethod("LDAP");
 is($user->authMethod, "LDAP", 'authMethod() -- set to LDAP');
 $user->authMethod("WebGUI");
 is($user->authMethod, "WebGUI", 'authMethod() -- set back to WebGUI');
-is($user->lastUpdated, $lastUpdate, 'lastUpdated() -- authmethod change');
+ok(abs($user->lastUpdated-$lastUpdate) < 1, 'lastUpdated() -- authmethod change');
 
 #See if datecreated is correct
 is($user->dateCreated, $userCreationTime, 'dateCreated()');
@@ -101,7 +101,7 @@ is($user->karma, $oldKarma-69, 'karma() -- get/set subtract amount');
 $lastUpdate = time();
 $user->referringAffiliate(10);
 is($user->referringAffiliate, '10', 'referringAffiliate() -- get/set');
-is($user->lastUpdated, $lastUpdate, 'lastUpdated() -- referringAffiliate');
+ok(abs($user->lastUpdated-$lastUpdate) < 1, 'lastUpdated() -- referringAffiliate');
 
 #Let's try adding this user to some groups.  Note, users are auto-added to 2 and 7 on creation
 my @groups = qw|6 4|;
@@ -173,7 +173,7 @@ is($user->karma, $oldKarma-69, 'karma() -- get/set subtract amount');
 $lastUpdate = time();
 $user->referringAffiliate(10);
 is($user->referringAffiliate, '10', 'referringAffiliate() -- get/set');
-is($user->lastUpdated, $lastUpdate, 'lastUpdated() -- referringAffiliate');
+ok(abs($user->lastUpdated-$lastUpdate) < 1, 'lastUpdated() -- referringAffiliate');
 
 #Let's try adding this user to some groups
 my @groups = qw|2 4|;
