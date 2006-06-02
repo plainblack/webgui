@@ -79,6 +79,7 @@ sub definition {
 	my $session = shift;
 	my $definition = shift;
 	my $i18n = WebGUI::International->new($session,'Asset_ProjectManager');
+	my $db = $session->db;
 	my %properties;
 	tie %properties, 'Tie::IxHash';
 	%properties = (
@@ -139,6 +140,94 @@ sub duplicate {
 	my $self = shift;
 	my $newAsset = $self->SUPER::duplicate(shift);
 	return $newAsset;
+}
+
+#-------------------------------------------------------------------
+#API method called by Time Tracker to return the instance of the PM wobject which this project blongs
+sub getProjectInstance {
+   my $class = shift;
+   my $session = shift;
+   my $db = $session->db;
+   my $projectId = $_[0];
+   return undef unless $projectId;
+   my ($assetId) = $db->quickArray("select assetId from PM_project where projectId=?",[$projectId]);
+   if($assetId) {
+      return WebGUI::Asset->newByDynamicClass($session,$assetId);
+   }
+   return undef;
+}
+
+#-------------------------------------------------------------------
+#API method called by Time Tracker to return all projects in all assets for which the user passed in has tasks assigned
+sub getProjectList {
+   my $self = shift;
+   my $db = $self->session->db;
+   my $userId = $_[0];
+   return $db->buildHashRef("select a.projectId,a.name from PM_project a, PM_task b where a.projectId=b.projectId and b.resourceId=?",[$userId]);
+}
+
+#-------------------------------------------------------------------
+#API method called by Time Tracker to return all tasks for the projectId passed in
+sub getTaskList {
+   my $self = shift;
+   my $db = $self->session->db;
+   my $projectId = $_[0];
+   my $userId = $_[1];
+   return $db->buildHashRef("select taskId, taskName from PM_task where projectId=? and resourceId=?",[$projectId,$userId]);
+}
+
+#-------------------------------------------------------------------
+#API method called by Time Tracker to set percent complete field in the task and update the project cache
+sub updateProjectTask {
+   my $self = shift;
+   my $db = $self->session->db;
+   my $eh = $self->session->errorHandler;
+   
+   my $taskId = $_[0];
+   my $projectId = $_[1];
+   my $totalHours = $_[2];
+   
+   $eh->warn("taskId: $taskId ~~ projectId: $projectId ~~ totalHours: $totalHours");
+   return 0 unless ($taskId && $projectId && $totalHours);
+   
+   my $task = $db->quickHashRef("select * from PM_task where taskId=?",[$taskId]);
+   my ($units,$hoursPer) = $db->quickArray("select durationUnits, hoursPerDay from PM_project where projectId=?",[$projectId]);
+   
+   return 0 unless ($task->{taskId});
+   my $duration = $task->{duration};
+   if($units eq "days"){
+      $duration = $duration / $hoursPer;
+   }
+   
+   my $percentComplete = ($totalHours / $duration) * 100;
+   
+   $self->setCollateral("PM_task","taskId",{ taskId=>$taskId, percentComplete=>$percentComplete });
+   $self->_updateProject($projectId);
+   return 1;
+}
+
+#-------------------------------------------------------------------
+sub _updateProject {
+   my $self = shift;
+   my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
+   my $eh = $session->errorHandler;
+   my $projectId= $_[0];
+   
+   my ($minStart) = $db->quickArray("select min(startDate) from PM_task where projectId=".$db->quote($projectId));
+   my ($maxEnd) = $db->quickArray("select max(endDate) from PM_task where projectId=".$db->quote($projectId));
+   
+   my ($projectTotal) = $db->quickArray("select sum(duration) from PM_task where projectId=".$db->quote($projectId));
+   
+   my $complete = 0;
+   
+   my $tasks =  $db->buildArrayRefOfHashRefs("select * from PM_task where projectId=".$db->quote($projectId)." order by sequenceNumber asc");
+   foreach my $task (@{$tasks}) {
+      $complete += ($task->{duration} * ($task->{percentComplete}/100));   
+   }
+   
+   my $projectComplete = ($projectTotal == 0)?0:(($complete / $projectTotal) * 100);
+   
+   $db->write("update PM_project set startDate=?, endDate=?, percentComplete=? where projectId=?",[$minStart,$maxEnd,$projectComplete,$projectId]);
 }
 
 #-------------------------------------------------------------------
@@ -224,6 +313,7 @@ sub view {
 	   $hash->{'project.cost.data.int'} = WebGUI::Utility::commify(int($project->{targetBudget}));
 	   $hash->{'project.cost.data.float'} = WebGUI::Utility::commify($project->{targetBudget});
 	   $hash->{'project.complete.data.int'} = int($project->{percentComplete});
+	   $hash->{'project.complete.data.int'} = 100 if($hash->{'project.complete.data.int'} > 100);
 	   $hash->{'project.complete.data.float'} = sprintf("%2.2f",$project->{percentComplete});
 	   if($var->{'canEditProjects'}) {
 		  $hash->{'project.edit.url'} = $self->getUrl("func=editProject;projectId=".$projectId);
@@ -603,32 +693,6 @@ return $privilege->insufficient unless ($user->isInGroup($project->{projectManag
    
    return $self->www_viewProject($projectId,$taskId);
 }
-
-#-------------------------------------------------------------------
-sub _updateProject {
-   my $self = shift;
-   my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
-   my $eh = $session->errorHandler;
-   my $projectId= $_[0];
-   
-   my ($minStart) = $db->quickArray("select min(startDate) from PM_task where projectId=".$db->quote($projectId));
-   my ($maxEnd) = $db->quickArray("select max(endDate) from PM_task where projectId=".$db->quote($projectId));
-   
-   my ($projectTotal) = $db->quickArray("select sum(duration) from PM_task where projectId=".$db->quote($projectId));
-   
-   my $complete = 0;
-   
-   my $tasks =  $db->buildArrayRefOfHashRefs("select * from PM_task where projectId=".$db->quote($projectId)." order by sequenceNumber asc");
-   foreach my $task (@{$tasks}) {
-      $complete += ($task->{duration} * ($task->{percentComplete}/100));   
-   }
-   
-   my $projectComplete = ($projectTotal == 0)?0:(($complete / $projectTotal) * 100);
-   
-   $db->write("update PM_project set startDate=?, endDate=?, percentComplete=? where projectId=?",[$minStart,$maxEnd,$projectComplete,$projectId]);
-}
-
-
 
 #-------------------------------------------------------------------
 sub _arrangePredecessors {
