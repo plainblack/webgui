@@ -1,0 +1,45 @@
+#EventManagerTmpl000004
+<tmpl_if session.var.adminOn>
+        <p><tmpl_var controls></p><br /><br />
+</tmpl_if>
+<h2><tmpl_var managePurchasesTitle></h2>
+<table width="100%" cellspacing="2" cellpadding="2" class="EMS_purchase">
+<tr class="header">
+	<td>Transaction ID<!--<tmpl_var purchaseId.label>--></td>
+	<td>Transaction Date<!--<tmpl_var datePurchasedHuman.label>--></td>
+</tr>
+<tmpl_if purchasesLoop>
+	<tmpl_loop purchasesLoop>
+	<tr<tmpl_unless __ODD__> class="evenRow"<tmpl_else> class="oddRow"</tmpl_unless>>
+		<td><strong><tmpl_var __COUNT__></strong></td>
+		<td>&nbsp;<a href="<tmpl_var purchaseUrl>"><tmpl_var purchaseId></a></td>
+		<td>&nbsp;<tmpl_var datePurchasedHuman></td>
+	</tr>
+	</tmpl_loop>
+<tmpl_else>
+<tr>
+	<td><tmpl_var noPurchasesMessage></td>
+</tr>
+</tmpl_if>
+</table>
+~~~
+<style type="text/css">
+tr.oddRow td {
+	background-color:#FFF;	
+}
+tr.evenRow td {
+	background-color:#DADADA;	
+}
+.EMS_purchase {
+	font-size:9pt;
+	font-family:arial;
+	border:solid #E0E0E0 1px;
+	color:black;
+}
+.EMS_purchase tr.header td {
+	background-color:#E2E2E2;
+	color:#808080;
+	font-size:10pt;
+	font-weight:bold;
+}
+</style>
