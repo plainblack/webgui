@@ -60,68 +60,82 @@ our $I18N = {
 		lastUpdated => 1078568518
 	},
 
+	'title' => {
+		message => q|The title of this event.|,
+		lastUpdated => 1149392729,
+	},
+
+	'start.label' => {
+		message => q|The translated label for the start date.|,
+		lastUpdated => 1149392729,
+	},
+
+	'start.date' => {
+		message => q|The date this event starts.|,
+		lastUpdated => 1149392729,
+	},
+
+	'start.time' => {
+		message => q|The time this event starts.|,
+		lastUpdated => 1149392729,
+	},
+
+	'end.date' => {
+		message => q|The date this event ends.|,
+		lastUpdated => 1149392729,
+	},
+
+	'end.time' => {
+		message => q|The time this event ends.|,
+		lastUpdated => 1149392729,
+	},
+
+	'end.label' => {
+		message => q|The translated label for the end date.|,
+		lastUpdated => 1149392729,
+	},
+
+	'canEdit' => {
+		message => q|A condition indicating whether the current user can edit an event.|,
+		lastUpdated => 1149392729,
+	},
+
+	'edit.url' => {
+		message => q|The URL to edit this event.|,
+		lastUpdated => 1149392729,
+	},
+
+	'edit.label' => {
+		message => q|The translated label for the edit URL.|,
+		lastUpdated => 1149392729,
+	},
+
+	'delete.url' => {
+		message => q|The URL to delete this event.|,
+		lastUpdated => 1149392729,
+	},
+
+	'delete.label' => {
+		message => q|The translated label for the delete URL.|,
+		lastUpdated => 1149392729,
+	},
+
+	'description' => {
+		message => q|The description of this event.|,
+		lastUpdated => 1149392729,
+	},
+
+	'eventLocation' => {
+		message => q|Where the event will occur.|,
+		lastUpdated => 1149392729,
+	},
+
+
 	'97' => {
 		message => q|<p>The following is the list of template variables available in when displaying an event from the calendar.
 </p>
-
-<p><b>title</b><br />
-The title of this event.
-</p>
-
-<p><b>start.label</b><br />
-The translated label for the start date.
-</p>
-
-<p><b>start.date</b><br />
-The date this event starts.
-</p>
-
-<p><b>start.time</b><br />
-The time this event starts.
-</p>
-
-<p><b>end.date</b><br />
-The date this event ends.
-</p>
-
-<p><b>end.time</b><br />
-The time this event ends.
-</p>
-
-<p><b>end.label</b><br />
-The translated label for the end date.
-</p>
-
-<p><b>canEdit</b><br />
-A condition indicating whether the current user can edit an event.
-</p>
-
-<p><b>edit.url</b><br />
-The URL to edit this event.
-</p>
-
-<p><b>edit.label</b><br />
-The translated label for the edit URL.
-</p>
-
-<p><b>delete.url</b><br />
-The URL to delete this event.
-</p>
-
-<p><b>delete.label</b><br />
-The translated label for the delete URL.
-</p>
-
-<p><b>description</b><br />
-The description of this event.
-</p>
-
-<p><b>eventLocation</b><br />
-Where the event will occur.
-</p>
-
 |,
-		lastUpdated => 1146763452,
+		lastUpdated => 1149392756,
 	},
 
           '519' => {

@@ -52,6 +52,50 @@ our $HELP = {
 		body => '97',
 		fields => [
 		],
+		variables => [
+		          {
+		            'name' => 'title'
+		          },
+		          {
+		            'name' => 'start.label'
+		          },
+		          {
+		            'name' => 'start.date'
+		          },
+		          {
+		            'name' => 'start.time'
+		          },
+		          {
+		            'name' => 'end.date'
+		          },
+		          {
+		            'name' => 'end.time'
+		          },
+		          {
+		            'name' => 'end.label'
+		          },
+		          {
+		            'name' => 'canEdit'
+		          },
+		          {
+		            'name' => 'edit.url'
+		          },
+		          {
+		            'name' => 'edit.label'
+		          },
+		          {
+		            'name' => 'delete.url'
+		          },
+		          {
+		            'name' => 'delete.label'
+		          },
+		          {
+		            'name' => 'description'
+		          },
+		          {
+		            'name' => 'eventLocation'
+		          }
+		],
 		related => [
 			{
 				tag => 'template language',

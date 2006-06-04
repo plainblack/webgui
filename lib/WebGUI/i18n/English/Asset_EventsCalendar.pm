@@ -203,255 +203,292 @@ The title of an individual event.
                     'message' => 'Events Calendar Template'
                   },
 
+	'addevent.url' => {
+		message => q|The URL to add an event to the calendar.|,
+		lastUpdated => 1149392808,
+	},
+
+	'addevent.label' => {
+		message => q|The translated label for the add event link.|,
+		lastUpdated => 1149392808,
+	},
+
+	'sunday.label' => {
+		message => q|A label representing "Sunday".|,
+		lastUpdated => 1149392808,
+	},
+
+	'monday.label' => {
+		message => q|A label representing "Monday".|,
+		lastUpdated => 1149392808,
+	},
+
+	'tuesday.label' => {
+		message => q|A label representing "Tuesday".|,
+		lastUpdated => 1149392808,
+	},
+
+	'wednesday.label' => {
+		message => q|A label representing "Wednesday".|,
+		lastUpdated => 1149392808,
+	},
+
+	'thursday.label' => {
+		message => q|A label representing "Thursday".|,
+		lastUpdated => 1149392808,
+	},
+
+	'friday.label' => {
+		message => q|A label representing "Friday".|,
+		lastUpdated => 1149392808,
+	},
+
+	'saturday.label' => {
+		message => q|A label representing "Saturday".|,
+		lastUpdated => 1149392808,
+	},
+
+	'sunday.label.short' => {
+		message => q|The first initial of the label for "Sunday".|,
+		lastUpdated => 1149392808,
+	},
+
+	'monday.label.short' => {
+		message => q|The first initial of the label for "Monday".|,
+		lastUpdated => 1149392808,
+	},
+
+	'tuesday.label.short' => {
+		message => q|The first initial of the label for "Tuesday".|,
+		lastUpdated => 1149392808,
+	},
+
+	'wednesday.label.short' => {
+		message => q|The first initial of the label for "Wednesday".|,
+		lastUpdated => 1149392808,
+	},
+
+	'thursday.label.short' => {
+		message => q|The first initial of the label for "Thursday".|,
+		lastUpdated => 1149392808,
+	},
+
+	'friday.label.short' => {
+		message => q|The first initial of the label for "Friday".|,
+		lastUpdated => 1149392808,
+	},
+
+	'saturday.label.short' => {
+		message => q|The first initial of the label for "Saturday".|,
+		lastUpdated => 1149392808,
+	},
+
+	'month_loop' => {
+		message => q|A loop containing all the months in the calendar.|,
+		lastUpdated => 1149392808,
+	},
+
+	'daysInMonth' => {
+		message => q|The number of days in this month.|,
+		lastUpdated => 1149392808,
+	},
+
+	'day_loop' => {
+		message => q|A loop containing all the days in the month.|,
+		lastUpdated => 1149392808,
+	},
+
+	'dayOfWeek' => {
+		message => q|The day number for the day in the week.|,
+		lastUpdated => 1149392808,
+	},
+
+	'day' => {
+		message => q|The day of the month.|,
+		lastUpdated => 1149392808,
+	},
+
+	'isStartOfWeek' => {
+		message => q|A boolean indicating this is the first day in the week.|,
+		lastUpdated => 1149392808,
+	},
+
+	'isEndOfWeek' => {
+		message => q|A boolean indicating this is the last day in the week.|,
+		lastUpdated => 1149392808,
+	},
+
+	'isToday' => {
+		message => q|A boolean indicating that this day is today.|,
+		lastUpdated => 1149392808,
+	},
+
+	'event_loop' => {
+		message => q|A loop containing all of the events in this day.|,
+		lastUpdated => 1149392808,
+	},
+
+	'description' => {
+		message => q|The description or detail of this event.|,
+		lastUpdated => 1149392808,
+	},
+
+	'name' => {
+		message => q|The name or title of this event.|,
+		lastUpdated => 1149392808,
+	},
+
+	'start.date.human' => {
+		message => q|The human representation of the start date of this event.|,
+		lastUpdated => 1149392808,
+	},
+
+	'start.time.human' => {
+		message => q|The human representation of the start time of this event.|,
+		lastUpdated => 1149392808,
+	},
+
+	'start.date.epoch' => {
+		message => q|The epoch representation of the start date of this event.|,
+		lastUpdated => 1149392808,
+	},
+
+	'start.year' => {
+		message => q|The 4-digit year this event starts.|,
+		lastUpdated => 1149392808,
+	},
+
+	'start.month' => {
+		message => q|The name of the month this event starts, internationalized.|,
+		lastUpdated => 1149392808,
+	},
+
+	'start.day' => {
+		message => q|The day this event starts.|,
+		lastUpdated => 1149392808,
+	},
+
+	'start.day.dayOfWeek' => {
+		message => q|The name of the day of the week this event starts, internationalized.|,
+		lastUpdated => 1149392808,
+	},
+
+	'end.date.human' => {
+		message => q|The human representation of the end date of this event.|,
+		lastUpdated => 1149392808,
+	},
+
+	'end.time.human' => {
+		message => q|The human representation of the end time of this event.|,
+		lastUpdated => 1149392808,
+	},
+
+	'end.date.epoch' => {
+		message => q|The epoch representation of the end date of this event.|,
+		lastUpdated => 1149392808,
+	},
+
+	'end.year' => {
+		message => q|The 4-digit year this event ends.|,
+		lastUpdated => 1149392808,
+	},
+
+	'end.month' => {
+		message => q|The name of the month this event ends, internationalized.|,
+		lastUpdated => 1149392808,
+	},
+
+	'end.day' => {
+		message => q|The day this event ends.|,
+		lastUpdated => 1149392808,
+	},
+
+	'end.day.dayOfWeek' => {
+		message => q|The name of the day of the week this event ends, internationalized.|,
+		lastUpdated => 1149392808,
+	},
+
+	'startEndYearMatch' => {
+		message => q|A boolean indicating whether the start and end year match.|,
+		lastUpdated => 1149392808,
+	},
+
+	'startEndMonthMatch' => {
+		message => q|A boolean indicating whether the start and end month match.|,
+		lastUpdated => 1149392808,
+	},
+
+	'startEndDayMatch' => {
+		message => q|A boolean indicating whether the start and end day match.|,
+		lastUpdated => 1149392808,
+	},
+
+	'isFirstDayOfEvent' => {
+		message => q|A boolean indicating whether this day is the first day of the event.|,
+		lastUpdated => 1149392808,
+	},
+
+	'dateIsSameAsPrevious' => {
+		message => q|A boolean indicating whether the start and end date of this event are the same as the previous event's start and end date.|,
+		lastUpdated => 1149392808,
+	},
+
+	'daysInEvent' => {
+		message => q|The length of this event in days.|,
+		lastUpdated => 1149392808,
+	},
+
+	'url' => {
+		message => q|The URL to view this event in detail.|,
+		lastUpdated => 1149392808,
+	},
+
+	'owner' => {
+		message => q|The username of the owner of the event.|,
+		lastUpdated => 1149392808,
+	},
+
+	'url' => {
+		message => q|A URL to today's events.|,
+		lastUpdated => 1149392808,
+	},
+
+	'prepad_loop' => {
+		message => q|A loop containing info to prepad the days in the month before the start day.|,
+		lastUpdated => 1149392808,
+	},
+
+	'count' => {
+		message => q|The day of the week for this pad.|,
+		lastUpdated => 1149392808,
+	},
+
+	'postpad_loop' => {
+		message => q|A loop containing the info to postpad the days in the month after the last day.|,
+		lastUpdated => 1149392808,
+	},
+
+	'count' => {
+		message => q|The day of the week for this pad.|,
+		lastUpdated => 1149392808,
+	},
+
+	'month' => {
+		message => q|The name of this month, internationalized.|,
+		lastUpdated => 1149392808,
+	},
+
+	'year' => {
+		message => q|The 4 digit year in the current month of the month_loop.|,
+		lastUpdated => 1149392808,
+	},
+
+
 	'95' => {
 		message => q|<p>The following template variables are available for you to customize your events calendar.
 </p>
-<p><b>addevent.url</b><br />
-The URL to add an event to the calendar.
-</p>
-
-<p><b>addevent.label</b><br />
-The translated label for the add event link.
-</p>
-
-<p><b>sunday.label</b><br />
-A label representing "Sunday".
-</p>
-
-<p><b>monday.label</b><br />
-A label representing "Monday".
-</p>
-
-<p><b>tuesday.label</b><br />
-A label representing "Tuesday".
-</p>
-
-<p><b>wednesday.label</b><br />
-A label representing "Wednesday".
-</p>
-
-<p><b>thursday.label</b><br />
-A label representing "Thursday".
-</p>
-
-<p><b>friday.label</b><br />
-A label representing "Friday".
-</p>
-
-<p><b>saturday.label</b><br />
-A label representing "Saturday".
-</p>
-
-<p><b>sunday.label.short</b><br />
-The first initial of the label for "Sunday".
-</p>
-
-<p><b>monday.label.short</b><br />
-The first initial of the label for "Monday".
-</p>
-
-<p><b>tuesday.label.short</b><br />
-The first initial of the label for "Tuesday".
-</p>
-
-<p><b>wednesday.label.short</b><br />
-The first initial of the label for "Wednesday".
-</p>
-
-<p><b>thursday.label.short</b><br />
-The first initial of the label for "Thursday".
-</p>
-
-<p><b>friday.label.short</b><br />
-The first initial of the label for "Friday".
-</p>
-
-<p><b>saturday.label.short</b><br />
-The first initial of the label for "Saturday".
-</p>
-
-<p><b>month_loop</b><br />
-A loop containing all the months in the calendar.
-</p>
-
-<div class="helpIndent">
-
-<p><b>daysInMonth</b><br />
-The number of days in this month.
-</p>
-
-<p><b>day_loop</b><br />
-A loop containing all the days in the month.
-</p>
-
-<div class="helpIndent">
-
-<p><b>dayOfWeek</b><br />
-The day number for the day in the week.
-</p>
-
-<p><b>day</b><br />
-The day of the month.
-</p>
-
-<p><b>isStartOfWeek</b><br />
-A boolean indicating this is the first day in the week.
-</p>
-
-<p><b>isEndOfWeek</b><br />
-A boolean indicating this is the last day in the week.
-</p>
-
-<p><b>isToday</b><br />
-A boolean indicating that this day is today.
-</p>
-
-<p><b>event_loop</b><br />
-A loop containing all of the events in this day.
-</p>
-
-<div class="helpIndent">
-
-<p><b>description</b><br />
-The description or detail of this event.
-</p>
-
-<p><b>name</b><br />
-The name or title of this event.
-</p>
-
-<p><b>start.date.human</b><br />
-The human representation of the start date of this event.
-</p>
-
-<p><b>start.time.human</b><br />
-The human representation of the start time of this event.
-</p>
-
-<p><b>start.date.epoch</b><br />
-The epoch representation of the start date of this event.
-</p>
-
-<p><b>start.year</b><br />
-The 4-digit year this event starts.
-</p>
-
-<p><b>start.month</b><br />
-The name of the month this event starts, internationalized.
-</p>
-
-<p><b>start.day</b><br />
-The day this event starts.
-</p>
-
-<p><b>start.day.dayOfWeek</b><br />
-The name of the day of the week this event starts, internationalized.
-</p>
-
-<p><b>end.date.human</b><br />
-The human representation of the end date of this event.
-</p>
-
-<p><b>end.time.human</b><br />
-The human representation of the end time of this event.
-</p>
-
-<p><b>end.date.epoch</b><br />
-The epoch representation of the end date of this event.
-</p>
-
-<p><b>end.year</b><br />
-The 4-digit year this event ends.
-</p>
-
-<p><b>end.month</b><br />
-The name of the month this event ends, internationalized.
-</p>
-
-<p><b>end.day</b><br />
-The day this event ends.
-</p>
-
-<p><b>end.day.dayOfWeek</b><br />
-The name of the day of the week this event ends, internationalized.
-</p>
-
-<p><b>startEndYearMatch</b><br />
-A boolean indicating whether the start and end year match.
-</p>
-
-<p><b>startEndMonthMatch</b><br />
-A boolean indicating whether the start and end month match.
-</p>
-
-<p><b>startEndDayMatch</b><br />
-A boolean indicating whether the start and end day match.
-</p>
-
-<p><b>isFirstDayOfEvent</b><br />
-A boolean indicating whether this day is the first day of the event.
-</p>
-
-<p><b>dateIsSameAsPrevious</b><br />
-A boolean indicating whether the start and end date of this event are the same as the previous event's start and end date.
-</p>
-
-<p><b>daysInEvent</b><br />
-The length of this event in days.
-</p>
-
-<p><b>url</b><br />
-The URL to view this event in detail.
-</p>
-
-<p><b>owner</b><br />
-The username of the owner of the event.
-</p>
-
-</div>
-
-<p><b>url</b><br />
-A URL to today's events.
-</p>
-
-</div>
-
-<p><b>prepad_loop</b><br />
-A loop containing info to prepad the days in the month before the start day.
-</p>
-
-<div class="helpIndent">
-
-<p><b>count</b><br />
-The day of the week for this pad.
-</p>
-
-</div>
-
-<p><b>postpad_loop</b><br />
-A loop containing the info to postpad the days in the month after the last day.
-</p>
-
-<div class="helpIndent">
-
-<p><b>count</b><br />
-The day of the week for this pad.
-</p>
-
-</div>
-
-<p><b>month</b><br />
-The name of this month, internationalized.
-</p>
-
-<p><b>year</b><br />
-The 4 digit year in the current month of the month_loop.
-</p>
-
-</div>
-
 |,
-		lastUpdated => 1149238798
+		lastUpdated => 1149392840
 	},
 
           '509' => {

@@ -71,6 +71,186 @@ our $HELP = {
 		body => '95',
 		fields => [
 		],
+		variables => [
+		          {
+		            'name' => 'addevent.url'
+		          },
+		          {
+		            'name' => 'addevent.label'
+		          },
+		          {
+		            'name' => 'sunday.label'
+		          },
+		          {
+		            'name' => 'monday.label'
+		          },
+		          {
+		            'name' => 'tuesday.label'
+		          },
+		          {
+		            'name' => 'wednesday.label'
+		          },
+		          {
+		            'name' => 'thursday.label'
+		          },
+		          {
+		            'name' => 'friday.label'
+		          },
+		          {
+		            'name' => 'saturday.label'
+		          },
+		          {
+		            'name' => 'sunday.label.short'
+		          },
+		          {
+		            'name' => 'monday.label.short'
+		          },
+		          {
+		            'name' => 'tuesday.label.short'
+		          },
+		          {
+		            'name' => 'wednesday.label.short'
+		          },
+		          {
+		            'name' => 'thursday.label.short'
+		          },
+		          {
+		            'name' => 'friday.label.short'
+		          },
+		          {
+		            'name' => 'saturday.label.short'
+		          },
+		          {
+		            'name' => 'month_loop',
+		            'variables' => [
+		                             {
+		                               'name' => 'daysInMonth'
+		                             },
+		                             {
+		                               'name' => 'day_loop',
+		                               'variables' => [
+		                                                {
+		                                                  'name' => 'dayOfWeek'
+		                                                },
+		                                                {
+		                                                  'name' => 'day'
+		                                                },
+		                                                {
+		                                                  'name' => 'isStartOfWeek'
+		                                                },
+		                                                {
+		                                                  'name' => 'isEndOfWeek'
+		                                                },
+		                                                {
+		                                                  'name' => 'isToday'
+		                                                },
+		                                                {
+		                                                  'name' => 'event_loop',
+		                                                  'variables' => [
+		                                                                   {
+		                                                                     'name' => 'description'
+		                                                                   },
+		                                                                   {
+		                                                                     'name' => 'name'
+		                                                                   },
+		                                                                   {
+		                                                                     'name' => 'start.date.human'
+		                                                                   },
+		                                                                   {
+		                                                                     'name' => 'start.time.human'
+		                                                                   },
+		                                                                   {
+		                                                                     'name' => 'start.date.epoch'
+		                                                                   },
+		                                                                   {
+		                                                                     'name' => 'start.year'
+		                                                                   },
+		                                                                   {
+		                                                                     'name' => 'start.month'
+		                                                                   },
+		                                                                   {
+		                                                                     'name' => 'start.day'
+		                                                                   },
+		                                                                   {
+		                                                                     'name' => 'start.day.dayOfWeek'
+		                                                                   },
+		                                                                   {
+		                                                                     'name' => 'end.date.human'
+		                                                                   },
+		                                                                   {
+		                                                                     'name' => 'end.time.human'
+		                                                                   },
+		                                                                   {
+		                                                                     'name' => 'end.date.epoch'
+		                                                                   },
+		                                                                   {
+		                                                                     'name' => 'end.year'
+		                                                                   },
+		                                                                   {
+		                                                                     'name' => 'end.month'
+		                                                                   },
+		                                                                   {
+		                                                                     'name' => 'end.day'
+		                                                                   },
+		                                                                   {
+		                                                                     'name' => 'end.day.dayOfWeek'
+		                                                                   },
+		                                                                   {
+		                                                                     'name' => 'startEndYearMatch'
+		                                                                   },
+		                                                                   {
+		                                                                     'name' => 'startEndMonthMatch'
+		                                                                   },
+		                                                                   {
+		                                                                     'name' => 'startEndDayMatch'
+		                                                                   },
+		                                                                   {
+		                                                                     'name' => 'isFirstDayOfEvent'
+		                                                                   },
+		                                                                   {
+		                                                                     'name' => 'dateIsSameAsPrevious'
+		                                                                   },
+		                                                                   {
+		                                                                     'name' => 'daysInEvent'
+		                                                                   },
+		                                                                   {
+		                                                                     'name' => 'url'
+		                                                                   },
+		                                                                   {
+		                                                                     'name' => 'owner'
+		                                                                   }
+		                                                                 ]
+		                                                },
+		                                                {
+		                                                  'name' => 'url'
+		                                                }
+		                                              ]
+		                             },
+		                             {
+		                               'name' => 'prepad_loop',
+		                               'variables' => [
+		                                                {
+		                                                  'name' => 'count'
+		                                                }
+		                                              ]
+		                             },
+		                             {
+		                               'name' => 'postpad_loop',
+		                               'variables' => [
+		                                                {
+		                                                  'name' => 'count'
+		                                                }
+		                                              ]
+		                             },
+		                             {
+		                               'name' => 'month'
+		                             },
+		                             {
+		                               'name' => 'year'
+		                             }
+		                           ]
+		          }
+		],
 		related => [
 			{
 				tag => 'events calendar add/edit',
