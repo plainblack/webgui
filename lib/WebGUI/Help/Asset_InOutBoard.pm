@@ -58,6 +58,46 @@ our $HELP = {
 	'in out board template' => {
 		title => '20',
 		body => '21',
+		variables => [
+		          {
+		            'name' => 'canViewReport'
+		          },
+		          {
+		            'name' => 'viewReportURL'
+		          },
+		          {
+		            'name' => 'selectDelegatesURL'
+		          },
+		          {
+		            'name' => 'displayForm'
+		          },
+		          {
+		            'name' => 'form'
+		          },
+		          {
+		            'name' => 'rows_loop',
+		            'variables' => [
+		                             {
+		                               'name' => 'deptHasChanged'
+		                             },
+		                             {
+		                               'name' => 'username'
+		                             },
+		                             {
+		                               'name' => 'status'
+		                             },
+		                             {
+		                               'name' => 'dateStamp'
+		                             },
+		                             {
+		                               'name' => 'message'
+		                             }
+		                           ]
+		          },
+		          {
+		            'name' => 'paginateBar'
+		          }
+		],
 		related => [
 			{
 				tag => 'in out board add/edit',
@@ -76,6 +116,60 @@ our $HELP = {
 	'in out board report template' => {
 		title => '22',
 		body => '23',
+		variables => [
+		          {
+		            'name' => 'showReport'
+		          },
+		          {
+		            'name' => 'form',
+		            'description' => 'report.form'
+		          },
+		          {
+		            'name' => 'username.label'
+		          },
+		          {
+		            'name' => 'status.label'
+		          },
+		          {
+		            'name' => 'date.label'
+		          },
+		          {
+		            'name' => 'message.label'
+		          },
+		          {
+		            'name' => 'updatedBy.label'
+		          },
+		          {
+		            'name' => 'rows_loop',
+		            'variables' => [
+		                             {
+		                               'name' => 'deptHasChanged',
+		                             },
+		                             {
+		                               'name' => 'username',
+		                             },
+		                             {
+		                               'name' => 'department'
+		                             },
+		                             {
+		                               'name' => 'status',
+		                             },
+		                             {
+		                               'name' => 'dateStamp',
+		                             },
+		                             {
+		                               'name' => 'message',
+		                             },
+		                             {
+		                               'name' => 'createdBy'
+		                             }
+		                           ],
+		            'description' => 'report rows_loop'
+		          },
+		          {
+		            'name' => 'paginateBar',
+		          }
+		],
 		related => [
 			{
 				tag => 'in out board add/edit',

@@ -32,77 +32,60 @@ our $I18N = {
 		lastUpdated =>1139260288
 	},
 
+	'showReport' => {
+		message => q|A boolean indicating whether or not the <i>rows_loop</i> variable will be set.|,
+		lastUpdated => 1149393724,
+	},
+
+	'report.form' => {
+		message => q|A variable that contains an HTML form for limiting the scope, by date or department, of the report.|,
+		lastUpdated => 1149393724,
+	},
+
+	'username.label' => {
+		message => q|Internationalized label for the "Username" column of the report.|,
+		lastUpdated => 1149393724,
+	},
+
+	'status.label' => {
+		message => q|Internationalized label for the "Status" column of the report.|,
+		lastUpdated => 1149393724,
+	},
+
+	'date.label' => {
+		message => q|Internationalized label for the "Date" column of the report.|,
+		lastUpdated => 1149393724,
+	},
+
+	'message.label' => {
+		message => q|Internationalized label for the "Message" column of the report.|,
+		lastUpdated => 1149393724,
+	},
+
+	'updatedBy.label' => {
+		message => q|Internationalized label for the "Updated By" column of the report.|,
+		lastUpdated => 1149393724,
+	},
+
+	'report rows_loop' => {
+		message => q|A loop containing the rows of data for the In/Out Board Report&nbsp;|,
+		lastUpdated => 1149393724,
+	},
+
+	'department' => {
+		message => q|A variable that returns the user's department. If no department has been assigned to this user, an internationalized label for "No Department" will be used.|,
+		lastUpdated => 1149393724,
+	},
+
+	'createdBy' => {
+		message => q|A variable that returns which user, either the user himself or a delegate, changed the status for this user.|,
+		lastUpdated => 1149393724,
+	},
+
 	'23' => {
 		message => q|<p>The following variables are available from In/Out Board Report template:</p>
-
-<p><b>showReport</b><br />
-A boolean indicating whether or not the <i>rows_loop</i> variable will be set.</p>
-
-<p><b>form</b><br />
-A variable that contains an HTML form for limiting the scope, by date or department, of the report.
-</p>
-
-<p><b>username.label</b><br />
-Internationalized label for the "Username" column of the report.
-</p>
-
-<p><b>status.label</b><br />
-Internationalized label for the "Status" column of the report.
-</p>
-
-<p><b>date.label</b><br />
-Internationalized label for the "Date" column of the report.
-</p>
-
-<p><b>message.label</b><br />
-Internationalized label for the "Message" column of the report.
-</p>
-
-<p><b>updatedBy.label</b><br />
-Internationalized label for the "Updated By" column of the report.
-</p>
-
-<p><b>rows_loop</b><br />
-A loop containing the rows of data for the In/Out Board Report&nbsp;
-</p>
-
-<div class="helpIndent">
-
-<p><b>deptHasChanged</b><br />
-A boolean value indicating whether or not this row of data is for a department that is differnet than the previous rows
-</p>
-
-<p><b>username</b><br />
-A variable that returns the user's name. If the first and last name fields are defined in the user profile, that is what is returned. Otherwise, the users WebGUI username is returned. i.e., "John Doe" vs "Jdoe".
-</p>
-
-<p><b>department</b><br />
-A variable that returns the user's department. If no department has been assigned to this user, an internationalized label for "No Department" will be used.
-</p>
-
-<p><b>status</b><br />
-A variable that returns the user's status. The status of a user is defined by the Status List in the Wobject Properties. If no status is set for the current user 'Never Checked In' is returned.
-</p>
-
-<p><b>dateStamp</b><br />
-A variable that returns the date the status of the user was last updated.
-</p>
-
-<p><b>message</b><br />
-A variable that returns what the user entered in the "What's going on?" field when updating their status.
-</p>
-
-<p><b>createdBy</b><br />
-A variable that returns which user, either the user himself or a delegate, changed the status for this user.
-</p>
-
-</div>
-
-<p><b>paginateBar</b><br />
-A variable that returns the HTML necessary to create a Traditional Pagination Bar. i.e., &lt;&lt; First, 1, 2, Last &gt;&gt;</p>
 |,
-
-		lastUpdated =>1139264476
+		lastUpdated =>1149394078
 	},
 
         '1 description' => {
@@ -156,51 +139,71 @@ their status for them.</p>
 		lastUpdated =>1091624565
 	},
 
+	'canViewReport' => {
+		message => q|A boolean indicating whether or not the <i>viewReportURL</i> variable will be set.|,
+		lastUpdated => 1149393667,
+	},
+
+	'viewReportURL' => {
+		message => q|URL that links to the view report page.|,
+		lastUpdated => 1149393667,
+	},
+
+	'selectDelegatesURL' => {
+		message => q|URL that links to a form where users can select other users (delegates) who
+can alter their status.|,
+		lastUpdated => 1149393667,
+	},
+
+	'displayForm' => {
+		message => q|A boolean indicating whether or not the <i>form</i> variable will be set.|,
+		lastUpdated => 1149393667,
+	},
+
+	'form' => {
+		message => q|A variable that contains the HTML for displaying the In/Out Entry Form to update status for the current user or another user.|,
+		lastUpdated => 1149393667,
+	},
+
+	'rows_loop' => {
+		message => q|A loop containing the rows of data for the In/Out Board|,
+		lastUpdated => 1149393667,
+	},
+
+	'deptHasChanged' => {
+		message => q|A boolean value indicating whether or not this row of data is for a department that is differnet than the previous rows|,
+		lastUpdated => 1149393667,
+	},
+
+	'username' => {
+		message => q|A variable that returns the users name.  If the first and last name fields are defined in the user profile, that is what is returned.  Otherwise, the users WebGUI username is returned.  i.e., "John Doe" vs "Jdoe"|,
+		lastUpdated => 1149393667,
+	},
+
+	'status' => {
+		message => q|A variable that returns the user's status.  The status of a user is defined by the Status List in the Wobject Properties.  If no status is set for the current user 'Never Checked In' is returned.|,
+		lastUpdated => 1149393667,
+	},
+
+	'dateStamp' => {
+		message => q|A variable that returns the date the status of the user was last updated.|,
+		lastUpdated => 1149393667,
+	},
+
+	'message' => {
+		message => q|A variable that returns what the user entered in the "What's going on?" field when updating their status.|,
+		lastUpdated => 1149393667,
+	},
+
+	'paginateBar' => {
+		message => q|A variable that returns the HTML necessary to create a Traditional Pagination Bar.  i.e., &gt;&gt; First, 1, 2, Last &lt;&lt;|,
+		lastUpdated => 1149393667,
+	},
+
 	'21' => {
 		message => q|<p>The following variables are made available from In/Out Board:</p>
-
-<p><b>canViewReport</b><br />
-A boolean indicating whether or not the <i>viewReportURL</i> variable will be set.</p>
-
-<p><b>viewReportURL</b><br />
-URL that links to the view report page.</p>
-
-<p><b>selectDelegatesURL</b><br />
-URL that links to a form where users can select other users (delegates) who
-can alter their status.</p>
-
-<p><b>displayForm</b><br />
-A boolean indicating whether or not the <i>form</i> variable will be set.</p>
-
-<p><b>form</b><br />
-A variable that contains the HTML for displaying the In/Out Entry Form to update status for the current user or another user.</p>
-
-<p><b>rows_loop</b><br />
-A loop containing the rows of data for the In/Out Board</p>
-
-<div class="helpIndent">
-
-<p><b>deptHasChanged</b><br />
-A boolean value indicating whether or not this row of data is for a department that is differnet than the previous rows</p>
-
-<p><b>username</b><br />
-A variable that returns the users name.  If the first and last name fields are defined in the user profile, that is what is returned.  Otherwise, the users WebGUI username is returned.  i.e., "John Doe" vs "Jdoe"</p>
-
-<p><b>status</b><br />
-A variable that returns the users status.  The status of a user is defined by the Status List in the Wobject Properties.  If no status is set for the current user 'Never Checked In' is returned.</p>
-
-<p><b>dateStamp</b><br />
-A variable that returns the date the status of the user was last updated.</p>
-
-<p><b>message</b><br />
-A variable that returns what the user entered in the "What's going on?" field when updating their status.</p>
-</div>
-
-<p><b>paginateBar</b><br />
-A variable that returns the HTML necessary to create a Traditional Pagination Bar.  i.e., &gt;&gt; First, 1, 2, Last &lt;&lt;</p>
-
   |,
-		lastUpdated =>1139254657
+		lastUpdated =>1149393698
 	},
 
 	'2' => {

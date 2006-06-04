@@ -216,75 +216,323 @@ a Google sitemap of your site.</p>
 		lastUpdated => 1078207966
 	},
 
+	'currentPage.menuTitle' => {
+		message => q|The pageId of the start page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'currentPage.assetId' => {
+		message => q|The assetId of the start page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'currentPage.parentId' => {
+		message => q|The assetId of the parent of the start page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'currentPage.ownerUserId' => {
+		message => q|The userId of the owner of the start page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'currentPage.synopsis' => {
+		message => q|The synopsis of the start page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'currentPage.newWindow' => {
+		message => q|A conditional indicating whether the start page should be opened in a new window.|,
+		lastUpdated => 1149394665,
+	},
+
+	'currentPage.menuTitle' => {
+		message => q|The menu title of the start page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'currentPage.title' => {
+		message => q|The title of the start page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'currentPage.isHome' => {
+		message => q|A conditional indicating whether the base page is the default page for the site.|,
+		lastUpdated => 1149394665,
+	},
+
+	'currentPage.url' => {
+		message => q|The URL of the start page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'currentPage.rank' => {
+		message => q|The position of the current page compared to its siblings.|,
+		lastUpdated => 1149394665,
+	},
+
+	'currentPage.hasChild' => {
+		message => q|A conditional indicating whether the start page has daughters.|,
+		lastUpdated => 1149394665,
+	},
+
+	'currentPage.hasSibling' => {
+		message => q|A conditional indicating whether the start page has siblings.|,
+		lastUpdated => 1149394665,
+	},
+
+	'currentPage.hasViewableSiblings' => {
+		message => q|A conditional indicating whether the start page has siblings that are viewable by the current user.|,
+		lastUpdated => 1149394665,
+	},
+
+	'currentPage.hasViewableChildren' => {
+		message => q|A conditional indicating whether the start page has children that are viewable by the current user.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page_loop' => {
+		message => q|A loop containing page information in nested, hierarchical order.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.assetId' => {
+		message => q|The assetId of this page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.parentId' => {
+		message => q|The assetId of the parent of this page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.ownerUserId' => {
+		message => q|The userId of the owner of this page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.synopsis' => {
+		message => q|The synopsis of this page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.newWindow' => {
+		message => q|A conditional indicating whether this page should be opened in a new window.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.menuTitle' => {
+		message => q|The menu title of this page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.title' => {
+		message => q|The title of this page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.rank' => {
+		message => q|The rank of this page compared with is siblings.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.absDepth' => {
+		message => q|The absolute depth of this page (relative to nameless root).|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.relDepth' => {
+		message => q|The relative depth of this page (relative to starting point).|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.isSystem' => {
+		message => q|A conditional indicating whether this page is a system page (Trash, Clipboard, etc).|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.isHidden' => {
+		message => q|A conditional indicating whether this page is a hidden page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.isContainer' => {
+		message => q|A conditional indicating whether this page a container asset.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.isUtility' => {
+		message => q|A conditional indicating whether this page is a utility asset.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.isViewable' => {
+		message => q|A conditional indicating whether the user has permission to view it.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.url' => {
+		message => q|The complete URL to this page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.indent' => {
+		message => q|A variable containing the indent for the current page. The default indent is three spaces. Use the <strong>page.indent_loop</strong> if you need a more flexible indent.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.indent_loop' => {
+		message => q|A loop that runs <strong>page.relDepth</strong> times.|,
+		lastUpdated => 1149394665,
+	},
+
+	'indent' => {
+		message => q|A number representing the loop count.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.isBranchRoot' => {
+		message => q|A conditional indicating whether this page is a root page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.isTopOfBranch' => {
+		message => q|A conditional indicating whether this page is a top page (daughter of root).|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.isChild' => {
+		message => q|A conditional indicating whether this page is a daughter of the base page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.isParent' => {
+		message => q|A conditional indicating whether this page is the mother of the base page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.isCurrent' => {
+		message => q|A conditional indicating whether this page is the base page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.isDescendent' => {
+		message => q|A conditional indicating whether this page is a descendant of the base page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.isAncestor' => {
+		message => q|A conditional indicating whether this page is an ancestor of the base page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.inBranchRoot' => {
+		message => q|This conditional is true if this page is a descendant of the root page of the base page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.isSibling' => {
+		message => q|A conditional indicating whether this page is the sister of the base page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.inBranch' => {
+		message => q|A conditional that is the logical OR of <strong>isAncestor</strong>, <strong>isSister</strong>, <strong>isBasepage</strong> and <strong>isDescendent</strong>.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.hasChild' => {
+		message => q|A conditional indicating whether this page has a daughter. In other words, it evaluates to true if this page is a mother.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.hasViewableChildren' => {
+		message => q|A conditional indicating whether this page has a viewable child.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.depthIsN' => {
+		message => q|A conditional indicating whether the depth of this page is N. This variable is useful if you want to style a certain level.
+</p>
+<p>&lt;tmpl_if page.depthIs1&gt;<br />
+&nbsp;&nbsp; &lt;img src="level1.gif"&gt;<br />&lt;tmpl_else&gt;<br />&nbsp;&nbsp; &lt;img src="defaultBullet.gif"&gt;<br />&lt;/tmpl_if&gt;|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.relativeDepthIsN' => {
+		message => q|A conditional indicating whether the depth of this page is N, relative to the starting page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.depthDiff' => {
+		message => q|The difference in depth between the previous page and this page, parent.absDepth - page.absDepth, although parent.absDepth is not a template variable.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.depthDiffIsN' => {
+		message => q|True if the <strong>page.depthDiff</strong> variable is N.  N can be positive or negative.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.depthDiff_loop' => {
+		message => q|A loop that runs <strong>page.depthDiff</strong> times, if <strong>page.depthDiff</strong> &gt; 0. This loop contains no loop variables.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.isRankedFirst' => {
+		message => q|This property is true if this page is the first within this level. ie. has no left sister.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.isRankedLast' => {
+		message => q|This property is true if this page is the last within this level. ie. has no right sister.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.parent.menuTitle' => {
+		message => q|The menu title of the mother of this page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.parent.title' => {
+		message => q|The title of the mother of this page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.parent.url' => {
+		message => q|The urlized title of the mother of this page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.parent.assetId' => {
+		message => q|The assetId of the mother of this page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.parent.parentId' => {
+		message => q|The assetId of the grandmother of this page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.parent.ownerUserId' => {
+		message => q|The userId of the owner of the mother of this page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.parent.synopsis' => {
+		message => q|The synopsis of the mother of this page.|,
+		lastUpdated => 1149394665,
+	},
+
+	'page.parent.newWindow' => {
+		message => q|A conditional indicating whether the mother of this page should be opened in a new window.|,
+		lastUpdated => 1149394665,
+	},
+
 	'1097' => {
-		message => q| <p><strong>currentPage.menuTitle</strong><br />The pageId of the start page.</p>
-<p><strong>currentPage.assetId</strong><br />The assetId of the start page.</p>
-<p><strong>currentPage.parentId</strong><br />The assetId of the parent of the start page.</p>
-<p><strong>currentPage.ownerUserId</strong><br />The userId of the owner of the start page.</p>
-<p><strong>currentPage.synopsis</strong><br />The synopsis of the start page.</p>
-<p><strong>currentPage.newWindow</strong><br />A conditional indicating whether the start page should be opened in a new window.</p>
-<p><strong>currentPage.menuTitle</strong><br />The menu title of the start page.</p>
-<p><strong>currentPage.title</strong><br />The title of the start page.</p>
-<p><strong>currentPage.isHome</strong><br />A conditional indicating whether the base page is the default page for the site.</p>
-<p><strong>currentPage.url</strong><br />The URL of the start page.</p>
-<p><strong>currentPage.rank</strong><br />The position of the current page compared to its siblings.</p>
-<p><strong>currentPage.hasChild</strong><br />A conditional indicating whether the start page has daughters.</p>
-<p><strong>currentPage.hasSibling</strong><br />A conditional indicating whether the start page has siblings.</p>
-<p><strong>currentPage.hasViewableSiblings</strong><br />A conditional indicating whether the start page has siblings that are viewable by the current user.</p>
-<p><strong>currentPage.hasViewableChildren</strong><br />A conditional indicating whether the start page has children that are viewable by the current user.</p>
-<p><strong>page_loop</strong><br />A loop containing page information in nested, hierarchical order.</p>
-<div class="helpIndent">
-<p><strong>page.assetId</strong><br />The assetId of this page.</p>
-<p><strong>page.parentId</strong><br />The assetId of the parent of this page.</p>
-<p><strong>page.ownerUserId</strong><br />The userId of the owner of this page.</p>
-<p><strong>page.synopsis</strong><br />The synopsis of this page.</p>
-<p><strong>page.newWindow</strong><br />A conditional indicating whether this page should be opened in a new window.</p>
-<p><strong>page.menuTitle</strong><br />The menu title of this page.</p>
-<p><strong>page.title</strong><br />The title of this page.</p>
-<p><strong>page.rank</strong><br />The rank of this page compared with is siblings.</p>
-<p><strong>page.absDepth</strong><br />The absolute depth of this page (relative to nameless root).</p>
-<p><strong>page.relDepth</strong><br />The relative depth of this page (relative to starting point).</p>
-<p><strong>page.isSystem</strong><br />A conditional indicating whether this page is a system page (Trash, Clipboard, etc).</p>
-<p><strong>page.isHidden</strong><br />A conditional indicating whether this page is a hidden page.</p>
-<p><strong>page.isContainer</strong><br />A conditional indicating whether this page a container asset.</p>
-<p><strong>page.isUtility</strong><br />A conditional indicating whether this page is a utility asset.</p>
-<p><strong>page.isViewable</strong><br />A conditional indicating whether the user has permission to view it.</p>
-<p><strong>page.url</strong><br />The complete URL to this page.</p>
-<p><strong>page.indent</strong><br />A variable containing the indent for the current page. The default indent is three spaces. Use the <strong>page.indent_loop</strong> if you need a more flexible indent.</p>
-<p><strong>page.indent_loop</strong><br />A loop that runs <strong>page.relDepth</strong> times.</p>
-<div class="helpIndent">
-<p><strong>indent</strong><br />A number representing the loop count. </p></div>
-<p><strong>page.isBranchRoot</strong><br />A conditional indicating whether this page is a root page.</p>
-<p><strong>page.isTopOfBranch</strong><br />A conditional indicating whether this page is a top page (daughter of root).</p>
-<p><strong>page.isChild</strong><br />A conditional indicating whether this page is a daughter of the base page.</p>
-<p><strong>page.isParent</strong><br />A conditional indicating whether this page is the mother of the base page.</p>
-<p><strong>page.isCurrent</strong><br />A conditional indicating whether this page is the base page.</p>
-<p><strong>page.isDescendent</strong><br />A conditional indicating whether this page is a descendant of the base page.</p>
-<p><strong>page.isAncestor</strong><br />A conditional indicating whether this page is an ancestor of the base page.</p>
-<p><strong>page.inBranchRoot</strong><br />This conditional is true if this page is a descendant of the root page of the base page.</p>
-<p><strong>page.isSibling</strong><br />A conditional indicating whether this page is the sister of the base page.</p>
-<p><strong>page.inBranch</strong><br />A conditional that is the logical OR of <strong>isAncestor</strong>, <strong>isSister</strong>, <strong>isBasepage</strong> and <strong>isDescendent</strong>.</p>
-<p><strong>page.hasChild</strong><br />A conditional indicating whether this page has a daughter. In other words, it evaluates to true if this page is a mother.</p>
-<p><strong>page.hasViewableChildren</strong><br />A conditional indicating whether this page has a viewable child.</p>
-<p><strong>page.depthIs1 , page.depthIs2 , page.depthIs3 , page.depthIs4 , page.depthIsN<br /></strong>A conditional indicating whether the depth of this page is N. This variable is useful if you want to style a certain level.</p>
-<p>&lt;tmpl_if page.depthIs1&gt;<br />&nbsp;&nbsp; &lt;img src="level1.gif"&gt;<br />&lt;tmpl_else&gt;<br />&nbsp;&nbsp; &lt;img src="defaultBullet.gif"&gt;<br />&lt;/tmpl_if&gt;</p>
-<p><strong>page.relativeDepthIs1 , page.relativeDepthIs2 , page.relativeDepthIs3 , page.relativeDepthIsN</strong><br />A conditional indicating whether the depth of this page is N, relative to the starting page.</p>
-<p><strong>page.depthDiff</strong><br />The difference in depth between the previous page and this page, parent.absDepth - page.absDepth, although parent.absDepth is not a template variable.</p>
-<p><strong>page.depthDiffIs1, page.depthDiffIs2, page.depthDiffIs3, page.depthDiffIsN</strong><br />True if the <strong>page.depthDiff</strong> variable is N.  N can be positive or negative.</p>
-<p><strong>page.depthDiff_loop</strong><br />A loop that runs <strong>page.depthDiff</strong> times, if <strong>page.depthDiff</strong> &gt; 0. This loop contains no loop variables.</p>
-<p><strong>page.isRankedFirst</strong><br />This property is true if this page is the first within this level. ie. has no left sister.</p>
-<p><strong>page.isRankedLast</strong><br />This property is true if this page is the last within this level. ie. has no right sister.</p>
-<p><strong>page.parent.*</strong><br />These variables will be undefined if the page is a root.</p>
-<p><strong>page.parent.menuTitle</strong><br />The menu title of the mother of this page.</p>
-<p><strong>page.parent.title</strong><br />The title of the mother of this page.</p>
-<p><strong>page.parent.url</strong><br />The urlized title of the mother of this page.</p>
-<p><strong>page.parent.assetId</strong><br />The assetId of the mother of this page.</p>
-<p><strong>page.parent.parentId</strong><br />The assetId of the grandmother of this page.</p>
-<p><strong>page.parent.ownerUserId</strong><br />The userId of the owner of the mother of this page.</p>
-<p><strong>page.parent.synopsis</strong><br />The synopsis of the mother of this page.</p>
-<p><strong>page.parent.newWindow</strong><br />A conditional indicating whether the mother of this page should be opened in a new window.</p>
-</div>|,
-		lastUpdated => 1145060204,
+		message => q|<p>These variables are available in Navigation Templates:</p>
+	|,
+		lastUpdated => 1149394711,
 	},
 
 	'1094' => {

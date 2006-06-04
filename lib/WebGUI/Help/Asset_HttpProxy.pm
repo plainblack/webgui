@@ -86,6 +86,26 @@ our $HELP = {
 		body => 'http proxy template body',
 		fields => [
 		],
+		variables => [
+		          {
+		            'name' => 'header'
+		          },
+		          {
+		            'name' => 'content'
+		          },
+		          {
+		            'name' => 'search.for'
+		          },
+		          {
+		            'name' => 'stop.at'
+		          },
+		          {
+		            'name' => 'content.leading'
+		          },
+		          {
+		            'name' => 'content.trailing'
+		          }
+		],
 		related => [
 			{
 				tag => 'http proxy add/edit',

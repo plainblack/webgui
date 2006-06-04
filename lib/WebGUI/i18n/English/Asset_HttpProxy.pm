@@ -30,33 +30,41 @@ our $I18N = {
 		lastUpdated => 1109714266,
 	},
 
+	'header' => {
+		message => q|The header from the proxied URL.|,
+		lastUpdated => 1149393165,
+	},
+
+	'content' => {
+		message => q|The content from the proxied URL.  If the <b>Search for</b> or <b>Stop at</b> properties are used, then the content will not contain either of those.|,
+		lastUpdated => 1149393165,
+	},
+
+	'search.for' => {
+		message => q|The string used to start the content search.|,
+		lastUpdated => 1149393165,
+	},
+
+	'stop.at' => {
+		message => q|The string used to stop the content search.|,
+		lastUpdated => 1149393165,
+	},
+
+	'content.leading' => {
+		message => q|Any text before the <b>Search For</b> string.|,
+		lastUpdated => 1149393165,
+	},
+
+	'content.trailing' => {
+		message => q|Any text after the <b>Stop At</b> string.|,
+		lastUpdated => 1149393165,
+	},
+
+
 	'http proxy template body' => {
 		message => q|<p>The following variables are available in templates for HTTP Proxies:</p>
-<p><b>header</b><br />
-The header from the proxied URL.
-</p>
-
-<p><b>content</b><br />
-The content from the proxied URL.  If the <b>Search for</b> or <b>Stop at</b> properties are used, then the content will not contain either of those.
-</p>
-
-<p><b>search.for</b><br />
-The string used to start the content search.
-</p>
-
-<p><b>stop.at</b><br />
-The string used to stop the content search.
-</p>
-
-<p><b>content.leading</b><br />
-Any text before the <b>Search For</b> string.
-</p>
-
-<p><b>content.trailing</b><br />
-Any text after the <b>Stop At</b> string.
-</p>
 |,
-		lastUpdated => 1146775775,
+		lastUpdated => 1149393194,
 	},
 
         '1 description' => {
