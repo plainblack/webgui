@@ -960,7 +960,7 @@ sub www_transferKarma {
 	my $self = shift;
 	my $amount = $self->session->form->get("karma","integer");
 	# cant have them giving more karma then they have
-	if ($amount <= $self->session->user->karma) {
+	if ($amount > 0 && $amount <= $self->session->user->karma) {
 		$self->session->user->karma(-$amount, "Thread ".$self->getId, "Transferring karma to a thread.");
 		my $newKarma = $self->get("karma")+$amount;
 		my $karmaScale = $self->get("karmaScale") || 1;
