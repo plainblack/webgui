@@ -1,4 +1,5 @@
 6.99.4
+ - fix: typo in spectre 
  - fixed a bug where a user could transfer a negative amount of karma to a
    thread and actually gain karma from the thread.
  - fix: Make Package not in Admin Bar

@@ -198,7 +198,7 @@ sub runTests {
         	} else {
                 	my $response = $response->content;
 			if ($response eq "subnet") {
-				$self->error("Spectre cannot communicate with WebGUI for $config, perhaps you need to adjust thhe spectreSubnets setting in this config file.");
+				$self->error("Spectre cannot communicate with WebGUI for $config, perhaps you need to adjust the spectreSubnets setting in this config file.");
 			} elsif ($response eq "spectre") {
 				$self->error("WebGUI connot communicate with Spectre for $config, perhaps you need to adjust the spectreIp or spectrePort setting the this config file.");
 			} elsif ($response ne "success") {
