@@ -209,6 +209,7 @@ our $I18N = {
 	  'hours label abbrev' => {
 		message => q|hrs|,
 		lastUpdated => 0
+		context => q|Abbreviation for hours|,
 		},
 
 	 'days label abbrev' => {
@@ -238,7 +239,8 @@ our $I18N = {
 
 	 'task dependant label' => {
 		message => q|Pred|,
-		lastUpdated => 0
+		lastUpdated => 0,
+		context => q|Abbreviation for predecessor|,
 		},
 
 	 'add task label' => {
@@ -283,37 +285,44 @@ our $I18N = {
 
 	 'monday label' => {
 		message => q|M|,
-		lastUpdated => 0
+		lastUpdated => 0,
+		context => q|Abbreviation for Monday|,
 		},
 
 	 'tuesday label' => {
 		message => q|T|,
-		lastUpdated => 0
+		lastUpdated => 0,
+		context => q|Abbreviation for Tuesday|,
 		},
 
 	 'wednesday label' => {
 		message => q|W|,
-		lastUpdated => 0
+		lastUpdated => 0,
+		context => q|Abbreviation for Wednesday|,
 		},
 
 	 'thursday label' => {
 		message => q|T|,
-		lastUpdated => 0
+		lastUpdated => 0,
+		context => q|Abbreviation for Thursday|,
 		},
 
 	 'friday label' => {
 		message => q|F|,
-		lastUpdated => 0
+		lastUpdated => 0,
+		context => q|Abbreviation for Friday|,
 		},
 
 	 'saturday label' => {
 		message => q|S|,
-		lastUpdated => 0
+		lastUpdated => 0,
+		context => q|Abbreviation for Saturday|,
 		},
 
 	 'sunday label' => {
 		message => q|S|,
-		lastUpdated => 0
+		lastUpdated => 0,
+		context => q|Abbreviation for Sunday|,
 		},
 
 	 'task previousPredecessor error' => {
