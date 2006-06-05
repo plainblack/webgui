@@ -495,11 +495,7 @@ The internationalized word "End".
 </p>
 
 <p><b>task.dependants.label</b><br />
-The internationalized word "Pred".
-</p>
-
-<p><b>task.dependants.label</b><br />
-The internationalized word "Pred".
+The internationalized word "Pred", short for Predecessor.
 </p>
 
 <p><b>form.name.error</b><br />
