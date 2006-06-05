@@ -208,7 +208,7 @@ our $I18N = {
 
 	  'hours label abbrev' => {
 		message => q|hrs|,
-		lastUpdated => 0
+		lastUpdated => 0,
 		context => q|Abbreviation for hours|,
 		},
 

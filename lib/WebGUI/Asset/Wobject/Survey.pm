@@ -39,11 +39,13 @@ sub addAnswer {
 sub addSection {
 	my $self = shift;
 	my $sectionName = shift;
-	$self->setCollateral("Survey_section","Survey_sectionId",{
+	my $sectionId = $self->setCollateral("Survey_section","Survey_sectionId",{
 		Survey_id=>$self->get("Survey_id"),
 		Survey_sectionId=>"new",
 		sectionName=>$sectionName
 		},1,0,"Survey_id");
+	
+	return $sectionId;
 }
 
 #-------------------------------------------------------------------
@@ -121,6 +123,10 @@ sub definition {
 			responseTemplateId => {
 				fieldType	=> 'template',
 				defaultValue	=> 'PBtmpl0000000000000064'
+				},
+			defaultSectionId => {
+				fieldType	=> 'text',
+				defaultValue	=> 'undef'
 				},
 			}
 		});
@@ -580,9 +586,11 @@ sub prepareView {
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
-	my $i18n = WebGUI::International->new($self->session);
+	my $i18n = WebGUI::International->new($self->session,"Asset_Survey");
 	if ($self->session->form->process("assetId") eq "new") {
-	  $self->addSection($i18n->get(107));
+	  my $defaultSectionId = $self->addSection($i18n->get(107));
+	  $self->update({'defaultSectionId' => $defaultSectionId});
+	  $self->session->errorHandler->warn($defaultSectionId);
 	}
 	
 }
@@ -740,15 +748,13 @@ sub www_deleteSectionConfirm {
 	my $self = shift;
         return $self->session->privilege->insufficient() unless ($self->canEdit);
 	my $i18n = WebGUI::International->new($self->session,'Asset_Survey');
-        my $none = $i18n->get(107);
-        my ($sectionName) = $self->session->db->quickArray("select sectionName from Survey_section where Survey_sectionId="
-        		.$self->session->db->quote($self->session->form->process("sid")));
-        if ($sectionName =~ /$none/) {
+        my $section_id = $self->session->form->get("sid");
+        if ($section_id eq $self->get("defaultSectionId")) {
 	  return $self->session->privilege->vitalComponent();
 	}
         
-	$self->session->db->write("delete from Survey_section where Survey_sectionId=".$self->session->db->quote($self->session->form->process("sid")));
-        $self->deleteCollateral("Survey_section","Survey_sectionId",$self->session->form->process("sid"));
+	$self->session->db->write("delete from Survey_section where Survey_sectionId=?",[$section_id]);
+        $self->deleteCollateral("Survey_section","Survey_sectionId",$section_id);
         $self->reorderCollateral("Survey_section","Survey_sectionId","Survey_id");
         return "";
 }
@@ -1077,11 +1083,10 @@ sub www_editSection {
 	my $self = shift;
 	my ($f, $section, $sectionName);
 	my $i18n = WebGUI::International->new($self->session, 'Asset_Survey');
-	my $none = $i18n->get(107);
 	return $self->session->privilege->insufficient() unless ($self->canEdit);
 	$section = $self->getCollateral("Survey_section","Survey_sectionId",$self->session->form->process("sid"));
 	
-	if ($section->{sectionName} =~ /$none/) {
+	if ($section->{Survey_sectionId} eq $self->get("defaultSectionId") && $section->{Survey_sectionId} ne "") {
 		return $self->session->privilege->vitalComponent;
 	}
 	

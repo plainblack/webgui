@@ -7,6 +7,8 @@
  - fix: Survey Asset Copy Problems
  - fix: EMS Add Subevent
  - fix: HTTPproxy
+ - fix: i18n reserved section name in Surveys
+ - fix: typo in Asset_ProjectManager i18n
 
 6.99.3
  - Someone removed the status from the submission templates. That has been

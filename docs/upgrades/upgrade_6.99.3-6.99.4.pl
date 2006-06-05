@@ -22,8 +22,28 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 
+fixSurvey($session);
+
 finish($session); # this line required
 
+#-------------------------------------------------
+sub fixSurvey{
+	my $session = shift;
+	print "\tFixing Surveys.\n" unless ($quiet);
+	
+	# Add a defaultSectionId column to Survey table
+	$session->db->write("alter table Survey add column (defaultSectionId varchar(22) binary not null)");
+
+	# Set defaultSectionId for existing Surveys by finding the sectionId for the section called 'none' and update the asset
+	my @surveyAssets = $session->db->buildArray("select assetId from asset where className='WebGUI::Asset::Wobject::Survey'");
+	foreach my $assetId (@surveyAssets) {
+		my $survey = WebGUI::Asset->new($session, $assetId, 'WebGUI::Asset::Wobject::Survey');
+		my $i18n = WebGUI::International->new($session, 'Asset_Survey');
+		my $noneLabel = $i18n->get(107);
+		my ($defaultSectionId) = $session->db->quickArray("select Survey_sectionId from Survey_section where assetId=? and sectionName=?", [$assetId,$noneLabel]);
+		$survey->update({defaultSectionId => $defaultSectionId});  
+	}
+}
 
 ##-------------------------------------------------
 #sub exampleFunction {
