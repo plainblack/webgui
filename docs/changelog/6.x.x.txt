@@ -6,7 +6,7 @@
  - fix: Make Package not in Admin Bar
  - fix: Survey Asset Copy Problems
  - fix: EMS Add Subevent
-
+ - fix: HTTPproxy
 
 6.99.3
  - Someone removed the status from the submission templates. That has been

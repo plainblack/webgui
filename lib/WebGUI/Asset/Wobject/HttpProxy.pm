@@ -236,7 +236,8 @@ sub view {
       $proxiedUrl = $self->session->form->process("FormAction") || $self->session->form->process("proxiedUrl") || $self->get("proxiedUrl") ;
    } else {
       $proxiedUrl = $self->get("proxiedUrl");
-      $self->session->env->get("REQUEST_METHOD")='GET';
+      $self->session->stow->set("REQUEST_METHOD", 'GET');
+	$self->session->errorHandler(Dumper($self->session->{_env}));
    }
 
    $redirect=0; 
@@ -247,7 +248,7 @@ sub view {
    my $cachedHeader = WebGUI::Cache->new($self->session,$proxiedUrl,"HEADER");
    $var{header} = $cachedHeader->get;
    $var{content} = $cachedContent->get;
-   unless ($var{content} && $self->session->env->get("REQUEST_METHOD")=~/GET/i) {
+   unless ($var{content} && $self->session->stow->get("REQUEST_METHOD")=~/GET/i) {
       $redirect=0; 
       until($redirect == 5) { # We follow max 5 redirects to prevent bouncing/flapping
       $userAgent = new LWP::UserAgent;
@@ -269,7 +270,7 @@ sub view {
       $header = new HTTP::Headers;
 	$header->referer($self->get("proxiedUrl")); # To get around referrer blocking
 
-      if($self->session->env->get("REQUEST_METHOD")=~/GET/i || $redirect != 0) {  # request_method is also GET after a redirection. Just to make sure we're
+      if($self->session->stow->get("REQUEST_METHOD")=~/GET/i || $redirect != 0) {  # request_method is also GET after a redirection. Just to make sure we're
                                						# not posting the same data over and over again.
          if($redirect == 0) {
             foreach my $input_name ($self->session->form->param) {
