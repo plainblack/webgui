@@ -956,7 +956,8 @@ sub www_editQuestion {
 			-name	=> "section",
 			-options=> $sectionList,
 			-value	=> [$question->{Survey_sectionId}],
-			-label	=> $i18n->get(106)
+			-label	=> $i18n->get(106),
+			-hoverHelp	=> $i18n->get('106 description'),
 		      );
 
 	if ($self->get("questionOrder") eq "response") {
@@ -1081,7 +1082,7 @@ sub www_editSection {
 	$section = $self->getCollateral("Survey_section","Survey_sectionId",$self->session->form->process("sid"));
 	
 	if ($section->{sectionName} =~ /$none/) {
-	  return $self->session->privilege->vitalComponent;
+		return $self->session->privilege->vitalComponent;
 	}
 	
 	$f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);

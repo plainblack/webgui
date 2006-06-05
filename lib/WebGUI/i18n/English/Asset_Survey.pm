@@ -6,7 +6,7 @@ our $I18N = {
 		message => q|Add a HTML Area Answer|,
 		lastUpdated => 1122296097
 	},
-	
+
 	'101' => {
 	        message => q|Add a Text Area Answer|,
 	        lastUpdated => 1122296097
@@ -16,7 +16,7 @@ our $I18N = {
 	        message => q|Section Name|,
 	        lastUpdated => 1122296097
         },
-        
+
         '103' => {
                 message => q|Survey Section, Add/Edit|,
                 lastUpdated => 1122296097
@@ -34,6 +34,11 @@ our $I18N = {
 
         '106' => {
                 message => q|Section|,
+                lastUpdated => 1122296097
+        },
+
+        '106 description' => {
+                message => q|Which section should this question be added to?|,
                 lastUpdated => 1122296097
         },
 
@@ -1084,7 +1089,7 @@ A comment.
 		lastUpdated => 0,
 		context => q|Form label indicating the gradebook template.|
 	},
-	
+
 	'response template' => {
 		message => q|Response template|,
 		lastUpdated => 0,

@@ -130,6 +130,11 @@ our $HELP = {
                                 namespace => 'Asset_Survey',
                         },
                         {
+                                title => '106',
+                                description => '106 description',
+                                namespace => 'Asset_Survey',
+                        },
+                        {
                                 title => '21',
                                 description => '21 description',
                                 namespace => 'Asset_Survey',
