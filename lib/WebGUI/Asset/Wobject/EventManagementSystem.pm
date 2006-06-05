@@ -2751,7 +2751,7 @@ sub www_search {
 		$subSearchFlag = 1;
 		$cfilter_s0 = "requirement";
 		$cfilter_c0 = "eq";
-		$pn = $self->session->form->get("pn");
+		$pn = 1 || $self->session->form->get("pn");
 	}
 
 	my $keywords = $self->session->form->process("searchKeywords",'text');
