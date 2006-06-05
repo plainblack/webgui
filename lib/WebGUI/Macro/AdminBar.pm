@@ -42,7 +42,6 @@ sub process {
 	return "" unless ($session->var->isAdminOn);
 	my @param = @_;
         my $templateId = $param[0] || "PBtmpl0000000000000090";
-        my %var;
 	my $i18n = WebGUI::International->new($session,'Macro_AdminBar');
 	my @adminbar = ();
    	my $ac = WebGUI::AdminConsole->new($session);
@@ -81,7 +80,7 @@ sub process {
 		foreach my $package (@{$session->asset->getPackageList}) {
 			my $title = $package->getTitle;
 			$title =~ s/'//g; # stops it from breaking the javascript menus
-                	push(@{$var{'package_loop'}},{
+                	push(@packages,{
 				'url'=>$session->asset->getUrl("func=deployPackage;assetId=".$package->getId),
 				'title'=>$title,
 				icon=>$package->getIcon(1),
