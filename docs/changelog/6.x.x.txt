@@ -1,5 +1,6 @@
 6.99.4
  - fix: Make Package not in Admin Bar
+ - fix: Survey Asset Copy Problems
 
 
 6.99.3
