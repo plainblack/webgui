@@ -1430,6 +1430,8 @@ Will mark the 'deleted' field identified by the id given in the form param 'fid'
 sub www_enableField {
 	my $self = shift;
 
+	return $self->session->privilege->insufficient() unless ($self->_canAlterTable);
+
 	$self->session->db->write('delete from SQLForm_fieldDefinitions '.
 		' where property="disabled" and assetId='.$self->session->db->quote($self->getId).' and fieldId='.$self->session->db->quote($self->session->form->process("fid")));
 		
