@@ -82,6 +82,7 @@ sub definition {
 					defaultValue=>1
 				},
 				parser=>{
+					noFormPost=>1,
 					fieldType=>'selectList',
 					defaultValue=>[$session->config->get("defaultTemplateParser")]
 				},	
@@ -98,6 +99,21 @@ sub definition {
         return $class->SUPER::definition($session,$definition);
 }
 
+#-------------------------------------------------------------------
+
+sub processPropertiesFromFormPost {
+	my $self = shift;
+	$self->SUPER::processPropertiesFromFormPost;
+	if ($self->getValue("parser") ne $self->session->form->process("parser","className") && ($self->session->form->process("parser","className") ne "")) {
+		my %data;
+		if (isIn($self->session->form->process("parser","className"),@{$self->session->config->get("templateParsers")})) {
+			%data = ( parser => $self->session->form->process("parser","className") );
+		} else {
+			%data = ( parser => $self->session->config->get("defaultTemplateParser") );
+		}
+		$self->update(\%data);
+	}
+}
 
 #-------------------------------------------------------------------
 
@@ -173,9 +189,6 @@ sub getEditForm {
 }
 
 
-
-
-
 #-------------------------------------------------------------------
 
 =head2 getList ( session, namespace )
@@ -198,7 +211,7 @@ sub getList {
 	my $class = shift;
 	my $session = shift;
 	my $namespace = shift;
-my $sql = "select asset.assetId, assetData.revisionDate from template left join asset on asset.assetId=template.assetId left join assetData on assetData.revisionDate=template.revisionDate and assetData.assetId=template.assetId where template.namespace=".$session->db->quote($namespace)." and template.showInForms=1 and asset.state='published' and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId and (assetData.status='approved' or assetData.tagId=".$session->db->quote($session->scratch->get("versionTag")).")) order by assetData.title";
+	my $sql = "select asset.assetId, assetData.revisionDate from template left join asset on asset.assetId=template.assetId left join assetData on assetData.revisionDate=template.revisionDate and assetData.assetId=template.assetId where template.namespace=".$session->db->quote($namespace)." and template.showInForms=1 and asset.state='published' and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId and (assetData.status='approved' or assetData.tagId=".$session->db->quote($session->scratch->get("versionTag")).")) order by assetData.title";
 	my $sth = $session->dbSlave->read($sql);
 	my %templates;
 	tie %templates, 'Tie::IxHash';
