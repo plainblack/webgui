@@ -66,6 +66,104 @@ our $HELP = {
 		body => '73',
 		fields => [
 		],
+		variables => [
+		          {
+		            'name' => 'columns_loop',
+		            'variables' => [
+		                             {
+		                               'name' => 'column.number'
+		                             },
+		                             {
+		                               'name' => 'column.name'
+		                             }
+		                           ]
+		          },
+		          {
+		            'name' => 'rows.count'
+		          },
+		          {
+		            'name' => 'rows.count.isZero'
+		          },
+		          {
+		            'name' => 'rows.count.isZero.label'
+		          },
+		          {
+		            'name' => 'rows_loop',
+		            'variables' => [
+		                             {
+		                               'name' => 'row.number'
+		                             },
+		                             {
+		                               'name' => 'row.field.__NAME__.value'
+		                             },
+		                             {
+		                               'name' => 'row.field_loop',
+		                               'variables' => [
+		                                                {
+		                                                  'name' => 'field.number'
+		                                                },
+		                                                {
+		                                                  'name' => 'field.name'
+		                                                },
+		                                                {
+		                                                  'name' => 'field.value'
+		                                                }
+		                                              ]
+		                             }
+		                           ]
+		          },
+		          {
+		            'name' => 'hasNest'
+		          },
+		          {
+		            'name' => 'queryN.columns_loop',
+		            'variables' => [
+		                             {
+		                               'name' => 'column.number'
+		                             },
+		                             {
+		                               'name' => 'column.name'
+		                             }
+		                           ]
+		          },
+		          {
+		            'name' => 'queryN.rows.count'
+		          },
+		          {
+		            'name' => 'queryN.count.isZero'
+		          },
+		          {
+		            'name' => 'queryN.rows.count.isZero.label'
+		          },
+		          {
+		            'name' => 'queryN.rows_loop',
+		            'variables' => [
+		                             {
+		                               'name' => 'queryN.row.number'
+		                             },
+		                             {
+		                               'name' => 'queryN.row.field.__NAME__.value'
+		                             },
+		                             {
+		                               'name' => 'queryN.row.field_loop',
+		                               'variables' => [
+		                                                {
+		                                                  'name' => 'field.number'
+		                                                },
+		                                                {
+		                                                  'name' => 'field.name'
+		                                                },
+		                                                {
+		                                                  'name' => 'field.value'
+		                                                }
+		                                              ]
+		                             }
+		                           ]
+		          },
+		          {
+		            'name' => 'queryN.hasNest'
+		          }
+		        ],
 		related => [
 			{
 				tag => 'pagination template variables',

@@ -31,6 +31,115 @@ our $HELP = {
 	'message board template' => {
 		title => '73',
 		body => '74',
+		variables => [
+		          {
+		            'name' => 'forum.add.url'
+		          },
+		          {
+		            'name' => 'forum.add.label'
+		          },
+		          {
+		            'name' => 'title.label'
+		          },
+		          {
+		            'name' => 'views.label'
+		          },
+		          {
+		            'name' => 'rating.label'
+		          },
+		          {
+		            'name' => 'threads.label'
+		          },
+		          {
+		            'name' => 'replies.label'
+		          },
+		          {
+		            'name' => 'lastpost.label'
+		          },
+		          {
+		            'name' => 'forum_loop',
+		            'variables' => [
+		                             {
+		                               'name' => 'forum.controls'
+		                             },
+		                             {
+		                               'name' => 'forum.count'
+		                             },
+		                             {
+		                               'name' => 'forum.title'
+		                             },
+		                             {
+		                               'name' => 'forum.description'
+		                             },
+		                             {
+		                               'name' => 'forum.replies'
+		                             },
+		                             {
+		                               'name' => 'forum.rating'
+		                             },
+		                             {
+		                               'name' => 'forum.views'
+		                             },
+		                             {
+		                               'name' => 'forum.threads'
+		                             },
+		                             {
+		                               'name' => 'forum.url'
+		                             },
+		                             {
+		                               'name' => 'forum.lastpost.url'
+		                             },
+		                             {
+		                               'name' => 'forum.lastpost.date'
+		                             },
+		                             {
+		                               'name' => 'forum.lastpost.time'
+		                             },
+		                             {
+		                               'name' => 'forum.lastpost.epoch'
+		                             },
+		                             {
+		                               'name' => 'forum.lastpost.subject'
+		                             },
+		                             {
+		                               'name' => 'forum.lastpost.user.id'
+		                             },
+		                             {
+		                               'name' => 'forum.lastpost.user.name'
+		                             },
+		                             {
+		                               'name' => 'forum.lastpost.user.alias'
+		                             },
+		                             {
+		                               'name' => 'forum.lastpost.user.profile'
+		                             },
+		                             {
+		                               'name' => 'forum.lastpost.user.isVisitor'
+		                             },
+		                             {
+		                               'name' => 'forum.user.canView'
+		                             },
+		                             {
+		                               'name' => 'forum.user.canPost'
+		                             }
+		                           ]
+		          },
+		          {
+		            'name' => 'default.listing'
+		          },
+		          {
+		            'name' => 'default.description'
+		          },
+		          {
+		            'name' => 'default.title'
+		          },
+		          {
+		            'name' => 'default.controls'
+		          },
+		          {
+		            'name' => 'areMultipleForums'
+		          }
+		        ],
 		fields => [
 		],
 		related => [

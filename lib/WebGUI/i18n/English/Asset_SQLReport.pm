@@ -133,153 +133,155 @@ while the second question mark will contain the form variable "field1".</p>
 		lastUpdated => 1082371148
 	},
 
+	'columns_loop' => {
+		message => q|A loop containing information about each column.|,
+		lastUpdated => 1149633030,
+	},
+
+	'column.number' => {
+		message => q|An integer starting with 1 and counting through the number of columns.|,
+		lastUpdated => 1149633030,
+	},
+
+	'column.name' => {
+		message => q|The name of this column as returned by the query.|,
+		lastUpdated => 1149633030,
+	},
+
+	'rows.count' => {
+		message => q|The total number of rows returned by the query.|,
+		lastUpdated => 1149633030,
+	},
+
+	'rows.count.isZero' => {
+		message => q|A boolean indicating that the query returned zero rows.|,
+		lastUpdated => 1149633030,
+	},
+
+	'rows.count.isZero.label' => {
+		message => q|The default label for rows.count.isZero.|,
+		lastUpdated => 1149633030,
+	},
+
+	'rows_loop' => {
+		message => q|A loop containing the data returned from the query.|,
+		lastUpdated => 1149633030,
+	},
+
+	'row.number' => {
+		message => q|An integer starting with 1 and counting through the total list of rows.|,
+		lastUpdated => 1149633030,
+	},
+
+	'row.field.__NAME__.value' => {
+		message => q|The data for a given field in this row where __NAME__ is the name of the field as it is returned by the query.|,
+		lastUpdated => 1149633030,
+	},
+
+	'row.field_loop' => {
+		message => q|A loop containing all of the fields for this row.|,
+		lastUpdated => 1149633030,
+	},
+
+	'field.number' => {
+		message => q|An integer starting with 1 and counting through the number of fields in this row. This is the same as column.number in the column_loop.|,
+		lastUpdated => 1149633030,
+	},
+
+	'field.name' => {
+		message => q|The name of the field as it is returned by the query.|,
+		lastUpdated => 1149633030,
+	},
+
+	'field.value' => {
+		message => q|The data in this field.|,
+		lastUpdated => 1149633030,
+	},
+
+	'hasNest' => {
+		message => q|A boolean indicating whether query2 has returned any results.|,
+		lastUpdated => 1149633030,
+	},
+
+	'queryN.columns_loop' => {
+		message => q|A loop containing information about each column for queryN.|,
+		lastUpdated => 1149633030,
+	},
+
+	'column.number' => {
+		message => q|An integer starting with 1 and counting through the number of columns.|,
+		lastUpdated => 1149633030,
+	},
+
+	'column.name' => {
+		message => q|The name of this column as returned by the query.|,
+		lastUpdated => 1149633030,
+	},
+
+	'queryN.rows.count' => {
+		message => q|The total number of rows returned by queryN.|,
+		lastUpdated => 1149633030,
+	},
+
+	'queryN.count.isZero' => {
+		message => q|A boolean indicating that queryN returned zero rows.|,
+		lastUpdated => 1149633030,
+	},
+
+	'queryN.rows.count.isZero.label' => {
+		message => q|The default label for rows.count.isZero.|,
+		lastUpdated => 1149633030,
+	},
+
+	'queryN.rows_loop' => {
+		message => q|A loop containing the data returned from queryN.|,
+		lastUpdated => 1149633030,
+	},
+
+	'queryN.row.number' => {
+		message => q|An integer starting with 1 and counting through the total list of rows.|,
+		lastUpdated => 1149633030,
+	},
+
+	'queryN.row.field.__NAME__.value' => {
+		message => q|The data for a given field in this row where __NAME__ is the name of the field as it is returned by the query.|,
+		lastUpdated => 1149633030,
+	},
+
+	'queryN.row.field_loop' => {
+		message => q|A loop containing all of the fields for this row.|,
+		lastUpdated => 1149633030,
+	},
+
+	'field.number' => {
+		message => q|An integer starting with 1 and counting through the number of fields in this row. This is the same as column.number in the column_loop.|,
+		lastUpdated => 1149633030,
+	},
+
+	'field.name' => {
+		message => q|The name of the field as it is returned by the query.|,
+		lastUpdated => 1149633030,
+	},
+
+	'field.value' => {
+		message => q|The data in this field.|,
+		lastUpdated => 1149633030,
+	},
+
+	'queryN.hasNest' => {
+		message => q|A boolean indicating whether the queryN+1 has returned any results.  This variable
+will always be false for query5.|,
+		lastUpdated => 1149633030,
+	},
+
 	'73' => {
 		message => q|<p>The following variables are made available in SQL Reports:
 </p>
 
-<p><b>columns_loop</b><br />
-A loop containing information about each column.
-</p>
-
-<div class="helpIndent">
-
-<p><b>column.number</b><br />
-An integer starting with 1 and counting through the number of columns.
-</p>
-
-<p><b>column.name</b><br />
-The name of this column as returned by the query.
-</p>
-
-</div>
-
-<p><b>rows.count</b><br />
-The total number of rows returned by the query.
-</p>
-
-<p><b>rows.count.isZero</b><br />
-A boolean indicating that the query returned zero rows.
-</p>
-
-<p><b>rows.count.isZero.label</b><br />
-The default label for rows.count.isZero.
-</p>
-
-<p><b>rows_loop</b><br />
-A loop containing the data returned from the query.
-</p>
-
-<div class="helpIndent">
-
-<p><b>row.number</b><br />
-An integer starting with 1 and counting through the total list of rows.
-</p>
-
-<p><b>row.field.</b><i>NAME</i><b>.value</b><br />
-The data for a given field in this row where NAME is the name of the field as it is returned by the query.
-</p>
-
-<p><b>row.field_loop</b><br />
-A loop containing all of the fields for this row.
-</p>
-
-<div class="helpIndent">
-
-<p><b>field.number</b><br />
-An integer starting with 1 and counting through the number of fields in this row. This is the same as column.number in the column_loop.
-</p>
-
-<p><b>field.name</b><br />
-The name of the field as it is returned by the query.
-</p>
-
-<p><b>field.value</b><br />
-The data in this field.
-</p>
-
-</div>
-
-</div>
-
-<p><b>hasNest</b><br />
-A boolean indicating whether query2 has returned any results.
-</p>
-
-<p>Any subqueries will have exactly the same format as the loops
-and variables above, but will be prefixed with queryN where N
-goes from 2 to 5.</p>
-
-<p><b>queryN.columns_loop</b><br />
-A loop containing information about each column for queryN.
-</p>
-
-<div class="helpIndent">
-
-<p><b>column.number</b><br />
-An integer starting with 1 and counting through the number of columns.
-</p>
-
-<p><b>column.name</b><br />
-The name of this column as returned by the query.
-</p>
-
-</div>
-
-<p><b>queryN.rows.count</b><br />
-The total number of rows returned by queryN.
-</p>
-
-<p><b>queryN.count.isZero</b><br />
-A boolean indicating that queryN returned zero rows.
-</p>
-
-<p><b>queryN.rows.count.isZero.label</b><br />
-The default label for rows.count.isZero.
-</p>
-
-<p><b>queryN.rows_loop</b><br />
-A loop containing the data returned from queryN.
-</p>
-
-<div class="helpIndent">
-
-<p><b>queryN.row.number</b><br />
-An integer starting with 1 and counting through the total list of rows.
-</p>
-
-<p><b>queryN.row.field.</b><i>NAME</i><b>.value</b><br />
-The data for a given field in this row where NAME is the name of the field as it is returned by the query.
-</p>
-
-<p><b>queryN.row.field_loop</b><br />
-A loop containing all of the fields for this row.
-</p>
-
-<div class="helpIndent">
-
-<p><b>field.number</b><br />
-An integer starting with 1 and counting through the number of fields in this row. This is the same as column.number in the column_loop.
-</p>
-
-<p><b>field.name</b><br />
-The name of the field as it is returned by the query.
-</p>
-
-<p><b>field.value</b><br />
-The data in this field.
-</p>
-
-</div>
-
-</div>
-
-<p><b>queryN.hasNest</b><br />
-A boolean indicating whether the queryN+1 has returned any results.  This variable
-will always be false for query5.
-</p>
-
+<p>Variables for any subqueries will have exactly the same format as the first
+query, but will be prefixed with queryN where N goes from 2 to 5.</p>
 |,
-		lastUpdated => 1146785660,
+		lastUpdated => 1149633053,
 	},
 
 	'16' => {
