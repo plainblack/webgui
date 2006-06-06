@@ -6,6 +6,144 @@ our $HELP = {
 		body => 'thread template body',
 		fields => [
 		],
+		variables => [
+		          {
+		            'name' => 'karma.transfer.form'
+		          },
+		          {
+		            'name' => 'karma'
+		          },
+		          {
+		            'name' => 'karmaScale'
+		          },
+		          {
+		            'name' => 'karmaRank'
+		          },
+		          {
+		            'name' => 'thumbsUp.icon.url'
+		          },
+		          {
+		            'name' => 'thumbsDown.icon.url'
+		          },
+		          {
+		            'name' => 'user.isVisitor'
+		          },
+		          {
+		            'name' => 'user.isModerator'
+		          },
+		          {
+		            'name' => 'user.canPost'
+		          },
+		          {
+		            'name' => 'user.canReply'
+		          },
+		          {
+		            'name' => 'repliesAllowed'
+		          },
+		          {
+		            'name' => 'userProfile.url'
+		          },
+		          {
+		            'name' => 'layout.nested.url'
+		          },
+		          {
+		            'name' => 'layout.flat.url'
+		          },
+		          {
+		            'name' => 'layout.threaded.url'
+		          },
+		          {
+		            'name' => 'layout.isFlat'
+		          },
+		          {
+		            'name' => 'layout.isNested'
+		          },
+		          {
+		            'name' => 'layout.isThreaded'
+		          },
+		          {
+		            'name' => 'user.isSubscribed'
+		          },
+		          {
+		            'name' => 'subscribe.url'
+		          },
+		          {
+		            'name' => 'unsubscribe.url'
+		          },
+		          {
+		            'name' => 'isArchived'
+		          },
+		          {
+		            'name' => 'archive.url'
+		          },
+		          {
+		            'name' => 'unarchive.url'
+		          },
+		          {
+		            'name' => 'isSticky'
+		          },
+		          {
+		            'name' => 'stick.url'
+		          },
+		          {
+		            'name' => 'unstick.url'
+		          },
+		          {
+		            'name' => 'isLocked'
+		          },
+		          {
+		            'name' => 'lock.url'
+		          },
+		          {
+		            'name' => 'unlock.url'
+		          },
+		          {
+		            'name' => 'post_loop',
+		            'variables' => [
+		                             {
+		                               'name' => 'isCurrent'
+		                             },
+		                             {
+		                               'name' => 'isThreadRoot'
+		                             },
+		                             {
+		                               'name' => 'depth'
+		                             },
+		                             {
+		                               'name' => 'depthX10'
+		                             },
+		                             {
+		                               'name' => 'indent_loop',
+		                               'variables' => [
+		                                                {
+		                                                  'name' => 'depth'
+		                                                }
+		                                              ]
+		                             }
+		                           ]
+		          },
+		          {
+		            'name' => 'add.url'
+		          },
+		          {
+		            'name' => 'previous.url'
+		          },
+		          {
+		            'name' => 'next.url'
+		          },
+		          {
+		            'name' => 'search.url'
+		          },
+		          {
+		            'name' => 'collaboration.url'
+		          },
+		          {
+		            'name' => 'collaboration.title'
+		          },
+		          {
+		            'name' => 'collaboration.description'
+		          }
+		        ],
 		related => [
 			{
 				tag => 'template language',
