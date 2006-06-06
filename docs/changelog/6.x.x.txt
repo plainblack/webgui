@@ -11,6 +11,7 @@
  - fix: typo in Asset_ProjectManager i18n
  - fix: captcha image is blank (Martink Kamerbeek / Procolix)
  - fix: Pagination of search results does not work (Martin Kamerbeek / Procolix)
+ - fix: Workflow Commit with approval Error (Martin Kamerbeek / Procolix)
 
 6.99.3
  - Someone removed the status from the submission templates. That has been

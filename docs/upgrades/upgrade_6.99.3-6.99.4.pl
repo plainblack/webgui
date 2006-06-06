@@ -23,6 +23,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 
 fixSurvey($session);
+fixEditWorkflow($session);
 
 finish($session); # this line required
 
@@ -43,6 +44,22 @@ sub fixSurvey{
 		my ($defaultSectionId) = $session->db->quickArray("select Survey_sectionId from Survey_section where assetId=? and sectionName=?", [$assetId,$noneLabel]);
 		$survey->update({defaultSectionId => $defaultSectionId});  
 	}
+}
+
+sub fixEditWorkflow {
+	my @goodPlugins;
+	my $session = shift;
+	print "\tRemoving erroneous ExportVersionTagAsHtml workflow activity from config file.\n" unless ($quiet);
+
+	my $workflow = $session->config->get('workflowActivities');
+
+	foreach (@{$workflow->{'WebGUI::VersionTag'}}) {
+		push (@goodPlugins, $_) if ($_ ne 'WebGUI::Workflow::Activity::ExportVersionTagAsHtml');
+	}
+
+	$workflow->{'WebGUI::VersionTag'} = \@goodPlugins;
+	
+	$session->config->set('workflowActivities', $workflow);
 }
 
 ##-------------------------------------------------
