@@ -15,6 +15,7 @@ use base "WebGUI::Asset::Wobject";
 use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Paginator;
+use WebGUI::Search;
 
 =head1 NAME
 
@@ -147,7 +148,7 @@ sub view {
 				synposis=>$data->{synopsis},
 				});
 		} 
-		my $p = WebGUI::Paginator->new($self->session,$self->getUrl);
+		my $p = WebGUI::Paginator->new($self->session,$self->getUrl('doit=1;keywords='.$self->session->url->escape($self->session->form->get('keywords'))));
 		$p->setDataByArrayRef(\@results);	
 		$p->appendTemplateVars(\%var);
 		$var{result_set} = $p->getPageData;
