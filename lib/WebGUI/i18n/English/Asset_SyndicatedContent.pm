@@ -54,86 +54,94 @@ these unique properties:
 |
                    },
 
+	'channel.title' => {
+		message => q|The title of this piece of syndicated content. This will be the same as the title of the Syndicated Content object when you're creating an aggregate feed.|,
+		lastUpdated => 1149567508,
+	},
+
+	'channel.description' => {
+		message => q|A description of the content available through this channel. This will be the same as the description of the Syndicated Content object when you're creating an aggregate feed.|,
+		lastUpdated => 1149567508,
+	},
+
+	'channel.link' => {
+		message => q|A URL back to the originating site of this channel. This variable *will not* exist when you're creating an aggregate feed, because there's no single channel to link to.|,
+		lastUpdated => 1149567508,
+	},
+
+	'rss.url' => {
+		message => q|This is the URL to use to get the contents of this Syndicated Content wobject as an RSS 2.0 feed. Additionally, you can specify RSS versions via the following template variables:|,
+		lastUpdated => 1149567508,
+	},
+
+	'rss.url.0.9' => {
+		message => q|The contents of this wobject as an RSS 0.9 feed.|,
+		lastUpdated => 1149567508,
+	},
+
+	'rss.url.0.91' => {
+		message => q|The contents of this wobject as an RSS 0.91 feed.|,
+		lastUpdated => 1149567508,
+	},
+
+	'rss.url.1.0' => {
+		message => q|The contents of this wobject as an RSS 1.0 feed.|,
+		lastUpdated => 1149567508,
+	},
+
+	'rss.url.2.0' => {
+		message => q|The contents of this wobject as an RSS 2.0 feed.|,
+		lastUpdated => 1149567508,
+	},
+
+	'item_loop' => {
+		message => q|A loop containing the data from this channel.|,
+		lastUpdated => 1149567508,
+	},
+
+	'site_title' => {
+		message => q|The title of the RSS feed this item comes from|,
+		lastUpdated => 1149567508,
+	},
+
+	'site_link' => {
+		message => q|Link to the source RSS feed.|,
+		lastUpdated => 1149567508,
+	},
+
+	'new_rss_site' => {
+		message => q|A "boolean" variable (suitable for using in a &lt;tmpl_if&gt; tag) that indicates we've started outputting items from a source RSS feed different than the previous item. This is most useful when you're viewing feeds in "grouped" mode- it gives you a hook to output <b>site_title</b> and <b>site_link</b> at the right time.|,
+		lastUpdated => 1149567508,
+	},
+
+	'title' => {
+		message => q|The title of a piece of content. If you're filtering on terms, this field will be inspected.|,
+		lastUpdated => 1149567508,
+	},
+
+	'description' => {
+		message => q|The description of the content. If you're filtering on terms, this field will be inspected as well.|,
+		lastUpdated => 1149567508,
+	},
+
+	'link' => {
+		message => q|A URL directly to the content of the item.|,
+		lastUpdated => 1149567508,
+	},
+
            '72' => {
                      lastUpdated => 1047855526,
                      message => q|Syndicated Content Template|
                    },
 
            '73' => {
-                     lastUpdated => 1047855526,
-                     message => q|The following are the template variables available to the Syndicated Content template.
-
-<p><b>channel.title</b><br />
-The title of this piece of syndicated content. This will be the same as the title of the Syndicated Content object when you're creating an aggregate feed.
-</p>
-
-<p><b>channel.description</b><br />
-A description of the content available through this channel. This will be the same as the description of the Syndicated Content object when you're creating an aggregate feed.
-</p>
-
-<p><b>channel.link</b><br />
-A URL back to the originating site of this channel. This variable *will not* exist when you're creating an aggregate feed, because there's no single channel to link to.
-</p>
-
-<p><b>rss.url</b><br />
-This is the URL to use to get the contents of this Syndicated Content wobject as an RSS 2.0 feed. Additionally, you can specify RSS versions via the following template variables:
-</p>
-
-<div class="helpIndent">
-
-<p><b>rss.url.0.9</b><br />
-The contents of this wobject as an RSS 0.9 feed.
-</p>
-
-<p><b>rss.url.0.91</b><br />
-The contents of this wobject as an RSS 0.91 feed.
-</p>
-
-<p><b>rss.url.1.0</b><br />
-The contents of this wobject as an RSS 1.0 feed.
-</p>
-
-<p><b>rss.url.2.0</b><br />
-The contents of this wobject as an RSS 2.0 feed.
-</p>
-
-</div>
+                     lastUpdated => 1149567527,
+                     message => q|<p>The following are the template variables available to the Syndicated Content template:</p>
 
 <p>Additionally, RSS feeds are transformed into HTML via XSLT stylesheets for "friendly" in-browser viewing. These XSLT stylesheets are stored in the WebGUI collateral system as snippets.
 </p>
-
-<p><b>item_loop</b><br />
-A loop containing the data from this channel.
-</p>
-
-<div class="helpIndent">
-
-<p><b>site_title</b><br />
-The title of the RSS feed this item comes from
-</p>
-
-<p><b>site_link</b><br />
-Link to the source RSS feed.
-</p>
-
-<p><b>new_rss_site</b><br />
-A "boolean" variable (suitable for using in a &lt;tmpl_if&gt; tag) that indicates we've started outputting items from a source RSS feed different than the previous item. This is most useful when you're viewing feeds in "grouped" mode- it gives you a hook to output <b>site_title</b> and <b>site_link</b> at the right time.
-</p>
-
-<p><b>title</b><br />
-The title of a piece of content. If you're filtering on terms, this field will be inspected.
-</p>
-
-<p><b>description</b><br />
-The description of the content. If you're filtering on terms, this field will be inspected as well.
-</p>
-
-<p><b>link</b>
-A URL directly to the content of the item.
-</p>
-
-</div>|,
-                   },
+|,
+	},
 
 	'displayModeLabel' => {
 		lastUpdated => 1047855526,

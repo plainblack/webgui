@@ -90,6 +90,43 @@ our $HELP = {
 	'ws client template' => {
 		title => '72',
 		body => '73',
+		variables => [
+		          {
+		            'name' => 'disableWobject'
+		          },
+		          {
+		            'name' => 'results',
+		            'variables' => [
+		                             {
+		                               'name' => 'numResults'
+		                             },
+		                             {
+		                               'name' => 'firstPage'
+		                             },
+		                             {
+		                               'name' => 'lastPage'
+		                             },
+		                             {
+		                               'name' => 'nextPage'
+		                             },
+		                             {
+		                               'name' => 'pageList'
+		                             },
+		                             {
+		                               'name' => 'previousPage'
+		                             },
+		                             {
+		                               'name' => 'multiplePages'
+		                             },
+		                             {
+		                               'name' => 'numberOfPages'
+		                             },
+		                             {
+		                               'name' => 'pageNumber'
+		                             }
+		                           ]
+		          }
+		],
 		fields => [
 		],
 		related => [

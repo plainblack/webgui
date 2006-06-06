@@ -41,6 +41,28 @@ our $HELP = {
 		body => 'search template body',
 		fields => [
 		],
+		variables => [
+		          {
+		            'name' => 'form_header',
+			    required => 1,
+		          },
+		          {
+		            'name' => 'form_footer',
+			    required => 1,
+		          },
+		          {
+		            'name' => 'form_submit',
+			    required => 1,
+		          },
+		          {
+		            'name' => 'form_keywords',
+			    required => 1,
+		          },
+		          {
+		            'name' => 'result_set',
+			    required => 1,
+		          }
+		],
 		related => [
 			{
 				tag => 'asset fields',

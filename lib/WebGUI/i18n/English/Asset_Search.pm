@@ -49,30 +49,35 @@ our $I18N = { ##hashref of hashes
 		context => q|hover help for search root|
 	},
 
+	'form_header' => {
+		message => q|HTML Code to begin the search form|,
+		lastUpdated => 1149567859,
+	},
+
+	'form_footer' => {
+		message => q|HTML Code to end the search form|,
+		lastUpdated => 1149567859,
+	},
+
+	'form_submit' => {
+		message => q|A button to allow the user to submit a search.|,
+		lastUpdated => 1149567859,
+	},
+
+	'form_keywords' => {
+		message => q|A form to let the user enter in keywords for the search.|,
+		lastUpdated => 1149567859,
+	},
+
+	'result_set' => {
+		message => q|Paginated search results with pagination controls.|,
+		lastUpdated => 1149567859,
+	},
+
 	'search template body' => {
 		message => q|<p>The following template variables are available for Search Asset templates.  All of these variables are required.</p>
-
-<p><b>form_header*</b><br />
-HTML Code to begin the search form
-</p>
-
-<p><b>form_footer*</b><br />
-HTML Code to end the search form
-</p>
-
-<p><b>form_submit*</b><br />
-A button to allow the user to submit a search.
-</p>
-
-<p><b>form_keywords*</b><br />
-A form to let the user enter in keywords for the search.
-</p>
-
-<p><b>result_set*</b><br />
-Paginated search results with pagination controls.
-</p>
 |,
-		lastUpdated => 1142051703,
+		lastUpdated => 1149567912,
 	},
 
 	'add/edit title' => {

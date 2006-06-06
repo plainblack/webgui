@@ -216,44 +216,68 @@ property allows you to override the default MIME type for this page.|,
 		lastUpdated => 1033575504
 	},
 
-	'73' => {
-		message => q|This is the list of template variables available for Web Services Client templates.
+	'disableWobject' => {
+		message => q|If the page was called with a form param of disableWobjects, this variable will
+be set to true.|,
+		lastUpdated => 1149568071,
+	},
 
-<p><b>disableWobject</b><br />
-If the page was called with a form param of disableWobjects, this variable will
-be set to true.
-</p>
-
-<p><b>results</b><br />
-This loop contains all the results from
+	'results' => {
+		message => q|This loop contains all the results from
 the SOAP call.  Within the loop, you may access specific data elements by the
-names set for them by the SOAP server (i.e. perhaps "localTime" for a time query).  In addition, there are a number of special template variables:
-</p>
+names set for them by the SOAP server (i.e. perhaps "localTime" for a time query).  In addition, there are a number of special template variables:|,
+		lastUpdated => 1149568071,
+	},
 
-<div class="helpIndent">
+	'numResults' => {
+		message => q|Number of rows found by the client, if an array was returned.|,
+		lastUpdated => 1149568071,
+	},
 
-<p><b>numResults</b><br />
-Number of rows found by the client, if an array was returned.</p>
+	'firstPage' => {
+		message => q|Link to first page in a paginated set.|,
+		lastUpdated => 1149568071,
+	},
 
-<p><b>firstPage</b><br />Link to first page in a paginated set.</p>
+	'lastPage' => {
+		message => q|Link to last page in a paginated set.|,
+		lastUpdated => 1149568071,
+	},
 
-<p><b>lastPage</b><br />Link to last page in a paginated set.</p>
+	'nextPage' => {
+		message => q|Link to next page in a paginated set.|,
+		lastUpdated => 1149568071,
+	},
 
-<p><b>nextPage</b><br />Link to next page in a paginated set.</p>
+	'pageList' => {
+		message => q|List of all pages in a paginated set.|,
+		lastUpdated => 1149568071,
+	},
 
-<p><b>pageList</b><br />List of all pages in a paginated set.</p>
+	'previousPage' => {
+		message => q|Link to previous page in a paginated set.|,
+		lastUpdated => 1149568071,
+	},
 
-<p><b>previousPage</b><br />Link to previous page in a paginated set.</p>
+	'multiplePages' => {
+		message => q|Boolean indicating multiple pages in a paginated set.|,
+		lastUpdated => 1149568071,
+	},
 
-<p><b>multiplePages</b><br />Boolean indicating multiple pages in a paginated set.</p>
+	'numberOfPages' => {
+		message => q|Number of pages in a paginated set.|,
+		lastUpdated => 1149568071,
+	},
 
-<p><b>numberOfPages</b><br />Number of pages in a paginated set.</p>
+	'pageNumber' => {
+		message => q|Current page number in a paginated set.|,
+		lastUpdated => 1149568071,
+	},
 
-<p><b>pageNumber</b><br />Current page number in a paginated set.
-</p>
-
-</div>|,
-		lastUpdated => 1111122637
+	'73' => {
+		message => q|<p>This is the list of template variables available for Web Services Client templates.</p>
+|,
+		lastUpdated => 1149568096
 	},
 
 	'24' => {

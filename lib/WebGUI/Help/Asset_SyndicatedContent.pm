@@ -57,6 +57,57 @@ our $HELP = {
 		body => '73',
 		fields => [
 		],
+		variables => [
+		          {
+		            'name' => 'channel.title'
+		          },
+		          {
+		            'name' => 'channel.description'
+		          },
+		          {
+		            'name' => 'channel.link'
+		          },
+		          {
+		            'name' => 'rss.url',
+		            'variables' => [
+		                             {
+		                               'name' => 'rss.url.0.9'
+		                             },
+		                             {
+		                               'name' => 'rss.url.0.91'
+		                             },
+		                             {
+		                               'name' => 'rss.url.1.0'
+		                             },
+		                             {
+		                               'name' => 'rss.url.2.0'
+		                             }
+		                           ]
+		          },
+		          {
+		            'name' => 'item_loop',
+		            'variables' => [
+		                             {
+		                               'name' => 'site_title'
+		                             },
+		                             {
+		                               'name' => 'site_link'
+		                             },
+		                             {
+		                               'name' => 'new_rss_site'
+		                             },
+		                             {
+		                               'name' => 'title'
+		                             },
+		                             {
+		                               'name' => 'description'
+		                             },
+		                             {
+		                               'name' => 'link'
+		                             }
+		                           ]
+		          }
+		],
 		related => [
 			{
 				tag => 'syndicated content add/edit',
