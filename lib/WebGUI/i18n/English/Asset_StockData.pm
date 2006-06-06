@@ -153,194 +153,235 @@ our $I18N = {
 		lastUpdated => 1119066250
 	},
 
+	'extrasFolder' => {
+		message => q|The url to the extras folder containing css files and images used by the Stock List application|,
+		lastUpdated => 1149565312,
+	},
+
+	'editUrl' => {
+		message => q|The url to the page where users can customize stocks|,
+		lastUpdated => 1149565312,
+	},
+
+	'isVisitor' => {
+		message => q|Whether or not the current user is a visitor.  This returns true if the users is authenticated against the system|,
+		lastUpdated => 1149565312,
+	},
+
+	'stock.display.url' => {
+		message => q|General url to the page that displays details for individual stocks.  A stock symbol must be added to the end of this url|,
+		lastUpdated => 1149565312,
+	},
+
+	'lastUpdate.default' => {
+		message => q|default date and time format for the date and time stocks were updated by the returning sources|,
+		lastUpdated => 1149565312,
+	},
+
+	'lastUpdate.intl' => {
+		message => q|international date and time format for the date and time stocks were updated by the returning sources|,
+		lastUpdated => 1149565312,
+	},
+
+	'lastUpdate.us' => {
+		message => q|US date and time format for the date and time stocks were updated by the returning sources|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.loop' => {
+		message => q|Loop containing all default or personalized stocks|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.symbol' => {
+		message => q|Stock Symbol|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.name' => {
+		message => q|Company or Mutual Fund Name|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.last' => {
+		message => q|Last Price|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.high' => {
+		message => q|Highest trade today|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.low' => {
+		message => q|Lowest trade today|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.date' => {
+		message => q|Last Trade Date  (MM/DD/YY format)|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.time' => {
+		message => q|Last Trade Time|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.net' => {
+		message => q|Net Change|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.net.isDown' => {
+		message => q|Net Change is negative|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.net.isUp' => {
+		message => q|Net Change is positive|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.net.noChange' => {
+		message => q|Net Change is zero|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.net.icon' => {
+		message => q|Icon associated with net change (up, down, even)|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.p_change' => {
+		message => q|Percent Change from previous day's close|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.volume' => {
+		message => q|Day's Volume|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.volume.millions' => {
+		message => q|Day's Volume In Millions|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.avg_vol' => {
+		message => q|Average Daily Vol|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.bid' => {
+		message => q|Bid|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.ask' => {
+		message => q|Ask|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.close' => {
+		message => q|Previous Close|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.open' => {
+		message => q|Today's Open|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.day_range' => {
+		message => q|Day's Range|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.year_range' => {
+		message => q|52-Week Range|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.year_high' => {
+		message => q|52-Week High|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.year_low' => {
+		message => q|52-Week Low|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.eps' => {
+		message => q|Earnings per Share|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.pe' => {
+		message => q|P/E Ratio|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.div_date' => {
+		message => q|Dividend Pay Date|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.div' => {
+		message => q|Dividend per Share|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.div_yield' => {
+		message => q|Dividend Yield|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.cap' => {
+		message => q|Market Capitalization|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.ex_div' => {
+		message => q|Ex-Dividend Date.|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.nav' => {
+		message => q|Net Asset Value|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.yield' => {
+		message => q|Yield (usually 30 day avg)|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.exchange' => {
+		message => q|The exchange the information was obtained from.|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.success' => {
+		message => q|Did the stock successfully return information? (true/false)|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.errormsg' => {
+		message => q|If success is false, this field may contain the reason why.|,
+		lastUpdated => 1149565312,
+	},
+
+	'stocks.method' => {
+		message => q|The module (as could be passed to fetch) which found this information.|,
+		lastUpdated => 1149565312,
+	},
+
 	'help_stock_list_template_description' => {
 		message => q|<p>The following describes the list of available template variables for building StockList templates</p>
-
-<p><b>extrasFolder</b><br />
-The url to the extras folder containing css files and images used by the Stock List application
-</p>
-
-<p><b>editUrl</b><br />
-The url to the page where users can customize stocks
-</p>
-
-<p><b>isVisitor</b><br />
-Whether or not the current user is a visitor.  This returns true if the users is authenticated against the system
-</p>
-
-<p><b>stock.display.url</b><br />
-General url to the page that displays details for individual stocks.  A stock symbol must be added to the end of this url
-</p>
-
-<p><b>lastUpdate.default</b><br />
-default date and time format for the date and time stocks were updated by the returning sources
-</p>
-
-<p><b>lastUpdate.intl</b><br />
-international date and time format for the date and time stocks were updated by the returning sources
-</p>
-
-<p><b>lastUpdate.us</b><br />
-US date and time format for the date and time stocks were updated by the returning sources
-</p>
-
-<p><b>stocks.loop</b><br />
-Loop containing all default or personalized stocks
-</p>
-
-<div class="helpIndent">
-
-<p><b>stocks.symbol</b><br />
-Stock Symbol
-</p>
-
-<p><b>stocks.name</b><br />
-Company or Mutual Fund Name
-</p>
-
-<p><b>stocks.last</b><br />
-Last Price
-</p>
-
-<p><b>stocks.high</b><br />
-Highest trade today
-</p>
-
-<p><b>stocks.low</b><br />
-Lowest trade today
-</p>
-
-<p><b>stocks.date</b><br />
-Last Trade Date  (MM/DD/YY format)
-</p>
-
-<p><b>stocks.time</b><br />
-Last Trade Time
-</p>
-
-<p><b>stocks.net</b><br />
-Net Change
-</p>
-
-<p><b>stocks.net.isDown</b><br />
-Net Change is negative
-</p>
-
-<p><b>stocks.net.isUp</b><br />
-Net Change is positive
-</p>
-
-<p><b>stocks.net.noChange</b><br />
-Net Change is zero
-</p>
-
-<p><b>stocks.net.icon</b><br />
-Icon associated with net change (up, down, even)
-</p>
-
-<p><b>stocks.p_change</b><br />
-Percent Change from previous day's close
-</p>
-
-<p><b>stocks.volume</b><br />
-Day's Volume
-</p>
-
-<p><b>stocks.volume.millions</b><br />
-Day's Volume In Millions
-</p>
-
-<p><b>stocks.avg_vol</b><br />
-Average Daily Vol
-</p>
-
-<p><b>stocks.bid</b><br />
-Bid
-</p>
-
-<p><b>stocks.ask</b><br />
-Ask
-</p>
-
-<p><b>stocks.close</b><br />
-Previous Close
-</p>
-
-<p><b>stocks.open</b><br />
-Today's Open
-</p>
-
-<p><b>stocks.day_range</b><br />
-Day's Range
-</p>
-
-<p><b>stocks.year_range</b><br />
-52-Week Range
-</p>
-
-<p><b>stocks.year_high</b><br />
-52-Week High
-</p>
-
-<p><b>stocks.year_low</b><br />
-52-Week Low
-</p>
-
-<p><b>stocks.eps</b><br />
-Earnings per Share
-</p>
-
-<p><b>stocks.pe</b><br />
-P/E Ratio
-</p>
-
-<p><b>stocks.div_date</b><br />
-Dividend Pay Date
-</p>
-
-<p><b>stocks.div</b><br />
-Dividend per Share
-</p>
-
-<p><b>stocks.div_yield</b><br />
-Dividend Yield
-</p>
-
-<p><b>stocks.cap</b><br />
-Market Capitalization
-</p>
-
-<p><b>stocks.ex_div</b><br />
-Ex-Dividend Date.
-</p>
-
-<p><b>stocks.nav</b><br />
-Net Asset Value
-</p>
-
-<p><b>stocks.yield</b><br />
-Yield (usually 30 day avg)
-</p>
-
-<p><b>stocks.exchange</b><br />
-The exchange the information was obtained from.
-</p>
-
-<p><b>stocks.success</b><br />
-Did the stock successfully return information? (true/false)
-</p>
-
-<p><b>stocks.errormsg</b><br />
-If success is false, this field may contain the reason why.
-</p>
-
-<p><b>stocks.method</b><br />
-The module (as could be passed to fetch) which found this information.
-</p>
-
-</div>
 		|,
-		lastUpdated => 1146785833
+		lastUpdated => 1149565354
 	},
 
 	'help_stock_list_display_template' => {
@@ -350,169 +391,8 @@ The module (as could be passed to fetch) which found this information.
 
 	'help_stock_list_display_template_description' => {
 		message => q|<p>The following describes the list of available template variables for building StockList templates</p>
-
-<p><b>extrasFolder</b><br />
-The url to the extras folder containing css files and images used by the Stock List application
-</p>
-
-<p><b>lastUpdate.intl</b><br />
-international date and time format for the date and time stocks were updated by the returning sources
-</p>
-
-<p><b>lastUpdate.us</b><br />
-US date and time format for the date and time stocks were updated by the returning sources
-</p>
-
-<p><b>stocks.symbol</b><br />
-Stock Symbol
-</p>
-
-<p><b>stocks.name</b><br />
-Company or Mutual Fund Name
-</p>
-
-<p><b>stocks.last</b><br />
-Last Price
-</p>
-
-<p><b>stocks.high</b><br />
-Highest trade today
-</p>
-
-<p><b>stocks.low</b><br />
-Lowest trade today
-</p>
-
-<p><b>stocks.date</b><br />
-Last Trade Date  (MM/DD/YY format)
-</p>
-
-<p><b>stocks.time</b><br />
-Last Trade Time
-</p>
-
-<p><b>stocks.net</b><br />
-Net Change
-</p>
-
-<p><b>stocks.net.isDown</b><br />
-Net Change is negative
-</p>
-
-<p><b>stocks.net.isUp</b><br />
-Net Change is positive
-</p>
-
-<p><b>stocks.net.noChange</b><br />
-Net Change is zero
-</p>
-
-<p><b>stocks.net.icon</b><br />
-Icon associated with net change (up, down, even)
-</p>
-
-<p><b>stocks.p_change</b><br />
-Percent Change from previous day's close
-</p>
-
-<p><b>stocks.volume</b><br />
-Day's Volume
-</p>
-
-<p><b>stocks.volume.millions</b><br />
-Day's Volume In Millions
-</p>
-
-<p><b>stocks.avg_vol</b><br />
-Average Daily Vol
-</p>
-
-<p><b>stocks.bid</b><br />
-Bid
-</p>
-
-<p><b>stocks.ask</b><br />
-Ask
-</p>
-
-<p><b>stocks.close</b><br />
-Previous Close
-</p>
-
-<p><b>stocks.open</b><br />
-Today's Open
-</p>
-
-<p><b>stocks.day_range</b><br />
-Day's Range
-</p>
-
-<p><b>stocks.year_range</b><br />
-52-Week Range
-</p>
-
-<p><b>stocks.year_high</b><br />
-52-Week High
-</p>
-
-<p><b>stocks.year_low</b><br />
-52-Week Low
-</p>
-
-<p><b>stocks.eps</b><br />
-Earnings per Share
-</p>
-
-<p><b>stocks.pe</b><br />
-P/E Ratio
-</p>
-
-<p><b>stocks.div_date</b><br />
-Dividend Pay Date
-</p>
-
-<p><b>stocks.div</b><br />
-Dividend per Share
-</p>
-
-<p><b>stocks.div_yield</b><br />
-Dividend Yield
-</p>
-
-<p><b>stocks.cap</b><br />
-Market Capitalization
-</p>
-
-<p><b>stocks.ex_div</b><br />
-Ex-Dividend Date.
-</p>
-
-<p><b>stocks.nav</b><br />
-Net Asset Value
-</p>
-
-<p><b>stocks.yield</b><br />
-Yield (usually 30 day avg)
-</p>
-
-<p><b>stocks.exchange</b><br />
-The exchange the information was obtained from.
-</p>
-
-<p><b>stocks.success</b><br />
-Did the stock successfully return information? (true/false)
-</p>
-
-<p><b>stocks.errormsg</b><br />
-If success is false, this field may contain the reason why.
-</p>
-
-<p><b>stocks.method</b><br />
-The module (as could be passed to fetch) which found this information.
-</p>
-
 		|,
-		lastUpdated => 1146786317
+		lastUpdated => 1149567007
 	},
 
 };

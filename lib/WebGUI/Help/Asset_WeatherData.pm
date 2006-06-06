@@ -26,12 +26,35 @@ our $HELP = {
 			},
 		],
 	},
+
 	'weatherdata template' => {
 		title => 'WeatherData template title',
 		body => 'WeatherData template description',
 		fields => [
 		],
-		related => [
+		variables => [
+		          {
+		            'name' => 'ourLocations.loop',
+		            'variables' => [
+		                             {
+		                               'name' => 'query'
+		                             },
+		                             {
+		                               'name' => 'cityState'
+		                             },
+		                             {
+		                               'name' => 'sky'
+		                             },
+		                             {
+		                               'name' => 'tempF'
+		                             },
+		                             {
+		                               'name' => 'iconUrl'
+		                             }
+		                           ]
+		          }
+		],
+	related => [
 			{
 				tag => 'weather data add/edit',
 				namespace => 'Asset_WeatherData'

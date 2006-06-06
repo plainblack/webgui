@@ -76,6 +76,145 @@ our $HELP = {
 		body => 'help_stock_list_template_description',
 		fields => [
 		],
+		variables => [
+		          {
+		            'name' => 'extrasFolder'
+		          },
+		          {
+		            'name' => 'editUrl'
+		          },
+		          {
+		            'name' => 'isVisitor'
+		          },
+		          {
+		            'name' => 'stock.display.url'
+		          },
+		          {
+		            'name' => 'lastUpdate.default'
+		          },
+		          {
+		            'name' => 'lastUpdate.intl'
+		          },
+		          {
+		            'name' => 'lastUpdate.us'
+		          },
+		          {
+		            'name' => 'stocks.loop',
+		            'variables' => [
+		                             {
+		                               'name' => 'stocks.symbol'
+		                             },
+		                             {
+		                               'name' => 'stocks.name'
+		                             },
+		                             {
+		                               'name' => 'stocks.last'
+		                             },
+		                             {
+		                               'name' => 'stocks.high'
+		                             },
+		                             {
+		                               'name' => 'stocks.low'
+		                             },
+		                             {
+		                               'name' => 'stocks.date'
+		                             },
+		                             {
+		                               'name' => 'stocks.time'
+		                             },
+		                             {
+		                               'name' => 'stocks.net'
+		                             },
+		                             {
+		                               'name' => 'stocks.net.isDown'
+		                             },
+		                             {
+		                               'name' => 'stocks.net.isUp'
+		                             },
+		                             {
+		                               'name' => 'stocks.net.noChange'
+		                             },
+		                             {
+		                               'name' => 'stocks.net.icon'
+		                             },
+		                             {
+		                               'name' => 'stocks.p_change'
+		                             },
+		                             {
+		                               'name' => 'stocks.volume'
+		                             },
+		                             {
+		                               'name' => 'stocks.volume.millions'
+		                             },
+		                             {
+		                               'name' => 'stocks.avg_vol'
+		                             },
+		                             {
+		                               'name' => 'stocks.bid'
+		                             },
+		                             {
+		                               'name' => 'stocks.ask'
+		                             },
+		                             {
+		                               'name' => 'stocks.close'
+		                             },
+		                             {
+		                               'name' => 'stocks.open'
+		                             },
+		                             {
+		                               'name' => 'stocks.day_range'
+		                             },
+		                             {
+		                               'name' => 'stocks.year_range'
+		                             },
+		                             {
+		                               'name' => 'stocks.year_high'
+		                             },
+		                             {
+		                               'name' => 'stocks.year_low'
+		                             },
+		                             {
+		                               'name' => 'stocks.eps'
+		                             },
+		                             {
+		                               'name' => 'stocks.pe'
+		                             },
+		                             {
+		                               'name' => 'stocks.div_date'
+		                             },
+		                             {
+		                               'name' => 'stocks.div'
+		                             },
+		                             {
+		                               'name' => 'stocks.div_yield'
+		                             },
+		                             {
+		                               'name' => 'stocks.cap'
+		                             },
+		                             {
+		                               'name' => 'stocks.ex_div'
+		                             },
+		                             {
+		                               'name' => 'stocks.nav'
+		                             },
+		                             {
+		                               'name' => 'stocks.yield'
+		                             },
+		                             {
+		                               'name' => 'stocks.exchange'
+		                             },
+		                             {
+		                               'name' => 'stocks.success'
+		                             },
+		                             {
+		                               'name' => 'stocks.errormsg'
+		                             },
+		                             {
+		                               'name' => 'stocks.method'
+		                             }
+		                           ]
+		          }
+		],
 		related => [
 			{
 				tag => 'stock list display template',
@@ -95,6 +234,128 @@ our $HELP = {
 		title => 'help_stock_list_display_template',
 		body => 'help_stock_list_display_template_description',
 		fields => [
+		],
+		variables => [
+		          {
+		            'name' => 'extrasFolder',
+		          },
+		          {
+		            'name' => 'lastUpdate.intl',
+		          },
+		          {
+		            'name' => 'lastUpdate.us',
+		          },
+		          {
+		            'name' => 'stocks.symbol',
+		          },
+		          {
+		            'name' => 'stocks.name',
+		          },
+		          {
+		            'name' => 'stocks.last',
+		          },
+		          {
+		            'name' => 'stocks.high',
+		          },
+		          {
+		            'name' => 'stocks.low',
+		          },
+		          {
+		            'name' => 'stocks.date',
+		          },
+		          {
+		            'name' => 'stocks.time',
+		          },
+		          {
+		            'name' => 'stocks.net',
+		          },
+		          {
+		            'name' => 'stocks.net.isDown',
+		          },
+		          {
+		            'name' => 'stocks.net.isUp',
+		          },
+		          {
+		            'name' => 'stocks.net.noChange',
+		          },
+		          {
+		            'name' => 'stocks.net.icon',
+		          },
+		          {
+		            'name' => 'stocks.p_change',
+		          },
+		          {
+		            'name' => 'stocks.volume',
+		          },
+		          {
+		            'name' => 'stocks.volume.millions',
+		          },
+		          {
+		            'name' => 'stocks.avg_vol',
+		          },
+		          {
+		            'name' => 'stocks.bid',
+		          },
+		          {
+		            'name' => 'stocks.ask',
+		          },
+		          {
+		            'name' => 'stocks.close',
+		          },
+		          {
+		            'name' => 'stocks.open',
+		          },
+		          {
+		            'name' => 'stocks.day_range',
+		          },
+		          {
+		            'name' => 'stocks.year_range',
+		          },
+		          {
+		            'name' => 'stocks.year_high',
+		          },
+		          {
+		            'name' => 'stocks.year_low',
+		          },
+		          {
+		            'name' => 'stocks.eps',
+		          },
+		          {
+		            'name' => 'stocks.pe',
+		          },
+		          {
+		            'name' => 'stocks.div_date',
+		          },
+		          {
+		            'name' => 'stocks.div',
+		          },
+		          {
+		            'name' => 'stocks.div_yield',
+		          },
+		          {
+		            'name' => 'stocks.cap',
+		          },
+		          {
+		            'name' => 'stocks.ex_div',
+		          },
+		          {
+		            'name' => 'stocks.nav',
+		          },
+		          {
+		            'name' => 'stocks.yield',
+		          },
+		          {
+		            'name' => 'stocks.exchange',
+		          },
+		          {
+		            'name' => 'stocks.success',
+		          },
+		          {
+		            'name' => 'stocks.errormsg',
+		          },
+		          {
+		            'name' => 'stocks.method',
+		          }
 		],
 		related => [
 			{

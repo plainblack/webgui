@@ -43,10 +43,41 @@ our $I18N = {
 		lastUpdated => 1133619940,
 	},
 
+	'ourLocations.loop' => {
+		message => q|A loop containing weather information for all configured user locations.|,
+		lastUpdated => 1149565151,
+	},
+
+	'query' => {
+		message => q|The requested location.|,
+		lastUpdated => 1149565151,
+	},
+
+	'cityState' => {
+		message => q|The city and state returned from the NOAA.  This will probably be the same as <b>query</b>.|,
+		lastUpdated => 1149565151,
+	},
+
+	'sky' => {
+		message => q|The condition of the sky, i.e. clear, sunny, cloudy, etc.|,
+		lastUpdated => 1149565151,
+	},
+
+	'tempF' => {
+		message => q|The temperature in degrees Farenheit.|,
+		lastUpdated => 1149565151,
+	},
+
+	'iconUrl' => {
+		message => q|The URL to an icon that represents visually the condition of the sky.|,
+		lastUpdated => 1149565151,
+	},
+
 
 	'WeatherData template description' => {
-		message => q|The wobject generates a loops of locations - tmpl_loop ourLocations.|,
-		lastUpdated => 1133619940,
+		message => q|<p>These template variables are available in the WeatherData template:</p>
+|,
+		lastUpdated => 1149565185,
 	},
 
 

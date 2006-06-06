@@ -77,7 +77,8 @@ sub definition {
 
 =head2 _getLocationData ( )
 
-Accepts an array ref of locations, and returns 
+Accepts a location, and returns a hashref of information about the weather
+at that location.
 
 =cut
 
