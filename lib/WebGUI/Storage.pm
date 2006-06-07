@@ -205,6 +205,7 @@ sub addFileFromFormPost {
 		my $tempFilename = $upload->filename();
 		next unless $tempFilename;
 		next unless $upload->size > 0;
+		next if ($upload->size > 1024 * $self->session->setting->get("maxAttachmentSize"));
 		if ($tempFilename =~ /([^\/\\]+)$/) { $tempFilename = $1; }
 		my $type = $self->getFileExtension($tempFilename);
 		if (isIn($type, qw(pl perl sh cgi php asp))) { # make us safe from malicious uploads

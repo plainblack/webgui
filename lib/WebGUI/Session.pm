@@ -368,8 +368,6 @@ sub open {
 	my $config = WebGUI::Config->new($webguiRoot,$configFile);
 	my $self = {_config=>$config, _server=>$server};
 	bless $self , $class;
-	#$self->{_request} = Apache2::Request->new($request, POST_MAX => 1024 * $self->setting->get("maxAttachmentSize")) if (defined $request);
-	# something screwed about POST_MAX, must look at this later
 	$self->{_request} = Apache2::Request->new($request) if (defined $request);
 	my $sessionId = shift || $self->http->getCookies->{"wgSession"} || $self->id->generate;
 	my $noFuss = shift;
