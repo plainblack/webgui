@@ -248,7 +248,7 @@ sub createAccountSave {
 			workflowId=>$self->session->setting->get("runOnRegistration"),
 			methodName=>"new",
 			className=>"WebGUI::User",
-			parameters=>$self->session->userId,
+			parameters=>$self->session->user->userId,
 			priority=>1
 			});
 	}

@@ -353,9 +353,6 @@ our $HELP = {
 		                           ]
 		          },
 		          {
-		            'name' => undef
-		          },
-		          {
 		            'required' => 1,
 		            'name' => 'form.send'
 		          },
