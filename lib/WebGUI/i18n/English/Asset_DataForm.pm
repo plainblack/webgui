@@ -491,7 +491,7 @@ field.|,
 	},
 
 	'field_loop' => {
-		message => q|A loop containing all of the field information.|,
+		message => q|A loop containing all of the field information.  From outside the <b>field_loop</b> it's also possible to access all form fields directly. To accomplish this you should use these variables. Call them with <b>field.noloop.<i>fieldName</i>.<i>property</i></b>, where fieldName is the name of the field (not the label) and property is anyone of the properties supplied by the <b>field_loop</b>. If you want the form tag of field 'name' you should use <b>field.noloop.name.form</b> anywhere in your template. If you want to know if the field is required use <b>field.noloop.name.isRequired</b>.|,
 		lastUpdated => 1149392054,
 	},
 
@@ -555,11 +555,6 @@ field.|,
 		lastUpdated => 1149392054,
 	},
 
-	'' => {
-		message => q|From outside the <b>field_loop</b> it's also possible to access all form fields directly. To accomplish this you should use these variables. Call them with <b>field.noloop.<i>fieldName</i>.<i>property</i></b>, where fieldName is the name of the field (not the label) and property is anyone of the properties supplied by the <b>field_loop</b>. If you want the form tag of field 'name' you should use <b>field.noloop.name.form</b> anywhere in your template. If you want to know if the field is required use <b>field.noloop.name.isRequired</b>.|,
-		lastUpdated => 1149392054,
-	},
-
 	'form.send' => {
 		message => q|A form button with the internationalized word "send" printed on it.|,
 		lastUpdated => 1149392054,
@@ -576,8 +571,7 @@ field.|,
 	},
 
 	'83' => {
-		message => q|<p>The following template variables are available for Data Form templates.
-</p>
+		message => q|<p>The following template variables are available for Data Form templates.</p>
 	|,
 		lastUpdated => 1149392104,
 	},
