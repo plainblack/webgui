@@ -214,6 +214,108 @@ our $HELP = {
 		body => 'collaboration post list template variables body',
 		fields => [
 		],
+		variables => [
+		          {
+		            'name' => 'post_loop',
+		            'variables' => [
+		                             {
+		                               'name' => 'id'
+		                             },
+		                             {
+		                               'name' => 'url',
+		                               'description' => 'tmplVar url'
+		                             },
+		                             {
+		                               'name' => 'rating_loop',
+		                               'variables' => [
+		                                                {
+		                                                  'name' => 'rating_loop.count'
+		                                                }
+		                                              ]
+		                             },
+		                             {
+		                               'name' => 'content'
+		                             },
+		                             {
+		                               'name' => 'status',
+		                               'description' => 'tmplVar status'
+		                             },
+		                             {
+		                               'name' => 'thumbnail',
+		                               'description' => 'tmplVar thumbnail'
+		                             },
+		                             {
+		                               'name' => 'image.url'
+		                             },
+		                             {
+		                               'name' => 'dateSubmitted.human'
+		                             },
+		                             {
+		                               'name' => 'dateUpdated.human'
+		                             },
+		                             {
+		                               'name' => 'timeSubmitted.human'
+		                             },
+		                             {
+		                               'name' => 'timeUpdated.human'
+		                             },
+		                             {
+		                               'name' => 'userProfile.url'
+		                             },
+		                             {
+		                               'name' => 'user.isVisitor'
+		                             },
+		                             {
+		                               'name' => 'edit.url'
+		                             },
+		                             {
+		                               'name' => 'controls'
+		                             },
+		                             {
+		                               'name' => 'isSecond'
+		                             },
+		                             {
+		                               'name' => 'isThird'
+		                             },
+		                             {
+		                               'name' => 'isFourth'
+		                             },
+		                             {
+		                               'name' => 'isFifth'
+		                             },
+		                             {
+		                               'name' => 'user.isPoster'
+		                             },
+		                             {
+		                               'name' => 'user.hasRead'
+		                             },
+		                             {
+		                               'name' => 'avatar.url'
+		                             },
+		                             {
+		                               'name' => 'lastReply.url'
+		                             },
+		                             {
+		                               'name' => 'lastReply.title'
+		                             },
+		                             {
+		                               'name' => 'lastReply.user.isVisitor'
+		                             },
+		                             {
+		                               'name' => 'lastReply.username'
+		                             },
+		                             {
+		                               'name' => 'lastReply.userProfile.url'
+		                             },
+		                             {
+		                               'name' => 'lastReply.dateSubmitted.human'
+		                             },
+		                             {
+		                               'name' => 'lastReply.timeSubmitted.human'
+		                             }
+		                           ]
+		          }
+		],
 		related => [
 			{
 				tag => 'asset fields',
@@ -230,6 +332,62 @@ our $HELP = {
 		title => 'collaboration template title',
 		body => 'collaboration template body',
 		fields => [
+		],
+		variables => [
+		          {
+		            'name' => 'user.canPost'
+		          },
+		          {
+		            'name' => 'user.isModerator'
+		          },
+		          {
+		            'name' => 'user.isVisitor',
+		          },
+		          {
+		            'name' => 'user.isSubscribed'
+		          },
+		          {
+		            'name' => 'add.url'
+		          },
+		          {
+		            'name' => 'rss.url'
+		          },
+		          {
+		            'name' => 'search.url'
+		          },
+		          {
+		            'name' => 'subscribe.url'
+		          },
+		          {
+		            'name' => 'unsubscribe.url'
+		          },
+		          {
+		            'name' => 'karmaIsEnabled'
+		          },
+		          {
+		            'name' => 'sortby.karmaRank.url'
+		          },
+		          {
+		            'name' => 'sortby.title.url'
+		          },
+		          {
+		            'name' => 'sortby.username.url'
+		          },
+		          {
+		            'name' => 'sortby.date.url'
+		          },
+		          {
+		            'name' => 'sortby.lastreply.url'
+		          },
+		          {
+		            'name' => 'sortby.views.url'
+		          },
+		          {
+		            'name' => 'sortby.replies.url'
+		          },
+		          {
+		            'name' => 'sortby.rating.url'
+		          }
 		],
 		related => [
 			{
@@ -248,6 +406,44 @@ our $HELP = {
 		body => 'collaboration search template body',
 		fields => [
 		],
+		variables => [
+		          {
+		            'name' => 'form.header'
+		          },
+		          {
+		            'name' => 'query.form'
+		          },
+		          {
+		            'name' => 'form.search'
+		          },
+		          {
+		            'name' => 'back.url'
+		          },
+		          {
+		            'name' => 'unsubscribe.url',
+		          },
+		          {
+		            'name' => 'sortby.title.url',
+		          },
+		          {
+		            'name' => 'sortby.username.url',
+		          },
+		          {
+		            'name' => 'sortby.date.url',
+		          },
+		          {
+		            'name' => 'sortby.lastreply.url',
+		          },
+		          {
+		            'name' => 'sortby.views.url',
+		          },
+		          {
+		            'name' => 'sortby.replies.url',
+		          },
+		          {
+		            'name' => 'sortby.rating.url',
+		          }
+		],
 		related => [
 			{
 		   		tag => 'collaboration post list template variables',
@@ -260,6 +456,72 @@ our $HELP = {
 		title => 'collaboration rss template title',
 		body => 'collaboration rss template body',
 		fields => [
+		],
+		variables => [
+		          {
+		            'name' => 'title',
+		            'description' => 'feed title'
+		          },
+		          {
+		            'name' => 'link',
+		            'description' => 'collab link'
+		          },
+		          {
+		            'name' => 'description',
+		            'description' => 'feed description'
+		          },
+		          {
+		            'name' => 'generator'
+		          },
+		          {
+		            'name' => 'webMaster'
+		          },
+		          {
+		            'name' => 'docs'
+		          },
+		          {
+		            'name' => 'lastBuildDate'
+		          },
+		          {
+		            'name' => 'item_loop',
+		            'variables' => [
+		                             {
+		                               'name' => 'author'
+		                             },
+		                             {
+		                               'name' => 'title',
+		                               'description' => 'post title'
+		                             },
+		                             {
+		                               'name' => 'link',
+		                               'description' => 'full text link'
+		                             },
+		                             {
+		                               'name' => 'description',
+		                               'description' => 'item description'
+		                             },
+		                             {
+		                               'name' => 'guid'
+		                             },
+		                             {
+		                               'name' => 'pubDate'
+		                             },
+		                             {
+		                               'name' => 'attachmentLoop',
+		                               'variables' => [
+		                                                {
+		                                                  'name' => 'attachment.url'
+		                                                },
+		                                                {
+		                                                  'name' => 'attachment.path'
+		                                                },
+		                                                {
+		                                                  'name' => 'attachment.length'
+		                                                }
+		                                              ]
+		                             }
+		                           ]
+		          }
 		],
 		related => [
 			{

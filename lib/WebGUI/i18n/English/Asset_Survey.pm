@@ -149,164 +149,190 @@ our $I18N = {
 		lastUpdated => 1035436321
 	},
 
+	'question.add.url' => {
+		message => q|The URL to add a new question to the survey.|,
+		lastUpdated => 1149654653,
+	},
+
+	'question.add.label' => {
+		message => q|The default label for question.add.url.|,
+		lastUpdated => 1149654653,
+	},
+
+	'user.canTakeSurvey' => {
+		message => q|A boolean indicating whether the current user has the rights to take the survey.|,
+		lastUpdated => 1149654653,
+	},
+
+	'form.header' => {
+		message => q|The required form elements that go at the top of the survey questions.|,
+		lastUpdated => 1149654653,
+	},
+
+	'form.footer' => {
+		message => q|The required form elements that go after the survey questions.|,
+		lastUpdated => 1149654653,
+	},
+
+	'form.submit' => {
+		message => q|The default submit button for the survey response.|,
+		lastUpdated => 1149654653,
+	},
+
+	'questions.sofar.label' => {
+		message => q|The default label for indicating how many questions have been answered to this point in the survey.|,
+		lastUpdated => 1149654653,
+	},
+
+	'start.newresponse.label' => {
+		message => q|The default label for start.newresponse.url.|,
+		lastUpdated => 1149654653,
+	},
+
+	'start.newresponse.url' => {
+		message => q|The URL to start a new response to the survey after the user has already taken the survey once.|,
+		lastUpdated => 1149654653,
+	},
+
+	'thanks.survey.label' => {
+		message => q|A message thanking the user for completing the survey.|,
+		lastUpdated => 1149654653,
+	},
+
+	'thanks.quiz.label' => {
+		message => q|A message thanking the user for completing the quiz.|,
+		lastUpdated => 1149654653,
+	},
+
+	'questions.total' => {
+		message => q|The total number of questions in the survey.|,
+		lastUpdated => 1149654653,
+	},
+
+	'questions.correct.count.label' => {
+		message => q|The default label for questions.correct.count.|,
+		lastUpdated => 1149654653,
+	},
+
+	'questions.correct.percent.label' => {
+		message => q|The default label for questions.correct.percent.|,
+		lastUpdated => 1149654653,
+	},
+
+	'mode.isSurvey' => {
+		message => q|A boolean indicating whether we are in survey mode or quiz mode.|,
+		lastUpdated => 1149654653,
+	},
+
+	'survey.noprivs.label' => {
+		message => q|A message telling the user that they do not have the privileges necessary  to take this survey.|,
+		lastUpdated => 1149654653,
+	},
+
+	'quiz.noprivs.label' => {
+		message => q|A message telling the user that they do not have the privileges necessary to take the quiz.|,
+		lastUpdated => 1149654653,
+	},
+
+	'response.id' => {
+		message => q|The unique id for the current response for this user.|,
+		lastUpdated => 1149654653,
+	},
+
+	'response.count' => {
+		message => q|The number of responses this user has provided for this survey.|,
+		lastUpdated => 1149654653,
+	},
+
+	'user.isFirstResponse' => {
+		message => q|A boolean indicating whether this is the first response for this user.|,
+		lastUpdated => 1149654653,
+	},
+
+	'user.canRespondAgain' => {
+		message => q|A boolean indicating whether the user is allowed to respond to this survey again.|,
+		lastUpdated => 1149654653,
+	},
+
+	'questions.sofar.count' => {
+		message => q|The number of questions that have been answered to this point in the survey.|,
+		lastUpdated => 1149654653,
+	},
+
+	'questions.correct.count' => {
+		message => q|The number of questions the user has correct in the quiz to this point.|,
+		lastUpdated => 1149654653,
+	},
+
+	'questions.correct.percent' => {
+		message => q|The percentage of questions that the user has correct in the quiz to this point.|,
+		lastUpdated => 1149654653,
+	},
+
+	'response.isComplete' => {
+		message => q|A boolean indicating whether the user has answered all of the questions for this survey response.|,
+		lastUpdated => 1149654653,
+	},
+
+	'question_loop' => {
+		message => q|A loop which contains the questions for this survey response.|,
+		lastUpdated => 1149654653,
+	},
+
+	'question.question' => {
+		message => q|The survey question itself.|,
+		lastUpdated => 1149654653,
+	},
+
+	'question.allowComment' => {
+		message => q|A boolean indicating whether this question allows comments or not.|,
+		lastUpdated => 1149654653,
+	},
+
+	'question.id' => {
+		message => q|The unique id for this question.|,
+		lastUpdated => 1149654653,
+	},
+
+	'question.comment.field' => {
+		message => q|The form field to enter comments for this question.|,
+		lastUpdated => 1149654653,
+	},
+
+	'question.comment.label' => {
+		message => q|The default label for question.comment.field.|,
+		lastUpdated => 1149654653,
+	},
+
+	'question.answer.field' => {
+		message => q|The form field containing the possible answers for this question.|,
+		lastUpdated => 1149654653,
+	},
+
+	'question.edit_loop' => {
+		message => q|A loop containing all the questions in the survey with edit controls.|,
+		lastUpdated => 1149654653,
+	},
+
+	'question.edit.controls' => {
+		message => q|A toolbar to use to edit this question.|,
+		lastUpdated => 1149654653,
+	},
+
+	'question.edit.question' => {
+		message => q|The question to be edited.|,
+		lastUpdated => 1149654653,
+	},
+
+	'question.edit.id' => {
+		message => q|The unique id for this question.|,
+		lastUpdated => 1149654653,
+	},
+
 	'89' => {
-		message => q|<p>The following template variables are available for the Survey.
-</p>
-
-<p><b>question.add.url</b><br />
-The URL to add a new question to the survey.
-</p>
-
-<p><b>question.add.label</b><br />
-The default label for question.add.url.
-</p>
-
-<p><b>user.canTakeSurvey</b><br />
-A boolean indicating whether the current user has the rights to take the survey.
-</p>
-
-<p><b>form.header</b><br />
-The required form elements that go at the top of the survey questions.
-</p>
-
-<p><b>form.footer</b><br />
-The required form elements that go after the survey questions.
-</p>
-
-<p><b>form.submit</b><br />
-The default submit button for the survey response.
-</p>
-
-<p><b>questions.sofar.label</b><br />
-The default label for indicating how many questions have been answered to this point in the survey.
-</p>
-
-<p><b>start.newresponse.label</b><br />
-The default label for start.newresponse.url.
-</p>
-
-<p><b>start.newresponse.url</b><br />
-The URL to start a new response to the survey after the user has already taken the survey once.
-</p>
-
-<p><b>thanks.survey.label</b><br />
-A message thanking the user for completing the survey.
-</p>
-
-<p><b>thanks.quiz.label</b><br />
-A message thanking the user for completing the quiz.
-</p>
-
-<p><b>questions.total</b><br />
-The total number of questions in the survey.
-</p>
-
-<p><b>questions.correct.count.label</b><br />
-The default label for questions.correct.count.
-</p>
-
-<p><b>questions.correct.percent.label</b><br />
-The default label for questions.correct.percent.
-</p>
-
-<p><b>mode.isSurvey</b><br />
-A boolean indicating whether we are in survey mode or quiz mode.
-</p>
-
-<p><b>survey.noprivs.label</b><br />
-A message telling the user that they do not have the privileges necessary  to take this survey.
-</p>
-
-<p><b>quiz.noprivs.label</b><br />
-A message telling the user that they do not have the privileges necessary to take the quiz.
-</p>
-
-<p><b>response.id</b><br />
-The unique id for the current response for this user.
-</p>
-
-<p><b>response.count</b><br />
-The number of responses this user has provided for this survey.
-</p>
-
-<p><b>user.isFirstResponse</b><br />
-A boolean indicating whether this is the first response for this user.
-</p>
-
-<p><b>user.canRespondAgain</b><br />
-A boolean indicating whether the user is allowed to respond to this survey again.
-</p>
-
-<p><b>questions.sofar.count</b><br />
-The number of questions that have been answered to this point in the survey.
-</p>
-
-<p><b>questions.correct.count</b><br />
-The number of questions the user has correct in the quiz to this point.
-</p>
-
-<p><b>questions.correct.percent</b><br />
-The percentage of questions that the user has correct in the quiz to this point.
-</p>
-
-<p><b>response.isComplete</b><br />
-A boolean indicating whether the user has answered all of the questions for this survey response.
-</p>
-
-<p><b>question_loop</b><br />
-A loop which contains the questions for this survey response.
-</p>
-
-
-<div class="helpIndent">
-
-<p><b>question.question</b><br />
-The survey question itself.
-</p>
-
-<p><b>question.allowComment</b><br />
-A boolean indicating whether this question allows comments or not.
-</p>
-
-<p><b>question.id</b><br />
-The unique id for this question.
-</p>
-
-<p><b>question.comment.field</b><br />
-The form field to enter comments for this question.
-</p>
-
-<p><b>question.comment.label</b><br />
-The default label for question.comment.field.
-</p>
-
-<p><b>question.answer.field</b><br />
-The form field containing the possible answers for this question.
-</p>
-
-</div>
-
-<p><b>question.edit_loop</b><br />
-A loop containing all the questions in the survey with edit controls.
-</p>
-
-<div class="helpIndent">
-
-<p><b>question.edit.controls</b><br />
-A toolbar to use to edit this question.
-</p>
-
-<p><b>question.edit.question</b><br />
-The question to be edited.
-</p>
-
-<p><b>question.edit.id</b><br />
-The unique id for this question.
-</p>
-
-</div>
+		message => q|<p>The following template variables are available for the Survey:</p>
 |,
-		lastUpdated => 1146806995
+		lastUpdated => 1149654687
 	},
 
 	'10' => {
@@ -329,79 +355,95 @@ The unique id for this question.
 		lastUpdated => 1033949647
 	},
 
+	'user.canViewReports' => {
+		message => q|A boolean indicating whether the user has the privileges to view survey reports.|,
+		lastUpdated => 1149654717,
+	},
+
+	'delete.all.responses.url' => {
+		message => q|This URL will delete all of the responses to this survey.|,
+		lastUpdated => 1149654717,
+	},
+
+	'delete.all.responses.label' => {
+		message => q|The default label for delete.all.responses.url.|,
+		lastUpdated => 1149654717,
+	},
+
+	'export.answers.url' => {
+		message => q|The URL to create a tab delimited file containing all of the answers to the questions in this survey.|,
+		lastUpdated => 1149654717,
+	},
+
+	'export.answers.label' => {
+		message => q|The default label for export.answers.url.|,
+		lastUpdated => 1149654717,
+	},
+
+	'export.questions.url' => {
+		message => q|The URL to create a tab delimited file containing all of the questions in this survey.|,
+		lastUpdated => 1149654717,
+	},
+
+	'export.questions.label' => {
+		message => q|The default label for export.questions.url.|,
+		lastUpdated => 1149654717,
+	},
+
+	'export.responses.url' => {
+		message => q|The  URL to create a tab delimited file containing all of the responses to the questions in this survey.|,
+		lastUpdated => 1149654717,
+	},
+
+	'export.responses.label' => {
+		message => q|The default label for export.responses.url|,
+		lastUpdated => 1149654717,
+	},
+
+	'export.composite.url' => {
+		message => q|The URL to create a tab delimited file containing a composite view of all of the data in this survey.|,
+		lastUpdated => 1149654717,
+	},
+
+	'export.composite.label' => {
+		message => q|The default label for export.composite.url.|,
+		lastUpdated => 1149654717,
+	},
+
+	'report.gradebook.url' => {
+		message => q|The URL to view the gradebook report for this quiz.|,
+		lastUpdated => 1149654717,
+	},
+
+	'report.gradebook.label' => {
+		message => q|The default label for report.gradebook.url.|,
+		lastUpdated => 1149654717,
+	},
+
+	'report.overview.url' => {
+		message => q|The URL to view statistical overview report for this survey.|,
+		lastUpdated => 1149654717,
+	},
+
+	'report.overview.label' => {
+		message => q|The default label for report.overview.url.|,
+		lastUpdated => 1149654717,
+	},
+
+	'survey.url' => {
+		message => q|The URL to view the survey. Usually used to get back to the survey after looking at a report.|,
+		lastUpdated => 1149654717,
+	},
+
+	'survey.label' => {
+		message => q|The default label for survey.url.|,
+		lastUpdated => 1149654717,
+	},
+
 	'91' => {
 		message => q|<p>The following template variables are available in all survey templates.</p>
-
-<p><b>user.canViewReports</b><br />
-A boolean indicating whether the user has the privileges to view survey reports.
-</p>
-
-<p><b>delete.all.responses.url</b><br />
-This URL will delete all of the responses to this survey.
-</p>
-
-<p><b>delete.all.responses.label</b><br />
-The default label for delete.all.responses.url.
-</p>
-
-<p><b>export.answers.url</b><br />
-The URL to create a tab delimited file containing all of the answers to the questions in this survey.
-</p>
-
-<p><b>export.answers.label</b><br />
-The default label for export.answers.url.
-</p>
-
-<p><b>export.questions.url</b><br />
-The URL to create a tab delimited file containing all of the questions in this survey.
-</p>
-
-<p><b>export.questions.label</b><br />
-The default label for export.questions.url.
-</p>
-
-<p><b>export.responses.url</b><br />
-The  URL to create a tab delimited file containing all of the responses to the questions in this survey.
-</p>
-
-<p><b>export.responses.label</b><br />
-The default label for export.responses.url
-</p>
-
-<p><b>export.composite.url</b><br />
-The URL to create a tab delimited file containing a composite view of all of the data in this survey.
-</p>
-
-<p><b>export.composite.label</b><br />
-The default label for export.composite.url.
-</p>
-
-<p><b>report.gradebook.url</b><br />
-The URL to view the gradebook report for this quiz.
-</p>
-
-<p><b>report.gradebook.label</b><br />
-The default label for report.gradebook.url.
-</p>
-
-<p><b>report.overview.url</b><br />
-The URL to view statistical overview report for this survey.
-</p>
-
-<p><b>report.overview.label</b><br />
-The default label for report.overview.url.
-</p>
-
-<p><b>survey.url</b><br />
-The URL to view the survey. Usually used to get back to the survey after looking at a report.
-</p>
-
-<p><b>survey.label</b><br />
-The default label for survey.url.
-</p>
-
 |,
-		lastUpdated => 1146807023
+		lastUpdated => 1149654745
 	},
 
 	'78' => {
@@ -805,54 +847,60 @@ the survey was added.|,
 		lastUpdated => 1078513217
 	},
 
+	'title' => {
+		message => q|The default title of the report.|,
+		lastUpdated => 1149654771,
+	},
+
+	'question.count' => {
+		message => q|The number of questions in the survey.|,
+		lastUpdated => 1149654771,
+	},
+
+	'response.user.label' => {
+		message => q|The default label for response.user.name.|,
+		lastUpdated => 1149654771,
+	},
+
+	'response.count.label' => {
+		message => q|The default label for response.count.correct.|,
+		lastUpdated => 1149654771,
+	},
+
+	'response.percent.label' => {
+		message => q|The default label for response.percent.|,
+		lastUpdated => 1149654771,
+	},
+
+	'response_loop' => {
+		message => q|A loop containing a list of responses.|,
+		lastUpdated => 1149654771,
+	},
+
+	'response.url' => {
+		message => q|The URL to view this response.|,
+		lastUpdated => 1149654771,
+	},
+
+	'response.user.name' => {
+		message => q|The username of the user that gave this response.|,
+		lastUpdated => 1149654771,
+	},
+
+	'response.count.correct' => {
+		message => q|The total number of questions that this user got correct.|,
+		lastUpdated => 1149654771,
+	},
+
+	'response.percent' => {
+		message => q|The percentage of correct questions.|,
+		lastUpdated => 1149654771,
+	},
+
 	'1088' => {
-		message => q|<p>The following template variables are available in the survey's gradebook report:
-</p>
-
-<p><b>title</b><br />
-The default title of the report.
-</p>
-
-<p><b>question.count</b><br />
-The number of questions in the survey.
-</p>
-
-<p><b>response.user.label</b><br />
-The default label for response.user.name.
-</p>
-
-<p><b>response.count.label</b><br />
-The default label for response.count.correct.
-</p>
-
-<p><b>response.percent.label</b><br />
-The default label for response.percent.
-</p>
-
-<p><b>response_loop</b><br />
-A loop containing a list of responses.
-</p>
-
-<div class="helpIndent">
-
-<p><b>response.url</b><br />
-The URL to view this response.
-</p>
-
-<p><b>response.user.name</b><br />
-The username of the user that gave this response.
-</p>
-
-<p><b>response.count.correct</b><br />
-The total number of questions that this user got correct.
-</p>
-
-<p><b>response.percent</b><br />
-The percentage of correct questions.
-</p>
-
-</div>|,
-		lastUpdated => 1078513217
+		message => q|<p>The following template variables are available in the survey's gradebook report: </p>
+|,
+		lastUpdated => 1149654794
 	},
 
 	'1089' => {
@@ -860,123 +908,130 @@ The percentage of correct questions.
 		lastUpdated => 1078515839
 	},
 
+	'delete.url' => {
+		message => q|The URL to delete this response.|,
+		lastUpdated => 1149654822,
+	},
+
+	'delete.label' => {
+		message => q|The default label for delete.url.|,
+		lastUpdated => 1149654822,
+	},
+
+	'start.date.label' => {
+		message => q|The default label for start.date.human.|,
+		lastUpdated => 1149654822,
+	},
+
+	'start.date.epoch' => {
+		message => q|The epoch representation of when the user started the survey response.|,
+		lastUpdated => 1149654822,
+	},
+
+	'start.date.human' => {
+		message => q|The human representation of the date when the user started the response.|,
+		lastUpdated => 1149654822,
+	},
+
+	'start.time.human' => {
+		message => q|The human representation of the time when the user started the response.|,
+		lastUpdated => 1149654822,
+	},
+
+	'end.date.label' => {
+		message => q|The default label for end.date.human.|,
+		lastUpdated => 1149654822,
+	},
+
+	'end.date.epoch' => {
+		message => q|The epoch representation of the date when the user completed this response.|,
+		lastUpdated => 1149654822,
+	},
+
+	'end.date.human' => {
+		message => q|The human representation of the date when the user completed this response.|,
+		lastUpdated => 1149654822,
+	},
+
+	'end.time.human' => {
+		message => q|The human representation of the time when the user completed this response.|,
+		lastUpdated => 1149654822,
+	},
+
+	'duration.label' => {
+		message => q|The default label for the duration.|,
+		lastUpdated => 1149654822,
+	},
+
+	'duration.minutes' => {
+		message => q|The number of minutes it took to complete the survey.|,
+		lastUpdated => 1149654822,
+	},
+
+	'duration.minutes.label' => {
+		message => q|A label for "minutes".|,
+		lastUpdated => 1149654822,
+	},
+
+	'duration.seconds' => {
+		message => q|The remainder seconds the duration.minutes calculations.|,
+		lastUpdated => 1149654822,
+	},
+
+	'duration.seconds.label' => {
+		message => q|A label for "seconds".|,
+		lastUpdated => 1149654822,
+	},
+
+	'answer.label' => {
+		message => q|The default label for question.answer.|,
+		lastUpdated => 1149654822,
+	},
+
+	'response.label' => {
+		message => q|The default label for question.label.|,
+		lastUpdated => 1149654822,
+	},
+
+	'comment.label' => {
+		message => q|The default label for question.comment.|,
+		lastUpdated => 1149654822,
+	},
+
+	'question' => {
+		message => q|The question itself.|,
+		lastUpdated => 1149654822,
+	},
+
+	'question.isRadioList' => {
+		message => q|A boolean indicating whether this question's answers are a radio list.|,
+		lastUpdated => 1149654822,
+	},
+
+	'question.response' => {
+		message => q|The user's response to this question.|,
+		lastUpdated => 1149654822,
+	},
+
+	'question.comment' => {
+		message => q|The user's comment on this question (if any).|,
+		lastUpdated => 1149654822,
+	},
+
+	'question.isCorrect' => {
+		message => q|A boolean indicating whether the user got this question correct.|,
+		lastUpdated => 1149654822,
+	},
+
+	'question.answer' => {
+		message => q|The correct answer for this question.|,
+		lastUpdated => 1149654822,
+	},
+
 	'1090' => {
-		message => q|<p>The following are the variables available to display the individual response.
-</p>
-
-<p><b>title</b><br />
-The default title for this report.
-</p>
-
-<p><b>delete.url</b><br />
-The URL to delete this response.
-</p>
-
-<p><b>delete.label</b><br />
-The default label for delete.url.
-</p>
-
-<p><b>start.date.label</b><br />
-The default label for start.date.human.
-</p>
-
-<p><b>start.date.epoch</b><br />
-The epoch representation of when the user started the survey response.
-</p>
-
-<p><b>start.date.human</b><br />
-The human representation of the date when the user started the response.
-</p>
-
-<p><b>start.time.human</b><br />
-The human representation of the time when the user started the response.
-</p>
-
-<p><b>end.date.label</b><br />
-The default label for end.date.human.
-</p>
-
-<p><b>end.date.epoch</b><br />
-The epoch representation of the date when the user completed this response.
-</p>
-
-<p><b>end.date.human</b><br />
-The human representation of the date when the user completed this response.
-</p>
-
-<p><b>end.time.human</b><br />
-The human representation of the time when the user completed this response.
-</p>
-
-<p><b>duration.label</b><br />
-The default label for the duration.
-</p>
-
-<p><b>duration.minutes</b><br />
-The number of minutes it took to complete the survey.
-</p>
-
-<p><b>duration.minutes.label</b><br />
-A label for "minutes".
-</p>
-
-<p><b>duration.seconds</b><br />
-The remainder seconds the duration.minutes calculations.
-</p>
-
-<p><b>duration.seconds.label</b><br />
-A label for "seconds".
-</p>
-
-<p><b>answer.label</b><br />
-The default label for question.answer.
-</p>
-
-<p><b>response.label</b><br />
-The default label for question.label.
-</p>
-
-<p><b>comment.label</b><br />
-The default label for question.comment.
-</p>
-
-<p><b>question_loop</b><br />
-A loop that includes the list of questions in this response.
-</p>
-
-<div class="helpIndent">
-
-<p><b>question</b><br />
-The question itself.
-</p>
-
-<p><b>question.id</b><br />
-The unique identifier for this question.
-</p>
-
-<p><b>question.isRadioList</b><br />
-A boolean indicating whether this question's answers are a radio list.
-</p>
-
-<p><b>question.response</b><br />
-The user's response to this question.
-</p>
-
-<p><b>question.comment</b><br />
-The user's comment on this question (if any).
-</p>
-
-<p><b>question.isCorrect</b><br />
-A boolean indicating whether the user got this question correct.
-</p>
-
-<p><b>question.answer</b><br />
-The correct answer for this question.
-</p>
-
-
-</div>|,
-		lastUpdated => 1078515839
+		message => q|<p>The following are the variables available to display the individual response.</p>
+|,
+		lastUpdated => 1149654936
 	},
 
 	'1091' => {
@@ -984,98 +1039,75 @@ The correct answer for this question.
 		lastUpdated => 1078517114
 	},
 
+	'report answer.label' => {
+		message => q|The default label for answer_loop.|,
+		lastUpdated => 1149654954,
+	},
+
+	'report response.count.label' => {
+		message => q|The default label for response.count.|,
+		lastUpdated => 1149654954,
+	},
+
+	'show.responses.label' => {
+		message => q|The default label that will display responses.|,
+		lastUpdated => 1149654954,
+	},
+
+	'show.comments.label' => {
+		message => q|The default label that will display comments.|,
+		lastUpdated => 1149654954,
+	},
+
+	'report question_loop' => {
+		message => q|A loop containing questions.|,
+		lastUpdated => 1149654954,
+	},
+
+	'question.response.total' => {
+		message => q|The total number of responses for this answer.|,
+		lastUpdated => 1149654954,
+	},
+
+	'answer_loop' => {
+		message => q|A loop containing the answers and responses for this question.|,
+		lastUpdated => 1149654954,
+	},
+
+	'answer.isCorrect' => {
+		message => q|A boolean indicating whether this answer is marked correct.|,
+		lastUpdated => 1149654954,
+	},
+
+	'answer' => {
+		message => q|The answer itself.|,
+		lastUpdated => 1149654954,
+	},
+
+	'answer.response.count' => {
+		message => q|The total number of responses given for this answer.|,
+		lastUpdated => 1149654954,
+	},
+
+	'answer.response.percent' => {
+		message => q|The percent of responses to this question that went to this answer.|,
+		lastUpdated => 1149654954,
+	},
+
+	'comment_loop' => {
+		message => q|A loop that contains all of the comments for this answer.|,
+		lastUpdated => 1149654954,
+	},
+
+	'answer.comment' => {
+		message => q|A comment.|,
+		lastUpdated => 1149654954,
+	},
+
 	'1092' => {
-		message => q|<p>The following are the variables available in this template:
-</p>
-
-<p><b>title</b><br />
-The default title for this report.
-</p>
-
-<p><b>answer.label</b><br />
-The default label for answer_loop.
-</p>
-
-<p><b>response.count.label</b><br />
-The default label for response.count.
-</p>
-
-<p><b>response.percent.label</b><br />
-The default label for response.percent.
-</p>
-
-<p><b>show.responses.label</b><br />
-The default label that will display responses.
-</p>
-
-<p><b>show.comments.label</b><br />
-The default label that will display comments.
-</p>
-
-<p><b>question_loop</b><br />
-A loop containing questions.
-</p>
-
-<div class="helpIndent">
-
-<p><b>question</b><br />
-The question itself.
-</p>
-
-<p><b>question.id</b><br />
-The unique identifier for this question.
-</p>
-
-<p><b>question.isRadioList</b><br />
-A boolean indicating whether the answer for this question is a radio list.
-</p>
-
-<p><b>question.response.total</b><br />
-The total number of responses for this answer.
-</p>
-
-<p><b>question.allowComment</b><br />
-A boolean indicating whether this question allows comments.
-</p>
-
-<p><b>answer_loop</b><br />
-A loop containing the answers and responses for this question.
-</p>
-
-<div class="helpIndent">
-
-<p><b>answer.isCorrect</b><br />
-A boolean indicating whether this answer is marked correct.
-</p>
-
-<p><b>answer</b><br />
-The answer itself.
-</p>
-
-<p><b>answer.response.count</b><br />
-The total number of responses given for this answer.
-</p>
-
-<p><b>answer.response.percent</b><br />
-The percent of responses to this question that went to this answer.
-</p>
-
-<p><b>comment_loop</b><br />
-A loop that contains all of the comments for this answer.
-</p>
-
-<div class="helpIndent">
-
-<p><b>answer.comment</b><br />
-A comment.
-</p>
-
-</div>
-
-</div>
-
-</div>|,
-		lastUpdated => 1146804179
+		message => q|<p>The following are the variables available in this template:</p>
+|,
+		lastUpdated => 1149655216
 	},
 
 	'overview template' => {

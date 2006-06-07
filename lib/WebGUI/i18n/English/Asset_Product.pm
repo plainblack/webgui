@@ -21,209 +21,230 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
+	'brochure.icon' => {
+		message => q|The URL to the icon for the brochure.|,
+		lastUpdated => 1149655398,
+	},
+
+	'brochure.url' => {
+		message => q|The URL to download the brochure.|,
+		lastUpdated => 1149655398,
+	},
+
+	'brochure.label' => {
+		message => q|The translated label for the brochure URL.|,
+		lastUpdated => 1149655398,
+	},
+
+	'manual.icon' => {
+		message => q|The URL to the icon for the manual.|,
+		lastUpdated => 1149655398,
+	},
+
+	'manual.url' => {
+		message => q|The URL to download the manual.|,
+		lastUpdated => 1149655398,
+	},
+
+	'manual.label' => {
+		message => q|The translated label for the manual URL.|,
+		lastUpdated => 1149655398,
+	},
+
+	'warranty.icon' => {
+		message => q|The URL to the icon for the warranty.|,
+		lastUpdated => 1149655398,
+	},
+
+	'warranty.url' => {
+		message => q|The URL to download the warranty.|,
+		lastUpdated => 1149655398,
+	},
+
+	'warranty.label' => {
+		message => q|The label for the warranty URL.|,
+		lastUpdated => 1149655398,
+	},
+
+	'image1' => {
+		message => q|The URL to the first image uploaded to this product.|,
+		lastUpdated => 1149655398,
+	},
+
+	'thumbnail1' => {
+		message => q|The URL to the thumbnail of the first image uploaded to this product.|,
+		lastUpdated => 1149655398,
+	},
+
+	'image2' => {
+		message => q|The URL to the second image uploaded to this product.|,
+		lastUpdated => 1149655398,
+	},
+
+	'thumbnail2' => {
+		message => q|The URL to the thumbnail of the second image uploaded to this product.|,
+		lastUpdated => 1149655398,
+	},
+
+	'image3' => {
+		message => q|The URL to the third image uploaded to this product.|,
+		lastUpdated => 1149655398,
+	},
+
+	'thumbnail3' => {
+		message => q|The URL to the thumbnail of the third image uploaded to this product.|,
+		lastUpdated => 1149655398,
+	},
+
+	'addfeature.url' => {
+		message => q|The URL to add a feature to this product.|,
+		lastUpdated => 1149655398,
+	},
+
+	'addfeature.label' => {
+		message => q|The translated label for the add feature link.|,
+		lastUpdated => 1149655398,
+	},
+
+	'feature_loop' => {
+		message => q|This loop contains all of the features associated with this product.|,
+		lastUpdated => 1149655398,
+	},
+
+	'feature.controls' => {
+		message => q|The WebGUI management controls for this feature.|,
+		lastUpdated => 1149655398,
+	},
+
+	'feature.feature' => {
+		message => q|The text of the feature itself.|,
+		lastUpdated => 1149655398,
+	},
+
+	'addbenefit.url' => {
+		message => q|The URL to add a benefit to this product.|,
+		lastUpdated => 1149655398,
+	},
+
+	'addbenefit.label' => {
+		message => q|The translated label for the add benefit link.|,
+		lastUpdated => 1149655398,
+	},
+
+	'benefit_loop' => {
+		message => q|This loop contains the benefits for this product.|,
+		lastUpdated => 1149655398,
+	},
+
+	'benefit.benefit' => {
+		message => q|The benefit text itself.|,
+		lastUpdated => 1149655398,
+	},
+
+	'benefit.controls' => {
+		message => q|The WebGUI management controls for this benefit.|,
+		lastUpdated => 1149655398,
+	},
+
+	'addspecification.url' => {
+		message => q|The URL to add a specification to this product.|,
+		lastUpdated => 1149655398,
+	},
+
+	'addspecification.label' => {
+		message => q|The translated label for the add specification link.|,
+		lastUpdated => 1149655398,
+	},
+
+	'specification_loop' => {
+		message => q|The list of specifications associated with this product.|,
+		lastUpdated => 1149655398,
+	},
+
+	'specification.controls' => {
+		message => q|The WebGUI management controls for this specification.|,
+		lastUpdated => 1149655398,
+	},
+
+	'specification.specification' => {
+		message => q|The text of the specification itself.|,
+		lastUpdated => 1149655398,
+	},
+
+	'specification.units' => {
+		message => q|The units for this specification. ex: meters|,
+		lastUpdated => 1149655398,
+	},
+
+	'specification.label' => {
+		message => q|The label for this specification. ex: height|,
+		lastUpdated => 1149655398,
+	},
+
+	'addaccessory.url' => {
+		message => q|The URL to add an accessory to this product.|,
+		lastUpdated => 1149655398,
+	},
+
+	'addaccessory.label' => {
+		message => q|The translated label for the add accessory link.|,
+		lastUpdated => 1149655398,
+	},
+
+	'accessory_loop' => {
+		message => q|This loop contains all of the accessories associated with this product.|,
+		lastUpdated => 1149655398,
+	},
+
+	'accessory.url' => {
+		message => q|The URL to the linked accessory.|,
+		lastUpdated => 1149655398,
+	},
+
+	'accessory.title' => {
+		message => q|The title of the linked accessory.|,
+		lastUpdated => 1149655398,
+	},
+
+	'accessory.controls' => {
+		message => q|The WebGUI management controls for this accessory.|,
+		lastUpdated => 1149655398,
+	},
+
+	'addRelatedProduct.url' => {
+		message => q|The URL to add a related product to this product.|,
+		lastUpdated => 1149655398,
+	},
+
+	'addRelatedProduct.label' => {
+		message => q|The translated label for the add related product link.|,
+		lastUpdated => 1149655398,
+	},
+
+	'relatedproduct.loop' => {
+		message => q|This loop contains all of the products related to this product.|,
+		lastUpdated => 1149655398,
+	},
+
+	'relatedproduct.url' => {
+		message => q|The URL to the related product.|,
+		lastUpdated => 1149655398,
+	},
+
+	'relatedproduct.title' => {
+		message => q|The title of the related product.|,
+		lastUpdated => 1149655398,
+	},
+
+	'relatedproduct.controls' => {
+		message => q|The WebGUI management controls for this related product.|,
+		lastUpdated => 1149655398,
+	},
+
 	'63' => {
-		message => q|<p>The following is the list of template variables available in product templates.
-</p>
-
-<p><b>brochure.icon</b><br />
-The URL to the icon for the brochure.
-</p>
-
-<p><b>brochure.url</b><br />
-The URL to download the brochure.
-</p>
-
-<p><b>brochure.label</b><br />
-The translated label for the brochure URL.
-</p>
-
-<p><b>manual.icon</b><br />
-The URL to the icon for the manual.
-</p>
-
-<p><b>manual.url</b><br />
-The URL to download the manual.
-</p>
-
-<p><b>manual.label</b><br />
-The translated label for the manual URL.
-</p>
-
-<p><b>warranty.icon</b><br />
-The URL to the icon for the warranty.
-</p>
-
-
-<p><b>warranty.url</b><br />
-The URL to download the warranty.
-</p>
-
-<p><b>warranty.label</b><br />
-The label for the warranty URL.
-</p>
-
-<p><b>image1</b><br />
-The URL to the first image uploaded to this product.
-</p>
-
-<p><b>thumbnail1</b><br />
-The URL to the thumbnail of the first image uploaded to this product.
-</p>
-
-<p><b>image2</b><br />
-The URL to the second image uploaded to this product.
-</p>
-
-<p><b>thumbnail2</b><br />
-The URL to the thumbnail of the second image uploaded to this product.
-</p>
-
-<p><b>image3</b><br />
-The URL to the third image uploaded to this product.
-</p>
-
-<p><b>thumbnail3</b><br />
-The URL to the thumbnail of the third image uploaded to this product.
-</p>
-
-
-<p><b>addfeature.url</b><br />
-The URL to add a feature to this product.
-</p>
-
-<p><b>addfeature.label</b><br />
-The translated label for the add feature link.
-</p>
-
-<p><b>feature_loop</b><br />
-This loop contains all of the features associated with this product.
-</p>
-
-<div class="helpIndent">
-
-<p><b>feature.controls</b><br />
-The WebGUI management controls for this feature.
-</p>
-
-<p><b>feature.feature</b><br />
-The text of the feature itself.
-</p>
-
-</div>
-
-<p><b>addbenefit.url</b><br />
-The URL to add a benefit to this product.
-</p>
-
-<p><b>addbenefit.label</b><br />
-The translated label for the add benefit link.
-</p>
-
-<p><b>benefit_loop</b><br />
-This loop contains the benefits for this product.
-</p>
-
-<div class="helpIndent">
-
-<p><b>benefit.benefit</b><br />
-The benefit text itself.
-</p>
-
-<p><b>benefit.controls</b><br />
-The WebGUI management controls for this benefit.
-</p>
-
-</div>
-
-<p><b>addspecification.url</b><br />
-The URL to add a specification to this product.
-</p>
-
-<p><b>addspecification.label</b><br />
-The translated label for the add specification link.
-</p>
-
-<p><b>specification_loop</b><br />
-The list of specifications associated with this product.
-</p>
-
-<div class="helpIndent">
-
-<p><b>specification.controls</b><br />
-The WebGUI management controls for this specification.
-</p>
-
-<p><b>specification.specification</b><br />
-The text of the specification itself.
-</p>
-
-<p><b>specification.units</b><br />
-The units for this specification. ex: meters
-</p>
-
-<p><b>specification.label</b><br />
-The label for this specification. ex: height
-</p>
-
-</div>
-
-<p><b>addaccessory.url</b><br />
-The URL to add an accessory to this product.
-</p>
-
-<p><b>addaccessory.label</b><br />
-The translated label for the add accessory link.
-</p>
-
-<p><b>accessory_loop</b><br />
-This loop contains all of the accessories associated with this product.
-</p>
-
-<div class="helpIndent">
-
-<p><b>accessory.url</b><br />
-The URL to the linked accessory.
-</p>
-
-<p><b>accessory.title</b><br />
-The title of the linked accessory.
-</p>
-
-<p><b>accessory.controls</b><br />
-The WebGUI management controls for this accessory.
-</p>
-
-</div>
-
-<p><b>addRelatedProduct.url</b><br />
-The URL to add a related product to this product.
-</p>
-
-<p><b>addRelatedProduct.label</b><br />
-The translated label for the add related product link.
-</p>
-
-<p><b>relatedproduct.loop</b><br />
-This loop contains all of the products related to this product.
-</p>
-
-<div class="helpIndent">
-
-<p><b>relatedproduct.url</b><br />
-The URL to the related product.
-</p>
-
-<p><b>relatedproduct.title</b><br />
-The title of the related product.
-</p>
-
-<p><b>relatedproduct.controls</b><br />
-The WebGUI management controls for this related product.
-</p>
-
-</div>
+		message => q|<p>The following is the list of template variables available in product templates.</p>
 |,
-		lastUpdated => 1146798062,
+		lastUpdated => 1149655422,
 	},
 
 	'21' => {

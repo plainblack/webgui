@@ -67,6 +67,52 @@ our $HELP = {
 		body => '74',
 		fields => [
 		],
+		variables => [
+		          {
+		            'name' => 'canVote'
+		          },
+		          {
+		            'name' => 'question'
+		          },
+		          {
+		            'name' => 'form.start'
+		          },
+		          {
+		            'name' => 'answer_loop',
+		            'variables' => [
+		                             {
+		                               'name' => 'answer.form'
+		                             },
+		                             {
+		                               'name' => 'answer.text'
+		                             },
+		                             {
+		                               'name' => 'answer.number'
+		                             },
+		                             {
+		                               'name' => 'answer.graphWidth'
+		                             },
+		                             {
+		                               'name' => 'answer.percent'
+		                             },
+		                             {
+		                               'name' => 'answer.total'
+		                             }
+		                           ]
+		          },
+		          {
+		            'name' => 'form.submit'
+		          },
+		          {
+		            'name' => 'form.end'
+		          },
+		          {
+		            'name' => 'responses.label'
+		          },
+		          {
+		            'name' => 'responses.total'
+		          }
+		],
 		related => [
 			{
 				tag => 'poll add/edit',

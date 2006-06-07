@@ -1130,159 +1130,167 @@ the preview is displayed, the Post can either be edited or canceled.|,
 		lastUpdated => 1113673895,
 	},
 
+	'post_loop' => {
+		message => q|A list of posts for this Collateral Asset.|,
+		lastUpdated => 1149655722,
+	},
+
+	'id' => {
+		message => q|The AssetId of this Post.|,
+		lastUpdated => 1149655722,
+	},
+
+	'tmplVar url' => {
+		message => q|The URL of this Post.|,
+		lastUpdated => 1149655722,
+	},
+
+	'rating_loop' => {
+		message => q|A loop that runs once for each point of <b>rating</b> that the Post has|,
+		lastUpdated => 1149655722,
+	},
+
+	'rating_loop.count' => {
+		message => q|The index variable for the <b>rating_loop</b>.|,
+		lastUpdated => 1149655722,
+	},
+
+	'content' => {
+		message => q|The formatted content of this Post.|,
+		lastUpdated => 1149655722,
+	},
+
+	'tmplVar status' => {
+		message => q|The status of this Post.|,
+		lastUpdated => 1149655722,
+	},
+
+	'tmplVar thumbnail' => {
+		message => q|If this Post has attachments, the URL for the thumbnail of the first image attachment.|,
+		lastUpdated => 1149655722,
+	},
+
+	'image.url' => {
+		message => q|If this Post has attachments, the URL for the first image attachment.|,
+		lastUpdated => 1149655722,
+	},
+
+	'dateSubmitted.human' => {
+		message => q|The date this Post was submitted, in a human readable format.|,
+		lastUpdated => 1149655722,
+	},
+
+	'dateUpdated.human' => {
+		message => q|The date this Post was last updated, in a human readable format.|,
+		lastUpdated => 1149655722,
+	},
+
+	'timeSubmitted.human' => {
+		message => q|The time this Post was submitted, in a human readable format.|,
+		lastUpdated => 1149655722,
+	},
+
+	'timeUpdated.human' => {
+		message => q|The time this Post was last updated, in a human readable format.|,
+		lastUpdated => 1149655722,
+	},
+
+	'userProfile.url' => {
+		message => q|The URL to the Profile of the User who submitted this Post.|,
+		lastUpdated => 1149655722,
+	},
+
+	'user.isVisitor' => {
+		message => q|A conditional that is true if the poster is a visitor.|,
+		lastUpdated => 1149655722,
+	},
+
+	'edit.url' => {
+		message => q|The URL to edit this Post.|,
+		lastUpdated => 1149655722,
+	},
+
+	'controls' => {
+		message => q|A set of editing icons to delete or re-order this Post.|,
+		lastUpdated => 1149655722,
+	},
+
+	'isSecond' => {
+		message => q|A conditional indicating that is true if this Post is the second in this Collaboration Asset.|,
+		lastUpdated => 1149655722,
+	},
+
+	'isThird' => {
+		message => q|A conditional indicating that is true if this Post is the third in this Collaboration Asset.|,
+		lastUpdated => 1149655722,
+	},
+
+	'isFourth' => {
+		message => q|A conditional indicating that is true if this Post is the fourth in this Collaboration Asset.|,
+		lastUpdated => 1149655722,
+	},
+
+	'isFifth' => {
+		message => q|A conditional indicating that is true if this Post is the fifth in this Collaboration Asset.|,
+		lastUpdated => 1149655722,
+	},
+
+	'user.isPoster' => {
+		message => q|A conditional indicating that is true if the current user submitted this Post.|,
+		lastUpdated => 1149655722,
+	},
+
+	'user.hasRead' => {
+		message => q|A conditional indicating whether a user has read this thread.|,
+		lastUpdated => 1149655722,
+	},
+
+	'avatar.url' => {
+		message => q|A URL to the avatar for the owner of the Post, if avatars are enabled and the
+user has an avatar.|,
+		lastUpdated => 1149655722,
+	},
+
+	'lastReply.url' => {
+		message => q|The URL to the last reply to this Post.|,
+		lastUpdated => 1149655722,
+	},
+
+	'lastReply.title' => {
+		message => q|The title of the last reply.|,
+		lastUpdated => 1149655722,
+	},
+
+	'lastReply.user.isVisitor' => {
+		message => q|A conditional that is true if the poster of the last reply is a visitor.|,
+		lastUpdated => 1149655722,
+	},
+
+	'lastReply.username' => {
+		message => q|The name of user who submitted the last reply.|,
+		lastUpdated => 1149655722,
+	},
+
+	'lastReply.userProfile.url' => {
+		message => q|The URL to the Profile of the User who submitted this Post.|,
+		lastUpdated => 1149655722,
+	},
+
+	'lastReply.dateSubmitted.human' => {
+		message => q|The date the last reply was submitted, in a human readable format.|,
+		lastUpdated => 1149655722,
+	},
+
+	'lastReply.timeSubmitted.human' => {
+		message => q|The time the last reply was submitted, in a human readable format.|,
+		lastUpdated => 1149655722,
+	},
+
 	'collaboration post list template variables body' => {
 		message => q|<p>These variables are available in several of the templates
 used by Collaboration Assets:</p>
-
-<p><b>post_loop</b><br />
-A list of posts for this Collateral Asset.
-</p>
-
-<div class="helpIndent">
-
-<p><b>Asset variables</b><br />
-The variables common to all Assets, such as <b>title</b>, <b>menuTitle</b>, etc.
-</p>
-
-<p><b>Post variables</b><br />
-All template variables from the Post template.  Some of those variables will be duplicates
-of the ones below.
-</p>
-
-<p><b>id</b><br />
-The AssetId of this Post.
-</p>
-
-<p><b>url</b><br />
-The URL of this Post.
-</p>
-
-<p><b>rating_loop</b><br />
-A loop that runs once for each point of <b>rating</b> that the Post has
-</p>
-
-<div class="helpIndent">
-
-<p><b>rating_loop.count</b><br />
-The index variable for the <b>rating_loop</b>.
-</p>
-
-</div>
-
-<p><b>content</b><br />
-The formatted content of this Post.
-</p>
-
-<p><b>status</b><br />
-The status of this Post.
-</p>
-
-<p><b>thumbnail</b><br />
-If this Post has attachments, the URL for the thumbnail of the first image attachment.
-</p>
-
-<p><b>image.url</b><br />
-If this Post has attachments, the URL for the first image attachment.
-</p>
-
-<p><b>dateSubmitted.human</b><br />
-The date this Post was submitted, in a human readable format.
-</p>
-
-<p><b>dateUpdated.human</b><br />
-The date this Post was last updated, in a human readable format.
-</p>
-
-<p><b>timeSubmitted.human</b><br />
-The time this Post was submitted, in a human readable format.
-</p>
-
-<p><b>timeUpdated.human</b><br />
-The time this Post was last updated, in a human readable format.
-</p>
-
-<p><b>userProfile.url</b><br />
-The URL to the Profile of the User who submitted this Post.
-</p>
-
-<p><b>user.isVisitor</b><br />
-A conditional that is true if the poster is a visitor.
-</p>
-
-<p><b>edit.url</b><br />
-The URL to edit this Post.
-</p>
-
-<p><b>controls</b><br />
-A set of editing icons to delete or re-order this Post.
-</p>
-
-<p><b>isSecond</b><br />
-A conditional indicating that is true if this Post is the second in this Collaboration Asset.
-</p>
-
-<p><b>isThird</b><br />
-A conditional indicating that is true if this Post is the third in this Collaboration Asset.
-</p>
-
-<p><b>isFourth</b><br />
-A conditional indicating that is true if this Post is the fourth in this Collaboration Asset.
-</p>
-
-<p><b>isFifth</b><br />
-A conditional indicating that is true if this Post is the fifth in this Collaboration Asset.
-</p>
-
-<p><b>user.isPoster</b><br />
-A conditional indicating that is true if the current user submitted this Post.
-</p>
-
-<p><b>user.hasRead</b><br />
-A conditional indicating whether a user has read this thread.
-</p>
-
-<p><b>avatar.url</b><br />
-A URL to the avatar for the owner of the Post, if avatars are enabled and the
-user has an avatar.
-</p>
-
-<p><b>lastReply.*</b><br />
-These variables are only defined if the <b>Display last reply</b> property is set to true
-in the Collaboration Asset.
-</p>
-
-<p><b>lastReply.url</b><br />
-The URL to the last reply to this Post.
-</p>
-
-<p><b>lastReply.title</b><br />
-The title of the last reply.
-</p>
-
-<p><b>lastReply.user.isVisitor</b><br />
-A conditional that is true if the poster of the last reply is a visitor.
-</p>
-
-<p><b>lastReply.username</b><br />
-The name of user who submitted the last reply.
-</p>
-
-<p><b>lastReply.userProfile.url</b><br />
-The URL to the Profile of the User who submitted this Post.
-</p>
-
-<p><b>lastReply.dateSubmitted.human</b><br />
-The date the last reply was submitted, in a human readable format.
-</p>
-
-<p><b>lastReply.timeSubmitted.human</b><br />
-The time the last reply was submitted, in a human readable format.
-</p>
-
-</div>
-
                 |,
-		lastUpdated => 1120083131,
+		lastUpdated => 1149655819,
 	},
 
 	'collaboration template title' => {
@@ -1290,84 +1298,96 @@ The time the last reply was submitted, in a human readable format.
 		lastUpdated => 1114466567,
 	},
 
+	'user.canPost' => {
+		message => q|A conditional that is true if the current user can add posts to this Collaboration Asset.|,
+		lastUpdated => 1149655833,
+	},
+
+	'user.isModerator' => {
+		message => q|A conditional that is true if the current user is a moderator for this Asset.|,
+		lastUpdated => 1149655833,
+	},
+
+	'user.isSubscribed' => {
+		message => q|A conditional that is true if the current user is subscribed to this Collaboration Asset.|,
+		lastUpdated => 1149655833,
+	},
+
+	'add.url' => {
+		message => q|A URL for adding a new thread.|,
+		lastUpdated => 1149655833,
+	},
+
+	'rss.url' => {
+		message => q|A URL for downloading the RSS summary of this Asset.|,
+		lastUpdated => 1149655833,
+	},
+
+	'search.url' => {
+		message => q|A URL for accessing the search form for this Collaboration Asset.|,
+		lastUpdated => 1149655833,
+	},
+
+	'subscribe.url' => {
+		message => q|A URL for subscribing the current user to this Collaboration Asset.  When new content is submitted to
+the Collaboration Asset, the user will be notified.|,
+		lastUpdated => 1149655833,
+	},
+
+	'unsubscribe.url' => {
+		message => q|A URL for unsubscribing the current user from this Asset.|,
+		lastUpdated => 1149655833,
+	},
+
+	'karmaIsEnabled' => {
+		message => q|A boolean indicating whether the use of karma is enabled or not.|,
+		lastUpdated => 1149655833,
+	},
+
+	'sortby.karmaRank.url' => {
+		message => q|A URL for sorting and displaying the list of posts by the amount of karma users have transfered to the thread.|,
+		lastUpdated => 1149655833,
+	},
+
+	'sortby.title.url' => {
+		message => q|A URL for sorting and displaying the list of posts by title.|,
+		lastUpdated => 1149655833,
+	},
+
+	'sortby.username.url' => {
+		message => q|A URL for sorting and displaying the list of posts by username.|,
+		lastUpdated => 1149655833,
+	},
+
+	'sortby.date.url' => {
+		message => q|A URL for sorting and displaying the list of posts by the date they were submitted.|,
+		lastUpdated => 1149655833,
+	},
+
+	'sortby.lastreply.url' => {
+		message => q|A URL for sorting and displaying the list of posts by the date they were last updated.|,
+		lastUpdated => 1149655833,
+	},
+
+	'sortby.views.url' => {
+		message => q|A URL for sorting and displaying the list of posts by the number of times each has been read.|,
+		lastUpdated => 1149655833,
+	},
+
+	'sortby.replies.url' => {
+		message => q|A URL for sorting and displaying the list of posts by the number of replies to the post.|,
+		lastUpdated => 1149655833,
+	},
+
+	'sortby.rating.url' => {
+		message => q|A URL for sorting and displaying the list of posts by their ratings.|,
+		lastUpdated => 1149655833,
+	},
+
 	'collaboration template body' => {
 		message => q|<p>These variables are available in the Collaboration Template:</p>
-
-<p><b>user.canPost</b><br />
-A conditional that is true if the current user can add posts to this Collaboration Asset.
-</p>
-
-<p><b>user.isModerator</b><br />
-A conditional that is true if the current user is a moderator for this Asset.
-</p>
-
-<p><b>user.isVisitor</b><br />
-A conditional that is true if the current user is a Visitor.
-</p>
-
-<p><b>user.isSubscribed</b><br />
-A conditional that is true if the current user is subscribed to this Collaboration Asset.
-</p>
-
-<p><b>add.url</b><br />
-A URL for adding a new thread.
-</p>
-
-<p><b>rss.url</b><br />
-A URL for downloading the RSS summary of this Asset.
-</p>
-
-<p><b>search.url</b><br />
-A URL for accessing the search form for this Collaboration Asset.
-</p>
-
-<p><b>subscribe.url</b><br />
-A URL for subscribing the current user to this Collaboration Asset.  When new content is submitted to
-the Collaboration Asset, the user will be notified.
-</p>
-
-<p><b>unsubscribe.url</b><br />
-A URL for unsubscribing the current user from this Asset.
-</p>
-
-<p><b>karmaIsEnabled</b><br />
-A boolean indicating whether the use of karma is enabled or not.
-</p>
-
-<p><b>sortby.karmaRank.url</b><br />
-A URL for sorting and displaying the list of posts by the amount of karma users have transfered to the thread.
-</p>
-
-<p><b>sortby.title.url</b><br />
-A URL for sorting and displaying the list of posts by title.
-</p>
-
-<p><b>sortby.username.url</b><br />
-A URL for sorting and displaying the list of posts by username.
-</p>
-
-<p><b>sortby.date.url</b><br />
-A URL for sorting and displaying the list of posts by the date they were submitted.
-</p>
-
-<p><b>sortby.lastreply.url</b><br />
-A URL for sorting and displaying the list of posts by the date they were last updated.
-</p>
-
-<p><b>sortby.views.url</b><br />
-A URL for sorting and displaying the list of posts by the number of times each has been read.
-</p>
-
-<p><b>sortby.replies.url</b><br />
-A URL for sorting and displaying the list of posts by the number of replies to the post.
-</p>
-
-<p><b>sortby.rating.url</b><br />
-A URL for sorting and displaying the list of posts by their ratings.
-</p>
-
                 |,
-		lastUpdated => 1146762019,
+		lastUpdated => 1149655899,
 	},
 
 	'collaboration search template title' => {
@@ -1375,57 +1395,28 @@ A URL for sorting and displaying the list of posts by their ratings.
 		lastUpdated => 1114467745,
 	},
 
+	'form.header' => {
+		message => q|HTML and javascript required to make the form work.|,
+		lastUpdated => 1149655909,
+	},
+
+	'query.form' => {
+		message => q|HTML form for adding a field where all input has to be in matched pages.|,
+		lastUpdated => 1149655909,
+	},
+
+	'form.search' => {
+		message => q|A button to add to the form to begin searching.|,
+		lastUpdated => 1149655909,
+	},
+
+	'back.url' => {
+		message => q|A URL for returning to the main view for this Collaboration Asset.|,
+		lastUpdated => 1149655909,
+	},
+
 	'collaboration search template body' => {
 		message => q|<p>These variables are available in the Collaboration Search Template:</p>
-
-<p><b>form.header</b><br />
-HTML and javascript required to make the form work.
-</p>
-
-
-<p><b>query.form</b><br />
-HTML form for adding a field where all input has to be in matched pages.
-</p>
-
-<p><b>form.search</b><br />
-A button to add to the form to begin searching.
-</p>
-
-<p><b>back.url</b><br />
-A URL for returning to the main view for this Collaboration Asset.
-</p>
-
-<p><b>unsubscribe.url</b><br />
-A URL for unsubscribing the current user from this Asset.
-</p>
-
-<p><b>sortby.title.url</b><br />
-A URL for sorting and displaying the list of posts by title.
-</p>
-
-<p><b>sortby.username.url</b><br />
-A URL for sorting and displaying the list of posts by username.
-</p>
-
-<p><b>sortby.date.url</b><br />
-A URL for sorting and displaying the list of posts by the date they were submitted.
-</p>
-
-<p><b>sortby.lastreply.url</b><br />
-A URL for sorting and displaying the list of posts by the date they were last updated.
-</p>
-
-<p><b>sortby.views.url</b><br />
-A URL for sorting and displaying the list of posts by the number of times each has been read.
-</p>
-
-<p><b>sortby.replies.url</b><br />
-A URL for sorting and displaying the list of posts by the number of replies to the post.
-</p>
-
-<p><b>sortby.rating.url</b><br />
-A URL for sorting and displaying the list of posts by their ratings.
-</p>
 
                 |,
 		lastUpdated => 1145039922,
@@ -1446,91 +1437,100 @@ A URL for sorting and displaying the list of posts by their ratings.
 		lastUpdated => 1114467745,
 	},
 
+	'feed title' => {
+		message => q|The title of the rss feed (comes from the collaboration title).|,
+		lastUpdated => 1149656056,
+	},
+
+	'collab link' => {
+		message => q|The url to the collaboration.|,
+		lastUpdated => 1149656056,
+	},
+
+	'feed description' => {
+		message => q|The description of the rss feed (comes from the collaboration description).|,
+		lastUpdated => 1149656056,
+	},
+
+	'generator' => {
+		message => q|The program used to generate the rss feed, i.e. WebGUI plus version information. (optional field)|,
+		lastUpdated => 1149656056,
+	},
+
+	'webMaster' => {
+		message => q|The email address of the person responsible for the technical issues relating to this rss feed. (optional field)|,
+		lastUpdated => 1149656056,
+	},
+
+	'docs' => {
+		message => q|The url of documentation about the format of this file, RSS 2.0 (optional field)|,
+		lastUpdated => 1149656056,
+	},
+
+	'lastBuildDate' => {
+		message => q|The date that this feed was last updated. (optional field)|,
+		lastUpdated => 1149656056,
+	},
+
+	'item_loop' => {
+		message => q|Loops over the posts to be transmitted in this RSS feed.|,
+		lastUpdated => 1149656056,
+	},
+
+	'author' => {
+		message => q|The username of the person who submitted the post.|,
+		lastUpdated => 1149656056,
+	},
+
+	'post title' => {
+		message => q|The title of the item (post).|,
+		lastUpdated => 1149656056,
+	},
+
+	'full text link' => {
+		message => q|The url to the full text of the item.|,
+		lastUpdated => 1149656056,
+	},
+
+	'item description' => {
+		message => q|A synopsis of the item.|,
+		lastUpdated => 1149656056,
+	},
+
+	'guid' => {
+		message => q|A unique identifier for this item.|,
+		lastUpdated => 1149656056,
+	},
+
+	'pubDate' => {
+		message => q|The date the item was published.|,
+		lastUpdated => 1149656056,
+	},
+
+	'attachmentLoop' => {
+		message => q|A loop containg all attachements to this item (post).|,
+		lastUpdated => 1149656056,
+	},
+
+	'attachment.url' => {
+		message => q|The URL to this attachment.|,
+		lastUpdated => 1149656056,
+	},
+
+	'attachment.path' => {
+		message => q|The path in the filesystem to this attachment.|,
+		lastUpdated => 1149656056,
+	},
+
+	'attachment.length' => {
+		message => q|The length in this attachment, in bytes.|,
+		lastUpdated => 1149656056,
+	},
+
 	'collaboration rss template body' => {
 		message => q|<p>The Collaboration RSS template is available to allow configuration of the XML produced as an RSS feed for a collaboration.  To produce a valid rss feed, this template must adhere to the <a href="http://blogs.law.harvard.edu/tech/rss">RSS 2.0 Specification.</a>  These variables are available in the Collaboration RSS Template:</p>
-
-<p><b>title</b><br />
-The title of the rss feed (comes from the collaboration title).
-</p>
-
-<p><b>link</b><br />
-The url to the collaboration.
-</p>
-
-<p><b>description</b><br />
-The description of the rss feed (comes from the collaboration description).
-</p>
-
-<p><b>generator</b><br />
-The program used to generate the rss feed, i.e. WebGUI plus version information. (optional field)
-</p>
-
-<p><b>webMaster</b><br />
-The email address of the person responsible for the technical issues relating to this rss feed. (optional field)
-</p>
-
-<p><b>docs</b><br />
-The url of documentation about the format of this file, RSS 2.0 (optional field)
-</p>
-
-<p><b>lastBuildDate</b><br />
-The date that this feed was last updated. (optional field)
-</p>
-
-<p><b>item_loop</b><br />
-Loops over the posts to be transmitted in this RSS feed.
-</p>
-
-<div class="helpIndent">
-
-<p><b>author</b><br />
-The username of the person who submitted the post.
-</p>
-
-<p><b>title</b><br />
-The title of the item (post).
-</p>
-
-<p><b>link</b><br />
-The url to the full text of the item.
-</p>
-
-<p><b>description</b><br />
-A synopsis of the item.
-</p>
-
-<p><b>guid</b><br />
-A unique identifier for this item.
-</p>
-
-<p><b>pubDate</b><br />
-The date the item was published.
-</p>
-
-<p><b>attachmentLoop</b><br />
-A loop containg all attachements to this item (post).
-</p>
-
-<div class="helpIndent">
-
-<p><b>attachment.url</b><br />
-The URL to this attachment.
-</p>
-
-<p><b>attachment.path</b><br />
-The path in the filesystem to this attachment.
-</p>
-
-<p><b>attachment.length</b><br />
-The length in this attachment, in bytes.
-</p>
-
-</div>
-
-</div>
-
                 |,
-		lastUpdated => 1146762108,
+		lastUpdated => 1149656374,
 	},
 
 

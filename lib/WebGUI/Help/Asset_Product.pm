@@ -221,6 +221,150 @@ our $HELP = {
 		body => '63',
 		fields => [
 		],
+		variables => [
+		          {
+		            'name' => 'brochure.icon'
+		          },
+		          {
+		            'name' => 'brochure.url'
+		          },
+		          {
+		            'name' => 'brochure.label'
+		          },
+		          {
+		            'name' => 'manual.icon'
+		          },
+		          {
+		            'name' => 'manual.url'
+		          },
+		          {
+		            'name' => 'manual.label'
+		          },
+		          {
+		            'name' => 'warranty.icon'
+		          },
+		          {
+		            'name' => 'warranty.url'
+		          },
+		          {
+		            'name' => 'warranty.label'
+		          },
+		          {
+		            'name' => 'image1'
+		          },
+		          {
+		            'name' => 'thumbnail1'
+		          },
+		          {
+		            'name' => 'image2'
+		          },
+		          {
+		            'name' => 'thumbnail2'
+		          },
+		          {
+		            'name' => 'image3'
+		          },
+		          {
+		            'name' => 'thumbnail3'
+		          },
+		          {
+		            'name' => 'addfeature.url'
+		          },
+		          {
+		            'name' => 'addfeature.label'
+		          },
+		          {
+		            'name' => 'feature_loop',
+		            'variables' => [
+		                             {
+		                               'name' => 'feature.controls'
+		                             },
+		                             {
+		                               'name' => 'feature.feature'
+		                             }
+		                           ]
+		          },
+		          {
+		            'name' => 'addbenefit.url'
+		          },
+		          {
+		            'name' => 'addbenefit.label'
+		          },
+		          {
+		            'name' => 'benefit_loop',
+		            'variables' => [
+		                             {
+		                               'name' => 'benefit.benefit'
+		                             },
+		                             {
+		                               'name' => 'benefit.controls'
+		                             }
+		                           ]
+		          },
+		          {
+		            'name' => 'addspecification.url'
+		          },
+		          {
+		            'name' => 'addspecification.label'
+		          },
+		          {
+		            'name' => 'specification_loop',
+		            'variables' => [
+		                             {
+		                               'name' => 'specification.controls'
+		                             },
+		                             {
+		                               'name' => 'specification.specification'
+		                             },
+		                             {
+		                               'name' => 'specification.units'
+		                             },
+		                             {
+		                               'name' => 'specification.label'
+		                             }
+		                           ]
+		          },
+		          {
+		            'name' => 'addaccessory.url'
+		          },
+		          {
+		            'name' => 'addaccessory.label'
+		          },
+		          {
+		            'name' => 'accessory_loop',
+		            'variables' => [
+		                             {
+		                               'name' => 'accessory.url'
+		                             },
+		                             {
+		                               'name' => 'accessory.title'
+		                             },
+		                             {
+		                               'name' => 'accessory.controls'
+		                             }
+		                           ]
+		          },
+		          {
+		            'name' => 'addRelatedProduct.url'
+		          },
+		          {
+		            'name' => 'addRelatedProduct.label'
+		          },
+		          {
+		            'name' => 'relatedproduct.loop',
+		            'variables' => [
+		                             {
+		                               'name' => 'relatedproduct.url'
+		                             },
+		                             {
+		                               'name' => 'relatedproduct.title'
+		                             },
+		                             {
+		                               'name' => 'relatedproduct.controls'
+		                             }
+		                           ]
+		          }
+		],
 		related => [
 			{
 				tag => 'product add/edit',

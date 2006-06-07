@@ -204,16 +204,14 @@ sub getHelpLabels {
 					entry=>$entry,
 					tag=>'variables',
 					namespace=>$namespace,
-					label=>$variable->{name},
 				};
+				if ($variable->{description}) {
+					$one->{label} = $variable->{description},
+				}
+				else {
+					$one->{label} = $variable->{name},
+				}
 				push @helpLabels, $one;
-				push @helpLabels, {
-					topic=>$topic,
-					entry=>$entry,
-					tag=>'variables',
-					namespace=>$namespace,
-					label=>$variable->{description},
-				} if $variable->{description};
 			}
 		}
 	}

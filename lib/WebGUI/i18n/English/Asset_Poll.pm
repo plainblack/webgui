@@ -1,72 +1,81 @@
 package WebGUI::i18n::English::Asset_Poll;
 
 our $I18N = {
+
+	'canVote' => {
+		message => q|A condition indicating whether the user has the right to vote on this poll.|,
+		lastUpdated => 1149655462,
+	},
+
+	'question' => {
+		message => q|The poll question.|,
+		lastUpdated => 1149655462,
+	},
+
+	'form.start' => {
+		message => q|The beginning of the poll form.|,
+		lastUpdated => 1149655462,
+	},
+
+	'answer_loop' => {
+		message => q|A loop containing information about the answers in the poll.|,
+		lastUpdated => 1149655462,
+	},
+
+	'answer.form' => {
+		message => q|The radio button for this answer.|,
+		lastUpdated => 1149655462,
+	},
+
+	'answer.text' => {
+		message => q|The text of the answer.|,
+		lastUpdated => 1149655462,
+	},
+
+	'answer.number' => {
+		message => q|The number of this answer. As in 1, 2, 3, etc.|,
+		lastUpdated => 1149655462,
+	},
+
+	'answer.graphWidth' => {
+		message => q|The width that the graph should be rendered for this answer. Based upon a percentage of the total graph size.|,
+		lastUpdated => 1149655462,
+	},
+
+	'answer.percent' => {
+		message => q|The percentage of the vote that this answer has received.|,
+		lastUpdated => 1149655462,
+	},
+
+	'answer.total' => {
+		message => q|The total number of votes that this answer has received.|,
+		lastUpdated => 1149655462,
+	},
+
+	'form.submit' => {
+		message => q|The submit button for the poll form.|,
+		lastUpdated => 1149655462,
+	},
+
+	'form.end' => {
+		message => q|The end of the poll form.|,
+		lastUpdated => 1149655462,
+	},
+
+	'responses.label' => {
+		message => q|The label for the total responses. "Total Votes"|,
+		lastUpdated => 1149655462,
+	},
+
+	'responses.total' => {
+		message => q|The total number of votes that have been placed on this poll.|,
+		lastUpdated => 1149655462,
+	},
+
 	'74' => {
-		message => q|<p>The following variables are available to the poll template:
-</p>
-
-<p><b>canVote</b><br />
-A condition indicating whether the user has the right to vote on this poll.
-</p>
-
-<p><b>question</b><br />
-The poll question.
-</p>
-
-<p><b>form.start</b><br />
-The beginning of the poll form.
-</p>
-
-<p><b>answer_loop</b><br />
-A loop containing information about the answers in the poll.
-</p>
-
-<div class="helpIndent">
-
-<p><b>answer.form</b><br />
-The radio button for this answer.
-</p>
-
-<p><b>answer.text</b><br />
-The text of the answer.
-</p>
-
-<p><b>answer.number</b><br />
-The number of this answer. As in 1, 2, 3, etc.
-</p>
-
-<p><b>answer.graphWidth</b><br />
-The width that the graph should be rendered for this answer. Based upon a percentage of the total graph size.
-</p>
-
-<p><b>answer.percent</b><br />
-The percentage of the vote that this answer has received.
-</p>
-
-<p><b>answer.total</b><br />
-The total number of votes that this answer has received.
-</p>
-
-</div>
-
-<p><b>form.submit</b><br />
-The submit button for the poll form.
-</p>
-
-<p><b>form.end</b><br />
-The end of the poll form.
-</p>
-
-<p><b>responses.label</b><br />
-The label for the total responses. "Total Votes"
-</p>
-
-<p><b>responses.total</b><br />
-The total number of votes that have been placed on this poll.
-</p>
-
+		message => q|<p>The following variables are available to the poll template:</p>
 |,
-		lastUpdated => 1146785056,
+		lastUpdated => 1149655485,
 	},
 
 	'6' => {
