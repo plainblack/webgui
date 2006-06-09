@@ -15,6 +15,7 @@
  - fix: Pagination of search results does not work (Martin Kamerbeek / Procolix)
  - fix: Workflow Commit with approval Error (Martin Kamerbeek / Procolix)
  - fix: Incorrect method call in Auth.pm
+ - fix: No Help link icon in Matrix edit page
 
 
 6.99.3
