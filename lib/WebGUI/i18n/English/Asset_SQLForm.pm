@@ -50,12 +50,12 @@ type of no importance. The database field type is very important, though, and
 should chosen with proper care.</p>|,
 		lastUpdated => 0,
 	},
-	
+
 	'ef signed' => {
 		message => q|Sign|,
 		lastUpdated => 0,
 	},
-	
+
 	'ef signed description' => {
 		message => q|<p>This property determines wheter this field
 interprets number as signed or unsigned. The difference lies in the boundaries
@@ -64,17 +64,17 @@ of allowed values.</p>
 <p>This property is available only for numeric fieldtypes like <i>int</i>.</p>|,
 		lastUpdated => 0,
 	},
-	
+
 	'ef signed label' => {
 		message => q|Signed|,
 		lastUpdated => 0,
 	},
-	
+
 	'ef unsigned label' => {
 		message => q|Unsigned|,
 		lastUpdated => 0,
 	},
-	
+
 	'ef autoincrement' => {
 		message => q|Autoincrement|,
 		lastUpdated => 0,
@@ -96,7 +96,7 @@ form field type is irrelevant if autoincrement is enabled.</p>|,
 		message => q|Height of form element|,
 		lastUpdated => 0,
 	},
-	
+
 	'ef form height description' => {
 		message => q|<p>This property sets the height of the form
 element, if applicable for the chosen form field type. Not all form elements
@@ -108,7 +108,7 @@ have a settable height.</p>|,
 		message => q|Width of form element|,
 		lastUpdated => 0,
 	},
-	
+
 	'ef form width description' => {
 		message => q|<p>This property sets the width of the form
 element, if applicable for the chosen form field type. Not all form elements
@@ -511,12 +511,12 @@ of form and db types do not make much sense.</p>|,
 		message => q|Keep|,
 		lastUpdated => 0,
 	},
-	
+
 	'overwrite' => {
 		message => q|Overwrite|,
 		lastUpdated => 0,
 	},
-	
+
 	'delete' => {
 		message => q|Delete|,
 		lastUpdated => 0,
@@ -912,12 +912,12 @@ search results.</p>|,
 		message => q|Default view|,
 		lastUpdated => 0,
 	},
-		
+
 	'gef default view description' => {
 		message => q|<p>This property switches the default view between normal and advanced search.</p>|,
 		lastUpdated => 0,
 	},
-												
+
 	'gef submit group' => {
 		message => q|Group to submit records|,
 		lastUpdated => 0,
@@ -1009,7 +1009,7 @@ have been purged yet.</p>|,
 		message => q|Manage fields|,
 		lastUpdated => 0,
 	},
-	
+
 	'manage fields title' => {
 		message => q|SQLForm, Manage Fields|,
 		lastUpdated => 0,
@@ -1024,7 +1024,7 @@ have been purged yet.</p>|,
 		message => q|Manage field types|,
 		lastUpdated => 0,
 	},
-	
+
 	'manage regexes title' => {
 		message => q|SQLForm, Manage Regexes|,
 		lastUpdated => 0,
@@ -1040,45 +1040,128 @@ have been purged yet.</p>|,
 		lastUpdated => 0,
 	},
 
+	'completeForm' => {
+		message => q|This contains the entire form, complete
+and layed out in a WebGUI-style table. You don't need to add a
+seperate form header, footer or anything else.|,
+		lastUpdated => 1149822620,
+	},
+
+	'formLoop' => {
+		message => q|A loop containing each field. Using
+this loop will allow you to use a different layout than that of
+<b>completeForm</b>. The <b>formLoop</b> loop provides the following
+variables:|,
+		lastUpdated => 1149822620,
+	},
+
+	'field.label' => {
+		message => q|The display name of the field.|,
+		lastUpdated => 1149822620,
+	},
+
+	'field.formElement' => {
+		message => q|The form Element for the field<br />
+In view mode this is the same as <b>field.value</b>.|,
+		lastUpdated => 1149822620,
+	},
+
+	'field.value' => {
+		message => q|The value of the field|,
+		lastUpdated => 1149822620,
+	},
+
+	'field.__FIELDNAME__.formElement' => {
+		message => q|Contains the form element of the field
+__FIELDNAME__. You must substitute __FIELDNAME__ with the
+name of the field you intend to place.<br />
+In view mode this is the same as <b>__FIELDNAME__.value</b>.|,
+		lastUpdated => 1149822620,
+	},
+
+	'field.__FIELDNAME__.label' => {
+		message => q|Contains the display name of the field
+__FIELDNAME__. You must substitute __FIELDNAME__ with the
+field name of the field you intend to place.|,
+		lastUpdated => 1149822620,
+	},
+
+	'field.__FIELDNAME__.value' => {
+		message => q|Contains the value of the field
+__FIELDNAME__. You must substitute __FIELDNAME__ with the
+name of the field you intend to place.|,
+		lastUpdated => 1149822620,
+	},
+
+	'formHeader' => {
+		message => q|The header of the form. If you are
+not using the <b>completeForm</b> you must include this variable
+before any other form variable. If you do use the <b>completeForm
+</b>variable, however, you must not use the <b>formHeader</b>
+variable.|,
+		lastUpdated => 1149822620,
+	},
+
+	'formFooter' => {
+		message => q|The footer of the form. If you are
+not using the <b>completeForm</b> you must include this variable
+after all form variables. If you do use the <b>completeForm</b>
+variable, however, you must not use the <b>formFooter</b> variable.|,
+		lastUpdated => 1149822620,
+	},
+
+	'errorOccurred' => {
+		message => q|Conditional indicating whether an error
+occurred in the submitted data.|,
+		lastUpdated => 1149822620,
+	},
+
+	'errorLoop' => {
+		message => q|Loop containing any errors that occurred while processing data submitted in the form.|,
+		lastUpdated => 1149822620,
+	},
+
+	'error.message' => {
+		message => q|The actual error message.|,
+		lastUpdated => 1149822620,
+	},
+
+	'isNew' => {
+		message => q|Conditional indicating whether the user
+is adding a new record or editing an existing one. It will be true if the record
+is new.|,
+		lastUpdated => 1149822620,
+	},
+
+	'viewHistory.url' => {
+		message => q|The url to the history of this record.|,
+		lastUpdated => 1149822620,
+	},
+
+	'viewHistory.label' => {
+		message => q|The label of the link to the history of this record.|,
+		lastUpdated => 1149822620,
+	},
+
+	'record.controls' => {
+		message => q|Delete, edit and copy buttons for theis record. Only available if the user is 
+allowed to edit the record.|,
+		lastUpdated => 1149822620,
+	},
+
 	'edit template help' => {
 		message => q|<p>The SQLForm provides you with three
 methods to construct record input and edit forms, offering three
 levels of flexibility. Please note that more flexibilty has the
 downside of increased complexity.</p>
-
 <p>The three methods you can use are:
 <b>completeForm</b>, <b>formloop</b> or manual placement of form
-elements using <b>field.&lt;fieldname&gt;.formElement</b> and
-<b>field.&lt;fieldname&gt;.label</b></p>
-
-
-<p><b>completeForm</b><br />
-This contains the entire form, complete
-and layouted in a WebGUI style table. You don't need to add a
-seperate form header, footer or anything else.</p>
-
-<p><b>formLoop</b><br />
-A loop containing each field. Using
-this loop will allow you to use a different layout than that of
-<b>completeForm</b>. The <b>formLoop</b> loop provides the following
-variables:</p>
-
-<div class="helpIndent">
-<p>	<b>field.label</b><br />
-The display name of the field.</p>
-
-
-<p>	<b>field.formElement</b><br />
-The form Element for the field<br />
-In view mode this is the same as <b>field.value</b>.
-</p>
-
-<p>     <b>field.value</b><br />
-The value of the field</p>
-
-
-</div>
-
+elements using <b>field.__FIELDNAME__.formElement</b> and
+<b>field.__FIELDNAME__.label</b></p>
+<p><b>completeForm</b> handles placing everything that you need in a table,
+automatically, using a default layout.</p>
+<p><b>formloop</b> handles placing everything that you need in a table,
+automatically.  This allows you some flexibility in your form layout.</p>
 <p>Finally there is the option of placing
 each seperate field by hand. This allows you to define the order and
 place of each form element. Please note, however, that using this
@@ -1087,86 +1170,292 @@ If you add, delete or rename a field you must update the template by
 hand. Using this method also implies the use of <b>formHeader</b> and
 <b>formFooter.</b> You should use the following two template
 variables:</p>
-
-
-<p><b>field.&lt;fieldname&gt;.formElement</b><br />
-Contains the form element of the field
-&lt;fieldname&gt;. You must substitute &lt;fieldname&gt; with the
-field name of the field you intend to place.<br />
-In view mode this is the same as <b>field&lt;fieldname&gt;.value</b>.
-</p>
-
-
-<p><b>field.&lt;fieldname&gt;.label</b><br />
-Contains the display name of the field
-&lt;fieldname&gt;. You must substitute &lt;fieldname&gt; with the
-field name of the field you intend to place.</p>
-
-<p><b>field.&lt;fieldname&gt;.value</b><br />
-Contains the value of the field
-&lt;fieldname&gt;. You must substitute &lt;fieldname&gt; with the
-field name of the field you intend to place.</p>
-
-
-<p><b>formHeader</b><br />
-The header of the form. If you are
-not using the <b>completeForm</b> You must include this variable
-before any other form variable. If you do use the <b>completeForm
-</b>variable, however, you must not use the <b>formHeader</b>
-variable.</p>
-
-
-<p><b>formFooter</b><br />
-The footer of the form. If you are
-not using the <b>completeForm</b> You must include this variable
-after every other form variable. If you do use the <b>completeForm</b>
-variable, however, you must not use the <b>formFooter</b> variable.</p>
-
-<p>This template also provides some other
-variables:</p>
-
-
-<p><b>errorOccurred</b><br />
-Conditional indicating whether an error
-occurred in the submitted data.</p>
-
-
-<p><b>errorLoop</b><br />
-Loop containing the errors.</p>
-
-<div class="helpIndent">
-<p>	<b>error.message</b><br />
-The actual error message.</p>
-</div>
-
-<p><b>isNew</b><br />
-Conditional idicating whether the user
-is adding a new record or editing an existing one. True is the record
-is new.</p>
-
-
-<p><b>viewHistory.url</b><br />
-The url to the history of this record.</p>
-
-
-<p><b>viewHistory.label</b><br />
-The label of the link to the history of
-this record.</p>
-
-
-<p><b>managementLinks</b><br />
-A string of links to all of the
-management functions.</p>
-
-<p><b>record.controls</b><br />
-Delete, edit and copy buttons for theis record. Only available if the user is 
-allowed to edit the record.</p>|,
-		lastUpdated => 0,
+|,
+		lastUpdated => 1149822668,
 	},
 
 	'search template help title' => {
 		message => q|SQLForm, Search Record Template|,
 		lastUpdated => 0,
+	},
+
+	'showFieldsDefined' => {
+		message => q|Conditional which returns true if there are field that are defined to be shown.
+In other words, this is false if every field is configured not to be displayed
+in the search results.|,
+		lastUpdated => 1149822982,
+	},
+
+	'searchForm' => {
+		message => q|Contains the complete form which allows users to search.|,
+		lastUpdated => 1149822982,
+	},
+
+	'searchFormHeader' => {
+		message => q|The header of the form, available in normal and advanced search. If you are
+not using the complete <b>searchForm</b> You must include this variable
+before any other form variable. If you do use the complete <b>searchForm
+</b> variable, however, you must not use the <b>searchFormHeader</b>
+variable.|,
+		lastUpdated => 1149822982,
+	},
+
+	'searchFormTrash.label' => {
+		message => q|The label for the search in trash option. Available in normal and advanced search. Only use this if you are
+not using the complete <b>searchForm</b>.</p>                                                                                                                                                             
+<p><b>searchFormTrash.form</b><br />
+The form Element for the search in trash option. Available in normal and advanced search. Only use this if you are
+not using the complete <b>searchForm</b>.|,
+		lastUpdated => 1149822982,
+	},
+
+	'searchFormMode.label' => {
+		message => q|The label for the search mode option (with regex or not). Available in normal search. Only use this if you are
+not using the complete <b>searchForm</b>.|,
+		lastUpdated => 1149822982,
+	},
+
+	'searchFormMode.form' => {
+		message => q|The form Element for the search mode option (with regex or not). Available in normal search. Only use this if you are
+not using the complete <b>searchForm</b>.|,
+		lastUpdated => 1149822982,
+	},
+
+	'searchFormQuery.label' => {
+		message => q|The label for the search query. Available in normal search. Only use this if you are
+not using the complete <b>searchForm</b>.</p>                                                                                                                                                              
+<p><b>searchFormQuery.form</b><br />
+The form Element for the search query. Available in normal search. Only use this if you are
+not using the complete <b>searchForm</b>.|,
+		lastUpdated => 1149822982,
+	},
+
+	'searchFormSearchIn.label' => {
+		message => q|The label for the search in fields select list. Available in normal search. Only use this if you are
+not using the complete <b>searchForm</b>.|,
+		lastUpdated => 1149822982,
+	},
+
+	'searchFormSearchIn.form' => {
+		message => q|The form Element for the search in fields select list. Available in normal search. Only use this if you are
+not using the complete <b>searchForm</b>.|,
+		lastUpdated => 1149822982,
+	},
+
+	'searchFormType.label' => {
+		message => q|The label for the search type option (or/and). Available in advanced search. Only use this if you are|,
+		lastUpdated => 1149822982,
+	},
+
+	'searchFormType.form' => {
+		message => q|The form Element for the search type option (or/and). Available in advanced search. Only use this if you are
+not using the complete <b>searchForm</b>.|,
+		lastUpdated => 1149822982,
+	},
+
+	'searchFormFooter' => {
+		message => q|The footer of the form, available in normal and advanced search. If you are
+not using the complete <b>searchForm</b> You must use this variable
+after every other searchForm variable. If you do use the complete <b>searchForm</b>
+variable, however, you must not use the <b>searchFormFooter</b> variable.|,
+		lastUpdated => 1149822982,
+	},
+
+	'searchFormSubmit' => {
+		message => q|The submit button of the form, available in normal and advanced search. Only use this if you are
+not using the complete <b>searchForm</b>.|,
+		lastUpdated => 1149822982,
+	},
+
+	'searchFormJavascript' => {
+		message => q|Only used for advanced search. This links the SQLFormSearch.js file and contains some inline javascript that is used by advanced search. If you are
+not using the complete <b>searchForm</b> you must include this variable
+for adUse of uninitialized value in exists at varify.pl line 62, <> chunk 26.
+Use of uninitialized value in printf at varify.pl line 63, <> chunk 26.
+vanced search. If you do use the complete <b>searchForm</b>
+variable, however, you must not use the <b>searchFormJavascript</b> variable.|,
+		lastUpdated => 1149822982,
+	},
+
+	'searchForm.field_loop' => {
+		message => q|A loop containing each field, only available in advanced search. 
+The <b>field_loop</b> provides the following
+variables:|,
+		lastUpdated => 1149822982,
+	},
+
+	'field.conditionalForm' => {
+		message => q|The form Element for the conditional for this field|,
+		lastUpdated => 1149822982,
+	},
+
+	'field.conditional' => {
+		message => q|The value of the conditional form Element for this field|,
+		lastUpdated => 1149822982,
+	},
+
+	'field.searchForm1' => {
+		message => q|The first search form Element for this field|,
+		lastUpdated => 1149822982,
+	},
+
+	'field.searchForm2' => {
+		message => q|The second search form Element for this field|,
+		lastUpdated => 1149822982,
+	},
+
+	'field.formValue1' => {
+		message => q|The value of first search form Element for this field|,
+		lastUpdated => 1149822982,
+	},
+
+	'field.formValue2' => {
+		message => q|The value of second search form Element for this field|,
+		lastUpdated => 1149822982,
+	},
+
+	'field.__FIELDNAME__.id' => {
+		message => q|Contains the id of the field
+__FIELDNAME__. You must substitute __FIELDNAME__ with the
+field name of the field.<br />
+You can use this if you want to create a custom Advanced search form that completely overrides the default search form.|,
+		lastUpdated => 1149822982,
+	},
+
+	'' => {
+		message => q||,
+		lastUpdated => 1149822982,
+	},
+
+	'headerLoop' => {
+		message => q|A loop containing the display names of each field, inclding sort controls. The
+following variables are provided within this loop:|,
+		lastUpdated => 1149822982,
+	},
+
+	'header.title' => {
+		message => q|The display name of the current field.|,
+		lastUpdated => 1149822982,
+	},
+
+	'header.sort.url' => {
+		message => q|The url that allows you to sort on this field.|,
+		lastUpdated => 1149822982,
+	},
+
+	'header.sort.onThis' => {
+		message => q|Conditional indicating whether the search results are sorted on this
+field.|,
+		lastUpdated => 1149822982,
+	},
+
+	'header.sort.ascending' => {
+		message => q|Conditional indicating whether the search results are sorted ascending
+or descending.|,
+		lastUpdated => 1149822982,
+	},
+
+	'searchResults.header' => {
+		message => q|Contains the form header for the batch restore and purge functions in the search
+results. You should put this somewhere before the searchResults loop.|,
+		lastUpdated => 1149822982,
+	},
+
+	'searchResults.footer' => {
+		message => q|Contains the form footer for the search results batch functions. Put this
+template variable somewhere after the searchResults loop.|,
+		lastUpdated => 1149822982,
+	},
+
+	'searchResults.actionButtons' => {
+		message => q|Contains the restore and purge buttons for the batch operations. Put this
+variable between searchResults.header and searchResults.footer.|,
+		lastUpdated => 1149822982,
+	},
+
+	'searchResults.recordLoop' => {
+		message => q|The loop containg the results of the search query. This should be between
+searchResults.header and searchResults.footer. Within this loop the following
+variables are available for use:|,
+		lastUpdated => 1149822982,
+	},
+
+	'record.deletionDate' => {
+		message => q|Contains the date this record was deleted. Only available for records|,
+		lastUpdated => 1149822982,
+	},
+
+	'record.deletedBy' => {
+		message => q|Contains the username of the person that deleted this record. Only|,
+		lastUpdated => 1149822982,
+	},
+
+	'record.updateDate' => {
+		message => q|The date of the last time this record has been updated.|,
+		lastUpdated => 1149822982,
+	},
+
+	'record.updatedBy' => {
+		message => q|The username of the person that made the most recent update to this|,
+		lastUpdated => 1149822982,
+	},
+
+	'record.valueLoop' => {
+		message => q|A loop containing the values for each field of this record. This loop|,
+		lastUpdated => 1149822982,
+	},
+
+	'record.value' => {
+		message => q|The value the record has for this field.|,
+		lastUpdated => 1149822982,
+	},
+
+	'record.value.isFile' => {
+		message => q|Conditional being true if this field contains an uploaded file.
+Also returns true if the file is an image.|,
+		lastUpdated => 1149822982,
+	},
+
+	'record.value.isImage' => {
+		message => q|Conditional indicating if the uploaded file is an image.|,
+		lastUpdated => 1149822982,
+	},
+
+	'record.value.downloadUrl' => {
+		message => q|The url to download the uploaded file in this field. Only
+available for files and images.|,
+		lastUpdated => 1149822982,
+	},
+
+	'superSearch.url' => {
+		message => q|The url to the advanced search mode.|,
+		lastUpdated => 1149822982,
+	},
+
+	'superSearch.label' => {
+		message => q|The internationalized name of the advanced search.|,
+		lastUpdated => 1149822982,
+	},
+
+	'normalSearch.url' => {
+		message => q|The url to the normal search mode.|,
+		lastUpdated => 1149822982,
+	},
+
+	'normalSearch.label' => {
+		message => q|The internationalized name of the normal search.|,
+		lastUpdated => 1149822982,
+	},
+
+	'showMetaData' => {
+		message => q|A conditional indictating whether the show meta data flag is turned on.|,
+		lastUpdated => 1149822982,
+	},
+
+	'managementLinks' => {
+		message => q|A collection of links to the admin functions of the SQLForm like manage fields,
+as well as links to add record and search record.|,
+		lastUpdated => 1149822982,
 	},
 
 	'search template help' => {
@@ -1176,222 +1465,12 @@ functionality that the SQLForm offers.</p>
 
 <p>There are two separate search methods, being normal and advanced search, but
 both use the same template. In both cases a complete <b>searchForm</b> is available. 
-The individual form Elements are also available, but note that different form Elements are used for normal and advanced search.</p>
-
-<p>The following template variable are available to you:</p>
-
-<p><b>showFieldsDefined</b><br />
-Conditional which returns true if there are field that are defined to be shown.
-In other words, this is false if every field is configured not to be displayed
-in the search results.</p>
-
-<p><b>searchForm</b><br />
-Contains the complete form which allows users to search.</p>
-
-<p><b>searchFormHeader</b><br />
-The header of the form, available in normal and advanced search. If you are
-not using the complete <b>searchForm</b> You must include this variable
-before any other form variable. If you do use the complete <b>searchForm
-</b> variable, however, you must not use the <b>searchFormHeader</b>
-variable.</p>
-
-<p><b>searchFormTrash.label</b><br />
-The label for the search in trash option. Available in normal and advanced search. Only use this if you are
-not using the complete <b>searchForm</b>.</p>                                                                                                                                                             
-<p><b>searchFormTrash.form</b><br />
-The form Element for the search in trash option. Available in normal and advanced search. Only use this if you are
-not using the complete <b>searchForm</b>.</p>
-
-<p><b>searchFormMode.label</b><br />
-The label for the search mode option (with regex or not). Available in normal search. Only use this if you are
-not using the complete <b>searchForm</b>.</p>                                                                                                                                                              
-<p><b>searchFormMode.form</b><br />
-The form Element for the search mode option (with regex or not). Available in normal search. Only use this if you are
-not using the complete <b>searchForm</b>.</p>
-
-<p><b>searchFormQuery.label</b><br />
-The label for the search query. Available in normal search. Only use this if you are
-not using the complete <b>searchForm</b>.</p>                                                                                                                                                              
-<p><b>searchFormQuery.form</b><br />
-The form Element for the search query. Available in normal search. Only use this if you are
-not using the complete <b>searchForm</b>.</p>
-
-<p><b>searchFormSearchIn.label</b><br />
-The label for the search in fields select list. Available in normal search. Only use this if you are
-not using the complete <b>searchForm</b>.</p>                                                                                                                                                              
-<p><b>searchFormSearchIn.form</b><br />
-The form Element for the search in fields select list. Available in normal search. Only use this if you are
-not using the complete <b>searchForm</b>.</p>
-
-<p><b>searchFormType.label</b><br />
-The label for the search type option (or/and). Available in advanced search. Only use this if you are
-not using the complete <b>searchForm</b>.</p>                                                                                                                                                              
-<p><b>searchFormType.form</b><br />
-The form Element for the search type option (or/and). Available in advanced search. Only use this if you are
-not using the complete <b>searchForm</b>.</p>
-                                                                                                                                                             
-<p><b>searchFormFooter</b><br />
-The footer of the form, available in normal and advanced search. If you are
-not using the complete <b>searchForm</b> You must use this variable
-after every other searchForm variable. If you do use the complete <b>searchForm</b>
-variable, however, you must not use the <b>searchFormFooter</b> variable.</p>
-
-<p><b>searchFormSubmit</b><br />
-The submit button of the form, available in normal and advanced search. Only use this if you are
-not using the complete <b>searchForm</b>.</p>
-
-<p><b>searchFormJavascript</b><br />
-Only used for advanced search. This links the SQLFormSearch.js file and contains some inline javascript that is used by advanced search. If you are
-not using the complete <b>searchForm</b> you must include this variable
-for advanced search. If you do use the complete <b>searchForm</b>
-variable, however, you must not use the <b>searchFormJavascript</b> variable.</p>
-
-<p><b>searchForm.field_loop</b><br />
-A loop containing each field, only available in advanced search. 
-The <b>field_loop</b> provides the following
-variables:</p>
-                                                                                                                                                             
-<div class="helpIndent">
-<p>     <b>field.label</b><br />
-The display name of the field.</p>
-                                                                                                                                                             
-<p>     <b>field.conditionalForm</b><br />
-The form Element for the conditional for this field</p>
-
-<p>     <b>field.conditional</b><br />
-The value of the conditional form Element for this field</p>
-                                                                                                                                                             
-<p>     <b>field.searchForm1</b><br />
-The first search form Element for this field</p>
-
-<p>     <b>field.searchForm1</b><br />
-The second search form Element for this field</p>                                                                                                                                                             
-<p>     <b>field.formValue1</b><br />
-The value of first search form Element for this field</p>
-
-<p>     <b>field.formValue2</b><br />
-The value of second search form Element for this field</p>
-
-<p>	<b>field.&lt;fieldname&gt;.id</b><br />
-Contains the id of the field
-&lt;fieldname&gt;. You must substitute &lt;fieldname&gt; with the
-field name of the field.<br />
-You can use this if you want to create a custom Advanced search form that completely overrides the default search form.
+The individual form Elements are also available, but note that different form Elements are used for normal and advanced search.
 </p>
 
-</div>
-
-<p>The template provides variables for the search results that are the same for normal and advanced search.</p>
-
-<p><b>headerLoop</b><br />
-A loop containing the display names of each field, inclding sort controls. The
-following variables are provided within this loop:</p>
-
-<div class="helpIndent">
-	<p><b>header.title</b><br />
-	The display name of the current field.</p>
-	
-	<p><b>header.sort.url</b><br />
-	The url that allows you to sort on this field.</p>
-	
-	<p><b>header.sort.onThis</b><br />
-	Conditional indicating whether the search results are sorted on this
-	field.</p>
-	
-	<p><b>header.sort.ascending</b><br />
-	Conditional indicating whether the search results are sorted ascending
-	or descending.</p>
-</div>
-
-<p><b>searchResults.header</b><br />
-Contains the form header for the batch restore and purge functions in the search
-results. You should put this somewhere before the searchResults loop.</p>
-
-<p><b>searchResults.footer</b><br />
-Contains the form footer for the search results batch functions. Put this
-template variable somewhere after the searchResults loop.</p>
-
-<p><b>searchResults.actionButtons</b><br />
-Contains the restore and purge buttons for the batch operations. Put this
-variable between searchResults.header and searchResults.footer.</p>
-
-<p><b>searchResults.recordLoop</b><br />
-The loop containg the results of the search query. This should be between
-searchResults.header and searchResults.footer. Within this loop the following
-variables are available for use:</p>
-
-<div class="helpIndent">
-	<p><b>record.controls</b><br />
-	Contains the edit/view, delete and purge restore controls for this
-	record.</p>
-	
-	<p><b>record.deletionDate</b><br />
-	Contains the date this record was deleted. Only available for records
-	that are deleted.</p>
-	
-	<p><b>record.deletedBy</b><br />
-	Contains the username of the person that deleted this record. Only
-	available for records that are deleted.</p>
-	
-	<p><b>record.updateDate</b><br />
-	The date of the last time this record has been updated.</p>
-	
-	<p><b>record.updatedBy</b><br />
-	The username of the person that made the most recent update to this
-	record.</p>
-	
-	<p><b>record.valueLoop</b><br />
-	A loop containing the values for each field of this record. This loop
-	provides the following variables:</p>
-	
-	<div class="helpIndent">
-		<p><b>record.value</b><br />
-		The value the record has for this field.</p>
-		
-		<p><b>record.value.isFile</b><br />
-		Conditional being true if this field contains an uploaded file.
-		Also returns true if the file is an image.</p>
-		
-		<p><b>record.value.isImage</b><br />
-		Conditional indicating if the uploaded file is an image.</p>
-		
-		<p><b>record.value.downloadUrl</b><br />
-		The url to download the uploaded file in this field. Only
-		available for files and images.</p>
-	</div>
-</div>
-
-<p><b>superSearch.url</b><br />
-The url to the advanced search mode.</p>
-
-<p><b>superSearch.label</b><br />
-The internationalized name of the advanced search.</p>
-
-<p><b>normalSearch.url</b><br />
-The url to the normal search mode.</p>
-
-<p><b>normalSearch.label</b><br />
-The internationalized name of the normal search.</p>
-
-<p><b>showMetaData</b><br />
-A conditional indictating whether the show meta data flag is turned on.</p>
-
-<p><b>managementLinks</b><br />
-A collection of links to the admin functions of the SQLForm like manage fields,
-as well as links to add record and search record.</p>
-
-<p><b>errorOccurred</b><br />
-Conditional which is true if some error happened while processing the search query.</p>
-
-<p><b>errorLoop</b><br />
-A loop containing the errors that have occurred while processing the search
-query. The following variable is available in this loop:</p>
-
-<div class="helpIndent">
-	<p><b>error.message</b><br />
-	Contains the actual error message.</p>
-</div>|,
-		lastUpdated => 0,
+<p>The template provides variables for the search results that are the same for normal and advanced search:</p>
+|,
+		lastUpdated => 1149823247,
 	},
 
 	'dft cannot delete' => {
