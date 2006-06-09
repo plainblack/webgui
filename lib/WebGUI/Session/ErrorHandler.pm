@@ -310,7 +310,7 @@ sub query {
 	else {
 		$plac = '';
 	}
-	$self->info("query  ".$self->{_queryCount}.':  '.$query.$plac);
+	$self->debug("query  ".$self->{_queryCount}.':  '.$query.$plac);
 }
 
 
@@ -364,9 +364,9 @@ sub showDebug {
 	$text = $self->{_debug_warn}; 
 	$text =~  s/\n/\<br \/\>\n/g;
 	$output .= '<div style="text-align: left;background-color: #ffbdbd;color: #000000;">'.$text."</div>\n";
-	$text = $self->{_debug_debug}; 
+	$text = $self->{_debug_info}; 
 	$text =~  s/\n/\<br \/\>\n/g;
-	$output .= '<div style="text-align: left;background-color: #cccc55;color: #000000;">'.$text."</div>\n";
+	$output .= '<div style="text-align: left;background-color: #bdffbd;color: #000000;">'.$text."</div>\n";
 	my $form = $self->session->form->paramsHashRef();
 	foreach my $key (keys %{$form}) {
 		if ($key eq "password" || $key eq "identifier") {
@@ -380,9 +380,9 @@ sub showDebug {
 	$text =~  s/\n/\<br \/\>\n/g;
 	$text =~  s/    /&nbsp; &nbsp; /g;
 	$output .= '<div style="text-align: left;background-color: #aaaaee;color: #000000;">'.$text."</div>\n";
-	$text = $self->{_debug_info}; 
+	$text = $self->{_debug_debug}; 
 	$text =~  s/\n/\<br \/\>\n/g;
-	$output .= '<div style="text-align: left;background-color: #bdffbd;color: #000000;">'.$text."</div>\n";
+	$output .= '<div style="text-align: left;background-color: #cccc55;color: #000000;">'.$text."</div>\n";
 	return $output;
 }
 
