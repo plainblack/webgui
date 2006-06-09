@@ -399,62 +399,68 @@ our $I18N = { ##hashref of hashes
 		lastUpdated => 1140465899,
 	},
 
+	'checkout.url' => {
+		message => q|A URL to take the user the screen that displays the contents of their shopping cart.|,
+		lastUpdated => 1149828278,
+	},
+
+	'checkout.label' => {
+		message => q|A label to go with checkout.url.  The internationalized word "Checkout".|,
+		lastUpdated => 1149828278,
+	},
+
+	'events_loop' => {
+		message => q|This loop contains all events that have been approved so that users can register.|,
+		lastUpdated => 1149828278,
+	},
+
+	'tmplVar event' => {
+		message => q|The information for one event that has been processed by its own event template.|,
+		lastUpdated => 1149828278,
+	},
+
+	'paginateBar' => {
+		message => q|A bar to help the user page through sets of Events if several pages of Events exist.|,
+		lastUpdated => 1149828278,
+	},
+
+	'Pagination variables' => {
+		message => q|Common pagination template variables.|,
+		lastUpdated => 1149828278,
+	},
+
+	'canManageEvents' => {
+		message => q|A flag to indicate if the current user is allowed to Manage Events.|,
+		lastUpdated => 1149829190,
+	},
+
+	'manageEvents.url' => {
+		message => q|A URL to take the user to the screen where Events can be managed (i.e. added, approved, deleted)|,
+		lastUpdated => 1149828278,
+	},
+
+	'manageEvents.label' => {
+		message => q|An internationalized label to dispaly to the user the link for managing events.|,
+		lastUpdated => 1149828278,
+	},
+
+	'managePurchases.url' => {
+		message => q|A URL to take the user to the screen where purchases can be managed (i.e. added, approved, deleted)|,
+		lastUpdated => 1149828278,
+	},
+
+	'managePurchases.label' => {
+		message => q|An internationalized label to dispaly to the user the link for managing purchases.|,
+		lastUpdated => 1149828278,
+	},
+
 	'template help body' => {
 		message => q|
 <p>This template is used to style the main page of the Event Management System where
 products are displayed to the user as well as providing a link for managing events
 in the system.</p>
-
-<p><b>checkout.url</b><br />
-A URL to take the user the screen that displays the contents of their shopping cart.
-</p>
-
-<p><b>checkout.label</b><br />
-A label to go with checkout.url.  The internationalized word "Checkout".
-</p>
-
-<p><b>events_loop</b><br />
-This loop contains all events that have been approved so that users can register.
-</p>
-
-<div class="helpIndent">
-
-<p><b>event</b><br />
-The information for one event that has been processed by its own event template.
-</p>
-
-</div>
-
-<p><b>paginateBar</b><br />
-A bar to help the user page through sets of Events if several pages of Events exist.
-</p>
-
-<p><b>Pagination variables</b><br />
-Common pagination template variables.
-</p>
-
-<p><b>canManageEvents</b><br />
-A flag to indiciate if the current user is allowed to Manage Events.
-</p>
-
-<p><b>manageEvents.url</b><br />
-A URL to take the user to the screen where Events can be managed (i.e. added, approved, deleted)
-</p>
-
-<p><b>manageEvents.label</b><br />
-An internationalized label to dispaly to the user the link for managing events.
-</p>
-
-<p><b>managePurchases.url</b><br />
-A URL to take the user to the screen where purchases can be managed (i.e. added, approved, deleted)
-</p>
-
-<p><b>managePurchases.label</b><br />
-An internationalized label to dispaly to the user the link for managing purchases.
-</p>
-
 |,
-		lastUpdated => 1147057198,
+		lastUpdated => 1149828856,
 	},
 
 	'event template help title' => {
@@ -462,103 +468,123 @@ An internationalized label to dispaly to the user the link for managing purchase
 		lastUpdated => 1140465899,
 	},
 
+	'title' => {
+		message => q|The title of this event.|,
+		lastUpdated => 1149828404,
+	},
+
+	'title.url' => {
+		message => q|A URL to display a list of events that have this event|,
+		lastUpdated => 1149828404,
+	},
+
+	'description' => {
+		message => q|The description of this event.|,
+		lastUpdated => 1149828404,
+	},
+
+	'image' => {
+		message => q|The image assigned to represent this event.|,
+		lastUpdated => 1149828404,
+	},
+
+	'tmplVar price' => {
+		message => q|The price of this event.|,
+		lastUpdated => 1149828404,
+	},
+
+	'tmplVar sku' => {
+		message => q|The SKU for this event.|,
+		lastUpdated => 1149828404,
+	},
+
+	'tmplVar sku template' => {
+		message => q|The SKU templates used to generate the SKU for this event.|,
+		lastUpdated => 1149828404,
+	},
+
+	'tmplVar weight' => {
+		message => q|The weight associated with materials for this event.|,
+		lastUpdated => 1149828404,
+	},
+
+	'numberRegistered' => {
+		message => q|The number of people currently registered for this event.|,
+		lastUpdated => 1149828404,
+	},
+
+	'maximumAttendees' => {
+		message => q|The number of people allowed to attend this event.|,
+		lastUpdated => 1149828404,
+	},
+
+	'seatsRemaining' => {
+		message => q|The number of available seats remaining for this event.|,
+		lastUpdated => 1149828404,
+	},
+
+	'eventIsFull' => {
+		message => q|A boolean that is true if the there are no available seats remaining in this event.|,
+		lastUpdated => 1149828404,
+	},
+
+	'eventIsApproved' => {
+		message => q|A boolean that is true if the event has been approved.|,
+		lastUpdated => 1149828404,
+	},
+
+	'startDate.human' => {
+		message => q|The date and time this event starts, in human readable format.|,
+		lastUpdated => 1149828404,
+	},
+
+	'endDate.human' => {
+		message => q|The date and time this event ends, in human readable format.|,
+		lastUpdated => 1149828404,
+	},
+
+	'purchase.label' => {
+		message => q|An internationalized label to display to the user the link for purchasing this event.
+If the event is full, the label will be "Sold out".|,
+		lastUpdated => 1149828404,
+	},
+
+	'purchase.url' => {
+		message => q|A URL for the user to register for this event and add it to their shopping cart.
+If the event is full, the url will be blank.|,
+		lastUpdated => 1149828404,
+	},
+
+	'purchase.message' => {
+		message => q|A message to ask the user whether or not they'd like to see subevents for this event.
+If the event is full, this variable will be blank.|,
+		lastUpdated => 1149828404,
+	},
+
+	'purchase.wantToSearch.url' => {
+		message => q|A URL to search for events that are requirements for this event.
+If the event is full, this variable will be blank.|,
+		lastUpdated => 1149828404,
+	},
+
+	'purchase.wantToContinue.url' => {
+		message => q|A URL to add this event to the cart.
+If the event is full, this variable will be blank.|,
+		lastUpdated => 1149828404,
+	},
+
+	'purchase.label' => {
+		message => q|The internationalized label "Add To Cart".
+If the event is full, this variable will be blank.|,
+		lastUpdated => 1149828404,
+	},
+
 	'event template help body' => {
 		message => q|
 <p>This template is used to display the contents of a single Event to the
 user.</p>
-
-<p><b>title</b><br />
-The title of this event.
-</p>
-
-<p><b>title.url</b><br />
-A URL to display a list of events that have this event
-</p>
-
-<p><b>description</b><br />
-The description of this event.
-</p>
-
-<p><b>image</b><br />
-The image assigned to represent this event.
-</p>
-
-<p><b>price</b><br />
-The price of this event.
-</p>
-
-<p><b>sku</b><br />
-The SKU for this event.
-</p>
-
-<p><b>sku template</b><br />
-The SKU templates used to generate the SKU for this event.
-</p>
-
-<p><b>weight</b><br />
-The weight associated with materials for this event.
-</p>
-
-<p><b>numberRegistered</b><br />
-The number of people currently registered for this event.
-</p>
-
-<p><b>maximumAttendees</b><br />
-The number of people allowed to attend this event.
-</p>
-
-<p><b>seatsRemaining</b><br />
-The number of available seats remaining for this event.
-</p>
-
-<p><b>eventIsFull</b><br />
-A boolean that is true if the there are no available seats remaining in this event.
-</p>
-
-<p><b>eventIsApproved</b><br />
-A boolean that is true if the event has been approved.
-</p>
-
-<p><b>startDate.human</b><br />
-The date and time this event starts, in human readable format.
-</p>
-
-<p><b>endDate.human</b><br />
-The date and time this event ends, in human readable format.
-</p>
-
-<p><b>purchase.label</b><br />
-An internationalized label to display to the user the link for purchasing this event.
-If the event is full, the label will be "Sold out".
-</p>
-
-<p><b>purchase.url</b><br />
-A URL for the user to register for this event and add it to their shopping cart.
-If the event is full, the url will be blank.
-</p>
-
-<p><b>purchase.message</b><br />
-A message to ask the user whether or not they'd like to see subevents for this event.
-If the event is full, this variable will be blank.
-</p>
-
-<p><b>purchase.wantToSearch.url</b><br />
-A URL to search for events that are requirements for this event.
-If the event is full, this variable will be blank.
-</p>
-
-<p><b>purchase.wantToContinue.url</b><br />
-A URL to add this event to the cart.
-If the event is full, this variable will be blank.
-</p>
-
-<p><b>purchase.label</b><br />
-The internationalized label "Add To Cart".
-If the event is full, this variable will be blank.
-</p>
-
 |,
-		lastUpdated => 1147056988,
+		lastUpdated => 1149828859,
 	},
 
 	'manage purchases template help title' => {
@@ -566,37 +592,145 @@ If the event is full, this variable will be blank.
 		lastUpdated => 1140465899,
 	},
 
+	'purchasesLoop' => {
+		message => q|This loop contains all events that have been approved so that users can view their purchases.|,
+		lastUpdated => 1149828546,
+	},
+
+	'purchaseUrl' => {
+		message => q|A link to view the details of this purchase.|,
+		lastUpdated => 1149828546,
+	},
+
+	'datePurchasedHuman' => {
+		message => q|The date and time this purchase was started in a human readable format.|,
+		lastUpdated => 1149828546,
+	},
+
+	'managePurchasesTitle' => {
+		message => q|An internationalized label to title this screen.|,
+		lastUpdated => 1149828546,
+	},
+
 	'manage purchases template help body' => {
 		message => q|
 <p>This template is used to style the screen of the Event Management System where
 the user can manage their purchases.</p>
-
-<p><b>purchasesLoop</b><br />
-This loop contains all events that have been approved so that users can view their purchases.
-</p>
-
-<div class="helpIndent">
-
-<p><b>purchaseUrl</b><br />
-A link to view the details of this purchase.
-</p>
-
-<p><b>datePurchasedHuman</b><br />
-The date and time this purchase was started in a human readable format.
-</p>
-
-</div>
-
-<p><b>managePurchasesTitle</b><br />
-An internationalized label to title this screen.
-</p>
 |,
-		lastUpdated => 1145465299,
+		lastUpdated => 1149828862,
 	},
 
 	'view purchase template help title' => {
 		message => q|EMS View Purchases Template|,
 		lastUpdated => 1140465899,
+	},
+
+	'purchasesLoop' => {
+		message => q|This loop contains all registrations that are included in this purchase.|,
+		lastUpdated => 1149828601,
+	},
+
+	'regLoop' => {
+		message => q|This loop contains all events that are included in this registration.|,
+		lastUpdated => 1149828601,
+	},
+
+	'startDateHuman' => {
+		message => q|The start date in a human readable format for this event.|,
+		lastUpdated => 1149828601,
+	},
+
+	'startDateHuman' => {
+		message => q|The start date in a human readable format for this event.|,
+		lastUpdated => 1149828601,
+	},
+
+	'endDateHuman' => {
+		message => q|The end date in a human readable format for this event.|,
+		lastUpdated => 1149828601,
+	},
+
+	'startDate' => {
+		message => q|This event's start date and time in epoch format.|,
+		lastUpdated => 1149828601,
+	},
+
+	'endDateHuman' => {
+		message => q|This event's end date and time in epoch format.|,
+		lastUpdated => 1149828601,
+	},
+
+	'registrationId' => {
+		message => q|The user's registrationId for this event.|,
+		lastUpdated => 1149828601,
+	},
+
+	'templateId' => {
+		message => q|The template used to style this event if it is to be displayed.|,
+		lastUpdated => 1149828601,
+	},
+
+	'returned' => {
+		message => q|A boolean that will be 1 if this event has been returned by the user.|,
+		lastUpdated => 1149828601,
+	},
+
+	'tmplVar approved' => {
+		message => q|A boolean that will be 1 if this event has been approved.|,
+		lastUpdated => 1149828601,
+	},
+
+	'templateId' => {
+		message => q|The template used to style this event if it is to be displayed.|,
+		lastUpdated => 1149828601,
+	},
+
+	'userId' => {
+		message => q|The Id of the user set to use this badge.|,
+		lastUpdated => 1149828601,
+	},
+
+	'createdByUserId' => {
+		message => q|The Id of the user who created this badge.|,
+		lastUpdated => 1149828601,
+	},
+
+	'canReturnItinerary' => {
+		message => q|A boolean indicating whether or not this event can be returned.|,
+		lastUpdated => 1149828601,
+	},
+
+	'canAddEvents' => {
+		message => q|A boolean indicating whether or not the current user is allowed to add events.  Admins, the owner
+of the transaction, the user who created the registration or the user who the registration is
+for are allowed to add events.|,
+		lastUpdated => 1149828601,
+	},
+
+	'canReturnTransaction' => {
+		message => q|A boolean that is true if any purchase can be returned.|,
+		lastUpdated => 1149828601,
+	},
+
+	'viewPurchaseTitle' => {
+		message => q|An internationalized label to title this screen.|,
+		lastUpdated => 1149828601,
+	},
+
+	'canReturn' => {
+		message => q|A boolean indicating if the current user may return events in the purchase.  Users who can add events 
+fall into this group.|,
+		lastUpdated => 1149828601,
+	},
+
+	'transactionId' => {
+		message => q|The unique identifier for this transaction in the database.|,
+		lastUpdated => 1149828601,
+	},
+
+	'appUrl' => {
+		message => q|A URL back to the main screen of the Asset.|,
+		lastUpdated => 1149828601,
 	},
 
 	'view purchase template help body' => {
@@ -606,120 +740,8 @@ the users and admins can view or edit a purchase.</p>
 
 <p>In addition to the template variables below, this template also has access to the
 EMS Asset variables.</p>
-
-<p><b>purchasesLoop</b><br />
-This loop contains all registrations that are included in this purchase.
-</p>
-
-<div class="helpIndent">
-
-<p><b>regLoop</b><br />
-This loop contains all events that are included in this registration.
-</p>
-
-<div class="helpIndent">
-
-<p><b>startDateHuman</b><br />
-The start date in a human readable format for this event.
-</p>
-
-<p><b>startDateHuman</b><br />
-The start date in a human readable format for this event.
-</p>
-
-<p><b>endDateHuman</b><br />
-The end date in a human readable format for this event.
-</p>
-
-<p><b>startDate</b><br />
-This event's start date and time in epoch format.
-</p>
-
-<p><b>endDateHuman</b><br />
-This event's end date and time in epoch format.
-</p>
-
-<p><b>registrationId</b><br />
-The user's registrationId for this event.
-</p>
-
-<p><b>title</b><br />
-The title of this event.
-</p>
-
-<p><b>description</b><br />
-The description of this event.
-</p>
-
-<p><b>price</b><br />
-The price of this event.
-</p>
-
-<p><b>templateId</b><br />
-The template used to style this event if it is to be displayed.
-</p>
-
-<p><b>returned</b><br />
-A boolean that will be 1 if this event has been returned by the user.
-</p>
-
-<p><b>approved</b><br />
-A boolean that will be 1 if this event has been approved.
-</p>
-
-<p><b>templateId</b><br />
-The template used to style this event if it is to be displayed.
-</p>
-
-<p><b>maximumAttendees</b><br />
-The number of people allowed to attend this event.
-</p>
-
-<p><b>userId</b><br />
-The Id of the user set to use this badge.
-</p>
-
-<p><b>createdByUserId</b><br />
-The Id of the user who created this badge.
-</p>
-
-</div>
-
-<p><b>canReturnItinerary</b><br />
-A boolean indicating whether or not this event can be returned.
-</p>
-
-<p><b>canAddEvents</b><br />
-A boolean indicating whether or not the current user is allowed to add events.  Admins, the owner
-of the transaction, the user who created the registration or the user who the registration is
-for are allowed to add events.
-</p>
-
-</div>
-
-<p><b>canReturnTransaction</b><br />
-A boolean that is true if any purchase can be returned.
-</p>
-
-<p><b>viewPurchaseTitle</b><br />
-An internationalized label to title this screen.
-</p>
-
-<p><b>canReturn</b><br />
-A boolean indicating if the current user may return events in the purchase.  Users who can add events 
-fall into this group.
-</p>
-
-<p><b>transactionId</b><br />
-The unique identifier for this transaction in the database.
-</p>
-
-<p><b>appUrl</b><br />
-A URL back to the main screen of the Asset.
-</p>
-
 |,
-		lastUpdated => 1147060455,
+		lastUpdated => 1149828843,
 	},
 
 	'search template help title' => {
@@ -727,220 +749,138 @@ A URL back to the main screen of the Asset.
 		lastUpdated => 1140465899,
 	},
 
+	'calendarJS' => {
+		message => q|Script tag to set up the javascript calendar picker.|,
+		lastUpdated => 1149828900,
+	},
+
+	'basicSearch.formHeader' => {
+		message => q|Form header for a basic search.|,
+		lastUpdated => 1149828900,
+	},
+
+	'advSearch.formHeader' => {
+		message => q|Form header for an advanced search.|,
+		lastUpdated => 1149828900,
+	},
+
+	'isAdvSearch' => {
+		message => q|Boolean indicating if an advanced search form has been requested.|,
+		lastUpdated => 1149828900,
+	},
+
+	'search.formFooter' => {
+		message => q|Form footer code for either type of search.|,
+		lastUpdated => 1149828900,
+	},
+
+	'search.formSubmit' => {
+		message => q|A button to submit the user's search data.  The button will contain the internationalized word "Filter".|,
+		lastUpdated => 1149828900,
+	},
+
+	'endDate' => {
+		message => q|The date and time this event ends, in epoch format.|,
+		lastUpdated => 1149828900,
+	},
+
+	'productId' => {
+		message => q|The unique identifier for this product.|,
+		lastUpdated => 1149828900,
+	},
+
+	'manageToolbar' => {
+		message => q|Code for an toolbar with icons to delete, edit and reorder events.|,
+		lastUpdated => 1149828900,
+	},
+
+	'noSearchDialog' => {
+		message => q|A boolean that indicates if the user has requested that no search dialog be presented
+by setting the "hide" form variable.|,
+		lastUpdated => 1149828900,
+	},
+
+	'addEvent.url' => {
+		message => q|A URL to take the user to the screen to add a new event.|,
+		lastUpdated => 1149828900,
+	},
+
+	'addEvent.label' => {
+		message => q|An internationalized label to dispaly to the user the link for adding an event.|,
+		lastUpdated => 1149828900,
+	},
+
+	'message' => {
+		message => q|Messages from the system about the number and type of results being displayed.|,
+		lastUpdated => 1149828900,
+	},
+
+	'numberOfSearchResults' => {
+		message => q|The number of results returned by the current search.|,
+		lastUpdated => 1149828900,
+	},
+
+	'continue.url' => {
+		message => q|A url to add this event to the cart.|,
+		lastUpdated => 1149828900,
+	},
+
+	'continue.label' => {
+		message => q|The internationalized label, "Continue" to go with continue.url.|,
+		lastUpdated => 1149828900,
+	},
+
+	'name.label' => {
+		message => q|The internationalized label, "Event".|,
+		lastUpdated => 1149828900,
+	},
+
+	'starts.label' => {
+		message => q|The internationalized label, "Starts".|,
+		lastUpdated => 1149828900,
+	},
+
+	'ends.label' => {
+		message => q|The internationalized label, "Ends".|,
+		lastUpdated => 1149828900,
+	},
+
+	'price.label' => {
+		message => q|The internationalized label, "Price".|,
+		lastUpdated => 1149828900,
+	},
+
+	'seats.label' => {
+		message => q|The internationalized label, "Seats".|,
+		lastUpdated => 1149828900,
+	},
+
+	'addToBadgeMessage' => {
+		message => q|A message from the system if a badge was successfully added to this transaction.|,
+		lastUpdated => 1149828900,
+	},
+
+	'search.filters.options' => {
+		message => q|Javascript for a search interface for Events based on their properties and metadata.|,
+		lastUpdated => 1149828900,
+	},
+
+	'search.data.url' => {
+		message => q|The URL to this Asset.|,
+		lastUpdated => 1149828900,
+	},
+
+	'ems.wobject.dir' => {
+		message => q|The URL the EventManagementSystem area in the WebGUI Extras directory.|,
+		lastUpdated => 1149828900,
+	},
+
 	'search template help body' => {
 		message => q|
 <p>This template is used to style the screen of the Event Management System where
 the users and admins can view or edit a purchase.</p>
-
-<p><b>calendarJS</b><br />
-Script tag to set up the javascript calendar picker.
-</p>
-
-<p><b>basicSearch.formHeader</b><br />
-Form header for a basic search.
-</p>
-
-<p><b>advSearch.formHeader</b><br />
-Form header for an advanced search.
-</p>
-
-<p><b>isAdvSearch</b><br />
-Boolean indicating if an advanced search form has been requested.
-</p>
-
-<p><b>search.formFooter</b><br />
-Form footer code for either type of search.
-</p>
-
-<p><b>search.formSubmit</b><br />
-A button to submit the user's search data.  The button will contain the internationalized word "Filter".
-</p>
-
-<p><b>events_loop</b><br />
-This loop contains all events that have been approved so that users can register.
-</p>
-
-<div class="helpIndent">
-
-<p><b>event</b><br />
-The information for one event that has been processed by its own event template.
-</p>
-
-<p><b>title</b><br />
-The title of this event.
-</p>
-
-<p><b>description</b><br />
-The description of this event.
-</p>
-
-<p><b>price</b><br />
-The price of this event.
-</p>
-
-<p><b>sku</b><br />
-The SKU for this event.
-</p>
-
-<p><b>sku template</b><br />
-The SKU templates used to generate the SKU for this event.
-</p>
-
-<p><b>weight</b><br />
-The weight associated with materials for this event.
-</p>
-
-<p><b>numberRegistered</b><br />
-The number of people currently registered for this event.
-</p>
-
-<p><b>maximumAttendees</b><br />
-The number of people allowed to attend this event.
-</p>
-
-<p><b>seatsRemaining</b><br />
-The number of available seats remaining for this event.
-</p>
-
-<p><b>startDate.human</b><br />
-The date and time this event starts, in human readable format.
-</p>
-
-<p><b>startDate</b><br />
-The date and time this event starts, in epoch format.
-</p>
-
-<p><b>endDate.human</b><br />
-The date and time this event ends, in human readable format.
-</p>
-
-<p><b>endDate</b><br />
-The date and time this event ends, in epoch format.
-</p>
-
-<p><b>productId</b><br />
-The unique identifier for this product.
-</p>
-
-<p><b>eventIsFull</b><br />
-A boolean that is true if the there are no available seats remaining in this event.
-</p>
-
-<p><b>eventIsApproved</b><br />
-A boolean that is true if this event has been approved.
-</p>
-
-<p><b>manageToolbar</b><br />
-Code for an toolbar with icons to delete, edit and reorder events.
-</p>
-
-<p><b>purchase.label</b><br />
-An internationalized label to display to the user the link for purchasing this event.
-If the event is full, the label will be "Sold out".
-</p>
-
-<p><b>purchase.url</b><br />
-A URL for the user to register for this event and add it to their shopping cart.
-If the event is full, the url will be blank.
-</p>
-
-</div>
-
-<p><b>paginateBar</b><br />
-A bar to help the user page through sets of Events if several pages of Events exist.
-</p>
-
-<p><b>Pagination variables</b><br />
-Common pagination template variables.
-</p>
-
-<p><b>manageEvents.url</b><br />
-A URL to take the user to the screen where Events can be managed (i.e. added, approved, deleted)
-</p>
-
-<p><b>manageEvents.label</b><br />
-An internationalized label to dispaly to the user the link for managing events.
-</p>
-
-<p><b>managePurchases.url</b><br />
-A URL to take the user to the screen where purchases can be managed (i.e. added, approved, deleted)
-</p>
-
-<p><b>managePurchases.label</b><br />
-An internationalized label to dispaly to the user the link for managing purchases.
-</p>
-
-<p><b>noSearchDialog</b><br />
-A boolean that indicates if the user has requested that no search dialog be presented
-by setting the "hide" form variable.
-</p>
-
-<p><b>addEvent.url</b><br />
-A URL to take the user to the screen to add a new event.
-</p>
-
-<p><b>addEvent.label</b><br />
-An internationalized label to dispaly to the user the link for adding an event.
-</p>
-
-<p><b>canManageEvents</b><br />
-A flag to indiciate if the current user is in the group to manage events.
-</p>
-
-<p><b>message</b><br />
-Messages from the system about the number and type of results being displayed.
-</p>
-
-<p><b>numberOfSearchResults</b><br />
-The number of results returned by the current search.
-</p>
-
-<p><b>continue.url</b><br />
-A url to add this event to the cart.
-</p>
-
-<p><b>continue.label</b><br />
-The internationalized label, "Continue" to go with continue.url.
-</p>
-
-<p><b>name.label</b><br />
-The internationalized label, "Event".
-</p>
-
-<p><b>starts.label</b><br />
-The internationalized label, "Starts".
-</p>
-
-<p><b>ends.label</b><br />
-The internationalized label, "Ends".
-</p>
-
-<p><b>price.label</b><br />
-The internationalized label, "Price".
-</p>
-
-<p><b>seats.label</b><br />
-The internationalized label, "Seats".
-</p>
-
-<p><b>addToBadgeMessage</b><br />
-A message from the system if a badge was successfully added to this transaction.
-</p>
-
-<p><b>search.filters.options</b><br />
-Javascript for a search interface for Events based on their properties and metadata.
-</p>
-
-<p><b>search.data.url</b><br />
-The URL to this Asset.
-</p>
-
-<p><b>ems.wobject.dir</b><br />
-The URL the EventManagementSystem area in the WebGUI Extras directory.
-</p>
-
 |,
-		lastUpdated => 1147061558,
+		lastUpdated => 1149829240,
 	},
 
 	'event template help title' => {
