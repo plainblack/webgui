@@ -370,65 +370,71 @@ our $I18N = {
 		lastUpdated => 0
 	},
 
+	'edit form.header' => {
+		message => q|Code to setup the Edit Task form.  Leaving out this variable will prevent the form
+from working.|,
+		lastUpdated => 1149825164,
+	},
+
+	'form.name' => {
+		message => q|Form element for the user to enter/edit the name of the task.|,
+		lastUpdated => 1149825164,
+	},
+
+	'form.duration' => {
+		message => q|Form element for the duration of the task.|,
+		lastUpdated => 1149825164,
+	},
+
+	'form.duration.units' => {
+		message => q|Form element for the units of duration for the task.|,
+		lastUpdated => 1149825164,
+	},
+
+	'form.start' => {
+		message => q|Form element for the starting date for the task.|,
+		lastUpdated => 1149825164,
+	},
+
+	'form.end' => {
+		message => q|Form element for the ending date for the task.|,
+		lastUpdated => 1149825164,
+	},
+
+	'form.dependants' => {
+		message => q|Form element for something I really don't understand.|,
+		lastUpdated => 1149825164,
+	},
+
+	'form.resource' => {
+		message => q|Form element for selecting a user to accomplish this task.|,
+		lastUpdated => 1149825164,
+	},
+
+	'form.milestone' => {
+		message => q|Form element for setting this task to be a milestone in the project.|,
+		lastUpdated => 1149825164,
+	},
+
+	'form.percentComplete' => {
+		message => q|Form element for entering in how much of the project has been completed, as a percentage.|,
+		lastUpdated => 1149825164,
+	},
+
+	'form.save' => {
+		message => q|A button to save data entered into the form.|,
+		lastUpdated => 1149825164,
+	},
+
+	'edit form.footer' => {
+		message => q|Code to end the form.|,
+		lastUpdated => 1149825164,
+	},
+
 	'edit task template vars body' => {
 		message => q|<p>The Edit Task template has these template variables</p>
-<p>! : This variable is required for the form to function correctly.</p>
-
-<p><b>form.header</b> ! <br />
-Code to setup the Edit Task form.  Leaving out this variable will prevent the form
-from working.
-</p>
-
-<p><b>form.name</b> ! <br />
-Form element for the user to enter/edit the name of the task.
-</p>
-
-<p><b>form.duration</b> ! <br />
-Form element for the duration of the task.
-</p>
-
-<p><b>form.duration.units</b> ! <br />
-Form element for the units of duration for the task.
-</p>
-
-<p><b>form.start</b> ! <br />
-Form element for the starting date for the task.
-</p>
-
-<p><b>form.end</b> ! <br />
-Form element for the ending date for the task.
-</p>
-
-<p><b>form.dependants</b> ! <br />
-Form element for something I really don't understand.
-</p>
-
-<p><b>form.resource</b> ! <br />
-Form element for selecting a user to accomplish this task.
-</p>
-
-<p><b>form.milestone</b> ! <br />
-Form element for setting this task to be a milestone in the project.
-</p>
-
-<p><b>form.percentComplete</b> ! <br />
-Form element for entering in how much of the project has been completed, as a percentage.
-</p>
-
-<p><b>form.save</b> ! <br />
-A button to save data entered into the form.
-</p>
-
-<p><b>form.footer</b> ! <br />
-Code to end the form.
-</p>
-
-<p><b>extras</b><br />
-The URL to the Extras directory.
-</p>
-
 |,
-		lastUpdated => 0
+		lastUpdated => 1149825739
 	},
 
 	'view project template vars title' => {
@@ -436,171 +442,202 @@ The URL to the Extras directory.
 		lastUpdated => 0
 	},
 
+	'form.header' => {
+		message => q|If the user is in the group to add projects, then this variable will contain HTML form code
+to make on the fly editing of tasks work.|,
+		lastUpdated => 1149824991,
+	},
+
+	'form.footer' => {
+		message => q|If the user is in the group to add projects, then this variable will contain HTML form code
+to make on the fly editing of tasks work.|,
+		lastUpdated => 1149824991,
+	},
+
+	'project.canEdit' => {
+		message => q|A conditional indicating whether or not this user is a member of the group to add projects.|,
+		lastUpdated => 1149824991,
+	},
+
+	'project.resources.url' => {
+		message => q|If the user is in the group to add projects, this will be the URL to the Manage Resources screen.|,
+		lastUpdated => 1149824991,
+	},
+
+	'project.resources.label' => {
+		message => q|If the user is in the group to add projects, this will be internationalized label to be used with <b>project.resources.label</b>.|,
+		lastUpdated => 1149824991,
+	},
+
+	'extras' => {
+		message => q|The URL to the Extras directory for the Project Manager.|,
+		lastUpdated => 1149824991,
+	},
+
+	'extras.base' => {
+		message => q|The URL to the top of the Extras directory.|,
+		lastUpdated => 1149824991,
+	},
+
+	'project.durationUnits' => {
+		message => q|An abbreviated version of the units of time that duration are measured.|,
+		lastUpdated => 1149824991,
+	},
+
+	'project.hoursPerDay' => {
+		message => q|The number of hours that represents a full day of work for this project.|,
+		lastUpdated => 1149824991,
+	},
+
+	'task.name.label' => {
+		message => q|The internationalized word "Task".|,
+		lastUpdated => 1149824991,
+	},
+
+	'task.duration.label' => {
+		message => q|The internationalized word "Duration".|,
+		lastUpdated => 1149824991,
+	},
+
+	'task.start.label' => {
+		message => q|The internationalized word "Start".|,
+		lastUpdated => 1149824991,
+	},
+
+	'task.end.label' => {
+		message => q|The internationalized word "End".|,
+		lastUpdated => 1149824991,
+	},
+
+	'task.dependants.label' => {
+		message => q|The internationalized word "Pred", short for Predecessor.|,
+		lastUpdated => 1149824991,
+	},
+
+	'form.name.error' => {
+		message => q|An internationalized error message for a missing task name.|,
+		lastUpdated => 1149824991,
+	},
+
+	'form.start.error' => {
+		message => q|An internationalized error message for not entering an start date.|,
+		lastUpdated => 1149824991,
+	},
+
+	'form.start.error' => {
+		message => q|An internationalized error message for not entering an end date.|,
+		lastUpdated => 1149824991,
+	},
+
+	'form.greaterThan.error' => {
+		message => q|An internationalized error message for entering a start date after the end date.|,
+		lastUpdated => 1149824991,
+	},
+
+	'form.previousPredecessor.error' => {
+		message => q|An internationalized error message for choosing a predecessor that is not a previous task.|,
+		lastUpdated => 1149824991,
+	},
+
+	'form.previousPredecessor.error' => {
+		message => q|An internationalized error message for choosing a predecessor task that does not exist.|,
+		lastUpdated => 1149824991,
+	},
+
+	'form.invalidMove.error' => {
+		message => q|An internationalized error message for choosing a task that is invalid as a predecessor because the end date is after the start date of this task.|,
+		lastUpdated => 1149824991,
+	},
+
+	'task.loop' => {
+		message => q|A loop containing all tasks for this project, in sequence order.|,
+		lastUpdated => 1149824991,
+	},
+
+	'task.number' => {
+		message => q|The sequence number for this task.|,
+		lastUpdated => 1149824991,
+	},
+
+	'task.number.id' => {
+		message => q|A unique identifier used internally by WebGUI for this task.|,
+		lastUpdated => 1149824991,
+	},
+
+	'task.name' => {
+		message => q|The name of this task.|,
+		lastUpdated => 1149824991,
+	},
+
+	'task.start' => {
+		message => q|If the user is in the group to add projects, then this will be a form field to edit the start date
+for this task.  Otherwise, just the start date will be displayed as text.|,
+		lastUpdated => 1149824991,
+	},
+
+	'task.dependants' => {
+		message => q|If the user is in the group to add projects, then this will be a form field to edit the dependants
+for this task.  Otherwise, just the list of dependants will be displayed as text.|,
+		lastUpdated => 1149824991,
+	},
+
+	'task.end' => {
+		message => q|If the user is in the group to add projects, then this will be a form field to edit the end date
+for this task.  Otherwise, just the end date will be displayed as text.|,
+		lastUpdated => 1149824991,
+	},
+
+	'task.duration' => {
+		message => q|If the user is in the group to add projects, and this task is not a milestone, then a this variable
+will be a form field to edit the duration.  
+Otherwise, just the duration will be displayed as text.|,
+		lastUpdated => 1149824991,
+	},
+
+	'task.duration.units' => {
+		message => q|The units for the duration, typically hours or days.|,
+		lastUpdated => 1149824991,
+	},
+
+	'task.isMilestone' => {
+		message => q|A conditiional indicating whether or not this task is a milestone.|,
+		lastUpdated => 1149824991,
+	},
+
+	'task.edit.url' => {
+		message => q|If the user can add tasks to this project, then this will be a URL to take them to the Add Task screen.|,
+		lastUpdated => 1149824991,
+	},
+
+	'task.edit.url' => {
+		message => q|If the user can add tasks to this project, then this will contain an internationalized label to go with <b>task.edit.url</b>.|,
+		lastUpdated => 1149824991,
+	},
+
+	'project.gaant.rowspan' => {
+		message => q|The number of rows for the Gannt chart, 4 + the number of tasks.|,
+		lastUpdated => 1149824991,
+	},
+
+	'project.ganttChart' => {
+		message => q|The Gannt chart for this project and its tasks.|,
+		lastUpdated => 1149824991,
+	},
+
+	'task.back.url' => {
+		message => q|A link back to this screen.|,
+		lastUpdated => 1149824991,
+	},
+
+	'task.back.label' => {
+		message => q|A label to go with the link back to this screen.|,
+		lastUpdated => 1149824991,
+	},
+
 	 'view project template vars body' => {
 		message => q|<p>The View Project template has these template variables</p>
-<p>! : This variable is required for the form to function correctly.</p>
-
-<p><b>form.header</b><br />
-If the user is in the group to add projects, then this variable will contain HTML form code
-to make on the fly editing of tasks work.
-</p>
-
-<p><b>form.footer</b><br />
-If the user is in the group to add projects, then this variable will contain HTML form code
-to make on the fly editing of tasks work.
-</p>
-
-<p><b>project.canEdit</b><br />
-A conditional indicating whether or not this user is a member of the group to add projects.
-</p>
-
-<p><b>project.resources.url</b><br />
-If the user is in the group to add projects, this will be the URL to the Manage Resources screen.
-</p>
-
-<p><b>project.resources.label</b><br />
-If the user is in the group to add projects, this will be internationalized label to be used with <b>project.resources.label</b>.
-</p>
-
-<p><b>extras</b><br />
-The URL to the Extras directory for the Project Manager.
-</p>
-
-<p><b>extras.base</b><br />
-The URL to the top of the Extras directory.
-</p>
-
-<p><b>project.durationUnits</b><br />
-An abbreviated version of the units of time that duration are measured.
-</p>
-
-<p><b>project.hoursPerDay</b><br />
-The number of hours that represents a full day of work for this project.
-</p>
-
-<p><b>task.name.label</b><br />
-The internationalized word "Task".
-</p>
-
-<p><b>task.duration.label</b><br />
-The internationalized word "Duration".
-</p>
-
-<p><b>task.start.label</b><br />
-The internationalized word "Start".
-</p>
-
-<p><b>task.end.label</b><br />
-The internationalized word "End".
-</p>
-
-<p><b>task.dependants.label</b><br />
-The internationalized word "Pred", short for Predecessor.
-</p>
-
-<p><b>form.name.error</b><br />
-An internationalized error message for a missing task name.
-</p>
-
-<p><b>form.start.error</b><br />
-An internationalized error message for not entering an start date.
-</p>
-
-<p><b>form.start.error</b><br />
-An internationalized error message for not entering an end date.
-</p>
-
-<p><b>form.greaterThan.error</b><br />
-An internationalized error message for entering a start date after the end date.
-</p>
-
-<p><b>form.previousPredecessor.error</b><br />
-An internationalized error message for choosing a predecessor that is not a previous task.
-</p>
-
-<p><b>form.previousPredecessor.error</b><br />
-An internationalized error message for choosing a predecessor task that does not exist.
-</p>
-
-<p><b>form.invalidMove.error</b><br />
-An internationalized error message for choosing a task that is invalid as a predecessor because the end date is after the start date of this task.
-</p>
-
-<p><b>task.loop</b><br />
-A loop containing all tasks for this project, in sequence order.
-</p>
-
-<div class="helpIndent">
-
-<p><b>task.number</b><br />
-The sequence number for this task.
-</p>
-
-<p><b>task.number.id</b><br />
-A unique identifier used internally by WebGUI for this task.
-</p>
-
-<p><b>task.name</b><br />
-The name of this task.
-</p>
-
-<p><b>task.start</b><br />
-If the user is in the group to add projects, then this will be a form field to edit the start date
-for this task.  Otherwise, just the start date will be displayed as text.
-</p>
-
-<p><b>task.dependants</b><br />
-If the user is in the group to add projects, then this will be a form field to edit the dependants
-for this task.  Otherwise, just the list of dependants will be displayed as text.
-</p>
-
-<p><b>task.end</b><br />
-If the user is in the group to add projects, then this will be a form field to edit the end date
-for this task.  Otherwise, just the end date will be displayed as text.
-</p>
-
-<p><b>task.duration</b><br />
-If the user is in the group to add projects, and this task is not a milestone, then a this variable
-will be a form field to edit the duration.  
-Otherwise, just the duration will be displayed as text.
-</p>
-
-<p><b>task.duration.units</b><br />
-The units for the duration, typically hours or days.
-</p>
-
-<p><b>task.isMilestone</b><br />
-A conditiional indicating whether or not this task is a milestone.
-</p>
-
-<p><b>task.edit.url</b><br />
-If the user can add tasks to this project, then this will be a URL to take them to the Add Task screen.
-</p>
-
-<p><b>task.edit.url</b><br />
-If the user can add tasks to this project, then this will contain an internationalized label to go with <b>task.edit.url</b>.
-</p>
-
-</div>
-
-<p><b>project.gaant.rowspan</b><br />
-The number of rows for the Gannt chart, 4 + the number of tasks.
-</p>
-
-<p><b>project.ganttChart</b><br />
-The Gannt chart for this project and its tasks.
-</p>
-
-<p><b>task.back.url</b><br />
-A link back to this screen.
-</p>
-
-<p><b>task.back.label</b><br />
-A label to go with the link back to this screen.
-</p>
-
 |,
-		lastUpdated => 0
+		lastUpdated => 1149825022
 	},
 
 	'gantt chart template vars title' => {
@@ -608,72 +645,69 @@ A label to go with the link back to this screen.
 		lastUpdated => 0
 	},
 
+	'sunday.label' => {
+		message => q|The initial of the day for Sunday, internationalized.|,
+		lastUpdated => 1149825039,
+	},
+
+	'monday.label' => {
+		message => q|The initial of the day for Monday, internationalized.|,
+		lastUpdated => 1149825039,
+	},
+
+	'tuesday.label' => {
+		message => q|The initial of the day for Tuesday, internationalized.|,
+		lastUpdated => 1149825039,
+	},
+
+	'wednesday.label' => {
+		message => q|The initial of the day for Wednesday, internationalized.|,
+		lastUpdated => 1149825039,
+	},
+
+	'thursday.label' => {
+		message => q|The initial of the day for Thursday, internationalized.|,
+		lastUpdated => 1149825039,
+	},
+
+	'friday.label' => {
+		message => q|The initial of the day for Friday, internationalized.|,
+		lastUpdated => 1149825039,
+	},
+
+	'saturday.label' => {
+		message => q|The initial of the day for Saturday, internationalized.|,
+		lastUpdated => 1149825039,
+	},
+
+	'daysLoop' => {
+		message => q|The initial of the day for Saturday, internationalized.|,
+		lastUpdated => 1149825039,
+	},
+
+	'month.name' => {
+		message => q|The name of the current month|,
+		lastUpdated => 1149825039,
+	},
+
+	'saturday.label' => {
+		message => q|The initial of the day for Saturday, internationalized.|,
+		lastUpdated => 1149825039,
+	},
+
+	'daysLoop' => {
+		message => q|The initial of the day for Saturday, internationalized.|,
+		lastUpdated => 1149825039,
+	},
+
+	'day.number' => {
+		message => q|The ordinal number for this day of the week, an integer between 1 and 7|,
+		lastUpdated => 1149825039,
+	},
+
 	'gantt chart template vars body' => {
-		message => q|<p>These variables are available in the Gantt Chart Template:</p>
-
-<p><b>extras</b><br />
-The URL to the Extras directory for the Project Manager.
-</p>
-
-<p><b>sunday.label</b><br />
-The initial of the day for Sunday, internationalized.
-</p>
-
-<p><b>monday.label</b><br />
-The initial of the day for Monday, internationalized.
-</p>
-
-<p><b>tuesday.label</b><br />
-The initial of the day for Tuesday, internationalized.
-</p>
-
-<p><b>wednesday.label</b><br />
-The initial of the day for Wednesday, internationalized.
-</p>
-
-<p><b>thursday.label</b><br />
-The initial of the day for Thursday, internationalized.
-</p>
-
-<p><b>friday.label</b><br />
-The initial of the day for Friday, internationalized.
-</p>
-
-<p><b>saturday.label</b><br />
-The initial of the day for Saturday, internationalized.
-</p>
-
-<p><b>daysLoop</b><br />
-The initial of the day for Saturday, internationalized.
-</p>
-
-<div class="helpIndent">
-
-<p><b>month.name</b><br />
-The name of the current month
-</p>
-
-<p><b>saturday.label</b><br />
-The initial of the day for Saturday, internationalized.
-</p>
-
-<p><b>daysLoop</b><br />
-The initial of the day for Saturday, internationalized.
-</p>
-
-<div class="helpIndent">
-
-<p><b>day.number</b><br />
-The ordinal number for this day of the week, an integer between 1 and 7
-</p>
-
-</div>
-
-</div>
-
-
-		|,
-		lastUpdated => 0
+		message => q|<p>These variables are available in the Gantt Chart Template:</p>|,
+		lastUpdated => 1149825108
 	},
 
 };
