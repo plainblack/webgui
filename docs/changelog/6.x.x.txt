@@ -17,6 +17,7 @@
  - fix: Incorrect method call in Auth.pm
  - fix: No Help link icon in Matrix edit page
  - fix: Problems with In/Out Board (labeling only)
+ - fix: Adding HTTP Proxy
 
 
 6.99.3
