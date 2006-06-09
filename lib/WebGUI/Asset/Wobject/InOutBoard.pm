@@ -133,13 +133,13 @@ sub getEditForm {
 	$tabform->getTab("security")->group(
 		-name=>"reportViewerGroup",
 		-value=>[$self->getValue("reportViewerGroup")],
-		-label=>$i18n->get(3)
+		-label=>$i18n->get(3),
 		-hoverHelp=>$i18n->get("3 description"),
 		);
    $tabform->getTab("security")->group(
 		-name=>"inOutGroup",
 		-value=>[$self->getValue("inOutGroup")],
-		-label=>$i18n->get('inOutGroup')
+		-label=>$i18n->get('inOutGroup'),
 		-hoverHelp=>$i18n->get('inOutGroup description'),
 		);
     return $tabform;
