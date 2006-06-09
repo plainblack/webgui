@@ -45,17 +45,17 @@ sub addItem {
 	$self->session->db->write("insert into transactionItem ".
 		"(transactionId, itemName, amount, quantity, itemId, itemType) values ".
 		"(".$self->session->db->quote($self->{_transactionId}).",".$self->session->db->quote($item->name).",".$self->session->db->quote(
-			($lineItemAmount)
+			($lineItemAmount ne "")
 				?($lineItemAmount)
 				:($item->price)
 			).",".$self->session->db->quote(
-				($lineItemAmount)
+				($lineItemAmount ne "")
 				?('1')
 				:($quantity)
 			).",".
 		$self->session->db->quote($item->id).",".$self->session->db->quote($item->type).")");
 	# Adjust total amount in the transaction table.
-	$self->session->db->write("update transaction set amount=amount+".($item->price * $quantity)." where transactionId=".$self->session->db->quote($self->{_transactionId}));
+	$self->session->db->write("update transaction set amount=amount+".$self->session->db->quote(($lineItemAmount ne "") ? ($lineItemAmount) : ($item->price * $quantity))." where transactionId=".$self->session->db->quote($self->{_transactionId}));
 	$self->{_properties}{amount} += ($item->price * $quantity);
 	push @{$self->{_items}}, {
 		transactionId	=> $self->{_transactionId},

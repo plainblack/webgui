@@ -236,7 +236,7 @@ If the user continues, the next sub called is www_checkoutSubmit.
 
 sub www_checkoutConfirm {
 	my $session = shift;
-	my ($plugin, $f, %var, $errors, $i18n, $shoppingCart, $normal, $recurring, $shipping, $total);
+	my ($plugin, $f, %var, $errors, $i18n, $shoppingCart, $normal, $recurring, $shipping, $total, $subTotal);
 	$errors = shift;
 	
 	$i18n = WebGUI::International->new($session, 'Commerce');
@@ -255,15 +255,22 @@ sub www_checkoutConfirm {
 	# Put contents of cart in template vars
 	$shoppingCart = WebGUI::Commerce::ShoppingCart->new($session);
 	($normal, $recurring) = $shoppingCart->getItems;
-
+	my @copyOfNormal = @$normal;
 	foreach (@$normal) {
+		my $amount;
 		$_->{deleteIcon} = $session->icon->delete('op=deleteCartItem;itemId='.$_->{item}->id.';itemType='.$_->{item}->type);
 		$_->{'quantity.form'} = WebGUI::Form::integer($session,{
 			name	=> 'quantity~'.$_->{item}->type.'~'.$_->{item}->id,
 			value	=> $_->{quantity},
 			size	=> 3,
 		});
-		$total += $_->{totalPrice};
+		my $priceLineItem = ($_->{item}->{priceLineItem}) ? ($_->{item}->priceLineItem($_->{quantity},\@copyOfNormal)) : undef;  # pass in the quantity and the normal items in the cart.
+		# use the item plugin's lineItem method for price override
+		# situations.	
+		$amount = ($priceLineItem ne "") ? ($priceLineItem) : ($_->{totalPrice});
+		$_->{item}->{price} = $amount;
+		$total += $amount;	       # tracks discount
+		$subTotal += $_->{totalPrice}; # ignores discount (we need this to show them an accurate subtotal and to calculate the discount given.)
 	}
 	foreach (@$recurring) {
 		$_->{deleteIcon} = $session->icon->delete('op=deleteCartItem;itemId='.$_->{item}->id.';itemType='.$_->{item}->type);
@@ -274,13 +281,13 @@ sub www_checkoutConfirm {
 		});
 		$total += $_->{totalPrice};
 	}
-
+	
 	$var{normalItemsLoop} = $normal;
 	$var{normalItems} = scalar(@$normal);
 	$var{recurringItemsLoop} = $recurring;
 	$var{recurringItems} = scalar(@$recurring);
 
-	$var{subTotal} = sprintf('%.2f', $total);
+	$var{subTotal} = sprintf('%.2f', $subTotal);
 
 	$shipping = WebGUI::Commerce::Shipping->load($session, $session->scratch->get('shippingMethod'));
 	$shipping->setOptions(Storable::thaw($session->scratch->get('shippingOptions'))) if ($session->scratch->get('shippingOptions'));
@@ -289,6 +296,8 @@ sub www_checkoutConfirm {
 
 	$var{total} = sprintf('%.2f', $total + $shipping->calc);
 	
+	$var{discountsApplied} = sprintf('%.2f', $total - $subTotal - $shipping->calc);
+	$var{'discountsApplied.label'} = $i18n->echo("Discount Applied");
 	$plugin = WebGUI::Commerce::Payment->load($session, $session->scratch->get('paymentGateway'));
 
 	$f = WebGUI::HTMLForm->new($session);
@@ -388,14 +397,12 @@ sub www_checkoutSubmit {
 		$transaction = WebGUI::Commerce::Transaction->new($session, 'new');
 		
 		foreach (@{$currentPurchase->{items}}) {
-			my $priceLineItem = ($_->{item}->{priceLineItem})
-					# pass in the quantity and the normal items in the cart.
-				?($_->{item}->priceLineItem($_->{quantity},\@copyOfNormal))
-				:undef;
+			my $priceLineItem = ($_->{item}->{priceLineItem}) ? ($_->{item}->priceLineItem($_->{quantity},\@copyOfNormal)) : undef;  # pass in the quantity and the normal items in the cart.
+			$session->errorHandler->warn("Price Line Item: $priceLineItem");
 			$transaction->addItem($_->{item}, $_->{quantity},$priceLineItem);
 			# use the item plugin's lineItem method for price override
 			# situations.	
-			$amount += ($priceLineItem)
+			$amount += ($priceLineItem ne "")
 				?($priceLineItem)
 				:($_->{item}->price * $_->{quantity});
 			$var->{purchaseDescription} .= $_->{quantity}.' x '.$_->{item}->name.'<br />';

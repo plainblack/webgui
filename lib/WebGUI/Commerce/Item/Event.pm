@@ -140,7 +140,7 @@ sub priceLineItem {
 			);
 		}
 		if ($numberOfPasses) {
-			# $self->session->errorHandler->warn('adding a discount pass.');
+			 #$self->session->errorHandler->warn('adding a discount pass.');
 			$passesInCart{$passId} = $numberOfPasses;
 			$totalPassesInCart += $numberOfPasses;
 		}
@@ -151,7 +151,7 @@ sub priceLineItem {
 		my $numberOfThisPass = $passesInCart{$passId};
 		# calculate discount.
 		if ($pass->{type} eq 'newPrice') {
-			$self->session->errorHandler->warn('discounted price: '.$pass->{amount});
+			#$self->session->errorHandler->warn('discounted price: '.$pass->{amount});
 			$discountedPrice = (0 + $pass->{amount}) if ($price > (0 + $pass->{amount}));
 		} elsif ($pass->{type} eq 'amountOff') {
 			# not yet implemented!
@@ -160,14 +160,15 @@ sub priceLineItem {
 		}
 		# while we still have passes and items left to discount.
 		while ($numberOfThisPass && $quantity) {
-			# $self->session->errorHandler->warn('applying a discount pass.');
+			 #$self->session->errorHandler->warn('applying a discount pass.');
 			$totalPrice += $discountedPrice;
-			$self->session->errorHandler->warn('new discounted price: '.$discountedPrice);
+			#$self->session->errorHandler->warn('new discounted price: '.$discountedPrice);
 			$quantity--;
 			$numberOfThisPass--;
 		}
 	}
 	# return the total of the discounted items plus the total of the non discounted items.
+	#$self->session->errorHandler->warn($totalPrice + ($quantity * $price));
 	return ($totalPrice + ($quantity * $price));
 }
 

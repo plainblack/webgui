@@ -18,7 +18,8 @@
  - fix: No Help link icon in Matrix edit page
  - fix: Problems with In/Out Board (labeling only)
  - fix: Adding HTTP Proxy
-
+ - fix: EMS Discount Pass Not Applied
+ - fix: Commerce checkout confirmation very confusing
 
 6.99.3
  - Someone removed the status from the submission templates. That has been
