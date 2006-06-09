@@ -41,7 +41,8 @@ sub fixSurvey{
 		my $survey = WebGUI::Asset->new($session, $assetId, 'WebGUI::Asset::Wobject::Survey');
 		my $i18n = WebGUI::International->new($session, 'Asset_Survey');
 		my $noneLabel = $i18n->get(107);
-		my ($defaultSectionId) = $session->db->quickArray("select Survey_sectionId from Survey_section where assetId=? and sectionName=?", [$assetId,$noneLabel]);
+		my $surveyId = $survey->get('Survey_id');
+		my ($defaultSectionId) = $session->db->quickArray("select Survey_sectionId from Survey_section where Survey_id=? and sectionName=?", [$surveyId,$noneLabel]);
 		$survey->update({defaultSectionId => $defaultSectionId});  
 	}
 }
