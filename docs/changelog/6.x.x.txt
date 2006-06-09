@@ -16,6 +16,7 @@
  - fix: Workflow Commit with approval Error (Martin Kamerbeek / Procolix)
  - fix: Incorrect method call in Auth.pm
  - fix: No Help link icon in Matrix edit page
+ - fix: Problems with In/Out Board (labeling only)
 
 
 6.99.3
