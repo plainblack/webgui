@@ -1,6 +1,18 @@
 package WebGUI::i18n::English::Asset_HttpProxy;
 
 our $I18N = {
+	'use ampersand help' => {
+		message => q|By default we use semicolons to seperate parameters in a URL. However, some older applications require the use of ampersands.|,
+		context => q|asset property hover help|,
+		lastUpdated => 0
+		},
+
+	'use ampersand' => {
+		message => q|Use ampersand as seperator?|,
+		context => q|asset property|,
+		lastUpdated => 0
+		},
+
 	'cache timeout description' => {
 		message => q|How long should the proxy cache a page, so that if it's requested again, it won't have to refetch it?|,
 		lastUpdated => 1047837230

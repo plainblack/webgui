@@ -21,6 +21,8 @@
  - fix: op=saveSettings broken
  - fix: EMS Discount Pass Not Applied
  - fix: Commerce checkout confirmation very confusing
+ - fix: HttpProxy turns ampersands into semicolons
+
 
 6.99.3
  - Someone removed the status from the submission templates. That has been

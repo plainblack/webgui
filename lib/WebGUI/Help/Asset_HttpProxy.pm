@@ -36,6 +36,11 @@ our $HELP = {
                                 namespace => 'Asset_HttpProxy',
                         },
                         {
+                                title => 'use ampersand',
+                                description => 'use ampersand help',
+                                namespace => 'Asset_HttpProxy',
+                        },
+                        {
                                 title => '6',
                                 description => '6 description',
                                 namespace => 'Asset_HttpProxy',

@@ -24,6 +24,20 @@ use WebGUI::Cache;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
 
+#-------------------------------------------------------------------
+sub appendToUrl {
+	my $self = shift;
+        my $url = shift;
+	my $paramSet = shift;
+	my $seperator = ($self->get("useAmpersand")) ? "&" : ";";
+        if ($url =~ /\?/) {
+                $url .= $seperator.$paramSet;
+        } else {
+                $url .= '?'.$paramSet;
+        }
+        return $url;
+}
+
 
 #-------------------------------------------------------------------
 sub definition {
@@ -46,6 +60,10 @@ sub definition {
 				fieldType=>"url",
 				defaultValue=>'http://'
 				}, 
+			useAmpersand=>{
+				fieldType=>"yesNo",
+				defaultValue=>0
+				},
 			timeout=>{
 				fieldType=>"selectBox",
 				defaultValue=>30
@@ -179,6 +197,12 @@ sub getEditForm {
                 -hoverHelp=>$i18n->get('14 description'),
                 -value=>$self->getValue("stopAt")
                 );
+	$tabform->getTab("properties")->yesNo(
+		name=>"useAmpersand",
+		value=>$self->getValue("useAmpersand"),
+		label=>$i18n->get("use ampersand"),
+		hoverHelp=>$i18n->get("use ampersand help")
+		);
 	return $tabform;
 }
 
@@ -276,7 +300,7 @@ sub view {
             foreach my $input_name ($self->session->form->param) {
                next if ($input_name !~ /^HttpProxy_/); # Skip non proxied form var's
                $input_name =~ s/^HttpProxy_//;
-               $proxiedUrl=$self->session->url->append($proxiedUrl,"$input_name=".$self->session->form->process('HttpProxy_'.$input_name));
+               $proxiedUrl=$self->appendToUrl($proxiedUrl,"$input_name=".$self->session->form->process('HttpProxy_'.$input_name));
             }
          }
          $request = HTTP::Request->new(GET => $proxiedUrl, $header) || return "wrong url"; # Create GET request
@@ -385,6 +409,7 @@ sub view {
 sub www_view {
         my $self = shift;
         return $self->session->privilege->noAccess() unless $self->canView;
+	$self->prepareView;
         my $output = $self->view;
         # this is s a stop gap. we need to do something here that deals with the real www_view and caching, etc.
         if ($self->session->http->getMimeType() ne "text/html") {

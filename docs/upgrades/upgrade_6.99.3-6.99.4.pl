@@ -24,8 +24,25 @@ my $session = start(); # this line required
 
 fixSurvey($session);
 fixEditWorkflow($session);
+fixOrphans();
+updateHttpProxy();
 
 finish($session); # this line required
+
+#-------------------------------------------------
+sub updateHttpProxy {
+	print "\tAllowing HTTP Proxy to use ampersands in addition to semicolons in URLs.\n" unless ($quiet);
+	$session->db->write("alter table HttpProxy add column useAmpersand int not null default 0");
+}
+
+#-------------------------------------------------
+sub fixOrphans {
+	print "\tFixing orphans created by 7fixup.\n" unless ($quiet);
+	my $db = $session->db;
+	$db->write("delete from template where assetId='9tBSOV44a9JPS8CcerOvYw'");	
+	$db->write("delete from template where assetId='B1bNjWVtzSjsvGZh9lPz_A'");	
+}
+
 
 #-------------------------------------------------
 sub fixSurvey{
