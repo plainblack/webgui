@@ -7,6 +7,17 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+6.99.4
+--------------------------------------------------------------------
+
+ * A bug was just discovered in the WebGUI::Auth API in that it was
+	missing the editUserSettingsFormSave() method. If you have
+	built your own auth module, then you need to add this method
+	or your auth settings will not save. See WebGUI::Auth::WebGUI
+	for an example of how to do this. If you are not using custom
+	auth, then don't worry about this.
+
+
 6.99.0
 --------------------------------------------------------------------
 

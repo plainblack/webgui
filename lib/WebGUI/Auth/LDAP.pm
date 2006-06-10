@@ -354,6 +354,14 @@ sub editUserSettingsForm {
 }
 
 #-------------------------------------------------------------------
+sub editUserSettingsFormSave {
+	my $self = shift;
+	my $f = $self->session->form;
+	my $s = $self->session->setting;
+	$s->set("ldapConnection", $f->process("ldapConnection","selectBox"));
+}
+
+#-------------------------------------------------------------------
 sub getAccountTemplateId {
     my $self = shift;
 	return ($self->{_connection}->{ldapAccountTemplate} || "PBtmpl0000000000000004");

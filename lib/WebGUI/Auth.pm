@@ -423,6 +423,28 @@ sub editUserFormSave {
 
 #-------------------------------------------------------------------
 
+=head2 editUserSettingsForm ( )
+
+You need to override this method in your auth module. It needs to return a the rows in a form for the stuff you want to be configured through webgui settings.
+
+=cut
+
+sub editUserSettingsForm {
+}
+
+#-------------------------------------------------------------------
+
+=head2 editUserSettingsFormSave ( )
+
+You need to override this method in your auth module. It's the save for the editUserSettingsFormSave method.
+
+=cut
+
+sub editUserSettingsFormSave {
+}
+
+#-------------------------------------------------------------------
+
 =head2 error ( [errorMsg] )
 
 Sets or returns the error currently stored in the object

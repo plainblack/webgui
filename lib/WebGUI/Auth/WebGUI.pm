@@ -332,12 +332,10 @@ sub editUserSettingsForm {
    my $self = shift;
 	my $i18n = WebGUI::International->new($self->session,'AuthWebGUI');
    my $f = WebGUI::HTMLForm->new($self->session);
-   $f->text(
+   $f->integer(
 	         -name=>"webguiPasswordLength",
 			 -value=>$self->session->setting->get("webguiPasswordLength"),
 			 -label=>$i18n->get(15),
-			 -size=>5,
-			 -maxLength=>5,
 			);
    $f->interval(
 	-name=>"webguiPasswordTimeout",
@@ -420,6 +418,29 @@ sub editUserSettingsForm {
 		-label=>$i18n->get("password recovery template")
 		);
    return $f->printRowsOnly;
+}
+
+#-------------------------------------------------------------------
+sub editUserSettingsFormSave {
+	my $self = shift;
+	my $f = $self->session->form;
+	my $s = $self->session->setting;
+	$s->set("webguiPasswordLength", $f->process("webguiPasswordLength","integer"));
+	$s->set("webguiPasswordTimeout", $f->process("webguiPasswordTimeout","interval"));
+	$s->set("webguiExpirePasswordOnCreation", $f->process("webguiExpirePasswordOnCreation","yesNo"));
+	$s->set("webguiSendWelcomeMessage", $f->process("webguiSendWelcomeMessage","yesNo"));
+	$s->set("webguiWelcomeMessage", $f->process("webguiWelcomeMessage","textarea"));
+	$s->set("webguiChangeUsername", $f->process("webguiChangeUsername","yesNo"));
+	$s->set("webguiChangePassword", $f->process("webguiChangePassword","yesNo"));
+	$s->set("webguiPasswordRecovery", $f->process("webguiPasswordRecovery","yesNo"));
+	$s->set("webguiRecoverPasswordEmail", $f->process("webguiRecoverPasswordEmail","textarea"));
+	$s->set("webguiValidateEmail", $f->process("webguiValidateEmail","yesNo"));
+	$s->set("webguiUseCaptcha", $f->process("webguiUseCaptcha","yesNo"));
+	$s->set("webguiAccountTemplate", $f->process("webguiAccountTemplate","template"));
+	$s->set("webguiCreateAccountTemplate", $f->process("webguiCreateAccountTemplate","template"));
+	$s->set("webguiExpiredPasswordTemplate", $f->process("webguiExpiredPasswordTemplate","template"));
+	$s->set("webguiLoginTemplate", $f->process("webguiLoginTemplate","template"));
+	$s->set("webguiPasswordRecoveryTemplate", $f->process("webguiPasswordRecoveryTemplate","template"));
 }
 
 #-------------------------------------------------------------------

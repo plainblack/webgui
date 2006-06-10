@@ -18,6 +18,7 @@
  - fix: No Help link icon in Matrix edit page
  - fix: Problems with In/Out Board (labeling only)
  - fix: Adding HTTP Proxy
+ - fix: op=saveSettings broken
  - fix: EMS Discount Pass Not Applied
  - fix: Commerce checkout confirmation very confusing
 
