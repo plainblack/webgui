@@ -769,8 +769,8 @@ each asset under the tab &quot;Meta&quot; in the asset properties.</p>
                    message => q|Hide from navigation?|
                  },
         '43' => {
-                  lastUpdated => 1031514049,
-                  message => q|Are you certain that you wish to delete this content?|
+                  lastUpdated => 1149960436,
+                  message => q|Are you certain that you wish to delete this content? Note that this change is not versioned and will take place immediately.|
                 },
         '940' => {
                    lastUpdated => 1050438829,

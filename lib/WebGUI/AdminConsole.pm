@@ -450,6 +450,28 @@ sub render {
 	$var{"console.canUse"} = $acParams->{canUse};
 	$var{"console.icon"} = $acParams->{icon};
 	$var{"help.url"} = $self->{_helpUrl};
+	my $working = WebGUI::VersionTag->getWorking($self->session, 1);
+        my $workingId = "";
+        my @tags = ();
+        if ($working) {
+                $workingId = $working->getId;
+                push(@tags, {
+                        url=>$self->session->url->page("op=commitVersionTag;tagId=".$workingId),
+                        title=>$i18n->get("commit my changes","Macro_AdminBar"),
+                        icon=>$self->session->url->extras('adminConsole/small/versionTags.gif')
+                        });
+        }
+        my $rs = $self->session->db->read("select tagId, name, groupToUse from assetVersionTag where isCommitted=0 and isLocked=0 order by name");
+        while (my ($id, $name, $group) = $rs->array) {
+                next unless $self->session->user->isInGroup($group);
+                push(@tags, {
+                        url=>$self->session->url->page("op=setWorkingVersionTag;tagId=".$id),
+                        title=>($id eq $workingId) ?  '* '.$name : $name,
+                        });
+        }
+        if (scalar(@tags)) {
+		$var{versionTags} = \@tags;
+        }
 	if (defined $self->session->asset) {
 		my $importNode = WebGUI::Asset->getImportNode($self->session);
 		my $importNodeLineage = $importNode->get("lineage");

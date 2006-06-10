@@ -22,6 +22,10 @@
  - fix: EMS Discount Pass Not Applied
  - fix: Commerce checkout confirmation very confusing
  - fix: HttpProxy turns ampersands into semicolons
+ - Added a better confirmation message when deleting content.
+ - Added a "commit" option as well as a listing of version tags per the rough
+   edges discussions on IRC.
+ - Added a "close" or "archive" option to replies.
 
 
 6.99.3

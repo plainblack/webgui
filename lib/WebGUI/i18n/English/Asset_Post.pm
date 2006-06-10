@@ -52,6 +52,11 @@ editing an existing Post.|,
 		lastUpdated => 1149829706,
 	},
 
+	'archive.form' => {
+		message => q|A yes/no button to archive the thread when you submit this reply. This is only available to moderators.|,
+		lastUpdated => 1149829706,
+	},
+
 	'sticky.form' => {
 		message => q|A yes/no button to set the thread to be sticky, so that it stays at the top of the forum listing.|,
 		lastUpdated => 1149829706,

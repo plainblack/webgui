@@ -36,6 +36,9 @@ our $HELP = {
 		            'name' => 'isNewThread'
 		          },
 		          {
+		            'name' => 'archive.form'
+		          },
+		          {
 		            'name' => 'sticky.form'
 		          },
 		          {

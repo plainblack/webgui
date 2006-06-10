@@ -140,7 +140,6 @@ sub chopTitle {
 sub commit {
 	my $self = shift;
 	$self->SUPER::commit;
-	$self->getThread->unarchive if ($self->getThread->get("status") eq "archived");
         $self->notifySubscribers;
 	if ($self->isNew) {
 		if ($self->session->setting->get("useKarma") && $self->getThread->getParent->get("karmaPerPost")) {
@@ -673,6 +672,11 @@ sub processPropertiesFromFormPost {
 			$self->getThread->stick if ($self->session->form->process("stick"));
 		}
 	}
+	if ($self->session->form->process("archive") && $self->getThread->getParent->canModerate) {
+		$self->getThread->archive;
+	} elsif ($self->getThread->get("status") eq "archived") {
+		$self->getThread->unarchive;
+	}
 	$self->getThread->subscribe if ($self->session->form->process("subscribe"));
 	delete $self->{_storageLocation};
 	my $storage = $self->getStorageLocation;
@@ -1002,6 +1006,9 @@ sub www_edit {
 		$content = $self->getValue("content");
 		$title = $self->getValue("title");
 	}
+	$var{'archive.form'} = WebGUI::Form::yesNo($self->session, {
+		name=>"archive"
+		});
 	$var{'form.header'} .= WebGUI::Form::hidden($self->session, {name=>"proceed", value=>"showConfirmation"});
 	if ($self->session->form->process("title") || $self->session->form->process("content") || $self->session->form->process("synopsis")) {
 		$var{'preview.title'} = WebGUI::HTML::filter($self->session->form->process("title"),"all");
