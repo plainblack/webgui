@@ -433,8 +433,7 @@ A conditional indicating whether this Post should be opened in a new window.
 <p><b>userDefined1, userDefined2, userDefined3, userDefined4, userDefined5</b><br />
 You can use up to 5 user defined fields. The fields are
 called "userDefined1" through "userDefined5". In the
-Post Form template you can use those variables like
-this to collect data:
+Post Form template you can use variables like this to collect data:
 </p>
 <div class="helpIndent">
 &lt;tmpl_var userDefined1.form&gt; (text)<br />

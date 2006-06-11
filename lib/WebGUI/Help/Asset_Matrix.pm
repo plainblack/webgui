@@ -100,6 +100,7 @@ our $HELP = {
 			},
 		],
 	},
+
 	'listing add/edit' => {
 		title => 'listing add/edit help title',
 		body => 'listing add/edit help body',
@@ -152,6 +153,7 @@ our $HELP = {
 			},
 		],
 	},
+
 	'field add/edit' => {
 		title => 'field add/edit help title',
 		body => 'field add/edit help body',
@@ -194,9 +196,47 @@ our $HELP = {
 			},
 		],
 	},
+
 	'search template' => {
 		title => 'search template help title',
 		body => 'search template help body',
+		variables => [
+		          {
+		            'name' => 'compare.form',
+		          },
+		          {
+		            'name' => 'form.header'
+		          },
+		          {
+		            'name' => 'form.footer'
+		          },
+		          {
+		            'name' => 'form.submit'
+		          },
+		          {
+		            'name' => 'CATEGORY_NAME_loop',
+		            'variables' => [
+		                             {
+		                               'name' => 'name',
+		                               'description' => 'listing name'
+		                             },
+		                             {
+		                               'name' => 'fieldType'
+		                             },
+		                             {
+		                               'name' => 'label',
+		                               'description' => 'listing label'
+		                             },
+		                             {
+		                               'name' => 'description',
+		                               'description' => 'search field description'
+		                             },
+		                             {
+		                               'name' => 'form'
+		                             }
+		                           ],
+		          }
+		],
 		related => [
 			{
 				tag => 'matrix add/edit',
@@ -220,6 +260,7 @@ our $HELP = {
 			},
 		],
 	},
+
 	'compare template' => {
 		title => 'comparison template help title',
 		body => 'comparison template help body',
@@ -312,9 +353,45 @@ our $HELP = {
 			},
 		],
 	},
+
 	'ratings detail template' => {
 		title => 'ratings detail template help title',
 		body => 'ratings detail template help body',
+		variables => [
+		          {
+		            'name' => 'rating_loop',
+		            'variables' => [
+		                             {
+		                               'name' => 'category',
+		                             },
+		                             {
+		                               'name' => 'detail_loop',
+		                               'variables' => [
+		                                                {
+		                                                  'name' => 'url',
+		                                                  'description' => 'tmplVar detail url'
+		                                                },
+		                                                {
+		                                                  'name' => 'mean',
+		                                                  'description' => 'detail mean'
+		                                                },
+		                                                {
+		                                                  'name' => 'median',
+		                                                  'description' => 'detail median'
+		                                                },
+		                                                {
+		                                                  'name' => 'count',
+		                                                  'description' => 'detail count'
+		                                                },
+		                                                {
+		                                                  'name' => 'name',
+		                                                  'description' => 'listing name'
+		                                                }
+		                                              ]
+		                             }
+		                           ]
+		          }
+		],
 		related => [
 			{
 				tag => 'matrix add/edit',
@@ -338,6 +415,7 @@ our $HELP = {
 			},
 		],
 	},
+
 	'main template' => {
 		title => 'matrix template help title',
 		body => 'matrix template help body',
@@ -517,6 +595,7 @@ our $HELP = {
 			},
 		],
 	},
+
 	'listing detail template' => {
 		title => 'detail template help title',
 		body => 'detail template help body',
@@ -616,7 +695,7 @@ our $HELP = {
 		                             },
 		                             {
 		                               'name' => 'description',
-		                               'description' => 'listing description'
+		                               'description' => 'category listing description'
 		                             },
 		                             {
 		                               'name' => 'category',

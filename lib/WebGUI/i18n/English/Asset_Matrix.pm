@@ -270,7 +270,7 @@ our $I18N = {
 		lastUpdated => 1149784175,
 	},
 
-	'listing description' => {
+	'category listing description' => {
 		message => q|The description that tells the user what this field represents.|,
 		lastUpdated => 1149784175,
 	},
@@ -421,12 +421,12 @@ our $I18N = {
 		lastUpdated => 1149795214,
 	},
 
-	'median' => {
+	'tmplVar worst.median' => {
 		message => q|The median (or middle) rating of the worst listing in this category.|,
 		lastUpdated => 1149795214,
 	},
 
-	'count' => {
+	'tmplVar worst.count' => {
 		message => q|The sum of all the votes of the worst listing in this category.|,
 		lastUpdated => 1149795214,
 	},
@@ -521,117 +521,86 @@ our $I18N = {
                 message => q|Matrix Ratings Detail Template|
         },
 
+	'rating_loop' => {
+		message => q|This loop contains a list of the categories in this matrix.|,
+		lastUpdated => 1149996259,
+	},
+
+	'detail_loop' => {
+		message => q|A loop containing a list of listings who have had at least 10 ratings votes and are listed in order by average rating from highest to lowest.|,
+		lastUpdated => 1149996259,
+	},
+
+	'tmplVar detail url' => {
+		message => q|The URL to the detail page for this listing.|,
+		lastUpdated => 1149996259,
+	},
+
+	'detail mean' => {
+		message => q|This listing's mean (or average) rating.|,
+		lastUpdated => 1149996259,
+	},
+
+	'detail median' => {
+		message => q|This listing's median (or middle) rating.|,
+		lastUpdated => 1149996259,
+	},
+
+	'detail count' => {
+		message => q|The total score for this listing.|,
+		lastUpdated => 1149996259,
+	},
+
+	'listing name' => {
+		message => q|The name of this listing.|,
+		lastUpdated => 1149996259,
+	},
+
         'ratings detail template help body' => {
-                lastUpdated => 0,
+                lastUpdated => 1149997187,
                 message => q|<p>The following variables are available in the ratings detail template.</p>
-
-		<p>
-		<b>rating_loop</b><br />
-		This loop contains a list of the categories in this matrix.
-		</p>
-
-		<div class="helpIndent">
-
-		<p>
-		<b>category</b><br />
-		The name of the current category.
-		</p>
-
-		<p>
-		<b>detail_loop</b><br />
-		A loop containing a list of listings who have had at least 10 ratings votes and are listed in order by average rating from highest to lowest.
-		</p>
-
-		<div class="helpIndent">
-		<p>
-		<b>url</b><br />
-		The URL to the detail page for this listing.
-		</p>
-
-		<p>
-		<b>mean</b><br />
-
-		This listing's mean (or average) rating.
-		</p>
-
-		<p>
-		<b>median</b><br />
-		This listing's median (or middle) rating.
-		</p>
-
-		<p>
-		<b>count</b><br />
-
-		The total score for this listing.
-		</p>
-
-		<p>
-		<b>name</b><br />
-		The name of this listing.
-		</p>
-		</div>
-		</div> |
+|
         },
 
+	'form.header' => {
+		message => q|The required header component of the search form.|,
+		lastUpdated => 1149996685,
+	},
+
+	'form.footer' => {
+		message => q|The required footer component of the search form.|,
+		lastUpdated => 1149996685,
+	},
+
+	'form.submit' => {
+		message => q|The required button to submit data for the search form.|,
+		lastUpdated => 1149996685,
+	},
+
+	'fieldType' => {
+		message => q|The type of field specified for this matrix field.|,
+		lastUpdated => 1149996685,
+	},
+
+	'listing label' => {
+		message => q|The label given to this field that describes what the field represents.|,
+		lastUpdated => 1149996685,
+	},
+
+	'search field description' => {
+		message => q|A description of the field that gives more detail about the field and is used in the hover over tool tips.|,
+		lastUpdated => 1149996685,
+	},
+
+	'form' => {
+		message => q|The form element representing this field.|,
+		lastUpdated => 1149996685,
+	},
+
         'search template help body' => {
-                lastUpdated => 0,
+                lastUpdated => 1149997201,
                 message => q|<p>The following variables are available in the matrix search template.</p>
-		
-		<p>
-		<b>compare.form</b><br />
-		The checkbox form that lists all of the listings in this matrix.
-		</p>
-
-		<p>
-		<b>form.header</b><br />
-
-		The required header component of the search form.
-		</p>
-
-		<p>
-		<b>form.footer</b><br />
-		The required footer component of the search form.
-		</p>
-
-		<p>
-		<b>form.submit</b><br />
-
-		The default submit button for the search form.
-		</p>
-
-		<p>
-		<b><i>category</i>_loop</b><br />
-		A loop is created for each category in this matrix. The category name is "<i>category</i>_loop" where category is the name of the category with spaces replaced with hyphens. So if you had a category called "Bells And Whistles" the loop would be called "bells-and-whistles_loop".
-		</p>
-
-		<div class="helpIndent">
-
-		<p>
-		<b>name</b><br />
-		The name of the listing.
-		</p>
-
-		<p>
-		<b>fieldType</b><br />
-		The type of field specified for this matrix field.
-		</p>
-
-		<p>
-		<b>label</b><br />
-		The label given to this field that describes what the field represents.
-		</p>
-
-		<p>
-		<b>description</b><br />
-		A description of the field that gives more detail about the field and is used in the hover over tool tips.
-		</p>
-
-		<p>
-		<b>form</b><br />
-		The form element representing this field.
-		</p>
-
-		</div>|
+|
         },
 
         'search template help title' => {
