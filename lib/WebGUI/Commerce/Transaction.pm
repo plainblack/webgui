@@ -42,25 +42,25 @@ sub addItem {
 	$quantity = shift;
 	$lineItemAmount = shift;
 	
-	$self->session->db->write("insert into transactionItem ".
-		"(transactionId, itemName, amount, quantity, itemId, itemType) values ".
-		"(".$self->session->db->quote($self->{_transactionId}).",".$self->session->db->quote($item->name).",".$self->session->db->quote(
-			($lineItemAmount ne "")
-				?($lineItemAmount)
-				:($item->price)
-			).",".$self->session->db->quote(
-				($lineItemAmount ne "")
-				?('1')
-				:($quantity)
-			).",".
-		$self->session->db->quote($item->id).",".$self->session->db->quote($item->type).")");
+	# If we have a lineItemAmount specified, we have to override price*quantity and use the value passed in instead
+	# We will however maintain the quantity passed and tell the user that the prices displayed are always line item totals.
+	#
+	# Again, prices are not per item but per line item.  Qty 3 Price 10.00 indicates 3 items for a total of 10.00, not 3 items at 10.00 each
+	# It has to be this way to handle discounted items where all items in the quantity are not discounted.  For example, 2 items at 5.00 each and the third item is free.
+	#
+	# Hopefully the new commerce system will handle this better. (Maybe making discounted items a different item all together with their own line item to retain the detailed information)
+	#
+	my $totalPrice = ($lineItemAmount eq "") ? $item->price * $quantity : $lineItemAmount;
+	$self->session->db->write("insert into transactionItem (transactionId, itemName, amount, quantity, itemId, itemType) values (?,?,?,?,?,?)",
+			[$self->{_transactionId}, $item->name, $totalPrice, $quantity, $item->id, $item->type]);
+
 	# Adjust total amount in the transaction table.
-	$self->session->db->write("update transaction set amount=amount+".$self->session->db->quote(($lineItemAmount ne "") ? ($lineItemAmount) : ($item->price * $quantity))." where transactionId=".$self->session->db->quote($self->{_transactionId}));
-	$self->{_properties}{amount} += ($item->price * $quantity);
+	$self->session->db->write("update transaction set amount=amount+? where transactionId=?",[$totalPrice,$self->{_transactionId}]);
+	$self->{_properties}{amount} += $totalPrice;
 	push @{$self->{_items}}, {
 		transactionId	=> $self->{_transactionId},
 		itemName	=> $item->name,
-		amount		=> $item->price,
+		amount		=> $totalPrice,
 		quantity	=> $quantity,
 		itemId		=> $item->id,
 		itemType	=> $item->type,

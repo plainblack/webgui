@@ -33,7 +33,7 @@
  - fix: Alternate Apache Port breaks "Commit with Approval"
  - Rearranged the "Getting Started" page in the default content to make it
    easier to follow for noobs.
-
+ - fix: EMS Transactions Dropping Free Events
 
 6.99.3
  - Someone removed the status from the submission templates. That has been
