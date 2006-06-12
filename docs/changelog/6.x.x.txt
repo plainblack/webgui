@@ -37,7 +37,7 @@
  - fix: Edit Style returns wrong page
  - fix: Can not make Shortcut for CollaborationSystem
  - fix: EMS Transactions Dropping Free Events
-
+ - fix: EMS Prerequisite Cache Stale
 
 6.99.3
  - Someone removed the status from the submission templates. That has been

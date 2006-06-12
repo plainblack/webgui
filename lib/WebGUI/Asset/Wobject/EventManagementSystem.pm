@@ -3251,6 +3251,14 @@ sub www_editPrereqSetSave {
 	foreach (@newRequiredEvents) {
 		$self->session->db->write("insert into EventManagementSystem_prerequisiteEvents values (?,?)",[$psid,$_]);
 	}
+	
+	# Rebuild the EMS Cache
+	WebGUI::Workflow::Instance->create($self->session, {
+			workflowId=>'EMSworkflow00000000001',
+			className=>"none",
+			priority=>1
+	});
+	
 	return $self->www_managePrereqSets();
 }
 
