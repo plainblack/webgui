@@ -26,6 +26,13 @@
  - Added a "commit" option as well as a listing of version tags per the rough
    edges discussions on IRC.
  - Added a "close" or "archive" option to replies.
+ - fix: Uncommitted, new Assets BREAK Navigations
+ - fix: I get on the chewed page
+ - fix: Bug in updateMetaData function in AssetMetaData.pm
+ - fix: Problems with In/Out Board
+ - fix: Alternate Apache Port breaks "Commit with Approval"
+ - Rearranged the "Getting Started" page in the default content to make it
+   easier to follow for noobs.
 
 
 6.99.3

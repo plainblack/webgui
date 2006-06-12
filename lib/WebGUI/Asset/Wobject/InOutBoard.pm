@@ -304,37 +304,32 @@ sub www_edit {
 #-------------------------------------------------------------------
 sub www_selectDelegates {
 	my $self = shift;
-	
-	#Uncomment the sql query below (lines 286 - 294) to show all users of the system in the delegate select list
-	#my $sql = sprintf "select users.username, 
-#users.userId, 
-#a.fieldData as firstName,
-#b.fieldData as lastName
-#from users
-#left join userProfileData a on users.userId=a.userId and a.fieldName='firstName'
-#left join userProfileData b on users.userId=b.userId and b.fieldName='lastName'
-#where users.userId<>'1' and users.status='Active' and users.userId<>%s
-#group by userId", $self->session->db->quote($self->session->user->userId);
-    
-	#Comment the sql query below (lines 297 - 307) to show all users of the system in the delegate select list
-    my $sql = sprintf "select users.username, 
-users.userId, 
-a.fieldData as firstName,
-b.fieldData as lastName
-from users, InOutBoard, groupings
-left join userProfileData a on users.userId=a.userId and a.fieldName='firstName'
-left join userProfileData b on users.userId=b.userId and b.fieldName='lastName'
-left join userProfileData c on users.userId=c.userId and c.fieldName='department'
-left join InOutBoard_status on users.userId=InOutBoard_status.userId and InOutBoard_status.assetId=%s
-where users.userId<>'1' and groupings.groupId=InOutBoard.inOutGroup and users.status='Active' and users.userId <> %s and groupings.userId=users.userId and InOutBoard.inOutGroup=%s
-group by userId", $self->session->db->quote($self->getId), $self->session->db->quote($self->session->user->userId), $self->session->db->quote($self->getValue("inOutGroup")) ;
 	my %userNames = ();
-	my $sth = $self->session->db->read($sql);
+	my $sth = $self->session->db->read(
+		"select 
+			users.username, 
+			users.userId, 
+			a.fieldData as firstName,
+			b.fieldData as lastName
+		from users
+		left join groupings on users.userId=groupings.userId
+		left join InOutBoard on groupings.groupId=InOutBoard.inOutGroup
+		left join userProfileData a on users.userId=a.userId and a.fieldName='firstName'
+		left join userProfileData b on users.userId=b.userId and b.fieldName='lastName'
+		left join userProfileData c on users.userId=c.userId and c.fieldName='department'
+		left join InOutBoard_status on users.userId=InOutBoard_status.userId and InOutBoard_status.assetId=?
+		where
+			users.userId<>'1'
+			and users.status='Active'
+			and users.userId <> ?
+			and InOutBoard.inOutGroup=?
+		group by userId
+		",[$self->getId, $self->session->user->userId, $self->getValue("inOutGroup")]);
 	while (my $data = $sth->hashRef) {
 		$userNames{ $data->{userId} } = _defineUsername($data);
 	}
 	$sth->finish;
-	$sql = sprintf "select delegateUserId from InOutBoard_delegates where userId=%s and assetId=%s",
+	my $sql = sprintf "select delegateUserId from InOutBoard_delegates where userId=%s and assetId=%s",
 	                $self->session->db->quote($self->session->user->userId), $self->session->db->quote($self->getId);
 	my $delegates = $self->session->db->buildArrayRef($sql);
 	my $i18n = WebGUI::International->new($self->session,"Asset_InOutBoard");

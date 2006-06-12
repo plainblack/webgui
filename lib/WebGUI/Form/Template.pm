@@ -118,7 +118,7 @@ sub toHtmlWithWrapper {
 	my $template = WebGUI::Asset::Template->new($self->session,$self->get('value'));
         if (defined $template && $template->canEdit) {
                 my $returnUrl;
-                if (defined $self->session->asset && ref $self->session->asset eq "WebGUI::Asset::Template") {
+                if (defined $self->session->asset && ref $self->session->asset ne "WebGUI::Asset::Template") {
                         $returnUrl = ";proceed=goBackToPage;returnUrl=".$self->session->url->escape($self->session->asset->getUrl);
                 }
                 my $buttons = $self->session->icon->edit("func=edit".$returnUrl,$template->get("url"));

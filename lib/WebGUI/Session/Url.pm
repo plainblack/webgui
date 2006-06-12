@@ -240,7 +240,9 @@ sub getSiteURL {
         	if ($self->session->env->get("HTTPS") eq "on") {
                	 	$proto = "https://";
         	}
-        	$self->{_siteUrl} = $proto.$site;
+		my $port = "";
+		$port = ":".$self->session->config->get("webServerPort") if ($self->session->config->get("webServerPort"));
+        	$self->{_siteUrl} = $proto.$site.$port;
 	}
 	return $self->{_siteUrl};
 }

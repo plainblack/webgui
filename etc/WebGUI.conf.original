@@ -45,6 +45,11 @@
 
 # "passthruUrls" : ["/icons", "/documentation/pdf", "/my-custom-application", "/server-status", "/perl-status"],
 
+# If you are not running your web server on the standard
+# port (80) then use this setting to specify that.
+
+#"webServerPort" : 80,
+
 # What kind of cache do you wish to use? Available types are 
 # WebGUI::Cache::FileCache, WebGUI::Cache::Database, and
 # WebGUI::Cache::Memcached. We highly recommend the file

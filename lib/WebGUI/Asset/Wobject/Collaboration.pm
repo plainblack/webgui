@@ -205,7 +205,7 @@ sub canModerate {
 #-------------------------------------------------------------------
 sub canPost {
 	my $self = shift;
-	return $self->session->user->isInGroup($self->get("postGroupId")) || $self->canEdit;
+	return ($self->get("status") eq "approved" && ($self->session->user->isInGroup($self->get("postGroupId")) || $self->canEdit));
 }
 
 

@@ -102,13 +102,13 @@ sub getMetaDataFields {
 
 #-------------------------------------------------------------------
 
-=head2 updateMetaData ( fieldName, value )
+=head2 updateMetaData ( fieldId, value )
 
 Updates the value of a metadata field for this asset.
 
-=head3 fieldName
+=head3 fieldId
 
-The name of the field to update.
+The unique Id of the field to update.
 
 =head3 value
 
@@ -118,16 +118,17 @@ The value to set this field to. Leave blank to unset it.
 
 sub updateMetaData {
 	my $self = shift;
-	my $fieldName = shift;
+	my $fieldId = shift;
 	my $value = shift;
-	my ($exists) = $self->session->db->quickArray("select count(*) from metaData_values where assetId = ".$self->session->db->quote($self->getId)." and fieldId = ".$self->session->db->quote($fieldName));
+	my $db = $self->session->db;
+	my ($exists) = $db->quickArray("select count(*) from metaData_values where assetId = ? and fieldId = ?",[$self->getId, $fieldId]);
         if (!$exists && $value ne "") {
-        	$self->session->db->write("insert into metaData_values (fieldId, assetId) values (".$self->session->db->quote($fieldName).",".$self->session->db->quote($self->getId).")");
+        	$db->write("insert into metaData_values (fieldId, assetId) values (?,?)",[$fieldId, $self->getId]);
         }
         if ($value  eq "") { # Keep it clean
-                $self->session->db->write("delete from metaData_values where assetId = ".$self->session->db->quote($self->getId)." and fieldId = ".$self->session->db->quote($fieldName));
+                $db->write("delete from metaData_values where assetId = ? and fieldId = ?",[$self->getId, $fieldId]);
         } else {
-                $self->session->db->write("update metaData_values set value = ".$self->session->db->quote($value)." where assetId = ".$self->session->db->quote($self->getId)." and fieldId=".$self->session->db->quote($fieldName));
+                $db->write("update metaData_values set value = ? where assetId = ? and fieldId=?", [$value, $self->getId, $fieldId]);
         }
 }
 
