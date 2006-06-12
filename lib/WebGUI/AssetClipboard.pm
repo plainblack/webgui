@@ -213,8 +213,7 @@ sub www_createShortcut {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(4));	
 	my $isOnDashboard = ref $self->getParent eq 'WebGUI::Asset::Wobject::Dashboard';
-	my $target = $isOnDashboard ? $self->getParent : $self;
-	my $child = $target->addChild({
+	my $child = $self->getParent->addChild({
 		className=>'WebGUI::Asset::Shortcut',
 		shortcutToAssetId=>$self->getId,
 		title=>$self->getTitle,
@@ -228,7 +227,7 @@ sub www_createShortcut {
 		templateId=>'PBtmpl0000000000000140'
 	});
 	if ($isOnDashboard) {
-		return $target->www_view;
+		return $self->getParent->www_view;
 	} else {
 		$child->cut;
 		return $self->getContainer->www_manageAssets if ($self->session->form->process("proceed") eq "manageAssets");
