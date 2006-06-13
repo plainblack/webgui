@@ -215,238 +215,294 @@ Defaults to mixed.|,
                 lastUpdated => 1111253044,
         },
 
+	'userId' => {
+		message => q|The User ID of the owner of the Post.|,
+		lastUpdated => 1150167057,
+	},
+
+	'user.isPoster' => {
+		message => q|A conditional that is true if the current user is the owner of this Post.|,
+		lastUpdated => 1150167057,
+	},
+
+	'avatar.url' => {
+		message => q|A URL to the avatar for the owner of the Post, if avatars are enabled in the parent
+Collaboration System and the user has an avatar.|,
+		lastUpdated => 1150167057,
+	},
+
+	'userProfile.url' => {
+		message => q|A URL to the profile of the owner of the Post.|,
+		lastUpdated => 1150167057,
+	},
+
+	'dateSubmitted.human' => {
+		message => q|The date that the post was sumbitted, in a readable format.|,
+		lastUpdated => 1150167057,
+	},
+
+	'dateUpdated.human' => {
+		message => q|The date that the post was last updated, in a readable format.|,
+		lastUpdated => 1150167057,
+	},
+
+	'title.short' => {
+		message => q|The title of the Post, limited to 30 characters. |,
+		lastUpdated => 1150167057,
+	},
+
+	'content' => {
+		message => q|The content of the post, if a thread containing the Post exists.|,
+		lastUpdated => 1150167057,
+	},
+
+	'user.canEdit' => {
+		message => q|A conditional that is true if the user is adding a new Post, as opposed to
+editing an existing Post, and a thread containing the Post exists.|,
+		lastUpdated => 1150167057,
+	},
+
+	'delete.url' => {
+		message => q|A URL to delete this Post.|,
+		lastUpdated => 1150167057,
+	},
+
+	'edit.url' => {
+		message => q|A URL to edit this Post.|,
+		lastUpdated => 1150167057,
+	},
+
+	'status' => {
+		message => q|The status of this Post: "Approved", "Pending" or "Archived".|,
+		lastUpdated => 1150167057,
+	},
+
+	'reply.url' => {
+		message => q|The URL to reply to this Post without quoting it.|,
+		lastUpdated => 1150167057,
+	},
+
+	'reply.withQuote.url' => {
+		message => q|The URL to initiate a quoted reply to this Post.|,
+		lastUpdated => 1150167057,
+	},
+
+	'url' => {
+		message => q|The URL for this Post.|,
+		lastUpdated => 1150167057,
+	},
+
+	'rating.value' => {
+		message => q|The current rating for this Post.|,
+		lastUpdated => 1150167057,
+	},
+
+	'rate.url.thumbsUp' => {
+		message => q|A positive rating.|,
+		lastUpdated => 1150167057,
+	},
+
+	'rate.url.thumbsDown' => {
+		message => q|A negative rating.|,
+		lastUpdated => 1150167057,
+	},
+
+	'hasRated' => {
+		message => q|A conditional that is true if the user has already rated this Post.|,
+		lastUpdated => 1150167057,
+	},
+
+	'image.url' => {
+		message => q|The URL to the first image attached to the Post.|,
+		lastUpdated => 1150167057,
+	},
+
+	'image.thumbnail' => {
+		message => q|A thumbnail for the image attached to the Post.|,
+		lastUpdated => 1150167057,
+	},
+
+	'attachment.url' => {
+		message => q|The URL to download the first attachment attached to the Post.|,
+		lastUpdated => 1150167057,
+	},
+
+	'attachment.icon' => {
+		message => q|An icon showing the file type of this attachment.|,
+		lastUpdated => 1150167057,
+	},
+
+	'attachment.name' => {
+		message => q|The name of the first attachment found on the Post.|,
+		lastUpdated => 1150167057,
+	},
+
+	'attachment_loop' => {
+		message => q|A loop containing all file and image attachments to this Post.|,
+		lastUpdated => 1150167057,
+	},
+
+	'url' => {
+		message => q|The URL to download this attachment.|,
+		lastUpdated => 1150167057,
+	},
+
+	'icon' => {
+		message => q|The icon representing the file type of this attachment.|,
+		lastUpdated => 1150167057,
+	},
+
+	'filename' => {
+		message => q|The name of this attachment.|,
+		lastUpdated => 1150167057,
+	},
+
+	'thumbnail' => {
+		message => q|A thumbnail of this attachment, if applicable.|,
+		lastUpdated => 1150167057,
+	},
+
+	'isImage' => {
+		message => q|A conditional indicating whether this attachment is an image.|,
+		lastUpdated => 1150167057,
+	},
+
+	'storageId' => {
+		message => q|The Asset ID of the storage node for the Post, where the attachments are kept.|,
+		lastUpdated => 1150167057,
+	},
+
+	'threadId' => {
+		message => q|The ID of the thread that contains this Post.|,
+		lastUpdated => 1150167057,
+	},
+
+	'dateSubmitted' => {
+		message => q|The date the Post was submitted, in epoch format.|,
+		lastUpdated => 1150167057,
+	},
+
+	'dateUpdated' => {
+		message => q|The date the Post was last updated, in epoch format.|,
+		lastUpdated => 1150167057,
+	},
+
+	'username' => {
+		message => q|The name of the user who last updated or submitted the Post.|,
+		lastUpdated => 1150167057,
+	},
+
+	'rating' => {
+		message => q|Another name for <b>rating.value</b>|,
+		lastUpdated => 1150167057,
+	},
+
+	'views' => {
+		message => q|The number of times that this post has been viewed.|,
+		lastUpdated => 1150167057,
+	},
+
+	'contentType' => {
+		message => q|The type of content in the post, typically "code", "text", "HTML", "mixed".|,
+		lastUpdated => 1150167057,
+	},
+
+	'content' => {
+		message => q|The content, or body, of the Post.|,
+		lastUpdated => 1150167057,
+	},
+
+	'title' => {
+		message => q|The title of the Post.|,
+		lastUpdated => 1150167057,
+	},
+
+	'menuTitle' => {
+		message => q|The menu title of the Post, often used in navigation.|,
+		lastUpdated => 1150167057,
+	},
+
+	'synopsis' => {
+		message => q|The synopsis of the Post.|,
+		lastUpdated => 1150167057,
+	},
+
+	'extraHeadTags' => {
+		message => q|Extra tags that the user requested by added to the HTML header.|,
+		lastUpdated => 1150167057,
+	},
+
+	'groupIdEdit' => {
+		message => q|The ID of the group with permission to edit this Post.|,
+		lastUpdated => 1150167057,
+	},
+
+	'groupIdView' => {
+		message => q|The ID of the group with permission to view this Post.|,
+		lastUpdated => 1150167057,
+	},
+
+	'ownerUserId' => {
+		message => q|An alias for <b>userId</b>.|,
+		lastUpdated => 1150167057,
+	},
+
+	'assetSize' => {
+		message => q|The formatted size of this Post.|,
+		lastUpdated => 1150167057,
+	},
+
+	'isPackage' => {
+		message => q|A conditional indicating whether this Post is a package.|,
+		lastUpdated => 1150167057,
+	},
+
+	'isPrototype' => {
+		message => q|A conditional indicating whether this Post is a Content Prototype.|,
+		lastUpdated => 1150167057,
+	},
+
+	'isHidden' => {
+		message => q|A conditional indicating whether this Post should be hidden from navigation.|,
+		lastUpdated => 1150167057,
+	},
+
+	'newWindow' => {
+		message => q|A conditional indicating whether this Post should be opened in a new window.|,
+		lastUpdated => 1150167057,
+	},
+
+	'userDefined1' => {
+		message => q|The value contained in the first user defined variable.|,
+		lastUpdated => 1150167057,
+	},
+
+	'userDefined2' => {
+		message => q|The value contained in the second user defined variable.|,
+		lastUpdated => 1150167057,
+	},
+
+	'userDefined3' => {
+		message => q|The value contained in the first user defined variable.|,
+		lastUpdated => 1150167057,
+	},
+
+	'userDefined4' => {
+		message => q|The value contained in the fourth user defined variable.|,
+		lastUpdated => 1150167057,
+	},
+
+	'userDefined5' => {
+		message => q|The value contained in the fifth user defined variable.|,
+		lastUpdated => 1150167057,
+	},
+
 	'post template variables body' => {
 		message => q|<p>The following variables are available in all Post templates.  Internationalized labels
 		for the action URLs (reply, delete, etc.)  are provided in the set of Collaboration Template labels.
 </p>
-
-<p><b>userId</b><br />
-The User ID of the owner of the Post.
-</p>
-
-<p><b>user.isPoster</b><br />
-A conditional that is true if the current user is the owner of this Post.
-</p>
-
-<p><b>avatar.url</b><br />
-A URL to the avatar for the owner of the Post, if avatars are enabled in the parent
-Collaboration System and the user has an avatar.
-</p>
-
-<p><b>userProfile.url</b><br />
-A URL to the profile of the owner of the Post.
-</p>
-
-<p><b>dateSubmitted.human</b><br />
-The date that the post was sumbitted, in a readable format.
-</p>
-
-<p><b>dateUpdated.human</b><br />
-The date that the post was last updated, in a readable format.
-</p>
-
-<p><b>title.short</b><br />
-The title of the Post, limited to 30 characters. 
-</p>
-
-<p><b>content</b><br />
-The content of the post, if a thread containing the Post exists.
-</p>
-
-<p><b>user.canEdit</b><br />
-A conditional that is true if the user is adding a new Post, as opposed to
-editing an existing Post, and a thread containing the Post exists.
-</p>
-
-<p><b>delete.url</b><br />
-A URL to delete this Post.
-</p>
-
-<p><b>edit.url</b><br />
-A URL to edit this Post.
-</p>
-
-<p><b>status</b><br />
-The status of this Post: "Approved", "Pending" or "Archived".
-</p>
-
-<p><b>reply.url</b><br />
-The URL to reply to this Post without quoting it.
-</p>
-
-<p><b>reply.withQuote.url</b><br />
-The URL to initiate a quoted reply to this Post.
-</p>
-
-<p><b>url</b><br />
-The URL for this Post.
-</p>
-
-<p><b>rating.value</b><br />
-The current rating for this Post.
-</p>
-
-<p><b>rate.url.thumbsUp</b><br />
-A positive rating.
-</p>
-
-<p><b>rate.url.thumbsDown</b><br />
-A negative rating.
-</p>
-
-<p><b>hasRated</b><br />
-A conditional that is true if the user has already rated this Post.
-</p>
-
-<p><b>image.url</b><br />
-The URL to the first image attached to the Post.
-</p>
-
-<p><b>image.thumbnail</b><br />
-A thumbnail for the image attached to the Post.
-</p>
-
-<p><b>attachment.url</b><br />
-The URL to download the first attachment attached to the Post.
-</p>
-
-<p><b>attachment.icon</b><br />
-An icon showing the file type of this attachment.
-</p>
-
-<p><b>attachment.name</b><br />
-The name of the first attachment found on the Post.
-</p>
-
-<p><b>attachment_loop</b><br />
-A loop containing all file and image attachments to this Post.
-</p>
-
-<div class="helpIndent">
-
-<p><b>url</b><br />
-The URL to download this attachment.
-</p>
-
-<p><b>icon</b><br />
-The icon representing the file type of this attachment.
-</p>
-
-<p><b>filename</b><br />
-The name of this attachment.
-</p>
-
-<p><b>thumbnail</b><br />
-A thumbnail of this attachment, if applicable.
-</p>
-
-<p><b>isImage</b><br />
-A conditional indicating whether this attachment is an image.
-</p>
-
-</div>
-
-<p><b>storageId</b><br />
-The Asset ID of the storage node for the Post, where the attachments are kept.
-</p>
-
-<p><b>threadId</b><br />
-The ID of the thread that contains this Post.
-</p>
-
-<p><b>dateSubmitted</b><br />
-The date the Post was submitted, in epoch format.
-</p>
-
-<p><b>dateUpdated</b><br />
-The date the Post was last updated, in epoch format.
-</p>
-
-<p><b>username</b><br />
-The name of the user who last updated or submitted the Post.
-</p>
-
-<p><b>rating</b><br />
-Another name for <b>rating.value</b>
-</p>
-
-<p><b>views</b><br />
-The number of times that this post has been viewed.
-</p>
-
-<p><b>contentType</b><br />
-The type of content in the post, typically "code", "text", "HTML", "mixed".
-</p>
-
-<p><b>content</b><br />
-The content, or body, of the Post.
-</p>
-
-<p><b>title</b><br />
-The title of the Post.
-</p>
-
-<p><b>menuTitle</b><br />
-The menu title of the Post, often used in navigation.
-</p>
-
-<p><b>synopsis</b><br />
-The synopsis of the Post.
-</p>
-
-<p><b>extraHeadTags</b><br />
-Extra tags that the user requested by added to the HTML header.
-</p>
-
-<p><b>groupIdEdit</b><br />
-The ID of the group with permission to edit this Post.
-</p>
-
-<p><b>groupIdView</b><br />
-The ID of the group with permission to view this Post.
-</p>
-
-<p><b>ownerUserId</b><br />
-An alias for <b>userId</b>.
-</p>
-
-<p><b>assetSize</b><br />
-The formatted size of this Post.
-</p>
-
-<p><b>isPackage</b><br />
-A conditional indicating whether this Post is a package.
-</p>
-
-<p><b>isPrototype</b><br />
-A conditional indicating whether this Post is a Content Prototype.
-</p>
-
-<p><b>isHidden</b><br />
-A conditional indicating whether this Post should be hidden from navigation.
-</p>
-
-<p><b>newWindow</b><br />
-A conditional indicating whether this Post should be opened in a new window.
-</p>
-
-<p><b>userDefined1, userDefined2, userDefined3, userDefined4, userDefined5</b><br />
-You can use up to 5 user defined fields. The fields are
-called "userDefined1" through "userDefined5". In the
-Post Form template you can use variables like this to collect data:
-</p>
-<div class="helpIndent">
-&lt;tmpl_var userDefined1.form&gt; (text)<br />
-&lt;tmpl_var userDefined1.form.yesNo&gt; (yes / no) <br />
-&lt;tmpl_var userDefined1.form.textarea&gt; (textarea) <br />
-&lt;tmpl_var userDefined1.form.htmlarea&gt; (rich edit box) <br />
-&lt;tmpl_var userDefined1.form.float&gt; (float field) <br />
-</div>
-<p>Then in the Thread and Main CS templates you can call
-back the data with a simple &lt;tmpl_var userDefined1&gt;.</p>
-
 |,
-		lastUpdated => 1146785175,
+		lastUpdated => 1150167094,
 	},
 
 	'post received' => {

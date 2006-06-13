@@ -140,6 +140,178 @@ our $HELP = {
 	'post template variables' => {
 		title => 'post template variables title',
 		body => 'post template variables body',
+		variables => [
+		          {
+		            'name' => 'userId'
+		          },
+		          {
+		            'name' => 'user.isPoster'
+		          },
+		          {
+		            'name' => 'avatar.url'
+		          },
+		          {
+		            'name' => 'userProfile.url'
+		          },
+		          {
+		            'name' => 'dateSubmitted.human'
+		          },
+		          {
+		            'name' => 'dateUpdated.human'
+		          },
+		          {
+		            'name' => 'title.short'
+		          },
+		          {
+		            'name' => 'content'
+		          },
+		          {
+		            'name' => 'user.canEdit'
+		          },
+		          {
+		            'name' => 'delete.url'
+		          },
+		          {
+		            'name' => 'edit.url'
+		          },
+		          {
+		            'name' => 'status'
+		          },
+		          {
+		            'name' => 'reply.url'
+		          },
+		          {
+		            'name' => 'reply.withQuote.url'
+		          },
+		          {
+		            'name' => 'url'
+		          },
+		          {
+		            'name' => 'rating.value'
+		          },
+		          {
+		            'name' => 'rate.url.thumbsUp'
+		          },
+		          {
+		            'name' => 'rate.url.thumbsDown'
+		          },
+		          {
+		            'name' => 'hasRated'
+		          },
+		          {
+		            'name' => 'image.url'
+		          },
+		          {
+		            'name' => 'image.thumbnail'
+		          },
+		          {
+		            'name' => 'attachment.url'
+		          },
+		          {
+		            'name' => 'attachment.icon'
+		          },
+		          {
+		            'name' => 'attachment.name'
+		          },
+		          {
+		            'name' => 'attachment_loop',
+		            'variables' => [
+		                             {
+		                               'name' => 'url'
+		                             },
+		                             {
+		                               'name' => 'icon'
+		                             },
+		                             {
+		                               'name' => 'filename'
+		                             },
+		                             {
+		                               'name' => 'thumbnail'
+		                             },
+		                             {
+		                               'name' => 'isImage'
+		                             }
+		                           ]
+		          },
+		          {
+		            'name' => 'storageId'
+		          },
+		          {
+		            'name' => 'threadId'
+		          },
+		          {
+		            'name' => 'dateSubmitted'
+		          },
+		          {
+		            'name' => 'dateUpdated'
+		          },
+		          {
+		            'name' => 'username'
+		          },
+		          {
+		            'name' => 'rating'
+		          },
+		          {
+		            'name' => 'views'
+		          },
+		          {
+		            'name' => 'contentType'
+		          },
+		          {
+		            'name' => 'content'
+		          },
+		          {
+		            'name' => 'title'
+		          },
+		          {
+		            'name' => 'menuTitle'
+		          },
+		          {
+		            'name' => 'synopsis'
+		          },
+		          {
+		            'name' => 'extraHeadTags'
+		          },
+		          {
+		            'name' => 'groupIdEdit'
+		          },
+		          {
+		            'name' => 'groupIdView'
+		          },
+		          {
+		            'name' => 'ownerUserId'
+		          },
+		          {
+		            'name' => 'assetSize'
+		          },
+		          {
+		            'name' => 'isPackage'
+		          },
+		          {
+		            'name' => 'isPrototype'
+		          },
+		          {
+		            'name' => 'isHidden'
+		          },
+		          {
+		            'name' => 'newWindow'
+		          },
+		          {
+		            'name' => 'userDefined1'
+		          },
+		          {
+		            'name' => 'userDefined2'
+		          },
+		          {
+		            'name' => 'userDefined3'
+		          },
+		          {
+		            'name' => 'userDefined4'
+		          },
+		          {
+		            'name' => 'userDefined5'
+		          }
+		],
 		fields => [
 		],
 		related => [
