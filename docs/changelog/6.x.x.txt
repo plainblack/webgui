@@ -53,6 +53,7 @@
  - fix: cs mail posts - no url prepending
  - Multiple "Re:"'s on CS Mail posts are now a thing of the past.
  - Made mail message ids follow convention.
+ - fix: shortcut bombs
 
 
 6.99.3

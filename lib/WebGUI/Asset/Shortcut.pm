@@ -214,11 +214,18 @@ sub getEditForm {
 	my $tabform = $self->SUPER::getEditForm();
 	my $originalTemplate;
 	my $i18n = WebGUI::International->new($self->session, "Asset_Shortcut");
-	$tabform->getTab("properties")->readOnly(
-		-label=>$i18n->get(1),
-		-hoverHelp=>$i18n->get('1 description'),
-		-value=>'<a href="'.$self->getShortcut->getUrl.'">'.$self->getShortcut->get('title').'</a> ('.$self->getShortcut->getId.')'
-		);
+	my $shortcut = $self->getShortcut;
+	if (defined $shortcut) {
+		$tabform->getTab("properties")->readOnly(
+			-label=>$i18n->get(1),
+			-hoverHelp=>$i18n->get('1 description'),
+			-value=>'<a href="'.$shortcut->getUrl.'">'.$shortcut->get('title').'</a> ('.$shortcut->getId.')'
+			);
+	} else {
+		$tabform->getTab("properties")->readOnly(
+			value=>'<a href="'.$self->getUrl("func=delete").'"><span style="font-weight: bold; color: red;">'.$self->notLinked.'</span></a>'
+			);
+	}
 	$tabform->getTab("display")->template(
 		-value=>$self->getValue("templateId"),
 		-label=>$i18n->get('shortcut template title'),
@@ -341,7 +348,9 @@ sub getOverridesList {
 	my %overrides = $self->getOverrides;
 	$output .= '<table cellspacing="0" cellpadding="3" border="1">';
 	$output .= '<tr class="tableHeader"><td>'.$i18n->get('fieldName').'</td><td>'.$i18n->get('edit delete fieldname').'</td><td>'.$i18n->get('Original Value').'</td><td>'.$i18n->get('New value').'</td><td>'.$i18n->get('Replacement value').'</td></tr>';
-	foreach my $definition (@{$self->getShortcutOriginal->definition($self->session)}) {
+	my $shortcut = $self->getShortcutOriginal;
+	return undef unless defined $shortcut;
+	foreach my $definition (@{$shortcut->definition($self->session)}) {
 		foreach my $prop (keys %{$definition->{properties}}) {
 			next if $definition->{properties}{$prop}{fieldType} eq 'hidden';
 			$output .= '<tr>';
@@ -373,12 +382,14 @@ sub getOverrides {
 	unless ($overridesRef->{cacheNotExpired}) {
 		my %overrides;
 		my $orig = $self->getShortcutOriginal;
-		unless (exists $orig->{_propertyDefinitions}) {
+		if (defined $orig) {
+			unless ( exists $orig->{_propertyDefinitions}) {
 			my %properties;
-			foreach my $definition (@{$orig->definition($self->session)}) {
-				%properties = (%properties, %{$definition->{properties}});
+				foreach my $definition (@{$orig->definition($self->session)}) {
+					%properties = (%properties, %{$definition->{properties}});
+				}
+				$orig->{_propertyDefinitions} = \%properties;
 			}
-			$orig->{_propertyDefinitions} = \%properties;
 		}
 		$overrides{cacheNotExpired} = 1;
 		my $sth = $self->session->db->read("select fieldName, newValue from Shortcut_overrides where assetId=".$self->session->db->quote($self->getId)." order by fieldName");
@@ -577,6 +588,14 @@ sub isDashlet {
 
 #-------------------------------------------------------------------
 
+sub notLinked {
+	my $self = shift;
+	$self->session->errorHandler->warn("Shortcut ".$self->getId." is linked to an asset ".$self->get("shortcutToAssetId").", which no longer exists.");
+	return "The asset this shortcut is linked to no longer exists. You need to delete this shortcut.";
+}
+
+#-------------------------------------------------------------------
+
 =head2 prepareView ( )
 
 See WebGUI::Asset::prepareView() for details.
@@ -589,7 +608,12 @@ sub prepareView {
 	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
 	$template->prepare;
 	$self->{_viewTemplate} = $template;
-	$self->getShortcut->prepareView;
+	my $shortcut = $self->getShortcut;
+	if (defined $shortcut) {
+		$shortcut->prepareView;
+	} else {
+		$self->notLinked;
+	}
 }
 
 
@@ -614,6 +638,13 @@ sub view {
 	my $content;
 	my $i18n = WebGUI::International->new($self->session,"Asset_Shortcut");
 	my $shortcut = $self->getShortcut;
+	if (defined $shortcut) {
+		# continue
+	} elsif ($self->canEdit) {
+		return '<a href="'.$self->getUrl("func=delete").'">'.$self->notLinked.'</a>';
+	} else {
+		return undef;
+	}
 	if ($self->get("shortcutToAssetId") eq $self->get("parentId")) {
 		$content = $i18n->get("Displaying this shortcut would cause a feedback loop");
 	} else {
@@ -814,7 +845,14 @@ sub www_view {
 		$self->session->asset($self->getParent);
 		return $self->session->asset->www_view;
 	} else {
-		return $self->getShortcut->www_view;
+		my $shortcut = $self->getShortcut;
+		if (defined $shortcut) {
+			return $shortcut->www_view;
+		} elsif ($self->canEdit) {
+			return $self->session->style->userStyle('<a href="'.$self->getUrl("func=delete").'">'.$self->notLinked.'</a>');
+		} else {
+			return $self->getParent->www_view;
+		}
 	}
 }
 
