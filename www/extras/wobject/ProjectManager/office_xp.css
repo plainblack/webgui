@@ -27,19 +27,6 @@ Menu related selectors
 	position: relative; /* Do not alter this line! */
 }
 
-.jsdomenuitemdisabled {
-	background: transparent;
-	border: none;
-	color: #B5B5B5;
-	font-family: Tahoma, Helvetica, sans, Arial, sans-serif;
-	font-size: 12px;
-	padding-bottom: 3px;
-	padding-left: 30px;
-	padding-right: 15px;
-	padding-top: 3px;
-	position: relative; /* Do not alter this line! */
-}
-
 .jsdomenuitemover {
 	background-color: #C1D2EE;
 	border: 1px solid #316AC5;

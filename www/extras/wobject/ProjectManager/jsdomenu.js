@@ -1,8 +1,8 @@
 /*
 
-  jsDOMenu Version 1.3.1
+  jsDOMenu Version 1.3
   Copyright (C) 2003 - 2005 Toh Zhiqiang
-  Released on 12 February 2005
+  Released on 16 January 2005
   jsDOMenu is distributed under the terms of the GNU GPL license
   Refer to license.txt for more informatiom
 
@@ -58,14 +58,6 @@ function isSafari() { // Private method
 }
 
 /*
-Determine if is konqueror
-*/
-function isKonqueror() { // Private method
-  return navigator.userAgent.indexOf("Konqueror") > -1;
-}
-
-
-/*
 Determine the page render mode.
 
 0: Quirks mode.
@@ -112,7 +104,7 @@ Get the x-coordinate of the cursor position relative to the window.
 */
 function getX(e) { // Private method
   if (!e) {
-    var e = window.event || window.Event;
+    var e = window.event;
   }
   if (safari) {
     return e.clientX - getScrollLeft();
@@ -127,7 +119,7 @@ Get the y-coordinate of the cursor position relative to the window.
 */
 function getY(e) { // Private method
   if (!e) {
-    var e = window.event || window.Event;
+    var e = window.event;
   }
   if (safari) {
     return e.clientY - getScrollTop();
@@ -451,7 +443,7 @@ function menuItemClick(e) { // Private method
     }
   }
   if (!e) {
-    var e = window.event || window.Event;
+    var e = window.event;
     e.cancelBubble = true;
   }
   if (e.stopPropagation) {
@@ -548,9 +540,8 @@ function activatePopUpMenu(e) { // Private method
   }
   else {
     if (!e) {
-      e = window.event || window.Event;
+      var e = window.event;
     }
-    setPopUpMenu(getPopUpMenuObj(e));if (popUpMenuObj==null) return;//DAMIANO
     var targetElm = (e.target) ? e.target : e.srcElement;
     if (targetElm.nodeType == 3) {
       targetElm = targetElm.parentNode;
@@ -565,24 +556,18 @@ function activatePopUpMenu(e) { // Private method
 Event handler that handles left click event.
 */
 function leftClickHandler(e) { // Private method
-  if (!e) {
-    e = window.event || window.Event;
-  }
-
-  if (e.button && e.button == 2) {
+  if (getX(e) > getClientWidth() || getY(e) > getClientHeight()) {
     return;
   }
-  
-  if (getX(e) > getClientWidth() || getY(e) > getClientHeight()) {
+  if (!e) {
+    var e = window.event;
+  }
+  if (e.button && e.button == 2) {
     return;
   }
   hideVisibleMenus();
   if (typeof(hideMenuBarMenus) == "function") {
     hideMenuBarMenus();
-  }
-  if (popUpMenuObj==null) {
-     //alert("getting popup in leftClickHandler");
-	 setPopUpMenu(getPopUpMenuObj(e));//DAMIANO
   }
   if (popUpMenuObj) {
     var state = popUpMenuObj.menuObj.style.visibility;
@@ -595,28 +580,16 @@ function leftClickHandler(e) { // Private method
   }
 }
 
-
 /*
 Event handler that handles right click event.
 */
 function rightClickHandler(e) { // Private method
-  
-  if (!e) {
-    e = window.event || window.Event;
-  }
-  
   if (getX(e) > getClientWidth() || getY(e) > getClientHeight()) {
     return;
   }
   hideVisibleMenus();
   if (typeof(hideMenuBarMenus) == "function") {
     hideMenuBarMenus();
-  }
-  
-  
-  if (popUpMenuObj==null) {
-     //alert("getting popup in rightClickHandler");
-     setPopUpMenu(getPopUpMenuObj(e)); //DAMIANO
   }
   if (popUpMenuObj) {
     var state = popUpMenuObj.menuObj.style.visibility;
@@ -748,7 +721,7 @@ function addMenuItem(menuItemObj) { // Public method
     };
     itemElm.onclick = function(e) { // Private method
       if (!e) {
-        var e = window.event || window.Event;
+        var e = window.event;
         e.cancelBubble = true;
       }
       if (e.stopPropagation) {
@@ -825,7 +798,14 @@ classNameOver      : Optional. String that specifies the CSS class selector for 
 */
 function menuItem() { // Public method
   this.displayText = arguments[0];
-
+  if (this.displayText == "-") {
+    this.id = "menuSep" + (++sepCount);
+    this.className = sepClassName;
+  }
+  else {
+    this.id = "menuItem" + (++menuItemCount);
+    this.className = menuItemClassName;
+  }
   this.itemName = "";
   this.actionOnClick = "";
   this.enabled = true;
@@ -852,18 +832,6 @@ function menuItem() { // Public method
   }
   if (len > 5 && arguments[5].length > 0) {
     this.classNameOver = arguments[5];
-  }
-  
-  if (this.displayText == "-") {
-    this.id = "menuSep" + (++sepCount);
-    this.className = sepClassName;
-  }
-  else {
-    this.id = "menuItem" + (++menuItemCount);
-    if (this.enabled) 
-    	this.className = menuItemClassName;
-    else
-    	this.className = menuItemClassNameDisabled;	
   }
 }
 
@@ -1131,7 +1099,6 @@ function hideVisibleMenus() { // Public method
       refreshMenuBarItems(getElmId(staticMenuBarId[i]));
     }
   }
-  hideVisibleCallback();
 }
 
 /*
@@ -1200,10 +1167,6 @@ if (typeof(menuClassName) == "undefined") {
 
 if (typeof(menuItemClassName) == "undefined") {
   var menuItemClassName = "jsdomenuitem"; // Public field
-}
-
-if (typeof(menuItemClassNameDisabled) == "undefined") {
-  var menuItemClassNameDisabled = "jsdomenuitemdisabled"; // Public field
 }
 
 if (typeof(menuItemClassNameOver) == "undefined") {

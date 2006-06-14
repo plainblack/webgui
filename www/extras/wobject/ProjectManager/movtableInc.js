@@ -55,8 +55,9 @@ function sortableInit(id)
 */
 function getPopUpMenuObj(e) {
     if(!e) e = window.event || window.Event;
-		
+	//alert(e);
 	targetElm = (e.target) ? e.target : e.srcElement;
+	//alert(targetElm);
     if(!targetElm) return null;
 	
   	if (targetElm.nodeType==3) //Text Node returned by Konqueror
