@@ -85,7 +85,7 @@ Returns an epoch date with the amount of time added.
 
 =head3 epoch
 
-The number of seconds since January 1, 1970.
+The number of seconds since January 1, 1970.  Defaults to current date/time.
 
 =head3 years
 
@@ -103,7 +103,7 @@ The number of days to add to the epoch.
 
 sub addToDate {
 	my $self = shift;
-	my $epoch = shift;
+	my $epoch = shift || time();
 	my $years = shift || 0;
 	my $months = shift || 0;
 	my $days = shift || 0;
@@ -121,7 +121,7 @@ Returns an epoch date with the amount of time added.
 
 =head3 epoch
 
-The number of seconds since January 1, 1970.
+The number of seconds since January 1, 1970. Defaults to current date/time.
 
 =head3 years
 
@@ -151,7 +151,7 @@ The number of seconds to add to the epoch.
 
 sub addToDateTime {
 	my $self = shift;
-	my $epoch = shift;
+	my $epoch = shift || time();
 	my $years = shift || 0;
 	my $months = shift || 0;
 	my $days = shift || 0;
@@ -172,7 +172,7 @@ Returns an epoch date with the amount of time added.
 
 =head3 epoch
 
-The number of seconds since January 1, 1970.
+The number of seconds since January 1, 1970. Defaults to current date/time.
 
 =head3 hours
 
@@ -190,7 +190,7 @@ The number of seconds to add to the epoch.
 
 sub addToTime {
 	my $self = shift;
-	my $epoch = shift;
+	my $epoch = shift || time();
 	my $hours = shift || 0;
 	my $mins = shift || 0;
 	my $secs = shift || 0;

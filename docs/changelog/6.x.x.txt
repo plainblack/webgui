@@ -41,7 +41,8 @@
  - Fixed a macro processing problem on the Redirect asset.
  - Added a log info entry when a redirect occurs.
  - Better handling of automated messages and post bounces for CS Mail.
-
+ - fix: op=listTransactions causes fatal
+ - Session/DateTime addToDate, addToTime, and addToDateTime now default to the current epoch for a starting point.
 
 6.99.3
  - Someone removed the status from the submission templates. That has been
