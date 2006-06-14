@@ -354,6 +354,49 @@ sub www_deleteProject {
 }
 
 #-------------------------------------------------------------------
+sub www_deleteTask {
+   my $self = shift;
+   #Set Method Helpers
+   my ($session,$privilege,$form,$db,$datetime,$i18n,$user) = $self->setSessionVars;
+   
+   #Check Privileges
+   return $privilege->insufficient unless ($user->isInGroup($self->get("groupToAdd")));
+   
+   #Set Local Vars
+   my $taskId = $form->get("taskId");
+   my $task = $db->quickHashRef("select * from PM_task where taskId=?",[$taskId]);
+   my $projectId = $task->{projectId};
+   my $taskRank = $task->{sequenceNumber};
+	     
+   #Remove dependencies to this task
+   $db->write("update PM_task set dependants=NULL where projectId=? and dependants=?",[$projectId,$taskId]);
+   
+   #Remove task
+   $self->deleteCollateral("PM_task","taskId",$taskId);
+   
+   #Reorder dependants and tasks
+   my $tasks = $db->buildArrayRefOfHashRefs("select * from PM_task where projectId=? order by sequenceNumber",[$projectId]);
+   my $taskLen = scalar(@{$tasks});
+   #$eh->warn("Task Length = $taskLen");
+   foreach my $tsk (@{$tasks}) {
+      my $seqNum = $tsk->{sequenceNumber};
+      next unless ($seqNum >= $taskRank);
+	  #$eh->warn("Fixing task $seqNum");		 
+	  my $dependant = $tsk->{dependants};
+	  #$eh->warn("Dependant is $dependant");
+	  #Only decrement the dependant if it's greater than the rank point of the deleted task
+	  if($dependant >= $taskRank){
+	     $dependant--;
+	  }
+	  #$eh->warn("New dependant is $dependant");
+	  $db->write("update PM_task set dependants=? where taskId=?",[$dependant,$tsk->{taskId}]);
+   }
+   $self->reorderCollateral("PM_task","taskId","projectId",$projectId);
+   
+   return $self->www_viewProject($projectId);
+}
+
+#-------------------------------------------------------------------
 sub www_editProject {
    my $self = shift;
    #Set Method Helpers
@@ -364,7 +407,7 @@ sub www_editProject {
    
    #Set Local Vars
    my $projectId = $form->get("projectId"); 
-   my $project = $db->quickHashRef("select * from PM_project where projectId=".$db->quote($projectId));
+   my $project = $db->quickHashRef("select * from PM_project where projectId=?",[$db->quote($projectId)]);
    my $addEditText = ($projectId eq "new")?$i18n->get("create project"):$i18n->get("edit project");
    
    #Build Form
@@ -558,6 +601,10 @@ sub www_editTask {
 				-name=>"taskId",
 				-value=>$taskId
 				});
+   $var->{'form.header'} .= WebGUI::Form::hidden($session, {
+				-name=>"insertAt",
+				-value=>$form->get("insertAt")
+				});				
    #Set some hidden variables to make it easy to reset data in javascript
    my $duration = $task->{duration};
    my $start = $dt->epochToSet($task->{startDate});
@@ -651,17 +698,18 @@ return $self->processTemplate($var,$self->getValue("editTaskTemplateId"))
 
 #-------------------------------------------------------------------
 sub www_editTaskSave {
-my $self = shift;
-my $var = {};
-#Set Method Helpers
-my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
-my $config = $session->config;
+   my $self = shift;
+   my $var = {};
+   #Set Method Helpers
+   my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
+   my $config = $session->config;
+   my $eh = $session->errorHandler;
 
-my $projectId = $form->get("projectId");
-my $project = $db->quickHashRef("select * from PM_project where projectId=".$db->quote($projectId));
+   my $projectId = $form->get("projectId");
+   my $project = $db->quickHashRef("select * from PM_project where projectId=".$db->quote($projectId));
 
-#Check Privileges
-return $privilege->insufficient unless ($user->isInGroup($project->{projectManager}));
+   #Check Privileges
+   return $privilege->insufficient unless ($user->isInGroup($project->{projectManager}));
    
    my $isMilestone = $form->process("milestone","checkbox");
    
@@ -687,6 +735,34 @@ return $privilege->insufficient unless ($user->isInGroup($project->{projectManag
    
    #Save the extended task data
    my $taskId = $self->setCollateral("PM_task","taskId",$props,1,0,"projectId",$projectId);
+   
+   #Reorder tasks if task is inserted
+   my $insertAt = $form->get("insertAt");
+   if($insertAt) {
+      #$eh->warn("Inserting at $insertAt");
+	  my $tasks = $db->buildArrayRefOfHashRefs("select * from PM_task where projectId=? order by sequenceNumber",[$projectId]);
+	  my $taskLen = scalar(@{$tasks});
+	  #$eh->warn("Task Length = $taskLen");
+	  foreach my $task (@{$tasks}) {
+	     my $seqNum = $task->{sequenceNumber};
+		 next unless ($seqNum >= $insertAt);
+		 #$eh->warn("Fixing task $seqNum");		 
+		 my $newSeq = $seqNum + 1;
+		 if($seqNum eq $taskLen) {
+		    $newSeq = $insertAt;
+		 }
+		 #$eh->warn("New seqNum is $newSeq");
+		 my $dependant = $task->{dependants};
+		 #$eh->warn("Dependant is $dependant");
+		 #Only increment the dependant if it's greater than or equal to the insertAt point
+		 if($dependant >= $insertAt){
+		    $dependant++;
+		 }
+		 #$eh->warn("New dependant is $dependant");
+		 $db->write("update PM_task set sequenceNumber=?, dependants=? where taskId=?",[$newSeq,$dependant,$task->{taskId}]);
+	  }
+	  $self->reorderCollateral("PM_task","taskId","projectId",$projectId);
+   }
   
    $self->_updateProject($projectId);   
    $self->_arrangePredecessors($project,$taskId);
@@ -707,7 +783,7 @@ sub _arrangePredecessors {
       $seq = "(select sequenceNumber from PM_task where taskId=".$db->quote($taskId).")";
    } 
    
-   my $tasks = $db->buildArrayRefOfHashRefs("select * from PM_task where projectId=".$db->quote($projectId));
+   my $tasks = $db->buildArrayRefOfHashRefs("select * from PM_task where projectId=?",[$projectId]);
    
    my $taskHash = {};
    foreach my $task (@{$tasks}) {
@@ -843,11 +919,9 @@ sub www_viewProject {
     #Set Some Style stuff	
 	$style->setLink($assetExtras."/subModal.css",{rel=>"stylesheet",type=>"text/css"});
 	$style->setLink($extras."/calendar/calendar-win2k-1.css",{rel=>"stylesheet",type=>"text/css"});
-	$style->setLink($assetExtras."/office_xp.css",{rel=>"stylesheet",type=>"text/css"});
+	$style->setLink($assetExtras."/cMenu.css",{rel=>"stylesheet",type=>"text/css"});
 	
-	$style->setScript($assetExtras."/jsdomenu.js",{ type=>"text/javascript" });
-    $style->setScript($assetExtras."/movtableInc.js",{ type=>"text/javascript" });
-	$style->setScript($assetExtras."/locale_EN.js",{ type=>"text/javascript" });
+	$style->setScript($assetExtras."/cMenu.js",{ type=>"text/javascript" });
     $style->setScript($extras."/js/at/AjaxRequest.js",{ type=>"text/javascript" });
 	$style->setScript($extras."/js/modal/modal.js",{ type=>"text/javascript" });
 	$style->setScript($extras."/calendar/calendar.js",{ type=>"text/javascript" });
@@ -976,6 +1050,13 @@ sub www_viewProject {
 	   if($canAddTask) {
 	      $hash->{'task.edit.url'} = $self->getUrl("func=editTask;projectId=$projectId;taskId=".$row->{taskId});
 		  $hash->{'task.edit.label'} = $i18n->get("edit task label");
+		  my $num = $row->{sequenceNumber};
+		  $hash->{'task.insertAbove.url'} = $self->getUrl("func=editTask;projectId=$projectId;taskId=new;insertAt=$num");
+		  $hash->{'task.insertAbove.label'} = $i18n->echo("Insert Task Above");
+		  $hash->{'task.insertBelow.url'} = $self->getUrl("func=editTask;projectId=$projectId;taskId=new;insertAt=".($num+1));
+		  $hash->{'task.insertBelow.label'} = $i18n->echo("Insert Task Below");
+		  $hash->{'task.delete.url'} = $self->getUrl("func=deleteTask;taskId=".$row->{taskId});
+		  $hash->{'task.delete.label'} = $i18n->echo("Delete Task");
 	   }
 	   push(@taskList, $hash);
 	}
@@ -1199,12 +1280,19 @@ sub www_drawGanttChart {
 		}
 		
 		#Adjust top for MSIE
-		my $divTop = ($session->env->get("HTTP_USER_AGENT") =~ /msie/i) ? 45 : 43;
+		my $isMSIE = ($session->env->get("HTTP_USER_AGENT") =~ /msie/i);
+		my $divTop =  $isMSIE ? 45 : 45;
 		#Start at 45 px and add 20px as the start of the new task
-		$hash->{'task.div.top'} = $divTop + (22*$taskCount);
+		#Set the propert mutiplier
+		my $multiplier = $isMSIE ? 22 : 20;
+		$hash->{'task.div.top'} = $divTop + ($multiplier*$taskCount);
 		
-		#Interval includes current day so add 1
-		my $daysFromStart = ($dt->getDaysInInterval($startMonth,$startDate) + 1);
+		#Interval includes current day if the start date is not the start of the month so add 1
+		my $adder = 1;
+		if($dt->epochToSet($startMonth) eq $dt->epochToSet($startDate)) {
+		   $adder = 0;
+		}
+		my $daysFromStart = ($dt->getDaysInInterval($startMonth,$startDate)+$adder);
 		#Add day part of predecessor if necessary
 		#$eh->warn("Task $seq is currently $daysFromStart days from the first day on ".$dt->epochToHuman($startDate));
 		my $daysLeft = $daysFromStart;
