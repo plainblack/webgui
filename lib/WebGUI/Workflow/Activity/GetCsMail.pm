@@ -100,11 +100,16 @@ sub addPost {
 	$prefix =~ s/\//\\\//g;
 	my $title = $message->{subject};
 	$title =~ s/$prefix//;
+	if ($title =~ m/re:/i) {
+		$title =~ s/re://ig;
+		$title = "Re: ".$title;
+		$title =~ s/\s+/ /g;
+	}
 	my $post = $parent->addChild({
 		className=>$class,
 		title=>$title,
 		menuTitle =>$title,
-		url=>$title,
+		url=>$parent->get("url")."/".$title,
 		content=>$content,
 		ownerUserId=>$user->userId,
 		username=>$user->profileField("alias") || $user->username,
@@ -188,7 +193,7 @@ sub execute {
 		}
 		my $post = undef;
 		if ($message->{inReplyTo}) {
-			$message->{inReplyTo} =~ m/cs\-([\w_-]{22})/;
+			$message->{inReplyTo} =~ m/cs\-([\w_-]{22})\@/;
 			my $id = $1;	
 			$post = WebGUI::Asset->newByDynamicClass($self->session, $id);
 		}

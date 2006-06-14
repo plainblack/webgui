@@ -50,6 +50,10 @@
  - fix: gaant chart not aligning correctly in firefox
  - fix: fixed obscure bug which was causing dependencies to display incorrectly in certain cases
  - fix: various time tracking issues
+ - fix: cs mail posts - no url prepending
+ - Multiple "Re:"'s on CS Mail posts are now a thing of the past.
+ - Made mail message ids follow convention.
+
 
 6.99.3
  - Someone removed the status from the submission templates. That has been

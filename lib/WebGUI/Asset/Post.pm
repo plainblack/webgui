@@ -679,9 +679,6 @@ sub processPropertiesFromFormPost {
 	}
 	$self->getThread->subscribe if ($self->session->form->process("subscribe"));
 	delete $self->{_storageLocation};
-	my $storage = $self->getStorageLocation;
-	my $attachmentLimit = $self->getThread->getParent->get("attachmentsPerPost");
-#	$storage->addFileFromFormPost("image", $attachmentLimit) if $attachmentLimit;
 	$self->postProcess;
 	$self->requestCommit;
 }
@@ -900,7 +897,10 @@ sub update {
                 );
         $self->SUPER::update(@_);
         if ($self->get("ownerUserId") ne $before{owner} || $self->get("groupIdEdit") ne $before{edit} || $self->get("groupIdView") ne $before{view}) {
-               	$self->getStorageLocation->setPrivileges($self->get("ownerUserId"),$self->get("groupIdView"),$self->get("groupIdEdit"));
+		my $storage = $self->getStorageLocation;
+		if (-d $storage->getPath) {
+               		$storage->setPrivileges($self->get("ownerUserId"),$self->get("groupIdView"),$self->get("groupIdEdit"));
+		}
         }
 }
 

@@ -216,14 +216,14 @@ sub create {
 			}	
 		}
 	}
-	my $returnPath = $session->setting->get("mailReturnPath");
-	$returnPath = "<".$returnPath.">" if $returnPath;
-	my $from = $headers->{from};
-	$from = $session->setting->get("companyEmail") if ($from eq "");
-	my $type = $headers->{contentType};
-	$type = "multipart/mixed" if ($type eq "");
-	my $id = $headers->{messageId};
-	$id = "WebGUI-".$session->id->generate if ($id eq "");
+	my $from = $headers->{from} || $session->setting->get("companyEmail");
+	my $type = $headers->{contentType} || "multipart/mixed";
+	my $domain = $from;
+	$domain =~ s/\@(.*)/$1/;
+	my $id = $headers->{messageId} ||  "WebGUI-".$session->id->generate;
+	unless ($id =~ m/\@/) {
+		$id .= '@'.$domain;
+	}
 	my $message = MIME::Entity->build(
 		Type=>$type,
 		From=>$from,
@@ -232,12 +232,14 @@ sub create {
 		Bcc=>$headers->{bcc},
 		"Reply-To"=>$headers->{replyTo},
 		"In-Reply-To"=>$headers->{inReplyTo},
-		"Return-Path"=>$returnPath,
 		Subject=>$headers->{subject},
 		"Message-Id"=>$id,
 		Date=>$session->datetime->epochToMail,
 		"X-Mailer"=>"WebGUI"
 		);
+	$message->head->delete("Return-Path");
+	$message->head->add("Return-Path",  "<". ($session->setting->get("mailReturnPath") || $from) . ">");
+	my $type = $headers->{contentType};
 	if ($session->config->get("emailOverride")) {
 		my $to = $headers->{to};
 		$to = "WebGUI Group ".$headers->{toGroup} if ($headers->{toGroup});
