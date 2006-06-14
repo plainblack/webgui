@@ -54,6 +54,9 @@
  - Multiple "Re:"'s on CS Mail posts are now a thing of the past.
  - Made mail message ids follow convention.
  - fix: shortcut bombs
+ - fix: DataForm
+ - Many template fixes.
+ - fix: Dashboard - can't instantiate
 
 
 6.99.3

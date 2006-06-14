@@ -237,6 +237,7 @@ sub view {
 							$newStuff .= 'available_dashlets["'.$child->getId.'"]=\''.$child->getUrl.'\';';
 
 						} else {
+							$child->prepareView;
 							push(@{$vars{"position".$i."_loop"}},{
 								id=>$child->getId,
 								content=>$child->view,
