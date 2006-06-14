@@ -20,7 +20,10 @@ function switchToApplication () {
         document.getElementById("application_icon").className = "adminConsoleTitleIcon";
         document.getElementById("application_title").className = "adminConsoleTitle";
 	if (adminConsoleApplicationSubmenu) {
-       	 	document.getElementById("adminConsoleApplicationSubmenu").className = "adminConsoleSubmenu";
+       	 	var submenu = document.getElementById("adminConsoleApplicationSubmenu");
+		if (submenu) {
+			submenu.className = "adminConsoleSubmenu";
+		}
 	}
         document.getElementById("application_workarea").className = "adminConsoleWorkArea";
         document.getElementById("console_toggle_off").className = "adminConsoleHidden";
@@ -31,7 +34,10 @@ function switchToAdminConsole () {
         adminConsoleIsOn = true;
         document.getElementById("application_icon").className = "adminConsoleHidden";
         document.getElementById("application_title").className = "adminConsoleHidden";
-        document.getElementById("adminConsoleApplicationSubmenu").className = "adminConsoleHidden";
+        var submenu = document.getElementById("adminConsoleApplicationSubmenu");
+	if (submenu) {
+		submenu.className = "adminConsoleHidden";
+	}
         document.getElementById("application_workarea").className = "adminConsoleHidden";
         document.getElementById("application_help").className = "adminConsoleHidden";
         document.getElementById("console_icon").className = "adminConsoleTitleIcon";

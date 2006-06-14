@@ -440,7 +440,7 @@ An array of method names of the objects you want returned.
 
 sub quick {
 	my $self = shift;
-	my @methods = shift;
+	my @methods = @_;
 	my @list = ();
 	foreach my $method (@methods) {
 		push(@list, $self->$method);

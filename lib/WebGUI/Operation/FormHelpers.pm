@@ -11,6 +11,7 @@ package WebGUI::Operation::FormHelpers;
 #-------------------------------------------------------------------
 
 use strict;
+use Tie::IxHash;
 use WebGUI::Asset;
 use WebGUI::Asset::Wobject::Folder;
 use WebGUI::Form::Group;
@@ -149,12 +150,15 @@ sub www_richEditPageTree {
 		-label=>$i18n->get(104),
 		-hoverHelp=>$i18n->get('104 description'),
 		);
+	my %options = ();
+	tie %options, 'Tie::IxHash';
+	%options = ("_self"=>$i18n->get('link in same window'),
+		           "_blank"=>$i18n->get('link in new window'));
 	$f->selectBox(
 		-name=>"target",
 		-label=>$i18n->get('target'),
 		-hoverHelp=>$i18n->get('target description'),
-		-options=>{"_self"=>$i18n->get('link in same window'),
-		           "_blank"=>$i18n->get('link in new window')},
+		-options=>\%options
 		);
 	$f->button(
 		-name=>"button",

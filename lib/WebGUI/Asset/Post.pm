@@ -681,7 +681,7 @@ sub processPropertiesFromFormPost {
 	delete $self->{_storageLocation};
 	my $storage = $self->getStorageLocation;
 	my $attachmentLimit = $self->getThread->getParent->get("attachmentsPerPost");
-	$storage->addFileFromFormPost("image", $attachmentLimit) if $attachmentLimit;
+#	$storage->addFileFromFormPost("image", $attachmentLimit) if $attachmentLimit;
 	$self->postProcess;
 	$self->requestCommit;
 }
@@ -957,7 +957,7 @@ sub www_edit {
 			unless ($self->session->form->process("content") || $self->session->form->process("title")) {
                 		$content = "[quote]".$self->getParent->get("content")."[/quote]" if ($self->session->form->process("withQuote"));
                 		$title = $self->getParent->get("title");
-                		$title = "Re: ".$title unless ($title =~ /^Re:/);
+                		$title = "Re: ".$title unless ($title =~ /^Re:/i);
 			}
 			$var{'subscribe.form'} = WebGUI::Form::yesNo($self->session, {
 				name=>"subscribe",
@@ -1080,6 +1080,7 @@ sub www_edit {
 		value=>$i18n->get("preview","Asset_Collaboration")
 		});
 	$var{'attachment.form'} = WebGUI::Form::image($self->session, {
+		name=>"storageId",
 		value=>$self->get("storageId"),
 		maxAttachments=>$self->getThread->getParent->getValue("attachmentsPerPost"),
 		deleteFileUrl=>$self->getUrl("func=deleteFile;filename=")
