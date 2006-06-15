@@ -75,7 +75,7 @@ The i18n key of the help link for this workarea.
 sub _submenu {
 	my $session = shift;
 	my $i18n = WebGUI::International->new($session, "Subscription");
-
+	
 	my $workarea = shift;
         my $title = shift;
         $title = $i18n->get($title) if ($title);
@@ -309,6 +309,7 @@ sub www_editSubscription {
 	unless ($session->form->process("sid") eq 'new') {
 		$properties = WebGUI::Subscription->new($session,$session->form->process("sid"))->get;
 	}
+	
 	$subscriptionId = $session->form->process("sid") || 'new';
 
 	$f = WebGUI::HTMLForm->new($session);
@@ -352,9 +353,9 @@ sub www_editSubscription {
 	$f->selectBox(
 		-name	=> 'duration',
 		-label	=> $i18n->get('subscription duration'),
-		-hoverHelp	=> $i18n->get('subscription duration description'),
-		-value	=> [$properties->{duration} || 'Monthly'],
-		-options=> WebGUI::Commerce::Payment::recurringPeriodValues($session),
+		-hoverHelp => $i18n->get('subscription duration description'),
+		-value	=> $properties->{duration} || 'Monthly',
+		-options=> WebGUI::Commerce::Payment->recurringPeriodValues($session),
 		);
 	$f->text(
 		-name	=> 'executeOnSubscription',
@@ -371,7 +372,6 @@ sub www_editSubscription {
 			);
 	}
 	$f->submit;
-
 	return _submenu($session,$f->print, 'edit subscription title', 'subscription add/edit');
 }
 

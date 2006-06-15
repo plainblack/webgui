@@ -57,7 +57,9 @@
  - fix: DataForm
  - Many template fixes.
  - fix: Dashboard - can't instantiate
-
+ - fix: More DataForm bugs
+ - Added new template vars to DataForm
+ - fix: op=editSubscription causes fatal
 
 6.99.3
  - Someone removed the status from the submission templates. That has been
