@@ -36,7 +36,7 @@ my $assetIds     = $session->db->buildArrayRef("select distinct(assetId) from as
 my $assetDataIds = $session->db->buildArrayRef("select distinct(assetId) from assetData order by assetId");
 
 ##This is a quick test to see if details of mismatch are required
-my $noDetails = ok(compare_arrays($assetIds, $assetDataIds), "Checking asset vs assetData");
+my $noDetails = is_deeply($assetIds, $assetDataIds, "Checking asset vs assetData");
 
 SKIP: {
 	skip("No need for details", 1) if $noDetails;
@@ -48,23 +48,13 @@ foreach my $asset ( @assets ) {
 	eval "use $asset";
 	my $def = $asset->definition($session);
 	my $tableName = $def->[0]->{tableName};
-	my $classIds = $session->db->buildArrayRef("select distinct(assetId) from asset where className=? order by assetId", [$asset]);
+	my $classIds = $session->db->buildArrayRef("select distinct(assetId) from asset where className LIKE ? order by assetId", [$asset.'%']);
 	my $tableIds = $session->db->buildArrayRef(sprintf("select distinct(assetId) from %s order by assetId", $tableName));
-	my $skipDetails = ok(compare_arrays($classIds, $tableIds),
+	my $skipDetails = is_deeply($classIds, $tableIds,
 			sprintf("Comparing assetIds for %s",$asset)
 			);
 	SKIP: {
 		skip("No details needed for $asset", 1) if $skipDetails;
 		cmp_bag($classIds, $tableIds, "Checking asset vs table for $asset");
 	}
-}
-
-sub compare_arrays {
-	my ($first, $second) = @_;
-	no warnings;
-	return 0 unless @$first == @$second;
-	for (my $i=0; $i <=@$first; $i++) {
-		return 0 if $first->[$i] ne $second->[$i];
-	}
-	return 1;
 }
