@@ -6,11 +6,9 @@
 
 <tmpl_if canEdit>
 	<div class="dataControls">
-		<a href="<tmpl_var entryList.url>"><tmpl_var entryList.label></a>
 		&bull; <a href="<tmpl_var export.tab.url>"><tmpl_var export.tab.label></a>
-		<tmpl_if entryId>
-			&bull; <a href="<tmpl_var delete.url>"><tmpl_var delete.label></a>
-			&bull; <a href="<tmpl_var deleteAllEntries.url>"><tmpl_var deleteAllEntries.label></a>
+		<tmpl_if hasEntries>
+			&bull; <a href="<tmpl_var deleteAllEntries.url>" onclick="<tmpl_var javascript.confirmation.deleteAll>"><tmpl_var deleteAllEntries.label></a>
 		</tmpl_if>
 		<tmpl_if session.var.adminOn>
 			&bull; <a href="<tmpl_var addField.url>"><tmpl_var addField.label></a>
@@ -41,6 +39,7 @@
 </tr>
 </tmpl_loop record_loop>
 </table>
+
 ~~~
 <style type="text/css">
 h2{

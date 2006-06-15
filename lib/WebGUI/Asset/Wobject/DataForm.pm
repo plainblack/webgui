@@ -296,6 +296,17 @@ sub getListTemplateVars {
 	my @fieldLoop;
 	$var->{"back.url"} = $self->getFormUrl;
 	$var->{"back.label"} = $i18n->get('go to form');
+	$var->{"deleteAllEntries.url"} = $self->getUrl("func=deleteAllEntriesConfirm");
+	$var->{"javascript.confirmation.deleteAll"} = sprintf("return confirm('%s');",$i18n->get('confirm delete all'));
+	$var->{"deleteAllEntries.label"} = $i18n->get(91);
+	$var->{"hasEntries"} = $self->hasEntries;
+	$var->{canEdit} = ($self->canEdit);
+	$var->{"export.tab.url"} = $self->getUrl('func=exportTab');
+	$var->{"export.tab.label"} = $i18n->get(84);
+	$var->{"addField.url"} = $self->getUrl('func=editField');
+	$var->{"addField.label"} = $i18n->get(76);
+	$var->{"addTab.label"}=  $i18n->get(105);;
+	$var->{"addTab.url"}= $self->getUrl('func=editTab');
 	my $fields = $self->session->db->read("select DataForm_fieldId,name,label,isMailField,type from DataForm_field
 			where assetId=".$self->session->db->quote($self->getId)." order by sequenceNumber");
 	while (my $field = $fields->hashRef) {
@@ -392,6 +403,11 @@ sub getRecordTemplateVars {
 	$var->{"back.label"} = $i18n->get(18);
 	$var->{"addField.url"} = $self->getUrl('func=editField');
 	$var->{"addField.label"} = $i18n->get(76);
+	$var->{"deleteAllEntries.url"} = $self->getUrl("func=deleteAllEntriesConfirm");
+	$var->{"deleteAllEntries.label"} = $i18n->get(91);
+	$var->{"javascript.confirmation.deleteAll"} = sprintf("return confirm('%s');",$i18n->get('confirm delete all'));
+	$var->{"javascript.confirmation.deleteOne"} = sprintf("return confirm('%s');",$i18n->get('confirm delete one'));
+	$var->{"hasEntries"} = $self->hasEntries;
 	# add Tab label, url, header and init
 	$var->{"addTab.label"}=  $i18n->get(105);;
 	$var->{"addTab.url"}= $self->getUrl('func=editTab');
@@ -511,6 +527,20 @@ sub getRecordTemplateVars {
 	return $var;
 }
 
+#-------------------------------------------------------------------
+
+=head2 hasEntries ( )
+
+Returns number of entries that exist for this dataform.
+
+=cut
+
+sub hasEntries {
+	my $self = shift;
+	my ($entryCount) = $self->session->db->quickArray("select count(*) from DataForm_entry where assetId=?",[$self->getId]);
+	
+	return $entryCount;
+}
 
 #-------------------------------------------------------------------
 
@@ -699,19 +729,10 @@ sub viewForm {
 }
 
 #-------------------------------------------------------------------
-sub www_deleteAllEntries {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-        my $assetId = $self->session->form->process("entryId");
-	$self->deleteCollateral("DataForm_entry","assetId",$assetId);
-	$self->session->stow->set("mode","list");
-}
-
-#-------------------------------------------------------------------
 sub www_deleteAllEntriesConfirm {
 	my $self = shift;
-	return $self->session->privilege->insufficient() unless ($self->canEdit && $self->session->form->process("entryId")==$self->getId);
-	$self->session->db->write("delete from DataForm_entry where assetId=".$self->session->db->quote($self->getId));
+	return $self->session->privilege->insufficient() unless ($self->canEdit);
+	$self->session->db->write("delete from DataForm_entry where assetId=?",[$self->getId]);
 	return $self->www_view;
 }
 
@@ -723,6 +744,7 @@ sub www_deleteEntry {
         my $entryId = $self->session->form->process("entryId");
 	$self->deleteCollateral("DataForm_entry","DataForm_entryId",$entryId);
 	$self->session->stow->set("mode","list");
+	return $self->www_view;
 }
 
 #-------------------------------------------------------------------

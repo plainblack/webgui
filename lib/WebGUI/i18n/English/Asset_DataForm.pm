@@ -25,7 +25,14 @@ our $I18N = {
 		message => q|Field Name|,
 		lastUpdated => 1031514049
 	},
-
+	'confirm delete all' => {
+		message => q|Are you sure you want to DELETE all of this Data Form\'s entries permanently?|,
+		lastUpdated => 1031514049
+	},
+	'confirm delete one' => {
+		message => q|Are you sure you want to DELETE this entry permanently?|,
+		lastUpdated => 1031514049
+	},
 	'71' => {
 		message => q|
 <p>This Asset creates a simple multipurpose data-entry and display
