@@ -15,7 +15,7 @@ our $HELP = {  ##hashref of hashes
 			tag => 'some other help tag',
 			namespace => 'some other help file',
 			},
-		];
+		],
 		fields => [	#This array is used to list hover help for form fields.
                         {
                                 title => 'form label 1',
@@ -32,14 +32,14 @@ our $HELP = {  ##hashref of hashes
 		variables => [
 			{
 				name => "template.variable.name",
-				description => "international tag in this namespace describing this var"
-				required => "is this variable required for the template to work correctly?"
+				description => "international tag in this namespace describing this var",
+				required => "is this variable required for the template to work correctly?",
 			},
 		],
 		related => [  ##This lists other help articles that are related to this one
 			{
 				tag => 'other help article',
-				namespace => 'other help articles namespace'
+				namespace => 'other help articles namespace',
 			},
 		],
 	},

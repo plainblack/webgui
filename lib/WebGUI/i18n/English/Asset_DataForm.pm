@@ -283,11 +283,6 @@ to validate any input that the user may supply.|,
 		lastUpdated => 1051463599
 	},
 
-	'canEdit' => {
-		message => q|A conditional indicating whether the current user has the privileges to edit this Data Form.|,
-		lastUpdated => 1149392054,
-	},
-
 	'entryId' => {
 		message => q|The ID of the current entry being viewed.  This variable is undefined
 unless the user can edit the Data Form (<b>canEdit</b> it true).|,
@@ -329,6 +324,21 @@ unless the user can edit the Data Form (<b>canEdit</b> it true).|,
 		lastUpdated => 1149392054,
 	},
 
+	'deleteAllEntries.url' => {
+		message => q|A URL to allow the user to delete all entries in the DataForm.|,
+		lastUpdated => 1150411936,
+	},
+
+	'deleteAllEntries.label' => {
+		message => q|The default label for the deleteAllEntries.url variable|,
+		lastUpdated => 1150411934,
+	},
+
+	'javascript.confirmation.deleteAll' => {
+		message => q|Javascript for an internationalized confirmation popup for deleting all entries.|,
+		lastUpdated => 1150411934,
+	},
+
 	'addField.url' => {
 		message => q|The URL that content managers will visit to add a new field to the form.|,
 		lastUpdated => 1149392054,
@@ -346,6 +356,16 @@ unless the user can edit the Data Form (<b>canEdit</b> it true).|,
 
 	'addTab.label' => {
 		message => q|The default label for the addTab.url variable.|,
+		lastUpdated => 1149392054,
+	},
+
+	'hasEntries' => {
+		message => q|The number of entries in this DataForm.|,
+		lastUpdated => 1149392054,
+	},
+
+	'canEdit' => {
+		message => q|Code to enable tabs to work correctly.|,
 		lastUpdated => 1149392054,
 	},
 

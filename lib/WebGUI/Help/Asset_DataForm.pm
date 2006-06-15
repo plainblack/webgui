@@ -165,6 +165,7 @@ our $HELP = {
 			}
 		]
 	},
+
 	'data form template' => {
 		title => '82',
 		body => '83',
@@ -210,6 +211,18 @@ our $HELP = {
 		          },
 		          {
 		            'name' => 'addTab.label'
+		          },
+		          {
+		            'name' => 'hasEntries',
+		          },
+		          {
+		            'name' => 'deleteAllEntries.url',
+		          },
+		          {
+		            'name' => 'deleteAllEntries.label',
+		          },
+		          {
+		            'name' => 'javascript.confirmation.deleteAll',
 		          },
 		          {
 		            'required' => 1,
@@ -380,6 +393,7 @@ our $HELP = {
 			}
 		]
 	},
+
 	'data form list template' => {
 		title => '88',
 		body => '89',
@@ -391,6 +405,39 @@ our $HELP = {
 		          },
 		          {
 		            'name' => 'back.label',
+		          },
+		          {
+		            'name' => 'deleteAllEntries.url',
+		          },
+		          {
+		            'name' => 'deleteAllEntries.label',
+		          },
+		          {
+		            'name' => 'javascript.confirmation.deleteAll',
+		          },
+		          {
+		            'name' => 'canEdit',
+		          },
+		          {
+		            'name' => 'hasEntries',
+		          },
+		          {
+		            'name' => 'export.tab.url',
+		          },
+		          {
+		            'name' => 'export.tab.label',
+		          },
+		          {
+		            'name' => 'addField.url',
+		          },
+		          {
+		            'name' => 'addField.label',
+		          },
+		          {
+		            'name' => 'addTab.url',
+		          },
+		          {
+		            'name' => 'addTab.label',
 		          },
 		          {
 		            'name' => 'field_loop',
