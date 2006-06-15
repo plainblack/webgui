@@ -112,8 +112,13 @@ sub completeTransaction {
 
 	foreach (@{$self->getItems}) {
 		$item = WebGUI::Commerce::Item->new($self->session,$_->{itemId}, $_->{itemType});
-		$item->handler($_->{transactionId});
-		#$item->handler;
+		if (ref($item) eq 'WebGUI::Commerce::Item::Event') {
+			$item->handler($_->{transactionId});
+		}
+		else {
+			$item->handler;
+		}
+		$self->session->errorHandler->warn(ref($item));
 	}
 
 	$self->status('Completed');	

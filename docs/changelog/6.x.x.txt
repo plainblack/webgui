@@ -60,6 +60,7 @@
  - fix: More DataForm bugs
  - Added new template vars to DataForm
  - fix: op=editSubscription causes fatal
+ - fix: Commerce and groups
 
 6.99.3
  - Someone removed the status from the submission templates. That has been
