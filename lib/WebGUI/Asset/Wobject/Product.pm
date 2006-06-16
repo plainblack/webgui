@@ -390,7 +390,7 @@ sub www_addRelated {
    );
    @usedRelated = $self->session->db->buildArray("select relatedAssetId from Product_related where assetId=".$self->session->db->quote($self->getId));
    push(@usedRelated,$self->getId);
-   $related = $self->session->db->buildHashRef("select assetId,title from asset where className='WebGUI::Asset::Wobject::Product' and assetId not in (".$self->session->db->quoteAndJoin(\@usedRelated).")");
+   $related = $self->session->db->buildHashRef("select asset.assetId,assetData.title from asset left join assetData on assetData.assetId=asset.assetId where asset.className='WebGUI::Asset::Wobject::Product' and asset.assetId not in (".$self->session->db->quoteAndJoin(\@usedRelated).")");
 	my $i18n = WebGUI::International->new($self->session,'Asset_Product');
    $f->selectBox(
 		-name => "relatedAssetId",
