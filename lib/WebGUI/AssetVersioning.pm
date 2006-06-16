@@ -264,7 +264,7 @@ sub www_manageRevisions {
         my $ac = WebGUI::AdminConsole->new($self->session,"versions");
         return $self->session->privilege->insufficient() unless ($self->canEdit);
         my $i18n = WebGUI::International->new($self->session,"Asset");
-        my $output = sprintf '<table width=100% class="content">
+        my $output = sprintf '<table style="width: 100%;" class="content">
         <tr><th></th><th>%s</th><th>%s</th><th>%s</th></tr> ',
 	$i18n->get('revision date'), $i18n->get('revised by'), $i18n->get('tag name');
         my $sth = $self->session->db->read("select assetData.revisionDate, users.username, assetVersionTag.name,assetData.tagId from assetData
