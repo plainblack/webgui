@@ -26,8 +26,15 @@ fixSurvey($session);
 fixEditWorkflow($session);
 fixOrphans();
 updateHttpProxy();
+fixShippingOptions();
 
 finish($session); # this line required
+
+#-------------------------------------------------
+sub fixShippingOptions {
+	print "\tRemoving unserialized shipping options data from the transaction table.\n";
+	$session->db->write("update transaction set shippingOptions = null where shippingOptions like '%HASH%'");
+}
 
 #-------------------------------------------------
 sub updateHttpProxy {
@@ -64,6 +71,7 @@ sub fixSurvey{
 	}
 }
 
+#--------------------------------------------------
 sub fixEditWorkflow {
 	my @goodPlugins;
 	my $session = shift;

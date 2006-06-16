@@ -61,7 +61,9 @@
  - Added new template vars to DataForm
  - fix: op=editSubscription causes fatal
  - fix: Commerce and groups
+ - fix: 6.99rc0 - shippingOptions not serialized
  - fix: Orphaned asset data (modified test to fix bug in test)
+
 
 6.99.3
  - Someone removed the status from the submission templates. That has been

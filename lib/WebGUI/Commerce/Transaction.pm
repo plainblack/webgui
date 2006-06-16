@@ -18,6 +18,7 @@ package WebGUI::Commerce::Transaction;
 use strict;
 use WebGUI::SQL;
 use WebGUI::Commerce::Payment;
+use JSON;
 
 #-------------------------------------------------------------------
 
@@ -553,8 +554,8 @@ Returns the shipping options for this transaction. If options is supplied the sh
 be set to it.
 
 =head3 options
-If supplied the shipping options of the transaction will be set to this value. This should probably 
-be some serialized datastructure.
+If supplied the shipping options of the transaction will be set to this value. The value passed will
+be serialized/un-serialized for you.
 
 =cut
 
@@ -563,12 +564,12 @@ sub shippingOptions {
 	$self = shift;
 	$shippingOptions = shift;
 
-	if ($shippingOptions) {
-		$self->{_properties}{shippingOptions} = $shippingOptions;
-		$self->session->db->write("update transaction set shippingOptions=".$self->session->db->quote($shippingOptions)." where transactionId=".$self->session->db->quote($self->{_transactionId}));
+	if (scalar (keys %{$shippingOptions})) {
+		$self->{_properties}{shippingOptions} = objToJson($shippingOptions);
+		$self->session->db->write("update transaction set shippingOptions=? where transactionId=?",[$self->{_properties}{shippingOptions},$self->{_transactionId}]);
 	}
 
-	return $self->{_properties}{shippingOptions};
+	return jsonToObj($self->{_properties}{shippingOptions});
 }
 
 #-------------------------------------------------------------------
