@@ -18,7 +18,8 @@ use WebGUI::Asset::Template;
 use WebGUI::Macro;
 use WebGUI::Utility;
 use WebGUI::TabForm;
-use Storable qw/dclone/;
+use Data::Dumper;
+#use Storable qw/dclone/;
 
 =head1 NAME
 
@@ -29,6 +30,70 @@ Package WebGUI::Operation::Help
 Handles displaying WebGUI's internal help to the user as an operation.
 
 =cut
+
+#-------------------------------------------------------------------
+
+=head2 _loadHelp ( $session, $helpPackage )
+
+Safely load's the Help file for the requested helpPackage if it hasn't
+been already and logs errors during the load.
+
+=cut
+
+sub _loadHelp {
+	my $session = shift;
+	my $helpPackage = shift;
+	return $helpPackage::HELP if defined $helpPackage::HELP; ##Already loaded
+	my $load = sprintf 'use %-s; $%-s::HELP', $helpPackage, $helpPackage;
+	my $help = eval($load);
+	if ($@) {
+		$session->errorHandler->error("Help failed to compile: $helpPackage. ".$@);
+		return {};
+	}
+	return $help;
+}
+
+#-------------------------------------------------------------------
+
+=head2 _process ( $session, $cmd, $key )
+
+Do all post processing for an entry in a freshly loaded help file.
+Resolve the related key, add a default isa key if it is missing,
+and set the __PROCESSED flag to prevent processing entries twice.
+
+=cut
+
+sub _process {
+	my ($session, $helpEntry, $key) = @_;
+	return if exists($helpEntry->{__PROCESSED}) and $helpEntry->{__PROCESSED};
+	$helpEntry->{related} = [ _related($session, $helpEntry->{related}) ];
+	##Add an ISA link unless it already exists.
+	##This simplifies handling later.
+	unless (exists $helpEntry->{isa} and ref $helpEntry->{isa} eq 'ARRAY') {
+		$helpEntry->{isa} = [];
+	}
+	unless (exists $helpEntry->{__PROCESSED}) {
+		$helpEntry->{__PROCESSED} = 0;
+	}
+	foreach my $isa ( @{ $helpEntry->{isa} } ) {
+		my $oCmd = "WebGUI::Help::".$isa->{namespace};
+		my $other = _loadHelp($session, $oCmd);
+		my $otherHelp = $other->{ $isa->{tag} };
+		_process($session, $otherHelp, $isa->{tag});
+		my $add = $otherHelp->{fields};
+		@{$helpEntry->{fields}} = (@{$helpEntry->{fields}}, @{$add});
+		$add = $otherHelp->{related};
+		@{$helpEntry->{related}} = (@{ $helpEntry->{related} }, @{ $add });
+		$add = $otherHelp->{variables};
+		foreach my $row (@{$add}) {
+			push(@{$helpEntry->{variables}}, {
+				name=> $row->{name},
+				description => $row->{description},
+				namespace => $row->{namespace} || $isa->{namespace}
+				});
+		}
+	}
+}
 
 #-------------------------------------------------------------------
 
@@ -43,38 +108,9 @@ sub _load {
 	my $session = shift;
 	my $namespace = shift;
 	my $cmd = "WebGUI::Help::".$namespace;
-        my $load = sprintf 'use %-s; $%-s::HELP;', $cmd, $cmd;
-	my $hash = eval($load);
-	if ($@) {
-		$session->errorHandler->error("Help failed to compile: $namespace. ".$@);
-		return {};
-	}
-	local $Storable::Deparse = 1;
-	local $Storable::Eval = 1;
-	my $help = dclone($hash);
+	my $help = _loadHelp($session, $cmd);
 	foreach my $tag (keys %{ $help }) {
-		$help->{$tag}{related} = [ _related($session, $help->{$tag}{related}) ];
-		##Add an ISA link unless it already exists.
-		##This simplifies handling later.
-		unless (exists $help->{$tag}{isa} and ref $help->{$tag}{isa} eq 'ARRAY') {
-			$help->{$tag}{isa} = [];
-		}
-		foreach my $isa ( @{ $help->{$tag}{isa} } ) {
-			my $other = _load($session, $isa->{namespace});
-			my $otherHelp = $other->{ $isa->{tag} };
-			my $add = $otherHelp->{fields};
-			@{$help->{$tag}{fields}} = (@{$help->{$tag}{fields}}, @{$add});
-			$add = $otherHelp->{related};
-			@{$help->{$tag}{related}} = (@{ $help->{$tag}{related} }, @{ $add });
-			$add = $otherHelp->{variables};
-			foreach my $row (@{$add}) {
-				push(@{$help->{$tag}{variables}}, {
-					name=> $row->{name},
-					description => $row->{description},
-					namespace => $row->{namespace} || $isa->{namespace}
-					});
-			}
-		}
+		_process($session, $help->{$tag}, $tag);
 	}
 	return $help;
 }

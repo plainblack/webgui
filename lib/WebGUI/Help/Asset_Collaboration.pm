@@ -203,6 +203,197 @@ our $HELP = {
 	'collaboration template labels' => {
 		title => 'collaboration template labels title',
 		body => 'collaboration template labels body',
+		variables => [
+		          {
+		            'name' => 'add.label'
+		          },
+		          {
+		            'name' => 'addlink.label'
+		          },
+		          {
+		            'name' => 'addquestion.label'
+		          },
+		          {
+		            'name' => 'answer.label'
+		          },
+		          {
+		            'name' => 'attachment.label'
+		          },
+		          {
+		            'name' => 'by.label'
+		          },
+		          {
+		            'name' => 'body.label'
+		          },
+		          {
+		            'name' => 'back.label'
+		          },
+		          {
+		            'name' => 'compensation.label'
+		          },
+		          {
+		            'name' => 'open.label'
+		          },
+		          {
+		            'name' => 'close.label'
+		          },
+		          {
+		            'name' => 'closed.label'
+		          },
+		          {
+		            'name' => 'critical.label'
+		          },
+		          {
+		            'name' => 'minor.label'
+		          },
+		          {
+		            'name' => 'cosmetic.label'
+		          },
+		          {
+		            'name' => 'fatal.label'
+		          },
+		          {
+		            'name' => 'severity.label'
+		          },
+		          {
+		            'name' => 'date.label'
+		          },
+		          {
+		            'name' => 'delete.label'
+		          },
+		          {
+		            'name' => 'description.label'
+		          },
+		          {
+		            'name' => 'edit.label'
+		          },
+		          {
+		            'name' => 'image.label'
+		          },
+		          {
+		            'name' => 'job.header.label'
+		          },
+		          {
+		            'name' => 'job.title.label'
+		          },
+		          {
+		            'name' => 'job.description.label'
+		          },
+		          {
+		            'name' => 'job.requirements.label'
+		          },
+		          {
+		            'name' => 'location.label'
+		          },
+		          {
+		            'name' => 'layout.flat.label'
+		          },
+		          {
+		            'name' => 'link.header.label'
+		          },
+		          {
+		            'name' => 'lastReply.label'
+		          },
+		          {
+		            'name' => 'lock.label'
+		          },
+		          {
+		            'name' => 'layout.label'
+		          },
+		          {
+		            'name' => 'message.header.label'
+		          },
+		          {
+		            'name' => 'message.label'
+		          },
+		          {
+		            'name' => 'next.label'
+		          },
+		          {
+		            'name' => 'newWindow.label'
+		          },
+		          {
+		            'name' => 'layout.nested.label'
+		          },
+		          {
+		            'name' => 'previous.label'
+		          },
+		          {
+		            'name' => 'post.label'
+		          },
+		          {
+		            'name' => 'question.label'
+		          },
+		          {
+		            'name' => 'question.header.label'
+		          },
+		          {
+		            'name' => 'rating.label'
+		          },
+		          {
+		            'name' => 'rate.label'
+		          },
+		          {
+		            'name' => 'reply.label'
+		          },
+		          {
+		            'name' => 'replies.label'
+		          },
+		          {
+		            'name' => 'readmore.label'
+		          },
+		          {
+		            'name' => 'responses.label'
+		          },
+		          {
+		            'name' => 'search.label'
+		          },
+		          {
+		            'name' => 'subject.label'
+		          },
+		          {
+		            'name' => 'subscribe.label'
+		          },
+		          {
+		            'name' => 'submission.header.label'
+		          },
+		          {
+		            'name' => 'stick.label'
+		          },
+		          {
+		            'name' => 'status.label'
+		          },
+		          {
+		            'name' => 'synopsis.label'
+		          },
+		          {
+		            'name' => 'thumbnail.label'
+		          },
+		          {
+		            'name' => 'title.label'
+		          },
+		          {
+		            'name' => 'unlock.label'
+		          },
+		          {
+		            'name' => 'unstick.label'
+		          },
+		          {
+		            'name' => 'unsubscribe.label'
+		          },
+		          {
+		            'name' => 'url.label'
+		          },
+		          {
+		            'name' => 'user.label'
+		          },
+		          {
+		            'name' => 'views.label'
+		          },
+		          {
+		            'name' => 'visitorName.label'
+		          }
+		],
 		fields => [
 		],
 		related => [
