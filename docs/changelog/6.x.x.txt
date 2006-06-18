@@ -1,5 +1,6 @@
 6.99.5
  - fix: Add a Related Product not working
+ - fix: Edit button missing in timetracker projects
 
 
 6.99.4
