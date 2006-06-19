@@ -1,6 +1,7 @@
 6.99.5
  - fix: Add a Related Product not working
  - fix: Edit button missing in timetracker projects
+ - fix: Upgrade from 6.8.10 to 6.99.4 failed
 
 
 6.99.4

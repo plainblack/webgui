@@ -75,6 +75,15 @@ save you many hours of grief.
 	edit each of your WebGUI config files to set the
 	spectreSubnet setting to match your IP address or IP range.
 
+	Running spectre requires a spectre.conf file.  Like the
+	log.conf file, the name is fixed.  Make a copy of the sample
+	spectre.conf, etc/spectre.conf.original, and place it in the
+	etc directory.	Then make any final edits or configurations
+	and start /sbin/spectre.pl.
+
+	You must have a spectre.conf file before you run the upgrade
+	to 6.99.0.
+
  * If you wish to run the full test suite, you'll need to install
 	these optional modules:
 
