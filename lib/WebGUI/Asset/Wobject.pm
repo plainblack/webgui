@@ -164,13 +164,13 @@ A comparison expression to be used when checking whether the action should be al
 =cut
 
 sub confirm {
-	my $self = shift;
-        return $self->session->privilege->vitalComponent() if ($_[4]);
-	my $noURL = $_[3] || $_[0]->getUrl;
+	my ($self, $message, $yesURL, $noURL, $vitalComparison) = @_;
+        return $self->session->privilege->vitalComponent() if ($vitalComparison);
+	$noURL = $noURL || $self->getUrl;
 	my $i18n = WebGUI::International->new($self->session,'Asset_Wobject');
         my $output = '<h1>'.$i18n->get(42).'</h1>';
-        $output .= $_[1].'<p>';
-        $output .= '<div align="center"><a href="'.$_[2].'">'.$i18n->get(44).'</a>';
+        $output .= $message.'<p>';
+        $output .= '<div align="center"><a href="'.$yesURL.'">'.$i18n->get(44).'</a>';
         $output .= ' &nbsp; <a href="'.$noURL.'">'.$i18n->get(45).'</a></div>';
         return $output;
 }
