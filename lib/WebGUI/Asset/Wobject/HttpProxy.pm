@@ -176,7 +176,9 @@ sub getEditForm {
                 );
 	$tabform->getTab("display")->filterContent(
 		-name=>"filterHtml",
-		-value=>$self->getValue("filterHtml")
+                -label=>$i18n->get(418, 'WebGUI'),
+                -hoverHelp=>$i18n->get('418 description', 'WebGUI'),
+		-value=>$self->getValue("filterHtml"),
 		);
         $tabform->getTab("properties")->selectBox(
 		-name=>"timeout", 

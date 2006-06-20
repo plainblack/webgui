@@ -275,11 +275,13 @@ If there is more than 1 value in a form variable, only the last will be returned
 
 	'template variable body' => {
 		message => q|
+<p>These variables are available in any template, regardless of its type
+or what namespace it lives in.  The session variables are deprecated.</p>
 <p><i>NOTE: The syntax for these variables is shown in WebGUI's default template language, HTML::Template.  If the Template Type
 has been set to some other language you will need to consult that template's documentation for the appropriate syntax for its variables.</i></p>.
 
 		|,
-		lastUpdated => 1148951237,
+		lastUpdated => 1150827247,
 	},
 
 	'site name' => {

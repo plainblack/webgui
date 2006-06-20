@@ -2,6 +2,7 @@
  - fix: Add a Related Product not working
  - fix: Edit button missing in timetracker projects
  - fix: Upgrade from 6.8.10 to 6.99.4 failed
+ - fix: Missing label in HTTP Proxy: Filter Content
  - Fixed a memory leak in Spectre that could cause it to double in size
    roughly every 30 hours under certain conditions.
 
