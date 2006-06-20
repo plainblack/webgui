@@ -6,7 +6,7 @@ The following is a rough overview of how to install WebGUI. For
 more detailed instructions read the WebGUI installation 
 documentation.
    
-   http://www.plainblack.com/installing_webgui
+   http://www.plainblack.com/webgui/install
 
 QnD INSTALL INSTRUCTIONS:
 
