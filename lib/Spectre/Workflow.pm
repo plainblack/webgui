@@ -18,6 +18,7 @@ use strict;
 use HTTP::Request::Common;
 use POE;
 use POE::Component::Client::UserAgent;
+use WebGUI::Session;
 
 #-------------------------------------------------------------------
 
@@ -189,6 +190,7 @@ sub deleteInstance {
 	$self->debug("Deleting workflow instance $instanceId from instance queue.");
 	if ($self->{_instances}{$instanceId}) {
 		my $priority = $self->{_instances}{$instanceId}{priority};
+		delete $self->{_errorCount}{$instanceId};
 		delete $self->{_instances}{$instanceId};
 		for (my $i=0; $i < scalar(@{$self->{"_priority".$priority}}); $i++) {
 			if ($self->{"_priority".$priority}[$i] eq $instanceId) {
@@ -398,19 +400,18 @@ sub workerResponse {
 		}
 		my $state = $response->content; 
 		if ($state eq "waiting") {
-			$self->{_errorCount}{$instanceId}=0;
+			delete $self->{_errorCount}{$instanceId};
 			$self->debug("Was told to wait on $instanceId because we're still waiting on some external event.");
 			$kernel->yield("suspendInstance",$instanceId);
 		} elsif ($state eq "complete") {
-			$self->{_errorCount}{$instanceId}=0;
+			delete $self->{_errorCount}{$instanceId};
 			$self->debug("Workflow instance $instanceId ran one of it's activities successfully.");
 			$kernel->yield("returnInstanceToQueue",$instanceId);
 		} elsif ($state eq "disabled") {
-			$self->{_errorCount}{$instanceId}=0;
+			delete $self->{_errorCount}{$instanceId};
 			$self->debug("Workflow instance $instanceId is disabled.");
 			$kernel->yield("suspendInstance",$instanceId);			
 		} elsif ($state eq "done") {
-			$self->{_errorCount}{$instanceId}=0;
 			$self->debug("Workflow instance $instanceId is now complete.");
 			$kernel->yield("deleteInstance",$instanceId);			
 		} elsif ($state eq "error") {

@@ -256,6 +256,7 @@ The config file name for the site this job belongs to.
 sub deleteJob {
 	my ($self, $params) = @_[OBJECT, ARG0];
 	$self->debug("Deleting schedule ".$params->{taskId}." for ".$params->{config}." from queue.");
+	delete $self->{_errorCount}{$params->{config}}{$params->{taskId}};
 	delete $self->{_jobs}{$params->{config}}{$params->{taskId}};
 }
 
@@ -418,7 +419,7 @@ sub runJobResponse {
 		}
 		my $state = $response->content; 
 		if ($state eq "done") {
-			$self->{_errorCount}{$config}{$taskId} = 0;
+			delete $self->{_errorCount}{$config}{$taskId};
 			$self->debug("Scheduled task $config / $taskId is now complete.");
 			if ($job->{runOnce}) {
 				$kernel->yield("deleteJob",{config=>$job->{config}, taskId=>$job->{taskId}});
