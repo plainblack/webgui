@@ -4,6 +4,7 @@
  - fix: Upgrade from 6.8.10 to 6.99.4 failed
  - fix: Missing label in HTTP Proxy: Filter Content
  - fix: Wobject.pm confirm() is broken
+ - fix: Survey - editQuestionSave - yesNo fields always "yes"
  - Fixed a memory leak in Spectre that could cause it to double in size
    roughly every 30 hours under certain conditions.
 
