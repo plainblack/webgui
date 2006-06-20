@@ -81,7 +81,7 @@ sub definition {
  			processAsTemplate=>{
                         	fieldType=>'yesNo',
 				label=>$i18n->get('process as template'),
-				hoverHelp=>$i18n->get('mimeType description'),
+				hoverHelp=>$i18n->get('process as template description'),
 				tab=>"properties",
                                 defaultValue=>0
                                 },
