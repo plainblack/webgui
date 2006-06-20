@@ -1037,10 +1037,10 @@ sub www_editQuestionSave {
                 question=>$self->session->form->process("question", 'HTMLArea') || 1,
         	Survey_questionId=>$self->session->form->process("qid") || 1,
 		Survey_id=>$self->get("Survey_id") || 1,
-                allowComment=>$self->session->form->process("allowComment", 'yesNo') || 1,
+                allowComment=>$self->session->form->process("allowComment", 'yesNo'),
 		gotoQuestion=>$self->session->form->process("gotoQuestion", 'selectBox') || 1,
 		answerFieldType=>$self->session->form->process("answerFieldType") || 1,
-                randomizeAnswers=>$self->session->form->process("randomizeAnswers", 'yesNo') || 1,
+                randomizeAnswers=>$self->session->form->process("randomizeAnswers", 'yesNo'),
                 Survey_sectionId=>$self->session->form->process("section") || 1
                 },1,0,"Survey_id");
 
