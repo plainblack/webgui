@@ -37,6 +37,10 @@ sub addAssetIndex {
 #-------------------------------------------------
 sub fixSpectre {
 	print "\tAdding more security to Spectre.\n" unless ($quiet);
+	unless (-e "../../etc/spectre.conf") {
+		print "\t *** Skiping this portion of the upgrade.  You do not have a spectre.conf file.  Read gotcha.txt for details. ***\n" unless ($quiet);
+		return;
+	}
 	my $config = WebGUI::Config->new("../..","spectre.conf");
 	$config->set("ip","127.0.0.1");
 }
