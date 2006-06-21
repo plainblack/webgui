@@ -290,6 +290,9 @@ sub _get_rss_data {
                 }
                 my $xml = $response->content();
 
+		# XML::RSSLite does not handle <![CDATA[ ]]> so:
+                $xml =~ s/<!\[CDATA\[(.*?)\]\]>/$1/sg;
+ 
 		# Convert encoding if needed / Perl 5.8.0 or up required.
 		if ($] >= 5.008 && $hasEncode) {
 			$xml =~ /<\?xml.*?encoding=['"](\S+)['"]/i;
