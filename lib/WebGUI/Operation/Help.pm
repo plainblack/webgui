@@ -304,7 +304,12 @@ sub www_viewHelp {
 	}
         my %vars;
         $vars{uiLevelLabel} = $i18n->get('739', 'WebGUI');
-        $vars{body} = $i18n->get($help->{body});
+	if (ref $help->{body} eq 'CODE') {
+		$vars{body} = $help->{body}->($session);
+	}
+	else {
+		$vars{body} = $i18n->get($help->{body});
+	}
 	my $userUiLevel = $session->user->profileField("uiLevel");
 	my $uiOverride = $session->form->process("uiOverride");
         foreach my $row (@{ $help->{fields} }) {
