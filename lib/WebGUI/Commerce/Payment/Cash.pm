@@ -127,7 +127,7 @@ sub configurationForm {
 
 	$f->yesNo(
 		-name	=> $self->prepend('completeTransaction'),
-		-value 	=> $self->get('completeTransaction') || 1,
+		-value 	=> ($self->get('completeTransaction') eq "0" ? 0 : $self->get('completeTransaction') || 1),
 		-label 	=> $i18n->get('complete transaction'),
 		-hoverHelp => $i18n->get('complete transaction description'),
 		);
