@@ -131,7 +131,8 @@ sub getDaysInWeek {
 	my $week = $_[0];
 	return [] unless $week;
 	
-	my ($session,$dt,$i18n,$eh) = $self->getSessionVars("datetime","i18n","errorHandler");
+	my ($session,$dt,$eh) = $self->getSessionVars("datetime","errorHandler");
+	my $i18n = WebGUI::International->new($session,'Asset_TimeTracking');
 	
     #Week View Below
 	my ($dayStart,$dayEnd) = $dt->dayStartEnd($week);
@@ -158,11 +159,7 @@ sub getSessionVars {
    push(@list, $session);
    
    foreach my $var (@vars) {
-      if($var eq "i18n") {
-	     push(@list,WebGUI::International->new($session,'Asset_TimeTracking'));
-	  } else {
          push(@list, $session->$var);
-      }
    }   
    return @list;
 }
@@ -173,8 +170,8 @@ sub view {
 	my $self = shift;
 	my $var = $self->get;
 	
-	my ($session,$privilege,$form,$db,$dt,$i18n,$user,$eh,$config) = $self->getSessionVars("privilege","form","db","datetime","i18n","user","errorHandler","config");    
-	
+	my ($session,$privilege,$form,$db,$dt,$user,$eh,$config) = $self->getSessionVars("privilege","form","db","datetime","user","errorHandler","config");    
+	my $i18n = WebGUI::International->new($session,'Asset_TimeTracking');
 	$var->{'extras'} = $config->get("extrasURL")."/wobject/TimeTracking"; 
 	
 	if($user->isInGroup($self->get("groupToManage"))) {
@@ -278,7 +275,8 @@ sub www_editTimeEntrySave {
 #-------------------------------------------------------------------
 sub www_deleteProject {
    	my $self = shift;
-    my ($session,$privilege,$form,$db,$i18n,$user,$eh,$config) = $self->getSessionVars("privilege","form","db","i18n","user","errorHandler","config");
+    my ($session,$privilege,$form,$db,$user,$eh,$config) = $self->getSessionVars("privilege","form","db","user","errorHandler","config");
+	my $i18n = WebGUI::International->new($session,'Asset_TimeTracking');
 	
 	#Check Privileges
     return $privilege->insufficient unless ($user->isInGroup($self->get("groupToManage")));
@@ -299,7 +297,8 @@ sub www_deleteProject {
 #-------------------------------------------------------------------
 sub www_editProject {
 	my $self = shift;
-    my ($session,$privilege,$form,$db,$i18n,$user,$eh,$config) = $self->getSessionVars("privilege","form","db","i18n","user","errorHandler","config");
+    my ($session,$privilege,$form,$db,$user,$eh,$config) = $self->getSessionVars("privilege","form","db","user","errorHandler","config");
+	my $i18n = WebGUI::International->new($session,'Asset_TimeTracking');
 	
 	#Check Privileges
     return $privilege->insufficient unless ($user->isInGroup($self->get("groupToManage")));
@@ -398,7 +397,8 @@ sub www_editProject {
 #-------------------------------------------------------------------
 sub www_editProjectSave {
 	my $self = shift;
-    my ($session,$privilege,$form,$db,$dt,$i18n,$user,$eh) = $self->getSessionVars("privilege","form","db","datetime","i18n","user","errorHandler");    
+    my ($session,$privilege,$form,$db,$dt,$user,$eh) = $self->getSessionVars("privilege","form","db","datetime","user","errorHandler");    
+	my $i18n = WebGUI::International->new($session,'Asset_TimeTracking');
 	
 	#Check Privileges
     return $privilege->insufficient unless ($user->isInGroup($self->get("groupToManage")));
@@ -457,7 +457,8 @@ sub www_editProjectSave {
 #-------------------------------------------------------------------
 sub www_manageProjects {
 	my $self = shift;
-    my ($session,$privilege,$form,$db,$dt,$i18n,$user,$eh,$config) = $self->getSessionVars("privilege","form","db","datetime","i18n","user","errorHandler","config");    
+    my ($session,$privilege,$form,$db,$dt,$user,$eh,$config) = $self->getSessionVars("privilege","form","db","datetime","user","errorHandler","config");    
+	my $i18n = WebGUI::International->new($session,'Asset_TimeTracking');
 	
 	#Check Privileges
     return $privilege->insufficient unless ($user->isInGroup($self->get("groupToManage")));
@@ -578,7 +579,8 @@ sub www_buildTimeTable {
 	my $viewVar = $_[0];
 	my $var = {};	
 	$var->{'extras'} = $viewVar->{'extras'}; 
-	my ($session,$dt,$i18n,$eh,$form,$db,$user,$privilege) = $self->getSessionVars("datetime","i18n","errorHandler","form","db","user","privilege");
+	my ($session,$dt,$eh,$form,$db,$user,$privilege) = $self->getSessionVars("datetime","errorHandler","form","db","user","privilege");
+	my $i18n = WebGUI::International->new($session,'Asset_TimeTracking');
 	
 	return $privilege->insufficient unless ($self->canView);
 	
@@ -740,7 +742,8 @@ sub www_buildTimeTable {
 #-------------------------------------------------------------------
 sub _buildRow {
 	my $self = shift;
-	my ($session,$dt,$i18n,$eh,$form,$db,$user) = $self->getSessionVars("datetime","i18n","errorHandler","form","db","user");
+	my ($session,$dt,$eh,$form,$db,$user) = $self->getSessionVars("datetime","errorHandler","form","db","user");
+	my $i18n = WebGUI::International->new($session,'Asset_TimeTracking');
 	
 	my $entry = $_[0] || {};
 	my $rowCount = $_[1];
