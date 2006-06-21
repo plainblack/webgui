@@ -11,6 +11,7 @@
  - Added new EMS event approval states
  - Fix: 6.99.2-6.99.3 upgrade fails if spectre.conf doesn't exist
  - fix: Payment in commerce system
+ - fix: packages don't take on new pages style when deployed
 
 6.99.4
  - fix: better checking of selected template type

@@ -202,7 +202,7 @@ sub www_deployPackage {
 		my $masterLineage = $packageMasterAsset->get("lineage");
                 if (defined $packageMasterAsset && $packageMasterAsset->canView && $self->get("lineage") !~ /^$masterLineage/) {
 			my $deployedTreeMaster = $self->duplicateBranch($packageMasterAsset);
-			$deployedTreeMaster->update({isPackage=>0});
+			$deployedTreeMaster->update({isPackage=>0, styleTemplateId=>$self->get("styleTemplateId")});
 		}
 	}
 	return "";
