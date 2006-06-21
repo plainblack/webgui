@@ -624,7 +624,7 @@ sub eventIsApproved {
 	my $self = shift;
 	my $eventId = shift;
 	my ($result) = $self->session->db->quickArray("select approved from EventManagementSystem_products where productId=?",[$eventId]);
-	return $result;
+	return ($result eq "1");
 }
 
 #------------------------------------------------------------------
@@ -1191,6 +1191,42 @@ sub getEventDetails {
 	return $self->{_eventDetails}{$eventId};
 }
 
+#------------------------------------------------------------------
+=head2 getEventStates
+
+Returns a hash reference containing event approval states
+
+=cut
+
+sub getEventStates {
+	my $self = shift;
+	my $i18n = WebGUI::International->new($self->session, 'Asset_EventManagementSystem');
+	my $eventStates = {
+		'-2' => $i18n->echo("Cancelled"),
+		'-1' => $i18n->echo("Pending"),
+		'0'  => $i18n->echo("Denied"),
+		'1'  => $i18n->echo("Approved"),
+	};
+	
+	return $eventStates;
+}
+
+
+#------------------------------------------------------------------
+=head2 getEventStateLabel ( status_code )
+
+Returns an internationalized string that corresponds to an events 'approval'
+state
+
+=cut
+
+sub getEventStateLabel {
+	my $self = shift;
+	my $statusCode = shift;
+	my $eventStates = $self->getEventStates;
+	
+	return $eventStates->{$statusCode};
+}
 
 #------------------------------------------------------------------
 sub verifyPrerequisitesForm {
@@ -1579,12 +1615,23 @@ sub www_editEvent {
 	$f->hidden( -name=>"pid", -value=>$pid );
 
 	if ($self->canApproveEvents) {
-		$f->yesNo(
-			-value => $event->{approved},
+		#$f->yesNo(
+		#	-value => $event->{approved},
+		#	-name => 'approved',
+		#	-label => $i18n->get('approve event'),
+		#	-hoverHelp => $i18n->get('approve event description')
+		#);	
+
+		$f->radioList(
 			-name => 'approved',
 			-label => $i18n->get('approve event'),
-			-hoverHelp => $i18n->get('approve event description')
+			-hoverHelp => $i18n->get('approve event description'),
+			-options => $self->getEventStates,
+			-value => ($event->{"approved"} eq "0" ? "0" : $event->{approved} || '-1'),
+			-vertical => 1,
+			-sortByValue => 1,
 		);
+				
 	} else {
 		$f->hidden(
 			-name  => "approved",
@@ -2963,7 +3010,11 @@ sub www_search {
 	  $eventFields{'endDate'} = $event->{'endDate'};
 	  $eventFields{'productId'} = $event->{'productId'};
 	  $eventFields{'eventIsFull'} = ($eventFields{'seatsRemaining'} <= 0);
-	  $eventFields{'eventIsApproved'} = $event->{'approved'};
+	  $eventFields{'eventIsApproved'} = ($event->{'approved'} eq "1");
+	  $eventFields{'eventIsPending'}  = ($event->{'approved'} eq "-1");
+	  $eventFields{'eventIsCanceled'} = ($event->{'approved'} eq "-2");
+	  $eventFields{'eventIsDenied'}   = ($event->{'approved'} eq "0");
+	  $eventFields{'eventState.label'} = $self->getEventStateLabel($event->{approved});
 	  $eventFields{'manageToolbar'} = $self->session->icon->delete('func=deleteEvent;pid='.$event->{productId}, $self->getUrl,
 					  $i18n->get('confirm delete event')).
 					  $self->session->icon->edit('func=editEvent;pid='.$event->{productId}, $self->getUrl).

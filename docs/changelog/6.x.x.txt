@@ -8,7 +8,7 @@
  - Fixed a memory leak in Spectre that could cause it to double in size
    roughly every 30 hours under certain conditions.
  - fix: Problems with page.isSibling and page.inBranch
-
+ - Added new EMS event approval states
 
 6.99.4
  - fix: better checking of selected template type
