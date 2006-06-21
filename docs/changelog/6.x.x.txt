@@ -7,6 +7,7 @@
  - fix: Survey - editQuestionSave - yesNo fields always "yes" (Matthew Wilson)
  - Fixed a memory leak in Spectre that could cause it to double in size
    roughly every 30 hours under certain conditions.
+ - fix: Problems with page.isSibling and page.inBranch
 
 
 6.99.4

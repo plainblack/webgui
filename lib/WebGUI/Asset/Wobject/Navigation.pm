@@ -412,11 +412,10 @@ sub view {
 		$pageData->{"page.isDescendant"} = ( $pageLineage =~ m/^$currentLineage/ && !$pageData->{"page.isCurrent"});
 		$pageData->{"page.isAncestor"} = ( $currentLineage =~ m/^$pageLineage/ && !$pageData->{"page.isCurrent"});
 		my $currentBranchLineage = substr($currentLineage,0,12);
-		$pageData->{"page.inBranchRoot"} = ($currentBranchLineage =~ m/^$pageLineage/);
+		$pageData->{"page.inBranchRoot"} = ($pageLineage =~ m/^$currentBranchLineage/);
 		$pageData->{"page.isSibling"} = (
-			$pageData->{"page.inBranchRoot"} && 
-			$asset->getLineageLength == $current->getLineageLength &&
-			!$pageData->{"page.isCurrent"}
+			$asset->get("parentId") eq $current->get("parentId") &&
+			$asset->getId ne $current->getId
 			);
 		$pageData->{"page.inBranch"} = ( 
 			$pageData->{"page.isCurrent"} ||
