@@ -48,7 +48,9 @@ PerlRequire /data/WebGUI/sbin/preload.perl
 
 8. Edit "etc/WebGUI.conf" to match your DB settings and log directory.
 
-9. Run the following command from your WebGUI/sbin directory to install
+9. Edit "etc/spectre.conf" to define port and worker settings for spectre
+
+10. Run the following command from your WebGUI/sbin directory to install
    the required perl modules and determine whether you've configured 
    your system correctly.
 
@@ -56,13 +58,13 @@ PerlRequire /data/WebGUI/sbin/preload.perl
 
    If it returns all "OK" then you're done. 
 
-10. Start Apache.
+11. Start Apache.
 
-11. Start Spectre.
+12. Start Spectre.
 
 	cd /data/WebGUI/sbin
 	perl spectre.pl --daemon
 
-12. Browse to your site. You'll be guided through a few quick questions
+13. Browse to your site. You'll be guided through a few quick questions
    to setup an admin account.
 
