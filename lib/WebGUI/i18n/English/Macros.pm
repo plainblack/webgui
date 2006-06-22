@@ -9,7 +9,13 @@ our $I18N = {
 
 	'macro shortcut' => {
 		message => q|Macro Shortcut|,
-		lastUpdated => 1112591289
+		lastUpdated => 1112591289,
+	},
+
+	'macro enabled header' => {
+		message => q|Macro Enabled?|,
+		lastUpdated => 1112591289,
+		context => q|Table heading in List of Macros help page.  Short for "Is this Macro enabled?"|,
 	},
 
 	'macros list title' => {
@@ -18,10 +24,11 @@ our $I18N = {
 	},
 
 	'macros list body' => {
-                message => q|<p>The set of available Macros is defined in the WebGUI configuration file.  These Macros are available for use on your site:</p>
+                message => q|<p>The set of available Macros is defined in the WebGUI configuration file.  The table below shows all macros that are available for use on your site, and which ones have
+		been enabled on your use.  If the macro is enabled, the table will list the shortcut that is used to call it.</p>
 |,
 		context => 'Content for dynamically generated macro list',
-		lastUpdated => 1114134745,
+		lastUpdated => 1150994876,
 	},
 
 	'macro enabled' => {
