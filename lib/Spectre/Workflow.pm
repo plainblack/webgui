@@ -345,6 +345,7 @@ sub runWorker {
 	$request->header("X-instanceId",$instance->{instanceId});
 	$self->debug("Posting workflow instance ".$instance->{instanceId}." to $url.");
 	$kernel->post( useragent => 'request', { request => $request, response => $session->postback('workerResponse') });
+	$kernel->post( useragent => 'shutdown'); # we'll still get the response, we're just done sending the request
 	$self->debug("Workflow instance ".$instance->{instanceId}." posted.");
 }
 

@@ -389,6 +389,7 @@ sub runJob {
 		$request->header("X-config",$job->{config});
 		$self->debug("Posting schedule job ".$job->{taskId}." to $url.");
 		$kernel->post( useragent => 'request', { request => $request, response => $session->postback('runJobResponse') });
+		$kernel->post( useragent => 'shutdown'); # we'll still get the response, we're just done sending the request
 		$self->debug("Cron job ".$job->{taskId}." posted.");
 	}
 }

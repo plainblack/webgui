@@ -13,6 +13,8 @@
  - fix: Payment in commerce system
  - fix: packages don't take on new pages style when deployed
  - fix: Payment in commerce system (Part II)
+ - fix: viewIndividualSurvey shows "Answer" lines in Survey mode
+
 
 6.99.4
  - fix: better checking of selected template type

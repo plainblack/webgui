@@ -1308,7 +1308,7 @@ sub www_viewIndividualSurvey {
 	$var->{'duration.minutes.label'} = $i18n->get(79);
 	$var->{'duration.seconds'} = (($response->{endDate} - $response->{start})%60);
 	$var->{'duration.seconds.label'} = $i18n->get(80);
-	$var->{'answer.label'} = $i18n->get(19);
+	$var->{'answer.label'} = $i18n->get(19) if ($self->get("mode") eq "quiz");
 	$var->{'response.label'} = $i18n->get(66);
 	$var->{'comment.label'} = $i18n->get(57);
 	my $questions = $self->session->db->read("select Survey_questionId,question,answerFieldType from Survey_question 

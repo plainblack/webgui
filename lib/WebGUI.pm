@@ -83,7 +83,7 @@ sub contentHandler {
 	### inherit Apache request.
 	my $r = shift;
 	my $configFile = shift || $r->dir_config('WebguiConfig');
-	### Instantiate the API for this httpd instance.
+	### nstantiate the API for this httpd instance.
 	my $s = Apache2::ServerUtil->server;
 	### Open new or existing user session based on user-agent's cookie.
 	my $session = WebGUI::Session->open($s->dir_config('WebguiRoot'),$configFile,$r, $s);
