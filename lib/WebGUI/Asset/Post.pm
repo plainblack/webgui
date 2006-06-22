@@ -1079,12 +1079,13 @@ sub www_edit {
 	$var{'form.preview'} = WebGUI::Form::submit($self->session, {
 		value=>$i18n->get("preview","Asset_Collaboration")
 		});
+	my $numberOfAttachments = $self->getThread->getParent->getValue("attachmentsPerPost");
 	$var{'attachment.form'} = WebGUI::Form::image($self->session, {
 		name=>"storageId",
 		value=>$self->get("storageId"),
-		maxAttachments=>$self->getThread->getParent->getValue("attachmentsPerPost"),
+		maxAttachments=>$numberOfAttachments,
 		deleteFileUrl=>$self->getUrl("func=deleteFile;filename=")
-		});
+		}) if ($numberOfAttachments);
         $var{'contentType.form'} = WebGUI::Form::contentType($self->session, {
                 name=>'contentType',
                 value=>$self->getValue("contentType") || "mixed"
