@@ -421,7 +421,7 @@ sub resultCode {
 sub resultMessage {
 	my $self = shift;
 	
-	return $self->{_errorMessage} if ($self->connectionError);
+	return $self->{_resultMessage} if ($self->{_connectionError});
 	return $self->{_response}->{ErrorMessage};
 }
 
