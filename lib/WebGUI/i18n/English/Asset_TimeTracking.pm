@@ -244,7 +244,18 @@ our $I18N = {
 		'edit project resource label' => {
 			lastUpdated => 0,
 			message => 'Project Resource'
-		}
+		},
+
+		'timetracking add/edit title' => {
+			lastUpdated => 0,
+			message => 'Add/Edit Time Tracking'
+		},
+
+		'timetracking add/edit body' => {
+			lastUpdated => 0,
+			message => 'The Time Tracking Asset lets you define a set of tasks and then to track how well they are accomplished against an original estimate for the task.'
+		},
+
 	};
 
 
