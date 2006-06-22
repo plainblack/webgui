@@ -1,174 +1,251 @@
 package WebGUI::i18n::English::Asset_TimeTracking;
 
 our $I18N = {
-	'userViewTemplate hoverhelp' => {
-		message => q|Template to use for main user view of Time Tracker Application|,
-		lastUpdated => 0
+		'' => {
+			lastUpdated => 0,
+			message => ''
 		},
 
-	'userViewTemplate label' => {
-		message => q|Default Time Tracker User View Template|,
-		lastUpdated => 0
+		'Project Management Integration' => {
+			lastUpdated => 1150997998,
+			message => 'Project Management Integration'
 		},
 
-	'managerViewTemplate hoverhelp' => {
-		message => q|Template to use for manager view of Time Tracker Application|,
-		lastUpdated => 0
+		'Add Row' => {
+			lastUpdated => 1150997998,
+			message => 'Add Row'
 		},
 
-	'managerViewTemplate label' => {
-		message => q|Default Time Tracker Manager View Template|,
-		lastUpdated => 0
+		'There must be at least one row.  Please add more rows if you wish to delete this one' => {
+			lastUpdated => 1150997998,
+			message => 'There must be at least one row.  Please add more rows if you wish to delete this one'
 		},
 
-	'groupToManage hoverhelp' => {
-		message => q|Group that is able to view all time sheets and update completed time records|,
-		lastUpdated => 0
+		'manage project available task label' => {
+			lastUpdated => 0,
+			message => 'Available Tasks'
 		},
 
-	'groupToManage label' => {
-		message => q|Group to Manage Time|,
-		lastUpdated => 0
+		assetName => {
+			lastUpdated => 0,
+			message => 'Time Tracking System'
 		},
 
-	'timeRowTemplateId hoverhelp' => {
-		message => q|Template to user for building rows in the time tracker|,
-		lastUpdated => 0
-		},			
-
-	'timeRowTemplateId label' => {
-		message => q|Default Time Tracker Row|,
-		lastUpdated => 0
+		'No  name was entered for new task' => {
+			lastUpdated => 1150997998,
+			message => 'No  name was entered for new task'
 		},
 
-	'assetName' => {
-		message => q|Time Tracking System|,
-		lastUpdated => 0
+		'time report task label' => {
+			lastUpdated => 0,
+			message => 'Task'
 		},
 
-	'time report header' => {
-		message => q|Time entry for week ending %s|,
-		lastUpdated => 0
+		'edit project label' => {
+			lastUpdated => 0,
+			message => 'Edit Project'
 		},
 
-	'total hours label' => {
-		message => q|Total Hours|,
-		lastUpdated => 0
+		'manage project name label' => {
+			lastUpdated => 0,
+			message => 'Project Name'
 		},
 
-	'time report date label' => {
-		message => q|Date|,
-		lastUpdated => 0
+		'managerViewTemplate label' => {
+			lastUpdated => 0,
+			message => 'Default Time Tracker Manager View Template'
 		},
 
-	'time report project label' => {
-		message => q|Project|,
-		lastUpdated => 0
-		},			
-
-	'time report task label' => {
-		message => q|Task|,
-		lastUpdated => 0
+		'time report comments label' => {
+			lastUpdated => 0,
+			message => 'Comments'
 		},
 
-	'time report hours label' => {
-		message => q|Hours|,
-		lastUpdated => 0
+		'total hours label' => {
+			lastUpdated => 0,
+			message => 'Total Hours'
 		},
 
-	'time report comments label' => {
-		message => q|Comments|,
-		lastUpdated => 0
+		'New Task Name' => {
+			lastUpdated => 1150997998,
+			message => 'New Task Name'
 		},
 
-	'project manage label' => {
-		message => q|Manage Projects|,
-		lastUpdated => 0
+		'You may not submit more hours than are available during any given week.' => {
+			lastUpdated => 1150997998,
+			message => 'You may not submit more hours than are available during any given week.'
 		},
 
-	'manage project name label' => {
-		message => q|Project Name|,
-		lastUpdated => 0
+		'edit project tasks hoverhelp' => {
+			lastUpdated => 0,
+			message => 'Enter the project tasks, one per line, that you would like to track time against for this project'
 		},
 
-	'manage project available task label' => {
-		message => q|Available Tasks|,
-		lastUpdated => 0
-		},			
-
-	'manage project resource label' => {
-		message => q|Available Resources|,
-		lastUpdated => 0
+		'Choose yes to pull projects and task information from the various project management assets on your site' => {
+			lastUpdated => 1150997998,
+			message => 'Choose yes to pull projects and task information from the various project management assets on your site'
 		},
 
-	'manage projects screen label' => {
-		message => q|Manage Projects|,
-		lastUpdated => 0
+		'The highlighted fields are required if you wish to submit this form.' => {
+			lastUpdated => 1150997998,
+			message => 'The highlighted fields are required if you wish to submit this form.'
 		},
 
-	'add project label' => {
-		message => q|Add New Project|,
-		lastUpdated => 0
+		'time report project label' => {
+			lastUpdated => 0,
+			message => 'Project'
 		},
 
-	'edit project label' => {
-		message => q|Edit Project|,
-		lastUpdated => 0
-		},			
-
-	'edit project name label' => {
-		message => q|Project Name|,
-		lastUpdated => 0
+		'Are you sure you want to delete this activity' => {
+			lastUpdated => 1150997998,
+			message => 'Are you sure you want to delete this activity?'
 		},
 
-	'edit project name hoverhelp' => {
-		message => q|Enter the name of the project you wish to show up in the projects drop down menu for this time tracker|,
-		lastUpdated => 0
+		Tasks => {
+			lastUpdated => 1150997998,
+			message => 'Tasks'
 		},
 
-	'edit project id label' => {
-		message => q|Project Id|,
-		lastUpdated => 0
+		'edit project id hoverhelp' => {
+			lastUpdated => 0,
+			message => 'Project Identifier'
 		},
 
-	'edit project id hoverhelp' => {
-		message => q|Project Identifier|,
-		lastUpdated => 0
-		},		
-	'edit project resource hoverhelp' => {
-		message => q|Choose the resources you would like to be able to log time to this project|,
-		lastUpdated => 0
+		'edit project name hoverhelp' => {
+			lastUpdated => 0,
+			message => 'Enter the name of the project you wish to show up in the projects drop down menu for this time tracker'
 		},
 
-	'edit project resource label' => {
-		message => q|Project Resource|,
-		lastUpdated => 0
+		'Report Complete' => {
+			lastUpdated => 1150997998,
+			message => 'Report Complete'
 		},
 
-	'edit project tasks label' => {
-		message => q|Project Tasks|,
-		lastUpdated => 0
-		},			
-
-	'edit project tasks hoverhelp' => {
-		message => q|Enter the project tasks, one per line, that you would like to track time against for this project|,
-		lastUpdated => 0
+		Add => {
+			lastUpdated => 1150997998,
+			message => 'Add'
 		},
 
-	'edit project screen label' => {
-		message => q|Edit Project|,
-		lastUpdated => 0
+		'edit project resource hoverhelp' => {
+			lastUpdated => 0,
+			message => 'Choose the resources you would like to be able to log time to this project'
 		},
 
-	'no project message' => {
-		message => q|No projects created.  Click <a href="%s">here</a> to add a new project|,
-		lastUpdated => 0
+		'time report date label' => {
+			lastUpdated => 0,
+			message => 'Date'
 		},
 
-	'' => {
-		message => q||,
-		lastUpdated => 0
-		},							
-};
+		'edit project screen label' => {
+			lastUpdated => 0,
+			message => 'Edit Project'
+		},
+
+		'Choose One' => {
+			lastUpdated => 1150997998,
+			message => 'Choose One'
+		},
+
+		'This project cannot be deleted as it is currently being used by existing time entry records and would corrupt this data.  The records must be deleted if you wish to remove this project' => {
+			lastUpdated => 1150997998,
+			message => 'This project cannot be deleted as it is currently being used by existing time entry records and would corrupt this data.  The records must be deleted if you wish to remove this project'
+		},
+
+		'time report header' => {
+			lastUpdated => 0,
+			message => 'Time entry for week ending %s'
+		},
+
+		Save => {
+			lastUpdated => 1150997998,
+			message => 'Save'
+		},
+
+		'edit project tasks label' => {
+			lastUpdated => 0,
+			message => 'Project Tasks'
+		},
+
+		'userViewTemplate label' => {
+			lastUpdated => 0,
+			message => 'Default Time Tracker User View Template'
+		},
+
+		'no project message' => {
+			lastUpdated => 0,
+			message => 'No projects created.  Click <a href="%s">here</a> to add a new project'
+		},
+
+		'managerViewTemplate hoverhelp' => {
+			lastUpdated => 0,
+			message => 'Template to use for manager view of Time Tracker Application'
+		},
+
+		'add project label' => {
+			lastUpdated => 0,
+			message => 'Add New Project'
+		},
+
+		'timeRowTemplateId label' => {
+			lastUpdated => 0,
+			message => 'Default Time Tracker Row'
+		},
+
+		'groupToManage label' => {
+			lastUpdated => 0,
+			message => 'Group to Manage Time'
+		},
+
+		'time report hours label' => {
+			lastUpdated => 0,
+			message => 'Hours'
+		},
+
+		'manage projects screen label' => {
+			lastUpdated => 0,
+			message => 'Manage Projects'
+		},
+
+		'edit project name label' => {
+			lastUpdated => 0,
+			message => 'Project Name'
+		},
+
+		'project manage label' => {
+			lastUpdated => 0,
+			message => 'Manage Projects'
+		},
+
+		'timeRowTemplateId hoverhelp' => {
+			lastUpdated => 0,
+			message => 'Template to user for building rows in the time tracker'
+		},
+
+		'groupToManage hoverhelp' => {
+			lastUpdated => 0,
+			message => 'Group that is able to view all time sheets and update completed time records'
+		},
+
+		'edit project id label' => {
+			lastUpdated => 0,
+			message => 'Project Id'
+		},
+
+		'userViewTemplate hoverhelp' => {
+			lastUpdated => 0,
+			message => 'Template to use for main user view of Time Tracker Application'
+		},
+
+		'manage project resource label' => {
+			lastUpdated => 0,
+			message => 'Available Resources'
+		},
+
+		'edit project resource label' => {
+			lastUpdated => 0,
+			message => 'Project Resource'
+		}
+	};
+
 
 1;

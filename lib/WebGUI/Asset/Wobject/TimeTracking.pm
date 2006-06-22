@@ -65,8 +65,8 @@ sub definition {
 		    fieldType=>"yesNo",
 			defaultValue=>0,
 			tab=>"properties",
-			hoverHelp=>$i18n->echo("Choose yes to pull projects and task information from the various project management assets on your site"),
-			label=>$i18n->echo("Project Management Integration")
+			hoverHelp=>$i18n->get("Choose yes to pull projects and task information from the various project management assets on your site"),
+			label=>$i18n->get("Project Management Integration")
 		},
 	);
 	push(@{$definition}, {
@@ -194,9 +194,9 @@ sub view {
 
 	$var->{'form.footer'} = WebGUI::Form::formFooter($session);
 	
-	$var->{'js.alert.removeRow.error'} = $i18n->echo("There must be at least one row.  Please add more rows if you wish to delete this one");
-	$var->{'js.alert.validate.hours.error'} = $i18n->echo("You may not submit more hours than are available during any given week.");
-	$var->{'js.alert.validate.incomplete.error'} = $i18n->echo("The highlighted fields are required if you wish to submit this form.");
+	$var->{'js.alert.removeRow.error'} = $i18n->get("There must be at least one row.  Please add more rows if you wish to delete this one");
+	$var->{'js.alert.validate.hours.error'} = $i18n->get("You may not submit more hours than are available during any given week.");
+	$var->{'js.alert.validate.incomplete.error'} = $i18n->get("The highlighted fields are required if you wish to submit this form.");
 	
 	$var->{'form.timetracker'} = $self->www_buildTimeTable($var);
 	
@@ -284,7 +284,7 @@ sub www_deleteProject {
 	my ($count) = $db->quickArray("select count(*) from TT_timeEntry where projectId=".$db->quote($projectId));
     
 	if($count > 0) {
-	   my $error = $i18n->echo("This project cannot be deleted as it is currently being used by existing time entry records and would corrupt this data.  The records must be deleted if you wish to remove this project");
+	   my $error = $i18n->get("This project cannot be deleted as it is currently being used by existing time entry records and would corrupt this data.  The records must be deleted if you wish to remove this project");
 	   return $self->www_manageProjects($error);
 	}
 	
@@ -346,9 +346,9 @@ sub www_editProject {
     );
 	
 	#Add Tasks
-	my $taskNameLabel = $i18n->echo("New Task Name");
-	my $taskAddButtonLabel = $i18n->echo("Add");
-	my $taskTitleLabel = $i18n->echo("Tasks");
+	my $taskNameLabel = $i18n->get("New Task Name");
+	my $taskAddButtonLabel = $i18n->get("Add");
+	my $taskTitleLabel = $i18n->get("Tasks");
 	my $taskDeletePrompt = $i18n->echo("Are you sure you want to delete this activity?");
 	$taskDeletePrompt =~ s/'/\\'/g;
 	my $taskLabel = $i18n->get("edit project tasks label");
@@ -433,7 +433,7 @@ sub www_editProjectSave {
 	}
 	
 	#Add Tasks
-	my $newTaskLabel = $i18n->echo("New Task Name");
+	my $newTaskLabel = $i18n->get("New Task Name");
 	my $newTaskValue = $form->process("newTaskName","text");
 	my $newTaskId = "";
 	if($newTaskValue ne $newTaskLabel && $newTaskValue ne "") {
@@ -446,7 +446,7 @@ sub www_editProjectSave {
 	
 	if($action eq "addTask") {
 	   my $taskError = "";
-	   $taskError = $i18n->echo("No  name was entered for new task") if($newTaskId eq "");
+	   $taskError = $i18n->get("No  name was entered for new task") if($newTaskId eq "");
 	   return $self->www_editProject($projectId,$taskError);
 	}
 	
@@ -607,9 +607,9 @@ sub www_buildTimeTable {
 	$var->{'time.report.task.label'} = $i18n->get("time report task label");
 	$var->{'time.report.hours.label'} = $i18n->get("time report hours label");
 	$var->{'time.report.comments.label'} = $i18n->get("time report comments label");
-	$var->{'time.add.row.label'} = $i18n->echo("Add Row");
-	$var->{'time.save.label'} = $i18n->echo("Save");
-	$var->{'time.report.complete.label'} = $i18n->echo("Report Complete");
+	$var->{'time.add.row.label'} = $i18n->get("Add Row");
+	$var->{'time.save.label'} = $i18n->get("Save");
+	$var->{'time.report.complete.label'} = $i18n->get("Report Complete");
 	
 	
 	#my ($junk,$weekEnd) = $dt->dayStartEnd($daysInWeek->{"6"});
@@ -636,7 +636,7 @@ sub www_buildTimeTable {
 	   }
 	} 
 	
-	my $chooseLabel = $i18n->echo("Choose One");
+	my $chooseLabel = $i18n->get("Choose One");
 	#Build Task Lists based on Project Ids
 	tie my %taskList, "Tie::IxHash";
 	#Build task list javascript:
@@ -766,7 +766,7 @@ sub _buildRow {
 							});
 	
 	#Entry Date
-	my $chooseLabel = $i18n->echo("Choose One");
+	my $chooseLabel = $i18n->get("Choose One");
 	$var->{'entry.hours'} = $entry->{hours};
 	if($reportComplete) {
 	   $var->{'form.date'} = $entry->{taskDate};
