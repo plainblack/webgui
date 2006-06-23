@@ -24,6 +24,7 @@
  - fix: Very very bad commerce bug that caused ITransact to charge the user more
    than it was supposed to and more than it told them it was charging.
  - fix: Deleted assets reappear upon paste of parent
+ - fix: select all checkbox does not work on clipboard / asset manager in IE
 
 
 6.99.4
