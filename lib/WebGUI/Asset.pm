@@ -155,6 +155,7 @@ sub canView {
 	my $userId = shift;
 	my $user =  $self->session->user;
 	$user = WebGUI::User->new($self->session, $userId) if (defined $userId);
+	my $eh = $self->session->errorHandler;
 	if ($userId eq $self->get("ownerUserId")) {
                 return 1;
         } elsif ($user->isInGroup($self->get("groupIdView"))) {

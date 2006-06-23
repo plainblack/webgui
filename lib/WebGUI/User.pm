@@ -254,73 +254,34 @@ The group that you wish to verify against the user. Defaults to group with Id 3 
 =cut
 
 sub isInGroup {
-        my (@data, $groupId);
-        my ($self, $gid, $secondRun) = @_;
-        $gid = 3 unless (defined $gid);
-        my $uid = $self->userId;
-        ### The following several checks are to increase performance. If this section were removed, everything would continue to work as normal. 
-        return 1 if ($gid eq '7');		# everyone is in the everyone group
-        return 1 if ($gid eq '1' && $uid eq '1'); 	# visitors are in the visitors group
-        return 1 if ($gid eq '2' && $uid ne '1'); 	# if you're not a visitor, then you're a registered user
-        ### Get data for auxillary checks.
-	my $isInGroup = $self->session->stow->get("isInGroup");
-        ### Look to see if we've already looked up this group. 
-	return $isInGroup->{$uid}{$gid} if exists $isInGroup->{$uid}{$gid};
-        ### Lookup the actual groupings.
-	my $group = WebGUI::Group->new($self->session,$gid);
-	### Check for groups of groups.
-	my $users = $group->getAllUsers();
-	foreach my $user (@{$users}) {
-		$isInGroup->{$user}{$gid} = 1;
-		if ($uid eq $user) {
-			$self->session->stow->set("isInGroup",$isInGroup);
-			return 1;
-		}
-	}
-
-	 ### Check ldap
-        if ($group->get("ldapGroup") && $group->get("ldapGroupProperty")) {
-		   # skip if not logged in
-		   unless($uid eq '1') {
-			  # skip if user is not set to LDAP
-			  if($self->authMethod eq "LDAP") {
-			     my $auth = WebGUI::Auth->new($self->session,"LDAP",$uid);
-				 my $params = $auth->getParams();
-				 my $ldapLink = WebGUI::LDAPLink->new($self->session,$params->{ldapConnection});
-				 if($ldapLink ne "") {
-					my $people = [];
-					if($group->get("ldapRecursiveProperty")) {
-					   $ldapLink->recurseProperty($group->get("ldapGroup"),$people,$group->get("ldapGroupProperty"),$group->get("ldapRecursiveProperty"));
-					} else {
-					   $people = $ldapLink->getProperty($group->get("ldapGroup"),$group->get("ldapGroupProperty"));
-					}
-					my @peeps;
-                                        my $connectDn = lc($params->{connectDN});
-                                        $connectDn =~ s/\s*,\s*/,/g;
-                                        foreach my $person (@{$people}) {
-                                                $person =~ s/\s*,\s*/,/g;
-                                                push(@peeps,lc($person));
-                                        }
-                                    if(isIn($connectDn,@peeps)) {	 
-					   $isInGroup->{$uid}{$gid} = 1;
-                       if ($group->{'groupCacheTimeout'} > 10) {
-                          $group->deleteUsers([$uid]);
-                          $group->addUsers([$uid],$group->get("groupCacheTimeout"));
-                       }
-					} else {
-					   $isInGroup->{$uid}{$gid} = 0;
-                       			   $group->deleteUsers([$uid]) if ($group->get("groupCacheTimeout") > 10);
-					}
-					$ldapLink->unbind;
-					$self->session->stow->set("isInGroup",$isInGroup);
-				    return 1 if ($isInGroup->{$uid}{$gid});
-				 }
-			  }
-		   }
-		}
-        $isInGroup->{$uid}{$gid} = 0;
-	$self->session->stow->set("isInGroup",$isInGroup);
-        return 0;
+   my (@data, $groupId);
+   my ($self, $gid, $secondRun) = @_;
+   $gid = 3 unless (defined $gid);
+   my $uid = $self->userId;
+   ### The following several checks are to increase performance. If this section were removed, everything would continue to work as normal. 
+   #my $eh = $self->session->errorHandler;
+   #$eh->warn("Group Id is: $gid for ".$tgroup->name);
+   return 1 if ($gid eq '7');		# everyone is in the everyone group
+   return 1 if ($gid eq '1' && $uid eq '1'); 	# visitors are in the visitors group
+   return 1 if ($gid eq '2' && $uid ne '1'); 	# if you're not a visitor, then you're a registered user
+   ### Get data for auxillary checks.
+   my $isInGroup = $self->session->stow->get("isInGroup");
+   ### Look to see if we've already looked up this group. 
+   return $isInGroup->{$uid}{$gid} if exists $isInGroup->{$uid}{$gid};
+   ### Lookup the actual groupings.
+   my $group = WebGUI::Group->new($self->session,$gid);
+   ### Check for groups of groups.
+   my $users = $group->getAllUsers();
+   foreach my $user (@{$users}) {
+      $isInGroup->{$user}{$gid} = 1;
+	  if ($uid eq $user) {
+	     $self->session->stow->set("isInGroup",$isInGroup);
+		 return 1;
+	  }
+   }
+   $isInGroup->{$uid}{$gid} = 0;
+   $self->session->stow->set("isInGroup",$isInGroup);
+   return 0;
 }
 
 

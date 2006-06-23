@@ -532,6 +532,7 @@ sub getAllUsers {
 	push @users,
 		@{ $self->getUsers($withoutExpired) },
 		@{ $self->getDatabaseUsers() },
+		@{ $self->getLDAPUsers() },
 		@{ $self->getKarmaUsers() },
 		@{ $self->getScratchUsers() },
 		@{ $self->getIpUsers() },
@@ -586,7 +587,7 @@ sub getDatabaseUsers {
                 }
         }
 	return \@dbUsers;
-}	
+}
 
 #-------------------------------------------------------------------
 
@@ -722,6 +723,54 @@ sub getKarmaUsers {
 	my $self = shift;
 	return [] unless $self->session->setting->get('useKarma');
 	return $self->session->db->buildArrayRef('select userId from users where karma >= ?', [$self->karmaThreshold]);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getLDAPUsers ( )
+
+Get the set of users allowed to be in this group via an LDAP connection.
+
+=cut
+
+sub getLDAPUsers {
+	my $self = shift;
+	my @ldapUsers = ();
+	my $gid = $self->getId;
+	### Check LDAP
+	my $ldapLinkId = $self->get("ldapLinkId");
+	my $ldapGroup = $self->get("ldapGroup");
+	my $ldapGroupProperty = $self->get("ldapGroupProperty");
+    my $ldapRecursiveProperty = $self->get("ldapRecursiveProperty");
+	
+	return [] unless ($ldapLinkId && $ldapGroup && $ldapGroupProperty);
+	
+	my $ldapLink = WebGUI::LDAPLink->new($self->session,$ldapLinkId);
+	unless ($ldapLink && $ldapLink->bind) {
+	   $self->session->errorHandler->warn("There was a problem connecting to LDAP link $ldapLinkId for group ID $gid.");
+	   return [];
+	}
+	
+	my $people = [];
+	if($ldapRecursiveProperty) {
+	   $ldapLink->recurseProperty($ldapGroup,$people,$ldapGroupProperty,$ldapRecursiveProperty);
+	} else {
+	   $people = $ldapLink->getProperty($ldapGroup,$ldapGroupProperty);
+	}
+	$ldapLink->unbind;
+    
+	foreach my $person (@{$people}) {
+	   $person =~ s/\s*,\s*/,/g;
+	   $person = lc($person);
+	   my ($userId) = $self->session->db->quickArray("select userId from authentication where authMethod='LDAP' and fieldName='connectDN' and lower(fieldData)=?",[$person]);
+	   if($userId) {
+	      push(@ldapUsers,$userId);
+	   } else {
+	      $self->session->errorHandler->warn("Could not find matching userId for dn $person in WebGUI for group $gid");
+	   }
+	}
+	
+	return \@ldapUsers;
 }	
 
 #-------------------------------------------------------------------
@@ -1075,6 +1124,27 @@ sub ldapGroupProperty {
            $self->set("ldapGroupProperty", $value);
         }
         return $self->get("ldapGroupProperty");
+}
+
+#-------------------------------------------------------------------
+
+=head2 ldapLinkId ( [ value ] )
+
+Returns the ldapLinkId for this group.
+
+=head3 value
+
+If specified, the ldapLinkId is set to this value and in-memory cached user and group data is cleared.
+
+=cut
+
+sub ldapLinkId {
+   my $self = shift;
+   my $value = shift;
+   if (defined $value) {
+      $self->set("ldapLinkId",$value);
+   }
+   return $self->get("ldapLinkId");
 }
 
 #-------------------------------------------------------------------
