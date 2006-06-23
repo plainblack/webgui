@@ -704,8 +704,8 @@ This method returns all events except for
  b) any events currently assigned as a prerequisite to the eventId parameter passed in
 as a hash reference with the productId, and title
 
- Checks property globalPrerequisites to determine if events from all defined Event Managers should be displayed
- or only the events defined in this particular Event Manager
+Checks property globalPrerequisites to determine if events from all defined Event Managers should be displayed
+or only the events defined in this particular Event Manager
 
 =head3 eventId
 
@@ -1192,6 +1192,7 @@ sub getEventDetails {
 }
 
 #------------------------------------------------------------------
+
 =head2 getEventStates
 
 Returns a hash reference containing event approval states
@@ -1213,6 +1214,7 @@ sub getEventStates {
 
 
 #------------------------------------------------------------------
+
 =head2 getEventStateLabel ( status_code )
 
 Returns an internationalized string that corresponds to an events 'approval'
