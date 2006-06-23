@@ -17,6 +17,8 @@
  - fix: Attachment label but no field in CS posts
  - fix: isInGroup now processes LDAP users correctly
  - fix: WG user not logged in Apache
+ - Upgraded to TinyMCE 2.0.6.1, which fixes a number of bugs that WebGUI users
+   have been experiencing with the Rich Editor.
 
 6.99.4
  - fix: better checking of selected template type
