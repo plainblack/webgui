@@ -1656,8 +1656,8 @@ sub publish {
 	my $self = shift;
 	my $statesToPublish = shift;
 	
-	my $stateList = $self->session->db->quoteAndJoin($statesToPublish);
-	my $where = "and state in (".$stateList.")" if $statesToPublish;
+	my $stateList = $self->session->db->quoteAndJoin($statesToPublish) if $statesToPublish;
+	my $where = "and state in (".$stateList.")" if $stateList;
 	
 	my $assetIds = $self->session->db->buildArrayRef("select assetId from asset where lineage like ".$self->session->db->quote($self->get("lineage").'%')." $where");
         my $idList = $self->session->db->quoteAndJoin($assetIds);
