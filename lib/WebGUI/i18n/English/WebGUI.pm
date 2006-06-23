@@ -3990,6 +3990,11 @@ Get a copy of wget and use this: <code>wget -p -r --html-extension -k http://the
 		message => q|Country|,
 		lastUpdated => 0,
 	},
+	
+	'noldaplink' => {
+	    message => q|No LDAP Connection|,
+		lastUpdated => 0,
+	}
 
 };
 
