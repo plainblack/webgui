@@ -19,11 +19,54 @@ my $quiet; # this line required
 
 
 my $session = start(); # this line required
+fixGroups();
 
 # upgrade functions go here
 
 finish($session); # this line required
 
+
+#-------------------------------------------------
+sub fixGroups {
+   print "\tUpdating Groups.\n" unless ($quiet);
+   my $tableList = [
+			"alter table groups add ldapLinkId varchar(22) binary default NULL"
+          ];
+
+   foreach (@{$tableList}) {
+      $session->db->write($_);
+   }
+   
+   my $ldapLinks = {};
+   
+   my $links = WebGUI::LDAPLink->getList($session);
+   foreach my $linkId (keys %{$links}) {
+      my $ldapLink = WebGUI::LDAPLink->new($session,$linkId);
+	  if ($ldapLink->bind) {
+	     $ldapLinks->{$linkId} = $ldapLink;
+	  } 
+   }
+   
+   
+   #Try to figure out which LDAP link each group belongs to
+   my $sth = $session->db->read("select groupId, ldapGroup, ldapGroupProperty from groups where ldapGroup is not NULL and ldapGroupProperty is not NULL and ldapGroup != '' and ldapGroupProperty != ''");
+   while (my $hash = $sth->hashRef) {
+	  foreach my $linkId (keys %{$ldapLinks}) {
+	     my $ldapLink = $ldapLinks->{$linkId};
+         my $people = $ldapLink->getProperty($hash->{ldapGroup},$hash->{ldapGroupProperty});
+	     if(scalar(@{$people})) {
+	        $session->db->write("update groups set ldapLinkId=? where groupId=?",[$linkId,$hash->{groupId}]);
+		 }
+      }
+   }
+   
+   foreach my $linkId (keys %{$ldapLinks}) {
+      my $ldapLink = $ldapLinks->{$linkId};
+	  $ldapLink->unbind;
+   }
+   
+
+}
 
 ##-------------------------------------------------
 #sub exampleFunction {
