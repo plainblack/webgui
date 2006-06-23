@@ -1,3 +1,31 @@
+Version 2.0.6.1 (2005-05-04)
+	Fixed issue where the layer and style plugins couldn't be added in incorrect order.
+	Fixed issue with Firefox nl not beeing defined in triggerSave correctly.
+Version 2.0.6 (2005-05-03)
+	Added new theme_advanced_source_editor_wrap option, this gives the possibility to force word wrapping.
+	Added new support for using div,blockquote,dt,dd,code,samp as a items in the theme_advanced_blockformats option.
+	Added new strict_loading_mode option, this switches the loading method from document.write to DOM.
+	Added new hidden_tab_class, display_tab_class options for resolving the MSIE image dimension bug.
+	Added new absolute layer support, this was added to a new plugin called layer.
+	Added new CSS style properties support, this was as a plugin called style.
+	Fixed bug where TinyMCE was reporting a warning when inserting a image while running on HTTPS.
+	Fixed bug where pressing the browser back button after submit removed empty paragraphs in MSIE.
+	Fixed bug where links the the same page as the editor page was converted into a /.
+	Fixed bug where the getSelectedHTML method was returning undefined when selecting controls in MSIE.
+	Fixed bug with unterminated string literal errors where reported in some browsers.
+	Fixed bug where src and href where converted into xsrc and xhref in text.
+	Fixed bug where two characters where removed by backspace sometimes in Gecko.
+	Fixed bug where class drop list wasn't visible in some of the table dialogs.
+	Fixed bug where br elements where incorrectly removed within paragraphs on backspace.
+	Fixed bug where drag/drop operations failed in MSIE when editor height was set to a % value.
+	Fixed bug where width/height was lost on images if they where placed in hidden tabs in MSIE.
+	Fixed bugs with CSS auto import parsing, contributed by Scott Eade.
+	Fixed compatiblity issues with MSIE 5.0. Some RegExps needed to be rewritten.
+	Fixed issue that made it impossible to remove the entity code/name for &#39;.
+	Fixed issue with odd <br></br> elements not beeing handled properly.
+	Fixed issue where TinyMCE couldn't be loaded in a XML document.
+	Fixed issue with contextmenu beeing placed outside of visible area on Gecko browsers.
+	Fixed issue whith area tag not being closed.
 Version 2.0.5.1 (2005-03-22)
 	Fixed bug where emtpy paragraphs sometimes got removed in MSIE.
 	Fixed bug where autosave plugin was running even in fullscreen mode.

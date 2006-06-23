@@ -21,6 +21,16 @@
 		<li>Add the button name to button list, example: theme_advanced_buttons3_add : &quot;spellchecker&quot;.</li>
 	</ol>
 	</p>
+	<h3>Spellchecker plugins/modes</h3>
+	<p>
+		TinyMCE Spellchecker currently supports 3 modes. These are available as configurable PHP classes.
+		<ul>
+			<li>TinyPspell - Run pspell within PHP. (PHP needs to be compiled with pspell support)</li>
+			<li>TinyPspellShell - Run pspell as a command line shell application.</li>
+			<li>TinyGoogleSpell - Use HTTP proxy bridge to connect to a Google XML Web Service.</li>
+		</ul>
+		Use this as the value for the the languages option when you are using the GoogleSpell class: +English=en,Danish=da,Dutch=nl,Finnish=fi,French=fr,German=de,Italian=it,Polish=pl,Portuguese=pt,Spanish=es,Swedish=sv
+	<br /><br /></p>
 	<h3>Initialization Example</h3>
 	<p>
 	<div class="example">
@@ -51,7 +61,6 @@ tinyMCE.init({
  	</tr>
 	</table>
 	</p>
-
 </div>
 
 <div class="footer">
@@ -59,6 +68,5 @@ tinyMCE.init({
 	<div class="copyright">Copyright &copy; 2003-2006 <a href="http://www.moxiecode.com">Moxiecode Systems AB</a></div>
 	<br style="clear: both" />
 </div>
-
 </body>
 </html>
