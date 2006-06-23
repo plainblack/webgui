@@ -478,7 +478,7 @@ my	%transactionData = %{$self->{_transactionParams}};
   <TransactionData>
     <VendorId>".$self->get('vendorId')."</VendorId>
     <VendorPassword>".$self->get('password')."</VendorPassword>
-    <HomePage>".$self->session->setting->get("companyURL")."</HomePage>";
+    <HomePage>".$self->session->setting->get("companyURL")."</HomePage>\n";
 
 	if ($self->{_recurring}) {
 		$xml .=
@@ -487,7 +487,7 @@ my	%transactionData = %{$self->{_transactionParams}};
       <RecurReps>$transactionData{TERM}</RecurReps>
       <RecurTotal>$transactionData{AMT}</RecurTotal>
       <RecurDesc>$transactionData{DESCRIPTION}</RecurDesc>
-    </RecurringData>";
+    </RecurringData>\n";
 	};
 
 	$xml .=
@@ -505,10 +505,11 @@ my	%transactionData = %{$self->{_transactionParams}};
 	#	$data =~ s/>/&gt;/sg;
 	#	$data =~ s/"/&quot;/sg;
 		$data =~ tr/A-Za-z0-9 //dc;
+		my $itemPrice = $_->{amount} / $_->{quantity};
 		$xml .= 
 "   <Item>
         <Description>".$data."</Description>
-	<Cost>".sprintf('%.2f', $_->{amount})."</Cost>
+	<Cost>".sprintf('%.2f', $itemPrice)."</Cost>
 	<Qty>".$_->{quantity}."</Qty>
       </Item>\n";
 	}
@@ -527,7 +528,15 @@ my	%transactionData = %{$self->{_transactionParams}};
   </TransactionData>
 </SaleRequest>";
 
+##
+## Nice for debugging
+##
+# open(DAT,">/tmp/itransact.xml") || die("Cannot Open File");
+# print DAT "$xml";
+# close(DAT);
+#
 
+$self->session->errorHandler->warn("<pre>".$xml."</pre>");
 my	$xmlTransactionScript = 'https://secure.paymentclearing.com/cgi-bin/rc/xmltrans.cgi';
 
 	# Set up LWP to post the XML to iTransact.

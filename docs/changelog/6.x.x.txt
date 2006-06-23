@@ -19,6 +19,8 @@
  - fix: WG user not logged in Apache
  - Upgraded to TinyMCE 2.0.6.1, which fixes a number of bugs that WebGUI users
    have been experiencing with the Rich Editor.
+ - fix: Very very bad commerce bug that caused ITransact to charge the user more
+   than it was supposed to and more than it told them it was charging.
 
 6.99.4
  - fix: better checking of selected template type
