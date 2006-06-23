@@ -145,7 +145,7 @@ sub validateProfileData {
 		} else {
 			$data{$field->getId} = $fieldValue;
 		}
-		if ($field->isRequired && !$data{$field->getId}) {
+		if ($field->isRequired && $data{$field->getId} eq "") {
 			$error .= '<li>'.$field->getLabel.' '.$i18n->get(451).'</li>';
 		} elsif ($field->getId eq "email" && isDuplicateEmail($session,$data{$field->getId})) {
 			$warning .= '<li>'.$i18n->get(1072).'</li>';
