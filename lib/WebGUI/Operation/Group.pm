@@ -377,6 +377,17 @@ sub www_editGroup {
 		-label=>$i18n->get(1005),
 		-hoverHelp=>$i18n->get('1005 description'),
 		);
+		
+    tie my %links, "Tie::IxHash";
+	%links = %{WebGUI::LDAPLink->getList($session)};
+	%links = (""=>$i18n->get("noldaplink"),%links);
+	$f->selectBox(
+	                -name=>"ldapLinkId",
+					-label=>$i18n->get("ldapConnection","AuthLDAP"),
+					-hoverHelp=>$i18n->get("ldapConnection description","AuthLDAP"),
+					-options=>\%links,
+					-value=>[$g->ldapLinkId]
+				  );
 	$f->text(
 	       -name=>"ldapGroup",
 		   -label=>$i18n->get("LDAPLink_ldapGroup","AuthLDAP"),
@@ -427,6 +438,7 @@ sub www_editGroupSave {
 	$g->databaseLinkId($session->form->process("databaseLinkId"));
 	$g->dbQuery($session->form->process("dbQuery"));
 	$g->groupCacheTimeout($session->form->interval("groupCacheTimeout"));
+	$g->ldapLinkId($session->form->selectBox("ldapLinkId"));
 	$g->ldapGroup($session->form->text("ldapGroup"));
 	$g->ldapGroupProperty($session->form->text("ldapGroupProperty"));
 	$g->ldapRecursiveProperty($session->form->text("ldapRecursiveProperty"));
