@@ -1214,7 +1214,7 @@ sub manageAssets {
 		$output .= '<div style="width: 28%; float: left; padding-right: 30px; font-size: 14px;"><fieldset><legend>'.$i18n->get(1082).'</legend>'
 			.WebGUI::Form::formHeader($self->session)
 			.WebGUI::Form::hidden($self->session,{name=>"func",value=>"pasteList"})
-			.WebGUI::Form::checkbox($self->session,{extras=>'onchange="toggleClipboardSelectAll(this.form);"'})
+			.WebGUI::Form::checkbox($self->session,{extras=>'onclick="toggleClipboardSelectAll(this.form);"'})
 			.' '.$i18n->get("select all").'<br />'
 			.WebGUI::Form::checkList($self->session,{name=>"assetId",vertical=>1,options=>\%options})
 			.'<br />'
