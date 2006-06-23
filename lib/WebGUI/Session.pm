@@ -587,7 +587,6 @@ sub user {
 		}	
 		delete $self->{_stow};
 		$self->{_user} = $option->{user} || WebGUI::User->new($self, $userId);
-		$self->request->user($self->{_user}->username) if ($self->request);
 	} elsif (!exists $self->{_user}) {
 		$self->{_user} = WebGUI::User->new($self, $self->var->get('userId'));
 	}

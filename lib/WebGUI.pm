@@ -93,6 +93,7 @@ sub contentHandler {
 	} elsif ($session->setting->get("specialState") eq "upgrading") {
 		upgrading($session);
 	} else {
+		$r->user($session->user->username); # Tell Apache who's getting this page
 		my $output = processOperations($session);
 		if ($output ne "") {
 			# do nothing because we have operation output to display

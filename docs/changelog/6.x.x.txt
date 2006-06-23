@@ -16,6 +16,7 @@
  - fix: viewIndividualSurvey shows "Answer" lines in Survey mode
  - fix: Attachment label but no field in CS posts
  - fix: isInGroup now processes LDAP users correctly
+ - fix: WG user not logged in Apache
 
 6.99.4
  - fix: better checking of selected template type
