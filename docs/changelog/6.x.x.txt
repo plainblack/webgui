@@ -26,6 +26,7 @@
  - fix: Deleted assets reappear upon paste of parent
  - fix: select all checkbox does not work on clipboard / asset manager in IE
  - fix: yes/no required profile fields evaluate as false if user chooses no
+ - fix: Shortcuts w/multiple criteria
 
 
 6.99.4

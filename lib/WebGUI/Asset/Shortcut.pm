@@ -79,7 +79,7 @@ sub _drawQueryBuilder {
 
 		# The operator select field
 		my $opFieldName = "op_field".$i;
-		my $opField = WebGUI::Form::selectList($self->session, {
+		my $opField = WebGUI::Form::selectBox($self->session, {
 			name=>$opFieldName,
 			uiLevel=>5,
 			options=>$operator{$fieldType},
@@ -483,12 +483,15 @@ sub getShortcutByCriteria {
 	my $constraint = $criteria;
 	
 	# Get each expression from $criteria
+	my $db = $self->session->db;
+	my $counter = "b";
+	my @joins = ();
 	foreach my $expression ($criteria =~ /($attribute\s*$operator\s*$attribute)/gi) {
 		# $expression will match "State = Wisconsin"
 
         	my $replacement = $expression;	# We don't want to modify $expression.
 						# We need it later.
-
+		push(@joins," left join metaData_values ".$counter."_v on a.assetId=".$counter."_v.assetId ");
 		# Get the field (State) and the value (Wisconsin) from the $expression.
 	        $expression =~ /($attribute)\s*$operator\s*($attribute)/gi;
 	        my $field = $1;
@@ -498,35 +501,34 @@ sub getShortcutByCriteria {
 		my $quotedField = $field;
 		my $quotedValue = $value;
 		unless ($field =~ /^\s*['"].*['"]\s*/) {
-			$quotedField = $self->session->db->quote($field);
+			$quotedField = $db->quote($field);
 		}
                 unless ($value =~ /^\s*['"].*['"]\s*/) {
-                        $quotedValue = $self->session->db->quote($value);
+                        $quotedValue = $db->quote($value);
                 }
 		
 		# transform replacement from "State = Wisconsin" to 
 		# "(fieldname=State and value = Wisconsin)"
-	        $replacement =~ s/\Q$field/(fieldname=$quotedField and value /;
+		my $clause = "(".$counter."_p.fieldName=".$quotedField." and ".$counter."_v.value ";
+	        $replacement =~ s/\Q$field/$clause/;
 	        $replacement =~ s/\Q$value/$quotedValue )/i;
 
 		# replace $expression with the new $replacement in $constraint.
 	        $constraint =~ s/\Q$expression/$replacement/;
+		push (@joins, " left join metaData_properties ".$counter."_p on ".$counter."_p.fieldId=".$counter."_v.fieldId ");
+		$counter++;
 	}
-	my $sql =  "	select w.assetId 
-			from metaData_values d, metaData_properties f, asset w 
-			where f.fieldId = d.fieldId
-				and w.assetId = d.assetId
-				and w.className=".$self->session->db->quote($self->getShortcutDefault->get("className"));
 
-	
+	my $sql = "select a.assetId from asset a
+			".join("\n", @joins)."
+			where a.className = ".$db->quote($self->getShortcutDefault->get("className"));
 	# Add constraint only if it has been modified.
 	$sql .= " and ".$constraint if (($constraint ne $criteria) && $constraint ne "");
-# Can't do this without extensive refactoring.....!  
-#	$sql .= " order by assetData.revisionDate desc";
+	$sql .= " order by a.creationDate desc";
 
 	# Execute the query with an unconditional read
 	my @ids;
-        my $sth = $self->session->db->unconditionalRead($sql);
+        my $sth = $db->unconditionalRead($sql);
         while (my ($data) = $sth->array) {
 		push (@ids, $data);
         }
