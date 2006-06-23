@@ -1641,17 +1641,28 @@ sub processTemplate {
 
 #-------------------------------------------------------------------
 
-=head2 publish ( )
+=head2 publish ( arrayref )
 
-Sets an asset and it's descendants to a state of 'published' regardless of it's current state.
+Sets an asset and it's descendants to a state of 'published' regardless of it's current state by default.
+Otherwise sets state to published only for assests matching one of the states passed in.
+
+=head3 arrayref
+
+[ 'clipboard', 'clipboard-limbo', 'trash', 'trash-limbo', 'published' ]
 
 =cut
 
 sub publish {
 	my $self = shift;
-	my $assetIds = $self->session->db->buildArrayRef("select assetId from asset where lineage like ".$self->session->db->quote($self->get("lineage").'%'));
+	my $statesToPublish = shift;
+	
+	my $stateList = $self->session->db->quoteAndJoin($statesToPublish);
+	my $where = "and state in (".$stateList.")" if $statesToPublish;
+	
+	my $assetIds = $self->session->db->buildArrayRef("select assetId from asset where lineage like ".$self->session->db->quote($self->get("lineage").'%')." $where");
         my $idList = $self->session->db->quoteAndJoin($assetIds);
-        $self->session->db->write("update asset set state='published', stateChangedBy=".$self->session->db->quote($self->session->user->userId).", stateChanged=".$self->session->datetime->time()." where assetId in (".$idList.")");
+        
+	$self->session->db->write("update asset set state='published', stateChangedBy=".$self->session->db->quote($self->session->user->userId).", stateChanged=".$self->session->datetime->time()." where assetId in (".$idList.")");
 	my $cache = WebGUI::Cache->new($self->session);
         foreach my $id (@{$assetIds}) {
         	# we do the purge directly cuz it's a lot faster than instantiating all these assets

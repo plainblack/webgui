@@ -153,7 +153,7 @@ sub paste {
 	my $pastedAsset = WebGUI::Asset->newByDynamicClass($self->session,$assetId);
 return 0 unless ($self->get("state") eq "published");
 	if ($self->getId eq $pastedAsset->get("parentId") || $pastedAsset->setParent($self)) {
-		$pastedAsset->publish;
+		$pastedAsset->publish(['published']); # Paste only published assets
 		$pastedAsset->updateHistory("pasted to parent ".$self->getId);
 		return 1;
 	}
