@@ -110,7 +110,7 @@ sub reindexSite {
 	my $rs = $session->db->read("select assetId, className from asset where state='published'");	
 	while (my ($id, $class) = $rs->array) {
 		my $asset = WebGUI::Asset->new($session,$id,$class);
-		if (defined $asset && $asset->get("status") eq "approved" || defined $asset && $asset->get("status") eq "archived") {
+		if (defined $asset && $asset->get("state") eq "published" && ($asset->get("status") eq "approved" || $asset->get("status") eq "archived")) {
 			print $asset->getId."\t".$asset->getTitle."\t";
 			my $t = [Time::HiRes::gettimeofday()];
 			$asset->indexContent;

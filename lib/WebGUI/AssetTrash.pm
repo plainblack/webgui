@@ -106,6 +106,7 @@ sub purge {
 		$self->session->db->write("delete from ".$definition->{tableName}." where assetId=".$self->session->db->quote($self->getId));
 	}
 	$self->session->db->write("delete from metaData_values where assetId = ".$self->session->db->quote($self->getId));
+	$self->session->db->write("delete from assetIndex where assetId=".$self->session->db->quote($self->getId));
 	$self->session->db->write("delete from asset where assetId=".$self->session->db->quote($self->getId));
 	$self->session->db->commit;
 	$self->purgeCache;
@@ -126,10 +127,15 @@ Removes asset from lineage, places it in trash state. The "gap" in the lineage i
 sub trash {
 	my $self = shift;
 	return undef if ($self->getId eq $self->session->setting->get("defaultPage") || $self->getId eq $self->session->setting->get("notFoundPage"));
-	$self->session->db->beginTransaction;
-	$self->session->db->write("update asset set state='trash-limbo' where lineage like ".$self->session->db->quote($self->get("lineage").'%'));
-	$self->session->db->write("update asset set state='trash', stateChangedBy=".$self->session->db->quote($self->session->user->userId).", stateChanged=".$self->session->datetime->time()." where assetId=".$self->session->db->quote($self->getId));
-	$self->session->db->commit;
+	my $db = $self->session->db;
+	$db->beginTransaction;
+	my $sth = $db->read("select assetId from asset where lineage like ?",[$self->get("lineage").'%']);
+	while (my ($id) = $sth->array) {
+		$db->write("delete from assetIndex where assetId=?",[$id]);
+	}
+	$db->write("update asset set state='trash-limbo' where lineage like ?",[$self->get("lineage").'%']);
+	$db->write("update asset set state='trash', stateChangedBy=?, stateChanged=? where assetId=?",[$self->session->user->userId, $self->session->datetime->time(), $self->getId]);
+	$db->commit;
 	$self->{_properties}{state} = "trash";
 	$self->updateHistory("trashed");
 	$self->purgeCache;
