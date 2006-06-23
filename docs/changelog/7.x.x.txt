@@ -1,0 +1,5 @@
+7.0.0
+ - Welcome to a whole new world of WebGUI. After 2.5 years and 20,000 hours of
+   development, WebGUI 7 is finally here.
+
+
