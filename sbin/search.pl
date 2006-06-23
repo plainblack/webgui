@@ -24,19 +24,23 @@ my $help = 0;
 my $indexsite = 0;
 my $configFile = "";
 my $indexAll = "";
+my $updatesite = 0;
 
 GetOptions(
 	'indexall'=>\$indexAll,
 	'configFile=s'=>\$configFile,
 	'search=s'=>\$search,
 	'help'=>\$help,
-	'indexsite'=>\$indexsite
+	'indexsite'=>\$indexsite,
+	'updatesite'=>\$updatesite
 	);
 
 if ($configFile) {
 	my $session = WebGUI::Session->open("..", $configFile);
 	if ($indexsite) {
 		reindexSite($session);
+	} elsif ($updatesite) {
+		updateSite($session);
 	} elsif ($search) {
 		searchSite($session, $search);
 	} else {
@@ -73,6 +77,11 @@ Options:
 
 	--search= *		Searches the site for a keyword or phrase and
 				returns the results.
+
+	--updatesite *		Indexes content that has not be indexed, but does not
+				index content that has been indexed. This is useful
+				if the --indexsite option had to be stopped part way
+				through.
 
 	* This option requires the --configFile option.
 
@@ -125,4 +134,22 @@ sub searchSite {
 	print "\nSearch took ".Time::HiRes::tv_interval($t)." seconds.\n";
 }
 
+#-------------------------------------------------------------------
+sub updateSite {
+	my $session = shift;
+	my $siteTime = [Time::HiRes::gettimeofday()];
+	my $rs = $session->db->read("select assetId, className from asset where state='published'");	
+	while (my ($id, $class) = $rs->array) {
+		my ($done) = $session->db->quickArray("select count(*) from assetIndex where assetId=?",[$id]);
+		next if $done;
+		my $asset = WebGUI::Asset->new($session,$id,$class);
+		if (defined $asset && $asset->get("status") eq "approved" || defined $asset && $asset->get("status") eq "archived") {
+			print $asset->getId."\t".$asset->getTitle."\t";
+			my $t = [Time::HiRes::gettimeofday()];
+			$asset->indexContent;
+			print "(".Time::HiRes::tv_interval($t).")\n";
+		}
+	}
+	print "\nSite indexing took ".Time::HiRes::tv_interval($siteTime)." seconds.\n";
+}
 
