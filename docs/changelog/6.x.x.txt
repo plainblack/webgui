@@ -25,6 +25,7 @@
    than it was supposed to and more than it told them it was charging.
  - fix: Deleted assets reappear upon paste of parent
  - fix: select all checkbox does not work on clipboard / asset manager in IE
+ - fix: yes/no required profile fields evaluate as false if user chooses no
 
 
 6.99.4
