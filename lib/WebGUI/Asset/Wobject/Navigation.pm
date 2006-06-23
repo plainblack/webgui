@@ -368,10 +368,12 @@ sub view {
 	my $absoluteDepthOfLastPage;
 	my %lastChildren;
 	my $previousPageData = undef;
+	my $eh = $self->session->errorHandler;
 	foreach my $asset (@{$assets}) {
 		# skip pages we shouldn't see
 		my $pageLineage = $asset->get("lineage");
 		next if ($pageLineage =~ m/^$lineageToSkip/);
+		
 		if ($asset->get("isHidden") && !$self->get("showHiddenPages")) {
 			$lineageToSkip = $pageLineage unless ($pageLineage eq "000001");
 			next;
