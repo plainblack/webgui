@@ -7,6 +7,15 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+6.99.5
+--------------------------------------------------------------------
+
+ * In transfering LDAP from the users to group module, it was discovered
+   the ldap link must also be saved with the group.  The upgrade attempts 
+   to determine the proper LDAP Link to use, however it is not guarenteed
+   to be accurate.  If you use LDAP groups in WebGUI, be sure and check 
+   each one to make sure they are assigned to the appropriate LDAP Link.
+
 6.99.4
 --------------------------------------------------------------------
 
