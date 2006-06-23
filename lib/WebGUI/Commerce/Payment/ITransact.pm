@@ -536,7 +536,6 @@ my	%transactionData = %{$self->{_transactionParams}};
 # close(DAT);
 #
 
-$self->session->errorHandler->warn("<pre>".$xml."</pre>");
 my	$xmlTransactionScript = 'https://secure.paymentclearing.com/cgi-bin/rc/xmltrans.cgi';
 
 	# Set up LWP to post the XML to iTransact.
