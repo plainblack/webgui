@@ -119,7 +119,7 @@ function AssetManager_Write() {
 	//added drag image
 	document.write('<div id="dragImage" class="dragImage"></div>');
 	
-	document.write('<form method="post" name="assetManagerForm"><input type="hidden" name="func" /><input type="hidden" name="proceed" />');
+	document.write('<form method="post" action="'+getWebguiProperty('pageURL')+'" name="assetManagerForm"><input type="hidden" name="func" /><input type="hidden" name="proceed" />');
 	document.write('<table class="am-table">');
 	document.write('<thead><tr class="am-headers">');
 	for (var i=0; i<this.Columns.length; i++) {

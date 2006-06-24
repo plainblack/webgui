@@ -1,5 +1,7 @@
 7.0.0
  - Welcome to a whole new world of WebGUI. After 2.5 years and 20,000 hours of
    development, WebGUI 7 is finally here.
+ - Fixed a bug in the asset manager where you could be redirected to a wrong
+   page after using the delete, copy, cut, duplicate buttons.
 
 
