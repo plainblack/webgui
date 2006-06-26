@@ -1,9 +1,60 @@
 package WebGUI::i18n::English::Asset_TimeTracking;
 
 our $I18N = {
-		'' => {
-			lastUpdated => 0,
-			message => ''
+		'extras' => {
+			lastUpdated => 1151295441,
+			message => 'URL to the TimeTracking area in the extras directory, wobject/TimeTracking'
+		},
+
+		'project.manage.url' => {
+			lastUpdated => 1151295441,
+			message => 'URL to manage projects for this Asset.  If the user is not a member of the group, groupToManage, this variable will be blank.'
+		},
+
+		'project.manage.label' => {
+			lastUpdated => 1151295441,
+			message => 'A label to go with project.manage.url.'
+		},
+
+
+		'form.header' => {
+			message => q|HTML and javascript required to start this form.|,
+			lastUpdated => 1151296558,
+		},
+
+		'form.footer' => {
+			message => q|HTML and javascript required to end this form.|,
+			lastUpdated => 1151296556,
+		},
+
+		'js.alert.removeRow.error' => {
+			message => q|Internationalized error displayed when the only row is requested to be deleted.|,
+			lastUpdated => 1151296556,
+		},
+
+		'js.alert.validate.hours.error' => {
+			message => q|Internationalized error displayed when more hours are submitted than available in a week.|,
+			lastUpdated => 1151296556,
+		},
+
+		'js.alert.validate.incomplete.error' => {
+			message => q|Internationalized error displayed when required fields are not filled in.|,
+			lastUpdated => 1151296556,
+		},
+
+		'form.timetracker' => {
+			message => q|Output of the timeRowTemplate for this Asset.|,
+			lastUpdated => 1151296556,
+		},
+
+		'user view template title' => {
+			message => q|Time Tracking User View Template|,
+			lastUpdated => 1151296556,
+		},
+
+		'user view template body' => {
+			message => q|<p>These variables are available in the User View Template of the Time Tracking Asset.</p>|,
+			lastUpdated => 1151296556,
 		},
 
 		'Project Management Integration' => {

@@ -35,6 +35,46 @@ our $HELP = {
 		],
 	},
 
+	'user view template variables' => {
+		title => 'user view template title',
+		body => 'user view template body',
+		variables => [
+			{
+				'name' => 'extras',
+			},
+			{
+				'name' => 'project.manage.url',
+			},
+			{
+				'name' => 'project.manage.label',
+			},
+			{
+				'name' => 'form.header',
+				'required' => 1,
+			},
+			{
+				'name' => 'form.footer',
+				'required' => 1,
+			},
+			{
+				'name' => 'js.alert.removeRow.error',
+			},
+			{
+				'name' => 'js.alert.validate.hours.error',
+			},
+			{
+				'name' => 'js.alert.validate.incomplete.error',
+			},
+			{
+				'name' => 'form.timetracker',
+			},
+		],
+		fields => [
+		],
+		related => [
+		],
+	},
+
 };
 
 1;  ##All perl modules must return true
