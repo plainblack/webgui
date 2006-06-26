@@ -1459,8 +1459,8 @@ The Groups page displays all groups that you are allowed to edit.  The form on t
         },
 
         '230 description' => {
-                message => q|The message that will be sent to all members of the group.  The email will not
-be in HTML format, and no attachments can be included.|,
+                message => q|The message that will be sent to all members of the group.  The message will be
+sent in HTML format. No attachments can be included.|,
                 lastUpdated => 1122093200,
         },
 
