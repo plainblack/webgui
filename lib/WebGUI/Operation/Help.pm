@@ -18,8 +18,6 @@ use WebGUI::Asset::Template;
 use WebGUI::Macro;
 use WebGUI::Utility;
 use WebGUI::TabForm;
-use Data::Dumper;
-#use Storable qw/dclone/;
 
 =head1 NAME
 
