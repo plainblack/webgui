@@ -169,13 +169,20 @@ sub getHelpLabels {
 	foreach my $topic ( keys %helpTable ) {
 		foreach my $entry ( keys %{ $helpTable{$topic} }) {
 			##Check the title and body data
-			foreach my $tag ('title','body') {
+			push @helpLabels, {
+				topic=>$topic,
+				entry=>$entry,
+				tag=>'title',
+				namespace=>$topic, ##default
+				label=>$helpTable{$topic}{$entry}{'title'},
+			};
+			if (ref $helpTable{$topic}{$entry}{'body'} ne 'CODE') {
 				push @helpLabels, {
 					topic=>$topic,
 					entry=>$entry,
-					tag=>$tag,
+					tag=>'body',
 					namespace=>$topic, ##default
-					label=>$helpTable{$topic}{$entry}{$tag},
+					label=>$helpTable{$topic}{$entry}{'body'},
 				};
 			}
 
