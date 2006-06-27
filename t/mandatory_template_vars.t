@@ -40,15 +40,6 @@ my @tmplVarTable = (
 		var  => [ qw(application.workarea) ],
 		loop => [ qw(application_loop)]
 	},
-	## Templates from WebGUI::Operation::MessageLog.pm
-	{
-		id   => 'PBtmpl0000000000000050',
-		loop => [ qw(message.loop) ],
-	},
-	{
-		id  => 'PBtmpl0000000000000049',
-		var => [ qw(message.takeAction) ],
-	},
 	## Templates from WebGUI::Operation::Help.pm
 	{
 		id   => 'PBtmplHelp000000000001',
