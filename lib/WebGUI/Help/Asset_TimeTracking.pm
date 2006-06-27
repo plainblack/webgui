@@ -66,7 +66,98 @@ our $HELP = {
 				'name' => 'js.alert.validate.incomplete.error',
 			},
 			{
+				'name' => 'form.isComplete',
+			},
+			{
+				'name' => 'time.report.rows.total',
+			},
+			{
 				'name' => 'form.timetracker',
+			},
+		],
+		fields => [
+		],
+		related => [
+		],
+	},
+
+	'time row template variables' => {
+		title => 'time row template title',
+		body => 'time row template body',
+		variables => [
+			{
+				'name' => 'extras',
+			},
+			{
+				'name' => 'report.nextWeek.url',
+			},
+			{
+				'name' => 'report.lastWeek.url',
+			},
+			{
+				'name' => 'time.report.header',
+			},
+			{
+				'name' => 'time.report.hours.label',
+			},
+			{
+				'name' => 'time.report.date.label',
+			},
+			{
+				'name' => 'time.report.project.label',
+			},
+			{
+				'name' => 'time.report.task.label',
+			},
+			{
+				'name' => 'time.report.hours.label',
+			},
+			{
+				'name' => 'time.report.comments.label',
+			},
+			{
+				'name' => 'time.save.label',
+			},
+			{
+				'name' => 'report.isComplete',
+			},
+			{
+				'name' => 'time.totalHours',
+			},
+			{
+				'name' => 'time.entry.loop',
+				'variables' => [
+					{
+						'name' => 'row.id',
+					},
+					{
+						'name' => 'form.taskEntryId',
+						'required' => 1,
+					},
+					{
+						'name' => 'form.project',
+						'required' => 1,
+					},
+					{
+						'name' => 'form.task',
+						'required' => 1,
+					},
+					{
+						'name' => 'form.date',
+						'required' => 1,
+					},
+					{
+						'name' => 'form.hours',
+						'required' => 1,
+					},
+					{
+						'name' => 'form.comments',
+						'required' => 1,
+					},
+					{
+						'name' => 'entry.hours',
+					},
+				],
 			},
 		],
 		fields => [

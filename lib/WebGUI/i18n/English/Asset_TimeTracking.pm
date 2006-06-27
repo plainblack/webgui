@@ -57,6 +57,16 @@ our $I18N = {
 			lastUpdated => 1151296556,
 		},
 
+		'time row template title' => {
+			message => q|Time Tracking Time Row Template|,
+			lastUpdated => 1151296556,
+		},
+
+		'time row template body' => {
+			message => q|<p>These variables are available in the Time Row Template of the Time Tracking Asset.</p>|,
+			lastUpdated => 1151296556,
+		},
+
 		'Project Management Integration' => {
 			lastUpdated => 1150997998,
 			message => 'Project Management Integration'
@@ -299,12 +309,138 @@ our $I18N = {
 
 		'timetracking add/edit title' => {
 			lastUpdated => 0,
-			message => 'Add/Edit Time Tracking'
+			message => 'Add/Edit Time Tracking',
 		},
 
 		'timetracking add/edit body' => {
 			lastUpdated => 0,
-			message => 'The Time Tracking Asset lets you define a set of tasks and then to track how well they are accomplished against an original estimate for the task.'
+			message => 'The Time Tracking Asset lets you define a set of tasks and then to track how well they are accomplished against an original estimate for the task.',
+		},
+
+		'report.nextWeek.url' => {
+			lastUpdated => 0,
+			message => 'URL display information for the next week',
+		},
+
+		'report.lastWeek.url' => {
+			lastUpdated => 0,
+			message => 'URL display information for the previous week',
+		},
+
+		'time.report.header' => {
+			lastUpdated => 0,
+			message => 'Header for the time report displaying the ending date of the week.',
+		},
+
+		'time.report.hours.label' => {
+			lastUpdated => 0,
+			message => 'The phrase "Total Hours", internationalized.',
+		},
+
+		'time.report.date.label' => {
+			lastUpdated => 0,
+			message => 'The word "Date", internationalized.',
+		},
+
+		'time.report.project.label' => {
+			lastUpdated => 0,
+			message => 'The word "Project", internationalized.',
+			context => q |A project that you work on, not to throw or emit something.|,
+		},
+
+		'time.report.hours.label' => {
+			lastUpdated => 0,
+			message => 'The word "Hours", internationalized.',
+		},
+
+		'time.report.task.label' => {
+			lastUpdated => 0,
+			message => 'The word "Task", internationalized.'
+		},
+
+		'time.report.comments.label' => {
+			lastUpdated => 0,
+			message => 'The word "Comments", internationalized.'
+		},
+
+		'time.add.row.label' => {
+			lastUpdated => 0,
+			message => 'The phrase "Add Row", internationalized.'
+		},
+
+		'time.save.label' => {
+			lastUpdated => 0,
+			message => 'The phrase "Add Row", internationalized.'
+		},
+
+		'time.report.complete.label' => {
+			lastUpdated => 0,
+			message => 'The phrase "Report Complete", internationalized.'
+		},
+
+		'form.isComplete' => {
+			lastUpdated => 0,
+			message => 'A checkbox for the user to indicate if the report is complete.'
+		},
+
+		'report.isComplete' => {
+			lastUpdated => 0,
+			message => 'A boolean that is true if the form is complete.'
+		},
+
+		'time.totalHours' => {
+			lastUpdated => 0,
+			message => 'The total amount of hours taken by all tasks in the week by the current user.'
+		},
+
+		'time.report.rows.total' => {
+			lastUpdated => 0,
+			message => 'The number of rows in this report, plus one extra.'
+		},
+
+		'time.entry.loop' => {
+			lastUpdated => 0,
+			message => 'A loop containing information and form elements for each task worked on during the week.  If a task is marked as complete, then that row in the loop will contain readonly status information for that task.  Otherwise a form elements will be generated for the user to enter status information.  Status information includes the project worked on, the task in the project that was worked on, on which days work was performed and the number of hours of work that were done.',
+		},
+
+		'row.id' => {
+			lastUpdated => 0,
+			message => 'A unique identifier for this row, row_<i>rowNum</i>',
+		},
+
+		'form.taskEntryId' => {
+			lastUpdated => 0,
+			message => 'Required form code containing the taskEntryId',
+		},
+
+		'form.project' => {
+			lastUpdated => 0,
+			message => 'If the report is marked complete, this variable will contain the name of the project.  If the task is not complete, then this variable will contain form code for a select box for the user to pick a project name to enter status information for.',
+		},
+
+		'form.date' => {
+			lastUpdated => 0,
+			message => 'If the report is marked complete, this variable will contain the project that status has been entered for.  If the task is not complete, then this variable will contain form code for a select box for the user to pick which day of the week status informatio will be entered.',
+		},
+
+		'form.task' => {
+			lastUpdated => 0,
+			message => 'If the report is marked complete, this variable will contain the name of the task in the project.  If the task is not complete, then this variable will contain form code for a select box for the user to pick a task name from the project.',
+		},
+
+		'form.hours' => {
+			lastUpdated => 0,
+			message => 'If the report is marked complete, this variable will contain the number of hours worked on a task for a project on a day.  If the task is not complete, then this variable will contain form code for a number field for the user to enter a floating point number for the number of hours worked.',
+		},
+
+		'form.comments' => {
+			lastUpdated => 0,
+			message => 'If the report is marked complete, this variable will contain comments from the user for work done for a task on a given day.  If the task is not complete, then this variable will contain form code for a text field for the user to enter comments.',
+		},
+
+		'entry.hours' => {
+			lastUpdated => 0,
+			message => 'This is similar to form.hours, except that it always contains the number ofhours entered by the user for work done on this task on a day.  If no hours have been entered, it will be 0.',
 		},
 
 	};
