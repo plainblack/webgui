@@ -35,6 +35,39 @@ our $HELP = {
 		],
 	},
 
+	'manage projects' => {
+		title => 'manage projects screen label',
+		body => 'manage projects body',
+		fields => [
+		],
+		related => [
+		],
+	},
+
+	'edit project' => {
+		title => 'edit project screen label',
+		body => 'edit projects body',
+		fields => [
+                        {
+                                title => 'edit project id label',
+                                description => 'edit project id hoverhelp',
+                                namespace => 'Asset_TimeTracking',
+                        },
+                        {
+                                title => 'edit project resource label',
+                                description => 'edit project resource hoverhelp',
+                                namespace => 'Asset_TimeTracking',
+                        },
+                        {
+                                title => 'edit project tasks label',
+                                description => 'edit project tasks hoverhelp',
+                                namespace => 'Asset_TimeTracking',
+                        },
+		],
+		related => [
+		],
+	},
+
 	'user view template variables' => {
 		title => 'user view template title',
 		body => 'user view template body',
