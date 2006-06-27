@@ -5,4 +5,5 @@
    page after using the delete, copy, cut, duplicate buttons.
  - fix: Can't set View Purchase History Template in commerce settings
  - fix: Template toolbar missing for Transaction Error Template
+ - fix: Page fails and cannot be edited except through the db if custom rich editor deleted.
 
