@@ -21,8 +21,15 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+fixCommerceSettings();
 
 finish($session); # this line required
+
+#--------------------------------------------------
+sub fixCommerceSettings {
+	print "\tFixing Commerce Settings.\n" unless ($quiet);
+	$session->db->write("insert into settings (name,value) values ('commercePurchaseHistoryTemplateId','PBtmpl0000000000000019');
+}
 
 
 ##-------------------------------------------------
