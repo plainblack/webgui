@@ -596,10 +596,17 @@ sub www_editCommerceSettings {
 		-namespace	=> 'Commerce/ConfirmCheckout'
 		);
 	$tabform->getTab('general')->template(
+		-name		=> 'commercePurchaseHistoryTemplateId',
+		-label		=> $i18n->get('purchase history template'),
+		-hoverHelp	=> $i18n->get('purchase history template description'),
+		-value		=> $session->setting->get('commercePurchaseHistoryTemplateId'),
+		-namespace	=> 'Commerce/ViewPurchaseHistory'
+		);
+	$tabform->getTab('general')->template(
 		-name		=> 'commerceTransactionErrorTemplateId',
 		-label		=> $i18n->get('transaction error template'),
 		-hoverHelp	=> $i18n->get('transaction error template description'),
-		-value		=> $session->setting->get('commerceTransactionPendingTemplateId'),
+		-value		=> $session->setting->get('commerceTransactionErrorTemplateId'),
 		-namespace	=> 'Commerce/TransactionError'
 		);
 	$tabform->getTab('general')->template(

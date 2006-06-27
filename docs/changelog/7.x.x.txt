@@ -3,5 +3,6 @@
    development, WebGUI 7 is finally here.
  - Fixed a bug in the asset manager where you could be redirected to a wrong
    page after using the delete, copy, cut, duplicate buttons.
-
+ - fix: Can't set View Purchase History Template in commerce settings
+ - fix: Template toolbar missing for Transaction Error Template
 

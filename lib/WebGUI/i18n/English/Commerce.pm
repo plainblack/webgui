@@ -1,6 +1,16 @@
 package WebGUI::i18n::English::Commerce;
 
 our $I18N = {
+        'purchase history template' => {
+		message => q|View Purchase History Template|,
+		lastUpdated => 0,
+		context => q|the title for the workflow activity that processes recurring payments|
+	},
+        'purchase history template description' => {
+		message => q|Controls the layout of the View Purchase History screen.  This screen is displayed to the user after a successful checkout is made and shows them all of their past purchases.|,
+		lastUpdated => 0,
+		context => q|the title for the workflow activity that processes recurring payments|
+	},
 	'process recurring payments' => {
 		message => q|Process Recurring Payments|,
 		lastUpdated => 0,
