@@ -123,16 +123,17 @@ Renders an HTML area field.
 
 sub toHtml {
 	my $self = shift;
-        $self->session->style->setScript($self->session->url->extras('textFix.js'),{ type=>'text/javascript' });
-	$self->set("extras", $self->get('extras') . ' onblur="fixChars(this.form.'.$self->get("name").')" mce_editable="true" ');
-	$self->set("resizeable", 0);
-	return $self->SUPER::toHtml.WebGUI::Asset::RichEdit->new($self->session,$self->get("richEditId"))->getRichEditor($self->get('id'));
+	#return $self->SUPER::toHtml.WebGUI::Asset::RichEdit->new($self->session,$self->get("richEditId"))->getRichEditor($self->get('id'));
 	my $i18n = WebGUI::International->new($self->session);
 	my $richEdit = WebGUI::Asset::RichEdit->new($self->session,$self->get("richEditId"));
-        if (defined $richEdit) {
-                return $self->SUPER::toHtml.$richEdit->getRichEditor($self->get('id'));
-        } else {
-		return $i18n->get('rich editor load error','Form_HTMLArea');
+	if (defined $richEdit) {
+       $self->session->style->setScript($self->session->url->extras('textFix.js'),{ type=>'text/javascript' });
+	   $self->set("extras", $self->get('extras') . ' onblur="fixChars(this.form.'.$self->get("name").')" mce_editable="true" ');
+	   $self->set("resizeable", 0);
+	   return $self->SUPER::toHtml.$richEdit->getRichEditor($self->get('id'));
+    } else {
+	   WebGUI::ErrorHandler::warn($i18n->get('rich editor load error','Form_HTMLArea'));
+	   return $self->SUPER::toHtml;
 	}
 
 }
