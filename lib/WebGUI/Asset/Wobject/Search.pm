@@ -133,10 +133,10 @@ sub view {
 		my $search = WebGUI::Search->new($self->session);
 		my %rules = (
 			keywords=>$self->session->form->get("keywords"), 
-#			lineage=>[$self->getValue("searchRoot")]
+			lineage=>[WebGUI::Asset->newByDynamicClass($self->session,$self->getValue("searchRoot"))->get("lineage")]
 			);
 		my @classes = split("\n",$self->get("classLimiter"));
-#		$rules{classes} = \@classes if (scalar(@classes));
+		$rules{classes} = \@classes if (scalar(@classes));
 		$search->search(\%rules);
 		my @results = ();
 		my $rs = $search->getResultSet;
