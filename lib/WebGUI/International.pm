@@ -32,7 +32,7 @@ This package provides an interface to the internationalization system.
  use WebGUI::International;
  $string = WebGUI::International::get($session,$internationalId,$namespace);
  $hashRef = WebGUI::International::getLanguage($session,$lang);
- $hashRef = WebGUI::International::getLanguages($session,);
+ $hashRef = WebGUI::International::getLanguages($session);
  $url = WebGUI::International::makeUrlCompliant($session,$url);
 
 This package can also be used in object-oriented (OO) style.

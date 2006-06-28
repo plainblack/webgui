@@ -150,6 +150,11 @@ sub validateProfileData {
 		} elsif ($field->getId eq "email" && isDuplicateEmail($session,$data{$field->getId})) {
 			$warning .= '<li>'.$i18n->get(1072).'</li>';
 		}
+		if ($field->getId eq "language") {
+			unless (exists WebGUI::International->new($session)->getLanguages($session)->{$fieldValue}) {
+				$error .= '<li>'.$field->getLabel.' '.$i18n->get(451).'</li>';
+			}
+		}
 	}
 	return (\%data, $error, $warning);
 }
