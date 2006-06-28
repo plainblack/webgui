@@ -160,7 +160,7 @@ sub www_exportGenerate {
 	$newSession->user({userId=>$userId});
 	foreach my $asset (@{$assets}) {
 		my $url = $asset->get("url");
-		$self->session->output->printf( $i18n->get('exporting page'), $url);
+		$self->session->output->print ( printf($i18n->get('exporting page')), $url);
 		unless ($asset->canView($userId)) {
 			$self->session->output->print ($i18n->get('bad user privileges')."\n");
 			next;

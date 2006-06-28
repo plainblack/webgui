@@ -10,4 +10,4 @@
  - fix: Product Asset - specification labels not showing
  - fix: Folders displayed for underprivileged users (wouter / Procolix)
  - fix: Secure the search function
-
+ - fix: Export Functionality
