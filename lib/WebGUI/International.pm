@@ -39,8 +39,15 @@ This package can also be used in object-oriented (OO) style.
 
  use WebGUI::International;
  my $i = WebGUI::International->new($session,$namespace);
+
  $string = $i->get($internationalId);
+ $string = $i->get($internationalId, $otherNamespace);
+
  $url = $i->makeUrlCompliant($url);
+
+ $hashRef = $i->getLanguage($lang);
+
+ $hashRef = $i->getLanguages();
 
 =head1 METHODS
 
