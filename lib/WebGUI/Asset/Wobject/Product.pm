@@ -624,7 +624,7 @@ sub www_editSpecificationSave {
 	return $self->session->privilege->insufficient() unless ($self->canEdit);
 	$self->setCollateral("Product_specification", "Product_specificationId", {
 		Product_specificationId => $self->session->form->process("sid"),
-		name => $self->session->form->process("name"),
+		name => $self->session->form->process("name","combo"),
 		value => $self->session->form->process("value","combo"),
 		units => $self->session->form->process("units","combo")
 	});
