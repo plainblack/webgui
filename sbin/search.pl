@@ -107,7 +107,8 @@ sub reindexAllSites {
 sub reindexSite {
 	my $session = shift;
 	my $siteTime = [Time::HiRes::gettimeofday()];
-	my $rs = $session->db->read("select assetId, className from asset where state='published'");	
+	my $rs = $session->db->read("select assetId, className from asset where state='published'");
+	my @searchableAssetIds;	
 	while (my ($id, $class) = $rs->array) {
 		my $asset = WebGUI::Asset->new($session,$id,$class);
 		if (defined $asset && $asset->get("state") eq "published" && ($asset->get("status") eq "approved" || $asset->get("status") eq "archived")) {
@@ -115,8 +116,13 @@ sub reindexSite {
 			my $t = [Time::HiRes::gettimeofday()];
 			$asset->indexContent;
 			print "(".Time::HiRes::tv_interval($t).")\n";
+			push (@searchableAssetIds, $id);
 		}
 	}
+	
+	# delete indexes of assets that are no longer searchable
+	my $list = $session->db->quoteAndJoin(\@searchableAssetIds) if scalar(@searchableAssetIds);
+	$session->db->write("delete from assetIndex where assetId not in (".$list.")") if $list;
 	print "\nSite indexing took ".Time::HiRes::tv_interval($siteTime)." seconds.\n";
 }
 
@@ -138,7 +144,8 @@ sub searchSite {
 sub updateSite {
 	my $session = shift;
 	my $siteTime = [Time::HiRes::gettimeofday()];
-	my $rs = $session->db->read("select assetId, className from asset where state='published'");	
+	my $rs = $session->db->read("select assetId, className from asset where state='published'");
+	my @searchableAssetIds;	
 	while (my ($id, $class) = $rs->array) {
 		my ($done) = $session->db->quickArray("select count(*) from assetIndex where assetId=?",[$id]);
 		next if $done;
@@ -148,8 +155,13 @@ sub updateSite {
 			my $t = [Time::HiRes::gettimeofday()];
 			$asset->indexContent;
 			print "(".Time::HiRes::tv_interval($t).")\n";
+			push(@searchableAssetIds, $id);
 		}
 	}
+	
+	# delete indexes of assets that are no longer searchable
+	my $list = $session->db->quoteAndJoin(\@searchableAssetIds) if scalar(@searchableAssetIds);
+	$session->db->write("delete from assetIndex where assetId not in (".$list.")") if $list;
 	print "\nSite indexing took ".Time::HiRes::tv_interval($siteTime)." seconds.\n";
 }
 

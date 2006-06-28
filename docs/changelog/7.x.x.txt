@@ -11,3 +11,5 @@
  - fix: Folders displayed for underprivileged users (wouter / Procolix)
  - fix: Secure the search function
  - fix: Export Functionality
+ - fix: Search displays already deleted files
+
