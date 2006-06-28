@@ -147,6 +147,7 @@ sub updateSite {
 	my $rs = $session->db->read("select assetId, className from asset where state='published'");
 	my @searchableAssetIds;	
 	while (my ($id, $class) = $rs->array) {
+		push(@searchableAssetIds, $id);
 		my ($done) = $session->db->quickArray("select count(*) from assetIndex where assetId=?",[$id]);
 		next if $done;
 		my $asset = WebGUI::Asset->new($session,$id,$class);
@@ -155,7 +156,6 @@ sub updateSite {
 			my $t = [Time::HiRes::gettimeofday()];
 			$asset->indexContent;
 			print "(".Time::HiRes::tv_interval($t).")\n";
-			push(@searchableAssetIds, $id);
 		}
 	}
 	
