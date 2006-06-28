@@ -8,4 +8,5 @@
  - fix: Page fails and cannot be edited except through the db if custom rich editor deleted.
  - fix: Search returns not restricted to chosen path or asset type
  - fix: Product Asset - specification labels not showing
-g
+ - fix: Folders displayed for underprivileged users (wouter / Procolix)
+
