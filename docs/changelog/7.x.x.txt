@@ -12,4 +12,5 @@
  - fix: Secure the search function
  - fix: Export Functionality
  - fix: Search displays already deleted files
+ - fix: Pagination not working in User Management System
 

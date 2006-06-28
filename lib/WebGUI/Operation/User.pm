@@ -168,9 +168,9 @@ sub getUserSearchForm {
 	my $op = shift;
 	my $params = shift;
 	my $noStatus = shift;
-	$session->scratch->set("userSearchKeyword",$session->form->process("keyword"));
-	$session->scratch->set("userSearchStatus",$session->form->process("status"));
-	$session->scratch->set("userSearchModifier",$session->form->process("modifier"));
+	$session->scratch->set("userSearchKeyword",$session->form->process("keyword")) if $session->form->process("keyword");
+	$session->scratch->set("userSearchStatus",$session->form->process("status")) if $session->form->process("status");
+	$session->scratch->set("userSearchModifier",$session->form->process("modifier")) if $session->form->process("modifier");
 	my $i18n = WebGUI::International->new($session);
 	my $output = '<div align="center">'
 		.WebGUI::Form::formHeader($session,)
