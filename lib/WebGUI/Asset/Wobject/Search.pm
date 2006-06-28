@@ -141,12 +141,13 @@ sub view {
 		my @results = ();
 		my $rs = $search->getResultSet;
 		while (my $data = $rs->hashRef) {
-			next unless ($self->session->user->userId eq $data->{ownerUserId} || $self->session->user->isInGroup($data->{groupIdView}) || $self->session->user->isInGroup($data->{groupIdEdit}));
-			push(@results, {
+			if ($self->session->user->userId eq $data->{ownerUserId} || $self->session->user->isInGroup($data->{groupIdView}) || $self->session->user->isInGroup($data->{groupIdEdit})) {
+			 push(@results, {
 				url=>$data->{url},
 				title=>$data->{title},
 				synposis=>$data->{synopsis},
 				});
+			}
 		} 
 		my $p = WebGUI::Paginator->new($self->session,$self->getUrl('doit=1;keywords='.$self->session->url->escape($self->session->form->get('keywords'))));
 		$p->setDataByArrayRef(\@results);	

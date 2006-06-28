@@ -9,4 +9,5 @@
  - fix: Search returns not restricted to chosen path or asset type
  - fix: Product Asset - specification labels not showing
  - fix: Folders displayed for underprivileged users (wouter / Procolix)
+ - fix: Secure the search function
 
