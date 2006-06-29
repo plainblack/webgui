@@ -3159,6 +3159,13 @@ that Asset and all Assets below it.</p>
 		lastUpdated => 1132359408
 	},
 
+	'manage groups in group body' => {
+		message => q|<p>In this form, you will add or remove groups to this group.  Doing this with several groups can create a hierarchy of groups (think about a tree structure) with parent groups and children groups.  The privileges of parent groups flow down to children groups.</p>
+<p>WebGUI will prevent you from creating circular structures that could cause it to go into an infinite loop while recursing down through groups.</p>
+|,
+		lastUpdated => 1151622488
+	},
+
 	'1009' => {
 		message => q|HTML|,
 		lastUpdated => 1060433286

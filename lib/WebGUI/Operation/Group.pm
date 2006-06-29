@@ -640,7 +640,7 @@ sub www_manageGroupsInGroup {
         my $output = $f->print;
 	$output .= '<p />';
 	$output .= walkGroups($session, $session->form->process("gid"));
-	return _submenu($session,$output,'813');
+	return _submenu($session,$output,'813', 'manage groups in group');
 }
 
 #-------------------------------------------------------------------

@@ -450,6 +450,14 @@ our $HELP = {
 		related => [
 		]
 	},
+	'manage groups in group' => {
+		title => '813',
+		body => 'manage groups in group body',
+		fields => [
+		],
+		related => [
+		]
+	},
 	'users manage' => {
 		title => '658',
 		body => '613',
