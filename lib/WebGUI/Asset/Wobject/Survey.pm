@@ -811,7 +811,8 @@ sub www_editAnswer {
         my ($question, $f, $answer);	
         return $self->session->privilege->insufficient() unless ($self->canEdit);
 	my $aid = shift || $self->session->form->process('aid');
-
+	my $qid = shift || $self->session->form->process('qid');
+	
 	my $i18n = WebGUI::International->new($self->session,'Asset_Survey');
 	$answer = $self->getCollateral("Survey_answer","Survey_answerId",$aid);
         $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
@@ -825,7 +826,7 @@ sub www_editAnswer {
 	);
         $f->hidden(
 		-name => "qid",
-		-value => $self->session->form->process("qid")
+		-value => $qid
 	);
         $f->hidden(
 		-name => "aid",
@@ -1045,7 +1046,7 @@ sub www_editQuestionSave {
                 },1,0,"Survey_id");
 
         if ($self->session->form->process("proceed") eq "addMultipleChoiceAnswer") {
-                return $self->www_editAnswer('new');
+                return $self->www_editAnswer('new',$qid);
 	} elsif ($self->session->form->process("proceed") eq "addTextAnswer") {
                 $self->setAnswerType("text",$qid);
         	$self->addAnswer(0,$qid);

@@ -14,4 +14,5 @@
  - fix: Search displays already deleted files
  - fix: Pagination not working in User Management System
  - fix: Upgrade 6.8.10 to 6.99.5 (Thanks to Erik Svanberg for the patch)
+ - fix: Adding Survey Choices
 
