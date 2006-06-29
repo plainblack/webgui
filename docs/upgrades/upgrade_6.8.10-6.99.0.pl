@@ -28,12 +28,12 @@ my $session = start(); # this line required
 
 changeDbCacheTimeoutName();
 addWorkflow();
+addSearchEngine();
 convertMessageLogToInbox();
 updateCs();
 changeCache();
 templateParsers();
 removeFiles();
-addSearchEngine();
 addEMS();
 addPM();
 addTT();
