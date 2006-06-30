@@ -18,4 +18,5 @@
  - fix: User/Group problem
  - fix: Edit LDAP Connection
  - fix: SQL Report w/ pagination and nested queries
+ - fix: Unable to add Web Services Client
 

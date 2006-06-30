@@ -227,7 +227,7 @@ sub getHelpLabels {
 
 sub getHelpVariables {
 	my ($variables) = @_; ##An arrayref of variables, possibly with nested variables in loops
-	my $tmplVars;
+	my $tmplVars = [];
 	foreach my $var ( @{ $variables } ) {
 		if ( exists $var->{variables} ) {
 			push @{ $tmplVars }, @{ getHelpVariables($var->{variables}) };

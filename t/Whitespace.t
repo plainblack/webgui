@@ -64,7 +64,10 @@ sub checkContent {
 	foreach my $line (@content) {
 		chomp $line;
 		my $isPodWord = ($line =~ m/^=/);
-		return 1 if ($isPodWord && !$podAllowed);
+		if ($isPodWord && !$podAllowed) {
+			diag $line;
+			return 1;
+		}
 		# POD is allowed on next line if current line is empty
 		$podAllowed = ($line eq '');
 	}

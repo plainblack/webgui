@@ -118,7 +118,7 @@ sub getEditForm {
       -name      => 'templateId',
       -value     => $self->getValue('templateId'),
       -namespace => "WSClient",
-      -label => WebG$i18n->get(72),
+      -label => $i18n->get(72),
       -hoverHelp => $i18n->get('72 description'),
    );
    $tabform->getTab("display")->yesNo (
