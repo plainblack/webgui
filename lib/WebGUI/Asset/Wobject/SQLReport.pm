@@ -428,7 +428,7 @@ sub _processQuery {
                                 }
                         }
 			my $paginateAfter = $self->get("paginateAfter");
-			$paginateAfter = 1000 if($nr > 1);
+			$paginateAfter = 1000 if($self->{_query}{$nr + 1}{dbQuery});
                         my $p = WebGUI::Paginator->new($self->session,$url,$paginateAfter);
                         my $error = $p->setDataByQuery($query,$dbh,1,$placeholderParams);
                         if ($error ne "") {

@@ -17,3 +17,5 @@
  - fix: Adding Survey Choices
  - fix: User/Group problem
  - fix: Edit LDAP Connection
+ - fix: SQL Report w/ pagination and nested queries
+
