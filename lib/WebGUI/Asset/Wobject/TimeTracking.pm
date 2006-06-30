@@ -603,7 +603,7 @@ sub www_buildTimeTable {
 	$var->{'report.lastWeek.url'} = $self->getUrl("func=view;week=$lastWeek");
 	
 	$var->{'time.report.header'} = sprintf($i18n->get("time report header"),$weekEnd);
-	$var->{'time.report.hours.label'} = $i18n->get("total hours label");
+	$var->{'time.report.totalHours.label'} = $i18n->get("total hours label");
 	$var->{'time.report.date.label'} = $i18n->get("time report date label");
 	$var->{'time.report.project.label'} = $i18n->get("time report project label");
 	$var->{'time.report.task.label'} = $i18n->get("time report task label");
@@ -731,7 +731,6 @@ sub www_buildTimeTable {
 	   for( my $i = $rowCount; $i < ($rowCount + 10); $i++) {
 	      push(@timeEntries,$self->_buildRow(undef,$i,\%setDaysHash, \%projectList, \%taskList));
 	   }
-    
 	   $self->_buildRow(undef,"x",\%setDaysHash, \%projectList, \%taskList,$var);
 	}
 	
