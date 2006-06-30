@@ -75,35 +75,46 @@ my @ipTests = (
 );
 
 
-plan tests => (103 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
+plan tests => (118 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 my $testCache = WebGUI::Cache->new($session, 'myTestKey');
 $testCache->flush;
 
+foreach my $gid ('new', '') {
+	my $g = WebGUI::Group->new($session, $gid);
+
+	##Check defaults
+	is (ref $g, "WebGUI::Group", "Group object creation");
+	isnt ($g->getId, "new", "Group assigned new groupId, not new");
+	is ($g->name(), 'New Group', 'Default name');
+	is ($g->expireOffset(), 314496000, 'Default expireOffset');
+	is ($g->karmaThreshold(), 1_000_000_000, 'Default karma threshold');
+	is ($g->expireNotifyOffset(), -14, 'Default expire notify offset time');
+	is ($g->deleteOffset(), 14, 'Default delete offset time');
+	is ($g->expireNotify(), 0, 'Default expire notify time');
+	is ($g->databaseLinkId(), 0, 'Default databaseLinkId');
+	is ($g->groupCacheTimeout(), 3600, 'Default external database cache timeout');
+	is ($g->dateCreated(), $g->lastUpdated(), 'lastUpdated = create time');
+	is ($g->autoAdd(), 0, 'auto Add is off by default');
+	is ($g->autoDelete(), 0, 'auto Delete is off by default');
+	is ($g->isEditable(), 1, 'isEditable is on by default');
+	is ($g->showInForms(), 1, 'show in forms is on by default');
+
+	$g->delete;
+}
+
+my $empty = WebGUI::Group->new($session, '');
+
 my $g = WebGUI::Group->new($session, "new");
 
-is (ref $g, "WebGUI::Group", "Group object creation");
 my $gid = $g->getId;
-isnt ($gid, "new", "Group assigned new groupId, not new");
 is (length($gid), 22, "GroupId is proper length");
-is ($g->name(), 'New Group', 'Default name');
-is ($g->expireOffset(), 314496000, 'Default karma threshold');
-is ($g->karmaThreshold(), 1_000_000_000, 'Default karma threshold');
-is ($g->expireNotifyOffset(), -14, 'Default expire notify offset time');
-is ($g->deleteOffset(), 14, 'Default delete offset time');
-is ($g->expireNotify(), 0, 'Default expire notify time');
-is ($g->databaseLinkId(), 0, 'Default databaseLinkId');
-is ($g->groupCacheTimeout(), 3600, 'Default external database cache timeout');
-is ($g->dateCreated(), $g->lastUpdated(), 'lastUpdated = create time');
+
 is_deeply ($g->getGroupsIn(), [3], 'Admin group added by default to this group');
 is_deeply ($g->getGroupsFor(), [], 'Group not added to any other group');
 is_deeply ($g->getUsers(), [], 'No users added by default');
 is_deeply ($g->getAllUsers(), [3], 'No users added by default in any method');
-is ($g->autoAdd(), 0, 'auto Add is off by default');
-is ($g->autoDelete(), 0, 'auto Delete is off by default');
-is ($g->isEditable(), 1, 'isEditable is on by default');
-is ($g->showInForms(), 1, 'show in forms is on by default');
 
 my $gname = '**TestGroup**';
 is ($g->name($gname), $gname, 'Set name');

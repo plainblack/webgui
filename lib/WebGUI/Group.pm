@@ -80,7 +80,15 @@ These methods are available from this class:
 sub _create {
 	my $self = shift;
 	my $override = shift;
-	$self->{_groupId} = $self->session->db->setRow("groups","groupId",{
+	$self->{_groupId} = $self->session->db->setRow("groups","groupId", $self->_defaults, $override);
+	$self->addGroups([3]);
+}
+
+
+#-------------------------------------------------------------------
+sub _defaults {
+	my $self = shift;
+	return {
 		groupId=>"new",
 		dateCreated=>$self->session->datetime->time(),
 		expireOffset=>314496000,
@@ -91,9 +99,12 @@ sub _create {
 		expireNotify=>0,
 		databaseLinkId=>0,
 		groupCacheTimeout=>3600,
-		lastUpdated=>$self->session->datetime->time()
-		}, $override);
-	$self->addGroups([3]);
+		lastUpdated=>$self->session->datetime->time(),
+		autoAdd=>0,
+		autoDelete=>0,
+		isEditable=>1,
+		showInForms=>1,
+		};
 }
 
 
@@ -971,7 +982,12 @@ sub new {
 	my $cached = $self->{_session}->stow->get("groupObj");
 	return $cached->{$self->{_groupId}} if ($cached->{$self->{_groupId}});
 	bless $self, $class;
-        $self->_create($override) if ($self->{_groupId} eq "new");
+        if ($self->{_groupId} eq "new") {
+		$self->_create($override);
+	}
+	elsif ($self->{_groupId} eq "") {
+		$self->{_group} = $self->_defaults();
+	}
 	$cached->{$self->{_groupId}} = $self;
 	$self->{_session}->stow->set("groupObj", $cached);
 	return $self;
