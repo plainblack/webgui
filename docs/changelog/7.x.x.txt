@@ -16,3 +16,4 @@
  - fix: Upgrade 6.8.10 to 6.99.5 (Thanks to Erik Svanberg for the patch)
  - fix: Adding Survey Choices
  - fix: User/Group problem
+ - fix: Edit LDAP Connection

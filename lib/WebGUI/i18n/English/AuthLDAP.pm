@@ -1,6 +1,46 @@
 package WebGUI::i18n::English::AuthLDAP;
 
 our $I18N = {
+        'ldap link name blank' => {
+		message => q|The LDAP Link Name field cannot be blank.|,
+		lastUpdated => 0,
+		context => q|error message|
+	},
+        'ldap url blank' => {
+		message => q|The LDAP URL field cannot be blank.|,
+		lastUpdated => 0,
+		context => q|error message|
+	},
+        'ldap user rdn blank' => {
+		message => q|The LDAP User RDN field cannot be blank.|,
+		lastUpdated => 0,
+		context => q|error message|
+	},
+        'ldap identity blank' => {
+		message => q|The LDAP Identity field cannot be blank.|,
+		lastUpdated => 0,
+		context => q|error message|
+	},
+        'ldap identity name blank' => {
+		message => q|The LDAP Identity Name field cannot be blank.|,
+		lastUpdated => 0,
+		context => q|error message|
+	},
+        'ldap password name blank' => {
+		message => q|The LDAP Password Name field cannot be blank.|,
+		lastUpdated => 0,
+		context => q|error message|
+	},
+        'ldap url malformed' => {
+		message => q|Malformed LDAP URL.  LDAP URLs must include the protocol, i.e., ldap://hostname/|,
+		lastUpdated => 0,
+		context => q|error message|
+	},
+        'error label' => {
+		message => q|Error|,
+		lastUpdated => 0,
+		context => q|label in front of error message displayed to the user so they know it's an error|
+	},
 	'sync profiles to ldap' => {
 		message => q|Sync Profiles To LDAP|,
 		lastUpdated => 0,

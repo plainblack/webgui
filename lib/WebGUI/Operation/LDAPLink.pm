@@ -12,6 +12,7 @@ package WebGUI::Operation::LDAPLink;
 
 use strict;
 use Tie::CPHash;
+use Tie::IxHash;
 use WebGUI::AdminConsole;
 use WebGUI::LDAPLink;
 use WebGUI::International;
@@ -82,6 +83,45 @@ sub _submenu {
 
 #-------------------------------------------------------------------
 
+=head2 validateForm ( )
+
+Checks the edit LDAP link form for errors before saving.  Returns error messages
+if any
+
+=cut
+
+sub validateForm {
+	my $session = shift;
+	my $errors;
+	my $i18n = WebGUI::International->new($session, 'AuthLDAP');
+	my %requiredFields;
+	tie %requiredFields, 'Tie::IxHash';
+	
+	%requiredFields = (
+		ldapLinkName	 => $i18n->get("ldap link name blank"),
+		ldapUrl 	 => $i18n->get("ldap url blank"),
+		ldapUserRDN 	 => $i18n->get("ldap user rdn blank"),
+		ldapIdentity 	 => $i18n->get("ldap identity blank"),
+		ldapIdentityName => $i18n->get("ldap identity name blank"),
+		ldapPasswordName => $i18n->get("ldap password name blank"),
+	);
+	
+	# Check required fields
+	my $formFields = $session->form->paramsHashRef;
+	foreach my $requiredField (keys %requiredFields) {
+		push(@{$errors}, $requiredFields{$requiredField}) if ($formFields->{$requiredField} eq "");
+	}
+	
+	# Check format of ldapUrl
+	push(@{$errors}, $i18n->get("ldap url malformed")) unless ($formFields->{ldapUrl} =~ m!^ldap://.*!);
+	
+	# Other checks here
+	
+	return $errors;	
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_copyLDAPLink ( $session )
 
 Copies the requested LDAP link in the form variable C<llid>.  Adds the words
@@ -129,14 +169,24 @@ Calls www_editLDAPLinkSave when done.
 
 sub www_editLDAPLink {
 	my $session = shift;
+	my $errors = shift;
    return $session->privilege->insufficient unless ($session->user->isInGroup(3));
    my ($output, %db, $f);
+
+
    tie %db, 'Tie::CPHash';
    %db = $session->db->quickHash("select * from ldapLink where ldapLinkId=".$session->db->quote($session->form->process("llid")));
    
-	my $i18n = WebGUI::International->new($session,"AuthLDAP");
+   my $i18n = WebGUI::International->new($session,"AuthLDAP");
    $f = WebGUI::HTMLForm->new($session, -extras=>'autocomplete="off"' );
-	$f->submit;
+
+   if ($errors) {
+	foreach my $error (@$errors) {
+		$f->readOnly( -value => sprintf("<span style='font-weight: bold; color: red;'>%s: %s</span>", $i18n->get("error label"), $error) );
+	}
+   }
+
+   $f->submit;
    $f->hidden(
    		-name => "op",
 		-value => "editLDAPLinkSave",
@@ -252,6 +302,11 @@ Returns the user to www_listLDAPLinks when done.
 sub www_editLDAPLinkSave {
 	my $session = shift;
 	return $session->privilege->insufficient unless ($session->user->isInGroup(3));
+	
+	# Check for errors
+	my $errors = validateForm($session);
+	return www_editLDAPLink($session, $errors) if defined $errors;
+
 	my $properties = {};
 	$properties->{ldapLinkId} = $session->form->process("llid");
 	$properties->{ldapLinkName} = $session->form->process("ldapLinkName");
