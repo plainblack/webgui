@@ -25,6 +25,11 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
+	'clean file cache body' => {
+		message => q|<p>This workflow activity will prune the size of a file based cache based on the user configured cache size and the expiration time of items in the cache.  If pruning expired items does not reduce the size of the cache to the value configured by the user, then the expiration time will be increased by 30 minutes and the process will repeat until it meets the size requirement.</p>|,
+		lastUpdated => 0,
+	},
+
 };
 
 1;
