@@ -25,8 +25,20 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
+	'add/edit workflow activity' => {
+		message => q|Add/Edit Workflow Activity|,
+		context => q|Title for the add and edit workflow activity screen|,
+		lastUpdated => 0,
+	},
+
+	'add/edit workflow activity body' => {
+		message => q|Add/Edit Workflow Activity|,
+		context => q|<p>Most Workflow Activities have these basic fields and properties:</p>|,
+		lastUpdated => 0,
+	},
+
 	'topicName' => {
-		message => q|Unnamed|,
+		message => q|Base Workflow Activity|,
 		context => q|The name of this workflow activity.|,
 		lastUpdated => 0,
 	},

@@ -21,11 +21,11 @@ use WebGUI::Asset;
 
 =head1 NAME
 
-Package WebGUI::Workflow::Activity::ArchiveOldPosts
+Package WebGUI::Workflow::Activity::ArchiveOldThreads
 
 =head1 DESCRIPTION
 
-Uses the settings in the collaboration systems to determine whether the posts in those collaboration systems should be archived.
+Uses the settings in the collaboration systems to determine whether the threads in those collaboration systems should be archived.
 
 =head1 SYNOPSIS
 
@@ -50,7 +50,7 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, "Workflow_Activity_ArchiveOldPosts");
+	my $i18n = WebGUI::International->new($session, "Workflow_Activity_ArchiveOldThreads");
 	push(@{$definition}, {
 		name=>$i18n->get("topicName"),
 		properties=> {}

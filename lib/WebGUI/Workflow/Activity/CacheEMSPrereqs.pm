@@ -52,8 +52,9 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift;
+	my $i18n = WebGUI::International->new($session, "Workflow_Activity_CacheEMSPrereqs");
 	push(@{$definition}, {
-		name=>'cacheEMSEvents',
+		name=>$i18n->get('topicName'),
 		properties=> { }
 	});
 	return $class->SUPER::definition($session,$definition);
