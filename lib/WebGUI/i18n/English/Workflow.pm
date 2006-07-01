@@ -127,6 +127,14 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
+	'manage workflow help body' => {
+		message => q|
+<p>This is the master screen for managing workflows.  All configured workflows are shown in a table by the title of the workflow, along with icons to edit or delete the workflow and the workflow's status, enabled or disabled. Links are provided to add new workflows and to show which, if any, workflows are presently running.</p>
+<p>The manage workflow screen is accessed from the Admin Console.</p>
+|,
+		lastUpdated => 0,
+	},
+
 	'topicName' => {
 		message => q|Workflow|,
 		context => q|The title of the workflow interface.|,
