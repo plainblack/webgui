@@ -19,6 +19,11 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
+	'clean login history body' => {
+		message => q|<p>This workflow activity will go through the User Login Log table in the WebGUI database and prune entries that are older than the user configured time limit.</p>|,
+		lastUpdated => 0,
+	},
+
 };
 
 1;
