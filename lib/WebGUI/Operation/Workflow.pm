@@ -421,7 +421,8 @@ sub www_showRunningWorkflows {
 	my $ac = WebGUI::AdminConsole->new($session,"workflow");
 	$ac->addSubmenuItem($session->url->page("op=addWorkflow"), $i18n->get("add a new workflow"));
 	$ac->addSubmenuItem($session->url->page("op=manageWorkflows"), $i18n->get("manage workflows"));
-	return $ac->render($output);
+	$ac->setHelp('show running workflows', 'Workflow');
+	return $ac->render($output, 'show running workflows');
 }
 
 

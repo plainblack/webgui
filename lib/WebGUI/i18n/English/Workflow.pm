@@ -130,9 +130,17 @@ our $I18N = {
 	'manage workflow help body' => {
 		message => q|
 <p>This is the master screen for managing workflows.  All configured workflows are shown in a table by the title of the workflow, along with icons to edit or delete the workflow and the workflow's status, enabled or disabled. Links are provided to add new workflows and to show which, if any, workflows are presently running.</p>
-<p>The manage workflow screen is accessed from the Admin Console.</p>
+<p>The Manage Workflow screen is accessed from the Admin Console.</p>
 |,
-		lastUpdated => 0,
+		lastUpdated => 1151719637,
+	},
+
+	'show running workflows body' => {
+		message => q|
+<p>This screen can help you debug problems with workflows by showing which workflows are currently running.  The workflows are shown in a table with the name of the workflow, the date it started running.  If the workflow has a defined status, then that status will also be shown, along with the date the workflow's status was last updated.</p>
+<p>The screen will not automatically update.  To update the list of running workflows, reload the page.</p>
+|,
+		lastUpdated => 1151719633,
 	},
 
 	'topicName' => {
