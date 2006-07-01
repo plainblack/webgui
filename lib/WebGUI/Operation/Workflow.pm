@@ -66,7 +66,8 @@ sub www_addWorkflow {
 	$f->submit;
 	my $ac = WebGUI::AdminConsole->new($session,"workflow");
 	$ac->addSubmenuItem($session->url->page("op=manageWorkflows"), $i18n->get("manage workflows"));
-	return $ac->render($f->print);
+	$ac->setHelp('add a new workflow', 'Workflow');
+	return $ac->render($f->print, 'add a new workflow');
 }
 
 #-------------------------------------------------------------------
@@ -176,7 +177,8 @@ sub www_editWorkflow {
 		);
 	$f->readOnly(
 		label=>$i18n->get("object type"),
-		value=>$workflow->get("type")
+		value=>$workflow->get("type"),
+		hoverHelp=>$workflow->get("object type help2"),
 		);
 	$f->text(
 		name=>"title",
@@ -226,7 +228,8 @@ sub www_editWorkflow {
 	my $ac = WebGUI::AdminConsole->new($session,"workflow");
 	$ac->addSubmenuItem($session->url->page("op=addWorkflow"), $i18n->get("add a new workflow"));
 	$ac->addSubmenuItem($session->url->page("op=manageWorkflows"), $i18n->get("manage workflows"));
-	return $ac->render($f->print.$addmenu.$steps);
+	$ac->setHelp('edit workflow','Workflow');
+	return $ac->render($f->print.$addmenu.$steps, 'edit workflow');
 }
 
 

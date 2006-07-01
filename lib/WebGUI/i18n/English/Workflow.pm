@@ -27,7 +27,13 @@ our $I18N = {
 
 	'object type help' => {
 		message => q|What type of objects do you want this workflow to be able to handle?|,
-		context => q|the hover help for the object type field|,
+		context => q|the hover help for the object type field in the add workflow screen|,
+		lastUpdated => 0,
+	},
+
+	'object type help2' => {
+		message => q|The type of workflow that you selected to add.|,
+		context => q|the hover help for the object type field in the edit workflow screen|,
 		lastUpdated => 0,
 	},
 
@@ -127,6 +133,11 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
+	'edit workflow' => {
+		message => q|Edit workflow|,
+		lastUpdated => 0,
+	},
+
 	'manage workflow help body' => {
 		message => q|
 <p>This is the master screen for managing workflows.  All configured workflows are shown in a table by the title of the workflow, along with icons to edit or delete the workflow and the workflow's status, enabled or disabled. Links are provided to add new workflows and to show which, if any, workflows are presently running.</p>
@@ -141,6 +152,31 @@ our $I18N = {
 <p>The screen will not automatically update.  To update the list of running workflows, reload the page.</p>
 |,
 		lastUpdated => 1151719633,
+	},
+
+	'add a new workflow body' => {
+		message => q|
+<p>Adding a workflow is a two-step process:</p>
+<div>
+<ol>
+<li>Select the type of workflow to add in this screen.</li>
+<li>Edit the workflow and add activities to it in the screen that follows.</li>
+</ol>
+</div>
+<p>Workflow types, and the kinds of activities that can be added to each, are configured in your WebGUI.conf file.</p>
+|,
+		lastUpdated => 1151719633,
+	},
+
+	'edit workflow body' => {
+		message => q|
+<p>Now that you have selected which type of workflow you want to add, you will edit the workflow
+and add activities to it.</p>
+<p>Below the fields in two columns are the set of activities that are available to be added, and activities, if any, that have already been added to the worflow.</p>
+<p>To add a new activity to the workflow, click on its name.  This will take you to the screen to configure that activity for this workflow.</p>
+<p>Activities that have already been added and configured are displayed by name in the order they will be executed by Spectre.  Icons next to the name of the activity allow it to be reordered, edited, deleted from this workflow.</p>
+|,
+		lastUpdated => 1151721687,
 	},
 
 	'topicName' => {
