@@ -2,7 +2,7 @@ package WebGUI::Help::Workflow_Activity_SyncProfilesToLdap;
 
 our $HELP = {
 	'sync profiles to ldap' => {
-		title => 'topicName',
+		title => 'activityName',
 		body => 'sync profiles to ldap body',
 		isa => [
 			{

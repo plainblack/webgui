@@ -2,7 +2,7 @@ package WebGUI::Help::Workflow_Activity_ExportVersionTagToHtml;
 
 our $HELP = {
 	'export version tag to html' => {
-		title => 'topicName',
+		title => 'activityName',
 		body => 'export version tag to html body',
 		isa => [
 			{

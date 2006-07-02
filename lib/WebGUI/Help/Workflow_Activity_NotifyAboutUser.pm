@@ -2,7 +2,7 @@ package WebGUI::Help::Workflow_Activity_NotifyAboutUser;
 
 our $HELP = {
 	'notify about user' => {
-		title => 'topicName',
+		title => 'activityName',
 		body => 'notify about user body',
 		isa => [
 			{

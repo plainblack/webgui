@@ -2,7 +2,7 @@ package WebGUI::Help::Workflow_Activity_CommitVersionTag;
 
 our $HELP = {
 	'commit version tag' => {
-		title => 'topicName',
+		title => 'activityName',
 		body => 'commit version tag body',
 		isa => [
 			{

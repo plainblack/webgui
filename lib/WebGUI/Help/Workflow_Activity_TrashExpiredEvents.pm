@@ -2,7 +2,7 @@ package WebGUI::Help::Workflow_Activity_TrashExpiredEvents;
 
 our $HELP = {
 	'trash expired events' => {
-		title => 'topicName',
+		title => 'activityName',
 		body => 'trash expired events body',
 		isa => [
 			{

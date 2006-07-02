@@ -2,7 +2,7 @@ package WebGUI::Help::Workflow_Activity_TrashClipboard;
 
 our $HELP = {
 	'trash clipboard' => {
-		title => 'topicName',
+		title => 'activityName',
 		body => 'trash clipboard body',
 		isa => [
 			{

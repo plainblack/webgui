@@ -2,7 +2,7 @@ package WebGUI::Help::Workflow_Activity_DecayKarma;
 
 our $HELP = {
 	'decay karma' => {
-		title => 'topicName',
+		title => 'activityName',
 		body => 'decay karma body',
 		isa => [
 			{

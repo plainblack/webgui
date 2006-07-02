@@ -2,7 +2,7 @@ package WebGUI::Help::Workflow_Activity_RollbackVersionTag;
 
 our $HELP = {
 	'rollback version tag' => {
-		title => 'topicName',
+		title => 'activityName',
 		body => 'rollback version tag body',
 		isa => [
 			{

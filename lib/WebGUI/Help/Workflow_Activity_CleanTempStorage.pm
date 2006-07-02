@@ -2,7 +2,7 @@ package WebGUI::Help::Workflow_Activity_CleanTempStorage;
 
 our $HELP = {
 	'clean temp storage' => {
-		title => 'topicName',
+		title => 'activityName',
 		body => 'clean temp storage body',
 		isa => [
 			{

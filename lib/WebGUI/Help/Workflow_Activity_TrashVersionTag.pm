@@ -2,7 +2,7 @@ package WebGUI::Help::Workflow_Activity_TrashVersionTag;
 
 our $HELP = {
 	'trash version tag' => {
-		title => 'topicName',
+		title => 'activityName',
 		body => 'trash version tag body',
 		isa => [
 			{

@@ -2,7 +2,7 @@ package WebGUI::Help::Workflow_Activity_SendQueuedMailMessages;
 
 our $HELP = {
 	'send queued mail messages' => {
-		title => 'topicName',
+		title => 'activityName',
 		body => 'send queued mail messages body',
 		isa => [
 			{

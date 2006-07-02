@@ -2,7 +2,7 @@ package WebGUI::Help::Workflow_Activity_NotifyAboutVersionTag;
 
 our $HELP = {
 	'notify about version tag' => {
-		title => 'topicName',
+		title => 'activityName',
 		body => 'notify about version tag body',
 		isa => [
 			{

@@ -25,7 +25,7 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
-	'topicName' => {
+	'activityName' => {
 		message => q|Decay Karma|,
 		context => q|The name of this workflow activity.|,
 		lastUpdated => 0,

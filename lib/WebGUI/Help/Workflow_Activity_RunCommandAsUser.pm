@@ -2,7 +2,7 @@ package WebGUI::Help::Workflow_Activity_RunCommandAsUser;
 
 our $HELP = {
 	'run command as user' => {
-		title => 'topicName',
+		title => 'activityName',
 		body => 'run command as user body',
 		isa => [
 			{

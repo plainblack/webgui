@@ -2,7 +2,7 @@ package WebGUI::Help::Workflow_Activity_CleanDatabaseCache;
 
 our $HELP = {
 	'clean database cache' => {
-		title => 'topicName',
+		title => 'activityName',
 		body => 'clean database cache body',
 		isa => [
 			{

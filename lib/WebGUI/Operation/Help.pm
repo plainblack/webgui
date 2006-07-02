@@ -207,6 +207,9 @@ sub _getHelpName {
 	elsif ($file =~ /^Macro_/) {
 		$helpName = 'macroName';
 	}
+	elsif ($file =~ /^Workflow_Activity_/) {
+		$helpName = 'activityName';
+	}
 	else {
 		$helpName = 'topicName';
 	}
@@ -261,7 +264,7 @@ A scalar ref to the array of data that will be broken into columns.
 sub _columnar {
 	my ($session, $columns, $list) = @_;
 	my @entries = @{ $list };
-	my $fraction = round(@entries/3 + 0.50);
+	my $fraction = round(@entries/$columns + 0.50);
 	my $output = '<tr><td valign="top">';
 	@entries = sort { $a->[0] cmp $b->[0] } @entries;
 	my $i = 0;
@@ -431,21 +434,27 @@ sub www_viewHelpTOC {
 			label => $i18n->get('topicName', 'Macros'),
 			uiLevel => 1,
 		},
+        	workf => {
+			label => $i18n->get('topicName', 'Workflow'),
+			uiLevel => 1,
+		},
 	);
-	my $i;
+
 	my @files = _getHelpFilesList($session,);
 	my %entries;
-	my $tabForm = WebGUI::TabForm->new($session, \%tabs);
 	foreach my $fileSet (@files) {
 		my $file = $fileSet->[1];
+		##This whole sorting routine sucks and should be replaced
 		my $tab = lc substr $file, 0, 5;
-		if (exists $tabs{$tab} or $tab eq "wobje") {
+		if (exists $tabs{$tab} or $tab eq "wobje" or $tab eq "workf") {
 			push @{ $entries{$tab} } , [_getHelpName($session,$file), $file];
 		}
 		else {
 			push @{ $entries{'other'} }, [_getHelpName($session,$file), $file];
 		}
 	}
+
+	my $tabForm = WebGUI::TabForm->new($session, \%tabs);
 	foreach my $tab ( keys %tabs ) {
 		my $tabPut = '<table width="100%" class="content"><tr><td valign="top">';
 		$tabPut .= _columnar($session, 3, $entries{$tab});

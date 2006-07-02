@@ -2,7 +2,7 @@ package WebGUI::Help::Workflow_Activity_SummarizePassiveProfileLog;
 
 our $HELP = {
 	'summarize passive profile log' => {
-		title => 'topicName',
+		title => 'activityName',
 		body => 'summarize passive profile log body',
 		isa => [
 			{

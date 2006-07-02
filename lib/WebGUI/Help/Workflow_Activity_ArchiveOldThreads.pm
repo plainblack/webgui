@@ -2,7 +2,7 @@ package WebGUI::Help::Workflow_Activity_ArchiveOldThreads;
 
 our $HELP = {
 	'add/edit archive old threads' => {
-		title => 'topicName',
+		title => 'activityName',
 		body => 'archive old threads body',
 		isa => [
 			{

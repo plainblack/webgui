@@ -2,7 +2,7 @@ package WebGUI::i18n::English::Workflow_Activity_ProcessRecurringPayments;
 
 our $I18N = {
 
-	'topicName' => {
+	'activityName' => {
 		message => q|Process Recurring Payments|,
 		context => q|The name of this workflow activity.|,
 		lastUpdated => 0,

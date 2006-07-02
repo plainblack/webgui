@@ -2,7 +2,7 @@ package WebGUI::Help::Workflow_Activity_GetCsPost;
 
 our $HELP = {
 	'get cs post' => {
-		title => 'topicName',
+		title => 'activityName',
 		body => 'get cs post body',
 		isa => [
 			{

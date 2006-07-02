@@ -2,7 +2,7 @@ package WebGUI::Help::Workflow_Activity_ExpireGroupings;
 
 our $HELP = {
 	'expire groupings' => {
-		title => 'topicName',
+		title => 'activityName',
 		body => 'expire groupings body',
 		isa => [
 			{

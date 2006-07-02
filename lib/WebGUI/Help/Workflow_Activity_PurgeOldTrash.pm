@@ -2,7 +2,7 @@ package WebGUI::Help::Workflow_Activity_PurgeOldTrash;
 
 our $HELP = {
 	'purge old trash' => {
-		title => 'topicName',
+		title => 'activityName',
 		body => 'purge old trash body',
 		isa => [
 			{

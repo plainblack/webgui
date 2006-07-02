@@ -2,7 +2,7 @@ package WebGUI::Help::Workflow_Activity_ProcessRecurringPayments;
 
 our $HELP = {
 	'process recurring payments' => {
-		title => 'topicName',
+		title => 'activityName',
 		body => 'process recurring payments body',
 		isa => [
 			{

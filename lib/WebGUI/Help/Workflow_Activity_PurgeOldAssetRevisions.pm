@@ -2,7 +2,7 @@ package WebGUI::Help::Workflow_Activity_PurgeOldAssetRevisions;
 
 our $HELP = {
 	'purge old asset revisions' => {
-		title => 'topicName',
+		title => 'activityName',
 		body => 'purge old asset revisions body',
 		isa => [
 			{

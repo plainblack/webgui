@@ -1,7 +1,7 @@
 package WebGUI::i18n::English::Workflow_Activity_CacheEMSPrereqs;
 
 our $I18N = {
-	'topicName' => {
+	'activityName' => {
 		message => q|Cache EMS Prerequisites|,
 		context => q|The name of this workflow activity.|,
 		lastUpdated => 0,

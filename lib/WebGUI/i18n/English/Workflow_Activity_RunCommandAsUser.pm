@@ -13,7 +13,7 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
-	'topicName' => {
+	'activityName' => {
 		message => q|Run Command As User|,
 		context => q|The name of this workflow activity.|,
 		lastUpdated => 0,

@@ -19,7 +19,7 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
-	'topicName' => {
+	'activityName' => {
 		message => q|Clean Database Cache|,
 		context => q|The name of this workflow activity.|,
 		lastUpdated => 0,

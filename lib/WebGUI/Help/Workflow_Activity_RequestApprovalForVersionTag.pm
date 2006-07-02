@@ -2,7 +2,7 @@ package WebGUI::Help::Workflow_Activity_RequestApprovalForVersionTag;
 
 our $HELP = {
 	'request approval for version tag' => {
-		title => 'topicName',
+		title => 'activityName',
 		body => 'request approval for version tag body',
 		isa => [
 			{

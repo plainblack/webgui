@@ -2,7 +2,7 @@ package WebGUI::Help::Workflow_Activity_ExpireSubscriptionCodes;
 
 our $HELP = {
 	'expire subscription codes' => {
-		title => 'topicName',
+		title => 'activityName',
 		body => 'expire subscription codes body',
 		isa => [
 			{

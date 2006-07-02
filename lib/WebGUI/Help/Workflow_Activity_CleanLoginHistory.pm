@@ -2,7 +2,7 @@ package WebGUI::Help::Workflow_Activity_CleanLoginHistory;
 
 our $HELP = {
 	'clean login history' => {
-		title => 'topicName',
+		title => 'activityName',
 		body => 'clean login history body',
 		isa => [
 			{

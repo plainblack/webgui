@@ -2,7 +2,7 @@ package WebGUI::Help::Workflow_Activity_DeleteExpiredSessions;
 
 our $HELP = {
 	'delete expired sessions' => {
-		title => 'topicName',
+		title => 'activityName',
 		body => 'delete expired sessions body',
 		isa => [
 			{

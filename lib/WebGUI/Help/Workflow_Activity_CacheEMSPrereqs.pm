@@ -2,7 +2,7 @@ package WebGUI::Help::Workflow_Activity_CacheEMSPrereqs;
 
 our $HELP = {
 	'cache ems prereqs' => {
-		title => 'topicName',
+		title => 'activityName',
 		body => 'cache ems prereqs body',
 		isa => [
 			{

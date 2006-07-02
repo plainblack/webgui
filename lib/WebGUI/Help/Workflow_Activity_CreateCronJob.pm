@@ -2,7 +2,7 @@ package WebGUI::Help::Workflow_Activity_CreateCronJob;
 
 our $HELP = {
 	'create cron job' => {
-		title => 'topicName',
+		title => 'activityName',
 		body => 'create cron job body',
 		isa => [
 			{

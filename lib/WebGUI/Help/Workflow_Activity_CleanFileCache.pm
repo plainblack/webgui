@@ -2,7 +2,7 @@ package WebGUI::Help::Workflow_Activity_CleanFileCache;
 
 our $HELP = {
 	'clean file cache' => {
-		title => 'topicName',
+		title => 'activityName',
 		body => 'clean file cache body',
 		isa => [
 			{

@@ -2,7 +2,7 @@ package WebGUI::Help::Workflow_Activity_UnlockVersionTag;
 
 our $HELP = {
 	'unlock version tag' => {
-		title => 'topicName',
+		title => 'activityName',
 		body => 'unlock version tag body',
 		isa => [
 			{
