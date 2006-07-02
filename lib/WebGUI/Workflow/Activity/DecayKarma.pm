@@ -51,7 +51,7 @@ sub definition {
 	my $definition = shift;
 	my $i18n = WebGUI::International->new($session, "Workflow_Activity_DecayKarma");
 	push(@{$definition}, {
-		name=>$i18n->get("topicName"),
+		name=>$i18n->get("activityName"),
 		properties=> {
 			minimumKarma => {
 				fieldType=>"integer",

@@ -52,7 +52,7 @@ sub definition {
 	my $definition = shift;
 	my $i18n = WebGUI::International->new($session, "Workflow_Activity_CleanFileCache");
 	push(@{$definition}, {
-		name=>$i18n->get("topicName"),
+		name=>$i18n->get("activityName"),
 		properties=> {
 			sizeLimit => {
 				fieldType=>"integer",
