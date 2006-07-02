@@ -67,8 +67,28 @@ our $HELP = {
 		],
 		variables => [
 		],
-		related => [
-		],
+		related => sub {
+			my $session = shift;
+
+			##Build list of enabled activities, by namespace, by reversing session hash:
+			my %workflows = %{ $session->config->get("workflowActivities") };
+			my @activities = map { s/^WebGUI::Workflow::Activity:://; $_; }
+					map { @{ $workflows{$_} } }
+					keys %workflows;
+			use Data::Dumper;
+			$session->errorHandler->warn(Dumper \@activities);
+			return map {
+				my ($namespace, $tag) = ($_, $_);
+				$tag =~ s/([a-z])([A-Z])/$1 $2/g;  #Separate studly caps
+				$tag =~ s/([A-Z]+(?![a-z]))/$1 /g; #Separate acronyms
+				$tag = lc $tag;
+				$namespace = join '', 'Workflow_Activity_', $namespace;
+				$session->errorHandler->warn($tag.' '.$namespace);
+				{ tag => "$tag",
+				namespace => $namespace }
+			} @activities;
+
+		},
 	},
 
 };

@@ -1,9 +1,9 @@
-package WebGUI::Help::Workflow_Activity_ArchiveOldThreads;
+package WebGUI::Help::Workflow_Activity_GetSyndicatedContent;
 
 our $HELP = {
-	'archive old threads' => {
+	'get syndicated content' => {
 		title => 'activityName',
-		body => 'archive old threads body',
+		body => 'get syndicated content body',
 		isa => [
 			{
 				namespace => "Workflow_Activity",
