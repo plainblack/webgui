@@ -19,6 +19,11 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
+	'run command as user body' => {
+		message => q|<p>This workflow activity will switch the session's current user to that passed in to the Activity.  Then it will process any macros found in the command and execute the command on the command line.</p>|,
+		lastUpdated => 0,
+	},
+
 };
 
 1;
