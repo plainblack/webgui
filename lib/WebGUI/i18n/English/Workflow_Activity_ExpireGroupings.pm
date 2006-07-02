@@ -9,7 +9,6 @@ our $I18N = {
 
 	'expire groupings body' => {
 		message => q|<p>This workflow activity will go through all Groups and handle changes in group membership.  If expiration notification has been setup for the group, users will be notified at the appropriate time before their membership expires.  After the delete offset has passed from their expiration date, the user is deleted from the group.</p>
-<p>
 |,
 		lastUpdated => 0,
 	},

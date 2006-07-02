@@ -63,6 +63,7 @@ our $HELP = {
                                  $tag =~ s/^[a-zA-Z]+_//;           #Remove initial shortcuts
 				 $tag =~ s/([A-Z]+(?![a-z]))/$1 /g; #Separate acronyms
 				 $tag =~ s/([a-z])([A-Z])/$1 $2/g;  #Separate studly caps
+				 $tag =~ s/\s+$//;
 				 $tag = lc $tag;
 				 $namespace = join '', 'Macro_', $_;
 				 { tag => $tag,
