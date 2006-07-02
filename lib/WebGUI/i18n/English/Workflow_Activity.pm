@@ -37,8 +37,38 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
+	'list of installed activities' => {
+		message => q|List of Installed Workflow Activities|,
+		lastUpdated => 0,
+	},
+
+	'activities list body' => {
+		message => q|<p>Making a Workflow Activity available for use on your site is a two step process.</p>
+<div>
+<ol>
+<li>The activity must be put in the Activities directory in the WebGUI source code: lib/WebGUI/Workflow/Activities.</li>
+<li>The activity must be enabled in your WebGUI.conf file, in the "workflowActivities" section.</li>
+</ol>
+</div>
+<p>The table below shows which activities are installed on your site and which have been configured in your WebGUI.conf file.  It does not say if the activity is used in a Workflow.</p>
+|,
+		lastUpdated => 0,
+	},
+
+	'activity enabled header' => {
+		message => q|Activity Enabled?|,
+		lastUpdated => 1112591289,
+		context => q|Table heading in List of Activities help page.  Short for "Is this Activity enabled?"|,
+	},
+
+	'activity name' => {
+		message => q|Activity Name|,
+		lastUpdated => 1112591289,
+		context => q|Table heading in List of Activities help page.  Short for "Is this Activity enabled?"|,
+	},
+
 	'topicName' => {
-		message => q|Base Workflow Activity|,
+		message => q|Workflow Activities|,
 		context => q|The name of this workflow activity.|,
 		lastUpdated => 0,
 	},

@@ -24,8 +24,15 @@ our $I18N = {
 	},
 
 	'macros list body' => {
-                message => q|<p>The set of available Macros is defined in the WebGUI configuration file.  The table below shows all macros that are available for use on your site, and which ones have
-		been enabled on your use.  If the macro is enabled, the table will list the shortcut that is used to call it.</p>
+                message => q|<p>Making a macro available for use on your site is a two step process.</p>
+<div>
+<ol>
+<li>The macro must be put in the Macros directory in the WebGUI source code: lib/WebGUI/Macros/.</li>
+<li>The macro must be enabled in your WebGUI.conf file, in the "macros" section.  In that section, you can assign a shortcut that is different from the macro's name.</li>
+</ol>
+</div>
+<p>The table below shows which macros are installed on your site and which have been configured in your WebGUI.conf file.</p>
+
 |,
 		context => 'Content for dynamically generated macro list',
 		lastUpdated => 1150994876,
