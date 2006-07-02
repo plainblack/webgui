@@ -1,9 +1,9 @@
-package WebGUI::Help::Workflow_Activity_CommitVersionTag;
+package WebGUI::Help::Workflow_Activity_ExpireSubscriptionCodes;
 
 our $HELP = {
-	'commit version tag' => {
+	'expire subscription codes' => {
 		title => 'topicName',
-		body => 'commit version tag body',
+		body => 'expire subscription codes body',
 		isa => [
 			{
 				namespace => "Workflow_Activity",

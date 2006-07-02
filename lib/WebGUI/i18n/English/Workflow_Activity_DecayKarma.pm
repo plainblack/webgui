@@ -31,6 +31,11 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
+	'decay karma body' => {
+		message => q|<p>This workflow activity will cause karma to increase or decrease by a set amount, not by a percentage, if it is above a minimum value specified by the user.  To alter the karma of all users, simple set the karma to a large, negative value.</p>|,
+		lastUpdated => 0,
+	},
+
 };
 
 1;

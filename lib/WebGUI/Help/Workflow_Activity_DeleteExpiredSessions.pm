@@ -1,9 +1,9 @@
-package WebGUI::Help::Workflow_Activity_CommitVersionTag;
+package WebGUI::Help::Workflow_Activity_DeleteExpiredSessions;
 
 our $HELP = {
-	'commit version tag' => {
+	'delete expired sessions' => {
 		title => 'topicName',
-		body => 'commit version tag body',
+		body => 'delete expired sessions body',
 		isa => [
 			{
 				namespace => "Workflow_Activity",

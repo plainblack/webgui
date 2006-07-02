@@ -7,6 +7,11 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
+	'delete expired sessions body' => {
+		message => q|<p>This workflows cleans up and deletes any expired sessions.</p>|,
+		lastUpdated => 0,
+	},
+
 };
 
 1;

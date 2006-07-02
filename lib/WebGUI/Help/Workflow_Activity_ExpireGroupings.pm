@@ -1,9 +1,9 @@
-package WebGUI::Help::Workflow_Activity_CommitVersionTag;
+package WebGUI::Help::Workflow_Activity_ExpireGroupings;
 
 our $HELP = {
-	'commit version tag' => {
+	'expire groupings' => {
 		title => 'topicName',
-		body => 'commit version tag body',
+		body => 'expire groupings body',
 		isa => [
 			{
 				namespace => "Workflow_Activity",
