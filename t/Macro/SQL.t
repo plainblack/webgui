@@ -37,6 +37,11 @@ my $url = "^/;";
 
 WebGUI::Macro::process($session, \$url);
 
+$session->db->dbh->do('DROP TABLE IF EXISTS testTable');
+$session->db->dbh->do('CREATE TABLE testTable (zero int(8), one int(8), two int(8), three int(8), four int(8), five int(8), six int(8), seven int(8), eight int(8), nine int(8), ten int(8), eleven int(8) ) TYPE=InnoDB');
+$session->db->dbh->do('INSERT INTO testTable (zero, one, two, three, four, five, six, seven, eight, nine, ten, eleven ) VALUES(0,1,2,3,4,5,6,7,8,9,10,11)');
+$session->db->dbh->do('INSERT INTO testTable (zero, one, two, three, four, five, six, seven, eight, nine, ten, eleven ) VALUES(100,101,102,103,104,105,106,107,108,109,110,111)');
+
 my @testSets = (
 	{ ##first example from docs
 	sql => q!select count(*) from users!,
@@ -53,6 +58,11 @@ my @testSets = (
 	template => q!<a href='^/;?op=viewProfile&uid=^0;'>^1;</a><br>!,
 	output => join '', map {sprintf "<a href='%s?op=viewProfile&uid=%d'>%s</a><br>", @{ $_ }} ([$url, 3,'Admin'],[$url, 1,'Visitor']),
 	},
+	{ ##test two digit macros
+	sql => q!select * from testTable order by one!,
+	template => join(':', map { "^$_;" } 0..11).'-',
+	output => '0:1:2:3:4:5:6:7:8:9:10:11-100:101:102:103:104:105:106:107:108:109:110:111-',
+	},
 );
 
 my $numTests = scalar @testSets;
@@ -65,3 +75,5 @@ foreach my $testSet (@testSets) {
 	WebGUI::Macro::process($session, \$output);
 	is($output, $testSet->{output}, 'testing '.$macro);
 }
+
+$session->db->dbh->do('DROP TABLE testTable');
