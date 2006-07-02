@@ -63,6 +63,16 @@ my @testSets = (
 	template => join(':', map { "^$_;" } 0..11).'-',
 	output => '0:1:2:3:4:5:6:7:8:9:10:11-100:101:102:103:104:105:106:107:108:109:110:111-',
 	},
+	{ ##Test illegal SQL, update
+	sql => q!update testTable set one=201 where one=101!,
+	template => '^0;',
+	output => 'Cannot execute this type of query.',
+	},
+	{ ##Test illegal SQL, update
+	sql => q!INSERT INTO testTable (zero, one, two, three, four, five, six, seven, eight, nine, ten, eleven ) VALUES(200,201,202,203,204,205,206,207,208,209,210,211)!,
+	template => '^0;',
+	output => 'Cannot execute this type of query.',
+	},
 );
 
 my $numTests = scalar @testSets;
