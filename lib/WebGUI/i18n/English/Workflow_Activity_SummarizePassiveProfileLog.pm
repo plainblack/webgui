@@ -7,6 +7,11 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
+	'summarize passive profile log body' => {
+		message => q|<p>This workflow activity will summarize passive profiling data for all users except for Visitor and then delete their previous passive log.  If passive profiling is disabled in the site settings, the summarization will not be done.</p>|,
+		lastUpdated => 0,
+	},
+
 };
 
 1;

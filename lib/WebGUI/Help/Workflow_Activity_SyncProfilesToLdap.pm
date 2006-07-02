@@ -1,9 +1,9 @@
-package WebGUI::Help::Workflow_Activity_SendQueuedMailMessages;
+package WebGUI::Help::Workflow_Activity_SyncProfilesToLdap;
 
 our $HELP = {
-	'send queued mail messages' => {
+	'sync profiles to ldap' => {
 		title => 'topicName',
-		body => 'send queued mail messages body',
+		body => 'sync profiles to ldap body',
 		isa => [
 			{
 				namespace => "Workflow_Activity",

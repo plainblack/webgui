@@ -1,9 +1,9 @@
-package WebGUI::Help::Workflow_Activity_SendQueuedMailMessages;
+package WebGUI::Help::Workflow_Activity_TrashVersionTag;
 
 our $HELP = {
-	'send queued mail messages' => {
+	'trash version tag' => {
 		title => 'topicName',
-		body => 'send queued mail messages body',
+		body => 'trash version tag body',
 		isa => [
 			{
 				namespace => "Workflow_Activity",

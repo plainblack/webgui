@@ -1,9 +1,9 @@
-package WebGUI::Help::Workflow_Activity_SendQueuedMailMessages;
+package WebGUI::Help::Workflow_Activity_SummarizePassiveProfileLog;
 
 our $HELP = {
-	'send queued mail messages' => {
+	'summarize passive profile log' => {
 		title => 'topicName',
-		body => 'send queued mail messages body',
+		body => 'summarize passive profile log body',
 		isa => [
 			{
 				namespace => "Workflow_Activity",

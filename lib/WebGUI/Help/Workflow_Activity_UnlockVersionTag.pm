@@ -1,9 +1,9 @@
-package WebGUI::Help::Workflow_Activity_SendQueuedMailMessages;
+package WebGUI::Help::Workflow_Activity_UnlockVersionTag;
 
 our $HELP = {
-	'send queued mail messages' => {
+	'unlock version tag' => {
 		title => 'topicName',
-		body => 'send queued mail messages body',
+		body => 'unlock version tag body',
 		isa => [
 			{
 				namespace => "Workflow_Activity",
