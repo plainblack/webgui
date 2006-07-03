@@ -19,4 +19,5 @@
  - fix: Edit LDAP Connection
  - fix: SQL Report w/ pagination and nested queries
  - fix: Unable to add Web Services Client
+ - Fixed a bug in spectre where it wasn't using session cookies.
 

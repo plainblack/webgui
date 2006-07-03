@@ -393,10 +393,10 @@ sub workerResponse {
 	$self->debug("Response retrieved is for $instanceId.");
 	if ($response->is_success) {
 		$self->debug("Response for $instanceId retrieved successfully.");
-		if ($response->header("Cookie") ne "") {
+		if ($response->header("Set-Cookie") ne "") {
 			$self->debug("Storing cookie for $instanceId for later use.");
 			my $cookie = $response->header("Set-Cookie");
-			$cookie =~ s/wgSession=([a-zA-Z0-9\_\-]{22})/$1/;
+			$cookie =~ s/wgSession=([a-zA-Z0-9\_\-]{22}).*/$1/;
 			$self->{_cookies}{$self->{_instances}{$instanceId}{sitename}} = $cookie;
 		}
 		my $state = $response->content; 

@@ -85,7 +85,7 @@ sub delete {
 	my $skipNotify = shift;
 	$self->session->db->deleteRow("WorkflowSchedule","taskId",$self->getId);
 	if ($skipNotify) {	
-		WebGUI::Workflow::Spectre->new($self->session)->notify("cron/deleteJob",{taskId=>$self->getId, config=>$self->session->config->getFilename});
+		WebGUI::Workflow::Spectre->new($self->session)->notify("cron/deleteJob", $self->session->config->getFilename."-".$self->getId);
 	}
 	undef $self;
 }
@@ -283,7 +283,7 @@ sub set {
 	$self->{_data}{enabled} = 0 unless ($self->{_data}{workflowId});
 	my $spectre = WebGUI::Workflow::Spectre->new($self->session);
 	$self->session->db->setRow("WorkflowSchedule","taskId",$self->{_data});
-	$spectre->notify("cron/deleteJob",{taskId=>$self->getId,config=>$self->session->config->getFilename});
+	$spectre->notify("cron/deleteJob", $self->session->config->getFilename."-".$self->getId);
 	my %params = %{$self->{_data}};
 	$params{parameters} = $self->get("parameters");
 	$params{config} = $self->session->config->getFilename;

@@ -153,7 +153,7 @@ sub new {
 		args=>[["shutdown","ping"]]
         	);
 	$self->{_workflow} = Spectre::Workflow->new($config, $logger, $debug);
-	$self->{_cron} = Spectre::Cron->new($config, $logger, $self->{_workflow}, $debug);
+	$self->{_cron} = Spectre::Cron->new($config, $logger, $debug);
 	POE::Kernel->run();
 }
 	
