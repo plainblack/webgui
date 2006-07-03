@@ -79,6 +79,10 @@ my $numTests = scalar @testSets;
 
 plan tests => $numTests;
 
+unless ($session->config->get('macros')->{'SQL'}) {
+	BAIL_OUT('SQL macro not enabled');
+}
+
 foreach my $testSet (@testSets) {
 	my $output = sprintf $macroText, $testSet->{sql}, $testSet->{template};
 	my $macro = $output;
