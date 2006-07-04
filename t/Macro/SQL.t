@@ -73,6 +73,16 @@ my @testSets = (
 	template => '^0;',
 	output => 'Cannot execute this type of query.',
 	},
+	{ ##Test unused macro variables
+	sql => q!select zero,one,two,three from testTable order by one!,
+	template => join(':', map { "^$_;" } 0..4).'-',
+	output => '0:1:2:3:-100:101:102:103:-',
+	},
+	{ ##rownum test
+	sql => q!select zero,one,two,three from testTable order by one!,
+	template => join(':', map { "^$_;" } 'rownum', 0..3).',',
+	output => '1:0:1:2:3,2:100:101:102:103,',
+	},
 );
 
 my $numTests = scalar @testSets;

@@ -66,7 +66,7 @@ plan tests => scalar @relatedHelp + scalar @isaHelp;
 
 foreach my $related (@relatedHelp) {
 	my ($topic, $entry, $parentTopic, $parentEntry) = @{ $related }{'namespace', 'tag', 'parentTopic', 'parentEntry'};
-	ok( exists $helpTable{$topic}{$entry}, "Help entry: $topic -> $entry from $parentTopic -> $parentEntry");
+	ok( exists $helpTable{$topic}{$entry}, "Help entry: $topic -> '$entry' from $parentTopic -> $parentEntry");
 }
 
 foreach my $isa (@isaHelp) {
