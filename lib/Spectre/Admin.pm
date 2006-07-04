@@ -152,8 +152,8 @@ sub new {
 		object_states => [ $self => {_start=>"_start", _stop=>"_stop", "shutdown"=>"_stop", "ping"=>"ping"} ],
 		args=>[["shutdown","ping"]]
         	);
-	$self->{_workflow} = Spectre::Workflow->new($config, $logger, $debug);
-	$self->{_cron} = Spectre::Cron->new($config, $logger, $debug);
+	Spectre::Workflow->new($config, $logger, $debug);
+	Spectre::Cron->new($config, $logger, $debug);
 	POE::Kernel->run();
 }
 	

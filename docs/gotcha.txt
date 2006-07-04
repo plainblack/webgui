@@ -7,6 +7,15 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+
+7.0.0
+--------------------------------------------------------------------
+
+ * There is a memory leak in Spectre. We're working on a solution to
+   this problem, but in the mean time you will need to restart spectre
+   every so often to clear out the memory. We recommend setting up a
+   cron job to restart it once per day.
+
 6.99.5
 --------------------------------------------------------------------
 

@@ -295,7 +295,7 @@ sub new {
 	my $config = shift;
 	my $logger = shift;
 	my $debug = shift;
-	my $self = {_debug=>$debug, _config=>$config, _logger=>$logger};
+	my $self = {_priority1=>[], _priority2=>[], _priority3=>[], _debug=>$debug, _config=>$config, _logger=>$logger};
 	bless $self, $class;
 	my @publicEvents = qw(addInstance deleteInstance);
 	POE::Session->create(
