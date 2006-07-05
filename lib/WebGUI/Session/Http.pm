@@ -174,8 +174,9 @@ Generates and sends HTTP headers.
 sub sendHeader {
 	my $self = shift;
 	return undef if ($self->{_http}{noHeader});
-	my $request = $self->session->request;
+	my ($request, $datetime) = $self->session->quick(qw(request datetime));
 	return undef unless $request;
+	my $userId = $self->session->var->get("userId");
 	$self->{_http}{noHeader} = 1;
 	my %params;
 	if ($self->isRedirect()) {
@@ -183,19 +184,19 @@ sub sendHeader {
 		$request->status(301);
 	} else {
 		$request->content_type($self->{_http}{mimetype} || "text/html");
-		my $date = $self->session->datetime->epochToHttp($self->{_http}{lastModified});
-		my $cc = $self->{_http}{cacheControl};
+		my $date = ($userId eq "1") ? $datetime->epochToHttp($self->{_http}{lastModified}) : $datetime->epochToHttp;
+		my $cacheControl = $self->{_http}{cacheControl};
 		$request->headers_out->set('Last-Modified' => $date);
-		if ($cc eq "none" || $self->session->setting->get("preventProxyCache") || ($cc eq "" && $self->session->var->get("userId") ne "1")) {
+		if ($cacheControl eq "none" || $self->session->setting->get("preventProxyCache") || ($cacheControl eq "" && $userId ne "1")) {
 			$request->headers_out->set("Cache-Control" => "private");
 			$request->no_cache(1);
-		} elsif ($cc ne "" && $request->protocol =~ /(\d\.\d)/ && $1 >= 1.1){
+		} elsif ($cacheControl ne "" && $request->protocol =~ /(\d\.\d)/ && $1 >= 1.1){
 			my $extras = "";
-			$extras .= ", private" unless ($self->session->var->get("userId") eq "1");
-    			$request->headers_out->set('Cache-Control' => "max-age=" . $cc.$extras);
-  		} elsif ($cc ne "") {
-			$request->headers_out->set("Cache-Control" => "private") unless ($self->session->var->get("userId") eq "1");
-			my $date = $self->session->datetime->epochToHttp(time() + $cc);
+			$extras .= ", private" unless ($userId eq "1");
+    			$request->headers_out->set('Cache-Control' => "max-age=" . $cacheControl.$extras);
+  		} elsif ($cacheControl ne "") {
+			$request->headers_out->set("Cache-Control" => "private") unless ($userId eq "1");
+			my $date = $datetime->epochToHttp(time() + $cacheControl);
     			$request->headers_out->set('Expires' => $date);
   		}
 		if ($self->{_http}{filename}) {

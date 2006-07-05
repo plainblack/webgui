@@ -20,4 +20,8 @@
  - fix: SQL Report w/ pagination and nested queries
  - fix: Unable to add Web Services Client
  - Fixed a bug in spectre where it wasn't using session cookies.
+ - Fixed a bug in spectre where you couldn't shut it down if you started it on
+   an IP other than 127.0.0.1.
+ - Made the Include macro more secure.
+ - Added Len's patch to fix some caching problems.
 
