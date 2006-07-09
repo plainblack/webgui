@@ -32,6 +32,8 @@ my ($versionTag, $template) = addTemplate();
 
 my $homeAsset = WebGUI::Asset->getDefault($session);
 
+$session->asset($homeAsset);
+
 my $i18n = WebGUI::International->new($session,'Macro_a_account');
 
 my @testSets = (
