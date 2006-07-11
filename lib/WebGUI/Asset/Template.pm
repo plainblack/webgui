@@ -452,6 +452,7 @@ sub www_styleWizard {
 	} elsif ($form->get("step") == 3) {
 		my $storageId = $form->get("logo","file");
 		my $logo;
+		my $logoContent = '';
 		if ($storageId) {
 			my $storage = WebGUI::Storage::Image->get($self->session,$storageId);
 			$logo = $self->addChild({
@@ -464,8 +465,48 @@ sub www_styleWizard {
 				templateId=>"PBtmpl0000000000000088"
 				});
 			$logo->generateThumbnail;
+			$logoContent = '<div class="logo"><a href="^H(linkonly);">^AssetProxy('.$logo->get("url").');</a></div>';
 		}
-my $style = '<html>
+		my $customHead = '';
+		if ($form->get("layout") eq "1") {
+			$customHead .= '
+			.bodyContent {
+			 	background-color: '.$form->get("bodyBackgroundColor","color").';
+                		color: '.$form->get("bodyForegroundColor","color").';
+				width: 70%; 
+				float: left;
+			}
+			.menu {
+				width: 30%;
+				float: left;
+			}
+			.wrapper { 
+				width: 80%;
+				margin-right: 10%;
+				margin-left: 10%;
+				background-color: '.$form->get("menuBackgroundColor","color").';
+			}
+			';
+		} else {
+			$customHead .= '
+			.bodyContent {
+			 	background-color: '.$form->get("bodyBackgroundColor","color").';
+                		color: '.$form->get("bodyForegroundColor","color").';
+				width: 100%;
+			}
+			.menu {
+                		background-color: '.$form->get("menuBackgroundColor","color").';
+				width: 100%;
+				text-align: center;
+			}
+			.wrapper { 
+				width: 80%;
+				margin-right: 10%;
+				margin-left: 10%;
+			}
+			';
+		}
+		my $style = '<html>
 <head>
 	<tmpl_var head.tags>
 	<title>^Page(title); - ^c;</title>
@@ -504,44 +545,7 @@ my $style = '<html>
 	.padding {
 		padding: 5px;
 	}
-	.bodyContent {
-		background-color: '.$form->get("bodyBackgroundColor","color").';
-		color: '.$form->get("bodyForegroundColor","color").';
-		width: 55%; ';
-if ($form->get("layout") == 1) {
-	$style .= '
-		float: left;
-		height: 75%;
-		margin-right: 10%;
-		';
-} else {
-	$style .= '
-		width: 80%;
-		margin-left: 10%;
-		margin-right: 10%;
-		';
-}
-	$style .= '
-	}
-	.menu {
-		background-color: '.$form->get("menuBackgroundColor","color").';
-		width: 25%; ';
-if ($form->get("layout") == 1) {
-	$style .= '
-		margin-left: 10%;
-		height: 75%;
-		float: left;
-		';
-} else {
-	$style .= '
-		width: 80%;
-		text-align: center;
-		margin-left: 10%;
-		margin-right: 10%;
-		';
-}
-	$style .= '
-	}
+	'.$customHead.'
 	a {
 		color: '.$form->get("linkColor","color").';
 	}
@@ -554,25 +558,20 @@ if ($form->get("layout") == 1) {
 ^AdminBar;
 <div class="heading">
 	<div class="padding">
-';
-	if (defined $logo) {
-		$style .= '<div class="logo"><a href="^H(linkonly);">^AssetProxy('.$logo->get("url").');</a></div>';
-	}
-	$style .= '
+		'.$logoContent.'
 		'.$form->get("heading").'
 		<div class="endFloat"></div>
 	</div>
 </div>
-<div class="menu">
-	<div class="padding">^AssetProxy('.($form->get("layout") == 1 ? 'flexmenu' : 'toplevelmenuhorizontal').');</div>
+<div class="wrapper">
+	<div class="menu">
+		<div class="padding">^AssetProxy('.($form->get("layout") == 1 ? 'flexmenu' : 'toplevelmenuhorizontal').');</div>
+	</div>
+	<div class="bodyContent">
+		<div class="padding"><tmpl_var body.content></div>
+	</div>
+	<div class="endFloat"></div>
 </div>
-<div class="bodyContent">
-	<div class="padding"><tmpl_var body.content></div>
-</div>';
-if ($form->get("layout") == 1) {
-	$style .= '<div class="endFloat"></div>';
-}
-$style .= '
 <div class="heading">
 	<div class="padding">
 		<div class="siteFunctions">^a(^@;); ^AdminToggle;</div>

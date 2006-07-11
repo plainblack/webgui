@@ -10,6 +10,13 @@
  - fix: Post Subject HTML
  - fix: Matrix: can't instantiate template
  - fix: Session id (Martin Kamerbeek / Procolix)
+ - fix: Style Wizard
+ - fix: content-type
+ - fix: Two cookies and incorrect Last-Modified date in HTTP header
+ - fix: HTTP status code 404 broken
+ - fix: Add missing page on Problem With Request
+ - fix: Avatar/photo upload not working
+ - fix: Shortcut with content lock fails (Thanks to Michelle Lamar)
 
 
 7.0.0

@@ -183,7 +183,7 @@ sub sendHeader {
 		$request->headers_out->set(Location => $self->{_http}{location});
 		$request->status(301);
 	} else {
-		$request->content_type($self->{_http}{mimetype} || "text/html");
+		$request->content_type($self->{_http}{mimetype} || "text/html; charset=UTF-8");
 		my $date = ($userId eq "1") ? $datetime->epochToHttp($self->{_http}{lastModified}) : $datetime->epochToHttp;
 		my $cacheControl = $self->{_http}{cacheControl};
 		$request->headers_out->set('Last-Modified' => $date);
@@ -202,8 +202,9 @@ sub sendHeader {
 		if ($self->{_http}{filename}) {
                         $request->headers_out->set('Content-Disposition' => qq!attachment; filename="$self->{_http}{filename}"!);
 		}
+		$request->status($self->getStatus());
+		$request->status_line($self->getStatus().' '.$self->{_http}{statusDescription});
 	}
-	$request->status_line($self->getStatus().' '.$self->{_http}{statusDescription});
 	return;
 }
 

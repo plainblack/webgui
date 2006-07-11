@@ -1,5 +1,5 @@
 package WebGUI;
-our $VERSION = "7.0.0";
+our $VERSION = "7.0.1";
 our $STATUS = "stable";
 
 #-------------------------------------------------------------------
@@ -371,7 +371,12 @@ sub tryAssetMethod {
 	my $output = eval{$asset->$methodToTry()};
 	if ($@) {
 		$session->errorHandler->warn("Couldn't call method ".$method." on asset for url: ".$session->url->getRequestedUrl." Root cause: ".$@);
-		$output = tryAssetMethod($session,$asset,'view') if ($method ne "view");
+		if ($method ne "view") {
+			$output = tryAssetMethod($session,$asset,'view');
+		} else {
+			# fatals return chunked
+			$output = 'chunked';
+		}
 	}
 	return $output;
 }

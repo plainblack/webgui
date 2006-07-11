@@ -94,7 +94,7 @@ The size in pixels of the thumbnail to be generated. If not specified the thumbn
 sub generateThumbnail {
 	my $self = shift;
 	my $filename = shift;
-	my $thumbnailSize = shift || $self->session->setting->get("thumbnailSize");
+	my $thumbnailSize = shift || $self->session->setting->get("thumbnailSize") || 100;
 	unless (defined $filename) {
 		$self->session->errorHandler->error("Can't generate a thumbnail when you haven't specified a file.");
 		return 0;
