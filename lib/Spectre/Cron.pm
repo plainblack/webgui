@@ -331,6 +331,7 @@ sub loadSchedule {
 		$data->{sitename} = $session->config->get("sitename")->[0];
 		$kernel->yield("addJob", $data);
 	}
+	$result->finish;
 	$session->close;
 }
 

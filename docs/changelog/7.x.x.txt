@@ -1,6 +1,6 @@
 7.0.1
  - fix: User profile field "Department" needs i18n 
-
+ - fix: new spectre.pl error (Martin Kamerbeek / Procolix)
 
 7.0.0
  - Welcome to a whole new world of WebGUI. After 2.5 years and 20,000 hours of

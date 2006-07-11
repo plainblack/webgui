@@ -267,6 +267,7 @@ sub loadWorkflows {
 	while (my ($id, $priority) = $result->array) {
 		$kernel->yield("addInstance", {gateway=>$config->get("gateway"), sitename=>$config->get("sitename")->[0], instanceId=>$id, priority=>$priority});
 	}
+	$result->finish;
 	$session->close;
 }
 
