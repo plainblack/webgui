@@ -30,7 +30,7 @@ sub _isValidLDAPUser {
    my ($uri, $error, $ldap, $search, $auth, $connectDN);
 	my $i18n = WebGUI::International->new($self->session);
    my $connection = $self->{_connection};
-   $uri = URI->new($connection->{ldapURL}) or $error = $i18n->get(2,'AuthLDAP');
+   $uri = URI->new($connection->{ldapUrl}) or $error = $i18n->get(2,'AuthLDAP');
    if($error ne ""){
       $self->error($error);
 	  return 0;
@@ -67,7 +67,7 @@ sub _isValidLDAPUser {
             }
 	 } else {
 	     $error = $i18n->get(2,'AuthLDAP');
-		 $self->session->errorHandler->error("Couldn't bind to LDAP server: ".$connection->{ldapURL});
+		 $self->session->errorHandler->error("Couldn't bind to LDAP server: ".$connection->{ldapUrl});
 	 }
   } else {
      $error = $i18n->get(2,'AuthLDAP');
@@ -175,7 +175,7 @@ sub createAccountSave {
    
    my $connection = $self->{_connection};
    #Get connectDN from settings   
-   my $uri = URI->new($connection->{ldapURL});
+   my $uri = URI->new($connection->{ldapUrl});
    my $ldap = Net::LDAP->new($uri->host, (port=>$uri->port));
    my $auth;
    if($connection->{connectDn}) {
@@ -209,7 +209,7 @@ sub createAccountSave {
    
    my $properties;
    $properties->{connectDN} = $connectDN;
-   $properties->{ldapUrl} = $connection->{ldapURL};
+   $properties->{ldapUrl} = $connection->{ldapUrl};
    
    return $self->SUPER::createAccountSave($username,$properties,$password,$profile);
 }
@@ -265,7 +265,7 @@ sub editUserForm {
    my $self = shift;
     my $userData = $self->getParams;
 	my $connection = $self->{_connection};
-    my $ldapUrl = $self->session->form->process('authLDAP_ldapUrl') || $userData->{ldapUrl} || $connection->{ldapURL};
+    my $ldapUrl = $self->session->form->process('authLDAP_ldapUrl') || $userData->{ldapUrl} || $connection->{ldapUrl};
 	my $connectDN = $self->session->form->process('authLDAP_connectDN') || $userData->{connectDN};
 	my $ldapConnection = $self->session->form->process('authLDAP_ldapConnection') || $userData->{ldapConnection};
 	my $ldapLinks = $self->session->db->buildHashRef("select ldapLinkId,ldapUrl from ldapLink");

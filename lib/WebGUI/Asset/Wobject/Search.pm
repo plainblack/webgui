@@ -48,13 +48,19 @@ Definition hashref from subclasses.
 
 =head3 Search specific properties
 
-=over 4
+These properties are added just for this asset.
 
-=item templateId
+=head4 templateId
 
 ID of a tempate from the Search namespace to display the search results.
 
-=back
+=head4 searchRoot
+
+An asset id of the point at which a search should start.
+
+=head4 classLimiter
+
+An array reference of asset classnames that are valid for the search.
 
 =cut
 
@@ -123,8 +129,7 @@ sub prepareView {
 
 =head2 view ( )
 
-view defines all template variables, processes the template and
-returns the output.
+Display search interface and results.
 
 =cut
 
