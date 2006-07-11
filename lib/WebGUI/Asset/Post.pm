@@ -532,7 +532,7 @@ sub hasRated {
         return 1 if $self->isPoster;
 	my $flag = 0;
 	if ($self->session->user->userId eq "1") {
-        	($flag) = $self->session->db->quickArray("select count(*) from Post_rating where assetId=? and ipAddress=?",[$self->getId, $self->session->env->get("REMOTE_ADDR")]);
+        	($flag) = $self->session->db->quickArray("select count(*) from Post_rating where assetId=? and ipAddress=?",[$self->getId, $self->session->env->getIp]);
 	} else {
         	($flag) = $self->session->db->quickArray("select count(*) from Post_rating where assetId=? and userId=?",[$self->getId, $self->session->user->userId]);
 	}
@@ -776,7 +776,7 @@ sub rate {
 	return undef unless ($rating == -1 || $rating == 1);
 	unless ($self->hasRated) {
         	$self->session->db->write("insert into Post_rating (assetId,userId,ipAddress,dateOfRating,rating) values ("
-                	.$self->session->db->quote($self->getId).", ".$self->session->db->quote($self->session->user->userId).", ".$self->session->db->quote($self->session->env->get("REMOTE_ADDR")).",
+                	.$self->session->db->quote($self->getId).", ".$self->session->db->quote($self->session->user->userId).", ".$self->session->db->quote($self->session->env->getIp).",
 			".$self->session->datetime->time().", ".$self->session->db->quote($rating).")");
         	my ($sum) = $self->session->db->quickArray("select sum(rating) from Post_rating where assetId=".$self->session->db->quote($self->getId));
         	$self->update({rating=>$sum});

@@ -94,7 +94,7 @@ sub _isValidUsername {
 sub _logLogin {
 	my $self = shift;
 	$self->session->db->write("insert into userLoginLog values (".$self->session->db->quote($_[0]).",".$self->session->db->quote($_[1]).",".$self->session->datetime->time().","
-	.$self->session->db->quote($self->session->env->get("REMOTE_ADDR")).",".$self->session->db->quote($self->session->env->get("HTTP_USER_AGENT")).")");
+	.$self->session->db->quote($self->session->env->getIp).",".$self->session->db->quote($self->session->env->get("HTTP_USER_AGENT")).")");
 }
 
 

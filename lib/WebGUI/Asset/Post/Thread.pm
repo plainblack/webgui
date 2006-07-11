@@ -553,7 +553,7 @@ sub rate {
 	return undef unless ($rating == -1 || $rating == 1);
 	unless ($self->hasRated) {
 		$self->session->db->write("insert into Post_rating (assetId,userId,ipAddress,dateOfRating,rating) values ("
-			.$self->session->db->quote($self->getId).", ".$self->session->db->quote($self->session->user->userId).", ".$self->session->db->quote($self->session->env->get("REMOTE_ADDR")).",
+			.$self->session->db->quote($self->getId).", ".$self->session->db->quote($self->session->user->userId).", ".$self->session->db->quote($self->session->env->getIp).",
 		".$self->session->datetime->time().", ".$self->session->db->quote($rating).")");
 		my ($sum) = $self->session->db->quickArray("select sum(Post.rating) from Post left join asset on Post.assetId=asset.assetId where Post.threadId=".$self->session->db->quote($self->getId)." and Post.rating>0");
 		$self->update({rating=>$sum});

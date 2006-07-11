@@ -322,7 +322,7 @@ sub getEditForm {
 #-------------------------------------------------------------------
 sub getIp {
 	my $self = shift;
-	my $ip = ($self->get("anonymous")) ? substr(md5_hex($self->session->env->get("REMOTE_ADDR")),0,8) : $self->session->env->get("REMOTE_ADDR");
+	my $ip = ($self->get("anonymous")) ? substr(md5_hex($self->session->env->getIp),0,8) : $self->session->env->getIp;
 	return $ip;
 }
 

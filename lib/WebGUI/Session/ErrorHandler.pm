@@ -90,7 +90,7 @@ sub canShowDebug {
 	my $ips = $self->session->setting->get("debugIp");
 	$ips =~ s/\s+//g;
 	my @ips = split(",", $ips);
-	my $ok = WebGUI::Utility::isInSubnet($self->session->env->get("REMOTE_ADDR"), [ @ips] );
+	my $ok = WebGUI::Utility::isInSubnet($self->session->env->getIp, [ @ips] );
 	return $ok;
 }
 
@@ -105,7 +105,7 @@ Returns true if the user meets the conditions to see performance indicators and 
 sub canShowPerformanceIndicators {
 	my $self = shift;
 	my $mask = $self->session->setting->get("debugIp");
-	my $ip = $self->session->env->get("REMOTE_ADDR");
+	my $ip = $self->session->env->getIp;
        	return (
 			(
 				$self->session->setting->get("showPerformanceIndicators")
@@ -331,7 +331,7 @@ sub security {
 	my $self = shift;
 	my $message = shift;
 	$self->warn($self->session->user->username." (".$self->session->user->userId.") connecting from "
-	.$self->session->env->get("REMOTE_ADDR")." attempted to ".$message);
+	.$self->session->env->getIp." attempted to ".$message);
 }
 
 

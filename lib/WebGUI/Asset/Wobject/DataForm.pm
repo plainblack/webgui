@@ -1091,7 +1091,7 @@ sub www_process {
                 assetId=>$self->getId,
                 userId=>$self->session->user->userId,
                 username=>$self->session->user->username,
-                ipAddress=>$self->session->env->get("REMOTE_ADDR"),
+                ipAddress=>$self->session->env->getIp,
                 submissionDate=>$self->session->datetime->time()
 		},0);
 	my ($var, %row, @errors, $updating, $hadErrors);

@@ -28,7 +28,7 @@ sub _hasVoted {
 	my $self = shift;
 	my ($hasVoted) = $self->session->db->quickArray("select count(*) from Poll_answer 
 		where assetId=".$self->session->db->quote($self->getId)." and ((userId=".$self->session->db->quote($self->session->user->userId)."
-		and userId<>'1') or (userId=".$self->session->db->quote($self->session->user->userId)." and ipAddress='".$self->session->env->get("REMOTE_ADDR")."'))");
+		and userId<>'1') or (userId=".$self->session->db->quote($self->session->user->userId)." and ipAddress='".$self->session->env->getIp."'))");
 	return $hasVoted;
 }
 
@@ -412,7 +412,7 @@ sub www_vote {
 	my $self = shift;
 	my $u;
         if ($self->session->form->process("answer") ne "" && $self->session->user->isInGroup($self->get("voteGroup")) && !($self->_hasVoted())) {
-        	$self->setVote($self->session->form->process("answer"),$self->session->user->userId,$self->session->env->get("REMOTE_ADDR"));
+        	$self->setVote($self->session->form->process("answer"),$self->session->user->userId,$self->session->env->getIp);
 		if ($self->session->setting->get("useKarma")) {
 			$self->session->user->karma($self->get("karmaPerVote"),"Poll (".$self->getId.")","Voted on this poll.");
 		}

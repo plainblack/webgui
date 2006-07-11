@@ -17,6 +17,7 @@
  - fix: Add missing page on Problem With Request
  - fix: Avatar/photo upload not working
  - fix: Shortcut with content lock fails (Thanks to Michelle Lamar)
+ - fix: Security bug in session env
 
 
 7.0.0
