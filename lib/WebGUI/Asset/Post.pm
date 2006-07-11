@@ -695,6 +695,7 @@ sub postProcess {
 	if ($self->getThread->getParent->get("addEditStampToPosts")) {
 		$data{content} .= "<p>\n\n --- (".$i18n->get('Edited_on')." ".$self->session->datetime->epochToHuman(undef,"%z %Z [GMT%O]")." ".$i18n->get('By')." ".$user->profileField("alias").") --- \n</p>";
 	}
+	$data{title} = WebGUI::HTML::filter($self->get("title"), "all");
 	$data{url} = $self->fixUrl($self->getThread->get("url")."/1") if ($self->isReply && $self->isNew);
 	$data{groupIdView} = $self->getThread->getParent->get("groupIdView");
 	$data{groupIdEdit} = $self->getThread->getParent->get("groupIdEdit");

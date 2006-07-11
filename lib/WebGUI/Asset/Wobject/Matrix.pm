@@ -707,13 +707,15 @@ sub www_editListingSave {
                         usePreview => 1,
                         sortOrder => 'desc',
                         sortBy => 'dateUpdated',
-                        notificationTemplateId =>'PBtmpl0000000000000027',
-                        searchTemplateId =>'PBtmpl0000000000000031',
-                        postFormTemplateId =>'PBtmpl0000000000000029',
-                        threadTemplateId =>'PBtmpl0000000000000032',
-   			collaborationTemplateId =>'PBtmpl0000000000000026',
+			rssTemplateId=>'PBtmpl0000000000000142',
+                     	notificationTemplateId=>'PBtmpl0000000000000027',
+                        searchTemplateId=>'PBtmpl0000000000000031',
+                        postFormTemplateId=>'PBtmpl0000000000000029',
+                        threadTemplateId=>'PBtmpl0000000000000032',
+                        collaborationTemplateId=>'PBtmpl0000000000000026',
                         karmaPerPost =>0,
                         karmaSpentToRate => 0,
+			approvalWorkflow=>"pbworkflow000000000003",
                         karmaRatingMultiplier => 0,
                         moderatePosts => 0,
                         moderateGroupId => '4',
@@ -1103,6 +1105,7 @@ sub www_viewDetail {
 		$var{screenshot} = $storage->getUrl($listing->{filename});
 		$var{thumbnail} = $storage->getThumbnailUrl($listing->{filename});
 	}
+	$forum->prepareView;
 	$var{"discussion"} = $forum->view;
 	$var{'isLoggedIn'} = ($self->session->user->userId ne "1");
 	if ($self->session->form->process("do") eq "sendEmail" && $self->session->form->process("verify","captcha")) {

@@ -22,8 +22,18 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 i18nDepartmentNames();
+addMissingAssets();
 
 finish($session); # this line required
+
+#--------------------------------------------------
+sub addMissingAssets {
+	print "\tAdding assets to config file that weren't added before.\n" unless ($quiet);
+	my $config = $session->config;
+	$config->addToArray("assets","WebGUI::Asset::Wobject::TimeTracking");
+	$config->addToArray("assets","WebGUI::Asset::Wobject::ProjectManager");
+	$config->addToArray("assets","WebGUI::Asset::Wobject::EventManagementSystem");
+}
 
 #--------------------------------------------------
 sub i18nDepartmentNames {

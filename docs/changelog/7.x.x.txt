@@ -5,7 +5,12 @@
    list
  - fix: Syndicated wobject erro 6.8+
  - fix: new spectre.pl error (Martin Kamerbeek / Procolix)
+ - fix: Can't create new account
+ - fix: Several new assets aren't added to config during upgrade process
+ - fix: Post Subject HTML
+ - fix: Matrix: can't instantiate template
  - fix: Session id (Martin Kamerbeek / Procolix)
+
 
 7.0.0
  - Welcome to a whole new world of WebGUI. After 2.5 years and 20,000 hours of
