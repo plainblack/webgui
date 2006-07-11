@@ -376,6 +376,29 @@ can alter their status.|,
 		lastUpdated =>1139262439
 	},
 
+	'IT' => {
+		message => q|IT|,
+		lastUpdated =>1152589736,
+		context => q|User profile field, abbreviation for Information Technology|,
+	},
+
+	'HR' => {
+		message => q|HR|,
+		lastUpdated =>1152589736,
+		context => q|User profile field, abbreviation for Human Resources|,
+	},
+
+	'Regular Staff' => {
+		message => q|Regular Staff|,
+		lastUpdated =>1152589736,
+		context => q|User profile field|,
+	},
+
+	'Department' => {
+		message => q|Department|,
+		lastUpdated =>1152589736,
+		context => q|label for user profile field|,
+	},
 
 };
 
