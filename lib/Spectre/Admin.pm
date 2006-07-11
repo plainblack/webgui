@@ -56,7 +56,7 @@ sub _stop {
 
 #-------------------------------------------------------------------
 
-=head2 config ()
+=head2 config ( )
 
 Returns a reference to the config object.
 

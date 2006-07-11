@@ -112,7 +112,7 @@ sub priceLineItem {
 	my $quantity = shift;
 	# this is the output of ShoppingCart->getItems (the \@normal arrayref).
 	my $cartItems = shift;
-	use Data::Dumper;
+	#use Data::Dumper;
 	# $self->session->errorHandler->warn('normal contents: '.Dumper($cartItems));
 	# this is the default price of this event.
 	my $price = $self->{_event}->{price};

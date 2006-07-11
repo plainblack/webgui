@@ -35,7 +35,7 @@ our @ISA = qw(WebGUI::Asset);
 
 #-------------------------------------------------------------------
 
-=head2 addChild 
+=head2 addChild ( )
 
 Overriding to limit the types of children allowed.
 
@@ -54,7 +54,7 @@ sub addChild {
 
 #-------------------------------------------------------------------
 
-=head2 addRevision
+=head2 addRevision ( )
 
 Override the default method in order to deal with attachments.
 
@@ -83,7 +83,7 @@ sub addRevision {
 		});
 	$newSelf->getThread->unmarkRead;
         return $newSelf;
-}  
+}
 
 #-------------------------------------------------------------------
 sub canAdd {
@@ -238,7 +238,7 @@ sub DESTROY {
 
 #-------------------------------------------------------------------
 
-=head2 exportAssetData() ( )
+=head2 exportAssetData ( )
 
 See WebGUI::AssetPackage::exportAssetData() for details.
 
@@ -281,7 +281,7 @@ sub formatContent {
 
 #-------------------------------------------------------------------
 
-=head2 getAvatarUrl (  )
+=head2 getAvatarUrl ( )
 
 Returns a URL to the owner's avatar.
 
@@ -310,7 +310,7 @@ sub getAvatarUrl {
 
 #-------------------------------------------------------------------
 
-=head2 getDeleteUrl (  )
+=head2 getDeleteUrl ( )
 
 Formats the url to delete a post.
 
@@ -353,7 +353,7 @@ sub getImageUrl {
 
 #-------------------------------------------------------------------
 
-=head2 getPosterProfileUrl (  )
+=head2 getPosterProfileUrl ( )
 
 Formats the url to view a users profile.
 
@@ -521,7 +521,7 @@ sub getThumbnailUrl {
 
 #-------------------------------------------------------------------
 
-=head2 hasRated (  )
+=head2 hasRated ( )
 
 Returns a boolean indicating whether this user has already rated this post.
 
@@ -543,7 +543,7 @@ sub hasRated {
 
 =head2 indexContent ( )
 
-Indexing the content of attachments and user defined fields. See WebGUI::Asset::indexContent() for additonal details. 
+Indexing the content of attachments and user defined fields. See WebGUI::Asset::indexContent() for additonal details.
 
 =cut
 
@@ -607,7 +607,7 @@ sub isPoster {
 
 =head2 isReply ( )
 
-Returns a boolean indicating whether this post is a reply. 
+Returns a boolean indicating whether this post is a reply.
 
 =cut
 
@@ -735,7 +735,7 @@ sub purge {
 
 #-------------------------------------------------------------------
 
-=head2 purgeCache ()
+=head2 purgeCache ( )
 
 See WebGUI::Asset::purgeCache() for details.
 
@@ -775,7 +775,7 @@ sub rate {
 	return undef unless ($rating == -1 || $rating == 1);
 	unless ($self->hasRated) {
         	$self->session->db->write("insert into Post_rating (assetId,userId,ipAddress,dateOfRating,rating) values ("
-                	.$self->session->db->quote($self->getId).", ".$self->session->db->quote($self->session->user->userId).", ".$self->session->db->quote($self->session->env->get("REMOTE_ADDR")).", 
+                	.$self->session->db->quote($self->getId).", ".$self->session->db->quote($self->session->user->userId).", ".$self->session->db->quote($self->session->env->get("REMOTE_ADDR")).",
 			".$self->session->datetime->time().", ".$self->session->db->quote($rating).")");
         	my ($sum) = $self->session->db->quickArray("select sum(rating) from Post_rating where assetId=".$self->session->db->quote($self->getId));
         	$self->update({rating=>$sum});
@@ -809,7 +809,7 @@ sub requestCommit {
 
 #-------------------------------------------------------------------
 
-=head2 setParent ( newParent ) 
+=head2 setParent ( newParent )
 
 We're overloading the setParent in Asset because we don't want posts to be able to be posted to anything other than other posts or threads.
 
@@ -858,7 +858,7 @@ sub setStatusUnarchived {
 
 #-------------------------------------------------------------------
 
-=head2 trash
+=head2 trash ( )
 
 Moves post to the trash and updates reply counter on thread.
 
@@ -882,7 +882,7 @@ sub trash {
 
 #-------------------------------------------------------------------
 
-=head2 update
+=head2 update ( )
 
 We overload the update method from WebGUI::Asset in order to handle file system privileges.
 
@@ -1012,7 +1012,7 @@ sub www_edit {
 	$var{'form.header'} .= WebGUI::Form::hidden($self->session, {name=>"proceed", value=>"showConfirmation"});
 	if ($self->session->form->process("title") || $self->session->form->process("content") || $self->session->form->process("synopsis")) {
 		$var{'preview.title'} = WebGUI::HTML::filter($self->session->form->process("title"),"all");
-		($var{'preview.synopsis'}, $var{'preview.content'}) = $self->getSynopsisAndContent($self->session->form->process("synopsis","textarea"), $self->session->form->process("content","HTMLArea")); 
+		($var{'preview.synopsis'}, $var{'preview.content'}) = $self->getSynopsisAndContent($self->session->form->process("synopsis","textarea"), $self->session->form->process("content","HTMLArea"));
 		$var{'preview.content'} = $self->formatContent($var{'preview.content'},$self->session->form->process("contentType"));
 		for my $i (1..5) {	
 			$var{'preview.userDefined'.$i} = WebGUI::HTML::filter($self->session->form->process('userDefined'.$i),"macros");
@@ -1097,7 +1097,7 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 
-=head2 www_editSave ()
+=head2 www_editSave ( )
 
 We're extending www_editSave() here to deal with editing a post that has been denied by the approval process.  Our change will reassign the old working tag of this post to the user so that they can edit it.
 
@@ -1111,7 +1111,7 @@ sub www_editSave {
 		my $i18n = WebGUI::International->new($self->session, "Asset");
 		return $self->session->style->userStyle($i18n->get("over max assets")) if ($self->session->config("maximumAssets") <= $count);
 	}
-	if ($self->session->form->param("assetId") ne "new" && $self->get("status") eq "pending") { 
+	if ($self->session->form->param("assetId") ne "new" && $self->get("status") eq "pending") {
 		my $currentTag = WebGUI::VersionTag->getWorking($self->session, 1);
 		if (defined $currentTag && $currentTag->getAssetCount > 0) {
 			# play a little working tag switcheroo
@@ -1151,7 +1151,7 @@ sub www_rate {
 
 Shows a confirmation message letting the user know their post has been submitted.
 
-=cut 
+=cut
 
 sub www_showConfirmation {
 	my $self = shift;

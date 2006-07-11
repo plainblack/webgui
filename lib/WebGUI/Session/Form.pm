@@ -48,7 +48,7 @@ These functions are available from this package:
 
 #-------------------------------------------------------------------
 
-=head2 AUTOLOAD ()
+=head2 AUTOLOAD ( )
 
 Dynamically creates functions on the fly for all the different form control types.
 
@@ -87,7 +87,7 @@ sub DESTROY {
 
 #-------------------------------------------------------------------
 
-=head2 get ()
+=head2 get ( )
 
 An alias for process()
 
@@ -230,7 +230,9 @@ sub process {
 
 #-------------------------------------------------------------------
 
-=head2 session
+=head2 session ( )
+
+Returns a reference to the current session.
 
 =cut
 

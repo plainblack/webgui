@@ -239,7 +239,7 @@ sub create {
 		);
 	$message->head->delete("Return-Path");
 	$message->head->add("Return-Path",  "<". ($session->setting->get("mailReturnPath") || $from) . ">");
-	my $type = $headers->{contentType};
+	$type = $headers->{contentType};
 	if ($session->config->get("emailOverride")) {
 		my $to = $headers->{to};
 		$to = "WebGUI Group ".$headers->{toGroup} if ($headers->{toGroup});

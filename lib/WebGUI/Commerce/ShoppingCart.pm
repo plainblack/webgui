@@ -272,7 +272,7 @@ sub new {
 
 #-------------------------------------------------------------------
 
-=head2 session
+=head2 session ( )
 
 Returns the cached, local session variable.
 

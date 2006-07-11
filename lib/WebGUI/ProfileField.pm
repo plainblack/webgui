@@ -95,7 +95,7 @@ sub create {
 
 #-------------------------------------------------------------------
 
-=head2 delete ()
+=head2 delete ( )
 
 Deletes this field and all user data attached to it.
 
@@ -167,7 +167,7 @@ sub formField {
 
 #-------------------------------------------------------------------
 
-=head2 formProcess ()
+=head2 formProcess ( )
 
 Returns the value retrieved from a form post.
 
@@ -211,7 +211,7 @@ sub get {
 
 #-------------------------------------------------------------------
 
-=head2 getCategory ()
+=head2 getCategory ( )
 
 Returns a WebGUI::ProfileCategory object for the category that this profile field belongs to.
 
@@ -225,7 +225,7 @@ sub getCategory {
 
 #-------------------------------------------------------------------
 
-=head2 getEditableFields ()
+=head2 getEditableFields ( )
 
 Returns an array reference of WebGUI::ProfileField objects that are marked "editable" or "required". This is a class method.
 
@@ -242,7 +242,7 @@ sub getEditableFields {
 
 #-------------------------------------------------------------------
 
-=head2 getFields ()
+=head2 getFields ( )
 
 Returns an array reference of WebGUI::ProfileField objects. This is a class method.
 
@@ -259,7 +259,7 @@ sub getFields {
 
 #-------------------------------------------------------------------
 
-=head2 getId ()
+=head2 getId ( )
 
 Returns the unique fieldName for this field.
 
@@ -274,7 +274,7 @@ sub getId {
 
 #-------------------------------------------------------------------
 
-=head2 getLabel ()
+=head2 getLabel ( )
 
 Returns the eval'd label for this field.
 
@@ -287,7 +287,7 @@ sub getLabel {
 
 #-------------------------------------------------------------------
 
-=head2 getRequiredFields ()
+=head2 getRequiredFields ( )
 
 Returns an array reference of WebGUI::ProfileField objects that are marked "required". This is a class method.
 
@@ -304,7 +304,7 @@ sub getRequiredFields {
 
 #-------------------------------------------------------------------
 
-=head2 isEditable ()
+=head2 isEditable ( )
 
 Returns a boolean indicating whether this field may be editable by a user.
 
@@ -318,7 +318,7 @@ sub isEditable {
 
 #-------------------------------------------------------------------
 
-=head2 isProtected ()
+=head2 isProtected ( )
 
 Returns a boolean indicating whether this field may be deleted.
 
@@ -331,7 +331,7 @@ sub isProtected {
 
 #-------------------------------------------------------------------
 
-=head2 isRequired ()
+=head2 isRequired ( )
 
 Returns a boolean indicating whether this field is required when a user creates an account or updates their account.
 
@@ -344,7 +344,7 @@ sub isRequired {
 
 #-------------------------------------------------------------------
 
-=head2 isViewable ()
+=head2 isViewable ( )
 
 Returns a boolean indicating whether this field may be viewed by a user.
 
@@ -357,7 +357,7 @@ sub isViewable {
 
 #-------------------------------------------------------------------
 
-=head2 moveDown ()
+=head2 moveDown ( )
 
 Moves this field down one position within it's category.
 
@@ -377,7 +377,7 @@ sub moveDown {
 
 #-------------------------------------------------------------------
 
-=head2 moveUp ()
+=head2 moveUp ( )
 
 Moves this field up one position within it's category.
 

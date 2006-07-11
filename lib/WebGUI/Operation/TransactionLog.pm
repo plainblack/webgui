@@ -15,6 +15,8 @@ Package WebGUI::Operation::TransactionLog
 Operations for dealing with transactions from the WebGUI Commerce System.
 
 =cut
+
+
 #-------------------------------------------------------------------
 
 =head2 www_viewPurchaseHistory ( errorMessage )

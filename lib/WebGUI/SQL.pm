@@ -737,7 +737,7 @@ sub rollback {
 
 =head2 session ( )
 
-Returns the session object reference.
+Returns a reference to the current session.
 
 =cut
 

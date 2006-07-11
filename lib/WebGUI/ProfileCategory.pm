@@ -80,7 +80,7 @@ sub create {
 
 #-------------------------------------------------------------------
 
-=head2 delete ()
+=head2 delete ( )
 
 Deletes this category and all fields attached to it.
 
@@ -117,7 +117,7 @@ sub get {
 
 #-------------------------------------------------------------------
 
-=head2 getCategories ()
+=head2 getCategories ( )
 
 Returns an array reference of all WebGUI::ProfileCategory objects in order of sequence. This is a class method.
 
@@ -136,7 +136,7 @@ sub getCategories {
 
 #-------------------------------------------------------------------
 
-=head2 getFields ()
+=head2 getFields ( )
 
 Returns an array reference of all WebGUI::ProfileField objects that are part of this category in order of sequence.
 
@@ -153,7 +153,7 @@ sub getFields {
 
 #-------------------------------------------------------------------
 
-=head2 getId ()
+=head2 getId ( )
 
 Returns the unique ID for this category.
 
@@ -166,7 +166,7 @@ sub getId {
 
 #-------------------------------------------------------------------
 
-=head2 getLabel ()
+=head2 getLabel ( )
 
 Returns the eval'd label for this category.
 
@@ -179,7 +179,7 @@ sub getLabel {
 
 #-------------------------------------------------------------------
 
-=head2 isEditable ()
+=head2 isEditable ( )
 
 Returns a boolean indicating whether the category's fields may be edited by a user.
 
@@ -193,7 +193,7 @@ sub isEditable {
 
 #-------------------------------------------------------------------
 
-=head2 isProtected ()
+=head2 isProtected ( )
 
 Returns a boolean indicating whether the category may be deleted.
 
@@ -206,7 +206,7 @@ sub isProtected {
 
 #-------------------------------------------------------------------
 
-=head2 isViewable ()
+=head2 isViewable ( )
 
 Returns a boolean indicating whether the category's fields may be viewed by a user.
 
@@ -220,7 +220,7 @@ sub isViewable {
 
 #-------------------------------------------------------------------
 
-=head2 moveDown ()
+=head2 moveDown ( )
 
 Moves this category down one position.
 
@@ -240,7 +240,7 @@ sub moveDown {
 
 #-------------------------------------------------------------------
 
-=head2 moveUp ()
+=head2 moveUp ( )
 
 Moves this field up one position.
 

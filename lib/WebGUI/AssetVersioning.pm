@@ -232,7 +232,7 @@ sub updateHistory {
 
 #-------------------------------------------------------------------
 
-=head2 www_lock ()
+=head2 www_lock ( )
 
 This is the same as doing an www_editSave without changing anything. It's here so that users can lock assets if they're planning on working on them, or they're working on some of the content offline.
 
@@ -253,7 +253,7 @@ sub www_lock {
 
 #-------------------------------------------------------------------
 
-=head2 www_manageRevisions ()
+=head2 www_manageRevisions ( )
 
 Shows a list of the revisions for this asset.
 

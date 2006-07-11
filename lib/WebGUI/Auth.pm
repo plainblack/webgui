@@ -459,7 +459,7 @@ sub error {
 
 #-------------------------------------------------------------------
 
-=head2 getAccountTemplateId ()
+=head2 getAccountTemplateId ( )
 
 This method should be overridden by the subclass and should return the template ID for the display/edit account screen.
 
@@ -471,7 +471,7 @@ sub getAccountTemplateId {
 
 #-------------------------------------------------------------------
 
-=head2 getAccountTemplateId ()
+=head2 getAccountTemplateId ( )
 
 This method should be overridden by the subclass and should return the template ID for the create account screen.
 
@@ -483,7 +483,7 @@ sub getCreateAccountTemplateId {
 
 #-------------------------------------------------------------------
 
-=head2 getAccountTemplateId ()
+=head2 getAccountTemplateId ( )
 
 This method should be overridden by the subclass and should return the template ID for the login screen.
 
@@ -495,7 +495,7 @@ sub getLoginTemplateId {
 
 #-------------------------------------------------------------------
 
-=head2 getParams ()
+=head2 getParams ( )
 
 Returns a hash reference with the user's authentication information.  This method uses data stored in the instance of the object.
 
@@ -641,7 +641,7 @@ sub new {
 
 #-------------------------------------------------------------------
 
-=head2 profile ()
+=head2 profile ( )
 
 Sets or returns the Profile hash for a user.
 

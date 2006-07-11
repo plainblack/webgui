@@ -64,7 +64,7 @@ sub privateName {
 
 #-------------------------------------------------------------------
 
-=head2 definition ( $session, [ additionalTerms ] )
+=head2 definition ( session, [ additionalTerms ] )
 
 Defines the schema or parameters for a form field.
 
@@ -526,7 +526,7 @@ sub prepareWrapper {
 
 =head2 session ( )
 
-Returns a reference to the session.
+Returns a reference to the current session.
 
 =cut
 

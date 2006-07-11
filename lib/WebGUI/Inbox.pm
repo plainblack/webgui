@@ -139,7 +139,7 @@ sub new {
 
 #-------------------------------------------------------------------
 
-=head2 session
+=head2 session ( )
 
 Returns a reference to the current session.
 

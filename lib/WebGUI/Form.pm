@@ -51,7 +51,7 @@ These functions are available from this package:
 
 #-------------------------------------------------------------------
 
-=head2 AUTOLOAD ()
+=head2 AUTOLOAD ( )
 
 Dynamically creates functions on the fly for all the different form control types.
 

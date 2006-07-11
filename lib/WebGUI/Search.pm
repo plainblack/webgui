@@ -64,7 +64,7 @@ sub getAssetIds {
 
 #-------------------------------------------------------------------
 
-=head2 getAsses ( )
+=head2 getAssets ( )
 
 Returns an array reference containing asset objects for those that matched.
 
@@ -95,7 +95,7 @@ sub getAssets {
 
 #-------------------------------------------------------------------
 
-=head2 getPaginatorResultSet ( )
+=head2 getPaginatorResultSet ( currentURL, paginateAfter, pageNumber, formVar )
 
 Returns a paginator object containing the search result set data.
 
@@ -317,6 +317,8 @@ sub search {
 #-------------------------------------------------------------------
 
 =head2 session ( ) 
+
+Returns a reference to the current session.
 
 =cut
 

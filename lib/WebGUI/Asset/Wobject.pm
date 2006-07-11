@@ -121,7 +121,7 @@ The name of the table you wish to delete the data from.
 
 =head3 keyName
 
-The name of a column in the table. Is not checked for invalid input. 
+The name of a column in the table. Is not checked for invalid input.
 
 =head3 keyValue
 
@@ -143,7 +143,7 @@ sub deleteCollateral {
 
 =head2 confirm ( message,yesURL [,noURL,vitalComparison] )
 
-Returns an HTML string that presents a link to confirm and a link to cancel an action, both Internationalized text. 
+Returns an HTML string that presents a link to confirm and a link to cancel an action, both Internationalized text.
 
 =head3 message
 
@@ -179,7 +179,7 @@ sub confirm {
 
 #-------------------------------------------------------------------
 
-=head2 getCollateral ( tableName, keyName, keyValue ) 
+=head2 getCollateral ( tableName, keyName, keyValue )
 
 Returns a hash reference containing a row of collateral data.
 
@@ -325,7 +325,7 @@ sub processPropertiesFromFormPost {
 
 #-------------------------------------------------------------------
 
-=head2 processStyle (output)
+=head2 processStyle ( output )
 
 Returns output parsed under the current style.
 
@@ -394,7 +394,7 @@ The name of the table to insert the data.
 
 =head3 keyName
 
-The column name of the primary key in the table specified above. 
+The column name of the primary key in the table specified above.
 
 =head3 properties
 
@@ -406,7 +406,7 @@ If set to "1", a new sequenceNumber will be generated and inserted into the row.
 
 =head3 useAssetId
 
-If set to "1", the current assetId will be inserted into the table upon creation of a new row. Note that this means the table better have a assetId column. Defaults to "1".  
+If set to "1", the current assetId will be inserted into the table upon creation of a new row. Note that this means the table better have a assetId column. Defaults to "1".
 
 =head3 setName
 
@@ -440,7 +440,7 @@ sub setCollateral {
 				my ($seq) = $self->session->db->quickArray("select max(sequenceNumber) from $table where $setName=".$self->session->db->quote($setValue));
 				$properties->{sequenceNumber} = $seq+1;
 			}
-		} 
+		}
 		unless ($useAssetId eq "0") {
 			$properties->{assetId} = $self->get("assetId");
 		}
@@ -473,7 +473,7 @@ sub setCollateral {
 
 #-------------------------------------------------------------------
 
-=head2 www_edit () 
+=head2 www_edit ( )
 
 Returns an edit form for this asset.
 

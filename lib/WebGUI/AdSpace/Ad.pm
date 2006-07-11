@@ -69,7 +69,7 @@ sub create {
 
 #-------------------------------------------------------------------
 
-=head2 delete 
+=head2 delete ( )
 
 Deletes this ad.
 
@@ -116,7 +116,7 @@ sub get {
 
 #-------------------------------------------------------------------
 
-=head2 getId 
+=head2 getId ( )
 
 Returns the id of this object.
 
@@ -154,7 +154,7 @@ sub new {
 
 #-------------------------------------------------------------------
 
-=head2 session
+=head2 session ( )
 
 Returns a reference to the current session.
 

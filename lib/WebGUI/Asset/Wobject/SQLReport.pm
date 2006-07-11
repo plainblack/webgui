@@ -293,7 +293,7 @@ sub prepareView {
 
 #-------------------------------------------------------------------
 
-=head2 purgeCache ()
+=head2 purgeCache ( )
 
 See WebGUI::Asset::purgeCache() for details.
 
@@ -494,7 +494,7 @@ sub _processQuery {
 
 #-------------------------------------------------------------------
 
-=head2 www_view ()
+=head2 www_view ( )
 
 See WebGUI::Asset::Wobject::www_view() for details.
 

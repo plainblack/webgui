@@ -66,7 +66,7 @@ sub cancelRecurringPayment {
 
 #-------------------------------------------------------------------
 
-=head2 checkoutForm
+=head2 checkoutForm ( )
 
 This must return a printRowsOnly'ed WebGUI::HTMLForm containing the fields for the checkout
 dat you want to collect. Do not include submit buttons. You probably want to override this 
@@ -80,7 +80,7 @@ sub checkoutForm {
 
 #-------------------------------------------------------------------
 
-=head2 configurationForm
+=head2 configurationForm ( )
 
 This generates the configuration form that's displayed in the admin console. You must 
 extend this method to include parameters specific to this payment module. To do so return
@@ -116,7 +116,7 @@ sub configurationForm {
 
 #-------------------------------------------------------------------
 
-=head2 confirmRecurringTransaction
+=head2 confirmRecurringTransaction ( )
 
 This method is called if your gateway signals you (ie. posts data to some URL) to confirm a 
 recurring payment term has been processed. If this is the case, you probably want to store 
@@ -133,7 +133,7 @@ sub confirmRecurringTransaction {
 
 #-------------------------------------------------------------------
 
-=head2 confirmTransaction
+=head2 confirmTransaction ( )
 
 This method is called when your gateway contacts a specific URL to notify you of the result of a
 transaction. You should override this method only if your gateway uses this kind of notification 
@@ -147,7 +147,7 @@ sub confirmTransaction {
 
 #-------------------------------------------------------------------
 
-=head2 connectionError
+=head2 connectionError ( )
 
 Returns an error message if there was a connection error. You must override this method.
 
@@ -159,7 +159,7 @@ sub connectionError {
 
 #-------------------------------------------------------------------
 
-=head2 enabled
+=head2 enabled ( )
 
 Returns a boolean indicating whether the plugin is enabled or not.
 
@@ -187,7 +187,7 @@ sub get {
 
 #-------------------------------------------------------------------
 
-=head2 getEnabledPlugins
+=head2 getEnabledPlugins ( )
 
 Returns a reference to an array of all enabled instantiated payment plugins.
 
@@ -237,7 +237,7 @@ sub init {
 
 #-------------------------------------------------------------------
 
-=head2 gatewayId
+=head2 gatewayId ( )
 
 Returns the gatewayId of the transaction. You must override this method.
 
@@ -276,7 +276,7 @@ sub getRecurringPaymentStatus {
 
 #-------------------------------------------------------------------
 
-=head2 errorCode
+=head2 errorCode ( )
 
 Returns the error code of the last submission.
 
@@ -335,7 +335,7 @@ sub name {
 
 #-------------------------------------------------------------------
 
-=head2 namespace
+=head2 namespace ( )
 
 Returns the namespace of the plugin.
 
@@ -394,7 +394,7 @@ sub recurringTransaction {
 
 #-------------------------------------------------------------------
 
-=head2 resultCode
+=head2 resultCode ( )
 
 Returns the result code of the transaction. You must override this method.
 
@@ -407,7 +407,7 @@ sub resultCode {
 
 #-------------------------------------------------------------------
 
-=head2 resultMessage
+=head2 resultMessage ( )
 
 Returns the result message of the transaction. You must override this method.
 
@@ -529,7 +529,7 @@ sub shippingDescription {
 
 #-------------------------------------------------------------------
 
-=head2 supports
+=head2 supports ( )
 
 Returns a hashref containg the types of payment the plugin supports. The hashref may contain:
 
@@ -547,7 +547,7 @@ sub supports {
 
 #-------------------------------------------------------------------
 
-=head2 transactionCompleted {
+=head2 transactionCompleted ( )
 
 A boolean indicating whether the payment has been finished or not. You must override this method.
 
@@ -560,7 +560,7 @@ sub transactionCompleted {
 
 #-------------------------------------------------------------------
 
-=head2 transactionError
+=head2 transactionError ( )
 
 Returns an error message if a transaction error has occurred. You must override this method.
 
@@ -573,7 +573,7 @@ sub transactionError {
 
 #-------------------------------------------------------------------
 
-=head2 transactionPending
+=head2 transactionPending ( )
 
 A boolean indicating whether the payment is pending or not. You must override this method.
 
@@ -586,7 +586,7 @@ sub transactionPending {
 
 #-------------------------------------------------------------------
 
-=head2 validateFormData
+=head2 validateFormData ( )
 
 This method checks the data entered in the checkoutForm. If an error has occurred this method must 
 return an arrayref containing the errormessages tied to the errors. If everything's ok it will return

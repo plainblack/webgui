@@ -27,7 +27,7 @@ use WebGUI::Operation::Commerce;
 use WebGUI::Commerce::ShoppingCart;
 use WebGUI::Commerce::Item;
 use WebGUI::Utility;
-use Data::Dumper;
+#use Data::Dumper;
 
 
 

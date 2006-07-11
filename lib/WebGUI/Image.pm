@@ -169,7 +169,7 @@ sub new {
 
 =head2 session ( )
 
-Returns the the session object.
+Returns a reference to the current session.
 
 =cut
 

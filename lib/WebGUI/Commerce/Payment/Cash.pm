@@ -156,6 +156,7 @@ A copy of the session object
 The namespace of the plugin.
 
 =cut
+
 sub init {
 	my ($class, $self);
 	$class = shift;

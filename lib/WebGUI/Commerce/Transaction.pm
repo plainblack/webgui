@@ -70,7 +70,7 @@ sub addItem {
 
 #-------------------------------------------------------------------
 
-=head2 cancelTransaction
+=head2 cancelTransaction ( )
 
 Cancels a recurring transaction. This is done by trying to cancel the subscription at the gateway
 using a Payment plugin. If this is succesfull the transaction is marked as canceled.
@@ -100,7 +100,7 @@ sub cancelTransaction {
 
 #-------------------------------------------------------------------
 
-=head2 completeTransaction
+=head2 completeTransaction ( )
 
 Sets the status of a transaction to 'Completed' and executes the handler for every item attached to
 the transction.
@@ -127,7 +127,7 @@ sub completeTransaction {
 
 #-------------------------------------------------------------------
 
-=head2 delete
+=head2 delete ( )
 
 Deletes the transaction from the database;
 
@@ -163,6 +163,7 @@ The type of the item you want to remove.
 =cut
 
 #-------------------------------------------------------------------
+
 sub deleteItem {
 	my ($self, $itemId, $itemType, $amount, @items);
 	$self = shift;
@@ -297,7 +298,7 @@ sub getByGatewayId {
 
 #-------------------------------------------------------------------
 
-=head2 getItems
+=head2 getItems ( )
 
 =cut
 
@@ -465,7 +466,7 @@ sub new {
 
 #-------------------------------------------------------------------
 
-=head2 pendingTransactions
+=head2 pendingTransactions ( )
 
 Returns a reference to an array which contains transaction objects of all pending transactions.
 
@@ -485,7 +486,7 @@ sub pendingTransactions {
 
 #-------------------------------------------------------------------
 
-=head2 session
+=head2 session ( )
 
 Returns the cached, local session variable.
 
@@ -650,7 +651,7 @@ sub trackingNumber {
 
 #-------------------------------------------------------------------
 
-=head2 transactionId
+=head2 transactionId ( )
 
 Returns the transactionId of the transaction.
 

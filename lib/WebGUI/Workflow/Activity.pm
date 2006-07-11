@@ -216,7 +216,7 @@ sub get {
 
 #-------------------------------------------------------------------
 
-=head2 getEditForm ()
+=head2 getEditForm ( )
 
 Returns the form that will be used to edit the properties of an activity.
 

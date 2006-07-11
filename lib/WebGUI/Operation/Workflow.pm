@@ -32,7 +32,7 @@ Operation handler for managing workflows.
 
 #-------------------------------------------------------------------
 
-=head2 www_addWorkflow ()
+=head2 www_addWorkflow ( )
 
 Allows the user to choose the type of workflow that's going to be created. 
 
@@ -72,7 +72,7 @@ sub www_addWorkflow {
 
 #-------------------------------------------------------------------
 
-=head2 www_addWorkflowSave ()
+=head2 www_addWorkflowSave ( )
 
 Saves the results from www_addWorkflow().
 

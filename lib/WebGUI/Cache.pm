@@ -164,7 +164,7 @@ sub parseKey {
 
 =head2 session ( ) 
 
-Returns a reference session.
+Returns a reference to the current session.
 
 =cut
 

@@ -25,15 +25,24 @@ Package WebGUI::Asset::Wobject::Search
 
 Asset used to search WebGUI content.
 
-=head2 definition ( $class, $definition )
+=head1 METHODS
+
+These methods are available from this package:
+
+=cut
+
+
+#-------------------------------------------------------------------
+
+=head2 definition ( class, definition )
 
 This method defines all properties of a Search and is used to autogenerate most methods.
 
-=head3 $class
+=head3 class
 
 $class is used to make sure that inheritance works on Assets and Wobjects.
 
-=head3 $definition
+=head3 definition
 
 Definition hashref from subclasses.
 
@@ -49,7 +58,6 @@ ID of a tempate from the Search namespace to display the search results.
 
 =cut
 
-#-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
 	my $session = shift;

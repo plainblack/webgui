@@ -153,7 +153,7 @@ sub duplicate {
 
 #-------------------------------------------------------------------
 
-=head2 exportAssetData() ( )
+=head2 exportAssetData ( )
 
 See WebGUI::AssetPackage::exportAssetData() for details.
 

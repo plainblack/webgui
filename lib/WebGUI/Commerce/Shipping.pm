@@ -21,7 +21,7 @@ use WebGUI::Commerce::ShoppingCart;
 
 #-------------------------------------------------------------------
 
-=head2 calc
+=head2 calc ( )
 
 Returns the calculated shipping cost. Your plugin must override this method.
 
@@ -33,7 +33,7 @@ sub calc {
 
 #-------------------------------------------------------------------
 
-=head2 description
+=head2 description ( )
 
 Returns a description of the shipping configuration. Defaults to the name of your plugin
 if you do not overload this method.
@@ -46,7 +46,7 @@ sub description {
 
 #-------------------------------------------------------------------
 
-=head2 configurationForm
+=head2 configurationForm ( )
 
 This generates the configuration form that's displayed in the admin console. You must 
 extend this method to include parameters specific to this payment module. To do so return
@@ -75,7 +75,7 @@ sub configurationForm {
 
 #-------------------------------------------------------------------
 
-=head2 enabled
+=head2 enabled ( )
 
 Returns a boolean indicating whether the plugin is enabled or not.
 
@@ -103,7 +103,7 @@ sub get {
 
 #-------------------------------------------------------------------
 
-=head2 getOptions
+=head2 getOptions ( )
 
 Returns a hash containing the parameters of a user configurable shipping method. If
 your shipping plugin has an options form you should overload this method.
@@ -116,7 +116,7 @@ sub getOptions {
 
 #-------------------------------------------------------------------
 
-=head2 getShippingItems
+=head2 getShippingItems ( )
 
 Returns an arrayref containing the items, marked for shipping. If no items are set
 using setShippingOptions it this method will default to the shopping cart of the user.
@@ -141,7 +141,7 @@ sub getShippingItems {
 
 #-------------------------------------------------------------------
 
-=head2 getEnabledPlugins
+=head2 getEnabledPlugins ( )
 
 Returns a reference to an array of all enabled instantiated payment plugins.
 
@@ -195,7 +195,7 @@ sub init {
 
 #-------------------------------------------------------------------
 
-=head2 getShoppingCart
+=head2 getShoppingCart ( )
 
 Returns a WebGUI::Commerce::ShoppingCart object of the current user.
 
@@ -237,7 +237,7 @@ sub load {
 
 #-------------------------------------------------------------------
 
-=head2 name
+=head2 name ( )
 
 Returns the (display) name of the plugin. You must override this method.
 
@@ -250,7 +250,7 @@ sub name {
 
 #-------------------------------------------------------------------
 
-=head2 namespace
+=head2 namespace ( )
 
 Returns the namespace of the plugin.
 
@@ -262,7 +262,7 @@ sub namespace {
 
 #-------------------------------------------------------------------
 
-=head2 optionsOk
+=head2 optionsOk ( )
 
 Indicates whether the options loaded into the plugin (by using either setOptions or processOptionsForm)
 are correct. If your plugin is able of being configured by an options form you must overload this method.
@@ -305,7 +305,7 @@ sub prepend {
 
 #-------------------------------------------------------------------
 
-=head2 processOptionsForm
+=head2 processOptionsForm ( )
 
 Processes the submitted form variables from the optionsForm and stores them
 into the plugin. You only need to overload this method if your plugin is capable
@@ -318,7 +318,7 @@ sub processOptionsForm {
 
 #-------------------------------------------------------------------
 
-=head2 session
+=head2 session ( )
 
 Returns the cached, local session variable.
 
@@ -366,7 +366,7 @@ sub setShippingItems {
 
 #-------------------------------------------------------------------
 
-=head2 supportsTracking
+=head2 supportsTracking ( )
 
 Returns a boolean indicating whether this plugin supports tracking of the shipment.
 Overload this method if your plugin does. Defaults to false.
@@ -379,7 +379,7 @@ sub supportsTracking {
 
 #-------------------------------------------------------------------
 
-=head2 trackingInfo
+=head2 trackingInfo ( )
 
 Returns a message containing information about the shipment tracking (ie. where the 
 package is or  something like that). If your plugin support these tracking, you probably
@@ -393,7 +393,7 @@ sub trackingInfo {
 
 #-------------------------------------------------------------------
 
-=head2 trackingNumber
+=head2 trackingNumber ( )
 
 Returns the tracking ID supplied by the shipment company. If your plugin supports tracking
 you'll have to overload this method. Defaults to undef.
@@ -406,7 +406,7 @@ sub trackingNumber {
 
 #-------------------------------------------------------------------
 
-=head2 trackingUrl
+=head2 trackingUrl ( )
 
 Returns the URL where the user can go to either fill in the tracking number or view the tracking 
 info of his package. Overload this method if your plugin supports tracking. Defaults to undef.

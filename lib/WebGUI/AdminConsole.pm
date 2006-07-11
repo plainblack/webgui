@@ -393,7 +393,7 @@ sub getAdminFunction {
 
 Constructor.
 
-=head2 session
+=head3 session
 
 A reference to the current session.
 
@@ -492,7 +492,7 @@ sub render {
 
 #-------------------------------------------------------------------
 
-=head2 setHelp ( id[,namespace] )
+=head2 setHelp ( id [,namespace] )
 
 Sets the _helpUrl to the urlized page.
 
@@ -529,6 +529,12 @@ sub getHelp {
 
 #-------------------------------------------------------------------
 
+=head2 session ( )
+
+Returns a reference to the current session.
+
+=cut
+
 sub session {
 	my $self = shift;
 	return $self->{_session};
@@ -536,7 +542,7 @@ sub session {
 
 #-------------------------------------------------------------------
 
-=head2 setIcon ( icon)
+=head2 setIcon ( icon )
 
 Sets the _function icon to parameter.
 

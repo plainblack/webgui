@@ -46,6 +46,10 @@ These methods are available from this class:
 
 Sets an approval for a version tag.
 
+=head3 session
+
+A reference to the current session.
+
 =cut
 
 sub www_approveVersionTag {
@@ -472,7 +476,7 @@ sub www_manageRevisionsInTag {
 
 Deletes a version tag and all asset revisions attached to it.
 
-=head2 session
+=head3 session
 
 A reference to the current session.
 

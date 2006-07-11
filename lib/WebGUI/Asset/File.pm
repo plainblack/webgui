@@ -126,7 +126,7 @@ sub duplicate {
 
 #-------------------------------------------------------------------
 
-=head2 exportAssetData() ( )
+=head2 exportAssetData ( )
 
 See WebGUI::AssetPackage::exportAssetData() for details.
 
@@ -142,7 +142,7 @@ sub exportAssetData {
 
 #-------------------------------------------------------------------
 
-=head2 getEditForm ()
+=head2 getEditForm ( )
 
 Returns the TabForm object that will be used in generating the edit page for this asset.
 
@@ -278,7 +278,7 @@ sub purge {
 
 #-------------------------------------------------------------------
 
-=head2 purgeCache ()
+=head2 purgeCache ( )
 
 See WebGUI::Asset::purgeCache() for details.
 

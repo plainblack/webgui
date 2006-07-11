@@ -70,7 +70,7 @@ sub _uiLevelChecksOut {
 
 #-------------------------------------------------------------------
 
-=head2 AUTOLOAD ()
+=head2 AUTOLOAD ( )
         
 Dynamically creates functions on the fly for all the different form control types.
 
@@ -95,7 +95,7 @@ sub AUTOLOAD {
         
 #-------------------------------------------------------------------
 
-=head2 DESTROY ()
+=head2 DESTROY ( )
 
 Disposes of the form object.
 

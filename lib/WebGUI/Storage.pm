@@ -616,7 +616,7 @@ sub getHashref {
 
 #-------------------------------------------------------------------
 
-=head2 getId ()
+=head2 getId ( )
 
 Returns the unique identifier of this storage location.
 
@@ -629,7 +629,7 @@ sub getId {
 
 #-------------------------------------------------------------------
 
-=head2 getLastError ()
+=head2 getLastError ( )
 
 Returns the most recently generated error message.
 

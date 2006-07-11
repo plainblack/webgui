@@ -32,19 +32,26 @@ Package WebGUI::Operation::Profile
 
 Operational handler for viewing, editing and validating user profile data.
 
-=head2 getRequiredProfileFields ( $session )
+=head1 METHODS
 
-Returns an array of hashes for required profile fields.  This array is ready
-to be used as template variables in the WebGUI template system.
-
-=head3 $session
-
-The current WebGUI session object.
+These methods are available from this package:
 
 =cut
 
 
 #-------------------------------------------------------------------
+
+=head2 getRequiredProfileFields ( session )
+
+Returns an array of hashes for required profile fields.  This array is ready
+to be used as template variables in the WebGUI template system.
+
+=head3 session
+
+The current WebGUI session object.
+
+=cut
+
 # Builds Extra form requirements for anonymous registration. 
 sub getRequiredProfileFields {
 	my $session = shift;
@@ -82,19 +89,19 @@ sub isDuplicateEmail {
 
 #-------------------------------------------------------------------
 
-=head2 saveProfileFields ( $session, $u, $profile )
+=head2 saveProfileFields ( session, u, profile )
 
 Saves profile data to a user's profile.  Does not validate any of the data.
 
-=head3 $session
+=head3 session
 
 WebGUI session object
 
-=head3 $user
+=head3 user
 
 User object.  Profile data will be placed in this user's profile.
 
-=head4 $profile
+=head3 profile
 
 Hash ref of profile data to save.
 
@@ -110,7 +117,7 @@ sub saveProfileFields {
 	}
 }
 
-=head2 validateProfileData ( $session )
+=head2 validateProfileData ( session )
 
 Validates profile data from the session form variables.  Returns processed data, warnings
 and errors.
@@ -159,7 +166,7 @@ sub validateProfileData {
 	return (\%data, $error, $warning);
 }
 
-=head2 www_editProfile ( $session )
+=head2 www_editProfile ( session )
 
 Provide a form where user profile data can be entered or edited.  The subroutine
 makes a large set of template variables which are passed to a template for presentation
@@ -168,9 +175,9 @@ selectable.
 
 Calls www_editProfileSave on submission.
 
-=head3 $session
+=head3 session
 
-=head3 $error
+A reference to the current session.
 
 =cut
 
@@ -213,7 +220,7 @@ sub www_editProfile {
 
 #-------------------------------------------------------------------
 
-=head2 www_editProfileSave ( $session )
+=head2 www_editProfileSave ( session )
 
 Validates all data submitted by www_editProfile.  If errors or warnings are present, 
 they are concatenated and sent back to www_editProfile for display and to let the user
@@ -239,7 +246,9 @@ sub www_editProfileSave {
 	return WebGUI::Operation::Auth::www_auth($session);
 }
 
-=head2 www_viewProfile ( $session )
+#-------------------------------------------------------------------
+
+=head2 www_viewProfile ( session )
 
 View the profile data for a user by the userId specified by the form variable C<uid>.
 Validates that the user requesting the profile data is allowed to see it.
@@ -248,8 +257,6 @@ is PBtmpl0000000000000052.  The template is not user selectable.
 
 =cut
 
-
-#-------------------------------------------------------------------
 sub www_viewProfile {
 	my $session = shift;
 	my $u = WebGUI::User->new($session,$session->form->process("uid"));

@@ -96,7 +96,7 @@ sub canShowDebug {
 
 #-------------------------------------------------------------------
 
-=head2 canShowPerformanceIndicators ()
+=head2 canShowPerformanceIndicators ( )
 
 Returns true if the user meets the conditions to see performance indicators and performance indicators are enabled.
 

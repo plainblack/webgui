@@ -35,21 +35,27 @@ Package WebGUI::Operation::User
 Operation for creating, deleting, editing and many other user related functions.
 
 =cut
+
+
 #-------------------------------------------------------------------
 
-=head2 _submenu ( $session, $workarea [, $title, $help] )
+=head2 _submenu ( session, workarea [, title, help] )
 
 Internal utility routine for setting up the Admin Console for User functions.
 
-=head3 $workarea
+=head3 session
+
+A reference to the current session.
+
+=head3 workarea
 
 The form and information to display to the administrator using the function.
 
-=head3 $title
+=head3 title
 
 Internationalized title for the Admin Console, looked up in the WebGUI namespace if it exists.
 
-=head3 $help
+=head3 help
 
 Help topic.  If set, then a Help icon will be displayed as a link to that topic.
 
@@ -86,20 +92,24 @@ sub _submenu {
         return $ac->render($workarea, $title);
 }
 
-=head2 doUserSearch ( $session, $op, $returnPaginator, $userFilter )
+=head2 doUserSearch ( session, op, returnPaginator, userFilter )
 
 Subroutine that actually performs the SQL search for users.
 
-=head3 $op
+=head3 session
+
+A reference to the current session.
+
+=head3 op
 
 The name of the calling operation, passed so that pagination links work correctly.
 
-=head3 $returnPaginator
+=head3 returnPaginator
 
 A boolean.  If true, a paginator object is returned.  Otherwise, a WebGUI::SQL
 statement handler is returned.
 
-=head3 $userFilter
+=head3 userFilter
 
 Array reference, used to screen out user names via a SQL "not in ()" clause.
 
@@ -149,11 +159,15 @@ sub doUserSearch {
 
 Form front-end and display for searching for users.
 
-=head3 $op
+=head3 session
+
+A reference to the current session.
+
+=head3 op
 
 The name of the calling operation, passed so that pagination links work correctly.
 
-=head3 $params
+=head3 params
 
 Hashref.  A set of key,value pairs that will be hidden in the user search form.
 
@@ -524,9 +538,13 @@ sub www_editUserKarmaSave {
 
 #-------------------------------------------------------------------
 
-=head2 www_formUsers ( $session )
+=head2 www_formUsers ( session )
 
 Form helper to pick a user from the system.
+
+=head3 session
+
+A reference to the current session.
 
 =cut
 

@@ -61,7 +61,7 @@ sub countClick {
 
 =head3 session
 
-A reference to the current session
+A reference to the current session.
 
 =head3 properties
 
@@ -85,7 +85,7 @@ sub create {
 
 #-------------------------------------------------------------------
 
-=head2 delete 
+=head2 delete ( )
 
 Deletes this ad space.
 
@@ -178,7 +178,7 @@ sub getAds {
 
 #-------------------------------------------------------------------
 
-=head2 getId 
+=head2 getId ( )
 
 Returns the id of this object.
 
@@ -241,7 +241,7 @@ sub newByName {
 
 #-------------------------------------------------------------------
 
-=head2 session
+=head2 session ( )
 
 Returns a reference to the current session.
 
