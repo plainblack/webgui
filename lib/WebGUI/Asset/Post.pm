@@ -965,6 +965,7 @@ sub www_edit {
 				});
 		} elsif ($self->session->form->process("class","className") eq "WebGUI::Asset::Post::Thread") { # new thread
 			return $self->session->privilege->insufficient() unless ($self->getThread->getParent->canPost);
+			$var{isThread} = 1;
 			$var{isNewThread} = 1;
                 	if ($self->getThread->getParent->canEdit) {
                         	$var{'sticky.form'} = WebGUI::Form::yesNo($self->session, {

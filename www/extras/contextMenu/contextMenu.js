@@ -75,7 +75,7 @@ function contextMenu_draw(){
 	var output = "";
 	output += '<div id="contextMenu_' + this.id + '_menu" class="contextMenu_skin">';
 	for (i=0;i<this.linkUrls.length;i++) {
-		output += "<a href=\"" + this.linkUrls[i] + "\">" + this.linkLabels[i] + "</a><br />";
+		output += "<a style=\"color: black;\" href=\"" + this.linkUrls[i] + "\">" + this.linkLabels[i] + "</a><br />";
 	}
 	output += '</div>';
 	if (this.type == "image") {

@@ -1,5 +1,9 @@
 7.0.1
  - fix: User profile field "Department" needs i18n 
+ - fix: AssetProxied Navigation context menu - items invisible in Style 02
+ - fix: Request Tracker Asset - Reply to a post displays Severity drop down
+   list
+ - fix: Syndicated wobject erro 6.8+
  - fix: new spectre.pl error (Martin Kamerbeek / Procolix)
 
 7.0.0

@@ -274,7 +274,6 @@ sub _normalize_items {
 sub _get_rss_data {
 	my $session = shift;
         my $url = shift;
-
 	my $cache = WebGUI::Cache->new($session,'url:' . $url, 'RSS');
         my $rss_serial = $cache->get;
         my $rss = {};
@@ -473,7 +472,6 @@ sub _get_items {
 	my $self = shift;
 	my $urls = shift;
 	my $maxHeadlines = shift || $self->getValue('maxHeadlines');
-
 	my $displayMode=$self->getValue('displayMode');
 
 	my $hasTermsRegex=_make_regex($self->getValue('hasTerms'));
@@ -488,12 +486,18 @@ sub _get_items {
 
                 for my $url (@{$urls}) {
 		    my $rss_info=_get_rss_data($self->session,$url);
-		    push(@rss_feeds, $rss_info) if($rss_info);
+		    push(@rss_feeds, $rss_info) if(defined $rss_info);
                 }
+
+		# deal with the fact that we may never get valid data
+
+		if (scalar(@rss_feeds) < 1) {
+			return ({}, []);
+		}
 
 		#Sort feeds in order by channel title.
 		#@rss_feeds=sort{$a->{channel}->{title} cmp $b->{channel}->{title}} @rss_feeds;
-		
+				
                 if ($displayMode eq 'grouped') {
 		    _create_grouped_items($items,\@rss_feeds,$maxHeadlines,$hasTermsRegex);
 		} else {
@@ -578,6 +582,11 @@ sub view {
         my %var;
 	
 	my($item_loop,$rss_feeds)=$self->_get_items(\@validatedUrls, $maxHeadlines);
+
+	if (scalar(@$rss_feeds) < 1) {
+		return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
+	}
+
 	if(@$rss_feeds > 1){
 	    #If there is more than one (valid) feed in this wobject, put in the wobject description info.
 	    $var{'channel.title'} = $title;
