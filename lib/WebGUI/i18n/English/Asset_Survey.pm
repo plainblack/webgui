@@ -984,17 +984,17 @@ the survey was added.|,
 	},
 
 	'answer.label' => {
-		message => q|The default label for question.answer.|,
+		message => q|The internationalized word "Answer".  If the survey is not in quiz mode, this label will be blank.|,
 		lastUpdated => 1149654822,
 	},
 
 	'response.label' => {
-		message => q|The default label for question.label.|,
+		message => q|The internationalized word "Responses".|,
 		lastUpdated => 1149654822,
 	},
 
 	'comment.label' => {
-		message => q|The default label for question.comment.|,
+		message => q|The internationalized word "Comments".|,
 		lastUpdated => 1149654822,
 	},
 
@@ -1040,7 +1040,7 @@ the survey was added.|,
 	},
 
 	'report answer.label' => {
-		message => q|The default label for answer_loop.|,
+		message => q|The internationalized label, "Answers".|,
 		lastUpdated => 1149654954,
 	},
 
