@@ -20,6 +20,7 @@
  - fix: Security bug in session env
  - fix: Ldap Registration of new users (Thanks to guiuser)
  - fix: Missing/Incorrect POD
+ - Made changes to spectre to handle finished workflows better.
 
 
 7.0.0

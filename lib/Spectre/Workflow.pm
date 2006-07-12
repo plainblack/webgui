@@ -108,6 +108,10 @@ sub checkInstances {
 	my ($kernel, $self) = @_[KERNEL, OBJECT];
 	$self->debug("Checking to see if we can run anymore instances right now.");
 	if ($self->countRunningInstances < $self->config->get("maxWorkers")) {
+		$self->debug("Total workflows waiting to run: ".scalar(keys %{$self->{_instances}}));
+		$self->debug("Priority 1 count: ".scalar(@{$self->{_priority1}}));
+                $self->debug("Priority 2 count: ".scalar(@{$self->{_priority2}}));
+                $self->debug("Priority 3 count: ".scalar(@{$self->{_priority3}}));
 		my $instance = $self->getNextInstance;
 		if (defined $instance) {
 			# mark it running so that it doesn't run twice at once

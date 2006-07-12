@@ -380,6 +380,8 @@ sub www_runWorkflow {
 		my $instance = WebGUI::Workflow::Instance->new($session, $instanceId);
 		if (defined $instance) {
 			return $instance->run;
+		} else {
+                        return "done";
 		}
 		return "complete";
 	}
