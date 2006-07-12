@@ -707,14 +707,7 @@ sub www_getUserPrefsForm {
 	}
 	$f->submit({extras=>'className="nothing"'});
 	$f->raw('</table>');
-	my $tags;
-	foreach my $tag (@{$self->session->style->{_javascript}}) {
-		$tags .= '<script';
-		foreach my $name (keys %{$tag}) {
-			$tags .= ' '.$name.'="'.$tag->{$name}.'"';
-		}
-		$tags .= '></script>'."\n";
-	}
+	my $tags = join "", values %{ $self->session->style->{_javascript} };
 	$output .= $tags.$f->print;
 	return $output;
 }
