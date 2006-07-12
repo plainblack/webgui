@@ -1,3 +1,7 @@
+7.0.2
+
+
+
 7.0.1
  - fix: User profile field "Department" needs i18n 
  - fix: AssetProxied Navigation context menu - items invisible in Style 02
