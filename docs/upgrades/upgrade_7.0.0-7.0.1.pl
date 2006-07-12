@@ -23,6 +23,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 i18nDepartmentNames();
 addMissingAssets();
+addLDAPRecursiveFilter();
 
 finish($session); # this line required
 
@@ -50,6 +51,15 @@ sub i18nDepartmentNames {
 	$i18nValues =~ s/\{/{'IT'=>WebGUI::International::get('IT','Asset_InOutBoard'),'HR'=>WebGUI::International::get('HR','Asset_InOutBoard'),'Regular Staff'=>WebGUI::International::get('Regular Staff','Asset_InOutBoard')/;
 	$session->db->write(q!update userProfileField set possibleValues=? where fieldName='department'!, [$i18nValues]);
 }
+
+#--------------------------------------------------
+sub addLDAPRecursiveFilter() {
+   print "\tAdding LDAP recursive filter.\n" unless ($quiet);
+   $session->db->write("alter table groups add ldapRecursiveFilter varchar(255) default null");
+   $session->db->write("alter table ldapLink add ldapGlobalRecursiveFilter varchar(255) default null");
+}
+
+
 
 
 ##-------------------------------------------------
