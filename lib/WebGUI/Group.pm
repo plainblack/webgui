@@ -753,6 +753,7 @@ sub getLDAPUsers {
 	my $ldapGroup = $self->get("ldapGroup");
 	my $ldapGroupProperty = $self->get("ldapGroupProperty");
     my $ldapRecursiveProperty = $self->get("ldapRecursiveProperty");
+	my $ldapRecurseFilter = $self->get("ldapRecursiveFilter");
 	
 	return [] unless ($ldapLinkId && $ldapGroup && $ldapGroupProperty);
 	
@@ -764,7 +765,7 @@ sub getLDAPUsers {
 	
 	my $people = [];
 	if($ldapRecursiveProperty) {
-	   $ldapLink->recurseProperty($ldapGroup,$people,$ldapGroupProperty,$ldapRecursiveProperty);
+	   $ldapLink->recurseProperty($ldapGroup,$people,$ldapGroupProperty,$ldapRecursiveProperty,$ldapRecurseFilter);
 	} else {
 	   $people = $ldapLink->getProperty($ldapGroup,$ldapGroupProperty);
 	}
@@ -1184,7 +1185,26 @@ sub ldapRecursiveProperty {
    	return $self->get("ldapRecursiveProperty");
 }
 
+#-------------------------------------------------------------------
 
+=head2 ldapRecursiveFilter ( [ value ] )
+
+Returns the ldap group recursive filter used to filter out entries that aren't groups from the groups of groups attribute.
+
+=head3 value
+
+If specified, the ldapRecursiveFilter is set to this value.
+
+=cut
+
+sub ldapRecursiveFilter {
+   	my $self = shift;
+   	my $value = shift;
+   	if (defined $value) {
+      		$self->set("ldapRecursiveFilter",$value);
+   	}
+   	return $self->get("ldapRecursiveFilter");
+}
 
 #-------------------------------------------------------------------
 
