@@ -12,11 +12,11 @@ use lib "../../lib";
 use strict;
 use Getopt::Long;
 use WebGUI::Session;
-
+use WebGUI::Operation::Shared;
+use Data::Dumper;
 
 my $toVersion = "7.0.1"; # make this match what version you're going to
 my $quiet; # this line required
-
 
 my $session = start(); # this line required
 
@@ -39,8 +39,16 @@ sub addMissingAssets {
 sub i18nDepartmentNames {
 	print "\tInternationalizing department settings in user profile\n" unless ($quiet);
 	$session->db->write(q!update userProfileField set label=? where fieldName='department'!, ["WebGUI::International::get('Department','Asset_InOutBoard')"]);
-	my $possibleValues = q|{ IT => WebGUI::International::get('IT','Asset_InOutBoard'), HR => WebGUI::International::get('HR','Asset_InOutBoard'), 'Regular Staff' => WebGUI::International::get('Regular Staff','Asset_InOutBoard')}|;
-	$session->db->write(q!update userProfileField set possibleValues=? where fieldName='department'!, [$possibleValues]);
+	my ($codeValues) = $session->db->quickArray(q|select possibleValues from userProfileField where fieldName='department'|);
+
+	my $possibleValues = WebGUI::Operation::Shared::secureEval($codeValues);
+	delete $possibleValues->{IT};
+	delete $possibleValues->{HR};
+	delete $possibleValues->{'Regular Staff'};
+	local $Data::Dumper::Terse = 1;
+	my $i18nValues = Dumper $possibleValues;
+	$i18nValues =~ s/\{/{'IT'=>WebGUI::International::get('IT','Asset_InOutBoard'),'HR'=>WebGUI::International::get('HR','Asset_InOutBoard'),'Regular Staff'=>WebGUI::International::get('Regular Staff','Asset_InOutBoard')/;
+	$session->db->write(q!update userProfileField set possibleValues=? where fieldName='department'!, [$i18nValues]);
 }
 
 
