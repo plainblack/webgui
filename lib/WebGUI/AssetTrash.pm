@@ -188,7 +188,7 @@ sub www_deleteList {
 
 =head2 www_manageTrash ( )
 
-Returns an AdminConsole to deal with assets in the Trash. If isInGroup(4) is False, renders an insufficient privilege page.
+Returns an AdminConsole to deal with assets in the Trash. If user isn't in the Turn On Admin group, renders an insufficient privilege page.
 
 =cut
 
