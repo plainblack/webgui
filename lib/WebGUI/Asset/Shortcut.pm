@@ -467,7 +467,7 @@ sub getShortcutByCriteria {
 	if ($assetId) {
 		$scratchId = "Shortcut_" . $assetId;
 		if($self->session->scratch->get($scratchId) && !$self->getValue("disableContentLock")) {
-			unless ($self->session->var->get("adminOn") {
+			unless ($self->session->var->get("adminOn")) {
 				return WebGUI::Asset->newByDynamicClass($self->session, $self->session->scratch->get($scratchId));
 			}
 		}
