@@ -217,6 +217,11 @@ our $HELP = {
                                 namespace => 'AuthLDAP',
                         },
                         {
+                                title => 'LDAPLink_ldapRecursiveFilter',
+                                description => 'LDAPLink_ldapRecursiveFilterDescription',
+                                namespace => 'AuthLDAP',
+                        },
+                        {
                                 title => '1004',
                                 description => '1004 description',
                                 namespace => 'WebGUI',
