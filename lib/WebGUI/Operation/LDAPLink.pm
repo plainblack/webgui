@@ -251,6 +251,12 @@ sub www_editLDAPLink {
 		-hoverHelp => $i18n->get('8 description'),
 		-value => $db{ldapPasswordName},
    );
+   $f->text(
+        -name => "ldapGlobalRecursiveFilter",
+		-label => $i18n->get("global recursive filter label"),
+		-hoverHelp => $i18n->get("global recursive filter label description"),
+		-value => $db{ldapGlobalRecursiveFilter}
+   );
 	$f->yesNo(
 		-name=>"ldapSendWelcomeMessage",
 		-value=>$db{ldapSendWelcomeMessage},
@@ -317,6 +323,7 @@ sub www_editLDAPLinkSave {
 	$properties->{ldapIdentity} = $session->form->process("ldapIdentity");
 	$properties->{ldapIdentityName} = $session->form->process("ldapIdentityName");
 	$properties->{ldapPasswordName} = $session->form->process("ldapPasswordName");
+	$properties->{ldapGlobalRecursiveFilter} = $session->form->process("ldapGlobalRecursiveFilter");
 	$properties->{ldapSendWelcomeMessage} = $session->form->yesNo("ldapSendWelcomeMessage");
 	$properties->{ldapWelcomeMessage} = $session->form->textarea("ldapWelcomeMessage");
 	$properties->{ldapAccountTemplate} = $session->form->template("ldapAccountTemplate");
