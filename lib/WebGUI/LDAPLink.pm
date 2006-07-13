@@ -267,7 +267,7 @@ sub recurseProperty {
 	my $property = $_[2];
 	my $recProperty = $_[3] || $property;
 	my $count = $_[4] || 0;
-	my $recurseFilter = $_[5] || $self->get->{globalRecursiveFilter};
+	my $recurseFilter = $_[5] || $self->get->{ldapGlobalRecursiveFilter};
 	return unless($ldap && $base && $property);
 
 	#Prevent infinate recursion
