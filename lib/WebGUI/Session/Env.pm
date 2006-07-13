@@ -36,6 +36,7 @@ These methods are available from this package:
 
 =cut
 
+
 #-------------------------------------------------------------------
 
 =head2 DESTROY ( )
@@ -48,7 +49,6 @@ sub DESTROY {
         my $self = shift;
         undef $self;
 }
-
 
 
 #-------------------------------------------------------------------
@@ -75,6 +75,7 @@ sub get {
 =head2 getIp ( )
 
 Returns the user's real IP address. Normally this is REMOTE_ADDR, but if they go through a proxy server it might be in HTTP_X_FORWARDED_FOR. This method attempts to figure out what the most likely IP is for the user. Note that it's possible to spoof this and therefore shouldn't be used as your only security mechanism for validating a user.
+
 =cut
 
 sub getIp {
@@ -98,7 +99,6 @@ sub new {
 	my $class = shift;
 	bless {_env=>\%ENV}, $class;
 }
-
 
 
 1;
