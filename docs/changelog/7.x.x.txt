@@ -4,6 +4,8 @@
  - fix: Unable to remove databaselinks (Thanks to misja)
  - fix: Collaboration System hangs under certain conditions (Martin Kamerbeek
    / Procolix)
+ - fix: Insert WebGUI Image inserts image, but does not retain border, spacing
+   or alignment.(Martin Kamerbeek / Procolix)
 
 7.0.1
  - fix: User profile field "Department" needs i18n 

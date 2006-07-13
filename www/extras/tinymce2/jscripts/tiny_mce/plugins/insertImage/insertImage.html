@@ -113,42 +113,32 @@ function OKClick() {
 	width="";
 	height="";
     
-   	var imageTag = '<img src="' + src + '" alt="' + alt + '" style="';
-	var preImageTag = '';
-	var postImageTag = '';
+   	var html = '<img src="' + src + '" alt="' + alt + '"';
+
 	if (border > 0) {
-		imageTag += 'border: ' + border + 'px;';
+		html += ' border="'+border+'px" ';
 	}
 	if (hspace > 0) {
-		imageTag += 'margin-left: ' + hspace + 'px; margin-right: ' + hspace + 'px;';
+		html += ' hspace="'+hspace+'px" ';
 	}
 	if (vspace > 0) {
-		imageTag += 'margin-top: ' + vspace + 'px; margin-bottom: ' + vspace + 'px;';
+		html += ' vspace="'+vspace+'px" ';
 	}
 	if (height > 0) {
-		imageTag += 'height: ' + height + 'px;';
+		html += ' height="'+height+'px" ';
 	}
 	if (width > 0) {
-		imageTag += 'height: ' + height + 'px;';
+		html += ' width="'+width+'px" ';
 	}
-	if (align == "left") {
-		imageTag += 'text-align: left;';
+	if (align != null) {
+		html += ' align="'+align+'" ';
 	}
-	if (align == "right") {
-		imageTag += 'text-align: right;';
-	}
-	if (align == "middle") {
-		imageTag += 'vertical-align: middle;';
-		preImageTag = '<p style="display:inline;vertical-align:middle;">';
-		postImageTag = '</p>';
-	}
-	imageTag += '" />';
-	imageTag = preImageTag + imageTag + postImageTag;
-
-	tinyMCE.execCommand('mceInsertContent', false, imageTag);
-    
-    window.close();
+ 
+ 	html += ' />';
+	tinyMCE.execCommand('mceInsertContent', false, html);
+	window.close();
 }
+
 var initialLoad = true;
 function resetForm() {
        if (!initialLoad) {
