@@ -23,13 +23,13 @@ my $session = WebGUI::Test->session;
 
 use Test::More; # increment this value for each test you create
 
-plan tests => 2 + 4;
+plan tests => 4 + 4;
 
 unless ($session->config->get('macros')->{'GroupText'}) {
 	Macro_Config::insert_macro($session, 'GroupText', 'GroupText');
 }
 
-my $macroText = q!^GroupText("Admin","admin","visitor");!;
+my $macroText = q!^GroupText("Admins","admin","visitor");!;
 my $output;
 
 $session->user({userId => 1});
@@ -41,6 +41,10 @@ $session->user({userId => 3});
 $output = $macroText;
 WebGUI::Macro::process($session, \$output);
 is($output, 'admin', 'user is admin');
+
+$output = q!^GroupText("Not a Group","in group","outside group");!;
+WebGUI::Macro::process($session, \$output);
+is($output, 'Group Not a Group was not found', 'Non-existant group returns an error message');
 
 ##Bug test setup
 

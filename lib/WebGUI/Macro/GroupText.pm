@@ -42,13 +42,17 @@ Text to be shown to someone not in the group.
 #-------------------------------------------------------------------
 sub process {
 	my $session = shift;
-	my @param = @_;
-	my ($groupId) = $session->dbSlave->quickArray("select groupId from groups where groupName=".$session->db->quote($param[0]));
-	$groupId = 3 if ($groupId eq "");
-	if ($session->user->isInGroup($groupId)) { 
-		return $param[1];
-	} else {
-		return $param[2];
+	my ($groupName, $inGroupText, $outGroupText ) = @_;
+	my ($groupId) = $session->dbSlave->quickArray("select groupId from groups where groupName=?",[$groupName]);
+	if ($groupId eq "") {
+		my $i18n = WebGUI::International->new($session, 'Macro_GroupText');
+		return sprintf $i18n->get('group not found'), $groupName
+	}
+	elsif ($session->user->isInGroup($groupId)) { 
+		return $inGroupText;
+	}
+	else {
+		return $outGroupText;
 	}
 }
 
