@@ -2,6 +2,8 @@
  - fix: upgrade from 6.99.4-6.99-5 can fail if site contains groups tied to ldap with no users in it.
  - GroupText macro returns an error message if it can't find the group by the name the user supplies.
  - fix: Unable to remove databaselinks (Thanks to misja)
+ - fix: Collaboration System hangs under certain conditions (Martin Kamerbeek
+   / Procolix)
 
 7.0.1
  - fix: User profile field "Department" needs i18n 

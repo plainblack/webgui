@@ -192,8 +192,20 @@ sub appendTemplateLabels {
 #-------------------------------------------------------------------
 sub canEdit {
         my $self = shift;
-        return ((($self->session->form->process("func") eq "add" || ($self->session->form->process("assetId") eq "new" && $self->session->form->process("func") eq "editSave" && $self->session->form->process("class") eq "WebGUI::Asset::Post::Thread")) && $self->canPost) || # account for new posts
-                $self->SUPER::canEdit());
+        return (
+		(
+			(
+				$self->session->form->process("func") eq "add" || 
+				(
+					$self->session->form->process("assetId") eq "new" && 
+					$self->session->form->process("func") eq "editSave" && 
+					$self->session->form->process("class") eq "WebGUI::Asset::Post::Thread"
+				)
+			) && 
+			$self->canPost
+		) || # account for new posts
+		$self->SUPER::canEdit()
+	);
 }
 
 #-------------------------------------------------------------------
@@ -205,7 +217,15 @@ sub canModerate {
 #-------------------------------------------------------------------
 sub canPost {
 	my $self = shift;
-	return (($self->get("status") eq "approved" || $self->getRevisionCount > 1) && ($self->session->user->isInGroup($self->get("postGroupId")) || $self->canEdit));
+	return (
+		(
+			$self->get("status") eq "approved" || 
+			$self->getRevisionCount > 1
+		) && (
+			$self->session->user->isInGroup($self->get("postGroupId")) 
+			|| $self->SUPER::canEdit
+		)
+	);
 }
 
 
