@@ -1,5 +1,5 @@
 7.0.2
-
+ - fix: upgrade from 6.99.4-6.99-5 can fail if site contains groups tied to ldap with no users in it.
 
 
 7.0.1
