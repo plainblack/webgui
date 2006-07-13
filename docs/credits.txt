@@ -45,8 +45,10 @@ Contributing Developers..............Lucas Bartholemy
                                      Steve Swanson / Plain Black
                                      Jeff Szpak / Plain Black
                                      Sean Tu / WDI
+                                     Vladimir Vitkovsky / WebGUI Worldwide
                                      Madsen Wikholm
                                      Matt Wilson / Plain Black
+                                     Zhou Xiaopeng / WebGUI Worldwide
                                      Gerald Young
 
 

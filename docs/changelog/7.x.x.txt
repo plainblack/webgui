@@ -6,6 +6,8 @@
    / Procolix)
  - fix: Insert WebGUI Image inserts image, but does not retain border, spacing
    or alignment.(Martin Kamerbeek / Procolix)
+ - Added Chinese character support to search engine and indexer thanks to Zhou
+   Xiaopeng.
 
 7.0.1
  - fix: User profile field "Department" needs i18n 

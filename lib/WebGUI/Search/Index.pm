@@ -112,6 +112,16 @@ sub create {
 	my $description = WebGUI::HTML::filter($asset->get('description'), "all");
 	my $keywords = WebGUI::HTML::filter(join(" ",$asset->get("title"), $asset->get("menuTitle"), $asset->get("synopsis"), $url, $description), "all");
 	my $synopsis = $asset->get("synopsis") || substr($description,0,255) || substr($keywords,0,255);
+
+#-------------------- added by zxp for chinese word segment
+	utf8::decode($keywords);
+	my @segs = split /([A-z|\d]+|\S)/, $keywords;
+	$keywords = join " ",@segs;
+	$keywords =~ s/\s{2,}/ /g;
+	$keywords =~ s/(^\s|\s$)//g;
+	$keywords =~ s/\s/\'\'/g;
+#-------------------- added by zxp end
+
 	my $add = $self->session->db->prepare("insert into assetIndex (assetId, title, url, creationDate, revisionDate, 
 		ownerUserId, groupIdView, groupIdEdit, lineage, className, synopsis, keywords) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )");
 	$add->execute([$asset->getId, $asset->get("title"), $asset->get("url"), $asset->get("creationDate"),

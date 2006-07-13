@@ -270,6 +270,17 @@ sub search {
 		unless ($keywords =~ m/"|\*/) { # do wildcards for people, like they'd expect
         		my @terms = split(' ',$keywords);
         		for (my $i = 0; $i < scalar(@terms); $i++) {
+			#-------------- Edited by zxp for Chinese Word Segment
+				utf8::decode($terms[$i]);
+				my @segs = split /([A-z|\d]+|\S)/, $terms[$i];
+				$terms[$i] = join " ",@segs;
+				$terms[$i] =~ s/\s{2,}/ /g;
+				$terms[$i] =~ s/(^\s|\s$)//g;
+				$terms[$i] =~ s/\s/\'\'/g;
+				if($terms[$i] =~ m/\'/) { # has non-latin latter in terms
+					$terms[$i] = '"' . $terms[$i] . '"';
+				}
+			#-------------- Edited by zxp end
                 		$terms[$i] .= "*";
         		}
         		$keywords = join(" ", @terms);
