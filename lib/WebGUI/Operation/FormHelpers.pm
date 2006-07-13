@@ -26,9 +26,11 @@ Package WebGUI::Operation::FormHelpers
 
 Operational support for various things relating to forms and rich editors.
 
+=cut
+
 #-------------------------------------------------------------------
 
-=head2 www_formAssetTree ( $session )
+=head2 www_formAssetTree ( session )
 
 Returns a list of the all the current Asset's children as form.  The children can be filtered via the
 form variable C<classLimiter>.  A crumb trail is provided for navigation.
@@ -101,10 +103,9 @@ sub www_formAssetTree {
 	return $output;
 }
 
-
 #-------------------------------------------------------------------
 
-=head2 www_richEditPageTree ( $session )
+=head2 www_richEditPageTree ( session )
 
 Asset picker for the rich editor.
 
@@ -201,11 +202,9 @@ function createLink() {
 	return $session->style->process($output, 'PBtmpl0000000000000137');
 }
 
-
-
 #-------------------------------------------------------------------
 
-=head2 www_richEditImageTree ( $session )
+=head2 www_richEditImageTree ( session )
 
 Similar to www_formAssetTree, except it is limited to only display assets of class WebGUI::Asset::File::Image.
 Each link display a thumbnail of the image via www_richEditViewThumbnail.
@@ -284,10 +283,9 @@ sub www_richEditImageTree {
 	return $session->style->process(join('', @output), 'PBtmpl0000000000000137');
 }
 
-
 #-------------------------------------------------------------------
 
-=head2 www_richEditViewThumbnail ( $session )
+=head2 www_richEditViewThumbnail ( session )
 
 Displays a thumbnail of an Image Asset in the Image manager for the Rich Editor.  The current
 URL in the session object is used to determine which Image is used.
@@ -324,7 +322,7 @@ sub www_richEditViewThumbnail {
 
 #-------------------------------------------------------------------
 
-=head2 www_richEditAddFolder ( $session )
+=head2 www_richEditAddFolder ( session )
 
 Returns a form to add a folder using the rich editor. The purpose of this feature is to provide a very simple way for end-users to create a folder from within the rich editor, in stead of having to leave the rich editor and use the asset manager. A very minimal set of options is supplied, all other options should be derived from the current asset.
 
@@ -354,10 +352,9 @@ sub www_richEditAddFolder {
 	return $session->style->process($html, 'PBtmpl0000000000000137');
 }
 
-
 #-------------------------------------------------------------------
 
-=head2 www_richEditAddFolderSave ( $session )
+=head2 www_richEditAddFolderSave ( session )
 
 Creates a directory under the current asset. The filename should be specified in the form. The Edit and View rights from the current asset are used if not specified in the form. All other properties are copied from the current asset.
 
@@ -407,7 +404,7 @@ sub www_richEditAddFolderSave {
 
 #-------------------------------------------------------------------
 
-=head2 www_richEditAddImage ( $session )
+=head2 www_richEditAddImage ( session )
 
 Returns a form to add an image using the rich editor. The purpose of this feature is to provide a very simple way for end-users to upload new images from within the rich editor, in stead of having to leave the rich editor and use the asset manager. A very minimal set of options is supplied, all other options should be derived from the current asset.
 
@@ -440,7 +437,7 @@ sub www_richEditAddImage {
 
 #-------------------------------------------------------------------
 
-=head2 www_richEditAddImageSave ( $session )
+=head2 www_richEditAddImageSave ( session )
 
 Creates an Image asset under the current asset. The filename should be specified in the form. The Edit and View rights from the current asset are used if not specified in the form. All other properties are copied from the current asset.
 
@@ -481,4 +478,3 @@ sub www_richEditAddImageSave {
 
 
 1;
-

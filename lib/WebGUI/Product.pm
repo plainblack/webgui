@@ -252,7 +252,7 @@ sub new {
 
 #-------------------------------------------------------------------
 
-=head3 session
+=head2 session ( )
 
 Returns a reference to the session.
 
@@ -262,7 +262,6 @@ sub session {
 	my $self = shift;
 	return $self->{_session};
 }
-
 
 #-------------------------------------------------------------------
 sub set {
