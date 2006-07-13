@@ -232,13 +232,11 @@ Specify a default language. Defaults to user preference or "English".
 
 sub new {
 	my ($class, $session, $namespace, $language) = @_;
-	return $i18nCache{namespaces}{$namespace} if $i18nCache{namespaces}{$namespace};
 	my $self = bless( {
 		_session   => $session,
 		_namespace => $namespace,
 		_language  => ($language || $session->user->profileField('language')),
 	},$class);
-	$i18nCache{namespaces}{$namespace} = $self;
 	return $self;
 }
 

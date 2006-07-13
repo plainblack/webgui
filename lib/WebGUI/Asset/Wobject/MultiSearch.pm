@@ -132,7 +132,7 @@ sub view {
 	#Set some template variables
 	$var{'for'}    = $i18n->get('for');
 	$var{'search'} = $i18n->get('search');
-	$var{'submit'} = WebGUI::Form::Submit->new({name=>'SearchSubmit',value=>$i18n->get('submit','WebGUI')})->toHtml();
+	$var{'submit'} = WebGUI::Form::Submit->new($self->session, {name=>'SearchSubmit',value=>$i18n->get('submit','WebGUI')})->toHtml();
 
        	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
