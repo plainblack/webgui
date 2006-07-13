@@ -264,7 +264,7 @@ sub setLink {
 	foreach my $name (keys %{$params}) {
 		$tag .= ' '.$name.'="'.$params->{$name}.'"';
 	}
-	$tag .= '/>'."\n";
+	$tag .= ' />'."\n";
 	$self->{_link}{$url} = $tag;
 	$self->session->output->print($tag) if ($self->sent);
 }
