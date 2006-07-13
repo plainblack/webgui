@@ -524,7 +524,7 @@ SKIP: {
 }
 
 END {
-	foreach my $testGroup ($gX, $gY, $gZ, $gA, $gB, $gC, $g, $gK, $gS, $gCache) {
+	foreach my $testGroup ($gX, $gY, $gZ, $gA, $gB, $gI, $gC, $g, $gK, $gS, $gCache) {
 		$testGroup->delete if (defined $testGroup and ref $testGroup eq 'WebGUI::Group');
 	}
 	foreach my $dude ($user, @crowd, @mob, @chameleons, @itchies, @tcps, $cacheDude) {
