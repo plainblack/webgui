@@ -57,8 +57,6 @@ sub _stop {
 	undef $self;
 }
 
-
-
 #-------------------------------------------------------------------
 
 =head2 addInstance ( params )
@@ -73,11 +71,11 @@ A hash reference containing important information about the workflow instance to
 
 The host and domain of the site this instance belongs to.
 
-=head3 instanceId
+=head4 instanceId
 
 The unqiue id for this workflow instance.
 
-=head3 priority
+=head4 priority
 
 The priority (1,2, or 3) that this instance should be run at.
 
@@ -134,7 +132,7 @@ sub checkInstances {
 
 #-------------------------------------------------------------------
 
-=head2 config 
+=head2 config ( )
 
 Returns a reference to the config object.
 
@@ -167,7 +165,9 @@ sub countRunningInstances {
 
 Prints out debug information if debug is enabled.
 
-=head3 
+=head3 output
+
+The debug message to be printed if debug is enabled.
 
 =cut 
 
@@ -210,7 +210,9 @@ sub deleteInstance {
 
 Prints out error information if debug is enabled.
 
-=head3 
+=head3 output
+
+The error message to be printed if debug is enabled.
 
 =cut 
 
@@ -439,7 +441,4 @@ sub workerResponse {
 }
 
 
-
 1;
-
-

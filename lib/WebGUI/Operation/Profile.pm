@@ -38,7 +38,6 @@ These methods are available from this package:
 
 =cut
 
-
 #-------------------------------------------------------------------
 
 =head2 getRequiredProfileFields ( session )
@@ -52,7 +51,7 @@ The current WebGUI session object.
 
 =cut
 
-# Builds Extra form requirements for anonymous registration. 
+# Builds Extra form requirements for anonymous registration.
 sub getRequiredProfileFields {
 	my $session = shift;
 	my @array;
@@ -67,7 +66,7 @@ sub getRequiredProfileFields {
 
 #-------------------------------------------------------------------
 
-=head2 isDuplicateEmail ( )
+=head2 isDuplicateEmail ( email )
 
 Checks the value of the email address passed in to see if it is
 duplicated in the system.  Returns true of false.  Will return false
@@ -89,7 +88,7 @@ sub isDuplicateEmail {
 
 #-------------------------------------------------------------------
 
-=head2 saveProfileFields ( session, u, profile )
+=head2 saveProfileFields ( session, user, profile )
 
 Saves profile data to a user's profile.  Does not validate any of the data.
 
@@ -117,6 +116,8 @@ sub saveProfileFields {
 	}
 }
 
+#-------------------------------------------------------------------
+
 =head2 validateProfileData ( session )
 
 Validates profile data from the session form variables.  Returns processed data, warnings
@@ -135,10 +136,10 @@ If the profile field is required, and the form field is blank, returns an error.
 If the profile field label is "email", then checks for a duplicate email and returns a
 warning if it is a duplicate.
 
+=back
+
 =cut
 
-
-#-------------------------------------------------------------------
 sub validateProfileData {
 	my $session = shift;
 	my %data = ();
@@ -166,6 +167,8 @@ sub validateProfileData {
 	return (\%data, $error, $warning);
 }
 
+#-------------------------------------------------------------------
+
 =head2 www_editProfile ( session )
 
 Provide a form where user profile data can be entered or edited.  The subroutine
@@ -181,7 +184,6 @@ A reference to the current session.
 
 =cut
 
-#-------------------------------------------------------------------
 sub www_editProfile {
 	my $session = shift;
 	return WebGUI::Operation::Auth::www_auth($session,"init") if($session->user->userId eq '1');
@@ -231,6 +233,10 @@ object.
 
 Returns the user to WebGUI::Operation::Auth::www_auth when done.
 
+=head3 session
+
+A reference to the current session.
+
 =cut
 
 sub www_editProfileSave {
@@ -254,6 +260,10 @@ View the profile data for a user by the userId specified by the form variable C<
 Validates that the user requesting the profile data is allowed to see it.
 Similarly to www_editProfile, this method is templated.  The default template
 is PBtmpl0000000000000052.  The template is not user selectable.
+
+=head3 session
+
+A reference to the current session.
 
 =cut
 
@@ -289,5 +299,6 @@ sub www_viewProfile {
 
 	return $session->style->userStyle(WebGUI::Asset::Template->new($session,"PBtmpl0000000000000052")->process($vars));
 }
+
 
 1;

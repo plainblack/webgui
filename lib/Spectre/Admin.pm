@@ -73,7 +73,9 @@ sub config {
 
 Prints out debug information if debug is enabled.
 
-=head3 
+=head3 output
+
+The debug message to be printed if debug is enabled.
 
 =cut 
 
@@ -92,7 +94,9 @@ sub debug {
 
 Prints out error information.
 
-=head3 
+=head3 output
+
+The error message to be printed if debug is enabled.
 
 =cut 
 
@@ -211,4 +215,3 @@ sub runTests {
 
 
 1;
-

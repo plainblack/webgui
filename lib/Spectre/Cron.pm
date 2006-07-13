@@ -32,7 +32,7 @@ Initializes the scheduler.
 =cut
 
 sub _start {
-        my ( $kernel, $self, $publicEvents) = @_[ KERNEL, OBJECT, ARG0 ];
+        my ($kernel, $self, $publicEvents) = @_[ KERNEL, OBJECT, ARG0 ];
 	$self->debug("Starting Spectre scheduler.");
         my $serviceName = "cron";
         $kernel->alias_set($serviceName);
@@ -59,8 +59,6 @@ sub _stop {
 	$self->debug("Stopping the scheduler.");
 	undef $self;
 }
-
-
 
 #-------------------------------------------------------------------
 
@@ -154,10 +152,9 @@ sub addJob {
 		};
 }
 
-
 #-------------------------------------------------------------------
 
-=head2 checkSchedule ( job, now ) 
+=head2 checkSchedule ( jobId, now )
 
 Compares a schedule with the current time and kicks off an event if necessary. This method should only ever need to be called by checkSchedules().
 
@@ -172,12 +169,12 @@ A DateTime object representing the time to compare the schedule with.
 =cut
 
 sub checkSchedule {
-	my ($kernel, $self, $id, $now) = @_[KERNEL, OBJECT, ARG0, ARG1];
-	$self->debug("Checking schedule ".$id." against the current time.");
-	my $cron = DateTime::Cron::Simple->new($self->getJob($id)->{schedule});
+	my ($kernel, $self, $jobId, $now) = @_[KERNEL, OBJECT, ARG0, ARG1];
+	$self->debug("Checking schedule ".$jobId." against the current time.");
+	my $cron = DateTime::Cron::Simple->new($self->getJob($jobId)->{schedule});
        	if ($cron->validate_time($now)) {
-		$self->debug("It's time to run ".$id.". Creating workflow instance.");
-		$kernel->yield("runJob",$id);
+		$self->debug("It's time to run ".$jobId.". Creating workflow instance.");
+		$kernel->yield("runJob",$jobId);
 	}
 }
 
@@ -199,7 +196,6 @@ sub checkSchedules {
 	$kernel->delay_set("checkSchedules",60);
 }
 
-
 #-------------------------------------------------------------------
 
 =head2 config 
@@ -219,7 +215,9 @@ sub config {
 
 Prints out debug information if debug is enabled.
 
-=head3 
+=head3 output
+
+The debug message to be printed if debug is enabled.
 
 =cut 
 
@@ -255,14 +253,15 @@ sub deleteJob {
 	delete $self->{_jobs}{$id};
 }
 
-
 #-------------------------------------------------------------------
 
 =head2 error ( output )
 
 Prints out error information if debug is enabled.
 
-=head3 
+=head3 output
+
+The error message to be printed if debug is enabled.
 
 =cut 
 
@@ -373,7 +372,6 @@ sub new {
         	);
 }
 
-
 #-------------------------------------------------------------------
 
 =head2 runJob ( )
@@ -456,4 +454,3 @@ sub runJobResponse {
 
 
 1;
-
