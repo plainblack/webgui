@@ -8,6 +8,7 @@
    or alignment.(Martin Kamerbeek / Procolix)
  - Added Chinese character support to search engine and indexer thanks to Zhou
    Xiaopeng.
+ - fix: issue with recursive ldap filter causing it not to work properly
 
 7.0.1
  - fix: User profile field "Department" needs i18n 
