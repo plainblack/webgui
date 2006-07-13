@@ -54,7 +54,7 @@ sub fixGroups {
 	  foreach my $linkId (keys %{$ldapLinks}) {
 	     my $ldapLink = $ldapLinks->{$linkId};
          my $people = $ldapLink->getProperty($hash->{ldapGroup},$hash->{ldapGroupProperty});
-	     if(scalar(@{$people})) {
+	     if($people && scalar(@{$people})) {
 	        $session->db->write("update groups set ldapLinkId=? where groupId=?",[$linkId,$hash->{groupId}]);
 		 }
       }
