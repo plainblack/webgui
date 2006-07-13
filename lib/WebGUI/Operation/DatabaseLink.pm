@@ -98,7 +98,7 @@ user is not in group Admin (3).
 sub www_deleteDatabaseLink {
 	my $session = shift;
         return $session->privilege->insufficient unless ($session->user->isInGroup(3));
-	return $session->privilege->vitalComponent if ($session->form->process("dlid") == 0);
+	return $session->privilege->vitalComponent if ($session->form->process("dlid") eq '0');
 	my $i18n = WebGUI::International->new($session);
         my ($output);
         $output .= $i18n->get(988).'<p>';
@@ -124,7 +124,7 @@ Returns the user to the List Database Links screen.
 sub www_deleteDatabaseLinkConfirm {
 	my $session = shift;
         return $session->privilege->insufficient unless ($session->user->isInGroup(3));
-	return $session->privilege->vitalComponent if ($session->form->process("dlid") == 0);
+	return $session->privilege->vitalComponent if ($session->form->process("dlid") eq '0');
 
 	WebGUI::DatabaseLink->new($session,$session->form->process("dlid"))->delete;
         return www_listDatabaseLinks($session);
