@@ -633,6 +633,7 @@ sub notifySubscribers {
 	$var->{url} = $self->session->url->getSiteURL().$self->getUrl;
 	$var->{'notify.subscription.message'} = $i18n->get(875,"Asset_Post");
 	my $message = $self->processTemplate($var, $self->getThread->getParent->get("notificationTemplateId"));
+	my $unsubscribe = '<p><a href="'.$self->getThread->getParent->getUnsubscribeUrl.'">'.$i18n->get("unsubscribe","Asset_Collaboration").'</a></p>';
 	my $from = $self->getThread->getParent->get("mailAddress");
 	my $subject = $self->getThread->getParent->get("mailPrefix").$self->get("title");
 	my $mail = WebGUI::Mail::Send->create($self->session, {
@@ -641,7 +642,7 @@ sub notifySubscribers {
 		subject=>$subject,
 		messageId=>"cs-".$self->getId
 		});
-	$mail->addHtml($message);
+	$mail->addHtml($message.$unsubscribe);
 	$mail->addFooter;
 	$mail->queue;
 	my $mail = WebGUI::Mail::Send->create($self->session, {
@@ -650,7 +651,8 @@ sub notifySubscribers {
 		subject=>$subject,
 		messageId=>"cs-".$self->getId
 		});
-	$mail->addHtml($message);
+	$unsubscribe = '<p><a href="'.$self->getThread->getUnsubscribeUrl.'">'.$i18n->get("unsubscribe","Asset_Collaboration").'</a></p>';
+	$mail->addHtml($message.$unsubscribe);
 	$mail->addFooter;
 	$mail->queue;
 }
