@@ -13,15 +13,29 @@ use FindBin qw($Bin);
 use lib "$FindBin::Bin/lib";
 
 use File::Find;
-use Test::More tests => 1; # increment this value for each test you create
+use Test::More;
 use WebGUI::Test;
 
 my (@modules, @failedModules);
 my $wgLib = WebGUI::Test->lib;
 File::Find::find( \&getWebGUIModules, $wgLib);
 
-my $numFailedModules = checkModules();
-is($numFailedModules, 0, "No erroneous whitespace in or before POD");
+plan tests => scalar(@modules);
+
+foreach my $module (@modules) {
+	open(FILE, "< $module") or die "Can't open file $module";
+	my @content = <FILE>;
+	close FILE;
+
+	my $lineNumber = checkContent(\@content);
+	is($lineNumber, 0, "Whitespace test for $module");
+
+	if ($lineNumber > 0) {
+		push(@failedModules, $module);
+		diag("Failed on $module, near line $lineNumber");
+	}
+}
+my $numFailedModules = scalar(@failedModules);
 
 if ($numFailedModules) {
 	print "\n# The folling modules have erroneous whitespace in or before POD:\n";
@@ -37,19 +51,6 @@ sub getWebGUIModules {
 	push( @modules, $File::Find::name ) if /\.pm$/;
 }
 
-sub checkModules {
-	foreach my $module (@modules) {
-		open(FILE, "< $module") or die "Can't open file $module";
-		my @content = <FILE>;
-		close FILE;
-
-		if (checkContent(\@content)) {
-			push(@failedModules, $module);
-		}
-	}
-	return scalar(@failedModules);
-}
-
 #---------------------------------------------------------------------
 # Note: this test checks for non-empty lines before POD commands
 # which are not detected by podchecker, but are causing problems
@@ -61,15 +62,16 @@ sub checkContent {
 	my @content = @{$content};
 
 	my $podAllowed = 0;
+	my $lineNumber = 1;
 	foreach my $line (@content) {
 		chomp $line;
 		my $isPodWord = ($line =~ m/^=/);
 		if ($isPodWord && !$podAllowed) {
-			diag $line;
-			return 1;
+			return $lineNumber;
 		}
 		# POD is allowed on next line if current line is empty
 		$podAllowed = ($line eq '');
+		$lineNumber++;
 	}
 
 	return 0;
