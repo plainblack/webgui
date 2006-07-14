@@ -124,6 +124,6 @@ is($input->{maxlength}, 20, 'set maxlength');
 
 ##Test Form Output parsing
 
-diag $formType;
+#diag $formType;
 WebGUI::Form_Checking::auto_check($session, $formType, $testBlock);
 
