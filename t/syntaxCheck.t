@@ -21,14 +21,14 @@ plan skip_all => 'set TEST_SYNTAX to enable this test' unless $ENV{TEST_SYNTAX};
 
 my @modules;
 my $wgLib = WebGUI::Test->lib;
-diag("Checking modules in $wgLib");
+#diag("Checking modules in $wgLib");
 File::Find::find( \&getWebGUIModules, $wgLib);
 
 my $numTests = scalar @modules;
 
 plan tests => $numTests;
 
-diag("Planning on $numTests tests");
+#diag("Planning on $numTests tests");
 
 foreach my $package (@modules) {
 	my $command = "$^X -I$wgLib -wc $package 2>&1";
