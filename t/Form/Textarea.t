@@ -93,8 +93,8 @@ $html = join "\n",
 $input = $inputs[0];
 is($input->name, 'preTestText', 'Checking input name');
 is($input->value, 'Some & text in " here', 'Checking default value');
-like($input->{style}, qr/height: 200/, 'Default height');
-like($input->{style}, qr/width: 500/, 'Default width');
+like($input->{style}, qr/height: 200/, 'Custom height');
+like($input->{style}, qr/width: 500/, 'Custom width');
 
 ##Test Form Output parsing
 
