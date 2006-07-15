@@ -58,7 +58,7 @@ for (my $count = 1; $count <= $maxCount; $count++){
 ##Creating a new session with the previous session's Id should clone the scratch data
 my $newSession = WebGUI::Session->open(WebGUI::Test->root, WebGUI::Test->file, undef, undef, $session->getId);
 
-ok($newSession->getId eq $session->getId, "Successful session duplication");
+is($newSession->getId, $session->getId, "Successful session duplication");
 
 for (my $count = 1; $count <= $maxCount; $count++){
    is($newSession->scratch->get("dBase$count"), $count, "Passed set/get $count");

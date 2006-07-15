@@ -68,8 +68,7 @@ sub generate {
   	my($s,$us)=gettimeofday();
   	my($v)=sprintf("%09d%06d%10d%06d%255s",rand(999999999),$us,$s,$$,$self->session->config->getFilename);
 	my $id = Digest::MD5::md5_base64($v);
-	$id =~ s/\+/_/g;
-	$id =~ s/\//-/g;
+	$id =~ tr{+/}{_-};
 	return $id;
 }
 
@@ -103,6 +102,19 @@ Returns a reference to the current session.
 sub session {
 	my $self = shift;
 	return $self->{_session};
+}
+
+#-------------------------------------------------------------------
+
+=head2 valid ( $idString ) 
+
+Returns true if $idString is a valid WebGUI guid.
+
+=cut
+
+sub valid {
+	my ($self, $idString) = @_;
+	return $idString =~ m/^[A-Za-z0-9_-]{22}$/;
 }
 
 

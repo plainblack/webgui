@@ -370,7 +370,7 @@ sub open {
 	bless $self , $class;
 	$self->{_request} = Apache2::Request->new($request) if (defined $request);
 	my $sessionId = shift || $self->http->getCookies->{"wgSession"} || $self->id->generate;
-	$sessionId = $self->id->generate if ($sessionId !~ m/^[A-Za-z0-9\+\/=]{22}$/);
+	$sessionId = $self->id->generate unless $self->id->valid($sessionId);
 	my $noFuss = shift;
 	$self->{_var} = WebGUI::Session::Var->new($self,$sessionId, $noFuss);
 	$self->errorHandler->warn("You've disabled cache in your config file and that can cause many problems on a production site.") if ($config->get("disableCache"));

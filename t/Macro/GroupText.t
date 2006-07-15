@@ -23,7 +23,7 @@ my $session = WebGUI::Test->session;
 
 use Test::More; # increment this value for each test you create
 
-plan tests => 4 + 4;
+plan tests => 3 + 4;
 
 unless ($session->config->get('macros')->{'GroupText'}) {
 	Macro_Config::insert_macro($session, 'GroupText', 'GroupText');
