@@ -21,9 +21,16 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addAdminToVisitorGroup($session);
 
 finish($session); # this line required
 
+sub addAdminToVisitorGroup {
+	my $session = shift;
+	my $Visitor = WebGUI::Group->new($session, '1');
+	$Visitor->addGroups([3]);
+	return 1;
+}
 
 ##-------------------------------------------------
 #sub exampleFunction {

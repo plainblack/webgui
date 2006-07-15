@@ -14,6 +14,7 @@
    subscriptions per the laws in various countries.
  - fix: MultiSearch
  - fix: Unable to duplicate existing Session Id
+ - fix: Admins not in visitors group
 
 
 7.0.1
