@@ -35,12 +35,12 @@ sub _createField {
 	$param{name} = "field_".$data->{sequenceNumber} if ($param{name} eq ""); # Empty fieldname not allowed
 	my $name = $param{name};
 	$name =~ s/\^.*?\;//gs ; # remove macro's from user input
-	$param{value} = $data->{value};
-	$param{size} = $data->{width};
-	$param{rows} = $data->{rows} || 5;
-	$param{columns} = $data->{width};
-	$param{vertical} = $data->{vertical};
+	$param{value}  = $data->{value};
+	$param{size}   = $data->{width};
+	$param{height} = $data->{rows};
+	$param{width}  = $data->{width};
 	$param{extras} = $data->{extras};
+	$param{vertical} = $data->{vertical};
 		
 	if ($data->{type} eq "checkbox") {
 		$param{value} = ($data->{defaultValue} =~ /checked/i) ? 1 : "";

@@ -15,6 +15,7 @@
  - fix: MultiSearch
  - fix: Unable to duplicate existing Session Id
  - fix: Admins not in visitors group
+ - fix: Data Form Text Area ignores size settings
 
 
 7.0.1
