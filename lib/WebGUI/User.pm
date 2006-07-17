@@ -442,10 +442,11 @@ sub profileField {
 	if (defined $value) {
 		$self->uncache;
 		$self->{_profile}{$fieldName} = $value;
-		$self->session->db->write("delete from userProfileData where userId=".$self->session->db->quote($self->{_userId})." and fieldName=".$self->session->db->quote($fieldName));
-		$self->session->db->write("insert into userProfileData values (".$self->session->db->quote($self->{_userId}).", ".$self->session->db->quote($fieldName).", ".$self->session->db->quote($value).")");
-		$self->{_user}{"lastUpdated"} =$self->session->datetime->time();
-        	$self->session->db->write("update users set lastUpdated=".$self->session->datetime->time()." where userId=".$self->session->db->quote($self->{_userId}));
+		$self->session->db->write("delete from userProfileData where userId=? and fieldName=?",[$self->{_userId}, $fieldName]);
+		$self->session->db->write("insert into userProfileData values (?,?,?)", [$self->{_userId}, $fieldName,$value]);
+		my $time = $self->session->datetime->time();
+		$self->{_user}{"lastUpdated"} = $time;
+        	$self->session->db->write("update users set lastUpdated=? where userId=?", [$time, $self->{_userId}]);
 	}
 	return $self->{_profile}{$fieldName};
 }
