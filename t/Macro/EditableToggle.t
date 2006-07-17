@@ -188,6 +188,17 @@ my @testSets = (
 		template => q!!,
 		output => \&simpleHTMLParser,
 	},
+	{
+		comment => 'user 2 sees off text, admin on, custom asset, text, template',
+		userId => $users[2]->userId,
+		adminStatus => 'on',
+		asset => $asset,
+		macroText => q!^EditableToggle("%s","%s","%s");!,
+		onText => 'Admin powers... Activate!',
+		offText => 'Chillin, dude',
+		template => $asset->get('url'),
+		output => \&simpleTextParser,
+	},
 );
 
 my $numTests = 0;
@@ -195,14 +206,7 @@ foreach my $testSet (@testSets) {
 	$numTests += 1 + (ref $testSet->{output} eq 'CODE');
 }
 
-plan tests => $numTests + 3;
-
-TODO: {
-	local $TODO = "Tests to do later";
-	ok(0, "Create an asset AND a template, not just the template");
-	ok(0, "Use the asset in place of the template");
-	ok(0, "Use the custom template");
-}
+plan tests => $numTests;
 
 foreach my $testSet (@testSets) {
 	my $output = sprintf $testSet->{macroText}, $testSet->{onText}, $testSet->{offText}, $testSet->{template};
@@ -266,8 +270,8 @@ sub setupTest {
 		url => 'EditableToggle-test',
 		namespace => 'Macro/EditableToggle',
 		template => "HREF=<tmpl_var toggle.url>\nLABEL=<tmpl_var toggle.text>",
-		#     '1234567890123456789012'
 		groupIdEdit => $editGroup->getId(),
+		#     '1234567890123456789012'
 		id => 'EditableToggleTemplate',
 	};
 	my $asset = $defaultNode->addChild($properties, $properties->{id});
