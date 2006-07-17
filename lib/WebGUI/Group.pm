@@ -708,7 +708,6 @@ sub getIpUsers {
 	my $sth = $self->session->db->read($query, [ $self->session->datetime->time() ]);
 	my %localCache = ();
 	my @ipUsers = ();
-	$self->session->errorHandler->warn("Fetching IP users");
 	while (my ($userId, $lastIP) = $sth->array() ) {
 		if (!exists $localCache{$lastIP}) {
 			$localCache{$lastIP} = isInSubnet($lastIP, \@filters);	
