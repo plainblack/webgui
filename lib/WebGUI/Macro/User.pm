@@ -22,7 +22,7 @@ Macro for displaying information from the current User's profile.
 
 =head2 process( field )
 
-process takes a single parameter, the name of a field in the User's User Profile from
+process takes a single parameter, the name of a field in the current user's User Profile from
 the data stored in $session .  If the field does not exist, undef is returned.
 
 =cut

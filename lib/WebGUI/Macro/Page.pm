@@ -23,11 +23,11 @@ Macro for pulling information from the Asset in which it's embedded.
 =head2 process ( property )
 
 If the macro is called from outside of an Asset, or if there's no asset in
-session variable, returns a single space.
+session variable, returns an empty string.
 
 =head3 property
 
-The name of the property to retrieve from the assset via $session->asset->get()
+The name of the property to retrieve from the asset via $session->asset->get()
 
 =cut
 
