@@ -16,6 +16,9 @@
  - fix: Unable to duplicate existing Session Id
  - fix: Admins not in visitors group
  - fix: Data Form Text Area ignores size settings
+ - Fixed a bug that didn't allow you to search a matrix.
+ - Fixed a bug in the upgrade that caused template problems with the WebGUI 6
+   template if anyone was still using that.
 
 
 7.0.1

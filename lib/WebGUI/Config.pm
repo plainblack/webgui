@@ -32,9 +32,9 @@ This package parses the WebGUI config file.
 
  use WebGUI::Config;
 
- WebGUI::Config::loadAllConfigs($webguiRoot);
+ WebGUI::Config->loadAllConfigs($webguiRoot);
  
- my $configs = WebGUI::Config::readAllConfigs($webguiRoot);
+ my $configs = WebGUI::Config->readAllConfigs($webguiRoot);
 
  my $config = WebGUI::Config->new($webguiRoot, $configFileName);
 

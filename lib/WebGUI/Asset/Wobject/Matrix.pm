@@ -285,7 +285,7 @@ sub www_compare {
 	$var{isTooMany} = (scalar(@cmsList)>$max);
 	$var{isTooFew} = (scalar(@cmsList)<2);
 	$var{'compare.form'} = $self->getCompareForm(@cmsList);
-	$var{'isLoggedIn'} = ($self->session->user->get("userId") ne "1");
+	$var{'isLoggedIn'} = ($self->session->user->userId ne "1");
 	if ($var{isTooMany} || $var{isTooFew}) {
 		return $self->processStyle($self->processTemplate(\%var,$self->get("compareTemplateId")));
 	}
@@ -920,7 +920,7 @@ sub www_search {
 			$var{isTooFew} = ($count<2);
 		}
 	}
-	$var{'isLoggedIn'} = ($self->session->user->get("userId") ne "1");
+	$var{'isLoggedIn'} = ($self->session->user->userId ne "1");
 	$var{'compare.form'} = $self->getCompareForm(@list);
 	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
 		.WebGUI::Form::hidden($self->session,{
