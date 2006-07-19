@@ -27,6 +27,7 @@
    privs to the storage associated with it. (Martin Kamerbeek / Procolix)
  - Added a reverse page loop option to the navigation asset (Martin 
    Kamerbeek / Procolix)
+ - fix: WebGUI::Image missing methods
  - Added runOnLogin and runOnLogout config file properties to Authentication to allow
    for running an external script on successful login or logout.
    

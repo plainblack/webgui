@@ -40,6 +40,24 @@ sub getBackgroundColor {
 
 #-------------------------------------------------------------------
 
+=head2 getFilename ( )
+
+Returns the filename that has been set for this Image.  If no filename
+has been set, then it throws a fatal error.
+
+=cut
+
+sub getFilename {
+	my $self = shift;
+	if (exists $self->{_properties}->{filename}) {
+		return $self->{_properties}->{filename};
+	}
+	$self->session->errorHandler->fatal('Attempted to retrieve filename before one was set');
+	return '';
+}
+
+#-------------------------------------------------------------------
+
 =head2 getImageHeight ( )
 
 Returns the height of the image in pixels.
@@ -199,6 +217,19 @@ sub setBackgroundColor {
 
 	$self->image->Colorize(fill => $colorTriplet);
 	$self->{_properties}->{backgroundColorTriplet} = $colorTriplet;
+}
+
+#-------------------------------------------------------------------
+
+=head2 setFilename ($filename)
+
+Set the default filename to be used for this image.  Returns the filename.
+
+=cut
+
+sub setFilename {
+	my ($self,$filename) = shift;
+	$self->{_properties}->{filename} = $filename;
 }
 
 #-------------------------------------------------------------------
