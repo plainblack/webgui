@@ -265,7 +265,10 @@ our $HELP = {
 		                             },
 		                             {
 		                               'name' => 'page.parent.newWindow'
-		                             }
+		                             },
+					     {
+					       'name' => 'page.parent.rank'
+					     },
 		                           ]
 		          }
 		],

@@ -529,6 +529,12 @@ a Google sitemap of your site.</p>
 		lastUpdated => 1149394665,
 	},
 
+	'page.parent.rank' => {
+		message => q|The rank of the mother of this page.|,
+		lastUpdated => 1153314572,
+	},
+
+
 	'1097' => {
 		message => q|<p>These variables are available in Navigation Templates:</p>
 	|,

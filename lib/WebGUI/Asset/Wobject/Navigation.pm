@@ -438,9 +438,9 @@ sub view {
                 ++$var->{"currentPage.hasSibling"}
                         if $pageData->{"page.isSibling"};
                 ++$var->{"currentPage.hasViewableSiblings"}
-                        if ($pageData->{"page.isSibling"} && $pageData->{"isViewable"});
+                        if ($pageData->{"page.isSibling"} && $pageData->{"page.isViewable"});
                 ++$var->{"currentPage.hasViewableChildren"}
-                        if ($pageData->{"page.isChild"} && $pageData->{"isViewable"});
+                        if ($pageData->{"page.isChild"} && $pageData->{"page.isViewable"});
 
 		my $parent = $asset->getParent;
 		if (defined $parent) {
@@ -449,7 +449,8 @@ sub view {
 			}
 			$pageData->{'page.parent.menuTitle'} = $parent->getMenuTitle;
 			$pageData->{'page.parent.title'} = $parent->getTitle;
-			$pageData->{"page.parent.url"} = $parent->getUrl;	
+			$pageData->{"page.parent.url"} = $parent->getUrl;
+			$pageData->{"page.parent.rank"} = $parent->getRank;
 			$pageData->{"page.isRankedFirst"} = 1 unless exists $lastChildren{$parent->getId};
 			$lastChildren{$parent->getId} = $asset->getId;			
 		}

@@ -19,8 +19,14 @@
  - Fixed a bug that didn't allow you to search a matrix.
  - Fixed a bug in the upgrade that caused template problems with the WebGUI 6
    template if anyone was still using that.
-
-
+ - Fixed a bug where the template variables currentPage.hasViewableSiblings
+   and currentPage.hasViewableChildren were always false. Added the
+   page.parent.rank template variable to the Navigation template. (Martin
+   Kamerbeek /  Procolix)
+ - Fixed a bug where WebGUI::Asset::File->addRevision did not set correct
+   privs to the storage associated with it. (Martin Kamerbeek / Procolix)
+ 
+   
 7.0.1
  - fix: User profile field "Department" needs i18n 
  - fix: AssetProxied Navigation context menu - items invisible in Style 02

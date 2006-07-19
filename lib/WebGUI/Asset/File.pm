@@ -251,6 +251,7 @@ sub processPropertiesFromFormPost {
 	delete $self->{_storageLocation};
 	my $storage = $self->getStorageLocation;
 	my $filename = $storage->addFileFromFormPost("file",1);
+	$storage->setPrivileges($self->get('ownerUserId'), $self->get('groupIdView'), $self->get('groupIdEdit'));
 	if (defined $filename && $filename ne $self->get("filename")) {
 		my %data;
 		$data{filename} = $filename;
