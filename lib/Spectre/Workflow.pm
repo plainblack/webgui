@@ -194,6 +194,10 @@ sub deleteInstance {
 	$self->debug("Deleting workflow instance $instanceId from instance queue.");
 	if ($self->{_instances}{$instanceId}) {
 		my $priority = $self->{_instances}{$instanceId}{priority};
+		unless ($priority) {
+			$priority = 2;
+			$self->error("Workflow instance $instanceId has no priority set. This is likely the cause of a bug somewhere in the system. Temporarily setting the priority to 2 to avoid a fatal error.");
+		}
 		delete $self->{_errorCount}{$instanceId};
 		delete $self->{_instances}{$instanceId};
 		for (my $i=0; $i < scalar(@{$self->{"_priority".$priority}}); $i++) {
