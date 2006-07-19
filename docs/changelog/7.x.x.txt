@@ -25,7 +25,8 @@
    Kamerbeek /  Procolix)
  - Fixed a bug where WebGUI::Asset::File->addRevision did not set correct
    privs to the storage associated with it. (Martin Kamerbeek / Procolix)
- 
+ - Added a reverse page loop option to the navigation asset (Martin 
+   Kamerbeek / Procolix)
    
 7.0.1
  - fix: User profile field "Department" needs i18n 

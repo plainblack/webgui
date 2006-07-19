@@ -73,7 +73,11 @@ sub definition {
 			showUnprivilegedPages=>{
 				fieldType=>'yesNo',
 				defaultValue=>0
-				}
+				},
+			reversePageLoop=>{
+				fieldType=>'yesNo',
+				defaultValue=>0
+				},
 			}
 		});
         return $class->SUPER::definition($session, $definition);
@@ -222,6 +226,12 @@ sub getEditForm {
                 -hoverHelp=>$i18n->get('32 description'),
                 -value=>$self->getValue("showUnprivilegedPages")
         	);
+	$tabform->getTab("display")->yesNo(
+		-name=>'reversePageLoop',
+		-label=>$i18n->get('reverse page loop'),
+		-hoverHelp => $i18n->get('reverse page loop description'),
+		-value=>$self->getValue('reversePageLoop'),
+		);
 	my $start = $self->getValue("startPoint");
 	$tabform->getTab("properties")->raw("<script type=\"text/javascript\">
 		//<![CDATA[
@@ -345,11 +355,14 @@ sub view {
 	}
 	$start = $current unless (defined $start); # if none of the above results in a start point, then the current page must be it
 	my @includedRelationships = split("\n",$self->get("assetsToInclude"));
+
 	my %rules;
 	$rules{returnObjects} = 1;
 	$rules{endingLineageLength} = $start->getLineageLength+$self->get("descendantEndPoint");
 	$rules{assetToPedigree} = $current if (isIn("pedigree",@includedRelationships));
 	$rules{ancestorLimit} = $self->get("ancestorEndPoint");
+	$rules{orderByClause} = 'rpad(asset.lineage, 255, 9) desc' if ($self->get('reversePageLoop'));
+	
 	my $assets = $start->getLineage(\@includedRelationships,\%rules);	
 	my $var = {'page_loop' => []};
 	my @interestingProperties = ('assetId', 'parentId', 'ownerUserId', 'synopsis', 'newWindow');

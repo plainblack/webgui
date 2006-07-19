@@ -534,6 +534,15 @@ a Google sitemap of your site.</p>
 		lastUpdated => 1153314572,
 	},
 
+	'reverse page loop' => {
+		message => q|Reverse page loop|,
+		lastUpdated => 1153314572,
+	},
+	
+	'reverse page loop description' => {
+		message => q|Reverses the order of all pages while maintaining hierarchy.|,
+		lastUpdated => 1153314572,
+	},
 
 	'1097' => {
 		message => q|<p>These variables are available in Navigation Templates:</p>

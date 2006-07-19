@@ -12,7 +12,7 @@ use lib "../../lib";
 use strict;
 use Getopt::Long;
 use WebGUI::Session;
-
+use WebGUI::Utility;
 
 my $toVersion = "7.0.2"; # make this match what version you're going to
 my $quiet; # this line required
@@ -22,6 +22,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 addAdminToVisitorGroup($session);
+addReversePageLoopColumn($session);
 
 finish($session); # this line required
 
@@ -30,6 +31,16 @@ sub addAdminToVisitorGroup {
 	my $Visitor = WebGUI::Group->new($session, '1');
 	$Visitor->addGroups([3]);
 	return 1;
+}
+
+sub addReversePageLoopColumn {
+	my $session = shift;
+	print "\tAdding the reversePageLoop column to the Navigation table\n" unless ($quiet);
+
+	my @columns = $session->db->buildArray('describe Navigation');
+	unless (isIn('reversePageLoop', @columns)) {
+		$session->db->write('alter table Navigation add column reversePageLoop tinyint(1) default 0');
+	}
 }
 
 ##-------------------------------------------------

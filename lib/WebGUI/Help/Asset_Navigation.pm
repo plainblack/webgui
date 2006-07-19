@@ -55,6 +55,11 @@ our $HELP = {
                                 description => '32 description',
                                 namespace => 'Asset_Navigation',
                         },
+			{
+				title => 'reverse page loop',
+				description => 'reverse page loop description',
+				namespace => 'Asset_Navigation',
+			},
 		],
 		related => [
 			{
