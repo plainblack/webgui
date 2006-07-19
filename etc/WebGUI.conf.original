@@ -353,6 +353,16 @@
 	"WebGUI::Image::Graph::Pie",
 	"WebGUI::Image::Graph::XYGraph::Bar",
 	"WebGUI::Image::Graph::XYGraph::Line"
-	]
+	],
+
+#Optional script to run upon successful login.  The script can contain macros
+# ex: /data/WebGUI/sbin/doLogin.pl --configFile=dev.localhost.localdomain.conf --loginPage=^PageUrl();
+
+"runOnLogin" : "",
+
+#Optional script to run upon successful logout.  The script can contain macros
+# ex: /data/WebGUI/sbin/doLogout.pl --configFile=dev.localhost.localdomain.conf --logoutPage=^PageUrl();
+
+"runOnLogout" : ""
 }
 
