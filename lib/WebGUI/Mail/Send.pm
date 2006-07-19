@@ -96,6 +96,30 @@ sub addFooter {
 
 #-------------------------------------------------------------------
 
+=head2 addHeaderField ( name, value ) 
+
+Adds a header field to the mail message. See also replaceHeaderField().
+
+=head3 name
+
+The name of the field to add.
+
+=head3 value
+
+The value of the field to add.
+
+=cut
+
+sub addHeaderField {
+	my $self = shift;
+	my $name = shift;
+	my $value = shift;
+	$self->{_message}->head->add($name, $value);
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 addHtml ( html ) 
 
 Appends an HTML block to the message.
@@ -219,7 +243,7 @@ sub create {
 	my $from = $headers->{from} || $session->setting->get("companyEmail");
 	my $type = $headers->{contentType} || "multipart/mixed";
 	my $domain = $from;
-	$domain =~ s/\@(.*)/$1/;
+	$domain =~ s/.*\@(.*)/$1/;
 	my $id = $headers->{messageId} ||  "WebGUI-".$session->id->generate;
 	unless ($id =~ m/\@/) {
 		$id .= '@'.$domain;
@@ -282,6 +306,30 @@ Puts this message in the mail queue so it can be sent out later by the workflow 
 sub queue {
 	my $self = shift;
 	return $self->session->db->setRow("mailQueue", "messageId", { messageId=>"new", message=>$self->{_message}->stringify, toGroup=>$self->{_toGroup} });
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 replaceHeaderField ( name, value ) 
+
+Replaces an existing header field in the mail message, or creates it if it doesn't exist. See also addHeaderField().
+
+=head3 name
+
+The name of the field to replace.
+
+=head3 value
+
+The value of the field to replace.
+
+=cut
+
+sub replaceHeaderField {
+	my $self = shift;
+	my $name = shift;
+	my $value = shift;
+	$self->{_message}->head->replace($name, $value);
 }
 
 

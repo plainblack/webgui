@@ -27,6 +27,11 @@
    privs to the storage associated with it. (Martin Kamerbeek / Procolix)
  - Added a reverse page loop option to the navigation asset (Martin 
    Kamerbeek / Procolix)
+ - fix: cs mail needs archive url
+ - fix: cs mail not sending in-reply-to and references headers
+ - fix: cs mail doesn't like code via email
+ - CS mail now sends out the email address of the poster as from, when it
+   exists.
  - fix: WebGUI::Image missing methods
  - Added runOnLogin and runOnLogout config file properties to Authentication to allow
    for running an external script on successful login or logout.

@@ -157,12 +157,12 @@ sub format {
                 $content =~ s/&/&amp;/g;
                 $content =~ s/\</&lt;/g;
                 $content =~ s/\>/&gt;/g;
-                $content =~ s/\n/\<br \/\>/g;
+                $content =~ s/\n/\<br \/\>\n/g;
                 $content =~ s/\t/&nbsp;&nbsp;&nbsp;&nbsp;/g;
 	}
 	if ($contentType eq "mixed") {
                 unless ($content =~ /\<div/ig || $content =~ /\<br/ig || $content =~ /\<p/ig) {
-                        $content =~ s/\n/\<br \/\>/g;
+                        $content =~ s/\n/\<br \/\>\n/g;
                 }
         } elsif ($contentType eq "text") {
                 $content =~ s/  / &nbsp;/g;

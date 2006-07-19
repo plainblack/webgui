@@ -20,6 +20,7 @@ use base 'WebGUI::Workflow::Activity';
 use WebGUI::Mail::Get;
 use WebGUI::Mail::Send;
 use WebGUI::Asset;
+use WebGUI::HTML;
 use WebGUI::International;
 use WebGUI::User;
 
@@ -78,7 +79,7 @@ sub addPost {
 		if (($part->{type} =~ /^text\/plain/ || $part->{type} =~ /^text\/html/) && $part->{filename} eq "") {
 			my $text = $part->{content};
 			if ($part->{type} eq "text/plain") {
-				$text =~ s/\n/\<br \/\>/g;
+				$text = WebGUI::HTML::format($text, "text");
 			}
 			$content .= $text;
 		} else {
