@@ -158,7 +158,7 @@ sub addTemplate {
 	my $properties = {
 		title => 'AdminToggle test template',
 		className => 'WebGUI::Asset::Template',
-		url => 'AdminToggle-test',
+		url => 'admintoggle-test',
 		namespace => 'Macro/AdminToggle',
 		template => "HREF=<tmpl_var toggle.url>\nLABEL=<tmpl_var toggle.text>",
 		id => 'AdminToggleTemplate--Z',

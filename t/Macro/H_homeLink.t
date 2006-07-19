@@ -95,7 +95,7 @@ sub addTemplate {
 	my $properties = {
 		title => 'H_homeLink test template',
 		className => 'WebGUI::Asset::Template',
-		url => 'H_homeLink-test',
+		url => 'h_homelink-test',
 		namespace => 'Macro/H_homeLink',
 		template => "HREF=<tmpl_var homeLink.url>\nLABEL=<tmpl_var homeLink.text>",
 		id => 'testTemplateH_HomeLink'

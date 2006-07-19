@@ -101,7 +101,7 @@ sub setupTest {
 	my $properties = {
 		title => 'CanEditText test template',
 		className => 'WebGUI::Asset::Wobject::Article',
-		url => '/home/CanEditText-test',
+		url => '/home/canedittext-test',
 		description => 'This is a test article for viewing privileges',
 		id => 'CanEditTextTestAsset01',
 		groupIdEdit => $editGroup->getId(),

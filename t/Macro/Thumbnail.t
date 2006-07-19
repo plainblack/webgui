@@ -56,7 +56,7 @@ my $properties = {
 	id => 'ThumbnailAsset00000001',
 	title => 'Thumbnail macro test',
 	className => 'WebGUI::Asset::File::Image',
-	url => 'Thumbnail-test',
+	url => 'thumbnail-test',
 	storageId => $storage->getId,
 	filename => 'square.png',
 };
