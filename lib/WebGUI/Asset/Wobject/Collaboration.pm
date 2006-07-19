@@ -30,7 +30,7 @@ sub addChild {
 	my $properties = shift;
 	my @other = @_;
 	if ($properties->{className} ne "WebGUI::Asset::Post::Thread") {
-		$self->session->errorHandler->security("tried to add a ".$properties->{className}." to a ".$self->get("className"));
+		$self->session->errorHandler->security("add a ".$properties->{className}." to a ".$self->get("className"));
 		return undef;
 	}
 	return $self->SUPER::addChild($properties, @other);
