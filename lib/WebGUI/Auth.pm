@@ -578,6 +578,15 @@ sub login {
 		$self->session->http->setRedirect($self->session->scratch->get("redirectAfterLogin"));
 	  	$self->session->scratch->delete("redirectAfterLogin");
 	}
+	
+	my $command = $self->session->config->get("runOnLogin");
+    if ($command ne "") {
+       WebGUI::Macro::process($self->session,\$command);
+	   $self->session->errorHandler->warn("Executing $command");
+       my $error = qx($command);
+       $self->session->errorHandler->warn($error) if $error;
+    }
+   
 	return "";
 }
 
@@ -595,6 +604,15 @@ sub logout {
 	$self->session->user({userId=>'1'});
 	my $u = WebGUI::User->new($self->session,1);
 	$self->{user} = $u;
+	
+	my $command = $self->session->config->get("runOnLogout");
+    if ($command ne "") {
+       WebGUI::Macro::process($self->session,\$command);
+	   $self->session->errorHandler->warn("Executing $command");
+       my $error = qx($command);
+       $self->session->errorHandler->warn($error) if $error;
+    }
+   
 	return "";
 }
 
