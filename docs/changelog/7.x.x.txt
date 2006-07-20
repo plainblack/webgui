@@ -1,3 +1,8 @@
+7.0.3
+ - Fixed a problem with the 7.0.0-7.0.1 upgrade relating to internationalized
+   department names.
+
+
 7.0.2
  - fix: upgrade from 6.99.4-6.99-5 can fail if site contains groups tied to ldap with no users in it.
  - GroupText macro returns an error message if it can't find the group by the name the user supplies.

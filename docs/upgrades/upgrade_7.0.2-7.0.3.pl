@@ -12,54 +12,17 @@ use lib "../../lib";
 use strict;
 use Getopt::Long;
 use WebGUI::Session;
-use WebGUI::Operation::Shared;
-use Data::Dumper;
 
-my $toVersion = "7.0.1"; # make this match what version you're going to
+
+my $toVersion = "7.0.3"; # make this match what version you're going to
 my $quiet; # this line required
+
 
 my $session = start(); # this line required
 
 # upgrade functions go here
-i18nDepartmentNames();
-addMissingAssets();
-addLDAPRecursiveFilter();
 
 finish($session); # this line required
-
-#--------------------------------------------------
-sub addMissingAssets {
-	print "\tAdding assets to config file that weren't added before.\n" unless ($quiet);
-	my $config = $session->config;
-	$config->addToArray("assets","WebGUI::Asset::Wobject::TimeTracking");
-	$config->addToArray("assets","WebGUI::Asset::Wobject::ProjectManager");
-	$config->addToArray("assets","WebGUI::Asset::Wobject::EventManagementSystem");
-}
-
-#--------------------------------------------------
-sub i18nDepartmentNames {
-	print "\tInternationalizing department settings in user profile\n" unless ($quiet);
-	$session->db->write(q!update userProfileField set label=? where fieldName='department'!, ["WebGUI::International::get('Department','Asset_InOutBoard')"]);
-	my ($codeValues) = $session->db->quickArray(q|select possibleValues from userProfileField where fieldName='department'|);
-
-	my $possibleValues = WebGUI::Operation::Shared::secureEval($session, $codeValues);
-	delete $possibleValues->{IT};
-	delete $possibleValues->{HR};
-	delete $possibleValues->{'Regular Staff'};
-	local $Data::Dumper::Terse = 1;
-	my $i18nValues = Dumper $possibleValues;
-	$i18nValues =~ s/\{/{'IT'=>WebGUI::International::get('IT','Asset_InOutBoard'),'HR'=>WebGUI::International::get('HR','Asset_InOutBoard'),'Regular Staff'=>WebGUI::International::get('Regular Staff','Asset_InOutBoard')/;
-	$session->db->write(q!update userProfileField set possibleValues=? where fieldName='department'!, [$i18nValues]);
-}
-
-#--------------------------------------------------
-sub addLDAPRecursiveFilter() {
-   print "\tAdding LDAP recursive filter.\n" unless ($quiet);
-   $session->db->write("alter table groups add ldapRecursiveFilter varchar(255) default null");
-   $session->db->write("alter table ldapLink add ldapGlobalRecursiveFilter varchar(255) default null");
-}
-
-
 
 
 ##-------------------------------------------------
