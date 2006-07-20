@@ -95,7 +95,6 @@ sub canAdd {
 #-------------------------------------------------------------------
 sub canEdit {
 	my $self = shift;
-	return 1;
 	return (($self->session->form->process("func") eq "add" || ($self->session->form->process("assetId") eq "new" && $self->session->form->process("func") eq "editSave" && $self->session->form->process("class","className") eq "WebGUI::Asset::Post")) && $self->getThread->getParent->canPost) || # account for new posts
 
 		($self->isPoster && $self->getThread->getParent->get("editTimeout") > ($self->session->datetime->time() - $self->get("dateUpdated"))) ||
@@ -113,7 +112,6 @@ Returns a boolean indicating whether the user can view the current post.
 
 sub canView {
         my $self = shift;
-	return 1;
         if (($self->get("status") eq "approved" || $self->get("status") eq "archived") && $self->getThread->getParent->canView) {
                 return 1;
         } elsif ($self->canEdit) {
