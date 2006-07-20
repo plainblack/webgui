@@ -3,6 +3,7 @@
    department names.
  - fix: Missing documentation breaks the List of Available Macros (Wouter
    van Oijen / ProcoliX)
+ - fix: Article thumbnail not working (Len Kranendonk)
 
 
 7.0.2
