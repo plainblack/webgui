@@ -101,14 +101,11 @@ sub addInstance {
 Checks to see if there are any open instance slots available, and if there are assigns a new instance to be run to fill it.
 
 =cut
-use POE::API::Peek;
 
 sub checkInstances {
 	my ($kernel, $self) = @_[KERNEL, OBJECT];
 	$self->debug("Checking to see if we can run anymore instances right now.");
 	if ($self->countRunningInstances < $self->config->get("maxWorkers")) {
-		my $api = POE::API::Peek->new;
-		$self->debug("POE SESSIONS: ".$api->session_count);
 		$self->debug("Total workflows waiting to run: ".scalar(keys %{$self->{_instances}}));
 		$self->debug("Priority 1 count: ".scalar(@{$self->{_priority1}}));
                 $self->debug("Priority 2 count: ".scalar(@{$self->{_priority2}}));
