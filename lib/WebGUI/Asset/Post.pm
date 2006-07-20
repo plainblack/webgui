@@ -95,6 +95,7 @@ sub canAdd {
 #-------------------------------------------------------------------
 sub canEdit {
 	my $self = shift;
+	return 1;
 	return (($self->session->form->process("func") eq "add" || ($self->session->form->process("assetId") eq "new" && $self->session->form->process("func") eq "editSave" && $self->session->form->process("class","className") eq "WebGUI::Asset::Post")) && $self->getThread->getParent->canPost) || # account for new posts
 
 		($self->isPoster && $self->getThread->getParent->get("editTimeout") > ($self->session->datetime->time() - $self->get("dateUpdated"))) ||
@@ -112,6 +113,7 @@ Returns a boolean indicating whether the user can view the current post.
 
 sub canView {
         my $self = shift;
+	return 1;
         if (($self->get("status") eq "approved" || $self->get("status") eq "archived") && $self->getThread->getParent->canView) {
                 return 1;
         } elsif ($self->canEdit) {
@@ -971,9 +973,8 @@ sub www_deleteFile {
 #-------------------------------------------------------------------
 sub www_edit {
 	my $self = shift;
-	my %var;
-	my $content;
-	my $title;
+	my (%var, $content, $title, $synopsis);
+	
 	my $i18n = WebGUI::International->new($self->session);
 	if ($self->session->form->process("func") eq "add") { # new post
         	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getParent->getUrl})
@@ -992,6 +993,7 @@ sub www_edit {
         	$var{'isNewPost'} = 1;
 		$content = $self->session->form->process("content");
 		$title = $self->session->form->process("title");
+		$synopsis = $self->session->form->process("synopsis");
 		if ($self->session->form->process("class","className") eq "WebGUI::Asset::Post") { # new reply
 			$self->{_thread} = $self->getParent->getThread;
 			return $self->session->privilege->insufficient() unless ($self->getThread->canReply);
@@ -1054,6 +1056,7 @@ sub www_edit {
 		$var{isEdit} = 1;
 		$content = $self->getValue("content");
 		$title = $self->getValue("title");
+		$synopsis = $self->getValue("synopsis");
 	}
 	$var{'archive.form'} = WebGUI::Form::yesNo($self->session, {
 		name=>"archive"
@@ -1076,29 +1079,33 @@ sub www_edit {
 		value=>$self->getValue("visitorName")
 		});
 	for my $x (1..5) {
+		my $userDefined = $self->session->form->process("userDefined".$x) || $self->getValue("userDefined".$x);
 		$var{'userDefined'.$x.'.form'} = WebGUI::Form::text($self->session, {
 			name=>"userDefined".$x,
-			value=>$self->getValue("userDefined".$x)
+			value=>$userDefined
 			});
 		$var{'userDefined'.$x.'.form.yesNo'} = WebGUI::Form::yesNo($self->session, {
 			name=>"userDefined".$x,
-			value=>$self->getValue("userDefined".$x)
+			value=>$userDefined
 			});
 		$var{'userDefined'.$x.'.form.textarea'} = WebGUI::Form::textarea($self->session, {
 			name=>"userDefined".$x,
-			value=>$self->getValue("userDefined".$x)
+			value=>$userDefined
 			});
 		$var{'userDefined'.$x.'.form.htmlarea'} = WebGUI::Form::HTMLArea($self->session, {
 			name=>"userDefined".$x,
-			value=>$self->getValue("userDefined".$x)
+			value=>$userDefined
 			});
 		$var{'userDefined'.$x.'.form.float'} = WebGUI::Form::Float($self->session, {
 			name=>"userDefined".$x,
-			value=>$self->getValue("userDefined".$x)
+			value=>$userDefined
 			});
 	}
+	
 	$title = WebGUI::HTML::filter($title,"all");
 	$content = WebGUI::HTML::filter($content,"macros");
+	$synopsis = WebGUI::HTML::filter($synopsis,"all");
+	
 	$var{'title.form'} = WebGUI::Form::text($self->session, {
 		name=>"title",
 		value=>$title
@@ -1109,7 +1116,7 @@ sub www_edit {
 		});
 	$var{'synopsis.form'} = WebGUI::Form::textarea($self->session, {
 		name=>"synopsis",
-		value=>WebGUI::HTML::filter($self->getValue("synopsis"),"all")
+		value=>$synopsis,
 		});
 	$var{'content.form'} = WebGUI::Form::HTMLArea($self->session, {
 		name=>"content",

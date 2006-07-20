@@ -4,6 +4,8 @@
  - fix: Missing documentation breaks the List of Available Macros (Wouter
    van Oijen / ProcoliX)
  - fix: Article thumbnail not working (Len Kranendonk)
+ - Fixed a bug in WebGUI::Asset::Post where userDefined and synopsis form
+   elements were not populated when previewed. (Martin Kamerbeek / Procolix)
 
 
 7.0.2
