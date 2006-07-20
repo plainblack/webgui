@@ -150,7 +150,7 @@ sub new {
 	create_ikc_server(
 		ip => $config->get("ip"),
         	port => $config->get("port"),
-       	 	name => 'Spectre',
+       	 	name => 'Spectre'
         	);
 	POE::Session->create(
 		object_states => [ $self => {_start=>"_start", _stop=>"_stop", "shutdown"=>"_stop", "ping"=>"ping"} ],

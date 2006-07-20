@@ -65,23 +65,29 @@ sub create {
 	my $instanceId = $session->db->setRow("WorkflowInstance","instanceId",{instanceId=>"new", runningSince=>time()});
 	my $self = $class->new($session, $instanceId);
 	$properties->{notifySpectre} = 1 unless ($properties->{notifySpectre} eq "0");
+	$properties->{newlyCreated} = 1;
 	$self->set($properties);
 	return $self;
 }
 
 #-------------------------------------------------------------------
 
-=head2 delete ( )
+=head2 delete ( [ skipNotify ] )
 
 Removes this instance.
+
+=head3 skipNotify
+
+A boolean, that if true will not notify Spectre of the delete.
 
 =cut
 
 sub delete {
 	my $self = shift;
+	my $skipNotify = shift;
 	$self->session->db->write("delete from WorkflowInstanceScratch where instanceId=?",[$self->getId]);
 	$self->session->db->deleteRow("WorkflowInstance","instanceId",$self->getId);
-	WebGUI::Workflow::Spectre->new($self->session)->notify("workflow/deleteInstance",$self->getId);
+	WebGUI::Workflow::Spectre->new($self->session)->notify("workflow/deleteInstance",$self->getId) unless ($skipNotify);
 	undef $self;
 }
 
@@ -254,7 +260,7 @@ sub run {
 	}
 	my $activity = $workflow->getNextActivity($self->get("currentActivityId"));
 	unless  (defined $activity)  {
-		$self->delete;
+		$self->delete(1);
 		return "done";
 	}
 	$self->session->errorHandler->info("Running workflow activity ".$activity->getId.", which is a ".(ref $activity).", for instance ".$self->getId.".");
@@ -373,7 +379,7 @@ sub set {
 	$self->session->db->setRow("WorkflowInstance","instanceId",$self->{_data});
 	if ($properties->{notifySpectre}) {
 		my $spectre = WebGUI::Workflow::Spectre->new($self->session);
-		$spectre->notify("workflow/deleteInstance",$self->getId);
+		$spectre->notify("workflow/deleteInstance",$self->getId) unless ($properties->{newlyCreated});
 		$spectre->notify("workflow/addInstance", {gateway=>$self->session->config->get("gateway"), sitename=>$self->session->config->get("sitename")->[0], instanceId=>$self->getId, priority=>$self->{_data}{priority}});
 	}
 }

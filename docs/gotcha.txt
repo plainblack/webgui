@@ -8,6 +8,14 @@ versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
 
+7.0.2
+--------------------------------------------------------------------
+
+ * We've cut the memory leak in half. It turns out we had a bad perl
+   module that was causing a big part of the memory leak. As such,
+   you now need to install POE::Component::Client::HTTP.
+
+
 7.0.0
 --------------------------------------------------------------------
 
@@ -15,6 +23,7 @@ save you many hours of grief.
    this problem, but in the mean time you will need to restart spectre
    every so often to clear out the memory. We recommend setting up a
    cron job to restart it once per day.
+
 
 6.99.5
 --------------------------------------------------------------------
@@ -24,6 +33,7 @@ save you many hours of grief.
    to determine the proper LDAP Link to use, however it is not guarenteed
    to be accurate.  If you use LDAP groups in WebGUI, be sure and check 
    each one to make sure they are assigned to the appropriate LDAP Link.
+
 
 6.99.4
 --------------------------------------------------------------------

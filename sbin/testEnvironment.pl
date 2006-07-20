@@ -85,7 +85,7 @@ checkModule("Net::Subnets",0.21);
 checkModule("Finance::Quote",1.08);
 checkModule("POE",0.3202);
 checkModule("POE::Component::IKC::Server",0.18);
-checkModule("POE::Component::Client::UserAgent", 0.06);
+checkModule("POE::Component::Client::HTTP", 0.77);
 checkModule("Data::Structure::Util",0.11);
 checkModule("Apache2::Request",2.06);
 checkModule("Cache::Memcached",1.15,2);

@@ -37,6 +37,9 @@
  - Added runOnLogin and runOnLogout config file properties to Authentication to allow
    for running an external script on successful login or logout.
  - fix: spectre
+ - fix: Spectre tries to delete the same workflow instance twice
+ - Fixed part of the Spectre memory leak. See gotcha.txt for details.
+
    
 7.0.1
  - fix: User profile field "Department" needs i18n 

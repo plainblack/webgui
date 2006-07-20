@@ -69,21 +69,23 @@ A scalar, array reference, or hash reference of data to pass to Spectre.
 sub notify {
 	my $self = shift;
 	my $module = shift;
-	my $params = shift;;
+	my $params = shift;
+	my ($config, $error) = $self->session->quick("config", "errorHandler");
 	my $remote = create_ikc_client(
-                port=>$self->session->config->get("spectrePort"),
-                ip=>$self->session->config->get("spectreIp"),
+                port=>$config->get("spectrePort"),
+                ip=>$config->get("spectreIp"),
                 name=>rand(100000),
                 timeout=>10
                 );
 	if (defined $remote) {
         	my $result = $remote->post($module, $params);
 		unless (defined $result) {
-			$self->session->errorHandler->warn("Couldn't send command to Spectre because ".$POE::Component::IKC::ClientLite::error);
+			$error->warn("Couldn't send command to Spectre because ".$POE::Component::IKC::ClientLite::error);
 		}
+		$remote->disconnect;
 		undef $remote;
 	} else {
-		$self->session->errorHandler->warn("Couldn't connect to Spectre because ".$POE::Component::IKC::ClientLite::error);
+		$error->warn("Couldn't connect to Spectre because ".$POE::Component::IKC::ClientLite::error);
 	}
 }
 

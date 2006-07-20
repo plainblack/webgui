@@ -18,8 +18,8 @@ use strict;
 use DateTime;
 use DateTime::Cron::Simple;
 use HTTP::Request::Common;
-use POE;
-use POE::Component::Client::UserAgent;
+use HTTP::Cookies;
+use POE qw(Component::Client::HTTP);
 use WebGUI::Session;
 use WebGUI::Workflow::Cron;
 
@@ -370,6 +370,12 @@ sub new {
 		object_states => [ $self => [qw(_start _stop runJob runJobResponse addJob deleteJob checkSchedules checkSchedule loadSchedule), @publicEvents] ],
 		args=>[\@publicEvents]
         	);
+	my $cookies = HTTP::Cookies->new(file => '/tmp/cookies');
+	POE::Component::Client::HTTP->spawn(
+		Agent => 'Spectre',
+		Alias => 'cron-ua',
+		CookieJar => $cookies
+  		);
 }
 
 #-------------------------------------------------------------------
@@ -391,7 +397,6 @@ sub runJob {
 		$self->error("Job ".$id." has failed ".$self->{_errorCount}{$id}." times in a row and will no longer attempt to execute.");
 		$kernel->yield("deleteJob",$id);
 	} else {
-		POE::Component::Client::UserAgent->new;
 		my $url = "http://".$job->{sitename}.':'.$self->config->get("webguiPort").$job->{gateway};
 		my $request = POST $url, [op=>"runCronJob", taskId=>$job->{taskId}];
 		my $cookie = $self->{_cookies}{$job->{sitename}};
@@ -399,8 +404,7 @@ sub runJob {
 		$request->header("User-Agent","Spectre");
 		$request->header("X-jobId",$id);
 		$self->debug("Posting job ".$id." to $url.");
-		$kernel->post( useragent => 'request', { request => $request, response => $session->postback('runJobResponse') });
-		$kernel->post( useragent => 'shutdown'); # we'll still get the response, we're just done sending the request
+		$kernel->post('cron-ua','request', 'runJobResponse', $request);
 		$self->debug("Cron job ".$id." posted.");
 	}
 }
@@ -414,9 +418,10 @@ This method is called when the response from the runJob() method is received.
 =cut
 
 sub runJobResponse {
-	my ($self, $kernel) = @_[OBJECT, KERNEL];	
+	my ($self, $kernel, $requestPacket, $responsePacket) = @_[OBJECT, KERNEL, ARG0, ARG1];
 	$self->debug("Retrieving response from job.");
-        my ($request, $response, $entry) = @{$_[ARG1]};
+ 	my $request  = $requestPacket->[0];
+    	my $response = $responsePacket->[0];
 	my $id = $request->header("X-jobId");	# got to figure out how to get this from the request, cuz the response may die
 	$self->debug("Response retrieved is for job $id.");
 	if ($response->is_success) {

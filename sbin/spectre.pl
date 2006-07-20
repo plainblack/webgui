@@ -84,6 +84,7 @@ if ($shutdown) {
 	die $POE::Component::IKC::ClientLite::error unless $remote;
 	my $result = $remote->post('admin/shutdown');
 	die $POE::Component::IKC::ClientLite::error unless defined $result;
+	$remote->disconnect;
 	undef $remote;
 } elsif ($ping) {
 	my $res = ping();
@@ -110,6 +111,7 @@ sub ping {
 	return $POE::Component::IKC::ClientLite::error unless $remote;
 	my $result = $remote->post_respond('admin/ping');
 	return $POE::Component::IKC::ClientLite::error unless defined $result;
+	$remote->disconnect;
 	undef $remote;
 	return 0 if ($result eq "pong");
 	return 1;
