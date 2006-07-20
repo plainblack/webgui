@@ -1,6 +1,8 @@
 7.0.3
  - Fixed a problem with the 7.0.0-7.0.1 upgrade relating to internationalized
    department names.
+ - fix: Missing documentation breaks the List of Available Macros (Wouter
+   van Oijen / ProcoliX)
 
 
 7.0.2

@@ -132,7 +132,8 @@ sub _get {
 		return $help->{$id};
 	}
 	else {
-		return "Unable to load help for $namespace -> $id\n";
+		$session->errorHandler->warn("Unable to load help for $namespace -> $id");
+		return undef;
 	}
 }
 
@@ -301,6 +302,7 @@ sub www_viewHelp {
 	my @related = @{ $help->{related} };
 	foreach my $row (@related) {
 		my $relatedHelp = _get($session,$row->{tag},$row->{namespace});
+		next unless (defined $relatedHelp);
 		$ac->addSubmenuItem(_link($session,$row->{tag},$row->{namespace}),$i18n->get($relatedHelp->{title},$row->{namespace}));
 	}
         my %vars;
