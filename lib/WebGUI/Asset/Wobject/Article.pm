@@ -288,7 +288,7 @@ sub view {
 				filename => $file,
 				isImage => $storage->isImage($file),
 				url=> $storage->getUrl($file),
-				thumbnailUrl => $storage->getThumbnail($file),
+				thumbnailUrl => $storage->getThumbnailUrl($file),
 				iconUrl => $storage->getFileIconUrl($file)
 				});
 		}
