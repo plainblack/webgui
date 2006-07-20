@@ -18,6 +18,7 @@ my $toVersion = "7.0.3"; # make this match what version you're going to
 my $quiet; # this line required
 
 
+sleep(1); # to prevent duplicate timestamps
 my $session = start(); # this line required
 
 # upgrade functions go here

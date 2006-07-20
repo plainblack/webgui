@@ -6,6 +6,7 @@
  - fix: Article thumbnail not working (Len Kranendonk)
  - Fixed a bug in WebGUI::Asset::Post where userDefined and synopsis form
    elements were not populated when previewed. (Martin Kamerbeek / Procolix)
+ - fix: Indent Navigation broken (Wouter van Oijen / ProcoliX)
 
 
 7.0.2
