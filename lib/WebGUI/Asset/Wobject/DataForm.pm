@@ -902,32 +902,32 @@ sub www_editField {
 sub www_editFieldSave {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
-	$self->session->form->process("name") = $self->session->form->process("label") if ($self->session->form->process("name") eq "");
-	my $tid = $self->session->form->process("tid", 'selectBox') || "0";
-	my $name = $self->session->url->urlize($self->session->form->process("name"));
+	my $form = $self->session->form;
+	my $tid = $form->process("tid", 'selectBox') || "0";
+	my $name = $self->session->url->urlize($form->process("name") || $form->process("label"));
         $name =~ s/\-//g;
         $name =~ s/\///g;
 	$self->setCollateral("DataForm_field","DataForm_fieldId",{
-		DataForm_fieldId=>$self->session->form->process("fid"),
-		width=>$self->session->form->process("width", 'integer'),
+		DataForm_fieldId=>$form->process("fid"),
+		width=>$form->process("width", 'integer'),
 		name=>$name,
-		label=>$self->session->form->process("label"),
+		label=>$form->process("label"),
 		DataForm_tabId=>$tid,
-		status=>$self->session->form->process("status", 'selectBox'),
-		type=>$self->session->form->process("type", 'fieldType'),
-		possibleValues=>$self->session->form->process("possibleValues", 'textarea'),
-		defaultValue=>$self->session->form->process("defaultValue", 'textarea'),
-		subtext=>$self->session->form->process("subtext"),
-		rows=>$self->session->form->process("rows", 'integer'),
-		vertical=>$self->session->form->process("vertical", 'yesNo'),
-		extras=>$self->session->form->process("extras"),
+		status=>$form->process("status", 'selectBox'),
+		type=>$form->process("type", 'fieldType'),
+		possibleValues=>$form->process("possibleValues", 'textarea'),
+		defaultValue=>$form->process("defaultValue", 'textarea'),
+		subtext=>$form->process("subtext"),
+		rows=>$form->process("rows", 'integer'),
+		vertical=>$form->process("vertical", 'yesNo'),
+		extras=>$form->process("extras"),
 		}, "1","1", _tonull("DataForm_tabId",$tid));
-	if($self->session->form->process("position")) {
-		$self->session->db->write("update DataForm_field set sequenceNumber=".$self->session->db->quote($self->session->form->process("position", 'integer')).
-					" where DataForm_fieldId=".$self->session->db->quote($self->session->form->process("fid")));
+	if($form->process("position")) {
+		$self->session->db->write("update DataForm_field set sequenceNumber=".$self->session->db->quote($form->process("position", 'integer')).
+					" where DataForm_fieldId=".$self->session->db->quote($form->process("fid")));
 	}
-	$self->reorderCollateral("DataForm_field","DataForm_fieldId", _tonull("DataForm_tabId",$tid)) if ($self->session->form->process("fid") ne "new");
-        if ($self->session->stow->get('whatNext') eq "editField" || $self->session->form->process("proceed") eq "editField") {
+	$self->reorderCollateral("DataForm_field","DataForm_fieldId", _tonull("DataForm_tabId",$tid)) if ($form->process("fid") ne "new");
+        if ($self->session->stow->get('whatNext') eq "editField" || $form->process("proceed") eq "editField") {
             return $self->www_editField('new');
         }
         return "";
