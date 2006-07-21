@@ -52,7 +52,7 @@ sub grabReferral {
 	my $session = shift;
 	if ($session->user->userId ne "1" && $session->user->referringAffiliate) {
 		return "";
-	} elsif ($session->user->userId ne "1" && (($session->user->referringAffiliate eq "0" && $session->scratch->process("referringAffiliate")) || $session->form->process("affiliateId"))) {
+	} elsif ($session->user->userId ne "1" && (($session->user->referringAffiliate eq "0" && $session->form->process("referringAffiliate")) || $session->form->process("affiliateId"))) {
 		$session->user->referringAffiliate($session->scratch->get("referringAffiliate"));
 	} elsif ($session->user->userId ne "1") {
 		$session->user->referringAffiliate(1);

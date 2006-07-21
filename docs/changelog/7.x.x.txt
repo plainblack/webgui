@@ -11,6 +11,7 @@
  - fix: Copyright on Default Template (Wouter van Oijen / ProcoliX)
  - fix: FileUrl macro doesn't handle snippets (Wouter van Oijen / ProcoliX)
  - fix: Dataform adding fields without fieldname (Wouter van Oijen / ProcoliX)
+ - fix: Fatal in Affiliate.pm
 
 
 7.0.2
