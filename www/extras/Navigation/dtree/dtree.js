@@ -58,7 +58,7 @@ function Node(id, pid, name, url, title, target, icon, iconOpen, open) {
 
 // Tree object
 
-function dTree(objName) {
+function dTree(objName, path) {
 
 	this.config = {
 
@@ -115,6 +115,8 @@ function dTree(objName) {
 	};
 
 	this.obj = objName;
+
+	this.path = path;
 
 	this.aNodes = [];
 
@@ -580,6 +582,7 @@ dTree.prototype.clearCookie = function() {
 
 dTree.prototype.setCookie = function(cookieName, cookieValue, expires, path, domain, secure) {
 
+	path = this.path;
 	document.cookie =
 
 		escape(cookieName) + '=' + escape(cookieValue)

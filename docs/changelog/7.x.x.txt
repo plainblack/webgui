@@ -13,6 +13,7 @@
  - fix: Dataform adding fields without fieldname (Wouter van Oijen / ProcoliX)
  - fix: Fatal in Affiliate.pm
  - Fixed several problems to make WebGUI 7 Windows compatible again.
+ - fix: navigation (Wouter van Oijen / Procolix)
 
 
 7.0.2
