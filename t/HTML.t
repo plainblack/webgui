@@ -41,6 +41,12 @@ my @filterSets = (
 		comment => 'all filter HTML',
 	},
 	{
+		inputText => q!<div class="something"><div style="float: left;">This <span>is some</span> <i>text</i> here. Let's&nbsp;see what we get when we add a table.<table><tr><td>a</td><td>b</td></tr><tr><td>c</td><td>d</td></tr></table></div><div>Here's a little more text with <b>bold</b>, <strong>strong</strong>, and <strong><b>bold strong</b></strong>.</div>!,
+		output => q!This is some text here. Let&#39;s&nbsp;see what we get when we add a table.abcdHere&#39;s a little more text with bold, strong, and bold strong.!,
+		type => 'all',
+		comment => 'all filter complex HTML',
+	},
+	{
 		inputText => q!<p>Paragraph</p>^H();!,
 		output => q!Paragraph&#94;H();!,
 		type => 'all',
