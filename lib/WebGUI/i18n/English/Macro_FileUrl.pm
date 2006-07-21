@@ -26,6 +26,11 @@ This macro is used to return a filesystem URL to a File or Image Asset identifie
         lastUpdated => 1134855446,
     },
 
+    'no storage' => {
+        message => q|The Asset you requested does not store files.|,
+        lastUpdated => 1153498370,
+    },
+
 };
 
 1;
