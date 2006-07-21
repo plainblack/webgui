@@ -9,6 +9,7 @@
  - fix: Indent Navigation broken (Wouter van Oijen / ProcoliX)
  - fix: HttpProxy not working (with fix) (Eric Kennedy)
  - fix: Copyright on Default Template (Wouter van Oijen / ProcoliX)
+ - fix: FileUrl macro doesn't handle snippets (Wouter van Oijen / ProcoliX)
 
 
 7.0.2

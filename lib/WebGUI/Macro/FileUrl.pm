@@ -43,13 +43,19 @@ sub process {
 	my $session = shift;
         my $url = shift;
 	my $asset = WebGUI::Asset->newByUrl($session,$url);
-	if (defined $asset) {
-		my $storage = WebGUI::Storage->get($session,$asset->get("storageId"));
-		return $storage->getUrl($asset->get("filename"));
-	} else {
+	if (not defined $asset) {
+		$session->errorHandler->warn("^FileUrl($url): asset not found");
 		my $i18n = WebGUI::International->new($session, 'Macro_FileUrl');
 		return $i18n->get('invalid url');
 	}
+	my $storageId = $asset->get('storageId');
+	if (not defined $storageId) {
+		$session->errorHandler->warn("^FileUrl($url): asset is not a file");
+		my $i18n = WebGUI::International->new($session, 'Macro_FileUrl');
+		return $i18n->get('invalid url');
+	}
+	my $storage = WebGUI::Storage->get($session,$storageId);
+	return $storage->getUrl($asset->get("filename"));
 }
 
 

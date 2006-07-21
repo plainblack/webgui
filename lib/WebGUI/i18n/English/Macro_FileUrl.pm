@@ -16,9 +16,9 @@ our $I18N = {
         message => q|
 <p><b>&#94;FileUrl</b>();<br />
 <b>&#94;FileUrl</b>(<i>Asset URL</i>);<br />
-This macro is used to return a filesystem URL to an File, Image or Snippet Asset identified by its Asset URL.</p>
+This macro is used to return a filesystem URL to a File or Image Asset identified by its Asset URL.</p>
         |,
-        lastUpdated => 1146679314,
+        lastUpdated => 1153476000,
     },
 
     'invalid url' => {
