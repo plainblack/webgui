@@ -317,11 +317,11 @@ sub view {
    
             my $uploadFile = $self->session->request->upload($self->session->form->process('HttpProxy_'.$input_name));
             if(-r $uploadFile) { # Found uploaded file
-      	       @formUpload=($uploadFile, qq/$self->session->form->process('HttpProxy_'.$input_name)/);
+      	       @formUpload=($uploadFile, $self->session->form->process('HttpProxy_'.$input_name));
    	       $formdata{$input_name}=\@formUpload;
 	       $contentType = 'form-data'; # Different Content Type header for file upload
    	    } else {
-   	      $formdata{$input_name}=qq/$self->session->form->process('HttpProxy_'.$input_name)/;
+   	      $formdata{$input_name}=$self->session->form->process('HttpProxy_'.$input_name);
             }
          }
          # Create POST request

@@ -7,6 +7,7 @@
  - Fixed a bug in WebGUI::Asset::Post where userDefined and synopsis form
    elements were not populated when previewed. (Martin Kamerbeek / Procolix)
  - fix: Indent Navigation broken (Wouter van Oijen / ProcoliX)
+ - fix: HttpProxy not working (with fix) (Eric Kennedy)
 
 
 7.0.2
