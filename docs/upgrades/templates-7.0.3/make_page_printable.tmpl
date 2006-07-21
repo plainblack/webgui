@@ -1,0 +1,93 @@
+#PBtmpl0000000000000111
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title>^Page(title); - <tmpl_var session.setting.companyName></title>
+<link rel="icon" href="^Extras(favicon.png);" type="image/png" />
+<link rel="shortcut icon" href="^Extras(favicon.ico);" />
+<tmpl_var head.tags>
+<style type="text/css">
+.content {
+	background-color: #ffffff;
+	color: #000000;
+	font-family: helvetica, arial;
+	font-size: 10pt;
+	padding: 10pt;
+}
+h1 {
+	font-family: helvetica, arial;
+	font-size: 16pt;
+}
+a {
+	color: #EF4200;
+}
+.pagination {
+	font-family: helvetica, arial;
+	font-size: 8pt;
+	text-align: center;
+}
+.formDescription {
+	font-family: helvetica, arial;
+	font-size: 10pt;
+	font-weight: bold;
+}
+.formSubtext {
+	font-family: helvetica, arial;
+	font-size: 8pt;
+}
+.highlight {
+	background-color: #dddddd;
+}
+.tableMenu {
+	background-color: #cccccc;
+	font-size: 8pt;
+	font-family: Helvetica, Arial;
+}
+.tableMenu a {
+	text-decoration: none;
+}
+.tableHeader {
+	background-color: #cccccc;
+	font-size: 10pt;
+	font-family: Helvetica, Arial;
+}
+.tableData {
+	font-size: 10pt;
+	font-family: Helvetica, Arial;
+}
+
+.pollAnswer {
+	font-family: Helvetica, Arial;
+	font-size: 8pt;
+}
+
+.pollColor {
+	background-color: #444444;
+}
+
+.pollQuestion {
+	font-face: Helvetica, Arial;
+	font-weight: bold;
+}
+
+.faqQuestion {
+	font-size: 12pt;
+	font-weight: bold;
+	color: #000000;
+}
+</style>
+</head>
+<body onload="window.print()">
+
+^AdminBar("");
+
+<div style="text-align:center;"><a href="^PageUrl;"><img src="^Extras(plainblack.gif);" style="border-style:none;" alt="plainblack" /></a></div>
+
+<div>
+	<tmpl_var body.content>
+</div>
+
+<div style="text-align:center;">&copy; 2001-2004 Plain Black LLC</div>
+
+</body>
+</html>
