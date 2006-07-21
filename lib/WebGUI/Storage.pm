@@ -24,8 +24,6 @@ use Storable qw(nstore retrieve);
 use strict;
 use warnings;
 use WebGUI::Utility;
-use Apache2::Request;
-use Apache2::Upload;
 
 =head1 NAME
 
@@ -198,6 +196,8 @@ sub addFileFromFormPost {
 	my $formVariableName = shift;
 	my $attachmentLimit = shift || 99999;
 	return "" if ($self->session->http->getStatus() =~ /^413/);
+	require Apache2::Request;
+    require Apache2::Upload;
 	my $filename;
 	my $attachmentCount = 1;
 	foreach my $upload ($self->session->request->upload($formVariableName)) {

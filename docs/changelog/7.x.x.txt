@@ -12,6 +12,7 @@
  - fix: FileUrl macro doesn't handle snippets (Wouter van Oijen / ProcoliX)
  - fix: Dataform adding fields without fieldname (Wouter van Oijen / ProcoliX)
  - fix: Fatal in Affiliate.pm
+ - Fixed several problems to make WebGUI 7 Windows compatible again.
 
 
 7.0.2

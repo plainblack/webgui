@@ -16,8 +16,6 @@ package WebGUI::Session::Http;
 
 
 use strict;
-use Apache2::Cookie;
-use APR::Request::Apache2;
 
 =head1 NAME
 
@@ -78,6 +76,8 @@ Retrieves the cookies from the HTTP header and returns a hash reference containi
 sub getCookies {
 	my $self = shift;
 	if ($self->session->request) {
+		# Have to require this instead of using it otherwise it causes problems for command-line scripts on some platforms (namely Windows)
+		require APR::Request::Apache2;
 		my $jarHashRef = APR::Request::Apache2->handle($self->session->request)->jar();
 		return $jarHashRef if $jarHashRef;
 		return {};
@@ -267,6 +267,7 @@ sub setCookie {
 	my $ttl = shift;
 	$ttl = (defined $ttl ? $ttl : '+10y');
 	if ($self->session->request) {
+		require Apache2::Cookie;
 		my $cookie = Apache2::Cookie->new($self->session->request,
 			-name=>$name,
 			-value=>$value,

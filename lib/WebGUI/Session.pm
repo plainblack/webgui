@@ -15,7 +15,6 @@ package WebGUI::Session;
 =cut
 
 use strict;
-use Apache2::Request;
 use WebGUI::Config;
 use WebGUI::SQL;
 use WebGUI::User;
@@ -368,7 +367,7 @@ sub open {
 	my $config = WebGUI::Config->new($webguiRoot,$configFile);
 	my $self = {_config=>$config, _server=>$server};
 	bless $self , $class;
-	$self->{_request} = Apache2::Request->new($request) if (defined $request);
+	$self->{_request} = $request if (defined $request);
 	my $sessionId = shift || $self->http->getCookies->{"wgSession"} || $self->id->generate;
 	$sessionId = $self->id->generate unless $self->id->valid($sessionId);
 	my $noFuss = shift;

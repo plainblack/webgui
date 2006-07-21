@@ -86,7 +86,8 @@ sub contentHandler {
 	### nstantiate the API for this httpd instance.
 	my $s = Apache2::ServerUtil->server;
 	### Open new or existing user session based on user-agent's cookie.
-	my $session = WebGUI::Session->open($s->dir_config('WebguiRoot'),$configFile,$r, $s);
+	my $request = Apache2::Request->new($r);
+	my $session = WebGUI::Session->open($s->dir_config('WebguiRoot'),$configFile, $request, $s);
 	if ($session->env->get("HTTP_X_MOZ") eq "prefetch") { # browser prefetch is a bad thing
 		$session->http->setStatus("403","We don't allow prefetch, because it increases bandwidth, hurts stats, and can break web sites.");
 		$session->http->sendHeader;
@@ -411,7 +412,8 @@ sub uploadsHandler {
 			my @privs = split("\n",$fileContents);
 			unless ($privs[1] eq "7" || $privs[1] eq "1") {
 				my $s = Apache2::ServerUtil->server;
-				my $session = WebGUI::Session->open($s->dir_config('WebguiRoot'),$configFile,$r, $s);
+				my $request = Apache2::Request->new($r);
+				my $session = WebGUI::Session->open($s->dir_config('WebguiRoot'),$configFile, $request, $s);
 				my $hasPrivs = ($session->var->get("userId") eq $privs[0] || $session->user->isInGroup($privs[1]) || $session->user->isInGroup($privs[2]));
 				$session->close();
 				if ($hasPrivs) {
