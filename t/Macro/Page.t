@@ -26,6 +26,7 @@ unless ($session->config->get('macros')->{'Page'}) {
 	Macro_Config::insert_macro($session, 'Page', 'Page');
 }
 
+##Add more Asset configurations here.
 my @testSets = (
 	{
 		className => 'WebGUI::Asset::Wobject::Layout',
