@@ -614,14 +614,14 @@ Otherwise, just the duration will be displayed as text.|,
 		lastUpdated => 1149824991,
 	},
 
-	'project.gaant.rowspan' => {
-		message => q|The number of rows for the Gannt chart, 4 + the number of tasks.|,
-		lastUpdated => 1149824991,
+	'project.gantt.rowspan' => {
+		message => q|The number of rows for the Gantt chart, 4 + the number of tasks.|,
+		lastUpdated => 1153478000,
 	},
 
 	'project.ganttChart' => {
-		message => q|The Gannt chart for this project and its tasks.|,
-		lastUpdated => 1149824991,
+		message => q|The Gantt chart for this project and its tasks.|,
+		lastUpdated => 1153478000,
 	},
 
 	'task.back.url' => {

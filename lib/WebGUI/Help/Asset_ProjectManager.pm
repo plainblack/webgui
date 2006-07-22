@@ -271,7 +271,7 @@ our $HELP = {
 		                           ]
 		          },
 		          {
-		            'name' => 'project.gaant.rowspan'
+		            'name' => 'project.gantt.rowspan'
 		          },
 		          {
 		            'name' => 'project.ganttChart'

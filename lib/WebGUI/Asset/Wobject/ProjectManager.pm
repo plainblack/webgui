@@ -1093,8 +1093,8 @@ sub www_viewProject {
 	}
 	
 	
-	#Rowspan of gaant chart is 4 plus number of tasks
-	$var->{'project.gaant.rowspan'} = 4 + $taskLength;
+	#Rowspan of gantt chart is 4 plus number of tasks
+	$var->{'project.gantt.rowspan'} = 4 + $taskLength;
 	
 	$var->{'project.ganttChart'} = $self->www_drawGanttChart($projectId, $data, $var);
 		

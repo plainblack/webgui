@@ -14,6 +14,7 @@
  - fix: Fatal in Affiliate.pm
  - Fixed several problems to make WebGUI 7 Windows compatible again.
  - fix: navigation (Wouter van Oijen / Procolix)
+ - Fixed typo in template variable project.gantt.rowspan and documentation
 
 
 7.0.2
