@@ -113,7 +113,9 @@ sub toHtml {
 		$resize = '<img src="'.$self->session->icon->getBaseURL().'/drag.gif" title="'.$i18n->get("drag to resize").'" alt="'.$i18n->get("drag to resize").'" class="draggable" onmousedown="tar_drag_start(event, \''.$self->get('id').'\');" />';
 	}
  	my $value = $self->fixMacros($self->fixTags($self->fixSpecialCharacters($self->get("value"))));
-	my $style = "width: ".$self->get('width')."px; height: ".$self->get('height')."px; ".$self->get("style");
+	my $width = $self->get('width') || 400;
+	my $height = $self->get('height') || 150;
+	my $style = "width: ".$width."px; height: ".$height."px; ".$self->get("style");
 	return '<textarea id="'.$self->get('id').'" name="'.$self->get("name").'" style="'.$style.'" '.$self->get("extras").'>'.$value.'</textarea>'.$resize;
 }
 

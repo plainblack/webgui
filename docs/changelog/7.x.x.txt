@@ -16,6 +16,7 @@
  - fix: navigation (Wouter van Oijen / ProcoliX)
  - Fixed typo in template variable project.gantt.rowspan and documentation
  - fix: Events Calendar Double Date (Wouter van Oijen / ProcoliX)
+ - fix: Data Form Text Area Box Non-Existent (Wouter van Oijen / ProcoliX)
 
 
 7.0.2
