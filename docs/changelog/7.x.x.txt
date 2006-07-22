@@ -13,8 +13,9 @@
  - fix: Dataform adding fields without fieldname (Wouter van Oijen / ProcoliX)
  - fix: Fatal in Affiliate.pm
  - Fixed several problems to make WebGUI 7 Windows compatible again.
- - fix: navigation (Wouter van Oijen / Procolix)
+ - fix: navigation (Wouter van Oijen / ProcoliX)
  - Fixed typo in template variable project.gantt.rowspan and documentation
+ - fix: Events Calendar Double Date (Wouter van Oijen / ProcoliX)
 
 
 7.0.2
