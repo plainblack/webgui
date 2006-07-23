@@ -31,6 +31,11 @@ This macro is used to return a filesystem URL to a File or Image Asset identifie
         lastUpdated => 1153498370,
     },
 
+    'no filename' => {
+        message => q|The Asset you requested does not have a filename property.|,
+        lastUpdated => 1153618016,
+    },
+
 };
 
 1;

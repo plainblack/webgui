@@ -50,8 +50,13 @@ sub process {
 	}
 	my $storageId = $asset->get('storageId');
 	if (not defined $storageId) {
-		$session->errorHandler->warn("^FileUrl($url): asset is not a file");
+		$session->errorHandler->warn("^FileUrl($url): asset does not store files");
 		return $i18n->get('no storage');
+	}
+	my $filename = $asset->get('filename');
+	if (not defined $filename) {
+		$session->errorHandler->warn("^FileUrl($url): asset does not have a 'filename' property");
+		return $i18n->get('no filename');
 	}
 	my $storage = WebGUI::Storage->get($session,$storageId);
 	return $storage->getUrl($asset->get("filename"));
