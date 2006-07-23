@@ -22,6 +22,7 @@ use Data::Dumper;
 use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
+my $i18n = WebGUI::International->new($session, 'Macro_FileUrl');
 
 unless ($session->config->get('macros')->{'FileUrl'}) {
 	Macro_Config::insert_macro($session, 'FileUrl', 'FileUrl');
@@ -37,30 +38,57 @@ my @testSets = (
 		title => 'Test File Asset',
 		url => 'fileurltest-file',
 		description => 'Test File Asset for the FileUrl macro test',
+		pass => 1,
 	},
 	{
-		className => 'Image Asset works with FileUrl',
+		comment => 'Image Asset works with FileUrl',
+		className => 'WebGUI::Asset::File::Image',
 		#          '1234567890123456789012'
 		assetId => 'ImageAsset0110011abc-e',
 		title => 'Test Image Asset',
 		url => 'fileurltest-image',
 		description => 'Test Image Asset for the FileUrl macro test',
+		pass => 1,
 	},
 	{
-		className => 'Article Asset does not work with FileUrl',
+		comment => 'ZipArchive Asset works with FileUrl',
+		className => 'WebGUI::Asset::File::ZipArchive',
 		#          '1234567890123456789012'
-		assetId => 'ArticleAsset10011abc-e',
+		assetId => 'ZipArchive0110011ZYWXV',
+		title => 'Test ZipArchive Asset',
+		url => 'fileurltest-ziparchive',
+		description => 'Test ZipArchive Asset for the FileUrl macro test',
+		pass => 1,
+	},
+	{
+		comment => 'Snippet Asset does not store files',
+		className => 'WebGUI::Asset::Snippet',
+		#          '1234567890123456789012'
+		assetId => 'SnippetAsset01011abc-e',
+		title => 'Test Snippet Asset',
+		url => 'fileurltest-snippet',
+		description => 'Test Snippet Asset for the FileUrl macro test',
+		snippet => 'Test Snippet Asset for the FileUrl macro test',
+		pass => 0,
+		output => $i18n->get('no storage'),
+	},
+	{
+		comment => 'Article Asset does not have a filename property',
+		className => 'WebGUI::Asset::Wobject::Article',
+		#          '1234567890123456789012'
+		assetId => 'ArticleAsset01011abc-e',
 		title => 'Test Article Asset',
-		url => 'fileurltest-Article',
+		url => 'fileurltest-article',
 		description => 'Test Article Asset for the FileUrl macro test',
+		pass => 0,
+		output => $i18n->get('no filename'),
 	},
 );
 
 
-plan tests => scalar(@testSets) + 3; ##3 TODO tests
+plan tests => scalar(@testSets) + 1;
 
 my $macroText = '^FileUrl("%s");';
-my $output = $macroText;
 
 my $homeAsset = WebGUI::Asset->getDefault($session);
 my $versionTag;
@@ -68,20 +96,19 @@ my $versionTag;
 ($versionTag, @testSets) = setupTest($session, $homeAsset, @testSets);
 
 foreach my $testSet (@testSets) {
-	$session->asset($testSet->{asset});
-	my $class = $testSet->{className};
 	my $output = sprintf $macroText, $testSet->{url};
 	WebGUI::Macro::process($session, \$output);
-	my $comment = sprintf "Checking asset: %s", $class;
-	is($output, $testSet->{fileUrl}, $comment);
+	if ($testSet->{pass}) {
+		is($output, $testSet->{fileUrl}, $testSet->{comment});
+	}
+	else {
+		is($output, $testSet->{output}, $testSet->{comment});
+	}
 }
 
-TODO: {
-	local $TODO = 'Things to do later';
-	ok(0, 'Add tests for Assets with no Storage ID and check error message');
-	ok(0, 'Add tests for bad URLs and check error message');
-	ok(0, 'Talk to JT about how to handle Assets with StorageIds but no filename properties');
-}
+my $output = sprintf $macroText, "non-existant-url";
+WebGUI::Macro::process($session, \$output);
+is($output, $i18n->get('invalid url'), "Non-existant url returns error message");
 
 sub setupTest {
 	my ($session, $homeAsset, @testSets) = @_;
