@@ -35,13 +35,14 @@ used as a default.
 #-------------------------------------------------------------------
 sub process {
 	my $session = shift;
-        my ($temp, @param);
+        my ($temp, @param, $limit);
         @param = @_;
         if ($param[0] ne "") {
-        	$temp = round(rand()*$param[0]);
+        	$limit = $param[0];
         } else {
-        	$temp = round(rand()*1000000000);
+		$limit = 1000000000;
         }
+	$temp = round(rand($limit));
 	return $temp;
 }
 
