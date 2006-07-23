@@ -28,7 +28,7 @@ use Data::Dumper;
 ##Note, testing statistical functions is kind of weird.  All we really
 ##need to do is make sure that the macro functions as advertised.
 
-plan tests => 3;
+plan tests => 4;
 
 unless ($session->config->get('macros')->{'Splat_random'}) {
 	Macro_Config::insert_macro($session, '*', 'Splat_random');
@@ -64,3 +64,16 @@ WHOLE: for (my $i=0; $i<=99; $i++) {
 
 ok($wholeNumber, "100 fetches were all whole numbers");
 
+my @bins = ();
+WHOLE: for (my $i=0; $i<=999; $i++) {
+	my $output = sprintf $macroText, 4;
+	WebGUI::Macro::process($session, \$output);
+	++$bins[$output];
+}
+
+is(scalar(@bins), 5, "All bins have values on a sample size of 1000");
+
+##Early work in analyzing a frequency distribution showed that the highest
+##and lowest bin have half the frequency of center bins.  Splat_random doesn't
+##seem very random
+#diag Dumper \@bins;
