@@ -21,8 +21,10 @@ Package WebGUI::Macro::FileUrl
 
 =head1 DESCRIPTION
 
-Macro for displaying returning the file system URL to a File, Image or Snippet Asset,
+Macro for returning the file system URL to a File or Image Asset,
 identified by it's asset URL.
+
+#-------------------------------------------------------------------
 
 =head2 process ( url )
 
@@ -37,8 +39,6 @@ The URL to the Asset.
 
 =cut
 
-
-#-------------------------------------------------------------------
 sub process {
 	my $session = shift;
         my $url = shift;
@@ -59,10 +59,8 @@ sub process {
 		return $i18n->get('no filename');
 	}
 	my $storage = WebGUI::Storage->get($session,$storageId);
-	return $storage->getUrl($asset->get("filename"));
+	return $storage->getUrl($filename);
 }
 
 
 1;
-
-
