@@ -208,13 +208,13 @@ to validate any input that the user may supply.|,
         },
 
         '8 description' => {
-                message => q|Set the number of characters wide this form field will be.|,
-                lastUpdated => 1119156590,
+                message => q|Set the width of most fields in pixels, except for lists.  For a drop-down list, it sets the height in entries.|,
+                lastUpdated => 1153612746,
         },
 
         '27 description' => {
-                message => q|Set the number of characters tall this form field will be. Only used on textareas and HTMLAreas.|,
-                lastUpdated => 1119156590,
+                message => q|Set the height of this field in pixels. Only used on textareas and HTMLAreas.|,
+                lastUpdated => 1153613086,
         },
 
         'editField vertical label description' => {
