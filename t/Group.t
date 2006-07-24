@@ -75,7 +75,7 @@ my @ipTests = (
 );
 
 
-plan tests => (119 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
+plan tests => (121 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 my $testCache = WebGUI::Cache->new($session, 'myTestKey');
@@ -129,6 +129,11 @@ SKIP: {
 	is( $g->getId, $g2->getId, 'find returns correct group');
 }
 undef $g2;
+
+$g2 = WebGUI::Group->find($session, 'Non existant group name');
+is(ref $g2, 'WebGUI::Group', 'find with non-existant group name returns a group');
+is($g2->getId, undef, 'find with non-existant group name returns a group with undefined ID');
+
 
 delete $g->{_group};
 ok( !exists $g->{_group}, 'deleted group property hash');
