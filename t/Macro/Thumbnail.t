@@ -38,7 +38,6 @@ $square->setBackgroundColor('#0000FF');
 my $storage = WebGUI::Storage::Image->create($session);
 
 ##Save the image to the location
-diag ref $storage;
 $square->saveToStorageLocation($storage, 'square.png');
 
 ##Do a file existance check.
