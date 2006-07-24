@@ -1,0 +1,905 @@
+#EventManagerTmpl000006
+<div><a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a></div>
+
+<tmpl_if displayTitle>
+	<h2><tmpl_var title></h2>
+</tmpl_if>
+
+<tmpl_if session.var.adminOn>
+        <p><tmpl_var controls></p><br /><br />
+</tmpl_if>
+
+<tmpl_if badgeSelected>
+<table border="0" cellpadding="5" cellspacing="0" width="100%">
+<tr>
+	<td style="width:50%;" valign="top">
+		<div class="badge">
+			<tmpl_loop badgeHolderInfo_loop>
+			<h2><tmpl_var mainEventTitle><br /><tmpl_var firstName> <tmpl_var lastName></h2>
+
+			<!-- USER DATA -->
+			<div class="badgeContent" style="background-color:#E5E5E5;">
+				<table cellpadding="1" cellspacing="3" width="100%" class="userData">
+				<tbody>
+				<tr>
+					<td style="width:65px;">&nbsp;Address</td>
+					<td class="data">&nbsp;<tmpl_var address></td>
+				</tr>
+				<tr>
+					<td>&nbsp;City</td>
+					<td class="data">&nbsp;<tmpl_var city></td>
+				</tr>
+				<tr>
+					<td>&nbsp;State</td>
+					<td class="data">&nbsp;<tmpl_var state></td>
+				</tr>
+				<tr>
+					<td>&nbsp;ZIP</td>
+					<td class="data">&nbsp;<tmpl_var zipCode></td>
+				</tr>
+				<tr>
+					<td>&nbsp;Phone</td>
+					<td class="data">&nbsp;<tmpl_var phone></td>
+				</tr>
+				<tr>
+					<td>&nbsp;Country</td>				
+					<td class="data">&nbsp;<tmpl_var country></td>
+				</tr>			
+				</tbody>
+				</table>
+			</tmpl_loop>
+			</div>
+			<!-- END USER DATA -->
+			
+			<!-- BADGE EVENT -->
+			<tmpl_loop eventsInBadge_loop>
+			<div class="badgeContent">
+				<table cellpadding="0" cellspacing="0" width="100%">
+				<tbody>
+				
+				<tr>
+					<td style="width:43%;text-align:left;"><tmpl_var title></td>
+					<td style="width:40%;text-align:right;">^D("%W %Z",<tmpl_var startDate>);</td>
+					<td style="width:17%;text-align:right;"><tmpl_if removeEventFromBadge.url><a href="<tmpl_var removeEventFromBadge.url>">Remove</a></tmpl_if></td>
+				</tr>
+				
+				</tbody>
+				</table>
+			</div>
+			</tmpl_loop>
+			<!-- END BADGE EVENT -->
+			
+
+			<!-- BADGE FOOTER -->
+			<div class="badgeFooter">
+				<table cellpadding="0" cellspacing="0" width="100%">
+				<tbody>
+				<tr>
+					<td style="width:50%;"><a href="<tmpl_var resetScratchCartUrl>" style="float:left;">Start Over</a></td>
+					<td style="width:50%;"><a href="<tmpl_var continue.url>" style="float:right;">Add Contents to Cart</a></td>					
+				</tr>
+				</tbody>
+				</table>	
+			</div>
+			<!-- END BADGE FOOTER -->
+		</div>
+	</td>
+	<td style="width:50%;" valign="top">			
+			<tmpl_if cart.purchaseLoop>
+			<div class="cart">
+				<h2>Shopping Cart</h2>
+				<tmpl_loop cart.purchaseLoop>
+				<div class="cartContent">
+					<tmpl_var deleteIcon><tmpl_var editIcon> <tmpl_var purchase.mainEventTitle> <br />
+					<tmpl_loop registrantInfoLoop>
+					Name: <tmpl_var firstName> <tmpl_var lastName>
+					</tmpl_loop>
+					<br />Additional Price: $<tmpl_var newPrice> 
+				</div>
+				</tmpl_loop>
+				<!-- OEOS -->
+				<div style="text-align:right;margin:0px;">
+					<a href="<tmpl_var emptyCart.url>">Empty Cart</a> &bull; <a href="<tmpl_var checkout.url>">Checkout</a>
+				</div>
+			</div>
+			</tmpl_if>
+			<br />
+			<div class="eventSearch">
+					<h2>Search Instructions</h2>
+			
+					<span style="font-style: italic; font-weight: bold">Basic Search</span> - This is the events search screen. There is a basic search box which allows you to search by event number, event title, and event description.<br /><br />
+
+					<span style="font-style: italic; font-weight: bold">Advanced Search</span> - Click on <span style="color: blue">Advanced Search</span> and you will see a pull-down list appear in the search area. Select which event characteristic you would like to search by and then in the next drop-down box specify what type of search to do (equals, contains, is not, not like, starts with, ends with). Most searches will likely be "<span style="font-style: italic;">contains</span>."
+		</div>
+		<br />
+
+	</td>
+</tr>
+<tr>
+	<td colspan="2">
+		<div class="eventSearch">
+			<h2>Search</h2>
+			
+<script type="text/javascript" src="<tmpl_var ems.wobject.dir>/script/dynamicForms.js"></script>
+
+<script type="text/javascript">
+function popUp(URL) {
+day = new Date();
+id = day.getTime();
+eval("page" + id + " = window.open(URL, '" + id + "', 'toolbar=0,scrollbars=1,location=0,statusbar=0,menubar=0,resizable=0,width=500,height=500')");
+}
+
+   <tmpl_var search.filters.options>
+   var advanced = 0;
+   var filterCount = 0;
+
+	function setSelectValue(selObj,newValue) {
+		for (var i=0; i<selObj.options.length; i++) {
+			selObj.options[i].selected = (selObj.options[i].value==newValue)?true:false;
+		}
+	}
+	
+
+   function toggleTitle(obj) {
+      if (obj.checked) {
+	     document.getElementById('cs_search_title_td').style.display='inline';
+	  } else {
+	     document.getElementById('cs_search_title_td').style.display='none';
+	  }
+   }
+   
+   function openWin (url, name, param) {
+      var newwin = window.open(url, name, param);
+      newwin.focus();
+   }
+   
+   function buildFilterList() {
+      return "Custom Filter";
+   }
+   
+   function stripDelim(value,delim) {
+      value = value.replace(/delim/g,"");
+	  return value;
+   }
+
+	function unset(array, valueToUnset){
+		var output=new Array(0);
+		for(var i in array){
+			if(i==valueToUnset){continue;}
+			output[i]=array[i];
+		}
+		return output;
+	}
+</script>
+<div id="basicSearch">
+<tmpl_var advSearch.formHeader>
+<table width="100%" border="0" cellpadding="1" style="border-bottom:double gray 5px;border-top:solid gray 1px;margin-bottom:5px;margin-top:5px;">
+   <tbody id="filterbody">
+   <tr>
+      <td style="font-weight:bold;width:80px;">Search Events:</td>
+	  <td><input name="searchKeywords" /></td>
+   </tr>
+   
+   </tbody>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr>
+	<td align="left" valign="top"><a href="javascript:void(addField())">Advanced Search</a></td>
+	<td align="right"><input type="submit" name="filter" id="filter_formId" value="Display Results" onclick="this.value='Please wait...'" /></td>
+</tr>
+</table>
+<!-- <tmpl_var search.formSubmit> -->
+<tmpl_var search.formFooter>
+</div>
+
+			
+		</div>
+	</td>
+</tr>
+<tr>
+	<td colspan="2">
+		<tmpl_var sortForm.header>
+		<div class="EMS_searchFilter">
+			<table width="100%">
+			<tbody>
+			<tr>
+				<td style="width:150px;text-align:left;"><i>Your search returned <tmpl_var numberOfSearchResults> results.</i></td>
+				<td>
+					<table>
+					<tbody>
+					<tr>
+						<td><tmpl_var sortForm.selectBox.label></td>
+						<td><tmpl_var sortForm.selectBox></td>
+						<td><tmpl_var sortForm.submit></td>
+					</tr>
+					</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" align="center">
+					<div style="align: center;">
+						<tmpl_var pagination.firstPage>&nbsp;&nbsp;<tmpl_var pagination.previousPage>&nbsp;&nbsp;<tmpl_var pagination.pageList.upTo20>&nbsp;&nbsp;<tmpl_var pagination.nextPage>&nbsp;&nbsp;<tmpl_var pagination.lastPage> of <tmpl_var pagination.pageCount>
+					</div>
+				</td>
+			</tr>
+			</tbody>
+			</table>
+		</div>
+		<tmpl_var sortForm.footer>
+		
+		<div class="eventList">
+			<h2>Available Events</h2>
+		
+			<!-- EVENT -->			
+				<table cellpadding="2" cellspacing="0" border="0" class="event">
+				<tbody>
+				<tr>
+					<th>Event<br />Number</th>
+					<th>Event<br />Name</th>
+					<th>Start<br />Date</th>
+					<th>End<br />Date</th>
+					<th>Seats Left/<br />Available</th>
+					<th>Price</th>
+					<th>Add to Badge</th>
+				</tr>
+				<tmpl_loop events_loop>
+				<tr>
+					<td style="width:9%;white-space:nowrap" class="left">
+						<tmpl_if canManageEvents><tmpl_var manageToolbar>
+						<tmpl_unless eventIsApproved><span style="color:red;font-size:9pt;font-weight:bold;">&bull; Not Approved</span><tmpl_else><span style="color:green;font-size:9pt;font-weight:bold;">&bull; Approved</span></tmpl_unless></tmpl_if>
+					</td>
+					<td style="width:25%;"><tmpl_var title></td>
+					<td style="width:14%;">^D("%W %Z",<tmpl_var startDate>);</td>
+					<td style="width:14%;">^D("%W %Z",<tmpl_var endDate>);</td>
+					<td style="width:14%;"><tmpl_var seatsRemaining>/<tmpl_var maximumAttendees></td>
+					<td style="width:10%;"><tmpl_var price></td>
+					<td style="width:14%;" class="right">
+						<tmpl_unless eventIsFull>
+							<a href="<tmpl_var purchase.url>"><tmpl_var purchase.label></a>
+						<tmpl_else>
+							<tmpl_var purchase.label>
+						</tmpl_unless>
+					</td>
+				</tr>
+				</tmpl_loop>
+				</tbody>
+				</table>			
+			<!-- END EVENT -->
+		</div>	
+		<div class="EMS_searchFilter" style="height:23px;">
+			<table width="100%">
+			<tbody>
+			<tr>
+				<td align="center">
+					<div style="align: center;">
+						<tmpl_var pagination.firstPage>&nbsp;&nbsp;<tmpl_var pagination.previousPage>&nbsp;&nbsp;<tmpl_var pagination.pageList.upTo20>&nbsp;&nbsp;<tmpl_var pagination.nextPage>&nbsp;&nbsp;<tmpl_var pagination.lastPage> of <tmpl_var pagination.pageCount>
+					</div>
+				</td>
+			</tr>
+			</tbody>
+			</table>
+		</div>
+		<br />
+	</div>
+	</td>
+</tr>
+</table>
+
+<tmpl_else>
+<ul>
+<tmpl_if canManageEvents>
+   <li><a href="<tmpl_var addEvent.url>"><tmpl_var addEvent.label></a></li>
+   <li><a href="<tmpl_var manageRegistrants>">Manage Registrants</a> (Event Directors and Staff)</li>
+   <li><a href="<tmpl_var manageEvents.url>">Manage Events</a> (Event Directors and Staff)</li></tmpl_if>
+<tmpl_unless badgeSelected>
+   <li><a href="^PageUrl;">Return To Badge List to begin a badge purchase</a></li></tmpl_unless>
+</ul>
+
+<tmpl_if badgeSelected>
+<div><a href="<tmpl_var resetScratchCartUrl>">Click Here to add events to a badge you've already purchased, or to select a different badge. (Start Over)</a></div><br /><br />
+<div><span class="StepLabel">Step 2: </span><h2> Add Events to your Badge</h2></div>
+<tmpl_else>
+<div><span class="StepLabel">Browse Events: </span> You have not selected a Badge.  You cannot add events to your cart until you select a badge.</div>
+</tmpl_if>
+<tmpl_var calendarJS>
+<tmpl_unless noSearchDialog>
+<script type="text/javascript" src="<tmpl_var ems.wobject.dir>/script/dynamicForms.js"></script>
+
+<script type="text/javascript">
+function popUp(URL) {
+day = new Date();
+id = day.getTime();
+eval("page" + id + " = window.open(URL, '" + id + "', 'toolbar=0,scrollbars=1,location=0,statusbar=0,menubar=0,resizable=0,width=500,height=500')");
+}
+
+   <tmpl_var search.filters.options>
+   var advanced = 0;
+   var filterCount = 0;
+
+	function setSelectValue(selObj,newValue) {
+		for (var i=0; i<selObj.options.length; i++) {
+			selObj.options[i].selected = (selObj.options[i].value==newValue)?true:false;
+		}
+	}
+	
+
+   function toggleTitle(obj) {
+      if (obj.checked) {
+	     document.getElementById('cs_search_title_td').style.display='inline';
+	  } else {
+	     document.getElementById('cs_search_title_td').style.display='none';
+	  }
+   }
+   
+   function openWin (url, name, param) {
+      var newwin = window.open(url, name, param);
+      newwin.focus();
+   }
+   
+   function buildFilterList() {
+      return "Custom Filter";
+   }
+   
+   function stripDelim(value,delim) {
+      value = value.replace(/delim/g,"");
+	  return value;
+   }
+
+	function unset(array, valueToUnset){
+		var output=new Array(0);
+		for(var i in array){
+			if(i==valueToUnset){continue;}
+			output[i]=array[i];
+		}
+		return output;
+	}
+</script>
+
+<div id="basicSearch">
+<tmpl_var advSearch.formHeader>
+<h2>How to Use the Events Search</h2>
+<p><span style="font-style: italic; font-weight: bold">Basic Search</span> - This is the events search screen. There is a basic search box which allows you to search by event number, event title, and event description.
+
+<p><span style="font-style: italic; font-weight: bold">Advanced Search</span> - Click on <span style="color: blue">Advanced Search</span> and you will see a pull-down list appear in the search area. Select which event characteristic you would like to search by and then in the next drop-down box specify what type of search to do (equals, contains, is not, not like, starts with, ends with). Most searches will likely be "<span style="font-style: italic;">contains</span>."
+
+<table width="100%" border="0" cellpadding="1" style="border-bottom:double gray 5px;border-top:solid gray 1px;margin-bottom:5px;margin-top:5px;">
+   <tbody id="filterbody">
+   <tr>
+      <td style="font-weight:bold;width:80px">Search Events:</td>
+	  <td><input name="searchKeywords" /></td>
+   </tr>
+   
+   </tbody>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr>
+	<td align="left" valign="top"><a href="javascript:void(addField())">Search By...</a></td>
+	<td align="right"><input type="submit" name="filter" id="filter_formId" value="Display Search Results" onclick="this.value='Please wait...'" /></td>
+</tr>
+</table>
+<!-- <tmpl_var search.formSubmit> -->
+<tmpl_var search.formFooter>
+</div>
+</tmpl_unless><!-- noSearchDialog -->
+<br /><br />
+<tmpl_if badgeSelected>
+<tmpl_if continue.url><table><tr><td align="right"><span class="StepLabel">Go to Step 3:</span><a href="<tmpl_var continue.url>">Add Badge and Events to Cart</a></td></tr><tr><td align="right"><span class="StepLabel">Go to Step 3:</span><a href="<tmpl_var checkoutNow.url>">Add Badge and Events to Cart and Checkout</a></td></tr></table></tmpl_if>
+</tmpl_if>
+
+<p><tmpl_var message></p>
+<tmpl_if badgeSelected>
+<p>Of the events you may add to this badge, your search returned <tmpl_var numberOfSearchResults> results.</p>
+<tmpl_else>
+<p>Your search returned <tmpl_var numberOfSearchResults> results.</p>
+</tmpl_if>
+
+<p><tmpl_var addToBadgeMessage></p>
+<div style="text-align: center;"><tmpl_var pagination.firstPage>&nbsp;&nbsp;<tmpl_var pagination.previousPage>&nbsp;&nbsp;<tmpl_var pagination.pageList.upTo20>&nbsp;&nbsp;<tmpl_var pagination.nextPage>&nbsp;&nbsp;<tmpl_var pagination.lastPage> of <tmpl_var pagination.pageCount></div><br />
+
+<!-- Sort Form -->
+<div style="align: right;">
+<tmpl_var sortForm.header>
+<tmpl_var sortForm.selectBox.label>&nbsp;
+<tmpl_var sortForm.selectBox>
+<tmpl_var sortForm.submit>
+<tmpl_var sortForm.footer>
+</div>
+
+<table width="100%" border="0" cellpadding="8" cellspacing="0" style="border-top:solid gray 2px;border-bottom:solid gray 2px;">
+<tr>
+<th>Event #</th>
+<th><tmpl_var name.label></th>
+<th><tmpl_var starts.label></th>
+<th><tmpl_var ends.label></th>
+<th>Seats<br />(Available/Max)</th>
+<th><tmpl_var price.label></th>
+<tmpl_if badgeSelected>
+<th>Add to Cart</th></tmpl_if>
+</tr>
+<tmpl_loop events_loop>
+  <tr<tmpl_unless __ODD__> class="oddRow"<tmpl_else> class="evenRow"</tmpl_unless>>
+
+  <td style="white-space:nowrap;">
+    <tmpl_if canManageEvents><tmpl_var manageToolbar>
+        <tmpl_unless eventIsApproved><span style="color:red;font-size:9pt;font-weight:bold;">&bull; <tmpl_var eventState.label></span><tmpl_else><span style="color:green;font-size:9pt;font-weight:bold;">&bull; <tmpl_var eventState.label></span></tmpl_unless></tmpl_if>
+  </td><td><tmpl_var title>
+  </td><td>^D("%W %Z",<tmpl_var startDate>);
+  </td><td>^D("%W %Z",<tmpl_var endDate>);
+  </td><td style="text-align: center;"><tmpl_var seatsRemaining>/<tmpl_var maximumAttendees>
+  </td><td><tmpl_var price>
+  </td><tmpl_if badgeSelected>
+    <td style="text-align: center;">
+      <tmpl_if canManageEvents>
+		<tmpl_unless eventIsFull>
+			<a href="<tmpl_var purchase.url>"><tmpl_var purchase.label></a>
+		<tmpl_else>
+			<tmpl_var purchase.label>
+		</tmpl_unless>
+      </tmpl_if>
+  </td>
+    </tmpl_if></tr>
+</tmpl_loop>
+
+</table>
+
+<div style="text-align: center;"><tmpl_var pagination.firstPage>&nbsp;&nbsp;<tmpl_var pagination.previousPage>&nbsp;&nbsp;<tmpl_var pagination.pageList.upTo20>&nbsp;&nbsp;<tmpl_var pagination.nextPage>&nbsp;&nbsp;<tmpl_var pagination.lastPage> of <tmpl_var pagination.pageCount></div>
+
+
+
+</tmpl_if>
+~~~
+<style type="text/css">
+
+tr.oddRow td {
+	background-color:#DADADA;
+	border-right:solid gray 1px;
+}
+tr.evenRow td {
+	background-color:#E8E8E8;
+	border-right:solid gray 1px;
+}
+.manageEvents {
+	margin-top:5px;
+	margin-bottom:5px;
+}
+.datacardtitle {
+	background: #3D5690;
+	color: white;
+	font-family: verdana;
+	font-weight: bold;
+	font-size:13px;
+}
+
+.leftnav{
+	padding: 1px 1px 1px 1px;
+	background: white;
+	color: black;
+	font-family: verdana;
+	font-weight: bold;
+	font-size:11px;
+	border: 2px #3D5690 ridge;
+}
+.leftnavon{
+	padding: 1px 1px 1px 1px;
+	background: yellow;
+	color: black;
+	font-family: verdana;
+	font-weight: bold;
+	font-size:11px;
+	border: 2px #3D5690 ridge;
+}
+.calendartitle {
+	background: #3D5690;
+	color: white;
+	font-family: verdana;
+	font-weight: bold;
+	font-size:11px;
+}
+.filter-select {
+	font-family: verdana;
+	font-size: 10px;
+	font-weight: normal;
+	color: black;
+	width: 105px;
+}
+.compare-select {
+	font-family: verdana;
+	font-size: 10px;
+	font-weight: normal;
+	color: black;
+	width: 76px;
+}
+.filter-text {
+	font-family: verdana;
+	font-size: 10px;
+	font-weight: normal;
+	color: black;
+	width: 114px;
+}
+.smLink {
+   font-family: verdana;
+   font-size: 10px;
+   font-weight: normal;
+   color: blue;
+}
+
+.StepLabel { font-family: Tahoma; font-size: 14pt; letter-spacing: 2pt; color: #234E9C; 
+               font-weight: bold }
+
+/* BADGE CSS */
+		.badge {
+			width:92%;
+			background-color:#F0F0F0;
+			-moz-border-radius:15px;
+			padding:5px;	
+			-moz-box-sizing:border-box;
+			font-family:verdana;
+			font-size:9pt;
+		}
+		.badge h2 {
+			width:100%;
+			font-size:12.5pt;
+			background-color:#E2E2E2;
+			text-align:center;
+			-moz-border-radius-topLeft:15px;
+			-moz-border-radius-topRight:15px;
+			margin:0px;
+			border:solid #E0E0E0 1px;
+			padding:5px;
+			-moz-box-sizing:border-box;			
+			color:gray;			
+		}
+		.badgeContent {
+			width:100%;
+			background-color:#F4F4F4;			
+			margin:0px;
+			margin-top:5px;
+			margin-bottom:5px;
+			border:solid #E0E0E0 1px;
+			padding:5px;
+			-moz-box-sizing:border-box;			
+			font-family:verdana;
+			font-size:9pt;
+		}
+		.badgeContent a {
+			background-color:#CF1D1D;
+			padding:5px;			
+			color:white;
+			border:solid #9C1616 1px;
+			text-decoration:none;
+			font-weight:bold;				
+			text-align:center;
+			-moz-border-radius:10px;
+			display:block;
+			width:40px;
+			font-size:9px;
+			float:right;
+			margin-left:10px;
+			letter-spacing:0px;
+		}
+		.badgeContent a:hover {
+			background-color:#9C1616;
+			color:#CF1D1D;
+			color:white;		
+		}		
+		.badgeFooter {
+			width:100%;
+			background-color:#E2E2E2;			
+			-moz-border-radius-bottomLeft:15px;
+			-moz-border-radius-bottomRight:15px;
+			margin:0px;			
+			border:solid #E0E0E0 1px;
+			padding:5px;
+			-moz-box-sizing:border-box;				
+			text-align:center;
+		}
+		.badgeFooter a {				
+			
+			background-color:#E2E2E2;
+			padding:5px;			
+			color:gray;
+			border:solid #F4F4F4 1px;
+			text-decoration:none;
+			font-weight:bold;						
+			text-align:center;
+			-moz-border-radius:10px;
+			display:block;
+		}
+		.badgeFooter a:hover {
+			background-color:#F0F0F0;
+			color:gray;
+		}		
+		.userData td {
+			background-color:#E2E2E2;
+			font-size:7pt;
+			-moz-border-radius:15px;
+			border:solid #F4F4F4 1px;
+			font-weight:bold;
+			
+		}
+		.userData td.data {
+			background-color:#F4F4F4;
+			border:solid #E2E2E2 1px;
+			font-weight:normal;
+		}	
+		/* END OF BADGE CSS */
+		
+		
+		
+		/* EVENT LIST CSS */
+		.eventList, .eventSearch {
+			width:95%;
+			border:solid #F0F0F0 1px;
+			padding:2px;
+			-moz-border-radius-topLeft:15px;
+			-moz-border-radius-topRight:15px;	
+			font-family:verdana;
+			font-size:9pt;
+		}
+		.eventList h2, .eventSearch h2 {
+			margin:0px;
+			width:100%;
+			font-family:verdana;
+			text-align:center;
+			font-size:11pt;
+			background-color: #F0F0F0;
+			color:gray;
+			-moz-border-radius-topLeft:15px;
+			-moz-border-radius-topRight:15px;
+			-moz-box-sizing:border-box;			
+		}
+		.eventList {	
+			width:98%;
+			border:solid #E0E0E0 1px;			
+			font-size:9pt;
+			font-family:verdana;
+			/*background-color:#F4F4F4;*/
+			margin-top:2px;
+			-moz-box-sizing:border-box;
+			padding-bottom:25px;
+			-moz-border-radius-bottomLeft:15px;
+			-moz-border-radius-bottomRight:15px;									
+		}
+		.event {
+			width:100%;						
+			font-size:9pt;
+			font-family:verdana;
+			background-color:#F4F4F4;
+			margin-top:2px;
+			-moz-box-sizing:border-box;			
+		}
+		.event td {
+			border-top:solid #E0E0E0 1px;
+			border-bottom:solid #E0E0E0 1px;
+			text-align:center;
+		}
+		.event th {
+			font-size:8pt;
+			text-align:center;
+			background:white;
+		}
+		.event td.left {
+			border-left:solid #E0E0E0 1px;
+		}
+		.event td.right {
+			border-right:solid #E0E0E0 1px;
+		}	
+		.event td.empty {
+			background-color:white;
+			border-style:none;
+			font-size:1px;
+		}
+		.event a {
+			background-color:#E2E2E2;
+			padding:5px;			
+			color:gray;
+			border:solid #F4F4F4 1px;
+			text-decoration:none;
+			font-weight:bold;						
+			text-align:center;
+			-moz-border-radius:10px;
+			display:block;		
+			width:80%;
+		}
+		.event a:hover {
+			border: solid #E2E2E2 1px;
+			background-color:#F0F0F0;
+			color:gray;
+		}		
+		/* END EVENT LIST CSS */
+		
+		
+		/* INSTRUCTIONS */
+		.instructions {
+			width:95%;
+			border:solid #F0F0F0 1px;
+			padding:5px;
+			-moz-border-radius-topLeft:15px;
+			-moz-border-radius-topRight:15px;	
+			font-family:verdana;
+			font-size:9pt;
+		}
+		/* END INSTRUCTIONS */
+
+		
+		/* SEARCH */
+		.eventSearch form {
+			margin:0px;
+		}
+		.eventSearch .searchBtn {
+			background-color:#E2E2E2;			
+			color:gray;
+			padding-top:1px;
+			padding-bottom:1px;
+			border:solid #F4F4F4 1px;
+			text-decoration:none;
+			font-weight:bold;						
+			text-align:center;
+			-moz-border-radius:10px;		
+		}
+		.searchBtn:hover {
+			border: solid #E2E2E2 1px;
+			background-color:#F0F0F0;
+			color:gray;		
+		}
+		.advSearch input, .advSearch select{
+			font-size:8pt;
+		}
+		.advSearch .button {
+			background-color:#CF1D1D;
+			padding-left:2px;			
+			padding-right:2px;			
+			color:white;
+			border:solid #9C1616 1px;
+			text-decoration:none;
+			font-weight:bold;						
+			text-align:center;
+			-moz-border-radius:10px;
+			display:block;
+			width:30px;
+			font-size:10pt;			
+			margin-left:10px;	
+			height:100%;
+		}
+		.advSearch .button:hover {
+			background-color:#9C1616;
+			color:#CF1D1D;
+			color:white;		
+		}
+		.advSearch .compare-select {
+			width:75px;
+		}		
+		.advSearch .filter-text {
+			width:98%;
+		}
+		* html .advSearch .filter-text {
+			width:97%;
+		}
+		.advSearch tr.border td {
+			font-size:1pt;
+			background-color:#CFCFCF;
+		}
+		/* END SEARCH */
+/* cart CSS */
+		.cart {
+			width:95%;
+			background-color:#F0F0F0;
+			-moz-border-radius:15px;
+			padding:5px;	
+			-moz-box-sizing:border-box;
+			font-family:verdana;
+			font-size:9pt;
+		}
+		.cart h2 {
+			width:100%;
+			font-size:12.5pt;
+			background-color:#E2E2E2;
+			text-align:center;
+			-moz-border-radius-topLeft:15px;
+			-moz-border-radius-topRight:15px;
+			margin:0px;
+			border:solid #E0E0E0 1px;			
+			-moz-box-sizing:border-box;			
+			color:gray;			
+		}
+		.cartContent {
+			width:100%;
+			background-color:#F4F4F4;			
+			margin:0px;
+			margin-top:5px;
+			margin-bottom:5px;
+			border:solid #E0E0E0 1px;
+			padding:5px;
+			-moz-box-sizing:border-box;			
+			font-family:verdana;
+			font-size:9pt;
+		}
+		.cartContent a {
+			background-color:#CF1D1D;
+			padding:5px;			
+			color:white;
+			border:solid #9C1616 1px;
+			text-decoration:none;
+			font-weight:bold;						
+			text-align:center;
+			-moz-border-radius:10px;
+			display:block;
+			width:40px;
+			font-size:7pt;
+			float:right;
+			margin-left:10px;
+		}
+		.cartContent a:hover {
+			background-color:#9C1616;
+			color:#CF1D1D;
+			color:white;		
+		}		
+		.cartFooter {
+			width:100%;
+			background-color:#E2E2E2;			
+			-moz-border-radius-bottomLeft:15px;
+			-moz-border-radius-bottomRight:15px;
+			margin:0px;			
+			border:solid #E0E0E0 1px;
+			padding:5px;
+			-moz-box-sizing:border-box;				
+			text-align:center;
+		}
+		.cartFooter a {				
+			
+			background-color:#E2E2E2;
+			padding:5px;			
+			color:gray;
+			border:solid #F4F4F4 1px;
+			text-decoration:none;
+			font-weight:bold;						
+			text-align:center;
+			-moz-border-radius:10px;
+			display:block;
+		}
+		.cartFooter a:hover {
+			background-color:#F0F0F0;
+			color:gray;
+		}		
+		/* END OF cart CSS */
+
+/* SEARCH FILTER (Sort By)*/
+		.EMS_searchFilter {	
+			width:98%;
+			border:solid #E0E0E0 1px;			
+			font-size:9pt;
+			font-family:verdana;			
+			margin-top:2px;
+			-moz-box-sizing:border-box;			
+			background-color:#E2E2E2;
+			-moz-border-radius:15px;			
+			color:#808080;
+			height:58px;
+		}		
+		.EMS_searchFilter table {
+			float:right;
+			margin-right:5px;
+		}
+		.EMS_searchFilter td, .EMS_searchFilter select {
+			font-size:8pt;
+		}
+		.EMS_searchFilter input {				
+			background-color:#E2E2E2;
+			padding:5px;			
+			color:gray;
+			border:solid #F4F4F4 1px;
+			text-decoration:none;
+			font-weight:bold;						
+			text-align:center;
+			-moz-border-radius:10px;
+			display:block;
+		}
+		.EMS_searchFilter input:hover {
+			background-color:#F0F0F0;
+			color:gray;
+		}		
+		/* END SEARCH FILTER */
+</style>
+
+<link href="^Extras;/calendar/calendar-win2k-1.css" rel="stylesheet" type="text/css" />
