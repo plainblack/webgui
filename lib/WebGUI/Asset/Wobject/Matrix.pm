@@ -1187,7 +1187,7 @@ sub www_viewDetail {
 	$var{compares} = $listing->{compares};
 	$var{clicks} = $listing->{clicks};
 	my $sth = $self->session->db->read("select a.value, b.name, b.label, b.description, category from Matrix_listingData a left join 
-		Matrix_field b on a.fieldId=b.fieldId where listingId=".$self->session->db->quote($listingId)." order by b.label");	
+		Matrix_field b on a.fieldId=b.fieldId and b.assetId=? where listingId=? order by b.label",[$self->getId, $listingId]);	
 	while (my $data = $sth->hashRef) {
 		$data->{description} =~ s/\n//g;
 		$data->{description} =~ s/\r//g;
