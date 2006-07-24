@@ -1,0 +1,47 @@
+#ProjectManagerTMPL0003
+<script type="text/javascript">
+	var taskArray=<tmpl_var project.task.array>;
+</script>
+<div class="barPositions">
+   <tmpl_loop task.div.loop>
+      <tmpl_if task.isMilestone>      
+	     <div class="milestone" style="left:<tmpl_var task.div.left>px;top:<tmpl_var task.div.top>px;">&diams;</div>
+	  <tmpl_else>
+	     <div class="projectBar" style="left:<tmpl_var task.div.left>px;top:<tmpl_var task.div.top>px;width:<tmpl_var task.div.width>px;">	 
+		    <div class="statusBar" style="width:<tmpl_var task.div.percentComplete>%;"></div>
+            <tmpl_if task.hasPredecessor>   
+		       <div class="projectLineH" style="top:4px;left:50px;width:75px;height:28px;">
+	              <div class="projectLineV"></div>
+		       </div>
+	        </tmpl_if>
+	        <tmpl_if task.hasResource>
+		       <div class="projectLabel" style="left:<tmpl_var task.div.label.left>px;top:3px;margin-top:-3px;">
+		          <tmpl_var task.resource.name>			
+		       </div>
+	        </tmpl_if> 
+		 </div>
+	  </tmpl_if>	  
+   </tmpl_loop>
+   <a name="<tmpl_var project.table.width>" id="projectTableWidth"></a>
+   <a name="<tmpl_var project.scroll.percentWidth>" id="projectScrollPercentWidth"></a>
+   <table cellpadding="0" cellspacing="0" border="0" style="width:<tmpl_var scrollWidth>px;z-index:1;">
+      <tr class="monthNames">
+	     <tmpl_loop months.loop>
+		    <td colspan="<tmpl_var month.colspan>" class="monthName" style="height:20px;"><tmpl_var month.name></td>
+		 </tmpl_loop>
+	  </tr>	
+	  <tr class="dates">
+	     <tmpl_loop days.loop>
+		    <td  align="center" style="width:23px"><tmpl_var day.number></td>
+		 </tmpl_loop>
+	  </tr>
+	  <tmpl_loop task.count.loop>
+	     <tr>
+		    <td colspan="<tmpl_var total.colspan>" class="empty" style="height:21px;">&nbsp;</td>
+	     </tr>
+	  </tmpl_loop>
+   </table>
+   <br />
+</div>
+
+~~~

@@ -25,6 +25,7 @@
  - Made some improvements to the mail subsystems.
  - fix: Revised WebGUI::HTML::filter "all" so that text does not run together when
    tags are removed. Added additional tests to HTML.t. (Eric Kennedy)
+ - fix: Templates XHTML compliance (Wouter van Oijen / ProcoliX)
 
 
 7.0.2
