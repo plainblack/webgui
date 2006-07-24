@@ -19,6 +19,7 @@
  - fix: Data Form Text Area Box Non-Existent (Wouter van Oijen / ProcoliX)
  - Added an error message to the FileUrl macro to help users figure out why it
    doesn't work.
+ - Fixed bugs in the GroupAdd and GroupDelete macros.
  - Fixed a cross-Matrix linking problem when you have two or more Matricies on
    one site with the same category names.
  - Deleted a template that was accidentally added to the core.

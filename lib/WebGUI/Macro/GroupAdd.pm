@@ -43,20 +43,19 @@ An optional template for formatting the text and link.
 
 #-------------------------------------------------------------------
 sub process {
-	my @param = @_;
-	my $session = shift;
-	return "" if ($param[0] eq "");
-	return "" if ($param[1] eq "");
+	my ($session, $groupName, $text, $template) = @_;
+	return "" if ($groupName eq "");
+	return "" if ($text eq "");
 	return "" if ($session->user->userId eq '1');
-	my $g = WebGUI::Group->find($param[0]);
+	my $g = WebGUI::Group->find($session, $groupName);
 	return "" unless defined $g->getId;
 	return "" unless ($g->autoAdd);
 	return "" if ($session->user->isInGroup($g->getId));
 	my %var = ();
 	$var{'group.url'} = $session->url->page("op=autoAddToGroup;groupId=".$g->getId);
-	$var{'group.text'} = $param[1];
-	if ($param[2]) {
-		return  WebGUI::Asset::Template->newByUrl($session,$param[2])->process(\%var);
+	$var{'group.text'} = $text;
+	if ($template) {
+		return  WebGUI::Asset::Template->newByUrl($session,$template)->process(\%var);
 	} else {
 		return  WebGUI::Asset::Template->new($session,"PBtmpl0000000000000040")->process(\%var);
 	}

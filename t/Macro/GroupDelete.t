@@ -23,8 +23,8 @@ use HTML::TokeParser;
 
 my $session = WebGUI::Test->session;
 
-unless ($session->config->get('macros')->{'GroupAdd'}) {
-	Macro_Config::insert_macro($session, 'GroupAdd', 'GroupAdd');
+unless ($session->config->get('macros')->{'GroupDelete'}) {
+	Macro_Config::insert_macro($session, 'GroupDelete', 'GroupDelete');
 }
 
 my $homeAsset = WebGUI::Asset->getDefault($session);
@@ -33,7 +33,7 @@ my ($versionTag, $template, $groups, $users) = setupTest($session, $homeAsset);
 my @testSets = (
 	{
 		comment => 'Empty macro call returns null string',
-		macroText => q!^GroupAdd();!,
+		macroText => q!^GroupDelete();!,
 		groupName => '',
 		text => '',
 		template => '',
@@ -42,16 +42,16 @@ my @testSets = (
 	},
 	{
 		comment => 'Empty group returns null string',
-		macroText => q!^GroupAdd("%s","%s");!,
+		macroText => q!^GroupDelete("%s","%s");!,
 		groupName => '',
-		text => 'Join up',
+		text => 'Bow out',
 		template => '',
 		empty => 1,
 		userId => $users->[2]->userId,
 	},
 	{
 		comment => 'Empty text returns null string',
-		macroText => q!^GroupAdd("%s","%s");!,
+		macroText => q!^GroupDelete("%s","%s");!,
 		groupName => $groups->[0]->name,
 		text => '',
 		template => '',
@@ -60,71 +60,70 @@ my @testSets = (
 	},
 	{
 		comment => 'Visitor sees empty string with valid group and text',
-		macroText => q!^GroupAdd("%s","%s");!,
+		macroText => q!^GroupDelete("%s","%s");!,
 		groupName => $groups->[0]->name(),
-		text => 'Join up!',
+		text => 'Bow out',
 		template => '',
 		empty => 1,
 		userId => 1,
 	},
 	{
 		comment => 'Non-existant group returns null string',
-		macroText => q!^GroupAdd("%s","%s");!,
+		macroText => q!^GroupDelete("%s","%s");!,
 		groupName => "Dudes of the day",
-		text => 'Join up!',
+		text => 'Bow out',
 		template => '',
 		empty => 1,
 		userId => $users->[2]->userId,
 	},
 	{
-		comment => 'Group without autoAdd returns null string',
-		macroText => q!^GroupAdd("%s","%s");!,
+		comment => 'Group without autoDelete returns null string',
+		macroText => q!^GroupDelete("%s","%s");!,
 		groupName => $groups->[1]->name,
-		text => 'Join up!',
+		text => 'Bow out',
 		template => '',
 		empty => 1,
 		userId => $users->[2]->userId,
 	},
 	{
-		comment => 'Existing member of group sees empty string',
-		macroText => q!^GroupAdd("%s","%s");!,
+		comment => 'Non-member of group sees empty string',
+		macroText => q!^GroupDelete("%s","%s");!,
 		groupName => $groups->[0]->name,
-		text => 'Join up!',
+		text => 'Bow out',
 		template => '',
 		empty => 1,
-		userId => $users->[0]->userId,
-	},
-	{
-		comment => 'Non-member of group sees text and link',
-		macroText => q!^GroupAdd("%s","%s");!,
-		groupName => $groups->[0]->name,
-		groupId => $groups->[0]->getId,
-		text => 'Join up!',
-		template => '',
-		empty => 0,
-		userId => $users->[2]->userId,
-		parser => \&simpleHTMLParser,
-	},
-	{
-		comment => 'Member of different group sees text and link',
-		macroText => q!^GroupAdd("%s","%s");!,
-		groupName => $groups->[0]->name,
-		groupId => $groups->[0]->getId,
-		text => 'Join up!',
-		template => '',
-		empty => 0,
 		userId => $users->[1]->userId,
+	},
+	{
+		comment => 'Member of different group sees empty string',
+		macroText => q!^GroupDelete("%s","%s");!,
+		groupName => $groups->[0]->name,
+		groupId => $groups->[0]->getId,
+		text => 'Bow out',
+		template => '',
+		empty => 1,
+		userId => $users->[2]->userId,
+	},
+	{
+		comment => 'Member of group sees text and link',
+		macroText => q!^GroupDelete("%s","%s");!,
+		groupName => $groups->[0]->name,
+		groupId => $groups->[0]->getId,
+		text => 'Bow out',
+		template => '',
+		empty => 0,
+		userId => $users->[0]->userId,
 		parser => \&simpleHTMLParser,
 	},
 	{
 		comment => 'Custom template check',
-		macroText => q!^GroupAdd("%s","%s","%s");!,
+		macroText => q!^GroupDelete("%s","%s","%s");!,
 		groupName => $groups->[0]->name,
 		groupId => $groups->[0]->getId,
-		text => 'Join up!',
+		text => 'Bow out',
 		template => $template->get('url'),
 		empty => 0,
-		userId => $users->[1]->userId,
+		userId => $users->[0]->userId,
 		parser => \&simpleTextParser,
 	},
 );
@@ -148,7 +147,7 @@ foreach my $testSet (@testSets) {
 	else {
 		my ($url, $text) = $testSet->{parser}->($output);
 		is($text, $testSet->{text}, 'TEXT: '.$testSet->{comment});
-		my $expectedUrl = $session->url->page('op=autoAddToGroup;groupId='.$testSet->{groupId});
+		my $expectedUrl = $session->url->page('op=autoDeleteFromGroup;groupId='.$testSet->{groupId});
 		is($url, $expectedUrl, 'URL: '.$testSet->{comment});
 	}
 }
@@ -156,13 +155,13 @@ foreach my $testSet (@testSets) {
 sub setupTest {
 	my ($session, $defaultNode) = @_;
 	my @groups;
-	##Two groups, one with Group Add and one without
+	##Two groups, one with Group Delete and one without
 	$groups[0] = WebGUI::Group->new($session, "new");
-	$groups[0]->name('AutoAdd Group');
-	$groups[0]->autoAdd(1);
+	$groups[0]->name('AutoDelete Group');
+	$groups[0]->autoDelete(1);
 	$groups[1] = WebGUI::Group->new($session, "new");
 	$groups[1]->name('Regular Old Group');
-	$groups[1]->autoAdd(0);
+	$groups[1]->autoDelete(0);
 
 	##Three users.  One in each group and one with no group membership
 	my @users = map { WebGUI::User->new($session, "new") } 0..2;
@@ -170,15 +169,15 @@ sub setupTest {
 	$users[1]->addToGroups([$groups[1]->getId]);
 
 	my $versionTag = WebGUI::VersionTag->getWorking($session);
-	$versionTag->set({name=>"GroupAdd test"});
+	$versionTag->set({name=>"GroupDelete test"});
 	my $properties = {
-		title => 'GroupAdd test template',
+		title => 'GroupDelete test template',
 		className => 'WebGUI::Asset::Template',
-		url => 'groupadd-test',
-		namespace => 'Macro/GroupAdd',
+		url => 'groupdelete-test',
+		namespace => 'Macro/GroupDelete',
 		template => "HREF=<tmpl_var group.url>\nLABEL=<tmpl_var group.text>",
 		#     '1234567890123456789012'
-		id => 'GroupAdd001100Template',
+		id => 'GroupDelete001Template',
 	};
 	my $asset = $defaultNode->addChild($properties, $properties->{id});
 	$versionTag->commit;
