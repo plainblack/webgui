@@ -21,32 +21,30 @@ Package WebGUI::Macro::Splat_random
 
 Macro for returning a bounded, integer random number.
 
+#-------------------------------------------------------------------
+
 =head2 process ( max )
 
-Random numbers are rounded, not truncated.
+Random numbers are truncated to integer values.
 
 =head3 max
 
-The maximum random number.  If omitted, 1_000_000_000 is
+The upper bound for the random number.  If omitted, 1_000_000_000 is
 used as a default.
 
 =cut
 
-#-------------------------------------------------------------------
 sub process {
 	my $session = shift;
-        my ($temp, @param, $limit);
-        @param = @_;
-        if ($param[0] ne "") {
-        	$limit = $param[0];
-        } else {
-		$limit = 1000000000;
-        }
-	$temp = round(rand($limit));
-	return $temp;
+	my (@param, $limit);
+	@param = @_;
+	if ($param[0] ne "") {
+		$limit = $param[0];
+	} else {
+	$limit = 1000000000;
+	}
+	return int(rand($limit));
 }
-
-
 
 
 1;

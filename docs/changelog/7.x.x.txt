@@ -35,6 +35,8 @@
    line, which fixed a problem with the WRE monitor, and also enabled us to
    add more complete connectivity testing.
  - fix: Templates XHTML compliance (Wouter van Oijen / ProcoliX)
+ - fix: Splat_random Macro not so random (Wouter van Oijen / ProcoliX) (Thanks
+   to Colin Kuskie for pointing this out and writing some tests)
 
 
 7.0.2

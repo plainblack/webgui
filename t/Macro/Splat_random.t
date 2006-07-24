@@ -71,9 +71,6 @@ WHOLE: for (my $i=0; $i<=999; $i++) {
 	++$bins[$output];
 }
 
-is(scalar(@bins), 5, "All bins have values on a sample size of 1000");
+is(scalar(@bins), 4, "All bins have values on a sample size of 1000");
 
-##Early work in analyzing a frequency distribution showed that the highest
-##and lowest bin have half the frequency of center bins.  Splat_random doesn't
-##seem very random
 #diag Dumper \@bins;
