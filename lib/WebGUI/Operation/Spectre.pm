@@ -46,11 +46,11 @@ sub www_spectreTest {
 		name=>rand(100000),
 		timeout=>10
 		);
-	$remote->disconnect;
 	# Can't perform this test until I get smarter. =)
-	#return "spectre" unless $remote;
-	#my $result = $remote->post_respond('admin/ping');
-	#return "spectre" unless defined $result;
+	return "spectre" unless defined $remote;
+	my $result = $remote->post_respond('admin/ping');
+	$remote->disconnect;
+	return "spectre" unless defined $result;
 	return "success";
 }
 

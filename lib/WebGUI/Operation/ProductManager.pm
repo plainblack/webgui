@@ -192,7 +192,7 @@ sub www_editProduct {
 		-name		=> 'sku',
 		-label		=> $i18n->get('sku'),
 		-hoverHelp	=> $i18n->get('sku description'),
-		-value		=> $session->form->process("sku") || $product->{SKU},
+		-value		=> $session->form->process("sku") || $product->{sku},
 		-maxlength	=> 64,
 	);
 	$f->template(

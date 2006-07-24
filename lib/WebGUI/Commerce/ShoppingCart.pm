@@ -219,8 +219,7 @@ The instantiated plugin of this item. See WebGUI::Commerce::Item for a detailed 
 sub getItems {
 	my ($self, $periodResolve, %cartContent, $item, $properties, @recurring, @normal);
 	$self = shift;
-	
-	$periodResolve = WebGUI::Commerce::Payment::recurringPeriodValues($self->session);
+	$periodResolve = WebGUI::Commerce::Payment->recurringPeriodValues($self->session);
 	%cartContent = %{$self->{_items}};
 	foreach (values(%cartContent)) {
 		$item = WebGUI::Commerce::Item->new($self->session,$_->{itemId}, $_->{itemType});

@@ -145,7 +145,6 @@ sub new {
 	my $logger = Log::Log4perl->get_logger($config->getFilename);
 	my $self = {_debug=>$debug, _config=>$config, _logger=>$logger};
 	bless $self, $class;
-	$self->runTests();
 	$self->debug("Trying to bind to ".$config->get("ip").":".$config->get("port"));
 	create_ikc_server(
 		ip => $config->get("ip"),
@@ -179,38 +178,42 @@ sub ping {
 
 =head2 runTests ( )
 
-Executes a test to see if Spectre can establish a connection to WebGUI and get back a valid response.
+Executes a test to see if Spectre can establish a connection to WebGUI and get back a valid response. This is a class method.
+
+=head3 config
+
+A WebGUI::Config object that represents the spectre.conf file.
 
 =cut
 
 sub runTests {
-	my $self = shift;
+	my $class = shift;
 	my $config = shift;
-	$self->debug("Running connectivity tests.");
-	my $configs = WebGUI::Config->readAllConfigs($self->config->getWebguiRoot);
-	foreach my $config (keys %{$configs}) {
+	print "Running connectivity tests.\n";
+	my $configs = WebGUI::Config->readAllConfigs($config->getWebguiRoot);
+	foreach my $key (keys %{$configs}) {
 		next if $config =~ m/^demo/;
-		$self->debug("Testing $config");
+		print "Testing $key\n";
 		 my $userAgent = new LWP::UserAgent;
         	$userAgent->agent("Spectre");
         	$userAgent->timeout(30);
-		my $url = "http://".$configs->{$config}->get("sitename")->[0].":".$self->config->get("webguiPort").$configs->{$config}->get("gateway")."?op=spectreTest";
+		my $url = "http://".$configs->{$key}->get("sitename")->[0].":".$config->get("webguiPort").$configs->{$key}->get("gateway")."?op=spectreTest";
         	my $request = new HTTP::Request (GET => $url);
         	my $response = $userAgent->request($request);
         	if ($response->is_error) {
-			$self->error("Couldn't connect to WebGUI site $config");
+			print "ERROR: Couldn't connect to WebGUI site $key\n";
         	} else {
                 	my $response = $response->content;
 			if ($response eq "subnet") {
-				$self->error("Spectre cannot communicate with WebGUI for $config, perhaps you need to adjust the spectreSubnets setting in this config file.");
+				print "ERROR: Spectre cannot communicate with WebGUI for $key, perhaps you need to adjust the spectreSubnets setting in this config file.\n";
 			} elsif ($response eq "spectre") {
-				$self->error("WebGUI connot communicate with Spectre for $config, perhaps you need to adjust the spectreIp or spectrePort setting the this config file.");
+				print "ERROR: WebGUI connot communicate with Spectre for $key, perhaps you need to adjust the spectreIp or spectrePort setting the this config file.";
 			} elsif ($response ne "success") {
-				$self->error("Spectre received an invalid response from WebGUI while testing $config");
+				print "ERROR: Spectre received an invalid response from WebGUI while testing $key\n";
 			}
         	}
 	}	
-	$self->debug("Tests completed.");	
+	print "Tests completed.\n";
 }
 
 

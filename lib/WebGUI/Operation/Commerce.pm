@@ -1145,7 +1145,7 @@ sub www_viewCart {
 	$var{'checkoutForm.header'} = WebGUI::Form::formHeader($session,).
 		WebGUI::Form::hidden($session,{name => 'op', value => 'checkout'});
 	$var{'checkoutForm.button'} = WebGUI::Form::submit($session,{value => $i18n->get('checkout')});
-	$var{'checkoutForm.footer'} = WebGUI::Form::formFooter;
+	$var{'checkoutForm.footer'} = WebGUI::Form::formFooter($session);
 	
 	$var{normalItemsLoop} = $normal;
 	$var{normalItems} = scalar(@$normal);

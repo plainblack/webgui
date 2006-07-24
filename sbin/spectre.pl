@@ -23,6 +23,7 @@ my $ping;
 my $daemon;
 my $run;
 my $debug;
+my $test;
 
 GetOptions(
 	'help'=>\$help,
@@ -30,10 +31,11 @@ GetOptions(
 	'shutdown'=>\$shutdown,
 	'daemon'=>\$daemon,
 	'debug' =>\$debug,
-	'run' => \$run
+	'run' => \$run,
+	'test' => \$test
 	);
 
-if ($help || !($ping||$shutdown||$daemon||$run)) {
+if ($help || !($ping||$shutdown||$daemon||$run||$test)) {
 	print <<STOP;
 
 	S.P.E.C.T.R.E. is the Supervisor of Perplexing Event-handling Contraptions for 
@@ -56,6 +58,9 @@ if ($help || !($ping||$shutdown||$daemon||$run)) {
 	--run		Starts Spectre without forking it as a daemon.
 
 	--shutdown	Stops the running Spectre server.
+
+	--test		Tests the connection between Spectre and WebGUI. Both Spectre
+			and WebGUI must be running to use this function.
 
 STOP
 	exit;
@@ -90,6 +95,8 @@ if ($shutdown) {
 	my $res = ping();
 	print "Spectre is Alive!\n" unless $res;
 	print "Spectre is not responding.\n".$res if $res;
+} elsif ($test) {
+	Spectre::Admin->runTests($config);
 } elsif ($run) {
 	Spectre::Admin->new($config, $debug);
 } elsif ($daemon) {
