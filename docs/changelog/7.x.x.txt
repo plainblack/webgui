@@ -35,6 +35,11 @@
    line, which fixed a problem with the WRE monitor, and also enabled us to
    add more complete connectivity testing.
  - fix: Templates XHTML compliance (Wouter van Oijen / ProcoliX)
+ - Fixed mail bounce processing.
+ - fix: Asset Manager displaying incorrectly 
+ - fix: Cannot paste from clipboard
+ - Made the search indexer mor compatible with Chinese and other non-ascii 
+   characters. (Thanks to Zhou Xiaopeng)
  - fix: Splat_random Macro not so random (Wouter van Oijen / ProcoliX) (Thanks
    to Colin Kuskie for pointing this out and writing some tests)
 

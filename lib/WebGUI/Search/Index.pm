@@ -75,6 +75,14 @@ sub addKeywords {
 	my $self = shift;
 	my $text = shift;
 	$text = WebGUI::HTML::filter($text, "all");
+	#-------------------- added by zxp for chinese word segment
+	utf8::decode($text);
+	my @segs = split /([A-z|\d]+|\S)/, $text;
+	$text = join " ",@segs;
+	$text =~ s/\s{2,}/ /g;
+	$text =~ s/(^\s|\s$)//g;
+	$text =~ s/\s/\'\'/g;
+	#-------------------- added by zxp end
 	my ($keywords) = $self->session->db->quickArray("select keywords from assetIndex where assetId=?",[$self->getId]);
 	$self->session->db->write("update assetIndex set keywords =? where assetId=?", [$keywords.' '.$text, $self->getId]);
 }

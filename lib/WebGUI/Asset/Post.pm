@@ -783,6 +783,7 @@ sub postProcess {
 
 sub publish {
 	my $self = shift;
+	$self->SUPER::publish(@_);
 	$self->getThread->sumReplies;
 }
 

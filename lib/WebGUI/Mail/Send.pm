@@ -252,9 +252,7 @@ sub create {
 	unless ($id =~ m/\@/) {
 		$id .= '@'.$domain;
 	}
-	my $returnPath = $headers->{returnPath} || $session->setting->get("mailReturnPath") || $from;
 	my $message = MIME::Entity->build(
-		"Return-Path"=>$returnPath,
 		Type=>$type,
 		From=>$from,
 		To=>$headers->{to},
@@ -267,8 +265,7 @@ sub create {
 		Date=>$session->datetime->epochToMail,
 		"X-Mailer"=>"WebGUI"
 		);
-#	$message->head->delete("Return-Path");
-#	$message->head->add("Return-Path",  "<". ($session->setting->get("mailReturnPath") || $from) . ">");
+	$message->head->add("X-Return-Path", $headers->{returnPath} || $session->setting->get("mailReturnPath") || $from);
 	$type = $headers->{contentType};
 	if ($session->config->get("emailOverride")) {
 		my $to = $headers->{to};
@@ -392,8 +389,8 @@ sub send {
 		} else {
 			my $smtp = Net::SMTP->new($self->session->setting->get("smtpServer")); # connect to an SMTP server
 			if (defined $smtp) {
-				$smtp->mail($self->{_message}->head->get("from"));     # use the sender's address here
-				$smtp->to(split(",",$self->{_message}->head->get("to")));             # recipient's address
+				$smtp->mail($self->{_message}->head->get("X-Return-Path")); 
+				$smtp->to(split(",",$self->{_message}->head->get("to"))); 
 				$smtp->cc(split(",",$self->{_message}->head->get("cc")));
 				$smtp->bcc(split(",",$self->{_message}->head->get("bcc")));
 				$smtp->data();              # Start the mail

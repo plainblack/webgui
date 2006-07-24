@@ -478,7 +478,11 @@ sub getAssetAdderLinks {
 	my $addToUrl = shift;
 	my $type = shift || "assets";
 	my %links;
-	foreach my $class (@{$self->session->config->get($type)}) {
+	my $classesInType = $self->session->config->get($type);
+	if (ref $classesInType ne "ARRAY") {
+		$classesInType = [];
+	}
+	foreach my $class (@{$classesInType}) {
 		next unless $class;
 		my %properties = (
 			className=>$class,
@@ -521,19 +525,21 @@ sub getAssetAdderLinks {
 	} else {
 		$constraint = $self->session->db->quoteAndJoin($self->session->config->get("assets"));
 	}
-	my $sth = $self->session->db->read("select asset.className,asset.assetId,assetData.revisionDate from asset left join assetData on asset.assetId=assetData.assetId where assetData.isPrototype=1 and asset.state='published' and asset.className in ($constraint) and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId) group by assetData.assetId");
-	while (my ($class,$id,$date) = $sth->array) {
-		my $asset = WebGUI::Asset->new($self->session,$id,$class,$date);
-		next unless ($asset->canView && $asset->canAdd($self->session) && $asset->getUiLevel <= $self->session->user->profileField("uiLevel"));
-		my $url = $self->getUrl("func=add;class=".$class.";prototype=".$id);
-		$url = $self->session->url->append($url,$addToUrl) if ($addToUrl);
-		$links{$asset->getTitle}{url} = $url;
-		$links{$asset->getTitle}{icon} = $asset->getIcon;
-		$links{$asset->getTitle}{'icon.small'} = $asset->getIcon(1);
-		$links{$asset->getTitle}{'isPrototype'} = 1;
-		$links{$asset->getTitle}{'asset'} = $asset;
+	if ($constraint) {
+		my $sth = $self->session->db->read("select asset.className,asset.assetId,assetData.revisionDate from asset left join assetData on asset.assetId=assetData.assetId where assetData.isPrototype=1 and asset.state='published' and asset.className in ($constraint) and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId) group by assetData.assetId");
+		while (my ($class,$id,$date) = $sth->array) {
+			my $asset = WebGUI::Asset->new($self->session,$id,$class,$date);
+			next unless ($asset->canView && $asset->canAdd($self->session) && $asset->getUiLevel <= $self->session->user->profileField("uiLevel"));
+			my $url = $self->getUrl("func=add;class=".$class.";prototype=".$id);
+			$url = $self->session->url->append($url,$addToUrl) if ($addToUrl);
+			$links{$asset->getTitle}{url} = $url;
+			$links{$asset->getTitle}{icon} = $asset->getIcon;
+			$links{$asset->getTitle}{'icon.small'} = $asset->getIcon(1);
+			$links{$asset->getTitle}{'isPrototype'} = 1;
+			$links{$asset->getTitle}{'asset'} = $asset;
+		}
+		$sth->finish;
 	}
-	$sth->finish;
 	my @sortedLinks;
 	foreach my $label (sort keys %links) {
 		push(@sortedLinks,{
