@@ -457,6 +457,9 @@ An alternative to the constructor "new", use find as a constructor by name rathe
 Returns the first group with that name found.  There is no guaranteed order of the search
 to be sure not to create groups with the same name!
 
+If the name of the group cannot be found, a new group will not be created.  This is
+due to how the constructor new handles the null id.
+
 =head3 session
 
 A reference to the current session.

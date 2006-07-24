@@ -91,7 +91,7 @@ sub getIp {
 
 =head2 new ( )
 
-Constructor. Returns a stow object.
+Constructor. Returns an env object.
 
 =cut
 

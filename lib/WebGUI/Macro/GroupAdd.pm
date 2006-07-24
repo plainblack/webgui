@@ -49,7 +49,7 @@ sub process {
 	return "" if ($param[1] eq "");
 	return "" if ($session->user->userId eq '1');
 	my $g = WebGUI::Group->find($param[0]);
-	return "" if ($g->getId eq "");
+	return "" unless defined $g->getId;
 	return "" unless ($g->autoAdd);
 	return "" if ($session->user->isInGroup($g->getId));
 	my %var = ();
