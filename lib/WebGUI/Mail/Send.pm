@@ -209,6 +209,10 @@ A single email address that this message will originate from. Defaults to the co
 
 A single email address that responses to this message will be sent to.
 
+=head4 returnPath
+
+The email address to send bounces to.
+
 =head4 contentType
 
 A mime type for the message. Defaults to "multipart/mixed".
@@ -248,7 +252,9 @@ sub create {
 	unless ($id =~ m/\@/) {
 		$id .= '@'.$domain;
 	}
+	my $returnPath = $headers->{returnPath} || $session->setting->get("mailReturnPath") || $from;
 	my $message = MIME::Entity->build(
+		"Return-Path"=>$returnPath,
 		Type=>$type,
 		From=>$from,
 		To=>$headers->{to},
@@ -261,8 +267,8 @@ sub create {
 		Date=>$session->datetime->epochToMail,
 		"X-Mailer"=>"WebGUI"
 		);
-	$message->head->delete("Return-Path");
-	$message->head->add("Return-Path",  "<". ($session->setting->get("mailReturnPath") || $from) . ">");
+#	$message->head->delete("Return-Path");
+#	$message->head->add("Return-Path",  "<". ($session->setting->get("mailReturnPath") || $from) . ">");
 	$type = $headers->{contentType};
 	if ($session->config->get("emailOverride")) {
 		my $to = $headers->{to};

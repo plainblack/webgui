@@ -44,7 +44,7 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 connect ( sessionh, params )
+=head2 connect ( session, params )
 
 Constructor. Opens a connection to a POP3 server.
 
@@ -191,6 +191,7 @@ sub getNextMessage {
 		subject => $subject,
 		inReplyTo => $inReplyTo,
 		messageId => $messageId,
+		"Return-Path" => $returnPath,
 		date => $self->session->datetime->mailToEpoch($head->get("Date")),
 		);
 	my @segments = ();

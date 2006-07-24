@@ -18,20 +18,22 @@ my $toVersion = "7.0.3"; # make this match what version you're going to
 my $quiet; # this line required
 
 
-sleep(1); # to prevent duplicate timestamps
+sleep(1); # todd prevent duplicate timestamps
 my $session = start(); # this line required
 
-# upgrade functions go here
+deleteTemplate();
 
 finish($session); # this line required
 
 
-##-------------------------------------------------
-#sub exampleFunction {
-#	my $session = shift;
-#	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
-#	# and here's our code
-#}
+#-------------------------------------------------
+sub deleteTemplate {
+	print "\tDeleting a template that was accidentally added.\n" unless ($quiet);
+	my $template = WebGUI::Asset->newByDynamicClass($session, "wCIc38CvNHUK7aY92Ww4SQ");
+	if (defined $template) {
+		$template->purge;
+	}
+}
 
 
 

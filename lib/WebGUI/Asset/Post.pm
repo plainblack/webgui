@@ -638,10 +638,16 @@ sub notifySubscribers {
 	my $message = $self->processTemplate($var, $cs->get("notificationTemplateId"));
 	my $unsubscribe = '<p><a href="'.$siteurl.$cs->getUnsubscribeUrl.'">'.$i18n->get("unsubscribe","Asset_Collaboration").'</a></p>';
 	my $user = WebGUI::User->new($self->session, $self->get("ownerUserId"));
-	my $from = $user->profileField("email") || $cs->get("mailAddress");
-	my $replyTo = $cs->get("mailAddress");
 	my $setting = $self->session->setting;
-	my $listId = $cs->get("mailAddress");
+	my $returnAddress = $setting->get("mailReturnPath");
+	my $companyAddress = $setting->get("companyEmail");
+	my $listAddress = $cs->get("mailAddress");
+	my $posterAddress = $user->profileField("email");
+	my $from = $posterAddress || $listAddress || $companyAddress;
+	my $replyTo = $listAddress || $returnAddress || $companyAddress;
+	my $sender = $listAddress || $companyAddress || $posterAddress;
+	my $returnPath = $returnAddress || $sender;
+	my $listId = $sender;
 	$listId =~ s/\@/\./;
 	my $domain = $cs->get("mailAddress");
 	$domain =~ s/.*\@(.*)/$1/;
@@ -653,6 +659,7 @@ sub notifySubscribers {
 	my $subject = $cs->get("mailPrefix").$self->get("title");
 	my $mail = WebGUI::Mail::Send->create($self->session, {
 		from=>"<".$from.">",
+		returnPath => "<".$returnPath.">",
 		replyTo=>"<".$replyTo.">",
 		toGroup=>$cs->get("subscriptionGroupId"),
 		subject=>$subject,
@@ -663,11 +670,16 @@ sub notifySubscribers {
 		$mail->addHeaderField("References", "<".$replyId.">");
 	}
 	$mail->addHeaderField("List-ID", $cs->getTitle." <".$listId.">");
-	$mail->addHeaderField("List-Help", "<mailto:".$setting->get("companyEmail").">, <".$setting->get("companyURL").">");
+	$mail->addHeaderField("List-Help", "<mailto:".$companyAddress.">, <".$setting->get("companyURL").">");
 	$mail->addHeaderField("List-Unsubscribe", "<".$siteurl.$cs->getUnsubscribeUrl.">");
 	$mail->addHeaderField("List-Subscribe", "<".$siteurl.$cs->getSubscribeUrl.">");
-	$mail->addHeaderField("List-Owner", "<mailto:".$setting->get("companyEmail").">, <".$setting->get("companyURL")."> (".$setting->get("companyName").")");
-	$mail->addHeaderField("List-Post", "<mailto:".$cs->get("mailAddress").">");
+	$mail->addHeaderField("List-Owner", "<mailto:".$companyAddress.">, <".$setting->get("companyURL")."> (".$setting->get("companyName").")");
+	$mail->addHeaderField("Sender", "<".$sender.">");
+	if ($listAddress eq "") {
+		$mail->addHeaderField("List-Post", "No");
+	} else {
+		$mail->addHeaderField("List-Post", "<mailto:".$listAddress.">");
+	}
 	$mail->addHeaderField("List-Archive", "<".$siteurl.$cs->getUrl.">");
 	$mail->addHeaderField("X-Unsubscribe-Web", "<".$siteurl.$cs->getUnsubscribeUrl.">");
 	$mail->addHeaderField("X-Subscribe-Web", "<".$siteurl.$cs->getSubscribeUrl.">");
@@ -677,6 +689,7 @@ sub notifySubscribers {
 	$mail->queue;
 	my $mail = WebGUI::Mail::Send->create($self->session, {
 		from=>"<".$from.">",
+		returnPath => "<".$returnPath.">",
 		replyTo=>"<".$replyTo.">",
 		toGroup=>$thread->get("subscriptionGroupId"),
 		subject=>$subject,
@@ -688,11 +701,16 @@ sub notifySubscribers {
 		$mail->addHeaderField("References", "<".$replyId.">");
 	}
 	$mail->addHeaderField("List-ID", $cs->getTitle." <".$listId.">");
-	$mail->addHeaderField("List-Help", "<mailto:".$setting->get("companyEmail").">, <".$setting->get("companyURL").">");
+	$mail->addHeaderField("List-Help", "<mailto:".$companyAddress.">, <".$setting->get("companyURL").">");
 	$mail->addHeaderField("List-Unsubscribe", "<".$siteurl.$thread->getUnsubscribeUrl.">");
 	$mail->addHeaderField("List-Subscribe", "<".$siteurl.$thread->getSubscribeUrl.">");
-	$mail->addHeaderField("List-Owner", "<mailto:".$setting->get("companyEmail").">, <".$setting->get("companyURL")."> (".$setting->get("companyName").")");
-	$mail->addHeaderField("List-Post", "<mailto:".$cs->get("mailAddress").">");
+	$mail->addHeaderField("List-Owner", "<mailto:".$companyAddress.">, <".$setting->get("companyURL")."> (".$setting->get("companyName").")");
+	if ($listAddress eq "") {
+		$mail->addHeaderField("List-Post", "No");
+	} else {
+		$mail->addHeaderField("List-Post", "<mailto:".$listAddress.">");
+	}
+	$mail->addHeaderField("Sender", "<".$sender.">");
 	$mail->addHeaderField("List-Archive", "<".$siteurl.$cs->getUrl.">");
 	$mail->addHeaderField("X-Unsubscribe-Web", "<".$siteurl.$thread->getUnsubscribeUrl.">");
 	$mail->addHeaderField("X-Subscribe-Web", "<".$siteurl.$thread->getSubscribeUrl.">");
