@@ -102,8 +102,42 @@ sub filter {
 	my $html = shift;
 	my $type = shift;
 	if ($type eq "all") {
-		my $filter = HTML::TagFilter->new(allow=>{'none'},strip_comments=>1);
-		$html = $filter->filter($html);
+		#Hash used to keep track of depth within tags
+		my %html_parser_inside_tag; 
+		#String containing text output from HTML::Parser
+		my $html_parser_text = "" ;
+		#Hash containing HTML tags (as keys) that create whitespace when rendered by the browser
+		my %html_parser_whitespace_tags = ('p'=>1, 'br'=>1, 'hr'=>1, 'td'=>1, 'th'=>1, 
+													  'tr'=>1, 'table'=>1, 'ul'=>1, 'li'=>1, 'div'=>1) ;
+		#HTML::Parser event handler called at the start and end of each HTML tag, adds whitespace (if necessary) 
+		#to output if the tag creates whitespace.  This was done to keep text from running together inappropriately.
+		my $html_parser_tag_sub = sub {
+			my($tag, $num) = @_;
+			$html_parser_inside_tag{$tag} += $num;
+			if ($html_parser_whitespace_tags{$tag} && 
+			    ($html_parser_text =~ /\S$/)) { #add space only if no preceeding space
+				$html_parser_text .= " "  ;
+   		}
+		} ;
+		#HTML::Parser event handler called with non-tag text (no tags)
+		my $html_parser_text_sub = sub {
+			return if $html_parser_inside_tag{script} || $html_parser_inside_tag{style}; # do not output text
+			$html_parser_text .= $_[0] ;
+		} ;
+		my $parser = HTML::Parser->new(api_version => 3,
+		  handlers => [start => [$html_parser_tag_sub, 
+   					 "tagname, '+1'"],
+			       end   => [$html_parser_tag_sub, 
+   					 "tagname, '-1'"],
+			       text  => [$html_parser_text_sub, 
+					 "text"]
+			      ],
+		  marked_sections => 1,
+		) ;
+		$parser->parse($html) ;
+		$parser->eof() ;
+		$html = $html_parser_text ;
+		$html =~ s/&nbsp;/ /ixsg ;
 		WebGUI::Macro::negate(\$html);
 	} elsif ($type eq "javascript") {
 		$html =~ s/\<script.*?\/script\>//ixsg;

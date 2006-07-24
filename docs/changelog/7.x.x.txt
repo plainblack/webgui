@@ -21,6 +21,8 @@
    doesn't work.
  - Fixed a cross-Matrix linking problem when you have two or more Matricies on
    one site with the same category names.
+ - fix: Revised WebGUI::HTML::filter "all" so that text does not run together when
+   tags are removed. Added additional tests to HTML.t. (Eric Kennedy)
 
 
 7.0.2
