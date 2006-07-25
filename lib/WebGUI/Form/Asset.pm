@@ -112,7 +112,7 @@ sub toHtml {
                         )->toHtml
                 .WebGUI::Form::Button->new($self->session,
                         value=>"...",
-                        extras=>'onclick="window.open(\''.$url.'\',\'assetPicker\',\'toolbar=no, location=no, status=no, directories=no, width=400, height=400\');"'
+                        extras=>'onclick="window.open(\''.$url.'\',\'assetPicker\',\'scrollbars=yes, toolbar=no, location=no, status=no, directories=no, width=400, height=400\');"'
                         )->toHtml;
 }
 

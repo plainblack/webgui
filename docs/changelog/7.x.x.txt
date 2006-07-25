@@ -52,6 +52,7 @@
  - Added the arrayRef() method to WebGUI::SQL::ResultSet, which is 12% faster
    than the array() method.
  - Added more tests to the test suite.
+ - fix: Search Feature Select Box Not Working
 
 
 7.0.2

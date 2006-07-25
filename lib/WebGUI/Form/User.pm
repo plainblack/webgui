@@ -114,7 +114,7 @@ sub toHtml {
                         )->toHtml
                 .($self->get('readOnly')?'':WebGUI::Form::Button->new($self->session,
                         value=>"...",
-                        extras=>'onclick="window.open(\''.$self->session->url->page("op=formUsers;formId=".$self->get('id')).'\',\'userPicker\',\'toolbar=no, location=no, status=no, directories=no, width=400, height=400\');"'
+                        extras=>'onclick="window.open(\''.$self->session->url->page("op=formUsers;formId=".$self->get('id')).'\',\'userPicker\',\'toolbar=no, location=no, status=no, directories=no, width=400, height=400, scrollbars=yes\');"'
                         )->toHtml).$manage;
 }
 
