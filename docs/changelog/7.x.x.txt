@@ -49,6 +49,9 @@
  - fix: assetUiLevel override broken
  - fix: Indexing files failes (derck)
  - fix: Unable to approve New listings on Matrix
+ - Added the arrayRef() method to WebGUI::SQL::ResultSet, which is 12% faster
+   than the array() method.
+ - Added more tests to the test suite.
 
 
 7.0.2

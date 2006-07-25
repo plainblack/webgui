@@ -17,7 +17,7 @@ use WebGUI::Session;
 use Data::Dumper;
 use Test::Deep;
 
-use Test::More tests => 49; # increment this value for each test you create
+use Test::More tests => 50; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -27,6 +27,10 @@ ok(my $sth = $session->db->read("select * from settings"), "read()");
 # array
 my @row = $sth->array;
 is(@row, 2, "array()");
+
+# arrayRef
+my $row = $sth->arrayRef;
+is(@{$row}, 2, "arrayRef()");
 
 # getColumnNames
 my @columnNames = $sth->getColumnNames;
