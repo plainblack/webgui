@@ -54,9 +54,9 @@ sub definition {
 	my %priorities = ();
 	tie %priorities, 'Tie::IxHash';
 	%priorities = (1=>$i18n->get("high"), 2=>$i18n->get("medium"), 3=>$i18n->get("low"));
-	push(@{$definition}, {
-		name=>$i18n->get("create cron job"),
-		properties=> { 
+	my %properties = ();
+	tie %properties, 'Tie::IxHash';
+	%properties =		( 
 			enabled=>{
 				fieldType=>"yesNo",
 				defaultValue=>0,
@@ -113,7 +113,10 @@ sub definition {
 				label=>$i18n->get("day of week"),
 				hoverHelp=>$i18n->get("day of week help")
 				}
-			}
+			);
+	push(@{$definition}, {
+		name=>$i18n->get("create cron job"),
+		properties=> \%properties
 		});
 	return $class->SUPER::definition($session,$definition);
 }
