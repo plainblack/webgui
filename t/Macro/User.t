@@ -22,9 +22,8 @@ use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-unless ($session->config->get('macros')->{'User'}) {
-	Macro_Config::insert_macro($session, 'User', 'User');
-}
+my @added_macros = ();
+push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'User', 'User');
 
 my @testSets = (
 	{
@@ -89,5 +88,9 @@ sub setupTest {
 END { ##Clean-up after yourself, always
 	foreach my $dude (@users) {
 		$dude->delete if (defined $dude and ref $dude eq 'WebGUI::User');
+	}
+	foreach my $macro (@added_macros) {
+		next unless $macro;
+		$session->config->deleteFromHash("macros", $macro);
 	}
 }

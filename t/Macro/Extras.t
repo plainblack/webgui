@@ -21,9 +21,8 @@ use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-unless ($session->config->get('macros')->{'Extras'}) {
-	Macro_Config::insert_macro($session, 'Extras', 'Extras');
-}
+my @added_macros = ();
+push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'Extras', 'Extras');
 
 my @testSets = (
 	{ ##Just get the extras path
@@ -57,5 +56,12 @@ foreach my $testSet (@testSets) {
 	my $macro = $output;
 	WebGUI::Macro::process($session, \$output);
 	is($output, $testSet->{output}, 'testing '.$macro);
+}
+
+END {
+	foreach my $macro (@added_macros) {
+		next unless $macro;
+		$session->config->deleteFromHash("macros", $macro);
+	}
 }
 

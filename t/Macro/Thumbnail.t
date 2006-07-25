@@ -27,9 +27,8 @@ plan tests => 7;
 
 my $session = WebGUI::Test->session;
 
-unless ($session->config->get('macros')->{'Thumbnail'}) {
-	Macro_Config::insert_macro($session, 'Thumbnail', 'Thumbnail');
-}
+my @added_macros = ();
+push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'Thumbnail', 'Thumbnail');
 
 my $square = WebGUI::Image->new($session, 100, 100);
 $square->setBackgroundColor('#0000FF');
@@ -93,4 +92,8 @@ END {
 		$versionTag->rollback;
 	}
 	##Storage is cleaned up by rolling back the version tag
+	foreach my $macro (@added_macros) {
+		next unless $macro;
+		$session->config->deleteFromHash("macros", $macro);
+	}
 }

@@ -41,15 +41,20 @@ my $numTests = scalar @testSets;
 
 plan tests => $numTests;
 
-
 my $session = WebGUI::Test->session;
 
-unless ($session->config->get('macros')->{'D'}) {
-	Macro_Config::insert_macro($session, 'D', 'Date');
-}
+my @added_macros = ();
+push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'D', 'Date');
 
 foreach my $testSet (@testSets) {
 	$output = sprintf $macroText, $testSet->{format}, $wgbday;
 	WebGUI::Macro::process($session, \$output);
 	is($output, $testSet->{output}, 'testing '.$testSet->{format});
+}
+
+END {
+	foreach my $macro (@added_macros) {
+		next unless $macro;
+		$session->config->deleteFromHash("macros", $macro);
+	}
 }

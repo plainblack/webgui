@@ -23,9 +23,9 @@ use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-unless ($session->config->get('macros')->{'AdminToggle'}) {
-	Macro_Config::insert_macro($session, 'AdminToggle', 'AdminToggle');
-}
+
+my @added_macros = ();
+push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'AdminToggle', 'AdminToggle');
 
 my ($versionTag, $template) = addTemplate();
 
@@ -191,5 +191,9 @@ sub simpleTextParser {
 END {
 	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
 		$versionTag->rollback;
+	}
+	foreach my $macro (@added_macros) {
+		next unless $macro;
+		$session->config->deleteFromHash("macros", $macro);
 	}
 }

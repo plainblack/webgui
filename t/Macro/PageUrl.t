@@ -22,10 +22,8 @@ use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-unless ($session->config->get('macros')->{'PageUrl'}) {
-	Macro_Config::insert_macro($session, 'PageUrl', 'PageUrl');
-}
-
+my @added_macros = ();
+push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'PageUrl', 'PageUrl');
 
 my $macroText = '^PageUrl;';
 my $output;
@@ -45,4 +43,11 @@ is($output, $session->url->gateway.$homeAsset->get('url'), 'fetching url for sit
 TODO: {
 	local $TODO = "Tests to make later";
 	ok(0, 'Fetch url from locally made asset with known url');
+}
+
+END {
+	foreach my $macro (@added_macros) {
+		next unless $macro;
+		$session->config->deleteFromHash("macros", $macro);
+	}
 }

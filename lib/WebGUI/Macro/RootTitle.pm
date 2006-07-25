@@ -25,7 +25,7 @@ Macro for returning the title of the root for this page.
 
 If an asset exists in the session variable cache and and it's
 topmost parent (root) can be found the title for that asset
-is returned.  Otherwise a space is returned.
+is returned.  Otherwise an empty string is returned.
 
 =cut
 

@@ -18,12 +18,9 @@ use WebGUI::Session;
 use Data::Dumper;
 use WebGUI::Macro_Config;
 
-my $session = WebGUI::Test->session;
+use Test::More; # increment this value for each test you create
 
-#This test is to verify bugs with respect to Macros:
-# - [ 1364838 ] ^GroupText Macro cannot execute other macros
-#
-# It also checks some macros which pull data out of the setting table.
+my $session = WebGUI::Test->session;
 
 my @settingMacros = (
 	{
@@ -40,36 +37,28 @@ my @settingMacros = (
 	},
 );
 
-use Test::More; # increment this value for each test you create
-
-##Build a reverse hash of the macro settings in the session var so that
-##we can lookup the aliases for each macro.
-
-my %macroNames = reverse %{ $session->config->get('macros') };
-
-my $settingMacros = 0;
-
+##Build a reversed hash so we know how to call the macros based on
+##their name
+my @added_macros = ();
 foreach my $macro ( @settingMacros ) {
-	++$settingMacros;
-	if (exists $macroNames{ $macro->{macro} }) {
-		$macro->{shortcut} = $macroNames{ $macro->{macro} };
-	}
-	else {
-		Macro_Config::insert_macro($session, $macro->{macro}, $macro->{macro});
-		$macro->{shortcut} = $macro->{macro};
-	}
+	$macro->{shortcut} = $macro->{macro};
+	push @added_macros,
+		WebGUI::Macro_Config::enable_macro($session, $macro->{shortcut}, $macro->{macro});
 }
 
-my $numTests = $settingMacros;
-
-plan tests => $numTests;
+plan tests => scalar @settingMacros;
 
 foreach my $macro ( @settingMacros ) {
 	my ($value) = $session->dbSlave->quickArray(
-		sprintf "select value from settings where name=%s",
-			$session->db->quote($macro->{settingKey})
-	);
+		"select value from settings where name=?", [$macro->{settingKey}]);
 	my $macroVal = sprintf "^%s();", $macro->{shortcut};
 	WebGUI::Macro::process($session, \$macroVal);
 	is($value, $macroVal, sprintf "Testing %s", $macro->{macro});
+}
+
+END {
+	foreach my $macro (@added_macros) {
+		next unless $macro;
+		$session->config->deleteFromHash("macros", $macro);
+	}
 }

@@ -22,9 +22,8 @@ use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-unless ($session->config->get('macros')->{'Page'}) {
-	Macro_Config::insert_macro($session, 'Page', 'Page');
-}
+my @added_macros = ();
+push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'Page', 'Page');
 
 ##Add more Asset configurations here.
 my @testSets = (
@@ -89,4 +88,8 @@ sub setupTest {
 
 END { ##Clean-up after yourself, always
 	$versionTag->rollback;
+	foreach my $macro (@added_macros) {
+		next unless $macro;
+		$session->config->deleteFromHash("macros", $macro);
+	}
 }

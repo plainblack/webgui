@@ -21,9 +21,8 @@ use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-unless ($session->config->get('macros')->{'LastModified'}) {
-	Macro_Config::insert_macro($session, 'LastModified', 'LastModified');
-}
+my @added_macros = ();
+push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'LastModified', 'LastModified');
 
 my $homeAsset = WebGUI::Asset->getDefault($session);
 
@@ -70,4 +69,11 @@ TODO: {
 	local $TODO = "Tests to make later";
 	ok(0, 'Check label and format');
 	ok(0, 'Create asset with revisionDate = 0 and check label "never"');
+}
+
+END {
+	foreach my $macro (@added_macros) {
+		next unless $macro;
+		$session->config->deleteFromHash("macros", $macro);
+	}
 }

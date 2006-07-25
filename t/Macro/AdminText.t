@@ -26,10 +26,8 @@ my $numTests = 4;
 
 plan tests => $numTests;
 
-
-unless ($session->config->get('macros')->{'AdminText'}) {
-	Macro_Config::insert_macro($session, 'AdminText', 'AdminText');
-}
+my @added_macros = ();
+push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'AdminText', 'AdminText');
 
 my $adminText = "^AdminText(admin);";
 my $output;
@@ -52,3 +50,10 @@ $session->var->switchAdminOff;
 $output = $adminText;
 WebGUI::Macro::process($session, \$output);
 is($output, '', 'user is admin, not in admin mode');
+
+END {
+	foreach my $macro (@added_macros) {
+		next unless $macro;
+		$session->config->deleteFromHash("macros", $macro);
+	}
+}

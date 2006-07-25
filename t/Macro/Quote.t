@@ -22,10 +22,8 @@ use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-unless ($session->config->get('macros')->{'Quote'}) {
-	Macro_Config::insert_macro($session, 'Quote', 'Quote');
-}
-
+my @added_macros = ();
+push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'Quote', 'Quote');
 
 my $macroText = '^Quote("%s");';
 my $output;
@@ -54,4 +52,11 @@ foreach my $testSet (@testSets) {
 	$output = sprintf $macroText, $testSet->{input};
 	WebGUI::Macro::process($session, \$output);
 	is($output, $testSet->{output}, 'testing '.$testSet->{input});
+}
+
+END {
+	foreach my $macro (@added_macros) {
+		next unless $macro;
+		$session->config->deleteFromHash("macros", $macro);
+	}
 }

@@ -22,10 +22,8 @@ use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-unless ($session->config->get('macros')->{'PageTitle'}) {
-	Macro_Config::insert_macro($session, 'PageTitle', 'PageTitle');
-}
-
+my @added_macros = ();
+push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'PageTitle', 'PageTitle');
 
 my $macroText = '^PageTitle;';
 my $output;
@@ -45,4 +43,11 @@ is($output, $homeAsset->get('title'), 'fetching title for site default asset');
 TODO: {
 	local $TODO = "Tests to make later";
 	ok(0, 'Fetch title from locally made asset with known title');
+}
+
+END {
+	foreach my $macro (@added_macros) {
+		next unless $macro;
+		$session->config->deleteFromHash("macros", $macro);
+	}
 }

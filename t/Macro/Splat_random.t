@@ -30,9 +30,8 @@ use Data::Dumper;
 
 plan tests => 4;
 
-unless ($session->config->get('macros')->{'Splat_random'}) {
-	Macro_Config::insert_macro($session, '*', 'Splat_random');
-}
+my @added_macros = ();
+push @added_macros, WebGUI::Macro_Config::enable_macro($session, '*', 'Splat_random');
 
 my $macroText = q!^*(%s);!;
 my $output;
@@ -74,3 +73,10 @@ WHOLE: for (my $i=0; $i<=999; $i++) {
 is(scalar(@bins), 4, "All bins have values on a sample size of 1000");
 
 #diag Dumper \@bins;
+
+END {
+	foreach my $macro (@added_macros) {
+		next unless $macro;
+		$session->config->deleteFromHash("macros", $macro);
+	}
+}

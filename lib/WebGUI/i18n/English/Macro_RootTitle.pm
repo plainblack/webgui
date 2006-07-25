@@ -17,8 +17,10 @@ our $I18N = {
 <p><b>&#94;RootTitle;</b><br />
 Returns the title of the root of the current page. For instance, the main root in WebGUI is the "Home" page. Many advanced sites have many roots and thus need a way to display to the user which root they are in.
 </p>
+<p>If the macro is called outside of an asset, or if the root can't be found, then
+the macro returns an empty string</p>
 |,
-		lastUpdated => 1146609161,
+		lastUpdated => 1153849842,
 	},
 };
 

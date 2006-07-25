@@ -23,9 +23,8 @@ use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-unless ($session->config->get('macros')->{'Spacer'}) {
-	Macro_Config::insert_macro($session, 'Spacer', 'Spacer');
-}
+my @added_macros = ();
+push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'Spacer', 'Spacer');
 
 my @testSets = (
 	{
@@ -85,4 +84,11 @@ sub simpleHTMLParser {
 	my $style  = $token->[1]{style} || "";
 
 	return ($width, $height, $src, $alt, $style);
+}
+
+END {
+	foreach my $macro (@added_macros) {
+		next unless $macro;
+		$session->config->deleteFromHash("macros", $macro);
+	}
 }

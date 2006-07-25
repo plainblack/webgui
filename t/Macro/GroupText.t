@@ -25,9 +25,8 @@ use Test::More; # increment this value for each test you create
 
 plan tests => 3 + 4;
 
-unless ($session->config->get('macros')->{'GroupText'}) {
-	Macro_Config::insert_macro($session, 'GroupText', 'GroupText');
-}
+my @added_macros = ();
+push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'GroupText', 'GroupText');
 
 my $macroText = q!^GroupText("Admins","admin","visitor");!;
 my $output;
@@ -116,5 +115,9 @@ END {
 		$dude->delete if (defined $dude and ref $dude eq 'WebGUI::User');
 	}
 	$session->db->dbh->do('DROP TABLE IF EXISTS myUserTable');
+	foreach my $macro (@added_macros) {
+		next unless $macro;
+		$session->config->deleteFromHash("macros", $macro);
+	}
 }
 

@@ -23,9 +23,8 @@ use HTML::TokeParser;
 
 my $session = WebGUI::Test->session;
 
-unless ($session->config->get('macros')->{'GroupDelete'}) {
-	Macro_Config::insert_macro($session, 'GroupDelete', 'GroupDelete');
-}
+my @added_macros = ();
+push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'GroupDelete', 'GroupDelete');
 
 my $homeAsset = WebGUI::Asset->getDefault($session);
 my ($versionTag, $template, $groups, $users) = setupTest($session, $homeAsset);
@@ -215,5 +214,9 @@ END { ##Clean-up after yourself, always
 	}
 	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
 		$versionTag->rollback;
+	}
+	foreach my $macro (@added_macros) {
+		next unless $macro;
+		$session->config->deleteFromHash("macros", $macro);
 	}
 }

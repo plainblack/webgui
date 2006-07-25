@@ -24,9 +24,8 @@ my $session = WebGUI::Test->session;
 
 use Test::More; # increment this value for each test you create
 
-unless ($session->config->get('macros')->{'#'}) {
-	Macro_Config::insert_macro($session, '#', 'Hash_userId');
-}
+my @added_macros = ();
+push @added_macros, WebGUI::Macro_Config::enable_macro($session, '#', 'Hash_userId');
 
 my @testSets = (
 	{
@@ -48,4 +47,11 @@ foreach my $testSet (@testSets) {
 	my $output = "^#;";
 	WebGUI::Macro::process($session, \$output);
 	is($output, $testSet->{userId}, 'testing '.$testSet->{comment});
+}
+
+END {
+	foreach my $macro (@added_macros) {
+		next unless $macro;
+		$session->config->deleteFromHash("macros", $macro);
+	}
 }

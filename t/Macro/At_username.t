@@ -26,10 +26,8 @@ my $numTests = 2;
 
 plan tests => $numTests;
 
-
-unless ($session->config->get('macros')->{'@'}) {
-	Macro_Config::insert_macro($session, '@', 'At_username');
-}
+my @added_macros = ();
+push @added_macros, WebGUI::Macro_Config::enable_macro($session, '@', 'At_username');
 
 my $macroText = "^@;";
 my $output;
@@ -42,3 +40,10 @@ $output = $macroText;
 $session->user({userId => 3});
 WebGUI::Macro::process($session, \$output);
 is($output, 'Admin', 'username = Admin');
+
+END {
+	foreach my $macro (@added_macros) {
+		next unless $macro;
+		$session->config->deleteFromHash("macros", $macro);
+	}
+}

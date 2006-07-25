@@ -21,10 +21,8 @@ use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-unless ($session->config->get('macros')->{'FetchMimeType'}) {
-	Macro_Config::insert_macro($session, 'FetchMimeType', 'FetchMimeType');
-}
-
+my @added_macros = ();
+push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'FetchMimeType', 'FetchMimeType');
 
 my $macroText = '^FetchMimeType("%s");';
 my $output;
@@ -62,4 +60,11 @@ foreach my $testSet (@testSets) {
 	$output = sprintf $macroText, $file;
 	WebGUI::Macro::process($session, \$output);
 	is($output, $testSet->{output}, $testSet->{comment} );
+}
+
+END {
+	foreach my $macro (@added_macros) {
+		next unless $macro;
+		$session->config->deleteFromHash("macros", $macro);
+	}
 }

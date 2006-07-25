@@ -22,14 +22,9 @@ use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-unless ($session->config->get('macros')->{'SQL'}) {
-	Macro_Config::insert_macro($session, 'SQL', 'SQL');
-}
-
-unless ($session->config->get('macros')->{'/'}) {
-	Macro_Config::insert_macro($session, '/', 'Slash_gatewayUrl');
-}
-
+my @added_macros = ();
+push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'SQL', 'SQL');
+push @added_macros, WebGUI::Macro_Config::enable_macro($session, '/', 'Slash_gatewayUrl');
 
 my $macroText = '^SQL("%s","%s");';
 
@@ -101,3 +96,10 @@ foreach my $testSet (@testSets) {
 }
 
 $session->db->dbh->do('DROP TABLE testTable');
+
+END {
+	foreach my $macro (@added_macros) {
+		next unless $macro;
+		$session->config->deleteFromHash("macros", $macro);
+	}
+}

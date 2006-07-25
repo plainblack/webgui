@@ -23,9 +23,8 @@ use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-unless ($session->config->get('macros')->{'a_account'}) {
-	Macro_Config::insert_macro($session, 'a', 'a_account');
-}
+my @added_macros = ();
+push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'a', 'a_account');
 
 # <a class="myAccountLink" href="<tmpl_var account.url>"><tmpl_var account.text></a>
 my ($versionTag, $template) = addTemplate();
@@ -131,5 +130,9 @@ sub simpleTextParser {
 END {
 	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
 		$versionTag->rollback;
+	}
+	foreach my $macro (@added_macros) {
+		next unless $macro;
+		$session->config->deleteFromHash("macros", $macro);
 	}
 }
