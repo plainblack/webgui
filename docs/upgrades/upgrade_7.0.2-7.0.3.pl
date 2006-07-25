@@ -22,9 +22,16 @@ sleep(1); # todd prevent duplicate timestamps
 my $session = start(); # this line required
 
 deleteTemplate();
+addConfigOption();
 
 finish($session); # this line required
 
+
+#-------------------------------------------------
+sub addConfigOption {
+	print "\tAdding save and commit option.\n" unless ($quiet);
+	$session->config->set("enableSaveAndCommit", 0);
+}
 
 #-------------------------------------------------
 sub deleteTemplate {

@@ -53,6 +53,8 @@
    than the array() method.
  - Added more tests to the test suite.
  - fix: Search Feature Select Box Not Working
+ - Added "Save and Commit" option for environments where the appearance of
+   workflow is unwanted.
 
 
 7.0.2

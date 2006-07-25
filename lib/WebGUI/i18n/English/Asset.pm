@@ -1,6 +1,12 @@
 package WebGUI::i18n::English::Asset;
 
 our $I18N = {
+	'save and commit' => {
+		message => q|save &amp; commit|,
+		lastUpdated => 0,
+		context => q|A button added to all asset properties pages when save and commit mode is enabled.|
+	},
+
 	'add the missing page' => {
 		message => q|Add the missing page.|,
 		lastUpdated => 0,

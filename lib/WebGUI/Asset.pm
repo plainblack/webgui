@@ -603,6 +603,9 @@ sub getEditForm {
 	my $uiLevelOverride = $self->get("className");
 	$uiLevelOverride =~ s/\:\:/_/g;
 	my $tabform = WebGUI::TabForm->new($self->session,undef,undef,$self->getUrl(),$uiLevelOverride);
+	if ($self->session->config->get("enableSaveAndCommit")) {
+		$tabform->submitAppend(WebGUI::Form::submit($self->session, {name=>"saveAndCommit", value=>$i18n->get("save and commit")}));
+	}
 	$tabform->hidden({
 		name=>"func",
 		value=>"editSave"
@@ -1963,6 +1966,10 @@ sub www_editSave {
 	}
 
 	$object->updateHistory("edited");
+	if ($self->session->form->process("saveAndCommit") ne "") {
+		$self->session->http->setRedirect($self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId));
+		return "1";
+	}
 	if ($self->session->form->process("proceed") eq "manageAssets") {
 		$self->session->asset($object->getParent);
 		return $self->session->asset->www_manageAssets;

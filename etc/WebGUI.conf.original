@@ -214,6 +214,11 @@
 #	"WebGUI:::Asset::Template" : 4
 #	},
 
+# Optionally add a "Save and Commit" button to assets so that you
+# don't have to hit "Commit My Changes" seperately.
+
+"enableSaveAndCommit" : 0,
+
 # Optionally override the default UI Level of any asset. This
 # determines whether the current user has the appropriate UI Level
 # to add assets of that type.
@@ -355,14 +360,15 @@
 	"WebGUI::Image::Graph::XYGraph::Line"
 	],
 
-#Optional script to run upon successful login.  The script can contain macros
+# Optional script to run upon successful login.  The script can contain macros
 # ex: /data/WebGUI/sbin/doLogin.pl --configFile=dev.localhost.localdomain.conf --loginPage=^PageUrl();
 
 "runOnLogin" : "",
 
-#Optional script to run upon successful logout.  The script can contain macros
-# ex: /data/WebGUI/sbin/doLogout.pl --configFile=dev.localhost.localdomain.conf --logoutPage=^PageUrl();
+# Optional script to run upon successful logout.  The script can contain macros
+# Example: /data/WebGUI/sbin/doLogout.pl --configFile=dev.localhost.localdomain.conf --logoutPage=^PageUrl();
 
 "runOnLogout" : ""
+
 }
 

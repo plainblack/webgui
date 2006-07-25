@@ -280,6 +280,19 @@ sub submit {
 	$self->{_submit} = WebGUI::Form::Submit($self->session,$submit);
 }
 
+#-------------------------------------------------------------------
+
+=head2 submitAppend ( html )
+
+Appends some HTML to the submit button.
+
+=cut
+
+sub submitAppend {
+	my $self = shift;
+	my $html = shift;
+	$self->{_submit} .= $html;
+}
 
 1;
 
