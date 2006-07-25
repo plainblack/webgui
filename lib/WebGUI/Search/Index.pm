@@ -50,7 +50,7 @@ The path to the filename to index, including the filename.
 sub addFile {
 	my $self = shift;
 	my $path = shift;
-	$path =~ m/\.(\w)$/;
+	$path =~ m/\.(\w+)$/; 
 	my $type = lc($1);
 	my $filters = $self->session->config->get("searchIndexerPlugins");
 	my $filter = $filters->{$type};

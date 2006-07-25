@@ -360,26 +360,24 @@ sub www_manageVersions {
 	my $commitPrompt = $i18n->get("commit version tag confirm");
 	my $output = '<p>'.$i18n->get("current tag is called").': <b>'.$tag.'</b>.</p><table width="100%" class="content">
 	<tr><th></th><th>'.$i18n->get("version tag name").'</th><th>'.$i18n->get("created on").'</th><th>'.$i18n->get("created by").'</th><th></th></tr> ';
-	my $sth = $session->db->read("select tagId,name,creationDate,createdBy,groupToUse from assetVersionTag where isCommitted=0 and isLocked=0");
-	while (my ($id,$name,$date,$by,$group) = $sth->array) {
-		next unless ($session->user->isInGroup($group));
-		my $u = WebGUI::User->new($session,$by);
+	foreach my $tag (@{WebGUI::VersionTag->getOpenTags($session)}) {	
+		next unless ($session->user->isInGroup($tag->get("groupToUse")));
+		my $u = WebGUI::User->new($session,$tag->get("createdBy"));
 		$output .= '<tr>
 			<td>'
-				.$session->icon->delete("op=rollbackVersionTag;tagId=".$id,undef,$rollbackPrompt)
-				.$session->icon->edit("op=editVersionTag;tagId=".$id)
+				.$session->icon->delete("op=rollbackVersionTag;tagId=".$tag->getId,undef,$rollbackPrompt)
+				.$session->icon->edit("op=editVersionTag;tagId=".$tag->getId)
 			.'</td>
-			<td><a href="'.$session->url->page("op=manageRevisionsInTag;tagId=".$id).'">'.$name.'</a></td>
-			<td>'.$session->datetime->epochToHuman($date).'</td>
+			<td><a href="'.$session->url->page("op=manageRevisionsInTag;tagId=".$tag->getId).'">'.$tag->get("name").'</a></td>
+			<td>'.$session->datetime->epochToHuman($tag->get("creationDate")).'</td>
 			<td>'.$u->username.'</td>
 			<td>';
-		unless ($workingTagId eq $id) {
-			$output .= '<a href="'.$session->url->page("op=setWorkingVersionTag;tagId=".$id).'">'.$setTag.'</a> | ';
+		unless ($workingTagId eq $tag->getId) {
+			$output .= '<a href="'.$session->url->page("op=setWorkingVersionTag;tagId=".$tag->getId).'">'.$setTag.'</a> | ';
 		}
 		$output .='
-			<a href="'.$session->url->page("op=commitVersionTag;tagId=".$id).'" onclick="return confirm(\''.$commitPrompt.'\');">'.$commit.'</a></td></tr>';
+			<a href="'.$session->url->page("op=commitVersionTag;tagId=".$tag->getId).'" onclick="return confirm(\''.$commitPrompt.'\');">'.$commit.'</a></td></tr>';
 	}
-	$sth->finish;	
 	$output .= '</table>';
 	return $ac->render($output);
 }

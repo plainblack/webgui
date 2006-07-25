@@ -192,6 +192,7 @@ if ($self->session->user->isInGroup(2)) {
 	my $style = WebGUI::Asset::Template->new($self->session,$templateId);
 	my $output;
 	if (defined $style) {
+		$var{'head.tags'} .= $style->get("headBlock");
 		$output = $style->process(\%var);
 	} else {
 		$output = "WebGUI was unable to instantiate your style template.".$var{'body.content'};

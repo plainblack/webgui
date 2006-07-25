@@ -490,32 +490,28 @@ sub getAssetAdderLinks {
 		);
 		my $newAsset = WebGUI::Asset->newByPropertyHashRef($self->session,\%properties);
 		next unless $newAsset;
-		#use Data::Dumper; print Dumper($newAsset);
 		my $uiLevel = eval{$newAsset->getUiLevel()};
 		if ($@) {
 			$self->session->errorHandler->error("Couldn't get UI level of ".$class.". Root cause: ".$@);
 			next;
-		} else {
-			next if ($uiLevel > $self->session->user->profileField("uiLevel") && !$self->session->user->isInGroup(3));
 		}
+		next if ($uiLevel > $self->session->user->profileField("uiLevel"));# && !$self->session->user->isInGroup(3));
 		my $canAdd = eval{$class->canAdd($self->session)};
 		if ($@) {
 			$self->session->errorHandler->error("Couldn't determine if user can add ".$class." because ".$@);
 			next;
-		} else {
-			next unless ($canAdd);
-		}
+		} 
+		next unless ($canAdd);
 		my $label = eval{$newAsset->getName()};
 		if ($@) {
 			$self->session->errorHandler->error("Couldn't get the name of ".$class."because ".$@);
 			next;
-		} else {
-			my $url = $self->getUrl("func=add;class=".$class);
-			$url = $self->session->url->append($url,$addToUrl) if ($addToUrl);
-			$links{$label}{url} = $url;
-			$links{$label}{icon} = $newAsset->getIcon;
-			$links{$label}{'icon.small'} = $newAsset->getIcon(1);
 		}
+		my $url = $self->getUrl("func=add;class=".$class);
+		$url = $self->session->url->append($url,$addToUrl) if ($addToUrl);
+		$links{$label}{url} = $url;
+		$links{$label}{icon} = $newAsset->getIcon;
+		$links{$label}{'icon.small'} = $newAsset->getIcon(1);
 	}
 	my $constraint;
 	if ($type eq "assetContainers") {
@@ -984,14 +980,12 @@ Returns the UI Level specified in the asset definition or from the config file i
 sub getUiLevel {
 	my $self = shift;
 	my $definition = $self->get("className")->definition($self->session);
-	my $uilevel = $self->session->config->get("assetUiLevel");
-	my $ret;
-	if ($uilevel && ref $uilevel eq 'HASHREF') {
-		$ret = $self->session->config->get("assetUiLevel")->{$definition->[0]{className}} || $definition->[0]{uiLevel} || 1 ;
+	my $uiLevel = $self->session->config->get("assetUiLevel");
+	if ($uiLevel && ref $uiLevel eq 'HASH') {
+		return $uiLevel->{$definition->[0]{className}} || $definition->[0]{uiLevel} || 1 ;
 	} else {
-		$ret = $definition->[0]{uiLevel} || 1 ;
+		return $definition->[0]{uiLevel} || 1 ;
 	}
-	return $ret;
 }
 
 
@@ -1803,9 +1797,7 @@ Returns "".
 
 sub view {
 	my $self = shift;
-	$self->session->http->setRedirect($self->getDefault($self->session)->getUrl) if ($self->getId eq "PBasset000000000000001");
 	return $self->getToolbar if ($self->session->var->get("adminOn"));
-	return undef;
 }
 
 #-------------------------------------------------------------------
@@ -2035,6 +2027,10 @@ Returns the view() method of the asset object if the requestor canView.
 
 sub www_view {
 	my $self = shift;
+	if ($self->getId eq "PBasset000000000000001") {
+		$self->session->http->setRedirect($self->getDefault($self->session)->getUrl);
+		return "1";
+	}
 	my $check = $self->checkView;
 	return $check if (defined $check);
 	$self->prepareView;

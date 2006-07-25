@@ -164,6 +164,25 @@ sub getId {
 
 #-------------------------------------------------------------------
 
+=head2 getOpenTags ( session ) 
+
+Returns an array reference containing all the open version tag objects. This is a class method.
+
+=cut
+
+sub getOpenTags {
+	my $class = shift;
+	my $session = shift;
+	my @tags = ();
+	my $sth = $session->db->read("select * from assetVersionTag where isCommitted=0 and isLocked=0 order by name");
+	while (my $data = $sth->hashRef) {
+        	push(@tags, bless {_session=>$session, _id=>$data->{tagId}, _data=>$data}, $class);
+	}
+	return \@tags;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getRevisionCount ( )
 
 Returns the number of revisions that are under this tag.

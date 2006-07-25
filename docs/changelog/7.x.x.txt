@@ -43,6 +43,12 @@
  - fix: Splat_random Macro not so random (Wouter van Oijen / ProcoliX) (Thanks
    to Colin Kuskie for pointing this out and writing some tests)
  - rfe: phone validation javascript
+ - fix: Head Block in styles
+ - fix: select assetVersionTag
+ - fix: Infinite recursion
+ - fix: assetUiLevel override broken
+ - fix: Indexing files failes (derck)
+ - fix: Unable to approve New listings on Matrix
 
 
 7.0.2

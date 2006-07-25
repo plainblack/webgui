@@ -105,12 +105,11 @@ sub process {
 			icon=>$session->url->extras('adminConsole/small/versionTags.gif')
 			});
 	}
-	my $rs = $session->db->read("select tagId, name, groupToUse from assetVersionTag where isCommitted=0 and isLocked=0 order by name");
-	while (my ($id, $name, $group) = $rs->array) {
-		next unless $session->user->isInGroup($group);
+	foreach my $tag (@{WebGUI::VersionTag->getOpenTags($session)}) {
+		next unless $session->user->isInGroup($tag->get("groupToUse"));
 		push(@tags, {
-			url=>$session->url->page("op=setWorkingVersionTag;backToSite=1;tagId=".$id),
-			title=>($id eq $workingId) ?  '<span style="color: #000080;">* '.$name.'</span>' : $name,
+			url=>$session->url->page("op=setWorkingVersionTag;backToSite=1;tagId=".$tag->getId),
+			title=>($tag->getId eq $workingId) ?  '<span style="color: #000080;">* '.$tag->get("name").'</span>' : $tag->get("name"),
 			icon=>$session->url->extras('spacer.gif')
 			});
 	}

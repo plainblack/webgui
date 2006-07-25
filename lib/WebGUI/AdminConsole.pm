@@ -17,6 +17,7 @@ package WebGUI::AdminConsole;
 use strict;
 use WebGUI::International;
 use WebGUI::Asset::Template;
+use WebGUI::VersionTag;
 
 =head1 NAME
 
@@ -461,12 +462,11 @@ sub render {
                         icon=>$self->session->url->extras('adminConsole/small/versionTags.gif')
                         });
         }
-        my $rs = $self->session->db->read("select tagId, name, groupToUse from assetVersionTag where isCommitted=0 and isLocked=0 order by name");
-        while (my ($id, $name, $group) = $rs->array) {
-                next unless $self->session->user->isInGroup($group);
+	foreach my $tag (@{WebGUI::VersionTag->getOpenTags($self->session)}) {
+                next unless $self->session->user->isInGroup($tag->get("groupToUse"));
                 push(@tags, {
-                        url=>$self->session->url->page("op=setWorkingVersionTag;tagId=".$id),
-                        title=>($id eq $workingId) ?  '* '.$name : $name,
+                        url=>$self->session->url->page("op=setWorkingVersionTag;tagId=".$tag->getId),
+                        title=>($tag->getId eq $workingId) ?  '* '.$tag->get("name") : $tag->get("name"),
                         });
         }
         if (scalar(@tags)) {

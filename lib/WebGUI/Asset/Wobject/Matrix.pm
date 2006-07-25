@@ -721,6 +721,7 @@ sub www_editListingSave {
                         moderateGroupId => '4',
                         postGroupId => '7'
 			});
+		WebGUI::VersionTag->getWorking($self->session)->commit;
 		$data{forumId} = $forum->getId;
 		$data{status} = "pending";
 		$isNew = 1;
@@ -1105,7 +1106,6 @@ sub www_viewDetail {
 		$var{screenshot} = $storage->getUrl($listing->{filename});
 		$var{thumbnail} = $storage->getThumbnailUrl($listing->{filename});
 	}
-	$forum->prepareView;
 	$var{"discussion"} = $forum->view;
 	$var{'isLoggedIn'} = ($self->session->user->userId ne "1");
 	if ($self->session->form->process("do") eq "sendEmail" && $self->session->form->process("verify","captcha")) {
