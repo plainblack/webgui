@@ -45,17 +45,14 @@ sub process {
 	my $asset = WebGUI::Asset->newByUrl($session,$url);
 	my $i18n = WebGUI::International->new($session, 'Macro_FileUrl');
 	if (not defined $asset) {
-		$session->errorHandler->warn("^FileUrl($url): asset not found");
 		return $i18n->get('invalid url');
 	}
 	my $storageId = $asset->get('storageId');
 	if (not defined $storageId) {
-		$session->errorHandler->warn("^FileUrl($url): asset does not store files");
 		return $i18n->get('no storage');
 	}
 	my $filename = $asset->get('filename');
 	if (not defined $filename) {
-		$session->errorHandler->warn("^FileUrl($url): asset does not have a 'filename' property");
 		return $i18n->get('no filename');
 	}
 	my $storage = WebGUI::Storage->get($session,$storageId);
