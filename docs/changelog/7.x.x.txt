@@ -42,6 +42,7 @@
    characters. (Thanks to Zhou Xiaopeng)
  - fix: Splat_random Macro not so random (Wouter van Oijen / ProcoliX) (Thanks
    to Colin Kuskie for pointing this out and writing some tests)
+ - rfe: phone validation javascript
 
 
 7.0.2
