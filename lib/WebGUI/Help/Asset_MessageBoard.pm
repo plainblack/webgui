@@ -102,6 +102,9 @@ our $HELP = {
 		                               'name' => 'forum.lastpost.subject'
 		                             },
 		                             {
+		                               'name' => 'forum.lastpost.user.hasread'
+		                             },
+		                             {
 		                               'name' => 'forum.lastpost.user.id'
 		                             },
 		                             {

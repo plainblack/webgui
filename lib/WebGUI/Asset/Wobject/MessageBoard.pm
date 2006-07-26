@@ -123,6 +123,7 @@ sub view {
 				'forum.lastPost.time' => $self->session->datetime->epochToHuman($lastPost->get("dateSubmitted"),"%Z"),
 				'forum.lastPost.epoch' => $lastPost->get("dateSubmitted"),
 				'forum.lastPost.subject' => $lastPost->get("title"),
+				'forum.lastPost.user.hasRead' => $lastPost->getThread->isMarkedRead,
 				'forum.lastPost.user.id' => $lastPost->get("ownerUserId"),
 				'forum.lastPost.user.name' => $lastPost->get("username"),
 				'forum.lastPost.user.alias' => $lastPost->get("username"),

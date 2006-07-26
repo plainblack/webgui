@@ -1,5 +1,5 @@
 7.0.4
-
+ - Added a forum.lastPost.user.hasRead variable to the Message Board template.
 
 7.0.3
  - Fixed a problem with the 7.0.0-7.0.1 upgrade relating to internationalized

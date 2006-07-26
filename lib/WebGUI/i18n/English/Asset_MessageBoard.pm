@@ -101,6 +101,11 @@ our $I18N = {
 		lastUpdated => 1149632734,
 	},
 
+	'forum.lastpost.user.hasread' => {
+		message => q|A boolean indicating whether the user has read the last post in the forum.|,
+		lastUpdated => 1149632734,
+	},
+
 	'forum.lastpost.url' => {
 		message => q|The url to view the last post in this forum.|,
 		lastUpdated => 1149632734,
