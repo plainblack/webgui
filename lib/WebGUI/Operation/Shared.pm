@@ -106,7 +106,7 @@ sub secureEval {
 	foreach my $function (keys %trusted ) {
 		while ($code =~ /($function\(([^)]*)\)\s*;*)/g) {
 			my $cmd = $1;
-			my @param = split (/,/,$2);
+			my @param = split (/,\s*/,$2);
 			@param = map { s/^['"]|['"]$//g; $_; } @param;
 			my $output = $trusted{$function}(@param);
 			return $output if (ref $output);	

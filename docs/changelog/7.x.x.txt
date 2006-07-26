@@ -55,6 +55,7 @@
  - fix: Search Feature Select Box Not Working
  - Added "Save and Commit" option for environments where the appearance of
    workflow is unwanted.
+ - fix: WebGUI::International::get can't handle spaces
 
 
 7.0.2
