@@ -425,28 +425,34 @@ sub runJobResponse {
 	my $id = $request->header("X-jobId");	# got to figure out how to get this from the request, cuz the response may die
 	$self->debug("Response retrieved is for job $id.");
 	if ($response->is_success) {
-		$self->debug("Response for job $id retrieved successfully.");
-		if ($response->header("Set-Cookie") ne "") {
-			$self->debug("Storing cookie for $id for later use.");
-			my $cookie = $response->header("Set-Cookie");
-			$cookie =~ s/wgSession=([a-zA-Z0-9\_\-]{22}).*/$1/;
-			$self->{_cookies}{$self->getJob($id)->{sitename}} = $cookie;
-		}
-		my $state = $response->content; 
-		if ($state eq "done") {
-			delete $self->{_errorCount}{$id};
-			$self->debug("Job $id is now complete.");
-			if ($self->getJob($id)->{runOnce}) {
-				$kernel->yield("deleteJob",$id);
+		my $job = $self->getJob($id);
+		if (defined $job && ref $job eq "HASH") {
+			$self->debug("Response for job $id retrieved successfully.");
+			if ($response->header("Set-Cookie") ne "") {
+				$self->debug("Storing cookie for $id for later use.");
+				my $cookie = $response->header("Set-Cookie");
+				$cookie =~ s/wgSession=([a-zA-Z0-9\_\-]{22}).*/$1/;
+				$self->{_cookies}{$job->{sitename}} = $cookie;
 			}
-		} elsif ($state eq "error") {
-			$self->{_errorCount}{$id}++;
-			$self->debug("Got an error response for job $id, will try again in ".$self->config->get("suspensionDelay")." seconds.");
-			$kernel->delay_set("runJob",$self->config->get("suspensionDelay"),$id);
+			my $state = $response->content; 
+			if ($state eq "done") {
+				delete $self->{_errorCount}{$id};
+				$self->debug("Job $id is now complete.");
+				if ($job->{runOnce}) {
+					$kernel->yield("deleteJob",$id);
+				}
+			} elsif ($state eq "error") {
+				$self->{_errorCount}{$id}++;
+				$self->debug("Got an error response for job $id, will try again in ".$self->config->get("suspensionDelay")." seconds.");
+				$kernel->delay_set("runJob",$self->config->get("suspensionDelay"),$id);
+			} else {
+				$self->{_errorCount}{$id}++;
+				$self->error("Something bad happened on the return of job $id, will try again in ".$self->config->get("suspensionDelay")." seconds. ".$response->error_as_HTML);
+				$kernel->delay_set("runJob",$self->config->get("suspensionDelay"),$id);
+			}
 		} else {
 			$self->{_errorCount}{$id}++;
-			$self->error("Something bad happened on the return of job $id, will try again in ".$self->config->get("suspensionDelay")." seconds. ".$response->error_as_HTML);
-			$kernel->delay_set("runJob",$self->config->get("suspensionDelay"),$id);
+			$self->error("Job $id is not in our queue.");
 		}
 	} elsif ($response->is_redirect) {
 		$self->error("Response for $id was redirected. This should never happen if configured properly!!!");

@@ -12,7 +12,8 @@ use lib "../../lib";
 use strict;
 use Getopt::Long;
 use WebGUI::Session;
-
+use WebGUI::Asset;
+use WebGUI::HTML;
 
 my $toVersion = "7.0.3"; # make this match what version you're going to
 my $quiet; # this line required
@@ -23,9 +24,21 @@ my $session = start(); # this line required
 
 deleteTemplate();
 addConfigOption();
+fixPostSubjects();
 
 finish($session); # this line required
 
+
+#-------------------------------------------------
+sub fixPostSubjects {
+	print "\tRemoving HTML from CS Post subjects.\n" unless ($quiet);
+	my $write = $session->db->prepare("update assetData set title=? where assetId=? and revisionDate=?");
+	my $sth = $session->db->read("select title, asset.assetId, assetData.revisionDate from assetData left join asset on assetData.assetId=asset.assetId where asset.className like 'WebGUI::Asset::Post%'");
+	while (my $row = $sth->arrayRef) {
+		$row->[0] = WebGUI::HTML::filter($row->[0], "all");		
+		$write->execute($row);
+	}
+}
 
 #-------------------------------------------------
 sub addConfigOption {

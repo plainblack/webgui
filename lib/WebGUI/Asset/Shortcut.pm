@@ -299,7 +299,10 @@ Returns the extraHeadTags stored in the asset.  Called in $self->session->style-
 
 sub getExtraHeadTags {
 	my $self = shift;
-	return $self->get("extraHeadTags")."\n".$self->getShortcut->get("extraHeadTags");
+	my $output = $self->get("extraHeadTags")."\n";
+	my $shortcut = $self->getShortcut;
+	$output .= $self->getShortcut->get("extraHeadTags") if defined $shortcut;
+	return $output;
 }
 
 #-------------------------------------------------------------------

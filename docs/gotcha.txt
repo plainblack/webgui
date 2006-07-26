@@ -19,6 +19,10 @@ save you many hours of grief.
    If you're using this macro, you might need to increment the max
    parameter.
 
+ * We've made a number of improvements and bug fixes to the search
+   indexing system in this release. You may want to use the search.pl
+   utiltity in sbin to reindex your site to get better search results.
+
 
 7.0.2
 --------------------------------------------------------------------

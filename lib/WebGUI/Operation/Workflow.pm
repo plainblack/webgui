@@ -115,7 +115,6 @@ sub www_deleteWorkflowActivity {
 	my $workflow = WebGUI::Workflow->new($session, $session->form->get("workflowId"));
 	if (defined $workflow) {
 		$workflow->deleteActivity($session->form->get("activityId"));
-		$workflow->set({enabled=>0});
 	}
 	return www_editWorkflow($session);
 }
