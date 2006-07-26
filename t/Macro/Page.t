@@ -13,17 +13,13 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro;
+use WebGUI::Macro::Page;
 use WebGUI::Session;
-use WebGUI::Macro_Config;
 use Data::Dumper;
 
 use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
-
-my @added_macros = ();
-push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'Page', 'Page');
 
 ##Add more Asset configurations here.
 my @testSets = (
@@ -53,9 +49,6 @@ foreach my $testSet (@testSets) {
 
 plan tests => $numTests;
 
-my $macroText = '^Page("%s");';
-my $output = $macroText;
-
 my $homeAsset = WebGUI::Asset->getDefault($session);
 my $versionTag;
 
@@ -66,8 +59,7 @@ foreach my $testSet (@testSets) {
 	my $class = $testSet->{className};
 	foreach my $field (keys %{ $testSet }) {
 		next if $field eq 'asset';
-		my $output = sprintf $macroText, $field;
-		WebGUI::Macro::process($session, \$output);
+		my $output = WebGUI::Macro::Page::process($session, $field);
 		my $comment = sprintf "Checking asset: %s, field: %s", $class, $field;
 		is($output, $testSet->{$field}, $comment);
 	}
@@ -88,8 +80,4 @@ sub setupTest {
 
 END { ##Clean-up after yourself, always
 	$versionTag->rollback;
-	foreach my $macro (@added_macros) {
-		next unless $macro;
-		$session->config->deleteFromHash("macros", $macro);
-	}
 }

@@ -13,41 +13,25 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro;
+use WebGUI::Macro::PageTitle;
 use WebGUI::Session;
-use WebGUI::Macro_Config;
 use Data::Dumper;
 
 use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-my @added_macros = ();
-push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'PageTitle', 'PageTitle');
-
-my $macroText = '^PageTitle;';
-my $output;
-
 plan tests => 2;
-
-$output = $macroText;
 
 my $homeAsset = WebGUI::Asset->getDefault($session);
 
 ##Make the homeAsset the default asset in the session.
 $session->asset($homeAsset);
 
-WebGUI::Macro::process($session, \$output);
+my $output = WebGUI::Macro::PageTitle::process($session);
 is($output, $homeAsset->get('title'), 'fetching title for site default asset');
 
 TODO: {
 	local $TODO = "Tests to make later";
 	ok(0, 'Fetch title from locally made asset with known title');
-}
-
-END {
-	foreach my $macro (@added_macros) {
-		next unless $macro;
-		$session->config->deleteFromHash("macros", $macro);
-	}
 }

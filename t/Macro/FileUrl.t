@@ -13,9 +13,8 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro;
+use WebGUI::Macro::FileUrl;
 use WebGUI::Session;
-use WebGUI::Macro_Config;
 use WebGUI::Storage;
 use Data::Dumper;
 
@@ -23,9 +22,6 @@ use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 my $i18n = WebGUI::International->new($session, 'Macro_FileUrl');
-
-my @added_macros = ();
-push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'FileUrl', 'FileUrl');
 
 ##Add more Asset configurations here.
 my @testSets = (
@@ -95,8 +91,7 @@ my $versionTag;
 ($versionTag, @testSets) = setupTest($session, $homeAsset, @testSets);
 
 foreach my $testSet (@testSets) {
-	my $output = sprintf $macroText, $testSet->{url};
-	WebGUI::Macro::process($session, \$output);
+	my $output = WebGUI::Macro::FileUrl::process($session, $testSet->{url});
 	if ($testSet->{pass}) {
 		is($output, $testSet->{fileUrl}, $testSet->{comment});
 	}
@@ -137,9 +132,4 @@ sub setupTest {
 
 END { ##Clean-up after yourself, always
 	$versionTag->rollback;
-
-	foreach my $macro (@added_macros) {
-		next unless $macro;
-		$session->config->deleteFromHash("macros", $macro);
-	}
 }

@@ -13,18 +13,14 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro;
+use WebGUI::Macro::EditableToggle;
 use WebGUI::Session;
-use WebGUI::Macro_Config;
 use HTML::TokeParser;
 use Data::Dumper;
 
 use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
-
-my @added_macros = ();
-push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'EditableToggle', 'EditableToggle');
 
 my $homeAsset = WebGUI::Asset->getDefault($session);
 $session->asset($homeAsset);
@@ -208,7 +204,6 @@ foreach my $testSet (@testSets) {
 plan tests => $numTests;
 
 foreach my $testSet (@testSets) {
-	my $output = sprintf $testSet->{macroText}, $testSet->{onText}, $testSet->{offText}, $testSet->{template};
 	$session->user({userId=>$testSet->{userId}});
 	$session->asset($testSet->{asset});
 	if ($testSet->{adminStatus} eq 'off') {
@@ -224,7 +219,8 @@ foreach my $testSet (@testSets) {
 	else {
 		BAIL_OUT('Unknown admin status selected');
 	}
-	WebGUI::Macro::process($session, \$output);
+	my $output = WebGUI::Macro::EditableToggle::process($session,
+		$testSet->{onText}, $testSet->{offText}, $testSet->{template});
 	if (ref $testSet->{output} eq 'CODE') {
 		my ($url, $label) = $testSet->{output}->($output);
 		is($label, $testSet->{label}, $testSet->{comment}.", label");
@@ -289,9 +285,5 @@ END { ##Clean-up after yourself, always
 	}
 	foreach my $dude (@users) {
 		$dude->delete if (defined $dude and ref $dude eq 'WebGUI::User');
-	}
-	foreach my $macro (@added_macros) {
-		next unless $macro;
-		$session->config->deleteFromHash("macros", $macro);
 	}
 }

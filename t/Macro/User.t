@@ -13,17 +13,13 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro;
+use WebGUI::Macro::User;
 use WebGUI::Session;
-use WebGUI::Macro_Config;
 use WebGUI::User;
 
 use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
-
-my @added_macros = ();
-push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'User', 'User');
 
 my @testSets = (
 	{
@@ -60,18 +56,16 @@ foreach my $testSet (@testSets) {
 	$session->user({ userId => $testSet->{user}->userId });
 	foreach my $field (keys %{ $testSet }) {
 		next if $field eq 'user';
-		my $output = sprintf q!^User("%s");!, $field;
-		WebGUI::Macro::process($session, \$output);
+		my $output = WebGUI::Macro::User::process($session, $field);
 		my $comment = sprintf "Checking userid: %s, field: %s", $session->user->userId, $field;
 		is($output, $testSet->{$field}, $comment);
 	}
 }
 
 my $field = "NonExistantField";
-my $output = sprintf q!^User("%s")!, $field;
-WebGUI::Macro::process($session, \$output);
+my $output = WebGUI::Macro::User::process($session, $field);
 my $comment = sprintf "Checking userid: %s, field: %s", $session->user->userId, $field;
-is($output, $output, $comment);  ##Unprocessed macro returns macro
+is($output, undef, $comment);  ##Unprocessed macro returns macro
 
 sub setupTest {
 	my ($session, @testSets) = @_;
@@ -88,9 +82,5 @@ sub setupTest {
 END { ##Clean-up after yourself, always
 	foreach my $dude (@users) {
 		$dude->delete if (defined $dude and ref $dude eq 'WebGUI::User');
-	}
-	foreach my $macro (@added_macros) {
-		next unless $macro;
-		$session->config->deleteFromHash("macros", $macro);
 	}
 }

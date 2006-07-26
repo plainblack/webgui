@@ -13,17 +13,13 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro;
+use WebGUI::Macro::CanEditText;
 use WebGUI::Session;
 use Data::Dumper;
-use WebGUI::Macro_Config;
 
 my $session = WebGUI::Test->session;
 
 use Test::More; # increment this value for each test you create
-
-my @added_macros = ();
-push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'CanEditText', 'CanEditText');
 
 my $adminText = "^CanEditText(editor);";
 my $output;
@@ -36,7 +32,6 @@ my @testSets = (
 	{
 		comment => 'Visitor sees nothing',
 		userId => 1,
-		macroText => q!^CanEditText("%s");!,
 		text => q!I am an editor!,
 		asset => $asset,
 		output => '',
@@ -44,7 +39,6 @@ my @testSets = (
 	{
 		comment => 'Admin sees text',
 		userId => 3,
-		macroText => q!^CanEditText("%s");!,
 		text => q!I am an editor!,
 		asset => $asset,
 		output => 'I am an editor',
@@ -52,7 +46,6 @@ my @testSets = (
 	{
 		comment => 'Random user sees nothing',
 		userId => $users[0]->userId,
-		macroText => q!^CanEditText("%s");!,
 		text => q!I am an editor!,
 		asset => $asset,
 		output => '',
@@ -60,7 +53,6 @@ my @testSets = (
 	{
 		comment => 'General Content Manager sees nothing',
 		userId => $users[1]->userId,
-		macroText => q!^CanEditText("%s");!,
 		text => q!I am an editor!,
 		asset => $asset,
 		output => '',
@@ -68,7 +60,6 @@ my @testSets = (
 	{
 		comment => 'Member of group to edit this asset sees text',
 		userId => $users[2]->userId,
-		macroText => q!^CanEditText("%s");!,
 		text => q!I am an editor!,
 		asset => $asset,
 		output => 'I am an editor',
@@ -82,8 +73,7 @@ plan tests => $numTests;
 foreach my $testSet (@testSets) {
 	$session->user({userId=>$testSet->{userId}});
 	$session->asset($testSet->{asset});
-	my $output = sprintf $testSet->{macroText}, $testSet->{text};
-	WebGUI::Macro::process($session, \$output);
+	my $output = WebGUI::Macro::CanEditText::process($session, $testSet->{text});
 	is($output, $testSet->{output}, $testSet->{comment});
 }
 
@@ -124,9 +114,5 @@ END { ##Clean-up after yourself, always
 	}
 	foreach my $dude (@users) {
 		$dude->delete if (defined $dude and ref $dude eq 'WebGUI::User');
-	}
-	foreach my $macro (@added_macros) {
-		next unless $macro;
-		$session->config->deleteFromHash("macros", $macro);
 	}
 }

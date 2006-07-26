@@ -13,9 +13,8 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro;
+use WebGUI::Macro::GroupDelete;
 use WebGUI::Session;
-use WebGUI::Macro_Config;
 use Data::Dumper;
 
 use Test::More; # increment this value for each test you create
@@ -23,16 +22,12 @@ use HTML::TokeParser;
 
 my $session = WebGUI::Test->session;
 
-my @added_macros = ();
-push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'GroupDelete', 'GroupDelete');
-
 my $homeAsset = WebGUI::Asset->getDefault($session);
 my ($versionTag, $template, $groups, $users) = setupTest($session, $homeAsset);
 
 my @testSets = (
 	{
 		comment => 'Empty macro call returns null string',
-		macroText => q!^GroupDelete();!,
 		groupName => '',
 		text => '',
 		template => '',
@@ -41,7 +36,6 @@ my @testSets = (
 	},
 	{
 		comment => 'Empty group returns null string',
-		macroText => q!^GroupDelete("%s","%s");!,
 		groupName => '',
 		text => 'Bow out',
 		template => '',
@@ -50,7 +44,6 @@ my @testSets = (
 	},
 	{
 		comment => 'Empty text returns null string',
-		macroText => q!^GroupDelete("%s","%s");!,
 		groupName => $groups->[0]->name,
 		text => '',
 		template => '',
@@ -59,7 +52,6 @@ my @testSets = (
 	},
 	{
 		comment => 'Visitor sees empty string with valid group and text',
-		macroText => q!^GroupDelete("%s","%s");!,
 		groupName => $groups->[0]->name(),
 		text => 'Bow out',
 		template => '',
@@ -68,7 +60,6 @@ my @testSets = (
 	},
 	{
 		comment => 'Non-existant group returns null string',
-		macroText => q!^GroupDelete("%s","%s");!,
 		groupName => "Dudes of the day",
 		text => 'Bow out',
 		template => '',
@@ -77,7 +68,6 @@ my @testSets = (
 	},
 	{
 		comment => 'Group without autoDelete returns null string',
-		macroText => q!^GroupDelete("%s","%s");!,
 		groupName => $groups->[1]->name,
 		text => 'Bow out',
 		template => '',
@@ -86,7 +76,6 @@ my @testSets = (
 	},
 	{
 		comment => 'Non-member of group sees empty string',
-		macroText => q!^GroupDelete("%s","%s");!,
 		groupName => $groups->[0]->name,
 		text => 'Bow out',
 		template => '',
@@ -95,7 +84,6 @@ my @testSets = (
 	},
 	{
 		comment => 'Member of different group sees empty string',
-		macroText => q!^GroupDelete("%s","%s");!,
 		groupName => $groups->[0]->name,
 		groupId => $groups->[0]->getId,
 		text => 'Bow out',
@@ -105,7 +93,6 @@ my @testSets = (
 	},
 	{
 		comment => 'Member of group sees text and link',
-		macroText => q!^GroupDelete("%s","%s");!,
 		groupName => $groups->[0]->name,
 		groupId => $groups->[0]->getId,
 		text => 'Bow out',
@@ -116,7 +103,6 @@ my @testSets = (
 	},
 	{
 		comment => 'Custom template check',
-		macroText => q!^GroupDelete("%s","%s","%s");!,
 		groupName => $groups->[0]->name,
 		groupId => $groups->[0]->getId,
 		text => 'Bow out',
@@ -137,9 +123,8 @@ plan tests => $numTests;
 
 foreach my $testSet (@testSets) {
 	$session->user({ userId => $testSet->{userId} });
-	my $output = sprintf $testSet->{macroText},
-		$testSet->{groupName}, $testSet->{text}, $testSet->{template};
-	WebGUI::Macro::process($session, \$output);
+	my $output = WebGUI::Macro::GroupDelete::process($session, 
+		$testSet->{groupName}, $testSet->{text}, $testSet->{template});
 	if ($testSet->{empty}) {
 		is($output, '', $testSet->{comment});
 	}
@@ -214,9 +199,5 @@ END { ##Clean-up after yourself, always
 	}
 	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
 		$versionTag->rollback;
-	}
-	foreach my $macro (@added_macros) {
-		next unless $macro;
-		$session->config->deleteFromHash("macros", $macro);
 	}
 }

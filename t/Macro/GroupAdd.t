@@ -13,9 +13,8 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro;
+use WebGUI::Macro::GroupAdd;
 use WebGUI::Session;
-use WebGUI::Macro_Config;
 use Data::Dumper;
 
 use Test::More; # increment this value for each test you create
@@ -23,16 +22,12 @@ use HTML::TokeParser;
 
 my $session = WebGUI::Test->session;
 
-my @added_macros = ();
-push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'GroupAdd', 'GroupAdd');
-
 my $homeAsset = WebGUI::Asset->getDefault($session);
 my ($versionTag, $template, $groups, $users) = setupTest($session, $homeAsset);
 
 my @testSets = (
 	{
 		comment => 'Empty macro call returns null string',
-		macroText => q!^GroupAdd();!,
 		groupName => '',
 		text => '',
 		template => '',
@@ -41,7 +36,6 @@ my @testSets = (
 	},
 	{
 		comment => 'Empty group returns null string',
-		macroText => q!^GroupAdd("%s","%s");!,
 		groupName => '',
 		text => 'Join up',
 		template => '',
@@ -50,7 +44,6 @@ my @testSets = (
 	},
 	{
 		comment => 'Empty text returns null string',
-		macroText => q!^GroupAdd("%s","%s");!,
 		groupName => $groups->[0]->name,
 		text => '',
 		template => '',
@@ -59,7 +52,6 @@ my @testSets = (
 	},
 	{
 		comment => 'Visitor sees empty string with valid group and text',
-		macroText => q!^GroupAdd("%s","%s");!,
 		groupName => $groups->[0]->name(),
 		text => 'Join up!',
 		template => '',
@@ -68,7 +60,6 @@ my @testSets = (
 	},
 	{
 		comment => 'Non-existant group returns null string',
-		macroText => q!^GroupAdd("%s","%s");!,
 		groupName => "Dudes of the day",
 		text => 'Join up!',
 		template => '',
@@ -77,7 +68,6 @@ my @testSets = (
 	},
 	{
 		comment => 'Group without autoAdd returns null string',
-		macroText => q!^GroupAdd("%s","%s");!,
 		groupName => $groups->[1]->name,
 		text => 'Join up!',
 		template => '',
@@ -86,7 +76,6 @@ my @testSets = (
 	},
 	{
 		comment => 'Existing member of group sees empty string',
-		macroText => q!^GroupAdd("%s","%s");!,
 		groupName => $groups->[0]->name,
 		text => 'Join up!',
 		template => '',
@@ -95,7 +84,6 @@ my @testSets = (
 	},
 	{
 		comment => 'Non-member of group sees text and link',
-		macroText => q!^GroupAdd("%s","%s");!,
 		groupName => $groups->[0]->name,
 		groupId => $groups->[0]->getId,
 		text => 'Join up!',
@@ -106,7 +94,6 @@ my @testSets = (
 	},
 	{
 		comment => 'Member of different group sees text and link',
-		macroText => q!^GroupAdd("%s","%s");!,
 		groupName => $groups->[0]->name,
 		groupId => $groups->[0]->getId,
 		text => 'Join up!',
@@ -117,7 +104,6 @@ my @testSets = (
 	},
 	{
 		comment => 'Custom template check',
-		macroText => q!^GroupAdd("%s","%s","%s");!,
 		groupName => $groups->[0]->name,
 		groupId => $groups->[0]->getId,
 		text => 'Join up!',
@@ -138,9 +124,8 @@ plan tests => $numTests;
 
 foreach my $testSet (@testSets) {
 	$session->user({ userId => $testSet->{userId} });
-	my $output = sprintf $testSet->{macroText},
-		$testSet->{groupName}, $testSet->{text}, $testSet->{template};
-	WebGUI::Macro::process($session, \$output);
+	my $output = WebGUI::Macro::GroupAdd::process($session,
+		$testSet->{groupName}, $testSet->{text}, $testSet->{template});
 	if ($testSet->{empty}) {
 		is($output, '', $testSet->{comment});
 	}
@@ -215,9 +200,5 @@ END { ##Clean-up after yourself, always
 	}
 	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
 		$versionTag->rollback;
-	}
-	foreach my $macro (@added_macros) {
-		next unless $macro;
-		$session->config->deleteFromHash("macros", $macro);
 	}
 }

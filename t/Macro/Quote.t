@@ -13,33 +13,26 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro;
+use WebGUI::Macro::Quote;
 use WebGUI::Session;
-use WebGUI::Macro_Config;
 use Data::Dumper;
 
 use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-my @added_macros = ();
-push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'Quote', 'Quote');
-
-my $macroText = '^Quote("%s");';
-my $output;
-
 my @testSets = (
 	{
-	input => q!that's great!,
-	output => q!'that\\'s great'!,
+		input => q!that's great!,
+		output => q!'that\\'s great'!,
 	},
 	{
-	input => q!0!,
-	output => q!'0'!,
+		input => q!0!,
+		output => q!'0'!,
 	},
 	{
-	input => q!!,
-	output => q!''!,
+		input => q!!,
+		output => q!''!,
 	},
 );
 
@@ -47,16 +40,7 @@ my $numTests = scalar @testSets;
 
 plan tests => $numTests;
 
-
 foreach my $testSet (@testSets) {
-	$output = sprintf $macroText, $testSet->{input};
-	WebGUI::Macro::process($session, \$output);
+	my $output = WebGUI::Macro::Quote::process($session, $testSet->{input});
 	is($output, $testSet->{output}, 'testing '.$testSet->{input});
-}
-
-END {
-	foreach my $macro (@added_macros) {
-		next unless $macro;
-		$session->config->deleteFromHash("macros", $macro);
-	}
 }

@@ -13,11 +13,10 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro;
+use WebGUI::Macro::Splat_random;
 use WebGUI::Session;
 use WebGUI::Group;
 use WebGUI::User;
-use WebGUI::Macro_Config;
 
 my $session = WebGUI::Test->session;
 
@@ -30,15 +29,9 @@ use Data::Dumper;
 
 plan tests => 4;
 
-my @added_macros = ();
-push @added_macros, WebGUI::Macro_Config::enable_macro($session, '*', 'Splat_random');
-
-my $macroText = q!^*(%s);!;
-my $output;
 my $inBounds = 1;
 BOUNDED: for (my $i=0; $i<=99; $i++) {
-	my $output = sprintf $macroText, 10;
-	WebGUI::Macro::process($session, \$output);
+	my $output = WebGUI::Macro::Splat_random::process($session, 10);
 	if (($output > 10) or ($output < 0)) {
 		$inBounds = 0;
 		last BOUNDED;
@@ -47,14 +40,12 @@ BOUNDED: for (my $i=0; $i<=99; $i++) {
 
 ok($inBounds, "100 fetches were in bounds");
 
-$output = '^*;';
-WebGUI::Macro::process($session, \$output);
-ok($output >= 0 and $output < 1_000_000_000, "Empty argument returns a number");
+my $output = WebGUI::Macro::Splat_random::process($session);
+ok($output >= 0 and $output < 1_000_000_000, "Empty argument returns a number within default bounds");
 
 my $wholeNumber = 1;
 WHOLE: for (my $i=0; $i<=99; $i++) {
-	my $output = sprintf $macroText, 1;
-	WebGUI::Macro::process($session, \$output);
+	my $output = WebGUI::Macro::Splat_random::process($session, 1);
 	if (int($output) != $output) {
 		$wholeNumber = 0;
 		last WHOLE;
@@ -65,18 +56,10 @@ ok($wholeNumber, "100 fetches were all whole numbers");
 
 my @bins = ();
 WHOLE: for (my $i=0; $i<=999; $i++) {
-	my $output = sprintf $macroText, 4;
-	WebGUI::Macro::process($session, \$output);
+	my $output = WebGUI::Macro::Splat_random::process($session, 4);
 	++$bins[$output];
 }
 
 is(scalar(@bins), 4, "All bins have values on a sample size of 1000");
 
 #diag Dumper \@bins;
-
-END {
-	foreach my $macro (@added_macros) {
-		next unless $macro;
-		$session->config->deleteFromHash("macros", $macro);
-	}
-}

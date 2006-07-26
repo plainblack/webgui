@@ -14,9 +14,8 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro;
+use WebGUI::Macro::D_date;
 use WebGUI::Session;
-use WebGUI::Macro_Config;
 use Data::Dumper;
 # ---- END DO NOT EDIT ----
 
@@ -28,12 +27,12 @@ my $output;
 
 my @testSets = (
 	{
-	format => '%%%c%d%h',
-	output =>'%August1608',
+		format => '%%%c%d%h',
+		output =>'%August1608',
 	},
 	{
-	format => '',
-	output =>'8/16/2001  8:00 am',
+		format => '',
+		output =>'8/16/2001  8:00 am',
 	},
 );
 
@@ -43,18 +42,7 @@ plan tests => $numTests;
 
 my $session = WebGUI::Test->session;
 
-my @added_macros = ();
-push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'D', 'Date');
-
 foreach my $testSet (@testSets) {
-	$output = sprintf $macroText, $testSet->{format}, $wgbday;
-	WebGUI::Macro::process($session, \$output);
+	my $output = WebGUI::Macro::D_date::process($session, $testSet->{format}, $wgbday);
 	is($output, $testSet->{output}, 'testing '.$testSet->{format});
-}
-
-END {
-	foreach my $macro (@added_macros) {
-		next unless $macro;
-		$session->config->deleteFromHash("macros", $macro);
-	}
 }

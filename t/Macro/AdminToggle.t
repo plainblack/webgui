@@ -13,7 +13,7 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro;
+use WebGUI::Macro::AdminToggle;
 use WebGUI::Session;
 use WebGUI::Macro_Config;
 use HTML::TokeParser;
@@ -22,10 +22,6 @@ use Data::Dumper;
 use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
-
-
-my @added_macros = ();
-push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'AdminToggle', 'AdminToggle');
 
 my ($versionTag, $template) = addTemplate();
 
@@ -121,7 +117,6 @@ foreach my $testSet (@testSets) {
 plan tests => $numTests + 1;
 
 foreach my $testSet (@testSets) {
-	my $output = sprintf $testSet->{macroText}, $testSet->{onText}, $testSet->{offText}, $testSet->{template};
 	$session->user({userId=>$testSet->{userId}});
 	if ($testSet->{adminStatus} eq 'off') {
 		$session->var->switchAdminOff();
@@ -134,7 +129,8 @@ foreach my $testSet (@testSets) {
 	else {
 		BAIL_OUT('Unknown admin status selected');
 	}
-	WebGUI::Macro::process($session, \$output);
+	my $output = WebGUI::Macro::AdminToggle::process( $session,
+		$testSet->{onText}, $testSet->{offText}, $testSet->{template} );
 	if (ref $testSet->{output} eq 'CODE') {
 		my ($url, $label) = $testSet->{output}->($output);
 		is($label, $testSet->{label}, $testSet->{comment}.", label");
@@ -191,9 +187,5 @@ sub simpleTextParser {
 END {
 	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
 		$versionTag->rollback;
-	}
-	foreach my $macro (@added_macros) {
-		next unless $macro;
-		$session->config->deleteFromHash("macros", $macro);
 	}
 }

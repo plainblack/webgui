@@ -13,10 +13,9 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro;
+use WebGUI::Macro::At_username;
 use WebGUI::Session;
 use Data::Dumper;
-use WebGUI::Macro_Config;
 
 my $session = WebGUI::Test->session;
 
@@ -26,24 +25,12 @@ my $numTests = 2;
 
 plan tests => $numTests;
 
-my @added_macros = ();
-push @added_macros, WebGUI::Macro_Config::enable_macro($session, '@', 'At_username');
-
-my $macroText = "^@;";
 my $output;
 
-$output = $macroText;
-WebGUI::Macro::process($session, \$output);
+$session->user({userId => 1});
+$output = WebGUI::Macro::At_username::process($session);
 is($output, 'Visitor', 'username = Visitor');
 
-$output = $macroText;
 $session->user({userId => 3});
-WebGUI::Macro::process($session, \$output);
+$output = WebGUI::Macro::At_username::process($session);
 is($output, 'Admin', 'username = Admin');
-
-END {
-	foreach my $macro (@added_macros) {
-		next unless $macro;
-		$session->config->deleteFromHash("macros", $macro);
-	}
-}

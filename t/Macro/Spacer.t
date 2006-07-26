@@ -13,18 +13,14 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro;
+use WebGUI::Macro::Spacer;
 use WebGUI::Session;
-use WebGUI::Macro_Config;
 use HTML::TokeParser;
 use Data::Dumper;
 
 use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
-
-my @added_macros = ();
-push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'Spacer', 'Spacer');
 
 my @testSets = (
 	{
@@ -56,8 +52,7 @@ my @testSets = (
 plan tests => 5 + 2 * scalar @testSets;
 
 foreach my $testSet (@testSets) {
-	my $output = sprintf $testSet->{macroText}, $testSet->{width}, $testSet->{height};
-	WebGUI::Macro::process($session, \$output);
+	my $output = WebGUI::Macro::Spacer::process($session, $testSet->{width}, $testSet->{height});
 	my ($width, $height) = simpleHTMLParser($output);
 	is($width,  $testSet->{width},  $testSet->{comment}.", width");
 	is($height, $testSet->{height}, $testSet->{comment}.", height");
@@ -84,11 +79,4 @@ sub simpleHTMLParser {
 	my $style  = $token->[1]{style} || "";
 
 	return ($width, $height, $src, $alt, $style);
-}
-
-END {
-	foreach my $macro (@added_macros) {
-		next unless $macro;
-		$session->config->deleteFromHash("macros", $macro);
-	}
 }

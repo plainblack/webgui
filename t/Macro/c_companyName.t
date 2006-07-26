@@ -13,31 +13,17 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro::AdminText;
+use WebGUI::Macro::c_companyName;
 use WebGUI::Session;
 use Data::Dumper;
 
-my $session = WebGUI::Test->session;
-
 use Test::More; # increment this value for each test you create
 
-my $numTests = 4;
+my $session = WebGUI::Test->session;
 
-plan tests => $numTests;
+plan tests => 1;
 
-my $output;
-
-$output = WebGUI::Macro::AdminText::process($session, 'admin');
-is($output, '', 'user is not admin');
-
-$session->user({userId => 3});
-$output = WebGUI::Macro::AdminText::process($session, 'admin');
-is($output, '', 'user is admin, not in admin mode');
-
-$session->var->switchAdminOn;
-$output = WebGUI::Macro::AdminText::process($session, 'admin');
-is($output, 'admin', 'admin in admin mode');
-
-$session->var->switchAdminOff;
-$output = WebGUI::Macro::AdminText::process($session, 'admin');
-is($output, '', 'user is admin, not in admin mode');
+my ($value) = $session->dbSlave->quickArray(
+	"select value from settings where name='companyName'");
+my $output = WebGUI::Macro::c_companyName::process($session);
+is($output, $value, sprintf "Testing companyName");

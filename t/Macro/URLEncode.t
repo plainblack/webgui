@@ -13,41 +13,34 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro;
+use WebGUI::Macro::URLEncode;
 use WebGUI::Session;
-use WebGUI::Macro_Config;
 use Data::Dumper;
 
 use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-my @added_macros = ();
-push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'URLEncode', 'URLEncode');
-
-my $macroText = '^URLEncode("%s");';
-my $output;
-
 my @testSets = (
 	{
-	input => q! !,
-	output => q!%20!,
-	comment => q|space|,
+		input => q! !,
+		output => q!%20!,
+		comment => q|space|,
 	},
 	{
-	input => q!/!,
-	output => q!%2F!,
-	comment => q|slash|,
+		input => q!/!,
+		output => q!%2F!,
+		comment => q|slash|,
 	},
 	{
-	input => q!abcde!,
-	output => q!abcde!,
-	comment => q|alpha|,
+		input => q!abcde!,
+		output => q!abcde!,
+		comment => q|alpha|,
 	},
 	{
-	input => q!&!,
-	output => q!%26!,
-	comment => q|ampersand|,
+		input => q!&!,
+		output => q!%26!,
+		comment => q|ampersand|,
 	},
 );
 
@@ -55,16 +48,7 @@ my $numTests = scalar @testSets;
 
 plan tests => $numTests;
 
-
 foreach my $testSet (@testSets) {
-	$output = sprintf $macroText, $testSet->{input};
-	WebGUI::Macro::process($session, \$output);
+	my $output = WebGUI::Macro::URLEncode::process($session, $testSet->{input});
 	is($output, $testSet->{output}, 'testing '.$testSet->{input});
-}
-
-END {
-	foreach my $macro (@added_macros) {
-		next unless $macro;
-		$session->config->deleteFromHash("macros", $macro);
-	}
 }

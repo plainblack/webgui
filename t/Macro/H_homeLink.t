@@ -13,18 +13,14 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro;
+use WebGUI::Macro::H_homeLink;
 use WebGUI::Session;
-use WebGUI::Macro_Config;
 use HTML::TokeParser;
 use Data::Dumper;
 
 use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
-
-my @added_macros = ();
-push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'H', 'H_homeLink');
 
 my ($versionTag, $template) = addTemplate();
 
@@ -34,14 +30,12 @@ my $i18n = WebGUI::International->new($session,'Macro_H_homeLink');
 
 my @testSets = (
 	{
-		macroText => q!^H("%s");!,
 		label => q!linkonly!,
 		template => q!!,
 		output => $homeAsset->getUrl(),
 		comment => 'linkonly argument',
 	},
 	{
-		macroText => q!^H();!,
 		label => $i18n->get(47),
 		template => q!!,
 		url => $homeAsset->getUrl(),
@@ -49,7 +43,6 @@ my @testSets = (
 		comment => 'default macro call',
 	},
 	{
-		macroText => q!^H("%s");!,
 		label => q!Hi, want to go home?!,
 		template => q!!,
 		url => $homeAsset->getUrl(),
@@ -57,7 +50,6 @@ my @testSets = (
 		comment => 'custom label',
 	},
 	{
-		macroText => q!^H("%s","%s");!,
 		label => q!Custom label!,
 		template => q!H_homeLink-test!,
 		url => $homeAsset->getUrl(),
@@ -74,8 +66,7 @@ foreach my $testSet (@testSets) {
 plan tests => $numTests;
 
 foreach my $testSet (@testSets) {
-	my $output = sprintf $testSet->{macroText}, $testSet->{label}, $testSet->{template};
-	WebGUI::Macro::process($session, \$output);
+	my $output = WebGUI::Macro::H_homeLink::process($session, $testSet->{label}, $testSet->{template});
 	if (ref $testSet->{output} eq 'CODE') {
 		my ($url, $label) = $testSet->{output}->($output);
 		is($label, $testSet->{label}, $testSet->{comment}.", label");
@@ -127,9 +118,5 @@ sub simpleTextParser {
 END {
 	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
 		$versionTag->rollback;
-	}
-	foreach my $macro (@added_macros) {
-		next unless $macro;
-		$session->config->deleteFromHash("macros", $macro);
 	}
 }

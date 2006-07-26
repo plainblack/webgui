@@ -13,11 +13,10 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro;
+use WebGUI::Macro::GroupText;
 use WebGUI::Session;
 use WebGUI::Group;
 use WebGUI::User;
-use WebGUI::Macro_Config;
 
 my $session = WebGUI::Test->session;
 
@@ -25,24 +24,17 @@ use Test::More; # increment this value for each test you create
 
 plan tests => 3 + 4;
 
-my @added_macros = ();
-push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'GroupText', 'GroupText');
-
-my $macroText = q!^GroupText("Admins","admin","visitor");!;
 my $output;
 
 $session->user({userId => 1});
-$output = $macroText;
-WebGUI::Macro::process($session, \$output);
+$output = WebGUI::Macro::GroupText::process($session, "Admins", "admin", "visitor");
 is($output, 'visitor', 'user is not admin');
 
 $session->user({userId => 3});
-$output = $macroText;
-WebGUI::Macro::process($session, \$output);
+$output = WebGUI::Macro::GroupText::process($session, "Admins", "admin", "visitor");
 is($output, 'admin', 'user is admin');
 
-$output = q!^GroupText("Not a Group","in group","outside group");!;
-WebGUI::Macro::process($session, \$output);
+$output = WebGUI::Macro::GroupText::process($session, "Not a Group","in group","outside group");
 is($output, 'Group Not a Group was not found', 'Non-existant group returns an error message');
 
 ##Bug test setup
@@ -89,21 +81,28 @@ my $int_disti = WebGUI::User->new($session, 'new');
 $ms_distributors->addUsers([$disti->userId]);
 $ms_int_distributors->addUsers([$int_disti->userId]);
 
-$macroText = q!^GroupText("MS Users","user","not");,^GroupText("MS Distributors","disti","not");,^GroupText("MS International Distributors","int_disti","not");!;
-
 $session->user({userId => $mob[0]->userId});
-$output = $macroText;
-WebGUI::Macro::process($session, \$output);
+$output = join ',',
+		WebGUI::Macro::GroupText::process($session, "MS Users","user","not"),
+		WebGUI::Macro::GroupText::process($session, "MS Distributors","disti","not"),
+		WebGUI::Macro::GroupText::process($session, "MS International Distributors","int_disti","not"),
+	;
 is($output, 'user,not,not', 'user is ms user');
 
 $session->user({userId => $disti->userId});
-$output = $macroText;
-WebGUI::Macro::process($session, \$output);
+$output = join ',',
+		WebGUI::Macro::GroupText::process($session, "MS Users","user","not"),
+		WebGUI::Macro::GroupText::process($session, "MS Distributors","disti","not"),
+		WebGUI::Macro::GroupText::process($session, "MS International Distributors","int_disti","not"),
+	;
 is($output, 'user,disti,not', 'user is ms user and distributor');
 
 $session->user({userId => $int_disti->userId});
-$output = $macroText;
-WebGUI::Macro::process($session, \$output);
+$output = join ',',
+		WebGUI::Macro::GroupText::process($session, "MS Users","user","not"),
+		WebGUI::Macro::GroupText::process($session, "MS Distributors","disti","not"),
+		WebGUI::Macro::GroupText::process($session, "MS International Distributors","int_disti","not"),
+	;
 is($output, 'user,disti,int_disti', 'user is in all three groups');
 
 ##clean up everything
@@ -115,9 +114,4 @@ END {
 		$dude->delete if (defined $dude and ref $dude eq 'WebGUI::User');
 	}
 	$session->db->dbh->do('DROP TABLE IF EXISTS myUserTable');
-	foreach my $macro (@added_macros) {
-		next unless $macro;
-		$session->config->deleteFromHash("macros", $macro);
-	}
 }
-

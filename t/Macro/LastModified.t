@@ -13,16 +13,12 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro;
+use WebGUI::Macro::LastModified;
 use WebGUI::Session;
-use WebGUI::Macro_Config;
 
 use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
-
-my @added_macros = ();
-push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'LastModified', 'LastModified');
 
 my $homeAsset = WebGUI::Asset->getDefault($session);
 
@@ -33,25 +29,22 @@ my ($time) = $session->dbSlave->quickArray("SELECT max(revisionDate) FROM assetD
 
 my @testSets = (
 	{
-	macroText => q!^LastModified();!,
-	label => q!!,
-	format => q!!,
-	output => $session->datetime->epochToHuman($time,'%z'),
-	comment => 'checking defaults with empty args',
+		label => q!!,
+		format => q!!,
+		output => $session->datetime->epochToHuman($time,'%z'),
+		comment => 'checking defaults with empty args',
 	},
 	{
-	macroText => q!^LastModified("%s");!,
-	label => q!Last modified on: !,
-	format => q!!,
-	output => 'Last modified on: '.$session->datetime->epochToHuman($time,'%z'),
-	comment => 'checking label, empty format',
+		label => q!Last modified on: !,
+		format => q!!,
+		output => 'Last modified on: '.$session->datetime->epochToHuman($time,'%z'),
+		comment => 'checking label, empty format',
 	},
 	{
-	macroText => q!^LastModified("%s","%s");!,
-	label => '',
-	format => q!%c %y!,
-	output => $session->datetime->epochToHuman($time,'%c %y'),
-	comment => 'checking format, empty label',
+		label => '',
+		format => q!%c %y!,
+		output => $session->datetime->epochToHuman($time,'%c %y'),
+		comment => 'checking format, empty label',
 	},
 );
 
@@ -60,8 +53,7 @@ my $numTests = scalar @testSets + 2;
 plan tests => $numTests;
 
 foreach my $testSet (@testSets) {
-	my $output = sprintf $testSet->{macroText}, $testSet->{label}, $testSet->{format};
-	WebGUI::Macro::process($session, \$output);
+	my $output = WebGUI::Macro::LastModified::process($session, $testSet->{label}, $testSet->{format});
 	is($output, $testSet->{output}, $testSet->{comment});
 }
 
@@ -69,11 +61,4 @@ TODO: {
 	local $TODO = "Tests to make later";
 	ok(0, 'Check label and format');
 	ok(0, 'Create asset with revisionDate = 0 and check label "never"');
-}
-
-END {
-	foreach my $macro (@added_macros) {
-		next unless $macro;
-		$session->config->deleteFromHash("macros", $macro);
-	}
 }

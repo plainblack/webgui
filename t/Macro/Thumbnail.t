@@ -13,9 +13,8 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro;
+use WebGUI::Macro::Thumbnail;
 use WebGUI::Session;
-use WebGUI::Macro_Config;
 use WebGUI::Image;
 use WebGUI::Storage::Image;
 
@@ -26,9 +25,6 @@ use Test::Deep;
 plan tests => 7;
 
 my $session = WebGUI::Test->session;
-
-my @added_macros = ();
-push @added_macros, WebGUI::Macro_Config::enable_macro($session, 'Thumbnail', 'Thumbnail');
 
 my $square = WebGUI::Image->new($session, 100, 100);
 $square->setBackgroundColor('#0000FF');
@@ -68,10 +64,9 @@ $asset->generateThumbnail();
 ##Call the Thumbnail Macro with that Asset's URL and see if it returns
 ##the correct URL.
 
-my $macroText = sprintf q!^Thumbnail("%s");!, $asset->getUrl();
-WebGUI::Macro::process($session, \$macroText);
+my $output = WebGUI::Macro::Thumbnail::process($session, $asset->getUrl());
 my $macroUrl = $storage->getPath('thumb-square.png');
-is($macroText, $asset->getThumbnailUrl, 'Macro returns correct filename');
+is($output, $asset->getThumbnailUrl, 'Macro returns correct filename');
 
 my $thumbUrl = $asset->getThumbnailUrl;
 substr($thumbUrl, 0, length($session->config->get("uploadsURL"))) = '';
@@ -92,8 +87,4 @@ END {
 		$versionTag->rollback;
 	}
 	##Storage is cleaned up by rolling back the version tag
-	foreach my $macro (@added_macros) {
-		next unless $macro;
-		$session->config->deleteFromHash("macros", $macro);
-	}
 }
