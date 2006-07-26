@@ -8,6 +8,16 @@ versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
 
+7.0.4
+--------------------------------------------------------------------
+
+ * Version 7.0.3 shipped with a 7.0.2 create.sql script. This doesn't
+   really hurt anything, it just means that if you installed 7.0.3
+   as your starting point, you'll see an extra upgrade go through
+   when you upgrade to 7.0.4.
+
+
+
 7.0.3
 --------------------------------------------------------------------
 
