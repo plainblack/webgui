@@ -31,7 +31,24 @@ $session->asset($homeAsset);
 my $output = WebGUI::Macro::PageTitle::process($session);
 is($output, $homeAsset->get('title'), 'fetching title for site default asset');
 
-TODO: {
-	local $TODO = "Tests to make later";
-	ok(0, 'Fetch title from locally made asset with known title');
+# Create a new snippet and set it's title then check it against the macros output
+my $snippetTitle = "Roy's Incredible Snippet of Mystery and Intrique";
+my $snippet = $homeAsset->addChild({
+                        className=>"WebGUI::Asset::Snippet",
+                        title=>$snippetTitle,
+                        menuTitle=>"Test Snippet",
+                        groupIdView=>7,
+                        groupIdEdit=>3,
+                        });
+$session->asset($snippet);
+my $macroOutput = WebGUI::Macro::PageTitle::process($session);
+is($macroOutput, $snippet->get('title'), "testing title returned from localy created asset with known title");
+
+my @added_macros;
+END {
+        foreach my $macro (@added_macros) {
+                next unless $macro;
+                $session->config->deleteFromHash("macros", $macro);
+        }
 }
+
