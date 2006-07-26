@@ -23,6 +23,7 @@ my $wgbday = 997966800;
 my $bdayCopy = $wgbday;
 ok($session->datetime->addToDate($wgbday,1,2,3) >= $wgbday+1*60*60*24*365+2*60*60*24*28+3*60*60*24, "addToDate()"); 
 ok($session->datetime->addToTime($wgbday,1,2,3) >= $wgbday+1*60*60+2*60+3, "addToTime()"); 
+ok($session->datetime->addToDateTime($wgbday,1,2,3,4,5,6) >= $wgbday+1*60*60*24*365+2*60*60*24*28+3*60*60*24+4*60*60+5*60+6, "addToDateTime()"); 
 my ($start, $end) = $session->datetime->dayStartEnd($wgbday);
 ok($end-$start >= 60*60*23, "dayStartEnd()"); 
 is($session->datetime->epochToHuman($wgbday,"%y"), "2001", "epochToHuman() - year"); 
