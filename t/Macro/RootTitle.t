@@ -30,78 +30,78 @@ my $session = WebGUI::Test->session;
 #    |       / \
 #    B      Y   X
 
-#my $versionTag = WebGUI::VersionTag->getWorking($session);
-#$versionTag->set({name=>"Adding assets for RootTitle tests"});
+my $versionTag = WebGUI::VersionTag->getWorking($session);
+$versionTag->set({name=>"Adding assets for RootTitle tests"});
 
 my $root = WebGUI::Asset->getRoot($session);
 my %properties_A = (
-		className => 'WebGUI::Asset::Snippet',
-		title     => 'Asset A',
-		url       => 'asset-a',
-		snippet   => 'root A',
+		className   => 'WebGUI::Asset::Snippet',
+		title       => 'Asset A',
+		url         => 'asset-a',
+		snippet     => 'root A',
+		ownerUserId => 3,
+		groupIdView => 7,
+		groupIdEdit => 3,
+		id          => 'RootA-----------------',
 		#            '1234567890123456789012'
-		id        => 'RootA-----------------',
 );
 
-my $versionA = WebGUI::VersionTag->getWorking($session);
-$versionA->set({name=>"Adding asset A"});
 my $assetA = $root->addChild(\%properties_A, $properties_A{id});
-$versionA->commit;
 
 my %properties_B = (
-		className => 'WebGUI::Asset::Snippet',
-		title     => 'Asset B',
-		url       => 'asset-b',
-		snippet   => 'Asset B',
+		className   => 'WebGUI::Asset::Snippet',
+		title       => 'Asset B',
+		url         => 'asset-b',
+		snippet     => 'Asset B',
+		ownerUserId => 3,
+		groupIdView => 7,
+		groupIdEdit => 3,
 		#            '1234567890123456789012'
-		id        => 'RootA-AssetB----------',
+		id          => 'RootA-AssetB----------',
 );
 
-my $versionB = WebGUI::VersionTag->getWorking($session);
-$versionB->set({name=>"Adding asset B"});
 my $assetB = $assetA->addChild(\%properties_B, $properties_B{id});
-$versionB->commit;
 
 my %properties_Z = (
-		className => 'WebGUI::Asset::Snippet',
-		title     => 'Asset Z',
-		url       => 'asset-z',
-		snippet   => 'root Z',
+		className   => 'WebGUI::Asset::Snippet',
+		title       => 'Asset Z',
+		url         => 'asset-z',
+		snippet     => 'root Z',
+		ownerUserId => 3,
+		groupIdView => 7,
+		groupIdEdit => 3,
 		#            '1234567890123456789012'
-		id        => 'RootZ-----------------',
+		id          => 'RootZ-----------------',
 );
-my $versionZ = WebGUI::VersionTag->getWorking($session);
-$versionZ->set({name=>"Adding asset Z"});
 my $assetZ = $root->addChild(\%properties_Z, $properties_Z{id});
-$versionZ->commit;
 
 my %properties_Y = (
-		className => 'WebGUI::Asset::Snippet',
-		title     => 'Asset Y',
-		url       => 'asset-y',
-		snippet   => 'Asset Y',
+		className   => 'WebGUI::Asset::Snippet',
+		title       => 'Asset Y',
+		url         => 'asset-y',
+		snippet     => 'Asset Y',
+		ownerUserId => 3,
+		groupIdView => 7,
+		groupIdEdit => 3,
 		#            '1234567890123456789012'
-		id        => 'RootZ-AssetY----------',
+		id          => 'RootZ-AssetY----------',
 );
-my $versionY = WebGUI::VersionTag->getWorking($session);
-$versionY->set({name=>"Adding asset Y"});
 my $assetY = $assetZ->addChild(\%properties_Y, $properties_Y{id});
-$versionY->commit;
 
 my %properties_X = (
-		className => 'WebGUI::Asset::Snippet',
-		title     => 'Asset X',
-		url       => 'asset-x',
-		snippet   => 'Asset X',
+		className   => 'WebGUI::Asset::Snippet',
+		title       => 'Asset X',
+		url         => 'asset-x',
+		snippet     => 'Asset X',
+		ownerUserId => 3,
+		groupIdView => 7,
+		groupIdEdit => 3,
 		#            '1234567890123456789012'
-		id        => 'RootZ-AssetX----------',
+		id          => 'RootZ-AssetX----------',
 );
-my $versionX = WebGUI::VersionTag->getWorking($session);
-$versionX->set({name=>"Adding asset X"});
 my $assetX = $assetZ->addChild(\%properties_X, $properties_X{id});
-$versionX->commit;
 
-#$versionTag->commit;
+$versionTag->commit;
 
 my @testSets = (
 	{
@@ -140,13 +140,7 @@ foreach my $testSet (@testSets) {
 }
 
 END { ##Clean-up after yourself, always
-#	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
-#		$versionTag->rollback;
-#	}
-
-	foreach my $vTag ($versionB, $versionA, $versionX, $versionY, $versionZ) {
-		if (defined $vTag and ref $vTag eq 'WebGUI::VersionTag') {
-			$vTag->rollback;
-		}
+	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
+		$versionTag->rollback;
 	}
 }

@@ -43,12 +43,3 @@ my $snippet = $homeAsset->addChild({
 $session->asset($snippet);
 my $macroOutput = WebGUI::Macro::PageTitle::process($session);
 is($macroOutput, $snippet->get('title'), "testing title returned from localy created asset with known title");
-
-my @added_macros;
-END {
-        foreach my $macro (@added_macros) {
-                next unless $macro;
-                $session->config->deleteFromHash("macros", $macro);
-        }
-}
-
