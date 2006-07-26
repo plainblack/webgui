@@ -56,6 +56,7 @@
  - Added "Save and Commit" option for environments where the appearance of
    workflow is unwanted.
  - fix: WebGUI::International::get can't handle spaces
+ - fix: makePagePrintable macro uses style name instead of styleId
 
 
 7.0.2
