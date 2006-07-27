@@ -43,7 +43,7 @@ my %properties_A = (
 		groupIdView => 7,
 		groupIdEdit => 3,
 		id          => 'RootA-----------------',
-		#            '1234567890123456789012'
+		#              '1234567890123456789012'
 );
 
 my $assetA = $root->addChild(\%properties_A, $properties_A{id});
@@ -56,7 +56,7 @@ my %properties_B = (
 		ownerUserId => 3,
 		groupIdView => 7,
 		groupIdEdit => 3,
-		#            '1234567890123456789012'
+		#              '1234567890123456789012'
 		id          => 'RootA-AssetB----------',
 );
 
@@ -70,7 +70,7 @@ my %properties_Z = (
 		ownerUserId => 3,
 		groupIdView => 7,
 		groupIdEdit => 3,
-		#            '1234567890123456789012'
+		#              '1234567890123456789012'
 		id          => 'RootZ-----------------',
 );
 my $assetZ = $root->addChild(\%properties_Z, $properties_Z{id});
@@ -83,7 +83,7 @@ my %properties_Y = (
 		ownerUserId => 3,
 		groupIdView => 7,
 		groupIdEdit => 3,
-		#            '1234567890123456789012'
+		#              '1234567890123456789012'
 		id          => 'RootZ-AssetY----------',
 );
 my $assetY = $assetZ->addChild(\%properties_Y, $properties_Y{id});
@@ -96,7 +96,7 @@ my %properties_X = (
 		ownerUserId => 3,
 		groupIdView => 7,
 		groupIdEdit => 3,
-		#            '1234567890123456789012'
+		#              '1234567890123456789012'
 		id          => 'RootZ-AssetX----------',
 );
 my $assetX = $assetZ->addChild(\%properties_X, $properties_X{id});

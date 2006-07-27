@@ -15,7 +15,6 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Macro::Extras;
 use WebGUI::Session;
-use WebGUI::Macro_Config;
 
 use Test::More; # increment this value for each test you create
 

@@ -15,7 +15,6 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Macro::AdminToggle;
 use WebGUI::Session;
-use WebGUI::Macro_Config;
 use HTML::TokeParser;
 use Data::Dumper;
 
