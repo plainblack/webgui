@@ -62,9 +62,7 @@ sub process {
 	if ($param[0] ne "linkonly") {
 		my %var;
 		$var{'printable.url'} = $temp;
-		$session->errorHandler->warn($param[0]);
        		if ($param[0] ne "") {
-			$session->errorHandler->warn('non-null');
                		$var{'printable.text'} = $param[0];
        		} else {
 			my $i18n = WebGUI::International->new($session,'Macro_r_printable');
