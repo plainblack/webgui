@@ -53,9 +53,6 @@ sub process {
         my ($temp, @param);
         @param = @_;
 	my $append = 'op=makePrintable';
-	if ($session->env->get("REQUEST_URI") =~ /op\=/) {
-		$append = 'op2='.$session->url->escape($append);
-	}
 	$temp = $session->url->page($append);
         $temp =~ s/\/\//\//;
         $temp = $session->url->append($temp,$session->env->get("QUERY_STRING"));
@@ -65,7 +62,9 @@ sub process {
 	if ($param[0] ne "linkonly") {
 		my %var;
 		$var{'printable.url'} = $temp;
+		$session->errorHandler->warn($param[0]);
        		if ($param[0] ne "") {
+			$session->errorHandler->warn('non-null');
                		$var{'printable.text'} = $param[0];
        		} else {
 			my $i18n = WebGUI::International->new($session,'Macro_r_printable');
