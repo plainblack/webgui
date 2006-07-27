@@ -50,7 +50,7 @@ is used.
 #-------------------------------------------------------------------
 sub process {
 	my $session = shift;
-        my ($temp, @param, $styleId);
+        my ($temp, @param);
         @param = @_;
 	my $append = 'op=makePrintable';
 	if ($session->env->get("REQUEST_URI") =~ /op\=/) {

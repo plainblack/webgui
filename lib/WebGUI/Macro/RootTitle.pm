@@ -32,17 +32,19 @@ is returned.  Otherwise an empty string is returned.
 #-------------------------------------------------------------------
 sub process {
 	my $session = shift;
-	if ($session->asset) {
-		my $lineage = $session->asset->get("lineage");
-		$lineage = substr($lineage,0,6);
-		my $root = WebGUI::Asset->newByLineage($session,$lineage);
-		if (defined $root) {
-			return $root->get("title");	
-		}
-	}
-	return "";
+	return "" unless $session->asset;
+
+	my $lineage = $session->asset->get("lineage");
+	return $session->asset->getTitle
+		if (length($lineage) == 6); ##I am the super root.
+
+	##Get my root.
+	$lineage = substr($lineage,0,12);
+	my $root = WebGUI::Asset->newByLineage($session,$lineage);
+
+	return "" unless defined $root;
+	return $root->get("title");	
 }
 
 
 1;
-
