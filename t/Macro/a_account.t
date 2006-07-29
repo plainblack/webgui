@@ -13,7 +13,6 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro::a_account;
 use WebGUI::Session;
 use HTML::TokeParser;
 use Data::Dumper;
@@ -33,31 +32,31 @@ my $i18n = WebGUI::International->new($session,'Macro_a_account');
 
 my @testSets = (
 	{
+		comment => 'linkonly argument',
 		label => q!linkonly!,
 		template => q!!,
 		output => $session->url->append($homeAsset->getUrl(),'op=auth;method=init'),
-		comment => 'linkonly argument',
 	},
 	{
-		label => $i18n->get(46),
+		comment => 'default macro call',
+		label => q!!,
 		template => q!!,
 		url => $session->url->page('op=auth;method=init'), ##already validated URL above
 		output => \&simpleHTMLParser,
-		comment => 'default macro call',
 	},
 	{
+		comment => 'custom label',
 		label => q!This is your account!,
 		template => q!!,
 		url => $session->url->page('op=auth;method=init'),
 		output => \&simpleHTMLParser,
-		comment => 'custom label',
 	},
 	{
+		comment => 'custom template',
 		label => q!Custom label!,
 		template => $template->get('url'),
 		url => $session->url->page('op=auth;method=init'),
 		output => \&simpleTextParser,
-		comment => 'custom template',
 	},
 );
 
@@ -66,11 +65,14 @@ foreach my $testSet (@testSets) {
 	$numTests += 1 + (ref $testSet->{output} eq 'CODE');
 }
 
-plan tests => $numTests;
+plan tests => $numTests + 1;
+
+use_ok('WebGUI::Macro::a_account');
 
 foreach my $testSet (@testSets) {
 	my $output = WebGUI::Macro::a_account::process( $session,
 		$testSet->{label}, $testSet->{template} );
+	$testSet->{label} ||= $i18n->get(46);  ##Get default text if blank
 	if (ref $testSet->{output} eq 'CODE') {
 		my ($url, $label) = $testSet->{output}->($output);
 		is($label, $testSet->{label}, $testSet->{comment}.", label");
