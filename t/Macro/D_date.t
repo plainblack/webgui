@@ -21,9 +21,7 @@ use Data::Dumper;
 
 use Test::More; # increment this value for each test you create
 
-my $macroText = '^D("%s",%s);';
 my $wgbday = 997966800;
-my $output;
 
 my @testSets = (
 	{

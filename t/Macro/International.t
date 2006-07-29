@@ -21,9 +21,6 @@ use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-my $macroText = '^International("%s","%s");';
-my $output;
-
 my @testSets = (
 	{
 		input => ['macroName', 'Macro_International'],

@@ -25,25 +25,21 @@ my $session = WebGUI::Test->session;
 my @testSets = (
 	{
 		comment => '5x5',
-		macroText => q!^Spacer("%s","%s");!,
 		width => 5,
 		height => 5,
 	},
 	{
 		comment => '10x3',
-		macroText => q!^Spacer("%s","%s");!,
 		width => 10,
 		height => 3,
 	},
 	{
 		comment => 'width only',
-		macroText => q!^Spacer("%s");!,
 		width => 11,
 		height => '',
 	},
 	{
 		comment => 'height only',
-		macroText => q!^Spacer("%s","%s");!,
 		width => '',
 		height => 7,
 	},

@@ -23,7 +23,11 @@ use Test::More; # increment this value for each test you create
 my $session = WebGUI::Test->session;
 my $i18n = WebGUI::International->new($session, 'Macro_FileUrl');
 
-##Add more Asset configurations here.
+##Add more Asset configurations here.  Each Asset is created and a reference
+##is put into the "asset" key of the hash.
+##The URL for the file the Asset contains is calculated and put
+##in the "fileUrl" key of the hash.
+
 my @testSets = (
 	{
 		comment => 'File Asset works with FileUrl',
@@ -83,8 +87,6 @@ my @testSets = (
 
 plan tests => scalar(@testSets) + 1;
 
-my $macroText = '^FileUrl("%s");';
-
 my $homeAsset = WebGUI::Asset->getDefault($session);
 my $versionTag;
 
@@ -100,8 +102,7 @@ foreach my $testSet (@testSets) {
 	}
 }
 
-my $output = sprintf $macroText, "non-existant-url";
-WebGUI::Macro::process($session, \$output);
+my $output = WebGUI::Macro::FileUrl::process($session, "non-existant-url");
 is($output, $i18n->get('invalid url'), "Non-existant url returns error message");
 
 sub setupTest {
