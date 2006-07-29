@@ -65,9 +65,16 @@ foreach my $testSet (@testSets) {
 	$numTests += 1 + (ref $testSet->{output} eq 'CODE');
 }
 
-plan tests => $numTests + 1;
+$numTests += 1; #For the use_ok
 
-use_ok('WebGUI::Macro::a_account');
+plan tests => $numTests;
+
+my $macro = 'WebGUI::Macro::a_account';
+my $loaded = use_ok($macro);
+
+SKIP: {
+
+skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 foreach my $testSet (@testSets) {
 	my $output = WebGUI::Macro::a_account::process( $session,
@@ -81,6 +88,8 @@ foreach my $testSet (@testSets) {
 	else {
 		is($output, $testSet->{output}, $testSet->{comment});
 	}
+}
+
 }
 
 sub addTemplate {
