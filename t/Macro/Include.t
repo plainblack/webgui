@@ -33,7 +33,8 @@ my $storage = WebGUI::Storage->createTemp($session);
 $storage->addFileFromScalar('goodFile', $goodFile);
 $storage->addFileFromScalar('twoLines', $twoLines);
 $storage->addFileFromScalar('unreadableFile', 'The contents of this file are not readable');
-chmod 0111, $storage->getPath('unreadableFile');
+chmod 0111, $storage->getPath('unreadableFile')
+	or diag($!);
 
 my @testSets = (
 	{
@@ -99,7 +100,7 @@ plan tests => $numTests;
 
 foreach my $testSet (@testSets) {
 	my $output = WebGUI::Macro::Include::process($session, $testSet->{file});
-	is($output, $testSet->{output}, $testSet->{comment} );
+	my $passed = is($output, $testSet->{output}, $testSet->{comment} . ":" .$testSet->{file});
 }
 
 END {
