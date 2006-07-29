@@ -13,7 +13,6 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro::International;
 use WebGUI::Session;
 use Data::Dumper;
 
@@ -44,11 +43,19 @@ my @testSets = (
 	},
 );
 
-my $numTests = scalar @testSets;
+my $numTests = scalar @testSets + 1;
 
 plan tests => $numTests;
+
+my $loaded = use_ok('WebGUI::Macro::International');
+
+SKIP: {
+
+skip 'Module was not loaded, skipping all tests', $numTests -1 unless $loaded;
 
 foreach my $testSet (@testSets) {
 	my $output = WebGUI::Macro::International::process($session, @{ $testSet->{input} });
 	is($output, $testSet->{output}, $testSet->{comment} );
+}
+
 }
