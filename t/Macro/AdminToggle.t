@@ -13,7 +13,6 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro::AdminToggle;
 use WebGUI::Session;
 use HTML::TokeParser;
 use Data::Dumper;
@@ -43,8 +42,8 @@ my @testSets = (
 		comment => 'Admin sees onText, default call',
 		userId => 3,
 		adminStatus => 'off',
-		onText => $i18n->get(516),
-		offText => $i18n->get(517),
+		onText => '',
+		offText => '',
 		template => q!!,
 		url => $session->url->append($homeAsset->getUrl(),'op=switchOnAdmin'),
 		output => \&simpleHTMLParser,
@@ -53,8 +52,8 @@ my @testSets = (
 		comment => 'Admin sees offText, default call',
 		userId => 3,
 		adminStatus => 'on',
-		onText => $i18n->get(516),
-		offText => $i18n->get(517),
+		onText => '',
+		offText => '',
 		template => q!!,
 		url => $session->url->append($homeAsset->getUrl(),'op=switchOffAdmin'),
 		output => \&simpleHTMLParser,
@@ -106,20 +105,24 @@ foreach my $testSet (@testSets) {
 	$numTests += 1 + (ref $testSet->{output} eq 'CODE');
 }
 
-plan tests => $numTests + 1;
+plan tests => $numTests + 2; ##conditional module load and TODO at end
+
+my $macro = 'WebGUI::Macro::AdminToggle';
+my $loaded = use_ok($macro);
+
+SKIP: {
+
+skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 foreach my $testSet (@testSets) {
 	$session->user({userId=>$testSet->{userId}});
 	if ($testSet->{adminStatus} eq 'off') {
 		$session->var->switchAdminOff();
-		$testSet->{label} = $testSet->{onText};
-	}
-	elsif ($testSet->{adminStatus} eq 'on') {
-		$session->var->switchAdminOn();
-		$testSet->{label} = $testSet->{offText};
+		$testSet->{label} = $testSet->{onText} || $i18n->get(516);
 	}
 	else {
-		BAIL_OUT('Unknown admin status selected');
+		$session->var->switchAdminOn();
+		$testSet->{label} = $testSet->{offText} || $i18n->get(517);
 	}
 	my $output = WebGUI::Macro::AdminToggle::process( $session,
 		$testSet->{onText}, $testSet->{offText}, $testSet->{template} );
@@ -131,6 +134,8 @@ foreach my $testSet (@testSets) {
 	else {
 		is($output, $testSet->{output}, $testSet->{comment});
 	}
+}
+
 }
 
 TODO: {
