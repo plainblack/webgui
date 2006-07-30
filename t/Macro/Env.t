@@ -13,7 +13,6 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro::Env;
 use WebGUI::Session;
 use Data::Dumper;
 
@@ -28,7 +27,16 @@ my $session = WebGUI::Test->session;
 my %env = %{ $session->env->{_env} };
 my @keys = keys %env;
 
-plan tests => 3 + scalar keys %env;
+my $numTests = 1 + 3 + scalar keys %env;
+
+plan tests => $numTests;
+
+my $macro = 'WebGUI::Macro::Env';
+my $loaded = use_ok($macro);
+
+SKIP: {
+
+skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 my $output;
 
@@ -44,4 +52,6 @@ is($output, undef, 'non existent key');
 foreach my $key (keys %env) {
 	my $output =  WebGUI::Macro::Env::process($session, $key);
 	is($output, $env{$key}, 'Fetching: '.$key);
+}
+
 }

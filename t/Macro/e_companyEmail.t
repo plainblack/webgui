@@ -13,7 +13,6 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro::e_companyEmail;
 use WebGUI::Session;
 use Data::Dumper;
 
@@ -21,9 +20,20 @@ use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-plan tests => 1;
+my $numTests = 1 + 1;
+
+plan tests => $numTests;
+
+my $macro = 'WebGUI::Macro::e_companyEmail';
+my $loaded = use_ok($macro);
+
+SKIP: {
+
+skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 my ($value) = $session->dbSlave->quickArray(
 	"select value from settings where name='companyEmail'");
 my $output = WebGUI::Macro::e_companyEmail::process($session);
 is($output, $value, sprintf "Testing companyEmail");
+
+}

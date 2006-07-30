@@ -13,7 +13,6 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro::Extras;
 use WebGUI::Session;
 
 use Test::More; # increment this value for each test you create
@@ -50,10 +49,20 @@ my @testSets = (
 
 my $numTests = scalar @testSets;
 
+$numTests += 1;
+
 plan tests => $numTests;
+
+my $macro = 'WebGUI::Macro::Extras';
+my $loaded = use_ok($macro);
+
+SKIP: {
+
+skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 foreach my $testSet (@testSets) {
 	my $output = WebGUI::Macro::Extras::process($session, $testSet->{path});
 	is($output, $testSet->{output}, $testSet->{comment});
 }
 
+}
