@@ -34,8 +34,8 @@ my @testSets = (
 		userId      => 1,
 		adminStatus => 'off',
 		asset       => $homeAsset,
-		onText      => $i18n->get(516),
-		offText     => $i18n->get(517),
+		onText      => '',
+		offText     => '',
 		template    => q!!,
 		output      => '',
 	},
@@ -44,8 +44,8 @@ my @testSets = (
 		userId      => 1,
 		adminStatus => 'on',
 		asset       => $homeAsset,
-		onText      => $i18n->get(516),
-		offText     => $i18n->get(517),
+		onText      => '',
+		offText     => '',
 		template    => q!!,
 		output      => '',
 	},
@@ -54,8 +54,8 @@ my @testSets = (
 		userId      => 3,
 		adminStatus => 'off',
 		asset       => $homeAsset,
-		onText      => $i18n->get(516),
-		offText     => $i18n->get(517),
+		onText      => '',
+		offText     => '',
 		template    => q!!,
 		output      => \&simpleHTMLParser,
 	},
@@ -64,8 +64,8 @@ my @testSets = (
 		userId      => 3,
 		adminStatus => 'on',
 		asset       => $homeAsset,
-		onText      => $i18n->get(516),
-		offText     => $i18n->get(517),
+		onText      => '',
+		offText     => '',
 		template    => q!!,
 		output      => \&simpleHTMLParser,
 	},
@@ -74,8 +74,8 @@ my @testSets = (
 		userId => 3,
 		adminStatus => 'off',
 		asset => $asset,
-		onText => $i18n->get(516),
-		offText => $i18n->get(517),
+		onText => '',
+		offText => '',
 		template => q!!,
 		output => \&simpleHTMLParser,
 	},
@@ -84,8 +84,8 @@ my @testSets = (
 		userId => 3,
 		adminStatus => 'on',
 		asset => $asset,
-		onText => $i18n->get(516),
-		offText => $i18n->get(517),
+		onText => '',
+		offText => '',
 		template => q!!,
 		output => \&simpleHTMLParser,
 	},
@@ -94,8 +94,8 @@ my @testSets = (
 		userId => $users[0]->userId,
 		adminStatus => 'off',
 		asset => $asset,
-		onText => $i18n->get(516),
-		offText => $i18n->get(517),
+		onText => '',
+		offText => '',
 		template => q!!,
 		output => '',
 	},
@@ -104,8 +104,8 @@ my @testSets = (
 		userId => $users[0]->userId,
 		adminStatus => 'on',
 		asset => $asset,
-		onText => $i18n->get(516),
-		offText => $i18n->get(517),
+		onText => '',
+		offText => '',
 		template => q!!,
 		output => '',
 	},
@@ -114,8 +114,8 @@ my @testSets = (
 		userId => $users[1]->userId,
 		adminStatus => 'off',
 		asset => $asset,
-		onText => $i18n->get(516),
-		offText => $i18n->get(517),
+		onText => '',
+		offText => '',
 		template => q!!,
 		output => '',
 	},
@@ -124,8 +124,8 @@ my @testSets = (
 		userId => $users[1]->userId,
 		adminStatus => 'on',
 		asset => $asset,
-		onText => $i18n->get(516),
-		offText => $i18n->get(517),
+		onText => '',
+		offText => '',
 		template => q!!,
 		output => '',
 	},
@@ -134,8 +134,8 @@ my @testSets = (
 		userId => $users[2]->userId,
 		adminStatus => 'off',
 		asset => $asset,
-		onText => $i18n->get(516),
-		offText => $i18n->get(517),
+		onText => '',
+		offText => '',
 		template => q!!,
 		output => \&simpleHTMLParser,
 	},
@@ -144,8 +144,8 @@ my @testSets = (
 		userId => $users[2]->userId,
 		adminStatus => 'on',
 		asset => $asset,
-		onText => $i18n->get(516),
-		offText => $i18n->get(517),
+		onText => '',
+		offText => '',
 		template => q!!,
 		output => \&simpleHTMLParser,
 	},
@@ -186,19 +186,28 @@ foreach my $testSet (@testSets) {
 	$numTests += 1 + (ref $testSet->{output} eq 'CODE');
 }
 
+$numTests += 1;
+
 plan tests => $numTests;
+
+my $macro = 'WebGUI::Macro::EditableToggle';
+my $loaded = use_ok($macro);
+
+SKIP: {
+
+skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 foreach my $testSet (@testSets) {
 	$session->user({userId=>$testSet->{userId}});
 	$session->asset($testSet->{asset});
 	if ($testSet->{adminStatus} eq 'off') {
 		$session->var->switchAdminOff();
-		$testSet->{label} = $testSet->{onText};
+		$testSet->{label} = $testSet->{onText} || $i18n->get(516);
 		$testSet->{url} = $session->url->page('op=switchOnAdmin'),
 	}
 	elsif ($testSet->{adminStatus} eq 'on') {
 		$session->var->switchAdminOn();
-		$testSet->{label} = $testSet->{offText};
+		$testSet->{label} = $testSet->{offText} || $i18n->get(517);
 		$testSet->{url} = $session->url->page('op=switchOffAdmin'),
 	}
 	else {
@@ -214,6 +223,8 @@ foreach my $testSet (@testSets) {
 	else {
 		is($output, $testSet->{output}, $testSet->{comment});
 	}
+}
+
 }
 
 sub simpleHTMLParser {

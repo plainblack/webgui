@@ -13,16 +13,12 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro::CanEditText;
 use WebGUI::Session;
 use Data::Dumper;
 
 my $session = WebGUI::Test->session;
 
 use Test::More; # increment this value for each test you create
-
-my $adminText = "^CanEditText(editor);";
-my $output;
 
 my $homeAsset = WebGUI::Asset->getDefault($session);
 $session->asset($homeAsset);
@@ -66,9 +62,16 @@ my @testSets = (
 	},
 );
 
-my $numTests = scalar @testSets;
+my $numTests = scalar @testSets + 1;
 
 plan tests => $numTests;
+
+my $macro = 'WebGUI::Macro::CanEditText';
+my $loaded = use_ok($macro);
+
+SKIP: {
+
+skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 foreach my $testSet (@testSets) {
 	$session->user({userId=>$testSet->{userId}});
@@ -77,6 +80,7 @@ foreach my $testSet (@testSets) {
 	is($output, $testSet->{output}, $testSet->{comment});
 }
 
+}
 
 sub setupTest {
 	my ($session, $defaultNode) = @_;

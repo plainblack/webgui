@@ -14,7 +14,6 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro::D_date;
 use WebGUI::Session;
 use Data::Dumper;
 # ---- END DO NOT EDIT ----
@@ -34,13 +33,27 @@ my @testSets = (
 	},
 );
 
-my $numTests = scalar @testSets;
+my $numTests = scalar @testSets + 1 + 1;
 
 plan tests => $numTests;
+
+my $macro = 'WebGUI::Macro::D_date';
+my $loaded = use_ok($macro);
+
+SKIP: {
+
+skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 my $session = WebGUI::Test->session;
 
 foreach my $testSet (@testSets) {
 	my $output = WebGUI::Macro::D_date::process($session, $testSet->{format}, $wgbday);
 	is($output, $testSet->{output}, 'testing '.$testSet->{format});
+}
+
+TODO: {
+	local $TODO = "Ideas for other tests";
+	ok(0, 'Test macro without a date argument');
+}
+
 }
