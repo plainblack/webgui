@@ -9,7 +9,6 @@
 #-------------------------------------------------------------------
 
 use FindBin;
-use trace;
 use strict;
 use lib "$FindBin::Bin/lib";
 
