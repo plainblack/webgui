@@ -13,7 +13,6 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro::GroupAdd;
 use WebGUI::Session;
 use Data::Dumper;
 
@@ -115,12 +114,20 @@ my @testSets = (
 );
 
 my $numTests = 0;
-
 foreach my $testSet (@testSets) {
 	$numTests += 1 + ($testSet->{empty} == 0);
 }
 
+$numTests += 1; #For the use_ok
+
 plan tests => $numTests;
+
+my $macro = 'WebGUI::Macro::GroupAdd';
+my $loaded = use_ok($macro);
+
+SKIP: {
+
+skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 foreach my $testSet (@testSets) {
 	$session->user({ userId => $testSet->{userId} });
@@ -135,6 +142,8 @@ foreach my $testSet (@testSets) {
 		my $expectedUrl = $session->url->page('op=autoAddToGroup;groupId='.$testSet->{groupId});
 		is($url, $expectedUrl, 'URL: '.$testSet->{comment});
 	}
+}
+
 }
 
 sub setupTest {

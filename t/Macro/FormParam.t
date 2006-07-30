@@ -53,11 +53,29 @@ my @testSets = (
 
 my $numTests = scalar @testSets;
 
-plan tests => $numTests + 2;
+$numTests += 1; ##use_ok
+$numTests += 1; ##testBlock has no name collisions
+$numTests += 3; ##TODO block
 
-use_ok('WebGUI::Macro::FormParam');
+plan tests => $numTests;
+
+my $macro = 'WebGUI::Macro::FormParam';
+my $loaded = use_ok($macro);
+
+SKIP: {
+
+skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 auto_check($session, \@testSets);
+
+}
+
+TODO: {
+	local $TODO = "Tests to write later";
+	ok(0, "What will this do with a non-existant form param?");
+	ok(0, "Also try null");
+	ok(0, "Also try undef");
+}
 
 sub auto_check {
 	my ($session, $testBlock) = @_;

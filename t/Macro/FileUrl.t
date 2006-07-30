@@ -13,7 +13,6 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro::FileUrl;
 use WebGUI::Session;
 use WebGUI::Storage;
 use Data::Dumper;
@@ -85,10 +84,22 @@ my @testSets = (
 );
 
 
-plan tests => scalar(@testSets) + 1;
+my $numTests = scalar(@testSets);
+$numTests += 1; #For the use_ok
+$numTests += 1; #non-existant URL
+
+plan tests => $numTests;
+
+my $macro = 'WebGUI::Macro::FileUrl';
+my $loaded = use_ok($macro);
+
+my $versionTag;
+
+SKIP: {
+
+skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 my $homeAsset = WebGUI::Asset->getDefault($session);
-my $versionTag;
 
 ($versionTag, @testSets) = setupTest($session, $homeAsset, @testSets);
 
@@ -104,6 +115,8 @@ foreach my $testSet (@testSets) {
 
 my $output = WebGUI::Macro::FileUrl::process($session, "non-existant-url");
 is($output, $i18n->get('invalid url'), "Non-existant url returns error message");
+
+}
 
 sub setupTest {
 	my ($session, $homeAsset, @testSets) = @_;
