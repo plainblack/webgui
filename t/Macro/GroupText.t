@@ -13,7 +13,6 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro::GroupText;
 use WebGUI::Session;
 use WebGUI::Group;
 use WebGUI::User;
@@ -22,7 +21,23 @@ my $session = WebGUI::Test->session;
 
 use Test::More; # increment this value for each test you create
 
-plan tests => 3 + 4;
+my $numTests;
+$numTests  = 3; #Direct Macro tests
+$numTests += 4; #Bug tests
+$numTests += 1; #For the use_ok
+
+plan tests => $numTests;
+
+my $macro = 'WebGUI::Macro::GroupText';
+my $loaded = use_ok($macro);
+
+my @mob;
+my ($ms_users, $ms_distributors, $ms_int_distributors);
+my ($disti, $int_disti);
+
+SKIP: {
+
+skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 my $output;
 
@@ -45,7 +60,7 @@ $session->db->dbh->do(q!CREATE TABLE myUserTable (userId varchar(22) binary NOT 
 
 ##Create a bunch of users and put them in the table.
 
-my @mob = map { WebGUI::User->new($session, "new") } 0..3;
+@mob = map { WebGUI::User->new($session, "new") } 0..3;
 my $sth = $session->db->prepare('INSERT INTO myUserTable VALUES(?)');
 foreach my $mob (@mob) {
 	$sth->execute([ $mob->userId ]);
@@ -53,9 +68,9 @@ foreach my $mob (@mob) {
 
 ##Create the 3 groups
 
-my $ms_users = WebGUI::Group->new($session, "new");
-my $ms_distributors = WebGUI::Group->new($session, "new");
-my $ms_int_distributors = WebGUI::Group->new($session, "new");
+$ms_users = WebGUI::Group->new($session, "new");
+$ms_distributors = WebGUI::Group->new($session, "new");
+$ms_int_distributors = WebGUI::Group->new($session, "new");
 
 $ms_users->name('MS Users');
 $ms_distributors->name('MS Distributors');
@@ -75,8 +90,8 @@ $ms_distributors->addGroups([$ms_int_distributors->getId]);
 
 ##Add two users for testing the two groups
 
-my $disti = WebGUI::User->new($session, 'new');
-my $int_disti = WebGUI::User->new($session, 'new');
+$disti = WebGUI::User->new($session, 'new');
+$int_disti = WebGUI::User->new($session, 'new');
 
 $ms_distributors->addUsers([$disti->userId]);
 $ms_int_distributors->addUsers([$int_disti->userId]);
@@ -104,6 +119,8 @@ $output = join ',',
 		WebGUI::Macro::GroupText::process($session, "MS International Distributors","int_disti","not"),
 	;
 is($output, 'user,disti,int_disti', 'user is in all three groups');
+
+}
 
 ##clean up everything
 END {

@@ -13,7 +13,6 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro::Include;
 use WebGUI::Session;
 use WebGUI::Storage;
 
@@ -33,8 +32,7 @@ my $storage = WebGUI::Storage->createTemp($session);
 $storage->addFileFromScalar('goodFile', $goodFile);
 $storage->addFileFromScalar('twoLines', $twoLines);
 $storage->addFileFromScalar('unreadableFile', 'The contents of this file are not readable');
-chmod 0111, $storage->getPath('unreadableFile')
-	or diag($!);
+chmod(0111, $storage->getPath('unreadableFile')) or diag($!);
 
 my @testSets = (
 	{
@@ -96,11 +94,22 @@ my @testSets = (
 
 my $numTests = scalar @testSets;
 
+$numTests += 1; #For the use_ok
+
 plan tests => $numTests;
+
+my $macro = 'WebGUI::Macro::Include';
+my $loaded = use_ok($macro);
+
+SKIP: {
+
+skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 foreach my $testSet (@testSets) {
 	my $output = WebGUI::Macro::Include::process($session, $testSet->{file});
 	my $passed = is($output, $testSet->{output}, $testSet->{comment} . ":" .$testSet->{file});
+}
+
 }
 
 END {

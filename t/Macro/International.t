@@ -43,8 +43,9 @@ my @testSets = (
 	},
 );
 
-my $numTests = scalar @testSets + 1;
+my $numTests = scalar @testSets;
 
+$numTests += 1;
 plan tests => $numTests;
 
 my $loaded = use_ok('WebGUI::Macro::International');

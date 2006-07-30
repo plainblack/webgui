@@ -13,7 +13,6 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro::Page;
 use WebGUI::Session;
 use Data::Dumper;
 
@@ -47,12 +46,21 @@ foreach my $testSet (@testSets) {
 	$numTests += scalar keys %{ $testSet };
 }
 
+$numTests += 1; #For the use_ok
+
 plan tests => $numTests;
+
+my $macro = 'WebGUI::Macro::Page';
+my $loaded = use_ok($macro);
 
 my $homeAsset = WebGUI::Asset->getDefault($session);
 my $versionTag;
 
 ($versionTag, @testSets) = setupTest($session, $homeAsset, @testSets);
+
+SKIP: {
+
+skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 foreach my $testSet (@testSets) {
 	$session->asset($testSet->{asset});
@@ -63,6 +71,8 @@ foreach my $testSet (@testSets) {
 		my $comment = sprintf "Checking asset: %s, field: %s", $class, $field;
 		is($output, $testSet->{$field}, $comment);
 	}
+}
+
 }
 
 sub setupTest {

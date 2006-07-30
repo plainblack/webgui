@@ -131,9 +131,15 @@ foreach my $testSet (@testSets) {
 	$numTests += 1 + (ref $testSet->{parser} eq 'CODE');
 }
 
-plan tests => $numTests + 1;
+$numTests += 1; #for the use_ok
+plan tests => $numTests;
 
-use_ok('WebGUI::Macro::LoginToggle');
+my $macro = 'WebGUI::Macro::LoginToggle';
+my $loaded = use_ok($macro);
+
+SKIP: {
+
+skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 foreach my $testSet (@testSets) {
 	$session->user({userId=>$testSet->{userId}});
@@ -155,6 +161,8 @@ foreach my $testSet (@testSets) {
 	else {
 		is($output, $testSet->{url}, $testSet->{comment});
 	}
+}
+
 }
 
 sub simpleHTMLParser {

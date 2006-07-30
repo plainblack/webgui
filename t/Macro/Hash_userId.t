@@ -15,7 +15,6 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro::Hash_userId;
 use WebGUI::Session;
 use Data::Dumper;
 
@@ -36,10 +35,21 @@ my @testSets = (
 
 my $numTests = scalar @testSets;
 
+$numTests += 1; #For the use_ok
+
 plan tests => $numTests;
+
+my $macro = 'WebGUI::Macro::Hash_userId';
+my $loaded = use_ok($macro);
+
+SKIP: {
+
+skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 foreach my $testSet (@testSets) {
 	$session->user({userId => $testSet->{userId}});
 	my $output = WebGUI::Macro::Hash_userId::process($session);
 	is($output, $testSet->{userId}, 'testing '.$testSet->{comment});
+}
+
 }

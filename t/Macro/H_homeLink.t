@@ -13,7 +13,6 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro::H_homeLink;
 use WebGUI::Session;
 use HTML::TokeParser;
 use Data::Dumper;
@@ -63,7 +62,16 @@ foreach my $testSet (@testSets) {
 	$numTests += 1 + (ref $testSet->{output} eq 'CODE');
 }
 
+$numTests += 1; #For the use_ok
+
 plan tests => $numTests;
+
+my $macro = 'WebGUI::Macro::H_homeLink';
+my $loaded = use_ok($macro);
+
+SKIP: {
+
+skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 foreach my $testSet (@testSets) {
 	my $output = WebGUI::Macro::H_homeLink::process($session, $testSet->{label}, $testSet->{template});
@@ -75,6 +83,8 @@ foreach my $testSet (@testSets) {
 	else {
 		is($output, $testSet->{output}, $testSet->{comment});
 	}
+}
+
 }
 
 sub addTemplate {
