@@ -14,9 +14,9 @@ our $I18N = {
 	},
 
 	'month of year help' => {
-		message => q|Which month of the year do you want this workflow triggered? The range is between 1 and 31. You can specify a specific month like "2" or 12". You may also specify all months by "*". You can specify intervals like "*/3" (every 3 months). And finally you can specify a list of months like "1,5,11".|,
+		message => q|Which month of the year do you want this workflow triggered? The range is between 1 and 12. You can specify a specific month like "2" or 12". You may also specify all months by "*". You can specify intervals like "*/3" (every 3 months). And finally you can specify a list of months like "1,5,11".|,
 		context => q|the hover help for the month of year  field|,
-		lastUpdated => 0,
+		lastUpdated => 1154368718,
 	},
 
 	'month of year' => {
