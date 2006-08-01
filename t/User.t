@@ -36,10 +36,10 @@ ok(defined ($user = WebGUI::User->new($session,"new")), 'new("new") -- object re
 ok(scalar %{$user->{_profile}} > 0, 'new("new") -- profile property contains at least one key');  
 
 #Let's assign a username
-$lastUpdate = time();
 $user->username("bill_lumberg");
+$lastUpdate = time();
 is($user->username, "bill_lumberg", 'username() method');
-ok(abs($user->lastUpdated-$lastUpdate) < 1, 'lastUpdated() -- username change');
+cmp_ok(abs($user->lastUpdated-$lastUpdate), '<=', 1, 'lastUpdated() -- username change');
 
 #Let's check the UID and make sure it's sane
 ok($user->userId =~ m/[A-Za-z0-9\-\_]{22}/, 'userId() returns sane value');
@@ -50,10 +50,10 @@ foreach my $groupId (2,7) {
 }
 
 #Let's check the status method
-$lastUpdate = time();
 $user->status('Active');
+$lastUpdate = time();
 is($user->status, "Active", 'status("Active")');
-ok(abs($user->lastUpdated-$lastUpdate) < 1, 'lastUpdated() -- status change');
+cmp_ok(abs($user->lastUpdated-$lastUpdate), '<=', 1, 'lastUpdated() -- status change');
 
 $user->status('Selfdestructed');
 is($user->status, "Selfdestructed", 'status("Selfdestructed")');
@@ -62,10 +62,10 @@ $user->status('Deactivated');
 is($user->status, "Deactivated", 'status("Deactivated")');
 
 #Let's get/set a profile field
-$lastUpdate = time();
 $user->profileField("firstName", "Bill");
+$lastUpdate = time();
 is($user->profileField("firstName"), "Bill", 'profileField() get/set');
-ok(abs($user->lastUpdated-$lastUpdate) < 1, 'lastUpdated() -- profileField');
+cmp_ok(abs($user->lastUpdated-$lastUpdate), '<=', 1, 'lastUpdated() -- profileField');
 
 #Let's check the auth methods
 
