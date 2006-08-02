@@ -31,6 +31,7 @@ is($session->datetime->epochToHuman($wgbday,"%c"), "August", "epochToHuman() - m
 is($session->datetime->epochToHuman($wgbday,"%m"), "08", "epochToHuman() - month number, 2 digit"); 
 is($session->datetime->epochToHuman($wgbday,"%M"), "8", "epochToHuman() - month number, variable digit"); 
 is($session->datetime->epochToHuman($wgbday,"%%%c%d%h"), "%August1608", "epochToHuman()"); 
+is($session->datetime->epochToHttp($wgbday),"Thu, 16 Aug 2001 13:08:00 GMT","epochToHttp()");
 is($session->datetime->epochToSet($wgbday,1), "2001-08-16 08:00:00", "epochToSet()");
 is($session->datetime->getDayName(7), "Sunday", "getDayName()");
 is($session->datetime->getDaysInMonth($wgbday), 31, "getDaysInMonth()");
