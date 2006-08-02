@@ -49,12 +49,13 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift;
+	my $i18n = WebGUI::International->new($session, "Activity_Skeleton");
 	push(@{$definition}, {
 		name=>$i18n->get("topicName"),
 		properties=> {
 			someField => {
 				fieldType=>"integer",
-				label=>"Some Field"
+				label=>"Some Field",
 				defaultValue=>0,
 				hoverHelp=>"Hover help for some field."
 				},

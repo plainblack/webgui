@@ -4,6 +4,10 @@
  - fixed a bug where the Include macro could be used to read WebGUI config
    files.
  - fix: new by webgui: 31 months in a year
+ - Several new tests.
+ - Many POD fixes.
+ - fix: URI::Escape missing from testEnvironment.pl
+
 
 7.0.3
  - Fixed a problem with the 7.0.0-7.0.1 upgrade relating to internationalized

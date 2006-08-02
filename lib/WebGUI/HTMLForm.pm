@@ -149,29 +149,38 @@ sub fieldSetStart {
 
 #-------------------------------------------------------------------
 
-=head2 new ( [ action, method, extras, enctype, tableExtras ] )
+=head2 new ( session [ properties ] )
 
 Constructor.
 
-=head3 action
+
+=head3 session
+
+A reference to the session.
+
+=head3 properties
+
+A hash of parameters to modify the defaults of the form.
+
+=head4 action
 
 The Action URL for the form information to be submitted to. This defaults to the current page.
 
-=head3 method
+=head4 method
 
 The form's submission method. This defaults to "POST" and probably shouldn't be changed.
 
-=head3 extras
+=head4 extras
 
 If you want to add anything special to your form like javascript actions, or stylesheet information, you'd add it in here as follows:
 
  '"name"="myForm" onchange="myForm.submit()"'
 
-=head3 enctype 
+=head4 enctype 
 
 The encapsulation type for this form. This defaults to "multipart/form-data" and should probably never be changed.
 
-=head3 tableExtras
+=head4 tableExtras
 
 If you want to add anything special to the form's table like a name or stylesheet information, you'd add it in here as follows:
 

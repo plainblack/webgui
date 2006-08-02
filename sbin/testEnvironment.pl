@@ -89,6 +89,7 @@ checkModule("POE::Component::Client::HTTP", 0.77);
 checkModule("Data::Structure::Util",0.11);
 checkModule("Apache2::Request",2.06);
 checkModule("Cache::Memcached",1.15,2);
+checkModule("URI::Escape","3.28");
 checkModule("POSIX");
 checkModule("List::Util");
 checkModule("Color::Calc");
