@@ -1,6 +1,8 @@
 7.0.5
  - Added a --skipDelete option to upgrade.pl
  - rfe: Approvers don't need to approve own changes
+ - Added some more tests to the suite.
+ - Fixed the test skeleton
 
 
 7.0.4

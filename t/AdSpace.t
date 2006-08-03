@@ -13,12 +13,18 @@ use strict;
 use lib "$FindBin::Bin/lib";
 use WebGUI::Test;
 use WebGUI::Session;
-
-# load your modules here
-
-use Test::More tests => 1; # increment this value for each test you create
+use WebGUI::AdSpace;
+use Test::More tests => 3; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-# put your tests here
+my $adSpace = WebGUI::AdSpace->create($session, {name=>"Alfred"});
+
+my $data = $session->db->quickHashRef("select adSpaceId, name from adSpace where adSpaceId=?",[$adSpace->getId]);
+
+ok(exists $data->{adSpaceId}, "create()");
+is($data->{name}, $adSpace->get("name"), "get()");
+is($data->{adSpaceId}, $adSpace->getId, "getId()");
+
+
 
