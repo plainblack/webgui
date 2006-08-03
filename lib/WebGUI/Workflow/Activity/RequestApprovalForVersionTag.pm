@@ -20,6 +20,7 @@ use base 'WebGUI::Workflow::Activity';
 use WebGUI::VersionTag;
 use WebGUI::Inbox;
 use WebGUI::International;
+use WebGUI::User;
 
 =head1 NAME
 
@@ -94,17 +95,22 @@ sub execute {
 	my $i18n = WebGUI::International->new($self->session, "VersionTag");
 	my $inbox = WebGUI::Inbox->new($self->session);
 	if ($instance->getScratch("status") eq "") {
-		my $message = $inbox->addMessage({
-			subject=>$i18n->get("approve/deny").": ".$versionTag->get("name"),
-			message=>join("\n\n",$self->get("message"),
-				$self->session->url->getSiteURL().$self->session->url->page("op=manageRevisionsInTag;workflowInstanceId=".$instance->getId.";tagId=".$versionTag->getId),
-				$versionTag->get("comments")),
-			groupId=>$self->get("groupToApprove"),
-			status=>'pending'
-			});
-		$instance->setScratch("messageId",$message->getId);
-		$instance->setScratch("status","notified");
-		return $self->WAITING;
+		my $u = WebGUI::User->new($self->session, $versionTag->get("committedBy"));
+		if ($u->isInGroup($self->get("groupToApprove"))) {
+			return $self->COMPLETE;
+ 		} else {
+			my $message = $inbox->addMessage({
+				subject=>$i18n->get("approve/deny").": ".$versionTag->get("name"),
+				message=>join("\n\n",$self->get("message"),
+					$self->session->url->getSiteURL().$self->session->url->page("op=manageRevisionsInTag;workflowInstanceId=".$instance->getId.";tagId=".$versionTag->getId),
+					$versionTag->get("comments")),
+				groupId=>$self->get("groupToApprove"),
+				status=>'pending'
+				});
+			$instance->setScratch("status","notified");
+			$instance->setScratch("messageId",$message->getId);
+			return $self->WAITING;
+ 		}
 	} elsif ($instance->getScratch("status") eq "denied") {
 		my $message = $inbox->getMessage($instance->getScratch("messageId"));
 		$message->setCompleted;

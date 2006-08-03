@@ -33,6 +33,7 @@ my $mysql = "mysql";
 my $mysqldump = "mysqldump";
 my $backupDir = "/tmp/backups";
 my $skipBackup;
+my $skipDelete;
 my $doit;
 
 GetOptions(
@@ -42,6 +43,7 @@ GetOptions(
         'quiet'=>\$quiet,
 	'mysql=s'=>\$mysql,
 	'doit'=>\$doit,
+	'skipDelete' =>\$skipDelete,
 	'mysqldump=s'=>\$mysqldump,
 	'backupDir=s'=>\$backupDir,
 	'skipbackup'=>\$skipBackup
@@ -86,6 +88,13 @@ Options:
 
 	--skipBackup	Backups will not be performed during the
 			upgrade.
+
+ 	--skipDelete	The upgrade normally deletes WebGUI's cache
+			and temporary files as part of the upgrade.
+			This is mainly important during big upgrades,
+			but can make the upgrade go very slowly.
+			Using this option skips the deletion of these
+			files.
 
 STOP
         exit;
@@ -183,12 +192,14 @@ foreach my $filename (keys %{$configs}) {
 			print "\tPreparing site for upgrade.\n" unless ($quiet);
 			$session->setting->remove('specialState');
 			$session->setting->add('specialState','upgrading');
-			print "\tDeleting temp files.\n" unless ($quiet);
-			my $path = $configs->{$filename}->get("uploadsPath").$slash."temp";
-			rmtree($path) unless ($path eq "" || $path eq "/" || $path eq "/data");
-			print "\tDeleting file cache.\n" unless ($quiet);
-			$path = $configs->{$filename}->get("fileCacheRoot")||"/tmp/WebGUICache";
-			rmtree($path)  unless ($path eq "" || $path eq "/" || $path eq "/data");
+			unless ($skipDelete) {
+				print "\tDeleting temp files.\n" unless ($quiet);
+				my $path = $configs->{$filename}->get("uploadsPath").$slash."temp";
+				rmtree($path) unless ($path eq "" || $path eq "/" || $path eq "/data");
+				print "\tDeleting file cache.\n" unless ($quiet);
+				$path = $configs->{$filename}->get("fileCacheRoot")||"/tmp/WebGUICache";
+				rmtree($path)  unless ($path eq "" || $path eq "/" || $path eq "/data");
+			}
 		}
 		$session->close();
 	} else {
