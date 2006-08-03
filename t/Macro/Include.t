@@ -32,7 +32,8 @@ my $storage = WebGUI::Storage->createTemp($session);
 $storage->addFileFromScalar('goodFile', $goodFile);
 $storage->addFileFromScalar('twoLines', $twoLines);
 $storage->addFileFromScalar('unreadableFile', 'The contents of this file are not readable');
-chmod(0111, $storage->getPath('unreadableFile')) or diag($!);
+chmod(0111, $storage->getPath('unreadableFile'))
+	diag("Unable to chmod file.");
 
 my @testSets = (
 	{
