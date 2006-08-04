@@ -3,6 +3,7 @@
  - rfe: Approvers don't need to approve own changes
  - Added some more tests to the suite.
  - Fixed the test skeleton
+ - Fixed some bugs regarding Search relevance sorting (Len Kranendonk / www.ilance.nl)
 
 
 7.0.4
