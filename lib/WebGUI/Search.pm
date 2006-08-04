@@ -51,7 +51,7 @@ sub getAssetIds {
 	$query .= " from assetIndex where ";
 	$query .= "isPublic=1 and " if ($self->{_isPublic});
 	$query .= "(".$self->{_where}.")";
-	$query .= " order by score " if ($self->{_score});
+	$query .= " order by score desc " if ($self->{_score});
 	my $rs = $self->session->db->prepare($query);
 	$rs->execute($self->{_params});
 	my @ids = ();
@@ -77,7 +77,7 @@ sub getAssets {
 	$query .= " from assetIndex where ";
 	$query .= "isPublic=1 and " if ($self->{_isPublic});
 	$query .= "(".$self->{_where}.")";
-	$query .= " order by score " if ($self->{_score});
+	$query .= " order by score desc " if ($self->{_score});
 	my $rs = $self->session->db->prepare($query);
 	$rs->execute($self->{_params});
 	my @assets = ();
@@ -149,7 +149,7 @@ sub getResultSet {
 	$query .= " from assetIndex where ";
 	$query .= "isPublic=1 and " if ($self->{_isPublic});
 	$query .= "(".$self->{_where}.")";
-	$query .= " order by score " if ($self->{_score});
+	$query .= " order by score desc " if ($self->{_score});
 	my $rs = $self->session->db->prepare($query);
 	$rs->execute($self->{_params});
 	return $rs;
@@ -286,7 +286,7 @@ sub search {
         		$keywords = join(" ", @terms);
 		}	
 		push(@params, $keywords, $keywords);
-		$self->{_score} = "match (keywords) against (? in boolean mode) as score";
+		$self->{_score} = "match (keywords) against (?) as score";
 		push(@clauses, "match (keywords) against (? in boolean mode)");
 	}
 	if ($rules->{lineage}) {
