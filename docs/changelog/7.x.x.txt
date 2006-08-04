@@ -4,6 +4,7 @@
  - Added some more tests to the suite.
  - Fixed the test skeleton
  - Fixed some bugs regarding Search relevance sorting (Len Kranendonk / www.ilance.nl)
+ - Added an option to override the session cookie name.
 
 
 7.0.4

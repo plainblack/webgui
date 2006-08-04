@@ -224,6 +224,19 @@ sub get {
 	return $self->{_config}{$param};
 }
 
+#-------------------------------------------------------------------
+
+=head2 getCookieName ( ) 
+
+Returns the cookie name defined in the config file. Returns "wgSession" if one isn't defined.
+
+=cut
+
+sub getCookieName {
+	my $self = shift;
+	return $self->get("cookieName") || "wgSession";	
+}
+
 
 #-------------------------------------------------------------------
 

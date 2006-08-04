@@ -380,7 +380,7 @@ sub set {
 	if ($properties->{notifySpectre}) {
 		my $spectre = WebGUI::Workflow::Spectre->new($self->session);
 		$spectre->notify("workflow/deleteInstance",$self->getId) unless ($properties->{newlyCreated});
-		$spectre->notify("workflow/addInstance", {gateway=>$self->session->config->get("gateway"), sitename=>$self->session->config->get("sitename")->[0], instanceId=>$self->getId, priority=>$self->{_data}{priority}});
+		$spectre->notify("workflow/addInstance", {cookieName=>$self->session->config->getCookieName, gateway=>$self->session->config->get("gateway"), sitename=>$self->session->config->get("sitename")->[0], instanceId=>$self->getId, priority=>$self->{_data}{priority}});
 	}
 }
 

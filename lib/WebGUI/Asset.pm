@@ -196,7 +196,8 @@ sub checkView {
 	}
 	$self->logView();
 	# must find a way to do this next line better
-	$self->session->http->setCookie("wgSession",$self->session->var->{_var}{sessionId}) unless $self->session->var->{_var}{sessionId} eq $self->session->http->getCookies->{"wgSession"};
+	my $cookieName = $self->session->config->getCookieName;
+	$self->session->http->setCookie($cookieName,$self->session->var->{_var}{sessionId}) unless $self->session->var->{_var}{sessionId} eq $self->session->http->getCookies->{$cookieName};
 	return undef;
 }
 

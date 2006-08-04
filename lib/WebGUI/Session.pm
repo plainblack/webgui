@@ -368,7 +368,7 @@ sub open {
 	my $self = {_config=>$config, _server=>$server};
 	bless $self , $class;
 	$self->{_request} = $request if (defined $request);
-	my $sessionId = shift || $self->http->getCookies->{"wgSession"} || $self->id->generate;
+	my $sessionId = shift || $self->http->getCookies->{$config->getCookieName} || $self->id->generate;
 	$sessionId = $self->id->generate unless $self->id->valid($sessionId);
 	my $noFuss = shift;
 	$self->{_var} = WebGUI::Session::Var->new($self,$sessionId, $noFuss);

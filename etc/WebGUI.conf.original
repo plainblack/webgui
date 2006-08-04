@@ -8,6 +8,10 @@
 
 "sitename" : [ "www.example.com", "example.com"],
 
+# Rename the WebGUI Session cookie if you like.
+
+"cookieName" : "wgSession",
+
 # The location where the WebGUI server will be handling
 # requests. This is normally just '/' or the root of the
 # server, but on some installations it might be /webgui or

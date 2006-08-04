@@ -137,19 +137,8 @@ sub addJob {
 	return 0 unless ($params->{enabled});
 	my $id = $params->{config}."-".$params->{taskId};
 	$self->debug("Adding schedule ".$params->{taskId}." to the queue.");
-	$self->{_jobs}{$id} = {
-		taskId=>$params->{taskId},
-		config=>$params->{config},
-		gateway=>$params->{gateway},
-		sitename=>$params->{sitename},
-		schedule=>join(" ", $params->{minuteOfHour}, $params->{hourOfDay}, $params->{dayOfMonth}, $params->{monthOfYear}, $params->{dayOfWeek}),
-		runOnce=>$params->{runOnce},
-		workflowId=>$params->{workflowId},
-		className=>$params->{className},
-		methodName=>$params->{methodName},
-		parameters=>$params->{parameters},
-		priority=>$params->{priority}
-		};
+	$params->{schedule} = join(" ", $params->{minuteOfHour}, $params->{hourOfDay}, $params->{dayOfMonth}, $params->{monthOfYear}, $params->{dayOfWeek});
+	$self->{_jobs}{$id} = $params;
 }
 
 #-------------------------------------------------------------------
@@ -400,7 +389,7 @@ sub runJob {
 		my $url = "http://".$job->{sitename}.':'.$self->config->get("webguiPort").$job->{gateway};
 		my $request = POST $url, [op=>"runCronJob", taskId=>$job->{taskId}];
 		my $cookie = $self->{_cookies}{$job->{sitename}};
-		$request->header("Cookie","wgSession=".$cookie) if (defined $cookie);
+		$request->header("Cookie",$job->{cookieName}."=".$cookie) if (defined $cookie);
 		$request->header("User-Agent","Spectre");
 		$request->header("X-jobId",$id);
 		$self->debug("Posting job ".$id." to $url.");
@@ -431,7 +420,8 @@ sub runJobResponse {
 			if ($response->header("Set-Cookie") ne "") {
 				$self->debug("Storing cookie for $id for later use.");
 				my $cookie = $response->header("Set-Cookie");
-				$cookie =~ s/wgSession=([a-zA-Z0-9\_\-]{22}).*/$1/;
+				my $pattern = $job->{cookieName}."=([a-zA-Z0-9\_\-]{22}).*";
+				$cookie =~ s/$pattern/$1/;
 				$self->{_cookies}{$job->{sitename}} = $cookie;
 			}
 			my $state = $response->content; 

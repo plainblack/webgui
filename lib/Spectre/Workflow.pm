@@ -84,13 +84,8 @@ The priority (1,2, or 3) that this instance should be run at.
 sub addInstance {
 	my ($self, $params) = @_[OBJECT, ARG0];
 	$self->debug("Adding workflow instance ".$params->{instanceId}." from ".$params->{sitename}." to queue at priority ".$params->{priority}.".");
-	$self->{_instances}{$params->{instanceId}} = {
-		sitename=>$params->{sitename},
-		instanceId=>$params->{instanceId},
-		gateway => $params->{gateway},
-		status=>"waiting",
-		priority=>$params->{priority}
-		};
+	$params->{status} = "waiting";
+	$self->{_instances}{$params->{instanceId}} = $params;
 	push(@{$self->{"_priority".$params->{priority}}}, $params->{instanceId});
 }
 
@@ -370,7 +365,7 @@ sub runWorker {
 	my $url = "http://".$instance->{sitename}.':'.$self->config->get("webguiPort").$instance->{gateway};
 	my $request = POST $url, [op=>"runWorkflow", instanceId=>$instance->{instanceId}];
 	my $cookie = $self->{_cookies}{$instance->{sitename}};
-	$request->header("Cookie","wgSession=".$cookie) if (defined $cookie);
+	$request->header("Cookie",$instance->{cookieName}."=".$cookie) if (defined $cookie);
 	$request->header("X-instanceId",$instance->{instanceId});
 	$request->header("User-Agent","Spectre");
 	$self->debug("Posting workflow instance ".$instance->{instanceId}." to $url.");
@@ -418,7 +413,8 @@ sub workerResponse {
 		if ($response->header("Set-Cookie") ne "") {
 			$self->debug("Storing cookie for $instanceId for later use.");
 			my $cookie = $response->header("Set-Cookie");
-			$cookie =~ s/wgSession=([a-zA-Z0-9\_\-]{22}).*/$1/;
+			my $pattern = $self->{_instances}{$instanceId}{cookieName}."=([a-zA-Z0-9\_\-]{22}).*";
+			$cookie =~ s/$pattern/$1/;
 			$self->{_cookies}{$self->{_instances}{$instanceId}{sitename}} = $cookie;
 		}
 		my $state = $response->content; 

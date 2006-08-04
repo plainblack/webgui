@@ -79,6 +79,12 @@ save you many hours of grief.
 	released. It will serve as the beta, gamma, and release
 	candidates for 7.0.0.
 
+ * The group SQL query mechanism has been changed to be more efficient,
+	more practical, and more consistent with the rest of WebGUI. As
+	such, your old query will no longer work. You used to do something
+	like "select 1 from table where foo='bar'", but now you need to
+	"select userId from table where foo='bar'".
+
  * The "messageLog" table will be deleted during the upgrade process,
 	and all of the messages in it. This is because the messages
 	contained in there are no longer useful because they won't
