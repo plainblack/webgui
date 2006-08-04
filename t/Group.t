@@ -239,11 +239,11 @@ ok($gX->userIsAdmin($user->userId), "userIsAdmin: Dude set to be group admin for
 
 sleep 5;
 $expireTime = time() + $expireOffset - $gX->userGroupExpireDate($user->userId) ;
-ok( ($expireTime < 7 && $expireTime > 0), 'userGroupExpireDate: Default expire time ages');
 
 $gX->addUsers([$user->userId]);
+ok( ($expireTime < 7 && $expireTime > 0), 'userGroupExpireDate: Default expire time ages');
 my $expireTime = abs($gX->userGroupExpireDate($user->userId) - $expireOffset - time());
-ok(  $expireTime < 1, 'adding exising user to group resets expire date');
+cmp_ok(  $expireTime, '<=', 1, 'adding exising user to group resets expire date');
 ok($gX->userIsAdmin($user->userId), "userIsAdmin: adding existing user to group does not change group admin status");
 
 ##undef and the empty string will return the set value because they're
