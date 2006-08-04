@@ -231,7 +231,7 @@ my $expireOffset = $gX->expireOffset;
 $user->addToGroups([$gX->getId]);
 ##User expire time is calculated correctly
 my $expireTime = abs($gX->userGroupExpireDate($user->userId) - $expireOffset - time());
-ok(  $expireTime < 1, 'userGroupExpireDate: Default expire time');
+cmp_ok( $expireTime,  '<=', 1, 'userGroupExpireDate: Default expire time');
 ok($user->isInGroup($gX->getId), "addToGroups: Added dude to gX");
 
 $gX->userIsAdmin($user->userId, 1);

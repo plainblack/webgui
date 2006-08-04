@@ -78,9 +78,9 @@ $user->authMethod("LDAP");
 is($user->authMethod, "LDAP", 'authMethod() -- set to LDAP');
 $user->authMethod("WebGUI");
 is($user->authMethod, "WebGUI", 'authMethod() -- set back to WebGUI');
-ok(abs($user->lastUpdated-$lastUpdate) < 1, 'lastUpdated() -- authmethod change');
+cmp_ok(abs($user->lastUpdated-$lastUpdate), '<=', 1, 'lastUpdated() -- authmethod change');
 
-#See if datecreated is correct
+#See if date created is correct
 is($user->dateCreated, $userCreationTime, 'dateCreated()');
 
 #get/set karma
@@ -101,7 +101,7 @@ is($user->karma, $oldKarma-69, 'karma() -- get/set subtract amount');
 $lastUpdate = time();
 $user->referringAffiliate(10);
 is($user->referringAffiliate, '10', 'referringAffiliate() -- get/set');
-ok(abs($user->lastUpdated-$lastUpdate) < 1, 'lastUpdated() -- referringAffiliate');
+cmp_ok(abs($user->lastUpdated-$lastUpdate), '<=', 1, 'lastUpdated() -- referringAffiliate');
 
 #Let's try adding this user to some groups.  Note, users are auto-added to 2 and 7 on creation
 my @groups = qw|6 4|;
@@ -173,7 +173,7 @@ is($user->karma, $oldKarma-69, 'karma() -- get/set subtract amount');
 $lastUpdate = time();
 $user->referringAffiliate(10);
 is($user->referringAffiliate, '10', 'referringAffiliate() -- get/set');
-ok(abs($user->lastUpdated-$lastUpdate) < 1, 'lastUpdated() -- referringAffiliate');
+cmp_ok(abs($user->lastUpdated-$lastUpdate), '<=', 1, 'lastUpdated() -- referringAffiliate');
 
 #Let's try adding this user to some groups
 my @groups = qw|2 4|;
