@@ -18,7 +18,7 @@ use WebGUI::Utility;
 use WebGUI::Cache;
 
 use WebGUI::User;
-use Test::More tests => 81; # increment this value for each test you create
+use Test::More tests => 82; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -260,6 +260,7 @@ $cm->ipFilter(defined $origFilter ? $origFilter : '');
 
 ##Test for group membership
 $user = WebGUI::User->new($session, "new");
+ok($user->isInGroup(7), "addToGroups: New user is in group 7(Everyone)");
 
 $user->addToGroups([3]);
 
