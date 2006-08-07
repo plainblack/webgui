@@ -13,18 +13,38 @@ use strict;
 use lib "$FindBin::Bin/lib";
 use WebGUI::Test;
 use WebGUI::Session;
-use WebGUI::AdSpace;
-use Test::More tests => 3; # increment this value for each test you create
+
+#use Test::More tests => 3;
+use Test::More;
+
+my $numTests = 4; # increment this value for each test you create
+++$numTests; ##For conditional testing on module load
+
+plan tests => $numTests;
+
+my $loaded = use_ok('WebGUI::AdSpace');
 
 my $session = WebGUI::Test->session;
+my $adSpace;
 
-my $adSpace = WebGUI::AdSpace->create($session, {name=>"Alfred"});
+SKIP: {
 
-my $data = $session->db->quickHashRef("select adSpaceId, name from adSpace where adSpaceId=?",[$adSpace->getId]);
+	skip "Unable to load WebGUI::AdSpace", $numTests-1 unless $loaded;
 
-ok(exists $data->{adSpaceId}, "create()");
-is($data->{name}, $adSpace->get("name"), "get()");
-is($data->{adSpaceId}, $adSpace->getId, "getId()");
+	my $adSpace = WebGUI::AdSpace->create($session, {name=>"Alfred"});
 
+	isa_ok($adSpace, 'WebGUI::AdSpace');
 
+	my $data = $session->db->quickHashRef("select adSpaceId, name from adSpace where adSpaceId=?",[$adSpace->getId]);
 
+	ok(exists $data->{adSpaceId}, "create()");
+	is($data->{name}, $adSpace->get("name"), "get()");
+	is($data->{adSpaceId}, $adSpace->getId, "getId()");
+
+}
+
+END {
+	if (defined $adSpace and ref $adSpace eq 'WebGUI::AdSpace') {
+		$adSpace->delete;
+	}
+}
