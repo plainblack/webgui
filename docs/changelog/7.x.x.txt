@@ -10,9 +10,6 @@
  - fix: Redirects get displayed inside page layouts as '0'
  - fix: Mysterious "0" Appearing When Admin Is Off
  - fix: Deletion of Products
- - Fix Asset.pm so that if no className is passed primeval Assets are not
-   returned.
-
 
 7.0.4
  - Added a forum.lastPost.user.hasRead variable to the Message Board template.

@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::Asset;
 use WebGUI::Asset::Wobject::Navigation;
 
-use Test::More tests => 11; # increment this value for each test you create
+use Test::More tests => 13; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -47,9 +47,8 @@ $deadAsset = WebGUI::Asset->new($session, '', 'WebGUI::Asset::Wobject::Navigatio
 is ($deadAsset, undef,'new constructor with no assetId returns undef');
 
 # -- no class
-$deadAsset = 1;
-$deadAsset = WebGUI::Asset->new($session, $assetId);
-is ($deadAsset, undef,'new constructor with no class returns undef');
+my $primevalAsset = WebGUI::Asset->new($session, $assetId);
+isa_ok ($primevalAsset, 'WebGUI::Asset');
 
 # Test the newByDynamicClass Constructor
 $asset = undef;
@@ -69,6 +68,11 @@ is ($deadAsset, undef,'newByDynamicClass constructor with invalid assetId return
 $deadAsset = 1;
 $deadAsset = WebGUI::Asset->newByDynamicClass($session);
 is ($deadAsset, undef, 'newByDynamicClass constructor with no assetId returns undef');
+
+# Root Asset
+my $rootAsset = WebGUI::Asset->getRoot($session);
+isa_ok($rootAsset, 'WebGUI::Asset');
+is($rootAsset->getId, 'PBasset000000000000001', 'Root Asset ID check');
 
 # TODO
 # Test the newByPropertiesHashRef Constructor

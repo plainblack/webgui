@@ -1361,7 +1361,7 @@ sub manageAssetsSearch {
 
 =head2 new ( session, assetId [, className, revisionDate ] )
 
-Constructor. This does not create an asset. Returns a new object if it can, otherwise returns undef.
+Constructor. This does not create an asset.
 
 =head3 session
 
@@ -1377,7 +1377,8 @@ By default we'll use whatever class it is called by like WebGUI::Asset::File->ne
 
 =head3 revisionDate
 
-An epoch date that represents a specific version of an asset. By default the most recent version will be used.
+An epoch date that represents a specific version of an asset. By default the most recent version will be used.  If
+no revision date is available it will return undef.
 
 =cut
 
@@ -1406,7 +1407,6 @@ sub new {
 		}
 		$class = $className;
 	}
-	return undef if $class eq 'WebGUI::Asset';
 	my $cache = WebGUI::Cache->new($session, ["asset",$assetId,$revisionDate]);
 	my $properties = $cache->get;
 	if (exists $properties->{assetId}) {
