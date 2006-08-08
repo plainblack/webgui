@@ -5,6 +5,8 @@
  - Fixed the test skeleton
  - Fixed some bugs regarding Search relevance sorting (Len Kranendonk / www.ilance.nl)
  - Added an option to override the session cookie name.
+ - Fix Asset.pm so that if no className is passed primeval Assets are not
+   returned.
 
 
 7.0.4

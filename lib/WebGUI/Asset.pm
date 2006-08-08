@@ -1406,6 +1406,7 @@ sub new {
 		}
 		$class = $className;
 	}
+	return undef if $class eq 'WebGUI::Asset';
 	my $cache = WebGUI::Cache->new($session, ["asset",$assetId,$revisionDate]);
 	my $properties = $cache->get;
 	if (exists $properties->{assetId}) {
