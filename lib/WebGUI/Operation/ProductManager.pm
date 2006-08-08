@@ -673,7 +673,7 @@ sub www_listProducts {
 	while ($row = $sth->hashRef) {
 		$output .= '<tr>';
 		$output .= '<td>';
-		$output .= $session->icon->delete('op=deleteProduct;productId='.$row->{productId});
+		$output .= $session->icon->delete('op=deleteProduct;productId='.$row->{productId}, undef, $i18n->get("confirm delete product"));
 		$output .= $session->icon->edit('op=manageProduct;productId='.$row->{productId});
 		$output .= '</td>';
 		$output .= '<td>'.$row->{title}.'</td>';

@@ -12,6 +12,12 @@
 
 "cookieName" : "wgSession",
 
+# Explicitly set the domain that the WebGUI session cookie
+# should be assigned to. Defaults to the domain that the user
+# is browsing the site under.
+
+# "cookieDomain" : ".example.com",
+
 # The location where the WebGUI server will be handling
 # requests. This is normally just '/' or the root of the
 # server, but on some installations it might be /webgui or

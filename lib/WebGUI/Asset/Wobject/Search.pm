@@ -158,7 +158,7 @@ sub view {
 			 push(@results, {
 				url=>$data->{url},
 				title=>$data->{title},
-				synposis=>$data->{synopsis},
+				synopsis=>$data->{synopsis},
 				});
 			}
 		} 

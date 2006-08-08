@@ -5,6 +5,11 @@
  - Fixed the test skeleton
  - Fixed some bugs regarding Search relevance sorting (Len Kranendonk / www.ilance.nl)
  - Added an option to override the session cookie name.
+ - Added an option to override the session cookie domain.
+ - fix: Search results not showing synopses
+ - fix: Redirects get displayed inside page layouts as '0'
+ - fix: Mysterious "0" Appearing When Admin Is Off
+ - fix: Deletion of Products
  - Fix Asset.pm so that if no className is passed primeval Assets are not
    returned.
 

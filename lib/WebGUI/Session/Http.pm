@@ -242,7 +242,7 @@ sub setCacheControl {
 
 #-------------------------------------------------------------------
 
-=head2 setCookie ( name, value [ , timeToLive ] ) 
+=head2 setCookie ( name, value [ , timeToLive, domain ] ) 
 
 Sends a cookie to the browser.
 
@@ -258,6 +258,10 @@ The value to set.
 
 The time that the cookie should remain in the browser. Defaults to "+10y" (10 years from now).
 
+=head3 domain
+
+Explicitly set the domain for this cookie.
+
 =cut
 
 sub setCookie {
@@ -265,6 +269,7 @@ sub setCookie {
 	my $name = shift;
 	my $value = shift;
 	my $ttl = shift;
+	my $domain = shift;
 	$ttl = (defined $ttl ? $ttl : '+10y');
 	if ($self->session->request) {
 		require Apache2::Cookie;
@@ -274,6 +279,7 @@ sub setCookie {
 			-expires=>$ttl,
 			-path=>'/'
 		);
+		$cookie->domain($domain) if ($domain);
 		$cookie->bake($self->session->request);
 	}
 }

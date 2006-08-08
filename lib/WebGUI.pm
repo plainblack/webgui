@@ -112,7 +112,7 @@ sub contentHandler {
 		} else {
 			$output = page($session);
 		}
-		$session->http->setCookie($session->config->getCookieName,$session->var->{_var}{sessionId}) unless $session->var->{_var}{sessionId} eq $session->http->getCookies->{$session->config->getCookieName};
+		$session->http->setCookie($session->config->getCookieName,$session->var->getId, undef, $session->config->get("cookieDomain")) unless $session->var->getId eq $session->http->getCookies->{$session->config->getCookieName};
 		my $filename = $session->http->getStreamedFile();
 		if ((defined $filename) && ($session->config->get("enableStreamingUploads") eq "1")) {
 			my $ct = guess_media_type($filename);

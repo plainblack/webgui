@@ -1,6 +1,11 @@
 package WebGUI::i18n::English::ProductManager;
 
 our $I18N = {
+	'confirm delete product' => {
+		message => q|Are you certain you wish to delete this product?|,
+		lastUpdated => 0,
+		context => q|displayed when deleting a product|
+	},
 	'manage products' => {
 		message => q|Products|,
 		lastUpdated => 0,

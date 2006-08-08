@@ -197,7 +197,7 @@ sub checkView {
 	$self->logView();
 	# must find a way to do this next line better
 	my $cookieName = $self->session->config->getCookieName;
-	$self->session->http->setCookie($cookieName,$self->session->var->{_var}{sessionId}) unless $self->session->var->{_var}{sessionId} eq $self->session->http->getCookies->{$cookieName};
+	$self->session->http->setCookie($cookieName,$self->session->var->getId, undef, $self->session->config->get("cookieDomain")) unless $self->session->var->getId eq $self->session->http->getCookies->{$cookieName};
 	return undef;
 }
 
@@ -1802,7 +1802,11 @@ Returns "".
 
 sub view {
 	my $self = shift;
-	return $self->getToolbar if ($self->session->var->get("adminOn"));
+	if ($self->session->var->get("adminOn")) {
+		return $self->getToolbar;
+	} else {
+		return "";
+	}
 }
 
 #-------------------------------------------------------------------

@@ -111,7 +111,10 @@ sub www_view {
                         <li><a href="'.$self->getParent->getUrl.'">'.$i18n->get("go to the redirect parent page").'</a></li>
                         </ul>',$i18n->get("assetName"));
         }
-        $self->session->http->setRedirect($url) unless $url eq $self->get("url");
+        unless ($url eq $self->get("url")) {
+        	$self->session->http->setRedirect($url);
+		return "";
+	}
         return $i18n->get('self_referential');
 }
 
