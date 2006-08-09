@@ -33,6 +33,7 @@ DBI->install_driver("mysql"); # Change to match your database driver.
 #----------------------------------------
 
 use WebGUI ();
+
 use WebGUI::Utility ();
 use File::Find ();
 my @modules = ();
@@ -53,6 +54,8 @@ foreach my $package (@modules) {
 
 use Apache2::ServerUtil ();
 Apache2::ServerUtil->server->add_version_component("WebGUI/".$WebGUI::VERSION);
+use APR::Request::Apache2 ();
+use Apache2::Cookie ();
 
 
 #----------------------------------------
