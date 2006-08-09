@@ -116,6 +116,8 @@ foreach my $testSet (@testSets) {
 
 }
 
+diag(sprintf "post test mode: %o", (stat $unreadable)[2]);
+
 END {
 	$storage->delete;
 }
