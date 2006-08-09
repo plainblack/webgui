@@ -12,7 +12,7 @@ use lib "../../lib";
 use strict;
 use Getopt::Long;
 use WebGUI::Session;
-
+use WebGUI::Asset;
 
 my $toVersion = "7.0.5"; # make this match what version you're going to
 my $quiet; # this line required
@@ -20,17 +20,18 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-# upgrade functions go here
-
+renameTemplate();
 finish($session); # this line required
 
 
-##-------------------------------------------------
-#sub exampleFunction {
-#	my $session = shift;
-#	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
-#	# and here's our code
-#}
+#-------------------------------------------------
+sub renameTemplate {
+	print "\tRenaming a template.\n" unless ($quiet);
+	my $asset = WebGUI::Asset->new($session, "PBtmpl0000000000000209", "WebGUI::Asset::Template");
+	if (defined $asset) {
+		$asset->update({title=>"Request Tracker Thread",menuTitle=>"Request Tracker Thread"});
+	}
+}
 
 
 

@@ -71,8 +71,10 @@ sub execute {
 	my $self = shift;
 	my $versionTag = shift;
 	foreach my $asset (@{$versionTag->getAssets}) {
-		$asset->exportAsHtml();
-		$asset->getContainer->exportAsHtml();
+		my $status = $asset->exportAsHtml();
+		return $self->ERROR unless ($status eq "success");
+		$status = $asset->getContainer->exportAsHtml();
+		return $self->ERROR unless ($status eq "success");
 	}
 	return $self->COMPLETE;
 }

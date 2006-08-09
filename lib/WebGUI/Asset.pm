@@ -1386,8 +1386,11 @@ sub new {
 	my $class = shift;
 	my $session = shift;
 	my $assetId = shift;
-	return undef unless ($assetId);
 	my $className = shift;
+	unless (defined $assetId) {
+		$session->errorHandler->error("Asset constructor new() requires an assetId.");
+		return undef;
+	}
 	my $assetRevision = $session->stow->get("assetRevision");
 	my $revisionDate = shift || $assetRevision->{$assetId}{$session->scratch->get("versionTag")||'_'};
 	unless ($revisionDate) {

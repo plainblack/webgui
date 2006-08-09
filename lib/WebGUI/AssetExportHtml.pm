@@ -67,6 +67,73 @@ sub checkExportPath {
 	return $error;
 }
 
+#-------------------------------------------------------------------
+
+=head2 exportAsHtml 
+
+Same as www_exportGenerate except without the output. Returns "success" if successful, otherwise returns an error message.
+
+=cut
+
+sub exportAsHtml {
+	my $self = shift;
+	my $error = $self->checkExportPath();
+	if ($error) {
+		return $error;
+	}
+	my $userId = '1';
+	my $index = "index.html";
+	# Change the stuff we need to change to do the export
+	my $newSession = WebGUI::Session->open($self->session->config->getWebguiRoot, $self->session->config->getFilename);
+	my $newSelf = WebGUI::Asset->new($newSession, $self->getId, $self->get("className"), $self->get("revisionDate"));
+	my $assets = $newSelf->getLineage(["self","descendants"],{returnObjects=>1,endingLineageLength=>$newSelf->getLineageLength+$self->session->form->process("depth")});
+	$newSession->user({userId=>$userId});
+	foreach my $asset (@{$assets}) {
+		my $url = $asset->get("url");
+		unless ($asset->canView($userId)) {
+			next;
+		}
+		my $path;
+		my $filename;
+		if ($url =~ /\./) {
+			$url =~ /^(.*)\/(.*)$/;
+			$path = $1;
+			$filename = $2;
+			if ($filename eq "") {
+				$filename = $path;
+				$path = undef;
+			}
+		} else {
+			$path = $url;
+			$filename = $index;
+		}
+		if($path) {
+			$path = $self->session->config->get("exportPath") . "/" . $path;
+			eval { mkpath($path) };
+			if($@) {
+				return "Couldn't create path";
+			}
+		} 
+		$path .= "/".$filename;
+                my $file = eval { FileHandle->new(">".$path) or die "$!" };
+		if ($@) {
+			return "couldn't open path";
+		} else {
+			$newSession->output->setHandle($file);
+			my $content = $asset->www_view;
+			unless ($content eq "chunked") {
+				$newSession->output->print($content);
+			}
+			$file->close;
+		}
+	}
+	$newSession->var->end;
+	$newSession->close;
+	return "success";
+}
+
+
+
 
 #-------------------------------------------------------------------
 

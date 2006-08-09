@@ -10,6 +10,10 @@
  - fix: Redirects get displayed inside page layouts as '0'
  - fix: Mysterious "0" Appearing When Admin Is Off
  - fix: Deletion of Products
+ - fix: Request Tracker Thread is called Request Tracker Post
+ - fix: asset constructor new, does not return undef as documented
+ - fix: Static export in html not working through the workflow
+
 
 7.0.4
  - Added a forum.lastPost.user.hasRead variable to the Message Board template.
