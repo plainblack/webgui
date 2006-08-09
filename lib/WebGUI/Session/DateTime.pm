@@ -258,7 +258,7 @@ sub epochToHttp {
 	my $time_zone = $self->getTimeZone();
 	my $dt = DateTime->from_epoch(epoch=>$epoch, time_zone=>$time_zone);
 	$dt->set_time_zone('GMT');
-	return $dt->strftime('%a, %d %b %Y %H:%m:%S GMT');
+	return $dt->strftime('%a, %d %b %Y %H:%M:%S GMT');
 }
 
 #-------------------------------------------------------------------
