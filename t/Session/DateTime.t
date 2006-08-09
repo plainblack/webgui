@@ -15,7 +15,7 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 28; # increment this value for each test you create
+use Test::More tests => 29; # increment this value for each test you create
  
 my $session = WebGUI::Test->session;
 
@@ -32,6 +32,7 @@ is($session->datetime->epochToHuman($wgbday,"%m"), "08", "epochToHuman() - month
 is($session->datetime->epochToHuman($wgbday,"%M"), "8", "epochToHuman() - month number, variable digit"); 
 is($session->datetime->epochToHuman($wgbday,"%%%c%d%h"), "%August1608", "epochToHuman()"); 
 is($session->datetime->epochToHttp($wgbday),"Thu, 16 Aug 2001 13:08:00 GMT","epochToHttp()");
+is($session->datetime->epochToMail($wgbday),"Thu, 16 Aug 2001 08:00:00 -0500","epochToMail()");
 is($session->datetime->epochToSet($wgbday,1), "2001-08-16 08:00:00", "epochToSet()");
 is($session->datetime->getDayName(7), "Sunday", "getDayName()");
 is($session->datetime->getDaysInMonth($wgbday), 31, "getDaysInMonth()");
