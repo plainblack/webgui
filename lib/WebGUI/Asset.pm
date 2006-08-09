@@ -197,7 +197,7 @@ sub checkView {
 	$self->logView();
 	# must find a way to do this next line better
 	my $cookieName = $self->session->config->getCookieName;
-	$self->session->http->setCookie($cookieName,$self->session->var->getId, undef, $self->session->config->get("cookieDomain")) unless $self->session->var->getId eq $self->session->http->getCookies->{$cookieName};
+	$self->session->http->setCookie($cookieName,$self->session->var->getId, $session->config->getCookieTTL, $self->session->config->get("cookieDomain")) unless $self->session->var->getId eq $self->session->http->getCookies->{$cookieName};
 	return undef;
 }
 
