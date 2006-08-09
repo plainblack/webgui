@@ -147,7 +147,6 @@ sub view {
 		my %rules = (
 			keywords=>$self->session->form->get("keywords"), 
 			lineage=>[WebGUI::Asset->newByDynamicClass($self->session,$self->getValue("searchRoot"))->get("lineage")],
-			creationDate=>{}, # content created at any time by default
 			);
 		my @classes = split("\n",$self->get("classLimiter"));
 		$rules{classes} = \@classes if (scalar(@classes));
