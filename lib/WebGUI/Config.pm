@@ -237,6 +237,18 @@ sub getCookieName {
 	return $self->get("cookieName") || "wgSession";	
 }
 
+#-------------------------------------------------------------------
+
+=head2 getCookieTTL ( ) 
+
+Returns the cookie time to live defined in the config file. Returns "10y" if one isn't defined.
+
+=cut
+
+sub getCookieTTL {
+	my $self = shift;
+	return $self->get("cookieTTL") || "+10y";	
+}
 
 #-------------------------------------------------------------------
 
