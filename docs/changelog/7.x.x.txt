@@ -1,5 +1,6 @@
 7.0.6
 - fix: Error in DateTime.pm
+- Added a cookieTTL parameter to the config file which lets you set an optional expiration time of the webgui session cookie
 
 
 7.0.5
@@ -17,6 +18,7 @@
  - fix: Request Tracker Thread is called Request Tracker Post
  - fix: asset constructor new, does not return undef as documented
  - fix: Static export in html not working through the workflow
+ - fix: Fixed project management display
 
 
 7.0.4
