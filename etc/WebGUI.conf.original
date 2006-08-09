@@ -18,6 +18,19 @@
 
 # "cookieDomain" : ".example.com",
 
+# Explicitly set the time to live for the WebGUI session cookie
+# Defaults to +10Y.  cookieTTL must follow the described format:
+# Format should match /^\+?(\d+)([YMDhms]?)$/ 
+# $2 qualifies the number in $1 as representing "Y"ears, 
+# "M"onths, "D"ays, "h"ours, "m"inutes, or "s"econds (if the qualifier is omitted, 
+# the number is interpreted as representing seconds).
+# +1h = 1 hour
+# +2D = 2 Days
+# +3M = 3 Months
+# +10Y = 10 Years (default)
+
+# "cookieTTL" : "+10Y",
+
 # The location where the WebGUI server will be handling
 # requests. This is normally just '/' or the root of the
 # server, but on some installations it might be /webgui or
