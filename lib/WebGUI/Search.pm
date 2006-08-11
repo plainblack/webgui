@@ -282,6 +282,10 @@ sub search {
 				}
 			#-------------- Edited by zxp end
                 		$terms[$i] .= "*";
+				
+                                # By default results need to match ALL keywords / Len Kranendonk 20060811
+                                $terms[$i] = "+" . $terms[$i] if ($terms[$i] !~ m/^[+-]/);
+
         		}
         		$keywords = join(" ", @terms);
 		}	
