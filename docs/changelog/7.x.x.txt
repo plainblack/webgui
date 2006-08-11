@@ -1,6 +1,7 @@
 7.0.6
 - fix: Error in DateTime.pm
 - Added a cookieTTL parameter to the config file which lets you set an optional expiration time of the webgui session cookie
+- RFE: By default, search results need to match ALL keywords (Len Kranendonk / www.ilance.nl)
 
 
 7.0.5
