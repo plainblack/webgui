@@ -13,8 +13,8 @@ our $I18N = {
 	},
 
 	'group.url' => {
-		message => q|The URL with the action to add the user to the group.|,
-		lastUpdated => 1149217736,
+		message => q|The URL with the action to delete the user from the group.|,
+		lastUpdated => 1155308958,
 	},
 
 	'group.text' => {

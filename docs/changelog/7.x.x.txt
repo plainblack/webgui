@@ -2,7 +2,7 @@
 - fix: Error in DateTime.pm
 - Added a cookieTTL parameter to the config file which lets you set an optional expiration time of the webgui session cookie
 - RFE: By default, search results need to match ALL keywords (Len Kranendonk / www.ilance.nl)
-
+- fix: adding in groupdelete macro
 
 7.0.5
  - Added a --skipDelete option to upgrade.pl
