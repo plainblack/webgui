@@ -24,9 +24,9 @@ our $I18N = {
 
 	'printable body' => {
 		message => q|
-<p><b>&#94;r(<i>link text</i>)</b><br />
-<b>&#94;r("",<i>custom style name</i>)</b><br />
-<b>&#94;r("",<i>custom style id</i>,<i>custom template URL</i>)</b><br />
+<p><b>&#94;r(<i>link text</i>);</b><br />
+<b>&#94;r("",<i>custom style name</i>);/b><br />
+<b>&#94;r("",<i>custom style id</i>,<i>custom template URL</i>);/b><br />
 Creates a link to alter the style from a page to make it printable.
 </p>
 
@@ -42,7 +42,7 @@ Creates a link to alter the style from a page to make it printable.
 </p>
 
 |,
-		lastUpdated => 1149217505,
+		lastUpdated => 1155309743,
 	},
 
 	'53' => {
