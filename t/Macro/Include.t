@@ -33,10 +33,7 @@ $storage->addFileFromScalar('goodFile', $goodFile);
 $storage->addFileFromScalar('twoLines', $twoLines);
 $storage->addFileFromScalar('unreadableFile', 'The contents of this file are not readable');
 my $unreadable = $storage->getPath('unreadableFile');
-diag(sprintf "original mode: %o", (stat $unreadable)[2]);
-chmod(0111, $unreadable) or
-	diag("Unable to chmod file.");
-diag(sprintf "modified mode: %o", (stat $unreadable)[2]);
+chmod(0111, $unreadable);
 
 my @testSets = (
 	{
@@ -80,11 +77,6 @@ my @testSets = (
 		comment => q|Non-existant file returns NOT FOUND|,
 	},
 	{
-		file => $storage->getPath('unreadableFile'),
-		output => $i18n->get('not found'),
-		comment => q|Unreadable file returns NOT FOUND|,
-	},
-	{
 		file => $storage->getPath('goodFile'),
 		output => $goodFile,
 		comment => q|Included a good file|,
@@ -99,6 +91,7 @@ my @testSets = (
 my $numTests = scalar @testSets;
 
 $numTests += 1; #For the use_ok
+$numTests += 1; #For the unreadable file test
 
 plan tests => $numTests;
 
@@ -111,12 +104,18 @@ skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 foreach my $testSet (@testSets) {
 	my $output = WebGUI::Macro::Include::process($session, $testSet->{file});
-	my $passed = is($output, $testSet->{output}, $testSet->{comment} . ":" .$testSet->{file});
+	is($output, $testSet->{output}, $testSet->{comment} . ":" .$testSet->{file});
+}
+
+SKIP: {
+	skip "Root will cause this test to fail since it does not obey file permissions", 1
+		if $< == 0;
+	my $file = $storage->getPath('unreadableFile');
+	my $output = WebGUI::Macro::Include::process($session, $file);
+	is($output, $i18n->get('not found'),  q|Unreadable file returns NOT FOUND|. ":" .$file);
 }
 
 }
-
-diag(sprintf "post test mode: %o", (stat $unreadable)[2]);
 
 END {
 	$storage->delete;
