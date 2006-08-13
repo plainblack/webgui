@@ -50,9 +50,7 @@ SKIP: {
 skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 my $output = WebGUI::Macro::L_loginBox::process($session,'','',$template->getId);
-diag $output;
 my %vars = simpleTextParser($output);
-diag Dumper \%vars;
 
 is($vars{'account.create.label'}, $i18n->get(407, 'WebGUI'), 'account.create.label');
 is($vars{'password.label'}, $i18n->get(51, 'WebGUI'), 'password.label');
