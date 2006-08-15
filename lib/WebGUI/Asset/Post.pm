@@ -290,8 +290,9 @@ Returns a URL to the owner's avatar.
 sub getAvatarUrl {
 	my $self = shift;
 	my $avatarUrl;
-	return $avatarUrl unless
-		$self->getThread->getParent->getValue("avatarsEnabled");
+	my $parent = $self->getThread->getParent;
+	return undef unless $parent;
+	return $avatarUrl unless $parent->getValue("avatarsEnabled");
 	my $user = WebGUI::User->new($self->session, $self->get('ownerUserId'));
 	#Get avatar field, storage Id.
 	my $storageId = $user->profileField("avatar");
