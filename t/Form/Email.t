@@ -37,6 +37,12 @@ my $testBlock = [
 	},
 	{
 		key => 'EMAIL2',
+		testValue => 'i@nowhere.com',
+		expected  => undef,
+		comment   => 'single character email fails'
+	},
+	{
+		key => 'EMAIL3',
 		testValue => 'what do you want?',
 		expected  => undef,
 		comment   => 'not an email address'
