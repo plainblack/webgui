@@ -4,6 +4,7 @@
 - RFE: By default, search results need to match ALL keywords (Len Kranendonk / www.ilance.nl)
 - fix: adding in groupdelete macro
 - fix: semicolons missing
+- fix: Typo in WebGUI/Form/Date.pm
 
 7.0.5
  - Added a --skipDelete option to upgrade.pl

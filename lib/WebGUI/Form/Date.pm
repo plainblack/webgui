@@ -142,7 +142,7 @@ sub toHtml {
 	}
 	my $language  = WebGUI::International->new($self->session)->getLanguage($self->session->user->profileField("language"),"languageAbbreviation");
 	unless ($language) {
-		$language = WebGUI::International->new($self->session)->getLanguage($self,"English","languageAbbreviation");
+		$language = WebGUI::International->new($self->session)->getLanguage("English","languageAbbreviation");
 	}
         $self->session->style->setScript($self->session->url->extras('calendar/calendar.js'),{ type=>'text/javascript' });
         $self->session->style->setScript($self->session->url->extras('calendar/lang/calendar-'.$language.'.js'),{ type=>'text/javascript' });
