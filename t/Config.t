@@ -13,7 +13,7 @@ use strict;
 use lib "$FindBin::Bin/lib";
 
 use WebGUI::Test;
-use Test::More tests => 12; # increment this value for each test you create
+use Test::More tests => 13; # increment this value for each test you create
 
 my $config     = WebGUI::Test->config;
 my $configFile = WebGUI::Test->file;
@@ -51,4 +51,9 @@ foreach my $macro (keys %{$config->get("macros")}) {
 	$found = 1 if ($macro eq "TEST");
 }
 ok(!$found, "deleteFromHash()");
-
+my $cookieName = $config->get("cookieName");
+if ($cookieName eq "") {
+	is($config->getCookieName,"wgSession", "getCookieName()");
+} else {
+	is($config->getCookieName,$cookieName, "getCookieName()");
+}

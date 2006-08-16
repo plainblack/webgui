@@ -113,7 +113,7 @@ sub www_view {
         }
         unless ($url eq $self->get("url")) {
         	$self->session->http->setRedirect($url);
-		return "";
+		return 1;
 	}
         return $i18n->get('self_referential');
 }

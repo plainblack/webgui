@@ -262,7 +262,7 @@ sub addFiles {
 #-----------------------------------------
 sub setPrivileges {
   print "Setting filesystem privileges.\n" unless ($quiet);
-  if ($session->os->get("type") = "Linuxish") {
+  if ($session->os->get("type") eq "Linuxish") {
     unless (system("chown -R ".$webUser." ".$session->config->get("uploadsPath"))) {
       print "Privileges set.\n" unless ($quiet);
     } else {

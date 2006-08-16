@@ -79,8 +79,7 @@ Returns a validated email address. If the result does not pass validation, it re
 sub getValueFromPost {
 	my $self = shift;
 	my $value = $self->session->form->param($self->get("name"));
-
-	if ($value =~ /^([A-Z0-9]+[._+-]?){1,}([A-Z0-9]+[_+-]?)+\@(([A-Z0-9]+[._-]?){1,}[A-Z0-9]+\.){1,}[A-Z]{2,4}$/i) {
+	if ($value =~ /^([0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})$/i) {
 		return $value;
 	}
 	return undef;

@@ -1,13 +1,20 @@
 7.0.6
-- fix: Error in DateTime.pm
-- Added a cookieTTL parameter to the config file which lets you set an optional expiration time of the webgui session cookie
-- RFE: By default, search results need to match ALL keywords (Len Kranendonk / www.ilance.nl)
-- fix: adding in groupdelete macro
-- fix: semicolons missing
-- fix: Typo in WebGUI/Form/Date.pm
-- fix: snytax error in wobject skeleton
-- fix: potential problem with posts if getThread->parent is not defined
-- fix: macro_env semicolonmissing again!!!!
+ - fix: Error in DateTime.pm
+ - Added a cookieTTL parameter to the config file which lets you set an optional expiration time of the webgui session cookie
+ - RFE: By default, search results need to match ALL keywords (Len Kranendonk / www.ilance.nl)
+ - fix: page redirect problem 
+ - fix: adding in groupdelete macro
+ - fix: semicolons missing
+ - fix: Typo in WebGUI/Form/Date.pm
+ - fix: snytax error in wobject skeleton
+ - fix: potential problem with posts if getThread->parent is not defined
+ - fix: macro_env semicolonmissing again!!!!
+ - Made some changes to make WebGUI compatible with the WRE for Windows.
+ - fix: cacheTimeout not respected as Visitor (Eric Kennedy).
+ - fix: Email address with just one character in the user part not accepted
+ - fix: Image (file) added to page shows before committing changes
+ - fix: Typo in fileImport.pl at line 265 (zxp)
+
 
 7.0.5
  - Added a --skipDelete option to upgrade.pl

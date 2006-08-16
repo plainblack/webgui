@@ -269,7 +269,7 @@ sub www_setContentPositions {
 sub www_view {
 	my $self = shift;
 	# slashdot / burst protection hack
-	if ($self->session->var->get("userId") eq "1" && $self->session->form->param("func") eq "" && $self->session->form->param("op") eq "") { 
+	if ($self->session->var->get("userId") eq "1" && $self->session->form->param() == 0) { 
 		my $check = $self->checkView;
 		return $check if (defined $check);
 		my $cache = WebGUI::Cache->new($self->session, "view_".$self->getId);
