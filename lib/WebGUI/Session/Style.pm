@@ -180,7 +180,7 @@ return props[propName];
 </script>
 <!--morehead-->
 ';
-if ($self->session->user->isInGroup(2)) {
+if ($self->session->user->isInGroup(2) || $self->session->setting->get("preventProxyCache")) {
 	# This "triple incantation" panders to the delicate tastes of various browsers for reliable cache suppression.
 	$var{'head.tags'} .= '
 <meta http-equiv="Pragma" content="no-cache" />

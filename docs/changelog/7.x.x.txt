@@ -14,6 +14,9 @@
  - fix: Email address with just one character in the user part not accepted
  - fix: Image (file) added to page shows before committing changes
  - fix: Typo in fileImport.pl at line 265 (zxp)
+ - rfe: Workflow activity for assigning users to a group
+ - The prevent proxy cache setting also now sets anti-caching meta tags and
+   HTTP headers.
  - fix: getMedia asset constructor returning wrong object type
 
 

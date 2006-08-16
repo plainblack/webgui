@@ -20,17 +20,18 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-# upgrade functions go here
+addNewWorkflowActivity();
 
 finish($session); # this line required
 
 
-##-------------------------------------------------
-#sub exampleFunction {
-#	my $session = shift;
-#	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
-#	# and here's our code
-#}
+#-------------------------------------------------
+sub addNewWorkflowActivity {
+	print "\tAdding 'add user to group' workflow activity.\n" unless ($quiet);
+	my $activities = $session->config->get("workflowActivities");
+	push(@{$activities->{"WebGUI::User"}}, "WebGUI::Workflow::Activity::AddUserToGroup");
+	$session->config->set("workflowActivities", $activities);
+}
 
 
 
