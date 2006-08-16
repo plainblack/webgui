@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::Asset;
 use WebGUI::Asset::Wobject::Navigation;
 
-use Test::More tests => 15; # increment this value for each test you create
+use Test::More tests => 17; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -82,4 +82,10 @@ is ($deadAsset, undef, 'newByDynamicClass constructor with no assetId returns un
 my $rootAsset = WebGUI::Asset->getRoot($session);
 isa_ok($rootAsset, 'WebGUI::Asset');
 is($rootAsset->getId, 'PBasset000000000000001', 'Root Asset ID check');
+
+# getMedia Constructor
+
+my $mediaFolder = WebGUI::Asset->getMedia($session);
+isa_ok($mediaFolder, 'WebGUI::Asset::Wobject::Folder');
+is($mediaFolder->getId, 'PBasset000000000000003', 'Media Folder Asset ID check');
 
