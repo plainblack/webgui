@@ -786,7 +786,7 @@ A reference to the current session.
 sub getMedia {
 	my $class = shift;
 	my $session = shift;
-	return WebGUI::Asset->new($session, "PBasset000000000000003");
+	return WebGUI::Asset->newByDynamicClass($session, "PBasset000000000000003");
 }
 
 
