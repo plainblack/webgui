@@ -55,7 +55,7 @@ sub definition {
 			hoverHelp=>$i18n->get('templateId label description'),
 			
 			# This is the text that will appear to the left of your form field.
-			label=>$i18n->get('templateId label)
+			label=>$i18n->get('templateId label'),
 		}
 	);
 	push(@{$definition}, {
