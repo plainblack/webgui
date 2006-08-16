@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::Asset;
 use WebGUI::Asset::Wobject::Navigation;
 
-use Test::More tests => 13; # increment this value for each test you create
+use Test::More tests => 15; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -32,6 +32,15 @@ my $assetId = "PBnav00000000000000001"; # one of the default nav assets
 my $asset = WebGUI::Asset->new($session, $assetId, 'WebGUI::Asset::Wobject::Navigation');
 is (ref $asset, 'WebGUI::Asset::Wobject::Navigation','new constructor explicit - ref check');
 is ($asset->getId, $assetId, 'new constructor explicit - returns correct asset');
+
+# - new by hashref properties
+$asset = undef;
+$asset = WebGUI::Asset->newByPropertyHashRef($session, {
+                                                          className=>"WebGUI::Asset::Wobject::Navigation",
+		                                                  assetId=>$assetId
+													    });
+is (ref $asset, 'WebGUI::Asset::Wobject::Navigation', 'new constructor newByHashref - ref check');
+is ($asset->getId, $assetId, 'new constructor newByHashref - returns correct asset');
 
 # - implicit class
 $asset = undef;
@@ -74,6 +83,3 @@ my $rootAsset = WebGUI::Asset->getRoot($session);
 isa_ok($rootAsset, 'WebGUI::Asset');
 is($rootAsset->getId, 'PBasset000000000000001', 'Root Asset ID check');
 
-# TODO
-# Test the newByPropertiesHashRef Constructor
-#
