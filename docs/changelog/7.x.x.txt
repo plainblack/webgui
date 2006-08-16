@@ -7,6 +7,7 @@
 - fix: Typo in WebGUI/Form/Date.pm
 - fix: snytax error in wobject skeleton
 - fix: potential problem with posts if getThread->parent is not defined
+- fix: macro_env semicolonmissing again!!!!
 
 7.0.5
  - Added a --skipDelete option to upgrade.pl
