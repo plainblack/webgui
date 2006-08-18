@@ -1,3 +1,8 @@
+7.0.7
+ - fix: sqlform trunctate search results doesn't work (Martin Kamerbeek /
+   Procolix)
+   
+
 7.0.6
  - fix: Error in DateTime.pm
  - Added a cookieTTL parameter to the config file which lets you set an optional expiration time of the webgui session cookie

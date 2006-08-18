@@ -3898,6 +3898,8 @@ my			$value;
 			} else {
 				$value = $row{$fieldProperties->{$_}->{fieldName}};
 			}
+		
+			$value = substr($value, 0, $fieldProperties->{$_}->{summaryLength}) if ($fieldProperties->{$_}->{summaryLength});
 			
 			$value =~ s/\n/<br \/>/g if (1);
 
