@@ -2048,10 +2048,16 @@ my		$regexName = $self->session->form->process("regex_name") || 'untitled';
 		# If id = new create column in table
 		if ($self->session->form->process("fid") eq 'new') {
 			$dbLink->db->write('alter table '.$self->get('tableName').' add column '.$processed->{fieldName}.' '.$type);
-			$dbLink->db->write('alter table '.$self->get('tableName').
-				' add column '.'__'.$processed->{fieldName}.'_mimeType'.' varchar(64)') if ($self->session->form->process("formFieldType") eq 'file');
 		} else {
 			$dbLink->db->write('alter table '.$self->get('tableName').' change column '.$properties->{fieldName}.' '.$processed->{fieldName}.' '.$type);
+		}
+
+		# Add mimetype column for file fields.
+		if ($processed->{formFieldType} eq 'file') {
+			unless (isIn('__'.$processed->{fieldName}.'_mimeType' , keys(%{$databaseDef->{$self->get('tableName')}}))) {
+				$dbLink->db->write('alter table '.$self->get('tableName').
+					' add column '.'__'.$processed->{fieldName}.'_mimeType'.' varchar(64)');
+			}
 		}
 
 		# Process fulltext columns
@@ -2506,7 +2512,7 @@ my 	($creationDate, $creator);
 
 		# Get field constraint
 my 		$fieldConstraint = undef;
-		if ($field->{fieldConstraintType} && $field->{fieldConstraintTarget} =~ /joinColumn[12]/) {
+		if ($field->{fieldConstraintType} && $field->{fieldConstraintTarget} ne 'value') {
 my			$sql = $field->{sqlQuery};
 			if ($field->{joinConstraintColumn}) {
 				$sql =~ s/^select/select $field->{fieldConstraintTarget},/;
@@ -2542,17 +2548,29 @@ my			@results = $self->session->db->quickArray($sql);
 				push(@update, "$fieldName = ".$self->session->db->quote($previousRecord->{$fieldName}));
 				push(@update, "__".$fieldName."_mimeType=".$self->session->db->quote($previousRecord->{"__".$fieldName."_mimeType"}));
 			} elsif ($self->session->form->process('_'.$fieldName.'_action') eq 'overwrite' && $self->session->form->process($fieldName)) {
-				my $fileHandle = $self->session->request->upload($fieldName);
+				require Apache2::Request;
+				require Apache2::Upload;
+
+				# Get Apache2::Upload object
+				my $upload = $self->session->request->upload($fieldName);
+
+				# Check file size
 				my $maxFileSize = ($self->get('maxFileSize') > $self->session->setting->get("maxAttachmentSize")) ? 
 					$self->session->setting->get("maxAttachmentSize") : $self->get('maxFileSize');
-				push(@error, $i18n->get('ers file too large')) if (-s $fileHandle > $maxFileSize);
-				my $fileType = $self->session->request->uploadInfo($self->session->form->process($fieldName))->{'Content-Type'};
-				my $fileContents;
-				while (<$fileHandle>) {
-					$fileContents .= $_;
+				if ($upload->size > $maxFileSize * 1024) {
+					push(@error, $i18n->get('ers file too large'));
+				} else {
+					my $fileType = $upload->type;
+					my $fileContents = '';
+
+					# Slurp file into scalar for use in query. Blocked reads will save memory, but then you
+					# have to stream the data, which is not possible in mysql queries as far as I know.
+					$upload->slurp($fileContents);
+					
+					# Include file content and mime type in query.
+					push(@update, "$fieldName = ".$self->session->db->quote($fileContents));
+					push(@update, "__".$fieldName."_mimeType=".$self->session->db->quote($fileType));
 				}
-				push(@update, "$fieldName = ".$self->session->db->quote($fileContents));
-				push(@update, "__".$fieldName."_mimeType=".$self->session->db->quote($fileType));
 			} else {
 			}
 		# Throw error if field is required and empty.

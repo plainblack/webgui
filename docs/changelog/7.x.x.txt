@@ -1,6 +1,8 @@
 7.0.7
  - fix: sqlform trunctate search results doesn't work (Martin Kamerbeek /
    Procolix)
+ - fixed some of bugs in the sqlform concerning file uploads and cross table
+   constraints (Martin Kamerbeek / Procolix)
    
 
 7.0.6
