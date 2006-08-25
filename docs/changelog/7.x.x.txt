@@ -3,7 +3,8 @@
    Procolix)
  - fixed some of bugs in the sqlform concerning file uploads and cross table
    constraints (Martin Kamerbeek / Procolix)
-   
+ - fix: Add event does not work WebGUI 7.0.5 in combination with Proxy Caching
+   turned off (Wouter van Oijen / ProcoliX)   
 
 7.0.6
  - fix: Error in DateTime.pm

@@ -500,7 +500,7 @@ sub view {
 
 	# Set all template variables
 	my %var;
-	$var{"addevent.url"} = $self->getUrl().'?func=add;class=WebGUI::Asset::Event';
+	$var{"addevent.url"} = $self->getUrl('func=add;class=WebGUI::Asset::Event');
 	$var{"addevent.label"} = $i18n->get(20);
 	$var{'sunday.label'} = $dt->getDayName(7);
 	$var{'monday.label'} = $dt->getDayName(1);
