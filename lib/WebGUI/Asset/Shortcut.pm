@@ -689,7 +689,7 @@ sub www_getUserPrefsForm {
 	return 'You are not allowed to personalize this Dashboard.' unless $self->getParent->canPersonalize;
 	my $output;
 	my @fielden = $self->getPrefFieldsToShow;
-	my $f = WebGUI::HTMLForm->new($self->session,extras=>' onSubmit="submitForm(this,\''.$self->getId.'\',\''.$self->getUrl.'\');return false;"');
+	my $f = WebGUI::HTMLForm->new($self->session,extras=>' onsubmit="submitForm(this,\''.$self->getId.'\',\''.$self->getUrl.'\');return false;"');
 	$f->raw('<table cellspacing="0" cellpadding="3" border="0">');
 	$f->hidden(  
 		-name => 'func', 
