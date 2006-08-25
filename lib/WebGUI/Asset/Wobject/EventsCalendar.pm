@@ -528,10 +528,10 @@ sub view {
 		$monthLabel = $i18n->get(561);
 	}
 	$var{'pagination.pageCount.isMultiple'} = 1;
-	$var{'pagination.previousPageUrl'} = $self->getUrl.'?calMonthStart='.$calMonthStart-$monthRangeLength.';calMonthEnd='.$calMonthEnd-$monthRangeLength;
-	$var{'pagination.previousPage'} = '<a href="'.$self->getUrl.'?calMonthStart='.($calMonthStart-$monthRangeLength).';calMonthEnd='.($calMonthEnd-$monthRangeLength).'">'.$i18n->get(558).' '.$monthRangeLength.' '.$monthLabel.'</a>';
-	$var{'pagination.nextPageUrl'} = $self->getUrl.'?calMonthEnd='.$calMonthStart+$monthRangeLength.';calMonthEnd='.$calMonthEnd+$monthRangeLength;
-	$var{'pagination.nextPage'} = '<a href="'.$self->getUrl.'?calMonthStart='.($calMonthStart+$monthRangeLength).';calMonthEnd='.($calMonthEnd+$monthRangeLength).'">'.$i18n->get(559).' '.$monthRangeLength.' '.$monthLabel.'</a>';
+	$var{'pagination.previousPageUrl'} = $self->getUrl('calMonthStart='.$calMonthStart-$monthRangeLength.';calMonthEnd='.$calMonthEnd-$monthRangeLength);
+	$var{'pagination.previousPage'} = '<a href="'.$self->getUrl('calMonthStart='.($calMonthStart-$monthRangeLength).';calMonthEnd='.($calMonthEnd-$monthRangeLength)).'">'.$i18n->get(558).' '.$monthRangeLength.' '.$monthLabel.'</a>';
+	$var{'pagination.nextPageUrl'} = $self->getUrl('calMonthEnd='.$calMonthStart+$monthRangeLength.';calMonthEnd='.$calMonthEnd+$monthRangeLength);
+	$var{'pagination.nextPage'} = '<a href="'.$self->getUrl('calMonthStart='.($calMonthStart+$monthRangeLength).';calMonthEnd='.($calMonthEnd+$monthRangeLength)).'">'.$i18n->get(559).' '.$monthRangeLength.' '.$monthLabel.'</a>';
 	$var{'pagination.pageList.upTo20'} = '
 	<form method="get" style="display: inline;" action="'.$self->getUrl.'">
 	<input type="hidden" name="calMonthStart" value="'.$calMonthStart.'" />
