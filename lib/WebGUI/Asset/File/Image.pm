@@ -307,9 +307,6 @@ A web executable method that redirects the user to the specified page, or displa
 
 sub www_view {
 	my $self = shift;
-	if ($self->session->var->get("adminOn")) {
-		return $self->www_edit;
-	}
 	my $storage = $self->getStorageLocation;
 	$self->session->http->setRedirect($storage->getUrl($self->get("filename")));
 	$self->session->http->setStreamedFile($storage->getPath($self->get("filename")));
