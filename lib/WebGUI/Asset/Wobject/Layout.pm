@@ -97,8 +97,15 @@ sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
 	my $i18n = WebGUI::International->new($self->session,"Asset_Layout");
+
+	my ($templateId);
+	if (($self->get("assetId") eq "new") && ($self->getParent->get('className') eq 'WebGUI::Asset::Wobject::Layout')) {
+		$templateId = $self->getParent->getValue('templateId');
+	} else {
+		$templateId = $self->getValue('templateId');
+	}
    	$tabform->getTab("display")->template(
-      		-value=>$self->getValue('templateId'),
+      		-value=>$templateId,
       		-label=>$i18n->get('layout template title'),
       		-hoverHelp=>$i18n->get('template description'),
       		-namespace=>"Layout"
