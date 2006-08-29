@@ -3356,7 +3356,7 @@ sub www_editRegistrant {
 	return $self->session->privilege->insufficient unless ($self->canAddEvents);
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my $f = WebGUI::HTMLForm->new($self->session, (
-		action => $self->getUrl("?func=editRegistrantSave;badgeId=".$badgeId)
+		action => $self->getUrl("func=editRegistrantSave;badgeId=".$badgeId)
 	));
 	my $data = {};
 	if ($error) {
