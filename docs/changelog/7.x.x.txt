@@ -17,7 +17,14 @@
    and printable style were not set for the Collabs attached to the listings
    in the Matrix (Martin Kamerbeek / Procolix)
  - fix: Spectre::Admin Error Message (xhunter)
-
+ - fix: invalid getUrl usage in EventManagementSystem
+ - fix: assets incorrectly setting Last-Modified by revisionDate only
+ - fix: SyndicatedContent caching the wrong thing and not displaying after first time
+ - fix: Database cache trying to freeze non-references with Storable
+ - fix: Apache version string component came before Apache's own version number
+ - RFE: JavaScript confirmation rather than page load for deleteUser
+ - RFE: JavaScript confirmation rather than page load for deleteGroup
+ - RFE: show which user locked an asset in the asset manager
 
 7.0.6
  - fix: Error in DateTime.pm
