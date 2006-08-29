@@ -205,9 +205,9 @@ sub runTests {
         	} else {
                 	my $response = $response->content;
 			if ($response eq "subnet") {
-				print "ERROR: Spectre cannot communicate with WebGUI for $key, perhaps you need to adjust the spectreSubnets setting in this config file.\n";
+				print "ERROR: Spectre cannot communicate with WebGUI. Perhaps you need to adjust the spectreSubnets setting in this config file: $key.\n";
 			} elsif ($response eq "spectre") {
-				print "ERROR: WebGUI connot communicate with Spectre for $key, perhaps you need to adjust the spectreIp or spectrePort setting the this config file.";
+				print "ERROR: WebGUI cannot communicate with Spectre. Perhaps you need to adjust the spectreIp or spectrePort setting the this config file: $key.";
 			} elsif ($response ne "success") {
 				print "ERROR: Spectre received an invalid response from WebGUI while testing $key\n";
 			}

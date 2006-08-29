@@ -16,6 +16,7 @@
  - fix: Matrix 'Can instantiate template' and also fixed a bug where the style
    and printable style were not set for the Collabs attached to the listings
    in the Matrix (Martin Kamerbeek / Procolix)
+ - fix: Spectre::Admin Error Message (xhunter)
 
 
 7.0.6
