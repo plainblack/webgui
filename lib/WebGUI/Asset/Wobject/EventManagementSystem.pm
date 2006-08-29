@@ -2326,7 +2326,7 @@ sub www_editEventMetaDataField {
 	my $i18n2 = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my $i18n = WebGUI::International->new($self->session,"WebGUIProfile");
 	my $f = WebGUI::HTMLForm->new($self->session, (
-		action => $self->getUrl."?func=editEventMetaDataFieldSave;fieldId=".$fieldId
+		action => $self->getUrl("func=editEventMetaDataFieldSave;fieldId=".$fieldId)
 	));
 	my $data = {};
 	if ($error) {
@@ -3226,7 +3226,7 @@ sub www_editPrereqSet {
 	return $self->session->privilege->insufficient unless ($self->canAddEvents);
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my $f = WebGUI::HTMLForm->new($self->session, (
-		action => $self->getUrl."?func=editPrereqSetSave;psid=".$psid
+		action => $self->getUrl("func=editPrereqSetSave;psid=".$psid)
 	));
 	my $data = {};
 	if ($error) {
@@ -3356,7 +3356,7 @@ sub www_editRegistrant {
 	return $self->session->privilege->insufficient unless ($self->canAddEvents);
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my $f = WebGUI::HTMLForm->new($self->session, (
-		action => $self->getUrl."?func=editRegistrantSave;badgeId=".$badgeId
+		action => $self->getUrl("?func=editRegistrantSave;badgeId=".$badgeId)
 	));
 	my $data = {};
 	if ($error) {
@@ -3607,7 +3607,7 @@ sub www_editDiscountPass {
 	return $self->session->privilege->insufficient unless ($self->canAddEvents);
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my $f = WebGUI::HTMLForm->new($self->session, (
-		action => $self->getUrl."?func=editDiscountPassSave;passId=".$passId
+		action => $self->getUrl("func=editDiscountPassSave;passId=".$passId)
 	));
 	my $data = {};
 	if ($error) {

@@ -2036,6 +2036,19 @@ sub www_manageAssets {
 
 #-------------------------------------------------------------------
 
+=head2 getContentLastModified
+
+Returns the overall modification time of the object and its content in Unix epoch format, for the purpose of the Last-Modified HTTP header.  Override this for subclasses that contain content that is not solely dependent on the revisionDate of the asset.
+
+=cut
+
+sub getContentLastModified {
+	my $self = shift;
+	return $self->get("revisionDate");
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_view ( )
 
 Returns the view() method of the asset object if the requestor canView.

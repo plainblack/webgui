@@ -80,7 +80,22 @@ sub _createRSSURLs {
 	$var->{'rss.url'}=$self->getUrl('func=viewRSS20');
 }
 
+#-------------------------------------------------------------------
+sub _getMaxHeadlines {
+	my $self = shift;
+	return $self->get('maxHeadlines') || 1000000;
+}
 
+#-------------------------------------------------------------------
+sub _getValidatedUrls {
+	my $self = shift;
+	my @urls = split(/\s+/,$self->get('rssUrl'));
+	my @validatedUrls = ();
+	foreach my $url (@urls) {
+		push(@validatedUrls, $url) if ($url =~ m/^http/);
+	}
+	return @validatedUrls
+}
 
 #-------------------------------------------------------------------
 
@@ -289,6 +304,11 @@ sub _get_rss_data {
                 }
                 my $xml = $response->content();
 
+		# Approximate with current time if we don't have a Last-Modified
+		# header coming from the RSS source.
+		my $http_lm = $response->last_modified;
+		my $last_modified = defined($http_lm)? $http_lm : time;
+
 		# XML::RSSLite does not handle <![CDATA[ ]]> so:
                 $xml =~ s/<!\[CDATA\[(.*?)\]\]>/$1/sg;
  
@@ -340,6 +360,9 @@ sub _get_rss_data {
 		#This is important because we can "filter" now and want to ensure we keep order
 		#correctly as new items appear.
 		_assign_rss_dates($session, $rss->{items});
+
+		# Store last-modified date as well.
+		$rss->{last_modified} = $last_modified;
 
                 #Default to an hour timeout
                 $cache->set(Storable::freeze($rss), 3600);
@@ -475,13 +498,21 @@ sub _get_items {
 	my $displayMode=$self->getValue('displayMode');
 
 	my $hasTermsRegex=_make_regex($self->getValue('hasTerms'));
-	
-	my $key=join(':',('aggregate', $displayMode,$hasTermsRegex,$maxHeadlines,$self->get('rssUrl')));
+
+	# Cache format changes:
+	#   - aggregate: $items
+	#   - aggregate2 (2006-08-26): [$items, \@rss_feeds]
+
+	my $key=join(':',('aggregate2', $displayMode,$hasTermsRegex,$maxHeadlines,$self->get('rssUrl')));
 
         my $cache = WebGUI::Cache->new($self->session,$key, 'RSS');
-        my $items = Storable::thaw($cache->get());
-	my @rss_feeds;
-        if (!$items) {
+        my $cached = Storable::thaw($cache->get());
+	my ($items, @rss_feeds);
+
+	if ($cached) {
+		$items = $cached->[0];
+		@rss_feeds = @{$cached->[1]};
+	} else {
                 $items = [];
 
                 for my $url (@{$urls}) {
@@ -506,8 +537,8 @@ sub _get_items {
 
                 #@{$items} = sort { $b->{date} <=> $a->{date} } @{$items};
 
-                $cache->set(Storable::freeze($items), 3600);
-	    }
+                $cache->set(Storable::freeze([$items, \@rss_feeds]), 3600);
+	}
 
 	#So return the item loop and the first RSS feed, because 
 	#when we're parsing a single feed we can use that feed's title and 
@@ -567,12 +598,8 @@ sub view {
 		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
 		return $out if $out;
 	}
-        my $maxHeadlines = $self->get('maxHeadlines') || 1000000;
-        my @urls = split(/\s+/,$self->get('rssUrl'));
-	my @validatedUrls = ();
-	foreach my $url (@urls) {
-		push(@validatedUrls, $url) if ($url =~ m/^http/);
-	}
+        my $maxHeadlines = $self->_getMaxHeadlines;
+	my @validatedUrls = $self->_getValidatedUrls;
 	return $self->processTemplate({},$self->get('templateId')) unless (scalar(@validatedUrls));
 	my $title=$self->get('title');
 
@@ -621,6 +648,32 @@ sub view {
 
 }
 
+#-------------------------------------------------------------------
+
+=head2 getContentLastModified ( )
+
+Derive the last-modified date from the revisionDate of the object and from the dates of the RSS feeds.
+
+=cut
+
+sub getContentLastModified {
+	# Buggo, is this too expensive?  Do we really want to do this every time?
+	# But how else are we supposed to get a reasonable last-modified date?
+	# Maybe just approximate... ?
+	my $self = shift;
+
+	my $maxHeadlines = $self->_getMaxHeadlines;
+	my @validatedUrls = $self->_getValidatedUrls;
+	my ($item_loop, $rss_feeds) = $self->_get_items(\@validatedUrls, $maxHeadlines);
+	my $mtime = $self->get("revisionDate");
+
+	foreach my $rss (@$rss_feeds) {
+		next unless defined $rss->{last_modified};
+		$mtime = $rss->{last_modified} if $rss->{last_modified} > $mtime;
+	}
+
+	return $mtime;
+}
 
 #-------------------------------------------------------------------
 

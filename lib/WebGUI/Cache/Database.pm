@@ -103,7 +103,8 @@ sub get {
 	$sth->finish;
 	my $content = $data->[0];
 	return undef unless ($content);
-	return thaw($content);
+	# Storable doesn't like non-reference arguments, so we wrap it in a scalar ref.
+	return ${thaw($content)};
 }
 
 #-------------------------------------------------------------------
@@ -170,7 +171,8 @@ The time to live for this content. This is the amount of time (in seconds) that 
 
 sub set {
 	my $self = shift;
-	my $content = freeze(shift);
+	# Storable doesn't like non-reference arguments, so we wrap it in a scalar ref.
+	my $content = freeze(\(scalar shift));
 	my $ttl = shift || 60;
 	my $size = length($content);
 	# getting better performance using native dbi than webgui sql

@@ -274,6 +274,18 @@ sub www_setContentPositions {
 }
 
 #-------------------------------------------------------------------
+sub getContentLastModified {
+        # Buggo: this is a little too conservative.  Children that are hidden maybe shouldn't count.  Hm.
+	my $self = shift;
+	my $mtime = $self->get("revisionDate");
+	foreach my $child (@{$self->getLineage(["children"],{returnObjects=>1, excludeClasses=>['WebGUI::Asset::Wobject::Layout']})}) {
+		my $child_mtime = $child->getContentLastModified;
+		$mtime = $child_mtime if ($child_mtime > $mtime);
+	}
+	return $mtime;
+}
+
+#-------------------------------------------------------------------
 sub www_view {
 	my $self = shift;
 	# slashdot / burst protection hack
@@ -296,7 +308,7 @@ sub www_view {
 			my $ad = $adSpace->displayImpression if (defined $adSpace);
 			$out =~ s/\Q$code/$ad/ges;
 		}
-		$self->session->http->setLastModified($self->get("revisionDate"));
+		$self->session->http->setLastModified($self->getContentLastModified);
 		$self->session->http->sendHeader;	
 		$self->session->output->print($out, 1);
 		return "chunked";	

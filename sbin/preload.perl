@@ -52,7 +52,16 @@ foreach my $package (@modules) {
 }
 
 use Apache2::ServerUtil ();
-Apache2::ServerUtil->server->add_version_component("WebGUI/".$WebGUI::VERSION);
+{
+    # Add WebGUI to Apache version tokens
+    my $server = Apache2::ServerUtil->server;
+    my $sub = sub {
+	$server->add_version_component("WebGUI/".$WebGUI::VERSION);	
+    };
+    $server->push_handlers(PerlPostConfigHandler => $sub);
+}
+
+
 use APR::Request::Apache2 ();
 use Apache2::Cookie ();
 
