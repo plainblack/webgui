@@ -31,7 +31,6 @@ DBI->install_driver("mysql"); # Change to match your database driver.
 #----------------------------------------
 # WebGUI modules.
 #----------------------------------------
-
 use WebGUI ();
 
 use WebGUI::Utility ();
