@@ -13,6 +13,9 @@
  - fix: extra elements (tags) do not show up in HTML source (Martin Kamerbeek
    / Procolix)
  - fix: Error in StockData Default View Template (Wouter van Oijen / Procolix)
+ - fix: Matrix 'Can instantiate template' and also fixed a bug where the style
+   and printable style were not set for the Collabs attached to the listings
+   in the Matrix (Martin Kamerbeek / Procolix)
 
 
 7.0.6

@@ -1157,6 +1157,11 @@ sub view {
 	$p->setDataByQuery($sql);
 	$self->appendPostListTemplateVars(\%var, $p);
 	$self->appendTemplateLabels(\%var);
+
+	# If the asset is not called through the normal prepareView/view cycle, first call prepareView.
+	# This happens for instance in the viewDetail method in the Matrix. In that case the Collaboration
+	# is called through the api.
+	$self->prepareView unless ($self->{_viewTemplate});
        	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 	if ($self->session->user->userId eq '1' && !$self->session->form->process("sortBy")) {
 		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("visitorCacheTimeout"));

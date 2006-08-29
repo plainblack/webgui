@@ -719,7 +719,9 @@ sub www_editListingSave {
                         karmaRatingMultiplier => 0,
                         moderatePosts => 0,
                         moderateGroupId => '4',
-                        postGroupId => '7'
+                        postGroupId => '7',
+			styleTemplateId => $self->get('styleTemplateId'),
+			printableStyleTemplateId => $self->get('printableStyleTemplateId'),
 			});
 		WebGUI::VersionTag->getWorking($self->session)->commit;
 		$data{forumId} = $forum->getId;
