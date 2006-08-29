@@ -37,7 +37,7 @@ foreach my $testSet (@testSets) {  ##Count dynamic tests
 }
 
 $numTests += 1; #Module loading test
-$numTests += 10; #Static tests
+$numTests += 11; #Static tests
 
 plan tests => $numTests;
 
@@ -63,6 +63,14 @@ is($vars{'logout.url'}, $session->url->page('op=auth;method=logout'), 'logout.ur
 is($vars{'account.display.url'}, $session->url->page('op=auth;method=displayAccount'), 'account.display.url');
 is($vars{'account.create.url'}, $session->url->page('op=auth;method=createAccount'), 'account.create.url');
 
+##The purpose of the test is to make sure that the variables are what they say
+##they are.
+
+#diag $output;
+#diag Dumper \%vars;
+
+is($vars{'form.footer'}, WebGUI::Form::formFooter($session), 'form.footer');
+
 foreach my $testSet (@testSets) {
 }
 
@@ -83,7 +91,7 @@ sub simpleTextParser {
 	my ($text) = @_;
 
 	my %pairedData = ();
-	while($text =~ m/^\s*(\S+)\s*=\s*(.*?)-\+-\n/smgc) {
+	while($text =~ m/^\s*(\S+)\s*=\s*(.*?)-\+-/smgc) {
 		$pairedData{$1} = $2;
 	}
 	return %pairedData;
@@ -113,6 +121,7 @@ sub setupTest {
 		logout.label form.header username.label username.form
 		password.label password.form form.login account.create.url
 		account.create.label form.footer/;
+	#$properties->{template} .= "\n";
 	my $template = $defaultNode->addChild($properties, $properties->{id});
 	$versionTag->commit;
 	return ($versionTag, $template);
