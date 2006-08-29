@@ -55,7 +55,7 @@ sub _submenu {
                 	$ac->addSubmenuItem($session->url->page("op=manageUsersInGroup;gid=".$session->form->process("gid")), $i18n->get(754));
 	                $ac->addSubmenuItem($session->url->page("op=manageGroupsInGroup;gid=".$session->form->process("gid")), $i18n->get(807));
         	        $ac->addSubmenuItem($session->url->page("op=emailGroup;gid=".$session->form->process("gid")), $i18n->get(808));
-                	$ac->addSubmenuItem($session->url->page("op=deleteGroup;gid=".$session->form->process("gid")), $i18n->get(806));
+                	$ac->addConfirmedSubmenuItem($session->url->page("op=deleteGroup;gid=".$session->form->process("gid")), $i18n->get(806), $i18n->get(86));
 	        }
         	$ac->addSubmenuItem($session->url->page("op=listGroups"), $i18n->get(756));
 	}
@@ -199,21 +199,6 @@ sub www_autoDeleteFromGroup {
 
 #-------------------------------------------------------------------
 sub www_deleteGroup {
-	my $session = shift;
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3) || _hasSecondaryPrivilege($session,$session->form->process("gid")));
-	return $session->privilege->vitalComponent() if (isIn($session->form->process("gid"), qw(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17)));
-	my $i18n = WebGUI::International->new($session);
-        my ($output);
-        $output .= $i18n->get(86).'<p>';
-        $output .= '<div align="center"><a href="'.$session->url->page('op=deleteGroupConfirm;gid='.$session->form->process("gid")).
-		'">'.$i18n->get(44).'</a>';
-        $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.$session->url->page('op=listGroups').'">'
-		.$i18n->get(45).'</a></div>';
-        return _submenu($session,$output, '42',"group delete");
-}
-
-#-------------------------------------------------------------------
-sub www_deleteGroupConfirm {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3) || _hasSecondaryPrivilege($session,$session->form->process("gid")));
 	return $session->privilege->vitalComponent() if (isIn($session->form->process("gid"), qw(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17)));

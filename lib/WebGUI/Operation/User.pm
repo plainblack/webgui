@@ -81,7 +81,7 @@ sub _submenu {
 			|| $session->stow->get("editUser_UID") eq "new") {
 			$ac->addSubmenuItem($session->url->page("op=editUser;uid=".$session->stow->get("editUser_UID")), $i18n->get(457));
 			$ac->addSubmenuItem($session->url->page('op=becomeUser;uid='.$session->stow->get("editUser_UID")), $i18n->get(751));
-			$ac->addSubmenuItem($session->url->page('op=deleteUser;uid='.$session->stow->get("editUser_UID")), $i18n->get(750));
+			$ac->addConfirmedSubmenuItem($session->url->page('op=deleteUser;uid='.$session->stow->get("editUser_UID")), $i18n->get(750), $i18n->get(167));
 			if ($session->setting->get("useKarma")) {
 				$ac->addSubmenuItem($session->url->page("op=editUserKarma;uid=".$session->stow->get("editUser_UID")), $i18n->get(555));
 			}
@@ -261,41 +261,13 @@ sub www_becomeUser {
 
 =head2 www_deleteUser ( )
 
-Confirmation form for deleting a user. Only Admins are allowed to
-delete users.  The WebGUI uses Visitor and Admin may not be deleted.
-If the Admin confirms, then www_deleteUserConfirm is called.  The UID
-of the user to delete is expected in a URL param names 'uid'.
-
-=cut
-
-sub www_deleteUser {
-	my $session = shift;
-        my ($output);
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
-	my $i18n = WebGUI::International->new($session);
-        if ($session->form->process("uid") eq '1' || $session->form->process("uid") eq '3') {
-		return _submenu($session,$session->privilege->vitalComponent());
-        } else {
-                $output .= $i18n->get(167).'<p>';
-                $output .= '<div align="center"><a href="'.$session->url->page('op=deleteUserConfirm;uid='.$session->form->process("uid")).
-			'">'.$i18n->get(44).'</a>';
-                $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.$session->url->page('op=listUsers').'">'.
-			$i18n->get(45).'</a></div>'; 
-		return _submenu($session,$output,'42',"user delete");
-        }
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_deleteUserConfirm ( )
-
 Deletes a user.  Only Admins are allowed to delete users.  The UID of the user
 to delete is expected in a URL param named 'uid'.  www_listUsers is called
 after this.
 
 =cut
 
-sub www_deleteUserConfirm {
+sub www_deleteUser {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	my ($u);

@@ -147,6 +147,22 @@ sub isLocked {
 
 #-------------------------------------------------------------------
 
+=head2 lockedBy ( )
+
+Returns the user who locked this asset, or undef if the asset is unlocked.
+
+=cut
+
+sub lockedBy {
+	my $self = shift;
+	my $userId = $self->get("isLockedBy");
+	return unless defined $userId;
+	return WebGUI::User->new($self->session, $userId);
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 purgeRevision ( )
 
 Deletes a revision of an asset. If it's the last revision, it purges the asset all together.

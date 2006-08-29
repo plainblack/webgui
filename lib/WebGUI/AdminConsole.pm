@@ -113,6 +113,43 @@ sub addSubmenuItem {
 
 #-------------------------------------------------------------------
 
+=head2 addConfirmedSubmenuItem ( url, label, confirmation, extras )
+
+Appends a link to the current AdminConsole submenu with a JavaScript confirmation showing the given message.
+
+=head3 url
+
+A string representing a URL.
+
+=head3 label
+
+A (hopefully informative) string.
+
+=head3 confirmation
+
+The message to use for the JavaScript confirmation before activating the link.
+
+=head3 extras
+
+Additional information.
+
+=cut
+
+sub addConfirmedSubmenuItem {
+	my $self = shift;
+	my $url = shift;
+	my $label = shift;
+	my $confirmation = shift;
+	my $extras = shift;
+
+	# Buggo.  We should really be using a proper JavaScript string escaping function here.
+	$confirmation =~ s/([\\\'])/\\$1/g;
+	$extras .= ' onclick="return confirm(\''.$confirmation.'\')"';
+	$self->addSubmenuItem($url, $label, $extras);
+}
+
+#-------------------------------------------------------------------
+
 =head2 getAdminConsoleParams ( )
 
 Returns a Hash of title, url, canUse, and icon. title is the Internationalization of "Admin Console". url is the page with op=adminConsole, canUse checks if is in group 12. icon is image located in extras/adminConsole/adminConsole.gif.

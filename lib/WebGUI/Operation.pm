@@ -143,7 +143,6 @@ sub getOperations {
 		'autoAddToGroup' => 'WebGUI::Operation::Group',
 		'autoDeleteFromGroup' => 'WebGUI::Operation::Group',
 		'deleteGroup' => 'WebGUI::Operation::Group',
-		'deleteGroupConfirm' => 'WebGUI::Operation::Group',
 		'deleteGroupGrouping' => 'WebGUI::Operation::Group',
 		'deleteGrouping' => 'WebGUI::Operation::Group',
 		'editGroup' => 'WebGUI::Operation::Group',
@@ -247,7 +246,6 @@ sub getOperations {
 
 		'becomeUser' => 'WebGUI::Operation::User',
 		'deleteUser' => 'WebGUI::Operation::User',
-		'deleteUserConfirm' => 'WebGUI::Operation::User',
 		'editUser' => 'WebGUI::Operation::User',
 		'editUserSave' => 'WebGUI::Operation::User',
 		'editUserKarma' => 'WebGUI::Operation::User',

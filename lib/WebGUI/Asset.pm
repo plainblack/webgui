@@ -1144,7 +1144,8 @@ sub manageAssets {
 		my $locked;
 		my $edit;
 		if ($child->isLocked) {
-			$locked = '<img src="'.$self->session->url->extras('assetManager/locked.gif').'" alt="locked" style="border: 0px;" />';
+			my $username_html = WebGUI::HTML::format($child->lockedBy->username, "text");
+			$locked = '<img src="'.$self->session->url->extras('assetManager/locked.gif').'" alt="locked by '.$username_html.'" title="locked by '.$username_html.'" style="border: 0px;" />';
 			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+" if ($child->canEditIfLocked);
 		} else {
 			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+";
