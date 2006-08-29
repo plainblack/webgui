@@ -8,6 +8,8 @@
  - When going to an image by it's webgui url in admin mode, you are now shown the image instead of being taken to the edit screen for the image.
  - fixed a bug in the Layout Asset where the asset would not inherit the
    Layout template of its parent on addition (Martin Kamerbeek / Procolix)
+ - fixed some issues with getting original values and template fields in the
+   overrides section of the Shortcut asset (Martin Kamerbeek / Procolix)
 
 7.0.6
  - fix: Error in DateTime.pm

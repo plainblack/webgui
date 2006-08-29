@@ -778,42 +778,69 @@ sub www_editOverride {
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	my $i18n = WebGUI::International->new($self->session, "Asset_Shortcut");
 	my $fieldName = $self->session->form->process("fieldName");
+
+	# Using getOverrides is not the most efficient way to get the properties of only
+	# one override, since it'll return all overrides (that have been set)
 	my %overrides = $self->getOverrides;
+
+	# Cannot fetch the original value from the overrides hash b/c it will be empty if
+	# the override has not been set before. Also getOverrides uses a cached version of
+	# the origValue, which can be out of date.
+	my $origValue = $self->getShortcutOriginal->getValue($fieldName); 
+
 	my $output = '';
-	my %props;
+	$output .= '</table>';
+	
+	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
+	$f->hidden(
+		-name		=> "func",
+		-value		=> "saveOverride"
+	);
+	$f->hidden(
+		-name		=> "overrideFieldName",
+		-value		=> $fieldName
+	);
+	$f->readOnly(
+		-label		=> $i18n->get("fieldName"),
+		-value		=> $fieldName
+	);
+	$f->readOnly(
+		-label		=> $i18n->get("Original Value"),
+		-value		=> $origValue
+	);
+
+	# Fetch the parameters for the dynamic field.
+	my (%params, %props);
 	foreach my $def (@{$self->getShortcutOriginal->definition($self->session)}) {
 		%props = (%props,%{$def->{properties}});
 	}
-	$output .= '</table>';
-	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
-	$f->hidden(-name=>"func",-value=>"saveOverride");
-	$f->hidden(-name=>"overrideFieldName",-value=>$self->session->form->process("fieldName"));
-	$f->readOnly(-label=>$i18n->get("fieldName"),-value=>$self->session->form->process("fieldName"));
-	$f->readOnly(-label=>$i18n->get("Original Value"),-value=>$overrides{overrides}{$fieldName}{origValue});
-	my %params;
 	foreach my $key (keys %{$props{$fieldName}}) {
 		next if ($key eq "tab");
 		$params{$key} = $props{$fieldName}{$key};
 	}
-	$params{value} = $overrides{overrides}{$fieldName}{origValue};
+	$params{value} = $origValue;
 	$params{name} = $fieldName;
 	$params{label} = $params{label} || $i18n->get("Edit Field Directly");
 	$params{hoverHelp} = $params{hoverHelp} || $i18n->get("Use this field to edit the override using the native form handler for this field type");
-	if ($fieldName eq 'templateId') {$params{namespace} = $params{namespace} || WebGUI::Asset->newByDynamicClass($self->session, $overrides{overrides}{templateId}{origValue})->get("namespace");}
+
+	if ($params{fieldType} eq 'template') {$params{namespace} = $params{namespace} || WebGUI::Asset->newByDynamicClass($self->session, $origValue)->get("namespace");}
+
 	$f->dynamicField(%params);
 	$f->textarea(
-		-name=>"newOverrideValueText",
-		-label=>$i18n->get("New Override Value"),
-		-value=>$overrides{overrides}{$fieldName}{newValue},
-		-hoverHelp=>$i18n->get("Place something in this box if you dont want to use the automatically generated field")
+		-name		=> "newOverrideValueText",
+		-label		=> $i18n->get("New Override Value"),
+		-value		=> $overrides{overrides}{$fieldName}{newValue},
+		-hoverHelp	=> $i18n->get("Place something in this box if you dont want to use the automatically generated field")
 	);
 	$f->readOnly(
-		-label=>$i18n->get("Replacement Value"),
-		-value=>$overrides{overrides}{$fieldName}{parsedValue},
-		-hoverHelp=>$i18n->get("This is the example output of the field when parsed for user preference macros")
+		-label		=> $i18n->get("Replacement Value"),
+		-value		=> $overrides{overrides}{$fieldName}{parsedValue},
+		-hoverHelp	=> $i18n->get("This is the example output of the field when parsed for user preference macros")
 	) if $self->isDashlet;
 	$f->submit;
+
 	$output .= $f->print;
+	
 	return $self->_submenu($output,$i18n->get('Edit Override'));
 }
 
