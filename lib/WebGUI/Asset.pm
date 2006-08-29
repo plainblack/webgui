@@ -1557,6 +1557,7 @@ Executes what is necessary to make the view() method work with content chunking.
 sub prepareView {
 	my $self = shift;
 	$self->{_toolbar} = $self->getToolbar;
+	$self->session->style->setRawHeadTags($self->getExtraHeadTags);
 }
 
 #-------------------------------------------------------------------

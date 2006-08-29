@@ -10,6 +10,8 @@
    Layout template of its parent on addition (Martin Kamerbeek / Procolix)
  - fixed some issues with getting original values and template fields in the
    overrides section of the Shortcut asset (Martin Kamerbeek / Procolix)
+ - fix: extra elements (tags) do not show up in HTML source (Martin Kamerbeek
+   / Procolix)
 
 7.0.6
  - fix: Error in DateTime.pm

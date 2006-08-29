@@ -196,6 +196,7 @@ sub prepareView {
 	foreach my $child (@{$children}) {
 		unless (isIn($child->getId, @found)||isIn($child->getId,@hidden)) {
 			if ($child->canView) {
+				$self->session->style->setRawHeadTags($child->getExtraHeadTags);
 				$child->prepareView;
 				push(@placeHolder1, $child);
 				push(@{$vars{"position1_loop"}},{
