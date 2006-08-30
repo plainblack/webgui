@@ -143,21 +143,6 @@ our $HELP = {
 		          {
 		            'name' => 'linkURL'
 		          },
-		          {
-		            'name' => 'post.label'
-		          },
-		          {
-		            'name' => 'post.URL'
-		          },
-		          {
-		            'name' => 'replies.count'
-		          },
-		          {
-		            'name' => 'replies.label'
-		          },
-		          {
-		            'name' => 'replies.url'
-		          }
 		        ],
 		related => [
 			{

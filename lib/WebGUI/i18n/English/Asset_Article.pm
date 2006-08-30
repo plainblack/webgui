@@ -225,43 +225,11 @@ use templates from the "page" namespace.|,
 		lastUpdated => 1148960553,
 	},
 
-	'post.label' => {
-		message => q|The translated label to add a comment to this article.|,
-		lastUpdated => 1148960553,
-	},
-
-	'post.URL' => {
-		message => q|The URL to add a comment to this article.|,
-		lastUpdated => 1148960553,
-	},
-
-	'replies.count' => {
-		message => q|The number of comments attached to this article.|,
-		lastUpdated => 1148960553,
-	},
-
-	'replies.label' => {
-		message => q|The translated text indicating that you can view the replies.|,
-		lastUpdated => 1148960553,
-	},
-
-	'replies.url' => {
-		message => q|The URL to view the replies to this article.|,
-		lastUpdated => 1148960553,
-	},
-
-
 	'73' => {
 		message => q|<p>The following template variables are available for article templates.</p>
 |,
 		lastUpdated => 1148960667
 	},
-
-	'24' => {
-		message => q|Post Response|,
-		lastUpdated => 1031514049
-	},
-
 
 };
 
