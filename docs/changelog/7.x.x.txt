@@ -25,6 +25,8 @@
  - RFE: JavaScript confirmation rather than page load for deleteUser
  - RFE: JavaScript confirmation rather than page load for deleteGroup
  - RFE: show which user locked an asset in the asset manager
+ - fix: dashlet user preference setting causing nested dashboard to appear
+ - fix: saving edits to dashlet shortcuts kicks you out of your version tag
 
 7.0.6
  - fix: Error in DateTime.pm

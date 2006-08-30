@@ -629,7 +629,7 @@ sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
 	my $scratchId = "Shortcut_" . $self->getId;
-	$self->session->scratch->deleteAll($scratchId);
+	$self->session->scratch->delete($scratchId);
 }
 
 #-------------------------------------------------------------------
@@ -749,7 +749,7 @@ sub www_saveUserPrefs {
 	$self->uncacheOverrides;
 	my $i18n = WebGUI::International->new($self->session);
 	my $u = WebGUI::User->new($self->session, $self->discernUserId);
-	foreach my $fieldId ($self->form->param) {
+	foreach my $fieldId ($self->session->form->param) {
 		my $field = WebGUI::ProfileField->new($self->session,$fieldId);
 		next unless $field;
 		$data{$field->getId} = $field->formProcess;
@@ -761,7 +761,7 @@ sub www_saveUserPrefs {
 		}
 		$u->profileField($field->getId,$data{$field->getId});
 	}
-	return $self->view;
+	return $self->www_view;
 }
 
 #-------------------------------------------------------------------
@@ -867,19 +867,14 @@ sub www_saveOverride {
 #-------------------------------------------------------------------
 sub www_view {
 	my $self = shift;
-	if ($self->isDashlet) {
-		return $self->session->privilege->noAccess() unless $self->canView;
-		$self->session->asset($self->getParent);
-		return $self->session->asset->www_view;
+	my $shortcut = $self->getShortcut;
+
+	if (defined $shortcut) {
+		return $shortcut->www_view;
+	} elsif ($self->canEdit) {
+		return $self->session->style->userStyle('<a href="'.$self->getUrl("func=delete").'">'.$self->notLinked.'</a>');
 	} else {
-		my $shortcut = $self->getShortcut;
-		if (defined $shortcut) {
-			return $shortcut->www_view;
-		} elsif ($self->canEdit) {
-			return $self->session->style->userStyle('<a href="'.$self->getUrl("func=delete").'">'.$self->notLinked.'</a>');
-		} else {
-			return $self->getParent->www_view;
-		}
+		return $self->notLinked;
 	}
 }
 
