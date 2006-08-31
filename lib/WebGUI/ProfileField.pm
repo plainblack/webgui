@@ -56,6 +56,7 @@ sub _reorderFields {
 }
 
 #-------------------------------------------------------------------
+
 =head2 isReservedFieldName ( fieldName )
 
 Return true iff fieldName is reserved and therefore not usable as a profile field name.
