@@ -21,6 +21,7 @@ use WebGUI::Form::DynamicField;
 use WebGUI::Operation::Shared;
 use WebGUI::HTML;
 use WebGUI::User;
+use WebGUI::Utility;
 
 
 =head1 NAME
@@ -55,6 +56,19 @@ sub _reorderFields {
 }
 
 #-------------------------------------------------------------------
+=head2 isReservedFieldName ( fieldName )
+
+Return true iff fieldName is reserved and therefore not usable as a profile field name.
+
+=cut
+
+sub isReservedFieldName {
+	my $class = shift;
+	my $fieldName = shift;
+	return isIn($fieldName, ('func', 'op'));
+}
+
+#-------------------------------------------------------------------
 
 =head2 create ( session, fieldName [, properties, categoryId] )
 
@@ -86,6 +100,8 @@ sub create {
 	my $categoryId = shift || "1";
 	my ($fieldNameExists) = $session->db->quickArray("select count(*) from userProfileField where fieldName=".$session->db->quote($fieldName));
 	return undef if ($fieldNameExists);
+	return undef if $class->isReservedFieldName($fieldName);
+
         my $id = $session->db->setRow("userProfileField","fieldName",{fieldName=>"new"},$fieldName);
         my $self = $class->new($session,$id);
 	$self->setCategory($categoryId);
@@ -225,34 +241,36 @@ sub getCategory {
 
 #-------------------------------------------------------------------
 
-=head2 getEditableFields ( )
+=head2 getEditableFields ( session )
 
 Returns an array reference of WebGUI::ProfileField objects that are marked "editable" or "required". This is a class method.
 
 =cut
 
 sub getEditableFields {
-        my $self = shift;
+        my $class = shift;
+	my $session = shift;
         my @fields = ();
-        foreach my $fieldName ($self->session->db->buildArray("select fieldName from userProfileField where required=1 or editable=1 order by sequenceNumber")) {
-                push(@fields,WebGUI::ProfileField->new($self->session,$fieldName));
+        foreach my $fieldName ($session->db->buildArray("select fieldName from userProfileField where required=1 or editable=1 order by sequenceNumber")) {
+                push(@fields,WebGUI::ProfileField->new($session,$fieldName));
         }
         return \@fields;
 }
 
 #-------------------------------------------------------------------
 
-=head2 getFields ( )
+=head2 getFields ( session )
 
 Returns an array reference of WebGUI::ProfileField objects. This is a class method.
 
 =cut
 
 sub getFields {
-        my $self = shift;
+        my $class = shift;
+	my $session = shift;
         my @fields = ();
-        foreach my $fieldName ($self->session->db->buildArray("select fieldName from userProfileField order by profileCategoryId, sequenceNumber")) {
-                push(@fields,WebGUI::ProfileField->new($self->session,$fieldName));
+        foreach my $fieldName ($session->db->buildArray("select fieldName from userProfileField order by profileCategoryId, sequenceNumber")) {
+                push(@fields,WebGUI::ProfileField->new($session,$fieldName));
         }
         return \@fields;
 }
@@ -287,17 +305,18 @@ sub getLabel {
 
 #-------------------------------------------------------------------
 
-=head2 getRequiredFields ( )
+=head2 getRequiredFields ( session )
 
 Returns an array reference of WebGUI::ProfileField objects that are marked "required". This is a class method.
 
 =cut
 
 sub getRequiredFields {
-	my $self = shift;
+	my $class = shift;
+	my $session = shift;
 	my @fields = ();
-	foreach my $fieldName ($self->session->db->buildArray("select userProfileField.fieldName from  userProfileField LEFT JOIN userProfileCategory ON userProfileField.profileCategoryId = userProfileCategory.profileCategoryId where userProfileField.required=1 order by userProfileCategory.sequenceNumber, userProfileField.sequenceNumber")) {
-		push(@fields,WebGUI::ProfileField->new($self->session,$fieldName));
+	foreach my $fieldName ($session->db->buildArray("select userProfileField.fieldName from  userProfileField LEFT JOIN userProfileCategory ON userProfileField.profileCategoryId = userProfileCategory.profileCategoryId where userProfileField.required=1 order by userProfileCategory.sequenceNumber, userProfileField.sequenceNumber")) {
+		push(@fields,WebGUI::ProfileField->new($session,$fieldName));
 	}
 	return \@fields;
 }
@@ -417,7 +436,10 @@ sub new {
 	my $session = shift;
         my $id = shift;
         return undef unless ($id);
+	return undef if $class->isReservedFieldName($id);
         my $properties = $session->db->getRow("userProfileField","fieldName",$id);
+	# Reject properties that don't exist.
+	return undef unless scalar keys %$properties;
         bless {_session=>$session, _properties=>$properties}, $class;
 }
 

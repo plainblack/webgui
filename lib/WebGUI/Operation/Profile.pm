@@ -55,7 +55,7 @@ The current WebGUI session object.
 sub getRequiredProfileFields {
 	my $session = shift;
 	my @array;
-	foreach my $field (@{WebGUI::ProfileField->new($session,'dummy')->getRequiredFields}) {
+	foreach my $field (@{WebGUI::ProfileField->getRequiredFields($session)}) {
 		push(@array, {
 			'profile.formElement' => $field->formField,
 			'profile.formElement.label' => $field->getLabel
@@ -146,7 +146,7 @@ sub validateProfileData {
 	my $error = "";
 	my $warning = "";
 	my $i18n = WebGUI::International->new($session);
-	foreach my $field (@{WebGUI::ProfileField->new($session,'dummy')->getEditableFields}) {
+	foreach my $field (@{WebGUI::ProfileField->getEditableFields($session)}) {
 		my $fieldValue = $field->formProcess;
 		if (ref $fieldValue eq "ARRAY") {
 			$data{$field->getId} = $$fieldValue[0];

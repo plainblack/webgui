@@ -312,7 +312,7 @@ sub getFieldsList {
 	my $output = '<a href="'.$self->getUrl('op=editProfileSettings').'" class="formLink">'.$i18n->get('Manage Profile Fields').'</a><br /><br />';
 	my %fieldNames;
 	tie %fieldNames, 'Tie::IxHash';
-	foreach my $field (@{WebGUI::ProfileField->new($self->session,'dummy')->getFields}) {
+	foreach my $field (@{WebGUI::ProfileField->getFields($self->session)}) {
 		my $fieldId = $field->getId;
 		next if $fieldId =~ /contentPositions/;
 		$fieldNames{$fieldId} = $field->getLabel.' ['.$fieldId.']';
@@ -616,11 +616,7 @@ sub prepareView {
 	$template->prepare;
 	$self->{_viewTemplate} = $template;
 	my $shortcut = $self->getShortcut;
-	if (defined $shortcut) {
-		$shortcut->prepareView;
-	} else {
-		$self->notLinked;
-	}
+	$shortcut->prepareView if defined $shortcut;
 }
 
 
@@ -645,18 +641,21 @@ sub view {
 	my $content;
 	my $i18n = WebGUI::International->new($self->session,"Asset_Shortcut");
 	my $shortcut = $self->getShortcut;
-	if (defined $shortcut) {
-		# continue
-	} elsif ($self->canEdit) {
-		return '<a href="'.$self->getUrl("func=delete").'">'.$self->notLinked.'</a>';
-	} else {
-		return undef;
+
+	unless (defined $shortcut) {
+		if ($self->canEdit) {
+			return $self->session->style->userStyle('<a href="'.$self->getUrl("func=delete").'">'.$self->notLinked.'</a>');
+		} else {
+			return $self->notLinked;
+		}
 	}
+	
 	if ($self->get("shortcutToAssetId") eq $self->get("parentId")) {
 		$content = $i18n->get("Displaying this shortcut would cause a feedback loop");
 	} else {
 		$content = $shortcut->view;
 	}
+
 	my %var = (
 		isShortcut => 1,
 		'shortcut.content' => $content,
@@ -866,16 +865,12 @@ sub www_saveOverride {
 
 #-------------------------------------------------------------------
 sub www_view {
+	# Hrrrm.  Why doesn't the default www_view work here?
 	my $self = shift;
-	my $shortcut = $self->getShortcut;
-
-	if (defined $shortcut) {
-		return $shortcut->www_view;
-	} elsif ($self->canEdit) {
-		return $self->session->style->userStyle('<a href="'.$self->getUrl("func=delete").'">'.$self->notLinked.'</a>');
-	} else {
-		return $self->notLinked;
-	}
+	my $check = $self->checkView;
+	return $check if defined $check;
+	$self->prepareView;
+	return $self->view;
 }
 
 1;

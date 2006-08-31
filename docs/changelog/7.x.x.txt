@@ -28,6 +28,10 @@
  - fix: dashlet user preference setting causing nested dashboard to appear
  - fix: saving edits to dashlet shortcuts kicks you out of your version tag
  - fix: Discussion tmpl variables in Article asset
+ - fix: dashlet www_saveUserPrefs refusing to execute
+ - API change: ProfileField::new now returns undef for invalid fields
+ - API change: in ProfileField, the get*Fields family of methods are now class methods
+ - API change: 'func' and 'op' are now reserved and not usable as profile fields
 
 7.0.6
  - fix: Error in DateTime.pm
