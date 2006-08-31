@@ -32,6 +32,7 @@
  - API change: ProfileField::new now returns undef for invalid fields
  - API change: in ProfileField, the get*Fields family of methods are now class methods
  - API change: 'func' and 'op' are now reserved and not usable as profile fields
+ - fix: project editing in project management systems not reading fields correctly
 
 7.0.6
  - fix: Error in DateTime.pm

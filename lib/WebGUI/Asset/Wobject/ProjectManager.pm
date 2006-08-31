@@ -407,7 +407,7 @@ sub www_editProject {
    
    #Set Local Vars
    my $projectId = $form->get("projectId"); 
-   my $project = $db->quickHashRef("select * from PM_project where projectId=?",[$db->quote($projectId)]);
+   my $project = $db->quickHashRef("select * from PM_project where projectId=?",[$projectId]);
    my $addEditText = ($projectId eq "new")?$i18n->get("create project"):$i18n->get("edit project");
    
    #Build Form
