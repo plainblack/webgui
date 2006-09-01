@@ -374,13 +374,18 @@ sub getOverridesList {
 	return $output;
 }
 
+#-------------------------------------------------------------------
+sub _overridesCacheTag {
+	my $self = shift;
+	#cache by userId, assetId of this shortcut, and whether adminMode is on or not.
+	return ["shortcutOverrides", $self->getId, $self->session->user->userId, $self->session->var->get("adminOn")];
+}
 
 #-------------------------------------------------------------------
 sub getOverrides {
 	my $self = shift;
 	my $i = 0;
-	#cache by userId, assetId of this shortcut, and whether adminMode is on or not.
-	my $cache = WebGUI::Cache->new($self->session,["shortcutOverrides",$self->getId,$self->session->user->userId,$self->session->var->get("adminOn")]);
+	my $cache = WebGUI::Cache->new($self->session,$self->_overridesCacheTag);
 	my $overridesRef = $cache->get;
 	unless ($overridesRef->{cacheNotExpired}) {
 		my %overrides;
@@ -412,7 +417,7 @@ sub getOverrides {
 				my $fieldName = $field->getId;
 				my $fieldValue = $u->profileField($field->getId);
 				$overrides{userPrefs}{$fieldName}{value} = $fieldValue;
-				$overrides{overrides}{$fieldName}{parsedValue} = $fieldValue;
+				$overrides{userPrefs}{$fieldName}{parsedValue} = $fieldValue;
 				#  'myTemplateId is ##userPref:myTemplateId##', for example.
 				foreach my $overr (keys %{$overrides{overrides}}) {
 					$overrides{overrides}{$overr}{parsedValue} =~ s/\#\#userPref\:${fieldName}\#\#/$fieldValue/gm;
@@ -626,13 +631,14 @@ sub processPropertiesFromFormPost {
 	$self->SUPER::processPropertiesFromFormPost;
 	my $scratchId = "Shortcut_" . $self->getId;
 	$self->session->scratch->delete($scratchId);
+	$self->uncacheOverrides;
 }
 
 #-------------------------------------------------------------------
 
 sub uncacheOverrides {
 	my $self = shift;
-	WebGUI::Cache->new($self->session,["shortcutOverrides",$self->getId])->delete;
+	WebGUI::Cache->new($self->session,$self->_overridesCacheTag)->delete;
 }
 
 #-------------------------------------------------------------------

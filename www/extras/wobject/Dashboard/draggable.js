@@ -516,11 +516,11 @@ function dashboard_toggleEditForm(event,shortcutId,shortcutUrl) {
 		return;
 	}
 	// Create the new form element.
-	formDiv = document.createElement("div");
+	var formDiv = document.createElement("div");
 	formDiv.id = "form" + shortcutId + "_div";
 	formDiv.className = "userPrefsForm";
-	parentDiv = document.getElementById("td" + shortcutId + "_div");
-	contentDiv = document.getElementById("ct" + shortcutId + "_div");
+	var parentDiv = document.getElementById("td" + shortcutId + "_div");
+	var contentDiv = document.getElementById("ct" + shortcutId + "_div");
 	parentDiv.insertBefore(formDiv,contentDiv);
 	var hooha = AjaxRequest.get(
 		{
