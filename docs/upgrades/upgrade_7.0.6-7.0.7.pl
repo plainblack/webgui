@@ -21,16 +21,18 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+dropLineageInAssetIndex($session);
 
 finish($session); # this line required
 
 
-##-------------------------------------------------
-#sub exampleFunction {
-#	my $session = shift;
-#	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
-#	# and here's our code
-#}
+#-------------------------------------------------
+sub dropLineageInAssetIndex {
+	my $session = shift;
+	print "\tDropping lineage column in assetIndex table.\n" unless ($quiet);
+
+	$session->db->write('alter table assetIndex drop column lineage');
+}
 
 
 

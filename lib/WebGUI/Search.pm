@@ -144,12 +144,14 @@ Returns a WebGUI::SQL::ResultSet object containing the search results with colum
 
 sub getResultSet {
 	my $self = shift;
-	my $query = "select assetId, title, url, synopsis, ownerUserId, groupIdView, groupIdEdit, creationDate, revisionDate,  className ";
+	my $query = "select t1.assetId, t1.title, t1.url, t1.synopsis, t1.ownerUserId, t1.groupIdView, t1.groupIdEdit, t1.creationDate, t1.revisionDate,  t1.className ";
 	$query .= " , ".$self->{_score} if ($self->{_score});
-	$query .= " from assetIndex where ";
+	$query .= " from assetIndex as t1, asset as t2 where ";
+	$query .= " t1.assetId=t2.assetId and ";
 	$query .= "isPublic=1 and " if ($self->{_isPublic});
 	$query .= "(".$self->{_where}.")";
 	$query .= " order by score desc " if ($self->{_score});
+
 	my $rs = $self->session->db->prepare($query);
 	$rs->execute($self->{_params});
 	return $rs;
@@ -298,7 +300,7 @@ sub search {
 		foreach my $lineage (@{$rules->{lineage}}) {
 			next unless defined $lineage;
 			push(@params, $lineage."%");
-			push(@phrases, "lineage like ?");
+			push(@phrases, "t2.lineage like ?");
 		}
 		push(@clauses, join(" or ", @phrases)) if (scalar(@phrases));
 	}

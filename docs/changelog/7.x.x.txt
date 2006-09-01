@@ -36,6 +36,8 @@
  - fix: JavaScript race condition in dashlet prefs form
  - fix: caching problem with overrides in dashlets
  - fix: CS pagination does not work for visitors
+ - fixed a problem in the search indexer and made the tabform css compatible
+   with tinymce. (Martin Kamerbeek / Procolix)
 
 7.0.6
  - fix: Error in DateTime.pm

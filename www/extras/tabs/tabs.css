@@ -14,7 +14,7 @@
 .tabBody {
 	width: auto;
          padding: 8px 12px 12px 12px;
-         z-index: 500;
+         z-index: 0;
      }
 
 div.tabs {
