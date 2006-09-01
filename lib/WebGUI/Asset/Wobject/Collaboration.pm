@@ -1101,10 +1101,23 @@ sub unsubscribe {
 
 
 #-------------------------------------------------------------------
+sub _visitorCacheOk {
+	my $self = shift;
+	return ($self->session->user->userId eq '1'
+		&& !$self->session->form->process('sortBy'));
+}
+
+sub _visitorCacheKey {
+	my $self = shift;
+	my $pn = $self->session->form->process('pn');
+	return "view_".$self->getId."?pn=".$pn;
+}
+
 sub view {
 	my $self = shift;
-	if ($self->session->user->userId eq '1' && !$self->session->form->process("sortBy")) {
-		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
+	if ($self->_visitorCacheOk) {
+		my $out = WebGUI::Cache->new($self->session,$self->_visitorCacheKey)->get;
+		$self->session->errorHandler->debug("HIT") if $out;
 		return $out if $out;
 	}
 	my $scratchSortBy = $self->getId."_sortBy";
@@ -1163,8 +1176,10 @@ sub view {
 	# is called through the api.
 	$self->prepareView unless ($self->{_viewTemplate});
        	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-	if ($self->session->user->userId eq '1' && !$self->session->form->process("sortBy")) {
-		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("visitorCacheTimeout"));
+	if ($self->_visitorCacheOk) {
+		WebGUI::Cache->new($self->session,$self->_visitorCacheKey)
+			->set($out,$self->get("visitorCacheTimeout"));
+		$self->session->errorHandler->debug("MISS");
 	}
        	return $out;
 }
