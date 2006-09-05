@@ -186,6 +186,8 @@ Loops iterate over a list of data output for each pass in the loop. Loops are sl
 <p>
 <b>Loop Conditions</b><br />
 Loops come with special condition variables of their own. They are __FIRST__, __ODD__, __INNER__, and __LAST__.
+There is also a loop counter variable, __COUNTER__, which keeps track of how many times the
+loop has been executed.
 </p>
 
 <p><i>Examples:</i></p>
@@ -211,13 +213,18 @@ Loops come with special condition variables of their own. They are __FIRST__, __
       &lt;TMPL_IF __LAST__&gt;
         This only outputs on the last pass.
       &lt;TMPL_IF&gt;
+
+      Loop number: &lt;TMPL_VAR __COUNTER__&gt;
+        This keeps track of how many times you have gone through the loop.
+      &lt;TMPL_IF&gt;
    &lt;/TMPL_LOOP&gt;
 </pre>
 
 <p><i>NOTE: This only documents WebGUI's default template language, HTML::Template.  If the Template Type
 has been set to some other language you will need to consult the documentation for it.</i></p>.
+<p><i>Some examples have been borrowed from the HTML::Template documentation.</i></p>.
 |,
-		lastUpdated =>1146243644,
+		lastUpdated =>1157490959,
 	},
 
 	'template variable title' => {
