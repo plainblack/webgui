@@ -97,7 +97,7 @@ sub _getLocationData {
 		my $document = $response->content;
 		$document =~ s/\n/ /g;
 		$document =~ s/\s+/ /g;
-		$document =~ m!<hr>\s<div\salign="center">\s(.*?)<br>.*?<br>.*?<br>.*?<br>\s(.*?):\s(.*?) &deg;F<br>!;
+		$document =~ m!<div\salign="center">\s(.*?)<br>.*?<br>.*?<br>.*?<br>\s(.*?):\s(.*?) &deg;F<br>!;
 		$locData = {
 			query => $location,
 			cityState => $1 || $location,
