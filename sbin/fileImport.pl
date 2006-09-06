@@ -211,7 +211,7 @@ sub addFiles {
     # TB : add the path relative to $pathToFile in the message.
     print "\tAdding ".$file->{relpath}.$slash.$file->{filename}." to the database.\n" unless ($quiet);
     my $templateId = 'PBtmpl0000000000000024';
-    if (isIn($file->{ext},@nailable)) {
+    if (isIn(lc($file->{ext}),@nailable)) {
       $class = 'WebGUI::Asset::File::Image';
       $templateId = 'PBtmpl0000000000000088'
     }

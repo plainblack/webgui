@@ -39,6 +39,9 @@
  - fixed a problem in the search indexer and made the tabform css compatible
    with tinymce. (Martin Kamerbeek / Procolix)
  - fixed WeatherData Wobject, noaa format had changed (ekennedy)
+ - fix: Matrix (updated detailed listing template to include the screenshot)
+   and fixed a bug in sbin/fileUpload.pl wher it didn't handle images with
+   uppercased extensions properly (Martin Kamerbeek / Procolix)
 
 7.0.6
  - fix: Error in DateTime.pm
