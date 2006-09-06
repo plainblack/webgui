@@ -134,7 +134,7 @@ sub new {
 		$formObj->correctOptions($param->{possibleValues});
 	}
 	elsif ($size) {
-		$formObj->{size} = $size;
+		$formObj->set('size',$size);
 	}
         return $formObj;
 }
