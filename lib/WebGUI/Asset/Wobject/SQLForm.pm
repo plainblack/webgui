@@ -1863,8 +1863,21 @@ sub www_editFieldSave {
 	$processed->{joinConstraintColumn} = $self->session->form->process("joinConstraintColumn");
 	$processed->{joinConstraintField} = $self->session->form->process("joinConstraintField");
 	
+	# Process fieldType ----------------------------------------------------------------------------
+my	($dbFieldType, $formFieldType) = $self->session->db->quickArray('select dbFieldType, formFieldType from SQLForm_fieldTypes '.
+		' where fieldTypeId='.$self->session->db->quote($self->session->form->process("fieldType")));
+	if ($dbFieldType && $formFieldType) {
+		$processed->{dbFieldType} = $dbFieldType;
+		$processed->{formFieldType} = $formFieldType;
+		$processed->{fieldType} = $self->session->form->process("fieldType");
+	} else {
+		push(@error, $i18n->get('efs field type error'));
+	}
+
 	# Process the join stuff -----------------------------------------------------------------------
-	if ($self->session->form->process("table1") && !($self->session->form->process("selectField1") && $self->session->form->process("selectField2"))) {
+	if ($allowedFormFieldTypes->{$processed->{formFieldType}}->{hasOptions} &&
+	    $self->session->form->process("table1") && 
+	    !($self->session->form->process("selectField1") && $self->session->form->process("selectField2"))) {
 		push(@error, $i18n->get('efs join populate error'));
 	}
 	if ($self->session->form->process("table1")) {
@@ -1959,17 +1972,6 @@ my								$subSelect = "select $joinAColumnName from $joinADatabaseName.$joinATa
 		$processed->{sqlQueryAllOptions} = "select ".$self->session->form->process("selectField1").", ".$self->session->form->process("selectField2"). " from ".
 			join(', ', @tables);
 		$processed->{sqlQueryAllOptions} .= " where ".join(' and ', @joinConstraints) if (@joinConstraints);
-	}
-	
-	# Process fieldType ----------------------------------------------------------------------------
-my	($dbFieldType, $formFieldType) = $self->session->db->quickArray('select dbFieldType, formFieldType from SQLForm_fieldTypes '.
-		' where fieldTypeId='.$self->session->db->quote($self->session->form->process("fieldType")));
-	if ($dbFieldType && $formFieldType) {
-		$processed->{dbFieldType} = $dbFieldType;
-		$processed->{formFieldType} = $formFieldType;
-		$processed->{fieldType} = $self->session->form->process("fieldType");
-	} else {
-		push(@error, $i18n->get('efs field type error'));
 	}
 	
 	# Check if fulltext search is allowed ----------------------------------------------------------
@@ -2515,7 +2517,9 @@ my 		$fieldConstraint = undef;
 		if ($field->{fieldConstraintType} && $field->{fieldConstraintTarget} ne 'value') {
 my			$sql = $field->{sqlQuery};
 			if ($field->{joinConstraintColumn}) {
-				$sql =~ s/^select/select $field->{fieldConstraintTarget},/;
+				#### This will still fail if a column is called 'from'. It's better to seperate the join construction 
+				#### from the column selection. Even better would be giving the contraint settings their own join selector.
+				$sql =~ s/^select .+? from/select $field->{fieldConstraintTarget} from/;
 				if ($sql =~ / where /) {
 				 	$sql .= ' and ';
 				} else {
@@ -2524,6 +2528,7 @@ my			$sql = $field->{sqlQuery};
 				$sql .= $field->{joinConstraintColumn} . ' = ' .
 					$self->session->db->quote($self->session->form->process($self->_getFieldProperties($field->{joinConstraintField})->{fieldName}));
 			}
+			
 my			@results = $self->session->db->quickArray($sql);
 			$fieldConstraint = $results[0];
 		}

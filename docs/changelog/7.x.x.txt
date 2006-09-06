@@ -1,8 +1,9 @@
 7.0.7
  - fix: sqlform trunctate search results doesn't work (Martin Kamerbeek /
    Procolix)
- - fixed some of bugs in the sqlform concerning file uploads and cross table
-   constraints (Martin Kamerbeek / Procolix)
+ - fixed some of bugs in the sqlform concerning file uploads, cross table
+   constraints and the join selector on non-key/value pair fields (Martin 
+   Kamerbeek / Procolix)
  - fix: Add event does not work WebGUI 7.0.5 in combination with Proxy Caching
    turned off (Wouter van Oijen / ProcoliX)   
  - When going to an image by it's webgui url in admin mode, you are now shown the image instead of being taken to the edit screen for the image.
