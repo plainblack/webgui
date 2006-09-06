@@ -22,6 +22,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 dropLineageInAssetIndex($session);
+giveTasksMultipleResources($session);
 
 finish($session); # this line required
 
@@ -34,7 +35,40 @@ sub dropLineageInAssetIndex {
 	$session->db->write('alter table assetIndex drop column lineage');
 }
 
-
+sub giveTasksMultipleResources {
+	my $session = shift;
+	print "\tMaking tasks handle multiple resources.\n" unless $quiet;
+	$session->db->write($_) for(<<'EOT',
+  CREATE TABLE PM_taskResource (
+    taskResourceId varchar(22) character set utf8 collate utf8_bin NOT NULL,
+    taskId varchar(22) character set utf8 collate utf8_bin NOT NULL,
+    sequenceNumber int(11) NOT NULL,
+    resourceKind enum('user', 'group') NOT NULL,
+    resourceId varchar(22) character set utf8 collate utf8_bin NOT NULL,
+    UNIQUE (taskId, resourceKind, resourceId),
+    UNIQUE (taskId, sequenceNumber),
+    PRIMARY KEY (taskResourceId)
+  ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+EOT
+				     <<'EOT',
+  INSERT INTO PM_taskResource
+  (taskResourceId, taskId, sequenceNumber, resourceKind, resourceId)
+    SELECT taskId, taskId, 1, 'user', resourceId
+      FROM PM_task WHERE resourceId IS NOT NULL;
+EOT
+				     <<'EOT',
+  ALTER TABLE PM_task
+  DROP COLUMN resourceId;
+EOT
+				     <<'EOT',
+  ALTER TABLE PM_wobject
+   ADD COLUMN resourcePopupTemplateId varchar(22) character set utf8 collate utf8_bin NOT NULL
+              DEFAULT 'ProjectManagerTMPL0005',
+   ADD COLUMN resourceListTemplateId varchar(22) character set utf8 collate utf8_bin NOT NULL
+              DEFAULT 'ProjectManagerTMPL0006'
+EOT
+				    );
+}
 
 # ---- DO NOT EDIT BELOW THIS LINE ----
 

@@ -1,0 +1,42 @@
+#ProjectManagerTMPL0005
+#create
+#namespace:ProjectManager_resourcePopup
+#url:default-pm-resource-popup
+#title:Default Resource Popup
+#menuTitle:Default Resource Popup
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html><head>
+<title><tmpl_var title></title>
+<script type="text/javascript">
+function searchPopup_itemSelected(kind, id) {
+	window.close();
+	opener.<tmpl_var callback>(kind, id);
+}
+</script>
+<style type="text/css">
+html, body {
+	font-family: arial;
+	font-size: 12pt;
+	color: black;
+	background-color: white;
+}
+</style>
+<link rel="stylesheet" href="<tmpl_var assetExtras>/taskEdit.css" />
+<style type="text/css">
+#taskEdit_resourceList_div {
+	height: auto;
+}
+</style>
+</head><body>
+<form method="GET" action="<tmpl_var selfUrl>">
+<input type="hidden" name="func" value="<tmpl_var func>" />
+<input type="hidden" name="doSearch" value="1" />
+<input type="hidden" name="callback" value="<tmpl_var callback>" />
+<input type="hidden" name="exclude" value="<tmpl_var exclude>" />
+<tmpl_var searchText><input type="text" name="search" value="<tmpl_var previousSearch>" size="20" />
+<input type="submit" value="Search" /></form>
+<tmpl_if doingSearch><tmpl_if foundResults><p><tmpl_var foundMessage></p><tmpl_var resourceDiv>
+<tmpl_else><p><tmpl_var notFoundMessage></p></tmpl_if></tmpl_if>
+</body></html>

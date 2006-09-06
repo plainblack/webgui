@@ -302,7 +302,7 @@ function cMenu_draw(){
 	var output = "";
 	output += '<div id="cMenu_' + this.id + '_menu" class="cMenu_skin">';
 	for (i=0;i<this.linkUrls.length;i++) {
-        var clazz = "submodal";
+        var clazz = "submodal-400-300";
 		if(this.linkUrls[i].indexOf("delete") != -1) {
 		   clazz=""
 		}

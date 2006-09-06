@@ -1,0 +1,21 @@
+#ProjectManagerTMPL0006
+#create
+#namespace:ProjectManager_resourceList
+#url:default-pm-resource-list
+#title:Default Resource List
+#menuTitle:Default Resource List
+
+<table border="0" cellpadding="2" cellspacing="0" width="100%">
+<tmpl_loop resourceLoop>
+  <tr <tmpl_if odd>class="odd"</tmpl_if>>
+    <td><img src="<tmpl_var assetExtras>/<tmpl_var resourceIcon>"></td>
+    <td><tmpl_if hiddenFields>
+          <input type="hidden" class="taskEdit_resourceList_hidden"
+                 name="resources" value="<tmpl_var resourceKind> <tmpl_var resourceId>" />
+        </tmpl_if><tmpl_var resourceName></td>
+    <td><tmpl_if opCallbackJs>
+          <a href="javascript:<tmpl_var opCallbackJs>('<tmpl_var resourceKind>', '<tmpl_var resourceId>')"><img src="<tmpl_var assetExtras>/<tmpl_var opIcon>" style="border-style:none;" alt="<tmpl_var opTitle>" title="<tmpl_var opTitle>" /></a>
+        </tmpl_if></td>
+  </tr>
+</tmpl_loop>
+</table>

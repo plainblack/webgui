@@ -1,0 +1,73 @@
+#ProjectManagerTMPL0004
+
+<tmpl_var form.header>
+<table class="popUp" cellspacing="0" cellpadding="3" border="0">
+<tbody>
+<tr>
+	<td align="right" style="width:25%;" class="header">Task Name&nbsp;</td>
+	<td style="width:75%;"><tmpl_var form.name></td>
+</tr>	
+<tr>
+	<td colspan="2">
+		<table width="100%" cellpadding="3" cellspacing="0">
+		<tbody>
+		<tr class="clear">
+			<td style="width:25%;" align="right" class="header">Start&nbsp;</td>
+			<td style="width:25%;"><tmpl_var form.start></td>
+			<td style="width:25%;" align="right" class="header">Finish&nbsp;</td>
+			<td style="width:25%;"><tmpl_var form.end></td>
+		</tr>
+		</tbody>
+		</table>
+	</td>
+</tr>
+<tr>
+	<td colspan="2">
+		<table width="100%" cellpadding="3" cellspacing="0">
+		<tbody>
+		<tr class="clear">
+			<td style="width:25%;" align="right" class="header">Duration&nbsp;</td>
+			<td style="width:25%;"><tmpl_var form.duration>&nbsp;<tmpl_var form.duration.units></td>
+			<td style="width:25%;" align="right" class="header">Is Milestone&nbsp;</td>
+			<td style="width:25%;"><tmpl_var form.milestone></td>
+		</tr>
+		</tbody>
+		</table>
+	</td>
+</tr>	
+<tr>
+	<td colspan="2">
+		<table width="100%" cellpadding="3" cellspacing="0">
+		<tbody>
+		<tr class="clear">
+			<td style="width:25%;" align="right" class="header">Predecessor&nbsp;</td>
+			<td style="width:25%;"><tmpl_var form.dependants></td>
+			<td style="width:25%;" align="right" class="header">% Complete&nbsp;</td>
+			<td style="width:25%;"><tmpl_var form.percentComplete></td>
+		</tr>
+		</tbody>
+		</table>
+	</td>
+</tr>	
+<tr>
+	<td colspan="2">
+		<table width="100%" cellpadding="3" cellspacing="0">
+		<tbody>
+		<tr class="clearNoBG">
+			<td style="width:50%;" colspan="2">
+                           <span class="header">Resources:</span><br />
+                           <span><input type="text" disabled="disabled" size="10" />
+                              <a id="<tmpl_var form.addUser.id>" href="<tmpl_var form.addUser.link>" target="_new" onclick="taskEdit_searchPopup(this.href); return false;"><img border="0" title="<tmpl_var form.addUser.text>" alt="<tmpl_var form.addUser.text>" src="<tmpl_var assetExtras>/users.gif" /></a>
+                              <a id="<tmpl_var form.addGroup.id>" href="<tmpl_var form.addGroup.link>" target="_new" onclick="taskEdit_searchPopup(this.href); return false;"><img border="0" title="<tmpl_var form.addGroup.text>" alt="<tmpl_var form.addGroup.text>" src="<tmpl_var assetExtras>/groups.gif" /></a>
+                           </span><tmpl_var form.resourceDiv>
+                        </td>
+			<td style="width:25%;">&nbsp;</td>
+			<td style="width:25%;" align="right" class="header"><a href="javascript:void(checkEditTaskForm(document.editTaskForm))" class="saveBtn">Save</a></td>
+		</tr>
+		</tbody>
+		</table>
+	</td>		
+</tr>	
+</tbody>
+</table>
+<tmpl_var form.footer>

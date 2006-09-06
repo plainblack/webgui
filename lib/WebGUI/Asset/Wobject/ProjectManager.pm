@@ -17,6 +17,7 @@ use DateTime;
 use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Utility;
+use WebGUI::HTML;
 use POSIX qw(ceil floor);
 use base 'WebGUI::Asset::Wobject';
 
@@ -115,6 +116,22 @@ sub definition {
 			hoverHelp=>$i18n->get('editTaskTemplate hoverhelp'),
 		    label=>$i18n->get('editTaskTemplate label')
 		},
+		resourcePopupTemplateId =>{
+			fieldType=>"template",  
+			defaultValue=>'ProjectManagerTMPL0005',
+			tab=>"display",
+			namespace=>"ProjectManager_resourcePopup", 
+			hoverHelp=>$i18n->get('resourcePopupTemplate hoverhelp'),
+		    label=>$i18n->get('resourcePopupTemplate label')
+		},
+		resourceListTemplateId =>{
+			fieldType=>"template",  
+			defaultValue=>'ProjectManagerTMPL0006',
+			tab=>"display",
+			namespace=>"ProjectManager_resourceList", 
+			hoverHelp=>$i18n->get('resourceListTemplate hoverhelp'),
+		    label=>$i18n->get('resourceListTemplate label')
+		},
 		groupToAdd => {
 			fieldType=>"group",
 			defaultValue=>3,
@@ -160,20 +177,42 @@ sub getProjectInstance {
 #-------------------------------------------------------------------
 #API method called by Time Tracker to return all projects in all assets for which the user passed in has tasks assigned
 sub getProjectList {
-   my $self = shift;
-   my $db = $self->session->db;
-   my $userId = $_[0];
-   return $db->buildHashRef("select a.projectId,a.name from PM_project a, PM_task b where a.projectId=b.projectId and b.resourceId=?",[$userId]);
+	my $self = shift;
+	my $db = $self->session->db;
+	my $userId = $_[0];
+	my @groupIds = @{WebGUI::User->new($self->session, $userId)->getGroups};
+	my $groupIdQuery = @groupIds?
+	    ('PM_taskResource.resourceId IN ('.join(',', map{'?'} @groupIds).')') : '0';
+
+	$self->session->db->buildHashRef(<<"SQL", [$userId, @groupIds]);
+SELECT DISTINCT PM_project.projectId, PM_project.name
+  FROM PM_project
+       INNER JOIN PM_task ON PM_project.projectId = PM_task.projectId 
+       INNER JOIN PM_taskResource ON PM_task.taskId = PM_taskResource.taskId
+ WHERE (PM_taskResource.resourceKind = 'user' AND PM_taskResource.resourceId = ?)
+       OR (PM_taskResource.resourceKind = 'group' AND $groupIdQuery)
+SQL
 }
 
 #-------------------------------------------------------------------
 #API method called by Time Tracker to return all tasks for the projectId passed in
 sub getTaskList {
-   my $self = shift;
-   my $db = $self->session->db;
-   my $projectId = $_[0];
-   my $userId = $_[1];
-   return $db->buildHashRef("select taskId, taskName from PM_task where projectId=? and resourceId=?",[$projectId,$userId]);
+	my $self = shift;
+	my $db = $self->session->db;
+	my $projectId = $_[0];
+	my $userId = $_[1];
+	my @groupIds = @{WebGUI::User->new($self->session, $userId)->getGroups};
+	my $groupIdQuery = @groupIds?
+	    ('PM_taskResource.resourceId IN ('.join(',', map{'?'} @groupIds).')') : '0';
+
+	$self->session->db->buildHashRef(<<"SQL", [$projectId, $userId, @groupIds]);
+SELECT DISTINCT PM_task.taskId, PM_task.taskName
+  FROM PM_task
+       INNER JOIN PM_taskResource ON PM_task.taskId = PM_taskResource.taskId
+ WHERE PM_task.projectId = ?
+       AND ((PM_taskResource.resourceKind = 'user' AND PM_taskResource.resourceId = ?)
+            OR (PM_taskResource.resourceKind = 'group' AND $groupIdQuery))
+SQL
 }
 
 #-------------------------------------------------------------------
@@ -566,6 +605,175 @@ sub www_editProjectSave {
 }
 
 #-------------------------------------------------------------------
+sub _htmlOfResourceList {
+	my $self = shift;
+	my %args = %{+shift};
+	my @resources = @_;
+	my @listItems;
+	my $assetExtras = $self->session->url->extras('wobject/ProjectManager');
+	my $var = {};
+
+	$var->{assetExtras} = $assetExtras;
+	$var->{resourceLoop} = [];
+
+	my $lastOdd = 0;
+	foreach my $row (@resources) {
+		my $subvar = {};
+		my ($resourceKind, $resourceId) = @$row{qw{resourceKind resourceId}};
+		my $odd = ($lastOdd = !$lastOdd);
+
+		$subvar->{resourceKind} = $resourceKind;
+		$subvar->{resourceId} = $resourceId;
+		$subvar->{opCallbackJs} = $args{opCallbackJs};
+		$subvar->{opIcon} = $args{opIcon};
+		$subvar->{opTitle} = $args{opTitle};
+		$subvar->{assetExtras} = $assetExtras;
+		$subvar->{odd} = $odd;
+		$subvar->{hiddenFields} = $args{hiddenFields};
+
+		if ($resourceKind eq 'group') {
+			my $group = WebGUI::Group->new($self->session, $resourceId);
+			$subvar->{resourceName} = WebGUI::HTML::format($group->name, 'text');
+			$subvar->{resourceIcon} = 'groups.gif';
+		} elsif ($resourceKind eq 'user') {
+			my $user = WebGUI::User->new($self->session, $resourceId);
+			$subvar->{resourceName} = WebGUI::HTML::format($user->profileField('lastName').', '.$user->profileField('firstName'), 'text');
+			$subvar->{resourceIcon} = 'users.gif';
+		} else {
+			$self->session->errorHandler->fatal("Unknown kind of resource '$resourceKind'!");
+		}
+
+		push @{$var->{resourceLoop}}, $subvar;
+	}
+
+	return $self->processTemplate($var, $self->getValue('resourceListTemplateId'));
+}
+
+sub _resourceSearchPopup {
+	my $self = shift;
+	my %args = @_;
+	my $i18n = WebGUI::International->new($self->session,'Asset_ProjectManager');
+
+	my $doSearch = $self->session->form->param('doSearch');
+	my $jsCallback = $self->session->form->param('callback');
+	$jsCallback =~ tr/A-Za-z0-9_//cd;
+	my $selfUrlHtml = WebGUI::HTML::format($self->getUrl, 'text');
+	my $assetExtras = $self->session->url->extras('wobject/ProjectManager');
+
+	my ($search, $exclude) = map {scalar $self->session->form->param($_)} ('search', 'exclude');
+	my ($searchHtml, $excludeHtml) = map {WebGUI::HTML::format($_, 'text')} ($search, $exclude);
+	my $var = {};
+
+	my $i18nprefix = $args{i18nprefix};
+	foreach my $key (qw/title searchText foundMessage notFoundMessage/) {
+		$var->{$key} = $i18n->get("$i18nprefix $key");
+	}
+
+	$var->{assetExtras} = $assetExtras;
+	$var->{func} = $args{func};
+	$var->{callback} = $jsCallback;
+	$var->{exclude} = $excludeHtml;
+	$var->{previousSearch} = $searchHtml;
+	$var->{selfUrl} = $selfUrlHtml;
+
+	if ($doSearch) {
+		my @resources = @{$self->session->db->buildArrayRefOfHashRefs($args{queryCallback}->($exclude, $search))};
+		$var->{doingSearch} = 1;
+		$var->{foundResults} = scalar @resources;
+
+		$var->{resourceDiv} = '<div id="taskEdit_resourceList_div">'.$self->_htmlOfResourceList({opCallbackJs => 'searchPopup_itemSelected', opIcon => 'add.gif', opTitle => $i18n->get('resource add opTitle'), hiddenFields => 0}, @resources).'</div>';
+	} else {
+		$var->{doingSearch} = 0;
+	}
+
+	return $self->processTemplate($var, $self->getValue('resourcePopupTemplateId'));
+}
+
+#-------------------------------------------------------------------
+sub _userSearchQuery {
+	my $self = shift;
+	my $exclude = shift;
+	my $searchPattern = lc('%'.shift().'%');
+	my @exclude = ('1', '3', split /\;/, $exclude);
+	my $excludePlaceholders = '('.join(',', map{'?'} @exclude).')';
+
+	my $query = <<"SQL";
+SELECT 'user' AS resourceKind, users.userId AS resourceId
+  FROM users
+       LEFT JOIN userProfileData AS lastName ON users.userId = lastName.userId
+                                             AND lastName.fieldName = 'lastName'
+       LEFT JOIN userProfileData AS firstName ON users.userId = firstName.userId
+                                              AND firstName.fieldName = 'firstName'
+ WHERE (LOWER(lastName.fieldData) LIKE ? OR LOWER(firstName.fieldData) LIKE ?
+        OR LOWER(users.username) LIKE ?) AND (users.userId NOT IN $excludePlaceholders)
+ ORDER BY lastName.fieldData, firstName.fieldData
+SQL
+	my @placeholders  = (($searchPattern) x 3, @exclude);
+	return ($query, \@placeholders);
+}
+
+sub www_userSearchPopup {
+	my $self = shift;
+
+	my %args = (func => 'userSearchPopup',
+		    i18nprefix => 'user add popup',
+		    queryCallback => sub { $self->_userSearchQuery(@_) },
+		   );
+	$self->_resourceSearchPopup(%args);
+}
+
+#-------------------------------------------------------------------
+sub _groupSearchQuery {
+	my $self = shift;
+	my $exclude = shift;
+	my $searchPattern = lc('%'.shift().'%');
+	my @exclude = ('1', '7', split /\;/, $exclude);
+	my $excludePlaceholders = '('.join(',', map{'?'} @exclude).')';
+	my $query = <<"SQL";
+SELECT 'group' AS resourceKind, groups.groupId AS resourceId
+  FROM groups
+ WHERE (LOWER(groups.groupName) LIKE ?) AND (groups.groupId NOT IN $excludePlaceholders)
+       AND groups.isEditable = 1
+ ORDER BY groups.groupName
+SQL
+	my @placeholders = ($searchPattern, @exclude);
+	return ($query, \@placeholders);
+}
+
+sub www_groupSearchPopup {
+	my $self = shift;
+	my %args = (func => 'groupSearchPopup',
+		    i18nprefix => 'group add popup',
+		    queryCallback => sub { $self->_groupSearchQuery(@_) },
+		   );
+	$self->_resourceSearchPopup(%args);
+}
+
+#-------------------------------------------------------------------
+sub _resourceListOfTask {
+	# TODO: Should there be a getAllCollateral in Asset::Wobject?
+	my $self = shift;
+	my $taskId = shift;
+	return ($taskId eq 'new')? () :
+	    @{$self->session->db->buildArrayRefOfHashRefs("SELECT resourceKind, resourceId FROM PM_taskResource WHERE taskId = ? ORDER BY sequenceNumber", [$taskId])};
+}
+
+sub _innerHtmlOfResources {
+	my $self = shift;
+	my @resources = @_;
+	my $i18n = WebGUI::International->new($self->session, 'Asset_ProjectManager');
+	return $self->_htmlOfResourceList({opCallbackJs => 'taskEdit_deleteResource', opIcon => 'delete.gif', opTitle => $i18n->get('resource remove opTitle'), hiddenFields => 1}, @resources);
+}
+
+sub www_innerHtmlOfResources {
+	my $self = shift;
+	my @resources = map {
+		my ($resourceKind, $resourceId) = split / /, $_, 2;
+		{ resourceKind => $resourceKind, resourceId => $resourceId }
+	} split /\;/, $self->session->form->param('resources');
+	return $self->_innerHtmlOfResources(@resources);
+}
+
 sub www_editTask {
    my $self = shift;
    my $var = {};
@@ -668,12 +876,26 @@ sub www_editTask {
    tie my %users, "Tie::IxHash";
    %users = $db->buildHash("select userId,username from users where userId not in ('1','3') order by userId");
    %users = (""=>$i18n->get("resource none"),%users);
-   $var->{'form.resource'} = WebGUI::Form::selectBox($session, {
-				-name=>"resource",
-				-options=>\%users,
-				-value=>[$task->{resourceId}],
-				-extras=>$extras
-				});
+
+   my @resources = $self->_resourceListOfTask($taskId);
+   my ($searchUserUrlHtml, $searchGroupUrlHtml) = map {
+	   my $kind = $_;
+	   my $exclude = $self->session->url->escape(join ';', map {$_->{resourceId}} grep {$_->{resourceKind} eq $kind} @resources);
+	   my $func = $kind.'SearchPopup';
+	   WebGUI::HTML::format($self->getUrl("func=$func;callback=taskEdit_queueAddResource;exclude=$exclude"), 'text');
+   } (qw/user group/);
+
+   $var->{'form.addUser.id'} = 'taskEdit_resourceList_addUser_a';
+   $var->{'form.addUser.link'} = $searchUserUrlHtml;
+   $var->{'form.addUser.text'} = $i18n->get('user add popup hover');
+   
+   $var->{'form.addGroup.id'} = 'taskEdit_resourceList_addGroup_a';
+   $var->{'form.addGroup.link'} = $searchGroupUrlHtml;
+   $var->{'form.addGroup.text'} = $i18n->get('group add popup hover');
+
+   $var->{'form.resourceDiv'} =
+       '<div id="taskEdit_resourceList_div">'.$self->_innerHtmlOfResources(@resources).'</div>';
+
    $var->{'form.milestone'} = WebGUI::Form::checkbox($session, {
 				-name=>"milestone",
 				-value=>1,
@@ -692,7 +914,7 @@ sub www_editTask {
 $var->{'form.footer'} = WebGUI::Form::formFooter($session);
 
 $var->{'extras'} = $config->get("extrasURL");
-
+$var->{'assetExtras'} = $config->get("extrasURL").'/wobject/ProjectManager';
 return $self->processTemplate($var,$self->getValue("editTaskTemplateId"))
 }
 
@@ -722,7 +944,7 @@ sub www_editTaskSave {
    $props->{endDate} = ($isMilestone ? $props->{startDate} : $form->process("end","date"));
    $props->{dependants} = $form->process("dependants","selectBox") unless $isMilestone;
    $props->{isMilestone} =  $isMilestone || 0;
-   $props->{resourceId} = $form->process("resource","selectBox");
+   my @resourceSpecs = $form->process("resources","hiddenList");
    $props->{percentComplete} = $isMilestone? 0 : $form->process("percentComplete","float");
    
    my $now = $dt->time();
@@ -735,6 +957,12 @@ sub www_editTaskSave {
    
    #Save the extended task data
    my $taskId = $self->setCollateral("PM_task","taskId",$props,1,0,"projectId",$projectId);
+   $self->deleteCollateral('PM_taskResource', 'taskId', $taskId);
+   foreach my $resourceSpec (@resourceSpecs) {
+	   # Buggo, should probably factor the common SQL out of the loop
+	   my ($resourceKind, $resourceId) = split / /, $resourceSpec, 2;
+	   $self->setCollateral('PM_taskResource', 'taskResourceId', {taskId => $taskId, resourceKind => $resourceKind, resourceId => $resourceId}, 1, 0, 'taskId', $taskId);
+   }
    
    #Reorder tasks if task is inserted
    my $insertAt = $form->get("insertAt");
@@ -918,6 +1146,7 @@ sub www_viewProject {
 	
     #Set Some Style stuff	
 	$style->setLink($assetExtras."/subModal.css",{rel=>"stylesheet",type=>"text/css"});
+	$style->setLink($assetExtras."/taskEdit.css",{rel=>"stylesheet",type=>"text/css"});
 	$style->setLink($extras."/calendar/calendar-win2k-1.css",{rel=>"stylesheet",type=>"text/css"});
 	$style->setLink($assetExtras."/cMenu.css",{rel=>"stylesheet",type=>"text/css"});
 	
@@ -928,6 +1157,7 @@ sub www_viewProject {
 	$style->setScript($extras."/contextMenu/contextMenu.js",{ type=>"text/javascript" });
 	$style->setScript($extras."/calendar/lang/calendar-en.js",{ type=>"text/javascript" });
 	$style->setScript($extras."/calendar/calendar-setup.js",{ type=>"text/javascript" });
+	$style->setScript($assetExtras."/taskEdit.js",{ type=>"text/javascript" });
 	
 	#Get Project Data
 	my $project = $db->quickHashRef("select * from PM_project where projectId=".$db->quote($projectId));
@@ -990,7 +1220,7 @@ sub www_viewProject {
 													   -value=>$startDate,
 													   -size=>"10",
 													   -maxlength=>"10",
-													   -extras=>qq|onfocus="doCalendar(this.id);" class="taskdate" onblur="adjustTaskTimeFromDate(this,document.getElementById('$endId'),document.getElementById('$durId'),this,false,document.getElementById('$predId'),document.getElementById('$origStartFieldId'),document.getElementById('$origEndFieldId'),'$seq');"|
+													   -extras=>qq<onfocus="doCalendar(this.id);" class="taskdate" onblur="adjustTaskTimeFromDate(this,document.getElementById('$endId'),document.getElementById('$durId'),this,false,document.getElementById('$predId'),document.getElementById('$origStartFieldId'),document.getElementById('$origEndFieldId'),'$seq');">
 		                                            });
 		  
 		  $hash->{'task.start'} .= WebGUI::Form::hidden($session,{
@@ -1105,6 +1335,38 @@ sub www_viewProject {
 }
 
 #-------------------------------------------------------------------
+sub _doGanttTaskResourceDisplay {
+	my $self = shift;
+	my $hash = shift;
+	my $task = shift;
+	my @resources = $self->_resourceListOfTask($task->{taskId});
+	my @resourceNames = ();
+
+	foreach my $resource (@resources) {
+		my ($resourceKind, $resourceId) = @$resource{qw{resourceKind resourceId}};
+		if ($resourceKind eq 'user') {
+			my $u = WebGUI::User->new($self->session, $resourceId);
+			my $name = $u->username;
+			my $firstName = $u->profileField('firstName');
+			my $lastName = $u->profileField('lastName');
+			$name = "$firstName $lastName" if ($firstName && $lastName);
+			push @resourceNames, $name;
+		} elsif ($resourceKind eq 'group') {
+			my $g = WebGUI::Group->new($self->session, $resourceId);
+			push @resourceNames, $g->name;
+		} else {
+			# Whee.
+			push @resourceNames, "???"
+		}
+	}
+
+	if (@resources) {
+		$hash->{'task.hasResource'} = "true";
+		$hash->{'task.resource.name'} =
+		    join(', ', map { WebGUI::HTML::format($_, 'text') } @resourceNames);
+	}
+}
+
 sub www_drawGanttChart {
 	my $self = shift;
 	my $var = {};
@@ -1228,28 +1490,15 @@ sub www_drawGanttChart {
 	
 	my $taskHash = {};
 	foreach my $task (@{$taskList}) {
-	    my $hash = {};
+		my $hash = {};
 		my $id = $task->{taskId};
 		my $seq = $task->{sequenceNumber};
 		my $startDate = $task->{startDate};
 		my $endDate = $task->{endDate};
 		my $duration = $task->{duration};
 		my $predecessor = $task->{dependants};
-		my $resource = $task->{resourceId};
-		
-		if($resource) {
-		   $hash->{'task.hasResource'} = "true";
-		   my $u = WebGUI::User->new($session,$resource);
-		   my $username = $u->username;
-		   
-		   my $firstName = $u->profileField('firstName');
-		   my $lastName = $u->profileField('lastName');
-		   if($firstName && $lastName) {
-		      $username = $firstName." ".$lastName;
-		   }
-		   $hash->{'task.resource.name'} = $username;
-		}		
-		
+		$self->_doGanttTaskResourceDisplay($hash, $task);
+
 		my $durationFloor = floor($duration);
 		$duration = $duration / $hoursPerDay if( $dunits == "hours" );
 		#Set duration to 1 day if it's a milestone

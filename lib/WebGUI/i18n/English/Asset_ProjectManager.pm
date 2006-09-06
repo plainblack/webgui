@@ -41,6 +41,26 @@ our $I18N = {
 		lastUpdated => 0
 		},
 
+	'resourcePopupTemplate hoverhelp' => {
+		message => q|Template to use for task resource selection popups.|,
+		lastUpdated => 1157510786
+		},
+
+	'resourcePopupTemplate label' => {
+		message => q|Default Resource Popup Template|,
+		lastUpdated => 1157510786
+		},
+
+	'resourceListTemplate hoverhelp' => {
+		message => q|Template to use for displaying resource lists.  Used by the resource popup template and the edit task template.|,
+		lastUpdated => 1157510786
+		},
+
+	'resourceListTemplate label' => {
+		message => q|Default Resource List Template|,
+		lastUpdated => 1157510786
+		},
+
 	'groupToAdd hoverhelp' => {
 		message => q|Group that is able to create projects|,
 		lastUpdated => 0
@@ -710,6 +730,65 @@ Otherwise, just the duration will be displayed as text.|,
 		lastUpdated => 1149825108
 	},
 
+	'resource add opTitle' => {
+		message => q|Add to Task|,
+		lastUpdated => 1157510786
+	},
+
+	'resource remove opTitle' => {
+		message => q|Remove from Task|,
+		lastUpdated => 1157510786
+	},
+
+	'user add popup hover' => {
+		message => q|Add User to Task|,
+		lastUpdated => 1157510786
+	},
+
+	'group add popup hover' => {
+		message => q|Add Group to Task|,
+		lastUpdated => 1157510786
+	},
+
+	'user add popup title' => {
+		message => q|Search for User|,
+		lastUpdated => 1157510786
+	},
+
+	'user add popup searchText' => {
+		message => q|Search for user: |,
+		lastUpdated => 1157510786
+	},
+
+	'user add popup foundMessage' => {
+		message => q|Matching users: |,
+		lastUpdated => 1157510786
+	},
+
+	'user add popup notFoundMessage' => {
+		message => q|No matching users found.|,
+		lastUpdated => 1157510786
+	},
+
+	'group add popup title' => {
+		message => q|Search for Group|,
+		lastUpdated => 1157510786
+	},
+
+	'group add popup searchText' => {
+		message => q|Search for group: |,
+		lastUpdated => 1157510786
+	},
+
+	'group add popup foundMessage' => {
+		message => q|Matching groups: |,
+		lastUpdated => 1157510786
+	},
+
+	'group add popup notFoundMessage' => {
+		message => q|No matching groups found.|,
+		lastUpdated => 1157510786
+	},
 };
 
 1;
