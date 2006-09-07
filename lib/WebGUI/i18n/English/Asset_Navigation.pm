@@ -437,8 +437,8 @@ a Google sitemap of your site.</p>
 	},
 
 	'page.inBranch' => {
-		message => q|A conditional that is the logical OR of <strong>isAncestor</strong>, <strong>isSister</strong>, <strong>isBasepage</strong> and <strong>isDescendent</strong>.|,
-		lastUpdated => 1149394665,
+		message => q|A conditional that is the logical OR of <strong>isAncestor</strong>, <strong>isSibling</strong>, <strong>isBasepage</strong> and <strong>isDescendent</strong>.|,
+		lastUpdated => 1157647394,
 	},
 
 	'page.hasChild' => {

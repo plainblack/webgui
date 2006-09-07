@@ -598,9 +598,10 @@ field.|,
 	},
 
 	'83' => {
-		message => q|<p>The following template variables are available for Data Form templates.</p>
+		message => q|<p>The following template variables are available for Data Form templates for
+		creating forms, displaying data and sending emails.</p>
 	|,
-		lastUpdated => 1149392104,
+		lastUpdated => 1157575884,
 	},
 
 	'61' => {
