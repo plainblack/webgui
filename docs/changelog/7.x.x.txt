@@ -46,6 +46,7 @@
    and fixed a bug in sbin/fileUpload.pl wher it didn't handle images with
    uppercased extensions properly (Martin Kamerbeek / Procolix)
  - new: In the Project Management asset, tasks can now have multiple resources, which may be users or groups.  Original single-resource data is migrated to the new schema by the 7.0.7 upgrade script.
+ - fix: makePrintable operation with other styleId
 
 7.0.6
  - fix: Error in DateTime.pm

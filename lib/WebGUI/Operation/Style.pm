@@ -12,7 +12,6 @@ package WebGUI::Operation::Style;
 
 use strict;
 use WebGUI::Paginator;
-
 =head1 NAME
 
 Package WebGUI::Operation::Style
@@ -34,9 +33,8 @@ the printableStyleId is used instead of the normal styleId for the page.
 
 sub www_makePrintable {
 	my $session = shift;
-	if ($session->form->process("styleId") ne "") {
-		$session->asset->{_properties}{printableStyleTemplateId} = $session->form->process("styleId");
-	}
+	my $styleId = $session->form->process("styleId");
+	$session->style->setPrintableStyleId($styleId) if $styleId;
 	$session->style->makePrintable("1");
 	return "";
 }

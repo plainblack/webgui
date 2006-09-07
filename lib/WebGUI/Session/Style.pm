@@ -153,7 +153,7 @@ sub process {
 	$var{'body.content'} = shift;
 	my $templateId = shift;
 	if ($self->{_makePrintable} && $self->session->asset) {
-		$templateId = $self->session->asset->get("printableStyleTemplateId");
+		$templateId = $self->{_printableStyleId} || $self->session->asset->get("printableStyleTemplateId");
 		my $currAsset = $self->session->asset;
 		until ($templateId) {
 			# some assets don't have this property.  But at least one ancestor should....
@@ -270,7 +270,24 @@ sub setLink {
 	$self->session->output->print($tag) if ($self->sent);
 }
 
+#-------------------------------------------------------------------
 
+=head2 setPrintableStyleId ( params )
+
+Overrides current printable style id defined in assets definition
+
+=head3 params
+
+scalar containing id of style to use
+
+=cut
+
+sub setPrintableStyleId {
+	my $self = shift;
+	my $styleId = shift;
+
+	$self->{_printableStyleId} = $styleId;
+}
 
 #-------------------------------------------------------------------
 
