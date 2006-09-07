@@ -4,6 +4,7 @@ var popTitle = "Add/Edit Task";
 // To be set by template vars
 var dunits, hoursPerDay, taskLength;
 var extrasPath, errorMsgs;
+var taskArray;
 
 function doCalendar (fieldId) {
    Calendar.setup({ 
@@ -132,8 +133,6 @@ function adjustTaskTimeFromDuration(start, end, duration, lagTime, isTaskForm, p
    
    //Set new duration in taskArray
    taskArray[seqNum]["duration"] = taskDuration;
-   if (seqNum == null)
-      alert("WARNING, WARNING!");
    //Adjust time based on new end date
    adjustTaskTimeFromDate(start, end, duration, lagTime, end, isTaskForm, predecessor, origStart, origEnd, seqNum);
 }
