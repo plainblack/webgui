@@ -1538,7 +1538,7 @@ sub www_drawGanttChart {
 
 		# Lerp RGB: probably not the best way, but it's good enough.
 		my @zerolag_color = (0x7a, 0xb7, 0xe9);
-		my @alllag_color = (0xc8, 0x2f, 0xd2);
+		my @alllag_color = (0x7a, 0xb7, 0xe9);
 		$hash->{'task.div.color'} = sprintf "#%02x%02x%02x",
 		    ($totalDuration > 0)? do {
 			    my $lerp = $lagTime / $totalDuration;
