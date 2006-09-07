@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::Asset;
 use WebGUI::Asset::Wobject::Navigation;
 
-use Test::More tests => 17; # increment this value for each test you create
+use Test::More tests => 19; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -88,4 +88,10 @@ is($rootAsset->getId, 'PBasset000000000000001', 'Root Asset ID check');
 my $mediaFolder = WebGUI::Asset->getMedia($session);
 isa_ok($mediaFolder, 'WebGUI::Asset::Wobject::Folder');
 is($mediaFolder->getId, 'PBasset000000000000003', 'Media Folder Asset ID check');
+
+# getImportNode Constructor
+
+my $importNode = WebGUI::Asset->getImportNode($session);
+isa_ok($importNode, 'WebGUI::Asset::Wobject::Folder');
+is($importNode->getId, 'PBasset000000000000002', 'Import Node Asset ID check');
 
