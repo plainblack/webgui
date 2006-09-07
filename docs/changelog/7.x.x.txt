@@ -48,6 +48,7 @@
  - new: In the Project Management asset, tasks can now have multiple resources, which may be users or groups.  Original single-resource data is migrated to the new schema by the 7.0.7 upgrade script.
  - fix: makePrintable operation with other styleId
  - fix: RandomThread macro not working properly.  Only CS's with more than one thread are considered for the random search
+ - new: Tasks in the Project Management can now be assigned non-work lag time that is added to the main work duration of the task.
 
 7.0.6
  - fix: Error in DateTime.pm

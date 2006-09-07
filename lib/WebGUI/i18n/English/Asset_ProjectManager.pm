@@ -299,7 +299,7 @@ our $I18N = {
 		},
 
 	 'task greaterthan error' => {
-		message => q|End Date cannot be greater than Start Date|,
+		message => q|Start Date cannot be later than End Date|,
 		lastUpdated => 0
 		},
 

@@ -230,12 +230,12 @@ sub updateProjectTask {
    return 0 unless ($taskId && $projectId && $totalHours);
    
    my $task = $db->quickHashRef("select * from PM_task where taskId=?",[$taskId]);
-   my ($units,$hoursPer) = $db->quickArray("select durationUnits, hoursPerDay from PM_project where projectId=?",[$projectId]);
+   my ($units,$hoursPerDay) = $db->quickArray("select durationUnits, hoursPerDay from PM_project where projectId=?",[$projectId]);
    
    return 0 unless ($task->{taskId});
    my $duration = $task->{duration};
    if($units eq "days"){
-      $duration = $duration / $hoursPer;
+      $duration = $duration * $hoursPerDay;
    }
    
    my $percentComplete = ($totalHours / $duration) * 100;
@@ -589,6 +589,7 @@ sub www_editProjectSave {
 	   $props->{projectId} = $projectId;
 	   $props->{taskName} = $i18n->get("project start task label");
 	   $props->{duration} = 0;
+	   $props->{lagTime} = 0;
 	   $props->{startDate} = $dt->time();
 	   $props->{endDate} = $dt->time();
 	   $props->{isMilestone} = 1;
@@ -845,15 +846,23 @@ sub www_editTask {
    $var->{'form.duration'} = WebGUI::Form::float($session,{
 				-name=>"duration",
 				-value=>$task->{duration}, 
-				-extras=>qq|style="width:70%;" onchange="adjustTaskTimeFromDuration(this.form.start,this.form.end,this,true,this.form.dependants,this.form.orig_start,this.form.orig_end,'$seq')"  onblur="if(this.value == 0){ adjustTaskTimeFromDuration(this.form.start,this.form.end,this,true,this.form.dependants,this.form.orig_start,this.form.orig_end,'$seq') }" $extras|
+				-extras=>qq|style="width:70%;" onchange="adjustTaskTimeFromDuration(this.form.start,this.form.end,this,this.form.lagTime,true,this.form.dependants,this.form.orig_start,this.form.orig_end,'$seq')"  onblur="if(this.value == 0){ adjustTaskTimeFromDuration(this.form.start,this.form.end,this,this.form.lagTime,true,this.form.dependants,this.form.orig_start,this.form.orig_end,'$seq') }" $extras|
 				});
    $var->{'form.duration.units'} = $self->_getDurationUnitHashAbbrev->{$project->{durationUnits}};
+
+   $var->{'form.lagTime'} = WebGUI::Form::float($session,{
+                                -name => "lagTime",
+				-value => $task->{lagTime},
+				-extras => qq|style="width:70%;" onchange="adjustTaskTimeFromDuration(this.form.start,this.form.end,this.form.duration,this,true,this.form.dependants,this.form.orig_start,this.form.orig_end,'$seq')"  onblur="if(this.value == 0){ adjustTaskTimeFromDuration(this.form.start,this.form.end,this.form.duration,this,true,this.form.dependants,this.form.orig_start,this.form.orig_end,'$seq') }" $extras|
+							 });
+   $var->{'form.lagTime.units'} = $self->_getDurationUnitHashAbbrev->{$project->{durationUnits}};
+
    $var->{'form.start'} = WebGUI::Form::text($session,{
 				-name=>"start",
 				-value=>$start,
 				-size=>"10",
 				-maxlength=>"10",
-				-extras=>qq|onfocus="doCalendar(this.id);" onblur="if(this.form.milestone.checked==true) this.form.end.value=this.value; adjustTaskTimeFromDate(this.form.start,this.form.end,this.form.duration,this,true,this.form.dependants,this.form.orig_start,this.form.orig_end,'$seq');" style="width:88%;"|
+				-extras=>qq|onfocus="doCalendar(this.id);" onblur="if(this.form.milestone.checked==true) this.form.end.value=this.value; adjustTaskTimeFromDate(this.form.start,this.form.end,this.form.duration,this.form.lagTime,this,true,this.form.dependants,this.form.orig_start,this.form.orig_end,'$seq');" style="width:88%;"|
 				});
 													
    $var->{'form.end'} = WebGUI::Form::text($session,{
@@ -861,7 +870,7 @@ sub www_editTask {
 				-value=>$end,
 				-size=>"10",
 				-maxlength=>"10",
-				-extras=>qq|onfocus="doCalendar(this.id);" style="width:88%;" onblur="adjustTaskTimeFromDate(this.form.start,this.form.end,this.form.duration,this,true,this.form.dependants,this.form.orig_start,this.form.orig_end,'$seq');" $extras|
+				-extras=>qq|onfocus="doCalendar(this.id);" style="width:88%;" onblur="adjustTaskTimeFromDate(this.form.start,this.form.end,this.form.duration,this.form.lagTime,this,true,this.form.dependants,this.form.orig_start,this.form.orig_end,'$seq');" $extras|
 				});
 
    $var->{'form.dependants'} = WebGUI::Form::integer($session,{
@@ -870,7 +879,7 @@ sub www_editTask {
 				-defaultValue=>"",
 				-size=>4,
 				-maxlength=>10, 
-				-extras=>qq|style="width:50%;" onchange="validateDependant(this,this.form.orig_dependant,'$seq',this.form.start,this.form.end,this.form.duration,true,true,this.form.orig_start,this.form.orig_end);"|
+				-extras=>qq|style="width:50%;" onchange="validateDependant(this,this.form.orig_dependant,'$seq',this.form.start,this.form.end,this.form.duration,this.form.lagTime,true,true,this.form.orig_start,this.form.orig_end);"|
 				});
 
    tie my %users, "Tie::IxHash";
@@ -940,6 +949,7 @@ sub www_editTaskSave {
    $props->{projectId} = $projectId;
    $props->{taskName} = $form->process("name","text");
    $props->{duration} = $isMilestone? 0 : $form->process("duration","text");
+   $props->{lagTime} = $isMilestone? 0 : $form->process("lagTime","text");
    $props->{startDate} = $form->process("start","date");
    $props->{endDate} = ($isMilestone ? $props->{startDate} : $form->process("end","date"));
    $props->{dependants} = $form->process("dependants","selectBox") unless $isMilestone;
@@ -959,7 +969,6 @@ sub www_editTaskSave {
    my $taskId = $self->setCollateral("PM_task","taskId",$props,1,0,"projectId",$projectId);
    $self->deleteCollateral('PM_taskResource', 'taskId', $taskId);
    foreach my $resourceSpec (@resourceSpecs) {
-	   # Buggo, should probably factor the common SQL out of the loop
 	   my ($resourceKind, $resourceId) = split / /, $resourceSpec, 2;
 	   $self->setCollateral('PM_taskResource', 'taskResourceId', {taskId => $taskId, resourceKind => $resourceKind, resourceId => $resourceId}, 1, 0, 'taskId', $taskId);
    }
@@ -1018,10 +1027,10 @@ sub _arrangePredecessors {
       my $seqNum = $task->{sequenceNumber};
 	  #$eh->warn("Seq Num = $seqNum");
 	  #Calculate initial duration in days and duration floor
-	  my $durationInDays = $task->{duration};
-	  $durationInDays = $durationInDays / $project->{hoursPerDay} if( $project->{durationUnits} == "hours" );
+	  my $totalDurationInDays = $task->{duration} + $task->{lagTime};
+	  $totalDurationInDays = $totalDurationInDays / $project->{hoursPerDay} if( $project->{durationUnits} eq "hours" );
 	  #$eh->warn("Duration in Days: ".$durationInDays);
-	  my $durationFloor = floor($durationInDays);
+	  my $totalDurationFloor = floor($totalDurationInDays);
 	  #$eh->warn("Duration Floor: ".$durationFloor);
 	  
 	  #Skip the first record as it has no predecessors
@@ -1044,8 +1053,8 @@ sub _arrangePredecessors {
 		       #Change the start and end dates of the task
 			   if($predDayPart > 0) {
 			      #The previous task took up a part of a day.  Add the additional day part to get the correct duration
-				  $durationInDays += $predDayPart;
-				  $durationFloor = floor($durationInDays);
+				  $totalDurationInDays += $predDayPart;
+				  $totalDurationFloor = floor($totalDurationInDays);
 			   } 
 	           
 			   #$eh->warn("Duration in Days is now: ".$durationInDays);
@@ -1057,7 +1066,7 @@ sub _arrangePredecessors {
 			   $task->{startDate} = $predEndDate;
 			   #$eh->warn("Start Date is now: ".$dt->epochToSet($task->{startDate}));
 	           #Adjust end date for change in start date and update the hash
-	           $task->{endDate} = $dt->addToDateTime($task->{startDate}, 0, 0, $durationFloor);
+	           $task->{endDate} = $dt->addToDateTime($task->{startDate}, 0, 0, $totalDurationFloor);
 			   #$eh->warn("End Date is now: ".$dt->epochToSet($task->{endDate})."\n\n");
 			   #Update the database
 			   $self->setCollateral("PM_task","taskId",$task,1,0,"projectId",$projectId);
@@ -1066,7 +1075,7 @@ sub _arrangePredecessors {
       }
 	  
 	  #Adjust duration of days to only include the part of the day used
-      $durationInDays = $durationInDays - floor($durationInDays);
+      $totalDurationInDays = $totalDurationInDays - floor($totalDurationInDays);
 	  #$eh->warn("Day Part left over is: $durationInDays \n\n");
 	  
 	  
@@ -1075,7 +1084,7 @@ sub _arrangePredecessors {
 	                           'startDate'=>$task->{startDate}, 
 	                           'endDate'=>$task->{endDate}, 
 							   'duration'=>$task->{duration}, 
-							   'dayPart'=>$durationInDays
+							   'dayPart'=>$totalDurationInDays
 							 };
    }
    
@@ -1110,6 +1119,7 @@ sub www_saveExistingTasks {
 	  $props->{dependants} = $form->process("dependants_$taskId","selectBox"); 
 	  unless($isMilestone) {
          $props->{duration} = $form->process("duration_$taskId","float");
+         $props->{lagTime} = $form->process("lagTime_$taskId","float");
       }
 	  $props->{lastUpdateDate} = $dt->time();
       $props->{lastUpdatedBy} = $user->userId;
@@ -1157,6 +1167,7 @@ sub www_viewProject {
 	$style->setScript($extras."/contextMenu/contextMenu.js",{ type=>"text/javascript" });
 	$style->setScript($extras."/calendar/lang/calendar-en.js",{ type=>"text/javascript" });
 	$style->setScript($extras."/calendar/calendar-setup.js",{ type=>"text/javascript" });
+	$style->setScript($assetExtras."/projectDisplay.js",{ type=>"text/javascript" });
 	$style->setScript($assetExtras."/taskEdit.js",{ type=>"text/javascript" });
 	
 	#Get Project Data
@@ -1198,6 +1209,7 @@ sub www_viewProject {
 	   my $startDate = $dt->epochToSet($row->{startDate});
 	   my $endDate = $dt->epochToSet($row->{endDate});
 	   my $duration = $row->{duration};
+	   my $lagTime = $row->{lagTime};
 	   
 	   $hash->{'task.number'} = $seq;
 	   $hash->{'task.row.id'} = "taskrow::$id";
@@ -1207,6 +1219,7 @@ sub www_viewProject {
 	      my $startId = "start_".$id."_formId";
 	      my $endId = "end_".$id."_formId";
 		  my $durId = "duration_".$id."_formId";
+		  my $lagId = "lagTime_".$id."_formId";
 		  my $predId = "dependants_".$id."_formId";
 		  my $origStartField = "orig_start_$id";
 		  my $origStartFieldId = $origStartField."_formId";
@@ -1220,7 +1233,7 @@ sub www_viewProject {
 													   -value=>$startDate,
 													   -size=>"10",
 													   -maxlength=>"10",
-													   -extras=>qq<onfocus="doCalendar(this.id);" class="taskdate" onblur="adjustTaskTimeFromDate(this,document.getElementById('$endId'),document.getElementById('$durId'),this,false,document.getElementById('$predId'),document.getElementById('$origStartFieldId'),document.getElementById('$origEndFieldId'),'$seq');">
+													   -extras=>qq<onfocus="doCalendar(this.id);" class="taskdate" onblur="adjustTaskTimeFromDate(this,document.getElementById('$endId'),document.getElementById('$durId'),document.getElementById('$lagId'),this,false,document.getElementById('$predId'),document.getElementById('$origStartFieldId'),document.getElementById('$origEndFieldId'),'$seq');">
 		                                            });
 		  
 		  $hash->{'task.start'} .= WebGUI::Form::hidden($session,{
@@ -1243,10 +1256,10 @@ sub www_viewProject {
 
 		  $hash->{'task.end'} = WebGUI::Form::text($session,{
 		                                               -name=>"end_$id",
-													   -value=>$endDate,
-													   -size=>"10",
-													   -maxlength=>"10",
-													   -extras=>qq|class="taskdate" onfocus="doCalendar(this.id);" onblur="adjustTaskTimeFromDate(document.getElementById('$startId'),this,document.getElementById('$durId'),this,false,document.getElementById('$predId'),document.getElementById('$origStartFieldId'),document.getElementById('$origEndFieldId'),'$seq');"|
+								     -value=>$endDate,
+								     -size=>"10",
+								     -maxlength=>"10",
+								     -extras=>qq|class="taskdate" onfocus="doCalendar(this.id);" onblur="adjustTaskTimeFromDate(document.getElementById('$startId'),this,document.getElementById('$durId'),document.getElementById('$lagId'),this,false,document.getElementById('$predId'),document.getElementById('$origStartFieldId'),document.getElementById('$origEndFieldId'),'$seq');"|
 		                                            });
 		  $hash->{'task.end'} .= WebGUI::Form::hidden($session,{
 			-name=>$origEndField,
@@ -1265,10 +1278,16 @@ sub www_viewProject {
 	         $hash->{'task.duration'} = WebGUI::Form::float($session,{
 				-name=>"duration_$id",
 				-value=>$duration, 
-				-extras=>qq|class="taskduration" onchange="adjustTaskTimeFromDuration(document.getElementById('$startId'),document.getElementById('$endId'),this,false,document.getElementById('$predId'),document.getElementById('$origStartFieldId'),document.getElementById('$origEndFieldId'),'$seq');" |
+				-extras=>qq|class="taskduration" onchange="adjustTaskTimeFromDuration(document.getElementById('$startId'),document.getElementById('$endId'),this,document.getElementById('$lagId'),false,document.getElementById('$predId'),document.getElementById('$origStartFieldId'),document.getElementById('$origEndFieldId'),'$seq');" |
 				});
 			 
 	      }
+	      $hash->{'task.lagTime'} = WebGUI::Form::hidden($session,{
+								       -name => "lagTime_$id",
+								       -value => $lagTime,
+								       -extras=>qq|id="$lagId"|
+								      });
+
 	   } else {
 	      $hash->{'task.duration'} = $duration;
 	      $hash->{'task.start'} = $startDate;
@@ -1496,20 +1515,37 @@ sub www_drawGanttChart {
 		my $startDate = $task->{startDate};
 		my $endDate = $task->{endDate};
 		my $duration = $task->{duration};
+		my $lagTime = $task->{lagTime};
+		my $totalDuration = $duration + $lagTime;
 		my $predecessor = $task->{dependants};
 		$self->_doGanttTaskResourceDisplay($hash, $task);
 
-		my $durationFloor = floor($duration);
-		$duration = $duration / $hoursPerDay if( $dunits == "hours" );
-		#Set duration to 1 day if it's a milestone
-		#$duration = 1 unless ($duration);
+		if ($dunits eq 'hours') {
+			foreach ($duration, $lagTime, $totalDuration) {
+				$_ /= $hoursPerDay;
+			}
+		}
+
+		my ($durationFloor, $lagTimeFloor, $totalDurationFloor) =
+		    map {floor($_)} ($duration, $lagTime, $totalDuration);
 		
 		#Each day is 23 pixels so calculate the days and round
 		unless ($duration) {
 		   $hash->{'task.div.width'} = $pixelSize;
 		} else {
-		   $hash->{'task.div.width'} = int(($duration * $pixelSize)) || 3;
+		   $hash->{'task.div.width'} = int(($totalDuration * $pixelSize)) || 3;
 		}
+
+		# Lerp RGB: probably not the best way, but it's good enough.
+		my @zerolag_color = (0x7a, 0xb7, 0xe9);
+		my @alllag_color = (0xc8, 0x2f, 0xd2);
+		$hash->{'task.div.color'} = sprintf "#%02x%02x%02x",
+		    ($totalDuration > 0)? do {
+			    my $lerp = $lagTime / $totalDuration;
+			    map { $zerolag_color[$_] +
+				      ($alllag_color[$_] - $zerolag_color[$_]) * $lerp }
+				(0..2);
+		    } : @zerolag_color;
 	    
 		$hash->{'task.div.label.left'} = $hash->{'task.div.width'} + 3;
 		
@@ -1522,8 +1558,10 @@ sub www_drawGanttChart {
 		   $predDayPart = $pred->{dayPart};
 		   if($startDate eq $predEndDate && $predDayPart > 0) {
 		      #The previous task took up a part of the same  day.  Add the additional day part to get the correct duration
-			  $duration += $predDayPart;
-			  $durationFloor = floor($duration);
+			   $duration += $predDayPart;
+			   $totalDuration += $predDayPart;
+			   $durationFloor = floor($duration);
+			   $totalDurationFloor = floor($totalDuration);
 		   }
 		   
 		}
@@ -1567,16 +1605,17 @@ sub www_drawGanttChart {
         $duration = $duration - floor($duration);
 		
 		$hash->{'task.div.percentComplete'} = $task->{percentComplete} || 0;
-		$var->{'project.task.array'} .= qq|"$seq": { "id":"$id" ,"start":"$startDate" ,"end":"$endDate", "duration":"$rduration", "dayPart":"$duration", "predecessor":"$predecessor" }|;
+		$var->{'project.task.array'} .= qq|"$seq": { "id":"$id" ,"start":"$startDate" ,"end":"$endDate", "duration":"$rduration", "dayPart":"$duration", "lagTime":"$lagTime", "predecessor":"$predecessor" }|;
 		$taskCount++;
 		   
 		$taskHash->{$seq} = { 
-	                           'startDate'=>$task->{startDate}, 
-	                           'endDate'=>$task->{endDate}, 
-							   'duration'=>$task->{duration}, 
-							   'dayPart'=>$duration
-							 };
-	}	
+				     'startDate'=>$task->{startDate}, 
+				     'endDate'=>$task->{endDate}, 
+				     'duration'=>$task->{duration}, 
+				     'lagTime'=>$task->{lagTime},
+				     'dayPart'=>$duration
+				    };
+	}
 	
 	$var->{'task.count.loop'} = \@taskCount;
 	$var->{'task.div.loop'} = \@taskDiv;

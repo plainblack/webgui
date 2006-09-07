@@ -23,6 +23,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 dropLineageInAssetIndex($session);
 giveTasksMultipleResources($session);
+giveTasksLagTime($session);
 
 finish($session); # this line required
 
@@ -68,6 +69,15 @@ EOT
               DEFAULT 'ProjectManagerTMPL0006'
 EOT
 				    );
+}
+
+sub giveTasksLagTime {
+	my $session = shift;
+	print "\tGiving tasks lag time.\n" unless $quiet;
+	$session->db->write($_) for(<<'EOT',
+  ALTER TABLE PM_task ADD COLUMN lagTime bigint(20) DEFAULT 0;
+EOT
+				   );
 }
 
 # ---- DO NOT EDIT BELOW THIS LINE ----
