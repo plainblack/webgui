@@ -93,6 +93,23 @@ sub process {
 		$session->errorHandler->warn('Error: no Collaboration Systems found with current parameters. Check parameters of macro on page '.$session->asset->get('url'));
 		return '';
 	}
+	
+	#Trim off any CS's that have no threads
+	my @llist = ();
+	foreach my $csid (@{$lineage}) {
+	   my $cs = undef;
+	   # Get random thread in that CS:
+	   $cs = WebGUI::Asset->new($session,$csid,'WebGUI::Asset::Wobject::Collaboration');
+	   my $threads = $cs->getLineage(['children'],{includeOnlyClasses => ['WebGUI::Asset::Post::Thread']});
+	   push(@llist,$csid) if (scalar(@{$threads}) > 0);
+	}
+	$lineage = \@llist;
+	
+	unless ( scalar(@{$lineage}) ) {
+		$session->errorHandler->warn('Error: no Collaboration Systems found have any threads to display.'.$session->asset->get('url'));
+		return '';
+	}
+	
 
 	# Try to get a random thread that the user can see:
 	my $randomThread = _getRandomThread($session, $lineage);
