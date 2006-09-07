@@ -306,7 +306,11 @@ sub www_richEditViewThumbnail {
 		$output .= '</div>';
 		$output .= '<script type="text/javascript">';
 		$output .= "//<![CDATA[\n";
-		$output .= "\nvar src = '".$image->getFileUrl."';\n";
+		if ( $session->config->get("richEditorsUseAssetUrls")) {
+			$output .= "\nvar src = '".$image->getUrl."';\n";
+		} else {
+			$output .= "\nvar src = '".$image->getFileUrl."';\n";
+		}
 		$output .= "if(src.length > 0) {
 				var manager=window.parent;
    				if(manager)		      	

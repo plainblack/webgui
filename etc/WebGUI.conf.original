@@ -62,6 +62,14 @@
 
 "uploadsPath" : "/data/WebGUI/www/uploads",
 
+# Set this value to 1 if you want rich editors to use the
+# WebGUI asset URLs for images rather than their real URLs
+# in the uploads folder. The advantage of this is that users 
+# see short clean WebGUI controlled URLs. However, this is 
+# slower than the default.
+
+"richEditorsUseAssetUrls" : 0,
+
 # An array of URLs that WebGUI should leave alone for normal
 # processing by Apache. Anything that begins with these URLs
 # will be entirely ignored by WebGUI
