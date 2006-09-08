@@ -62,12 +62,12 @@ our $I18N = {
 		},
 
 	'groupToAdd hoverhelp' => {
-		message => q|Group that is able to create projects|,
+		message => q|This group will be able to create, delete, and change the permissions on projects.  They will also have implicit managerial privileges to every project in the asset.|,
 		lastUpdated => 0
 		},
 
 	'groupToAdd label' => {
-		message => q|Group to Add Projects|,
+		message => q|Group to Manage Project List|,
 		lastUpdated => 0
 		},
 
@@ -117,13 +117,23 @@ our $I18N = {
 		},
 
 	 'project manager hoverhelp' => {
-		message => q|Choose a group of users that are able to manage this project.  Project Managers will be able to edit project tasks|,
+		message => q|Choose a group of users that are able to manage this project.  Project Managers will be able to edit project tasks.|,
 		lastUpdated => 0
 		},
 
 	 'project manager label' => {
 		message => q|Project Managers Group|,
 		lastUpdated => 0
+		},
+
+	 'project observer hoverhelp' => {
+		message => q|Choose a group of users that are able to observe this project.  Project Observers will be able to see the project in the project management asset's list, and will be able to see the task overview.|,
+		lastUpdated => 1157675812
+		},
+
+	 'project observer label' => {
+		message => q|Project Observers Group|,
+		lastUpdated => 1157675812
 		},
 
 	 'hours per day hoverhelp' => {

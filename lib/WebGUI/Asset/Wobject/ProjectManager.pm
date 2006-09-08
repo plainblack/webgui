@@ -246,6 +246,30 @@ sub updateProjectTask {
 }
 
 #-------------------------------------------------------------------
+sub _userCanManageProject {
+	my $self = shift;
+	my $user = shift;
+	my $projectId = shift;
+	my ($managerGroup) = $self->session->db->quickArray("select projectManager from PM_project where projectId = ?", [$projectId]);
+	return $self->canView($user->userId) && ($user->isInGroup($managerGroup) || $user->isInGroup($self->get('groupToAdd')));
+}
+
+sub _userCanObserveProject {
+	my $self = shift;
+	my $user = shift;
+	my $projectId = shift;
+	my ($managerGroup, $observerGroup) = $self->session->db->quickArray("select projectManager, projectObserver from PM_project where projectId = ?", [$projectId]);
+	$self->session->errorHandler->warn("DEBUG: user=".$user->userId." manager=".$managerGroup." observer=".$observerGroup." project=".$projectId." observedirect=".!!$user->isInGroup($observerGroup));
+	return $self->canView($user->userId) && ($user->isInGroup($managerGroup) || $user->isInGroup($observerGroup) || $user->isInGroup($self->get('groupToAdd')));
+}
+
+sub _userCanManageProjectList {
+	my $self = shift;
+	my $user = shift;
+	return $self->canView($user->userId) && $user->isInGroup($self->get('groupToAdd'));
+}
+
+#-------------------------------------------------------------------
 sub _updateProject {
    my $self = shift;
    my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
@@ -333,10 +357,10 @@ sub view {
 	$var->{'project.actions.label'} = $i18n->get("project action label");
 	
 	$var->{'empty.colspan'} = 5;
-	if($user->isInGroup($self->get("groupToAdd"))) {
-	      $var->{'canEditProjects'} = "true";
-		  $var->{'empty.colspan'} = 6;
-    }
+	if($self->_userCanManageProjectList($user)) {
+		$var->{'canEditProjects'} = "true";
+	      $var->{'empty.colspan'} = 6;
+	}
 	
 	#Project Data
 	my @projects = ();
@@ -344,6 +368,10 @@ sub view {
 	while (my $project = $sth->hashRef) {
 	   my $hash = {};
 	   my $projectId = $project->{projectId};
+
+	   # Drop projects that the current user can't view.
+	   next unless ($self->_userCanObserveProject($user, $projectId));
+
 	   $hash->{'project.view.url'} = $self->getUrl("func=viewProject;projectId=".$projectId);
 	   $hash->{'project.name.data'} = $project->{name};
 	   $hash->{'project.description.data'} = $project->{description};
@@ -380,7 +408,7 @@ sub www_deleteProject {
     my ($session,$privilege,$form,$db,$datetime,$i18n,$user) = $self->setSessionVars;
 
     #Check Privileges
-    return $privilege->insufficient unless ($user->isInGroup($self->get("groupToAdd")));
+    return $privilege->insufficient unless $self->_userCanManageProjectList($user);
 	
 	my $projectId = $form->get("projectId");
     
@@ -398,15 +426,15 @@ sub www_deleteTask {
    #Set Method Helpers
    my ($session,$privilege,$form,$db,$datetime,$i18n,$user) = $self->setSessionVars;
    
-   #Check Privileges
-   return $privilege->insufficient unless ($user->isInGroup($self->get("groupToAdd")));
-   
    #Set Local Vars
    my $taskId = $form->get("taskId");
    my $task = $db->quickHashRef("select * from PM_task where taskId=?",[$taskId]);
    my $projectId = $task->{projectId};
    my $taskRank = $task->{sequenceNumber};
 	     
+   #Check Privileges
+   return $privilege->insufficient unless $self->_userCanManageProject($user, $projectId);
+   
    #Remove dependencies to this task
    $db->write("update PM_task set dependants=NULL where projectId=? and dependants=?",[$projectId,$taskId]);
    
@@ -442,7 +470,7 @@ sub www_editProject {
    my ($session,$privilege,$form,$db,$datetime,$i18n,$user) = $self->setSessionVars;
 
    #Check Privileges
-   return $privilege->insufficient unless ($user->isInGroup($self->get("groupToAdd")));
+   return $privilege->insufficient unless $self->_userCanManageProjectList($user);
    
    #Set Local Vars
    my $projectId = $form->get("projectId"); 
@@ -481,6 +509,12 @@ sub www_editProject {
 		 -value=> $form->get("projectManager") || $project->{projectManager} || $self->get("groupToAdd"),
 		 -hoverHelp=> $i18n->get('project manager hoverhelp'),
 		 -label => $i18n->get('project manager label')
+   );
+   $f->group(
+         -name=> "projectObserver",
+		 -value=> $form->get("projectObserver") || $project->{projectObserver} || '7',
+		 -hoverHelp=> $i18n->get('project observer hoverhelp'),
+		 -label => $i18n->get('project observer label')
    );
    
    my $dunitValue = $form->get("durationUnits") || $project->{durationUnits} || "hours";
@@ -550,7 +584,7 @@ sub www_editProjectSave {
     my $eh = $session->errorHandler;
 	
     #Check Privileges
-    return $privilege->insufficient unless ($user->isInGroup($self->get("groupToAdd")));
+    return $privilege->insufficient unless $self->_userCanManageProjectList($user);
     
 	my $now = $dt->time();
 	my $uid = $user->userId;
@@ -563,6 +597,7 @@ sub www_editProjectSave {
 	$props->{name} = $form->process("name","text");
 	$props->{description} = $form->process("description","HTMLArea");
 	$props->{projectManager} = $form->process("projectManager","group");
+	$props->{projectObserver} = $form->process("projectObserver","group");
 	$props->{durationUnits} = $form->process("durationUnits","selectBox");
 	$props->{hoursPerDay} = $form->process("hoursPerDay","float") || 8.0;
 	$props->{targetBudget} = $form->process("targetBudget","float");
@@ -789,7 +824,7 @@ sub www_editTask {
    my $task = $db->quickHashRef("select * from PM_task where taskId=".$db->quote($taskId));
    
    #Check Privileges
-   return $privilege->insufficient unless ($user->isInGroup($project->{projectManager}));
+   return $privilege->insufficient unless $self->_userCanManageProject($user, $projectId);
    
    my $isMilestone = $task->{isMilestone};
    my $seq = $task->{sequenceNumber};
@@ -940,7 +975,7 @@ sub www_editTaskSave {
    my $project = $db->quickHashRef("select * from PM_project where projectId=".$db->quote($projectId));
 
    #Check Privileges
-   return $privilege->insufficient unless ($user->isInGroup($project->{projectManager}));
+   return $privilege->insufficient unless $self->_userCanManageProject($user, $projectId);
    
    my $isMilestone = $form->process("milestone","checkbox");
    
@@ -1103,7 +1138,7 @@ sub www_saveExistingTasks {
    my $project = $db->quickHashRef("select * from PM_project where projectId=".$db->quote($projectId));
    
    #Check Privileges
-   return $privilege->insufficient unless ($user->isInGroup($project->{projectManager}));
+   return $privilege->insufficient unless $self->_userCanManageProject($user, $projectId);
    
    my $tasks = $db->buildArrayRefOfHashRefs("select * from PM_task where projectId=".$db->quote($projectId)." order by sequenceNumber asc");
   
@@ -1146,7 +1181,7 @@ sub www_viewProject {
 	my $projectId = $_[0] || $form->get("projectId");
 		
 	#Check Privileges
-    return $privilege->insufficient unless ($self->canView);
+    return $privilege->insufficient unless $self->_userCanObserveProject($user, $projectId);
 	
 	my $extras = $config->get("extrasURL");
 	my $assetExtras = $config->get("extrasURL")."/wobject/ProjectManager";
@@ -1172,8 +1207,7 @@ sub www_viewProject {
 	
 	#Get Project Data
 	my $project = $db->quickHashRef("select * from PM_project where projectId=".$db->quote($projectId));
-    my $canEdit = $user->isInGroup($self->get("groupToAdd"));
-	my $canAddTask = $user->isInGroup($project->{projectManager}) || $canEdit;
+	my $canEditTasks = $self->_userCanManageProject($user, $projectId);
 	my $dunits = $self->_getDurationUnitHashAbbrev->{$project->{durationUnits}};
 	
 	#Set some JavaScript stuff
@@ -1215,7 +1249,7 @@ sub www_viewProject {
 	   $hash->{'task.row.id'} = "taskrow::$id";
 	   $hash->{'task.name'} = $row->{taskName};
 	   	  
-	   if($canEdit) {
+	   if($canEditTasks) {
 	      my $startId = "start_".$id."_formId";
 	      my $endId = "end_".$id."_formId";
 		  my $durId = "duration_".$id."_formId";
@@ -1296,7 +1330,7 @@ sub www_viewProject {
 	   }
 	   $hash->{'task.duration.units'} = $dunits;
 	   $hash->{'task.isMilestone'} = "true" if($isMilestone);
-	   if($canAddTask) {
+	   if($canEditTasks) {
 	      $hash->{'task.edit.url'} = $self->getUrl("func=editTask;projectId=$projectId;taskId=".$row->{taskId});
 		  $hash->{'task.edit.label'} = $i18n->get("edit task label");
 		  my $num = $row->{sequenceNumber};
@@ -1315,7 +1349,7 @@ sub www_viewProject {
 	my $taskLength = scalar(@taskList);
 	$var->{'project.task.length'} = $taskLength;
 	
-	if($canEdit) {
+	if($canEditTasks) {
 	   #Build Form for submitting on the fly updates
 	   $var->{'form.header'} = WebGUI::Form::formHeader($session,{
 			action=>$self->getUrl,
@@ -1335,7 +1369,7 @@ sub www_viewProject {
 		$var->{'task.resources.url'} = $self->getUrl("func=manageResources");
 	}
 
-	if($canAddTask) {
+	if($canEditTasks) {
 		$var->{'task.add.label'} = $i18n->get("add task label");
 		$var->{'task.add.url'} = $self->getUrl("func=editTask;projectId=$projectId;taskId=new");
 		$var->{'task.canAdd'} = "true";
@@ -1395,9 +1429,6 @@ sub www_drawGanttChart {
 	my $style = $session->style;
 	my $eh = $session->errorHandler;
 	
-	#Check Privileges
-    return $privilege->insufficient unless ($self->canView);
-	
 	#Set up some the task data
 	my $projectId = $_[0];
 	my $taskList = $_[1] || [];
@@ -1409,6 +1440,10 @@ sub www_drawGanttChart {
 	   $taskList = $db->buildArrayRefOfHashRefs("select * from PM_task where projectId=".$db->quote($projectId)." order by sequenceNumber asc");
 	   $calledByAjax = 1;
 	}
+
+
+	#Check Privileges
+    return $privilege->insufficient unless $self->_userCanObserveProject($user, $projectId);
 	
 	my ($dunits,$hoursPerDay) = $db->quickArray("select durationUnits,hoursPerDay from PM_project where projectId=".$db->quote($projectId));
 

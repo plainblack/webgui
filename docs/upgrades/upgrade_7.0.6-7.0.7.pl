@@ -24,6 +24,7 @@ my $session = start(); # this line required
 dropLineageInAssetIndex($session);
 giveTasksMultipleResources($session);
 giveTasksLagTime($session);
+giveProjectsObserverGroup($session);
 
 finish($session); # this line required
 
@@ -76,6 +77,16 @@ sub giveTasksLagTime {
 	print "\tGiving tasks lag time.\n" unless $quiet;
 	$session->db->write($_) for(<<'EOT',
   ALTER TABLE PM_task ADD COLUMN lagTime bigint(20) DEFAULT 0;
+EOT
+				   );
+}
+
+sub giveProjectsObserverGroup {
+	my $session = shift;
+	print "\tGiving projects observer groups.\n" unless $quiet;
+	$session->db->write($_) for(<<'EOT',
+  ALTER TABLE PM_project
+   ADD COLUMN projectObserver varchar(22) character set utf8 collate utf8_bin DEFAULT '7';
 EOT
 				   );
 }
