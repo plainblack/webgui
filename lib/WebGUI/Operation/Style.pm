@@ -12,6 +12,7 @@ package WebGUI::Operation::Style;
 
 use strict;
 use WebGUI::Paginator;
+
 =head1 NAME
 
 Package WebGUI::Operation::Style
