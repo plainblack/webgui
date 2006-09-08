@@ -288,56 +288,56 @@ my @reservedKeywords = qw(
 		defaultRegEx		=> 'defaultText',
 	},
 	tinyblob	=> {
-		name			=> 'tinyblob (tinytext)',
+		name			=> 'tinyblob',
 		supportsFulltext	=> 1,
 		maxLength		=> 255,
 		defaultFormElement	=> 'textarea',
 		defaultRegEx		=> 'defaultText',
 	},
 	blob		=> {
-		name			=> 'blob (text)',
+		name			=> 'blob',
 		supportsFulltext	=> 1,
 		maxLength		=> 65_535,
 		defaultFormElement	=> 'textarea',
 		defaultRegEx		=> 'defaultText',
 	},
 	mediumblob	=> {
-		name			=> 'mediumblob (mediumtext)',
+		name			=> 'mediumblob',
 		supportsFulltext	=> 1,
 		maxLength		=> 16_777_215,
 		defaultFormElement	=> 'file',
 		defaultRegEx		=> '',
 	},
 	longblob	=> {
-		name			=> 'longblob (longtext)',
+		name			=> 'longblob',
 		supportsFulltext	=> 1,
 		maxLength		=> 4_294_967_295,
 		defaultFormElement	=> 'file',
 		defaultRegEx		=> '',
 	},
 	tinytext	=> {
-		name			=> 'tinytext (tinyblob)',
+		name			=> 'tinytext',
 		supportsFulltext	=> 1,
 		maxLength		=> 255,
 		defaultFormElement	=> 'textarea',
 		defaultRegEx		=> 'defaultText',
 	},
 	text		=> {
-		name			=> 'text (blob)',
+		name			=> 'text',
 		supportsFulltext	=> 1,
 		maxLength		=> 65_535,
 		defaultFormElement	=> 'textarea',
 		defaultRegEx		=> 'defaultText',
 	},
 	mediumtext	=> {
-		name			=> 'mediumtext (mediumblob)',
+		name			=> 'mediumtext',
 		supportsFulltext	=> 1,
 		maxLength		=> 16_777_215,
 		defaultFormElement	=> 'file',
 		defaultRegEx		=> '',
 	},
 	longtext	=> {
-		name			=> 'longtext (longblob)',
+		name			=> 'longtext',
 		supportsFulltext	=> 1,
 		maxLength		=> 4_294_967_295,
 		defaultFormElement	=> 'file',
@@ -1333,7 +1333,7 @@ sub www_deleteFieldType {
 	my ($isUsed);
 	my $self = shift;
 
-	my $i18n = WebGUI::International($self->session, 'Asset_SQLForm');
+	my $i18n = WebGUI::International->new($self->session, 'Asset_SQLForm');
 	
 	return $self->session->privilege->insufficient unless ($self->_canAlterTable);
 	
@@ -2567,7 +2567,7 @@ my			@results = $self->session->db->quickArray($sql);
 				} else {
 					my $fileType = $upload->type;
 					my $fileContents = '';
-
+					
 					# Slurp file into scalar for use in query. Blocked reads will save memory, but then you
 					# have to stream the data, which is not possible in mysql queries as far as I know.
 					$upload->slurp($fileContents);
@@ -3813,7 +3813,19 @@ my					$joinStatement = $currentFieldProperties->{"database$joinCounter"}.'.'.
 			push(@constraints, $constraint) if $constraint;
 		}
 	}
+
+my 	@selectColumns = qw(t1.__recordId t1.__deletionDate t1.__deletedBy t1.__initDate t1.__userId t1.__deleted t1.__archived t1.__revision);
+	foreach (@$showFields) {
+my		$fieldName = $fieldProperties->{$_}->{fieldName};
 	
+		push(@selectColumns, "t1.$fieldName");
+
+		# In case of files also select mimetype
+		if ($fieldProperties->{$_}->{formFieldType} eq 'file') {
+			push(@selectColumns, 't1.__'.$fieldName.'_mimeType');
+		}
+	}
+
 my	$searchInTrash = $self->session->scratch->get('SQLForm_'.$self->getId.'searchInTrash') || $self->session->form->process("searchInTrash") || '0';
 
 my	$searchType = ($self->session->form->process("searchType") || $self->session->scratch->get('SQLForm_'.$self->getId.'searchType')) eq 'and' ? 'and' : 'or';
@@ -3821,8 +3833,8 @@ my	$searchType = ($self->session->form->process("searchType") || $self->session-
 	return undef if (!@constraints);
 
 	# Construct the search query
-my	$sql = " select distinct t1.__recordId, t1.__deletionDate, t1.__deletedBy, t1.__initDate, t1.__userId, t1.__deleted, t1.__archived, t1.__revision ";
-	$sql .= ", ".join(", \n", map {"t1.".$fieldProperties->{$_}->{fieldName}} @$showFields)."\n";
+my	$sql = " select distinct ".join(', ', @selectColumns); #t1.__recordId, t1.__deletionDate, t1.__deletedBy, t1.__initDate, t1.__userId, t1.__deleted, t1.__archived, t1.__revision ";
+#	$sql .= ", ".join(", \n", map {"t1.".$fieldProperties->{$_}->{fieldName}} @$showFields)."\n";
 	$sql .= " from ".$self->get('tableName').' as t1 ';
 	$sql .= " left join ".join(" left join \n", @joinSequence)."\n" if (@joinSequence);
 	$sql .= " where ";
@@ -3933,6 +3945,7 @@ my			$value;
 			if ($fieldProperties->{$_}->{formFieldType} eq 'file') {
 				$props->{'record.value.isFile'} = 1;
 				$props->{'record.value.isImage'} = 1 if ($row{'__'.$fieldProperties->{$_}->{fieldName}.'_mimeType'} =~ m/^image/);
+print "[".'__'.$fieldProperties->{$_}->{fieldName}.'_mimeType'."]";
 				$props->{'record.value.downloadUrl'} = 
 					$self->getUrl('func=viewFile;rid='.$row{__recordId}.';fid='.$_);
 			}
