@@ -15,7 +15,6 @@ use lib "$FindBin::Bin/lib";
 use WebGUI::Test;
 use WebGUI::HTML;
 use WebGUI::Session;
-use HTML::TokeParser;
 
 use Test::More; # increment this value for each test you create
 
