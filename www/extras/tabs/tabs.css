@@ -33,6 +33,7 @@ div.tabs {
 .tabActive {
          padding: 3px 9px 3px 9px;
          z-index: 10000;
+         background: white;
          top: -2px;
 }
 
