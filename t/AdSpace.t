@@ -31,7 +31,7 @@ SKIP: {
 
 	skip "Unable to load WebGUI::AdSpace", $numTests-1 unless $loaded;
 
-	my $adSpace = WebGUI::AdSpace->create($session, {name=>"Alfred"});
+	$adSpace = WebGUI::AdSpace->create($session, {name=>"Alfred"});
 
 	isa_ok($adSpace, 'WebGUI::AdSpace');
 

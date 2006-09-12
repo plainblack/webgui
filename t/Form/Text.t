@@ -46,6 +46,12 @@ my $testBlock = [
 		expected  => 'EQUAL',
 		comment   => 'single word',
 	},
+	{
+		key => 'Text4',
+		testValue => '0leadingzero',
+		expected  => 'EQUAL',
+		comment   => 'leading zero',
+	},
 ];
 
 my $formType = 'text';
