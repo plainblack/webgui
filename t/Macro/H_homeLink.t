@@ -35,7 +35,7 @@ my @testSets = (
 		comment => 'linkonly argument',
 	},
 	{
-		label => $i18n->get(47),
+		label => q!!,
 		template => q!!,
 		url => $homeAsset->getUrl(),
 		output => \&simpleHTMLParser,
@@ -75,6 +75,7 @@ skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 foreach my $testSet (@testSets) {
 	my $output = WebGUI::Macro::H_homeLink::process($session, $testSet->{label}, $testSet->{template});
+	$testSet->{label} ||= $i18n->get(47);
 	if (ref $testSet->{output} eq 'CODE') {
 		my ($url, $label) = $testSet->{output}->($output);
 		is($label, $testSet->{label}, $testSet->{comment}.", label");

@@ -20,7 +20,7 @@ use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-my $numTests = 2;
+my $numTests = 3;
 $numTests += 1; #For the use_ok
 
 plan tests => $numTests;
@@ -49,6 +49,12 @@ SKIP: {
 
 skip "Unable to load $macro", $numTests-1 unless $loaded;
 
+is(
+	WebGUI::Macro::PageTitle::process($session),
+	undef,
+	q!Call with no default session asset returns undef!,
+);
+
 ##Make the homeAsset the default asset in the session.
 $session->asset($homeAsset);
 
@@ -60,6 +66,23 @@ my $macroOutput = WebGUI::Macro::PageTitle::process($session);
 is($macroOutput, $snippet->get('title'), "testing title returned from localy created asset with known title");
 
 }
+
+my $origSessionRequest = $session->{_request};
+
+my ($operation, $function) = (0,0);
+
+my $request = Test::MockObject->new;
+$request->mock('body',
+	sub {
+		my ($self, $value) = @_;
+		return 1 if $operation;
+		return 1 if $function;
+		return 0;
+	}
+);
+
+$output = WebGUI::Macro::PageTitle::process($session);
+is($output, $homeAsset->get('title'), 'fetching title for site default asset');
 
 END {
 	$versionTag->rollback;

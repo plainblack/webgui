@@ -22,7 +22,6 @@ use Test::More; # increment this value for each test you create
 my $session = WebGUI::Test->session;
 
 my $homeAsset = WebGUI::Asset->getDefault($session);
-$session->asset($homeAsset);
 my ($versionTag, $asset, @users) = setupTest($session, $homeAsset);
 
 my $i18n = WebGUI::International->new($session,'Macro_EditableToggle');
@@ -185,7 +184,7 @@ foreach my $testSet (@testSets) {
 	$numTests += 1 + (ref $testSet->{output} eq 'CODE');
 }
 
-$numTests += 1;
+$numTests += 1 + 1; ##Empty session Asset plus use_ok
 
 plan tests => $numTests;
 
@@ -195,6 +194,12 @@ my $loaded = use_ok($macro);
 SKIP: {
 
 skip "Unable to load $macro", $numTests-1 unless $loaded;
+
+is(
+	WebGUI::Macro::EditableToggle::process($session,'on','off',''),
+	'',
+	q!Call with no default session asset returns ''!,
+);
 
 foreach my $testSet (@testSets) {
 	$session->user({userId=>$testSet->{userId}});

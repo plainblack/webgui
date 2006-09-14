@@ -43,12 +43,24 @@ my @testSets = (
 		width => '',
 		height => 7,
 	},
+	{
+		comment => 'width only, undef',
+		width => 9,
+		height => undef,
+	},
+	{
+		comment => 'height only, undef',
+		width => undef,
+		height => 17,
+	},
 );
 
 plan tests => 5 + 2 * scalar @testSets;
 
 foreach my $testSet (@testSets) {
 	my $output = WebGUI::Macro::Spacer::process($session, $testSet->{width}, $testSet->{height});
+	$testSet->{width} = '' unless defined $testSet->{width};
+	$testSet->{height} = '' unless defined $testSet->{height};
 	my ($width, $height) = simpleHTMLParser($output);
 	is($width,  $testSet->{width},  $testSet->{comment}.", width");
 	is($height, $testSet->{height}, $testSet->{comment}.", height");

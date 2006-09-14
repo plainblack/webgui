@@ -15,7 +15,7 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 26; # increment this value for each test you create
+use Test::More tests => 29; # increment this value for each test you create
  
 my $session = WebGUI::Test->session;
  
@@ -59,3 +59,9 @@ my $milList = $stow->get("military");
 push @{ $milList }, qw/foxtrot echo/;
 
 is_deeply($stow->get("military"), [ @orig_list, qw/foxtrot echo/ ], "modifying fetched list changes stow'ed list because it is a reference");
+
+is($stow->delete(), undef, 'deleting with no key returns undef');
+is($stow->delete('noSuchKey'), undef, 'deleting non-existant variable returns undef');
+
+$stow->set('countedKey', 5);
+is($stow->delete('countedKey'), 5, 'delete method returns what was deleted');

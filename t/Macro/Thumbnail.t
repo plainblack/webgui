@@ -22,9 +22,15 @@ use Image::Magick;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
-plan tests => 7;
+plan tests => 8;
 
 my $session = WebGUI::Test->session;
+
+is(
+	WebGUI::Macro::Thumbnail::process($session, '/url-that-does-not-resolve'),
+	undef,
+	'non-existant URL returns undef'
+);
 
 my $square = WebGUI::Image->new($session, 100, 100);
 $square->setBackgroundColor('#0000FF');

@@ -95,7 +95,9 @@ sub DESTROY {
 
 =head2 get( varName ) 
 
-Retrieves the current value of a stow variable.
+Retrieves the current value of a stow variable.  Note that if you use references, you're
+getting back a reference and modifying the contents of the reference will change the
+contents of the stow variable.
 
 =head3 varName
 
@@ -155,7 +157,7 @@ The name of the stow variable.
 
 =head3 value
 
-The value of the  stow variable.  Any scalar or reference.
+The value of the stow variable.  Any scalar or reference.
 
 =cut
 

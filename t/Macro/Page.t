@@ -47,6 +47,7 @@ foreach my $testSet (@testSets) {
 }
 
 $numTests += 1; #For the use_ok
+$numTests += 1; #For macro call with undefined session asset
 
 plan tests => $numTests;
 
@@ -61,6 +62,12 @@ my $versionTag;
 SKIP: {
 
 skip "Unable to load $macro", $numTests-1 unless $loaded;
+
+is(
+	WebGUI::Macro::Page::process($session,'url'),
+	'',
+	q!Call with no default session asset returns ''!,
+);
 
 foreach my $testSet (@testSets) {
 	$session->asset($testSet->{asset});

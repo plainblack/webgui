@@ -21,7 +21,6 @@ my $session = WebGUI::Test->session;
 use Test::More; # increment this value for each test you create
 
 my $homeAsset = WebGUI::Asset->getDefault($session);
-$session->asset($homeAsset);
 my ($versionTag, $asset, $group, @users) = setupTest($session, $homeAsset);
 
 my @testSets = (
@@ -62,7 +61,7 @@ my @testSets = (
 	},
 );
 
-my $numTests = scalar @testSets + 1;
+my $numTests = scalar @testSets + 2;
 
 plan tests => $numTests;
 
@@ -72,6 +71,12 @@ my $loaded = use_ok($macro);
 SKIP: {
 
 skip "Unable to load $macro", $numTests-1 unless $loaded;
+
+is(
+	WebGUI::Macro::CanEditText::process($session,''),
+	'',
+	q!Call with no default session asset returns ''!,
+);
 
 foreach my $testSet (@testSets) {
 	$session->user({userId=>$testSet->{userId}});
