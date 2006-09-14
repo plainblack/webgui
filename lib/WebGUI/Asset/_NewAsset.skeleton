@@ -112,7 +112,7 @@ sub definition {
 		className=>'WebGUI::Asset::NewAsset',
 		properties=>\%properties
 	});
-	return $class->SUPER::definition($definition);
+	return $class->SUPER::definition($session, $definition);
 }
 
 
