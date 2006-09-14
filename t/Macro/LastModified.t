@@ -21,9 +21,6 @@ my $session = WebGUI::Test->session;
 
 my $homeAsset = WebGUI::Asset->getDefault($session);
 
-##Make the homeAsset the default asset in the session.
-$session->asset($homeAsset);
-
 my ($time) = $session->dbSlave->quickArray("SELECT max(revisionDate) FROM assetData where assetId=?",[$homeAsset->getId]);
 
 my @testSets = (
@@ -49,28 +46,62 @@ my @testSets = (
 
 my $numTests = scalar @testSets;
 
-$numTests += 1; #For the use_ok
-$numTests += 2; #For TODO tests
+$numTests += 1 + 2; #For the use_ok, default asset, and revisionDate=0
 
 plan tests => $numTests;
 
 my $macro = 'WebGUI::Macro::LastModified';
 my $loaded = use_ok($macro);
+my $versionTag = WebGUI::VersionTag->getWorking($session);
 
 SKIP: {
 
 skip "Unable to load $macro", $numTests-1 unless $loaded;
 
+my $output = WebGUI::Macro::LastModified::process($session);
+is($output, '', "Macro returns '' if no asset is defined");
+
+##Make the homeAsset the default asset in the session.
+$session->asset($homeAsset);
 
 foreach my $testSet (@testSets) {
 	my $output = WebGUI::Macro::LastModified::process($session, $testSet->{label}, $testSet->{format});
 	is($output, $testSet->{output}, $testSet->{comment});
 }
 
+$versionTag->set({name=>"Adding assets for LastModified macro tests"});
+
+my $root = WebGUI::Asset->getRoot($session);
+my %properties_A = (
+		className   => 'WebGUI::Asset',
+		title       => 'Asset A',
+		url         => 'asset-a',
+		ownerUserId => 3,
+		groupIdView => 7,
+		groupIdEdit => 3,
+		id          => 'RootA-----------------',
+		#              '1234567890123456789012'
+);
+
+my $assetA = $root->addChild(\%properties_A, $properties_A{id}, 0e0);
+$versionTag->commit;
+
+##Save the original revisionDate and then rewrite it in the db to be 0
+my $revDate = $session->db->quickArray('select max(revisionDate) from assetData where assetId=?', [$assetA->getId]);
+$session->db->write('update assetData set revisionDate=0 where assetId=?', [$assetA->getId]);
+
+$session->asset($assetA);
+$output = WebGUI::Macro::LastModified::process($session);
+my $i18n = WebGUI::International->new($session, 'Macro_LastModified');
+is($output, $i18n->get('never'), 'asset with 0 revisionDate returns never modified label');
+
+##Restore the original revisionDate, otherwise it dies during clean-up
+$session->db->write('update assetData set revisionDate=? where assetId=?', [$revDate, $assetA->getId]);
+
 }
 
-TODO: {
-	local $TODO = "Tests to make later";
-	ok(0, 'Check label and format');
-	ok(0, 'Create asset with revisionDate = 0 and check label "never"');
+END { ##Clean-up after yourself, always
+	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
+		$versionTag->rollback;
+	}
 }

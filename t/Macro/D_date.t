@@ -51,9 +51,19 @@ foreach my $testSet (@testSets) {
 	is($output, $testSet->{output}, 'testing '.$testSet->{format});
 }
 
-TODO: {
-	local $TODO = "Ideas for other tests";
-	ok(0, 'Test macro without a date argument');
+##How do you make sure that two sequential statements in perl are executed in the
+##same integer second "window"?  You bracket the statement in question between
+##time statements and check the outside statements.  If they match in time, then the
+##statement is in the same window.
+
+my ($time1, $time2) = (0,1);
+my $output;
+while ($time1 != $time2) {
+	$time1 = time();
+	$output = WebGUI::Macro::D_date::process($session);
+	$time2 = time();
 }
+
+is($output, $session->datetime->epochToHuman($time1), 'checking default time and format');
 
 }
