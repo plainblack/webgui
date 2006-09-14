@@ -16,11 +16,12 @@ use WebGUI::Test;
 use WebGUI::Session;
 use Data::Dumper;
 
-use Test::More; # increment this value for each test you create
+use Test::More;
+use Test::MockObject;
 
 my $session = WebGUI::Test->session;
 
-my $numTests = 3;
+my $numTests = 7;
 $numTests += 1; #For the use_ok
 
 plan tests => $numTests;
@@ -65,7 +66,6 @@ $session->asset($snippet);
 my $macroOutput = WebGUI::Macro::PageTitle::process($session);
 is($macroOutput, $snippet->get('title'), "testing title returned from localy created asset with known title");
 
-}
 
 my $origSessionRequest = $session->{_request};
 
@@ -75,14 +75,37 @@ my $request = Test::MockObject->new;
 $request->mock('body',
 	sub {
 		my ($self, $value) = @_;
-		return 1 if $operation;
-		return 1 if $function;
+		return 1 if $operation and ($value eq "op");
+		return 1 if $function and ($value eq "func");
 		return 0;
 	}
 );
 
+$session->{_request} = $request;
+
 $output = WebGUI::Macro::PageTitle::process($session);
-is($output, $homeAsset->get('title'), 'fetching title for site default asset');
+is($output, $session->asset->get('title'), 'fetching title for session asset, no func or op');
+
+my $urlizedTitle = sprintf q!<a href="%s">%s</a>!,
+	$session->asset->getUrl,
+	$session->asset->get('title');
+
+$operation = 1;
+$function = 0;
+$output = WebGUI::Macro::PageTitle::process($session);
+is($output, $urlizedTitle, 'fetching urlized title via an operation');
+
+$operation = 0;
+$function = 1;
+$output = WebGUI::Macro::PageTitle::process($session);
+is($output, $urlizedTitle, 'fetching urlized title via a function');
+
+$operation = 1;
+$function = 1;
+$output = WebGUI::Macro::PageTitle::process($session);
+is($output, $urlizedTitle, 'fetching urlized title via an operation and function');
+
+}
 
 END {
 	$versionTag->rollback;

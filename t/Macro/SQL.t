@@ -14,8 +14,8 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Macro::Slash_gatewayUrl;
-use WebGUI::Macro::SQL;
 use WebGUI::Session;
+use WebGUI::International;
 use Data::Dumper;
 
 use Test::More; # increment this value for each test you create
@@ -23,6 +23,8 @@ use Test::More; # increment this value for each test you create
 my $session = WebGUI::Test->session;
 
 my $url = WebGUI::Macro::Slash_gatewayUrl::process($session);
+
+my $i18n = WebGUI::International->new($session, 'Macro_SQL');
 
 $session->db->dbh->do('DROP TABLE IF EXISTS testTable');
 $session->db->dbh->do('CREATE TABLE testTable (zero int(8), one int(8), two int(8), three int(8), four int(8), five int(8), six int(8), seven int(8), eight int(8), nine int(8), ten int(8), eleven int(8) ) TYPE=InnoDB');
@@ -49,6 +51,12 @@ my @testSets = (
 		output => join '', map {sprintf "<a href='%s?op=viewProfile&uid=%d'>%s</a><br>", @{ $_ }} ([$url, 3,'Admin'],[$url, 1,'Visitor']),
 	},
 	{
+		comment => q!Null template returns ^0;!,
+		sql => q!select count(*) from users!,
+		template => q!!,
+		output => q!2!,
+	},
+	{
 		comment => q!test two digit macros!,
 		sql => q!select * from testTable order by one!,
 		template => join(':', map { "^$_;" } 0..11).'-',
@@ -58,13 +66,25 @@ my @testSets = (
 		comment => q!Test illegal SQL, update!,
 		sql => q!update testTable set one=201 where one=101!,
 		template => '^0;',
-		output => 'Cannot execute this type of query.',
+		output => $i18n->get('illegal query'),
 	},
 	{
 		comment => q!Test illegal SQL, update!,
 		sql => q!INSERT INTO testTable (zero, one, two, three, four, five, six, seven, eight, nine, ten, eleven ) VALUES(200,201,202,203,204,205,206,207,208,209,210,211)!,
 		template => '^0;',
-		output => 'Cannot execute this type of query.',
+		output => $i18n->get('illegal query'),
+	},
+	{
+		comment => q!Test valid SQL, show!,
+		sql => q!show columns from testTable like 'zero'!,
+		template => '^0;',
+		output => 'zero',
+	},
+	{
+		comment => q!Test valid SQL, describe!,
+		sql => q!DESCRIBE testTable 'one'!,
+		template => '^0;',
+		output => 'one',
 	},
 	{
 		comment => q!Test unused macro variables!,
@@ -78,15 +98,35 @@ my @testSets = (
 		template => join(':', map { "^$_;" } 'rownum', 0..3).',',
 		output => '1:0:1:2:3,2:100:101:102:103,',
 	},
+	{
+		comment => q!SQL error!,
+		sql => q!select ** from testTable order by one!,
+		template => join(':', map { "^$_;" } 'rownum', 0..3).',',
+		output => sprintf $i18n->get('sql error'),
+			q!You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '* from testTable order by one' at line 1!,
+	},
 );
 
 my $numTests = scalar @testSets;
 
+++$numTests; ##For the load check;
+
 plan tests => $numTests;
+
+my $macro = 'WebGUI::Macro::SQL';
+my $loaded = use_ok($macro);
+
+SKIP: {
+
+skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 foreach my $testSet (@testSets) {
 	my $output = WebGUI::Macro::SQL::process($session, $testSet->{sql}, $testSet->{template});
 	is($output, $testSet->{output}, $testSet->{comment});
 }
 
-$session->db->dbh->do('DROP TABLE testTable');
+}
+
+END {
+	$session->db->dbh->do('DROP TABLE testTable');
+}
