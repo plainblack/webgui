@@ -3,6 +3,11 @@
    Approval for Version Tag workflow activity.
  - Updated the hoverhelp to denote that you can use ranges in the WebGUI
    scheduler.
+ - fix: deleting workflows did not delete related instances and crons
+ - Added a "run" link to the scheduler and the running workflows listings to
+   aid in debugging workflow errors.
+ - fix: profile fields not validated by WebGUI::User
+
 
 7.0.7
  - rfe: Image Management (funded by Formation Design Systems)

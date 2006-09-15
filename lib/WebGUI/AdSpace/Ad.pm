@@ -52,6 +52,7 @@ The unique id of an ad space to attach this ad to.
 =head3 properties
 
 The properties used to create this object. See the set() method for details.
+A hash must be passed into create and a "type" key of either "text", "rich"  or  "image" is mandatory. 
 
 =cut
 
@@ -209,7 +210,7 @@ The hex color to be used to display the border on a text based ad.
 
 =head4 textColor
 
-THe hex color to be used to display the text on a test based ad.
+The hex color to be used to display the text on a test based ad.
 
 =head4 backgroundColor
 

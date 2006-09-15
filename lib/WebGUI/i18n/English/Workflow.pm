@@ -1,6 +1,12 @@
 package WebGUI::i18n::English::Workflow;
 
 our $I18N = { 
+	'run' => {
+		message => q|Run|,
+		context => q|Execute a workflow.|,
+		lastUpdated => 0,
+	},
+
 	'show running workflows' => {
 		message => q|Show running workflows.|,
 		context => q|A label used to get to a display of running workflows.|,

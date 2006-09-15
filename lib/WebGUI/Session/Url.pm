@@ -44,7 +44,7 @@ This package provides URL writing functionality. It is important that all WebGUI
  $string = $url->getSiteURL;
  $string = $url->makeCompliant($string);
  $string = $url->makeAbsolute($string);
- $string = $url->page($string, $pairs);
+ $string = $url->page($pairs);
  $string = $url->unescape($string);
  $string = $url->urlize($string);
 

@@ -370,7 +370,7 @@ sub www_runWorkflow {
         my $session = shift;
 	$session->http->setMimeType("text/plain");
 	$session->http->setCacheControl("none");
-	unless (isInSubnet($session->env->get("REMOTE_ADDR"), $session->config->get("spectreSubnets"))) {
+	unless (isInSubnet($session->env->get("REMOTE_ADDR"), $session->config->get("spectreSubnets")) || $session->user->isInGroup("3")) {
 		$session->errorHandler->security("make a Spectre workflow runner request, but we're only allowed to accept requests from ".join(",",@{$session->config->get("spectreSubnets")}).".");
         	return "error";
 	}
@@ -407,9 +407,10 @@ sub www_showRunningWorkflows {
 		.disabled { color: #808000; }
 		.done { color: #008000; }
 		.undefined { color: #800000; }
-		</style><table width="100%">'; 
-	my $rs = $session->db->read("select Workflow.title, WorkflowInstance.lastStatus, WorkflowInstance.runningSince, WorkflowInstance.lastUpdate  from WorkflowInstance left join Workflow on WorkflowInstance.workflowId=Workflow.workflowId order by WorkflowInstance.runningSince desc");
-	while (my ($title, $status, $runningSince, $lastUpdate) = $rs->array) {
+		</style><table style="width: 100%;">'; 
+	my $isAdmin = $session->user->isInGroup("3");
+	my $rs = $session->db->read("select Workflow.title, WorkflowInstance.lastStatus, WorkflowInstance.runningSince, WorkflowInstance.lastUpdate, WorkflowInstance.instanceId from WorkflowInstance left join Workflow on WorkflowInstance.workflowId=Workflow.workflowId order by WorkflowInstance.runningSince desc");
+	while (my ($title, $status, $runningSince, $lastUpdate, $id) = $rs->array) {
 		my $class = $status || "complete";
 		$output .= '<tr class="'.$class.'">'
 			.'<td>'.$title.'</td>'
@@ -419,6 +420,7 @@ sub www_showRunningWorkflows {
 				.$status.' / '.$session->datetime->epochToHuman($lastUpdate)
 				.'</td>';
 		}
+		$output .= '<td><a href="'.$session->url->page("op=runWorkflow;instanceId=".$id).'">'.$i18n->get("run").'</a></td>' if ($isAdmin);
 		$output .= "</tr>\n";
 	}
 	$output .= '</table>';

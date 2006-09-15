@@ -233,7 +233,9 @@ sub www_manageCron {
 			.$session->icon->edit("op=editCronJob;id=".$id)
 			.'</td><td>'.$title.'</td><td>'.$schedule.'</td><td>'
 			.($enabled ? $i18n->get("enabled") : $i18n->get("disabled"))
-			."</td></tr>\n";
+			."</td>";
+		$output .= '<td><a href="'.$session->url->page("op=runCronJob;taskId=".$id).'">'.$i18n->get("run","Workflow").'</a></td>';
+		$output .= "</tr>\n";
 	}
 	$output .= '</table>';
 	my $ac = WebGUI::AdminConsole->new($session,"cron");
@@ -254,7 +256,7 @@ sub www_runCronJob {
         my $session = shift;
 	$session->http->setMimeType("text/plain");
 	$session->http->setCacheControl("none");
-	unless (isInSubnet($session->env->get("REMOTE_ADDR"), $session->config->get("spectreSubnets"))) {
+	unless (isInSubnet($session->env->get("REMOTE_ADDR"), $session->config->get("spectreSubnets")) || $session->user->isInGroup("3")) {
 		$session->errorHandler->security("make a Spectre cron job runner request, but we're only allowed to accept requests from ".join(",",@{$session->config->get("spectreSubnets")}).".");
         	return "error";
 	}

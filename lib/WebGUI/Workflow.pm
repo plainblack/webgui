@@ -228,6 +228,37 @@ sub getActivities {
 	return \@activities;
 }
 
+=head2 getInstances ( )
+
+Returns an array reference of the instance objects currently existing for this workflow.
+
+=cut
+
+sub getInstances {
+	my $self = shift;
+	my @instances = ();
+	my $rs = $self->session->db->read("SELECT instanceId FROM WorkflowInstance WHERE workflowId = ?", [$self->getId]);
+	while (my ($instanceId) = $rs->array) {
+		push(@instances, WebGUI::Workflow::Instance->new($self->session, $instanceId));
+	}
+	return \@instances;
+}
+
+=head2 getCrons ( )
+
+Returns an array reference of the cron objects that trigger this workflow.
+
+=cut
+
+sub getCrons {
+	my $self = shift;
+	my @crons = ();
+	my $rs = $self->session->db->read("SELECT taskId FROM WorkflowSchedule WHERE workflowId = ?", [$self->getId]);
+	while (my ($taskId) = $rs->array) {
+		push(@crons, WebGUI::Workflow::Cron->new($self->session, $taskId));
+	}
+	return \@crons;
+}
 
 #-------------------------------------------------------------------
 
