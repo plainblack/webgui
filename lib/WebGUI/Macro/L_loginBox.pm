@@ -47,12 +47,14 @@ sub _createURL {
 
 =head3 boxSize
 
-The size of the login box.  Defaults to 12.
+The size of the username and password form fields.  Defaults to 12.
+Non-IE browsers will have their boxSize automatically scaled by 2/3
+due differences in the way they render text form boxes.
 
 =head3 text
 
 A custom text message, processed for embedded text surrounded by percent signs
-to turn into links to logout.
+to turn into a link to logout.
 
 =head3 templateId
 

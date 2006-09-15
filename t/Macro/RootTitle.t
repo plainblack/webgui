@@ -101,7 +101,24 @@ my %properties_X = (
 );
 my $assetX = $assetZ->addChild(\%properties_X, $properties_X{id});
 
+my %properties__ = (
+		className   => 'WebGUI::Asset::Snippet',
+		title       => 'Asset _',
+		url         => 'asset-_',
+		snippet     => 'Asset _',
+		ownerUserId => 3,
+		groupIdView => 7,
+		groupIdEdit => 3,
+		#              '1234567890123456789012'
+		id          => 'Root_-----------------',
+);
+my $asset_ = $root->addChild(\%properties__, $properties__{id});
+
 $versionTag->commit;
+
+my $origLineage = $asset_->getLineage;
+my $newLineage = substr $origLineage, 0, length($origLineage)-1; 
+$session->db->write('update asset set lineage=? where assetId=?',[$newLineage, $asset_->getId]);
 
 my @testSets = (
 	{
@@ -129,9 +146,36 @@ my @testSets = (
 		asset   => $assetY,
 		title   => $assetZ->getTitle,
 	},
+	{
+		comment => q!The super root's root is itself!,
+		asset   => $root,
+		title   => $root->getTitle,
+	},
+	{
+		comment => q!Unable to find root!,
+		asset   => $asset_,
+		title   => '',
+	},
 );
 
-plan tests => scalar @testSets;
+my $numTests = scalar @testSets; 
+$numTests += 2;
+
+plan tests => $numTests;
+
+my $macro = 'WebGUI::Macro::RootTitle';
+my $loaded = use_ok($macro);
+
+SKIP: {
+
+skip "Unable to load $macro", $numTests-1 unless $loaded;
+
+is(
+	WebGUI::Macro::RootTitle::process($session),
+	'',
+	q!Call with no default session asset returns ''!,
+);
+
 
 foreach my $testSet (@testSets) {
 	$session->asset($testSet->{asset});
@@ -139,7 +183,10 @@ foreach my $testSet (@testSets) {
 	is($output, $testSet->{title}, $testSet->{comment});
 }
 
+}
+
 END { ##Clean-up after yourself, always
+	$session->db->write('update asset set lineage=? where assetId=?',[$origLineage, $asset_->getId]);
 	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
 		$versionTag->rollback;
 	}
