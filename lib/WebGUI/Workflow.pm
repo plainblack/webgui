@@ -101,11 +101,19 @@ Removes this workflow and everything associated with it..
 
 sub delete {
 	my $self = shift;
-	# delete crons
+
+	foreach my $cron (@{$self->getCrons}) {
+		$cron->delete;
+	}
+
+	foreach my $instance (@{$self->getInstances}) {
+		$instance->delete;
+	}
+
 	foreach my $activity (@{$self->getActivities}) {
 		$activity->delete;
 	}
-	# delete instances
+
 	$self->session->db->deleteRow("Workflow","workflowId",$self->getId);
 	$self = undef;
 }

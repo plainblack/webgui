@@ -1,3 +1,9 @@
+7.0.8
+ - Fixed a couple of minor bugs with the default values of the Request
+   Approval for Version Tag workflow activity.
+ - Updated the hoverhelp to denote that you can use ranges in the WebGUI
+   scheduler.
+
 7.0.7
  - rfe: Image Management (funded by Formation Design Systems)
  - fix: can't change default size of text fields (midellaq)

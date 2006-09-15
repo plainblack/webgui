@@ -70,8 +70,9 @@ sub definition {
 				},
 			doOnDeny => {
 				fieldType=>"workflow",
-				defaultValue=>"pbwf",
+				defaultValue=>"pbworkflow000000000006",
 				label=>$i18n->get("do on deny"),
+				type=>"WebGUI::VersionTag",
 				hoverHelp => $i18n->get("do on deny help")
 				}
 			}
