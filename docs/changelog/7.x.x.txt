@@ -7,7 +7,7 @@
  - Added a "run" link to the scheduler and the running workflows listings to
    aid in debugging workflow errors.
  - fix: profile fields not validated by WebGUI::User
-
+ - fix: Spectre pings not using correct IP address
 
 7.0.7
  - rfe: Image Management (funded by Formation Design Systems)

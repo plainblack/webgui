@@ -111,7 +111,7 @@ if ($shutdown) {
 sub ping {
 	my $remote = create_ikc_client(
 	        port=>$config->get("port"),
-	        ip=>'127.0.0.1',
+	        ip=>$config->get("ip"),
 	        name=>rand(100000),
         	timeout=>10
         	);
