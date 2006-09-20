@@ -8,6 +8,7 @@
    aid in debugging workflow errors.
  - fix: profile fields not validated by WebGUI::User
  - fix: Spectre pings not using correct IP address
+ - fix: search functionality throwing fatal errors
 
 7.0.7
  - rfe: Image Management (funded by Formation Design Systems)
