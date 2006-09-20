@@ -348,6 +348,14 @@
         "u" : "u_companyUrl"
 	},
 
+#Specify any LDAP aliases for synchronizing user profiles to LDAP	
+"ldapAlias" : {	
+        "firstName" : "givenName",
+		"lastName" : "sn",
+		"email" : "mail",
+		"companyName" : "o"	
+    },
+	
 # Define the subnets that WebGUI should expect Spectre communication
 # to come from. All other subnets will be ignored. The subnet
 # should be listed in CIDR notation.
