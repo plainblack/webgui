@@ -18,8 +18,10 @@ package WebGUI::Workflow::Activity::SyncProfilesToLdap;
 use strict;
 use base 'WebGUI::Workflow::Activity';
 use Net::LDAP;
+use Time::HiRes;
 use WebGUI::Auth;
 use WebGUI::User;
+use WebGUI::Utility;
 
 =head1 NAME
 
@@ -41,27 +43,7 @@ These methods are available from this class:
 
 
 #-------------------------------------------------------------------
-
-=head2 definition ( session, definition )
-
-See WebGUI::Workflow::Activity::defintion() for details.
-
-=cut 
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, "AuthLDAP");
-	push(@{$definition}, {
-		name=>$i18n->get("sync profiles to ldap"),
-		properties=> { }
-		});
-	return $class->SUPER::definition($session,$definition);
-}
-
-
-
+#Status code messages returned by the server
 my %ldapStatusCode = ( 0=>'success (0)', 1=>'Operations Error (1)', 2=>'Protocol Error (2)',
         3=>'Time Limit Exceeded (3)', 4=>'Size Limit Exceeded (4)', 5=>'Compare False (5)',
         6=>'Compare True (6)', 7=>'Auth Method Not Supported (7)', 8=>'Strong Auth Required (8)',
@@ -81,17 +63,49 @@ my %ldapStatusCode = ( 0=>'success (0)', 1=>'Operations Error (1)', 2=>'Protocol
 		86=>'The method of authentication requested in a bind request is unknown to the server (86)',
 		87=>'An error occurred while encoding the given search filter. (87)',
 		89=>'An invalid parameter was specified (89)',90=>'Out of Memory (90)',91=>'A connection to the server could not be established (91)',
-		92=>'An attempt has been made to use a feature not supported by Net::LDAP (92)');
+		92=>'An attempt has been made to use a feature not supported by Net::LDAP (92)',
+		93=>'The controls required to perform the requested operation were not found. (93)',
+		94=>'No results were returned from the server. (94)', 95=>'There are more results in the chain of results. (95)',
+		96=>'A loop has been detected. For example when following referals. (96)', 97=>'The referral hop limit has been exceeded. (97)');
 
 #-------------------------------------------------------------------
 sub _alias {
-	my %alias = (
-		firstName=>"givenName",
-		lastName=>"sn",
-		email=>"mail",
-		companyName=>"o"
-		);
-	return $alias{$_[0]} || $_[0];
+    my $self = shift;
+	my $key = shift;
+	my $session = $self->session;
+	#Pull alias from memory.
+	my $alias = $self->{_alias};
+	#If alias is not in memory, pull it from the config file and set it.
+	unless ($alias) {
+	   $alias = $session->config->get("ldapAlias");
+	   $self->{_alias} = $alias;
+	}
+	#Print an error message if no aliases are found
+	unless (scalar(keys %{$alias}) > 0) {
+	   $session->errorHandler->warn("SynchProfilesToLdap: ldapAlias is not configured properly in your WebGUI config file.  Please check to make sure that this setting is enabled and contains alias mappings");
+	}
+	#Return the value of the key passed in
+	return $alias->{$key} || $key;
+}
+
+#-------------------------------------------------------------------
+
+=head2 definition ( session, definition )
+
+See WebGUI::Workflow::Activity::defintion() for details.
+
+=cut 
+
+sub definition {
+	my $class = shift;
+	my $session = shift;
+	my $definition = shift;
+	my $i18n = WebGUI::International->new($session, "AuthLDAP");
+	push(@{$definition}, {
+		name=>$i18n->get("sync profiles to ldap"),
+		properties=> { }
+		});
+	return $class->SUPER::definition($session,$definition);
 }
 
 #-------------------------------------------------------------------
@@ -104,45 +118,68 @@ See WebGUI::Workflow::Activity::execute() for details.
 
 sub execute {
 	my $self = shift;
-	my ($userId, $u, $userData, $uri, $port, %args, $fieldName, $ldap, $search, $a, $b);
-	$a = $self->session->db->read("select userId from users where authMethod='LDAP'");
-	while (($userId) = $a->array) {
-		$u = WebGUI::User->new($self->session, $userId);
-		my $auth = WebGUI::Auth->new($self->session, "LDAP",$userId);
-		$userData = $auth->getParams;
-		$uri = URI->new($userData->{ldapUrl});
-		if ($uri->port < 1) {
-			$port = 389;
-		} else {
-			$port = $uri->port;
-		}
-		%args = (port => $port);
-		$ldap = Net::LDAP->new($uri->host, %args);
-		if ($ldap) {
-		   my $result = $ldap->bind;
-		   if ($result->code == 0) {
-			   $search = $ldap->search( base=>$userData->{connectDN}, filter=>"&(objectClass=*)" );
-			   if($search->code) {
-			      	$self->session->errorHandler->warn("Couldn't search LDAP ".$uri->host." to find user ".$u->username." (".$userId.").\nError Message from LDAP: ".$ldapStatusCode{$search->code});
-			   } elsif($search->count == 0) {
-			      	$self->session->errorHandler->warn("No results returned for user with dn ".$userData->{connectDN});
-			   } else {
-			      my $user = WebGUI::User->new($self->session, $userId);
-				  $b = $self->session->db->read("select fieldName from userProfileField where profileCategoryId<>4");
-				  while (($fieldName) = $b->array) {
-				     if ($search->entry(0)->get_value(_alias($fieldName)) ne "") {
-					    $user->profileField($fieldName,$search->entry(0)->get_value(_alias($fieldName)));
-					 }
-				  }
-				  $b->finish;
-			   }
-			   $ldap->unbind;
-			} else {
-		      $self->session->errorHandler->warn("Couldn't bind to LDAP host ".$uri->host."\nError Message from LDAP: ".$ldapStatusCode{$result->code});
-		   }
-		} 
+	my $object = shift;
+	my $instance = shift;
+	my $session = $self->session;
+	
+	#No Results Codes are returned by the server if a search didn't error, but returned no results. These codes should have a different error message returned.
+    my @noResultsCodes = (32,94);		
+	
+	my ($u, $userData, $uri, $port, %args, $fieldName, $ldap, $search, $a, $b);
+	my $t = [Time::HiRes::gettimeofday()];
+	
+	my $arrIndex = $instance->getScratch("arrayIndex");
+	$a = $self->session->db->buildArrayRef("select userId from users where authMethod='LDAP'");
+	
+	for(my $i = $arrIndex; $i < scalar(@{$a}); $i++) {
+	   my $userId = $a->[$i];
+       $u = WebGUI::User->new($session, $userId);
+	   my $auth = WebGUI::Auth->new($session, "LDAP", $userId);
+	   $userData = $auth->getParams;
+	   $uri = URI->new($userData->{ldapUrl});
+	   
+	   #Set the port
+	   $port = 389;
+	   if ($uri->port >= 1) {
+		  $port = $uri->port;
+	   }
+	   
+	   %args = (port => $port);
+	   $ldap = Net::LDAP->new($uri->host, %args);
+	   if ($ldap) {
+	      my $result = $ldap->bind;
+		  if ($result->code == 0) {
+		     $search = $ldap->search( base=>$userData->{connectDN}, filter=>"&(objectClass=*)" );
+			 my $code = $search->code;
+			 if($code && !WebGUI::Utility::isIn($code,@noResultsCodes)) {
+			    $session->errorHandler->error("SynchProfilesToLdap: Couldn't search LDAP ".$uri->host." to find user ".$u->username." (".$userId.").\nError Message from LDAP: ".$ldapStatusCode{$search->code});
+			 } elsif(WebGUI::Utility::isIn($code,@noResultsCodes) || $search->count == 0) {
+			    $session->errorHandler->warn("SynchProfilesToLdap: No results returned by LDAP server for user with dn ".$userData->{connectDN});
+			 } else {
+			    my $user = WebGUI::User->new($self->session, $userId);
+				$b = $session->db->read("select fieldName from userProfileField where profileCategoryId<>4");
+				my $entry = $search->entry(0);
+				while (($fieldName) = $b->array) {
+				   if ($entry->get_value($self->_alias($fieldName)) ne "") {
+				      $user->profileField($fieldName,$entry->get_value($self->_alias($fieldName)));
+				   }
+				}
+				$b->finish;
+			 }
+			 $ldap->unbind;
+	      } else {
+		     $session->errorHandler->error("SynchProfilesToLdap: Couldn't bind to LDAP host ".$uri->host."\nError Message from LDAP: ".$ldapStatusCode{$result->code});
+		  }
+	   } else {
+	      $session->errorHandler->error("SynchProfilesToLdap: Could not create an LDAP object using LDAP URL: ".$userData->{ldapUrl}.".  Most likely, this url is not in standard format.");
+	   }
+	   
+	   #Return waiting if this has taken longer than 55 seconds
+	   if(Time::HiRes::tv_interval($t) >= 55) {
+	      $instance->setScratch("arrayIndex",($i+1));
+	      return $self->WAITING;
+	   }
 	}
-	$a->finish;
 	return $self->COMPLETE;
 }
 
