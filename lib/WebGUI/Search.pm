@@ -35,6 +35,18 @@ These methods are available from this package:
 
 =cut
 
+#-------------------------------------------------------------------
+
+sub _getQuery {
+	my $self = shift;
+	my $selectsRef = shift;
+	return
+	    ('select ' . join(', ', @$selectsRef,
+			      ($self->{_score}? $self->{_score} : ())) .
+	     ' from assetIndex inner join asset on assetIndex.assetId = asset.assetId where ' .
+	     ($self->{_isPublic}? 'isPublic = 1 and ' : '') . '('.$self->{_where}.')' .
+	     ($self->{_score}? ' order by score desc' : ''));
+}
 
 #-------------------------------------------------------------------
 
@@ -46,12 +58,7 @@ Returns an array reference containing all the asset ids of the assets that match
 
 sub getAssetIds {
 	my $self = shift;
-	my $query = "select assetId ";
-	$query .= " , ".$self->{_score} if ($self->{_score});
-	$query .= " from assetIndex where ";
-	$query .= "isPublic=1 and " if ($self->{_isPublic});
-	$query .= "(".$self->{_where}.")";
-	$query .= " order by score desc " if ($self->{_score});
+	my $query = $self->_getQuery(['assetIndex.assetId']);
 	my $rs = $self->session->db->prepare($query);
 	$rs->execute($self->{_params});
 	my @ids = ();
@@ -72,12 +79,8 @@ Returns an array reference containing asset objects for those that matched.
 
 sub getAssets {
 	my $self = shift;
-	my $query = "select assetId,className,revisionDate ";
-	$query .= " , ".$self->{_score} if ($self->{_score});
-	$query .= " from assetIndex where ";
-	$query .= "isPublic=1 and " if ($self->{_isPublic});
-	$query .= "(".$self->{_where}.")";
-	$query .= " order by score desc " if ($self->{_score});
+	my $query = $self->_getQuery(['assetIndex.assetId', 'assetIndex.className',
+				      'assetIndex.revisionDate']);
 	my $rs = $self->session->db->prepare($query);
 	$rs->execute($self->{_params});
 	my @assets = ();
@@ -123,12 +126,11 @@ sub getPaginatorResultSet {
 	my $paginate = shift;
 	my $pageNumber = shift;
 	my $formVar = shift;
-	my $query = "select assetId, title, url, synopsis, ownerUserId, groupIdView, groupIdEdit, creationDate, revisionDate,  className ";
-	$query .= " , ".$self->{_score} if ($self->{_score});
-	$query .= " from assetIndex where ";
-	$query .= "isPublic=1 and " if ($self->{_isPublic});
-	$query .= "(".$self->{_where}.")";
-	$query .= " order by score " if ($self->{_score});
+	my $query = $self->_getQuery(['assetIndex.assetId', 'assetIndex.title',
+				      'assetIndex.url', 'assetIndex.synopsis',
+				      'assetIndex.ownerUserId', 'assetIndex.groupIdView',
+				      'assetIndex.groupIdEdit', 'assetIndex.creationDate',
+				      'assetIndex.revisionDate', 'assetIndex.className']);
 	my $paginator = WebGUI::Paginator->new($self->session, $url, $paginate, $pageNumber, $formVar);
 	$paginator->setDataByQuery($query, undef, undef, $self->{_params});
 	return $paginator;
@@ -144,20 +146,17 @@ Returns a WebGUI::SQL::ResultSet object containing the search results with colum
 
 sub getResultSet {
 	my $self = shift;
-	my $query = "select t1.assetId, t1.title, t1.url, t1.synopsis, t1.ownerUserId, t1.groupIdView, t1.groupIdEdit, t1.creationDate, t1.revisionDate,  t1.className ";
-	$query .= " , ".$self->{_score} if ($self->{_score});
-	$query .= " from assetIndex as t1, asset as t2 where ";
-	$query .= " t1.assetId=t2.assetId and ";
-	$query .= "isPublic=1 and " if ($self->{_isPublic});
-	$query .= "(".$self->{_where}.")";
-	$query .= " order by score desc " if ($self->{_score});
-
+	my $query = $self->_getQuery(['assetIndex.assetId', 'assetIndex.title',
+				      'assetIndex.url', 'assetIndex.synopsis',
+				      'assetIndex.assetId', 'assetIndex.title',
+				      'assetIndex.url', 'assetIndex.synopsis',
+				      'assetIndex.ownerUserId', 'assetIndex.groupIdView',
+				      'assetIndex.groupIdEdit', 'assetIndex.creationDate',
+				      'assetIndex.revisionDate', ' assetIndex.className']);
 	my $rs = $self->session->db->prepare($query);
 	$rs->execute($self->{_params});
 	return $rs;
 }
-
-
 
 #-------------------------------------------------------------------
 
@@ -292,15 +291,15 @@ sub search {
         		$keywords = join(" ", @terms);
 		}	
 		push(@params, $keywords, $keywords);
-		$self->{_score} = "match (keywords) against (?) as score";
-		push(@clauses, "match (keywords) against (? in boolean mode)");
+		$self->{_score} = "match (assetIndex.keywords) against (?) as score";
+		push(@clauses, "match (assetIndex.keywords) against (? in boolean mode)");
 	}
 	if ($rules->{lineage}) {
 		my @phrases = ();
 		foreach my $lineage (@{$rules->{lineage}}) {
 			next unless defined $lineage;
 			push(@params, $lineage."%");
-			push(@phrases, "t2.lineage like ?");
+			push(@phrases, "asset.lineage like ?");
 		}
 		push(@clauses, join(" or ", @phrases)) if (scalar(@phrases));
 	}
@@ -309,20 +308,20 @@ sub search {
 		foreach my $class (@{$rules->{classes}}) {
 			next unless defined $class;
 			push(@params, $class);
-			push(@phrases, "className=?");
+			push(@phrases, "assetIndex.className=?");
 		}
 		push(@clauses, join(" or ", @phrases)) if (scalar(@phrases));
 	}
 	if ($rules->{creationDate}) {
 		my $start = $rules->{creationDate}{start} || 0;
 		my $end = $rules->{creationDate}{end} || 9999999999999999999999;
-		push(@clauses, "creationDate between ? and ?");
+		push(@clauses, "assetIndex.creationDate between ? and ?");
 		push(@params, $start, $end);
 	}
 	if ($rules->{revisionDate}) {
 		my $start = $rules->{revisionDate}{start} || 0;
 		my $end = $rules->{revisionDate}{end} || 9999999999999999999999;
-		push(@clauses, "revisionDate between ? and ?");
+		push(@clauses, "assetIndex.revisionDate between ? and ?");
 		push(@params, $start, $end);
 	}
 	$self->{_params} = \@params;
