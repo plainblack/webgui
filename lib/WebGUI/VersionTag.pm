@@ -369,7 +369,7 @@ A human readable name.
 
 =head4 workflowId
 
-The ID of the workflow that will be triggered when this workflow is committed. Defaults to the default version tag workflow set in the settings.
+The ID of the workflow that will be triggered when this version tag is committed. Defaults to the default version tag workflow set in the settings.
 
 =head4 groupToUse
 
