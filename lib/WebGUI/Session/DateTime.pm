@@ -642,6 +642,7 @@ Returns the timezone for this user, in DateTime::TimeZone format.  Checks to mak
 
 sub getTimeZone {
 	my $self = shift;
+	return 'America/Chicago' if $self->session->dbNotAvailable;
 	return $self->session->user->{_timeZone} if $self->session->user->{_timeZone};
 	my @zones = @{DateTime::TimeZone::all_names()};
 	my $zone = $self->session->user->profileField('timeZone');

@@ -176,33 +176,42 @@ sub error {
 
 #-------------------------------------------------------------------
 
-=head2 fatal ( )
+=head2 fatal ( message [, flags] )
 
 Adds a FATAL type message to the log, outputs an error message to the user, and forces a close on the session. This should only be called if the system cannot recover from an error, or it would be unsafe to recover from an error like database connectivity problems.
+
+=head3 message
+
+The message to use.
 
 =cut
 
 sub fatal {
 	my $self = shift;
 	my $message = shift;
+
 	$self->session->http->setStatus("500","Server Error");
 	Apache2::RequestUtil->request->content_type('text/html') if ($self->session->request);
 	$self->getLogger->fatal($message);
 	$self->getLogger->debug("Stack trace for FATAL ".$message."\n".$self->getStackTrace());
 	$self->session->http->sendHeader if ($self->session->request);
-	unless ($self->canShowDebug()) {
-		#NOTE: You can't internationalize this because with some types of errors that would cause an infinite loop.
+
+	if ($self->session->dbNotAvailable) {
+		# We can't even _determine_ whether we can show the debug text.  Punt.
+		$self->session->output->print("<h1>Fatal Internal Error</h1>");
+	} elsif ($self->canShowDebug()) {
+		$self->session->output->print("<h1>WebGUI Fatal Error</h1><p>Something unexpected happened that caused this system to fault.</p>\n",1);
+		$self->session->output->print("<p>".$message."</p>\n",1);
+		$self->session->output->print($self->getStackTrace(), 1);
+		$self->session->output->print($self->showDebug(),1);
+	} else {
+		# NOTE: You can't internationalize this because with some types of errors that would cause an infinite loop.
 		$self->session->output->print("<h1>Problem With Request</h1>
 		We have encountered a problem with your request. Please use your back button and try again.
 		If this problem persists, please contact us with what you were trying to do and the time and date of the problem.<br />",1);
 		$self->session->output->print('<br />'.$self->session->setting->get("companyName"),1);
 		$self->session->output->print('<br />'.$self->session->setting->get("companyEmail"),1);
 		$self->session->output->print('<br />'.$self->session->setting->get("companyURL"),1);
-	} else {
-		$self->session->output->print("<h1>WebGUI Fatal Error</h1><p>Something unexpected happened that caused this system to fault.</p>\n",1);
-		$self->session->output->print("<p>".$message."</p>\n",1);
-		$self->session->output->print($self->getStackTrace(), 1);
-		$self->session->output->print($self->showDebug(),1);
 	}
 	$self->session->close();
 	exit;

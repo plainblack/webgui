@@ -117,14 +117,13 @@ Cleans up a WebGUI session information from memory and disconnects from any reso
 
 sub close {
 	my $self = shift;
-	$self->db->disconnect;
-	##Must destroy the logger last!
-	my %mykeys = grep { ($_ ne '_errorHandler' && $_ ne '_request' && $_ eq '_sessionId' && $_ eq '_server') } keys %{ $self };
-	foreach my $object (keys %mykeys) {
-		$self->{$object} and $self->{$object}->DESTROY;
+	$self->db->disconnect unless $self->dbNotAvailable;
+
+	# Kill circular references.  The literal list is so that the order
+	# can be explicitly shuffled as necessary.
+	foreach my $key (qw/_asset _datetime _icon _slave _db _env _form _http _id _output _os _privilege _scratch _setting _stow _style _url _user _var _errorHandler/) {
+		delete $self->{$key};
 	}
-	$self->{_errorHandler} and $self->{_errorHandler}->DESTROY;
-	undef $self;
 }
 
 #-------------------------------------------------------------------
@@ -494,7 +493,7 @@ sub server {
 
 =head2 setting ( param ) 
 
-Returns a WebGUI::Session object.
+Returns the associated WebGUI::Session::Setting object.
 
 =cut
 
@@ -612,5 +611,28 @@ sub var {
 	return $self->{_var};
 }
 
+#-------------------------------------------------------------------
+
+=head2 setDbNotAvailable ( )
+
+Sets a flag for this session indicating that database accesses are known to be probably broken and should not be performed.
+
+=cut
+
+sub setDbNotAvailable {
+	my $self = shift;
+	$self->{_dbNotAvailable} = 1;
+}
+
+=head2 dbNotAvailable ( )
+
+Returns true iff there is an error condition such that no database accesses should be attempted for this session whatsoever.
+
+=cut
+
+sub dbNotAvailable {
+	my $self = shift;
+	return $self->{_dbNotAvailable};
+}
 
 1;

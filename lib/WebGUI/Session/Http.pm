@@ -165,18 +165,21 @@ sub new {
 
 #-------------------------------------------------------------------
 
-=head2 sendHeader ( ) 
+=head2 sendHeader ( )
 
-Generates and sends HTTP headers.
+Generates and sends HTTP headers for a response.
 
 =cut
 
 sub sendHeader {
 	my $self = shift;
 	return undef if ($self->{_http}{noHeader});
+	return $self->_sendMinimalHeader if $self->session->dbNotAvailable;
+
 	my ($request, $datetime) = $self->session->quick(qw(request datetime));
 	return undef unless $request;
 	my $userId = $self->session->var->get("userId");
+
 	$self->{_http}{noHeader} = 1;
 	my %params;
 	if ($self->isRedirect()) {
@@ -205,6 +208,17 @@ sub sendHeader {
 		$request->status($self->getStatus());
 		$request->status_line($self->getStatus().' '.$self->{_http}{statusDescription});
 	}
+	return;
+}
+
+sub _sendMinimalHeader {
+	my $self = shift;
+	my $request = $self->session->request;
+	$request->content_type('text/html; charset=UTF-8');
+	$request->headers_out->set('Cache-Control' => 'private');
+	$request->no_cache(1);
+	$request->status($self->getStatus());
+	$request->status_line($self->getStatus().' '.$self->{_http}{statusDescription});
 	return;
 }
 
@@ -257,6 +271,7 @@ The value to set.
 =head3 timeToLive
 
 The time that the cookie should remain in the browser. Defaults to "+10y" (10 years from now).
+This may be "session" to indicate that the cookie is for the current browser session only.
 
 =head3 domain
 
@@ -271,6 +286,7 @@ sub setCookie {
 	my $ttl = shift;
 	my $domain = shift;
 	$ttl = (defined $ttl ? $ttl : '+10y');
+
 	if ($self->session->request) {
 		require Apache2::Cookie;
 		my $cookie = Apache2::Cookie->new($self->session->request,

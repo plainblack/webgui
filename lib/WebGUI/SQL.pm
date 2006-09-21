@@ -315,7 +315,13 @@ sub connect {
 	my $dsn = shift;
 	my $user = shift;
 	my $pass = shift;
-	my $dbh = DBI->connect($dsn,$user,$pass,{RaiseError=>0,AutoCommit=>1 }) or $session->errorHandler->fatal("Couldn't connect to database.");
+	my $dbh = DBI->connect($dsn,$user,$pass,{RaiseError=>0,AutoCommit=>1 });
+
+	unless (defined $dbh) {
+		$session->setDbNotAvailable;
+		$session->errorHandler->fatal("Couldn't connect to database.");
+	}
+
 	if ( $dsn =~ /Oracle/ ) { # Set Oracle specific attributes
 		$dbh->{LongReadLen} = 512 * 1024;
 		$dbh->{LongTruncOk} = 1;
