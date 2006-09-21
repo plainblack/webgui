@@ -259,7 +259,6 @@ sub _userCanObserveProject {
 	my $user = shift;
 	my $projectId = shift;
 	my ($managerGroup, $observerGroup) = $self->session->db->quickArray("select projectManager, projectObserver from PM_project where projectId = ?", [$projectId]);
-	$self->session->errorHandler->warn("DEBUG: user=".$user->userId." manager=".$managerGroup." observer=".$observerGroup." project=".$projectId." observedirect=".!!$user->isInGroup($observerGroup));
 	return $self->canView($user->userId) && ($user->isInGroup($managerGroup) || $user->isInGroup($observerGroup) || $user->isInGroup($self->get('groupToAdd')));
 }
 
