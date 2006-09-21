@@ -271,6 +271,7 @@ The value to set.
 =head3 timeToLive
 
 The time that the cookie should remain in the browser. Defaults to "+10y" (10 years from now).
+This may be "session" to indicate that the cookie is for the current browser session only.
 
 =head3 domain
 
@@ -291,9 +292,10 @@ sub setCookie {
 		my $cookie = Apache2::Cookie->new($self->session->request,
 			-name=>$name,
 			-value=>$value,
-			-expires=>$ttl,
 			-path=>'/'
 		);
+
+		$cookie->expires($ttl) if $ttl ne 'session';
 		$cookie->domain($domain) if ($domain);
 		$cookie->bake($self->session->request);
 	}

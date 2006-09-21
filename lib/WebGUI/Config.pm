@@ -241,13 +241,16 @@ sub getCookieName {
 
 =head2 getCookieTTL ( ) 
 
-Returns the cookie time to live defined in the config file. Returns "10y" if one isn't defined.
+Returns the cookie time to live defined in the config file. Returns "+10y" if one isn't defined.
+This may also be "session" to indicate that the cookie should only live for the current browser
+session.
 
 =cut
 
 sub getCookieTTL {
 	my $self = shift;
-	return $self->get("cookieTTL") || "+10y";	
+	my $configTTL = $self->get("cookieTTL");
+	return defined($configTTL)? $configTTL : "+10y";
 }
 
 #-------------------------------------------------------------------
