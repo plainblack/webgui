@@ -71,7 +71,7 @@ Removes the specified user session from memory and database.
 sub end {
         my $self = shift;
         $self->session->scratch->deleteAll;
-        $self->session->db->write("delete from userSession where sessionId=".$self->session->db->quote($self->getId));
+        $self->session->db->write("delete from userSession where sessionId=?",[$self->getId]);
         delete $self->session->{_user};
 	$self->DESTROY;
 }
@@ -171,21 +171,21 @@ sub new {
 	my $self = bless {_session=>$session}, $class;
 	my $sessionId = shift;
 	my $noFuss = shift;
-	if ($sessionId eq "") {
+	if ($sessionId eq "") { ##New session
 		$self->start(1);
-	} else {
+	} else { ##existing session requested
 		$self->{_var} = $session->db->quickHashRef("select * from userSession where sessionId=?",[$sessionId]);
 		return $self if $noFuss && $self->{_var}{sessionId};
-		if ($self->{_var}{expires} && $self->{_var}{expires} < $session->datetime->time()) {
+		if ($self->{_var}{expires} && $self->{_var}{expires} < $session->datetime->time()) { ##Session expired, start a new one with the same Id
 			$self->end;
 			$self->start(1,$sessionId);
-		} elsif ($self->{_var}{sessionId} ne "") {
+		} elsif ($self->{_var}{sessionId} ne "") { ##Fetched an existing session.  Update variables with recent data.
 			$self->{_var}{lastPageView} = $session->datetime->time();
 			$self->{_var}{lastIP} = $session->env->getIp;
 			$self->{_var}{expires} = $session->datetime->time() + $session->setting->get("sessionTimeout");
 			$self->session->{_sessionId} = $self->{_var}{sessionId};
 			$session->db->setRow("userSession","sessionId",$self->{_var});
-		} else {
+		} else {  ##Start a new session with the requested id.
 			$self->start(1,$sessionId);
 		}
 	}
@@ -229,12 +229,13 @@ sub start {
 	$userId = 1 if ($userId eq "");
 	my $sessionId = shift;
 	$sessionId = $self->session->id->generate if ($sessionId eq "");
+	my $time = $self->session->datetime->time();
 	$self->{_var} = {
-		expires=>$self->session->datetime->time() + $self->session->setting->get("sessionTimeout"),
-		lastPageView=>$self->session->datetime->time(),
-		lastIP => $self->session->env->getIp,
-		adminOn => 0,
-		userId => $userId
+		expires      => $time + $self->session->setting->get("sessionTimeout"),
+		lastPageView => $time,
+		lastIP       => $self->session->env->getIp,
+		adminOn      => 0,
+		userId       => $userId
 	};
 	$self->{_var}{sessionId} = $sessionId;
 	$self->session->db->setRow("userSession","sessionId",$self->{_var},$sessionId);
