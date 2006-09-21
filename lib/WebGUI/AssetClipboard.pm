@@ -171,7 +171,7 @@ Duplicates self, cuts duplicate, returns self->getContainer->www_view if canEdit
 sub www_copy {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
-	my $newAsset = $self->getParent->duplicate($self);
+	my $newAsset = $self->duplicate;
 	$newAsset->update({ title=>$self->getTitle.' (copy)'});
 	$newAsset->cut;
 	return $self->getContainer->www_view;

@@ -10,7 +10,6 @@
  - fix: Spectre pings not using correct IP address
  - fix: search functionality throwing fatal errors
  - fix: DBI connect errors infinitely recurse
- - fix: copying Collaboration System assets failing
 
 7.0.7
  - rfe: Image Management (funded by Formation Design Systems)
