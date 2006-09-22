@@ -211,7 +211,8 @@ sub session {
 
 =head2 start ( [ userId, sessionId ] )
 
-Start a new user session. Returns the session id.
+Start a new user session. Returns the user session id.  The session variable's sessionId
+is set to the var object's session id.
 
 =head3 userId
 
