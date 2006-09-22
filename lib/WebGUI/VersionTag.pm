@@ -92,7 +92,7 @@ Commits all assets edited under a version tag, and then sets the version tag to 
 
 sub commit {
 	my $self = shift;
-	foreach my $asset (@{$self->getAssets}) {
+	foreach my $asset (@{$self->getAssets({"reverse"=>1})}) {
 		$asset->commit;
 	}
 	$self->{_data}{isCommitted} = 1;
@@ -133,16 +133,26 @@ sub getAssetCount {
 
 #-------------------------------------------------------------------
 
-=head2 getAssets ( )
+=head2 getAssets ( [options] )
 
 Returns a list of asset objects that are part of this version tag.
+
+=head3 options
+
+A hash reference containing options to change the output.
+
+=head4 reverse
+
+A boolean that will reverse the order of the assets. The default is to return the assets in descending order.
 
 =cut
 
 sub getAssets {
 	my $self = shift;
+	my $options = shift;
 	my @assets = ();
-	my $sth = $self->session->db->read("select asset.assetId,asset.className,assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.tagId=? order by revisionDate desc", [$self->getId]);
+	my $direction = $options->{reverse} ? "asc" : "desc";
+	my $sth = $self->session->db->read("select asset.assetId,asset.className,assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.tagId=? order by revisionDate ".$direction, [$self->getId]);
 	while (my ($id,$class,$version) = $sth->array) {
 		push(@assets, WebGUI::Asset->new($self->session,$id,$class,$version));
 	}
