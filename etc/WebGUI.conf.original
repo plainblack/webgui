@@ -29,6 +29,9 @@
 # +3M = 3 Months
 # +10Y = 10 Years (default)
 
+# This may also be set to the word "session" to have cookies live
+# for the current browser session only.
+
 # "cookieTTL" : "+10Y",
 
 # The location where the WebGUI server will be handling
