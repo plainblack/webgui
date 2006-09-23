@@ -185,7 +185,7 @@ sub new {
 			$self->{_var}{expires} = $session->datetime->time() + $session->setting->get("sessionTimeout");
 			$self->session->{_sessionId} = $self->{_var}{sessionId};
 			$session->db->setRow("userSession","sessionId",$self->{_var});
-		} else {  ##Start a new session with the requested id.
+		} else {  ##Start a new default session with the requested, non-existant id.
 			$self->start(1,$sessionId);
 		}
 	}
