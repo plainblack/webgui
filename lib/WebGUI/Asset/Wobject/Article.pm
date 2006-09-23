@@ -145,7 +145,7 @@ sub definition {
 
 sub duplicate {
 	my $self = shift;
-	my $newAsset = $self->SUPER::duplicate(shift);
+	my $newAsset = $self->SUPER::duplicate(@_);
 	my $newStorage = $self->getStorageLocation->copy;
 	$newAsset->update({storageId=>$newStorage->getId});
 	return $newAsset;

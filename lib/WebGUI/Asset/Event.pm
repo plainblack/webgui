@@ -182,7 +182,7 @@ sub processPropertiesFromFormPost {
 					$start = $self->session->datetime->addToDate($self->get("eventStartDate"),($i*$interval),0,0);
 					$end = $self->session->datetime->addToDate($self->get("eventEndDate"),($i*$interval),0,0);
 				}
-				my $newEvent = $self->getParent->duplicate($self);
+				my $newEvent = $self->duplicate;
 				$newEvent->update({
 					eventStartDate=>$start,
 					eventEndDate=>$end

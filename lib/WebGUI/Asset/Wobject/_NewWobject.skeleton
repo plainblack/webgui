@@ -82,7 +82,7 @@ wobject instances, you will need to duplicate them here.
 
 sub duplicate {
 	my $self = shift;
-	my $newAsset = $self->SUPER::duplicate(shift);
+	my $newAsset = $self->SUPER::duplicate(@_);
 	return $newAsset;
 }
 

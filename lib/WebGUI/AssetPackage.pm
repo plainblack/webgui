@@ -183,7 +183,9 @@ sub importPackage {
 
 =head2 www_deployPackage ( ) 
 
-Returns "". Deploys a Package. If canEdit is Fales, renders an insufficient Privilege page. 
+Deploys the package referenced by the query parameter 'assetId' as a
+new child of the current asset.  Requires edit privileges on the
+current asset.
 
 =cut
 
@@ -201,7 +203,8 @@ sub www_deployPackage {
 		}
 		my $masterLineage = $packageMasterAsset->get("lineage");
                 if (defined $packageMasterAsset && $packageMasterAsset->canView && $self->get("lineage") !~ /^$masterLineage/) {
-			my $deployedTreeMaster = $self->duplicateBranch($packageMasterAsset);
+			my $deployedTreeMaster = $packageMasterAsset->duplicateBranch;
+			$deployedTreeMaster->setParent($self);
 			$deployedTreeMaster->update({isPackage=>0, styleTemplateId=>$self->get("styleTemplateId")});
 		}
 	}

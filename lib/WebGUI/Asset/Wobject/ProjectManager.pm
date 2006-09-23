@@ -153,13 +153,6 @@ sub definition {
 
 
 #-------------------------------------------------------------------
-sub duplicate {
-	my $self = shift;
-	my $newAsset = $self->SUPER::duplicate(shift);
-	return $newAsset;
-}
-
-#-------------------------------------------------------------------
 #API method called by Time Tracker to return the instance of the PM wobject which this project blongs
 sub getProjectInstance {
    my $class = shift;

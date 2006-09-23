@@ -495,7 +495,7 @@ sub definition {
 #-------------------------------------------------------------------
 sub duplicate {
 	my $self = shift;
-	my $newAsset = $self->SUPER::duplicate;
+	my $newAsset = $self->SUPER::duplicate(@_);
 	$newAsset->createSubscriptionGroup;
 	return $newAsset;
 }

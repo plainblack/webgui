@@ -82,13 +82,6 @@ sub definition {
 
 
 #-------------------------------------------------------------------
-sub duplicate {
-	my $self = shift;
-	my $newAsset = $self->SUPER::duplicate(shift);
-	return $newAsset;
-}
-
-#-------------------------------------------------------------------
 sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView();

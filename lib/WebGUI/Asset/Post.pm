@@ -81,7 +81,9 @@ sub addRevision {
 		isHidden => 1,
 		dateUpdated=>$now,
 		});
+
 	$newSelf->getThread->unmarkRead;
+
         return $newSelf;
 }
 
@@ -498,7 +500,7 @@ sub getTemplateVars {
 #-------------------------------------------------------------------
 sub getThread {
 	my $self = shift;
-	unless (exists $self->{_thread}) {
+	unless (defined $self->{_thread}) {
 		$self->{_thread} = WebGUI::Asset::Post::Thread->new($self->session, $self->get("threadId"));
 	}
 	return $self->{_thread};	
@@ -856,6 +858,14 @@ sub rate {
 			$u->karma($self->getThread->getParent->get("karmaRatingMultiplier"), "Post ".$self->getId." Rated by ".$self->session->user->userId, "Had post rated.");
 		}
 	}
+}
+
+#-------------------------------------------------------------------
+sub rethreadUnder {
+	my $self = shift;
+	my $thread = shift;
+	$self->update({threadId => $thread->getId});
+	delete $self->{_thread};
 }
 
 #-------------------------------------------------------------------

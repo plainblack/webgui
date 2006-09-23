@@ -139,7 +139,7 @@ sub duplicate {
 	
 	$self = shift;
 	
-	$newAsset = $self->SUPER::duplicate(shift);
+	$newAsset = $self->SUPER::duplicate(@_);
 	$newSurveyId = $self->session->id->generate();
 	$newAsset->update({
 		Survey_id=>$newSurveyId
@@ -172,13 +172,9 @@ sub duplicate {
 					$rdata->{Survey_questionId} = $qdata->{Survey_questionId};
 					$newAsset->setCollateral("Survey_questionResponse","Survey_responseId",$rdata,0,0);
 				}
-				$responses->finish;
 			}
-			$answers->finish;
 		}
-		$questions->finish;
 	}
-	$section->finish;
 
 	return $newAsset;
 }

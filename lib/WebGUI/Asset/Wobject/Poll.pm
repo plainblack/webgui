@@ -168,8 +168,8 @@ sub definition {
 #-------------------------------------------------------------------
 sub duplicate {
 	my $self = shift;
-	my $newAsset = $self->SUPER::duplicate(shift);
-	my $sth = $self->session->db->read("select * from Poll_answer where assetId=".$self->session->db->quote($self->getId));
+	my $newAsset = $self->SUPER::duplicate(@_);
+	my $sth = $self->session->db->read("select * from Poll_answer where assetId=?", [$self->getId]);
 	while (my $data = $sth->hashRef) {
 		$newAsset->setVote($data->{answer}, $data->{userId}, $data->{ipAddress});
 	}

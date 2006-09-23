@@ -38,31 +38,26 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 duplicateBranch ( [assetToDuplicate] )
+=head2 duplicateBranch ( )
 
-Duplicates an asset and all its descendants. Calls addChild with assetToDuplicate as an argument. Returns a new Asset object.
-
-=head3 assetToDuplicate
-
-The asset to duplicate. Defaults to self.
+Duplicates this asset and the entire subtree below it.  Returns the root of the new subtree.
 
 =cut
 
 sub duplicateBranch {
 	my $self = shift;
-	my $assetToDuplicate = shift || $self;
-	my $newAsset = $assetToDuplicate->duplicate();
-	$newAsset->setParent($self);
-	my $contentPositions;
-	$contentPositions = $assetToDuplicate->get("contentPositions");
-	foreach my $child (@{$assetToDuplicate->getLineage(["children"],{returnObjects=>1})}) {
-		my $newChild = $newAsset->duplicateBranch($child);
+	my $newAsset = $self->duplicate;
+	my $contentPositions = $self->get("contentPositions");
+
+	foreach my $child (@{$self->getLineage(["children"],{returnObjects=>1})}) {
+		my $newChild = $child->duplicateBranch;
+		$newChild->setParent($newAsset);
 		if ($contentPositions) {
-			my $newChildId = $newChild->getId;
-			my $oldChildId = $child->getId;
-			$contentPositions =~ s/${oldChildId}/${newChildId}/g;
+			my ($oldChildId, $newChildId) = ($child->getId, $newChild->getId);
+			$contentPositions =~ s/\Q${oldChildId}\E/${newChildId}/g;
 		}
 	}
+
 	$newAsset->update({contentPositions=>$contentPositions}) if $contentPositions;
 	return $newAsset;
 }

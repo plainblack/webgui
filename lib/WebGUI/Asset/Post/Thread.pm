@@ -26,9 +26,7 @@ our @ISA = qw(WebGUI::Asset::Post);
 sub addRevision {
         my $self = shift;
         my $newSelf = $self->SUPER::addRevision(@_);
-	if ($newSelf->get("subscriptionGroupId") eq "") {
-		$newSelf->createSubscriptionGroup;
-	}
+	$newSelf->createSubscriptionGroup;
         return $newSelf;
 }
 
@@ -60,6 +58,22 @@ sub commit {
 	if ($self->isNew) {
         	$self->getParent->incrementThreads($self->get("dateUpdated"),$self->getId);
 	}
+}
+
+#-------------------------------------------------------------------
+# Override duplicateBranch here so that new posts get their threadId set correctly.
+# Buggo: should this be part of the addRevision override instead?
+
+sub duplicateBranch {
+	my $self = shift;
+	my $newAsset = $self->SUPER::duplicateBranch(@_);
+
+	foreach my $post (@{$newAsset->getPosts}) {
+		$post->rethreadUnder($newAsset);
+	}
+	$newAsset->normalizeLastPost;
+
+	return $newAsset;
 }
 
 #-------------------------------------------------------------------
@@ -590,6 +604,13 @@ sub setLastPost {
         my $date = shift;
         $self->update({lastPostId=>$id, lastPostDate=>$date});
         $self->getParent->setLastPost($id,$date);
+}
+
+sub normalizeLastPost {
+	my $self = shift;
+	# Hmm.  Is this right?
+	my ($lastPostId, $lastPostDate) = $self->session->db->quickArray("SELECT a.assetId, a.creationDate FROM asset as a INNER JOIN Post as t ON a.assetId = t.assetId WHERE t.threadId = ? ORDER BY a.creationDate DESC LIMIT 1", [$self->getId]);
+	$self->setLastPost($lastPostId, $lastPostDate);
 }
 
 

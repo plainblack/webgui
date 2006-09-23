@@ -156,55 +156,35 @@ sub definition {
 
 #-------------------------------------------------------------------
 sub duplicate {
-   my $self = shift;
-   my $newAsset = $self->SUPER::duplicate(shift);
-   
-   my (%data, $file, $row, $sth, $newstore);
-   tie %data, 'Tie::CPHash';
-   
-   $self->_duplicateFile($newAsset,"image1");
-   $self->_duplicateFile($newAsset,"image2");
-   $self->_duplicateFile($newAsset,"image3");
-   $self->_duplicateFile($newAsset,"manual");
-   $self->_duplicateFile($newAsset,"brochure");
-   $self->_duplicateFile($newAsset,"warranty");
-  
-   $sth = $self->session->db->read("select * from Product_feature where assetId=".$self->session->db->quote($self->getId));
-   while ($row = $sth->hashRef) {
-      $row->{"Product_featureId"} = "new";
-	  $row->{"assetId"} = $newAsset->getId; 
-	  $newAsset->setCollateral("Product_feature","Product_featureId",$row);
-   }
-   $sth->finish;
-   
-   $sth = $self->session->db->read("select * from Product_benefit where assetId=".$self->session->db->quote($self->getId));
-   while ($row = $sth->hashRef) {
-      $row->{"Product_benefitId"} = "new";
-	  $row->{"assetId"} = $newAsset->getId; 
-      $newAsset->setCollateral("Product_benefit","Product_benefitId",$row);
-   }
-   $sth->finish;
-   
-   $sth = $self->session->db->read("select * from Product_specification where assetId=".$self->session->db->quote($self->getId));
-   while ($row = $sth->hashRef) {
-      $row->{"Product_specificationId"} = "new";
-	  $row->{"assetId"} = $newAsset->getId; 
-      $newAsset->setCollateral("Product_specification","Product_specificationId",$row);
-   }
-   $sth->finish;
-   
-   $sth = $self->session->db->read("select * from Product_accessory where assetId=".$self->session->db->quote($self->getId));
-   while (%data = $sth->hash) {
-      $self->session->db->write("insert into Product_accessory (assetId,accessoryAssetId,sequenceNumber) values (".$self->session->db->quote($newAsset->getId).", ".$self->session->db->quote($data{accessoryAssetId}).", $data{sequenceNumber})");
-   }
-   $sth->finish;
+	my $self = shift;
+	my $newAsset = $self->SUPER::duplicate(@_);
 
-   $sth = $self->session->db->read("select * from Product_related where assetId=".$self->session->db->quote($self->getId));
-   while (%data = $sth->hash) {
-      $self->session->db->write("insert into Product_related (assetId,relatedAssetId,sequenceNumber) values (".$self->session->db->quote($newAsset->getId).", ".$self->session->db->quote($data{relatedAssetId}).", $data{sequenceNumber})");
-   }
-   $sth->finish;
-   return $newAsset;
+	foreach my $file ('image1', 'image2', 'image3', 'manual', 'brochure', 'warranty') {
+		$self->_duplicateFile($newAsset, $file);
+	}
+
+	foreach my $basename ('feature', 'benefit', 'specification') {
+		my $table = "Product_${basename}";
+		my $sth = $self->session->db->read("select * from $table where assetId=?", [$self->getId]);
+		while (my $row = $sth->hashRef) {
+			$row->{"${table}Id"} = "new";
+			$row->{"assetId"} = $newAsset->getId; 
+			$newAsset->setCollateral($table, "${table}Id", $row);
+		}
+	}
+   
+	foreach my $basename ('accessory', 'related') {
+		my $table = "Product_${basename}";
+		my $tableAssetId = "${basename}AssetId";
+		my $sth = $self->session->db->read("select * from $table where assetId=?", [$self->getId]);
+		my %data;
+		tie %data, 'Tie::CPHash';
+		while (%data = $sth->hash) {
+			$self->session->db->write("insert into $table (assetId, $tableAssetId, sequenceNumber) values (?, ?, ?)", [$newAsset->getId, $data{$tableAssetId}, $data{sequenceNumber}]);
+		}
+	}
+
+	return $newAsset;
 }
 
 

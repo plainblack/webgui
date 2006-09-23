@@ -136,22 +136,6 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 duplicate ( )
-
-   This method exists for demonstration purposes only.  The superclass
-   handles duplicating ZipArchive Assets.  This method will be called 
-   whenever a copy action is executed
-
-=cut
-
-sub duplicate {
-	my $self = shift;
-	my $newAsset = $self->SUPER::duplicate(shift);
-	return $newAsset;
-}
-
-#-------------------------------------------------------------------
-
 =head2 prepareView ( )
 
 See WebGUI::Asset::prepareView() for details.

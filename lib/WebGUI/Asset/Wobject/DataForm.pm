@@ -182,30 +182,30 @@ sub definition {
 #-------------------------------------------------------------------
 sub duplicate {
 	my $self = shift;
-	my $newAsset = $self->SUPER::duplicate(shift);
-       my (%dataField, %dataTab, $sthField, $sthTab, $newTabId);
-       tie %dataTab, 'Tie::CPHash';
-       tie %dataField, 'Tie::CPHash';
-       $sthTab = $self->session->db->read("select * from DataForm_tab where assetId=".$self->session->db->quote($self->getId));
-       while (%dataTab = $sthTab->hash) {
-               $sthField = $self->session->db->read("select * from DataForm_field where assetId=".$self->session->db->quote($self->getId)." AND DataForm_tabId=".$self->session->db->quote($dataTab{DataForm_tabId}));
-               $dataTab{DataForm_tabId} = "new";
-               $newTabId = $newAsset->setCollateral("DataForm_tab","DataForm_tabId",\%dataTab);
-               while (%dataField = $sthField->hash) {
-                       $dataField{DataForm_fieldId} = "new";
-                       $dataField{DataForm_tabId} = $newTabId;
-                       $newAsset->setCollateral("DataForm_field","DataForm_fieldId",\%dataField);
-               }
-               $sthField->finish;
-       }
-       $sthField = $self->session->db->read("select * from DataForm_field where assetId=".$self->session->db->quote($self->getId)." AND DataForm_tabId='0'");
-       while (%dataField = $sthField->hash) {
-               $dataField{DataForm_fieldId} = "new";
-               $newAsset->setCollateral("DataForm_field","DataForm_fieldId",\%dataField);
-       }
-       $sthField->finish;
-       $sthTab->finish;
-       return $newAsset;
+	my $newAsset = $self->SUPER::duplicate(@_);
+	my (%dataField, %dataTab, $sthField, $sthTab, $newTabId);
+	tie %dataTab, 'Tie::CPHash';
+	tie %dataField, 'Tie::CPHash';
+
+	$sthTab = $self->session->db->read("select * from DataForm_tab where assetId=?", [$self->getId]);
+	while (%dataTab = $sthTab->hash) {
+		$sthField = $self->session->db->read("select * from DataForm_field where assetId=? AND DataForm_tabId=?", [$self->getId, $dataTab{DataForm_tabId}]);
+		$dataTab{DataForm_tabId} = "new";
+		$newTabId = $newAsset->setCollateral("DataForm_tab","DataForm_tabId",\%dataTab);
+		while (%dataField = $sthField->hash) {
+			$dataField{DataForm_fieldId} = "new";
+			$dataField{DataForm_tabId} = $newTabId;
+			$newAsset->setCollateral("DataForm_field","DataForm_fieldId",\%dataField);
+		}
+	}
+
+	$sthField = $self->session->db->read("select * from DataForm_field where assetId=? AND DataForm_tabId='0'", [$self->getId]);
+	while (%dataField = $sthField->hash) {
+		$dataField{DataForm_fieldId} = "new";
+		$newAsset->setCollateral("DataForm_field","DataForm_fieldId",\%dataField);
+	}
+
+	return $newAsset;
 }
 
 #-------------------------------------------------------------------

@@ -61,26 +61,19 @@ sub cut {
 
 #-------------------------------------------------------------------
 
-=head2 duplicate ( [assetToDuplicate] )
+=head2 duplicate ( )
 
-Duplicates an asset. Calls addChild with assetToDuplicate as an arguement. Returns a new Asset object.
-
-=head3 assetToDuplicate
-
-If not supplied, defaults to self.
+Duplicates this asset, returning the new asset.
 
 =cut
 
 sub duplicate {
         my $self = shift;
-        my $assetToDuplicate = shift || $self;
-        my $newAsset = $self->addChild($assetToDuplicate->get);
-        my $sth = $self->session->db->read("select * from metaData_values where assetId = ".$self->session->db->quote($assetToDuplicate->getId));
-        while( my $h = $sth->hashRef) {
-                $self->session->db->write("insert into metaData_values (fieldId, assetId, value) values (".
-                                        $self->session->db->quote($h->{fieldId}).",".$self->session->db->quote($newAsset->getId).",".$self->session->db->quote($h->{value}).")");
+        my $newAsset = $self->getParent->addChild($self->get);
+        my $sth = $self->session->db->read("select * from metaData_values where assetId = ?", [$self->getId]);
+        while (my $h = $sth->hashRef) {
+                $self->session->db->write("insert into metaData_values (fieldId, assetId, value) values (?, ?, ?)", [$h->{fieldId}, $newAsset->getId, $h->{value}]);
         }
-        $sth->finish;
         return $newAsset;
 }
 
@@ -291,7 +284,6 @@ sub www_duplicateList {
 		if ($asset->canEdit) {
 			my $newAsset = $asset->duplicate;
 			$newAsset->update({ title=>$newAsset->getTitle.' (copy)'});
-			$newAsset->setParent($asset->getParent);
 		}
 	}
 	if ($self->session->form->process("proceed") ne "") {
