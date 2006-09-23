@@ -17,6 +17,7 @@
  - structure: normalize signature of Asset::duplicate method
  - fix: Copying Collaboration System assets fails
  - fix: Collaboration System packages do not deploy
+ - fix: robots.txt returns wrong MIME type
 
 7.0.7
  - rfe: Image Management (funded by Formation Design Systems)

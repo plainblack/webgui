@@ -19,6 +19,7 @@ my $quiet; # this line required
 
 
 my $session = start(); # this line required
+fixRobotsTxtMimeType($session);
 
 # upgrade functions go here
 
@@ -32,7 +33,22 @@ finish($session); # this line required
 #	# and here's our code
 #}
 
+sub fixRobotsTxtMimeType {
+	my $session = shift;
+	print "\tFixing MIME type of robots.txt snippet.\n" unless $quiet;
 
+	my $asset = WebGUI::Asset->newByDynamicClass($session, 'pbrobot000000000000001');
+	unless (defined $asset) {
+		print "\t\tCouldn't find it; skipping this.\n";
+		return;
+	}
+	unless ($asset->isa('WebGUI::Asset::Snippet')) {
+		print "\t\tWrong asset class; skipping this.\n";
+		return;
+	}
+
+	$asset->update({mimeType => 'text/plain'});
+}
 
 # ---- DO NOT EDIT BELOW THIS LINE ----
 
