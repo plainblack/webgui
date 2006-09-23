@@ -18,6 +18,7 @@
  - fix: Copying Collaboration System assets fails
  - fix: Collaboration System packages do not deploy
  - fix: robots.txt returns wrong MIME type
+ - change: overlong alternate text for Weather Data icons shortened to basename
 
 7.0.7
  - rfe: Image Management (funded by Formation Design Systems)
