@@ -1270,9 +1270,7 @@ not using the complete <b>searchForm</b>.|,
 	'searchFormJavascript' => {
 		message => q|Only used for advanced search. This links the SQLFormSearch.js file and contains some inline javascript that is used by advanced search. If you are
 not using the complete <b>searchForm</b> you must include this variable
-for adUse of uninitialized value in exists at varify.pl line 62, <> chunk 26.
-Use of uninitialized value in printf at varify.pl line 63, <> chunk 26.
-vanced search. If you do use the complete <b>searchForm</b>
+for advanced search. If you do use the complete <b>searchForm</b>
 variable, however, you must not use the <b>searchFormJavascript</b> variable.|,
 		lastUpdated => 1149822982,
 	},

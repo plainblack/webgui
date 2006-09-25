@@ -227,7 +227,7 @@ sub www_exportGenerate {
 	$newSession->user({userId=>$userId});
 	foreach my $asset (@{$assets}) {
 		my $url = $asset->get("url");
-		$self->session->output->print ( printf($i18n->get('exporting page')), $url);
+		$self->session->output->print ( sprintf($i18n->get('exporting page')), $url);
 		unless ($asset->canView($userId)) {
 			$self->session->output->print ($i18n->get('bad user privileges')."\n");
 			next;
@@ -250,14 +250,14 @@ sub www_exportGenerate {
 			$path = $self->session->config->get("exportPath") . "/" . $path;
 			eval { mkpath($path) };
 			if($@) {
-				$self->session->output->print(printf($i18n->get('could not create path'), $path, $@), 1);
+				$self->session->output->print(sprintf($i18n->get('could not create path'), $path, $@), 1);
 				return;
 			}
 		} 
 		$path .= "/".$filename;
                 my $file = eval { FileHandle->new(">".$path) or die "$!" };
 		if ($@) {
-			$self->session->output->print(printf($i18n->get('could not open path'), $path, $@),1);
+			$self->session->output->print(sprintf($i18n->get('could not open path'), $path, $@),1);
 			return;
 		} else {
 			$newSession->output->setHandle($file);
@@ -271,7 +271,7 @@ sub www_exportGenerate {
 	}
 	$newSession->var->end;
 	$newSession->close;
-	$self->session->output->print(printf($i18n->get('export information'), scalar(@{$assets}), ($self->session->datetime->time()-$startTime)),1);
+	$self->session->output->print(sprintf($i18n->get('export information'), scalar(@{$assets}), ($self->session->datetime->time()-$startTime)),1);
 	$self->session->output->print('<a target="_parent" href="'.$self->getUrl.'">'.$i18n->get(493,'WebGUI').'</a>');
 	return;
 }

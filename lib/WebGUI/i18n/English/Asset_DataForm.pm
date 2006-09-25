@@ -456,9 +456,7 @@ below to see which template variables may be used inside this loop.|,
 	},
 
 	'tab.field.form' => {
-		message => q|The form element for this Use of uninitialized value in exists at varify.pl line 61, <> chunk 64.
-Use of uninitialized value in printf at varify.pl line 62, <> chunk 64.
-field.|,
+		message => q|The form element for this field.|,
 		lastUpdated => 1149392054,
 	},
 
