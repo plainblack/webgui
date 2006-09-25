@@ -15,8 +15,43 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 19; # increment this value for each test you create
+my @getRefererUrlTests = (
+	{
+		input => undef,
+		output => undef,
+		comment => 'getRerererUrl returns undef unless there is a referrer',
+	},
+	{
+		input => 'http://www.domain.com/myUrl.html',
+		output => 'myUrl.html',
+		comment => 'getRefererUrl returns the url minus the gateway',
+	},
+	{
+		input => 'http://www.domain.com/myUrl.html?op=switchAdminOn',
+		output => 'myUrl.html',
+		comment => 'getRefererUrl returns the url minus the gateway',
+	},
+	{
+		input => 'https://www.site.com/myUrl.html',
+		output => 'myUrl.html',
+		comment => 'getRefererUrl handles SSL urls',
+	},
+	{
+		input => 'itunes://www.site.com/myUrl.html',
+		output => undef,
+		comment => 'getRefererUrl only handles HTTP protocols',
+	},
+	{
+		input => 'http://site/myUrl.html',
+		output => 'myUrl.html',
+		comment => 'getRefererUrl will also parse weird URLs',
+	},
+);
+
+use Test::More;
+use Test::MockObject::Extends;
 use Test::MockObject;
+plan tests => 21 + scalar(@getRefererUrlTests);
 
 my $session = WebGUI::Test->session;
 
@@ -28,13 +63,11 @@ $session->setting->set('preventProxyCache', 0) if ($preventProxyCache);
 my $url = 'http://localhost.localdomain/foo';
 my $url2;
 
-
 $url2 = $session->url->append($url,'a=b');
 is( $url2, $url.'?a=b', 'append first pair');
 
 $url2 = $session->url->append($url2,'c=d');
 is( $url2, $url.'?a=b;c=d', 'append second pair');
-
 
 $session->config->{_config}->{'gateway'} = '/';
 
@@ -105,3 +138,18 @@ is ($session->url->page, '/path1/file1', 'page with no args returns getRequested
 
 $url2 = 'http://'.$session->config->get('sitename')->[0].'/path1/file1';
 is ($session->url->page('',1), $url2, 'page, withFullUrl includes method and sitename');
+
+##getReferrerUrl tests
+
+our %mockEnv = (HTTP_REFERER => undef);
+
+$session->{_env}->{_env} = \%mockEnv;
+
+$mockEnv{'HTTP_REFERER'} = 'test';
+
+is($session->env->get('HTTP_REFERER'), 'test', 'testing MockObject');
+
+foreach my $test (@getRefererUrlTests) {
+	$mockEnv{HTTP_REFERER} = $test->{input};
+	is($session->url->getRefererUrl, $test->{output}, $test->{comment});
+}

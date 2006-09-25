@@ -67,7 +67,7 @@ sub add {
 	my $name = shift;
 	my $value = shift;
 	$self->{_settings}{$name} = $value;
-	$self->session->db->write("insert into settings (name,value) values (".$self->session->db->quote($name).",".$self->session->db->quote($value).")");
+	$self->session->db->write("insert into settings (name,value) values (?,?)",[$name, $value]);
 }
 
 #-------------------------------------------------------------------
@@ -136,7 +136,7 @@ sub remove {
 	my $self = shift;
 	my $name = shift;
 	delete $self->{_settings}{$name};
-	$self->session->db->write("delete from settings where name=".$self->session->db->quote($name));
+	$self->session->db->write("delete from settings where name=?",[$name]);
 }
 
 
@@ -175,7 +175,7 @@ sub set {
 	my $name = shift;
 	my $value = shift;
 	$self->{_settings}{$name} = $value;
-	$self->session->db->write("update settings set value=".$self->session->db->quote($value)." where name=".$self->session->db->quote($name));
+	$self->session->db->write("update settings set value=? where name=?",[$value, $name]);
 }
 
 

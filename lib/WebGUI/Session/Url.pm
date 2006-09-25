@@ -189,8 +189,8 @@ sub getRefererUrl {
 	return undef unless ($referer);
 	my $url = $referer;
 	my $gateway = $self->session->config->get("gateway");
-	$url =~ s/htt\w+\:\/\/[A-Za-z0-9\.\-]+$gateway\/*(\S*)/$1/;;
-	if ($url eq $referer) {
+	$url =~ s{https?://[A-Za-z0-9\.-]+$gateway/*([^?]*)\??.*$}{$1};
+	if ($url eq $referer) { ##s/// failed
 		return undef;
 	} else {
 		return $url;
