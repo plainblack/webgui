@@ -212,7 +212,7 @@ sub getRequestedUrl {
 	unless ($self->{_requestedUrl}) {
 		$self->{_requestedUrl} = $self->session->request->uri;
 		my $gateway = $self->session->config->get("gateway");
-		$self->{_requestedUrl} =~ s/^$gateway(.*)$/$1/;
+		$self->{_requestedUrl} =~ s/^$gateway([^?]*)\??.*$/$1/;
 	}
 	return $self->{_requestedUrl};
 }
@@ -367,7 +367,7 @@ sub session {
 
 =head2 setSiteURL ( )
 
-Sets an alternate site url.
+Sets an alternate site url for this session variable.
 
 =cut
 

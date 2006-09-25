@@ -134,6 +134,12 @@ is ($session->url->getRequestedUrl, 'path1/file1', 'getRequestedUrl, fetch');
 $requestedUrl = '/path2/file2';
 is ($session->url->getRequestedUrl, 'path1/file1', 'getRequestedUrl, check cache of previous result');
 
+$session->url->{_requestedUrl} = undef;  ##Manually clear cached value
+$requestedUrl = '/path2/file2?param1=one;param2=two';
+is ($session->url->getRequestedUrl, 'path2/file2', 'getRequestedUrl, does not return params');
+
+$session->url->{_requestedUrl} = undef;  ##Manually clear cached value
+$requestedUrl = '/path1/file1';
 is ($session->url->page, '/path1/file1', 'page with no args returns getRequestedUrl through gateway');
 
 $url2 = 'http://'.$session->config->get('sitename')->[0].'/path1/file1';
@@ -141,7 +147,7 @@ is ($session->url->page('',1), $url2, 'page, withFullUrl includes method and sit
 
 ##getReferrerUrl tests
 
-our %mockEnv = (HTTP_REFERER => undef);
+our %mockEnv = %ENV;
 
 $session->{_env}->{_env} = \%mockEnv;
 
