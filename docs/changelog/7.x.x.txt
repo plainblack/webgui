@@ -24,6 +24,9 @@
  - fix: changeUrlConfirm returns to previous URL rather than new URL
  - fix: performance indicators interfering with CSS
  - fix: admin bar causes pages to extend forever
+ - fix: File Upload - documented HTTP file upload size limitations in File
+   Pile Assets Hover help as well as the WebGUI settings documentation for Max
+   Upload size.
 
 7.0.7
  - rfe: Image Management (funded by Formation Design Systems)
