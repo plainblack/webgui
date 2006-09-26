@@ -47,7 +47,7 @@ have the following properties:</p>
         },
 
         'upload files description' => {
-                message => q|<p>This is where files can be uploaded from your computer.  You can upload to to 100 files at a time.
+                message => q|<p>This is where files can be uploaded from your computer.  You can upload to to 100 files at a time.  File sizes should not exceed 100MB in size.
 </p>|,
                 lastUpdated => 1139206282,
         },

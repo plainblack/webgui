@@ -3516,7 +3516,7 @@ that Asset and all Assets below it.</p>
         },
 
         '130 description' => {
-                message => q|The size (in kilobytes) of the maximum allowable attachment to be uploaded to your system. |,
+                message => q|The size (in kilobytes) of the maximum allowable attachment to be uploaded to your system. Due to the nature of the HTTP Protocol, 100MB is the largest practical file size you can expect to upload via WebGUI's web interface. |,
                 lastUpdated => 1120239343,
         },
 
