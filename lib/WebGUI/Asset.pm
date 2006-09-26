@@ -1388,10 +1388,12 @@ sub new {
 	my $session = shift;
 	my $assetId = shift;
 	my $className = shift;
+
 	unless (defined $assetId) {
 		$session->errorHandler->error("Asset constructor new() requires an assetId.");
 		return undef;
 	}
+
 	my $assetRevision = $session->stow->get("assetRevision");
 	my $revisionDate = shift || $assetRevision->{$assetId}{$session->scratch->get("versionTag")||'_'};
 	unless ($revisionDate) {
@@ -1402,6 +1404,15 @@ sub new {
 		$session->stow->set("assetRevision",$assetRevision);
 	}
 	return undef unless ($revisionDate);
+
+	unless ($class ne 'WebGUI::Asset' or defined $className) {
+		($className) = $session->db->quickArray("select className from asset where assetId=?", [$assetId]);
+		unless ($className) {
+			$session->errorHandler->error("Couldn't instantiate asset: ".$assetId. ": couldn't find class name");
+			return undef;
+		}
+	}
+
         if ($className) {
 		my $cmd = "use ".$className;
         	eval ($cmd);
@@ -1411,6 +1422,7 @@ sub new {
 		}
 		$class = $className;
 	}
+
 	my $cache = WebGUI::Cache->new($session, ["asset",$assetId,$revisionDate]);
 	my $properties = $cache->get;
 	if (exists $properties->{assetId}) {

@@ -20,6 +20,7 @@
  - fix: robots.txt returns wrong MIME type
  - change: overlong alternate text for Weather Data icons shortened to basename
  - fix: multiple problems with static export, including wrong asset context and wrong status messages
+ - fix: WebGUI::Asset->new interacting badly with caching
 
 7.0.7
  - rfe: Image Management (funded by Formation Design Systems)
