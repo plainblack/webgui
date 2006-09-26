@@ -27,6 +27,10 @@
  - fix: File Upload - documented HTTP file upload size limitations in File
    Pile Assets Hover help as well as the WebGUI settings documentation for Max
    Upload size.
+ - Eliminated several hundred queries to the database during certain user
+   profile field options.
+ - Fixed the search function that broke in 7.0.7.
+
 
 7.0.7
  - rfe: Image Management (funded by Formation Design Systems)

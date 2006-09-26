@@ -7,6 +7,14 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.0.8
+--------------------------------------------------------------------
+ * 7.0.7 was released with a critical bug that broke the search engine
+   for many sites, but not all. This bug has been corrected and tests
+   have been written to help ensure it doesn't happen again. However,
+   as a result you must rerun the search indexer program (sbin/search.pl)
+   on all your sites.
+
 
 7.0.4
 --------------------------------------------------------------------

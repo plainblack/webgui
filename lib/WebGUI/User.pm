@@ -439,7 +439,10 @@ sub profileField {
 	$self = shift;
         $fieldName = shift;
         $value = shift;
-	die "No such profile field: $fieldName" unless $self->session->db->quickArray("SELECT COUNT(*) FROM userProfileField WHERE fieldName = ?", [$fieldName]);
+	if (!exists $self->{_profile}{$fieldName} && !$self->session->db->quickArray("SELECT COUNT(*) FROM userProfileField WHERE fieldName = ?", [$fieldName])) {
+		$self->session->warn("No such profile field: $fieldName");
+		return undef;
+	}
 	if (defined $value) {
 		$self->uncache;
 		$self->{_profile}{$fieldName} = $value;

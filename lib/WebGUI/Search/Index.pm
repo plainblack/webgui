@@ -131,10 +131,10 @@ sub create {
 #-------------------- added by zxp end
 
 	my $add = $self->session->db->prepare("insert into assetIndex (assetId, title, url, creationDate, revisionDate, 
-		ownerUserId, groupIdView, groupIdEdit, className, synopsis, keywords) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+		ownerUserId, groupIdView, groupIdEdit, lineage, className, synopsis, keywords) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )");
 	$add->execute([$asset->getId, $asset->get("title"), $asset->get("url"), $asset->get("creationDate"),
 		$asset->get("revisionDate"), $asset->get("ownerUserId"), $asset->get("groupIdView"), $asset->get("groupIdEdit"), 
-		$asset->get("className"), $synopsis, $keywords]);
+		$asset->get("lineage"), $asset->get("className"), $synopsis, $keywords]);
 	return $self;
 }
 

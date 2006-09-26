@@ -20,19 +20,21 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 fixRobotsTxtMimeType($session);
+fixSearch();
 
 # upgrade functions go here
 
 finish($session); # this line required
 
 
-##-------------------------------------------------
-#sub exampleFunction {
-#	my $session = shift;
-#	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
-#	# and here's our code
-#}
+#-------------------------------------------------
+sub fixSearch {
+	print "\tFixing search.\n" unless ($quiet);
+	$session->db->write("alter table assetIndex add column lineage varchar(255)");
 
+}
+
+#-------------------------------------------------
 sub fixRobotsTxtMimeType {
 	my $session = shift;
 	print "\tFixing MIME type of robots.txt snippet.\n" unless $quiet;
