@@ -21,6 +21,9 @@
  - change: overlong alternate text for Weather Data icons shortened to basename
  - fix: multiple problems with static export, including wrong asset context and wrong status messages
  - fix: WebGUI::Asset->new interacting badly with caching
+ - fix: changeUrlConfirm returns to previous URL rather than new URL
+ - fix: performance indicators interfering with CSS
+ - fix: admin bar causes pages to extend forever
 
 7.0.7
  - rfe: Image Management (funded by Formation Design Systems)

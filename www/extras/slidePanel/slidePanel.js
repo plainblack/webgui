@@ -92,7 +92,8 @@ function sp_draw() {
 	var c=3;
 
 	//slide panel 
-	document.write('<div id="slidePanel" style="width:'+this.width+'px">');
+	document.write('<div id="slidePanel" style="width:'+this.width+'px; ');
+	document.write('height:'+this.height+'px; overflow:hidden">');
     	document.write('<div class="slidePanel" id="'+this.name+'" style="left:');
     	document.write(this.xpos+'px; top:'+this.ypos+'px; width:'+this.width);
     	document.write('px; height:'+this.height+'px; ')
@@ -231,7 +232,7 @@ function createSlidePanelBar(name) {
   	this.ypos=0;                            // bar y-pos
   	this.width=160;                       // bar width
   	//this.height=((navigator.appVersion.indexOf("MSIE ") == -1)?innerHeight:document.body.offsetHeight)-10;                     // bar height
-	this.height=((navigator.appVersion.indexOf("MSIE ") == -1)?innerHeight:docElement.offsetHeight)-10;                     // bar height
+	this.height=((navigator.appVersion.indexOf("MSIE ") == -1)?innerHeight:docElement.offsetHeight)*0.95;                   // bar height
   	this.buttonspace=slidePanelButtonHeight-1;                     // distance of panel buttons
   	this.panels=new Array();                 // panels
   	this.addPanel=sp_addPanel;               // add new panel to bar

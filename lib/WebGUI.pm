@@ -107,7 +107,16 @@ sub contentHandler {
 			if ($output =~ /<\/title>/) {
 				$output =~ s/<\/title>/ : ${t} seconds<\/title>/i;
 			} else {
-				$session->output->print("\nPage generated in $t seconds.\n");
+				# Kludge.
+				my $mimeType = $session->http->getMimeType();
+				if ($mimeType eq 'text/css') {
+					$session->output->print("\n/* Page generated in $t seconds. */\n");
+				} elsif ($mimeType eq 'text/html') {
+					$session->output->print("\nPage generated in $t seconds.\n");
+				} else {
+					# Don't apply to content when we don't know how
+					# to modify it semi-safely.
+				}
 			}
 		} else {
 			$output = page($session);

@@ -1925,9 +1925,15 @@ sub www_changeUrlConfirm {
                         $old->purgeRevision if defined $old;
                 }
 	}
+
 	if ($self->session->form->param("proceed") eq "manageAssets") {
-		return $self->www_manageAssets;
+		$self->session->http->setRedirect($self->getUrl('func=manageAssets'));
+		return 'redirect';
+	} else {
+		$self->session->http->setRedirect($self->getUrl());
+		return 'redirect';
 	}
+
 	return undef;
 }
 
