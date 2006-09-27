@@ -31,6 +31,7 @@
    profile field options.
  - Fixed the search function that broke in 7.0.7.
  - fix: typo + obsolete approve section in Collaboration System Default Thread template
+ - fix: attachments section of post form not working correctly on edit
 
 7.0.7
  - rfe: Image Management (funded by Formation Design Systems)

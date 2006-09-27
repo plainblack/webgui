@@ -160,9 +160,9 @@ sub toHtml {
 	my $i18n = WebGUI::International->new($self->session);
 	my $uploadControl = undef;
 	my $storage = WebGUI::Storage::Image->get($self->session, $self->get("value")) if ($self->get("value"));
-	my @files = $storage->getFiles if (defined $storage);
-	my $maxFiles = $self->get('maxAttachments') - scalar(@files);
-	if ($maxFiles > 0) {
+	my @files = defined($storage)? @{$storage->getFiles} : ();
+	my $maxNewFiles = $self->get('maxAttachments') - scalar(@files);
+	if ($maxNewFiles > 0) {
         	$self->session->style->setScript($self->session->url->extras('/FileUploadControl.js'),{type=>"text/javascript"});
         	$uploadControl = '<script type="text/javascript">
                 	var fileIcons = new Array();
@@ -179,23 +179,21 @@ sub toHtml {
         	}
         	$uploadControl .= sprintf q!var uploader = new FileUploadControl("%s", fileIcons, "%s","%d");
         	uploader.addRow();
-        	</script>!, $self->get("name"), $i18n->get("removeLabel"), $maxFiles;
+        	</script>!, $self->get("name"), $i18n->get("removeLabel"), $maxNewFiles;
 		$uploadControl .= WebGUI::Form::Hidden->new($self->session, {-name => $self->privateName('action'), -value => 'upload'})->toHtml()."<br />";
 	} else {
 		$uploadControl .= WebGUI::Form::Hidden->new($self->session, {-name => $self->get("name"), -value => $self->get("value")})->toHtml()."<br />";
 		$uploadControl .= WebGUI::Form::Hidden->new($self->session, {-name => $self->privateName('action'), -value => 'keep'})->toHtml()."<br />";
 	}
-	if (scalar(@files)) {
-		foreach my $file (@{$storage->getFiles}) {
-			if ($self->get("deleteFileUrl")) {
-				$uploadControl .= '<p style="display:inline;vertical-align:middle;"><a href="'.$self->get("deleteFileUrl").$file.'">'
-				.'<img src="'.$self->session->icon->getBaseURL().'delete.gif" style="vertical-align:middle;border: 0px;" alt="x" /></a></p> ';
-			}
-			my $image = $storage->isImage($file) ? $storage->getThumbnailUrl($file) : $storage->getFileIconUrl($file);
-			$uploadControl .= '<p style="display:inline;vertical-align:middle;"><a href="'.$storage->getUrl($file).'">'
-       				.'<img src="'.$image.'" style="vertical-align:middle;border: 0px;" alt="'
-				.$file.'" /> '.$file.'</a></p><br />';
+	foreach my $file (@files) {
+		if ($self->get("deleteFileUrl")) {
+			$uploadControl .= '<p style="display:inline;vertical-align:middle;"><a href="'.$self->get("deleteFileUrl").$file.'">'
+			    .'<img src="'.$self->session->icon->getBaseURL().'delete.gif" style="vertical-align:middle;border: 0px;" alt="x" /></a></p> ';
 		}
+		my $image = $storage->isImage($file) ? $storage->getThumbnailUrl($file) : $storage->getFileIconUrl($file);
+		$uploadControl .= '<p style="display:inline;vertical-align:middle;"><a href="'.$storage->getUrl($file).'">'
+		    .'<img src="'.$image.'" style="vertical-align:middle;border: 0px;" alt="'
+			.$file.'" /> '.$file.'</a></p><br />';
 	}
         return $uploadControl;
 }
