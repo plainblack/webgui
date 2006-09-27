@@ -30,8 +30,12 @@ finish($session); # this line required
 #-------------------------------------------------
 sub fixSearch {
 	print "\tFixing search.\n" unless ($quiet);
-	$session->db->write("alter table assetIndex add column lineage varchar(255)");
-
+	my $sth = $session->db->read("describe assetIndex lineage");
+	my $exists = $sth->rows;
+	$sth->finish;
+	unless ($exists) {
+		$session->db->write("alter table assetIndex add column lineage varchar(255)");
+	}
 }
 
 #-------------------------------------------------

@@ -21,7 +21,6 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
-dropLineageInAssetIndex($session);
 giveTasksMultipleResources($session);
 giveTasksLagTime($session);
 giveProjectsObserverGroup($session);
@@ -29,13 +28,6 @@ giveProjectsObserverGroup($session);
 finish($session); # this line required
 
 
-#-------------------------------------------------
-sub dropLineageInAssetIndex {
-	my $session = shift;
-	print "\tDropping lineage column in assetIndex table.\n" unless ($quiet);
-
-	$session->db->write('alter table assetIndex drop column lineage');
-}
 
 sub giveTasksMultipleResources {
 	my $session = shift;
