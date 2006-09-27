@@ -30,7 +30,7 @@
  - Eliminated several hundred queries to the database during certain user
    profile field options.
  - Fixed the search function that broke in 7.0.7.
-
+ - fix: typo + obsolete approve section in Collaboration System Default Thread template
 
 7.0.7
  - rfe: Image Management (funded by Formation Design Systems)
