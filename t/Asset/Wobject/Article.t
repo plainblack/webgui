@@ -16,7 +16,7 @@ use lib "$FindBin::Bin/../../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 21; # increment this value for each test you create
+use Test::More tests => 20; # increment this value for each test you create
 use WebGUI::Asset::Wobject::Article;
 
 my $session = WebGUI::Test->session;
@@ -27,7 +27,7 @@ my $node = WebGUI::Asset->getImportNode($session);
 # Lets create an article wobject using all defaults then test to see if those defaults were set
 my $articleDefaults = {
 	cacheTimeout => 3600,
-	templateId   => 'PBtmpl0000000000000002',
+#	templateId   => 'PBtmpl0000000000000002',
 	linkURL	     => undef,
 	linkTitle    => undef,
 	storageId    => undef,

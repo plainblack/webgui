@@ -263,8 +263,11 @@ sub www_resize {
         my $self = shift;
         return $self->session->privilege->insufficient() unless $self->canEdit;
 	if ($self->session->form->process("newWidth") || $self->session->form->process("newHeight")) {
-		$self->getStorageLocation->resize($self->get("filename"),$self->session->form->process("newWidth"),$self->session->form->process("newHeight"));
-		$self->setSize($self->getStorageLocation->getFileSize($self->get("filename")));
+		my $newSelf = $self->addRevision();
+		delete $newSelf->{_storageLocation};
+		$newSelf->getStorageLocation->resize($newSelf->get("filename"),$newSelf->session->form->process("newWidth"),$newSelf->session->form->process("newHeight"));
+		$newSelf->setSize($newSelf->getStorageLocation->getFileSize($newSelf->get("filename")));
+		$self = $newSelf;
 	}
 	my $i18n = WebGUI::International->new($self->session,"Asset_Image");
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),$i18n->get("edit image"));
