@@ -51,7 +51,7 @@ my @getRefererUrlTests = (
 use Test::More;
 use Test::MockObject::Extends;
 use Test::MockObject;
-plan tests => 21 + scalar(@getRefererUrlTests);
+plan tests => 27 + scalar(@getRefererUrlTests);
 
 my $session = WebGUI::Test->session;
 
@@ -100,14 +100,63 @@ is( $url2, '/home?a=b', 'append one pair via gateway');
 #Restore original proxy cache setting so downstream tests work with no surprises
 $session->setting->set(preventProxyCache => $preventProxyCache );
 
+
+#######################################
+#
+# setSiteUrl and getSiteUrl
+#
+#######################################
+
+##Memorize the current setting and set up the default setting to start tests.
+my $setting_hostToUse = $session->setting->get('hostToUse');
+$session->setting->set('hostToUse', 'HTTP_HOST');
 my $sitename = $session->config->get('sitename')->[0];
-is ( $session->url->getSiteURL, 'http://'.$sitename, 'getSiteURL from config');
+is ( $session->url->getSiteURL, 'http://'.$sitename, 'getSiteURL from config as http_host');
+my $config_port;
+if ($session->config->get('webServerPort')) {
+	$config_port = $session->config->get('webServerPort');
+}
 
 $session->url->setSiteURL('http://webgui.org');
 is ( $session->url->getSiteURL, 'http://webgui.org', 'override config setting with setSiteURL');
 
+##Create a fake environment hash so we can muck with it.
+our %mockEnv = %ENV;
+$session->{_env}->{_env} = \%mockEnv;
+
+$mockEnv{HTTPS} = "on";
+$session->url->setSiteURL(undef);
+is ( $session->url->getSiteURL, 'https://'.$sitename, 'getSiteURL from config as http_host with SSL');
+
+$mockEnv{HTTPS} = "";
+$mockEnv{HTTP_HOST} = "devsite.com";
+$session->url->setSiteURL(undef);
+is ( $session->url->getSiteURL, 'http://'.$sitename, 'getSiteURL where requested host is not a configured site');
+
+my @config_sitename = @{ $session->config->get('sitename') };
+$session->config->addToArray('sitename', 'devsite.com');
+$session->url->setSiteURL(undef);
+is ( $session->url->getSiteURL, 'http://devsite.com', 'getSiteURL where requested host is not the first configured site');
+
+$session->setting->set('hostToUse', 'sitename');
+$session->url->setSiteURL(undef);
+is ( $session->url->getSiteURL, 'http://'.$sitename, 'getSiteURL where illegal host has been requested');
+
+$session->config->set('webServerPort', 80);
+$session->url->setSiteURL(undef);
+is ( $session->url->getSiteURL, 'http://'.$sitename.':80', 'getSiteURL with a port');
+
+$session->config->set('webServerPort', 8880);
+$session->url->setSiteURL(undef);
+is ( $session->url->getSiteURL, 'http://'.$sitename.':8880', 'getSiteURL with a non-standard port');
+
 $session->url->setSiteURL('http://'.$sitename);
 is ( $session->url->getSiteURL, 'http://'.$sitename, 'restore config setting');
+$session->config->set('sitename', \@config_sitename);
+$session->setting->set('hostToUse', $setting_hostToUse);
+if ($config_port) {
+	$session->config->set($config_port);
+}
 
 $url  = 'level1 /level2/level3   ';
 $url2 = 'level1-/level2/level3';
@@ -147,10 +196,6 @@ is ($session->url->page('',1), $url2, 'page, withFullUrl includes method and sit
 
 ##getReferrerUrl tests
 
-our %mockEnv = %ENV;
-
-$session->{_env}->{_env} = \%mockEnv;
-
 $mockEnv{'HTTP_REFERER'} = 'test';
 
 is($session->env->get('HTTP_REFERER'), 'test', 'testing MockObject');
@@ -158,4 +203,12 @@ is($session->env->get('HTTP_REFERER'), 'test', 'testing MockObject');
 foreach my $test (@getRefererUrlTests) {
 	$mockEnv{HTTP_REFERER} = $test->{input};
 	is($session->url->getRefererUrl, $test->{output}, $test->{comment});
+}
+
+END {
+	$session->config->set('sitename', \@config_sitename);
+	$session->setting->set('hostToUse', $setting_hostToUse);
+	if ($config_port) {
+		$session->config->set($config_port);
+	}
 }
