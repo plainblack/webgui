@@ -1,6 +1,7 @@
 7.0.9
  - partial fix: invalid Message-ID headers in outgoing mail
  - fix: HttpProxy not doing file uploads correctly
+ - fix: leftover discussion template variables in Default Article template
 
 7.0.8
  - Fixed a couple of minor bugs with the default values of the Request
