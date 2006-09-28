@@ -257,7 +257,7 @@ sub view {
    	$cookiebox =~ s/[^A-Za-z0-9\-\.\_]//g;  #removes all funky characters
    	$cookiebox .= '.cookie';
    	my $jar = HTTP::Cookies->new(File => $self->getCookieJar->getPath($cookiebox), AutoSave => 1, Ignore_Discard => 1);
-   my (%var, %formdata, @formUpload, $redirect, $response, $header, $userAgent, $proxiedUrl, $request);
+   my (%var, %formdata, $redirect, $response, $header, $userAgent, $proxiedUrl, $request);
 
    if($self->session->form->param("func")!~/editSave/i) {
       $proxiedUrl = $self->session->form->process("FormAction") || $self->session->form->process("proxiedUrl") || $self->get("proxiedUrl") ;
@@ -311,18 +311,17 @@ sub view {
          my $contentType = 'application/x-www-form-urlencoded'; # default Content Type header
 
          # Create a %formdata hash to pass key/value pairs to the POST request
-         foreach my $input_name ($self->session->form->param) {
-   	 next if ($input_name !~ /^HttpProxy_/); # Skip non proxied form var's
-   	 $input_name =~ s/^HttpProxy_//;
+         foreach my $input_name ($self->session->request->param) {
+		 $input_name =~ s/^HttpProxy_// or next;
    
-            my $uploadFile = $self->session->request->upload($self->session->form->process('HttpProxy_'.$input_name));
-            if(-r $uploadFile) { # Found uploaded file
-      	       @formUpload=($uploadFile, $self->session->form->process('HttpProxy_'.$input_name));
-   	       $formdata{$input_name}=\@formUpload;
-	       $contentType = 'form-data'; # Different Content Type header for file upload
-   	    } else {
-   	      $formdata{$input_name}=$self->session->form->process('HttpProxy_'.$input_name);
-            }
+		 my (@upload) = grep{defined} $self->session->request->upload('HttpProxy_'.$input_name);
+		 if (@upload) { # Found uploaded file
+			 my $upload = $upload[0];
+			 $formdata{$input_name}=[$upload->tempname, $self->session->form->process('HttpProxy_'.$input_name)];
+			 $contentType = 'form-data'; # Different Content Type header for file upload
+		 } else {
+			 $formdata{$input_name}=$self->session->form->process('HttpProxy_'.$input_name);
+		 }
          }
          # Create POST request
          $request = HTTP::Request::Common::POST($proxiedUrl, \%formdata, Content_Type => $contentType);

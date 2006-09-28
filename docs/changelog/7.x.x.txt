@@ -1,3 +1,7 @@
+7.0.9
+ - partial fix: invalid Message-ID headers in outgoing mail
+ - fix: HttpProxy not doing file uploads correctly
+
 7.0.8
  - Fixed a couple of minor bugs with the default values of the Request
    Approval for Version Tag workflow activity.
@@ -34,7 +38,6 @@
  - fix: attachments section of post form not working correctly on edit
  - Images now create revisions as you resize them, so you can roll back to a
    previous size.
- - partial fix: invalid Message-ID headers in outgoing mail
 
 7.0.7
  - rfe: Image Management (funded by Formation Design Systems)

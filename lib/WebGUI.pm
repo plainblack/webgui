@@ -26,6 +26,7 @@ use WebGUI::Session;
 use WebGUI::User;
 use WebGUI::Utility;
 use WebGUI::PassiveProfiling;
+use Apache2::Upload;
 use Apache2::Request;
 use Apache2::RequestRec ();
 use Apache2::RequestIO ();
