@@ -39,10 +39,10 @@ sub www_deleteScratch {
 
 #-------------------------------------------------------------------
 
-=head2 www_deleteScratch ( )
+=head2 www_setScratch ( )
 
 
-Delete a variable from the session scratch area by setting forms
+Set a variable in the session scratch area by setting forms
 variables, scratchName, the name of the variable to set, and scratchValue,
 the value the variable should take.
 
