@@ -316,8 +316,8 @@ Returns the URL of the current page.
 
 =head3 pairs
 
-Name value pairs to add to the URL in the form of:
-gateway()
+Name and value pairs as a string to add to the URL that will be returned.
+
  name1=value1;name2=value2;name3=value3
 
 =head3 useSiteUrl
@@ -326,7 +326,9 @@ If set to "1" we'll use the full site URL rather than the script (gateway) URL.
 
 =head3 skipPreventProxyCache
 
-If set to "1" we'll skip adding the prevent proxy cache code to the url.
+If preventing proxy caching is enabled in the settings, then if skipPreventProxyCache
+is a 1 it will prevent the code that prevents proxy caching.  If that doesn't make
+your head hurt then you'll understand the rest of wG just fine.
 
 =cut
 

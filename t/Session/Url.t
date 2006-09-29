@@ -14,6 +14,7 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
+use WebGUI::Asset;
 
 my @getRefererUrlTests = (
 	{
@@ -51,7 +52,7 @@ my @getRefererUrlTests = (
 use Test::More;
 use Test::MockObject::Extends;
 use Test::MockObject;
-plan tests => 37 + scalar(@getRefererUrlTests);
+plan tests => 43 + scalar(@getRefererUrlTests);
 
 my $session = WebGUI::Test->session;
 
@@ -211,14 +212,36 @@ is ($session->url->getRequestedUrl, 'path2/file2', 'getRequestedUrl, does not re
 #
 #######################################
 
+my $sessionAsset = $session->asset;
+$session->asset(undef);
+
 $session->url->{_requestedUrl} = undef;  ##Manually clear cached value
 $requestedUrl = '/path1/file1';
-is ($session->url->page, '/path1/file1', 'page with no args returns getRequestedUrl through gateway');
+is($session->url->page, $requestedUrl, 'page with no args returns getRequestedUrl through gateway');
 
-$url2 = 'http://'.$session->config->get('sitename')->[0].'/path1/file1';
-is ($session->url->page('',1), $url2, 'page, withFullUrl includes method and sitename');
+is($session->url->page('op=viewHelpTOC;topic=Article'), $requestedUrl.'?op=viewHelpTOC;topic=Article', 'page: pairs are appended');
 
+$url2 = 'http://'.$session->config->get('sitename')->[0].$requestedUrl;
+is($session->url->page('',1), $url2, 'page: withFullUrl includes method and sitename');
 
+my $settingsPreventProxyCache = $session->setting->get('preventProxyCache');
+$session->setting->set('preventProxyCache', 0);
+
+is($session->url->page('','',1), $requestedUrl, 'page: skipPreventProxyCache is a no-op with preventProxyCache off in settings');
+$session->setting->set('preventProxyCache', 1);
+my $uncacheableUrl = $session->url->page('','',1);
+diag($uncacheableUrl);
+like($uncacheableUrl, qr{^$requestedUrl}, 'page: skipPreventProxyCache does not change url');
+like($uncacheableUrl, qr/\?noCache=\d{0,4},\d+$/, 'page: skipPreventProxyCache adds noCache param to url');
+
+is($session->url->page('','',0), $requestedUrl, 'page: skipPreventProxyCache does not change url');
+
+$session->setting->set('preventProxyCache', $settingsPreventProxyCache);
+
+my $defaultAsset = WebGUI::Asset->getDefault($session);
+$session->asset($defaultAsset);
+is($session->url->page, $session->url->gateway($defaultAsset->get('url')), 'page:session asset trumps requestedUrl');
+$session->asset($sessionAsset);
 #######################################
 #
 # getReferrerUrl
@@ -273,9 +296,11 @@ my $unEscapedString = $session->url->unescape($escapeString);
 is($escapedString, '10%25%20is%20enough!', 'escape method');
 is($unEscapedString, '10% is enough!', 'unescape method');
 
-END {
+END {  ##Always clean-up
+	$session->asset($sessionAsset);
 	$session->config->set('sitename', \@config_sitename);
 	$session->setting->set('hostToUse', $setting_hostToUse);
+	$session->setting->set('preventProxyCache', $settingsPreventProxyCache);
 	if ($config_port) {
 		$session->config->set($config_port);
 	}
