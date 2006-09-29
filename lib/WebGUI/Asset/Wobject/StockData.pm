@@ -152,7 +152,11 @@ sub _convertToEpoch {
    my $self = shift;
    my $date = $_[0];
    my $time = $_[1];
-   
+
+   unless ($date =~ m{^\d+/\d+/\d+} and $time =~ m{^\d+:\d+}) {
+	   return undef;
+   }
+
    my ($month,$day,$year) = split("/",$date);
    $month = $self->_appendZero($month);
    $day = $self->_appendZero($day);   
@@ -180,14 +184,19 @@ List of stock symbols to find passed in as an array reference.  Stock symbols sh
 
 sub _getStocks {
    my $self = shift;
-   my $stocks = $_[0];   
-   #Create a new Finance::Quote object
+   my $stocks = $_[0];
+
+   # Create a new Finance::Quote object
    my $q = Finance::Quote->new;
-   #Disable failover if specified
+   # Disable failover if specified
    unless ($self->getValue("failover")) {
-      $q->failover(0);
+	   $q->failover(0);
    }
-   #Fetch the stock information and return the results
+
+   # Hardcoded timeout for now.
+   $q->timeout(15);
+
+   # Fetch the stock information and return the results
    return $q->fetch($self->getValue("source"),@{$stocks});
 }
 
@@ -195,25 +204,24 @@ sub _getStocks {
 
 =head2 _getStockSources (  )
 
-Private method which retrieves the list of available stock sources from Finance::Quote package
-and returns the results as a hash reference for the selectList Form API
+Class method which retrieves the list of available stock sources from
+Finance::Quote package and returns the results as a hash reference for
+the selectList Form API.
 
 =cut
 
 sub _getStockSources {
-   my $self = shift;
-   #Instantiate Finance::Quote
-   my $q = Finance::Quote->new;
-   #Retrieve array of available sources and sort them
-   my @srcs = sort $q->sources;
-   #Create a hash reference with the name referencing itself
-   my %sources;
-   #Tie to IxHash to preserve alphabetical order
-   tie %sources, "Tie::IxHash";
-   foreach my $src (@srcs) {
-      $sources{$src} = $src;
-   }
-   return \%sources;
+	my $class = shift;
+	my @srcs = Finance::Quote->new->sources;
+	my %sources;
+	
+	# Tie to IxHash to preserve alphabetical order
+	tie %sources, "Tie::IxHash";
+	foreach my $src (@srcs) {
+		$sources{$src} = $src;
+	}
+
+	return \%sources;
 }
 
 #-------------------------------------------------------------------
@@ -267,91 +275,60 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift;
-	my $properties = {
+	my $i18n = WebGUI::International->new($session,"Asset_StockData");
+
+	my %properties;
+	tie %properties, 'Tie::IxHash';
+	%properties = (
 		templateId =>{
 			fieldType=>"template",
-			defaultValue=>'StockDataTMPL000000001'
+			defaultValue=>'StockDataTMPL000000001',
+			tab=>'display',
+			namespace=>'StockData',
+			label=>$i18n->get("template_label"),
+			hoverHelp=>$i18n->get("template_label_description"),
 		},
 		displayTemplateId=>{
 			fieldType=>"template",
-			defaultValue=>'StockDataTMPL000000002'
+			defaultValue=>'StockDataTMPL000000002',
+			tab=>'display',
+			namespace=>"StockData/Display",
+			label=>$i18n->get("display_template_label"),
+			hoverHelp=>$i18n->get("display_template_label_description"),
 		},
 		defaultStocks=>{
 			fieldType=>"textarea",
-			defaultValue=>"DELL\nMSFT\nORCL\nSUNW\nYHOO"
+			defaultValue=>"DELL\nMSFT\nORCL\nSUNW\nYHOO",
+			tab=>'properties',
+			label=> $i18n->get("default_stock_label"),
+			hoverHelp=> $i18n->get("default_stock_label_description"),
 		},
 		source=>{
 			fieldType=>"selectList",
-			defaultValue=>"usa"
+			defaultValue=>"usa",
+			tab=>'properties',
+			label=> $i18n->get("stock_source"),
+			options=>$class->_getStockSources(),
+			hoverHelp=>$i18n->get("stock_source_description"),
 		},
 		failover=>{
-			fieldType=>"checkbox",
-			defaultValue=>undef
+			fieldType=>"yesNo",
+			defaultValue=>undef,
+			label=> $i18n->get("failover_label"),
+			hoverHelp=> $i18n->get("failover_description")
 		}
-	};
-	my $i18n = WebGUI::International->new($session,"Asset_StockData");
+	);
+
 	push(@{$definition}, {
 		tableName=>'StockData',
 		className=>'WebGUI::Asset::Wobject::StockData',
 		icon=>'stockData.gif',
 		assetName=>$i18n->get("assetName"),
-		properties=>$properties
+		autoGenerateForms=>1,
+		properties=>\%properties
 	});
+
         return $class->SUPER::definition($session, $definition);
-}
-
-#-------------------------------------------------------------------
-
-=head2 getEditForm
-
-Returns the tabform object that will be used in generating the edit page for Stock Lists
-
-=cut
-
-sub getEditForm {
-	my $self = shift;
-	my $tabform = $self->SUPER::getEditForm();
-	my $i18n = WebGUI::International->new($self->session,"Asset_StockData");
-   	
-	$tabform->getTab("display")->template(
-       -name=>"templateId",
-       -value=>$self->get("templateId"),
-       -label=>$i18n->get("template_label"),
-       -hoverHelp=>$i18n->get("template_label_description"),
-       -namespace=>"StockData"
-    );
-	
-	$tabform->getTab("display")->template(
-       -name=>"displayTemplateId",
-       -value=>$self->get("displayTemplateId"),
-       -label=>$i18n->get("display_template_label"),
-       -hoverHelp=>$i18n->get("display_template_label_description"),
-       -namespace=>"StockData/Display"
-    );
-	
-	$tabform->getTab("properties")->textarea(
-	    -name => "defaultStocks",
-		-label=> $i18n->get("default_stock_label"),
-		-hoverHelp=> $i18n->get("default_stock_label_description"),
-		-value=> $self->getValue("defaultStocks") 
-	);
-	
-	$tabform->getTab("properties")->selectList(
-	    -name => "source",
-		-label=> $i18n->get("stock_source"),
-		-options=>$self->_getStockSources(),
-		-value=> [$self->getValue("source")],
-		-hoverHelp=>$i18n->get("stock_source_description")
-	);
-	
-	$tabform->getTab("properties")->yesNo(
-	    -name=> "failover",
-		-label=> $i18n->get("failover_label"),
-		-value=>$self->getValue("failover"),
-		-hoverHelp=> $i18n->get("failover_description")
-	);
-
-	return $tabform;
 }
 
 #-------------------------------------------------------------------
@@ -423,11 +400,16 @@ sub view {
 	   
 	   #Create last update date formats
 	   unless ($var->{'lastUpdate.default'}) {
-          my $luEpoch = $self->_convertToEpoch($hash->{'stocks.date'},$hash->{'stocks.time'});
-	      $var->{'lastUpdate.intl'} = $self->session->datetime->epochToHuman($luEpoch,"%y-%m-%d %j:%n");
-	      $var->{'lastUpdate.us'} = $self->session->datetime->epochToHuman($luEpoch,"%m/%d/%y %h:%n %p");
-          $var->{'lastUpdate.default'} = $self->session->datetime->epochToHuman($luEpoch,"%C %d %H:%n %P");
-       }
+		   my $luEpoch = $self->_convertToEpoch($hash->{'stocks.date'},$hash->{'stocks.time'});
+		   if (defined $luEpoch) {
+			   @$var{'lastUpdate.intl', 'lastUpdate.us', 'lastUpdate.default'} =
+			       map {$self->session->datetime->epochToHuman($luEpoch, $_)}
+				   ("%y-%m-%d %j:%n", "%m/%d/%y %h:%n %p", "%C %d %H:%n %P");
+		   } else {
+			   @$var{'lastUpdate.intl', 'lastUpdate.us', 'lastUpdate.default'} =
+			       ('(not available)') x 3;
+		   }
+	   }
 	   
 	   push (@stocks, $hash);
 	}
@@ -457,8 +439,14 @@ sub www_displayStock {
    
    #Configure last update dates
    my $luEpoch = $self->_convertToEpoch($var->{'stocks.date'},$var->{'stocks.time'});
-   $var->{'lastUpdate.intl'} = $self->session->datetime->epochToHuman($luEpoch,"%y-%m-%d");
-   $var->{'lastUpdate.us'} = $self->session->datetime->epochToHuman($luEpoch,"%m/%d/%y");
+   if (defined $luEpoch) {
+	   @$var{'lastUpdate.intl', 'lastUpdate.us'} =
+	       map {$self->session->datetime->epochToHuman($luEpoch, $_)}
+		   ("%y-%m-%d", "%m/%d/%y");
+   } else {
+	   @$var{'lastUpdate.intl', 'lastUpdate.us'} =
+	       ('(not available)') x 2;
+   }
    
    return $self->processTemplate($var, $self->get("displayTemplateId"));
 }
