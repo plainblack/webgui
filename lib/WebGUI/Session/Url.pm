@@ -231,10 +231,10 @@ sub getSiteURL {
 	unless ($self->{_siteUrl}) {
 		my $site = "";
 		my $sitenames = $self->session->config->get("sitename");
-        	if ($self->session->setting->get("hostToUse") eq "sitename" || !isIn($self->session->env->get("HTTP_HOST"),@{$sitenames})) {
-                	$site = $sitenames->[0];
+        	if ($self->session->setting->get("hostToUse") eq "HTTP_HOST" and isIn($self->session->env->get("HTTP_HOST"),@{$sitenames})) {
+                	$site = $self->session->env->get("HTTP_HOST");
         	} else {
-                	$site = $self->session->env->get("HTTP_HOST") || $sitenames->[0];
+                	$site = $sitenames->[0];
         	}
         	my $proto = "http://";
         	if ($self->session->env->get("HTTPS") eq "on") {

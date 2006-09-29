@@ -51,7 +51,7 @@ my @getRefererUrlTests = (
 use Test::More;
 use Test::MockObject::Extends;
 use Test::MockObject;
-plan tests => 27 + scalar(@getRefererUrlTests);
+plan tests => 31 + scalar(@getRefererUrlTests);
 
 my $session = WebGUI::Test->session;
 
@@ -155,7 +155,10 @@ is ( $session->url->getSiteURL, 'http://'.$sitename, 'restore config setting');
 $session->config->set('sitename', \@config_sitename);
 $session->setting->set('hostToUse', $setting_hostToUse);
 if ($config_port) {
-	$session->config->set($config_port);
+	$session->config->set('webServerPort', $config_port);
+}
+else {
+	$session->config->delete('webServerPort');
 }
 
 $url  = 'level1 /level2/level3   ';
@@ -164,6 +167,8 @@ $url2 = 'level1-/level2/level3';
 is ( $session->url->makeCompliant($url), $url2, 'language specific URL compliance');
 
 my $originalRequest = $session->request;  ##Save the original request
+
+is ($session->url->getRequestedUrl, undef, 'getRequestedUrl returns undef unless it has a request object');
 
 my $newRequest = Test::MockObject->new;
 my $requestedUrl = 'empty';
@@ -194,7 +199,12 @@ is ($session->url->page, '/path1/file1', 'page with no args returns getRequested
 $url2 = 'http://'.$session->config->get('sitename')->[0].'/path1/file1';
 is ($session->url->page('',1), $url2, 'page, withFullUrl includes method and sitename');
 
-##getReferrerUrl tests
+
+#######################################
+#
+# getReferrerUrl
+#
+#######################################
 
 $mockEnv{'HTTP_REFERER'} = 'test';
 
@@ -205,10 +215,27 @@ foreach my $test (@getRefererUrlTests) {
 	is($session->url->getRefererUrl, $test->{output}, $test->{comment});
 }
 
+#######################################
+#
+# makeAbsolute
+#
+#######################################
+
+TODO: {
+	local $TODO = "makeAbsolute TODO's";
+	ok(0, 'go back and refigure out how the page method works to test makeAbsoluate with default params');
+}
+
+is($session->url->makeAbsolute('page1', '/layer1/layer2/'), '/layer1/layer2/page1', 'use a different root');
+is($session->url->makeAbsolute('page1', '/layer1/page2'), '/layer1/page1', 'use a second root that is one level shallower');
+
 END {
 	$session->config->set('sitename', \@config_sitename);
 	$session->setting->set('hostToUse', $setting_hostToUse);
 	if ($config_port) {
 		$session->config->set($config_port);
+	}
+	else {
+		$session->config->delete('webServerPort');
 	}
 }
