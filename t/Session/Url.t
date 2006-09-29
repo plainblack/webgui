@@ -51,7 +51,7 @@ my @getRefererUrlTests = (
 use Test::More;
 use Test::MockObject::Extends;
 use Test::MockObject;
-plan tests => 31 + scalar(@getRefererUrlTests);
+plan tests => 37 + scalar(@getRefererUrlTests);
 
 my $session = WebGUI::Test->session;
 
@@ -59,6 +59,12 @@ my $session = WebGUI::Test->session;
 my $preventProxyCache = $session->setting->get('preventProxyCache');
 
 $session->setting->set('preventProxyCache', 0) if ($preventProxyCache);
+
+#######################################
+#
+# append
+#
+#######################################
 
 my $url = 'http://localhost.localdomain/foo';
 my $url2;
@@ -166,7 +172,14 @@ $url2 = 'level1-/level2/level3';
 
 is ( $session->url->makeCompliant($url), $url2, 'language specific URL compliance');
 
-my $originalRequest = $session->request;  ##Save the original request
+
+#######################################
+#
+# getRequestedUrl
+#
+#######################################
+
+my $originalRequest = $session->request;  ##Save the original request object
 
 is ($session->url->getRequestedUrl, undef, 'getRequestedUrl returns undef unless it has a request object');
 
@@ -191,6 +204,12 @@ is ($session->url->getRequestedUrl, 'path1/file1', 'getRequestedUrl, check cache
 $session->url->{_requestedUrl} = undef;  ##Manually clear cached value
 $requestedUrl = '/path2/file2?param1=one;param2=two';
 is ($session->url->getRequestedUrl, 'path2/file2', 'getRequestedUrl, does not return params');
+
+#######################################
+#
+# page
+#
+#######################################
 
 $session->url->{_requestedUrl} = undef;  ##Manually clear cached value
 $requestedUrl = '/path1/file1';
@@ -228,6 +247,31 @@ TODO: {
 
 is($session->url->makeAbsolute('page1', '/layer1/layer2/'), '/layer1/layer2/page1', 'use a different root');
 is($session->url->makeAbsolute('page1', '/layer1/page2'), '/layer1/page1', 'use a second root that is one level shallower');
+
+#######################################
+#
+# extras
+#
+#######################################
+
+is($session->url->extras, $session->config->get('extrasURL').'/', 'extras method returns URL to extras with a trailing slash');
+is($session->url->extras('foo.html'), join('/', $session->config->get('extrasURL'),'foo.html'), 'extras method appends to the extras url');
+is($session->url->extras('/foo.html'), join('/', $session->config->get('extrasURL'),'foo.html'), 'extras method removes extra slashes');
+is($session->url->extras('/dir1//foo.html'), join('/', $session->config->get('extrasURL'),'dir1/foo.html'), 'extras method removes extra slashes anywhere');
+
+#######################################
+#
+# escape and unescape
+# Our goal in this test is just to show that the calls to the URI module work,
+# not to test the URI methods themselves
+#
+#######################################
+
+my $escapeString = '10% is enough!';
+my $escapedString = $session->url->escape($escapeString);
+my $unEscapedString = $session->url->unescape($escapeString);
+is($escapedString, '10%25%20is%20enough!', 'escape method');
+is($unEscapedString, '10% is enough!', 'unescape method');
 
 END {
 	$session->config->set('sitename', \@config_sitename);

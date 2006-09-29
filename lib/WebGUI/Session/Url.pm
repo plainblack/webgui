@@ -130,7 +130,7 @@ Combinds the base extrasURL defined in the config file with a specfied path.
 
 =head3 path
 
-The path to the thing in the extras folder that you're referencing. Note that the preceding / is not necessary.
+The path to the thing in the extras folder that you're referencing. Note that the leading / is not necessary.  Multiple consecutive slashes will be replaced with a single slash.
 
 =cut
 
@@ -138,7 +138,7 @@ sub extras {
 	my $self = shift;
 	my $path = shift;
         my $url = $self->session->config->get("extrasURL").'/'.$path;
-	$url =~ s/\/+/\//g;
+	$url =~ s!/+!/!g;
 	return $url;
 }
 
@@ -399,11 +399,12 @@ sub unescape {
 
 =head2 urlize ( string )
 
-Returns a url that is safe for WebGUI pages.
+Returns a url that is safe for WebGUI pages.  Strings are lower-cased, run through
+$self->makeCompliant and then have any trailing slashes removed.
 
 =head3 string
 
- The string to urlize.
+The string to urlize.
 
 =cut
 
