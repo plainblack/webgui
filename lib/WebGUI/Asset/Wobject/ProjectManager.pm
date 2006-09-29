@@ -843,8 +843,8 @@ sub www_editTask {
 				});				
    #Set some hidden variables to make it easy to reset data in javascript
    my $duration = $task->{duration};
-   my $start = $dt->epochToSet($task->{startDate});
-   my $end = $dt->epochToSet($task->{endDate});
+   my $start = $dt->epochToSet($db->quickArray('SELECT startDate, startDate FROM PM_task WHERE projectId = ? ORDER BY sequenceNumber LIMIT 1', [$projectId]));
+   my $end = $start;
    my $dependant = $task->{dependants};
    														   
    $var->{'form.header'} .= WebGUI::Form::hidden($session, {
