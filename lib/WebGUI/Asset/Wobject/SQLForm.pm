@@ -3,7 +3,7 @@ package WebGUI::Asset::Wobject::SQLForm;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  SQLForm is Copyright 2006 Procolix
+  /SQLForm is Copyright 2006 Procolix
  -------------------------------------------------------------------
   Please read the legal notices (legal.txt) and the license
   (license.txt) that came with this distribution before using
@@ -22,6 +22,7 @@ use WebGUI::Asset::Wobject;
 use WebGUI::Utility;
 use WebGUI::DatabaseLink;
 use WebGUI::International;
+use WebGUI::User;
 use Storable;
 use Tie::IxHash;
 
@@ -636,6 +637,8 @@ sub _getFieldProperties {
 	my $self = shift;
 	$fieldId = shift;
 
+	return $self->{_fieldPropertiesCache}->{$fieldId} if exists ($self->{_fieldPropertiesCache}->{$fieldId});
+
 	$dbLink = $self->_getDbLink;
 	%definition = $self->session->db->buildHash("select property, value from SQLForm_fieldDefinitions where fieldId = ".$self->session->db->quote($fieldId));
 	
@@ -679,6 +682,8 @@ my		$sth = $dbLink->db->unconditionalRead($definition{sqlQuery}." order by ".$de
 	$properties->{processedDefaultValue} = WebGUI::Macro::process($self->session, $definition{defaultValue});
 	$properties->{fieldId} = $fieldId;
 
+	$self->{_fieldPropertiesCache}->{$fieldId} = {%definition, %$properties};
+
 	return {%definition, %$properties};
 }
 
@@ -719,6 +724,57 @@ sub _getDatabaseInfo {
 	$dbLink->disconnect;
 	return $databaseDefinition; 
 }
+
+#-------------------------------------------------------------------
+
+=head2 _getFileFromDatabase ( recordId, fieldName, [ revision ] )
+
+Returns the file contents and mime type of files stored in file fields.
+
+=head3 recordId
+
+The recordId of the record you want the file contents of.
+
+=head3 fieldName
+
+The the name of the column containing the actual file data.
+
+=head3 revision
+
+The revision number of the record you wan to select. If this is omitted the most
+recent revision will be fetched.
+
+=cut
+
+sub _getFileFromDatabase {
+	my ($constraint, $dbLink);
+	my $self = shift;
+	my $recordId = shift || return undef;
+	my $fieldName = shift || return undef;
+	my $revision = shift;
+
+	$dbLink = $self->_getDbLink;
+
+	if ($revision =~ m/^\d+$/) {
+		$constraint = '__revision='.$self->session->db->quote($revision);
+	} else {
+		$constraint = '__archived = 0';
+	}
+	
+	my $sql = 
+		'select '.
+			' __'.$fieldName.'_mimeType, '.
+			$fieldName.
+		' from '.
+			$self->get('tableName').
+		' where '.
+			'__recordId='.$self->session->db->quote($recordId).' and '.
+			$constraint;
+
+	return $dbLink->db->quickArray($sql);
+}
+
+
 
 #-------------------------------------------------------------------
 
@@ -801,6 +857,26 @@ sub _resolveFieldConstraintType {
 
 	return $types->{$type} if ($type);
 	return $types;
+}
+
+#-------------------------------------------------------------------
+
+=head2 _uncacheFieldProperties ( fieldId )
+
+Removes the cached properties of the given field. Fiekd properties are automatically cached
+by _getFieldProperties.
+
+=head3 fieldId
+
+The GUID of the field to uncache the properties of.
+
+=cut
+
+sub _uncacheFieldProperties {
+	my $self = shift;
+	my $fieldId = shift;
+
+	delete($self->{_fieldPropertiesCache}->{$fieldId});
 }
 
 #-------------------------------------------------------------------
@@ -1821,6 +1897,7 @@ sub www_editFieldSave {
 	} else {
 		$fieldId = $self->session->form->process("fid");
 		$properties = $self->session->db->buildHashRef("select property, value from SQLForm_fieldDefinitions where fieldId=".$self->session->db->quote($fieldId));
+		$self->_uncacheFieldProperties($fieldId);
 	}
 
 	# If no value  (or zero) is given for any of these values just discard them and use the WebGUI defaults.
@@ -2216,6 +2293,7 @@ sub _getFieldValue {
 	if ($field->{canHaveMultipleValues} && !$readOnly) {
 		$fieldValue = [ $recordValues->{$field->{fieldName}} ];
 		$fieldValue = [ $self->session->request->param($field->{fieldName}) ] if (defined $self->session->form->process($field->{fieldName}));
+		$fieldValue = join(', ', @$fieldValue) if ($readOnly);
 	}
 	
 	# Handle file uploads
@@ -2225,8 +2303,8 @@ sub _getFieldValue {
 		} else {
 			$fieldValue = '<a href="'.$self->session->url->page('func=viewFile;rid='.$self->session->form->process("rid").';fid='.$_, $self->getUrl).'">';
 			if ($recordValues->{'__'.$field->{fieldName}.'_mimeType'} =~ /^image/i) {
-				$fieldValue .= '<img width="100" src="'.
-					$self->session->url->page('func=viewFile;rid='.$self->session->form->process("rid").'&fid='.$_, $self->getUrl).'" />';
+				$fieldValue .= '<img src="'.
+					$self->session->url->page('func=viewThumbnail;rid='.$self->session->form->process("rid").'&fid='.$_, $self->getUrl).'" />';
 			} else {
 				$fieldValue .= WebGUI::Internation::get('click here for file', 'Asset_SQLForm');
 			}
@@ -2273,28 +2351,31 @@ sub _getFormElement {
 	$fieldValue = $field->{allOptions}->{$fieldValue} if ($field->{hasOptions} && $readOnly);
 	$maxLength = $field->{maxFieldLength} || $allowedDbFieldTypes->{$field->{dbFieldType}}->{maxLength};
 
-	# Set up form element parameters
-	$fieldParameters->{name} 			= $field->{fieldName};
-	$fieldParameters->{value}			= $fieldValue;
-	$fieldParameters->{options}			= $field->{options} if ($field->{hasOptions});
-	$fieldParameters->{options}->{''}		= '-leave empty-' if (!$field->{isRequired});
-	$fieldParameters->{multiple}			= $field->{multipleAllowed} == 1;
-	$fieldParameters->{$field->{widthParam}}	= $field->{formFieldWidth} if ($field->{formFieldWidth});
-	$fieldParameters->{$field->{heightParam}}	= $field->{formFieldHeight} if ($field->{formFieldHeight});
-	$fieldParameters->{maxlength}			= $maxLength;
-	$fieldParameters->{extras}			= 'onkeyup="if (this.value.length > '.$maxLength.') {this.value = this.value.substring(0,'.$maxLength.');}"';
-	$fieldParameters->{id}				= 'sqlform'.$field->{fieldId};
-
 	# Construct the form element
 	if ($readOnly) {
 		$formElement = $fieldValue;
 	} else {
+		# Set up form element parameters
+		$fieldParameters->{options}			= $field->{options};
+		# make sure that previously selected items still appear for this for element, even if
+		# if is set to a set difference.
+		@{$fieldParameters->{options}}{@$fieldValue} 	= @{$field->{allOptions}}{@$fieldValue} if ($fieldValue && $field->{hasOptions});
+		$fieldParameters->{options}->{''}		= '-leave empty-' if (!$field->{isRequired});
+		$fieldParameters->{name} 			= $field->{fieldName};
+		$fieldParameters->{value}			= $fieldValue unless ($fieldType eq 'file');
+		$fieldParameters->{multiple}			= $field->{multipleAllowed} == 1;
+		$fieldParameters->{$field->{widthParam}}	= $field->{formFieldWidth} if ($field->{formFieldWidth});
+		$fieldParameters->{$field->{heightParam}}	= $field->{formFieldHeight} if ($field->{formFieldHeight});
+		$fieldParameters->{maxlength}			= $maxLength;
+		$fieldParameters->{extras}			= 'onkeyup="if (this.value.length > '.$maxLength.') {this.value = this.value.substring(0,'.$maxLength.');}"';
+		$fieldParameters->{id}				= 'sqlform'.$field->{fieldId};
+
 		# Show file if a file is uploaded
 		$formElement = $fieldValue.'<br />' if ($fieldType eq 'file' && $fieldValue);
 		
 		# Add form element
 		$cmd = 'WebGUI::Form::'.$fieldType.'($self->session, $fieldParameters)';
-		$formElement = eval($cmd);
+		$formElement .= eval($cmd);
 		$self->session->errorHandler->fatal('Could not instanciate formelement via WebGUI::Form: '.$@) if ($@);
 
 		if ($fieldType eq 'selectList' && !$field->{isRequired}) {
@@ -3110,49 +3191,57 @@ sub www_viewHistory {
 	return $self->session->privilege->insufficient() unless ($self->canView);
 
 	my $dbLink = $self->_getDbLink;
-	my $output = $self->_getManagementLinks;
-	my $recordId = $self->session->form->process("rid");
+	my $recordId = $self->session->form->process('rid');
 
-	my @fields = $self->session->db->buildArray(
-		" select distinct t1.value ".
-		" from SQLForm_fieldDefinitions as t1, SQLForm_fieldOrder as t2 ".
-		" where t1.fieldId=t2.fieldId and t1.assetId=t2.assetId and t1.property='fieldName' and t1.assetId=".$self->session->db->quote($self->getId).
-		" order by t2.rank"
-	);
-	my @fieldNames = $self->session->db->buildArray(
-		" select distinct t1.value ".
-		" from SQLForm_fieldDefinitions as t1, SQLForm_fieldOrder as t2 ".
-		" where t1.fieldId=t2.fieldId and t1.assetId=t2.assetId and t1.property='displayName' and t1.assetId=".$self->session->db->quote($self->getId).
-		" order by t2.rank"
+	my @includeMetaFields = qw|__recordId __initDate __userId __revision|;
+	my @metaFieldHeadings = ("Record ID", "Changed on", "Changed by", "Revision #");
+
+	my @fieldIds = $self->session->db->buildArray(
+		 " select fieldId "
+		." from SQLForm_fieldOrder "
+		." where assetId=".$self->session->db->quote($self->getId) 
+		." order by rank"
 	);
 
-	my $sth = $dbLink->db->read("select ".
-		" t1.__recordId, from_unixtime(t1.__initDate) as __initDate, ".
-		" t1.__userId, t1.__revision, ".
-		join(', ', map {"t1.$_"} @fields).
-		" from ".$self->get('tableName')." as t1".
-		" where t1.__recordId=".$self->session->db->quote($recordId).
-		" order by t1.__revision");
-	
-	$output .= '<br /><table border="0" cellspacing="0" cellpadding="3px" >';
+	my $tableHeading = '<tr><th>'.join('</th><th>', (@metaFieldHeadings, map {$self->_getFieldProperties($_)->{displayName}} @fieldIds)).'</th></tr>';
 
-	$output .= '<tr align="left"><th>Rev</th><th>Init date</th><th style="border-right: 2px solid black">User</th>';
-	$output .= '<th align="left">'.join('</th><th align="left">', @fieldNames).'</th></tr>';
-	
-	my %userCache;
-	
-	while (my %row = $sth->hash) {
-		$userCache{$row{__userId}} = WebGUI::User->new($self->session, $row{__userId}) unless (exists $userCache{$row{__userId}});
-		my $username = $userCache{$row{__userId}}->username || $row{__userId};
-		
-		$output .= '<tr align="right" style="border: 10px solid #bbb">';
-		$output .= '<td align="right" style="border: 1px solid #bbb">'.$row{__revision}.'</td>';
-		$output .= '<td align="right" style="border: 1px solid #bbb">'.$row{__initDate}.'</td>';
-		$output .= '<td align="right" style="border: 1px solid #bbb; border-right: 2px solid black">'.$username.'</td>';
-		$output .= '<td align="right" style="border: 1px solid #bbb">'.join('</td><td align="right" style="border: 1px solid #bbb">', map {$row{$_}} @fields).'</td>';
-		$output .= '</tr>';		
+	my $sth = $dbLink->db->read('select * from '.$self->get('tableName').' where __recordId='.$dbLink->db->quote($recordId).' order by __revision');
+
+	my ($tableBody);
+	while (my $row = $sth->hashRef) {
+		$row->{__initDate} = $self->session->datetime->epochToHuman($row->{__initDate});
+		$row->{__userId} = WebGUI::User->new($self->session, $row->{__userId})->username;
+		$tableBody .= '<tr>';
+		$tableBody .= '<td>'.join('</td><td>', map {$row->{$_}} @includeMetaFields).'</td>';
+
+		foreach (@fieldIds) {
+			my $field = $self->_getFieldProperties($_);
+			$tableBody .= '<td>';
+			if ($field->{formFieldType} eq 'file') {
+				$tableBody .= '<a href="'.$self->getUrl('func=viewFile;rid='.$row->{__recordId}.';rev='.$row->{__revision}.';fid='.$_).'">';
+				if ($row->{'__'.$field->{fieldName}.'_mimeType'} =~ /^image/) {
+					$tableBody .= '<img src="'.$self->getUrl('func=viewThumbnail;rid='.$row->{__recordId}.';rev='.$row->{__revision}.';fid='.$_).'">';
+				} else {
+					$tableBody .= 'Click here for file.';
+				}
+				$tableBody .= '</a>';
+			} else {
+				if ($field->{hasOptions}) {
+					$tableBody .= $field->{allOptions}->{$row->{$field->{fieldName}}};
+				} else {
+					$tableBody .= $row->{$field->{fieldName}};
+				}
+			}
+			$tableBody .= '</td>';
+		}
+		$tableBody .= '</tr>';
 	}
-	
+
+	my $output = $self->_getManagementLinks;
+	$output .= '<style type="text/css">.historyTable td, th { border: 1px solid #ccc; padding: 2px; }</style>';
+	$output .= '<table class="historyTable">';
+	$output .= $tableHeading;
+	$output .= $tableBody;
 	$output .= '</table>';
 
 	$dbLink->disconnect;
@@ -3163,7 +3252,7 @@ sub www_viewHistory {
 
 =head2 www_viewFile ( )
 
-Returns the file saved in a file upolad field, and sets the mime-type to the correct value. Pass the record id
+Returns the file saved in a file upload field, and sets the mime-type to the correct value. Pass the record id
 via form param 'rid' and the field id of the upload field through form param 'fid'. Optionally you can pass the 
 revision number in form param 'rev'; otherwise the latest revision is used.
 
@@ -3175,27 +3264,14 @@ sub www_viewFile {
 
 	return $self->session->privilege->insufficient() unless ($self->canView);
 
-	my $dbLink = $self->_getDbLink;
+	my $fieldId = $self->session->form->process('fid');
+	my $recordId = $self->session->form->process('rid');
+	my $revision = $self->session->form->process('rev');
 
-	$field = $self->_getFieldProperties($self->session->form->process("fid"));
+	$field = $self->_getFieldProperties($fieldId);
 
 	if ($field->{formFieldType} eq 'file') {
-		if ($self->session->form->process("rev") =~ m/^\d+$/) {
-			$revision = '__revision='.$self->session->db->quote($self->session->form->process("rev"));
-		} else {
-			$revision = '__archived=0';
-		}
-
-		my $sql = 
-			'select '.
-				' __'.$field->{fieldName}.'_mimeType, '.
-				$field->{fieldName}.
-			' from '.
-				$self->get('tableName').
-			' where '.
-				'__recordId='.$self->session->db->quote($self->session->form->process("rid")).' and '.
-				$revision;
-		my ($mimeType, $data) = $dbLink->db->quickArray($sql);
+		my ($mimeType, $data) = $self->_getFileFromDatabase($recordId, $field->{fieldName}, $revision); 
 		$self->session->http->setMimeType($mimeType);
 	
 		return $data;
@@ -3203,6 +3279,61 @@ sub www_viewFile {
 
 	return "No file found";
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_viewThumbnail ( )
+
+Returns a thumbnail of the image stored in an upload field.
+
+This particular caching scheme is used in stead of storage, since privileges should still be checked.
+
+=cut
+
+sub www_viewThumbnail {
+	my ($field, $revision, $thumbnailData);
+	my $self = shift;
+
+	return $self->session->privilege->insufficient() unless ($self->canView);
+
+	my $fieldId = $self->session->form->process('fid');
+	my $recordId = $self->session->form->process('rid');
+	my $revision = $self->session->form->process('rev');
+	$field = $self->_getFieldProperties($self->session->form->process("fid"));
+
+	if ($field->{formFieldType} eq 'file') {
+		my $cache = WebGUI::Cache->new($self->session, ["sqlform",$recordId,$fieldId,$revision], 24*60*60);
+
+		$thumbnailData = $cache->get;
+		
+		unless ($thumbnailData) {	
+			my ($mimeType, $data) = $self->_getFileFromDatabase($recordId, $field->{fieldName}, $revision);
+
+			# Create thumbnail. I use this method b/c it seems to be impossible to feed
+			# image magick scalars containing pictures. Even using IO::Scalar or PerlIO::Scalar.
+			# This is b/c Image::Magick cannot handle perl GLOBS.
+			my $tempStorage	= WebGUI::Storage::Image->createTemp($self->session);
+			$tempStorage->addFileFromScalar('tempthumb.png', $data);
+			$tempStorage->generateThumbnail('tempthumb.png', 100);
+			
+			open my $FH1, "<", $tempStorage->getPath().'/thumb-tempthumb.png';
+			while (<$FH1>) {
+				$thumbnailData .= $_;
+			}
+			close $FH1;
+	
+			$tempStorage->delete;
+			$cache->set($thumbnailData);
+		}
+
+		$self->session->http->setMimeType('image/png');
+		
+		return $thumbnailData;
+	}
+
+	return "No file found";
+}
+
 
 #-------------------------------------------------------------------
 
@@ -3833,8 +3964,7 @@ my	$searchType = ($self->session->form->process("searchType") || $self->session-
 	return undef if (!@constraints);
 
 	# Construct the search query
-my	$sql = " select distinct ".join(', ', @selectColumns); #t1.__recordId, t1.__deletionDate, t1.__deletedBy, t1.__initDate, t1.__userId, t1.__deleted, t1.__archived, t1.__revision ";
-#	$sql .= ", ".join(", \n", map {"t1.".$fieldProperties->{$_}->{fieldName}} @$showFields)."\n";
+my	$sql = " select distinct ".join(', ', @selectColumns);
 	$sql .= " from ".$self->get('tableName').' as t1 ';
 	$sql .= " left join ".join(" left join \n", @joinSequence)."\n" if (@joinSequence);
 	$sql .= " where ";
@@ -3945,7 +4075,9 @@ my			$value;
 			if ($fieldProperties->{$_}->{formFieldType} eq 'file') {
 				$props->{'record.value.isFile'} = 1;
 				$props->{'record.value.isImage'} = 1 if ($row{'__'.$fieldProperties->{$_}->{fieldName}.'_mimeType'} =~ m/^image/);
-print "[".'__'.$fieldProperties->{$_}->{fieldName}.'_mimeType'."]";
+				$props->{'record.value.thumbnailUrl'} = 
+					$self->getUrl('func=viewThumbnail;rid='.$row{__recordId}.';fid='.$_);
+			
 				$props->{'record.value.downloadUrl'} = 
 					$self->getUrl('func=viewFile;rid='.$row{__recordId}.';fid='.$_);
 			}

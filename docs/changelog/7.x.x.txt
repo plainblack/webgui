@@ -4,6 +4,10 @@
  - fix: leftover discussion template variables in Default Article template
  - fix: Stock Data asset insufficiently robust handling erroneous data
  - refactor: move getEditForm data into definition for Collaboration asset
+ - Fixed some bugs in the SQLForm. Also refactored parts of the SQLForm to
+   reduce the number of database queries and lessen the amount of data being
+   uploaded when images are put in the form. (Martin Kamerbeek / Procolix)
+
 
 7.0.8
  - Fixed a couple of minor bugs with the default values of the Request
