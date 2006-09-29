@@ -3,6 +3,7 @@
  - fix: HttpProxy not doing file uploads correctly
  - fix: leftover discussion template variables in Default Article template
  - fix: Stock Data asset insufficiently robust handling erroneous data
+ - refactor: move getEditForm data into definition for Collaboration asset
 
 7.0.8
  - Fixed a couple of minor bugs with the default values of the Request

@@ -590,6 +590,19 @@ sub getDefault {
 
 #-------------------------------------------------------------------
 
+=head2 getEditTabs ()
+
+Returns a list of arrayrefs, one per extra tab to add to the edit
+form.  The default is no extra tabs.  Override this in a subclass to
+add extra tabs.
+
+=cut
+
+sub getEditTabs {
+	my $self = shift;
+	return ();
+}
+
 =head2 getEditForm ()
 
 Creates and returns a tabform to edit parameters of an Asset.
@@ -651,21 +664,38 @@ sub getEditForm {
 		-value=>$self->get("assetId"),
 		-hoverHelp=>$i18n->get('asset id description'),
 		);
+
+	foreach my $tabspec ($self->getEditTabs) {
+		$tabform->addTab(@$tabspec);
+	}
+
 	foreach my $definition (reverse @{$self->definition($self->session)}) {
 		my $properties = $definition->{properties};
 		next unless ($definition->{autoGenerateForms});
-		foreach my $fieldname (keys %{$properties}) {
-			my %params;
-			foreach my $key (keys %{$properties->{$fieldname}}) {
-				next if ($key eq "tab");
-				$params{$key} = $properties->{$fieldname}{$key};
+
+		foreach my $fieldName (keys %{$properties}) {
+			my %fieldHash = %{$properties->{$fieldName}};
+			my %params = (name => $fieldName,
+				      value => $self->getValue($fieldName));
+			next if exists $fieldHash{autoGenerate} and not $fieldHash{autoGenerate};
+
+			# Kludge.
+			if (isIn($fieldHash{fieldType}, 'selectBox', 'workflow') and ref $params{value} ne 'ARRAY') {
+				$params{value} = [$params{value}];
 			}
-			$params{value} = $self->getValue($fieldname);
-			$params{name} = $fieldname;
-			my $tab = $properties->{$fieldname}{tab} || "properties";
+
+			if (exists $fieldHash{visible} and not $fieldHash{visible}) {
+				$params{fieldType} = 'hidden';
+			} else {
+				%params = (%params, %fieldHash);
+				delete $params{tab};
+			}
+
+			my $tab = $fieldHash{tab} || "properties";
 			$tabform->getTab($tab)->dynamicField(%params);
 		}
 	}
+
         if ($self->session->setting->get("metaDataEnabled")) {
                 my $meta = $self->getMetaDataFields();
                 foreach my $field (keys %$meta) {

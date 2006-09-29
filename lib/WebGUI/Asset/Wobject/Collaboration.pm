@@ -288,206 +288,351 @@ sub definition {
 	my $session = shift;
         my $definition = shift;
 	my $i18n = WebGUI::International->new($session,"Asset_Collaboration");
+	my $useKarma = $session->setting->get('useKarma');
+
+	my %sortByOptions;
+	tie %sortByOptions, 'Tie::IxHash';
+	%sortByOptions = (lineage=>$i18n->get('sequence'),
+			  dateUpdated=>$i18n->get('date updated'),
+			  dateSubmitted=>$i18n->get('date submitted'),
+			  title=>$i18n->get('title'),
+			  userDefined1=>$i18n->get('user defined 1'),
+			  userDefined2=>$i18n->get('user defined 2'),
+			  userDefined3=>$i18n->get('user defined 3'),
+			  userDefined4=>$i18n->get('user defined 4'),
+			  userDefined5=>$i18n->get('user defined 5'),
+			  ($useKarma? (karmaRank=>$i18n->get('karma rank')) : ()),
+			 );
+
+	my $richEditorOptions = $session->db->buildHashRef("select distinct(assetData.assetId), assetData.title from asset, assetData where asset.className='WebGUI::Asset::RichEdit' and asset.assetId=assetData.assetId order by assetData.title");
+
+	my %properties;
+	tie %properties, 'Tie::IxHash';
+	%properties = (
+		visitorCacheTimeout => {
+			tab => "display",
+			fieldType => "interval",
+			defaultValue => 3600,
+			uiLevel => 8,
+			label => $i18n->get("visitor cache timeout"),
+			hoverHelp => $i18n->get("visitor cache timeout help")
+			},
+		autoSubscribeToThread => {
+			fieldType=>"yesNo",
+			defaultValue=>1,
+			tab=>'mail',
+			label=>$i18n->get("auto subscribe to thread"),
+			hoverHelp=>$i18n->get("auto subscribe to thread help"),
+			},
+		requireSubscriptionForEmailPosting => {
+			fieldType=>"yesNo",
+			defaultValue=>1,
+			tab=>'mail',
+			label=>$i18n->get("require subscription for email posting"),
+			hoverHelp=>$i18n->get("require subscription for email posting help"),
+			},
+		approvalWorkflow =>{
+			fieldType=>"workflow",
+			defaultValue=>"pbworkflow000000000003",
+			type=>'WebGUI::VersionTag',
+			tab=>'security',
+			label=>$i18n->get('approval workflow'),
+			hoverHelp=>$i18n->get('approval workflow description'),
+			},
+		mailServer=>{
+			fieldType=>"text",
+			defaultValue=>undef,
+			tab=>'mail',
+			label=>$i18n->get("mail server"),
+			hoverHelp=>$i18n->get("mail server help"),
+			},
+		mailAccount=>{
+			fieldType=>"text",
+			defaultValue=>undef,
+			tab=>'mail',
+			label=>$i18n->get("mail account"),
+			hoverHelp=>$i18n->get("mail account help"),
+			},
+		mailPassword=>{
+			fieldType=>"password",
+			defaultValue=>undef,
+			tab=>'mail',
+			label=>$i18n->get("mail password"),
+			hoverHelp=>$i18n->get("mail password help"),
+			},
+		mailAddress=>{
+			fieldType=>"email",
+			defaultValue=>undef,
+			tab=>'mail',
+			label=>$i18n->get("mail address"),
+			hoverHelp=>$i18n->get("mail address help"),
+			},
+		mailPrefix=>{
+			fieldType=>"text",
+			defaultValue=>undef,
+			tab=>'mail',
+			label=>$i18n->get("mail prefix"),
+			hoverHelp=>$i18n->get("mail prefix help"),
+			},
+		getMailCronId=>{
+			fieldType=>"hidden",
+			defaultValue=>undef,
+			noFormPost=>1
+			},
+		getMail=>{
+			fieldType=>"yesNo",
+			defaultValue=>0,
+			tab=>'mail',
+			label=>$i18n->get("get mail"),
+			hoverHelp=>$i18n->get("get mail help"),
+			},
+		getMailInterval=>{
+			fieldType=>"interval",
+			defaultValue=>300,
+			tab=>'mail',
+			label=>$i18n->get("get mail interval"),
+			hoverHelp=>$i18n->get("get mail interval help"),
+			},
+		displayLastReply =>{
+			fieldType=>"yesNo",
+			defaultValue=>0,
+			tab=>'display',
+			label=>$i18n->get('display last reply'),
+			hoverHelp=>$i18n->get('display last reply description'),
+			},
+		allowReplies =>{
+			fieldType=>"yesNo",
+			defaultValue=>1,
+			tab=>'security',
+			label=>$i18n->get('allow replies'),
+			hoverHelp=>$i18n->get('allow replies description'),
+			},
+		threadsPerPage =>{
+			fieldType=>"integer",
+			defaultValue=>30,
+			tab=>'display',
+			label=>$i18n->get('threads/page'),
+			hoverHelp=>$i18n->get('threads/page description'),
+			},
+		postsPerPage =>{
+			fieldType=>"integer",
+			defaultValue=>10,
+			tab=>'display',
+			label=>$i18n->get('posts/page'),
+			hoverHelp=>$i18n->get('posts/page description'),
+			},
+		archiveAfter =>{
+			fieldType=>"interval",
+			defaultValue=>31536000,
+			tab=>'properties',
+			label=>$i18n->get('archive after'),
+			hoverHelp=>$i18n->get('archive after description'),
+			},
+		subscriptionGroupId =>{
+			noFormPost=>1,
+			fieldType=>"hidden",
+			defaultValue=>undef
+			},
+		lastPostDate =>{
+			noFormPost=>1,
+			fieldType=>"hidden",
+			defaultValue=>undef
+			},
+		lastPostId =>{
+			noFormPost=>1,
+			fieldType=>"hidden",
+			defaultValue=>undef
+			},
+		rating =>{
+			noFormPost=>1,
+			fieldType=>"hidden",
+			defaultValue=>undef
+			},
+		replies =>{
+			noFormPost=>1,
+			fieldType=>"hidden",
+			defaultValue=>undef
+			},
+		views =>{
+			noFormPost=>1,
+			fieldType=>"hidden",
+			defaultValue=>undef
+			},
+		threads =>{
+			noFormPost=>1,
+			fieldType=>"hidden",
+			defaultValue=>undef
+			},
+		useContentFilter =>{
+			fieldType=>"yesNo",
+			defaultValue=>1,
+			tab=>'display',
+			label=>$i18n->get('content filter'),
+			hoverHelp=>$i18n->get('content filter description'),
+			},
+		filterCode =>{
+			fieldType=>"filterContent",
+			defaultValue=>'javascript',
+			tab=>'security',
+			label=>$i18n->get('filter code'),
+			hoverHelp=>$i18n->get('filter code description'),
+			},
+		richEditor =>{
+			fieldType=>"selectBox",
+			defaultValue=>"PBrichedit000000000002",
+			tab=>'display',
+			label=>$i18n->get('rich editor'),
+			hoverHelp=>$i18n->get('rich editor description'),
+			options=>$richEditorOptions,
+			},
+		attachmentsPerPost =>{
+			fieldType=>"integer",
+			defaultValue=>0,
+			tab=>'properties',
+			label=>$i18n->get('attachments/post'),
+			hoverHelp=>$i18n->get('attachments/post description'),
+			},
+		editTimeout =>{
+			fieldType=>"interval",
+			defaultValue=>3600,
+			tab=>'security',
+			label=>$i18n->get('edit timeout'),
+			hoverHelp=>$i18n->get('edit timeout description'),
+			},
+		addEditStampToPosts =>{
+			fieldType=>"yesNo",
+			defaultValue=>0,
+			tab=>'security',
+			label=>$i18n->get('edit stamp'),
+			hoverHelp=>$i18n->get('edit stamp description'),
+			},
+		usePreview =>{
+			fieldType=>"yesNo",
+			defaultValue=>1,
+			tab=>'properties',
+			label=>$i18n->get('use preview'),
+			hoverHelp=>$i18n->get('use preview description'),
+			},
+		sortOrder =>{
+			fieldType=>"selectBox",
+			defaultValue=>'desc',
+			tab=>'display',
+			options=>{ asc => $i18n->get('ascending'),
+				   desc => $i18n->get('descending') },
+			label=>$i18n->get('sort order'),
+			hoverHelp=>$i18n->get('sort order description'),
+			},
+		sortBy =>{
+			fieldType=>"selectBox",
+			defaultValue=>'dateUpdated',
+			tab=>'display',
+			options=>\%sortByOptions,
+			label=>$i18n->get('sort by'),
+			hoverHelp=>$i18n->get('sort by description'),
+			},
+		rssTemplateId =>{
+			fieldType=>"template",
+			namespace=>"Collaboration/RSS",
+			defaultValue=>'PBtmpl0000000000000142',
+			tab=>'display',
+			label=>$i18n->get('rss template'),
+			hoverHelp=>$i18n->get('rss template description'),
+			},
+		notificationTemplateId =>{
+			fieldType=>"template",
+			namespace=>"Collaboration/Notification",
+			defaultValue=>'PBtmpl0000000000000027',
+			tab=>'display',
+			label=>$i18n->get('notification template'),
+			hoverHelp=>$i18n->get('notification template description'),
+			},
+		searchTemplateId =>{
+			fieldType=>"template",
+			namespace=>"Collaboration/Search",
+			defaultValue=>'PBtmpl0000000000000031',
+			tab=>'display',
+			label=>$i18n->get('search template'),
+			hoverHelp=>$i18n->get('search template description'),
+			},
+		postFormTemplateId =>{
+			fieldType=>"template",
+			namespace=>"Collaboration/PostForm",
+			defaultValue=>'PBtmpl0000000000000029',
+			tab=>'display',
+			label=>$i18n->get('post template'),
+			hoverHelp=>$i18n->get('post template description'),
+			},
+		threadTemplateId =>{
+			fieldType=>"template",
+			namespace=>"Collaboration/Thread",
+			defaultValue=>'PBtmpl0000000000000032',
+			tab=>'display',
+			label=>$i18n->get('thread template'),
+			hoverHelp=>$i18n->get('thread template description'),
+			},
+		collaborationTemplateId =>{
+			fieldType=>"template",
+			namespace=>'Collaboration',
+			defaultValue=>'PBtmpl0000000000000026',
+			tab=>'display',
+			label=>$i18n->get('system template'),
+			hoverHelp=>$i18n->get('system template description'),
+			},
+		karmaPerPost =>{
+			fieldType=>"integer",
+			defaultValue=>0,
+			tab=>'properties',
+			visible=>$useKarma,
+			label=>$i18n->get('karma/post'),
+			hoverHelp=>$i18n->get('karma/post description'),
+			},
+		karmaSpentToRate => {
+			fieldType => "integer",
+			defaultValue=> 0,
+			tab=>'properties',
+			visible => $useKarma,
+			label => $i18n->get('karma spent to rate'),
+			hoverHelp => $i18n->get('karma spent to rate description'),
+			},
+		karmaRatingMultiplier => {
+			fieldType => "integer",
+			defaultValue=> 1,
+			tab=>'properties',
+			visible => $useKarma,
+			label=>$i18n->get('karma rating multiplier'),
+			hoverHelp=>$i18n->get('karma rating multiplier description'),
+			},
+		avatarsEnabled =>{
+			fieldType=>"yesNo",
+			defaultValue=>0,
+			tab=>'properties',
+			label=>$i18n->get('enable avatars'),
+			hoverHelp=>$i18n->get('enable avatars description'),
+			},
+		postGroupId =>{
+			fieldType=>"group",
+			defaultValue=>'2',
+			tab=>'security',
+			label=>$i18n->get('who posts'),
+			hoverHelp=>$i18n->get('who posts description'),
+			},
+		defaultKarmaScale => {
+			fieldType=>"integer",
+			defaultValue=>1,
+			tab=>'properties',
+			visible=>$useKarma,
+			label=>$i18n->get("default karma scale"),
+			hoverHelp=>$i18n->get('default karma scale help'),
+			}
+        );
+
         push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
+		autoGenerateForms=>1,
 		icon=>'collaboration.gif',
                 tableName=>'Collaboration',
                 className=>'WebGUI::Asset::Wobject::Collaboration',
-                properties=>{
-			visitorCacheTimeout => {
-				tab => "display",
-				fieldType => "interval",
-				defaultValue => 3600,
-				uiLevel => 8,
-				label => $i18n->get("visitor cache timeout"),
-				hoverHelp => $i18n->get("visitor cache timeout help")
-				},
-			autoSubscribeToThread => {
-				fieldType=>"yesNo",
-				defaultValue=>1
-				},
-			requireSubscriptionForEmailPosting => {
-				fieldType=>"yesNo",
-				defaultValue=>1
-				},
-			approvalWorkflow =>{
-				fieldType=>"workflow",
-				defaultValue=>"pbworkflow000000000003"
-				},
-			mailServer=>{
-				fieldType=>"text",
-				defaultValue=>undef
-				},
-			mailAccount=>{
-				fieldType=>"text",
-				defaultValue=>undef
-				},
-			mailPassword=>{
-				fieldType=>"password",
-				defaultValue=>undef
-				},
-			mailAddress=>{
-				fieldType=>"email",
-				defaultValue=>undef
-				},
-			mailPrefix=>{
-				fieldType=>"text",
-				defaultValue=>undef
-				},
-			getMailCronId=>{
-				fieldType=>"hidden",
-				defaultValue=>undef,
-				noFormPost=>1
-				},
-			getMail=>{
-				fieldType=>"yesNo",
-				defaultValue=>0
-				},
-			getMailInterval=>{
-				fieldType=>"interval",
-				defaultValue=>300
-				},
-			displayLastReply =>{
-				fieldType=>"yesNo",
-				defaultValue=>0
-				},
-			allowReplies =>{
-				fieldType=>"yesNo",
-				defaultValue=>1
-				},
-			threadsPerPage =>{
-				fieldType=>"integer",
-				defaultValue=>30
-				},
-			postsPerPage =>{
-				fieldType=>"integer",
-				defaultValue=>10
-				},
-			archiveAfter =>{
-				fieldType=>"interval",
-				defaultValue=>31536000
-				},
-			subscriptionGroupId =>{
-				noFormPost=>1,
-				fieldType=>"hidden",
-				defaultValue=>undef
-				},
-			lastPostDate =>{
-				noFormPost=>1,
-				fieldType=>"hidden",
-				defaultValue=>undef
-				},
-			lastPostId =>{
-				noFormPost=>1,
-				fieldType=>"hidden",
-				defaultValue=>undef
-				},
-			rating =>{
-				noFormPost=>1,
-				fieldType=>"hidden",
-				defaultValue=>undef
-				},
-			replies =>{
-				noFormPost=>1,
-				fieldType=>"hidden",
-				defaultValue=>undef
-				},
-			views =>{
-				noFormPost=>1,
-				fieldType=>"hidden",
-				defaultValue=>undef
-				},
-			threads =>{
-				noFormPost=>1,
-				fieldType=>"hidden",
-				defaultValue=>undef
-				},
-			useContentFilter =>{
-				fieldType=>"yesNo",
-				defaultValue=>1
-				},
-			filterCode =>{
-				fieldType=>"filterContent",
-				defaultValue=>'javascript'
-				},
-			richEditor =>{
-				fieldType=>"selectBox",
-				defaultValue=>"PBrichedit000000000002"
-				},
-			attachmentsPerPost =>{
-				fieldType=>"integer",
-				defaultValue=>0
-				},
-			editTimeout =>{
-				fieldType=>"interval",
-				defaultValue=>3600
-				},
-			addEditStampToPosts =>{
-				fieldType=>"yesNo",
-				defaultValue=>0
-				},
-			usePreview =>{
-				fieldType=>"yesNo",
-				defaultValue=>1
-				},
-			sortOrder =>{
-				fieldType=>"selectBox",
-				defaultValue=>'desc'
-				},
-			sortBy =>{
-				fieldType=>"selectBox",
-				defaultValue=>'dateUpdated'
-				},
-			rssTemplateId =>{
-				fieldType=>"template",
-				defaultValue=>'PBtmpl0000000000000142'
-				},
-			notificationTemplateId =>{
-				fieldType=>"template",
-				defaultValue=>'PBtmpl0000000000000027'
-				},
-			searchTemplateId =>{
-				fieldType=>"template",
-				defaultValue=>'PBtmpl0000000000000031'
-				},
-			postFormTemplateId =>{
-				fieldType=>"template",
-				defaultValue=>'PBtmpl0000000000000029'
-				},
-			threadTemplateId =>{
-				fieldType=>"template",
-				defaultValue=>'PBtmpl0000000000000032'
-				},
-			collaborationTemplateId =>{
-				fieldType=>"template",
-				namespace=>'Collaboration',
-				defaultValue=>'PBtmpl0000000000000026'
-				},
-			karmaPerPost =>{
-				fieldType=>"integer",
-				defaultValue=>0
-				},
-			karmaSpentToRate => {
-				fieldType => "integer",
-				defaultValue=> 0
-				},
-			karmaRatingMultiplier => {
-				fieldType => "integer",
-				defaultValue=> 0
-				},
-			avatarsEnabled =>{
-				fieldType=>"yesNo",
-				defaultValue=>0
-				},
-			postGroupId =>{
-				fieldType=>"group",
-				defaultValue=>'2'
-				},
-			defaultKarmaScale => {
-				fieldType=>"integer",
-				defaultValue=>1
-				}
-			}
+                properties=>\%properties,
 		});
         return $class->SUPER::definition($session, $definition);
 }
@@ -501,286 +646,12 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
-sub getEditForm {
+sub getEditTabs {
 	my $self = shift;
-	my $tabform = $self->SUPER::getEditForm;
 	my $i18n = WebGUI::International->new($self->session,"Asset_Collaboration");
-	$tabform->addTab("mail",$i18n->get("mail"), 9);
-	$tabform->getTab("mail")->yesNo(
-		name=>"getMail",
-		value=>$self->getValue("getMail"),
-		label=>$i18n->get("get mail"),
-		hoverHelp=>$i18n->get("get mail help"),
-		);
-	$tabform->getTab("mail")->text(
-		name=>"mailServer",
-		value=>$self->getValue("mailServer"),
-		label=>$i18n->get("mail server"),
-		hoverHelp=>$i18n->get("mail server help"),
-		);
-	$tabform->getTab("mail")->text(
-		name=>"mailAccount",
-		value=>$self->getValue("mailAccount"),
-		label=>$i18n->get("mail account"),
-		hoverHelp=>$i18n->get("mail account help"),
-		);
-	$tabform->getTab("mail")->password(
-		name=>"mailPassword",
-		value=>$self->getValue("mailPassword"),
-		label=>$i18n->get("mail password"),
-		hoverHelp=>$i18n->get("mail password help"),
-		);
-	$tabform->getTab("mail")->email(
-		name=>"mailAddress",
-		value=>$self->getValue("mailAddress"),
-		label=>$i18n->get("mail address"),
-		hoverHelp=>$i18n->get("mail address help"),
-		);
-	$tabform->getTab("mail")->interval(
-		name=>"getMailInterval",
-		value=>$self->getValue("getMailInterval"),
-		label=>$i18n->get("get mail interval"),
-		hoverHelp=>$i18n->get("get mail interval help"),
-		);
-	$tabform->getTab("mail")->text(
-		name=>"mailPrefix",
-		value=>$self->getValue("mailPrefix"),
-		label=>$i18n->get("mail prefix"),
-		hoverHelp=>$i18n->get("mail prefix help"),
-		);
-	$tabform->getTab("mail")->yesNo(
-		name=>"autoSubscribeToThread",
-		value=>$self->getValue("autoSubscribeToThread"),
-		label=>$i18n->get("auto subscribe to thread"),
-		hoverHelp=>$i18n->get("auto subscribe to thread help"),
-		);
-	$tabform->getTab("mail")->yesNo(
-		name=>"requireSubscriptionForEmailPosting",
-		value=>$self->getValue("requireSubscriptionForEmailPosting"),
-		label=>$i18n->get("require subscription for email posting"),
-		hoverHelp=>$i18n->get("require subscription for email posting help"),
-		);
-  	$tabform->getTab("display")->interval(
- 		-name=>"visitorCacheTimeout",
-		-label=>$i18n->get('visitor cache timeout'),
-		-hoverHelp=>$i18n->get('visitor cache timeout help'),
-		-value=>$self->getValue('visitorCacheTimeout'),
-		-uiLevel=>8,
-		-defaultValue=>3600
-	);
-   	$tabform->getTab("display")->yesNo(
-      		-value=>$self->getValue('displayLastReply'),
-		-label=>$i18n->get('display last reply'),
-		-hoverHelp=>$i18n->get('display last reply description'),
-		-name=>"displayLastReply"
-   		);
-   	$tabform->getTab("display")->template(
-      		-value=>$self->getValue('collaborationTemplateId'),
-      		-namespace=>"Collaboration",
-		-label=>$i18n->get('system template'),
-		-hoverHelp=>$i18n->get('system template description'),
-		-name=>"collaborationTemplateId"
-   		);
-        $tabform->getTab("display")->template(
-                -name=>"threadTemplateId",
-                -value=>$self->getValue("threadTemplateId"),
-                -namespace=>"Collaboration/Thread",
-		-label=>$i18n->get('thread template'),
-		-hoverHelp=>$i18n->get('thread template description'),
-                );
-        $tabform->getTab("display")->template(
-                -name=>"postFormTemplateId",
-                -value=>$self->getValue("postFormTemplateId"),
-                -namespace=>"Collaboration/PostForm",
-		-label=>$i18n->get('post template'),
-		-hoverHelp=>$i18n->get('post template description'),
-                );
-        $tabform->getTab("display")->template(
-                -name=>"searchTemplateId",
-                -value=>$self->getValue("searchTemplateId"),
-                -namespace=>"Collaboration/Search",
-		-label=>$i18n->get('search template'),
-		-hoverHelp=>$i18n->get('search template description'),
-                );
-        $tabform->getTab("display")->template(
-                -name=>"notificationTemplateId",
-                -value=>$self->getValue("notificationTemplateId"),
-                -namespace=>"Collaboration/Notification",
-		-label=>$i18n->get('notification template'),
-		-hoverHelp=>$i18n->get('notification template description'),
-                );
-        $tabform->getTab("display")->template(
-                -name=>"rssTemplateId",
-                -value=>$self->getValue("rssTemplateId"),
-                -namespace=>"Collaboration/RSS",
-		-label=>$i18n->get('rss template'),
-		-hoverHelp=>$i18n->get('rss template description'),
-                );
-        $tabform->getTab("security")->group(
-		-name=>"postGroupId",
-		-label=>$i18n->get('who posts'),
-		-hoverHelp=>$i18n->get('who posts description'),
-		-value=>[$self->getValue("postGroupId")]
-		);
-        $tabform->getTab("security")->workflow(
-		-name=>"approvalWorkflow",
-		-type=>"WebGUI::VersionTag",
-		-label=>$i18n->get('approval workflow'),
-		-hoverHelp=>$i18n->get('approval workflow description'),
-		-value=>[$self->getValue("approvalWorkflow")]
-		);
-        $tabform->getTab("display")->integer(
-		-name=>"threadsPerPage",
-		-label=>$i18n->get('threads/page'),
-		-hoverHelp=>$i18n->get('threads/page description'),
-		-value=>$self->getValue("threadsPerPage")
-		);
-        $tabform->getTab("display")->integer(
-		-name=>"postsPerPage",
-		-label=>$i18n->get('posts/page'),
-		-hoverHelp=>$i18n->get('posts/page description'),
-		-value=>$self->getValue("postsPerPage")
-		);
-        if ($self->session->setting->get("useKarma")) {
-                $tabform->getTab("properties")->integer(
-			-name=>"karmaPerPost",
-			-label=>$i18n->get('karma/post'),
-			-hoverHelp=>$i18n->get('karma/post description'),
-			-value=>$self->getValue("karmaPerPost")
-			);
-                $tabform->getTab("properties")->integer(
-			-name=>"karmaSpentToRate",
-			-label=>$i18n->get('karma spent to rate'),
-			-hoverHelp=>$i18n->get('karma spent to rate description'),
-			-value=>$self->getValue("karmaSpentToRate")
-			);
-                $tabform->getTab("properties")->integer(
-			-name=>"karmaRatingMultiplier",
-			-label=>$i18n->get('karma rating multiplier'),
-			-hoverHelp=>$i18n->get('karma rating multiplier description'),
-			-defaultValue=>1,
-			-value=>$self->getValue("karmaRatingMultiplier")
-			);
-                $tabform->getTab("properties")->integer(
-			-name=>"defaultKarmaScale",
-			-label=>$i18n->get("default karma scale"),
-			-hoverHelp=>$i18n->get('default karma scale help'),
-			-defaultValue=>10,
-			-value=>$self->getValue("defaultKarmaScale")
-			);
-        } else {
-                $tabform->getTab("properties")->hidden(
-			-name=>"defaultKarmaScale",
-			-value=>$self->getValue("defaultKarmaScale")
-			);
-                $tabform->getTab("properties")->hidden(
-			-name=>"karmaPerPost",
-			-value=>$self->getValue("karmaPerPost")
-			);
-                $tabform->getTab("properties")->hidden(
-			-name=>"karmaSpentToRate",
-			-value=>$self->getValue("karmaSpentToRate")
-			);
-                $tabform->getTab("properties")->hidden(
-			-name=>"karmaRatingMultiplier",
-			-value=>$self->getValue("karmaRatingMultiplier")
-			);
-        }
-	$tabform->getTab("security")->filterContent(
-		-value=>$self->getValue("filterCode"),
-		-name=>"filterCode",
-		-label=>$i18n->get('filter code'),
-		-hoverHelp=>$i18n->get('filter code description'),
-		);
-	my %options;
-	tie %options, 'Tie::IxHash';
-	%options = (
-			lineage=>$i18n->get('sequence'),
-			dateUpdated=>$i18n->get('date updated'),
-			dateSubmitted=>$i18n->get('date submitted'),
-			title=>$i18n->get('title'),
-			userDefined1=>$i18n->get('user defined 1'),
-			userDefined2=>$i18n->get('user defined 2'),
-			userDefined3=>$i18n->get('user defined 3'),
-			userDefined4=>$i18n->get('user defined 4'),
-			userDefined5=>$i18n->get('user defined 5'),
-			);
-	$options{karmaRank} = $i18n->get("karma rank") if ($self->session->setting->get("useKarma"));
-	$tabform->getTab("display")->selectBox(
-		-name=>"sortBy",
-		-value=>[$self->getValue("sortBy")],
-		-options=>\%options,
-		-label=>$i18n->get('sort by'),
-		-hoverHelp=>$i18n->get('sort by description'),
-		);
-	$tabform->getTab("display")->selectBox(
-		-name=>"sortOrder",
-		-value=>[$self->getValue("sortOrder")],
-		-options=>{
-			asc=>$i18n->get('ascending'),
-			desc=>$i18n->get('descending'),
-			},
-		-label=>$i18n->get('sort order'),
-		-hoverHelp=>$i18n->get('sort order description'),
-		);
-        $tabform->getTab("properties")->interval(
-		-name=>"archiveAfter",
-		-label=>$i18n->get('archive after'),
-		-hoverHelp=>$i18n->get('archive after description'),
-		-value=>$self->getValue("archiveAfter")
-		);
-        $tabform->getTab("properties")->integer(
-		-name=>"attachmentsPerPost",
-		-label=>$i18n->get('attachments/post'),
-		-hoverHelp=>$i18n->get('attachments/post description'),
-		-value=>$self->getValue("attachmentsPerPost")
-		);
-        $tabform->getTab("security")->interval(
-		-name=>"editTimeout",
-		-label=>$i18n->get('edit timeout'),
-		-hoverHelp=>$i18n->get('edit timeout description'),
-		-value=>$self->getValue("editTimeout")
-		);
-        $tabform->getTab("security")->yesNo(
-		-name=>"allowReplies",
-		-label=>$i18n->get('allow replies'),
-		-hoverHelp=>$i18n->get('allow replies description'),
-		-value=>$self->getValue("allowReplies")
-		);
-        $tabform->getTab("security")->yesNo(
-		-name=>"addEditStampToPosts",
-		-label=>$i18n->get('edit stamp'),
-		-hoverHelp=>$i18n->get('edit stamp description'),
-		-value=>$self->getValue("addEditStampToPosts")
-		);
-        $tabform->getTab("display")->selectBox(
-		-name=>"richEditor",
-		-label=>$i18n->get('rich editor'),
-		-hoverHelp=>$i18n->get('rich editor description'),
-		-options=>$self->session->db->buildHashRef("select distinct(assetData.assetId), assetData.title from asset, assetData where asset.className='WebGUI::Asset::RichEdit' and asset.assetId=assetData.assetId order by assetData.title"),
-		-value=>[$self->getValue("richEditor")]
-		);
-        $tabform->getTab("display")->yesNo(
-		-name=>"useContentFilter",
-		-label=>$i18n->get('content filter'),
-		-hoverHelp=>$i18n->get('content filter description'),
-		-value=>$self->getValue("useContentFilter")
-		);
-        $tabform->getTab("properties")->yesNo(
-		-name=>"usePreview",
-		-label=>$i18n->get('use preview'),
-		-hoverHelp=>$i18n->get('use preview description'),
-		-value=>$self->getValue("usePreview")
-		);
-        $tabform->getTab("properties")->yesNo(
-		-name=>"avatarsEnabled",
-		-label=>$i18n->get('enable avatars'),
-		-hoverHelp=>$i18n->get('enable avatars description'),
-		-value=>$self->getValue("avatarsEnabled")
-		);
-	return $tabform;
-}
 
+	return (['mail', $i18n->get('mail'), 9]);
+}
 
 #-------------------------------------------------------------------
 
