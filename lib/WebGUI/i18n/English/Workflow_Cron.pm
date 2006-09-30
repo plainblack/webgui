@@ -2,9 +2,9 @@ package WebGUI::i18n::English::Workflow_Cron;
 
 our $I18N = { 
 	'day of week help' => {
-		message => q|Which day of the week do you want this workflow triggered? The range is between 0 and 6 where 0 is Sunday. You can specify a specific day like "0" or "2". You can specify a range like "3-6". You may also specify all days of the week by "*". And finally you can specify a list of days of the week like "1,5,6".|,
+		message => q|Which day of the week do you want this workflow triggered? The range is between 0 and 6 where 0 is Sunday. You can specify a specific day like "0" or "2". You can specify a range like "3-6". You may also specify all days of the week by "*". You can also use &gt;3, &lt;3, or !3 to equate to greater than, less than, or not equal to 3 (or any number). And finally you can specify a list of days of the week like "1,5,6".|,
 		context => q|the hover help for the month of year field|,
-		lastUpdated => 0,
+		lastUpdated => 1159644012,
 	},
 
 	'day of week' => {
@@ -14,9 +14,9 @@ our $I18N = {
 	},
 
 	'month of year help' => {
-		message => q|Which month of the year do you want this workflow triggered? The range is between 1 and 12. You can specify a specific month like "2" or 12". You can specify a range like "3-6". You may also specify all months by "*". You can specify intervals like "*/3" (every 3 months). And finally you can specify a list of months like "1,5,11".|,
+		message => q|Which month of the year do you want this workflow triggered? The range is between 1 and 12. You can specify a specific month like "2" or 12". You can specify a range like "3-6". You may also specify all months by "*". You can also use &gt;3, &lt;3, or !3 to equate to greater than, less than, or not equal to 3 (or any number). You can specify intervals like "*/3" (every 3 months). And finally you can specify a list of months like "1,5,11".|,
 		context => q|the hover help for the month of year  field|,
-		lastUpdated => 1154368718,
+		lastUpdated => 1159644012,
 	},
 
 	'month of year' => {
@@ -26,7 +26,7 @@ our $I18N = {
 	},
 
 	'day of month help' => {
-		message => q|Which day of the month do you want this workflow triggered? The range is between 1 and 31. You can specify a specific day like "2" or 12". You can specify a range like "3-6". You may also specify all days by "*". You can specify intervals like "*/3" (every 3 days). And finally you can specify a list of days like "1,5,11".|,
+		message => q|Which day of the month do you want this workflow triggered? The range is between 1 and 31. You can specify a specific day like "2" or 12". You can specify a range like "3-6". You may also specify all days by "*". You can specify intervals like "*/3" (every 3 days). You can also use &gt;3, &lt;3, or !3 to equate to greater than, less than, or not equal to 3 (or any number). And finally you can specify a list of days like "1,5,11".|,
 		context => q|the hover help for the day of month field|,
 		lastUpdated => 0,
 	},
@@ -38,9 +38,9 @@ our $I18N = {
 	},
 
 	'hour of day help' => {
-		message => q|Which hour of the day do you want this workflow triggered? The range is between 0 and 23. You can specify a specific hour like "0" or 12". You may also specify all hours by "*". You can specify a range like "3-6". You can specify intervals like "*/3" (every 3 hours). And finally you can specify a list of hours like "1,5,17,21".|,
+		message => q|Which hour of the day do you want this workflow triggered? The range is between 0 and 23. You can specify a specific hour like "0" or 12". You may also specify all hours by "*". You can specify a range like "3-6". You can specify intervals like "*/3" (every 3 hours). You can also use &gt;3, &lt;3, or !3 to equate to greater than, less than, or not equal to 3 (or any number). And finally you can specify a list of hours like "1,5,17,21".|,
 		context => q|the hover help for the hour of day field|,
-		lastUpdated => 0,
+		lastUpdated => 1159644012,
 	},
 
 	'hour of day' => {
@@ -50,9 +50,9 @@ our $I18N = {
 	},
 
 	'minute of hour help' => {
-		message => q|Which minute of the hour do you want this workflow triggered? The range is between 0 and 59. You can specify a specific minute like "0" or 12". You may also specify all minutes by "*". You can specify a range like "3-6". You can specify intervals like "*/3" (every 3 minutes). And finally you can specify a list of minutes like "1,5,17,24".|,
+		message => q|Which minute of the hour do you want this workflow triggered? The range is between 0 and 59. You can specify a specific minute like "0" or 12". You may also specify all minutes by "*". You can specify a range like "3-6". You can specify intervals like "*/3" (every 3 minutes). You can also use &gt;3, &lt;3, or !3 to equate to greater than, less than, or not equal to 3 (or any number). And finally you can specify a list of minutes like "1,5,17,24".|,
 		context => q|the hover help for the minute of hour field|,
-		lastUpdated => 0,
+		lastUpdated => 1159644012,
 	},
 
 	'minute of hour' => {

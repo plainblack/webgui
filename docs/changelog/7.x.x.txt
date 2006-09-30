@@ -1,4 +1,6 @@
 7.0.9
+ - Removed the need for DateTime::Cron::Simple, which also added the ability
+   to use ! < and > in schedules.
  - partial fix: invalid Message-ID headers in outgoing mail
  - fix: HttpProxy not doing file uploads correctly
  - fix: leftover discussion template variables in Default Article template

@@ -16,7 +16,6 @@ package Spectre::Cron;
 
 use strict;
 use DateTime;
-use DateTime::Cron::Simple;
 use HTTP::Request::Common;
 use HTTP::Cookies;
 use POE qw(Component::Client::HTTP);
@@ -160,8 +159,12 @@ A DateTime object representing the time to compare the schedule with.
 sub checkSchedule {
 	my ($kernel, $self, $jobId, $now) = @_[KERNEL, OBJECT, ARG0, ARG1];
 	$self->debug("Checking schedule ".$jobId." against the current time.");
-	my $cron = DateTime::Cron::Simple->new($self->getJob($jobId)->{schedule});
-       	if ($cron->validate_time($now)) {
+	my $job = $self->getJob($jobId);
+	if ($self->checkSegment($now->minute, $job->{minuteOfHour}, [0..59])
+		&& $self->checkSegment($now->hour, $job->{hourOfDay}, [0..23])
+		&& $self->checkSegment($now->day, $job->{dayOfMonth}, [1..31])
+		&& $self->checkSegment($now->month, $job->{monthOfYear}, [1..12])
+		&& $self->checkSegment($now->dow, $job->{dayOfWeek}, [0..6]) ) {
 		$self->debug("It's time to run ".$jobId.". Creating workflow instance.");
 		$kernel->yield("runJob",$jobId);
 	}
@@ -183,6 +186,47 @@ sub checkSchedules {
 		$kernel->yield("checkSchedule", $id, $now)
 	}
 	$kernel->delay_set("checkSchedules",60);
+}
+
+#-------------------------------------------------------------------
+
+=head2 checkSegment ( current, pattern, range )
+
+Checks a crontab schedule segment against a current time segment.
+
+=cut
+
+sub checkSegment {
+	# borrowed from Set::Crontab on CPAN
+	my $self = shift;
+        my (@list, @and, @not);
+        my ($now, $spec, $range) = @_;
+        # 1,2-4,*/3,!13,>9,<15
+        foreach (split /,/, $spec) {
+                my @pick;
+                my $step = $1 if s#/(\d+)$##;
+                # 0+"01" == 1
+                if    (/^(\d+)$/)       { push @pick, 0+$1;          }
+                elsif (/^\*$/)          { push @pick, @$range;       }
+                elsif (/^(\d+)-(\d+)$/) { push @pick, 0+$1..0+$2;    }
+                elsif (/^!(\d+)$/)      { push @not,  "\$_ != 0+$1"; }
+                elsif (/^([<>])(\d+)$/) { push @and,  "\$_ $1 0+$2"; }
+                if ($step) {
+                        my $i;
+                        @pick = grep { defined $_ if $i++ % $step == 0 } @pick;
+                }
+                push @list, @pick;
+        }
+        if (@and) {
+                my $and = join q{ && }, @and;
+                push @list, grep { defined $_ if eval $and } @$range;
+        }
+        if (@not) {
+                my $not = join q{ && }, @not;
+                @list = grep { defined $_ if eval $not } (@list ? @list : @$range);
+        }
+        my $matches = {map {$_ => 1} @list};
+        return exists $matches->{$now};
 }
 
 #-------------------------------------------------------------------

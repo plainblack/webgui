@@ -68,7 +68,6 @@ checkModule("SOAP::Lite",0.60);
 checkModule("DateTime",0.2901);
 checkModule("Time::HiRes",1.38);
 checkModule("DateTime::Format::Strptime",1.0601);
-checkModule("DateTime::Cron::Simple",0.2);
 checkModule("DateTime::Format::Mail",0.2901);
 checkModule("Image::Magick",6.0);
 checkModule("Log::Log4perl",0.51);
