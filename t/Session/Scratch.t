@@ -15,7 +15,7 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 37; # increment this value for each test you create
+use Test::More tests => 45; # increment this value for each test you create
  
 my $session = WebGUI::Test->session;
 
@@ -34,10 +34,18 @@ for (my $count = 1; $count <= $maxCount; $count++){
    is($scratch->get("Test$count"), $count, "Passed set/get $count");
 }
 
-$scratch->delete("Test1");
+is($scratch->delete("Test1"), 1, 'delete returns number deleted');
+is($scratch->delete(), undef, 'delete without name of variable to delete returns undef');
 is($scratch->get("Test1"), undef, "delete()");
 
-$scratch->deleteName("Test10");
+is($scratch->deleteName(), undef, 'deleteName without name of variable to delete returns undef');
+is($scratch->deleteName("Test10"), 1, 'deleteName returns number of elements deleted');
+
+TODO: {
+	local $TODO = "deleteName tests to write later";
+	ok(0, 'set up scratch variable across multiple sessions and make sure deleteName gets them all');
+}
+
 is($scratch->get("Test10"), undef, "deleteName()");
 
 $scratch->deleteAll;
@@ -71,3 +79,13 @@ is($changedValue, 15, "changing stored scratch value");
 is($scratch->get("dBase5"), 15, "checking cached scratch value");
 
 $newSession->close;
+
+is($scratch->set('retVal',2), 1, 'set returns number of rows affected');
+is($scratch->set(), undef, 'set returns undef unless it gets a name');
+is($scratch->set('','value'), undef, 'set returns undef unless it gets a name even if there is a value');
+
+END {
+	if (defined $newSession and ref $newSession eq 'WebGUI::Session') {
+		$newSession->close;
+	}
+}
