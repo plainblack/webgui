@@ -158,15 +158,22 @@ Name value pairs to add to the URL in the form of:
 
  name1=value1;name2=value2;name3=value3
 
+=head3 skipPreventProxyCache
+
+If preventing proxy caching is enabled in the settings, then if
+skipPreventProxyCache is a 1 will override that and prevent the
+noCache param from being added to the URL.
+
 =cut
 
 sub gateway {
 	my $self = shift;
 	my $pageUrl = shift;
 	my $pairs = shift;
+	my $skipPreventProxyCache = shift;
         my $url = $self->session->config->get("gateway").'/'.$pageUrl;
 	$url =~ s/\/+/\//g;
-        if ($self->session->setting->get("preventProxyCache") == 1) {
+        if ($self->session->setting->get("preventProxyCache") == 1 and !$skipPreventProxyCache) {
                 $url = $self->append($url,"noCache=".randint(0,1000).','.$self->session->datetime->time());
         }
 	if ($pairs) {
@@ -267,7 +274,8 @@ The base URL to use. This defaults to current page url.
 sub makeAbsolute {
 	my $self = shift;
 	my $url = shift;
-	my $baseURL = shift || $self->page();
+	my $baseURL = shift;
+	$baseURL = $self->page() unless $baseURL;
 	return URI->new_abs($url,$baseURL);
 }
 
@@ -326,9 +334,10 @@ If set to "1" we'll use the full site URL rather than the script (gateway) URL.
 
 =head3 skipPreventProxyCache
 
-If preventing proxy caching is enabled in the settings, then if skipPreventProxyCache
-is a 1 it will prevent the code that prevents proxy caching.  If that doesn't make
-your head hurt then you'll understand the rest of wG just fine.
+If preventing proxy caching is enabled in the settings, then if
+skipPreventProxyCache is a 1 it will prevent the code that prevents
+proxy caching from being added.  If that doesn't make your head hurt
+then you'll understand the rest of wG just fine.
 
 =cut
 
@@ -341,13 +350,9 @@ sub page {
         if ($useFullUrl) {
                 $url = $self->getSiteURL();
         }
-	$url .= $self->gateway($self->session->asset ? $self->session->asset->get("url") : $self->getRequestedUrl);
-        if ($self->session->setting->get("preventProxyCache") == 1 && !$skipPreventProxyCache) {
-                $url = $self->append($url,"noCache=".randint(0,1000).','.$self->session->datetime->time());
-        }
-        if ($pairs) {
-                $url = $self->append($url,$pairs);
-        }
+	my $path = $self->session->asset ? $self->session->asset->get("url") : $self->getRequestedUrl;
+	$url .= $self->gateway($path, $pairs, $skipPreventProxyCache);
+			
         return $url;
 }
 

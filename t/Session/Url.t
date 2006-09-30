@@ -52,11 +52,11 @@ my @getRefererUrlTests = (
 use Test::More;
 use Test::MockObject::Extends;
 use Test::MockObject;
-plan tests => 43 + scalar(@getRefererUrlTests);
+plan tests => 46 + scalar(@getRefererUrlTests);
 
 my $session = WebGUI::Test->session;
 
-#Enable caching
+#disable caching
 my $preventProxyCache = $session->setting->get('preventProxyCache');
 
 $session->setting->set('preventProxyCache', 0) if ($preventProxyCache);
@@ -76,26 +76,35 @@ is( $url2, $url.'?a=b', 'append first pair');
 $url2 = $session->url->append($url2,'c=d');
 is( $url2, $url.'?a=b;c=d', 'append second pair');
 
+#######################################
+#
+# gateway
+#
+#######################################
+
 $session->config->{_config}->{'gateway'} = '/';
 
-is ( $session->config->get('gateway'), '/', 'Set gateway for downstream tests');
+is( $session->config->get('gateway'), '/', 'Set gateway for downstream tests');
 
 $url2 = $session->url->gateway;
-is ( $url2, '/', 'gateway method, no args');
+is( $url2, '/', 'gateway: args');
 
 $url2 = $session->url->gateway('/home');
-is ( $url2, '/home', 'gateway method, pageUrl with leading slash');
+is( $url2, '/home', 'gateway: with leading slash');
 
 $url2 = $session->url->gateway('home');
-is ( $url2, '/home', 'gateway method, pageUrl without leading slash');
+is( $url2, '/home', 'gateway: without leading slash');
 
 #Disable caching
 $session->setting->set(preventProxyCache => 1);
 
-is ( 1, $session->setting->get('preventProxyCache'), 'disable proxy caching');
+is( 1, $session->setting->get('preventProxyCache'), 'gateway: disable proxy caching');
 
 $url2 = $session->url->gateway('home');
-like ( $url2, qr{/home\?noCache=\d+,\d+$}, 'check proxy prevention setting');
+like( $url2, qr{/home\?noCache=\d+,\d+$}, 'gateway: check proxy prevention setting');
+
+$url2 = $session->url->gateway('home','',1);
+is( $url2, '/home', 'gateway: skipPreventProxyCache');
 
 #Enable caching
 $session->setting->set(preventProxyCache => 0);
@@ -107,7 +116,6 @@ is( $url2, '/home?a=b', 'append one pair via gateway');
 #Restore original proxy cache setting so downstream tests work with no surprises
 $session->setting->set(preventProxyCache => $preventProxyCache );
 
-
 #######################################
 #
 # setSiteUrl and getSiteUrl
@@ -118,14 +126,14 @@ $session->setting->set(preventProxyCache => $preventProxyCache );
 my $setting_hostToUse = $session->setting->get('hostToUse');
 $session->setting->set('hostToUse', 'HTTP_HOST');
 my $sitename = $session->config->get('sitename')->[0];
-is ( $session->url->getSiteURL, 'http://'.$sitename, 'getSiteURL from config as http_host');
+is( $session->url->getSiteURL, 'http://'.$sitename, 'getSiteURL from config as http_host');
 my $config_port;
 if ($session->config->get('webServerPort')) {
 	$config_port = $session->config->get('webServerPort');
 }
 
 $session->url->setSiteURL('http://webgui.org');
-is ( $session->url->getSiteURL, 'http://webgui.org', 'override config setting with setSiteURL');
+is( $session->url->getSiteURL, 'http://webgui.org', 'override config setting with setSiteURL');
 
 ##Create a fake environment hash so we can muck with it.
 our %mockEnv = %ENV;
@@ -133,32 +141,32 @@ $session->{_env}->{_env} = \%mockEnv;
 
 $mockEnv{HTTPS} = "on";
 $session->url->setSiteURL(undef);
-is ( $session->url->getSiteURL, 'https://'.$sitename, 'getSiteURL from config as http_host with SSL');
+is( $session->url->getSiteURL, 'https://'.$sitename, 'getSiteURL from config as http_host with SSL');
 
 $mockEnv{HTTPS} = "";
 $mockEnv{HTTP_HOST} = "devsite.com";
 $session->url->setSiteURL(undef);
-is ( $session->url->getSiteURL, 'http://'.$sitename, 'getSiteURL where requested host is not a configured site');
+is( $session->url->getSiteURL, 'http://'.$sitename, 'getSiteURL where requested host is not a configured site');
 
 my @config_sitename = @{ $session->config->get('sitename') };
 $session->config->addToArray('sitename', 'devsite.com');
 $session->url->setSiteURL(undef);
-is ( $session->url->getSiteURL, 'http://devsite.com', 'getSiteURL where requested host is not the first configured site');
+is( $session->url->getSiteURL, 'http://devsite.com', 'getSiteURL where requested host is not the first configured site');
 
 $session->setting->set('hostToUse', 'sitename');
 $session->url->setSiteURL(undef);
-is ( $session->url->getSiteURL, 'http://'.$sitename, 'getSiteURL where illegal host has been requested');
+is( $session->url->getSiteURL, 'http://'.$sitename, 'getSiteURL where illegal host has been requested');
 
 $session->config->set('webServerPort', 80);
 $session->url->setSiteURL(undef);
-is ( $session->url->getSiteURL, 'http://'.$sitename.':80', 'getSiteURL with a port');
+is( $session->url->getSiteURL, 'http://'.$sitename.':80', 'getSiteURL with a port');
 
 $session->config->set('webServerPort', 8880);
 $session->url->setSiteURL(undef);
-is ( $session->url->getSiteURL, 'http://'.$sitename.':8880', 'getSiteURL with a non-standard port');
+is( $session->url->getSiteURL, 'http://'.$sitename.':8880', 'getSiteURL with a non-standard port');
 
 $session->url->setSiteURL('http://'.$sitename);
-is ( $session->url->getSiteURL, 'http://'.$sitename, 'restore config setting');
+is( $session->url->getSiteURL, 'http://'.$sitename, 'restore config setting');
 $session->config->set('sitename', \@config_sitename);
 $session->setting->set('hostToUse', $setting_hostToUse);
 if ($config_port) {
@@ -171,7 +179,7 @@ else {
 $url  = 'level1 /level2/level3   ';
 $url2 = 'level1-/level2/level3';
 
-is ( $session->url->makeCompliant($url), $url2, 'language specific URL compliance');
+is( $session->url->makeCompliant($url), $url2, 'language specific URL compliance');
 
 
 #######################################
@@ -182,7 +190,7 @@ is ( $session->url->makeCompliant($url), $url2, 'language specific URL complianc
 
 my $originalRequest = $session->request;  ##Save the original request object
 
-is ($session->url->getRequestedUrl, undef, 'getRequestedUrl returns undef unless it has a request object');
+is($session->url->getRequestedUrl, undef, 'getRequestedUrl returns undef unless it has a request object');
 
 my $newRequest = Test::MockObject->new;
 my $requestedUrl = 'empty';
@@ -191,20 +199,20 @@ $session->{_request} = $newRequest;
 
 ##Validate new MockObject
 
-is ($session->request->uri, 'empty', 'Validate Mock Object operation');
+is($session->request->uri, 'empty', 'Validate Mock Object operation');
 
 $requestedUrl = 'full';
-is ($session->request->uri, 'full', 'Validate Mock Object operation #2');
+is($session->request->uri, 'full', 'Validate Mock Object operation #2');
 
 $requestedUrl = '/path1/file1';
-is ($session->url->getRequestedUrl, 'path1/file1', 'getRequestedUrl, fetch');
+is($session->url->getRequestedUrl, 'path1/file1', 'getRequestedUrl, fetch');
 
 $requestedUrl = '/path2/file2';
-is ($session->url->getRequestedUrl, 'path1/file1', 'getRequestedUrl, check cache of previous result');
+is($session->url->getRequestedUrl, 'path1/file1', 'getRequestedUrl, check cache of previous result');
 
 $session->url->{_requestedUrl} = undef;  ##Manually clear cached value
 $requestedUrl = '/path2/file2?param1=one;param2=two';
-is ($session->url->getRequestedUrl, 'path2/file2', 'getRequestedUrl, does not return params');
+is($session->url->getRequestedUrl, 'path2/file2', 'getRequestedUrl, does not return params');
 
 #######################################
 #
@@ -224,19 +232,17 @@ is($session->url->page('op=viewHelpTOC;topic=Article'), $requestedUrl.'?op=viewH
 $url2 = 'http://'.$session->config->get('sitename')->[0].$requestedUrl;
 is($session->url->page('',1), $url2, 'page: withFullUrl includes method and sitename');
 
-my $settingsPreventProxyCache = $session->setting->get('preventProxyCache');
 $session->setting->set('preventProxyCache', 0);
 
 is($session->url->page('','',1), $requestedUrl, 'page: skipPreventProxyCache is a no-op with preventProxyCache off in settings');
 $session->setting->set('preventProxyCache', 1);
-my $uncacheableUrl = $session->url->page('','',1);
-diag($uncacheableUrl);
-like($uncacheableUrl, qr{^$requestedUrl}, 'page: skipPreventProxyCache does not change url');
-like($uncacheableUrl, qr/\?noCache=\d{0,4},\d+$/, 'page: skipPreventProxyCache adds noCache param to url');
+my $cacheableUrl = $session->url->page('','',1);
+is($cacheableUrl, $requestedUrl, 'page: skipPreventProxyCache does not change url');
 
-is($session->url->page('','',0), $requestedUrl, 'page: skipPreventProxyCache does not change url');
+like($session->url->page('','',0), qr(^$requestedUrl\?noCache=\d{0,4},\d+$), 'page: noCache added');
 
-$session->setting->set('preventProxyCache', $settingsPreventProxyCache);
+##Restore original setting
+$session->setting->set('preventProxyCache', $preventProxyCache);
 
 my $defaultAsset = WebGUI::Asset->getDefault($session);
 $session->asset($defaultAsset);
@@ -263,13 +269,9 @@ foreach my $test (@getRefererUrlTests) {
 #
 #######################################
 
-TODO: {
-	local $TODO = "makeAbsolute TODO's";
-	ok(0, 'go back and refigure out how the page method works to test makeAbsoluate with default params');
-}
-
-is($session->url->makeAbsolute('page1', '/layer1/layer2/'), '/layer1/layer2/page1', 'use a different root');
-is($session->url->makeAbsolute('page1', '/layer1/page2'), '/layer1/page1', 'use a second root that is one level shallower');
+is($session->url->makeAbsolute('page1', '/layer1/layer2/'), '/layer1/layer2/page1', 'makeAbsolute: use a different root');
+is($session->url->makeAbsolute('page1', '/layer1/page2'), '/layer1/page1', 'makeAbsolute: use a second root that is one level shallower');
+is($session->url->makeAbsolute('page1'), '/page1', 'makeAbsolute: default baseUrl from session->asset');
 
 #######################################
 #
@@ -296,11 +298,24 @@ my $unEscapedString = $session->url->unescape($escapeString);
 is($escapedString, '10%25%20is%20enough!', 'escape method');
 is($unEscapedString, '10% is enough!', 'unescape method');
 
+#######################################
+#
+# urlize
+# part of urlize is calling makeCompliant, which is tested elsewhere.
+# these tests will just make sure that it was called correctly and
+# check other urlize behavior
+#
+#######################################
+
+is($session->url->urlize('HOME/PATH1'), 'home/path1', 'urlize: urls are lower cased');
+is($session->url->urlize('home/'), 'home', 'urlize: trailing slashes removed');
+is($session->url->urlize('home is where the heart is'), 'home-is-where-the-heart-is', 'urlize: makeCompliant translates spaces to dashes');
+
 END {  ##Always clean-up
 	$session->asset($sessionAsset);
 	$session->config->set('sitename', \@config_sitename);
 	$session->setting->set('hostToUse', $setting_hostToUse);
-	$session->setting->set('preventProxyCache', $settingsPreventProxyCache);
+	$session->setting->set('preventProxyCache', $preventProxyCache);
 	if ($config_port) {
 		$session->config->set($config_port);
 	}

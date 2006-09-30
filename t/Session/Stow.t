@@ -15,7 +15,7 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 29; # increment this value for each test you create
+use Test::More tests => 32; # increment this value for each test you create
  
 my $session = WebGUI::Test->session;
  
@@ -24,6 +24,9 @@ my $session = WebGUI::Test->session;
 my $stow  = $session->stow;
 my $count = 0;
 my $maxCount = 20;
+
+my $disableCache = $session->config->get('disableCache');
+$session->config->set('disableCache',0);
 
 for (my $count = 1; $count <= $maxCount; $count++){
    $stow->set("Test$count",$count);
@@ -37,6 +40,13 @@ $stow->delete("Test1");
 is($stow->get("Test1"), undef, "delete()");
 $stow->deleteAll;
 is($stow->get("Test2"), undef, "deleteAll()");
+
+$session->config->set('disableCache', 1);
+is($stow->get('Test2'), undef, 'get: when config->disableCache is set get returns undef');
+$session->config->set('disableCache', 0);
+
+is($session->stow->set('', 'null string'), undef, 'set returns undef when name is empty string');
+is($session->stow->set(0, 'zero'), undef, 'set returns undef when name is zero');
 
 my @list = qw/alpha delta tango charlie omicron zero/;
 my @orig_list = qw/alpha delta tango charlie omicron zero/;
@@ -65,3 +75,7 @@ is($stow->delete('noSuchKey'), undef, 'deleting non-existant variable returns un
 
 $stow->set('countedKey', 5);
 is($stow->delete('countedKey'), 5, 'delete method returns what was deleted');
+
+END {
+	$session->config->set('disableCache',$disableCache);
+}
