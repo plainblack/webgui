@@ -15,7 +15,8 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 45; # increment this value for each test you create
+use Test::More tests => 58; # increment this value for each test you create
+use Test::Deep;
  
 my $session = WebGUI::Test->session;
 
@@ -24,29 +25,18 @@ my $maxCount = 10;
 
 $scratch->deleteAll();
 
-
 for (my $count = 1; $count <= $maxCount; $count++){
    $scratch->set("Test$count",$count);
 }
-
 
 for (my $count = 1; $count <= $maxCount; $count++){
    is($scratch->get("Test$count"), $count, "Passed set/get $count");
 }
 
+is($scratch->delete("nonExistantVariable"), '0E0', 'delete returns number deleted, even if the variable does not exist.  0E0 is 0 but true');
 is($scratch->delete("Test1"), 1, 'delete returns number deleted');
 is($scratch->delete(), undef, 'delete without name of variable to delete returns undef');
 is($scratch->get("Test1"), undef, "delete()");
-
-is($scratch->deleteName(), undef, 'deleteName without name of variable to delete returns undef');
-is($scratch->deleteName("Test10"), 1, 'deleteName returns number of elements deleted');
-
-TODO: {
-	local $TODO = "deleteName tests to write later";
-	ok(0, 'set up scratch variable across multiple sessions and make sure deleteName gets them all');
-}
-
-is($scratch->get("Test10"), undef, "deleteName()");
 
 $scratch->deleteAll;
 is($scratch->get("Test2"), undef, "deleteAll()");
@@ -84,8 +74,54 @@ is($scratch->set('retVal',2), 1, 'set returns number of rows affected');
 is($scratch->set(), undef, 'set returns undef unless it gets a name');
 is($scratch->set('','value'), undef, 'set returns undef unless it gets a name even if there is a value');
 
+############################################
+#
+# Multi-session deleting
+#
+############################################
+
+my @sessionBank = map { WebGUI::Session->open(WebGUI::Test->root, WebGUI::Test->file) } 0..3;
+
+##Set variables to be deleted by name
+foreach my $i (0..3) {
+	$sessionBank[$i]->scratch->set('deletableName', $i);
+}
+##Set variables to be deleted by name and value
+$sessionBank[0]->scratch->set('deletableValue', 'a');
+$sessionBank[1]->scratch->set('deletableValue', 'a');
+$sessionBank[2]->scratch->set('deletableValue', 'b');
+$sessionBank[2]->scratch->set('falseValue', '');
+$sessionBank[3]->scratch->set('deletableValue', 'c');
+$sessionBank[3]->scratch->set('falseValue', '0');
+
+is($scratch->deleteName(), undef, 'deleteName without name of variable to delete returns undef');
+is($sessionBank[2]->scratch->deleteName("deletableName"), 4, 'deleteName returns number of elements deleted');
+is($sessionBank[2]->scratch->get("deletableName"), undef, 'deleteName clears session cached in the object that calls it');
+is($sessionBank[1]->scratch->get('deletableName'), 1, "deleteName does not change session cached vriables");
+my ($entries) = $session->db->quickArray("select count(name) from userSessionScratch where name=?",['deletableName']);
+is($entries, 0, "deleteName deletes entries in the database");
+
+is($sessionBank[1]->scratch->deleteNameByValue('deletableValue', 'a'), 2, 'deleteNameByValue deleted two rows');
+($entries) = $session->db->quickArray("select count(name) from userSessionScratch where name=?",['deletableValue']);
+is($entries, 2, "deleteNameByValue deleted entries in the database");
+is($sessionBank[1]->scratch->get('deletableValue'), undef, 'deleteNameByValue removes session cache in object that called it...');
+is($sessionBank[0]->scratch->get('deletableValue'), 'a', 'but not in any other object whose database entry was cleared');
+cmp_bag($session->db->buildArrayRef('select value from userSessionScratch where name=?',['deletableValue']), ['b', 'c'], 'deleteNameByValue values that were not deleted');
+
+is($sessionBank[2]->scratch->deleteNameByValue('deletableValue', 'c'), 1, 'deleteNameByValue deleted one row');
+
+is($sessionBank[0]->scratch->deleteNameByValue('',35), undef, 'deleteNameByValue requires a NAME');
+is($sessionBank[0]->scratch->deleteNameByValue('scratch'), undef, 'deleteNameByValue requires a value');
+is($sessionBank[0]->scratch->deleteNameByValue('',''), undef, 'deleteNameByValue require a NAME and a VALUE');
+is($sessionBank[3]->scratch->deleteNameByValue('falseValue','0'), 1, 'deleteNameByValue will delete values that are false (0)');
+is($sessionBank[2]->scratch->deleteNameByValue('falseValue',''), 1, "deleteNameByValue will delete values that are false ('')");
+
 END {
-	if (defined $newSession and ref $newSession eq 'WebGUI::Session') {
-		$newSession->close;
+	$session->scratch->deleteAll;
+	foreach my $wgSess ($newSession, @sessionBank, $session) {
+		if (defined $wgSess and ref $wgSess eq 'WebGUI::Session') {
+			$wgSess->scratch->deleteAll;
+			$wgSess->close;
+		}
 	}
 }

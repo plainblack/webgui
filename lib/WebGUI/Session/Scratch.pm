@@ -112,7 +112,7 @@ The name of the scratch variable.
 
 =head3 value
 
-The value to match.
+The value to match.  This can be anything except for undef.
 
 =cut
 
@@ -120,7 +120,7 @@ sub deleteNameByValue {
 	my $self = shift;
 	my $name = shift;
 	my $value = shift;
-	return undef unless ($name and $value);
+	return undef unless ($name and defined $value);
 	delete $self->{_data}{$name} if ($self->{_data}{$name} eq $value);
 	$self->session->db->write("delete from userSessionScratch where name=? and value=?", [$name,$value]);
 }
