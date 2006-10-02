@@ -394,7 +394,7 @@ Some text about this version tag, what it's for, why it was committed, why it wa
 sub set {
 	my $self = shift;
 	my $properties = shift;
-	$self->{_data}{name} = $properties->{name} || $self->{_data}{name} || "(Autotag) ".$self->session->datetime->epochToHuman()." / ".$self->session->user->username;
+	$self->{_data}{name} = $properties->{name} || $self->{_data}{name} || $self->session->user->username." / ".$self->session->datetime->epochToHuman()." (Autotag)";
 	$self->{_data}{workflowId} = $properties->{workflowId} || $self->{_data}{workflowId} || $self->session->setting->get("defaultVersionTagWorkflow");
 	$self->{_data}{groupToUse} = $properties->{groupToUse} || $self->{_data}{groupToUse} || "12";
 	if (exists $properties->{comments}) {
