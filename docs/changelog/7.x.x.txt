@@ -11,7 +11,7 @@
    uploaded when images are put in the form. (Martin Kamerbeek / Procolix)
  - change: PM asset task editor now defaults start date to start of project
  - Rearranged the autotag name creation to be easier to read.
-
+ - add: progressive (duration-tracked but untimed) tasks now possible in Project Manager
 
 7.0.8
  - Fixed a couple of minor bugs with the default values of the Request

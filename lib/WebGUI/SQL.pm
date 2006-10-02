@@ -678,8 +678,6 @@ sub quote {
 
 Returns a comma seperated string quoted and ready for insert/select into/from the database.  This is typically used for a statement like "select * from someTable where field in (".$db->quoteAndJoin(\@strings).")".
 
-B<NOTE:> This is not a regular method, but is an exported subroutine.
-
 =head3 arrayRef 
 
 An array reference containing strings to be quoted.

@@ -19,7 +19,7 @@ my $quiet;
 
 my $session = start();
 
-# upgrade functions go here
+pmAddProgressiveTasks($session);
 
 finish($session);
 
@@ -31,7 +31,26 @@ finish($session);
 #	# and here's our code
 #}
 
-
+sub pmAddProgressiveTasks {
+	my $session = shift;
+	print "\tMaking progressive tasks representable.\n" unless $quiet;
+	$session->db->write($_) for(<<'EOT',
+    ALTER TABLE PM_task
+     ADD COLUMN taskType enum('timed', 'progressive', 'milestone') NOT NULL
+                DEFAULT 'timed',
+  CHANGE COLUMN percentComplete percentComplete float NULL DEFAULT NULL
+EOT
+				    <<'EOT',
+    UPDATE PM_task SET taskType = 'milestone'
+                   AND percentComplete = NULL
+     WHERE isMilestone = 1
+EOT
+				    <<'EOT',
+  ALTER TABLE PM_task
+  DROP COLUMN isMilestone
+EOT
+				   );
+}
 
 # ---- DO NOT EDIT BELOW THIS LINE ----
 

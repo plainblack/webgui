@@ -6,7 +6,12 @@ var dunits, hoursPerDay, taskLength;
 var extrasPath, errorMsgs;
 var taskArray;
 
-function doCalendar (fieldId) {
+function parseFloatOrNA(str) {
+   if (str == 'N/A') return 0.0;
+   else return parseFloat(str);
+}
+
+function doCalendar(fieldId) {
    Calendar.setup({ 
                      inputField : fieldId, 
                      ifFormat : "%Y-%m-%d", 
@@ -36,39 +41,78 @@ function closeImage() {
 }
 
 //--------------------------------------------------------------------------------------	
-function configureMilestone(box) {
-   var form = box.form;
-   if(box.checked==true) { 
-      form.end.value=form.start.value; 
-      form.duration.value=0; 
-      form.duration.disabled=true; 
-      form.lagTime.value=0;
-      form.lagTime.disabled=true;
-      form.end.disabled=true;
-      form.dependants.disabled=true;
-      form.resource.disabled=true;
-      form.percentComplete.disabled=true;
-      form.percentComplete.value=0;
-   } else { 
-      form.end.disabled=false; 
-      form.duration.disabled=false; 
-      form.lagTime.disabled=false;
-      form.dependants.disabled=false;
-      form.resource.disabled=false;
-      form.percentComplete.disabled=false;
-      form.duration.value = (dunits == "hrs")?hoursPerDay:1;
+function configureForTaskType(form) {
+   switch (getTaskType(form)) {
+   case 'timed':
+      form.end.disabled = false; 
+      form.duration.disabled = false; 
+      form.lagTime.disabled = false;
+      form.dependants.disabled = false;
+      form.percentComplete.disabled = false;
+
+      if (!form.duration.value || parseFloatOrNA(form.duration.value) == 0)
+	 form.duration.value = (dunits == "hrs")? hoursPerDay : 1;
+      if (!form.percentComplete.value || form.percentComplete.value == 'N/A')
+	 form.percentComplete.value = 0;
+      if (!form.lagTime.value || form.lagTime.value == 'N/A')
+	 form.lagTime.value = 0;
+
+      break;
+
+   case 'progressive':
+      form.end.value = form.start.value;
+      form.end.disabled = true;
+      form.duration.disabled = false;
+      form.dependants.disabled = false;
+      form.lagTime.value = 'N/A';
+      form.lagTime.disabled = true;
+      form.percentComplete.value = 'N/A';
+      form.percentComplete.disabled = true;
+      break;
+
+   case 'milestone':
+      form.end.value = form.start.value; 
+      form.duration.value = 0;
+      form.duration.disabled = true; 
+      form.lagTime.value = 'N/A';
+      form.lagTime.disabled = true;
+      form.end.disabled = true;
+      form.dependants.disabled = true;
+      form.percentComplete.value = 'N/A';
+      form.percentComplete.disabled = true;
+      break;
    }
 }
 
+//--------------------------------------------------------------------------------------
+function getCheckedOfNodeList(list) {
+	for (var i = 0; i < list.length; i++) {
+		if (list[i].checked) { return list[i].value; }
+	}
+	return null;
+}
+
+function setCheckedOfNodeList(list, value) {
+	for (var i = 0; i < list.length; i++) {
+		list[i].checked = (list[i].value == value);
+	}
+	return value;
+}
+
+function getTaskType(form) { return getCheckedOfNodeList(form.taskType); }
+function setTaskType(form, value) { setCheckedOfNodeList(form.taskType, value); }
+function isTimed(form) { return getTaskType(form) == 'timed'; }
+function isUntimed(form) { return !isTimed(form); }
+
 //--------------------------------------------------------------------------------------	
 function checkEditTaskForm (form) {
-   if(form.name.value == "") {
+   if (form.name.value == "") {
       alert(errorMsgs.name);
       return;
-   } else if(form.start.value == "") {
+   } else if (form.start.value == "") {
       alert(errorMsgs.start);
       return;
-   } else if(form.milestone.checked==false && form.end.value == "") {
+   } else if (isTimed(form) && form.end.value == "") {
       alert(errorMsgs.end);
       return;
    }
@@ -92,32 +136,37 @@ function adjustTaskTimeFromDuration(start, end, duration, lagTime, isTaskForm, p
    //set the form element
    var form = duration.form;
    
-   //get today's date
    var today = new Date();
    var todayIntl = intlDate(today);
-   //set start and end date if not already set
-   if(start.value == "") start.value = todayIntl;
-   if(end.value == "") end.value = todayIntl;
+
+   // Set values if not already set.
+   if (start.value == "") start.value = todayIntl;
+   if (end.value == "") end.value = todayIntl;
+   if (duration.value == "") duration.value = hoursPerDay;
    
-   //Convert hours to days
+   // Convert hours to days.
    var taskDuration = parseFloat(duration.value);
-   var taskTotalDuration = taskDuration + parseFloat(lagTime.value);
+   var taskTotalDuration = taskDuration + parseFloatOrNA(lagTime.value);
    if(dunits == "hrs") taskTotalDuration = taskTotalDuration / hoursPerDay;
    var totalDurationFloor = Math.floor(taskTotalDuration);
    
-   //Handle task form and main form seperately due to differences in the forms
-   if(isTaskForm && taskDuration <= 0) {
-      //Convert to milestone if task is less or equal to zero
-      if(confirm("Zero duration tasks are considered Milestones.  Do you wish to change this task to a milestone?")) {
-	 form.milestone.checked = true;
-	 configureMilestone(form.milestone);
+   // We can't have timed tasks with duration zero.  Those are called "milestones".
+   if (taskDuration <= 0 && getTaskType(form) == 'timed') {
+      if (isTaskForm) {
+         // Convert to milestone if desired.
+         if (confirm("Zero duration tasks are considered milestones.  Do you wish to change this task to a milestone?")) {
+            setTaskType(form, 'milestone');
+            configureForTaskType(form);
+         } else {
+	    duration.value = form.orig_duration.value;
+	    if (parseFloat(duration.value) <= 0)
+	       duration.value = hoursPerDay;
+         }
       } else {
-	 duration.value = form.orig_duration.value;
+         // Do not let users zero out tasks from the quick view.
+         alert("Zero duration tasks are considered Milestones.  Please edit the task by clicking the link if you wish to change this task to a milestone");
       }
-      return;
-   } else if (taskDuration <= 0){
-      //Do not let users zero out tasks
-      alert("Zero duration tasks are considered Milestones.  Please edit the task by clicking the link if you wish to change this task to a milestone");
+
       return;
    }
    
@@ -138,19 +187,19 @@ function adjustTaskTimeFromDuration(start, end, duration, lagTime, isTaskForm, p
 }
 
 //--------------------------------------------------------------------------------------	
-function adjustTaskTimeFromDate (start, end, duration, lagTime, element, isTaskForm, predecessor, origStart, origEnd, seqNum) {
+function adjustTaskTimeFromDate(start, end, duration, lagTime, element, isTaskForm, predecessor, origStart, origEnd, seqNum) {
    //set the form element
    var form = element.form;
    //set original duration from task form to determine whether or not to continue to set duration
    var orig_duration;
    
-   if(isTaskForm) {
-      if(form.milestone.checked == true) return;
+   if (isTaskForm) {
+      if (isUntimed(form)) return;
       orig_duration = form.orig_duration.value;
    }
    
    //Handle case where both start and end are empty
-   if(start.value == "" && end.value == "") {
+   if (start.value == "" && end.value == "") {
       //get today's date
       var today = new Date();
       var todayIntl = intlDate(today);
@@ -161,9 +210,9 @@ function adjustTaskTimeFromDate (start, end, duration, lagTime, element, isTaskF
    
    //Handle case where one is set and the other isn't
    if (end.value == "") end.value = start.value;
-   if(start.value == "") start.value = end.value;
+   if (start.value == "") start.value = end.value;
    
-   if(isTaskForm && orig_duration == "") {
+   if (isTaskForm && orig_duration == "") {
       //Set duration if this is a new record
       //Check to make sure start date comes before end date
       var startcomp = start.value.replace(/-/g,"");
@@ -188,7 +237,7 @@ function adjustTaskTimeFromDate (start, end, duration, lagTime, element, isTaskF
       duration.value = d - lagTime.value;
    } else {
       //Set start/end if duration has been saved
-      var d = parseFloat(duration.value) + parseFloat(lagTime.value); 
+      var d = parseFloat(duration.value) + parseFloatOrNA(lagTime.value); 
       if(dunits == "hrs") {
 	 //Convert to days
 	 d = d / hoursPerDay;
@@ -351,21 +400,30 @@ function validateDependant(field,origField,seqNum,start,end,duration,lagTime,isT
    var pred = field.value;
    var newTask = false;
    if(pred != "") {
-      if(seqNum == "") seqNum = taskLength+1;
-      if(pred < 1) {
+      if (seqNum == "") seqNum = taskLength+1;
+
+      if (pred < 1) {
 	 alert(errorMsgs.noPredecessor);
-	 field.value=origField.value;
+	 field.value = origField.value;
 	 return;
       }
-      if(pred == seqNum) {
+
+      if (pred == seqNum) {
 	 alert(errorMsgs.samePredecessor);
-	 field.value=origField.value;
+	 field.value = origField.value;
 	 return;
       }
-      if(pred > seqNum) {
+
+      if (pred > seqNum) {
 	 alert(errorMsgs.previousPredecessor);
 	 field.value = origField.value;
 	 return; 
+      }
+
+      if (taskArray[pred]["type"] != 'timed') {
+	 alert(errorMsgs.untimedPredecessor);
+	 field.value = origField.value;
+	 return;
       }
       
       //Set defaults if it's a new record and one of the other options hasn't been checked.
@@ -384,7 +442,7 @@ function validateDependant(field,origField,seqNum,start,end,duration,lagTime,isT
       if(newTask || (taskStartObj.getTime() < predTaskEndObj.getTime())) {
 	 
 	 //Convert predecessor hours to days
-	 var taskTotalDuration = parseFloat(duration.value) + parseFloat(lagTime.value);
+	 var taskTotalDuration = parseFloat(duration.value) + parseFloatOrNA(lagTime.value);
 	 if(dunits == "hrs") taskTotalDuration = taskTotalDuration / hoursPerDay;
 	 var totalDurationFloor = Math.floor(taskTotalDuration);
 	 

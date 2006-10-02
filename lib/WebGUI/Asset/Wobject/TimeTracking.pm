@@ -199,7 +199,7 @@ sub view {
 #-------------------------------------------------------------------
 sub www_editTimeEntrySave {
    	my $self = shift;
-    my ($session,$privilege,$form,$db,$user,$eh,$dt) = $self->getSessionVars("privilege","form","db","user","errorHandler","datetime");
+	my ($session,$privilege,$form,$db,$user,$eh,$dt) = $self->getSessionVars("privilege","form","db","user","errorHandler","datetime");
     
 	return $privilege->insufficient unless ($self->canView);
 	
@@ -214,53 +214,56 @@ sub www_editTimeEntrySave {
 	$props->{endDate} = $form->process("endDate","hidden");
 	$props->{reportComplete} = $form->process("isComplete","checkbox") || 0;
 	$props->{resourceId} = $form->process("resourceId","hidden"); 
-	if($reportId eq "new") {
-       $props->{creationDate} = $now;
-	   $props->{createdBy} = $currUser;
+	if ($reportId eq "new") {
+		$props->{creationDate} = $now;
+		$props->{createdBy} = $currUser;
 	}
 	$props->{lastUpdatedBy} = $currUser;
 	$props->{lastUpdateDate} = $now;
 	$reportId = $self->setCollateral("TT_report","reportId",$props,0,1);
 	
-	my @tasks = ();
-	my $tasksToUpdate = {};
-	
+	my %deltaHours = ();
+
+	foreach my $entry (@{$db->buildArrayRefOfHashRefs("SELECT * FROM TT_timeEntry WHERE reportId = ?", [$reportId])}) {
+		$deltaHours{$entry->{projectId}}{$entry->{taskId}} -= $entry->{hours};
+	}
+
 	my $rowTotal = $form->get("rowTotal");
-	for(my $i = 1; $i <= $rowTotal; $i++) {
-	   my $taskEntryId = $form->get("taskEntryId_$i");
-	   next unless ($taskEntryId);
-	   $props = {};
-	   $props->{entryId} = $taskEntryId;
-	   $props->{reportId} = $reportId;
-	   $props->{taskDate} = $form->process("taskDate_$i","selectBox");
-	   $props->{projectId} = $form->process("projectId_$i","selectBox");
-	   $props->{taskId} = $form->process("taskId_$i","selectBox");
-	   $props->{hours} = $form->process("hours_$i","float");
-	   $props->{comments} = $form->process("comments_$i","text");
-	   if ($props->{taskDate} && $props->{projectId} && $props->{taskId} && $props->{hours}) {
-	      $taskEntryId = $self->setCollateral("TT_timeEntry","entryId",$props,0,0);
-   	      push(@tasks,$taskEntryId);
-		  $tasksToUpdate->{$taskEntryId} = { taskId=>$props->{taskId}, projectId=>$props->{projectId} };
-	   }
+	my @entryIds = ();
+	for (my $i = 1; $i <= $rowTotal; $i++) {
+		my $entryId = $form->get("taskEntryId_$i");
+		next unless $entryId;
+
+		my $props = {};
+		$props->{entryId} = $entryId;
+		$props->{reportId} = $reportId;
+		$props->{taskDate} = $form->process("taskDate_$i","selectBox");
+		$props->{projectId} = $form->process("projectId_$i","selectBox");
+		$props->{taskId} = $form->process("taskId_$i","selectBox");
+		$props->{hours} = $form->process("hours_$i","float");
+		$props->{comments} = $form->process("comments_$i","text");
+		$deltaHours{$props->{projectId}}{$props->{taskId}} += $props->{hours};
+
+		next unless $props->{taskDate} and $props->{projectId} and $props->{taskId} and $props->{hours};
+		$entryId = $self->setCollateral("TT_timeEntry","entryId",$props,0,0);
+		push @entryIds, $entryId;
 	}
 	
-	#Delete anything not in the task list
-    $db->write("delete from TT_timeEntry where reportId=? and entryId not in (".$db->quoteAndJoin(\@tasks).")",[$reportId]);
-	
-	
-	#Update Project Management App if integrated
-	if($self->getValue("pmIntegration")) {
-	   foreach my $eid (@tasks) {
-	      my $task = $tasksToUpdate->{$eid};
-          my $taskId = $task->{taskId};
-	      my $projectId = $task->{projectId};
-	      my $pmAsset = WebGUI::Asset::Wobject::ProjectManager->getProjectInstance($session,$projectId);
-	      if($pmAsset) {
-	         my ($totalHours) = $db->quickArray("select sum(hours) from TT_timeEntry where taskId=?",[$taskId]);
-		     $pmAsset->updateProjectTask($taskId,$projectId,$totalHours);
-	      }
-	   }
-    }
+	# Clobber other entries.  We can't just do this beforehand
+	# because otherwise setCollateral will fail.
+	$db->write("DELETE FROM TT_timeEntry WHERE reportId = ? AND entryId NOT IN (".join(', ', ('?') x @entryIds).")", [$reportId, @entryIds]);
+
+	# Update Project Management App if integrated
+	if ($self->getValue("pmIntegration")) {
+		foreach my $projectId (keys %deltaHours) {
+			foreach my $taskId (keys %{$deltaHours{$projectId}}) {
+				my $deltaHours = $deltaHours{$projectId}{$taskId};
+				if (my $pmAsset = WebGUI::Asset::Wobject::ProjectManager->getProjectInstance($session, $projectId)) {
+					$pmAsset->updateProjectTask($taskId, $projectId, $deltaHours);
+				}
+			}
+		}
+	}
 		  
 	return "";
 }

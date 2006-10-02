@@ -370,10 +370,15 @@ our $I18N = {
 		lastUpdated => 0
 		},
 
+	 'task untimedPredecessor error' => {
+                message => q|Tasks are not permitted to have predecessors that are not timed tasks.|,
+		lastUpdated => 1159825527,
+         },
+
 	 'task invalidMove error' => {
-		message => q|The start date that you have selected for this task is invalid as it's predecessor's end date will not be met.  Either remove the predecessor restriction from this task or change the end date of it's predecessor to make this date valid. |,
+		message => q|The start date that you have selected for this task is invalid as its predecessor's end date will not be met.  Either remove the predecessor restriction from this task or change the end date of its predecessor to make this date valid.|,
 		lastUpdated => 0
-        },
+         },
 
 	 'resource none' => {
 		message => q|No Resource|,
@@ -799,6 +804,21 @@ Otherwise, just the duration will be displayed as text.|,
 		message => q|No matching groups found.|,
 		lastUpdated => 1157510786
 	},
+
+	'taskType timed label' => {
+		message => q|Timed|,
+                lastUpdated => 1159557353
+        },
+
+	'taskType progressive label' => {
+		message => q|Progressive|,
+                lastUpdated => 1159557353
+        },
+
+	'taskType milestone label' => {
+		message => q|Milestone|,
+                lastUpdated => 1159557353
+        },
 };
 
 1;
