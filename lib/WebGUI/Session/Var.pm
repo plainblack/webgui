@@ -149,7 +149,7 @@ sub isAdminOn {
 
 =head2 new ( session, sessionId, noFuss )
 
-Constructor. Returns a var object.
+Constructor. Overwrites the sessionId of $session with its own id.  Returns a var object.
 
 =head3 session
 

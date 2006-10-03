@@ -248,7 +248,8 @@ Sets a <link> tag into the <head> of this rendered page for this page view. This
 
 =head3 url
 
-The URL to the document you are linking.
+The URL to the document you are linking.  Only one link can be set per url.  If a link to this URL exists,
+the old link will remain and this method will return undef.
 
 =head3 params
 
@@ -260,6 +261,7 @@ sub setLink {
 	my $self = shift;
 	my $url = shift;
 	my $params = shift;
+	$params = {} unless (defined $params and ref $params eq 'HASH');
 	return undef if ($self->{_link}{$url});
 	my $tag = '<link href="'.$url.'"';
 	foreach my $name (keys %{$params}) {
