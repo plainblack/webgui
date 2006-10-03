@@ -1398,7 +1398,8 @@ sub _doGanttTaskResourceDisplay {
 			my $name = $u->username;
 			my $firstName = $u->profileField('firstName');
 			my $lastName = $u->profileField('lastName');
-			$name = "$firstName $lastName" if ($firstName && $lastName);
+			$name = "$firstName $lastName"
+			    if (length $firstName and length $lastName);
 			push @resourceNames, $name;
 		} elsif ($resourceKind eq 'group') {
 			my $g = WebGUI::Group->new($self->session, $resourceId);
