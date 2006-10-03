@@ -849,7 +849,7 @@ sub www_editTask {
 				});				
    #Set some hidden variables to make it easy to reset data in javascript
    my $duration = $task->{duration};
-   my $start = $dt->epochToSet($db->quickArray('SELECT startDate, startDate FROM PM_task WHERE projectId = ? ORDER BY sequenceNumber LIMIT 1', [$projectId]));
+   my $start = $dt->epochToSet($db->quickArray('SELECT startDate FROM PM_task WHERE projectId = ? ORDER BY sequenceNumber LIMIT 1', [$projectId]));
    my $end = $start;
    my $dependant = $task->{dependants};
    														   
@@ -949,7 +949,7 @@ sub www_editTask {
 				-vertical=>0,
 				-options=>\%taskTypeOptions,
 			        -defaultValue=>$taskType,
-				-extras=>q|onchange="configureForTaskType(this.form)"|,
+				-extras=>q|onclick="configureForTaskType(this.form)"|,
 				});
    $var->{'form.percentComplete'} = WebGUI::Form::float($session, {
 				-name => "percentComplete",
