@@ -1242,7 +1242,7 @@ sub www_viewProject {
 	   my $lagTime = $row->{lagTime};
 	   
 	   $hash->{'task.number'} = $seq;
-	   $hash->{'task.row.id'} = "taskrow::$id";
+	   $hash->{'task.row.id'} = $id;
 	   $hash->{'task.name'} = $row->{taskName};
 	   	  
 	   if($canEditTasks) {

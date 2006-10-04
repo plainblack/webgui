@@ -594,9 +594,9 @@ to make on the fly editing of tasks work.|,
 		lastUpdated => 1149824991,
 	},
 
-	'task.number.id' => {
+	'task.row.id' => {
 		message => q|A unique identifier used internally by WebGUI for this task.|,
-		lastUpdated => 1149824991,
+		lastUpdated => 1159980663,
 	},
 
 	'task.name' => {

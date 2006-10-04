@@ -13,6 +13,7 @@
  - Rearranged the autotag name creation to be easier to read.
  - add: progressive (duration-tracked but untimed) tasks now possible in Project Manager
  - fix: Shortcut causes endless loop
+ - fix: Template variable in Project Management System
 
 7.0.8
  - Fixed a couple of minor bugs with the default values of the Request

@@ -239,7 +239,7 @@ our $HELP = {
 		                               'name' => 'task.number'
 		                             },
 		                             {
-		                               'name' => 'task.number.id'
+		                               'name' => 'task.row.id'
 		                             },
 		                             {
 		                               'name' => 'task.name'
