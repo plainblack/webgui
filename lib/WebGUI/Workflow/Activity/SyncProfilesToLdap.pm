@@ -122,64 +122,74 @@ sub execute {
 	my $instance = shift;
 	my $session = $self->session;
 	
-	#No Results Codes are returned by the server if a search didn't error, but returned no results. These codes should have a different error message returned.
-    my @noResultsCodes = (32,94);		
-	
-	my ($u, $userData, $uri, $port, %args, $fieldName, $ldap, $search, $a, $b);
-	my $t = [Time::HiRes::gettimeofday()];
-	
-	my $arrIndex = $instance->getScratch("arrayIndex");
-	$a = $self->session->db->buildArrayRef("select userId from users where authMethod='LDAP'");
-	
-	for(my $i = $arrIndex; $i < scalar(@{$a}); $i++) {
-	   my $userId = $a->[$i];
-       $u = WebGUI::User->new($session, $userId);
-	   my $auth = WebGUI::Auth->new($session, "LDAP", $userId);
-	   $userData = $auth->getParams;
-	   $uri = URI->new($userData->{ldapUrl});
-	   
-	   #Set the port
-	   $port = 389;
-	   if ($uri->port >= 1) {
-		  $port = $uri->port;
-	   }
-	   
-	   %args = (port => $port);
-	   $ldap = Net::LDAP->new($uri->host, %args);
-	   if ($ldap) {
-	      my $result = $ldap->bind;
-		  if ($result->code == 0) {
-		     $search = $ldap->search( base=>$userData->{connectDN}, filter=>"&(objectClass=*)" );
-			 my $code = $search->code;
-			 if($code && !WebGUI::Utility::isIn($code,@noResultsCodes)) {
-			    $session->errorHandler->error("SynchProfilesToLdap: Couldn't search LDAP ".$uri->host." to find user ".$u->username." (".$userId.").\nError Message from LDAP: ".$ldapStatusCode{$search->code});
-			 } elsif(WebGUI::Utility::isIn($code,@noResultsCodes) || $search->count == 0) {
-			    $session->errorHandler->warn("SynchProfilesToLdap: No results returned by LDAP server for user with dn ".$userData->{connectDN});
-			 } else {
-			    my $user = WebGUI::User->new($self->session, $userId);
-				$b = $session->db->read("select fieldName from userProfileField where profileCategoryId<>4");
-				my $entry = $search->entry(0);
-				while (($fieldName) = $b->array) {
-				   if ($entry->get_value($self->_alias($fieldName)) ne "") {
-				      $user->profileField($fieldName,$entry->get_value($self->_alias($fieldName)));
-				   }
-				}
-				$b->finish;
-			 }
-			 $ldap->unbind;
-	      } else {
-		     $session->errorHandler->error("SynchProfilesToLdap: Couldn't bind to LDAP host ".$uri->host."\nError Message from LDAP: ".$ldapStatusCode{$result->code});
-		  }
-	   } else {
-	      $session->errorHandler->error("SynchProfilesToLdap: Could not create an LDAP object using LDAP URL: ".$userData->{ldapUrl}.".  Most likely, this url is not in standard format.");
-	   }
-	   
-	   #Return waiting if this has taken longer than 55 seconds
-	   if(Time::HiRes::tv_interval($t) >= 55) {
-	      $instance->setScratch("arrayIndex",($i+1));
-	      return $self->WAITING;
-	   }
+	# No Results Codes are returned by the server if a search didn't error, but returned no results. These codes should have a different error message returned.
+	my @noResultsCodes = (32,94);		
+
+	my $startTime = time;
+	my @fieldNames = $self->session->db->buildArray("SELECT fieldName FROM userProfileField WHERE profileCategoryId <> 4");
+
+	my $index = $instance->getScratch('ldapSelectIndex') || 0;
+	my $sth = $self->session->db->read("SELECT u.userId AS userId, a1.fieldData AS ldapConnection FROM users AS u INNER JOIN authentication AS a1 ON u.userId = a1.userId WHERE a1.fieldName = 'ldapConnection' AND u.authMethod = 'LDAP' ORDER BY ldapConnection, userId LIMIT ?,18446744073709551615", [$index]);
+	my ($currentLinkId, $link, $ldapUrl, $ldap);
+	my $skippingLink = 0;
+
+	while (my ($userId, $rowLinkId) = $sth->array) {
+		if ($rowLinkId ne $currentLinkId) {
+			$link->unbind if defined $link;
+			$skippingLink = 0;
+#			$self->session->errorHandler->warn("DEBUG: SyncProfilesToLdap: Switching to link $rowLinkId");
+
+			$currentLinkId = $rowLinkId;
+			$link = WebGUI::LDAPLink->new($self->session, $rowLinkId);
+			$ldapUrl = $link->get->{ldapUrl};
+			$ldap = $link->bind;
+
+			if (my $error = $link->getErrorMessage) {
+				$self->session->errorHandler->error("SyncProfilesToLdap: Couldn't bind to LDAP link $ldapUrl ($currentLinkId), skipping: $error");
+				$skippingLink = 1;
+				next;
+			}
+		} elsif ($skippingLink) {
+			next;
+		}
+#		$self->session->errorHandler->warn("DEBUG: SyncProfilesToLdap: Syncing profile for user $userId");
+
+		my $user = WebGUI::User->new($self->session, $userId);
+		my $username = $user->username;
+		my $auth = WebGUI::Auth->new($self->session, 'LDAP', $userId);
+		my $userData = $auth->getParams;
+		my $result = $ldap->search(base => $userData->{connectDN},
+					   filter => "&(objectClass=*)");
+
+		if ($result->code && !isIn($result->code, @noResultsCodes)) {
+			$self->session->errorHandler->error("SyncProfilesToLdap: Couldn't search LDAP link $ldapUrl ($currentLinkId) to find user $username ($userId) with DN ".$userData->{connectDN}.": LDAP returned: ".$ldapStatusCode{$result->code});
+		} elsif (isIn($result->code, @noResultsCodes) || $result->count == 0) {
+			$self->session->errorHandler->warn("SyncProfilesToLdap: No results returned by LDAP server for user with dn ".$userData->{connectDN});
+		} else {
+			my $entry = $result->entry(0);
+			
+			foreach my $fieldName (@fieldNames) {
+				my $value = $entry->get_value($self->_alias($fieldName));
+				next unless length $value;
+#				$self->session->errorHandler->warn("DEBUG: SyncProfilesToLdap: Got data for profile field '$fieldName'");
+				$user->profileField($fieldName, $value);
+			}
+		}
+	} continue {
+		$index++;
+
+		if (time - $startTime >= 55) {
+#			$self->session->errorHandler->warn("DEBUG: SyncProfilesToLdap: next round");
+			$link->unbind if defined $link;
+			$instance->setScratch('ldapSelectIndex', $index);
+			$sth->finish;
+			return $self->WAITING;
+		}
 	}
+	
+#	$self->session->errorHandler->warn("DEBUG: SyncProfilesToLdap: done");
+	$link->unbind if defined $link;
+	$instance->deleteScratch('ldapSelectIndex');
 	return $self->COMPLETE;
 }
 

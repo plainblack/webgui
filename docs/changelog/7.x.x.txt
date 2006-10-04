@@ -14,6 +14,7 @@
  - add: progressive (duration-tracked but untimed) tasks now possible in Project Manager
  - fix: Shortcut causes endless loop
  - fix: Template variable in Project Management System
+ - fix: behavior of SyncProfilesToLdap workflow activity should be more correct now
 
 7.0.8
  - Fixed a couple of minor bugs with the default values of the Request
