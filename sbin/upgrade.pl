@@ -72,10 +72,10 @@ Options:
 			flag will NOT run the upgrade.
 
 	--mysql		The path to your mysql client executable.
-			Defaults to '$mysqldump'.
+			Defaults to '$mysql'.
 
 	--mysqldump	The path to your mysqldump executable.
-			Defaults to '$mysql'.
+			Defaults to '$mysqldump'.
 
         --override      This utility is designed to be run as
                         a privileged user on Linux style systems.
