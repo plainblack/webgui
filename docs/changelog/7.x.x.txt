@@ -1,5 +1,6 @@
 7.0.10
  - fix: mysql and mysqldump were transposed in upgrade.pl --help
+ - fix: adding Matrix listings committing the current version tag
 
 7.0.9
  - Removed the need for DateTime::Cron::Simple, which also added the ability

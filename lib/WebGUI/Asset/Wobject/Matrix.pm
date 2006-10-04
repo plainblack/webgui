@@ -684,14 +684,24 @@ sub www_editListingSave {
 		$data{filename} = $screenshot;
 		$storage->generateThumbnail($screenshot);
 	}
+
+	my $productName = $self->session->form->process("productName");
+
 	my $isNew = 0;
 	if ($self->session->form->process("listingId") eq "new") {
 		$data{maintainerId} = $self->session->user->userId if ($self->session->form->process("listingId") eq "new");
+
+		my $newTag = WebGUI::VersionTag->create($self->session, {
+			name => $productName.' / '.$self->session->user->username,
+			workflowId => 'pbworkflow000000000003' });
+		my $oldTag = WebGUI::VersionTag->getWorking($self->session, 1);
+		$newTag->setWorking;
+
 		my $forum = $self->addChild({
 			className=>"WebGUI::Asset::Wobject::Collaboration",
-			title=>$self->session->form->process("productName"),
-			menuTitle=>$self->session->form->process("productName"),
-			url=>$self->session->form->process("productName"),
+			title=>$productName,
+			menuTitle=>$productName,
+			url=>$productName,
 			groupIdView=>7,
 			groupIdEdit=>3,
                         displayLastReply => 0,
@@ -724,7 +734,10 @@ sub www_editListingSave {
 			styleTemplateId => $self->get('styleTemplateId'),
 			printableStyleTemplateId => $self->get('printableStyleTemplateId'),
 			});
-		WebGUI::VersionTag->getWorking($self->session)->commit;
+		$newTag->requestCommit;
+		$newTag->clearWorking;
+		$oldTag->setWorking if defined $oldTag;
+
 		$data{forumId} = $forum->getId;
 		$data{status} = "pending";
 		$isNew = 1;
