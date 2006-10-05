@@ -79,14 +79,8 @@ sub generateAdditionalHeadTags {
 	# generate additional raw tags
 	my $tags = $self->{_raw};
         # generate additional link tags
-	foreach my $url (keys %{$self->{_link}}) {
-		$tags .= $self->{_link}{$url};
-	}
 	# generate additional javascript tags
-	foreach my $url (keys %{$self->{_javascript}}) {
-		$tags .= $self->{_javascript}{$url};
-	}
-	delete $self->{_meta};
+	$tags .= join '', values %{ $self->{_link} }, values %{ $self->{_javascript} };
 	delete $self->{_raw};
 	delete $self->{_javascript};
 	delete $self->{_link};

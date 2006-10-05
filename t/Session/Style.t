@@ -16,7 +16,7 @@ use HTML::TokeParser;
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 21; # increment this value for each test you create
+use Test::More tests => 31; # increment this value for each test you create
 use Test::Deep;
  
 my $session = WebGUI::Test->session;
@@ -55,7 +55,7 @@ is($style->setLink(), 0, 'setLink returns the result of the conditional check fo
 ($url) = simpleLinkParser('link', $style->generateAdditionalHeadTags);
 is($url, '-', 'setLink: called with no params or link url');
 
-is($style->generateAdditionalHeadTags(), undef, 'generateAdditionalHeadTags: returns undef since nothing has been set');
+is($style->generateAdditionalHeadTags(), '', 'generateAdditionalHeadTags: returns empty string since nothing has been set');
 
 $style->setLink('http://www.plainblack.com');
 ($url) = simpleLinkParser('link', $style->generateAdditionalHeadTags);
@@ -92,14 +92,64 @@ is($style->setMeta(), 0, 'setMeta returns the result of the conditional check fo
 ($url, $params) = simpleLinkParser('meta', $style->generateAdditionalHeadTags);
 cmp_deeply($params, {}, 'setMeta: called with no params');
 
+$setParams = {'author' => 'JT Smith', 'generator' => 'WebGUI'};
+$style->setMeta($setParams);
+($url, $params) = simpleLinkParser('meta', $style->generateAdditionalHeadTags);
+cmp_deeply($params, $setParams, 'setMeta: called with params');
+($url, $params) = simpleLinkParser('meta', $style->generateAdditionalHeadTags);
+cmp_deeply($params, {}, 'setMeta: clears all content in generateAdditionalHeadTags');
+
+TODO: {
+	local $TODO = "more setMeta tests";
+	ok(0, 'meta: check that more than one tag can be set');
+	ok(0, 'meta: check for immediate send if sent returns true');
+}
+
+####################################################
+#
+# setScript and generateAdditionalHeadTags
+#
+####################################################
+
+is($style->setScript(), 0, 'setScript returns the result of the conditional check for already sent');
+($url) = simpleLinkParser('script', $style->generateAdditionalHeadTags);
+is($url, '-', 'setScript: called with no params or script url');
+
+$style->setScript('http://www.plainblack.com/stuff.js');
+is($style->setScript('http://www.plainblack.com/stuff.js'), undef, 'setScript: called with duplicate url returns undef');
+my $scriptOutput = $style->generateAdditionalHeadTags;
+($url) = simpleLinkParser('script', $scriptOutput);
+is($url, 'http://www.plainblack.com/stuff.js', 'setScript: called with script url');
+
+my $setParams = { type => 'text/javascript' };
+my $setUrl = 'http://www.webguidev.org/sorting.js';
+$style->setScript($setUrl, $setParams);
+my $scriptOutput = $style->generateAdditionalHeadTags;
+($url, $params) = simpleLinkParser('script', $scriptOutput);
+is($url, $setUrl, 'setScript: called with new script url');
+is_deeply($params, $setParams, 'setScript: params set properly');
+
+TODO: {
+	local $TODO = "more setScript tests";
+	ok(0, 'check that more than one script tag can be set if they are unique URLs');
+	ok(0, 'check for immediate send if sent returns true');
+}
+
 sub simpleLinkParser {
 	my ($tokenName, $text) = @_;
 	my $p = HTML::TokeParser->new(\$text);
 
 	my $token = $p->get_tag($tokenName);
-	my $url = $token->[1]{href} || "-";
+	my $tokenParam;
+	if ($tokenName eq 'script') {
+		$tokenParam = 'src';
+	}
+	else {
+		$tokenParam = 'href';
+	}
+	my $url = $token->[1]{$tokenParam} || "-";
 	my $params = $token->[1];
-	delete $params->{href};
+	delete $params->{$tokenParam};
 	delete $params->{'/'};  ##delete unary slash from XHTML output
 
 	return ($url, $params);
