@@ -16,7 +16,7 @@ use HTML::TokeParser;
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 31; # increment this value for each test you create
+use Test::More tests => 33; # increment this value for each test you create
 use Test::Deep;
  
 my $session = WebGUI::Test->session;
