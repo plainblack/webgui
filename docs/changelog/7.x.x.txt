@@ -2,6 +2,7 @@
  - fix: mysql and mysqldump were transposed in upgrade.pl --help
  - fix: adding Matrix listings committing the current version tag
  - fix: user searches in task resource additions in PM not displaying right without both last name and first name present
+ - fix: task editor in PM not actually receiving start/end date information at first
 
 7.0.9
  - Removed the need for DateTime::Cron::Simple, which also added the ability

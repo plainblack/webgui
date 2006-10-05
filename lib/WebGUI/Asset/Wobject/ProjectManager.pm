@@ -853,13 +853,16 @@ sub www_editTask {
    $var->{'form.header'} .= WebGUI::Form::hidden($session, {
 				-name=>"insertAt",
 				-value=>$form->get("insertAt")
-				});				
-   #Set some hidden variables to make it easy to reset data in javascript
+				});
+
    my $duration = $task->{duration};
-   my $start = $dt->epochToSet($db->quickArray('SELECT startDate FROM PM_task WHERE projectId = ? ORDER BY sequenceNumber LIMIT 1', [$projectId]));
-   my $end = $start;
+   my ($startEpoch, $endEpoch) = $db->quickArray('SELECT startDate, startDate FROM PM_task WHERE projectId = ? ORDER BY sequenceNumber LIMIT 1', [$projectId]);
+   $startEpoch = $task->{startDate} if $task->{startDate};
+   $endEpoch = $task->{endDate} if $task->{endDate};
+   my ($start, $end) = ($dt->epochToSet($startEpoch), $dt->epochToSet($endEpoch));
    my $dependant = $task->{dependants};
-   														   
+
+   # Set some hidden variables to make it easy to reset data in javascript
    $var->{'form.header'} .= WebGUI::Form::hidden($session, {
 				-name=>"orig_duration",
 				-value=>$duration
@@ -875,7 +878,7 @@ sub www_editTask {
    $var->{'form.header'} .= WebGUI::Form::hidden($session, {
 				-name=>"orig_dependant",
 				-value=>$dependant
-				});														   
+				});
    $var->{'form.name'} = WebGUI::Form::text($session,{
 				-name=>"name",
 				-value=>$task->{taskName}, 
