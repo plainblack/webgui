@@ -671,7 +671,7 @@ sub www_buildTimeTable {
 	my $resourceIdFromForm = $form->get("resourceId");
 	my $resourceId = ($user->isInGroup($self->get("groupToManage")) && $resourceIdFromForm)?$resourceIdFromForm:$user->userId;
 	#Build Report Info
-	my $report = $db->quickHashRef("select * from TT_report where resourceId=? and startDate=? and endDate=?",[$resourceId,$weekStart,$weekEnd]);	
+	my $report = $db->quickHashRef("select * from TT_report where resourceId=? and assetId=? and startDate=? and endDate=?",[$resourceId,$self->getId,$weekStart,$weekEnd]);	
 	my $reportId = $report->{reportId};
 	#$eh->warn($reportId);
 	#Add Report Stuff to form header
