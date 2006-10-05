@@ -357,13 +357,13 @@ a Google sitemap of your site.</p>
 	},
 
 	'page.isContainer' => {
-		message => q|A conditional indicating whether this page a container asset.|,
-		lastUpdated => 1149394665,
+		message => q|A conditional indicating whether this page a container asset.  Container assets are those assets which contain other assets, like Pages, Folders and Dashboards.|,
+		lastUpdated => 1160064240,
 	},
 
 	'page.isUtility' => {
-		message => q|A conditional indicating whether this page is a utility asset.|,
-		lastUpdated => 1149394665,
+		message => q|A conditional indicating whether this page is a utility asset.  Utility assets are assets that typically may not be viewed directly, like Images, Files, Templates and RichEditors.|,
+		lastUpdated => 1160064177,
 	},
 
 	'page.isViewable' => {

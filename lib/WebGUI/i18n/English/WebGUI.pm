@@ -3784,7 +3784,11 @@ JavaScript fields from HTML tags.</dd>
 		message => q|
 
 <p><b>Assets</b><br />
-Everything inside of WebGUI is an Asset: files, images, forums, threads in forums, posts in threads, templates, Wobjects (like Articles, DataForms, EventsCalendars) and more.
+Everything inside of WebGUI is an Asset: files, images, forums, threads in forums, posts in threads, templates, Wobjects (like Articles, DataForms, EventsCalendars) and more.  Assets come in three types, Utility, Container and Assets (for lack of a better name).  Regular old Assets are those assets that are dealt with on a daily bases, such as Articles, File Piles, Data Forms and Collaboration Systems.
+</p>
+
+<p><b>Container Assets</b><br />
+Container Assets are those Assets which contain other Assets, like Folders, Pages and Dashboards.  Collaboration System and Event Calendar Assets are not considered Container Assets even though they do contain other Assets (Posts and Events, respectively).
 </p>
 
 <p><b>captcha</b><br />
@@ -3823,6 +3827,12 @@ to give them full access to the site controls.
 WebGUI usernames cannot start or begin with any kind of space (spaces, tabs, etc.) and can only be made of letters, numbers, or dashes, underscores, periods, commas or @ signs.
 </p>
 
+<p><b>Utility Assets</b><br />
+Utility Assets are those Assets which are not normally used in content management, but have various
+uses inside of WebGUI.  Utility Assets include RichEditors (which are used for entering content),
+Templates (used for styling content) and File and Image Assets.
+</p>
+
 <p><b>Version Tag</b><br />
 Every version in WebGUI is assigned a tag.  In the default version control setup, the tag is the date and time
 the tag was requested.
@@ -3835,7 +3845,7 @@ are for collecting data from users (and optionally emailing a copy), and
 Message Boards hold forums for users.  There are many different Wobjects in WebGUI.
 </p>
 |,
-		lastUpdated => 1129432303,
+		lastUpdated => 1160064628,
 	},
 	'manage cache'  => {
                 message => q|Cache|,
