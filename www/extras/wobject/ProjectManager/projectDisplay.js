@@ -42,6 +42,8 @@ function closeImage() {
 
 //--------------------------------------------------------------------------------------	
 function configureForTaskType(form) {
+   var te = getTaskElements(form, '');
+
    switch (getTaskType(form)) {
    case 'timed':
       form.end.disabled = false; 
@@ -71,7 +73,6 @@ function configureForTaskType(form) {
       break;
 
    case 'milestone':
-      form.end.value = form.start.value; 
       form.duration.value = 0;
       form.duration.disabled = true; 
       form.lagTime.value = 'N/A';
@@ -82,6 +83,8 @@ function configureForTaskType(form) {
       form.percentComplete.disabled = true;
       break;
    }
+
+   setEndFromStartDate(te);
 }
 
 //--------------------------------------------------------------------------------------
@@ -99,10 +102,107 @@ function setCheckedOfNodeList(list, value) {
 	return value;
 }
 
-function getTaskType(form) { return getCheckedOfNodeList(form.taskType); }
-function setTaskType(form, value) { setCheckedOfNodeList(form.taskType, value); }
-function isTimed(form) { return getTaskType(form) == 'timed'; }
-function isUntimed(form) { return !isTimed(form); }
+// TODO: convert this whole bunch of stuff to do with task element groups
+// to an actual prototype/class?
+
+function getTaskElements(form, suffix) {
+   var te = new Object();
+   var keys = ['start', 'end', 'duration', 'lagTime', 'dependants', 'origStart', 'origEnd',
+	       'seqNum', 'taskType', 'orig_start', 'orig_duration', 'orig_dependant', 'orig_end'];
+   for (var i = 0; i < keys.length; i++)
+      te[keys[i]] = form[keys[i]+suffix];
+   return te;
+}
+
+function getTaskType(te) {
+   var taskTypeElt = te.taskType;
+   if (taskTypeElt.type == 'hidden') return taskTypeElt.value;
+   else return getCheckedOfNodeList(taskTypeElt);
+}
+
+function setTaskType(te, value) {
+   var taskTypeElt = te.taskType;
+   if (taskTypeElt.type == 'hidden') taskTypeElt.value = value;
+   else setCheckedOfNodeList(taskTypeElt, value);
+}
+
+function isTimed(te) { return getTaskType(te) == 'timed'; }
+function isUntimed(te) { return !isTimed(te); }
+
+function fracDaysOfDuration(dur) {
+   if (dunits == 'hrs') return dur / hoursPerDay;
+   else return dur;
+}
+
+function durationOfFracDays(days) {
+   if (dunits == 'hrs') return days * hoursPerDay;
+   else return days;
+}
+
+function getDuration(te) { return fracDaysOfDuration(parseFloat(te.duration.value)); }
+function setDuration(te, days) { te.duration.value = durationOfFracDays(days); }
+
+function getDateByKey(te, key) {
+   var split = te[key].value.split('-');
+   return new Date(split[0], split[1]-1, split[2], 0, 0, 1, 0);
+}
+function getStartDate(te) { return getDateByKey(te, 'start'); }
+function getEndDate(te) { return getDateByKey(te, 'end'); }
+
+function setDateByKey(te, key, date) { te[key].value = intlDate(date); }
+function setStartDate(te, date) { setDateByKey(te, 'start', date); }
+function setEndDate(te, date) { setDateByKey(te, 'end', date); }
+
+function setStartFromEndDate(te) { setStartDate(te, datePlusDays(getEndDate(te), -Math.floor(getTotalDuration(te)))); }
+function setEndFromStartDate(te) { setEndDate(te, datePlusDays(getStartDate(te), Math.floor(getTotalDuration(te)))); }
+
+function setOrigDates(te) {
+   te.orig_start.value = te.start.value;
+   te.orig_end.value = te.end.value;
+}
+
+function datePlusDays(date, days) {
+   var ret = new Date();
+   ret.setTime(date.getTime() + days * dayMS);
+   return ret;
+}
+
+function getTotalDuration(te) {
+   return fracDaysOfDuration(parseFloat(te.duration.value) +
+			     parseFloatOrNA(te.lagTime.value));
+}
+
+function maybeDefaultTaskValues(te) {
+   var todayString = intlDate(new Date());
+   var tomorrowString = intlDate(datePlusDays(new Date(), 1));
+   var timed = isTimed(te);
+
+   if (te.duration.value == "") te.duration.value = timed? durationOfFracDays(1) : 0;
+   if (te.lagTime.value == "") te.lagTime.value = 0;
+
+   if (te.start.value == "" && te.end.value == "") {
+      te.start.value = todayString;
+      te.end.value = tomorrowString;
+   } else if (te.start.value == "") {
+      setEndFromStartDate(te);
+   } else if (te.end.value == "") {
+      setStartFromEndDate(te);
+   }
+
+   updateTaskArray(te);
+}
+
+function updateTaskArray(te) {
+   var seqNum = te.seqNum.value;
+   if (seqNum == "") return;
+   var assoc = taskArray[seqNum];
+   assoc.start = te.start.value;
+   assoc.end = te.end.value;
+   assoc.duration = te.duration.value;
+   assoc.lagTime = ''+parseInt(te.lagTime.value);
+   assoc.predecessor = te.dependants.value;
+   assoc.type = getTaskType(te);
+}
 
 //--------------------------------------------------------------------------------------	
 function checkEditTaskForm (form) {
@@ -131,173 +231,115 @@ function toDateObj(date) {
    return dateObj;
 }
 
-//--------------------------------------------------------------------------------------	
-function adjustTaskTimeFromDuration(start, end, duration, lagTime, isTaskForm, predecessor, origStart, origEnd, seqNum) {
-   //set the form element
-   var form = duration.form;
-   
-   var today = new Date();
-   var todayIntl = intlDate(today);
+//--------------------------------------------------------------------------------------x
+function durationChanged(form, suffix, isTaskForm, gotDelay) {
+   if (!isTaskForm && !gotDelay)
+      return window.setTimeout(function() {
+	 durationChanged(form, suffix, isTaskForm, true); }, 1);
 
-   // Set values if not already set.
-   if (start.value == "") start.value = todayIntl;
-   if (end.value == "") end.value = todayIntl;
-   if (duration.value == "") duration.value = hoursPerDay;
-   
-   // Convert hours to days.
-   var taskDuration = parseFloat(duration.value);
-   var taskTotalDuration = taskDuration + parseFloatOrNA(lagTime.value);
-   if(dunits == "hrs") taskTotalDuration = taskTotalDuration / hoursPerDay;
-   var totalDurationFloor = Math.floor(taskTotalDuration);
+   var te = getTaskElements(form, suffix);
+   maybeDefaultTaskValues(te);
+
+   // Get the new duration.
+   var duration = getDuration(te);
+   var totalDuration = getTotalDuration(te);
    
    // We can't have timed tasks with duration zero.  Those are called "milestones".
-   if (taskDuration <= 0 && getTaskType(form) == 'timed') {
+   if (duration <= 0 && getTaskType(te) == 'timed') {
       if (isTaskForm) {
          // Convert to milestone if desired.
          if (confirm("Zero duration tasks are considered milestones.  Do you wish to change this task to a milestone?")) {
-            setTaskType(form, 'milestone');
+            setTaskType(te, 'milestone');
             configureForTaskType(form);
          } else {
-	    duration.value = form.orig_duration.value;
-	    if (parseFloat(duration.value) <= 0)
-	       duration.value = hoursPerDay;
+	    form.duration.value = form.orig_duration.value;
+	    if (getDuration(te) <= 0)
+	       setDuration(te, 1);
          }
       } else {
          // Do not let users zero out tasks from the quick view.
          alert("Zero duration tasks are considered Milestones.  Please edit the task by clicking the link if you wish to change this task to a milestone");
       }
-
-      return;
    }
-   
-   //create the start date 
-   var aTo = start.value.split("-");
-   var toDate = new Date(aTo[0],(aTo[1]-1),aTo[2],0,0,1,0);
-   
-   //add new duration days to the start date
-   toDate.setDate(toDate.getDate() + totalDurationFloor);
-   
-   //set end date to this date
-   end.value = intlDate(toDate);
-   
-   //Set new duration in taskArray
-   taskArray[seqNum]["duration"] = taskDuration;
-   //Adjust time based on new end date
-   adjustTaskTimeFromDate(start, end, duration, lagTime, end, isTaskForm, predecessor, origStart, origEnd, seqNum);
+
+   switch (getTaskType(te)) {
+   case 'timed':
+   case 'progressive':
+      setEndDate(te, datePlusDays(getStartDate(te), Math.floor(totalDuration)));
+      break;
+
+   case 'milestone':
+      setEndDate(te, getStartDate(te));
+      break;
+   }
+
+   te.orig_duration.value = te.duration.value;
+   updateTaskArray(te);
+
+   if (!isTaskForm) {
+      updateDependantDates();
+      paintGanttChart();
+   }
 }
 
-//--------------------------------------------------------------------------------------	
-function adjustTaskTimeFromDate(start, end, duration, lagTime, element, isTaskForm, predecessor, origStart, origEnd, seqNum) {
-   //set the form element
-   var form = element.form;
-   //set original duration from task form to determine whether or not to continue to set duration
-   var orig_duration;
-   
-   if (isTaskForm) {
-      if (isUntimed(form)) return;
-      orig_duration = form.orig_duration.value;
+function checkPredecessorCollision(te, isTaskForm) {
+   var predecessor = te.dependants.value;
+   if (predecessor == "") return;
+   var predAssoc = taskArray[predecessor];
+   var predEnd = toDateObj(predAssoc.end);
+   if (predEnd.getTime() >= getStartDate(te).getTime()) {
+      setStartDate(te, predEnd);
+      setEndFromStartDate(te);
    }
-   
-   //Handle case where both start and end are empty
-   if (start.value == "" && end.value == "") {
-      //get today's date
-      var today = new Date();
-      var todayIntl = intlDate(today);
-      //set start and end date if not already set
-      start.value = todayIntl;
-      end.value = todayIntl;
+}
+
+function dateChanged(form, suffix, isTaskForm, setWhichWay, gotDelay) {
+   if (!isTaskForm && !gotDelay)
+      return window.setTimeout(function() {
+	 dateChanged(form, suffix, isTaskForm, setWhichWay, true); }, 1);
+
+   var te = getTaskElements(form, suffix);
+   maybeDefaultTaskValues(te);
+   setWhichWay(te);
+   checkPredecessorCollision(te, isTaskForm);
+   setOrigDates(te);
+   updateTaskArray(te);
+
+   if (!isTaskForm) {
+      updateDependantDates();
+      paintGanttChart();
    }
-   
-   //Handle case where one is set and the other isn't
-   if (end.value == "") end.value = start.value;
-   if (start.value == "") start.value = end.value;
-   
-   if (isTaskForm && orig_duration == "") {
-      //Set duration if this is a new record
-      //Check to make sure start date comes before end date
-      var startcomp = start.value.replace(/-/g,"");
-      var endcomp = end.value.replace(/-/g,"");
-      if(startcomp > endcomp) {
-	 alert(errorMsgs.greaterthan);
-	 if(element.name == "start") {
-	    end.value = element.value;
-	 } else {
-	    start.value = element.value;
-	 }
-	 duration.value = (dunits == "hrs")?hoursPerDay:1;
-	 lagTime.value = 0;
-	 return;
+}
+
+function startDateChanged(form, suffix, isTaskForm) { dateChanged(form, suffix, isTaskForm, setEndFromStartDate); }
+function endDateChanged(form, suffix, isTaskForm) { dateChanged(form, suffix, isTaskForm, setStartFromEndDate); }
+
+function predecessorChanged(form, suffix, isTaskForm, gotDelay) {
+   if (!isTaskForm && !gotDelay)
+      return window.setTimeout(function() {
+	 predecessorChanged(form, suffix, isTaskForm, true); }, 1);
+
+   var te = getTaskElements(form, suffix);
+   var seqNum = te.seqNum.value, predecessor = te.dependants.value;
+
+   if (predecessor != "") {
+      var assoc = taskArray[predecessor];
+      var revert = function() { te.dependants.value = te.orig_dependant.value; return; }
+
+      if (predecessor < 1) { alert(errorMsgs.noPredecessor); return revert(); }
+      if (seqNum != "") {
+	 if (predecessor == seqNum) { alert(errorMsgs.samePredecessor); return revert(); }
+	 if (predecessor > seqNum) { alert(errorMsgs.previousPredecessor); return revert(); }
       }
-      
-      var d = getDaysInterval(start.value,end.value);
-      if(d == 0) d = 1;
-      if(dunits == "hrs") {
-	 d = d * hoursPerDay;
-      }
-      duration.value = d - lagTime.value;
-   } else {
-      //Set start/end if duration has been saved
-      var d = parseFloat(duration.value) + parseFloatOrNA(lagTime.value); 
-      if(dunits == "hrs") {
-	 //Convert to days
-	 d = d / hoursPerDay;
-      }
-      //Round off duration or set it to zero if less than 1;
-      //alert("d = " + d + " floor = " + Math.floor(d));
-      if(d < 1) d = 0;
-      else d = Math.floor(d);
-      
-      if(element.name.indexOf("start") > -1) {
-	 //create the date 
-	 var aTo = start.value.split("-");
-	 var toDate = new Date(aTo[0],(aTo[1]-1),aTo[2],0,0,1,0);
-         //add duration days to the start date
-         toDate.setDate(toDate.getDate() + d);
-	 //set end date to this date
-	 end.value = intlDate(toDate);
-      } else if(element.name.indexOf("end") > -1) {
-	 //create the date
-	 var aFrom = end.value.split("-");
-	 var fromDate = new Date(aFrom[0],(aFrom[1]-1),aFrom[2],0,0,1,0);
-	 //subtract duration days from the end date
-	 fromDate.setDate(fromDate.getDate() - d);
-	 //set start date to this date
-	 start.value = intlDate(fromDate);
-      }
+      if (assoc["type"] != 'timed') { alert(errorMsgs.untimedPredecessor); return revert(); }
    }
-   
-   //Check Predecessors before moving stuff
-   var pred = predecessor.value;
-   if(pred != "") {
-      //Check to make sure that the dependency requirement for this task is still valid
-      //Get the predecessor end date
-      var taskStart = toDateObj(start.value);
-      var predTaskEnd;
-      if(isTaskForm) {
-	 predTaskEnd = toDateObj(taskArray[pred]["end"]);
-      } else {
-	 var predTaskEndId = "end_"+taskArray[pred]["id"]+"_formId"
-	 predTaskEnd = toDateObj(document.getElementById(predTaskEndId).value);
-      }
-      
-      if(taskStart.getTime() < predTaskEnd.getTime()) {
-	 alert(errorMsgs.invalidMove);
-	 start.value = origStart.value;
-	 end.value = origEnd.value;
-	 return;
-      }
-   }
-   
-   //Check all tasks past this one and move them forward if necessary (this only needs to happen on the main form)
-   if(!isTaskForm) {
-      arrangePredecessors(element,seqNum);
-   }
-   //reset orig start and end values
-   origStart.value = start.value;
-   origEnd.value = end.value;
-   
-   if(!isTaskForm) {
-      //Adjust task form for 
+
+   te.orig_dependant.value = te.dependants.value;
+   checkPredecessorCollision(te, isTaskForm);
+   updateTaskArray(te);
+
+   if (!isTaskForm) {
+      updateDependantDates();
       paintGanttChart();
    }
 }
@@ -308,7 +350,7 @@ function trim(str) {
 }
 
 //--------------------------------------------------------------------------------------
-function arrangePredecessors (element,seqNum) {
+function updateDependantDates() {
    for (var i = 1; i <= taskLength; i++) {
       var seq = i;
       var task = taskArray[seq];
@@ -393,79 +435,4 @@ function paintGanttChart () {
    var swidth = document.getElementById("projectScrollPercentWidth").name + "%";
    document.getElementById("mastertable").style.width=mwidth;
    document.getElementById("scrolltd").style.width=swidth;
-}
-
-//--------------------------------------------------------------------------------------	
-function validateDependant(field,origField,seqNum,start,end,duration,lagTime,isTaskForm,origStart,origEnd) {
-   var pred = field.value;
-   var newTask = false;
-   if(pred != "") {
-      if (seqNum == "") seqNum = taskLength+1;
-
-      if (pred < 1) {
-	 alert(errorMsgs.noPredecessor);
-	 field.value = origField.value;
-	 return;
-      }
-
-      if (pred == seqNum) {
-	 alert(errorMsgs.samePredecessor);
-	 field.value = origField.value;
-	 return;
-      }
-
-      if (pred > seqNum) {
-	 alert(errorMsgs.previousPredecessor);
-	 field.value = origField.value;
-	 return; 
-      }
-
-      if (taskArray[pred]["type"] != 'timed') {
-	 alert(errorMsgs.untimedPredecessor);
-	 field.value = origField.value;
-	 return;
-      }
-      
-      //Set defaults if it's a new record and one of the other options hasn't been checked.
-      if(start.value == "" || end.value == "") {
-         //get today's date
-	 newTask = true;
-	 duration.value = (dunits == "hrs")?hoursPerDay:1; 
-      }
-      //Get the predecessor end date and decide where the new start date belongs
-      var taskStart = start.value;
-      var taskStartObj = toDateObj(taskStart);
-      var predTaskEnd = taskArray[pred]["end"];
-      var predTaskEndObj = toDateObj(predTaskEnd);
-      
-      //Change start date if it comes before predecessor end date
-      if(newTask || (taskStartObj.getTime() < predTaskEndObj.getTime())) {
-	 
-	 //Convert predecessor hours to days
-	 var taskTotalDuration = parseFloat(duration.value) + parseFloatOrNA(lagTime.value);
-	 if(dunits == "hrs") taskTotalDuration = taskTotalDuration / hoursPerDay;
-	 var totalDurationFloor = Math.floor(taskTotalDuration);
-	 
-	 //Get the predecessor dayPart
-	 var predDayPart = parseFloat(pred["dayPart"]);
-	 if(predDayPart > 0) {
-	    //The previous task took up part of a day.  Add the additional day part to the duration
-	    taskTotalDuration += predDayPart;
-	    totalDurationFloor = Math.floor(totalDurationInDays);
-	 }
-	 
-	 //Set the start date of this task to the end date of the predecessor
-	 start.value = predTaskEnd;
-	 //Adjust end date for change in start date
-	 adjustTaskTimeFromDate(start,end,duration,lagTime,start,isTaskForm,field,origStart,origEnd,seqNum);
-	 return;
-      }
-   }
-   
-   //Repaint
-   if(!isTaskForm) {
-      //Set new predecessor in taskArray
-      taskArray[seqNum]["predecessor"] = pred;
-      paintGanttChart();
-   }
 }
