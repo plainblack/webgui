@@ -669,7 +669,14 @@ sub _htmlOfResourceList {
 			$subvar->{resourceIcon} = 'groups.gif';
 		} elsif ($resourceKind eq 'user') {
 			my $user = WebGUI::User->new($self->session, $resourceId);
-			$subvar->{resourceName} = WebGUI::HTML::format($user->profileField('lastName').', '.$user->profileField('firstName'), 'text');
+			my ($firstName, $lastName, $username) = ($user->profileField('firstName'), $user->profileField('lastName'), $user->username);
+			my $displayName = do {
+				if (length($firstName) && length($lastName)) { "$lastName, $firstName" }
+				elsif (length($firstName)) { $firstName }
+				elsif (length($lastName)) { $lastName }
+				else { $username }
+			};
+			$subvar->{resourceName} = WebGUI::HTML::format($displayName, 'text');
 			$subvar->{resourceIcon} = 'users.gif';
 		} else {
 			$self->session->errorHandler->fatal("Unknown kind of resource '$resourceKind'!");
