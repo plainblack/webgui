@@ -17,22 +17,26 @@ use WebGUI::Session;
 my $toVersion = "7.0.10"; # make this match what version you're going to
 my $quiet; # this line required
 
-
 my $session = start(); # this line required
 
-# upgrade functions go here
+recalculateProjectCompletion($session);
 
 finish($session); # this line required
 
 
 ##-------------------------------------------------
-#sub exampleFunction {
-#	my $session = shift;
-#	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
-#	# and here's our code
-#}
-
-
+sub recalculateProjectCompletion {
+	my $session = shift;
+	print "\tForcing project completion recalculation.\n" unless $quiet;
+	my @assetIds = $session->db->buildArray("SELECT DISTINCT assetId FROM PM_wobject", []);
+	foreach my $assetId (@assetIds) {
+		my $pm = WebGUI::Asset->newByDynamicClass($session, $assetId);
+		my @projectIds = $session->db->buildArray("SELECT projectId FROM PM_project WHERE assetId = ?", [$assetId]);
+		foreach my $project (@projectIds) {
+			$pm->updateProject($project);
+		}
+	}
+}
 
 # ---- DO NOT EDIT BELOW THIS LINE ----
 

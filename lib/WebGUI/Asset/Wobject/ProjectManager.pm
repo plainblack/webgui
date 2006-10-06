@@ -243,7 +243,7 @@ sub updateProjectTask {
 	}
    
 	$self->setCollateral("PM_task","taskId", { taskId=>$taskId, duration=>$task->{duration}, percentComplete=>$task->{percentComplete} });
-	$self->_updateProject($projectId);
+	$self->updateProject($projectId);
 	return 1;
 }
 
@@ -271,7 +271,7 @@ sub _userCanManageProjectList {
 }
 
 #-------------------------------------------------------------------
-sub _updateProject {
+sub updateProject {
 	my $self = shift;
 	my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
 	my $projectId= $_[0];
@@ -1071,7 +1071,7 @@ sub www_editTaskSave {
 	  $self->reorderCollateral("PM_task","taskId","projectId",$projectId);
    }
   
-   $self->_updateProject($projectId);
+   $self->updateProject($projectId);
    $self->_clobberImproperDependants($projectId);
    $self->_updateDependantDates($projectId);
    
@@ -1179,7 +1179,7 @@ sub www_saveExistingTasks {
 	   $self->setCollateral("PM_task","taskId",$props,1,0,"projectId",$projectId);
    }
    
-   $self->_updateProject($projectId);
+   $self->updateProject($projectId);
    $self->_updateDependantDates($projectId);
    return $self->www_drawGanttChart();
 }
