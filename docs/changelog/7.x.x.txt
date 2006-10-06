@@ -9,6 +9,7 @@
  - fix: Missing translation in calendar (Klaus)
  - fixed a bug where the calendar would break if a language other than English has 
    been selected (Martin Kamerbeek / Procolix)
+ - fix: Events Calendar: error in "big" template (Martin Kamerbeek / Procolix)
 
 7.0.9
  - Removed the need for DateTime::Cron::Simple, which also added the ability
