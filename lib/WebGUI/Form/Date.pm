@@ -140,6 +140,7 @@ sub toHtml {
 	else {
 		$self->set("value",$self->session->datetime->epochToSet($self->get("value")));
 	}
+
 	my $language  = WebGUI::International->new($self->session)->getLanguage($self->session->user->profileField("language"),"languageAbbreviation");
 	unless ($language) {
 		$language = WebGUI::International->new($self->session)->getLanguage("English","languageAbbreviation");
@@ -148,7 +149,7 @@ sub toHtml {
         $self->session->style->setScript($self->session->url->extras('calendar/lang/calendar-'.$language.'.js'),{ type=>'text/javascript' });
         $self->session->style->setScript($self->session->url->extras('calendar/calendar-setup.js'),{ type=>'text/javascript' });
         $self->session->style->setLink($self->session->url->extras('calendar/calendar-win2k-1.css'), { rel=>"stylesheet", type=>"text/css", media=>"all" });
-        my $mondayFirst = $self->session->user->profileField("firstDayOfWeek") ? "true" : "false";
+        my $mondayFirst = $self->session->user->profileField("firstDayOfWeek") ? "1" : "0";
         return $self->SUPER::toHtml. '<script type="text/javascript"> 
                         Calendar.setup({ 
                                 inputField : "'.$self->get('id').'", 

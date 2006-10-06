@@ -3,6 +3,7 @@
 // Calendar EN language
 // Author: Mihai Bazon, <mihai_bazon@yahoo.com>
 // Translator: Fabio Di Bernardini, <altraqua@email.it>
+// Fixed by: Massimiliano Picone, <max@applenewton.it>
 // Encoding: any
 // Distributed under the same terms as the calendar itself.
 
@@ -43,7 +44,7 @@ Calendar._SDN = new Array
  "Ven",
  "Sab",
  "Dom");
-
+ 
 // full month names
 Calendar._MN = new Array
 ("Gennaio",
@@ -53,7 +54,7 @@ Calendar._MN = new Array
  "Maggio",
  "Giugno",
  "Luglio",
- "Augosto",
+ "Agosto",
  "Settembre",
  "Ottobre",
  "Novembre",
