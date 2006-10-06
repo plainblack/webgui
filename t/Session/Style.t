@@ -16,7 +16,7 @@ use HTML::TokeParser;
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 34; # increment this value for each test you create
+use Test::More tests => 35; # increment this value for each test you create
 use Test::Deep;
  
 my $session = WebGUI::Test->session;
@@ -141,10 +141,20 @@ TODO: {
 #
 ####################################################
 
-TODO: {
-	local $TODO = "more generateAdditionalHeadTags tests";
-	ok(0, 'check for Macro processing in generateAdditionalHeadTags');
-}
+$session->user({userId => 1});
+$style->setRawHeadTags("^#;");
+my $macroOutput = $style->generateAdditionalHeadTags();
+is($macroOutput, 1, 'generateAdditionalHeadTags: process a macro');
+
+####################################################
+#
+# process
+#
+####################################################
+
+is($style->process('body.content', 'notATemplateId'),
+"WebGUI was unable to instantiate your style template.body.content",
+'process:  invalid templateId returns error message to client');
 
 sub simpleLinkParser {
 	my ($tokenName, $text) = @_;
