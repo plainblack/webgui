@@ -16,7 +16,7 @@ use HTML::TokeParser;
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 33; # increment this value for each test you create
+use Test::More tests => 34; # increment this value for each test you create
 use Test::Deep;
  
 my $session = WebGUI::Test->session;
@@ -133,6 +133,17 @@ TODO: {
 	local $TODO = "more setScript tests";
 	ok(0, 'check that more than one script tag can be set if they are unique URLs');
 	ok(0, 'check for immediate send if sent returns true');
+}
+
+####################################################
+#
+# generateAdditionalHeadTags
+#
+####################################################
+
+TODO: {
+	local $TODO = "more generateAdditionalHeadTags tests";
+	ok(0, 'check for Macro processing in generateAdditionalHeadTags');
 }
 
 sub simpleLinkParser {
