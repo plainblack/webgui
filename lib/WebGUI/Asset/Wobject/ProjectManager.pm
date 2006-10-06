@@ -279,7 +279,7 @@ sub _updateProject {
 	my ($minStart, $maxEnd) = $db->quickArray("select min(startDate), max(endDate) from PM_task where projectId=?", [$projectId]);
 	my ($projectTotal, $complete) = 0;
 
-	my $tasks =  $db->buildArrayRefOfHashRefs("select * from PM_task where projectId=? and taskType <> 'timed' order by sequenceNumber asc", [$projectId]);
+	my $tasks = $db->buildArrayRefOfHashRefs("select * from PM_task where projectId=? and taskType = 'timed' order by sequenceNumber asc", [$projectId]);
 	foreach my $task (@{$tasks}) {
 		$projectTotal += $task->{duration};
 		$complete += ($task->{duration} * ($task->{percentComplete}/100));
@@ -857,7 +857,7 @@ sub www_editTask {
 
    my ($startEpoch, $endEpoch) = $db->quickArray('SELECT startDate, startDate FROM PM_task WHERE projectId = ? ORDER BY sequenceNumber LIMIT 1', [$projectId]);
    my $dependant = $task->{dependants};
-   my $duration = $task->{duration} || ($taskType eq 'timed')? (($project->{durationUnits} eq 'hours')? $project->{hoursPerDay} : 1) : 0;
+   my $duration = $task->{duration} || (($taskType eq 'timed')? (($project->{durationUnits} eq 'hours')? $project->{hoursPerDay} : 1) : 0);
 
    $startEpoch = $endEpoch = time unless defined $startEpoch and defined $endEpoch;
    $startEpoch = $task->{startDate} if $task->{startDate};
