@@ -151,66 +151,97 @@ sub www_editProduct {
 		$product = WebGUI::Product->new($session,$productId)->get;
 	}
 	
-	$f = WebGUI::HTMLForm->new($session);
+	$f = WebGUI::TabForm->new($session);
+	$f->addTab("properties","Properties");
+	$f->addTab("actions","Actions");
+	
 	$f->submit;
-	$f->hidden(
-		-name => 'op', 
-		-value => 'editProductSave'
-		);
-	$f->hidden(
-		-name => 'productId', 
-		-value => $productId
-	);
-	$f->text(
+	$f->hidden({
+		name => 'op', 
+		value => 'editProductSave'
+	});
+	$f->hidden({
+		name => 'productId', 
+		value => $productId
+	});
+	
+	$f->getTab("properties")->text(
 		-name		=> 'title',
 		-label		=> $i18n->get('title'),
 		-hoverHelp	=> $i18n->get('title description'),
 		-value		=> $session->form->process("title") || $product->{title},
 		-maxlength	=> 255,
 	);
-	$f->textarea(
+	$f->getTab("properties")->textarea(
 		-name		=> 'description',
 		-label		=> $i18n->get('description'),
 		-hoverHelp	=> $i18n->get('description description'),
 		-value		=> $session->form->process("decsription") || $product->{description},
 	);
-	$f->float(
+	$f->getTab("properties")->float(
 		-name		=> 'price',
 		-label		=> $i18n->get('price'),
 		-hoverHelp	=> $i18n->get('price description'),
 		-value		=> $session->form->process("price") || $product->{price},
 		-maxlength	=> 13,
 	);
-	$f->float(
+	$f->getTab("properties")->float(
 		-name		=> 'weight',
 		-label		=> $i18n->get('weight'),
 		-hoverHelp	=> $i18n->get('weight description'),
 		-value		=> $session->form->process("weight") || $product->{weight},
 		-maxlength	=> 9,
 	);
-	$f->text(
+	$f->getTab("properties")->text(
 		-name		=> 'sku',
 		-label		=> $i18n->get('sku'),
 		-hoverHelp	=> $i18n->get('sku description'),
 		-value		=> $session->form->process("sku") || $product->{sku},
 		-maxlength	=> 64,
 	);
-	$f->template(
+	$f->getTab("properties")->template(
 		-name		=> 'templateId',
 		-label		=> $i18n->get('template'),
 		-hoverHelp	=> $i18n->get('template description'),
 		-value		=> $session->form->process("templateId") || $product->{templateId},
 		-namespace	=> 'Commerce/Product',
 	);
-	$f->text(
+	$f->getTab("properties")->text(
 		-name		=> 'skuTemplate',
 		-label		=> $i18n->get('sku template'),
 		-hoverHelp	=> $i18n->get('sku template description'),
 		-value		=> $session->form->process("skuTemplate") || $product->{skuTemplate},
 		-maxlength	=> 255,
 	);
-	$f->submit;
-
+	
+	$f->getTab("actions")->group(
+		-name		=> 'groupId',
+		-label		=> $i18n->get('group id'),
+		-hoverHelp	=> $i18n->get('group id description'),
+		-value		=> $session->form->process("groupId") || $product->{groupId},
+	);
+	
+	my %groupExpiresOffsetOptions;
+	tie %groupExpiresOffsetOptions, 'Tie::IxHash',
+		'1month'	=> $i18n->get("1 month"),
+		'6month'	=> $i18n->get("6 months"),
+		'1year'		=> $i18n->get("1 year"),
+		'2year'		=> $i18n->get("2 years"),
+		'3year'		=> $i18n->get("3 years"),
+		'5year'		=> $i18n->get("5 years"),
+		'10year'	=> $i18n->get("10 years"),
+		'1000year'	=> $i18n->get("lifetime"),
+		;
+	
+	$f->getTab("actions")->selectBox(
+		-name		=> 'groupExpiresOffset',
+		-label		=> $i18n->get('group expires offset'),
+		-hoverHelp	=> $i18n->get('group expires offset description'),
+		-value		=> $session->form->process("groupExpiresOffset") || $product->{groupExpiresOffset},
+		-options	=> \%groupExpiresOffsetOptions,
+		-defaultValue	=> '1000year',
+	);
+	
 	return _submenu($session,$f->print, 'edit product', 'edit product', 'ProductManager');
 }
 
@@ -251,6 +282,10 @@ sub www_editProductSave {
 		sku		=> $session->form->process("sku"),
 		templateId	=> $session->form->process("templateId"),
 		skuTemplate	=> $session->form->process("skuTemplate"),
+		
+		groupId		=> $session->form->process('groupId'),
+		groupExpiresOffset => $session->form->process('groupExpiresOffset'),
+		
 	});
 	
 	return www_manageProduct($session, $product->get('productId'));

@@ -20,6 +20,8 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 recalculateProjectCompletion($session);
+updateSqlReportTable($session);
+updateProductsTable($session);
 
 finish($session); # this line required
 
@@ -36,6 +38,20 @@ sub recalculateProjectCompletion {
 			$pm->updateProject($project);
 		}
 	}
+}
+
+
+sub updateSqlReportTable {
+	my $session = shift;
+	print "\tUpdating SQLReport table structure.\n" unless ($quiet);
+	$session->db->write("alter table `SQLReport` ADD COLUMN ( downloadType varchar(255), downloadFilename varchar(255), downloadTemplateId varchar(22), downloadMimeType varchar(255), downloadUserGroup varchar(22))");
+}
+
+
+sub updateProductsTable {
+	my $session	= shift;
+	print "\tUpdating products table structure.\n" unless ($quiet);
+	$session->db->write("alter table products add column (groupId varchar(22), groupExpiresOffset varchar(16))");
 }
 
 # ---- DO NOT EDIT BELOW THIS LINE ----

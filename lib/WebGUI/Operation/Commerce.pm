@@ -398,7 +398,7 @@ sub www_checkoutSubmit {
 		
 		foreach (@{$currentPurchase->{items}}) {
 			my $priceLineItem = ($_->{item}->{priceLineItem}) ? ($_->{item}->priceLineItem($_->{quantity},\@copyOfNormal)) : undef;  # pass in the quantity and the normal items in the cart.
-			$session->errorHandler->warn("Price Line Item: $priceLineItem");
+			#$session->errorHandler->warn("Price Line Item: $priceLineItem");
 			$transaction->addItem($_->{item}, $_->{quantity},$priceLineItem);
 			# use the item plugin's lineItem method for price override
 			# situations.	

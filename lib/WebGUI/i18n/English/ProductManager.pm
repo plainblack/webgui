@@ -567,6 +567,68 @@ the form.<br />|,
 		message => q|Product Manager|,
 		lastUpdated => 1128919931,
 	},
+	
+	
+	'group id' => {
+		message => "Add to Group",
+		lastUpdated => 0,
+		context => "Label for add to group action",
+	},
+	
+	'group id description' => {
+		message => "Add purchasers of this product to this group. Set to 'everyone' to disable.",
+		lastUpdated => 0,
+		context => "Hover help for add to group action",
+	},
+	
+	'group expires offset' => {
+		message => "Group Expires Offset",
+		lastUpdated => 0,
+		context => "Label for group expires offset",
+	},
+	
+	'group expires offset description' => {
+		message => "Length of time added to user's expiration from the above group each time this product is purchased.",
+		lastUpdated => 0,
+		context => "Hover help for group expires offset",
+	},
+	
+	
+	'6 months'	=> {
+		message => "6 months",
+		lastUpdated => 0,
+		context => "A time period for group expires offset",
+	},
+	'1 year'	=> {
+		message => "1 year",
+		lastUpdated => 0,
+		context => "A time period for group expires offset",
+	},
+	'2 years'	=> {
+		message => "2 years",
+		lastUpdated => 0,
+		context => "A time period for group expires offset",
+	},
+	'3 years'	=> {
+		message => "3 years",
+		lastUpdated => 0,
+		context => "A time period for group expires offset",
+	},
+	'5 years'	=> {
+		message => "5 years",
+		lastUpdated => 0,
+		context => "A time period for group expires offset",
+	},
+	'10 years'	=> {
+		message => "10 years",
+		lastUpdated => 0,
+		context => "A time period for group expires offset",
+	},
+	'lifetime'	=> {
+		message => "lifetime",
+		lastUpdated => 0,
+		context => "A time period for group expires offset",
+	},
 
 };
 

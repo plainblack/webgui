@@ -319,6 +319,59 @@ query, but will be prefixed with queryN where N goes from 2 to 5.</p>
 <p>The prequery statements are seperated from each other by returns and cannot use placeholders. You can use macro's within the prequery statements, however. Please note that prequery statements are only visible in the query they belong to and that you can only use statements that are allowed by the database link.</p>|,
 		lastUpdated => 0,
 	},
+	
+	
+	
+	'download type' => {
+		message => 'Download Type',
+		lastUpdated => 0,
+	},
+	
+	'download type description' => {
+		message => "The type of download to create.",
+		lastUpdated => 0,
+	},
+	
+	'download filename' => {
+		message => 'Download File Name',
+		lastUpdated => 0,
+	},
+	
+	'download filename description' => {
+		message => "The filename of the file to download. If left blank, will autogenerate.",
+		lastUpdated => 0,
+	},
+	
+	'download template' => {
+		message => "Download Template",
+		lastUpdated => 0,
+	},
+	
+	'download template description' => {
+		message => "The template to use to generate the download file.",
+		lastUpdated => 0,
+	},
+	
+	'download mimetype' => {
+		message => "Download Mime-Type",
+		lastUpdated => 0,
+	},
+	
+	'download mimetype description' => {
+		message => "Mime-Type for the downloaded template.",
+		lastUpdated => 0,
+	},
+	
+	'download usergroup' => {
+		message => "Download User Group",
+		lastUpdated => 0,
+	},
+	
+	'download usergroup description' => {
+		message => "Group of users allowed to download the report.",
+		lastUpdated => 0,
+	},
+	
 };
 
 1;

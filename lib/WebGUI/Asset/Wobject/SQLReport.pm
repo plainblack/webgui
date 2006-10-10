@@ -19,6 +19,7 @@ use WebGUI::SQL;
 use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 use WebGUI::Cache;
+use WebGUI::Text qw(:csv);
 
 our @ISA = qw(WebGUI::Asset::Wobject);
 
@@ -153,6 +154,30 @@ sub definition {
 				fieldType=>"yesNo",
 				defaultValue=>0
 				},
+			
+			# download
+			downloadType=>{
+				fieldType=>"text",
+				defaultValue=>"",
+				},
+			downloadFilename=>{
+				fieldType=>"text",
+				defaultValue=>"",
+				},
+			downloadTemplateId=>{
+				fieldType=>"template",
+				defaultValue=>'SQLReportDownload0001',
+				},
+			downloadMimeType=>{
+				fieldType=>"text",
+				defaultValue=>"text/html",
+				},
+			downloadUserGroup=>{
+				fieldType=>"group",
+				defaultValue=>"text/html",
+				},
+			
+			
                         }
                 });
         return $class->SUPER::definition($session, $definition);
@@ -182,7 +207,79 @@ sub getEditForm {
 		-uiLevel => 8,
                 -value=>$self->getValue("cacheTimeout")
                 );
+	
+	
+	### Download
+	# Download Type
+	my %downloadTypes;
+	tie %downloadTypes, 'Tie::IxHash', 
+		"none" 		=> "No Download",
+		"csv"		=> "CSV",
+		"template"	=> "Template",
+		;
+		
+	$tabform->getTab("properties")->radioList(
+		-name=>"downloadType",		# ID is downloadType_formId
+		-label=>$i18n->get("download type"),
+		-hoverHelp=>$i18n->get("download type description"),
+		-vertical=>1,
+		-options=> \%downloadTypes,
+		-defaultValue=>"none",
+		-value=>$self->getValue("downloadType"),
+		-extras=> "onclick='changeDownloadType(this)'"
+		);
+	
+	# Download Filename
+	$tabform->getTab("properties")->text(
+		-name=>"downloadFilename",		# ID is downloadFilename_formId
+		-label=>$i18n->get("download filename"),
+		-hoverHelp=>$i18n->get("download filename description"),
+		-value=>$self->getValue("downloadFilename"),
+		);
+	
+	# Download template (if necessary)
+	$tabform->getTab("properties")->template(
+		-name=>"downloadTemplateId",	# ID is downloadTemplateId_formId
+		-label=>$i18n->get("download template"),
+		-hoverHelp=>$i18n->get("download template description"),
+		-value=>$self->getValue("downloadTemplateId"),
+		-namespace=>"SQLReport/Download",
+		);
+	
+	# Download mimeType (if necessary)
+	my %downloadMimeType;
+	tie %downloadMimeType, 'Tie::IxHash', 
+		"application/octet-stream"	=> "application/octet-stream",
+		"application/xml"		=> "application/xml",
+		"application/csv"		=> "application/csv",
+		"text/html"			=> "text/html",
+		"text/plain"			=> "text/plain",
+		;
 
+	$tabform->getTab("properties")->selectBox(
+		-name=>"downloadMimeType",
+		-label=>$i18n->get("download mimetype"),
+		-hoverHelp=>$i18n->get("download mimetype description"),
+		-options=> \%downloadMimeType,
+		-value=>$self->getValue("downloadMimeType"),
+		-defaultValue=>"application/octet-stream",
+		);
+	
+	# Download UserGroup
+	$tabform->getTab("security")->group(
+		-name=>"downloadUserGroup",
+		-label=>$i18n->get("download usergroup"),
+		-hoverHelp=>$i18n->get("download usergroup description"),
+		-value=>$self->getValue("downloadUserGroup"),
+		-defaultValue=>$self->getValue("groupIdView"),
+		);
+	
+	# javascript
+	$self->session->style->setScript("/extras/wobject/SQLReport/editFormDownload.js");
+	
+	### /DOWNLOAD
+	
+	
 	# Add toggleQuery javascript
 	$tabform->getTab("properties")->raw(qq|
 		<script type="text/javascript">
@@ -276,6 +373,64 @@ sub getEditForm {
 
 #-------------------------------------------------------------------
 
+=head2 download ( )
+
+Returns the SQLReport in the configured manner. Returns nothing if download is
+not enabled.
+
+=cut
+
+sub download {
+	my $self	= shift;
+	
+	# Instead of going through some costly exercises...
+	return if ($self->getValue("downloadType") eq "none");
+	
+        # Initiate an empty debug loop
+        $self->{_debug_loop} = [] ;
+	
+	# Store queries in class
+	$self->_storeQueries();
+	
+	# Call _processQuery
+	my $data	= $self->_processQuery(0,0);
+	
+	
+	# If we're downloading CSV
+	if ($self->getValue("downloadType") eq "csv") {
+		my $out		= "";
+		
+		### Loop through the returned structure and put it through Text::CSV
+		# Column heads
+		$out	.= joinCSV(
+			map { $_->{"field.name"} } 
+				@{$data->{rows_loop}->[0]->{"row.field_loop"}}
+			);
+		
+		
+		# Data lines
+		for my $row (@{$data->{rows_loop}}) {
+			$out .= "\n".joinCSV(map { $_->{"field.value"} }
+					@{$row->{"row.field_loop"}}
+				);
+			
+		}
+		
+		return $out;
+		
+	} elsif ($self->getValue("downloadType") eq "template") { 
+		return $self->processTemplate($data,$self->get("downloadTemplateId"));
+		
+	} else {
+		# I don't know what to do
+		return;
+	}
+}
+
+
+
+#-------------------------------------------------------------------
+
 =head2 prepareView ( )
 
 See WebGUI::Asset::prepareView() for details.
@@ -324,6 +479,13 @@ sub view {
 	# Add debug loop to template vars
 	$var->{'debug_loop'} = $self->{_debug_loop};
 	#use Data::Dumper; return '<pre>'.Dumper($var).'</pre>';
+	
+	# Add the "Download data" link if the user is allowed to download
+	$var->{'canDownload'} = 1 
+		if ($self->getValue("downloadType") ne "none" 
+		&& $self->session->user->isInGroup($self->getValue("downloadUserGroup"))
+		);
+	
        	my $out = $self->processTemplate($var,undef,$self->{_viewTemplate});
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
 		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("cacheTimeout"));
@@ -370,9 +532,20 @@ sub _parsePlaceholderParams {
 
 
 #-------------------------------------------------------------------
+# _processQuery($nest, $page, $nr)
+# Recursive sub to process this SQLReport's queries.
+# Arguments:	$nest	- If true, will run the nested queries. Defaults to true
+#		$page	- If true, will paginate. Defaults to true
+#		$nr	- This query number. Defaults to one. This is used 
+#		internally to tell which query we're performing. You should not
+#		send this yourself.
+# Returns:	A reference to a datastructure containing template variables to 
+#		be passed to processTemplate()
 sub _processQuery {
-	my $self = shift;	
-	my $nr = shift || 1;
+	my $self 	= shift;
+	my $nest	= shift || 1;	
+	my $page	= shift || 1;
+	my $nr 		= shift || 1;
         my ($query, %var, $prefix);
 
 	if($nr > 1) {
@@ -427,8 +600,16 @@ sub _processQuery {
                                                 .'='.$self->session->url->escape($self->session->form->process($_)));
                                 }
                         }
-			my $paginateAfter = $self->get("paginateAfter");
-			$paginateAfter = 1000 if($self->{_query}{$nr + 1}{dbQuery});
+			my $paginateAfter;
+			if ($page)	# Set page length
+			{
+				$paginateAfter 	= $self->get("paginateAfter");
+				$paginateAfter 	= 1000 if($self->{_query}{$nr + 1}{dbQuery});
+			}
+			else
+			{
+				$paginateAfter	= 1000000;
+			}
                         my $p = WebGUI::Paginator->new($self->session,$url,$paginateAfter);
                         my $error = $p->setDataByQuery($query,$dbh,1,$placeholderParams);
                         if ($error ne "") {
@@ -461,8 +642,8 @@ sub _processQuery {
                                                 $row{$prefix.'row.field.'.$name.'.value'} = $data->{$name};
                                         }
 					# Process nested query
-                                        if($self->{_query}{$nr + 1}{dbQuery}) {
-                                                my $nest = $self->_processQuery($nr+1);
+                                        if($nest && $self->{_query}{$nr + 1}{dbQuery}) {
+                                                my $nest = $self->_processQuery($nest,$page,$nr+1);
 						%row = (%row , %$nest);
 						$row{$prefix.'hasNest'} = $nest->{'query'.($nr+1).'.rows.count'};
                                         }
@@ -491,6 +672,42 @@ sub _processQuery {
         }
 	return \%var;
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_download ( )
+
+Calls download() to let user download the SQLReport in the configured manner.
+
+=cut
+
+sub www_download {
+	my $self	= shift;
+	
+	# Only allow if download type is not "none"
+	return if $self->getValue("downloadType") eq "none";
+	
+	# Only allow users in appropriate group
+	return $self->session->privilege->noAccess() 
+		unless $self->session->user->isInGroup($self->getValue("downloadUserGroup"));
+	
+	# Set filename and mimetype
+	if ($self->getValue("downloadType") eq "csv")
+	{
+		$self->session->http->setFilename($self->getValue("downloadFilename"),"application/octet-stream");
+	}
+	else
+	{
+		$self->session->http->setFilename($self->getValue("downloadFilename"),$self->getValue("downloadMimeType"));
+	}
+	
+	$self->session->http->sendHeader;
+	
+	
+	return $self->download;
+}
+
+
 
 #-------------------------------------------------------------------
 

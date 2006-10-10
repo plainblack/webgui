@@ -12,6 +12,11 @@
  - fix: Events Calendar: error in "big" template (Martin Kamerbeek / Procolix)
  - fix: PM task editor not preserving duration
  - fix: PM project completion percentage updates not working right
+ - Added ability to download an SQLReport in either CSV or as a template.
+ - Added ability for Products to add a user to a group when purchased.
+ - Changed the ?op=editProduct form to a TabForm.
+ - fixed a small error in WebGUI::Group documentation.
+ - Added WebGUI::Text with some CSV functions.
 
 7.0.9
  - Removed the need for DateTime::Cron::Simple, which also added the ability
