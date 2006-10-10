@@ -15,8 +15,10 @@ use HTML::TokeParser;
 
 use WebGUI::Test;
 use WebGUI::Session;
+use WebGUI::Asset;
+use WebGUI::VersionTag;
 
-use Test::More tests => 35; # increment this value for each test you create
+use Test::More tests => 38; # increment this value for each test you create
 use Test::Deep;
  
 my $session = WebGUI::Test->session;
@@ -152,9 +154,23 @@ is($macroOutput, 1, 'generateAdditionalHeadTags: process a macro');
 #
 ####################################################
 
+$style->sent(0);
+is($style->sent, 0, 'process: setup sent to 0');
+
 is($style->process('body.content', 'notATemplateId'),
 "WebGUI was unable to instantiate your style template.body.content",
 'process:  invalid templateId returns error message to client');
+
+is($style->sent, 1, 'process: sets sent to 1');
+
+my ($versionTag, $personalTemplate) = setup_assets($session);
+
+$session->scratch->set('personalStyleId', $personalTemplate->getId);
+
+my $styled = $style->process('body.content', 'notATemplateId');
+like($styled,
+qr/PERSONAL STYLE TEMPLATE/,
+'process:  personalStyleTemplate overrides submitted template');
 
 sub simpleLinkParser {
 	my ($tokenName, $text) = @_;
@@ -175,6 +191,28 @@ sub simpleLinkParser {
 
 	return ($url, $params);
 }
- 
+
+sub setup_assets {
+	my $session = shift;
+	my $importNode = WebGUI::Asset->getImportNode($session);
+	my $versionTag = WebGUI::VersionTag->getWorking($session);
+	$versionTag->set({name=>"Session Style test"});
+	my $properties = {
+		title => 'personal style test template',
+		className => 'WebGUI::Asset::Template',
+		url => 'personal_style',
+		namespace => 'Style',
+		template => "PERSONAL STYLE TEMPLATE\n\nBODY=<tmpl_var body.content>\n\nHEAD=<tmpl_var head.tags>",
+		id => 'testTemplate_personal1',
+		#     '1234567890123456789012'
+	};
+	my $template = $importNode->addChild($properties, $properties->{id});
+	$versionTag->commit;
+	return ($versionTag, $template);
+}
+
 END {
+	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
+		$versionTag->rollback;
+	}
 }

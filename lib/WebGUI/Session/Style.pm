@@ -130,6 +130,8 @@ sub new {
 =head2 process ( content, templateId )
 
 Returns a parsed style with content based upon the current WebGUI session information.
+Sets the C<sent> method/flag to be true so that subsequent head data is processed
+right away.
 
 =head3 content
 
