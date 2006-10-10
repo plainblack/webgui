@@ -270,7 +270,13 @@ sub recurseProperty {
 	my $recurseFilter = $_[5] || $self->get->{ldapGlobalRecursiveFilter};
 	return unless($ldap && $base && $property);
 
-	#Prevent infinate recursion
+	if (length $recurseFilter) {
+		$recurseFilter =~ s/\A\n*//; $recurseFilter =~ s/\n*\z//;
+		$recurseFilter = (join '|', map{quotemeta} grep{/\S/} split /\n/, $recurseFilter);
+		$recurseFilter = length($recurseFilter)? qr/$recurseFilter/ : undef;
+	}
+
+	#Prevent infinite recursion
 	$count++;
 	return if $count == 99;
 
@@ -294,8 +300,8 @@ sub recurseProperty {
 			$properties = $entry->get_value($recProperty,asref => 1);
 		}
 		foreach my $prop (@{$properties}) {
-		   next if ($recurseFilter && $prop =~ m/$recurseFilter/ig);
-		   $self->recurseProperty($prop,$array,$property,$recProperty,$count,$recurseFilter);
+			next if $recurseFilter and $prop =~ m/$recurseFilter/i;
+			$self->recurseProperty($prop,$array,$property,$recProperty,$count,$recurseFilter);
 		}
 	}
 }

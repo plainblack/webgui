@@ -3,19 +3,19 @@ package WebGUI::i18n::English::AuthLDAP;
 our $I18N = {
         'global recursive filter label' => {
 		   message => q|LDAP Recursive Group Filter|,
-		   lastUpdate => 0
+		   lastUpdate => 1160517240
     },
 		'global recursive filter label description' => {
-		   message => q|Enter a string by which to filter out anything in your recursive ldap group that might not be a group.  This is a performance setting which can help speed up the group search in the case where your groups and group members are both part of the same attribute used for groups of groups within LDAP.  For example, if both users and groups are stored in the "member" attribute and users always contain the string o= while groups contain the string cn=, you might add o= as the filter in order that the code to recurse through the groups skips over the users in the group and only searches the groups.  This setting will be applied to each LDAP group with recursive group settings.  Optionally, you may choose to apply this setting to individual groups.  The individual group setting will override the global setting|,
-		   lastUpdate => 0
+		   message => q|Enter any number of strings by which to filter out anything in your recursive LDAP group that is not a group, delimited by newlines.  An object matching any one of these strings will not be searched recursively.  This is a performance setting which can help speed up the group search in the case where your groups and group members are both part of the same attribute used for groups of groups within LDAP.  For example, if both users and groups are stored in the "member" attribute and users always contain the string o= while groups contain the string cn=, you might add o= as a filter in order to skip over users and only search recursively within groups.  This setting will be applied to each LDAP group with recursive group settings.  Optionally, you may choose to apply this setting to individual groups; in that case, the individual group setting will override the global setting.|,
+		   lastUpdate => 1160517240
     },
 	    'LDAPLink_ldapRecursiveFilter' => {
 		   message => q|LDAP Recursive Group Filter|,
-		   lastUpdate => 0
+		   lastUpdate => 1160517240
 	},
 	    'LDAPLink_ldapRecursiveFilterDescription' => {
-		   message => q|Enter a string by which to filter out anything in your recursive ldap group that might not be a group.  This is a performance setting which can help speed up the group search in the case where your groups and group members are both part of the same attribute used for groups of groups within LDAP.  For example, if both users and groups are stored in the "member" attribute and users always contain the string o= while groups contain the string cn=, you might add o= as the filter in order that the code to recurse through the groups skips over the users in the group and only searches the groups.  This setting will be applied to only this group.  and will override any global filter you may have set for the ldap connection chosen.|,
-		   lastUpdate => 0
+		   message => q|Enter any number of strings by which to filter out anything in your recursive LDAP group that is not a group.  An object matching any of these strings will not be searched recursively. This is a performance setting which can help speed up the group search in the case where your groups and group members are both part of the same attribute used for groups of groups within LDAP.  For example, if both users and groups are stored in the "member" attribute and users always contain the string o= while groups contain the string cn=, you might add o= as a filter in order to skip over users and only search recursively within groups.  This setting will be applied to only this group, and will override any global filter you may have set for the LDAP connection chosen.|,
+		   lastUpdate => 1160517240
 	},
 		'ldap link name blank' => {
 		message => q|The LDAP Link Name field cannot be blank.|,

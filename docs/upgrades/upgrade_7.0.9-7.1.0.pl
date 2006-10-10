@@ -22,6 +22,7 @@ my $session = start(); # this line required
 recalculateProjectCompletion($session);
 updateSqlReportTable($session);
 updateProductsTable($session);
+makeLdapRecursiveFiltersText($session);
 
 finish($session); # this line required
 
@@ -52,6 +53,20 @@ sub updateProductsTable {
 	my $session	= shift;
 	print "\tUpdating products table structure.\n" unless ($quiet);
 	$session->db->write("alter table products add column (groupId varchar(22), groupExpiresOffset varchar(16))");
+}
+
+sub makeLdapRecursiveFiltersText {
+	my $session = shift;
+	print "\tMaking LDAP recursive filters text fields.\n" unless $quiet;
+	$session->db->write($_) for(<<'EOT',
+    ALTER TABLE LDAPLink
+  CHANGE COLUMN ldapGlobalRecursiveFilter ldapGlobalRecursiveFilter mediumtext NULL DEFAULT NULL
+EOT
+				    <<'EOT',
+    ALTER TABLE groups
+  CHANGE COLUMN ldapRecursiveFilter ldapRecursiveFilter mediumtext NULL DEFAULT NULL
+EOT
+				   )
 }
 
 # ---- DO NOT EDIT BELOW THIS LINE ----

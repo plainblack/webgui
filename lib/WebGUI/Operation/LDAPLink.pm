@@ -251,7 +251,7 @@ sub www_editLDAPLink {
 		-hoverHelp => $i18n->get('8 description'),
 		-value => $db{ldapPasswordName},
    );
-   $f->text(
+   $f->textarea(
         -name => "ldapGlobalRecursiveFilter",
 		-label => $i18n->get("global recursive filter label"),
 		-hoverHelp => $i18n->get("global recursive filter label description"),

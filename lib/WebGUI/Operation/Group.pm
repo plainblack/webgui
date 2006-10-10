@@ -392,7 +392,7 @@ sub www_editGroup {
 		   -hoverHelp=>$i18n->get("LDAPLink_ldapRecursiveProperty","AuthLDAP"),
 		   -value=>$g->ldapRecursiveProperty
 	    );
-	$f->text(
+	$f->textarea(
 	       -name=>"ldapRecursiveFilter",
 		   -label=>$i18n->get("LDAPLink_ldapRecursiveFilter","AuthLDAP"),
 		   -hoverHelp=>$i18n->get("LDAPLink_ldapRecursiveFilterDescription","AuthLDAP"),
@@ -433,7 +433,7 @@ sub www_editGroupSave {
 	$g->ldapGroup($session->form->text("ldapGroup"));
 	$g->ldapGroupProperty($session->form->text("ldapGroupProperty"));
 	$g->ldapRecursiveProperty($session->form->text("ldapRecursiveProperty"));
-	$g->ldapRecursiveFilter($session->form->text("ldapRecursiveFilter"));
+	$g->ldapRecursiveFilter($session->form->process("ldapRecursiveFilter"));
 	return www_listGroups($session);
 }
 
