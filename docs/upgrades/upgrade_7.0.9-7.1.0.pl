@@ -12,7 +12,7 @@ use lib "../../lib";
 use strict;
 use Getopt::Long;
 use WebGUI::Session;
-
+use WebGUI::Workflow;
 
 my $toVersion = "7.1.0"; # make this match what version you're going to
 my $quiet; # this line required
@@ -25,8 +25,33 @@ updateProductsTable($session);
 makeLdapRecursiveFiltersText($session);
 addImageStuffToCs($session);
 addNewAuthSettings($session);
+addAutoLDAPRegistration($session);
 
 finish($session); # this line required
+
+#-------------------------------------------------
+sub addAutoLDAPRegistration {
+        my $session = shift;
+	print "\tAdding new feature that allows autoregistration of WebGUI users from LDAP directories.\n" unless $quiet;
+
+	# Put an entry in the settings table to turn this thing on and off
+	$session->db-write("insert into settings (name,value) values ('automaticLDAPRegistration',0)");
+
+	# Enable our new workflow activity in the config file
+	my $activities = $session->config->get("workflowActivities");
+	push (@{$activities->{'WebGUI::User'}}, 'WebGUI::Workflow::Activity::SyncProfileToLdap');
+	$session->config->set("workflowActivities", $activities);
+
+	# Add a workflow that the LDAP auth module can kick off to pull the users info from LDAP to their wG user profile.
+        my $workflow = WebGUI::Workflow->create($session, {
+                type=>"WebGUI::User",
+                enabled=>1,
+                description=>"Synchronizes a users LDAP information to their WebGUI User Profile",
+                title=>"Synchronize Profile To LDAP"
+        }, "AuthLDAPworkflow000001");
+        my $activity = $workflow->addActivity("WebGUI::Workflow::Activity::SyncProfileToLdap");
+        $activity->set("title","Synchronize Profile To LDAP");
+}
 
 #-------------------------------------------------
 sub addNewAuthSettings {
@@ -65,20 +90,21 @@ sub recalculateProjectCompletion {
 	}
 }
 
-
+#-------------------------------------------------
 sub updateSqlReportTable {
 	my $session = shift;
 	print "\tUpdating SQLReport table structure.\n" unless ($quiet);
 	$session->db->write("alter table `SQLReport` ADD COLUMN ( downloadType varchar(255), downloadFilename varchar(255), downloadTemplateId varchar(22), downloadMimeType varchar(255), downloadUserGroup varchar(22))");
 }
 
-
+#-------------------------------------------------
 sub updateProductsTable {
 	my $session	= shift;
 	print "\tUpdating products table structure.\n" unless ($quiet);
 	$session->db->write("alter table products add column (groupId varchar(22), groupExpiresOffset varchar(16))");
 }
 
+#-------------------------------------------------
 sub makeLdapRecursiveFiltersText {
 	my $session = shift;
 	print "\tMaking LDAP recursive filters text fields.\n" unless $quiet;

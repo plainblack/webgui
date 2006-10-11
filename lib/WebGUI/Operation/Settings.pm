@@ -258,6 +258,14 @@ sub definition {
 		});
 	push(@fields, {
 		tab=>"user",
+		fieldType=>"yesNo",
+                name=>"automaticLDAPRegistration",
+                label=>$i18n->echo("Automatic LDAP Registration"),
+                hoverHelp=>$i18n->echo('When set to yes, a WebGUI user account will be created and the user logged in, if the credentials entered are validated by LDAP.'),
+		defaultValue=>$session->setting->get("automaticLDAPRegistration")
+                });
+	push(@fields, {
+		tab=>"user",
 		fieldType=>"workflow",
 		none=>1,
 		type=>"WebGUI::User",

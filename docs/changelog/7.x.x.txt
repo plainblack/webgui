@@ -24,6 +24,11 @@
  - Added option to WebGUI Auth module to require strong passwords. Admins can
    now require users to enter a specific combination of characters, etc.
  - Added skeleton code for writing WebGUI utility scripts.
+ - Added auto-registration via LDAP.  This allows users to simply login and
+   have a WebGUI account created if their credentials are validated by the
+   directory.
+ - Added a Sync Profile to LDAP workflow activity that will grab a single user
+   profile from LDAP instead of all of them.
 
 7.0.9
  - Removed the need for DateTime::Cron::Simple, which also added the ability
