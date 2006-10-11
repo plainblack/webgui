@@ -19,7 +19,7 @@ use WebGUI::Asset;
 use WebGUI::VersionTag;
 use WebGUI;
 
-use Test::More tests => 44; # increment this value for each test you create
+use Test::More tests => 46; # increment this value for each test you create
 use Test::Deep;
  
 my $session = WebGUI::Test->session;
@@ -63,6 +63,11 @@ is($style->generateAdditionalHeadTags(), '', 'generateAdditionalHeadTags: return
 $style->setLink('http://www.plainblack.com');
 ($url) = simpleLinkParser('link', $style->generateAdditionalHeadTags);
 is($url, 'http://www.plainblack.com', 'setLink: called with link url');
+
+$style->setLink('http://dev.plainblack.com', '');
+($url,$params) = simpleLinkParser('link', $style->generateAdditionalHeadTags);
+is($url, 'http://dev.plainblack.com', 'setLink: called with bad params');
+cmp_deeply({}, $params, 'setLink: bad params sent return no params in tag');
 
 my $setParams = {rating => 5, affiliateId => '007', CAPS => 'CapitalS'};
 $style->setLink('http://www.webguidev.org', $setParams);
