@@ -159,7 +159,7 @@ sub process {
 	} elsif ($self->session->scratch->get("personalStyleId") ne "") {
 		$templateId = $self->session->scratch->get("personalStyleId");
 	} elsif ($self->{_useEmptyStyle}) {
-		$templateId = 6;
+		$templateId = 'PBtmpl0000000000000132';
 	}
 $var{'head.tags'} = '
 <meta name="generator" content="WebGUI '.$WebGUI::VERSION.'" />

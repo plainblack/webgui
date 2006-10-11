@@ -12,6 +12,7 @@
  - fix: Events Calendar: error in "big" template (Martin Kamerbeek / Procolix)
  - fix: PM task editor not preserving duration
  - fix: PM project completion percentage updates not working right
+ - fix: useEmptyStyle caused invalid template to be used
  - Added ability to download an SQLReport in either CSV or as a template.
  - Added ability for Products to add a user to a group when purchased.
  - Changed the ?op=editProduct form to a TabForm.

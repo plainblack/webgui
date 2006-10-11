@@ -18,7 +18,7 @@ use WebGUI::Session;
 use WebGUI::Asset;
 use WebGUI::VersionTag;
 
-use Test::More tests => 38; # increment this value for each test you create
+use Test::More tests => 39; # increment this value for each test you create
 use Test::Deep;
  
 my $session = WebGUI::Test->session;
@@ -150,7 +150,8 @@ is($macroOutput, 1, 'generateAdditionalHeadTags: process a macro');
 
 ####################################################
 #
-# process
+# process 
+# useEmptyStyle
 #
 ####################################################
 
@@ -162,6 +163,10 @@ is($style->process('body.content', 'notATemplateId'),
 'process:  invalid templateId returns error message to client');
 
 is($style->sent, 1, 'process: sets sent to 1');
+
+$style->useEmptyStyle(1);
+
+is($style->process('body.content'), "body.content", 'process, useEmptyStyle:  valid data returned');
 
 my ($versionTag, $personalTemplate) = setup_assets($session);
 
