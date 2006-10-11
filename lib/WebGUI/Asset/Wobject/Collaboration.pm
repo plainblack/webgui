@@ -339,6 +339,20 @@ sub definition {
 			label=>$i18n->get('approval workflow'),
 			hoverHelp=>$i18n->get('approval workflow description'),
 			},
+		thumbnailSize => {
+			fieldType => "integer",
+			defaultValue => 0,
+			tab => "display",
+			label => $i18n->get("thumbnail size"),
+			hoverHelp => $i18n->get("thumbnail size help")
+			},
+		maxImageSize => {
+			fieldType => "integer",
+			defaultValue => 0,
+			tab => "display",
+			label => $i18n->get("max image size"),
+			hoverHelp => $i18n->get("max image size help")
+			},
 		mailServer=>{
 			fieldType=>"text",
 			defaultValue=>undef,

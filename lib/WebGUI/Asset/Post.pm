@@ -747,10 +747,10 @@ sub postProcess {
 		if ($storage->isImage($file)) {
 			##Use generateThumbnail to shrink size to site's max image size
 			##We should look into using the new resize method instead.
-			$storage->generateThumbnail($file,$self->session->setting->get("maxImageSize"));
+			$storage->generateThumbnail($file, $self->getThread->getParent->get("maxImageSize") || $self->session->setting->get("maxImageSize"));
 			$storage->deleteFile($file);
 			$storage->renameFile('thumb-'.$file,$file);
-			$storage->generateThumbnail($file);
+			$storage->generateThumbnail($file, $self->getThread->getParent->get("thumbnailSize"));
 		}
 		$size += $storage->getFileSize($file);
 	}

@@ -18,6 +18,7 @@
  - Changed the ?op=editProduct form to a TabForm.
  - fixed a small error in WebGUI::Group documentation.
  - Added WebGUI::Text with some CSV functions.
+ - Added Karma RFE: Thumbnail size can be enterred in CS
 
 7.0.9
  - Removed the need for DateTime::Cron::Simple, which also added the ability

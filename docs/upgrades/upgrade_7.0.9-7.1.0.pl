@@ -23,11 +23,21 @@ recalculateProjectCompletion($session);
 updateSqlReportTable($session);
 updateProductsTable($session);
 makeLdapRecursiveFiltersText($session);
+addImageStuffToCs($session);
 
 finish($session); # this line required
 
 
-##-------------------------------------------------
+#-------------------------------------------------
+sub addImageStuffToCs {
+	my $session = shift;
+	print "\tAdding thumbnail and image sizing to CS.\n" unless $quiet;
+	$session->db->write("alter table Collaboration add column thumbnailSize int not null default 0");
+	$session->db->write("alter table Collaboration add column maxImageSize int not null default 0");
+}
+
+
+#-------------------------------------------------
 sub recalculateProjectCompletion {
 	my $session = shift;
 	print "\tForcing project completion recalculation.\n" unless $quiet;

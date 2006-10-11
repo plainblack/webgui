@@ -14,6 +14,30 @@ our $I18N = {
 		context => q|thread link|
 		},
 
+	'max image size' => {
+		message => q|Maximum Image Size|,
+		lastUpdated => 0,
+		context => q|field label for image on display tab|
+		},
+
+	'max image size help' => {
+		message => q|Set the size of the image attachments for this Collaboration System. If you set it to 0 then the default size set in the master settings will be used. Also, changing this setting does not retroactively change the size of images already in the CS. You'll have to re-save each post to get the size to change.|,
+		lastUpdated => 0,
+		context => q|help for display setting label|
+		},
+
+	'thumbnail size' => {
+		message => q|Thumbnail Size|,
+		lastUpdated => 0,
+		context => q|field label for thumbnails on display tab|
+		},
+
+	'thumbnail size help' => {
+		message => q|Set the size of the thumbnails for this Collaboration System. If you set it to 0 then the default size set in the master settings will be used. Also, changing this setting does not retroactively change the size of thumbnails already in the CS. You'll have to re-save each post to get the size to change.|,
+		lastUpdated => 0,
+		context => q|help for display setting label|
+		},
+
 	'require subscription for email posting' => {
 		message => q|Require subscription for email posts?|,
 		lastUpdated => 0,

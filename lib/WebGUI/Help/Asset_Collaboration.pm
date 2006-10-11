@@ -17,6 +17,16 @@ our $HELP = {
                                 namespace => 'Asset_Collaboration',
                         },
                         {
+                                title => 'thumbnail size',
+                                description => 'thumbnail size help',
+                                namespace => 'Asset_Collaboration',
+                        },
+                        {
+                                title => 'max image size',
+                                description => 'max image size help',
+                                namespace => 'Asset_Collaboration',
+                        },
+                        {
                                 title => 'system template',
                                 description => 'system template description',
                                 namespace => 'Asset_Collaboration',
