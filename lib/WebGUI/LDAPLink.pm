@@ -268,9 +268,11 @@ sub recurseProperty {
 	my $recProperty = $_[3] || $property;
 	my $count = $_[4] || 0;
 	my $recurseFilter = $_[5] || $self->get->{ldapGlobalRecursiveFilter};
+	my $rfAlreadyTransformed = $_[6];
 	return unless($ldap && $base && $property);
 
-	if (length $recurseFilter) {
+	if (length $recurseFilter and not $rfAlreadyTransformed) {
+		$recurseFilter =~ tr/\r//d;
 		$recurseFilter =~ s/\A\n*//; $recurseFilter =~ s/\n*\z//;
 		$recurseFilter = (join '|', map{quotemeta} grep{/\S/} split /\n/, $recurseFilter);
 		$recurseFilter = length($recurseFilter)? qr/$recurseFilter/ : undef;
@@ -301,7 +303,7 @@ sub recurseProperty {
 		}
 		foreach my $prop (@{$properties}) {
 			next if $recurseFilter and $prop =~ m/$recurseFilter/i;
-			$self->recurseProperty($prop,$array,$property,$recProperty,$count,$recurseFilter);
+			$self->recurseProperty($prop,$array,$property,$recProperty,$count,$recurseFilter,1);
 		}
 	}
 }
