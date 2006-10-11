@@ -275,7 +275,7 @@ sub recurseProperty {
 		$recurseFilter =~ tr/\r//d;
 		$recurseFilter =~ s/\A\n*//; $recurseFilter =~ s/\n*\z//;
 		$recurseFilter = (join '|', map{quotemeta} grep{/\S/} split /\n/, $recurseFilter);
-		$recurseFilter = length($recurseFilter)? qr/$recurseFilter/ : undef;
+		$recurseFilter = length($recurseFilter)? qr/(?i:$recurseFilter)/ : undef;
 	}
 
 	#Prevent infinite recursion
@@ -302,7 +302,7 @@ sub recurseProperty {
 			$properties = $entry->get_value($recProperty,asref => 1);
 		}
 		foreach my $prop (@{$properties}) {
-			next if $recurseFilter and $prop =~ m/$recurseFilter/i;
+			next if $recurseFilter and $prop =~ m/$recurseFilter/;
 			$self->recurseProperty($prop,$array,$property,$recProperty,$count,$recurseFilter,1);
 		}
 	}
