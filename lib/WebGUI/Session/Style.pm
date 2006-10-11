@@ -20,6 +20,7 @@ use Tie::CPHash;
 use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Asset::Template;
+use WebGUI;
 
 =head1 NAME
 
@@ -71,6 +72,7 @@ sub DESTROY {
 =head2 generateAdditionalHeadTags ( )
 
 Creates tags that were set using setLink, setMeta, setScript, extraHeadTags, and setRawHeadTags.
+Macros are processed in the tags if processed by this method.
 
 =cut
 
@@ -240,7 +242,12 @@ sub sent {
 
 =head2 setLink ( url, params )
 
-Sets a <link> tag into the <head> of this rendered page for this page view. This is typically used for dynamically adding references to CSS and RSS documents.
+Sets a <link> tag into the <head> of this rendered page for this page
+view. This is typically used for dynamically adding references to CSS
+and RSS documents.  Tags are normally cached until the $style->sent
+flag is set to be true.  If this method is called after that sent is
+true, then the tag will be sent immediately, but will not be processed
+for macros.
 
 =head3 url
 
@@ -291,7 +298,10 @@ sub setPrintableStyleId {
 
 =head2 setMeta ( params )
 
-Sets a <meta> tag into the <head> of this rendered page for this page view. 
+Sets a <meta> tag into the <head> of this rendered page for this
+page view.  Tags are normally cached until the $style->sent flag is
+set to be true.  If this method is called after that sent is true,
+then the tag will be sent immediately, but will not be processed
 
 =head3 params
 
@@ -316,7 +326,11 @@ sub setMeta {
 
 =head2 setRawHeadTags ( tags )
 
-Sets data to be output into the <head> of the current rendered page for this page view.
+Sets data to be output into the <head> of the current rendered page
+for this page view.  Tags are normally cached until the $style->sent
+flag is set to be true.  If this method is called after that sent is
+true, then the tag will be sent immediately, but will not be processed
+for macros.
 
 =head3 tags
 
@@ -336,7 +350,12 @@ sub setRawHeadTags {
 
 =head2 setScript ( url, params )
 
-Sets a <script> tag into the <head> of this rendered page for this page view. This is typically used for dynamically adding references to Javascript or ECMA script.
+Sets a <script> tag into the <head> of this rendered page for this
+page view. This is typically used for dynamically adding references
+to Javascript or ECMA script.  Tags are normally cached until the
+$style->sent flag is set to be true.  If this method is called after
+that sent is true, then the tag will be sent immediately, but will
+not be processed for macros.
 
 =head3 url
 

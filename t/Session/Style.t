@@ -17,8 +17,9 @@ use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Asset;
 use WebGUI::VersionTag;
+use WebGUI;
 
-use Test::More tests => 39; # increment this value for each test you create
+use Test::More tests => 44; # increment this value for each test you create
 use Test::Deep;
  
 my $session = WebGUI::Test->session;
@@ -177,6 +178,65 @@ like($styled,
 qr/PERSONAL STYLE TEMPLATE/,
 'process:  personalStyleTemplate overrides submitted template');
 
+my $head = $styled;
+$head =~ s/(^HEAD=.+$)/$1/s;
+
+my @metas = fetchMultipleMetas($head);
+my $expectedMetas = [
+           {
+             'content' => 'WebGUI '.$WebGUI::VERSION,
+             'name' => 'generator'
+           },
+           {
+             'http-equiv' => 'Content-Type',
+             'content' => 'text/html; charset=UTF-8'
+           },
+           {
+             'http-equiv' => 'Content-Script-Type',
+             'content' => 'text/javascript'
+           },
+           {
+             'http-equiv' => 'Content-Style-Type',
+             'content' => 'text/css'
+           }
+];
+cmp_bag(\@metas, $expectedMetas, 'process:default meta tags');
+is($session->http->{_http}{cacheControl}, undef, 'process: HTTP cacheControl undefined');
+
+$session->user({userId=>3});
+$styled = $style->process('body.content');
+$head = $styled;
+$head =~ s/(^HEAD=.+$)/$1/s;
+@metas = fetchMultipleMetas($head);
+push @{ $expectedMetas }, (
+           {
+             'http-equiv' => 'Pragma',
+             'content' => 'no-cache',
+           },
+           {
+             'http-equiv' => 'Cache-Control',
+             'content' => 'no-cache, must-revalidate, max-age=0, private',
+           },
+           {
+             'http-equiv' => 'Expires',
+             'content' => '0',
+           },
+);
+cmp_bag(\@metas, $expectedMetas, 'process:default meta tags with no caching head tags, group 2 user');
+
+$session->user({userId=>1});
+my $origPreventProxyCache = $session->setting->get('preventProxyCache');
+$session->setting->set('preventProxyCache', 1);
+$styled = $style->process('body.content');
+$head = $styled;
+$head =~ s/(^HEAD=.+$)/$1/s;
+@metas = fetchMultipleMetas($head);
+cmp_bag(\@metas, $expectedMetas, 'process:default meta tags with no caching head tags, preventProxyCache setting');
+$session->setting->set('preventProxyCache', $origPreventProxyCache);
+
+##No accessor
+is($session->http->{_http}{cacheControl}, 'none', 'process: HTTP cacheControl set to none to prevent proxying');
+
 sub simpleLinkParser {
 	my ($tokenName, $text) = @_;
 	my $p = HTML::TokeParser->new(\$text);
@@ -195,6 +255,20 @@ sub simpleLinkParser {
 	delete $params->{'/'};  ##delete unary slash from XHTML output
 
 	return ($url, $params);
+}
+
+sub fetchMultipleMetas {
+	my ($text) = @_;
+	my $p = HTML::TokeParser->new(\$text);
+	my @metas = ();
+
+	while (my $token = $p->get_tag('meta')) {
+		my $params = $token->[1];
+		delete $params->{'/'};  ##delete unary slash from XHTML output
+		push @metas, $params;
+	}
+
+	return @metas;
 }
 
 sub setup_assets {
@@ -217,6 +291,7 @@ sub setup_assets {
 }
 
 END {
+	$session->setting->set('preventProxyCache', $origPreventProxyCache);
 	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
 		$versionTag->rollback;
 	}
