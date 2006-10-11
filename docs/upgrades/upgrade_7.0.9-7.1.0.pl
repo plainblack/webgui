@@ -25,9 +25,23 @@ updateProductsTable($session);
 makeLdapRecursiveFiltersText($session);
 addWikiAssets($session);
 addImageStuffToCs($session);
+addNewAuthSettings($session);
 
 finish($session); # this line required
 
+#-------------------------------------------------
+sub addNewAuthSettings {
+	my $session = shift;
+	print "\tAdding new WebGUI auth settings to support strong passwords.\n" unless $quiet;
+	my $newSettings = {
+		webguiRequiredDigits => 0,
+		webguiNonWordCharacters => 0,
+		webguiRequiredMixedCase => 0,	
+	};
+	foreach my $setting (keys %{$newSettings}) {
+		$session->db->write("insert into settings (name,value) values (?,?)",[$setting,$newSettings->{$setting}]);
+	}
+}
 
 #-------------------------------------------------
 sub addImageStuffToCs {

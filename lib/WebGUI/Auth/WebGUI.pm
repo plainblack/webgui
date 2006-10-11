@@ -24,12 +24,59 @@ use WebGUI::Utility;
 
 our @ISA = qw(WebGUI::Auth);
 
+#-------------------------------------------------------------------
+
+sub _hasNonWordCharacters {
+	my $self = shift;
+        my $password = shift;
+	my $numberRequired = shift;
+	my @characters = split(//,$password);
+	my $counter = 0;
+	foreach my $character (@characters) {
+		$self->session->errorHandler->warn($character);
+        	$counter++ if ($character =~ /\W/);
+		return 1 if ($counter == $numberRequired);
+      	}
+
+	return 0;
+}
+
+#-------------------------------------------------------------------
+
+sub _hasNumberCharacters {
+	my $self = shift;
+        my $password = shift;
+	my $numberRequired = shift;
+        my @characters = split(//,$password);
+	my $counter = 0;
+        foreach my $character (@characters) {
+        	$counter++ if ($character =~ /\d/);
+		return 1 if ($counter == $numberRequired);
+        }
+        return 0;
+}
+
+#-------------------------------------------------------------------
+
+sub _hasMixedCaseCharacters {
+	my $self = shift;
+        my $password = shift;
+	my $numberRequired = shift;
+        my @characters = split(//,$password);
+	my ($numberOfCaps, $hasLower, $counter);
+        foreach my $character (@characters) {
+                $hasLower = 1 if ($character =~ /[a-z]/); 
+        	$numberOfCaps++ if ($character =~ /[A-Z]/);
+	        return 1 if ($hasLower && $numberOfCaps == $numberRequired);
+        }
+        return 0;
+}
 
 #-------------------------------------------------------------------
 
 =head2 _isValidPassword (  )
 
-  Validates the password.
+  Validates the password9.
 
 =cut
 
@@ -41,7 +88,8 @@ sub _isValidPassword {
 	WebGUI::Macro::negate(\$confirm);
    my $error = "";
 
-	my $i18n = WebGUI::International->new($self->session,'AuthWebGUI');
+   my $i18n = WebGUI::International->new($self->session,'AuthWebGUI');
+
    if ($password ne $confirm) {
       $error .= '<li>'.$i18n->get(3).'</li>';
    }
@@ -51,6 +99,18 @@ sub _isValidPassword {
 
    if ($self->getSetting("passwordLength") && length($password) < $self->getSetting("passwordLength")){
       $error .= '<li>'.$i18n->get(7)." ".$self->getSetting("passwordLength").'</li>';
+   }
+
+   if ($self->getSetting("requiredDigits") && !$self->_hasNumberCharacters($password, $self->getSetting("requiredDigits"))) {
+     $error .= '<li>'.sprintf($i18n->echo("Password must conatain at least %s numeric characters."), $self->getSetting("requiredDigits")).'</li>';
+   }
+
+   if ($self->getSetting("nonWordCharacters") && !$self->_hasNonWordCharacters($password, $self->getSetting("nonWordCharacters"))) {
+     $error .= '<li>'.sprintf($i18n->echo("Password must contain at least %s non-word characters such as , ! @ etc."), $self->getSetting("nonWordCharacters")).'</li>';
+   }
+
+   if ($self->getSetting("requiredMixedCase") && !$self->_hasMixedCaseCharacters($password, $self->getSetting("requiredMixedCase"))) {
+     $error .= '<li>'.sprintf($i18n->echo("Password must contain at least %s upper case characters and at least one lowercase character (mixed case)."), $self->getSetting("requiredMixedCase")).'</li>';
    }
 
    $self->error($error);
@@ -301,7 +361,7 @@ sub editUserFormSave {
    my $userId = $self->session->form->get("uid");
    my $properties;
    my $userData = $self->getParams($userId);
-   unless (!$self->session->form->process('authWebGUI.identifier') || $self->session->form->process('authWebGUI.identifier') eq "password") {
+   unless (!$self->session->form->process('authWebGUI.identifier') || $self->session->form->process('authWebGUI.identifier') eq "password" || !$self->_isValidPassword($self->session->form->get('authWebGUI.identifier'))) {
       $properties->{identifier} = Digest::MD5::md5_base64($self->session->form->process('authWebGUI.identifier'));
 	   if($userData->{identifier} ne $properties->{identifier}){
 	     $properties->{passwordLastUpdated} =$self->session->datetime->time();
@@ -337,6 +397,21 @@ sub editUserSettingsForm {
 			 -value=>$self->session->setting->get("webguiPasswordLength"),
 			 -label=>$i18n->get(15),
 			);
+   $f->integer(
+	-name  => "webguiRequiredDigits",
+	-label => $i18n->echo("Number of digits required in password"),
+	-value => $self->session->setting->get("webguiRequiredDigits")
+   	);
+   $f->integer(
+	-name  => "webguiNonWordCharacters",
+	-label => $i18n->echo("Number of non-word characters required in password"),
+	-value => $self->session->setting->get("webguiNonWordCharacters")
+   	);
+   $f->integer(
+	-name  => "webguiRequiredMixedCase",
+	-label => $i18n->echo("Number of upper case case characters required in password"),
+	-value => $self->session->setting->get("webguiRequiredMixedCase")
+	);
    $f->interval(
 	-name=>"webguiPasswordTimeout",
 	-label=>$i18n->get(16),
@@ -426,6 +501,9 @@ sub editUserSettingsFormSave {
 	my $f = $self->session->form;
 	my $s = $self->session->setting;
 	$s->set("webguiPasswordLength", $f->process("webguiPasswordLength","integer"));
+	$s->set("webguiRequiredDigits", $f->process("webguiRequiredDigits","integer"));
+	$s->set("webguiNonWordCharacters", $f->process("webguiNonWordCharacters","integer"));
+	$s->set("webguiRequiredMixedCase", $f->process("webguiRequiredMixedCase","integer"));
 	$s->set("webguiPasswordTimeout", $f->process("webguiPasswordTimeout","interval"));
 	$s->set("webguiExpirePasswordOnCreation", $f->process("webguiExpirePasswordOnCreation","yesNo"));
 	$s->set("webguiSendWelcomeMessage", $f->process("webguiSendWelcomeMessage","yesNo"));

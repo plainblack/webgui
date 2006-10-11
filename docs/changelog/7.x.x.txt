@@ -19,6 +19,11 @@
  - fixed a small error in WebGUI::Group documentation.
  - Added WebGUI::Text with some CSV functions.
  - Added Karma RFE: Thumbnail size can be enterred in CS
+ - Added diskUsage.pl utility script to show space used by assets in a webgui
+   site, similar to the unix du utility.
+ - Added option to WebGUI Auth module to require strong passwords. Admins can
+   now require users to enter a specific combination of characters, etc.
+ - Added skeleton code for writing WebGUI utility scripts.
 
 7.0.9
  - Removed the need for DateTime::Cron::Simple, which also added the ability
