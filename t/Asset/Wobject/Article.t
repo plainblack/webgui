@@ -55,7 +55,7 @@ my $newArticleSettings = {
 	templateId   => "PBtmpl0000000000000084",
 	linkURL      => "http://www.snapcount.org",
 	linkTitle    => "I'm thinking of getting metal legs",
-	storageId    => "FKGH2yiNQoC2E_FqbMYebw", # This is the storageId of main_bg.jpg from the default wg 7 style 3
+	storageId    => "ImadeThisUp",
 };
 $article->update($newArticleSettings);
 
@@ -64,23 +64,39 @@ foreach my $newSetting (keys %{$newArticleSettings}) {
 }
 
 # Test the duplicate method... not for assets, just the extended duplicate functionality of the article wobject
-my $filename = "main_bg.jpg";
+my $filename = "page_title.jpg";
+
+# Use some test collateral to create a storage location and assign it to our article
+my $storage = WebGUI::Storage::Image->create($session);
+$storage->addFileFromFilesystem("../../supporting_collateral/".$filename);
+$article->update({storageId=>$storage->getId});
 
 my $duplicateArticle = $article->duplicate();
 isa_ok($duplicateArticle, 'WebGUI::Asset::Wobject::Article');
 
-my $storageId = $duplicateArticle->get("storageId");
-my $storage = WebGUI::Storage::Image->get($session,$storageId);
-my $duplicateFilename = $storage->getFiles->[0];
+my $duplicateStorageId = $duplicateArticle->get("storageId");
+my $duplicateStorage = WebGUI::Storage::Image->get($session,$duplicateStorageId);
+my $duplicateFilename = $duplicateStorage->getFiles->[0];
 
 is ($duplicateFilename, $filename, "duplicate method copies collateral");
+
+# Test the purge method to see if it gets rid of the collateral
+
+$duplicateArticle->purge();
+
+# The get method will create the directory if it doesnt exist... very strange.
+$duplicateStorage = WebGUI::Storage::Image->get($session,$duplicateStorageId);
+
+# so lets check for the file instead
+$duplicateFilename = $duplicateStorage->getFiles->[0];
+
+is ($duplicateFilename, undef, 'purge method deletes collateral');
 
 TODO: {
         local $TODO = "Tests to make later";
         ok(0, 'Test exportAssetData method');
 	ok(0, 'Test getStorageLocation method');
 	ok(0, 'Test indexContent method');
-	ok(0, 'Test purge method');
 	ok(0, 'Test purgeCache method');
 	ok(0, 'Test purgeRevision method');
 	ok(0, 'Test view method... maybe?');

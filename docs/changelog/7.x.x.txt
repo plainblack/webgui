@@ -29,6 +29,7 @@
    directory.
  - Added a Sync Profile to LDAP workflow activity that will grab a single user
    profile from LDAP instead of all of them.
+ - fix: Article.t copy collateral test false failure.
 
 7.0.9
  - Removed the need for DateTime::Cron::Simple, which also added the ability
