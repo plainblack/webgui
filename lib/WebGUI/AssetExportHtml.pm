@@ -108,25 +108,27 @@ sub _exportAsHtml {
 		my $filename;
 
 		if ($url =~ /\./) {
-			$url =~ /^(.*)\/(.*)$/;
-			$path = $1;
-			$filename = $2;
-			if ($filename eq "") {
-				$filename = $path;
+			if ($url =~ /^(.*)\/(.*)$/) {
+				$path = $1;
+				$filename = $2;
+				if ($filename eq "") {
+					$filename = $path;
+					$path = undef;
+				}
+			} else {
 				$path = undef;
+				$filename = $url;
 			}
 		} else {
 			$path = $url;
 			$filename = $index;
 		}
 
-		if ($path) {
-			$path = $self->session->config->get("exportPath") . "/" . $path;
-			eval { mkpath($path) };
-			if($@) {
-				return (0, sprintf($i18n->get('could not create path'), $path, $@));
-			}
-		} 
+		$path = $self->session->config->get("exportPath") . (length($path)? "/$path" : "");
+		eval { mkpath($path) };
+		if($@) {
+			return (0, sprintf($i18n->get('could not create path'), $path, $@));
+		}
 		$path .= "/".$filename;
 
                 my $file = eval { FileHandle->new(">".$path) or die "$!" };
