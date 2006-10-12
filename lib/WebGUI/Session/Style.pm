@@ -423,7 +423,7 @@ sub userStyle {
 	my $self = shift;
         my $output = shift;
 	$self->session->http->setCacheControl("none");
-        if ($output) {
+        if (defined $output) {
                 return $self->process($output,$self->session->setting->get("userFunctionStyleId"));
         } else {
                 return undef;

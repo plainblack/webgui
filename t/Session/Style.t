@@ -19,7 +19,7 @@ use WebGUI::Asset;
 use WebGUI::VersionTag;
 use WebGUI;
 
-use Test::More tests => 53; # increment this value for each test you create
+use Test::More tests => 58; # increment this value for each test you create
 use Test::Deep;
  
 my $session = WebGUI::Test->session;
@@ -157,9 +157,10 @@ is($macroOutput, 1, 'generateAdditionalHeadTags: process a macro');
 ####################################################
 #
 # process 
-# useEmptyStyle
 #
 ####################################################
+
+my ($versionTag, $templates, $article, $snippet) = setup_assets($session);
 
 $style->sent(0);
 is($style->sent, 0, 'process: setup sent to 0');
@@ -170,11 +171,40 @@ is($style->process('body.content', 'notATemplateId'),
 
 is($style->sent, 1, 'process: sets sent to 1');
 
+####################################################
+#
+# userStyle
+#
+####################################################
+
+my $origUserStyle = $session->setting->get('userFunctionStyleId');
+$session->setting->set('userFunctionStyleId', $templates->{user}->getId);
+
+is($style->userStyle('userStyle'), 'USER PRINTABLE STYLE TEMPLATE:userStyle',
+'userStyle returns templated output according to userFunctionStyleId in settings');
+is($session->http->{_http}{cacheControl}, 'none', 'userStyle(via process): HTTP cacheControl set to none to prevent proxying');
+
+is($style->userStyle('userStyle'), 'USER PRINTABLE STYLE TEMPLATE:userStyle',
+'userStyle returns templated output according to userFunctionStyleId in settings');
+
+is($style->userStyle(0), 'USER PRINTABLE STYLE TEMPLATE:0',
+'userStyle returns templated output even 0 which is false');
+
+is($style->userStyle(undef), undef,
+'userStyle returns undef if no output is sent');
+
+$session->setting->set('userFunctionStyleId', $origUserStyle);
+$session->http->setCacheControl(undef); ##return to default setting for downstream testing
+####################################################
+#
+# process 
+# useEmptyStyle
+#
+####################################################
+
 $style->useEmptyStyle(1);
 
 is($style->process('body.content'), "body.content", 'process, useEmptyStyle:  valid data returned');
-
-my ($versionTag, $templates, $article, $snippet) = setup_assets($session);
 
 $session->scratch->set('personalStyleId', $templates->{personal}->getId);
 
@@ -276,6 +306,7 @@ $session->asset($snippet);
 is($style->process('test output'), 
 	"WebGUI was unable to instantiate your style template.test output",
 	'process:  no valid printableStyleTemplateFound in asset branch returns error');
+
 ####################################################
 #
 # Utility routines for printing
@@ -355,6 +386,17 @@ sub setup_assets {
 	};
 	$templates->{asset} = $importNode->addChild($properties, $properties->{id});
 	$properties = {
+		title => 'user template for printing',
+		className => 'WebGUI::Asset::Template',
+		url => 'user_style_printable',
+		namespace => 'Style',
+		##Note, at this point 
+		template => "USER PRINTABLE STYLE TEMPLATE:<tmpl_var body.content>",
+		id => 'printableUser0Template',
+		#     '1234567890123456789012'
+	};
+	$templates->{user} = $importNode->addChild($properties, $properties->{id});
+	$properties = {
 		title => 'asset for printing',
 		className => 'WebGUI::Asset::Wobject::Article',
 		url => 'printable_article',
@@ -364,6 +406,17 @@ sub setup_assets {
 		#     '1234567890123456789012'
 	};
 	my $asset = $importNode->addChild($properties, $properties->{id});
+	##We have to have nested assets without printable style ids
+	##for code coverage
+	$properties = {
+		title => 'Daddy Snippet',
+		className => 'WebGUI::Asset::Snippet',
+		url => 'daddy_snippet',
+		id => 'printableSnippet0Daddy',
+		#     '1234567890123456789012'
+		snippet => 'I am a snippet',
+	};
+	my $daddySnippet = WebGUI::Asset->getRoot($session)->addChild($properties, $properties->{id});
 	$properties = {
 		title => 'My Snippet',
 		className => 'WebGUI::Asset::Snippet',
@@ -372,13 +425,14 @@ sub setup_assets {
 		#     '1234567890123456789012'
 		snippet => 'I am a snippet',
 	};
-	my $snippet = WebGUI::Asset->getRoot($session)->addChild($properties, $properties->{id});
+	my $snippet = $daddySnippet->addChild($properties, $properties->{id});
 	$versionTag->commit;
 	return ($versionTag, $templates, $asset, $snippet);
 }
 
 END {
 	$session->setting->set('preventProxyCache', $origPreventProxyCache);
+	$session->setting->set('userFunctionStyleId', $origUserStyle);
 	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
 		$versionTag->rollback;
 	}
