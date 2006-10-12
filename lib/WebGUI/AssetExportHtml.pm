@@ -80,12 +80,18 @@ sub _exportAsHtml {
 	my $quiet = shift;
 	my $userId = shift;
 	my $index = shift;
+	my $extrasUploadsAction = shift;
+	my $rootUrlAction = shift;
 	my $startTime = $self->session->datetime->time();
 
 	my $exportPathError = $self->checkExportPath();
 	if ($exportPathError) {
 		return (0, $exportPathError);
 	}
+
+	my $exportPath = $self->session->config->get('exportPath');
+	my $defaultAssetId = $self->session->setting->get('defaultPage');
+	my $defaultAssetPath = undef;
 
 	my $i18n = WebGUI::International->new($self->session, 'Asset');
 
@@ -124,7 +130,11 @@ sub _exportAsHtml {
 			$filename = $index;
 		}
 
-		$path = $self->session->config->get("exportPath") . (length($path)? "/$path" : "");
+		if ($asset->getId eq $defaultAssetId) {
+			$defaultAssetPath = $path.'/'.$filename;
+		}
+
+		$path = $exportPath . (length($path)? "/$path" : "");
 		eval { mkpath($path) };
 		if($@) {
 			return (0, sprintf($i18n->get('could not create path'), $path, $@));
@@ -148,6 +158,48 @@ sub _exportAsHtml {
 	}
 	$newSession->var->end;
 	$newSession->close;
+
+	if ($extrasUploadsAction eq 'symlink') {
+		my ($extrasPath, $uploadsPath) = ($self->session->config->get('extrasPath'), $self->session->config->get('uploadsPath'));
+		my ($extrasUrl, $uploadsUrl) = ($self->session->config->get('extrasURL'), $self->session->config->get('uploadsURL'));
+		s#^/*## for ($extrasUrl, $uploadsUrl);
+		my ($extrasDst, $uploadsDst) = ($exportPath.'/'.$extrasUrl, $exportPath.'/'.$uploadsUrl);
+
+		# TODO: internationalize
+		$self->session->output->print("Symlinking extras and uploads dirs.\n") unless $quiet;
+		foreach my $rec ([$extrasPath, $extrasDst],
+				 [$uploadsPath, $uploadsDst]) {
+			my ($path, $dst) = @$rec;
+			if (-l $dst) {
+				next if (readlink $dst eq $path);
+				unlink $dst or return (0, sprintf("Could not unlink %s: %s", $dst, $!));
+			}
+
+			eval { mkpath($dst) };
+			$@ and return (0, sprintf("Could not create path %s: %s", $dst, $@));
+			rmdir $dst or return (0, sprintf("Could not remove directory at path %s: %s", $dst, $!));
+			symlink $path, $dst or return (0, sprintf("Could not symlink %s to %s: %s", $path, $dst, $!));
+		}
+	} elsif ($extrasUploadsAction eq 'none') {
+		# Nothing.  This is the default.
+	}
+
+	if ($rootUrlAction eq 'symlinkDefault') {
+		# TODO: internationalize
+		if (defined $defaultAssetPath) {
+			my ($src, $dst) = ($defaultAssetPath, $exportPath.'/'.$index);
+			$self->session->output->print("Symlinking default asset.\n") unless $quiet;
+			if (-l $dst and readlink $dst ne $src) {
+				unlink $dst or return (0, sprintf("Could not unlink %s: %s", $dst, $!));
+			}
+			symlink $src, $dst or return (0, sprintf("Could not symlink %s to %s: %s", $src, $dst, $!));
+		} else {
+			$self->session->output->print("Not symlinking default asset; not included in exported subtree.\n") unless $quiet;
+		}
+	} elsif ($rootUrlAction eq 'none') {
+		# Nothing.  This is the default.
+	}
+
 	return (1, sprintf($i18n->get('export information'), scalar(@{$assets}), ($self->session->datetime->time()-$startTime)));
 }
 
@@ -201,6 +253,24 @@ sub www_export {
 			-name=>"index",
 			-value=>"index.html"
 		);
+	# TODO: internationalize
+	# TODO: maybe add copy options to these boxes alongside symlink
+	$f->selectBox(
+		        -label => "Extras and uploads directories",
+		        -hoverHelp => "What action to take regarding the extras and uploads directories, which are often referenced by parts of the site.  Symlink means to use a symbolic link (not available on all systems) to the original directory.  None means to do nothing, and ignore the extras and uploads directories; this will probably cause references to them to break in the exported site unless you've prepared the directories already.",
+		        -name => "extrasUploadsAction",
+		        -options => { 'symlink' => 'Symlink',
+				      'none' => 'None' },
+		        -value => ['none'],
+		     );
+	$f->selectBox(
+		        -label => "Root URL",
+		        -hoverHelp => "What action to take regarding queries to the root URL.  Symlink Default means to create a symbolic link from the root-URL index file to the index file of the default asset (not available on all systems).  None means to do nothing, which usually causes queries to the root URL to be rejected in the exported site.",
+		        -name => "rootUrlAction",
+		        -options => { 'symlinkDefault' => 'Symlink Default',
+				      'none' => 'None' },
+		        -value => ['none'],
+		     );
         $f->submit;
         $self->getAdminConsole->render($self->checkExportPath.$f->print,$i18n->get('Export Page'));
 }
@@ -219,9 +289,10 @@ sub www_exportStatus {
 	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(13));
 	my $i18n = WebGUI::International->new($self->session, "Asset");
 	my $iframeUrl = $self->getUrl('func=exportGenerate');
-	$iframeUrl = $self->session->url->append($iframeUrl, 'index='.$self->session->form->process("index"));
-	$iframeUrl = $self->session->url->append($iframeUrl, 'depth='.$self->session->form->process("depth"));
-	$iframeUrl = $self->session->url->append($iframeUrl, 'userId='.$self->session->form->process("userId"));
+	foreach my $formVar (qw/index depth userId extrasUploadsAction rootUrlAction/) {
+		$iframeUrl = $self->session->url->append($iframeUrl, $formVar.'='.$self->session->form->process($formVar));
+	}
+
 	my $output = '<iframe src="'.$iframeUrl.'" title="'.$i18n->get('Page Export Status').'" width="410" height="200"></iframe>';
         $self->getAdminConsole->render($output,$i18n->get('Page Export Status'),"Asset");
 }
@@ -244,7 +315,9 @@ sub www_exportGenerate {
 	my $i18n = WebGUI::International->new($self->session, 'Asset');
 	my ($success, $description) =
 	    $self->_exportAsHtml(0, $self->session->form->process('userId'),
-				 $self->session->form->process('index'));
+				 $self->session->form->process('index'),
+				 $self->session->form->process('extrasUploadsAction'),
+				 $self->session->form->process('rootUrlAction'));
 	if (!$success) {	
 		$self->session->output->print($description,1);
 		return;

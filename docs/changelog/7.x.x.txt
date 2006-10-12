@@ -3,6 +3,7 @@
  - fix: Search from root
  - fix: Survey: textarea answers are trunctated
  - fix: Snippet Security Fails
+ - add: asset exporter making appropriate symlinks for extras, uploads, and root URL
 
 7.1.0
  - fix: mysql and mysqldump were transposed in upgrade.pl --help
