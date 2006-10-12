@@ -158,7 +158,7 @@ sub definition {
 			# download
 			downloadType=>{
 				fieldType=>"text",
-				defaultValue=>"",
+				defaultValue=>"none",
 				},
 			downloadFilename=>{
 				fieldType=>"text",
