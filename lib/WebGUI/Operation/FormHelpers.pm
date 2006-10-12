@@ -82,7 +82,7 @@ sub www_formAssetTree {
 		</style></head><body>
 		<div class="base">
 		<div class="crumbTrail">'.join(" &gt; ", @crumb)."</div><br />\n";
-	my $children = $base->getLineage(["children"],{returnObjects=>1});
+	my $children = $base->getLineage(["children","self"],{returnObjects=>1});
 	my $i18n = WebGUI::International->new($session);
 	my $limit = $session->form->process("classLimiter","className");
 	foreach my $child (@{$children}) {
