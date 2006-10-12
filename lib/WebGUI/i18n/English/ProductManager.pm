@@ -604,6 +604,11 @@ the form.<br />|,
 		lastUpdated => 0,
 		context => "A time period for group expires offset",
 	},
+	'1 month'	=> {
+		message => "1 month",
+		lastUpdated => 1160615577,
+		context => "A time period for group expires offset",
+	},
 	'2 years'	=> {
 		message => "2 years",
 		lastUpdated => 0,
