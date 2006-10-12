@@ -19,7 +19,7 @@ use WebGUI::Asset;
 use WebGUI::VersionTag;
 use WebGUI;
 
-use Test::More tests => 58; # increment this value for each test you create
+use Test::More tests => 55; # increment this value for each test you create
 use Test::Deep;
  
 my $session = WebGUI::Test->session;
@@ -27,6 +27,8 @@ my $session = WebGUI::Test->session;
 # put your tests here
 
 my $style = $session->style;
+
+my $crappyPerl = $^V lt v5.8;
 
 isa_ok($style, 'WebGUI::Session::Style', 'session has correct object type');
 
@@ -54,7 +56,6 @@ $style->sent(0); ##Set to unsent to we don't trigger any other code, yet
 
 my ($url, $params);
 
-is($style->setLink(), 0, 'setLink returns the result of the conditional check for already sent');
 ($url) = simpleLinkParser('link', $style->generateAdditionalHeadTags);
 is($url, '-', 'setLink: called with no params or link url');
 
@@ -84,10 +85,12 @@ is($url, 'http://www.webguidev.org', 'setLink: called with link url and params')
 my %setParams = map { lc($_) => $setParams->{$_} } keys %{ $setParams };
 cmp_deeply(\%setParams, $params, 'setLink: all params set correctly');
 
+sendImmediate($style, 'setLink', 'http://dev.setlink.com',
+	'setLink, sent: data automatically sent out via Session->Output');
+
 TODO: {
 	local $TODO = "more setLink tests";
 	ok(0, 'check that more than one link tag can be set if they are unique URLs');
-	ok(0, 'check for immediate send if sent returns true');
 }
 
 ####################################################
@@ -96,7 +99,6 @@ TODO: {
 #
 ####################################################
 
-is($style->setMeta(), 0, 'setMeta returns the result of the conditional check for already sent');
 ($url, $params) = simpleLinkParser('meta', $style->generateAdditionalHeadTags);
 cmp_deeply($params, {}, 'setMeta: called with no params');
 
@@ -110,8 +112,20 @@ cmp_deeply($params, {}, 'setMeta: clears all content in generateAdditionalHeadTa
 TODO: {
 	local $TODO = "more setMeta tests";
 	ok(0, 'meta: check that more than one tag can be set');
-	ok(0, 'meta: check for immediate send if sent returns true');
 }
+
+####################################################
+#
+# setRawHeadTags
+#
+# Note, this gets tested via setMeta above.  However,
+# it is easier to test the sending of data immediately
+# this way.
+#
+####################################################
+
+sendImmediate($style, 'setRawHeadTags', 'this is really a tag',
+	'setRawHeadTags, sent: data automatically sent out via Session->Output');
 
 ####################################################
 #
@@ -119,7 +133,6 @@ TODO: {
 #
 ####################################################
 
-is($style->setScript(), 0, 'setScript returns the result of the conditional check for already sent');
 ($url) = simpleLinkParser('script', $style->generateAdditionalHeadTags);
 is($url, '-', 'setScript: called with no params or script url');
 
@@ -137,10 +150,12 @@ my $scriptOutput = $style->generateAdditionalHeadTags;
 is($url, $setUrl, 'setScript: called with new script url');
 is_deeply($params, $setParams, 'setScript: params set properly');
 
+sendImmediate($style, 'setScript', 'http://dev.setscript.com/script.js',
+	'setScript, sent: data automatically sent out via Session->Output');
+
 TODO: {
 	local $TODO = "more setScript tests";
 	ok(0, 'check that more than one script tag can be set if they are unique URLs');
-	ok(0, 'check for immediate send if sent returns true');
 }
 
 ####################################################
@@ -347,6 +362,25 @@ sub fetchMultipleMetas {
 	return @metas;
 }
 
+sub sendImmediate {
+	my ($style, $action, $output, $comment) = @_;
+
+	SKIP: {
+		skip "You have an old perl", 1 if $crappyPerl;
+		close STDOUT;
+		my $buffer;
+		open STDOUT, '>', \$buffer or die "Unable to point handle at variable: $!\n";
+		$style->sent(1);
+		$style->$action($output);
+		like($buffer, qr/$output/, $comment);
+		$style->sent(0);
+		close STDOUT;
+		open STDOUT, '>-' or die "Unable to restore STDOUT: $!\n";
+	}
+
+}
+
+#like($buffer, qr/$output/, );
 sub setup_assets {
 	my $session = shift;
 	my $importNode = WebGUI::Asset->getImportNode($session);

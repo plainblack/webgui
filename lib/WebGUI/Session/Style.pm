@@ -280,8 +280,12 @@ sub setLink {
 		$tag .= ' '.$name.'="'.$params->{$name}.'"';
 	}
 	$tag .= ' />'."\n";
-	$self->{_link}{$url} = $tag;
-	$self->session->output->print($tag) if ($self->sent);
+	if ($self->sent) {
+		$self->session->output->print($tag);
+	}
+	else {
+		$self->{_link}{$url} = $tag;
+	}
 }
 
 #-------------------------------------------------------------------
@@ -350,8 +354,12 @@ A raw string containing tags. This is just a raw string so you must actually pas
 sub setRawHeadTags {
 	my $self = shift;
 	my $tags = shift;
-	$self->{_raw} .= $tags;
-	$self->session->output->print($tags) if ($self->sent);
+	if ($self->sent) {
+		$self->session->output->print($tags);
+	}
+	else {
+		$self->{_raw} .= $tags;
+	}
 }
 
 
@@ -386,8 +394,12 @@ sub setScript {
 		$tag .= ' '.$name.'="'.$params->{$name}.'"';
 	}
 	$tag .= '></script>'."\n";
-	$self->{_javascript}{$url} = $tag;
-	$self->session->output->print($tag) if ($self->sent);
+	if ($self->sent) {
+		$self->session->output->print($tag);
+	}
+	else {
+		$self->{_javascript}{$url} = $tag;
+	}
 }
 
 #-------------------------------------------------------------------
