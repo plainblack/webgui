@@ -1,6 +1,8 @@
 7.1.1
  - fix: some issues with asset exports not handling URLs with dots correctly
  - fix: Search from root
+ - fix: Survey: textarea answers are trunctated
+ - fix: Snippet Security Fails
 
 7.1.0
  - fix: mysql and mysqldump were transposed in upgrade.pl --help

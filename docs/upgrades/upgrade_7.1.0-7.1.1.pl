@@ -20,17 +20,16 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-# upgrade functions go here
+fixSurvey();
 
 finish($session); # this line required
 
 
-##-------------------------------------------------
-#sub exampleFunction {
-#	my $session = shift;
-#	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
-#	# and here's our code
-#}
+#-------------------------------------------------
+sub fixSurvey {
+	print "\tFixing answer truncation in survey.\n" unless ($quiet);
+	$session->db->write("alter table Survey_questionResponse change response response text");
+}
 
 
 

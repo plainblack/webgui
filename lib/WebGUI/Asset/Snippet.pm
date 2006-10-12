@@ -176,6 +176,7 @@ A web accessible version of the view method.
 
 sub www_view {
 	my $self = shift;
+        return $self->session->privilege->insufficient() unless $self->canView;
 	my $mimeType=$self->getValue('mimeType');
 	$self->session->http->setMimeType($mimeType || 'text/html');
 	$self->session->http->setCacheControl($self->get("cacheTimeout"));
