@@ -26,6 +26,7 @@ our @ISA = qw(WebGUI::Auth);
 
 
 #-------------------------------------------------------------------
+
 =head2 sub _isValidLDAPUser ( )
 
 Private method that gets username and password supplied by a user attempting to
@@ -125,6 +126,7 @@ sub _isValidLDAPUser {
 }
 
 #-------------------------------------------------------------------
+
 =head2 sub authenticate ( $username, $password )
 
 This method checks a given username and password for the following:
