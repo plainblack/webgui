@@ -95,13 +95,19 @@ sub _exportAsHtml {
 
 	my $i18n = WebGUI::International->new($self->session, 'Asset');
 
-	my $newSession = WebGUI::Session->open($self->session->config->getWebguiRoot, $self->session->config->getFilename);
-	$newSession->user({userId=>$userId});
+	my $tempSession = WebGUI::Session->open($self->session->config->getWebguiRoot, $self->session->config->getFilename);
+	$tempSession->user({userId=>$userId});
 
-	my $newSelf = WebGUI::Asset->new($newSession, $self->getId, $self->get("className"), $self->get("revisionDate"));
-	my $assets = $newSelf->getLineage(["self","descendants"],{returnObjects=>1,endingLineageLength=>$newSelf->getLineageLength+$self->session->form->process("depth")});
+	my $newSelf = WebGUI::Asset->new($tempSession, $self->getId, $self->get("className"), $self->get("revisionDate"));
+	my $assetIds = $newSelf->getLineage(["self","descendants"],{endingLineageLength=>$newSelf->getLineageLength+$self->session->form->process("depth")});
+	$tempSession->var->end;
+	$tempSession->close;
 
-	foreach my $asset (@{$assets}) {
+	foreach my $assetId (@{$assetIds}) {
+		my $assetSession = WebGUI::Session->open($self->session->config->getWebguiRoot, $self->session->config->getFilename);
+		$assetSession->user({userId => $userId});
+		my $asset = WebGUI::Asset->newByDynamicClass($assetSession, $assetId);
+
 		my $url = $asset->get("url");
 		$self->session->output->print(sprintf($i18n->get('exporting page'), $url)) unless $quiet;
 
@@ -145,19 +151,19 @@ sub _exportAsHtml {
 		if ($@) {
 			return (0, sprintf($i18n->get('could not open path'), $path, $@));
 		} else {
-			$newSession->output->setHandle($file);
-			$newSession->asset($asset);
+			$assetSession->output->setHandle($file);
+			$assetSession->asset($asset);
 			my $content = $asset->www_view;
 			unless ($content eq "chunked") {
-				$newSession->output->print($content);
+				$assetSession->output->print($content);
 			}
 			$file->close;
 		}
 
+		$assetSession->var->end;
+		$assetSession->close;
 		$self->session->output->print($i18n->get('done')) unless $quiet;
 	}
-	$newSession->var->end;
-	$newSession->close;
 
 	if ($extrasUploadsAction eq 'symlink') {
 		my ($extrasPath, $uploadsPath) = ($self->session->config->get('extrasPath'), $self->session->config->get('uploadsPath'));
@@ -187,12 +193,15 @@ sub _exportAsHtml {
 	if ($rootUrlAction eq 'symlinkDefault') {
 		# TODO: internationalize
 		if (defined $defaultAssetPath) {
-			my ($src, $dst) = ($defaultAssetPath, $exportPath.'/'.$index);
-			$self->session->output->print("Symlinking default asset.\n") unless $quiet;
-			if (-l $dst and readlink $dst ne $src) {
-				unlink $dst or return (0, sprintf("Could not unlink %s: %s", $dst, $!));
+			{
+				my ($src, $dst) = ($defaultAssetPath, $exportPath.'/'.$index);
+				$self->session->output->print("Symlinking default asset.\n") unless $quiet;
+				if (-l $dst) {
+					last if (readlink $dst eq $src);
+					unlink $dst or return (0, sprintf("Could not unlink %s: %s", $dst, $!));
+				}
+				symlink $src, $dst or return (0, sprintf("Could not symlink %s to %s: %s", $src, $dst, $!));
 			}
-			symlink $src, $dst or return (0, sprintf("Could not symlink %s to %s: %s", $src, $dst, $!));
 		} else {
 			$self->session->output->print("Not symlinking default asset; not included in exported subtree.\n") unless $quiet;
 		}
@@ -200,7 +209,7 @@ sub _exportAsHtml {
 		# Nothing.  This is the default.
 	}
 
-	return (1, sprintf($i18n->get('export information'), scalar(@{$assets}), ($self->session->datetime->time()-$startTime)));
+	return (1, sprintf($i18n->get('export information'), scalar(@{$assetIds}), ($self->session->datetime->time()-$startTime)));
 }
 
 =head2 exportAsHtml 

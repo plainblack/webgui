@@ -4,6 +4,7 @@
  - fix: Survey: textarea answers are trunctated
  - fix: Snippet Security Fails
  - add: asset exporter making appropriate symlinks for extras, uploads, and root URL
+ - change: asset exporter now uses one session per asset to avoid breaking state in between
 
 7.1.0
  - fix: mysql and mysqldump were transposed in upgrade.pl --help
