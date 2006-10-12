@@ -19,7 +19,7 @@ use WebGUI::Asset;
 use WebGUI::VersionTag;
 use WebGUI;
 
-use Test::More tests => 46; # increment this value for each test you create
+use Test::More tests => 53; # increment this value for each test you create
 use Test::Deep;
  
 my $session = WebGUI::Test->session;
@@ -174,9 +174,9 @@ $style->useEmptyStyle(1);
 
 is($style->process('body.content'), "body.content", 'process, useEmptyStyle:  valid data returned');
 
-my ($versionTag, $personalTemplate) = setup_assets($session);
+my ($versionTag, $templates, $article, $snippet) = setup_assets($session);
 
-$session->scratch->set('personalStyleId', $personalTemplate->getId);
+$session->scratch->set('personalStyleId', $templates->{personal}->getId);
 
 my $styled = $style->process('body.content', 'notATemplateId');
 like($styled,
@@ -242,6 +242,46 @@ $session->setting->set('preventProxyCache', $origPreventProxyCache);
 ##No accessor
 is($session->http->{_http}{cacheControl}, 'none', 'process: HTTP cacheControl set to none to prevent proxying');
 
+####################################################
+#
+# process 
+# makePrintable
+# printableStyleId
+#
+# From this point on, we don't need to do a ton of parsing since we've fully
+# verified that template processing works okay
+#
+####################################################
+
+$style->setPrintableStyleId($templates->{printable}->getId);
+is($style->{_printableStyleId}, $templates->{printable}->getId, 'printableStyleId: set');
+
+like($style->process, qr/PERSONAL STYLE TEMPLATE/,
+	'process: setting printStyleId does not change template selection');
+
+$style->makePrintable(1);
+is($style->{_makePrintable}, 1, 'makePrintable: set');
+
+like($style->process, qr/PERSONAL STYLE TEMPLATE/,
+	'process: setting printStyleId and makePrintable does not change template');
+$session->asset($article);
+like($style->process, qr/PRINTABLE STYLE TEMPLATE/,
+	'process: setting printStyleId and makePrintable and default session asset causes printable template to use');
+
+$style->setPrintableStyleId(0);
+like($style->process, qr/ASSET PRINTABLE STYLE TEMPLATE/,
+	'process: uses styleTemplateId from current asset if not set in $style->setPrintableStyleId');
+
+$session->asset($snippet);
+is($style->process('test output'), 
+	"WebGUI was unable to instantiate your style template.test output",
+	'process:  no valid printableStyleTemplateFound in asset branch returns error');
+####################################################
+#
+# Utility routines for printing
+#
+####################################################
+
 sub simpleLinkParser {
 	my ($tokenName, $text) = @_;
 	my $p = HTML::TokeParser->new(\$text);
@@ -281,6 +321,7 @@ sub setup_assets {
 	my $importNode = WebGUI::Asset->getImportNode($session);
 	my $versionTag = WebGUI::VersionTag->getWorking($session);
 	$versionTag->set({name=>"Session Style test"});
+	my $templates = {};
 	my $properties = {
 		title => 'personal style test template',
 		className => 'WebGUI::Asset::Template',
@@ -290,9 +331,50 @@ sub setup_assets {
 		id => 'testTemplate_personal1',
 		#     '1234567890123456789012'
 	};
-	my $template = $importNode->addChild($properties, $properties->{id});
+	$templates->{personal} = $importNode->addChild($properties, $properties->{id});
+	$properties = {
+		title => 'personal style test template for printing',
+		className => 'WebGUI::Asset::Template',
+		url => 'personal_style_printable',
+		namespace => 'Style',
+		##Note, at this point 
+		template => "PRINTABLE STYLE TEMPLATE",
+		id => 'testTemplate_printable',
+		#     '1234567890123456789012'
+	};
+	$templates->{printable} = $importNode->addChild($properties, $properties->{id});
+	$properties = {
+		title => 'asset template for printing',
+		className => 'WebGUI::Asset::Template',
+		url => 'asset_style_printable',
+		namespace => 'Style',
+		##Note, at this point 
+		template => "ASSET PRINTABLE STYLE TEMPLATE",
+		id => 'printableAssetTemplate',
+		#     '1234567890123456789012'
+	};
+	$templates->{asset} = $importNode->addChild($properties, $properties->{id});
+	$properties = {
+		title => 'asset for printing',
+		className => 'WebGUI::Asset::Wobject::Article',
+		url => 'printable_article',
+		id => 'printableAsset00000000',
+		printableStyleTemplateId => $templates->{asset}->getId,
+		description => 'This is a printable asset',
+		#     '1234567890123456789012'
+	};
+	my $asset = $importNode->addChild($properties, $properties->{id});
+	$properties = {
+		title => 'My Snippet',
+		className => 'WebGUI::Asset::Snippet',
+		url => 'printable_snippet',
+		id => 'printableSnippet123456',
+		#     '1234567890123456789012'
+		snippet => 'I am a snippet',
+	};
+	my $snippet = WebGUI::Asset->getRoot($session)->addChild($properties, $properties->{id});
 	$versionTag->commit;
-	return ($versionTag, $template);
+	return ($versionTag, $templates, $asset, $snippet);
 }
 
 END {

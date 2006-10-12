@@ -160,10 +160,12 @@ sub process {
 	if ($self->{_makePrintable} && $self->session->asset) {
 		$templateId = $self->{_printableStyleId} || $self->session->asset->get("printableStyleTemplateId");
 		my $currAsset = $self->session->asset;
-		until ($templateId) {
+		my $rootAssetId = WebGUI::Asset->getRoot($self->session)->getId;
+		TEMPLATE: until ($templateId) {
 			# some assets don't have this property.  But at least one ancestor should....
 			$currAsset = $currAsset->getParent;
 			$templateId = $currAsset->get("printableStyleTemplateId");
+			last TEMPLATE if $currAsset->getId eq $rootAssetId;
 		}
 	} elsif ($self->session->scratch->get("personalStyleId") ne "") {
 		$templateId = $self->session->scratch->get("personalStyleId");
