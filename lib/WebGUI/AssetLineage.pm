@@ -65,6 +65,11 @@ sub addChild {
 	$properties->{groupIdView} ||= '7';
 	$properties->{styleTemplateId} ||= 'PBtmpl0000000000000060';
 
+	# Check if it is possible to add a child to this asset. If not add it as a sibling of this asset.
+	if (length($self->get("lineage")) >= 252) {
+		$self->session->errorHandler->warn('Tried to add child to asset "'.$self->getId.'" which is already on the deepest level. Adding it as a sibling instead.');
+		return $self->getParent->addChild($properties, $id, $now);
+	}
 	my $lineage = $self->get("lineage").$self->getNextChildRank;
 	$self->{_hasChildren} = 1;
 	$self->session->db->beginTransaction;
