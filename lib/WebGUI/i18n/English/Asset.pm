@@ -967,6 +967,81 @@ to edit or modify that asset.</p>|,
 		lastUpdated => 1128920336,
 	},
 
+	'extrasUploads symlinking' => {
+		message => q|Symlinking extras and uploads dirs.|,
+		lastUpdated => 1160773957,
+	},
+
+	'rootUrl symlinking default' => {
+		message => q|Symlinking extras and uploads dirs.|,
+		lastUpdated => 1160773957,
+	},
+
+	'rootUrl default not present' => {
+		message => q|Not symlinking default asset; not included in exported subtree.|,
+		lastUpdated => 1160773957,
+	},
+
+	'could not create' => {
+		message => q|Could not create %s: %s|,
+		lastUpdated => 1160773957,
+	},
+
+	'could not unlink' => {
+		message => q|Could not unlink %s: %s|,
+		lastUpdated => 1160773957,
+	},
+
+	'could not rmdir' => {
+		message => q|Could not remove directory at %s: %s|,
+		lastUpdated => 1160773957,
+	},
+
+	'could not symlink' => {
+		message => q|Could not symlink %s to %s: %s|,
+		lastUpdated => 1160773957,
+	},
+
+	'extrasUploads form label' => {
+		message => q|Extras and uploads directories|,
+		lastUpdated => 1160773957,
+	},
+
+	'extrasUploads form hoverHelp' => {
+		message => q|What action to take regarding the extras and uploads directories, which are often referenced by parts of the site.  Symlink means to use a symbolic link (not available on all systems) to the original directory.  None means to do nothing, and ignore the extras and uploads directories; this will probably cause references to them to break in the exported site unless you've prepared the directories already.|,
+		lastUpdated => 1160773957,
+	},
+
+	'extrasUploads form option symlink' => {
+		message => q|Symlink|,
+		lastUpdated => 1160773957,
+	},
+
+	'extrasUploads form option none' => {
+		message => q|None|,
+		lastUpdated => 1160773957,
+	},
+
+	'rootUrl form label' => {
+		message => q|Root URL|,
+		lastUpdated => 1160773957,
+	},
+
+	'rootUrl form hoverHelp' => {
+		message => q|What action to take regarding queries to the root URL.  Symlink Default means to create a symbolic link from the root-URL index file to the index file of the default asset (not available on all systems).  None means to do nothing, which usually causes queries to the root URL to be rejected in the exported site.|,
+		lastUpdated => 1160773957,
+	},
+
+	'rootUrl form option symlinkDefault' => {
+		message => q|Symlink Default|,
+		lastUpdated => 1160773957,
+	},
+
+	'rootUrl form option none' => {
+		message => q|None|,
+		lastUpdated => 1160773957,
+	},
+
 };
 
 1;

@@ -171,39 +171,37 @@ sub _exportAsHtml {
 		s#^/*## for ($extrasUrl, $uploadsUrl);
 		my ($extrasDst, $uploadsDst) = ($exportPath.'/'.$extrasUrl, $exportPath.'/'.$uploadsUrl);
 
-		# TODO: internationalize
-		$self->session->output->print("Symlinking extras and uploads dirs.\n") unless $quiet;
+		$self->session->output->print($i18n->get('extrasUploads symlinking')."\n") unless $quiet;
 		foreach my $rec ([$extrasPath, $extrasDst],
 				 [$uploadsPath, $uploadsDst]) {
 			my ($path, $dst) = @$rec;
 			if (-l $dst) {
 				next if (readlink $dst eq $path);
-				unlink $dst or return (0, sprintf("Could not unlink %s: %s", $dst, $!));
+				unlink $dst or return (0, sprintf($i18n->get('could not unlink'), $dst, $!));
 			}
 
 			eval { mkpath($dst) };
-			$@ and return (0, sprintf("Could not create path %s: %s", $dst, $@));
-			rmdir $dst or return (0, sprintf("Could not remove directory at path %s: %s", $dst, $!));
-			symlink $path, $dst or return (0, sprintf("Could not symlink %s to %s: %s", $path, $dst, $!));
+			$@ and return (0, sprintf($i18n->get('could not create'), $dst, $@));
+			rmdir $dst or return (0, sprintf($i18n->get('could not rmdir'), $dst, $!));
+			symlink $path, $dst or return (0, sprintf($i18n->get('could not symlink'), $path, $dst, $!));
 		}
 	} elsif ($extrasUploadsAction eq 'none') {
 		# Nothing.  This is the default.
 	}
 
 	if ($rootUrlAction eq 'symlinkDefault') {
-		# TODO: internationalize
 		if (defined $defaultAssetPath) {
 			{
 				my ($src, $dst) = ($defaultAssetPath, $exportPath.'/'.$index);
-				$self->session->output->print("Symlinking default asset.\n") unless $quiet;
+				$self->session->output->print($i18n->get('rootUrl symlinking default')."\n") unless $quiet;
 				if (-l $dst) {
 					last if (readlink $dst eq $src);
-					unlink $dst or return (0, sprintf("Could not unlink %s: %s", $dst, $!));
+					unlink $dst or return (0, sprintf($i18n->get('could not unlink'), $dst, $!));
 				}
-				symlink $src, $dst or return (0, sprintf("Could not symlink %s to %s: %s", $src, $dst, $!));
+				symlink $src, $dst or return (0, sprintf($i18n->get('could not symlink'), $src, $dst, $!));
 			}
 		} else {
-			$self->session->output->print("Not symlinking default asset; not included in exported subtree.\n") unless $quiet;
+			$self->session->output->print($i18n->get('rootUrl default not present')."\n") unless $quiet;
 		}
 	} elsif ($rootUrlAction eq 'none') {
 		# Nothing.  This is the default.
@@ -262,22 +260,22 @@ sub www_export {
 			-name=>"index",
 			-value=>"index.html"
 		);
-	# TODO: internationalize
+
 	# TODO: maybe add copy options to these boxes alongside symlink
 	$f->selectBox(
-		        -label => "Extras and uploads directories",
-		        -hoverHelp => "What action to take regarding the extras and uploads directories, which are often referenced by parts of the site.  Symlink means to use a symbolic link (not available on all systems) to the original directory.  None means to do nothing, and ignore the extras and uploads directories; this will probably cause references to them to break in the exported site unless you've prepared the directories already.",
+		        -label => $i18n->get('extrasUploads form label'),
+		        -hoverHelp => $i18n->get('extrasUploads form hoverHelp'),
 		        -name => "extrasUploadsAction",
-		        -options => { 'symlink' => 'Symlink',
-				      'none' => 'None' },
+		        -options => { 'symlink' => $i18n->get('extrasUploads form option symlink'),
+				      'none' => $i18n->get('extrasUploads form option none') },
 		        -value => ['none'],
 		     );
 	$f->selectBox(
-		        -label => "Root URL",
-		        -hoverHelp => "What action to take regarding queries to the root URL.  Symlink Default means to create a symbolic link from the root-URL index file to the index file of the default asset (not available on all systems).  None means to do nothing, which usually causes queries to the root URL to be rejected in the exported site.",
+		        -label => $i18n->get('rootUrl form label'),
+		        -hoverHelp => $i18n->get('rootUrl form hoverHelp'),
 		        -name => "rootUrlAction",
-		        -options => { 'symlinkDefault' => 'Symlink Default',
-				      'none' => 'None' },
+		        -options => { 'symlinkDefault' => $i18n->get('rootUrl form option symlinkDefault'),
+				      'none' => $i18n->get('rootUrl form option none') },
 		        -value => ['none'],
 		     );
         $f->submit;
