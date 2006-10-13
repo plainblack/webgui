@@ -301,20 +301,19 @@ sub www_resize {
 }
 
 #-------------------------------------------------------------------
-
-=head2 www_view
-
-A web executable method that redirects the user to the specified page, or displays the edit interface when admin mode is enabled.
-
-=cut
-
+# Use superclass method for now.
 sub www_view {
 	my $self = shift;
-	my $storage = $self->getStorageLocation;
-	$self->session->http->setRedirect($storage->getUrl($self->get("filename")));
-	$self->session->http->setStreamedFile($storage->getPath($self->get("filename")));
-	return "1";
+	$self->SUPER::www_view;
 }
+
+#sub www_view {
+#	my $self = shift;
+#	my $storage = $self->getStorageLocation;
+#	$self->session->http->setRedirect($storage->getUrl($self->get("filename")));
+#	$self->session->http->setStreamedFile($storage->getPath($self->get("filename")));
+#	return "1";
+#}
 
 
 1;

@@ -20,6 +20,7 @@ use WebGUI::Cache;
 use WebGUI::Storage;
 use WebGUI::SQL;
 use WebGUI::Utility;
+use FileHandle;
 
 our @ISA = qw(WebGUI::Asset);
 
@@ -371,14 +372,26 @@ sub www_edit {
 sub www_view {
 	my $self = shift;
 	return $self->session->privilege->noAccess() unless $self->canView;
-	if ($self->session->var->get("adminOn")) {
-		return $self->getContainer->www_view;
+#	if ($self->session->var->get("adminOn")) {
+#		return $self->getContainer->www_view;
+#	}
+
+	# Kludge for now to make this work with the exporter.
+	my $path = $self->getStorageLocation->getPath($self->get('filename'));
+	my $fh = eval { FileHandle->new($path) };
+	defined($fh) or return "";
+	binmode $fh or ($fh->close, return "");
+	my $block;
+	while (read($fh, $block, 16384) > 0) {
+		$self->session->output->print($block, 1);
 	}
-	$self->session->http->setRedirect($self->getFileUrl);
-    	$self->session->http->setStreamedFile($self->getStorageLocation->getPath($self->get("filename")));
-	return '1';
+	$fh->close;
+	return 'chunked';
+
+#	$self->session->http->setRedirect($self->getFileUrl);
+#    	$self->session->http->setStreamedFile($self->getStorageLocation->getPath($self->get("filename")));
+#	return '1';
 }
 
 
 1;
-
