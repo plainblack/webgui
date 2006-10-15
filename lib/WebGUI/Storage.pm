@@ -124,7 +124,7 @@ sub _makePath {
 
 =head2 addFileFromFilesystem( pathToFile )
 
-Grabs a file from the server's file system and saves it to a storage location and returns a URL compliant filename.
+Grabs a file from the server's file system and saves it to a storage location and returns a URL compliant filename.  If there are errors encountered during the add, then it will return undef instead.
 
 =head3 pathToFile
 
