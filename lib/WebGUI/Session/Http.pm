@@ -36,6 +36,7 @@ This package allows the manipulation of HTTP protocol information.
  $cookies = $http->getCookies();
  $mimetype = $http->getMimeType();
  $code = $http->getStatus();
+ ($code, $description) = $http->getStatus();
  $boolean = $http->isRedirect();
  
  $http->setCookie($name,$value);
@@ -105,14 +106,19 @@ sub getMimeType {
 
 =head2 getStatus ( ) {
 
-Returns the current HTTP status code, if one has been set.
+Returns the current HTTP status code and description.  When called in scalar
+context, returns only the status code.  When called in list context, returns
+the status and description.  If no code has been set, the code returned will be 200.
+If no description has been set, the internal description will be set to "OK" and
+"OK" will be returned.
 
 =cut
 
 sub getStatus {
 	my $self = shift;
 	$self->{_http}{statusDescription} = $self->{_http}{statusDescription} || "OK";
-	return $self->{_http}{status} || "200";
+	my $status = $self->{_http}{status} || "200";
+	return wantarray ? ( $status, $self->{_http}{statusDescription} ) : $status;
 }
 
 
