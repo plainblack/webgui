@@ -16,7 +16,7 @@ use lib "$FindBin::Bin/../../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 17; # increment this value for each test you create
+use Test::More tests => 19; # increment this value for each test you create
 use WebGUI::Asset::Wobject::Article;
 
 my $session = WebGUI::Test->session;
@@ -68,8 +68,14 @@ my $filename = "page_title.jpg";
 
 # Use some test collateral to create a storage location and assign it to our article
 my $storage = WebGUI::Storage::Image->create($session);
-$storage->addFileFromFilesystem("../../supporting_collateral/".$filename);
+my $storedFilename = $storage->addFileFromFilesystem("../../supporting_collateral/".$filename);
+my $filenameOK = is ($storedFilename, $filename, 'storage created correctly');
 $article->update({storageId=>$storage->getId});
+my $storageOK = is($article->get('storageId'), $storage->getId, 'correct storage id stored');
+
+SKIP: {
+
+skip 'storage test setup problem', 3 unless $filenameOK and $storageOK;
 
 my $duplicateArticle = $article->duplicate();
 isa_ok($duplicateArticle, 'WebGUI::Asset::Wobject::Article');
@@ -91,6 +97,8 @@ $duplicateStorage = WebGUI::Storage::Image->get($session,$duplicateStorageId);
 $duplicateFilename = $duplicateStorage->getFiles->[0];
 
 is ($duplicateFilename, undef, 'purge method deletes collateral');
+
+}
 
 TODO: {
         local $TODO = "Tests to make later";
