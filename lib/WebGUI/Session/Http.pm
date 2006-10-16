@@ -211,8 +211,9 @@ sub sendHeader {
 		if ($self->{_http}{filename}) {
                         $request->headers_out->set('Content-Disposition' => qq!attachment; filename="$self->{_http}{filename}"!);
 		}
-		$request->status($self->getStatus());
-		$request->status_line($self->getStatus().' '.$self->{_http}{statusDescription});
+		my ($status, $description) = $self->getStatus();
+		$request->status($status);
+		$request->status_line(join ' ', $status, $description);
 	}
 	return;
 }
@@ -223,8 +224,9 @@ sub _sendMinimalHeader {
 	$request->content_type('text/html; charset=UTF-8');
 	$request->headers_out->set('Cache-Control' => 'private');
 	$request->no_cache(1);
-	$request->status($self->getStatus());
-	$request->status_line($self->getStatus().' '.$self->{_http}{statusDescription});
+	my ($status, $description) = $self->getStatus();
+	$request->status($status);
+	$request->status_line(join ' ', $status, $description);
 	return;
 }
 
