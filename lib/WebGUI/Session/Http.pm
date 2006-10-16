@@ -106,11 +106,9 @@ sub getMimeType {
 
 =head2 getStatus ( ) {
 
-Returns the current HTTP status code and description.  When called in scalar
-context, returns only the status code.  When called in list context, returns
-the status and description.  If no code has been set, the code returned will be 200.
-If no description has been set, the internal description will be set to "OK" and
-"OK" will be returned.
+Returns the current HTTP status code.  If no code has been set,
+the code returned will be 200.  If no description has been set,
+the internal description will be set to "OK" and "OK" will be returned.
 
 =cut
 
@@ -118,7 +116,22 @@ sub getStatus {
 	my $self = shift;
 	$self->{_http}{statusDescription} = $self->{_http}{statusDescription} || "OK";
 	my $status = $self->{_http}{status} || "200";
-	return wantarray ? ( $status, $self->{_http}{statusDescription} ) : $status;
+	return $status;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getStatusDescription ( ) {
+
+Returns the current HTTP status description.  If no description has
+been set, "OK" will be returned.
+
+=cut
+
+sub getStatusDescription {
+	my $self = shift;
+	return $self->{_http}{statusDescription} || "OK";
 }
 
 
@@ -211,9 +224,8 @@ sub sendHeader {
 		if ($self->{_http}{filename}) {
                         $request->headers_out->set('Content-Disposition' => qq!attachment; filename="$self->{_http}{filename}"!);
 		}
-		my ($status, $description) = $self->getStatus();
-		$request->status($status);
-		$request->status_line(join ' ', $status, $description);
+		$request->status($self->getStatus());
+		$request->status_line($self->getStatus().' '.$self->getStatusDescription());
 	}
 	return;
 }
@@ -224,9 +236,8 @@ sub _sendMinimalHeader {
 	$request->content_type('text/html; charset=UTF-8');
 	$request->headers_out->set('Cache-Control' => 'private');
 	$request->no_cache(1);
-	my ($status, $description) = $self->getStatus();
-	$request->status($status);
-	$request->status_line(join ' ', $status, $description);
+	$request->status($self->getStatus());
+	$request->status_line($self->getStatus().' '.$self->getStatusDescription());
 	return;
 }
 
