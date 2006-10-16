@@ -17,7 +17,7 @@ use WebGUI::Session;
 
 use Test::More; # increment this value for each test you create
 
-my $num_tests = 8;
+my $num_tests = 6;
 
 plan tests => $num_tests;
  
@@ -31,23 +31,17 @@ isa_ok($http, 'WebGUI::Session::Http', 'session has correct object type');
 
 $http->setStatus('123');
 
-is($http->getStatus, '123', 'getStatus: returns correct code in scalar context');
-
-my ($status, $description) = $http->getStatus;
-is($status, '123', 'getStatus: returns correct code');
-is($description, 'OK', 'getStatus: default description returned');
+is($http->getStatus, '123', 'getStatus: returns correct code');
+is($http->getStatusDescription, 'OK', 'getStatusDescription: returns default description via getStatus');
 
 $http->setStatus('');
 
-($status, $description) = $http->getStatus;
-is($status, '200', 'getStatus: returns default code');
-is($description, 'OK', 'getStatus: default description returned');
+is($http->getStatusDescription, 'OK', 'getStatusDescription: returns default description via itself');
+is($http->getStatus, '200', 'getStatus: returns default code');
 
 $http->setStatus('', 'packets are great');
 
-($status, $description) = $http->getStatus;
-is($status, '200', 'getStatus: returns default code');
-is($description, 'packets are great', 'getStatus: default description returned');
+is($http->getStatusDescription, 'packets are great', 'getStatusDescription: returns correct description');
 
 END {
 }
