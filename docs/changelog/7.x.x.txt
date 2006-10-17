@@ -23,21 +23,28 @@
  - fix: PM project completion percentage updates not working right
  - fix: useEmptyStyle caused invalid template to be used
  - Added ability to download an SQLReport in either CSV or as a template.
+   (Special thanks to the Alliance for a Media Literate America for funding
+   this feature.)
  - Added ability for Products to add a user to a group when purchased.
+   (Special thanks to the Alliance for a Media Literate America for funding
+   this feature.)
  - Changed the ?op=editProduct form to a TabForm.
  - fixed a small error in WebGUI::Group documentation.
  - Added WebGUI::Text with some CSV functions.
  - Added Karma RFE: Thumbnail size can be enterred in CS
  - Added diskUsage.pl utility script to show space used by assets in a webgui
-   site, similar to the unix du utility.
+   site, similar to the unix du utility (Special thanks to Volvo for funding
+   this feature).
  - Added option to WebGUI Auth module to require strong passwords. Admins can
    now require users to enter a specific combination of characters, etc.
+   (Special thanks to Brunswick Bowling and Billiards for funding this feature.)
  - Added skeleton code for writing WebGUI utility scripts.
  - Added auto-registration via LDAP.  This allows users to simply login and
    have a WebGUI account created if their credentials are validated by the
-   directory.
+   directory. (Special thanks to Kemin Industries for funding this feature.)
  - Added a Sync Profile to LDAP workflow activity that will grab a single user
-   profile from LDAP instead of all of them.
+   profile from LDAP instead of all of them. (Special thanks to Kemin
+   Industries for funding this feature.)
  - fix: Article.t copy collateral test false failure.
 
 7.0.9
