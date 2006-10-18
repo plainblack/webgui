@@ -198,6 +198,14 @@ sub authenticate {
 
 #-------------------------------------------------------------------
 sub connectToLDAP {
+
+   # This method needs to do some excpetion handling when we try to create an LDAPLink object
+   # Lot's to do though because then everything calling connectToLDAP must also handle exceptions on up
+   #
+   # Problem is that $connectionId may not have a value or the object creation may fail for other reasons.
+   # Quick fix for now is to ensure the ldapConnection setting is set in the settings table with the id of 
+   # the default ldap connection.
+
    my $self = shift;
    my $connectionId = $self->session->form->process("connection") || $self->session->setting->get("ldapConnection");
    my $ldapLink = WebGUI::LDAPLink->new($self->session,$connectionId);

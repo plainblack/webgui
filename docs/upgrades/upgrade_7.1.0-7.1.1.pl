@@ -21,9 +21,17 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 fixSurvey();
+fixLDAP();
 
 finish($session); # this line required
 
+#-------------------------------------------------
+sub fixLDAP {
+	print "\tFixing the ldap connection setting.\n" unless ($quiet);
+	# Set the LDAP connection setting to the default ldap link if it's not set to anything
+	my $ldapConnection = $session->setting->get("ldapConnection");
+	$session->setting->set("ldapConnection", "1uBbhUm686mkFZ1ghv7Lag") if ($ldapConnection eq "");
+}
 
 #-------------------------------------------------
 sub fixSurvey {
