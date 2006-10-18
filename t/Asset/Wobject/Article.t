@@ -16,7 +16,7 @@ use lib "$FindBin::Bin/../../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 19; # increment this value for each test you create
+use Test::More tests => 20; # increment this value for each test you create
 use WebGUI::Asset::Wobject::Article;
 
 my $session = WebGUI::Test->session;
@@ -100,20 +100,33 @@ is ($duplicateFilename, undef, 'purge method deletes collateral');
 
 }
 
+# Lets make sure the view method returns something.
+# This is not a very good test but I need to do it to test the purgeCache method anyways =)
+
+my $output = $article->view;
+isnt ($output, "", 'view method returns something');
+
+# Lets see if caching works
+my $cachedOutput = WebGUI::Cache->new($session, 'view_'.$article->getId)->get;
+is ($output, $cachedOutput, 'view method caches output');
+
+# Lets see if the purgeCache method works
+$article->purgeCache;
+isnt ($output, $cachedOutput, 'purgeCache method deletes cache');
+
+
 TODO: {
         local $TODO = "Tests to make later";
         ok(0, 'Test exportAssetData method');
 	ok(0, 'Test getStorageLocation method');
 	ok(0, 'Test indexContent method');
-	ok(0, 'Test purgeCache method');
 	ok(0, 'Test purgeRevision method');
-	ok(0, 'Test view method... maybe?');
 	ok(0, 'Test www_deleteFile method');
 	ok(0, 'Test www_view method... maybe?');
 }
 
 END {
 	# Clean up after thy self
-	$versionTag->rollback($versionTag->getId);
+	#$versionTag->rollback($versionTag->getId);
 }
 
