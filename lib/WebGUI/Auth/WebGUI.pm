@@ -361,7 +361,8 @@ sub editUserFormSave {
    my $userId = $self->session->form->get("uid");
    my $properties;
    my $userData = $self->getParams($userId);
-   unless (!$self->session->form->process('authWebGUI.identifier') || $self->session->form->process('authWebGUI.identifier') eq "password" || !$self->_isValidPassword($self->session->form->get('authWebGUI.identifier'))) {
+   my $identifier = $self->session->form->process('authWebGUI.identifier');
+   unless (!$identifier || $identifier eq "password") {
       $properties->{identifier} = Digest::MD5::md5_base64($self->session->form->process('authWebGUI.identifier'));
 	   if($userData->{identifier} ne $properties->{identifier}){
 	     $properties->{passwordLastUpdated} =$self->session->datetime->time();

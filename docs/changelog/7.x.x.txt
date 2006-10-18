@@ -7,6 +7,7 @@
  - change: asset exporter now uses one session per asset to avoid breaking state in between
  - fix: Lineage length is not checked (Martin Kamerbeek / Procolix)
  - fix: Cannot manage user accounts in 7.1.0
+ - fix: New created users don't have password
 
 7.1.0
  - fix: mysql and mysqldump were transposed in upgrade.pl --help
