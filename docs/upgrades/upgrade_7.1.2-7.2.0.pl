@@ -20,17 +20,21 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-# upgrade functions go here
+createDictionaryStorage($session);
 
 finish($session); # this line required
 
 
-##-------------------------------------------------
-#sub exampleFunction {
-#	my $session = shift;
-#	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
-#	# and here's our code
-#}
+#-------------------------------------------------
+sub createDictionaryStorage {
+	my $session = shift;
+	print "\tCreating the directory for the personal dictionaries.\n" unless ($quiet);
+
+	my $dictionaryDirectory = $session->config->get('uploadsPath') .'/dictionaries';
+
+	mkdir $dictionaryDirectory unless (-e $dictionaryDirectory);
+	mkdir $dictionaryDirectory.'/oldIds' unless (-e $dictionaryDirectory.'/oldIds');
+}
 
 
 

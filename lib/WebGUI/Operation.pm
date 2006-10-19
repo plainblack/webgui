@@ -298,6 +298,10 @@ sub getOperations {
 		'moveColorDown' => 'WebGUI::Operation::Graphics',
 		'moveColorUp' => 'WebGUI::Operation::Graphics',
 		'removeColorFromPalette' => 'WebGUI::Operation::Graphics',
+
+		'spellCheck' => 'WebGUI::Operation::SpellCheck',
+		'suggestWords' => 'WebGUI::Operation::SpellCheck',
+		'addWordToDictionary' => 'WebGUI::Operation::SpellCheck',
 	};
 }
 

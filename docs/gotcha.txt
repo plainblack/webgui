@@ -7,6 +7,15 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.2.0
+--------------------------------------------------------------------
+ * Server side spellchecking has been added to this release. You must 
+   install Text::Aspell, and any dictionary you like. If you want to 
+   use spellchecking you have to setup the dictionaries you want your 
+   users to use in the config file. Also you'll have to check the 
+   spellchecker checkbox in the RichEdit asset you're using.
+	
+
 7.0.8
 --------------------------------------------------------------------
  * 7.0.7 was released with a critical bug that broke the search engine

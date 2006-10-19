@@ -19,6 +19,7 @@ use WebGUI::Asset;
 use WebGUI::Form;
 use WebGUI::Utility;
 use WebGUI::International;
+use Text::Aspell;
 
 our @ISA = qw(WebGUI::Asset);
 
@@ -217,6 +218,7 @@ sub getEditForm {
 		'fullscreen' => $i18n->get('fullscreen'),
 		'zoom' => $i18n->get('zoom'),
 		'print' => $i18n->get('print'),
+		'spellchecker' => $i18n->get('Server Side Spell Checker'),
 #		'advlink' => "Advanced Link",
 #		'spacer' => "Toolbar Spacer", 
 #		'separator' => "Toolbar Separator", 
@@ -229,6 +231,7 @@ sub getEditForm {
 			<td>%s</td>
 			<td>%s</td>
 			<td>%s</td>
+			<td></td>
 		</tr>!,
 		$i18n->get('button'),
 		$i18n->get('row 1'),
@@ -260,7 +263,11 @@ sub getEditForm {
 			value=>$key,
 			name=>"toolbarRow3",
 			checked=>$checked3
-			}).'</td>
+			}).'</td><td>';
+		if ($key eq 'spellchecker' && !($self->session->config->get('availableDictionaries'))) {
+			$buttonGrid .= $i18n->get('no dictionaries');
+		}
+		$buttonGrid .= '</td>
 	</tr>
 			';
 	}
@@ -457,8 +464,14 @@ sub getRichEditor {
 		theme_advanced_toolbar_location => $self->getValue("toolbarLocation"),
 		theme_advanced_statusbar_location => "bottom",
 		valid_elements => $self->getValue("validElements"),
+		wg_userIsVisitor => $self->session->user->userId eq '1' ? 'true' : 'false',
 		);
 	foreach my $button (@toolbarButtons) {
+		if ($button eq "spellchecker" && $self->session->config->get('availableDictionaries')) {
+			push(@plugins,"spellchecker");
+			$config{spellchecker_languages} = 
+				join(',', map { ($_->{default} ? '+' : '').$_->{name}.'='.$_->{id} } @{$self->session->config->get('availableDictionaries')});
+		}
 		push(@plugins,"table") if ($button eq "tablecontrols");	
 		push(@plugins,"save") if ($button eq "save");	
 		push(@plugins,"advhr") if ($button eq "advhr");	
@@ -516,6 +529,7 @@ sub getRichEditor {
 			push(@directives,$key." : '".$config{$key}."'");
 		}
 	}
+
 	$self->session->style->setScript($self->session->url->extras('tinymce2/jscripts/tiny_mce/tiny_mce.js'),{type=>"text/javascript"});
 	$self->session->style->setScript($self->session->url->extras("tinymce2/jscripts/webgui.js"),{type=>"text/javascript"});
 	return '<script type="text/javascript">

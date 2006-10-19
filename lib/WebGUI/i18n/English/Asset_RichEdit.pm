@@ -453,6 +453,16 @@ option is set to Yes, then all whitespace entered into the form will be preserve
                 lastUpdated => 1128830747,
         },
 
+	'Server Side Spell Checker' => {
+		message => q|Server Side Spell Checker|,
+		lastUpdated => 0,
+	},
+
+	'no dictionaries' => {
+		message => q|No dictionaries are configured yet. Spellchecking will not be enabled before at least one is.|,
+		lastUpdated => 0,
+	},
+
 };
 
 1;
