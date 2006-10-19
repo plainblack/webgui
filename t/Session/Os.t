@@ -14,10 +14,39 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
+use WebGUI::Session::Os;
 
-use Test::More tests => 2; # increment this value for each test you create
+my @testSets = (
+	{
+		os => 'Win',
+		type => 'Windowsish',
+	},
+	{
+		os => 'win32',
+		type => 'Windowsish',
+	},
+	{
+		os => 'MSWin32',
+		type => 'Windowsish',
+	},
+	{
+		os => 'Amiga OS',
+		type => 'Linuxish',
+	},
+);
+
+use Test::More;
+
+my $numTests = 2 * scalar @testSets;
+
+plan tests => $numTests;
 
 my $session = WebGUI::Test->session;
 
-ok($session->os->get("name") ne "", "get(name)");
-ok($session->os->get("type") eq "Windowsish" || $session->os->get("type") eq "Linuxish", "get(type)");
+foreach my $test (@testSets) {
+	local $^O = $test->{os};
+	my $os = WebGUI::Session::Os->new($session);
+	is($os->get('name'), $test->{os}, "$test->{os}: name set");
+	is($os->get('type'), $test->{type}, "$test->{os}: type set");
+}
+
