@@ -2,6 +2,8 @@
  - Added server side spellchecker (Martin Kamerbeek / Procolix)
 
 7.1.2
+ - Fixed a bug that caused workflows to fail if collaboration systems and
+   posts for that CS were in the same version tag at commit time.
 
 
 7.1.1
