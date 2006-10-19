@@ -92,7 +92,7 @@ Commits all assets edited under a version tag, and then sets the version tag to 
 
 sub commit {
 	my $self = shift;
-	foreach my $asset (@{$self->getAssets({"reverse"=>1})}) {
+	foreach my $asset (@{$self->getAssets({"byLineage"=>1})}) {
 		$asset->commit;
 	}
 	$self->{_data}{isCommitted} = 1;
@@ -145,6 +145,10 @@ A hash reference containing options to change the output.
 
 A boolean that will reverse the order of the assets. The default is to return the assets in descending order.
 
+=head4 byLineage
+
+A boolean that will return the asset list ordered by lineage, ascending. Cannot be used in conjunction with "reverse".
+
 =cut
 
 sub getAssets {
@@ -152,7 +156,12 @@ sub getAssets {
 	my $options = shift;
 	my @assets = ();
 	my $direction = $options->{reverse} ? "asc" : "desc";
-	my $sth = $self->session->db->read("select asset.assetId,asset.className,assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.tagId=? order by revisionDate ".$direction, [$self->getId]);
+	my $sort = "revisionDate";
+	if ($options->{byLineage}) {
+		$sort = "lineage";
+		$direction = "asc";
+	}
+	my $sth = $self->session->db->read("select asset.assetId,asset.className,assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.tagId=? order by ".$sort." ".$direction, [$self->getId]);
 	while (my ($id,$class,$version) = $sth->array) {
 		push(@assets, WebGUI::Asset->new($self->session,$id,$class,$version));
 	}
