@@ -56,7 +56,7 @@ sub handler {
 		return Apache2::Const::DECLINED if ($r->uri =~ m/^$url/);
 	}
 	my $uploads = $config->get("uploadsURL");
-	if ($r->uri =~ m!^uploads/dictionaries!) {
+	if ($r->uri =~ m!^$uploads/dictionaries!) {
 		# Do not allow web-access to personal dictionaries.
 		$r->push_handlers(PerlAccessHandler => sub { return 401 } );
 	} elsif($r->uri =~ m/^$uploads/) {
