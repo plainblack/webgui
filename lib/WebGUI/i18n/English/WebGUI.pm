@@ -603,8 +603,8 @@ Database Links enable a WebGUI administrator to add commonly used databases for 
 	},
 
 	'1084' => {
-		message => q|Default|,
-		lastUpdated => 1077472740
+		message => q|Use the default toolbar for my language|,
+		lastUpdated => 1161300438,
 	},
 
 	'370' => {

@@ -58,8 +58,7 @@ sub adminOnly {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session);
 	$self->session->http->setStatus("401", "Admin Only");
-	my ($output, $sth, @data);
-        $output = '<h1>'.$i18n->get(35).'</h1>';
+        my $output = '<h1>'.$i18n->get(35).'</h1>';
 	$output .= $i18n->get(36);
 	return $self->session->style->userStyle($output);
 }
@@ -91,10 +90,8 @@ sub insufficient {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session);
 	$self->session->http->setStatus("401", "Insufficient Privileges");
-	my ($output);
-	$output = '<h1>'.$i18n->get(37).'</h1>';
+	my $output = '<h1>'.$i18n->get(37).'</h1>';
 	$output .= $i18n->get(38);
-	$output .= '<p>';
 	return $self->session->style->userStyle($output);
 }
 
@@ -155,7 +152,6 @@ sub notMember {
 	my ($output);
 	$output = '<h1>'.$i18n->get(345).'</h1>';
 	$output .= $i18n->get(346);
-	$output .= '<p>';
 	return $self->session->style->userStyle($output);
 }
 
