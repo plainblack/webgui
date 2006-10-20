@@ -63,8 +63,9 @@ Returns the base URL for this user's toolbar icon set.
 sub getBaseURL {
 	my $self = shift;
 	my $url = $self->session->url->extras('toolbar/');
-	if ($self->session->user->profileField("toolbar") ne "useLanguageDefault") {
-		$url .= $self->session->user->profileField("toolbar");
+	my $toolbar = $self->session->user->profileField("toolbar");
+	if ($toolbar ne "useLanguageDefault") {
+		$url .= $toolbar;
 	} else {
 		$url .= WebGUI::International->new($self->session,'Icon')->getLanguage($self->session->user->profileField("language"),"toolbar");
 	}
@@ -361,6 +362,10 @@ Any URL parameters that need to be tacked on to the current URL to accomplish wh
 
 The URL to any page. Defaults to the current page.
 
+=head3 disabled
+
+If this flag is true, the icon will be generated but no action link will be wrapped around it.
+
 =cut
 
 sub moveDown {
@@ -468,6 +473,10 @@ Any URL parameters that need to be tacked on to the current URL to accomplish wh
 =head3 pageURL
 
 The URL to any page. Defaults to the current page.
+
+=head3 disabled
+
+If this flag is true, the icon will be generated but no action link will be wrapped around it.
 
 =cut
 
