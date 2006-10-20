@@ -72,31 +72,30 @@ foreach my $test (@iconTests) {
 	my $label = $i18n->get($test->{label});
 
 	my $icon = $session->icon->$method($test->{urlParam});
-	my ($url, $alt, $title) = linkAndText($icon);
 
+	my ($url) = linkAndText($icon, 'a', 'href');
 	is($url, $session->url->gateway($requestedUrl, $test->{urlParam}), "$method: url okay");
+
+	my ($alt, $title) = linkAndText($icon, 'img', 'alt', 'title');
 	is($alt, $label, "$method: alt okay");
 	is($title, $label, "$method: title okay");
 
 	$icon = $session->icon->copy($test->{urlParam2}, '/lowes');
-	($url, $alt, $title) = linkAndText($icon);
+	($url) = linkAndText($icon, 'a', 'href');
 	is($url, $session->url->gateway('/lowes', $test->{urlParam2}), "$method: manual url okay");
 
 }
 
 
 sub linkAndText {
-	my ($text) = @_;
+	my ($text, $tag, @params) = @_;
 	my $p = HTML::TokeParser->new(\$text);
 
-	my $token = $p->get_tag('a');
-	my $url = $token->[1]{href} || "-";
+	my $token = $p->get_tag($tag);
 
-	$token = $p->get_tag('img');
-	my $alt = $token->[1]{alt} || "-";
-	my $title = $token->[1]{title} || "-";
+	my @parsedParams = map { $token->[1]{$_} || '-' } @params;
 
-	return ($url, $alt, $title);
+	return @parsedParams;
 }
 
 ####################################################
@@ -107,6 +106,8 @@ sub linkAndText {
 # confirmText for delete
 #
 ####################################################
+
+my $icon = $session->icon->drag();
 
 END: {
 	$session->user->profileField('toolbar', $origToolbar);
