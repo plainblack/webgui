@@ -4,8 +4,8 @@
 
 7.1.2
  - Fixed a bug that caused workflows to fail if collaboration systems and
-   posts for that CS were in the same version tag at commit time.
-
+    posts for that CS were in the same version tag at commit time.
+  - fix: minor assetsToHide implementation bug in dashboard
 
 7.1.1
  - fix: some issues with asset exports not handling URLs with dots correctly
