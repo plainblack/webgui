@@ -12,7 +12,8 @@ package WebGUI::Operation::SpellCheck;
 
 use strict;
 use Encode;
-use Text::Aspell;
+# Optional, but if unavailable, spell checking will have no effect.
+eval 'use Text::Aspell';
 use WebGUI::Utility;
 
 =head1 NAME
@@ -40,6 +41,7 @@ An instanciated session object.
 sub _getSpeller {
 	my ($baseDir, $userDir, $homeDir);
 	my $session = shift;
+	return undef unless Text::Aspell->can('new');
 	my $speller = Text::Aspell->new;
 
 	# Get language

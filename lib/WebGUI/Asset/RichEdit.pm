@@ -19,7 +19,7 @@ use WebGUI::Asset;
 use WebGUI::Form;
 use WebGUI::Utility;
 use WebGUI::International;
-use Text::Aspell;
+eval 'use Text::Aspell';  # Optional
 
 our @ISA = qw(WebGUI::Asset);
 

@@ -1,5 +1,6 @@
 7.2.0
  - Added server side spellchecker (Martin Kamerbeek / Procolix)
+ - change: made Text::Aspell optional, nullifying spellchecker if not present
 
 7.1.2
  - Fixed a bug that caused workflows to fail if collaboration systems and

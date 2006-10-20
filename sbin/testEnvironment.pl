@@ -92,7 +92,7 @@ checkModule("URI::Escape","3.28");
 checkModule("POSIX");
 checkModule("List::Util");
 checkModule("Color::Calc");
-checkModule("Text::Aspell");
+checkModule("Text::Aspell",0.01,2);
 
 ###################################
 # Checking WebGUI
