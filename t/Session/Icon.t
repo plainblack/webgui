@@ -141,13 +141,21 @@ is($anchorTag, undef, "moveDown: no anchor tag when disabled is set");
 #
 ####################################################
 
-my $toolbarOptions = $session->icon->getToolbarOptions();
-my $expectedOptions = {
-	useLanguageDefault => $i18n->get('1084', 'WebGUI'),
-	bullet => 'bullet', 
-};
+my $toolbarDir = join '/', $session->config->get('extrasPath'), 'toolbar';
+my $dirOpened = opendir my $tbdir, $toolbarDir or diag "uh-oh: $!";
 
-cmp_deeply($expectedOptions, $toolbarOptions, 'getToolbarOptions');
+SKIP: {
+
+	skip 'No toolbar dir', 1 unless $dirOpened;
+	my @toolbarDirs = grep {! /^\./ } readdir $tbdir;
+	push @toolbarDirs, 'useLanguageDefault';
+
+	my $toolbarOptions = $session->icon->getToolbarOptions();
+	my @toolbarOptionDirs = keys %{ $toolbarOptions };
+
+	cmp_bag(\@toolbarDirs, \@toolbarOptionDirs, 'getToolbarOptions');
+}
+
 
 sub linkAndText {
 	my ($text, $tag, @params) = @_;
