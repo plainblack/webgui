@@ -587,7 +587,7 @@ sub login {
        $self->session->errorHandler->warn($error) if $error;
     }
    
-	return "";
+	return undef;
 }
 
 #-------------------------------------------------------------------
@@ -613,7 +613,7 @@ sub logout {
        $self->session->errorHandler->warn($error) if $error;
     }
    
-	return "";
+	return undef;
 }
 
 #-------------------------------------------------------------------

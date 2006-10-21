@@ -2,6 +2,7 @@
  - Added server side spellchecker (Martin Kamerbeek / Procolix)
  - Added configurable sales tax. (Tiffany Patterson / Elite Marketing)
  - change: made Text::Aspell optional, nullifying spellchecker if not present
+ - Fixed a bug where logging in/out would cause a blank page display.
 
 7.1.2
  - Fixed a bug that caused workflows to fail if collaboration systems and
