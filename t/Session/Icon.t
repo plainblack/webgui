@@ -16,10 +16,11 @@ use WebGUI::Test;
 use WebGUI::Session;
 
 use Test::More;
+use Test::Deep;
 use Test::MockObject;
 use HTML::TokeParser;
 
-my $numTests = 2;
+my $numTests = 10;
 
 my @iconTests = fetchTestSet();
 
@@ -80,12 +81,73 @@ foreach my $test (@iconTests) {
 	is($alt, $label, "$method: alt okay");
 	is($title, $label, "$method: title okay");
 
-	$icon = $session->icon->copy($test->{urlParam2}, '/lowes');
+	$icon = $session->icon->$method($test->{urlParam2}, '/lowes');
 	($url) = linkAndText($icon, 'a', 'href');
 	is($url, $session->url->gateway('/lowes', $test->{urlParam2}), "$method: manual url okay");
 
 }
 
+####################################################
+#
+# drag
+#
+####################################################
+
+my $icon = $session->icon->drag();
+my ($alt, $title, $extras) = linkAndText($icon, 'img', 'alt', 'title', 'extras');
+is($alt, $i18n->get('Drag'), "drag: alt okay");
+is($title, $i18n->get('Drag'), "drag: title okay");
+is($extras, '-', "drag: no extras set");
+
+$icon = $session->icon->drag(q!onclick="doSomething()"!);
+($extras) = linkAndText($icon, 'img', 'onclick');
+is($extras, q!doSomething()!, "drag: set extras");
+
+####################################################
+#
+# delete with confirmText
+#
+####################################################
+
+$icon = $session->icon->delete('','','What did I ever do to you?');
+my ($onclick) = linkAndText($icon, 'a', 'onclick');
+is($onclick, "return confirm('What did I ever do to you?')", "delete: confirm text");
+
+####################################################
+#
+# moveUp with disabled
+#
+####################################################
+
+$icon = $session->icon->moveUp('','',1);
+my $parser = HTML::TokeParser->new(\$icon);
+my $anchorTag = $parser->get_tag('a');
+is($anchorTag, undef, "moveUp: no anchor tag when disabled is set");
+
+####################################################
+#
+# moveDown with disabled
+#
+####################################################
+
+$icon = $session->icon->moveDown('','',1);
+$parser = HTML::TokeParser->new(\$icon);
+$anchorTag = $parser->get_tag('a');
+is($anchorTag, undef, "moveDown: no anchor tag when disabled is set");
+
+####################################################
+#
+# getToolbarOptions
+#
+####################################################
+
+my $toolbarOptions = $session->icon->getToolbarOptions();
+my $expectedOptions = {
+	useLanguageDefault => $i18n->get('1084', 'WebGUI'),
+	bullet => 'bullet', 
+};
+
+cmp_deeply($expectedOptions, $toolbarOptions, 'getToolbarOptions');
 
 sub linkAndText {
 	my ($text, $tag, @params) = @_;
@@ -97,15 +159,6 @@ sub linkAndText {
 
 	return @parsedParams;
 }
-
-####################################################
-#
-# Pick up tests
-# drag
-# disabled for moveUp and moveDown
-# confirmText for delete
-#
-####################################################
 
 my $icon = $session->icon->drag();
 
@@ -162,6 +215,12 @@ sub fetchTestSet {
 			label     => 'Move To Bottom',
 			urlParam  => 'func=moveBottom',
 			urlParam2 => 'op=moveBottom',
+		},
+		{
+			method    => 'moveDown',
+			label     => 'Move Down',
+			urlParam  => 'func=moveDown',
+			urlParam2 => 'op=moveDown',
 		},
 		{
 			method    => 'moveLeft',

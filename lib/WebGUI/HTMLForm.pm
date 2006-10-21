@@ -244,13 +244,11 @@ The UI level for this field. See the WebGUI developer's site for details. Defaul
 =cut
 
 sub raw {
-        my ($output);
         my ($self, @p) = @_;
         my ($value, $uiLevel) = rearrange([qw(value uiLevel)], @p);
         if ($self->_uiLevelChecksOut($uiLevel)) {
 		$self->{_data} .= $value;
         }
-        $self->{_data} .= $output;
 }
 
 
