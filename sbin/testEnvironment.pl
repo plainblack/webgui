@@ -93,6 +93,7 @@ checkModule("POSIX");
 checkModule("List::Util");
 checkModule("Color::Calc");
 checkModule("Text::Aspell",0.01,2);
+checkModule("Locale::US");
 
 ###################################
 # Checking WebGUI
