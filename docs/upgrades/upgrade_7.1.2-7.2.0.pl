@@ -20,10 +20,31 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
+commerceSalesTax($session);
 createDictionaryStorage($session);
 
 finish($session); # this line required
 
+
+##-------------------------------------------------
+sub commerceSalesTax {
+	my $session = shift;
+	print "\tAdding tables and columns to support sales tax in the Commerce System.\n" unless ($quiet);
+	$session->db->write(<<EOS1);
+CREATE TABLE commerceSalesTax (commerceSalesTaxId varchar(22) NOT NULL, regionIdentifier varchar(50) NOT NULL, salesTax float NOT NULL, PRIMARY KEY (commerceSalesTaxId) ) ENGINE MyISAM DEFAULT CHARSET=utf8;
+EOS1
+	$session->db->write(<<EOS2);
+ALTER TABLE products
+ADD COLUMN useSalesTax INTEGER DEFAULT 0;
+EOS2
+	$session->db->write(<<EOS3);
+ALTER TABLE subscription
+ADD COLUMN useSalesTax INTEGER DEFAULT 0;
+EOS3
+	$session->db->write(<<EOS3);
+INSERT INTO settings (name,value) VALUES ('commerceEnableSalesTax','0');
+EOS3
+}
 
 #-------------------------------------------------
 sub createDictionaryStorage {

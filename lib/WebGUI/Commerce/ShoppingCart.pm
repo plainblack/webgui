@@ -219,16 +219,20 @@ The instantiated plugin of this item. See WebGUI::Commerce::Item for a detailed 
 sub getItems {
 	my ($self, $periodResolve, %cartContent, $item, $properties, @recurring, @normal);
 	$self = shift;
+	my $salesTaxRate = shift;
 	$periodResolve = WebGUI::Commerce::Payment->recurringPeriodValues($self->session);
 	%cartContent = %{$self->{_items}};
 	foreach (values(%cartContent)) {
 		$item = WebGUI::Commerce::Item->new($self->session,$_->{itemId}, $_->{itemType});
+		my $totalPrice = $item->price * $_->{quantity};
+		my $productTax = $salesTaxRate * $item->useSalesTax;
 		$properties = {
 			quantity        => $_->{quantity},
 			period          => lc($periodResolve->{$item->duration}),
 			name		=> $item->name,
 			price		=> sprintf('%.2f', $item->price),
-			totalPrice	=> sprintf('%.2f', $item->price * $_->{quantity}),
+			totalPrice	=> sprintf('%.2f', $totalPrice),
+			salesTax	=> sprintf('%.2f', $totalPrice * $productTax),
 			item		=> $item,
 			};
 

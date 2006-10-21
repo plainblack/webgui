@@ -146,15 +146,15 @@ sub www_editProduct {
 
 	$i18n = WebGUI::International->new($session, 'ProductManager');	
 	$productId = $session->form->process("productId");
-	
+
 	unless ($productId eq 'new') {
 		$product = WebGUI::Product->new($session,$productId)->get;
 	}
-	
+
 	$f = WebGUI::TabForm->new($session);
 	$f->addTab("properties","Properties");
-	$f->addTab("actions","Actions");
-	
+	$f->addTab("properties","Actions");
+
 	$f->submit;
 	$f->hidden({
 		name => 'op', 
@@ -164,7 +164,7 @@ sub www_editProduct {
 		name => 'productId', 
 		value => $productId
 	});
-	
+
 	$f->getTab("properties")->text(
 		-name		=> 'title',
 		-label		=> $i18n->get('title'),
@@ -184,6 +184,12 @@ sub www_editProduct {
 		-hoverHelp	=> $i18n->get('price description'),
 		-value		=> $session->form->process("price") || $product->{price},
 		-maxlength	=> 13,
+	);
+	$f->getTab("properties")->yesNo(
+		-name		=> 'useSalesTax',
+		-label		=> $i18n->get('useSalesTax'),
+		-hoverHelp	=> $i18n->get('useSalesTax description'),
+		-value		=> $session->form->process("useSalesTax") || $product->{useSalesTax},
 	);
 	$f->getTab("properties")->float(
 		-name		=> 'weight',
@@ -213,35 +219,37 @@ sub www_editProduct {
 		-value		=> $session->form->process("skuTemplate") || $product->{skuTemplate},
 		-maxlength	=> 255,
 	);
-	
-	$f->getTab("actions")->group(
-		-name		=> 'groupId',
-		-label		=> $i18n->get('group id'),
-		-hoverHelp	=> $i18n->get('group id description'),
-		-value		=> $session->form->process("groupId") || $product->{groupId},
-	);
-	
-	my %groupExpiresOffsetOptions;
-	tie %groupExpiresOffsetOptions, 'Tie::IxHash',
-		'1month'	=> $i18n->get("1 month"),
-		'6month'	=> $i18n->get("6 months"),
-		'1year'		=> $i18n->get("1 year"),
-		'2year'		=> $i18n->get("2 years"),
-		'3year'		=> $i18n->get("3 years"),
-		'5year'		=> $i18n->get("5 years"),
-		'10year'	=> $i18n->get("10 years"),
-		'1000year'	=> $i18n->get("lifetime"),
-		;
-	
-	$f->getTab("actions")->selectBox(
-		-name		=> 'groupExpiresOffset',
-		-label		=> $i18n->get('group expires offset'),
-		-hoverHelp	=> $i18n->get('group expires offset description'),
-		-value		=> $session->form->process("groupExpiresOffset") || $product->{groupExpiresOffset},
-		-options	=> \%groupExpiresOffsetOptions,
-		-defaultValue	=> '1000year',
-	);
-	
+
+       $f->getTab("actions")->group(
+               -name           => 'groupId',
+               -label          => $i18n->get('group id'),
+               -hoverHelp      => $i18n->get('group id description'),
+               -value          => $session->form->process("groupId") || $product->{groupId},
+       );
+
+       my %groupExpiresOffsetOptions;
+       tie %groupExpiresOffsetOptions, 'Tie::IxHash',
+               '1month'        => $i18n->get("1 month"),
+               '6month'        => $i18n->get("6 months"),
+               '1year'         => $i18n->get("1 year"),
+               '2year'         => $i18n->get("2 years"),
+               '3year'         => $i18n->get("3 years"),
+               '5year'         => $i18n->get("5 years"),
+               '10year'        => $i18n->get("10 years"),
+               '1000year'      => $i18n->get("lifetime"),
+               ;
+
+       $f->getTab("actions")->selectBox(
+               -name           => 'groupExpiresOffset',
+               -label          => $i18n->get('group expires offset'),
+               -hoverHelp      => $i18n->get('group expires offset description'),
+               -value          => $session->form->process("groupExpiresOffset") || $product->{groupExpiresOffset},
+               -options        => \%groupExpiresOffsetOptions,
+               -defaultValue   => '1000year',
+       );
+
+
+
 	return _submenu($session,$f->print, 'edit product', 'edit product', 'ProductManager');
 }
 
@@ -278,14 +286,15 @@ sub www_editProductSave {
 		title		=> $session->form->process("title"),
 		description	=> $session->form->process("description"),
 		price		=> $session->form->process("price"),
+		useSalesTax	=> $session->form->process("useSalesTax"),
 		weight		=> $session->form->process("weight"),
 		sku		=> $session->form->process("sku"),
 		templateId	=> $session->form->process("templateId"),
 		skuTemplate	=> $session->form->process("skuTemplate"),
-		
-		groupId		=> $session->form->process('groupId'),
+
+		groupId         => $session->form->process('groupId'),
 		groupExpiresOffset => $session->form->process('groupExpiresOffset'),
-		
+
 	});
 	
 	return www_manageProduct($session, $product->get('productId'));
@@ -853,6 +862,10 @@ sub www_manageProduct {
 	$output .= "<h2>".$i18n->get('properties').$session->icon->edit('op=editProduct;productId='.$productId)."</h2>";
 	$output .= "<table>";
 	$output .= "<tr><td>".$i18n->get('price')."</td><td>".$product->get('price')."</td></tr>";
+	my $useSalesTax = $product->get('useSalesTax')
+			? $i18n->get(138, 'WebGUI')
+			: $i18n->get(139, 'WebGUI');
+	$output .= "<tr><td>".$i18n->get('useSalesTax')."</td><td>".$useSalesTax."</td></tr>";
 	$output .= "<tr><td>".$i18n->get('weight')."</td><td>".$product->get('weight')."</td></tr>";
 	$output .= "<tr><td>".$i18n->get('sku')."</td><td>".$product->get('sku')."</td></tr>";
 	$output .= "<tr><td>".$i18n->get('description')."</td><td>".$product->get('description')."</td></tr>";

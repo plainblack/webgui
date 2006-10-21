@@ -83,6 +83,12 @@ sub price {
 }
 
 #-------------------------------------------------------------------
+sub useSalesTax {
+	my $self = shift;
+	return $self->{_subscription}->get('useSalesTax') ? 1 : 0;
+}
+
+#-------------------------------------------------------------------
 sub type {
 	return 'Subscription';
 }

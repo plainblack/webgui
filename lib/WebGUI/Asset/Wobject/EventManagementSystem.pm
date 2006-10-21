@@ -1596,7 +1596,7 @@ sub www_editEvent {
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 
 	my $event = $self->session->db->quickHashRef("
-		select p.productId, p.title, p.description, p.price, p.weight, p.sku, p.templateId, p.skuTemplate, e.prerequisiteId, e.passType, e.passId,
+		select p.productId, p.title, p.description, p.price, p.useSalesTax, p.weight, p.sku, p.templateId, p.skuTemplate, e.prerequisiteId, e.passType, e.passId,
 		       e.startDate, e.endDate, e.maximumAttendees, e.approved
 		from
 		       products as p, EventManagementSystem_products as e
@@ -1661,6 +1661,13 @@ sub www_editEvent {
 		-label => $i18n->get('add/edit event image'),
 		-value => $storageId
 	 );
+
+	$f->yesNo(
+		-name  => "useSalesTax",
+		-value => $self->session->form->get("useSalesTax") || $event->{useSalesTax},
+		-hoverHelp => $i18n->get('add/edit useSalesTax description'),		
+		-label => $i18n->get('add/edit useSalesTax')
+	);
 
 	$f->float(
 		-name  => "price",
@@ -1893,6 +1900,7 @@ sub www_editEventSave {
 		title		=> $self->session->form->get("title", "text"),
 		description	=> $self->session->form->get("description", "HTMLArea"),
 		price		=> $self->session->form->get("price", "float"),
+		useSalesTax	=> $self->session->form->get("useSalesTax", "yesNo"),
 		weight		=> $self->session->form->get("weight", "float"),
 		sku		=> $self->session->form->get("sku", "text"),
 		skuTemplate	=> $self->session->form->get("skuTemplate", "text"),

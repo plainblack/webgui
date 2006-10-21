@@ -338,6 +338,12 @@ sub www_editSubscription {
 		-hoverHelp	=> $i18n->get('subscription price description'),
 		-value	=> $properties->{price} || '0.00'
 		);
+	$f->yesNo(
+		-name	=> 'useSalesTax',
+		-label	=> $i18n->get('useSalesTax'),
+		-hoverHelp	=> $i18n->get('useSalesTax description'),
+		-value	=> $properties->{useSalesTax} || 0,
+		);
 	$f->textarea(
 		-name	=> 'description',
 		-label	=> $i18n->get('subscription description'),
@@ -393,7 +399,7 @@ sub www_editSubscriptionSave {
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
 	my $properties = {};
-	@relevantFields = qw(subscriptionId name price description subscriptionGroup duration executeOnSubscription karma);
+	@relevantFields = qw(subscriptionId name useSalesTax price description subscriptionGroup duration executeOnSubscription karma);
 	foreach (@relevantFields) {
 		$properties->{$_} = $session->form->process($_) if (defined $session->form->process($_));
 	}

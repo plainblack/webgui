@@ -279,6 +279,16 @@ left of it. Use the delete button to remove it.<br />
                 lastUpdated => 1120449422,
         },
 
+        'useSalesTax' => {
+                message => q|Use Sales Tax?|,
+                lastUpdated => 1159844899,
+        },
+
+        'useSalesTax description' => {
+                message => q|Should this product have sales tax applied to it?|,
+                lastUpdated => 1159844899,
+        },
+
         'weight description' => {
                 message => q|The default weight of the product.|,
                 lastUpdated => 1120449422,

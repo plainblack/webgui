@@ -50,6 +50,11 @@ our $HELP = {
                                 description => 'shipping plugin label description',
                                 namespace => 'Commerce',
                         },
+                        {
+                                title => 'enable sales tax',
+                                description => 'enable sales tax description',
+                                namespace => 'Commerce',
+                        },
 		],
 		related => [
 		]
@@ -107,6 +112,9 @@ our $HELP = {
 		                               'name' => 'name'
 		                             },
 		                             {
+		                               'name' => 'salesTax'
+		                             },
+		                             {
 		                               'name' => 'price'
 		                             },
 		                             {
@@ -122,7 +130,13 @@ our $HELP = {
 		          },
 		          {
 		            'name' => 'form'
-		          }
+		          },
+		          {
+		            'name' => 'salesTaxRate'
+		          },
+		          {
+		            'name' => 'totalSalesTax'
+		          },
 		],
 		related => [
 			{

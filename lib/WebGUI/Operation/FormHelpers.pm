@@ -17,6 +17,7 @@ use WebGUI::Asset::Wobject::Folder;
 use WebGUI::Form::Group;
 use WebGUI::HTMLForm;
 use WebGUI::Storage::Image;
+use WebGUI::Utility;
 
 =head1 NAME
 
@@ -479,6 +480,109 @@ sub www_richEditAddImageSave {
 	$session->http->setRedirect($url.'?op=richEditImageTree');
 	return "";
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_setupSalesTaxForm ( $session )
+
+Create the AJAX form for displaying, adding and deleting sales tax information.
+
+=cut
+
+sub www_salesTaxTable {
+	my $session = shift;
+
+	my $returnTableOnly = 0;
+
+	if ($session->form->process('addDelete') eq 'add') {
+		my $state = $session->form->process('addStateId', 'selectBox');
+		my $taxRate = $session->form->process('taxRate', 'float');
+		my $commerceSalesTaxId = $session->id->generate();
+		if ( $state and $taxRate ) {
+			$session->db->write('insert into commerceSalesTax (commerceSalesTaxId,regionIdentifier,salesTax) VALUES (?,?,?)', [$commerceSalesTaxId, $state, $taxRate]);
+		}
+		$returnTableOnly = 1;
+	}
+	elsif ($session->form->process('addDelete') eq 'delete') {
+		my $commerceSalesTaxId = $session->form->process('entryId');
+		$session->db->write('delete from commerceSalesTax where commerceSalesTaxId=?',[$commerceSalesTaxId]);
+		$returnTableOnly = 1;
+	}
+
+	my $existingData = $session->db->buildArrayRefOfHashRefs('select * from commerceSalesTax order by regionIdentifier');
+
+	##To build the form, we need two pieces
+
+	##1: The table contains all information from the database
+	my @existingStates = map { $_->{regionIdentifier} } @{ $existingData };
+	my %existingStates = map { $_ => 1 } @existingStates;
+
+	##2: The list contains all states except for those in the table;
+	my $stateObj = Locale::US->new();
+	my @stateNames = $stateObj->all_state_names;
+	my @newStates = sort grep {! exists $existingStates{$_} } @stateNames;
+
+	my %orderedStates;
+	tie %orderedStates, 'Tie::IxHash';
+	my $i18n = WebGUI::International->new($session);
+	%orderedStates = map { $_ => $_ } 'Select State', @newStates;
+	$orderedStates{'Select State'} = $i18n->get('Select State');
+
+	my $statesField = WebGUI::Form::selectBox($session,
+		-name    => 'stateChooser',
+		-options => \%orderedStates,
+		-default => 'Select State',
+	);
+
+	$session->errorHandler->warn($statesField);
+
+	my $taxField = WebGUI::Form::float($session,
+		-name => 'taxRate',
+		-value => '',
+		-size => 6,
+	);
+	my $addButton = WebGUI::Form::button($session,
+		-name=>"addTaxInfo",
+		-value=>"Add Tax Information",
+		-extras=>q!align="right" onclick="addState()"!,
+	);
+
+	##build the table to display all existing sales tax
+
+	my $tableRows = '';
+	my $deleteIcon = $session->config->get('extrasURL').'/toolbar/bullet/delete.gif';
+	foreach my $sRow ( @{$existingData} ) {
+		$tableRows .= sprintf <<EOTR, $deleteIcon, $sRow->{commerceSalesTaxId}, $sRow->{regionIdentifier}, $sRow->{salesTax};
+<tr>
+<td class="cell"><img style="cursor:pointer;" src="%s" onclick="deleteState(event,'%s')"></td>
+<td class="cell"><span>%s</span></td>
+<td class="cell"><span>%6.4f%%</span></td>
+</tr>
+EOTR
+	}
+	my $stateForm = sprintf <<EOSF, $taxField, $statesField, $addButton;
+<table id="salesTaxEntryTable">
+<tbody>
+<tr>
+<td class="cell">%s&nbsp;%% tax for</td>
+<td class="cell">%s</td>
+<td class="cell">%s</td>
+</tr>
+</tbody>
+</table>
+EOSF
+
+my $stateTable = sprintf <<EOST, $tableRows;
+<table id="salesTaxDataTable" border="1" cellpadding="3">
+<tbody>
+%s
+</tbody>
+</table>
+EOST
+	$stateTable = '' unless $tableRows;
+	return $stateForm.$stateTable;
+}
+
 
 
 1;

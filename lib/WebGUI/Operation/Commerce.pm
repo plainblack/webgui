@@ -15,7 +15,10 @@ use WebGUI::International;
 use WebGUI::Asset::Template;
 use WebGUI::Paginator;
 use WebGUI::Form;
+use WebGUI::Utility;
 use Storable;
+use Locale::US;
+use Tie::IxHash;
 
 
 #-------------------------------------------------------------------
@@ -144,6 +147,30 @@ sub _shippingSelected {
 
 #-------------------------------------------------------------------
 
+=head2 _validateState ( $state )
+
+A utility method to tell if $state is a valid US state for determining
+sales tax.  Returns either the name of a US state in ALL CAPS or '' if
+it isn't a valid US state.
+
+=cut
+
+sub _validateState {
+	my $state = shift;
+	$state = uc($state);
+	my $stateObj = Locale::US->new;
+	if (exists $stateObj->{code2state}->{$state}) {
+		##An abbreviation was used, translate back to state name
+		$state = $stateObj->{code2state}->{$state};
+	}
+	##Next, we validate the state.  If it isn't a valid US state, null out
+	##the state field so we don't do sales tax.
+	$state = '' unless exists $stateObj->{state2code}->{$state};
+	return $state;
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_addToCart ( $session )
 
 Adds the requested item to the user's shopping cart and creates a cart if necessary.
@@ -252,10 +279,23 @@ sub www_checkoutConfirm {
 
 	$var{errorLoop} = [ map {{message => $_}} @{$errors} ] if $errors;
 
+	my $enableSalesTax = $var{useSalesTax} = $session->setting->get('commerceEnableSalesTax');
+	my $salesTaxRate = 0;
+	my $state = $session->form->process('state') || $session->user->profileField('homeState');
+	$state = _validateState($state);
+	if ($state and $enableSalesTax) {
+		($salesTaxRate) = $session->db->quickArray("select salesTax from commerceSalesTax where regionIdentifier=?",[$state]);
+	}
+	$var{salesTaxRate} = sprintf "%6.4f%%", $salesTaxRate;
+	$salesTaxRate /= 100; ##convert from percent to float
+
 	# Put contents of cart in template vars
 	$shoppingCart = WebGUI::Commerce::ShoppingCart->new($session);
-	($normal, $recurring) = $shoppingCart->getItems;
+	($normal, $recurring) = $shoppingCart->getItems($salesTaxRate);
 	my @copyOfNormal = @$normal;
+	my $totalSalesTax = 0;
+	##Note, if the special casing in the normal loop can be pushed back into the item,
+	##then the loops can be combined and collapsed.
 	foreach (@$normal) {
 		my $amount;
 		$_->{deleteIcon} = $session->icon->delete('op=deleteCartItem;itemId='.$_->{item}->id.';itemType='.$_->{item}->type);
@@ -268,9 +308,17 @@ sub www_checkoutConfirm {
 		# use the item plugin's lineItem method for price override
 		# situations.	
 		$amount = ($priceLineItem ne "") ? ($priceLineItem) : ($_->{totalPrice});
+		if ($priceLineItem ne "") {  ##There was a discount, fix the amount and tax
+			$amount = $priceLineItem;
+			$_->{salesTax} = sprintf "%.2f", $priceLineItem * $salesTaxRate * $_->{item}->useSalesTax;
+		}
+		else {
+			$amount = $_->{totalPrice};
+		}
 		$_->{item}->{price} = $amount;
 		$total += $amount;	       # tracks discount
 		$subTotal += $_->{totalPrice}; # ignores discount (we need this to show them an accurate subtotal and to calculate the discount given.)
+		$totalSalesTax += $_->{salesTax};
 	}
 	foreach (@$recurring) {
 		$_->{deleteIcon} = $session->icon->delete('op=deleteCartItem;itemId='.$_->{item}->id.';itemType='.$_->{item}->type);
@@ -280,6 +328,7 @@ sub www_checkoutConfirm {
 			size	=> 3,
 		});
 		$total += $_->{totalPrice};
+		$totalSalesTax += $_->{salesTax};
 	}
 	
 	$var{normalItemsLoop} = $normal;
@@ -288,13 +337,14 @@ sub www_checkoutConfirm {
 	$var{recurringItems} = scalar(@$recurring);
 
 	$var{subTotal} = sprintf('%.2f', $subTotal);
+	$var{totalSalesTax} = sprintf('%.2f', $totalSalesTax);
 
 	$shipping = WebGUI::Commerce::Shipping->load($session, $session->scratch->get('shippingMethod'));
 	$shipping->setOptions(Storable::thaw($session->scratch->get('shippingOptions'))) if ($session->scratch->get('shippingOptions'));
 	$var{shippingName} = $shipping->name;
 	$var{shippingCost} = sprintf('%.2f', $shipping->calc);
 
-	$var{total} = sprintf('%.2f', $total + $shipping->calc);
+	$var{total} = sprintf('%.2f', $total + $shipping->calc + $totalSalesTax);
 	
 	$var{discountsApplied} = sprintf('%.2f', $total - $subTotal - $shipping->calc);
 	$var{'discountsApplied.label'} = $i18n->echo("Discount Applied");
@@ -315,11 +365,11 @@ sub www_checkoutConfirm {
 	$var{'changePayment.label'} = $i18n->get('change payment gateway');
 	
 	my $plugins = WebGUI::Commerce::Shipping->getEnabledPlugins($session);
-    if (scalar(@$plugins) > 1) {
-       $var{'changeShipping.url'} = $session->url->page('op=selectShippingMethod');
-       $var{'changeShipping.label'} = $i18n->get('change shipping method');
-       $var{'hasMultipleShipping'} = "true";
-    }
+	if (scalar(@$plugins) > 1) {
+		$var{'changeShipping.url'} = $session->url->page('op=selectShippingMethod');
+		$var{'changeShipping.label'} = $i18n->get('change shipping method');
+		$var{'hasMultipleShipping'} = "true";
+	}
 	
 	$var{'viewShoppingCart.url'} = $session->url->page('op=viewCart');
 	$var{'viewShoppingCart.label'} = $i18n->get('view shopping cart');
@@ -366,7 +416,15 @@ sub www_checkoutSubmit {
 	# Load payment plugin.
 	$plugin = WebGUI::Commerce::Payment->load($session, $session->scratch->get('paymentGateway'));
 	$shoppingCart = WebGUI::Commerce::ShoppingCart->new($session);
-	($normal, $recurring) = $shoppingCart->getItems;
+	my $enableSalesTax = $session->setting->get('commerceEnableSalesTax');
+	my $state = $session->form->process('state') || $session->user->profileField('homeState');
+	$state = _validateState($state);
+	my $salesTaxRate = 0;
+	if ($state and $enableSalesTax) {
+		($salesTaxRate) = $session->db->quickArray("select salesTax from commerceSalesTax where regionIdentifier=?",[$state]);
+	}
+	$salesTaxRate /= 100; ##convert from percent to float
+	($normal, $recurring) = $shoppingCart->getItems($salesTaxRate);
 	my @copyOfNormal = @$normal;
 	# Check if shoppingcart contains any items. If not the user probably clicked reload, so we redirect to the current page.
 	unless (@$normal || @$recurring) {
@@ -396,17 +454,19 @@ sub www_checkoutSubmit {
 		# Write transaction to the log with status pending
 		$transaction = WebGUI::Commerce::Transaction->new($session, 'new');
 		
+		my $salesTaxTotal = 0;
 		foreach (@{$currentPurchase->{items}}) {
 			my $priceLineItem = ($_->{item}->{priceLineItem}) ? ($_->{item}->priceLineItem($_->{quantity},\@copyOfNormal)) : undef;  # pass in the quantity and the normal items in the cart.
-			#$session->errorHandler->warn("Price Line Item: $priceLineItem");
 			$transaction->addItem($_->{item}, $_->{quantity},$priceLineItem);
 			# use the item plugin's lineItem method for price override
 			# situations.	
-			$amount += ($priceLineItem ne "")
-				?($priceLineItem)
-				:($_->{item}->price * $_->{quantity});
+                        $amount += ($priceLineItem ne "")? $priceLineItem : 
+                                ($_->{item}->price * $_->{quantity});
 			$var->{purchaseDescription} .= $_->{quantity}.' x '.$_->{item}->name.'<br />';
+                        $salesTaxTotal += $_->{salesTax};
 		}
+                # Oy, the kludge.
+                $transaction->addItem(WebGUI::Commerce::Item::Fake->new($session, $salesTaxTotal.',Sales Tax'));
 		$transaction->shippingCost($shippingCost);
 		$transaction->shippingMethod($shipping->namespace);
 		$transaction->shippingOptions($shipping->getOptions);
@@ -579,6 +639,7 @@ sub www_editCommerceSettings {
        		general=>{label=>$i18n->get('general tab')},
 		payment=>{label=>$i18n->get('payment tab')},
 		shipping=>{label=>$i18n->get('shipping tab')},
+		salesTax=>{label=>$i18n->get('salesTax tab')},
         );
 
 	$paymentPlugin = $session->config->get("paymentPlugins")->[0];
@@ -645,6 +706,18 @@ sub www_editCommerceSettings {
 		-value		=> $session->setting->get("commerceSendDailyReportTo")
 		);
 
+	$tabform->getTab('salesTax')->yesNo(
+		-name		=> 'commerceEnableSalesTax',
+		-label		=> $i18n->get('enable sales tax'),
+		-hoverHelp	=> $i18n->get('enable sales tax description'),
+		-value		=> $session->setting->get("commerceEnableSalesTax") || 0,
+		);
+	$tabform->getTab('salesTax')->raw('<tr><td colspan="2">');
+	$session->style->setScript($session->url->extras('/js/at/AjaxRequest.js'), {type=>"text/javascript"});
+	$session->style->setScript($session->url->extras('/operations/salesTaxAjax.js'), {type=>"text/javascript"});
+	my $stateForm = WebGUI::Operation::FormHelpers::www_salesTaxTable($session);
+	$tabform->getTab('salesTax')->raw('<div id="salesTaxFormDiv">'.$stateForm.'</div>');
+	$tabform->getTab('salesTax')->raw('</td></tr>');
 	# Check which payment plugins will compile, and load them.
 	foreach (@{$session->config->get("paymentPlugins")}) {
 		$plugin = WebGUI::Commerce::Payment->load($session, $_);
@@ -742,7 +815,12 @@ sub www_editCommerceSettingsSave {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
-	foreach ($session->form->param) {
+	PARAM: foreach ($session->form->param) {
+
+		##Sales tax form parameters will also be in this list, but they
+		##should NOT be handled here.  We'll skip them.
+		next PARAM if isIn($_, qw/stateChooser taxRate addTaxInfo/);
+
 		# Store the plugin configuration data in a special table for security and the general settings in the
 		# normal settings table for easy access.
 		if (/~([^~]*)~([^~]*)~([^~]*)/) {

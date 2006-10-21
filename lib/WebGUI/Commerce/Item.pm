@@ -230,6 +230,20 @@ sub type {
 
 #-------------------------------------------------------------------
 
+=head2 useSalesTax ( )
+
+This method should return whether or not the item uses sales tax.
+This must be implemented by an item plugin.
+
+=cut
+
+sub useSalesTax {
+	my $self = shift;
+	return $self->session->errorHandler->fatalError('The useSalesTax method of WebGUI::Commerce::Item must be overridden.');
+}
+
+#-------------------------------------------------------------------
+
 =head2 weight ( )
 
 Returns the weight of the item. If your item has a weight, you'll want to overload this method. Weight is calculated on a unit based scale.

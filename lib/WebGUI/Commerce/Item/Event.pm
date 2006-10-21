@@ -88,7 +88,7 @@ sub new {
 	$session = shift;
 	$eventId = shift;
 
-	my $eventData = $session->db->quickHashRef("select p.productId, p.title, p.description, p.price, p.sku, e.approved, e.passId, e.passType
+	my $eventData = $session->db->quickHashRef("select p.productId, p.title, p.description, p.price, p.useSalesTax, p.sku, e.approved, e.passId, e.passType
                    from EventManagementSystem_products as e, products as p
 		   where p.productId = e.productId and p.productId=".$session->db->quote($eventId)); 	
 	
@@ -181,6 +181,12 @@ sub session {
 #-------------------------------------------------------------------
 sub type {
 	return 'Event';
+}
+
+#-------------------------------------------------------------------
+sub useSalesTax {
+	my $self = shift;
+	return $self->{_event}->{useSalesTax} ? 1 : 0;
 }
 
 #-------------------------------------------------------------------

@@ -187,6 +187,16 @@ our $I18N = { ##hashref of hashes
 		lastUpdated => 1138312761,
 	},
 
+        'add/edit useSalesTax' => {
+                message => q|Use Sales Tax?|,
+                lastUpdated => 1160109884,
+        },
+
+        'add/edit useSalesTax description' => {
+                message => q|Should this event have sales tax applied to it?|,
+                lastUpdated => 1160109886,
+        },
+
 	'add/edit event maximum attendees' => {
 		message => q|Maximum Attendees|,
 		lastUpdated => 1138312761,

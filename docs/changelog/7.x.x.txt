@@ -1,5 +1,6 @@
 7.2.0
  - Added server side spellchecker (Martin Kamerbeek / Procolix)
+ - Added configurable sales tax. (Tiffany Patterson / Elite Marketing)
  - change: made Text::Aspell optional, nullifying spellchecker if not present
 
 7.1.2

@@ -118,6 +118,16 @@ our $I18N = {
                 lastUpdated => 1120861450,
         },
 
+        'useSalesTax' => {
+                message => q|Use Sales Tax?|,
+                lastUpdated => 1159845025,
+        },
+
+        'useSalesTax description' => {
+                message => q|Should this subscription have sales tax applied to it?|,
+                lastUpdated => 1159845045,
+        },
+
         'subscription description description' => {
                 message => q|<p>Detailed description of the subscription.</p>|,
                 lastUpdated => 1120861450,

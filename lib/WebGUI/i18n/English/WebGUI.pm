@@ -4007,11 +4007,16 @@ Get a copy of wget and use this: <code>wget -p -r --html-extension -k http://the
 		message => q|Country|,
 		lastUpdated => 0,
 	},
-	
+
 	'noldaplink' => {
-	    message => q|No LDAP Connection|,
+		message => q|No LDAP Connection|,
 		lastUpdated => 0,
-	}
+	},
+
+	'Select State' => {
+		message => q|Select State|,
+		lastUpdated => 1161388472,
+	},
 
 };
 

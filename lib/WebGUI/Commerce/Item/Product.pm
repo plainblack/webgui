@@ -44,35 +44,36 @@ sub description {
 
 #-------------------------------------------------------------------
 sub handler {
-	my $self	= shift;
-	
-	### Add to group action
-	# If group is 'everyone', skip
-	unless ($self->{_product}->get('groupId') eq '7') {
-		my $g = WebGUI::Group->new($self->session,$self->{_product}->get('groupId'));
-		my $expiresOffset;
-		
-		# Parse the value
-		if ($self->{_product}->get('groupExpiresOffset') =~ /^(\d+)month/i) {
-			$expiresOffset = $1 * 3600*24*30;	# One month
-		} elsif ($self->{_product}->get('groupExpiresOffset') =~ /^(\d+)year/i) {
-			$expiresOffset = $1 * 3600*24*365;	# One year
-		}
-		
-		# Multiply by how many quantity we're purchasing
-		#!!! TODO !!! - handlers don't know how many we're purchasing
-		
-		# If user has time left
-		my $remains	= $g->userGroupExpireDate($self->session->user->userId);
-		if ($remains) {
-			# Add any remaining time to the offset
-			$expiresOffset += $remains - time();
-		}
-		
-		# Add user to group
-		$g->addUsers([$self->session->user->userId],$expiresOffset);
-	}
+       my $self        = shift;
+
+       ### Add to group action
+       # If group is 'everyone', skip
+       unless ($self->{_product}->get('groupId') eq '7') {
+               my $g = WebGUI::Group->new($self->session,$self->{_product}->get('groupId'));
+               my $expiresOffset;
+
+               # Parse the value
+               if ($self->{_product}->get('groupExpiresOffset') =~ /^(\d+)month/i) {
+                       $expiresOffset = $1 * 3600*24*30;       # One month
+               } elsif ($self->{_product}->get('groupExpiresOffset') =~ /^(\d+)year/i) {
+                       $expiresOffset = $1 * 3600*24*365;      # One year
+               }
+
+               # Multiply by how many quantity we're purchasing
+               #!!! TODO !!! - handlers don't know how many we're purchasing
+
+               # If user has time left
+               my $remains     = $g->userGroupExpireDate($self->session->user->userId);
+               if ($remains) {
+                       # Add any remaining time to the offset
+                       $expiresOffset += $remains - time();
+               }
+
+               # Add user to group
+               $g->addUsers([$self->session->user->userId],$expiresOffset);
+       }
 }
+
 
 #-------------------------------------------------------------------
 sub id {
@@ -119,6 +120,12 @@ sub needsShipping {
 #-------------------------------------------------------------------
 sub price {
 	return $_[0]->{_variant}->{price};
+}
+
+#-------------------------------------------------------------------
+sub useSalesTax {
+	my $self = shift;
+	return $self->{_product}->get('useSalesTax') ? 1 : 0;
 }
 
 #-------------------------------------------------------------------

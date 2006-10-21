@@ -332,10 +332,6 @@ our $I18N = {
 		context => q|The body of the help page of the list pending transactions screen.|
 	},
 
-
-
-
-	
 	'help cancel checkout template title' => {
 		message => q|Cancel checkout template|,
 		lastUpdated => 0,
@@ -370,28 +366,43 @@ our $I18N = {
 	},
 
 	'quantity' => {
-		message => q|	The quantity of the current item in the shopping cart.<br />|,
-		lastUpdated => 1149221320,
+		message => q|The quantity of the current item in the shopping cart.<br />|,
+		lastUpdated => 1161319738,
 	},
 
 	'period' => {
-		message => q|	The period of the recurring payment.<br />|,
-		lastUpdated => 1149221320,
+		message => q|The period of the recurring payment.<br />|,
+		lastUpdated => 1161319740,
 	},
 
 	'name' => {
-		message => q|	The name of this item.<br />|,
-		lastUpdated => 1149221320,
+		message => q|The name of this item.<br />|,
+		lastUpdated => 1161319741,
 	},
 
 	'price' => {
-		message => q|	The price of one item.<br />|,
-		lastUpdated => 1149221320,
+		message => q|The price of one item.<br />|,
+		lastUpdated => 1161319747,
 	},
 
 	'totalPrice' => {
-		message => q|	The price of the quantity of this item. (totalPrice = quantity * price)|,
-		lastUpdated => 1149221320,
+		message => q|The price of the quantity of this item. (totalPrice = quantity * price)|,
+		lastUpdated => 1161319749,
+	},
+
+	'salesTax' => {
+		message => q|The amount of sales tax for this item.|,
+		lastUpdated => 1161319799,
+	},
+
+	'salesTaxRate' => {
+		message => q|The sales tax rate, as determined by the user's homeState in their profile.|,
+		lastUpdated => 1161319799,
+	},
+
+	'totalSalesTax' => {
+		message => q|The sum of all sales taxes applied to eligible items.|,
+		lastUpdated => 1161319799,
 	},
 
 	'recurringItems' => {
@@ -400,8 +411,8 @@ our $I18N = {
 	},
 
 	'recurringItemLoop' => {
-		message => q|A loop containing the recurring items in the shopping cart. For available template variables seen <p><b>normalItemLoop</b>|,
-		lastUpdated => 1149221320,
+		message => q|A loop containing the recurring items in the shopping cart. For available template variables see <p><b>normalItemLoop</b>|,
+		lastUpdated => 1161320125,
 	},
 
 	'form' => {
@@ -437,23 +448,23 @@ our $I18N = {
 	},
 
 	'purchaseDescription' => {
-		message => q|	The description of this transaction.<br />|,
-		lastUpdated => 1149221449,
+		message => q|The description of this transaction.<br />|,
+		lastUpdated => 1161319762,
 	},
 
 	'status' => {
-		message => q|	The status of this item.<br />|,
-		lastUpdated => 1149221449,
+		message => q|The status of this item.<br />|,
+		lastUpdated => 1161319763,
 	},
 
 	'error' => {
-		message => q|	The error text returned from the payment plugin.<br />|,
-		lastUpdated => 1149221449,
+		message => q|The error text returned from the payment plugin.<br />|,
+		lastUpdated => 1161319765,
 	},
 
 	'errorCode' => {
-		message => q|	The error code returned from the payment plugin.<br />|,
-		lastUpdated => 1149221449,
+		message => q|The error code returned from the payment plugin.<br />|,
+		lastUpdated => 1161319767,
 	},
 
 
@@ -568,6 +579,24 @@ our $I18N = {
 		message => q|Shipping|,
 		lastUpdated => 0,
 		context => q|The label of the SHipping tab in the commerce settings manager.|
+	},
+
+	'salesTax tab' => {
+		message => q|SalesTax|,
+		lastUpdated => 1159845482,
+		context => q|The label of the sales tax tab in the commerce settings manager.|
+	},
+
+	'enable sales tax' => {
+		message => q|Enable Sales Tax?|,
+		lastUpdated => 1160189717,
+		context => q|The label field in the commerce setting for enabling sales tax.|
+	},
+
+	'enable sales tax description' => {
+		message => q|Set this to "Yes" if you would like Sales Tax enabled in the Commerce System.  Sales Tax will be applied to any product, subscription or EMS event that has it enabled.|,
+		lastUpdated => 1160189808,
+		context => q|The label field in the commerce setting for enabling sales tax.|
 	},
 
 	'shipping plugin label' => {

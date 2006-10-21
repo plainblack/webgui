@@ -137,6 +137,7 @@ sub getOperations {
 		'richEditImageTree' => 'WebGUI::Operation::FormHelpers',
 		'richEditPageTree' => 'WebGUI::Operation::FormHelpers',
 		'richEditViewThumbnail' => 'WebGUI::Operation::FormHelpers',
+		'salesTaxTable' => 'WebGUI::Operation::FormHelpers',
 
 		'addGroupsToGroupSave' => 'WebGUI::Operation::Group',
 		'addUsersToGroupSave' => 'WebGUI::Operation::Group',
