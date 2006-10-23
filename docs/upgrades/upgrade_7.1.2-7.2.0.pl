@@ -22,6 +22,7 @@ my $session = start(); # this line required
 
 commerceSalesTax($session);
 createDictionaryStorage($session);
+fixAssetVersionTag($session);
 
 finish($session); # this line required
 
@@ -57,6 +58,16 @@ sub createDictionaryStorage {
 	mkdir $dictionaryDirectory.'/oldIds' unless (-e $dictionaryDirectory.'/oldIds');
 }
 
+
+#-------------------------------------------------
+sub fixAssetVersionTag {
+	my $session = shift;
+	print "\tFixing assetVersionTag database table.\n" unless ($quiet);
+	
+	$session->db->write("alter table assetVersionTag alter lockedBy set default ''");
+	$session->db->write("alter table assetVersionTag alter groupToUse set default ''");
+	$session->db->write("alter table assetVersionTag alter workflowId set default ''");
+}
 
 
 # ---- DO NOT EDIT BELOW THIS LINE ----

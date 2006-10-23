@@ -1152,9 +1152,9 @@ CREATE TABLE `assetVersionTag` (
   `commitDate` bigint(20) NOT NULL default '0',
   `committedBy` varchar(22) binary NOT NULL default '',
   `isLocked` int(11) NOT NULL default '0',
-  `lockedBy` varchar(22) binary NOT NULL,
-  `groupToUse` varchar(22) binary NOT NULL,
-  `workflowId` varchar(22) binary NOT NULL,
+  `lockedBy` varchar(22) binary NOT NULL default '',
+  `groupToUse` varchar(22) binary NOT NULL default '',
+  `workflowId` varchar(22) binary NOT NULL default '',
   `workflowInstanceId` varchar(22) binary default NULL,
   `comments` text,
   PRIMARY KEY  (`tagId`)
