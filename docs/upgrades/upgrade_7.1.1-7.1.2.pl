@@ -21,6 +21,8 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+fixAssetVersionTag($session);
+
 
 finish($session); # this line required
 
@@ -31,6 +33,16 @@ finish($session); # this line required
 #	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
 #	# and here's our code
 #}
+
+#-------------------------------------------------
+sub fixAssetVersionTag {
+	my $session = shift;
+	print "\tFixing assetVersionTag database table.\n" unless ($quiet);
+	
+	$session->db->write("alter table assetVersionTag alter lockedBy set default ''");
+	$session->db->write("alter table assetVersionTag alter groupToUse set default ''");
+	$session->db->write("alter table assetVersionTag alter workflowId set default ''");
+}
 
 
 

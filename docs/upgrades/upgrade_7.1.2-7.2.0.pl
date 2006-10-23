@@ -59,17 +59,6 @@ sub createDictionaryStorage {
 }
 
 
-#-------------------------------------------------
-sub fixAssetVersionTag {
-	my $session = shift;
-	print "\tFixing assetVersionTag database table.\n" unless ($quiet);
-	
-	$session->db->write("alter table assetVersionTag alter lockedBy set default ''");
-	$session->db->write("alter table assetVersionTag alter groupToUse set default ''");
-	$session->db->write("alter table assetVersionTag alter workflowId set default ''");
-}
-
-
 # ---- DO NOT EDIT BELOW THIS LINE ----
 
 #-------------------------------------------------
