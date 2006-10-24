@@ -318,6 +318,7 @@
         "AdminBar" : "AdminBar", 
         "AdminText" : "AdminText", 
         "AdminToggle" : "AdminToggle", 
+	"AdSpace" : "AdSpace",
         "AssetProxy" : "AssetProxy", 
         "CanEditText" : "CanEditText", 
         "D" : "D_date", 
