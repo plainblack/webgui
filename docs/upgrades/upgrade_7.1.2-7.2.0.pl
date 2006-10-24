@@ -22,7 +22,6 @@ my $session = start(); # this line required
 
 commerceSalesTax($session);
 createDictionaryStorage($session);
-fixAssetVersionTag($session);
 
 finish($session); # this line required
 
