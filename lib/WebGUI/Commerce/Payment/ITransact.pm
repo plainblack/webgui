@@ -65,6 +65,7 @@ sub cancelRecurringPayment {
 		    
 		# Set up a user agent that uses cookies and allows POST redirects
 		$userAgent = LWP::UserAgent->new;
+		$userAgent->env_proxy;
 		$userAgent->agent("Mozilla/5.0 (Windows; U; Windows NT 5.0; en-US; rv:1.7.5) Gecko/20041107 Firefox/1.0");
 		push @{ $userAgent->requests_redirectable }, 'POST';
 		$userAgent->cookie_jar({});
@@ -541,6 +542,7 @@ my	$xmlTransactionScript = 'https://secure.paymentclearing.com/cgi-bin/rc/xmltra
 
 	# Set up LWP to post the XML to iTransact.
 my	$userAgent = LWP::UserAgent->new;
+	$userAgent->env_proxy;
 	$userAgent->agent("WebGUI ");
 
 my	$request = HTTP::Request->new(POST => $xmlTransactionScript);

@@ -296,6 +296,7 @@ sub _get_rss_data {
                 $rss = Storable::thaw($rss_serial);
         } else {
                 my $ua = LWP::UserAgent->new(timeout => 5);
+		$ua->env_proxy;
                 my $response = $ua->get($url);
                 if (!$response->is_success()) {
                         $session->errorHandler->warn("Error retrieving url '$url': " . 

@@ -215,6 +215,7 @@ sub setByHTTP {
 	my $url = shift;
 	my $ttl = shift;
         my $userAgent = new LWP::UserAgent;
+	$userAgent->env_proxy;
         $userAgent->agent("WebGUI/".$WebGUI::VERSION);
         $userAgent->timeout(30);
         my $header = new HTTP::Headers;

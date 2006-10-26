@@ -3,6 +3,7 @@
  - Added configurable sales tax. (Tiffany Patterson / Elite Marketing)
  - change: made Text::Aspell optional, nullifying spellchecker if not present
  - Fixed a bug where logging in/out would cause a blank page display.
+ - change: made all LWP user agents use env_proxy
 
 7.1.2
  - Fixed a bug that caused workflows to fail if collaboration systems and

@@ -90,6 +90,7 @@ sub _getLocationData {
 	unless ($locData->{cityState}) {
 		my $oldagent;
 		my $ua = LWP::UserAgent->new;
+		$ua->env_proxy;
 		$ua->timeout(10);
 		$oldagent = $ua->agent();
 		$ua->agent($self->session->env->get("HTTP_USER_AGENT")); # Act as a proxy.
