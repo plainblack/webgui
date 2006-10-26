@@ -103,6 +103,7 @@ is ($duplicateFilename, undef, 'purge method deletes collateral');
 # Lets make sure the view method returns something.
 # This is not a very good test but I need to do it to test the purgeCache method anyways =)
 
+$article->prepareView;
 my $output = $article->view;
 isnt ($output, "", 'view method returns something');
 
@@ -112,6 +113,7 @@ is ($output, $cachedOutput, 'view method caches output');
 
 # Lets see if the purgeCache method works
 $article->purgeCache;
+$cachedOutput = WebGUI::Cache->new($session, 'view_'.$article->getId)->get;  # Check cache post purge
 isnt ($output, $cachedOutput, 'purgeCache method deletes cache');
 
 
@@ -127,6 +129,6 @@ TODO: {
 
 END {
 	# Clean up after thy self
-	#$versionTag->rollback($versionTag->getId);
+	$versionTag->rollback($versionTag->getId);
 }
 
