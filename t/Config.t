@@ -13,7 +13,7 @@ use strict;
 use lib "$FindBin::Bin/lib";
 
 use WebGUI::Test;
-use Test::More tests => 13; # increment this value for each test you create
+use Test::More tests => 14; # increment this value for each test you create
 
 my $config     = WebGUI::Test->config;
 my $configFile = WebGUI::Test->file;
@@ -56,4 +56,29 @@ if ($cookieName eq "") {
 	is($config->getCookieName,"wgSession", "getCookieName()");
 } else {
 	is($config->getCookieName,$cookieName, "getCookieName()");
+}
+
+{
+	my $ok = 1;
+
+	foreach my $assetClass (@{$config->get('assets')}, @{$config->get('assetContainers')},
+				@{$config->get('utilityAssets')}) {
+		unless ($assetClass =~ /\A(?:[A-Za-z0-9_]+::)*[A-Za-z0-9_]+\z/) {
+			diag "$assetClass is not a valid class name";
+			$ok = 0; next;
+		}
+
+		eval "require $assetClass";
+		if ($@) {
+			diag "$assetClass could not be loaded: $@";
+			$ok = 0; next;
+		}
+		
+		unless ($assetClass->isa('WebGUI::Asset')) {
+			diag "$assetClass is not a subclass of WebGUI::Asset";
+			$ok = 0; next;
+		}
+	}
+
+	ok($ok, "asset classes are all valid asset classes");
 }
