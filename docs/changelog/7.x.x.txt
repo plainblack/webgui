@@ -5,6 +5,10 @@
  - Fixed a bug where logging in/out would cause a blank page display.
  - change: made all LWP user agents use env_proxy
 
+7.1.3
+ - fix: SQLReport now returns error if can't find DatabaseLink
+ - WebGUI::DatabaseLink->new now warns if can't find requested DatabaseLink
+
 7.1.2
  - Fixed a bug that caused workflows to fail if collaboration systems and
     posts for that CS were in the same version tag at commit time.

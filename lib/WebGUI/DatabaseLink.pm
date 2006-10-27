@@ -219,9 +219,9 @@ is reserved for the WebGUI database.
 =cut
 
 sub new {
-    my ($class, $databaseLinkId, %databaseLink);
-    tie %databaseLink, 'Tie::CPHash';
-    $class = shift;
+	my ($class, $databaseLinkId, %databaseLink);
+	tie %databaseLink, 'Tie::CPHash';
+	$class = shift;
 	my $session = shift;
 	$databaseLinkId = shift;
 	unless ($databaseLinkId eq "") {
@@ -238,8 +238,13 @@ sub new {
 			%databaseLink = $session->db->quickHash("select * from databaseLink where databaseLinkId=".$session->db->quote($databaseLinkId));
 		}
 	}
-
-	return undef unless defined($databaseLink{databaseLinkId});
+	
+	unless (defined($databaseLink{databaseLinkId}))
+	{
+		$session->errorHandler->warn("Could not find database link '".$databaseLinkId."'");
+		return undef;
+	}
+	
 	bless {_session=>$session, _databaseLink => \%databaseLink }, $class;
 }
 
