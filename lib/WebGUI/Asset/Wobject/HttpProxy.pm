@@ -254,154 +254,163 @@ sub view {
 	my $self = shift;
 	my $cookiebox = $self->session->url->escape($self->session->var->get("sessionId"));
 	my $requestMethod = $self->session->env->get("REQUEST_METHOD");
-   	$cookiebox =~ s/[^A-Za-z0-9\-\.\_]//g;  #removes all funky characters
-   	$cookiebox .= '.cookie';
-   	my $jar = HTTP::Cookies->new(File => $self->getCookieJar->getPath($cookiebox), AutoSave => 1, Ignore_Discard => 1);
-   my (%var, %formdata, $redirect, $response, $header, $userAgent, $proxiedUrl, $request);
-
-   if($self->session->form->param("func")!~/editSave/i) {
-      $proxiedUrl = $self->session->form->process("FormAction") || $self->session->form->process("proxiedUrl") || $self->get("proxiedUrl") ;
-   } else {
-      $proxiedUrl = $self->get("proxiedUrl");
-	$requestMethod = "GET";
-   }
-
-   $redirect=0; 
-
-   return $self->processTemplate({},$self->get("templateId")) unless ($proxiedUrl ne "");
-   
-   my $cachedContent = WebGUI::Cache->new($self->session,$proxiedUrl,"URL");
-   my $cachedHeader = WebGUI::Cache->new($self->session,$proxiedUrl,"HEADER");
-   $var{header} = $cachedHeader->get;
-   $var{content} = $cachedContent->get;
-   unless ($var{content} && $requestMethod=~/GET/i) {
-      $redirect=0; 
-      until($redirect == 5) { # We follow max 5 redirects to prevent bouncing/flapping
-      $userAgent = new LWP::UserAgent;
-      $userAgent->agent($self->session->env->get("HTTP_USER_AGENT"));
-      $userAgent->timeout($self->get("timeout"));
-      $userAgent->env_proxy;
-
-      $proxiedUrl = URI->new($proxiedUrl);
-
-      #my $allowed_url = URI->new($self->get('proxiedUrl'))->abs;;
-
-      #if ($self->get("followExternal")==0 && $proxiedUrl !~ /\Q$allowed_url/i) {
-      if ($self->get("followExternal")==0 && 
-          (URI->new($self->get('proxiedUrl'))->host) ne (URI->new($proxiedUrl)->host) ) {
-	$var{header} = "text/html";
-         return "<h1>You are not allowed to leave ".$self->get("proxiedUrl")."</h1>";
-      }
-
-      $header = new HTTP::Headers;
-	$header->referer($self->get("proxiedUrl")); # To get around referrer blocking
-
-      if($requestMethod=~/GET/i || $redirect != 0) {  # request_method is also GET after a redirection. Just to make sure we're
-                               						# not posting the same data over and over again.
-         if($redirect == 0) {
-            foreach my $input_name ($self->session->form->param) {
-               next if ($input_name !~ /^HttpProxy_/); # Skip non proxied form var's
-               $input_name =~ s/^HttpProxy_//;
-               $proxiedUrl=$self->appendToUrl($proxiedUrl,"$input_name=".$self->session->form->process('HttpProxy_'.$input_name));
-            }
-         }
-         $request = HTTP::Request->new(GET => $proxiedUrl, $header) || return "wrong url"; # Create GET request
-      } else { # It's a POST
-
-         my $contentType = 'application/x-www-form-urlencoded'; # default Content Type header
-
-         # Create a %formdata hash to pass key/value pairs to the POST request
-         foreach my $input_name ($self->session->request->param) {
-		 $input_name =~ s/^HttpProxy_// or next;
-   
-		 my (@upload) = grep{defined} $self->session->request->upload('HttpProxy_'.$input_name);
-		 if (@upload) { # Found uploaded file
-			 my $upload = $upload[0];
-			 $formdata{$input_name}=[$upload->tempname, $self->session->form->process('HttpProxy_'.$input_name)];
-			 $contentType = 'form-data'; # Different Content Type header for file upload
-		 } else {
-			 $formdata{$input_name}=$self->session->form->process('HttpProxy_'.$input_name);
-		 }
-         }
-         # Create POST request
-         $request = HTTP::Request::Common::POST($proxiedUrl, \%formdata, Content_Type => $contentType);
-      }
-      $jar->add_cookie_header($request);
-  
-       
-      $response = $userAgent->simple_request($request);
-   
-      $jar->extract_cookies($response);
-   
-      if ($response->is_redirect) { # redirected by http header
-         $proxiedUrl = URI::URL::url($response->header("Location"))->abs($proxiedUrl);;
-         $redirect++;
-      } elsif ($response->content_type eq "text/html" && $response->content =~ 
-                     /<meta[^>]+refresh[^>]+content[^>]*url=([^\s'"<>]+)/gis) {
-         # redirection through meta refresh
-         my $refreshUrl = $1;
-         if($refreshUrl=~ /^http/gis) { #Refresh value is absolute
-   	 $proxiedUrl=$refreshUrl;
-         } else { # Refresh value is relative
-   	 $proxiedUrl =~ s/[^\/\\]*$//; #chop off everything after / in $proxiedURl
-            $proxiedUrl .= URI::URL::url($refreshUrl)->rel($proxiedUrl); # add relative path
-         }
-         $redirect++;
-      } else { 
-         $redirect = 5; #No redirection found. Leave loop.
-      }
-      $redirect=5 if (not $self->get("followRedirect")); # No redirection. Overruled by setting
-   }
-   
-   if($response->is_success) {
-      $var{content} = $response->content;
-      $var{header} = $response->content_type; 
-      if($response->content_type eq "text/html" || 
-        ($response->content_type eq "" && $var{content}=~/<html/gis)) {
- 
-        $var{"search.for"} = $self->getValue("searchFor");
-        $var{"stop.at"} = $self->getValue("stopAt");
-	if ($var{"search.for"}) {
-		$var{content} =~ /^(.*?)\Q$var{"search.for"}\E(.*)$/gis;
-		$var{"content.leading"} = $1 || $var{content};
-		$var{content} = $2;
+	$cookiebox =~ s/[^A-Za-z0-9\-\.\_]//g;  #removes all funky characters
+	$cookiebox .= '.cookie';
+	my $jar = HTTP::Cookies->new(File => $self->getCookieJar->getPath($cookiebox), AutoSave => 1, Ignore_Discard => 1);
+	my (%var, %formdata, $redirect, $response, $header, $userAgent, $proxiedUrl, $request);
+	
+	if($self->session->form->param("func")!~/editSave/i) {
+		$proxiedUrl = $self->session->form->process("FormAction") || $self->session->form->process("proxiedUrl") || $self->get("proxiedUrl") ;
+	} else {
+		$proxiedUrl = $self->get("proxiedUrl");
+		$requestMethod = "GET";
 	}
-	if ($var{"stop.at"}) {
-		$var{content} =~ /(.*?)\Q$var{"stop.at"}\E(.*)$/gis;
-		$var{content} = $1 || $var{content};
-		$var{"content.trailing"} = $2;
+	
+	$redirect=0; 
+	
+	return $self->processTemplate({},$self->get("templateId")) unless ($proxiedUrl ne "");
+	
+	my $cachedContent = WebGUI::Cache->new($self->session,$proxiedUrl,"URL");
+	my $cachedHeader = WebGUI::Cache->new($self->session,$proxiedUrl,"HEADER");
+	$var{header} = $cachedHeader->get;
+	$var{content} = $cachedContent->get;
+	unless ($var{content} && $requestMethod=~/GET/i) {
+		$redirect=0; 
+		until($redirect == 5) { # We follow max 5 redirects to prevent bouncing/flapping
+		$userAgent = new LWP::UserAgent;
+		$userAgent->agent($self->session->env->get("HTTP_USER_AGENT"));
+		$userAgent->timeout($self->get("timeout"));
+		$userAgent->env_proxy;
+		
+		$proxiedUrl = URI->new($proxiedUrl);
+		
+		#my $allowed_url = URI->new($self->get('proxiedUrl'))->abs;;
+		
+		#if ($self->get("followExternal")==0 && $proxiedUrl !~ /\Q$allowed_url/i) {
+		if ($self->get("followExternal")==0 && 
+				(URI->new($self->get('proxiedUrl'))->host) ne (URI->new($proxiedUrl)->host) ) {
+			$var{header} = "text/html";
+			return "<h1>You are not allowed to leave ".$self->get("proxiedUrl")."</h1>";
+		}
+	
+		$header = new HTTP::Headers;
+		$header->referer($self->get("proxiedUrl")); # To get around referrer blocking
+		
+		if($requestMethod=~/GET/i || $redirect != 0) {  
+					# request_method is also GET after a redirection. Just to make sure we're
+					# not posting the same data over and over again.
+			if($redirect == 0) {
+				my $params	= $self->session->form->paramsHashRef();
+				for my $key (keys %{$params}) {
+					next unless ($key =~ s/^HttpProxy_//); # Skip non-proxied params
+					if (ref $params->{$key} eq "ARRAY") {
+						# Param value is an array reference
+						# Add all values to URL
+						for my $value (@{$params->{$key}}) {
+							$proxiedUrl = $self->appendToUrl($proxiedUrl,"$key=$value");
+						}
+					} else {
+						$proxiedUrl = $self->appendToUrl($proxiedUrl,"$key=".$self->session->form->process('HttpProxy_'.$key));
+					}
+				}
+			}
+			$request = HTTP::Request->new(GET => $proxiedUrl, $header) || return "wrong url"; # Create GET request
+		} else { # It's a POST
+	
+			my $contentType = 'application/x-www-form-urlencoded'; # default Content Type header
+			
+			# Create a %formdata hash to pass key/value pairs to the POST request
+			foreach my $input_name ($self->session->request->param) {
+				$input_name =~ s/^HttpProxy_// or next;
+				
+				my (@upload) = grep{defined} $self->session->request->upload('HttpProxy_'.$input_name);
+				if (@upload) { # Found uploaded file
+					my $upload = $upload[0];
+					$formdata{$input_name}=[$upload->tempname, $self->session->form->process('HttpProxy_'.$input_name)];
+					$contentType = 'form-data'; # Different Content Type header for file upload
+				} else {
+					$formdata{$input_name}=[($self->session->form->process('HttpProxy_'.$input_name))];
+				}
+			}
+			# Create POST request
+			$request = HTTP::Request::Common::POST($proxiedUrl, \%formdata, Content_Type => $contentType);
+		}
+		$jar->add_cookie_header($request);
+		
+		
+		$response = $userAgent->simple_request($request);
+		
+		$jar->extract_cookies($response);
+		
+		if ($response->is_redirect) { # redirected by http header
+			$proxiedUrl = URI::URL::url($response->header("Location"))->abs($proxiedUrl);;
+			$redirect++;
+		} elsif ($response->content_type eq "text/html" 
+			&& $response->content =~ /<meta[^>]+refresh[^>]+content[^>]*url=([^\s'"<>]+)/gis) {
+			# redirection through meta refresh
+			my $refreshUrl = $1;
+			if($refreshUrl=~ /^http/gis) { #Refresh value is absolute
+				$proxiedUrl=$refreshUrl;
+			} else { # Refresh value is relative
+				$proxiedUrl =~ s/[^\/\\]*$//; #chop off everything after / in $proxiedURl
+				$proxiedUrl .= URI::URL::url($refreshUrl)->rel($proxiedUrl); # add relative path
+			}
+			$redirect++;
+		} else { 
+			$redirect = 5; #No redirection found. Leave loop.
+		}
+		$redirect=5 if (not $self->get("followRedirect")); # No redirection. Overruled by setting
 	}
-	 my $p = WebGUI::Asset::Wobject::HttpProxy::Parse->new($self->session, $proxiedUrl, $var{content}, $self->getId,$self->get("rewriteUrls"),$self->getUrl);
-	 $var{content} = $p->filter; # Rewrite content. (let forms/links return to us).
-	 $p->DESTROY;
-   
-         if ($var{content} =~ /<frame/gis) {
-		$var{header} = "text/html";
-            $var{content} = "<h1>HttpProxy: Can't display frames</h1>
-                        Try fetching it directly <a href='$proxiedUrl'>here.</a>";
-         } else {
-            $var{content} =~ s/\<style.*?\/style\>//isg if ($self->get("removeStyle"));
-            $var{content} = WebGUI::HTML::cleanSegment($var{content});
-            $var{content} = WebGUI::HTML::filter($var{content}, $self->get("filterHtml"));
-         }
-      }
-   } else { # Fetching page failed...
-	$var{header} = "text/html";
-      $var{content} = "<b>Getting <a href='$proxiedUrl'>$proxiedUrl</a> failed</b>".
-   	      "<p><i>GET status line: ".$response->status_line."</i>";
-   }
-	unless ($self->get("cacheTimeout") <= 10) {
-	   $cachedContent->set($var{content},$self->get("cacheTimeout"));
-	   $cachedHeader->set($var{header},$self->get("cacheTimeout"));
-	  }
-   }
-
-   if($var{header} ne "text/html") {
-	$self->session->http->setMimeType($var{header});
-	return $var{content};
-   } else {
-   	return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-   }
+	
+	if($response->is_success) {
+		$var{content} = $response->content;
+		$var{header} = $response->content_type; 
+		if($response->content_type eq "text/html"
+		    || ($response->content_type eq "" && $var{content}=~/<html/gis)) {
+			
+			$var{"search.for"} = $self->getValue("searchFor");
+			$var{"stop.at"} = $self->getValue("stopAt");
+			if ($var{"search.for"}) {
+				$var{content} =~ /^(.*?)\Q$var{"search.for"}\E(.*)$/gis;
+				$var{"content.leading"} = $1 || $var{content};
+				$var{content} = $2;
+			}
+			if ($var{"stop.at"}) {
+				$var{content} =~ /(.*?)\Q$var{"stop.at"}\E(.*)$/gis;
+				$var{content} = $1 || $var{content};
+				$var{"content.trailing"} = $2;
+			}
+			my $p = WebGUI::Asset::Wobject::HttpProxy::Parse->new($self->session, $proxiedUrl, $var{content}, $self->getId,$self->get("rewriteUrls"),$self->getUrl);
+			$var{content} = $p->filter; # Rewrite content. (let forms/links return to us).
+			$p->DESTROY;
+	
+			if ($var{content} =~ /<frame/gis) {
+				$var{header} = "text/html";
+				$var{content} = "<h1>HttpProxy: Can't display frames</h1>
+				Try fetching it directly <a href='$proxiedUrl'>here.</a>";
+			} else {
+				$var{content} =~ s/\<style.*?\/style\>//isg if ($self->get("removeStyle"));
+				$var{content} = WebGUI::HTML::cleanSegment($var{content});
+				$var{content} = WebGUI::HTML::filter($var{content}, $self->get("filterHtml"));
+			}
+		}
+		} else { # Fetching page failed...
+			$var{header} = "text/html";
+			$var{content} = "<b>Getting <a href='$proxiedUrl'>$proxiedUrl</a> failed</b>".
+				"<p><i>GET status line: ".$response->status_line."</i>";
+		}
+		unless ($self->get("cacheTimeout") <= 10) {
+			$cachedContent->set($var{content},$self->get("cacheTimeout"));
+			$cachedHeader->set($var{header},$self->get("cacheTimeout"));
+		}
+	}
+	
+	if($var{header} ne "text/html") {
+		$self->session->http->setMimeType($var{header});
+		return $var{content};
+	} else {
+		return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
+	}
 }
 
 
