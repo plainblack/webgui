@@ -37,6 +37,7 @@ This package allows the manipulation of HTTP protocol information.
  $mimetype = $http->getMimeType();
  $code = $http->getStatus();
  ($code, $description) = $http->getStatus();
+ $description = $http->getStatusDescription();
  $boolean = $http->isRedirect();
  
  $http->setCookie($name,$value);
@@ -99,7 +100,7 @@ Returns the current mime type of the document to be returned.
 
 sub getMimeType {
 	my $self = shift;
-	return $self->{_http}{mimetype} || "text/html";
+	return $self->{_http}{mimetype} || "text/html; charset=UTF-8";
 }
 
 #-------------------------------------------------------------------

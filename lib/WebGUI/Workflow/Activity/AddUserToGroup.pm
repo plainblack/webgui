@@ -21,7 +21,7 @@ use WebGUI::International;
 
 =head1 NAME
 
-Package WebGUI::Workflow::Activity::RunCommandAsUser
+Package WebGUI::Workflow::Activity::AddUserToGroup;
 
 =head1 DESCRIPTION
 
