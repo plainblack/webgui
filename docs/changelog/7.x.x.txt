@@ -9,6 +9,10 @@
  - fix: SQLReport now returns error if can't find DatabaseLink
  - WebGUI::DatabaseLink->new now warns if can't find requested DatabaseLink
  - fix: Wrong template variable name in default Matrix View template
+ - Tried to clean up some HttpProxy code. Still very ugly. (need rewrite?)
+ - fix: HttpProxy would not put correct values for multiple query params with 
+    same name.
+ 
 
 7.1.2
  - Fixed a bug that caused workflows to fail if collaboration systems and
