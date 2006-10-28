@@ -4,6 +4,8 @@
  - change: made Text::Aspell optional, nullifying spellchecker if not present
  - Fixed a bug where logging in/out would cause a blank page display.
  - change: made all LWP user agents use env_proxy
+ - Help: If a Help Chapter only has 1 page, then in the TOC view it links
+   right to the page instead of the Chapter.
 
 7.1.3
  - fix: SQLReport now returns error if can't find DatabaseLink

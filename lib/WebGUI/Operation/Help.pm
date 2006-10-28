@@ -244,13 +244,9 @@ sub _related {
 
 #-------------------------------------------------------------------
 
-=head2 _columnar ( $session, $columns, $list )
+=head2 _columnar ( $columns, $list )
 
 Utility routine for taking a list of data and returning it multiple columns.
-
-=head3 $session
-
-The session object.
 
 =head3 $columns
 
@@ -263,15 +259,14 @@ A scalar ref to the array of data that will be broken into columns.
 =cut
 
 sub _columnar {
-	my ($session, $columns, $list) = @_;
+	my ($columns, $list) = @_;
 	my @entries = @{ $list };
 	my $fraction = round(@entries/$columns + 0.50);
 	my $output = '<tr><td valign="top">';
-	@entries = sort { $a->[0] cmp $b->[0] } @entries;
+	@entries = sort { $a->{name} cmp $b->{name} } @entries;
 	my $i = 0;
 	foreach my $helpEntry (@entries) {
-		my ($helpName, $helpFile) = @{ $helpEntry };
-                $output .= '<p><a href="'._linkTOC($session,$helpFile).'">'.$helpName."</a></p>\n";
+                $output .= '<p><a href="'.$helpEntry->{link}.'">'.$helpEntry->{name}."</a></p>\n";
                 $i++;
                 if ($i % $fraction == 0) {
                         $output .= '</td><td valign="top">';
@@ -445,21 +440,36 @@ sub www_viewHelpTOC {
 	my @files = _getHelpFilesList($session,);
 	my %entries;
 	foreach my $fileSet (@files) {
-		my $file = $fileSet->[1];
+		my $moduleName = $fileSet->[1];
 		##This whole sorting routine sucks and should be replaced
-		my $tab = lc substr $file, 0, 5;
-		if (exists $tabs{$tab} or $tab eq "wobje" or $tab eq "workf") {
-			push @{ $entries{$tab} } , [_getHelpName($session,$file), $file];
+		my $tab = lc substr $moduleName, 0, 5;
+		unless (exists $tabs{$tab} or $tab eq "wobje" or $tab eq "workf") {
+			$tab = 'other';
+		}
+		my $helpTopic = _loadHelp($session, "WebGUI::Help::".$moduleName);
+		my @helpEntries = keys %{ $helpTopic };
+		my $link;
+		$session->errorHandler->warn("MOD: ". $moduleName. " ".scalar(@helpEntries));
+		$session->errorHandler->warn("MOD: ". $moduleName);
+		if (scalar @helpEntries > 1) {
+			##Chapter
+			$link = _linkTOC($session, $moduleName);
 		}
 		else {
-			push @{ $entries{'other'} }, [_getHelpName($session,$file), $file];
+			##Single page
+			$link = _link($session, $helpEntries[0], $moduleName);
 		}
+		push @{ $entries{$tab} } ,
+			{
+				link => $link,
+				name => _getHelpName($session,$moduleName),
+			};
 	}
 
 	my $tabForm = WebGUI::TabForm->new($session, \%tabs);
 	foreach my $tab ( keys %tabs ) {
 		my $tabPut = '<table width="100%" class="content"><tr><td valign="top">';
-		$tabPut .= _columnar($session, 3, $entries{$tab});
+		$tabPut .= _columnar(3, $entries{$tab});
 		$tabPut .= '</table>';
 		$tabForm->getTab($tab)->raw($tabPut);
 	}
