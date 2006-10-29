@@ -6,6 +6,12 @@
  - change: made all LWP user agents use env_proxy
  - Help: If a Help Chapter only has 1 page, then in the TOC view it links
    right to the page instead of the Chapter.
+ - fix: HTML::Template::Expr templates would not handle template variables
+   with dots in them.  Added a fix to the template plugin so that dots are
+   translated to underscores automatically in submitted template variables.
+   Templates will still need to be manually updated.
+ - Help: Added pluggable docs for template plugins, and added a new tab
+   to the Help that lists template parser docs.
 
 7.1.3
  - fix: SQLReport now returns error if can't find DatabaseLink

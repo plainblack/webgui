@@ -439,6 +439,36 @@ be on the right side of the page.</p>
 		lastUpdated => 1146456174,
 	},
 
+	'plugin name' => {
+		message => q|Parser Name|,
+		lastUpdated => 1162087997,
+	},
+
+	'plugin enabled header' => {
+		message => q|Enabled?|,
+		lastUpdated => 1162088018,
+	},
+
+	'template parsers' => {
+		message => q|Template Parsers|,
+		lastUpdated => 1162088018,
+	},
+
+	'default parser' => {
+		message => q|Default Parser|,
+		lastUpdated => 1162088018,
+	},
+
+	'template parsers list title' => {
+		message => q|List of Template Parsers|,
+		lastUpdated => 1162088018,
+	},
+
+	'template parsers list body' => {
+		message => q|<p>The following template parsers are installed on your site and may be enabled for use.</p>|,
+		lastUpdated => 1162088018,
+	},
+
 };
 
 1;

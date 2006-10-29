@@ -16,6 +16,7 @@ our $I18N = { ##hashref of hashes
 	#If the help file documents an Asset, it must include an assetName key
 	#If the help file documents an Macro, it must include an macroName key
 	#If the help file documents a Workflow Activity, it must include an activityName key
+	#If the help file documents a Template Parser, it must include an templateParserName key
 	#For all other types, use topicName
 	'assetName' => {
 		message => q|My Asset|,

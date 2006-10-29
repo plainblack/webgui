@@ -22,7 +22,7 @@ our $HELP = {
 			my $session = shift;
 			my $dir = join '/', $session->config->getWebguiRoot,"lib","WebGUI","Macro";
 			opendir (DIR,$dir) or $session->errorHandler->fatal("Can't open Macro directory: $dir!");
-			my @macros = map { s/Macro_//; s/\.pm//; $_; }
+			my @macros = map { s/\.pm//; $_; }
 				     grep { /\.pm$/ }
 				     readdir(DIR);  ##list of namespaces
 			closedir(DIR);

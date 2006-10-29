@@ -211,6 +211,9 @@ sub _getHelpName {
 	elsif ($file =~ /^Workflow_Activity_/) {
 		$helpName = 'activityName';
 	}
+	elsif ($file =~ /^Template_/) {
+		$helpName = 'templateParserName';
+	}
 	else {
 		$helpName = 'topicName';
 	}
@@ -435,6 +438,10 @@ sub www_viewHelpTOC {
 			label => $i18n->get('topicName', 'Workflow'),
 			uiLevel => 1,
 		},
+        	templ => {
+			label => $i18n->get('template parsers', 'Asset_Template'),
+			uiLevel => 1,
+		},
 	);
 
 	my @files = _getHelpFilesList($session,);
@@ -449,8 +456,6 @@ sub www_viewHelpTOC {
 		my $helpTopic = _loadHelp($session, "WebGUI::Help::".$moduleName);
 		my @helpEntries = keys %{ $helpTopic };
 		my $link;
-		$session->errorHandler->warn("MOD: ". $moduleName. " ".scalar(@helpEntries));
-		$session->errorHandler->warn("MOD: ". $moduleName);
 		if (scalar @helpEntries > 1) {
 			##Chapter
 			$link = _linkTOC($session, $moduleName);

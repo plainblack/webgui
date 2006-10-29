@@ -20,6 +20,25 @@ use HTML::Template::Expr;
 
 
 #-------------------------------------------------------------------
+sub _rewriteVars { # replace dots with underscrores in keys (except in keys that aren't usable as variables (URLs etc.))
+	my $vars = shift;
+	foreach my $key (keys %$vars){
+		my $newKey = $key;
+		$newKey =~ s/\./_/g if $newKey !~ /\//; 
+		if(ref $vars->{$key} eq 'HASH'){
+			$vars->{$newKey} = _rewriteVars($vars->{$key});
+			delete $vars->{$key} if($key ne $newKey);			
+		}else{
+			if($key ne $newKey){
+				$vars->{$newKey} = $vars->{$key};
+				delete $vars->{$key};
+			}
+		}		
+	}
+	return $vars;
+}
+
+#-------------------------------------------------------------------
 
 =head2 getName ( )
 
@@ -62,7 +81,7 @@ sub process {
                 strict=>0);
         };
         unless ($@) {
-                $t->param(%{$vars});
+                $t->param(%{_rewriteVars($vars)});
                 return $t->output;
         } else {
                 $class->session->errorHandler->error("Error in template. ".$@);
