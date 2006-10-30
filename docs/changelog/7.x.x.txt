@@ -24,6 +24,8 @@
  - Tried to clean up some HttpProxy code. Still very ugly. (need rewrite?)
  - fix: HttpProxy would not put correct values for multiple query params with 
     same name.
+ - fix: metadata (WebGUI Help).  Removed mention of the RawHeadTags macro
+   from the Metadata help.
  
 
 7.1.2
