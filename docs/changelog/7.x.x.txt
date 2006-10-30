@@ -12,6 +12,10 @@
    Templates will still need to be manually updated.
  - Help: Added pluggable docs for template plugins, and added a new tab
    to the Help that lists template parser docs.
+ - Added accessors to Session/Http.pm to make testing easier.
+ - Test: Added t/lib/WebGUI/PseudoRequest, which is a mostly functional
+   Apache::Request object replacement.  It doesn't do everything, but it
+   does enough to test Session/Http.pm, except for cookies.
 
 7.1.3
  - fix: SQLReport now returns error if can't find DatabaseLink

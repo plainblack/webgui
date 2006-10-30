@@ -69,6 +69,19 @@ sub DESTROY {
 
 #-------------------------------------------------------------------
 
+=head2 getCacheControl  ( ) 
+
+Returns the cache control setting from this object.
+
+=cut
+
+sub getCacheControl {
+	my $self = shift;
+	return $self->{_http}{cacheControl};
+}
+
+#-------------------------------------------------------------------
+
 =head2 getCookies ( )
 
 Retrieves the cookies from the HTTP header and returns a hash reference containing them.
@@ -92,6 +105,19 @@ sub getCookies {
 
 #-------------------------------------------------------------------
 
+=head2 getLastModified ( ) 
+
+Returns the stored epoch date when the page as last modified.
+
+=cut
+
+sub getLastModified {
+	my $self = shift;
+	return $self->{_http}{lastModified};
+}
+
+#-------------------------------------------------------------------
+
 =head2 getMimeType ( ) 
 
 Returns the current mime type of the document to be returned.
@@ -102,6 +128,33 @@ sub getMimeType {
 	my $self = shift;
 	return $self->{_http}{mimetype} || "text/html; charset=UTF-8";
 }
+
+#-------------------------------------------------------------------
+
+=head2 getNoHeader ( )
+
+Returns whether or not a HTTP header will be printed.
+
+=cut
+
+sub getNoHeader {
+	my $self = shift;
+        return $self->{_http}{noHeader};
+}
+
+#-------------------------------------------------------------------
+
+=head2 getRedirectLocation ( )
+
+Return the location that was set via setRedirect
+
+=cut
+
+sub getRedirectLocation {
+	my $self = shift;
+	return $self->{_http}{location};
+}
+
 
 #-------------------------------------------------------------------
 
@@ -200,15 +253,15 @@ sub sendHeader {
 	return undef unless $request;
 	my $userId = $self->session->var->get("userId");
 
-	$self->{_http}{noHeader} = 1;
+	$self->setNoHeader(1);
 	my %params;
 	if ($self->isRedirect()) {
-		$request->headers_out->set(Location => $self->{_http}{location});
+		$request->headers_out->set(Location => $self->getRedirectLocation);
 		$request->status(301);
 	} else {
-		$request->content_type($self->{_http}{mimetype} || "text/html; charset=UTF-8");
-		my $date = ($userId eq "1") ? $datetime->epochToHttp($self->{_http}{lastModified}) : $datetime->epochToHttp;
-		my $cacheControl = $self->{_http}{cacheControl};
+		$request->content_type($self->getMimeType || "text/html; charset=UTF-8");
+		my $cacheControl = $self->getCacheControl;
+		my $date = ($userId eq "1") ? $datetime->epochToHttp($self->getLastModified) : $datetime->epochToHttp;
 		$request->headers_out->set('Last-Modified' => $date);
 		if ($cacheControl eq "none" || $self->session->setting->get("preventProxyCache") || ($cacheControl eq "" && $userId ne "1")) {
 			$request->headers_out->set("Cache-Control" => "private");
@@ -222,8 +275,8 @@ sub sendHeader {
 			my $date = $datetime->epochToHttp(time() + $cacheControl);
     			$request->headers_out->set('Expires' => $date);
   		}
-		if ($self->{_http}{filename}) {
-                        $request->headers_out->set('Content-Disposition' => qq!attachment; filename="$self->{_http}{filename}"!);
+		if ($self->getFilename) {
+                        $request->headers_out->set('Content-Disposition' => qq!attachment; filename="!.$self->getFilename().'"');
 		}
 		$request->status($self->getStatus());
 		$request->status_line($self->getStatus().' '.$self->getStatusDescription());
@@ -349,7 +402,26 @@ sub setFilename {
 
 #-------------------------------------------------------------------
 
+=head2 getFilename ( )
+
+Returns the default filename for the document.
+
+=cut
+
+sub getFilename {
+	my $self = shift;
+	return $self->{_http}{filename};
+}
+
+
+
+#-------------------------------------------------------------------
+
 =head2 setLastModified ( epoch ) 
+
+=head3 epoch
+
+The epoch date when the page was last modified.
 
 =cut
 
