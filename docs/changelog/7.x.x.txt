@@ -25,6 +25,7 @@
     same name.
  - fix: metadata (WebGUI Help).  Removed mention of the RawHeadTags macro
    from the Metadata help.
+ - WebGUI::Session::Stow now warns if set() is called when cache is disabled
  
 
 7.1.2
