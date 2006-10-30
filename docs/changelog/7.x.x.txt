@@ -10,6 +10,7 @@
  - fix: metadata (WebGUI Help).  Removed mention of the RawHeadTags macro
    from the Metadata help.
  - fix: Config 
+ - fix: Article Shortcut Loses Style Information
 
 7.1.2
  - Fixed a bug where logging in/out would cause a blank page display.
