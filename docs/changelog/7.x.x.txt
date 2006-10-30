@@ -11,6 +11,7 @@
    from the Metadata help.
  - fix: Config 
  - fix: Article Shortcut Loses Style Information
+ - fix: Pagination loses search criteria
  - WebGUI::Session::Stow now warns if set() is called when cache is disabled
 
 7.1.2
