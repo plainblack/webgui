@@ -636,6 +636,7 @@ sub notifySubscribers {
 	my $thread = $self->getThread;
 	my $cs = $thread->getParent;
 	$cs->appendTemplateLabels($var);
+	$var->{relativeUrl} = $var->{url};
 	my $siteurl = $self->session->url->getSiteURL();
 	$var->{url} = $siteurl.$self->getUrl;
 	$var->{'notify.subscription.message'} = $i18n->get(875,"Asset_Post");

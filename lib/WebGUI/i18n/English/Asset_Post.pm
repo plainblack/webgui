@@ -6,6 +6,11 @@ our $I18N = {
                 lastUpdated => 1111253044,
         },
 
+	'relativeUrl' => {
+		message => q|Provides the URL of the post relative to the server (/path/to/post) rather than fully qualified (http://host/path/to/post), which is the default.|,
+		lastUpdated => 1149829706,
+	},
+
 	'form.header' => {
 		message => q|Code required to start the form for the Post.|,
 		lastUpdated => 1149829706,

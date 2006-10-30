@@ -337,7 +337,12 @@ our $HELP = {
 		            'description' => 'notify url'
 		          },
 		          {
-		            'name' => 'notification.subscription.message'
+		            'name' => 'relativeUrl',
+		            'description' => 'relativeUrl'
+		          },
+		          {
+		            'name' => 'notification.subscription.message',
+		            'description' => '875'
 		          }
 		],
 		related => [
