@@ -159,6 +159,16 @@ our $I18N = {
 		lastUpdated => 1149654653,
 	},
 
+	'section.add.url' => {
+		message => q|The URL to add a new section to the survey.|,
+		lastUpdated => 1149654653,
+	},
+
+	'section.add.label' => {
+		message => q|The default label for section.add.url.|,
+		lastUpdated => 1149654653,
+	},
+
 	'user.canTakeSurvey' => {
 		message => q|A boolean indicating whether the current user has the rights to take the survey.|,
 		lastUpdated => 1149654653,
