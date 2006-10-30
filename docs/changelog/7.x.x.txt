@@ -5,7 +5,9 @@
  - Tried to clean up some HttpProxy code. Still very ugly. (need rewrite?)
  - fix: HttpProxy would not put correct values for multiple query params with 
     same name.
-
+ - fix: metadata (WebGUI Help).  Removed mention of the RawHeadTags macro
+   from the Metadata help.
+ 
 7.1.2
  - Fixed a bug where logging in/out would cause a blank page display.
   - Fixed a bug that caused workflows to fail if collaboration systems and

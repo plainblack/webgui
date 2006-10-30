@@ -615,11 +615,11 @@ each asset under the tab &quot;Meta&quot; in the asset properties.</p>
     Metadata fields are exposed to the asset templates as their property name. So you can actually display the metadata
     to the rendered page using a template variable like &lt;tmpl_var <i>propertyname</i>&gt;</p></li>
    <li><p><b>Meta tags</b><br />
-    Since the meta data is exposed as template variables, you can use that in combination with the &#94;RawHeadTags();
-    macro to create meta tags from meta data, including the tags from the Dublin Core standard.</p></li>
+    Since the meta data is exposed as template variables, you can use them in the Head Block of Style templates
+    to create meta tags from meta data, including the tags from the Dublin Core standard.</p></li>
 </ul>|,
                 context => q|Metadata help|,
-                lastUpdated => 1110530955
+                lastUpdated => 1162233025
         },
 
 	'metadata edit property' => {
