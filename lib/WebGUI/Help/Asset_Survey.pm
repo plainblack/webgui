@@ -200,6 +200,12 @@ our $HELP = {
 		            'name' => 'question.add.label'
 		          },
 		          {
+		            'name' => 'section.add.url'
+		          },
+		          {
+		            'name' => 'section.add.label'
+		          },
+		          {
 		            'name' => 'user.canTakeSurvey'
 		          },
 		          {
