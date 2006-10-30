@@ -871,12 +871,23 @@ sub www_saveOverride {
 
 #-------------------------------------------------------------------
 sub www_view {
-	# Hrrrm.  Why doesn't the default www_view work here?
-	my $self = shift;
-	my $check = $self->checkView;
-	return $check if defined $check;
-	$self->prepareView;
-	return $self->view;
+        my $self = shift;
+        my $check = $self->checkView;
+        return $check if defined $check;
+        my $shortcut = $self->getShortcut;
+        $self->prepareView;
+        if ($shortcut->get("className") =~ m/Asset::Wobject/) {
+                $self->session->http->setLastModified($self->getContentLastModified);
+                $self->session->http->sendHeader;
+                $shortcut->prepareView;
+                my $style = $shortcut->processStyle("~~~");
+                my ($head, $foot) = split("~~~",$style);
+                $self->session->output->print($head, 1);
+                $self->session->output->print($self->view);
+                $self->session->output->print($foot, 1);
+                return "chunked";
+        }
+        return $shortcut->www_view;
 }
 
 1;

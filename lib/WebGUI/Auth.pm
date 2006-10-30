@@ -252,7 +252,7 @@ sub createAccountSave {
 			priority=>1
 			});
 	}
-	return "";
+	return undef;
 }
 
 #-------------------------------------------------------------------
