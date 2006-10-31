@@ -283,13 +283,14 @@ sub www_manageRevisions {
         my $output = sprintf '<table style="width: 100%;" class="content">
         <tr><th></th><th>%s</th><th>%s</th><th>%s</th></tr> ',
 	$i18n->get('revision date'), $i18n->get('revised by'), $i18n->get('tag name');
+	my $canEdit = $self->canEdit;
         my $sth = $self->session->db->read("select assetData.revisionDate, users.username, assetVersionTag.name,assetData.tagId from assetData
 		left join assetVersionTag on assetData.tagId=assetVersionTag.tagId left join users on assetData.revisedBy=users.userId
 		where assetData.assetId=".$self->session->db->quote($self->getId));
         while (my ($date,$by,$tag,$tagId) = $sth->array) {
-                $output .= '<tr><td>'
-			.$self->session->icon->delete("func=purgeRevision;revisionDate=".$date,$self->get("url"),$i18n->get("purge revision prompt"))
-			.$self->session->icon->view("func=view;revision=".$date)
+                $output .= '<tr><td>';
+		$output .= $self->session->icon->delete("func=purgeRevision;revisionDate=".$date,$self->get("url"),$i18n->get("purge revision prompt")) if ($canEdit);
+		$output .= $self->session->icon->view("func=view;revision=".$date)
 			.'</td>
 			<td>'.$self->session->datetime->epochToHuman($date).'</td>
 			<td>'.$by.'</td>

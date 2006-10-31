@@ -61,7 +61,7 @@ sub delete {
 	my $name = shift;
 	return undef unless ($name);
 	delete $self->{_data}{$name};
-	$self->session->db->write("delete from userSessionScratch where name=? and sessionId=?", [$name, $self->{_sessionId}]);
+	$self->session->db->write("delete from userSessionScratch where name=? and sessionId=?", [$name, $self->session->getId]);
 }
 
 
@@ -76,7 +76,7 @@ Deletes all scratch variables for this session.
 sub deleteAll {
 	my $self = shift;
 	delete $self->{_data};
-	$self->session->db->write("delete from userSessionScratch where sessionId=?", [$self->{_sessionId}]);
+	$self->session->db->write("delete from userSessionScratch where sessionId=?", [$self->session->getId]);
 }
 
 
@@ -175,7 +175,7 @@ sub new {
 	my $class = shift;
 	my $session = shift;
 	my $data = $session->db->buildHashRef("select name,value from userSessionScratch where sessionId=?",[$session->getId]);
-	bless {_session=>$session,_sessionId=>$session->getId, _data=>$data}, $class;
+	bless {_session=>$session, _data=>$data}, $class;
 }
 
 
@@ -215,7 +215,7 @@ sub set {
 	my $value = shift;
 	return undef unless ($name);
 	$self->{_data}{$name} = $value;
-	$self->session->db->write("insert into userSessionScratch (sessionId, name, value) values (?,?,?) on duplicate key update value=VALUES(value)", [$self->{_sessionId}, $name, $value]);
+	$self->session->db->write("insert into userSessionScratch (sessionId, name, value) values (?,?,?) on duplicate key update value=VALUES(value)", [$self->session->getId, $name, $value]);
 }
 
 

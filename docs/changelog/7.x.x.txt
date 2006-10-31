@@ -19,6 +19,9 @@
    (Martin Kamerbeek / Procolix)
  - Fixed a bug in the Poll where using graphs could result in errors. See 
    gotcha.txt for details. (Martin Kamerbeek / Procolix)
+ - fix: Group lookups via database link
+ - fix: Error before logging into WebGUI site
+ - fix: Unlock tag
 
 7.1.2
  - Fixed a bug where logging in/out would cause a blank page display.

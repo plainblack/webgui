@@ -588,15 +588,18 @@ sub getDatabaseUsers {
 			my $query = $self->get("dbQuery");
 			WebGUI::Macro::process($self->session,\$query);
 			my $sth = $dbh->unconditionalRead($query);
-			unless ($sth->errorCode < 1) {
-				$self->session->errorHandler->warn("There was a problem with the database query for group ID $gid.");
-			}
-			else {
-				while(my ($userId)=$sth->array) {
-					push @dbUsers, $userId;
+			if (defined $sth) {
+				unless ($sth->errorCode < 1) {
+					$self->session->errorHandler->warn("There was a problem with the database query for group ID $gid.");
+				} else {
+					while(my ($userId)=$sth->array) {
+						push @dbUsers, $userId;
+					}
 				}
+				$sth->finish;
+			} else {
+				$self->session->errorHandler->error("Couldn't process unconditional read for database group with group id $gid.");
 			}
-			$sth->finish;
 			$dbLink->disconnect;
                 }
         }
