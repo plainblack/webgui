@@ -82,7 +82,7 @@ sub _isValidLDAPUser {
             else { # or... use a releative distinguished name instead
                $connectDN = $search->entry(0)->get_value($connection->{ldapUserRDN});
             }
-            
+
             # Remember the users DN so we can use it later.
             $self->setConnectDN($connectDN);
             $ldap->unbind;
@@ -111,7 +111,7 @@ sub _isValidLDAPUser {
       }
       else { # Unable to bind with proxy user credentials or anonymously for our search
          $error = $i18n->get(2,'AuthLDAP');
-	 $self->session->errorHandler->error("Couldn't bind to LDAP server: ".$connection->{ldapURL});
+	 $self->session->errorHandler->error("Couldn't bind to LDAP server: ".$connection->{ldapUrl});
       }
    }
    else { # Could not create our LDAP object
@@ -264,7 +264,7 @@ sub createAccountSave {
    
    my $connection = $self->getLDAPConnection;
    #Get connectDN from settings   
-   my $uri = URI->new($connection->{ldapURL});
+   my $uri = URI->new($connection->{ldapUrl});
    my $ldap = Net::LDAP->new($uri->host, (port=>$uri->port));
    my $auth;
    if($connection->{connectDn}) {
@@ -298,7 +298,7 @@ sub createAccountSave {
    
    my $properties;
    $properties->{connectDN} = $connectDN;
-   $properties->{ldapUrl} = $connection->{ldapURL};
+   $properties->{ldapUrl} = $connection->{ldapUrl};
    
    return $self->SUPER::createAccountSave($username,$properties,$password,$profile);
 }
@@ -354,7 +354,7 @@ sub editUserForm {
    my $self = shift;
     my $userData = $self->getParams;
 	my $connection = $self->getLDAPConnection;
-    my $ldapUrl = $self->session->form->process('authLDAP_ldapUrl') || $userData->{ldapUrl} || $connection->{ldapURL};
+    my $ldapUrl = $self->session->form->process('authLDAP_ldapUrl') || $userData->{ldapUrl} || $connection->{ldapUrl};
 	my $connectDN = $self->session->form->process('authLDAP_connectDN') || $userData->{connectDN};
 	my $ldapConnection = $self->session->form->process('authLDAP_ldapConnection') || $userData->{ldapConnection};
 	my $ldapLinks = $self->session->db->buildHashRef("select ldapLinkId,ldapUrl from ldapLink");
@@ -497,7 +497,7 @@ sub login {
    if ($autoRegistration && !$hasAuthenticated) {
       # See if they are in LDAP and if so that they can bind with the password given.
       if($self->_isValidLDAPUser()) {
-         
+            
          # Create a WebGUI Account
          if ($self->validUsername($username)) {
             $self->SUPER::createAccountSave($username, {
