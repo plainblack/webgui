@@ -20,19 +20,31 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-# upgrade functions go here
+insertAutomaticLDAPRegistrationSetting($session);
+changeGraphConfigColumnType($session);
 
 finish($session); # this line required
 
 
-##-------------------------------------------------
-#sub exampleFunction {
-#	my $session = shift;
-#	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
-#	# and here's our code
-#}
+#-------------------------------------------------
+sub insertAutomaticLDAPRegistrationSetting {
+	my $session = shift;
+	print "\tAdding Automatic LDAP Registration setting to database.\n" unless ($quiet);
 
+	my ($hasSetting) = $session->db->quickArray('select name from settings where value=?', ['automaticLDAPRegistration']);
 
+	unless ($hasSetting) {
+		$session->db->write('insert into settings (name, value) values (?,?)', ['automaticLDAPRegistration', 0]);
+	}
+}
+
+#-------------------------------------------------
+sub changeGraphConfigColumnType {
+	my $session = shift;
+	print "\tFixing the the charts in the Poll asset (PLEASE SEE NOTES IN docs/gotcha.txt).\n" unless ($quiet);
+
+	$session->db->write('alter table Poll change column graphConfiguration graphConfiguration blob');
+}
 
 # ---- DO NOT EDIT BELOW THIS LINE ----
 

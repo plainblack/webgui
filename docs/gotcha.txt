@@ -15,7 +15,15 @@ save you many hours of grief.
    users to use in the config file. Also you'll have to check the 
    spellchecker checkbox in the RichEdit asset you're using.
 	
-
+7.1.3
+--------------------------------------------------------------------
+ * The column that stores the graph configuration in the Poll table 
+   has the wrong type. In MySQL 5 this results in corrpution of this 
+   hash. The upgrade script will fix the column type, but not the 
+   corrupted graph configs. Polls with an erroneous configuration
+   will diplay the old text based graphs. To fix the Polls, just edit
+   them, set the correct graphing options again and finally save.
+   
 7.0.8
 --------------------------------------------------------------------
  * 7.0.7 was released with a critical bug that broke the search engine

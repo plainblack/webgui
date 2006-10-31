@@ -20,6 +20,7 @@ use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 use WebGUI::Image::Graph;
 use WebGUI::Storage::Image;
+use Storable;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
 
@@ -388,19 +389,23 @@ sub view {
 		my $config = {};
 		if ($self->get('graphConfiguration')) {
 			$config = Storable::thaw($self->get('graphConfiguration'));
-		
-			my $graph = WebGUI::Image::Graph->loadByConfiguration($self->session, $config);
-			$graph->addDataset(\@dataset);
-			$graph->setLabels(\@labels);
 
-			$graph->draw;
+			if ($config) {
+				my $graph = WebGUI::Image::Graph->loadByConfiguration($self->session, $config);
+				$graph->addDataset(\@dataset);
+				$graph->setLabels(\@labels);
 
-			my $storage = WebGUI::Storage::Image->createTemp($self->session);
-			my $filename = 'poll'.$self->session->id->generate.".png";
-			$graph->saveToStorageLocation($storage, $filename);
+				$graph->draw;
 
-			$var{graphUrl} = $storage->getUrl($filename);
-			$var{hasImageGraph} = 1;
+				my $storage = WebGUI::Storage::Image->createTemp($self->session);
+				my $filename = 'poll'.$self->session->id->generate.".png";
+				$graph->saveToStorageLocation($storage, $filename);
+
+				$var{graphUrl} = $storage->getUrl($filename);
+				$var{hasImageGraph} = 1;
+			} else {
+				$self->session->errorHandler->error('The graph configuration hash of the Poll ('.$self->getUrl.') is corrupt.');
+			}
 		}
 	}
 	

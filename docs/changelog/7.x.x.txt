@@ -28,6 +28,10 @@
  - WebGUI::Session::Stow now warns if set() is called when cache is disabled
  - Fixed a bug in the LDAP auth module where LDAP links could not connect to 
    the LDAP server (Martin Kamerbeek / Procolix)
+ - Fixed a bug where the Automatic LDAP Registration setting could not be set.
+   (Martin Kamerbeek / Procolix)
+ - Fixed a bug in the Poll where using graphs could result in errors. See 
+   gotcha.txt for details. (Martin Kamerbeek / Procolix)
 
 7.1.2
  - Fixed a bug where logging in/out would cause a blank page display.
