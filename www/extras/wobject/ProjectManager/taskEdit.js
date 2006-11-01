@@ -6,7 +6,7 @@ function taskEdit_getResourceListDiv() {
 }
 
 function taskEdit_searchPopup(url) {
-	window.open(url, null, 'status=1,toolbar=0,location=0,menubar=0,directories=0,resizable=1,height=350,width=400');
+        window.open(url, null, 'status=1,scrollbars=1,toolbar=0,location=0,menubar=0,directories=0,resizable=1,height=350,width=400');
 }
 
 function taskEdit_getResources() {
