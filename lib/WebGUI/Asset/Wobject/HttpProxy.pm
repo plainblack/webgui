@@ -21,6 +21,7 @@ use WebGUI::Storage;
 use WebGUI::Asset::Wobject;
 use WebGUI::Asset::Wobject::HttpProxy::Parse;
 use WebGUI::Cache;
+use Apache2::Upload;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
 
