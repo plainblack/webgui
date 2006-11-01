@@ -41,6 +41,7 @@
  - fix: Error before logging into WebGUI site
  - fix: Unlock tag
  - Added some additional indicies for slightly better performance.
+ - fix: PM resource search popup has no scrollbars
 
 7.1.2
  - Fixed a bug where logging in/out would cause a blank page display.
