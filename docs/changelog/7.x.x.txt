@@ -22,6 +22,7 @@
  - fix: Group lookups via database link
  - fix: Error before logging into WebGUI site
  - fix: Unlock tag
+ - Added some additional indicies for slightly better performance.
 
 7.1.2
  - Fixed a bug where logging in/out would cause a blank page display.
