@@ -43,6 +43,7 @@
  - Added some additional indicies for slightly better performance.
  - fix: PM resource search popup has no scrollbars
  - fix: Matrix listings create CS assets with wrong permissions
+ - fix: HttpProxy not requiring Apache2::Upload correctly
 
 7.1.2
  - Fixed a bug where logging in/out would cause a blank page display.
