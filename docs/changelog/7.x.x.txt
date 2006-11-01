@@ -21,17 +21,25 @@
  - WebGUI::DatabaseLink->new now warns if can't find requested DatabaseLink
  - fix: Wrong template variable name in default Matrix View template
  - Tried to clean up some HttpProxy code. Still very ugly. (need rewrite?)
- - fix: HttpProxy would not put correct values for multiple query params with 
+ - fix: HttpProxy would not put correct values for multiple query params with
     same name.
+ - Fixed a bug in the template engein that caused CS notifcations not to send
+    in certain circumstances.
  - fix: metadata (WebGUI Help).  Removed mention of the RawHeadTags macro
    from the Metadata help.
+ - fix: Config
+ - fix: Article Shortcut Loses Style Information
+ - fix: Pagination loses search criteria
  - WebGUI::Session::Stow now warns if set() is called when cache is disabled
- - Fixed a bug in the LDAP auth module where LDAP links could not connect to 
+ - Fixed a bug in the LDAP auth module where LDAP links could not connect to
    the LDAP server (Martin Kamerbeek / Procolix)
  - Fixed a bug where the Automatic LDAP Registration setting could not be set.
    (Martin Kamerbeek / Procolix)
- - Fixed a bug in the Poll where using graphs could result in errors. See 
+ - Fixed a bug in the Poll where using graphs could result in errors. See
    gotcha.txt for details. (Martin Kamerbeek / Procolix)
+ - fix: Group lookups via database link
+ - fix: Error before logging into WebGUI site
+ - fix: Unlock tag
  - Added some additional indicies for slightly better performance.
 
 7.1.2
