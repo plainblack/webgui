@@ -22,9 +22,23 @@ my $session = start(); # this line required
 
 insertAutomaticLDAPRegistrationSetting($session);
 changeGraphConfigColumnType($session);
-
+addIndicies($session);
 finish($session); # this line required
 
+
+#-------------------------------------------------
+sub addIndicies {
+	my $session = shift;
+	print "\tAdding database table indicies to improve performance.\n" unless ($quiet);
+	my $db = $session->db;
+	$db->write("alter table template add index namespace_showInForms (namespace, showInForms)");	
+	$db->write("alter table groups add index groupName (groupName)");	
+	$db->write("alter table Product_feature add index assetId (assetId)");	
+	$db->write("alter table Product_benefit add index assetId (assetId)");	
+	$db->write("alter table Product_specification add index assetId (assetId)");	
+	$db->write("alter table DataForm_field add index assetId_tabId (assetId,DataForm_tabId)");	
+	$db->write("alter table Post add index threadId_rating (threadId, rating)");	
+}
 
 #-------------------------------------------------
 sub insertAutomaticLDAPRegistrationSetting {

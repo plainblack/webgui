@@ -132,7 +132,7 @@ sub getEditForm {
 		value=>$self->session->form->get("returnUrl")
 		});
 	if ($self->getValue("namespace") eq "") {
-		my $namespaces = $self->session->dbSlave->buildHashRef("select distinct(namespace),namespace from template order by namespace");
+		my $namespaces = $self->session->dbSlave->buildHashRef("select distinct(namespace) from template order by namespace");
 		$tabform->getTab("properties")->combo(
 			-name=>"namespace",
 			-options=>$namespaces,

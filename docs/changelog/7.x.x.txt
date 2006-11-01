@@ -32,6 +32,7 @@
    (Martin Kamerbeek / Procolix)
  - Fixed a bug in the Poll where using graphs could result in errors. See 
    gotcha.txt for details. (Martin Kamerbeek / Procolix)
+ - Added some additional indicies for slightly better performance.
 
 7.1.2
  - Fixed a bug where logging in/out would cause a blank page display.
