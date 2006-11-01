@@ -14,7 +14,7 @@ use lib "$FindBin::Bin/lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::VersionTag;
-use Test::More tests => 25; # increment this value for each test you create
+use Test::More tests => 34; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -77,8 +77,33 @@ ok_open($savedTagId, 0, 'nonexistent tag');
 my $tagAgain2 = WebGUI::VersionTag->new($session, $savedTagId);
 ok(!defined $tagAgain2, 'nonexistent tag cannot be instantiated');
 $tag2->rollback;
+($tag, $tagAgain1, $tag2, $tagAgain2) = ();
 
-# TODO: actually test interactions between tags and assets/revisions
+my $tag3 = WebGUI::VersionTag->create($session, {});
+$tag3->setWorking;
+my $asset1 = WebGUI::Asset->getRoot($session)->addChild({ className => 'WebGUI::Asset::Snippet' });
+my $asset2 = WebGUI::Asset->getRoot($session)->addChild({ className => 'WebGUI::Asset::Snippet' });
+is($tag3->getAssetCount, 2, 'tag with two assets');
+is($tag3->getRevisionCount, 2, 'tag with two revisions');
+$asset1 = $asset1->addRevision({ title => 'revised once' }, time+10);
+$asset1 = $asset1->addRevision({ title => 'revised twice' }, time+20);
+$asset2 = $asset2->addRevision({ title => 'other revised once' }, time+30);
+is($tag3->getRevisionCount, 5, 'tag with five revisions');
+
+my $tag4 = WebGUI::VersionTag->create($session, {});
+$tag4->setWorking;
+my $asset3 = WebGUI::Asset->getRoot($session)->addChild({ className => 'WebGUI::Asset::Snippet' });
+is($tag4->getAssetCount, 1, 'other tag with one asset');
+is($tag4->getRevisionCount, 1, 'other tag with one revision');
+$asset3->addRevision({ title => 'again revised once' }, time+40);
+is($tag4->getRevisionCount, 2, 'other tag still with one asset');
+is($tag4->getRevisionCount, 2, 'other tag with two revisions');
+is($tag3->getAssetCount, 2, 'original tag still with two assets');
+is($tag3->getRevisionCount, 5, 'original tag still with five revisions');
+$tag4->clearWorking;
+$tag3->rollback;
+$tag4->rollback;
+($asset1, $asset2, $asset3, $tag3, $tag4) = ();
 
 # Local variables:
 # mode: cperl
