@@ -319,14 +319,29 @@ our $I18N = {
 		lastUpdated => 1149654653,
 	},
 
-	'question.edit_loop' => {
-		message => q|A loop containing all the questions in the survey with edit controls.|,
+	'section.questions_loop' => {
+		message => q|A loop containing all the questions in this section of the survey with edit controls.|,
 		lastUpdated => 1149654653,
 	},
 
+	'section.edit_loop' => {
+		message => q|A loop containing all the sections and their questions with edit controls.|,
+		lastUpdated => 1162445117,
+	},
+
+	'section.edit.controls' => {
+		message => q|A toolbar to use to edit, delete or move this section.|,
+		lastUpdated => 1162270258,
+	},
+
+	'section.edit.sectionName' => {
+		message => q|The name of this section of questions.|,
+		lastUpdated => 1162270301,
+	},
+
 	'question.edit.controls' => {
-		message => q|A toolbar to use to edit this question.|,
-		lastUpdated => 1149654653,
+		message => q|A toolbar to use to edit, delete or move this question.|,
+		lastUpdated => 1162270256,
 	},
 
 	'question.edit.question' => {
@@ -337,6 +352,11 @@ our $I18N = {
 	'question.edit.id' => {
 		message => q|The unique id for this question.|,
 		lastUpdated => 1149654653,
+	},
+
+	'section.edit.id' => {
+		message => q|The unique id for this section.|,
+		lastUpdated => 1162270283,
 	},
 
 	'89' => {

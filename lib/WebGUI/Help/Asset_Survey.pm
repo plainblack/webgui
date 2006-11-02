@@ -275,6 +275,33 @@ our $HELP = {
 		            'name' => 'response.isComplete'
 		          },
 		          {
+		            'name' => 'section.edit_loop',
+		            'variables' => [
+				  {
+				     'name' => 'section.edit.controls'
+				  },
+				  {
+				     'name' => 'section.edit.sectionName'
+				  },
+				  {
+				     'name' => 'section.edit.id'
+				  },
+				  {
+				    'name' => 'section.questions_loop',
+				    'variables' => [
+						     {
+						       'name' => 'question.edit.controls'
+						     },
+						     {
+						       'name' => 'question.edit.question'
+						     },
+						     {
+						       'name' => 'question.edit.id'
+						     },
+				   ],
+				  },
+				],
+		          {
 		            'name' => 'question_loop',
 		            'variables' => [
 		                             {
@@ -297,20 +324,7 @@ our $HELP = {
 		                             }
 		                           ]
 		          },
-		          {
-		            'name' => 'question.edit_loop',
-		            'variables' => [
-		                             {
-		                               'name' => 'question.edit.controls'
-		                             },
-		                             {
-		                               'name' => 'question.edit.question'
-		                             },
-		                             {
-		                               'name' => 'question.edit.id'
-		                             }
-		                           ]
-		          }
+			  },
 		],
 		related => [
 			{
