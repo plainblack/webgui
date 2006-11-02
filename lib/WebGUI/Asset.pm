@@ -1459,12 +1459,12 @@ sub new {
 		# got properties from cache
 	} else {
 		my $sql = "select * from asset";
+		my $where = " where asset.assetId=".$session->db->quote($assetId);
 		foreach my $definition (@{$class->definition($session)}) {
-			$sql .= " left join ".$definition->{tableName}." on asset.assetId="
-				.$definition->{tableName}.".assetId and ".$definition->{tableName}.".revisionDate=".$revisionDate;
+			$sql .= ",".$definition->{tableName};
+			$where .= " and (asset.assetId=".$definition->{tableName}.".assetId and ".$definition->{tableName}.".revisionDate=".$revisionDate.")";
 		}
-		$sql .= " where asset.assetId=".$session->db->quote($assetId);
-		$properties = $session->db->quickHashRef($sql);
+		$properties = $session->db->quickHashRef($sql.$where);
 		return undef unless (exists $properties->{assetId});
 		$cache->set($properties,60*60*24);
 	}
