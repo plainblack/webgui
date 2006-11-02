@@ -48,7 +48,7 @@ sub handler {
 
        ### Add to group action
        # If group is 'everyone', skip
-       unless ($self->{_product}->get('groupId') && $self->{_product}->get('groupId') eq '7') {
+       if ($self->{_product}->get('groupId') && $self->{_product}->get('groupId') ne '7') {
                my $g = WebGUI::Group->new($self->session,$self->{_product}->get('groupId'));
                my $expiresOffset;
 
