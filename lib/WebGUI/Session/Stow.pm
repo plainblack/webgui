@@ -163,7 +163,7 @@ The value of the stow variable.  Any scalar or reference.
 
 sub set {
 	my $self = shift;
-	$self->session->errorHandler->warn('Stow->set() is being called but cache has been disabled')
+	$self->session->errorHandler->debug('Stow->set() is being called but cache has been disabled')
 		if $self->session->config->get("disableCache");
 	my $name = shift;
 	my $value = shift;

@@ -543,8 +543,10 @@ sub _parsePlaceholderParams {
 #		be passed to processTemplate()
 sub _processQuery {
 	my $self 	= shift;
-	my $nest	= shift || 1;	
-	my $page	= shift || 1;
+	my $nest	= shift;
+	$nest		= 1 unless defined $nest;	
+	my $page	= shift;
+	$page		= 1 unless defined $page;	
 	my $nr 		= shift || 1;
         my ($query, %var, $prefix);
 
