@@ -16,7 +16,7 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 10; # increment this value for each test you create
+use Test::More tests => 12; # increment this value for each test you create
 use WebGUI::Asset::Snippet;
 
 my $session = WebGUI::Test->session;
@@ -41,11 +41,27 @@ foreach my $property (keys %{$properties}) {
 	is ($snippet->get($property), $properties->{$property}, "updated $property is ".$properties->{$property});
 }
 
+# Test the getToolbar method
+for (1..2) {
+	my $toolbarState = $snippet->getToolbarState;
+	my $toolbar = $snippet->getToolbar;
+	is($toolbar, undef, 'getToolbar method returns undef when _toolbarState is set') if $toolbarState;
+	isnt($toolbar, undef, 'getToolbar method returns something other than undef when _toolbarState is not set') unless $toolbarState;
+	$snippet->toggleToolbar;
+}
+
+# Rudimentry test of the view method
+my $output = $snippet->view;
+
+# It should return something
+isnt ($output, undef, 'view method returns something');
+
+# What about our snippet?
+ok ($output =~ /Gooey's milkshake brings all the girls to the yard\.\.\./, 'view method output has our snippet in it'); 
+
 TODO: {
         local $TODO = "Tests to make later";
-        ok(0, 'Test getToolbar method');
 	ok(0, 'Test indexContent method');
-	ok(0, 'Test view method');
 	ok(0, 'Test www_edit method');
 	ok(0, 'Test www_view method... maybe?');
 }
