@@ -22,9 +22,17 @@ my $session = start(); # this line required
 
 commerceSalesTax($session);
 createDictionaryStorage($session);
+addRssUrlMacroProcessing($session);
 
 finish($session); # this line required
 
+#--------------------------------------------------
+sub addRssUrlMacroProcessing {
+	my $session = shift;
+	print "\tAdding option to process macros in a Syndicated Content RSS Url.\n" unless ($quiet);
+	$session->db->write("alter table SyndicatedContent add column processMacroInRssUrl int(11) default 0");
+
+}
 
 ##-------------------------------------------------
 sub commerceSalesTax {

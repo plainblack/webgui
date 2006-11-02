@@ -1,6 +1,14 @@
 package WebGUI::i18n::English::Asset_SyndicatedContent;
 
 our $I18N = {
+	'process macros in rss url' => {
+		message => q|Process Macros in RSS URLs|,
+		lastUpdated => 0
+	},
+	'process macros in rss url description' => {
+		message => q|Setting this to yes will allow you to use macros in your urls|,
+		lastUpdated => 0
+	},
 	'cache timeout' => {
 		message => q|Cache Timeout|,
 		lastUpdated => 0

@@ -20,6 +20,7 @@ use WebGUI::HTMLForm;
 use WebGUI::HTML;
 use WebGUI::International;
 use WebGUI::Asset::Wobject;
+use WebGUI::Macro;
 use XML::RSSLite;
 use XML::RSS::Creator;
 use LWP::UserAgent;
@@ -89,7 +90,7 @@ sub _getMaxHeadlines {
 #-------------------------------------------------------------------
 sub _getValidatedUrls {
 	my $self = shift;
-	my @urls = split(/\s+/,$self->get('rssUrl'));
+	my @urls = split(/\s+/,$self->getRssUrl);
 	my @validatedUrls = ();
 	foreach my $url (@urls) {
 		push(@validatedUrls, $url) if ($url =~ m/^http/);
@@ -139,6 +140,13 @@ sub definition {
 				fieldType=>'textarea',
 				label=>$i18n->get(1),
                 		hoverHelp=>$i18n->get('1 description')
+				},
+			processMacroInRssUrl=>{
+				tab=>"properties",
+				defaultValue=>0,
+				fieldType=>'yesNo',
+				label=>$i18n->get('process macros in rss url'),
+				hoverHelp=>$i18n->get('process macros in rss url description'),
 				},
                         maxHeadlines=>{
 				tab=>"properties",
@@ -504,7 +512,7 @@ sub _get_items {
 	#   - aggregate: $items
 	#   - aggregate2 (2006-08-26): [$items, \@rss_feeds]
 
-	my $key=join(':',('aggregate2', $displayMode,$hasTermsRegex,$maxHeadlines,$self->get('rssUrl')));
+	my $key=join(':',('aggregate2', $displayMode,$hasTermsRegex,$maxHeadlines,$self->getRssUrl));
 
         my $cache = WebGUI::Cache->new($self->session,$key, 'RSS');
         my $cached = Storable::thaw($cache->get());
@@ -647,6 +655,20 @@ sub view {
        		return $out;
 	}
 
+}
+
+#-------------------------------------------------------------------
+=head2 getRssUrl
+
+Get the RSS URL and process macros if we're supposed to.
+
+=cut
+
+sub getRssUrl {
+	my $self = shift;
+	my $value = $self->get("rssUrl");
+	WebGUI::Macro::process($self->session,\$value) if $self->get("processMacroInRssUrl");
+	return $value;	
 }
 
 #-------------------------------------------------------------------

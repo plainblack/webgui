@@ -15,6 +15,8 @@
  - Test: Added t/lib/WebGUI/PseudoRequest, which is a mostly functional
    Apache::Request object replacement.  It doesn't do everything, but it
    does enough to test Session/Http.pm, except for cookies.
+ - Added an option to the Syndicated Content Wobject that allows use of macros
+   inside the RSS Url property.
 
 7.1.4
  - Template variables in the main Survey Template were out of date in the
