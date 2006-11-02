@@ -127,17 +127,21 @@ A hash reference containing the exported data.
 sub importAssetData {
 	my $self = shift;
 	my $data = shift;
+	my $error = $self->session->errorHandler;
 	my $id = $data->{properties}{assetId};
 	my $class = $data->{properties}{className};
 	my $version = $data->{properties}{revisionDate};
 	my $asset = WebGUI::Asset->new($self->session, $id, $class, $version);
 	if (defined $asset) { # update an existing revision
+		$error->info("Updating an existing revision of asset $id");	
 		$asset->update($data->{properties});
 	} else {
 		$asset = WebGUI::Asset->new($self->session, $id, $class);
 		if (defined $asset) { # create a new revision of an existing asset
+			$error->info("Creating a new revision of asset $id");	
 			$asset = $asset->addRevision($data->{properties}, $version);
 		} else { # add an entirely new asset
+			$error->info("Adding $id that didn't previously exist.");	
 			$asset = $self->addChild($data->{properties}, $id, $version);
 		}
 	}
@@ -161,13 +165,17 @@ sub importPackage {
 	my $storage = shift;
 	my $decompressed = $storage->untar($storage->getFiles->[0]);
 	my %assets = ();
+	my $error = $self->session->errorHandler;
+	$error->info("Importing package.");
 	foreach my $file (sort(@{$decompressed->getFiles})) {
 		next unless ($decompressed->getFileExtension($file) eq "json");
+		$error->info("Found data file $file");
 		my $data = eval{JSON::jsonToObj($decompressed->getFileContentsAsScalar($file))};
 		if ($@ || $data->{properties}{assetId} eq "" || $data->{properties}{className} eq "" || $data->{properties}{revisionDate} eq "") {
-			$self->session->errorHandler->warn("package corruption: ".$@) if ($@);
+			$error->error("package corruption: ".$@) if ($@);
 			return "corrupt";
 		}
+		$error->info("Data file $file is valid and represents asset ".$data->{properties}{assetId});
 		foreach my $storageId (@{$data->{storage}}) {
 			my $assetStorage = WebGUI::Storage->get($self->session, $storageId);
 			$decompressed->untar($storageId.".storage", $assetStorage);
