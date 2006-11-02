@@ -21,6 +21,7 @@
    documentation.
  - fix: SQLReport no longer paginates or runs nested queries when downloading.
  - Made Stow's warning a debug message, which is what debug messages are for.
+ - fix: WebGUI::Text::splitCsv no longer removes trailing empty fields
 
 7.1.3
  - fix: SQLReport now returns error if can't find DatabaseLink

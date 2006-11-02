@@ -24,7 +24,7 @@ var tar_Textarea, tar_Orig_width, tar_Orig_height, tar_Grip, tar_Cursor_start_x,
 function tar_drag_start (event, textarea_id) {
   Textarea = tar_id(textarea_id);
 
-  if(! tar_find_draggable(event) ) return;
+  Grip = Textarea.parentNode;
 
   tar_add_class(Grip, "activedrag");
 
@@ -34,10 +34,20 @@ function tar_drag_start (event, textarea_id) {
   Orig_height  = parseInt( Textarea.style.height   , 10 );
 
   // Capture mousemove and mouseup events on the page.
-  document.addEventListener("mousemove", tar_drag_move, true);
-  document.addEventListener("mouseup",   tar_drag_stop, true);
-
-  event.preventDefault();
+  if (document.attachEvent)
+  {
+	  document.attachEvent("mousemove",tar_drag_move,true);
+	  document.attachEvent("mouseup",tar_drag_stop,true);
+	  event.returnValue = false;
+  }
+  else
+  {
+	  document.addEventListener("mousemove", tar_drag_move, true);
+	  document.addEventListener("mouseup",   tar_drag_stop, true);
+	  event.preventDefault();
+  }
+  
+  
   return;
 }
 
@@ -54,7 +64,10 @@ function tar_drag_move(event) {
   Textarea.style.width  = new_width+'px';
   Textarea.style.height = new_height+'px';
 
-  event.preventDefault();
+  if (document.attachEvent)
+	  event.returnValue = false;
+  else
+	  event.preventDefault();
   return;
 }
 
@@ -63,8 +76,17 @@ function tar_drag_move(event) {
 function tar_drag_stop(event) {
   // Stop capturing the mousemove and mouseup events.
   tar_remove_class(Grip, "activedrag");
-  document.removeEventListener("mousemove", tar_drag_move, true);
-  document.removeEventListener("mouseup",   tar_drag_stop, true);
+  // Capture mousemove and mouseup events on the page.
+  if (document.attachEvent)
+  {
+	  document.detachEvent("mousemove",tar_drag_move,true);
+	  document.detachEvent("mouseup",tar_drag_stop,true);
+  }
+  else 
+  {
+	  document.removeEventListener("mousemove", tar_drag_move, true);
+	  document.removeEventListener("mouseup",   tar_drag_stop, true);
+  }
   return;
 }
 

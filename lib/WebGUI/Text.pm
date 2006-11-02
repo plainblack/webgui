@@ -97,7 +97,8 @@ sub splitCSV {
 	my $s	= shift;
 	
 	# Split on ,
-	my @array = split /,/, $s;
+	# Negative LIMIT so that empty trailing fields are preserved
+	my @array = split /,/, $s, -1; 
 	
 	for (my $i = 0; $i < @array; $i++) {
 		# Fix quoted strings being used to escape commas.
