@@ -22,7 +22,7 @@ use DateTime::Format::Strptime;
 use Test::More; # increment this value for each test you create
 use Test::Deep;
 
-my $num_tests = 60;
+my $num_tests = 71;
 
 plan tests => $num_tests;
  
@@ -177,6 +177,10 @@ isnt($http->setRedirect('/here/now'), undef, 'setRedirect: does not return undef
 # setNoHeader and sendHeader
 #
 ####################################################
+
+##Force settings
+my $origPreventProxyCache = $session->setting->get('preventProxyCache');
+$session->setting->set('preventProxyCache', 0);
 
 ##Clear request object for next two tests
 $session->{_request} = undef;
@@ -337,6 +341,33 @@ ok(! exists $request->headers_out->fetch->{'Expires'}, 'sendHeaders, cacheContro
 is($request->headers_out->fetch->{'Cache-Control'}, "max-age=250", 'sendHeaders, cacheControl=250, user=visitor, HTTP 5.5: header Expires does not exist');
 is($request->no_cache, undef, 'sendHeaders, cacheControl=250, user=visitor, HTTP 5.5: no_cache undefined');
 
+##Clear request object to run a new set of requests
+$request = WebGUI::PseudoRequest->new();
+$session->{_request} = $request;
+$request->protocol('HTTP 5.5');
+$http->setNoHeader(0);
+$http->setCacheControl('none');
+$http->sendHeader();
+
+##Boolean test here
+ok(! exists $request->headers_out->fetch->{'Expires'}, 'sendHeaders, cacheControl=none, user=visitor, HTTP 5.5: header Expires does not exist');
+is($request->headers_out->fetch->{'Cache-Control'}, "private", 'sendHeaders, cacheControl=none, user=visitor, HTTP 5.5: header Cache-Control=private');
+is($request->no_cache, 1, 'sendHeaders, cacheControl=none, user=visitor, HTTP 5.5: no_cache=1');
+
+##Clear request object to run a new set of requests
+$request = WebGUI::PseudoRequest->new();
+$session->{_request} = $request;
+$request->protocol('HTTP 5.5');
+$http->setNoHeader(0);
+$http->setCacheControl('80');
+$session->setting->set('preventProxyCache', 1);
+$http->sendHeader();
+
+##Boolean test here
+ok(! exists $request->headers_out->fetch->{'Expires'}, 'sendHeaders, cacheControl=none, user=visitor, HTTP 5.5: header Expires does not exist');
+is($request->headers_out->fetch->{'Cache-Control'}, "private", 'sendHeaders, cacheControl=80, preventProxyCache=1, user=visitor, HTTP 5.5: header Cache-Control=private');
+is($request->no_cache, 1, 'sendHeaders, cacheControl=none, preventProxyCache=1, user=visitor, HTTP 5.5: no_cache=1');
+
 ####################################################
 #
 # Utility functions
@@ -367,4 +398,5 @@ sub deltaHttpTimes {
 
 
 END {
+	$session->setting->set('preventProxyCache', $origPreventProxyCache);
 }
