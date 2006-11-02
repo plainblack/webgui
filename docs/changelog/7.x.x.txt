@@ -47,6 +47,8 @@
  - Fixed a bug that could cause package imports to fail if they included
    updated revisions of existing assets. This fix may also prevent other
    revisionDate related errors, though none are known at this time.
+ - fix: Error in Storage.pm
+ - fix: Relative URL in viewRSS function of CS
 
 7.1.2
  - Fixed a bug where logging in/out would cause a blank page display.

@@ -1176,7 +1176,8 @@ sub www_viewRSS {
 	$self->logView() if ($self->session->setting->get("passiveProfilingEnabled"));        
 	# Set the required channel variables
 	$var{'title'} = _xml_encode($self->get("title"));
-	$var{'link'} = _xml_encode($self->getUrl);
+	$var{'link'} = _xml_encode($self->session->url->getSiteURL().$self->getUrl);
+	$self->session->errorHandler->warn( $var{'link'} );
 	$var{'description'} = _xml_encode($self->get("description"));
 	# Set some of the optional channel variables
 	$var{'generator'} = "WebGUI ".$WebGUI::VERSION;
@@ -1199,7 +1200,6 @@ sub www_viewRSS {
         while (my ($id, $class, $version)  = $sth->array) {
 		my $post = WebGUI::Asset::Wobject::Collaboration->new($self->session, $id, $class, $version);
 		my $encUrl = _xml_encode($self->session->url->getSiteURL().$post->getUrl);
-
 		my @attachmentLoop = ();
 		unless ($post->get("storageId") eq "") {
 			my $storage = $post->getStorageLocation;
