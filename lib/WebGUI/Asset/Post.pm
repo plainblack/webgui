@@ -494,7 +494,6 @@ sub getTemplateVars {
 				});
 		}
 	}
-	delete $var{'attachment_loop'} unless (scalar(@{$var{'attachment_loop'}}));
 	return \%var;
 }
 
