@@ -16,7 +16,7 @@ package WebGUI::Text;
 
 
 use strict;
-use warnings;
+#use warnings;
 
 use base 'Exporter';
 
