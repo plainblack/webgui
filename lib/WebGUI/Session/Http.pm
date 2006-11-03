@@ -249,9 +249,13 @@ sub sendHeader {
 	return undef if ($self->{_http}{noHeader});
 	return $self->_sendMinimalHeader if $self->session->dbNotAvailable;
 
-	my ($request, $datetime) = $self->session->quick(qw(request datetime));
+	my ($request, $datetime, $config, $var) = $self->session->quick(qw(request datetime config var));
 	return undef unless $request;
-	my $userId = $self->session->var->get("userId");
+	my $userId = $var->get("userId");
+	
+	# send webgui session cookie
+	my $cookieName = $config->getCookieName;
+	$self->setCookie($cookieName,$var->getId, $config->getCookieTTL, $config->get("cookieDomain")) unless $var->getId eq $self->getCookies->{$cookieName};
 
 	$self->setNoHeader(1);
 	my %params;

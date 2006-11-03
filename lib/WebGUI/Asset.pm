@@ -182,22 +182,20 @@ Returns error messages if a user can't view due to publishing problems, otherwis
 sub checkView {
 	my $self = shift;
 	return $self->session->privilege->noAccess() unless $self->canView;
-	if ($self->session->var->isAdminOn && $self->get("state") =~ /^trash/) { # show em trash
-		$self->session->http->setRedirect($self->getUrl("func=manageTrash"));
+	my ($var, $http) = $self->session->quick(qw(var http));
+	if ($var->isAdminOn && $self->get("state") =~ /^trash/) { # show em trash
+		$http->setRedirect($self->getUrl("func=manageTrash"));
 		return "redirect";
-	} elsif ($self->session->var->isAdminOn && $self->get("state") =~ /^clipboard/) { # show em clipboard
-		$self->session->http->setRedirect($self->getUrl("func=manageClipboard"));
+	} elsif ($var->isAdminOn && $self->get("state") =~ /^clipboard/) { # show em clipboard
+		$http->setRedirect($self->getUrl("func=manageClipboard"));
 		return "redirect";
 	} elsif ($self->get("state") ne "published" && $self->get("state") ne "archived") { # tell em it doesn't exist anymore
-		$self->session->http->setStatus("410");
+		$http->setStatus("410");
 		my $notFound = WebGUI::Asset->getNotFound($self->session);
 		$self->session->asset($notFound);
 		return $notFound->www_view;
 	}
 	$self->logView();
-	# must find a way to do this next line better
-	my $cookieName = $self->session->config->getCookieName;
-	$self->session->http->setCookie($cookieName,$self->session->var->getId, $self->session->config->getCookieTTL, $self->session->config->get("cookieDomain")) unless $self->session->var->getId eq $self->session->http->getCookies->{$cookieName};
 	return undef;
 }
 

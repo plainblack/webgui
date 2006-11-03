@@ -93,42 +93,42 @@ sub contentHandler {
 	### Open new or existing user session based on user-agent's cookie.
 	my $request = Apache2::Request->new($r);
 	my $session = WebGUI::Session->open($s->dir_config('WebguiRoot'),$configFile, $request, $s);
+	my ($env, $http, $setting, $output, $errorHandler, $config) = $session->quick(qw(env http setting output errorHandler config));
 	if ($session->env->get("HTTP_X_MOZ") eq "prefetch") { # browser prefetch is a bad thing
-		$session->http->setStatus("403","We don't allow prefetch, because it increases bandwidth, hurts stats, and can break web sites.");
-		$session->http->sendHeader;
-	} elsif ($session->setting->get("specialState") eq "upgrading") {
+		$http->setStatus("403","We don't allow prefetch, because it increases bandwidth, hurts stats, and can break web sites.");
+		$http->sendHeader;
+	} elsif ($setting->get("specialState") eq "upgrading") {
 		upgrading($session);
 	} else {
-		my $output = processOperations($session);
-		if ($output ne "") {
+		my $out = processOperations($session);
+		if ($out ne "") {
 			# do nothing because we have operation output to display
-			$output = undef if ($output eq "chunked");
-		} elsif ($session->setting->get("specialState") eq "init") {
-			$output = setup($session);
-		} elsif ($session->errorHandler->canShowPerformanceIndicators) {
+			$out = undef if ($out eq "chunked");
+		} elsif ($setting->get("specialState") eq "init") {
+			$out = setup($session);
+		} elsif ($errorHandler->canShowPerformanceIndicators) {
 			my $t = [Time::HiRes::gettimeofday()];
-			$output = page($session);
+			$out = page($session);
 			$t = Time::HiRes::tv_interval($t) ;
-			if ($output =~ /<\/title>/) {
-				$output =~ s/<\/title>/ : ${t} seconds<\/title>/i;
+			if ($out =~ /<\/title>/) {
+				$out =~ s/<\/title>/ : ${t} seconds<\/title>/i;
 			} else {
 				# Kludge.
-				my $mimeType = $session->http->getMimeType();
+				my $mimeType = $http->getMimeType();
 				if ($mimeType eq 'text/css') {
-					$session->output->print("\n/* Page generated in $t seconds. */\n");
+					$output->print("\n/* Page generated in $t seconds. */\n");
 				} elsif ($mimeType eq 'text/html') {
-					$session->output->print("\nPage generated in $t seconds.\n");
+					$output->print("\nPage generated in $t seconds.\n");
 				} else {
 					# Don't apply to content when we don't know how
 					# to modify it semi-safely.
 				}
 			}
 		} else {
-			$output = page($session);
+			$out = page($session);
 		}
-		$session->http->setCookie($session->config->getCookieName,$session->var->getId, $session->config->getCookieTTL, $session->config->get("cookieDomain")) unless $session->var->getId eq $session->http->getCookies->{$session->config->getCookieName};
-		my $filename = $session->http->getStreamedFile();
-		if ((defined $filename) && ($session->config->get("enableStreamingUploads") eq "1")) {
+		my $filename = $http->getStreamedFile();
+		if ((defined $filename) && ($config->get("enableStreamingUploads") eq "1")) {
 			my $ct = guess_media_type($filename);
             		my $oldContentType = $r->content_type($ct);
             		if ($r->sendfile($filename) ) {
@@ -137,11 +137,11 @@ sub contentHandler {
                 		$r->content_type($oldContentType);
 			}
 		}
-		$session->http->sendHeader();
-		unless ($session->http->isRedirect()) {
-			$session->output->print($output);
-			if ($session->errorHandler->canShowDebug()) {
-				$session->output->print($session->errorHandler->showDebug(),1);
+		$http->sendHeader();
+		unless ($http->isRedirect()) {
+			$output->print($out);
+			if ($errorHandler->canShowDebug()) {
+				$output->print($errorHandler->showDebug(),1);
 			}
 		}
 		WebGUI::Affiliate::grabReferral($session);	# process affiliate tracking request
