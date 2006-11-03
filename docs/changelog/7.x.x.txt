@@ -18,6 +18,10 @@
  - Added an option to the Syndicated Content Wobject that allows use of macros
    inside the RSS Url property.
  - semi-fix: WebGUI/Mail/Send.pm no longer has extraneous UTF-8 BOM
+ - new: RSSCapable mixin for assets that can have RSS feeds, and RSSFromParent
+        asset (automatic) that actually generates the feeds from them.
+ - new: workflow activity and hooks for deleting exported files on trash,
+        purge, and changeUrl
 
 7.1.4
  - Template variables in the main Survey Template were out of date in the
