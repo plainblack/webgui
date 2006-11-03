@@ -2117,6 +2117,18 @@ sub www_view {
 	return undef;
 }
 
+#-------------------------------------------------------------------
+
+=head2 isValidRssItem ( )
+
+Returns true iff this asset should be included in RSS feeds from the
+RSS From Parent asset.  If false, this asset will be ignored when
+generating feeds, even if it appears in the item list.  Defaults to
+true.
+
+=cut
+
+sub isValidRssItem { 1 }
 
 1;
 

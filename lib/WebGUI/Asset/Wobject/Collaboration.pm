@@ -20,16 +20,17 @@ use WebGUI::Paginator;
 use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 use WebGUI::Workflow::Cron;
-
-our @ISA = qw(WebGUI::Asset::Wobject);
-
+use WebGUI::Asset::RSSCapable;
+use base 'WebGUI::Asset::RSSCapable';
+use base 'WebGUI::Asset::Wobject';
 
 #-------------------------------------------------------------------
 sub addChild {
 	my $self = shift;
 	my $properties = shift;
 	my @other = @_;
-	if ($properties->{className} ne "WebGUI::Asset::Post::Thread") {
+	if ($properties->{className} ne "WebGUI::Asset::Post::Thread"
+	    and $properties->{className} ne 'WebGUI::Asset::RSSFromParent') {
 		$self->session->errorHandler->security("add a ".$properties->{className}." to a ".$self->get("className"));
 		return undef;
 	}
@@ -544,14 +545,6 @@ sub definition {
 			label=>$i18n->get('sort by'),
 			hoverHelp=>$i18n->get('sort by description'),
 			},
-		rssTemplateId =>{
-			fieldType=>"template",
-			namespace=>"Collaboration/RSS",
-			defaultValue=>'PBtmpl0000000000000142',
-			tab=>'display',
-			label=>$i18n->get('rss template'),
-			hoverHelp=>$i18n->get('rss template description'),
-			},
 		notificationTemplateId =>{
 			fieldType=>"template",
 			namespace=>"Collaboration/Notification",
@@ -660,6 +653,50 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
+sub getRssItems {
+	my $self = shift;
+
+	# XXX copied and reformatted this query from www_viewRSS, but why is it constructed like this?
+	# And it's duplicated inside view, too!  Eeeagh!  And it uses the versionTag scratch var...
+	my ($sortBy, $sortOrder) = ($self->getValue('sortBy'), $self->getValue('sortOrder'));
+	my @postIds = $self->session->db->buildArray(<<"SQL", [$self->getId, $self->session->scratch->get('versionTag')]);
+  SELECT asset.assetId
+    FROM Thread
+         LEFT JOIN asset ON Thread.assetId = asset.assetId
+         LEFT JOIN Post ON Post.assetId = Thread.assetId AND Post.revisionDate = Thread.revisionDate
+         LEFT JOIN assetData ON assetData.assetId = Thread.assetId
+                                AND assetData.revisionDate = Thread.revisionDate
+   WHERE asset.parentId = ? AND asset.state = 'published' AND asset.className = 'WebGUI::Asset::Post::Thread'
+         AND (assetData.status = 'approved' OR assetData.tagId = ?)
+   GROUP BY assetData.assetId
+   ORDER BY $sortBy $sortOrder
+SQL
+
+	return map {
+		my $postId = $_;
+		my $post = WebGUI::Asset->newByDynamicClass($self->session, $postId);
+		my $postUrl = $self->session->url->getSiteURL() . $post->getUrl;
+		# Buggo: this is an abuse of 'author'.  'author' is supposed to be an email address.
+		# But this is how it was in the original Collaboration RSS, so.
+		({ author => $post->get('username'),
+		   title => $post->get('title'),
+		   link => $postUrl, guid => $postUrl,
+		   description => $post->get('synopsis'),
+		   pubDate => $self->session->datetime->epochToMail($post->get('dateUpdated')),
+		   attachmentLoop => do {
+			   if ($post->get('storageId')) {
+				   my $storage = $post->getStorageLocation;
+				   [map {({ 'attachment.url' => $storage->getUrl($_),
+					    'attachment.path' => $storage->getPath($_),
+					    'attachment.length' => $storage->getFileSize($_) })}
+				    @{$storage->getFiles}]
+			   } else { undef }
+		   }
+		 })
+	} @postIds;
+}
+
+#-------------------------------------------------------------------
 sub getEditTabs {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session,"Asset_Collaboration");
@@ -678,19 +715,6 @@ Formats the url to start a new thread.
 sub getNewThreadUrl {
 	my $self = shift;
 	$self->getUrl("func=add;class=WebGUI::Asset::Post::Thread");
-}
-
-#-------------------------------------------------------------------
-
-=head2 getRssUrl (  )
-
-Formats the url to start a new thread.
-
-=cut
-
-sub getRssUrl {
-	my $self = shift;
-	$self->getUrl("func=viewRSS");
 }
 
 #-------------------------------------------------------------------
@@ -752,6 +776,17 @@ sub getUnsubscribeUrl {
 
 
 #-------------------------------------------------------------------
+sub _computeThreadCount {
+	my $self = shift;
+	return scalar @{$self->getLineage(['children'], {includeOnlyClasses => ['WebGUI::Asset::Post::Thread']})};
+}
+
+sub _computePostCount {
+	my $self = shift;
+	return scalar @{$self->getLineage(['descendants'], {includeOnlyClasses => ['WebGUI::Asset::Post']})};
+}
+
+#-------------------------------------------------------------------
 
 =head2 incrementReplies ( lastPostDate, lastPostId )
 
@@ -769,8 +804,8 @@ The unique identifier of the post being added.
 
 sub incrementReplies {
         my ($self, $lastPostDate, $lastPostId) = @_;
-	my $threads = $self->getChildCount;
-        my $replies = $self->getDescendantCount - $threads;
+	my $threads = $self->_computeThreadCount;
+        my $replies = $self->_computePostCount;
         $self->update({replies=>$replies, threads=>$threads, lastPostId=>$lastPostId, lastPostDate=>$lastPostDate});
 }
 
@@ -792,7 +827,7 @@ The unique identifier of the post that was just added.
 
 sub incrementThreads {
         my ($self, $lastPostDate, $lastPostId) = @_;
-        $self->update({threads=>$self->getChildCount, lastPostId=>$lastPostId, lastPostDate=>$lastPostDate});
+        $self->update({threads=>$self->_computeThreadCount, lastPostId=>$lastPostId, lastPostDate=>$lastPostDate});
 }
 
 #-------------------------------------------------------------------
@@ -938,8 +973,8 @@ Calculates the number of replies to this collaboration system and updates the co
 
 sub sumReplies {
         my $self = shift;
-	my $threads = $self->getChildCount;
-	my $replies = $self->getDescendantCount - $threads;
+	my $threads = $self->_computeThreadCount;
+	my $replies = $self->_computePostCount;
 	$self->update({replies=>$replies, threads=>$threads});
 }
 
@@ -953,7 +988,7 @@ Calculates the number of threads in this collaboration system and updates the co
 
 sub sumThreads {
         my $self = shift;
-	$self->update({threads=>$self->getChildCount});
+	$self->update({threads=>$self->_computeThreadCount});
 }
 
 #-------------------------------------------------------------------
@@ -1164,74 +1199,6 @@ sub www_view {
 	$self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->userId eq "1" && !$disableCache);
 	return $self->SUPER::www_view(@_);
 }
-
-
-#-------------------------------------------------------------------
-# print out RSS 2.0 feed describing the items visible on the first page
-sub www_viewRSS {
-	my $self = shift;
-	 return $self->session->privilege->noAccess() unless $self->canView;
-	my %var;
-
-	$self->logView() if ($self->session->setting->get("passiveProfilingEnabled"));        
-	# Set the required channel variables
-	$var{'title'} = _xml_encode($self->get("title"));
-	$var{'link'} = _xml_encode($self->session->url->getSiteURL().$self->getUrl);
-	$self->session->errorHandler->warn( $var{'link'} );
-	$var{'description'} = _xml_encode($self->get("description"));
-	# Set some of the optional channel variables
-	$var{'generator'} = "WebGUI ".$WebGUI::VERSION;
-	$var{'lastBuildDate'} = _xml_encode($self->_get_rfc822_date($self->get("dateUpdated")));
-	$var{'webMaster'} = $self->session->setting->get("companyEmail");
-	$var{'docs'} = "http://blogs.law.harvard.edu/tech/rss";
-
-	my $sth = $self->session->db->read("select asset.assetId, asset.className, max(assetData.revisionDate) 
-		from Thread
-		left join asset on Thread.assetId=asset.assetId
-		left join Post on Post.assetId=Thread.assetId and Thread.revisionDate=Post.revisionDate
-		left join assetData on assetData.assetId=Thread.assetId and Thread.revisionDate=assetData.revisionDate
-		where asset.parentId=".$self->session->db->quote($self->getId)." and asset.state='published' 
-			and asset.className='WebGUI::Asset::Post::Thread' 
-			and (assetData.status='approved'
-			 or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")).")
-		group by assetData.assetId
-		order by ".$self->getValue("sortBy")." ".$self->getValue("sortOrder"));
-	my $i = 1;
-        while (my ($id, $class, $version)  = $sth->array) {
-		my $post = WebGUI::Asset::Wobject::Collaboration->new($self->session, $id, $class, $version);
-		my $encUrl = _xml_encode($self->session->url->getSiteURL().$post->getUrl);
-		my @attachmentLoop = ();
-		unless ($post->get("storageId") eq "") {
-			my $storage = $post->getStorageLocation;
-			foreach my $filename (@{ $storage->getFiles }) {
-				push @attachmentLoop, {
-					'attachment.url' => $storage->getUrl($filename),
-					'attachment.path' =>  $storage->getPath($filename),
-					'attachment.length' => $storage->getFileSize($filename),
-				};
-			}
-		}
-		push(@{$var{'item_loop'}}, {
-		    author => _xml_encode($post->get('username')),
-		    title => _xml_encode($post->get("title")),
-		    link => $encUrl,
-		    description => _xml_encode($post->get("synopsis")),
-		    guid => $encUrl,
-		    pubDate => _xml_encode($self->_get_rfc822_date($post->get("dateUpdated"))),
-		    attachmentLoop => \@attachmentLoop,
-		    });
-		$i++;
-		last if ($i == $self->get("threadsPerPage"));
-        }
-
-	$self->session->http->setMimeType("text/xml");
-	my $output = $self->processTemplate(\%var,$self->get("rssTemplateId"));
-	WebGUI::Macro::process($self->session,\$output);
-	return $output;
-}
-
-
-
 
 1;
 

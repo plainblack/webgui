@@ -23,6 +23,7 @@ my $session = start(); # this line required
 commerceSalesTax($session);
 createDictionaryStorage($session);
 addRssUrlMacroProcessing($session);
+addRSSFromParent($session);
 
 finish($session); # this line required
 
@@ -65,6 +66,75 @@ sub createDictionaryStorage {
 	mkdir $dictionaryDirectory.'/oldIds' unless (-e $dictionaryDirectory.'/oldIds');
 }
 
+
+#-------------------------------------------------
+sub addRSSFromParent {
+	my $session = shift;
+	print "\tAdding RSS From Parent capability.\n" unless $quiet;
+
+	$session->db->write($_) for (<<'EOT',
+  CREATE TABLE RSSFromParent (
+    assetId varchar(22) character set utf8 collate utf8_bin NOT NULL,
+    revisionDate bigint(20) NOT NULL,
+    PRIMARY KEY (assetId, revisionDate)
+  ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+EOT
+				     <<'EOT',
+  CREATE TABLE RSSCapable (
+    assetId varchar(22) character set utf8 collate utf8_bin NOT NULL,
+    revisionDate bigint(20) NOT NULL,
+    rssCapableRssEnabled int(11) NOT NULL DEFAULT 1,
+    rssCapableRssTemplateId varchar(22) character set utf8 collate utf8_bin NOT NULL
+                            DEFAULT 'PBtmpl0000000000000142',
+    rssCapableRssFromParentId varchar(22) character set utf8 collate utf8_bin NULL DEFAULT NULL,
+    PRIMARY KEY (assetId, revisionDate)
+  ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+EOT
+				    );
+
+	my $oldTag = WebGUI::VersionTag->getWorking($session, 0);
+	my $templateTag = WebGUI::VersionTag->create($session, { name => '7.2.0 RSS template update' });
+	$templateTag->setWorking;
+	foreach my $templateId ($session->db->buildArray("SELECT assetId FROM template WHERE namespace = 'Collaboration/RSS'")) {
+		my $template = WebGUI::Asset->newByDynamicClass($session, $templateId)->addRevision;
+		$template->update({ namespace => 'RSSCapable/RSS' });
+	}
+
+	WebGUI::Asset->newByDynamicClass($session, 'PBtmpl0000000000000142')
+					     ->update({ title => 'Default RSS', menuTitle => 'Default RSS' });
+	$templateTag->commit;
+
+	# Need to get the Collaborations, since those now have RSS capability.
+	$session->db->write($_) for (<<'EOT',
+  INSERT INTO RSSCapable (assetId, revisionDate, rssCapableRssEnabled, rssCapableRssTemplateId,
+                          rssCapableRssFromParentId)
+    SELECT assetId, revisionDate, 0, 'PBtmpl0000000000000142', NULL
+      FROM Collaboration
+EOT
+				     <<'EOT',
+  ALTER TABLE Collaboration
+  DROP COLUMN rssTemplateId
+EOT
+				    );
+
+	my $csTag = WebGUI::VersionTag->create($session, { name => '7.2.0 Collaboration RSS update' });
+	$csTag->setWorking;
+	foreach my $csId ($session->db->buildArray("SELECT assetId FROM Collaboration")) {
+		# Blah, some duplication with RSSCapable.pm.
+		my $cs = WebGUI::Asset->newByDynamicClass($session, $csId)->addRevision;
+		next if $cs->get('isPrototype'); # Uh.
+		my $rssFromParent =
+		    $cs->addChild({ className => 'WebGUI::Asset::RSSFromParent',
+				    title => $cs->get('title'),
+				    menuTitle => $cs->get('menuTitle'),
+				    url => $cs->get('url').'.rss'
+				  });
+		$cs->update({ rssCapableRssFromParentId => $rssFromParent->getId });
+	}
+	$csTag->commit;
+
+	$oldTag->setWorking if $oldTag;
+}
 
 # ---- DO NOT EDIT BELOW THIS LINE ----
 
