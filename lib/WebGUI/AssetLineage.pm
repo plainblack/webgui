@@ -378,7 +378,10 @@ sub getLineage {
 		$where = "asset.state='published'";
 	}
 	## get only approved items or those that i'm currently working on
-	my $archived = " or assetData.status='archived' " if ($rules->{includeArchived});
+	my $archived = "";
+	if ($rules->{includeArchived}) {
+		$archived = " or assetData.status='archived' ";
+	}
 	$where .= " and (assetData.status='approved' $archived or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")).")";
 	## class exclusions
 	if (exists $rules->{excludeClasses}) {

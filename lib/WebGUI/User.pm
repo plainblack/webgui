@@ -208,7 +208,10 @@ If set to "1" then the listing will not include expired groupings. Defaults to "
 sub getGroups {
 	my $self = shift;
         my $withoutExpired = shift;
-        my $clause = "and expireDate>".$self->session->datetime->time() if ($withoutExpired);
+        my $clause = "";
+	if ($withoutExpired) {
+        	$clause = "and expireDate>".$self->session->datetime->time();
+	}
 	my $gotGroupsForUser = $self->session->stow->get("gotGroupsForUser");
         if (exists $gotGroupsForUser->{$self->userId}) {
                 return $gotGroupsForUser->{$self->userId};

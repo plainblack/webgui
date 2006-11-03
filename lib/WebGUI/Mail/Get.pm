@@ -205,7 +205,10 @@ sub getNextMessage {
 		my $disposition = $part->head->get("Content-Disposition");
 		$disposition =~ m/filename=\"(.*)\"/;
 		my $filename = $1;
-		my $content = $body->as_string if (defined $body);
+		my $content = "";
+ 		if (defined $body) {
+			$content = $body->as_string;
+		}
 		next unless ($content);
 		push(@segments, {
 			filename=>$filename,

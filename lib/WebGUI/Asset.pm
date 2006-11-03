@@ -869,11 +869,11 @@ sub getNotFound {
 	my $session = shift;
 	if ($session->url->getRequestedUrl eq "*give-credit-where-credit-is-due*") {
 		my $content = "";
-		open(FILE,"<".$session->config->getWebguiRoot."/docs/credits.txt");
-		while (<FILE>) {
+		open(my $FILE,"<",$session->config->getWebguiRoot."/docs/credits.txt");
+		while (<$FILE>) {
 			$content .= $_;
 		}
-		close(FILE);
+		close($FILE);
 		return WebGUI::Asset->newByPropertyHashRef($session,{
 			className=>"WebGUI::Asset::Snippet",
 			snippet=> '<pre>'.$content.'</pre>'
@@ -1680,7 +1680,10 @@ sub processTemplate {
 	my $template = shift;
 	$template = WebGUI::Asset->new($self->session, $templateId,"WebGUI::Asset::Template") unless (defined $template);
 	if (defined $template) {
-        	my $meta = $self->getMetaDataFields() if ($self->session->setting->get("metaDataEnabled"));
+        	my $meta = {};
+		if ($self->session->setting->get("metaDataEnabled")) {
+        		$meta = $self->getMetaDataFields();
+		}
         	foreach my $field (keys %$meta) {
 			$var->{$meta->{$field}{fieldName}} = $meta->{$field}{value};
 		}

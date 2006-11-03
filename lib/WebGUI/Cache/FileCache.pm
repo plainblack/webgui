@@ -14,7 +14,7 @@ package WebGUI::Cache::FileCache;
 
 =cut
 
-
+use strict;
 use Storable qw(nstore retrieve);
 use File::Path;
 use File::Find;
@@ -107,9 +107,9 @@ sub get {
 	my $self = shift;
 	return undef if ($self->session->config->get("disableCache"));
 	my $folder = $self->getFolder;
-	if (-e $folder."/expires" && -e $folder."/cache" && open(FILE,"<".$folder."/expires")) {
-		my $expires = <FILE>;
-		close(FILE);
+	if (-e $folder."/expires" && -e $folder."/cache" && open(my $FILE,"<",$folder."/expires")) {
+		my $expires = <$FILE>;
+		close($FILE);
 		return undef if ($expires < $self->session->datetime->time());
 		my $value;
 		eval {$value = retrieve($folder."/cache")};
@@ -173,9 +173,9 @@ sub getNamespaceSize {
         File::Find::find({no_chdir=>1, wanted=> sub {
                                 return unless $File::Find::name =~ m/^(.*)expires$/;
                                 my $dir = $1;
-                                if (open(FILE,"<".$dir."/expires")) {
-                                        my $expires = <FILE>;
-                                        close(FILE);
+                                if (open(my $FILE,"<",$dir."/expires")) {
+                                        my $expires = <$FILE>;
+                                        close($FILE);
                                         if ($expires <$self->session->datetime->time()+$expiresModifier) {
                                                 rmtree($dir);
                                         } else {
@@ -254,9 +254,9 @@ sub set {
 		$value = $content;
 	}
 	nstore($value, $path."/cache");
-	open(FILE,">".$path."/expires");
-	print FILE$self->session->datetime->time()+$ttl;
-	close(FILE);
+	open(my $FILE,">",$path."/expires");
+	print $FILE $self->session->datetime->time()+$ttl;
+	close($FILE);
 	umask($oldumask);
 }
 

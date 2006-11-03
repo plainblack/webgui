@@ -1,5 +1,7 @@
 package WebGUI::Affiliate;
 
+use strict;
+
 =head1 LEGAL
 
  -------------------------------------------------------------------

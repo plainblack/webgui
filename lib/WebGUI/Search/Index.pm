@@ -209,7 +209,7 @@ A reference to an asset object.
 sub new {
 	my $class = shift;
 	my $asset = shift;
-	my $self = {_asset=>$asset, _session=>$asset->session, _id=>$asset->getId};
+	my $self = {_asset=>$asset, _session=>$asset->session, _id=>$asset->getId}, $class;
 	bless $self;
 }
 

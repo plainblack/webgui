@@ -5,12 +5,12 @@ use WebGUI::Asset::Template;
 
 #-------------------------------------------------------------------
 sub _permute {
-	my ($currentSet, @permutations, $permutation, $value, @result);
+	my ($currentSet, @permutations, @result);
 	$currentSet = shift;
 	
 	@permutations = (@_) ? _permute(@_) : [];
-	foreach $permutation (@permutations) {
-		foreach $value (@$currentSet) {
+	foreach my $permutation (@permutations) {
+		foreach my $value (@$currentSet) {
 			push(@result, [$value, @{$permutation}]);
 		}
 	}
@@ -362,7 +362,7 @@ my		$currentOption = $self->getOption($_);
 
 #-------------------------------------------------------------------
 sub updateVariants {
-	my ($self, %variants, @optionSets, @variants, $variant, %var, @composition, $option, @newVariants, $parameterName);
+	my ($self, %variants, @optionSets, @variants, %var, @composition, @newVariants, $parameterName);
 	$self = shift;
 
 	foreach (@{$self->getVariant}) {
@@ -378,7 +378,7 @@ sub updateVariants {
 	
 	@variants = ([]) unless	(@variants);
 	my %newVariants;
-	foreach $variant (@variants) {
+	foreach my $variant (@variants) {
 		my %sku;
 		
 		$var{productId} = $self->get('productId');
@@ -388,7 +388,7 @@ sub updateVariants {
 		$sku{base} = $self->get('sku');
 		@composition = ();
 
-		foreach $option (@{$variant}) {
+		foreach my $option (@{$variant}) {
 			$var{price} += $option->{priceModifier};
 			$var{weight} += $option->{weightModifier};
 			$var{sku} .= $option->{skuModifier};

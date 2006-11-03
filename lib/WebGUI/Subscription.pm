@@ -1,5 +1,6 @@
 package WebGUI::Subscription;
 
+use strict;
 use WebGUI::Macro;
 use WebGUI::Utility;
 use WebGUI::Commerce::Payment;

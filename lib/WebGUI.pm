@@ -418,11 +418,11 @@ sub uploadsHandler {
 		$path =~ s/^(\/.*\/).*$/$1/;
 		if (-e $path.".wgaccess") {
 			my $fileContents;
-			open(FILE,"<".$path.".wgaccess");
-			while (<FILE>) {
+			open(my $FILE,"<",$path.".wgaccess");
+			while (<$FILE>) {
 				$fileContents .= $_;
 			}
-			close(FILE);
+			close($FILE);
 			my @privs = split("\n",$fileContents);
 			unless ($privs[1] eq "7" || $privs[1] eq "1") {
 				my $s = Apache2::ServerUtil->server;
@@ -459,11 +459,11 @@ The current WebGUI::Session object.
 sub upgrading {
 	my $session = shift;
 	$session->http->sendHeader;
-	open(FILE,"<".$session->config->getWebguiRoot."/docs/maintenance.html");
-	while (<FILE>) {
+	open(my $FILE,"<",$session->config->getWebguiRoot."/docs/maintenance.html");
+	while (<$FILE>) {
 		$session->output->print($_);
 	}
-	close(FILE);
+	close($FILE);
 }
 
 1;

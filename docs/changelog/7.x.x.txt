@@ -25,6 +25,7 @@
  - Made Stow's warning a debug message, which is what debug messages are for.
  - fix: WebGUI::Text::splitCsv no longer removes trailing empty fields
  - fix: Product add-to-group would always try to add a user to a group
+ - Made many minor changes recommended by Perl::Critic.
 
 7.1.3
  - fix: SQLReport now returns error if can't find DatabaseLink

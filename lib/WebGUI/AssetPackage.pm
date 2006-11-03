@@ -247,7 +247,10 @@ sub www_importPackage {
 	return $self->session->privilege->insufficient() unless ($self->canEdit && $self->session->user->isInGroup(4));
 	my $storage = WebGUI::Storage->createTemp($self->session);
 	$storage->addFileFromFormPost("packageFile",1);
-	my $error = $self->importPackage($storage) if ($storage->getFileExtension($storage->getFiles->[0]) eq "wgpkg");
+	my $error = "";
+	if ($storage->getFileExtension($storage->getFiles->[0]) eq "wgpkg") {
+		$error = $self->importPackage($storage);
+	}
 	if ($error) {
 		my $i18n = WebGUI::International->new($self->session, "Asset");
 		return $self->session->style->userStyle($i18n->get("package corrupt"));

@@ -125,7 +125,10 @@ Optionally specify to get the count based upon the status of the revisions. Opti
 sub getRevisionCount {
 	my $self = shift;
 	my $status = shift;
-	my $statusClause = " and status=".$self->session->db->quote($status) if ($status);
+	my $statusClause = "";
+	if ($status) {
+		$statusClause = " and status=".$self->session->db->quote($status);
+	}
 	my ($count) = $self->session->db->quickArray("select count(*) from assetData where assetId=".$self->session->db->quote($self->getId).$statusClause);
 	return $count;
 }

@@ -132,9 +132,9 @@ sub delete {
 	my $self = shift;
 	my $param = shift;
 	delete $self->{_config}{$param};
-	open(FILE,">".$self->getWebguiRoot.'/etc/'.$self->getFilename);
-	print FILE "# config-file-type: JSON 1\n".objToJson($self->{_config}, {pretty => 1, indent => 4, autoconv=>0, skipinvalid=>1});
-	close(FILE);
+	open(my $FILE,">",$self->getWebguiRoot.'/etc/'.$self->getFilename);
+	print $FILE "# config-file-type: JSON 1\n".objToJson($self->{_config}, {pretty => 1, indent => 4, autoconv=>0, skipinvalid=>1});
+	close($FILE);
 }
 
 #-------------------------------------------------------------------
@@ -334,11 +334,11 @@ sub new {
 		return $config{$filename};
 	} else {
 		my $json = "";
-		if (open(FILE,"<".$webguiPath.'/etc/'.$filename)) {
-			while (my $line = <FILE>) {
+		if (open(my $FILE,"<",$webguiPath.'/etc/'.$filename)) {
+			while (my $line = <$FILE>) {
         			$json .= $line unless ($line =~ /^\s*#/);
 			}
-			close(FILE);
+			close($FILE);
 			my $conf = jsonToObj($json);
 			my $self = {_webguiRoot=>$webguiPath, _configFile=>$filename, _config=>$conf};
 			bless $self, $class;
@@ -403,9 +403,9 @@ sub set {
 	my $param = shift;
 	my $value = shift;
 	$self->{_config}{$param} = $value;
-	open(FILE,">".$self->getWebguiRoot.'/etc/'.$self->getFilename);
-	print FILE "# config-file-type: JSON 1\n".objToJson($self->{_config}, {pretty => 1, indent => 4, autoconv=>0, skipinvalid=>1});
-	close(FILE);
+	open(my $FILE,">",$self->getWebguiRoot.'/etc/'.$self->getFilename);
+	print $FILE "# config-file-type: JSON 1\n".objToJson($self->{_config}, {pretty => 1, indent => 4, autoconv=>0, skipinvalid=>1});
+	close($FILE);
 }
 
 1;

@@ -254,7 +254,6 @@ sub addFileFromHashref {
 	my $self = shift;
 	my $filename = $self->session->url->makeCompliant(shift);
 	my $hashref = shift;
-	bless $hashref;
         nstore $hashref, $self->getPath($filename) or $self->_addError("Couldn't create file ".$self->getPath($filename)." because ".$!);
 	return $filename;
 }
@@ -279,9 +278,9 @@ sub addFileFromScalar {
 	my $self = shift;
 	my $filename = $self->session->url->makeCompliant(shift);
 	my $content = shift;
-	if (open(FILE,">".$self->getPath($filename))) {
-		print FILE $content;
-		close(FILE);
+	if (open(my $FILE,">",$self->getPath($filename))) {
+		print $FILE $content;
+		close($FILE);
 	} else {
         	$self->_addError("Couldn't create file ".$self->getPath($filename)." because ".$!);
 	}
@@ -478,6 +477,25 @@ sub getErrors {
 
 #-------------------------------------------------------------------
 
+=head2 getFileContentsAsHashref ( filename )
+
+Returns a hash reference from the file. Must be used in conjunction with a file that was saved using the addFileFromHashref method.
+
+=head3 filename
+
+The file to retrieve the data from.
+
+=cut
+
+sub getFileContentsAsHashref {
+	my $self = shift;
+	my $filename = shift;
+        return retrieve($self->getPath($filename));
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getFileContentsAsScalar ( filename )
 
 Reads the contents of a file into a scalar variable and returns the scalar.
@@ -492,11 +510,11 @@ sub getFileContentsAsScalar {
 	my $self = shift;
 	my $filename = shift;
 	my $content;
-	open (FILE,"<".$self->getPath($filename));
-	while (<FILE>) {
+	open (my $FILE,"<",$self->getPath($filename));
+	while (<$FILE>) {
 		$content .= $_;
 	}
-	close(FILE);
+	close($FILE);
 	return $content;
 }
 
@@ -592,25 +610,6 @@ sub getFiles {
 	return [];
 }
 
-
-
-#-------------------------------------------------------------------
-
-=head2 getFileContentsAsHashref ( filename )
-
-Returns a hash reference from the file. Must be used in conjunction with a file that was saved using the addFileFromHashref method.
-
-=head3 filename
-
-The file to retrieve the data from.
-
-=cut
-
-sub getHashref {
-	my $self = shift;
-	my $filename = shift;
-        return retrieve($self->getPath($filename));
-}
 
 
 

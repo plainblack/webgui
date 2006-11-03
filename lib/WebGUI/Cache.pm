@@ -14,6 +14,7 @@ package WebGUI::Cache;
 
 =cut
 
+use strict;
 use File::Path;
 use HTTP::Headers;
 use HTTP::Request;
@@ -63,7 +64,7 @@ An array reference representing the portion of the key to delete. So if you have
 =cut
 
 sub deleteChunk {
-	$self = shift;
+	my $self = shift;
 	$self->flush;
 }
 
