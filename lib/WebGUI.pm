@@ -1,6 +1,4 @@
 package WebGUI;
-our $VERSION = "7.2.0";
-our $STATUS = "beta";
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2006 Plain Black Corporation.
@@ -33,6 +31,9 @@ use Apache2::RequestIO ();
 use Apache2::Const -compile => qw(OK DECLINED NOT_FOUND DIR_MAGIC_TYPE);
 use Apache2::ServerUtil ();
 use LWP::MediaTypes qw(guess_media_type);
+
+our $VERSION = "7.2.0";
+our $STATUS = "beta";
 
 #-------------------------------------------------------------------
 
