@@ -1947,6 +1947,8 @@ This actually does the change url of the www_changeUrl() function.
 sub www_changeUrlConfirm {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
+	$self->_invokeWorkflowOnExportedFiles($self->session->setting->get('changeUrlWorkflow'), 1);
+
 	if ($self->session->form->process("confirm","yesNo") && $self->session->form->process("url","text")) {
 		$self->update({url=>$self->session->form->process("url","text")});
 	 	my $rs = $self->session->db->read("select revisionDate from assetData where assetId=? and revisionDate<>?",[$self->getId, $self->get("revisionDate")]);

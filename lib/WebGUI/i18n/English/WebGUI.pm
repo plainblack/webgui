@@ -31,6 +31,42 @@ our $I18N = {
 		context=>"Settings"
 	},
 
+	'trash workflow help' => {
+		message => q|Which workflow to run when an asset is placed in the trash.|,
+		lastUpdated => 1162242500,
+		context=>"Settings hover help"
+	},
+
+	'trash workflow' => {
+		message => q|Trash Workflow|,
+		lastUpdated => 1162242500,
+		context=>"Settings"
+	},
+
+	'purge workflow help' => {
+		message => q|Which workflow to run when an asset is purged.|,
+		lastUpdated => 1162242500,
+		context=>"Settings hover help"
+	},
+
+	'purge workflow' => {
+		message => q|Purge Workflow|,
+		lastUpdated => 1162242500,
+		context=>"Settings"
+	},
+
+	'changeUrl workflow help' => {
+		message => q|Which workflow to run when an asset's URL is changed.|,
+		lastUpdated => 1162348521,
+		context=>"Settings hover help"
+	},
+
+	'changeUrl workflow' => {
+		message => q|Change URL Workflow|,
+		lastUpdated => 1162348521,
+		context=>"Settings"
+	},
+
 	'expire groupings' => {
 		message => q|Expire User Groupings|,
 		lastUpdated => 0

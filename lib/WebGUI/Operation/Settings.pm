@@ -68,6 +68,7 @@ sub definition {
 		hoverHelp=>$i18n->get('127 description'),
 		defaultValue=>$session->setting->get("companyURL")
 		});
+
 	# content settings
 	push(@fields, {
 		tab=>"content",
@@ -78,6 +79,34 @@ sub definition {
 		label=>$i18n->get("default version tag workflow"),
 		hoverHelp=>$i18n->get('default version tag workflow help')
 		});
+	push(@fields, {
+		tab=>"content",
+		fieldType=>"workflow",
+		name=>"trashWorkflow",
+		defaultValue=>$session->setting->get("trashWorkflow"),
+		type=>"None",
+		label=>$i18n->get("trash workflow"),
+		hoverHelp=>$i18n->get('trash workflow help')
+		});
+	push(@fields, {
+		tab=>"content",
+		fieldType=>"workflow",
+		name=>"purgeWorkflow",
+		defaultValue=>$session->setting->get("purgeWorkflow"),
+		type=>"None",
+		label=>$i18n->get("purge workflow"),
+		hoverHelp=>$i18n->get('purge workflow help')
+		});
+	push(@fields, {
+		tab=>"content",
+		fieldType=>"workflow",
+		name=>"changeUrlWorkflow",
+		defaultValue=>$session->setting->get("changeUrlWorkflow"),
+		type=>"None",
+		label=>$i18n->get("changeUrl workflow"),
+		hoverHelp=>$i18n->get('changeUrl workflow help')
+		});
+
         my %htmlFilter = (
 		'none'=>$i18n->get(420), 
 		'most'=>$i18n->get(421), 

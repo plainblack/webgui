@@ -136,9 +136,12 @@ sub _exportAsHtml {
 			$filename = $index;
 		}
 
+		my $fullPath = (length($path)? "$path/" : "").$filename;
 		if ($asset->getId eq $defaultAssetId) {
-			$defaultAssetPath = $path.'/'.$filename;
+			$defaultAssetPath = $fullPath;
 		}
+
+		$self->session->db->write("UPDATE asset SET lastExportedAs = ? WHERE assetId = ?", [$fullPath, $asset->getId]);
 
 		$path = $exportPath . (length($path)? "/$path" : "");
 		eval { mkpath($path) };

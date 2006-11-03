@@ -12,7 +12,7 @@ use lib "../../lib";
 use strict;
 use Getopt::Long;
 use WebGUI::Session;
-
+use WebGUI::Workflow;
 
 my $toVersion = "7.2.0"; # make this match what version you're going to
 my $quiet; # this line required
@@ -23,6 +23,8 @@ my $session = start(); # this line required
 commerceSalesTax($session);
 createDictionaryStorage($session);
 addRssUrlMacroProcessing($session);
+addLastExportedAs($session);
+addDeletionWorkflows($session);
 addRSSFromParent($session);
 
 finish($session); # this line required
@@ -64,6 +66,48 @@ sub createDictionaryStorage {
 
 	mkdir $dictionaryDirectory unless (-e $dictionaryDirectory);
 	mkdir $dictionaryDirectory.'/oldIds' unless (-e $dictionaryDirectory.'/oldIds');
+}
+
+#-------------------------------------------------
+sub addLastExportedAs {
+	my $session = shift;
+	print "\tAdding lastExportedAs field for assets.\n" unless $quiet;
+
+	$session->db->write($_) for(<<'EOT',
+  ALTER TABLE asset
+   ADD COLUMN lastExportedAs varchar(255) NULL DEFAULT NULL
+EOT
+				   );
+}
+
+#-------------------------------------------------
+sub addDeletionWorkflows {
+	my $session = shift;
+	print "\tAdding deletion workflows and activities.\n" unless $quiet;
+
+	my $nullAssetWorkflow = WebGUI::Workflow->create
+	    ($session, { type => "None",
+			 enabled => 1,
+			 description => "Does nothing extra.  Default for deletion workflow settings.",
+			 title => "Do Nothing on Deletion" },
+	     "DPWwf20061030000000001");
+	my $deleteExportsWorkflow = WebGUI::Workflow->create
+	    ($session, { type => "None",
+			 enabled => 1,
+			 description => "Deletes exported files from an asset being deleted or moved.",
+			 title => "Delete Exported Files" },
+	     "DPWwf20061030000000002");
+	my $deleteExportsActivity = $deleteExportsWorkflow->addActivity
+	    ("WebGUI::Workflow::Activity::DeleteExportedFiles", "DPWwfa2006103000000002");
+	$deleteExportsActivity->set('title', 'Delete Exported Files');
+
+	$session->db->write("INSERT INTO settings (name, value) VALUES (?, ?)", $_) for
+	    (['trashWorkflow', $nullAssetWorkflow->getId], ['purgeWorkflow', $nullAssetWorkflow->getId],
+	     ['changeUrlWorkflow', $nullAssetWorkflow->getId]);
+
+	my $activityHash = $session->config->get('workflowActivities');
+	push @{$activityHash->{None}}, 'WebGUI::Workflow::Activity::DeleteExportedFiles';
+	$session->config->set('workflowActivities', $activityHash);
 }
 
 

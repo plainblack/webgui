@@ -97,6 +97,8 @@ Deletes an asset from tables and removes anything bound to that asset, including
 sub purge {
 	my $self = shift;
 	return undef if ($self->getId eq $self->session->setting->get("defaultPage") || $self->getId eq $self->session->setting->get("notFoundPage") || $self->get("isSystem"));
+	$self->_invokeWorkflowOnExportedFiles($self->session->setting->get('purgeWorkflow'), 1);
+
 	my $kids = $self->getLineage(["children"],{returnObjects=>1, statesToInclude=>['published', 'clipboard', 'clipboard-limbo','trash','trash-limbo']});
 	foreach my $kid (@{$kids}) {
 		$kid->purge;
@@ -127,6 +129,10 @@ Removes asset from lineage, places it in trash state. The "gap" in the lineage i
 sub trash {
 	my $self = shift;
 	return undef if ($self->getId eq $self->session->setting->get("defaultPage") || $self->getId eq $self->session->setting->get("notFoundPage"));
+	foreach my $asset ($self, @{$self->getLineage(['descendants'], {returnObjects => 1})}) {
+		$asset->_invokeWorkflowOnExportedFiles($self->session->setting->get('trashWorkflow'), 1);
+	}
+
 	my $db = $self->session->db;
 	$db->beginTransaction;
 	my $sth = $db->read("select assetId from asset where lineage like ?",[$self->get("lineage").'%']);
@@ -141,6 +147,16 @@ sub trash {
 	$self->purgeCache;
 }
 
+sub _invokeWorkflowOnExportedFiles {
+	my $self = shift;
+	my $workflowId = shift;
+	my $clearExportedAs = shift;
+
+	my ($lastExportedAs) = $self->session->db->quickArray("SELECT lastExportedAs FROM asset WHERE assetId = ?", [$self->getId]);
+	my $wfInstance = WebGUI::Workflow::Instance->create($self->session, { workflowId => $self->session->setting->get('trashWorkflow') });
+	$wfInstance->setScratch(WebGUI::Workflow::Activity::DeleteExportedFiles::DELETE_FILES_SCRATCH(), Storable::freeze([defined($lastExportedAs)? ($lastExportedAs) : ()]));
+	$clearExportedAs and $self->session->db->write("UPDATE asset SET lastExportedAs = NULL WHERE assetId = ?", [$self->getId]);
+}
 
 #-------------------------------------------------------------------
 
