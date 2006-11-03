@@ -288,8 +288,8 @@ sub _normalize_items {
                 }
 
                 # IE doesn't recognize &apos;
-                $item->{title} =~ s/&apos;/\'/;
-                $item->{description} =~ s/&apos;/\'/;
+                $item->{title} =~ s/&apos;/\'/g;
+                $item->{description} =~ s/&apos;/\'/g;
         }
 }
 
