@@ -93,10 +93,6 @@ our $HELP = {
 				namespace => 'Asset_Survey'
 			},
 			{
-				tag => 'survey template common vars',
-				namespace => 'Asset_Survey'
-			},
-			{
 				tag => 'gradebook report template',
 				namespace => 'Asset_Survey'
 			},
@@ -191,6 +187,12 @@ our $HELP = {
 		title => '88',
 		body => '89',
 		fields => [
+		],
+		isa => [
+			{
+				namespace => "Asset_Survey",
+				tag => "survey template common vars"
+			},
 		],
 		variables => [
 		          {
@@ -328,10 +330,6 @@ our $HELP = {
 		],
 		related => [
 			{
-				tag => 'survey template common vars',
-				namespace => 'Asset_Survey'
-			},
-			{
 				tag => 'survey add/edit',
 				namespace => 'Asset_Survey'
 			},
@@ -411,6 +409,12 @@ our $HELP = {
 		body => '1088',
 		fields => [
 		],
+		isa => [
+			{
+				namespace => "Asset_Survey",
+				tag => "survey template common vars"
+			},
+		],
 		variables => [
 		          {
 		            'name' => 'title'
@@ -454,15 +458,17 @@ our $HELP = {
 				tag => 'survey template',
 				namespace => 'Asset_Survey'
 			},
-			{
-				tag => 'survey template common vars',
-				namespace => 'Asset_Survey'
-			}
 		]
 	},
 	'survey response template' => {
 		title => '1089',
 		body => '1090',
+		isa => [
+			{
+				namespace => "Asset_Survey",
+				tag => "survey template common vars"
+			},
+		],
 		fields => [
 		],
 		variables => [
@@ -552,10 +558,6 @@ our $HELP = {
 		],
 		related => [
 			{
-				tag => 'survey template common vars',
-				namespace => 'Asset_Survey'
-			},
-			{
 				tag => 'survey add/edit',
 				namespace => 'Asset_Survey'
 			}
@@ -565,6 +567,12 @@ our $HELP = {
 		title => '1091',
 		body => '1092',
 		fields => [
+		],
+		isa => [
+			{
+				namespace => "Asset_Survey",
+				tag => "survey template common vars"
+			},
 		],
 		variables => [
 		          {
@@ -637,10 +645,6 @@ our $HELP = {
 			{
 				tag => 'pagination template variables',
 				namespace => 'WebGUI'
-			},
-			{
-				tag => 'survey template common vars',
-				namespace => 'Asset_Survey'
 			},
 			{
 				tag => 'survey add/edit',
