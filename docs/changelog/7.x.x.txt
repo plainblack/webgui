@@ -17,6 +17,7 @@
    does enough to test Session/Http.pm, except for cookies.
  - Added an option to the Syndicated Content Wobject that allows use of macros
    inside the RSS Url property.
+ - semi-fix: WebGUI/Mail/Send.pm no longer has extraneous UTF-8 BOM
 
 7.1.4
  - Template variables in the main Survey Template were out of date in the

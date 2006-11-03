@@ -1,4 +1,4 @@
-﻿package WebGUI::Mail::Send;
+package WebGUI::Mail::Send;
 
 =head1 LEGAL
 
