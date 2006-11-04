@@ -515,8 +515,9 @@ sub _parsePlaceholderParams {
         my $params = shift;
         my @placeholderParams;
         foreach my $row (split(/\n/,$params)) {
-		chop($row) if ($row =~ m/\s+$/);	
-                next if ($row =~ /^\s*$/);
+		$row =~ s/^\s+//;
+		$row =~ s/\s+$//;
+                next if ($row eq '');
                 my ($type,$field) = split(/:/,$row);
                 my $param;
                 if($type =~ /^form/) {
@@ -524,6 +525,9 @@ sub _parsePlaceholderParams {
                 } elsif ($type =~ /^query(\d)/) {
                         $param = $self->{_query}{$1}{rowData}{$field};
                 }
+		else {
+			$param = $row;
+		}
                 WebGUI::Macro::process($self->session,\$param);
                 push(@placeholderParams, $param);
         }

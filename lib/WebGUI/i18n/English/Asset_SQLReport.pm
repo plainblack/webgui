@@ -56,9 +56,9 @@ Placeholder Parameters: query1:pageId<br />form:field1</p>
 </div>
 <p>In this example the first question mark will contain the field value of pageId in query1,
 while the second question mark will contain the form variable "field1".</p>
-<p>Place one Placeholder Parameter on each line.</p>
+<p>Place one Placeholder Parameter on each line.  Leading and trailing whitespace will be trimmed from each parameter.</p>
 |,
-                lastUpdated => 1146785541,
+                lastUpdated => 1162613239,
         },
 
         '15 description' => {

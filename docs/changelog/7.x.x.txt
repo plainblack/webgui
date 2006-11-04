@@ -31,6 +31,7 @@
  - fix: WebGUI::Text::splitCsv no longer removes trailing empty fields
  - fix: Product add-to-group would always try to add a user to a group
  - Made many minor changes recommended by Perl::Critic.
+ - fix: No Integers or Strings as Placeholder Parameters
  - Made many minor code efficiency changes.
  - fix: Two cookies and incorrect Last-Modified date in HTTP header
  - WebGUI::Text no longer spits out a billion warnings
