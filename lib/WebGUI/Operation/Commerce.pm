@@ -1011,7 +1011,7 @@ sub www_selectPaymentGateway {
 	
 	$i18n = WebGUI::International->new($session, 'Commerce');
 	$plugins = WebGUI::Commerce::Payment->getEnabledPlugins($session);
-	if (scalar(@$plugins) > 1) {
+	if (scalar(@$plugins)) {
 		foreach (@$plugins) {
 			push(@pluginLoop, {
 				name		=> $_->name,
@@ -1019,8 +1019,10 @@ sub www_selectPaymentGateway {
 				formElement	=> WebGUI::Form::radio($session,{name=>'paymentGateway', value=>$_->namespace})
 				}) if ($session->user->isInGroup($_->get('whoCanUse')));
 		}
-	} elsif (scalar(@$plugins) == 1) {
-		my $paymentGateway = $plugins->[0]->namespace;
+	} 
+	# If user is only authorized for one payment gateway, skip this step
+	if (scalar(@pluginLoop) == 1) {
+		my $paymentGateway = $pluginLoop[0]->{namespace};
 		return WebGUI::Operation::Commerce::www_selectPaymentGatewaySave($session, $paymentGateway);
 	}
 	

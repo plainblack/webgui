@@ -37,6 +37,8 @@
  - WebGUI::Text no longer spits out a billion warnings
  - fix: workaround for IE not handling &apos; in SyndicatedContent was not catching everything
  - fix: WebGUI::Operation::ProductManager added a tab with wrong name.
+ - fix: WebGUI::Operation::Commerce www_selectPaymentGateway no longer forces
+   user to choose gateway if they are only authorized to use one
 
 7.1.3
  - fix: SQLReport now returns error if can't find DatabaseLink
