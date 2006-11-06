@@ -153,7 +153,7 @@ sub www_editProduct {
 
 	$f = WebGUI::TabForm->new($session);
 	$f->addTab("properties","Properties");
-	$f->addTab("properties","Actions");
+	$f->addTab("actions","Actions");
 
 	$f->submit;
 	$f->hidden({
