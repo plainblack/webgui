@@ -27,10 +27,16 @@ my $num_tests = 71;
 plan tests => $num_tests;
  
 my $session = WebGUI::Test->session;
- 
-# put your tests here
 
 my $http = $session->http;
+
+use Test::MockObject::Extends;
+
+$http = Test::MockObject::Extends->new($http);
+my $cookieName = $session->config->getCookieName;
+my $varId = $session->var->getId();
+
+$http->mock( getCookies => sub { return {$cookieName => $varId} } );
 
 isa_ok($http, 'WebGUI::Session::Http', 'session has correct object type');
 
