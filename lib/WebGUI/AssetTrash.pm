@@ -147,6 +147,7 @@ sub trash {
 	$self->purgeCache;
 }
 
+require WebGUI::Workflow::Activity::DeleteExportedFiles;
 sub _invokeWorkflowOnExportedFiles {
 	my $self = shift;
 	my $workflowId = shift;
