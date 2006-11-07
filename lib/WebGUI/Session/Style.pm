@@ -200,6 +200,13 @@ if ($self->session->user->isInGroup(2) || $self->session->setting->get("preventP
 	my $output;
 	if (defined $style) {
 		$var{'head.tags'} .= $style->get("headBlock");
+		my $meta = {};
+        	if ($self->session->setting->get("metaDataEnabled")) {
+                	$meta = $style->getMetaDataFields();
+        	}
+        	foreach my $field (keys %$meta) {
+                	$var{$meta->{$field}{fieldName}} = $meta->{$field}{value};
+        	}
 		$output = $style->process(\%var);
 	} else {
 		$output = "WebGUI was unable to instantiate your style template.".$var{'body.content'};
