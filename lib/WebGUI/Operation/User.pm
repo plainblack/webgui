@@ -47,48 +47,48 @@ Internal utility routine for setting up the Admin Console for User functions.
 
 A reference to the current session.
 
-=head3 workarea
+=head3 properties
 
-The form and information to display to the administrator using the function.
+A hash reference containing all the properties to set in this submenu
 
-=head3 title
+workarea: content to render in admin console
 
-Internationalized title for the Admin Console, looked up in the WebGUI namespace if it exists.
+userId: userId of user to be modified by submenu controls such as edit and delete
 
-=head3 help
+title: internationalization key from users for text to display as the admin consoles title
 
-Help topic.  If set, then a Help icon will be displayed as a link to that topic.
+help: interanationalization key from users help to link current screen help icon to
 
 =cut
 
 sub _submenu {
 	my $session = shift;
-        my $workarea = shift;
-        my $title = shift;
+	my $properties = shift;
 	my $i18n = WebGUI::International->new($session);
-        $title = $i18n->get($title) if ($title);
-        my $help = shift;
-        my $ac = WebGUI::AdminConsole->new($session,"users");
-        if ($help) {
-                $ac->setHelp($help);
-        }
+	my $ac = WebGUI::AdminConsole->new($session,"users");
+	my $userId = $properties->{userId} || $session->form->get("uid");
+	my $workarea = $properties->{workarea};
+	my $title;
+	$title = $i18n->get($properties->{title}) if ($properties->{title});
+	$ac->setHelp($properties->{help}) if ($properties->{help});
+
 	if ($session->user->isInGroup(11)) {
 		$ac->addSubmenuItem($session->url->page("op=editUser;uid=new"), $i18n->get(169));
 	}
+
 	if ($session->user->isInGroup(3)) {
 		unless ($session->form->process("op") eq "listUsers" 
 			|| $session->form->process("op") eq "deleteUserConfirm"
-			|| $session->stow->get("editUser_UID") eq "new") {
-			$ac->addSubmenuItem($session->url->page("op=editUser;uid=".$session->stow->get("editUser_UID")), $i18n->get(457));
-			$ac->addSubmenuItem($session->url->page('op=becomeUser;uid='.$session->stow->get("editUser_UID")), $i18n->get(751));
-			$ac->addConfirmedSubmenuItem($session->url->page('op=deleteUser;uid='.$session->stow->get("editUser_UID")), $i18n->get(750), $i18n->get(167));
+			|| $userId eq "new") {
+			$ac->addSubmenuItem($session->url->page("op=editUser;uid=$userId"), $i18n->get(457));
+			$ac->addSubmenuItem($session->url->page("op=becomeUser;uid=$userId"), $i18n->get(751));
+			$ac->addConfirmedSubmenuItem($session->url->page("op=deleteUser;uid=$userId"), $i18n->get(750), $i18n->get(167));
 			if ($session->setting->get("useKarma")) {
-				$ac->addSubmenuItem($session->url->page("op=editUserKarma;uid=".$session->stow->get("editUser_UID")), $i18n->get(555));
+				$ac->addSubmenuItem($session->url->page("op=editUserKarma;uid=$userId"), $i18n->get(555));
 			}
 		}
 		$ac->addSubmenuItem($session->url->page("op=listUsers"), $i18n->get(456));
 	}
-	$session->stow->delete("editUser_UID");
         return $ac->render($workarea, $title);
 }
 
@@ -298,7 +298,6 @@ sub www_editUser {
 	$tabform->formHeader({extras=>'autocomplete="off"'});	
 	my $u = WebGUI::User->new($session,($uid eq 'new') ? '' : $uid); #Setting uid to '' when uid is 'new' so visitor defaults prefill field for new user
 	my $username = ($u->userId eq '1' && $uid ne "1") ? '' : $u->username;
-	$session->stow->set("editUser_UID", $uid);
     	$tabform->hidden({name=>"op",value=>"editUserSave"});
     	$tabform->hidden({name=>"uid",value=>$uid});
     	$tabform->getTab("account")->raw('<tr><td width="170">&nbsp;</td><td>&nbsp;</td></tr>');
@@ -392,7 +391,12 @@ sub www_editUser {
 		-size=>15,
 		-value=>\@groupsToDelete
 		);
-	return _submenu($session,$error.$tabform->print,'168',"user add/edit");
+	my $submenu = _submenu($session,{ workarea => $error.$tabform->print,
+					  title    => 168,
+					  help     => 'user add/edit',
+					  userId   => $uid,
+					});
+	return $submenu;;
 }
 
 #-------------------------------------------------------------------
@@ -459,7 +463,7 @@ sub www_editUserSave {
        		$error = '<ul>' . sprintf($i18n->get(77), $username, $username, $username, $session->datetime->epochToHuman($session->datetime->time(),"%y")).'</ul>';
 	}
 	if ($isSecondary) {
-		return _submenu($session,$i18n->get(978));
+		return _submenu($session,{workarea => $i18n->get(978)});
 
 	# Display updated user information
 	} else {
@@ -495,7 +499,11 @@ sub www_editUserKarma {
 	);
         $f->submit;
         $output .= $f->print;
-        return _submenu($session,$output,'558',"edit user karma");
+	my $submenu = _submenu($session,{ workarea => $output,
+					  title    => 558,
+					  help	   => 'edit user karma',
+					});  
+        return $submenu;
 }
 
 #-------------------------------------------------------------------
@@ -552,7 +560,7 @@ sub www_listUsers {
 	my $i18n = WebGUI::International->new($session);
 	my $output = getUserSearchForm($session,"listUsers");
 	my ($userCount) = $session->db->quickArray("select count(*) from users");
-	return _submenu($session,$output) unless ($session->form->process("doit") || $userCount<250 || $session->form->process("pn") > 1);
+	return _submenu($session,{workarea => $output}) unless ($session->form->process("doit") || $userCount<250 || $session->form->process("pn") > 1);
 	tie %status, 'Tie::IxHash';
 	%status = (
 		Active		=> $i18n->get(817),
@@ -595,7 +603,10 @@ sub www_listUsers {
         $output .= '</table>';
         $p->setAlphabeticalKey('username');
         $output .= $p->getBarTraditional;
-	return _submenu($session,$output,undef,"users manage");
+	my $submenu = _submenu($session, { workarea => $output,
+					   help => "users manage"
+					 });
+	return $submenu;
 }
 
 1;
