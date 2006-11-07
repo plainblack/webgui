@@ -868,6 +868,7 @@ sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView();
 	my $template = WebGUI::Asset::Template->new($self->session, $self->get("collaborationTemplateId"));
+	$self->session->style->setLink($self->getRssUrl,{ rel=>'alternate', type=>'application/rss+xml', title=>'RSS' });
 	$template->prepare;
 	$self->{_viewTemplate} = $template;
 }
@@ -1072,7 +1073,6 @@ sub view {
 	$var{'sortby.views.url'} = $self->getSortByUrl("views");
 	$var{'sortby.replies.url'} = $self->getSortByUrl("replies");
 	$var{'sortby.rating.url'} = $self->getSortByUrl("rating");
-	$self->session->style->setLink($var{"rss.url"},{ rel=>'alternate', type=>'application/rss+xml', title=>'RSS' });
 	$var{"search.url"} = $self->getSearchUrl;
 	$var{"subscribe.url"} = $self->getSubscribeUrl;
 	$var{"unsubscribe.url"} = $self->getUnsubscribeUrl;
