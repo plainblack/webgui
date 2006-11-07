@@ -172,26 +172,32 @@ function getTotalDuration(te) {
 			     parseFloatOrNA(te.lagTime.value));
 }
 
+//--------------------------------------------------------------------------------------	
 function maybeDefaultTaskValues(te) {
    var todayString = intlDate(new Date());
-   var tomorrowString = intlDate(datePlusDays(new Date(), 1));
+   //var tomorrowString = intlDate(datePlusDays(new Date(), 1));
    var timed = isTimed(te);
 
-   if (te.duration.value == "") te.duration.value = timed? durationOfFracDays(1) : 0;
+   //if (te.duration.value == "") te.duration.value = timed? durationOfFracDays(1) : 0;
    if (te.lagTime.value == "") te.lagTime.value = 0;
 
    if (te.start.value == "" && te.end.value == "") {
       te.start.value = todayString;
-      te.end.value = tomorrowString;
+      te.end.value = todayString;  
    } else if (te.start.value == "") {
       setEndFromStartDate(te);
    } else if (te.end.value == "") {
       setStartFromEndDate(te);
    }
+   
+   if(timed && te.duration.value == 0) {
+      //TO DO - Calculate duration based on end date
+   }
 
    updateTaskArray(te);
 }
 
+//--------------------------------------------------------------------------------------	
 function updateTaskArray(te) {
    var seqNum = te.seqNum.value;
    if (seqNum == "") return;
