@@ -40,6 +40,7 @@
  - fix: Thread layout "flat" doesn't stick
  - fix: Rich Edit omitting rows drops subsequent rows
  - fix: Phishing Bug... take that spammers!
+ - fix: Default PM Dashboard Template extra form element not implemented yet
 
 7.1.4
  - Template variables in the main Survey Template were out of date in the
