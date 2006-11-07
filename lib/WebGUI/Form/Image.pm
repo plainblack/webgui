@@ -139,7 +139,13 @@ sub getValueFromPost {
 		my $storage = WebGUI::Storage::Image->get($self->session, $id);
 		if (defined $storage) {
 			foreach my $file (@{$storage->getFiles}) {
-				$storage->generateThumbnail($file) if ($storage->isImage($file));
+				if ($storage->isImage($file)) {
+					$storage->generateThumbnail($file);
+				}
+				else {
+					$storage->delete;
+					$id = undef;
+				}
 			}
 		}
 	}

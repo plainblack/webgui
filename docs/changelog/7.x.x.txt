@@ -39,6 +39,7 @@
  - fix: Activity list expands outside of edit workflow screen
  - fix: Thread layout "flat" doesn't stick
  - fix: Rich Edit omitting rows drops subsequent rows
+ - fix: Phishing Bug... take that spammers!
 
 7.1.4
  - Template variables in the main Survey Template were out of date in the
