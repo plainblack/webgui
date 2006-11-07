@@ -658,6 +658,7 @@ sub view {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getRssUrl
 
 Get the RSS URL and process macros if we're supposed to.
