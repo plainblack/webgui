@@ -433,12 +433,11 @@ sub getRichEditor {
 	my $self = shift;
 	return '' if ($self->getValue('disableRichEditor') || $self->session->env->get("HTTP_USER_AGENT") =~ /Safari/);
 	my $nameId = shift;
-	my @toolbarRow1 = split("\n",$self->getValue("toolbarRow1"));	
-	push(@toolbarRow1,"contextmenu") if ($self->getValue("enableContextMenu"));
-	my @toolbarRow2 = split("\n",$self->getValue("toolbarRow2"));	
-	my @toolbarRow3 = split("\n",$self->getValue("toolbarRow3"));	
-	my @toolbarButtons = (@toolbarRow1,@toolbarRow2,@toolbarRow3);
+	my @toolbarRows = grep{@$_} map{[split "\n", $self->getValue("toolbarRow$_")]} (1..3);
+	push(@{$toolbarRows[0]},"contextmenu") if ($self->getValue("enableContextMenu"));
+	my @toolbarButtons = map{@$_} @toolbarRows;
 	my @plugins;
+
 	my $i18n = WebGUI::International->new($self->session, 'Asset_RichEdit');
 	my %config = (
 		mode => "exact",
@@ -451,9 +450,8 @@ sub getRichEditor {
     		cleanup_callback => "tinyMCE_WebGUI_Cleanup",
     		urlconvertor_callback => "tinyMCE_WebGUI_URLConvertor",
 		theme_advanced_resizing => "true",
-		theme_advanced_buttons1 => join(",",@toolbarRow1),
-		theme_advanced_buttons2 => join(",",@toolbarRow2),
-		theme_advanced_buttons3 => join(",",@toolbarRow3),
+		      (map { "theme_advanced_buttons".($_+1) => (join ',', @{$toolbarRows[$_]}) }
+		       (0..$#toolbarRows)),
 		ask => $self->getValue("askAboutRichEdit") ? "true" : "false",
 		preformatted => $self->getValue("preformatted") ? "true" : "false",
 		force_br_newlines => $self->getValue("useBr") ? "true" : "false",
