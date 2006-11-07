@@ -46,65 +46,121 @@ sub definition {
 	my $session = shift;
 	my $definition = shift;
 	my $i18n = WebGUI::International->new($session,"Asset_HttpProxy");
+	my %timeoutOptions;
+	tie %timeoutOptions, 'Tie::IxHash';
+	%timeoutOptions = map{$_ => $_} (5, 10, 20, 30, 60);
+
 	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
+		assetName => $i18n->get('assetName'),
 		uiLevel => 5,
-		icon=>'httpProxy.gif',
-		tableName=>'HttpProxy',
-		className=>'WebGUI::Asset::Wobject::HttpProxy',
-		properties=>{
-			templateId =>{
-				fieldType=>"template",
-				defaultValue=>'PBtmpl0000000000000033'
+		icon => 'httpProxy.gif',
+		tableName => 'HttpProxy',
+		className => 'WebGUI::Asset::Wobject::HttpProxy',
+		autoGenerateForms => 1,
+		properties => {
+			templateId => {
+				fieldType => "template",
+				defaultValue => 'PBtmpl0000000000000033',
+				namespace => 'HttpProxy',
+				tab => 'display',
+				label => $i18n->get('http proxy template title'),
+				hoverHelp => $i18n->get('http proxy template title description'),
 				},
-			proxiedUrl=>{
-				fieldType=>"url",
-				defaultValue=>'http://'
-				}, 
-			useAmpersand=>{
-				fieldType=>"yesNo",
-				defaultValue=>0
+
+			proxiedUrl => {
+				fieldType => "url",
+				defaultValue => 'http://',
+				tab => 'properties',
+				label => $i18n->get(1),
+				hoverHelp => $i18n->get('1 description'),
 				},
-			timeout=>{
-				fieldType=>"selectBox",
-				defaultValue=>30
-				}, 
-			removeStyle=>{
-				fieldType=>"yesNo",
-				defaultValue=>1
-				}, 
-			cacheTimeout=>{
-				fieldType=>"interval",
-				defaultValue=>0
+
+			useAmpersand => {
+				fieldType => "yesNo",
+				defaultValue => 0,
+				tab => 'properties',
+				label => $i18n->get("use ampersand"),
+				hoverHelp => $i18n->get("use ampersand help")
 				},
-			filterHtml=>{
-				fieldType=>"filterContent",
-				defaultValue=>"javascript"
-				}, 
-			followExternal=>{
-				fieldType=>"yesNo",
-				defaultValue=>1
-				}, 
-                        rewriteUrls=>{
-				fieldType=>"yesNo",
-                                defaultValue=>1
+
+			timeout => {
+				fieldType => "selectBox",
+				defaultValue => 30,
+				tab => 'properties',
+				options => \%timeoutOptions,
+				label => $i18n->get(4),
+				hoverHelp => $i18n->get('4 description'),
+				},
+
+			removeStyle => {
+				fieldType => "yesNo",
+				defaultValue => 1,
+				tab => 'display',
+				label => $i18n->get(6),
+				hoverHelp => $i18n->get('6 description'),
+				},
+
+			cacheTimeout => {
+				fieldType => "interval",
+				defaultValue => 0,
+				tab => 'display',
+				label => $i18n->get('cache timeout'),
+				hoverHelp => $i18n->get('cache timeout description'),
+				uiLevel => 8,
+				},
+
+			filterHtml => {
+				fieldType => "filterContent",
+				defaultValue => "javascript",
+				tab => 'display',
+				label => $i18n->get(418, 'WebGUI'),
+				hoverHelp => $i18n->get('418 description', 'WebGUI'),
+				},
+
+			followExternal => {
+				fieldType => "yesNo",
+				defaultValue => 1,
+				tab => 'security',
+				label => $i18n->get(5),
+				hoverHelp => $i18n->get('5 description'),
+				},
+
+                        rewriteUrls => {
+				fieldType => "yesNo",
+                                defaultValue => 1,
+				tab => 'properties',
+				label => $i18n->get(12),
+				hoverHelp => $i18n->get('12 description'),
                                 },
-			followRedirect=>{
-				fieldType=>"yesNo",
-				defaultValue=>0
+
+			followRedirect => {
+				fieldType => "yesNo",
+				defaultValue => 0,
+				tab => 'security',
+				label => $i18n->get(8),
+				hoverHelp => $i18n->get('8 description'),
 				},
-			searchFor=>{
-				fieldType=>"text",
-                                defaultValue=>undef
+
+			searchFor => {
+				fieldType => "text",
+                                defaultValue => undef,
+				tab => 'display',
+				label => $i18n->get(13),
+				hoverHelp => $i18n->get('13 description'),
                                 },
-                        stopAt=>{
-				fieldType=>"text",
-                                defaultValue=>undef
+
+                        stopAt => {
+				fieldType => "text",
+                                defaultValue => undef,
+				tab => 'display',
+				label => $i18n->get(14),
+				hoverHelp => $i18n->get('14 description'),
                                 },
-			cookieJarStorageId=>{
-                                noFormPost=>1,
-                                fieldType=>"hidden",
-                                defaultValue=>undef
+
+			cookieJarStorageId => {
+                                noFormPost => 1,
+                                fieldType => "hidden",
+                                defaultValue => undef
                                 }
 			}
 		});
@@ -123,92 +179,6 @@ sub getCookieJar {
 	}
 	return $storage;
 }
-
-#-------------------------------------------------------------------
-sub getEditForm {
-	my $self = shift;
-	my $i18n = WebGUI::International->new($self->session,"Asset_HttpProxy");
-	my $tabform = $self->SUPER::getEditForm();
-   	$tabform->getTab("display")->template(
-      		-value=>$self->getValue('templateId'),
-                -label=>$i18n->get('http proxy template title'),
-                -hoverHelp=>$i18n->get('http proxy template title description'),
-      		-namespace=>"HttpProxy"
-   		);
-	my %hash;
-	tie %hash, 'Tie::IxHash';
-	%hash=(5=>5,10=>10,20=>20,30=>30,60=>60);
-        $tabform->getTab("properties")->url(
-		-name=>"proxiedUrl", 
-		-label=>$i18n->get(1),
-		-hoverHelp=>$i18n->get('1 description'),
-		-value=>$self->getValue("proxiedUrl")
-		);
-        $tabform->getTab("security")->yesNo(
-        	-name=>"followExternal",
-                -label=>$i18n->get(5),
-                -hoverHelp=>$i18n->get('5 description'),
-                -value=>$self->getValue("followExternal")
-                );
-        $tabform->getTab("security")->yesNo(
-                -name=>"followRedirect",
-                -label=>$i18n->get(8),
-                -hoverHelp=>$i18n->get('8 description'),
-                -value=>$self->getValue("followRedirect")
-                );
-        $tabform->getTab("properties")->yesNo(
-                -name=>"rewriteUrls",
-                -label=>$i18n->get(12),
-                -hoverHelp=>$i18n->get('12 description'),
-                -value=>$self->getValue("rewriteUrls")
-                );
-        $tabform->getTab("display")->interval(
-                -name=>"cacheTimeout",
-                -label=>$i18n->get('cache timeout'),
-                -hoverHelp=>$i18n->get('cache timeout description'),
-		-uiLevel => 8,
-                -value=>$self->getValue("cacheTimeout")
-                );
-        $tabform->getTab("display")->yesNo(
-                -name=>"removeStyle",
-                -label=>$i18n->get(6),
-                -hoverHelp=>$i18n->get('6 description'),
-                -value=>$self->getValue("removeStyle")
-                );
-	$tabform->getTab("display")->filterContent(
-		-name=>"filterHtml",
-                -label=>$i18n->get(418, 'WebGUI'),
-                -hoverHelp=>$i18n->get('418 description', 'WebGUI'),
-		-value=>$self->getValue("filterHtml"),
-		);
-        $tabform->getTab("properties")->selectBox(
-		-name=>"timeout", 
-		-options=>\%hash, 
-		-label=>$i18n->get(4),
-		-hoverHelp=>$i18n->get('4 description'),
-		-value=>[$self->getValue("timeout")]
-		);
-        $tabform->getTab("display")->text(
-                -name=>"searchFor",
-                -label=>$i18n->get(13),
-                -hoverHelp=>$i18n->get('13 description'),
-                -value=>$self->getValue("searchFor")
-                );
-        $tabform->getTab("display")->text(
-                -name=>"stopAt",
-                -label=>$i18n->get(14),
-                -hoverHelp=>$i18n->get('14 description'),
-                -value=>$self->getValue("stopAt")
-                );
-	$tabform->getTab("properties")->yesNo(
-		name=>"useAmpersand",
-		value=>$self->getValue("useAmpersand"),
-		label=>$i18n->get("use ampersand"),
-		hoverHelp=>$i18n->get("use ampersand help")
-		);
-	return $tabform;
-}
-
 
 #-------------------------------------------------------------------
 

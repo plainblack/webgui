@@ -41,6 +41,7 @@
  - fix: Rich Edit omitting rows drops subsequent rows
  - fix: Phishing Bug... take that spammers!
  - fix: Default PM Dashboard Template extra form element not implemented yet
+ - refactor: move Dashboard, Folder, and HttpProxy getEditForm overrides into definition clauses
 
 7.1.4
  - Template variables in the main Survey Template were out of date in the

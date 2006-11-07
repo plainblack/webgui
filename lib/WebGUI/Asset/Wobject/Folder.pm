@@ -60,12 +60,13 @@ sub definition {
         my $definition = shift;
 	my $i18n = WebGUI::International->new($session,"Asset_Folder");
         push(@{$definition}, {
-		assetName=>$i18n->get("assetName"),
+		assetName => $i18n->get("assetName"),
 		uiLevel => 5,
-		icon=>'folder.gif',
-                tableName=>'Folder',
-                className=>'WebGUI::Asset::Wobject::Folder',
-                properties=>{
+		icon => 'folder.gif',
+                tableName => 'Folder',
+                className => 'WebGUI::Asset::Wobject::Folder',
+		autoGenerateForms => 1,
+                properties => {
 			visitorCacheTimeout => {
 				tab => "display",
 				fieldType => "interval",
@@ -74,13 +75,22 @@ sub definition {
 				label => $i18n->get("visitor cache timeout"),
 				hoverHelp => $i18n->get("visitor cache timeout help")
 				},
+
 			sortAlphabetically => {
-				fieldType=>"yesNo",
-				defaultValue=>0
+				fieldType => "yesNo",
+				defaultValue => 0,
+				tab => 'display',
+				label => $i18n->get('sort alphabetically'),
+			        hoverHelp => $i18n->get('sort alphabetically help'),
 				},
-			templateId =>{
-				fieldType=>"template",
-				defaultValue=>'PBtmpl0000000000000078'
+
+			templateId => {
+				fieldType => "template",
+				defaultValue => 'PBtmpl0000000000000078',
+                                namespace => 'Folder',
+				tab => 'display',
+				label => $i18n->get('folder template title'),
+				hoverHelp => $i18n->get('folder template description'),
 				}
                         }
                 });
@@ -101,26 +111,6 @@ sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
 	my $i18n = WebGUI::International->new($self->session,"Asset_Folder");
- 	$tabform->getTab("display")->interval(
- 		-name=>"visitorCacheTimeout",
-		-label=>$i18n->get('visitor cache timeout'),
-		-hoverHelp=>$i18n->get('visitor cache timeout help'),
-		-value=>$self->getValue('visitorCacheTimeout'),
-		-uiLevel=>8,
-		-defaultValue=>3600
-	);
-   	$tabform->getTab("display")->yesNo(
-      		-value=>$self->getValue('sortAlphabetically'),
-      		-label=>$i18n->get('sort alphabetically'),
-      		-hoverHelp=>$i18n->get('sort alphabetically help'),
-		-name=>"sortAlphabetically"
-   		);
-   	$tabform->getTab("display")->template(
-      		-value=>$self->getValue('templateId'),
-      		-label=>$i18n->get('folder template title'),
-      		-hoverHelp=>$i18n->get('folder template description'),
-      		-namespace=>"Folder"
-   		);
 	if ($self->get("assetId") eq "new") {
                	$tabform->getTab("properties")->whatNext(
                        	-options=>{

@@ -39,41 +39,59 @@ sub canPersonalize {
 sub definition {
 	my $class = shift;
 	my $session = shift;
-  my $definition = shift;
+	my $definition = shift;
+	my $i18n = WebGUI::International->new($session,"Asset_Dashboard");
+
 	my %properties;
 	tie %properties, 'Tie::IxHash';
 	%properties = (
-		templateId =>{
-			fieldType=>"template",
-			defaultValue=>'DashboardViewTmpl00001',
-			namespace=>"Dashboard"
+		templateId => {
+			fieldType => "template",
+			defaultValue => 'DashboardViewTmpl00001',
+			namespace => "Dashboard",
+			tab => 'display',
+			label => $i18n->get('dashboard template field label'),
+		        hoverHelp => $i18n->get('dashboard template description'),
 		},
-		adminsGroupId =>{
-			fieldType=>"group",
-			defaultValue=>'4'
+
+		adminsGroupId => {
+			fieldType => "group",
+			defaultValue => '4',
+		        tab => 'security',
+			label => $i18n->get('dashboard adminsGroupId field label'),
+			hoverHelp=>$i18n->get('dashboard adminsGroupId description'),
 		},
-		usersGroupId =>{
-			fieldType=>"group",
-			defaultValue=>'2'
+
+		usersGroupId => {
+			fieldType => "group",
+			defaultValue => '2',
+			label => $i18n->get('dashboard usersGroupId field label'),
+			hoverHelp => $i18n->get('dashboard usersGroupId description'),
 		},
-		isInitialized =>{
-			fieldType=>"yesNo",
-			defaultValue=>0,
-			noFormPost=>1,
+
+		isInitialized => {
+			fieldType => "yesNo",
+			defaultValue => 0,
+			noFormPost => 1,
+			autoGenerate => 0,
 		},
+
 		assetsToHide => {
-			defaultValue=>undef,
-			fieldType=>"checkList"
+			defaultValue => undef,
+			fieldType => "checkList",
+			autoGenerate => 0,
 		},
 	);
-	my $i18n = WebGUI::International->new($session,"Asset_Dashboard");
+
 	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		icon=>'dashboard.gif',
-		tableName=>'Dashboard',
-		className=>'WebGUI::Asset::Wobject::Dashboard',
-		properties=>\%properties
+		assetName => $i18n->get('assetName'),
+		icon => 'dashboard.gif',
+		tableName => 'Dashboard',
+		className => 'WebGUI::Asset::Wobject::Dashboard',
+		properties => \%properties,
+		autoGenerateForms => 1,
 	});
+
 	return $class->SUPER::definition($session, $definition);
 }
 
@@ -96,25 +114,6 @@ sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm;
 	my $i18n = WebGUI::International->new($self->session, "Asset_Dashboard");
-	$tabform->getTab("display")->template(
-		-name=>"templateId",
-		-value=>$self->getValue('templateId'),
-		-namespace=>"Dashboard",
-		-label=>$i18n->get('dashboard template field label'),
-		-hoverHelp=>$i18n->get('dashboard template description'),
-	);
-	$tabform->getTab("security")->group(
-		-name=>"adminsGroupId",
-		-label=>$i18n->get('dashboard adminsGroupId field label'),
-		-hoverHelp=>$i18n->get('dashboard adminsGroupId description'),
-		-value=>[$self->getValue("adminsGroupId")]
-	);
-	$tabform->getTab("security")->group(
-		-name=>"usersGroupId",
-		-label=>$i18n->get('dashboard usersGroupId field label'),
-		-hoverHelp=>$i18n->get('dashboard usersGroupId description'),
-		-value=>[$self->getValue("usersGroupId")]
-	);
 	if ($self->session->form->process("func") ne "add") {
 		my @assetsToHide = split("\n",$self->getValue("assetsToHide"));
 		my $children = $self->getLineage(["children"],{"returnObjects"=>1, excludeClasses=>["WebGUI::Asset::Wobject::Layout"]});
