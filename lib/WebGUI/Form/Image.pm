@@ -73,6 +73,9 @@ sub definition {
 		profileEnabled=>{
 			defaultValue=>1
 			},
+		forceImageOnly=>{
+			defaultValue=>0
+			},
 		});
         return $class->SUPER::definition($session, $definition);
 }
@@ -142,7 +145,7 @@ sub getValueFromPost {
 				if ($storage->isImage($file)) {
 					$storage->generateThumbnail($file);
 				}
-				else {
+				elsif ($self->get("forceImageOnly")) {
 					$storage->delete;
 					$id = undef;
 				}

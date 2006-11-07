@@ -160,6 +160,7 @@ sub formField {
 		$orderedValues->{$ov} = $values->{$ov};
 	}
 	$properties->{options} = $orderedValues;
+	$properties->{forceImageOnly} = $self->get("forceImageOnly");
 	my $default;
 	if ($skipDefault) {
 	} elsif (defined $self->session->form->process($properties->{name})) {

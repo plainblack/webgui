@@ -266,6 +266,15 @@ sub www_editProfileField {
 		-hoverHelp=>$i18n->get('474 description'),
 		-value=>$data->{required}
 		);
+	if ($data->{fieldType} eq "Image") {
+		$f->yesNo(
+			-name=>"forceImageOnly",
+			-label=>$i18n->echo("Force Image Only Uploads"),
+			-hoverHelp=>$i18n->echo("If set to yes, this form control will only allow image file types to be uploaded through it."),
+			-value=>$data->{forceImageOnly},
+			-defaultValue=>1,
+		);
+	}	
 	my $fieldType = WebGUI::Form::FieldType->new($session,
 		-name=>"fieldType",
 		-label=>$i18n->get(486),
@@ -330,6 +339,7 @@ sub www_editProfileFieldSave {
 		possibleValues=>$session->form->textarea("possibleValues"),
 		dataDefault=>$session->form->textarea("dataDefault"),
 		fieldType=>$session->form->fieldType("fieldType"),
+		forceImageOnly=>$session->form->fieldType("yesNo"),
 		);
 	my $categoryId = $session->form->selectBox("profileCategoryId");
 	if ($session->form->process("new")) {

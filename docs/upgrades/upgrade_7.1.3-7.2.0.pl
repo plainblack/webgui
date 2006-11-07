@@ -28,10 +28,18 @@ addLastExportedAs($session);
 addDeletionWorkflows($session);
 addRSSFromParent($session);
 reorderSurveyCollateral($session);
+addNewProfileSetting($session);
 deleteFiles($session);
 fixAds($session);
 
 finish($session); # this line required
+
+#--------------------------------------------------
+sub addNewProfileSetting {
+	my $session = shift;
+	print "\tAdding new profile setting to force image only uploads on image form controls.\n" unless ($quiet);
+	$session->db->write("alter table userProfileField add column forceImageOnly int(11) default 1");
+}
 
 #--------------------------------------------------
 sub deleteFiles {
