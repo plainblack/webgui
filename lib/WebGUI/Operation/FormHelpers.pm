@@ -167,25 +167,27 @@ sub www_richEditPageTree {
 		-value=>$i18n->get('done'),
 		-extras=>'onclick="createLink()"'
 		);
-	my $output = ' <fieldset><legend>'.$i18n->get('insert a link').'</legend>'.$f->print.'</fieldset>
+	my $output = ' <fieldset><legend>'.$i18n->get('insert a link').'</legend>'.$f->print.'</fieldset>'.<<"JS"
 	<script type="text/javascript">
 //<![CDATA[
 function createLink() {
     if (window.opener) {        
         if (document.getElementById("url_formId").value == "") {
-           alert("'.$i18n->get("link enter alert").'");
+           alert("@{[$i18n->get("link enter alert")]}");
            document.getElementById("url_formId").focus();
         }
-	var link = \'<a href="\'+"^" + "/" + ";" + document.getElementById("url_formId").value+\'">\';
-	link += window.opener.tinyMceSelectedText; 
-	link += \'</a>\';
+	var link = '<a href="'+"^" + "/" + ";" + document.getElementById("url_formId").value+'"';
+        var target = document.getElementById('target_formId').value;
+        if (target != '_self') link += ' target="' + target + '"';
+	link += '>' + window.opener.tinyMceSelectedText + '</a>';
 	window.opener.tinyMCE.execCommand("mceInsertContent",false,link);
      window.close();
     }
 }
 //]]>
 </script>
-	<fieldset><legend>'.$i18n->get('pages').'</legend> ';
+JS
+	.'<fieldset><legend>'.$i18n->get('pages').'</legend> ';
 	$output .= '<div class="base">';
 	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
 	my @crumb;

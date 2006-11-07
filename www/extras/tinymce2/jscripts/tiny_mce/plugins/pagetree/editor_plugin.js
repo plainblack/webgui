@@ -2,7 +2,7 @@
 tinyMCE.importPluginLanguagePack('pagetree', 'en');
 
 /**
- * Returns the HTML contents of the emotions control.
+ * Returns the HTML contents of the pagetree control.
  */
 function TinyMCE_pagetree_getControlHTML(control_name) {
         switch (control_name) {
@@ -14,7 +14,7 @@ function TinyMCE_pagetree_getControlHTML(control_name) {
 }
 
 /**
- * Executes the mceEmotion command.
+ * Executes the wgPageTree command.
  */
 var tinyMceSelectedText = '';
 function TinyMCE_pagetree_execCommand(editor_id, element, command, user_interface, value) {
@@ -26,9 +26,8 @@ function TinyMCE_pagetree_execCommand(editor_id, element, command, user_interfac
                         tinyMceSelectedText = inst.selection.getSelectedText();
 			var template = new Array();
 			//Check for proper get delimiter
-			var seperator = '';
-			if (getWebguiProperty ("pageURL").match(/\?/)) { seperator = ';' } else { seperator = '?'}
-			template['file'] = "../../../../../.." + getWebguiProperty ("pageURL") + seperator + 'op=richEditPageTree';
+ 	                var separator = getWebguiProperty("pageURL").match(/\?/)? ';' : '?';
+ 	                template['file'] = "../../../../../.." + getWebguiProperty("pageURL") + separator + 'op=richEditPageTree';
 			template['width'] = 500;
 			template['height'] = 500;
 			tinyMCE.openWindow(template, {editor_id : editor_id, scrollbars : "yes"} );

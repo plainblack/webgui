@@ -28,6 +28,7 @@
  - fix: inability to create shortcuts to threads
  - fix: Style templates do not render metadata
  - fix: Survey duplication not working
+ - fix: "Open link in new window" with WebGUI asset tree link in TinyMCE
 
 7.1.4
  - Template variables in the main Survey Template were out of date in the
