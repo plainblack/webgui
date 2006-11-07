@@ -33,7 +33,7 @@ for (my $count = 1; $count <= $maxCount; $count++){
    is($scratch->get("Test$count"), $count, "Passed set/get $count");
 }
 
-is($scratch->delete("nonExistantVariable"), '0E0', 'delete returns number deleted, even if the variable does not exist.  0E0 is 0 but true');
+is($scratch->delete("nonExistantVariable"), undef, 'delete returns value if deleted, otherwise undef');
 is($scratch->delete("Test1"), 1, 'delete returns number deleted');
 is($scratch->delete(), undef, 'delete without name of variable to delete returns undef');
 is($scratch->get("Test1"), undef, "delete()");
