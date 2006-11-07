@@ -1623,12 +1623,7 @@ sub www_drawGanttChart {
 		my $multiplier = $isMSIE ? 22 : 20;
 		$hash->{'task.div.top'} = $divTop + ($multiplier*$taskCount);
 		
-		#Interval includes current day if the start date is not the start of the month so add 1
-		my $adder = 1;
-		if($dt->epochToSet($startMonth) eq $dt->epochToSet($startDate)) {
-		   $adder = 0;
-		}
-		my $daysFromStart = ($dt->getDaysInInterval($startMonth,$startDate)+$adder);
+		my $daysFromStart = $dt->getDaysInInterval($startMonth,$startDate);
 		#Add day part of predecessor if necessary
 		#$eh->warn("Task $seq is currently $daysFromStart days from the first day on ".$dt->epochToHuman($startDate));
 		my $daysLeft = $daysFromStart;
