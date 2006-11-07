@@ -135,37 +135,36 @@ sub definition {
 
 #-------------------------------------------------------------------
 sub duplicate {
-	my ($self, $newAsset, $newSurveyId, $qdata, $adata, $rdata, $sdata, $oldSectionId);
-	
-	$self = shift;
-	
-	$newAsset = $self->SUPER::duplicate(@_);
-	$newSurveyId = $self->session->id->generate();
+	my $self = shift;
+	my $newAsset = $self->SUPER::duplicate(@_);
+	my $newSurveyId = $self->session->id->generate();
 	$newAsset->update({
 		Survey_id=>$newSurveyId
 		});
 		
-	my $section = $self->session->db->read("select * from Survey_section where Survey_id=? order by sequenceNumber",[$self->get("Survey_id")]);
-	while ($sdata = $section->hashRef) {
-		$oldSectionId = $sdata->{Survey_sectionId};
+	my $sections = $self->session->db->read("select * from Survey_section where Survey_id=? order by sequenceNumber",[$self->get("Survey_id")]);
+	while (my $sdata = $sections->hashRef) {
+		my $oldSectionId = $sdata->{Survey_sectionId};
 		$sdata->{Survey_sectionId} = "new";
 		$sdata->{Survey_id} = $newSurveyId;
 		$sdata->{Survey_sectionId} = $newAsset->setCollateral("Survey_section", "Survey_sectionId",$sdata,1,0, "Survey_id");
 	
 		my $questions = $self->session->db->read("select * from Survey_question where Survey_id=? and Survey_sectionId=?",[$self->get("Survey_id"), $oldSectionId]);
-		while ($qdata = $questions->hashRef) {
+		while (my $qdata = $questions->hashRef) {
+			my $oldQuestionId = $qdata->{Survey_questionId};
 			$qdata->{Survey_questionId} = "new";
 			$qdata->{Survey_id} = $newSurveyId;
 			$qdata->{Survey_sectionId} = $sdata->{Survey_sectionId};
 			$qdata->{Survey_questionId} = $newAsset->setCollateral("Survey_question","Survey_questionId",$qdata,1,0,"Survey_id");
-			my $answers = $self->session->db->read("select * from Survey_answer where Survey_questionId=? order by sequenceNumber",[$qdata->{Survey_questionId}]);
-			while ($adata = $answers->hashRef) {
+			my $answers = $self->session->db->read("select * from Survey_answer where Survey_questionId=? order by sequenceNumber",[$oldQuestionId]);
+			while (my $adata = $answers->hashRef) {
+				my $oldAnswerId = $adata->{Survey_answerId};
 				$adata->{Survey_answerId} = "new";
 				$adata->{Survey_questionId} = $qdata->{Survey_questionId};
 				$adata->{Survey_id} = $newSurveyId;
 				$adata->{Survey_answerId} = $newAsset->setCollateral("Survey_answer", "Survey_answerId", $adata, 1, 0, "Survey_Id");
-				my $responses = $self->session->db->read("select * from Survey_questionResponse where Survey_answerId=?",[$adata->{Survey_answerId}]);
-				while ($rdata = $responses->hashRef) {
+				my $responses = $self->session->db->read("select * from Survey_questionResponse where Survey_answerId=?",[$oldAnswerId]);
+				while (my $rdata = $responses->hashRef) {
 					$rdata->{Survey_responseId} = "new";
 					$rdata->{Survey_answerId} = $adata->{Survey_answerId};
 					$rdata->{Survey_id} = $newSurveyId;

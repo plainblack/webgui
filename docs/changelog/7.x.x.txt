@@ -27,6 +27,7 @@
  - fix: Survey numeric multiple choice options
  - fix: inability to create shortcuts to threads
  - fix: Style templates do not render metadata
+ - fix: Survey duplication not working
 
 7.1.4
  - Template variables in the main Survey Template were out of date in the
