@@ -108,7 +108,7 @@ function setCheckedOfNodeList(list, value) {
 function getTaskElements(form, suffix) {
    var te = new Object();
    var keys = ['start', 'end', 'duration', 'lagTime', 'dependants', 'origStart', 'origEnd',
-	       'seqNum', 'taskType', 'orig_start', 'orig_duration', 'orig_dependant', 'orig_end'];
+	       'seqNum', 'taskType', 'orig_start', 'orig_duration', 'orig_dependants', 'orig_end'];
    for (var i = 0; i < keys.length; i++)
       te[keys[i]] = form[keys[i]+suffix];
    return te;
@@ -330,7 +330,7 @@ function predecessorChanged(form, suffix, isTaskForm, gotDelay) {
 
    if (predecessor != "") {
       var assoc = taskArray[predecessor];
-      var revert = function() { te.dependants.value = te.orig_dependant.value; return; }
+      var revert = function() { te.dependants.value = te.orig_dependants.value; return; }
 
       if (predecessor < 1) { alert(errorMsgs.noPredecessor); return revert(); }
       if (seqNum != "") {
@@ -340,7 +340,7 @@ function predecessorChanged(form, suffix, isTaskForm, gotDelay) {
       if (assoc["type"] != 'timed') { alert(errorMsgs.untimedPredecessor); return revert(); }
    }
 
-   te.orig_dependant.value = te.dependants.value;
+   te.orig_dependants.value = te.dependants.value;
    checkPredecessorCollision(te, isTaskForm);
    updateTaskArray(te);
 

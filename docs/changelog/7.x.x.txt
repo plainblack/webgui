@@ -31,6 +31,7 @@
  - fix: "Open link in new window" with WebGUI asset tree link in TinyMCE
  - fix: Admin Users submenu doesn't fill in uid
  - fix: EMS Manage Events broken
+ - fix: "orig_dependant" JavaScript error in PM quick task display
 
 7.1.4
  - Template variables in the main Survey Template were out of date in the
