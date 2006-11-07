@@ -221,7 +221,7 @@ sub canPost {
 	return (
 		(
 			$self->get("status") eq "approved" || 
-			$self->getRevisionCount > 1
+			$self->getTagCount > 1 # checks to make sure that the cs has been committed at least once
 		) && (
 			$self->session->user->isInGroup($self->get("postGroupId")) 
 			|| $self->SUPER::canEdit
