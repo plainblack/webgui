@@ -37,6 +37,7 @@
  - fix: Gantt chart bars erroneously being shifted one day to the right
  - fix: Post titles containing periods result in urls containing periods
  - fix: Activity list expands outside of edit workflow screen
+ - fix: Thread layout "flat" doesn't stick
 
 7.1.4
  - Template variables in the main Survey Template were out of date in the

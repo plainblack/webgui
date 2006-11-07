@@ -93,8 +93,13 @@ sub _isValidUsername {
 #-------------------------------------------------------------------
 sub _logLogin {
 	my $self = shift;
-	$self->session->db->write("insert into userLoginLog values (".$self->session->db->quote($_[0]).",".$self->session->db->quote($_[1]).",".$self->session->datetime->time().","
-	.$self->session->db->quote($self->session->env->getIp).",".$self->session->db->quote($self->session->env->get("HTTP_USER_AGENT")).")");
+	$self->session->db->write("insert into userLoginLog values (?,?,?,?,?)",
+		$_[0],
+		$_[1],
+		$self->session->datetime->time(),
+		$self->session->env->getIp,
+		$self->session->env->get("HTTP_USER_AGENT")
+		);
 }
 
 
@@ -217,10 +222,10 @@ sub createAccountSave {
 	my $properties = $_[1];
 	my $password = $_[2];
 	my $profile = $_[3];
-
+	
 	my $i18n = WebGUI::International->new($self->session);
-
-
+	
+	
 	my $u = WebGUI::User->new($self->session,"new");
 	$self->user($u);
 	my $userId = $u->userId;
@@ -302,12 +307,12 @@ Superclass method that performs general functionality for deactivating accounts.
 =cut
 
 sub deactivateAccountConfirm {
-   my $self = shift;
-   return $self->session->privilege->vitalComponent() if($self->userId eq '1' || $self->userId eq '3');
-   my $u = $self->user;
-   $u->status("Selfdestructed");
-   $self->session->var->end();
-   $self->session->user({userId=>'1'});
+	my $self = shift;
+	return $self->session->privilege->vitalComponent() if($self->userId eq '1' || $self->userId eq '3');
+	my $u = $self->user;
+	$u->status("Selfdestructed");
+	$self->session->var->end();
+	$self->session->user({userId=>'1'});
 }
 
 #-------------------------------------------------------------------
@@ -345,7 +350,7 @@ sub displayAccount {
 	my $vars = $_[1];
 
 	my $i18n = WebGUI::International->new($self->session);
-   $vars->{title} = $i18n->get(61);
+	$vars->{title} = $i18n->get(61);
 
 	$vars->{'account.form.header'} = WebGUI::Form::formHeader($self->session,{});
 	$vars->{'account.form.header'} .= WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"});
@@ -579,7 +584,7 @@ Authentication should always happen in the subclass routine.
 
 sub login {
 	my $self = shift;
-	my ($cmd, $uid, $u, $authMethod,$msg,$userData,$expireDate);
+	my ($cmd, $uid, $u);
 
 	#Create a new user
 	$uid = $self->userId;
@@ -593,13 +598,13 @@ sub login {
 	}
 	
 	my $command = $self->session->config->get("runOnLogin");
-    if ($command ne "") {
-       WebGUI::Macro::process($self->session,\$command);
-	   $self->session->errorHandler->warn("Executing $command");
-       my $error = qx($command);
-       $self->session->errorHandler->warn($error) if $error;
-    }
-   
+	if ($command ne "") {
+		WebGUI::Macro::process($self->session,\$command);
+		$self->session->errorHandler->warn("Executing $command");
+		my $error = qx($command);
+		$self->session->errorHandler->warn($error) if $error;
+	}
+	
 	return undef;
 }
 

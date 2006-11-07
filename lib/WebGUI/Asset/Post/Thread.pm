@@ -776,7 +776,10 @@ sub view {
 		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
 		return $out if $out;
 	}
-        $self->session->scratch->set("discussionLayout",$self->session->form->process("layout"));
+        $self->session->scratch->set("discussionLayout",$self->session->form->process("layout"))
+		if ($self->session->form->process("layout"));
+        my $layout = $self->session->scratch->get("discussionLayout") 
+		|| $self->session->user->profileField("discussionLayout");
         my $var = $self->getTemplateVars;
 	$self->getParent->appendTemplateLabels($var);
 	$var->{karmaIsEnabled} = $self->session->setting->get("useKarma");
@@ -788,7 +791,6 @@ sub view {
 
         $var->{'layout.nested.url'} = $self->getLayoutUrl("nested");
         $var->{'layout.flat.url'} = $self->getLayoutUrl("flat");
-        my $layout = $self->session->scratch->get("discussionLayout") || $self->session->user->profileField("discussionLayout");
         $var->{'layout.isFlat'} = ($layout eq "flat");
         $var->{'layout.isNested'} = ($layout eq "nested" || !$var->{'layout.isFlat'});
 
