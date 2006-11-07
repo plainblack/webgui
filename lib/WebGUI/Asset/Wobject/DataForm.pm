@@ -770,7 +770,6 @@ sub www_deleteTabConfirm {
 sub www_editField {
 	my $self = shift;
 	my $fid = shift || $self->session->form->process("fid") || 'new';
-	$self->session->errorHandler->warn("fid: $fid");
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
     	my (%field, $f, %fieldStatus,$tab);

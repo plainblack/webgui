@@ -432,7 +432,7 @@ sub getQuestionVars {
 			name=>'textResponse_'.$questionId
 			});
 	} else {
-		my $answer = $self->session->db->buildHashRef("select Survey_answerId,answer from Survey_answer where Survey_questionId=".$self->session->db->quote($question->{Survey_questionId})." order by sequenceNumber");
+		my $answer = $self->session->db->buildHashRef("select Survey_answerId,answer from Survey_answer where Survey_questionId=? order by sequenceNumber", [$question->{Survey_questionId}]);
 		if ($question->{randomizeAnswers}) {
 			$answer = randomizeHash($answer);
 		}
@@ -885,14 +885,15 @@ sub www_editAnswer {
 sub www_editAnswerSave {
 	my $self = shift;
         return $self->session->privilege->insufficient() unless ($self->canEdit);
+	my $qid = $self->session->form->process("qid");
         $self->setCollateral("Survey_answer", "Survey_answerId", {
                 Survey_answerId => $self->session->form->process("aid"),
-                Survey_questionId => $self->session->form->process("qid"),
+                Survey_questionId => $qid,
                 answer => $self->session->form->process("answer"),
                 isCorrect => $self->session->form->process("isCorrect"),
 		Survey_id=>$self->get("Survey_id"),
                 gotoQuestion => $self->session->form->process("gotoQuestion")
-                },1,0,"Survey_Id");
+                },1,0,"Survey_questionId", $qid);
 	if ($self->session->form->process("proceed") eq "addQuestion") {
 		return $self->www_editQuestion('new');
 	} elsif ($self->session->form->process("proceed") eq "addAnswer") {

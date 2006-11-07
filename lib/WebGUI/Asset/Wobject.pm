@@ -373,11 +373,14 @@ sub reorderCollateral {
 	my $setName = shift || "assetId";
 	my $setValue = shift || $self->get($setName);
 	my $i = 1;
-        my $sth = $self->session->db->read("select $keyName from $table where $setName=".$self->session->db->quote($setValue)." order by sequenceNumber");
+        my $sth = $self->session->db->read("select $keyName from $table where $setName=? order by sequenceNumber", [$setValue]);
+	my $sth2 = $self->session->db->prepare("update $table set sequenceNumber=? where $setName=? and $keyName=?");
         while (my ($id) = $sth->array) {
-                $self->session->db->write("update $table set sequenceNumber=$i where $setName=".$self->session->db->quote($setValue)." and $keyName=".$self->session->db->quote($id));
+		$sth2->execute([$i, $setValue, $id]);
                 $i++;
         }
+	$sth2->finish;
+        $sth->finish;
         $sth->finish;
 }
 
@@ -437,7 +440,7 @@ sub setCollateral {
      		my $dbvalues = "";
 		unless ($useSequence eq "0") {
 			unless (exists $properties->{sequenceNumber}) {
-				my ($seq) = $self->session->db->quickArray("select max(sequenceNumber) from $table where $setName=".$self->session->db->quote($setValue));
+				my ($seq) = $self->session->db->quickArray("select max(sequenceNumber) from $table where $setName=?",[$setValue]);
 				$properties->{sequenceNumber} = $seq+1;
 			}
 		}

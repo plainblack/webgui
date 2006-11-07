@@ -26,6 +26,7 @@ addRssUrlMacroProcessing($session);
 addLastExportedAs($session);
 addDeletionWorkflows($session);
 addRSSFromParent($session);
+reorderSurveyCollateral($session);
 
 finish($session); # this line required
 
@@ -178,6 +179,27 @@ EOT
 	$csTag->commit;
 
 	$oldTag->setWorking if $oldTag;
+}
+
+##-------------------------------------------------
+sub reorderSurveyCollateral {
+	my $session = shift;
+	print "\tFixing ordering problems with Survey answers.\n" unless ($quiet);
+	# and here's our code
+	my $sth1 = $session->db->prepare("select distinct(assetId) from Survey");
+	my $sth2 = $session->db->prepare("select Survey_questionId from Survey_question where Survey_Id=?");
+	$sth1->execute();
+	while (my ($assetId) = $sth1->array) {  ##Iterate over all surveys
+		my $survey = WebGUI::Asset->new($session, $assetId, 'WebGUI::Asset::Wobject::Survey');
+		my $Survey_Id = $survey->get('Survey_id');
+		$sth2->execute([$Survey_Id]);
+		while (my ($questionId) = $sth2->array) { ##iterate over all questions in the survey
+			$session->errorHandler->warn($questionId);
+			$survey->reorderCollateral("Survey_answer", "Survey_answerId","Survey_questionId", $questionId);
+		}
+		$sth2->finish;
+	}
+	$sth1->finish;
 }
 
 # ---- DO NOT EDIT BELOW THIS LINE ----
