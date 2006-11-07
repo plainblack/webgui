@@ -32,6 +32,8 @@
  - fix: Admin Users submenu doesn't fill in uid
  - fix: EMS Manage Events broken
  - fix: "orig_dependant" JavaScript error in PM quick task display
+ - fix: Tasks now start at zero duration in the PM system
+ - fix: RSS for collaboration systems now properly shows in the head rather than the body
 
 7.1.4
  - Template variables in the main Survey Template were out of date in the
