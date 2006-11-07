@@ -797,6 +797,7 @@ sub _resourceListOfTask {
 	    @{$self->session->db->buildArrayRefOfHashRefs("SELECT resourceKind, resourceId FROM PM_taskResource WHERE taskId = ? ORDER BY sequenceNumber", [$taskId])};
 }
 
+#-------------------------------------------------------------------
 sub _innerHtmlOfResources {
 	my $self = shift;
 	my @resources = @_;
@@ -804,6 +805,7 @@ sub _innerHtmlOfResources {
 	return $self->_htmlOfResourceList({opCallbackJs => 'taskEdit_deleteResource', opIcon => 'delete.gif', opTitle => $i18n->get('resource remove opTitle'), hiddenFields => 1}, @resources);
 }
 
+#-------------------------------------------------------------------
 sub www_innerHtmlOfResources {
 	my $self = shift;
 	my @resources = map {
@@ -813,6 +815,7 @@ sub www_innerHtmlOfResources {
 	return $self->_innerHtmlOfResources(@resources);
 }
 
+#-------------------------------------------------------------------
 sub www_editTask {
    my $self = shift;
    my $var = {};
@@ -857,7 +860,8 @@ sub www_editTask {
 
    my ($startEpoch, $endEpoch) = $db->quickArray('SELECT startDate, startDate FROM PM_task WHERE projectId = ? ORDER BY sequenceNumber LIMIT 1', [$projectId]);
    my $dependant = $task->{dependants};
-   my $duration = $task->{duration} || (($taskType eq 'timed')? (($project->{durationUnits} eq 'hours')? $project->{hoursPerDay} : 1) : 0);
+   #my $duration = $task->{duration} || (($taskType eq 'timed')? (($project->{durationUnits} eq 'hours')? $project->{hoursPerDay} : 1) : 0);
+   my $duration = $task->{duration} || 0;   
 
    $startEpoch = $endEpoch = time unless defined $startEpoch and defined $endEpoch;
    $startEpoch = $task->{startDate} if $task->{startDate};
@@ -1133,6 +1137,7 @@ sub _updateDependantDates {
 	}
 }
 
+#-------------------------------------------------------------------
 sub _clobberImproperDependants {
 	my $self = shift;
 	my $projectId = shift;
@@ -1430,6 +1435,7 @@ sub _doGanttTaskResourceDisplay {
 	}
 }
 
+#-------------------------------------------------------------------
 sub www_drawGanttChart {
 	my $self = shift;
 	my $var = {};
