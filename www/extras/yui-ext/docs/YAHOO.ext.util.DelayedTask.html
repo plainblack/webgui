@@ -1,0 +1,272 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN""http://www.w3.org/TR/REC-html40/loose.dtd">
+<!--NewPage-->
+<HTML>
+<HEAD>
+<TITLE>
+YAHOO.ext.util.DelayedTask
+</TITLE>
+<LINK REL ="stylesheet" TYPE="text/css" HREF="stylesheet.css" TITLE="Style">
+</HEAD>
+<SCRIPT>
+function asd()
+{
+parent.document.title="YAHOO.ext.util.DelayedTask";
+}
+</SCRIPT>
+<BODY BGCOLOR="white" onload="asd();" style="margin:15px;">
+<!-- ======== START OF CLASS DATA ======== -->
+<H2>Class YAHOO.ext.util.DelayedTask</H2>
+<PRE>Object
+   |
+   +--<b>YAHOO.ext.util.DelayedTask</b>
+</PRE>
+
+
+<HR>
+<DL>
+   <!-- Class definition -->
+   <DT>class 
+   <B>YAHOO.ext.util.DelayedTask</B>
+   
+
+</DL>
+   
+   <P>
+   <BR/>Provides a convenient method of performing setTimeout where a new
+ timeout cancels the old timeout. An example would be performing validation on a keypress.
+ You can use this class to buffer
+ the keypress events for a certain number of milliseconds, and perform only if they stop
+ for that amount of time.
+ <BR/><I>Defined in <a href='overview-summary-yutil.js.html'>yutil.js</a></I><BR/><BR/>
+   </P>
+   
+   <HR>
+
+<!-- ======== NESTED CLASS SUMMARY ======== -->
+
+<!-- ======== END NESTED CLASS SUMMARY ======== -->
+
+
+<!-- =========== FIELD SUMMARY =========== -->
+
+
+   
+
+<!-- =========== END FIELD SUMMARY =========== -->
+
+
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+
+<A NAME="constructor_summary"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+  <TD COLSPAN="2" class="title-cell">
+    Constructor Summary
+  </TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD>
+      <CODE>
+	 <B>
+	    <A HREF="YAHOO.ext.util.DelayedTask.html#YAHOO.ext.util.DelayedTask()">YAHOO.ext.util.DelayedTask</A> 
+	 </B>
+	 (&lt;<i>Function</i>&gt; fn, &lt;<i>Object</i>&gt; scope, &lt;<i>Array</i>&gt; args)
+      </CODE>
+      <BR>
+      &nbsp;&nbsp;
+      
+      </TD>
+</TR>
+</TABLE>
+
+<!-- ======== END CONSTRUCTOR SUMMARY ======== -->
+
+&nbsp;
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<A NAME="method_summary"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+  <TD COLSPAN="2" class="title-cell">
+    <span style="float:left">Method Summary</span>
+    <span style="float:right;font-weight:normal;font-size:8pt;">
+      <i>* Parameter types in italic indicate optional parameters</i>
+    </span>
+  </TD>
+</TR>
+
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#cancel">cancel</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Cancel the last queued timeout
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#delay">delay</A></B>(&lt;Number&gt; delay, &lt;<a href="Function.html">Function</a>&gt; newFn, &lt;Object&gt; newScope, &lt;Array&gt; newArgs)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Cancels any pending timeout and queues a new one
+      </TD>
+   </TR>
+
+
+</TABLE>
+
+
+
+<P>
+<!-- ========== END METHOD SUMMARY =========== -->
+
+
+<!-- ============ FIELD DETAIL START =========== -->
+
+
+<!-- ============ FIELD DETAIL END =========== -->
+
+    <!-- ========= CONSTRUCTOR DETAIL START ======== -->
+
+<A NAME="constructor_detail"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+   <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+     <TD COLSPAN="1" class="title-cell">
+       Constructor Detail
+     </TD>
+   </TR>
+</TABLE>
+
+<A NAME="YAHOO.ext.util.DelayedTask()"><!-- --></A><H3>
+YAHOO.ext.util.DelayedTask</H3>
+<PRE><B>YAHOO.ext.util.DelayedTask</B>(&lt;<i>Function</i>&gt; fn, &lt;<i>Object</i>&gt; scope, &lt;<i>Array</i>&gt; args)</PRE>
+
+
+
+
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>fn</CODE> -  (optional) The default function to timeout  
+     </UL>
+   
+     <UL><CODE>scope</CODE> -  (optional) The default scope of that timeout  
+     </UL>
+   
+     <UL><CODE>args</CODE> -  (optional) The default Array of arguments
+     </UL>
+   
+   
+   </UL>
+
+
+<!-- Constructor return value(s) -->
+
+<!-- End constructor return value(s) -->
+
+<!-- ADDITIONAL ATTRIBUTES -->
+
+<HR/>
+<!-- END ADDITIONAL ATTRIBUTES  -->
+
+<!-- ========= CONSTRUCTOR DETAIL END ======== -->
+
+
+<!-- ============ METHOD DETAIL START ========== -->
+
+<A NAME="method_detail"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+   <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+     <TD COLSPAN="1" class="title-cell">
+       Method Detail
+     </TD>
+   </TR>
+</TABLE>
+
+<!-- One single method detail entry -->
+
+   <A NAME="cancel"><!-- --></A>
+   <H3>cancel</H3>
+   <PRE>void <B>cancel</B>()</PRE>
+   
+      <UL>Cancel the last queued timeout</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="delay"><!-- --></A>
+   <H3>delay</H3>
+   <PRE>void <B>delay</B>(&lt;Number&gt; delay, &lt;<a href="Function.html">Function</a>&gt; newFn, &lt;Object&gt; newScope, &lt;Array&gt; newArgs)</PRE>
+   
+      <UL>Cancels any pending timeout and queues a new one</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>delay</CODE> -  The milliseconds to delay  
+      </UL> 
+   
+     <UL><CODE>newFn</CODE> -  Overrides function passed to constructor  
+      </UL> 
+   
+     <UL><CODE>newScope</CODE> -  Overrides scope passed to constructor  
+      </UL> 
+   
+     <UL><CODE>newArgs</CODE> -  Overrides args passed to constructor        
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+
+
+<!-- ============ METHOD DETAIL END ========== -->
+
+<!-- ========= END OF CLASS DATA ========= -->
+
+<HR>
+<FONT SIZE="-1">
+
+</FONT>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat Oct 14 06:07:10 2006</div>
+</BODY>
+</HTML>

@@ -1,0 +1,376 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Frameset//EN""http://www.w3.org/TR/REC-html40/frameset.dtd">
+<html>
+<head>
+<title>
+ Overview
+</title>
+<link rel ="stylesheet" type="text/css" href="stylesheet.css" title="Style">
+<script>
+function asd() {
+	
+		parent.document.title="DomHelper.js Overview";
+	
+}
+</script>
+</head>
+<body bgcolor="white" onload="asd();" style="margin:15px;">
+<center>
+	
+	   <h2>DomHelper.js</h2>
+	
+</center>
+
+	
+
+
+<h4>Summary</h4>
+<p>
+	
+		
+	
+</p>
+
+
+    <table border="1" cellpadding="3" cellspacing="0" width="100%">
+    <tr bgcolor="#CCCCFF" class="TableHeadingColor">
+    <td colspan="2" class="title-cell">
+    
+        <b>Class Summary</b>
+    
+    </td>
+    </tr>
+    
+    <tr bgcolor="white" class="TableRowColor">
+    <td width="15%"><b><a href="YAHOO.ext.DomHelper.Template.html">YAHOO.ext.DomHelper.Template</a></b></td>
+    <td>Represents an HTML fragment template
+ </td>
+    </tr>
+    
+    </table>
+   <hr/> 
+
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<!-- ========== END METHOD SUMMARY =========== -->
+
+
+        <pre class="sourceview"><span class="comment">/**
+ * <span class="attrib">@class</span>
+ * Utility class for working with DOM
+ */</span>
+YAHOO.ext.DomHelper = new <span class="reserved">function</span>(){
+    <span class="comment">/**<span class="attrib">@private</span>*/</span>
+    var d = document;
+    
+    <span class="comment">/** True to force the use of DOM instead of html fragments <span class="attrib">@type</span> Boolean */</span>
+    <span class="reserved">this</span>.useDom = false;
+    
+    <span class="comment">// parse and apply styles to dom element</span>
+    <span class="comment">/** <span class="attrib">@ignore</span> */</span>
+    <span class="reserved">function</span> applyStyles(el, styles){
+        <span class="reserved">if</span>(styles){
+            var D = YAHOO.util.Dom;
+            var re = /\s?(.*?)\:(.*?);/g;
+            var matches;
+            <span class="reserved">while</span> ((matches = re.exec(styles)) != null){
+                D.setStyle(el, matches[1], matches[2]);
+            }
+        }
+    }
+    
+    <span class="comment">// build as innerHTML where available</span>
+    <span class="comment">/** <span class="attrib">@ignore</span> */</span>
+    <span class="reserved">function</span> createHtml(o){
+        var b = <span class="literal">''</span>;
+        b += <span class="literal">'&lt;'</span> + o.tag;
+        <span class="reserved">for</span>(var attr in o){
+            <span class="reserved">if</span>(attr == <span class="literal">'tag'</span> || attr == <span class="literal">'children'</span> || attr == <span class="literal">'html'</span> || typeof o[attr] == <span class="literal">'function'</span>) continue;
+            <span class="reserved">if</span>(attr == <span class="literal">'cls'</span>){
+                b += <span class="literal">' class="'</span> + o[<span class="literal">'cls'</span>] + <span class="literal">'"'</span>;
+            }<span class="reserved">else</span>{
+                b += <span class="literal">' '</span> + attr + <span class="literal">'="'</span> + o[attr] + <span class="literal">'"'</span>;
+            }
+        }
+        b += <span class="literal">'&gt;'</span>;
+        <span class="reserved">if</span>(o.children){
+            <span class="reserved">for</span>(var i = 0, len = o.children.length; i &lt; len; i++) {
+                b += createHtml(o.children[i], b);
+            }
+        }
+        <span class="reserved">if</span>(o.html){
+            b += o.html;
+        }
+        b += <span class="literal">'&lt;/'</span> + o.tag + <span class="literal">'&gt;'</span>;
+        <span class="reserved">return</span> b;
+    }
+    
+    <span class="comment">// build as dom</span>
+    <span class="comment">/** <span class="attrib">@ignore</span> */</span>
+    <span class="reserved">function</span> createDom(o, parentNode){
+        var el = d.createElement(o.tag);
+        var useSet = el.setAttribute ? true : false; <span class="comment">// In IE some elements don't have setAttribute</span>
+        <span class="reserved">for</span>(var attr in o){
+            <span class="reserved">if</span>(attr == <span class="literal">'tag'</span> || attr == <span class="literal">'children'</span> || attr == <span class="literal">'html'</span> || attr == <span class="literal">'style'</span> || typeof o[attr] == <span class="literal">'function'</span>) continue;
+            <span class="reserved">if</span>(attr==<span class="literal">'cls'</span>){
+                el.className = o[<span class="literal">'cls'</span>];
+            }<span class="reserved">else</span>{
+                <span class="reserved">if</span>(useSet) el.setAttribute(attr, o[attr]);
+                <span class="reserved">else</span> el[attr] = o[attr];
+            }
+        }
+        applyStyles(el, o.style);
+        <span class="reserved">if</span>(o.children){
+            <span class="reserved">for</span>(var i = 0, len = o.children.length; i &lt; len; i++) {
+             	createDom(o.children[i], el);
+            }
+        }
+        <span class="reserved">if</span>(o.html){
+            el.innerHTML = o.html;
+        }
+        <span class="reserved">if</span>(parentNode){
+           parentNode.appendChild(el);
+        }
+        <span class="reserved">return</span> el;
+    }
+    
+    <span class="comment">/**
+     * Inserts an HTML fragment into the Dom
+     * <span class="attrib">@param</span> {String} where Where to insert the html in relation to el - beforeBegin, afterBegin, beforeEnd, afterEnd.
+     * <span class="attrib">@param</span> {HTMLElement} el The context element
+     * <span class="attrib">@param</span> {String} html The HTML fragmenet
+     * <span class="attrib">@return</span> {HTMLElement} The new node
+     */</span>
+    <span class="reserved">this</span>.insertHtml = <span class="reserved">function</span>(where, el, html){
+        <span class="reserved">if</span>(el.insertAdjacentHTML){
+            <span class="reserved">if</span>(where == <span class="literal">'beforeBegin'</span>){
+                el.insertAdjacentHTML(where, html);
+                <span class="reserved">return</span> el.previousSibling;
+            }<span class="reserved">else</span> <span class="reserved">if</span>(where == <span class="literal">'afterBegin'</span>){
+                el.insertAdjacentHTML(where, html);
+                <span class="reserved">return</span> el.firstChild;
+            }<span class="reserved">else</span> <span class="reserved">if</span>(where == <span class="literal">'beforeEnd'</span>){
+                el.insertAdjacentHTML(where, html);
+                <span class="reserved">return</span> el.lastChild;
+            }<span class="reserved">else</span> <span class="reserved">if</span>(where == <span class="literal">'afterEnd'</span>){
+                el.insertAdjacentHTML(where, html);
+                <span class="reserved">return</span> el.nextSibling;
+            }
+            throw <span class="literal">'Illegal insertion point -&gt; "'</span> + where + <span class="literal">'"'</span>;
+        }
+        var range = el.ownerDocument.createRange();
+        var frag;
+        <span class="reserved">if</span>(where == <span class="literal">'beforeBegin'</span>){
+            range.setStartBefore(el);
+            frag = range.createContextualFragment(html);
+            el.parentNode.insertBefore(frag, el);
+            <span class="reserved">return</span> el.previousSibling;
+        }<span class="reserved">else</span> <span class="reserved">if</span>(where == <span class="literal">'afterBegin'</span>){
+            range.selectNodeContents(el);
+            range.collapse(true);
+            frag = range.createContextualFragment(html);
+            el.insertBefore(frag, el.firstChild);
+            <span class="reserved">return</span> el.firstChild;
+        }<span class="reserved">else</span> <span class="reserved">if</span>(where == <span class="literal">'beforeEnd'</span>){
+            range.selectNodeContents(el);
+            range.collapse(false);
+            frag = range.createContextualFragment(html);
+            el.appendChild(frag);
+            <span class="reserved">return</span> el.lastChild;
+        }<span class="reserved">else</span> <span class="reserved">if</span>(where == <span class="literal">'afterEnd'</span>){
+            range.setStartAfter(el);
+            frag = range.createContextualFragment(html);
+            el.parentNode.insertBefore(frag, el.nextSibling);
+            <span class="reserved">return</span> el.nextSibling;
+        }<span class="reserved">else</span>{
+            throw <span class="literal">'Illegal insertion point -&gt; "'</span> + where + <span class="literal">'"'</span>;
+        } 
+    };
+    
+    <span class="comment">/**
+     * Creates new Dom element(s) and inserts them before el
+     * <span class="attrib">@param</span> {HTMLElement} el The context element
+     * <span class="attrib">@param</span> {Object} o The Dom object spec (and children)
+     * <span class="attrib">@return</span> {HTMLElement} The new node
+     */</span>
+    <span class="reserved">this</span>.insertBefore = <span class="reserved">function</span>(el, o){
+        el = YAHOO.util.Dom.get(el);
+        var newNode;
+        <span class="reserved">if</span>(<span class="reserved">this</span>.useDom){
+            newNode = createDom(o, null);
+            el.parentNode.insertBefore(newNode, el);
+        }<span class="reserved">else</span>{
+            var html = createHtml(o);
+            newNode = <span class="reserved">this</span>.insertHtml(<span class="literal">'beforeBegin'</span>, el, html);
+        }
+        <span class="reserved">return</span> newNode;
+    };
+    
+    <span class="comment">/**
+     * Creates new Dom element(s) and inserts them after el
+     * <span class="attrib">@param</span> {HTMLElement} el The context element
+     * <span class="attrib">@param</span> {Object} o The Dom object spec (and children)
+     * <span class="attrib">@return</span> {HTMLElement} The new node
+     */</span>
+    <span class="reserved">this</span>.insertAfter = <span class="reserved">function</span>(el, o){
+        el = YAHOO.util.Dom.get(el);
+        var newNode;
+        <span class="reserved">if</span>(<span class="reserved">this</span>.useDom){
+            newNode = createDom(o, null);
+            el.parentNode.insertBefore(newNode, el.nextSibling);
+        }<span class="reserved">else</span>{
+            var html = createHtml(o);
+            newNode = <span class="reserved">this</span>.insertHtml(<span class="literal">'afterEnd'</span>, el, html);
+        }
+        <span class="reserved">return</span> newNode;
+    };
+    
+    <span class="comment">/**
+     * Creates new Dom element(s) and appends them to el
+     * <span class="attrib">@param</span> {HTMLElement} el The context element
+     * <span class="attrib">@param</span> {Object} o The Dom object spec (and children)
+     * <span class="attrib">@return</span> {HTMLElement} The new node
+     */</span>
+    <span class="reserved">this</span>.append = <span class="reserved">function</span>(el, o){
+        el = YAHOO.util.Dom.get(el);
+        var newNode;
+        <span class="reserved">if</span>(<span class="reserved">this</span>.useDom){
+            newNode = createDom(o, null);
+            el.appendChild(newNode);
+        }<span class="reserved">else</span>{
+            var html = createHtml(o);
+            newNode = <span class="reserved">this</span>.insertHtml(<span class="literal">'beforeEnd'</span>, el, html);
+        }
+        <span class="reserved">return</span> newNode;
+    };
+    
+    <span class="comment">/**
+     * Creates new Dom element(s) and overwrites the contents of el with them
+     * <span class="attrib">@param</span> {HTMLElement} el The context element
+     * <span class="attrib">@param</span> {Object} o The Dom object spec (and children)
+     * <span class="attrib">@return</span> {HTMLElement} The new node
+     */</span>
+    <span class="reserved">this</span>.overwrite = <span class="reserved">function</span>(el, o){
+        el = YAHOO.util.Dom.get(el);
+        el.innerHTML = createHtml(o);
+        <span class="reserved">return</span> el.firstChild;
+    };
+    
+    <span class="comment">/**
+     * Creates a new YAHOO.ext.DomHelper.Template from the Dom object spec 
+     * <span class="attrib">@param</span> {Object} o The Dom object spec (and children)
+     * <span class="attrib">@return</span> {YAHOO.ext.DomHelper.Template} The new template
+     */</span>
+    <span class="reserved">this</span>.createTemplate = <span class="reserved">function</span>(o){
+        var html = createHtml(o);
+        <span class="reserved">return</span> new YAHOO.ext.DomHelper.Template(html);
+    };
+}();
+
+<span class="comment">/**
+* <span class="attrib">@class</span>
+* Represents an HTML fragment template
+* <span class="attrib">@constructor</span>
+* <span class="attrib">@param</span> {String} html The HTML fragment
+*/</span>
+YAHOO.ext.DomHelper.Template = <span class="reserved">function</span>(html){
+    <span class="comment">/**<span class="attrib">@private</span>*/</span>
+    <span class="reserved">this</span>.html = html;
+    <span class="comment">/**<span class="attrib">@private</span>*/</span>
+    <span class="reserved">this</span>.re = /\{(\w+)\}/g;
+};
+YAHOO.ext.DomHelper.Template.<span class="reserved">prototype</span> = {
+    <span class="comment">/**
+     * Returns an HTML fragment of this template with the specified values applied
+     * <span class="attrib">@param</span> {Object} values The template values. Can be an array if your params are numeric (i.e. {0}) or an object (i.e. {foo: 'bar'})
+     * <span class="attrib">@return</span> {String}
+     */</span>
+    applyTemplate : <span class="reserved">function</span>(values){
+        <span class="reserved">if</span>(<span class="reserved">this</span>.compiled){
+            <span class="reserved">return</span> <span class="reserved">this</span>.compiled(values);
+        }
+        var empty = <span class="literal">''</span>;
+        var fn = <span class="reserved">function</span>(match, index){
+            <span class="reserved">if</span>(typeof values[index] != <span class="literal">'undefined'</span>){
+                <span class="reserved">return</span> values[index];
+            }<span class="reserved">else</span>{
+                <span class="reserved">return</span> empty;
+            }
+        }
+        <span class="reserved">return</span> <span class="reserved">this</span>.html.replace(<span class="reserved">this</span>.re, fn);
+    },
+    
+    <span class="comment">/**
+     * Compiles the template into an internal function, eliminating the RegEx overhead
+     */</span>
+    compile : <span class="reserved">function</span>(){
+        var html = <span class="reserved">this</span>.html;
+        var re = /\{(\w+)\}/g;
+        var body = [];
+        body.push(<span class="literal">"this.compiled = function(values){ return "</span>);
+        var result;
+        var lastMatchEnd = 0;
+        <span class="reserved">while</span> ((result = re.exec(html)) != null){
+            body.push(<span class="literal">"'"</span>, html.substring(lastMatchEnd, result.index), <span class="literal">"' + "</span>);
+            body.push(<span class="literal">"values["</span>, html.substring(result.index+1,re.lastIndex-1), <span class="literal">"] + "</span>);
+            lastMatchEnd = re.lastIndex;
+        }
+        body.push(<span class="literal">"'"</span>, html.substr(lastMatchEnd), <span class="literal">"';};"</span>);
+        eval(body.join(<span class="literal">''</span>));
+    },
+   
+    <span class="comment">/**
+     * Applies the supplied values to the template and inserts the new node(s) before el
+     * <span class="attrib">@param</span> {HTMLElement} el The context element
+     * <span class="attrib">@param</span> {Object} values The template values. Can be an array if your params are numeric (i.e. {0}) or an object (i.e. {foo: 'bar'})
+     * <span class="attrib">@return</span> {HTMLElement} The new node
+     */</span>
+    insertBefore: <span class="reserved">function</span>(el, values){
+        el = YAHOO.util.Dom.get(el);
+        <span class="reserved">return</span> YAHOO.ext.DomHelper.insertHtml(<span class="literal">'beforeBegin'</span>, el, <span class="reserved">this</span>.applyTemplate(values));
+    },
+    
+    <span class="comment">/**
+     * Applies the supplied values to the template and inserts the new node(s) after el
+     * <span class="attrib">@param</span> {HTMLElement} el The context element
+     * <span class="attrib">@param</span> {Object} values The template values. Can be an array if your params are numeric (i.e. {0}) or an object (i.e. {foo: 'bar'})
+     * <span class="attrib">@return</span> {HTMLElement} The new node
+     */</span>
+    insertAfter : <span class="reserved">function</span>(el, values){
+        el = YAHOO.util.Dom.get(el);
+        <span class="reserved">return</span> YAHOO.ext.DomHelper.insertHtml(<span class="literal">'afterEnd'</span>, el, <span class="reserved">this</span>.applyTemplate(values));
+    },
+    
+    <span class="comment">/**
+     * Applies the supplied values to the template and append the new node(s) to el
+     * <span class="attrib">@param</span> {HTMLElement} el The context element
+     * <span class="attrib">@param</span> {Object} values The template values. Can be an array if your params are numeric (i.e. {0}) or an object (i.e. {foo: 'bar'})
+     * <span class="attrib">@return</span> {HTMLElement} The new node
+     */</span>
+    append : <span class="reserved">function</span>(el, values){
+        el = YAHOO.util.Dom.get(el);
+        <span class="reserved">return</span> YAHOO.ext.DomHelper.insertHtml(<span class="literal">'beforeEnd'</span>, el, <span class="reserved">this</span>.applyTemplate(values));
+    },
+    
+    <span class="comment">/**
+     * Applies the supplied values to the template and overwrites the content of el with the new node(s)
+     * <span class="attrib">@param</span> {HTMLElement} el The context element
+     * <span class="attrib">@param</span> {Object} values The template values. Can be an array if your params are numeric (i.e. {0}) or an object (i.e. {foo: 'bar'})
+     * <span class="attrib">@return</span> {HTMLElement} The new node
+     */</span>
+    overwrite : <span class="reserved">function</span>(el, values){
+        el = YAHOO.util.Dom.get(el);
+        el.innerHTML = <span class="literal">''</span>;
+        <span class="reserved">return</span> YAHOO.ext.DomHelper.insertHtml(<span class="literal">'beforeEnd'</span>, el, <span class="reserved">this</span>.applyTemplate(values));
+    }
+};</pre>
+	<hr>
+
+
+<hr>
+<font size="-1">
+
+</font>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat Oct 14 06:07:10 2006</div>
+</body>
+</html>

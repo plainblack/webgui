@@ -1,0 +1,10 @@
+/*
+ * YUI Extensions
+ * Copyright(c) 2006, Jack Slocum.
+ * 
+ * This code is licensed under BSD license. 
+ * http://www.opensource.org/licenses/bsd-license.php
+ */
+
+
+YAHOO.ext.grid.AbstractDataModel=function(){this.onCellUpdated=new YAHOO.util.CustomEvent('onCellUpdated');this.onTableDataChanged=new YAHOO.util.CustomEvent('onTableDataChanged');this.onRowsDeleted=new YAHOO.util.CustomEvent('onRowsDeleted');this.onRowsInserted=new YAHOO.util.CustomEvent('onRowsInserted');this.onRowsUpdated=new YAHOO.util.CustomEvent('onRowsUpdated');this.onRowsSorted=new YAHOO.util.CustomEvent('onRowsSorted');this.events={'cellupdated':this.onCellUpdated,'datachanged':this.onTableDataChanged,'rowsdeleted':this.onRowsDeleted,'rowsinserted':this.onRowsInserted,'rowsupdated':this.onRowsUpdated,'rowssorted':this.onRowsSorted};};YAHOO.ext.grid.AbstractDataModel.prototype={addListener:YAHOO.ext.grid.Grid.prototype.addListener,removeListener:YAHOO.ext.grid.Grid.prototype.removeListener,fireEvent:YAHOO.ext.grid.Grid.prototype.fireEvent,fireCellUpdated:function(row,col){this.onCellUpdated.fireDirect(this,row,col);},fireTableDataChanged:function(){this.onTableDataChanged.fireDirect(this);},fireRowsDeleted:function(firstRow,lastRow){this.onRowsDeleted.fireDirect(this,firstRow,lastRow);},fireRowsInserted:function(firstRow,lastRow){this.onRowsInserted.fireDirect(this,firstRow,lastRow);},fireRowsUpdated:function(firstRow,lastRow){this.onRowsUpdated.fireDirect(this,firstRow,lastRow);},fireRowsSorted:function(sortColumnIndex,sortDir,noRefresh){this.onRowsSorted.fireDirect(this,sortColumnIndex,sortDir,noRefresh);},sort:function(columnModel,columnIndex,direction,suppressEvent){},getSortState:function(){return{column:this.sortColumn,direction:this.sortDir};},getRowCount:function(){},getTotalRowCount:function(){return this.getRowCount();},getRowId:function(rowIndex){},getValueAt:function(rowIndex,colIndex){},setValueAt:function(value,rowIndex,colIndex){},isPaged:function(){return false;}};

@@ -380,13 +380,12 @@ sub www_manageAdSpaces {
 	my $ac = WebGUI::AdminConsole->new($session,"adSpace");
 	my $i18n = WebGUI::International->new($session,"AdSpace");
 	my $output = "";
-	my $rs = $session->db->read("select adSpaceId, title from adSpace order by title");
-	while (my ($id, $title) = $rs->array) {
+	foreach my $adSpace (@{WebGUI::AdSpace->getAdSpaces($session)}) {
 		$output .= '<div style="float: left; margin: 10px;">'
-			.$session->icon->delete("op=deleteAdSpace;adSpaceId=".$id, undef, $i18n->get("confirm ad space delete"))
-			.$session->icon->edit("op=editAdSpace;adSpaceId=".$id)
-			.' '.$title.'<br />'
-			.WebGUI::AdSpace->new($session, $id)->displayImpression(1)
+			.$session->icon->delete("op=deleteAdSpace;adSpaceId=".$adSpace->getId, undef, $i18n->get("confirm ad space delete"))
+			.$session->icon->edit("op=editAdSpace;adSpaceId=".$adSpace->getId)
+			.' '.$adSpace->get("title").'<br />'
+			.$adSpace->displayImpression(1)
 			.'</div>';
 	}	
 	$output .= '<div style="clear: both;"></div>';

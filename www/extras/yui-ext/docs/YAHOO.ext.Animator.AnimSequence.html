@@ -1,0 +1,485 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN""http://www.w3.org/TR/REC-html40/loose.dtd">
+<!--NewPage-->
+<HTML>
+<HEAD>
+<TITLE>
+YAHOO.ext.Animator.AnimSequence
+</TITLE>
+<LINK REL ="stylesheet" TYPE="text/css" HREF="stylesheet.css" TITLE="Style">
+</HEAD>
+<SCRIPT>
+function asd()
+{
+parent.document.title="YAHOO.ext.Animator.AnimSequence";
+}
+</SCRIPT>
+<BODY BGCOLOR="white" onload="asd();" style="margin:15px;">
+<!-- ======== START OF CLASS DATA ======== -->
+<H2>Class YAHOO.ext.Animator.AnimSequence</H2>
+<PRE>Object
+   |
+   +--<b>YAHOO.ext.Animator.AnimSequence</b>
+</PRE>
+
+
+<HR>
+<DL>
+   <!-- Class definition -->
+   <DT>class 
+   <B>YAHOO.ext.Animator.AnimSequence</B>
+   
+
+</DL>
+   
+   <P>
+   <BR/>Used by <a href="YAHOO.ext.Animator.html#">YAHOO.ext.Animator</a> to sequence animations. Generally used internally. Documentation to come.<br><br>
+  
+<BR/><I>Defined in <a href='overview-summary-Animator.js.html'>Animator.js</a></I><BR/><BR/>
+   </P>
+   
+   <HR>
+
+<!-- ======== NESTED CLASS SUMMARY ======== -->
+
+<!-- ======== END NESTED CLASS SUMMARY ======== -->
+
+
+<!-- =========== FIELD SUMMARY =========== -->
+
+
+   
+
+<!-- =========== END FIELD SUMMARY =========== -->
+
+
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+
+<A NAME="constructor_summary"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+  <TD COLSPAN="2" class="title-cell">
+    Constructor Summary
+  </TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD>
+      <CODE>
+	 <B>
+	    <A HREF="YAHOO.ext.Animator.AnimSequence.html#YAHOO.ext.Animator.AnimSequence()">YAHOO.ext.Animator.AnimSequence</A> 
+	 </B>
+	 ()
+      </CODE>
+      <BR>
+      &nbsp;&nbsp;
+      
+      </TD>
+</TR>
+</TABLE>
+
+<!-- ======== END CONSTRUCTOR SUMMARY ======== -->
+
+&nbsp;
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<A NAME="method_summary"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+  <TD COLSPAN="2" class="title-cell">
+    <span style="float:left">Method Summary</span>
+    <span style="float:right;font-weight:normal;font-size:8pt;">
+      <i>* Parameter types in italic indicate optional parameters</i>
+    </span>
+  </TD>
+</TR>
+
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#add">add</A></B>(action)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#addAsyncCall">addAsyncCall</A></B>(&lt;<a href="Function.html">Function</a>&gt; fcn, &lt;Number&gt; callbackIndex, &lt;<i>Array</i>&gt; args, &lt;<i>Object</i>&gt; scope)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Add an async function call to the capture queue.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#addCall">addCall</A></B>(fcn, args, scope)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#clear">clear</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Object</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#isPlaying">isPlaying</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#next">next</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#pause">pause</A></B>(seconds)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#play">play</A></B>(oncomplete)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#stop">stop</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 
+      </TD>
+   </TR>
+
+
+</TABLE>
+
+
+
+<P>
+<!-- ========== END METHOD SUMMARY =========== -->
+
+
+<!-- ============ FIELD DETAIL START =========== -->
+
+
+<!-- ============ FIELD DETAIL END =========== -->
+
+    <!-- ========= CONSTRUCTOR DETAIL START ======== -->
+
+<A NAME="constructor_detail"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+   <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+     <TD COLSPAN="1" class="title-cell">
+       Constructor Detail
+     </TD>
+   </TR>
+</TABLE>
+
+<A NAME="YAHOO.ext.Animator.AnimSequence()"><!-- --></A><H3>
+YAHOO.ext.Animator.AnimSequence</H3>
+<PRE><B>YAHOO.ext.Animator.AnimSequence</B>()</PRE>
+
+
+
+
+   </UL>
+
+
+<!-- Constructor return value(s) -->
+
+<!-- End constructor return value(s) -->
+
+<!-- ADDITIONAL ATTRIBUTES -->
+
+<HR/>
+<!-- END ADDITIONAL ATTRIBUTES  -->
+
+<!-- ========= CONSTRUCTOR DETAIL END ======== -->
+
+
+<!-- ============ METHOD DETAIL START ========== -->
+
+<A NAME="method_detail"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+   <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+     <TD COLSPAN="1" class="title-cell">
+       Method Detail
+     </TD>
+   </TR>
+</TABLE>
+
+<!-- One single method detail entry -->
+
+   <A NAME="add"><!-- --></A>
+   <H3>add</H3>
+   <PRE>void <B>add</B>(action)</PRE>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="addAsyncCall"><!-- --></A>
+   <H3>addAsyncCall</H3>
+   <PRE>void <B>addAsyncCall</B>(&lt;<a href="Function.html">Function</a>&gt; fcn, &lt;Number&gt; callbackIndex, &lt;<i>Array</i>&gt; args, &lt;<i>Object</i>&gt; scope)</PRE>
+   
+      <UL>Add an async function call to the capture queue.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>fcn</CODE> -  The function to call  
+      </UL> 
+   
+     <UL><CODE>callbackIndex</CODE> -  The index of the callback parameter on the passed function. A CALLBACK IS REQUIRED.  
+      </UL> 
+   
+     <UL><CODE>args</CODE> -  The arguments to call the function with  
+      </UL> 
+   
+     <UL><CODE>scope</CODE> -  (optional) The scope of the function        
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="addCall"><!-- --></A>
+   <H3>addCall</H3>
+   <PRE>void <B>addCall</B>(fcn, args, scope)</PRE>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="clear"><!-- --></A>
+   <H3>clear</H3>
+   <PRE>void <B>clear</B>()</PRE>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="isPlaying"><!-- --></A>
+   <H3>isPlaying</H3>
+   <PRE>Object <B>isPlaying</B>()</PRE>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="next"><!-- --></A>
+   <H3>next</H3>
+   <PRE>void <B>next</B>()</PRE>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="pause"><!-- --></A>
+   <H3>pause</H3>
+   <PRE>void <B>pause</B>(seconds)</PRE>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="play"><!-- --></A>
+   <H3>play</H3>
+   <PRE>void <B>play</B>(oncomplete)</PRE>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="stop"><!-- --></A>
+   <H3>stop</H3>
+   <PRE>void <B>stop</B>()</PRE>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+
+
+<!-- ============ METHOD DETAIL END ========== -->
+
+<!-- ========= END OF CLASS DATA ========= -->
+
+<HR>
+<FONT SIZE="-1">
+
+</FONT>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat Oct 14 06:07:10 2006</div>
+</BODY>
+</HTML>

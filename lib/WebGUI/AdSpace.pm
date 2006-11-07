@@ -178,6 +178,25 @@ sub getAds {
 
 #-------------------------------------------------------------------
 
+=head2 getAdSpaces ( session )
+
+Returns an array reference containing all the ad spaces. This is a class method.
+
+=cut
+
+sub getAdSpaces {
+	my $class = shift;
+	my $session = shift;
+	my @ads = ();
+	my $rs = $session->db->read("select adSpaceId from adSpace order by title");
+	while (my ($id) = $rs->array) {
+		push(@ads, WebGUI::AdSpace->new($session, $id));
+	}	
+	return \@ads;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getId ( )
 
 Returns the id of this object.

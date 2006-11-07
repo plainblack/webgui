@@ -1,0 +1,738 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Frameset//EN""http://www.w3.org/TR/REC-html40/frameset.dtd">
+<html>
+<head>
+<title>
+ Overview
+</title>
+<link rel ="stylesheet" type="text/css" href="stylesheet.css" title="Style">
+<script>
+function asd() {
+	
+		parent.document.title="Actor.js Overview";
+	
+}
+</script>
+</head>
+<body bgcolor="white" onload="asd();" style="margin:15px;">
+<center>
+	
+	   <h2>Actor.js</h2>
+	
+</center>
+
+	
+
+
+<h4>Summary</h4>
+<p>
+	
+		
+	
+</p>
+
+
+    <table border="1" cellpadding="3" cellspacing="0" width="100%">
+    <tr bgcolor="#CCCCFF" class="TableHeadingColor">
+    <td colspan="2" class="title-cell">
+    
+        <b>Class Summary</b>
+    
+    </td>
+    </tr>
+    
+    <tr bgcolor="white" class="TableRowColor">
+    <td width="15%"><b><a href="YAHOO.ext.Actor.html">YAHOO.ext.Actor</a></b></td>
+    <td>Provides support for syncing and chaining of Element Yahoo!</td>
+    </tr>
+    
+    <tr bgcolor="white" class="TableRowColor">
+    <td width="15%"><b><a href="YAHOO.ext.Actor.Action.html">YAHOO.ext.Actor.Action</a></b></td>
+    <td>Used by <a href="YAHOO.ext.Actor.html#">YAHOO.ext.Actor</a> to queue standard calls.</td>
+    </tr>
+    
+    <tr bgcolor="white" class="TableRowColor">
+    <td width="15%"><b><a href="YAHOO.ext.Actor.AsyncAction.html">YAHOO.ext.Actor.AsyncAction</a></b></td>
+    <td>Used by <a href="YAHOO.ext.Actor.html#">YAHOO.ext.Actor</a> to queue animations.</td>
+    </tr>
+    
+    <tr bgcolor="white" class="TableRowColor">
+    <td width="15%"><b><a href="YAHOO.ext.Actor.PauseAction.html">YAHOO.ext.Actor.PauseAction</a></b></td>
+    <td>Used by <a href="YAHOO.ext.Actor.html#">YAHOO.ext.Actor</a> to perform pauses.</td>
+    </tr>
+    
+    </table>
+   <hr/> 
+
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<!-- ========== END METHOD SUMMARY =========== -->
+
+
+        <pre class="sourceview">
+<span class="comment">/**
+ * <span class="attrib">@class</span>
+ * Provides support for syncing and chaining of Element Yahoo! UI based animation and some common effects. Actors support "self-play" without an Animator.&lt;br&gt;&lt;br&gt;
+ * &lt;b&gt;Note: Along with the animation methods defined below, this class inherits and captures all of the "set" or animation methods of {<span class="attrib">@link</span> YAHOO.ext.Element}. "get" methods are not captured and execute immediately.&lt;/b&gt;
+ * &lt;br&gt;&lt;br&gt;Usage:&lt;br&gt;
+ * &lt;pre&gt;&lt;code&gt;
+ * var actor = new YAHOO.ext.Actor('myElementId');
+ * actor.startCapture(true);
+ * actor.moveTo(100, 100, true);
+ * actor.squish();
+ * actor.play();
+ * &lt;br&gt;
+ * // or to start capturing immediately, with no Animator (the null second param)
+ * &lt;br&gt;
+ * var actor = new YAHOO.ext.Actor('myElementId', null, true);
+ * actor.moveTo(100, 100, true);
+ * actor.squish();
+ * actor.play();
+ * &lt;/code&gt;&lt;/pre&gt;
+ * <span class="attrib">@extends</span> YAHOO.ext.Element
+ * <span class="attrib">@requires</span> YAHOO.ext.Element
+ * <span class="attrib">@requires</span> YAHOO.util.Dom
+ * <span class="attrib">@requires</span> YAHOO.util.Event
+ * <span class="attrib">@requires</span> YAHOO.util.CustomEvent 
+ * <span class="attrib">@requires</span> YAHOO.util.Anim
+ * <span class="attrib">@requires</span> YAHOO.util.ColorAnim
+ * <span class="attrib">@requires</span> YAHOO.util.Motion
+ * <span class="attrib">@className</span> YAHOO.ext.Actor
+ * <span class="attrib">@constructor</span>
+ * Create new Actor.
+ * <span class="attrib">@param</span> {String/HTMLElement} el The dom element or element id 
+ * <span class="attrib">@param</span> {&lt;i&gt;YAHOO.ext.Animator&lt;/i&gt;} animator (optional) The Animator that will capture this Actor's actions
+ * <span class="attrib">@param</span> {&lt;i&gt;Boolean&lt;/i&gt;} selfCapture (optional) Whether this actor should capture it's own actions to support self playback without an animator (defaults to false)
+ */</span>
+YAHOO.ext.Actor = <span class="reserved">function</span>(element, animator, selfCapture){
+    YAHOO.ext.Actor.superclass.constructor.call(<span class="reserved">this</span>, element, true);
+    
+    <span class="reserved">this</span>.el = YAHOO.ext.Element.get(<span class="reserved">this</span>.id); <span class="comment">// cache el object for playback</span>
+    
+    <span class="reserved">this</span>.onCapture = new YAHOO.util.CustomEvent(<span class="literal">'Actor.onCapture'</span>);
+    <span class="reserved">if</span>(animator){
+        <span class="comment">/**
+        * The animator used to sync this actor with other actors
+        * <span class="attrib">@member</span> YAHOO.ext.Actor
+        */</span>
+        animator.addActor(<span class="reserved">this</span>);
+    }
+    <span class="comment">/**
+    * Whether this actor is currently capturing
+    * <span class="attrib">@member</span> YAHOO.ext.Actor
+    */</span>
+    <span class="reserved">this</span>.capturing = selfCapture;
+    <span class="reserved">this</span>.playlist = selfCapture ? new YAHOO.ext.Animator.AnimSequence() : null;
+};
+
+YAHOO.extendX(YAHOO.ext.Actor, YAHOO.ext.Element);
+
+<span class="comment">/**
+ * Captures an action for this actor. Generally called internally but can be called directly.
+ # <span class="attrib">@param</span> {YAHOO.ext.Actor.Action} action
+ */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.capture = <span class="reserved">function</span>(action){
+    <span class="reserved">if</span>(<span class="reserved">this</span>.playlist != null){
+        <span class="reserved">this</span>.playlist.add(action);
+    }
+    <span class="reserved">this</span>.onCapture.fireDirect(<span class="reserved">this</span>, action);
+    <span class="reserved">return</span> action;
+};
+
+<span class="comment">/** <span class="attrib">@ignore</span> */</span>
+YAHOO.ext.Actor.overrideAnimation = <span class="reserved">function</span>(method, animParam, onParam){
+    <span class="reserved">return</span> <span class="reserved">function</span>(){
+        <span class="reserved">if</span>(!<span class="reserved">this</span>.capturing){
+            <span class="reserved">return</span> method.apply(<span class="reserved">this</span>, arguments);
+        }
+        var args = Array.<span class="reserved">prototype</span>.slice.call(arguments, 0);
+        <span class="reserved">if</span>(args[animParam] === true){
+            <span class="reserved">return</span> <span class="reserved">this</span>.capture(new YAHOO.ext.Actor.AsyncAction(<span class="reserved">this</span>, method, args, onParam));
+        }<span class="reserved">else</span>{
+            <span class="reserved">return</span> <span class="reserved">this</span>.capture(new YAHOO.ext.Actor.Action(<span class="reserved">this</span>, method, args));
+        }
+    };
+}
+
+<span class="comment">/** <span class="attrib">@ignore</span> */</span>
+YAHOO.ext.Actor.overrideBasic = <span class="reserved">function</span>(method){
+    <span class="reserved">return</span> <span class="reserved">function</span>(){
+        <span class="reserved">if</span>(!<span class="reserved">this</span>.capturing){
+            <span class="reserved">return</span> method.apply(<span class="reserved">this</span>, arguments);
+        }
+        var args = Array.<span class="reserved">prototype</span>.slice.call(arguments, 0);
+        <span class="reserved">return</span> <span class="reserved">this</span>.capture(new YAHOO.ext.Actor.Action(<span class="reserved">this</span>, method, args));
+    };
+}
+
+<span class="comment">// All of these methods below are marked "ignore" because JSDoc treats them as fields, not function. How brilliant. The Element methods are documented anyway though.</span>
+<span class="comment">/** Capturing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#setVisibilityMode} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.setVisibilityMode = YAHOO.ext.Actor.overrideBasic(YAHOO.ext.Actor.superclass.setVisibilityMode);
+<span class="comment">/** Capturing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#enableDisplayMode} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.enableDisplayMode = YAHOO.ext.Actor.overrideBasic(YAHOO.ext.Actor.superclass.enableDisplayMode);
+<span class="comment">/** Capturing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#focus} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.focus = YAHOO.ext.Actor.overrideBasic(YAHOO.ext.Actor.superclass.focus);
+<span class="comment">/** Capturing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#addClass} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.addClass = YAHOO.ext.Actor.overrideBasic(YAHOO.ext.Actor.superclass.addClass);
+<span class="comment">/** Capturing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#removeClass} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.removeClass = YAHOO.ext.Actor.overrideBasic(YAHOO.ext.Actor.superclass.removeClass);
+<span class="comment">/** Capturing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#replaceClass} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.replaceClass = YAHOO.ext.Actor.overrideBasic(YAHOO.ext.Actor.superclass.replaceClass);
+<span class="comment">/** Capturing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#setStyle} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.setStyle = YAHOO.ext.Actor.overrideBasic(YAHOO.ext.Actor.superclass.setStyle);
+<span class="comment">/** Capturing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#setX} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.setX = YAHOO.ext.Actor.overrideBasic(YAHOO.ext.Actor.superclass.setX);
+<span class="comment">/** Capturing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#setY} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.setY = YAHOO.ext.Actor.overrideBasic(YAHOO.ext.Actor.superclass.setY);
+<span class="comment">/** Capturing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#setLeft} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.setLeft = YAHOO.ext.Actor.overrideBasic(YAHOO.ext.Actor.superclass.setLeft);
+<span class="comment">/** Capturing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#setTop} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.setTop = YAHOO.ext.Actor.overrideBasic(YAHOO.ext.Actor.superclass.setTop);
+<span class="comment">/** Capturing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#setAbsolutePositioned} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.setAbsolutePositioned = YAHOO.ext.Actor.overrideBasic(YAHOO.ext.Actor.superclass.setAbsolutePositioned);
+<span class="comment">/** Capturing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#setRelativePositioned} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.setRelativePositioned = YAHOO.ext.Actor.overrideBasic(YAHOO.ext.Actor.superclass.setRelativePositioned);
+<span class="comment">/** Capturing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#clearPositioning} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.clearPositioning = YAHOO.ext.Actor.overrideBasic(YAHOO.ext.Actor.superclass.clearPositioning);
+<span class="comment">/** Capturing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#setPositioning} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.setPositioning = YAHOO.ext.Actor.overrideBasic(YAHOO.ext.Actor.superclass.setPositioning);
+<span class="comment">/** Capturing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#clip} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.clip = YAHOO.ext.Actor.overrideBasic(YAHOO.ext.Actor.superclass.clip);
+<span class="comment">/** Capturing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#unclip} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.unclip = YAHOO.ext.Actor.overrideBasic(YAHOO.ext.Actor.superclass.unclip);
+<span class="comment">/** Capturing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#clearOpacity} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.clearOpacity = YAHOO.ext.Actor.overrideBasic(YAHOO.ext.Actor.superclass.clearOpacity);
+<span class="comment">/** Capturing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#clearOpacity} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.update = YAHOO.ext.Actor.overrideBasic(YAHOO.ext.Actor.superclass.update);
+
+<span class="comment">/**Capturing and animation syncing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#animate} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.animate = <span class="reserved">function</span>(args, duration, onComplete, easing, animType){
+    <span class="reserved">if</span>(!<span class="reserved">this</span>.capturing){
+        <span class="reserved">return</span> YAHOO.ext.Actor.superclass.animate.apply(<span class="reserved">this</span>, arguments);
+   }
+    <span class="reserved">return</span> <span class="reserved">this</span>.capture(new YAHOO.ext.Actor.AsyncAction(<span class="reserved">this</span>, YAHOO.ext.Actor.superclass.animate, 
+        [args, duration, onComplete, easing, animType], 2));
+};
+
+<span class="comment">/** Capturing and animation syncing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#setVisible} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.setVisible = YAHOO.ext.Actor.overrideAnimation(YAHOO.ext.Actor.superclass.setVisible, 1, 3);
+<span class="comment">/**Capturing and animation syncing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#toggle} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.toggle = YAHOO.ext.Actor.overrideAnimation(YAHOO.ext.Actor.superclass.toggle, 0, 2);
+<span class="comment">/**Capturing and animation syncing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#setXY} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.setXY = YAHOO.ext.Actor.overrideAnimation(YAHOO.ext.Actor.superclass.setXY, 1, 3);
+<span class="comment">/**Capturing and animation syncing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#setLocation} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.setLocation = YAHOO.ext.Actor.overrideAnimation(YAHOO.ext.Actor.superclass.setLocation, 2, 4);
+<span class="comment">/**Capturing and animation syncing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#setWidth} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.setWidth = YAHOO.ext.Actor.overrideAnimation(YAHOO.ext.Actor.superclass.setWidth, 1, 3);
+<span class="comment">/**Capturing and animation syncing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#setHeight} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.setHeight = YAHOO.ext.Actor.overrideAnimation(YAHOO.ext.Actor.superclass.setHeight, 1, 3);
+<span class="comment">/**Capturing and animation syncing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#setSize} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.setSize = YAHOO.ext.Actor.overrideAnimation(YAHOO.ext.Actor.superclass.setSize, 2, 4);
+<span class="comment">/**Capturing and animation syncing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#setBounds} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.setBounds = YAHOO.ext.Actor.overrideAnimation(YAHOO.ext.Actor.superclass.setBounds, 4, 6);
+<span class="comment">/**Capturing and animation syncing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#setHeight} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.setOpacity = YAHOO.ext.Actor.overrideAnimation(YAHOO.ext.Actor.superclass.setHeight, 1, 3);
+<span class="comment">/**Capturing and animation syncing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#moveTo} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.moveTo = YAHOO.ext.Actor.overrideAnimation(YAHOO.ext.Actor.superclass.moveTo, 2, 4);
+<span class="comment">/**Capturing and animation syncing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#move} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.move = YAHOO.ext.Actor.overrideAnimation(YAHOO.ext.Actor.superclass.move, 2, 4);
+<span class="comment">/**Capturing and animation syncing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#alignTo} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.alignTo = YAHOO.ext.Actor.overrideAnimation(YAHOO.ext.Actor.superclass.alignTo, 3, 5);
+<span class="comment">/**Capturing and animation syncing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#hide} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.hide = YAHOO.ext.Actor.overrideAnimation(YAHOO.ext.Actor.superclass.hide, 0, 2);
+<span class="comment">/**Capturing and animation syncing override - See {<span class="attrib">@link</span> YAHOO.ext.Element#show} for method details.
+ * <span class="attrib">@type</span> Function */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.show = YAHOO.ext.Actor.overrideAnimation(YAHOO.ext.Actor.superclass.show, 0, 2);
+    
+<span class="comment">/**
+ * Start self capturing calls on this Actor. All subsequent calls are captured and executed when play() is called.
+ */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.startCapture = <span class="reserved">function</span>(){
+    <span class="reserved">this</span>.capturing = true;
+    <span class="reserved">this</span>.playlist = new YAHOO.ext.Animator.AnimSequence();
+ };
+ 
+ <span class="comment">/**
+ * Stop self capturing calls on this Actor.
+ */</span>
+ YAHOO.ext.Actor.<span class="reserved">prototype</span>.stopCapture = <span class="reserved">function</span>(){
+     <span class="reserved">this</span>.capturing = false;
+ };
+
+<span class="comment">/**
+ * Clears any calls that have been self captured.
+ */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.clear = <span class="reserved">function</span>(){
+    <span class="reserved">this</span>.playlist = new YAHOO.ext.Animator.AnimSequence();
+};
+
+<span class="comment">/**
+ * Starts playback of self captured calls.
+ * <span class="attrib">@param</span> {&lt;i&gt;Function&lt;/i&gt;} oncomplete (optional) Callback to execute when playback has completed
+ */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.play = <span class="reserved">function</span>(oncomplete){
+    <span class="reserved">this</span>.capturing = false;
+    <span class="reserved">if</span>(<span class="reserved">this</span>.playlist){
+        <span class="reserved">this</span>.playlist.play(oncomplete);
+    }
+ };
+
+<span class="comment">/**
+ * Capture a function call.
+ * <span class="attrib">@param</span> {Function} fcn The function to call
+ * <span class="attrib">@param</span> {&lt;i&gt;Array&lt;/i&gt;} args (optional) The arguments to call the function with
+ * <span class="attrib">@param</span> {&lt;i&gt;Object&lt;/i&gt;} scope (optional) The scope of the function
+ */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.addCall = <span class="reserved">function</span>(fcn, args, scope){
+    <span class="reserved">this</span>.capture(new YAHOO.ext.Actor.Action(scope, fcn, args || []));
+};
+
+<span class="comment">/**
+ * Capture an async function call.
+ * <span class="attrib">@param</span> {Function} fcn The function to call
+ * <span class="attrib">@param</span> {Number} callbackIndex The index of the callback parameter on the passed function. A CALLBACK IS REQUIRED.
+ * <span class="attrib">@param</span> {&lt;i&gt;Array&lt;/i&gt;} args The arguments to call the function with
+ * <span class="attrib">@param</span> {&lt;i&gt;Object&lt;/i&gt;} scope (optional) The scope of the function
+ */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.addAsyncCall = <span class="reserved">function</span>(fcn, callbackIndex, args, scope){
+    <span class="reserved">this</span>.capture(new YAHOO.ext.Actor.AsyncAction(scope, fcn, args || [], callbackIndex));
+ },
+ 
+<span class="comment">/**
+ * Capture a pause (in seconds).
+ * <span class="attrib">@param</span> {Number} seconds The seconds to pause
+ */</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.pause = <span class="reserved">function</span>(seconds){
+    <span class="reserved">this</span>.capture(new YAHOO.ext.Actor.PauseAction(seconds));
+ };
+ 
+<span class="comment">/**
+* Shake this element from side to side
+*/</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.shake = <span class="reserved">function</span>(){
+    <span class="reserved">this</span>.move(<span class="literal">'left'</span>, 20, true, .05);
+    <span class="reserved">this</span>.move(<span class="literal">'right'</span>, 40, true, .05);
+    <span class="reserved">this</span>.move(<span class="literal">'left'</span>, 40, true, .05);
+    <span class="reserved">this</span>.move(<span class="literal">'right'</span>, 20, true, .05);
+};
+
+<span class="comment">/**
+* Bounce this element from up and down
+*/</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.bounce = <span class="reserved">function</span>(){
+    <span class="reserved">this</span>.move(<span class="literal">'up'</span>, 20, true, .05);
+    <span class="reserved">this</span>.move(<span class="literal">'down'</span>, 40, true, .05);
+    <span class="reserved">this</span>.move(<span class="literal">'up'</span>, 40, true, .05);
+    <span class="reserved">this</span>.move(<span class="literal">'down'</span>, 20, true, .05);
+};
+
+<span class="comment">/**
+* Show the element using a "blinds" effect
+* <span class="attrib">@param</span> {String} anchor The part of the element that it should appear to exapand from. 
+                        The short/long options currently are t/top, l/left
+* <span class="attrib">@param</span> {&lt;i&gt;Number&lt;/i&gt;} newSize (optional) The size to animate to. (Default to current size)
+* <span class="attrib">@param</span> {&lt;i&gt;Float&lt;/i&gt;} duration (optional) How long the effect lasts (in seconds)
+* <span class="attrib">@param</span> {&lt;i&gt;Function&lt;/i&gt;} easing (optional) YAHOO.util.Easing method to use. (Defaults to YAHOO.util.Easing.easeOut)
+*/</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.blindShow = <span class="reserved">function</span>(anchor, newSize, duration, easing){
+    var size = newSize || <span class="reserved">this</span>.getSize();
+    <span class="reserved">this</span>.clip();
+    <span class="reserved">this</span>.setVisible(true);
+    anchor = anchor.toLowerCase();
+    switch(anchor){
+        case <span class="literal">'t'</span>:
+        case <span class="literal">'top'</span>:
+            <span class="reserved">this</span>.setHeight(1);
+            <span class="reserved">this</span>.setHeight(newSize, true, duration || .5, null, easing || YAHOO.util.Easing.easeOut);
+        break;
+        case <span class="literal">'l'</span>:
+        case <span class="literal">'left'</span>:
+            <span class="reserved">this</span>.setWidth(1);
+            <span class="reserved">this</span>.setWidth(newSize, true, duration || .5, null, easing || YAHOO.util.Easing.easeOut);
+        break;
+    }
+    <span class="reserved">this</span>.unclip();
+    <span class="reserved">return</span> size;
+};
+
+<span class="comment">/**
+* Hide the element using a "blinds" effect
+* <span class="attrib">@param</span> {String} anchor The part of the element that it should appear to collapse to.
+                        The short/long options are t/top, l/left, b/bottom, r/right.
+* <span class="attrib">@param</span> {&lt;i&gt;Float&lt;/i&gt;} duration (optional) How long the effect lasts (in seconds)
+* <span class="attrib">@param</span> {&lt;i&gt;Function&lt;/i&gt;} easing (optional) YAHOO.util.Easing method to use. (Defaults to YAHOO.util.Easing.easeIn)
+*/</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.blindHide = <span class="reserved">function</span>(anchor, duration, easing){
+    var size = <span class="reserved">this</span>.getSize();
+    <span class="reserved">this</span>.clip();
+    anchor = anchor.toLowerCase();
+    switch(anchor){
+        case <span class="literal">'t'</span>:
+        case <span class="literal">'top'</span>:
+            <span class="reserved">this</span>.setSize(size.width, 1, true, duration || .5, null, easing || YAHOO.util.Easing.easeIn);
+            <span class="reserved">this</span>.setVisible(false);
+        break;
+        case <span class="literal">'l'</span>:
+        case <span class="literal">'left'</span>:
+            <span class="reserved">this</span>.setSize(1, size.height, true, duration || .5, null, easing || YAHOO.util.Easing.easeIn);
+            <span class="reserved">this</span>.setVisible(false);
+        break;
+        case <span class="literal">'r'</span>:
+        case <span class="literal">'right'</span>:
+            <span class="reserved">this</span>.animate({width: {to: 1}, points: {by: [<span class="reserved">this</span>.getWidth(), 0]}}, 
+            duration || .5, null, YAHOO.util.Easing.easeIn, YAHOO.util.Motion);
+            <span class="reserved">this</span>.setVisible(false);
+        break;
+        case <span class="literal">'b'</span>:
+        case <span class="literal">'bottom'</span>:
+            <span class="reserved">this</span>.animate({height: {to: 1}, points: {by: [0, <span class="reserved">this</span>.getHeight()]}}, 
+            duration || .5, null, YAHOO.util.Easing.easeIn, YAHOO.util.Motion);
+            <span class="reserved">this</span>.setVisible(false);
+        break;
+    }
+    <span class="reserved">return</span> size;
+};
+
+<span class="comment">/**
+* Show the element using a "slide in" effect - In order for this effect to work the element MUST have a child element container that can be "slid" otherwise a blindShow effect is rendered. 
+* <span class="attrib">@param</span> {String} anchor The part of the element that it should appear to slide from. 
+                        The short/long options currently are t/top, l/left
+* <span class="attrib">@param</span> {&lt;i&gt;Number&lt;/i&gt;} newSize (optional) The size to animate to. (Default to current size)
+* <span class="attrib">@param</span> {&lt;i&gt;Float&lt;/i&gt;} duration (optional) How long the effect lasts (in seconds)
+* <span class="attrib">@param</span> {&lt;i&gt;Function&lt;/i&gt;} easing (optional) YAHOO.util.Easing method to use. (Defaults to YAHOO.util.Easing.easeOuth)
+*/</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.slideShow = <span class="reserved">function</span>(anchor, newSize, duration, easing){
+    var size = newSize || <span class="reserved">this</span>.getSize();
+    <span class="reserved">this</span>.clip();
+    var firstChild = <span class="reserved">this</span>.dom.firstChild;
+    <span class="reserved">if</span>(!firstChild || (firstChild.nodeName &amp;&amp; <span class="literal">"#TEXT"</span> == firstChild.nodeName.toUpperCase())) { <span class="comment">// can't do a slide with only a textnode</span>
+        <span class="reserved">this</span>.blindShow(anchor, newSize, duration, easing);
+        <span class="reserved">return</span>;
+    }
+    var child = YAHOO.ext.Element.get(firstChild, true);
+    var pos = child.getPositioning();
+    <span class="reserved">this</span>.addCall(child.setAbsolutePositioned, null, child);
+    <span class="reserved">this</span>.setVisible(true);
+    anchor = anchor.toLowerCase();
+    switch(anchor){
+        case <span class="literal">'t'</span>:
+        case <span class="literal">'top'</span>:
+            <span class="reserved">this</span>.addCall(child.setStyle, [<span class="literal">'left'</span>, <span class="literal">'0px'</span>], child);
+            <span class="reserved">this</span>.addCall(child.setStyle, [<span class="literal">'bottom'</span>, <span class="literal">'0px'</span>], child);
+            <span class="reserved">this</span>.setHeight(1);
+            <span class="reserved">this</span>.setHeight(newSize, true, duration || .5, null, easing || YAHOO.util.Easing.easeOut);
+        break;
+        case <span class="literal">'l'</span>:
+        case <span class="literal">'left'</span>:
+            <span class="reserved">this</span>.addCall(child.setStyle, [<span class="literal">'right'</span>, <span class="literal">'0px'</span>], child);
+            <span class="reserved">this</span>.addCall(child.setStyle, [<span class="literal">'top'</span>, <span class="literal">'0px'</span>], child);
+            <span class="reserved">this</span>.setWidth(1);
+            <span class="reserved">this</span>.setWidth(newSize, true, duration || .5, null, easing || YAHOO.util.Easing.easeOut);
+        break;
+    }
+    <span class="reserved">this</span>.addCall(child.setPositioning, [pos], child);
+    <span class="reserved">this</span>.unclip();
+    <span class="reserved">return</span> size;
+};
+
+<span class="comment">/**
+* Hide the element using a "slide in" effect - In order for this effect to work the element MUST have a child element container that can be "slid" otherwise a blindHide effect is rendered. 
+* <span class="attrib">@param</span> {String} anchor The part of the element that it should appear to slide to.
+                        The short/long options are t/top, l/left, b/bottom, r/right.
+* <span class="attrib">@param</span> {&lt;i&gt;Float&lt;/i&gt;} duration (optional) How long the effect lasts (in seconds)
+* <span class="attrib">@param</span> {&lt;i&gt;Function&lt;/i&gt;} easing (optional) YAHOO.util.Easing method to use. (Defaults to YAHOO.util.Easing.easeIn)
+*/</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.slideHide = <span class="reserved">function</span>(anchor, duration, easing){
+    var size = <span class="reserved">this</span>.getSize();
+    <span class="reserved">this</span>.clip();
+    var firstChild = <span class="reserved">this</span>.dom.firstChild;
+    <span class="reserved">if</span>(!firstChild || (firstChild.nodeName &amp;&amp; <span class="literal">"#TEXT"</span> == firstChild.nodeName.toUpperCase())) { <span class="comment">// can't do a slide with only a textnode</span>
+        <span class="reserved">this</span>.blindHide(anchor, duration, easing);
+        <span class="reserved">return</span>;
+    }
+    var child = YAHOO.ext.Element.get(firstChild, true);
+    var pos = child.getPositioning();
+    <span class="reserved">this</span>.addCall(child.setAbsolutePositioned, null, child);
+    anchor = anchor.toLowerCase();
+    switch(anchor){
+        case <span class="literal">'t'</span>:
+        case <span class="literal">'top'</span>:
+            <span class="reserved">this</span>.addCall(child.setStyle, [<span class="literal">'left'</span>, <span class="literal">'0px'</span>], child);
+            <span class="reserved">this</span>.addCall(child.setStyle, [<span class="literal">'bottom'</span>, <span class="literal">'0px'</span>], child);
+            <span class="reserved">this</span>.setSize(size.width, 1, true, duration || .5, null, easing || YAHOO.util.Easing.easeIn);
+            <span class="reserved">this</span>.setVisible(false);
+        break;
+        case <span class="literal">'l'</span>:
+        case <span class="literal">'left'</span>:
+            <span class="reserved">this</span>.addCall(child.setStyle, [<span class="literal">'right'</span>, <span class="literal">'0px'</span>], child);
+            <span class="reserved">this</span>.addCall(child.setStyle, [<span class="literal">'top'</span>, <span class="literal">'0px'</span>], child);
+            <span class="reserved">this</span>.setSize(1, size.height, true, duration || .5, null, easing || YAHOO.util.Easing.easeIn);
+            <span class="reserved">this</span>.setVisible(false);
+        break;
+        case <span class="literal">'r'</span>:
+        case <span class="literal">'right'</span>:
+            <span class="reserved">this</span>.addCall(child.setStyle, [<span class="literal">'left'</span>, <span class="literal">'0px'</span>], child);
+            <span class="reserved">this</span>.addCall(child.setStyle, [<span class="literal">'top'</span>, <span class="literal">'0px'</span>], child);
+            <span class="reserved">this</span>.animate({width: {to: 1}, points: {by: [<span class="reserved">this</span>.getWidth(), 0]}}, 
+            duration || .5, null, YAHOO.util.Easing.easeIn, YAHOO.util.Motion);
+            <span class="reserved">this</span>.setVisible(false);
+        break;
+        case <span class="literal">'b'</span>:
+        case <span class="literal">'bottom'</span>:
+            <span class="reserved">this</span>.addCall(child.setStyle, [<span class="literal">'left'</span>, <span class="literal">'0px'</span>], child);
+            <span class="reserved">this</span>.addCall(child.setStyle, [<span class="literal">'bottom'</span>, <span class="literal">'0px'</span>], child);
+            <span class="reserved">this</span>.animate({height: {to: 1}, points: {by: [0, <span class="reserved">this</span>.getHeight()]}}, 
+            duration || .5, null, YAHOO.util.Easing.easeIn, YAHOO.util.Motion);
+            <span class="reserved">this</span>.setVisible(false);
+        break;
+    }
+    <span class="reserved">this</span>.addCall(child.setPositioning, [pos], child);
+    <span class="reserved">return</span> size;
+};
+
+<span class="comment">/**
+* Hide the element by "squishing" it into the corner
+* <span class="attrib">@param</span> {&lt;i&gt;Float&lt;/i&gt;} duration (optional) How long the effect lasts (in seconds)
+*/</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.squish = <span class="reserved">function</span>(duration){
+    var size = <span class="reserved">this</span>.getSize();
+    <span class="reserved">this</span>.clip();
+    <span class="reserved">this</span>.setSize(1, 1, true, duration || .5);
+    <span class="reserved">this</span>.setVisible(false);
+    <span class="reserved">return</span> size;
+};
+
+<span class="comment">/**
+* Fade an element in
+* <span class="attrib">@param</span> {&lt;i&gt;Float&lt;/i&gt;} duration (optional) How long the effect lasts (in seconds)
+*/</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.appear = <span class="reserved">function</span>(duration){
+    <span class="reserved">this</span>.setVisible(true, true, duration);
+};
+
+<span class="comment">/**
+* Fade an element out
+* <span class="attrib">@param</span> {&lt;i&gt;Float&lt;/i&gt;} duration (optional) How long the effect lasts (in seconds)
+*/</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.fade = <span class="reserved">function</span>(duration){
+    <span class="reserved">this</span>.setVisible(false, true, duration);
+};
+
+<span class="comment">/**
+* Blink the element as if it was clicked and then collapse on it's center
+* <span class="attrib">@param</span> {&lt;i&gt;Float&lt;/i&gt;} duration (optional) How long the effect lasts (in seconds)
+*/</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.switchOff = <span class="reserved">function</span>(duration){
+    <span class="reserved">this</span>.clip();
+    <span class="reserved">this</span>.setVisible(false, true, .1);
+    <span class="reserved">this</span>.clearOpacity();
+    <span class="reserved">this</span>.setVisible(true);
+    <span class="reserved">this</span>.animate({height: {to: 1}, points: {by: [0, <span class="reserved">this</span>.getHeight()/2]}}, 
+            duration || .5, null, YAHOO.util.Easing.easeOut, YAHOO.util.Motion);
+    <span class="reserved">this</span>.setVisible(false);
+};
+
+<span class="comment">/**
+* Highlight the element using a background color (or passed attribute) animation
+* <span class="attrib">@param</span> {String} color (optional) The color to use for the highlight
+* <span class="attrib">@param</span> {&lt;i&gt;String&lt;/i&gt;} fromColor (optional) If the element does not currently have a background color, you will need to pass in a color to animate from
+* <span class="attrib">@param</span> {&lt;i&gt;Float&lt;/i&gt;} duration (optional) How long the effect lasts (in seconds)
+* <span class="attrib">@param</span> {&lt;i&gt;String&lt;/i&gt;} attribute (optional) Specify a CSS attribute to use other than background color - camelCase
+*/</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.highlight = <span class="reserved">function</span>(color, fromColor, duration, attribute){
+    attribute = attribute || <span class="literal">'backgroundColor'</span>;
+    var original = <span class="reserved">this</span>.getStyle(attribute);
+    fromColor = fromColor || ((original &amp;&amp; original != <span class="literal">''</span> &amp;&amp; original != <span class="literal">'transparent'</span>) ? original : <span class="literal">'#FFFFFF'</span>);
+    var cfg = {};
+    cfg[attribute] = {to: color, from: fromColor};
+    <span class="reserved">this</span>.setVisible(true);
+    <span class="reserved">this</span>.animate(cfg, duration || .5, null, YAHOO.util.Easing.bounceOut, YAHOO.util.ColorAnim);
+    <span class="reserved">this</span>.setStyle(attribute, original);
+};
+
+<span class="comment">/**
+* Fade the element in and out the specified amount of times
+* <span class="attrib">@param</span> {&lt;i&gt;Number&lt;/i&gt;} count (optional) How many times to pulse (Defaults to 3)
+* <span class="attrib">@param</span> {&lt;i&gt;Float&lt;/i&gt;} duration (optional) How long the effect lasts (in seconds)
+*/</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.pulsate = <span class="reserved">function</span>(count, duration){
+    count = count || 3;
+    <span class="reserved">for</span>(var i = 0; i &lt; count; i++){
+        <span class="reserved">this</span>.toggle(true, duration || .25);
+        <span class="reserved">this</span>.toggle(true, duration || .25);
+    }
+};
+
+<span class="comment">/**
+* Fade the element as it is falling from it's current position
+* <span class="attrib">@param</span> {&lt;i&gt;Float&lt;/i&gt;} duration (optional) How long the effect lasts (in seconds)
+*/</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.dropOut = <span class="reserved">function</span>(duration){
+    <span class="reserved">this</span>.animate({opacity: {to: 0}, points: {by: [0, <span class="reserved">this</span>.getHeight()]}}, 
+            duration || .5, null, YAHOO.util.Easing.easeIn, YAHOO.util.Motion);
+    <span class="reserved">this</span>.setVisible(false);
+};
+
+<span class="comment">/**
+* Hide the element in a way that it appears as if it is flying off the screen
+* <span class="attrib">@param</span> {String} anchor The part of the page that the element should appear to move to. 
+                        The short/long options are t/top, l/left, b/bottom, r/right, tl/top-left, 
+                        tr/top-right, bl/bottom-left or br/bottom-right.
+* <span class="attrib">@param</span> {&lt;i&gt;Float&lt;/i&gt;} duration (optional) How long the effect lasts (in seconds)
+* <span class="attrib">@param</span> {&lt;i&gt;Function&lt;/i&gt;} easing (optional) YAHOO.util.Easing method to use. (Defaults to YAHOO.util.Easing.easeIn)
+*/</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.moveOut = <span class="reserved">function</span>(anchor, duration, easing){
+    var Y = YAHOO.util;
+    var vw = Y.Dom.getViewportWidth();
+    var vh = Y.Dom.getViewportHeight();
+    var cpoints = <span class="reserved">this</span>.getCenterXY()
+    var centerX = cpoints[0];
+    var centerY = cpoints[1];
+    var anchor = anchor.toLowerCase();
+    var p;
+    switch(anchor){
+        case <span class="literal">'t'</span>:
+        case <span class="literal">'top'</span>:
+            p = [centerX, -<span class="reserved">this</span>.getHeight()];
+        break;
+        case <span class="literal">'l'</span>:
+        case <span class="literal">'left'</span>:
+            p = [-<span class="reserved">this</span>.getWidth(), centerY];
+        break;
+        case <span class="literal">'r'</span>:
+        case <span class="literal">'right'</span>:
+            p = [vw+<span class="reserved">this</span>.getWidth(), centerY];
+        break;
+        case <span class="literal">'b'</span>:
+        case <span class="literal">'bottom'</span>:
+            p = [centerX, vh+<span class="reserved">this</span>.getHeight()];
+        break;
+        case <span class="literal">'tl'</span>:
+        case <span class="literal">'top-left'</span>:
+            p = [-<span class="reserved">this</span>.getWidth(), -<span class="reserved">this</span>.getHeight()];
+        break;
+        case <span class="literal">'bl'</span>:
+        case <span class="literal">'bottom'</span>:
+            p = [-<span class="reserved">this</span>.getWidth(), vh+<span class="reserved">this</span>.getHeight()];
+        break;
+        case <span class="literal">'br'</span>:
+        case <span class="literal">'bottom-right'</span>:
+            p = [vw+<span class="reserved">this</span>.getWidth(), vh+<span class="reserved">this</span>.getHeight()];
+        break;
+        case <span class="literal">'tr'</span>:
+        case <span class="literal">'top-right'</span>:
+            p = [vw+<span class="reserved">this</span>.getWidth(), -<span class="reserved">this</span>.getHeight()];
+        break;
+    }
+    <span class="reserved">this</span>.moveTo(p[0], p[1], true, duration || .35, null, easing || Y.Easing.easeIn);
+    <span class="reserved">this</span>.setVisible(false);
+};
+
+<span class="comment">/**
+* Show the element in a way that it appears as if it is flying onto the screen
+* <span class="attrib">@param</span> {String} anchor The part of the page that the element should appear to move from. 
+                        The short/long options are t/top, l/left, b/bottom, r/right, tl/top-left, 
+                        tr/top-right, bl/bottom-left or br/bottom-right.
+* <span class="attrib">@param</span> {&lt;i&gt;Array&lt;/i&gt;} to (optional) Array of x and y position to move to like [x, y] (Defaults to center screen)
+* <span class="attrib">@param</span> {&lt;i&gt;Float&lt;/i&gt;} duration (optional) How long the effect lasts (in seconds)
+* <span class="attrib">@param</span> {&lt;i&gt;Function&lt;/i&gt;} easing (optional) YAHOO.util.Easing method to use. (Defaults to YAHOO.util.Easing.easeOut)
+*/</span>
+YAHOO.ext.Actor.<span class="reserved">prototype</span>.moveIn = <span class="reserved">function</span>(anchor, to, duration, easing){
+    to = to || <span class="reserved">this</span>.getCenterXY();
+    <span class="reserved">this</span>.moveOut(anchor, .01);
+    <span class="reserved">this</span>.setVisible(true);
+    <span class="reserved">this</span>.setXY(to, true, duration || .35, null, easing || YAHOO.util.Easing.easeOut);
+};
+
+
+
+<span class="comment">/**
+ * <span class="attrib">@class</span> Used by {<span class="attrib">@link</span> YAHOO.ext.Actor} to queue standard calls. Generally used internally. Documentation to come.&lt;br&gt;&lt;br&gt;
+ */</span>
+YAHOO.ext.Actor.Action = <span class="reserved">function</span>(actor, method, args){
+      <span class="reserved">this</span>.actor = actor;
+      <span class="reserved">this</span>.method = method;
+      <span class="reserved">this</span>.args = args;
+      <span class="comment">//alert('queueing ' + actor.id + ' ' + method.toString());</span>
+  }
+  
+YAHOO.ext.Actor.Action.<span class="reserved">prototype</span> = {
+    play : <span class="reserved">function</span>(onComplete){
+        <span class="reserved">this</span>.method.apply(<span class="reserved">this</span>.actor || window, <span class="reserved">this</span>.args);
+        onComplete();
+    }  
+};
+
+
+<span class="comment">/**
+ * <span class="attrib">@class</span> Used by {<span class="attrib">@link</span> YAHOO.ext.Actor} to queue animations. Generally used internally. Documentation to come.&lt;br&gt;&lt;br&gt;
+ */</span>
+YAHOO.ext.Actor.AsyncAction = <span class="reserved">function</span>(actor, method, args, onIndex){
+    YAHOO.ext.Actor.AsyncAction.superclass.constructor.call(<span class="reserved">this</span>, actor, method, args);
+    <span class="reserved">this</span>.onIndex = onIndex;
+    <span class="reserved">this</span>.originalCallback = <span class="reserved">this</span>.args[onIndex];
+}
+YAHOO.extendX(YAHOO.ext.Actor.AsyncAction, YAHOO.ext.Actor.Action);
+
+YAHOO.ext.Actor.AsyncAction.<span class="reserved">prototype</span>.play = <span class="reserved">function</span>(onComplete){
+    var callbackArg = <span class="reserved">this</span>.originalCallback ? 
+                        <span class="reserved">this</span>.originalCallback.createSequence(onComplete) : onComplete;
+    <span class="reserved">this</span>.args[<span class="reserved">this</span>.onIndex] = callbackArg;
+    <span class="reserved">this</span>.method.apply(<span class="reserved">this</span>.actor, <span class="reserved">this</span>.args);
+};
+
+
+<span class="comment">/**
+ * <span class="attrib">@class</span> Used by {<span class="attrib">@link</span> YAHOO.ext.Actor} to perform pauses. Generally used internally. Documentation to come.&lt;br&gt;&lt;br&gt;
+ */</span>
+YAHOO.ext.Actor.PauseAction = <span class="reserved">function</span>(seconds){
+    <span class="reserved">this</span>.seconds = seconds;
+};
+YAHOO.ext.Actor.PauseAction.<span class="reserved">prototype</span> = {
+    play : <span class="reserved">function</span>(onComplete){
+        setTimeout(onComplete, <span class="reserved">this</span>.seconds * 1000);
+    }
+};</pre>
+	<hr>
+
+
+<hr>
+<font size="-1">
+
+</font>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat Oct 14 06:07:10 2006</div>
+</body>
+</html>

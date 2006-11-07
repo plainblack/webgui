@@ -516,13 +516,33 @@ sub www_edit {
 					$i18n->get("edit matrix"));
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_deleteImage ( )
+
+Deletes and attached file.
+
+=cut
+
+sub www_deleteImage {
+	my $self = shift;
+        my $listing = $self->session->db->getRow("Matrix_listing","listingId",$self->session->form->process("listingId"));
+	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
+	return $i18n->get('no edit rights') unless ($self->session->user->userId eq $listing->{maintainerId} || $self->canEdit);
+	if ($listing->{storageId} ne "") {
+		my $storage = WebGUI::Storage::Image->get($self->session, $listing->{storageId});
+		$storage->delete;
+	}
+	return $self->www_editListing($listing, $i18n);
+}
+
 
  
 #-------------------------------------------------------------------
 sub www_editListing {
         my $self = shift;
-        my $listing= $self->session->db->getRow("Matrix_listing","listingId",$self->session->form->process("listingId"));
-	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
+        my $listing= shift || $self->session->db->getRow("Matrix_listing","listingId",$self->session->form->process("listingId"));
+	my $i18n = shift || WebGUI::International->new($self->session,'Asset_Matrix');
 	return $i18n->get('no edit rights') unless (($self->session->form->process("listingId") eq "new" && $self->session->user->isInGroup($self->get("groupToAdd"))) || $self->session->user->userId eq $listing->{maintainerId} || $self->canEdit);
         my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
         $f->hidden(
@@ -555,12 +575,10 @@ sub www_editListing {
 	$f->image(
 		name=>"screenshot",
 		label=>$i18n->get("screenshot"),
-		hoverHelp=>$i18n->get("screenshot help")
+		value=>$listing->{storageId},
+		hoverHelp=>$i18n->get("screenshot help"),
+		deleteFileUrl=>$self->getUrl("func=deleteImage;listingId=".$listing->{listingId}.";filename=")
 		);
-	if ($listing->{filename} && $listing->{storageId}) {
-		my $storage = WebGUI::Storage::Image->get($self->session, $listing->{storageId});
-		$f->readOnly(value=>'<img src="'.$storage->getThumbnailUrl($listing->{filename}).'" alt="'.$listing->{filename}.'" />');
-	}
 	$f->text(
 		-name=>"manufacturerName",
 		-value=>$listing->{manufacturerName},

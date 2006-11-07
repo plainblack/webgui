@@ -78,11 +78,7 @@ Macros are processed in the tags if processed by this method.
 
 sub generateAdditionalHeadTags {
 	my $self = shift;
-	# generate additional raw tags
 	my $tags = $self->{_raw};
-        # generate additional link tags
-	# generate additional javascript tags
-	$tags .= join '', values %{ $self->{_link} }, values %{ $self->{_javascript} };
 	delete $self->{_raw};
 	delete $self->{_javascript};
 	delete $self->{_link};
@@ -287,12 +283,8 @@ sub setLink {
 		$tag .= ' '.$name.'="'.$params->{$name}.'"';
 	}
 	$tag .= ' />'."\n";
-	if ($self->sent) {
-		$self->session->output->print($tag);
-	}
-	else {
-		$self->{_link}{$url} = $tag;
-	}
+	$self->{_link}{$url} = 1;
+	$self->setRawHeadTags($tag);
 }
 
 #-------------------------------------------------------------------
@@ -401,12 +393,8 @@ sub setScript {
 		$tag .= ' '.$name.'="'.$params->{$name}.'"';
 	}
 	$tag .= '></script>'."\n";
-	if ($self->sent) {
-		$self->session->output->print($tag);
-	}
-	else {
-		$self->{_javascript}{$url} = $tag;
-	}
+	$self->{_javascript}{$url} = 1;
+	$self->setRawHeadTags($tag);
 }
 
 #-------------------------------------------------------------------

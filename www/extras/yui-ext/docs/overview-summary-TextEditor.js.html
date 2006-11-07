@@ -1,0 +1,154 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Frameset//EN""http://www.w3.org/TR/REC-html40/frameset.dtd">
+<html>
+<head>
+<title>
+ Overview
+</title>
+<link rel ="stylesheet" type="text/css" href="stylesheet.css" title="Style">
+<script>
+function asd() {
+	
+		parent.document.title="TextEditor.js Overview";
+	
+}
+</script>
+</head>
+<body bgcolor="white" onload="asd();" style="margin:15px;">
+<center>
+	
+	   <h2>TextEditor.js</h2>
+	
+</center>
+
+	
+
+
+<h4>Summary</h4>
+<p>
+	
+		
+	
+</p>
+
+
+    <table border="1" cellpadding="3" cellspacing="0" width="100%">
+    <tr bgcolor="#CCCCFF" class="TableHeadingColor">
+    <td colspan="2" class="title-cell">
+    
+        <b>Class Summary</b>
+    
+    </td>
+    </tr>
+    
+    <tr bgcolor="white" class="TableRowColor">
+    <td width="15%"><b><a href="YAHOO.ext.grid.TextEditor.html">YAHOO.ext.grid.TextEditor</a></b></td>
+    <td>&nbsp;</td>
+    </tr>
+    
+    </table>
+   <hr/> 
+
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<!-- ========== END METHOD SUMMARY =========== -->
+
+
+        <pre class="sourceview">YAHOO.ext.grid.TextEditor = <span class="reserved">function</span>(config){
+    var element = document.createElement(<span class="literal">'input'</span>);
+    element.type = <span class="literal">'text'</span>;
+    element.className = <span class="literal">'ygrid-editor ygrid-text-editor'</span>;
+    element.setAttribute(<span class="literal">'autocomplete'</span>, <span class="literal">'off'</span>);
+    document.body.appendChild(element);
+    YAHOO.ext.grid.TextEditor.superclass.constructor.call(<span class="reserved">this</span>, element);
+    YAHOO.ext.util.Config.apply(<span class="reserved">this</span>, config);
+};
+YAHOO.extendX(YAHOO.ext.grid.TextEditor, YAHOO.ext.grid.CellEditor);
+
+YAHOO.ext.grid.TextEditor.<span class="reserved">prototype</span>.validate = <span class="reserved">function</span>(){
+    var dom = <span class="reserved">this</span>.element.dom;
+    var value = dom.value;
+    <span class="reserved">if</span>(value.length &lt; 1){ <span class="comment">// if it's blank</span>
+         <span class="reserved">if</span>(<span class="reserved">this</span>.allowBlank){
+             dom.title = <span class="literal">''</span>;
+             <span class="reserved">this</span>.element.removeClass(<span class="literal">'ygrid-editor-invalid'</span>);
+             <span class="reserved">return</span> true;
+         }<span class="reserved">else</span>{
+             dom.title = <span class="reserved">this</span>.blankText;
+             <span class="reserved">this</span>.element.addClass(<span class="literal">'ygrid-editor-invalid'</span>);
+             <span class="reserved">return</span> false;
+         }
+    }
+    <span class="reserved">if</span>(value.length &lt; <span class="reserved">this</span>.minLength){
+        dom.title = <span class="reserved">this</span>.minText.replace(<span class="literal">'%0'</span>, <span class="reserved">this</span>.minLength);
+        <span class="reserved">this</span>.element.addClass(<span class="literal">'ygrid-editor-invalid'</span>);
+        <span class="reserved">return</span> false;
+    }
+    <span class="reserved">if</span>(value.length &gt; <span class="reserved">this</span>.maxLength){
+        dom.title = <span class="reserved">this</span>.maxText.replace(<span class="literal">'%0'</span>, <span class="reserved">this</span>.maxLength);
+        <span class="reserved">this</span>.element.addClass(<span class="literal">'ygrid-editor-invalid'</span>);
+        <span class="reserved">return</span> false;
+    }
+    var msg = <span class="reserved">this</span>.validator(value);
+    <span class="reserved">if</span>(msg !== true){
+        dom.title = msg;
+        <span class="reserved">this</span>.element.addClass(<span class="literal">'ygrid-editor-invalid'</span>);
+        <span class="reserved">return</span> false;
+    }
+    <span class="reserved">if</span>(<span class="reserved">this</span>.regex &amp;&amp; !<span class="reserved">this</span>.regex.test(value)){
+        dom.title = <span class="reserved">this</span>.regexText;
+        <span class="reserved">this</span>.element.addClass(<span class="literal">'ygrid-editor-invalid'</span>);
+        <span class="reserved">return</span> false;
+    }
+    dom.title = <span class="literal">''</span>;
+    <span class="reserved">this</span>.element.removeClass(<span class="literal">'ygrid-editor-invalid'</span>);
+    <span class="reserved">return</span> true;
+};
+
+YAHOO.ext.grid.TextEditor.<span class="reserved">prototype</span>.initEvents = <span class="reserved">function</span>(){
+    YAHOO.ext.grid.TextEditor.superclass.initEvents.call(<span class="reserved">this</span>);
+    var vtask = new YAHOO.ext.util.DelayedTask(<span class="reserved">this</span>.validate, <span class="reserved">this</span>);
+    <span class="reserved">this</span>.element.mon(<span class="literal">'keyup'</span>, vtask.delay.createDelegate(vtask, [<span class="reserved">this</span>.validationDelay]));
+};
+
+YAHOO.ext.grid.TextEditor.<span class="reserved">prototype</span>.show = <span class="reserved">function</span>(){
+    <span class="reserved">this</span>.element.dom.title = <span class="literal">''</span>;
+    YAHOO.ext.grid.TextEditor.superclass.show.call(<span class="reserved">this</span>);
+    <span class="reserved">this</span>.element.focus();
+    <span class="reserved">if</span>(<span class="reserved">this</span>.selectOnFocus){
+        try{
+            <span class="reserved">this</span>.element.dom.select();
+        }catch(e){}
+    }
+    <span class="reserved">this</span>.validate(<span class="reserved">this</span>.element.dom.value);
+};
+
+YAHOO.ext.grid.TextEditor.<span class="reserved">prototype</span>.getValue = <span class="reserved">function</span>(){
+   <span class="reserved">if</span>(!<span class="reserved">this</span>.validate()){
+       <span class="reserved">return</span> <span class="reserved">this</span>.originalValue;
+   }<span class="reserved">else</span>{
+       <span class="reserved">return</span> <span class="reserved">this</span>.element.dom.value;
+   }   
+};
+
+YAHOO.ext.grid.TextEditor.<span class="reserved">prototype</span>.allowBlank = true;
+YAHOO.ext.grid.TextEditor.<span class="reserved">prototype</span>.minLength = 0;
+YAHOO.ext.grid.TextEditor.<span class="reserved">prototype</span>.maxLength = Number.MAX_VALUE;
+YAHOO.ext.grid.TextEditor.<span class="reserved">prototype</span>.minText = <span class="literal">'The minimum length for this field is %0'</span>;
+YAHOO.ext.grid.TextEditor.<span class="reserved">prototype</span>.maxText = <span class="literal">'The maximum length for this field is %0'</span>;
+YAHOO.ext.grid.TextEditor.<span class="reserved">prototype</span>.selectOnFocus = true;
+YAHOO.ext.grid.TextEditor.<span class="reserved">prototype</span>.blankText = <span class="literal">'This field cannot be blank'</span>;
+YAHOO.ext.grid.TextEditor.<span class="reserved">prototype</span>.validator = <span class="reserved">function</span>(){<span class="reserved">return</span> true;};
+YAHOO.ext.grid.TextEditor.<span class="reserved">prototype</span>.validationDelay = 200;
+YAHOO.ext.grid.TextEditor.<span class="reserved">prototype</span>.regex = null;
+YAHOO.ext.grid.TextEditor.<span class="reserved">prototype</span>.regexText = <span class="literal">''</span>;</pre>
+	<hr>
+
+
+<hr>
+<font size="-1">
+
+</font>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat Oct 14 06:07:10 2006</div>
+</body>
+</html>

@@ -1,0 +1,794 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN""http://www.w3.org/TR/REC-html40/loose.dtd">
+<!--NewPage-->
+<HTML>
+<HEAD>
+<TITLE>
+YAHOO.ext.grid.XMLDataModel
+</TITLE>
+<LINK REL ="stylesheet" TYPE="text/css" HREF="stylesheet.css" TITLE="Style">
+</HEAD>
+<SCRIPT>
+function asd()
+{
+parent.document.title="YAHOO.ext.grid.XMLDataModel";
+}
+</SCRIPT>
+<BODY BGCOLOR="white" onload="asd();" style="margin:15px;">
+<!-- ======== START OF CLASS DATA ======== -->
+<H2>Class YAHOO.ext.grid.XMLDataModel</H2>
+<PRE>Object
+   |
+   +--<a href='YAHOO.ext.grid.AbstractDataModel.html'>YAHOO.ext.grid.AbstractDataModel</a>
+         |
+         +--<a href='YAHOO.ext.grid.DefaultDataModel.html'>YAHOO.ext.grid.DefaultDataModel</a>
+               |
+               +--<a href='YAHOO.ext.grid.LoadableDataModel.html'>YAHOO.ext.grid.LoadableDataModel</a>
+                     |
+                     +--<b>YAHOO.ext.grid.XMLDataModel</b>
+</PRE>
+
+
+<HR>
+<DL>
+   <!-- Class definition -->
+   <DT>class 
+   <B>YAHOO.ext.grid.XMLDataModel</B>
+   
+      <DT>extends <a href='YAHOO.ext.grid.LoadableDataModel.html'>YAHOO.ext.grid.LoadableDataModel</a> 
+   
+
+</DL>
+   
+   <P>
+   <BR/>This is an implementation of a DataModel used by the Grid. It works 
+ with XML data. 
+ <br>Example schema from Amazon search:
+ <pre><code>
+ var schema = {
+     tagName: 'Item',
+     id: 'ASIN',
+     fields: ['Author', 'Title', 'Manufacturer', 'ProductGroup']
+ };
+ </code></pre>
+ <BR/><I>Defined in <a href='overview-summary-XMLDataModel.js.html'>XMLDataModel.js</a></I><BR/><BR/>
+   </P>
+   
+   <HR>
+
+<!-- ======== NESTED CLASS SUMMARY ======== -->
+
+<!-- ======== END NESTED CLASS SUMMARY ======== -->
+
+
+<!-- =========== FIELD SUMMARY =========== -->
+
+   <A NAME="field_summary"><!-- --></A>
+      <TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+         <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+            <TD COLSPAN="2" class="title-cell">Field Summary</TD></TR>
+
+   <!-- This is one instance field summary -->
+   
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+   <CODE>&nbsp;Object</CODE></FONT></TD>
+   <TD><CODE><B><A HREF="#xml">xml</A></B></CODE>
+   <BR>
+   &nbsp;&nbsp;</TD>
+   </TR>
+   
+
+   </TABLE>
+   &nbsp;
+   
+
+   
+   
+   &nbsp;<A NAME=""><!-- --></A>
+   <TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+   <TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+   <TD class="title-cell"><B>Fields inherited from class <A HREF="YAHOO.ext.grid.LoadableDataModel.html">YAHOO.ext.grid.LoadableDataModel</A></B></TD>
+   </TR>
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD><CODE>
+   <a href="YAHOO.ext.grid.LoadableDataModel.html#onLoad">onLoad</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#onLoadException">onLoadException</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#loadedPage">loadedPage</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#remoteSort">remoteSort</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#pageSize">pageSize</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#pageUrl">pageUrl</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#baseParams">baseParams</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#paramMap">paramMap</a>
+   </CODE></TD>
+   </TR>
+</TABLE>
+&nbsp;
+
+
+   
+
+   
+   &nbsp;<A NAME=""><!-- --></A>
+   <TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+   <TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+   <TD class="title-cell"><B>Fields inherited from class <A HREF="YAHOO.ext.grid.AbstractDataModel.html">YAHOO.ext.grid.AbstractDataModel</A></B></TD>
+   </TR>
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD><CODE>
+   <a href="YAHOO.ext.grid.AbstractDataModel.html#onCellUpdated">onCellUpdated</a>, <a href="YAHOO.ext.grid.AbstractDataModel.html#onTableDataChanged">onTableDataChanged</a>, <a href="YAHOO.ext.grid.AbstractDataModel.html#onRowsDeleted">onRowsDeleted</a>, <a href="YAHOO.ext.grid.AbstractDataModel.html#onRowsInserted">onRowsInserted</a>, <a href="YAHOO.ext.grid.AbstractDataModel.html#onRowsUpdated">onRowsUpdated</a>, <a href="YAHOO.ext.grid.AbstractDataModel.html#onRowsSorted">onRowsSorted</a>, <a href="YAHOO.ext.grid.AbstractDataModel.html#events">events</a>, <a href="YAHOO.ext.grid.AbstractDataModel.html#addListener">addListener</a>, <a href="YAHOO.ext.grid.AbstractDataModel.html#removeListener">removeListener</a>, <a href="YAHOO.ext.grid.AbstractDataModel.html#fireEvent">fireEvent</a>
+   </CODE></TD>
+   </TR>
+</TABLE>
+&nbsp;
+
+
+
+<!-- =========== END FIELD SUMMARY =========== -->
+
+
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+
+<A NAME="constructor_summary"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+  <TD COLSPAN="2" class="title-cell">
+    Constructor Summary
+  </TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD>
+      <CODE>
+	 <B>
+	    <A HREF="YAHOO.ext.grid.XMLDataModel.html#YAHOO.ext.grid.XMLDataModel()">YAHOO.ext.grid.XMLDataModel</A> 
+	 </B>
+	 (&lt;Object&gt; schema, &lt;XMLDocument&gt; xml)
+      </CODE>
+      <BR>
+      &nbsp;&nbsp;
+      
+      </TD>
+</TR>
+</TABLE>
+
+<!-- ======== END CONSTRUCTOR SUMMARY ======== -->
+
+&nbsp;
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<A NAME="method_summary"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+  <TD COLSPAN="2" class="title-cell">
+    <span style="float:left">Method Summary</span>
+    <span style="float:right;font-weight:normal;font-size:8pt;">
+      <i>* Parameter types in italic indicate optional parameters</i>
+    </span>
+  </TD>
+</TR>
+
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Number</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#addRow">addRow</A></B>(&lt;String&gt; id, &lt;Array&gt; cellValues)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Adds a row to this DataModel and syncs the XML document
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;XMLNode</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#createNode">createNode</A></B>(&lt;XMLDocument&gt; xmlDoc, id, &lt;Array&gt; colData)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Override this method to define your own node creation routine for when new rows are added.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Object</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getDocument">getDocument</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Object</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getNamedValue">getNamedValue</A></B>(node, name, defaultValue)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Convenience function looks for value in attributes, then in children tags - also 
+ normalizes namespace matches (ie matches ns:tag, FireFox matches tag and not ns:tag).
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Object</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getNode">getNode</A></B>(rowIndex)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Number</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getRowId">getRowId</A></B>(&lt;Number&gt; rowIndex)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Overrides getRowId in DefaultDataModel to return the ID value of the specified node.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Number</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#insertRow">insertRow</A></B>(&lt;Number&gt; index, &lt;String&gt; id, &lt;Array&gt; cellValues)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Inserts a row into this DataModel and syncs the XML document
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#loadData">loadData</A></B>(&lt;XMLDocument&gt; doc, &lt;<i>Function</i>&gt; callback, &lt;<i>Boolean</i>&gt; keepExisting, &lt;<i>Number</i>&gt; insertIndex)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Overrides loadData in LoadableDataModel to process XML
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#removeRow">removeRow</A></B>(&lt;Number&gt; index)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Removes the row from DataModel and syncs the XML document
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#setNamedValue">setNamedValue</A></B>(node, name, value)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Convenience function set a value in the underlying xml node.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#setValueAt">setValueAt</A></B>(&lt;Object&gt; value, &lt;Number&gt; rowIndex, &lt;Number&gt; colIndex)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Overrides DefaultDataModel.setValueAt to update the underlying XML Document
+      </TD>
+   </TR>
+
+
+</TABLE>
+
+
+
+&nbsp;<A NAME="methods_inherited_from_class_java.lang.Object"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TD class="title-cell"><B>Methods inherited from class <a href="YAHOO.ext.grid.LoadableDataModel.html">YAHOO.ext.grid.LoadableDataModel</a></B></TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE>
+<!-- Inherited methods -->
+<a href="YAHOO.ext.grid.LoadableDataModel.html#isPaged">isPaged</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#getTotalRowCount">getTotalRowCount</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#getPageSize">getPageSize</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#getTotalPages">getTotalPages</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#initPaging">initPaging</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#loadPage">loadPage</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#sort">sort</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#load">load</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#fireLoadException">fireLoadException</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#fireLoadEvent">fireLoadEvent</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#addPreprocessor">addPreprocessor</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#getPreprocessor">getPreprocessor</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#removePreprocessor">removePreprocessor</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#addPostprocessor">addPostprocessor</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#getPostprocessor">getPostprocessor</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#removePostprocessor">removePostprocessor</a>
+</CODE></TD>
+</TR>
+</TABLE>
+&nbsp;
+
+&nbsp;<A NAME="methods_inherited_from_class_java.lang.Object"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TD class="title-cell"><B>Methods inherited from class <a href="YAHOO.ext.grid.DefaultDataModel.html">YAHOO.ext.grid.DefaultDataModel</a></B></TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE>
+<!-- Inherited methods -->
+<a href="YAHOO.ext.grid.DefaultDataModel.html#getRowCount">getRowCount</a>, <a href="YAHOO.ext.grid.DefaultDataModel.html#getRow">getRow</a>, <a href="YAHOO.ext.grid.DefaultDataModel.html#getRows">getRows</a>, <a href="YAHOO.ext.grid.DefaultDataModel.html#getValueAt">getValueAt</a>, <a href="YAHOO.ext.grid.DefaultDataModel.html#query">query</a>, <a href="YAHOO.ext.grid.DefaultDataModel.html#filter">filter</a>, <a href="YAHOO.ext.grid.DefaultDataModel.html#applySort">applySort</a>, <a href="YAHOO.ext.grid.DefaultDataModel.html#setDefaultSort">setDefaultSort</a>
+</CODE></TD>
+</TR>
+</TABLE>
+&nbsp;
+
+&nbsp;<A NAME="methods_inherited_from_class_java.lang.Object"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TD class="title-cell"><B>Methods inherited from class <a href="YAHOO.ext.grid.AbstractDataModel.html">YAHOO.ext.grid.AbstractDataModel</a></B></TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE>
+<!-- Inherited methods -->
+<a href="YAHOO.ext.grid.AbstractDataModel.html#fireCellUpdated">fireCellUpdated</a>, <a href="YAHOO.ext.grid.AbstractDataModel.html#fireTableDataChanged">fireTableDataChanged</a>, <a href="YAHOO.ext.grid.AbstractDataModel.html#fireRowsDeleted">fireRowsDeleted</a>, <a href="YAHOO.ext.grid.AbstractDataModel.html#fireRowsInserted">fireRowsInserted</a>, <a href="YAHOO.ext.grid.AbstractDataModel.html#fireRowsUpdated">fireRowsUpdated</a>, <a href="YAHOO.ext.grid.AbstractDataModel.html#fireRowsSorted">fireRowsSorted</a>, <a href="YAHOO.ext.grid.AbstractDataModel.html#getSortState">getSortState</a>
+</CODE></TD>
+</TR>
+</TABLE>
+&nbsp;
+
+<P>
+<!-- ========== END METHOD SUMMARY =========== -->
+
+
+<!-- ============ FIELD DETAIL START =========== -->
+
+   <A NAME="field_detail"><!-- --></A>
+   <TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+      <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+        <TD COLSPAN="1" class="title-cell">Field Detail</TD>
+      </TR>
+   </TABLE>
+
+   
+   <A NAME="xml"><!-- --></A>
+   <H3>xml</H3>
+   <PRE>Object&nbsp;<B>xml</B></PRE>
+   <UL>
+   
+   
+   </UL>
+   <HR>
+   
+
+
+<!-- ============ FIELD DETAIL END =========== -->
+
+    <!-- ========= CONSTRUCTOR DETAIL START ======== -->
+
+<A NAME="constructor_detail"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+   <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+     <TD COLSPAN="1" class="title-cell">
+       Constructor Detail
+     </TD>
+   </TR>
+</TABLE>
+
+<A NAME="YAHOO.ext.grid.XMLDataModel()"><!-- --></A><H3>
+YAHOO.ext.grid.XMLDataModel</H3>
+<PRE><B>YAHOO.ext.grid.XMLDataModel</B>(&lt;Object&gt; schema, &lt;XMLDocument&gt; xml)</PRE>
+
+
+
+
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>schema</CODE> -  The schema to use  
+     </UL>
+   
+     <UL><CODE>xml</CODE> -  An XML document to load immediately
+     </UL>
+   
+   
+   </UL>
+
+
+<!-- Constructor return value(s) -->
+
+<!-- End constructor return value(s) -->
+
+<!-- ADDITIONAL ATTRIBUTES -->
+
+<HR/>
+<!-- END ADDITIONAL ATTRIBUTES  -->
+
+<!-- ========= CONSTRUCTOR DETAIL END ======== -->
+
+
+<!-- ============ METHOD DETAIL START ========== -->
+
+<A NAME="method_detail"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+   <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+     <TD COLSPAN="1" class="title-cell">
+       Method Detail
+     </TD>
+   </TR>
+</TABLE>
+
+<!-- One single method detail entry -->
+
+   <A NAME="addRow"><!-- --></A>
+   <H3>addRow</H3>
+   <PRE>Number <B>addRow</B>(&lt;String&gt; id, &lt;Array&gt; cellValues)</PRE>
+   
+      <UL>Adds a row to this DataModel and syncs the XML document</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>id</CODE> -  The id of the row, if null the next row index is used  
+      </UL> 
+   
+     <UL><CODE>cellValues</CODE> -  The cell values for this row  
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+   <UL>
+   <B>Returns:</B>
+        <UL>
+         The index of the new row 
+        </UL>
+   </UL>
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="createNode"><!-- --></A>
+   <H3>createNode</H3>
+   <PRE>XMLNode <B>createNode</B>(&lt;XMLDocument&gt; xmlDoc, id, &lt;Array&gt; colData)</PRE>
+   
+      <UL>Override this method to define your own node creation routine for when new rows are added.
+ By default this method clones the first node and sets the column values in the newly cloned node.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>xmlDoc</CODE> -  The xml document being used by this model  
+      </UL> 
+   
+     <UL><CODE>colData</CODE> -  The column data for the new node  
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+   <UL>
+   <B>Returns:</B>
+        <UL>
+         The created node 
+        </UL>
+   </UL>
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getDocument"><!-- --></A>
+   <H3>getDocument</H3>
+   <PRE>Object <B>getDocument</B>()</PRE>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getNamedValue"><!-- --></A>
+   <H3>getNamedValue</H3>
+   <PRE>Object <B>getNamedValue</B>(node, name, defaultValue)</PRE>
+   
+      <UL>Convenience function looks for value in attributes, then in children tags - also 
+ normalizes namespace matches (ie matches ns:tag, FireFox matches tag and not ns:tag).</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getNode"><!-- --></A>
+   <H3>getNode</H3>
+   <PRE>Object <B>getNode</B>(rowIndex)</PRE>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getRowId"><!-- --></A>
+   <H3>getRowId</H3>
+   <PRE>Number <B>getRowId</B>(&lt;Number&gt; rowIndex)</PRE>
+   
+      <UL>Overrides getRowId in DefaultDataModel to return the ID value of the specified node.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>rowIndex</CODE> -   
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="insertRow"><!-- --></A>
+   <H3>insertRow</H3>
+   <PRE>Number <B>insertRow</B>(&lt;Number&gt; index, &lt;String&gt; id, &lt;Array&gt; cellValues)</PRE>
+   
+      <UL>Inserts a row into this DataModel and syncs the XML document</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>index</CODE> -  The index to insert the row  
+      </UL> 
+   
+     <UL><CODE>id</CODE> -  The id of the row, if null the next row index is used  
+      </UL> 
+   
+     <UL><CODE>cellValues</CODE> -  The cell values for this row  
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+   <UL>
+   <B>Returns:</B>
+        <UL>
+         The index of the new row 
+        </UL>
+   </UL>
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="loadData"><!-- --></A>
+   <H3>loadData</H3>
+   <PRE>void <B>loadData</B>(&lt;XMLDocument&gt; doc, &lt;<i>Function</i>&gt; callback, &lt;<i>Boolean</i>&gt; keepExisting, &lt;<i>Number</i>&gt; insertIndex)</PRE>
+   
+      <UL>Overrides loadData in LoadableDataModel to process XML</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>doc</CODE> -  The document to load  
+      </UL> 
+   
+     <UL><CODE>callback</CODE> -  (optional) callback to call when loading is complete  
+      </UL> 
+   
+     <UL><CODE>keepExisting</CODE> -  (optional) true to keep existing data  
+      </UL> 
+   
+     <UL><CODE>insertIndex</CODE> -  (optional) if present, loaded data is inserted at the specified index instead of overwriting existing data    
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="removeRow"><!-- --></A>
+   <H3>removeRow</H3>
+   <PRE>void <B>removeRow</B>(&lt;Number&gt; index)</PRE>
+   
+      <UL>Removes the row from DataModel and syncs the XML document</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>index</CODE> -  The index of the row to remove    
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="setNamedValue"><!-- --></A>
+   <H3>setNamedValue</H3>
+   <PRE>void <B>setNamedValue</B>(node, name, value)</PRE>
+   
+      <UL>Convenience function set a value in the underlying xml node.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="setValueAt"><!-- --></A>
+   <H3>setValueAt</H3>
+   <PRE>void <B>setValueAt</B>(&lt;Object&gt; value, &lt;Number&gt; rowIndex, &lt;Number&gt; colIndex)</PRE>
+   
+      <UL>Overrides DefaultDataModel.setValueAt to update the underlying XML Document</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>value</CODE> -  The new value  
+      </UL> 
+   
+     <UL><CODE>rowIndex</CODE> -   
+      </UL> 
+   
+     <UL><CODE>colIndex</CODE> -     
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+
+
+<!-- ============ METHOD DETAIL END ========== -->
+
+<!-- ========= END OF CLASS DATA ========= -->
+
+<HR>
+<FONT SIZE="-1">
+
+</FONT>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat Oct 14 06:07:10 2006</div>
+</BODY>
+</HTML>

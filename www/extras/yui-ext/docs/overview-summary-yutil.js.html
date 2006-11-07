@@ -1,0 +1,942 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Frameset//EN""http://www.w3.org/TR/REC-html40/frameset.dtd">
+<html>
+<head>
+<title>
+ Overview
+</title>
+<link rel ="stylesheet" type="text/css" href="stylesheet.css" title="Style">
+<script>
+function asd() {
+	
+		parent.document.title="yutil.js Overview";
+	
+}
+</script>
+</head>
+<body bgcolor="white" onload="asd();" style="margin:15px;">
+<center>
+	
+	   <h2>yutil.js</h2>
+	
+</center>
+
+	
+
+
+<h4>Summary</h4>
+<p>
+	
+		
+	
+</p>
+
+
+    <table border="1" cellpadding="3" cellspacing="0" width="100%">
+    <tr bgcolor="#CCCCFF" class="TableHeadingColor">
+    <td colspan="2" class="title-cell">
+    
+        <b>Class Summary</b>
+    
+    </td>
+    </tr>
+    
+    <tr bgcolor="white" class="TableRowColor">
+    <td width="15%"><b><a href="YAHOO.ext.util.Bench.html">YAHOO.ext.util.Bench</a></b></td>
+    <td>Very simple Benchmark class that supports multiple timers
+ </td>
+    </tr>
+    
+    <tr bgcolor="white" class="TableRowColor">
+    <td width="15%"><b><a href="YAHOO.ext.util.DelayedTask.html">YAHOO.ext.util.DelayedTask</a></b></td>
+    <td>Provides a convenient method of performing setTimeout where a new
+ timeout cancels the old timeout.</td>
+    </tr>
+    
+    <tr bgcolor="white" class="TableRowColor">
+    <td width="15%"><b><a href="YAHOO.ext.util.Observable.html">YAHOO.ext.util.Observable</a></b></td>
+    <td>&nbsp;</td>
+    </tr>
+    
+    </table>
+   <hr/> 
+
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<!-- ========== END METHOD SUMMARY =========== -->
+
+
+        <pre class="sourceview">
+YAHOO.namespace(<span class="literal">'ext'</span>);
+YAHOO.namespace(<span class="literal">'ext.util'</span>);
+YAHOO.ext.Strict = (document.compatMode == <span class="literal">'CSS1Compat'</span>);
+
+<span class="comment">/**
+ * Creates a callback that passes arguments[0], arguments[1], arguments[2], ...
+ * Call directly on any function. Example: &lt;code&gt;myFunction.createCallback(myarg, myarg2)&lt;/code&gt;
+ * Will create a function that is bound to those 2 args.
+ * <span class="attrib">@addon</span>
+ * <span class="attrib">@return</span> {Function} The new function
+*/</span>
+Function.<span class="reserved">prototype</span>.createCallback = <span class="reserved">function</span>(<span class="comment">/*args...*/</span>){
+    <span class="comment">// make args available, in function below</span>
+    var args = arguments;
+    var method = <span class="reserved">this</span>;
+    <span class="reserved">return</span> <span class="reserved">function</span>() {
+        <span class="reserved">return</span> method.apply(window, args);
+    }
+};
+
+<span class="comment">/**
+ * Creates a delegate (callback) that sets the scope to obj.
+ * Call directly on any function. Example: &lt;code&gt;this.myFunction.createDelegate(this)&lt;/code&gt;
+ * Will create a function that is automatically scoped to this.
+ * <span class="attrib">@addon</span>
+ * <span class="attrib">@param</span> {Object} obj The object for which the scope is set
+ * <span class="attrib">@param</span> {&lt;i&gt;Array&lt;/i&gt;} args (optional) Overrides arguments for the call. (Defaults to the arguments passed by the caller)
+ * <span class="attrib">@param</span> {&lt;i&gt;Boolean&lt;/i&gt;} appendArgs (optional) if True args are appended to call args instead of overriding
+ * <span class="attrib">@return</span> {Function} The new function
+ */</span>
+Function.<span class="reserved">prototype</span>.createDelegate = <span class="reserved">function</span>(obj, args, appendArgs){
+    var method = <span class="reserved">this</span>;
+    <span class="reserved">return</span> <span class="reserved">function</span>() {
+        var callargs = args || arguments;
+        <span class="reserved">if</span>(appendArgs){
+            callargs = Array.<span class="reserved">prototype</span>.concat.apply(arguments, args);
+        }
+        <span class="reserved">return</span> method.apply(obj || window, callargs);
+    }
+};
+
+<span class="comment">/**
+ * Create a combined function call sequence of the original function + the passed function.
+ * The resulting function returns the results of the original function.
+ * The passed fcn is called with the parameters of the original function
+ * <span class="attrib">@addon</span>
+ * <span class="attrib">@param</span> {Function} fcn The function to sequence
+ * <span class="attrib">@param</span> {&lt;i&gt;Object&lt;/i&gt;} scope (optional) The scope of the passed fcn (Defaults to scope of original function or window)
+ * <span class="attrib">@return</span> {Function} The new function
+ */</span>
+Function.<span class="reserved">prototype</span>.createSequence = <span class="reserved">function</span>(fcn, scope){
+    <span class="reserved">if</span>(typeof fcn != <span class="literal">'function'</span>){
+        <span class="reserved">return</span> <span class="reserved">this</span>;
+    }
+    var method = <span class="reserved">this</span>;
+    <span class="reserved">return</span> <span class="reserved">function</span>() {
+        var retval = method.apply(<span class="reserved">this</span> || window, arguments);
+        fcn.apply(scope || <span class="reserved">this</span> || window, arguments);
+        <span class="reserved">return</span> retval;
+    }
+};
+
+<span class="comment">/**
+ * Creates an interceptor function. The passed fcn is called before the original one. If it returns false, the original one is not called.
+ * The resulting function returns the results of the original function.
+ * The passed fcn is called with the parameters of the original function.
+ * <span class="attrib">@addon</span>
+ * <span class="attrib">@param</span> {Function} fcn The function to call before the original
+ * <span class="attrib">@param</span> {&lt;i&gt;Object&lt;/i&gt;} scope (optional) The scope of the passed fcn (Defaults to scope of original function or window)
+ * <span class="attrib">@return</span> {Function} The new function
+ */</span>
+Function.<span class="reserved">prototype</span>.createInterceptor = <span class="reserved">function</span>(fcn, scope){
+    <span class="reserved">if</span>(typeof fcn != <span class="literal">'function'</span>){
+        <span class="reserved">return</span> <span class="reserved">this</span>;
+    }
+    var method = <span class="reserved">this</span>;
+    <span class="reserved">return</span> <span class="reserved">function</span>() {
+        fcn.target = <span class="reserved">this</span>;
+        fcn.method = method;
+        <span class="reserved">if</span>(fcn.apply(scope || <span class="reserved">this</span> || window, arguments) === false) 
+            <span class="reserved">return</span>;
+        <span class="reserved">return</span> method.apply(<span class="reserved">this</span> || window, arguments);;
+    }
+};
+
+<span class="comment">/**
+ * <span class="attrib">@class</span>
+ * <span class="attrib">@constructor</span>
+ */</span>
+YAHOO.ext.util.Browser = new <span class="reserved">function</span>(){
+	var ua = navigator.userAgent.toLowerCase();
+	<span class="comment">/** <span class="attrib">@type</span> Boolean */</span>
+	<span class="reserved">this</span>.isOpera = (ua.indexOf(<span class="literal">'opera'</span>) &gt; -1);
+   	<span class="comment">/** <span class="attrib">@type</span> Boolean */</span>
+	<span class="reserved">this</span>.isSafari = (ua.indexOf(<span class="literal">'webkit'</span>) &gt; -1);
+   	<span class="comment">/** <span class="attrib">@type</span> Boolean */</span>
+	<span class="reserved">this</span>.isIE = (window.ActiveXObject);
+   	<span class="comment">/** <span class="attrib">@type</span> Boolean */</span>
+	<span class="reserved">this</span>.isIE7 = (ua.indexOf(<span class="literal">'msie 7'</span>) &gt; -1);
+   	<span class="comment">/** <span class="attrib">@type</span> Boolean */</span>
+	<span class="reserved">this</span>.isGecko = !<span class="reserved">this</span>.isSafari &amp;&amp; (ua.indexOf(<span class="literal">'gecko'</span>) &gt; -1);
+}();
+
+<span class="comment">/**
+ * Enable custom handler signature and event cancelling. Using fireDirect() instead of fire() calls the subscribed event handlers 
+ * with the exact parameters passed to fireDirect, instead of the usual (eventType, args[], obj). IMO this is more intuitive 
+ * and promotes cleaner code. Also, if an event handler returns false, it is returned by fireDirect and no other handlers will be called.&lt;br&gt;
+ * Example:&lt;br&gt;&lt;br&gt;&lt;pre&gt;&lt;code&gt;
+ * if(beforeUpdateEvent.fireDirect(myArg, myArg2) !== false){
+ *     // do update
+ * }&lt;/code&gt;&lt;/pre&gt;
+ * <span class="attrib">@addon</span>
+ */</span>
+YAHOO.util.CustomEvent.<span class="reserved">prototype</span>.fireDirect = <span class="reserved">function</span>(){
+    var len=<span class="reserved">this</span>.subscribers.length;
+    <span class="reserved">for</span> (var i=0; i&lt;len; ++i) {
+        var s = <span class="reserved">this</span>.subscribers[i];
+        <span class="reserved">if</span>(s){
+            var scope = (s.override) ? s.obj : <span class="reserved">this</span>.scope;
+            <span class="reserved">if</span>(s.fn.apply(scope, arguments) === false){
+                <span class="reserved">return</span> false;
+            }
+        }
+    }
+    <span class="reserved">return</span> true;
+};
+
+YAHOO.extendX = <span class="reserved">function</span>(subclass, superclass, overrides){
+    YAHOO.extend(subclass, superclass);
+    subclass.override = <span class="reserved">function</span>(o){
+        YAHOO.override(subclass, o);
+    };
+    subclass.<span class="reserved">prototype</span>.override = <span class="reserved">function</span>(o){
+        <span class="reserved">for</span>(var method in o){
+            <span class="reserved">this</span>[method] = o[method];
+        }  
+    };
+    <span class="reserved">if</span>(overrides){
+        subclass.override(overrides);
+    }
+};
+
+YAHOO.override = <span class="reserved">function</span>(origclass, overrides){
+    <span class="reserved">if</span>(overrides){
+        var p = origclass.<span class="reserved">prototype</span>;
+        <span class="reserved">for</span>(var method in overrides){
+            p[method] = overrides[method];
+        }
+    }
+};
+
+<span class="comment">/**
+ * <span class="attrib">@class</span>
+ * Very simple Benchmark class that supports multiple timers
+ * <span class="attrib">@constructor</span>
+ */</span>
+YAHOO.ext.util.Bench = <span class="reserved">function</span>(){
+   <span class="reserved">this</span>.timers = {};
+   <span class="reserved">this</span>.lastKey = null;
+};
+YAHOO.ext.util.Bench.<span class="reserved">prototype</span> = {
+   start : <span class="reserved">function</span>(key){
+       <span class="reserved">this</span>.lastKey = key;
+       <span class="reserved">this</span>.timers[key] = {};
+       <span class="reserved">this</span>.timers[key].startTime = new Date().getTime(); 
+   },
+   
+   stop : <span class="reserved">function</span>(key){
+       key = key || <span class="reserved">this</span>.lastKey;
+       <span class="reserved">this</span>.timers[key].endTime = new Date().getTime(); 
+   },
+   
+   getElapsed : <span class="reserved">function</span>(key){
+       key = key || <span class="reserved">this</span>.lastKey;
+       <span class="reserved">return</span> <span class="reserved">this</span>.timers[key].endTime - <span class="reserved">this</span>.timers[key].startTime;
+   },
+   
+   toString : <span class="reserved">function</span>(html){
+       var results = <span class="literal">"Results: \n"</span>;
+       <span class="reserved">for</span>(var key in <span class="reserved">this</span>.timers){
+           <span class="reserved">if</span>(typeof <span class="reserved">this</span>.timers[key] != <span class="literal">'function'</span>){
+               results += key + <span class="literal">":\t"</span> + (<span class="reserved">this</span>.getElapsed(key) / 1000) + <span class="literal">" seconds\n"</span>;
+           }
+       }
+       <span class="reserved">if</span>(html){
+           results = results.replace(<span class="literal">"\n"</span>, <span class="literal">'&lt;br&gt;'</span>);
+       }
+       <span class="reserved">return</span> results;
+   },
+   
+   show : <span class="reserved">function</span>(){
+       alert(<span class="reserved">this</span>.toString());
+   }
+};
+
+<span class="comment">/**
+ * <span class="attrib">@class</span>
+ * Provides a convenient method of performing setTimeout where a new
+ * timeout cancels the old timeout. An example would be performing validation on a keypress.
+ * You can use this class to buffer
+ * the keypress events for a certain number of milliseconds, and perform only if they stop
+ * for that amount of time.
+ * <span class="attrib">@constructor</span> The parameters to this constructor serve as defaults and are not required.
+ * <span class="attrib">@param</span> {&lt;i&gt;Function&lt;/i&gt;} fn (optional) The default function to timeout
+ * <span class="attrib">@param</span> {&lt;i&gt;Object&lt;/i&gt;} scope (optional) The default scope of that timeout
+ * <span class="attrib">@param</span> {&lt;i&gt;Array&lt;/i&gt;} args (optional) The default Array of arguments
+ */</span>
+YAHOO.ext.util.DelayedTask = <span class="reserved">function</span>(fn, scope, args){
+    var timeoutId = null;
+    
+    <span class="comment">/**
+     * Cancels any pending timeout and queues a new one
+     * <span class="attrib">@param</span> {Number} delay The milliseconds to delay
+     * <span class="attrib">@param</span> {Function} newFn Overrides function passed to constructor
+     * <span class="attrib">@param</span> {Object} newScope Overrides scope passed to constructor
+     * <span class="attrib">@param</span> {Array} newArgs Overrides args passed to constructor
+     */</span>
+    <span class="reserved">this</span>.delay = <span class="reserved">function</span>(delay, newFn, newScope, newArgs){
+        <span class="reserved">if</span>(timeoutId){
+            clearTimeout(timeoutId);
+        }
+        fn = newFn || fn;
+        scope = newScope || scope;
+        args = newArgs || args;
+        timeoutId = setTimeout(fn.createDelegate(scope, args), delay);
+    };
+    
+    <span class="comment">/**
+     * Cancel the last queued timeout
+     */</span>
+    <span class="reserved">this</span>.cancel = <span class="reserved">function</span>(){
+        <span class="reserved">if</span>(timeoutId){
+            clearTimeout(timeoutId);
+            timeoutId = null;
+        }
+    };
+};
+
+YAHOO.ext.util.Observable = <span class="reserved">function</span>(){};
+YAHOO.ext.util.Observable.<span class="reserved">prototype</span> = {
+    fireEvent : <span class="reserved">function</span>(){
+        var ce = <span class="reserved">this</span>.events[arguments[0].toLowerCase()];
+        ce.fireDirect.apply(ce, Array.<span class="reserved">prototype</span>.slice.call(arguments, 1));
+    },
+    addListener : <span class="reserved">function</span>(eventName, fn, scope, override){
+        eventName = eventName.toLowerCase();
+        <span class="reserved">if</span>(!<span class="reserved">this</span>.events[eventName]){
+            <span class="comment">// added for a better message when subscribing to wrong event</span>
+            throw <span class="literal">'You are trying to listen for an event that does not exist: "'</span> + eventName + <span class="literal">'".'</span>;
+        }
+        <span class="reserved">this</span>.events[eventName].subscribe(fn, scope, override);
+    },
+    delayedListener : <span class="reserved">function</span>(eventName, fn, scope, delay){
+        var newFn = <span class="reserved">function</span>(){
+            setTimeout(fn.createDelegate(scope, arguments), delay || 1);
+        }
+        <span class="reserved">this</span>.addListener(eventName, newFn);
+        <span class="reserved">return</span> newFn;
+    },
+    removeListener : <span class="reserved">function</span>(eventName, fn, scope){
+        <span class="reserved">this</span>.events[eventName.toLowerCase()].unsubscribe(fn, scope);
+    }
+};
+YAHOO.ext.util.Observable.<span class="reserved">prototype</span>.on = YAHOO.ext.util.Observable.<span class="reserved">prototype</span>.addListener;
+    
+YAHOO.ext.util.Config = {
+    apply : <span class="reserved">function</span>(obj, config){
+        <span class="reserved">if</span>(config){
+            <span class="reserved">for</span>(var prop in config){
+                <span class="reserved">if</span>(typeof config[prop] != <span class="literal">'function'</span>){
+                    obj[prop] = config[prop];
+                }
+            }
+        }
+    }
+};
+
+<span class="comment">/**
+ * <span class="attrib">@class</span>
+ */</span>
+YAHOO.ext.util.CSS = new <span class="reserved">function</span>(){
+	var rules = null;
+   	
+   	var toCamel = <span class="reserved">function</span>(property) {
+      var convert = <span class="reserved">function</span>(prop) {
+         var test = /(-[a-z])/i.exec(prop);
+         <span class="reserved">return</span> prop.replace(RegExp.$1, RegExp.$1.substr(1).toUpperCase());
+      };
+      <span class="reserved">while</span>(property.indexOf(<span class="literal">'-'</span>) &gt; -1) {
+         property = convert(property);
+      }
+      <span class="reserved">return</span> property;
+   };
+   
+   <span class="comment">/**
+    * Gets all css rules for the document
+    */</span>
+   <span class="reserved">this</span>.getRules = <span class="reserved">function</span>(refreshCache){
+   		<span class="reserved">if</span>(rules == null || refreshCache){
+   			rules = {};
+   			var ds = document.styleSheets;
+   			<span class="reserved">for</span>(var i =0, len = ds.length; i &lt; len; i++){
+   			    try{
+    		        var ss = ds[i];
+    		        var ssRules = ss.cssRules || ss.rules;
+    		        <span class="reserved">for</span>(var j = ssRules.length-1; j &gt;= 0; --j){
+    		        	rules[ssRules[j].selectorText] = ssRules[j];
+    		        }
+   			    }catch(e){} <span class="comment">// try catch for cross domain access issue</span>
+	        }
+   		}
+   		<span class="reserved">return</span> rules;
+   	};
+   	
+   	<span class="comment">/**
+    * Searches for a rule by selector
+    */</span>
+   <span class="reserved">this</span>.getRule = <span class="reserved">function</span>(selector, refreshCache){
+   		var rs = <span class="reserved">this</span>.getRules(refreshCache);
+   		<span class="reserved">if</span>(!(selector instanceof Array)){
+   		    <span class="reserved">return</span> rs[selector];
+   		}
+   		<span class="reserved">for</span>(var i = 0; i &lt; selector.length; i++){
+			<span class="reserved">if</span>(rs[selector[i]]){
+				<span class="reserved">return</span> rs[selector[i]];
+			}
+		}
+		<span class="reserved">return</span> null;
+   	};
+   	
+   	
+   	<span class="comment">/**
+    * Updates a rule property
+    * <span class="attrib">@param</span> {String/Array} selector If it's an array it tries each selector until it finds one. Stops immediately once one is found.
+    */</span>
+   <span class="reserved">this</span>.updateRule = <span class="reserved">function</span>(selector, property, value){
+   		<span class="reserved">if</span>(!(selector instanceof Array)){
+   			var rule = <span class="reserved">this</span>.getRule(selector);
+   			<span class="reserved">if</span>(rule){
+   				rule.style[property] = value;
+   				<span class="reserved">return</span> true;
+   			}
+   		}<span class="reserved">else</span>{
+   			<span class="reserved">for</span>(var i = 0; i &lt; selector.length; i++){
+   				<span class="reserved">if</span>(<span class="reserved">this</span>.updateRule(selector[i], property, value)){
+   					<span class="reserved">return</span> true;
+   				}
+   			}
+   		}
+   		<span class="reserved">return</span> false;
+   	};
+   	
+   	<span class="comment">/**
+    * Applies a rule to an element without adding the class
+    * <span class="attrib">@param</span> {String/Array} selector If it's an array it tries each selector until it finds one. Stops immediately once one is found.
+    */</span>
+   <span class="reserved">this</span>.apply = <span class="reserved">function</span>(el, selector){
+   		<span class="reserved">if</span>(!(selector instanceof Array)){
+   			var rule = <span class="reserved">this</span>.getRule(selector);
+   			<span class="reserved">if</span>(rule){
+   			    var s = rule.style;
+   				<span class="reserved">for</span>(var key in s){
+   				    <span class="reserved">if</span>(typeof s[key] != <span class="literal">'function'</span>){
+       					<span class="reserved">if</span>(s[key] &amp;&amp; String(s[key]).indexOf(<span class="literal">':'</span>) &lt; 0 &amp;&amp; s[key] != <span class="literal">'false'</span>){
+       						try{el.style[key] = s[key];}catch(e){}
+       					}
+   				    }
+   				}
+   				<span class="reserved">return</span> true;
+   			}
+   		}<span class="reserved">else</span>{
+   			<span class="reserved">for</span>(var i = 0; i &lt; selector.length; i++){
+   				<span class="reserved">if</span>(<span class="reserved">this</span>.apply(el, selector[i])){
+   					<span class="reserved">return</span> true;
+   				}
+   			}
+   		}
+   		<span class="reserved">return</span> false;
+   	};
+   	
+   	<span class="reserved">this</span>.applyFirst = <span class="reserved">function</span>(el, id, selector){
+   		var selectors = [
+   			<span class="literal">'#'</span> + id + <span class="literal">' '</span> + selector,
+   			selector
+   		];
+   		<span class="reserved">return</span> <span class="reserved">this</span>.apply(el, selectors);
+   	};
+   	
+   	<span class="reserved">this</span>.revert = <span class="reserved">function</span>(el, selector){
+   		<span class="reserved">if</span>(!(selector instanceof Array)){
+   			var rule = <span class="reserved">this</span>.getRule(selector);
+   			<span class="reserved">if</span>(rule){
+   				<span class="reserved">for</span>(key in rule.style){
+   					<span class="reserved">if</span>(rule.style[key] &amp;&amp; String(rule.style[key]).indexOf(<span class="literal">':'</span>) &lt; 0 &amp;&amp; rule.style[key] != <span class="literal">'false'</span>){
+   						try{el.style[key] = <span class="literal">''</span>;}catch(e){}
+   					}
+   				}
+   				<span class="reserved">return</span> true;
+   			}
+   		}<span class="reserved">else</span>{
+   			<span class="reserved">for</span>(var i = 0; i &lt; selector.length; i++){
+   				<span class="reserved">if</span>(<span class="reserved">this</span>.revert(el, selector[i])){
+   					<span class="reserved">return</span> true;
+   				}
+   			}
+   		}
+   		<span class="reserved">return</span> false;
+   	};
+   	
+   	<span class="reserved">this</span>.revertFirst = <span class="reserved">function</span>(el, id, selector){
+   		var selectors = [
+   			<span class="literal">'#'</span> + id + <span class="literal">' '</span> + selector,
+   			selector
+   		];
+   		<span class="reserved">return</span> <span class="reserved">this</span>.revert(el, selectors);
+   	};
+}();
+
+
+<span class="comment">/*
+ * All the Date functions below are the excellent work of Baron Schwartz
+ */</span>
+
+<span class="comment">/** <span class="attrib">@ignore</span> */</span>
+Date.parseFunctions = {count:0};
+<span class="comment">/** <span class="attrib">@ignore</span> */</span>
+Date.parseRegexes = [];
+<span class="comment">/** <span class="attrib">@ignore</span> */</span>
+Date.formatFunctions = {count:0};
+
+<span class="comment">/**
+ * Formats a date given to the supplied format - the format syntax is the same as &lt;a href="http://www.php.net/date"&gt;PHP's date() function&lt;/a&gt;.
+ */</span>
+Date.<span class="reserved">prototype</span>.dateFormat = <span class="reserved">function</span>(format) {
+    <span class="reserved">if</span> (Date.formatFunctions[format] == null) {
+        Date.createNewFormat(format);
+    }
+    var func = Date.formatFunctions[format];
+    <span class="reserved">return</span> <span class="reserved">this</span>[func]();
+};
+
+<span class="comment">/**
+ * Same as {<span class="attrib">@link</span> #dateFormat}
+ */</span>
+Date.<span class="reserved">prototype</span>.format = Date.<span class="reserved">prototype</span>.dateFormat;
+
+<span class="comment">/** <span class="attrib">@ignore</span> */</span>
+Date.createNewFormat = <span class="reserved">function</span>(format) {
+    var funcName = <span class="literal">"format"</span> + Date.formatFunctions.count++;
+    Date.formatFunctions[format] = funcName;
+    var code = <span class="literal">"Date.prototype."</span> + funcName + <span class="literal">" = function(){return "</span>;
+    var special = false;
+    var ch = <span class="literal">''</span>;
+    <span class="reserved">for</span> (var i = 0; i &lt; format.length; ++i) {
+        ch = format.charAt(i);
+        <span class="reserved">if</span> (!special &amp;&amp; ch == <span class="literal">"\\"</span>) {
+            special = true;
+        }
+        <span class="reserved">else</span> <span class="reserved">if</span> (special) {
+            special = false;
+            code += <span class="literal">"'"</span> + String.escape(ch) + <span class="literal">"' + "</span>;
+        }
+        <span class="reserved">else</span> {
+            code += Date.getFormatCode(ch);
+        }
+    }
+    eval(code.substring(0, code.length - 3) + <span class="literal">";}"</span>);
+};
+
+<span class="comment">/** <span class="attrib">@ignore</span> */</span>
+Date.getFormatCode = <span class="reserved">function</span>(character) {
+    switch (character) {
+    case <span class="literal">"d"</span>:
+        <span class="reserved">return</span> <span class="literal">"String.leftPad(this.getDate(), 2, '0') + "</span>;
+    case <span class="literal">"D"</span>:
+        <span class="reserved">return</span> <span class="literal">"Date.dayNames[this.getDay()].substring(0, 3) + "</span>;
+    case <span class="literal">"j"</span>:
+        <span class="reserved">return</span> <span class="literal">"this.getDate() + "</span>;
+    case <span class="literal">"l"</span>:
+        <span class="reserved">return</span> <span class="literal">"Date.dayNames[this.getDay()] + "</span>;
+    case <span class="literal">"S"</span>:
+        <span class="reserved">return</span> <span class="literal">"this.getSuffix() + "</span>;
+    case <span class="literal">"w"</span>:
+        <span class="reserved">return</span> <span class="literal">"this.getDay() + "</span>;
+    case <span class="literal">"z"</span>:
+        <span class="reserved">return</span> <span class="literal">"this.getDayOfYear() + "</span>;
+    case <span class="literal">"W"</span>:
+        <span class="reserved">return</span> <span class="literal">"this.getWeekOfYear() + "</span>;
+    case <span class="literal">"F"</span>:
+        <span class="reserved">return</span> <span class="literal">"Date.monthNames[this.getMonth()] + "</span>;
+    case <span class="literal">"m"</span>:
+        <span class="reserved">return</span> <span class="literal">"String.leftPad(this.getMonth() + 1, 2, '0') + "</span>;
+    case <span class="literal">"M"</span>:
+        <span class="reserved">return</span> <span class="literal">"Date.monthNames[this.getMonth()].substring(0, 3) + "</span>;
+    case <span class="literal">"n"</span>:
+        <span class="reserved">return</span> <span class="literal">"(this.getMonth() + 1) + "</span>;
+    case <span class="literal">"t"</span>:
+        <span class="reserved">return</span> <span class="literal">"this.getDaysInMonth() + "</span>;
+    case <span class="literal">"L"</span>:
+        <span class="reserved">return</span> <span class="literal">"(this.isLeapYear() ? 1 : 0) + "</span>;
+    case <span class="literal">"Y"</span>:
+        <span class="reserved">return</span> <span class="literal">"this.getFullYear() + "</span>;
+    case <span class="literal">"y"</span>:
+        <span class="reserved">return</span> <span class="literal">"('' + this.getFullYear()).substring(2, 4) + "</span>;
+    case <span class="literal">"a"</span>:
+        <span class="reserved">return</span> <span class="literal">"(this.getHours() &lt; 12 ? 'am' : 'pm') + "</span>;
+    case <span class="literal">"A"</span>:
+        <span class="reserved">return</span> <span class="literal">"(this.getHours() &lt; 12 ? 'AM' : 'PM') + "</span>;
+    case <span class="literal">"g"</span>:
+        <span class="reserved">return</span> <span class="literal">"((this.getHours() %12) ? this.getHours() % 12 : 12) + "</span>;
+    case <span class="literal">"G"</span>:
+        <span class="reserved">return</span> <span class="literal">"this.getHours() + "</span>;
+    case <span class="literal">"h"</span>:
+        <span class="reserved">return</span> <span class="literal">"String.leftPad((this.getHours() %12) ? this.getHours() % 12 : 12, 2, '0') + "</span>;
+    case <span class="literal">"H"</span>:
+        <span class="reserved">return</span> <span class="literal">"String.leftPad(this.getHours(), 2, '0') + "</span>;
+    case <span class="literal">"i"</span>:
+        <span class="reserved">return</span> <span class="literal">"String.leftPad(this.getMinutes(), 2, '0') + "</span>;
+    case <span class="literal">"s"</span>:
+        <span class="reserved">return</span> <span class="literal">"String.leftPad(this.getSeconds(), 2, '0') + "</span>;
+    case <span class="literal">"O"</span>:
+        <span class="reserved">return</span> <span class="literal">"this.getGMTOffset() + "</span>;
+    case <span class="literal">"T"</span>:
+        <span class="reserved">return</span> <span class="literal">"this.getTimezone() + "</span>;
+    case <span class="literal">"Z"</span>:
+        <span class="reserved">return</span> <span class="literal">"(this.getTimezoneOffset() * -60) + "</span>;
+    default:
+        <span class="reserved">return</span> <span class="literal">"'"</span> + String.escape(character) + <span class="literal">"' + "</span>;
+    };
+};
+
+<span class="comment">/**
+ * Parses a date given the supplied format - the format syntax is the same as &lt;a href="http://www.php.net/date"&gt;PHP's date() function&lt;/a&gt;.
+ */</span>
+Date.parseDate = <span class="reserved">function</span>(input, format) {
+    <span class="reserved">if</span> (Date.parseFunctions[format] == null) {
+        Date.createParser(format);
+    }
+    var func = Date.parseFunctions[format];
+    <span class="reserved">return</span> Date[func](input);
+};
+
+<span class="comment">/** <span class="attrib">@ignore</span> */</span>
+Date.createParser = <span class="reserved">function</span>(format) {
+    var funcName = <span class="literal">"parse"</span> + Date.parseFunctions.count++;
+    var regexNum = Date.parseRegexes.length;
+    var currentGroup = 1;
+    Date.parseFunctions[format] = funcName;
+
+    var code = <span class="literal">"Date."</span> + funcName + <span class="literal">" = function(input){\n"</span>
+        + <span class="literal">"var y = -1, m = -1, d = -1, h = -1, i = -1, s = -1;\n"</span>
+        + <span class="literal">"var d = new Date();\n"</span>
+        + <span class="literal">"y = d.getFullYear();\n"</span>
+        + <span class="literal">"m = d.getMonth();\n"</span>
+        + <span class="literal">"d = d.getDate();\n"</span>
+        + <span class="literal">"var results = input.match(Date.parseRegexes["</span> + regexNum + <span class="literal">"]);\n"</span>
+        + <span class="literal">"if (results &amp;&amp; results.length &gt; 0) {"</span>
+    var regex = <span class="literal">""</span>;
+
+    var special = false;
+    var ch = <span class="literal">''</span>;
+    <span class="reserved">for</span> (var i = 0; i &lt; format.length; ++i) {
+        ch = format.charAt(i);
+        <span class="reserved">if</span> (!special &amp;&amp; ch == <span class="literal">"\\"</span>) {
+            special = true;
+        }
+        <span class="reserved">else</span> <span class="reserved">if</span> (special) {
+            special = false;
+            regex += String.escape(ch);
+        }
+        <span class="reserved">else</span> {
+            obj = Date.formatCodeToRegex(ch, currentGroup);
+            currentGroup += obj.g;
+            regex += obj.s;
+            <span class="reserved">if</span> (obj.g &amp;&amp; obj.c) {
+                code += obj.c;
+            }
+        }
+    }
+
+    code += <span class="literal">"if (y &gt; 0 &amp;&amp; m &gt;= 0 &amp;&amp; d &gt; 0 &amp;&amp; h &gt;= 0 &amp;&amp; i &gt;= 0 &amp;&amp; s &gt;= 0)\n"</span>
+        + <span class="literal">"{return new Date(y, m, d, h, i, s);}\n"</span>
+        + <span class="literal">"else if (y &gt; 0 &amp;&amp; m &gt;= 0 &amp;&amp; d &gt; 0 &amp;&amp; h &gt;= 0 &amp;&amp; i &gt;= 0)\n"</span>
+        + <span class="literal">"{return new Date(y, m, d, h, i);}\n"</span>
+        + <span class="literal">"else if (y &gt; 0 &amp;&amp; m &gt;= 0 &amp;&amp; d &gt; 0 &amp;&amp; h &gt;= 0)\n"</span>
+        + <span class="literal">"{return new Date(y, m, d, h);}\n"</span>
+        + <span class="literal">"else if (y &gt; 0 &amp;&amp; m &gt;= 0 &amp;&amp; d &gt; 0)\n"</span>
+        + <span class="literal">"{return new Date(y, m, d);}\n"</span>
+        + <span class="literal">"else if (y &gt; 0 &amp;&amp; m &gt;= 0)\n"</span>
+        + <span class="literal">"{return new Date(y, m);}\n"</span>
+        + <span class="literal">"else if (y &gt; 0)\n"</span>
+        + <span class="literal">"{return new Date(y);}\n"</span>
+        + <span class="literal">"}return null;}"</span>;
+
+    Date.parseRegexes[regexNum] = new RegExp(<span class="literal">"^"</span> + regex + <span class="literal">"$"</span>);
+    eval(code);
+};
+
+<span class="comment">/** <span class="attrib">@ignore</span> */</span>
+Date.formatCodeToRegex = <span class="reserved">function</span>(character, currentGroup) {
+    switch (character) {
+    case <span class="literal">"D"</span>:
+        <span class="reserved">return</span> {g:0,
+        c:null,
+        s:<span class="literal">"(?:Sun|Mon|Tue|Wed|Thu|Fri|Sat)"</span>};
+    case <span class="literal">"j"</span>:
+    case <span class="literal">"d"</span>:
+        <span class="reserved">return</span> {g:1,
+            c:<span class="literal">"d = parseInt(results["</span> + currentGroup + <span class="literal">"], 10);\n"</span>,
+            s:<span class="literal">"(\\d{1,2})"</span>};
+    case <span class="literal">"l"</span>:
+        <span class="reserved">return</span> {g:0,
+            c:null,
+            s:<span class="literal">"(?:"</span> + Date.dayNames.join(<span class="literal">"|"</span>) + <span class="literal">")"</span>};
+    case <span class="literal">"S"</span>:
+        <span class="reserved">return</span> {g:0,
+            c:null,
+            s:<span class="literal">"(?:st|nd|rd|th)"</span>};
+    case <span class="literal">"w"</span>:
+        <span class="reserved">return</span> {g:0,
+            c:null,
+            s:<span class="literal">"\\d"</span>};
+    case <span class="literal">"z"</span>:
+        <span class="reserved">return</span> {g:0,
+            c:null,
+            s:<span class="literal">"(?:\\d{1,3})"</span>};
+    case <span class="literal">"W"</span>:
+        <span class="reserved">return</span> {g:0,
+            c:null,
+            s:<span class="literal">"(?:\\d{2})"</span>};
+    case <span class="literal">"F"</span>:
+        <span class="reserved">return</span> {g:1,
+            c:<span class="literal">"m = parseInt(Date.monthNumbers[results["</span> + currentGroup + <span class="literal">"].substring(0, 3)], 10);\n"</span>,
+            s:<span class="literal">"("</span> + Date.monthNames.join(<span class="literal">"|"</span>) + <span class="literal">")"</span>};
+    case <span class="literal">"M"</span>:
+        <span class="reserved">return</span> {g:1,
+            c:<span class="literal">"m = parseInt(Date.monthNumbers[results["</span> + currentGroup + <span class="literal">"]], 10);\n"</span>,
+            s:<span class="literal">"(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)"</span>};
+    case <span class="literal">"n"</span>:
+    case <span class="literal">"m"</span>:
+        <span class="reserved">return</span> {g:1,
+            c:<span class="literal">"m = parseInt(results["</span> + currentGroup + <span class="literal">"], 10) - 1;\n"</span>,
+            s:<span class="literal">"(\\d{1,2})"</span>};
+    case <span class="literal">"t"</span>:
+        <span class="reserved">return</span> {g:0,
+            c:null,
+            s:<span class="literal">"\\d{1,2}"</span>};
+    case <span class="literal">"L"</span>:
+        <span class="reserved">return</span> {g:0,
+            c:null,
+            s:<span class="literal">"(?:1|0)"</span>};
+    case <span class="literal">"Y"</span>:
+        <span class="reserved">return</span> {g:1,
+            c:<span class="literal">"y = parseInt(results["</span> + currentGroup + <span class="literal">"], 10);\n"</span>,
+            s:<span class="literal">"(\\d{4})"</span>};
+    case <span class="literal">"y"</span>:
+        <span class="reserved">return</span> {g:1,
+            c:<span class="literal">"var ty = parseInt(results["</span> + currentGroup + <span class="literal">"], 10);\n"</span>
+                + <span class="literal">"y = ty &gt; Date.y2kYear ? 1900 + ty : 2000 + ty;\n"</span>,
+            s:<span class="literal">"(\\d{1,2})"</span>};
+    case <span class="literal">"a"</span>:
+        <span class="reserved">return</span> {g:1,
+            c:<span class="literal">"if (results["</span> + currentGroup + <span class="literal">"] == 'am') {\n"</span>
+                + <span class="literal">"if (h == 12) { h = 0; }\n"</span>
+                + <span class="literal">"} else { if (h &lt; 12) { h += 12; }}"</span>,
+            s:<span class="literal">"(am|pm)"</span>};
+    case <span class="literal">"A"</span>:
+        <span class="reserved">return</span> {g:1,
+            c:<span class="literal">"if (results["</span> + currentGroup + <span class="literal">"] == 'AM') {\n"</span>
+                + <span class="literal">"if (h == 12) { h = 0; }\n"</span>
+                + <span class="literal">"} else { if (h &lt; 12) { h += 12; }}"</span>,
+            s:<span class="literal">"(AM|PM)"</span>};
+    case <span class="literal">"g"</span>:
+    case <span class="literal">"G"</span>:
+    case <span class="literal">"h"</span>:
+    case <span class="literal">"H"</span>:
+        <span class="reserved">return</span> {g:1,
+            c:<span class="literal">"h = parseInt(results["</span> + currentGroup + <span class="literal">"], 10);\n"</span>,
+            s:<span class="literal">"(\\d{1,2})"</span>};
+    case <span class="literal">"i"</span>:
+        <span class="reserved">return</span> {g:1,
+            c:<span class="literal">"i = parseInt(results["</span> + currentGroup + <span class="literal">"], 10);\n"</span>,
+            s:<span class="literal">"(\\d{2})"</span>};
+    case <span class="literal">"s"</span>:
+        <span class="reserved">return</span> {g:1,
+            c:<span class="literal">"s = parseInt(results["</span> + currentGroup + <span class="literal">"], 10);\n"</span>,
+            s:<span class="literal">"(\\d{2})"</span>};
+    case <span class="literal">"O"</span>:
+        <span class="reserved">return</span> {g:0,
+            c:null,
+            s:<span class="literal">"[+-]\\d{4}"</span>};
+    case <span class="literal">"T"</span>:
+        <span class="reserved">return</span> {g:0,
+            c:null,
+            s:<span class="literal">"[A-Z]{3}"</span>};
+    case <span class="literal">"Z"</span>:
+        <span class="reserved">return</span> {g:0,
+            c:null,
+            s:<span class="literal">"[+-]\\d{1,5}"</span>};
+    default:
+        <span class="reserved">return</span> {g:0,
+            c:null,
+            s:String.escape(character)};
+    }
+};
+
+Date.<span class="reserved">prototype</span>.getTimezone = <span class="reserved">function</span>() {
+    <span class="reserved">return</span> <span class="reserved">this</span>.toString().replace(
+        /^.*? ([A-Z]{3}) [0-9]{4}.*$/, <span class="literal">"$1"</span>).replace(
+        /^.*?\(([A-Z])[a-z]+ ([A-Z])[a-z]+ ([A-Z])[a-z]+\)$/, <span class="literal">"$1$2$3"</span>);
+};
+
+Date.<span class="reserved">prototype</span>.getGMTOffset = <span class="reserved">function</span>() {
+    <span class="reserved">return</span> (<span class="reserved">this</span>.getTimezoneOffset() &gt; 0 ? <span class="literal">"-"</span> : <span class="literal">"+"</span>)
+        + String.leftPad(Math.floor(<span class="reserved">this</span>.getTimezoneOffset() / 60), 2, <span class="literal">"0"</span>)
+        + String.leftPad(<span class="reserved">this</span>.getTimezoneOffset() % 60, 2, <span class="literal">"0"</span>);
+};
+
+Date.<span class="reserved">prototype</span>.getDayOfYear = <span class="reserved">function</span>() {
+    var num = 0;
+    Date.daysInMonth[1] = <span class="reserved">this</span>.isLeapYear() ? 29 : 28;
+    <span class="reserved">for</span> (var i = 0; i &lt; <span class="reserved">this</span>.getMonth(); ++i) {
+        num += Date.daysInMonth[i];
+    }
+    <span class="reserved">return</span> num + <span class="reserved">this</span>.getDate() - 1;
+};
+
+Date.<span class="reserved">prototype</span>.getWeekOfYear = <span class="reserved">function</span>() {
+    <span class="comment">// Skip to Thursday of this week</span>
+    var now = <span class="reserved">this</span>.getDayOfYear() + (4 - <span class="reserved">this</span>.getDay());
+    <span class="comment">// Find the first Thursday of the year</span>
+    var jan1 = new Date(<span class="reserved">this</span>.getFullYear(), 0, 1);
+    var then = (7 - jan1.getDay() + 4);
+    document.write(then);
+    <span class="reserved">return</span> String.leftPad(((now - then) / 7) + 1, 2, <span class="literal">"0"</span>);
+};
+
+Date.<span class="reserved">prototype</span>.isLeapYear = <span class="reserved">function</span>() {
+    var year = <span class="reserved">this</span>.getFullYear();
+    <span class="reserved">return</span> ((year &amp; 3) == 0 &amp;&amp; (year % 100 || (year % 400 == 0 &amp;&amp; year)));
+};
+
+Date.<span class="reserved">prototype</span>.getFirstDayOfMonth = <span class="reserved">function</span>() {
+    var day = (<span class="reserved">this</span>.getDay() - (<span class="reserved">this</span>.getDate() - 1)) % 7;
+    <span class="reserved">return</span> (day &lt; 0) ? (day + 7) : day;
+};
+
+Date.<span class="reserved">prototype</span>.getLastDayOfMonth = <span class="reserved">function</span>() {
+    var day = (<span class="reserved">this</span>.getDay() + (Date.daysInMonth[<span class="reserved">this</span>.getMonth()] - <span class="reserved">this</span>.getDate())) % 7;
+    <span class="reserved">return</span> (day &lt; 0) ? (day + 7) : day;
+};
+
+Date.<span class="reserved">prototype</span>.getDaysInMonth = <span class="reserved">function</span>() {
+    Date.daysInMonth[1] = <span class="reserved">this</span>.isLeapYear() ? 29 : 28;
+    <span class="reserved">return</span> Date.daysInMonth[<span class="reserved">this</span>.getMonth()];
+};
+
+<span class="comment">/** <span class="attrib">@ignore</span> */</span>
+Date.<span class="reserved">prototype</span>.getSuffix = <span class="reserved">function</span>() {
+    switch (<span class="reserved">this</span>.getDate()) {
+        case 1:
+        case 21:
+        case 31:
+            <span class="reserved">return</span> <span class="literal">"st"</span>;
+        case 2:
+        case 22:
+            <span class="reserved">return</span> <span class="literal">"nd"</span>;
+        case 3:
+        case 23:
+            <span class="reserved">return</span> <span class="literal">"rd"</span>;
+        default:
+            <span class="reserved">return</span> <span class="literal">"th"</span>;
+    }
+};
+
+<span class="reserved">if</span>(!String.escape){
+    <span class="comment">/** <span class="attrib">@ignore</span> */</span>
+    String.escape = <span class="reserved">function</span>(string) {
+        <span class="reserved">return</span> string.replace(/(<span class="literal">'|\\)/g, "\\$1");
+    };
+};
+
+/**
+ * Left pads a string to size with ch
+ */
+String.leftPad = function (val, size, ch) {
+    var result = new String(val);
+    if (ch == null) {
+        ch = " ";
+    }
+    while (result.length &lt; size) {
+        result = ch + result;
+    }
+    return result;
+};
+
+if(!Object.dump){
+Object.dump = function(o){
+    var s = "\n{";
+    for(var k in o){
+        if(typeof o[k] != '</span><span class="reserved">function</span><span class="literal">'){
+            s += "\n\t" + k + '</span>: <span class="literal">' + o[k] +'</span>,<span class="literal">'; 
+        }
+    }
+    if(s.length &gt; 3){
+      s = s.substring(0, s.length-1);
+    }
+    s += "\n}";
+    return s;
+}
+}
+
+/** @ignore */
+Date.daysInMonth = [31,28,31,30,31,30,31,31,30,31,30,31];
+
+/**
+ * Override these values for international dates, for example...
+ * Date.monthNames = ['</span>JanInYourLang<span class="literal">', '</span>FebInYourLang<span class="literal">', ...];
+ */
+Date.monthNames =
+   ["January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"];
+    
+/**
+ * Override these values for international dates, for example...
+ * Date.dayNames = ['</span>SundayInYourLang<span class="literal">', '</span>MondayInYourLang', ...];
+ */
+Date.dayNames =
+   [<span class="literal">"Sunday"</span>,
+    <span class="literal">"Monday"</span>,
+    <span class="literal">"Tuesday"</span>,
+    <span class="literal">"Wednesday"</span>,
+    <span class="literal">"Thursday"</span>,
+    <span class="literal">"Friday"</span>,
+    <span class="literal">"Saturday"</span>];
+
+<span class="comment">/** <span class="attrib">@ignore</span> */</span>
+Date.y2kYear = 50;
+
+<span class="comment">/** <span class="attrib">@ignore</span> */</span>
+Date.monthNumbers = {
+    Jan:0,
+    Feb:1,
+    Mar:2,
+    Apr:3,
+    May:4,
+    Jun:5,
+    Jul:6,
+    Aug:7,
+    Sep:8,
+    Oct:9,
+    Nov:10,
+    Dec:11};</pre>
+	<hr>
+
+
+<hr>
+<font size="-1">
+
+</font>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat Oct 14 06:07:10 2006</div>
+</body>
+</html>

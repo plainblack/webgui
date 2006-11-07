@@ -25,11 +25,15 @@
  - fix: editing posts loses changes in preview
  - change: Asset::getContainer no longer changes the session asset
  - fix: Survey numeric multiple choice options
+ - fix: Matrix/can't remove picture from listing
  - fix: inability to create shortcuts to threads
  - fix: Style templates do not render metadata
  - fix: Survey duplication not working
  - fix: "Open link in new window" with WebGUI asset tree link in TinyMCE
  - fix: Admin Users submenu doesn't fill in uid
+ - Added YUI javascript library to the core, so that we can begin converting
+   to a standard javascript API.
+ - fix: Resizable textarea no longer works in IE
  - fix: EMS Manage Events broken
  - fix: "orig_dependant" JavaScript error in PM quick task display
  - fix: Tasks now start at zero duration in the PM system
@@ -43,8 +47,6 @@
  - fix: Default PM Dashboard Template extra form element not implemented yet
  - refactor: move Dashboard, Folder, and HttpProxy getEditForm overrides into definition clauses
  - possible fix: Dates messed up on subscriptions
-
-7.1.4
  - Template variables in the main Survey Template were out of date in the
    documentation.
  - fix: SQLReport no longer paginates or runs nested queries when downloading.

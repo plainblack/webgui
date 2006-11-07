@@ -1,0 +1,512 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN""http://www.w3.org/TR/REC-html40/loose.dtd">
+<!--NewPage-->
+<HTML>
+<HEAD>
+<TITLE>
+YAHOO.ext.grid.GridDD
+</TITLE>
+<LINK REL ="stylesheet" TYPE="text/css" HREF="stylesheet.css" TITLE="Style">
+</HEAD>
+<SCRIPT>
+function asd()
+{
+parent.document.title="YAHOO.ext.grid.GridDD";
+}
+</SCRIPT>
+<BODY BGCOLOR="white" onload="asd();" style="margin:15px;">
+<!-- ======== START OF CLASS DATA ======== -->
+<H2>Class YAHOO.ext.grid.GridDD</H2>
+<PRE>Object
+   |
+   +--YAHOO.util.DDProxy
+         |
+         +--<b>YAHOO.ext.grid.GridDD</b>
+</PRE>
+
+
+<HR>
+<DL>
+   <!-- Class definition -->
+   <DT>class 
+   <B>YAHOO.ext.grid.GridDD</B>
+   
+      <DT>extends YAHOO.util.DDProxy 
+   
+
+</DL>
+   
+   <P>
+   <BR/>Custom implementation of YAHOO.util.DDProxy used internally by the grid
+ <BR/><I>Defined in <a href='overview-summary-GridDD.js.html'>GridDD.js</a></I><BR/><BR/>
+   </P>
+   
+   <HR>
+
+<!-- ======== NESTED CLASS SUMMARY ======== -->
+
+<!-- ======== END NESTED CLASS SUMMARY ======== -->
+
+
+<!-- =========== FIELD SUMMARY =========== -->
+
+
+   
+
+<!-- =========== END FIELD SUMMARY =========== -->
+
+
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+
+<A NAME="constructor_summary"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+  <TD COLSPAN="2" class="title-cell">
+    Constructor Summary
+  </TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD>
+      <CODE>
+	 <B>
+	    <A HREF="YAHOO.ext.grid.GridDD.html#YAHOO.ext.grid.GridDD()">YAHOO.ext.grid.GridDD</A> 
+	 </B>
+	 (grid, bwrap)
+      </CODE>
+      <BR>
+      &nbsp;&nbsp;
+      
+      </TD>
+</TR>
+</TABLE>
+
+<!-- ======== END CONSTRUCTOR SUMMARY ======== -->
+
+&nbsp;
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<A NAME="method_summary"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+  <TD COLSPAN="2" class="title-cell">
+    <span style="float:left">Method Summary</span>
+    <span style="float:right;font-weight:normal;font-size:8pt;">
+      <i>* Parameter types in italic indicate optional parameters</i>
+    </span>
+  </TD>
+</TR>
+
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#autoOffset">autoOffset</A></B>(iPageX, iPageY)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#endDrag">endDrag</A></B>(e)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#handleClick">handleClick</A></B>(e)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#handleMouseDown">handleMouseDown</A></B>(e)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#onDragDrop">onDragDrop</A></B>(e, id)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#onDragEnter">onDragEnter</A></B>(e, id)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#onDragOut">onDragOut</A></B>(e, id)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#onDragOver">onDragOver</A></B>(e, id)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#setDropStatus">setDropStatus</A></B>(&lt;Boolean&gt; dropStatus)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Updates the DD visual element to allow/not allow a drop
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#startDrag">startDrag</A></B>(e)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 
+      </TD>
+   </TR>
+
+
+</TABLE>
+
+
+
+<P>
+<!-- ========== END METHOD SUMMARY =========== -->
+
+
+<!-- ============ FIELD DETAIL START =========== -->
+
+
+<!-- ============ FIELD DETAIL END =========== -->
+
+    <!-- ========= CONSTRUCTOR DETAIL START ======== -->
+
+<A NAME="constructor_detail"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+   <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+     <TD COLSPAN="1" class="title-cell">
+       Constructor Detail
+     </TD>
+   </TR>
+</TABLE>
+
+<A NAME="YAHOO.ext.grid.GridDD()"><!-- --></A><H3>
+YAHOO.ext.grid.GridDD</H3>
+<PRE><B>YAHOO.ext.grid.GridDD</B>(grid, bwrap)</PRE>
+
+
+
+
+   </UL>
+
+
+<!-- Constructor return value(s) -->
+
+<!-- End constructor return value(s) -->
+
+<!-- ADDITIONAL ATTRIBUTES -->
+
+<HR/>
+<!-- END ADDITIONAL ATTRIBUTES  -->
+
+<!-- ========= CONSTRUCTOR DETAIL END ======== -->
+
+
+<!-- ============ METHOD DETAIL START ========== -->
+
+<A NAME="method_detail"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+   <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+     <TD COLSPAN="1" class="title-cell">
+       Method Detail
+     </TD>
+   </TR>
+</TABLE>
+
+<!-- One single method detail entry -->
+
+   <A NAME="autoOffset"><!-- --></A>
+   <H3>autoOffset</H3>
+   <PRE>void <B>autoOffset</B>(iPageX, iPageY)</PRE>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="endDrag"><!-- --></A>
+   <H3>endDrag</H3>
+   <PRE>void <B>endDrag</B>(e)</PRE>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="handleClick"><!-- --></A>
+   <H3>handleClick</H3>
+   <PRE>void <B>handleClick</B>(e)</PRE>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="handleMouseDown"><!-- --></A>
+   <H3>handleMouseDown</H3>
+   <PRE>void <B>handleMouseDown</B>(e)</PRE>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="onDragDrop"><!-- --></A>
+   <H3>onDragDrop</H3>
+   <PRE>void <B>onDragDrop</B>(e, id)</PRE>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="onDragEnter"><!-- --></A>
+   <H3>onDragEnter</H3>
+   <PRE>void <B>onDragEnter</B>(e, id)</PRE>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="onDragOut"><!-- --></A>
+   <H3>onDragOut</H3>
+   <PRE>void <B>onDragOut</B>(e, id)</PRE>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="onDragOver"><!-- --></A>
+   <H3>onDragOver</H3>
+   <PRE>void <B>onDragOver</B>(e, id)</PRE>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="setDropStatus"><!-- --></A>
+   <H3>setDropStatus</H3>
+   <PRE>void <B>setDropStatus</B>(&lt;Boolean&gt; dropStatus)</PRE>
+   
+      <UL>Updates the DD visual element to allow/not allow a drop</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>dropStatus</CODE> -  True if drop is allowed on the target    
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="startDrag"><!-- --></A>
+   <H3>startDrag</H3>
+   <PRE>void <B>startDrag</B>(e)</PRE>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+
+
+<!-- ============ METHOD DETAIL END ========== -->
+
+<!-- ========= END OF CLASS DATA ========= -->
+
+<HR>
+<FONT SIZE="-1">
+
+</FONT>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat Oct 14 06:07:10 2006</div>
+</BODY>
+</HTML>

@@ -106,17 +106,30 @@ Renders an input tag of type text.
 
 sub toHtml {
 	my $self = shift;
-	my $resize = undef;
-	if ($self->get("resizeable")) {
-		my $i18n = WebGUI::International->new($self->session, "Form_Textarea");
-		$self->session->style->setScript($self->session->url->extras("resizeable_textarea.js"), {type=>"text/javascript"});
-		$resize = '<img src="'.$self->session->icon->getBaseURL().'/drag.gif" title="'.$i18n->get("drag to resize").'" alt="'.$i18n->get("drag to resize").'" class="draggable" onmousedown="tar_drag_start(event, \''.$self->get('id').'\');" />';
-	}
  	my $value = $self->fixMacros($self->fixTags($self->fixSpecialCharacters($self->get("value"))));
 	my $width = $self->get('width') || 400;
 	my $height = $self->get('height') || 150;
 	my $style = "width: ".$width."px; height: ".$height."px; ".$self->get("style");
-	return '<textarea id="'.$self->get('id').'" name="'.$self->get("name").'" style="'.$style.'" '.$self->get("extras").'>'.$value.'</textarea>'.$resize;
+	my $out = '<textarea id="'.$self->get('id').'" name="'.$self->get("name").'" style="'.$style.'" '.$self->get("extras").'>'.$value.'</textarea>';
+	if ($self->get("resizeable")) {
+		$out = '<div style="border: 0px;" class="yresizable-pinned" id="'.$self->get('id').'_wrapper">'.$out.'</div>';
+		my ($style, $url) = $self->session->quick(qw(style url));
+		$style->setScript($url->extras("yui/build/yahoo/yahoo.js"), {type=>"text/javascript"});
+		$style->setScript($url->extras("yui/build/event/event.js"), {type=>"text/javascript"});
+		$style->setScript($url->extras("yui/build/dom/dom.js"), {type=>"text/javascript"});
+		$style->setScript($url->extras("yui/build/dragdrop/dragdrop.js"), {type=>"text/javascript"});
+		$style->setScript($url->extras("yui/build/logger/logger.js"), {type=>"text/javascript"});
+		$style->setScript($url->extras("yui-ext/yui-ext-core.js"), {type=>"text/javascript"});
+		$style->setScript($url->extras("yui-ext/resizable-lib.js"), {type=>"text/javascript"});
+		$style->setLink($url->extras("yui-ext/resources/css/resizable.css"), {type=>"text/css", rel=>"stylesheet"});
+		$out .= qq|
+		<script type="text/javascript">
+			var draggable_textarea = document.getElementById('|.$self->get('id').qq|_wrapper');
+			draggable_textarea.resize = new YAHOO.ext.Resizable(draggable_textarea, {resizeChild: true, minWidth:300, minHeight:200, disableTrackOver:true, multiDirectional: false});
+		</script>
+		|;
+	}
+	return $out;
 }
 
 

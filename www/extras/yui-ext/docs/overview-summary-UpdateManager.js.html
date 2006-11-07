@@ -1,0 +1,488 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Frameset//EN""http://www.w3.org/TR/REC-html40/frameset.dtd">
+<html>
+<head>
+<title>
+ Overview
+</title>
+<link rel ="stylesheet" type="text/css" href="stylesheet.css" title="Style">
+<script>
+function asd() {
+	
+		parent.document.title="UpdateManager.js Overview";
+	
+}
+</script>
+</head>
+<body bgcolor="white" onload="asd();" style="margin:15px;">
+<center>
+	
+	   <h2>UpdateManager.js</h2>
+	
+</center>
+
+	
+
+
+<h4>Summary</h4>
+<p>
+	
+		
+	
+</p>
+
+
+    <table border="1" cellpadding="3" cellspacing="0" width="100%">
+    <tr bgcolor="#CCCCFF" class="TableHeadingColor">
+    <td colspan="2" class="title-cell">
+    
+        <b>Class Summary</b>
+    
+    </td>
+    </tr>
+    
+    <tr bgcolor="white" class="TableRowColor">
+    <td width="15%"><b><a href="YAHOO.ext.UpdateManager.html">YAHOO.ext.UpdateManager</a></b></td>
+    <td>Provides AJAX-style update for Element object using Yahoo 
+ UI library YAHOO.util.Connect functionality.<br><br>
+ Usage:<br>
+ <pre><code>
+ // Get it from a YAHOO.ext.Element object
+ var mgr = myElement.getUpdateManager();
+ mgr.update('http://myserver.com/index.php', 'param1=1&amp;param2=2');
+ ...</td>
+    </tr>
+    
+    <tr bgcolor="white" class="TableRowColor">
+    <td width="15%"><b><a href="YAHOO.ext.UpdateManager.BasicRenderer.html">YAHOO.ext.UpdateManager.BasicRenderer</a></b></td>
+    <td>Default Content renderer.</td>
+    </tr>
+    
+    </table>
+   <hr/> 
+
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<!-- ========== END METHOD SUMMARY =========== -->
+
+
+        <pre class="sourceview"><span class="comment">/**
+ * <span class="attrib">@class</span> Provides AJAX-style update for Element object using Yahoo 
+ * UI library YAHOO.util.Connect functionality.&lt;br&gt;&lt;br&gt;
+ * Usage:&lt;br&gt;
+ * &lt;pre&gt;&lt;code&gt;
+ * // Get it from a YAHOO.ext.Element object
+ * var mgr = myElement.getUpdateManager();
+ * mgr.update('http://myserver.com/index.php', 'param1=1&amp;amp;param2=2');
+ * ...
+ * mgr.formUpdate('myFormId', 'http://myserver.com/index.php');
+ * &lt;br&gt;
+ * // or directly (returns the same UpdateManager instance)
+ * var mgr = new YAHOO.ext.UpdateManager('myElementId');
+ * mgr.startAutoRefresh('http://myserver.com/index.php', 60);
+ * mgr.onUpdate.subscribe(myFcnNeedsToKnow);
+ * &lt;br&gt;
+ * &lt;/code&gt;&lt;/pre&gt;
+ * <span class="attrib">@requires</span> YAHOO.ext.Element
+ * <span class="attrib">@requires</span> YAHOO.util.Dom
+ * <span class="attrib">@requires</span> YAHOO.util.Event
+ * <span class="attrib">@requires</span> YAHOO.util.CustomEvent 
+ * <span class="attrib">@requires</span> YAHOO.util.Connect
+ * <span class="attrib">@constructor</span>
+ * Create new UpdateManager.
+ * <span class="attrib">@param</span> {String/HTMLElement/YAHOO.ext.Element} el The element to update 
+ * <span class="attrib">@param</span> {&lt;i&gt;Boolean&lt;/i&gt;} forceNew (optional) By default the constructor checks to see if the passed element already has an UpdateManager and if it does it returns the same instance. This will skip that check (useful for extending this class).
+ */</span>
+YAHOO.ext.UpdateManager = <span class="reserved">function</span>(el, forceNew){
+    el = YAHOO.ext.Element.get(el);
+    <span class="reserved">if</span>(!forceNew &amp;&amp; el.updateManager){
+        <span class="reserved">return</span> el.updateManager;
+    }
+    <span class="comment">/**
+     * The Element object
+     * <span class="attrib">@type</span> YAHOO.ext.Element
+     */</span>
+    <span class="reserved">this</span>.el = el;
+    <span class="comment">/**
+     * Cached url to use for refreshes. Overwritten every time update() is called unless 'discardUrl' param is set to true.
+     * <span class="attrib">@type</span> String
+     */</span>
+    <span class="reserved">this</span>.defaultUrl = null;
+    <span class="comment">/**
+     * fired before update is made, return false from your handler and the update is cancelled. 
+     * Uses fireDirect with signature: (oElement, url, params)
+     * <span class="attrib">@type</span> YAHOO.util.CustomEvent
+     */</span>
+    <span class="reserved">this</span>.beforeUpdate = new YAHOO.util.CustomEvent(<span class="literal">'UpdateManager.beforeUpdate'</span>);
+    <span class="comment">/**
+     * Fired after successful update is made. Uses fireDirect with signature: (oElement, oResponseObject)
+     * <span class="attrib">@type</span> YAHOO.util.CustomEvent
+     */</span>
+    <span class="reserved">this</span>.onUpdate = new YAHOO.util.CustomEvent(<span class="literal">'UpdateManager.onUpdate'</span>);
+    <span class="comment">/**
+     * Fired on update failure. Uses fireDirect with signature: (oElement, oResponseObject)
+     * <span class="attrib">@type</span> YAHOO.util.CustomEvent
+     */</span>
+    <span class="reserved">this</span>.onFailure = new YAHOO.util.CustomEvent(<span class="literal">'UpdateManager.onFailure'</span>);
+    
+    <span class="comment">/**
+     * Blank page URL to use with SSL file uploads (Defaults to YAHOO.ext.UpdateManager.defaults.sslBlankUrl or 'about:blank'). 
+     * <span class="attrib">@type</span> String
+     */</span>
+    <span class="reserved">this</span>.sslBlankUrl = YAHOO.ext.UpdateManager.defaults.sslBlankUrl;
+    <span class="comment">/**
+     * Whether to append unique parameter on get request to disable caching (Defaults to YAHOO.ext.UpdateManager.defaults.disableCaching or false). 
+     * <span class="attrib">@type</span> Boolean
+     */</span>
+    <span class="reserved">this</span>.disableCaching = YAHOO.ext.UpdateManager.defaults.disableCaching;
+    <span class="comment">/**
+     * Text for loading indicator (Defaults to YAHOO.ext.UpdateManager.defaults.indicatorText or '&amp;lt;div class="loading-indicator"&amp;gt;Loading...&amp;lt;/div&amp;gt;'). 
+     * <span class="attrib">@type</span> String
+     */</span>
+    <span class="reserved">this</span>.indicatorText = YAHOO.ext.UpdateManager.defaults.indicatorText;
+    <span class="comment">/**
+     * Whether to show indicatorText when loading (Defaults to YAHOO.ext.UpdateManager.defaults.showLoadIndicator or true). 
+     * <span class="attrib">@type</span> String
+     */</span>
+    <span class="reserved">this</span>.showLoadIndicator = YAHOO.ext.UpdateManager.defaults.showLoadIndicator;
+    <span class="comment">/**
+     * Timeout for requests or form posts in seconds (Defaults to YAHOO.ext.UpdateManager.defaults.timeout or 30 seconds). 
+     * <span class="attrib">@type</span> Number
+     */</span>
+    <span class="reserved">this</span>.timeout = YAHOO.ext.UpdateManager.defaults.timeout;
+    
+    <span class="comment">/**
+     * True to process scripts in the output (Defaults to YAHOO.ext.UpdateManager.defaults.loadScripts (false)). 
+     * <span class="attrib">@type</span> Number
+     */</span>
+    <span class="reserved">this</span>.loadScripts = YAHOO.ext.UpdateManager.defaults.loadScripts;
+    
+    <span class="comment">/**
+     * YAHOO.util.Connect transaction object of current executing transaction
+     */</span>
+    <span class="reserved">this</span>.transaction = null;
+    
+    <span class="comment">/**
+     * <span class="attrib">@private</span>
+     */</span>
+    <span class="reserved">this</span>.autoRefreshProcId = null;
+    <span class="comment">/**
+     * Delegate for refresh() prebound to 'this', use myUpdater.refreshDelegate.createCallback(arg1, arg2) to bind arguments
+     * <span class="attrib">@type</span> Function
+     */</span>
+    <span class="reserved">this</span>.refreshDelegate = <span class="reserved">this</span>.refresh.createDelegate(<span class="reserved">this</span>);
+    <span class="comment">/**
+     * Delegate for update() prebound to 'this', use myUpdater.updateDelegate.createCallback(arg1, arg2) to bind arguments
+     * <span class="attrib">@type</span> Function
+     */</span>
+    <span class="reserved">this</span>.updateDelegate = <span class="reserved">this</span>.update.createDelegate(<span class="reserved">this</span>);
+    <span class="comment">/**
+     * Delegate for formUpdate() prebound to 'this', use myUpdater.formUpdateDelegate.createCallback(arg1, arg2) to bind arguments
+     * <span class="attrib">@type</span> Function
+     */</span>
+    <span class="reserved">this</span>.formUpdateDelegate = <span class="reserved">this</span>.formUpdate.createDelegate(<span class="reserved">this</span>);
+    <span class="comment">/**
+     * <span class="attrib">@private</span>
+     */</span>
+    <span class="reserved">this</span>.successDelegate = <span class="reserved">this</span>.processSuccess.createDelegate(<span class="reserved">this</span>);
+    <span class="comment">/**
+     * <span class="attrib">@private</span>
+     */</span>
+     <span class="reserved">this</span>.failureDelegate = <span class="reserved">this</span>.processFailure.createDelegate(<span class="reserved">this</span>);
+     
+     <span class="comment">/**
+      * The renderer for this UpdateManager. Defaults to {<span class="attrib">@link</span> YAHOO.ext.UpdateManager.BasicRenderer}. 
+      */</span>
+      <span class="reserved">this</span>.renderer = new YAHOO.ext.UpdateManager.BasicRenderer();
+};
+
+YAHOO.ext.UpdateManager.<span class="reserved">prototype</span> = {
+    <span class="comment">/**
+     * Get the Element this UpdateManager is bound to
+     * <span class="attrib">@return</span> {YAHOO.ext.Element} The element
+     */</span>
+    getEl : <span class="reserved">function</span>(){
+        <span class="reserved">return</span> <span class="reserved">this</span>.el;
+    },
+    
+    <span class="comment">/**
+     * Performs an async request, updating this element with the response. If params are specified it uses POST, otherwise it uses GET.
+     * <span class="attrib">@param</span> {String/Function} url The url for this request or a function to call to get the url
+     * <span class="attrib">@param</span> {&lt;i&gt;String/Object&lt;/i&gt;} params (optional) The parameters to pass as either a url encoded string "param1=1&amp;amp;param2=2" or as an object {param1: 1, param2: 2}
+     * <span class="attrib">@param</span> {&lt;i&gt;Function&lt;/i&gt;} callback (optional) Callback when transaction is complete - called with signature (oElement, bSuccess)
+     * <span class="attrib">@param</span> {&lt;i&gt;Boolean&lt;/i&gt;} discardUrl (optional) By default when you execute an update the defaultUrl is changed to the last used url. If true, it will not store the url.
+     */</span>
+    update : <span class="reserved">function</span>(url, params, callback, discardUrl){
+        <span class="reserved">if</span>(<span class="reserved">this</span>.beforeUpdate.fireDirect(<span class="reserved">this</span>.el, url, params) !== false){
+            <span class="reserved">this</span>.showLoading();
+            <span class="reserved">if</span>(!discardUrl){
+                <span class="reserved">this</span>.defaultUrl = url;
+            }
+            <span class="reserved">if</span>(typeof url == <span class="literal">'function'</span>){
+                url = url();
+            }
+            <span class="reserved">if</span>(params &amp;&amp; typeof params != <span class="literal">'string'</span>){ <span class="comment">// must be object</span>
+                var buf = [];
+                <span class="reserved">for</span>(var key in params){
+                    <span class="reserved">if</span>(typeof params[key] != <span class="literal">'function'</span>){
+                        buf.push(encodeURIComponent(key), <span class="literal">'='</span>, encodeURIComponent(params[key]), <span class="literal">'&amp;'</span>);
+                    }
+                }
+                delete buf[buf.length-1];
+                params = buf.join(<span class="literal">''</span>);
+            }
+            var callback = {
+                success: <span class="reserved">this</span>.successDelegate,
+                failure: <span class="reserved">this</span>.failureDelegate,
+                timeout: (<span class="reserved">this</span>.timeout*1000),
+                argument: {<span class="literal">'url'</span>: url, <span class="literal">'form'</span>: null, <span class="literal">'callback'</span>: callback, <span class="literal">'params'</span>: params}
+            };
+            var method = params ? <span class="literal">'POST'</span> : <span class="literal">'GET'</span>;
+            <span class="reserved">if</span>(method == <span class="literal">'GET'</span>){
+                url = <span class="reserved">this</span>.prepareUrl(url);
+            }
+            <span class="reserved">this</span>.transaction = YAHOO.util.Connect.asyncRequest(method, url, callback, params);
+        }
+    },
+    
+    <span class="comment">/**
+     * Performs an async form post, updating this element with the response. If the form has the attribute enctype="multipart/form-data", it assumes it's a file upload.
+     * Uses this.sslBlankUrl for SSL file uploads to prevent IE security warning. See YUI docs for more info. 
+     * <span class="attrib">@param</span> {String/HTMLElement} form The form Id or form element
+     * <span class="attrib">@param</span> {&lt;i&gt;String&lt;/i&gt;} url (optional) The url to pass the form to. If omitted the action attribute on the form will be used.
+     * <span class="attrib">@param</span> {&lt;i&gt;Boolean&lt;/i&gt;} reset (optional) Whether to try to reset the form after the update
+     * <span class="attrib">@param</span> {&lt;i&gt;Function&lt;/i&gt;} callback (optional) Callback when transaction is complete - called with signature (oElement, bSuccess)
+     */</span>
+    formUpdate : <span class="reserved">function</span>(form, url, reset, callback){
+        <span class="reserved">if</span>(<span class="reserved">this</span>.beforeUpdate.fireDirect(<span class="reserved">this</span>.el, form, url) !== false){
+            <span class="reserved">this</span>.showLoading();
+            formEl = YAHOO.util.Dom.get(form);
+            <span class="reserved">if</span>(typeof url == <span class="literal">'function'</span>){
+                url = url();
+            }
+            url = url || formEl.action;
+            var callback = {
+                success: <span class="reserved">this</span>.successDelegate,
+                failure: <span class="reserved">this</span>.failureDelegate,
+                timeout: (<span class="reserved">this</span>.timeout*1000),
+                argument: {<span class="literal">'url'</span>: url, <span class="literal">'form'</span>: form, <span class="literal">'callback'</span>: callback, <span class="literal">'reset'</span>: reset}
+            };
+            var isUpload = false;
+            var enctype = formEl.getAttribute(<span class="literal">'enctype'</span>);
+            <span class="reserved">if</span>(enctype &amp;&amp; enctype.toLowerCase() == <span class="literal">'multipart/form-data'</span>){
+                isUpload = true;
+            }
+            YAHOO.util.Connect.setForm(form, isUpload, <span class="reserved">this</span>.sslBlankUrl);
+            <span class="reserved">this</span>.transaction = YAHOO.util.Connect.asyncRequest(<span class="literal">'POST'</span>, url, callback);
+        }
+    },
+    
+    <span class="comment">/**
+     * Refresh the element with the last used url or defaultUrl. If there is no url, it returns immediately
+     * <span class="attrib">@param</span> {Function} callback (optional) Callback when transaction is complete - called with signature (oElement, bSuccess)
+     */</span>
+    refresh : <span class="reserved">function</span>(callback){
+        <span class="reserved">if</span>(<span class="reserved">this</span>.defaultUrl == null){
+            <span class="reserved">return</span>;
+        }
+        <span class="reserved">this</span>.update(<span class="reserved">this</span>.defaultUrl, null, callback, true);
+    },
+    
+    <span class="comment">/**
+     * Set this element to auto refresh.
+     * <span class="attrib">@param</span> {Number} interval How often to update (in seconds).
+     * <span class="attrib">@param</span> {&lt;i&gt;String/Function&lt;/i&gt;} url (optional) The url for this request or a function to call to get the url (Defaults to the last used url)
+     * <span class="attrib">@param</span> {&lt;i&gt;String/Object&lt;/i&gt;} params (optional) The parameters to pass as either a url encoded string "&amp;param1=1&amp;param2=2" or as an object {param1: 1, param2: 2}
+     * <span class="attrib">@param</span> {&lt;i&gt;Function&lt;/i&gt;} callback (optional) Callback when transaction is complete - called with signature (oElement, bSuccess)
+     * <span class="attrib">@param</span> {&lt;i&gt;Boolean&lt;/i&gt;} refreshNow (optional) Whether to execute the refresh now, or wait the interval
+     */</span>
+    startAutoRefresh : <span class="reserved">function</span>(interval, url, params, callback, refreshNow){
+        <span class="reserved">if</span>(refreshNow){
+            <span class="reserved">this</span>.update(url || <span class="reserved">this</span>.defaultUrl, params, callback, true);
+        }
+        <span class="reserved">if</span>(<span class="reserved">this</span>.autoRefreshProcId){
+            clearInterval(<span class="reserved">this</span>.autoRefreshProcId);
+        }
+        <span class="reserved">this</span>.autoRefreshProcId = setInterval(<span class="reserved">this</span>.update.createDelegate(<span class="reserved">this</span>, [url || <span class="reserved">this</span>.defaultUrl, params, callback, true]), interval*1000);
+    },
+    
+    <span class="comment">/**
+     * Stop auto refresh on this element.
+     */</span>
+     stopAutoRefresh : <span class="reserved">function</span>(){
+        <span class="reserved">if</span>(<span class="reserved">this</span>.autoRefreshProcId){
+            clearInterval(<span class="reserved">this</span>.autoRefreshProcId);
+        }
+    },
+    
+    <span class="comment">/**
+     * Called to update the element to "Loading" state. Override to perform custom action.
+     */</span>
+    showLoading : <span class="reserved">function</span>(){
+        <span class="reserved">if</span>(<span class="reserved">this</span>.showLoadIndicator){
+            <span class="reserved">this</span>.el.update(<span class="reserved">this</span>.indicatorText);
+        }
+    },
+    
+    <span class="comment">/**
+     * Adds unique parameter to query string if disableCaching = true
+     * <span class="attrib">@private</span>
+     */</span>
+    prepareUrl : <span class="reserved">function</span>(url){
+        <span class="reserved">if</span>(<span class="reserved">this</span>.disableCaching){
+            var append = <span class="literal">'_dc='</span> + (new Date().getTime());
+            <span class="reserved">if</span>(url.indexOf(<span class="literal">'?'</span>) !== -1){
+                url += <span class="literal">'&amp;'</span> + append;
+            }<span class="reserved">else</span>{
+                url += <span class="literal">'?'</span> + append;
+            }
+        }
+        <span class="reserved">return</span> url;
+    },
+    
+    <span class="comment">/**
+     * <span class="attrib">@private</span>
+     */</span>
+    processSuccess : <span class="reserved">function</span>(response){
+        <span class="reserved">this</span>.transaction = null;
+        <span class="reserved">this</span>.renderer.render(<span class="reserved">this</span>.el, response, <span class="reserved">this</span>);
+        <span class="reserved">if</span>(response.argument.form &amp;&amp; response.argument.reset){
+            try{ <span class="comment">// put in try/catch since some older FF releases had problems with this</span>
+                response.argument.form.reset();
+            }catch(e){}
+        }
+        <span class="reserved">this</span>.onUpdate.fireDirect(<span class="reserved">this</span>.el, response);
+        <span class="reserved">if</span>(typeof response.argument.callback == <span class="literal">'function'</span>){
+            response.argument.callback(<span class="reserved">this</span>.el, true);
+        }
+    },
+    
+    <span class="comment">/**
+     * <span class="attrib">@private</span>
+     */</span>
+    processFailure : <span class="reserved">function</span>(response){
+        <span class="reserved">this</span>.transaction = null;
+        <span class="reserved">this</span>.onFailure.fireDirect(<span class="reserved">this</span>.el, response);
+        <span class="reserved">if</span>(typeof response.argument.callback == <span class="literal">'function'</span>){
+            response.argument.callback(<span class="reserved">this</span>.el, false);
+        }
+    },
+    
+    <span class="comment">/**
+     * Set the content renderer for this UpdateManager. See {<span class="attrib">@link</span> YAHOO.ext.UpdateManager.BasicRenderer#render} for more details.
+     * <span class="attrib">@param</span> {Object} renderer The object implementing the render() method
+     */</span>
+    setRenderer : <span class="reserved">function</span>(renderer){
+        <span class="reserved">this</span>.renderer = renderer;
+    },
+    
+    getRenderer : <span class="reserved">function</span>(){
+       <span class="reserved">return</span> <span class="reserved">this</span>.renderer;  
+    },
+    
+    <span class="comment">/**
+     * Set the defaultUrl used for updates
+     * <span class="attrib">@param</span> {String/Function} defaultUrl The url or a function to call to get the url
+     */</span>
+    setDefaultUrl : <span class="reserved">function</span>(defaultUrl){
+        <span class="reserved">this</span>.defaultUrl = defaultUrl;
+    },
+    
+    <span class="comment">/**
+     * Aborts the executing transaction
+     */</span>
+    abort : <span class="reserved">function</span>(){
+        <span class="reserved">if</span>(<span class="reserved">this</span>.transaction){
+            YAHOO.util.Connect.abort(<span class="reserved">this</span>.transaction);
+        }
+    },
+    
+    <span class="comment">/**
+     * Returns true if an update is in progress
+     */</span>
+    isUpdating : <span class="reserved">function</span>(){
+        <span class="reserved">if</span>(<span class="reserved">this</span>.transaction){
+            <span class="reserved">return</span> YAHOO.util.Connect.isCallInProgress(<span class="reserved">this</span>.transaction);
+        }
+        <span class="reserved">return</span> false;
+    }
+};
+
+<span class="comment">/**
+ * Static convenience method, Usage:
+ * YAHOO.ext.UpdateManager.update('my-div', 'stuff.php');
+ * <span class="attrib">@param</span> {String/HTMLElement/YAHOO.ext.Element} el The element to update
+ * <span class="attrib">@param</span> {String} url The url
+ * <span class="attrib">@param</span> {&lt;i&gt;String/Object&lt;/i&gt;} params (optional) Url encoded param string or an object of name/value pairs
+ * <span class="attrib">@param</span> {&lt;i&gt;Object&lt;/i&gt;} options (optional) A config object with any of the UpdateManager properties you want to set - for example: {disableCaching:true, indicatorText: 'Loading data...'}
+ */</span>
+YAHOO.ext.UpdateManager.update = <span class="reserved">function</span>(el, url, params, options){
+    var um = getEl(el, true).getUpdateManager();
+    YAHOO.ext.util.Config.apply(um, options);
+    um.update(url, params, options.callback);
+}
+
+<span class="comment">/**
+ * <span class="attrib">@class</span>
+ * Default Content renderer. Updates the elements innerHTML with the responseText.
+ */</span> 
+YAHOO.ext.UpdateManager.BasicRenderer = <span class="reserved">function</span>(){};
+
+YAHOO.ext.UpdateManager.BasicRenderer.<span class="reserved">prototype</span> = {
+    <span class="comment">/**
+     * This is called when the transaction is completed and it's time to update the element - The BasicRenderer 
+     * updates the elements innerHTML with the responseText - To perform a custom render (i.e. XML or JSON processing), 
+     * create an object with a "render(el, response)" method and pass it to setRenderer on the UpdateManager.
+     * <span class="attrib">@param</span> {YAHOO.ext.Element} el The element being rendered
+     * <span class="attrib">@param</span> {Object} response The YUI Connect response object
+     */</span>
+     render : <span class="reserved">function</span>(el, response, updateManager){
+        el.update(response.responseText, updateManager.loadScripts);
+    }
+};
+
+<span class="comment">/**
+ * The defaults collection enables customizing the default behavior of UpdateManager
+ */</span>
+YAHOO.ext.UpdateManager.defaults = {};
+<span class="comment">/**
+ * Timeout for requests or form posts in seconds (Defaults 30 seconds). 
+ * <span class="attrib">@type</span> Number
+ */</span>
+ YAHOO.ext.UpdateManager.defaults.timeout = 30;
+ <span class="comment">/**
+ * True to process scripts by default (Defaults to false). 
+ * <span class="attrib">@type</span> Number
+ */</span>
+ YAHOO.ext.UpdateManager.defaults.loadScripts = false;
+ 
+<span class="comment">/**
+* Blank page URL to use with SSL file uploads (Defaults to 'about:blank'). 
+* <span class="attrib">@type</span> String
+*/</span>
+YAHOO.ext.UpdateManager.defaults.sslBlankUrl = <span class="literal">'about:blank'</span>;
+<span class="comment">/**
+ * Whether to append unique parameter on get request to disable caching (Defaults to false). 
+ * <span class="attrib">@type</span> Boolean
+ */</span>
+YAHOO.ext.UpdateManager.defaults.disableCaching = false;
+<span class="comment">/**
+ * Whether to show indicatorText when loading (Defaults to true). 
+ * <span class="attrib">@type</span> String
+ */</span>
+YAHOO.ext.UpdateManager.defaults.showLoadIndicator = true;
+<span class="comment">/**
+ * Text for loading indicator (Defaults to '&amp;lt;div class="loading-indicator"&amp;gt;Loading...&amp;lt;/div&amp;gt;'). 
+ * <span class="attrib">@type</span> String
+ */</span>
+YAHOO.ext.UpdateManager.defaults.indicatorText = <span class="literal">'&lt;div class="loading-indicator"&gt;Loading...&lt;/div&gt;'</span>;</pre>
+	<hr>
+
+
+<hr>
+<font size="-1">
+
+</font>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat Oct 14 06:07:10 2006</div>
+</body>
+</html>

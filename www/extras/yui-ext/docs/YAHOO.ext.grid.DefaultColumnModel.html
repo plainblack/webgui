@@ -1,0 +1,1183 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN""http://www.w3.org/TR/REC-html40/loose.dtd">
+<!--NewPage-->
+<HTML>
+<HEAD>
+<TITLE>
+YAHOO.ext.grid.DefaultColumnModel
+</TITLE>
+<LINK REL ="stylesheet" TYPE="text/css" HREF="stylesheet.css" TITLE="Style">
+</HEAD>
+<SCRIPT>
+function asd()
+{
+parent.document.title="YAHOO.ext.grid.DefaultColumnModel";
+}
+</SCRIPT>
+<BODY BGCOLOR="white" onload="asd();" style="margin:15px;">
+<!-- ======== START OF CLASS DATA ======== -->
+<H2>Class YAHOO.ext.grid.DefaultColumnModel</H2>
+<PRE>Object
+   |
+   +--<a href='YAHOO.ext.grid.AbstractColumnModel.html'>YAHOO.ext.grid.AbstractColumnModel</a>
+         |
+         +--<b>YAHOO.ext.grid.DefaultColumnModel</b>
+</PRE>
+
+
+<HR>
+<DL>
+   <!-- Class definition -->
+   <DT>class 
+   <B>YAHOO.ext.grid.DefaultColumnModel</B>
+   
+      <DT>extends <a href='YAHOO.ext.grid.AbstractColumnModel.html'>YAHOO.ext.grid.AbstractColumnModel</a> 
+   
+
+</DL>
+   
+   <P>
+   <BR/>This is the default implementation of a ColumnModel used by the Grid. It defines
+ the columns in the grid.
+ <br>Usage:<br>
+ <pre><code>
+ var sort = YAHOO.ext.grid.DefaultColumnModel.sortTypes;
+ var myColumns = [
+	{header: "Ticker", width: 60, sortable: true, sortType: sort.asUCString}, 
+	{header: "Company Name", width: 150, sortable: true, sortType: sort.asUCString}, 
+	{header: "Market Cap.", width: 100, sortable: true, sortType: sort.asFloat}, 
+	{header: "$ Sales", width: 100, sortable: true, sortType: sort.asFloat, renderer: money}, 
+	{header: "Employees", width: 100, sortable: true, sortType: sort.asFloat}
+ ];
+ var colModel = new YAHOO.ext.grid.DefaultColumnModel(myColumns);
+ </code></pre>
+ <BR/><I>Defined in <a href='overview-summary-DefaultColumnModel.js.html'>DefaultColumnModel.js</a></I><BR/><BR/>
+   </P>
+   
+   <HR>
+
+<!-- ======== NESTED CLASS SUMMARY ======== -->
+
+<!-- ======== END NESTED CLASS SUMMARY ======== -->
+
+
+<!-- =========== FIELD SUMMARY =========== -->
+
+   <A NAME="field_summary"><!-- --></A>
+      <TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+         <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+            <TD COLSPAN="2" class="title-cell">Field Summary</TD></TR>
+
+   <!-- This is one instance field summary -->
+   
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+   <CODE>&nbsp;Object</CODE></FONT></TD>
+   <TD><CODE><B><A HREF="#config">config</A></B></CODE>
+   <BR>
+   &nbsp;&nbsp;The config passed into the constructor</TD>
+   </TR>
+   
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+   <CODE>&nbsp;Boolean</CODE></FONT></TD>
+   <TD><CODE><B><A HREF="#defaultSortable">defaultSortable</A></B></CODE>
+   <BR>
+   &nbsp;&nbsp;Default sortable of columns which have no sortable specified (defaults to false)</TD>
+   </TR>
+   
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+   <CODE>&nbsp;Number</CODE></FONT></TD>
+   <TD><CODE><B><A HREF="#defaultWidth">defaultWidth</A></B></CODE>
+   <BR>
+   &nbsp;&nbsp;The width of columns which have no width specified (defaults to 100)</TD>
+   </TR>
+   
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+   <CODE>&lt;static&gt; &nbsp;Object</CODE></FONT></TD>
+   <TD><CODE><B><A HREF="#!s!sortTypes">sortTypes</A></B></CODE>
+   <BR>
+   &nbsp;&nbsp;Defines the default sorting (casting?) comparison functions used when sorting data:
+ <br>&nbsp;&nbsp;sortTypes.none - sorts data as it is without casting or parsing (the default)
+ <br>&nbsp;&nbsp;sortTypes.asUCString - case insensitive string
+ <br>&nbsp;&nbsp;sortTypes.asDate - attempts to parse data as a date
+ <br>&nbsp;&nbsp;sortTypes.asFloat
+ <br>&nbsp;&nbsp;sortTypes.asInt</TD>
+   </TR>
+   
+
+   </TABLE>
+   &nbsp;
+   
+
+   
+   
+   &nbsp;<A NAME=""><!-- --></A>
+   <TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+   <TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+   <TD class="title-cell"><B>Fields inherited from class <A HREF="YAHOO.ext.grid.AbstractColumnModel.html">YAHOO.ext.grid.AbstractColumnModel</A></B></TD>
+   </TR>
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD><CODE>
+   <a href="YAHOO.ext.grid.AbstractColumnModel.html#onWidthChange">onWidthChange</a>, <a href="YAHOO.ext.grid.AbstractColumnModel.html#onHeaderChange">onHeaderChange</a>, <a href="YAHOO.ext.grid.AbstractColumnModel.html#onHiddenChange">onHiddenChange</a>
+   </CODE></TD>
+   </TR>
+</TABLE>
+&nbsp;
+
+
+
+<!-- =========== END FIELD SUMMARY =========== -->
+
+
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+
+<A NAME="constructor_summary"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+  <TD COLSPAN="2" class="title-cell">
+    Constructor Summary
+  </TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD>
+      <CODE>
+	 <B>
+	    <A HREF="YAHOO.ext.grid.DefaultColumnModel.html#YAHOO.ext.grid.DefaultColumnModel()">YAHOO.ext.grid.DefaultColumnModel</A> 
+	 </B>
+	 (config)
+      </CODE>
+      <BR>
+      &nbsp;&nbsp;
+      
+      </TD>
+</TR>
+</TABLE>
+
+<!-- ======== END CONSTRUCTOR SUMMARY ======== -->
+
+&nbsp;
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<A NAME="method_summary"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+  <TD COLSPAN="2" class="title-cell">
+    <span style="float:left">Method Summary</span>
+    <span style="float:right;font-weight:normal;font-size:8pt;">
+      <i>* Parameter types in italic indicate optional parameters</i>
+    </span>
+  </TD>
+</TR>
+
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Object</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getCellEditor">getCellEditor</A></B>(&lt;Number&gt; colIndex, &lt;Number&gt; rowIndex)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Returns the editor defined for the cell/column.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Number</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getColumnCount">getColumnCount</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Returns the number of columns.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;String</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getColumnHeader">getColumnHeader</A></B>(&lt;Number&gt; col)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Returns the header for the specified column.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Number</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getColumnWidth">getColumnWidth</A></B>(&lt;Number&gt; col)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Returns the width for the specified column.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Number</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getDataIndex">getDataIndex</A></B>(&lt;Number&gt; col)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Returns the dataIndex for the specified column.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;<a href="Function.html">Function</a></CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getRenderer">getRenderer</A></B>(&lt;Number&gt; col)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Returns the rendering (formatting) function defined for the column.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;<a href="Function.html">Function</a></CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getSortType">getSortType</A></B>(&lt;Number&gt; col)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Returns the sorting comparison function defined for the column (defaults to sortTypes.none).
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Number</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getTotalWidth">getTotalWidth</A></B>(&lt;Boolean&gt; includeHidden)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Returns the total width of all columns.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Boolean</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#isCellEditable">isCellEditable</A></B>(&lt;Number&gt; colIndex, &lt;Number&gt; rowIndex)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Returns true if the cell is editable.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Boolean</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#isHidden">isHidden</A></B>(&lt;Number&gt; colIndex)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Returns true if the column is hidden.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Boolean</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#isSortable">isSortable</A></B>(&lt;Number&gt; col)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Returns true if the specified column is sortable.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#setColumnHeader">setColumnHeader</A></B>(&lt;Number&gt; col, &lt;String&gt; header)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Sets the header for a column.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#setColumnWidth">setColumnWidth</A></B>(&lt;Number&gt; col, &lt;Number&gt; width, suppressEvent)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Sets the width for a column.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#setDataIndex">setDataIndex</A></B>(&lt;Number&gt; col, &lt;Number&gt; dataIndex)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Sets the dataIndex for a column.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#setEditable">setEditable</A></B>(&lt;Number&gt; col, &lt;Boolean&gt; editable)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Sets if a column is editable.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#setEditor">setEditor</A></B>(&lt;Number&gt; col, &lt;Object&gt; editor)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Sets the editor for a column.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#setHidden">setHidden</A></B>(&lt;Number&gt; colIndex, hidden)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Sets if a column is hidden.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#setRenderer">setRenderer</A></B>(&lt;Number&gt; col, &lt;<a href="Function.html">Function</a>&gt; fn)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Sets the rendering (formatting) function for a column.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#setSortType">setSortType</A></B>(&lt;Number&gt; col, &lt;<a href="Function.html">Function</a>&gt; fn)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Sets the sorting comparison function for a column.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&lt;static&gt;&nbsp;Object</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#!s!defaultRenderer">defaultRenderer</A></B>(value)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Default empty rendering function
+      </TD>
+   </TR>
+
+
+</TABLE>
+
+
+
+&nbsp;<A NAME="methods_inherited_from_class_java.lang.Object"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TD class="title-cell"><B>Methods inherited from class <a href="YAHOO.ext.grid.AbstractColumnModel.html">YAHOO.ext.grid.AbstractColumnModel</a></B></TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE>
+<!-- Inherited methods -->
+<a href="YAHOO.ext.grid.AbstractColumnModel.html#fireWidthChange">fireWidthChange</a>, <a href="YAHOO.ext.grid.AbstractColumnModel.html#fireHeaderChange">fireHeaderChange</a>, <a href="YAHOO.ext.grid.AbstractColumnModel.html#fireHiddenChange">fireHiddenChange</a>
+</CODE></TD>
+</TR>
+</TABLE>
+&nbsp;
+
+<P>
+<!-- ========== END METHOD SUMMARY =========== -->
+
+
+<!-- ============ FIELD DETAIL START =========== -->
+
+   <A NAME="field_detail"><!-- --></A>
+   <TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+      <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+        <TD COLSPAN="1" class="title-cell">Field Detail</TD>
+      </TR>
+   </TABLE>
+
+   
+   <A NAME="config"><!-- --></A>
+   <H3>config</H3>
+   <PRE>Object&nbsp;<B>config</B></PRE>
+   <UL>
+   The config passed into the constructor
+   
+   </UL>
+   <HR>
+   
+   <A NAME="defaultSortable"><!-- --></A>
+   <H3>defaultSortable</H3>
+   <PRE>Boolean&nbsp;<B>defaultSortable</B></PRE>
+   <UL>
+   Default sortable of columns which have no sortable specified (defaults to false)
+   
+   </UL>
+   <HR>
+   
+   <A NAME="defaultWidth"><!-- --></A>
+   <H3>defaultWidth</H3>
+   <PRE>Number&nbsp;<B>defaultWidth</B></PRE>
+   <UL>
+   The width of columns which have no width specified (defaults to 100)
+   
+   </UL>
+   <HR>
+   
+   <A NAME="!s!sortTypes"><!-- --></A>
+   <H3>sortTypes</H3>
+   <PRE>&lt;static&gt;&nbsp;Object&nbsp;<B>sortTypes</B></PRE>
+   <UL>
+   Defines the default sorting (casting?) comparison functions used when sorting data:
+ <br>&nbsp;&nbsp;sortTypes.none - sorts data as it is without casting or parsing (the default)
+ <br>&nbsp;&nbsp;sortTypes.asUCString - case insensitive string
+ <br>&nbsp;&nbsp;sortTypes.asDate - attempts to parse data as a date
+ <br>&nbsp;&nbsp;sortTypes.asFloat
+ <br>&nbsp;&nbsp;sortTypes.asInt
+   
+   </UL>
+   <HR>
+   
+
+
+<!-- ============ FIELD DETAIL END =========== -->
+
+    <!-- ========= CONSTRUCTOR DETAIL START ======== -->
+
+<A NAME="constructor_detail"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+   <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+     <TD COLSPAN="1" class="title-cell">
+       Constructor Detail
+     </TD>
+   </TR>
+</TABLE>
+
+<A NAME="YAHOO.ext.grid.DefaultColumnModel()"><!-- --></A><H3>
+YAHOO.ext.grid.DefaultColumnModel</H3>
+<PRE><B>YAHOO.ext.grid.DefaultColumnModel</B>(config)</PRE>
+
+
+
+
+   </UL>
+
+
+<!-- Constructor return value(s) -->
+
+<!-- End constructor return value(s) -->
+
+<!-- ADDITIONAL ATTRIBUTES -->
+
+<HR/>
+<!-- END ADDITIONAL ATTRIBUTES  -->
+
+<!-- ========= CONSTRUCTOR DETAIL END ======== -->
+
+
+<!-- ============ METHOD DETAIL START ========== -->
+
+<A NAME="method_detail"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+   <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+     <TD COLSPAN="1" class="title-cell">
+       Method Detail
+     </TD>
+   </TR>
+</TABLE>
+
+<!-- One single method detail entry -->
+
+   <A NAME="getCellEditor"><!-- --></A>
+   <H3>getCellEditor</H3>
+   <PRE>Object <B>getCellEditor</B>(&lt;Number&gt; colIndex, &lt;Number&gt; rowIndex)</PRE>
+   
+      <UL>Returns the editor defined for the cell/column.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>colIndex</CODE> -  The column index  
+      </UL> 
+   
+     <UL><CODE>rowIndex</CODE> -  The row index  
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getColumnCount"><!-- --></A>
+   <H3>getColumnCount</H3>
+   <PRE>Number <B>getColumnCount</B>()</PRE>
+   
+      <UL>Returns the number of columns.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getColumnHeader"><!-- --></A>
+   <H3>getColumnHeader</H3>
+   <PRE>String <B>getColumnHeader</B>(&lt;Number&gt; col)</PRE>
+   
+      <UL>Returns the header for the specified column.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>col</CODE> -  The column index  
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getColumnWidth"><!-- --></A>
+   <H3>getColumnWidth</H3>
+   <PRE>Number <B>getColumnWidth</B>(&lt;Number&gt; col)</PRE>
+   
+      <UL>Returns the width for the specified column.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>col</CODE> -  The column index  
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getDataIndex"><!-- --></A>
+   <H3>getDataIndex</H3>
+   <PRE>Number <B>getDataIndex</B>(&lt;Number&gt; col)</PRE>
+   
+      <UL>Returns the dataIndex for the specified column.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>col</CODE> -  The column index  
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getRenderer"><!-- --></A>
+   <H3>getRenderer</H3>
+   <PRE><a href="Function.html">Function</a> <B>getRenderer</B>(&lt;Number&gt; col)</PRE>
+   
+      <UL>Returns the rendering (formatting) function defined for the column.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>col</CODE> -  The column index  
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getSortType"><!-- --></A>
+   <H3>getSortType</H3>
+   <PRE><a href="Function.html">Function</a> <B>getSortType</B>(&lt;Number&gt; col)</PRE>
+   
+      <UL>Returns the sorting comparison function defined for the column (defaults to sortTypes.none).</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>col</CODE> -  The column index  
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getTotalWidth"><!-- --></A>
+   <H3>getTotalWidth</H3>
+   <PRE>Number <B>getTotalWidth</B>(&lt;Boolean&gt; includeHidden)</PRE>
+   
+      <UL>Returns the total width of all columns.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>includeHidden</CODE> -  True to include hidden column widths  
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="isCellEditable"><!-- --></A>
+   <H3>isCellEditable</H3>
+   <PRE>Boolean <B>isCellEditable</B>(&lt;Number&gt; colIndex, &lt;Number&gt; rowIndex)</PRE>
+   
+      <UL>Returns true if the cell is editable.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>colIndex</CODE> -  The column index  
+      </UL> 
+   
+     <UL><CODE>rowIndex</CODE> -  The row index  
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="isHidden"><!-- --></A>
+   <H3>isHidden</H3>
+   <PRE>Boolean <B>isHidden</B>(&lt;Number&gt; colIndex)</PRE>
+   
+      <UL>Returns true if the column is hidden.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>colIndex</CODE> -  The column index  
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="isSortable"><!-- --></A>
+   <H3>isSortable</H3>
+   <PRE>Boolean <B>isSortable</B>(&lt;Number&gt; col)</PRE>
+   
+      <UL>Returns true if the specified column is sortable.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>col</CODE> -  The column index  
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="setColumnHeader"><!-- --></A>
+   <H3>setColumnHeader</H3>
+   <PRE>void <B>setColumnHeader</B>(&lt;Number&gt; col, &lt;String&gt; header)</PRE>
+   
+      <UL>Sets the header for a column.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>col</CODE> -  The column index  
+      </UL> 
+   
+     <UL><CODE>header</CODE> -  The new header    
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="setColumnWidth"><!-- --></A>
+   <H3>setColumnWidth</H3>
+   <PRE>void <B>setColumnWidth</B>(&lt;Number&gt; col, &lt;Number&gt; width, suppressEvent)</PRE>
+   
+      <UL>Sets the width for a column.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>col</CODE> -  The column index  
+      </UL> 
+   
+     <UL><CODE>width</CODE> -  The new width    
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="setDataIndex"><!-- --></A>
+   <H3>setDataIndex</H3>
+   <PRE>void <B>setDataIndex</B>(&lt;Number&gt; col, &lt;Number&gt; dataIndex)</PRE>
+   
+      <UL>Sets the dataIndex for a column.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>col</CODE> -  The column index  
+      </UL> 
+   
+     <UL><CODE>dataIndex</CODE> -  The new dataIndex    
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="setEditable"><!-- --></A>
+   <H3>setEditable</H3>
+   <PRE>void <B>setEditable</B>(&lt;Number&gt; col, &lt;Boolean&gt; editable)</PRE>
+   
+      <UL>Sets if a column is editable.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>col</CODE> -  The column index  
+      </UL> 
+   
+     <UL><CODE>editable</CODE> -  True if the column is editable    
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="setEditor"><!-- --></A>
+   <H3>setEditor</H3>
+   <PRE>void <B>setEditor</B>(&lt;Number&gt; col, &lt;Object&gt; editor)</PRE>
+   
+      <UL>Sets the editor for a column.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>col</CODE> -  The column index  
+      </UL> 
+   
+     <UL><CODE>editor</CODE> -  The editor object    
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="setHidden"><!-- --></A>
+   <H3>setHidden</H3>
+   <PRE>void <B>setHidden</B>(&lt;Number&gt; colIndex, hidden)</PRE>
+   
+      <UL>Sets if a column is hidden.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>colIndex</CODE> -  The column index    
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="setRenderer"><!-- --></A>
+   <H3>setRenderer</H3>
+   <PRE>void <B>setRenderer</B>(&lt;Number&gt; col, &lt;<a href="Function.html">Function</a>&gt; fn)</PRE>
+   
+      <UL>Sets the rendering (formatting) function for a column.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>col</CODE> -  The column index  
+      </UL> 
+   
+     <UL><CODE>fn</CODE> -     
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="setSortType"><!-- --></A>
+   <H3>setSortType</H3>
+   <PRE>void <B>setSortType</B>(&lt;Number&gt; col, &lt;<a href="Function.html">Function</a>&gt; fn)</PRE>
+   
+      <UL>Sets the sorting comparison function for a column.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>col</CODE> -  The column index  
+      </UL> 
+   
+     <UL><CODE>fn</CODE> -     
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="!s!defaultRenderer"><!-- --></A>
+   <H3>defaultRenderer</H3>
+   <PRE>&lt;static&gt; Object <B>defaultRenderer</B>(value)</PRE>
+   
+      <UL>Default empty rendering function</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+
+
+<!-- ============ METHOD DETAIL END ========== -->
+
+<!-- ========= END OF CLASS DATA ========= -->
+
+<HR>
+<FONT SIZE="-1">
+
+</FONT>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat Oct 14 06:07:10 2006</div>
+</BODY>
+</HTML>

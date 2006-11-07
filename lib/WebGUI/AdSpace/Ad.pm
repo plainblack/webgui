@@ -254,17 +254,10 @@ sub set {
 	# prerender the ad for faster display
 	my $adSpace = WebGUI::AdSpace->new($self->session, $self->get("adSpaceId"));
 	if ($self->get("type") eq "text") {
-		$self->{_properties}{renderedAd} = '<a href="'.$self->session->url->gateway(undef, "op=clickAd;id=".$self->getId)
-			.'" style="text-decoration: none;"><div style="overflow: hidden; font-size: 13px; font-weight: normal; width: '
-			.($adSpace->get("width") - 2)
-			.'px; padding: 3px; height: '.($adSpace->get("height") - 2).'px; color: '.$self->get("textColor")
-			.'; background-color: '.$self->get("backgroundColor")
-			.'; border: 1px solid '.$self->get("borderColor").';"><b>'
-			.$self->get("title").'</b><br />'.$self->get("adText").'</div></a>';
+		$self->{_properties}{renderedAd} = '<div style="position:relative; width:'.($adSpace->get("width")-2).'px; height:'.($adSpace->get("height")-2).'px; margin:0px; overflow:hidden; border:solid '.$self->get("borderColor").' 1px;"><a href="'.$self->session->url->gateway(undef, "op=clickAd;id=".$self->getId).'" style="position:absolute; padding: 3px; top:0px; left:0px; width:100%; height:100%; z-index:10; display:block; text-decoration:none; vertical-align:top; background-color:'.$self->get("backgroundColor").'; font-size: 13px; font-weight: normal;"><b><span style="color:'.$self->get("textColor").';">'.$self->get("title").'</span></b><br /><span style="color:'.$self->get("textColor").';">'.$self->get("adText").'</span></a></div>';
 	} elsif ($self->get("type") eq "image") {
 		my $storage = WebGUI::Storage::Image->get($self->session, $self->get("storageId"));
-		$self->{_properties}{renderedAd} = '<a href="'.$self->session->url->gateway(undef, "op=clickAd;id=".$self->getId).'"><div style="overflow: hidden; width: '.$adSpace->get("width").'px; height: '.$adSpace->get("height").'px;"><img src="'.$storage->getUrl($storage->getFiles->[0]).'" style="border: 0px;" alt="'.$self->get("title").'" /></div></a>';
-		
+		$self->{_properties}{renderedAd} = '<div style="position:relative; width:'.$adSpace->get("width").'px; height:'.$adSpace->get("height").'px; margin:0px; overflow:hidden; border:0px;"><a href="'.$self->session->url->gateway(undef, "op=clickAd;id=".$self->getId).'" style="position:absolute; padding: 3px; top:0px; left:0px; width:100%; height:100%; z-index:10; display:block; text-decoration:none; vertical-align:top;"><img src="'.$storage->getUrl($storage->getFiles->[0]).'" alt="'.$self->get("title").'" style="z-index:0;position:relative;border-style:none;border: 0px;" alt="'.$self->get("title").'" /></a></div>';
 	} elsif ($self->get("type") eq "rich") {
 		$self->{_properties}{renderedAd} = $self->get("richMedia");
 	}

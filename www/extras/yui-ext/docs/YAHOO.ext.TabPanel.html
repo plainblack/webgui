@@ -1,0 +1,636 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN""http://www.w3.org/TR/REC-html40/loose.dtd">
+<!--NewPage-->
+<HTML>
+<HEAD>
+<TITLE>
+YAHOO.ext.TabPanel
+</TITLE>
+<LINK REL ="stylesheet" TYPE="text/css" HREF="stylesheet.css" TITLE="Style">
+</HEAD>
+<SCRIPT>
+function asd()
+{
+parent.document.title="YAHOO.ext.TabPanel";
+}
+</SCRIPT>
+<BODY BGCOLOR="white" onload="asd();" style="margin:15px;">
+<!-- ======== START OF CLASS DATA ======== -->
+<H2>Class YAHOO.ext.TabPanel</H2>
+<PRE>Object
+   |
+   +--<b>YAHOO.ext.TabPanel</b>
+</PRE>
+
+
+<HR>
+<DL>
+   <!-- Class definition -->
+   <DT>class 
+   <B>YAHOO.ext.TabPanel</B>
+   
+
+</DL>
+   
+   <P>
+   <BR/>Creates a lightweight TabPanel component using Yahoo! UI.
+ <br><br>
+ Usage:
+ <pre><code>
+    <font color="#008000">// basic tabs 1, built from existing content</font>
+    var tabs = new YAHOO.ext.TabPanel('tabs1');
+    tabs.addTab('script', "View Script");
+    tabs.addTab('markup', "View Markup");
+    tabs.activate('script');
+    
+    <font color="#008000">// more advanced tabs, built from javascript</font>
+    var jtabs = new YAHOO.ext.TabPanel('jtabs');
+    jtabs.addTab('jtabs-1', "Normal Tab", "My content was added during construction.");
+    
+    <font color="#008000">// set up the UpdateManager</font>
+    var tab2 = jtabs.addTab('jtabs-2', "Ajax Tab 1");
+    var updater = tab2.getUpdateManager();
+    updater.setDefaultUrl('ajax1.htm');
+    tab2.onActivate.subscribe(updater.refresh, updater, true);
+    
+    <font color="#008000">// Use setUrl for Ajax loading</font>
+    var tab3 = jtabs.addTab('jtabs-3', "Ajax Tab 2");
+    tab3.setUrl('ajax2.htm', null, true);
+    
+    <font color="#008000">// Disabled tab</font>
+    var tab4 = jtabs.addTab('tabs1-5', "Disabled Tab", "Can't see me cause I'm disabled");
+    tab4.disable();
+    
+    jtabs.activate('jtabs-1');
+}
+ </code></pre>
+ <BR/><I>Defined in <a href='overview-summary-TabPanel.js.html'>TabPanel.js</a></I><BR/><BR/><B>Requires:</B><UL>- <a href="YAHOO.ext.Element.html#">YAHOO.ext.Element</a><BR/>- <a href="YAHOO.ext.UpdateManager.html#">YAHOO.ext.UpdateManager</a><BR/>- YAHOO.util.Dom<BR/>- YAHOO.util.Event<BR/>- <a href="YAHOO.util.CustomEvent.html#">YAHOO.util.CustomEvent</a><BR/>- YAHOO.util.DDProxy<BR/>- YAHOO.util.Connect (optional)</UL>
+   </P>
+   
+   <HR>
+
+<!-- ======== NESTED CLASS SUMMARY ======== -->
+
+<!-- ======== END NESTED CLASS SUMMARY ======== -->
+
+
+<!-- =========== FIELD SUMMARY =========== -->
+
+   <A NAME="field_summary"><!-- --></A>
+      <TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+         <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+            <TD COLSPAN="2" class="title-cell">Field Summary</TD></TR>
+
+   <!-- This is one instance field summary -->
+   
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+   <CODE>&nbsp;<a href="YAHOO.ext.Element.html">YAHOO.ext.Element</a></CODE></FONT></TD>
+   <TD><CODE><B><A HREF="#bodyEl">bodyEl</A></B></CODE>
+   <BR>
+   &nbsp;&nbsp;The body element that contains TabPaneItem bodies.</TD>
+   </TR>
+   
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+   <CODE>&nbsp;<a href="YAHOO.ext.Element.html">YAHOO.ext.Element</a></CODE></FONT></TD>
+   <TD><CODE><B><A HREF="#el">el</A></B></CODE>
+   <BR>
+   &nbsp;&nbsp;The container element for this TabPanel.</TD>
+   </TR>
+   
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+   <CODE>&nbsp;CustomEvent</CODE></FONT></TD>
+   <TD><CODE><B><A HREF="#onTabChange">onTabChange</A></B></CODE>
+   <BR>
+   &nbsp;&nbsp;Fires when the active TabPanelItem changes.</TD>
+   </TR>
+   
+
+   </TABLE>
+   &nbsp;
+   
+
+   
+
+<!-- =========== END FIELD SUMMARY =========== -->
+
+
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+
+<A NAME="constructor_summary"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+  <TD COLSPAN="2" class="title-cell">
+    Constructor Summary
+  </TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD>
+      <CODE>
+	 <B>
+	    <A HREF="YAHOO.ext.TabPanel.html#YAHOO.ext.TabPanel()">YAHOO.ext.TabPanel</A> 
+	 </B>
+	 (&lt;String/HTMLElement/Element&gt; container)
+      </CODE>
+      <BR>
+      &nbsp;&nbsp;
+      
+      </TD>
+</TR>
+</TABLE>
+
+<!-- ======== END CONSTRUCTOR SUMMARY ======== -->
+
+&nbsp;
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<A NAME="method_summary"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+  <TD COLSPAN="2" class="title-cell">
+    <span style="float:left">Method Summary</span>
+    <span style="float:right;font-weight:normal;font-size:8pt;">
+      <i>* Parameter types in italic indicate optional parameters</i>
+    </span>
+  </TD>
+</TR>
+
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#activate">activate</A></B>(&lt;String&gt; id)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Activate a TabPanelItem.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;<a href="YAHOO.ext.TabPanelItem.html">YAHOO.ext.TabPanelItem</a></CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#addTab">addTab</A></B>(&lt;String&gt; id, &lt;String&gt; text, &lt;<i>String</i>&gt; content)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Creates a new TabPanelItem by looking for an existing element with the provided id - if it's not found it creates one.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#addTabItem">addTabItem</A></B>(&lt;<a href="YAHOO.ext.TabPanelItem.html">YAHOO.ext.TabPanelItem</a>&gt; item)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Add an existing TabPanelItem.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#disableTab">disableTab</A></B>(&lt;String&gt; id)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Disable a TabPanelItem.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#enableTab">enableTab</A></B>(&lt;String&gt; id)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Enable a TabPanelItem that is disabled.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;<a href="YAHOO.ext.TabPanelItem.html">YAHOO.ext.TabPanelItem</a></CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getActiveTab">getActiveTab</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Get the active TabPanelItem
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;<a href="YAHOO.ext.TabPanelItem.html">YAHOO.ext.TabPanelItem</a></CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getTab">getTab</A></B>(&lt;String&gt; id)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Returns the TabPanelItem with the specified id
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#removeTab">removeTab</A></B>(&lt;String&gt; id)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Remove a TabPanelItem.
+      </TD>
+   </TR>
+
+
+</TABLE>
+
+
+
+<P>
+<!-- ========== END METHOD SUMMARY =========== -->
+
+
+<!-- ============ FIELD DETAIL START =========== -->
+
+   <A NAME="field_detail"><!-- --></A>
+   <TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+      <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+        <TD COLSPAN="1" class="title-cell">Field Detail</TD>
+      </TR>
+   </TABLE>
+
+   
+   <A NAME="bodyEl"><!-- --></A>
+   <H3>bodyEl</H3>
+   <PRE><a href="YAHOO.ext.Element.html">YAHOO.ext.Element</a>&nbsp;<B>bodyEl</B></PRE>
+   <UL>
+   The body element that contains TabPaneItem bodies.
+   
+   </UL>
+   <HR>
+   
+   <A NAME="el"><!-- --></A>
+   <H3>el</H3>
+   <PRE><a href="YAHOO.ext.Element.html">YAHOO.ext.Element</a>&nbsp;<B>el</B></PRE>
+   <UL>
+   The container element for this TabPanel.
+   
+   </UL>
+   <HR>
+   
+   <A NAME="onTabChange"><!-- --></A>
+   <H3>onTabChange</H3>
+   <PRE>CustomEvent&nbsp;<B>onTabChange</B></PRE>
+   <UL>
+   Fires when the active TabPanelItem changes. Uses fireDirect with signature: (TabPanel this, TabPanelItem activedTab).
+   
+   </UL>
+   <HR>
+   
+
+
+<!-- ============ FIELD DETAIL END =========== -->
+
+    <!-- ========= CONSTRUCTOR DETAIL START ======== -->
+
+<A NAME="constructor_detail"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+   <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+     <TD COLSPAN="1" class="title-cell">
+       Constructor Detail
+     </TD>
+   </TR>
+</TABLE>
+
+<A NAME="YAHOO.ext.TabPanel()"><!-- --></A><H3>
+YAHOO.ext.TabPanel</H3>
+<PRE><B>YAHOO.ext.TabPanel</B>(&lt;String/HTMLElement/Element&gt; container)</PRE>
+
+
+
+
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>container</CODE> -  The id, DOM element or YAHOO.ext.Element container where this TabPanel is to be rendered.
+     </UL>
+   
+   
+   </UL>
+
+
+<!-- Constructor return value(s) -->
+
+<!-- End constructor return value(s) -->
+
+<!-- ADDITIONAL ATTRIBUTES -->
+
+<UL>   
+<B>Requires:</B><UL>- <a href="YAHOO.ext.Element.html#">YAHOO.ext.Element</a><BR/>- <a href="YAHOO.ext.UpdateManager.html#">YAHOO.ext.UpdateManager</a><BR/>- YAHOO.util.Dom<BR/>- YAHOO.util.Event<BR/>- <a href="YAHOO.util.CustomEvent.html#">YAHOO.util.CustomEvent</a><BR/>- YAHOO.util.DDProxy<BR/>- YAHOO.util.Connect (optional)</UL>
+</UL>
+
+<HR/>
+<!-- END ADDITIONAL ATTRIBUTES  -->
+
+<!-- ========= CONSTRUCTOR DETAIL END ======== -->
+
+
+<!-- ============ METHOD DETAIL START ========== -->
+
+<A NAME="method_detail"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+   <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+     <TD COLSPAN="1" class="title-cell">
+       Method Detail
+     </TD>
+   </TR>
+</TABLE>
+
+<!-- One single method detail entry -->
+
+   <A NAME="activate"><!-- --></A>
+   <H3>activate</H3>
+   <PRE>void <B>activate</B>(&lt;String&gt; id)</PRE>
+   
+      <UL>Activate a TabPanelItem. The currently active will be deactivated.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>id</CODE> -  The id of the TabPanelItem to activate.        
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="addTab"><!-- --></A>
+   <H3>addTab</H3>
+   <PRE><a href="YAHOO.ext.TabPanelItem.html">YAHOO.ext.TabPanelItem</a> <B>addTab</B>(&lt;String&gt; id, &lt;String&gt; text, &lt;<i>String</i>&gt; content)</PRE>
+   
+      <UL>Creates a new TabPanelItem by looking for an existing element with the provided id - if it's not found it creates one.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>id</CODE> -  The id of the div to use or create  
+      </UL> 
+   
+     <UL><CODE>text</CODE> -  The text for the tab  
+      </UL> 
+   
+     <UL><CODE>content</CODE> -  (optional) Content to put in the TabPanelItem body  
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+   <UL>
+   <B>Returns:</B>
+        <UL>
+         The created TabPanelItem 
+        </UL>
+   </UL>
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="addTabItem"><!-- --></A>
+   <H3>addTabItem</H3>
+   <PRE>void <B>addTabItem</B>(&lt;<a href="YAHOO.ext.TabPanelItem.html">YAHOO.ext.TabPanelItem</a>&gt; item)</PRE>
+   
+      <UL>Add an existing TabPanelItem.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>item</CODE> -  The TabPanelItem to add        
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="disableTab"><!-- --></A>
+   <H3>disableTab</H3>
+   <PRE>void <B>disableTab</B>(&lt;String&gt; id)</PRE>
+   
+      <UL>Disable a TabPanelItem. <b>It cannot be the active tab, if it is this call is ignored.</b>.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>id</CODE> -  The id of the TabPanelItem to disable.        
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="enableTab"><!-- --></A>
+   <H3>enableTab</H3>
+   <PRE>void <B>enableTab</B>(&lt;String&gt; id)</PRE>
+   
+      <UL>Enable a TabPanelItem that is disabled.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>id</CODE> -  The id of the TabPanelItem to enable.        
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getActiveTab"><!-- --></A>
+   <H3>getActiveTab</H3>
+   <PRE><a href="YAHOO.ext.TabPanelItem.html">YAHOO.ext.TabPanelItem</a> <B>getActiveTab</B>()</PRE>
+   
+      <UL>Get the active TabPanelItem</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+   <UL>
+   <B>Returns:</B>
+        <UL>
+         The active TabPanelItem or null if none are active. 
+        </UL>
+   </UL>
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getTab"><!-- --></A>
+   <H3>getTab</H3>
+   <PRE><a href="YAHOO.ext.TabPanelItem.html">YAHOO.ext.TabPanelItem</a> <B>getTab</B>(&lt;String&gt; id)</PRE>
+   
+      <UL>Returns the TabPanelItem with the specified id</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>id</CODE> -  The id of the TabPanelItem to fetch.  
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="removeTab"><!-- --></A>
+   <H3>removeTab</H3>
+   <PRE>void <B>removeTab</B>(&lt;String&gt; id)</PRE>
+   
+      <UL>Remove a TabPanelItem.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>id</CODE> -  The id of the TabPanelItem to remove.        
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+
+
+<!-- ============ METHOD DETAIL END ========== -->
+
+<!-- ========= END OF CLASS DATA ========= -->
+
+<HR>
+<FONT SIZE="-1">
+
+</FONT>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat Oct 14 06:07:10 2006</div>
+</BODY>
+</HTML>

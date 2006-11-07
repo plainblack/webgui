@@ -1,0 +1,1821 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN""http://www.w3.org/TR/REC-html40/loose.dtd">
+<!--NewPage-->
+<HTML>
+<HEAD>
+<TITLE>
+YAHOO.ext.grid.Grid
+</TITLE>
+<LINK REL ="stylesheet" TYPE="text/css" HREF="stylesheet.css" TITLE="Style">
+</HEAD>
+<SCRIPT>
+function asd()
+{
+parent.document.title="YAHOO.ext.grid.Grid";
+}
+</SCRIPT>
+<BODY BGCOLOR="white" onload="asd();" style="margin:15px;">
+<!-- ======== START OF CLASS DATA ======== -->
+<H2>Class YAHOO.ext.grid.Grid</H2>
+<PRE>Object
+   |
+   +--<b>YAHOO.ext.grid.Grid</b>
+</PRE>
+
+
+<HR>
+<DL>
+   <!-- Class definition -->
+   <DT>class 
+   <B>YAHOO.ext.grid.Grid</B>
+   
+
+</DL>
+   
+   <P>
+   <BR/>This class represents the primary interface of a component based grid control.
+ <br><br>Usage:<pre><code>
+ var grid = new YAHOO.ext.grid.Grid('my-container-id', dataModel, columnModel);
+ // set any options
+ grid.render();
+ </code></pre>
+ <BR/><I>Defined in <a href='overview-summary-Grid.js.html'>Grid.js</a></I><BR/><BR/><B>Requires:</B><UL>- YAHOO.util.Dom<BR/>- YAHOO.util.Event<BR/>- <a href="YAHOO.util.CustomEvent.html#">YAHOO.util.CustomEvent</a><BR/>- <a href="YAHOO.ext.Element.html#">YAHOO.ext.Element</a><BR/>- <a href="YAHOO.ext.util.Browser.html#">YAHOO.ext.util.Browser</a><BR/>- <a href="YAHOO.ext.util.CSS.html#">YAHOO.ext.util.CSS</a><BR/>- <a href="YAHOO.ext.SplitBar.html#">YAHOO.ext.SplitBar</a><BR/>- <a href="YAHOO.ext.EventObject.html#">YAHOO.ext.EventObject</a></UL>
+   </P>
+   
+   <HR>
+
+<!-- ======== NESTED CLASS SUMMARY ======== -->
+
+<!-- ======== END NESTED CLASS SUMMARY ======== -->
+
+
+<!-- =========== FIELD SUMMARY =========== -->
+
+   <A NAME="field_summary"><!-- --></A>
+      <TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+         <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+            <TD COLSPAN="2" class="title-cell">Field Summary</TD></TR>
+
+   <!-- This is one instance field summary -->
+   
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+   <CODE>&nbsp;Object</CODE></FONT></TD>
+   <TD><CODE><B><A HREF="#allowTextSelectionPattern">allowTextSelectionPattern</A></B></CODE>
+   <BR>
+   &nbsp;&nbsp;A regular expression defining tagNames 
+ allowed to have text selection (Defaults to <code>/INPUT|TEXTAREA/i</code>)</TD>
+   </TR>
+   
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+   <CODE>&nbsp;Boolean</CODE></FONT></TD>
+   <TD><CODE><B><A HREF="#autoSizeColumns">autoSizeColumns</A></B></CODE>
+   <BR>
+   &nbsp;&nbsp;True to automatically resize the columns to fit their content <b>on initial render</b></TD>
+   </TR>
+   
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+   <CODE>&nbsp;Boolean</CODE></FONT></TD>
+   <TD><CODE><B><A HREF="#autoSizeHeaders">autoSizeHeaders</A></B></CODE>
+   <BR>
+   &nbsp;&nbsp;True to measure headers with column data when auto sizing columns</TD>
+   </TR>
+   
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+   <CODE>&nbsp;String</CODE></FONT></TD>
+   <TD><CODE><B><A HREF="#ddText">ddText</A></B></CODE>
+   <BR>
+   &nbsp;&nbsp;Configures the text is the drag proxy (defaults to "%0 selected row(s)").</TD>
+   </TR>
+   
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+   <CODE>&nbsp;Boolean</CODE></FONT></TD>
+   <TD><CODE><B><A HREF="#enableDragDrop">enableDragDrop</A></B></CODE>
+   <BR>
+   &nbsp;&nbsp;True to enable drag and drop of rows</TD>
+   </TR>
+   
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+   <CODE>&nbsp;Number</CODE></FONT></TD>
+   <TD><CODE><B><A HREF="#maxRowsToMeasure">maxRowsToMeasure</A></B></CODE>
+   <BR>
+   &nbsp;&nbsp;If autoSizeColumns is on, maxRowsToMeasure can be used to limit the number of
+ rows measured to get a columns size - defaults to 0 (all rows).</TD>
+   </TR>
+   
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+   <CODE>&nbsp;Number</CODE></FONT></TD>
+   <TD><CODE><B><A HREF="#minColumnWidth">minColumnWidth</A></B></CODE>
+   <BR>
+   &nbsp;&nbsp;The minimum width a column can be resized to.</TD>
+   </TR>
+   
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+   <CODE>&nbsp;Boolean</CODE></FONT></TD>
+   <TD><CODE><B><A HREF="#stripeRows">stripeRows</A></B></CODE>
+   <BR>
+   &nbsp;&nbsp;True to stripe the rows (default is true)</TD>
+   </TR>
+   
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+   <CODE>&nbsp;Boolean</CODE></FONT></TD>
+   <TD><CODE><B><A HREF="#trackMouseOver">trackMouseOver</A></B></CODE>
+   <BR>
+   &nbsp;&nbsp;True to highlight rows when the mouse is over (default is false)</TD>
+   </TR>
+   
+
+   </TABLE>
+   &nbsp;
+   
+
+   
+
+<!-- =========== END FIELD SUMMARY =========== -->
+
+
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+
+<A NAME="constructor_summary"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+  <TD COLSPAN="2" class="title-cell">
+    Constructor Summary
+  </TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD>
+      <CODE>
+	 <B>
+	    <A HREF="YAHOO.ext.grid.Grid.html#YAHOO.ext.grid.Grid()">YAHOO.ext.grid.Grid</A> 
+	 </B>
+	 (&lt;String/HTMLElement/YAHOO.ext.Element&gt; container, &lt;Object&gt; dataModel, &lt;Object&gt; colModel, &lt;<i>Object</i>&gt; selectionModel)
+      </CODE>
+      <BR>
+      &nbsp;&nbsp;
+      
+      </TD>
+</TR>
+</TABLE>
+
+<!-- ======== END CONSTRUCTOR SUMMARY ======== -->
+
+&nbsp;
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<A NAME="method_summary"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+  <TD COLSPAN="2" class="title-cell">
+    <span style="float:left">Method Summary</span>
+    <span style="float:right;font-weight:normal;font-size:8pt;">
+      <i>* Parameter types in italic indicate optional parameters</i>
+    </span>
+  </TD>
+</TR>
+
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#addListener">addListener</A></B>(&lt;String&gt; eventName, &lt;<a href="Function.html">Function</a>&gt; fn, &lt;<i>Object</i>&gt; scope, &lt;<i>boolean</i>&gt; override)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Adds a listener for one of the many defined grid events
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#autoSize">autoSize</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Causes the grid to manually recalculate it's dimensions.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#bindToField">bindToField</A></B>(fieldId)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Binds this grid to the field with the specified id.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#clearSelections">clearSelections</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Convenience method for getSelectionModel().clearSelections() - 
+ See <small><a href="YAHOO.ext.grid.DefaultSelectionModel.html#clearSelections">YAHOO.ext.grid.DefaultSelectionModel.clearSelections()</a></small> for more details.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;HTMLElement</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getCellAfter">getCellAfter</A></B>(&lt;HTMLElement&gt; cell, &lt;Boolean&gt; includeHidden)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Returns the cell that comes after the specified cell - text nodes are skipped.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;HTMLElement</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getCellBefore">getCellBefore</A></B>(&lt;HTMLElement&gt; cell, &lt;Boolean&gt; includeHidden)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Returns the cell that comes before the specified cell - text nodes are skipped.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;HTMLElement</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getCellFromChild">getCellFromChild</A></B>(&lt;HTMLElement&gt; childEl)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Returns the cell that contains the specified child element.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Object</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getColumnModel">getColumnModel</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Returns the grid's ColumnModel.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Object</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getDataModel">getDataModel</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Returns the grid's DataModel.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;String</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getDragDropText">getDragDropText</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Called to get grid's drag proxy text, by default returns this.ddText.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;HTMLElement</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getFirstCell">getFirstCell</A></B>(&lt;HTMLElement&gt; row, &lt;Boolean&gt; includeHidden)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Returns the first cell for the row - text nodes and hidden columns are skipped.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;HTMLElement</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getHeaderFromChild">getHeaderFromChild</A></B>(&lt;HTMLElement&gt; childEl)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Returns the header element that contains the specified child element.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;HTMLElement</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getLastCell">getLastCell</A></B>(&lt;HTMLElement&gt; row, &lt;Boolean&gt; includeHidden)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Returns the last cell for the row - text nodes and hidden columns are skipped.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;HTMLElement</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getRow">getRow</A></B>(index)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Returns the table row at the specified index
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;HTMLElement</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getRowAfter">getRowAfter</A></B>(&lt;HTMLElement&gt; row)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Returns the row that comes after the specified row - text nodes are skipped.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;HTMLElement</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getRowBefore">getRowBefore</A></B>(&lt;HTMLElement&gt; row)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Returns the row that comes before the specified row - text nodes are skipped.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;HTMLElement</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getRowFromChild">getRowFromChild</A></B>(&lt;HTMLElement&gt; childEl)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Returns the row that contains the specified child element.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;HtmlElement/Array</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getRowsById">getRowsById</A></B>(id)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Returns the rows that have the specified id(s).
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Object</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getSelectedRow">getSelectedRow</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Convenience method for getSelectionModel().getSelectedRows()[0] - 
+ See <small><a href="YAHOO.ext.grid.DefaultSelectionModel.html#getSelectedRows">YAHOO.ext.grid.DefaultSelectionModel.getSelectedRows()</a></small> for more details.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Object</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getSelectedRowId">getSelectedRowId</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Convenience method for getSelectionModel().getSelectedRowIds()[0] - 
+ See <small><a href="YAHOO.ext.grid.DefaultSelectionModel.html#getSelectedRowIds">YAHOO.ext.grid.DefaultSelectionModel.getSelectedRowIds()</a></small> for more details.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Object</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getSelectedRowIds">getSelectedRowIds</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Convenience method for getSelectionModel().getSelectedRowIds() - 
+ See <small><a href="YAHOO.ext.grid.DefaultSelectionModel.html#getSelectedRowIds">YAHOO.ext.grid.DefaultSelectionModel.getSelectedRowIds()</a></small> for more details.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Number</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getSelectedRowIndex">getSelectedRowIndex</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Gets the first selected row or -1 if none are selected
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Array</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getSelectedRowIndexes">getSelectedRowIndexes</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Get the selected row indexes
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Object</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getSelectedRows">getSelectedRows</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Convenience method for getSelectionModel().getSelectedRows() - 
+ See <small><a href="YAHOO.ext.grid.DefaultSelectionModel.html#getSelectedRows">YAHOO.ext.grid.DefaultSelectionModel.getSelectedRows()</a></small> for more details.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Object</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getSelectionCount">getSelectionCount</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Convenience method for getSelectionModel().getCount() - 
+ See <small><a href="YAHOO.ext.grid.DefaultSelectionModel.html#getCount">YAHOO.ext.grid.DefaultSelectionModel.getCount()</a></small> for more details.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Object</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getSelectionModel">getSelectionModel</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Returns the grid's SelectionModel.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Object</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getView">getView</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Returns the grid's GridView object.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Object</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#hasSelection">hasSelection</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Convenience method for getSelectionModel().hasSelection() - 
+ See <small><a href="YAHOO.ext.grid.DefaultSelectionModel.html#hasSelection">YAHOO.ext.grid.DefaultSelectionModel.hasSelection()</a></small> for more details.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#on">on</A></B>(eventName, fn, scope, override)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Shorthand for addListener
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#readField">readField</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Causes the grid to read and select the ids from the bound field - See <a href="#bindToField">bindToField()</a>.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#removeListener">removeListener</A></B>(eventName, fn, scope)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#render">render</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Called once after all setup has been completed and the grid is ready to be rendered.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#scrollTo">scrollTo</A></B>(&lt;Number/HTMLElement&gt; row)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Scrolls the grid to the specified row
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#selectAll">selectAll</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Convenience method for getSelectionModel().selectAll() - 
+ See <small><a href="YAHOO.ext.grid.DefaultSelectionModel.html#selectAll">YAHOO.ext.grid.DefaultSelectionModel.selectAll()</a></small> for more details.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#setCellValue">setCellValue</A></B>(value, rowIndex, colIndex)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#startEditing">startEditing</A></B>(rowIndex, colIndex)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Starts editing the specified for the specified row/column
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#stopEditing">stopEditing</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Stops any active editing
+      </TD>
+   </TR>
+
+
+</TABLE>
+
+
+
+<P>
+<!-- ========== END METHOD SUMMARY =========== -->
+
+
+<!-- ============ FIELD DETAIL START =========== -->
+
+   <A NAME="field_detail"><!-- --></A>
+   <TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+      <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+        <TD COLSPAN="1" class="title-cell">Field Detail</TD>
+      </TR>
+   </TABLE>
+
+   
+   <A NAME="allowTextSelectionPattern"><!-- --></A>
+   <H3>allowTextSelectionPattern</H3>
+   <PRE>Object&nbsp;<B>allowTextSelectionPattern</B></PRE>
+   <UL>
+   A regular expression defining tagNames 
+ allowed to have text selection (Defaults to <code>/INPUT|TEXTAREA/i</code>)
+   
+   </UL>
+   <HR>
+   
+   <A NAME="autoSizeColumns"><!-- --></A>
+   <H3>autoSizeColumns</H3>
+   <PRE>Boolean&nbsp;<B>autoSizeColumns</B></PRE>
+   <UL>
+   True to automatically resize the columns to fit their content <b>on initial render</b>
+   
+   </UL>
+   <HR>
+   
+   <A NAME="autoSizeHeaders"><!-- --></A>
+   <H3>autoSizeHeaders</H3>
+   <PRE>Boolean&nbsp;<B>autoSizeHeaders</B></PRE>
+   <UL>
+   True to measure headers with column data when auto sizing columns
+   
+   </UL>
+   <HR>
+   
+   <A NAME="ddText"><!-- --></A>
+   <H3>ddText</H3>
+   <PRE>String&nbsp;<B>ddText</B></PRE>
+   <UL>
+   Configures the text is the drag proxy (defaults to "%0 selected row(s)"). 
+ %0 is replaced with the number of selected rows.
+   
+   </UL>
+   <HR>
+   
+   <A NAME="enableDragDrop"><!-- --></A>
+   <H3>enableDragDrop</H3>
+   <PRE>Boolean&nbsp;<B>enableDragDrop</B></PRE>
+   <UL>
+   True to enable drag and drop of rows
+   
+   </UL>
+   <HR>
+   
+   <A NAME="maxRowsToMeasure"><!-- --></A>
+   <H3>maxRowsToMeasure</H3>
+   <PRE>Number&nbsp;<B>maxRowsToMeasure</B></PRE>
+   <UL>
+   If autoSizeColumns is on, maxRowsToMeasure can be used to limit the number of
+ rows measured to get a columns size - defaults to 0 (all rows).
+   
+   </UL>
+   <HR>
+   
+   <A NAME="minColumnWidth"><!-- --></A>
+   <H3>minColumnWidth</H3>
+   <PRE>Number&nbsp;<B>minColumnWidth</B></PRE>
+   <UL>
+   The minimum width a column can be resized to. (Defaults to 25)
+   
+   </UL>
+   <HR>
+   
+   <A NAME="stripeRows"><!-- --></A>
+   <H3>stripeRows</H3>
+   <PRE>Boolean&nbsp;<B>stripeRows</B></PRE>
+   <UL>
+   True to stripe the rows (default is true)
+   
+   </UL>
+   <HR>
+   
+   <A NAME="trackMouseOver"><!-- --></A>
+   <H3>trackMouseOver</H3>
+   <PRE>Boolean&nbsp;<B>trackMouseOver</B></PRE>
+   <UL>
+   True to highlight rows when the mouse is over (default is false)
+   
+   </UL>
+   <HR>
+   
+
+
+<!-- ============ FIELD DETAIL END =========== -->
+
+    <!-- ========= CONSTRUCTOR DETAIL START ======== -->
+
+<A NAME="constructor_detail"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+   <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+     <TD COLSPAN="1" class="title-cell">
+       Constructor Detail
+     </TD>
+   </TR>
+</TABLE>
+
+<A NAME="YAHOO.ext.grid.Grid()"><!-- --></A><H3>
+YAHOO.ext.grid.Grid</H3>
+<PRE><B>YAHOO.ext.grid.Grid</B>(&lt;String/HTMLElement/YAHOO.ext.Element&gt; container, &lt;Object&gt; dataModel, &lt;Object&gt; colModel, &lt;<i>Object</i>&gt; selectionModel)</PRE>
+
+
+
+
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>container</CODE> -  The element into which this grid will be rendered -   The container MUST have some type of size defined for the grid to fill. The container will be   automatically set to position relative if it isn't already.  
+     </UL>
+   
+     <UL><CODE>dataModel</CODE> -  The data model to bind to  
+     </UL>
+   
+     <UL><CODE>colModel</CODE> -  The column model with info about this grid's columns  
+     </UL>
+   
+     <UL><CODE>selectionModel</CODE> -  (optional) The selection model for this grid (defaults to DefaultSelectionModel)
+     </UL>
+   
+   
+   </UL>
+
+
+<!-- Constructor return value(s) -->
+
+<!-- End constructor return value(s) -->
+
+<!-- ADDITIONAL ATTRIBUTES -->
+
+<UL>   
+<B>Requires:</B><UL>- YAHOO.util.Dom<BR/>- YAHOO.util.Event<BR/>- <a href="YAHOO.util.CustomEvent.html#">YAHOO.util.CustomEvent</a><BR/>- <a href="YAHOO.ext.Element.html#">YAHOO.ext.Element</a><BR/>- <a href="YAHOO.ext.util.Browser.html#">YAHOO.ext.util.Browser</a><BR/>- <a href="YAHOO.ext.util.CSS.html#">YAHOO.ext.util.CSS</a><BR/>- <a href="YAHOO.ext.SplitBar.html#">YAHOO.ext.SplitBar</a><BR/>- <a href="YAHOO.ext.EventObject.html#">YAHOO.ext.EventObject</a></UL>
+</UL>
+
+<HR/>
+<!-- END ADDITIONAL ATTRIBUTES  -->
+
+<!-- ========= CONSTRUCTOR DETAIL END ======== -->
+
+
+<!-- ============ METHOD DETAIL START ========== -->
+
+<A NAME="method_detail"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+   <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+     <TD COLSPAN="1" class="title-cell">
+       Method Detail
+     </TD>
+   </TR>
+</TABLE>
+
+<!-- One single method detail entry -->
+
+   <A NAME="addListener"><!-- --></A>
+   <H3>addListener</H3>
+   <PRE>void <B>addListener</B>(&lt;String&gt; eventName, &lt;<a href="Function.html">Function</a>&gt; fn, &lt;<i>Object</i>&gt; scope, &lt;<i>boolean</i>&gt; override)</PRE>
+   
+      <UL>Adds a listener for one of the many defined grid events</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>eventName</CODE> -      The type of event to listen for  
+      </UL> 
+   
+     <UL><CODE>fn</CODE> -         The method the event invokes  
+      </UL> 
+   
+     <UL><CODE>scope</CODE> -   (optional)  An arbitrary object that will be                               passed as a parameter to the handler  
+      </UL> 
+   
+     <UL><CODE>override</CODE> -  (optional) If true, the obj passed in becomes                              the execution scope of the listener        
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="autoSize"><!-- --></A>
+   <H3>autoSize</H3>
+   <PRE>void <B>autoSize</B>()</PRE>
+   
+      <UL>Causes the grid to manually recalculate it's dimensions. Generally this is done automatically, 
+ but if manual update is required this method will initiate it.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="bindToField"><!-- --></A>
+   <H3>bindToField</H3>
+   <PRE>void <B>bindToField</B>(fieldId)</PRE>
+   
+      <UL>Binds this grid to the field with the specified id. Initially reads and parses the comma 
+ delimited ids in the field and selects those items. All selections made in the grid
+ will be persisted to the field by their ids comma delimited.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>The</CODE> -  id of the field to bind to        
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="clearSelections"><!-- --></A>
+   <H3>clearSelections</H3>
+   <PRE>void <B>clearSelections</B>()</PRE>
+   
+      <UL>Convenience method for getSelectionModel().clearSelections() - 
+ See <small><a href="YAHOO.ext.grid.DefaultSelectionModel.html#clearSelections">YAHOO.ext.grid.DefaultSelectionModel.clearSelections()</a></small> for more details.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getCellAfter"><!-- --></A>
+   <H3>getCellAfter</H3>
+   <PRE>HTMLElement <B>getCellAfter</B>(&lt;HTMLElement&gt; cell, &lt;Boolean&gt; includeHidden)</PRE>
+   
+      <UL>Returns the cell that comes after the specified cell - text nodes are skipped.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>cell</CODE> -   
+      </UL> 
+   
+     <UL><CODE>includeHidden</CODE> -   
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getCellBefore"><!-- --></A>
+   <H3>getCellBefore</H3>
+   <PRE>HTMLElement <B>getCellBefore</B>(&lt;HTMLElement&gt; cell, &lt;Boolean&gt; includeHidden)</PRE>
+   
+      <UL>Returns the cell that comes before the specified cell - text nodes are skipped.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>cell</CODE> -   
+      </UL> 
+   
+     <UL><CODE>includeHidden</CODE> -   
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getCellFromChild"><!-- --></A>
+   <H3>getCellFromChild</H3>
+   <PRE>HTMLElement <B>getCellFromChild</B>(&lt;HTMLElement&gt; childEl)</PRE>
+   
+      <UL>Returns the cell that contains the specified child element.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>childEl</CODE> -   
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getColumnModel"><!-- --></A>
+   <H3>getColumnModel</H3>
+   <PRE>Object <B>getColumnModel</B>()</PRE>
+   
+      <UL>Returns the grid's ColumnModel.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getDataModel"><!-- --></A>
+   <H3>getDataModel</H3>
+   <PRE>Object <B>getDataModel</B>()</PRE>
+   
+      <UL>Returns the grid's DataModel.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getDragDropText"><!-- --></A>
+   <H3>getDragDropText</H3>
+   <PRE>String <B>getDragDropText</B>()</PRE>
+   
+      <UL>Called to get grid's drag proxy text, by default returns this.ddText.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getFirstCell"><!-- --></A>
+   <H3>getFirstCell</H3>
+   <PRE>HTMLElement <B>getFirstCell</B>(&lt;HTMLElement&gt; row, &lt;Boolean&gt; includeHidden)</PRE>
+   
+      <UL>Returns the first cell for the row - text nodes and hidden columns are skipped.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>row</CODE> -   
+      </UL> 
+   
+     <UL><CODE>includeHidden</CODE> -   
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getHeaderFromChild"><!-- --></A>
+   <H3>getHeaderFromChild</H3>
+   <PRE>HTMLElement <B>getHeaderFromChild</B>(&lt;HTMLElement&gt; childEl)</PRE>
+   
+      <UL>Returns the header element that contains the specified child element.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>childEl</CODE> -   
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getLastCell"><!-- --></A>
+   <H3>getLastCell</H3>
+   <PRE>HTMLElement <B>getLastCell</B>(&lt;HTMLElement&gt; row, &lt;Boolean&gt; includeHidden)</PRE>
+   
+      <UL>Returns the last cell for the row - text nodes and hidden columns are skipped.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>row</CODE> -   
+      </UL> 
+   
+     <UL><CODE>includeHidden</CODE> -   
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getRow"><!-- --></A>
+   <H3>getRow</H3>
+   <PRE>HTMLElement <B>getRow</B>(index)</PRE>
+   
+      <UL>Returns the table row at the specified index</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getRowAfter"><!-- --></A>
+   <H3>getRowAfter</H3>
+   <PRE>HTMLElement <B>getRowAfter</B>(&lt;HTMLElement&gt; row)</PRE>
+   
+      <UL>Returns the row that comes after the specified row - text nodes are skipped.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>row</CODE> -   
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getRowBefore"><!-- --></A>
+   <H3>getRowBefore</H3>
+   <PRE>HTMLElement <B>getRowBefore</B>(&lt;HTMLElement&gt; row)</PRE>
+   
+      <UL>Returns the row that comes before the specified row - text nodes are skipped.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>row</CODE> -   
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getRowFromChild"><!-- --></A>
+   <H3>getRowFromChild</H3>
+   <PRE>HTMLElement <B>getRowFromChild</B>(&lt;HTMLElement&gt; childEl)</PRE>
+   
+      <UL>Returns the row that contains the specified child element.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>childEl</CODE> -   
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getRowsById"><!-- --></A>
+   <H3>getRowsById</H3>
+   <PRE>HtmlElement/Array <B>getRowsById</B>(id)</PRE>
+   
+      <UL>Returns the rows that have the specified id(s). The id value for a row is provided 
+ by the DataModel. See <a href="YAHOO.ext.grid.DefaultDataModel.html#getRowId">YAHOO.ext.grid.DefaultDataModel.getRowId()</a>.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>An</CODE> -  id to find or an array of ids  
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+   <UL>
+   <B>Returns:</B>
+        <UL>
+         If one id was passed in, it returns one result.   If an array of ids was specified, it returns an Array of HTMLElements 
+        </UL>
+   </UL>
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getSelectedRow"><!-- --></A>
+   <H3>getSelectedRow</H3>
+   <PRE>Object <B>getSelectedRow</B>()</PRE>
+   
+      <UL>Convenience method for getSelectionModel().getSelectedRows()[0] - 
+ See <small><a href="YAHOO.ext.grid.DefaultSelectionModel.html#getSelectedRows">YAHOO.ext.grid.DefaultSelectionModel.getSelectedRows()</a></small> for more details.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getSelectedRowId"><!-- --></A>
+   <H3>getSelectedRowId</H3>
+   <PRE>Object <B>getSelectedRowId</B>()</PRE>
+   
+      <UL>Convenience method for getSelectionModel().getSelectedRowIds()[0] - 
+ See <small><a href="YAHOO.ext.grid.DefaultSelectionModel.html#getSelectedRowIds">YAHOO.ext.grid.DefaultSelectionModel.getSelectedRowIds()</a></small> for more details.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getSelectedRowIds"><!-- --></A>
+   <H3>getSelectedRowIds</H3>
+   <PRE>Object <B>getSelectedRowIds</B>()</PRE>
+   
+      <UL>Convenience method for getSelectionModel().getSelectedRowIds() - 
+ See <small><a href="YAHOO.ext.grid.DefaultSelectionModel.html#getSelectedRowIds">YAHOO.ext.grid.DefaultSelectionModel.getSelectedRowIds()</a></small> for more details.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getSelectedRowIndex"><!-- --></A>
+   <H3>getSelectedRowIndex</H3>
+   <PRE>Number <B>getSelectedRowIndex</B>()</PRE>
+   
+      <UL>Gets the first selected row or -1 if none are selected</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getSelectedRowIndexes"><!-- --></A>
+   <H3>getSelectedRowIndexes</H3>
+   <PRE>Array <B>getSelectedRowIndexes</B>()</PRE>
+   
+      <UL>Get the selected row indexes</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+   <UL>
+   <B>Returns:</B>
+        <UL>
+         Array of indexes 
+        </UL>
+   </UL>
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getSelectedRows"><!-- --></A>
+   <H3>getSelectedRows</H3>
+   <PRE>Object <B>getSelectedRows</B>()</PRE>
+   
+      <UL>Convenience method for getSelectionModel().getSelectedRows() - 
+ See <small><a href="YAHOO.ext.grid.DefaultSelectionModel.html#getSelectedRows">YAHOO.ext.grid.DefaultSelectionModel.getSelectedRows()</a></small> for more details.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getSelectionCount"><!-- --></A>
+   <H3>getSelectionCount</H3>
+   <PRE>Object <B>getSelectionCount</B>()</PRE>
+   
+      <UL>Convenience method for getSelectionModel().getCount() - 
+ See <small><a href="YAHOO.ext.grid.DefaultSelectionModel.html#getCount">YAHOO.ext.grid.DefaultSelectionModel.getCount()</a></small> for more details.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getSelectionModel"><!-- --></A>
+   <H3>getSelectionModel</H3>
+   <PRE>Object <B>getSelectionModel</B>()</PRE>
+   
+      <UL>Returns the grid's SelectionModel.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getView"><!-- --></A>
+   <H3>getView</H3>
+   <PRE>Object <B>getView</B>()</PRE>
+   
+      <UL>Returns the grid's GridView object.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="hasSelection"><!-- --></A>
+   <H3>hasSelection</H3>
+   <PRE>Object <B>hasSelection</B>()</PRE>
+   
+      <UL>Convenience method for getSelectionModel().hasSelection() - 
+ See <small><a href="YAHOO.ext.grid.DefaultSelectionModel.html#hasSelection">YAHOO.ext.grid.DefaultSelectionModel.hasSelection()</a></small> for more details.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="on"><!-- --></A>
+   <H3>on</H3>
+   <PRE>void <B>on</B>(eventName, fn, scope, override)</PRE>
+   
+      <UL>Shorthand for addListener</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="readField"><!-- --></A>
+   <H3>readField</H3>
+   <PRE>void <B>readField</B>()</PRE>
+   
+      <UL>Causes the grid to read and select the ids from the bound field - See <a href="#bindToField">bindToField()</a>.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="removeListener"><!-- --></A>
+   <H3>removeListener</H3>
+   <PRE>void <B>removeListener</B>(eventName, fn, scope)</PRE>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="render"><!-- --></A>
+   <H3>render</H3>
+   <PRE>void <B>render</B>()</PRE>
+   
+      <UL>Called once after all setup has been completed and the grid is ready to be rendered.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="scrollTo"><!-- --></A>
+   <H3>scrollTo</H3>
+   <PRE>void <B>scrollTo</B>(&lt;Number/HTMLElement&gt; row)</PRE>
+   
+      <UL>Scrolls the grid to the specified row</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>row</CODE> -  The row object or index of the row        
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="selectAll"><!-- --></A>
+   <H3>selectAll</H3>
+   <PRE>void <B>selectAll</B>()</PRE>
+   
+      <UL>Convenience method for getSelectionModel().selectAll() - 
+ See <small><a href="YAHOO.ext.grid.DefaultSelectionModel.html#selectAll">YAHOO.ext.grid.DefaultSelectionModel.selectAll()</a></small> for more details.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="setCellValue"><!-- --></A>
+   <H3>setCellValue</H3>
+   <PRE>void <B>setCellValue</B>(value, rowIndex, colIndex)</PRE>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="startEditing"><!-- --></A>
+   <H3>startEditing</H3>
+   <PRE>void <B>startEditing</B>(rowIndex, colIndex)</PRE>
+   
+      <UL>Starts editing the specified for the specified row/column</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="stopEditing"><!-- --></A>
+   <H3>stopEditing</H3>
+   <PRE>void <B>stopEditing</B>()</PRE>
+   
+      <UL>Stops any active editing</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+
+
+<!-- ============ METHOD DETAIL END ========== -->
+
+<!-- ========= END OF CLASS DATA ========= -->
+
+<HR>
+<FONT SIZE="-1">
+
+</FONT>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat Oct 14 06:07:10 2006</div>
+</BODY>
+</HTML>

@@ -1,0 +1,150 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Frameset//EN""http://www.w3.org/TR/REC-html40/frameset.dtd">
+<html>
+<head>
+<title>
+ Overview
+</title>
+<link rel ="stylesheet" type="text/css" href="stylesheet.css" title="Style">
+<script>
+function asd() {
+	
+		parent.document.title="CellEditor.js Overview";
+	
+}
+</script>
+</head>
+<body bgcolor="white" onload="asd();" style="margin:15px;">
+<center>
+	
+	   <h2>CellEditor.js</h2>
+	
+</center>
+
+	
+
+
+<h4>Summary</h4>
+<p>
+	
+		
+	
+</p>
+
+
+    <table border="1" cellpadding="3" cellspacing="0" width="100%">
+    <tr bgcolor="#CCCCFF" class="TableHeadingColor">
+    <td colspan="2" class="title-cell">
+    
+        <b>Class Summary</b>
+    
+    </td>
+    </tr>
+    
+    <tr bgcolor="white" class="TableRowColor">
+    <td width="15%"><b><a href="YAHOO.ext.grid.CellEditor.html">YAHOO.ext.grid.CellEditor</a></b></td>
+    <td>&nbsp;</td>
+    </tr>
+    
+    </table>
+   <hr/> 
+
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<!-- ========== END METHOD SUMMARY =========== -->
+
+
+        <pre class="sourceview">YAHOO.ext.grid.CellEditor = <span class="reserved">function</span>(element){
+    <span class="reserved">this</span>.colIndex = null;
+    <span class="reserved">this</span>.rowIndex = null;
+    <span class="reserved">this</span>.grid = null;
+    <span class="reserved">this</span>.editing = false;
+    <span class="reserved">this</span>.originalValue = null;
+    <span class="reserved">this</span>.element = getEl(element, true);
+    <span class="reserved">this</span>.element.addClass(<span class="literal">'ygrid-editor'</span>);
+    <span class="reserved">this</span>.element.dom.tabIndex = 1;
+    <span class="reserved">this</span>.initialized = false;
+    <span class="reserved">this</span>.callback = null;
+};
+
+YAHOO.ext.grid.CellEditor.<span class="reserved">prototype</span> = {
+    init : <span class="reserved">function</span>(grid, bodyElement, callback){
+        <span class="comment">// there's no way for the grid to know if multiple columns </span>
+        <span class="comment">// share the same editor so it will try to initialize the </span>
+        <span class="comment">// same one over and over</span>
+        <span class="reserved">if</span>(<span class="reserved">this</span>.initialized) <span class="reserved">return</span>;
+        <span class="reserved">this</span>.initialized = true;
+        <span class="reserved">this</span>.callback = callback;
+        <span class="reserved">this</span>.grid = grid;
+        bodyElement.appendChild(<span class="reserved">this</span>.element.dom);
+        <span class="reserved">this</span>.initEvents();
+    },
+    
+    initEvents : <span class="reserved">function</span>(){
+        var stopOnEnter = <span class="reserved">function</span>(e){
+            <span class="reserved">if</span>(e.browserEvent.keyCode == e.RETURN){
+                <span class="reserved">this</span>.stopEditing(true);
+            }
+        }
+        <span class="reserved">this</span>.element.mon(<span class="literal">'keydown'</span>, stopOnEnter, <span class="reserved">this</span>, true);
+        <span class="reserved">this</span>.element.on(<span class="literal">'blur'</span>, <span class="reserved">this</span>.stopEditing, <span class="reserved">this</span>, true);
+    },
+
+    startEditing : <span class="reserved">function</span>(value, row, cell){
+        <span class="reserved">this</span>.originalValue = value;
+        <span class="reserved">this</span>.rowIndex = row.rowIndex;
+        <span class="reserved">this</span>.colIndex = cell.columnIndex;
+        <span class="reserved">this</span>.cell = cell;
+        <span class="reserved">this</span>.setValue(value);
+        var cellbox = getEl(cell, true).getBox();
+        <span class="reserved">this</span>.fitToCell(cellbox);
+        <span class="reserved">this</span>.editing = true;
+        <span class="reserved">this</span>.show();
+    },
+     
+    stopEditing : <span class="reserved">function</span>(focusCell){
+         <span class="reserved">if</span>(<span class="reserved">this</span>.editing){
+             <span class="reserved">this</span>.editing = false;
+             var newValue = <span class="reserved">this</span>.getValue();
+             <span class="reserved">this</span>.hide();
+             <span class="comment">//if(focusCell){try{this.cell.focus();}catch(e){}}; // try to give the cell focus so keyboard nav still works</span>
+             <span class="reserved">if</span>(<span class="reserved">this</span>.originalValue != newValue){
+                <span class="reserved">this</span>.callback(newValue, <span class="reserved">this</span>.rowIndex, <span class="reserved">this</span>.colIndex);
+             }
+         }
+     },
+     
+    setValue : <span class="reserved">function</span>(value){
+        <span class="reserved">this</span>.element.dom.value = value;
+    },
+    
+    getValue : <span class="reserved">function</span>(){
+        <span class="reserved">return</span> <span class="reserved">this</span>.element.dom.value;
+    },
+    
+    fitToCell : <span class="reserved">function</span>(box){
+        <span class="reserved">this</span>.element.setBox(box, true);
+    },
+    
+    show : <span class="reserved">function</span>(){
+        <span class="reserved">this</span>.element.show();
+        <span class="reserved">this</span>.element.focus();
+    },
+    
+    hide : <span class="reserved">function</span>(){
+        try{
+            <span class="reserved">this</span>.element.dom.blur();
+        }catch(e){}
+        <span class="reserved">this</span>.element.hide();
+    }
+};</pre>
+	<hr>
+
+
+<hr>
+<font size="-1">
+
+</font>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat Oct 14 06:07:10 2006</div>
+</body>
+</html>

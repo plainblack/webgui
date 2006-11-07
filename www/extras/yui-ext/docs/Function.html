@@ -1,0 +1,335 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN""http://www.w3.org/TR/REC-html40/loose.dtd">
+<!--NewPage-->
+<HTML>
+<HEAD>
+<TITLE>
+Function
+</TITLE>
+<LINK REL ="stylesheet" TYPE="text/css" HREF="stylesheet.css" TITLE="Style">
+</HEAD>
+<SCRIPT>
+function asd()
+{
+parent.document.title="Function";
+}
+</SCRIPT>
+<BODY BGCOLOR="white" onload="asd();" style="margin:15px;">
+<!-- ======== START OF CLASS DATA ======== -->
+<H2>Class Function</H2>
+<PRE>Object
+   |
+   +--<b>Function</b>
+</PRE>
+
+
+<HR>
+<DL>
+   <!-- Class definition -->
+   <DT>class 
+   <B>Function</B>
+   
+
+</DL>
+   
+   <HR>
+
+<!-- ======== NESTED CLASS SUMMARY ======== -->
+
+<!-- ======== END NESTED CLASS SUMMARY ======== -->
+
+
+<!-- =========== FIELD SUMMARY =========== -->
+
+
+   
+
+<!-- =========== END FIELD SUMMARY =========== -->
+
+
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+
+<!-- ======== END CONSTRUCTOR SUMMARY ======== -->
+
+&nbsp;
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<A NAME="method_summary"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+  <TD COLSPAN="2" class="title-cell">
+    <span style="float:left">Method Summary</span>
+    <span style="float:right;font-weight:normal;font-size:8pt;">
+      <i>* Parameter types in italic indicate optional parameters</i>
+    </span>
+  </TD>
+</TR>
+
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;<a href="Function.html">Function</a></CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#createCallback">createCallback</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Creates a callback that passes arguments[0], arguments[1], arguments[2], ...
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;<a href="Function.html">Function</a></CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#createDelegate">createDelegate</A></B>(&lt;Object&gt; obj, &lt;<i>Array</i>&gt; args, &lt;<i>Boolean</i>&gt; appendArgs)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Creates a delegate (callback) that sets the scope to obj.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;<a href="Function.html">Function</a></CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#createInterceptor">createInterceptor</A></B>(&lt;<a href="Function.html">Function</a>&gt; fcn, &lt;<i>Object</i>&gt; scope)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Creates an interceptor function.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;<a href="Function.html">Function</a></CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#createSequence">createSequence</A></B>(&lt;<a href="Function.html">Function</a>&gt; fcn, &lt;<i>Object</i>&gt; scope)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Create a combined function call sequence of the original function + the passed function.
+      </TD>
+   </TR>
+
+
+</TABLE>
+
+
+
+<P>
+<!-- ========== END METHOD SUMMARY =========== -->
+
+
+<!-- ============ FIELD DETAIL START =========== -->
+
+
+<!-- ============ FIELD DETAIL END =========== -->
+
+    <!-- ========= CONSTRUCTOR DETAIL START ======== -->
+
+
+<!-- Constructor return value(s) -->
+
+<!-- End constructor return value(s) -->
+
+<!-- ADDITIONAL ATTRIBUTES -->
+
+<HR/>
+<!-- END ADDITIONAL ATTRIBUTES  -->
+
+<!-- ========= CONSTRUCTOR DETAIL END ======== -->
+
+
+<!-- ============ METHOD DETAIL START ========== -->
+
+<A NAME="method_detail"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+   <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+     <TD COLSPAN="1" class="title-cell">
+       Method Detail
+     </TD>
+   </TR>
+</TABLE>
+
+<!-- One single method detail entry -->
+
+   <A NAME="createCallback"><!-- --></A>
+   <H3>createCallback</H3>
+   <PRE><a href="Function.html">Function</a> <B>createCallback</B>()</PRE>
+   
+      <UL>Creates a callback that passes arguments[0], arguments[1], arguments[2], ...
+ Call directly on any function. Example: <code>myFunction.createCallback(myarg, myarg2)</code>
+ Will create a function that is bound to those 2 args.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+   <UL>
+   <B>Returns:</B>
+        <UL>
+         The new function 
+        </UL>
+   </UL>
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="createDelegate"><!-- --></A>
+   <H3>createDelegate</H3>
+   <PRE><a href="Function.html">Function</a> <B>createDelegate</B>(&lt;Object&gt; obj, &lt;<i>Array</i>&gt; args, &lt;<i>Boolean</i>&gt; appendArgs)</PRE>
+   
+      <UL>Creates a delegate (callback) that sets the scope to obj.
+ Call directly on any function. Example: <code>this.myFunction.createDelegate(this)</code>
+ Will create a function that is automatically scoped to this.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>obj</CODE> -  The object for which the scope is set  
+      </UL> 
+   
+     <UL><CODE>args</CODE> -  (optional) Overrides arguments for the call. (Defaults to the arguments passed by the caller)  
+      </UL> 
+   
+     <UL><CODE>appendArgs</CODE> -  (optional) if True args are appended to call args instead of overriding  
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+   <UL>
+   <B>Returns:</B>
+        <UL>
+         The new function 
+        </UL>
+   </UL>
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="createInterceptor"><!-- --></A>
+   <H3>createInterceptor</H3>
+   <PRE><a href="Function.html">Function</a> <B>createInterceptor</B>(&lt;<a href="Function.html">Function</a>&gt; fcn, &lt;<i>Object</i>&gt; scope)</PRE>
+   
+      <UL>Creates an interceptor function. The passed fcn is called before the original one. If it returns false, the original one is not called.
+ The resulting function returns the results of the original function.
+ The passed fcn is called with the parameters of the original function.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>fcn</CODE> -  The function to call before the original  
+      </UL> 
+   
+     <UL><CODE>scope</CODE> -  (optional) The scope of the passed fcn (Defaults to scope of original function or window)  
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+   <UL>
+   <B>Returns:</B>
+        <UL>
+         The new function 
+        </UL>
+   </UL>
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="createSequence"><!-- --></A>
+   <H3>createSequence</H3>
+   <PRE><a href="Function.html">Function</a> <B>createSequence</B>(&lt;<a href="Function.html">Function</a>&gt; fcn, &lt;<i>Object</i>&gt; scope)</PRE>
+   
+      <UL>Create a combined function call sequence of the original function + the passed function.
+ The resulting function returns the results of the original function.
+ The passed fcn is called with the parameters of the original function</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>fcn</CODE> -  The function to sequence  
+      </UL> 
+   
+     <UL><CODE>scope</CODE> -  (optional) The scope of the passed fcn (Defaults to scope of original function or window)  
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+   <UL>
+   <B>Returns:</B>
+        <UL>
+         The new function 
+        </UL>
+   </UL>
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+
+
+<!-- ============ METHOD DETAIL END ========== -->
+
+<!-- ========= END OF CLASS DATA ========= -->
+
+<HR>
+<FONT SIZE="-1">
+
+</FONT>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat Oct 14 06:07:10 2006</div>
+</BODY>
+</HTML>

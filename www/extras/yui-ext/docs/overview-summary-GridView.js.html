@@ -1,0 +1,846 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Frameset//EN""http://www.w3.org/TR/REC-html40/frameset.dtd">
+<html>
+<head>
+<title>
+ Overview
+</title>
+<link rel ="stylesheet" type="text/css" href="stylesheet.css" title="Style">
+<script>
+function asd() {
+	
+		parent.document.title="GridView.js Overview";
+	
+}
+</script>
+</head>
+<body bgcolor="white" onload="asd();" style="margin:15px;">
+<center>
+	
+	   <h2>GridView.js</h2>
+	
+</center>
+
+	
+
+
+<h4>Summary</h4>
+<p>
+	
+		
+	
+</p>
+
+
+    <table border="1" cellpadding="3" cellspacing="0" width="100%">
+    <tr bgcolor="#CCCCFF" class="TableHeadingColor">
+    <td colspan="2" class="title-cell">
+    
+        <b>Class Summary</b>
+    
+    </td>
+    </tr>
+    
+    <tr bgcolor="white" class="TableRowColor">
+    <td width="15%"><b><a href="YAHOO.ext.grid.GridView.html">YAHOO.ext.grid.GridView</a></b></td>
+    <td>Default UI code used internally by the Grid.</td>
+    </tr>
+    
+    <tr bgcolor="white" class="TableRowColor">
+    <td width="15%"><b><a href="YAHOO.ext.grid.HeaderController.html">YAHOO.ext.grid.HeaderController</a></b></td>
+    <td>Used internal by GridView to route header related events.</td>
+    </tr>
+    
+    </table>
+   <hr/> 
+
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<!-- ========== END METHOD SUMMARY =========== -->
+
+
+        <pre class="sourceview"><span class="comment">/**
+ * <span class="attrib">@class</span>
+ * Default UI code used internally by the Grid. Documentation to come.
+ * <span class="attrib">@constructor</span>
+ */</span>
+YAHOO.ext.grid.GridView = <span class="reserved">function</span>(){
+	<span class="comment">/** <span class="attrib">@private</span> */</span>
+	<span class="reserved">this</span>.grid = null;
+	
+	<span class="comment">/** <span class="attrib">@private</span> */</span>
+	<span class="reserved">this</span>.lastFocusedRow = null;
+	<span class="comment">/**
+	 * Fires when the ViewPort is scrolled - fireDirect sig: (this, scrollLeft, scrollTop)
+	 * <span class="attrib">@type</span> YAHOO.util.CustomEvent
+	 * <span class="attrib">@deprecated</span>
+	 */</span>
+	<span class="reserved">this</span>.onScroll = new YAHOO.util.CustomEvent(<span class="literal">'onscroll'</span>);
+	
+	<span class="comment">/**
+	 * <span class="attrib">@private</span>
+	 */</span>
+	<span class="reserved">this</span>.adjustScrollTask = new YAHOO.ext.util.DelayedTask(<span class="reserved">this</span>._adjustForScroll, <span class="reserved">this</span>);
+	<span class="comment">/**
+	 * <span class="attrib">@private</span>
+	 */</span>
+	<span class="reserved">this</span>.ensureVisibleTask = new YAHOO.ext.util.DelayedTask();
+};
+
+YAHOO.ext.grid.GridView.<span class="reserved">prototype</span> = {
+	init: <span class="reserved">function</span>(grid){
+		<span class="reserved">this</span>.grid = grid;
+	},
+	
+	fireScroll: <span class="reserved">function</span>(scrollLeft, scrollTop){
+		<span class="reserved">this</span>.onScroll.fireDirect(<span class="reserved">this</span>.grid, scrollLeft, scrollTop);
+	},
+	
+	<span class="comment">/**
+	 * Utility method that gets an array of the cell renderers
+	 */</span>
+	getColumnRenderers : <span class="reserved">function</span>(){
+    	var renderers = [];
+    	var cm = <span class="reserved">this</span>.grid.colModel;
+        var colCount = cm.getColumnCount();
+        <span class="reserved">for</span>(var i = 0; i &lt; colCount; i++){
+            renderers.push(cm.getRenderer(i));
+        }
+        <span class="reserved">return</span> renderers;
+    },
+    
+    buildIndexMap : <span class="reserved">function</span>(){
+        var colToData = {};
+        var dataToCol = {};
+        var cm = <span class="reserved">this</span>.grid.colModel;
+        <span class="reserved">for</span>(var i = 0, len = cm.getColumnCount(); i &lt; len; i++){
+            var di = cm.getDataIndex(i);
+            colToData[i] = di;
+            dataToCol[di] = i;
+        }
+        <span class="reserved">return</span> {<span class="literal">'colToData'</span>: colToData, <span class="literal">'dataToCol'</span>: dataToCol};
+    },
+    
+    getDataIndexes : <span class="reserved">function</span>(){
+    	<span class="reserved">if</span>(!<span class="reserved">this</span>.indexMap){
+            <span class="reserved">this</span>.indexMap = <span class="reserved">this</span>.buildIndexMap();
+        }
+        <span class="reserved">return</span> <span class="reserved">this</span>.indexMap.colToData;
+    },
+    
+    getColumnIndexByDataIndex : <span class="reserved">function</span>(dataIndex){
+        <span class="reserved">if</span>(!<span class="reserved">this</span>.indexMap){
+            <span class="reserved">this</span>.indexMap = <span class="reserved">this</span>.buildIndexMap();
+        }
+    	<span class="reserved">return</span> <span class="reserved">this</span>.indexMap.dataToCol[dataIndex];
+    },
+    
+    updateHeaders : <span class="reserved">function</span>(){
+        var colModel = <span class="reserved">this</span>.grid.colModel;
+        var hcells = <span class="reserved">this</span>.headers;
+        var colCount = colModel.getColumnCount();
+        <span class="reserved">for</span>(var i = 0; i &lt; colCount; i++){
+            hcells[i].textNode.innerHTML = colModel.getColumnHeader(i);
+        }
+    },
+    
+    adjustForScroll : <span class="reserved">function</span>(disableDelay){
+        <span class="reserved">if</span>(!disableDelay){
+            <span class="reserved">this</span>.adjustScrollTask.delay(50);
+        }<span class="reserved">else</span>{
+            <span class="reserved">this</span>._adjustForScroll();
+        }
+    },
+    
+    getCellAtPoint : <span class="reserved">function</span>(x, y){
+        var colIndex = null;        
+        var rowIndex = null;
+        
+        <span class="comment">// translate page coordinates to local coordinates</span>
+        var xy = YAHOO.util.Dom.getXY(<span class="reserved">this</span>.wrap);
+        x = (x - xy[0]) + <span class="reserved">this</span>.wrap.scrollLeft;
+        y = (y - xy[1]) + <span class="reserved">this</span>.wrap.scrollTop;
+        
+        var colModel = <span class="reserved">this</span>.grid.colModel;
+        var pos = 0;
+        var colCount = colModel.getColumnCount();
+        <span class="reserved">for</span>(var i = 0; i &lt; colCount; i++){
+            <span class="reserved">if</span>(colModel.isHidden(i)) continue;
+            var width = colModel.getColumnWidth(i);
+            <span class="reserved">if</span>(x &gt;= pos &amp;&amp; x &lt; pos+width){
+                colIndex = i;
+                break;
+            }
+            pos += width;
+        }
+        <span class="reserved">if</span>(colIndex != null){
+            rowIndex = (y == 0 ? 0 : Math.floor(y / <span class="reserved">this</span>.getRowHeight()));
+            <span class="reserved">if</span>(rowIndex &gt;= <span class="reserved">this</span>.grid.dataModel.getRowCount()){
+                <span class="reserved">return</span> null;
+            }
+            <span class="reserved">return</span> [colIndex, rowIndex];
+        }
+        <span class="reserved">return</span> null;
+    },
+    
+    <span class="comment">/** <span class="attrib">@private</span> */</span>
+    _adjustForScroll : <span class="reserved">function</span>(){
+        <span class="reserved">this</span>.forceScrollUpdate();
+        <span class="reserved">if</span>(<span class="reserved">this</span>.scrollbarMode == YAHOO.ext.grid.GridView.SCROLLBARS_OVERLAP){
+            var adjustment = 0;
+            <span class="reserved">if</span>(<span class="reserved">this</span>.wrap.clientWidth &amp;&amp; <span class="reserved">this</span>.wrap.clientWidth != 0){
+                adjustment = <span class="reserved">this</span>.wrap.offsetWidth - <span class="reserved">this</span>.wrap.clientWidth;
+            }
+            <span class="reserved">this</span>.hwrap.setWidth(<span class="reserved">this</span>.wrap.offsetWidth-adjustment);
+        }<span class="reserved">else</span>{
+            <span class="reserved">this</span>.hwrap.setWidth(<span class="reserved">this</span>.wrap.offsetWidth);
+        }
+        <span class="reserved">this</span>.bwrap.setWidth(Math.max(<span class="reserved">this</span>.grid.colModel.getTotalWidth(), <span class="reserved">this</span>.wrap.clientWidth));
+    },
+
+    focusRow : <span class="reserved">function</span>(row){
+        <span class="reserved">if</span>(typeof row == <span class="literal">'number'</span>){
+            row = <span class="reserved">this</span>.getBodyTable().childNodes[row];
+        }
+        <span class="reserved">if</span>(!row) <span class="reserved">return</span>;
+    	var left = <span class="reserved">this</span>.wrap.scrollLeft;
+    	try{ <span class="comment">// try catch for IE occasional focus bug</span>
+    	    row.childNodes.item(0).hideFocus = true;
+        	row.childNodes.item(0).focus();
+        }catch(e){}
+        <span class="reserved">this</span>.ensureVisible(row);
+        <span class="reserved">this</span>.wrap.scrollLeft = left;
+        <span class="reserved">this</span>.handleScroll();
+        <span class="reserved">this</span>.lastFocusedRow = row;
+    },
+
+    ensureVisible : <span class="reserved">function</span>(row, disableDelay){
+        <span class="reserved">if</span>(!disableDelay){
+            <span class="reserved">this</span>.ensureVisibleTask.delay(50, <span class="reserved">this</span>._ensureVisible, <span class="reserved">this</span>, [row]);
+        }<span class="reserved">else</span>{
+            <span class="reserved">this</span>._ensureVisible(row);
+        }
+    },
+
+    <span class="comment">/** <span class="attrib">@ignore</span> */</span>
+    _ensureVisible : <span class="reserved">function</span>(row){
+        <span class="reserved">if</span>(typeof row == <span class="literal">'number'</span>){
+            row = <span class="reserved">this</span>.getBodyTable().childNodes[row];
+        }
+        <span class="reserved">if</span>(!row) <span class="reserved">return</span>;
+    	var left = <span class="reserved">this</span>.wrap.scrollLeft;
+    	var rowTop = parseInt(row.offsetTop, 10); <span class="comment">// parseInt for safari bug</span>
+        var rowBottom = rowTop + row.offsetHeight;
+        var clientTop = parseInt(<span class="reserved">this</span>.wrap.scrollTop, 10); <span class="comment">// parseInt for safari bug</span>
+        var clientBottom = clientTop + <span class="reserved">this</span>.wrap.clientHeight;
+        <span class="reserved">if</span>(rowTop &lt; clientTop){
+        	<span class="reserved">this</span>.wrap.scrollTop = rowTop;
+        }<span class="reserved">else</span> <span class="reserved">if</span>(rowBottom &gt; clientBottom){
+            <span class="reserved">this</span>.wrap.scrollTop = rowBottom-<span class="reserved">this</span>.wrap.clientHeight;
+        }
+        <span class="reserved">this</span>.wrap.scrollLeft = left;
+        <span class="reserved">this</span>.handleScroll();
+    },
+    
+    updateColumns : <span class="reserved">function</span>(){
+        <span class="reserved">this</span>.grid.stopEditing();
+        var colModel = <span class="reserved">this</span>.grid.colModel;
+        var hcols = <span class="reserved">this</span>.headers;
+        var colCount = colModel.getColumnCount();
+        var pos = 0;
+        var totalWidth = colModel.getTotalWidth();
+        <span class="reserved">for</span>(var i = 0; i &lt; colCount; i++){
+            <span class="reserved">if</span>(colModel.isHidden(i)) continue;
+            var width = colModel.getColumnWidth(i);
+            hcols[i].style.width = width + <span class="literal">'px'</span>;
+            hcols[i].style.left = pos + <span class="literal">'px'</span>;
+            hcols[i].split.style.left = (pos+width-3) + <span class="literal">'px'</span>;
+            <span class="reserved">this</span>.setCSSWidth(i, width, pos);
+            pos += width;
+        }
+        <span class="reserved">this</span>.lastWidth = totalWidth;
+        <span class="reserved">this</span>.bwrap.setWidth(Math.max(totalWidth, <span class="reserved">this</span>.wrap.clientWidth));
+        <span class="reserved">if</span>(!YAHOO.ext.util.Browser.isIE){ <span class="comment">// fix scrolling prob in gecko and opera</span>
+        	<span class="reserved">this</span>.wrap.scrollLeft = <span class="reserved">this</span>.hwrap.dom.scrollLeft;
+        }
+        <span class="reserved">this</span>.syncScroll();
+        <span class="reserved">this</span>.forceScrollUpdate();
+    },
+    
+    setCSSWidth : <span class="reserved">function</span>(colIndex, width, pos){
+        var selector = [<span class="literal">"#"</span> + <span class="reserved">this</span>.grid.id + <span class="literal">" .ygrid-col-"</span> + colIndex, <span class="literal">".ygrid-col-"</span> + colIndex];
+        YAHOO.ext.util.CSS.updateRule(selector, <span class="literal">'width'</span>, width + <span class="literal">'px'</span>);
+        <span class="reserved">if</span>(typeof pos == <span class="literal">'number'</span>){
+            YAHOO.ext.util.CSS.updateRule(selector, <span class="literal">'left'</span>, pos + <span class="literal">'px'</span>);
+        }
+    },
+    
+    handleHiddenChange : <span class="reserved">function</span>(colModel, colIndex, hidden){
+        <span class="reserved">if</span>(hidden){
+            <span class="reserved">this</span>.hideColumn(colIndex);
+        }<span class="reserved">else</span>{
+            <span class="reserved">this</span>.unhideColumn(colIndex);
+        }
+        <span class="reserved">this</span>.updateColumns();
+    },
+    
+    hideColumn : <span class="reserved">function</span>(colIndex){
+        var selector = [<span class="literal">"#"</span> + <span class="reserved">this</span>.grid.id + <span class="literal">" .ygrid-col-"</span> + colIndex, <span class="literal">".ygrid-col-"</span> + colIndex];
+        YAHOO.ext.util.CSS.updateRule(selector, <span class="literal">'position'</span>, <span class="literal">'absolute'</span>);
+        YAHOO.ext.util.CSS.updateRule(selector, <span class="literal">'visibility'</span>, <span class="literal">'hidden'</span>);
+        
+        <span class="reserved">this</span>.headers[colIndex].style.display = <span class="literal">'none'</span>;
+        <span class="reserved">this</span>.headers[colIndex].split.style.display = <span class="literal">'none'</span>;
+    },
+    
+    unhideColumn : <span class="reserved">function</span>(colIndex){
+        var selector = [<span class="literal">"#"</span> + <span class="reserved">this</span>.grid.id + <span class="literal">" .ygrid-col-"</span> + colIndex, <span class="literal">".ygrid-col-"</span> + colIndex];
+        YAHOO.ext.util.CSS.updateRule(selector, <span class="literal">'position'</span>, <span class="literal">''</span>);
+        YAHOO.ext.util.CSS.updateRule(selector, <span class="literal">'visibility'</span>, <span class="literal">'visible'</span>);
+        
+        <span class="reserved">this</span>.headers[colIndex].style.display = <span class="literal">''</span>;
+        <span class="reserved">this</span>.headers[colIndex].split.style.display = <span class="literal">''</span>;
+    },
+    
+    getBodyTable : <span class="reserved">function</span>(){
+    	<span class="reserved">return</span> <span class="reserved">this</span>.bwrap.dom;
+    },
+    
+    updateRowIndexes : <span class="reserved">function</span>(firstRow, lastRow){
+        var stripeRows = <span class="reserved">this</span>.grid.stripeRows;
+        var bt = <span class="reserved">this</span>.getBodyTable();
+        var nodes = bt.childNodes;
+        firstRow = firstRow || 0;
+        lastRow = lastRow || nodes.length-1;
+        var re = /^(?:ygrid-row ygrid-row-alt|ygrid-row)/;
+        <span class="reserved">for</span>(var rowIndex = firstRow; rowIndex &lt;= lastRow; rowIndex++){
+            var node = nodes[rowIndex];
+            <span class="reserved">if</span>(stripeRows &amp;&amp; (rowIndex+1) % 2 == 0){
+        		node.className = node.className.replace(re, <span class="literal">'ygrid-row ygrid-row-alt'</span>);
+        	}<span class="reserved">else</span>{
+        		node.className = node.className.replace(re, <span class="literal">'ygrid-row'</span>);
+        	}
+            node.rowIndex = rowIndex;
+            nodes[rowIndex].style.top = (rowIndex * <span class="reserved">this</span>.rowHeight) + <span class="literal">'px'</span>;
+        }
+    },
+
+    insertRows : <span class="reserved">function</span>(dataModel, firstRow, lastRow){
+        <span class="reserved">this</span>.updateBodyHeight();
+        <span class="reserved">this</span>.adjustForScroll(true);
+        var renderers = <span class="reserved">this</span>.getColumnRenderers();
+        var dindexes = <span class="reserved">this</span>.getDataIndexes();
+        var colCount = <span class="reserved">this</span>.grid.colModel.getColumnCount();
+        var beforeRow = null;
+        var bt = <span class="reserved">this</span>.getBodyTable();
+        <span class="reserved">if</span>(firstRow &lt; bt.childNodes.length){
+            beforeRow = bt.childNodes[firstRow];
+        }
+        <span class="reserved">for</span>(var rowIndex = firstRow; rowIndex &lt;= lastRow; rowIndex++){
+            var row = document.createElement(<span class="literal">'span'</span>);
+            row.className = <span class="literal">'ygrid-row'</span>;
+            row.style.top = (rowIndex * <span class="reserved">this</span>.rowHeight) + <span class="literal">'px'</span>;
+            <span class="reserved">this</span>.renderRow(dataModel, row, rowIndex, colCount, renderers, dindexes);
+            <span class="reserved">if</span>(beforeRow){
+            	bt.insertBefore(row, beforeRow);
+            }<span class="reserved">else</span>{
+                bt.appendChild(row);
+            }
+        }
+        <span class="reserved">this</span>.updateRowIndexes(firstRow);
+        <span class="reserved">this</span>.adjustForScroll();
+    },
+    
+    renderRow : <span class="reserved">function</span>(dataModel, row, rowIndex, colCount, renderers, dindexes){
+        <span class="reserved">for</span>(var colIndex = 0; colIndex &lt; colCount; colIndex++){
+            var td = document.createElement(<span class="literal">'span'</span>);
+            td.className = <span class="literal">'ygrid-col ygrid-col-'</span> + colIndex + (colIndex == colCount-1 ? <span class="literal">' ygrid-col-last'</span> : <span class="literal">''</span>);
+            td.columnIndex = colIndex;
+            td.tabIndex = 0;
+            var span = document.createElement(<span class="literal">'span'</span>);
+            span.className = <span class="literal">'ygrid-cell-text'</span>;
+            td.appendChild(span);
+            var val = renderers[colIndex](dataModel.getValueAt(rowIndex, dindexes[colIndex]), rowIndex, colIndex);
+            <span class="reserved">if</span>(val == <span class="literal">''</span>) val = <span class="literal">'&amp;nbsp;'</span>;
+            span.innerHTML = val;
+            row.appendChild(td);
+        }
+    },
+    
+    deleteRows : <span class="reserved">function</span>(dataModel, firstRow, lastRow){
+        <span class="reserved">this</span>.updateBodyHeight();
+        <span class="comment">// first make sure they are deselected</span>
+        <span class="reserved">this</span>.grid.selModel.deselectRange(firstRow, lastRow);
+        var bt = <span class="reserved">this</span>.getBodyTable();
+        var rows = []; <span class="comment">// get references because the rowIndex will change</span>
+        <span class="reserved">for</span>(var rowIndex = firstRow; rowIndex &lt;= lastRow; rowIndex++){
+            rows.push(bt.childNodes[rowIndex]);
+        }
+        <span class="reserved">for</span>(var i = 0; i &lt; rows.length; i++){
+            bt.removeChild(rows[i]);
+            rows[i] = null;
+        }
+        rows = null;
+        <span class="reserved">this</span>.updateRowIndexes(firstRow);
+        <span class="reserved">this</span>.adjustForScroll();
+    },
+    
+    updateRows : <span class="reserved">function</span>(dataModel, firstRow, lastRow){
+        var bt = <span class="reserved">this</span>.getBodyTable();
+        var dindexes = <span class="reserved">this</span>.getDataIndexes();
+        var renderers = <span class="reserved">this</span>.getColumnRenderers();
+        var colCount = <span class="reserved">this</span>.grid.colModel.getColumnCount();
+        <span class="reserved">for</span>(var rowIndex = firstRow; rowIndex &lt;= lastRow; rowIndex++){
+            var row = bt.rows[rowIndex];
+            var cells = row.childNodes;
+            <span class="reserved">for</span>(var colIndex = 0; colIndex &lt; colCount; colIndex++){
+                var td = cells[colIndex];
+                var val = renderers[colIndex](dataModel.getValueAt(rowIndex, dindexes[colIndex]), rowIndex, colIndex);
+                <span class="reserved">if</span>(val == <span class="literal">''</span>) val = <span class="literal">'&amp;nbsp;'</span>;
+                td.firstChild.innerHTML = val;
+            }
+        }
+    },
+    
+    handleSort : <span class="reserved">function</span>(dataModel, sortColumnIndex, sortDir, noRefresh){
+        <span class="reserved">this</span>.grid.selModel.syncSelectionsToIds();
+        <span class="reserved">if</span>(!noRefresh){
+           <span class="reserved">this</span>.updateRows(dataModel, 0, dataModel.getRowCount()-1);
+        }
+        <span class="reserved">this</span>.updateHeaderSortState();
+        <span class="reserved">if</span>(<span class="reserved">this</span>.lastFocusedRow){
+            <span class="reserved">this</span>.focusRow(<span class="reserved">this</span>.lastFocusedRow);
+        }
+    },
+    
+    syncScroll : <span class="reserved">function</span>(){
+        <span class="reserved">this</span>.hwrap.dom.scrollLeft = <span class="reserved">this</span>.wrap.scrollLeft;
+    },
+    
+    handleScroll : <span class="reserved">function</span>(){
+        <span class="reserved">this</span>.syncScroll();
+        <span class="reserved">this</span>.fireScroll(<span class="reserved">this</span>.wrap.scrollLeft, <span class="reserved">this</span>.wrap.scrollTop);
+        <span class="reserved">this</span>.grid.fireEvent(<span class="literal">'bodyscroll'</span>, <span class="reserved">this</span>.wrap.scrollLeft, <span class="reserved">this</span>.wrap.scrollTop);
+    },
+    
+    getRowHeight : <span class="reserved">function</span>(){
+        <span class="reserved">if</span>(!<span class="reserved">this</span>.rowHeight){
+            var rule = YAHOO.ext.util.CSS.getRule([<span class="literal">"#"</span> + <span class="reserved">this</span>.grid.id + <span class="literal">" .ygrid-row"</span>, <span class="literal">".ygrid-row"</span>]);
+        	<span class="reserved">if</span>(rule &amp;&amp; rule.style.height){
+        	    <span class="reserved">this</span>.rowHeight = parseInt(rule.style.height, 10);
+        	}<span class="reserved">else</span>{
+        	    <span class="reserved">this</span>.rowHeight = 21;
+        	}
+        }
+        <span class="reserved">return</span> <span class="reserved">this</span>.rowHeight;
+    },
+    
+    renderRows : <span class="reserved">function</span>(dataModel){
+        <span class="reserved">if</span>(<span class="reserved">this</span>.grid.selModel){
+            <span class="reserved">this</span>.grid.selModel.clearSelections();
+        }
+    	var bt = <span class="reserved">this</span>.getBodyTable();
+    	bt.innerHTML = <span class="literal">''</span>;
+    	<span class="reserved">this</span>.rowHeight = <span class="reserved">this</span>.getRowHeight();
+    	<span class="reserved">this</span>.insertRows(dataModel, 0, dataModel.getRowCount()-1);
+    },
+    
+    updateCell : <span class="reserved">function</span>(dataModel, rowIndex, dataIndex){
+        var colIndex = <span class="reserved">this</span>.getColumnIndexByDataIndex(dataIndex);
+        <span class="reserved">if</span>(typeof colIndex == <span class="literal">'undefined'</span>){ <span class="comment">// not present in grid</span>
+            <span class="reserved">return</span>;
+        }
+        var bt = <span class="reserved">this</span>.getBodyTable();
+        var row = bt.childNodes[rowIndex];
+        var cell = row.childNodes[colIndex];
+        var renderer = <span class="reserved">this</span>.grid.colModel.getRenderer(colIndex);
+        var val = renderer(dataModel.getValueAt(rowIndex, dataIndex), rowIndex, colIndex);
+        <span class="reserved">if</span>(val == <span class="literal">''</span>) val = <span class="literal">'&amp;nbsp;'</span>;
+        cell.firstChild.innerHTML = val;
+    },
+    
+    calcColumnWidth : <span class="reserved">function</span>(colIndex, maxRowsToMeasure){
+        var maxWidth = 0;
+        var bt = <span class="reserved">this</span>.getBodyTable();
+        var rows = bt.childNodes;
+        var stopIndex = Math.min(maxRowsToMeasure || rows.length, rows.length);
+        <span class="reserved">if</span>(<span class="reserved">this</span>.grid.autoSizeHeaders){
+            var h = <span class="reserved">this</span>.headers[colIndex];
+            var curWidth = h.style.width;
+            h.style.width = <span class="reserved">this</span>.grid.minColumnWidth+<span class="literal">'px'</span>;
+            maxWidth = Math.max(maxWidth, h.scrollWidth);
+            h.style.width = curWidth;
+        }
+        <span class="reserved">for</span>(var i = 0; i &lt; stopIndex; i++){
+            var cell = rows[i].childNodes[colIndex].firstChild;
+            maxWidth = Math.max(maxWidth, cell.scrollWidth);
+        }
+        <span class="reserved">return</span> maxWidth + <span class="comment">/*margin for error in IE*/</span> 5;
+    },
+    
+    autoSizeColumn : <span class="reserved">function</span>(colIndex, forceMinSize){
+        <span class="reserved">if</span>(forceMinSize){
+           <span class="reserved">this</span>.setCSSWidth(colIndex, <span class="reserved">this</span>.grid.minColumnWidth);
+        }
+        var newWidth = <span class="reserved">this</span>.calcColumnWidth(colIndex);
+        <span class="reserved">this</span>.grid.colModel.setColumnWidth(colIndex,
+            Math.max(<span class="reserved">this</span>.grid.minColumnWidth, newWidth));
+        <span class="reserved">this</span>.grid.fireEvent(<span class="literal">'columnresize'</span>, colIndex, newWidth);
+    },
+    
+    autoSizeColumns : <span class="reserved">function</span>(){
+        var colModel = <span class="reserved">this</span>.grid.colModel;
+        var colCount = colModel.getColumnCount();
+        var wrap = <span class="reserved">this</span>.wrap;
+        <span class="reserved">for</span>(var i = 0; i &lt; colCount; i++){
+            <span class="reserved">this</span>.setCSSWidth(i, <span class="reserved">this</span>.grid.minColumnWidth);
+            colModel.setColumnWidth(i, <span class="reserved">this</span>.calcColumnWidth(i, <span class="reserved">this</span>.grid.maxRowsToMeasure), true);
+        }
+        <span class="reserved">if</span>(colModel.getTotalWidth() &lt; wrap.clientWidth){
+            var diff = Math.floor((wrap.clientWidth - colModel.getTotalWidth()) / colCount);
+            <span class="reserved">for</span>(var i = 0; i &lt; colCount; i++){
+                colModel.setColumnWidth(i, colModel.getColumnWidth(i) + diff, true);
+            }
+        }
+        <span class="reserved">this</span>.updateColumns();  
+    },
+    
+    updateWrapHeight : <span class="reserved">function</span>(){
+        var box = <span class="reserved">this</span>.grid.container.getBox(true);
+        <span class="reserved">this</span>.wrapEl.setHeight(box.height-<span class="reserved">this</span>.footerHeight-parseInt(<span class="reserved">this</span>.wrap.offsetTop, 10));
+    },
+    
+    forceScrollUpdate : <span class="reserved">function</span>(){
+        var wrap = <span class="reserved">this</span>.wrap;
+        YAHOO.util.Dom.setStyle(wrap, <span class="literal">'width'</span>, (wrap.offsetWidth) +<span class="literal">'px'</span>);
+        setTimeout(<span class="reserved">function</span>(){ <span class="comment">// set timeout so FireFox works</span>
+            YAHOO.util.Dom.setStyle(wrap, <span class="literal">'width'</span>, <span class="literal">''</span>);
+        }, 1);
+    },
+    
+    updateHeaderSortState : <span class="reserved">function</span>(){
+        var state = <span class="reserved">this</span>.grid.dataModel.getSortState();
+        var sortColumn = <span class="reserved">this</span>.getColumnIndexByDataIndex(state.column);
+        var sortDir = state.direction;
+        <span class="reserved">for</span>(var i = 0, len = <span class="reserved">this</span>.headers.length; i &lt; len; i++){
+            var h = <span class="reserved">this</span>.headers[i];
+            <span class="reserved">if</span>(i != sortColumn){
+                h.sortDesc.style.display = <span class="literal">'none'</span>;
+                h.sortAsc.style.display = <span class="literal">'none'</span>;
+            }<span class="reserved">else</span>{
+                h.sortDesc.style.display = sortDir == <span class="literal">'DESC'</span> ? <span class="literal">'block'</span> : <span class="literal">'none'</span>;
+                h.sortAsc.style.display = sortDir == <span class="literal">'ASC'</span> ? <span class="literal">'block'</span> : <span class="literal">'none'</span>;
+            }
+        }
+    },
+
+    render : <span class="reserved">function</span>(){
+        var grid = <span class="reserved">this</span>.grid;
+        var container = grid.container.dom;
+        var dataModel = grid.dataModel;
+        dataModel.onCellUpdated.subscribe(<span class="reserved">this</span>.updateCell, <span class="reserved">this</span>, true);
+        dataModel.onTableDataChanged.subscribe(<span class="reserved">this</span>.renderRows, <span class="reserved">this</span>, true);
+        dataModel.onRowsDeleted.subscribe(<span class="reserved">this</span>.deleteRows, <span class="reserved">this</span>, true);
+        dataModel.onRowsInserted.subscribe(<span class="reserved">this</span>.insertRows, <span class="reserved">this</span>, true);
+        dataModel.onRowsUpdated.subscribe(<span class="reserved">this</span>.updateRows, <span class="reserved">this</span>, true);
+        dataModel.onRowsSorted.subscribe(<span class="reserved">this</span>.handleSort, <span class="reserved">this</span>, true);
+    
+        var colModel = grid.colModel;
+        colModel.onWidthChange.subscribe(<span class="reserved">this</span>.updateColumns, <span class="reserved">this</span>, true);
+        colModel.onHeaderChange.subscribe(<span class="reserved">this</span>.updateHeaders, <span class="reserved">this</span>, true);
+        colModel.onHiddenChange.subscribe(<span class="reserved">this</span>.handleHiddenChange, <span class="reserved">this</span>, true);
+        
+        YAHOO.util.Event.on(window, <span class="literal">'resize'</span>, <span class="reserved">this</span>.adjustForScroll, <span class="reserved">this</span>, true);
+        YAHOO.util.Event.on(window, <span class="literal">'resize'</span>, <span class="reserved">this</span>.updateWrapHeight, <span class="reserved">this</span>, true);
+        
+        var autoSizeDelegate = <span class="reserved">this</span>.autoSizeColumn.createDelegate(<span class="reserved">this</span>);
+        
+        var colCount = colModel.getColumnCount();
+    
+        var dh = YAHOO.ext.DomHelper;
+        <span class="comment">//create wrapper elements that handle offsets and scrolling</span>
+        var wrap = dh.append(container, {tag: <span class="literal">'div'</span>, cls: <span class="literal">'ygrid-wrap'</span>});
+        <span class="reserved">this</span>.wrap = wrap;
+        <span class="reserved">this</span>.wrapEl = getEl(wrap, true);
+        YAHOO.ext.EventManager.on(wrap, <span class="literal">'scroll'</span>, <span class="reserved">this</span>.handleScroll, <span class="reserved">this</span>, true);
+        
+        var hwrap = dh.append(container, {tag: <span class="literal">'div'</span>, cls: <span class="literal">'ygrid-wrap-headers'</span>});
+        <span class="reserved">this</span>.hwrap = getEl(hwrap, true);
+        
+        var bwrap = dh.append(wrap, {tag: <span class="literal">'div'</span>, cls: <span class="literal">'ygrid-wrap-body'</span>, id: container.id + <span class="literal">'-body'</span>});
+        <span class="reserved">this</span>.bwrap = getEl(bwrap, true);
+        <span class="reserved">this</span>.bwrap.setWidth(colModel.getTotalWidth());
+        bwrap.rows = bwrap.childNodes;
+        
+        <span class="reserved">this</span>.footerHeight = 0;
+        var foot = <span class="reserved">this</span>.appendFooter(container);
+        <span class="reserved">if</span>(foot){
+            <span class="reserved">this</span>.footer = getEl(foot, true);
+            <span class="reserved">this</span>.footerHeight = <span class="reserved">this</span>.footer.getHeight();
+        }
+        <span class="reserved">this</span>.updateWrapHeight();
+        
+        var hrow = dh.append(hwrap, {tag: <span class="literal">'span'</span>, cls: <span class="literal">'ygrid-hrow'</span>});
+        <span class="reserved">this</span>.hrow = hrow;
+        
+        <span class="comment">// IE doesn't like iframes, we will leave this alone</span>
+        var iframe = document.createElement(<span class="literal">'iframe'</span>);
+        iframe.className = <span class="literal">'ygrid-hrow-frame'</span>;
+        iframe.frameBorder = 0;
+        hwrap.appendChild(iframe);
+        
+        <span class="reserved">this</span>.headerCtrl = new YAHOO.ext.grid.HeaderController(<span class="reserved">this</span>.grid);
+        <span class="reserved">this</span>.headers = [];
+        <span class="reserved">this</span>.cols = [];
+        
+        
+        
+        var htemplate = dh.createTemplate({
+           tag: <span class="literal">'span'</span>, cls: <span class="literal">'ygrid-hd ygrid-header-{0}'</span>, children: [{
+                tag: <span class="literal">'span'</span>, 
+                cls: <span class="literal">'ygrid-hd-body'</span>, 
+                html: <span class="literal">'&lt;table border="0" cellpadding="0" cellspacing="0"&gt;'</span> +
+                      <span class="literal">'&lt;tbody&gt;&lt;tr&gt;&lt;td&gt;&lt;span&gt;{1}&lt;/span&gt;&lt;/td&gt;'</span> +
+                      <span class="literal">'&lt;td&gt;&lt;span class="sort-desc"&gt;&lt;/span&gt;&lt;span class="sort-asc"&gt;&lt;/span&gt;&lt;/td&gt;'</span> +
+                      <span class="literal">'&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;'</span>
+           }]           
+        });
+        htemplate.compile();
+        <span class="reserved">for</span>(var i = 0; i &lt; colCount; i++){
+            var hd = htemplate.append(hrow, [i, colModel.getColumnHeader(i)]);
+            var spans = hd.getElementsByTagName(<span class="literal">'span'</span>);
+            hd.textNode = spans[1];
+            hd.sortDesc = spans[2];
+    	    hd.sortAsc = spans[3];
+    	    hd.columnIndex = i;
+            <span class="reserved">this</span>.headers.push(hd);
+            <span class="reserved">if</span>(colModel.isSortable(i)){
+                <span class="reserved">this</span>.headerCtrl.register(hd);
+            }
+            var split = dh.append(hrow, {tag: <span class="literal">'span'</span>, cls: <span class="literal">'ygrid-hd-split'</span>});
+            hd.split = split;
+        	
+        	YAHOO.util.Event.on(split, <span class="literal">'dblclick'</span>, autoSizeDelegate.createCallback(i+0, true));
+        	
+        	var sb = new YAHOO.ext.SplitBar(split, hd, null, YAHOO.ext.SplitBar.LEFT);
+        	sb.columnIndex = i;
+        	sb.minSize = grid.minColumnWidth;
+        	sb.onMoved.subscribe(<span class="reserved">this</span>.onColumnSplitterMoved, <span class="reserved">this</span>, true);
+        	YAHOO.util.Dom.addClass(sb.proxy, <span class="literal">'ygrid-column-sizer'</span>);
+        	YAHOO.util.Dom.setStyle(sb.proxy, <span class="literal">'background-color'</span>, <span class="literal">''</span>);
+        	sb.dd._resizeProxy = <span class="reserved">function</span>(){
+        	    var el = <span class="reserved">this</span>.getDragEl();
+        	    YAHOO.util.Dom.setStyle(el, <span class="literal">'height'</span>, (hwrap.clientHeight+wrap.clientHeight-2) +<span class="literal">'px'</span>);
+        	};
+        }
+        <span class="reserved">if</span>(grid.autoSizeColumns){
+            <span class="reserved">this</span>.renderRows(dataModel);
+            <span class="reserved">this</span>.autoSizeColumns();
+        }<span class="reserved">else</span>{
+            <span class="reserved">this</span>.updateColumns();
+            <span class="reserved">this</span>.renderRows(dataModel);
+        }
+        
+        <span class="reserved">for</span>(var i = 0; i &lt; colCount; i++){
+            <span class="reserved">if</span>(colModel.isHidden(i)){
+                <span class="reserved">this</span>.hideColumn(i);
+            }
+        }
+        <span class="reserved">return</span> <span class="reserved">this</span>.bwrap;
+        
+        <span class="comment">/*
+        // Old DOM code
+        //create wrapper elements that handle offsets and scrolling
+        var wrap = document.createElement('div');
+        wrap.className = 'ygrid-wrap';
+        grid.container.dom.appendChild(wrap);
+        this.wrap = wrap;
+        this.wrapEl = getEl(wrap, true);
+        YAHOO.ext.EventManager.on(wrap, 'scroll', this.handleScroll, this, true);
+        
+        var hwrap = document.createElement('div');
+        hwrap.className = 'ygrid-wrap-headers';
+        grid.container.dom.appendChild(hwrap);
+        this.hwrap = getEl(hwrap, true);
+        //this.hwrap.setWidth(colModel.getTotalWidth());
+        
+        var bwrap = document.createElement('div');
+        bwrap.id = grid.container.id + '-body';
+        bwrap.className = 'ygrid-wrap-body';
+        wrap.appendChild(bwrap);
+        this.bwrap = getEl(bwrap, true);
+        this.bwrap.setWidth(colModel.getTotalWidth());
+        bwrap.rows = bwrap.childNodes;
+        
+        this.footerHeight = 0;
+        var foot = this.appendFooter(grid.container.dom);
+        if(foot){
+            this.footer = getEl(foot, true);
+            this.footerHeight = this.footer.getHeight();
+        }
+        this.updateWrapHeight();
+        
+        var hrow = document.createElement('span');
+        hrow.className = 'ygrid-hrow';
+        hwrap.appendChild(hrow);
+        var iframe = document.createElement('iframe');
+        iframe.className = 'ygrid-hrow-frame';
+        iframe.frameBorder = 0;
+        hwrap.appendChild(iframe);
+        this.hrow = hrow;
+        this.headerCtrl = new YAHOO.ext.grid.HeaderController(this.grid);
+        this.headers = [];
+        this.cols = [];
+        for(var i = 0; i &lt; colCount; i++){
+            var hd = document.createElement('span');
+        	hd.className = 'ygrid-hd ygrid-header-' + i;
+        	var span = document.createElement('span');
+            span.className = 'ygrid-hd-body';
+            hd.appendChild(span);
+            var tb = document.createElement('table');
+            span.appendChild(tb);
+            tb.border = 0;
+            tb.cellPadding=0;
+            tb.cellSpacing = 0;
+            var tbody = document.createElement('tbody');
+            tb.appendChild(tbody);
+            var tr = document.createElement('tr');
+            tbody.appendChild(tr);
+            var td = document.createElement('td');
+            tr.appendChild(td);
+            var td2 = document.createElement('td');
+            tr.appendChild(td2);
+            var text = document.createElement('span');
+            text.innerHTML = colModel.getColumnHeader(i);
+            td.appendChild(text);
+            hd.textNode = text;
+            hd.sortDesc = document.createElement('span');
+    	    hd.sortDesc.className = 'sort-desc';
+    	    hd.sortAsc = document.createElement('span');
+    	    hd.sortAsc.className = 'sort-asc';
+            td2.appendChild(hd.sortDesc);
+    	    td2.appendChild(hd.sortAsc);
+    	    hrow.appendChild(hd)
+            hd.columnIndex = i;
+            this.headers.push(hd);
+            if(colModel.isSortable(i)){
+                this.headerCtrl.register(hd);
+            }
+            var split = document.createElement('span');
+        	split.className = 'ygrid-hd-split';
+        	hrow.appendChild(split);
+        	hd.split = split;
+        	
+        	YAHOO.util.Event.on(split, 'dblclick', autoSizeDelegate.createCallback(i+0, true));
+        	
+        	var sb = new YAHOO.ext.SplitBar(split, hd, null, YAHOO.ext.SplitBar.LEFT);
+        	sb.columnIndex = i;
+        	sb.minSize = grid.minColumnWidth;
+        	// anonymous function = bad? 
+        	sb.onMoved.subscribe(function(splitter, newSize){
+        		colModel.setColumnWidth(splitter.columnIndex, newSize);
+        		grid.fireEvent('columnresize', splitter.columnIndex, newSize);
+        	});
+        	YAHOO.util.Dom.addClass(sb.proxy, 'ygrid-column-sizer');
+        	YAHOO.util.Dom.setStyle(sb.proxy, 'background-color', '');
+        	sb.dd._resizeProxy = function(){
+        	    var el = this.getDragEl();
+        	    YAHOO.util.Dom.setStyle(el, 'height', (hwrap.clientHeight+wrap.clientHeight-2) +'px');
+        	};
+        }
+        if(grid.autoSizeColumns){
+            this.renderRows(dataModel);
+            this.autoSizeColumns();
+        }else{
+            this.updateColumns();
+            this.renderRows(dataModel);
+        }
+        
+        for(var i = 0; i &lt; colCount; i++){
+            if(colModel.isHidden(i)){
+                this.hideColumn(i);
+            }
+        }
+        return this.bwrap;*/</span>
+    },
+    
+    onColumnSplitterMoved : <span class="reserved">function</span>(splitter, newSize){
+        <span class="reserved">this</span>.grid.colModel.setColumnWidth(splitter.columnIndex, newSize);
+        <span class="reserved">this</span>.grid.fireEvent(<span class="literal">'columnresize'</span>, splitter.columnIndex, newSize);
+    },
+    
+    appendFooter : <span class="reserved">function</span>(parentEl){
+        <span class="reserved">return</span> null;  
+    },
+    
+    updateBodyHeight : <span class="reserved">function</span>(){
+        YAHOO.util.Dom.setStyle(<span class="reserved">this</span>.getBodyTable(), <span class="literal">'height'</span>, 
+                             (<span class="reserved">this</span>.grid.dataModel.getRowCount()*<span class="reserved">this</span>.rowHeight)+<span class="literal">'px'</span>);
+    }
+};
+YAHOO.ext.grid.GridView.SCROLLBARS_UNDER = 0;
+YAHOO.ext.grid.GridView.SCROLLBARS_OVERLAP = 1;
+YAHOO.ext.grid.GridView.<span class="reserved">prototype</span>.scrollbarMode = YAHOO.ext.grid.GridView.SCROLLBARS_UNDER;
+
+<span class="comment">/**
+ * <span class="attrib">@class</span>
+ * Used internal by GridView to route header related events.
+ * <span class="attrib">@constructor</span>
+ */</span>
+YAHOO.ext.grid.HeaderController = <span class="reserved">function</span>(grid){
+	<span class="comment">/** <span class="attrib">@private</span> */</span>
+	<span class="reserved">this</span>.grid = grid;
+	<span class="comment">/** <span class="attrib">@private</span> */</span>
+	<span class="reserved">this</span>.headers = [];
+};
+
+YAHOO.ext.grid.HeaderController.<span class="reserved">prototype</span> = {
+	register : <span class="reserved">function</span>(header){
+		<span class="reserved">this</span>.headers.push(header);
+		YAHOO.ext.EventManager.on(header, <span class="literal">'selectstart'</span>, <span class="reserved">this</span>.cancelTextSelection, <span class="reserved">this</span>, true);
+        YAHOO.ext.EventManager.on(header, <span class="literal">'mousedown'</span>, <span class="reserved">this</span>.cancelTextSelection, <span class="reserved">this</span>, true);
+        YAHOO.ext.EventManager.on(header, <span class="literal">'mouseover'</span>, <span class="reserved">this</span>.headerOver, <span class="reserved">this</span>, true);
+        YAHOO.ext.EventManager.on(header, <span class="literal">'mouseout'</span>, <span class="reserved">this</span>.headerOut, <span class="reserved">this</span>, true);
+        YAHOO.ext.EventManager.on(header, <span class="literal">'click'</span>, <span class="reserved">this</span>.headerClick, <span class="reserved">this</span>, true);
+	},
+	
+	headerClick : <span class="reserved">function</span>(e){
+	    var grid = <span class="reserved">this</span>.grid, cm = grid.colModel, dm = grid.dataModel;
+	    grid.stopEditing();
+        var header = grid.getHeaderFromChild(e.getTarget());
+        var direction = header.sortDir || <span class="literal">'ASC'</span>;
+        var state = dm.getSortState();
+        <span class="reserved">if</span>(typeof state.column != <span class="literal">'undefined'</span> &amp;&amp; 
+                 grid.getView().getColumnIndexByDataIndex(state.column) == header.columnIndex){
+            direction = (direction == <span class="literal">'ASC'</span> ? <span class="literal">'DESC'</span> : <span class="literal">'ASC'</span>);
+        }
+        header.sortDir = direction;
+        dm.sort(cm, cm.getDataIndex(header.columnIndex), direction);
+    },
+    
+    headerOver : <span class="reserved">function</span>(e){
+        var header = <span class="reserved">this</span>.grid.getHeaderFromChild(e.getTarget());
+        YAHOO.util.Dom.addClass(header, <span class="literal">'ygrid-hd-over'</span>);
+        <span class="comment">//YAHOO.ext.util.CSS.applyFirst(header, this.grid.id, '.ygrid-hd-over');</span>
+    },
+    
+    headerOut : <span class="reserved">function</span>(e){
+        var header = <span class="reserved">this</span>.grid.getHeaderFromChild(e.getTarget());
+        YAHOO.util.Dom.removeClass(header, <span class="literal">'ygrid-hd-over'</span>);
+        <span class="comment">//YAHOO.ext.util.CSS.revertFirst(header, this.grid.id, '.ygrid-hd-over');</span>
+    },
+    
+    cancelTextSelection : <span class="reserved">function</span>(e){
+    	e.preventDefault();
+    }
+};</pre>
+	<hr>
+
+
+<hr>
+<font size="-1">
+
+</font>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat Oct 14 06:07:10 2006</div>
+</body>
+</html>

@@ -1,0 +1,243 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Frameset//EN""http://www.w3.org/TR/REC-html40/frameset.dtd">
+<html>
+<head>
+<title>
+ Overview
+</title>
+<link rel ="stylesheet" type="text/css" href="stylesheet.css" title="Style">
+<script>
+function asd() {
+	
+		parent.document.title="Toolbar.js Overview";
+	
+}
+</script>
+</head>
+<body bgcolor="white" onload="asd();" style="margin:15px;">
+<center>
+	
+	   <h2>Toolbar.js</h2>
+	
+</center>
+
+	
+
+
+<h4>Summary</h4>
+<p>
+	
+		
+	
+</p>
+
+
+    <table border="1" cellpadding="3" cellspacing="0" width="100%">
+    <tr bgcolor="#CCCCFF" class="TableHeadingColor">
+    <td colspan="2" class="title-cell">
+    
+        <b>Class Summary</b>
+    
+    </td>
+    </tr>
+    
+    <tr bgcolor="white" class="TableRowColor">
+    <td width="15%"><b><a href="YAHOO.ext.Toolbar.html">YAHOO.ext.Toolbar</a></b></td>
+    <td>Basic Toolbar used by the Grid to create the paging toolbar.</td>
+    </tr>
+    
+    <tr bgcolor="white" class="TableRowColor">
+    <td width="15%"><b><a href="YAHOO.ext.ToolbarButton.html">YAHOO.ext.ToolbarButton</a></b></td>
+    <td>A toolbar button.</td>
+    </tr>
+    
+    </table>
+   <hr/> 
+
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<!-- ========== END METHOD SUMMARY =========== -->
+
+
+        <pre class="sourceview"><span class="comment">/**
+ * <span class="attrib">@class</span>
+ * Basic Toolbar used by the Grid to create the paging toolbar. This class is reusable but functionality
+ * is limited. Look for more functionality in a future version. 
+ */</span>
+ YAHOO.ext.Toolbar = <span class="reserved">function</span>(container){
+    <span class="reserved">this</span>.el = getEl(container, true);
+    var div = document.createElement(<span class="literal">'div'</span>);
+    div.className = <span class="literal">'ytoolbar'</span>;
+    var tb = document.createElement(<span class="literal">'table'</span>);
+    tb.border = 0;
+    tb.cellPadding = 0;
+    tb.cellSpacing = 0;
+    div.appendChild(tb);
+    var tbody = document.createElement(<span class="literal">'tbody'</span>);
+    tb.appendChild(tbody);
+    var tr = document.createElement(<span class="literal">'tr'</span>);
+    tbody.appendChild(tr);
+    <span class="reserved">this</span>.el.dom.appendChild(div);
+    <span class="reserved">this</span>.tr = tr;
+};
+
+YAHOO.ext.Toolbar.<span class="reserved">prototype</span> = {
+    <span class="comment">/**
+     * Adds element(s) to the toolbar - this function takes a variable number of 
+     * arguments of mixed type and adds them to the toolbar...
+     * If an argument is a ToolbarButton, it is added. If the element is a string, it is wrapped 
+     * in a ytb-text element and added unless the text is "separator" in which case a separator
+     * is added. Otherwise, it is assumed the element is an HTMLElement and it is added directly.
+     */</span>
+    add : <span class="reserved">function</span>(){
+        <span class="reserved">for</span>(var i = 0; i &lt; arguments.length; i++){
+            var el = arguments[i];
+            var td = document.createElement(<span class="literal">'td'</span>);
+            <span class="reserved">this</span>.tr.appendChild(td);
+            <span class="reserved">if</span>(el instanceof YAHOO.ext.ToolbarButton){
+                el.init(td);
+            }<span class="reserved">else</span> <span class="reserved">if</span>(typeof el == <span class="literal">'string'</span>){
+                var span = document.createElement(<span class="literal">'span'</span>);
+                <span class="reserved">if</span>(el == <span class="literal">'separator'</span>){
+                    span.className = <span class="literal">'ytb-sep'</span>;
+                }<span class="reserved">else</span>{
+                    span.innerHTML = el;
+                    span.className = <span class="literal">'ytb-text'</span>;
+                }
+                td.appendChild(span);
+            }<span class="reserved">else</span> <span class="reserved">if</span>(typeof el == <span class="literal">'object'</span>){ <span class="comment">// must be element?</span>
+                td.appendChild(el);
+            }
+        }
+    },
+    
+    addSeparator : <span class="reserved">function</span>(){
+        var td = document.createElement(<span class="literal">'td'</span>);
+        <span class="reserved">this</span>.tr.appendChild(td);
+        var span = document.createElement(<span class="literal">'span'</span>);
+        span.className = <span class="literal">'ytb-sep'</span>;
+        td.appendChild(span);
+    },
+    
+    <span class="comment">/**
+     * Adds a button, see {<span class="attrib">@link</span> YAHOO.ext.ToolbarButton} for more info on the config
+     * <span class="attrib">@return</span> {YAHOO.ext.ToolbarButton}
+     */</span>
+    addButton : <span class="reserved">function</span>(config){
+        var b = new YAHOO.ext.ToolbarButton(config);
+        <span class="reserved">this</span>.add(b);
+        <span class="reserved">return</span> b;
+    },
+    
+    addText : <span class="reserved">function</span>(text){
+        var td = document.createElement(<span class="literal">'td'</span>);
+        <span class="reserved">this</span>.tr.appendChild(td);
+        var span = document.createElement(<span class="literal">'span'</span>);
+        span.className = <span class="literal">'ytb-text'</span>;
+        span.innerHTML = text;
+        td.appendChild(span);
+        <span class="reserved">return</span> span;
+    }
+};
+
+<span class="comment">/**
+ * <span class="attrib">@class</span>
+ * A toolbar button. The config has the following options:
+ * &lt;ul&gt;
+ * &lt;li&gt;className - The CSS class for the button. Use this to attach a background image for an icon.&lt;/li&gt;
+ * &lt;li&gt;text - The button's text&lt;/li&gt;
+ * &lt;li&gt;tooltip - The buttons tooltip text&lt;/li&gt;
+ * &lt;li&gt;click - function to call when the button is clicked&lt;/li&gt;
+ * &lt;li&gt;mouseover - function to call when the mouse moves over the button&lt;/li&gt;
+ * &lt;li&gt;mouseout - function to call when the mouse moves off the button&lt;/li&gt;
+ * &lt;li&gt;scope - The scope of the above event handlers&lt;/li&gt;
+ * &lt;li&gt;&lt;/li&gt;
+ * &lt;li&gt;&lt;/li&gt;
+ */</span>
+YAHOO.ext.ToolbarButton = <span class="reserved">function</span>(config){
+    YAHOO.ext.util.Config.apply(<span class="reserved">this</span>, config);
+};
+
+YAHOO.ext.ToolbarButton.<span class="reserved">prototype</span> = {
+    <span class="comment">/** <span class="attrib">@private</span> */</span>
+    init : <span class="reserved">function</span>(appendTo){
+        var element = document.createElement(<span class="literal">'span'</span>);
+        element.className = <span class="literal">'ytb-button'</span>;
+        <span class="reserved">this</span>.disabled = (<span class="reserved">this</span>.disabled === true);
+        var inner = document.createElement(<span class="literal">'span'</span>);
+        inner.className = <span class="literal">'ytb-button-inner '</span> + <span class="reserved">this</span>.className;
+        <span class="reserved">if</span>(<span class="reserved">this</span>.tooltip){
+            element.setAttribute(<span class="literal">'title'</span>, <span class="reserved">this</span>.tooltip);
+        }
+        element.appendChild(inner);
+        appendTo.appendChild(element);
+        <span class="reserved">this</span>.el = getEl(element, true);
+        inner.innerHTML = (<span class="reserved">this</span>.text ? <span class="reserved">this</span>.text : <span class="literal">'&amp;nbsp;'</span>);
+        <span class="reserved">this</span>.el.mon(<span class="literal">'click'</span>, <span class="reserved">this</span>.onClick, <span class="reserved">this</span>, true);    
+        <span class="reserved">this</span>.el.mon(<span class="literal">'mouseover'</span>, <span class="reserved">this</span>.onMouseOver, <span class="reserved">this</span>, true);    
+        <span class="reserved">this</span>.el.mon(<span class="literal">'mouseout'</span>, <span class="reserved">this</span>.onMouseOut, <span class="reserved">this</span>, true);
+    },
+    
+    disable : <span class="reserved">function</span>(){
+        <span class="reserved">this</span>.disabled = true;
+        <span class="reserved">if</span>(<span class="reserved">this</span>.el){
+            <span class="reserved">this</span>.el.addClass(<span class="literal">'ytb-button-disabled'</span>);
+        }
+    },
+    
+    enable : <span class="reserved">function</span>(){
+        <span class="reserved">this</span>.disabled = false;
+        <span class="reserved">if</span>(<span class="reserved">this</span>.el){
+            <span class="reserved">this</span>.el.removeClass(<span class="literal">'ytb-button-disabled'</span>);
+        }
+    },
+    
+    isDisabled : <span class="reserved">function</span>(){
+        <span class="reserved">return</span> <span class="reserved">this</span>.disabled === true;
+    },
+    
+    setDisabled : <span class="reserved">function</span>(disabled){
+        <span class="reserved">if</span>(disabled){
+            <span class="reserved">this</span>.disable();
+        }<span class="reserved">else</span>{
+            <span class="reserved">this</span>.enable();
+        }
+    },
+    
+    <span class="comment">/** <span class="attrib">@private</span> */</span>
+    onClick : <span class="reserved">function</span>(){
+        <span class="reserved">if</span>(!<span class="reserved">this</span>.disabled &amp;&amp; <span class="reserved">this</span>.click){
+            <span class="reserved">this</span>.click.call(<span class="reserved">this</span>.scope || window, <span class="reserved">this</span>);
+        }
+    },
+    
+    <span class="comment">/** <span class="attrib">@private</span> */</span>
+    onMouseOver : <span class="reserved">function</span>(){
+        <span class="reserved">if</span>(!<span class="reserved">this</span>.disabled){
+            <span class="reserved">this</span>.el.addClass(<span class="literal">'ytb-button-over'</span>);
+            <span class="reserved">if</span>(<span class="reserved">this</span>.mouseover){
+                <span class="reserved">this</span>.mouseover.call(<span class="reserved">this</span>.scope || window, <span class="reserved">this</span>);
+            }
+        }
+    },
+    
+    <span class="comment">/** <span class="attrib">@private</span> */</span>
+    onMouseOut : <span class="reserved">function</span>(){
+        <span class="reserved">this</span>.el.removeClass(<span class="literal">'ytb-button-over'</span>);
+        <span class="reserved">if</span>(!<span class="reserved">this</span>.disabled){
+            <span class="reserved">if</span>(<span class="reserved">this</span>.mouseout){
+                <span class="reserved">this</span>.mouseout.call(<span class="reserved">this</span>.scope || window, <span class="reserved">this</span>);
+            }
+        }
+    }
+};</pre>
+	<hr>
+
+
+<hr>
+<font size="-1">
+
+</font>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat Oct 14 06:07:10 2006</div>
+</body>
+</html>

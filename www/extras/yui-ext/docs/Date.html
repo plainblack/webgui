@@ -1,0 +1,530 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN""http://www.w3.org/TR/REC-html40/loose.dtd">
+<!--NewPage-->
+<HTML>
+<HEAD>
+<TITLE>
+Date
+</TITLE>
+<LINK REL ="stylesheet" TYPE="text/css" HREF="stylesheet.css" TITLE="Style">
+</HEAD>
+<SCRIPT>
+function asd()
+{
+parent.document.title="Date";
+}
+</SCRIPT>
+<BODY BGCOLOR="white" onload="asd();" style="margin:15px;">
+<!-- ======== START OF CLASS DATA ======== -->
+<H2>Class Date</H2>
+<PRE>Object
+   |
+   +--<b>Date</b>
+</PRE>
+
+
+<HR>
+<DL>
+   <!-- Class definition -->
+   <DT>class 
+   <B>Date</B>
+   
+
+</DL>
+   
+   <HR>
+
+<!-- ======== NESTED CLASS SUMMARY ======== -->
+
+<!-- ======== END NESTED CLASS SUMMARY ======== -->
+
+
+<!-- =========== FIELD SUMMARY =========== -->
+
+   <A NAME="field_summary"><!-- --></A>
+      <TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+         <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+            <TD COLSPAN="2" class="title-cell">Field Summary</TD></TR>
+
+   <!-- This is one instance field summary -->
+   
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+   <CODE>&nbsp;Object</CODE></FONT></TD>
+   <TD><CODE><B><A HREF="#format">format</A></B></CODE>
+   <BR>
+   &nbsp;&nbsp;Same as <a href="#dateFormat">dateFormat()</a></TD>
+   </TR>
+   
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+   <CODE>&lt;static&gt; &nbsp;Object</CODE></FONT></TD>
+   <TD><CODE><B><A HREF="#!s!dayNames">dayNames</A></B></CODE>
+   <BR>
+   &nbsp;&nbsp;Override these values for international dates, for example...</TD>
+   </TR>
+   
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+   <CODE>&lt;static&gt; &nbsp;Object</CODE></FONT></TD>
+   <TD><CODE><B><A HREF="#!s!monthNames">monthNames</A></B></CODE>
+   <BR>
+   &nbsp;&nbsp;Override these values for international dates, for example...</TD>
+   </TR>
+   
+
+   </TABLE>
+   &nbsp;
+   
+
+   
+
+<!-- =========== END FIELD SUMMARY =========== -->
+
+
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+
+<!-- ======== END CONSTRUCTOR SUMMARY ======== -->
+
+&nbsp;
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<A NAME="method_summary"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+  <TD COLSPAN="2" class="title-cell">
+    <span style="float:left">Method Summary</span>
+    <span style="float:right;font-weight:normal;font-size:8pt;">
+      <i>* Parameter types in italic indicate optional parameters</i>
+    </span>
+  </TD>
+</TR>
+
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Object</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#dateFormat">dateFormat</A></B>(format)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Formats a date given to the supplied format - the format syntax is the same as <a href="http://www.php.net/date">PHP's date() function</a>.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Object</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getDayOfYear">getDayOfYear</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Object</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getDaysInMonth">getDaysInMonth</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Object</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getFirstDayOfMonth">getFirstDayOfMonth</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Object</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getGMTOffset">getGMTOffset</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Object</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getLastDayOfMonth">getLastDayOfMonth</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Object</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getTimezone">getTimezone</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Object</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getWeekOfYear">getWeekOfYear</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Object</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#isLeapYear">isLeapYear</A></B>()
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&lt;static&gt;&nbsp;Object</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#!s!parseDate">parseDate</A></B>(input, format)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Parses a date given the supplied format - the format syntax is the same as <a href="http://www.php.net/date">PHP's date() function</a>.
+      </TD>
+   </TR>
+
+
+</TABLE>
+
+
+
+<P>
+<!-- ========== END METHOD SUMMARY =========== -->
+
+
+<!-- ============ FIELD DETAIL START =========== -->
+
+   <A NAME="field_detail"><!-- --></A>
+   <TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+      <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+        <TD COLSPAN="1" class="title-cell">Field Detail</TD>
+      </TR>
+   </TABLE>
+
+   
+   <A NAME="format"><!-- --></A>
+   <H3>format</H3>
+   <PRE>Object&nbsp;<B>format</B></PRE>
+   <UL>
+   Same as <a href="#dateFormat">dateFormat()</a>
+   
+   </UL>
+   <HR>
+   
+   <A NAME="!s!dayNames"><!-- --></A>
+   <H3>dayNames</H3>
+   <PRE>&lt;static&gt;&nbsp;Object&nbsp;<B>dayNames</B></PRE>
+   <UL>
+   Override these values for international dates, for example...
+ Date.dayNames = ['SundayInYourLang', 'MondayInYourLang', ...];
+   
+   </UL>
+   <HR>
+   
+   <A NAME="!s!monthNames"><!-- --></A>
+   <H3>monthNames</H3>
+   <PRE>&lt;static&gt;&nbsp;Object&nbsp;<B>monthNames</B></PRE>
+   <UL>
+   Override these values for international dates, for example...
+ Date.monthNames = ['JanInYourLang', 'FebInYourLang', ...];
+   
+   </UL>
+   <HR>
+   
+
+
+<!-- ============ FIELD DETAIL END =========== -->
+
+    <!-- ========= CONSTRUCTOR DETAIL START ======== -->
+
+
+<!-- Constructor return value(s) -->
+
+<!-- End constructor return value(s) -->
+
+<!-- ADDITIONAL ATTRIBUTES -->
+
+<HR/>
+<!-- END ADDITIONAL ATTRIBUTES  -->
+
+<!-- ========= CONSTRUCTOR DETAIL END ======== -->
+
+
+<!-- ============ METHOD DETAIL START ========== -->
+
+<A NAME="method_detail"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+   <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+     <TD COLSPAN="1" class="title-cell">
+       Method Detail
+     </TD>
+   </TR>
+</TABLE>
+
+<!-- One single method detail entry -->
+
+   <A NAME="dateFormat"><!-- --></A>
+   <H3>dateFormat</H3>
+   <PRE>Object <B>dateFormat</B>(format)</PRE>
+   
+      <UL>Formats a date given to the supplied format - the format syntax is the same as <a href="http://www.php.net/date">PHP's date() function</a>.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getDayOfYear"><!-- --></A>
+   <H3>getDayOfYear</H3>
+   <PRE>Object <B>getDayOfYear</B>()</PRE>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getDaysInMonth"><!-- --></A>
+   <H3>getDaysInMonth</H3>
+   <PRE>Object <B>getDaysInMonth</B>()</PRE>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getFirstDayOfMonth"><!-- --></A>
+   <H3>getFirstDayOfMonth</H3>
+   <PRE>Object <B>getFirstDayOfMonth</B>()</PRE>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getGMTOffset"><!-- --></A>
+   <H3>getGMTOffset</H3>
+   <PRE>Object <B>getGMTOffset</B>()</PRE>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getLastDayOfMonth"><!-- --></A>
+   <H3>getLastDayOfMonth</H3>
+   <PRE>Object <B>getLastDayOfMonth</B>()</PRE>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getTimezone"><!-- --></A>
+   <H3>getTimezone</H3>
+   <PRE>Object <B>getTimezone</B>()</PRE>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="getWeekOfYear"><!-- --></A>
+   <H3>getWeekOfYear</H3>
+   <PRE>Object <B>getWeekOfYear</B>()</PRE>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="isLeapYear"><!-- --></A>
+   <H3>isLeapYear</H3>
+   <PRE>Object <B>isLeapYear</B>()</PRE>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="!s!parseDate"><!-- --></A>
+   <H3>parseDate</H3>
+   <PRE>&lt;static&gt; Object <B>parseDate</B>(input, format)</PRE>
+   
+      <UL>Parses a date given the supplied format - the format syntax is the same as <a href="http://www.php.net/date">PHP's date() function</a>.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+
+
+<!-- ============ METHOD DETAIL END ========== -->
+
+<!-- ========= END OF CLASS DATA ========= -->
+
+<HR>
+<FONT SIZE="-1">
+
+</FONT>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat Oct 14 06:07:10 2006</div>
+</BODY>
+</HTML>

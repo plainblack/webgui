@@ -13,6 +13,7 @@ use strict;
 use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Workflow;
+use WebGUI::AdSpace;
 
 my $toVersion = "7.2.0"; # make this match what version you're going to
 my $quiet; # this line required
@@ -27,15 +28,34 @@ addLastExportedAs($session);
 addDeletionWorkflows($session);
 addRSSFromParent($session);
 reorderSurveyCollateral($session);
+deleteFiles($session);
+fixAds($session);
 
 finish($session); # this line required
+
+#--------------------------------------------------
+sub deleteFiles {
+	my $session = shift;
+	print "\tDelete unnecessary files.\n" unless ($quiet);
+	unlink "../../lib/WebGUI/i18n/English/Form_Textarea.pm";
+}
+
+#--------------------------------------------------
+sub fixAds {
+	my $session = shift;
+	print "\tFixing ads so they work in IE.\n" unless ($quiet);
+	foreach my $adSpace (@{WebGUI::AdSpace->getAdSpaces($session)}) {
+		foreach my $ad (@{$adSpace->getAds}) {
+			$ad->set({});
+		}
+	}
+}
 
 #--------------------------------------------------
 sub addRssUrlMacroProcessing {
 	my $session = shift;
 	print "\tAdding option to process macros in a Syndicated Content RSS Url.\n" unless ($quiet);
 	$session->db->write("alter table SyndicatedContent add column processMacroInRssUrl int(11) default 0");
-
 }
 
 ##-------------------------------------------------

@@ -1,0 +1,360 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Frameset//EN""http://www.w3.org/TR/REC-html40/frameset.dtd">
+<html>
+<head>
+<title>
+ Overview
+</title>
+<link rel ="stylesheet" type="text/css" href="stylesheet.css" title="Style">
+<script>
+function asd() {
+	
+		parent.document.title="DefaultColumnModel.js Overview";
+	
+}
+</script>
+</head>
+<body bgcolor="white" onload="asd();" style="margin:15px;">
+<center>
+	
+	   <h2>DefaultColumnModel.js</h2>
+	
+</center>
+
+	
+
+
+<h4>Summary</h4>
+<p>
+	
+		
+	
+</p>
+
+
+    <table border="1" cellpadding="3" cellspacing="0" width="100%">
+    <tr bgcolor="#CCCCFF" class="TableHeadingColor">
+    <td colspan="2" class="title-cell">
+    
+        <b>Class Summary</b>
+    
+    </td>
+    </tr>
+    
+    <tr bgcolor="white" class="TableRowColor">
+    <td width="15%"><b><a href="YAHOO.ext.grid.DefaultColumnModel.html">YAHOO.ext.grid.DefaultColumnModel</a></b></td>
+    <td>This is the default implementation of a ColumnModel used by the Grid.</td>
+    </tr>
+    
+    </table>
+   <hr/> 
+
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<!-- ========== END METHOD SUMMARY =========== -->
+
+
+        <pre class="sourceview">
+<span class="comment">/**
+ * <span class="attrib">@class</span>
+ * This is the default implementation of a ColumnModel used by the Grid. It defines
+ * the columns in the grid.
+ * &lt;br&gt;Usage:&lt;br&gt;
+ * &lt;pre&gt;&lt;code&gt;
+ * var sort = YAHOO.ext.grid.DefaultColumnModel.sortTypes;
+ * var myColumns = [
+	{header: "Ticker", width: 60, sortable: true, sortType: sort.asUCString}, 
+	{header: "Company Name", width: 150, sortable: true, sortType: sort.asUCString}, 
+	{header: "Market Cap.", width: 100, sortable: true, sortType: sort.asFloat}, 
+	{header: "$ Sales", width: 100, sortable: true, sortType: sort.asFloat, renderer: money}, 
+	{header: "Employees", width: 100, sortable: true, sortType: sort.asFloat}
+ * ];
+ * var colModel = new YAHOO.ext.grid.DefaultColumnModel(myColumns);
+ * &lt;/code&gt;&lt;/pre&gt;
+ * <span class="attrib">@extends</span> YAHOO.ext.grid.AbstractColumnModel
+ * <span class="attrib">@constructor</span>
+*/</span>
+YAHOO.ext.grid.DefaultColumnModel = <span class="reserved">function</span>(config){
+	YAHOO.ext.grid.DefaultColumnModel.superclass.constructor.call(<span class="reserved">this</span>);
+    <span class="comment">/**
+     * The config passed into the constructor
+     */</span>
+    <span class="reserved">this</span>.config = config;
+    
+    <span class="comment">/**
+     * The width of columns which have no width specified (defaults to 100)
+     * <span class="attrib">@type</span> Number
+     */</span>
+    <span class="reserved">this</span>.defaultWidth = 100;
+    <span class="comment">/**
+     * Default sortable of columns which have no sortable specified (defaults to false)
+     * <span class="attrib">@type</span> Boolean
+     */</span>
+    <span class="reserved">this</span>.defaultSortable = false;
+};
+YAHOO.extendX(YAHOO.ext.grid.DefaultColumnModel, YAHOO.ext.grid.AbstractColumnModel);
+
+<span class="comment">/**
+ * Returns the number of columns.
+ * <span class="attrib">@return</span> {Number}
+ */</span>
+YAHOO.ext.grid.DefaultColumnModel.<span class="reserved">prototype</span>.getColumnCount = <span class="reserved">function</span>(){
+    <span class="reserved">return</span> <span class="reserved">this</span>.config.length;
+};
+    
+<span class="comment">/**
+ * Returns true if the specified column is sortable.
+ * <span class="attrib">@param</span> {Number} col The column index
+ * <span class="attrib">@return</span> {Boolean}
+ */</span>
+YAHOO.ext.grid.DefaultColumnModel.<span class="reserved">prototype</span>.isSortable = <span class="reserved">function</span>(col){
+    <span class="reserved">if</span>(typeof <span class="reserved">this</span>.config[col].sortable == <span class="literal">'undefined'</span>){
+        <span class="reserved">return</span> <span class="reserved">this</span>.defaultSortable;
+    }
+    <span class="reserved">return</span> <span class="reserved">this</span>.config[col].sortable;
+};
+    
+<span class="comment">/**
+ * Returns the sorting comparison function defined for the column (defaults to sortTypes.none).
+ * <span class="attrib">@param</span> {Number} col The column index
+ * <span class="attrib">@return</span> {Function}
+ */</span>
+YAHOO.ext.grid.DefaultColumnModel.<span class="reserved">prototype</span>.getSortType = <span class="reserved">function</span>(col){
+    <span class="reserved">if</span>(!<span class="reserved">this</span>.dataMap){
+        <span class="comment">// build a lookup so we don't search every time</span>
+        var map = [];
+        <span class="reserved">for</span>(var i = 0, len = <span class="reserved">this</span>.config.length; i &lt; len; i++){
+            map[<span class="reserved">this</span>.getDataIndex(i)] = i;
+        }
+        <span class="reserved">this</span>.dataMap = map;
+    }
+    col = <span class="reserved">this</span>.dataMap[col];
+    <span class="reserved">if</span>(!<span class="reserved">this</span>.config[col].sortType){
+        <span class="reserved">return</span> YAHOO.ext.grid.DefaultColumnModel.sortTypes.none;
+    }
+    <span class="reserved">return</span> <span class="reserved">this</span>.config[col].sortType;
+};
+    
+<span class="comment">/**
+ * Sets the sorting comparison function for a column.
+ * <span class="attrib">@param</span> {Number} col The column index
+ * <span class="attrib">@param</span> {Function} fn
+ */</span>
+YAHOO.ext.grid.DefaultColumnModel.<span class="reserved">prototype</span>.setSortType = <span class="reserved">function</span>(col, fn){
+    <span class="reserved">this</span>.config[col].sortType = fn;
+};
+    
+
+<span class="comment">/**
+ * Returns the rendering (formatting) function defined for the column.
+ * <span class="attrib">@param</span> {Number} col The column index
+ * <span class="attrib">@return</span> {Function}
+ */</span>
+YAHOO.ext.grid.DefaultColumnModel.<span class="reserved">prototype</span>.getRenderer = <span class="reserved">function</span>(col){
+    <span class="reserved">if</span>(!<span class="reserved">this</span>.config[col].renderer){
+        <span class="reserved">return</span> YAHOO.ext.grid.DefaultColumnModel.defaultRenderer;
+    }
+    <span class="reserved">return</span> <span class="reserved">this</span>.config[col].renderer;
+};
+    
+<span class="comment">/**
+ * Sets the rendering (formatting) function for a column.
+ * <span class="attrib">@param</span> {Number} col The column index
+ * <span class="attrib">@param</span> {Function} fn
+ */</span>
+YAHOO.ext.grid.DefaultColumnModel.<span class="reserved">prototype</span>.setRenderer = <span class="reserved">function</span>(col, fn){
+    <span class="reserved">this</span>.config[col].renderer = fn;
+};
+    
+<span class="comment">/**
+ * Returns the width for the specified column.
+ * <span class="attrib">@param</span> {Number} col The column index
+ * <span class="attrib">@return</span> {Number}
+ */</span>
+YAHOO.ext.grid.DefaultColumnModel.<span class="reserved">prototype</span>.getColumnWidth = <span class="reserved">function</span>(col){
+    <span class="reserved">return</span> <span class="reserved">this</span>.config[col].width || <span class="reserved">this</span>.defaultWidth;
+};
+    
+<span class="comment">/**
+ * Sets the width for a column.
+ * <span class="attrib">@param</span> {Number} col The column index
+ * <span class="attrib">@param</span> {Number} width The new width
+ */</span>
+YAHOO.ext.grid.DefaultColumnModel.<span class="reserved">prototype</span>.setColumnWidth = <span class="reserved">function</span>(col, width, suppressEvent){
+    <span class="reserved">this</span>.config[col].width = width;
+    <span class="reserved">this</span>.totalWidth = null;
+    <span class="reserved">if</span>(!suppressEvent){
+         <span class="reserved">this</span>.onWidthChange.fireDirect(<span class="reserved">this</span>, col, width);
+    }
+};
+    
+<span class="comment">/**
+ * Returns the total width of all columns.
+ * <span class="attrib">@param</span> {Boolean} includeHidden True to include hidden column widths
+ * <span class="attrib">@return</span> {Number}
+ */</span>
+YAHOO.ext.grid.DefaultColumnModel.<span class="reserved">prototype</span>.getTotalWidth = <span class="reserved">function</span>(includeHidden){
+    <span class="reserved">if</span>(!<span class="reserved">this</span>.totalWidth){
+        <span class="reserved">this</span>.totalWidth = 0;
+        <span class="reserved">for</span>(var i = 0; i &lt; <span class="reserved">this</span>.config.length; i++){
+            <span class="reserved">if</span>(includeHidden || !<span class="reserved">this</span>.isHidden(i)){
+                <span class="reserved">this</span>.totalWidth += <span class="reserved">this</span>.getColumnWidth(i);
+            }
+        }
+    }
+    <span class="reserved">return</span> <span class="reserved">this</span>.totalWidth;
+};
+    
+<span class="comment">/**
+ * Returns the header for the specified column.
+ * <span class="attrib">@param</span> {Number} col The column index
+ * <span class="attrib">@return</span> {String}
+ */</span>
+YAHOO.ext.grid.DefaultColumnModel.<span class="reserved">prototype</span>.getColumnHeader = <span class="reserved">function</span>(col){
+    <span class="reserved">return</span> <span class="reserved">this</span>.config[col].header;
+};
+     
+<span class="comment">/**
+ * Sets the header for a column.
+ * <span class="attrib">@param</span> {Number} col The column index
+ * <span class="attrib">@param</span> {String} header The new header
+ */</span>
+YAHOO.ext.grid.DefaultColumnModel.<span class="reserved">prototype</span>.setColumnHeader = <span class="reserved">function</span>(col, header){
+    <span class="reserved">this</span>.config[col].header = header;
+    <span class="reserved">this</span>.onHeaderChange.fireDirect(<span class="reserved">this</span>, col, header);
+};
+<span class="comment">/**
+ * Returns the dataIndex for the specified column.
+ * <span class="attrib">@param</span> {Number} col The column index
+ * <span class="attrib">@return</span> {Number}
+ */</span>
+YAHOO.ext.grid.DefaultColumnModel.<span class="reserved">prototype</span>.getDataIndex = <span class="reserved">function</span>(col){
+    <span class="reserved">if</span>(typeof <span class="reserved">this</span>.config[col].dataIndex != <span class="literal">'number'</span>){
+        <span class="reserved">return</span> col;
+    }
+    <span class="reserved">return</span> <span class="reserved">this</span>.config[col].dataIndex;
+};
+     
+<span class="comment">/**
+ * Sets the dataIndex for a column.
+ * <span class="attrib">@param</span> {Number} col The column index
+ * <span class="attrib">@param</span> {Number} dataIndex The new dataIndex
+ */</span>
+YAHOO.ext.grid.DefaultColumnModel.<span class="reserved">prototype</span>.setDataIndex = <span class="reserved">function</span>(col, dataIndex){
+    <span class="reserved">this</span>.config[col].dataIndex = dataIndex;
+};
+<span class="comment">/**
+ * Returns true if the cell is editable.
+ * <span class="attrib">@param</span> {Number} colIndex The column index
+ * <span class="attrib">@param</span> {Number} rowIndex The row index
+ * <span class="attrib">@return</span> {Boolean}
+ */</span>
+YAHOO.ext.grid.DefaultColumnModel.<span class="reserved">prototype</span>.isCellEditable = <span class="reserved">function</span>(colIndex, rowIndex){
+    <span class="reserved">return</span> <span class="reserved">this</span>.config[colIndex].editable || (typeof <span class="reserved">this</span>.config[colIndex].editable == <span class="literal">'undefined'</span> &amp;&amp; <span class="reserved">this</span>.config[colIndex].editor);
+};
+
+<span class="comment">/**
+ * Returns the editor defined for the cell/column.
+ * <span class="attrib">@param</span> {Number} colIndex The column index
+ * <span class="attrib">@param</span> {Number} rowIndex The row index
+ * <span class="attrib">@return</span> {Object}
+ */</span>
+YAHOO.ext.grid.DefaultColumnModel.<span class="reserved">prototype</span>.getCellEditor = <span class="reserved">function</span>(colIndex, rowIndex){
+    <span class="reserved">return</span> <span class="reserved">this</span>.config[colIndex].editor;
+};
+   
+<span class="comment">/**
+ * Sets if a column is editable.
+ * <span class="attrib">@param</span> {Number} col The column index
+ * <span class="attrib">@param</span> {Boolean} editable True if the column is editable
+ */</span>
+YAHOO.ext.grid.DefaultColumnModel.<span class="reserved">prototype</span>.setEditable = <span class="reserved">function</span>(col, editable){
+    <span class="reserved">this</span>.config[col].editable = editable;
+};
+
+
+<span class="comment">/**
+ * Returns true if the column is hidden.
+ * <span class="attrib">@param</span> {Number} colIndex The column index
+ * <span class="attrib">@return</span> {Boolean}
+ */</span>
+YAHOO.ext.grid.DefaultColumnModel.<span class="reserved">prototype</span>.isHidden = <span class="reserved">function</span>(colIndex){
+    <span class="reserved">return</span> <span class="reserved">this</span>.config[colIndex].hidden;
+};
+   
+<span class="comment">/**
+ * Sets if a column is hidden.
+ * <span class="attrib">@param</span> {Number} colIndex The column index
+ */</span>
+YAHOO.ext.grid.DefaultColumnModel.<span class="reserved">prototype</span>.setHidden = <span class="reserved">function</span>(colIndex, hidden){
+    <span class="reserved">this</span>.config[colIndex].hidden = hidden;
+    <span class="reserved">this</span>.totalWidth = null;
+    <span class="reserved">this</span>.fireHiddenChange(colIndex, hidden);
+};
+
+<span class="comment">/**
+ * Sets the editor for a column.
+ * <span class="attrib">@param</span> {Number} col The column index
+ * <span class="attrib">@param</span> {Object} editor The editor object
+ */</span>
+YAHOO.ext.grid.DefaultColumnModel.<span class="reserved">prototype</span>.setEditor = <span class="reserved">function</span>(col, editor){
+    <span class="reserved">this</span>.config[col].editor = editor;
+};
+
+
+<span class="comment">/**
+ * Default empty rendering function
+ */</span>
+YAHOO.ext.grid.DefaultColumnModel.defaultRenderer = <span class="reserved">function</span>(value){
+	<span class="reserved">if</span>(typeof value == <span class="literal">'string'</span> &amp;&amp; value.length &lt; 1){
+	    <span class="reserved">return</span> <span class="literal">'&amp;nbsp;'</span>;
+	}
+	<span class="reserved">return</span> value;
+}
+
+<span class="comment">/**
+ * Defines the default sorting (casting?) comparison functions used when sorting data:
+ * &lt;br&gt;&amp;nbsp;&amp;nbsp;sortTypes.none - sorts data as it is without casting or parsing (the default)
+ * &lt;br&gt;&amp;nbsp;&amp;nbsp;sortTypes.asUCString - case insensitive string
+ * &lt;br&gt;&amp;nbsp;&amp;nbsp;sortTypes.asDate - attempts to parse data as a date
+ * &lt;br&gt;&amp;nbsp;&amp;nbsp;sortTypes.asFloat
+ * &lt;br&gt;&amp;nbsp;&amp;nbsp;sortTypes.asInt
+ */</span>
+YAHOO.ext.grid.DefaultColumnModel.sortTypes = {};
+
+YAHOO.ext.grid.DefaultColumnModel.sortTypes.none = <span class="reserved">function</span>(s) {
+	<span class="reserved">return</span> s;
+};
+
+YAHOO.ext.grid.DefaultColumnModel.sortTypes.asUCString = <span class="reserved">function</span>(s) {
+	<span class="reserved">return</span> String(s).toUpperCase();
+};
+
+YAHOO.ext.grid.DefaultColumnModel.sortTypes.asDate = <span class="reserved">function</span>(s) {
+    <span class="reserved">if</span>(s instanceof Date){
+        <span class="reserved">return</span> s;
+    }
+	<span class="reserved">return</span> Date.parse(String(s));
+};
+
+YAHOO.ext.grid.DefaultColumnModel.sortTypes.asFloat = <span class="reserved">function</span>(s) {
+	var val = parseFloat(String(s).replace(/,/g, <span class="literal">''</span>));
+    <span class="reserved">if</span>(isNaN(val)) val = 0;
+	<span class="reserved">return</span> val;
+};
+
+YAHOO.ext.grid.DefaultColumnModel.sortTypes.asInt = <span class="reserved">function</span>(s) {
+    var val = parseInt(String(s).replace(/,/g, <span class="literal">''</span>));
+    <span class="reserved">if</span>(isNaN(val)) val = 0;
+	<span class="reserved">return</span> val;
+};</pre>
+	<hr>
+
+
+<hr>
+<font size="-1">
+
+</font>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat Oct 14 06:07:10 2006</div>
+</body>
+</html>

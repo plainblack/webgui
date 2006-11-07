@@ -1,0 +1,405 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Frameset//EN""http://www.w3.org/TR/REC-html40/frameset.dtd">
+<html>
+<head>
+<title>
+ Overview
+</title>
+<link rel ="stylesheet" type="text/css" href="stylesheet.css" title="Style">
+<script>
+function asd() {
+	
+		parent.document.title="LoadableDataModel.js Overview";
+	
+}
+</script>
+</head>
+<body bgcolor="white" onload="asd();" style="margin:15px;">
+<center>
+	
+	   <h2>LoadableDataModel.js</h2>
+	
+</center>
+
+	
+
+
+<h4>Summary</h4>
+<p>
+	
+		
+	
+</p>
+
+
+    <table border="1" cellpadding="3" cellspacing="0" width="100%">
+    <tr bgcolor="#CCCCFF" class="TableHeadingColor">
+    <td colspan="2" class="title-cell">
+    
+        <b>Class Summary</b>
+    
+    </td>
+    </tr>
+    
+    <tr bgcolor="white" class="TableRowColor">
+    <td width="15%"><b><a href="YAHOO.ext.grid.LoadableDataModel.html">YAHOO.ext.grid.LoadableDataModel</a></b></td>
+    <td>This class extends DefaultDataModel and adds the core functionality to load data remotely.</td>
+    </tr>
+    
+    </table>
+   <hr/> 
+
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<!-- ========== END METHOD SUMMARY =========== -->
+
+
+        <pre class="sourceview"><span class="comment">/**
+ * <span class="attrib">@class</span>
+ * This class extends DefaultDataModel and adds the core functionality to load data remotely. &lt;br&gt;&lt;br&gt;
+ * <span class="attrib">@extends</span> YAHOO.ext.grid.DefaultDataModel
+ * <span class="attrib">@constructor</span>
+ * <span class="attrib">@param</span> {String} dataType YAHOO.ext.grid.LoadableDataModel.XML, YAHOO.ext.grid.LoadableDataModel.TEXT or YAHOO.ext.grid.JSON
+*/</span>
+YAHOO.ext.grid.LoadableDataModel = <span class="reserved">function</span>(dataType){
+    YAHOO.ext.grid.LoadableDataModel.superclass.constructor.call(<span class="reserved">this</span>, []);
+    
+    <span class="comment">/** Fires when a successful load is completed - fireDirect sig: (this)
+     * <span class="attrib">@type</span> YAHOO.util.CustomEvent 
+     * <span class="attrib">@deprecated</span> Use addListener instead of accessing directly
+     */</span>
+    <span class="reserved">this</span>.onLoad = new YAHOO.util.CustomEvent(<span class="literal">'load'</span>);
+    <span class="comment">/** Fires when a load fails - fireDirect sig: (this, errorMsg, responseObj)
+     * <span class="attrib">@type</span> YAHOO.util.CustomEvent 
+     * <span class="attrib">@deprecated</span> Use addListener instead of accessing directly
+     */</span>
+    <span class="reserved">this</span>.onLoadException = new YAHOO.util.CustomEvent(<span class="literal">'loadException'</span>);
+    
+    <span class="reserved">this</span>.events[<span class="literal">'load'</span>] = <span class="reserved">this</span>.onLoad;
+    <span class="reserved">this</span>.events[<span class="literal">'beforeload'</span>] = new YAHOO.util.CustomEvent(<span class="literal">'beforeload'</span>);
+    <span class="reserved">this</span>.events[<span class="literal">'loadexception'</span>] = <span class="reserved">this</span>.onLoadException;
+    
+    <span class="comment">/**<span class="attrib">@private</span>*/</span>
+    <span class="reserved">this</span>.dataType = dataType;
+    <span class="comment">/**<span class="attrib">@private</span>*/</span>
+    <span class="reserved">this</span>.preprocessors = [];
+    <span class="comment">/**<span class="attrib">@private</span>*/</span>
+    <span class="reserved">this</span>.postprocessors = [];
+    
+    <span class="comment">// paging info</span>
+    <span class="comment">/** The active page <span class="attrib">@type</span> Number*/</span>
+    <span class="reserved">this</span>.loadedPage = 1;
+    <span class="comment">/** True to use remote sorting, initPaging automatically sets this to true <span class="attrib">@type</span> Boolean */</span>
+    <span class="reserved">this</span>.remoteSort = false;
+    <span class="comment">/** The number of records per page <span class="attrib">@type</span> Number*/</span>
+    <span class="reserved">this</span>.pageSize = 0;
+    <span class="comment">/** The script/page to call to provide paged/sorted data <span class="attrib">@type</span> String*/</span>
+    <span class="reserved">this</span>.pageUrl = null;
+    <span class="comment">/** An object of key/value pairs to be passed as parameters
+     * when loading pages/sorting <span class="attrib">@type</span> Object*/</span>
+    <span class="reserved">this</span>.baseParams = {};
+    <span class="comment">/** Maps named params to url parameters - Override to specify your own param names */</span>
+    <span class="reserved">this</span>.paramMap = {<span class="literal">'page'</span>:<span class="literal">'page'</span>, <span class="literal">'pageSize'</span>:<span class="literal">'pageSize'</span>, <span class="literal">'sortColumn'</span>:<span class="literal">'sortColumn'</span>, <span class="literal">'sortDir'</span>:<span class="literal">'sortDir'</span>};
+    
+};
+YAHOO.extendX(YAHOO.ext.grid.LoadableDataModel, YAHOO.ext.grid.DefaultDataModel);
+
+<span class="comment">/** <span class="attrib">@ignore</span> */</span>
+YAHOO.ext.grid.LoadableDataModel.<span class="reserved">prototype</span>.setLoadedPage = <span class="reserved">function</span>(pageNum, userCallback){
+    <span class="reserved">this</span>.loadedPage = pageNum;
+    <span class="reserved">if</span>(typeof userCallback == <span class="literal">'function'</span>){
+        userCallback();
+    }
+};
+
+<span class="comment">/** Returns true if this model uses paging <span class="attrib">@type</span> Boolean */</span>
+YAHOO.ext.grid.LoadableDataModel.<span class="reserved">prototype</span>.isPaged = <span class="reserved">function</span>(){
+    <span class="reserved">return</span> <span class="reserved">this</span>.pageSize &gt; 0;
+};
+
+<span class="comment">/** Returns the total number of records available, override if needed <span class="attrib">@type</span> Number */</span>
+YAHOO.ext.grid.LoadableDataModel.<span class="reserved">prototype</span>.getTotalRowCount = <span class="reserved">function</span>(){
+    <span class="reserved">return</span> <span class="reserved">this</span>.totalCount || <span class="reserved">this</span>.getRowCount();
+};
+
+<span class="comment">/** Returns the number of records per page <span class="attrib">@type</span> Number */</span>
+YAHOO.ext.grid.LoadableDataModel.<span class="reserved">prototype</span>.getPageSize = <span class="reserved">function</span>(){
+    <span class="reserved">return</span> <span class="reserved">this</span>.pageSize;
+};
+
+<span class="comment">/** Returns the total number of pages available <span class="attrib">@type</span> Number */</span>
+YAHOO.ext.grid.LoadableDataModel.<span class="reserved">prototype</span>.getTotalPages = <span class="reserved">function</span>(){
+    <span class="reserved">if</span>(<span class="reserved">this</span>.getPageSize() == 0 || <span class="reserved">this</span>.getTotalRowCount() == 0){
+        <span class="reserved">return</span> 1;
+    }
+    <span class="reserved">return</span> Math.ceil(<span class="reserved">this</span>.getTotalRowCount()/<span class="reserved">this</span>.getPageSize());
+};
+
+<span class="comment">/** Initializes paging for this model. */</span>
+YAHOO.ext.grid.LoadableDataModel.<span class="reserved">prototype</span>.initPaging = <span class="reserved">function</span>(url, pageSize, baseParams){
+    <span class="reserved">this</span>.pageUrl = url;
+    <span class="reserved">this</span>.pageSize = pageSize;
+    <span class="reserved">this</span>.remoteSort = true;
+    <span class="reserved">if</span>(baseParams) <span class="reserved">this</span>.baseParams = baseParams;
+};
+
+<span class="comment">/** <span class="attrib">@ignore</span> */</span>
+YAHOO.ext.grid.LoadableDataModel.<span class="reserved">prototype</span>.createParams = <span class="reserved">function</span>(pageNum, sortColumn, sortDir){
+    var params = {}, map = <span class="reserved">this</span>.paramMap;
+    <span class="reserved">for</span>(var key in <span class="reserved">this</span>.baseParams){
+        <span class="reserved">if</span>(typeof <span class="reserved">this</span>.baseParams[key] != <span class="literal">'function'</span>){
+            params[key] = <span class="reserved">this</span>.baseParams[key];
+        }
+    }
+    params[map[<span class="literal">'page'</span>]] = pageNum;
+    params[map[<span class="literal">'pageSize'</span>]] = <span class="reserved">this</span>.getPageSize();
+    params[map[<span class="literal">'sortColumn'</span>]] = (typeof sortColumn == <span class="literal">'undefined'</span> ? <span class="literal">''</span> : sortColumn);
+    params[map[<span class="literal">'sortDir'</span>]] = sortDir || <span class="literal">''</span>;
+    <span class="reserved">return</span> params;
+};
+
+YAHOO.ext.grid.LoadableDataModel.<span class="reserved">prototype</span>.loadPage = <span class="reserved">function</span>(pageNum, callback, keepExisting){
+    var sort = <span class="reserved">this</span>.getSortState();
+    var params = <span class="reserved">this</span>.createParams(pageNum, sort.column, sort.direction);
+    <span class="reserved">this</span>.load(<span class="reserved">this</span>.pageUrl, params, <span class="reserved">this</span>.setLoadedPage.createDelegate(<span class="reserved">this</span>, [pageNum, callback]), 
+               keepExisting ? (pageNum-1) * <span class="reserved">this</span>.pageSize : null);
+};
+
+<span class="comment">/** <span class="attrib">@ignore</span> */</span>
+YAHOO.ext.grid.LoadableDataModel.<span class="reserved">prototype</span>.applySort = <span class="reserved">function</span>(suppressEvent){
+	<span class="reserved">if</span>(!<span class="reserved">this</span>.remoteSort){
+        YAHOO.ext.grid.LoadableDataModel.superclass.applySort.apply(<span class="reserved">this</span>, arguments);
+    }<span class="reserved">else</span> <span class="reserved">if</span>(!suppressEvent){
+        var sort = <span class="reserved">this</span>.getSortState();
+        <span class="reserved">if</span>(sort.column){
+           <span class="reserved">this</span>.fireRowsSorted(sort.column, sort.direction, true);
+        }
+    }
+};
+
+<span class="comment">/** <span class="attrib">@ignore</span> */</span>
+YAHOO.ext.grid.LoadableDataModel.<span class="reserved">prototype</span>.resetPaging = <span class="reserved">function</span>(){
+	<span class="reserved">this</span>.loadedPage = 1;
+};
+
+<span class="comment">/** Overridden sort method to use remote sorting if turned on */</span>
+YAHOO.ext.grid.LoadableDataModel.<span class="reserved">prototype</span>.sort = <span class="reserved">function</span>(columnModel, columnIndex, direction, suppressEvent){
+    <span class="reserved">if</span>(!<span class="reserved">this</span>.remoteSort){
+        YAHOO.ext.grid.LoadableDataModel.superclass.sort.apply(<span class="reserved">this</span>, arguments);
+    }<span class="reserved">else</span>{
+        <span class="reserved">this</span>.columnModel = columnModel;
+        <span class="reserved">this</span>.sortColumn = columnIndex;
+        <span class="reserved">this</span>.sortDir = direction;
+        var params = <span class="reserved">this</span>.createParams(<span class="reserved">this</span>.loadedPage, columnIndex, direction);
+        <span class="reserved">this</span>.load(<span class="reserved">this</span>.pageUrl, params, <span class="reserved">this</span>.fireRowsSorted.createDelegate(<span class="reserved">this</span>, [columnIndex, direction, true]));
+    }
+}
+<span class="comment">/**
+ * Initiates the loading of the data from the specified URL - Failed load attempts will 
+ * fire the {<span class="attrib">@link</span> #onLoadException} event.
+ * <span class="attrib">@param</span> {Object/String} url The url from which the data can be loaded
+ * <span class="attrib">@param</span> {&lt;i&gt;String/Object&lt;/i&gt;} params (optional) The parameters to pass as either a url encoded string "param1=1&amp;amp;param2=2" or as an object {param1: 1, param2: 2}
+ * <span class="attrib">@param</span> {&lt;i&gt;Function&lt;/i&gt;} callback (optional) Callback when load is complete - called with signature (this, rowCountLoaded)
+ * <span class="attrib">@param</span> {&lt;i&gt;Number&lt;/i&gt;} insertIndex (optional) if present, loaded data is inserted at the specified index instead of overwriting existing data
+ */</span>
+YAHOO.ext.grid.LoadableDataModel.<span class="reserved">prototype</span>.load = <span class="reserved">function</span>(url, params, callback, insertIndex){
+	<span class="reserved">this</span>.fireEvent(<span class="literal">'beforeload'</span>);
+	<span class="reserved">if</span>(params &amp;&amp; typeof params != <span class="literal">'string'</span>){ <span class="comment">// must be object</span>
+        var buf = [];
+        <span class="reserved">for</span>(var key in params){
+            <span class="reserved">if</span>(typeof params[key] != <span class="literal">'function'</span>){
+                buf.push(encodeURIComponent(key), <span class="literal">'='</span>, encodeURIComponent(params[key]), <span class="literal">'&amp;'</span>);
+            }
+        }
+        delete buf[buf.length-1];
+        params = buf.join(<span class="literal">''</span>);
+    }
+    var cb = {
+        success: <span class="reserved">this</span>.processResponse,
+        failure: <span class="reserved">this</span>.processException,
+        scope: <span class="reserved">this</span>,
+		argument: {callback: callback, insertIndex: insertIndex}
+    };
+    var method = params ? <span class="literal">'POST'</span> : <span class="literal">'GET'</span>;
+    YAHOO.util.Connect.asyncRequest(method, url, cb, params);
+};
+
+<span class="comment">/**<span class="attrib">@private</span>*/</span>
+YAHOO.ext.grid.LoadableDataModel.<span class="reserved">prototype</span>.processResponse = <span class="reserved">function</span>(response){
+    var cb = response.argument.callback;
+    var keepExisting = (typeof response.argument.insertIndex == <span class="literal">'number'</span>);
+    var insertIndex = response.argument.insertIndex;
+    switch(<span class="reserved">this</span>.dataType){
+    	case YAHOO.ext.grid.LoadableDataModel.XML:
+    		<span class="reserved">this</span>.loadData(response.responseXML, cb, keepExisting, insertIndex);
+    	break;
+    	case YAHOO.ext.grid.LoadableDataModel.JSON:
+    		var rtext = response.responseText;
+    		try { <span class="comment">// this code is a modified version of Yahoo! UI DataSource JSON parsing</span>
+		        <span class="comment">// Trim leading spaces</span>
+		        <span class="reserved">while</span>(rtext.substring(0,1) == <span class="literal">" "</span>) {
+		            rtext = rtext.substring(1, rtext.length);
+		        }
+		        <span class="comment">// Invalid JSON response</span>
+		        <span class="reserved">if</span>(rtext.indexOf(<span class="literal">"{"</span>) &lt; 0) {
+		            throw <span class="literal">"Invalid JSON response"</span>;
+		        }
+		
+		        <span class="comment">// Empty (but not invalid) JSON response</span>
+		        <span class="reserved">if</span>(rtext.indexOf(<span class="literal">"{}"</span>) === 0) {
+		            <span class="reserved">this</span>.loadData({}, response.argument.callback);
+		            <span class="reserved">return</span>;
+		        }
+		
+		        <span class="comment">// Turn the string into an object literal...</span>
+		        <span class="comment">// ...eval is necessary here</span>
+		        var jsonObjRaw = eval(<span class="literal">"("</span> + rtext + <span class="literal">")"</span>);
+		        <span class="reserved">if</span>(!jsonObjRaw) {
+		            throw <span class="literal">"Error evaling JSON response"</span>;
+		        }
+				<span class="reserved">this</span>.loadData(jsonObjRaw, cb, keepExisting, insertIndex);
+		    } catch(e) {
+		        <span class="reserved">this</span>.fireLoadException(e, response);
+				<span class="reserved">if</span>(typeof callback == <span class="literal">'function'</span>){
+			    	callback(<span class="reserved">this</span>, false);
+			    }
+		   	}
+    	break;
+    	case YAHOO.ext.grid.LoadableDataModel.TEXT:
+    		<span class="reserved">this</span>.loadData(response.responseText, cb, keepExisting, insertIndex);
+    	break;
+    };
+};
+
+<span class="comment">/**<span class="attrib">@private</span>*/</span>
+YAHOO.ext.grid.LoadableDataModel.<span class="reserved">prototype</span>.processException = <span class="reserved">function</span>(response){
+    <span class="reserved">this</span>.fireLoadException(null, response);
+    <span class="reserved">if</span>(typeof response.argument.callback == <span class="literal">'function'</span>){
+        response.argument.callback(<span class="reserved">this</span>, false);
+    }
+};
+
+YAHOO.ext.grid.LoadableDataModel.<span class="reserved">prototype</span>.fireLoadException = <span class="reserved">function</span>(e, responseObj){
+    <span class="reserved">this</span>.onLoadException.fireDirect(<span class="reserved">this</span>, e, responseObj);
+};
+
+YAHOO.ext.grid.LoadableDataModel.<span class="reserved">prototype</span>.fireLoadEvent = <span class="reserved">function</span>(){
+    <span class="reserved">this</span>.fireEvent(<span class="literal">'load'</span>, <span class="reserved">this</span>.loadedPage, <span class="reserved">this</span>.getTotalPages());
+};
+
+<span class="comment">/**
+ * Adds a preprocessor function to parse data before it is added to the Model - ie. Date.parse to parse dates.
+ */</span>
+YAHOO.ext.grid.LoadableDataModel.<span class="reserved">prototype</span>.addPreprocessor = <span class="reserved">function</span>(columnIndex, fn){
+    <span class="reserved">this</span>.preprocessors[columnIndex] = fn;
+};
+
+<span class="comment">/**
+ * Gets the preprocessor function for the specified column.
+ */</span>
+YAHOO.ext.grid.LoadableDataModel.<span class="reserved">prototype</span>.getPreprocessor = <span class="reserved">function</span>(columnIndex){
+    <span class="reserved">return</span> <span class="reserved">this</span>.preprocessors[columnIndex];
+};
+
+<span class="comment">/**
+ * Removes a preprocessor function.
+ */</span>
+YAHOO.ext.grid.LoadableDataModel.<span class="reserved">prototype</span>.removePreprocessor = <span class="reserved">function</span>(columnIndex){
+    <span class="reserved">this</span>.preprocessors[columnIndex] = null;
+};
+
+<span class="comment">/**
+ * Adds a postprocessor function to format data before updating the underlying data source (ie. convert date to string before updating XML document).
+ */</span>
+YAHOO.ext.grid.LoadableDataModel.<span class="reserved">prototype</span>.addPostprocessor = <span class="reserved">function</span>(columnIndex, fn){
+    <span class="reserved">this</span>.postprocessors[columnIndex] = fn;
+};
+
+<span class="comment">/**
+ * Gets the postprocessor function for the specified column.
+ */</span>
+YAHOO.ext.grid.LoadableDataModel.<span class="reserved">prototype</span>.getPostprocessor = <span class="reserved">function</span>(columnIndex){
+    <span class="reserved">return</span> <span class="reserved">this</span>.postprocessors[columnIndex];
+};
+
+<span class="comment">/**
+ * Removes a postprocessor function.
+ */</span>
+YAHOO.ext.grid.LoadableDataModel.<span class="reserved">prototype</span>.removePostprocessor = <span class="reserved">function</span>(columnIndex){
+    <span class="reserved">this</span>.postprocessors[columnIndex] = null;
+};
+<span class="comment">/**
+ * Empty interface method - Called to process the data returned by the XHR - Classes which extend LoadableDataModel should implement this method.
+ * See {<span class="attrib">@link</span> YAHOO.ext.XMLDataModel} for an example implementation.
+ */</span>
+YAHOO.ext.grid.LoadableDataModel.<span class="reserved">prototype</span>.loadData = <span class="reserved">function</span>(data, callback, keepExisting, insertIndex){
+	
+};
+
+YAHOO.ext.grid.LoadableDataModel.XML = <span class="literal">'xml'</span>;
+YAHOO.ext.grid.LoadableDataModel.JSON = <span class="literal">'json'</span>;
+YAHOO.ext.grid.LoadableDataModel.TEXT = <span class="literal">'text'</span>;
+
+<span class="comment">/*
+YAHOO.ext.grid.SparceDataset = function(bufferSize){
+    this.stack = [];
+    this.bufferSize = bufferSize || 1000;
+    this.maxIndex = 0;
+    
+    this.events = {
+        'rowsexpired' : new YAHOO.util.CustomEvent('rowsexpired')
+    };
+};
+
+YAHOO.ext.grid.SparceDataset.prototype = {
+    addListener : YAHOO.ext.grid.Grid.prototype.addListener,
+    removeListener : YAHOO.ext.grid.Grid.prototype.removeListener,
+    fireEvent : YAHOO.ext.grid.Grid.prototype.fireEvent,
+    
+    getRowAt : function(index){
+        return this[String(index)];
+    },
+    
+    splice : function(index, deleteCount){
+        this.insertRowsAt(index, Array.prototype.slice.call(arguments, 2));
+    },
+    
+    concat : function(){
+        this.insertRowsAt(index, Array.prototype.slice.call(arguments, 2));
+    },
+    
+    insertRowsAt: function(index, rowData){
+        for(var i = 0; i &lt; rowData.length; i++) {
+        	var d = rowData[i];
+        	var dataIndex = index + i;
+        	this[dataIndex] = d;
+        	this.stack.push(dataIndex);
+        }
+        this.maxIndex = Math.max(this.maxIndex, index+rowData.length);
+        this.cleanup();
+    },
+    
+    cleanup : function(){
+        while(stack.length &gt; this.bufferSize){
+            var dataIndex = stack.shift();
+            delete this[dataIndex];
+            this.fireEvent('rowsexpired', dataIndex);
+        }
+    }
+};*/</span>
+
+
+
+
+
+</pre>
+	<hr>
+
+
+<hr>
+<font size="-1">
+
+</font>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat Oct 14 06:07:10 2006</div>
+</body>
+</html>

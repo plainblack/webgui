@@ -1,0 +1,493 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN""http://www.w3.org/TR/REC-html40/loose.dtd">
+<!--NewPage-->
+<HTML>
+<HEAD>
+<TITLE>
+YAHOO.ext.DomHelper
+</TITLE>
+<LINK REL ="stylesheet" TYPE="text/css" HREF="stylesheet.css" TITLE="Style">
+</HEAD>
+<SCRIPT>
+function asd()
+{
+parent.document.title="YAHOO.ext.DomHelper";
+}
+</SCRIPT>
+<BODY BGCOLOR="white" onload="asd();" style="margin:15px;">
+<!-- ======== START OF CLASS DATA ======== -->
+<H2>Class YAHOO.ext.DomHelper</H2>
+<PRE>Object
+   |
+   +--<b>YAHOO.ext.DomHelper</b>
+</PRE>
+
+
+<HR>
+<DL>
+   <!-- Class definition -->
+   <DT>class 
+   <B>YAHOO.ext.DomHelper</B>
+   
+
+</DL>
+   
+   <HR>
+
+<!-- ======== NESTED CLASS SUMMARY ======== -->
+
+<A NAME="inner_classes"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TD COLSPAN="2" class="title-cell">Nested Class Summary</TD>
+</TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+   <CODE>&lt;static&nbsp;class&gt;</CODE></FONT></TD>
+   <TD><CODE><B><A HREF="YAHOO.ext.DomHelper.Template.html">YAHOO.ext.DomHelper.Template</A></B></CODE></TD>
+   </TR>
+
+</TABLE>
+&nbsp;
+
+<!-- ======== END NESTED CLASS SUMMARY ======== -->
+
+
+<!-- =========== FIELD SUMMARY =========== -->
+
+   <A NAME="field_summary"><!-- --></A>
+      <TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+         <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+            <TD COLSPAN="2" class="title-cell">Field Summary</TD></TR>
+
+   <!-- This is one instance field summary -->
+   
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+   <CODE>&nbsp;Boolean</CODE></FONT></TD>
+   <TD><CODE><B><A HREF="#useDom">useDom</A></B></CODE>
+   <BR>
+   &nbsp;&nbsp;True to force the use of DOM instead of html fragments</TD>
+   </TR>
+   
+
+   </TABLE>
+   &nbsp;
+   
+
+   
+
+<!-- =========== END FIELD SUMMARY =========== -->
+
+
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+
+<!-- ======== END CONSTRUCTOR SUMMARY ======== -->
+
+&nbsp;
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<A NAME="method_summary"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+  <TD COLSPAN="2" class="title-cell">
+    <span style="float:left">Method Summary</span>
+    <span style="float:right;font-weight:normal;font-size:8pt;">
+      <i>* Parameter types in italic indicate optional parameters</i>
+    </span>
+  </TD>
+</TR>
+
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;HTMLElement</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#append">append</A></B>(&lt;HTMLElement&gt; el, &lt;Object&gt; o)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Creates new Dom element(s) and appends them to el
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;<a href="YAHOO.ext.DomHelper.Template.html">YAHOO.ext.DomHelper.Template</a></CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#createTemplate">createTemplate</A></B>(&lt;Object&gt; o)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Creates a new YAHOO.ext.DomHelper.Template from the Dom object spec
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;HTMLElement</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#insertAfter">insertAfter</A></B>(&lt;HTMLElement&gt; el, &lt;Object&gt; o)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Creates new Dom element(s) and inserts them after el
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;HTMLElement</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#insertBefore">insertBefore</A></B>(&lt;HTMLElement&gt; el, &lt;Object&gt; o)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Creates new Dom element(s) and inserts them before el
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;HTMLElement</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#insertHtml">insertHtml</A></B>(&lt;String&gt; where, &lt;HTMLElement&gt; el, &lt;String&gt; html)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Inserts an HTML fragment into the Dom
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;HTMLElement</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#overwrite">overwrite</A></B>(&lt;HTMLElement&gt; el, &lt;Object&gt; o)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Creates new Dom element(s) and overwrites the contents of el with them
+      </TD>
+   </TR>
+
+
+</TABLE>
+
+
+
+<P>
+<!-- ========== END METHOD SUMMARY =========== -->
+
+
+<!-- ============ FIELD DETAIL START =========== -->
+
+   <A NAME="field_detail"><!-- --></A>
+   <TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+      <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+        <TD COLSPAN="1" class="title-cell">Field Detail</TD>
+      </TR>
+   </TABLE>
+
+   
+   <A NAME="useDom"><!-- --></A>
+   <H3>useDom</H3>
+   <PRE>Boolean&nbsp;<B>useDom</B></PRE>
+   <UL>
+   True to force the use of DOM instead of html fragments
+   
+   </UL>
+   <HR>
+   
+
+
+<!-- ============ FIELD DETAIL END =========== -->
+
+    <!-- ========= CONSTRUCTOR DETAIL START ======== -->
+
+
+<!-- Constructor return value(s) -->
+
+<!-- End constructor return value(s) -->
+
+<!-- ADDITIONAL ATTRIBUTES -->
+
+<HR/>
+<!-- END ADDITIONAL ATTRIBUTES  -->
+
+<!-- ========= CONSTRUCTOR DETAIL END ======== -->
+
+
+<!-- ============ METHOD DETAIL START ========== -->
+
+<A NAME="method_detail"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+   <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+     <TD COLSPAN="1" class="title-cell">
+       Method Detail
+     </TD>
+   </TR>
+</TABLE>
+
+<!-- One single method detail entry -->
+
+   <A NAME="append"><!-- --></A>
+   <H3>append</H3>
+   <PRE>HTMLElement <B>append</B>(&lt;HTMLElement&gt; el, &lt;Object&gt; o)</PRE>
+   
+      <UL>Creates new Dom element(s) and appends them to el</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>el</CODE> -  The context element  
+      </UL> 
+   
+     <UL><CODE>o</CODE> -  The Dom object spec (and children)  
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+   <UL>
+   <B>Returns:</B>
+        <UL>
+         The new node 
+        </UL>
+   </UL>
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="createTemplate"><!-- --></A>
+   <H3>createTemplate</H3>
+   <PRE><a href="YAHOO.ext.DomHelper.Template.html">YAHOO.ext.DomHelper.Template</a> <B>createTemplate</B>(&lt;Object&gt; o)</PRE>
+   
+      <UL>Creates a new YAHOO.ext.DomHelper.Template from the Dom object spec</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>o</CODE> -  The Dom object spec (and children)  
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+   <UL>
+   <B>Returns:</B>
+        <UL>
+         The new template 
+        </UL>
+   </UL>
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="insertAfter"><!-- --></A>
+   <H3>insertAfter</H3>
+   <PRE>HTMLElement <B>insertAfter</B>(&lt;HTMLElement&gt; el, &lt;Object&gt; o)</PRE>
+   
+      <UL>Creates new Dom element(s) and inserts them after el</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>el</CODE> -  The context element  
+      </UL> 
+   
+     <UL><CODE>o</CODE> -  The Dom object spec (and children)  
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+   <UL>
+   <B>Returns:</B>
+        <UL>
+         The new node 
+        </UL>
+   </UL>
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="insertBefore"><!-- --></A>
+   <H3>insertBefore</H3>
+   <PRE>HTMLElement <B>insertBefore</B>(&lt;HTMLElement&gt; el, &lt;Object&gt; o)</PRE>
+   
+      <UL>Creates new Dom element(s) and inserts them before el</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>el</CODE> -  The context element  
+      </UL> 
+   
+     <UL><CODE>o</CODE> -  The Dom object spec (and children)  
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+   <UL>
+   <B>Returns:</B>
+        <UL>
+         The new node 
+        </UL>
+   </UL>
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="insertHtml"><!-- --></A>
+   <H3>insertHtml</H3>
+   <PRE>HTMLElement <B>insertHtml</B>(&lt;String&gt; where, &lt;HTMLElement&gt; el, &lt;String&gt; html)</PRE>
+   
+      <UL>Inserts an HTML fragment into the Dom</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>where</CODE> -  Where to insert the html in relation to el - beforeBegin, afterBegin, beforeEnd, afterEnd.  
+      </UL> 
+   
+     <UL><CODE>el</CODE> -  The context element  
+      </UL> 
+   
+     <UL><CODE>html</CODE> -  The HTML fragmenet  
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+   <UL>
+   <B>Returns:</B>
+        <UL>
+         The new node 
+        </UL>
+   </UL>
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="overwrite"><!-- --></A>
+   <H3>overwrite</H3>
+   <PRE>HTMLElement <B>overwrite</B>(&lt;HTMLElement&gt; el, &lt;Object&gt; o)</PRE>
+   
+      <UL>Creates new Dom element(s) and overwrites the contents of el with them</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>el</CODE> -  The context element  
+      </UL> 
+   
+     <UL><CODE>o</CODE> -  The Dom object spec (and children)  
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+   <UL>
+   <B>Returns:</B>
+        <UL>
+         The new node 
+        </UL>
+   </UL>
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+
+
+<!-- ============ METHOD DETAIL END ========== -->
+
+<!-- ========= END OF CLASS DATA ========= -->
+
+<HR>
+<FONT SIZE="-1">
+
+</FONT>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat Oct 14 06:07:10 2006</div>
+</BODY>
+</HTML>

@@ -1,0 +1,170 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Frameset//EN""http://www.w3.org/TR/REC-html40/frameset.dtd">
+<html>
+<head>
+<title>
+ Overview
+</title>
+<link rel ="stylesheet" type="text/css" href="stylesheet.css" title="Style">
+<script>
+function asd() {
+	
+		parent.document.title="AbstractColumnModel.js Overview";
+	
+}
+</script>
+</head>
+<body bgcolor="white" onload="asd();" style="margin:15px;">
+<center>
+	
+	   <h2>AbstractColumnModel.js</h2>
+	
+</center>
+
+	
+
+
+<h4>Summary</h4>
+<p>
+	
+		
+	
+</p>
+
+
+    <table border="1" cellpadding="3" cellspacing="0" width="100%">
+    <tr bgcolor="#CCCCFF" class="TableHeadingColor">
+    <td colspan="2" class="title-cell">
+    
+        <b>Class Summary</b>
+    
+    </td>
+    </tr>
+    
+    <tr bgcolor="white" class="TableRowColor">
+    <td width="15%"><b><a href="YAHOO.ext.grid.AbstractColumnModel.html">YAHOO.ext.grid.AbstractColumnModel</a></b></td>
+    <td>This abstract class defines the ColumnModel interface and provides default implementations of the events required by the Grid.</td>
+    </tr>
+    
+    </table>
+   <hr/> 
+
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<!-- ========== END METHOD SUMMARY =========== -->
+
+
+        <pre class="sourceview"><span class="comment">/**
+ * <span class="attrib">@class</span>
+ * This abstract class defines the ColumnModel interface and provides default implementations of the events required by the Grid. 
+ * <span class="attrib">@constructor</span>
+*/</span>
+YAHOO.ext.grid.AbstractColumnModel = <span class="reserved">function</span>(){
+	<span class="comment">/** Fires when a column width is changed - fireDirect sig: (this, columnIndex, newWidth)
+     * <span class="attrib">@type</span> YAHOO.util.CustomEvent 
+     * */</span>
+    <span class="reserved">this</span>.onWidthChange = new YAHOO.util.CustomEvent(<span class="literal">'widthChanged'</span>);
+    <span class="comment">/** Fires when a header has changed - fireDirect sig: (this, columnIndex, newHeader)
+     * <span class="attrib">@type</span> YAHOO.util.CustomEvent 
+     * */</span>
+    <span class="reserved">this</span>.onHeaderChange = new YAHOO.util.CustomEvent(<span class="literal">'headerChanged'</span>);
+	<span class="comment">/** Fires when a column is hidden or unhidden - fireDirect sig: (this, columnIndex, hidden)
+     * <span class="attrib">@type</span> YAHOO.util.CustomEvent 
+     * */</span>
+    <span class="reserved">this</span>.onHiddenChange = new YAHOO.util.CustomEvent(<span class="literal">'hiddenChanged'</span>);
+};
+
+YAHOO.ext.grid.AbstractColumnModel.<span class="reserved">prototype</span> = {
+	fireWidthChange : <span class="reserved">function</span>(colIndex, newWidth){
+		<span class="reserved">this</span>.onWidthChange.fireDirect(<span class="reserved">this</span>, colIndex, newWidth);
+	},
+	
+	fireHeaderChange : <span class="reserved">function</span>(colIndex, newHeader){
+		<span class="reserved">this</span>.onHeaderChange.fireDirect(<span class="reserved">this</span>, colIndex, newHeader);
+	},
+	
+	fireHiddenChange : <span class="reserved">function</span>(colIndex, hidden){
+		<span class="reserved">this</span>.onHiddenChange.fireDirect(<span class="reserved">this</span>, colIndex, hidden);
+	},
+	
+	<span class="comment">/**
+     * Interface method - Returns the number of columns.
+     * <span class="attrib">@return</span> {Number}
+     */</span>
+    getColumnCount : <span class="reserved">function</span>(){
+        <span class="reserved">return</span> 0;
+    },
+    
+    <span class="comment">/**
+     * Interface method - Returns true if the specified column is sortable.
+     * <span class="attrib">@param</span> {Number} col The column index
+     * <span class="attrib">@return</span> {Boolean}
+     */</span>
+    isSortable : <span class="reserved">function</span>(col){
+        <span class="reserved">return</span> false;
+    },
+    
+    <span class="comment">/**
+     * Interface method - Returns true if the specified column is hidden.
+     * <span class="attrib">@param</span> {Number} col The column index
+     * <span class="attrib">@return</span> {Boolean}
+     */</span>
+    isHidden : <span class="reserved">function</span>(col){
+        <span class="reserved">return</span> false;
+    },
+    
+    <span class="comment">/**
+     * Interface method - Returns the sorting comparison function defined for the column (defaults to sortTypes.none).
+     * <span class="attrib">@param</span> {Number} col The column index
+     * <span class="attrib">@return</span> {Function}
+     */</span>
+    getSortType : <span class="reserved">function</span>(col){
+        <span class="reserved">return</span> YAHOO.ext.grid.DefaultColumnModel.sortTypes.none;
+    },
+    
+    <span class="comment">/**
+     * Interface method - Returns the rendering (formatting) function defined for the column.
+     * <span class="attrib">@param</span> {Number} col The column index
+     * <span class="attrib">@return</span> {Function}
+     */</span>
+    getRenderer : <span class="reserved">function</span>(col){
+        <span class="reserved">return</span> YAHOO.ext.grid.DefaultColumnModel.defaultRenderer;
+    },
+    
+    <span class="comment">/**
+     * Interface method - Returns the width for the specified column.
+     * <span class="attrib">@param</span> {Number} col The column index
+     * <span class="attrib">@return</span> {Number}
+     */</span>
+    getColumnWidth : <span class="reserved">function</span>(col){
+        <span class="reserved">return</span> 0;
+    },
+    
+    <span class="comment">/**
+     * Interface method - Returns the total width of all columns.
+     * <span class="attrib">@return</span> {Number}
+     */</span>
+    getTotalWidth : <span class="reserved">function</span>(){
+        <span class="reserved">return</span> 0;
+    },
+    
+    <span class="comment">/**
+     * Interface method - Returns the header for the specified column.
+     * <span class="attrib">@param</span> {Number} col The column index
+     * <span class="attrib">@return</span> {String}
+     */</span>
+    getColumnHeader : <span class="reserved">function</span>(col){
+        <span class="reserved">return</span> <span class="literal">''</span>;
+    }
+};
+</pre>
+	<hr>
+
+
+<hr>
+<font size="-1">
+
+</font>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat Oct 14 06:07:10 2006</div>
+</body>
+</html>

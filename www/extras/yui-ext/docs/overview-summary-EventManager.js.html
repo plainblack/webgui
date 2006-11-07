@@ -1,0 +1,422 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Frameset//EN""http://www.w3.org/TR/REC-html40/frameset.dtd">
+<html>
+<head>
+<title>
+ Overview
+</title>
+<link rel ="stylesheet" type="text/css" href="stylesheet.css" title="Style">
+<script>
+function asd() {
+	
+		parent.document.title="EventManager.js Overview";
+	
+}
+</script>
+</head>
+<body bgcolor="white" onload="asd();" style="margin:15px;">
+<center>
+	
+	   <h2>EventManager.js</h2>
+	
+</center>
+
+	
+
+
+<h4>Summary</h4>
+<p>
+	
+		
+	
+</p>
+
+
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<!-- ========== END METHOD SUMMARY =========== -->
+
+
+        <pre class="sourceview">
+<span class="comment">/**
+ * <span class="attrib">@class</span> 
+ * Registers event handlers that want to receive an EventObject instead of the standard browser event
+ * See {<span class="attrib">@link</span> YAHOO.ext.EventObject} for more details on the usage of this object.
+ */</span>
+YAHOO.ext.EventManager = new <span class="reserved">function</span>(){
+    var docReadyEvent;
+    var docReadyProcId;
+    var docReadyState = false;
+    
+    <span class="reserved">this</span>.ieDeferSrc = <span class="literal">"javascript:false"</span>;
+    
+    var fireDocReady = <span class="reserved">function</span>(){
+        <span class="reserved">if</span>(!docReadyState){
+            docReadyState = true;
+            <span class="reserved">if</span>(docReadyProcId){
+                clearInterval(docReadyProcId);
+            }
+            <span class="reserved">if</span>(docReadyEvent){
+                docReadyEvent.fire();
+            }
+        }
+    };
+    
+    var initDocReady = <span class="reserved">function</span>(){
+        docReadyEvent = new YAHOO.util.CustomEvent(<span class="literal">'documentready'</span>);
+        <span class="reserved">if</span>(document.addEventListener) {
+            YAHOO.util.Event.on(document, <span class="literal">"DOMContentLoaded"</span>, fireDocReady);
+        }<span class="reserved">else</span> <span class="reserved">if</span>(YAHOO.ext.util.Browser.isIE){
+            <span class="comment">// inspired by  http://www.thefutureoftheweb.com/blog/2006/6/adddomloadevent</span>
+            document.write(<span class="literal">'&lt;s'</span>+<span class="literal">'cript id="ie-deferred-loader" defer="defer" src="'</span> +
+                        YAHOO.ext.EventManager.ieDeferSrc + <span class="literal">'"&gt;&lt;/s'</span>+<span class="literal">'cript&gt;'</span>);
+            YAHOO.util.Event.on(<span class="literal">'ie-deferred-loader'</span>, <span class="literal">'readystatechange'</span>, <span class="reserved">function</span>(){
+                <span class="reserved">if</span>(<span class="reserved">this</span>.readyState == <span class="literal">'complete'</span>){
+                    fireDocReady();
+                }
+            });
+        }<span class="reserved">else</span> <span class="reserved">if</span>(YAHOO.ext.util.Browser.isSafari){ 
+            docReadyProcId = setInterval(<span class="reserved">function</span>(){
+                var rs = document.readyState;
+                <span class="reserved">if</span>(rs == <span class="literal">'loaded'</span> || rs == <span class="literal">'complete'</span>) {
+                    fireDocReady();     
+                 }
+            }, 10);
+        }
+        <span class="comment">// no matter what, make sure it fires on load</span>
+        YAHOO.util.Event.on(window, <span class="literal">'load'</span>, fireDocReady);
+    };
+    <span class="comment">/** 
+     * Places a simple wrapper around an event handler to override the browser event 
+     * object with a YAHOO.ext.EventObject
+     */</span>
+    <span class="reserved">this</span>.wrap = <span class="reserved">function</span>(fn, scope, override){
+        var wrappedFn = <span class="reserved">function</span>(e){
+            YAHOO.ext.EventObject.setEvent(e);
+            fn.call(override ? scope || window : window, YAHOO.ext.EventObject, scope);
+        };
+        <span class="reserved">return</span> wrappedFn;
+    };
+    
+    <span class="comment">/**
+     * Appends an event handler
+     *
+     * <span class="attrib">@param</span> {Object}   element        The html element to assign the 
+     *                             event to
+     * <span class="attrib">@param</span> {String}   eventName     The type of event to append
+     * <span class="attrib">@param</span> {Function} fn        The method the event invokes
+     * <span class="attrib">@param</span> {Object}   scope    An arbitrary object that will be 
+     *                             passed as a parameter to the handler
+     * <span class="attrib">@param</span> {boolean}  override If true, the obj passed in becomes
+     *                             the execution scope of the listener
+     * <span class="attrib">@return</span> {Function} The wrapper function created (to be used to remove the listener if necessary)
+     */</span>
+    <span class="reserved">this</span>.addListener = <span class="reserved">function</span>(element, eventName, fn, scope, override){
+        var wrappedFn = <span class="reserved">this</span>.wrap(fn, scope, override);
+        YAHOO.util.Event.addListener(element, eventName, wrappedFn);
+        <span class="reserved">return</span> wrappedFn;
+    };
+    
+    <span class="comment">/**
+     * Removes an event handler
+     *
+     * <span class="attrib">@param</span> {Object}   element        The html element to remove the 
+     *                             event from
+     * <span class="attrib">@param</span> {String}   eventName     The type of event to append
+     * <span class="attrib">@param</span> {Function} wrappedFn        The wrapper method returned when adding the listener
+     * <span class="attrib">@return</span> {Boolean} True if a listener was actually removed
+     */</span>
+    <span class="reserved">this</span>.removeListener = <span class="reserved">function</span>(element, eventName, wrappedFn){
+        <span class="reserved">return</span> YAHOO.util.Event.removeListener(element, eventName, wrappedFn);
+    };
+    
+    <span class="comment">/**
+     * Appends an event handler (shorthand for addListener)
+     *
+     * <span class="attrib">@param</span> {Object}   element        The html element to assign the 
+     *                             event to
+     * <span class="attrib">@param</span> {String}   eventName     The type of event to append
+     * <span class="attrib">@param</span> {Function} fn        The method the event invokes
+     * <span class="attrib">@param</span> {Object}   scope    An arbitrary object that will be 
+     *                             passed as a parameter to the handler
+     * <span class="attrib">@param</span> {boolean}  override If true, the obj passed in becomes
+     *                             the execution scope of the listener
+     * <span class="attrib">@return</span> {Function} The wrapper function created (to be used to remove the listener if necessary)
+     */</span>
+    <span class="reserved">this</span>.on = <span class="reserved">function</span>(element, eventName, fn, scope, override){
+        var wrappedFn = <span class="reserved">this</span>.wrap(fn, scope, override);
+        YAHOO.util.Event.addListener(element, eventName, wrappedFn);
+        <span class="reserved">return</span> wrappedFn;
+    };
+    
+    <span class="comment">/**
+     * Fires when the document is ready (before onload)
+     */</span>
+    <span class="reserved">this</span>.onDocumentReady = <span class="reserved">function</span>(fn, scope, override){
+        <span class="reserved">if</span>(!docReadyEvent){
+            initDocReady();
+        }
+        docReadyEvent.subscribe(fn, scope, override);
+    }
+};
+
+<span class="comment">/**
+ * <span class="attrib">@class</span> 
+ * EventObject exposes the Yahoo! UI Event functionality directly on the object
+ * passed to your event handler. It exists mostly for convenience. It also fixes the annoying null checks automatically to cleanup your code 
+ * (All the YAHOO.util.Event methods throw javascript errors if the passed event is null).
+ * To get an EventObject instead of the standard browser event,
+ * your must register your listener thru the {<span class="attrib">@link</span> YAHOO.ext.EventManager} or directly on an Element
+ * with {<span class="attrib">@link</span> YAHOO.ext.Element#addManagedListener} or the shorthanded equivalent {<span class="attrib">@link</span> YAHOO.ext.Element#mon}.&lt;br&gt;
+ * Example:
+ * &lt;pre&gt;&lt;code&gt;
+ fu&lt;&gt;nction handleClick(e){ // e is not a standard event object, it is a YAHOO.ext.EventObject
+    e.preventDefault();
+    var target = e.getTarget();
+    ...
+ }
+ var myDiv = getEl('myDiv');
+ myDiv.mon('click', handleClick);
+ //or
+ YAHOO.ext.EventManager.on('myDiv', 'click', handleClick);
+ YAHOO.ext.EventManager.addListener('myDiv', 'click', handleClick);
+ &lt;/code&gt;&lt;/pre&gt;
+ */</span>
+YAHOO.ext.EventObject = new <span class="reserved">function</span>(){
+    <span class="comment">/** The normal browser event */</span> 
+    <span class="reserved">this</span>.browserEvent = null;
+    <span class="comment">/** The button pressed in a mouse event */</span> 
+    <span class="reserved">this</span>.button = -1;
+    <span class="comment">/** True if the shift key was down during the event */</span> 
+    <span class="reserved">this</span>.shiftKey = false;
+    <span class="comment">/** True if the control key was down during the event */</span> 
+    <span class="reserved">this</span>.ctrlKey = false;
+    <span class="comment">/** True if the alt key was down during the event */</span> 
+    <span class="reserved">this</span>.altKey = false;
+    
+    <span class="comment">/** Key constant <span class="attrib">@type</span> Number */</span>
+    <span class="reserved">this</span>.BACKSPACE = 8;
+    <span class="comment">/** Key constant <span class="attrib">@type</span> Number */</span>
+    <span class="reserved">this</span>.TAB = 9;
+    <span class="comment">/** Key constant <span class="attrib">@type</span> Number */</span>
+    <span class="reserved">this</span>.RETURN = 13;
+    <span class="comment">/** Key constant <span class="attrib">@type</span> Number */</span>
+    <span class="reserved">this</span>.ESC = 27;
+    <span class="comment">/** Key constant <span class="attrib">@type</span> Number */</span>
+    <span class="reserved">this</span>.SPACE = 32;
+    <span class="comment">/** Key constant <span class="attrib">@type</span> Number */</span>
+    <span class="reserved">this</span>.PAGEUP = 33;
+    <span class="comment">/** Key constant <span class="attrib">@type</span> Number */</span>
+    <span class="reserved">this</span>.PAGEDOWN = 34;
+    <span class="comment">/** Key constant <span class="attrib">@type</span> Number */</span>
+    <span class="reserved">this</span>.END = 35;
+    <span class="comment">/** Key constant <span class="attrib">@type</span> Number */</span>
+    <span class="reserved">this</span>.HOME = 36;
+    <span class="comment">/** Key constant <span class="attrib">@type</span> Number */</span>
+    <span class="reserved">this</span>.LEFT = 37;
+    <span class="comment">/** Key constant <span class="attrib">@type</span> Number */</span>
+    <span class="reserved">this</span>.UP = 38;
+    <span class="comment">/** Key constant <span class="attrib">@type</span> Number */</span>
+    <span class="reserved">this</span>.RIGHT = 39;
+    <span class="comment">/** Key constant <span class="attrib">@type</span> Number */</span>
+    <span class="reserved">this</span>.DOWN = 40;
+    <span class="comment">/** Key constant <span class="attrib">@type</span> Number */</span>
+    <span class="reserved">this</span>.DELETE = 46;
+    <span class="comment">/** Key constant <span class="attrib">@type</span> Number */</span>
+    <span class="reserved">this</span>.F5 = 116;
+
+       <span class="comment">/** <span class="attrib">@private</span> */</span> 
+    <span class="reserved">this</span>.setEvent = <span class="reserved">function</span>(e){
+        <span class="reserved">this</span>.browserEvent = e;
+        <span class="reserved">if</span>(e){
+            <span class="reserved">this</span>.button = e.button;
+            <span class="reserved">this</span>.shiftKey = e.shiftKey;
+            <span class="reserved">this</span>.ctrlKey = e.ctrlKey;
+            <span class="reserved">this</span>.altKey = e.altKey;
+        }<span class="reserved">else</span>{
+            <span class="reserved">this</span>.button = -1;
+            <span class="reserved">this</span>.shiftKey = false;
+            <span class="reserved">this</span>.ctrlKey = false;
+            <span class="reserved">this</span>.altKey = false;
+        }
+    };
+    
+    <span class="comment">/**
+     * Stop the event. Calls YAHOO.util.Event.stopEvent() if the event is not null.
+     */</span> 
+    <span class="reserved">this</span>.stopEvent = <span class="reserved">function</span>(){
+        <span class="reserved">if</span>(<span class="reserved">this</span>.browserEvent){
+            YAHOO.util.Event.stopEvent(<span class="reserved">this</span>.browserEvent);
+        }
+    };
+    
+    <span class="comment">/**
+     * Prevents the browsers default handling of the event. Calls YAHOO.util.Event.preventDefault() if the event is not null.
+     */</span> 
+    <span class="reserved">this</span>.preventDefault = <span class="reserved">function</span>(){
+        <span class="reserved">if</span>(<span class="reserved">this</span>.browserEvent){
+            YAHOO.util.Event.preventDefault(<span class="reserved">this</span>.browserEvent);
+        }
+    };
+    
+    <span class="comment">/** <span class="attrib">@private</span> */</span>
+    <span class="reserved">this</span>.isNavKeyPress = <span class="reserved">function</span>(){
+        <span class="reserved">return</span> (<span class="reserved">this</span>.browserEvent.keyCode &amp;&amp; <span class="reserved">this</span>.browserEvent.keyCode &gt;= 33 &amp;&amp; <span class="reserved">this</span>.browserEvent.keyCode &lt;= 40);
+    };
+    
+    <span class="comment">/**
+     * Cancels bubbling of the event. Calls YAHOO.util.Event.stopPropagation() if the event is not null.
+     */</span> 
+    <span class="reserved">this</span>.stopPropagation = <span class="reserved">function</span>(){
+        <span class="reserved">if</span>(<span class="reserved">this</span>.browserEvent){
+            YAHOO.util.Event.stopPropagation(<span class="reserved">this</span>.browserEvent);
+        }
+    };
+    
+    <span class="comment">/**
+     * Gets the key code for the event. Returns value from YAHOO.util.Event.getCharCode() if the event is not null.
+     * <span class="attrib">@return</span> {Number}
+     */</span> 
+    <span class="reserved">this</span>.getCharCode = <span class="reserved">function</span>(){
+        <span class="reserved">if</span>(<span class="reserved">this</span>.browserEvent){
+            <span class="reserved">return</span> YAHOO.util.Event.getCharCode(<span class="reserved">this</span>.browserEvent);
+        }
+        <span class="reserved">return</span> null;
+    };
+    
+    <span class="comment">/**
+     * Gets the x coordinate of the event. Returns value from YAHOO.util.Event.getPageX() if the event is not null.
+     * <span class="attrib">@return</span> {Number}
+     */</span> 
+    <span class="reserved">this</span>.getPageX = <span class="reserved">function</span>(){
+        <span class="reserved">if</span>(<span class="reserved">this</span>.browserEvent){
+            <span class="reserved">return</span> YAHOO.util.Event.getPageX(<span class="reserved">this</span>.browserEvent);
+        }
+        <span class="reserved">return</span> null;
+    };
+    
+    <span class="comment">/**
+     * Gets the y coordinate of the event. Returns value from YAHOO.util.Event.getPageY() if the event is not null.
+     * <span class="attrib">@return</span> {Number}
+     */</span> 
+    <span class="reserved">this</span>.getPageY = <span class="reserved">function</span>(){
+        <span class="reserved">if</span>(<span class="reserved">this</span>.browserEvent){
+            <span class="reserved">return</span> YAHOO.util.Event.getPageY(<span class="reserved">this</span>.browserEvent);
+        }
+        <span class="reserved">return</span> null;
+    };
+    
+    <span class="comment">/**
+     * Gets the time of the event. Returns value from YAHOO.util.Event.getTime() if the event is not null.
+     * <span class="attrib">@return</span> {Number}
+     */</span> 
+    <span class="reserved">this</span>.getTime = <span class="reserved">function</span>(){
+        <span class="reserved">if</span>(<span class="reserved">this</span>.browserEvent){
+            <span class="reserved">return</span> YAHOO.util.Event.getTime(<span class="reserved">this</span>.browserEvent);
+        }
+        <span class="reserved">return</span> null;
+    };
+    
+    <span class="comment">/**
+     * Gets the page coordinates of the event. Returns value from YAHOO.util.Event.getXY() if the event is not null.
+     * <span class="attrib">@return</span> {Array} The xy values like [x, y]
+     */</span> 
+    <span class="reserved">this</span>.getXY = <span class="reserved">function</span>(){
+        <span class="reserved">if</span>(<span class="reserved">this</span>.browserEvent){
+            <span class="reserved">return</span> YAHOO.util.Event.getXY(<span class="reserved">this</span>.browserEvent);
+        }
+        <span class="reserved">return</span> [];
+    };
+    
+    <span class="comment">/**
+     * Gets the target for the event. Returns value from YAHOO.util.Event.getTarget() if the event is not null.
+     * <span class="attrib">@return</span> {HTMLelement}
+     */</span> 
+    <span class="reserved">this</span>.getTarget = <span class="reserved">function</span>(){
+        <span class="reserved">if</span>(<span class="reserved">this</span>.browserEvent){
+            <span class="reserved">return</span> YAHOO.util.Event.getTarget(<span class="reserved">this</span>.browserEvent);
+        }
+        <span class="reserved">return</span> null;
+    };
+    
+    <span class="comment">/**
+     * Walk up the DOM looking for a particular target - if the default target matches, it is returned.
+     * <span class="attrib">@return</span> {HTMLelement}
+     */</span> 
+    <span class="reserved">this</span>.findTarget = <span class="reserved">function</span>(className, tagName){
+        <span class="reserved">if</span>(tagName) tagName = tagName.toLowerCase();
+        <span class="reserved">if</span>(<span class="reserved">this</span>.browserEvent){
+            <span class="reserved">function</span> isMatch(el){
+               <span class="reserved">if</span>(!el){
+                   <span class="reserved">return</span> false;
+               }
+               <span class="reserved">if</span>(className &amp;&amp; !YAHOO.util.Dom.hasClass(el, className)){
+                   <span class="reserved">return</span> false;
+               }
+               <span class="reserved">if</span>(tagName &amp;&amp; el.tagName.toLowerCase() != tagName){
+                   <span class="reserved">return</span> false;
+               }
+               <span class="reserved">return</span> true;
+            };
+            
+            var t = <span class="reserved">this</span>.getTarget();
+            <span class="reserved">if</span>(!t || isMatch(t)){
+    		    <span class="reserved">return</span> t;
+    	    }
+    	    var p = t.parentNode;
+    	    <span class="reserved">while</span>(p &amp;&amp; p.tagName.toUpperCase() != <span class="literal">'BODY'</span>){
+                <span class="reserved">if</span>(isMatch(p)){
+                	<span class="reserved">return</span> p;
+                }
+                p = p.parentNode;
+            }
+    	}
+        <span class="reserved">return</span> null;
+    };
+    <span class="comment">/**
+     * Gets the related target. Returns value from YAHOO.util.Event.getRelatedTarget() if the event is not null.
+     * <span class="attrib">@return</span> {HTMLelement}
+     */</span> 
+    <span class="reserved">this</span>.getRelatedTarget = <span class="reserved">function</span>(){
+        <span class="reserved">if</span>(<span class="reserved">this</span>.browserEvent){
+            <span class="reserved">return</span> YAHOO.util.Event.getRelatedTarget(<span class="reserved">this</span>.browserEvent);
+        }
+        <span class="reserved">return</span> null;
+    };
+    
+    <span class="comment">/**
+     * Normalizes mouse wheel delta across browsers
+     */</span>
+    <span class="reserved">this</span>.getWheelDelta = <span class="reserved">function</span>(){
+        var e = <span class="reserved">this</span>.browserEvent;
+        var delta = 0;
+        <span class="reserved">if</span>(e.wheelDelta){ <span class="comment">/* IE/Opera. */</span>
+            delta = e.wheelDelta/120;
+            <span class="comment">/** In Opera 9, delta differs in sign as compared to IE. */</span>
+            <span class="reserved">if</span>(window.opera) delta = -delta;
+        }<span class="reserved">else</span> <span class="reserved">if</span>(e.detail){ <span class="comment">/** Mozilla case. */</span>
+            delta = -e.detail/3;
+        }
+        <span class="reserved">return</span> delta;
+    };
+    
+    <span class="comment">/**
+     * Returns true if the control, shift or alt key was pressed during this event.
+     * <span class="attrib">@return</span> {Boolean}
+     */</span> 
+    <span class="reserved">this</span>.hasModifier = <span class="reserved">function</span>(){
+        <span class="reserved">return</span> <span class="reserved">this</span>.ctrlKey || <span class="reserved">this</span>.altKey || <span class="reserved">this</span>.shiftKey;
+    };
+}();
+            
+    </pre>
+	<hr>
+
+
+<hr>
+<font size="-1">
+
+</font>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat Oct 14 06:07:10 2006</div>
+</body>
+</html>

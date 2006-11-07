@@ -1,0 +1,348 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN""http://www.w3.org/TR/REC-html40/loose.dtd">
+<!--NewPage-->
+<HTML>
+<HEAD>
+<TITLE>
+YAHOO.ext.grid.JSONDataModel
+</TITLE>
+<LINK REL ="stylesheet" TYPE="text/css" HREF="stylesheet.css" TITLE="Style">
+</HEAD>
+<SCRIPT>
+function asd()
+{
+parent.document.title="YAHOO.ext.grid.JSONDataModel";
+}
+</SCRIPT>
+<BODY BGCOLOR="white" onload="asd();" style="margin:15px;">
+<!-- ======== START OF CLASS DATA ======== -->
+<H2>Class YAHOO.ext.grid.JSONDataModel</H2>
+<PRE>Object
+   |
+   +--<a href='YAHOO.ext.grid.AbstractDataModel.html'>YAHOO.ext.grid.AbstractDataModel</a>
+         |
+         +--<a href='YAHOO.ext.grid.DefaultDataModel.html'>YAHOO.ext.grid.DefaultDataModel</a>
+               |
+               +--<a href='YAHOO.ext.grid.LoadableDataModel.html'>YAHOO.ext.grid.LoadableDataModel</a>
+                     |
+                     +--<b>YAHOO.ext.grid.JSONDataModel</b>
+</PRE>
+
+
+<HR>
+<DL>
+   <!-- Class definition -->
+   <DT>class 
+   <B>YAHOO.ext.grid.JSONDataModel</B>
+   
+      <DT>extends <a href='YAHOO.ext.grid.LoadableDataModel.html'>YAHOO.ext.grid.LoadableDataModel</a> 
+   
+
+</DL>
+   
+   <P>
+   <BR/>This is an implementation of a DataModel used by the Grid. It works 
+ with JSON data.
+ <br>Example schema:
+ <pre><code>
+ var schema = {
+     root: 'Results.Result',
+     id: 'ASIN',
+     fields: ['Author', 'Title', 'Manufacturer', 'ProductGroup']
+ };
+ </code></pre>
+ <BR/><I>Defined in <a href='overview-summary-JSONDataModel.js.html'>JSONDataModel.js</a></I><BR/><BR/>
+   </P>
+   
+   <HR>
+
+<!-- ======== NESTED CLASS SUMMARY ======== -->
+
+<!-- ======== END NESTED CLASS SUMMARY ======== -->
+
+
+<!-- =========== FIELD SUMMARY =========== -->
+
+
+   
+   
+   &nbsp;<A NAME=""><!-- --></A>
+   <TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+   <TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+   <TD class="title-cell"><B>Fields inherited from class <A HREF="YAHOO.ext.grid.LoadableDataModel.html">YAHOO.ext.grid.LoadableDataModel</A></B></TD>
+   </TR>
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD><CODE>
+   <a href="YAHOO.ext.grid.LoadableDataModel.html#onLoad">onLoad</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#onLoadException">onLoadException</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#loadedPage">loadedPage</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#remoteSort">remoteSort</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#pageSize">pageSize</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#pageUrl">pageUrl</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#baseParams">baseParams</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#paramMap">paramMap</a>
+   </CODE></TD>
+   </TR>
+</TABLE>
+&nbsp;
+
+
+   
+
+   
+   &nbsp;<A NAME=""><!-- --></A>
+   <TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+   <TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+   <TD class="title-cell"><B>Fields inherited from class <A HREF="YAHOO.ext.grid.AbstractDataModel.html">YAHOO.ext.grid.AbstractDataModel</A></B></TD>
+   </TR>
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD><CODE>
+   <a href="YAHOO.ext.grid.AbstractDataModel.html#onCellUpdated">onCellUpdated</a>, <a href="YAHOO.ext.grid.AbstractDataModel.html#onTableDataChanged">onTableDataChanged</a>, <a href="YAHOO.ext.grid.AbstractDataModel.html#onRowsDeleted">onRowsDeleted</a>, <a href="YAHOO.ext.grid.AbstractDataModel.html#onRowsInserted">onRowsInserted</a>, <a href="YAHOO.ext.grid.AbstractDataModel.html#onRowsUpdated">onRowsUpdated</a>, <a href="YAHOO.ext.grid.AbstractDataModel.html#onRowsSorted">onRowsSorted</a>, <a href="YAHOO.ext.grid.AbstractDataModel.html#events">events</a>, <a href="YAHOO.ext.grid.AbstractDataModel.html#addListener">addListener</a>, <a href="YAHOO.ext.grid.AbstractDataModel.html#removeListener">removeListener</a>, <a href="YAHOO.ext.grid.AbstractDataModel.html#fireEvent">fireEvent</a>
+   </CODE></TD>
+   </TR>
+</TABLE>
+&nbsp;
+
+
+
+<!-- =========== END FIELD SUMMARY =========== -->
+
+
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+
+<A NAME="constructor_summary"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+  <TD COLSPAN="2" class="title-cell">
+    Constructor Summary
+  </TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+   <TD>
+      <CODE>
+	 <B>
+	    <A HREF="YAHOO.ext.grid.JSONDataModel.html#YAHOO.ext.grid.JSONDataModel()">YAHOO.ext.grid.JSONDataModel</A> 
+	 </B>
+	 (schema)
+      </CODE>
+      <BR>
+      &nbsp;&nbsp;
+      
+      </TD>
+</TR>
+</TABLE>
+
+<!-- ======== END CONSTRUCTOR SUMMARY ======== -->
+
+&nbsp;
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<A NAME="method_summary"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+  <TD COLSPAN="2" class="title-cell">
+    <span style="float:left">Method Summary</span>
+    <span style="float:right;font-weight:normal;font-size:8pt;">
+      <i>* Parameter types in italic indicate optional parameters</i>
+    </span>
+  </TD>
+</TR>
+
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;Number</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#getRowId">getRowId</A></B>(&lt;Number&gt; rowIndex)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Overrides getRowId in DefaultDataModel to return the ID value of the specified node.
+      </TD>
+   </TR>
+
+   <TR BGCOLOR="white" CLASS="TableRowColor">
+      <TD ALIGN="right" VALIGN="top" WIDTH="1%">
+	 <FONT SIZE="-1">
+	    <CODE>&nbsp;void</CODE>
+	 </FONT>
+      </TD>
+      <TD>
+	 <CODE>
+	    <B>
+	       <A HREF="#loadData">loadData</A></B>(&lt;Object&gt; data, &lt;<a href="Function.html">Function</a>&gt; callback, keepExisting)
+	 </CODE>
+	 <BR>
+	 &nbsp;&nbsp;
+	 Overrides loadData in LoadableDataModel to process JSON data
+      </TD>
+   </TR>
+
+
+</TABLE>
+
+
+
+&nbsp;<A NAME="methods_inherited_from_class_java.lang.Object"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TD class="title-cell"><B>Methods inherited from class <a href="YAHOO.ext.grid.LoadableDataModel.html">YAHOO.ext.grid.LoadableDataModel</a></B></TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE>
+<!-- Inherited methods -->
+<a href="YAHOO.ext.grid.LoadableDataModel.html#isPaged">isPaged</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#getTotalRowCount">getTotalRowCount</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#getPageSize">getPageSize</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#getTotalPages">getTotalPages</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#initPaging">initPaging</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#loadPage">loadPage</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#sort">sort</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#load">load</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#fireLoadException">fireLoadException</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#fireLoadEvent">fireLoadEvent</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#addPreprocessor">addPreprocessor</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#getPreprocessor">getPreprocessor</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#removePreprocessor">removePreprocessor</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#addPostprocessor">addPostprocessor</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#getPostprocessor">getPostprocessor</a>, <a href="YAHOO.ext.grid.LoadableDataModel.html#removePostprocessor">removePostprocessor</a>
+</CODE></TD>
+</TR>
+</TABLE>
+&nbsp;
+
+&nbsp;<A NAME="methods_inherited_from_class_java.lang.Object"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TD class="title-cell"><B>Methods inherited from class <a href="YAHOO.ext.grid.DefaultDataModel.html">YAHOO.ext.grid.DefaultDataModel</a></B></TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE>
+<!-- Inherited methods -->
+<a href="YAHOO.ext.grid.DefaultDataModel.html#getRowCount">getRowCount</a>, <a href="YAHOO.ext.grid.DefaultDataModel.html#getRow">getRow</a>, <a href="YAHOO.ext.grid.DefaultDataModel.html#getRows">getRows</a>, <a href="YAHOO.ext.grid.DefaultDataModel.html#getValueAt">getValueAt</a>, <a href="YAHOO.ext.grid.DefaultDataModel.html#setValueAt">setValueAt</a>, <a href="YAHOO.ext.grid.DefaultDataModel.html#removeRow">removeRow</a>, <a href="YAHOO.ext.grid.DefaultDataModel.html#query">query</a>, <a href="YAHOO.ext.grid.DefaultDataModel.html#filter">filter</a>, <a href="YAHOO.ext.grid.DefaultDataModel.html#addRow">addRow</a>, <a href="YAHOO.ext.grid.DefaultDataModel.html#insertRow">insertRow</a>, <a href="YAHOO.ext.grid.DefaultDataModel.html#applySort">applySort</a>, <a href="YAHOO.ext.grid.DefaultDataModel.html#setDefaultSort">setDefaultSort</a>
+</CODE></TD>
+</TR>
+</TABLE>
+&nbsp;
+
+&nbsp;<A NAME="methods_inherited_from_class_java.lang.Object"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TD class="title-cell"><B>Methods inherited from class <a href="YAHOO.ext.grid.AbstractDataModel.html">YAHOO.ext.grid.AbstractDataModel</a></B></TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE>
+<!-- Inherited methods -->
+<a href="YAHOO.ext.grid.AbstractDataModel.html#fireCellUpdated">fireCellUpdated</a>, <a href="YAHOO.ext.grid.AbstractDataModel.html#fireTableDataChanged">fireTableDataChanged</a>, <a href="YAHOO.ext.grid.AbstractDataModel.html#fireRowsDeleted">fireRowsDeleted</a>, <a href="YAHOO.ext.grid.AbstractDataModel.html#fireRowsInserted">fireRowsInserted</a>, <a href="YAHOO.ext.grid.AbstractDataModel.html#fireRowsUpdated">fireRowsUpdated</a>, <a href="YAHOO.ext.grid.AbstractDataModel.html#fireRowsSorted">fireRowsSorted</a>, <a href="YAHOO.ext.grid.AbstractDataModel.html#getSortState">getSortState</a>
+</CODE></TD>
+</TR>
+</TABLE>
+&nbsp;
+
+<P>
+<!-- ========== END METHOD SUMMARY =========== -->
+
+
+<!-- ============ FIELD DETAIL START =========== -->
+
+
+<!-- ============ FIELD DETAIL END =========== -->
+
+    <!-- ========= CONSTRUCTOR DETAIL START ======== -->
+
+<A NAME="constructor_detail"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+   <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+     <TD COLSPAN="1" class="title-cell">
+       Constructor Detail
+     </TD>
+   </TR>
+</TABLE>
+
+<A NAME="YAHOO.ext.grid.JSONDataModel()"><!-- --></A><H3>
+YAHOO.ext.grid.JSONDataModel</H3>
+<PRE><B>YAHOO.ext.grid.JSONDataModel</B>(schema)</PRE>
+
+
+
+
+   </UL>
+
+
+<!-- Constructor return value(s) -->
+
+<!-- End constructor return value(s) -->
+
+<!-- ADDITIONAL ATTRIBUTES -->
+
+<HR/>
+<!-- END ADDITIONAL ATTRIBUTES  -->
+
+<!-- ========= CONSTRUCTOR DETAIL END ======== -->
+
+
+<!-- ============ METHOD DETAIL START ========== -->
+
+<A NAME="method_detail"><!-- --></A>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+   <TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+     <TD COLSPAN="1" class="title-cell">
+       Method Detail
+     </TD>
+   </TR>
+</TABLE>
+
+<!-- One single method detail entry -->
+
+   <A NAME="getRowId"><!-- --></A>
+   <H3>getRowId</H3>
+   <PRE>Number <B>getRowId</B>(&lt;Number&gt; rowIndex)</PRE>
+   
+      <UL>Overrides getRowId in DefaultDataModel to return the ID value of the specified node.</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>rowIndex</CODE> -   
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+   <A NAME="loadData"><!-- --></A>
+   <H3>loadData</H3>
+   <PRE>void <B>loadData</B>(&lt;Object&gt; data, &lt;<a href="Function.html">Function</a>&gt; callback, keepExisting)</PRE>
+   
+      <UL>Overrides loadData in LoadableDataModel to process JSON data</UL>
+   
+
+   <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>data</CODE> -  The JSON object to load  
+      </UL> 
+   
+     <UL><CODE>callback</CODE> -     
+      </UL> 
+   
+   </UL>
+   
+   <!-- METHOD PARAMETERS END -->
+
+   
+
+   <!-- ADDITIONAL ATTRIBUTES START -->
+   
+   <!-- ADDITIONAL ATTRIBUTES  END -->
+<HR>
+
+
+
+<!-- ============ METHOD DETAIL END ========== -->
+
+<!-- ========= END OF CLASS DATA ========= -->
+
+<HR>
+<FONT SIZE="-1">
+
+</FONT>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat Oct 14 06:07:10 2006</div>
+</BODY>
+</HTML>

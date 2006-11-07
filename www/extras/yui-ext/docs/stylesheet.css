@@ -1,0 +1,141 @@
+/* JSDoc style sheet */
+
+/* Define colors, fonts and other style attributes here to override the defaults */
+
+/* Page background color */
+body {background-color: #FFFFFF; font-family:Helvetica, Arial, san-serif; font-size: 9pt;padding:0px;margin:0px;}
+#docs{
+	width:100%;
+	height:100%;
+}
+#dsplit{
+	z-index: 10001;
+}
+#dnav{
+	width:240px;
+	float:left;
+	background-color:white;
+}
+#dnav-inner{
+	width:100%;
+	padding-top:4px;
+}
+#dnav a{
+	display:block;
+	padding:2px;
+	font-size:8pt;
+	color:black;
+	padding-left:6px;
+}
+#dnav a:hover{
+	background:#c3daf9;
+	text-decoration:none;
+}
+#dnav .hd{
+	background: #e1eeff;
+	border-bottom: 1px solid #81aae2;
+	border-top: 1px solid white;
+	color: #083772;
+	font: bold 8pt arial;
+	padding:3px;
+}
+#dsplit{
+	width:4px;
+	float:left;
+	height:100%;
+	background-color:#c3daf9;
+}
+#dbody{
+	float:right;
+	height:100%;
+}
+
+tr.over{
+	background:#e1eeff;
+	cursor:pointer;
+}
+
+.loading-indicator {
+	font-size:8pt;
+	background-image: url('../images/wait.gif');
+	background-repeat: no-repeat;
+	background-position: left;
+	padding-left:20px;
+}
+
+table {
+	border:1px solid #c3daf9;
+}
+hr {
+	color:#eeeeee;
+}
+i {
+	color:#444444;
+}
+a{
+	text-decoration:none;
+}
+a:hover{
+	text-decoration:underline;
+}
+table td {
+	font-family:Helvetica, Arial, san-serif;
+	font-size: 12px;
+	border:none;
+	border-right:1px solid #dddddd;
+	border-bottom:1px solid #dddddd;
+	border-collapse: collapse;
+	padding:5px;
+}
+h2 {
+	font-size:16px;
+	font-family:tahoma;
+}
+h3 {
+	font-size:14px;
+	font-family:tahoma;
+}
+dt {
+	font-size:14px;
+	font-family:tahoma;
+}
+/* Table colors */
+.TableHeadingColor     { background: #c3daf9;} /* Dark mauve */
+.TableSubHeadingColor  { background: #EEEEFF;} /* Light mauve */
+.TableRowColor         { background: #FFFFFF } /* White */
+
+.title-cell {
+	font-size:10pt;font-weight:bold;
+	border-top:1px solid white;
+	border-left:1px solid white;
+	border-bottom:1px solid #c3daf9;
+	background:#e1eeff;
+	color:#083772;
+}
+/* Font used in left-hand frame lists */
+.FrameTitleFont   { font-size: 10pt; }
+.FrameHeadingFont { font-size: 10pt; }
+.FrameItemFont    { font-size: 10pt; }
+
+/* Example of smaller, sans-serif font in frames */
+/* .FrameItemFont  { font-size: 10pt; font-family: Helvetica, Arial, sans-serif } */
+
+/* Navigation bar fonts and colors */
+.NavBarCell1    { background-color:#EEEEFF;}/* Light mauve */
+.NavBarCell1Rev { background-color:#00008B;}/* Dark Blue */
+.NavBarFont1    { font-family: Arial, Helvetica, sans-serif; color:#000000;}
+.NavBarFont1Rev { font-family: Arial, Helvetica, sans-serif; color:#FFFFFF;}
+
+.NavBarCell2    { font-family: Arial, Helvetica, sans-serif; background-color:#FFFFFF;}
+.NavBarCell3    { font-family: Arial, Helvetica, sans-serif; background-color:#FFFFFF;}
+
+.jsdoc_ctime    { font-family: Arial, Helvetica, sans-serif; font-size: 9pt;
+                    text-align: right }
+
+/* Sourcecode view */
+.sourceview { background: #f1f1f1 }
+.attrib { color: gray }
+.comment { color: #008000 }
+.reserved { color: #0000ff }
+.literal { color: #a31515 }
+
