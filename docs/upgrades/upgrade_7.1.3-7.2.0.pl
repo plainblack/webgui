@@ -38,6 +38,7 @@ sub deleteFiles {
 	my $session = shift;
 	print "\tDelete unnecessary files.\n" unless ($quiet);
 	unlink "../../lib/WebGUI/i18n/English/Form_Textarea.pm";
+	unlink "../../www/extras/resizeable_textarea.js";
 }
 
 #--------------------------------------------------
