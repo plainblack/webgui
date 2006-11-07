@@ -183,6 +183,7 @@ sub getRssItems { () }
 =head2 www_viewRSS ( )
 
 Default www method for methods that return RSS.  This will redirect to the getRssUrl unless overridden.
+
 =cut
 
 sub www_viewRSS { 
