@@ -169,7 +169,7 @@ sub www_copy {
 	my $newAsset = $self->duplicate;
 	$newAsset->update({ title=>$self->getTitle.' (copy)'});
 	$newAsset->cut;
-	return $self->getContainer->www_view;
+	return $self->session->asset($self->getContainer)->www_view;
 }
 
 #-------------------------------------------------------------------
@@ -225,8 +225,9 @@ sub www_createShortcut {
 		return $self->getParent->www_view;
 	} else {
 		$child->cut;
-		return $self->getContainer->www_manageAssets if ($self->session->form->process("proceed") eq "manageAssets");
-		return $self->getContainer->www_view;
+		$self->session->asset($self->getContainer);
+		return $self->session->asset->www_manageAssets if ($self->session->form->process("proceed") eq "manageAssets");
+		return $self->session->asset->www_view;
 	}
 }
 

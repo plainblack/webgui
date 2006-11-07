@@ -623,7 +623,7 @@ sub www_styleWizard {
 #-------------------------------------------------------------------
 sub www_view {
 	my $self = shift;
-	return $self->getContainer->www_view;
+	return $self->session->asset($self->getContainer)->www_view;
 }
 
 

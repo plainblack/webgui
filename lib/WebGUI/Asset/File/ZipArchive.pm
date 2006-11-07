@@ -258,7 +258,7 @@ sub www_view {
 	my $self = shift;
 	return $self->session->privilege->noAccess() unless $self->canView;
 	if ($self->session->var->isAdminOn) {
-		return $self->getContainer->www_view;
+		return $self->session->asset($self->getContainer)->www_view;
 	}
 	$self->session->http->setRedirect($self->getFileUrl($self->getValue("showPage")));
 	return "1";

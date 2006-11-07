@@ -423,7 +423,8 @@ sub www_vote {
 		}
 		$self->getContainer->purgeCache;
 	}
-	return $self->getContainer->www_view;
+
+	return $self->session->asset($self->getContainer)->www_view;
 }
 
 

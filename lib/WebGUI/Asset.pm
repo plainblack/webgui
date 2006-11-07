@@ -563,7 +563,7 @@ sub getContainer {
 	if (WebGUI::Utility::isIn($self->get("className"), @{$self->session->config->get("assetContainers")})) {
 		return $self;
 	} else {
-		$self->session->asset($self->getParent);
+#		$self->session->asset($self->getParent);
 		return $self->getParent;
 	}
 }
@@ -2011,7 +2011,7 @@ sub www_editSave {
 		if ($self->canEditIfLocked) {
                         $object = $self->addRevision;
                 } else {
-                        return $self->getContainer->www_view;
+                        return $self->session->asset($self->getContainer)->www_view;
                 }
 	}
 

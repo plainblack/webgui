@@ -329,7 +329,8 @@ sub www_deleteEventConfirm {
 	} else {
 		$self->trash;
 	}
-	return $self->getParent->getContainer->www_view;;
+
+	return $self->session->asset($self->getParent->getContainer)->www_view;
 }
 
 

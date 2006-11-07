@@ -724,7 +724,7 @@ sub www_demote {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	$self->demote;
-	return $self->getContainer->www_view; 
+	return $self->session->asset($self->getContainer)->www_view; 
 }
 
 
@@ -740,7 +740,7 @@ sub www_promote {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	$self->promote;
-	return $self->getContainer->www_view;
+	return $self->session->asset($self->getContainer)->www_view;
 }
 
 

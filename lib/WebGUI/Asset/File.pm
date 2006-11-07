@@ -373,7 +373,7 @@ sub www_view {
 	my $self = shift;
 	return $self->session->privilege->noAccess() unless $self->canView;
 #	if ($self->session->var->get("adminOn")) {
-#		return $self->getContainer->www_view;
+#		return $self->session->asset($self->getContainer)->www_view;
 #	}
 
 	# Kludge for now to make this work with the exporter.
