@@ -1,6 +1,12 @@
 package WebGUI::i18n::English::Asset_EventManagementSystem;
 
 our $I18N = { ##hashref of hashes
+	'cancel registration' => {
+		message => q|Cancel Registration|,
+		lastUpdated => 0,
+		context => q|Label for hyperlink asking user if they wish to cancel the registration process during checkout.|,
+	},
+
         'search template' => { 
 		message => q|Search Template|,
 		lastUpdated => 1131394070,

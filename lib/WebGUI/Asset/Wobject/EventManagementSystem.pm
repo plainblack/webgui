@@ -930,7 +930,9 @@ sub getRegistrationInfo {
 	$var{'form.updateProfile'} = WebGUI::Form::Checkbox($self->session,{name=>'updateProfile'});
 	$var{isLoggedIn} = 1 if ($self->session->user->userId ne '1');
 	$var{'form.email'} = WebGUI::Form::Email($self->session,{name=>'email'});
-	$var{'registration'} = 1;	
+	$var{'registration'} = 1;
+	$var{'cancelRegistration.url'} = $self->getUrl('func=resetScratchCart');
+	$var{'cancelRegistration.url.label'} = $i18n->get('cancel registration');	
 	return \%var;
 }
 
