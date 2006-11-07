@@ -65,6 +65,8 @@
  - WebGUI::Session::Scratch->delete now returns the value deleted for 
    convenience, like Perl's built-in delete() function.
  - fix: Auth redirectOnLogin wouldn't work if login called from Operation::execute()
+ - fix: WebGUI::Operation::Commerce->listTransactions now adds trailing 0's to
+   prices/totals.
  - fix: Uncommitted Collaborations and adding threads
 
 

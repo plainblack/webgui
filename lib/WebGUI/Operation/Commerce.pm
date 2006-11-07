@@ -970,8 +970,8 @@ sub www_listTransactions {
 		$output .= '<td>'.$session->icon->delete('op=deleteTransaction;tid='.$transaction->get('transactionId')).'</td>';
 		$output .= '<td>'.$session->datetime->epochToHuman($transaction->get('initDate')).'</td>';
 		$output .= '<td>'.$session->datetime->epochToHuman($transaction->get('completionDate')).'</td>';
-		$output .= '<td>'.$transaction->get('amount').'</td>';
-		$output .= '<td>'.$transaction->get('shippingCost').'</td>';
+		$output .= '<td>'.sprintf('%.2f',$transaction->get('amount')).'</td>';
+		$output .= '<td>'.sprintf('%.2f',$transaction->get('shippingCost')).'</td>';
 		$output .= '<td>'.$transaction->get('status').'</td>';
 		$output .= '<td>'.$transaction->get('shippingStatus').'</td>';
 		$output .= '</tr>';
