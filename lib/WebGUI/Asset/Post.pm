@@ -255,6 +255,26 @@ sub exportAssetData {
 
 #-------------------------------------------------------------------
 
+=head2 fixUrl ( url ) 
+
+Extends superclass method to remove periods from post urls
+
+=head3 url
+
+The url of the post
+
+=cut
+
+sub fixUrl {
+	my $self = shift;
+	my $url = shift;
+	$url =~ s/\./_/g;
+
+	$self->SUPER::fixUrl($url);
+}
+
+#-------------------------------------------------------------------
+
 =head2 formatContent ( [ content, contentType ])
 
 Formats post content for display.
