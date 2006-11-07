@@ -59,7 +59,7 @@ sub apply {
 	$groupId = $self->{_properties}{subscriptionGroup};
 	my $group = WebGUI::Group->new($self->session,$groupId);
 	# Make user part of the right group
-	$group->addUsers([$userId], $self->_getDuration($self->{_properties}{duration}));
+	$group->addUsers([$userId], $self->session->datetime->time + $self->_getDuration($self->{_properties}{duration}));
 
 	# Add karma
 	WebGUI::User->new($self->session,$userId)->karma($self->{_properties}{karma}, 'Subscription', 'Added for purchasing subscription '.$self->{_properties}{name});
