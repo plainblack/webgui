@@ -27,7 +27,6 @@ addLastExportedAs($session);
 addDeletionWorkflows($session);
 addRSSFromParent($session);
 reorderSurveyCollateral($session);
-addMailExcludeGroups($session);
 
 finish($session); # this line required
 
