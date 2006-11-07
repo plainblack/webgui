@@ -74,6 +74,7 @@ sub definition {
 	return $class->NEXT::definition($session, $definition);
 }
 
+#-------------------------------------------------------------------
 sub _rssFromParentValid {
 	my $self = shift;
 	my $rssFromParentId = $self->get('rssCapableRssFromParentId');
@@ -84,6 +85,7 @@ sub _rssFromParentValid {
 		&& $rssFromParent->getParent->getId eq $self->getId);
 }
 
+#-------------------------------------------------------------------
 sub _updateRssFromParentProperties {
 	my $self = shift;
 	my $rssFromParent = WebGUI::Asset->newByDynamicClass($self->session,
@@ -92,6 +94,7 @@ sub _updateRssFromParentProperties {
 				 menuTitle => $self->get('menuTitle') });
 }
 
+#-------------------------------------------------------------------
 sub _purgeExtraRssFromParentAssets {
 	my $self = shift;
 	my $rssFromParentId = $self->get('rssCapableRssFromParentId');
@@ -104,6 +107,7 @@ sub _purgeExtraRssFromParentAssets {
 	}
 }
 
+#-------------------------------------------------------------------
 sub _ensureRssFromParentPresent {
 	my $self = shift;
 	if (!$self->_rssFromParentValid) {
@@ -120,6 +124,7 @@ sub _ensureRssFromParentPresent {
 	$self->_purgeExtraRssFromParentAssets;
 }
 
+#-------------------------------------------------------------------
 sub _ensureRssFromParentAbsent {
 	my $self = shift;
 	# Invalidate it, and then it'll get purged along with any others.
@@ -127,6 +132,7 @@ sub _ensureRssFromParentAbsent {
 	$self->_purgeExtraRssFromParentAssets;
 }
 
+#-------------------------------------------------------------------
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	my $error = $self->NEXT::processPropertiesFromFormPost(@_);
@@ -170,5 +176,27 @@ This is the primary method that RSSCapable assets should override.
 =cut
 
 sub getRssItems { () }
+
+
+#-------------------------------------------------------------------
+
+=head2 www_viewRSS ( )
+
+Default www method for methods that return RSS.  This will redirect to the getRssUrl unless overridden.
+=cut
+
+sub www_viewRSS { 
+   my $self = shift;
+   my $session = $self->session;
+   
+   my $rssUrl = $self->getRssUrl;
+   
+   if($rssUrl) {
+      $session->http->setRedirect($self->getRssUrl);
+   }
+   
+   return "";
+}
+
 
 1;
