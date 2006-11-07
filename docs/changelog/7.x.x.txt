@@ -22,6 +22,7 @@
         asset (automatic) that actually generates the feeds from them.
  - new: workflow activity and hooks for deleting exported files on trash,
         purge, and changeUrl
+ - fix: editing posts loses changes in preview
 
 7.1.4
  - Template variables in the main Survey Template were out of date in the

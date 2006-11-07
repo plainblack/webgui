@@ -1058,9 +1058,9 @@ sub www_edit {
 				value=>$self->getValue("username")
 				});
 		$var{isEdit} = 1;
-		$content = $self->getValue("content");
-		$title = $self->getValue("title");
-		$synopsis = $self->getValue("synopsis");
+		$content = $self->session->form->process('content') || $self->getValue("content");
+		$title = $self->session->form->process('title') || $self->getValue("title");
+		$synopsis = $self->session->form->process('synopsis') || $self->getValue("synopsis");
 	}
 	$var{'archive.form'} = WebGUI::Form::yesNo($self->session, {
 		name=>"archive"
