@@ -48,7 +48,8 @@ These methods are available from this package:
 
 =head2 delete ( name )
 
-Deletes a scratch variable.
+Deletes a scratch variable. Returns the value of the deleted variable for 
+convenience, or undef if the variable was not defined.
 
 =head3 name
 
@@ -60,8 +61,9 @@ sub delete {
 	my $self = shift;
 	my $name = shift;
 	return undef unless ($name);
-	delete $self->{_data}{$name};
+	my $value = delete $self->{_data}{$name};
 	$self->session->db->write("delete from userSessionScratch where name=? and sessionId=?", [$name, $self->session->getId]);
+	return $value;
 }
 
 

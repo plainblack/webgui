@@ -242,7 +242,6 @@ sub createAccountSave {
 	}
 	$self->session->user({user=>$u});
 	$self->_logLogin($userId,"success");
-	$self->session->http->setStatus(201,"Account Registration Successful");
 	if ($self->session->setting->get("runOnRegistration")) {
 		WebGUI::Workflow::Instance->create($self->session, {
 			workflowId=>$self->session->setting->get("runOnRegistration"),
@@ -252,6 +251,17 @@ sub createAccountSave {
 			priority=>1
 			});
 	}
+	
+	
+	# If we have a redirectOnLogin, redirect the user
+	if ($self->session->scratch->get("redirectOnLogin")) {
+		my $url = $self->session->scratch->delete("redirectOnLogin");
+		$self->session->http->setRedirect($url);
+	} else {
+		$self->session->http->setStatus(201,"Account Registration Successful");
+	}
+	
+	
 	return undef;
 }
 
@@ -371,7 +381,10 @@ sub displayLogin {
     	my $self = shift;
 	my $method = $_[0] || "login";
 	my $vars = $_[1];
-	unless ($self->session->form->process("op") eq "auth") {
+	# Automatically set redirectAfterLogin unless we've linked here directly
+	# or it's already been set.
+	unless ($self->session->form->process("op") eq "auth"
+		|| $self->session->scratch->get("redirectAfterLogin") ) {
 	   	$self->session->scratch->set("redirectAfterLogin",$self->session->url->page($self->session->env->get("QUERY_STRING")));
 	}
 	my $i18n = WebGUI::International->new($self->session);

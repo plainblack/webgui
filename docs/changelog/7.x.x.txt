@@ -42,6 +42,9 @@
  - fix: WebGUI::Operation::ProductManager added a tab with wrong name.
  - fix: WebGUI::Operation::Commerce www_selectPaymentGateway no longer forces
    user to choose gateway if they are only authorized to use one
+ - WebGUI::Session::Scratch->delete now returns the value deleted for 
+   convenience, like Perl's built-in delete() function.
+ - fix: Auth redirectOnLogin wouldn't work if login called from Operation::execute()
 
 7.1.3
  - fix: SQLReport now returns error if can't find DatabaseLink
