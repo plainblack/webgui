@@ -179,7 +179,7 @@ sub set {
 
 	foreach (keys(%{$properties})) {
 		if (isIn($_, qw(name price useSalesTax description subscriptionGroup duration executeOnSubscription karma))) {
-			$self->{_properties}{$_} = $value;
+			$self->{_properties}{$_} = $properties->{$_};
 			push(@fieldsToUpdate, $_);
 		}
 	}
