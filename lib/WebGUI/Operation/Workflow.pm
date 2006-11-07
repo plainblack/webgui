@@ -213,7 +213,7 @@ sub www_editWorkflow {
 		hoverHelp=>$i18n->get("is serial help")
 		);
 	$f->submit;
-	my $steps = '<table class="content">';
+	my $steps = '<div style="clear:both"></div><table class="content">';
 	my $rs = $session->db->read("select activityId, title from WorkflowActivity where workflowId=? order by sequenceNumber",[$workflow->getId]);
 	while (my ($id, $title) = $rs->array) {
 		$steps .= '<tr><td>'
