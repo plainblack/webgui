@@ -1,3 +1,5 @@
+7.2.1
+
 7.2.0
  - Added server side spellchecker (Martin Kamerbeek / Procolix)
  - Added configurable sales tax. (Tiffany Patterson / Elite Marketing)
