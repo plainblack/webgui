@@ -142,22 +142,22 @@ See WebGUI::Form::File::getValueFromPost() for details. Generates a thumbnail.
 sub getValueFromPost {
 	my $self = shift;
 	my $id = $self->SUPER::getValueFromPost(@_);
+
 	if (defined $id) {
 		my $storage = WebGUI::Storage::Image->get($self->session, $id);
 		if (defined $storage) {
-			my $atLeastOneImage = 0;
-			foreach my $file (@{$storage->getFiles}) {
-				if ($storage->isImage($file)) {
-					$storage->generateThumbnail($file);
-					$atLeastOneImage = 1;
-				}
-				elsif ($self->get("forceImageOnly")) {
-					$storage->deleteFile($file);
-					$id = undef unless $atLeastOneImage;
-				}
+			my @files = @{$storage->getFiles};
+			my @images = grep{$storage->isImage($_)} @files;
+			if ($self->get('forceImageOnly')) {
+				$storage->deleteFile($_) for grep{!isIn($_, @images)} @files;
+				@files = @images;
 			}
+
+			return undef unless @files;
+			$storage->generateThumbnail($_) for @images;
 		}
 	}
+
 	return $id;
 }
 
