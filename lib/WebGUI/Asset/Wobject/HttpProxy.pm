@@ -230,6 +230,7 @@ sub view {
 	my $header; 
 	my $proxiedUrl; 
 	
+	my $i18n = WebGUI::International->new($self->session, 'Asset_HttpProxy');
 	
 	### Set up a cookie jar
 	my $cookiebox = $self->session->url->escape($self->session->var->get("sessionId"));
@@ -284,7 +285,7 @@ sub view {
 			if ($self->get("followExternal")==0 
 				&& (URI->new($self->get('proxiedUrl'))->host) ne (URI->new($proxiedUrl)->host) ) {
 				$var{header} 	= "text/html";
-				$var{content} 	= "<h1>You are not allowed to leave ".$self->get("proxiedUrl")."</h1>";
+				$var{content} 	= sprintf $i18n->get('may not leave error message'), $self->get("proxiedUrl");
 				last;
 			}
 			
@@ -383,8 +384,7 @@ sub view {
 		
 				if ($var{content} =~ /<frame/gis) {
 					$var{header} = "text/html";
-					$var{content} = "<h1>HttpProxy: Can't display frames</h1>
-					Try fetching it directly <a href='$proxiedUrl'>here.</a>";
+					$var{content} = sprintf $i18n->get('no frame error message'), $proxiedUrl;
 				} else {
 					$var{content} =~ s/\<style.*?\/style\>//isg if ($self->get("removeStyle"));
 					$var{content} = WebGUI::HTML::cleanSegment($var{content});

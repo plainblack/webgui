@@ -179,6 +179,18 @@ our $I18N = {
 		lastUpdated => 1047835817
 	},
 
+	'no frame error message' => {
+		message => q|<h1>HttpProxy: Can't display frames</h1>Try fetching it directly <a href='%s'>here.</a>|,
+		lastUpdated => 1162959817,
+		context => q|This entry is used to tell the user that the HttpProxy cannot display frames.  Please leeave the %s part of the string as is, since this entry is used in sprintf|,
+	},
+
+	'may not leave error message' => {
+		message => q|<h1>You are not allowed to leave %s</h1>"|,
+		lastUpdated => 1162959817,
+		context => q|This entry is used to tell the user that the HttpProxy cannot leave this URL.  Please leeave the %s part of the string as is, since this entry is used in sprintf|,
+	},
+
 };
 
 1;
