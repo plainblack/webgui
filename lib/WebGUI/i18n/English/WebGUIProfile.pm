@@ -330,7 +330,16 @@ new categories of profile settings.
 		message => q|User Profile|,
 		lastUpdated => 1128920410,
 	},
-	
+
+        'forceImageOnly label' => {
+                message => q|Force Image Only Uploads|,
+                lastUpdated => 1162945563
+        },
+
+        'forceImageOnly hoverHelp' => {
+                message => "If set to yes, this form control will only allow image file types to be uploaded through it.",
+                lastUpdated => 1162945563
+        },
 };
 
 1;

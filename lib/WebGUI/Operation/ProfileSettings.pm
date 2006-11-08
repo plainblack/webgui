@@ -269,8 +269,8 @@ sub www_editProfileField {
 	if ($data->{fieldType} eq "Image") {
 		$f->yesNo(
 			-name=>"forceImageOnly",
-			-label=>$i18n->echo("Force Image Only Uploads"),
-			-hoverHelp=>$i18n->echo("If set to yes, this form control will only allow image file types to be uploaded through it."),
+			-label=>$i18n->get('forceImageOnly label'),
+			-hoverHelp=>$i18n->get('forceImageOnly hoverHelp'),
 			-value=>$data->{forceImageOnly},
 			-defaultValue=>1,
 		);

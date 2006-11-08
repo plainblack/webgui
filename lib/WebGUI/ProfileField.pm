@@ -125,6 +125,22 @@ sub delete {
 }
 
 #-------------------------------------------------------------------
+sub _formProperties {
+	my $self = shift;
+	my $properties = shift || {};
+	$properties->{label} = $self->getLabel unless $properties->{label};
+	$properties->{fieldType} = $self->get("fieldType");
+	$properties->{name} = $self->getId;
+	my $values = WebGUI::Operation::Shared::secureEval($self->session,$self->get("possibleValues")) || {};
+	my $orderedValues = {};
+	tie %{$orderedValues}, 'Tie::IxHash';
+	foreach my $ov (sort keys %{$values}) {
+		$orderedValues->{$ov} = $values->{$ov};
+	}
+	$properties->{options} = $orderedValues;
+	$properties->{forceImageOnly} = $self->get("forceImageOnly");
+	return $properties;
+}
 
 =head2 formField ( [ formProperties, withWrapper, userObject ] )
 
@@ -146,21 +162,10 @@ A WebGUI::User object reference to use instead of the currently logged in user.
 
 sub formField {
 	my $self = shift;
-	my $properties = shift || {};
+	my $properties = $self->_formProperties(shift);
 	my $withWrapper = shift;
 	my $u = shift;
 	my $skipDefault = shift;
-	$properties->{label} = $self->getLabel unless $properties->{label};
-	$properties->{fieldType} = $self->get("fieldType");
-	$properties->{name} = $self->getId;
-	my $values = WebGUI::Operation::Shared::secureEval($self->session,$self->get("possibleValues")) || {};
-	my $orderedValues = {};
-	tie %{$orderedValues}, 'Tie::IxHash';
-	foreach my $ov (sort keys %{$values}) {
-		$orderedValues->{$ov} = $values->{$ov};
-	}
-	$properties->{options} = $orderedValues;
-	$properties->{forceImageOnly} = $self->get("forceImageOnly");
 	my $default;
 	if ($skipDefault) {
 	} elsif (defined $self->session->form->process($properties->{name})) {
@@ -193,7 +198,7 @@ Returns the value retrieved from a form post.
 
 sub formProcess {
 	my $self = shift;
-	my $result = $self->session->form->process($self->getId,$self->get("fieldType"),WebGUI::Operation::Shared::secureEval($self->session,$self->get("dataDefault")));
+	my $result = $self->session->form->process($self->getId,$self->get("fieldType"),WebGUI::Operation::Shared::secureEval($self->session,$self->get("dataDefault")), $self->_formProperties);
 	if (ref $result eq "ARRAY") {
 		my @results = @$result;
 		for (my $count=0;$count<scalar(@results);$count++) {
