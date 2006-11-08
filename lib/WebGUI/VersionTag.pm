@@ -204,29 +204,16 @@ sub getOpenTags {
 
 =head2 getRevisionCount ( )
 
-Returns the number of revisions for this asset.
+Returns the number of revisions for this tag.
 
 =cut
 
 sub getRevisionCount {
 	my $self = shift;
-	my ($count) = $self->session->db->quickArray("select count(*) from assetData where assetId=?", [$self->getId]);
+	my ($count) = $self->session->db->quickArray("select count(*) from assetData where tagId=?", [$self->getId]);
 	return $count;
 }
 
-#-------------------------------------------------------------------
-
-=head2 getTagCount ( )
-
-Returns the number of tags that have been attached to this asset. Think of it sort of like an absolute revision count, rather than counting the number of actual edits, we're counting the number of tags opened against this asset to be edited.
-
-=cut
-
-sub getTagCount {
-	my $self = shift;
-	my ($count) = $self->session->db->quickArray("select count(distinct(tagId)) from assetData where assetId=?", [$self->getId]);
-	return $count;
-}
 
 #-------------------------------------------------------------------
 

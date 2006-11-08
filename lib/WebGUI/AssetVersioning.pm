@@ -133,6 +133,19 @@ sub getRevisionCount {
 	return $count;
 }
 
+#-------------------------------------------------------------------
+
+=head2 getTagCount ( )
+
+Returns the number of tags that have been attached to this asset. Think of it sort of like an absolute revision count, rather than counting the number of actual edits, we're counting the number of tags opened against this asset to be edited.
+
+=cut
+
+sub getTagCount {
+	my $self = shift;
+	my ($count) = $self->session->db->quickArray("select count(distinct(tagId)) from assetData where assetId=?", [$self->getId]);
+	return $count;
+}
 
 #-------------------------------------------------------------------
 
