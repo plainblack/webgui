@@ -339,7 +339,7 @@ sub www_editProfileFieldSave {
 		possibleValues=>$session->form->textarea("possibleValues"),
 		dataDefault=>$session->form->textarea("dataDefault"),
 		fieldType=>$session->form->fieldType("fieldType"),
-		forceImageOnly=>$session->form->fieldType("yesNo"),
+		forceImageOnly=>$session->form->yesNo("forceImageOnly"),
 		);
 	my $categoryId = $session->form->selectBox("profileCategoryId");
 	if ($session->form->process("new")) {
