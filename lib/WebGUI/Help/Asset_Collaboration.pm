@@ -163,7 +163,7 @@ our $HELP = {
                         },
                         {
                                 title => 'display last reply',
-                                description => 'display last reply help',
+                                description => 'display last reply description',
                                 namespace => 'Asset_Collaboration',
                         },
                         {

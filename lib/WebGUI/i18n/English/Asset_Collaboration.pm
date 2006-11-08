@@ -1064,7 +1064,7 @@ properties listed below:</p>
 
         'display last reply description' => {
                 message => q|If set to Yes, template variables will be added to allow the display the last Post.|,
-                lastUpdated => 1119070429,
+                lastUpdated => 1163013333,
         },
 
         'system template description' => {

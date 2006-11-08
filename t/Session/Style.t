@@ -59,7 +59,7 @@ my ($url, $params);
 ($url) = simpleLinkParser('link', $style->generateAdditionalHeadTags);
 is($url, '-', 'setLink: called with no params or link url');
 
-is($style->generateAdditionalHeadTags(), '', 'generateAdditionalHeadTags: returns empty string since nothing has been set');
+is($style->generateAdditionalHeadTags(), undef, 'generateAdditionalHeadTags: returns undef since nothing has been set');
 
 $style->setLink('http://www.plainblack.com');
 ($url) = simpleLinkParser('link', $style->generateAdditionalHeadTags);
