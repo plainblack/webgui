@@ -148,17 +148,16 @@ sub getValueFromPost {
 		my $storage = WebGUI::Storage::Image->get($self->session, $id);
 		if (defined $storage) {
 			my @files = @{$storage->getFiles};
-			my @images = grep{$storage->isImage($_)} @files;
+			my @images = grep{$storage->isImage($_)} @files; # Put all filenames that isImage returns true for into @images
 			if ($self->get('forceImageOnly')) {
-				$storage->deleteFile($_) for grep{!isIn($_, @images)} @files;
+				$storage->deleteFile($_) for grep{!isIn($_, @images)} @files; # Search @files for filenames that are not in @images and delete them
 				@files = @images;
 			}
 
 			return undef unless @files;
-			$storage->generateThumbnail($_) for @images;
+			$storage->generateThumbnail($_) for @images; # Make a thumbnail for each filename in @images
 		}
 	}
-
 	return $id;
 }
 
