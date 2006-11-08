@@ -1376,6 +1376,11 @@ used by Collaboration Assets:</p>
 		lastUpdated => 1149655833,
 	},
 
+	'displayLastReply' => {
+		message => q|A conditional that is true if the Collaboration System was configured to display the last reply.  If this variable is true, then in the Collaboration Template, the lastReply.* variables will be enabled.|,
+		lastUpdated => 1149655833,
+	},
+
 	'user.isModerator' => {
 		message => q|A conditional that is true if the current user is a moderator for this Asset.|,
 		lastUpdated => 1149655833,

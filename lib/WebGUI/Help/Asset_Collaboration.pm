@@ -162,6 +162,11 @@ our $HELP = {
                                 namespace => 'Asset_Collaboration',
                         },
                         {
+                                title => 'display last reply',
+                                description => 'display last reply help',
+                                namespace => 'Asset_Collaboration',
+                        },
+                        {
                                 title => 'mail server',
                                 description => 'mail server help',
                                 namespace => 'Asset_Collaboration',
@@ -410,7 +415,7 @@ our $HELP = {
 		]
 	},
 
-	'collaboration post list template variables' => {
+	'collaboration post list template variables' => { ##from appendPostListTemplateVars
 		title => 'collaboration post list template variables title',
 		body => 'collaboration post list template variables body',
 		fields => [
@@ -535,6 +540,9 @@ our $HELP = {
 		fields => [
 		],
 		variables => [
+		          {
+		            'name' => 'displayLastReply'
+		          },
 		          {
 		            'name' => 'user.canPost'
 		          },

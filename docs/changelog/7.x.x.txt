@@ -68,6 +68,7 @@
  - fix: WebGUI::Operation::Commerce->listTransactions now adds trailing 0's to
    prices/totals.
  - fix: Uncommitted Collaborations and adding threads
+ - fix: template variable displayLastReply is in none of the CS help files
 
 
 7.1.3
