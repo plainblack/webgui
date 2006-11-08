@@ -19,6 +19,7 @@ use base 'WebGUI::Form::File';
 use WebGUI::International;
 use WebGUI::Storage::Image;
 use WebGUI::Form::YesNo;
+use WebGUI::Utility qw/isIn/;
 
 =head1 NAME
 
