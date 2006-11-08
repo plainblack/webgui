@@ -56,6 +56,10 @@ If no name is specified a default name of "file" will be used.
 
 Flag that tells the User Profile system that this is a valid form element in a User Profile
 
+=head4 forceImageOnly
+
+When set, form control will not allow file uploads unless the file has recognized image file extension
+
 =cut
 
 sub definition {
