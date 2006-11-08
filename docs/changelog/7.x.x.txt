@@ -69,6 +69,8 @@
    prices/totals.
  - fix: Uncommitted Collaborations and adding threads
  - fix: template variable displayLastReply is in none of the CS help files
+ - karma rfe: Faster rendering for editing interface
+ - karma rfe: Limiting access to admin mode to set of ip's
 
 
 7.1.3

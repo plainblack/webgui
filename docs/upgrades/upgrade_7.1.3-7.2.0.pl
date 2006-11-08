@@ -21,6 +21,7 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
+addAdminModeSubnets($session);
 commerceSalesTax($session);
 createDictionaryStorage($session);
 addRssUrlMacroProcessing($session);
@@ -33,6 +34,13 @@ deleteFiles($session);
 fixAds($session);
 
 finish($session); # this line required
+
+#--------------------------------------------------
+sub addAdminModeSubnets {
+	my $session = shift;
+	print "\tAllowing admin mode to be restricted to certain subnets in the config file.\n" unless ($quiet);
+	$session->config->set("adminModeSubnets",[]);
+}
 
 #--------------------------------------------------
 sub addNewProfileSetting {

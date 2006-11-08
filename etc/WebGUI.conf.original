@@ -151,6 +151,11 @@
 
 # "emailOverride" : "joe@example.com",
 
+# By adding CIDR based subnets to the following array you can limit the
+# subnets by which users can turn admin mode on.
+
+"adminModeSubnets" : [ ],
+
 # List the authentication plug-ins you wish to be available on
 # this site.
 

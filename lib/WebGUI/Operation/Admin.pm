@@ -33,7 +33,7 @@ If the current user is in the Turn On Admin Group, then return an Admin Console.
 
 sub www_adminConsole {
 	my $session = shift;
-	return "" unless ($session->user->isInGroup(12));
+	return "" unless ($session->user->canUseAdminMode);
 	my $ac = WebGUI::AdminConsole->new($session);
 	return $ac->render;
 }
@@ -50,7 +50,7 @@ via WebGUI::Session::Var::switchAdminOff()
 
 sub www_switchOffAdmin {
 	my $session = shift;
-	return "" unless ($session->user->isInGroup(12));
+	return "" unless ($session->user->canUseAdminMode);
 	$session->http->setCacheControl("none");
 	$session->var->switchAdminOff();
 	return "";
@@ -66,7 +66,7 @@ If the current user is in the Turn On Admin Group, then allow them to turn on Ad
 
 sub www_switchOnAdmin {
 	my $session = shift;
-	return "" unless ($session->user->isInGroup(12));
+	return "" unless ($session->user->canUseAdminMode);
 	$session->http->setCacheControl("none");
 	$session->var->switchAdminOn();
 	return "";

@@ -120,6 +120,24 @@ sub authMethod {
 
 #-------------------------------------------------------------------
 
+=head2 canUseAdminMode ( )
+
+Returns a boolean indicating whether the user has the basic privileges needed to turn on admin mode and use basic admin functions. Note this isn't checking for any special privileges like whether the user can create new users, etc.
+
+=cut
+
+sub canUseAdminMode {
+        my $self = shift;
+	my $pass = 1;
+	my $subnets = $self->session->config->get("adminModeSubnets");
+	if (scalar(@$subnets)) {
+		$pass = isInSubnet($self->session->env->get("REMOTE_ADDR"), $subnets);
+	}
+	return $pass && $self->session->user->isInGroup(12)
+}
+
+#-------------------------------------------------------------------
+
 =head2 dateCreated ( )
 
 Returns the epoch for when this user was created.
