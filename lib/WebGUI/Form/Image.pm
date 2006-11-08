@@ -145,13 +145,15 @@ sub getValueFromPost {
 	if (defined $id) {
 		my $storage = WebGUI::Storage::Image->get($self->session, $id);
 		if (defined $storage) {
+			my $atLeastOneImage = 0;
 			foreach my $file (@{$storage->getFiles}) {
 				if ($storage->isImage($file)) {
 					$storage->generateThumbnail($file);
+					$atLeastOneImage = 1;
 				}
 				elsif ($self->get("forceImageOnly")) {
-					$storage->delete;
-					$id = undef;
+					$storage->deleteFile($file);
+					$id = undef unless $atLeastOneImage;
 				}
 			}
 		}
