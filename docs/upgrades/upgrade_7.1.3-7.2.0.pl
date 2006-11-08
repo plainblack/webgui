@@ -177,7 +177,7 @@ EOT
 	my $oldTag = WebGUI::VersionTag->getWorking($session, 0);
 	my $templateTag = WebGUI::VersionTag->create($session, { name => '7.2.0 RSS template update' });
 	$templateTag->setWorking;
-	foreach my $templateId ($session->db->buildArray("SELECT assetId FROM template WHERE namespace = 'Collaboration/RSS'")) {
+	foreach my $templateId ($session->db->buildArray("SELECT DISTINCT assetId FROM template WHERE namespace = 'Collaboration/RSS'")) {
 		my $template = WebGUI::Asset->newByDynamicClass($session, $templateId)->addRevision;
 		$template->update({ namespace => 'RSSCapable/RSS' });
 	}
@@ -190,7 +190,7 @@ EOT
 	$session->db->write($_) for (<<'EOT',
   INSERT INTO RSSCapable (assetId, revisionDate, rssCapableRssEnabled, rssCapableRssTemplateId,
                           rssCapableRssFromParentId)
-    SELECT assetId, revisionDate, 0, 'PBtmpl0000000000000142', NULL
+    SELECT assetId, revisionDate, 0, rssTemplateId, NULL
       FROM Collaboration
 EOT
 				     <<'EOT',
@@ -201,7 +201,7 @@ EOT
 
 	my $csTag = WebGUI::VersionTag->create($session, { name => '7.2.0 Collaboration RSS update' });
 	$csTag->setWorking;
-	foreach my $csId ($session->db->buildArray("SELECT assetId FROM Collaboration")) {
+	foreach my $csId ($session->db->buildArray("SELECT DISTINCT assetId FROM Collaboration")) {
 		# Blah, some duplication with RSSCapable.pm.
 		my $cs = WebGUI::Asset->newByDynamicClass($session, $csId)->addRevision;
 		next if $cs->get('isPrototype'); # Uh.
@@ -211,7 +211,8 @@ EOT
 				    menuTitle => $cs->get('menuTitle'),
 				    url => $cs->get('url').'.rss'
 				  });
-		$cs->update({ rssCapableRssFromParentId => $rssFromParent->getId });
+		$cs->update({ rssCapableRssEnabled => 1,
+			      rssCapableRssFromParentId => $rssFromParent->getId });
 	}
 	$csTag->commit;
 
