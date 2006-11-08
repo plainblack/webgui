@@ -59,11 +59,17 @@ isnt ($output, undef, 'view method returns something');
 # What about our snippet?
 ok ($output =~ /Gooey's milkshake brings all the girls to the yard\.\.\./, 'view method output has our snippet in it'); 
 
+my $wwwViewOutput = $snippet->www_view;
+isnt ($wwwViewOutput, undef, 'www_view returns something');
+
+my $editOutput = $snippet->www_edit;
+isnt ($editOutput, undef, 'www_edit returns something');
+
 TODO: {
         local $TODO = "Tests to make later";
 	ok(0, 'Test indexContent method');
-	ok(0, 'Test www_edit method');
-	ok(0, 'Test www_view method... maybe?');
+	#ok(0, 'Test www_edit method');
+	#ok(0, 'Test www_view method... maybe?');
 }
 
 END {
