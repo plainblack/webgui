@@ -32,6 +32,8 @@ my $http = $session->http;
 
 use Test::MockObject::Extends;
 
+##This tests mocks http's getCookies so that it doesn't have to
+##try and implement the mod_perl cookie handling code.
 $http = Test::MockObject::Extends->new($http);
 my $cookieName = $session->config->getCookieName;
 my $varId = $session->var->getId();
