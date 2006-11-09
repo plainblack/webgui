@@ -21,7 +21,7 @@ my @tests =
      ['end null', ['a', 'b', ''], 'a,b,'],
      ['start null', ['', 'b', 'c'], ',b,c'],
      ['all null', ['', '', ''], ',,'],
-     ['single null', [''], ''],
+     ['single null', [], ''],
      ['escape commas', ['w,x', 'y,z'], '"w,x","y,z"'],
      ['escape double quotes', ['abc"def', 'ghi-jkl', 'mnop'], '"abc""def",ghi-jkl,mnop']);
 plan(tests => scalar(@tests) * 2);
