@@ -84,22 +84,42 @@ sub create {
 
 #-------------------------------------------------------------------
 
-=head2 commit (  )
+=head2 commit ( [ options ] )
 
-Commits all assets edited under a version tag, and then sets the version tag to committed.
+Commits all assets edited under a version tag, and then sets the version tag to committed. Returns 1 if successful.
+
+=head3 options
+
+A hash reference with options for this asset.
+
+=head4 timeout
+
+Commit assets until we've reached this timeout. If we're not able to commit them all in this amount of time, then we'll return 2 rather than 1. We defaultly timeout after 999 seconds.
 
 =cut
 
 sub commit {
 	my $self = shift;
-	foreach my $asset (@{$self->getAssets({"byLineage"=>1})}) {
+	my $options = shift;
+	my $timeout = $options->{timeout} || 999;
+	my $now = time;
+	my $finished = 1;
+	foreach my $asset (@{$self->getAssets({"byLineage"=>1, onlyPending=>1})}) {
 		$asset->commit;
+		if ($now + $timeout < time) {
+			$finished = 0;	
+			last;
+		}
 	}
-	$self->{_data}{isCommitted} = 1;
-	$self->{_data}{committedBy} = $self->session->user->userId unless ($self->{_data}{committedBy});
-	$self->{_data}{commitDate} = $self->session->datetime->time();
-	$self->session->db->setRow("assetVersionTag", "tagId", $self->{_data});
-	$self->clearWorking;
+	if ($finished) {
+		$self->{_data}{isCommitted} = 1;
+		$self->{_data}{committedBy} = $self->session->user->userId unless ($self->{_data}{committedBy});
+		$self->{_data}{commitDate} = $self->session->datetime->time();
+		$self->session->db->setRow("assetVersionTag", "tagId", $self->{_data});
+		$self->clearWorking;
+		return 1;
+	}
+	return 2;
 }
 
 
@@ -149,6 +169,10 @@ A boolean that will reverse the order of the assets. The default is to return th
 
 A boolean that will return the asset list ordered by lineage, ascending. Cannot be used in conjunction with "reverse".
 
+=head4 onlyPending
+
+Return only assets pending a commit, not assets that have already been committed.
+
 =cut
 
 sub getAssets {
@@ -157,11 +181,15 @@ sub getAssets {
 	my @assets = ();
 	my $direction = $options->{reverse} ? "asc" : "desc";
 	my $sort = "revisionDate";
+	my $pending = "";
 	if ($options->{byLineage}) {
 		$sort = "lineage";
 		$direction = "asc";
 	}
-	my $sth = $self->session->db->read("select asset.assetId,asset.className,assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.tagId=? order by ".$sort." ".$direction, [$self->getId]);
+	if ($options->{onlyPending}) {
+		$pending = " and assetData.status='pending' ";
+	}
+	my $sth = $self->session->db->read("select asset.assetId,asset.className,assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.tagId=? ".$pending." order by ".$sort." ".$direction, [$self->getId]);
 	while (my ($id,$class,$version) = $sth->array) {
 		push(@assets, WebGUI::Asset->new($self->session,$id,$class,$version));
 	}

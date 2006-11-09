@@ -70,8 +70,13 @@ See WebGUI::Workflow::Activity::execute() for details.
 sub execute {
 	my $self = shift;
 	my $versionTag = shift;
-	$versionTag->commit;
-	return $self->COMPLETE;
+	my $completion = $versionTag->commit({timeout=>55});
+	if ($completion == 1) {
+		return $self->COMPLETE;
+	} elsif ($completion == 2) {
+		return $self->WAITING;
+	}
+	return $self->ERROR;
 }
 
 
