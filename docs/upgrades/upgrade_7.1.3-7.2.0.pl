@@ -205,10 +205,10 @@ EOT
 		# Blah, some duplication with RSSCapable.pm.
 		my ($revisionDate) = $session->db->quickArray("SELECT MAX(revisionDate) FROM Collaboration WHERE assetId = ?", [$csId]);
 		my $cs = WebGUI::Asset->newByDynamicClass($session, $csId, $revisionDate);
-		if ($cs->isPrototype or not($cs->get('status') eq 'approved' or
-					    $cs->get('status') eq 'archived')) {
+		if ($cs->get('isPrototype') or not($cs->get('status') eq 'approved' or
+						   $cs->get('status') eq 'archived')) {
 			$cs->update({ rssCapableRssEnabled => 1, rssCapableRssFromParentId => undef });
-			if (!$cs->isPrototype) {
+			if (!$cs->get('isPrototype')) {
 				# Update the most recent published one too.
 				my $csp = WebGUI::Asset->newByDynamicClass($session, $csId);
 				if ($csp) {

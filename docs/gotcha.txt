@@ -9,6 +9,10 @@ save you many hours of grief.
 
 7.2.0
 --------------------------------------------------------------------
+ * NOTE: if you tried to upgrade to 7.2.0 and it failed during the
+   addition of RSS From Parent capability, there have been bugs fixed
+   in that section of the relevant upgrade script in 7.2.1.
+
  * Server side spellchecking has been added to this release. You must 
    install Text::Aspell, and any dictionary you like. If you want to 
    use spellchecking you have to setup the dictionaries you want your 
