@@ -178,7 +178,8 @@ EOT
 	my $templateTag = WebGUI::VersionTag->create($session, { name => '7.2.0 RSS template update' });
 	$templateTag->setWorking;
 	foreach my $templateId ($session->db->buildArray("SELECT DISTINCT assetId FROM template WHERE namespace = 'Collaboration/RSS'")) {
-		my $template = WebGUI::Asset->newByDynamicClass($session, $templateId)->addRevision;
+		my ($revisionDate) = $session->db->quickArray("SELECT MAX(revisionDate) FROM template WHERE assetId = ?", [$templateId]);
+		my $template = WebGUI::Asset->newByDynamicClass($session, $templateId, $revisionDate);
 		$template->update({ namespace => 'RSSCapable/RSS' });
 	}
 
@@ -203,16 +204,20 @@ EOT
 	$csTag->setWorking;
 	foreach my $csId ($session->db->buildArray("SELECT DISTINCT assetId FROM Collaboration")) {
 		# Blah, some duplication with RSSCapable.pm.
-		my $cs = WebGUI::Asset->newByDynamicClass($session, $csId)->addRevision;
-		next if $cs->get('isPrototype'); # Uh.
-		my $rssFromParent =
-		    $cs->addChild({ className => 'WebGUI::Asset::RSSFromParent',
-				    title => $cs->get('title'),
-				    menuTitle => $cs->get('menuTitle'),
-				    url => $cs->get('url').'.rss'
-				  });
-		$cs->update({ rssCapableRssEnabled => 1,
-			      rssCapableRssFromParentId => $rssFromParent->getId });
+		my ($revisionDate) = $session->db->quickArray("SELECT MAX(revisionDate) FROM Collaboration WHERE assetId = ?", [$csId]);
+		my $cs = WebGUI::Asset->newByDynamicClass($session, $csId, $revisionDate);
+		if ($cs->isPrototype) {
+			$cs->update({ rssCapableRssEnabled => 1, rssCapableRssFromParentId => undef });
+		} else {
+			my $rssFromParent =
+			    $cs->addChild({ className => 'WebGUI::Asset::RSSFromParent',
+					    title => $cs->get('title'),
+					    menuTitle => $cs->get('menuTitle'),
+					    url => $cs->get('url').'.rss'
+					  });
+			$cs->update({ rssCapableRssEnabled => 1,
+				      rssCapableRssFromParentId => $rssFromParent->getId });
+		}
 	}
 	$csTag->commit;
 
