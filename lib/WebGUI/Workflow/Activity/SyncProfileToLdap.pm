@@ -85,13 +85,19 @@ my %ldapStatusCode = ( 0=>'success (0)', 1=>'Operations Error (1)', 2=>'Protocol
 
 #-------------------------------------------------------------------
 sub _alias {
+	my $self = shift;
+	my $attribute = shift;
 	my %alias = (
 		firstName=>"cn",
 		lastName=>"sn",
 		email=>"mail",
 		companyName=>"o"
 		);
-	return $alias{$_[0]} || $_[0];
+	if (defined $self->session->config->get('ldapAlias')) {
+		%alias = %{$self->session->config->get('ldapAlias')};
+	}
+
+	return $alias{$attribute} || $attribute;
 }
 
 #-------------------------------------------------------------------
@@ -105,7 +111,7 @@ See WebGUI::Workflow::Activity::execute() for details.
 sub execute {
 	my $self = shift;
 	my $userObject = shift; # Set to the current user by the instance
-	my ($userId, $u, $userData, $uri, $port, %args, $fieldName, $ldap, $search, $a, $b);
+	my ($userId, $userData, $uri, $port, %args, $fieldName, $ldap, $search, $sth);
 	
 	$userId = $userObject->userId;
 	my $auth = WebGUI::Auth->new($self->session, "LDAP",$userId);
@@ -124,19 +130,19 @@ sub execute {
 		if ($result->code == 0) {
 			$search = $ldap->search( base=>$userData->{connectDN}, filter=>"&(objectClass=*)" );
 			if($search->code) {
-				$self->session->errorHandler->warn("Couldn't search LDAP ".$uri->host." to find user ".$u->username." (".$userId.").\nError Message from LDAP: ".$ldapStatusCode{$search->code});
+				$self->session->errorHandler->warn("Couldn't search LDAP ".$uri->host." to find user ".$userObject->username." (".$userId.").\nError Message from LDAP: ".$ldapStatusCode{$search->code});
 			}
 			elsif ($search->count == 0) {
 				$self->session->errorHandler->warn("No results returned for user with dn ".$userData->{connectDN});
 			}
 			else {
-				$b = $self->session->db->read("select fieldName from userProfileField where profileCategoryId<>4");
-				while (($fieldName) = $b->array) {
-					if ($search->entry(0)->get_value(_alias($fieldName)) ne "") {
-						$userObject->profileField($fieldName,$search->entry(0)->get_value(_alias($fieldName)));
+				$sth = $self->session->db->read("select fieldName from userProfileField where profileCategoryId<>4");
+				while (($fieldName) = $sth->array) {
+					if ($search->entry(0)->get_value($self->_alias($fieldName)) ne "") {
+						$userObject->profileField($fieldName,$search->entry(0)->get_value($self->_alias($fieldName)));
 					}
 				}
-				$b->finish;
+				$sth->finish;
 			}
 			$ldap->unbind;
 		}
@@ -145,7 +151,7 @@ sub execute {
 		}
  
 	}
-	$a->finish;
+	
 	return $self->COMPLETE;
 }
 

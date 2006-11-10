@@ -1,6 +1,8 @@
 7.2.1
  - Made a change to version tag commits to deal with unusually long commit
    times.
+ - Fixed bugs the SyncProfileToLdap workflow activity where it would ignore the
+   ldapAlias config setting and it crash (Martin Kamerbeek / Procolix) 
 
 7.2.0
  - Added server side spellchecker (Martin Kamerbeek / Procolix)
