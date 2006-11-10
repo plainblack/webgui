@@ -94,11 +94,11 @@ sub _isValidUsername {
 sub _logLogin {
 	my $self = shift;
 	$self->session->db->write("insert into userLoginLog values (?,?,?,?,?)",
-		$_[0],
+		[ $_[0],
 		$_[1],
 		$self->session->datetime->time(),
 		$self->session->env->getIp,
-		$self->session->env->get("HTTP_USER_AGENT")
+		$self->session->env->get("HTTP_USER_AGENT") ]
 		);
 }
 

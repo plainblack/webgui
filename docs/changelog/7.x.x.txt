@@ -3,6 +3,8 @@
    times.
  - Fixed bugs the SyncProfileToLdap workflow activity where it would ignore the
    ldapAlias config setting and it crash (Martin Kamerbeek / Procolix) 
+ - fix: entry in error log of WebGUI
+
 
 7.2.0
  - Added server side spellchecker (Martin Kamerbeek / Procolix)
