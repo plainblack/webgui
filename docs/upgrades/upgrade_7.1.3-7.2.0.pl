@@ -175,17 +175,16 @@ EOT
 				    );
 
 	my $oldTag = WebGUI::VersionTag->getWorking($session, 0);
-	my $templateTag = WebGUI::VersionTag->create($session, { name => '7.2.0 RSS template update' });
-	$templateTag->setWorking;
-	foreach my $templateId ($session->db->buildArray("SELECT DISTINCT assetId FROM template WHERE namespace = 'Collaboration/RSS'")) {
-		my ($revisionDate) = $session->db->quickArray("SELECT MAX(revisionDate) FROM template WHERE assetId = ?", [$templateId]);
-		my $template = WebGUI::Asset->newByDynamicClass($session, $templateId, $revisionDate);
-		$template->update({ namespace => 'RSSCapable/RSS' });
-	}
+
+	$session->db->write($_) for (<<'EOT',
+  UPDATE template
+     SET namespace = 'RSSCapable/RSS'
+   WHERE namespace = 'Collaboration/RSS'
+EOT
+				    );
 
 	WebGUI::Asset->newByDynamicClass($session, 'PBtmpl0000000000000142')
 					     ->update({ title => 'Default RSS', menuTitle => 'Default RSS' });
-	$templateTag->commit;
 
 	# Need to get the Collaborations, since those now have RSS capability.
 	$session->db->write($_) for (<<'EOT',
@@ -206,8 +205,23 @@ EOT
 		# Blah, some duplication with RSSCapable.pm.
 		my ($revisionDate) = $session->db->quickArray("SELECT MAX(revisionDate) FROM Collaboration WHERE assetId = ?", [$csId]);
 		my $cs = WebGUI::Asset->newByDynamicClass($session, $csId, $revisionDate);
-		if ($cs->isPrototype) {
+		if ($cs->isPrototype or $cs->get('status') ne 'published') {
 			$cs->update({ rssCapableRssEnabled => 1, rssCapableRssFromParentId => undef });
+			if (!$cs->isPrototype) {
+				# Update the most recent published one too.
+				my $csp = WebGUI::Asset->newByDynamicClass($session, $csId);
+				if ($csp) {
+					# Duplication with below.  x.o
+					my $rssFromParent =
+					    $csp->addChild({ className => 'WebGUI::Asset::RSSFromParent',
+							     title => $csp->get('title'),
+							     menuTitle => $csp->get('menuTitle'),
+							     url => $csp->get('url').'.rss' 
+							   });
+					$csp->update({ rssCapableRssEnabled => 1,
+						       rssCapableRssFromParentId => $rssFromParent->getId });
+				}
+			}
 		} else {
 			my $rssFromParent =
 			    $cs->addChild({ className => 'WebGUI::Asset::RSSFromParent',
