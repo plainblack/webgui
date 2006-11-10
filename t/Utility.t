@@ -74,14 +74,25 @@ SKIP: {
 is(WebGUI::Utility::round(47.133984233, 0), 47, 'round() - 0 significant digits');
 is(WebGUI::Utility::round(47.133984233, 3), 47.134, 'round() - multiple significant digits');
 
-# sortHash
-SKIP: {
-	skip("Don't know how to test sortHash.",1);
-	ok(undef, 'sortHash()');
-	}
+{
+	# Just some basic tests for now.
 
-# sortHashDescending
-SKIP: {
-	skip("Don't know how to test sortHashDescending.",1);
-	ok(undef, 'sortHashDescending()');
-	}
+	# XXX: These both fail.  I think whoever designed sortHash and
+	# sortHashDescending didn't know how Perl calling conventions
+	# work---the Tie::IxHash association, and therefore the order
+	# preservation, goes away as soon as you unbox the hash...  it
+	# probably works if you tie the hash on the caller's end
+	# first, but that's not how I interpret the documentation as
+	# specifying it.  --DPW
+
+	my (%hash1, %hash2, %hash3);
+	%hash1 = ('a' => 5, 'b' => 3, 'c' => 2, 'd' => 4, 'e' => 1);
+	%hash2 = WebGUI::Utility::sortHash(%hash1);
+	%hash3 = WebGUI::Utility::sortHashDescending(%hash1);
+	is_deeply([keys %hash2], [qw/e c b d a/], 'sortHash');
+	is_deeply([keys %hash3], [qw/a d b c e/], 'sortHashDescending');
+}
+
+# Local variables:
+# mode: cperl
+# End:
