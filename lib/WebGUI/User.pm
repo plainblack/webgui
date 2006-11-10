@@ -129,7 +129,7 @@ Returns a boolean indicating whether the user has the basic privileges needed to
 sub canUseAdminMode {
         my $self = shift;
 	my $pass = 1;
-	my $subnets = $self->session->config->get("adminModeSubnets");
+	my $subnets = $self->session->config->get("adminModeSubnets") || [];
 	if (scalar(@$subnets)) {
 		$pass = isInSubnet($self->session->env->get("REMOTE_ADDR"), $subnets);
 	}
