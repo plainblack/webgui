@@ -156,7 +156,7 @@ sub _exportAsHtml {
 		} else {
 			$assetSession->output->setHandle($file);
 			$assetSession->asset($asset);
-			my $content = $asset->www_view;
+			my $content = $asset->exportHtml_view;
 			unless ($content eq "chunked") {
 				$assetSession->output->print($content);
 			}

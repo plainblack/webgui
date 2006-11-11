@@ -5,6 +5,7 @@
    ldapAlias config setting and it crash (Martin Kamerbeek / Procolix) 
  - fix: entry in error log of WebGUI
  - Fixed part of RSSCapable addition upgrade script in 7.2.0.
+ - fix: MIME types broken from change to the way File assets were streamed
 
 7.2.0
  - Added server side spellchecker (Martin Kamerbeek / Procolix)

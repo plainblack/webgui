@@ -369,14 +369,16 @@ sub www_edit {
 }
 
 #-------------------------------------------------------------------
-sub www_view {
+
+# setStreamedFile and setRedirect do not interact well with the
+# exporter.  We have a separate method for this now.
+sub exportHtml_view {
 	my $self = shift;
 	return $self->session->privilege->noAccess() unless $self->canView;
 #	if ($self->session->var->get("adminOn")) {
 #		return $self->session->asset($self->getContainer)->www_view;
 #	}
 
-	# Kludge for now to make this work with the exporter.
 	my $path = $self->getStorageLocation->getPath($self->get('filename'));
 	my $fh = eval { FileHandle->new($path) };
 	defined($fh) or return "";
@@ -387,10 +389,15 @@ sub www_view {
 	}
 	$fh->close;
 	return 'chunked';
+}
 
-#	$self->session->http->setRedirect($self->getFileUrl);
-#    	$self->session->http->setStreamedFile($self->getStorageLocation->getPath($self->get("filename")));
-#	return '1';
+sub www_view {
+	my $self = shift;
+	return $self->session->privilege->noAccess() unless $self->canView;
+
+	$self->session->http->setRedirect($self->getFileUrl);
+    	$self->session->http->setStreamedFile($self->getStorageLocation->getPath($self->get("filename")));
+	return 'chunked';
 }
 
 
