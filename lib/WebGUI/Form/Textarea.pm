@@ -112,7 +112,7 @@ sub toHtml {
 	my $style = "width: ".$width."px; height: ".$height."px; ".$self->get("style");
 	my $out = '<textarea id="'.$self->get('id').'" name="'.$self->get("name").'" style="'.$style.'" '.$self->get("extras").'>'.$value.'</textarea>';
 	if ($self->get("resizeable")) {
-		$out = '<div style="border: 0px;" class="yresizable-pinned" id="'.$self->get('id').'_wrapper">'.$out.'</div>';
+		$out = '<div style="border: 0px; width: '.$width.'px; height: '.$height.'px;" class="yresizable-pinned" id="'.$self->get('id').'_wrapper">'.$out.'</div>';
 		my ($style, $url) = $self->session->quick(qw(style url));
 		$style->setScript($url->extras("yui/build/yahoo/yahoo.js"), {type=>"text/javascript"});
 		$style->setScript($url->extras("yui/build/event/event.js"), {type=>"text/javascript"});
@@ -125,7 +125,7 @@ sub toHtml {
 		$out .= qq|
 		<script type="text/javascript">
 			var draggable_textarea = document.getElementById('|.$self->get('id').qq|_wrapper');
-			draggable_textarea.resize = new YAHOO.ext.Resizable(draggable_textarea, {resizeChild: true, minWidth:300, minHeight:200, disableTrackOver:true, multiDirectional: false});
+			draggable_textarea.resize = new YAHOO.ext.Resizable(draggable_textarea, {resizeChild: true, minWidth:300, minHeight:150, disableTrackOver:true, multiDirectional: false});
 		</script>
 		|;
 	}
