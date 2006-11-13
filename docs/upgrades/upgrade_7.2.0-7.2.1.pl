@@ -21,6 +21,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+fixInOutBoardTable();
 
 finish($session); # this line required
 
@@ -31,6 +32,15 @@ finish($session); # this line required
 #	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
 #	# and here's our code
 #}
+
+#-------------------------------------------------
+sub fixInOutBoardTable {
+	my $session = shift;
+	print "\tFixing InOutBoard table: Adding revisionDate column as a primary key.\n" unless ($quiet);
+	
+	$session->db->write("alter table InOutBoard drop primary key");
+	$session->db->write("alter table InOutBoard add primary key (assetId,revisionDate)");
+}
 
 
 
