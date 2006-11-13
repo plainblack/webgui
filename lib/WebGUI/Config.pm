@@ -340,6 +340,8 @@ sub new {
 			}
 			close($FILE);
 			my $conf = jsonToObj($json);
+			die "Couldn't parse JSON in config file '$filename'\n" 
+				unless ref $conf;
 			my $self = {_webguiRoot=>$webguiPath, _configFile=>$filename, _config=>$conf};
 			bless $self, $class;
 			$config{$filename} = $self unless $noCache;

@@ -6,6 +6,9 @@
  - fix: entry in error log of WebGUI
  - Fixed part of RSSCapable addition upgrade script in 7.2.0.
  - fix: MIME types broken from change to the way File assets were streamed
+ - fix: New resizable textareas not obeying width/height parameters
+ - fix: InOutBoard not allowing re-editing of new revisions
+ - Added a fatal error should parsing of JSON config file fail
 
 7.2.0
  - Added server side spellchecker (Martin Kamerbeek / Procolix)
