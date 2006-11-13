@@ -417,22 +417,10 @@ An integer ranging from 1-7 representing the day of the week (Sunday is 1 and Sa
 sub getDayName {
 	my $self = shift;
 	my $day = shift;
+	return undef unless ($day >= 1 && $day <= 7);
+
 	my $i18n = WebGUI::International->new($self->session,'DateTime');
-        if ($day == 7) {
-                return $i18n->get('sunday');
-        } elsif ($day == 1) {
-                return $i18n->get('monday');
-        } elsif ($day == 2) {
-                return $i18n->get('tuesday');
-        } elsif ($day == 3) {
-                return $i18n->get('wednesday');
-        } elsif ($day == 4) {
-                return $i18n->get('thursday');
-        } elsif ($day == 5) {
-                return $i18n->get('friday');
-        } elsif ($day == 6) {
-                return $i18n->get('saturday');
-        }
+	return $i18n->get((qw/monday tuesday wednesday thursday friday saturday sunday/)[$day-1]);
 }
 
 #-------------------------------------------------------------------
@@ -559,32 +547,11 @@ An integer ranging from 1-12 representing the month.
 sub getMonthName {
 	my $self = shift;
 	my $month = shift;
+	return undef unless ($month >= 1 && $month <= 12);
+
 	my $i18n = WebGUI::International->new($self->session,'DateTime');
-        if ($month == 1) {
-                return $i18n->get('january');
-        } elsif ($month == 2) {
-                return $i18n->get('february');
-        } elsif ($month == 3) {
-                return $i18n->get('march');
-        } elsif ($month == 4) {
-                return $i18n->get('april');
-        } elsif ($month == 5) {
-                return $i18n->get('may');
-        } elsif ($month == 6) {
-                return $i18n->get('june');
-        } elsif ($month == 7) {
-                return $i18n->get('july');
-        } elsif ($month == 8) {
-                return $i18n->get('august');
-        } elsif ($month == 9) {
-                return $i18n->get('september');
-        } elsif ($month == 10) {
-                return $i18n->get('october');
-        } elsif ($month == 11) {
-                return $i18n->get('november');
-        } elsif ($month == 12) {
-                return $i18n->get('december');
-        }
+	return $i18n->get((qw/january february march april may june
+			      july august september october november december/)[$month-1]);
 }
 
 #-------------------------------------------------------------------
