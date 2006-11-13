@@ -3649,8 +3649,8 @@ and tracked by WebGUI.|,
         },
 
         '1006 description' => {
-                message => q|Should the system use the HTTPS protocol for the login form?  Note that setting this option to true will only encrypt the authentication itself, not anything else before or after the authentication.|,
-                lastUpdated => 1120239343,
+                message => q|Should the system use the HTTPS protocol for the login form?  Note that setting this option to true will encrypt not only the login form, but all pages after that as well.|,
+                lastUpdated => 1163457062,
         },
 
         'Enable passive profiling description' => {
