@@ -94,8 +94,9 @@ to validate any input that the user may supply.|,
 	'627' => {
 		message => q|<p>Profiles are used to extend the information of a particular user. In some cases profiles are important to a site, in others they are not. The profiles system is completely extensible. You can add as much information to the user profiles as you like.
 </p>
+<p>If you would like to change the default settings for new users on the site, then edit the User Profile for the user Visitor.</p>
 |,
-		lastUpdated => 1146807311
+		lastUpdated => 1163395390
 	},
 
 	'492' => {
