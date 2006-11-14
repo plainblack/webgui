@@ -21,7 +21,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
-fixInOutBoardTable();
+fixInOutBoardTable($session);
 
 finish($session); # this line required
 
