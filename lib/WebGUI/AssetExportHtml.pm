@@ -213,6 +213,7 @@ sub _exportAsHtml {
 	return (1, sprintf($i18n->get('export information'), scalar(@{$assetIds}), ($self->session->datetime->time()-$startTime)));
 }
 
+#-------------------------------------------------------------------
 =head2 exportAsHtml 
 
 Same as www_exportGenerate except without the output. Returns
@@ -224,6 +225,21 @@ sub exportAsHtml {
 	my $self = shift;
 	my ($success, $description) = $self->_exportAsHtml(1, '1', 'index.html');
 	return $success? "success" : $description;
+}
+
+#-------------------------------------------------------------------
+
+=head2 exportHtml_view ( )
+
+View method for static export.  This is like www_view, and defaults to
+just calling www_view, but this needs to be overridden if www_view
+depends on there being an actual HTTP response on the other end.
+
+=cut
+
+sub exportHtml_view {
+	my $self = shift;
+	$self->www_view(@_);
 }
 
 #-------------------------------------------------------------------

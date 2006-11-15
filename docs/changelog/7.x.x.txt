@@ -9,6 +9,13 @@
  - fix: New resizable textareas not obeying width/height parameters
  - fix: InOutBoard not allowing re-editing of new revisions
  - Added a fatal error should parsing of JSON config file fail
+ - Fixed a bug with the admin mode subnet feature.
+ - Fixed a problem with rich media ads not processing macros.
+ - Fixed a flaw in the new commerce tax system that caused checkouts to fail.
+ - fix: Bug in "Article with Files"
+ - fix: SQLReport pagination retains op= parameter
+ - fix: Invalid MIME type set for images
+
 
 7.2.0
  - Added server side spellchecker (Martin Kamerbeek / Procolix)

@@ -602,7 +602,7 @@ sub _processQuery {
 
                         my $url = $self->getUrl('func=view');
                         foreach ($self->session->form->param) {
-                                unless ($_ eq "pn" || $_ eq "func" || $_ =~ /identifier/i || $_ =~ /password/i) {
+                                unless ($_ eq "pn" || $_ eq "op" || $_ eq "func" || $_ =~ /identifier/i || $_ =~ /password/i) {
                                         $url = $self->session->url->append($url, $self->session->url->escape($_)
                                                 .'='.$self->session->url->escape($self->session->form->process($_)));
                                 }

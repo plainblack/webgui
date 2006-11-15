@@ -18,6 +18,7 @@ use strict;
 use WebGUI::Cache;
 use WebGUI::Group;
 use WebGUI::DatabaseLink;
+use WebGUI::Utility;
 
 =head1 NAME
 
@@ -131,7 +132,7 @@ sub canUseAdminMode {
 	my $pass = 1;
 	my $subnets = $self->session->config->get("adminModeSubnets") || [];
 	if (scalar(@$subnets)) {
-		$pass = isInSubnet($self->session->env->get("REMOTE_ADDR"), $subnets);
+		$pass = WebGUI::Utility::isInSubnet($self->session->env->get("REMOTE_ADDR"), $subnets);
 	}
 	return $pass && $self->session->user->isInGroup(12)
 }

@@ -466,7 +466,7 @@ sub www_checkoutSubmit {
                         $salesTaxTotal += $_->{salesTax};
 		}
                 # Oy, the kludge.
-                $transaction->addItem(WebGUI::Commerce::Item::Fake->new($session, $salesTaxTotal.',Sales Tax'));
+                $transaction->addItem(WebGUI::Commerce::Item::Fake->new($session, $salesTaxTotal.',Sales Tax'), 1, $salesTaxTotal);
 		$transaction->shippingCost($shippingCost);
 		$transaction->shippingMethod($shipping->namespace);
 		$transaction->shippingOptions($shipping->getOptions);

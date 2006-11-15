@@ -375,9 +375,6 @@ sub www_edit {
 sub exportHtml_view {
 	my $self = shift;
 	return $self->session->privilege->noAccess() unless $self->canView;
-#	if ($self->session->var->get("adminOn")) {
-#		return $self->session->asset($self->getContainer)->www_view;
-#	}
 
 	my $path = $self->getStorageLocation->getPath($self->get('filename'));
 	my $fh = eval { FileHandle->new($path) };
