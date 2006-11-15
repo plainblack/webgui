@@ -33,7 +33,7 @@ use Apache2::ServerUtil ();
 use LWP::MediaTypes qw(guess_media_type);
 
 our $VERSION = "7.2.1";
-our $STATUS = "beta";
+our $STATUS = "stable";
 
 #-------------------------------------------------------------------
 
