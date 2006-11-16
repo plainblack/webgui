@@ -536,8 +536,6 @@ sub www_salesTaxTable {
 		-default => 'Select State',
 	);
 
-	$session->errorHandler->warn($statesField);
-
 	my $taxField = WebGUI::Form::float($session,
 		-name => 'taxRate',
 		-value => '',
