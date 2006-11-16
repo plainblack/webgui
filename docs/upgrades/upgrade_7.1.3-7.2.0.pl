@@ -249,6 +249,7 @@ sub reorderSurveyCollateral {
 	$sth1->execute();
 	while (my ($assetId) = $sth1->array) {  ##Iterate over all surveys
 		my $survey = WebGUI::Asset->new($session, $assetId, 'WebGUI::Asset::Wobject::Survey');
+		next unless defined $survey; # skip pending surveys
 		my $Survey_Id = $survey->get('Survey_id');
 		$sth2->execute([$Survey_Id]);
 		while (my ($questionId) = $sth2->array) { ##iterate over all questions in the survey

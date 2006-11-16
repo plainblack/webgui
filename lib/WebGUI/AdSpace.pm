@@ -15,6 +15,7 @@ package WebGUI::AdSpace;
 =cut
 
 use strict;
+use WebGUI::AdSpace::Ad;
 
 =head1 NAME
 
