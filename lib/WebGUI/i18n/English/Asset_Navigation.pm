@@ -217,82 +217,82 @@ a Google sitemap of your site.</p>
 	},
 
 	'currentPage.menuTitle' => {
-		message => q|The pageId of the start page.|,
-		lastUpdated => 1149394665,
+		message => q|The pageId of the current page.|,
+		lastUpdated => 1163720613,
 	},
 
 	'currentPage.assetId' => {
-		message => q|The assetId of the start page.|,
-		lastUpdated => 1149394665,
+		message => q|The assetId of the current page.|,
+		lastUpdated => 1163720616,
 	},
 
 	'currentPage.parentId' => {
-		message => q|The assetId of the parent of the start page.|,
-		lastUpdated => 1149394665,
+		message => q|The assetId of the parent of the current page.|,
+		lastUpdated => 1163720617,
 	},
 
 	'currentPage.ownerUserId' => {
-		message => q|The userId of the owner of the start page.|,
-		lastUpdated => 1149394665,
+		message => q|The userId of the owner of the current page.|,
+		lastUpdated => 1163720620,
 	},
 
 	'currentPage.synopsis' => {
-		message => q|The synopsis of the start page.|,
-		lastUpdated => 1149394665,
+		message => q|The synopsis of the current page.|,
+		lastUpdated => 1163720621,
 	},
 
 	'currentPage.newWindow' => {
-		message => q|A conditional indicating whether the start page should be opened in a new window.|,
-		lastUpdated => 1149394665,
+		message => q|A conditional indicating whether the current page should be opened in a new window.|,
+		lastUpdated => 1163720622,
 	},
 
 	'currentPage.menuTitle' => {
-		message => q|The menu title of the start page.|,
-		lastUpdated => 1149394665,
+		message => q|The menu title of the current page.|,
+		lastUpdated => 1163720624,
 	},
 
 	'currentPage.title' => {
-		message => q|The title of the start page.|,
-		lastUpdated => 1149394665,
+		message => q|The title of the current page.|,
+		lastUpdated => 1163720625,
 	},
 
 	'currentPage.isHome' => {
-		message => q|A conditional indicating whether the base page is the default page for the site.|,
-		lastUpdated => 1149394665,
+		message => q|A conditional indicating whether the current page is the default page for the site.|,
+		lastUpdated => 1163720628,
 	},
 
 	'currentPage.url' => {
-		message => q|The URL of the start page.|,
-		lastUpdated => 1149394665,
+		message => q|The URL of the current page.|,
+		lastUpdated => 1163720631,
 	},
 
 	'currentPage.rank' => {
 		message => q|The position of the current page compared to its siblings.|,
-		lastUpdated => 1149394665,
+		lastUpdated => 1163720636,
 	},
 
 	'currentPage.hasChild' => {
-		message => q|A conditional indicating whether the start page has daughters.|,
-		lastUpdated => 1149394665,
+		message => q|A conditional indicating whether the current page has daughters.|,
+		lastUpdated => 1163720639,
 	},
 
 	'currentPage.hasSibling' => {
-		message => q|A conditional indicating whether the start page has siblings.|,
-		lastUpdated => 1149394665,
+		message => q|A conditional indicating whether the current page has siblings.|,
+		lastUpdated => 1163720640,
 	},
 
 	'currentPage.hasViewableSiblings' => {
-		message => q|A conditional indicating whether the start page has siblings that are viewable by the current user.|,
-		lastUpdated => 1149394665,
+		message => q|A conditional indicating whether the current page has siblings that are viewable by the current user.|,
+		lastUpdated => 1163720642,
 	},
 
 	'currentPage.hasViewableChildren' => {
-		message => q|A conditional indicating whether the start page has children that are viewable by the current user.|,
-		lastUpdated => 1149394665,
+		message => q|A conditional indicating whether the current page has children that are viewable by the current user.|,
+		lastUpdated => 1163720645,
 	},
 
 	'page_loop' => {
-		message => q|A loop containing page information in nested, hierarchical order.|,
+		message => q|A loop containing pages in nested, hierarchical order.|,
 		lastUpdated => 1149394665,
 	},
 
@@ -378,7 +378,7 @@ a Google sitemap of your site.</p>
 
 	'page.indent' => {
 		message => q|A variable containing the indent for the current page. The default indent is three spaces. Use the <strong>page.indent_loop</strong> if you need a more flexible indent.|,
-		lastUpdated => 1149394665,
+		lastUpdated => 1163720649,
 	},
 
 	'page.indent_loop' => {
@@ -402,38 +402,38 @@ a Google sitemap of your site.</p>
 	},
 
 	'page.isChild' => {
-		message => q|A conditional indicating whether this page is a daughter of the base page.|,
-		lastUpdated => 1149394665,
+		message => q|A conditional indicating whether this page is a daughter of the current page.|,
+		lastUpdated => 1163720652,
 	},
 
 	'page.isParent' => {
-		message => q|A conditional indicating whether this page is the mother of the base page.|,
-		lastUpdated => 1149394665,
+		message => q|A conditional indicating whether this page is the mother of the current page.|,
+		lastUpdated => 1163720145,
 	},
 
 	'page.isCurrent' => {
-		message => q|A conditional indicating whether this page is the base page.|,
-		lastUpdated => 1149394665,
+		message => q|A conditional indicating whether this page is the current page.|,
+		lastUpdated => 1163720148,
 	},
 
 	'page.isDescendent' => {
-		message => q|A conditional indicating whether this page is a descendant of the base page.|,
-		lastUpdated => 1149394665,
+		message => q|A conditional indicating whether this page is a descendant of the current page.|,
+		lastUpdated => 1163720154,
 	},
 
 	'page.isAncestor' => {
-		message => q|A conditional indicating whether this page is an ancestor of the base page.|,
-		lastUpdated => 1149394665,
+		message => q|A conditional indicating whether this page is an ancestor of the current page.|,
+		lastUpdated => 1163720164,
 	},
 
 	'page.inBranchRoot' => {
-		message => q|This conditional is true if this page is a descendant of the root page of the base page.|,
-		lastUpdated => 1149394665,
+		message => q|This conditional is true if this page is a descendant of the root page of the current page.|,
+		lastUpdated => 1163720167,
 	},
 
 	'page.isSibling' => {
-		message => q|A conditional indicating whether this page is the sister of the base page.|,
-		lastUpdated => 1149394665,
+		message => q|A conditional indicating whether this page is the sister of the current page.|,
+		lastUpdated => 1163720172,
 	},
 
 	'page.inBranch' => {
@@ -546,8 +546,10 @@ a Google sitemap of your site.</p>
 
 	'1097' => {
 		message => q|<p>These variables are available in Navigation Templates:</p>
+<p><b>currentPage</b> refers to the page that the user is currently looking at. <b>page</b> refers to any
+given page inside of the <b>page_loop</b></p>
 	|,
-		lastUpdated => 1149394711,
+		lastUpdated => 1163720438,
 	},
 
 	'1094' => {
