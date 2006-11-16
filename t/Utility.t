@@ -12,11 +12,12 @@
 use FindBin;
 use strict;
 use lib "$FindBin::Bin/lib";
+use Tie::IxHash;
 
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 23; # increment this value for each test you create
+use Test::More tests => 21; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -77,16 +78,10 @@ is(WebGUI::Utility::round(47.133984233, 3), 47.134, 'round() - multiple signific
 {
 	# Just some basic tests for now.
 
-	# XXX: These both fail.  I think whoever designed sortHash and
-	# sortHashDescending didn't know how Perl calling conventions
-	# work---the Tie::IxHash association, and therefore the order
-	# preservation, goes away as soon as you unbox the hash...  it
-	# probably works if you tie the hash on the caller's end
-	# first, but that's not how I interpret the documentation as
-	# specifying it.  --DPW
-
 	my (%hash1, %hash2, %hash3);
-	%hash1 = ('a' => 5, 'b' => 3, 'c' => 2, 'd' => 4, 'e' => 1);
+	my %hash1 = ('a' => 5, 'b' => 3, 'c' => 2, 'd' => 4, 'e' => 1);
+	tie my %hash2, 'Tie::IxHash';
+	tie my %hash3, 'Tie::IxHash';
 	%hash2 = WebGUI::Utility::sortHash(%hash1);
 	%hash3 = WebGUI::Utility::sortHashDescending(%hash1);
 	is_deeply([keys %hash2], [qw/e c b d a/], 'sortHash');

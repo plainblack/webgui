@@ -367,7 +367,8 @@ sub round {
 
 =head2 sortHash ( hash )
 
-Sorts a hash by its values. Returns a hash.
+Sorts a hash by its values. Returns a Tie::IxHash.  You must assign this to
+a similarly tied hash to preserve the order.
 
 =head3 hash
 
@@ -388,7 +389,8 @@ sub sortHash {
 
 =head2 sortHashDecending ( hash )
 
-Sorts a hash in decending order by its values. Returns a hash.
+Sorts a hash in decending order by its values.  Returns a Tie::IxHash.
+You must assign this to a similarly tied hash to preserve the order.
 
 =head3 hash
 
