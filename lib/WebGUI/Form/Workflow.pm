@@ -117,7 +117,9 @@ Renders the form field to HTML as a table row complete with labels, subtext, hov
 sub toHtmlWithWrapper {
 	my $self = shift;
         my $returnUrl = ";proceed=goBackToPage;returnUrl=".$self->session->url->escape($self->session->asset->getUrl) if $self->session->asset;
-        my $buttons = $self->session->icon->edit("op=editWorkflow;workflowId=".$self->get("value").$returnUrl) if ($self->get("value"));
+        my $buttons;
+	# This edit button will not work with multiple workflows.
+	#$buttons .= $self->session->icon->edit("op=editWorkflow;workflowId=".$self->get("value")->[0].$returnUrl) if ($self->get("value"));
         $buttons .= $self->session->icon->manage("op=manageWorkflows".$returnUrl);
 	$self->set("subtext",$buttons . $self->get("subtext"));
 	return $self->SUPER::toHtmlWithWrapper;
