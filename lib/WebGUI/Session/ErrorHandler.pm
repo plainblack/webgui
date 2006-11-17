@@ -85,7 +85,7 @@ Returns true if the user meets the condition to see debugging information and de
 sub canShowDebug {
 	my $self = shift;
 	return 0 unless ($self->session->setting->get("showDebug"));
-	return 0 unless ($self->session->http->getMimeType eq "text/html");
+	return 0 unless (substr($self->session->http->getMimeType(),0,9) eq "text/html");
 	return 1 if ($self->session->setting->get("debugIp") eq "");
 	my $ips = $self->session->setting->get("debugIp");
 	$ips =~ s/\s+//g;
