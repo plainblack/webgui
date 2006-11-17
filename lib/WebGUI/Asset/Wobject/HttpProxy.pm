@@ -265,7 +265,7 @@ sub view {
 	unless ($var{content}) {
 		
 		# Get new content
-		for my $redirect (0..5) { # We follow max 5 redirects to prevent bouncing/flapping
+		REDIRECT: for my $redirect (0..4) { # We follow max 5 redirects to prevent bouncing/flapping
 			
 			my $userAgent = new LWP::UserAgent;
 			$userAgent->agent($self->session->env->get("HTTP_USER_AGENT"));
@@ -342,7 +342,6 @@ sub view {
 			
 			if ($response->is_redirect) { # redirected by http header
 				$proxiedUrl = URI::URL::url($response->header("Location"))->abs($proxiedUrl);;
-				$redirect++;
 			} elsif ($response->content_type eq "text/html" 
 				&& $response->content =~ /<meta[^>]+refresh[^>]+content[^>]*url=([^\s'"<>]+)/gis) {
 				# redirection through meta refresh
@@ -353,11 +352,11 @@ sub view {
 					$proxiedUrl =~ s/[^\/\\]*$//; #chop off everything after / in $proxiedURl
 					$proxiedUrl .= URI::URL::url($refreshUrl)->rel($proxiedUrl); # add relative path
 				}
-				$redirect++;
 			} else { 
-				$redirect = 5; #No redirection found. Leave loop.
+				last REDIRECT;
 			}
-			$redirect=5 if (not $self->get("followRedirect")); # No redirection. Overruled by setting
+			##At least 1 time through the loop
+			last REDIRECT if (not $self->get("followRedirect")); # No redirection. Overruled by setting
 		}
 		
 		if($response->is_success) {
