@@ -241,7 +241,7 @@ sub getGraphingTab {
 
 	unless ($session->config->get("graphingPlugins")) {
 		$f->readOnly(
-			-value	=> $i18n->get('no graphing plugins in config'); 
+			-value	=> $i18n->get('no graphing plugins in config'),
 		);
 
 		return $f->printRowsOnly;
