@@ -186,7 +186,13 @@ our $I18N = {
 	},
 
 	'may not leave error message' => {
-		message => q|<h1>You are not allowed to leave %s</h1>"|,
+		message => q|<h1>You are not allowed to leave %s</h1>|,
+		lastUpdated => 1163746361,
+		context => q|This entry is used to tell the user that the HttpProxy cannot leave this URL.  Please leave the %s part of the string as is, since this entry is used in sprintf|,
+	},
+
+	'no recursion' => {
+		message => q|<p>Error: HttpProxy can't recursively proxy its own content.</p>|,
 		lastUpdated => 1162959817,
 		context => q|This entry is used to tell the user that the HttpProxy cannot leave this URL.  Please leeave the %s part of the string as is, since this entry is used in sprintf|,
 	},

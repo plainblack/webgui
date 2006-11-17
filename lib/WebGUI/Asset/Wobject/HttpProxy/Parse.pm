@@ -79,7 +79,8 @@ sub filter {
   	my $self=shift;
   	$self->parse($self->{Content}); # Make paths absolute and let them return to us
   	$self->eof;
-	return "<p>Error: HttpProxy can't recursively proxy its own content.</p>" if ($self->{recurseCheck});
+	my $i18n = WebGUI::International->new($self->session, 'Asset_HttpProxy');
+	return $i18n->get('no recursion') if ($self->{recurseCheck});
   	return $self->{Filtered};
 }
 
