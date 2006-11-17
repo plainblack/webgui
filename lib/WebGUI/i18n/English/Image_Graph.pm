@@ -80,6 +80,11 @@ want to use.|,
 		message => q|No graphing plugins found|,
 		lastUpdated => 1146451962,
 	},
+
+	'no graphing plugins in config' => {
+		message => q|No graphing plugins are enabled in the config file.|,
+		lastUpdated => 1163746146,
+	},
 };
 
 1;
