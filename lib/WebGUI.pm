@@ -32,7 +32,7 @@ use Apache2::Const -compile => qw(OK DECLINED NOT_FOUND DIR_MAGIC_TYPE);
 use Apache2::ServerUtil ();
 use LWP::MediaTypes qw(guess_media_type);
 
-our $VERSION = "7.2.1";
+our $VERSION = "7.2.2";
 our $STATUS = "stable";
 
 #-------------------------------------------------------------------
