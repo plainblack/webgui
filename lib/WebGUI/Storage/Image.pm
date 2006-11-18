@@ -74,6 +74,26 @@ sub addFileFromCaptcha {
 	return ($filename, $challenge);
 }
 
+#-------------------------------------------------------------------
+
+=head2 copy ( [ storage ] )
+
+Overriding the copy method so that thumbnail files are copied along with other image files
+
+=head3 storage
+
+Optionally pass a storage object to copy the files to.
+
+=cut
+
+sub copy {
+	my $self = shift;
+	my $newStorage = shift;
+	# Storage::Image->getFiles excludes thumbnails from the filelist and we want to copy the thumbnails
+	my $filelist = $self->SUPER::getFiles(1);
+	
+	return $self->SUPER::copy($newStorage, $filelist);
+}
 
 #-------------------------------------------------------------------
 
