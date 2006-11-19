@@ -91,6 +91,24 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 
+=head2 exportHtml_view
+
+A web executable method that redirects the user to the specified page, or displays the edit interface when admin mode is enabled.
+
+=cut
+
+sub exportHtml_view {
+        my $self = shift;
+        return $self->session->privilege->noAccess() unless $self->canView;
+        my $url = $self->get("redirectUrl");
+        WebGUI::Macro::process($self->session, \$url);
+	return '' if ($url eq $self->get("url"));
+	$self->session->http->setRedirect($url);
+	return $self->session->style->process('', 'PBtmpl0000000000000060');
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_view
 
 A web executable method that redirects the user to the specified page, or displays the edit interface when admin mode is enabled.

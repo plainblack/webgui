@@ -3,6 +3,7 @@
  - fix: Workflow form control edit button won't work. removed.
  - fix: Bug in HttpProxy.pm
  - fix: Storage::Image copy does not create thumbnails
+ - fix: Static export - redirect problems
 
 7.2.1
  - Made a change to version tag commits to deal with unusually long commit
