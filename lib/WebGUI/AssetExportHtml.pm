@@ -214,6 +214,7 @@ sub _exportAsHtml {
 }
 
 #-------------------------------------------------------------------
+
 =head2 exportAsHtml 
 
 Same as www_exportGenerate except without the output. Returns

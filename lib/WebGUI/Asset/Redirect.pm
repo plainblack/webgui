@@ -93,7 +93,7 @@ sub www_edit {
 
 =head2 exportHtml_view
 
-A web executable method that redirects the user to the specified page, or displays the edit interface when admin mode is enabled.
+Override the method from AssetExportHtml to handle the redirect.
 
 =cut
 
