@@ -18,11 +18,15 @@ use WebGUI::Session;
 use Test::More;
 use Test::MockObject::Extends;
 
-my $numTests = 13;
+my $numTests = 15;
 
 plan tests => $numTests;
 
 my $session = WebGUI::Test->session;
+
+##Setup for security method test
+my %newEnv = ( REMOTE_ADDR => '192.168.0.2' );
+$session->env->{_env} = \%newEnv;
 
 my ($eh) = $session->quick('errorHandler');
 my $logger = $session->errorHandler->getLogger;
@@ -38,29 +42,42 @@ $logger->mock( 'info',  sub { $info = $_[1]} );
 
 ####################################################
 #
-# warn
+# warn, security
 #
 ####################################################
 
+my $accumulated_warn = "";
 $eh->warn("This is a warning");
 is($warns, "This is a warning", "warn: Log4perl called");
-is($session->errorHandler->{_debug_warn}, "This is a warning\n", "warn: message internally appended");
+my $accumulated_warn .= "This is a warning\n";
+is($session->errorHandler->{_debug_warn}, $accumulated_warn, "warn: message internally appended");
 $eh->warn("Second warning");
 is($warns, "Second warning", "warn: Log4perl called again");
-is($session->errorHandler->{_debug_warn}, "This is a warning\nSecond warning\n", "warn: second message appended");
+$accumulated_warn .= "Second warning\n";
+is($session->errorHandler->{_debug_warn}, $accumulated_warn, "warn: second message appended");
+$eh->security('Shields up, red alert');
+my $security = sprintf '%s (%d) connecting from %s attempted to %s',
+	$session->user->username, $session->user->userId, $session->env->getIp, 'Shields up, red alert';
+is($warns, $security, 'security: calls warn with username, userId and IP address');
 
 ####################################################
 #
-# info
+# info, audit
 #
 ####################################################
 
+my $accumulated_info = '';
 $eh->info("This is informative");
 is($info, "This is informative", "info: Log4perl called");
-is($session->errorHandler->{_debug_info}, "This is informative\n", "info: message internally appended");
+$accumulated_info .= "This is informative\n";
+is($session->errorHandler->{_debug_info}, $accumulated_info, "info: message internally appended");
 $eh->info("More info");
 is($info, "More info", "info: Log4perl called again");
-is($session->errorHandler->{_debug_info}, "This is informative\nMore info\n", "info: second message appended");
+$accumulated_info .= "More info\n";
+is($session->errorHandler->{_debug_info}, $accumulated_info, "info: second message appended");
+$eh->audit('Check this out');
+my $audit = sprintf '%s (%d) %s', $session->user->username, $session->user->userId, 'Check this out';
+is($info, $audit, 'audit: calls info with username and userId');
 
 ####################################################
 #
