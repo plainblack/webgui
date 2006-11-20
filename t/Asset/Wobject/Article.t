@@ -70,6 +70,9 @@ my $filename = "page_title.jpg";
 my $storage = WebGUI::Storage::Image->create($session);
 my $storedFilename = $storage->addFileFromFilesystem("../../supporting_collateral/".$filename);
 my $filenameOK = is ($storedFilename, $filename, 'storage created correctly');
+
+diag(join("\n", @{ $storage->getErrors })) unless $filenameOK;
+
 $article->update({storageId=>$storage->getId});
 my $storageOK = is($article->get('storageId'), $storage->getId, 'correct storage id stored');
 
