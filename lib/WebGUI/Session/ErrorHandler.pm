@@ -76,6 +76,31 @@ sub audit {
 
 #-------------------------------------------------------------------
 
+=head2 canShowBasedOnIP ( $ipSetting )
+
+Returns true if the the user's IP address matches the requested IP setting.
+
+=head3 ipSetting
+
+The setting to pull from the database.  It should containt a CSV list of IP
+addresses in CIDR format.
+
+=cut
+
+sub canShowBasedOnIP {
+	my $self = shift;
+	my $ipSetting = shift;
+	return 0 unless $ipSetting;
+	return 1 if ($self->session->setting->get($ipSetting) eq "");
+	my $ips = $self->session->setting->get($ipSetting);
+	$ips =~ s/\s+//g;
+	my @ips = split(",", $ips);
+	my $ok = WebGUI::Utility::isInSubnet($self->session->env->getIp, [ @ips] );
+	return $ok;
+}
+
+#-------------------------------------------------------------------
+
 =head2 canShowDebug ( )
 
 Returns true if the user meets the condition to see debugging information and debug mode is enabled.
@@ -86,12 +111,7 @@ sub canShowDebug {
 	my $self = shift;
 	return 0 unless ($self->session->setting->get("showDebug"));
 	return 0 unless (substr($self->session->http->getMimeType(),0,9) eq "text/html");
-	return 1 if ($self->session->setting->get("debugIp") eq "");
-	my $ips = $self->session->setting->get("debugIp");
-	$ips =~ s/\s+//g;
-	my @ips = split(",", $ips);
-	my $ok = WebGUI::Utility::isInSubnet($self->session->env->getIp, [ @ips] );
-	return $ok;
+	return $self->canShowBasedOnIP('debugIp');
 }
 
 #-------------------------------------------------------------------
@@ -104,16 +124,8 @@ Returns true if the user meets the conditions to see performance indicators and 
 
 sub canShowPerformanceIndicators {
 	my $self = shift;
-	my $mask = $self->session->setting->get("debugIp");
-	my $ip = $self->session->env->getIp;
-       	return (
-			(
-				$self->session->setting->get("showPerformanceIndicators")
-			) && (
-				$ip =~ /^$mask/ || 
-				$self->session->setting->get("debugIp") eq ""
-			)
-		);
+	return 0 unless $self->session->setting->get("showPerformanceIndicators");
+	return $self->canShowBasedOnIP('debugIp');
 }
 
 

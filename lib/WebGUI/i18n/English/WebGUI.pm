@@ -83,8 +83,8 @@ our $I18N = {
 	},
 
 	'debug ip description' => {
-		message => q|This will limit debugging output to a specific IP address or IP range. Enter the subnet that you want to be able to view debug output in CIDR format.  For example: 10.0.0.0/24.  Multiple CIDR addresses may be entered, separated by commas.|,
-		lastUpdated => 1139948380
+		message => q|This will limit debugging and/or performance output to a specific IP address or IP range. Enter the subnet that you want to be able to view debug output in CIDR format.  For example: 10.0.0.0/24.  Multiple CIDR addresses may be entered, separated by commas.|,
+		lastUpdated => 1164055466
 	},
 
 	'debug ip' => {

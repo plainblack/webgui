@@ -18,14 +18,14 @@ use WebGUI::Session;
 use Test::More;
 use Test::MockObject::Extends;
 
-my $numTests = 15;
+my $numTests = 38;
 
 plan tests => $numTests;
 
 my $session = WebGUI::Test->session;
 
 ##Setup for security method test
-my %newEnv = ( REMOTE_ADDR => '192.168.0.2' );
+my %newEnv = ( REMOTE_ADDR => '192.168.0.6' );
 $session->env->{_env} = \%newEnv;
 
 my ($eh) = $session->quick('errorHandler');
@@ -34,11 +34,12 @@ $logger = Test::MockObject::Extends->new( $logger );
 
 is( $logger, $session->errorHandler->getLogger, 'Main logger mocked');
 
-my ($warns, $debug, $info);
+my ($warns, $debug, $info, $error);
 
 $logger->mock( 'warn',  sub { $warns = $_[1]} );
 $logger->mock( 'debug', sub { $debug = $_[1]} );
-$logger->mock( 'info',  sub { $info = $_[1]} );
+$logger->mock( 'info',  sub { $info  = $_[1]} );
+$logger->mock( 'error', sub { $error = $_[1]} );
 
 ####################################################
 #
@@ -81,7 +82,7 @@ is($info, $audit, 'audit: calls info with username and userId');
 
 ####################################################
 #
-# debug
+# debug, query
 #
 ####################################################
 
@@ -92,3 +93,119 @@ is($eh->{'_debug_debug'}, "This is a bug\n", "debug: message internally appended
 $eh->debug("More bugs");
 is($debug, "More bugs", "debug: Log4perl called again");
 is($eh->{'_debug_debug'}, "This is a bug\nMore bugs\n", "debug: second message appended");
+
+$eh->{'_debug_debug'} = ''; ##Manually clean debug
+my $queryCount = $eh->{_queryCount};
+$eh->query('select this');
+++$queryCount;
+is($debug, "query  $queryCount:  select this", "query: Log4perl called debug via query");
+
+$eh->query('select that', 'literal');
+++$queryCount;
+is($debug, "query  $queryCount:  select that", "query: Log4perl called debug via query, literal placeholder");
+
+$eh->query('select more', []);
+++$queryCount;
+is($debug, "query  $queryCount:  select more", "query: Log4perl called debug via query, empty placeholder");
+
+$eh->query('select many', [1, 2]);
+++$queryCount;
+is($debug, "query  $queryCount:  select many\n&nbsp;&nbsp;with placeholders:&nbsp;&nbsp;['1', '2']", "query: Log4perl called debug via query, empty placeholder");
+
+####################################################
+#
+# error
+#
+####################################################
+
+$eh->{'_debug_debug'} = ''; ##Manually clean debug
+$eh->error("ERROR");
+is($error, "ERROR", "error: Log4perl called error");
+like($debug, qr/^Stack trace for ERROR ERROR/, "error: Log4perl called debug");
+is($eh->{'_debug_error'}, "ERROR\n", "error: message internally appended");
+$eh->error("More errors");
+is($error, "More errors", "error: Log4perl called error again");
+is($eh->{'_debug_error'}, "ERROR\nMore errors\n", "error: new message internally appended");
+
+####################################################
+#
+# getStackTrace
+#
+####################################################
+
+is ($eh->getStackTrace, undef, 'no stack trace due to shallow depth, must be 2 deep for a stack trace');
+like(&depth1(), qr/main,ErrorHandler\.t/, 'stack trace has correct information');
+
+sub depth1 {
+	return &depth2();
+}
+
+sub depth2 {
+	return $eh->getStackTrace;
+}
+
+####################################################
+#
+# canShowBasedOnIP
+#
+####################################################
+
+is($eh->canShowBasedOnIP(''), 0, 'canShowBasedOnIP: must send IP setting');
+
+####################################################
+#
+# canShowDebug
+#
+####################################################
+
+my $origDebugIp   = $session->setting->get('debugIp');
+my $origShowDebug = $session->setting->get('showDebug');
+
+$session->setting->set('showDebug', 0);
+is($eh->canShowDebug, 0, 'canShowDebug: returns 0 if not enabled');
+
+$session->setting->set('showDebug', 1);
+$session->http->setMimeType('audio/mp3');
+is($eh->canShowDebug, 0, 'canShowDebug: returns 0 if mime type is wrong');
+
+$session->http->setMimeType('text/html');
+$session->setting->set('debugIp', '');
+is($eh->canShowDebug, 1, 'canShowDebug: returns 1 if debugIp is empty string');
+
+$session->setting->set('debugIp', '10.0.0.5/32, 192.168.0.4/30');
+$newEnv{REMOTE_ADDR} = '172.17.0.5';
+is($eh->canShowDebug, 0, 'canShowDebug: returns 0 if debugIp is set and IP address is out of filter');
+$newEnv{REMOTE_ADDR} = '10.0.0.5';
+is($eh->canShowDebug, 1, 'canShowDebug: returns 1 if debugIp is set and IP address matches filter');
+$newEnv{REMOTE_ADDR} = '192.168.0.5';
+is($eh->canShowDebug, 1, 'canShowDebug: returns 1 if debugIp is set and IP address matches filter');
+
+####################################################
+#
+# canShowPerformanceIndicators
+#
+####################################################
+
+my $origShowPerf = $session->setting->get('showPerformanceIndicators');
+
+$session->setting->set('showPerformanceIndicators', 0);
+is($eh->canShowPerformanceIndicators, 0, 'canShowPerformanceIndicators: returns 0 if not enabled');
+
+$session->setting->set('showPerformanceIndicators', 1);
+$session->setting->set('debugIp', '');
+is($eh->canShowPerformanceIndicators, 1, 'canShowPerformanceIndicators: returns 1 if debugIp is blank');
+
+$session->setting->set('debugIp', '10.0.0.5/32, 192.168.0.4/30');
+$newEnv{REMOTE_ADDR} = '172.17.0.5';
+is($eh->canShowPerformanceIndicators, 0, 'canShowPerformanceIndicators: returns 0 if debugIp is set and IP address does not match');
+$newEnv{REMOTE_ADDR} = '10.0.0.5';
+is($eh->canShowPerformanceIndicators, 1, 'canShowPerformanceIndicators: returns 0 if debugIp is set and IP address matches exactly');
+$newEnv{REMOTE_ADDR} = '192.168.0.5';
+is($eh->canShowPerformanceIndicators, 1, 'canShowPerformanceIndicators: returns 0 if debugIp is set and IP address matches subnet');
+
+END {
+	$session->setting->set('debugIp',   $origDebugIp);
+	$session->setting->set('showDebug', $origShowDebug);
+
+	$session->setting->set('showPerformanceIndicators', $origShowPerf);
+}
