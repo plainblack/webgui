@@ -46,7 +46,7 @@ sub definition {
 
 	push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
-		icon=>'rssFromParent.gif',
+		icon=>'rssGear.gif',
 		autoGenerateForms=>1,
 		tableName=>'RSSFromParent',
 		className=>'WebGUI::Asset::RSSFromParent',
