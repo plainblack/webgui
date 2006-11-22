@@ -30,15 +30,7 @@ sub _hasNonWordCharacters {
 	my $self = shift;
         my $password = shift;
 	my $numberRequired = shift;
-	my @characters = split(//,$password);
-	my $counter = 0;
-	foreach my $character (@characters) {
-		$self->session->errorHandler->warn($character);
-        	$counter++ if ($character =~ /\W/);
-		return 1 if ($counter == $numberRequired);
-      	}
-
-	return 0;
+	return ($password =~ tr/A-Za-z0-9_//c) >= $numberRequired;
 }
 
 #-------------------------------------------------------------------
@@ -47,13 +39,7 @@ sub _hasNumberCharacters {
 	my $self = shift;
         my $password = shift;
 	my $numberRequired = shift;
-        my @characters = split(//,$password);
-	my $counter = 0;
-        foreach my $character (@characters) {
-        	$counter++ if ($character =~ /\d/);
-		return 1 if ($counter == $numberRequired);
-        }
-        return 0;
+	return ($password =~ tr/0-9//) >= $numberRequired;
 }
 
 #-------------------------------------------------------------------
@@ -62,14 +48,7 @@ sub _hasMixedCaseCharacters {
 	my $self = shift;
         my $password = shift;
 	my $numberRequired = shift;
-        my @characters = split(//,$password);
-	my ($numberOfCaps, $hasLower, $counter);
-        foreach my $character (@characters) {
-                $hasLower = 1 if ($character =~ /[a-z]/); 
-        	$numberOfCaps++ if ($character =~ /[A-Z]/);
-	        return 1 if ($hasLower && $numberOfCaps == $numberRequired);
-        }
-        return 0;
+	return $password =~ tr/a-z// && ($password =~ tr/A-Z//) >= $numberRequired;
 }
 
 #-------------------------------------------------------------------
