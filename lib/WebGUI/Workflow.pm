@@ -115,7 +115,6 @@ sub delete {
 	}
 
 	$self->session->db->deleteRow("Workflow","workflowId",$self->getId);
-	$self = undef;
 }
 
 #-------------------------------------------------------------------
@@ -277,7 +276,7 @@ sub getId {
 
 =head2 getList ( session, [ type ] )
 
-Returns a hash reference of workflowId/title pairs of all the workflows defined in the system. This is a class method. Note that this will not return anything that is disabled.
+Returns a hash reference of workflowId/title pairs of all enabled workflows.  This is a class method.
 
 =head3 session
 
