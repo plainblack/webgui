@@ -770,6 +770,7 @@ sub unsubscribe {
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
+	my $currentPost = shift || $self;
         $self->markRead;
         $self->incrementViews unless ($self->session->form->process("func") eq 'rate');
 	if ($self->session->user->userId eq '1' && !$self->session->form->process("layout")) {
@@ -852,7 +853,7 @@ sub view {
 		my $reply = WebGUI::Asset::Post->new($self->session, $dataSet->{assetId}, $dataSet->{className}, $dataSet->{revisionDate});
 		$reply->{_thread} = $self; # caching thread for better performance
 		my %replyVars = %{$reply->getTemplateVars};
-		$replyVars{isCurrent} = ($reply->get("url") eq $currentPageUrl);
+		$replyVars{isCurrent} = ($reply->getId eq $currentPost->getId);
 		$replyVars{isThreadRoot} = $self->getId eq $reply->getId;
 		$replyVars{depth} = $reply->getLineageLength - $self->getLineageLength;
 		$replyVars{depthX10} = $replyVars{depth}*10;

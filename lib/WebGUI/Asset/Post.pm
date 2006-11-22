@@ -979,10 +979,19 @@ sub update {
 }
 
 #-------------------------------------------------------------------
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView;
+	unless ($self->getThread->getId eq $self->getId) {
+		# Need the unless to avoid infinite recursion.
+		$self->getThread->prepareView;
+	}
+}
+
 sub view {
 	my $self = shift;
 	$self->incrementViews;
-	return $self->getThread->view;
+	return $self->getThread->view($self);
 }
 
 
