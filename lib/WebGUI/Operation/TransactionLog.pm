@@ -37,13 +37,24 @@ sub www_viewPurchaseHistory {
 	$var{errorMessage} = shift;
 	
 	@history = @{WebGUI::Commerce::Transaction->new($session)->transactionsByUser($session->user->userId)};
-	foreach (@history) {
-		%properties = %{$_->get};
+	for my $transaction (@history) {
+		%properties = %{$transaction->get};
 		$properties{initDate} = $session->datetime->epochToHuman($properties{initDate});
-		$properties{completionDate} = $session->datetime->epochToHuman($properties{completionDate}) if ($properties{completionDate});
+		$properties{completionDate} = $session->datetime->epochToHuman($properties{completionDate}) 
+			if ($properties{completionDate});
+		
+		# Format dollar amounts
+		$properties{amount}		= sprintf("%.2f",$properties{amount});
+		$properties{shippingCost}	= sprintf("%.2f",$properties{shippingCost});
+		
+		my $items	= $transaction->getItems;
+		for my $item (@$items) {
+			$item->{amount}	= sprintf("%.2f",$item->{amount});
+		}
+		
 		push(@historyLoop, {
 			(%properties),
-			itemLoop 	=> $_->getItems,
+			itemLoop 	=> $items,
 			cancelUrl 	=> $session->url->page('op=cancelRecurringTransaction;tid='.$properties{transactionId}),
 			canCancel 	=> ($properties{recurring} && ($properties{status} eq 'Completed')),
 			});
