@@ -175,10 +175,26 @@ sub createAccount {
    	
 	$vars->{'create.form.header'} = WebGUI::Form::formHeader($self->session,{});
 	$vars->{'create.form.header'} .= WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"});
-    $vars->{'create.form.header'} .= WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>$method});
+	$vars->{'create.form.header'} .= WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>$method});
 	
 	#User Defined Options
-	$vars->{'create.form.profile'} = WebGUI::Operation::Profile::getRequiredProfileFields($self->session);
+	$vars->{'create.form.profile'} = [];
+	foreach my $field (@{WebGUI::ProfileField->getRegistrationFields($self->session)}) {
+		my ($id, $formField, $label) = ($field->getId, $field->formField, $field->getLabel);
+		my $required = $field->isRequired;
+
+		# Old-style field loop.
+		push @{$vars->{'create.form.profile'}},
+		    +{ 'profile.formElement' => $formField,
+		       'profile.formElement.label' => $label,
+		       'profile.required' => $required };
+
+		# Individual field template vars.
+		my $prefix = 'create.form.profile.'.$field->getId.'.';
+		$vars->{$prefix.'formElement'} = $id;
+		$vars->{$prefix.'formElement.label'} = $label;
+		$vars->{$prefix.'required'} = $required;
+	}
 	
 	$vars->{'create.form.submit'} = WebGUI::Form::submit($self->session,{});
 	$vars->{'create.form.footer'} = WebGUI::Form::formFooter($self->session,);

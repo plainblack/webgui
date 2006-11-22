@@ -21,6 +21,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addProfileFieldsOnRegistration($session);
 
 finish($session); # this line required
 
@@ -51,6 +52,21 @@ sub start {
 	$session->db->write("insert into webguiVersion values (".$session->db->quote($toVersion).",'upgrade',".$session->datetime->time().")");
 	updateTemplates($session);
 	return $session;
+}
+
+#-------------------------------------------------
+sub addProfileFieldsOnRegistration {
+	my $session = shift;
+	print "\tAdding showAtRegistration to userProfileField rows.\n" unless $quiet;
+
+	$session->db->write($_) for(<<'EOT',
+  ALTER TABLE userProfileField
+   ADD COLUMN showAtRegistration int(11) NOT NULL default '0'
+EOT
+				    <<'EOT',
+  UPDATE userProfileField SET showAtRegistration = required
+EOT
+				   );
 }
 
 #-------------------------------------------------

@@ -45,6 +45,10 @@ These methods are available from this package:
 Returns an array of hashes for required profile fields.  This array is ready
 to be used as template variables in the WebGUI template system.
 
+This method is deprecated, and should not be used in new code.  Use
+the getRequiredFields method from WebGUI::ProfileField and specify the
+translation to template variables directly instead.
+
 =head3 session
 
 The current WebGUI session object.

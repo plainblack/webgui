@@ -341,6 +341,16 @@ new categories of profile settings.
                 message => "If set to yes, this form control will only allow image file types to be uploaded through it.",
                 lastUpdated => 1162945563
         },
+
+	'showAtRegistration label' => {
+                message => "Show at Registration?",
+                lastUpdated => 1164237018
+        },
+
+	'showAtRegistration hoverHelp' => {
+                message => "Show an entry for this field at the registration screen for newly-registering users.  The field will not actually be required unless Required is also set.",
+                lastUpdated => 1164237018
+        },
 };
 
 1;

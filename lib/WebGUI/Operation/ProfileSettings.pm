@@ -266,6 +266,12 @@ sub www_editProfileField {
 		-hoverHelp=>$i18n->get('474 description'),
 		-value=>$data->{required}
 		);
+	$f->yesNo(
+		  -name => 'showAtRegistration',
+		  -label => $i18n->get('showAtRegistration label'),
+		  -hoverHelp => $i18n->get('showAtRegistration hoverHelp'),
+		  -value => $data->{showAtRegistration}
+		 );
 	if ($data->{fieldType} eq "Image") {
 		$f->yesNo(
 			-name=>"forceImageOnly",
@@ -336,6 +342,7 @@ sub www_editProfileFieldSave {
 		editable=>$session->form->yesNo("editable"),
 		visible=>$session->form->yesNo("visible"),
 		required=>$session->form->yesNo("required"),
+		showAtRegistration=>$session->form->yesNo("showAtRegistration"),
 		possibleValues=>$session->form->textarea("possibleValues"),
 		dataDefault=>$session->form->textarea("dataDefault"),
 		fieldType=>$session->form->fieldType("fieldType"),

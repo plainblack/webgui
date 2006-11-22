@@ -254,42 +254,6 @@ sub getCategory {
 
 #-------------------------------------------------------------------
 
-=head2 getEditableFields ( session )
-
-Returns an array reference of WebGUI::ProfileField objects that are marked "editable" or "required". This is a class method.
-
-=cut
-
-sub getEditableFields {
-        my $class = shift;
-	my $session = shift;
-        my @fields = ();
-        foreach my $fieldName ($session->db->buildArray("select fieldName from userProfileField where required=1 or editable=1 order by sequenceNumber")) {
-                push(@fields,WebGUI::ProfileField->new($session,$fieldName));
-        }
-        return \@fields;
-}
-
-#-------------------------------------------------------------------
-
-=head2 getFields ( session )
-
-Returns an array reference of WebGUI::ProfileField objects. This is a class method.
-
-=cut
-
-sub getFields {
-        my $class = shift;
-	my $session = shift;
-        my @fields = ();
-        foreach my $fieldName ($session->db->buildArray("select fieldName from userProfileField order by profileCategoryId, sequenceNumber")) {
-                push(@fields,WebGUI::ProfileField->new($session,$fieldName));
-        }
-        return \@fields;
-}
-
-#-------------------------------------------------------------------
-
 =head2 getId ( )
 
 Returns the unique fieldName for this field.
@@ -318,6 +282,43 @@ sub getLabel {
 
 #-------------------------------------------------------------------
 
+sub _listFieldsWhere {
+	my $class = shift;
+	my $session = shift;
+	my $whereClause = shift;
+	return [map{$class->new($session, $_)} $session->db->buildArray(<<"SQL")];
+  SELECT f.fieldName
+    FROM userProfileField AS f
+         LEFT JOIN userProfileCategory AS c ON f.profileCategoryId = c.profileCategoryId
+   WHERE $whereClause
+   ORDER BY c.sequenceNumber, f.sequenceNumber
+SQL
+}
+
+=head2 getEditableFields ( session )
+
+Returns an array reference of WebGUI::ProfileField objects that are marked "editable" or "required". This is a class method.
+
+=cut
+
+sub getEditableFields {
+        my $class = shift;
+	my $session = shift;
+	return $class->_listFieldsWhere($session, "f.required = 1 OR f.editable = 1");
+}
+
+=head2 getFields ( session )
+
+Returns an array reference of WebGUI::ProfileField objects. This is a class method.
+
+=cut
+
+sub getFields {
+        my $class = shift;
+	my $session = shift;
+	return $class->_listFieldsWhere($session, "1");
+}
+
 =head2 getRequiredFields ( session )
 
 Returns an array reference of WebGUI::ProfileField objects that are marked "required". This is a class method.
@@ -327,11 +328,19 @@ Returns an array reference of WebGUI::ProfileField objects that are marked "requ
 sub getRequiredFields {
 	my $class = shift;
 	my $session = shift;
-	my @fields = ();
-	foreach my $fieldName ($session->db->buildArray("select userProfileField.fieldName from  userProfileField LEFT JOIN userProfileCategory ON userProfileField.profileCategoryId = userProfileCategory.profileCategoryId where userProfileField.required=1 order by userProfileCategory.sequenceNumber, userProfileField.sequenceNumber")) {
-		push(@fields,WebGUI::ProfileField->new($session,$fieldName));
-	}
-	return \@fields;
+	return $class->_listFieldsWhere($session, "f.required = 1");
+}
+
+=head2 getRegistrationFields ( session )
+
+Returns an array reference of profile field objects to use during anonymous registration.  Class method.
+
+=cut
+
+sub getRegistrationFields {
+	my $class = shift;
+	my $session = shift;
+	return $class->_listFieldsWhere($session, "f.showAtRegistration = 1");
 }
 
 #-------------------------------------------------------------------
