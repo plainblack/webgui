@@ -310,7 +310,7 @@ sub view {
 					}
 				}
 				### DEBUG
-				$self->session->errorHandler->warn("URL: $proxiedUrl");
+				#$self->session->errorHandler->warn("URL: $proxiedUrl");
 				
 				$request = HTTP::Request->new(GET => $proxiedUrl, $header) || return "wrong url"; # Create GET request
 			} else { # It's a POST
@@ -401,8 +401,10 @@ sub view {
 		}
 	}
 	
+	
+	$self->session->http->setMimeType($var{header});
+	
 	if($var{header} ne "text/html") {
-		$self->session->http->setMimeType($var{header});
 		return $var{content};
 	} else {
 		return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
@@ -417,11 +419,16 @@ sub www_view {
         return $self->session->privilege->noAccess() unless $self->canView;
 	$self->prepareView;
         my $output = $self->view;
-        # this is s a stop gap. we need to do something here that deals with the real www_view and caching, etc.
-        if ($self->session->http->getMimeType() ne "text/html") {
+        if ($self->session->http->getMimeType ne "text/html") {
                 return $output;
         } else {
-                return $self->processStyle($output);
+		$self->session->http->sendHeader;
+		my $style = $self->processStyle("~~~");
+		my ($head, $foot) = split("~~~",$style);
+		$self->session->output->print($head, 1);
+		$self->session->output->print($output);
+		$self->session->output->print($foot, 1);
+		return "chunked";
         }
 }
 
