@@ -134,7 +134,7 @@ is($eh->{'_debug_error'}, "ERROR\nMore errors\n", "error: new message internally
 ####################################################
 
 is ($eh->getStackTrace, undef, 'no stack trace due to shallow depth, must be 2 deep for a stack trace');
-like(&depth1(), qr/main,ErrorHandler\.t/, 'stack trace has correct information');
+like(&depth1(), qr/main(.*?)ErrorHandler\.t/, 'stack trace has correct information');
 
 sub depth1 {
 	return &depth2();
