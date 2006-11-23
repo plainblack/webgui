@@ -1,4 +1,5 @@
 7.2.3
+ - fix: minor bug with new template vars in Auth::createAccount
 
 7.2.2
  - fix: Show Debugging option not working

@@ -190,8 +190,8 @@ sub createAccount {
 		       'profile.required' => $required };
 
 		# Individual field template vars.
-		my $prefix = 'create.form.profile.'.$field->getId.'.';
-		$vars->{$prefix.'formElement'} = $id;
+		my $prefix = 'create.form.profile.'.$id.'.';
+		$vars->{$prefix.'formElement'} = $formField;
 		$vars->{$prefix.'formElement.label'} = $label;
 		$vars->{$prefix.'required'} = $required;
 	}
