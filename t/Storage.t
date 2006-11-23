@@ -47,7 +47,7 @@ my $extensionTests = [
 	},
 ];
 
-plan tests => 27 + scalar @{ $extensionTests }; # increment this value for each test you create
+plan tests => 28 + scalar @{ $extensionTests }; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -165,10 +165,17 @@ foreach my $extTest (@{ $extensionTests }) {
 	is( $storage1->getFileExtension($extTest->{filename}), $extTest->{extension}, $extTest->{comment} );
 }
 
+$storage1->addFileFromHashref("testfile-hash.file",{'blah'=>"blah",'foo'=>"foo"});
+ok (-e $storage1->getPath("testfile-hash.file"), 'addFileFromHashRef creates file');
+
+$storage1->renameFile("testfile-hash.file", "testfile-hash-renamed.file");
+ok (-e $storage1->getPath("testfile-hash-renamed.file"),'renameFile created file with new name');
+ok (!(-e $storage1->getPath("testfile-hash.file")), "rename file original file is gone");
+
 TODO: {
 	local $TODO = "Tests to make later";
-	ok(0, 'Add a file to the storage location via addFileFromHashref');
-	ok(0, 'Test renaming of files inside of a storage location');
+	#ok(0, 'Add a file to the storage location via addFileFromHashref');
+	#ok(0, 'Test renaming of files inside of a storage location');
 }
 
 END {
