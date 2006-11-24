@@ -130,36 +130,15 @@ our $HELP = {
 		body => 'anon reg template body',
 		fields => [
 		],
+		isa => [
+			{
+				namespace => "Auth",
+				tag => "anonymous registration template"
+			},
+		],
 		variables => [
 		          {
-		            'name' => 'create.form.header'
-		          },
-		          {
 		            'name' => 'create.form.hidden'
-		          },
-		          {
-		            'name' => 'create.form.footer'
-		          },
-		          {
-		            'name' => 'create.form.submit'
-		          },
-		          {
-		            'name' => 'title',
-		          },
-		          {
-		            'name' => 'create.form.profile'
-		          },
-		          {
-		            'name' => 'profile.formElement'
-		          },
-		          {
-		            'name' => 'profile.formElement.label'
-		          },
-		          {
-		            'name' => 'login.url',
-		          },
-		          {
-		            'name' => 'login.label',
 		          },
 		          {
 		            'name' => 'create.message'

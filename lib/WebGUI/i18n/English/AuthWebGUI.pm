@@ -121,6 +121,11 @@ our $I18N = {
 		lastUpdated => 1149220294,
 	},
 
+	'title' => {
+		message => q|Default page title.|,
+		lastUpdated => 1164335682,
+	},
+
 	'login.form.footer' => {
 		message => q|The required form elements that go after the login page form.|,
 		lastUpdated => 1149220294,
@@ -148,11 +153,6 @@ our $I18N = {
 
 	'login.form.password.label' => {
 		message => q|Default text for password form field|,
-		lastUpdated => 1149220294,
-	},
-
-	'title' => {
-		message => q|Default page title |,
 		lastUpdated => 1149220294,
 	},
 
@@ -469,38 +469,8 @@ our $I18N = {
 		lastUpdated => 1149220652
 	},
 
-	'create.form.header' => {
-		message => q|The required form elements that go at the top of the anonymous registration page.|,
-		lastUpdated => 1149220721,
-	},
-
 	'create.form.hidden' => {
 		message => q|Hidden form fields required for form submittal.|,
-		lastUpdated => 1149220721,
-	},
-
-	'create.form.footer' => {
-		message => q|The required form elements that go after the anonymous registration page form. |,
-		lastUpdated => 1149220721,
-	},
-
-	'create.form.submit' => {
-		message => q|The default submit button for the anonymous registration form. |,
-		lastUpdated => 1149220721,
-	},
-
-	'create.form.profile' => {
-		message => q|A loop containing visible and required profile fields for anonymous registration.|,
-		lastUpdated => 1149220721,
-	},
-
-	'profile.formElement' => {
-		message => q|Form element for visible or required profile field.|,
-		lastUpdated => 1149220721,
-	},
-
-	'profile.formElement.label' => {
-		message => q|Default text label for profile form element.|,
 		lastUpdated => 1149220721,
 	},
 

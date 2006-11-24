@@ -195,7 +195,7 @@ sub createAccount {
 		$vars->{$prefix.'formElement.label'} = $label;
 		$vars->{$prefix.'required'} = $required;
 	}
-	
+
 	$vars->{'create.form.submit'} = WebGUI::Form::submit($self->session,{});
 	$vars->{'create.form.footer'} = WebGUI::Form::formFooter($self->session,);
 
