@@ -387,36 +387,6 @@ our $I18N = {
 		lastUpdated => 1078857230
 	},
 
-	'account.form.header' => {
-		message => q|The required form elements that go at the top of the display account page.|,
-		lastUpdated => 1149220575,
-	},
-
-	'account.form.footer' => {
-		message => q|The required form elements that go after the display account page form.|,
-		lastUpdated => 1149220575,
-	},
-
-	'account.form.karma' => {
-		message => q|A read only form property displaying the amount of karma a user has.  Karma is a configurable user setting that is turned off by default  |,
-		lastUpdated => 1149220575,
-	},
-
-	'account.form.karma.label' => {
-		message => q|Internationalized text label for the karma form value.|,
-		lastUpdated => 1149220575,
-	},
-
-	'account.form.submit' => {
-		message => q|The default submit button for the display account form. |,
-		lastUpdated => 1149220575,
-	},
-
-	'account.options' => {
-		message => q|Links list of options which allow users to turn on Admin, view and edit profile, view the inbox, etc.  |,
-		lastUpdated => 1149220575,
-	},
-
 	'account.message' => {
 		message => q|Any message returned by the system.  Usually displays after the form is submitted.|,
 		lastUpdated => 1149220575,

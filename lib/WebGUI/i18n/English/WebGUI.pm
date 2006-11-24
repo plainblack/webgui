@@ -1319,15 +1319,16 @@ add new users, but cannot edit users.
 Users that have privileges to edit styles for this site. These privileges do not allow the user to assign styles to a page, just define them to be used.
 </p>
 
-<p><b>Template Managers</b><br />
-Users that have privileges to edit templates for this site.
-</p>
-
 <p><b>Visitors</b><br />
 Visitors are users who are not logged in using an account on the system. Also, if you wish to punish a registered user you could remove him/her from the Registered Users group and insert him/her into the Visitors group.
 </p>
+
+<p><b>Template Managers</b><br />
+Template Managers are an old deprecated group that used to be in charge of editing and creating
+templates.  Templates are now owned by the Turn On Admin group by default.
+</p>
 |,
-		lastUpdated => 1164311106
+		lastUpdated => 1164348333
 	},
 
 	'615' => {

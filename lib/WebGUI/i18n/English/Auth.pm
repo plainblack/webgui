@@ -78,6 +78,47 @@ our $I18N = {
 		lastUpdated => 1149220395,
 	},
 
+	'display account template title' => {
+		message => q|Authentication Display Account Template|,
+		lastUpdated => 1078852836
+	},
+
+	'display account template body' => {
+		message => q|<p>The following template variables are available for Authentication Display Account templates. </p>
+|,
+		lastUpdated => 1149220652
+	},
+
+	'account.form.header' => {
+		message => q|The required form elements that go at the top of the display account page.|,
+		lastUpdated => 1149220575,
+	},
+
+	'account.form.footer' => {
+		message => q|The required form elements that go after the display account page form.|,
+		lastUpdated => 1149220575,
+	},
+
+	'account.form.karma' => {
+		message => q|A read only form property displaying the amount of karma a user has.  Karma is a configurable user setting that is turned off by default  |,
+		lastUpdated => 1149220575,
+	},
+
+	'account.form.karma.label' => {
+		message => q|Internationalized text label for the karma form value.|,
+		lastUpdated => 1149220575,
+	},
+
+	'account.form.submit' => {
+		message => q|The default submit button for the display account form. |,
+		lastUpdated => 1149220575,
+	},
+
+	'account.options' => {
+		message => q|Links list of options which allow users to turn on Admin, view and edit profile, view the inbox, etc.  |,
+		lastUpdated => 1149220575,
+	},
+
 	'topicName' => {
 		message => q|Authentication|,
 		lastUpdated => 1164338173,

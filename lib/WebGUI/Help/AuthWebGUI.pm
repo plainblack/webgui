@@ -4,28 +4,13 @@ our $HELP = {
 	'webgui authentication display account template' => {
 		title => 'display account template title',
 		body => 'display account template body',
+		isa => [
+			{
+				namespace => "Auth",
+				tag => "display account template"
+			},
+		],
 		variables => [
-		          {
-		            'name' => 'account.form.header'
-		          },
-		          {
-		            'name' => 'account.form.footer'
-		          },
-		          {
-		            'name' => 'account.form.karma'
-		          },
-		          {
-		            'name' => 'account.form.karma.label'
-		          },
-		          {
-		            'name' => 'account.form.submit'
-		          },
-		          {
-		            'name' => 'account.options'
-		          },
-		          {
-		            'name' => 'displayTitle',
-		          },
 		          {
 		            'name' => 'account.message'
 		          },
@@ -57,10 +42,6 @@ our $HELP = {
 		fields => [
 		],
 		related => [
-			{
-				tag => 'wobject template',
-				namespace => 'Asset_Wobject'
-			}
 		]
 	},
 	'webgui authentication login template' => {
@@ -119,10 +100,6 @@ our $HELP = {
 		fields => [
 		],
 		related => [
-			{
-				tag => 'wobject template',
-				namespace => 'Asset_Wobject'
-			}
 		]
 	},
 	'webgui authentication anonymous registration template' => {
