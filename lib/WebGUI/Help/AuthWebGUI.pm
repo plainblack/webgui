@@ -15,6 +15,9 @@ our $HELP = {
 		            'name' => 'account.message'
 		          },
 		          {
+		            'name' => 'account.noform'
+		          },
+		          {
 		            'name' => 'account.form.username'
 		          },
 		          {
@@ -33,9 +36,6 @@ our $HELP = {
 		            'name' => 'account.form.passwordConfirm.label'
 		          },
 		          {
-		            'name' => 'account.noform'
-		          },
-		          {
 		            'name' => 'account.nofields'
 		          }
 		],
@@ -47,45 +47,15 @@ our $HELP = {
 	'webgui authentication login template' => {
 		title => 'login template title',
 		body => 'login template body',
+		isa => [
+			{
+				namespace => "Auth",
+				tag => "login template"
+			},
+		],
 		variables => [
 		          {
-		            'name' => 'login.form.header'
-		          },
-		          {
-		            'name' => 'login.form.hidden'
-		          },
-		          {
-		            'name' => 'login.form.footer'
-		          },
-		          {
-		            'name' => 'login.form.submit'
-		          },
-		          {
-		            'name' => 'login.form.username'
-		          },
-		          {
-		            'name' => 'login.form.username.label'
-		          },
-		          {
-		            'name' => 'login.form.password'
-		          },
-		          {
-		            'name' => 'login.form.password.label'
-		          },
-		          {
-		            'name' => 'title'
-		          },
-		          {
 		            'name' => 'login.message'
-		          },
-		          {
-		            'name' => 'anonymousRegistration.isAllowed'
-		          },
-		          {
-		            'name' => 'createAccount.url'
-		          },
-		          {
-		            'name' => 'createAccount.label'
 		          },
 		          {
 		            'name' => 'recoverPassword.isAllowed'
@@ -257,6 +227,19 @@ our $HELP = {
 				namespace => 'Asset_Wobject'
 			}
 		]
+	},
+	'webgui deactivate account template' => {
+		title => 'deactivate account template title',
+		body => 'deactivate account template body',
+		isa => [
+			{
+				namespace => "Auth",
+				tag => "deactivate account template"
+			},
+		],
+		variables => [ ],
+		fields => [ ],
+		related => [ ],
 	},
 };
 

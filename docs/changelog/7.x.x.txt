@@ -3,6 +3,10 @@
    from the system, but you do not have to be in the Template Managers group
    to edit or add Templates.  Those privileges have been transferred to the
    Turn On Admin group.
+ - TESTS: The help labels were broken out from the i18n/label.t test into their own
+   test.  An environment variable, CODE_COP, is used to enable the long
+   i18n/label.t and help/setHelp.t tests.
+ - documented the Deactivate Account Template.
 
 7.2.3
  - fix: minor bug with new template vars in Auth::createAccount

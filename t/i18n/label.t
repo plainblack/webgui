@@ -26,6 +26,7 @@ use Data::Dumper;
 
 use Test::More; # increment this value for each test you create
 my $numTests = 0;
+plan skip_all => 'set CODE_COP to enable this test' unless $ENV{CODE_COP};
 
 my $session = WebGUI::Test->session;
 my $lib = WebGUI::Test->lib;
@@ -65,42 +66,20 @@ foreach my $helpSet (@helpFileSet) {
 ##	namespace -> which help file it is form
 ##	label -> which help file it is form
 
-my @helpLabels;
-my @sqlLabels;
 my @libLabels;
 my @objLabels;
-
-
-@helpLabels = getHelpLabels();
-
-#@sqlLabels = getSQLLabels();
 
 find(\&label_finder_pm, $lib);
 
 find(\&obj_finder_pm, $lib);
 
-$numTests = scalar(@helpLabels)
-#	  + scalar(@sqlLabels)
-	  + scalar(@libLabels)
+$numTests = scalar(@libLabels)
 	  + scalar(@objLabels)
 ;
 
 plan tests => $numTests;
 
 my $i18n = WebGUI::International->new($session);
-
-foreach my $label ( @helpLabels ) {
-	ok($i18n->get(@{ $label }{qw(label namespace )} ),
-	sprintf "label: %s->%s inside %s->%s->%s", @{ $label }{'namespace', 'label', 'topic', 'entry', 'tag', });
-}
-
-#
-#foreach my $label ( @sqlLabels ) {
-#	ok($i18n->get(@{ $label }{qw(label namespace )} ),
-#	sprintf "label: %s->%s inside %s", @{ $label }{'namespace', 'label', 'file', });
-#}
-#
-##Subroutine calls are now illegal, everything must be done by object methods.
 
 foreach my $label ( @libLabels ) {
 	ok(0,
@@ -164,100 +143,4 @@ sub obj_finder_pm {
 	}
 }
 
-sub getHelpLabels {
-	my @helpLabels = ();
-	foreach my $topic ( keys %helpTable ) {
-		foreach my $entry ( keys %{ $helpTable{$topic} }) {
-			##Check the title and body data
-			push @helpLabels, {
-				topic=>$topic,
-				entry=>$entry,
-				tag=>'title',
-				namespace=>$topic, ##default
-				label=>$helpTable{$topic}{$entry}{'title'},
-			};
-			if (ref $helpTable{$topic}{$entry}{'body'} ne 'CODE') {
-				push @helpLabels, {
-					topic=>$topic,
-					entry=>$entry,
-					tag=>'body',
-					namespace=>$topic, ##default
-					label=>$helpTable{$topic}{$entry}{'body'},
-				};
-			}
 
-			##Add all labels in the fields array
-			foreach my $field (@{ $helpTable{$topic}{$entry}{fields} }) {
-				push @helpLabels, {
-					topic=>$topic,
-					entry=>$entry,
-					tag=>'fields',
-					namespace=>$field->{namespace},
-					label=>$field->{title},
-				},
-				{
-					topic=>$topic,
-					entry=>$entry,
-					tag=>'fields',
-					namespace=>$field->{namespace},
-					label=>$field->{description},
-				},;
-			}
-			my $variableEntries = getHelpVariables($helpTable{$topic}{$entry}{variables});
-			foreach my $variable ( @{ $variableEntries } ) {
-				my $namespace = exists $variable->{namespace} ?  $variable->{namespace} : $topic;
-				my $one = {
-					topic=>$topic,
-					entry=>$entry,
-					tag=>'variables',
-					namespace=>$namespace,
-				};
-				if ($variable->{description}) {
-					$one->{label} = $variable->{description},
-				}
-				else {
-					$one->{label} = $variable->{name},
-				}
-				push @helpLabels, $one;
-			}
-		}
-	}
-	return @helpLabels;
-}
-
-sub getHelpVariables {
-	my ($variables) = @_; ##An arrayref of variables, possibly with nested variables in loops
-	my $tmplVars = [];
-	foreach my $var ( @{ $variables } ) {
-		if ( exists $var->{variables} ) {
-			push @{ $tmplVars }, @{ getHelpVariables($var->{variables}) };
-			delete $var->{variables};
-		}
-		push @{ $tmplVars }, $var;
-	}
-	return $tmplVars;
-}
-
-sub getSQLLabels {
-	my @sqlLabels = ();
-	foreach my $file (qw/create.sql previousVersion.sql/) {
-		my $file2 = join '/', '../..', 'docs', $file;
-		open my $fh, $file2 or
-			die "Unable to open $file2: $!\n";
-		local $/;
-		my $sql = <$fh>;
-		while ($sql =~ /WebGUI::International::get\(([^\)]+)\)/gs) {
-			my $args;
-			($args = $1) =~ tr{\\"}{}d;
-			my ($label,$namespace) = split ',', $args;
-			$namespace = "WebGUI" unless $namespace;
-			push @sqlLabels, {
-						label => $label,
-						namespace => $namespace,
-						file => $file,
-					};
-		}
-		close $fh;
-	}
-	return @sqlLabels;
-}

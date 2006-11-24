@@ -25,6 +25,7 @@ use File::Find;
 
 use Test::More; # increment this value for each test you create
 my $numTests = 0;
+plan skip_all => 'set CODE_COP to enable this test' unless $ENV{CODE_COP};
 
 my $session = WebGUI::Test->session;
 my $lib = WebGUI::Test->lib;

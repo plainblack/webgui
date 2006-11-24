@@ -111,49 +111,9 @@ our $I18N = {
 		lastUpdated => 1071507721
 	},
 
-	'login.form.header' => {
-		message => q|The required form elements that go at the top of the login page.|,
-		lastUpdated => 1149220294,
-	},
-
-	'login.form.hidden' => {
-		message => q|Hidden form fields required for form submission|,
-		lastUpdated => 1149220294,
-	},
-
 	'title' => {
 		message => q|Default page title.|,
 		lastUpdated => 1164335682,
-	},
-
-	'login.form.footer' => {
-		message => q|The required form elements that go after the login page form.|,
-		lastUpdated => 1149220294,
-	},
-
-	'login.form.submit' => {
-		message => q|The default submit button for the login form.|,
-		lastUpdated => 1149220294,
-	},
-
-	'login.form.username' => {
-		message => q|Default username form field|,
-		lastUpdated => 1149220294,
-	},
-
-	'login.form.username.label' => {
-		message => q|Default text for username form field|,
-		lastUpdated => 1149220294,
-	},
-
-	'login.form.password' => {
-		message => q|Default password form field|,
-		lastUpdated => 1149220294,
-	},
-
-	'login.form.password.label' => {
-		message => q|Default text for password form field|,
-		lastUpdated => 1149220294,
 	},
 
 	'login.message' => {
@@ -504,6 +464,18 @@ our $I18N = {
 	'5' => {
 		message => q|Your password cannot be "password".|,
 		lastUpdated => 1071507752
+	},
+
+	'deactivate account template title' => {
+		message => q|WebGUI Authentication Deactivate Account Template|,
+		lastUpdated => 1164394401
+	},
+
+	'deactivate account template body' => {
+		message => q|<p>The following template variables are available for the WebGUI Authentication Deactivate account templates. 
+</p>
+|,
+		lastUpdated => 1164394398
 	},
 
 	'topicName' => {

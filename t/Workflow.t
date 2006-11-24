@@ -15,7 +15,7 @@ use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Workflow;
 use WebGUI::Utility qw/isIn/;
-use Test::More tests => 0; # increment this value for each test you create
+use Test::More tests => 16; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 my $wf = WebGUI::Workflow->create($session, {title => 'Title', description => 'Description',
@@ -40,8 +40,9 @@ ok(!isIn($wfId, keys %{WebGUI::Workflow->getList($session)}), 'workflow not in e
 $wf->set({enabled => 1});
 ok($wf->get('enabled'), 'workflow is enabled');
 ok(isIn($wfId, keys %{WebGUI::Workflow->getList($session)}), 'workflow in enabled list');
+$session->errorHandler->warn('Interesting');
 $wf->set({enabled => 0});
-ok($wf->get('enabled'), 'workflow is disabled again');
+ok(!$wf->get('enabled'), 'workflow is disabled again');
 
 $wf->delete;
 ok(!defined WebGUI::Workflow->new($session, $wfId), 'deleted workflow cannot be retrieved');

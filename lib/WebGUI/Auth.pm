@@ -313,7 +313,7 @@ sub deactivateAccount {
 
 #-------------------------------------------------------------------
 
-=head2 deactivateAccount ( method )
+=head2 deactivateAccountConfirm ( method )
 
 Superclass method that performs general functionality for deactivating accounts.
 

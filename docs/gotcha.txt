@@ -7,6 +7,13 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.3.0
+--------------------------------------------------------------------
+ * The i18n/label.t and help/setHelp.t test now require that you set
+   an environment variable, CODE_COP to run them.  This should make
+   running the entire test suite prior to SVN commits easier to do
+   since it won't take so long.
+
 7.2.0
 --------------------------------------------------------------------
  * NOTE: if you tried to upgrade to 7.2.0 and it failed during the

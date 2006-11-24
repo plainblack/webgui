@@ -119,6 +119,110 @@ our $I18N = {
 		lastUpdated => 1149220575,
 	},
 
+	'login template title' => {
+		message => q|Authentication Login Template|,
+		lastUpdated => 1164394401
+	},
+
+	'login template body' => {
+		message => q|<p>The following template variables are available for all Authentication Login templates. 
+</p>
+|,
+		lastUpdated => 1164394398
+	},
+
+	'login.form.header' => {
+		message => q|The required form elements that go at the top of the login page.|,
+		lastUpdated => 1149220294,
+	},
+
+	'login.form.hidden' => {
+		message => q|Hidden form fields required for form submission|,
+		lastUpdated => 1149220294,
+	},
+
+	'login.form.footer' => {
+		message => q|The required form elements that go after the login page form.|,
+		lastUpdated => 1149220294,
+	},
+
+	'login.form.submit' => {
+		message => q|The default submit button for the login form.|,
+		lastUpdated => 1149220294,
+	},
+
+	'login.form.username' => {
+		message => q|Default username form field|,
+		lastUpdated => 1149220294,
+	},
+
+	'login.form.username.label' => {
+		message => q|Default text for username form field|,
+		lastUpdated => 1149220294,
+	},
+
+	'login.form.password' => {
+		message => q|Default password form field|,
+		lastUpdated => 1149220294,
+	},
+
+	'login.form.password.label' => {
+		message => q|Default text for password form field|,
+		lastUpdated => 1149220294,
+	},
+
+	'anonymousRegistration.isAllowed' => {
+		message => q|Flag indicating whether or not anonymous registrations are allowed.|,
+		lastUpdated => 1149220294,
+	},
+
+	'createAccount.url' => {
+		message => q|URL for the anonymous registration page|,
+		lastUpdated => 1149220294,
+	},
+
+	'createAccount.label' => {
+		message => q|Default label for the anonymous registration link.|,
+		lastUpdated => 1149220294,
+	},
+
+	'deactivate account template title' => {
+		message => q|Authentication Deactivate Account Template|,
+		lastUpdated => 1164394401
+	},
+
+	'deactivate account template body' => {
+		message => q|<p>The following template variables are available for all Authentication Deactivate account templates. 
+</p>
+|,
+		lastUpdated => 1164394398
+	},
+
+	'yes.label' => {
+		message => q|Internationalized label for "Yes".|,
+		lastUpdated => 1149220294,
+	},
+
+	'no.label' => {
+		message => q|Internationalized label for "No".|,
+		lastUpdated => 1149220294,
+	},
+
+	'yes.url' => {
+		message => q|URL to deactivate the user's account.|,
+		lastUpdated => 1149220294,
+	},
+
+	'no.url' => {
+		message => q|URL to leave the user's account alone|,
+		lastUpdated => 1149220294,
+	},
+
+	'question' => {
+		message => q|URL to leave the user's account alone|,
+		lastUpdated => 1149220294,
+	},
+
 	'topicName' => {
 		message => q|Authentication|,
 		lastUpdated => 1164338173,
