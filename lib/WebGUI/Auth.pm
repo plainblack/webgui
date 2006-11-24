@@ -202,9 +202,6 @@ sub createAccount {
 	$vars->{'login.url'} = $self->session->url->page('op=auth;method=init');
 	$vars->{'login.label'} = $i18n->get(58);
 
-	$vars->{'login.url'} = $self->session->url->page('op=auth;method=init');
-	$vars->{'login.label'} = $i18n->get(58);
-
 	return WebGUI::Asset::Template->new($self->session,$self->getCreateAccountTemplateId)->process($vars);
 }
 
