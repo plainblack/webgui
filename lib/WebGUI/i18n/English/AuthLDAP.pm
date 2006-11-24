@@ -108,66 +108,10 @@ our $I18N = {
 		lastUpdated => 1039450730
 	},
 
-	'login.form.header' => {
-		message => q|The required form elements that go at the top of the login page.|,
-		lastUpdated => 1149219946,
-	},
-
-	'login.form.hidden' => {
-		message => q|Hidden form fields required for form submission.|,
-		lastUpdated => 1149219946,
-	},
-
-	'login.form.footer' => {
-		message => q|The required form elements that go after the login page form.|,
-		lastUpdated => 1149219946,
-	},
-
-	'login.form.submit' => {
-		message => q|The default submit button for the login form.|,
-		lastUpdated => 1149219946,
-	},
-
-	'login.form.username' => {
-		message => q|Default username form field.|,
-		lastUpdated => 1149219946,
-	},
-
-	'login.form.username.label' => {
-		message => q|Default text for username form field.|,
-		lastUpdated => 1149219946,
-	},
-
-	'login.form.password' => {
-		message => q|Default password form field.|,
-		lastUpdated => 1149219946,
-	},
-
-	'login.form.password.label' => {
-		message => q|Default text for password form field.|,
-		lastUpdated => 1149219946,
-	},
-
 	'login.message' => {
 		message => q|Any message returned by the system.  Usually displays after the form is submitted.|,
 		lastUpdated => 1149219946,
 	},
-
-	'anonymousRegistration.isAllowed' => {
-		message => q|Flag indicating whether or not anonymous registrations are allowed.|,
-		lastUpdated => 1149219946,
-	},
-
-	'createAccount.url' => {
-		message => q|URL for the anonymous registration page.|,
-		lastUpdated => 1149219946,
-	},
-
-	'createAccount.label' => {
-		message => q|Default label for the anonymous registration link.|,
-		lastUpdated => 1149219946,
-	},
-
 
 	'auth login template body' => {
 		message => q|<p>The following template variables are available for LDAP Authentication Login templates.
@@ -257,53 +201,13 @@ our $I18N = {
 		lastUpdated => 1071845113
 	},
 
-	'create.form.header' => {
-		message => q|The required form elements that go at the top of the anonymous registration page.|,
-		lastUpdated => 1149219898,
-	},
-
 	'create.form.hidden' => {
 		message => q|Hidden form fields required for form submittal.|,
 		lastUpdated => 1149219898,
 	},
 
-	'create.form.footer' => {
-		message => q|The required form elements that go after the anonymous registration page form. |,
-		lastUpdated => 1149219898,
-	},
-
-	'create.form.submit' => {
-		message => q|The default submit button for the anonymous registration form.|,
-		lastUpdated => 1149219898,
-	},
-
 	'title' => {
 		message => q|Default page title.|,
-		lastUpdated => 1149219898,
-	},
-
-	'create.form.profile' => {
-		message => q|A loop containing visible and required profile fields for registration.|,
-		lastUpdated => 1149219898,
-	},
-
-	'profile.formElement' => {
-		message => q|Form element for visible or required profile field.|,
-		lastUpdated => 1149219898,
-	},
-
-	'profile.formElement.label' => {
-		message => q|Default text label for profile form element.|,
-		lastUpdated => 1149219898,
-	},
-
-	'login.url' => {
-		message => q|URL for the login page.|,
-		lastUpdated => 1149219898,
-	},
-
-	'login.label' => {
-		message => q|Default text label for login page link.|,
 		lastUpdated => 1149219898,
 	},
 
@@ -315,6 +219,21 @@ our $I18N = {
 	'create.form.ldapId' => {
 		message => q|Default ldapId form field.|,
 		lastUpdated => 1149219898,
+	},
+
+	'create.form.ldapId.label' => {
+		message => q|Default text for ldapId form field.|,
+		lastUpdated => 1149219898,
+	},
+
+	'create.form.ldapConnection' => {
+		message => q|Form field containing a drop-down list to choose which LDAP connection to use to authenticate.|,
+		lastUpdated => 1164405945,
+	},
+
+	'create.form.ldapConnection.label' => {
+		message => q|Internationalized label for the drop-down list <b>create.form.ldapConnection</b>|,
+		lastUpdated => 1164405947,
 	},
 
 	'create.form.ldapId.label' => {
@@ -787,6 +706,18 @@ Usually the RDN looks something like:</p>
 		message => q|LDAP Connections|,
 		lastUpdated =>1092930637,
         context => q|Title of the ldap connection manager for the admin console.|
+	},
+
+	'deactivate account template title' => {
+		message => q|LDAP Authentication Deactivate Account Template|,
+		lastUpdated => 1164406538
+	},
+
+	'deactivate account template body' => {
+		message => q|<p>The following template variables are available for the LDAP Authentication Deactivate account templates. 
+</p>
+|,
+		lastUpdated => 1164406540
 	},
 
 	'topicName' => {

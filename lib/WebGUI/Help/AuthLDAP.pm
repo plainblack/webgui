@@ -77,6 +77,12 @@ our $HELP = {
 	'ldap authentication display account template' => {
 		title => 'display account template title',
 		body => 'display account template body',
+		isa => [
+			{
+				namespace => "Auth",
+				tag => "display account template"
+			},
+		],
 		variables => [
 		          {
 		            'name' => 'account.form.karma'
@@ -105,56 +111,22 @@ our $HELP = {
 				tag => 'ldap authentication login template',
 				namespace => 'AuthLDAP'
 			},
-			{
-				tag => 'wobject template',
-				namespace => 'Asset_Wobject'
-			},
 		]
 	},
 
 	'ldap authentication login template' => {
 		title => 'auth login template title',
 		body => 'auth login template body',
+		isa => [
+			{
+				namespace => "Auth",
+				tag => "login template"
+			},
+		],
 		variables => [
-		          {
-		            'name' => 'login.form.header'
-		          },
-		          {
-		            'name' => 'login.form.hidden'
-		          },
-		          {
-		            'name' => 'login.form.footer'
-		          },
-		          {
-		            'name' => 'login.form.submit'
-		          },
-		          {
-		            'name' => 'login.form.username'
-		          },
-		          {
-		            'name' => 'login.form.username.label'
-		          },
-		          {
-		            'name' => 'login.form.password'
-		          },
-		          {
-		            'name' => 'login.form.password.label'
-		          },
-		          {
-		            'name' => 'title',
-		          },
 		          {
 		            'name' => 'login.message'
 		          },
-		          {
-		            'name' => 'anonymousRegistration.isAllowed'
-		          },
-		          {
-		            'name' => 'createAccount.url'
-		          },
-		          {
-		            'name' => 'createAccount.label'
-		          }
 		],
 		fields => [
 		],
@@ -174,46 +146,26 @@ our $HELP = {
 		]
 	},
 
-	'ldap authentication anonymous registration template' => {
+	'ldap authentication anonymous registration template' => { ##createAccount
 		title => 'anon reg template title',
 		body => 'anon reg template body',
+		isa => [
+			{
+				namespace => "Auth",
+				tag => "anonymous registration template"
+			},
+		],
 		fields => [
 		],
 		variables => [
 		          {
-		            'name' => 'create.form.header'
-		          },
-		          {
-		            'name' => 'create.form.hidden'
-		          },
-		          {
-		            'name' => 'create.form.footer'
-		          },
-		          {
-		            'name' => 'create.form.submit'
-		          },
-		          {
-		            'name' => 'title'
-		          },
-		          {
-		            'name' => 'create.form.profile',
-		            'variables' => [
-		                             {
-		                               'name' => 'profile.formElement'
-		                             },
-		                             {
-		                               'name' => 'profile.formElement.label'
-		                             }
-		                           ]
-		          },
-		          {
-		            'name' => 'login.url'
-		          },
-		          {
-		            'name' => 'login.label'
-		          },
-		          {
 		            'name' => 'create.message'
+		          },
+		          {
+		            'name' => 'create.form.ldapConnection'
+		          },
+		          {
+		            'name' => 'create.form.ldapConnection.label'
 		          },
 		          {
 		            'name' => 'create.form.ldapId'
@@ -237,11 +189,21 @@ our $HELP = {
 				tag => 'ldap authentication login template',
 				namespace => 'AuthLDAP'
 			},
-			{
-				tag => 'wobject template',
-				namespace => 'Asset_Wobject'
-			}
 		]
+	},
+
+	'ldap deactivate account template' => {
+		title => 'deactivate account template title',
+		body => 'deactivate account template body',
+		isa => [
+			{
+				namespace => "Auth",
+				tag => "deactivate account template"
+			},
+		],
+		variables => [ ],
+		fields => [ ],
+		related => [ ],
 	},
 };
 
