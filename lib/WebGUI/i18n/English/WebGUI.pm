@@ -1285,6 +1285,12 @@ The Connect DN is the <b>cn</b> (or common name) of a given user in your LDAP da
 Admins are users who have unlimited privileges within WebGUI. A user should only be added to the admin group if they oversee the system. Usually only one to three people will be added to this group.  Once a person has been added to this group, their UI level is automatically updated to 9.
 </p>
 
+<p><b>Turn Admin On</b><br />
+Users in this group are allowed to enter Admin mode.  By default, the Content Managers,
+Template Managers, Package Managers and Secondary Admins groups are members of the
+Turn Admin On group and also may enter Admin mode.
+</p>
+
 <p><b>Content Managers</b><br />
 Content managers are users who have privileges to add, edit, and delete content from various areas on the site. The content managers group should not be used to control individual content areas within the site, but to determine whether a user can edit content at all. You should set up additional groups to separate content areas on the site.
 </p>
@@ -1317,15 +1323,11 @@ Users that have privileges to edit styles for this site. These privileges do not
 Users that have privileges to edit templates for this site.
 </p>
 
-<p><b>Turn Admin On</b><br />
-These users are allowed to turn on Admin mode.
-</p>
-
 <p><b>Visitors</b><br />
 Visitors are users who are not logged in using an account on the system. Also, if you wish to punish a registered user you could remove him/her from the Registered Users group and insert him/her into the Visitors group.
 </p>
 |,
-		lastUpdated => 1146592032
+		lastUpdated => 1164311106
 	},
 
 	'615' => {
