@@ -518,6 +518,13 @@ sub getTemplateVars {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getThread
+
+Returns the Thread that this Post belongs to.  The method caches the result of the Asset creation.
+
+=cut
+
 sub getThread {
 	my $self = shift;
 	unless (defined $self->{_thread}) {

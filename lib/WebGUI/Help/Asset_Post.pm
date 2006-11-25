@@ -1,9 +1,19 @@
 package WebGUI::Help::Asset_Post;
 
 our $HELP = {
-	'post add/edit template' => {
+	'post add/edit template' => { ##Asset/Post/www_edit
 		title => 'add/edit post template title',
 		body => 'add/edit post template body',
+		isa => [
+			{
+				tag => 'collaboration template labels',
+				namespace => 'Asset_Collaboration'
+			},
+			{
+				tag => 'template language',
+				namespace => 'Asset_Template'
+			},
+		],
 		fields => [
 		],
 		variables => [
@@ -127,19 +137,21 @@ our $HELP = {
 		],
 		related => [
 			{
-				tag => 'template language',
-				namespace => 'Asset_Template'
-			},
-			{
-				tag => 'post template variables',
+				tag => 'notification template',
 				namespace => 'Asset_Post'
 			},
 		]
 	},
 
-	'post template variables' => {
+	'post template variables' => { ##Asset/Post/getTemplateVars
 		title => 'post template variables title',
 		body => 'post template variables body',
+		isa => [
+			{
+				tag => 'post asset variables',
+				namespace => 'Asset_Post'
+			},
+		],
 		variables => [
 		          {
 		            'name' => 'userId'
@@ -163,7 +175,8 @@ our $HELP = {
 		            'name' => 'title.short'
 		          },
 		          {
-		            'name' => 'content'
+		            'name' => 'content',
+			    'description' => 'formatted.content'
 		          },
 		          {
 		            'name' => 'user.canEdit'
@@ -233,6 +246,27 @@ our $HELP = {
 		                             }
 		                           ]
 		          },
+		],
+		fields => [
+		],
+		related => [
+			{
+				tag => 'template language',
+				namespace => 'Asset_Template'
+			},
+			{
+				tag => 'collaboration template labels',
+				namespace => 'Asset_Collaboration'
+			},
+		]
+	},
+
+	'post asset variables' => {
+		title => 'post asset variables title',
+		body => 'post asset variables body',
+		isa => [
+		],
+		variables => [
 		          {
 		            'name' => 'storageId'
 		          },
@@ -315,20 +349,21 @@ our $HELP = {
 		fields => [
 		],
 		related => [
+		]
+	},
+	'notification template' => {
+		title => 'notification template title',
+		body => 'notification template body',
+		isa => [
+			{
+				namespace => "Asset_Post",
+				tag => "post template variables"
+			},
 			{
 				tag => 'template language',
 				namespace => 'Asset_Template'
 			},
-			{
-				tag => 'collaboration template labels',
-				namespace => 'Asset_Collaboration'
-			},
-		]
-	},
-
-	'notification template' => {
-		title => 'notification template title',
-		body => 'notification template body',
+		],
 		fields => [
 		],
 		variables => [
@@ -347,11 +382,7 @@ our $HELP = {
 		],
 		related => [
 			{
-				tag => 'template language',
-				namespace => 'Asset_Template'
-			},
-			{
-				tag => 'post template variables',
+				tag => 'post add/edit template',
 				namespace => 'Asset_Post'
 			},
 		]

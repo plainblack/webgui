@@ -261,6 +261,11 @@ Collaboration System and the user has an avatar.|,
 		lastUpdated => 1150167057,
 	},
 
+	'formatted.content' => {
+		message => q|The formatted and filtered content of the post, if a thread containing the Post exists.  This variable will override any other variables with this name in the list of template variables.|,
+		lastUpdated => 1164424431,
+	},
+
 	'user.canEdit' => {
 		message => q|A conditional that is true if the user is adding a new Post, as opposed to
 editing an existing Post, and a thread containing the Post exists.|,
@@ -503,11 +508,22 @@ editing an existing Post, and a thread containing the Post exists.|,
 	},
 
 	'post template variables body' => {
-		message => q|<p>The following variables are available in all Post templates.  Internationalized labels
-		for the action URLs (reply, delete, etc.)  are provided in the set of Collaboration Template labels.
-</p>
+		message => q|<p>The following variables are available in all Post templates and
+templates in the Collaboration System.</p>
 |,
-		lastUpdated => 1150167094,
+		lastUpdated => 1164424949,
+	},
+
+	'post asset variables title' => {
+		message => q|Post Asset Template Variables|,
+                lastUpdated => 1164425086,
+        },
+
+	'post asset variables body' => {
+		message => q|<p>The following variables are used in many Post and Collaboration System templates.  They
+		pull their data directly from the Post Asset's properties.</p>
+|,
+		lastUpdated => 1164425047,
 	},
 
 	'post received' => {
