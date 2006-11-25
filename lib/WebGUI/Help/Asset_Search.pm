@@ -4,6 +4,12 @@ our $HELP = {
 	'search add/edit' => {
 		title => 'add/edit title',
 		body => 'add/edit body',
+		isa => [
+			{
+				namespace => "Asset_Wobject",
+				tag => "wobject add/edit"
+			},
+		],
 		fields => [
                         {
                                 title => 'search template',
@@ -25,10 +31,6 @@ our $HELP = {
 			{
 				tag => 'search template',
 				namespace => 'Asset_Search'
-			},
-			{
-				tag => 'asset fields',
-				namespace => 'Asset'
 			},
 			{
 				tag => 'wobjects using',

@@ -4,6 +4,12 @@ our $HELP = {
 	'product add/edit' => {
 		title => '38',
 		body => '39',
+		isa => [
+			{
+				namespace => "Asset_Wobject",
+				tag => "wobject add/edit"
+			},
+		],
 		fields => [
                         {
                                 title => 'cache timeout',

@@ -4,6 +4,12 @@ our $HELP = {
 	'stock data add/edit' => {
 		title => 'help_add_edit_stocklist_title',
 		body => 'help_add_edit_stocklist_body',
+		isa => [
+			{
+				namespace => "Asset_Wobject",
+				tag => "wobject add/edit"
+			},
+		],
 		fields => [
 			{
 				title => 'template_label',

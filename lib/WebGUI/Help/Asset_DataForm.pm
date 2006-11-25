@@ -4,6 +4,12 @@ our $HELP = {
 	'data form add/edit' => {
 		title => '61',
 		body => '71',
+		isa => [
+			{
+				namespace => "Asset_Wobject",
+				tag => "wobject add/edit"
+			},
+		],
 		fields => [
                         {
                                 title => '82',
@@ -82,10 +88,6 @@ our $HELP = {
 			{
 				tag => 'wobjects using',
 				namespace => 'Asset_Wobject'
-			},
-			{
-				tag => 'asset fields',
-				namespace => 'Asset'
 			},
 		]
 	},

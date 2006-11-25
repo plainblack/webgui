@@ -4,6 +4,12 @@ our $HELP = {
 	'events calendar add/edit' => {
 		title => '61',
 		body => '71',
+		isa => [
+			{
+				namespace => "Asset_Wobject",
+				tag => "wobject add/edit"
+			},
+		],
 		fields => [
                         {
                                 title => 'visitor cache timeout',

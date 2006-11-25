@@ -4,6 +4,12 @@ our $HELP = {
 	'http proxy add/edit' => {
 		title => '10',
 		body => '11',
+		isa => [
+			{
+				namespace => "Asset_Wobject",
+				tag => "wobject add/edit"
+			},
+		],
 		fields => [
                         {
                                 title => '1',

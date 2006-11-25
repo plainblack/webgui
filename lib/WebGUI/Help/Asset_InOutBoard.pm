@@ -4,6 +4,12 @@ our $HELP = {
 	'in out board add/edit' => {
 		title => '18',
 		body => '19',
+		isa => [
+			{
+				namespace => "Asset_Wobject",
+				tag => "wobject add/edit"
+			},
+		],
 		fields => [
                         {
                                 title => '1',

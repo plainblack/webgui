@@ -4,6 +4,12 @@ our $HELP = {
 	'article add/edit' => {
 		title => '61',
 		body => '71',
+		isa => [
+			{
+				namespace => "Asset_Wobject",
+				tag => "wobject add/edit"
+			},
+		],
 		fields => [
                         {
                                 title => 'cache timeout',
@@ -37,10 +43,6 @@ our $HELP = {
 			{
 				tag => 'wobjects using',
 				namespace => 'Asset_Wobject'
-			},
-			{
-				tag => 'asset fields',
-				namespace => 'Asset'
 			},
 		],
 	},

@@ -7,6 +7,12 @@ our $HELP = {
 		source => 'sub definition',
 		title => 'add/edit help title',
 		body => 'add/edit help body',
+		isa => [
+			{
+				namespace => "Asset_Wobject",
+				tag => "wobject add/edit"
+			},
+		],
 		fields => [
                         {
                                 title => 'display template',

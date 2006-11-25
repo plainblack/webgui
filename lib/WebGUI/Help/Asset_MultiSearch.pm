@@ -4,6 +4,12 @@ our $HELP = {
 	'multi search add/edit' => {
 		title => 'multisearch add/edit title',
 		body => 'multisearch add/edit body',
+		isa => [
+			{
+				namespace => "Asset_Wobject",
+				tag => "wobject add/edit"
+			},
+		],
 		fields => [
                         {
                                 title => 'cache timeout',

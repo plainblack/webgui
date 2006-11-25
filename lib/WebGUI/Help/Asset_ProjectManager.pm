@@ -6,6 +6,12 @@ our $HELP = {
 	'project manager add/edit' => {
 		title => 'pm add/edit title',
 		body => 'pm add/edit body',
+		isa => [
+			{
+				namespace => "Asset_Wobject",
+				tag => "wobject add/edit"
+			},
+		],
 		fields => [
                         {
                                 title => 'projectDashboardTemplate label',

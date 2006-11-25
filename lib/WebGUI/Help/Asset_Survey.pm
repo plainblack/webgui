@@ -4,6 +4,12 @@ our $HELP = {
 	'survey add/edit' => {
 		title => '3',
 		body => '4',
+		isa => [
+			{
+				namespace => "Asset_Wobject",
+				tag => "wobject add/edit"
+			},
+		],
 		fields => [
                         {
                                 title => 'view template',

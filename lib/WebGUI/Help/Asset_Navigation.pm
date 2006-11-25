@@ -4,6 +4,12 @@ our $HELP = {
 	'navigation add/edit' => {
 		title => '1098',
 		body => '1093',
+		isa => [
+			{
+				namespace => "Asset_Wobject",
+				tag => "wobject add/edit"
+			},
+		],
 		fields => [
                         {
                                 title => '1096',
