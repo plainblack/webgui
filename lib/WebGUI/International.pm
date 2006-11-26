@@ -102,7 +102,6 @@ sub get {
 	$namespace =~ s/$safeRe//g;
 	my $cmd = "WebGUI::i18n::".$language."::".$namespace;
 
-	use Data::Dumper;
 	if (defined *{"$cmd\::I18N"}) {  ##Symbol table lookup
 		our $table;
 		*table = *{"$cmd\::I18N"};  ##Create alias into symbol table
