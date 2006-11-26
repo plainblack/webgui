@@ -46,7 +46,6 @@ sub _loadHelp {
 		*table = *{"$helpPackage\::HELP"};  ##Create alias into symbol table
 		return $table;  ##return whole hashref
 	}
-	$session->errorHandler->warn("cache miss for $helpPackage");
 	my $load = sprintf 'use %-s; $%-s::HELP', $helpPackage, $helpPackage;
 	my $help = eval($load);
 	if ($@) {
