@@ -10,7 +10,7 @@ package WebGUI::Operation::Help;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use strict;
+use strict qw(vars subs);
 use Tie::IxHash;
 use WebGUI::AdminConsole;
 use WebGUI::International;
@@ -41,7 +41,12 @@ been already and logs errors during the load.
 sub _loadHelp {
 	my $session = shift;
 	my $helpPackage = shift;
-	return $helpPackage::HELP if defined $helpPackage::HELP; ##Already loaded
+	if (defined *{"$helpPackage\::HELP"}) {  ##Symbol table lookup
+		our $table;
+		*table = *{"$helpPackage\::HELP"};  ##Create alias into symbol table
+		return $table;  ##return whole hashref
+	}
+	$session->errorHandler->warn("cache miss for $helpPackage");
 	my $load = sprintf 'use %-s; $%-s::HELP', $helpPackage, $helpPackage;
 	my $help = eval($load);
 	if ($@) {

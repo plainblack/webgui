@@ -7,6 +7,11 @@
    test.  An environment variable, CODE_COP, is used to enable the long
    i18n/label.t and help/setHelp.t tests.
  - documented the Deactivate Account Template.
+ - Added the setNamespace and getNamespace methods to WebGUI::International.
+ - Fixed bad caching via codespace in Operation::Help.  The original failed all the time.
+ - Implemented codespace caching in WebGUI::International.  This replaces the
+   in-memory cache by symbol table lookups into the code itself and saves
+   duplicating the i18n entries.
 
 7.2.3
  - fix: minor bug with new template vars in Auth::createAccount

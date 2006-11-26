@@ -17,8 +17,6 @@ package WebGUI::International;
 
 use strict qw(vars subs);
 
-our %i18nCache;
-
 =head1 NAME
 
 Package WebGUI::International
@@ -102,8 +100,14 @@ sub get {
 	$id =~ s/$safeRe//g;
 	$language =~ s/$safeRe//g;
 	$namespace =~ s/$safeRe//g;
-	return $i18nCache{$language}{$namespace}{$id}{message} if $i18nCache{$language}{$namespace}{$id}{message};
 	my $cmd = "WebGUI::i18n::".$language."::".$namespace;
+
+	use Data::Dumper;
+	if (defined *{"$cmd\::I18N"}) {  ##Symbol table lookup
+		our $table;
+		*table = *{"$cmd\::I18N"};  ##Create alias into symbol table
+		return $table->{$id}->{message};  ##return key
+	}
 	my $load = "use ".$cmd;
 	eval($load);
 	$self->session->errorHandler->warn($cmd." failed to compile because ".$@) if ($@);
@@ -111,7 +115,6 @@ sub get {
 	my $output = eval($cmd);	
 	$self->session->errorHandler->warn("Couldn't get value from ".$cmd." because ".$@) if ($@);
 	$output = $self->get($id,$namespace,"English") if ($output eq "" && $language ne "English");
-	$i18nCache{$language}{$namespace}{$id}{message} = $output;
 	return $output;
 }
 
@@ -152,6 +155,19 @@ sub getLanguage {
 	}
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 getNamespace ( ) 
+
+Returns the default namespace set in the object when created.
+
+=cut
+
+sub getNamespace {
+	my ($self) = @_;
+	return $self->{_namespace};
+}
 
 #-------------------------------------------------------------------
 
@@ -210,6 +226,23 @@ sub makeUrlCompliant {
 
 #-------------------------------------------------------------------
 
+=head2 setNamespace ( namespace ) 
+
+Set the default namespace for pulling internationalized labels.
+
+=head3 namespace
+
+The namespace to make the new default.
+
+=cut
+
+sub setNamespace {
+	my ($self, $namespace) = @_;
+	$self->{_namespace} = $namespace;
+}
+
+#-------------------------------------------------------------------
+
 =head2 new ( session, [ namespace, language ] ) 
 
 The constructor for the International function if using it in OO mode.  Note
@@ -222,7 +255,7 @@ The current user's session variable
 
 =head3 namespace
 
-Specify a default namespace. Defaults to "WebGUI".
+Specify a default namespace.
 
 =head3 language
 
