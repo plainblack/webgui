@@ -19,20 +19,96 @@ my $quiet; # this line required
 
 
 my $session = start(); # this line required
-
-# upgrade functions go here
-
+addWikiAssets($session);
+deleteOldFiles($session);
 finish($session); # this line required
 
 
-##-------------------------------------------------
-#sub exampleFunction {
-#	my $session = shift;
-#	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
-#	# and here's our code
-#}
+#-------------------------------------------------
+sub deleteOldFiles {
+	my $session = shift;
+	print "\tDeleting old unneeded files.\n" unless $quiet;
+	unlink "../../www/extras/assets/wiki.gif";
+	unlink "../../www/extras/assets/wikiPost.gif";
+	unlink "../../www/extras/assets/small/wiki.gif";
+	unlink "../../www/extras/assets/small/wikiPost.gif";
+}
 
+#-------------------------------------------------
+sub addWikiAssets {
+	my $session = shift;
+	print "\tAdding wiki assets.\n" unless $quiet;
 
+	$session->db->write($_) for(<<'EOT',
+  CREATE TABLE `WikiMaster` (
+    `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
+    `revisionDate` bigint(20) NOT NULL,
+    `groupToEditPages` varchar(22) character set utf8 collate utf8_bin NOT NULL,
+    `groupToAdminister` varchar(22) character set utf8 collate utf8_bin NOT NULL,
+    `richEditor` varchar(22) character set utf8 collate utf8_bin NOT NULL
+                 default 'PBrichedit000000000002',
+    `masterTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL
+                       default 'WikiMasterTmpl00000001',
+    `frontPageTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL
+                          default 'WikiFrontTmpl000000001',
+    `pageTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL
+                     default 'WikiPageTmpl0000000001',
+    `pageEditTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL
+                         default 'WikiPageEditTmpl000001',
+    `recentChangesTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL
+                              default 'WikiRCTmpl000000000001',
+    `pageHistoryTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL
+                            default 'WikiPHTmpl000000000001',
+    `pageListTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL
+                         default 'WikiPLTmpl000000000001',
+    `searchTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL
+                       default 'WikiSearchTmpl00000001',
+    `recentChangesCount` int(11) NOT NULL default 50,
+    `recentChangesCountFront` int(11) NOT NULL default 10,
+    PRIMARY KEY (`assetId`, `revisionDate`)
+  ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+EOT
+				    <<'EOT',
+  CREATE TABLE `WikiPage` (
+    `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
+    `revisionDate` bigint(20) NOT NULL,
+    `content` mediumtext,
+    `storageId` varchar(22) character set utf8 collate utf8_bin NULL,
+    `views` bigint(20) NOT NULL default 0,
+    PRIMARY KEY (`assetId`, `revisionDate`)
+  ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+EOT
+				    <<'EOT',
+  CREATE TABLE `WikiMaster_titleIndex` (
+    `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
+    `pageId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
+    `title` varchar(255) NOT NULL,
+    PRIMARY KEY (`assetId`, `pageId`)
+  ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+EOT
+				    # Don't want protection to be versioned, so put it in a
+				    # separate table.
+				    <<'EOT',
+  CREATE TABLE `WikiPage_protected` (
+    `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
+    PRIMARY KEY (`assetId`)
+  ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+EOT
+				    <<'EOT',
+  CREATE TABLE `WikiPage_extraHistory` (
+    `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
+    `userId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
+    `dateStamp` bigint(20) NOT NULL,
+    `actionTaken` varchar(255) NOT NULL,
+    `url` varchar(255) NOT NULL,
+    `title` varchar(255) NOT NULL
+  ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+EOT
+				   );
+
+	my $config = $session->config;
+	$config->addToArray('assetContainers', 'WebGUI::Asset::Wobject::WikiMaster');
+}
 
 # ---- DO NOT EDIT BELOW THIS LINE ----
 

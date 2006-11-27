@@ -1,0 +1,11 @@
+.accordion { }
+
+.accordionHeader {
+	cursor: pointer;
+}
+
+.accordionBody {
+        height: 0px;
+	overflow: auto;
+}
+

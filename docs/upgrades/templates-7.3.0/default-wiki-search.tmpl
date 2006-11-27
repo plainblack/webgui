@@ -1,0 +1,11 @@
+#WikiSearchTmpl00000001
+#create
+#namespace:WikiMaster_search
+#url:default-wiki-search
+#title:Default Wiki Search
+#menuTitle:Default Wiki Search
+
+<tmpl_var search.formHeader>Search: <tmpl_var search.query><tmpl_var search.submit><tmpl_var search.formFooter>
+<tmpl_if search.results><h3>Results</h3>
+<ul><tmpl_loop search.results><li><a href="<tmpl_var viewLatest>"><tmpl_var title></a></li></tmpl_loop></ul>
+</tmpl_if>

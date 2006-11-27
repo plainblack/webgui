@@ -1,0 +1,14 @@
+#WikiRCTmpl000000000001
+#create
+#namespace:WikiMaster_recentChanges
+#url:default-wiki-recent-changes
+#title:Default Recent Changes
+#menuTitle:Default Recent Changes
+
+<tmpl_loop rc.days>
+<h3><tmpl_var day.date></h3>
+<ul><tmpl_loop day.entries>
+<li><tmpl_var date> <tmpl_var time>: <a href="<tmpl_var viewLatest>"><tmpl_var title></a>
+<tmpl_var actionNL> by <tmpl_var username></li>
+</tmpl_loop></ul>
+</tmpl_loop>

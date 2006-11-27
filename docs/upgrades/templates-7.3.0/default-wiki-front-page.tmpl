@@ -1,0 +1,15 @@
+#WikiFrontTmpl000000001
+#create
+#namespace:WikiMaster_front
+#url:default-wiki-front-page
+#title:Default Wiki Front Page
+#menuTitle:Default Wiki Front Page
+
+<tmpl_var description>
+<h3>Search</h3>
+<tmpl_var search.formHeader>Search: <tmpl_var search.query><tmpl_var search.submit><tmpl_var search.formFooter>
+<h3>Recent changes (<a href="<tmpl_var recentChanges.url>">more</a>)</h3>
+<ul><tmpl_loop rc.entries>
+<li><tmpl_var date> <tmpl_var time>: <a href="<tmpl_var viewLatest>"><tmpl_var title></a>
+<tmpl_var actionNL> by <tmpl_var username></li>
+</tmpl_loop></ul>
