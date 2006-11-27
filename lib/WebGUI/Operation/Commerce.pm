@@ -59,6 +59,7 @@ sub _submenu {
         }
 	$ac->addSubmenuItem($session->url->page('op=editCommerceSettings'), $i18n->get('manage commerce settings'));
 	$ac->addSubmenuItem($session->url->page('op=listTransactions'), $i18n->get('list transactions')); 
+	$ac->addSubmenuItem($session->url->page('op=listPendingTransactions'), $i18n->get('list pending transactions')); 
         return $ac->render($workarea, $title);
 }
 
