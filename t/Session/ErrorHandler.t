@@ -50,7 +50,7 @@ $logger->mock( 'error', sub { $error = $_[1]} );
 my $accumulated_warn = "";
 $eh->warn("This is a warning");
 is($warns, "This is a warning", "warn: Log4perl called");
-my $accumulated_warn .= "This is a warning\n";
+$accumulated_warn .= "This is a warning\n";
 is($session->errorHandler->{_debug_warn}, $accumulated_warn, "warn: message internally appended");
 $eh->warn("Second warning");
 is($warns, "Second warning", "warn: Log4perl called again");
@@ -202,6 +202,29 @@ $newEnv{REMOTE_ADDR} = '10.0.0.5';
 is($eh->canShowPerformanceIndicators, 1, 'canShowPerformanceIndicators: returns 0 if debugIp is set and IP address matches exactly');
 $newEnv{REMOTE_ADDR} = '192.168.0.5';
 is($eh->canShowPerformanceIndicators, 1, 'canShowPerformanceIndicators: returns 0 if debugIp is set and IP address matches subnet');
+
+####################################################
+#
+# showDebug
+#
+####################################################
+
+my $form = $session->form;
+$form = Test::MockObject::Extends->new($form);
+$form->mock('paramsHashRef',
+	sub {
+		return {
+			password => 'passWord',
+			identifier => 'qwe123',
+			username => 'Admin',
+		};
+	});
+
+foreach my $entry (qw/_debug_error _debug_warn _debug_info _debug_debug/) {
+	$eh->{$entry} = $entry . "\n";
+}
+
+my $showDebug = $eh->showDebug;
 
 END {
 	$session->setting->set('debugIp',   $origDebugIp);
