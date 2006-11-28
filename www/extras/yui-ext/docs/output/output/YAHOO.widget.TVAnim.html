@@ -1,0 +1,137 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.widget.TVAnim</title>
+        <link rel="stylesheet" type="text/css" href="../reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.widget.TVAnim.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.widget.TVAnim</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.widget</td></tr>
+            <tr><td class="label">Class:</td><td>TVAnim</td></tr>
+                        <tr><td class="label">Extends:</td><td>Object</td></tr>
+                                    <tr><td class="label">Defined In:</td><td><a href="treeview.js.html">treeview.js</a></td></tr>
+        </table>
+        <div class="description">
+            A static factory class for tree view expand/collapse animations        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Property</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#FADE_IN">FADE_IN</a> : string</td>
+        <td class="msource" rowspan="2">TVAnim</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Constant for the fade in animation</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#FADE_OUT">FADE_OUT</a> : string</td>
+        <td class="msource" rowspan="2">TVAnim</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Constant for the fade out animation</td>
+    </tr>
+            </table>
+                <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getAnim">getAnim</a>(<code>type {string}</code>, <code>el {HTMLElement}</code>, <code>callback {function}</code>) : YAHOO.util.Animation</td>
+        <td class="msource" rowspan="2">TVAnim</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Returns a ygAnim instance of the given type</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#isValid">isValid</a>(<code>type {string}</code>) : boolean</td>
+        <td class="msource" rowspan="2">TVAnim</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Returns true if the specified animation class is available</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+        <div class="no-members">This class has no public events.</div>        
+                    <h2 class="mdetail-head">Property Details</h2>
+            <div class="detail-wrap">
+                            <a name="FADE_IN"></a>
+                <div class="mdetail">
+                <h3>FADE_IN</i></h3>
+                <code>public string FADE_IN</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant for the fade in animation                </div>
+                <div class="mdetail-def">This property is defined by TVAnim.</div>
+                </div>
+                            <a name="FADE_OUT"></a>
+                <div class="mdetail alt">
+                <h3>FADE_OUT</i></h3>
+                <code>public string FADE_OUT</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant for the fade out animation                </div>
+                <div class="mdetail-def">This property is defined by TVAnim.</div>
+                </div>
+                        </div>
+                
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="getAnim"></a>
+                <div class="mdetail">
+                <h3>getAnim</i></h3>
+                <code>public function getAnim(<code>type {string}</code>, <code>el {HTMLElement}</code>, <code>callback {function}</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Returns a ygAnim instance of the given type                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>{string}</code> : type<div class="sub-desc">the type of animation</div></li><li><code>{HTMLElement}</code> : el<div class="sub-desc">the element to element (probably the children div)</div></li><li><code>{function}</code> : callback<div class="sub-desc">function to invoke when the animation is done.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>YAHOO.util.Animation</code><div class="sub-desc">the animation instance</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by TVAnim.</div>
+                </div>
+                            <a name="isValid"></a>
+                <div class="mdetail alt">
+                <h3>isValid</i></h3>
+                <code>public function isValid(<code>type {string}</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Returns true if the specified animation class is available                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>{string}</code> : type<div class="sub-desc">the type of animation</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>boolean</code><div class="sub-desc">true if valid, false if not</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by TVAnim.</div>
+                </div>
+                        </div>
+                    
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    

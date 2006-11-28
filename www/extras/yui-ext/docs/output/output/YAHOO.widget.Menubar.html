@@ -1,0 +1,1903 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.widget.Menubar</title>
+        <link rel="stylesheet" type="text/css" href="../reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.widget.Menubar.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.widget.Menubar</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.widget</td></tr>
+            <tr><td class="label">Class:</td><td>Menubar</td></tr>
+                        <tr><td class="label">Extends:</td><td><a href="YAHOO.widget.Menu.html">Menu</a></td></tr>
+                                    <tr><td class="label">Defined In:</td><td><a href="menu.js.html">menu.js</a></td></tr>
+        </table>
+        <div class="description">
+            Horizontal collection of items, each of which can contain a submenu.        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Property</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#BOTTOM_LEFT&lt;static&gt;">BOTTOM_LEFT&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#BOTTOM_LEFT&lt;static&gt;">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Constant representing the top bottom left corner of an element, used for configuring the context eleme...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#BOTTOM_RIGHT&lt;static&gt;">BOTTOM_RIGHT&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#BOTTOM_RIGHT&lt;static&gt;">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Constant representing the bottom right corner of an element, used for configuring the context element ...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_CLASS_NAME">CSS_CLASS_NAME</a> : String</td>
+        <td class="msource" rowspan="2">Menubar</td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description String representing the CSS class(es) to be applied to the menu
+bar's &#60;div&#62; element.
+@default "y...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_OVERLAY&lt;static&gt;">CSS_OVERLAY&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#CSS_OVERLAY&lt;static&gt;">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Constant representing the default CSS class used for an Overlay</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#GROUP_TITLE_TAG_NAME">GROUP_TITLE_TAG_NAME</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#GROUP_TITLE_TAG_NAME">Menu</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description String representing the tagname of the HTML element used to
+title the menu's item groups.
+@default H6
+@f...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#ITEM_TYPE">ITEM_TYPE</a> : YAHOO.widget.MenuItem</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#ITEM_TYPE">Menu</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Object representing the type of menu item to instantiate and
+add when parsing the child nodes (either &#...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#TOP_LEFT&lt;static&gt;">TOP_LEFT&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#TOP_LEFT&lt;static&gt;">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Constant representing the top left corner of an element, used for configuring the context element alig...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#TOP_RIGHT&lt;static&gt;">TOP_RIGHT&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#TOP_RIGHT&lt;static&gt;">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Constant representing the top right corner of an element, used for configuring the context element ali...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#activeItem">activeItem</a> : YAHOO.widget.MenuItem</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#activeItem">Menu</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Object reference to the item in the menu that has focus.
+@default null</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#cfg">cfg</a> : Boolean
+@default</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#cfg">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">True if the Overlay should have an IFRAME shim (for correcting the select z-index bug in IE6 and below).
+@config iframe</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#itemData">itemData</a> : Array</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#itemData">Menu</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Array of items to be added to the menu.  The array can contain
+strings representing the text for each it...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#javascript">javascript</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#javascript">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; The URL that will be placed in the iframe</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#lazyLoad">lazyLoad</a> : Boolean</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#lazyLoad">Menu</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Boolean indicating if the menu's "lazy load" feature is
+enabled.  If set to "true," initialization and r...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#parent">parent</a> : YAHOO.widget.MenuItem</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#parent">Menu</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Object reference to the menu's parent menu or menu item.
+This property can be set via the constructor us...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#srcElement">srcElement</a> : <a</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#srcElement">Menu</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Object reference to the HTML element (either
+&#60;select&#62; or &#60;div&#62;) used to
+create the menu....</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#value">value</a> : Array</td>
+        <td class="msource" rowspan="2">Menubar</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@config submenualignment
+@description Array defining how submenus should be aligned to their
+parent menu bar item. Th...</td>
+    </tr>
+            </table>
+                <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#Menubar">Menubar</a>()</td>
+        <td class="msource" rowspan="2">Menubar</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#_onClick">_onClick</a>(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.MenuBar p_oMenuBar</code>) : void</td>
+        <td class="msource" rowspan="2">Menubar</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description "click" event handler for the menu bar.
+@protected</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#_onKeyDown">_onKeyDown</a>(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.Menu p_oMenu</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#_onKeyDown">Menu</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description "keydown" event handler for the menu.
+@protected</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#_onMouseOut">_onMouseOut</a>(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.Menu p_oMenu</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#_onMouseOut">Menu</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description "mouseout" event handler for the menu.
+@protected</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#_onMouseOver">_onMouseOver</a>(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.Menu p_oMenu</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#_onMouseOver">Menu</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description "mouseover" event handler for the menu.
+@protected</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#addItem">addItem</a>(<code>YAHOO.widget.MenuItem p_oItem</code>, <code>String p_oItem</code>, <code>Object p_oItem</code>, <code>Number p_nGroupIndex</code>) : YAHOO.widget.MenuItem</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#addItem">Menu</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Appends an item to the menu.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#addItems">addItems</a>(<code>Array p_aItems</code>, <code>Number p_nGroupIndex</code>) : Array</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#addItems">Menu</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Adds an array of items to the menu.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#align">align</a>(<code>String elementAlign</code>, <code>String contextAlign</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#align">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Aligns the Overlay to its context element using the specified corner points (represented by the constants TOP_LEFT, T...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#center">center</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#center">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Centers the container in the viewport.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#clearActiveItem">clearActiveItem</a>(<code>Boolean p_bBlur</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#clearActiveItem">Menu</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Sets the "selected" configuration property of the menu's active
+item to "false" and hides the item's sub...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configConstrainToViewport">configConstrainToViewport</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#configConstrainToViewport">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default event handler fired when the "constraintoviewport" property is changed.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configContainer">configContainer</a>(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.Menu p_oMenu</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#configContainer">Menu</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Event handler for when the "container" configuration property
+of the menu changes.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configContext">configContext</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#configContext">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default event handler fired when the "context" property is changed.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configFixedCenter">configFixedCenter</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#configFixedCenter">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The default event handler fired when the "fixedcenter" property is changed.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configHeight">configHeight</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#configHeight">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default event handler fired when the "height" property is changed.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configHideDelay">configHideDelay</a>(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.Menu p_oMenu</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#configHideDelay">Menu</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Event handler for when the "hidedelay" configuration property
+of the menu changes.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configIframe">configIframe</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#configIframe">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default event handler fired when the "iframe" property is changed.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configPosition">configPosition</a>(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.Menu p_oMenu</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#configPosition">Menu</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Event handler for when the "position" configuration property
+of the menu changes.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configVisible">configVisible</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#configVisible">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default event handler fired when the "visible" property is changed. This method is responsible for firing showEve...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configWidth">configWidth</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#configWidth">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The default event handler fired when the "width" property is changed.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configX">configX</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#configX">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default event handler fired when the "x" property is changed.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configXY">configXY</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#configXY">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The default event handler fired when the "xy" property is changed.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configY">configY</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#configY">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default event handler fired when the "y" property is changed.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configzIndex">configzIndex</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#configzIndex">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The default event handler fired when the "zIndex" property is changed.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#destroy">destroy</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#destroy">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Removes the Overlay element from the DOM and sets all child elements to null.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#doCenterOnDOMEvent">doCenterOnDOMEvent</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#doCenterOnDOMEvent">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Center event handler used for centering on scroll/resize, but only if the Overlay is visible</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#enforceConstraints">enforceConstraints</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#enforceConstraints">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default event handler executed when the moveEvent is fired, if the "constraintoviewport" is set to true.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getItem">getItem</a>(<code>Number p_nItemIndex</code>, <code>Number p_nGroupIndex</code>) : YAHOO.widget.MenuItem</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#getItem">Menu</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Returns the item at the specified index.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getItemGroups">getItemGroups</a>() : Array</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#getItemGroups">Menu</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Returns a multi-dimensional array of all of the items in the menu.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getRoot">getRoot</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#getRoot">Menu</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Finds the menu's root menu.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#hideIframe">hideIframe</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#hideIframe">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Hides the iframe shim, if it has been enabled</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#hideMacGeckoScrollbars">hideMacGeckoScrollbars</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#hideMacGeckoScrollbars">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Adds a special CSS class to the Overlay when Mac/Gecko is in use, to work around a Gecko bug where
+scrollbars cannot ...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#init">init</a>(<code>String p_oElement</code>, <code>String p_oElement</code>, <code><a href="http://www.w3.org/TR/2000/WD-DOM-Level-1-20000929/level-</code>, <code><a href="http://www.w3.org/TR/2000/WD-DOM-Level-1-20000929/level-</code>, <code>Object p_oConfig</code>) : void</td>
+        <td class="msource" rowspan="2">Menubar</td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description The MenuBar class's initialization method. This method is
+automatically called by the constructor, and s...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#initDefaultConfig">initDefaultConfig</a>() : void</td>
+        <td class="msource" rowspan="2">Menubar</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Initializes the class's configurable properties which can be
+changed using the menu bar's Config object ...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#initEvents">initEvents</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#initEvents">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Initializes the custom events for Overlay which are fired automatically at appropriate times by the Overlay class.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#insertItem">insertItem</a>(<code>YAHOO.widget.MenuItem p_oItem</code>, <code>String p_oItem</code>, <code>Object p_oItem</code>, <code>Number p_nItemIndex</code>, <code>Number p_nGroupIndex</code>) : YAHOO.widget.MenuItem</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#insertItem">Menu</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Inserts an item into the menu at the specified index.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#moveTo">moveTo</a>(<code>Number x</code>, <code>Number y</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#moveTo">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Moves the Overlay to the specified position. This function is identical to calling this.cfg.setProperty("xy", [x,y]);</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#onDomResize">onDomResize</a>(<code>DOMEvent e</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#onDomResize">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Event handler fired when the resize monitor element is resized.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#removeItem">removeItem</a>(<code>YAHOO.widget.MenuItem p_oObject</code>, <code>Number p_oObject</code>, <code>Number p_nGroupIndex</code>) : YAHOO.widget.MenuItem</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#removeItem">Menu</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Removes the specified item from the menu.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setInitialFocus">setInitialFocus</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#setInitialFocus">Menu</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Sets focus to the menu's first enabled item.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setInitialSelection">setInitialSelection</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#setInitialSelection">Menu</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Sets the "selected" configuration property of the menu's first
+enabled item to "true."</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setItemGroupTitle">setItemGroupTitle</a>(<code>String p_sGroupTitle</code>, <code>Number p_nGroupIndex</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#setItemGroupTitle">Menu</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Sets the title of a group of menu items.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#showIframe">showIframe</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#showIframe">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Shows the iframe shim, if it has been enabled</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#showMacGeckoScrollbars">showMacGeckoScrollbars</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#showMacGeckoScrollbars">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Removes a special CSS class from the Overlay when Mac/Gecko is in use, to work around a Gecko bug where
+scrollbars ca...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#syncPosition">syncPosition</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#syncPosition">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Synchronizes the Panel's "xy", "x", and "y" properties with the Panel's position in the DOM. This is primarily used t...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#toString">toString</a>() : String</td>
+        <td class="msource" rowspan="2">Menubar</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Returns a string representing the menu bar.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#windowResizeHandler&lt;static&gt;">windowResizeHandler&lt;static&gt;</a>(<code>DOMEvent e</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#windowResizeHandler&lt;static&gt;">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; The DOM event handler used to fire the CustomEvent for window resize</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#windowScrollHandler&lt;static&gt;">windowScrollHandler&lt;static&gt;</a>(<code>DOMEvent e</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#windowScrollHandler&lt;static&gt;">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; The DOM event handler used to fire the CustomEvent for window scroll</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Event</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#YAHOO.widget.Overlay.windowResizeEvent">YAHOO.widget.Overlay.windowResizeEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#YAHOO.widget.Overlay.windowResizeEvent">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">A singleton CustomEvent used for reacting to the DOM event for window resize</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#YAHOO.widget.Overlay.windowScrollEvent">YAHOO.widget.Overlay.windowScrollEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#YAHOO.widget.Overlay.windowScrollEvent">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">A singleton CustomEvent used for reacting to the DOM event for window scroll</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#beforeMoveEvent">beforeMoveEvent</a> : (<code>Number x</code>, <code>Number y</code>)</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#beforeMoveEvent">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">CustomEvent fired before the Overlay is moved.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#clickEvent">clickEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#clickEvent">Menu</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Fires when the user clicks the on the menu.  Passes back the
+DOM Event object as an argument.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#itemAddedEvent">itemAddedEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#itemAddedEvent">Menu</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Fires when an item is added to the menu.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#itemRemovedEvent">itemRemovedEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#itemRemovedEvent">Menu</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Fires when an item is removed to the menu.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#keyDownEvent">keyDownEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#keyDownEvent">Menu</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Fires when the user presses a key when one of the menu's items
+has focus.  Passes back the DOM Event obj...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#keyPressEvent">keyPressEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#keyPressEvent">Menu</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Fires when the user presses an alphanumeric key when one of the
+menu's items has focus.  Passes back the...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#keyUpEvent">keyUpEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#keyUpEvent">Menu</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Fires when the user releases a key when one of the menu's items
+has focus.  Passes back the DOM Event ob...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#mouseDownEvent">mouseDownEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#mouseDownEvent">Menu</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Fires when the user mouses down on the menu.  Passes back the
+DOM Event object as an argument.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#mouseOutEvent">mouseOutEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#mouseOutEvent">Menu</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Fires when the mouse has left the menu.  Passes back the DOM
+Event object as an argument.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#mouseOverEvent">mouseOverEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#mouseOverEvent">Menu</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Fires when the mouse has entered the menu.  Passes back
+the DOM Event object as an argument.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#mouseUpEvent">mouseUpEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Menu.html#mouseUpEvent">Menu</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Fires when the user releases a mouse button while the mouse is
+over the menu.  Passes back the DOM Event...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#moveEvent">moveEvent</a> : (<code>Number x</code>, <code>Number y</code>)</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#moveEvent">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">CustomEvent fired after the Overlay is moved.</td>
+    </tr>
+            </table>
+                
+                    <h2 class="mdetail-head">Property Details</h2>
+            <div class="detail-wrap">
+                            <a name="BOTTOM_LEFT&lt;static&gt;"></a>
+                <div class="mdetail">
+                <h3>BOTTOM_LEFT&lt;static&gt;</i></h3>
+                <code>public String BOTTOM_LEFT&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the top bottom left corner of an element, used for configuring the context element alignment                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Overlay.html#BOTTOM_LEFT&lt;static&gt;">Overlay</a>.</div>
+                </div>
+                            <a name="BOTTOM_RIGHT&lt;static&gt;"></a>
+                <div class="mdetail alt">
+                <h3>BOTTOM_RIGHT&lt;static&gt;</i></h3>
+                <code>public String BOTTOM_RIGHT&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the bottom right corner of an element, used for configuring the context element alignment                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Overlay.html#BOTTOM_RIGHT&lt;static&gt;">Overlay</a>.</div>
+                </div>
+                            <a name="CSS_CLASS_NAME"></a>
+                <div class="mdetail">
+                <h3>CSS_CLASS_NAME</i></h3>
+                <code>public String CSS_CLASS_NAME</code>
+                <div class="mdetail-desc">
+                    @description String representing the CSS class(es) to be applied to the menu
+bar's <code>&#60;div&#62;</code> element.
+@default "yuimenubar"
+@final                </div>
+                <div class="mdetail-def">This property is defined by Menubar.</div>
+                </div>
+                            <a name="CSS_OVERLAY&lt;static&gt;"></a>
+                <div class="mdetail alt">
+                <h3>CSS_OVERLAY&lt;static&gt;</i></h3>
+                <code>public String CSS_OVERLAY&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the default CSS class used for an Overlay                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Overlay.html#CSS_OVERLAY&lt;static&gt;">Overlay</a>.</div>
+                </div>
+                            <a name="GROUP_TITLE_TAG_NAME"></a>
+                <div class="mdetail">
+                <h3>GROUP_TITLE_TAG_NAME</i></h3>
+                <code>public String GROUP_TITLE_TAG_NAME</code>
+                <div class="mdetail-desc">
+                    @description String representing the tagname of the HTML element used to
+title the menu's item groups.
+@default H6
+@final                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Menu.html#GROUP_TITLE_TAG_NAME">Menu</a>.</div>
+                </div>
+                            <a name="ITEM_TYPE"></a>
+                <div class="mdetail alt">
+                <h3>ITEM_TYPE</i></h3>
+                <code>public YAHOO.widget.MenuItem ITEM_TYPE</code>
+                <div class="mdetail-desc">
+                    @description Object representing the type of menu item to instantiate and
+add when parsing the child nodes (either <code>&#60;li&#62;</code> element,
+<code>&#60;optgroup&#62;</code> element or <code>&#60;option&#62;</code>)
+of the menu's source HTML element.
+@default YAHOO.widget.MenuItem
+@final                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Menu.html#ITEM_TYPE">Menu</a>.</div>
+                </div>
+                            <a name="TOP_LEFT&lt;static&gt;"></a>
+                <div class="mdetail">
+                <h3>TOP_LEFT&lt;static&gt;</i></h3>
+                <code>public String TOP_LEFT&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the top left corner of an element, used for configuring the context element alignment                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Overlay.html#TOP_LEFT&lt;static&gt;">Overlay</a>.</div>
+                </div>
+                            <a name="TOP_RIGHT&lt;static&gt;"></a>
+                <div class="mdetail alt">
+                <h3>TOP_RIGHT&lt;static&gt;</i></h3>
+                <code>public String TOP_RIGHT&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the top right corner of an element, used for configuring the context element alignment                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Overlay.html#TOP_RIGHT&lt;static&gt;">Overlay</a>.</div>
+                </div>
+                            <a name="activeItem"></a>
+                <div class="mdetail">
+                <h3>activeItem</i></h3>
+                <code>public YAHOO.widget.MenuItem activeItem</code>
+                <div class="mdetail-desc">
+                    @description Object reference to the item in the menu that has focus.
+@default null                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Menu.html#activeItem">Menu</a>.</div>
+                </div>
+                            <a name="cfg"></a>
+                <div class="mdetail alt">
+                <h3>cfg</i></h3>
+                <code>public Boolean
+@default cfg</code>
+                <div class="mdetail-desc">
+                    True if the Overlay should have an IFRAME shim (for correcting the select z-index bug in IE6 and below).
+@config iframe                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Overlay.html#cfg">Overlay</a>.</div>
+                </div>
+                            <a name="itemData"></a>
+                <div class="mdetail">
+                <h3>itemData</i></h3>
+                <code>public Array itemData</code>
+                <div class="mdetail-desc">
+                    @description Array of items to be added to the menu.  The array can contain
+strings representing the text for each item to be created, object literals
+representing the menu item configuration properties, or MenuItem instances.
+This property should be set via the constructor using the configuration
+object literal.
+@default null                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Menu.html#itemData">Menu</a>.</div>
+                </div>
+                            <a name="javascript"></a>
+                <div class="mdetail alt">
+                <h3>javascript</i></h3>
+                <code>public String javascript</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; The URL that will be placed in the iframe                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Overlay.html#javascript">Overlay</a>.</div>
+                </div>
+                            <a name="lazyLoad"></a>
+                <div class="mdetail">
+                <h3>lazyLoad</i></h3>
+                <code>public Boolean lazyLoad</code>
+                <div class="mdetail-desc">
+                    @description Boolean indicating if the menu's "lazy load" feature is
+enabled.  If set to "true," initialization and rendering of the menu's
+items will be deferred until the first time it is made visible.  This
+property should be set via the constructor using the configuration
+object literal.
+@default false                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Menu.html#lazyLoad">Menu</a>.</div>
+                </div>
+                            <a name="parent"></a>
+                <div class="mdetail alt">
+                <h3>parent</i></h3>
+                <code>public YAHOO.widget.MenuItem parent</code>
+                <div class="mdetail-desc">
+                    @description Object reference to the menu's parent menu or menu item.
+This property can be set via the constructor using the configuration
+object literal.
+@default null                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Menu.html#parent">Menu</a>.</div>
+                </div>
+                            <a name="srcElement"></a>
+                <div class="mdetail">
+                <h3>srcElement</i></h3>
+                <code>public <a srcElement</code>
+                <div class="mdetail-desc">
+                    @description Object reference to the HTML element (either
+<code>&#60;select&#62;</code> or <code>&#60;div&#62;</code>) used to
+create the menu.
+@default null                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Menu.html#srcElement">Menu</a>.</div>
+                </div>
+                            <a name="value"></a>
+                <div class="mdetail alt">
+                <h3>value</i></h3>
+                <code>public Array value</code>
+                <div class="mdetail-desc">
+                    @config submenualignment
+@description Array defining how submenus should be aligned to their
+parent menu bar item. The format is: [itemCorner, submenuCorner].
+@default ["tl","bl"]                </div>
+                <div class="mdetail-def">This property is defined by Menubar.</div>
+                </div>
+                        </div>
+                
+                    <a name="Menubar"></a>
+            <h2 class="mdetail-head">Constructor Details</h2>
+            <div class="detail-wrap">
+                <div class="mdetail">
+                <h3>Menubar</i></h3>
+                <code>public function Menubar()</code>
+                <div class="mdetail-desc">
+                                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                </div>
+            </div>
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="_onClick"></a>
+                <div class="mdetail">
+                <h3>_onClick</i></h3>
+                <code>public function _onClick(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.MenuBar p_oMenuBar</code>)</code>
+                <div class="mdetail-desc">
+                    @description "click" event handler for the menu bar.
+@protected                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>p_sType</code> : String<div class="sub-desc">String representing the name of the event that was fired.</div></li><li><code>p_aArgs</code> : Array<div class="sub-desc">Array of arguments sent when the event was fired.</div></li><li><code>p_oMenuBar</code> : YAHOO.widget.MenuBar<div class="sub-desc">Object representing the menu bar that fired the event.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Menubar.</div>
+                </div>
+                            <a name="_onKeyDown"></a>
+                <div class="mdetail alt">
+                <h3>_onKeyDown</i></h3>
+                <code>public function _onKeyDown(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.Menu p_oMenu</code>)</code>
+                <div class="mdetail-desc">
+                    @description "keydown" event handler for the menu.
+@protected                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>p_sType</code> : String<div class="sub-desc">String representing the name of the event that was fired.</div></li><li><code>p_aArgs</code> : Array<div class="sub-desc">Array of arguments sent when the event was fired.</div></li><li><code>p_oMenu</code> : YAHOO.widget.Menu<div class="sub-desc">Object representing the menu that fired the event.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Menu.html#_onKeyDown">Menu</a>.</div>
+                </div>
+                            <a name="_onMouseOut"></a>
+                <div class="mdetail">
+                <h3>_onMouseOut</i></h3>
+                <code>public function _onMouseOut(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.Menu p_oMenu</code>)</code>
+                <div class="mdetail-desc">
+                    @description "mouseout" event handler for the menu.
+@protected                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>p_sType</code> : String<div class="sub-desc">String representing the name of the event that was fired.</div></li><li><code>p_aArgs</code> : Array<div class="sub-desc">Array of arguments sent when the event was fired.</div></li><li><code>p_oMenu</code> : YAHOO.widget.Menu<div class="sub-desc">Object representing the menu that fired the event.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Menu.html#_onMouseOut">Menu</a>.</div>
+                </div>
+                            <a name="_onMouseOver"></a>
+                <div class="mdetail alt">
+                <h3>_onMouseOver</i></h3>
+                <code>public function _onMouseOver(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.Menu p_oMenu</code>)</code>
+                <div class="mdetail-desc">
+                    @description "mouseover" event handler for the menu.
+@protected                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>p_sType</code> : String<div class="sub-desc">String representing the name of the event that was fired.</div></li><li><code>p_aArgs</code> : Array<div class="sub-desc">Array of arguments sent when the event was fired.</div></li><li><code>p_oMenu</code> : YAHOO.widget.Menu<div class="sub-desc">Object representing the menu that fired the event.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Menu.html#_onMouseOver">Menu</a>.</div>
+                </div>
+                            <a name="addItem"></a>
+                <div class="mdetail">
+                <h3>addItem</i></h3>
+                <code>public function addItem(<code>YAHOO.widget.MenuItem p_oItem</code>, <code>String p_oItem</code>, <code>Object p_oItem</code>, <code>Number p_nGroupIndex</code>)</code>
+                <div class="mdetail-desc">
+                    @description Appends an item to the menu.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>p_oItem</code> : YAHOO.widget.MenuItem<div class="sub-desc">Object reference for the MenuItem instance to be added to the menu.</div></li><li><code>p_oItem</code> : String<div class="sub-desc">String specifying the text of the item to be added to the menu.</div></li><li><code>p_oItem</code> : Object<div class="sub-desc">Object literal containing a set of menu item configuration properties.</div></li><li><code>p_nGroupIndex</code> : Number<div class="sub-desc">Optional. Number indicating the group to which the item belongs.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>YAHOO.widget.MenuItem</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Menu.html#addItem">Menu</a>.</div>
+                </div>
+                            <a name="addItems"></a>
+                <div class="mdetail alt">
+                <h3>addItems</i></h3>
+                <code>public function addItems(<code>Array p_aItems</code>, <code>Number p_nGroupIndex</code>)</code>
+                <div class="mdetail-desc">
+                    @description Adds an array of items to the menu.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>p_aItems</code> : Array<div class="sub-desc">Array of items to be added to the menu. The array can contain strings specifying the text for each item to be created, object literals specifying each of the menu item configuration properties, or MenuItem instances.</div></li><li><code>p_nGroupIndex</code> : Number<div class="sub-desc">Optional. Number specifying the group to which the items belongs.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Array</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Menu.html#addItems">Menu</a>.</div>
+                </div>
+                            <a name="align"></a>
+                <div class="mdetail">
+                <h3>align</i></h3>
+                <code>public function align(<code>String elementAlign</code>, <code>String contextAlign</code>)</code>
+                <div class="mdetail-desc">
+                    Aligns the Overlay to its context element using the specified corner points (represented by the constants TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, and BOTTOM_RIGHT.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>elementAlign</code> : String<div class="sub-desc">The String representing the corner of the Overlay that should be aligned to the context element</div></li><li><code>contextAlign</code> : String<div class="sub-desc">The corner of the context element that the elementAlign corner should stick to.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#align">Overlay</a>.</div>
+                </div>
+                            <a name="center"></a>
+                <div class="mdetail alt">
+                <h3>center</i></h3>
+                <code>public function center()</code>
+                <div class="mdetail-desc">
+                    Centers the container in the viewport.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#center">Overlay</a>.</div>
+                </div>
+                            <a name="clearActiveItem"></a>
+                <div class="mdetail">
+                <h3>clearActiveItem</i></h3>
+                <code>public function clearActiveItem(<code>Boolean p_bBlur</code>)</code>
+                <div class="mdetail-desc">
+                    @description Sets the "selected" configuration property of the menu's active
+item to "false" and hides the item's submenu.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>p_bBlur</code> : Boolean<div class="sub-desc">Boolean indicating if the menu's active item should be blurred.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Menu.html#clearActiveItem">Menu</a>.</div>
+                </div>
+                            <a name="configConstrainToViewport"></a>
+                <div class="mdetail alt">
+                <h3>configConstrainToViewport</i></h3>
+                <code>public function configConstrainToViewport(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "constraintoviewport" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#configConstrainToViewport">Overlay</a>.</div>
+                </div>
+                            <a name="configContainer"></a>
+                <div class="mdetail">
+                <h3>configContainer</i></h3>
+                <code>public function configContainer(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.Menu p_oMenu</code>)</code>
+                <div class="mdetail-desc">
+                    @description Event handler for when the "container" configuration property
+of the menu changes.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>p_sType</code> : String<div class="sub-desc">String representing the name of the event that was fired.</div></li><li><code>p_aArgs</code> : Array<div class="sub-desc">Array of arguments sent when the event was fired.</div></li><li><code>p_oMenu</code> : YAHOO.widget.Menu<div class="sub-desc">Object representing the menu that fired the event.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Menu.html#configContainer">Menu</a>.</div>
+                </div>
+                            <a name="configContext"></a>
+                <div class="mdetail alt">
+                <h3>configContext</i></h3>
+                <code>public function configContext(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "context" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#configContext">Overlay</a>.</div>
+                </div>
+                            <a name="configFixedCenter"></a>
+                <div class="mdetail">
+                <h3>configFixedCenter</i></h3>
+                <code>public function configFixedCenter(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "fixedcenter" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#configFixedCenter">Overlay</a>.</div>
+                </div>
+                            <a name="configHeight"></a>
+                <div class="mdetail alt">
+                <h3>configHeight</i></h3>
+                <code>public function configHeight(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "height" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#configHeight">Overlay</a>.</div>
+                </div>
+                            <a name="configHideDelay"></a>
+                <div class="mdetail">
+                <h3>configHideDelay</i></h3>
+                <code>public function configHideDelay(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.Menu p_oMenu</code>)</code>
+                <div class="mdetail-desc">
+                    @description Event handler for when the "hidedelay" configuration property
+of the menu changes.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>p_sType</code> : String<div class="sub-desc">String representing the name of the event that was fired.</div></li><li><code>p_aArgs</code> : Array<div class="sub-desc">Array of arguments sent when the event was fired.</div></li><li><code>p_oMenu</code> : YAHOO.widget.Menu<div class="sub-desc">Object representing the menu that fired the event.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Menu.html#configHideDelay">Menu</a>.</div>
+                </div>
+                            <a name="configIframe"></a>
+                <div class="mdetail alt">
+                <h3>configIframe</i></h3>
+                <code>public function configIframe(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "iframe" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#configIframe">Overlay</a>.</div>
+                </div>
+                            <a name="configPosition"></a>
+                <div class="mdetail">
+                <h3>configPosition</i></h3>
+                <code>public function configPosition(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.Menu p_oMenu</code>)</code>
+                <div class="mdetail-desc">
+                    @description Event handler for when the "position" configuration property
+of the menu changes.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>p_sType</code> : String<div class="sub-desc">String representing the name of the event that was fired.</div></li><li><code>p_aArgs</code> : Array<div class="sub-desc">Array of arguments sent when the event was fired.</div></li><li><code>p_oMenu</code> : YAHOO.widget.Menu<div class="sub-desc">Object representing the menu that fired the event.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Menu.html#configPosition">Menu</a>.</div>
+                </div>
+                            <a name="configVisible"></a>
+                <div class="mdetail alt">
+                <h3>configVisible</i></h3>
+                <code>public function configVisible(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "visible" property is changed. This method is responsible for firing showEvent and hideEvent.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#configVisible">Overlay</a>.</div>
+                </div>
+                            <a name="configWidth"></a>
+                <div class="mdetail">
+                <h3>configWidth</i></h3>
+                <code>public function configWidth(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "width" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#configWidth">Overlay</a>.</div>
+                </div>
+                            <a name="configX"></a>
+                <div class="mdetail alt">
+                <h3>configX</i></h3>
+                <code>public function configX(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "x" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#configX">Overlay</a>.</div>
+                </div>
+                            <a name="configXY"></a>
+                <div class="mdetail">
+                <h3>configXY</i></h3>
+                <code>public function configXY(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "xy" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#configXY">Overlay</a>.</div>
+                </div>
+                            <a name="configY"></a>
+                <div class="mdetail alt">
+                <h3>configY</i></h3>
+                <code>public function configY(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "y" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#configY">Overlay</a>.</div>
+                </div>
+                            <a name="configzIndex"></a>
+                <div class="mdetail">
+                <h3>configzIndex</i></h3>
+                <code>public function configzIndex(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "zIndex" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#configzIndex">Overlay</a>.</div>
+                </div>
+                            <a name="destroy"></a>
+                <div class="mdetail alt">
+                <h3>destroy</i></h3>
+                <code>public function destroy()</code>
+                <div class="mdetail-desc">
+                    Removes the Overlay element from the DOM and sets all child elements to null.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#destroy">Overlay</a>.</div>
+                </div>
+                            <a name="doCenterOnDOMEvent"></a>
+                <div class="mdetail">
+                <h3>doCenterOnDOMEvent</i></h3>
+                <code>public function doCenterOnDOMEvent()</code>
+                <div class="mdetail-desc">
+                    Center event handler used for centering on scroll/resize, but only if the Overlay is visible                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#doCenterOnDOMEvent">Overlay</a>.</div>
+                </div>
+                            <a name="enforceConstraints"></a>
+                <div class="mdetail alt">
+                <h3>enforceConstraints</i></h3>
+                <code>public function enforceConstraints(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler executed when the moveEvent is fired, if the "constraintoviewport" is set to true.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#enforceConstraints">Overlay</a>.</div>
+                </div>
+                            <a name="getItem"></a>
+                <div class="mdetail">
+                <h3>getItem</i></h3>
+                <code>public function getItem(<code>Number p_nItemIndex</code>, <code>Number p_nGroupIndex</code>)</code>
+                <div class="mdetail-desc">
+                    @description Returns the item at the specified index.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>p_nItemIndex</code> : Number<div class="sub-desc">Number indicating the ordinal position of the item to be retrieved.</div></li><li><code>p_nGroupIndex</code> : Number<div class="sub-desc">Optional. Number indicating the group to which the item belongs.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>YAHOO.widget.MenuItem</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Menu.html#getItem">Menu</a>.</div>
+                </div>
+                            <a name="getItemGroups"></a>
+                <div class="mdetail alt">
+                <h3>getItemGroups</i></h3>
+                <code>public function getItemGroups()</code>
+                <div class="mdetail-desc">
+                    @description Returns a multi-dimensional array of all of the items in the menu.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Array</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Menu.html#getItemGroups">Menu</a>.</div>
+                </div>
+                            <a name="getRoot"></a>
+                <div class="mdetail">
+                <h3>getRoot</i></h3>
+                <code>public function getRoot()</code>
+                <div class="mdetail-desc">
+                    @description Finds the menu's root menu.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Menu.html#getRoot">Menu</a>.</div>
+                </div>
+                            <a name="hideIframe"></a>
+                <div class="mdetail alt">
+                <h3>hideIframe</i></h3>
+                <code>public function hideIframe()</code>
+                <div class="mdetail-desc">
+                    Hides the iframe shim, if it has been enabled                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#hideIframe">Overlay</a>.</div>
+                </div>
+                            <a name="hideMacGeckoScrollbars"></a>
+                <div class="mdetail">
+                <h3>hideMacGeckoScrollbars</i></h3>
+                <code>public function hideMacGeckoScrollbars()</code>
+                <div class="mdetail-desc">
+                    Adds a special CSS class to the Overlay when Mac/Gecko is in use, to work around a Gecko bug where
+scrollbars cannot be hidden. See https://bugzilla.mozilla.org/show_bug.cgi?id=187435                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#hideMacGeckoScrollbars">Overlay</a>.</div>
+                </div>
+                            <a name="init"></a>
+                <div class="mdetail alt">
+                <h3>init</i></h3>
+                <code>public function init(<code>String p_oElement</code>, <code>String p_oElement</code>, <code><a href="http://www.w3.org/TR/2000/WD-DOM-Level-1-20000929/level-</code>, <code><a href="http://www.w3.org/TR/2000/WD-DOM-Level-1-20000929/level-</code>, <code>Object p_oConfig</code>)</code>
+                <div class="mdetail-desc">
+                    @description The MenuBar class's initialization method. This method is
+automatically called by the constructor, and sets up all DOM references for
+pre-existing markup, and creates required markup if it is not already present.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>p_oElement</code> : String<div class="sub-desc">String specifying the id attribute of the <code>&#60;div&#62;</code> element of the menu bar.</div></li><li><code>p_oElement</code> : String<div class="sub-desc">String specifying the id attribute of the <code>&#60;select&#62;</code> element to be used as the data source for the menu bar.</div></li><li><code>href="http://www.w3.org/TR/2000/WD-DOM-Level-1-20000929/level-</code> : <a<div class="sub-desc">one-html.html#ID-22445964">HTMLDivElement</a>} p_oElement Object specifying the <code>&#60;div&#62;</code> element of the menu bar.</div></li><li><code>href="http://www.w3.org/TR/2000/WD-DOM-Level-1-20000929/level-</code> : <a<div class="sub-desc">one-html.html#ID-94282980">HTMLSelectElement</a>} p_oElement Object specifying the <code>&#60;select&#62;</code> element to be used as the data source for the menu bar.</div></li><li><code>p_oConfig</code> : Object<div class="sub-desc">Optional. Object literal specifying the configuration for the menu bar. See configuration class documentation for more details.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Menubar.</div>
+                </div>
+                            <a name="initDefaultConfig"></a>
+                <div class="mdetail">
+                <h3>initDefaultConfig</i></h3>
+                <code>public function initDefaultConfig()</code>
+                <div class="mdetail-desc">
+                    @description Initializes the class's configurable properties which can be
+changed using the menu bar's Config object ("cfg").                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Menubar.</div>
+                </div>
+                            <a name="initEvents"></a>
+                <div class="mdetail alt">
+                <h3>initEvents</i></h3>
+                <code>public function initEvents()</code>
+                <div class="mdetail-desc">
+                    Initializes the custom events for Overlay which are fired automatically at appropriate times by the Overlay class.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#initEvents">Overlay</a>.</div>
+                </div>
+                            <a name="insertItem"></a>
+                <div class="mdetail">
+                <h3>insertItem</i></h3>
+                <code>public function insertItem(<code>YAHOO.widget.MenuItem p_oItem</code>, <code>String p_oItem</code>, <code>Object p_oItem</code>, <code>Number p_nItemIndex</code>, <code>Number p_nGroupIndex</code>)</code>
+                <div class="mdetail-desc">
+                    @description Inserts an item into the menu at the specified index.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>p_oItem</code> : YAHOO.widget.MenuItem<div class="sub-desc">Object reference for the MenuItem instance to be added to the menu.</div></li><li><code>p_oItem</code> : String<div class="sub-desc">String specifying the text of the item to be added to the menu.</div></li><li><code>p_oItem</code> : Object<div class="sub-desc">Object literal containing a set of menu item configuration properties.</div></li><li><code>p_nItemIndex</code> : Number<div class="sub-desc">Number indicating the ordinal position at which the item should be added.</div></li><li><code>p_nGroupIndex</code> : Number<div class="sub-desc">Optional. Number indicating the group to which the item belongs.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>YAHOO.widget.MenuItem</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Menu.html#insertItem">Menu</a>.</div>
+                </div>
+                            <a name="moveTo"></a>
+                <div class="mdetail alt">
+                <h3>moveTo</i></h3>
+                <code>public function moveTo(<code>Number x</code>, <code>Number y</code>)</code>
+                <div class="mdetail-desc">
+                    Moves the Overlay to the specified position. This function is identical to calling this.cfg.setProperty("xy", [x,y]);                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>x</code> : Number<div class="sub-desc">The Overlay's new x position</div></li><li><code>y</code> : Number<div class="sub-desc">The Overlay's new y position</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#moveTo">Overlay</a>.</div>
+                </div>
+                            <a name="onDomResize"></a>
+                <div class="mdetail">
+                <h3>onDomResize</i></h3>
+                <code>public function onDomResize(<code>DOMEvent e</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    Event handler fired when the resize monitor element is resized.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>e</code> : DOMEvent<div class="sub-desc">The resize DOM event</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#onDomResize">Overlay</a>.</div>
+                </div>
+                            <a name="removeItem"></a>
+                <div class="mdetail alt">
+                <h3>removeItem</i></h3>
+                <code>public function removeItem(<code>YAHOO.widget.MenuItem p_oObject</code>, <code>Number p_oObject</code>, <code>Number p_nGroupIndex</code>)</code>
+                <div class="mdetail-desc">
+                    @description Removes the specified item from the menu.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>p_oObject</code> : YAHOO.widget.MenuItem<div class="sub-desc">Object reference for the MenuItem instance to be removed from the menu.</div></li><li><code>p_oObject</code> : Number<div class="sub-desc">Number specifying the index of the item to be removed.</div></li><li><code>p_nGroupIndex</code> : Number<div class="sub-desc">Optional. Number specifying the group to which the item belongs.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>YAHOO.widget.MenuItem</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Menu.html#removeItem">Menu</a>.</div>
+                </div>
+                            <a name="setInitialFocus"></a>
+                <div class="mdetail">
+                <h3>setInitialFocus</i></h3>
+                <code>public function setInitialFocus()</code>
+                <div class="mdetail-desc">
+                    @description Sets focus to the menu's first enabled item.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Menu.html#setInitialFocus">Menu</a>.</div>
+                </div>
+                            <a name="setInitialSelection"></a>
+                <div class="mdetail alt">
+                <h3>setInitialSelection</i></h3>
+                <code>public function setInitialSelection()</code>
+                <div class="mdetail-desc">
+                    @description Sets the "selected" configuration property of the menu's first
+enabled item to "true."                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Menu.html#setInitialSelection">Menu</a>.</div>
+                </div>
+                            <a name="setItemGroupTitle"></a>
+                <div class="mdetail">
+                <h3>setItemGroupTitle</i></h3>
+                <code>public function setItemGroupTitle(<code>String p_sGroupTitle</code>, <code>Number p_nGroupIndex</code>)</code>
+                <div class="mdetail-desc">
+                    @description Sets the title of a group of menu items.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>p_sGroupTitle</code> : String<div class="sub-desc">String specifying the title of the group.</div></li><li><code>p_nGroupIndex</code> : Number<div class="sub-desc">Optional. Number specifying the group to which the title belongs.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Menu.html#setItemGroupTitle">Menu</a>.</div>
+                </div>
+                            <a name="showIframe"></a>
+                <div class="mdetail alt">
+                <h3>showIframe</i></h3>
+                <code>public function showIframe()</code>
+                <div class="mdetail-desc">
+                    Shows the iframe shim, if it has been enabled                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#showIframe">Overlay</a>.</div>
+                </div>
+                            <a name="showMacGeckoScrollbars"></a>
+                <div class="mdetail">
+                <h3>showMacGeckoScrollbars</i></h3>
+                <code>public function showMacGeckoScrollbars()</code>
+                <div class="mdetail-desc">
+                    Removes a special CSS class from the Overlay when Mac/Gecko is in use, to work around a Gecko bug where
+scrollbars cannot be hidden. See https://bugzilla.mozilla.org/show_bug.cgi?id=187435                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#showMacGeckoScrollbars">Overlay</a>.</div>
+                </div>
+                            <a name="syncPosition"></a>
+                <div class="mdetail alt">
+                <h3>syncPosition</i></h3>
+                <code>public function syncPosition()</code>
+                <div class="mdetail-desc">
+                    Synchronizes the Panel's "xy", "x", and "y" properties with the Panel's position in the DOM. This is primarily used to update position information during drag & drop.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#syncPosition">Overlay</a>.</div>
+                </div>
+                            <a name="toString"></a>
+                <div class="mdetail">
+                <h3>toString</i></h3>
+                <code>public function toString()</code>
+                <div class="mdetail-desc">
+                    @description Returns a string representing the menu bar.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>String</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Menubar.</div>
+                </div>
+                            <a name="windowResizeHandler&lt;static&gt;"></a>
+                <div class="mdetail alt">
+                <h3>windowResizeHandler&lt;static&gt;</i></h3>
+                <code>public function windowResizeHandler&lt;static&gt;(<code>DOMEvent e</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; The DOM event handler used to fire the CustomEvent for window resize                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>e</code> : DOMEvent<div class="sub-desc">The DOM resize event</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#windowResizeHandler&lt;static&gt;">Overlay</a>.</div>
+                </div>
+                            <a name="windowScrollHandler&lt;static&gt;"></a>
+                <div class="mdetail">
+                <h3>windowScrollHandler&lt;static&gt;</i></h3>
+                <code>public function windowScrollHandler&lt;static&gt;(<code>DOMEvent e</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; The DOM event handler used to fire the CustomEvent for window scroll                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>e</code> : DOMEvent<div class="sub-desc">The DOM scroll event</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#windowScrollHandler&lt;static&gt;">Overlay</a>.</div>
+                </div>
+                        </div>
+                    
+                    <h2 class="mdetail-head">Event Details</h2>
+            <div class="detail-wrap">
+                            <a name="YAHOO.widget.Overlay.windowResizeEvent"></a>
+                <div class="mdetail">
+                <h3>YAHOO.widget.Overlay.windowResizeEvent</i></h3>
+                <code>public event YAHOO.widget.Overlay.windowResizeEvent</code>
+                <div class="mdetail-desc">
+                A singleton CustomEvent used for reacting to the DOM event for window resize                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Overlay.html#YAHOO.widget.Overlay.windowResizeEvent">Overlay</a>.</div>
+                </div>
+                            <a name="YAHOO.widget.Overlay.windowScrollEvent"></a>
+                <div class="mdetail alt">
+                <h3>YAHOO.widget.Overlay.windowScrollEvent</i></h3>
+                <code>public event YAHOO.widget.Overlay.windowScrollEvent</code>
+                <div class="mdetail-desc">
+                A singleton CustomEvent used for reacting to the DOM event for window scroll                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Overlay.html#YAHOO.widget.Overlay.windowScrollEvent">Overlay</a>.</div>
+                </div>
+                            <a name="beforeMoveEvent"></a>
+                <div class="mdetail">
+                <h3>beforeMoveEvent</i></h3>
+                <code>public event beforeMoveEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired before the Overlay is moved.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>x</code> : Number<div class="sub-desc">x coordinate</div></li><li><code>y</code> : Number<div class="sub-desc">y coordinate</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Overlay.html#beforeMoveEvent">Overlay</a>.</div>
+                </div>
+                            <a name="clickEvent"></a>
+                <div class="mdetail alt">
+                <h3>clickEvent</i></h3>
+                <code>public event clickEvent</code>
+                <div class="mdetail-desc">
+                @description Fires when the user clicks the on the menu.  Passes back the
+DOM Event object as an argument.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Menu.html#clickEvent">Menu</a>.</div>
+                </div>
+                            <a name="itemAddedEvent"></a>
+                <div class="mdetail">
+                <h3>itemAddedEvent</i></h3>
+                <code>public event itemAddedEvent</code>
+                <div class="mdetail-desc">
+                @description Fires when an item is added to the menu.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Menu.html#itemAddedEvent">Menu</a>.</div>
+                </div>
+                            <a name="itemRemovedEvent"></a>
+                <div class="mdetail alt">
+                <h3>itemRemovedEvent</i></h3>
+                <code>public event itemRemovedEvent</code>
+                <div class="mdetail-desc">
+                @description Fires when an item is removed to the menu.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Menu.html#itemRemovedEvent">Menu</a>.</div>
+                </div>
+                            <a name="keyDownEvent"></a>
+                <div class="mdetail">
+                <h3>keyDownEvent</i></h3>
+                <code>public event keyDownEvent</code>
+                <div class="mdetail-desc">
+                @description Fires when the user presses a key when one of the menu's items
+has focus.  Passes back the DOM Event object as an argument.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Menu.html#keyDownEvent">Menu</a>.</div>
+                </div>
+                            <a name="keyPressEvent"></a>
+                <div class="mdetail alt">
+                <h3>keyPressEvent</i></h3>
+                <code>public event keyPressEvent</code>
+                <div class="mdetail-desc">
+                @description Fires when the user presses an alphanumeric key when one of the
+menu's items has focus.  Passes back the DOM Event object as an argument.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Menu.html#keyPressEvent">Menu</a>.</div>
+                </div>
+                            <a name="keyUpEvent"></a>
+                <div class="mdetail">
+                <h3>keyUpEvent</i></h3>
+                <code>public event keyUpEvent</code>
+                <div class="mdetail-desc">
+                @description Fires when the user releases a key when one of the menu's items
+has focus.  Passes back the DOM Event object as an argument.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Menu.html#keyUpEvent">Menu</a>.</div>
+                </div>
+                            <a name="mouseDownEvent"></a>
+                <div class="mdetail alt">
+                <h3>mouseDownEvent</i></h3>
+                <code>public event mouseDownEvent</code>
+                <div class="mdetail-desc">
+                @description Fires when the user mouses down on the menu.  Passes back the
+DOM Event object as an argument.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Menu.html#mouseDownEvent">Menu</a>.</div>
+                </div>
+                            <a name="mouseOutEvent"></a>
+                <div class="mdetail">
+                <h3>mouseOutEvent</i></h3>
+                <code>public event mouseOutEvent</code>
+                <div class="mdetail-desc">
+                @description Fires when the mouse has left the menu.  Passes back the DOM
+Event object as an argument.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Menu.html#mouseOutEvent">Menu</a>.</div>
+                </div>
+                            <a name="mouseOverEvent"></a>
+                <div class="mdetail alt">
+                <h3>mouseOverEvent</i></h3>
+                <code>public event mouseOverEvent</code>
+                <div class="mdetail-desc">
+                @description Fires when the mouse has entered the menu.  Passes back
+the DOM Event object as an argument.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Menu.html#mouseOverEvent">Menu</a>.</div>
+                </div>
+                            <a name="mouseUpEvent"></a>
+                <div class="mdetail">
+                <h3>mouseUpEvent</i></h3>
+                <code>public event mouseUpEvent</code>
+                <div class="mdetail-desc">
+                @description Fires when the user releases a mouse button while the mouse is
+over the menu.  Passes back the DOM Event object as an argument.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Menu.html#mouseUpEvent">Menu</a>.</div>
+                </div>
+                            <a name="moveEvent"></a>
+                <div class="mdetail alt">
+                <h3>moveEvent</i></h3>
+                <code>public event moveEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired after the Overlay is moved.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>x</code> : Number<div class="sub-desc">x coordinate</div></li><li><code>y</code> : Number<div class="sub-desc">y coordinate</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Overlay.html#moveEvent">Overlay</a>.</div>
+                </div>
+                        </div>
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    

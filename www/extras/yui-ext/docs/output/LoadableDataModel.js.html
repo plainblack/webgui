@@ -1,0 +1,331 @@
+<html><head><title>LoadableDataModel.js</title><link rel="stylesheet" type="text/css" href="../style.css" media="screen"/></head><body><div class="hl-main"><pre><span class="hl-comment">/**
+ * @class YAHOO.ext.grid.LoadableDataModel
+ * This class extends DefaultDataModel and adds the core functionality to load data remotely. Generally you will want to use one of it's subclasses.&lt;br&gt;&lt;br&gt;
+ * @extends YAHOO.ext.grid.DefaultDataModel
+ * @constructor
+ * @param {String} dataType YAHOO.ext.grid.LoadableDataModel.XML, YAHOO.ext.grid.LoadableDataModel.TEXT or YAHOO.ext.grid.JSON
+*/
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">grid</span><span class="hl-default">.</span><span class="hl-identifier">LoadableDataModel</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">dataType</span><span class="hl-brackets">){
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">LoadableDataModel</span><span class="hl-code">.</span><span class="hl-identifier">superclass</span><span class="hl-code">.</span><span class="hl-identifier">constructor</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-brackets">[])</span><span class="hl-code">;
+    
+    </span><span class="hl-comment">/** Fires when a successful load is completed - fireDirect sig: (this)
+     * @type YAHOO.util.CustomEvent 
+     * @deprecated Use addListener instead of accessing directly
+     * @private
+     */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-builtin">onLoad</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">CustomEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">load</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-comment">/** Fires when a load fails - fireDirect sig: (this, errorMsg, responseObj)
+     * @type YAHOO.util.CustomEvent 
+     * @deprecated Use addListener instead of accessing directly
+     * @private
+     */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onLoadException</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">CustomEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">loadException</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-comment">/**
+       * @event load
+       * Fires when new data has successfully been loaded
+       * @param {DataModel} this
+       */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">events</span><span class="hl-brackets">[</span><span class="hl-quotes">'</span><span class="hl-string">load</span><span class="hl-quotes">'</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-builtin">onLoad</span><span class="hl-code">;
+    </span><span class="hl-comment">/**
+       * @event beforeload
+       * Fires before a load takes place
+       * @param {DataModel} this
+       */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">events</span><span class="hl-brackets">[</span><span class="hl-quotes">'</span><span class="hl-string">beforeload</span><span class="hl-quotes">'</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">CustomEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">beforeload</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-comment">/**
+       * @event loadexception
+       * Fires when there's an error loading data
+       * @param {DataModel} this
+       * @param {Exception} e The exception object or null
+       * @param {Object} response The Connect response object
+       */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">events</span><span class="hl-brackets">[</span><span class="hl-quotes">'</span><span class="hl-string">loadexception</span><span class="hl-quotes">'</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onLoadException</span><span class="hl-code">;
+    
+    </span><span class="hl-comment">/**@private*/
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">dataType</span><span class="hl-code"> = </span><span class="hl-identifier">dataType</span><span class="hl-code">;
+    </span><span class="hl-comment">/**@private*/
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">preprocessors</span><span class="hl-code"> = </span><span class="hl-brackets">[]</span><span class="hl-code">;
+    </span><span class="hl-comment">/**@private*/
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">postprocessors</span><span class="hl-code"> = </span><span class="hl-brackets">[]</span><span class="hl-code">;
+    
+    </span><span class="hl-comment">// paging info
+    /** The active page @type Number*/
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">loadedPage</span><span class="hl-code"> = </span><span class="hl-number">1</span><span class="hl-code">;
+    </span><span class="hl-comment">/** True to use remote sorting, initPaging automatically sets this to true @type Boolean */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">remoteSort</span><span class="hl-code"> = </span><span class="hl-reserved">false</span><span class="hl-code">;
+    </span><span class="hl-comment">/** The number of records per page @type Number*/
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">pageSize</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">;
+    </span><span class="hl-comment">/** The script/page to call to provide paged/sorted data @type String*/
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">pageUrl</span><span class="hl-code"> = </span><span class="hl-reserved">null</span><span class="hl-code">;
+    </span><span class="hl-comment">/** An object of key/value pairs to be passed as parameters
+     * when loading pages/sorting @type Object*/
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">baseParams</span><span class="hl-code"> = </span><span class="hl-brackets">{}</span><span class="hl-code">;
+    </span><span class="hl-comment">/** Maps named params to url parameters - Override to specify your own param names */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">paramMap</span><span class="hl-code"> = </span><span class="hl-brackets">{</span><span class="hl-quotes">'</span><span class="hl-string">page</span><span class="hl-quotes">'</span><span class="hl-code">:</span><span class="hl-quotes">'</span><span class="hl-string">page</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">pageSize</span><span class="hl-quotes">'</span><span class="hl-code">:</span><span class="hl-quotes">'</span><span class="hl-string">pageSize</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">sortColumn</span><span class="hl-quotes">'</span><span class="hl-code">:</span><span class="hl-quotes">'</span><span class="hl-string">sortColumn</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">sortDir</span><span class="hl-quotes">'</span><span class="hl-code">:</span><span class="hl-quotes">'</span><span class="hl-string">sortDir</span><span class="hl-quotes">'</span><span class="hl-brackets">}</span><span class="hl-code">;
+    
+</span><span class="hl-brackets">}</span><span class="hl-default">;
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">extendX</span><span class="hl-brackets">(</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">LoadableDataModel</span><span class="hl-code">, </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">DefaultDataModel</span><span class="hl-code">, </span><span class="hl-brackets">{
+    
+    </span><span class="hl-comment">/** @ignore */
+    </span><span class="hl-identifier">setLoadedPage</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">pageNum</span><span class="hl-code">, </span><span class="hl-identifier">userCallback</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">loadedPage</span><span class="hl-code"> = </span><span class="hl-identifier">pageNum</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">userCallback</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">function</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+            </span><span class="hl-identifier">userCallback</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/** Returns true if this model uses paging @return Boolean */
+    </span><span class="hl-identifier">isPaged</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">pageSize</span><span class="hl-code"> &gt; </span><span class="hl-number">0</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/** Returns the total number of records available, override if needed @return {Number} */
+    </span><span class="hl-identifier">getTotalRowCount</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">totalCount</span><span class="hl-code"> || </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getRowCount</span><span class="hl-brackets">()</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/** Returns the number of records per page @return Number */
+    </span><span class="hl-identifier">getPageSize</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">pageSize</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/** Returns the total number of pages available @return Number */
+    </span><span class="hl-identifier">getTotalPages</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getPageSize</span><span class="hl-brackets">()</span><span class="hl-code"> == </span><span class="hl-number">0</span><span class="hl-code"> || </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getTotalRowCount</span><span class="hl-brackets">()</span><span class="hl-code"> == </span><span class="hl-number">0</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">return </span><span class="hl-number">1</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">return </span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">ceil</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getTotalRowCount</span><span class="hl-brackets">()</span><span class="hl-quotes">/</span><span class="hl-string">this.getPageSize());
+    },
+    
+    </span><span class="hl-quotes">/</span><span class="hl-code">** </span><span class="hl-identifier">Initializes paging </span><span class="hl-reserved">for this </span><span class="hl-identifier">model</span><span class="hl-code">.
+     * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">String</span><span class="hl-brackets">} </span><span class="hl-identifier">url</span><span class="hl-code">
+     * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">pageSize</span><span class="hl-code">
+     * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-identifier">Object</span><span class="hl-brackets">} </span><span class="hl-identifier">baseParams </span><span class="hl-brackets">(</span><span class="hl-identifier">optional</span><span class="hl-brackets">) </span><span class="hl-identifier">Object containing key</span><span class="hl-quotes">/</span><span class="hl-string">value pairs to add to all requests
+     *</span><span class="hl-quotes">/
+    </span><span class="hl-identifier">initPaging</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">url</span><span class="hl-code">, </span><span class="hl-identifier">pageSize</span><span class="hl-code">, </span><span class="hl-identifier">baseParams</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">pageUrl</span><span class="hl-code"> = </span><span class="hl-identifier">url</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">pageSize</span><span class="hl-code"> = </span><span class="hl-identifier">pageSize</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">remoteSort</span><span class="hl-code"> = </span><span class="hl-reserved">true</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">baseParams</span><span class="hl-brackets">) </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">baseParams</span><span class="hl-code"> = </span><span class="hl-identifier">baseParams</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/** @ignore */
+    </span><span class="hl-identifier">createParams</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">pageNum</span><span class="hl-code">, </span><span class="hl-identifier">sortColumn</span><span class="hl-code">, </span><span class="hl-identifier">sortDir</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">params</span><span class="hl-code"> = </span><span class="hl-brackets">{}</span><span class="hl-code">, </span><span class="hl-identifier">map</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">paramMap</span><span class="hl-code">;
+        </span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">key </span><span class="hl-reserved">in this</span><span class="hl-code">.</span><span class="hl-identifier">baseParams</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">typeof this</span><span class="hl-code">.</span><span class="hl-identifier">baseParams</span><span class="hl-brackets">[</span><span class="hl-identifier">key</span><span class="hl-brackets">]</span><span class="hl-code"> != </span><span class="hl-quotes">'</span><span class="hl-string">function</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+                </span><span class="hl-identifier">params</span><span class="hl-brackets">[</span><span class="hl-identifier">key</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">baseParams</span><span class="hl-brackets">[</span><span class="hl-identifier">key</span><span class="hl-brackets">]</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+        }
+        </span><span class="hl-identifier">params</span><span class="hl-brackets">[</span><span class="hl-identifier">map</span><span class="hl-brackets">[</span><span class="hl-quotes">'</span><span class="hl-string">page</span><span class="hl-quotes">'</span><span class="hl-brackets">]]</span><span class="hl-code"> = </span><span class="hl-identifier">pageNum</span><span class="hl-code">;
+        </span><span class="hl-identifier">params</span><span class="hl-brackets">[</span><span class="hl-identifier">map</span><span class="hl-brackets">[</span><span class="hl-quotes">'</span><span class="hl-string">pageSize</span><span class="hl-quotes">'</span><span class="hl-brackets">]]</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getPageSize</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-identifier">params</span><span class="hl-brackets">[</span><span class="hl-identifier">map</span><span class="hl-brackets">[</span><span class="hl-quotes">'</span><span class="hl-string">sortColumn</span><span class="hl-quotes">'</span><span class="hl-brackets">]]</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">sortColumn</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">undefined</span><span class="hl-quotes">'</span><span class="hl-code"> ? </span><span class="hl-quotes">''</span><span class="hl-code"> : </span><span class="hl-identifier">sortColumn</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-identifier">params</span><span class="hl-brackets">[</span><span class="hl-identifier">map</span><span class="hl-brackets">[</span><span class="hl-quotes">'</span><span class="hl-string">sortDir</span><span class="hl-quotes">'</span><span class="hl-brackets">]]</span><span class="hl-code"> = </span><span class="hl-identifier">sortDir</span><span class="hl-code"> || </span><span class="hl-quotes">''</span><span class="hl-code">;
+        </span><span class="hl-reserved">return </span><span class="hl-identifier">params</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Loads a page of data.
+     * @param {Number} pageNum Which page to load. The first page is 1.
+     * @param {Function} callback (optional) Optional callback when loading is complete
+     * @param {Boolean} keepExisting (optional) true to keep existing data and append the new data
+     */
+    </span><span class="hl-identifier">loadPage</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">pageNum</span><span class="hl-code">, </span><span class="hl-identifier">callback</span><span class="hl-code">, </span><span class="hl-identifier">keepExisting</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">sort</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getSortState</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">params</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">createParams</span><span class="hl-brackets">(</span><span class="hl-identifier">pageNum</span><span class="hl-code">, </span><span class="hl-identifier">sort</span><span class="hl-code">.</span><span class="hl-identifier">column</span><span class="hl-code">, </span><span class="hl-identifier">sort</span><span class="hl-code">.</span><span class="hl-identifier">direction</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">load</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">pageUrl</span><span class="hl-code">, </span><span class="hl-identifier">params</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">setLoadedPage</span><span class="hl-code">.</span><span class="hl-identifier">createDelegate</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-brackets">[</span><span class="hl-identifier">pageNum</span><span class="hl-code">, </span><span class="hl-identifier">callback</span><span class="hl-brackets">])</span><span class="hl-code">, 
+                   </span><span class="hl-identifier">keepExisting</span><span class="hl-code"> ? </span><span class="hl-brackets">(</span><span class="hl-identifier">pageNum</span><span class="hl-code">-</span><span class="hl-number">1</span><span class="hl-brackets">)</span><span class="hl-code"> * </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">pageSize</span><span class="hl-code"> : </span><span class="hl-reserved">null</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/** @ignore */
+    </span><span class="hl-identifier">applySort</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">suppressEvent</span><span class="hl-brackets">){
+    	</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">remoteSort</span><span class="hl-brackets">){
+            </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">LoadableDataModel</span><span class="hl-code">.</span><span class="hl-identifier">superclass</span><span class="hl-code">.</span><span class="hl-identifier">applySort</span><span class="hl-code">.</span><span class="hl-identifier">apply</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-identifier">arguments</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-reserved">else if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">suppressEvent</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">sort</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getSortState</span><span class="hl-brackets">()</span><span class="hl-code">;
+            </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">sort</span><span class="hl-code">.</span><span class="hl-identifier">column</span><span class="hl-brackets">){
+               </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">fireRowsSorted</span><span class="hl-brackets">(</span><span class="hl-identifier">sort</span><span class="hl-code">.</span><span class="hl-identifier">column</span><span class="hl-code">, </span><span class="hl-identifier">sort</span><span class="hl-code">.</span><span class="hl-identifier">direction</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+        }
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/** @ignore */
+    </span><span class="hl-identifier">resetPaging</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+    	</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">loadedPage</span><span class="hl-code"> = </span><span class="hl-number">1</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/* Overridden sort method to use remote sorting if turned on */
+    </span><span class="hl-identifier">sort</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">sortInfo</span><span class="hl-code">, </span><span class="hl-identifier">columnIndex</span><span class="hl-code">, </span><span class="hl-identifier">direction</span><span class="hl-code">, </span><span class="hl-identifier">suppressEvent</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">remoteSort</span><span class="hl-brackets">){
+            </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">LoadableDataModel</span><span class="hl-code">.</span><span class="hl-identifier">superclass</span><span class="hl-code">.</span><span class="hl-identifier">sort</span><span class="hl-code">.</span><span class="hl-identifier">apply</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-identifier">arguments</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">sortInfo</span><span class="hl-code"> = </span><span class="hl-identifier">sortInfo</span><span class="hl-code">;
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">sortColumn</span><span class="hl-code"> = </span><span class="hl-identifier">columnIndex</span><span class="hl-code">;
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">sortDir</span><span class="hl-code"> = </span><span class="hl-identifier">direction</span><span class="hl-code">;
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">params</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">createParams</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">loadedPage</span><span class="hl-code">, </span><span class="hl-identifier">columnIndex</span><span class="hl-code">, </span><span class="hl-identifier">direction</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">load</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">pageUrl</span><span class="hl-code">, </span><span class="hl-identifier">params</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">fireRowsSorted</span><span class="hl-code">.</span><span class="hl-identifier">createDelegate</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-brackets">[</span><span class="hl-identifier">columnIndex</span><span class="hl-code">, </span><span class="hl-identifier">direction</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">]))</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Initiates the loading of the data from the specified URL - Failed load attempts will 
+     * fire the {@link #loadexception} event.
+     * @param {Object/String} url The url from which the data can be loaded
+     * @param {&lt;i&gt;String/Object&lt;/i&gt;} params (optional) The parameters to pass as either a url encoded string &quot;param1=1&amp;amp;param2=2&quot; or as an object {param1: 1, param2: 2}
+     * @param {&lt;i&gt;Function&lt;/i&gt;} callback (optional) Callback when load is complete - called with signature (this, rowCountLoaded)
+     * @param {&lt;i&gt;Number&lt;/i&gt;} insertIndex (optional) if present, loaded data is inserted at the specified index instead of overwriting existing data
+     */
+    </span><span class="hl-identifier">load</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">url</span><span class="hl-code">, </span><span class="hl-identifier">params</span><span class="hl-code">, </span><span class="hl-identifier">callback</span><span class="hl-code">, </span><span class="hl-identifier">insertIndex</span><span class="hl-brackets">){
+    	</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">fireEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">beforeload</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+    	</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">params</span><span class="hl-code"> &amp;&amp; </span><span class="hl-reserved">typeof </span><span class="hl-identifier">params</span><span class="hl-code"> != </span><span class="hl-quotes">'</span><span class="hl-string">string</span><span class="hl-quotes">'</span><span class="hl-brackets">){ </span><span class="hl-comment">// must be object
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">buf</span><span class="hl-code"> = </span><span class="hl-brackets">[]</span><span class="hl-code">;
+            </span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">key </span><span class="hl-reserved">in </span><span class="hl-identifier">params</span><span class="hl-brackets">){
+                </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">params</span><span class="hl-brackets">[</span><span class="hl-identifier">key</span><span class="hl-brackets">]</span><span class="hl-code"> != </span><span class="hl-quotes">'</span><span class="hl-string">function</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+                    </span><span class="hl-identifier">buf</span><span class="hl-code">.</span><span class="hl-identifier">push</span><span class="hl-brackets">(</span><span class="hl-identifier">encodeURIComponent</span><span class="hl-brackets">(</span><span class="hl-identifier">key</span><span class="hl-brackets">)</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">=</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-identifier">encodeURIComponent</span><span class="hl-brackets">(</span><span class="hl-identifier">params</span><span class="hl-brackets">[</span><span class="hl-identifier">key</span><span class="hl-brackets">])</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">&amp;</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+                </span><span class="hl-brackets">}
+            }
+            </span><span class="hl-reserved">delete </span><span class="hl-identifier">buf</span><span class="hl-brackets">[</span><span class="hl-identifier">buf</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">-</span><span class="hl-number">1</span><span class="hl-brackets">]</span><span class="hl-code">;
+            </span><span class="hl-identifier">params</span><span class="hl-code"> = </span><span class="hl-identifier">buf</span><span class="hl-code">.</span><span class="hl-identifier">join</span><span class="hl-brackets">(</span><span class="hl-quotes">''</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">cb</span><span class="hl-code"> = </span><span class="hl-brackets">{
+            </span><span class="hl-identifier">success</span><span class="hl-code">: </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">processResponse</span><span class="hl-code">,
+            </span><span class="hl-identifier">failure</span><span class="hl-code">: </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">processException</span><span class="hl-code">,
+            </span><span class="hl-identifier">scope</span><span class="hl-code">: </span><span class="hl-reserved">this</span><span class="hl-code">,
+    		</span><span class="hl-identifier">argument</span><span class="hl-code">: </span><span class="hl-brackets">{</span><span class="hl-identifier">callback</span><span class="hl-code">: </span><span class="hl-identifier">callback</span><span class="hl-code">, </span><span class="hl-identifier">insertIndex</span><span class="hl-code">: </span><span class="hl-identifier">insertIndex</span><span class="hl-brackets">}
+        }</span><span class="hl-code">;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">method</span><span class="hl-code"> = </span><span class="hl-identifier">params</span><span class="hl-code"> ? </span><span class="hl-quotes">'</span><span class="hl-string">POST</span><span class="hl-quotes">'</span><span class="hl-code"> : </span><span class="hl-quotes">'</span><span class="hl-string">GET</span><span class="hl-quotes">'</span><span class="hl-code">;
+        </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Connect</span><span class="hl-code">.</span><span class="hl-identifier">asyncRequest</span><span class="hl-brackets">(</span><span class="hl-identifier">method</span><span class="hl-code">, </span><span class="hl-identifier">url</span><span class="hl-code">, </span><span class="hl-identifier">cb</span><span class="hl-code">, </span><span class="hl-identifier">params</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**@private*/
+    </span><span class="hl-identifier">processResponse</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">response</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">cb</span><span class="hl-code"> = </span><span class="hl-identifier">response</span><span class="hl-code">.</span><span class="hl-identifier">argument</span><span class="hl-code">.</span><span class="hl-identifier">callback</span><span class="hl-code">;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">keepExisting</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">response</span><span class="hl-code">.</span><span class="hl-identifier">argument</span><span class="hl-code">.</span><span class="hl-identifier">insertIndex</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">number</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">insertIndex</span><span class="hl-code"> = </span><span class="hl-identifier">response</span><span class="hl-code">.</span><span class="hl-identifier">argument</span><span class="hl-code">.</span><span class="hl-identifier">insertIndex</span><span class="hl-code">;
+        </span><span class="hl-reserved">switch</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">dataType</span><span class="hl-brackets">){
+        	</span><span class="hl-reserved">case </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">LoadableDataModel</span><span class="hl-code">.</span><span class="hl-identifier">XML</span><span class="hl-code">:
+        		</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">loadData</span><span class="hl-brackets">(</span><span class="hl-identifier">response</span><span class="hl-code">.</span><span class="hl-identifier">responseXML</span><span class="hl-code">, </span><span class="hl-identifier">cb</span><span class="hl-code">, </span><span class="hl-identifier">keepExisting</span><span class="hl-code">, </span><span class="hl-identifier">insertIndex</span><span class="hl-brackets">)</span><span class="hl-code">;
+        	</span><span class="hl-reserved">break</span><span class="hl-code">;
+        	</span><span class="hl-reserved">case </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">LoadableDataModel</span><span class="hl-code">.</span><span class="hl-identifier">JSON</span><span class="hl-code">:
+        		</span><span class="hl-reserved">var </span><span class="hl-identifier">rtext</span><span class="hl-code"> = </span><span class="hl-identifier">response</span><span class="hl-code">.</span><span class="hl-identifier">responseText</span><span class="hl-code">;
+        		</span><span class="hl-reserved">try </span><span class="hl-brackets">{ </span><span class="hl-comment">// this code is a modified version of Yahoo! UI DataSource JSON parsing
+    		        // Trim leading spaces
+    		        </span><span class="hl-reserved">while</span><span class="hl-brackets">(</span><span class="hl-identifier">rtext</span><span class="hl-code">.</span><span class="hl-identifier">substring</span><span class="hl-brackets">(</span><span class="hl-number">0</span><span class="hl-code">,</span><span class="hl-number">1</span><span class="hl-brackets">)</span><span class="hl-code"> == </span><span class="hl-quotes">&quot; &quot;</span><span class="hl-brackets">) {
+    		            </span><span class="hl-identifier">rtext</span><span class="hl-code"> = </span><span class="hl-identifier">rtext</span><span class="hl-code">.</span><span class="hl-identifier">substring</span><span class="hl-brackets">(</span><span class="hl-number">1</span><span class="hl-code">, </span><span class="hl-identifier">rtext</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-brackets">)</span><span class="hl-code">;
+    		        </span><span class="hl-brackets">}
+    		        </span><span class="hl-comment">// Invalid JSON response
+    		        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">rtext</span><span class="hl-code">.</span><span class="hl-identifier">indexOf</span><span class="hl-brackets">(</span><span class="hl-quotes">&quot;</span><span class="hl-string">{</span><span class="hl-quotes">&quot;</span><span class="hl-brackets">)</span><span class="hl-code"> &lt; </span><span class="hl-number">0</span><span class="hl-brackets">) {
+    		            </span><span class="hl-reserved">throw </span><span class="hl-quotes">&quot;</span><span class="hl-string">Invalid JSON response</span><span class="hl-quotes">&quot;</span><span class="hl-code">;
+    		        </span><span class="hl-brackets">}
+    		
+    		        </span><span class="hl-comment">// Empty (but not invalid) JSON response
+    		        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">rtext</span><span class="hl-code">.</span><span class="hl-identifier">indexOf</span><span class="hl-brackets">(</span><span class="hl-quotes">&quot;</span><span class="hl-string">{}</span><span class="hl-quotes">&quot;</span><span class="hl-brackets">)</span><span class="hl-code"> === </span><span class="hl-number">0</span><span class="hl-brackets">) {
+    		            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">loadData</span><span class="hl-brackets">({}</span><span class="hl-code">, </span><span class="hl-identifier">response</span><span class="hl-code">.</span><span class="hl-identifier">argument</span><span class="hl-code">.</span><span class="hl-identifier">callback</span><span class="hl-brackets">)</span><span class="hl-code">;
+    		            </span><span class="hl-reserved">return</span><span class="hl-code">;
+    		        </span><span class="hl-brackets">}
+    		
+    		        </span><span class="hl-comment">// Turn the string into an object literal...
+    		        // ...eval is necessary here
+    		        </span><span class="hl-reserved">var </span><span class="hl-identifier">jsonObjRaw</span><span class="hl-code"> = </span><span class="hl-identifier">eval</span><span class="hl-brackets">(</span><span class="hl-quotes">&quot;</span><span class="hl-string">(</span><span class="hl-quotes">&quot;</span><span class="hl-code"> + </span><span class="hl-identifier">rtext</span><span class="hl-code"> + </span><span class="hl-quotes">&quot;</span><span class="hl-string">)</span><span class="hl-quotes">&quot;</span><span class="hl-brackets">)</span><span class="hl-code">;
+    		        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">jsonObjRaw</span><span class="hl-brackets">) {
+    		            </span><span class="hl-reserved">throw </span><span class="hl-quotes">&quot;</span><span class="hl-string">Error evaling JSON response</span><span class="hl-quotes">&quot;</span><span class="hl-code">;
+    		        </span><span class="hl-brackets">}
+    				</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">loadData</span><span class="hl-brackets">(</span><span class="hl-identifier">jsonObjRaw</span><span class="hl-code">, </span><span class="hl-identifier">cb</span><span class="hl-code">, </span><span class="hl-identifier">keepExisting</span><span class="hl-code">, </span><span class="hl-identifier">insertIndex</span><span class="hl-brackets">)</span><span class="hl-code">;
+    		    </span><span class="hl-brackets">} </span><span class="hl-reserved">catch</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-brackets">) {
+    		        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">fireLoadException</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-code">, </span><span class="hl-identifier">response</span><span class="hl-brackets">)</span><span class="hl-code">;
+    				</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">callback</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">function</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+    			    	</span><span class="hl-identifier">callback</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">false</span><span class="hl-brackets">)</span><span class="hl-code">;
+    			    </span><span class="hl-brackets">}
+    		   	}
+        	</span><span class="hl-reserved">break</span><span class="hl-code">;
+        	</span><span class="hl-reserved">case </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">LoadableDataModel</span><span class="hl-code">.</span><span class="hl-identifier">TEXT</span><span class="hl-code">:
+        		</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">loadData</span><span class="hl-brackets">(</span><span class="hl-identifier">response</span><span class="hl-code">.</span><span class="hl-identifier">responseText</span><span class="hl-code">, </span><span class="hl-identifier">cb</span><span class="hl-code">, </span><span class="hl-identifier">keepExisting</span><span class="hl-code">, </span><span class="hl-identifier">insertIndex</span><span class="hl-brackets">)</span><span class="hl-code">;
+        	</span><span class="hl-reserved">break</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**@private*/
+    </span><span class="hl-identifier">processException</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">response</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">fireLoadException</span><span class="hl-brackets">(</span><span class="hl-reserved">null</span><span class="hl-code">, </span><span class="hl-identifier">response</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">response</span><span class="hl-code">.</span><span class="hl-identifier">argument</span><span class="hl-code">.</span><span class="hl-identifier">callback</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">function</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+            </span><span class="hl-identifier">response</span><span class="hl-code">.</span><span class="hl-identifier">argument</span><span class="hl-code">.</span><span class="hl-identifier">callback</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">false</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">fireLoadException</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-code">, </span><span class="hl-identifier">responseObj</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onLoadException</span><span class="hl-code">.</span><span class="hl-identifier">fireDirect</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-identifier">e</span><span class="hl-code">, </span><span class="hl-identifier">responseObj</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">fireLoadEvent</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">fireEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">load</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">loadedPage</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getTotalPages</span><span class="hl-brackets">())</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Adds a preprocessor function to parse data before it is added to the Model - ie. Date.parse to parse dates.
+     * @param {Number} columnIndex 
+     * @param {Function} fn
+     */
+    </span><span class="hl-identifier">addPreprocessor</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">columnIndex</span><span class="hl-code">, </span><span class="hl-identifier">fn</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">preprocessors</span><span class="hl-brackets">[</span><span class="hl-identifier">columnIndex</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-identifier">fn</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Gets the preprocessor function for the specified column.
+     * @param {Number} columnIndex
+     * @return {Function}
+     */
+    </span><span class="hl-identifier">getPreprocessor</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">columnIndex</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">preprocessors</span><span class="hl-brackets">[</span><span class="hl-identifier">columnIndex</span><span class="hl-brackets">]</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Removes a preprocessor function.
+     * @param {Number} columnIndex 
+     */
+    </span><span class="hl-identifier">removePreprocessor</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">columnIndex</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">preprocessors</span><span class="hl-brackets">[</span><span class="hl-identifier">columnIndex</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-reserved">null</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Adds a postprocessor function to format data before updating the underlying data source (ie. convert date to string before updating XML document).
+     * @param {Number} columnIndex 
+     * @param {Function} fn
+     */
+    </span><span class="hl-identifier">addPostprocessor</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">columnIndex</span><span class="hl-code">, </span><span class="hl-identifier">fn</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">postprocessors</span><span class="hl-brackets">[</span><span class="hl-identifier">columnIndex</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-identifier">fn</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Gets the postprocessor function for the specified column.
+     * @param {Number} columnIndex
+     * @return {Function}
+     */
+    </span><span class="hl-identifier">getPostprocessor</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">columnIndex</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">postprocessors</span><span class="hl-brackets">[</span><span class="hl-identifier">columnIndex</span><span class="hl-brackets">]</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Removes a postprocessor function.
+     * @param {Number} columnIndex
+     */
+    </span><span class="hl-identifier">removePostprocessor</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">columnIndex</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">postprocessors</span><span class="hl-brackets">[</span><span class="hl-identifier">columnIndex</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-reserved">null</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    </span><span class="hl-comment">/**
+     * Empty interface method - Called to process the data returned by the XHR - Classes which extend LoadableDataModel should implement this method.
+     * See {@link YAHOO.ext.XMLDataModel} for an example implementation.
+     */
+    </span><span class="hl-identifier">loadData</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">data</span><span class="hl-code">, </span><span class="hl-identifier">callback</span><span class="hl-code">, </span><span class="hl-identifier">keepExisting</span><span class="hl-code">, </span><span class="hl-identifier">insertIndex</span><span class="hl-brackets">){
+    	
+    }</span><span class="hl-code">
+}</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">LoadableDataModel</span><span class="hl-code">.</span><span class="hl-identifier">XML</span><span class="hl-code"> = </span><span class="hl-quotes">'</span><span class="hl-string">xml</span><span class="hl-quotes">'</span><span class="hl-code">;
+</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">LoadableDataModel</span><span class="hl-code">.</span><span class="hl-identifier">JSON</span><span class="hl-code"> = </span><span class="hl-quotes">'</span><span class="hl-string">json</span><span class="hl-quotes">'</span><span class="hl-code">;
+</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">LoadableDataModel</span><span class="hl-code">.</span><span class="hl-identifier">TEXT</span><span class="hl-code"> = </span><span class="hl-quotes">'</span><span class="hl-string">text</span><span class="hl-quotes">'</span><span class="hl-code">;
+
+
+
+
+
+</span></pre></div><hr>Copyright &copy; 2006 Jack Slocum. All rights reserved.</body></html>

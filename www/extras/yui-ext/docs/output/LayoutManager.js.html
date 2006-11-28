@@ -1,0 +1,131 @@
+<html><head><title>LayoutManager.js</title><link rel="stylesheet" type="text/css" href="../style.css" media="screen"/></head><body><div class="hl-main"><pre><span class="hl-comment">/**
+ * @class YAHOO.ext.LayoutManager
+ * @extends YAHOO.ext.util.Observable
+ * Base class for layout managers.
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">LayoutManager</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">container</span><span class="hl-brackets">){
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">LayoutManager</span><span class="hl-code">.</span><span class="hl-identifier">superclass</span><span class="hl-code">.</span><span class="hl-identifier">constructor</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code"> = </span><span class="hl-identifier">getEl</span><span class="hl-brackets">(</span><span class="hl-identifier">container</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">id</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">id</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">addClass</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">ylayout-container</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-comment">/** false to disable window resize monitoring @type Boolean */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">monitorWindowResize</span><span class="hl-code"> = </span><span class="hl-reserved">true</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">regions</span><span class="hl-code"> = </span><span class="hl-brackets">{}</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">events</span><span class="hl-code"> = </span><span class="hl-brackets">{
+        </span><span class="hl-comment">/**
+         * @event layout
+         * Fires when a layout is performed. 
+         * @param {YAHOO.ext.LayoutManager} this
+         */
+        </span><span class="hl-quotes">'</span><span class="hl-string">layout</span><span class="hl-quotes">'</span><span class="hl-code"> : </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">CustomEvent</span><span class="hl-brackets">()</span><span class="hl-code">,
+        </span><span class="hl-comment">/**
+         * @event regionresized
+         * Fires when the user resizes a region. 
+         * @param {YAHOO.ext.LayoutRegion} region
+         * @param {Number} newSize The new size (width for east/west, height for north/south)
+         */
+        </span><span class="hl-quotes">'</span><span class="hl-string">regionresized</span><span class="hl-quotes">'</span><span class="hl-code"> : </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">CustomEvent</span><span class="hl-brackets">()</span><span class="hl-code">,
+        </span><span class="hl-comment">/**
+         * @event regioncollapsed
+         * Fires when a region is collapsed. 
+         * @param {YAHOO.ext.LayoutRegion} region
+         */
+        </span><span class="hl-quotes">'</span><span class="hl-string">regioncollapsed</span><span class="hl-quotes">'</span><span class="hl-code"> : </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">CustomEvent</span><span class="hl-brackets">()</span><span class="hl-code">,
+        </span><span class="hl-comment">/**
+         * @event regionexpanded
+         * Fires when a region is expanded.  
+         * @param {YAHOO.ext.LayoutRegion} region
+         */
+        </span><span class="hl-quotes">'</span><span class="hl-string">regionexpanded</span><span class="hl-quotes">'</span><span class="hl-code"> : </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">CustomEvent</span><span class="hl-brackets">()
+    }</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">updating</span><span class="hl-code"> = </span><span class="hl-reserved">false</span><span class="hl-code">;
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">EventManager</span><span class="hl-code">.</span><span class="hl-identifier">onWindowResize</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onWindowResize</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-default">;
+
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">extendX</span><span class="hl-brackets">(</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">LayoutManager</span><span class="hl-code">, </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Observable</span><span class="hl-code">, </span><span class="hl-brackets">{
+    </span><span class="hl-comment">/**
+     * Returns true if this layout is currently being updated
+     * @return {Boolean}
+     */
+    </span><span class="hl-identifier">isUpdating</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">updating</span><span class="hl-code">; 
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Suspend the LayoutManager from doing auto-layouts while
+     * making multiple add or remove calls
+     */
+    </span><span class="hl-identifier">beginUpdate</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">updating</span><span class="hl-code"> = </span><span class="hl-reserved">true</span><span class="hl-code">;    
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Restore auto-layouts and optionally disable the manager from performing a layout
+     * @param {Boolean} noLayout true to disable a layout update 
+     */
+    </span><span class="hl-identifier">endUpdate</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">noLayout</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">updating</span><span class="hl-code"> = </span><span class="hl-reserved">false</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">noLayout</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">layout</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-brackets">}    
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">layout</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">onRegionResized</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">region</span><span class="hl-code">, </span><span class="hl-identifier">newSize</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">fireEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">regionresized</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-identifier">region</span><span class="hl-code">, </span><span class="hl-identifier">newSize</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">layout</span><span class="hl-brackets">()</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">onRegionCollapsed</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">region</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">fireEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">regioncollapsed</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-identifier">region</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">onRegionExpanded</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">region</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">fireEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">regionexpanded</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-identifier">region</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+        
+    </span><span class="hl-comment">/**
+     * Returns the size of the current view, This method normalizes document.body and element embedded layouts and
+     * performs box-model adjustments.
+     * @return {Object} The size as an object {width: (the width), height: (the height)}
+     */
+    </span><span class="hl-identifier">getViewSize</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">size</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-code"> != </span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">body</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">beginMeasure</span><span class="hl-brackets">()</span><span class="hl-code">;
+            </span><span class="hl-identifier">size</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">getSize</span><span class="hl-brackets">()</span><span class="hl-code">;
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">endMeasure</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+            </span><span class="hl-identifier">size</span><span class="hl-code"> = </span><span class="hl-brackets">{</span><span class="hl-identifier">width</span><span class="hl-code">: </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">getViewportWidth</span><span class="hl-brackets">()</span><span class="hl-code">, </span><span class="hl-identifier">height</span><span class="hl-code">: </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">getViewportHeight</span><span class="hl-brackets">()}</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-identifier">size</span><span class="hl-code">.</span><span class="hl-identifier">width</span><span class="hl-code"> -= </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">getBorderWidth</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">lr</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">-</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">getPadding</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">lr</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-identifier">size</span><span class="hl-code">.</span><span class="hl-identifier">height</span><span class="hl-code"> -= </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">getBorderWidth</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">tb</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">-</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">getPadding</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">tb</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">return </span><span class="hl-identifier">size</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Returns the element this layout is bound to.
+     * @return {YAHOO.ext.Element}
+     */
+    </span><span class="hl-identifier">getEl</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Returns the specified region.
+     * @param {String} target The region key
+     * @return {YAHOO.ext.LayoutRegion}
+     */
+    </span><span class="hl-identifier">getRegion</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">target</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">regions</span><span class="hl-brackets">[</span><span class="hl-identifier">target</span><span class="hl-brackets">]</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">onWindowResize</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">monitorWindowResize</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">layout</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }
+})</span><span class="hl-default">;</span></pre></div><hr>Copyright &copy; 2006 Jack Slocum. All rights reserved.</body></html>

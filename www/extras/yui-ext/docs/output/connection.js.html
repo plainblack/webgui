@@ -1,0 +1,960 @@
+<html><head><title>connection.js</title><link rel="stylesheet" type="text/css" href="../style.css" media="screen"/></head><body><div class="hl-main"><pre><span class="hl-comment">/*
+Copyright (c) 2006, Yahoo! Inc. All rights reserved.
+Code licensed under the BSD License:
+</span><span class="hl-url">http://developer.yahoo.net/yui/license.txt</span><span class="hl-comment">
+version: 0.12.0
+*/
+// holder
+/**
+ * @description
+ * The Connection Manager provides a simplified interface to the XMLHttpRequest
+ * object.  It handles cross-browser instantiantion of XMLHttpRequest, negotiates the
+ * interactive states and server response, returning the results to a pre-defined
+ * callback you create.
+ *
+ * @namespace YAHOO.util
+ * @module Connection
+ * @Class Connect
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">util</span><span class="hl-default">.</span><span class="hl-identifier">Connect</span><span class="hl-default"> =
+</span><span class="hl-brackets">{
+  </span><span class="hl-comment">/**
+   * @description Array of MSFT ActiveX ids for XMLHttpRequest.
+   * @property _msxml_progid
+   * @private
+   * @static
+   * @type array
+   */
+	</span><span class="hl-identifier">_msxml_progid</span><span class="hl-code">:</span><span class="hl-brackets">[
+		</span><span class="hl-quotes">'</span><span class="hl-string">MSXML2.XMLHTTP.3.0</span><span class="hl-quotes">'</span><span class="hl-code">,
+		</span><span class="hl-quotes">'</span><span class="hl-string">MSXML2.XMLHTTP</span><span class="hl-quotes">'</span><span class="hl-code">,
+		</span><span class="hl-quotes">'</span><span class="hl-string">Microsoft.XMLHTTP</span><span class="hl-quotes">'
+		</span><span class="hl-brackets">]</span><span class="hl-code">,
+
+  </span><span class="hl-comment">/**
+   * @description Object literal of HTTP header(s)
+   * @property _http_header
+   * @private
+   * @static
+   * @type object
+   */
+	</span><span class="hl-identifier">_http_header</span><span class="hl-code">:</span><span class="hl-brackets">{}</span><span class="hl-code">,
+
+  </span><span class="hl-comment">/**
+   * @description Determines if HTTP headers are set.
+   * @property _has_http_headers
+   * @private
+   * @static
+   * @type boolean
+   */
+	</span><span class="hl-identifier">_has_http_headers</span><span class="hl-code">:</span><span class="hl-reserved">false</span><span class="hl-code">,
+
+ </span><span class="hl-comment">/**
+  * @description Determines if a default header of
+  * Content-Type of 'application/x-www-form-urlencoded'
+  * will be added to any client HTTP headers sent for POST
+  * transactions.
+  * @property _use_default_post_header
+  * @private
+  * @static
+  * @type boolean
+  */
+    </span><span class="hl-identifier">_use_default_post_header</span><span class="hl-code">:</span><span class="hl-reserved">true</span><span class="hl-code">,
+
+ </span><span class="hl-comment">/**
+  * @description Determines if a default header of
+  * Content-Type of 'application/x-www-form-urlencoded'
+  * will be added to any client HTTP headers sent for POST
+  * transactions.
+  * @property _default_post_header
+  * @private
+  * @static
+  * @type boolean
+  */
+    </span><span class="hl-identifier">_default_post_header</span><span class="hl-code">:</span><span class="hl-quotes">'</span><span class="hl-string">application/x-www-form-urlencoded</span><span class="hl-quotes">'</span><span class="hl-code">,
+
+ </span><span class="hl-comment">/**
+  * @description Property modified by setForm() to determine if the data
+  * should be submitted as an HTML form.
+  * @property _isFormSubmit
+  * @private
+  * @static
+  * @type boolean
+  */
+    </span><span class="hl-identifier">_isFormSubmit</span><span class="hl-code">:</span><span class="hl-reserved">false</span><span class="hl-code">,
+
+ </span><span class="hl-comment">/**
+  * @description Property modified by setForm() to determine if a file(s)
+  * upload is expected.
+  * @property _isFileUpload
+  * @private
+  * @static
+  * @type boolean
+  */
+    </span><span class="hl-identifier">_isFileUpload</span><span class="hl-code">:</span><span class="hl-reserved">false</span><span class="hl-code">,
+
+ </span><span class="hl-comment">/**
+  * @description Property modified by setForm() to set a reference to the HTML
+  * form node if the desired action is file upload.
+  * @property _formNode
+  * @private
+  * @static
+  * @type object
+  */
+    </span><span class="hl-identifier">_formNode</span><span class="hl-code">:</span><span class="hl-reserved">null</span><span class="hl-code">,
+
+ </span><span class="hl-comment">/**
+  * @description Property modified by setForm() to set the HTML form data
+  * for each transaction.
+  * @property _sFormData
+  * @private
+  * @static
+  * @type string
+  */
+    </span><span class="hl-identifier">_sFormData</span><span class="hl-code">:</span><span class="hl-reserved">null</span><span class="hl-code">,
+
+ </span><span class="hl-comment">/**
+  * @description Collection of polling references to the polling mechanism in handleReadyState.
+  * @property _poll
+  * @private
+  * @static
+  * @type object
+  */
+    </span><span class="hl-identifier">_poll</span><span class="hl-code">:</span><span class="hl-brackets">{}</span><span class="hl-code">,
+
+ </span><span class="hl-comment">/**
+  * @description Queue of timeout values for each transaction callback with a defined timeout value.
+  * @property _timeOut
+  * @private
+  * @static
+  * @type object
+  */
+    </span><span class="hl-identifier">_timeOut</span><span class="hl-code">:</span><span class="hl-brackets">{}</span><span class="hl-code">,
+
+  </span><span class="hl-comment">/**
+   * @description The polling frequency, in milliseconds, for HandleReadyState.
+   * when attempting to determine a transaction's XHR readyState.
+   * The default is 50 milliseconds.
+   * @property _polling_interval
+   * @private
+   * @static
+   * @type int
+   */
+     </span><span class="hl-identifier">_polling_interval</span><span class="hl-code">:</span><span class="hl-number">50</span><span class="hl-code">,
+
+  </span><span class="hl-comment">/**
+   * @description A transaction counter that increments the transaction id for each transaction.
+   * @property _transaction_id
+   * @private
+   * @static
+   * @type int
+   */
+     </span><span class="hl-identifier">_transaction_id</span><span class="hl-code">:</span><span class="hl-number">0</span><span class="hl-code">,
+
+  </span><span class="hl-comment">/**
+   * @description Member to add an ActiveX id to the existing xml_progid array.
+   * In the event(unlikely) a new ActiveX id is introduced, it can be added
+   * without internal code modifications.
+   * @method setProgId
+   * @public
+   * @static
+   * @param {string} id The ActiveX id to be added to initialize the XHR object.
+   * @return void
+   */
+	</span><span class="hl-identifier">setProgId</span><span class="hl-code">:</span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">id</span><span class="hl-brackets">)
+	{
+		</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_msxml_progid</span><span class="hl-code">.</span><span class="hl-identifier">unshift</span><span class="hl-brackets">(</span><span class="hl-identifier">id</span><span class="hl-brackets">)</span><span class="hl-code">;
+	</span><span class="hl-brackets">}</span><span class="hl-code">,
+
+  </span><span class="hl-comment">/**
+   * @description Member to enable or disable the default POST header.
+   * @method setDefaultPostHeader
+   * @public
+   * @static
+   * @param {boolean} b Set and use default header - true or false .
+   * @return void
+   */
+	</span><span class="hl-identifier">setDefaultPostHeader</span><span class="hl-code">:</span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">b</span><span class="hl-brackets">)
+	{
+		</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_use_default_post_header</span><span class="hl-code"> = </span><span class="hl-identifier">b</span><span class="hl-code">;
+	</span><span class="hl-brackets">}</span><span class="hl-code">,
+
+  </span><span class="hl-comment">/**
+   * @description Member to modify the default polling interval.
+   * @method setPollingInterval
+   * @public
+   * @static
+   * @param {int} i The polling interval in milliseconds.
+   * @return void
+   */
+	</span><span class="hl-identifier">setPollingInterval</span><span class="hl-code">:</span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">i</span><span class="hl-brackets">)
+	{
+		</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">i</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">number</span><span class="hl-quotes">'</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">isFinite</span><span class="hl-brackets">(</span><span class="hl-identifier">i</span><span class="hl-brackets">)){
+			</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_polling_interval</span><span class="hl-code"> = </span><span class="hl-identifier">i</span><span class="hl-code">;
+		</span><span class="hl-brackets">}
+	}</span><span class="hl-code">,
+
+  </span><span class="hl-comment">/**
+   * @description Instantiates a XMLHttpRequest object and returns an object with two properties:
+   * the XMLHttpRequest instance and the transaction id.
+   * @method createXhrObject
+   * @private
+   * @static
+   * @param {int} transactionId Property containing the transaction id for this transaction.
+   * @return object
+   */
+	</span><span class="hl-identifier">createXhrObject</span><span class="hl-code">:</span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">transactionId</span><span class="hl-brackets">)
+	{
+		</span><span class="hl-reserved">var </span><span class="hl-identifier">obj</span><span class="hl-code">,</span><span class="hl-identifier">http</span><span class="hl-code">;
+		</span><span class="hl-reserved">try
+		</span><span class="hl-brackets">{
+			</span><span class="hl-comment">// Instantiates XMLHttpRequest in non-IE browsers and assigns to http.
+			</span><span class="hl-identifier">http</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-identifier">XMLHttpRequest</span><span class="hl-brackets">()</span><span class="hl-code">;
+			</span><span class="hl-comment">//  Object literal with http and tId properties
+			</span><span class="hl-identifier">obj</span><span class="hl-code"> = </span><span class="hl-brackets">{ </span><span class="hl-identifier">conn</span><span class="hl-code">:</span><span class="hl-identifier">http</span><span class="hl-code">, </span><span class="hl-identifier">tId</span><span class="hl-code">:</span><span class="hl-identifier">transactionId </span><span class="hl-brackets">}</span><span class="hl-code">;
+		</span><span class="hl-brackets">}
+		</span><span class="hl-reserved">catch</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-brackets">)
+		{
+			</span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code">=</span><span class="hl-number">0</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code">&lt;</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_msxml_progid</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; ++</span><span class="hl-identifier">i</span><span class="hl-brackets">){
+				</span><span class="hl-reserved">try
+				</span><span class="hl-brackets">{
+					</span><span class="hl-comment">// Instantiates XMLHttpRequest for IE and assign to http.
+					</span><span class="hl-identifier">http</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-identifier">ActiveXObject</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_msxml_progid</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">])</span><span class="hl-code">;
+					</span><span class="hl-comment">//  Object literal with conn and tId properties
+					</span><span class="hl-identifier">obj</span><span class="hl-code"> = </span><span class="hl-brackets">{ </span><span class="hl-identifier">conn</span><span class="hl-code">:</span><span class="hl-identifier">http</span><span class="hl-code">, </span><span class="hl-identifier">tId</span><span class="hl-code">:</span><span class="hl-identifier">transactionId </span><span class="hl-brackets">}</span><span class="hl-code">;
+					</span><span class="hl-reserved">break</span><span class="hl-code">;
+				</span><span class="hl-brackets">}
+				</span><span class="hl-reserved">catch</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-brackets">){}
+			}
+		}
+		</span><span class="hl-reserved">finally
+		</span><span class="hl-brackets">{
+			</span><span class="hl-reserved">return </span><span class="hl-identifier">obj</span><span class="hl-code">;
+		</span><span class="hl-brackets">}
+	}</span><span class="hl-code">,
+
+  </span><span class="hl-comment">/**
+   * @description This method is called by asyncRequest to create a
+   * valid connection object for the transaction.  It also passes a
+   * transaction id and increments the transaction id counter.
+   * @method getConnectionObject
+   * @private
+   * @static
+   * @return {object}
+   */
+	</span><span class="hl-identifier">getConnectionObject</span><span class="hl-code">:</span><span class="hl-reserved">function</span><span class="hl-brackets">()
+	{
+		</span><span class="hl-reserved">var </span><span class="hl-identifier">o</span><span class="hl-code">;
+		</span><span class="hl-reserved">var </span><span class="hl-identifier">tId</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_transaction_id</span><span class="hl-code">;
+
+		</span><span class="hl-reserved">try
+		</span><span class="hl-brackets">{
+			</span><span class="hl-identifier">o</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">createXhrObject</span><span class="hl-brackets">(</span><span class="hl-identifier">tId</span><span class="hl-brackets">)</span><span class="hl-code">;
+			</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">o</span><span class="hl-brackets">){
+				</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_transaction_id</span><span class="hl-code">++;
+			</span><span class="hl-brackets">}
+		}
+		</span><span class="hl-reserved">catch</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-brackets">){}
+		</span><span class="hl-reserved">finally
+		</span><span class="hl-brackets">{
+			</span><span class="hl-reserved">return </span><span class="hl-identifier">o</span><span class="hl-code">;
+		</span><span class="hl-brackets">}
+	}</span><span class="hl-code">,
+
+  </span><span class="hl-comment">/**
+   * @description Method for initiating an asynchronous request via the XHR object.
+   * @method asyncRequest
+   * @public
+   * @static
+   * @param {string} method HTTP transaction method
+   * @param {string} uri Fully qualified path of resource
+   * @param {callback} callback User-defined callback function or object
+   * @param {string} postData POST body
+   * @return {object} Returns the connection object
+   */
+	</span><span class="hl-identifier">asyncRequest</span><span class="hl-code">:</span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">method</span><span class="hl-code">, </span><span class="hl-identifier">uri</span><span class="hl-code">, </span><span class="hl-identifier">callback</span><span class="hl-code">, </span><span class="hl-identifier">postData</span><span class="hl-brackets">)
+	{
+		</span><span class="hl-reserved">var </span><span class="hl-identifier">o</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getConnectionObject</span><span class="hl-brackets">()</span><span class="hl-code">;
+
+		</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">o</span><span class="hl-brackets">){
+			</span><span class="hl-reserved">return null</span><span class="hl-code">;
+		</span><span class="hl-brackets">}
+		</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+			</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_isFormSubmit</span><span class="hl-brackets">){
+				</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_isFileUpload</span><span class="hl-brackets">){
+					</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">uploadFile</span><span class="hl-brackets">(</span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">tId</span><span class="hl-code">, </span><span class="hl-identifier">callback</span><span class="hl-code">, </span><span class="hl-identifier">uri</span><span class="hl-code">, </span><span class="hl-identifier">postData</span><span class="hl-brackets">)</span><span class="hl-code">;
+					</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">releaseObject</span><span class="hl-brackets">(</span><span class="hl-identifier">o</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+					</span><span class="hl-reserved">return</span><span class="hl-code">;
+				</span><span class="hl-brackets">}
+
+				</span><span class="hl-comment">//If the specified HTTP method is GET, setForm() will return an
+				//encoded string that is concatenated to the uri to
+				//create a querystring.
+				</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">method</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">GET</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+					</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_sFormData</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code"> != </span><span class="hl-number">0</span><span class="hl-brackets">){
+						</span><span class="hl-comment">// If the URI already contains a querystring, append an ampersand
+						// and then concatenate _sFormData to the URI.
+						</span><span class="hl-identifier">uri</span><span class="hl-code"> += </span><span class="hl-brackets">((</span><span class="hl-identifier">uri</span><span class="hl-code">.</span><span class="hl-identifier">indexOf</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">?</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code"> == -</span><span class="hl-number">1</span><span class="hl-brackets">)</span><span class="hl-code">?</span><span class="hl-quotes">'</span><span class="hl-string">?</span><span class="hl-quotes">'</span><span class="hl-code">:</span><span class="hl-quotes">'</span><span class="hl-string">&amp;</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code"> + </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_sFormData</span><span class="hl-code">;
+					</span><span class="hl-brackets">}
+					</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+						</span><span class="hl-identifier">uri</span><span class="hl-code"> += </span><span class="hl-quotes">&quot;</span><span class="hl-string">?</span><span class="hl-quotes">&quot;</span><span class="hl-code"> + </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_sFormData</span><span class="hl-code">;
+					</span><span class="hl-brackets">}
+				}
+				</span><span class="hl-reserved">else if</span><span class="hl-brackets">(</span><span class="hl-identifier">method</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">POST</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+					</span><span class="hl-comment">//If POST data exist in addition to the HTML form data,
+					//it will be concatenated to the form data.
+					</span><span class="hl-identifier">postData</span><span class="hl-code"> = </span><span class="hl-identifier">postData</span><span class="hl-code">?</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_sFormData</span><span class="hl-code"> + </span><span class="hl-quotes">&quot;</span><span class="hl-string">&amp;</span><span class="hl-quotes">&quot;</span><span class="hl-code"> + </span><span class="hl-identifier">postData</span><span class="hl-code">:</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_sFormData</span><span class="hl-code">;
+				</span><span class="hl-brackets">}
+			}
+
+			</span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">conn</span><span class="hl-code">.</span><span class="hl-identifier">open</span><span class="hl-brackets">(</span><span class="hl-identifier">method</span><span class="hl-code">, </span><span class="hl-identifier">uri</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+			</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_isFormSubmit</span><span class="hl-code"> || </span><span class="hl-brackets">(</span><span class="hl-identifier">postData</span><span class="hl-code"> &amp;&amp; </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_use_default_post_header</span><span class="hl-brackets">)){
+				</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">initHeader</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">Content-Type</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_default_post_header</span><span class="hl-brackets">)</span><span class="hl-code">;
+				</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_isFormSubmit</span><span class="hl-brackets">){
+					</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">resetFormState</span><span class="hl-brackets">()</span><span class="hl-code">;
+				</span><span class="hl-brackets">}
+			}
+
+			</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_has_http_headers</span><span class="hl-brackets">){
+				</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">setHeader</span><span class="hl-brackets">(</span><span class="hl-identifier">o</span><span class="hl-brackets">)</span><span class="hl-code">;
+			</span><span class="hl-brackets">}
+
+			</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">handleReadyState</span><span class="hl-brackets">(</span><span class="hl-identifier">o</span><span class="hl-code">, </span><span class="hl-identifier">callback</span><span class="hl-brackets">)</span><span class="hl-code">;
+			</span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">conn</span><span class="hl-code">.</span><span class="hl-identifier">send</span><span class="hl-brackets">(</span><span class="hl-identifier">postData</span><span class="hl-code"> || </span><span class="hl-reserved">null</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+			</span><span class="hl-reserved">return </span><span class="hl-identifier">o</span><span class="hl-code">;
+		</span><span class="hl-brackets">}
+	}</span><span class="hl-code">,
+
+  </span><span class="hl-comment">/**
+   * @description This method serves as a timer that polls the XHR object's readyState
+   * property during a transaction, instead of binding a callback to the
+   * onreadystatechange event.  Upon readyState 4, handleTransactionResponse
+   * will process the response, and the timer will be cleared.
+   * @method handleReadyState
+   * @private
+   * @static
+   * @param {object} o The connection object
+   * @param {callback} callback The user-defined callback object
+   * @return {void}
+   */
+    </span><span class="hl-identifier">handleReadyState</span><span class="hl-code">:</span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">o</span><span class="hl-code">, </span><span class="hl-identifier">callback</span><span class="hl-brackets">)
+    {
+		</span><span class="hl-reserved">var </span><span class="hl-identifier">oConn</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">;
+
+		</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">callback</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">callback</span><span class="hl-code">.</span><span class="hl-identifier">timeout</span><span class="hl-brackets">){
+			</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_timeOut</span><span class="hl-brackets">[</span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">tId</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-builtin">window</span><span class="hl-code">.</span><span class="hl-identifier">setTimeout</span><span class="hl-brackets">(</span><span class="hl-reserved">function</span><span class="hl-brackets">(){ </span><span class="hl-identifier">oConn</span><span class="hl-code">.</span><span class="hl-identifier">abort</span><span class="hl-brackets">(</span><span class="hl-identifier">o</span><span class="hl-code">, </span><span class="hl-identifier">callback</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">; </span><span class="hl-brackets">}</span><span class="hl-code">, </span><span class="hl-identifier">callback</span><span class="hl-code">.</span><span class="hl-identifier">timeout</span><span class="hl-brackets">)</span><span class="hl-code">;
+		</span><span class="hl-brackets">}
+
+		</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_poll</span><span class="hl-brackets">[</span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">tId</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-builtin">window</span><span class="hl-code">.</span><span class="hl-identifier">setInterval</span><span class="hl-brackets">(
+			</span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+				</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">conn</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">conn</span><span class="hl-code">.</span><span class="hl-identifier">readyState</span><span class="hl-code"> == </span><span class="hl-number">4</span><span class="hl-brackets">){
+					</span><span class="hl-builtin">window</span><span class="hl-code">.</span><span class="hl-identifier">clearInterval</span><span class="hl-brackets">(</span><span class="hl-identifier">oConn</span><span class="hl-code">.</span><span class="hl-identifier">_poll</span><span class="hl-brackets">[</span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">tId</span><span class="hl-brackets">])</span><span class="hl-code">;
+					</span><span class="hl-reserved">delete </span><span class="hl-identifier">oConn</span><span class="hl-code">.</span><span class="hl-identifier">_poll</span><span class="hl-brackets">[</span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">tId</span><span class="hl-brackets">]</span><span class="hl-code">;
+
+					</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">callback</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">callback</span><span class="hl-code">.</span><span class="hl-identifier">timeout</span><span class="hl-brackets">){
+						</span><span class="hl-reserved">delete </span><span class="hl-identifier">oConn</span><span class="hl-code">.</span><span class="hl-identifier">_timeOut</span><span class="hl-brackets">[</span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">tId</span><span class="hl-brackets">]</span><span class="hl-code">;
+					</span><span class="hl-brackets">}
+
+					</span><span class="hl-identifier">oConn</span><span class="hl-code">.</span><span class="hl-identifier">handleTransactionResponse</span><span class="hl-brackets">(</span><span class="hl-identifier">o</span><span class="hl-code">, </span><span class="hl-identifier">callback</span><span class="hl-brackets">)</span><span class="hl-code">;
+				</span><span class="hl-brackets">}
+			}</span><span class="hl-code">
+		,</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_polling_interval</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+  </span><span class="hl-comment">/**
+   * @description This method attempts to interpret the server response and
+   * determine whether the transaction was successful, or if an error or
+   * exception was encountered.
+   * @method handleTransactionResponse
+   * @private
+   * @static
+   * @param {object} o The connection object
+   * @param {object} callback The sser-defined callback object
+   * @param {boolean} isAbort Determines if the transaction was aborted.
+   * @return {void}
+   */
+    </span><span class="hl-identifier">handleTransactionResponse</span><span class="hl-code">:</span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">o</span><span class="hl-code">, </span><span class="hl-identifier">callback</span><span class="hl-code">, </span><span class="hl-identifier">isAbort</span><span class="hl-brackets">)
+    {
+		</span><span class="hl-comment">// If no valid callback is provided, then do not process any callback handling.
+		</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">callback</span><span class="hl-brackets">){
+			</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">releaseObject</span><span class="hl-brackets">(</span><span class="hl-identifier">o</span><span class="hl-brackets">)</span><span class="hl-code">;
+			</span><span class="hl-reserved">return</span><span class="hl-code">;
+		</span><span class="hl-brackets">}
+
+		</span><span class="hl-reserved">var </span><span class="hl-identifier">httpStatus</span><span class="hl-code">, </span><span class="hl-identifier">responseObject</span><span class="hl-code">;
+
+		</span><span class="hl-reserved">try
+		</span><span class="hl-brackets">{
+			</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">conn</span><span class="hl-code">.</span><span class="hl-identifier">status</span><span class="hl-code"> !== </span><span class="hl-identifier">undefined</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">conn</span><span class="hl-code">.</span><span class="hl-identifier">status</span><span class="hl-code"> != </span><span class="hl-number">0</span><span class="hl-brackets">){
+				</span><span class="hl-identifier">httpStatus</span><span class="hl-code"> = </span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">conn</span><span class="hl-code">.</span><span class="hl-identifier">status</span><span class="hl-code">;
+			</span><span class="hl-brackets">}
+			</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+				</span><span class="hl-identifier">httpStatus</span><span class="hl-code"> = </span><span class="hl-number">13030</span><span class="hl-code">;
+			</span><span class="hl-brackets">}
+		}
+		</span><span class="hl-reserved">catch</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-brackets">){
+			</span><span class="hl-comment">// 13030 is the custom code to indicate the condition -- in Mozilla/FF --
+			// when the o object's status and statusText properties are
+			// unavailable, and a query attempt throws an exception.
+			</span><span class="hl-identifier">httpStatus</span><span class="hl-code"> = </span><span class="hl-number">13030</span><span class="hl-code">;
+		</span><span class="hl-brackets">}
+
+		</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">httpStatus</span><span class="hl-code"> &gt;= </span><span class="hl-number">200</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">httpStatus</span><span class="hl-code"> &lt; </span><span class="hl-number">300</span><span class="hl-brackets">){
+			</span><span class="hl-reserved">try
+			</span><span class="hl-brackets">{
+				</span><span class="hl-identifier">responseObject</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">createResponseObject</span><span class="hl-brackets">(</span><span class="hl-identifier">o</span><span class="hl-code">, </span><span class="hl-identifier">callback</span><span class="hl-code">.</span><span class="hl-identifier">argument</span><span class="hl-brackets">)</span><span class="hl-code">;
+				</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">callback</span><span class="hl-code">.</span><span class="hl-identifier">success</span><span class="hl-brackets">){
+					</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">callback</span><span class="hl-code">.</span><span class="hl-identifier">scope</span><span class="hl-brackets">){
+						</span><span class="hl-identifier">callback</span><span class="hl-code">.</span><span class="hl-identifier">success</span><span class="hl-brackets">(</span><span class="hl-identifier">responseObject</span><span class="hl-brackets">)</span><span class="hl-code">;
+					</span><span class="hl-brackets">}
+					</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+						</span><span class="hl-comment">// If a scope property is defined, the callback will be fired from
+						// the context of the object.
+						</span><span class="hl-identifier">callback</span><span class="hl-code">.</span><span class="hl-identifier">success</span><span class="hl-code">.</span><span class="hl-identifier">apply</span><span class="hl-brackets">(</span><span class="hl-identifier">callback</span><span class="hl-code">.</span><span class="hl-identifier">scope</span><span class="hl-code">, </span><span class="hl-brackets">[</span><span class="hl-identifier">responseObject</span><span class="hl-brackets">])</span><span class="hl-code">;
+					</span><span class="hl-brackets">}
+				}
+			}
+			</span><span class="hl-reserved">catch</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-brackets">){}
+		}
+		</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+			</span><span class="hl-reserved">try
+			</span><span class="hl-brackets">{
+				</span><span class="hl-reserved">switch</span><span class="hl-brackets">(</span><span class="hl-identifier">httpStatus</span><span class="hl-brackets">){
+					</span><span class="hl-comment">// The following cases are wininet.dll error codes that may be encountered.
+					</span><span class="hl-reserved">case </span><span class="hl-number">12002</span><span class="hl-code">: </span><span class="hl-comment">// Server timeout
+					</span><span class="hl-reserved">case </span><span class="hl-number">12029</span><span class="hl-code">: </span><span class="hl-comment">// 12029 to 12031 correspond to dropped connections.
+					</span><span class="hl-reserved">case </span><span class="hl-number">12030</span><span class="hl-code">:
+					</span><span class="hl-reserved">case </span><span class="hl-number">12031</span><span class="hl-code">:
+					</span><span class="hl-reserved">case </span><span class="hl-number">12152</span><span class="hl-code">: </span><span class="hl-comment">// Connection closed by server.
+					</span><span class="hl-reserved">case </span><span class="hl-number">13030</span><span class="hl-code">: </span><span class="hl-comment">// See above comments for variable status.
+						</span><span class="hl-identifier">responseObject</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">createExceptionObject</span><span class="hl-brackets">(</span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">tId</span><span class="hl-code">, </span><span class="hl-identifier">callback</span><span class="hl-code">.</span><span class="hl-identifier">argument</span><span class="hl-code">, </span><span class="hl-brackets">(</span><span class="hl-identifier">isAbort</span><span class="hl-code">?</span><span class="hl-identifier">isAbort</span><span class="hl-code">:</span><span class="hl-reserved">false</span><span class="hl-brackets">))</span><span class="hl-code">;
+						</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">callback</span><span class="hl-code">.</span><span class="hl-identifier">failure</span><span class="hl-brackets">){
+							</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">callback</span><span class="hl-code">.</span><span class="hl-identifier">scope</span><span class="hl-brackets">){
+								</span><span class="hl-identifier">callback</span><span class="hl-code">.</span><span class="hl-identifier">failure</span><span class="hl-brackets">(</span><span class="hl-identifier">responseObject</span><span class="hl-brackets">)</span><span class="hl-code">;
+							</span><span class="hl-brackets">}
+							</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+								</span><span class="hl-identifier">callback</span><span class="hl-code">.</span><span class="hl-identifier">failure</span><span class="hl-code">.</span><span class="hl-identifier">apply</span><span class="hl-brackets">(</span><span class="hl-identifier">callback</span><span class="hl-code">.</span><span class="hl-identifier">scope</span><span class="hl-code">, </span><span class="hl-brackets">[</span><span class="hl-identifier">responseObject</span><span class="hl-brackets">])</span><span class="hl-code">;
+							</span><span class="hl-brackets">}
+						}
+						</span><span class="hl-reserved">break</span><span class="hl-code">;
+					</span><span class="hl-reserved">default</span><span class="hl-code">:
+						</span><span class="hl-identifier">responseObject</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">createResponseObject</span><span class="hl-brackets">(</span><span class="hl-identifier">o</span><span class="hl-code">, </span><span class="hl-identifier">callback</span><span class="hl-code">.</span><span class="hl-identifier">argument</span><span class="hl-brackets">)</span><span class="hl-code">;
+						</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">callback</span><span class="hl-code">.</span><span class="hl-identifier">failure</span><span class="hl-brackets">){
+							</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">callback</span><span class="hl-code">.</span><span class="hl-identifier">scope</span><span class="hl-brackets">){
+								</span><span class="hl-identifier">callback</span><span class="hl-code">.</span><span class="hl-identifier">failure</span><span class="hl-brackets">(</span><span class="hl-identifier">responseObject</span><span class="hl-brackets">)</span><span class="hl-code">;
+							</span><span class="hl-brackets">}
+							</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+								</span><span class="hl-identifier">callback</span><span class="hl-code">.</span><span class="hl-identifier">failure</span><span class="hl-code">.</span><span class="hl-identifier">apply</span><span class="hl-brackets">(</span><span class="hl-identifier">callback</span><span class="hl-code">.</span><span class="hl-identifier">scope</span><span class="hl-code">, </span><span class="hl-brackets">[</span><span class="hl-identifier">responseObject</span><span class="hl-brackets">])</span><span class="hl-code">;
+							</span><span class="hl-brackets">}
+						}
+				}
+			}
+			</span><span class="hl-reserved">catch</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-brackets">){}
+		}
+
+		</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">releaseObject</span><span class="hl-brackets">(</span><span class="hl-identifier">o</span><span class="hl-brackets">)</span><span class="hl-code">;
+		</span><span class="hl-identifier">responseObject</span><span class="hl-code"> = </span><span class="hl-reserved">null</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+  </span><span class="hl-comment">/**
+   * @description This method evaluates the server response, creates and returns the results via
+   * its properties.  Success and failure cases will differ in the response
+   * object's property values.
+   * @method createResponseObject
+   * @private
+   * @static
+   * @param {object} o The connection object
+   * @param {callbackArg} callbackArg The user-defined argument or arguments to be passed to the callback
+   * @return {object}
+   */
+    </span><span class="hl-identifier">createResponseObject</span><span class="hl-code">:</span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">o</span><span class="hl-code">, </span><span class="hl-identifier">callbackArg</span><span class="hl-brackets">)
+    {
+		</span><span class="hl-reserved">var </span><span class="hl-identifier">obj</span><span class="hl-code"> = </span><span class="hl-brackets">{}</span><span class="hl-code">;
+		</span><span class="hl-reserved">var </span><span class="hl-identifier">headerObj</span><span class="hl-code"> = </span><span class="hl-brackets">{}</span><span class="hl-code">;
+
+		</span><span class="hl-reserved">try
+		</span><span class="hl-brackets">{
+			</span><span class="hl-reserved">var </span><span class="hl-identifier">headerStr</span><span class="hl-code"> = </span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">conn</span><span class="hl-code">.</span><span class="hl-identifier">getAllResponseHeaders</span><span class="hl-brackets">()</span><span class="hl-code">;
+			</span><span class="hl-reserved">var </span><span class="hl-identifier">header</span><span class="hl-code"> = </span><span class="hl-identifier">headerStr</span><span class="hl-code">.</span><span class="hl-identifier">split</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">\n</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+			</span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code">=</span><span class="hl-number">0</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code">&lt;</span><span class="hl-identifier">header</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code">++</span><span class="hl-brackets">){
+				</span><span class="hl-reserved">var </span><span class="hl-identifier">delimitPos</span><span class="hl-code"> = </span><span class="hl-identifier">header</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">indexOf</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">:</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+				</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">delimitPos</span><span class="hl-code"> != -</span><span class="hl-number">1</span><span class="hl-brackets">){
+					</span><span class="hl-identifier">headerObj</span><span class="hl-brackets">[</span><span class="hl-identifier">header</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">substring</span><span class="hl-brackets">(</span><span class="hl-number">0</span><span class="hl-code">,</span><span class="hl-identifier">delimitPos</span><span class="hl-brackets">)]</span><span class="hl-code"> = </span><span class="hl-identifier">header</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">substring</span><span class="hl-brackets">(</span><span class="hl-identifier">delimitPos</span><span class="hl-code">+</span><span class="hl-number">2</span><span class="hl-brackets">)</span><span class="hl-code">;
+				</span><span class="hl-brackets">}
+			}
+		}
+		</span><span class="hl-reserved">catch</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-brackets">){}
+
+		</span><span class="hl-identifier">obj</span><span class="hl-code">.</span><span class="hl-identifier">tId</span><span class="hl-code"> = </span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">tId</span><span class="hl-code">;
+		</span><span class="hl-identifier">obj</span><span class="hl-code">.</span><span class="hl-identifier">status</span><span class="hl-code"> = </span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">conn</span><span class="hl-code">.</span><span class="hl-identifier">status</span><span class="hl-code">;
+		</span><span class="hl-identifier">obj</span><span class="hl-code">.</span><span class="hl-identifier">statusText</span><span class="hl-code"> = </span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">conn</span><span class="hl-code">.</span><span class="hl-identifier">statusText</span><span class="hl-code">;
+		</span><span class="hl-identifier">obj</span><span class="hl-code">.</span><span class="hl-identifier">getResponseHeader</span><span class="hl-code"> = </span><span class="hl-identifier">headerObj</span><span class="hl-code">;
+		</span><span class="hl-identifier">obj</span><span class="hl-code">.</span><span class="hl-identifier">getAllResponseHeaders</span><span class="hl-code"> = </span><span class="hl-identifier">headerStr</span><span class="hl-code">;
+		</span><span class="hl-identifier">obj</span><span class="hl-code">.</span><span class="hl-identifier">responseText</span><span class="hl-code"> = </span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">conn</span><span class="hl-code">.</span><span class="hl-identifier">responseText</span><span class="hl-code">;
+		</span><span class="hl-identifier">obj</span><span class="hl-code">.</span><span class="hl-identifier">responseXML</span><span class="hl-code"> = </span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">conn</span><span class="hl-code">.</span><span class="hl-identifier">responseXML</span><span class="hl-code">;
+
+		</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">callbackArg</span><span class="hl-code"> !== </span><span class="hl-identifier">undefined</span><span class="hl-brackets">){
+			</span><span class="hl-identifier">obj</span><span class="hl-code">.</span><span class="hl-identifier">argument</span><span class="hl-code"> = </span><span class="hl-identifier">callbackArg</span><span class="hl-code">;
+		</span><span class="hl-brackets">}
+
+		</span><span class="hl-reserved">return </span><span class="hl-identifier">obj</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+  </span><span class="hl-comment">/**
+   * @description If a transaction cannot be completed due to dropped or closed connections,
+   * there may be not be enough information to build a full response object.
+   * The failure callback will be fired and this specific condition can be identified
+   * by a status property value of 0.
+   *
+   * If an abort was successful, the status property will report a value of -1.
+   *
+   * @method createExceptionObject
+   * @private
+   * @static
+   * @param {int} tId The Transaction Id
+   * @param {callbackArg} callbackArg The user-defined argument or arguments to be passed to the callback
+   * @param {boolean} isAbort Determines if the exception case is caused by a transaction abort
+   * @return {object}
+   */
+    </span><span class="hl-identifier">createExceptionObject</span><span class="hl-code">:</span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">tId</span><span class="hl-code">, </span><span class="hl-identifier">callbackArg</span><span class="hl-code">, </span><span class="hl-identifier">isAbort</span><span class="hl-brackets">)
+    {
+		</span><span class="hl-reserved">var </span><span class="hl-identifier">COMM_CODE</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">;
+		</span><span class="hl-reserved">var </span><span class="hl-identifier">COMM_ERROR</span><span class="hl-code"> = </span><span class="hl-quotes">'</span><span class="hl-string">communication failure</span><span class="hl-quotes">'</span><span class="hl-code">;
+		</span><span class="hl-reserved">var </span><span class="hl-identifier">ABORT_CODE</span><span class="hl-code"> = -</span><span class="hl-number">1</span><span class="hl-code">;
+		</span><span class="hl-reserved">var </span><span class="hl-identifier">ABORT_ERROR</span><span class="hl-code"> = </span><span class="hl-quotes">'</span><span class="hl-string">transaction aborted</span><span class="hl-quotes">'</span><span class="hl-code">;
+
+		</span><span class="hl-reserved">var </span><span class="hl-identifier">obj</span><span class="hl-code"> = </span><span class="hl-brackets">{}</span><span class="hl-code">;
+
+		</span><span class="hl-identifier">obj</span><span class="hl-code">.</span><span class="hl-identifier">tId</span><span class="hl-code"> = </span><span class="hl-identifier">tId</span><span class="hl-code">;
+		</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">isAbort</span><span class="hl-brackets">){
+			</span><span class="hl-identifier">obj</span><span class="hl-code">.</span><span class="hl-identifier">status</span><span class="hl-code"> = </span><span class="hl-identifier">ABORT_CODE</span><span class="hl-code">;
+			</span><span class="hl-identifier">obj</span><span class="hl-code">.</span><span class="hl-identifier">statusText</span><span class="hl-code"> = </span><span class="hl-identifier">ABORT_ERROR</span><span class="hl-code">;
+		</span><span class="hl-brackets">}
+		</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+			</span><span class="hl-identifier">obj</span><span class="hl-code">.</span><span class="hl-identifier">status</span><span class="hl-code"> = </span><span class="hl-identifier">COMM_CODE</span><span class="hl-code">;
+			</span><span class="hl-identifier">obj</span><span class="hl-code">.</span><span class="hl-identifier">statusText</span><span class="hl-code"> = </span><span class="hl-identifier">COMM_ERROR</span><span class="hl-code">;
+		</span><span class="hl-brackets">}
+
+		</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">callbackArg</span><span class="hl-brackets">){
+			</span><span class="hl-identifier">obj</span><span class="hl-code">.</span><span class="hl-identifier">argument</span><span class="hl-code"> = </span><span class="hl-identifier">callbackArg</span><span class="hl-code">;
+		</span><span class="hl-brackets">}
+
+		</span><span class="hl-reserved">return </span><span class="hl-identifier">obj</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+  </span><span class="hl-comment">/**
+   * @description Public method that stores the custom HTTP headers for each transaction.
+   * @method initHeader
+   * @public
+   * @static
+   * @param {string} label The HTTP header label
+   * @param {string} value The HTTP header value
+   * @return {void}
+   */
+	</span><span class="hl-identifier">initHeader</span><span class="hl-code">:</span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-reserved">label</span><span class="hl-code">,</span><span class="hl-identifier">value</span><span class="hl-brackets">)
+	{
+		</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_http_header</span><span class="hl-brackets">[</span><span class="hl-reserved">label</span><span class="hl-brackets">]</span><span class="hl-code"> === </span><span class="hl-identifier">undefined</span><span class="hl-brackets">){
+			</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_http_header</span><span class="hl-brackets">[</span><span class="hl-reserved">label</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-identifier">value</span><span class="hl-code">;
+		</span><span class="hl-brackets">}
+		</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+			</span><span class="hl-comment">// Concatenate multiple values, comma-delimited,
+			// for the same header label,
+			</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_http_header</span><span class="hl-brackets">[</span><span class="hl-reserved">label</span><span class="hl-brackets">]</span><span class="hl-code"> =  </span><span class="hl-identifier">value</span><span class="hl-code"> + </span><span class="hl-quotes">&quot;</span><span class="hl-string">,</span><span class="hl-quotes">&quot;</span><span class="hl-code"> + </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_http_header</span><span class="hl-brackets">[</span><span class="hl-reserved">label</span><span class="hl-brackets">]</span><span class="hl-code">;
+		</span><span class="hl-brackets">}
+
+		</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_has_http_headers</span><span class="hl-code"> = </span><span class="hl-reserved">true</span><span class="hl-code">;
+	</span><span class="hl-brackets">}</span><span class="hl-code">,
+
+  </span><span class="hl-comment">/**
+   * @description Accessor that sets the HTTP headers for each transaction.
+   * @method setHeader
+   * @private
+   * @static
+   * @param {object} o The connection object for the transaction.
+   * @return {void}
+   */
+	</span><span class="hl-identifier">setHeader</span><span class="hl-code">:</span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">o</span><span class="hl-brackets">)
+	{
+		</span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">prop </span><span class="hl-reserved">in this</span><span class="hl-code">.</span><span class="hl-identifier">_http_header</span><span class="hl-brackets">){
+			</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_http_header</span><span class="hl-code">.</span><span class="hl-identifier">hasOwnProperty</span><span class="hl-brackets">(</span><span class="hl-identifier">prop</span><span class="hl-brackets">)){
+				</span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">conn</span><span class="hl-code">.</span><span class="hl-identifier">setRequestHeader</span><span class="hl-brackets">(</span><span class="hl-identifier">prop</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_http_header</span><span class="hl-brackets">[</span><span class="hl-identifier">prop</span><span class="hl-brackets">])</span><span class="hl-code">;
+			</span><span class="hl-brackets">}
+		}
+		</span><span class="hl-reserved">delete this</span><span class="hl-code">.</span><span class="hl-identifier">_http_header</span><span class="hl-code">;
+
+		</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_http_header</span><span class="hl-code"> = </span><span class="hl-brackets">{}</span><span class="hl-code">;
+		</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_has_http_headers</span><span class="hl-code"> = </span><span class="hl-reserved">false</span><span class="hl-code">;
+	</span><span class="hl-brackets">}</span><span class="hl-code">,
+
+  </span><span class="hl-comment">/**
+   * @description This method assembles the form label and value pairs and
+   * constructs an encoded string.
+   * asyncRequest() will automatically initialize the
+   * transaction with a HTTP header Content-Type of
+   * application/x-www-form-urlencoded.
+   * @method setForm
+   * @public
+   * @static
+   * @param {string || object} form id or name attribute, or form object.
+   * @param {string} optional boolean to indicate SSL environment.
+   * @param {string || boolean} optional qualified path of iframe resource for SSL in IE.
+   * @return {string} string of the HTML form field name and value pairs..
+   */
+	</span><span class="hl-identifier">setForm</span><span class="hl-code">:</span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">formId</span><span class="hl-code">, </span><span class="hl-identifier">isUpload</span><span class="hl-code">, </span><span class="hl-identifier">secureUri</span><span class="hl-brackets">)
+	{
+		</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">resetFormState</span><span class="hl-brackets">()</span><span class="hl-code">;
+		</span><span class="hl-reserved">var </span><span class="hl-identifier">oForm</span><span class="hl-code">;
+		</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">formId</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">string</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+			</span><span class="hl-comment">// Determine if the argument is a form id or a form name.
+			// Note form name usage is deprecated by supported
+			// here for legacy reasons.
+			</span><span class="hl-identifier">oForm</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">getElementById</span><span class="hl-brackets">(</span><span class="hl-identifier">formId</span><span class="hl-brackets">)</span><span class="hl-code"> || </span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">forms</span><span class="hl-brackets">[</span><span class="hl-identifier">formId</span><span class="hl-brackets">])</span><span class="hl-code">;
+		</span><span class="hl-brackets">}
+		</span><span class="hl-reserved">else if</span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">formId</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">object</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+			</span><span class="hl-comment">// Treat argument as an HTML form object.
+			</span><span class="hl-identifier">oForm</span><span class="hl-code"> = </span><span class="hl-identifier">formId</span><span class="hl-code">;
+		</span><span class="hl-brackets">}
+		</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+			</span><span class="hl-reserved">return</span><span class="hl-code">;
+		</span><span class="hl-brackets">}
+
+		</span><span class="hl-comment">// If the isUpload argument is true, setForm will call createFrame to initialize
+		// an iframe as the form target.
+		//
+		// The argument secureURI is also required by IE in SSL environments
+		// where the secureURI string is a fully qualified HTTP path, used to set the source
+		// of the iframe, to a stub resource in the same domain.
+		</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">isUpload</span><span class="hl-brackets">){
+
+			</span><span class="hl-comment">// Create iframe in preparation for file upload.
+			</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">createFrame</span><span class="hl-brackets">(</span><span class="hl-identifier">secureUri</span><span class="hl-code">?</span><span class="hl-identifier">secureUri</span><span class="hl-code">:</span><span class="hl-reserved">null</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+			</span><span class="hl-comment">// Set form reference and file upload properties to true.
+			</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_isFormSubmit</span><span class="hl-code"> = </span><span class="hl-reserved">true</span><span class="hl-code">;
+			</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_isFileUpload</span><span class="hl-code"> = </span><span class="hl-reserved">true</span><span class="hl-code">;
+			</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_formNode</span><span class="hl-code"> = </span><span class="hl-identifier">oForm</span><span class="hl-code">;
+
+			</span><span class="hl-reserved">return</span><span class="hl-code">;
+		</span><span class="hl-brackets">}
+
+		</span><span class="hl-reserved">var </span><span class="hl-identifier">oElement</span><span class="hl-code">, </span><span class="hl-identifier">oName</span><span class="hl-code">, </span><span class="hl-identifier">oValue</span><span class="hl-code">, </span><span class="hl-identifier">oDisabled</span><span class="hl-code">;
+		</span><span class="hl-reserved">var </span><span class="hl-identifier">hasSubmit</span><span class="hl-code"> = </span><span class="hl-reserved">false</span><span class="hl-code">;
+
+		</span><span class="hl-comment">// Iterate over the form elements collection to construct the
+		// label-value pairs.
+		</span><span class="hl-reserved">for </span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code">=</span><span class="hl-number">0</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code">&lt;</span><span class="hl-identifier">oForm</span><span class="hl-code">.</span><span class="hl-identifier">elements</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code">++</span><span class="hl-brackets">){
+			</span><span class="hl-identifier">oElement</span><span class="hl-code"> = </span><span class="hl-identifier">oForm</span><span class="hl-code">.</span><span class="hl-identifier">elements</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">;
+			</span><span class="hl-identifier">oDisabled</span><span class="hl-code"> = </span><span class="hl-identifier">oForm</span><span class="hl-code">.</span><span class="hl-identifier">elements</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">disabled</span><span class="hl-code">;
+			</span><span class="hl-identifier">oName</span><span class="hl-code"> = </span><span class="hl-identifier">oForm</span><span class="hl-code">.</span><span class="hl-identifier">elements</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">name</span><span class="hl-code">;
+			</span><span class="hl-identifier">oValue</span><span class="hl-code"> = </span><span class="hl-identifier">oForm</span><span class="hl-code">.</span><span class="hl-identifier">elements</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">value</span><span class="hl-code">;
+
+			</span><span class="hl-comment">// Do not submit fields that are disabled or
+			// do not have a name attribute value.
+			</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">oDisabled</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">oName</span><span class="hl-brackets">)
+			{
+				</span><span class="hl-reserved">switch </span><span class="hl-brackets">(</span><span class="hl-identifier">oElement</span><span class="hl-code">.</span><span class="hl-identifier">type</span><span class="hl-brackets">)
+				{
+					</span><span class="hl-reserved">case </span><span class="hl-quotes">'</span><span class="hl-string">select-one</span><span class="hl-quotes">'</span><span class="hl-code">:
+					</span><span class="hl-reserved">case </span><span class="hl-quotes">'</span><span class="hl-string">select-multiple</span><span class="hl-quotes">'</span><span class="hl-code">:
+						</span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">j</span><span class="hl-code">=</span><span class="hl-number">0</span><span class="hl-code">; </span><span class="hl-identifier">j</span><span class="hl-code">&lt;</span><span class="hl-identifier">oElement</span><span class="hl-code">.</span><span class="hl-identifier">options</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; </span><span class="hl-identifier">j</span><span class="hl-code">++</span><span class="hl-brackets">){
+							</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">oElement</span><span class="hl-code">.</span><span class="hl-identifier">options</span><span class="hl-brackets">[</span><span class="hl-identifier">j</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">selected</span><span class="hl-brackets">){
+								</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-builtin">window</span><span class="hl-code">.</span><span class="hl-identifier">ActiveXObject</span><span class="hl-brackets">){
+									</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_sFormData</span><span class="hl-code"> += </span><span class="hl-identifier">encodeURIComponent</span><span class="hl-brackets">(</span><span class="hl-identifier">oName</span><span class="hl-brackets">)</span><span class="hl-code"> + </span><span class="hl-quotes">'</span><span class="hl-string">=</span><span class="hl-quotes">'</span><span class="hl-code"> + </span><span class="hl-identifier">encodeURIComponent</span><span class="hl-brackets">(</span><span class="hl-identifier">oElement</span><span class="hl-code">.</span><span class="hl-identifier">options</span><span class="hl-brackets">[</span><span class="hl-identifier">j</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">attributes</span><span class="hl-brackets">[</span><span class="hl-quotes">'</span><span class="hl-string">value</span><span class="hl-quotes">'</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">specified</span><span class="hl-code">?</span><span class="hl-identifier">oElement</span><span class="hl-code">.</span><span class="hl-identifier">options</span><span class="hl-brackets">[</span><span class="hl-identifier">j</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">value</span><span class="hl-code">:</span><span class="hl-identifier">oElement</span><span class="hl-code">.</span><span class="hl-identifier">options</span><span class="hl-brackets">[</span><span class="hl-identifier">j</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">text</span><span class="hl-brackets">)</span><span class="hl-code"> + </span><span class="hl-quotes">'</span><span class="hl-string">&amp;</span><span class="hl-quotes">'</span><span class="hl-code">;
+								</span><span class="hl-brackets">}
+								</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+									</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_sFormData</span><span class="hl-code"> += </span><span class="hl-identifier">encodeURIComponent</span><span class="hl-brackets">(</span><span class="hl-identifier">oName</span><span class="hl-brackets">)</span><span class="hl-code"> + </span><span class="hl-quotes">'</span><span class="hl-string">=</span><span class="hl-quotes">'</span><span class="hl-code"> + </span><span class="hl-identifier">encodeURIComponent</span><span class="hl-brackets">(</span><span class="hl-identifier">oElement</span><span class="hl-code">.</span><span class="hl-identifier">options</span><span class="hl-brackets">[</span><span class="hl-identifier">j</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">hasAttribute</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">value</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">?</span><span class="hl-identifier">oElement</span><span class="hl-code">.</span><span class="hl-identifier">options</span><span class="hl-brackets">[</span><span class="hl-identifier">j</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">value</span><span class="hl-code">:</span><span class="hl-identifier">oElement</span><span class="hl-code">.</span><span class="hl-identifier">options</span><span class="hl-brackets">[</span><span class="hl-identifier">j</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">text</span><span class="hl-brackets">)</span><span class="hl-code"> + </span><span class="hl-quotes">'</span><span class="hl-string">&amp;</span><span class="hl-quotes">'</span><span class="hl-code">;
+								</span><span class="hl-brackets">}
+
+							}
+						}
+						</span><span class="hl-reserved">break</span><span class="hl-code">;
+					</span><span class="hl-reserved">case </span><span class="hl-quotes">'</span><span class="hl-string">radio</span><span class="hl-quotes">'</span><span class="hl-code">:
+					</span><span class="hl-reserved">case </span><span class="hl-quotes">'</span><span class="hl-string">checkbox</span><span class="hl-quotes">'</span><span class="hl-code">:
+						</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">oElement</span><span class="hl-code">.</span><span class="hl-identifier">checked</span><span class="hl-brackets">){
+							</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_sFormData</span><span class="hl-code"> += </span><span class="hl-identifier">encodeURIComponent</span><span class="hl-brackets">(</span><span class="hl-identifier">oName</span><span class="hl-brackets">)</span><span class="hl-code"> + </span><span class="hl-quotes">'</span><span class="hl-string">=</span><span class="hl-quotes">'</span><span class="hl-code"> + </span><span class="hl-identifier">encodeURIComponent</span><span class="hl-brackets">(</span><span class="hl-identifier">oValue</span><span class="hl-brackets">)</span><span class="hl-code"> + </span><span class="hl-quotes">'</span><span class="hl-string">&amp;</span><span class="hl-quotes">'</span><span class="hl-code">;
+						</span><span class="hl-brackets">}
+						</span><span class="hl-reserved">break</span><span class="hl-code">;
+					</span><span class="hl-reserved">case </span><span class="hl-quotes">'</span><span class="hl-string">file</span><span class="hl-quotes">'</span><span class="hl-code">:
+						</span><span class="hl-comment">// stub case as XMLHttpRequest will only send the file path as a string.
+					</span><span class="hl-reserved">case </span><span class="hl-identifier">undefined</span><span class="hl-code">:
+						</span><span class="hl-comment">// stub case for fieldset element which returns undefined.
+					</span><span class="hl-reserved">case </span><span class="hl-quotes">'</span><span class="hl-string">reset</span><span class="hl-quotes">'</span><span class="hl-code">:
+						</span><span class="hl-comment">// stub case for input type reset button.
+					</span><span class="hl-reserved">case </span><span class="hl-quotes">'</span><span class="hl-string">button</span><span class="hl-quotes">'</span><span class="hl-code">:
+						</span><span class="hl-comment">// stub case for input type button elements.
+						</span><span class="hl-reserved">break</span><span class="hl-code">;
+					</span><span class="hl-reserved">case </span><span class="hl-quotes">'</span><span class="hl-string">submit</span><span class="hl-quotes">'</span><span class="hl-code">:
+						</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">hasSubmit</span><span class="hl-code"> == </span><span class="hl-reserved">false</span><span class="hl-brackets">){
+							</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_sFormData</span><span class="hl-code"> += </span><span class="hl-identifier">encodeURIComponent</span><span class="hl-brackets">(</span><span class="hl-identifier">oName</span><span class="hl-brackets">)</span><span class="hl-code"> + </span><span class="hl-quotes">'</span><span class="hl-string">=</span><span class="hl-quotes">'</span><span class="hl-code"> + </span><span class="hl-identifier">encodeURIComponent</span><span class="hl-brackets">(</span><span class="hl-identifier">oValue</span><span class="hl-brackets">)</span><span class="hl-code"> + </span><span class="hl-quotes">'</span><span class="hl-string">&amp;</span><span class="hl-quotes">'</span><span class="hl-code">;
+							</span><span class="hl-identifier">hasSubmit</span><span class="hl-code"> = </span><span class="hl-reserved">true</span><span class="hl-code">;
+						</span><span class="hl-brackets">}
+						</span><span class="hl-reserved">break</span><span class="hl-code">;
+					</span><span class="hl-reserved">default</span><span class="hl-code">:
+						</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_sFormData</span><span class="hl-code"> += </span><span class="hl-identifier">encodeURIComponent</span><span class="hl-brackets">(</span><span class="hl-identifier">oName</span><span class="hl-brackets">)</span><span class="hl-code"> + </span><span class="hl-quotes">'</span><span class="hl-string">=</span><span class="hl-quotes">'</span><span class="hl-code"> + </span><span class="hl-identifier">encodeURIComponent</span><span class="hl-brackets">(</span><span class="hl-identifier">oValue</span><span class="hl-brackets">)</span><span class="hl-code"> + </span><span class="hl-quotes">'</span><span class="hl-string">&amp;</span><span class="hl-quotes">'</span><span class="hl-code">;
+						</span><span class="hl-reserved">break</span><span class="hl-code">;
+				</span><span class="hl-brackets">}
+			}
+		}
+
+		</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_isFormSubmit</span><span class="hl-code"> = </span><span class="hl-reserved">true</span><span class="hl-code">;
+		</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_sFormData</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_sFormData</span><span class="hl-code">.</span><span class="hl-identifier">substr</span><span class="hl-brackets">(</span><span class="hl-number">0</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_sFormData</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code"> - </span><span class="hl-number">1</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+		</span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">_sFormData</span><span class="hl-code">;
+	</span><span class="hl-brackets">}</span><span class="hl-code">,
+
+  </span><span class="hl-comment">/**
+   * @description Resets HTML form properties when an HTML form or HTML form
+   * with file upload transaction is sent.
+   * @method resetFormState
+   * @private
+   * @static
+   * @return {void}
+   */
+	</span><span class="hl-identifier">resetFormState</span><span class="hl-code">:</span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+		</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_isFormSubmit</span><span class="hl-code"> = </span><span class="hl-reserved">false</span><span class="hl-code">;
+		</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_isFileUpload</span><span class="hl-code"> = </span><span class="hl-reserved">false</span><span class="hl-code">;
+		</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_formNode</span><span class="hl-code"> = </span><span class="hl-reserved">null</span><span class="hl-code">;
+		</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_sFormData</span><span class="hl-code"> = </span><span class="hl-quotes">&quot;&quot;</span><span class="hl-code">;
+	</span><span class="hl-brackets">}</span><span class="hl-code">,
+
+  </span><span class="hl-comment">/**
+   * @description Creates an iframe to be used for form file uploads.  It is remove from the
+   * document upon completion of the upload transaction.
+   * @method createFrame
+   * @private
+   * @static
+   * @param {string} secureUri Optional qualified path of iframe resource for SSL in IE.
+   * @return {void}
+   */
+	</span><span class="hl-identifier">createFrame</span><span class="hl-code">:</span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">secureUri</span><span class="hl-brackets">){
+
+		</span><span class="hl-comment">// IE does not allow the setting of id and name attributes as object
+		// properties via createElement().  A different iframe creation
+		// pattern is required for IE.
+		</span><span class="hl-reserved">var </span><span class="hl-identifier">frameId</span><span class="hl-code"> = </span><span class="hl-quotes">'</span><span class="hl-string">yuiIO</span><span class="hl-quotes">'</span><span class="hl-code"> + </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_transaction_id</span><span class="hl-code">;
+		</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-builtin">window</span><span class="hl-code">.</span><span class="hl-identifier">ActiveXObject</span><span class="hl-brackets">){
+			</span><span class="hl-reserved">var </span><span class="hl-identifier">io</span><span class="hl-code"> = </span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">createElement</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">&lt;iframe id=&quot;</span><span class="hl-quotes">'</span><span class="hl-code"> + </span><span class="hl-identifier">frameId</span><span class="hl-code"> + </span><span class="hl-quotes">'</span><span class="hl-string">&quot; name=&quot;</span><span class="hl-quotes">'</span><span class="hl-code"> + </span><span class="hl-identifier">frameId</span><span class="hl-code"> + </span><span class="hl-quotes">'</span><span class="hl-string">&quot; /&gt;</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+			</span><span class="hl-comment">// IE will throw a security exception in an SSL environment if the
+			// iframe source is undefined.
+			</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">secureUri</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">boolean</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+				</span><span class="hl-identifier">io</span><span class="hl-code">.</span><span class="hl-identifier">src</span><span class="hl-code"> = </span><span class="hl-quotes">'</span><span class="hl-string">javascript:false</span><span class="hl-quotes">'</span><span class="hl-code">;
+			</span><span class="hl-brackets">}
+			</span><span class="hl-reserved">else if</span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">secureURI</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">string</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+				</span><span class="hl-comment">// Deprecated
+				</span><span class="hl-identifier">io</span><span class="hl-code">.</span><span class="hl-identifier">src</span><span class="hl-code"> = </span><span class="hl-identifier">secureUri</span><span class="hl-code">;
+			</span><span class="hl-brackets">}
+		}
+		</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+			</span><span class="hl-reserved">var </span><span class="hl-identifier">io</span><span class="hl-code"> = </span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">createElement</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">iframe</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+			</span><span class="hl-identifier">io</span><span class="hl-code">.</span><span class="hl-identifier">id</span><span class="hl-code"> = </span><span class="hl-identifier">frameId</span><span class="hl-code">;
+			</span><span class="hl-identifier">io</span><span class="hl-code">.</span><span class="hl-identifier">name</span><span class="hl-code"> = </span><span class="hl-identifier">frameId</span><span class="hl-code">;
+		</span><span class="hl-brackets">}
+
+		</span><span class="hl-identifier">io</span><span class="hl-code">.</span><span class="hl-identifier">style</span><span class="hl-code">.</span><span class="hl-identifier">position</span><span class="hl-code"> = </span><span class="hl-quotes">'</span><span class="hl-string">absolute</span><span class="hl-quotes">'</span><span class="hl-code">;
+		</span><span class="hl-identifier">io</span><span class="hl-code">.</span><span class="hl-identifier">style</span><span class="hl-code">.</span><span class="hl-identifier">top</span><span class="hl-code"> = </span><span class="hl-quotes">'</span><span class="hl-string">-1000px</span><span class="hl-quotes">'</span><span class="hl-code">;
+		</span><span class="hl-identifier">io</span><span class="hl-code">.</span><span class="hl-identifier">style</span><span class="hl-code">.</span><span class="hl-identifier">left</span><span class="hl-code"> = </span><span class="hl-quotes">'</span><span class="hl-string">-1000px</span><span class="hl-quotes">'</span><span class="hl-code">;
+
+		</span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">body</span><span class="hl-code">.</span><span class="hl-identifier">appendChild</span><span class="hl-brackets">(</span><span class="hl-identifier">io</span><span class="hl-brackets">)</span><span class="hl-code">;
+	</span><span class="hl-brackets">}</span><span class="hl-code">,
+
+  </span><span class="hl-comment">/**
+   * @description Parses the POST data and creates hidden form elements
+   * for each key-value, and appends them to the HTML form object.
+   * @method appendPostData
+   * @private
+   * @static
+   * @param {string} postData The HTTP POST data
+   * @return {array} formElements Collection of hidden fields.
+   */
+	</span><span class="hl-identifier">appendPostData</span><span class="hl-code">:</span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">postData</span><span class="hl-brackets">)
+	{
+		</span><span class="hl-reserved">var </span><span class="hl-identifier">formElements</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-builtin">Array</span><span class="hl-brackets">()</span><span class="hl-code">;
+		</span><span class="hl-reserved">var </span><span class="hl-identifier">postMessage</span><span class="hl-code"> = </span><span class="hl-identifier">postData</span><span class="hl-code">.</span><span class="hl-identifier">split</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">&amp;</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+		</span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code">=</span><span class="hl-number">0</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code"> &lt; </span><span class="hl-identifier">postMessage</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code">++</span><span class="hl-brackets">){
+			</span><span class="hl-reserved">var </span><span class="hl-identifier">delimitPos</span><span class="hl-code"> = </span><span class="hl-identifier">postMessage</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">indexOf</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">=</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+			</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">delimitPos</span><span class="hl-code"> != -</span><span class="hl-number">1</span><span class="hl-brackets">){
+				</span><span class="hl-identifier">formElements</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">createElement</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">input</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+				</span><span class="hl-identifier">formElements</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">type</span><span class="hl-code"> = </span><span class="hl-quotes">'</span><span class="hl-string">hidden</span><span class="hl-quotes">'</span><span class="hl-code">;
+				</span><span class="hl-identifier">formElements</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">name</span><span class="hl-code"> = </span><span class="hl-identifier">postMessage</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">substring</span><span class="hl-brackets">(</span><span class="hl-number">0</span><span class="hl-code">,</span><span class="hl-identifier">delimitPos</span><span class="hl-brackets">)</span><span class="hl-code">;
+				</span><span class="hl-identifier">formElements</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">value</span><span class="hl-code"> = </span><span class="hl-identifier">postMessage</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">substring</span><span class="hl-brackets">(</span><span class="hl-identifier">delimitPos</span><span class="hl-code">+</span><span class="hl-number">1</span><span class="hl-brackets">)</span><span class="hl-code">;
+				</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_formNode</span><span class="hl-code">.</span><span class="hl-identifier">appendChild</span><span class="hl-brackets">(</span><span class="hl-identifier">formElements</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">])</span><span class="hl-code">;
+			</span><span class="hl-brackets">}
+		}
+
+		</span><span class="hl-reserved">return </span><span class="hl-identifier">formElements</span><span class="hl-code">;
+	</span><span class="hl-brackets">}</span><span class="hl-code">,
+
+  </span><span class="hl-comment">/**
+   * @description Uploads HTML form, including files/attachments, to the
+   * iframe created in createFrame.
+   * @method uploadFile
+   * @private
+   * @static
+   * @param {int} id The transaction id.
+   * @param {object} callback - User-defined callback object.
+   * @param {string} uri Fully qualified path of resource.
+   * @return {void}
+   */
+	</span><span class="hl-identifier">uploadFile</span><span class="hl-code">:</span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">id</span><span class="hl-code">, </span><span class="hl-identifier">callback</span><span class="hl-code">, </span><span class="hl-identifier">uri</span><span class="hl-code">, </span><span class="hl-identifier">postData</span><span class="hl-brackets">){
+
+		</span><span class="hl-comment">// Each iframe has an id prefix of &quot;yuiIO&quot; followed
+		// by the unique transaction id.
+		</span><span class="hl-reserved">var </span><span class="hl-identifier">frameId</span><span class="hl-code"> = </span><span class="hl-quotes">'</span><span class="hl-string">yuiIO</span><span class="hl-quotes">'</span><span class="hl-code"> + </span><span class="hl-identifier">id</span><span class="hl-code">;
+		</span><span class="hl-reserved">var </span><span class="hl-identifier">io</span><span class="hl-code"> = </span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">getElementById</span><span class="hl-brackets">(</span><span class="hl-identifier">frameId</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+		</span><span class="hl-comment">// Initialize the HTML form properties in case they are
+		// not defined in the HTML form.
+		</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_formNode</span><span class="hl-code">.</span><span class="hl-identifier">action</span><span class="hl-code"> = </span><span class="hl-identifier">uri</span><span class="hl-code">;
+		</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_formNode</span><span class="hl-code">.</span><span class="hl-identifier">method</span><span class="hl-code"> = </span><span class="hl-quotes">'</span><span class="hl-string">POST</span><span class="hl-quotes">'</span><span class="hl-code">;
+		</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_formNode</span><span class="hl-code">.</span><span class="hl-identifier">target</span><span class="hl-code"> = </span><span class="hl-identifier">frameId</span><span class="hl-code">;
+
+		</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_formNode</span><span class="hl-code">.</span><span class="hl-identifier">encoding</span><span class="hl-brackets">){
+			</span><span class="hl-comment">// IE does not respect property enctype for HTML forms.
+			// Instead use property encoding.
+			</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_formNode</span><span class="hl-code">.</span><span class="hl-identifier">encoding</span><span class="hl-code"> = </span><span class="hl-quotes">'</span><span class="hl-string">multipart/form-data</span><span class="hl-quotes">'</span><span class="hl-code">;
+		</span><span class="hl-brackets">}
+		</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+			</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_formNode</span><span class="hl-code">.</span><span class="hl-identifier">enctype</span><span class="hl-code"> = </span><span class="hl-quotes">'</span><span class="hl-string">multipart/form-data</span><span class="hl-quotes">'</span><span class="hl-code">;
+		</span><span class="hl-brackets">}
+
+		</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">postData</span><span class="hl-brackets">){
+			</span><span class="hl-reserved">var </span><span class="hl-identifier">oElements</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">appendPostData</span><span class="hl-brackets">(</span><span class="hl-identifier">postData</span><span class="hl-brackets">)</span><span class="hl-code">;
+		</span><span class="hl-brackets">}
+
+		</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_formNode</span><span class="hl-code">.</span><span class="hl-identifier">submit</span><span class="hl-brackets">()</span><span class="hl-code">;
+
+		</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">oElements</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">oElements</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code"> &gt; </span><span class="hl-number">0</span><span class="hl-brackets">){
+			</span><span class="hl-reserved">try
+			</span><span class="hl-brackets">{
+				</span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code">=</span><span class="hl-number">0</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code"> &lt; </span><span class="hl-identifier">oElements</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code">++</span><span class="hl-brackets">){
+					</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_formNode</span><span class="hl-code">.</span><span class="hl-identifier">removeChild</span><span class="hl-brackets">(</span><span class="hl-identifier">oElements</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">])</span><span class="hl-code">;
+				</span><span class="hl-brackets">}
+			}
+			</span><span class="hl-reserved">catch</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-brackets">){}
+		}
+
+		</span><span class="hl-comment">// Reset HTML form status properties.
+		</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">resetFormState</span><span class="hl-brackets">()</span><span class="hl-code">;
+
+		</span><span class="hl-comment">// Create the upload callback handler that fires when the iframe
+		// receives the load event.  Subsequently, the event handler is detached
+		// and the iframe removed from the document.
+
+		</span><span class="hl-reserved">var </span><span class="hl-identifier">uploadCallback</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">()
+		{
+			</span><span class="hl-reserved">var </span><span class="hl-identifier">obj</span><span class="hl-code"> = </span><span class="hl-brackets">{}</span><span class="hl-code">;
+			</span><span class="hl-identifier">obj</span><span class="hl-code">.</span><span class="hl-identifier">tId</span><span class="hl-code"> = </span><span class="hl-identifier">id</span><span class="hl-code">;
+			</span><span class="hl-identifier">obj</span><span class="hl-code">.</span><span class="hl-identifier">argument</span><span class="hl-code"> = </span><span class="hl-identifier">callback</span><span class="hl-code">.</span><span class="hl-identifier">argument</span><span class="hl-code">;
+
+			</span><span class="hl-reserved">try
+			</span><span class="hl-brackets">{
+				</span><span class="hl-identifier">obj</span><span class="hl-code">.</span><span class="hl-identifier">responseText</span><span class="hl-code"> = </span><span class="hl-identifier">io</span><span class="hl-code">.</span><span class="hl-identifier">contentWindow</span><span class="hl-code">.</span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">body</span><span class="hl-code">?</span><span class="hl-identifier">io</span><span class="hl-code">.</span><span class="hl-identifier">contentWindow</span><span class="hl-code">.</span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">body</span><span class="hl-code">.</span><span class="hl-identifier">innerHTML</span><span class="hl-code">:</span><span class="hl-reserved">null</span><span class="hl-code">;
+				</span><span class="hl-identifier">obj</span><span class="hl-code">.</span><span class="hl-identifier">responseXML</span><span class="hl-code"> = </span><span class="hl-identifier">io</span><span class="hl-code">.</span><span class="hl-identifier">contentWindow</span><span class="hl-code">.</span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">XMLDocument</span><span class="hl-code">?</span><span class="hl-identifier">io</span><span class="hl-code">.</span><span class="hl-identifier">contentWindow</span><span class="hl-code">.</span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">XMLDocument</span><span class="hl-code">:</span><span class="hl-identifier">io</span><span class="hl-code">.</span><span class="hl-identifier">contentWindow</span><span class="hl-code">.</span><span class="hl-builtin">document</span><span class="hl-code">;
+			</span><span class="hl-brackets">}
+			</span><span class="hl-reserved">catch</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-brackets">){}
+
+			</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">callback</span><span class="hl-code">.</span><span class="hl-identifier">upload</span><span class="hl-brackets">){
+				</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">callback</span><span class="hl-code">.</span><span class="hl-identifier">scope</span><span class="hl-brackets">){
+					</span><span class="hl-identifier">callback</span><span class="hl-code">.</span><span class="hl-identifier">upload</span><span class="hl-brackets">(</span><span class="hl-identifier">obj</span><span class="hl-brackets">)</span><span class="hl-code">;
+				</span><span class="hl-brackets">}
+				</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+					</span><span class="hl-identifier">callback</span><span class="hl-code">.</span><span class="hl-identifier">upload</span><span class="hl-code">.</span><span class="hl-identifier">apply</span><span class="hl-brackets">(</span><span class="hl-identifier">callback</span><span class="hl-code">.</span><span class="hl-identifier">scope</span><span class="hl-code">, </span><span class="hl-brackets">[</span><span class="hl-identifier">obj</span><span class="hl-brackets">])</span><span class="hl-code">;
+				</span><span class="hl-brackets">}
+			}
+
+			</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Event</span><span class="hl-brackets">){
+				</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Event</span><span class="hl-code">.</span><span class="hl-identifier">removeListener</span><span class="hl-brackets">(</span><span class="hl-identifier">io</span><span class="hl-code">, </span><span class="hl-quotes">&quot;</span><span class="hl-string">load</span><span class="hl-quotes">&quot;</span><span class="hl-code">, </span><span class="hl-identifier">uploadCallback</span><span class="hl-brackets">)</span><span class="hl-code">;
+			</span><span class="hl-brackets">}
+			</span><span class="hl-reserved">else if</span><span class="hl-brackets">(</span><span class="hl-builtin">window</span><span class="hl-code">.</span><span class="hl-identifier">detachEvent</span><span class="hl-brackets">){
+				</span><span class="hl-identifier">io</span><span class="hl-code">.</span><span class="hl-identifier">detachEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">onload</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-identifier">uploadCallback</span><span class="hl-brackets">)</span><span class="hl-code">;
+			</span><span class="hl-brackets">}
+			</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+				</span><span class="hl-identifier">io</span><span class="hl-code">.</span><span class="hl-identifier">removeEventListener</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">load</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-identifier">uploadCallback</span><span class="hl-code">, </span><span class="hl-reserved">false</span><span class="hl-brackets">)</span><span class="hl-code">;
+			</span><span class="hl-brackets">}
+			</span><span class="hl-identifier">setTimeout</span><span class="hl-brackets">(</span><span class="hl-reserved">function</span><span class="hl-brackets">(){ </span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">body</span><span class="hl-code">.</span><span class="hl-identifier">removeChild</span><span class="hl-brackets">(</span><span class="hl-identifier">io</span><span class="hl-brackets">)</span><span class="hl-code">; </span><span class="hl-brackets">}</span><span class="hl-code">, </span><span class="hl-number">100</span><span class="hl-brackets">)</span><span class="hl-code">;
+		</span><span class="hl-brackets">}</span><span class="hl-code">;
+
+
+		</span><span class="hl-comment">// Bind the onload handler to the iframe to detect the file upload response.
+		</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Event</span><span class="hl-brackets">){
+			</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Event</span><span class="hl-code">.</span><span class="hl-identifier">addListener</span><span class="hl-brackets">(</span><span class="hl-identifier">io</span><span class="hl-code">, </span><span class="hl-quotes">&quot;</span><span class="hl-string">load</span><span class="hl-quotes">&quot;</span><span class="hl-code">, </span><span class="hl-identifier">uploadCallback</span><span class="hl-brackets">)</span><span class="hl-code">;
+		</span><span class="hl-brackets">}
+		</span><span class="hl-reserved">else if</span><span class="hl-brackets">(</span><span class="hl-builtin">window</span><span class="hl-code">.</span><span class="hl-identifier">attachEvent</span><span class="hl-brackets">){
+			</span><span class="hl-identifier">io</span><span class="hl-code">.</span><span class="hl-identifier">attachEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">onload</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-identifier">uploadCallback</span><span class="hl-brackets">)</span><span class="hl-code">;
+		</span><span class="hl-brackets">}
+		</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+			</span><span class="hl-identifier">io</span><span class="hl-code">.</span><span class="hl-identifier">addEventListener</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">load</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-identifier">uploadCallback</span><span class="hl-code">, </span><span class="hl-reserved">false</span><span class="hl-brackets">)</span><span class="hl-code">;
+		</span><span class="hl-brackets">}
+	}</span><span class="hl-code">,
+
+  </span><span class="hl-comment">/**
+   * @description Method to terminate a transaction, if it has not reached readyState 4.
+   * @method abort
+   * @public
+   * @static
+   * @param {object} o The connection object returned by asyncRequest.
+   * @param {object} callback  User-defined callback object.
+   * @param {string} isTimeout boolean to indicate if abort was a timeout.
+   * @return {boolean}
+   */
+	</span><span class="hl-identifier">abort</span><span class="hl-code">:</span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">o</span><span class="hl-code">, </span><span class="hl-identifier">callback</span><span class="hl-code">, </span><span class="hl-identifier">isTimeout</span><span class="hl-brackets">)
+	{
+		</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">isCallInProgress</span><span class="hl-brackets">(</span><span class="hl-identifier">o</span><span class="hl-brackets">)){
+			</span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">conn</span><span class="hl-code">.</span><span class="hl-identifier">abort</span><span class="hl-brackets">()</span><span class="hl-code">;
+			</span><span class="hl-builtin">window</span><span class="hl-code">.</span><span class="hl-identifier">clearInterval</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_poll</span><span class="hl-brackets">[</span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">tId</span><span class="hl-brackets">])</span><span class="hl-code">;
+			</span><span class="hl-reserved">delete this</span><span class="hl-code">.</span><span class="hl-identifier">_poll</span><span class="hl-brackets">[</span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">tId</span><span class="hl-brackets">]</span><span class="hl-code">;
+			</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">isTimeout</span><span class="hl-brackets">){
+				</span><span class="hl-reserved">delete this</span><span class="hl-code">.</span><span class="hl-identifier">_timeOut</span><span class="hl-brackets">[</span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">tId</span><span class="hl-brackets">]</span><span class="hl-code">;
+			</span><span class="hl-brackets">}
+
+			</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">handleTransactionResponse</span><span class="hl-brackets">(</span><span class="hl-identifier">o</span><span class="hl-code">, </span><span class="hl-identifier">callback</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+			</span><span class="hl-reserved">return true</span><span class="hl-code">;
+		</span><span class="hl-brackets">}
+		</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+			</span><span class="hl-reserved">return false</span><span class="hl-code">;
+		</span><span class="hl-brackets">}
+	}</span><span class="hl-code">,
+
+  </span><span class="hl-comment">/**
+   * Public method to check if the transaction is still being processed.
+   *
+   * @method isCallInProgress
+   * @public
+   * @static
+   * @param {object} o The connection object returned by asyncRequest
+   * @return {boolean}
+   */
+	</span><span class="hl-identifier">isCallInProgress</span><span class="hl-code">:</span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">o</span><span class="hl-brackets">)
+	{
+		</span><span class="hl-comment">// if the XHR object assigned to the transaction has not been dereferenced,
+		// then check its readyState status.  Otherwise, return false.
+		</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">conn</span><span class="hl-brackets">){
+			</span><span class="hl-reserved">return </span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">conn</span><span class="hl-code">.</span><span class="hl-identifier">readyState</span><span class="hl-code"> != </span><span class="hl-number">4</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">conn</span><span class="hl-code">.</span><span class="hl-identifier">readyState</span><span class="hl-code"> != </span><span class="hl-number">0</span><span class="hl-code">;
+		</span><span class="hl-brackets">}
+		</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+			</span><span class="hl-comment">//The XHR object has been destroyed.
+			</span><span class="hl-reserved">return false</span><span class="hl-code">;
+		</span><span class="hl-brackets">}
+	}</span><span class="hl-code">,
+
+  </span><span class="hl-comment">/**
+   * @description Dereference the XHR instance and the connection object after the transaction is completed.
+   * @method releaseObject
+   * @private
+   * @static
+   * @param {object} o The connection object
+   * @return {void}
+   */
+	</span><span class="hl-identifier">releaseObject</span><span class="hl-code">:</span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">o</span><span class="hl-brackets">)
+	{
+		</span><span class="hl-comment">//dereference the XHR instance.
+		</span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">conn</span><span class="hl-code"> = </span><span class="hl-reserved">null</span><span class="hl-code">;
+		</span><span class="hl-comment">//dereference the connection object.
+		</span><span class="hl-identifier">o</span><span class="hl-code"> = </span><span class="hl-reserved">null</span><span class="hl-code">;
+	</span><span class="hl-brackets">}
+}</span><span class="hl-default">;</span></pre></div><hr>Copyright &copy; 2006 Jack Slocum. All rights reserved.</body></html>

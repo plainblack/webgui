@@ -1,0 +1,448 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.util.Easing</title>
+        <link rel="stylesheet" type="text/css" href="../reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.util.Easing.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.util.Easing</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.util</td></tr>
+            <tr><td class="label">Class:</td><td>Easing</td></tr>
+                        <tr><td class="label">Extends:</td><td>Object</td></tr>
+                                    <tr><td class="label">Defined In:</td><td><a href="animation.js.html">animation.js</a></td></tr>
+        </table>
+        <div class="description">
+            Singleton that determines how an animation proceeds from start to end.        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+        <div class="no-members">This class has no public properties.</div>        <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#backBoth">backBoth</a>(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>, <span class="optional" title="Optional">[<code>Number s</code>]</span>) : Number</td>
+        <td class="msource" rowspan="2">Easing</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Backtracks slightly, then reverses direction, overshoots end,
+then reverses and comes back to end.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#backIn">backIn</a>(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>, <span class="optional" title="Optional">[<code>Number s</code>]</span>) : Number</td>
+        <td class="msource" rowspan="2">Easing</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Backtracks slightly, then reverses direction and moves to end.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#backOut">backOut</a>(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>, <span class="optional" title="Optional">[<code>Number s</code>]</span>) : Number</td>
+        <td class="msource" rowspan="2">Easing</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Overshoots end, then reverses and comes back to end.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#bounceBoth">bounceBoth</a>(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>) : Number</td>
+        <td class="msource" rowspan="2">Easing</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Bounces off start and end.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#bounceIn">bounceIn</a>(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>) : Number</td>
+        <td class="msource" rowspan="2">Easing</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Bounce off of start.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#bounceOut">bounceOut</a>(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>) : Number</td>
+        <td class="msource" rowspan="2">Easing</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Bounces off end.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#easeBoth">easeBoth</a>(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>) : Number</td>
+        <td class="msource" rowspan="2">Easing</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Begins slowly and decelerates towards end. (quadratic)</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#easeBothStrong">easeBothStrong</a>(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>) : Number</td>
+        <td class="msource" rowspan="2">Easing</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Begins slowly and decelerates towards end. (quartic)</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#easeIn">easeIn</a>(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>) : Number</td>
+        <td class="msource" rowspan="2">Easing</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Begins slowly and accelerates towards end. (quadratic)</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#easeInStrong">easeInStrong</a>(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>) : Number</td>
+        <td class="msource" rowspan="2">Easing</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Begins slowly and accelerates towards end. (quartic)</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#easeNone">easeNone</a>(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>) : Number</td>
+        <td class="msource" rowspan="2">Easing</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Uniform speed between points.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#easeOut">easeOut</a>(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>) : Number</td>
+        <td class="msource" rowspan="2">Easing</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Begins quickly and decelerates towards end.  (quadratic)</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#easeOutStrong">easeOutStrong</a>(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>) : Number</td>
+        <td class="msource" rowspan="2">Easing</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Begins quickly and decelerates towards end.  (quartic)</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#elasticBoth">elasticBoth</a>(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>, <span class="optional" title="Optional">[<code>Number p</code>]</span>) : Number</td>
+        <td class="msource" rowspan="2">Easing</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Snap both elastic effect.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#elasticIn">elasticIn</a>(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>, <span class="optional" title="Optional">[<code>Number p</code>]</span>) : Number</td>
+        <td class="msource" rowspan="2">Easing</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Snap in elastic effect.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#elasticOut">elasticOut</a>(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>, <span class="optional" title="Optional">[<code>Number p</code>]</span>) : Number</td>
+        <td class="msource" rowspan="2">Easing</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Snap out elastic effect.</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+        <div class="no-members">This class has no public events.</div>        
+                
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="backBoth"></a>
+                <div class="mdetail">
+                <h3>backBoth</i></h3>
+                <code>public function backBoth(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>, <span class="optional" title="Optional">[<code>Number s</code>]</span>)</code>
+                <div class="mdetail-desc">
+                    Backtracks slightly, then reverses direction, overshoots end,
+then reverses and comes back to end.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>t</code> : Number<div class="sub-desc">Time value used to compute current value</div></li><li><code>b</code> : Number<div class="sub-desc">Starting value</div></li><li><code>c</code> : Number<div class="sub-desc">Delta between start and end values</div></li><li><code>d</code> : Number<div class="sub-desc">Total length of animation</div></li><li><code>s</code> : Number<div class="sub-desc">Overshoot (optional)</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Number</code><div class="sub-desc">The computed value for the current animation frame</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Easing.</div>
+                </div>
+                            <a name="backIn"></a>
+                <div class="mdetail alt">
+                <h3>backIn</i></h3>
+                <code>public function backIn(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>, <span class="optional" title="Optional">[<code>Number s</code>]</span>)</code>
+                <div class="mdetail-desc">
+                    Backtracks slightly, then reverses direction and moves to end.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>t</code> : Number<div class="sub-desc">Time value used to compute current value</div></li><li><code>b</code> : Number<div class="sub-desc">Starting value</div></li><li><code>c</code> : Number<div class="sub-desc">Delta between start and end values</div></li><li><code>d</code> : Number<div class="sub-desc">Total length of animation</div></li><li><code>s</code> : Number<div class="sub-desc">Overshoot (optional)</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Number</code><div class="sub-desc">The computed value for the current animation frame</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Easing.</div>
+                </div>
+                            <a name="backOut"></a>
+                <div class="mdetail">
+                <h3>backOut</i></h3>
+                <code>public function backOut(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>, <span class="optional" title="Optional">[<code>Number s</code>]</span>)</code>
+                <div class="mdetail-desc">
+                    Overshoots end, then reverses and comes back to end.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>t</code> : Number<div class="sub-desc">Time value used to compute current value</div></li><li><code>b</code> : Number<div class="sub-desc">Starting value</div></li><li><code>c</code> : Number<div class="sub-desc">Delta between start and end values</div></li><li><code>d</code> : Number<div class="sub-desc">Total length of animation</div></li><li><code>s</code> : Number<div class="sub-desc">Overshoot (optional)</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Number</code><div class="sub-desc">The computed value for the current animation frame</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Easing.</div>
+                </div>
+                            <a name="bounceBoth"></a>
+                <div class="mdetail alt">
+                <h3>bounceBoth</i></h3>
+                <code>public function bounceBoth(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>)</code>
+                <div class="mdetail-desc">
+                    Bounces off start and end.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>t</code> : Number<div class="sub-desc">Time value used to compute current value</div></li><li><code>b</code> : Number<div class="sub-desc">Starting value</div></li><li><code>c</code> : Number<div class="sub-desc">Delta between start and end values</div></li><li><code>d</code> : Number<div class="sub-desc">Total length of animation</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Number</code><div class="sub-desc">The computed value for the current animation frame</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Easing.</div>
+                </div>
+                            <a name="bounceIn"></a>
+                <div class="mdetail">
+                <h3>bounceIn</i></h3>
+                <code>public function bounceIn(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>)</code>
+                <div class="mdetail-desc">
+                    Bounce off of start.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>t</code> : Number<div class="sub-desc">Time value used to compute current value</div></li><li><code>b</code> : Number<div class="sub-desc">Starting value</div></li><li><code>c</code> : Number<div class="sub-desc">Delta between start and end values</div></li><li><code>d</code> : Number<div class="sub-desc">Total length of animation</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Number</code><div class="sub-desc">The computed value for the current animation frame</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Easing.</div>
+                </div>
+                            <a name="bounceOut"></a>
+                <div class="mdetail alt">
+                <h3>bounceOut</i></h3>
+                <code>public function bounceOut(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>)</code>
+                <div class="mdetail-desc">
+                    Bounces off end.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>t</code> : Number<div class="sub-desc">Time value used to compute current value</div></li><li><code>b</code> : Number<div class="sub-desc">Starting value</div></li><li><code>c</code> : Number<div class="sub-desc">Delta between start and end values</div></li><li><code>d</code> : Number<div class="sub-desc">Total length of animation</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Number</code><div class="sub-desc">The computed value for the current animation frame</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Easing.</div>
+                </div>
+                            <a name="easeBoth"></a>
+                <div class="mdetail">
+                <h3>easeBoth</i></h3>
+                <code>public function easeBoth(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>)</code>
+                <div class="mdetail-desc">
+                    Begins slowly and decelerates towards end. (quadratic)                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>t</code> : Number<div class="sub-desc">Time value used to compute current value</div></li><li><code>b</code> : Number<div class="sub-desc">Starting value</div></li><li><code>c</code> : Number<div class="sub-desc">Delta between start and end values</div></li><li><code>d</code> : Number<div class="sub-desc">Total length of animation</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Number</code><div class="sub-desc">The computed value for the current animation frame</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Easing.</div>
+                </div>
+                            <a name="easeBothStrong"></a>
+                <div class="mdetail alt">
+                <h3>easeBothStrong</i></h3>
+                <code>public function easeBothStrong(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>)</code>
+                <div class="mdetail-desc">
+                    Begins slowly and decelerates towards end. (quartic)                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>t</code> : Number<div class="sub-desc">Time value used to compute current value</div></li><li><code>b</code> : Number<div class="sub-desc">Starting value</div></li><li><code>c</code> : Number<div class="sub-desc">Delta between start and end values</div></li><li><code>d</code> : Number<div class="sub-desc">Total length of animation</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Number</code><div class="sub-desc">The computed value for the current animation frame</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Easing.</div>
+                </div>
+                            <a name="easeIn"></a>
+                <div class="mdetail">
+                <h3>easeIn</i></h3>
+                <code>public function easeIn(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>)</code>
+                <div class="mdetail-desc">
+                    Begins slowly and accelerates towards end. (quadratic)                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>t</code> : Number<div class="sub-desc">Time value used to compute current value</div></li><li><code>b</code> : Number<div class="sub-desc">Starting value</div></li><li><code>c</code> : Number<div class="sub-desc">Delta between start and end values</div></li><li><code>d</code> : Number<div class="sub-desc">Total length of animation</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Number</code><div class="sub-desc">The computed value for the current animation frame</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Easing.</div>
+                </div>
+                            <a name="easeInStrong"></a>
+                <div class="mdetail alt">
+                <h3>easeInStrong</i></h3>
+                <code>public function easeInStrong(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>)</code>
+                <div class="mdetail-desc">
+                    Begins slowly and accelerates towards end. (quartic)                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>t</code> : Number<div class="sub-desc">Time value used to compute current value</div></li><li><code>b</code> : Number<div class="sub-desc">Starting value</div></li><li><code>c</code> : Number<div class="sub-desc">Delta between start and end values</div></li><li><code>d</code> : Number<div class="sub-desc">Total length of animation</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Number</code><div class="sub-desc">The computed value for the current animation frame</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Easing.</div>
+                </div>
+                            <a name="easeNone"></a>
+                <div class="mdetail">
+                <h3>easeNone</i></h3>
+                <code>public function easeNone(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>)</code>
+                <div class="mdetail-desc">
+                    Uniform speed between points.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>t</code> : Number<div class="sub-desc">Time value used to compute current value</div></li><li><code>b</code> : Number<div class="sub-desc">Starting value</div></li><li><code>c</code> : Number<div class="sub-desc">Delta between start and end values</div></li><li><code>d</code> : Number<div class="sub-desc">Total length of animation</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Number</code><div class="sub-desc">The computed value for the current animation frame</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Easing.</div>
+                </div>
+                            <a name="easeOut"></a>
+                <div class="mdetail alt">
+                <h3>easeOut</i></h3>
+                <code>public function easeOut(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>)</code>
+                <div class="mdetail-desc">
+                    Begins quickly and decelerates towards end.  (quadratic)                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>t</code> : Number<div class="sub-desc">Time value used to compute current value</div></li><li><code>b</code> : Number<div class="sub-desc">Starting value</div></li><li><code>c</code> : Number<div class="sub-desc">Delta between start and end values</div></li><li><code>d</code> : Number<div class="sub-desc">Total length of animation</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Number</code><div class="sub-desc">The computed value for the current animation frame</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Easing.</div>
+                </div>
+                            <a name="easeOutStrong"></a>
+                <div class="mdetail">
+                <h3>easeOutStrong</i></h3>
+                <code>public function easeOutStrong(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>)</code>
+                <div class="mdetail-desc">
+                    Begins quickly and decelerates towards end.  (quartic)                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>t</code> : Number<div class="sub-desc">Time value used to compute current value</div></li><li><code>b</code> : Number<div class="sub-desc">Starting value</div></li><li><code>c</code> : Number<div class="sub-desc">Delta between start and end values</div></li><li><code>d</code> : Number<div class="sub-desc">Total length of animation</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Number</code><div class="sub-desc">The computed value for the current animation frame</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Easing.</div>
+                </div>
+                            <a name="elasticBoth"></a>
+                <div class="mdetail alt">
+                <h3>elasticBoth</i></h3>
+                <code>public function elasticBoth(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>, <span class="optional" title="Optional">[<code>Number p</code>]</span>)</code>
+                <div class="mdetail-desc">
+                    Snap both elastic effect.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>t</code> : Number<div class="sub-desc">Time value used to compute current value</div></li><li><code>b</code> : Number<div class="sub-desc">Starting value</div></li><li><code>c</code> : Number<div class="sub-desc">Delta between start and end values</div></li><li><code>d</code> : Number<div class="sub-desc">Total length of animation</div></li><li><code>p</code> : Number<div class="sub-desc">Period (optional)</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Number</code><div class="sub-desc">The computed value for the current animation frame</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Easing.</div>
+                </div>
+                            <a name="elasticIn"></a>
+                <div class="mdetail">
+                <h3>elasticIn</i></h3>
+                <code>public function elasticIn(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>, <span class="optional" title="Optional">[<code>Number p</code>]</span>)</code>
+                <div class="mdetail-desc">
+                    Snap in elastic effect.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>t</code> : Number<div class="sub-desc">Time value used to compute current value</div></li><li><code>b</code> : Number<div class="sub-desc">Starting value</div></li><li><code>c</code> : Number<div class="sub-desc">Delta between start and end values</div></li><li><code>d</code> : Number<div class="sub-desc">Total length of animation</div></li><li><code>p</code> : Number<div class="sub-desc">Period (optional)</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Number</code><div class="sub-desc">The computed value for the current animation frame</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Easing.</div>
+                </div>
+                            <a name="elasticOut"></a>
+                <div class="mdetail alt">
+                <h3>elasticOut</i></h3>
+                <code>public function elasticOut(<code>Number t</code>, <code>Number b</code>, <code>Number c</code>, <code>Number d</code>, <span class="optional" title="Optional">[<code>Number p</code>]</span>)</code>
+                <div class="mdetail-desc">
+                    Snap out elastic effect.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>t</code> : Number<div class="sub-desc">Time value used to compute current value</div></li><li><code>b</code> : Number<div class="sub-desc">Starting value</div></li><li><code>c</code> : Number<div class="sub-desc">Delta between start and end values</div></li><li><code>d</code> : Number<div class="sub-desc">Total length of animation</div></li><li><code>p</code> : Number<div class="sub-desc">Period (optional)</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Number</code><div class="sub-desc">The computed value for the current animation frame</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Easing.</div>
+                </div>
+                        </div>
+                    
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    

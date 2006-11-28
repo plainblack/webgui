@@ -1,0 +1,2180 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.widget.SimpleDialog</title>
+        <link rel="stylesheet" type="text/css" href="../reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.widget.SimpleDialog.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.widget.SimpleDialog</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.widget</td></tr>
+            <tr><td class="label">Class:</td><td>SimpleDialog</td></tr>
+                        <tr><td class="label">Extends:</td><td><a href="YAHOO.widget.Dialog.html">Dialog</a></td></tr>
+                                    <tr><td class="label">Defined In:</td><td><a href="container.js.html">container.js</a></td></tr>
+        </table>
+        <div class="description">
+            SimpleDialog is a simple implementation of Dialog that can be used to submit a single value. Forms can be processed in 3 ways -- via an asynchronous Connection utility call, a simple form POST or GET, or manually.        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Property</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#BOTTOM_LEFT&lt;static&gt;">BOTTOM_LEFT&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#BOTTOM_LEFT&lt;static&gt;">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Constant representing the top bottom left corner of an element, used for configuring the context eleme...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#BOTTOM_RIGHT&lt;static&gt;">BOTTOM_RIGHT&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#BOTTOM_RIGHT&lt;static&gt;">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Constant representing the bottom right corner of an element, used for configuring the context element ...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_DIALOG&lt;static&gt;">CSS_DIALOG&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Dialog.html#CSS_DIALOG&lt;static&gt;">Dialog</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Constant representing the default CSS class used for a Dialog</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_OVERLAY&lt;static&gt;">CSS_OVERLAY&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#CSS_OVERLAY&lt;static&gt;">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Constant representing the default CSS class used for an Overlay</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_PANEL&lt;static&gt;">CSS_PANEL&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Panel.html#CSS_PANEL&lt;static&gt;">Panel</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Constant representing the default CSS class used for a Panel</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_PANEL_CONTAINER&lt;static&gt;">CSS_PANEL_CONTAINER&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Panel.html#CSS_PANEL_CONTAINER&lt;static&gt;">Panel</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Constant representing the default CSS class used for a Panel's wrapping container</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_SIMPLEDIALOG&lt;static&gt;">CSS_SIMPLEDIALOG&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2">SimpleDialog</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Constant representing the default CSS class used for a SimpleDialog</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#ICON_ALARM&lt;static&gt;">ICON_ALARM&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2">SimpleDialog</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Constant for the standard network icon for alarm</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#ICON_BLOCK&lt;static&gt;">ICON_BLOCK&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2">SimpleDialog</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Constant for the standard network icon for a blocking action</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#ICON_HELP&lt;static&gt;">ICON_HELP&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2">SimpleDialog</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Constant for the standard network icon for help</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#ICON_INFO&lt;static&gt;">ICON_INFO&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2">SimpleDialog</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Constant for the standard network icon for info</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#ICON_TIP&lt;static&gt;">ICON_TIP&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2">SimpleDialog</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Constant for the standard network icon for a tip</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#ICON_WARN&lt;static&gt;">ICON_WARN&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2">SimpleDialog</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Constant for the standard network icon for warn</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#TOP_LEFT&lt;static&gt;">TOP_LEFT&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#TOP_LEFT&lt;static&gt;">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Constant representing the top left corner of an element, used for configuring the context element alig...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#TOP_RIGHT&lt;static&gt;">TOP_RIGHT&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#TOP_RIGHT&lt;static&gt;">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Constant representing the top right corner of an element, used for configuring the context element ali...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#argument">argument</a> : Object</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Dialog.html#argument">Dialog</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The arbitraty argument or arguments to pass to the Connection callback functions</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#callback">callback</a> : Object</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Dialog.html#callback">Dialog</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The internally maintained callback object for use with the Connection utility</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#cfg">cfg</a> : String
+@default</td>
+        <td class="msource" rowspan="2">SimpleDialog</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Sets the text for the SimpleDialog
+@config text</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#failure">failure</a> : Function</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Dialog.html#failure">Dialog</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The function to execute upon failure of the Connection submission</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#javascript">javascript</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#javascript">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; The URL that will be placed in the iframe</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#success">success</a> : Function</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Dialog.html#success">Dialog</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The function to execute upon success of the Connection submission</td>
+    </tr>
+            </table>
+                <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#SimpleDialog">SimpleDialog</a>(<code>String el</code>, <code>HTMLElement el</code>, <code>Object userConfig</code>)</td>
+        <td class="msource" rowspan="2">SimpleDialog</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#align">align</a>(<code>String elementAlign</code>, <code>String contextAlign</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#align">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Aligns the Overlay to its context element using the specified corner points (represented by the constants TOP_LEFT, T...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#blurButtons">blurButtons</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Dialog.html#blurButtons">Dialog</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Blurs all the html buttons</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#buildMask">buildMask</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Panel.html#buildMask">Panel</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Builds the mask that is laid over the document when the Panel is configured to be modal.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#buildWrapper">buildWrapper</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Panel.html#buildWrapper">Panel</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Builds the wrapping container around the Panel that is used for positioning the shadow and matte underlays. The conta...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#cancel">cancel</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Dialog.html#cancel">Dialog</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Executes the cancel of the Dialog followed by a hide.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#center">center</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#center">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Centers the container in the viewport.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#cfg">cfg</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Dialog.html#cfg">Dialog</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The method to use for posting the Dialog's form. Possible values are "async", "form", and "manual".
+@config postmethod</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configButtons">configButtons</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Dialog.html#configButtons">Dialog</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default event handler for the "buttons" configuration property</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configClose">configClose</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Panel.html#configClose">Panel</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The default event handler fired when the "close" property is changed. The method controls the appending or hiding of ...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configConstrainToViewport">configConstrainToViewport</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#configConstrainToViewport">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default event handler fired when the "constraintoviewport" property is changed.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configContext">configContext</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#configContext">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The default event handler fired when the "context" property is changed.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configDraggable">configDraggable</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Panel.html#configDraggable">Panel</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default event handler fired when the "draggable" property is changed.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configFixedCenter">configFixedCenter</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#configFixedCenter">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The default event handler fired when the "fixedcenter" property is changed.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configHeight">configHeight</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#configHeight">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default event handler fired when the "height" property is changed.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configIcon">configIcon</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2">SimpleDialog</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Fired when the "icon" property is set.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configIframe">configIframe</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#configIframe">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default event handler fired when the "iframe" property is changed.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configKeyListeners">configKeyListeners</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Panel.html#configKeyListeners">Panel</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The default event handler fired when the "keylisteners" property is changed.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configModal">configModal</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Panel.html#configModal">Panel</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default event handler fired when the "modal" property is changed. This handler subscribes or unsubscribes to the ...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configText">configText</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2">SimpleDialog</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Fired when the "text" property is set.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configUnderlay">configUnderlay</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Panel.html#configUnderlay">Panel</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default event handler fired when the "underlay" property is changed.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configVisible">configVisible</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#configVisible">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The default event handler fired when the "visible" property is changed. This method is responsible for firing showEve...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configWidth">configWidth</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#configWidth">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default event handler fired when the "width" property is changed.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configX">configX</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#configX">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The default event handler fired when the "x" property is changed.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configXY">configXY</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#configXY">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default event handler fired when the "xy" property is changed.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configY">configY</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#configY">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The default event handler fired when the "y" property is changed.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configzIndex">configzIndex</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#configzIndex">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default event handler fired when the "zIndex" property is changed.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#destroy">destroy</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#destroy">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Removes the Overlay element from the DOM and sets all child elements to null.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#doCenterOnDOMEvent">doCenterOnDOMEvent</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#doCenterOnDOMEvent">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Center event handler used for centering on scroll/resize, but only if the Overlay is visible</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#doSubmit">doSubmit</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Dialog.html#doSubmit">Dialog</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Performs the submission of the Dialog form depending on the value of "postmethod" property.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#enforceConstraints">enforceConstraints</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#enforceConstraints">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default event handler executed when the moveEvent is fired, if the "constraintoviewport" is set to true.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#focusDefaultButton">focusDefaultButton</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Dialog.html#focusDefaultButton">Dialog</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Sets the focus to the button that is designated as the default. By default, his handler is executed when the show eve...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#focusFirst">focusFirst</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Dialog.html#focusFirst">Dialog</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default event handler used to focus the first field of the form when the Dialog is shown.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#focusFirstButton">focusFirstButton</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Dialog.html#focusFirstButton">Dialog</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Sets the focus to the first button in the button list</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#focusLast">focusLast</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Dialog.html#focusLast">Dialog</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Sets the focus to the last button in the button or form element in the Dialog</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#focusLastButton">focusLastButton</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Dialog.html#focusLastButton">Dialog</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Sets the focus to the first button in the button list</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getData">getData</a>() : Object</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Dialog.html#getData">Dialog</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Returns a JSON-compatible data structure representing the data currently contained in the form.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#hideIframe">hideIframe</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#hideIframe">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Hides the iframe shim, if it has been enabled</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#hideMacGeckoScrollbars">hideMacGeckoScrollbars</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#hideMacGeckoScrollbars">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Adds a special CSS class to the Overlay when Mac/Gecko is in use, to work around a Gecko bug where
+scrollbars cannot ...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#hideMask">hideMask</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Panel.html#hideMask">Panel</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Hides the modality mask.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#init">init</a>(<code>String el</code>, <code>HTMLElement el</code>, <code>Object userConfig</code>) : void</td>
+        <td class="msource" rowspan="2">SimpleDialog</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The SimpleDialog initialization method, which is executed for SimpleDialog and all of its subclasses. This method is ...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#initDefaultConfig">initDefaultConfig</a>() : void</td>
+        <td class="msource" rowspan="2">SimpleDialog</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Initializes the class's configurable properties which can be changed using the SimpleDialog's Config object (cfg).</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#initEvents">initEvents</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#initEvents">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Initializes the custom events for Overlay which are fired automatically at appropriate times by the Overlay class.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#moveTo">moveTo</a>(<code>Number x</code>, <code>Number y</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#moveTo">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Moves the Overlay to the specified position. This function is identical to calling this.cfg.setProperty("xy", [x,y]);</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#onDomResize">onDomResize</a>(<code>DOMEvent e</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#onDomResize">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Event handler fired when the resize monitor element is resized.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#registerDragDrop">registerDragDrop</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Panel.html#registerDragDrop">Panel</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Registers the Panel's header for drag & drop capability.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#registerForm">registerForm</a>() : void</td>
+        <td class="msource" rowspan="2">SimpleDialog</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Prepares the SimpleDialog's internal FORM object, creating one if one is not currently present, and adding the value ...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#removeMask">removeMask</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Panel.html#removeMask">Panel</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Removes the modality mask.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#render">render</a>(<code>String appendToNode</code>, <code>HTMLElement appendToNode</code>) : boolean</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Panel.html#render">Panel</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Renders the Panel by inserting the elements that are not already in the main Panel into their correct places. Optiona...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#showIframe">showIframe</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#showIframe">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Shows the iframe shim, if it has been enabled</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#showMacGeckoScrollbars">showMacGeckoScrollbars</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#showMacGeckoScrollbars">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Removes a special CSS class from the Overlay when Mac/Gecko is in use, to work around a Gecko bug where
+scrollbars ca...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#showMask">showMask</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Panel.html#showMask">Panel</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Shows the modality mask.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#sizeMask">sizeMask</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Panel.html#sizeMask">Panel</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Sets the size of the modality mask to cover the entire scrollable area of the document</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#sizeUnderlay">sizeUnderlay</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Panel.html#sizeUnderlay">Panel</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Adjusts the size of the shadow based on the size of the element.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#submit">submit</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Dialog.html#submit">Dialog</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Executes a submit of the Dialog followed by a hide, if validation is successful.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#syncPosition">syncPosition</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#syncPosition">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Synchronizes the Panel's "xy", "x", and "y" properties with the Panel's position in the DOM. This is primarily used t...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#toString">toString</a>() : String</td>
+        <td class="msource" rowspan="2">SimpleDialog</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Returns a string representation of the object.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#validate">validate</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Dialog.html#validate">Dialog</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Built-in function hook for writing a validation function that will be checked for a "true" value prior to a submit. T...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#windowResizeHandler&lt;static&gt;">windowResizeHandler&lt;static&gt;</a>(<code>DOMEvent e</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#windowResizeHandler&lt;static&gt;">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; The DOM event handler used to fire the CustomEvent for window resize</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#windowScrollHandler&lt;static&gt;">windowScrollHandler&lt;static&gt;</a>(<code>DOMEvent e</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#windowScrollHandler&lt;static&gt;">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; The DOM event handler used to fire the CustomEvent for window scroll</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Event</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#YAHOO.widget.Overlay.windowResizeEvent">YAHOO.widget.Overlay.windowResizeEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#YAHOO.widget.Overlay.windowResizeEvent">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">A singleton CustomEvent used for reacting to the DOM event for window resize</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#YAHOO.widget.Overlay.windowScrollEvent">YAHOO.widget.Overlay.windowScrollEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#YAHOO.widget.Overlay.windowScrollEvent">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">A singleton CustomEvent used for reacting to the DOM event for window scroll</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#asyncSubmitEvent">asyncSubmitEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Dialog.html#asyncSubmitEvent">Dialog</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">CustomEvent fired prior to asynchronous submission</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#beforeMoveEvent">beforeMoveEvent</a> : (<code>Number x</code>, <code>Number y</code>)</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#beforeMoveEvent">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">CustomEvent fired before the Overlay is moved.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#beforeSumitEvent">beforeSumitEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Dialog.html#beforeSumitEvent">Dialog</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">CustomEvent fired prior to submission</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#cancelEvent">cancelEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Dialog.html#cancelEvent">Dialog</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">CustomEvent fired after cancel</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#dragEvent">dragEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Panel.html#dragEvent">Panel</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">CustomEvent when the Panel is dragged</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#formSubmitEvent">formSubmitEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Dialog.html#formSubmitEvent">Dialog</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">CustomEvent fired prior to form-based submission</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#hideMaskEvent">hideMaskEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Panel.html#hideMaskEvent">Panel</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">CustomEvent fired after the modality mask is hidden</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#manualSubmitEvent">manualSubmitEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Dialog.html#manualSubmitEvent">Dialog</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">CustomEvent fired prior to manual submission</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#moveEvent">moveEvent</a> : (<code>Number x</code>, <code>Number y</code>)</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#moveEvent">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">CustomEvent fired after the Overlay is moved.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#showMaskEvent">showMaskEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Panel.html#showMaskEvent">Panel</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">CustomEvent fired after the modality mask is shown</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#submitEvent">submitEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Dialog.html#submitEvent">Dialog</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">CustomEvent fired after submission</td>
+    </tr>
+            </table>
+                
+                    <h2 class="mdetail-head">Property Details</h2>
+            <div class="detail-wrap">
+                            <a name="BOTTOM_LEFT&lt;static&gt;"></a>
+                <div class="mdetail">
+                <h3>BOTTOM_LEFT&lt;static&gt;</i></h3>
+                <code>public String BOTTOM_LEFT&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the top bottom left corner of an element, used for configuring the context element alignment                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Overlay.html#BOTTOM_LEFT&lt;static&gt;">Overlay</a>.</div>
+                </div>
+                            <a name="BOTTOM_RIGHT&lt;static&gt;"></a>
+                <div class="mdetail alt">
+                <h3>BOTTOM_RIGHT&lt;static&gt;</i></h3>
+                <code>public String BOTTOM_RIGHT&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the bottom right corner of an element, used for configuring the context element alignment                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Overlay.html#BOTTOM_RIGHT&lt;static&gt;">Overlay</a>.</div>
+                </div>
+                            <a name="CSS_DIALOG&lt;static&gt;"></a>
+                <div class="mdetail">
+                <h3>CSS_DIALOG&lt;static&gt;</i></h3>
+                <code>public String CSS_DIALOG&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the default CSS class used for a Dialog                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Dialog.html#CSS_DIALOG&lt;static&gt;">Dialog</a>.</div>
+                </div>
+                            <a name="CSS_OVERLAY&lt;static&gt;"></a>
+                <div class="mdetail alt">
+                <h3>CSS_OVERLAY&lt;static&gt;</i></h3>
+                <code>public String CSS_OVERLAY&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the default CSS class used for an Overlay                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Overlay.html#CSS_OVERLAY&lt;static&gt;">Overlay</a>.</div>
+                </div>
+                            <a name="CSS_PANEL&lt;static&gt;"></a>
+                <div class="mdetail">
+                <h3>CSS_PANEL&lt;static&gt;</i></h3>
+                <code>public String CSS_PANEL&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the default CSS class used for a Panel                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Panel.html#CSS_PANEL&lt;static&gt;">Panel</a>.</div>
+                </div>
+                            <a name="CSS_PANEL_CONTAINER&lt;static&gt;"></a>
+                <div class="mdetail alt">
+                <h3>CSS_PANEL_CONTAINER&lt;static&gt;</i></h3>
+                <code>public String CSS_PANEL_CONTAINER&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the default CSS class used for a Panel's wrapping container                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Panel.html#CSS_PANEL_CONTAINER&lt;static&gt;">Panel</a>.</div>
+                </div>
+                            <a name="CSS_SIMPLEDIALOG&lt;static&gt;"></a>
+                <div class="mdetail">
+                <h3>CSS_SIMPLEDIALOG&lt;static&gt;</i></h3>
+                <code>public String CSS_SIMPLEDIALOG&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the default CSS class used for a SimpleDialog                </div>
+                <div class="mdetail-def">This property is defined by SimpleDialog.</div>
+                </div>
+                            <a name="ICON_ALARM&lt;static&gt;"></a>
+                <div class="mdetail alt">
+                <h3>ICON_ALARM&lt;static&gt;</i></h3>
+                <code>public String ICON_ALARM&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant for the standard network icon for alarm                </div>
+                <div class="mdetail-def">This property is defined by SimpleDialog.</div>
+                </div>
+                            <a name="ICON_BLOCK&lt;static&gt;"></a>
+                <div class="mdetail">
+                <h3>ICON_BLOCK&lt;static&gt;</i></h3>
+                <code>public String ICON_BLOCK&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant for the standard network icon for a blocking action                </div>
+                <div class="mdetail-def">This property is defined by SimpleDialog.</div>
+                </div>
+                            <a name="ICON_HELP&lt;static&gt;"></a>
+                <div class="mdetail alt">
+                <h3>ICON_HELP&lt;static&gt;</i></h3>
+                <code>public String ICON_HELP&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant for the standard network icon for help                </div>
+                <div class="mdetail-def">This property is defined by SimpleDialog.</div>
+                </div>
+                            <a name="ICON_INFO&lt;static&gt;"></a>
+                <div class="mdetail">
+                <h3>ICON_INFO&lt;static&gt;</i></h3>
+                <code>public String ICON_INFO&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant for the standard network icon for info                </div>
+                <div class="mdetail-def">This property is defined by SimpleDialog.</div>
+                </div>
+                            <a name="ICON_TIP&lt;static&gt;"></a>
+                <div class="mdetail alt">
+                <h3>ICON_TIP&lt;static&gt;</i></h3>
+                <code>public String ICON_TIP&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant for the standard network icon for a tip                </div>
+                <div class="mdetail-def">This property is defined by SimpleDialog.</div>
+                </div>
+                            <a name="ICON_WARN&lt;static&gt;"></a>
+                <div class="mdetail">
+                <h3>ICON_WARN&lt;static&gt;</i></h3>
+                <code>public String ICON_WARN&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant for the standard network icon for warn                </div>
+                <div class="mdetail-def">This property is defined by SimpleDialog.</div>
+                </div>
+                            <a name="TOP_LEFT&lt;static&gt;"></a>
+                <div class="mdetail alt">
+                <h3>TOP_LEFT&lt;static&gt;</i></h3>
+                <code>public String TOP_LEFT&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the top left corner of an element, used for configuring the context element alignment                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Overlay.html#TOP_LEFT&lt;static&gt;">Overlay</a>.</div>
+                </div>
+                            <a name="TOP_RIGHT&lt;static&gt;"></a>
+                <div class="mdetail">
+                <h3>TOP_RIGHT&lt;static&gt;</i></h3>
+                <code>public String TOP_RIGHT&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the top right corner of an element, used for configuring the context element alignment                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Overlay.html#TOP_RIGHT&lt;static&gt;">Overlay</a>.</div>
+                </div>
+                            <a name="argument"></a>
+                <div class="mdetail alt">
+                <h3>argument</i></h3>
+                <code>public Object argument</code>
+                <div class="mdetail-desc">
+                    The arbitraty argument or arguments to pass to the Connection callback functions                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Dialog.html#argument">Dialog</a>.</div>
+                </div>
+                            <a name="callback"></a>
+                <div class="mdetail">
+                <h3>callback</i></h3>
+                <code>public Object callback</code>
+                <div class="mdetail-desc">
+                    The internally maintained callback object for use with the Connection utility                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Dialog.html#callback">Dialog</a>.</div>
+                </div>
+                            <a name="cfg"></a>
+                <div class="mdetail alt">
+                <h3>cfg</i></h3>
+                <code>public String
+@default cfg</code>
+                <div class="mdetail-desc">
+                    Sets the text for the SimpleDialog
+@config text                </div>
+                <div class="mdetail-def">This property is defined by SimpleDialog.</div>
+                </div>
+                            <a name="failure"></a>
+                <div class="mdetail">
+                <h3>failure</i></h3>
+                <code>public Function failure</code>
+                <div class="mdetail-desc">
+                    The function to execute upon failure of the Connection submission                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Dialog.html#failure">Dialog</a>.</div>
+                </div>
+                            <a name="javascript"></a>
+                <div class="mdetail alt">
+                <h3>javascript</i></h3>
+                <code>public String javascript</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; The URL that will be placed in the iframe                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Overlay.html#javascript">Overlay</a>.</div>
+                </div>
+                            <a name="success"></a>
+                <div class="mdetail">
+                <h3>success</i></h3>
+                <code>public Function success</code>
+                <div class="mdetail-desc">
+                    The function to execute upon success of the Connection submission                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Dialog.html#success">Dialog</a>.</div>
+                </div>
+                        </div>
+                
+                    <a name="SimpleDialog"></a>
+            <h2 class="mdetail-head">Constructor Details</h2>
+            <div class="detail-wrap">
+                <div class="mdetail">
+                <h3>SimpleDialog</i></h3>
+                <code>public function SimpleDialog(<code>String el</code>, <code>HTMLElement el</code>, <code>Object userConfig</code>)</code>
+                <div class="mdetail-desc">
+                                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>el</code> : String<div class="sub-desc">The element ID representing the SimpleDialog <em>OR</em></div></li><li><code>el</code> : HTMLElement<div class="sub-desc">The element representing the SimpleDialog</div></li><li><code>userConfig</code> : Object<div class="sub-desc">The configuration object literal containing the configuration that should be set for this SimpleDialog. See configuration documentation for more details.</div></li>                    </ul>
+                </div>
+                </div>
+                </div>
+            </div>
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="align"></a>
+                <div class="mdetail">
+                <h3>align</i></h3>
+                <code>public function align(<code>String elementAlign</code>, <code>String contextAlign</code>)</code>
+                <div class="mdetail-desc">
+                    Aligns the Overlay to its context element using the specified corner points (represented by the constants TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, and BOTTOM_RIGHT.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>elementAlign</code> : String<div class="sub-desc">The String representing the corner of the Overlay that should be aligned to the context element</div></li><li><code>contextAlign</code> : String<div class="sub-desc">The corner of the context element that the elementAlign corner should stick to.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#align">Overlay</a>.</div>
+                </div>
+                            <a name="blurButtons"></a>
+                <div class="mdetail alt">
+                <h3>blurButtons</i></h3>
+                <code>public function blurButtons()</code>
+                <div class="mdetail-desc">
+                    Blurs all the html buttons                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Dialog.html#blurButtons">Dialog</a>.</div>
+                </div>
+                            <a name="buildMask"></a>
+                <div class="mdetail">
+                <h3>buildMask</i></h3>
+                <code>public function buildMask()</code>
+                <div class="mdetail-desc">
+                    Builds the mask that is laid over the document when the Panel is configured to be modal.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Panel.html#buildMask">Panel</a>.</div>
+                </div>
+                            <a name="buildWrapper"></a>
+                <div class="mdetail alt">
+                <h3>buildWrapper</i></h3>
+                <code>public function buildWrapper()</code>
+                <div class="mdetail-desc">
+                    Builds the wrapping container around the Panel that is used for positioning the shadow and matte underlays. The container element is assigned to a  local instance variable called container, and the element is reinserted inside of it.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Panel.html#buildWrapper">Panel</a>.</div>
+                </div>
+                            <a name="cancel"></a>
+                <div class="mdetail">
+                <h3>cancel</i></h3>
+                <code>public function cancel()</code>
+                <div class="mdetail-desc">
+                    Executes the cancel of the Dialog followed by a hide.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Dialog.html#cancel">Dialog</a>.</div>
+                </div>
+                            <a name="center"></a>
+                <div class="mdetail alt">
+                <h3>center</i></h3>
+                <code>public function center()</code>
+                <div class="mdetail-desc">
+                    Centers the container in the viewport.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#center">Overlay</a>.</div>
+                </div>
+                            <a name="cfg"></a>
+                <div class="mdetail">
+                <h3>cfg</i></h3>
+                <code>public function cfg()</code>
+                <div class="mdetail-desc">
+                    The method to use for posting the Dialog's form. Possible values are "async", "form", and "manual".
+@config postmethod                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Dialog.html#cfg">Dialog</a>.</div>
+                </div>
+                            <a name="configButtons"></a>
+                <div class="mdetail alt">
+                <h3>configButtons</i></h3>
+                <code>public function configButtons(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler for the "buttons" configuration property                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Dialog.html#configButtons">Dialog</a>.</div>
+                </div>
+                            <a name="configClose"></a>
+                <div class="mdetail">
+                <h3>configClose</i></h3>
+                <code>public function configClose(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "close" property is changed. The method controls the appending or hiding of the close icon at the top right of the Panel.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Panel.html#configClose">Panel</a>.</div>
+                </div>
+                            <a name="configConstrainToViewport"></a>
+                <div class="mdetail alt">
+                <h3>configConstrainToViewport</i></h3>
+                <code>public function configConstrainToViewport(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "constraintoviewport" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#configConstrainToViewport">Overlay</a>.</div>
+                </div>
+                            <a name="configContext"></a>
+                <div class="mdetail">
+                <h3>configContext</i></h3>
+                <code>public function configContext(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "context" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#configContext">Overlay</a>.</div>
+                </div>
+                            <a name="configDraggable"></a>
+                <div class="mdetail alt">
+                <h3>configDraggable</i></h3>
+                <code>public function configDraggable(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "draggable" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Panel.html#configDraggable">Panel</a>.</div>
+                </div>
+                            <a name="configFixedCenter"></a>
+                <div class="mdetail">
+                <h3>configFixedCenter</i></h3>
+                <code>public function configFixedCenter(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "fixedcenter" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#configFixedCenter">Overlay</a>.</div>
+                </div>
+                            <a name="configHeight"></a>
+                <div class="mdetail alt">
+                <h3>configHeight</i></h3>
+                <code>public function configHeight(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "height" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#configHeight">Overlay</a>.</div>
+                </div>
+                            <a name="configIcon"></a>
+                <div class="mdetail">
+                <h3>configIcon</i></h3>
+                <code>public function configIcon(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    Fired when the "icon" property is set.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by SimpleDialog.</div>
+                </div>
+                            <a name="configIframe"></a>
+                <div class="mdetail alt">
+                <h3>configIframe</i></h3>
+                <code>public function configIframe(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "iframe" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#configIframe">Overlay</a>.</div>
+                </div>
+                            <a name="configKeyListeners"></a>
+                <div class="mdetail">
+                <h3>configKeyListeners</i></h3>
+                <code>public function configKeyListeners(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "keylisteners" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Panel.html#configKeyListeners">Panel</a>.</div>
+                </div>
+                            <a name="configModal"></a>
+                <div class="mdetail alt">
+                <h3>configModal</i></h3>
+                <code>public function configModal(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "modal" property is changed. This handler subscribes or unsubscribes to the show and hide events to handle the display or hide of the modality mask.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Panel.html#configModal">Panel</a>.</div>
+                </div>
+                            <a name="configText"></a>
+                <div class="mdetail">
+                <h3>configText</i></h3>
+                <code>public function configText(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    Fired when the "text" property is set.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by SimpleDialog.</div>
+                </div>
+                            <a name="configUnderlay"></a>
+                <div class="mdetail alt">
+                <h3>configUnderlay</i></h3>
+                <code>public function configUnderlay(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "underlay" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Panel.html#configUnderlay">Panel</a>.</div>
+                </div>
+                            <a name="configVisible"></a>
+                <div class="mdetail">
+                <h3>configVisible</i></h3>
+                <code>public function configVisible(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "visible" property is changed. This method is responsible for firing showEvent and hideEvent.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#configVisible">Overlay</a>.</div>
+                </div>
+                            <a name="configWidth"></a>
+                <div class="mdetail alt">
+                <h3>configWidth</i></h3>
+                <code>public function configWidth(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "width" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#configWidth">Overlay</a>.</div>
+                </div>
+                            <a name="configX"></a>
+                <div class="mdetail">
+                <h3>configX</i></h3>
+                <code>public function configX(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "x" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#configX">Overlay</a>.</div>
+                </div>
+                            <a name="configXY"></a>
+                <div class="mdetail alt">
+                <h3>configXY</i></h3>
+                <code>public function configXY(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "xy" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#configXY">Overlay</a>.</div>
+                </div>
+                            <a name="configY"></a>
+                <div class="mdetail">
+                <h3>configY</i></h3>
+                <code>public function configY(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "y" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#configY">Overlay</a>.</div>
+                </div>
+                            <a name="configzIndex"></a>
+                <div class="mdetail alt">
+                <h3>configzIndex</i></h3>
+                <code>public function configzIndex(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "zIndex" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#configzIndex">Overlay</a>.</div>
+                </div>
+                            <a name="destroy"></a>
+                <div class="mdetail">
+                <h3>destroy</i></h3>
+                <code>public function destroy()</code>
+                <div class="mdetail-desc">
+                    Removes the Overlay element from the DOM and sets all child elements to null.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#destroy">Overlay</a>.</div>
+                </div>
+                            <a name="doCenterOnDOMEvent"></a>
+                <div class="mdetail alt">
+                <h3>doCenterOnDOMEvent</i></h3>
+                <code>public function doCenterOnDOMEvent()</code>
+                <div class="mdetail-desc">
+                    Center event handler used for centering on scroll/resize, but only if the Overlay is visible                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#doCenterOnDOMEvent">Overlay</a>.</div>
+                </div>
+                            <a name="doSubmit"></a>
+                <div class="mdetail">
+                <h3>doSubmit</i></h3>
+                <code>public function doSubmit()</code>
+                <div class="mdetail-desc">
+                    Performs the submission of the Dialog form depending on the value of "postmethod" property.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Dialog.html#doSubmit">Dialog</a>.</div>
+                </div>
+                            <a name="enforceConstraints"></a>
+                <div class="mdetail alt">
+                <h3>enforceConstraints</i></h3>
+                <code>public function enforceConstraints(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler executed when the moveEvent is fired, if the "constraintoviewport" is set to true.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#enforceConstraints">Overlay</a>.</div>
+                </div>
+                            <a name="focusDefaultButton"></a>
+                <div class="mdetail">
+                <h3>focusDefaultButton</i></h3>
+                <code>public function focusDefaultButton()</code>
+                <div class="mdetail-desc">
+                    Sets the focus to the button that is designated as the default. By default, his handler is executed when the show event is fired.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Dialog.html#focusDefaultButton">Dialog</a>.</div>
+                </div>
+                            <a name="focusFirst"></a>
+                <div class="mdetail alt">
+                <h3>focusFirst</i></h3>
+                <code>public function focusFirst()</code>
+                <div class="mdetail-desc">
+                    The default event handler used to focus the first field of the form when the Dialog is shown.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Dialog.html#focusFirst">Dialog</a>.</div>
+                </div>
+                            <a name="focusFirstButton"></a>
+                <div class="mdetail">
+                <h3>focusFirstButton</i></h3>
+                <code>public function focusFirstButton()</code>
+                <div class="mdetail-desc">
+                    Sets the focus to the first button in the button list                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Dialog.html#focusFirstButton">Dialog</a>.</div>
+                </div>
+                            <a name="focusLast"></a>
+                <div class="mdetail alt">
+                <h3>focusLast</i></h3>
+                <code>public function focusLast()</code>
+                <div class="mdetail-desc">
+                    Sets the focus to the last button in the button or form element in the Dialog                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Dialog.html#focusLast">Dialog</a>.</div>
+                </div>
+                            <a name="focusLastButton"></a>
+                <div class="mdetail">
+                <h3>focusLastButton</i></h3>
+                <code>public function focusLastButton()</code>
+                <div class="mdetail-desc">
+                    Sets the focus to the first button in the button list                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Dialog.html#focusLastButton">Dialog</a>.</div>
+                </div>
+                            <a name="getData"></a>
+                <div class="mdetail alt">
+                <h3>getData</i></h3>
+                <code>public function getData()</code>
+                <div class="mdetail-desc">
+                    Returns a JSON-compatible data structure representing the data currently contained in the form.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Object</code><div class="sub-desc">A JSON object reprsenting the data of the current form.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Dialog.html#getData">Dialog</a>.</div>
+                </div>
+                            <a name="hideIframe"></a>
+                <div class="mdetail">
+                <h3>hideIframe</i></h3>
+                <code>public function hideIframe()</code>
+                <div class="mdetail-desc">
+                    Hides the iframe shim, if it has been enabled                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#hideIframe">Overlay</a>.</div>
+                </div>
+                            <a name="hideMacGeckoScrollbars"></a>
+                <div class="mdetail alt">
+                <h3>hideMacGeckoScrollbars</i></h3>
+                <code>public function hideMacGeckoScrollbars()</code>
+                <div class="mdetail-desc">
+                    Adds a special CSS class to the Overlay when Mac/Gecko is in use, to work around a Gecko bug where
+scrollbars cannot be hidden. See https://bugzilla.mozilla.org/show_bug.cgi?id=187435                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#hideMacGeckoScrollbars">Overlay</a>.</div>
+                </div>
+                            <a name="hideMask"></a>
+                <div class="mdetail">
+                <h3>hideMask</i></h3>
+                <code>public function hideMask()</code>
+                <div class="mdetail-desc">
+                    Hides the modality mask.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Panel.html#hideMask">Panel</a>.</div>
+                </div>
+                            <a name="init"></a>
+                <div class="mdetail alt">
+                <h3>init</i></h3>
+                <code>public function init(<code>String el</code>, <code>HTMLElement el</code>, <code>Object userConfig</code>)</code>
+                <div class="mdetail-desc">
+                    The SimpleDialog initialization method, which is executed for SimpleDialog and all of its subclasses. This method is automatically called by the constructor, and  sets up all DOM references for pre-existing markup, and creates required markup if it is not already present.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>el</code> : String<div class="sub-desc">The element ID representing the SimpleDialog <em>OR</em></div></li><li><code>el</code> : HTMLElement<div class="sub-desc">The element representing the SimpleDialog</div></li><li><code>userConfig</code> : Object<div class="sub-desc">The configuration object literal containing the configuration that should be set for this SimpleDialog. See configuration documentation for more details.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by SimpleDialog.</div>
+                </div>
+                            <a name="initDefaultConfig"></a>
+                <div class="mdetail">
+                <h3>initDefaultConfig</i></h3>
+                <code>public function initDefaultConfig()</code>
+                <div class="mdetail-desc">
+                    Initializes the class's configurable properties which can be changed using the SimpleDialog's Config object (cfg).                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by SimpleDialog.</div>
+                </div>
+                            <a name="initEvents"></a>
+                <div class="mdetail alt">
+                <h3>initEvents</i></h3>
+                <code>public function initEvents()</code>
+                <div class="mdetail-desc">
+                    Initializes the custom events for Overlay which are fired automatically at appropriate times by the Overlay class.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#initEvents">Overlay</a>.</div>
+                </div>
+                            <a name="moveTo"></a>
+                <div class="mdetail">
+                <h3>moveTo</i></h3>
+                <code>public function moveTo(<code>Number x</code>, <code>Number y</code>)</code>
+                <div class="mdetail-desc">
+                    Moves the Overlay to the specified position. This function is identical to calling this.cfg.setProperty("xy", [x,y]);                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>x</code> : Number<div class="sub-desc">The Overlay's new x position</div></li><li><code>y</code> : Number<div class="sub-desc">The Overlay's new y position</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#moveTo">Overlay</a>.</div>
+                </div>
+                            <a name="onDomResize"></a>
+                <div class="mdetail alt">
+                <h3>onDomResize</i></h3>
+                <code>public function onDomResize(<code>DOMEvent e</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    Event handler fired when the resize monitor element is resized.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>e</code> : DOMEvent<div class="sub-desc">The resize DOM event</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#onDomResize">Overlay</a>.</div>
+                </div>
+                            <a name="registerDragDrop"></a>
+                <div class="mdetail">
+                <h3>registerDragDrop</i></h3>
+                <code>public function registerDragDrop()</code>
+                <div class="mdetail-desc">
+                    Registers the Panel's header for drag & drop capability.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Panel.html#registerDragDrop">Panel</a>.</div>
+                </div>
+                            <a name="registerForm"></a>
+                <div class="mdetail alt">
+                <h3>registerForm</i></h3>
+                <code>public function registerForm()</code>
+                <div class="mdetail-desc">
+                    Prepares the SimpleDialog's internal FORM object, creating one if one is not currently present, and adding the value hidden field.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by SimpleDialog.</div>
+                </div>
+                            <a name="removeMask"></a>
+                <div class="mdetail">
+                <h3>removeMask</i></h3>
+                <code>public function removeMask()</code>
+                <div class="mdetail-desc">
+                    Removes the modality mask.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Panel.html#removeMask">Panel</a>.</div>
+                </div>
+                            <a name="render"></a>
+                <div class="mdetail alt">
+                <h3>render</i></h3>
+                <code>public function render(<code>String appendToNode</code>, <code>HTMLElement appendToNode</code>)</code>
+                <div class="mdetail-desc">
+                    Renders the Panel by inserting the elements that are not already in the main Panel into their correct places. Optionally appends the Panel to the specified node prior to the render's execution. NOTE: For Panels without existing markup, the appendToNode argument is REQUIRED. If this argument is ommitted and the current element is not present in the document, the function will return false, indicating that the render was a failure.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>appendToNode</code> : String<div class="sub-desc">The element id to which the Module should be appended to prior to rendering <em>OR</em></div></li><li><code>appendToNode</code> : HTMLElement<div class="sub-desc">The element to which the Module should be appended to prior to rendering</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>boolean</code><div class="sub-desc">Success or failure of the render</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Panel.html#render">Panel</a>.</div>
+                </div>
+                            <a name="showIframe"></a>
+                <div class="mdetail">
+                <h3>showIframe</i></h3>
+                <code>public function showIframe()</code>
+                <div class="mdetail-desc">
+                    Shows the iframe shim, if it has been enabled                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#showIframe">Overlay</a>.</div>
+                </div>
+                            <a name="showMacGeckoScrollbars"></a>
+                <div class="mdetail alt">
+                <h3>showMacGeckoScrollbars</i></h3>
+                <code>public function showMacGeckoScrollbars()</code>
+                <div class="mdetail-desc">
+                    Removes a special CSS class from the Overlay when Mac/Gecko is in use, to work around a Gecko bug where
+scrollbars cannot be hidden. See https://bugzilla.mozilla.org/show_bug.cgi?id=187435                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#showMacGeckoScrollbars">Overlay</a>.</div>
+                </div>
+                            <a name="showMask"></a>
+                <div class="mdetail">
+                <h3>showMask</i></h3>
+                <code>public function showMask()</code>
+                <div class="mdetail-desc">
+                    Shows the modality mask.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Panel.html#showMask">Panel</a>.</div>
+                </div>
+                            <a name="sizeMask"></a>
+                <div class="mdetail alt">
+                <h3>sizeMask</i></h3>
+                <code>public function sizeMask()</code>
+                <div class="mdetail-desc">
+                    Sets the size of the modality mask to cover the entire scrollable area of the document                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Panel.html#sizeMask">Panel</a>.</div>
+                </div>
+                            <a name="sizeUnderlay"></a>
+                <div class="mdetail">
+                <h3>sizeUnderlay</i></h3>
+                <code>public function sizeUnderlay()</code>
+                <div class="mdetail-desc">
+                    Adjusts the size of the shadow based on the size of the element.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Panel.html#sizeUnderlay">Panel</a>.</div>
+                </div>
+                            <a name="submit"></a>
+                <div class="mdetail alt">
+                <h3>submit</i></h3>
+                <code>public function submit()</code>
+                <div class="mdetail-desc">
+                    Executes a submit of the Dialog followed by a hide, if validation is successful.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Dialog.html#submit">Dialog</a>.</div>
+                </div>
+                            <a name="syncPosition"></a>
+                <div class="mdetail">
+                <h3>syncPosition</i></h3>
+                <code>public function syncPosition()</code>
+                <div class="mdetail-desc">
+                    Synchronizes the Panel's "xy", "x", and "y" properties with the Panel's position in the DOM. This is primarily used to update position information during drag & drop.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#syncPosition">Overlay</a>.</div>
+                </div>
+                            <a name="toString"></a>
+                <div class="mdetail alt">
+                <h3>toString</i></h3>
+                <code>public function toString()</code>
+                <div class="mdetail-desc">
+                    Returns a string representation of the object.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>String</code><div class="sub-desc">The string representation of the SimpleDialog</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by SimpleDialog.</div>
+                </div>
+                            <a name="validate"></a>
+                <div class="mdetail">
+                <h3>validate</i></h3>
+                <code>public function validate()</code>
+                <div class="mdetail-desc">
+                    Built-in function hook for writing a validation function that will be checked for a "true" value prior to a submit. This function, as implemented by default, always returns true, so it should be overridden if validation is necessary.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Dialog.html#validate">Dialog</a>.</div>
+                </div>
+                            <a name="windowResizeHandler&lt;static&gt;"></a>
+                <div class="mdetail alt">
+                <h3>windowResizeHandler&lt;static&gt;</i></h3>
+                <code>public function windowResizeHandler&lt;static&gt;(<code>DOMEvent e</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; The DOM event handler used to fire the CustomEvent for window resize                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>e</code> : DOMEvent<div class="sub-desc">The DOM resize event</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#windowResizeHandler&lt;static&gt;">Overlay</a>.</div>
+                </div>
+                            <a name="windowScrollHandler&lt;static&gt;"></a>
+                <div class="mdetail">
+                <h3>windowScrollHandler&lt;static&gt;</i></h3>
+                <code>public function windowScrollHandler&lt;static&gt;(<code>DOMEvent e</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; The DOM event handler used to fire the CustomEvent for window scroll                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>e</code> : DOMEvent<div class="sub-desc">The DOM scroll event</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#windowScrollHandler&lt;static&gt;">Overlay</a>.</div>
+                </div>
+                        </div>
+                    
+                    <h2 class="mdetail-head">Event Details</h2>
+            <div class="detail-wrap">
+                            <a name="YAHOO.widget.Overlay.windowResizeEvent"></a>
+                <div class="mdetail">
+                <h3>YAHOO.widget.Overlay.windowResizeEvent</i></h3>
+                <code>public event YAHOO.widget.Overlay.windowResizeEvent</code>
+                <div class="mdetail-desc">
+                A singleton CustomEvent used for reacting to the DOM event for window resize                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Overlay.html#YAHOO.widget.Overlay.windowResizeEvent">Overlay</a>.</div>
+                </div>
+                            <a name="YAHOO.widget.Overlay.windowScrollEvent"></a>
+                <div class="mdetail alt">
+                <h3>YAHOO.widget.Overlay.windowScrollEvent</i></h3>
+                <code>public event YAHOO.widget.Overlay.windowScrollEvent</code>
+                <div class="mdetail-desc">
+                A singleton CustomEvent used for reacting to the DOM event for window scroll                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Overlay.html#YAHOO.widget.Overlay.windowScrollEvent">Overlay</a>.</div>
+                </div>
+                            <a name="asyncSubmitEvent"></a>
+                <div class="mdetail">
+                <h3>asyncSubmitEvent</i></h3>
+                <code>public event asyncSubmitEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired prior to asynchronous submission                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Dialog.html#asyncSubmitEvent">Dialog</a>.</div>
+                </div>
+                            <a name="beforeMoveEvent"></a>
+                <div class="mdetail alt">
+                <h3>beforeMoveEvent</i></h3>
+                <code>public event beforeMoveEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired before the Overlay is moved.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>x</code> : Number<div class="sub-desc">x coordinate</div></li><li><code>y</code> : Number<div class="sub-desc">y coordinate</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Overlay.html#beforeMoveEvent">Overlay</a>.</div>
+                </div>
+                            <a name="beforeSumitEvent"></a>
+                <div class="mdetail">
+                <h3>beforeSumitEvent</i></h3>
+                <code>public event beforeSumitEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired prior to submission                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Dialog.html#beforeSumitEvent">Dialog</a>.</div>
+                </div>
+                            <a name="cancelEvent"></a>
+                <div class="mdetail alt">
+                <h3>cancelEvent</i></h3>
+                <code>public event cancelEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired after cancel                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Dialog.html#cancelEvent">Dialog</a>.</div>
+                </div>
+                            <a name="dragEvent"></a>
+                <div class="mdetail">
+                <h3>dragEvent</i></h3>
+                <code>public event dragEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent when the Panel is dragged                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Panel.html#dragEvent">Panel</a>.</div>
+                </div>
+                            <a name="formSubmitEvent"></a>
+                <div class="mdetail alt">
+                <h3>formSubmitEvent</i></h3>
+                <code>public event formSubmitEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired prior to form-based submission                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Dialog.html#formSubmitEvent">Dialog</a>.</div>
+                </div>
+                            <a name="hideMaskEvent"></a>
+                <div class="mdetail">
+                <h3>hideMaskEvent</i></h3>
+                <code>public event hideMaskEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired after the modality mask is hidden                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Panel.html#hideMaskEvent">Panel</a>.</div>
+                </div>
+                            <a name="manualSubmitEvent"></a>
+                <div class="mdetail alt">
+                <h3>manualSubmitEvent</i></h3>
+                <code>public event manualSubmitEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired prior to manual submission                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Dialog.html#manualSubmitEvent">Dialog</a>.</div>
+                </div>
+                            <a name="moveEvent"></a>
+                <div class="mdetail">
+                <h3>moveEvent</i></h3>
+                <code>public event moveEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired after the Overlay is moved.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>x</code> : Number<div class="sub-desc">x coordinate</div></li><li><code>y</code> : Number<div class="sub-desc">y coordinate</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Overlay.html#moveEvent">Overlay</a>.</div>
+                </div>
+                            <a name="showMaskEvent"></a>
+                <div class="mdetail alt">
+                <h3>showMaskEvent</i></h3>
+                <code>public event showMaskEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired after the modality mask is shown                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Panel.html#showMaskEvent">Panel</a>.</div>
+                </div>
+                            <a name="submitEvent"></a>
+                <div class="mdetail">
+                <h3>submitEvent</i></h3>
+                <code>public event submitEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired after submission                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Dialog.html#submitEvent">Dialog</a>.</div>
+                </div>
+                        </div>
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    

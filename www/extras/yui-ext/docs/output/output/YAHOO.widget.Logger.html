@@ -1,0 +1,301 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.widget.Logger</title>
+        <link rel="stylesheet" type="text/css" href="../reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.widget.Logger.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.widget.Logger</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.widget</td></tr>
+            <tr><td class="label">Class:</td><td>Logger</td></tr>
+                        <tr><td class="label">Extends:</td><td>Object</td></tr>
+                                    <tr><td class="label">Defined In:</td><td><a href="logger.js.html">logger.js</a></td></tr>
+        </table>
+        <div class="description">
+            The singleton Logger class provides core log management functionality. Saves
+logs written through the global YAHOO.log function or written by a LogWriter
+instance. Provides access to logs for reading by a LogReader instance or
+native browser console such as the Firebug extension to Firefox or Safari's
+JavaScript console through integration with the console.log() method.        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+        <div class="no-members">This class has no public properties.</div>        <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#disableBrowserConsole">disableBrowserConsole</a>() : void</td>
+        <td class="msource" rowspan="2">Logger</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Disables output to the browser's global console.log() function, which is used
+by the Firebug extension to Firefox as ...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#enableBrowserConsole">enableBrowserConsole</a>() : void</td>
+        <td class="msource" rowspan="2">Logger</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Enables output to the browser's global console.log() function, which is used
+by the Firebug extension to Firefox as w...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getStack">getStack</a>() : Object[]</td>
+        <td class="msource" rowspan="2">Logger</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Public accessor to internal stack of log message objects.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getStartTime">getStartTime</a>() : Date</td>
+        <td class="msource" rowspan="2">Logger</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Public accessor to internal start time.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#log">log</a>(<code>sMsg {String}</code>, <code>sCategory {String}</code>, <code>sSource {String}</code>) : void</td>
+        <td class="msource" rowspan="2">Logger</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Saves a log message to the stack and fires newLogEvent. If the log message is
+assigned to an unknown category, create...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#reset">reset</a>() : void</td>
+        <td class="msource" rowspan="2">Logger</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Resets internal stack and startTime, enables Logger, and fires logResetEvent.</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Event</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#categoryCreateEvent">categoryCreateEvent</a> : (<code>sCategory {String}</code>)</td>
+        <td class="msource" rowspan="2">Logger</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fired when a new category has been created.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#logResetEvent">logResetEvent</a> : ()</td>
+        <td class="msource" rowspan="2">Logger</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Fired when the Logger has been reset has been created.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#newLogEvent">newLogEvent</a> : (<code>sMsg {String}</code>)</td>
+        <td class="msource" rowspan="2">Logger</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fired when a new log message has been created.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#sourceCreateEvent">sourceCreateEvent</a> : (<code>sSource {String}</code>)</td>
+        <td class="msource" rowspan="2">Logger</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Fired when a new source has been named.</td>
+    </tr>
+            </table>
+                
+                
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="disableBrowserConsole"></a>
+                <div class="mdetail">
+                <h3>disableBrowserConsole</i></h3>
+                <code>public function disableBrowserConsole()</code>
+                <div class="mdetail-desc">
+                    Disables output to the browser's global console.log() function, which is used
+by the Firebug extension to Firefox as well as Safari.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Logger.</div>
+                </div>
+                            <a name="enableBrowserConsole"></a>
+                <div class="mdetail alt">
+                <h3>enableBrowserConsole</i></h3>
+                <code>public function enableBrowserConsole()</code>
+                <div class="mdetail-desc">
+                    Enables output to the browser's global console.log() function, which is used
+by the Firebug extension to Firefox as well as Safari.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Logger.</div>
+                </div>
+                            <a name="getStack"></a>
+                <div class="mdetail">
+                <h3>getStack</i></h3>
+                <code>public function getStack()</code>
+                <div class="mdetail-desc">
+                    Public accessor to internal stack of log message objects.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Object[]</code><div class="sub-desc">Array of log message objects.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Logger.</div>
+                </div>
+                            <a name="getStartTime"></a>
+                <div class="mdetail alt">
+                <h3>getStartTime</i></h3>
+                <code>public function getStartTime()</code>
+                <div class="mdetail-desc">
+                    Public accessor to internal start time.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Date</code><div class="sub-desc">Internal date of when Logger singleton was initialized.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Logger.</div>
+                </div>
+                            <a name="log"></a>
+                <div class="mdetail">
+                <h3>log</i></h3>
+                <code>public function log(<code>sMsg {String}</code>, <code>sCategory {String}</code>, <code>sSource {String}</code>)</code>
+                <div class="mdetail-desc">
+                    Saves a log message to the stack and fires newLogEvent. If the log message is
+assigned to an unknown category, creates a new category. If the log message is
+from an unknown source, creates a new source.  If browser console is enabled,
+outputs the log message to browser console.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>{String}</code> : sMsg<div class="sub-desc">The log message.</div></li><li><code>{String}</code> : sCategory<div class="sub-desc">Category of log message, or null.</div></li><li><code>{String}</code> : sSource<div class="sub-desc">Source of LogWriter, or null if global.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Logger.</div>
+                </div>
+                            <a name="reset"></a>
+                <div class="mdetail alt">
+                <h3>reset</i></h3>
+                <code>public function reset()</code>
+                <div class="mdetail-desc">
+                    Resets internal stack and startTime, enables Logger, and fires logResetEvent.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Logger.</div>
+                </div>
+                        </div>
+                    
+                    <h2 class="mdetail-head">Event Details</h2>
+            <div class="detail-wrap">
+                            <a name="categoryCreateEvent"></a>
+                <div class="mdetail">
+                <h3>categoryCreateEvent</i></h3>
+                <code>public event categoryCreateEvent</code>
+                <div class="mdetail-desc">
+                Fired when a new category has been created.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>{String}</code> : sCategory<div class="sub-desc">Category name.</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Logger.</div>
+                </div>
+                            <a name="logResetEvent"></a>
+                <div class="mdetail alt">
+                <h3>logResetEvent</i></h3>
+                <code>public event logResetEvent</code>
+                <div class="mdetail-desc">
+                Fired when the Logger has been reset has been created.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Logger.</div>
+                </div>
+                            <a name="newLogEvent"></a>
+                <div class="mdetail">
+                <h3>newLogEvent</i></h3>
+                <code>public event newLogEvent</code>
+                <div class="mdetail-desc">
+                Fired when a new log message has been created.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>{String}</code> : sMsg<div class="sub-desc">Log message.</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Logger.</div>
+                </div>
+                            <a name="sourceCreateEvent"></a>
+                <div class="mdetail alt">
+                <h3>sourceCreateEvent</i></h3>
+                <code>public event sourceCreateEvent</code>
+                <div class="mdetail-desc">
+                Fired when a new source has been named.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>{String}</code> : sSource<div class="sub-desc">Source name.</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Logger.</div>
+                </div>
+                        </div>
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    

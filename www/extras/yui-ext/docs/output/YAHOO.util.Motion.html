@@ -1,0 +1,542 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.util.Motion</title>
+        <link rel="stylesheet" type="text/css" href="../resources/reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../resources/style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../resources/print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="../resources/print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.util.Motion.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.util.Motion</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.util</td></tr>
+            <tr><td class="label">Class:</td><td>Motion</td></tr>
+                        <tr><td class="label">Extends:</td><td><a href="YAHOO.util.Anim.html">Anim</a></td></tr>
+                                    <tr><td class="label">Defined In:</td><td><a href="animation.js.html">animation.js</a></td></tr>
+        </table>
+        <div class="description">
+            Anim subclass for moving elements along a path defined by the "points"
+member of "attributes".  All "points" are arrays with x, y coordinates.
+<p>Usage: <code>var myAnim = new YAHOO.util.Motion(el, { points: { to: [800, 800] } }, 1, YAHOO.util.Easing.easeOut);</code></p>        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Property</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#attributes">attributes</a> : Object</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Anim.html#attributes">Anim</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The collection of attributes to be animated.
+Each attribute must have at least a "to" or "by" defined in order to ani...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#currentFrame">currentFrame</a> : Int</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Anim.html#currentFrame">Anim</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The location of the current animation on the timeline.
+In time-based animations, this is used by AnimMgr to ensure th...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#duration">duration</a> : Number</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Anim.html#duration">Anim</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The length of the animation.  Defaults to "1" (second).</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#method">method</a> : Function</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Anim.html#method">Anim</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The method that will provide values to the attribute(s) during the animation.
+Defaults to "YAHOO.util.Easing.easeNone".</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#totalFrames">totalFrames</a> : Int</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Anim.html#totalFrames">Anim</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The total number of frames to be executed.
+In time-based animations, this is used by AnimMgr to ensure the animation ...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#useSeconds">useSeconds</a> : Boolean</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Anim.html#useSeconds">Anim</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Whether or not the duration should be treated as seconds.
+Defaults to true.</td>
+    </tr>
+            </table>
+                <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#Motion">Motion</a>(<code>String/HTMLElement el</code>, <code>Object attributes</code>, <code>Number duration</code>, <code>Function method</code>)</td>
+        <td class="msource" rowspan="2">Motion</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#animate">animate</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Anim.html#animate">Anim</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Starts the animation by registering it with the animation manager.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#doMethod">doMethod</a>(<code>String attr</code>, <code>Number start</code>, <code>Number end</code>) : Number</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Anim.html#doMethod">Anim</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Returns the value computed by the animation's "method".</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getAttribute">getAttribute</a>(<code>String attr</code>) : Number</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Anim.html#getAttribute">Anim</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Returns current value of the attribute.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getDefaultUnit">getDefaultUnit</a>(<code>attr attr</code>) : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Anim.html#getDefaultUnit">Anim</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Returns the unit to use when none is supplied.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getEl">getEl</a>() : HTMLElement</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Anim.html#getEl">Anim</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Returns a reference to the animated element.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getStartTime">getStartTime</a>() : Date</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Anim.html#getStartTime">Anim</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Returns the animation start time.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#init">init</a>(<code>String/HTMLElement el</code>, <code>Object attributes</code>, <code>Number duration</code>, <code>Function method</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Anim.html#init">Anim</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Constructor for Anim instance.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#isAnimated">isAnimated</a>() : Boolean</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Anim.html#isAnimated">Anim</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Checks whether the element is currently animated.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setAttribute">setAttribute</a>(<code>String attr</code>, <code>Number val</code>, <code>String unit</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Anim.html#setAttribute">Anim</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Applies a value to an attribute.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#stop">stop</a>(<span class="optional" title="Optional">[<code>Boolean finish</code>]</span>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Anim.html#stop">Anim</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Stops the animation.  Normally called by AnimMgr when animation completes.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#toString">toString</a>() : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Anim.html#toString">Anim</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Provides a readable name for the Anim instance.</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Event</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#event-onComplete">onComplete</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Anim.html#event-onComplete">Anim</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Custom event that fires when animation ends
+Listen via subscribe method (e.g. myAnim.onComplete.subscribe(someFunction)</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#event-onStart">onStart</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Anim.html#event-onStart">Anim</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Custom event that fires when animation begins
+Listen via subscribe method (e.g. myAnim.onStart.subscribe(someFunction)</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#event-onTween">onTween</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Anim.html#event-onTween">Anim</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Custom event that fires between each frame
+Listen via subscribe method (e.g. myAnim.onTween.subscribe(someFunction)</td>
+    </tr>
+            </table>
+                
+                    <h2 class="mdetail-head">Property Details</h2>
+            <div class="detail-wrap">
+                            <a name="attributes"></a>
+                <div class="mdetail">
+                <h3>attributes</i></h3>
+                <code>public Object attributes</code>
+                <div class="mdetail-desc">
+                    The collection of attributes to be animated.
+Each attribute must have at least a "to" or "by" defined in order to animate.
+If "to" is supplied, the animation will end with the attribute at that value.
+If "by" is supplied, the animation will end at that value plus its starting value.
+If both are supplied, "to" is used, and "by" is ignored.
+Optional additional member include "from" (the value the attribute should start animating from, defaults to current value), and "unit" (the units to apply to the values).                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.util.Anim.html#attributes">Anim</a>.</div>
+                </div>
+                            <a name="currentFrame"></a>
+                <div class="mdetail alt">
+                <h3>currentFrame</i></h3>
+                <code>public Int currentFrame</code>
+                <div class="mdetail-desc">
+                    The location of the current animation on the timeline.
+In time-based animations, this is used by AnimMgr to ensure the animation finishes on time.                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.util.Anim.html#currentFrame">Anim</a>.</div>
+                </div>
+                            <a name="duration"></a>
+                <div class="mdetail">
+                <h3>duration</i></h3>
+                <code>public Number duration</code>
+                <div class="mdetail-desc">
+                    The length of the animation.  Defaults to "1" (second).                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.util.Anim.html#duration">Anim</a>.</div>
+                </div>
+                            <a name="method"></a>
+                <div class="mdetail alt">
+                <h3>method</i></h3>
+                <code>public Function method</code>
+                <div class="mdetail-desc">
+                    The method that will provide values to the attribute(s) during the animation.
+Defaults to "YAHOO.util.Easing.easeNone".                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.util.Anim.html#method">Anim</a>.</div>
+                </div>
+                            <a name="totalFrames"></a>
+                <div class="mdetail">
+                <h3>totalFrames</i></h3>
+                <code>public Int totalFrames</code>
+                <div class="mdetail-desc">
+                    The total number of frames to be executed.
+In time-based animations, this is used by AnimMgr to ensure the animation finishes on time.                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.util.Anim.html#totalFrames">Anim</a>.</div>
+                </div>
+                            <a name="useSeconds"></a>
+                <div class="mdetail alt">
+                <h3>useSeconds</i></h3>
+                <code>public Boolean useSeconds</code>
+                <div class="mdetail-desc">
+                    Whether or not the duration should be treated as seconds.
+Defaults to true.                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.util.Anim.html#useSeconds">Anim</a>.</div>
+                </div>
+                        </div>
+                
+                    <a name="Motion"></a>
+            <h2 class="mdetail-head">Constructor Details</h2>
+            <div class="detail-wrap">
+                <div class="mdetail">
+                <h3>Motion</i></h3>
+                <code>public function Motion(<code>String/HTMLElement el</code>, <code>Object attributes</code>, <code>Number duration</code>, <code>Function method</code>)</code>
+                <div class="mdetail-desc">
+                                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>el</code> : String/HTMLElement<div class="sub-desc">Reference to the element that will be animated</div></li><li><code>attributes</code> : Object<div class="sub-desc">The attribute(s) to be animated. Each attribute is an object with at minimum a "to" or "by" member defined. Additional optional members are "from" (defaults to current value), "units" (defaults to "px"). All attribute names use camelCase.</div></li><li><code>duration</code> : Number<div class="sub-desc">(optional, defaults to 1 second) Length of animation (frames or seconds), defaults to time-based</div></li><li><code>method</code> : Function<div class="sub-desc">(optional, defaults to YAHOO.util.Easing.easeNone) Computes the values that are applied to the attributes per frame (generally a YAHOO.util.Easing method)</div></li>                    </ul>
+                </div>
+                </div>
+                </div>
+            </div>
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="animate"></a>
+                <div class="mdetail">
+                <h3>animate</i></h3>
+                <code>public function animate()</code>
+                <div class="mdetail-desc">
+                    Starts the animation by registering it with the animation manager.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Anim.html#animate">Anim</a>.</div>
+                </div>
+                            <a name="doMethod"></a>
+                <div class="mdetail alt">
+                <h3>doMethod</i></h3>
+                <code>public function doMethod(<code>String attr</code>, <code>Number start</code>, <code>Number end</code>)</code>
+                <div class="mdetail-desc">
+                    Returns the value computed by the animation's "method".                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>attr</code> : String<div class="sub-desc">The name of the attribute.</div></li><li><code>start</code> : Number<div class="sub-desc">The value this attribute should start from for this animation.</div></li><li><code>end</code> : Number<div class="sub-desc">The value this attribute should end at for this animation.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Number</code><div class="sub-desc">The Value to be applied to the attribute.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Anim.html#doMethod">Anim</a>.</div>
+                </div>
+                            <a name="getAttribute"></a>
+                <div class="mdetail">
+                <h3>getAttribute</i></h3>
+                <code>public function getAttribute(<code>String attr</code>)</code>
+                <div class="mdetail-desc">
+                    Returns current value of the attribute.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>attr</code> : String<div class="sub-desc">The name of the attribute.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Number</code><div class="sub-desc">val The current value of the attribute.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Anim.html#getAttribute">Anim</a>.</div>
+                </div>
+                            <a name="getDefaultUnit"></a>
+                <div class="mdetail alt">
+                <h3>getDefaultUnit</i></h3>
+                <code>public function getDefaultUnit(<code>attr attr</code>)</code>
+                <div class="mdetail-desc">
+                    Returns the unit to use when none is supplied.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>attr</code> : attr<div class="sub-desc">The name of the attribute.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>String</code><div class="sub-desc">The default unit to be used.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Anim.html#getDefaultUnit">Anim</a>.</div>
+                </div>
+                            <a name="getEl"></a>
+                <div class="mdetail">
+                <h3>getEl</i></h3>
+                <code>public function getEl()</code>
+                <div class="mdetail-desc">
+                    Returns a reference to the animated element.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>HTMLElement</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Anim.html#getEl">Anim</a>.</div>
+                </div>
+                            <a name="getStartTime"></a>
+                <div class="mdetail alt">
+                <h3>getStartTime</i></h3>
+                <code>public function getStartTime()</code>
+                <div class="mdetail-desc">
+                    Returns the animation start time.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Date</code><div class="sub-desc">current value of startTime.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Anim.html#getStartTime">Anim</a>.</div>
+                </div>
+                            <a name="init"></a>
+                <div class="mdetail">
+                <h3>init</i></h3>
+                <code>public function init(<code>String/HTMLElement el</code>, <code>Object attributes</code>, <code>Number duration</code>, <code>Function method</code>)</code>
+                <div class="mdetail-desc">
+                    Constructor for Anim instance.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>el</code> : String/HTMLElement<div class="sub-desc">Reference to the element that will be animated</div></li><li><code>attributes</code> : Object<div class="sub-desc">The attribute(s) to be animated. Each attribute is an object with at minimum a "to" or "by" member defined. Additional optional members are "from" (defaults to current value), "units" (defaults to "px"). All attribute names use camelCase.</div></li><li><code>duration</code> : Number<div class="sub-desc">(optional, defaults to 1 second) Length of animation (frames or seconds), defaults to time-based</div></li><li><code>method</code> : Function<div class="sub-desc">(optional, defaults to YAHOO.util.Easing.easeNone) Computes the values that are applied to the attributes per frame (generally a YAHOO.util.Easing method)</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Anim.html#init">Anim</a>.</div>
+                </div>
+                            <a name="isAnimated"></a>
+                <div class="mdetail alt">
+                <h3>isAnimated</i></h3>
+                <code>public function isAnimated()</code>
+                <div class="mdetail-desc">
+                    Checks whether the element is currently animated.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">current value of isAnimated.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Anim.html#isAnimated">Anim</a>.</div>
+                </div>
+                            <a name="setAttribute"></a>
+                <div class="mdetail">
+                <h3>setAttribute</i></h3>
+                <code>public function setAttribute(<code>String attr</code>, <code>Number val</code>, <code>String unit</code>)</code>
+                <div class="mdetail-desc">
+                    Applies a value to an attribute.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>attr</code> : String<div class="sub-desc">The name of the attribute.</div></li><li><code>val</code> : Number<div class="sub-desc">The value to be applied to the attribute.</div></li><li><code>unit</code> : String<div class="sub-desc">The unit ('px', '%', etc.) of the value.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Anim.html#setAttribute">Anim</a>.</div>
+                </div>
+                            <a name="stop"></a>
+                <div class="mdetail alt">
+                <h3>stop</i></h3>
+                <code>public function stop(<span class="optional" title="Optional">[<code>Boolean finish</code>]</span>)</code>
+                <div class="mdetail-desc">
+                    Stops the animation.  Normally called by AnimMgr when animation completes.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>finish</code> : Boolean<div class="sub-desc">(optional) If true, animation will jump to final frame.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Anim.html#stop">Anim</a>.</div>
+                </div>
+                            <a name="toString"></a>
+                <div class="mdetail">
+                <h3>toString</i></h3>
+                <code>public function toString()</code>
+                <div class="mdetail-desc">
+                    Provides a readable name for the Anim instance.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>String</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Anim.html#toString">Anim</a>.</div>
+                </div>
+                        </div>
+                    
+                    <h2 class="mdetail-head">Event Details</h2>
+            <div class="detail-wrap">
+                            <a name="event-onComplete"></a>
+                <div class="mdetail">
+                <h3>onComplete</i></h3>
+                <code>public event onComplete</code>
+                <div class="mdetail-desc">
+                Custom event that fires when animation ends
+Listen via subscribe method (e.g. myAnim.onComplete.subscribe(someFunction)                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.util.Anim.html#event-onComplete">Anim</a>.</div>
+                </div>
+                            <a name="event-onStart"></a>
+                <div class="mdetail alt">
+                <h3>onStart</i></h3>
+                <code>public event onStart</code>
+                <div class="mdetail-desc">
+                Custom event that fires when animation begins
+Listen via subscribe method (e.g. myAnim.onStart.subscribe(someFunction)                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.util.Anim.html#event-onStart">Anim</a>.</div>
+                </div>
+                            <a name="event-onTween"></a>
+                <div class="mdetail">
+                <h3>onTween</i></h3>
+                <code>public event onTween</code>
+                <div class="mdetail-desc">
+                Custom event that fires between each frame
+Listen via subscribe method (e.g. myAnim.onTween.subscribe(someFunction)                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.util.Anim.html#event-onTween">Anim</a>.</div>
+                </div>
+                        </div>
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    

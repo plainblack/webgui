@@ -1,0 +1,42 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Editor Grid Example</title>
+<!-- YAHOO UI Utilities Lib, you will need to replace this with the path to your YUI lib file -->
+<script type="text/javascript" src="http://us.js2.yimg.com/us.js.yimg.com/lib/common/utils/2/utilities_2.1.0.js"></script>
+
+<link rel="stylesheet" type="text/css" href="../../resources/css/reset-min.css" />
+<link rel="stylesheet" type="text/css" href="../../resources/css/grid.css" />
+
+<script type="text/javascript" src="../../yui-ext.js"></script>
+<script type="text/javascript" src="edit-grid.js"></script>
+
+<!-- Common Styles for the examples -->
+<link rel="stylesheet" type="text/css" href="../examples.css" />
+</head>
+<body>
+<div class="example-info">
+    To view the source of this page, right click (Mac users control+click) in this frame and select "View Source" or "This Frame"-&gt;"View Source".
+</div>
+<h1>Editor Grid Example</h1>
+<p>This example shows how to create a grid with inline editing. For more details on this example, see <a href="http://www.jackslocum.com/yui/2006/09/10/adding-built-in-editing-support-to-the-yahoo-ui-extensions-grid/">the blog post</a>.</p>
+<p>Note that the js is not minified so it is readable. See <a href="edit-grid.js">edit-grid.js</a>.</p>
+
+<p>The data in the grid is loaded from <a href="plants.xml">plants.xml</a>.</p>
+
+<!-- you must define the select box here, as the custom editor for the 'Light' column will require it -->
+<select name="light" id="light" class="ygrid-editor" style="visibility: hidden;">
+	<option value="Shade">Shade</option>
+	<option value="Mostly Shady">Mostly Shady</option>
+	<option value="Sun or Shade">Sun or Shade</option>
+
+	<option value="Mostly Sunny">Mostly Sunny</option>
+
+	<option value="Sunny">Sunny</option>
+</select>
+
+<!-- a place holder for the grid. requires the unique id to be passed in the javascript function, and width and height ! -->
+<div id="editor-grid" style="border: 1px solid #cccccc; overflow: hidden; width: 535px; height: 225px;"></div>
+
+</body>
+</html>

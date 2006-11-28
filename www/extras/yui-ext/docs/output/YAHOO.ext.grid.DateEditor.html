@@ -1,0 +1,82 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.ext.grid.DateEditor</title>
+        <link rel="stylesheet" type="text/css" href="../resources/reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../resources/style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../resources/print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="../resources/print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.ext.grid.DateEditor.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.ext.grid.DateEditor</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.ext.grid</td></tr>
+            <tr><td class="label">Class:</td><td>DateEditor</td></tr>
+                        <tr><td class="label">Extends:</td><td><a href="YAHOO.ext.grid.CellEditor.html">CellEditor</a></td></tr>
+                                    <tr><td class="label">Defined In:</td><td><a href="DateEditor.js.html">DateEditor.js</a></td></tr>
+        </table>
+        <div class="description">
+            Provides a date editor field, and optionally a DatePicker. The DateEditor provides a method to override (showCalendar) if you don't want to use the built in DatePicker control. The reason I chose to use my own DatePicker control rather than the nice YUI Calendar component is my control was very easy to override events to make it work well with the grid. It's also only 5k compressed, while the YUI Calendar is 40k compressed. The DatePicker supports left/right keys to move months, up/down keys to move years and the mouse wheel to quickly go through the months. The DateEditor supports the following configuration options:
+<ul class="list">
+<li><i>format</i> - The date format for the editor. The format is identical to <a href="http://www.php.net/date">PHP date()</a> and text is allowed. Credit for that goes to <a style="font-weight:normal;" href="http://www.xaprb.com/blog/2006/05/14/javascript-date-formatting-benchmarks/">this fantastic date library</a>. This format is for the editor only and doesn't affect the rendering of the cell when not in edit mode. Your rendering function can use any date format it wants.</li>
+<li><i>minValue</i> - The minimum allowed date. Can be either a Javascript date object or a string date in the specified format.</li>
+<li><i>maxValue</i> - The maximum allowed date. Can be either a Javascript date object or a string date in the specified format.</li>
+<li><i>minText</i> - The tooltip to display when the date in the cell is before minValue.</li>
+<li><i>maxText</i> - The tooltip to display when the date in the cell is after maxValue.</li>
+<li><i>invalidText</i> - The text to display when the date in the field is invalid (for example: 02/31/06)</li>
+<li><i>disabledDays</i> - An array of days to disable, 0 based. For example, [0, 6] disables Sunday and Saturday.</li>
+<li><i>disabledDaysText</i> - The tooltip to display when the date in the cell (or DatePicker) falls on a disabled day.</li>
+<li><i>disabledDates</i> - An array of "dates" to disable, as strings. These strings will be used to build a dynamic regular expression so they are very powerful. For example, ["03/08/2003", "09/16/2003"] would disable those dates, but ["03/08", "09/16"] would disable them for every year. If you are using short years, you will want to use ^ to tell the regular expression to only match the beginning like ["^03/08"]. To disable March of 2006: ["03/../2006"] or every March ["^03"]. In order to support regular expressions, if you are using a date format that has "." in it, you will have to  escape the dot when restricting dates. For example: ["03\\.08\\.03"].</li>
+<li><i>disabledDatesText</i> - The tooltip to display when the date in the cell (or DatePicker) falls on a disabled date.</li>
+<li><i>allowBlank</i> - True if the cell is allowed to be empty.</li>
+<li><i>blankText</i> - The tooltip (error message) to display when the cell is empty and is not allowed to be.</li>
+<li><i>validator</i> - Any custom validation function you want called. The function must return true if the data is valid or an error message otherwise.</li>
+<li><i>validationDelay</i> - The delay in milliseconds for validation. Each time the user types something the field is validated after a specified delay, setting this value allows you to customize that delay (for example, if your custom validation routine is slow).</li>
+</ul>
+For more information on using this editor, see <a href="http://www.jackslocum.com/yui/2006/09/10/adding-built-in-editing-support-to-the-yahoo-ui-extensions-grid/">this blog post</a>.        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+        <div class="no-members">This class has no public properties.</div>        <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#DateEditor">DateEditor</a>(<code>Object config</code>)</td>
+        <td class="msource" rowspan="2">DateEditor</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Create a new DateEditor</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+        <div class="no-members">This class has no public events.</div>        
+                
+                    <a name="DateEditor"></a>
+            <h2 class="mdetail-head">Constructor Details</h2>
+            <div class="detail-wrap">
+                <div class="mdetail">
+                <h3>DateEditor</i></h3>
+                <code>public function DateEditor(<code>Object config</code>)</code>
+                <div class="mdetail-desc">
+                Create a new DateEditor                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>config</code> : Object<div class="sub-desc"></div></li>                    </ul>
+                </div>
+                </div>
+                </div>
+            </div>
+                 
+                    
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    

@@ -1,0 +1,1273 @@
+<html><head><title>animation.js</title><link rel="stylesheet" type="text/css" href="../style.css" media="screen"/></head><body><div class="hl-main"><pre><span class="hl-comment">/*
+Copyright (c) 2006, Yahoo! Inc. All rights reserved.
+Code licensed under the BSD License:
+</span><span class="hl-url">http://developer.yahoo.net/yui/license.txt</span><span class="hl-comment">
+version: 0.12.0
+*/
+// holder
+/**
+ * The animation module provides allows effects to be added to HTMLElements.
+ * @module animation
+ */
+// holder
+/**
+ *
+ * Base animation class that provides the interface for building animated effects.
+ * &lt;p&gt;Usage: var myAnim = new YAHOO.util.Anim(el, { width: { from: 10, to: 100 } }, 1, YAHOO.util.Easing.easeOut);&lt;/p&gt;
+ * @class Anim
+ * @namespace YAHOO.util
+ * @requires YAHOO.util.AnimMgr
+ * @requires YAHOO.util.Easing
+ * @requires YAHOO.util.Dom
+ * @requires YAHOO.util.Event
+ * @requires YAHOO.util.CustomEvent
+ * @constructor
+ * @param {String | HTMLElement} el Reference to the element that will be animated
+ * @param {Object} attributes The attribute(s) to be animated.
+ * Each attribute is an object with at minimum a &quot;to&quot; or &quot;by&quot; member defined.
+ * Additional optional members are &quot;from&quot; (defaults to current value), &quot;units&quot; (defaults to &quot;px&quot;).
+ * All attribute names use camelCase.
+ * @param {Number} duration (optional, defaults to 1 second) Length of animation (frames or seconds), defaults to time-based
+ * @param {Function} method (optional, defaults to YAHOO.util.Easing.easeNone) Computes the values that are applied to the attributes per frame (generally a YAHOO.util.Easing method)
+ */
+
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">util</span><span class="hl-default">.</span><span class="hl-identifier">Anim</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">attributes</span><span class="hl-code">, </span><span class="hl-identifier">duration</span><span class="hl-code">, </span><span class="hl-identifier">method</span><span class="hl-brackets">) {
+   </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">) {
+      </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">init</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">attributes</span><span class="hl-code">, </span><span class="hl-identifier">duration</span><span class="hl-code">, </span><span class="hl-identifier">method</span><span class="hl-brackets">)</span><span class="hl-code">;
+   </span><span class="hl-brackets">}
+}</span><span class="hl-default">;
+
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">util</span><span class="hl-default">.</span><span class="hl-identifier">Anim</span><span class="hl-default">.</span><span class="hl-identifier">prototype</span><span class="hl-default"> = </span><span class="hl-brackets">{
+   </span><span class="hl-comment">/**
+    * Provides a readable name for the Anim instance.
+    * @method toString
+    * @return {String}
+    */
+   </span><span class="hl-identifier">toString</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">() {
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">el</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getEl</span><span class="hl-brackets">()</span><span class="hl-code">;
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">id</span><span class="hl-code"> = </span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">id</span><span class="hl-code"> || </span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">tagName</span><span class="hl-code">;
+      </span><span class="hl-reserved">return </span><span class="hl-brackets">(</span><span class="hl-quotes">&quot;</span><span class="hl-string">Anim </span><span class="hl-quotes">&quot;</span><span class="hl-code"> + </span><span class="hl-identifier">id</span><span class="hl-brackets">)</span><span class="hl-code">;
+   </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+   </span><span class="hl-identifier">patterns</span><span class="hl-code">: </span><span class="hl-brackets">{ </span><span class="hl-comment">// cached for performance
+      </span><span class="hl-identifier">noNegatives</span><span class="hl-code">:      </span><span class="hl-quotes">/</span><span class="hl-string">width|height|opacity|padding</span><span class="hl-quotes">/i</span><span class="hl-code">, </span><span class="hl-comment">// keep at zero or above
+      </span><span class="hl-identifier">offsetAttribute</span><span class="hl-code">:  </span><span class="hl-quotes">/</span><span class="hl-string">^((width|height)|(top|left))$</span><span class="hl-quotes">/</span><span class="hl-code">, </span><span class="hl-comment">// use offsetValue as default
+      </span><span class="hl-identifier">defaultUnit</span><span class="hl-code">:      </span><span class="hl-quotes">/</span><span class="hl-string">width|height|top$|bottom$|left$|right$</span><span class="hl-quotes">/i</span><span class="hl-code">, </span><span class="hl-comment">// use 'px' by default
+      </span><span class="hl-identifier">offsetUnit</span><span class="hl-code">:       </span><span class="hl-quotes">/</span><span class="hl-string">\d+(em|%|en|ex|pt|in|cm|mm|pc)$</span><span class="hl-quotes">/i </span><span class="hl-comment">// IE may return these, so convert these to offset
+   </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+   </span><span class="hl-comment">/**
+    * Returns the value computed by the animation's &quot;method&quot;.
+    * @method doMethod
+    * @param {String} attr The name of the attribute.
+    * @param {Number} start The value this attribute should start from for this animation.
+    * @param {Number} end  The value this attribute should end at for this animation.
+    * @return {Number} The Value to be applied to the attribute.
+    */
+   </span><span class="hl-identifier">doMethod</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">attr</span><span class="hl-code">, </span><span class="hl-identifier">start</span><span class="hl-code">, </span><span class="hl-identifier">end</span><span class="hl-brackets">) {
+      </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">method</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">currentFrame</span><span class="hl-code">, </span><span class="hl-identifier">start</span><span class="hl-code">, </span><span class="hl-identifier">end</span><span class="hl-code"> - </span><span class="hl-identifier">start</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">totalFrames</span><span class="hl-brackets">)</span><span class="hl-code">;
+   </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+   </span><span class="hl-comment">/**
+    * Applies a value to an attribute.
+    * @method setAttribute
+    * @param {String} attr The name of the attribute.
+    * @param {Number} val The value to be applied to the attribute.
+    * @param {String} unit The unit ('px', '%', etc.) of the value.
+    */
+   </span><span class="hl-identifier">setAttribute</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">attr</span><span class="hl-code">, </span><span class="hl-identifier">val</span><span class="hl-code">, </span><span class="hl-identifier">unit</span><span class="hl-brackets">) {
+      </span><span class="hl-reserved">if </span><span class="hl-brackets">( </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">patterns</span><span class="hl-code">.</span><span class="hl-identifier">noNegatives</span><span class="hl-code">.</span><span class="hl-identifier">test</span><span class="hl-brackets">(</span><span class="hl-identifier">attr</span><span class="hl-brackets">) ) {
+         </span><span class="hl-identifier">val</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-identifier">val</span><span class="hl-code"> &gt; </span><span class="hl-number">0</span><span class="hl-brackets">)</span><span class="hl-code"> ? </span><span class="hl-identifier">val</span><span class="hl-code"> : </span><span class="hl-number">0</span><span class="hl-code">;
+      </span><span class="hl-brackets">}
+
+      </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">setStyle</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getEl</span><span class="hl-brackets">()</span><span class="hl-code">, </span><span class="hl-identifier">attr</span><span class="hl-code">, </span><span class="hl-identifier">val</span><span class="hl-code"> + </span><span class="hl-identifier">unit</span><span class="hl-brackets">)</span><span class="hl-code">;
+   </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+   </span><span class="hl-comment">/**
+    * Returns current value of the attribute.
+    * @method getAttribute
+    * @param {String} attr The name of the attribute.
+    * @return {Number} val The current value of the attribute.
+    */
+   </span><span class="hl-identifier">getAttribute</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">attr</span><span class="hl-brackets">) {
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">el</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getEl</span><span class="hl-brackets">()</span><span class="hl-code">;
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">val</span><span class="hl-code"> = </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">getStyle</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">attr</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+      </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">val</span><span class="hl-code"> !== </span><span class="hl-quotes">'</span><span class="hl-string">auto</span><span class="hl-quotes">'</span><span class="hl-code"> &amp;&amp; !</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">patterns</span><span class="hl-code">.</span><span class="hl-identifier">offsetUnit</span><span class="hl-code">.</span><span class="hl-identifier">test</span><span class="hl-brackets">(</span><span class="hl-identifier">val</span><span class="hl-brackets">)) {
+         </span><span class="hl-reserved">return </span><span class="hl-identifier">parseFloat</span><span class="hl-brackets">(</span><span class="hl-identifier">val</span><span class="hl-brackets">)</span><span class="hl-code">;
+      </span><span class="hl-brackets">}
+
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">a</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">patterns</span><span class="hl-code">.</span><span class="hl-identifier">offsetAttribute</span><span class="hl-code">.</span><span class="hl-identifier">exec</span><span class="hl-brackets">(</span><span class="hl-identifier">attr</span><span class="hl-brackets">)</span><span class="hl-code"> || </span><span class="hl-brackets">[]</span><span class="hl-code">;
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">pos</span><span class="hl-code"> = !!</span><span class="hl-brackets">( </span><span class="hl-identifier">a</span><span class="hl-brackets">[</span><span class="hl-number">3</span><span class="hl-brackets">] )</span><span class="hl-code">; </span><span class="hl-comment">// top or left
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">box</span><span class="hl-code"> = !!</span><span class="hl-brackets">( </span><span class="hl-identifier">a</span><span class="hl-brackets">[</span><span class="hl-number">2</span><span class="hl-brackets">] )</span><span class="hl-code">; </span><span class="hl-comment">// width or height
+
+      // use offsets for width/height and abs pos top/left
+      </span><span class="hl-reserved">if </span><span class="hl-brackets">( </span><span class="hl-identifier">box</span><span class="hl-code"> || </span><span class="hl-brackets">(</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">getStyle</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">position</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">absolute</span><span class="hl-quotes">'</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">pos</span><span class="hl-brackets">) ) {
+         </span><span class="hl-identifier">val</span><span class="hl-code"> = </span><span class="hl-identifier">el</span><span class="hl-brackets">[</span><span class="hl-quotes">'</span><span class="hl-string">offset</span><span class="hl-quotes">'</span><span class="hl-code"> + </span><span class="hl-identifier">a</span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">charAt</span><span class="hl-brackets">(</span><span class="hl-number">0</span><span class="hl-brackets">)</span><span class="hl-code">.</span><span class="hl-identifier">toUpperCase</span><span class="hl-brackets">()</span><span class="hl-code"> + </span><span class="hl-identifier">a</span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">substr</span><span class="hl-brackets">(</span><span class="hl-number">1</span><span class="hl-brackets">)]</span><span class="hl-code">;
+      </span><span class="hl-brackets">} </span><span class="hl-reserved">else </span><span class="hl-brackets">{ </span><span class="hl-comment">// default to zero for other 'auto'
+         </span><span class="hl-identifier">val</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">;
+      </span><span class="hl-brackets">}
+
+      </span><span class="hl-reserved">return </span><span class="hl-identifier">val</span><span class="hl-code">;
+   </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+   </span><span class="hl-comment">/**
+    * Returns the unit to use when none is supplied.
+    * @method getDefaultUnit
+    * @param {attr} attr The name of the attribute.
+    * @return {String} The default unit to be used.
+    */
+   </span><span class="hl-identifier">getDefaultUnit</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">attr</span><span class="hl-brackets">) {
+       </span><span class="hl-reserved">if </span><span class="hl-brackets">( </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">patterns</span><span class="hl-code">.</span><span class="hl-identifier">defaultUnit</span><span class="hl-code">.</span><span class="hl-identifier">test</span><span class="hl-brackets">(</span><span class="hl-identifier">attr</span><span class="hl-brackets">) ) {
+         </span><span class="hl-reserved">return </span><span class="hl-quotes">'</span><span class="hl-string">px</span><span class="hl-quotes">'</span><span class="hl-code">;
+       </span><span class="hl-brackets">}
+
+       </span><span class="hl-reserved">return </span><span class="hl-quotes">''</span><span class="hl-code">;
+   </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+   </span><span class="hl-comment">/**
+    * Sets the actual values to be used during the animation.
+    * @method setRuntimeAttribute
+    * Should only be needed for subclass use.
+    * @param {Object} attr The attribute object
+    * @private
+    */
+   </span><span class="hl-identifier">setRuntimeAttribute</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">attr</span><span class="hl-brackets">) {
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">start</span><span class="hl-code">;
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">end</span><span class="hl-code">;
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">attributes</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">attributes</span><span class="hl-code">;
+
+      </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">runtimeAttributes</span><span class="hl-brackets">[</span><span class="hl-identifier">attr</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-brackets">{}</span><span class="hl-code">;
+
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">isset</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">prop</span><span class="hl-brackets">) {
+         </span><span class="hl-reserved">return </span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">prop</span><span class="hl-code"> !== </span><span class="hl-quotes">'</span><span class="hl-string">undefined</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+      </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+      </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-code"> !</span><span class="hl-identifier">isset</span><span class="hl-brackets">(</span><span class="hl-identifier">attributes</span><span class="hl-brackets">[</span><span class="hl-identifier">attr</span><span class="hl-brackets">][</span><span class="hl-quotes">'</span><span class="hl-string">to</span><span class="hl-quotes">'</span><span class="hl-brackets">])</span><span class="hl-code"> &amp;&amp; !</span><span class="hl-identifier">isset</span><span class="hl-brackets">(</span><span class="hl-identifier">attributes</span><span class="hl-brackets">[</span><span class="hl-identifier">attr</span><span class="hl-brackets">][</span><span class="hl-quotes">'</span><span class="hl-string">by</span><span class="hl-quotes">'</span><span class="hl-brackets">]) ) {
+         </span><span class="hl-reserved">return false</span><span class="hl-code">; </span><span class="hl-comment">// note return; nothing to animate to
+      </span><span class="hl-brackets">}
+
+      </span><span class="hl-identifier">start</span><span class="hl-code"> = </span><span class="hl-brackets">( </span><span class="hl-identifier">isset</span><span class="hl-brackets">(</span><span class="hl-identifier">attributes</span><span class="hl-brackets">[</span><span class="hl-identifier">attr</span><span class="hl-brackets">][</span><span class="hl-quotes">'</span><span class="hl-string">from</span><span class="hl-quotes">'</span><span class="hl-brackets">]) )</span><span class="hl-code"> ? </span><span class="hl-identifier">attributes</span><span class="hl-brackets">[</span><span class="hl-identifier">attr</span><span class="hl-brackets">][</span><span class="hl-quotes">'</span><span class="hl-string">from</span><span class="hl-quotes">'</span><span class="hl-brackets">]</span><span class="hl-code"> : </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getAttribute</span><span class="hl-brackets">(</span><span class="hl-identifier">attr</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+      </span><span class="hl-comment">// To beats by, per SMIL 2.1 spec
+      </span><span class="hl-reserved">if </span><span class="hl-brackets">( </span><span class="hl-identifier">isset</span><span class="hl-brackets">(</span><span class="hl-identifier">attributes</span><span class="hl-brackets">[</span><span class="hl-identifier">attr</span><span class="hl-brackets">][</span><span class="hl-quotes">'</span><span class="hl-string">to</span><span class="hl-quotes">'</span><span class="hl-brackets">]) ) {
+         </span><span class="hl-identifier">end</span><span class="hl-code"> = </span><span class="hl-identifier">attributes</span><span class="hl-brackets">[</span><span class="hl-identifier">attr</span><span class="hl-brackets">][</span><span class="hl-quotes">'</span><span class="hl-string">to</span><span class="hl-quotes">'</span><span class="hl-brackets">]</span><span class="hl-code">;
+      </span><span class="hl-brackets">} </span><span class="hl-reserved">else if </span><span class="hl-brackets">( </span><span class="hl-identifier">isset</span><span class="hl-brackets">(</span><span class="hl-identifier">attributes</span><span class="hl-brackets">[</span><span class="hl-identifier">attr</span><span class="hl-brackets">][</span><span class="hl-quotes">'</span><span class="hl-string">by</span><span class="hl-quotes">'</span><span class="hl-brackets">]) ) {
+         </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">start</span><span class="hl-code">.</span><span class="hl-identifier">constructor</span><span class="hl-code"> == </span><span class="hl-builtin">Array</span><span class="hl-brackets">) {
+            </span><span class="hl-identifier">end</span><span class="hl-code"> = </span><span class="hl-brackets">[]</span><span class="hl-code">;
+            </span><span class="hl-reserved">for </span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">, </span><span class="hl-identifier">len</span><span class="hl-code"> = </span><span class="hl-identifier">start</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code"> &lt; </span><span class="hl-identifier">len</span><span class="hl-code">; ++</span><span class="hl-identifier">i</span><span class="hl-brackets">) {
+               </span><span class="hl-identifier">end</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-identifier">start</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code"> + </span><span class="hl-identifier">attributes</span><span class="hl-brackets">[</span><span class="hl-identifier">attr</span><span class="hl-brackets">][</span><span class="hl-quotes">'</span><span class="hl-string">by</span><span class="hl-quotes">'</span><span class="hl-brackets">][</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+         } </span><span class="hl-reserved">else </span><span class="hl-brackets">{
+            </span><span class="hl-identifier">end</span><span class="hl-code"> = </span><span class="hl-identifier">start</span><span class="hl-code"> + </span><span class="hl-identifier">attributes</span><span class="hl-brackets">[</span><span class="hl-identifier">attr</span><span class="hl-brackets">][</span><span class="hl-quotes">'</span><span class="hl-string">by</span><span class="hl-quotes">'</span><span class="hl-brackets">]</span><span class="hl-code">;
+         </span><span class="hl-brackets">}
+      }
+
+      </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">runtimeAttributes</span><span class="hl-brackets">[</span><span class="hl-identifier">attr</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">start</span><span class="hl-code"> = </span><span class="hl-identifier">start</span><span class="hl-code">;
+      </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">runtimeAttributes</span><span class="hl-brackets">[</span><span class="hl-identifier">attr</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">end</span><span class="hl-code"> = </span><span class="hl-identifier">end</span><span class="hl-code">;
+
+      </span><span class="hl-comment">// set units if needed
+      </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">runtimeAttributes</span><span class="hl-brackets">[</span><span class="hl-identifier">attr</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">unit</span><span class="hl-code"> = </span><span class="hl-brackets">( </span><span class="hl-identifier">isset</span><span class="hl-brackets">(</span><span class="hl-identifier">attributes</span><span class="hl-brackets">[</span><span class="hl-identifier">attr</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">unit</span><span class="hl-brackets">) )</span><span class="hl-code"> ? </span><span class="hl-identifier">attributes</span><span class="hl-brackets">[</span><span class="hl-identifier">attr</span><span class="hl-brackets">][</span><span class="hl-quotes">'</span><span class="hl-string">unit</span><span class="hl-quotes">'</span><span class="hl-brackets">]</span><span class="hl-code"> : </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getDefaultUnit</span><span class="hl-brackets">(</span><span class="hl-identifier">attr</span><span class="hl-brackets">)</span><span class="hl-code">;
+   </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+   </span><span class="hl-comment">/**
+    * Constructor for Anim instance.
+    * @method init
+    * @param {String | HTMLElement} el Reference to the element that will be animated
+    * @param {Object} attributes The attribute(s) to be animated.
+    * Each attribute is an object with at minimum a &quot;to&quot; or &quot;by&quot; member defined.
+    * Additional optional members are &quot;from&quot; (defaults to current value), &quot;units&quot; (defaults to &quot;px&quot;).
+    * All attribute names use camelCase.
+    * @param {Number} duration (optional, defaults to 1 second) Length of animation (frames or seconds), defaults to time-based
+    * @param {Function} method (optional, defaults to YAHOO.util.Easing.easeNone) Computes the values that are applied to the attributes per frame (generally a YAHOO.util.Easing method)
+    */
+   </span><span class="hl-identifier">init</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">attributes</span><span class="hl-code">, </span><span class="hl-identifier">duration</span><span class="hl-code">, </span><span class="hl-identifier">method</span><span class="hl-brackets">) {
+      </span><span class="hl-comment">/**
+       * Whether or not the animation is running.
+       * @property isAnimated
+       * @private
+       * @type Boolean
+       */
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">isAnimated</span><span class="hl-code"> = </span><span class="hl-reserved">false</span><span class="hl-code">;
+
+      </span><span class="hl-comment">/**
+       * A Date object that is created when the animation begins.
+       * @property startTime
+       * @private
+       * @type Date
+       */
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">startTime</span><span class="hl-code"> = </span><span class="hl-reserved">null</span><span class="hl-code">;
+
+      </span><span class="hl-comment">/**
+       * The number of frames this animation was able to execute.
+       * @property actualFrames
+       * @private
+       * @type Int
+       */
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">actualFrames</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">;
+
+      </span><span class="hl-comment">/**
+       * The element to be animated.
+       * @property el
+       * @private
+       * @type HTMLElement
+       */
+      </span><span class="hl-identifier">el</span><span class="hl-code"> = </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">get</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+      </span><span class="hl-comment">/**
+       * The collection of attributes to be animated.
+       * Each attribute must have at least a &quot;to&quot; or &quot;by&quot; defined in order to animate.
+       * If &quot;to&quot; is supplied, the animation will end with the attribute at that value.
+       * If &quot;by&quot; is supplied, the animation will end at that value plus its starting value.
+       * If both are supplied, &quot;to&quot; is used, and &quot;by&quot; is ignored.
+       * Optional additional member include &quot;from&quot; (the value the attribute should start animating from, defaults to current value), and &quot;unit&quot; (the units to apply to the values).
+       * @property attributes
+       * @type Object
+       */
+      </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">attributes</span><span class="hl-code"> = </span><span class="hl-identifier">attributes</span><span class="hl-code"> || </span><span class="hl-brackets">{}</span><span class="hl-code">;
+
+      </span><span class="hl-comment">/**
+       * The length of the animation.  Defaults to &quot;1&quot; (second).
+       * @property duration
+       * @type Number
+       */
+      </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">duration</span><span class="hl-code"> = </span><span class="hl-identifier">duration</span><span class="hl-code"> || </span><span class="hl-number">1</span><span class="hl-code">;
+
+      </span><span class="hl-comment">/**
+       * The method that will provide values to the attribute(s) during the animation.
+       * Defaults to &quot;YAHOO.util.Easing.easeNone&quot;.
+       * @property method
+       * @type Function
+       */
+      </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">method</span><span class="hl-code"> = </span><span class="hl-identifier">method</span><span class="hl-code"> || </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Easing</span><span class="hl-code">.</span><span class="hl-identifier">easeNone</span><span class="hl-code">;
+
+      </span><span class="hl-comment">/**
+       * Whether or not the duration should be treated as seconds.
+       * Defaults to true.
+       * @property useSeconds
+       * @type Boolean
+       */
+      </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">useSeconds</span><span class="hl-code"> = </span><span class="hl-reserved">true</span><span class="hl-code">; </span><span class="hl-comment">// default to seconds
+
+      /**
+       * The location of the current animation on the timeline.
+       * In time-based animations, this is used by AnimMgr to ensure the animation finishes on time.
+       * @property currentFrame
+       * @type Int
+       */
+      </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">currentFrame</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">;
+
+      </span><span class="hl-comment">/**
+       * The total number of frames to be executed.
+       * In time-based animations, this is used by AnimMgr to ensure the animation finishes on time.
+       * @property totalFrames
+       * @type Int
+       */
+      </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">totalFrames</span><span class="hl-code"> = </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">AnimMgr</span><span class="hl-code">.</span><span class="hl-identifier">fps</span><span class="hl-code">;
+
+
+      </span><span class="hl-comment">/**
+       * Returns a reference to the animated element.
+       * @method getEl
+       * @return {HTMLElement}
+       */
+      </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getEl</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">() { </span><span class="hl-reserved">return </span><span class="hl-identifier">el</span><span class="hl-code">; </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+      </span><span class="hl-comment">/**
+       * Checks whether the element is currently animated.
+       * @method isAnimated
+       * @return {Boolean} current value of isAnimated.
+       */
+      </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">isAnimated</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">() {
+         </span><span class="hl-reserved">return </span><span class="hl-identifier">isAnimated</span><span class="hl-code">;
+      </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+      </span><span class="hl-comment">/**
+       * Returns the animation start time.
+       * @method getStartTime
+       * @return {Date} current value of startTime.
+       */
+      </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getStartTime</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">() {
+         </span><span class="hl-reserved">return </span><span class="hl-identifier">startTime</span><span class="hl-code">;
+      </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+      </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">runtimeAttributes</span><span class="hl-code"> = </span><span class="hl-brackets">{}</span><span class="hl-code">;
+
+
+
+      </span><span class="hl-comment">/**
+       * Starts the animation by registering it with the animation manager.
+       * @method animate
+       */
+      </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">animate</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">() {
+         </span><span class="hl-reserved">if </span><span class="hl-brackets">( </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">isAnimated</span><span class="hl-brackets">() ) { </span><span class="hl-reserved">return false</span><span class="hl-code">; </span><span class="hl-brackets">}
+
+         </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">currentFrame</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">;
+
+         </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">totalFrames</span><span class="hl-code"> = </span><span class="hl-brackets">( </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">useSeconds </span><span class="hl-brackets">)</span><span class="hl-code"> ? </span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">ceil</span><span class="hl-brackets">(</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">AnimMgr</span><span class="hl-code">.</span><span class="hl-identifier">fps</span><span class="hl-code"> * </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">duration</span><span class="hl-brackets">)</span><span class="hl-code"> : </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">duration</span><span class="hl-code">;
+
+         </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">AnimMgr</span><span class="hl-code">.</span><span class="hl-identifier">registerElement</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+      </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+      </span><span class="hl-comment">/**
+       * Stops the animation.  Normally called by AnimMgr when animation completes.
+       * @method stop
+       * @param {Boolean} finish (optional) If true, animation will jump to final frame.
+       */
+      </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">stop</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">finish</span><span class="hl-brackets">) {
+         </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">finish</span><span class="hl-brackets">) {
+             </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">currentFrame</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">totalFrames</span><span class="hl-code">;
+             </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_onTween</span><span class="hl-code">.</span><span class="hl-identifier">fire</span><span class="hl-brackets">()</span><span class="hl-code">;
+         </span><span class="hl-brackets">}
+         </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">AnimMgr</span><span class="hl-code">.</span><span class="hl-identifier">stop</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+      </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">onStart</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">() {
+         </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onStart</span><span class="hl-code">.</span><span class="hl-identifier">fire</span><span class="hl-brackets">()</span><span class="hl-code">;
+
+         </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">runtimeAttributes</span><span class="hl-code"> = </span><span class="hl-brackets">{}</span><span class="hl-code">;
+         </span><span class="hl-reserved">for </span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">attr </span><span class="hl-reserved">in this</span><span class="hl-code">.</span><span class="hl-identifier">attributes</span><span class="hl-brackets">) {
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">setRuntimeAttribute</span><span class="hl-brackets">(</span><span class="hl-identifier">attr</span><span class="hl-brackets">)</span><span class="hl-code">;
+         </span><span class="hl-brackets">}
+
+         </span><span class="hl-identifier">isAnimated</span><span class="hl-code"> = </span><span class="hl-reserved">true</span><span class="hl-code">;
+         </span><span class="hl-identifier">actualFrames</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">;
+         </span><span class="hl-identifier">startTime</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-builtin">Date</span><span class="hl-brackets">()</span><span class="hl-code">;
+      </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+      </span><span class="hl-comment">/**
+       * Feeds the starting and ending values for each animated attribute to doMethod once per frame, then applies the resulting value to the attribute(s).
+       * @private
+       */
+
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">onTween</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">() {
+         </span><span class="hl-reserved">var </span><span class="hl-identifier">data</span><span class="hl-code"> = </span><span class="hl-brackets">{
+            </span><span class="hl-identifier">duration</span><span class="hl-code">: </span><span class="hl-reserved">new </span><span class="hl-builtin">Date</span><span class="hl-brackets">()</span><span class="hl-code"> - </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getStartTime</span><span class="hl-brackets">()</span><span class="hl-code">,
+            </span><span class="hl-identifier">currentFrame</span><span class="hl-code">: </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">currentFrame
+         </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+         </span><span class="hl-identifier">data</span><span class="hl-code">.</span><span class="hl-identifier">toString</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">() {
+            </span><span class="hl-reserved">return </span><span class="hl-brackets">(
+               </span><span class="hl-quotes">'</span><span class="hl-string">duration: </span><span class="hl-quotes">'</span><span class="hl-code"> + </span><span class="hl-identifier">data</span><span class="hl-code">.</span><span class="hl-identifier">duration</span><span class="hl-code"> +
+               </span><span class="hl-quotes">'</span><span class="hl-string">, currentFrame: </span><span class="hl-quotes">'</span><span class="hl-code"> + </span><span class="hl-identifier">data</span><span class="hl-code">.</span><span class="hl-identifier">currentFrame
+            </span><span class="hl-brackets">)</span><span class="hl-code">;
+         </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+         </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onTween</span><span class="hl-code">.</span><span class="hl-identifier">fire</span><span class="hl-brackets">(</span><span class="hl-identifier">data</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+         </span><span class="hl-reserved">var </span><span class="hl-identifier">runtimeAttributes</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">runtimeAttributes</span><span class="hl-code">;
+
+         </span><span class="hl-reserved">for </span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">attr </span><span class="hl-reserved">in </span><span class="hl-identifier">runtimeAttributes</span><span class="hl-brackets">) {
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">setAttribute</span><span class="hl-brackets">(</span><span class="hl-identifier">attr</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">doMethod</span><span class="hl-brackets">(</span><span class="hl-identifier">attr</span><span class="hl-code">, </span><span class="hl-identifier">runtimeAttributes</span><span class="hl-brackets">[</span><span class="hl-identifier">attr</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">start</span><span class="hl-code">, </span><span class="hl-identifier">runtimeAttributes</span><span class="hl-brackets">[</span><span class="hl-identifier">attr</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">end</span><span class="hl-brackets">)</span><span class="hl-code">, </span><span class="hl-identifier">runtimeAttributes</span><span class="hl-brackets">[</span><span class="hl-identifier">attr</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">unit</span><span class="hl-brackets">)</span><span class="hl-code">;
+         </span><span class="hl-brackets">}
+
+         </span><span class="hl-identifier">actualFrames</span><span class="hl-code"> += </span><span class="hl-number">1</span><span class="hl-code">;
+      </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">onComplete</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">() {
+         </span><span class="hl-reserved">var </span><span class="hl-identifier">actual_duration</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-reserved">new </span><span class="hl-builtin">Date</span><span class="hl-brackets">()</span><span class="hl-code"> - </span><span class="hl-identifier">startTime</span><span class="hl-brackets">) </span><span class="hl-quotes">/</span><span class="hl-string"> 1000 ;
+
+         var data = {
+            duration: actual_duration,
+            frames: actualFrames,
+            fps: actualFrames </span><span class="hl-quotes">/ </span><span class="hl-identifier">actual_duration
+         </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+         </span><span class="hl-identifier">data</span><span class="hl-code">.</span><span class="hl-identifier">toString</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">() {
+            </span><span class="hl-reserved">return </span><span class="hl-brackets">(
+               </span><span class="hl-quotes">'</span><span class="hl-string">duration: </span><span class="hl-quotes">'</span><span class="hl-code"> + </span><span class="hl-identifier">data</span><span class="hl-code">.</span><span class="hl-identifier">duration</span><span class="hl-code"> +
+               </span><span class="hl-quotes">'</span><span class="hl-string">, frames: </span><span class="hl-quotes">'</span><span class="hl-code"> + </span><span class="hl-identifier">data</span><span class="hl-code">.</span><span class="hl-identifier">frames</span><span class="hl-code"> +
+               </span><span class="hl-quotes">'</span><span class="hl-string">, fps: </span><span class="hl-quotes">'</span><span class="hl-code"> + </span><span class="hl-identifier">data</span><span class="hl-code">.</span><span class="hl-identifier">fps
+            </span><span class="hl-brackets">)</span><span class="hl-code">;
+         </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+         </span><span class="hl-identifier">isAnimated</span><span class="hl-code"> = </span><span class="hl-reserved">false</span><span class="hl-code">;
+         </span><span class="hl-identifier">actualFrames</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">;
+         </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onComplete</span><span class="hl-code">.</span><span class="hl-identifier">fire</span><span class="hl-brackets">(</span><span class="hl-identifier">data</span><span class="hl-brackets">)</span><span class="hl-code">;
+      </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+      </span><span class="hl-comment">/**
+       * Custom event that fires after onStart, useful in subclassing
+       * @private
+       */
+      </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_onStart</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">CustomEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">_start</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+      </span><span class="hl-comment">/**
+       * Custom event that fires when animation begins
+       * Listen via subscribe method (e.g. myAnim.onStart.subscribe(someFunction)
+       * @event onStart
+       */
+      </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onStart</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">CustomEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">start</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+      </span><span class="hl-comment">/**
+       * Custom event that fires between each frame
+       * Listen via subscribe method (e.g. myAnim.onTween.subscribe(someFunction)
+       * @event onTween
+       */
+      </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onTween</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">CustomEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">tween</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+      </span><span class="hl-comment">/**
+       * Custom event that fires after onTween
+       * @private
+       */
+      </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_onTween</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">CustomEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">_tween</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+      </span><span class="hl-comment">/**
+       * Custom event that fires when animation ends
+       * Listen via subscribe method (e.g. myAnim.onComplete.subscribe(someFunction)
+       * @event onComplete
+       */
+      </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onComplete</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">CustomEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">complete</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+      </span><span class="hl-comment">/**
+       * Custom event that fires after onComplete
+       * @private
+       */
+      </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_onComplete</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">CustomEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">_complete</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+      </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_onStart</span><span class="hl-code">.</span><span class="hl-identifier">subscribe</span><span class="hl-brackets">(</span><span class="hl-identifier">onStart</span><span class="hl-brackets">)</span><span class="hl-code">;
+      </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_onTween</span><span class="hl-code">.</span><span class="hl-identifier">subscribe</span><span class="hl-brackets">(</span><span class="hl-identifier">onTween</span><span class="hl-brackets">)</span><span class="hl-code">;
+      </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_onComplete</span><span class="hl-code">.</span><span class="hl-identifier">subscribe</span><span class="hl-brackets">(</span><span class="hl-identifier">onComplete</span><span class="hl-brackets">)</span><span class="hl-code">;
+   </span><span class="hl-brackets">}</span><span class="hl-default">
+};
+
+</span><span class="hl-comment">/**
+ * Handles animation queueing and threading.
+ * Used by Anim and subclasses.
+ * @class AnimMgr
+ * @namespace YAHOO.util
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">util</span><span class="hl-default">.</span><span class="hl-identifier">AnimMgr</span><span class="hl-default"> = </span><span class="hl-reserved">new function</span><span class="hl-brackets">() {
+   </span><span class="hl-comment">/**
+    * Reference to the animation Interval.
+    * @property thread
+    * @private
+    * @type Int
+    */
+   </span><span class="hl-reserved">var </span><span class="hl-identifier">thread</span><span class="hl-code"> = </span><span class="hl-reserved">null</span><span class="hl-code">;
+
+   </span><span class="hl-comment">/**
+    * The current queue of registered animation objects.
+    * @property queue
+    * @private
+    * @type Array
+    */
+   </span><span class="hl-reserved">var </span><span class="hl-identifier">queue</span><span class="hl-code"> = </span><span class="hl-brackets">[]</span><span class="hl-code">;
+
+   </span><span class="hl-comment">/**
+    * The number of active animations.
+    * @property tweenCount
+    * @private
+    * @type Int
+    */
+   </span><span class="hl-reserved">var </span><span class="hl-identifier">tweenCount</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">;
+
+   </span><span class="hl-comment">/**
+    * Base frame rate (frames per second).
+    * Arbitrarily high for better x-browser calibration (slower browsers drop more frames).
+    * @property fps
+    * @type Int
+    *
+    */
+   </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">fps</span><span class="hl-code"> = </span><span class="hl-number">200</span><span class="hl-code">;
+
+   </span><span class="hl-comment">/**
+    * Interval delay in milliseconds, defaults to fastest possible.
+    * @property delay
+    * @type Int
+    *
+    */
+   </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">delay</span><span class="hl-code"> = </span><span class="hl-number">1</span><span class="hl-code">;
+
+   </span><span class="hl-comment">/**
+    * Adds an animation instance to the animation queue.
+    * All animation instances must be registered in order to animate.
+    * @method registerElement
+    * @param {object} tween The Anim instance to be be registered
+    */
+   </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">registerElement</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">tween</span><span class="hl-brackets">) {
+      </span><span class="hl-identifier">queue</span><span class="hl-brackets">[</span><span class="hl-identifier">queue</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-identifier">tween</span><span class="hl-code">;
+      </span><span class="hl-identifier">tweenCount</span><span class="hl-code"> += </span><span class="hl-number">1</span><span class="hl-code">;
+      </span><span class="hl-identifier">tween</span><span class="hl-code">.</span><span class="hl-identifier">_onStart</span><span class="hl-code">.</span><span class="hl-identifier">fire</span><span class="hl-brackets">()</span><span class="hl-code">;
+      </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">start</span><span class="hl-brackets">()</span><span class="hl-code">;
+   </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+   </span><span class="hl-comment">/**
+    * removes an animation instance from the animation queue.
+    * All animation instances must be registered in order to animate.
+    * @method unRegister
+    * @param {object} tween The Anim instance to be be registered
+    * @param {Int} index The index of the Anim instance
+    * @private
+    */
+   </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">unRegister</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">tween</span><span class="hl-code">, </span><span class="hl-identifier">index</span><span class="hl-brackets">) {
+      </span><span class="hl-identifier">tween</span><span class="hl-code">.</span><span class="hl-identifier">_onComplete</span><span class="hl-code">.</span><span class="hl-identifier">fire</span><span class="hl-brackets">()</span><span class="hl-code">;
+      </span><span class="hl-identifier">index</span><span class="hl-code"> = </span><span class="hl-identifier">index</span><span class="hl-code"> || </span><span class="hl-identifier">getIndex</span><span class="hl-brackets">(</span><span class="hl-identifier">tween</span><span class="hl-brackets">)</span><span class="hl-code">;
+      </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">index</span><span class="hl-code"> != -</span><span class="hl-number">1</span><span class="hl-brackets">) { </span><span class="hl-identifier">queue</span><span class="hl-code">.</span><span class="hl-identifier">splice</span><span class="hl-brackets">(</span><span class="hl-identifier">index</span><span class="hl-code">, </span><span class="hl-number">1</span><span class="hl-brackets">)</span><span class="hl-code">; </span><span class="hl-brackets">}
+
+      </span><span class="hl-identifier">tweenCount</span><span class="hl-code"> -= </span><span class="hl-number">1</span><span class="hl-code">;
+      </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">tweenCount</span><span class="hl-code"> &lt;= </span><span class="hl-number">0</span><span class="hl-brackets">) { </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">stop</span><span class="hl-brackets">()</span><span class="hl-code">; </span><span class="hl-brackets">}
+   }</span><span class="hl-code">;
+
+   </span><span class="hl-comment">/**
+    * Starts the animation thread.
+	* Only one thread can run at a time.
+    * @method start
+    */
+   </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">start</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">() {
+      </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">thread</span><span class="hl-code"> === </span><span class="hl-reserved">null</span><span class="hl-brackets">) { </span><span class="hl-identifier">thread</span><span class="hl-code"> = </span><span class="hl-identifier">setInterval</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">run</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">delay</span><span class="hl-brackets">)</span><span class="hl-code">; </span><span class="hl-brackets">}
+   }</span><span class="hl-code">;
+
+   </span><span class="hl-comment">/**
+    * Stops the animation thread or a specific animation instance.
+    * @method stop
+    * @param {object} tween A specific Anim instance to stop (optional)
+    * If no instance given, Manager stops thread and all animations.
+    */
+   </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">stop</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">tween</span><span class="hl-brackets">) {
+      </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">tween</span><span class="hl-brackets">) {
+         </span><span class="hl-identifier">clearInterval</span><span class="hl-brackets">(</span><span class="hl-identifier">thread</span><span class="hl-brackets">)</span><span class="hl-code">;
+         </span><span class="hl-reserved">for </span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">, </span><span class="hl-identifier">len</span><span class="hl-code"> = </span><span class="hl-identifier">queue</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code"> &lt; </span><span class="hl-identifier">len</span><span class="hl-code">; ++</span><span class="hl-identifier">i</span><span class="hl-brackets">) {
+            </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">queue</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">isAnimated</span><span class="hl-brackets">()) {
+               </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">unRegister</span><span class="hl-brackets">(</span><span class="hl-identifier">tween</span><span class="hl-code">, </span><span class="hl-identifier">i</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+         }
+         </span><span class="hl-identifier">queue</span><span class="hl-code"> = </span><span class="hl-brackets">[]</span><span class="hl-code">;
+         </span><span class="hl-identifier">thread</span><span class="hl-code"> = </span><span class="hl-reserved">null</span><span class="hl-code">;
+         </span><span class="hl-identifier">tweenCount</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">;
+      </span><span class="hl-brackets">}
+      </span><span class="hl-reserved">else </span><span class="hl-brackets">{
+         </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">unRegister</span><span class="hl-brackets">(</span><span class="hl-identifier">tween</span><span class="hl-brackets">)</span><span class="hl-code">;
+      </span><span class="hl-brackets">}
+   }</span><span class="hl-code">;
+
+   </span><span class="hl-comment">/**
+    * Called per Interval to handle each animation frame.
+    * @method run
+    */
+   </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">run</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">() {
+      </span><span class="hl-reserved">for </span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">, </span><span class="hl-identifier">len</span><span class="hl-code"> = </span><span class="hl-identifier">queue</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code"> &lt; </span><span class="hl-identifier">len</span><span class="hl-code">; ++</span><span class="hl-identifier">i</span><span class="hl-brackets">) {
+         </span><span class="hl-reserved">var </span><span class="hl-identifier">tween</span><span class="hl-code"> = </span><span class="hl-identifier">queue</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">;
+         </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-code"> !</span><span class="hl-identifier">tween</span><span class="hl-code"> || !</span><span class="hl-identifier">tween</span><span class="hl-code">.</span><span class="hl-identifier">isAnimated</span><span class="hl-brackets">() ) { </span><span class="hl-reserved">continue</span><span class="hl-code">; </span><span class="hl-brackets">}
+
+         </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">tween</span><span class="hl-code">.</span><span class="hl-identifier">currentFrame</span><span class="hl-code"> &lt; </span><span class="hl-identifier">tween</span><span class="hl-code">.</span><span class="hl-identifier">totalFrames</span><span class="hl-code"> || </span><span class="hl-identifier">tween</span><span class="hl-code">.</span><span class="hl-identifier">totalFrames</span><span class="hl-code"> === </span><span class="hl-reserved">null</span><span class="hl-brackets">)
+         {
+            </span><span class="hl-identifier">tween</span><span class="hl-code">.</span><span class="hl-identifier">currentFrame</span><span class="hl-code"> += </span><span class="hl-number">1</span><span class="hl-code">;
+
+            </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">tween</span><span class="hl-code">.</span><span class="hl-identifier">useSeconds</span><span class="hl-brackets">) {
+               </span><span class="hl-identifier">correctFrame</span><span class="hl-brackets">(</span><span class="hl-identifier">tween</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+            </span><span class="hl-identifier">tween</span><span class="hl-code">.</span><span class="hl-identifier">_onTween</span><span class="hl-code">.</span><span class="hl-identifier">fire</span><span class="hl-brackets">()</span><span class="hl-code">;
+         </span><span class="hl-brackets">}
+         </span><span class="hl-reserved">else </span><span class="hl-brackets">{ </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">AnimMgr</span><span class="hl-code">.</span><span class="hl-identifier">stop</span><span class="hl-brackets">(</span><span class="hl-identifier">tween</span><span class="hl-code">, </span><span class="hl-identifier">i</span><span class="hl-brackets">)</span><span class="hl-code">; </span><span class="hl-brackets">}
+      }
+   }</span><span class="hl-code">;
+
+   </span><span class="hl-reserved">var </span><span class="hl-identifier">getIndex</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">anim</span><span class="hl-brackets">) {
+      </span><span class="hl-reserved">for </span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">, </span><span class="hl-identifier">len</span><span class="hl-code"> = </span><span class="hl-identifier">queue</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code"> &lt; </span><span class="hl-identifier">len</span><span class="hl-code">; ++</span><span class="hl-identifier">i</span><span class="hl-brackets">) {
+         </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">queue</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code"> == </span><span class="hl-identifier">anim</span><span class="hl-brackets">) {
+            </span><span class="hl-reserved">return </span><span class="hl-identifier">i</span><span class="hl-code">; </span><span class="hl-comment">// note return;
+         </span><span class="hl-brackets">}
+      }
+      </span><span class="hl-reserved">return</span><span class="hl-code"> -</span><span class="hl-number">1</span><span class="hl-code">;
+   </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+   </span><span class="hl-comment">/**
+    * On the fly frame correction to keep animation on time.
+    * @method correctFrame
+    * @private
+    * @param {Object} tween The Anim instance being corrected.
+    */
+   </span><span class="hl-reserved">var </span><span class="hl-identifier">correctFrame</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">tween</span><span class="hl-brackets">) {
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">frames</span><span class="hl-code"> = </span><span class="hl-identifier">tween</span><span class="hl-code">.</span><span class="hl-identifier">totalFrames</span><span class="hl-code">;
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">frame</span><span class="hl-code"> = </span><span class="hl-identifier">tween</span><span class="hl-code">.</span><span class="hl-identifier">currentFrame</span><span class="hl-code">;
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">expected</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-identifier">tween</span><span class="hl-code">.</span><span class="hl-identifier">currentFrame</span><span class="hl-code"> * </span><span class="hl-identifier">tween</span><span class="hl-code">.</span><span class="hl-identifier">duration</span><span class="hl-code"> * </span><span class="hl-number">1000 </span><span class="hl-quotes">/</span><span class="hl-string"> tween.totalFrames);
+      var elapsed = (new Date() - tween.getStartTime());
+      var tweak = 0;
+
+      if (elapsed &lt; tween.duration * 1000) { </span><span class="hl-quotes">//</span><span class="hl-string"> check if falling behind
+         tweak = Math.round((elapsed </span><span class="hl-quotes">/ </span><span class="hl-identifier">expected</span><span class="hl-code"> - </span><span class="hl-number">1</span><span class="hl-brackets">)</span><span class="hl-code"> * </span><span class="hl-identifier">tween</span><span class="hl-code">.</span><span class="hl-identifier">currentFrame</span><span class="hl-code">);
+      </span><span class="hl-brackets">} </span><span class="hl-reserved">else </span><span class="hl-brackets">{ </span><span class="hl-comment">// went over duration, so jump to end
+         </span><span class="hl-identifier">tweak</span><span class="hl-code"> = </span><span class="hl-identifier">frames</span><span class="hl-code"> - </span><span class="hl-brackets">(</span><span class="hl-identifier">frame</span><span class="hl-code"> + </span><span class="hl-number">1</span><span class="hl-brackets">)</span><span class="hl-code">;
+      </span><span class="hl-brackets">}
+      </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">tweak</span><span class="hl-code"> &gt; </span><span class="hl-number">0</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">isFinite</span><span class="hl-brackets">(</span><span class="hl-identifier">tweak</span><span class="hl-brackets">)) { </span><span class="hl-comment">// adjust if needed
+         </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">tween</span><span class="hl-code">.</span><span class="hl-identifier">currentFrame</span><span class="hl-code"> + </span><span class="hl-identifier">tweak</span><span class="hl-code"> &gt;= </span><span class="hl-identifier">frames</span><span class="hl-brackets">) {</span><span class="hl-comment">// dont go past last frame
+            </span><span class="hl-identifier">tweak</span><span class="hl-code"> = </span><span class="hl-identifier">frames</span><span class="hl-code"> - </span><span class="hl-brackets">(</span><span class="hl-identifier">frame</span><span class="hl-code"> + </span><span class="hl-number">1</span><span class="hl-brackets">)</span><span class="hl-code">;
+         </span><span class="hl-brackets">}
+
+         </span><span class="hl-identifier">tween</span><span class="hl-code">.</span><span class="hl-identifier">currentFrame</span><span class="hl-code"> += </span><span class="hl-identifier">tweak</span><span class="hl-code">;
+      </span><span class="hl-brackets">}
+   }</span><span class="hl-default">;
+};
+</span><span class="hl-comment">/**
+ * Used to calculate Bezier splines for any number of control points.
+ * @class Bezier
+ * @namespace YAHOO.util
+ *
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">util</span><span class="hl-default">.</span><span class="hl-identifier">Bezier</span><span class="hl-default"> = </span><span class="hl-reserved">new function</span><span class="hl-brackets">()
+{
+   </span><span class="hl-comment">/**
+    * Get the current position of the animated element based on t.
+    * Each point is an array of &quot;x&quot; and &quot;y&quot; values (0 = x, 1 = y)
+    * At least 2 points are required (start and end).
+    * First point is start. Last point is end.
+    * Additional control points are optional.
+    * @method getPosition
+    * @param {Array} points An array containing Bezier points
+    * @param {Number} t A number between 0 and 1 which is the basis for determining current position
+    * @return {Array} An array containing int x and y member data
+    */
+   </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getPosition</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">points</span><span class="hl-code">, </span><span class="hl-identifier">t</span><span class="hl-brackets">)
+   {
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">n</span><span class="hl-code"> = </span><span class="hl-identifier">points</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">;
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">tmp</span><span class="hl-code"> = </span><span class="hl-brackets">[]</span><span class="hl-code">;
+
+      </span><span class="hl-reserved">for </span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code"> &lt; </span><span class="hl-identifier">n</span><span class="hl-code">; ++</span><span class="hl-identifier">i</span><span class="hl-brackets">){
+         </span><span class="hl-identifier">tmp</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-brackets">[</span><span class="hl-identifier">points</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">][</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code">, </span><span class="hl-identifier">points</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">][</span><span class="hl-number">1</span><span class="hl-brackets">]]</span><span class="hl-code">; </span><span class="hl-comment">// save input
+      </span><span class="hl-brackets">}
+
+      </span><span class="hl-reserved">for </span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">j</span><span class="hl-code"> = </span><span class="hl-number">1</span><span class="hl-code">; </span><span class="hl-identifier">j</span><span class="hl-code"> &lt; </span><span class="hl-identifier">n</span><span class="hl-code">; ++</span><span class="hl-identifier">j</span><span class="hl-brackets">) {
+         </span><span class="hl-reserved">for </span><span class="hl-brackets">(</span><span class="hl-identifier">i</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code"> &lt; </span><span class="hl-identifier">n</span><span class="hl-code"> - </span><span class="hl-identifier">j</span><span class="hl-code">; ++</span><span class="hl-identifier">i</span><span class="hl-brackets">) {
+            </span><span class="hl-identifier">tmp</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">][</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-number">1</span><span class="hl-code"> - </span><span class="hl-identifier">t</span><span class="hl-brackets">)</span><span class="hl-code"> * </span><span class="hl-identifier">tmp</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">][</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code"> + </span><span class="hl-identifier">t</span><span class="hl-code"> * </span><span class="hl-identifier">tmp</span><span class="hl-brackets">[</span><span class="hl-identifier">parseInt</span><span class="hl-brackets">(</span><span class="hl-identifier">i</span><span class="hl-code"> + </span><span class="hl-number">1</span><span class="hl-code">, </span><span class="hl-number">10</span><span class="hl-brackets">)][</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code">;
+            </span><span class="hl-identifier">tmp</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">][</span><span class="hl-number">1</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-number">1</span><span class="hl-code"> - </span><span class="hl-identifier">t</span><span class="hl-brackets">)</span><span class="hl-code"> * </span><span class="hl-identifier">tmp</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">][</span><span class="hl-number">1</span><span class="hl-brackets">]</span><span class="hl-code"> + </span><span class="hl-identifier">t</span><span class="hl-code"> * </span><span class="hl-identifier">tmp</span><span class="hl-brackets">[</span><span class="hl-identifier">parseInt</span><span class="hl-brackets">(</span><span class="hl-identifier">i</span><span class="hl-code"> + </span><span class="hl-number">1</span><span class="hl-code">, </span><span class="hl-number">10</span><span class="hl-brackets">)][</span><span class="hl-number">1</span><span class="hl-brackets">]</span><span class="hl-code">;
+         </span><span class="hl-brackets">}
+      }
+
+      </span><span class="hl-reserved">return </span><span class="hl-brackets">[ </span><span class="hl-identifier">tmp</span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-brackets">][</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code">, </span><span class="hl-identifier">tmp</span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-brackets">][</span><span class="hl-number">1</span><span class="hl-brackets">] ]</span><span class="hl-code">;
+
+   </span><span class="hl-brackets">}</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-default">;
+</span><span class="hl-comment">/**
+ * Anim subclass for color transitions.
+ * &lt;p&gt;Usage: &lt;code&gt;var myAnim = new Y.ColorAnim(el, { backgroundColor: { from: '#FF0000', to: '#FFFFFF' } }, 1, Y.Easing.easeOut);&lt;/code&gt; Color values can be specified with either 112233, #112233,
+ * [255,255,255], or rgb(255,255,255)&lt;/p&gt;
+ * @class ColorAnim
+ * @namespace YAHOO.util
+ * @requires YAHOO.util.Anim
+ * @requires YAHOO.util.AnimMgr
+ * @requires YAHOO.util.Easing
+ * @requires YAHOO.util.Bezier
+ * @requires YAHOO.util.Dom
+ * @requires YAHOO.util.Event
+ * @constructor
+ * @extends YAHOO.util.Anim
+ * @param {HTMLElement | String} el Reference to the element that will be animated
+ * @param {Object} attributes The attribute(s) to be animated.
+ * Each attribute is an object with at minimum a &quot;to&quot; or &quot;by&quot; member defined.
+ * Additional optional members are &quot;from&quot; (defaults to current value), &quot;units&quot; (defaults to &quot;px&quot;).
+ * All attribute names use camelCase.
+ * @param {Number} duration (optional, defaults to 1 second) Length of animation (frames or seconds), defaults to time-based
+ * @param {Function} method (optional, defaults to YAHOO.util.Easing.easeNone) Computes the values that are applied to the attributes per frame (generally a YAHOO.util.Easing method)
+ */
+</span><span class="hl-brackets">(</span><span class="hl-reserved">function</span><span class="hl-brackets">() {
+   </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">ColorAnim</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">attributes</span><span class="hl-code">, </span><span class="hl-identifier">duration</span><span class="hl-code">,  </span><span class="hl-identifier">method</span><span class="hl-brackets">) {
+      </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">ColorAnim</span><span class="hl-code">.</span><span class="hl-identifier">superclass</span><span class="hl-code">.</span><span class="hl-identifier">constructor</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">attributes</span><span class="hl-code">, </span><span class="hl-identifier">duration</span><span class="hl-code">, </span><span class="hl-identifier">method</span><span class="hl-brackets">)</span><span class="hl-code">;
+   </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+   </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">extend</span><span class="hl-brackets">(</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">ColorAnim</span><span class="hl-code">, </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Anim</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+   </span><span class="hl-comment">// shorthand
+   </span><span class="hl-reserved">var </span><span class="hl-identifier">Y</span><span class="hl-code"> = </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">;
+   </span><span class="hl-reserved">var </span><span class="hl-identifier">superclass</span><span class="hl-code"> = </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">ColorAnim</span><span class="hl-code">.</span><span class="hl-identifier">superclass</span><span class="hl-code">;
+   </span><span class="hl-reserved">var </span><span class="hl-identifier">proto</span><span class="hl-code"> = </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">ColorAnim</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">;
+
+   </span><span class="hl-identifier">proto</span><span class="hl-code">.</span><span class="hl-identifier">toString</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">() {
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">el</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getEl</span><span class="hl-brackets">()</span><span class="hl-code">;
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">id</span><span class="hl-code"> = </span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">id</span><span class="hl-code"> || </span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">tagName</span><span class="hl-code">;
+      </span><span class="hl-reserved">return </span><span class="hl-brackets">(</span><span class="hl-quotes">&quot;</span><span class="hl-string">ColorAnim </span><span class="hl-quotes">&quot;</span><span class="hl-code"> + </span><span class="hl-identifier">id</span><span class="hl-brackets">)</span><span class="hl-code">;
+   </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+   </span><span class="hl-identifier">proto</span><span class="hl-code">.</span><span class="hl-identifier">patterns</span><span class="hl-code">.</span><span class="hl-identifier">color</span><span class="hl-code"> = </span><span class="hl-quotes">/</span><span class="hl-string">color$</span><span class="hl-quotes">/i</span><span class="hl-code">;
+   </span><span class="hl-identifier">proto</span><span class="hl-code">.</span><span class="hl-identifier">patterns</span><span class="hl-code">.</span><span class="hl-identifier">rgb</span><span class="hl-code">         = </span><span class="hl-quotes">/</span><span class="hl-string">^rgb\(([0-9]+)\s*,\s*([0-9]+)\s*,\s*([0-9]+)\)$</span><span class="hl-quotes">/i</span><span class="hl-code">;
+   </span><span class="hl-identifier">proto</span><span class="hl-code">.</span><span class="hl-identifier">patterns</span><span class="hl-code">.</span><span class="hl-identifier">hex</span><span class="hl-code">         = </span><span class="hl-quotes">/</span><span class="hl-string">^#?([0-9A-F]{2})([0-9A-F]{2})([0-9A-F]{2})$</span><span class="hl-quotes">/i</span><span class="hl-code">;
+   </span><span class="hl-identifier">proto</span><span class="hl-code">.</span><span class="hl-identifier">patterns</span><span class="hl-code">.</span><span class="hl-identifier">hex3</span><span class="hl-code">        = </span><span class="hl-quotes">/</span><span class="hl-string">^#?([0-9A-F]{1})([0-9A-F]{1})([0-9A-F]{1})$</span><span class="hl-quotes">/i</span><span class="hl-code">;
+   </span><span class="hl-identifier">proto</span><span class="hl-code">.</span><span class="hl-identifier">patterns</span><span class="hl-code">.</span><span class="hl-identifier">transparent</span><span class="hl-code"> = </span><span class="hl-quotes">/</span><span class="hl-string">^transparent|rgba\(0, 0, 0, 0\)$</span><span class="hl-quotes">/</span><span class="hl-code">; </span><span class="hl-comment">// need rgba for safari
+
+   /**
+    * Attempts to parse the given string and return a 3-tuple.
+    * @method parseColor
+    * @param {String} s The string to parse.
+    * @return {Array} The 3-tuple of rgb values.
+    */
+   </span><span class="hl-identifier">proto</span><span class="hl-code">.</span><span class="hl-identifier">parseColor</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">s</span><span class="hl-brackets">) {
+      </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">s</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code"> == </span><span class="hl-number">3</span><span class="hl-brackets">) { </span><span class="hl-reserved">return </span><span class="hl-identifier">s</span><span class="hl-code">; </span><span class="hl-brackets">}
+
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">c</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">patterns</span><span class="hl-code">.</span><span class="hl-identifier">hex</span><span class="hl-code">.</span><span class="hl-identifier">exec</span><span class="hl-brackets">(</span><span class="hl-identifier">s</span><span class="hl-brackets">)</span><span class="hl-code">;
+      </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">c</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">c</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code"> == </span><span class="hl-number">4</span><span class="hl-brackets">) {
+         </span><span class="hl-reserved">return </span><span class="hl-brackets">[ </span><span class="hl-identifier">parseInt</span><span class="hl-brackets">(</span><span class="hl-identifier">c</span><span class="hl-brackets">[</span><span class="hl-number">1</span><span class="hl-brackets">]</span><span class="hl-code">, </span><span class="hl-number">16</span><span class="hl-brackets">)</span><span class="hl-code">, </span><span class="hl-identifier">parseInt</span><span class="hl-brackets">(</span><span class="hl-identifier">c</span><span class="hl-brackets">[</span><span class="hl-number">2</span><span class="hl-brackets">]</span><span class="hl-code">, </span><span class="hl-number">16</span><span class="hl-brackets">)</span><span class="hl-code">, </span><span class="hl-identifier">parseInt</span><span class="hl-brackets">(</span><span class="hl-identifier">c</span><span class="hl-brackets">[</span><span class="hl-number">3</span><span class="hl-brackets">]</span><span class="hl-code">, </span><span class="hl-number">16</span><span class="hl-brackets">) ]</span><span class="hl-code">;
+      </span><span class="hl-brackets">}
+
+      </span><span class="hl-identifier">c</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">patterns</span><span class="hl-code">.</span><span class="hl-identifier">rgb</span><span class="hl-code">.</span><span class="hl-identifier">exec</span><span class="hl-brackets">(</span><span class="hl-identifier">s</span><span class="hl-brackets">)</span><span class="hl-code">;
+      </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">c</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">c</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code"> == </span><span class="hl-number">4</span><span class="hl-brackets">) {
+         </span><span class="hl-reserved">return </span><span class="hl-brackets">[ </span><span class="hl-identifier">parseInt</span><span class="hl-brackets">(</span><span class="hl-identifier">c</span><span class="hl-brackets">[</span><span class="hl-number">1</span><span class="hl-brackets">]</span><span class="hl-code">, </span><span class="hl-number">10</span><span class="hl-brackets">)</span><span class="hl-code">, </span><span class="hl-identifier">parseInt</span><span class="hl-brackets">(</span><span class="hl-identifier">c</span><span class="hl-brackets">[</span><span class="hl-number">2</span><span class="hl-brackets">]</span><span class="hl-code">, </span><span class="hl-number">10</span><span class="hl-brackets">)</span><span class="hl-code">, </span><span class="hl-identifier">parseInt</span><span class="hl-brackets">(</span><span class="hl-identifier">c</span><span class="hl-brackets">[</span><span class="hl-number">3</span><span class="hl-brackets">]</span><span class="hl-code">, </span><span class="hl-number">10</span><span class="hl-brackets">) ]</span><span class="hl-code">;
+      </span><span class="hl-brackets">}
+
+      </span><span class="hl-identifier">c</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">patterns</span><span class="hl-code">.</span><span class="hl-identifier">hex3</span><span class="hl-code">.</span><span class="hl-identifier">exec</span><span class="hl-brackets">(</span><span class="hl-identifier">s</span><span class="hl-brackets">)</span><span class="hl-code">;
+      </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">c</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">c</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code"> == </span><span class="hl-number">4</span><span class="hl-brackets">) {
+         </span><span class="hl-reserved">return </span><span class="hl-brackets">[ </span><span class="hl-identifier">parseInt</span><span class="hl-brackets">(</span><span class="hl-identifier">c</span><span class="hl-brackets">[</span><span class="hl-number">1</span><span class="hl-brackets">]</span><span class="hl-code"> + </span><span class="hl-identifier">c</span><span class="hl-brackets">[</span><span class="hl-number">1</span><span class="hl-brackets">]</span><span class="hl-code">, </span><span class="hl-number">16</span><span class="hl-brackets">)</span><span class="hl-code">, </span><span class="hl-identifier">parseInt</span><span class="hl-brackets">(</span><span class="hl-identifier">c</span><span class="hl-brackets">[</span><span class="hl-number">2</span><span class="hl-brackets">]</span><span class="hl-code"> + </span><span class="hl-identifier">c</span><span class="hl-brackets">[</span><span class="hl-number">2</span><span class="hl-brackets">]</span><span class="hl-code">, </span><span class="hl-number">16</span><span class="hl-brackets">)</span><span class="hl-code">, </span><span class="hl-identifier">parseInt</span><span class="hl-brackets">(</span><span class="hl-identifier">c</span><span class="hl-brackets">[</span><span class="hl-number">3</span><span class="hl-brackets">]</span><span class="hl-code"> + </span><span class="hl-identifier">c</span><span class="hl-brackets">[</span><span class="hl-number">3</span><span class="hl-brackets">]</span><span class="hl-code">, </span><span class="hl-number">16</span><span class="hl-brackets">) ]</span><span class="hl-code">;
+      </span><span class="hl-brackets">}
+
+      </span><span class="hl-reserved">return null</span><span class="hl-code">;
+   </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+   </span><span class="hl-identifier">proto</span><span class="hl-code">.</span><span class="hl-identifier">getAttribute</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">attr</span><span class="hl-brackets">) {
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">el</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getEl</span><span class="hl-brackets">()</span><span class="hl-code">;
+      </span><span class="hl-reserved">if </span><span class="hl-brackets">(  </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">patterns</span><span class="hl-code">.</span><span class="hl-identifier">color</span><span class="hl-code">.</span><span class="hl-identifier">test</span><span class="hl-brackets">(</span><span class="hl-identifier">attr</span><span class="hl-brackets">) ) {
+         </span><span class="hl-reserved">var </span><span class="hl-identifier">val</span><span class="hl-code"> = </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">getStyle</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">attr</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+         </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">patterns</span><span class="hl-code">.</span><span class="hl-identifier">transparent</span><span class="hl-code">.</span><span class="hl-identifier">test</span><span class="hl-brackets">(</span><span class="hl-identifier">val</span><span class="hl-brackets">)) { </span><span class="hl-comment">// bgcolor default
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">parent</span><span class="hl-code"> = </span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">parentNode</span><span class="hl-code">; </span><span class="hl-comment">// try and get from an ancestor
+            </span><span class="hl-identifier">val</span><span class="hl-code"> = </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">getStyle</span><span class="hl-brackets">(</span><span class="hl-identifier">parent</span><span class="hl-code">, </span><span class="hl-identifier">attr</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+            </span><span class="hl-reserved">while </span><span class="hl-brackets">(</span><span class="hl-identifier">parent</span><span class="hl-code"> &amp;&amp; </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">patterns</span><span class="hl-code">.</span><span class="hl-identifier">transparent</span><span class="hl-code">.</span><span class="hl-identifier">test</span><span class="hl-brackets">(</span><span class="hl-identifier">val</span><span class="hl-brackets">)) {
+               </span><span class="hl-identifier">parent</span><span class="hl-code"> = </span><span class="hl-identifier">parent</span><span class="hl-code">.</span><span class="hl-identifier">parentNode</span><span class="hl-code">;
+               </span><span class="hl-identifier">val</span><span class="hl-code"> = </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">getStyle</span><span class="hl-brackets">(</span><span class="hl-identifier">parent</span><span class="hl-code">, </span><span class="hl-identifier">attr</span><span class="hl-brackets">)</span><span class="hl-code">;
+               </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">parent</span><span class="hl-code">.</span><span class="hl-identifier">tagName</span><span class="hl-code">.</span><span class="hl-identifier">toUpperCase</span><span class="hl-brackets">()</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">HTML</span><span class="hl-quotes">'</span><span class="hl-brackets">) {
+                  </span><span class="hl-identifier">val</span><span class="hl-code"> = </span><span class="hl-quotes">'</span><span class="hl-string">#fff</span><span class="hl-quotes">'</span><span class="hl-code">;
+               </span><span class="hl-brackets">}
+            }
+         }
+      } </span><span class="hl-reserved">else </span><span class="hl-brackets">{
+         </span><span class="hl-identifier">val</span><span class="hl-code"> = </span><span class="hl-identifier">superclass</span><span class="hl-code">.</span><span class="hl-identifier">getAttribute</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-identifier">attr</span><span class="hl-brackets">)</span><span class="hl-code">;
+      </span><span class="hl-brackets">}
+
+      </span><span class="hl-reserved">return </span><span class="hl-identifier">val</span><span class="hl-code">;
+   </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+   </span><span class="hl-identifier">proto</span><span class="hl-code">.</span><span class="hl-identifier">doMethod</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">attr</span><span class="hl-code">, </span><span class="hl-identifier">start</span><span class="hl-code">, </span><span class="hl-identifier">end</span><span class="hl-brackets">) {
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">val</span><span class="hl-code">;
+
+      </span><span class="hl-reserved">if </span><span class="hl-brackets">( </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">patterns</span><span class="hl-code">.</span><span class="hl-identifier">color</span><span class="hl-code">.</span><span class="hl-identifier">test</span><span class="hl-brackets">(</span><span class="hl-identifier">attr</span><span class="hl-brackets">) ) {
+         </span><span class="hl-identifier">val</span><span class="hl-code"> = </span><span class="hl-brackets">[]</span><span class="hl-code">;
+         </span><span class="hl-reserved">for </span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">, </span><span class="hl-identifier">len</span><span class="hl-code"> = </span><span class="hl-identifier">start</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code"> &lt; </span><span class="hl-identifier">len</span><span class="hl-code">; ++</span><span class="hl-identifier">i</span><span class="hl-brackets">) {
+            </span><span class="hl-identifier">val</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-identifier">superclass</span><span class="hl-code">.</span><span class="hl-identifier">doMethod</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-identifier">attr</span><span class="hl-code">, </span><span class="hl-identifier">start</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">, </span><span class="hl-identifier">end</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">])</span><span class="hl-code">;
+         </span><span class="hl-brackets">}
+
+         </span><span class="hl-identifier">val</span><span class="hl-code"> = </span><span class="hl-quotes">'</span><span class="hl-string">rgb(</span><span class="hl-quotes">'</span><span class="hl-code">+</span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">floor</span><span class="hl-brackets">(</span><span class="hl-identifier">val</span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-brackets">])</span><span class="hl-code">+</span><span class="hl-quotes">'</span><span class="hl-string">,</span><span class="hl-quotes">'</span><span class="hl-code">+</span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">floor</span><span class="hl-brackets">(</span><span class="hl-identifier">val</span><span class="hl-brackets">[</span><span class="hl-number">1</span><span class="hl-brackets">])</span><span class="hl-code">+</span><span class="hl-quotes">'</span><span class="hl-string">,</span><span class="hl-quotes">'</span><span class="hl-code">+</span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">floor</span><span class="hl-brackets">(</span><span class="hl-identifier">val</span><span class="hl-brackets">[</span><span class="hl-number">2</span><span class="hl-brackets">])</span><span class="hl-code">+</span><span class="hl-quotes">'</span><span class="hl-string">)</span><span class="hl-quotes">'</span><span class="hl-code">;
+      </span><span class="hl-brackets">}
+      </span><span class="hl-reserved">else </span><span class="hl-brackets">{
+         </span><span class="hl-identifier">val</span><span class="hl-code"> = </span><span class="hl-identifier">superclass</span><span class="hl-code">.</span><span class="hl-identifier">doMethod</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-identifier">attr</span><span class="hl-code">, </span><span class="hl-identifier">start</span><span class="hl-code">, </span><span class="hl-identifier">end</span><span class="hl-brackets">)</span><span class="hl-code">;
+      </span><span class="hl-brackets">}
+
+      </span><span class="hl-reserved">return </span><span class="hl-identifier">val</span><span class="hl-code">;
+   </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+   </span><span class="hl-identifier">proto</span><span class="hl-code">.</span><span class="hl-identifier">setRuntimeAttribute</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">attr</span><span class="hl-brackets">) {
+      </span><span class="hl-identifier">superclass</span><span class="hl-code">.</span><span class="hl-identifier">setRuntimeAttribute</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-identifier">attr</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+      </span><span class="hl-reserved">if </span><span class="hl-brackets">( </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">patterns</span><span class="hl-code">.</span><span class="hl-identifier">color</span><span class="hl-code">.</span><span class="hl-identifier">test</span><span class="hl-brackets">(</span><span class="hl-identifier">attr</span><span class="hl-brackets">) ) {
+         </span><span class="hl-reserved">var </span><span class="hl-identifier">attributes</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">attributes</span><span class="hl-code">;
+         </span><span class="hl-reserved">var </span><span class="hl-identifier">start</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">parseColor</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">runtimeAttributes</span><span class="hl-brackets">[</span><span class="hl-identifier">attr</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">start</span><span class="hl-brackets">)</span><span class="hl-code">;
+         </span><span class="hl-reserved">var </span><span class="hl-identifier">end</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">parseColor</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">runtimeAttributes</span><span class="hl-brackets">[</span><span class="hl-identifier">attr</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">end</span><span class="hl-brackets">)</span><span class="hl-code">;
+         </span><span class="hl-comment">// fix colors if going &quot;by&quot;
+         </span><span class="hl-reserved">if </span><span class="hl-brackets">( </span><span class="hl-reserved">typeof </span><span class="hl-identifier">attributes</span><span class="hl-brackets">[</span><span class="hl-identifier">attr</span><span class="hl-brackets">][</span><span class="hl-quotes">'</span><span class="hl-string">to</span><span class="hl-quotes">'</span><span class="hl-brackets">]</span><span class="hl-code"> === </span><span class="hl-quotes">'</span><span class="hl-string">undefined</span><span class="hl-quotes">'</span><span class="hl-code"> &amp;&amp; </span><span class="hl-reserved">typeof </span><span class="hl-identifier">attributes</span><span class="hl-brackets">[</span><span class="hl-identifier">attr</span><span class="hl-brackets">][</span><span class="hl-quotes">'</span><span class="hl-string">by</span><span class="hl-quotes">'</span><span class="hl-brackets">]</span><span class="hl-code"> !== </span><span class="hl-quotes">'</span><span class="hl-string">undefined</span><span class="hl-quotes">' </span><span class="hl-brackets">) {
+            </span><span class="hl-identifier">end</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">parseColor</span><span class="hl-brackets">(</span><span class="hl-identifier">attributes</span><span class="hl-brackets">[</span><span class="hl-identifier">attr</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">by</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+            </span><span class="hl-reserved">for </span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">, </span><span class="hl-identifier">len</span><span class="hl-code"> = </span><span class="hl-identifier">start</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code"> &lt; </span><span class="hl-identifier">len</span><span class="hl-code">; ++</span><span class="hl-identifier">i</span><span class="hl-brackets">) {
+               </span><span class="hl-identifier">end</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-identifier">start</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code"> + </span><span class="hl-identifier">end</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+         }
+
+         </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">runtimeAttributes</span><span class="hl-brackets">[</span><span class="hl-identifier">attr</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">start</span><span class="hl-code"> = </span><span class="hl-identifier">start</span><span class="hl-code">;
+         </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">runtimeAttributes</span><span class="hl-brackets">[</span><span class="hl-identifier">attr</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">end</span><span class="hl-code"> = </span><span class="hl-identifier">end</span><span class="hl-code">;
+      </span><span class="hl-brackets">}
+   }</span><span class="hl-code">;
+</span><span class="hl-brackets">})()</span><span class="hl-default">;</span><span class="hl-comment">/*
+TERMS OF USE - EASING EQUATIONS
+Open source under the BSD License.
+Copyright 2001 Robert Penner All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+ * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+ * Neither the name of the author nor the names of contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+// holder
+/**
+ * Singleton that determines how an animation proceeds from start to end.
+ * @class Easing
+ * @namespace YAHOO.util
+*/
+
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">util</span><span class="hl-default">.</span><span class="hl-identifier">Easing</span><span class="hl-default"> = </span><span class="hl-brackets">{
+
+   </span><span class="hl-comment">/**
+    * Uniform speed between points.
+    * @method easeNone
+    * @param {Number} t Time value used to compute current value
+    * @param {Number} b Starting value
+    * @param {Number} c Delta between start and end values
+    * @param {Number} d Total length of animation
+    * @return {Number} The computed value for the current animation frame
+    */
+   </span><span class="hl-identifier">easeNone</span><span class="hl-code">: </span><span class="hl-reserved">function </span><span class="hl-brackets">(</span><span class="hl-identifier">t</span><span class="hl-code">, </span><span class="hl-identifier">b</span><span class="hl-code">, </span><span class="hl-identifier">c</span><span class="hl-code">, </span><span class="hl-identifier">d</span><span class="hl-brackets">) {
+   	</span><span class="hl-reserved">return </span><span class="hl-identifier">c</span><span class="hl-code">*</span><span class="hl-identifier">t</span><span class="hl-quotes">/</span><span class="hl-string">d + b;
+   },
+
+   </span><span class="hl-quotes">/</span><span class="hl-code">**
+    * </span><span class="hl-identifier">Begins slowly and accelerates towards end</span><span class="hl-code">. </span><span class="hl-brackets">(</span><span class="hl-identifier">quadratic</span><span class="hl-brackets">)</span><span class="hl-code">
+    * @</span><span class="hl-identifier">method easeIn</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">t Time value used to compute current value</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">b Starting value</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">c Delta between start and end values</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">d Total length of animation</span><span class="hl-code">
+    * @</span><span class="hl-reserved">return </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">The computed value </span><span class="hl-reserved">for </span><span class="hl-identifier">the current animation frame</span><span class="hl-code">
+    *</span><span class="hl-quotes">/</span><span class="hl-string">
+   easeIn: function (t, b, c, d) {
+   	return c*(t</span><span class="hl-quotes">/</span><span class="hl-code">=</span><span class="hl-identifier">d</span><span class="hl-code">)*</span><span class="hl-identifier">t</span><span class="hl-code"> + </span><span class="hl-identifier">b</span><span class="hl-code">;
+   </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+   </span><span class="hl-comment">/**
+    * Begins quickly and decelerates towards end.  (quadratic)
+    * @method easeOut
+    * @param {Number} t Time value used to compute current value
+    * @param {Number} b Starting value
+    * @param {Number} c Delta between start and end values
+    * @param {Number} d Total length of animation
+    * @return {Number} The computed value for the current animation frame
+    */
+   </span><span class="hl-identifier">easeOut</span><span class="hl-code">: </span><span class="hl-reserved">function </span><span class="hl-brackets">(</span><span class="hl-identifier">t</span><span class="hl-code">, </span><span class="hl-identifier">b</span><span class="hl-code">, </span><span class="hl-identifier">c</span><span class="hl-code">, </span><span class="hl-identifier">d</span><span class="hl-brackets">) {
+   	</span><span class="hl-reserved">return</span><span class="hl-code"> -</span><span class="hl-identifier">c</span><span class="hl-code"> *</span><span class="hl-brackets">(</span><span class="hl-identifier">t</span><span class="hl-quotes">/</span><span class="hl-string">=d)*(t-2) + b;
+   },
+
+   </span><span class="hl-quotes">/</span><span class="hl-code">**
+    * </span><span class="hl-identifier">Begins slowly and decelerates towards end</span><span class="hl-code">. </span><span class="hl-brackets">(</span><span class="hl-identifier">quadratic</span><span class="hl-brackets">)</span><span class="hl-code">
+    * @</span><span class="hl-identifier">method easeBoth</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">t Time value used to compute current value</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">b Starting value</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">c Delta between start and end values</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">d Total length of animation</span><span class="hl-code">
+    * @</span><span class="hl-reserved">return </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">The computed value </span><span class="hl-reserved">for </span><span class="hl-identifier">the current animation frame</span><span class="hl-code">
+    *</span><span class="hl-quotes">/</span><span class="hl-string">
+   easeBoth: function (t, b, c, d) {
+   	if ((t</span><span class="hl-quotes">/</span><span class="hl-code">=</span><span class="hl-identifier">d</span><span class="hl-quotes">/</span><span class="hl-string">2) &lt; 1) return c</span><span class="hl-quotes">/</span><span class="hl-number">2</span><span class="hl-code">*</span><span class="hl-identifier">t</span><span class="hl-code">*</span><span class="hl-identifier">t</span><span class="hl-code"> + </span><span class="hl-identifier">b</span><span class="hl-code">;
+   	</span><span class="hl-reserved">return</span><span class="hl-code"> -</span><span class="hl-identifier">c</span><span class="hl-quotes">/</span><span class="hl-string">2 * ((--t)*(t-2) - 1) + b;
+   },
+
+   </span><span class="hl-quotes">/</span><span class="hl-code">**
+    * </span><span class="hl-identifier">Begins slowly and accelerates towards end</span><span class="hl-code">. </span><span class="hl-brackets">(</span><span class="hl-identifier">quartic</span><span class="hl-brackets">)</span><span class="hl-code">
+    * @</span><span class="hl-identifier">method easeInStrong</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">t Time value used to compute current value</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">b Starting value</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">c Delta between start and end values</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">d Total length of animation</span><span class="hl-code">
+    * @</span><span class="hl-reserved">return </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">The computed value </span><span class="hl-reserved">for </span><span class="hl-identifier">the current animation frame</span><span class="hl-code">
+    *</span><span class="hl-quotes">/</span><span class="hl-string">
+   easeInStrong: function (t, b, c, d) {
+   	return c*(t</span><span class="hl-quotes">/</span><span class="hl-code">=</span><span class="hl-identifier">d</span><span class="hl-brackets">)</span><span class="hl-code">*</span><span class="hl-identifier">t</span><span class="hl-code">*</span><span class="hl-identifier">t</span><span class="hl-code">*</span><span class="hl-identifier">t</span><span class="hl-code"> + </span><span class="hl-identifier">b</span><span class="hl-code">;
+   </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+   </span><span class="hl-comment">/**
+    * Begins quickly and decelerates towards end.  (quartic)
+    * @method easeOutStrong
+    * @param {Number} t Time value used to compute current value
+    * @param {Number} b Starting value
+    * @param {Number} c Delta between start and end values
+    * @param {Number} d Total length of animation
+    * @return {Number} The computed value for the current animation frame
+    */
+   </span><span class="hl-identifier">easeOutStrong</span><span class="hl-code">: </span><span class="hl-reserved">function </span><span class="hl-brackets">(</span><span class="hl-identifier">t</span><span class="hl-code">, </span><span class="hl-identifier">b</span><span class="hl-code">, </span><span class="hl-identifier">c</span><span class="hl-code">, </span><span class="hl-identifier">d</span><span class="hl-brackets">) {
+   	</span><span class="hl-reserved">return</span><span class="hl-code"> -</span><span class="hl-identifier">c</span><span class="hl-code"> * </span><span class="hl-brackets">((</span><span class="hl-identifier">t</span><span class="hl-code">=</span><span class="hl-identifier">t</span><span class="hl-quotes">/</span><span class="hl-string">d-1)*t*t*t - 1) + b;
+   },
+
+   </span><span class="hl-quotes">/</span><span class="hl-code">**
+    * </span><span class="hl-identifier">Begins slowly and decelerates towards end</span><span class="hl-code">. </span><span class="hl-brackets">(</span><span class="hl-identifier">quartic</span><span class="hl-brackets">)</span><span class="hl-code">
+    * @</span><span class="hl-identifier">method easeBothStrong</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">t Time value used to compute current value</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">b Starting value</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">c Delta between start and end values</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">d Total length of animation</span><span class="hl-code">
+    * @</span><span class="hl-reserved">return </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">The computed value </span><span class="hl-reserved">for </span><span class="hl-identifier">the current animation frame</span><span class="hl-code">
+    *</span><span class="hl-quotes">/</span><span class="hl-string">
+   easeBothStrong: function (t, b, c, d) {
+   	if ((t</span><span class="hl-quotes">/</span><span class="hl-code">=</span><span class="hl-identifier">d</span><span class="hl-quotes">/</span><span class="hl-string">2) &lt; 1) return c</span><span class="hl-quotes">/</span><span class="hl-number">2</span><span class="hl-code">*</span><span class="hl-identifier">t</span><span class="hl-code">*</span><span class="hl-identifier">t</span><span class="hl-code">*</span><span class="hl-identifier">t</span><span class="hl-code">*</span><span class="hl-identifier">t</span><span class="hl-code"> + </span><span class="hl-identifier">b</span><span class="hl-code">;
+   	</span><span class="hl-reserved">return</span><span class="hl-code"> -</span><span class="hl-identifier">c</span><span class="hl-quotes">/</span><span class="hl-string">2 * ((t-=2)*t*t*t - 2) + b;
+   },
+
+   </span><span class="hl-quotes">/</span><span class="hl-code">**
+    * </span><span class="hl-identifier">Snap </span><span class="hl-reserved">in </span><span class="hl-identifier">elastic effect</span><span class="hl-code">.
+    * @</span><span class="hl-identifier">method elasticIn</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">t Time value used to compute current value</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">b Starting value</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">c Delta between start and end values</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">d Total length of animation</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">p Period </span><span class="hl-brackets">(</span><span class="hl-identifier">optional</span><span class="hl-brackets">)</span><span class="hl-code">
+    * @</span><span class="hl-reserved">return </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">The computed value </span><span class="hl-reserved">for </span><span class="hl-identifier">the current animation frame</span><span class="hl-code">
+    *</span><span class="hl-quotes">/</span><span class="hl-string">
+
+   elasticIn: function (t, b, c, d, a, p) {
+   	if (t==0) return b;  if ((t</span><span class="hl-quotes">/</span><span class="hl-code">=</span><span class="hl-identifier">d</span><span class="hl-brackets">)</span><span class="hl-code">==</span><span class="hl-number">1</span><span class="hl-brackets">) </span><span class="hl-reserved">return </span><span class="hl-identifier">b</span><span class="hl-code">+</span><span class="hl-identifier">c</span><span class="hl-code">;  </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">p</span><span class="hl-brackets">) </span><span class="hl-identifier">p</span><span class="hl-code">=</span><span class="hl-identifier">d</span><span class="hl-code">*</span><span class="hl-number">.3</span><span class="hl-code">;
+   	</span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">a</span><span class="hl-code"> || </span><span class="hl-identifier">a</span><span class="hl-code"> &lt; </span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">abs</span><span class="hl-brackets">(</span><span class="hl-identifier">c</span><span class="hl-brackets">)) { </span><span class="hl-identifier">a</span><span class="hl-code">=</span><span class="hl-identifier">c</span><span class="hl-code">; </span><span class="hl-reserved">var </span><span class="hl-identifier">s</span><span class="hl-code">=</span><span class="hl-identifier">p</span><span class="hl-quotes">/</span><span class="hl-string">4; }
+   	else var s = p</span><span class="hl-quotes">/</span><span class="hl-brackets">(</span><span class="hl-number">2</span><span class="hl-code">*</span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">PI</span><span class="hl-brackets">)</span><span class="hl-code"> * </span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">asin </span><span class="hl-brackets">(</span><span class="hl-identifier">c</span><span class="hl-quotes">/</span><span class="hl-string">a);
+   	return -(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)</span><span class="hl-quotes">/</span><span class="hl-identifier">p </span><span class="hl-brackets">)</span><span class="hl-code">) + </span><span class="hl-identifier">b</span><span class="hl-code">;
+   </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+   </span><span class="hl-comment">/**
+    * Snap out elastic effect.
+    * @method elasticOut
+    * @param {Number} t Time value used to compute current value
+    * @param {Number} b Starting value
+    * @param {Number} c Delta between start and end values
+    * @param {Number} d Total length of animation
+    * @param {Number} p Period (optional)
+    * @return {Number} The computed value for the current animation frame
+    */
+   </span><span class="hl-identifier">elasticOut</span><span class="hl-code">: </span><span class="hl-reserved">function </span><span class="hl-brackets">(</span><span class="hl-identifier">t</span><span class="hl-code">, </span><span class="hl-identifier">b</span><span class="hl-code">, </span><span class="hl-identifier">c</span><span class="hl-code">, </span><span class="hl-identifier">d</span><span class="hl-code">, </span><span class="hl-identifier">a</span><span class="hl-code">, </span><span class="hl-identifier">p</span><span class="hl-brackets">) {
+   	</span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">t</span><span class="hl-code">==</span><span class="hl-number">0</span><span class="hl-brackets">) </span><span class="hl-reserved">return </span><span class="hl-identifier">b</span><span class="hl-code">;  </span><span class="hl-reserved">if </span><span class="hl-brackets">((</span><span class="hl-identifier">t</span><span class="hl-quotes">/</span><span class="hl-string">=d)==1) return b+c;  if (!p) p=d*.3;
+   	if (!a || a &lt; Math.abs(c)) { a=c; var s=p</span><span class="hl-quotes">/</span><span class="hl-number">4</span><span class="hl-code">; }
+   	</span><span class="hl-reserved">else var </span><span class="hl-identifier">s</span><span class="hl-code"> = </span><span class="hl-identifier">p</span><span class="hl-quotes">/</span><span class="hl-string">(2*Math.PI) * Math.asin (c</span><span class="hl-quotes">/</span><span class="hl-identifier">a</span><span class="hl-brackets">)</span><span class="hl-code">;
+   	</span><span class="hl-reserved">return </span><span class="hl-identifier">a</span><span class="hl-code">*</span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">pow</span><span class="hl-brackets">(</span><span class="hl-number">2</span><span class="hl-code">,-</span><span class="hl-number">10</span><span class="hl-code">*</span><span class="hl-identifier">t</span><span class="hl-brackets">)</span><span class="hl-code"> * </span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">sin</span><span class="hl-brackets">( (</span><span class="hl-identifier">t</span><span class="hl-code">*</span><span class="hl-identifier">d</span><span class="hl-code">-</span><span class="hl-identifier">s</span><span class="hl-brackets">)</span><span class="hl-code">*</span><span class="hl-brackets">(</span><span class="hl-number">2</span><span class="hl-code">*</span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">PI</span><span class="hl-brackets">)</span><span class="hl-quotes">/</span><span class="hl-string">p ) + c + b;
+   },
+
+   </span><span class="hl-quotes">/</span><span class="hl-code">**
+    * </span><span class="hl-identifier">Snap both elastic effect</span><span class="hl-code">.
+    * @</span><span class="hl-identifier">method elasticBoth</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">t Time value used to compute current value</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">b Starting value</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">c Delta between start and end values</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">d Total length of animation</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">p Period </span><span class="hl-brackets">(</span><span class="hl-identifier">optional</span><span class="hl-brackets">)</span><span class="hl-code">
+    * @</span><span class="hl-reserved">return </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">The computed value </span><span class="hl-reserved">for </span><span class="hl-identifier">the current animation frame</span><span class="hl-code">
+    *</span><span class="hl-quotes">/</span><span class="hl-string">
+   elasticBoth: function (t, b, c, d, a, p) {
+   	if (t==0) return b;  if ((t</span><span class="hl-quotes">/</span><span class="hl-code">=</span><span class="hl-identifier">d</span><span class="hl-quotes">/</span><span class="hl-string">2)==2) return b+c;  if (!p) p=d*(.3*1.5);
+   	if (!a || a &lt; Math.abs(c)) { a=c; var s=p</span><span class="hl-quotes">/</span><span class="hl-number">4</span><span class="hl-code">; }
+   	</span><span class="hl-reserved">else var </span><span class="hl-identifier">s</span><span class="hl-code"> = </span><span class="hl-identifier">p</span><span class="hl-quotes">/</span><span class="hl-string">(2*Math.PI) * Math.asin (c</span><span class="hl-quotes">/</span><span class="hl-identifier">a</span><span class="hl-brackets">)</span><span class="hl-code">;
+   	</span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">t</span><span class="hl-code"> &lt; </span><span class="hl-number">1</span><span class="hl-brackets">) </span><span class="hl-reserved">return</span><span class="hl-code"> -</span><span class="hl-number">.5</span><span class="hl-code">*</span><span class="hl-brackets">(</span><span class="hl-identifier">a</span><span class="hl-code">*</span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">pow</span><span class="hl-brackets">(</span><span class="hl-number">2</span><span class="hl-code">,</span><span class="hl-number">10</span><span class="hl-code">*</span><span class="hl-brackets">(</span><span class="hl-identifier">t</span><span class="hl-code">-=</span><span class="hl-number">1</span><span class="hl-brackets">))</span><span class="hl-code"> * </span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">sin</span><span class="hl-brackets">( (</span><span class="hl-identifier">t</span><span class="hl-code">*</span><span class="hl-identifier">d</span><span class="hl-code">-</span><span class="hl-identifier">s</span><span class="hl-brackets">)</span><span class="hl-code">*</span><span class="hl-brackets">(</span><span class="hl-number">2</span><span class="hl-code">*</span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">PI</span><span class="hl-brackets">)</span><span class="hl-quotes">/</span><span class="hl-string">p )) + b;
+   	return a*Math.pow(2,-10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)</span><span class="hl-quotes">/</span><span class="hl-identifier">p </span><span class="hl-brackets">)</span><span class="hl-code">*</span><span class="hl-number">.5</span><span class="hl-code"> + </span><span class="hl-identifier">c</span><span class="hl-code"> + </span><span class="hl-identifier">b</span><span class="hl-code">;
+   },
+
+   </span><span class="hl-comment">/**
+    * Backtracks slightly, then reverses direction and moves to end.
+    * @method backIn
+    * @param {Number} t Time value used to compute current value
+    * @param {Number} b Starting value
+    * @param {Number} c Delta between start and end values
+    * @param {Number} d Total length of animation
+    * @param {Number} s Overshoot (optional)
+    * @return {Number} The computed value for the current animation frame
+    */
+   </span><span class="hl-identifier">backIn</span><span class="hl-code">: </span><span class="hl-reserved">function </span><span class="hl-brackets">(</span><span class="hl-identifier">t</span><span class="hl-code">, </span><span class="hl-identifier">b</span><span class="hl-code">, </span><span class="hl-identifier">c</span><span class="hl-code">, </span><span class="hl-identifier">d</span><span class="hl-code">, </span><span class="hl-identifier">s</span><span class="hl-brackets">) {
+   	</span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">s</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">undefined</span><span class="hl-quotes">'</span><span class="hl-brackets">) </span><span class="hl-identifier">s</span><span class="hl-code"> = </span><span class="hl-number">1.70158</span><span class="hl-code">;
+   	</span><span class="hl-reserved">return </span><span class="hl-identifier">c</span><span class="hl-code">*</span><span class="hl-brackets">(</span><span class="hl-identifier">t</span><span class="hl-quotes">/</span><span class="hl-string">=d)*t*((s+1)*t - s) + b;
+   },
+
+   </span><span class="hl-quotes">/</span><span class="hl-code">**
+    * </span><span class="hl-identifier">Overshoots end</span><span class="hl-code">, </span><span class="hl-identifier">then reverses and comes back to end</span><span class="hl-code">.
+    * @</span><span class="hl-identifier">method backOut</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">t Time value used to compute current value</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">b Starting value</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">c Delta between start and end values</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">d Total length of animation</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">s Overshoot </span><span class="hl-brackets">(</span><span class="hl-identifier">optional</span><span class="hl-brackets">)</span><span class="hl-code">
+    * @</span><span class="hl-reserved">return </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">The computed value </span><span class="hl-reserved">for </span><span class="hl-identifier">the current animation frame</span><span class="hl-code">
+    *</span><span class="hl-quotes">/</span><span class="hl-string">
+   backOut: function (t, b, c, d, s) {
+   	if (typeof s == 'undefined') s = 1.70158;
+   	return c*((t=t</span><span class="hl-quotes">/</span><span class="hl-identifier">d</span><span class="hl-code">-</span><span class="hl-number">1</span><span class="hl-brackets">)</span><span class="hl-code">*</span><span class="hl-identifier">t</span><span class="hl-code">*</span><span class="hl-brackets">((</span><span class="hl-identifier">s</span><span class="hl-code">+</span><span class="hl-number">1</span><span class="hl-brackets">)</span><span class="hl-code">*</span><span class="hl-identifier">t</span><span class="hl-code"> + </span><span class="hl-identifier">s</span><span class="hl-brackets">)</span><span class="hl-code"> + </span><span class="hl-number">1</span><span class="hl-code">) + </span><span class="hl-identifier">b</span><span class="hl-code">;
+   </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+   </span><span class="hl-comment">/**
+    * Backtracks slightly, then reverses direction, overshoots end,
+    * then reverses and comes back to end.
+    * @method backBoth
+    * @param {Number} t Time value used to compute current value
+    * @param {Number} b Starting value
+    * @param {Number} c Delta between start and end values
+    * @param {Number} d Total length of animation
+    * @param {Number} s Overshoot (optional)
+    * @return {Number} The computed value for the current animation frame
+    */
+   </span><span class="hl-identifier">backBoth</span><span class="hl-code">: </span><span class="hl-reserved">function </span><span class="hl-brackets">(</span><span class="hl-identifier">t</span><span class="hl-code">, </span><span class="hl-identifier">b</span><span class="hl-code">, </span><span class="hl-identifier">c</span><span class="hl-code">, </span><span class="hl-identifier">d</span><span class="hl-code">, </span><span class="hl-identifier">s</span><span class="hl-brackets">) {
+   	</span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">s</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">undefined</span><span class="hl-quotes">'</span><span class="hl-brackets">) </span><span class="hl-identifier">s</span><span class="hl-code"> = </span><span class="hl-number">1.70158</span><span class="hl-code">;
+   	</span><span class="hl-reserved">if </span><span class="hl-brackets">((</span><span class="hl-identifier">t</span><span class="hl-quotes">/</span><span class="hl-string">=d</span><span class="hl-quotes">/</span><span class="hl-number">2</span><span class="hl-brackets">)</span><span class="hl-code"> &lt; </span><span class="hl-number">1</span><span class="hl-brackets">) </span><span class="hl-reserved">return </span><span class="hl-identifier">c</span><span class="hl-quotes">/</span><span class="hl-string">2*(t*t*(((s*=(1.525))+1)*t - s)) + b;
+   	return c</span><span class="hl-quotes">/</span><span class="hl-number">2</span><span class="hl-code">*</span><span class="hl-brackets">((</span><span class="hl-identifier">t</span><span class="hl-code">-=</span><span class="hl-number">2</span><span class="hl-brackets">)</span><span class="hl-code">*</span><span class="hl-identifier">t</span><span class="hl-code">*</span><span class="hl-brackets">(((</span><span class="hl-identifier">s</span><span class="hl-code">*=</span><span class="hl-brackets">(</span><span class="hl-number">1.525</span><span class="hl-brackets">))</span><span class="hl-code">+</span><span class="hl-number">1</span><span class="hl-brackets">)</span><span class="hl-code">*</span><span class="hl-identifier">t</span><span class="hl-code"> + </span><span class="hl-identifier">s</span><span class="hl-brackets">)</span><span class="hl-code"> + </span><span class="hl-number">2</span><span class="hl-brackets">)</span><span class="hl-code"> + </span><span class="hl-identifier">b</span><span class="hl-code">;
+   </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+   </span><span class="hl-comment">/**
+    * Bounce off of start.
+    * @method bounceIn
+    * @param {Number} t Time value used to compute current value
+    * @param {Number} b Starting value
+    * @param {Number} c Delta between start and end values
+    * @param {Number} d Total length of animation
+    * @return {Number} The computed value for the current animation frame
+    */
+   </span><span class="hl-identifier">bounceIn</span><span class="hl-code">: </span><span class="hl-reserved">function </span><span class="hl-brackets">(</span><span class="hl-identifier">t</span><span class="hl-code">, </span><span class="hl-identifier">b</span><span class="hl-code">, </span><span class="hl-identifier">c</span><span class="hl-code">, </span><span class="hl-identifier">d</span><span class="hl-brackets">) {
+   	</span><span class="hl-reserved">return </span><span class="hl-identifier">c</span><span class="hl-code"> - </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Easing</span><span class="hl-code">.</span><span class="hl-identifier">bounceOut</span><span class="hl-brackets">(</span><span class="hl-identifier">d</span><span class="hl-code">-</span><span class="hl-identifier">t</span><span class="hl-code">, </span><span class="hl-number">0</span><span class="hl-code">, </span><span class="hl-identifier">c</span><span class="hl-code">, </span><span class="hl-identifier">d</span><span class="hl-brackets">)</span><span class="hl-code"> + </span><span class="hl-identifier">b</span><span class="hl-code">;
+   </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+   </span><span class="hl-comment">/**
+    * Bounces off end.
+    * @method bounceOut
+    * @param {Number} t Time value used to compute current value
+    * @param {Number} b Starting value
+    * @param {Number} c Delta between start and end values
+    * @param {Number} d Total length of animation
+    * @return {Number} The computed value for the current animation frame
+    */
+   </span><span class="hl-identifier">bounceOut</span><span class="hl-code">: </span><span class="hl-reserved">function </span><span class="hl-brackets">(</span><span class="hl-identifier">t</span><span class="hl-code">, </span><span class="hl-identifier">b</span><span class="hl-code">, </span><span class="hl-identifier">c</span><span class="hl-code">, </span><span class="hl-identifier">d</span><span class="hl-brackets">) {
+   	</span><span class="hl-reserved">if </span><span class="hl-brackets">((</span><span class="hl-identifier">t</span><span class="hl-quotes">/</span><span class="hl-string">=d) &lt; (1</span><span class="hl-quotes">/</span><span class="hl-number">2.75</span><span class="hl-brackets">)) {
+   		</span><span class="hl-reserved">return </span><span class="hl-identifier">c</span><span class="hl-code">*</span><span class="hl-brackets">(</span><span class="hl-number">7.5625</span><span class="hl-code">*</span><span class="hl-identifier">t</span><span class="hl-code">*</span><span class="hl-identifier">t</span><span class="hl-brackets">)</span><span class="hl-code"> + </span><span class="hl-identifier">b</span><span class="hl-code">;
+   	</span><span class="hl-brackets">} </span><span class="hl-reserved">else if </span><span class="hl-brackets">(</span><span class="hl-identifier">t</span><span class="hl-code"> &lt; </span><span class="hl-brackets">(</span><span class="hl-number">2</span><span class="hl-quotes">/</span><span class="hl-string">2.75)) {
+   		return c*(7.5625*(t-=(1.5</span><span class="hl-quotes">/</span><span class="hl-number">2.75</span><span class="hl-brackets">))</span><span class="hl-code">*</span><span class="hl-identifier">t</span><span class="hl-code"> + </span><span class="hl-number">.75</span><span class="hl-code">) + </span><span class="hl-identifier">b</span><span class="hl-code">;
+   	</span><span class="hl-brackets">} </span><span class="hl-reserved">else if </span><span class="hl-brackets">(</span><span class="hl-identifier">t</span><span class="hl-code"> &lt; </span><span class="hl-brackets">(</span><span class="hl-number">2.5</span><span class="hl-quotes">/</span><span class="hl-string">2.75)) {
+   		return c*(7.5625*(t-=(2.25</span><span class="hl-quotes">/</span><span class="hl-number">2.75</span><span class="hl-brackets">))</span><span class="hl-code">*</span><span class="hl-identifier">t</span><span class="hl-code"> + </span><span class="hl-number">.9375</span><span class="hl-brackets">)</span><span class="hl-code"> + </span><span class="hl-identifier">b</span><span class="hl-code">;
+   	} </span><span class="hl-reserved">else </span><span class="hl-brackets">{
+   		</span><span class="hl-reserved">return </span><span class="hl-identifier">c</span><span class="hl-code">*</span><span class="hl-brackets">(</span><span class="hl-number">7.5625</span><span class="hl-code">*</span><span class="hl-brackets">(</span><span class="hl-identifier">t</span><span class="hl-code">-=</span><span class="hl-brackets">(</span><span class="hl-number">2.625</span><span class="hl-quotes">/</span><span class="hl-string">2.75))*t + .984375) + b;
+   	}
+   },
+
+   </span><span class="hl-quotes">/</span><span class="hl-code">**
+    * </span><span class="hl-identifier">Bounces off start and end</span><span class="hl-code">.
+    * @</span><span class="hl-identifier">method bounceBoth</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">t Time value used to compute current value</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">b Starting value</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">c Delta between start and end values</span><span class="hl-code">
+    * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">d Total length of animation</span><span class="hl-code">
+    * @</span><span class="hl-reserved">return </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">The computed value </span><span class="hl-reserved">for </span><span class="hl-identifier">the current animation frame</span><span class="hl-code">
+    *</span><span class="hl-quotes">/</span><span class="hl-string">
+   bounceBoth: function (t, b, c, d) {
+   	if (t &lt; d</span><span class="hl-quotes">/</span><span class="hl-number">2</span><span class="hl-brackets">) </span><span class="hl-reserved">return </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Easing</span><span class="hl-code">.</span><span class="hl-identifier">bounceIn</span><span class="hl-brackets">(</span><span class="hl-identifier">t</span><span class="hl-code">*</span><span class="hl-number">2</span><span class="hl-code">, </span><span class="hl-number">0</span><span class="hl-code">, </span><span class="hl-identifier">c</span><span class="hl-code">, </span><span class="hl-identifier">d</span><span class="hl-brackets">)</span><span class="hl-code"> * </span><span class="hl-number">.5</span><span class="hl-code"> + </span><span class="hl-identifier">b</span><span class="hl-code">;
+   	</span><span class="hl-reserved">return </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Easing</span><span class="hl-code">.</span><span class="hl-identifier">bounceOut</span><span class="hl-brackets">(</span><span class="hl-identifier">t</span><span class="hl-code">*</span><span class="hl-number">2</span><span class="hl-code">-</span><span class="hl-identifier">d</span><span class="hl-code">, </span><span class="hl-number">0</span><span class="hl-code">, </span><span class="hl-identifier">c</span><span class="hl-code">, </span><span class="hl-identifier">d</span><span class="hl-brackets">)</span><span class="hl-code"> * </span><span class="hl-number">.5</span><span class="hl-code"> + </span><span class="hl-identifier">c</span><span class="hl-code">*</span><span class="hl-number">.5</span><span class="hl-code"> + </span><span class="hl-identifier">b</span><span class="hl-code">;
+   }
+};
+
+</span><span class="hl-comment">/**
+ * Anim subclass for moving elements along a path defined by the &quot;points&quot;
+ * member of &quot;attributes&quot;.  All &quot;points&quot; are arrays with x, y coordinates.
+ * &lt;p&gt;Usage: &lt;code&gt;var myAnim = new YAHOO.util.Motion(el, { points: { to: [800, 800] } }, 1, YAHOO.util.Easing.easeOut);&lt;/code&gt;&lt;/p&gt;
+ * @class Motion
+ * @namespace YAHOO.util
+ * @requires YAHOO.util.Anim
+ * @requires YAHOO.util.AnimMgr
+ * @requires YAHOO.util.Easing
+ * @requires YAHOO.util.Bezier
+ * @requires YAHOO.util.Dom
+ * @requires YAHOO.util.Event
+ * @requires YAHOO.util.CustomEvent
+ * @constructor
+ * @extends YAHOO.util.Anim
+ * @param {String | HTMLElement} el Reference to the element that will be animated
+ * @param {Object} attributes The attribute(s) to be animated.
+ * Each attribute is an object with at minimum a &quot;to&quot; or &quot;by&quot; member defined.
+ * Additional optional members are &quot;from&quot; (defaults to current value), &quot;units&quot; (defaults to &quot;px&quot;).
+ * All attribute names use camelCase.
+ * @param {Number} duration (optional, defaults to 1 second) Length of animation (frames or seconds), defaults to time-based
+ * @param {Function} method (optional, defaults to YAHOO.util.Easing.easeNone) Computes the values that are applied to the attributes per frame (generally a YAHOO.util.Easing method)
+ */
+</span><span class="hl-brackets">(</span><span class="hl-reserved">function</span><span class="hl-brackets">() {
+   </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Motion</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">attributes</span><span class="hl-code">, </span><span class="hl-identifier">duration</span><span class="hl-code">,  </span><span class="hl-identifier">method</span><span class="hl-brackets">) {
+      </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">) { </span><span class="hl-comment">// dont break existing subclasses not using YAHOO.extend
+         </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Motion</span><span class="hl-code">.</span><span class="hl-identifier">superclass</span><span class="hl-code">.</span><span class="hl-identifier">constructor</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">attributes</span><span class="hl-code">, </span><span class="hl-identifier">duration</span><span class="hl-code">, </span><span class="hl-identifier">method</span><span class="hl-brackets">)</span><span class="hl-code">;
+      </span><span class="hl-brackets">}
+   }</span><span class="hl-code">;
+
+   </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">extend</span><span class="hl-brackets">(</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Motion</span><span class="hl-code">, </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">ColorAnim</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+   </span><span class="hl-comment">// shorthand
+   </span><span class="hl-reserved">var </span><span class="hl-identifier">Y</span><span class="hl-code"> = </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">;
+   </span><span class="hl-reserved">var </span><span class="hl-identifier">superclass</span><span class="hl-code"> = </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Motion</span><span class="hl-code">.</span><span class="hl-identifier">superclass</span><span class="hl-code">;
+   </span><span class="hl-reserved">var </span><span class="hl-identifier">proto</span><span class="hl-code"> = </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Motion</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">;
+
+   </span><span class="hl-identifier">proto</span><span class="hl-code">.</span><span class="hl-identifier">toString</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">() {
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">el</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getEl</span><span class="hl-brackets">()</span><span class="hl-code">;
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">id</span><span class="hl-code"> = </span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">id</span><span class="hl-code"> || </span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">tagName</span><span class="hl-code">;
+      </span><span class="hl-reserved">return </span><span class="hl-brackets">(</span><span class="hl-quotes">&quot;</span><span class="hl-string">Motion </span><span class="hl-quotes">&quot;</span><span class="hl-code"> + </span><span class="hl-identifier">id</span><span class="hl-brackets">)</span><span class="hl-code">;
+   </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+   </span><span class="hl-identifier">proto</span><span class="hl-code">.</span><span class="hl-identifier">patterns</span><span class="hl-code">.</span><span class="hl-identifier">points</span><span class="hl-code"> = </span><span class="hl-quotes">/</span><span class="hl-string">^points$</span><span class="hl-quotes">/i</span><span class="hl-code">;
+
+   </span><span class="hl-identifier">proto</span><span class="hl-code">.</span><span class="hl-identifier">setAttribute</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">attr</span><span class="hl-code">, </span><span class="hl-identifier">val</span><span class="hl-code">, </span><span class="hl-identifier">unit</span><span class="hl-brackets">) {
+      </span><span class="hl-reserved">if </span><span class="hl-brackets">(  </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">patterns</span><span class="hl-code">.</span><span class="hl-identifier">points</span><span class="hl-code">.</span><span class="hl-identifier">test</span><span class="hl-brackets">(</span><span class="hl-identifier">attr</span><span class="hl-brackets">) ) {
+         </span><span class="hl-identifier">unit</span><span class="hl-code"> = </span><span class="hl-identifier">unit</span><span class="hl-code"> || </span><span class="hl-quotes">'</span><span class="hl-string">px</span><span class="hl-quotes">'</span><span class="hl-code">;
+         </span><span class="hl-identifier">superclass</span><span class="hl-code">.</span><span class="hl-identifier">setAttribute</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">left</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-identifier">val</span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code">, </span><span class="hl-identifier">unit</span><span class="hl-brackets">)</span><span class="hl-code">;
+         </span><span class="hl-identifier">superclass</span><span class="hl-code">.</span><span class="hl-identifier">setAttribute</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">top</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-identifier">val</span><span class="hl-brackets">[</span><span class="hl-number">1</span><span class="hl-brackets">]</span><span class="hl-code">, </span><span class="hl-identifier">unit</span><span class="hl-brackets">)</span><span class="hl-code">;
+      </span><span class="hl-brackets">} </span><span class="hl-reserved">else </span><span class="hl-brackets">{
+         </span><span class="hl-identifier">superclass</span><span class="hl-code">.</span><span class="hl-identifier">setAttribute</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-identifier">attr</span><span class="hl-code">, </span><span class="hl-identifier">val</span><span class="hl-code">, </span><span class="hl-identifier">unit</span><span class="hl-brackets">)</span><span class="hl-code">;
+      </span><span class="hl-brackets">}
+   }</span><span class="hl-code">;
+
+   </span><span class="hl-identifier">proto</span><span class="hl-code">.</span><span class="hl-identifier">getAttribute</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">attr</span><span class="hl-brackets">) {
+      </span><span class="hl-reserved">if </span><span class="hl-brackets">(  </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">patterns</span><span class="hl-code">.</span><span class="hl-identifier">points</span><span class="hl-code">.</span><span class="hl-identifier">test</span><span class="hl-brackets">(</span><span class="hl-identifier">attr</span><span class="hl-brackets">) ) {
+         </span><span class="hl-reserved">var </span><span class="hl-identifier">val</span><span class="hl-code"> = </span><span class="hl-brackets">[
+            </span><span class="hl-identifier">superclass</span><span class="hl-code">.</span><span class="hl-identifier">getAttribute</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">left</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">,
+            </span><span class="hl-identifier">superclass</span><span class="hl-code">.</span><span class="hl-identifier">getAttribute</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">top</span><span class="hl-quotes">'</span><span class="hl-brackets">)
+         ]</span><span class="hl-code">;
+      </span><span class="hl-brackets">} </span><span class="hl-reserved">else </span><span class="hl-brackets">{
+         </span><span class="hl-identifier">val</span><span class="hl-code"> = </span><span class="hl-identifier">superclass</span><span class="hl-code">.</span><span class="hl-identifier">getAttribute</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-identifier">attr</span><span class="hl-brackets">)</span><span class="hl-code">;
+      </span><span class="hl-brackets">}
+
+      </span><span class="hl-reserved">return </span><span class="hl-identifier">val</span><span class="hl-code">;
+   </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+   </span><span class="hl-identifier">proto</span><span class="hl-code">.</span><span class="hl-identifier">doMethod</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">attr</span><span class="hl-code">, </span><span class="hl-identifier">start</span><span class="hl-code">, </span><span class="hl-identifier">end</span><span class="hl-brackets">) {
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">val</span><span class="hl-code"> = </span><span class="hl-reserved">null</span><span class="hl-code">;
+
+      </span><span class="hl-reserved">if </span><span class="hl-brackets">( </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">patterns</span><span class="hl-code">.</span><span class="hl-identifier">points</span><span class="hl-code">.</span><span class="hl-identifier">test</span><span class="hl-brackets">(</span><span class="hl-identifier">attr</span><span class="hl-brackets">) ) {
+         </span><span class="hl-reserved">var </span><span class="hl-identifier">t</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">method</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">currentFrame</span><span class="hl-code">, </span><span class="hl-number">0</span><span class="hl-code">, </span><span class="hl-number">100</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">totalFrames</span><span class="hl-brackets">) </span><span class="hl-quotes">/</span><span class="hl-string"> 100;
+         val = Y.Bezier.getPosition(this.runtimeAttributes[attr], t);
+      } else {
+         val = superclass.doMethod.call(this, attr, start, end);
+      }
+      return val;
+   };
+
+   proto.setRuntimeAttribute = function(attr) {
+      if ( this.patterns.points.test(attr) ) {
+         var el = this.getEl();
+         var attributes = this.attributes;
+         var start;
+         var control = attributes['points']['control'] || [];
+         var end;
+         var i, len;
+
+         if (control.length &gt; 0 &amp;&amp; !(control[0] instanceof Array) ) { </span><span class="hl-quotes">//</span><span class="hl-string"> could be single point or array of points
+            control = [control];
+         } else { </span><span class="hl-quotes">//</span><span class="hl-string"> break reference to attributes.points.control
+            var tmp = [];
+            for (i = 0, len = control.length; i&lt; len; ++i) {
+               tmp[i] = control[i];
+            }
+            control = tmp;
+         }
+
+         if (Y.Dom.getStyle(el, 'position') == 'static') { </span><span class="hl-quotes">//</span><span class="hl-string"> default to relative
+            Y.Dom.setStyle(el, 'position', 'relative');
+         }
+
+         if ( isset(attributes['points']['from']) ) {
+            Y.Dom.setXY(el, attributes['points']['from']); </span><span class="hl-quotes">//</span><span class="hl-string"> set position to from point
+         }
+         else { Y.Dom.setXY( el, Y.Dom.getXY(el) ); } </span><span class="hl-quotes">//</span><span class="hl-string"> set it to current position
+
+         start = this.getAttribute('points'); </span><span class="hl-quotes">//</span><span class="hl-string"> get actual top &amp; left
+
+         </span><span class="hl-quotes">//</span><span class="hl-string"> TO beats BY, per SMIL 2.1 spec
+         if ( isset(attributes['points']['to']) ) {
+            end = translateValues.call(this, attributes['points']['to'], start);
+
+            var pageXY = Y.Dom.getXY(this.getEl());
+            for (i = 0, len = control.length; i &lt; len; ++i) {
+               control[i] = translateValues.call(this, control[i], start);
+            }
+
+
+         } else if ( isset(attributes['points']['by']) ) {
+            end = [ start[0] + attributes['points']['by'][0], start[1] + attributes['points']['by'][1] ];
+
+            for (i = 0, len = control.length; i &lt; len; ++i) {
+               control[i] = [ start[0] + control[i][0], start[1] + control[i][1] ];
+            }
+         }
+
+         this.runtimeAttributes[attr] = [start];
+
+         if (control.length &gt; 0) {
+            this.runtimeAttributes[attr] = this.runtimeAttributes[attr].concat(control);
+         }
+
+         this.runtimeAttributes[attr][this.runtimeAttributes[attr].length] = end;
+      }
+      else {
+         superclass.setRuntimeAttribute.call(this, attr);
+      }
+   };
+
+   var translateValues = function(val, start) {
+      var pageXY = Y.Dom.getXY(this.getEl());
+      val = [ val[0] - pageXY[0] + start[0], val[1] - pageXY[1] + start[1] ];
+
+      return val;
+   };
+
+   var isset = function(prop) {
+      return (typeof prop !== 'undefined');
+   };
+})();
+</span><span class="hl-quotes">/</span><span class="hl-code">**
+ * </span><span class="hl-identifier">Anim subclass </span><span class="hl-reserved">for </span><span class="hl-identifier">scrolling elements to a position defined by the </span><span class="hl-quotes">&quot;</span><span class="hl-string">scroll</span><span class="hl-quotes">&quot;</span><span class="hl-code">
+ * </span><span class="hl-identifier">member of </span><span class="hl-quotes">&quot;</span><span class="hl-string">attributes</span><span class="hl-quotes">&quot;</span><span class="hl-code">.  </span><span class="hl-identifier">All </span><span class="hl-quotes">&quot;</span><span class="hl-string">scroll</span><span class="hl-quotes">&quot; </span><span class="hl-identifier">members are arrays </span><span class="hl-reserved">with </span><span class="hl-identifier">x</span><span class="hl-code">, </span><span class="hl-identifier">y scroll positions</span><span class="hl-code">.
+ * &lt;</span><span class="hl-identifier">p</span><span class="hl-code">&gt;</span><span class="hl-identifier">Usage</span><span class="hl-code">: &lt;</span><span class="hl-identifier">code</span><span class="hl-code">&gt;</span><span class="hl-reserved">var </span><span class="hl-identifier">myAnim</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Scroll</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-brackets">{ </span><span class="hl-identifier">scroll</span><span class="hl-code">: </span><span class="hl-brackets">{ </span><span class="hl-identifier">to</span><span class="hl-code">: </span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-code">, </span><span class="hl-number">800</span><span class="hl-brackets">] } }</span><span class="hl-code">, </span><span class="hl-number">1</span><span class="hl-code">, </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Easing</span><span class="hl-code">.</span><span class="hl-identifier">easeOut</span><span class="hl-brackets">)</span><span class="hl-code">;&lt;</span><span class="hl-quotes">/</span><span class="hl-string">code&gt;&lt;</span><span class="hl-quotes">/</span><span class="hl-identifier">p</span><span class="hl-code">&gt;
+ * @</span><span class="hl-reserved">class </span><span class="hl-identifier">Scroll</span><span class="hl-code">
+ * @</span><span class="hl-identifier">namespace YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">
+ * @</span><span class="hl-identifier">requires YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Anim</span><span class="hl-code">
+ * @</span><span class="hl-identifier">requires YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">AnimMgr</span><span class="hl-code">
+ * @</span><span class="hl-identifier">requires YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Easing</span><span class="hl-code">
+ * @</span><span class="hl-identifier">requires YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Bezier</span><span class="hl-code">
+ * @</span><span class="hl-identifier">requires YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">
+ * @</span><span class="hl-identifier">requires YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Event</span><span class="hl-code">
+ * @</span><span class="hl-identifier">requires YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">CustomEvent</span><span class="hl-code">
+ * @</span><span class="hl-reserved">extends </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Anim</span><span class="hl-code">
+ * @</span><span class="hl-identifier">constructor</span><span class="hl-code">
+ * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">String </span><span class="hl-identifier">or HTMLElement</span><span class="hl-brackets">} </span><span class="hl-identifier">el Reference to the element that will be animated</span><span class="hl-code">
+ * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-identifier">Object</span><span class="hl-brackets">} </span><span class="hl-identifier">attributes The attribute</span><span class="hl-brackets">(</span><span class="hl-identifier">s</span><span class="hl-brackets">) </span><span class="hl-identifier">to be animated</span><span class="hl-code">.
+ * </span><span class="hl-identifier">Each attribute is an object </span><span class="hl-reserved">with </span><span class="hl-identifier">at minimum a </span><span class="hl-quotes">&quot;</span><span class="hl-string">to</span><span class="hl-quotes">&quot; </span><span class="hl-identifier">or </span><span class="hl-quotes">&quot;</span><span class="hl-string">by</span><span class="hl-quotes">&quot; </span><span class="hl-identifier">member defined</span><span class="hl-code">.
+ * </span><span class="hl-identifier">Additional optional members are </span><span class="hl-quotes">&quot;</span><span class="hl-string">from</span><span class="hl-quotes">&quot; </span><span class="hl-brackets">(</span><span class="hl-identifier">defaults to current value</span><span class="hl-brackets">)</span><span class="hl-code">, </span><span class="hl-quotes">&quot;</span><span class="hl-string">units</span><span class="hl-quotes">&quot; </span><span class="hl-brackets">(</span><span class="hl-identifier">defaults to </span><span class="hl-quotes">&quot;</span><span class="hl-string">px</span><span class="hl-quotes">&quot;</span><span class="hl-brackets">)</span><span class="hl-code">.
+ * </span><span class="hl-identifier">All attribute names use camelCase</span><span class="hl-code">.
+ * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">duration </span><span class="hl-brackets">(</span><span class="hl-identifier">optional</span><span class="hl-code">, </span><span class="hl-identifier">defaults to </span><span class="hl-number">1 </span><span class="hl-identifier">second</span><span class="hl-brackets">) </span><span class="hl-identifier">Length of animation </span><span class="hl-brackets">(</span><span class="hl-identifier">frames or seconds</span><span class="hl-brackets">)</span><span class="hl-code">, </span><span class="hl-identifier">defaults to time</span><span class="hl-code">-</span><span class="hl-identifier">based</span><span class="hl-code">
+ * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Function</span><span class="hl-brackets">} </span><span class="hl-identifier">method </span><span class="hl-brackets">(</span><span class="hl-identifier">optional</span><span class="hl-code">, </span><span class="hl-identifier">defaults to YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Easing</span><span class="hl-code">.</span><span class="hl-identifier">easeNone</span><span class="hl-brackets">) </span><span class="hl-identifier">Computes the values that are applied to the attributes per frame </span><span class="hl-brackets">(</span><span class="hl-identifier">generally a YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Easing method</span><span class="hl-brackets">)</span><span class="hl-code">
+ *</span><span class="hl-quotes">/</span><span class="hl-string">
+(function() {
+   YAHOO.util.Scroll = function(el, attributes, duration,  method) {
+      if (el) { </span><span class="hl-quotes">//</span><span class="hl-string"> dont break existing subclasses not using YAHOO.extend
+         YAHOO.util.Scroll.superclass.constructor.call(this, el, attributes, duration, method);
+      }
+   };
+
+   YAHOO.extend(YAHOO.util.Scroll, YAHOO.util.ColorAnim);
+
+   </span><span class="hl-quotes">//</span><span class="hl-string"> shorthand
+   var Y = YAHOO.util;
+   var superclass = Y.Scroll.superclass;
+   var proto = Y.Scroll.prototype;
+
+   proto.toString = function() {
+      var el = this.getEl();
+      var id = el.id || el.tagName;
+      return (&quot;Scroll &quot; + id);
+   };
+
+   proto.doMethod = function(attr, start, end) {
+      var val = null;
+
+      if (attr == 'scroll') {
+         val = [
+            this.method(this.currentFrame, start[0], end[0] - start[0], this.totalFrames),
+            this.method(this.currentFrame, start[1], end[1] - start[1], this.totalFrames)
+         ];
+
+      } else {
+         val = superclass.doMethod.call(this, attr, start, end);
+      }
+      return val;
+   };
+
+   proto.getAttribute = function(attr) {
+      var val = null;
+      var el = this.getEl();
+
+      if (attr == 'scroll') {
+         val = [ el.scrollLeft, el.scrollTop ];
+      } else {
+         val = superclass.getAttribute.call(this, attr);
+      }
+
+      return val;
+   };
+
+   proto.setAttribute = function(attr, val, unit) {
+      var el = this.getEl();
+
+      if (attr == 'scroll') {
+         el.scrollLeft = val[0];
+         el.scrollTop = val[1];
+      } else {
+         superclass.setAttribute.call(this, attr, val, unit);
+      }
+   };
+})();
+</span></pre></div><hr>Copyright &copy; 2006 Jack Slocum. All rights reserved.</body></html>

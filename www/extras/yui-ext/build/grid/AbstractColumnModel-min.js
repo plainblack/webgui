@@ -1,0 +1,7 @@
+/*
+ * YUI Extensions 0.33 RC2
+ * Copyright(c) 2006, Jack Slocum.
+ */
+
+
+YAHOO.ext.grid.AbstractColumnModel=function(){this.onWidthChange=new YAHOO.util.CustomEvent('widthChanged');this.onHeaderChange=new YAHOO.util.CustomEvent('headerChanged');this.onHiddenChange=new YAHOO.util.CustomEvent('hiddenChanged');this.events={'widthchange':this.onWidthChange,'headerchange':this.onHeaderChange,'hiddenchange':this.onHiddenChange};};YAHOO.ext.grid.AbstractColumnModel.prototype={fireEvent:YAHOO.ext.util.Observable.prototype.fireEvent,on:YAHOO.ext.util.Observable.prototype.on,addListener:YAHOO.ext.util.Observable.prototype.addListener,delayedListener:YAHOO.ext.util.Observable.prototype.delayedListener,removeListener:YAHOO.ext.util.Observable.prototype.removeListener,purgeListeners:YAHOO.ext.util.Observable.prototype.purgeListeners,fireWidthChange:function(colIndex,newWidth){this.onWidthChange.fireDirect(this,colIndex,newWidth);},fireHeaderChange:function(colIndex,newHeader){this.onHeaderChange.fireDirect(this,colIndex,newHeader);},fireHiddenChange:function(colIndex,hidden){this.onHiddenChange.fireDirect(this,colIndex,hidden);},getColumnCount:function(){return 0;},isSortable:function(col){return false;},isHidden:function(col){return false;},getSortType:function(col){return YAHOO.ext.grid.DefaultColumnModel.sortTypes.none;},getRenderer:function(col){return YAHOO.ext.grid.DefaultColumnModel.defaultRenderer;},getColumnWidth:function(col){return 0;},getTotalWidth:function(){return 0;},getColumnHeader:function(col){return'';}};

@@ -1,0 +1,712 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.util.Dom</title>
+        <link rel="stylesheet" type="text/css" href="../reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.util.Dom.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.util.Dom</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.util</td></tr>
+            <tr><td class="label">Class:</td><td>Dom</td></tr>
+                        <tr><td class="label">Extends:</td><td>Object</td></tr>
+                                    <tr><td class="label">Defined In:</td><td><a href="dom.js.html">dom.js</a></td></tr>
+        </table>
+        <div class="description">
+            Provides helper methods for DOM elements.        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+        <div class="no-members">This class has no public properties.</div>        <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#addClass">addClass</a>(<code>String |</code>, <code>String className</code>) : void</td>
+        <td class="msource" rowspan="2">Dom</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Adds a class name to a given element or collection of elements.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#batch">batch</a>(<span class="optional" title="Optional">[<code>String |</code>]</span>, <code>Function method</code>, <span class="optional" title="Optional">[<code>Any o</code>]</span>, <span class="optional" title="Optional">[<code>Boolean override</code>]</span>) : HTMLElement</td>
+        <td class="msource" rowspan="2">Dom</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Returns an array of elements that have had the supplied method applied.
+The method is called with the element(s) as t...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#generateId">generateId</a>(<span class="optional" title="Optional">[<code>String |</code>]</span>, <span class="optional" title="Optional">[<code>String prefix</code>]</span>) : String</td>
+        <td class="msource" rowspan="2">Dom</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Generates a unique ID</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#get">get</a>(<code>String |</code>) : HTMLElement</td>
+        <td class="msource" rowspan="2">Dom</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Returns an HTMLElement reference.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getClientHeight">getClientHeight</a>() : Int</td>
+        <td class="msource" rowspan="2">Dom</td>
+    </tr>
+    <tr>
+        <td class="mdesc"><b>Deprecated.</b> Returns the height of the client (viewport).</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getClientWidth">getClientWidth</a>() : Int</td>
+        <td class="msource" rowspan="2">Dom</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc"><b>Deprecated.</b> Returns the width of the client (viewport).</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getDocumentHeight">getDocumentHeight</a>() : Int</td>
+        <td class="msource" rowspan="2">Dom</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Returns the height of the document.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getDocumentWidth">getDocumentWidth</a>() : Int</td>
+        <td class="msource" rowspan="2">Dom</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Returns the width of the document.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getElementsBy">getElementsBy</a>(<code>Function method</code>, <span class="optional" title="Optional">[<code>String tag</code>]</span>, <span class="optional" title="Optional">[<code>String |</code>]</span>) : void</td>
+        <td class="msource" rowspan="2">Dom</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Returns a array of HTMLElements that pass the test applied by supplied boolean method.
+For optimized performance, inc...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getElementsByClassName">getElementsByClassName</a>(<code>String className</code>, <span class="optional" title="Optional">[<code>String tag</code>]</span>, <span class="optional" title="Optional">[<code>String |</code>]</span>) : Array</td>
+        <td class="msource" rowspan="2">Dom</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Returns a array of HTMLElements with the given class.
+For optimized performance, include a tag and/or root node when ...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getRegion">getRegion</a>(<code>String |</code>) : Region</td>
+        <td class="msource" rowspan="2">Dom</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Returns the region position of the given element.
+The element must be part of the DOM tree to have a region (display:...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getStyle">getStyle</a>(<code>String |</code>, <code>String property</code>) : String</td>
+        <td class="msource" rowspan="2">Dom</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Normalizes currentStyle and ComputedStyle.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getViewportHeight">getViewportHeight</a>() : Int</td>
+        <td class="msource" rowspan="2">Dom</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Returns the current height of the viewport.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getViewportWidth">getViewportWidth</a>() : Int</td>
+        <td class="msource" rowspan="2">Dom</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Returns the current width of the viewport.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getX">getX</a>(<code>String |</code>) : String</td>
+        <td class="msource" rowspan="2">Dom</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Gets the current X position of an element based on page coordinates.  The element must be part of the DOM tree to hav...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getXY">getXY</a>(<code>String |</code>) : Array</td>
+        <td class="msource" rowspan="2">Dom</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Gets the current position of an element based on page coordinates.  Element must be part of the DOM tree to have page...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getY">getY</a>(<code>String |</code>) : String</td>
+        <td class="msource" rowspan="2">Dom</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Gets the current Y position of an element based on page coordinates.  Element must be part of the DOM tree to have pa...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#hasClass">hasClass</a>(<code>String |</code>, <code>String className</code>) : Boolean</td>
+        <td class="msource" rowspan="2">Dom</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Determines whether an HTMLElement has the given className.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#inDocument">inDocument</a>(<code>String |</code>) : Boolean</td>
+        <td class="msource" rowspan="2">Dom</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Determines whether an HTMLElement is present in the current document.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#isAncestor">isAncestor</a>(<code>String |</code>, <code>String |</code>) : Boolean</td>
+        <td class="msource" rowspan="2">Dom</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Determines whether an HTMLElement is an ancestor of another HTML element in the DOM hierarchy.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#removeClass">removeClass</a>(<code>String |</code>, <code>String className</code>) : void</td>
+        <td class="msource" rowspan="2">Dom</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Removes a class name from a given element or collection of elements.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#replaceClass">replaceClass</a>(<code>String |</code>, <code>String oldClassName</code>, <code>String newClassName</code>) : void</td>
+        <td class="msource" rowspan="2">Dom</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Replace a class with another class for a given element or collection of elements.
+If no oldClassName is present, the ...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setStyle">setStyle</a>(<code>String |</code>, <code>String property</code>, <code>String val</code>) : void</td>
+        <td class="msource" rowspan="2">Dom</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Wrapper for setting style properties of HTMLElements.  Normalizes "opacity" across modern browsers.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setX">setX</a>(<code>String |</code>, <code>Int x</code>) : void</td>
+        <td class="msource" rowspan="2">Dom</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Set the X position of an html element in page coordinates, regardless of how the element is positioned.
+The element m...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setXY">setXY</a>(<code>String |</code>, <code>Array pos</code>, <code>Boolean noRetry</code>) : void</td>
+        <td class="msource" rowspan="2">Dom</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Set the position of an html element in page coordinates, regardless of how the element is positioned.
+The element(s) ...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setY">setY</a>(<code>String |</code>, <code>Int x</code>) : void</td>
+        <td class="msource" rowspan="2">Dom</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Set the Y position of an html element in page coordinates, regardless of how the element is positioned.
+The element m...</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+        <div class="no-members">This class has no public events.</div>        
+                
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="addClass"></a>
+                <div class="mdetail">
+                <h3>addClass</i></h3>
+                <code>public function addClass(<code>String |</code>, <code>String className</code>)</code>
+                <div class="mdetail-desc">
+                    Adds a class name to a given element or collection of elements.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>|</code> : String<div class="sub-desc">HTMLElement | Array} el The element or collection to add the class to</div></li><li><code>className</code> : String<div class="sub-desc">the class name to add to the class attribute</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Dom.</div>
+                </div>
+                            <a name="batch"></a>
+                <div class="mdetail alt">
+                <h3>batch</i></h3>
+                <code>public function batch(<span class="optional" title="Optional">[<code>String |</code>]</span>, <code>Function method</code>, <span class="optional" title="Optional">[<code>Any o</code>]</span>, <span class="optional" title="Optional">[<code>Boolean override</code>]</span>)</code>
+                <div class="mdetail-desc">
+                    Returns an array of elements that have had the supplied method applied.
+The method is called with the element(s) as the first arg, and the optional param as the second ( method(el, o) ).                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>|</code> : String<div class="sub-desc">HTMLElement | Array} el (optional) An element or array of elements to apply the method to</div></li><li><code>method</code> : Function<div class="sub-desc">The method to apply to the element(s)</div></li><li><code>o</code> : Any<div class="sub-desc">(optional) An optional arg that is passed to the supplied method</div></li><li><code>override</code> : Boolean<div class="sub-desc">(optional) Whether or not to override the scope of "method" with "o"</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>HTMLElement</code><div class="sub-desc">| Array} The element(s) with the method applied</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Dom.</div>
+                </div>
+                            <a name="generateId"></a>
+                <div class="mdetail">
+                <h3>generateId</i></h3>
+                <code>public function generateId(<span class="optional" title="Optional">[<code>String |</code>]</span>, <span class="optional" title="Optional">[<code>String prefix</code>]</span>)</code>
+                <div class="mdetail-desc">
+                    Generates a unique ID                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>|</code> : String<div class="sub-desc">HTMLElement | Array} el (optional) An optional element array of elements to add an ID to (no ID is added if one is already present).</div></li><li><code>prefix</code> : String<div class="sub-desc">(optional) an optional prefix to use (defaults to "yui-gen").</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>String</code><div class="sub-desc">| Array} The generated ID, or array of generated IDs (or original ID if already present on an element)</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Dom.</div>
+                </div>
+                            <a name="get"></a>
+                <div class="mdetail alt">
+                <h3>get</i></h3>
+                <code>public function get(<code>String |</code>)</code>
+                <div class="mdetail-desc">
+                    Returns an HTMLElement reference.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>|</code> : String<div class="sub-desc">HTMLElement |Array} el Accepts a string to use as an ID for getting a DOM reference, an actual DOM reference, or an Array of IDs and/or HTMLElements.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>HTMLElement</code><div class="sub-desc">| Array} A DOM reference to an HTML element or an array of HTMLElements.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Dom.</div>
+                </div>
+                            <a name="getClientHeight"></a>
+                <div class="mdetail">
+                <h3>getClientHeight</i></h3>
+                <code>public function getClientHeight()</code>
+                <div class="mdetail-desc">
+                    <b>Deprecated.</b> Returns the height of the client (viewport).                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Int</code><div class="sub-desc">The height of the viewable area of the page.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Dom.</div>
+                </div>
+                            <a name="getClientWidth"></a>
+                <div class="mdetail alt">
+                <h3>getClientWidth</i></h3>
+                <code>public function getClientWidth()</code>
+                <div class="mdetail-desc">
+                    <b>Deprecated.</b> Returns the width of the client (viewport).                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Int</code><div class="sub-desc">The width of the viewable area of the page.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Dom.</div>
+                </div>
+                            <a name="getDocumentHeight"></a>
+                <div class="mdetail">
+                <h3>getDocumentHeight</i></h3>
+                <code>public function getDocumentHeight()</code>
+                <div class="mdetail-desc">
+                    Returns the height of the document.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Int</code><div class="sub-desc">The height of the actual document (which includes the body and its margin).</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Dom.</div>
+                </div>
+                            <a name="getDocumentWidth"></a>
+                <div class="mdetail alt">
+                <h3>getDocumentWidth</i></h3>
+                <code>public function getDocumentWidth()</code>
+                <div class="mdetail-desc">
+                    Returns the width of the document.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Int</code><div class="sub-desc">The width of the actual document (which includes the body and its margin).</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Dom.</div>
+                </div>
+                            <a name="getElementsBy"></a>
+                <div class="mdetail">
+                <h3>getElementsBy</i></h3>
+                <code>public function getElementsBy(<code>Function method</code>, <span class="optional" title="Optional">[<code>String tag</code>]</span>, <span class="optional" title="Optional">[<code>String |</code>]</span>)</code>
+                <div class="mdetail-desc">
+                    Returns a array of HTMLElements that pass the test applied by supplied boolean method.
+For optimized performance, include a tag and/or root node when possible.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>method</code> : Function<div class="sub-desc">- A boolean method for testing elements which receives the element as its only argument.</div></li><li><code>tag</code> : String<div class="sub-desc">(optional) The tag name of the elements being collected</div></li><li><code>|</code> : String<div class="sub-desc">HTMLElement} root (optional) The HTMLElement or an ID to use as the starting point</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Dom.</div>
+                </div>
+                            <a name="getElementsByClassName"></a>
+                <div class="mdetail alt">
+                <h3>getElementsByClassName</i></h3>
+                <code>public function getElementsByClassName(<code>String className</code>, <span class="optional" title="Optional">[<code>String tag</code>]</span>, <span class="optional" title="Optional">[<code>String |</code>]</span>)</code>
+                <div class="mdetail-desc">
+                    Returns a array of HTMLElements with the given class.
+For optimized performance, include a tag and/or root node when possible.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>className</code> : String<div class="sub-desc">The class name to match against</div></li><li><code>tag</code> : String<div class="sub-desc">(optional) The tag name of the elements being collected</div></li><li><code>|</code> : String<div class="sub-desc">HTMLElement} root (optional) The HTMLElement or an ID to use as the starting point</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Array</code><div class="sub-desc">An array of elements that have the given class name</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Dom.</div>
+                </div>
+                            <a name="getRegion"></a>
+                <div class="mdetail">
+                <h3>getRegion</i></h3>
+                <code>public function getRegion(<code>String |</code>)</code>
+                <div class="mdetail-desc">
+                    Returns the region position of the given element.
+The element must be part of the DOM tree to have a region (display:none or elements not appended return false).                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>|</code> : String<div class="sub-desc">HTMLElement | Array} el Accepts a string to use as an ID, an actual DOM reference, or an Array of IDs and/or HTMLElements.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Region</code><div class="sub-desc">| Array} A Region or array of Region instances containing "top, left, bottom, right" member data.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Dom.</div>
+                </div>
+                            <a name="getStyle"></a>
+                <div class="mdetail alt">
+                <h3>getStyle</i></h3>
+                <code>public function getStyle(<code>String |</code>, <code>String property</code>)</code>
+                <div class="mdetail-desc">
+                    Normalizes currentStyle and ComputedStyle.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>|</code> : String<div class="sub-desc">HTMLElement |Array} el Accepts a string to use as an ID, an actual DOM reference, or an Array of IDs and/or HTMLElements.</div></li><li><code>property</code> : String<div class="sub-desc">The style property whose value is returned.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>String</code><div class="sub-desc">| Array} The current value of the style property for the element(s).</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Dom.</div>
+                </div>
+                            <a name="getViewportHeight"></a>
+                <div class="mdetail">
+                <h3>getViewportHeight</i></h3>
+                <code>public function getViewportHeight()</code>
+                <div class="mdetail-desc">
+                    Returns the current height of the viewport.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Int</code><div class="sub-desc">The height of the viewable area of the page (excludes scrollbars).</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Dom.</div>
+                </div>
+                            <a name="getViewportWidth"></a>
+                <div class="mdetail alt">
+                <h3>getViewportWidth</i></h3>
+                <code>public function getViewportWidth()</code>
+                <div class="mdetail-desc">
+                    Returns the current width of the viewport.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Int</code><div class="sub-desc">The width of the viewable area of the page (excludes scrollbars).</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Dom.</div>
+                </div>
+                            <a name="getX"></a>
+                <div class="mdetail">
+                <h3>getX</i></h3>
+                <code>public function getX(<code>String |</code>)</code>
+                <div class="mdetail-desc">
+                    Gets the current X position of an element based on page coordinates.  The element must be part of the DOM tree to have page coordinates (display:none or elements not appended return false).                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>|</code> : String<div class="sub-desc">HTMLElement | Array} el Accepts a string to use as an ID, an actual DOM reference, or an Array of IDs and/or HTMLElements</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>String</code><div class="sub-desc">| Array} The X position of the element(s)</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Dom.</div>
+                </div>
+                            <a name="getXY"></a>
+                <div class="mdetail alt">
+                <h3>getXY</i></h3>
+                <code>public function getXY(<code>String |</code>)</code>
+                <div class="mdetail-desc">
+                    Gets the current position of an element based on page coordinates.  Element must be part of the DOM tree to have page coordinates (display:none or elements not appended return false).                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>|</code> : String<div class="sub-desc">HTMLElement | Array} el Accepts a string to use as an ID, an actual DOM reference, or an Array of IDs and/or HTMLElements</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Array</code><div class="sub-desc">The XY position of the element(s)</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Dom.</div>
+                </div>
+                            <a name="getY"></a>
+                <div class="mdetail">
+                <h3>getY</i></h3>
+                <code>public function getY(<code>String |</code>)</code>
+                <div class="mdetail-desc">
+                    Gets the current Y position of an element based on page coordinates.  Element must be part of the DOM tree to have page coordinates (display:none or elements not appended return false).                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>|</code> : String<div class="sub-desc">HTMLElement | Array} el Accepts a string to use as an ID, an actual DOM reference, or an Array of IDs and/or HTMLElements</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>String</code><div class="sub-desc">| Array} The Y position of the element(s)</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Dom.</div>
+                </div>
+                            <a name="hasClass"></a>
+                <div class="mdetail alt">
+                <h3>hasClass</i></h3>
+                <code>public function hasClass(<code>String |</code>, <code>String className</code>)</code>
+                <div class="mdetail-desc">
+                    Determines whether an HTMLElement has the given className.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>|</code> : String<div class="sub-desc">HTMLElement | Array} el The element or collection to test</div></li><li><code>className</code> : String<div class="sub-desc">the class name to search for</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">| Array} A boolean value or array of boolean values</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Dom.</div>
+                </div>
+                            <a name="inDocument"></a>
+                <div class="mdetail">
+                <h3>inDocument</i></h3>
+                <code>public function inDocument(<code>String |</code>)</code>
+                <div class="mdetail-desc">
+                    Determines whether an HTMLElement is present in the current document.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>|</code> : String<div class="sub-desc">HTMLElement} el The element to search for</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">Whether or not the element is present in the current document</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Dom.</div>
+                </div>
+                            <a name="isAncestor"></a>
+                <div class="mdetail alt">
+                <h3>isAncestor</i></h3>
+                <code>public function isAncestor(<code>String |</code>, <code>String |</code>)</code>
+                <div class="mdetail-desc">
+                    Determines whether an HTMLElement is an ancestor of another HTML element in the DOM hierarchy.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>|</code> : String<div class="sub-desc">HTMLElement} haystack The possible ancestor</div></li><li><code>|</code> : String<div class="sub-desc">HTMLElement} needle The possible descendent</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">Whether or not the haystack is an ancestor of needle</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Dom.</div>
+                </div>
+                            <a name="removeClass"></a>
+                <div class="mdetail">
+                <h3>removeClass</i></h3>
+                <code>public function removeClass(<code>String |</code>, <code>String className</code>)</code>
+                <div class="mdetail-desc">
+                    Removes a class name from a given element or collection of elements.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>|</code> : String<div class="sub-desc">HTMLElement | Array} el The element or collection to remove the class from</div></li><li><code>className</code> : String<div class="sub-desc">the class name to remove from the class attribute</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Dom.</div>
+                </div>
+                            <a name="replaceClass"></a>
+                <div class="mdetail alt">
+                <h3>replaceClass</i></h3>
+                <code>public function replaceClass(<code>String |</code>, <code>String oldClassName</code>, <code>String newClassName</code>)</code>
+                <div class="mdetail-desc">
+                    Replace a class with another class for a given element or collection of elements.
+If no oldClassName is present, the newClassName is simply added.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>|</code> : String<div class="sub-desc">HTMLElement | Array} el The element or collection to remove the class from</div></li><li><code>oldClassName</code> : String<div class="sub-desc">the class name to be replaced</div></li><li><code>newClassName</code> : String<div class="sub-desc">the class name that will be replacing the old class name</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Dom.</div>
+                </div>
+                            <a name="setStyle"></a>
+                <div class="mdetail">
+                <h3>setStyle</i></h3>
+                <code>public function setStyle(<code>String |</code>, <code>String property</code>, <code>String val</code>)</code>
+                <div class="mdetail-desc">
+                    Wrapper for setting style properties of HTMLElements.  Normalizes "opacity" across modern browsers.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>|</code> : String<div class="sub-desc">HTMLElement | Array} el Accepts a string to use as an ID, an actual DOM reference, or an Array of IDs and/or HTMLElements.</div></li><li><code>property</code> : String<div class="sub-desc">The style property to be set.</div></li><li><code>val</code> : String<div class="sub-desc">The value to apply to the given property.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Dom.</div>
+                </div>
+                            <a name="setX"></a>
+                <div class="mdetail alt">
+                <h3>setX</i></h3>
+                <code>public function setX(<code>String |</code>, <code>Int x</code>)</code>
+                <div class="mdetail-desc">
+                    Set the X position of an html element in page coordinates, regardless of how the element is positioned.
+The element must be part of the DOM tree to have page coordinates (display:none or elements not appended return false).                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>|</code> : String<div class="sub-desc">HTMLElement | Array} el Accepts a string to use as an ID, an actual DOM reference, or an Array of IDs and/or HTMLElements.</div></li><li><code>x</code> : Int<div class="sub-desc">The value to use as the X coordinate for the element(s).</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Dom.</div>
+                </div>
+                            <a name="setXY"></a>
+                <div class="mdetail">
+                <h3>setXY</i></h3>
+                <code>public function setXY(<code>String |</code>, <code>Array pos</code>, <code>Boolean noRetry</code>)</code>
+                <div class="mdetail-desc">
+                    Set the position of an html element in page coordinates, regardless of how the element is positioned.
+The element(s) must be part of the DOM tree to have page coordinates (display:none or elements not appended return false).                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>|</code> : String<div class="sub-desc">HTMLElement | Array} el Accepts a string to use as an ID, an actual DOM reference, or an Array of IDs and/or HTMLElements</div></li><li><code>pos</code> : Array<div class="sub-desc">Contains X & Y values for new position (coordinates are page-based)</div></li><li><code>noRetry</code> : Boolean<div class="sub-desc">By default we try and set the position a second time if the first fails</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Dom.</div>
+                </div>
+                            <a name="setY"></a>
+                <div class="mdetail alt">
+                <h3>setY</i></h3>
+                <code>public function setY(<code>String |</code>, <code>Int x</code>)</code>
+                <div class="mdetail-desc">
+                    Set the Y position of an html element in page coordinates, regardless of how the element is positioned.
+The element must be part of the DOM tree to have page coordinates (display:none or elements not appended return false).                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>|</code> : String<div class="sub-desc">HTMLElement | Array} el Accepts a string to use as an ID, an actual DOM reference, or an Array of IDs and/or HTMLElements.</div></li><li><code>x</code> : Int<div class="sub-desc">To use as the Y coordinate for the element(s).</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Dom.</div>
+                </div>
+                        </div>
+                    
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    

@@ -1,0 +1,882 @@
+<html><head><title>dom.js</title><link rel="stylesheet" type="text/css" href="../style.css" media="screen"/></head><body><div class="hl-main"><pre><span class="hl-comment">/*
+Copyright (c) 2006, Yahoo! Inc. All rights reserved.
+Code licensed under the BSD License:
+</span><span class="hl-url">http://developer.yahoo.net/yui/license.txt</span><span class="hl-comment">
+version: 0.12.0
+*/
+// holder
+/**
+ * The dom module provides helper methods for manipulating Dom elements.
+ * @module dom
+ *
+ */
+
+</span><span class="hl-brackets">(</span><span class="hl-reserved">function</span><span class="hl-brackets">() {
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">Y</span><span class="hl-code"> = </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">,     </span><span class="hl-comment">// internal shorthand
+        </span><span class="hl-identifier">getStyle</span><span class="hl-code">,           </span><span class="hl-comment">// for load time browser branching
+        </span><span class="hl-identifier">setStyle</span><span class="hl-code">,           </span><span class="hl-comment">// ditto
+        </span><span class="hl-identifier">id_counter</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">,     </span><span class="hl-comment">// for use with generateId
+        </span><span class="hl-identifier">propertyCache</span><span class="hl-code"> = </span><span class="hl-brackets">{}</span><span class="hl-code">; </span><span class="hl-comment">// for faster hyphen converts
+
+    // brower detection
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">ua</span><span class="hl-code"> = </span><span class="hl-builtin">navigator</span><span class="hl-code">.</span><span class="hl-identifier">userAgent</span><span class="hl-code">.</span><span class="hl-identifier">toLowerCase</span><span class="hl-brackets">()</span><span class="hl-code">,
+        </span><span class="hl-identifier">isOpera</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-identifier">ua</span><span class="hl-code">.</span><span class="hl-identifier">indexOf</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">opera</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code"> &gt; -</span><span class="hl-number">1</span><span class="hl-brackets">)</span><span class="hl-code">,
+        </span><span class="hl-identifier">isSafari</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-identifier">ua</span><span class="hl-code">.</span><span class="hl-identifier">indexOf</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">safari</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code"> &gt; -</span><span class="hl-number">1</span><span class="hl-brackets">)</span><span class="hl-code">,
+        </span><span class="hl-identifier">isGecko</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">isOpera</span><span class="hl-code"> &amp;&amp; !</span><span class="hl-identifier">isSafari</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">ua</span><span class="hl-code">.</span><span class="hl-identifier">indexOf</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">gecko</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code"> &gt; -</span><span class="hl-number">1</span><span class="hl-brackets">)</span><span class="hl-code">,
+        </span><span class="hl-identifier">isIE</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">isOpera</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">ua</span><span class="hl-code">.</span><span class="hl-identifier">indexOf</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">msie</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code"> &gt; -</span><span class="hl-number">1</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+    </span><span class="hl-comment">// regex cache
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">patterns</span><span class="hl-code"> = </span><span class="hl-brackets">{
+        </span><span class="hl-identifier">HYPHEN</span><span class="hl-code">: </span><span class="hl-quotes">/</span><span class="hl-string">(-[a-z])</span><span class="hl-quotes">/i
+    </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">toCamel</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">property</span><span class="hl-brackets">) {
+        </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-code"> !</span><span class="hl-identifier">patterns</span><span class="hl-code">.</span><span class="hl-identifier">HYPHEN</span><span class="hl-code">.</span><span class="hl-identifier">test</span><span class="hl-brackets">(</span><span class="hl-identifier">property</span><span class="hl-brackets">) ) {
+            </span><span class="hl-reserved">return </span><span class="hl-identifier">property</span><span class="hl-code">; </span><span class="hl-comment">// no hyphens
+        </span><span class="hl-brackets">}
+
+        </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">propertyCache</span><span class="hl-brackets">[</span><span class="hl-identifier">property</span><span class="hl-brackets">]) { </span><span class="hl-comment">// already converted
+            </span><span class="hl-reserved">return </span><span class="hl-identifier">propertyCache</span><span class="hl-brackets">[</span><span class="hl-identifier">property</span><span class="hl-brackets">]</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+
+        </span><span class="hl-reserved">while</span><span class="hl-brackets">( </span><span class="hl-identifier">patterns</span><span class="hl-code">.</span><span class="hl-identifier">HYPHEN</span><span class="hl-code">.</span><span class="hl-identifier">exec</span><span class="hl-brackets">(</span><span class="hl-identifier">property</span><span class="hl-brackets">) ) {
+            </span><span class="hl-identifier">property</span><span class="hl-code"> = </span><span class="hl-identifier">property</span><span class="hl-code">.</span><span class="hl-identifier">replace</span><span class="hl-brackets">(</span><span class="hl-builtin">RegExp</span><span class="hl-code">.$</span><span class="hl-number">1</span><span class="hl-code">,
+                    </span><span class="hl-builtin">RegExp</span><span class="hl-code">.$</span><span class="hl-number">1</span><span class="hl-code">.</span><span class="hl-identifier">substr</span><span class="hl-brackets">(</span><span class="hl-number">1</span><span class="hl-brackets">)</span><span class="hl-code">.</span><span class="hl-identifier">toUpperCase</span><span class="hl-brackets">())</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+
+        </span><span class="hl-identifier">propertyCache</span><span class="hl-brackets">[</span><span class="hl-identifier">property</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-identifier">property</span><span class="hl-code">;
+        </span><span class="hl-reserved">return </span><span class="hl-identifier">property</span><span class="hl-code">;
+        </span><span class="hl-comment">//return property.replace(/-([a-z])/gi, function(m0, m1) {return m1.toUpperCase()}) // cant use function as 2nd arg yet due to safari bug
+    </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+    </span><span class="hl-comment">// branching at load instead of runtime
+    </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">defaultView</span><span class="hl-code"> &amp;&amp; </span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">defaultView</span><span class="hl-code">.</span><span class="hl-identifier">getComputedStyle</span><span class="hl-brackets">) { </span><span class="hl-comment">// W3C DOM method
+        </span><span class="hl-identifier">getStyle</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">property</span><span class="hl-brackets">) {
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">value</span><span class="hl-code"> = </span><span class="hl-reserved">null</span><span class="hl-code">;
+
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">computed</span><span class="hl-code"> = </span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">defaultView</span><span class="hl-code">.</span><span class="hl-identifier">getComputedStyle</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-quotes">''</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">computed</span><span class="hl-brackets">) { </span><span class="hl-comment">// test computed before touching for safari
+                </span><span class="hl-identifier">value</span><span class="hl-code"> = </span><span class="hl-identifier">computed</span><span class="hl-brackets">[</span><span class="hl-identifier">toCamel</span><span class="hl-brackets">(</span><span class="hl-identifier">property</span><span class="hl-brackets">)]</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+
+            </span><span class="hl-reserved">return </span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">style</span><span class="hl-brackets">[</span><span class="hl-identifier">property</span><span class="hl-brackets">]</span><span class="hl-code"> || </span><span class="hl-identifier">value</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-code">;
+    </span><span class="hl-brackets">} </span><span class="hl-reserved">else if </span><span class="hl-brackets">(</span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">documentElement</span><span class="hl-code">.</span><span class="hl-identifier">currentStyle</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">isIE</span><span class="hl-brackets">) { </span><span class="hl-comment">// IE method
+        </span><span class="hl-identifier">getStyle</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">property</span><span class="hl-brackets">) {
+            </span><span class="hl-reserved">switch</span><span class="hl-brackets">( </span><span class="hl-identifier">toCamel</span><span class="hl-brackets">(</span><span class="hl-identifier">property</span><span class="hl-brackets">) ) {
+                </span><span class="hl-reserved">case </span><span class="hl-quotes">'</span><span class="hl-string">opacity</span><span class="hl-quotes">'</span><span class="hl-code"> :</span><span class="hl-comment">// IE opacity uses filter
+                    </span><span class="hl-reserved">var </span><span class="hl-identifier">val</span><span class="hl-code"> = </span><span class="hl-number">100</span><span class="hl-code">;
+                    </span><span class="hl-reserved">try </span><span class="hl-brackets">{ </span><span class="hl-comment">// will error if no DXImageTransform
+                        </span><span class="hl-identifier">val</span><span class="hl-code"> = </span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">filters</span><span class="hl-brackets">[</span><span class="hl-quotes">'</span><span class="hl-string">DXImageTransform.Microsoft.Alpha</span><span class="hl-quotes">'</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">opacity</span><span class="hl-code">;
+
+                    </span><span class="hl-brackets">} </span><span class="hl-reserved">catch</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-brackets">) {
+                        </span><span class="hl-reserved">try </span><span class="hl-brackets">{ </span><span class="hl-comment">// make sure its in the document
+                            </span><span class="hl-identifier">val</span><span class="hl-code"> = </span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">filters</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">alpha</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">.</span><span class="hl-identifier">opacity</span><span class="hl-code">;
+                        </span><span class="hl-brackets">} </span><span class="hl-reserved">catch</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-brackets">) {
+                        }
+                    }
+                    </span><span class="hl-reserved">return </span><span class="hl-identifier">val </span><span class="hl-quotes">/</span><span class="hl-string"> 100;
+                    break;
+                default:
+                    </span><span class="hl-quotes">//</span><span class="hl-string"> test currentStyle before touching
+                    var value = el.currentStyle ? el.currentStyle[property] : null;
+                    return ( el.style[property] || value );
+            }
+        };
+    } else { </span><span class="hl-quotes">//</span><span class="hl-string"> default to inline only
+        getStyle = function(el, property) { return el.style[property]; };
+    }
+
+    if (isIE) {
+        setStyle = function(el, property, val) {
+            switch (property) {
+                case 'opacity':
+                    if ( typeof el.style.filter == 'string' ) { </span><span class="hl-quotes">//</span><span class="hl-string"> in case not appended
+                        el.style.filter = 'alpha(opacity=' + val * 100 + ')';
+
+                        if (!el.currentStyle || !el.currentStyle.hasLayout) {
+                            el.style.zoom = 1; </span><span class="hl-quotes">//</span><span class="hl-string"> when no layout or cant tell
+                        }
+                    }
+                    break;
+                default:
+                el.style[property] = val;
+            }
+        };
+    } else {
+        setStyle = function(el, property, val) {
+            el.style[property] = val;
+        };
+    }
+
+    </span><span class="hl-quotes">/</span><span class="hl-code">**
+     * </span><span class="hl-identifier">Provides helper methods </span><span class="hl-reserved">for </span><span class="hl-identifier">DOM elements</span><span class="hl-code">.
+     * @</span><span class="hl-identifier">namespace YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">
+     * @</span><span class="hl-reserved">class </span><span class="hl-identifier">Dom</span><span class="hl-code">
+     *</span><span class="hl-quotes">/</span><span class="hl-string">
+    YAHOO.util.Dom = {
+        </span><span class="hl-quotes">/</span><span class="hl-code">**
+         * </span><span class="hl-identifier">Returns an HTMLElement reference</span><span class="hl-code">.
+         * @</span><span class="hl-identifier">method get</span><span class="hl-code">
+         * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">String</span><span class="hl-code"> | </span><span class="hl-identifier">HTMLElement</span><span class="hl-code"> |</span><span class="hl-builtin">Array</span><span class="hl-brackets">} </span><span class="hl-identifier">el Accepts a string to use as an ID </span><span class="hl-reserved">for </span><span class="hl-identifier">getting a DOM reference</span><span class="hl-code">, </span><span class="hl-identifier">an actual DOM reference</span><span class="hl-code">, </span><span class="hl-identifier">or an </span><span class="hl-builtin">Array </span><span class="hl-identifier">of IDs and</span><span class="hl-quotes">/</span><span class="hl-string">or HTMLElements.
+         * @return {HTMLElement | Array} A DOM reference to an HTML element or an array of HTMLElements.
+         *</span><span class="hl-quotes">/
+        </span><span class="hl-identifier">get</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">) {
+            </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">el</span><span class="hl-brackets">) { </span><span class="hl-reserved">return null</span><span class="hl-code">; </span><span class="hl-brackets">} </span><span class="hl-comment">// nothing to work with
+
+            </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">el</span><span class="hl-code"> != </span><span class="hl-quotes">'</span><span class="hl-string">string</span><span class="hl-quotes">'</span><span class="hl-code"> &amp;&amp; !</span><span class="hl-brackets">(</span><span class="hl-identifier">el </span><span class="hl-reserved">instanceof </span><span class="hl-builtin">Array</span><span class="hl-brackets">) ) { </span><span class="hl-comment">// assuming HTMLElement or HTMLCollection, so pass back as is
+                </span><span class="hl-reserved">return </span><span class="hl-identifier">el</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+
+            </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">el</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">string</span><span class="hl-quotes">'</span><span class="hl-brackets">) { </span><span class="hl-comment">// ID
+                </span><span class="hl-reserved">return </span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">getElementById</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+            </span><span class="hl-reserved">else </span><span class="hl-brackets">{ </span><span class="hl-comment">// array of ID's and/or elements
+                </span><span class="hl-reserved">var </span><span class="hl-identifier">collection</span><span class="hl-code"> = </span><span class="hl-brackets">[]</span><span class="hl-code">;
+                </span><span class="hl-reserved">for </span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">, </span><span class="hl-identifier">len</span><span class="hl-code"> = </span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code"> &lt; </span><span class="hl-identifier">len</span><span class="hl-code">; ++</span><span class="hl-identifier">i</span><span class="hl-brackets">) {
+                    </span><span class="hl-identifier">collection</span><span class="hl-brackets">[</span><span class="hl-identifier">collection</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">get</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">])</span><span class="hl-code">;
+                </span><span class="hl-brackets">}
+
+                </span><span class="hl-reserved">return </span><span class="hl-identifier">collection</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+
+            </span><span class="hl-reserved">return null</span><span class="hl-code">; </span><span class="hl-comment">// safety, should never happen
+        </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+        </span><span class="hl-comment">/**
+         * Normalizes currentStyle and ComputedStyle.
+         * @method getStyle
+         * @param {String | HTMLElement |Array} el Accepts a string to use as an ID, an actual DOM reference, or an Array of IDs and/or HTMLElements.
+         * @param {String} property The style property whose value is returned.
+         * @return {String | Array} The current value of the style property for the element(s).
+         */
+        </span><span class="hl-identifier">getStyle</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">property</span><span class="hl-brackets">) {
+            </span><span class="hl-identifier">property</span><span class="hl-code"> = </span><span class="hl-identifier">toCamel</span><span class="hl-brackets">(</span><span class="hl-identifier">property</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">f</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">element</span><span class="hl-brackets">) {
+                </span><span class="hl-reserved">return </span><span class="hl-identifier">getStyle</span><span class="hl-brackets">(</span><span class="hl-identifier">element</span><span class="hl-code">, </span><span class="hl-identifier">property</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+            </span><span class="hl-reserved">return </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">batch</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">f</span><span class="hl-code">, </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+        </span><span class="hl-comment">/**
+         * Wrapper for setting style properties of HTMLElements.  Normalizes &quot;opacity&quot; across modern browsers.
+         * @method setStyle
+         * @param {String | HTMLElement | Array} el Accepts a string to use as an ID, an actual DOM reference, or an Array of IDs and/or HTMLElements.
+         * @param {String} property The style property to be set.
+         * @param {String} val The value to apply to the given property.
+         */
+        </span><span class="hl-identifier">setStyle</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">property</span><span class="hl-code">, </span><span class="hl-identifier">val</span><span class="hl-brackets">) {
+            </span><span class="hl-identifier">property</span><span class="hl-code"> = </span><span class="hl-identifier">toCamel</span><span class="hl-brackets">(</span><span class="hl-identifier">property</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">f</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">element</span><span class="hl-brackets">) {
+                </span><span class="hl-identifier">setStyle</span><span class="hl-brackets">(</span><span class="hl-identifier">element</span><span class="hl-code">, </span><span class="hl-identifier">property</span><span class="hl-code">, </span><span class="hl-identifier">val</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+            </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+            </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">batch</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">f</span><span class="hl-code">, </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+        </span><span class="hl-comment">/**
+         * Gets the current position of an element based on page coordinates.  Element must be part of the DOM tree to have page coordinates (display:none or elements not appended return false).
+         * @method getXY
+         * @param {String | HTMLElement | Array} el Accepts a string to use as an ID, an actual DOM reference, or an Array of IDs and/or HTMLElements
+         * @return {Array} The XY position of the element(s)
+         */
+        </span><span class="hl-identifier">getXY</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">) {
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">f</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">) {
+
+            </span><span class="hl-comment">// has to be part of document to have pageXY
+                </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">parentNode</span><span class="hl-code"> === </span><span class="hl-reserved">null</span><span class="hl-code"> || </span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">offsetParent</span><span class="hl-code"> === </span><span class="hl-reserved">null</span><span class="hl-code"> ||
+                        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getStyle</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">display</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">none</span><span class="hl-quotes">'</span><span class="hl-brackets">) {
+                    </span><span class="hl-reserved">return false</span><span class="hl-code">;
+                </span><span class="hl-brackets">}
+
+                </span><span class="hl-reserved">var </span><span class="hl-identifier">parentNode</span><span class="hl-code"> = </span><span class="hl-reserved">null</span><span class="hl-code">;
+                </span><span class="hl-reserved">var </span><span class="hl-identifier">pos</span><span class="hl-code"> = </span><span class="hl-brackets">[]</span><span class="hl-code">;
+                </span><span class="hl-reserved">var </span><span class="hl-identifier">box</span><span class="hl-code">;
+
+                </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">getBoundingClientRect</span><span class="hl-brackets">) { </span><span class="hl-comment">// IE
+                    </span><span class="hl-identifier">box</span><span class="hl-code"> = </span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">getBoundingClientRect</span><span class="hl-brackets">()</span><span class="hl-code">;
+                    </span><span class="hl-reserved">var </span><span class="hl-identifier">doc</span><span class="hl-code"> = </span><span class="hl-builtin">document</span><span class="hl-code">;
+                    </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-code"> !</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">inDocument</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">)</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">parent</span><span class="hl-code">.</span><span class="hl-builtin">document</span><span class="hl-code"> != </span><span class="hl-builtin">document</span><span class="hl-brackets">) {</span><span class="hl-comment">// might be in a frame, need to get its scroll
+                        </span><span class="hl-identifier">doc</span><span class="hl-code"> = </span><span class="hl-identifier">parent</span><span class="hl-code">.</span><span class="hl-builtin">document</span><span class="hl-code">;
+
+                        </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-code"> !</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">isAncestor</span><span class="hl-brackets">(</span><span class="hl-identifier">doc</span><span class="hl-code">.</span><span class="hl-identifier">documentElement</span><span class="hl-code">, </span><span class="hl-identifier">el</span><span class="hl-brackets">) ) {
+                            </span><span class="hl-reserved">return false</span><span class="hl-code">;
+                        </span><span class="hl-brackets">}
+
+                    }
+
+                    </span><span class="hl-reserved">var </span><span class="hl-identifier">scrollTop</span><span class="hl-code"> = </span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">max</span><span class="hl-brackets">(</span><span class="hl-identifier">doc</span><span class="hl-code">.</span><span class="hl-identifier">documentElement</span><span class="hl-code">.</span><span class="hl-identifier">scrollTop</span><span class="hl-code">, </span><span class="hl-identifier">doc</span><span class="hl-code">.</span><span class="hl-identifier">body</span><span class="hl-code">.</span><span class="hl-identifier">scrollTop</span><span class="hl-brackets">)</span><span class="hl-code">;
+                    </span><span class="hl-reserved">var </span><span class="hl-identifier">scrollLeft</span><span class="hl-code"> = </span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">max</span><span class="hl-brackets">(</span><span class="hl-identifier">doc</span><span class="hl-code">.</span><span class="hl-identifier">documentElement</span><span class="hl-code">.</span><span class="hl-identifier">scrollLeft</span><span class="hl-code">, </span><span class="hl-identifier">doc</span><span class="hl-code">.</span><span class="hl-identifier">body</span><span class="hl-code">.</span><span class="hl-identifier">scrollLeft</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+                    </span><span class="hl-reserved">return </span><span class="hl-brackets">[</span><span class="hl-identifier">box</span><span class="hl-code">.</span><span class="hl-identifier">left</span><span class="hl-code"> + </span><span class="hl-identifier">scrollLeft</span><span class="hl-code">, </span><span class="hl-identifier">box</span><span class="hl-code">.</span><span class="hl-identifier">top</span><span class="hl-code"> + </span><span class="hl-identifier">scrollTop</span><span class="hl-brackets">]</span><span class="hl-code">;
+                </span><span class="hl-brackets">}
+                </span><span class="hl-reserved">else </span><span class="hl-brackets">{ </span><span class="hl-comment">// safari, opera, &amp; gecko
+                    </span><span class="hl-identifier">pos</span><span class="hl-code"> = </span><span class="hl-brackets">[</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">offsetLeft</span><span class="hl-code">, </span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">offsetTop</span><span class="hl-brackets">]</span><span class="hl-code">;
+                    </span><span class="hl-identifier">parentNode</span><span class="hl-code"> = </span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">offsetParent</span><span class="hl-code">;
+                    </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">parentNode</span><span class="hl-code"> != </span><span class="hl-identifier">el</span><span class="hl-brackets">) {
+                        </span><span class="hl-reserved">while </span><span class="hl-brackets">(</span><span class="hl-identifier">parentNode</span><span class="hl-brackets">) {
+                            </span><span class="hl-identifier">pos</span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code"> += </span><span class="hl-identifier">parentNode</span><span class="hl-code">.</span><span class="hl-identifier">offsetLeft</span><span class="hl-code">;
+                            </span><span class="hl-identifier">pos</span><span class="hl-brackets">[</span><span class="hl-number">1</span><span class="hl-brackets">]</span><span class="hl-code"> += </span><span class="hl-identifier">parentNode</span><span class="hl-code">.</span><span class="hl-identifier">offsetTop</span><span class="hl-code">;
+                            </span><span class="hl-identifier">parentNode</span><span class="hl-code"> = </span><span class="hl-identifier">parentNode</span><span class="hl-code">.</span><span class="hl-identifier">offsetParent</span><span class="hl-code">;
+                        </span><span class="hl-brackets">}
+                    }
+                    </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">isSafari</span><span class="hl-code"> &amp;&amp; </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getStyle</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">position</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">absolute</span><span class="hl-quotes">' </span><span class="hl-brackets">) { </span><span class="hl-comment">// safari doubles in some cases
+                        </span><span class="hl-identifier">pos</span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code"> -= </span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">body</span><span class="hl-code">.</span><span class="hl-identifier">offsetLeft</span><span class="hl-code">;
+                        </span><span class="hl-identifier">pos</span><span class="hl-brackets">[</span><span class="hl-number">1</span><span class="hl-brackets">]</span><span class="hl-code"> -= </span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">body</span><span class="hl-code">.</span><span class="hl-identifier">offsetTop</span><span class="hl-code">;
+                    </span><span class="hl-brackets">}
+                }
+
+                </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">parentNode</span><span class="hl-brackets">) { </span><span class="hl-identifier">parentNode</span><span class="hl-code"> = </span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">parentNode</span><span class="hl-code">; </span><span class="hl-brackets">}
+                </span><span class="hl-reserved">else </span><span class="hl-brackets">{ </span><span class="hl-identifier">parentNode</span><span class="hl-code"> = </span><span class="hl-reserved">null</span><span class="hl-code">; </span><span class="hl-brackets">}
+
+                </span><span class="hl-reserved">while </span><span class="hl-brackets">(</span><span class="hl-identifier">parentNode</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">parentNode</span><span class="hl-code">.</span><span class="hl-identifier">tagName</span><span class="hl-code">.</span><span class="hl-identifier">toUpperCase</span><span class="hl-brackets">()</span><span class="hl-code"> != </span><span class="hl-quotes">'</span><span class="hl-string">BODY</span><span class="hl-quotes">'</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">parentNode</span><span class="hl-code">.</span><span class="hl-identifier">tagName</span><span class="hl-code">.</span><span class="hl-identifier">toUpperCase</span><span class="hl-brackets">()</span><span class="hl-code"> != </span><span class="hl-quotes">'</span><span class="hl-string">HTML</span><span class="hl-quotes">'</span><span class="hl-brackets">)
+                { </span><span class="hl-comment">// account for any scrolled ancestors
+                    </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">getStyle</span><span class="hl-brackets">(</span><span class="hl-identifier">parentNode</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">display</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code"> != </span><span class="hl-quotes">'</span><span class="hl-string">inline</span><span class="hl-quotes">'</span><span class="hl-brackets">) { </span><span class="hl-comment">// work around opera inline scrollLeft/Top bug
+                        </span><span class="hl-identifier">pos</span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code"> -= </span><span class="hl-identifier">parentNode</span><span class="hl-code">.</span><span class="hl-identifier">scrollLeft</span><span class="hl-code">;
+                        </span><span class="hl-identifier">pos</span><span class="hl-brackets">[</span><span class="hl-number">1</span><span class="hl-brackets">]</span><span class="hl-code"> -= </span><span class="hl-identifier">parentNode</span><span class="hl-code">.</span><span class="hl-identifier">scrollTop</span><span class="hl-code">;
+                    </span><span class="hl-brackets">}
+
+                    </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">parentNode</span><span class="hl-code">.</span><span class="hl-identifier">parentNode</span><span class="hl-brackets">) {
+                        </span><span class="hl-identifier">parentNode</span><span class="hl-code"> = </span><span class="hl-identifier">parentNode</span><span class="hl-code">.</span><span class="hl-identifier">parentNode</span><span class="hl-code">;
+                    </span><span class="hl-brackets">} </span><span class="hl-reserved">else </span><span class="hl-brackets">{ </span><span class="hl-identifier">parentNode</span><span class="hl-code"> = </span><span class="hl-reserved">null</span><span class="hl-code">; </span><span class="hl-brackets">}
+                }
+
+
+                </span><span class="hl-reserved">return </span><span class="hl-identifier">pos</span><span class="hl-code">;
+            </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+            </span><span class="hl-reserved">return </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">batch</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">f</span><span class="hl-code">, </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+        </span><span class="hl-comment">/**
+         * Gets the current X position of an element based on page coordinates.  The element must be part of the DOM tree to have page coordinates (display:none or elements not appended return false).
+         * @method getX
+         * @param {String | HTMLElement | Array} el Accepts a string to use as an ID, an actual DOM reference, or an Array of IDs and/or HTMLElements
+         * @return {String | Array} The X position of the element(s)
+         */
+        </span><span class="hl-identifier">getX</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">) {
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">f</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">) {
+                </span><span class="hl-reserved">return </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">getXY</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">)[</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code">;
+            </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+            </span><span class="hl-reserved">return </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">batch</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">f</span><span class="hl-code">, </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+        </span><span class="hl-comment">/**
+         * Gets the current Y position of an element based on page coordinates.  Element must be part of the DOM tree to have page coordinates (display:none or elements not appended return false).
+         * @method getY
+         * @param {String | HTMLElement | Array} el Accepts a string to use as an ID, an actual DOM reference, or an Array of IDs and/or HTMLElements
+         * @return {String | Array} The Y position of the element(s)
+         */
+        </span><span class="hl-identifier">getY</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">) {
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">f</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">) {
+                </span><span class="hl-reserved">return </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">getXY</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">)[</span><span class="hl-number">1</span><span class="hl-brackets">]</span><span class="hl-code">;
+            </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+            </span><span class="hl-reserved">return </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">batch</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">f</span><span class="hl-code">, </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+        </span><span class="hl-comment">/**
+         * Set the position of an html element in page coordinates, regardless of how the element is positioned.
+         * The element(s) must be part of the DOM tree to have page coordinates (display:none or elements not appended return false).
+         * @method setXY
+         * @param {String | HTMLElement | Array} el Accepts a string to use as an ID, an actual DOM reference, or an Array of IDs and/or HTMLElements
+         * @param {Array} pos Contains X &amp; Y values for new position (coordinates are page-based)
+         * @param {Boolean} noRetry By default we try and set the position a second time if the first fails
+         */
+        </span><span class="hl-identifier">setXY</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">pos</span><span class="hl-code">, </span><span class="hl-identifier">noRetry</span><span class="hl-brackets">) {
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">f</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">) {
+                </span><span class="hl-reserved">var </span><span class="hl-identifier">style_pos</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getStyle</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">position</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+                </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">style_pos</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">static</span><span class="hl-quotes">'</span><span class="hl-brackets">) { </span><span class="hl-comment">// default to relative
+                    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">setStyle</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">position</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">relative</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+                    </span><span class="hl-identifier">style_pos</span><span class="hl-code"> = </span><span class="hl-quotes">'</span><span class="hl-string">relative</span><span class="hl-quotes">'</span><span class="hl-code">;
+                </span><span class="hl-brackets">}
+
+                </span><span class="hl-reserved">var </span><span class="hl-identifier">pageXY</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getXY</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">)</span><span class="hl-code">;
+                </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">pageXY</span><span class="hl-code"> === </span><span class="hl-reserved">false</span><span class="hl-brackets">) { </span><span class="hl-comment">// has to be part of doc to have pageXY
+                    </span><span class="hl-reserved">return false</span><span class="hl-code">;
+                </span><span class="hl-brackets">}
+
+                </span><span class="hl-reserved">var </span><span class="hl-identifier">delta</span><span class="hl-code"> = </span><span class="hl-brackets">[ </span><span class="hl-comment">// assuming pixels; if not we will have to retry
+                    </span><span class="hl-identifier">parseInt</span><span class="hl-brackets">( </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getStyle</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">left</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">, </span><span class="hl-number">10 </span><span class="hl-brackets">)</span><span class="hl-code">,
+                    </span><span class="hl-identifier">parseInt</span><span class="hl-brackets">( </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getStyle</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">top</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">, </span><span class="hl-number">10 </span><span class="hl-brackets">)
+                ]</span><span class="hl-code">;
+
+                </span><span class="hl-reserved">if </span><span class="hl-brackets">( </span><span class="hl-identifier">isNaN</span><span class="hl-brackets">(</span><span class="hl-identifier">delta</span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-brackets">]) ) {</span><span class="hl-comment">// in case of 'auto'
+                    </span><span class="hl-identifier">delta</span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-identifier">style_pos</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">relative</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code"> ? </span><span class="hl-number">0</span><span class="hl-code"> : </span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">offsetLeft</span><span class="hl-code">;
+                </span><span class="hl-brackets">}
+                </span><span class="hl-reserved">if </span><span class="hl-brackets">( </span><span class="hl-identifier">isNaN</span><span class="hl-brackets">(</span><span class="hl-identifier">delta</span><span class="hl-brackets">[</span><span class="hl-number">1</span><span class="hl-brackets">]) ) { </span><span class="hl-comment">// in case of 'auto'
+                    </span><span class="hl-identifier">delta</span><span class="hl-brackets">[</span><span class="hl-number">1</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-identifier">style_pos</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">relative</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code"> ? </span><span class="hl-number">0</span><span class="hl-code"> : </span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">offsetTop</span><span class="hl-code">;
+                </span><span class="hl-brackets">}
+
+                </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">pos</span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code"> !== </span><span class="hl-reserved">null</span><span class="hl-brackets">) { </span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">style</span><span class="hl-code">.</span><span class="hl-identifier">left</span><span class="hl-code"> = </span><span class="hl-identifier">pos</span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code"> - </span><span class="hl-identifier">pageXY</span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code"> + </span><span class="hl-identifier">delta</span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code"> + </span><span class="hl-quotes">'</span><span class="hl-string">px</span><span class="hl-quotes">'</span><span class="hl-code">; </span><span class="hl-brackets">}
+                </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">pos</span><span class="hl-brackets">[</span><span class="hl-number">1</span><span class="hl-brackets">]</span><span class="hl-code"> !== </span><span class="hl-reserved">null</span><span class="hl-brackets">) { </span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">style</span><span class="hl-code">.</span><span class="hl-identifier">top</span><span class="hl-code"> = </span><span class="hl-identifier">pos</span><span class="hl-brackets">[</span><span class="hl-number">1</span><span class="hl-brackets">]</span><span class="hl-code"> - </span><span class="hl-identifier">pageXY</span><span class="hl-brackets">[</span><span class="hl-number">1</span><span class="hl-brackets">]</span><span class="hl-code"> + </span><span class="hl-identifier">delta</span><span class="hl-brackets">[</span><span class="hl-number">1</span><span class="hl-brackets">]</span><span class="hl-code"> + </span><span class="hl-quotes">'</span><span class="hl-string">px</span><span class="hl-quotes">'</span><span class="hl-code">; </span><span class="hl-brackets">}
+
+                </span><span class="hl-reserved">var </span><span class="hl-identifier">newXY</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getXY</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+                </span><span class="hl-comment">// if retry is true, try one more time if we miss
+                </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">noRetry</span><span class="hl-code"> &amp;&amp; </span><span class="hl-brackets">(</span><span class="hl-identifier">newXY</span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code"> != </span><span class="hl-identifier">pos</span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code"> || </span><span class="hl-identifier">newXY</span><span class="hl-brackets">[</span><span class="hl-number">1</span><span class="hl-brackets">]</span><span class="hl-code"> != </span><span class="hl-identifier">pos</span><span class="hl-brackets">[</span><span class="hl-number">1</span><span class="hl-brackets">]) ) {
+                    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">setXY</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">pos</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+                </span><span class="hl-brackets">}
+
+            }</span><span class="hl-code">;
+
+            </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">batch</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">f</span><span class="hl-code">, </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+        </span><span class="hl-comment">/**
+         * Set the X position of an html element in page coordinates, regardless of how the element is positioned.
+         * The element must be part of the DOM tree to have page coordinates (display:none or elements not appended return false).
+         * @method setX
+         * @param {String | HTMLElement | Array} el Accepts a string to use as an ID, an actual DOM reference, or an Array of IDs and/or HTMLElements.
+         * @param {Int} x The value to use as the X coordinate for the element(s).
+         */
+        </span><span class="hl-identifier">setX</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">x</span><span class="hl-brackets">) {
+            </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">setXY</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-brackets">[</span><span class="hl-identifier">x</span><span class="hl-code">, </span><span class="hl-reserved">null</span><span class="hl-brackets">])</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+        </span><span class="hl-comment">/**
+         * Set the Y position of an html element in page coordinates, regardless of how the element is positioned.
+         * The element must be part of the DOM tree to have page coordinates (display:none or elements not appended return false).
+         * @method setY
+         * @param {String | HTMLElement | Array} el Accepts a string to use as an ID, an actual DOM reference, or an Array of IDs and/or HTMLElements.
+         * @param {Int} x To use as the Y coordinate for the element(s).
+         */
+        </span><span class="hl-identifier">setY</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">y</span><span class="hl-brackets">) {
+            </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">setXY</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-brackets">[</span><span class="hl-reserved">null</span><span class="hl-code">, </span><span class="hl-identifier">y</span><span class="hl-brackets">])</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+        </span><span class="hl-comment">/**
+         * Returns the region position of the given element.
+         * The element must be part of the DOM tree to have a region (display:none or elements not appended return false).
+         * @method getRegion
+         * @param {String | HTMLElement | Array} el Accepts a string to use as an ID, an actual DOM reference, or an Array of IDs and/or HTMLElements.
+         * @return {Region | Array} A Region or array of Region instances containing &quot;top, left, bottom, right&quot; member data.
+         */
+        </span><span class="hl-identifier">getRegion</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">) {
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">f</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">) {
+                </span><span class="hl-reserved">var </span><span class="hl-identifier">region</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Region</span><span class="hl-code">.</span><span class="hl-identifier">getRegion</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">)</span><span class="hl-code">;
+                </span><span class="hl-reserved">return </span><span class="hl-identifier">region</span><span class="hl-code">;
+            </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+            </span><span class="hl-reserved">return </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">batch</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">f</span><span class="hl-code">, </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+        </span><span class="hl-comment">/**
+         * Returns the width of the client (viewport).
+         * @method getClientWidth
+         * @deprecated Now using getViewportWidth.  This interface left intact for back compat.
+         * @return {Int} The width of the viewable area of the page.
+         */
+        </span><span class="hl-identifier">getClientWidth</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">() {
+            </span><span class="hl-reserved">return </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">getViewportWidth</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+        </span><span class="hl-comment">/**
+         * Returns the height of the client (viewport).
+         * @method getClientHeight
+         * @deprecated Now using getViewportHeight.  This interface left intact for back compat.
+         * @return {Int} The height of the viewable area of the page.
+         */
+        </span><span class="hl-identifier">getClientHeight</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">() {
+            </span><span class="hl-reserved">return </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">getViewportHeight</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+        </span><span class="hl-comment">/**
+         * Returns a array of HTMLElements with the given class.
+         * For optimized performance, include a tag and/or root node when possible.
+         * @method getElementsByClassName
+         * @param {String} className The class name to match against
+         * @param {String} tag (optional) The tag name of the elements being collected
+         * @param {String | HTMLElement} root (optional) The HTMLElement or an ID to use as the starting point
+         * @return {Array} An array of elements that have the given class name
+         */
+        </span><span class="hl-identifier">getElementsByClassName</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">className</span><span class="hl-code">, </span><span class="hl-identifier">tag</span><span class="hl-code">, </span><span class="hl-identifier">root</span><span class="hl-brackets">) {
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">method</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">) { </span><span class="hl-reserved">return </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">hasClass</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">className</span><span class="hl-brackets">)</span><span class="hl-code">; </span><span class="hl-brackets">}</span><span class="hl-code">;
+            </span><span class="hl-reserved">return </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">getElementsBy</span><span class="hl-brackets">(</span><span class="hl-identifier">method</span><span class="hl-code">, </span><span class="hl-identifier">tag</span><span class="hl-code">, </span><span class="hl-identifier">root</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+        </span><span class="hl-comment">/**
+         * Determines whether an HTMLElement has the given className.
+         * @method hasClass
+         * @param {String | HTMLElement | Array} el The element or collection to test
+         * @param {String} className the class name to search for
+         * @return {Boolean | Array} A boolean value or array of boolean values
+         */
+        </span><span class="hl-identifier">hasClass</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">className</span><span class="hl-brackets">) {
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">re</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-builtin">RegExp</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">(?:^|</span><span class="hl-special">\\</span><span class="hl-string">s+)</span><span class="hl-quotes">'</span><span class="hl-code"> + </span><span class="hl-identifier">className</span><span class="hl-code"> + </span><span class="hl-quotes">'</span><span class="hl-string">(?:</span><span class="hl-special">\\</span><span class="hl-string">s+|$)</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">f</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">) {
+                </span><span class="hl-reserved">return </span><span class="hl-identifier">re</span><span class="hl-code">.</span><span class="hl-identifier">test</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">[</span><span class="hl-quotes">'</span><span class="hl-string">className</span><span class="hl-quotes">'</span><span class="hl-brackets">])</span><span class="hl-code">;
+            </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+            </span><span class="hl-reserved">return </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">batch</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">f</span><span class="hl-code">, </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+        </span><span class="hl-comment">/**
+         * Adds a class name to a given element or collection of elements.
+         * @method addClass
+         * @param {String | HTMLElement | Array} el The element or collection to add the class to
+         * @param {String} className the class name to add to the class attribute
+         */
+        </span><span class="hl-identifier">addClass</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">className</span><span class="hl-brackets">) {
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">f</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">) {
+                </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">hasClass</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">className</span><span class="hl-brackets">)) { </span><span class="hl-reserved">return</span><span class="hl-code">; </span><span class="hl-brackets">} </span><span class="hl-comment">// already present
+
+
+                </span><span class="hl-identifier">el</span><span class="hl-brackets">[</span><span class="hl-quotes">'</span><span class="hl-string">className</span><span class="hl-quotes">'</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-brackets">[</span><span class="hl-identifier">el</span><span class="hl-brackets">[</span><span class="hl-quotes">'</span><span class="hl-string">className</span><span class="hl-quotes">'</span><span class="hl-brackets">]</span><span class="hl-code">, </span><span class="hl-identifier">className</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">join</span><span class="hl-brackets">(</span><span class="hl-quotes">' '</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+            </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">batch</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">f</span><span class="hl-code">, </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+        </span><span class="hl-comment">/**
+         * Removes a class name from a given element or collection of elements.
+         * @method removeClass
+         * @param {String | HTMLElement | Array} el The element or collection to remove the class from
+         * @param {String} className the class name to remove from the class attribute
+         */
+        </span><span class="hl-identifier">removeClass</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">className</span><span class="hl-brackets">) {
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">re</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-builtin">RegExp</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">(?:^|</span><span class="hl-special">\\</span><span class="hl-string">s+)</span><span class="hl-quotes">'</span><span class="hl-code"> + </span><span class="hl-identifier">className</span><span class="hl-code"> + </span><span class="hl-quotes">'</span><span class="hl-string">(?:</span><span class="hl-special">\\</span><span class="hl-string">s+|$)</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">g</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">f</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">) {
+                </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">hasClass</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">className</span><span class="hl-brackets">)) { </span><span class="hl-reserved">return</span><span class="hl-code">; </span><span class="hl-brackets">} </span><span class="hl-comment">// not present
+
+
+                </span><span class="hl-reserved">var </span><span class="hl-identifier">c</span><span class="hl-code"> = </span><span class="hl-identifier">el</span><span class="hl-brackets">[</span><span class="hl-quotes">'</span><span class="hl-string">className</span><span class="hl-quotes">'</span><span class="hl-brackets">]</span><span class="hl-code">;
+                </span><span class="hl-identifier">el</span><span class="hl-brackets">[</span><span class="hl-quotes">'</span><span class="hl-string">className</span><span class="hl-quotes">'</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-identifier">c</span><span class="hl-code">.</span><span class="hl-identifier">replace</span><span class="hl-brackets">(</span><span class="hl-identifier">re</span><span class="hl-code">, </span><span class="hl-quotes">' '</span><span class="hl-brackets">)</span><span class="hl-code">;
+                </span><span class="hl-reserved">if </span><span class="hl-brackets">( </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">hasClass</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">className</span><span class="hl-brackets">) ) { </span><span class="hl-comment">// in case of multiple adjacent
+                    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">removeClass</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">className</span><span class="hl-brackets">)</span><span class="hl-code">;
+                </span><span class="hl-brackets">}
+
+            }</span><span class="hl-code">;
+
+            </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">batch</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">f</span><span class="hl-code">, </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+        </span><span class="hl-comment">/**
+         * Replace a class with another class for a given element or collection of elements.
+         * If no oldClassName is present, the newClassName is simply added.
+         * @method replaceClass
+         * @param {String | HTMLElement | Array} el The element or collection to remove the class from
+         * @param {String} oldClassName the class name to be replaced
+         * @param {String} newClassName the class name that will be replacing the old class name
+         */
+        </span><span class="hl-identifier">replaceClass</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">oldClassName</span><span class="hl-code">, </span><span class="hl-identifier">newClassName</span><span class="hl-brackets">) {
+            </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">oldClassName</span><span class="hl-code"> === </span><span class="hl-identifier">newClassName</span><span class="hl-brackets">) { </span><span class="hl-comment">// avoid infinite loop
+                </span><span class="hl-reserved">return false</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">re</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-builtin">RegExp</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">(?:^|</span><span class="hl-special">\\</span><span class="hl-string">s+)</span><span class="hl-quotes">'</span><span class="hl-code"> + </span><span class="hl-identifier">oldClassName</span><span class="hl-code"> + </span><span class="hl-quotes">'</span><span class="hl-string">(?:</span><span class="hl-special">\\</span><span class="hl-string">s+|$)</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">g</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">f</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">) {
+
+                </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-code"> !</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">hasClass</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">oldClassName</span><span class="hl-brackets">) ) {
+                    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">addClass</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">newClassName</span><span class="hl-brackets">)</span><span class="hl-code">; </span><span class="hl-comment">// just add it if nothing to replace
+                    </span><span class="hl-reserved">return</span><span class="hl-code">; </span><span class="hl-comment">// note return
+                </span><span class="hl-brackets">}
+
+                </span><span class="hl-identifier">el</span><span class="hl-brackets">[</span><span class="hl-quotes">'</span><span class="hl-string">className</span><span class="hl-quotes">'</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-identifier">el</span><span class="hl-brackets">[</span><span class="hl-quotes">'</span><span class="hl-string">className</span><span class="hl-quotes">'</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">replace</span><span class="hl-brackets">(</span><span class="hl-identifier">re</span><span class="hl-code">, </span><span class="hl-quotes">' '</span><span class="hl-code"> + </span><span class="hl-identifier">newClassName</span><span class="hl-code"> + </span><span class="hl-quotes">' '</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+                </span><span class="hl-reserved">if </span><span class="hl-brackets">( </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">hasClass</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">oldClassName</span><span class="hl-brackets">) ) { </span><span class="hl-comment">// in case of multiple adjacent
+                    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">replaceClass</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">oldClassName</span><span class="hl-code">, </span><span class="hl-identifier">newClassName</span><span class="hl-brackets">)</span><span class="hl-code">;
+                </span><span class="hl-brackets">}
+            }</span><span class="hl-code">;
+
+            </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">batch</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">f</span><span class="hl-code">, </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+        </span><span class="hl-comment">/**
+         * Generates a unique ID
+         * @method generateId
+         * @param {String | HTMLElement | Array} el (optional) An optional element array of elements to add an ID to (no ID is added if one is already present).
+         * @param {String} prefix (optional) an optional prefix to use (defaults to &quot;yui-gen&quot;).
+         * @return {String | Array} The generated ID, or array of generated IDs (or original ID if already present on an element)
+         */
+        </span><span class="hl-identifier">generateId</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">prefix</span><span class="hl-brackets">) {
+            </span><span class="hl-identifier">prefix</span><span class="hl-code"> = </span><span class="hl-identifier">prefix</span><span class="hl-code"> || </span><span class="hl-quotes">'</span><span class="hl-string">yui-gen</span><span class="hl-quotes">'</span><span class="hl-code">;
+            </span><span class="hl-identifier">el</span><span class="hl-code"> = </span><span class="hl-identifier">el</span><span class="hl-code"> || </span><span class="hl-brackets">{}</span><span class="hl-code">;
+
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">f</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">) {
+                </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">) {
+                    </span><span class="hl-identifier">el</span><span class="hl-code"> = </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">get</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">)</span><span class="hl-code">;
+                </span><span class="hl-brackets">} </span><span class="hl-reserved">else </span><span class="hl-brackets">{
+                    </span><span class="hl-identifier">el</span><span class="hl-code"> = </span><span class="hl-brackets">{}</span><span class="hl-code">; </span><span class="hl-comment">// just generating ID in this case
+                </span><span class="hl-brackets">}
+
+                </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">id</span><span class="hl-brackets">) {
+                    </span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">id</span><span class="hl-code"> = </span><span class="hl-identifier">prefix</span><span class="hl-code"> + </span><span class="hl-identifier">id_counter</span><span class="hl-code">++;
+                </span><span class="hl-brackets">} </span><span class="hl-comment">// dont override existing
+
+
+                </span><span class="hl-reserved">return </span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">id</span><span class="hl-code">;
+            </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+            </span><span class="hl-reserved">return </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">batch</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">f</span><span class="hl-code">, </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+        </span><span class="hl-comment">/**
+         * Determines whether an HTMLElement is an ancestor of another HTML element in the DOM hierarchy.
+         * @method isAncestor
+         * @param {String | HTMLElement} haystack The possible ancestor
+         * @param {String | HTMLElement} needle The possible descendent
+         * @return {Boolean} Whether or not the haystack is an ancestor of needle
+         */
+        </span><span class="hl-identifier">isAncestor</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">haystack</span><span class="hl-code">, </span><span class="hl-identifier">needle</span><span class="hl-brackets">) {
+            </span><span class="hl-identifier">haystack</span><span class="hl-code"> = </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">get</span><span class="hl-brackets">(</span><span class="hl-identifier">haystack</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">haystack</span><span class="hl-code"> || !</span><span class="hl-identifier">needle</span><span class="hl-brackets">) { </span><span class="hl-reserved">return false</span><span class="hl-code">; </span><span class="hl-brackets">}
+
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">f</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">needle</span><span class="hl-brackets">) {
+                </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">haystack</span><span class="hl-code">.</span><span class="hl-identifier">contains</span><span class="hl-code"> &amp;&amp; !</span><span class="hl-identifier">isSafari</span><span class="hl-brackets">) { </span><span class="hl-comment">// safari &quot;contains&quot; is broken
+                    </span><span class="hl-reserved">return </span><span class="hl-identifier">haystack</span><span class="hl-code">.</span><span class="hl-identifier">contains</span><span class="hl-brackets">(</span><span class="hl-identifier">needle</span><span class="hl-brackets">)</span><span class="hl-code">;
+                </span><span class="hl-brackets">}
+                </span><span class="hl-reserved">else if </span><span class="hl-brackets">( </span><span class="hl-identifier">haystack</span><span class="hl-code">.</span><span class="hl-identifier">compareDocumentPosition </span><span class="hl-brackets">) {
+                    </span><span class="hl-reserved">return</span><span class="hl-code"> !!</span><span class="hl-brackets">(</span><span class="hl-identifier">haystack</span><span class="hl-code">.</span><span class="hl-identifier">compareDocumentPosition</span><span class="hl-brackets">(</span><span class="hl-identifier">needle</span><span class="hl-brackets">)</span><span class="hl-code"> &amp; </span><span class="hl-number">16</span><span class="hl-brackets">)</span><span class="hl-code">;
+                </span><span class="hl-brackets">}
+                </span><span class="hl-reserved">else </span><span class="hl-brackets">{ </span><span class="hl-comment">// loop up and test each parent
+                    </span><span class="hl-reserved">var </span><span class="hl-identifier">parent</span><span class="hl-code"> = </span><span class="hl-identifier">needle</span><span class="hl-code">.</span><span class="hl-identifier">parentNode</span><span class="hl-code">;
+
+                    </span><span class="hl-reserved">while </span><span class="hl-brackets">(</span><span class="hl-identifier">parent</span><span class="hl-brackets">) {
+                        </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">parent</span><span class="hl-code"> == </span><span class="hl-identifier">haystack</span><span class="hl-brackets">) {
+                            </span><span class="hl-reserved">return true</span><span class="hl-code">;
+                        </span><span class="hl-brackets">}
+                        </span><span class="hl-reserved">else if </span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">parent</span><span class="hl-code">.</span><span class="hl-identifier">tagName</span><span class="hl-code"> || </span><span class="hl-identifier">parent</span><span class="hl-code">.</span><span class="hl-identifier">tagName</span><span class="hl-code">.</span><span class="hl-identifier">toUpperCase</span><span class="hl-brackets">()</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">HTML</span><span class="hl-quotes">'</span><span class="hl-brackets">) {
+                            </span><span class="hl-reserved">return false</span><span class="hl-code">;
+                        </span><span class="hl-brackets">}
+
+                        </span><span class="hl-identifier">parent</span><span class="hl-code"> = </span><span class="hl-identifier">parent</span><span class="hl-code">.</span><span class="hl-identifier">parentNode</span><span class="hl-code">;
+                    </span><span class="hl-brackets">}
+                    </span><span class="hl-reserved">return false</span><span class="hl-code">;
+                </span><span class="hl-brackets">}
+            }</span><span class="hl-code">;
+
+            </span><span class="hl-reserved">return </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">batch</span><span class="hl-brackets">(</span><span class="hl-identifier">needle</span><span class="hl-code">, </span><span class="hl-identifier">f</span><span class="hl-code">, </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+        </span><span class="hl-comment">/**
+         * Determines whether an HTMLElement is present in the current document.
+         * @method inDocument
+         * @param {String | HTMLElement} el The element to search for
+         * @return {Boolean} Whether or not the element is present in the current document
+         */
+        </span><span class="hl-identifier">inDocument</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">) {
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">f</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">) {
+                </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">isAncestor</span><span class="hl-brackets">(</span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">documentElement</span><span class="hl-code">, </span><span class="hl-identifier">el</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-brackets">}</span><span class="hl-code">;
+
+            </span><span class="hl-reserved">return </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">batch</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">f</span><span class="hl-code">, </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+        </span><span class="hl-comment">/**
+         * Returns a array of HTMLElements that pass the test applied by supplied boolean method.
+         * For optimized performance, include a tag and/or root node when possible.
+         * @method getElementsBy
+         * @param {Function} method - A boolean method for testing elements which receives the element as its only argument.
+
+         * @param {String} tag (optional) The tag name of the elements being collected
+         * @param {String | HTMLElement} root (optional) The HTMLElement or an ID to use as the starting point
+         */
+        </span><span class="hl-identifier">getElementsBy</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">method</span><span class="hl-code">, </span><span class="hl-identifier">tag</span><span class="hl-code">, </span><span class="hl-identifier">root</span><span class="hl-brackets">) {
+            </span><span class="hl-identifier">tag</span><span class="hl-code"> = </span><span class="hl-identifier">tag</span><span class="hl-code"> || </span><span class="hl-quotes">'</span><span class="hl-string">*</span><span class="hl-quotes">'</span><span class="hl-code">;
+            </span><span class="hl-identifier">root</span><span class="hl-code"> = </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">get</span><span class="hl-brackets">(</span><span class="hl-identifier">root</span><span class="hl-brackets">)</span><span class="hl-code"> || </span><span class="hl-builtin">document</span><span class="hl-code">;
+
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">nodes</span><span class="hl-code"> = </span><span class="hl-brackets">[]</span><span class="hl-code">;
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">elements</span><span class="hl-code"> = </span><span class="hl-identifier">root</span><span class="hl-code">.</span><span class="hl-identifier">getElementsByTagName</span><span class="hl-brackets">(</span><span class="hl-identifier">tag</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+            </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-code"> !</span><span class="hl-identifier">elements</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code"> &amp;&amp; </span><span class="hl-brackets">(</span><span class="hl-identifier">tag</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">*</span><span class="hl-quotes">'</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">root</span><span class="hl-code">.</span><span class="hl-identifier">all</span><span class="hl-brackets">) ) {
+                </span><span class="hl-identifier">elements</span><span class="hl-code"> = </span><span class="hl-identifier">root</span><span class="hl-code">.</span><span class="hl-identifier">all</span><span class="hl-code">; </span><span class="hl-comment">// IE &lt; 6
+            </span><span class="hl-brackets">}
+
+            </span><span class="hl-reserved">for </span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">, </span><span class="hl-identifier">len</span><span class="hl-code"> = </span><span class="hl-identifier">elements</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code"> &lt; </span><span class="hl-identifier">len</span><span class="hl-code">; ++</span><span class="hl-identifier">i</span><span class="hl-brackets">) {
+                </span><span class="hl-reserved">if </span><span class="hl-brackets">( </span><span class="hl-identifier">method</span><span class="hl-brackets">(</span><span class="hl-identifier">elements</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]) ) { </span><span class="hl-identifier">nodes</span><span class="hl-brackets">[</span><span class="hl-identifier">nodes</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-identifier">elements</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">; </span><span class="hl-brackets">}
+            }
+
+
+            </span><span class="hl-reserved">return </span><span class="hl-identifier">nodes</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+        </span><span class="hl-comment">/**
+         * Returns an array of elements that have had the supplied method applied.
+         * The method is called with the element(s) as the first arg, and the optional param as the second ( method(el, o) ).
+         * @method batch
+         * @param {String | HTMLElement | Array} el (optional) An element or array of elements to apply the method to
+         * @param {Function} method The method to apply to the element(s)
+         * @param {Any} o (optional) An optional arg that is passed to the supplied method
+         * @param {Boolean} override (optional) Whether or not to override the scope of &quot;method&quot; with &quot;o&quot;
+         * @return {HTMLElement | Array} The element(s) with the method applied
+         */
+        </span><span class="hl-identifier">batch</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">method</span><span class="hl-code">, </span><span class="hl-identifier">o</span><span class="hl-code">, </span><span class="hl-identifier">override</span><span class="hl-brackets">) {
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">id</span><span class="hl-code"> = </span><span class="hl-identifier">el</span><span class="hl-code">;
+            </span><span class="hl-identifier">el</span><span class="hl-code"> = </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">get</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">scope</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-identifier">override</span><span class="hl-brackets">)</span><span class="hl-code"> ? </span><span class="hl-identifier">o</span><span class="hl-code"> : </span><span class="hl-builtin">window</span><span class="hl-code">;
+
+            </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">el</span><span class="hl-code"> || </span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">tagName</span><span class="hl-code"> || !</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-brackets">) { </span><span class="hl-comment">// is null or not a collection (tagName for SELECT and others that can be both an element and a collection)
+                </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">el</span><span class="hl-brackets">) {
+                    </span><span class="hl-reserved">return false</span><span class="hl-code">;
+                </span><span class="hl-brackets">}
+                </span><span class="hl-reserved">return </span><span class="hl-identifier">method</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-identifier">scope</span><span class="hl-code">, </span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">o</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">collection</span><span class="hl-code"> = </span><span class="hl-brackets">[]</span><span class="hl-code">;
+
+            </span><span class="hl-reserved">for </span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">, </span><span class="hl-identifier">len</span><span class="hl-code"> = </span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code"> &lt; </span><span class="hl-identifier">len</span><span class="hl-code">; ++</span><span class="hl-identifier">i</span><span class="hl-brackets">) {
+                </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">el</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]) {
+                    </span><span class="hl-identifier">id</span><span class="hl-code"> = </span><span class="hl-identifier">el</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">;
+                </span><span class="hl-brackets">}
+                </span><span class="hl-identifier">collection</span><span class="hl-brackets">[</span><span class="hl-identifier">collection</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-identifier">method</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-identifier">scope</span><span class="hl-code">, </span><span class="hl-identifier">el</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">, </span><span class="hl-identifier">o</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+
+            </span><span class="hl-reserved">return </span><span class="hl-identifier">collection</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+        </span><span class="hl-comment">/**
+         * Returns the height of the document.
+         * @method getDocumentHeight
+         * @return {Int} The height of the actual document (which includes the body and its margin).
+         */
+        </span><span class="hl-identifier">getDocumentHeight</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">() {
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">scrollHeight</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">compatMode</span><span class="hl-code"> != </span><span class="hl-quotes">'</span><span class="hl-string">CSS1Compat</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code"> ? </span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">body</span><span class="hl-code">.</span><span class="hl-identifier">scrollHeight</span><span class="hl-code"> : </span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">documentElement</span><span class="hl-code">.</span><span class="hl-identifier">scrollHeight</span><span class="hl-code">;
+
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">h</span><span class="hl-code"> = </span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">max</span><span class="hl-brackets">(</span><span class="hl-identifier">scrollHeight</span><span class="hl-code">, </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">getViewportHeight</span><span class="hl-brackets">())</span><span class="hl-code">;
+            </span><span class="hl-reserved">return </span><span class="hl-identifier">h</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+        </span><span class="hl-comment">/**
+         * Returns the width of the document.
+         * @method getDocumentWidth
+         * @return {Int} The width of the actual document (which includes the body and its margin).
+         */
+        </span><span class="hl-identifier">getDocumentWidth</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">() {
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">scrollWidth</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">compatMode</span><span class="hl-code"> != </span><span class="hl-quotes">'</span><span class="hl-string">CSS1Compat</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code"> ? </span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">body</span><span class="hl-code">.</span><span class="hl-identifier">scrollWidth</span><span class="hl-code"> : </span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">documentElement</span><span class="hl-code">.</span><span class="hl-identifier">scrollWidth</span><span class="hl-code">;
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">w</span><span class="hl-code"> = </span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">max</span><span class="hl-brackets">(</span><span class="hl-identifier">scrollWidth</span><span class="hl-code">, </span><span class="hl-identifier">Y</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">getViewportWidth</span><span class="hl-brackets">())</span><span class="hl-code">;
+            </span><span class="hl-reserved">return </span><span class="hl-identifier">w</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+        </span><span class="hl-comment">/**
+         * Returns the current height of the viewport.
+         * @method getViewportHeight
+         * @return {Int} The height of the viewable area of the page (excludes scrollbars).
+         */
+        </span><span class="hl-identifier">getViewportHeight</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">() {
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">height</span><span class="hl-code"> = </span><span class="hl-identifier">self</span><span class="hl-code">.</span><span class="hl-identifier">innerHeight</span><span class="hl-code">; </span><span class="hl-comment">// Safari, Opera
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">mode</span><span class="hl-code"> = </span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">compatMode</span><span class="hl-code">;
+
+            </span><span class="hl-reserved">if </span><span class="hl-brackets">( (</span><span class="hl-identifier">mode</span><span class="hl-code"> || </span><span class="hl-identifier">isIE</span><span class="hl-brackets">)</span><span class="hl-code"> &amp;&amp; !</span><span class="hl-identifier">isOpera </span><span class="hl-brackets">) { </span><span class="hl-comment">// IE, Gecko
+                </span><span class="hl-identifier">height</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-identifier">mode</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">CSS1Compat</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code"> ?
+                        </span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">documentElement</span><span class="hl-code">.</span><span class="hl-identifier">clientHeight</span><span class="hl-code"> : </span><span class="hl-comment">// Standards
+                        </span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">body</span><span class="hl-code">.</span><span class="hl-identifier">clientHeight</span><span class="hl-code">; </span><span class="hl-comment">// Quirks
+            </span><span class="hl-brackets">}
+
+            </span><span class="hl-reserved">return </span><span class="hl-identifier">height</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+        </span><span class="hl-comment">/**
+         * Returns the current width of the viewport.
+         * @method getViewportWidth
+         * @return {Int} The width of the viewable area of the page (excludes scrollbars).
+         */
+
+        </span><span class="hl-identifier">getViewportWidth</span><span class="hl-code">: </span><span class="hl-reserved">function</span><span class="hl-brackets">() {
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">width</span><span class="hl-code"> = </span><span class="hl-identifier">self</span><span class="hl-code">.</span><span class="hl-identifier">innerWidth</span><span class="hl-code">;  </span><span class="hl-comment">// Safari
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">mode</span><span class="hl-code"> = </span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">compatMode</span><span class="hl-code">;
+
+            </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">mode</span><span class="hl-code"> || </span><span class="hl-identifier">isIE</span><span class="hl-brackets">) { </span><span class="hl-comment">// IE, Gecko, Opera
+                </span><span class="hl-identifier">width</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-identifier">mode</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">CSS1Compat</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code"> ?
+                        </span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">documentElement</span><span class="hl-code">.</span><span class="hl-identifier">clientWidth</span><span class="hl-code"> : </span><span class="hl-comment">// Standards
+                        </span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">body</span><span class="hl-code">.</span><span class="hl-identifier">clientWidth</span><span class="hl-code">; </span><span class="hl-comment">// Quirks
+            </span><span class="hl-brackets">}
+            </span><span class="hl-reserved">return </span><span class="hl-identifier">width</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-code">)</span><span class="hl-brackets">()</span><span class="hl-code">;
+</span><span class="hl-comment">/**
+ * A region is a representation of an object on a grid.  It is defined
+ * by the top, right, bottom, left extents, so is rectangular by default.  If
+ * other shapes are required, this class could be extended to support it.
+ * @namespace YAHOO.util
+ * @class Region
+ * @param {Int} t the top extent
+ * @param {Int} r the right extent
+ * @param {Int} b the bottom extent
+ * @param {Int} l the left extent
+ * @constructor
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Region</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">t</span><span class="hl-code">, </span><span class="hl-identifier">r</span><span class="hl-code">, </span><span class="hl-identifier">b</span><span class="hl-code">, </span><span class="hl-identifier">l</span><span class="hl-brackets">) {
+
+    </span><span class="hl-comment">/**
+     * The region's top extent
+     * @property top
+     * @type Int
+     */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">top</span><span class="hl-code"> = </span><span class="hl-identifier">t</span><span class="hl-code">;
+
+    </span><span class="hl-comment">/**
+     * The region's top extent as index, for symmetry with set/getXY
+     * @property 1
+     * @type Int
+     */
+    </span><span class="hl-reserved">this</span><span class="hl-brackets">[</span><span class="hl-number">1</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-identifier">t</span><span class="hl-code">;
+
+    </span><span class="hl-comment">/**
+     * The region's right extent
+     * @property right
+     * @type int
+     */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">right</span><span class="hl-code"> = </span><span class="hl-identifier">r</span><span class="hl-code">;
+
+    </span><span class="hl-comment">/**
+     * The region's bottom extent
+     * @property bottom
+     * @type Int
+     */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">bottom</span><span class="hl-code"> = </span><span class="hl-identifier">b</span><span class="hl-code">;
+
+    </span><span class="hl-comment">/**
+     * The region's left extent
+     * @property left
+     * @type Int
+     */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">left</span><span class="hl-code"> = </span><span class="hl-identifier">l</span><span class="hl-code">;
+
+    </span><span class="hl-comment">/**
+     * The region's left extent as index, for symmetry with set/getXY
+     * @property 0
+     * @type Int
+     */
+    </span><span class="hl-reserved">this</span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-identifier">l</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-code">;
+
+</span><span class="hl-comment">/**
+ * Returns true if this region contains the region passed in
+ * @method contains
+ * @param  {Region}  region The region to evaluate
+ * @return {Boolean}        True if the region is contained with this region,
+ *                          else false
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Region</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">contains</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">region</span><span class="hl-brackets">) {
+    </span><span class="hl-reserved">return </span><span class="hl-brackets">( </span><span class="hl-identifier">region</span><span class="hl-code">.</span><span class="hl-identifier">left</span><span class="hl-code">   &gt;= </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">left</span><span class="hl-code">   &amp;&amp;
+             </span><span class="hl-identifier">region</span><span class="hl-code">.</span><span class="hl-identifier">right</span><span class="hl-code">  &lt;= </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">right</span><span class="hl-code">  &amp;&amp;
+             </span><span class="hl-identifier">region</span><span class="hl-code">.</span><span class="hl-identifier">top</span><span class="hl-code">    &gt;= </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">top</span><span class="hl-code">    &amp;&amp;
+             </span><span class="hl-identifier">region</span><span class="hl-code">.</span><span class="hl-identifier">bottom</span><span class="hl-code"> &lt;= </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">bottom    </span><span class="hl-brackets">)</span><span class="hl-code">;
+
+</span><span class="hl-brackets">}</span><span class="hl-code">;
+
+</span><span class="hl-comment">/**
+ * Returns the area of the region
+ * @method getArea
+ * @return {Int} the region's area
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Region</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">getArea</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">() {
+    </span><span class="hl-reserved">return </span><span class="hl-brackets">( (</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">bottom</span><span class="hl-code"> - </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">top</span><span class="hl-brackets">)</span><span class="hl-code"> * </span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">right</span><span class="hl-code"> - </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">left</span><span class="hl-brackets">) )</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-code">;
+
+</span><span class="hl-comment">/**
+ * Returns the region where the passed in region overlaps with this one
+ * @method intersect
+ * @param  {Region} region The region that intersects
+ * @return {Region}        The overlap region, or null if there is no overlap
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Region</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">intersect</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">region</span><span class="hl-brackets">) {
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">t</span><span class="hl-code"> = </span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">max</span><span class="hl-brackets">( </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">top</span><span class="hl-code">,    </span><span class="hl-identifier">region</span><span class="hl-code">.</span><span class="hl-identifier">top    </span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">r</span><span class="hl-code"> = </span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">min</span><span class="hl-brackets">( </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">right</span><span class="hl-code">,  </span><span class="hl-identifier">region</span><span class="hl-code">.</span><span class="hl-identifier">right  </span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">b</span><span class="hl-code"> = </span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">min</span><span class="hl-brackets">( </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">bottom</span><span class="hl-code">, </span><span class="hl-identifier">region</span><span class="hl-code">.</span><span class="hl-identifier">bottom </span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">l</span><span class="hl-code"> = </span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">max</span><span class="hl-brackets">( </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">left</span><span class="hl-code">,   </span><span class="hl-identifier">region</span><span class="hl-code">.</span><span class="hl-identifier">left   </span><span class="hl-brackets">)</span><span class="hl-code">;
+
+    </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">b</span><span class="hl-code"> &gt;= </span><span class="hl-identifier">t</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">r</span><span class="hl-code"> &gt;= </span><span class="hl-identifier">l</span><span class="hl-brackets">) {
+        </span><span class="hl-reserved">return new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Region</span><span class="hl-brackets">(</span><span class="hl-identifier">t</span><span class="hl-code">, </span><span class="hl-identifier">r</span><span class="hl-code">, </span><span class="hl-identifier">b</span><span class="hl-code">, </span><span class="hl-identifier">l</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">} </span><span class="hl-reserved">else </span><span class="hl-brackets">{
+        </span><span class="hl-reserved">return null</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+}</span><span class="hl-code">;
+
+</span><span class="hl-comment">/**
+ * Returns the region representing the smallest region that can contain both
+ * the passed in region and this region.
+ * @method union
+ * @param  {Region} region The region that to create the union with
+ * @return {Region}        The union region
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Region</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">union</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">region</span><span class="hl-brackets">) {
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">t</span><span class="hl-code"> = </span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">min</span><span class="hl-brackets">( </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">top</span><span class="hl-code">,    </span><span class="hl-identifier">region</span><span class="hl-code">.</span><span class="hl-identifier">top    </span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">r</span><span class="hl-code"> = </span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">max</span><span class="hl-brackets">( </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">right</span><span class="hl-code">,  </span><span class="hl-identifier">region</span><span class="hl-code">.</span><span class="hl-identifier">right  </span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">b</span><span class="hl-code"> = </span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">max</span><span class="hl-brackets">( </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">bottom</span><span class="hl-code">, </span><span class="hl-identifier">region</span><span class="hl-code">.</span><span class="hl-identifier">bottom </span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">l</span><span class="hl-code"> = </span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">min</span><span class="hl-brackets">( </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">left</span><span class="hl-code">,   </span><span class="hl-identifier">region</span><span class="hl-code">.</span><span class="hl-identifier">left   </span><span class="hl-brackets">)</span><span class="hl-code">;
+
+    </span><span class="hl-reserved">return new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Region</span><span class="hl-brackets">(</span><span class="hl-identifier">t</span><span class="hl-code">, </span><span class="hl-identifier">r</span><span class="hl-code">, </span><span class="hl-identifier">b</span><span class="hl-code">, </span><span class="hl-identifier">l</span><span class="hl-brackets">)</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-code">;
+
+</span><span class="hl-comment">/**
+ * toString
+ * @method toString
+ * @return string the region properties
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Region</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">toString</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">() {
+    </span><span class="hl-reserved">return </span><span class="hl-brackets">( </span><span class="hl-quotes">&quot;</span><span class="hl-string">Region {</span><span class="hl-quotes">&quot;</span><span class="hl-code">    +
+             </span><span class="hl-quotes">&quot;</span><span class="hl-string">top: </span><span class="hl-quotes">&quot;</span><span class="hl-code">       + </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">top</span><span class="hl-code">    +
+             </span><span class="hl-quotes">&quot;</span><span class="hl-string">, right: </span><span class="hl-quotes">&quot;</span><span class="hl-code">   + </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">right</span><span class="hl-code">  +
+             </span><span class="hl-quotes">&quot;</span><span class="hl-string">, bottom: </span><span class="hl-quotes">&quot;</span><span class="hl-code">  + </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">bottom</span><span class="hl-code"> +
+             </span><span class="hl-quotes">&quot;</span><span class="hl-string">, left: </span><span class="hl-quotes">&quot;</span><span class="hl-code">    + </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">left</span><span class="hl-code">   +
+             </span><span class="hl-quotes">&quot;</span><span class="hl-string">}</span><span class="hl-quotes">&quot; </span><span class="hl-brackets">)</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-code">;
+
+</span><span class="hl-comment">/**
+ * Returns a region that is occupied by the DOM element
+ * @method getRegion
+ * @param  {HTMLElement} el The element
+ * @return {Region}         The region that the element occupies
+ * @static
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Region</span><span class="hl-code">.</span><span class="hl-identifier">getRegion</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">) {
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">p</span><span class="hl-code"> = </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">getXY</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-brackets">)</span><span class="hl-code">;
+
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">t</span><span class="hl-code"> = </span><span class="hl-identifier">p</span><span class="hl-brackets">[</span><span class="hl-number">1</span><span class="hl-brackets">]</span><span class="hl-code">;
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">r</span><span class="hl-code"> = </span><span class="hl-identifier">p</span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code"> + </span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">offsetWidth</span><span class="hl-code">;
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">b</span><span class="hl-code"> = </span><span class="hl-identifier">p</span><span class="hl-brackets">[</span><span class="hl-number">1</span><span class="hl-brackets">]</span><span class="hl-code"> + </span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">offsetHeight</span><span class="hl-code">;
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">l</span><span class="hl-code"> = </span><span class="hl-identifier">p</span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code">;
+
+    </span><span class="hl-reserved">return new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Region</span><span class="hl-brackets">(</span><span class="hl-identifier">t</span><span class="hl-code">, </span><span class="hl-identifier">r</span><span class="hl-code">, </span><span class="hl-identifier">b</span><span class="hl-code">, </span><span class="hl-identifier">l</span><span class="hl-brackets">)</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-code">;
+
+</span><span class="hl-comment">/////////////////////////////////////////////////////////////////////////////
+
+/**
+ * A point is a region that is special in that it represents a single point on
+ * the grid.
+ * @namespace YAHOO.util
+ * @class Point
+ * @param {Int} x The X position of the point
+ * @param {Int} y The Y position of the point
+ * @constructor
+ * @extends YAHOO.util.Region
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Point</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">x</span><span class="hl-code">, </span><span class="hl-identifier">y</span><span class="hl-brackets">) {
+   </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">x </span><span class="hl-reserved">instanceof </span><span class="hl-builtin">Array</span><span class="hl-brackets">) { </span><span class="hl-comment">// accept output from Dom.getXY
+      </span><span class="hl-identifier">y</span><span class="hl-code"> = </span><span class="hl-identifier">x</span><span class="hl-brackets">[</span><span class="hl-number">1</span><span class="hl-brackets">]</span><span class="hl-code">;
+      </span><span class="hl-identifier">x</span><span class="hl-code"> = </span><span class="hl-identifier">x</span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code">;
+   </span><span class="hl-brackets">}
+
+    </span><span class="hl-comment">/**
+     * The X position of the point, which is also the right, left and index zero (for Dom.getXY symmetry)
+     * @property x
+     * @type Int
+     */
+
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">x</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">right</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">left</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-identifier">x</span><span class="hl-code">;
+
+    </span><span class="hl-comment">/**
+     * The Y position of the point, which is also the top, bottom and index one (for Dom.getXY symmetry)
+     * @property y
+     * @type Int
+     */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">y</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">top</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">bottom</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-brackets">[</span><span class="hl-number">1</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-identifier">y</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-code">;
+
+</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Point</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Region</span><span class="hl-brackets">()</span><span class="hl-code">;
+
+</span></pre></div><hr>Copyright &copy; 2006 Jack Slocum. All rights reserved.</body></html>

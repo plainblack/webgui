@@ -1,0 +1,296 @@
+<html><head><title>ContentPanels.js</title><link rel="stylesheet" type="text/css" href="../style.css" media="screen"/></head><body><div class="hl-main"><pre><span class="hl-comment">/**
+ * @class YAHOO.ext.ContentPanel
+ * @extends YAHOO.ext.util.Observable
+ * A basic ContentPanel element.
+ * @constructor
+ * Create a new ContentPanel.
+ * @param {String/HTMLElement/Element} el The container element for this panel
+ * @param {String/Object} config A string to set only the title or a config object
+ * @param {String} content (optional) Set the HTML content for this panel
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">ContentPanel</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">config</span><span class="hl-code">, </span><span class="hl-identifier">content</span><span class="hl-brackets">){
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">ContentPanel</span><span class="hl-code">.</span><span class="hl-identifier">superclass</span><span class="hl-code">.</span><span class="hl-identifier">constructor</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code"> = </span><span class="hl-identifier">getEl</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">config</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">config</span><span class="hl-code">.</span><span class="hl-identifier">autoCreate</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">config</span><span class="hl-code">.</span><span class="hl-identifier">autoCreate</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">object</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">config</span><span class="hl-code">.</span><span class="hl-identifier">autoCreate</span><span class="hl-code">.</span><span class="hl-identifier">id</span><span class="hl-brackets">){
+                </span><span class="hl-identifier">config</span><span class="hl-code">.</span><span class="hl-identifier">autoCreate</span><span class="hl-code">.</span><span class="hl-identifier">id</span><span class="hl-code"> = </span><span class="hl-identifier">el</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code"> = </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">DomHelper</span><span class="hl-code">.</span><span class="hl-identifier">append</span><span class="hl-brackets">(</span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">body</span><span class="hl-code">,
+                        </span><span class="hl-identifier">config</span><span class="hl-code">.</span><span class="hl-identifier">autoCreate</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code"> = </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">DomHelper</span><span class="hl-code">.</span><span class="hl-identifier">append</span><span class="hl-brackets">(</span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">body</span><span class="hl-code">,
+                        </span><span class="hl-brackets">{</span><span class="hl-identifier">tag</span><span class="hl-code">: </span><span class="hl-quotes">'</span><span class="hl-string">div</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-identifier">cls</span><span class="hl-code">: </span><span class="hl-quotes">'</span><span class="hl-string">ylayout-inactive-content</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-identifier">id</span><span class="hl-code">: </span><span class="hl-identifier">el</span><span class="hl-brackets">}</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">closable</span><span class="hl-code"> = </span><span class="hl-reserved">false</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">loaded</span><span class="hl-code"> = </span><span class="hl-reserved">false</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">active</span><span class="hl-code"> = </span><span class="hl-reserved">false</span><span class="hl-code">;
+    </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">config</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">string</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">title</span><span class="hl-code"> = </span><span class="hl-identifier">config</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+        </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Config</span><span class="hl-code">.</span><span class="hl-identifier">apply</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-identifier">config</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+    </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">resizeEl</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">resizeEl</span><span class="hl-code"> = </span><span class="hl-identifier">getEl</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">resizeEl</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">resizeEl</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">events</span><span class="hl-code"> = </span><span class="hl-brackets">{
+        </span><span class="hl-comment">/**
+         * @event activate
+         * Fires when this panel is activated. 
+         * @param {YAHOO.ext.ContentPanel} this
+         */
+        </span><span class="hl-quotes">'</span><span class="hl-string">activate</span><span class="hl-quotes">'</span><span class="hl-code"> : </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">CustomEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">activate</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">,
+        </span><span class="hl-comment">/**
+         * @event deactivate
+         * Fires when this panel is activated. 
+         * @param {YAHOO.ext.ContentPanel} this
+         */
+        </span><span class="hl-quotes">'</span><span class="hl-string">deactivate</span><span class="hl-quotes">'</span><span class="hl-code"> : </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">CustomEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">deactivate</span><span class="hl-quotes">'</span><span class="hl-brackets">) 
+    }</span><span class="hl-code">;
+    </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">content</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">setContent</span><span class="hl-brackets">(</span><span class="hl-identifier">content</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+}</span><span class="hl-default">;
+
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">extendX</span><span class="hl-brackets">(</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">ContentPanel</span><span class="hl-code">, </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Observable</span><span class="hl-code">, </span><span class="hl-brackets">{
+    </span><span class="hl-identifier">setRegion</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">region</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">region</span><span class="hl-code"> = </span><span class="hl-identifier">region</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">region</span><span class="hl-brackets">){
+           </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">replaceClass</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">ylayout-inactive-content</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">ylayout-active-content</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">; 
+        </span><span class="hl-brackets">}</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+           </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">replaceClass</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">ylayout-active-content</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">ylayout-inactive-content</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">; 
+        </span><span class="hl-brackets">} 
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Returns the toolbar for this Panel if one was configured
+     * @return {YAHOO.ext.Toolbar} 
+     */
+    </span><span class="hl-identifier">getToolbar</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">toolbar</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">setActiveState</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">active</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">active</span><span class="hl-code"> = </span><span class="hl-identifier">active</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">active</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">fireEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">deactivate</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">fireEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">activate</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Updates this panel's element
+     * @param {String} content The new content
+     * @param {&lt;i&gt;Boolean&lt;/i&gt;} loadScripts (optional) true to look for and process scripts
+    */
+    </span><span class="hl-identifier">setContent</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">content</span><span class="hl-code">, </span><span class="hl-identifier">loadScripts</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">update</span><span class="hl-brackets">(</span><span class="hl-identifier">content</span><span class="hl-code">, </span><span class="hl-identifier">loadScripts</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Get the {@link YAHOO.ext.UpdateManager} for this panel. Enables you to perform Ajax updates.
+     * @return {YAHOO.ext.UpdateManager} The UpdateManager
+     */
+    </span><span class="hl-identifier">getUpdateManager</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">getUpdateManager</span><span class="hl-brackets">()</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Set a URL to be used to load the content for this panel.
+     * @param {String/Function} url The url to load the content from or a function to call to get the url
+     * @param {&lt;i&gt;String/Object&lt;/i&gt;} params (optional) The string params for the update call or an object of the params. See {@link YAHOO.ext.UpdateManager#update} for more details. (Defaults to null)
+     * @param {&lt;i&gt;Boolean&lt;/i&gt;} loadOnce (optional) Whether to only load the content once. If this is false it makes the Ajax call every time this panel is activated. (Defaults to false)
+     * @return {YAHOO.ext.UpdateManager} The UpdateManager
+     */
+    </span><span class="hl-identifier">setUrl</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">url</span><span class="hl-code">, </span><span class="hl-identifier">params</span><span class="hl-code">, </span><span class="hl-identifier">loadOnce</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">refreshDelegate</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">removeListener</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">activate</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">refreshDelegate</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">refreshDelegate</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_handleRefresh</span><span class="hl-code">.</span><span class="hl-identifier">createDelegate</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-brackets">[</span><span class="hl-identifier">url</span><span class="hl-code">, </span><span class="hl-identifier">params</span><span class="hl-code">, </span><span class="hl-identifier">loadOnce</span><span class="hl-brackets">])</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">on</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">activate</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_handleRefresh</span><span class="hl-code">.</span><span class="hl-identifier">createDelegate</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-brackets">[</span><span class="hl-identifier">url</span><span class="hl-code">, </span><span class="hl-identifier">params</span><span class="hl-code">, </span><span class="hl-identifier">loadOnce</span><span class="hl-brackets">]))</span><span class="hl-code">;
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">getUpdateManager</span><span class="hl-brackets">()</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">_handleRefresh</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">url</span><span class="hl-code">, </span><span class="hl-identifier">params</span><span class="hl-code">, </span><span class="hl-identifier">loadOnce</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">loadOnce</span><span class="hl-code"> || !</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">loaded</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">updater</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">getUpdateManager</span><span class="hl-brackets">()</span><span class="hl-code">;
+            </span><span class="hl-identifier">updater</span><span class="hl-code">.</span><span class="hl-identifier">update</span><span class="hl-brackets">(</span><span class="hl-identifier">url</span><span class="hl-code">, </span><span class="hl-identifier">params</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_setLoaded</span><span class="hl-code">.</span><span class="hl-identifier">createDelegate</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-brackets">))</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">_setLoaded</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">loaded</span><span class="hl-code"> = </span><span class="hl-reserved">true</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">, 
+    
+    </span><span class="hl-comment">/**
+     * Returns this panel's id
+     * @return {String} 
+     */
+    </span><span class="hl-identifier">getId</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">id</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Returns this panel's element
+     * @return {YAHOO.ext.Element} 
+     */
+    </span><span class="hl-identifier">getEl</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">adjustForComponents</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">width</span><span class="hl-code">, </span><span class="hl-identifier">height</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">toolbar</span><span class="hl-brackets">){
+            </span><span class="hl-identifier">height</span><span class="hl-code"> -= </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">toolbar</span><span class="hl-code">.</span><span class="hl-identifier">getEl</span><span class="hl-brackets">()</span><span class="hl-code">.</span><span class="hl-identifier">getHeight</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">return </span><span class="hl-brackets">{</span><span class="hl-quotes">'</span><span class="hl-string">width</span><span class="hl-quotes">'</span><span class="hl-code">: </span><span class="hl-identifier">width</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">height</span><span class="hl-quotes">'</span><span class="hl-code">: </span><span class="hl-identifier">height</span><span class="hl-brackets">}</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">setSize</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">width</span><span class="hl-code">, </span><span class="hl-identifier">height</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">fitToFrame</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">size</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">adjustForComponents</span><span class="hl-brackets">(</span><span class="hl-identifier">width</span><span class="hl-code">, </span><span class="hl-identifier">height</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">resizeEl</span><span class="hl-code">.</span><span class="hl-identifier">setSize</span><span class="hl-brackets">(</span><span class="hl-identifier">size</span><span class="hl-code">.</span><span class="hl-identifier">width</span><span class="hl-code">, </span><span class="hl-identifier">size</span><span class="hl-code">.</span><span class="hl-identifier">height</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Returns this panel's title
+     * @return {String} 
+     */
+    </span><span class="hl-identifier">getTitle</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">title</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Set this panel's title
+     * @param {String} title
+     */
+    </span><span class="hl-identifier">setTitle</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">title</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">title</span><span class="hl-code"> = </span><span class="hl-identifier">title</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">region</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">region</span><span class="hl-code">.</span><span class="hl-identifier">updatePanelTitle</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-identifier">title</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Returns true is this panel was configured to be closable
+     * @return {Boolean} 
+     */
+    </span><span class="hl-identifier">isClosable</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">closable</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">beforeSlide</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">clip</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">resizeEl</span><span class="hl-code">.</span><span class="hl-identifier">clip</span><span class="hl-brackets">()</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">afterSlide</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">unclip</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">resizeEl</span><span class="hl-code">.</span><span class="hl-identifier">unclip</span><span class="hl-brackets">()</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Destroys this panel
+     */
+    </span><span class="hl-identifier">destroy</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">removeAllListeners</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">tempEl</span><span class="hl-code"> = </span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">createElement</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">span</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-identifier">tempEl</span><span class="hl-code">.</span><span class="hl-identifier">appendChild</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-identifier">tempEl</span><span class="hl-code">.</span><span class="hl-identifier">innerHTML</span><span class="hl-code"> = </span><span class="hl-quotes">''</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code"> = </span><span class="hl-reserved">null</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+})</span><span class="hl-default">;
+
+</span><span class="hl-comment">/**
+ * @class YAHOO.ext.GridPanel
+ * @extends YAHOO.ext.ContentPanel
+ * @constructor
+ * Create a new GridPanel.
+ * @param {YAHOO.ext.grid.Grid} grid The grid for this panel
+ * @param {String/Object} config A string to set only the title or a config object
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">GridPanel</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">grid</span><span class="hl-code">, </span><span class="hl-identifier">config</span><span class="hl-brackets">){
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">wrapper</span><span class="hl-code"> = </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">DomHelper</span><span class="hl-code">.</span><span class="hl-identifier">append</span><span class="hl-brackets">(</span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">body</span><span class="hl-code">, </span><span class="hl-comment">// wrapper for IE7 strict &amp; safari scroll issue
+        </span><span class="hl-brackets">{</span><span class="hl-identifier">tag</span><span class="hl-code">: </span><span class="hl-quotes">'</span><span class="hl-string">div</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-identifier">cls</span><span class="hl-code">: </span><span class="hl-quotes">'</span><span class="hl-string">ylayout-grid-wrapper ylayout-inactive-content</span><span class="hl-quotes">'</span><span class="hl-brackets">}</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">wrapper</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-code">.</span><span class="hl-identifier">appendChild</span><span class="hl-brackets">(</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">container</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">GridPanel</span><span class="hl-code">.</span><span class="hl-identifier">superclass</span><span class="hl-code">.</span><span class="hl-identifier">constructor</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">wrapper</span><span class="hl-code">, </span><span class="hl-identifier">config</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">toolbar</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">toolbar</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">insertBefore</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">wrapper</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-code">.</span><span class="hl-identifier">firstChild</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+    </span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">monitorWindowResize</span><span class="hl-code"> = </span><span class="hl-reserved">false</span><span class="hl-code">; </span><span class="hl-comment">// turn off autosizing
+    </span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">autoHeight</span><span class="hl-code"> = </span><span class="hl-reserved">false</span><span class="hl-code">;
+    </span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">autoWidth</span><span class="hl-code"> = </span><span class="hl-reserved">false</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code"> = </span><span class="hl-identifier">grid</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">container</span><span class="hl-code">.</span><span class="hl-identifier">replaceClass</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">ylayout-inactive-content</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">ylayout-component-panel</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-default">;
+
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">extendX</span><span class="hl-brackets">(</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">GridPanel</span><span class="hl-code">, </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">ContentPanel</span><span class="hl-code">, </span><span class="hl-brackets">{
+    </span><span class="hl-identifier">getId</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">id</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Returns the grid for this panel
+     * @return {YAHOO.ext.grid.Grid} 
+     */
+    </span><span class="hl-identifier">getGrid</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">;    
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">setSize</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">width</span><span class="hl-code">, </span><span class="hl-identifier">height</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">grid</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">size</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">adjustForComponents</span><span class="hl-brackets">(</span><span class="hl-identifier">width</span><span class="hl-code">, </span><span class="hl-identifier">height</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">container</span><span class="hl-code">.</span><span class="hl-identifier">setSize</span><span class="hl-brackets">(</span><span class="hl-identifier">size</span><span class="hl-code">.</span><span class="hl-identifier">width</span><span class="hl-code">, </span><span class="hl-identifier">size</span><span class="hl-code">.</span><span class="hl-identifier">height</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">autoSize</span><span class="hl-brackets">()</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">beforeSlide</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">getView</span><span class="hl-brackets">()</span><span class="hl-code">.</span><span class="hl-identifier">wrapEl</span><span class="hl-code">.</span><span class="hl-identifier">clip</span><span class="hl-brackets">()</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">afterSlide</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">getView</span><span class="hl-brackets">()</span><span class="hl-code">.</span><span class="hl-identifier">wrapEl</span><span class="hl-code">.</span><span class="hl-identifier">unclip</span><span class="hl-brackets">()</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">destroy</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">getView</span><span class="hl-brackets">()</span><span class="hl-code">.</span><span class="hl-identifier">unplugDataModel</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">getDataModel</span><span class="hl-brackets">())</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">container</span><span class="hl-code">.</span><span class="hl-identifier">removeAllListeners</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">GridPanel</span><span class="hl-code">.</span><span class="hl-identifier">superclass</span><span class="hl-code">.</span><span class="hl-identifier">destroy</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+})</span><span class="hl-default">;
+
+
+</span><span class="hl-comment">/**
+ * @class YAHOO.ext.NestedLayoutPanel
+ * @extends YAHOO.ext.ContentPanel
+ * @constructor
+ * Create a new NestedLayoutPanel.
+ * @param {YAHOO.ext.BorderLayout} layout The layout for this panel
+ * @param {String/Object} config A string to set only the title or a config object
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">NestedLayoutPanel</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">layout</span><span class="hl-code">, </span><span class="hl-identifier">config</span><span class="hl-brackets">){
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">NestedLayoutPanel</span><span class="hl-code">.</span><span class="hl-identifier">superclass</span><span class="hl-code">.</span><span class="hl-identifier">constructor</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-identifier">layout</span><span class="hl-code">.</span><span class="hl-identifier">getEl</span><span class="hl-brackets">()</span><span class="hl-code">, </span><span class="hl-identifier">config</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-identifier">layout</span><span class="hl-code">.</span><span class="hl-identifier">monitorWindowResize</span><span class="hl-code"> = </span><span class="hl-reserved">false</span><span class="hl-code">; </span><span class="hl-comment">// turn off autosizing
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">layout</span><span class="hl-code"> = </span><span class="hl-identifier">layout</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">layout</span><span class="hl-code">.</span><span class="hl-identifier">getEl</span><span class="hl-brackets">()</span><span class="hl-code">.</span><span class="hl-identifier">addClass</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">ylayout-nested-layout</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-default">;
+
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">extendX</span><span class="hl-brackets">(</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">NestedLayoutPanel</span><span class="hl-code">, </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">ContentPanel</span><span class="hl-code">, </span><span class="hl-brackets">{
+    </span><span class="hl-identifier">setSize</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">width</span><span class="hl-code">, </span><span class="hl-identifier">height</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">size</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">adjustForComponents</span><span class="hl-brackets">(</span><span class="hl-identifier">width</span><span class="hl-code">, </span><span class="hl-identifier">height</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">layout</span><span class="hl-code">.</span><span class="hl-identifier">getEl</span><span class="hl-brackets">()</span><span class="hl-code">.</span><span class="hl-identifier">setSize</span><span class="hl-brackets">(</span><span class="hl-identifier">size</span><span class="hl-code">.</span><span class="hl-identifier">width</span><span class="hl-code">, </span><span class="hl-identifier">size</span><span class="hl-code">.</span><span class="hl-identifier">height</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">layout</span><span class="hl-code">.</span><span class="hl-identifier">layout</span><span class="hl-brackets">()</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Returns the nested BorderLayout for this panel
+     * @return {YAHOO.ext.BorderLayout} 
+     */
+    </span><span class="hl-identifier">getLayout</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">layout</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+})</span><span class="hl-default">;</span></pre></div><hr>Copyright &copy; 2006 Jack Slocum. All rights reserved.</body></html>

@@ -1,0 +1,342 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.util.Point</title>
+        <link rel="stylesheet" type="text/css" href="../reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.util.Point.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.util.Point</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.util</td></tr>
+            <tr><td class="label">Class:</td><td>Point</td></tr>
+                        <tr><td class="label">Extends:</td><td><a href="YAHOO.util.Region.html">Region</a></td></tr>
+                                    <tr><td class="label">Defined In:</td><td><a href="dom.js.html">dom.js</a></td></tr>
+        </table>
+        <div class="description">
+            A point is a region that is special in that it represents a single point on
+the grid.        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Property</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#1">1</a> : Int</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Region.html#1">Region</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The region's top extent as index, for symmetry with set/getXY</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#bottom">bottom</a> : Int</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Region.html#bottom">Region</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The region's bottom extent</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#left">left</a> : Int</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Region.html#left">Region</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The region's left extent</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#right">right</a> : int</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Region.html#right">Region</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The region's right extent</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#top">top</a> : Int</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Region.html#top">Region</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The region's top extent</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#x">x</a> : Int</td>
+        <td class="msource" rowspan="2">Point</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The X position of the point, which is also the right, left and index zero (for Dom.getXY symmetry)</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#y">y</a> : Int</td>
+        <td class="msource" rowspan="2">Point</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The Y position of the point, which is also the top, bottom and index one (for Dom.getXY symmetry)</td>
+    </tr>
+            </table>
+                <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#Point">Point</a>()</td>
+        <td class="msource" rowspan="2">Point</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#contains">contains</a>(<code>Region region</code>) : Boolean</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Region.html#contains">Region</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Returns true if this region contains the region passed in</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getArea">getArea</a>() : Int</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Region.html#getArea">Region</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Returns the area of the region</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getRegion">getRegion</a>(<code>HTMLElement el</code>) : Region</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Region.html#getRegion">Region</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Returns a region that is occupied by the DOM element</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#intersect">intersect</a>(<code>Region region</code>) : Region</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Region.html#intersect">Region</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Returns the region where the passed in region overlaps with this one</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#toString">toString</a>() : string</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Region.html#toString">Region</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">toString</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#union">union</a>(<code>Region region</code>) : Region</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Region.html#union">Region</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Returns the region representing the smallest region that can contain both
+the passed in region and this region.</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+        <div class="no-members">This class has no public events.</div>        
+                    <h2 class="mdetail-head">Property Details</h2>
+            <div class="detail-wrap">
+                            <a name="1"></a>
+                <div class="mdetail">
+                <h3>1</i></h3>
+                <code>public Int 1</code>
+                <div class="mdetail-desc">
+                    The region's top extent as index, for symmetry with set/getXY                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.util.Region.html#1">Region</a>.</div>
+                </div>
+                            <a name="bottom"></a>
+                <div class="mdetail alt">
+                <h3>bottom</i></h3>
+                <code>public Int bottom</code>
+                <div class="mdetail-desc">
+                    The region's bottom extent                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.util.Region.html#bottom">Region</a>.</div>
+                </div>
+                            <a name="left"></a>
+                <div class="mdetail">
+                <h3>left</i></h3>
+                <code>public Int left</code>
+                <div class="mdetail-desc">
+                    The region's left extent                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.util.Region.html#left">Region</a>.</div>
+                </div>
+                            <a name="right"></a>
+                <div class="mdetail alt">
+                <h3>right</i></h3>
+                <code>public int right</code>
+                <div class="mdetail-desc">
+                    The region's right extent                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.util.Region.html#right">Region</a>.</div>
+                </div>
+                            <a name="top"></a>
+                <div class="mdetail">
+                <h3>top</i></h3>
+                <code>public Int top</code>
+                <div class="mdetail-desc">
+                    The region's top extent                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.util.Region.html#top">Region</a>.</div>
+                </div>
+                            <a name="x"></a>
+                <div class="mdetail alt">
+                <h3>x</i></h3>
+                <code>public Int x</code>
+                <div class="mdetail-desc">
+                    The X position of the point, which is also the right, left and index zero (for Dom.getXY symmetry)                </div>
+                <div class="mdetail-def">This property is defined by Point.</div>
+                </div>
+                            <a name="y"></a>
+                <div class="mdetail">
+                <h3>y</i></h3>
+                <code>public Int y</code>
+                <div class="mdetail-desc">
+                    The Y position of the point, which is also the top, bottom and index one (for Dom.getXY symmetry)                </div>
+                <div class="mdetail-def">This property is defined by Point.</div>
+                </div>
+                        </div>
+                
+                    <a name="Point"></a>
+            <h2 class="mdetail-head">Constructor Details</h2>
+            <div class="detail-wrap">
+                <div class="mdetail">
+                <h3>Point</i></h3>
+                <code>public function Point()</code>
+                <div class="mdetail-desc">
+                                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                </div>
+            </div>
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="contains"></a>
+                <div class="mdetail">
+                <h3>contains</i></h3>
+                <code>public function contains(<code>Region region</code>)</code>
+                <div class="mdetail-desc">
+                    Returns true if this region contains the region passed in                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>region</code> : Region<div class="sub-desc">The region to evaluate</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">True if the region is contained with this region, else false</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Region.html#contains">Region</a>.</div>
+                </div>
+                            <a name="getArea"></a>
+                <div class="mdetail alt">
+                <h3>getArea</i></h3>
+                <code>public function getArea()</code>
+                <div class="mdetail-desc">
+                    Returns the area of the region                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Int</code><div class="sub-desc">the region's area</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Region.html#getArea">Region</a>.</div>
+                </div>
+                            <a name="getRegion"></a>
+                <div class="mdetail">
+                <h3>getRegion</i></h3>
+                <code>public function getRegion(<code>HTMLElement el</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Returns a region that is occupied by the DOM element                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>el</code> : HTMLElement<div class="sub-desc">The element</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Region</code><div class="sub-desc">The region that the element occupies</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Region.html#getRegion">Region</a>.</div>
+                </div>
+                            <a name="intersect"></a>
+                <div class="mdetail alt">
+                <h3>intersect</i></h3>
+                <code>public function intersect(<code>Region region</code>)</code>
+                <div class="mdetail-desc">
+                    Returns the region where the passed in region overlaps with this one                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>region</code> : Region<div class="sub-desc">The region that intersects</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Region</code><div class="sub-desc">The overlap region, or null if there is no overlap</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Region.html#intersect">Region</a>.</div>
+                </div>
+                            <a name="toString"></a>
+                <div class="mdetail">
+                <h3>toString</i></h3>
+                <code>public function toString()</code>
+                <div class="mdetail-desc">
+                    toString                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>string</code><div class="sub-desc">the region properties</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Region.html#toString">Region</a>.</div>
+                </div>
+                            <a name="union"></a>
+                <div class="mdetail alt">
+                <h3>union</i></h3>
+                <code>public function union(<code>Region region</code>)</code>
+                <div class="mdetail-desc">
+                    Returns the region representing the smallest region that can contain both
+the passed in region and this region.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>region</code> : Region<div class="sub-desc">The region that to create the union with</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Region</code><div class="sub-desc">The union region</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Region.html#union">Region</a>.</div>
+                </div>
+                        </div>
+                    
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    

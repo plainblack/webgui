@@ -1,0 +1,255 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.util.Connect</title>
+        <link rel="stylesheet" type="text/css" href="../resources/reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../resources/style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../resources/print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="../resources/print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.util.Connect.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.util.Connect</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.util</td></tr>
+            <tr><td class="label">Class:</td><td>Connect</td></tr>
+                        <tr><td class="label">Extends:</td><td>Object</td></tr>
+                                    <tr><td class="label">Defined In:</td><td><a href="connection.js.html">connection.js</a></td></tr>
+        </table>
+        <div class="description">
+                    </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+        <div class="no-members">This class has no public properties.</div>        <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#abort">abort</a>(<code>object o</code>, <code>object callback</code>, <code>string isTimeout</code>) : boolean</td>
+        <td class="msource" rowspan="2">Connect</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Method to terminate a transaction, if it has not reached readyState 4.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#asyncRequest">asyncRequest</a>(<code>string method</code>, <code>string uri</code>, <code>callback callback</code>, <code>string postData</code>) : object</td>
+        <td class="msource" rowspan="2">Connect</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Method for initiating an asynchronous request via the XHR object.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#initHeader">initHeader</a>(<code>string label</code>, <code>string value</code>) : void</td>
+        <td class="msource" rowspan="2">Connect</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Public method that stores the custom HTTP headers for each transaction.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#isCallInProgress">isCallInProgress</a>(<code>object o</code>) : boolean</td>
+        <td class="msource" rowspan="2">Connect</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Public method to check if the transaction is still being processed.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setDefaultPostHeader">setDefaultPostHeader</a>(<code>boolean b</code>) : void</td>
+        <td class="msource" rowspan="2">Connect</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Member to enable or disable the default POST header.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setForm">setForm</a>(<code>string ||</code>, <code>string optional</code>, <code>string ||</code>) : string</td>
+        <td class="msource" rowspan="2">Connect</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; This method assembles the form label and value pairs and
+constructs an encoded string.
+asyncRequest() ...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setPollingInterval">setPollingInterval</a>(<code>int i</code>) : void</td>
+        <td class="msource" rowspan="2">Connect</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Member to modify the default polling interval.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setProgId">setProgId</a>(<code>string id</code>) : void</td>
+        <td class="msource" rowspan="2">Connect</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Member to add an ActiveX id to the existing xml_progid array.
+In the event(unlikely) a new ActiveX id ...</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+        <div class="no-members">This class has no public events.</div>        
+                
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="abort"></a>
+                <div class="mdetail">
+                <h3>abort</i></h3>
+                <code>public function abort(<code>object o</code>, <code>object callback</code>, <code>string isTimeout</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Method to terminate a transaction, if it has not reached readyState 4.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>o</code> : object<div class="sub-desc">The connection object returned by asyncRequest.</div></li><li><code>callback</code> : object<div class="sub-desc">User-defined callback object.</div></li><li><code>isTimeout</code> : string<div class="sub-desc">boolean to indicate if abort was a timeout.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>boolean</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Connect.</div>
+                </div>
+                            <a name="asyncRequest"></a>
+                <div class="mdetail alt">
+                <h3>asyncRequest</i></h3>
+                <code>public function asyncRequest(<code>string method</code>, <code>string uri</code>, <code>callback callback</code>, <code>string postData</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Method for initiating an asynchronous request via the XHR object.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>method</code> : string<div class="sub-desc">HTTP transaction method</div></li><li><code>uri</code> : string<div class="sub-desc">Fully qualified path of resource</div></li><li><code>callback</code> : callback<div class="sub-desc">User-defined callback function or object</div></li><li><code>postData</code> : string<div class="sub-desc">POST body</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>object</code><div class="sub-desc">Returns the connection object</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Connect.</div>
+                </div>
+                            <a name="initHeader"></a>
+                <div class="mdetail">
+                <h3>initHeader</i></h3>
+                <code>public function initHeader(<code>string label</code>, <code>string value</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Public method that stores the custom HTTP headers for each transaction.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>label</code> : string<div class="sub-desc">The HTTP header label</div></li><li><code>value</code> : string<div class="sub-desc">The HTTP header value</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Connect.</div>
+                </div>
+                            <a name="isCallInProgress"></a>
+                <div class="mdetail alt">
+                <h3>isCallInProgress</i></h3>
+                <code>public function isCallInProgress(<code>object o</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Public method to check if the transaction is still being processed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>o</code> : object<div class="sub-desc">The connection object returned by asyncRequest</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>boolean</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Connect.</div>
+                </div>
+                            <a name="setDefaultPostHeader"></a>
+                <div class="mdetail">
+                <h3>setDefaultPostHeader</i></h3>
+                <code>public function setDefaultPostHeader(<code>boolean b</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Member to enable or disable the default POST header.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>b</code> : boolean<div class="sub-desc">Set and use default header - true or false .</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Connect.</div>
+                </div>
+                            <a name="setForm"></a>
+                <div class="mdetail alt">
+                <h3>setForm</i></h3>
+                <code>public function setForm(<code>string ||</code>, <code>string optional</code>, <code>string ||</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; This method assembles the form label and value pairs and
+constructs an encoded string.
+asyncRequest() will automatically initialize the
+transaction with a HTTP header Content-Type of
+application/x-www-form-urlencoded.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>||</code> : string<div class="sub-desc">object} form id or name attribute, or form object.</div></li><li><code>optional</code> : string<div class="sub-desc">boolean to indicate SSL environment.</div></li><li><code>||</code> : string<div class="sub-desc">boolean} optional qualified path of iframe resource for SSL in IE.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>string</code><div class="sub-desc">string of the HTML form field name and value pairs..</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Connect.</div>
+                </div>
+                            <a name="setPollingInterval"></a>
+                <div class="mdetail">
+                <h3>setPollingInterval</i></h3>
+                <code>public function setPollingInterval(<code>int i</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Member to modify the default polling interval.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>i</code> : int<div class="sub-desc">The polling interval in milliseconds.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Connect.</div>
+                </div>
+                            <a name="setProgId"></a>
+                <div class="mdetail alt">
+                <h3>setProgId</i></h3>
+                <code>public function setProgId(<code>string id</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Member to add an ActiveX id to the existing xml_progid array.
+In the event(unlikely) a new ActiveX id is introduced, it can be added
+without internal code modifications.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>id</code> : string<div class="sub-desc">The ActiveX id to be added to initialize the XHR object.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Connect.</div>
+                </div>
+                        </div>
+                    
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    

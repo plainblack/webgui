@@ -1,0 +1,199 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.ext.Toolbar</title>
+        <link rel="stylesheet" type="text/css" href="../resources/reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../resources/style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../resources/print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="../resources/print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.ext.Toolbar.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.ext.Toolbar</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.ext</td></tr>
+            <tr><td class="label">Class:</td><td>Toolbar</td></tr>
+                        <tr><td class="label">Extends:</td><td>Object</td></tr>
+                                    <tr><td class="label">Defined In:</td><td><a href="Toolbar.js.html">Toolbar.js</a></td></tr>
+        </table>
+        <div class="description">
+            Basic Toolbar used by the Grid to create the paging toolbar. This class is reusable but functionality
+is limited. Look for more functionality in a future version.        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+        <div class="no-members">This class has no public properties.</div>        <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#add">add</a>(<code>Mixed arg</code>) : void</td>
+        <td class="msource" rowspan="2">Toolbar</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Adds element(s) to the toolbar - this function takes a variable number of 
+arguments of mixed type and adds them to t...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#addButton">addButton</a>(<code>Object/Array config</code>) : YAHOO.ext.ToolbarButton/Array</td>
+        <td class="msource" rowspan="2">Toolbar</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Add a button (or buttons), see <a href="YAHOO.ext.ToolbarButton.html">YAHOO.ext.ToolbarButton</a> for more info on the config</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#addSeparator">addSeparator</a>() : void</td>
+        <td class="msource" rowspan="2">Toolbar</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Adds a separator</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#addText">addText</a>(<code>String text</code>) : HTMLElement</td>
+        <td class="msource" rowspan="2">Toolbar</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Adds text to the toolbar</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getEl">getEl</a>() : YAHOO.ext.Element</td>
+        <td class="msource" rowspan="2">Toolbar</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Returns the element for this toolbar</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#insertButton">insertButton</a>(<code>Number index</code>, <code>Object/Array config</code>) : YAHOO.ext.ToolbarButton/Array</td>
+        <td class="msource" rowspan="2">Toolbar</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Inserts a button (or buttons) at the specified index</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+        <div class="no-members">This class has no public events.</div>        
+                
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="add"></a>
+                <div class="mdetail">
+                <h3>add</i></h3>
+                <code>public function add(<code>Mixed arg</code>)</code>
+                <div class="mdetail-desc">
+                    Adds element(s) to the toolbar - this function takes a variable number of 
+arguments of mixed type and adds them to the toolbar...                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>arg</code> : Mixed<div class="sub-desc">If arg is a ToolbarButton, it is added. If arg is a string, it is wrapped in a ytb-text element and added unless the text is "separator" in which case a separator is added. Otherwise, it is assumed the element is an HTMLElement and it is added directly.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Toolbar.</div>
+                </div>
+                            <a name="addButton"></a>
+                <div class="mdetail alt">
+                <h3>addButton</i></h3>
+                <code>public function addButton(<code>Object/Array config</code>)</code>
+                <div class="mdetail-desc">
+                    Add a button (or buttons), see <a href="YAHOO.ext.ToolbarButton.html">YAHOO.ext.ToolbarButton</a> for more info on the config                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>config</code> : Object/Array<div class="sub-desc">A button config or array of configs</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>YAHOO.ext.ToolbarButton/Array</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Toolbar.</div>
+                </div>
+                            <a name="addSeparator"></a>
+                <div class="mdetail">
+                <h3>addSeparator</i></h3>
+                <code>public function addSeparator()</code>
+                <div class="mdetail-desc">
+                    Adds a separator                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Toolbar.</div>
+                </div>
+                            <a name="addText"></a>
+                <div class="mdetail alt">
+                <h3>addText</i></h3>
+                <code>public function addText(<code>String text</code>)</code>
+                <div class="mdetail-desc">
+                    Adds text to the toolbar                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>text</code> : String<div class="sub-desc">The text to add</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>HTMLElement</code><div class="sub-desc">The span element created which you can use to update the text.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Toolbar.</div>
+                </div>
+                            <a name="getEl"></a>
+                <div class="mdetail">
+                <h3>getEl</i></h3>
+                <code>public function getEl()</code>
+                <div class="mdetail-desc">
+                    Returns the element for this toolbar                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>YAHOO.ext.Element</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Toolbar.</div>
+                </div>
+                            <a name="insertButton"></a>
+                <div class="mdetail alt">
+                <h3>insertButton</i></h3>
+                <code>public function insertButton(<code>Number index</code>, <code>Object/Array config</code>)</code>
+                <div class="mdetail-desc">
+                    Inserts a button (or buttons) at the specified index                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>index</code> : Number<div class="sub-desc">The index where the buttons are to be inserted</div></li><li><code>config</code> : Object/Array<div class="sub-desc">A button config or array of configs</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>YAHOO.ext.ToolbarButton/Array</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Toolbar.</div>
+                </div>
+                        </div>
+                    
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    

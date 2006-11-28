@@ -1,0 +1,1438 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.widget.HTMLNode</title>
+        <link rel="stylesheet" type="text/css" href="../reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.widget.HTMLNode.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.widget.HTMLNode</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.widget</td></tr>
+            <tr><td class="label">Class:</td><td>HTMLNode</td></tr>
+                        <tr><td class="label">Extends:</td><td><a href="YAHOO.widget.Node.html">Node</a></td></tr>
+                                    <tr><td class="label">Defined In:</td><td><a href="treeview.js.html">treeview.js</a></td></tr>
+        </table>
+        <div class="description">
+            This implementation takes either a string or object for the
+oData argument.  If is it a string, we will use it for the display
+of this node (and it can contain any html code).  If the parameter
+is an object, we look for a parameter called "html" that will be
+used for this node's display.        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Property</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#children">children</a> : Node[]</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#children">Node</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">This node's child node collection.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#childrenRendered">childrenRendered</a> : boolean</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#childrenRendered">Node</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">This flag is set to true when the html is generated for this node's
+children, and set to false when new children are ...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#content">content</a> : string</td>
+        <td class="msource" rowspan="2">HTMLNode</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The HTML content to use for this node's display</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#contentElId">contentElId</a> : string</td>
+        <td class="msource" rowspan="2">HTMLNode</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The generated id that will contain the data passed in by the implementer.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#contentStyle">contentStyle</a> : string</td>
+        <td class="msource" rowspan="2">HTMLNode</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The CSS class for the html content container.  Defaults to ygtvhtml, but 
+can be overridden to provide a custom prese...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#data">data</a> : object</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#data">Node</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The data linked to this node.  This can be any object or primitive
+value, and the data can be used in getNodeHtml().</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#dataLoader">dataLoader</a> : function</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#dataLoader">Node</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Function to execute when we need to get this node's child data.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#depth">depth</a> : int</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#depth">Node</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The depth of this node.  We start at -1 for the root node.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#dynamicLoadComplete">dynamicLoadComplete</a> : boolean</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#dynamicLoadComplete">Node</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Dynamically loaded nodes only fetch the data the first time they are
+expanded.  This flag is set to true once the dat...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#expanded">expanded</a> : boolean</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#expanded">Node</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The node's expanded/collapsed state</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#hasIcon">hasIcon</a> : boolean</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#hasIcon">Node</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The toggle/branch icon will not show if this is set to false.  This
+could be useful if the implementer wants to have ...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#href">href</a> : string</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#href">Node</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The href for the node's label.  If one is not specified, the href will
+be set so that it toggles the node.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#iconMode">iconMode</a> : int</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#iconMode">Node</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Used to configure what happens when a dynamic load node is expanded
+and we discover that it does not have children.  ...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#index">index</a> : int</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#index">Node</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The index for this instance obtained from global counter in YAHOO.widget.TreeView.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#initContent">initContent</a> : Object</td>
+        <td class="msource" rowspan="2">HTMLNode</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Sets up the node label</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#isLoading">isLoading</a> : boolean</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#isLoading">Node</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">This is true for dynamically loading nodes while waiting for the
+callback to return.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#multiExpand">multiExpand</a> : boolean</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#multiExpand">Node</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Can multiple children be expanded at once?</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#nextSibling">nextSibling</a> : Node</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#nextSibling">Node</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">This node's next sibling</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#parent">parent</a> : Node</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#parent">Node</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Parent node</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#previousSibling">previousSibling</a> : Node</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#previousSibling">Node</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">This node's previous sibling</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#renderHidden">renderHidden</a> : boolean</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#renderHidden">Node</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Should we render children for a collapsed node?  It is possible that the
+implementer will want to render the hidden d...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#target">target</a> : string</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#target">Node</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The label href target, defaults to current window</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#tree">tree</a> : TreeView</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#tree">Node</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Tree instance this node is part of</td>
+    </tr>
+            </table>
+                <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#HTMLNode">HTMLNode</a>(<code>oData {object}</code>, <code>oParent {YAHOO.widget.Node}</code>, <code>expanded {boolean}</code>, <code>hasIcon {boolean}</code>)</td>
+        <td class="msource" rowspan="2">HTMLNode</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#appendTo">appendTo</a>(<code>parentNode {Node}</code>) : Node</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#appendTo">Node</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Appends this node to the supplied node's child collection</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#applyParent">applyParent</a>(<code>Node parentNode</code>) : boolean</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#applyParent">Node</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Certain properties for the node cannot be set until the parent
+is known. This is called after the node is inserted in...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#collapse">collapse</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#collapse">Node</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Hides this nodes children (creating them if necessary), changes the
+toggle style.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#collapseAll">collapseAll</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#collapseAll">Node</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Recursively collapses all of this node's children.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#completeRender">completeRender</a>() : string</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#completeRender">Node</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Called when we know we have all the child data.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#expand">expand</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#expand">Node</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Shows this nodes children (creating them if necessary), changes the
+toggle style, and collapses its siblings if multi...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#expandAll">expandAll</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#expandAll">Node</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Recursively expands all of this node's children.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getAncestor">getAncestor</a>(<code>int depth</code>) : Node</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#getAncestor">Node</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Returns this node's ancestor at the specified depth.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getChildrenEl">getChildrenEl</a>() : HTMLElement</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#getChildrenEl">Node</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Returns the div that was generated for this node's children</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getChildrenElId">getChildrenElId</a>() : string</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#getChildrenElId">Node</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Returns the id for this node's children div</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getContentEl">getContentEl</a>() : HTMLElement</td>
+        <td class="msource" rowspan="2">HTMLNode</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Returns the outer html element for this node's content</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getDepthStyle">getDepthStyle</a>(<code>int depth</code>) : string</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#getDepthStyle">Node</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Returns the css class for the spacer at the specified depth for
+this node.  If this node's ancestor at the specified ...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getEl">getEl</a>() : HTMLElement</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#getEl">Node</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Returns this node's container html element</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getElId">getElId</a>() : string</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#getElId">Node</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Returns the id for this node's container div</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getHoverStyle">getHoverStyle</a>() : string</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#getHoverStyle">Node</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Returns the hover style for the icon</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getHtml">getHtml</a>() : string</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#getHtml">Node</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Returns the markup for this node and its children.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getIconMode">getIconMode</a>() : int</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#getIconMode">Node</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Returns the current icon mode.  This refers to the way childless dynamic
+load nodes appear.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getNodeHtml">getNodeHtml</a>() : string</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#getNodeHtml">Node</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Get the markup for the node.  This is designed to be overrided so that we can
+support different types of nodes.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getSiblings">getSiblings</a>() : Node[]</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#getSiblings">Node</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Returns a node array of this node's siblings, null if none.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getStyle">getStyle</a>() : string</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#getStyle">Node</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Returns the css style name for the toggle</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getToggleEl">getToggleEl</a>() : HTMLElement</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#getToggleEl">Node</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Returns the element that is being used for this node's toggle.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getToggleElId">getToggleElId</a>() : string</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#getToggleElId">Node</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Returns the id for this node's toggle element</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getToggleLink">getToggleLink</a>() : string</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#getToggleLink">Node</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Generates the link that will invoke this node's toggle method</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#hasChildren">hasChildren</a>(<code>checkForLazyLoad {boolean}</code>) : boolean</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#hasChildren">Node</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Checks if this node has children.  If this node is lazy-loading and the
+children have not been rendered, we do not kn...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#hideChildren">hideChildren</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#hideChildren">Node</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Hides this node's children</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#init">init</a>(<code>oData {object}</code>, <code>oParent {Node}</code>, <code>expanded {boolean}</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#init">Node</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Initializes this node, gets some of the properties from the parent</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#insertAfter">insertAfter</a>(<code>node {Node}</code>) : Node</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#insertAfter">Node</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Inserts this node after the supplied node</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#insertBefore">insertBefore</a>(<code>node {Node}</code>) : Node</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#insertBefore">Node</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Inserts this node before this supplied node</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#isDynamic">isDynamic</a>() : boolean</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#isDynamic">Node</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Evaluates if this node's children should be loaded dynamically.  Looks for
+the property both in this instance and the...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#isRoot">isRoot</a>() : boolean</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#isRoot">Node</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Evaluates if this node is the root node of the tree</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#loadComplete">loadComplete</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#loadComplete">Node</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Load complete is the callback function we pass to the data provider
+in dynamic load situations.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#refresh">refresh</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#refresh">Node</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Regenerates the html for this node and its children.  To be used when the
+node is expanded and new children have been...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setDynamicLoad">setDynamicLoad</a>(<code>fmDataLoader {function}</code>, <code>iconMode {int}</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#setDynamicLoad">Node</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Configures this node for dynamically obtaining the child data
+when the node is first expanded.  Calling it without th...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#showChildren">showChildren</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#showChildren">Node</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Shows this node's children</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#toString">toString</a>() : string</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#toString">Node</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Node toString</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#toggle">toggle</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#toggle">Node</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Expands if node is collapsed, collapses otherwise.</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Event</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#parentChange">parentChange</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Node.html#parentChange">Node</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The parentChange event is fired when a parent element is applied
+to the node.  This is useful if you need to apply tr...</td>
+    </tr>
+            </table>
+                
+                    <h2 class="mdetail-head">Property Details</h2>
+            <div class="detail-wrap">
+                            <a name="children"></a>
+                <div class="mdetail">
+                <h3>children</i></h3>
+                <code>public Node[] children</code>
+                <div class="mdetail-desc">
+                    This node's child node collection.                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Node.html#children">Node</a>.</div>
+                </div>
+                            <a name="childrenRendered"></a>
+                <div class="mdetail alt">
+                <h3>childrenRendered</i></h3>
+                <code>public boolean childrenRendered</code>
+                <div class="mdetail-desc">
+                    This flag is set to true when the html is generated for this node's
+children, and set to false when new children are added.                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Node.html#childrenRendered">Node</a>.</div>
+                </div>
+                            <a name="content"></a>
+                <div class="mdetail">
+                <h3>content</i></h3>
+                <code>public string content</code>
+                <div class="mdetail-desc">
+                    The HTML content to use for this node's display                </div>
+                <div class="mdetail-def">This property is defined by HTMLNode.</div>
+                </div>
+                            <a name="contentElId"></a>
+                <div class="mdetail alt">
+                <h3>contentElId</i></h3>
+                <code>public string contentElId</code>
+                <div class="mdetail-desc">
+                    The generated id that will contain the data passed in by the implementer.                </div>
+                <div class="mdetail-def">This property is defined by HTMLNode.</div>
+                </div>
+                            <a name="contentStyle"></a>
+                <div class="mdetail">
+                <h3>contentStyle</i></h3>
+                <code>public string contentStyle</code>
+                <div class="mdetail-desc">
+                    The CSS class for the html content container.  Defaults to ygtvhtml, but 
+can be overridden to provide a custom presentation for a specific node.                </div>
+                <div class="mdetail-def">This property is defined by HTMLNode.</div>
+                </div>
+                            <a name="data"></a>
+                <div class="mdetail alt">
+                <h3>data</i></h3>
+                <code>public object data</code>
+                <div class="mdetail-desc">
+                    The data linked to this node.  This can be any object or primitive
+value, and the data can be used in getNodeHtml().                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Node.html#data">Node</a>.</div>
+                </div>
+                            <a name="dataLoader"></a>
+                <div class="mdetail">
+                <h3>dataLoader</i></h3>
+                <code>public function dataLoader</code>
+                <div class="mdetail-desc">
+                    Function to execute when we need to get this node's child data.                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Node.html#dataLoader">Node</a>.</div>
+                </div>
+                            <a name="depth"></a>
+                <div class="mdetail alt">
+                <h3>depth</i></h3>
+                <code>public int depth</code>
+                <div class="mdetail-desc">
+                    The depth of this node.  We start at -1 for the root node.                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Node.html#depth">Node</a>.</div>
+                </div>
+                            <a name="dynamicLoadComplete"></a>
+                <div class="mdetail">
+                <h3>dynamicLoadComplete</i></h3>
+                <code>public boolean dynamicLoadComplete</code>
+                <div class="mdetail-desc">
+                    Dynamically loaded nodes only fetch the data the first time they are
+expanded.  This flag is set to true once the data has been fetched.                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Node.html#dynamicLoadComplete">Node</a>.</div>
+                </div>
+                            <a name="expanded"></a>
+                <div class="mdetail alt">
+                <h3>expanded</i></h3>
+                <code>public boolean expanded</code>
+                <div class="mdetail-desc">
+                    The node's expanded/collapsed state                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Node.html#expanded">Node</a>.</div>
+                </div>
+                            <a name="hasIcon"></a>
+                <div class="mdetail">
+                <h3>hasIcon</i></h3>
+                <code>public boolean hasIcon</code>
+                <div class="mdetail-desc">
+                    The toggle/branch icon will not show if this is set to false.  This
+could be useful if the implementer wants to have the child contain
+extra info about the parent, rather than an actual node.                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Node.html#hasIcon">Node</a>.</div>
+                </div>
+                            <a name="href"></a>
+                <div class="mdetail alt">
+                <h3>href</i></h3>
+                <code>public string href</code>
+                <div class="mdetail-desc">
+                    The href for the node's label.  If one is not specified, the href will
+be set so that it toggles the node.                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Node.html#href">Node</a>.</div>
+                </div>
+                            <a name="iconMode"></a>
+                <div class="mdetail">
+                <h3>iconMode</i></h3>
+                <code>public int iconMode</code>
+                <div class="mdetail-desc">
+                    Used to configure what happens when a dynamic load node is expanded
+and we discover that it does not have children.  By default, it is
+treated as if it still could have children (plus/minus icon).  Set
+iconMode to have it display like a leaf node instead.                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Node.html#iconMode">Node</a>.</div>
+                </div>
+                            <a name="index"></a>
+                <div class="mdetail alt">
+                <h3>index</i></h3>
+                <code>public int index</code>
+                <div class="mdetail-desc">
+                    The index for this instance obtained from global counter in YAHOO.widget.TreeView.                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Node.html#index">Node</a>.</div>
+                </div>
+                            <a name="initContent"></a>
+                <div class="mdetail">
+                <h3>initContent</i></h3>
+                <code>public Object initContent</code>
+                <div class="mdetail-desc">
+                    Sets up the node label                </div>
+                <div class="mdetail-def">This property is defined by HTMLNode.</div>
+                </div>
+                            <a name="isLoading"></a>
+                <div class="mdetail alt">
+                <h3>isLoading</i></h3>
+                <code>public boolean isLoading</code>
+                <div class="mdetail-desc">
+                    This is true for dynamically loading nodes while waiting for the
+callback to return.                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Node.html#isLoading">Node</a>.</div>
+                </div>
+                            <a name="multiExpand"></a>
+                <div class="mdetail">
+                <h3>multiExpand</i></h3>
+                <code>public boolean multiExpand</code>
+                <div class="mdetail-desc">
+                    Can multiple children be expanded at once?                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Node.html#multiExpand">Node</a>.</div>
+                </div>
+                            <a name="nextSibling"></a>
+                <div class="mdetail alt">
+                <h3>nextSibling</i></h3>
+                <code>public Node nextSibling</code>
+                <div class="mdetail-desc">
+                    This node's next sibling                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Node.html#nextSibling">Node</a>.</div>
+                </div>
+                            <a name="parent"></a>
+                <div class="mdetail">
+                <h3>parent</i></h3>
+                <code>public Node parent</code>
+                <div class="mdetail-desc">
+                    Parent node                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Node.html#parent">Node</a>.</div>
+                </div>
+                            <a name="previousSibling"></a>
+                <div class="mdetail alt">
+                <h3>previousSibling</i></h3>
+                <code>public Node previousSibling</code>
+                <div class="mdetail-desc">
+                    This node's previous sibling                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Node.html#previousSibling">Node</a>.</div>
+                </div>
+                            <a name="renderHidden"></a>
+                <div class="mdetail">
+                <h3>renderHidden</i></h3>
+                <code>public boolean renderHidden</code>
+                <div class="mdetail-desc">
+                    Should we render children for a collapsed node?  It is possible that the
+implementer will want to render the hidden data...  @todo verify that we 
+need this, and implement it if we do.                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Node.html#renderHidden">Node</a>.</div>
+                </div>
+                            <a name="target"></a>
+                <div class="mdetail alt">
+                <h3>target</i></h3>
+                <code>public string target</code>
+                <div class="mdetail-desc">
+                    The label href target, defaults to current window                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Node.html#target">Node</a>.</div>
+                </div>
+                            <a name="tree"></a>
+                <div class="mdetail">
+                <h3>tree</i></h3>
+                <code>public TreeView tree</code>
+                <div class="mdetail-desc">
+                    Tree instance this node is part of                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Node.html#tree">Node</a>.</div>
+                </div>
+                        </div>
+                
+                    <a name="HTMLNode"></a>
+            <h2 class="mdetail-head">Constructor Details</h2>
+            <div class="detail-wrap">
+                <div class="mdetail">
+                <h3>HTMLNode</i></h3>
+                <code>public function HTMLNode(<code>oData {object}</code>, <code>oParent {YAHOO.widget.Node}</code>, <code>expanded {boolean}</code>, <code>hasIcon {boolean}</code>)</code>
+                <div class="mdetail-desc">
+                                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>{object}</code> : oData<div class="sub-desc">a string or object containing the data that will be used to render this node</div></li><li><code>{YAHOO.widget.Node}</code> : oParent<div class="sub-desc">this node's parent node</div></li><li><code>{boolean}</code> : expanded<div class="sub-desc">the initial expanded/collapsed state</div></li><li><code>{boolean}</code> : hasIcon<div class="sub-desc">specifies whether or not leaf nodes should have an icon</div></li>                    </ul>
+                </div>
+                </div>
+                </div>
+            </div>
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="appendTo"></a>
+                <div class="mdetail">
+                <h3>appendTo</i></h3>
+                <code>public function appendTo(<code>parentNode {Node}</code>)</code>
+                <div class="mdetail-desc">
+                    Appends this node to the supplied node's child collection                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>{Node}</code> : parentNode<div class="sub-desc">the node to append to.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Node</code><div class="sub-desc">The appended node</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#appendTo">Node</a>.</div>
+                </div>
+                            <a name="applyParent"></a>
+                <div class="mdetail alt">
+                <h3>applyParent</i></h3>
+                <code>public function applyParent(<code>Node parentNode</code>)</code>
+                <div class="mdetail-desc">
+                    Certain properties for the node cannot be set until the parent
+is known. This is called after the node is inserted into a tree.
+the parent is also applied to this node's children in order to
+make it possible to move a branch from one tree to another.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>parentNode</code> : Node<div class="sub-desc">this node's parent node</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>boolean</code><div class="sub-desc">true if the application was successful</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#applyParent">Node</a>.</div>
+                </div>
+                            <a name="collapse"></a>
+                <div class="mdetail">
+                <h3>collapse</i></h3>
+                <code>public function collapse()</code>
+                <div class="mdetail-desc">
+                    Hides this nodes children (creating them if necessary), changes the
+toggle style.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#collapse">Node</a>.</div>
+                </div>
+                            <a name="collapseAll"></a>
+                <div class="mdetail alt">
+                <h3>collapseAll</i></h3>
+                <code>public function collapseAll()</code>
+                <div class="mdetail-desc">
+                    Recursively collapses all of this node's children.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#collapseAll">Node</a>.</div>
+                </div>
+                            <a name="completeRender"></a>
+                <div class="mdetail">
+                <h3>completeRender</i></h3>
+                <code>public function completeRender()</code>
+                <div class="mdetail-desc">
+                    Called when we know we have all the child data.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>string</code><div class="sub-desc">children html</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#completeRender">Node</a>.</div>
+                </div>
+                            <a name="expand"></a>
+                <div class="mdetail alt">
+                <h3>expand</i></h3>
+                <code>public function expand()</code>
+                <div class="mdetail-desc">
+                    Shows this nodes children (creating them if necessary), changes the
+toggle style, and collapses its siblings if multiExpand is not set.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#expand">Node</a>.</div>
+                </div>
+                            <a name="expandAll"></a>
+                <div class="mdetail">
+                <h3>expandAll</i></h3>
+                <code>public function expandAll()</code>
+                <div class="mdetail-desc">
+                    Recursively expands all of this node's children.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#expandAll">Node</a>.</div>
+                </div>
+                            <a name="getAncestor"></a>
+                <div class="mdetail alt">
+                <h3>getAncestor</i></h3>
+                <code>public function getAncestor(<code>int depth</code>)</code>
+                <div class="mdetail-desc">
+                    Returns this node's ancestor at the specified depth.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>depth</code> : int<div class="sub-desc">the depth of the ancestor.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Node</code><div class="sub-desc">the ancestor</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#getAncestor">Node</a>.</div>
+                </div>
+                            <a name="getChildrenEl"></a>
+                <div class="mdetail">
+                <h3>getChildrenEl</i></h3>
+                <code>public function getChildrenEl()</code>
+                <div class="mdetail-desc">
+                    Returns the div that was generated for this node's children                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>HTMLElement</code><div class="sub-desc">this node's children div</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#getChildrenEl">Node</a>.</div>
+                </div>
+                            <a name="getChildrenElId"></a>
+                <div class="mdetail alt">
+                <h3>getChildrenElId</i></h3>
+                <code>public function getChildrenElId()</code>
+                <div class="mdetail-desc">
+                    Returns the id for this node's children div                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>string</code><div class="sub-desc">the element id for this node's children div</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#getChildrenElId">Node</a>.</div>
+                </div>
+                            <a name="getContentEl"></a>
+                <div class="mdetail">
+                <h3>getContentEl</i></h3>
+                <code>public function getContentEl()</code>
+                <div class="mdetail-desc">
+                    Returns the outer html element for this node's content                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>HTMLElement</code><div class="sub-desc">the element</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by HTMLNode.</div>
+                </div>
+                            <a name="getDepthStyle"></a>
+                <div class="mdetail alt">
+                <h3>getDepthStyle</i></h3>
+                <code>public function getDepthStyle(<code>int depth</code>)</code>
+                <div class="mdetail-desc">
+                    Returns the css class for the spacer at the specified depth for
+this node.  If this node's ancestor at the specified depth
+has a next sibling the presentation is different than if it
+does not have a next sibling                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>depth</code> : int<div class="sub-desc">the depth of the ancestor.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>string</code><div class="sub-desc">the css class for the spacer</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#getDepthStyle">Node</a>.</div>
+                </div>
+                            <a name="getEl"></a>
+                <div class="mdetail">
+                <h3>getEl</i></h3>
+                <code>public function getEl()</code>
+                <div class="mdetail-desc">
+                    Returns this node's container html element                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>HTMLElement</code><div class="sub-desc">the container html element</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#getEl">Node</a>.</div>
+                </div>
+                            <a name="getElId"></a>
+                <div class="mdetail alt">
+                <h3>getElId</i></h3>
+                <code>public function getElId()</code>
+                <div class="mdetail-desc">
+                    Returns the id for this node's container div                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>string</code><div class="sub-desc">the element id</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#getElId">Node</a>.</div>
+                </div>
+                            <a name="getHoverStyle"></a>
+                <div class="mdetail">
+                <h3>getHoverStyle</i></h3>
+                <code>public function getHoverStyle()</code>
+                <div class="mdetail-desc">
+                    Returns the hover style for the icon                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>string</code><div class="sub-desc">the css class hover state</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#getHoverStyle">Node</a>.</div>
+                </div>
+                            <a name="getHtml"></a>
+                <div class="mdetail alt">
+                <h3>getHtml</i></h3>
+                <code>public function getHtml()</code>
+                <div class="mdetail-desc">
+                    Returns the markup for this node and its children.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>string</code><div class="sub-desc">the markup for this node and its expanded children.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#getHtml">Node</a>.</div>
+                </div>
+                            <a name="getIconMode"></a>
+                <div class="mdetail">
+                <h3>getIconMode</i></h3>
+                <code>public function getIconMode()</code>
+                <div class="mdetail-desc">
+                    Returns the current icon mode.  This refers to the way childless dynamic
+load nodes appear.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>int</code><div class="sub-desc">0 for collapse style, 1 for leaf node style</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#getIconMode">Node</a>.</div>
+                </div>
+                            <a name="getNodeHtml"></a>
+                <div class="mdetail alt">
+                <h3>getNodeHtml</i></h3>
+                <code>public function getNodeHtml()</code>
+                <div class="mdetail-desc">
+                    Get the markup for the node.  This is designed to be overrided so that we can
+support different types of nodes.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>string</code><div class="sub-desc">The HTML that will render this node.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#getNodeHtml">Node</a>.</div>
+                </div>
+                            <a name="getSiblings"></a>
+                <div class="mdetail">
+                <h3>getSiblings</i></h3>
+                <code>public function getSiblings()</code>
+                <div class="mdetail-desc">
+                    Returns a node array of this node's siblings, null if none.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Node[]</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#getSiblings">Node</a>.</div>
+                </div>
+                            <a name="getStyle"></a>
+                <div class="mdetail alt">
+                <h3>getStyle</i></h3>
+                <code>public function getStyle()</code>
+                <div class="mdetail-desc">
+                    Returns the css style name for the toggle                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>string</code><div class="sub-desc">the css class for this node's toggle</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#getStyle">Node</a>.</div>
+                </div>
+                            <a name="getToggleEl"></a>
+                <div class="mdetail">
+                <h3>getToggleEl</i></h3>
+                <code>public function getToggleEl()</code>
+                <div class="mdetail-desc">
+                    Returns the element that is being used for this node's toggle.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>HTMLElement</code><div class="sub-desc">this node's toggle html element</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#getToggleEl">Node</a>.</div>
+                </div>
+                            <a name="getToggleElId"></a>
+                <div class="mdetail alt">
+                <h3>getToggleElId</i></h3>
+                <code>public function getToggleElId()</code>
+                <div class="mdetail-desc">
+                    Returns the id for this node's toggle element                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>string</code><div class="sub-desc">the toggel element id</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#getToggleElId">Node</a>.</div>
+                </div>
+                            <a name="getToggleLink"></a>
+                <div class="mdetail">
+                <h3>getToggleLink</i></h3>
+                <code>public function getToggleLink()</code>
+                <div class="mdetail-desc">
+                    Generates the link that will invoke this node's toggle method                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>string</code><div class="sub-desc">the javascript url for toggling this node</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#getToggleLink">Node</a>.</div>
+                </div>
+                            <a name="hasChildren"></a>
+                <div class="mdetail alt">
+                <h3>hasChildren</i></h3>
+                <code>public function hasChildren(<code>checkForLazyLoad {boolean}</code>)</code>
+                <div class="mdetail-desc">
+                    Checks if this node has children.  If this node is lazy-loading and the
+children have not been rendered, we do not know whether or not there
+are actual children.  In most cases, we need to assume that there are
+children (for instance, the toggle needs to show the expandable 
+presentation state).  In other times we want to know if there are rendered
+children.  For the latter, "checkForLazyLoad" should be false.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>{boolean}</code> : checkForLazyLoad<div class="sub-desc">should we check for unloaded children?</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>boolean</code><div class="sub-desc">true if this has children or if it might and we are checking for this condition.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#hasChildren">Node</a>.</div>
+                </div>
+                            <a name="hideChildren"></a>
+                <div class="mdetail">
+                <h3>hideChildren</i></h3>
+                <code>public function hideChildren()</code>
+                <div class="mdetail-desc">
+                    Hides this node's children                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#hideChildren">Node</a>.</div>
+                </div>
+                            <a name="init"></a>
+                <div class="mdetail alt">
+                <h3>init</i></h3>
+                <code>public function init(<code>oData {object}</code>, <code>oParent {Node}</code>, <code>expanded {boolean}</code>)</code>
+                <div class="mdetail-desc">
+                    Initializes this node, gets some of the properties from the parent                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>{object}</code> : oData<div class="sub-desc">a string or object containing the data that will be used to render this node</div></li><li><code>{Node}</code> : oParent<div class="sub-desc">this node's parent node</div></li><li><code>{boolean}</code> : expanded<div class="sub-desc">the initial expanded/collapsed state</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#init">Node</a>.</div>
+                </div>
+                            <a name="insertAfter"></a>
+                <div class="mdetail">
+                <h3>insertAfter</i></h3>
+                <code>public function insertAfter(<code>node {Node}</code>)</code>
+                <div class="mdetail-desc">
+                    Inserts this node after the supplied node                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>{Node}</code> : node<div class="sub-desc">the node to insert after</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Node</code><div class="sub-desc">the inserted node</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#insertAfter">Node</a>.</div>
+                </div>
+                            <a name="insertBefore"></a>
+                <div class="mdetail alt">
+                <h3>insertBefore</i></h3>
+                <code>public function insertBefore(<code>node {Node}</code>)</code>
+                <div class="mdetail-desc">
+                    Inserts this node before this supplied node                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>{Node}</code> : node<div class="sub-desc">the node to insert this node before</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Node</code><div class="sub-desc">the inserted node</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#insertBefore">Node</a>.</div>
+                </div>
+                            <a name="isDynamic"></a>
+                <div class="mdetail">
+                <h3>isDynamic</i></h3>
+                <code>public function isDynamic()</code>
+                <div class="mdetail-desc">
+                    Evaluates if this node's children should be loaded dynamically.  Looks for
+the property both in this instance and the root node.  If the tree is
+defined to load all children dynamically, the data callback function is
+defined in the root node                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>boolean</code><div class="sub-desc">true if this node's children are to be loaded dynamically</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#isDynamic">Node</a>.</div>
+                </div>
+                            <a name="isRoot"></a>
+                <div class="mdetail alt">
+                <h3>isRoot</i></h3>
+                <code>public function isRoot()</code>
+                <div class="mdetail-desc">
+                    Evaluates if this node is the root node of the tree                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>boolean</code><div class="sub-desc">true if this is the root node</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#isRoot">Node</a>.</div>
+                </div>
+                            <a name="loadComplete"></a>
+                <div class="mdetail">
+                <h3>loadComplete</i></h3>
+                <code>public function loadComplete()</code>
+                <div class="mdetail-desc">
+                    Load complete is the callback function we pass to the data provider
+in dynamic load situations.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#loadComplete">Node</a>.</div>
+                </div>
+                            <a name="refresh"></a>
+                <div class="mdetail alt">
+                <h3>refresh</i></h3>
+                <code>public function refresh()</code>
+                <div class="mdetail-desc">
+                    Regenerates the html for this node and its children.  To be used when the
+node is expanded and new children have been added.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#refresh">Node</a>.</div>
+                </div>
+                            <a name="setDynamicLoad"></a>
+                <div class="mdetail">
+                <h3>setDynamicLoad</i></h3>
+                <code>public function setDynamicLoad(<code>fmDataLoader {function}</code>, <code>iconMode {int}</code>)</code>
+                <div class="mdetail-desc">
+                    Configures this node for dynamically obtaining the child data
+when the node is first expanded.  Calling it without the callback
+will turn off dynamic load for the node.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>{function}</code> : fmDataLoader<div class="sub-desc">the function that will be used to get the data.</div></li><li><code>{int}</code> : iconMode<div class="sub-desc">configures the icon that is displayed when a dynamic load node is expanded the first time without children. By default, the "collapse" icon will be used. If set to 1, the leaf node icon will be displayed.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#setDynamicLoad">Node</a>.</div>
+                </div>
+                            <a name="showChildren"></a>
+                <div class="mdetail alt">
+                <h3>showChildren</i></h3>
+                <code>public function showChildren()</code>
+                <div class="mdetail-desc">
+                    Shows this node's children                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#showChildren">Node</a>.</div>
+                </div>
+                            <a name="toString"></a>
+                <div class="mdetail">
+                <h3>toString</i></h3>
+                <code>public function toString()</code>
+                <div class="mdetail-desc">
+                    Node toString                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>string</code><div class="sub-desc">string representation of the node</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#toString">Node</a>.</div>
+                </div>
+                            <a name="toggle"></a>
+                <div class="mdetail alt">
+                <h3>toggle</i></h3>
+                <code>public function toggle()</code>
+                <div class="mdetail-desc">
+                    Expands if node is collapsed, collapses otherwise.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Node.html#toggle">Node</a>.</div>
+                </div>
+                        </div>
+                    
+                    <h2 class="mdetail-head">Event Details</h2>
+            <div class="detail-wrap">
+                            <a name="parentChange"></a>
+                <div class="mdetail">
+                <h3>parentChange</i></h3>
+                <code>public event parentChange</code>
+                <div class="mdetail-desc">
+                The parentChange event is fired when a parent element is applied
+to the node.  This is useful if you need to apply tree-level
+properties to a tree that need to happen if a node is moved from
+one tre to another.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Node.html#parentChange">Node</a>.</div>
+                </div>
+                        </div>
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    

@@ -1,0 +1,457 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.widget.ContainerEffect</title>
+        <link rel="stylesheet" type="text/css" href="../reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.widget.ContainerEffect.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.widget.ContainerEffect</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.widget</td></tr>
+            <tr><td class="label">Class:</td><td>ContainerEffect</td></tr>
+                        <tr><td class="label">Extends:</td><td>Object</td></tr>
+                                    <tr><td class="label">Defined In:</td><td><a href="container_core.js.html">container_core.js</a></td></tr>
+        </table>
+        <div class="description">
+            ContainerEffect encapsulates animation transitions that are executed when an Overlay is shown or hidden.        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Property</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#animClass">animClass</a> : class</td>
+        <td class="msource" rowspan="2">ContainerEffect</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The animation class to use for animating the overlay</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#attrIn">attrIn</a> : Object</td>
+        <td class="msource" rowspan="2">ContainerEffect</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The animation attributes to use when transitioning into view</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#attrOut">attrOut</a> : Object</td>
+        <td class="msource" rowspan="2">ContainerEffect</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The animation attributes to use when transitioning out of view</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#overlay">overlay</a> : YAHOO.widget.Overlay</td>
+        <td class="msource" rowspan="2">ContainerEffect</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The overlay to animate</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#targetElement">targetElement</a> : HTMLElement</td>
+        <td class="msource" rowspan="2">ContainerEffect</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The target element to be animated</td>
+    </tr>
+            </table>
+                <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#ContainerEffect">ContainerEffect</a>(<code>YAHOO.widget.Overlay overlay</code>, <code>Object attrIn</code>, <code>Object attrOut</code>, <code>HTMLElement targetElement</code>, <code>class Optional.</code>)</td>
+        <td class="msource" rowspan="2">ContainerEffect</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#FADE">FADE</a>(<code>Overlay The</code>, <code>Number The</code>) : ContainerEffect</td>
+        <td class="msource" rowspan="2">ContainerEffect</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; A pre-configured ContainerEffect instance that can be used for fading an overlay in and out.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#SLIDE">SLIDE</a>(<code>Overlay The</code>, <code>Number The</code>) : ContainerEffect</td>
+        <td class="msource" rowspan="2">ContainerEffect</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; A pre-configured ContainerEffect instance that can be used for sliding an overlay in and out.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#animateIn">animateIn</a>() : void</td>
+        <td class="msource" rowspan="2">ContainerEffect</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Triggers the in-animation.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#animateOut">animateOut</a>() : void</td>
+        <td class="msource" rowspan="2">ContainerEffect</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Triggers the out-animation.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#handleCompleteAnimateIn">handleCompleteAnimateIn</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2">ContainerEffect</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The default onComplete handler for the in-animation.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#handleCompleteAnimateOut">handleCompleteAnimateOut</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2">ContainerEffect</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default onComplete handler for the out-animation.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#handleStartAnimateIn">handleStartAnimateIn</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2">ContainerEffect</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The default onStart handler for the in-animation.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#handleStartAnimateOut">handleStartAnimateOut</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2">ContainerEffect</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default onStart handler for the out-animation.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#handleTweenAnimateIn">handleTweenAnimateIn</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2">ContainerEffect</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The default onTween handler for the in-animation.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#handleTweenAnimateOut">handleTweenAnimateOut</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2">ContainerEffect</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default onTween handler for the out-animation.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#init">init</a>() : void</td>
+        <td class="msource" rowspan="2">ContainerEffect</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Initializes the animation classes and events.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#toString">toString</a>() : String</td>
+        <td class="msource" rowspan="2">ContainerEffect</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Returns a string representation of the object.</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+        <div class="no-members">This class has no public events.</div>        
+                    <h2 class="mdetail-head">Property Details</h2>
+            <div class="detail-wrap">
+                            <a name="animClass"></a>
+                <div class="mdetail">
+                <h3>animClass</i></h3>
+                <code>public class animClass</code>
+                <div class="mdetail-desc">
+                    The animation class to use for animating the overlay                </div>
+                <div class="mdetail-def">This property is defined by ContainerEffect.</div>
+                </div>
+                            <a name="attrIn"></a>
+                <div class="mdetail alt">
+                <h3>attrIn</i></h3>
+                <code>public Object attrIn</code>
+                <div class="mdetail-desc">
+                    The animation attributes to use when transitioning into view                </div>
+                <div class="mdetail-def">This property is defined by ContainerEffect.</div>
+                </div>
+                            <a name="attrOut"></a>
+                <div class="mdetail">
+                <h3>attrOut</i></h3>
+                <code>public Object attrOut</code>
+                <div class="mdetail-desc">
+                    The animation attributes to use when transitioning out of view                </div>
+                <div class="mdetail-def">This property is defined by ContainerEffect.</div>
+                </div>
+                            <a name="overlay"></a>
+                <div class="mdetail alt">
+                <h3>overlay</i></h3>
+                <code>public YAHOO.widget.Overlay overlay</code>
+                <div class="mdetail-desc">
+                    The overlay to animate                </div>
+                <div class="mdetail-def">This property is defined by ContainerEffect.</div>
+                </div>
+                            <a name="targetElement"></a>
+                <div class="mdetail">
+                <h3>targetElement</i></h3>
+                <code>public HTMLElement targetElement</code>
+                <div class="mdetail-desc">
+                    The target element to be animated                </div>
+                <div class="mdetail-def">This property is defined by ContainerEffect.</div>
+                </div>
+                        </div>
+                
+                    <a name="ContainerEffect"></a>
+            <h2 class="mdetail-head">Constructor Details</h2>
+            <div class="detail-wrap">
+                <div class="mdetail">
+                <h3>ContainerEffect</i></h3>
+                <code>public function ContainerEffect(<code>YAHOO.widget.Overlay overlay</code>, <code>Object attrIn</code>, <code>Object attrOut</code>, <code>HTMLElement targetElement</code>, <code>class Optional.</code>)</code>
+                <div class="mdetail-desc">
+                                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>overlay</code> : YAHOO.widget.Overlay<div class="sub-desc">The Overlay that the animation should be associated with</div></li><li><code>attrIn</code> : Object<div class="sub-desc">The object literal representing the animation arguments to be used for the animate-in transition. The arguments for this literal are: attributes(object, see YAHOO.util.Anim for description), duration(Number), and method(i.e. YAHOO.util.Easing.easeIn).</div></li><li><code>attrOut</code> : Object<div class="sub-desc">The object literal representing the animation arguments to be used for the animate-out transition. The arguments for this literal are: attributes(object, see YAHOO.util.Anim for description), duration(Number), and method(i.e. YAHOO.util.Easing.easeIn).</div></li><li><code>targetElement</code> : HTMLElement<div class="sub-desc">Optional. The target element that should be animated during the transition. Defaults to overlay.element.</div></li><li><code>Optional.</code> : class<div class="sub-desc">The animation class to instantiate. Defaults to YAHOO.util.Anim. Other options include YAHOO.util.Motion.</div></li>                    </ul>
+                </div>
+                </div>
+                </div>
+            </div>
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="FADE"></a>
+                <div class="mdetail">
+                <h3>FADE</i></h3>
+                <code>public function FADE(<code>Overlay The</code>, <code>Number The</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; A pre-configured ContainerEffect instance that can be used for fading an overlay in and out.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>The</code> : Overlay<div class="sub-desc">Overlay object to animate</div></li><li><code>The</code> : Number<div class="sub-desc">duration of the animation</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>ContainerEffect</code><div class="sub-desc">The configured ContainerEffect object</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by ContainerEffect.</div>
+                </div>
+                            <a name="SLIDE"></a>
+                <div class="mdetail alt">
+                <h3>SLIDE</i></h3>
+                <code>public function SLIDE(<code>Overlay The</code>, <code>Number The</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; A pre-configured ContainerEffect instance that can be used for sliding an overlay in and out.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>The</code> : Overlay<div class="sub-desc">Overlay object to animate</div></li><li><code>The</code> : Number<div class="sub-desc">duration of the animation</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>ContainerEffect</code><div class="sub-desc">The configured ContainerEffect object</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by ContainerEffect.</div>
+                </div>
+                            <a name="animateIn"></a>
+                <div class="mdetail">
+                <h3>animateIn</i></h3>
+                <code>public function animateIn()</code>
+                <div class="mdetail-desc">
+                    Triggers the in-animation.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by ContainerEffect.</div>
+                </div>
+                            <a name="animateOut"></a>
+                <div class="mdetail alt">
+                <h3>animateOut</i></h3>
+                <code>public function animateOut()</code>
+                <div class="mdetail-desc">
+                    Triggers the out-animation.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by ContainerEffect.</div>
+                </div>
+                            <a name="handleCompleteAnimateIn"></a>
+                <div class="mdetail">
+                <h3>handleCompleteAnimateIn</i></h3>
+                <code>public function handleCompleteAnimateIn(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default onComplete handler for the in-animation.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by ContainerEffect.</div>
+                </div>
+                            <a name="handleCompleteAnimateOut"></a>
+                <div class="mdetail alt">
+                <h3>handleCompleteAnimateOut</i></h3>
+                <code>public function handleCompleteAnimateOut(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default onComplete handler for the out-animation.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by ContainerEffect.</div>
+                </div>
+                            <a name="handleStartAnimateIn"></a>
+                <div class="mdetail">
+                <h3>handleStartAnimateIn</i></h3>
+                <code>public function handleStartAnimateIn(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default onStart handler for the in-animation.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by ContainerEffect.</div>
+                </div>
+                            <a name="handleStartAnimateOut"></a>
+                <div class="mdetail alt">
+                <h3>handleStartAnimateOut</i></h3>
+                <code>public function handleStartAnimateOut(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default onStart handler for the out-animation.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by ContainerEffect.</div>
+                </div>
+                            <a name="handleTweenAnimateIn"></a>
+                <div class="mdetail">
+                <h3>handleTweenAnimateIn</i></h3>
+                <code>public function handleTweenAnimateIn(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default onTween handler for the in-animation.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by ContainerEffect.</div>
+                </div>
+                            <a name="handleTweenAnimateOut"></a>
+                <div class="mdetail alt">
+                <h3>handleTweenAnimateOut</i></h3>
+                <code>public function handleTweenAnimateOut(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default onTween handler for the out-animation.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by ContainerEffect.</div>
+                </div>
+                            <a name="init"></a>
+                <div class="mdetail">
+                <h3>init</i></h3>
+                <code>public function init()</code>
+                <div class="mdetail-desc">
+                    Initializes the animation classes and events.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by ContainerEffect.</div>
+                </div>
+                            <a name="toString"></a>
+                <div class="mdetail alt">
+                <h3>toString</i></h3>
+                <code>public function toString()</code>
+                <div class="mdetail-desc">
+                    Returns a string representation of the object.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>String</code><div class="sub-desc">The string representation of the ContainerEffect</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by ContainerEffect.</div>
+                </div>
+                        </div>
+                    
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    

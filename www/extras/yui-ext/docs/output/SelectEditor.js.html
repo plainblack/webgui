@@ -1,0 +1,37 @@
+<html><head><title>SelectEditor.js</title><link rel="stylesheet" type="text/css" href="../style.css" media="screen"/></head><body><div class="hl-main"><pre><span class="hl-comment">/**
+ * @class YAHOO.ext.grid.SelectEditor
+ * @extends YAHOO.ext.grid.CellEditor
+Creates an editor out of an existing select field. You can create the select element through DOM in Javascript and pass it to the SelectEditor's constructor &lt;b&gt;or&lt;/b&gt; an easier way is like this:
+&lt;br&gt;&lt;br&gt;
+Define the select field in your document, giving it the ygrid-editor class.
+&lt;pre&gt;&lt;code&gt;
+&amp;lt;select id=&quot;light&quot; class=&quot;ygrid-editor&quot;&amp;gt;
+	&amp;lt;option value=&quot;Shade&quot;&amp;gt;Shade&amp;lt;/option&amp;gt;
+	&amp;lt;option value=&quot;Mostly Shady&quot;&amp;gt;Mostly Shady&amp;lt;/option&amp;gt;
+	&amp;lt;option value=&quot;Sun or Shade&quot;&amp;gt;Sun or Shade&amp;lt;/option&amp;gt;
+	&amp;lt;option value=&quot;Mostly Sunny&quot;&amp;gt;Mostly Sunny&amp;lt;/option&amp;gt;
+	&amp;lt;option value=&quot;Sunny&quot;&amp;gt;Sunny&amp;lt;/option&amp;gt;
+&amp;lt;/select&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+Create the SelectEditor object, passing in the id of your select field.
+&lt;pre&gt;&lt;code&gt;
+var editor = new YAHOO.ext.grid.SelectEditor('light'); 
+&lt;/code&gt;&lt;/pre&gt;
+For more information on using this editor, see &lt;a href=&quot;</span><span class="hl-url">http://www.jackslocum.com/yui/2006/09/10/adding-built-in-editing-support-to-the-yahoo-ui-extensions-grid/</span><span class="hl-comment">&quot;&gt;this blog post&lt;/a&gt;.
+* @constructor
+* Create a new SelectEditor
+* @param {HTMLElement/String} element
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">grid</span><span class="hl-default">.</span><span class="hl-identifier">SelectEditor</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">element</span><span class="hl-brackets">){
+    </span><span class="hl-identifier">element</span><span class="hl-code">.</span><span class="hl-identifier">hideFocus</span><span class="hl-code"> = </span><span class="hl-reserved">true</span><span class="hl-code">;
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">SelectEditor</span><span class="hl-code">.</span><span class="hl-identifier">superclass</span><span class="hl-code">.</span><span class="hl-identifier">constructor</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-identifier">element</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">element</span><span class="hl-code">.</span><span class="hl-identifier">swallowEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">click</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-default">;
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">extendX</span><span class="hl-brackets">(</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">SelectEditor</span><span class="hl-code">, </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">CellEditor</span><span class="hl-brackets">)</span><span class="hl-default">;
+
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">grid</span><span class="hl-default">.</span><span class="hl-identifier">SelectEditor</span><span class="hl-default">.</span><span class="hl-identifier">prototype</span><span class="hl-default">.</span><span class="hl-identifier">fitToCell</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">box</span><span class="hl-brackets">){
+    </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Browser</span><span class="hl-code">.</span><span class="hl-identifier">isGecko</span><span class="hl-brackets">){
+        </span><span class="hl-identifier">box</span><span class="hl-code">.</span><span class="hl-identifier">height</span><span class="hl-code"> -= </span><span class="hl-number">3</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">element</span><span class="hl-code">.</span><span class="hl-identifier">setBox</span><span class="hl-brackets">(</span><span class="hl-identifier">box</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-default">;</span></pre></div><hr>Copyright &copy; 2006 Jack Slocum. All rights reserved.</body></html>

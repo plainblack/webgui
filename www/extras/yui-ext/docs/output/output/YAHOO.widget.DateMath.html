@@ -1,0 +1,3369 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.widget.DateMath</title>
+        <link rel="stylesheet" type="text/css" href="../reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.widget.DateMath.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.widget.DateMath</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.widget</td></tr>
+            <tr><td class="label">Class:</td><td>DateMath</td></tr>
+                        <tr><td class="label">Extends:</td><td>Object</td></tr>
+                                    <tr><td class="label">Defined In:</td><td><a href="calendar.js.html">calendar.js</a></td></tr>
+        </table>
+        <div class="description">
+            YAHOO.widget.DateMath is used for simple date manipulation. The class is a static utility
+used for adding, subtracting, and comparing dates.        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Property</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_CALENDAR">CSS_CALENDAR</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_CELL">CSS_CELL</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc"></td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_CELL_BOTTOM">CSS_CELL_BOTTOM</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_CELL_HIGHLIGHT1">CSS_CELL_HIGHLIGHT1</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc"></td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_CELL_HIGHLIGHT2">CSS_CELL_HIGHLIGHT2</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_CELL_HIGHLIGHT3">CSS_CELL_HIGHLIGHT3</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc"></td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_CELL_HIGHLIGHT4">CSS_CELL_HIGHLIGHT4</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_CELL_HOVER">CSS_CELL_HOVER</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc"></td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_CELL_LEFT">CSS_CELL_LEFT</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_CELL_OOB">CSS_CELL_OOB</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc"></td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_CELL_OOM">CSS_CELL_OOM</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_CELL_RESTRICTED">CSS_CELL_RESTRICTED</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc"></td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_CELL_RIGHT">CSS_CELL_RIGHT</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_CELL_SELECTABLE">CSS_CELL_SELECTABLE</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc"></td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_CELL_SELECTED">CSS_CELL_SELECTED</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_CELL_TODAY">CSS_CELL_TODAY</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc"></td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_CELL_TOP">CSS_CELL_TOP</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_CONTAINER">CSS_CONTAINER</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc"></td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_FOOTER">CSS_FOOTER</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_HEADER">CSS_HEADER</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc"></td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_HEADER_TEXT">CSS_HEADER_TEXT</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_NAV_LEFT">CSS_NAV_LEFT</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc"></td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_NAV_RIGHT">CSS_NAV_RIGHT</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_ROW_FOOTER">CSS_ROW_FOOTER</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc"></td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_ROW_HEADER">CSS_ROW_HEADER</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_SINGLE">CSS_SINGLE</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc"></td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_WEEKDAY_CELL">CSS_WEEKDAY_CELL</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_WEEKDAY_ROW">CSS_WEEKDAY_ROW</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc"></td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#DATE&lt;static&gt;">DATE&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Type constant used for renderers to represent an individual date (M/D/Y)</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#DAY">DAY</a> : String</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Constant field representing Day</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#DISPLAY_DAYS&lt;static&gt;">DISPLAY_DAYS&lt;static&gt;</a> : Number</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Constant that represents the total number of date cells that are displayed in a given month</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#Locale">Locale</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The local object which contains the Calendar's locale settings</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#MONTH">MONTH</a> : String</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Constant field representing Month</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#MONTH&lt;static&gt;">MONTH&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Type constant used for renderers to represent a month across any year</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#MONTH_DAY&lt;static&gt;">MONTH_DAY&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Type constant used for renderers to represent an individual date across any year (M/D)</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#ONE_DAY_MS">ONE_DAY_MS</a> : Number</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Constant field representing one day, in milliseconds</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#Options">Options</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The local object which contains the Calendar's options</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#RANGE&lt;static&gt;">RANGE&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Type constant used for renderers to represent a range of individual dates (M/D/Y-M/D/Y)</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#STOP_RENDER&lt;static&gt;">STOP_RENDER&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Constant used for halting the execution of the remainder of the render stack</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#Style">Style</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Collection of Style constants for the Calendar</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#WEEK">WEEK</a> : String</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Constant field representing Week</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#WEEKDAY&lt;static&gt;">WEEKDAY&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Type constant used for renderers to represent a weekday</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#YEAR">YEAR</a> : String</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Constant field representing Year</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#browser">browser</a> : String</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Returns a string representing the current browser.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#cellDates">cellDates</a> : Array[](Number[])</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The collection of calendar cell dates that is parallel to the cells collection. The array contains dates field arrays...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#cells">cells</a> : HTMLTableCellElement[]</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The collection of calendar table cells</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#cfg">cfg</a> : Number
+@default</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The position of the year in a month/day/year date string
+@config MDY_YEAR_POSITION</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#domEventMap">domEventMap</a> : Object</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">A map of DOM event handlers to attach to cells associated with specific CSS class names</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#https">https</a> : String</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; The path to be used for images loaded for the Calendar</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#id">id</a> : String</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The id that uniquely identifies this calendar. This id should match the id of the placeholder element on the page.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#index">index</a> : Number</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The index of this item in the parent group</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#oDomContainer">oDomContainer</a> : HTMLElement</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The DOM element reference that points to this calendar's container element. The calendar will be inserted into this e...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#parent">parent</a> : CalendarGroup</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The parent CalendarGroup, only to be set explicitly by the parent group</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#renderStack">renderStack</a> : Array[]</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The list of render functions, along with required parameters, used to render cells.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#today">today</a> : Date</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">A Date object representing today's date.</td>
+    </tr>
+            </table>
+                <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#add">add</a>(<code>Date date</code>, <code>String field</code>, <code>Number amount</code>) : Date</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Adds the specified amount of time to the this instance.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#addMonthRenderer">addMonthRenderer</a>(<code>Number month</code>, <code>Function fnRender</code>) : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Adds a month to the render stack. The function reference passed to this method will be executed
+when a date cell matc...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#addMonths">addMonths</a>(<code>Number count</code>) : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Adds the designated number of months to the current calendar month, and sets the current
+calendar page date to the ne...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#addRenderer">addRenderer</a>(<code>String sDates</code>, <code>Function fnRender</code>) : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Adds a renderer to the render stack. The function reference passed to this method will be executed
+when a date cell m...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#addWeekdayRenderer">addWeekdayRenderer</a>(<code>Number weekday</code>, <code>Function fnRender</code>) : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Adds a weekday to the render stack. The function reference passed to this method will be executed
+when a date cell ma...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#addYears">addYears</a>(<code>Number count</code>) : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Adds the designated number of years to the current calendar, and sets the current
+calendar page date to the new month.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#after">after</a>(<code>Date date</code>, <code>Date compareTo</code>) : Boolean</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Determines whether a given date is after another date on the calendar.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#applyListeners">applyListeners</a>() : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Applies the Calendar's DOM listeners to applicable elements.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#before">before</a>(<code>Date date</code>, <code>Date compareTo</code>) : Boolean</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Determines whether a given date is before another date on the calendar.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#between">between</a>(<code>Date date</code>, <code>Date dateBegin</code>, <code>Date dateEnd</code>) : Boolean</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Determines whether a given date is between two other dates on the calendar.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#buildDayLabel">buildDayLabel</a>(<code>Date workingDate</code>) : String</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Builds the date digit that will be displayed in calendar cells</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#buildMonthLabel">buildMonthLabel</a>() : String</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Builds the date label that will be displayed in the calendar header or
+footer, depending on configuration.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#buildWeekdays">buildWeekdays</a>(<code>Array html</code>) : Array</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Renders the Calendar's weekday headers.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#clear">clear</a>() : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Clears the selected dates in the current calendar widget and sets the calendar
+to the current month and year.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#clearAllBodyCellStyles">clearAllBodyCellStyles</a>(<code>style The</code>) : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Removes all styles from all body cells in the current calendar table.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#clearElement">clearElement</a>(<code>HTMLTableCellElement The</code>) : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Clears the inner HTML, CSS class and style information from the specified cell.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#clearTime">clearTime</a>(<code>Date date</code>) : Date</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Clears the time fields from a given date, effectively setting the time to midnight.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configClose">configClose</a>() : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Default handler for the "close" property</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configIframe">configIframe</a>() : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Renders the built-in IFRAME shim for the IE6 and below</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configLocale">configLocale</a>() : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The default handler for all configuration locale properties</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configLocaleValues">configLocaleValues</a>() : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default handler for all configuration locale field length properties</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configMaxDate">configMaxDate</a>() : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The default handler for the "maxdate" property</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configMinDate">configMinDate</a>() : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default handler for the "mindate" property</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configOptions">configOptions</a>() : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The default handler for all configuration options properties</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configPageDate">configPageDate</a>() : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default handler for the "pagedate" property</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configSelected">configSelected</a>() : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The default handler for the "selected" property</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configTitle">configTitle</a>() : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Default handler for the "title" property</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#deselect">deselect</a>(<code>String/Date/Date[] date</code>) : Date[]</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Deselects a date or a collection of dates on the current calendar. This method, by default,
+does not call the render ...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#deselectAll">deselectAll</a>() : Date[]</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Deselects all dates on the current calendar.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#deselectCell">deselectCell</a>(<code>Number cellIndex</code>) : Date[]</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Deselects a date on the current calendar by referencing the index of the cell that should be deselected.
+This method ...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#doCellMouseOut">doCellMouseOut</a>(<code>DOMEvent e</code>, <code>Calendar cal</code>) : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The event that is executed when the user moves the mouse out of a cell</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#doCellMouseOver">doCellMouseOver</a>(<code>DOMEvent e</code>, <code>Calendar cal</code>) : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The event that is executed when the user hovers over a cell</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#doSelectCell">doSelectCell</a>(<code>DOMEvent e</code>, <code>Calendar cal</code>) : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default event function that is attached to a date link within a calendar cell
+when the calendar is rendered.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#findMonthEnd">findMonthEnd</a>(<code>Date date</code>) : Date</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Gets the last day of a month containing a given date.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#findMonthStart">findMonthStart</a>(<code>Date date</code>) : Date</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Gets the first day of a month containing a given date.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getDateByCellId">getDateByCellId</a>(<code>String id</code>) : Date</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Retrieves the Date object for the specified Calendar cell</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getDateFieldsByCellId">getDateFieldsByCellId</a>(<code>String id</code>) : Array</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Retrieves the Date object for the specified Calendar cell</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getDayOffset">getDayOffset</a>(<code>Date date</code>, <code>Number calendarYear</code>) : Number</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Calculates the number of days the specified date is from January 1 of the specified calendar year.
+Passing January 1 ...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getJan1">getJan1</a>(<code>Number calendarYear</code>) : Date</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Retrieves a JavaScript Date object representing January 1 of any given year.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getSelectedDates">getSelectedDates</a>() : Date[]</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Gets the list of currently selected dates from the calendar.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getWeekNumber">getWeekNumber</a>(<code>Date date</code>, <code>Number calendarYear</code>, <code>Number weekStartsOn</code>) : Number</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Calculates the week number for the given date. This function assumes that week 1 is the
+week in which January 1 appea...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#hide">hide</a>() : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Hides the Calendar's outer container from view.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#init">init</a>(<code>String id</code>, <code>String containerId</code>, <code>Object config</code>) : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Initializes the Calendar widget.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#initEvents">initEvents</a>() : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Initializes Calendar's built-in CustomEvents</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#initStyles">initStyles</a>() : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Defines the style constants for the Calendar</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#isDateOOM">isDateOOM</a>(<code>Date date</code>) : Boolean</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Determines whether a given date is OOM (out of month).</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#isMonthOverlapWeek">isMonthOverlapWeek</a>(<code>Date weekBeginDate</code>) : Boolean</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Determines if a given week overlaps two different months.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#isYearOverlapWeek">isYearOverlapWeek</a>(<code>Date weekBeginDate</code>) : Boolean</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Determines if a given week overlaps two different years.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#nextMonth">nextMonth</a>() : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Navigates to the next month page in the calendar widget.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#nextYear">nextYear</a>() : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Navigates to the next year in the currently selected month in the calendar widget.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#onBeforeDeselect">onBeforeDeselect</a>() : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc"><b>Deprecated.</b> Event executed before a date is deselected in the calendar widget.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#onBeforeSelect">onBeforeSelect</a>() : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc"><b>Deprecated.</b> Event executed before a date is selected in the calendar widget.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#onChangePage">onChangePage</a>() : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc"><b>Deprecated.</b> Event executed when the user navigates to a different calendar page.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#onDeselect">onDeselect</a>(<code>Array selected</code>) : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc"><b>Deprecated.</b> Event executed when a date is deselected in the calendar widget.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#onRender">onRender</a>() : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc"><b>Deprecated.</b> Event executed when the calendar widget is rendered.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#onSelect">onSelect</a>(<code>Array selected</code>) : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc"><b>Deprecated.</b> Event executed when a date is selected in the calendar widget.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#previousMonth">previousMonth</a>() : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Navigates to the previous month page in the calendar widget.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#previousYear">previousYear</a>() : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Navigates to the previous year in the currently selected month in the calendar widget.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#render">render</a>() : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc"><b>Deprecated.</b> Event executed when the calendar widget is completely cleared to the current month with no selections.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#renderBody">renderBody</a>(<code>Date workingDate</code>, <code>Array html</code>) : Array</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Renders the calendar body.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#renderBodyCellRestricted">renderBodyCellRestricted</a>(<code>Date workingDate</code>, <code>HTMLTableCellElement cell</code>) : String</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Renders the current calendar cell as a non-selectable "black-out" date using the default
+restricted style.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#renderCellDefault">renderCellDefault</a>(<code>Date workingDate</code>, <code>HTMLTableCellElement cell</code>) : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Renders a single standard calendar cell in the calendar widget table.
+All logic for determining how a standard defaul...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#renderCellNotThisMonth">renderCellNotThisMonth</a>(<code>Date workingDate</code>, <code>HTMLTableCellElement cell</code>) : String</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Applies the default style used for rendering dates that are not a part of the current
+month (preceding or trailing th...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#renderCellStyleHighlight1">renderCellStyleHighlight1</a>(<code>Date workingDate</code>, <code>HTMLTableCellElement cell</code>) : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Renders a single standard calendar cell using the CSS hightlight1 style</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#renderCellStyleHighlight2">renderCellStyleHighlight2</a>(<code>Date workingDate</code>, <code>HTMLTableCellElement cell</code>) : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Renders a single standard calendar cell using the CSS hightlight2 style</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#renderCellStyleHighlight3">renderCellStyleHighlight3</a>(<code>Date workingDate</code>, <code>HTMLTableCellElement cell</code>) : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Renders a single standard calendar cell using the CSS hightlight3 style</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#renderCellStyleHighlight4">renderCellStyleHighlight4</a>(<code>Date workingDate</code>, <code>HTMLTableCellElement cell</code>) : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Renders a single standard calendar cell using the CSS hightlight4 style</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#renderCellStyleSelected">renderCellStyleSelected</a>(<code>Date workingDate</code>, <code>HTMLTableCellElement cell</code>) : String</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Applies the default style used for rendering selected dates to the current calendar cell</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#renderCellStyleToday">renderCellStyleToday</a>(<code>Date workingDate</code>, <code>HTMLTableCellElement cell</code>) : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Applies the default style used for rendering today's date to the current calendar cell</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#renderFooter">renderFooter</a>(<code>Array html</code>) : Array</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Renders the calendar footer. In the default implementation, there is
+no footer.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#renderHeader">renderHeader</a>(<code>Array html</code>) : Array</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Renders the calendar header.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#renderOutOfBoundsDate">renderOutOfBoundsDate</a>(<code>Date workingDate</code>, <code>HTMLTableCellElement cell</code>) : String</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Renders a cell that falls before the minimum date or after the maximum date.
+widget class.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#renderRowFooter">renderRowFooter</a>(<code>Number weekNum</code>, <code>Array cell</code>) : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Renders the row footer for a week.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#renderRowHeader">renderRowHeader</a>(<code>Number weekNum</code>, <code>Array cell</code>) : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Renders the row header for a week.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#reset">reset</a>() : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Resets the calendar widget to the originally selected month and year, and
+sets the calendar to the initial selection(s).</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#resetRenderers">resetRenderers</a>() : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Resets the render stack of the current calendar to its original pre-render value.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#select">select</a>(<code>String/Date/Date[] date</code>) : Date[]</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Selects a date or a collection of dates on the current calendar. This method, by default,
+does not call the render me...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#selectCell">selectCell</a>(<code>Number cellIndex</code>) : Date[]</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Selects a date on the current calendar by referencing the index of the cell that should be selected.
+This method is u...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setMonth">setMonth</a>(<code>Number month</code>) : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Sets the calendar's month explicitly</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setYear">setYear</a>(<code>Number year</code>) : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Sets the calendar's year explicitly.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#show">show</a>() : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Shows the Calendar's outer container.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#styleCellDefault">styleCellDefault</a>(<code>Date workingDate</code>, <code>HTMLTableCellElement cell</code>) : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Styles a selectable cell.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#subtract">subtract</a>(<code>Date date</code>, <code>Number field</code>, <code>Number amount</code>) : Date</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Subtracts the specified amount of time from the this instance.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#subtractMonths">subtractMonths</a>(<code>Number count</code>) : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Subtracts the designated number of months from the current calendar month, and sets the current
+calendar page date to...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#subtractYears">subtractYears</a>(<code>Number count</code>) : void</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Subtcats the designated number of years from the current calendar, and sets the current
+calendar page date to the new...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#toString">toString</a>() : String</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Returns a string representation of the object.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#validate">validate</a>() : Should</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Validates the calendar widget. This method has no default implementation
+and must be extended by subclassing the widget.</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Event</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#beforeDeselectEvent">beforeDeselectEvent</a> : ()</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fired before a selection is made</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#beforeRenderEvent">beforeRenderEvent</a> : ()</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Fired before the Calendar is rendered</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#beforeSelectEvent">beforeSelectEvent</a> : ()</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fired before a selection is made</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#changePageEvent">changePageEvent</a> : ()</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Fired when the Calendar page is changed</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#clearEvent">clearEvent</a> : ()</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fired when the Calendar is cleared</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#deselectEvent">deselectEvent</a> : (<code>Array Array</code>)</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Fired when a selection is made</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#renderEvent">renderEvent</a> : ()</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fired when the Calendar is rendered</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#resetEvent">resetEvent</a> : ()</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Fired when the Calendar is reset</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#selectEvent">selectEvent</a> : (<code>Array Array</code>)</td>
+        <td class="msource" rowspan="2">DateMath</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fired when a selection is made</td>
+    </tr>
+            </table>
+                
+                    <h2 class="mdetail-head">Property Details</h2>
+            <div class="detail-wrap">
+                            <a name="CSS_CALENDAR"></a>
+                <div class="mdetail">
+                <h3>CSS_CALENDAR</i></h3>
+                <code>public Object CSS_CALENDAR</code>
+                <div class="mdetail-desc">
+                                    </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="CSS_CELL"></a>
+                <div class="mdetail alt">
+                <h3>CSS_CELL</i></h3>
+                <code>public Object CSS_CELL</code>
+                <div class="mdetail-desc">
+                                    </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="CSS_CELL_BOTTOM"></a>
+                <div class="mdetail">
+                <h3>CSS_CELL_BOTTOM</i></h3>
+                <code>public Object CSS_CELL_BOTTOM</code>
+                <div class="mdetail-desc">
+                                    </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="CSS_CELL_HIGHLIGHT1"></a>
+                <div class="mdetail alt">
+                <h3>CSS_CELL_HIGHLIGHT1</i></h3>
+                <code>public Object CSS_CELL_HIGHLIGHT1</code>
+                <div class="mdetail-desc">
+                                    </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="CSS_CELL_HIGHLIGHT2"></a>
+                <div class="mdetail">
+                <h3>CSS_CELL_HIGHLIGHT2</i></h3>
+                <code>public Object CSS_CELL_HIGHLIGHT2</code>
+                <div class="mdetail-desc">
+                                    </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="CSS_CELL_HIGHLIGHT3"></a>
+                <div class="mdetail alt">
+                <h3>CSS_CELL_HIGHLIGHT3</i></h3>
+                <code>public Object CSS_CELL_HIGHLIGHT3</code>
+                <div class="mdetail-desc">
+                                    </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="CSS_CELL_HIGHLIGHT4"></a>
+                <div class="mdetail">
+                <h3>CSS_CELL_HIGHLIGHT4</i></h3>
+                <code>public Object CSS_CELL_HIGHLIGHT4</code>
+                <div class="mdetail-desc">
+                                    </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="CSS_CELL_HOVER"></a>
+                <div class="mdetail alt">
+                <h3>CSS_CELL_HOVER</i></h3>
+                <code>public Object CSS_CELL_HOVER</code>
+                <div class="mdetail-desc">
+                                    </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="CSS_CELL_LEFT"></a>
+                <div class="mdetail">
+                <h3>CSS_CELL_LEFT</i></h3>
+                <code>public Object CSS_CELL_LEFT</code>
+                <div class="mdetail-desc">
+                                    </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="CSS_CELL_OOB"></a>
+                <div class="mdetail alt">
+                <h3>CSS_CELL_OOB</i></h3>
+                <code>public Object CSS_CELL_OOB</code>
+                <div class="mdetail-desc">
+                                    </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="CSS_CELL_OOM"></a>
+                <div class="mdetail">
+                <h3>CSS_CELL_OOM</i></h3>
+                <code>public Object CSS_CELL_OOM</code>
+                <div class="mdetail-desc">
+                                    </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="CSS_CELL_RESTRICTED"></a>
+                <div class="mdetail alt">
+                <h3>CSS_CELL_RESTRICTED</i></h3>
+                <code>public Object CSS_CELL_RESTRICTED</code>
+                <div class="mdetail-desc">
+                                    </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="CSS_CELL_RIGHT"></a>
+                <div class="mdetail">
+                <h3>CSS_CELL_RIGHT</i></h3>
+                <code>public Object CSS_CELL_RIGHT</code>
+                <div class="mdetail-desc">
+                                    </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="CSS_CELL_SELECTABLE"></a>
+                <div class="mdetail alt">
+                <h3>CSS_CELL_SELECTABLE</i></h3>
+                <code>public Object CSS_CELL_SELECTABLE</code>
+                <div class="mdetail-desc">
+                                    </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="CSS_CELL_SELECTED"></a>
+                <div class="mdetail">
+                <h3>CSS_CELL_SELECTED</i></h3>
+                <code>public Object CSS_CELL_SELECTED</code>
+                <div class="mdetail-desc">
+                                    </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="CSS_CELL_TODAY"></a>
+                <div class="mdetail alt">
+                <h3>CSS_CELL_TODAY</i></h3>
+                <code>public Object CSS_CELL_TODAY</code>
+                <div class="mdetail-desc">
+                                    </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="CSS_CELL_TOP"></a>
+                <div class="mdetail">
+                <h3>CSS_CELL_TOP</i></h3>
+                <code>public Object CSS_CELL_TOP</code>
+                <div class="mdetail-desc">
+                                    </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="CSS_CONTAINER"></a>
+                <div class="mdetail alt">
+                <h3>CSS_CONTAINER</i></h3>
+                <code>public Object CSS_CONTAINER</code>
+                <div class="mdetail-desc">
+                                    </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="CSS_FOOTER"></a>
+                <div class="mdetail">
+                <h3>CSS_FOOTER</i></h3>
+                <code>public Object CSS_FOOTER</code>
+                <div class="mdetail-desc">
+                                    </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="CSS_HEADER"></a>
+                <div class="mdetail alt">
+                <h3>CSS_HEADER</i></h3>
+                <code>public Object CSS_HEADER</code>
+                <div class="mdetail-desc">
+                                    </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="CSS_HEADER_TEXT"></a>
+                <div class="mdetail">
+                <h3>CSS_HEADER_TEXT</i></h3>
+                <code>public Object CSS_HEADER_TEXT</code>
+                <div class="mdetail-desc">
+                                    </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="CSS_NAV_LEFT"></a>
+                <div class="mdetail alt">
+                <h3>CSS_NAV_LEFT</i></h3>
+                <code>public Object CSS_NAV_LEFT</code>
+                <div class="mdetail-desc">
+                                    </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="CSS_NAV_RIGHT"></a>
+                <div class="mdetail">
+                <h3>CSS_NAV_RIGHT</i></h3>
+                <code>public Object CSS_NAV_RIGHT</code>
+                <div class="mdetail-desc">
+                                    </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="CSS_ROW_FOOTER"></a>
+                <div class="mdetail alt">
+                <h3>CSS_ROW_FOOTER</i></h3>
+                <code>public Object CSS_ROW_FOOTER</code>
+                <div class="mdetail-desc">
+                                    </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="CSS_ROW_HEADER"></a>
+                <div class="mdetail">
+                <h3>CSS_ROW_HEADER</i></h3>
+                <code>public Object CSS_ROW_HEADER</code>
+                <div class="mdetail-desc">
+                                    </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="CSS_SINGLE"></a>
+                <div class="mdetail alt">
+                <h3>CSS_SINGLE</i></h3>
+                <code>public Object CSS_SINGLE</code>
+                <div class="mdetail-desc">
+                                    </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="CSS_WEEKDAY_CELL"></a>
+                <div class="mdetail">
+                <h3>CSS_WEEKDAY_CELL</i></h3>
+                <code>public Object CSS_WEEKDAY_CELL</code>
+                <div class="mdetail-desc">
+                                    </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="CSS_WEEKDAY_ROW"></a>
+                <div class="mdetail alt">
+                <h3>CSS_WEEKDAY_ROW</i></h3>
+                <code>public Object CSS_WEEKDAY_ROW</code>
+                <div class="mdetail-desc">
+                                    </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="DATE&lt;static&gt;"></a>
+                <div class="mdetail">
+                <h3>DATE&lt;static&gt;</i></h3>
+                <code>public String DATE&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Type constant used for renderers to represent an individual date (M/D/Y)                </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="DAY"></a>
+                <div class="mdetail alt">
+                <h3>DAY</i></h3>
+                <code>public String DAY</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant field representing Day                </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="DISPLAY_DAYS&lt;static&gt;"></a>
+                <div class="mdetail">
+                <h3>DISPLAY_DAYS&lt;static&gt;</i></h3>
+                <code>public Number DISPLAY_DAYS&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant that represents the total number of date cells that are displayed in a given month                </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="Locale"></a>
+                <div class="mdetail alt">
+                <h3>Locale</i></h3>
+                <code>public Object Locale</code>
+                <div class="mdetail-desc">
+                    The local object which contains the Calendar's locale settings                </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="MONTH"></a>
+                <div class="mdetail">
+                <h3>MONTH</i></h3>
+                <code>public String MONTH</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant field representing Month                </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="MONTH&lt;static&gt;"></a>
+                <div class="mdetail alt">
+                <h3>MONTH&lt;static&gt;</i></h3>
+                <code>public String MONTH&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Type constant used for renderers to represent a month across any year                </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="MONTH_DAY&lt;static&gt;"></a>
+                <div class="mdetail">
+                <h3>MONTH_DAY&lt;static&gt;</i></h3>
+                <code>public String MONTH_DAY&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Type constant used for renderers to represent an individual date across any year (M/D)                </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="ONE_DAY_MS"></a>
+                <div class="mdetail alt">
+                <h3>ONE_DAY_MS</i></h3>
+                <code>public Number ONE_DAY_MS</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant field representing one day, in milliseconds                </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="Options"></a>
+                <div class="mdetail">
+                <h3>Options</i></h3>
+                <code>public Object Options</code>
+                <div class="mdetail-desc">
+                    The local object which contains the Calendar's options                </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="RANGE&lt;static&gt;"></a>
+                <div class="mdetail alt">
+                <h3>RANGE&lt;static&gt;</i></h3>
+                <code>public String RANGE&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Type constant used for renderers to represent a range of individual dates (M/D/Y-M/D/Y)                </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="STOP_RENDER&lt;static&gt;"></a>
+                <div class="mdetail">
+                <h3>STOP_RENDER&lt;static&gt;</i></h3>
+                <code>public String STOP_RENDER&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant used for halting the execution of the remainder of the render stack                </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="Style"></a>
+                <div class="mdetail alt">
+                <h3>Style</i></h3>
+                <code>public Object Style</code>
+                <div class="mdetail-desc">
+                    Collection of Style constants for the Calendar                </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="WEEK"></a>
+                <div class="mdetail">
+                <h3>WEEK</i></h3>
+                <code>public String WEEK</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant field representing Week                </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="WEEKDAY&lt;static&gt;"></a>
+                <div class="mdetail alt">
+                <h3>WEEKDAY&lt;static&gt;</i></h3>
+                <code>public String WEEKDAY&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Type constant used for renderers to represent a weekday                </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="YEAR"></a>
+                <div class="mdetail">
+                <h3>YEAR</i></h3>
+                <code>public String YEAR</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant field representing Year                </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="browser"></a>
+                <div class="mdetail alt">
+                <h3>browser</i></h3>
+                <code>public String browser</code>
+                <div class="mdetail-desc">
+                    Returns a string representing the current browser.                </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="cellDates"></a>
+                <div class="mdetail">
+                <h3>cellDates</i></h3>
+                <code>public Array[](Number[]) cellDates</code>
+                <div class="mdetail-desc">
+                    The collection of calendar cell dates that is parallel to the cells collection. The array contains dates field arrays in the format of [YYYY, M, D].                </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="cells"></a>
+                <div class="mdetail alt">
+                <h3>cells</i></h3>
+                <code>public HTMLTableCellElement[] cells</code>
+                <div class="mdetail-desc">
+                    The collection of calendar table cells                </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="cfg"></a>
+                <div class="mdetail">
+                <h3>cfg</i></h3>
+                <code>public Number
+@default cfg</code>
+                <div class="mdetail-desc">
+                    The position of the year in a month/day/year date string
+@config MDY_YEAR_POSITION                </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="domEventMap"></a>
+                <div class="mdetail alt">
+                <h3>domEventMap</i></h3>
+                <code>public Object domEventMap</code>
+                <div class="mdetail-desc">
+                    A map of DOM event handlers to attach to cells associated with specific CSS class names                </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="https"></a>
+                <div class="mdetail">
+                <h3>https</i></h3>
+                <code>public String https</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; The path to be used for images loaded for the Calendar                </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="id"></a>
+                <div class="mdetail alt">
+                <h3>id</i></h3>
+                <code>public String id</code>
+                <div class="mdetail-desc">
+                    The id that uniquely identifies this calendar. This id should match the id of the placeholder element on the page.                </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="index"></a>
+                <div class="mdetail">
+                <h3>index</i></h3>
+                <code>public Number index</code>
+                <div class="mdetail-desc">
+                    The index of this item in the parent group                </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="oDomContainer"></a>
+                <div class="mdetail alt">
+                <h3>oDomContainer</i></h3>
+                <code>public HTMLElement oDomContainer</code>
+                <div class="mdetail-desc">
+                    The DOM element reference that points to this calendar's container element. The calendar will be inserted into this element when the shell is rendered.                </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="parent"></a>
+                <div class="mdetail">
+                <h3>parent</i></h3>
+                <code>public CalendarGroup parent</code>
+                <div class="mdetail-desc">
+                    The parent CalendarGroup, only to be set explicitly by the parent group                </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="renderStack"></a>
+                <div class="mdetail alt">
+                <h3>renderStack</i></h3>
+                <code>public Array[] renderStack</code>
+                <div class="mdetail-desc">
+                    The list of render functions, along with required parameters, used to render cells.                </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                            <a name="today"></a>
+                <div class="mdetail">
+                <h3>today</i></h3>
+                <code>public Date today</code>
+                <div class="mdetail-desc">
+                    A Date object representing today's date.                </div>
+                <div class="mdetail-def">This property is defined by DateMath.</div>
+                </div>
+                        </div>
+                
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="add"></a>
+                <div class="mdetail">
+                <h3>add</i></h3>
+                <code>public function add(<code>Date date</code>, <code>String field</code>, <code>Number amount</code>)</code>
+                <div class="mdetail-desc">
+                    Adds the specified amount of time to the this instance.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>date</code> : Date<div class="sub-desc">The JavaScript Date object to perform addition on</div></li><li><code>field</code> : String<div class="sub-desc">The field constant to be used for performing addition.</div></li><li><code>amount</code> : Number<div class="sub-desc">The number of units (measured in the field constant) to add to the date.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Date</code><div class="sub-desc">The resulting Date object</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="addMonthRenderer"></a>
+                <div class="mdetail alt">
+                <h3>addMonthRenderer</i></h3>
+                <code>public function addMonthRenderer(<code>Number month</code>, <code>Function fnRender</code>)</code>
+                <div class="mdetail-desc">
+                    Adds a month to the render stack. The function reference passed to this method will be executed
+when a date cell matches the month passed to this method.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>month</code> : Number<div class="sub-desc">The month (1-12) to associate with this renderer</div></li><li><code>fnRender</code> : Function<div class="sub-desc">The function executed to render cells that match the render rules for this renderer.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="addMonths"></a>
+                <div class="mdetail">
+                <h3>addMonths</i></h3>
+                <code>public function addMonths(<code>Number count</code>)</code>
+                <div class="mdetail-desc">
+                    Adds the designated number of months to the current calendar month, and sets the current
+calendar page date to the new month.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>count</code> : Number<div class="sub-desc">The number of months to add to the current calendar</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="addRenderer"></a>
+                <div class="mdetail alt">
+                <h3>addRenderer</i></h3>
+                <code>public function addRenderer(<code>String sDates</code>, <code>Function fnRender</code>)</code>
+                <div class="mdetail-desc">
+                    Adds a renderer to the render stack. The function reference passed to this method will be executed
+when a date cell matches the conditions specified in the date string for this renderer.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>sDates</code> : String<div class="sub-desc">A date string to associate with the specified renderer. Valid formats include date (12/24/2005), month/day (12/24), and range (12/1/2004-1/1/2005)</div></li><li><code>fnRender</code> : Function<div class="sub-desc">The function executed to render cells that match the render rules for this renderer.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="addWeekdayRenderer"></a>
+                <div class="mdetail">
+                <h3>addWeekdayRenderer</i></h3>
+                <code>public function addWeekdayRenderer(<code>Number weekday</code>, <code>Function fnRender</code>)</code>
+                <div class="mdetail-desc">
+                    Adds a weekday to the render stack. The function reference passed to this method will be executed
+when a date cell matches the weekday passed to this method.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>weekday</code> : Number<div class="sub-desc">The weekday (0-6) to associate with this renderer</div></li><li><code>fnRender</code> : Function<div class="sub-desc">The function executed to render cells that match the render rules for this renderer.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="addYears"></a>
+                <div class="mdetail alt">
+                <h3>addYears</i></h3>
+                <code>public function addYears(<code>Number count</code>)</code>
+                <div class="mdetail-desc">
+                    Adds the designated number of years to the current calendar, and sets the current
+calendar page date to the new month.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>count</code> : Number<div class="sub-desc">The number of years to add to the current calendar</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="after"></a>
+                <div class="mdetail">
+                <h3>after</i></h3>
+                <code>public function after(<code>Date date</code>, <code>Date compareTo</code>)</code>
+                <div class="mdetail-desc">
+                    Determines whether a given date is after another date on the calendar.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>date</code> : Date<div class="sub-desc">The Date object to compare with the compare argument</div></li><li><code>compareTo</code> : Date<div class="sub-desc">The Date object to use for the comparison</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">true if the date occurs after the compared date; false if not.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="applyListeners"></a>
+                <div class="mdetail alt">
+                <h3>applyListeners</i></h3>
+                <code>public function applyListeners()</code>
+                <div class="mdetail-desc">
+                    Applies the Calendar's DOM listeners to applicable elements.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="before"></a>
+                <div class="mdetail">
+                <h3>before</i></h3>
+                <code>public function before(<code>Date date</code>, <code>Date compareTo</code>)</code>
+                <div class="mdetail-desc">
+                    Determines whether a given date is before another date on the calendar.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>date</code> : Date<div class="sub-desc">The Date object to compare with the compare argument</div></li><li><code>compareTo</code> : Date<div class="sub-desc">The Date object to use for the comparison</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">true if the date occurs before the compared date; false if not.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="between"></a>
+                <div class="mdetail alt">
+                <h3>between</i></h3>
+                <code>public function between(<code>Date date</code>, <code>Date dateBegin</code>, <code>Date dateEnd</code>)</code>
+                <div class="mdetail-desc">
+                    Determines whether a given date is between two other dates on the calendar.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>date</code> : Date<div class="sub-desc">The date to check for</div></li><li><code>dateBegin</code> : Date<div class="sub-desc">The start of the range</div></li><li><code>dateEnd</code> : Date<div class="sub-desc">The end of the range</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">true if the date occurs between the compared dates; false if not.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="buildDayLabel"></a>
+                <div class="mdetail">
+                <h3>buildDayLabel</i></h3>
+                <code>public function buildDayLabel(<code>Date workingDate</code>)</code>
+                <div class="mdetail-desc">
+                    Builds the date digit that will be displayed in calendar cells                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>workingDate</code> : Date<div class="sub-desc">The current working date</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>String</code><div class="sub-desc">The formatted day label</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="buildMonthLabel"></a>
+                <div class="mdetail alt">
+                <h3>buildMonthLabel</i></h3>
+                <code>public function buildMonthLabel()</code>
+                <div class="mdetail-desc">
+                    Builds the date label that will be displayed in the calendar header or
+footer, depending on configuration.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>String</code><div class="sub-desc">The formatted calendar month label</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="buildWeekdays"></a>
+                <div class="mdetail">
+                <h3>buildWeekdays</i></h3>
+                <code>public function buildWeekdays(<code>Array html</code>)</code>
+                <div class="mdetail-desc">
+                    Renders the Calendar's weekday headers.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>html</code> : Array<div class="sub-desc">The current working HTML array</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Array</code><div class="sub-desc">The current working HTML array</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="clear"></a>
+                <div class="mdetail alt">
+                <h3>clear</i></h3>
+                <code>public function clear()</code>
+                <div class="mdetail-desc">
+                    Clears the selected dates in the current calendar widget and sets the calendar
+to the current month and year.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="clearAllBodyCellStyles"></a>
+                <div class="mdetail">
+                <h3>clearAllBodyCellStyles</i></h3>
+                <code>public function clearAllBodyCellStyles(<code>style The</code>)</code>
+                <div class="mdetail-desc">
+                    Removes all styles from all body cells in the current calendar table.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>The</code> : style<div class="sub-desc">CSS class name to remove from all calendar body cells</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="clearElement"></a>
+                <div class="mdetail alt">
+                <h3>clearElement</i></h3>
+                <code>public function clearElement(<code>HTMLTableCellElement The</code>)</code>
+                <div class="mdetail-desc">
+                    Clears the inner HTML, CSS class and style information from the specified cell.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>The</code> : HTMLTableCellElement<div class="sub-desc">cell to clear</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="clearTime"></a>
+                <div class="mdetail">
+                <h3>clearTime</i></h3>
+                <code>public function clearTime(<code>Date date</code>)</code>
+                <div class="mdetail-desc">
+                    Clears the time fields from a given date, effectively setting the time to midnight.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>date</code> : Date<div class="sub-desc">The JavaScript Date for which the time fields will be cleared</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Date</code><div class="sub-desc">The JavaScript Date cleared of all time fields</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="configClose"></a>
+                <div class="mdetail alt">
+                <h3>configClose</i></h3>
+                <code>public function configClose()</code>
+                <div class="mdetail-desc">
+                    Default handler for the "close" property                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="configIframe"></a>
+                <div class="mdetail">
+                <h3>configIframe</i></h3>
+                <code>public function configIframe()</code>
+                <div class="mdetail-desc">
+                    Renders the built-in IFRAME shim for the IE6 and below                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="configLocale"></a>
+                <div class="mdetail alt">
+                <h3>configLocale</i></h3>
+                <code>public function configLocale()</code>
+                <div class="mdetail-desc">
+                    The default handler for all configuration locale properties                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="configLocaleValues"></a>
+                <div class="mdetail">
+                <h3>configLocaleValues</i></h3>
+                <code>public function configLocaleValues()</code>
+                <div class="mdetail-desc">
+                    The default handler for all configuration locale field length properties                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="configMaxDate"></a>
+                <div class="mdetail alt">
+                <h3>configMaxDate</i></h3>
+                <code>public function configMaxDate()</code>
+                <div class="mdetail-desc">
+                    The default handler for the "maxdate" property                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="configMinDate"></a>
+                <div class="mdetail">
+                <h3>configMinDate</i></h3>
+                <code>public function configMinDate()</code>
+                <div class="mdetail-desc">
+                    The default handler for the "mindate" property                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="configOptions"></a>
+                <div class="mdetail alt">
+                <h3>configOptions</i></h3>
+                <code>public function configOptions()</code>
+                <div class="mdetail-desc">
+                    The default handler for all configuration options properties                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="configPageDate"></a>
+                <div class="mdetail">
+                <h3>configPageDate</i></h3>
+                <code>public function configPageDate()</code>
+                <div class="mdetail-desc">
+                    The default handler for the "pagedate" property                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="configSelected"></a>
+                <div class="mdetail alt">
+                <h3>configSelected</i></h3>
+                <code>public function configSelected()</code>
+                <div class="mdetail-desc">
+                    The default handler for the "selected" property                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="configTitle"></a>
+                <div class="mdetail">
+                <h3>configTitle</i></h3>
+                <code>public function configTitle()</code>
+                <div class="mdetail-desc">
+                    Default handler for the "title" property                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="deselect"></a>
+                <div class="mdetail alt">
+                <h3>deselect</i></h3>
+                <code>public function deselect(<code>String/Date/Date[] date</code>)</code>
+                <div class="mdetail-desc">
+                    Deselects a date or a collection of dates on the current calendar. This method, by default,
+does not call the render method explicitly. Once deselection has completed, render must be
+called for the changes to be reflected visually.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>date</code> : String/Date/Date[]<div class="sub-desc">The date string of dates to deselect in the current calendar. Valid formats are individual date(s) (12/24/2005,12/26/2005) or date range(s) (12/24/2005-1/1/2006). Multiple comma-delimited dates can also be passed to this method (12/24/2005,12/11/2005-12/13/2005). This method can also take a JavaScript Date object or an array of Date objects.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Date[]</code><div class="sub-desc">Array of JavaScript Date objects representing all individual dates that are currently selected.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="deselectAll"></a>
+                <div class="mdetail">
+                <h3>deselectAll</i></h3>
+                <code>public function deselectAll()</code>
+                <div class="mdetail-desc">
+                    Deselects all dates on the current calendar.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Date[]</code><div class="sub-desc">Array of JavaScript Date objects representing all individual dates that are currently selected. Assuming that this function executes properly, the return value should be an empty array. However, the empty array is returned for the sake of being able to check the selection status of the calendar.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="deselectCell"></a>
+                <div class="mdetail alt">
+                <h3>deselectCell</i></h3>
+                <code>public function deselectCell(<code>Number cellIndex</code>)</code>
+                <div class="mdetail-desc">
+                    Deselects a date on the current calendar by referencing the index of the cell that should be deselected.
+This method is used to easily deselect a single cell (usually with a mouse click) without having to do
+a full render. The selected style is removed from the cell directly.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>cellIndex</code> : Number<div class="sub-desc">The index of the cell to deselect in the current calendar.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Date[]</code><div class="sub-desc">Array of JavaScript Date objects representing all individual dates that are currently selected.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="doCellMouseOut"></a>
+                <div class="mdetail">
+                <h3>doCellMouseOut</i></h3>
+                <code>public function doCellMouseOut(<code>DOMEvent e</code>, <code>Calendar cal</code>)</code>
+                <div class="mdetail-desc">
+                    The event that is executed when the user moves the mouse out of a cell                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>e</code> : DOMEvent<div class="sub-desc">The event</div></li><li><code>cal</code> : Calendar<div class="sub-desc">A reference to the calendar passed by the Event utility</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="doCellMouseOver"></a>
+                <div class="mdetail alt">
+                <h3>doCellMouseOver</i></h3>
+                <code>public function doCellMouseOver(<code>DOMEvent e</code>, <code>Calendar cal</code>)</code>
+                <div class="mdetail-desc">
+                    The event that is executed when the user hovers over a cell                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>e</code> : DOMEvent<div class="sub-desc">The event</div></li><li><code>cal</code> : Calendar<div class="sub-desc">A reference to the calendar passed by the Event utility</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="doSelectCell"></a>
+                <div class="mdetail">
+                <h3>doSelectCell</i></h3>
+                <code>public function doSelectCell(<code>DOMEvent e</code>, <code>Calendar cal</code>)</code>
+                <div class="mdetail-desc">
+                    The default event function that is attached to a date link within a calendar cell
+when the calendar is rendered.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>e</code> : DOMEvent<div class="sub-desc">The event</div></li><li><code>cal</code> : Calendar<div class="sub-desc">A reference to the calendar passed by the Event utility</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="findMonthEnd"></a>
+                <div class="mdetail alt">
+                <h3>findMonthEnd</i></h3>
+                <code>public function findMonthEnd(<code>Date date</code>)</code>
+                <div class="mdetail-desc">
+                    Gets the last day of a month containing a given date.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>date</code> : Date<div class="sub-desc">The JavaScript Date used to calculate the month end</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Date</code><div class="sub-desc">The JavaScript Date representing the last day of the month</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="findMonthStart"></a>
+                <div class="mdetail">
+                <h3>findMonthStart</i></h3>
+                <code>public function findMonthStart(<code>Date date</code>)</code>
+                <div class="mdetail-desc">
+                    Gets the first day of a month containing a given date.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>date</code> : Date<div class="sub-desc">The JavaScript Date used to calculate the month start</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Date</code><div class="sub-desc">The JavaScript Date representing the first day of the month</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="getDateByCellId"></a>
+                <div class="mdetail alt">
+                <h3>getDateByCellId</i></h3>
+                <code>public function getDateByCellId(<code>String id</code>)</code>
+                <div class="mdetail-desc">
+                    Retrieves the Date object for the specified Calendar cell                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>id</code> : String<div class="sub-desc">The id of the cell</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Date</code><div class="sub-desc">The Date object for the specified Calendar cell</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="getDateFieldsByCellId"></a>
+                <div class="mdetail">
+                <h3>getDateFieldsByCellId</i></h3>
+                <code>public function getDateFieldsByCellId(<code>String id</code>)</code>
+                <div class="mdetail-desc">
+                    Retrieves the Date object for the specified Calendar cell                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>id</code> : String<div class="sub-desc">The id of the cell</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Array</code><div class="sub-desc">The array of Date fields for the specified Calendar cell</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="getDayOffset"></a>
+                <div class="mdetail alt">
+                <h3>getDayOffset</i></h3>
+                <code>public function getDayOffset(<code>Date date</code>, <code>Number calendarYear</code>)</code>
+                <div class="mdetail-desc">
+                    Calculates the number of days the specified date is from January 1 of the specified calendar year.
+Passing January 1 to this function would return an offset value of zero.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>date</code> : Date<div class="sub-desc">The JavaScript date for which to find the offset</div></li><li><code>calendarYear</code> : Number<div class="sub-desc">The calendar year to use for determining the offset</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Number</code><div class="sub-desc">The number of days since January 1 of the given year</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="getJan1"></a>
+                <div class="mdetail">
+                <h3>getJan1</i></h3>
+                <code>public function getJan1(<code>Number calendarYear</code>)</code>
+                <div class="mdetail-desc">
+                    Retrieves a JavaScript Date object representing January 1 of any given year.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>calendarYear</code> : Number<div class="sub-desc">The calendar year for which to retrieve January 1</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Date</code><div class="sub-desc">January 1 of the calendar year specified.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="getSelectedDates"></a>
+                <div class="mdetail alt">
+                <h3>getSelectedDates</i></h3>
+                <code>public function getSelectedDates()</code>
+                <div class="mdetail-desc">
+                    Gets the list of currently selected dates from the calendar.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Date[]</code><div class="sub-desc">An array of currently selected JavaScript Date objects.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="getWeekNumber"></a>
+                <div class="mdetail">
+                <h3>getWeekNumber</i></h3>
+                <code>public function getWeekNumber(<code>Date date</code>, <code>Number calendarYear</code>, <code>Number weekStartsOn</code>)</code>
+                <div class="mdetail-desc">
+                    Calculates the week number for the given date. This function assumes that week 1 is the
+week in which January 1 appears, regardless of whether the week consists of a full 7 days.
+The calendar year can be specified to help find what a the week number would be for a given
+date if the date overlaps years. For instance, a week may be considered week 1 of 2005, or
+week 53 of 2004. Specifying the optional calendarYear allows one to make this distinction
+easily.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>date</code> : Date<div class="sub-desc">The JavaScript date for which to find the week number</div></li><li><code>calendarYear</code> : Number<div class="sub-desc">OPTIONAL - The calendar year to use for determining the week number. Default is the calendar year of parameter "date".</div></li><li><code>weekStartsOn</code> : Number<div class="sub-desc">OPTIONAL - The integer (0-6) representing which day a week begins on. Default is 0 (for Sunday).</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Number</code><div class="sub-desc">The week number of the given date.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="hide"></a>
+                <div class="mdetail alt">
+                <h3>hide</i></h3>
+                <code>public function hide()</code>
+                <div class="mdetail-desc">
+                    Hides the Calendar's outer container from view.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="init"></a>
+                <div class="mdetail">
+                <h3>init</i></h3>
+                <code>public function init(<code>String id</code>, <code>String containerId</code>, <code>Object config</code>)</code>
+                <div class="mdetail-desc">
+                    Initializes the Calendar widget.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>id</code> : String<div class="sub-desc">The id of the table element that will represent the calendar widget</div></li><li><code>containerId</code> : String<div class="sub-desc">The id of the container div element that will wrap the calendar table</div></li><li><code>config</code> : Object<div class="sub-desc">The configuration object containing the Calendar's arguments</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="initEvents"></a>
+                <div class="mdetail alt">
+                <h3>initEvents</i></h3>
+                <code>public function initEvents()</code>
+                <div class="mdetail-desc">
+                    Initializes Calendar's built-in CustomEvents                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="initStyles"></a>
+                <div class="mdetail">
+                <h3>initStyles</i></h3>
+                <code>public function initStyles()</code>
+                <div class="mdetail-desc">
+                    Defines the style constants for the Calendar                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="isDateOOM"></a>
+                <div class="mdetail alt">
+                <h3>isDateOOM</i></h3>
+                <code>public function isDateOOM(<code>Date date</code>)</code>
+                <div class="mdetail-desc">
+                    Determines whether a given date is OOM (out of month).                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>date</code> : Date<div class="sub-desc">The JavaScript Date object for which to check the OOM status</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">true if the date is OOM</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="isMonthOverlapWeek"></a>
+                <div class="mdetail">
+                <h3>isMonthOverlapWeek</i></h3>
+                <code>public function isMonthOverlapWeek(<code>Date weekBeginDate</code>)</code>
+                <div class="mdetail-desc">
+                    Determines if a given week overlaps two different months.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>weekBeginDate</code> : Date<div class="sub-desc">The JavaScript Date representing the first day of the week.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">true if the date overlaps two different months.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="isYearOverlapWeek"></a>
+                <div class="mdetail alt">
+                <h3>isYearOverlapWeek</i></h3>
+                <code>public function isYearOverlapWeek(<code>Date weekBeginDate</code>)</code>
+                <div class="mdetail-desc">
+                    Determines if a given week overlaps two different years.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>weekBeginDate</code> : Date<div class="sub-desc">The JavaScript Date representing the first day of the week.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">true if the date overlaps two different years.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="nextMonth"></a>
+                <div class="mdetail">
+                <h3>nextMonth</i></h3>
+                <code>public function nextMonth()</code>
+                <div class="mdetail-desc">
+                    Navigates to the next month page in the calendar widget.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="nextYear"></a>
+                <div class="mdetail alt">
+                <h3>nextYear</i></h3>
+                <code>public function nextYear()</code>
+                <div class="mdetail-desc">
+                    Navigates to the next year in the currently selected month in the calendar widget.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="onBeforeDeselect"></a>
+                <div class="mdetail">
+                <h3>onBeforeDeselect</i></h3>
+                <code>public function onBeforeDeselect()</code>
+                <div class="mdetail-desc">
+                    <b>Deprecated.</b> Event executed before a date is deselected in the calendar widget.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="onBeforeSelect"></a>
+                <div class="mdetail alt">
+                <h3>onBeforeSelect</i></h3>
+                <code>public function onBeforeSelect()</code>
+                <div class="mdetail-desc">
+                    <b>Deprecated.</b> Event executed before a date is selected in the calendar widget.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="onChangePage"></a>
+                <div class="mdetail">
+                <h3>onChangePage</i></h3>
+                <code>public function onChangePage()</code>
+                <div class="mdetail-desc">
+                    <b>Deprecated.</b> Event executed when the user navigates to a different calendar page.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="onDeselect"></a>
+                <div class="mdetail alt">
+                <h3>onDeselect</i></h3>
+                <code>public function onDeselect(<code>Array selected</code>)</code>
+                <div class="mdetail-desc">
+                    <b>Deprecated.</b> Event executed when a date is deselected in the calendar widget.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>selected</code> : Array<div class="sub-desc">An array of date field arrays representing which date or dates were deselected. Example: [ [2006,8,6],[2006,8,7],[2006,8,8] ]</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="onRender"></a>
+                <div class="mdetail">
+                <h3>onRender</i></h3>
+                <code>public function onRender()</code>
+                <div class="mdetail-desc">
+                    <b>Deprecated.</b> Event executed when the calendar widget is rendered.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="onSelect"></a>
+                <div class="mdetail alt">
+                <h3>onSelect</i></h3>
+                <code>public function onSelect(<code>Array selected</code>)</code>
+                <div class="mdetail-desc">
+                    <b>Deprecated.</b> Event executed when a date is selected in the calendar widget.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>selected</code> : Array<div class="sub-desc">An array of date field arrays representing which date or dates were selected. Example: [ [2006,8,6],[2006,8,7],[2006,8,8] ]</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="previousMonth"></a>
+                <div class="mdetail">
+                <h3>previousMonth</i></h3>
+                <code>public function previousMonth()</code>
+                <div class="mdetail-desc">
+                    Navigates to the previous month page in the calendar widget.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="previousYear"></a>
+                <div class="mdetail alt">
+                <h3>previousYear</i></h3>
+                <code>public function previousYear()</code>
+                <div class="mdetail-desc">
+                    Navigates to the previous year in the currently selected month in the calendar widget.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="render"></a>
+                <div class="mdetail">
+                <h3>render</i></h3>
+                <code>public function render()</code>
+                <div class="mdetail-desc">
+                    <b>Deprecated.</b> Event executed when the calendar widget is completely cleared to the current month with no selections.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="renderBody"></a>
+                <div class="mdetail alt">
+                <h3>renderBody</i></h3>
+                <code>public function renderBody(<code>Date workingDate</code>, <code>Array html</code>)</code>
+                <div class="mdetail-desc">
+                    Renders the calendar body.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>workingDate</code> : Date<div class="sub-desc">The current working Date being used for the render process</div></li><li><code>html</code> : Array<div class="sub-desc">The current working HTML array</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Array</code><div class="sub-desc">The current working HTML array</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="renderBodyCellRestricted"></a>
+                <div class="mdetail">
+                <h3>renderBodyCellRestricted</i></h3>
+                <code>public function renderBodyCellRestricted(<code>Date workingDate</code>, <code>HTMLTableCellElement cell</code>)</code>
+                <div class="mdetail-desc">
+                    Renders the current calendar cell as a non-selectable "black-out" date using the default
+restricted style.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>workingDate</code> : Date<div class="sub-desc">The current working Date object being used to generate the calendar</div></li><li><code>cell</code> : HTMLTableCellElement<div class="sub-desc">The current working cell in the calendar</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>String</code><div class="sub-desc">YAHOO.widget.Calendar.STOP_RENDER if rendering should stop with this style, null or nothing if rendering should not be terminated</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="renderCellDefault"></a>
+                <div class="mdetail alt">
+                <h3>renderCellDefault</i></h3>
+                <code>public function renderCellDefault(<code>Date workingDate</code>, <code>HTMLTableCellElement cell</code>)</code>
+                <div class="mdetail-desc">
+                    Renders a single standard calendar cell in the calendar widget table.
+All logic for determining how a standard default cell will be rendered is
+encapsulated in this method, and must be accounted for when extending the
+widget class.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>workingDate</code> : Date<div class="sub-desc">The current working Date object being used to generate the calendar</div></li><li><code>cell</code> : HTMLTableCellElement<div class="sub-desc">The current working cell in the calendar</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="renderCellNotThisMonth"></a>
+                <div class="mdetail">
+                <h3>renderCellNotThisMonth</i></h3>
+                <code>public function renderCellNotThisMonth(<code>Date workingDate</code>, <code>HTMLTableCellElement cell</code>)</code>
+                <div class="mdetail-desc">
+                    Applies the default style used for rendering dates that are not a part of the current
+month (preceding or trailing the cells for the current month)                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>workingDate</code> : Date<div class="sub-desc">The current working Date object being used to generate the calendar</div></li><li><code>cell</code> : HTMLTableCellElement<div class="sub-desc">The current working cell in the calendar</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>String</code><div class="sub-desc">YAHOO.widget.Calendar.STOP_RENDER if rendering should stop with this style, null or nothing if rendering should not be terminated</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="renderCellStyleHighlight1"></a>
+                <div class="mdetail alt">
+                <h3>renderCellStyleHighlight1</i></h3>
+                <code>public function renderCellStyleHighlight1(<code>Date workingDate</code>, <code>HTMLTableCellElement cell</code>)</code>
+                <div class="mdetail-desc">
+                    Renders a single standard calendar cell using the CSS hightlight1 style                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>workingDate</code> : Date<div class="sub-desc">The current working Date object being used to generate the calendar</div></li><li><code>cell</code> : HTMLTableCellElement<div class="sub-desc">The current working cell in the calendar</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="renderCellStyleHighlight2"></a>
+                <div class="mdetail">
+                <h3>renderCellStyleHighlight2</i></h3>
+                <code>public function renderCellStyleHighlight2(<code>Date workingDate</code>, <code>HTMLTableCellElement cell</code>)</code>
+                <div class="mdetail-desc">
+                    Renders a single standard calendar cell using the CSS hightlight2 style                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>workingDate</code> : Date<div class="sub-desc">The current working Date object being used to generate the calendar</div></li><li><code>cell</code> : HTMLTableCellElement<div class="sub-desc">The current working cell in the calendar</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="renderCellStyleHighlight3"></a>
+                <div class="mdetail alt">
+                <h3>renderCellStyleHighlight3</i></h3>
+                <code>public function renderCellStyleHighlight3(<code>Date workingDate</code>, <code>HTMLTableCellElement cell</code>)</code>
+                <div class="mdetail-desc">
+                    Renders a single standard calendar cell using the CSS hightlight3 style                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>workingDate</code> : Date<div class="sub-desc">The current working Date object being used to generate the calendar</div></li><li><code>cell</code> : HTMLTableCellElement<div class="sub-desc">The current working cell in the calendar</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="renderCellStyleHighlight4"></a>
+                <div class="mdetail">
+                <h3>renderCellStyleHighlight4</i></h3>
+                <code>public function renderCellStyleHighlight4(<code>Date workingDate</code>, <code>HTMLTableCellElement cell</code>)</code>
+                <div class="mdetail-desc">
+                    Renders a single standard calendar cell using the CSS hightlight4 style                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>workingDate</code> : Date<div class="sub-desc">The current working Date object being used to generate the calendar</div></li><li><code>cell</code> : HTMLTableCellElement<div class="sub-desc">The current working cell in the calendar</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="renderCellStyleSelected"></a>
+                <div class="mdetail alt">
+                <h3>renderCellStyleSelected</i></h3>
+                <code>public function renderCellStyleSelected(<code>Date workingDate</code>, <code>HTMLTableCellElement cell</code>)</code>
+                <div class="mdetail-desc">
+                    Applies the default style used for rendering selected dates to the current calendar cell                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>workingDate</code> : Date<div class="sub-desc">The current working Date object being used to generate the calendar</div></li><li><code>cell</code> : HTMLTableCellElement<div class="sub-desc">The current working cell in the calendar</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>String</code><div class="sub-desc">YAHOO.widget.Calendar.STOP_RENDER if rendering should stop with this style, null or nothing if rendering should not be terminated</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="renderCellStyleToday"></a>
+                <div class="mdetail">
+                <h3>renderCellStyleToday</i></h3>
+                <code>public function renderCellStyleToday(<code>Date workingDate</code>, <code>HTMLTableCellElement cell</code>)</code>
+                <div class="mdetail-desc">
+                    Applies the default style used for rendering today's date to the current calendar cell                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>workingDate</code> : Date<div class="sub-desc">The current working Date object being used to generate the calendar</div></li><li><code>cell</code> : HTMLTableCellElement<div class="sub-desc">The current working cell in the calendar</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="renderFooter"></a>
+                <div class="mdetail alt">
+                <h3>renderFooter</i></h3>
+                <code>public function renderFooter(<code>Array html</code>)</code>
+                <div class="mdetail-desc">
+                    Renders the calendar footer. In the default implementation, there is
+no footer.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>html</code> : Array<div class="sub-desc">The current working HTML array</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Array</code><div class="sub-desc">The current working HTML array</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="renderHeader"></a>
+                <div class="mdetail">
+                <h3>renderHeader</i></h3>
+                <code>public function renderHeader(<code>Array html</code>)</code>
+                <div class="mdetail-desc">
+                    Renders the calendar header.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>html</code> : Array<div class="sub-desc">The current working HTML array</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Array</code><div class="sub-desc">The current working HTML array</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="renderOutOfBoundsDate"></a>
+                <div class="mdetail alt">
+                <h3>renderOutOfBoundsDate</i></h3>
+                <code>public function renderOutOfBoundsDate(<code>Date workingDate</code>, <code>HTMLTableCellElement cell</code>)</code>
+                <div class="mdetail-desc">
+                    Renders a cell that falls before the minimum date or after the maximum date.
+widget class.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>workingDate</code> : Date<div class="sub-desc">The current working Date object being used to generate the calendar</div></li><li><code>cell</code> : HTMLTableCellElement<div class="sub-desc">The current working cell in the calendar</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>String</code><div class="sub-desc">YAHOO.widget.Calendar.STOP_RENDER if rendering should stop with this style, null or nothing if rendering should not be terminated</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="renderRowFooter"></a>
+                <div class="mdetail">
+                <h3>renderRowFooter</i></h3>
+                <code>public function renderRowFooter(<code>Number weekNum</code>, <code>Array cell</code>)</code>
+                <div class="mdetail-desc">
+                    Renders the row footer for a week.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>weekNum</code> : Number<div class="sub-desc">The week number of the current row</div></li><li><code>cell</code> : Array<div class="sub-desc">The current working HTML array</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="renderRowHeader"></a>
+                <div class="mdetail alt">
+                <h3>renderRowHeader</i></h3>
+                <code>public function renderRowHeader(<code>Number weekNum</code>, <code>Array cell</code>)</code>
+                <div class="mdetail-desc">
+                    Renders the row header for a week.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>weekNum</code> : Number<div class="sub-desc">The week number of the current row</div></li><li><code>cell</code> : Array<div class="sub-desc">The current working HTML array</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="reset"></a>
+                <div class="mdetail">
+                <h3>reset</i></h3>
+                <code>public function reset()</code>
+                <div class="mdetail-desc">
+                    Resets the calendar widget to the originally selected month and year, and
+sets the calendar to the initial selection(s).                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="resetRenderers"></a>
+                <div class="mdetail alt">
+                <h3>resetRenderers</i></h3>
+                <code>public function resetRenderers()</code>
+                <div class="mdetail-desc">
+                    Resets the render stack of the current calendar to its original pre-render value.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="select"></a>
+                <div class="mdetail">
+                <h3>select</i></h3>
+                <code>public function select(<code>String/Date/Date[] date</code>)</code>
+                <div class="mdetail-desc">
+                    Selects a date or a collection of dates on the current calendar. This method, by default,
+does not call the render method explicitly. Once selection has completed, render must be
+called for the changes to be reflected visually.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>date</code> : String/Date/Date[]<div class="sub-desc">The date string of dates to select in the current calendar. Valid formats are individual date(s) (12/24/2005,12/26/2005) or date range(s) (12/24/2005-1/1/2006). Multiple comma-delimited dates can also be passed to this method (12/24/2005,12/11/2005-12/13/2005). This method can also take a JavaScript Date object or an array of Date objects.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Date[]</code><div class="sub-desc">Array of JavaScript Date objects representing all individual dates that are currently selected.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="selectCell"></a>
+                <div class="mdetail alt">
+                <h3>selectCell</i></h3>
+                <code>public function selectCell(<code>Number cellIndex</code>)</code>
+                <div class="mdetail-desc">
+                    Selects a date on the current calendar by referencing the index of the cell that should be selected.
+This method is used to easily select a single cell (usually with a mouse click) without having to do
+a full render. The selected style is applied to the cell directly.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>cellIndex</code> : Number<div class="sub-desc">The index of the cell to select in the current calendar.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Date[]</code><div class="sub-desc">Array of JavaScript Date objects representing all individual dates that are currently selected.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="setMonth"></a>
+                <div class="mdetail">
+                <h3>setMonth</i></h3>
+                <code>public function setMonth(<code>Number month</code>)</code>
+                <div class="mdetail-desc">
+                    Sets the calendar's month explicitly                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>month</code> : Number<div class="sub-desc">The numeric month, from 0 (January) to 11 (December)</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="setYear"></a>
+                <div class="mdetail alt">
+                <h3>setYear</i></h3>
+                <code>public function setYear(<code>Number year</code>)</code>
+                <div class="mdetail-desc">
+                    Sets the calendar's year explicitly.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>year</code> : Number<div class="sub-desc">The numeric 4-digit year</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="show"></a>
+                <div class="mdetail">
+                <h3>show</i></h3>
+                <code>public function show()</code>
+                <div class="mdetail-desc">
+                    Shows the Calendar's outer container.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="styleCellDefault"></a>
+                <div class="mdetail alt">
+                <h3>styleCellDefault</i></h3>
+                <code>public function styleCellDefault(<code>Date workingDate</code>, <code>HTMLTableCellElement cell</code>)</code>
+                <div class="mdetail-desc">
+                    Styles a selectable cell.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>workingDate</code> : Date<div class="sub-desc">The current working Date object being used to generate the calendar</div></li><li><code>cell</code> : HTMLTableCellElement<div class="sub-desc">The current working cell in the calendar</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="subtract"></a>
+                <div class="mdetail">
+                <h3>subtract</i></h3>
+                <code>public function subtract(<code>Date date</code>, <code>Number field</code>, <code>Number amount</code>)</code>
+                <div class="mdetail-desc">
+                    Subtracts the specified amount of time from the this instance.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>date</code> : Date<div class="sub-desc">The JavaScript Date object to perform subtraction on</div></li><li><code>field</code> : Number<div class="sub-desc">The this field constant to be used for performing subtraction.</div></li><li><code>amount</code> : Number<div class="sub-desc">The number of units (measured in the field constant) to subtract from the date.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Date</code><div class="sub-desc">The resulting Date object</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="subtractMonths"></a>
+                <div class="mdetail alt">
+                <h3>subtractMonths</i></h3>
+                <code>public function subtractMonths(<code>Number count</code>)</code>
+                <div class="mdetail-desc">
+                    Subtracts the designated number of months from the current calendar month, and sets the current
+calendar page date to the new month.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>count</code> : Number<div class="sub-desc">The number of months to subtract from the current calendar</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="subtractYears"></a>
+                <div class="mdetail">
+                <h3>subtractYears</i></h3>
+                <code>public function subtractYears(<code>Number count</code>)</code>
+                <div class="mdetail-desc">
+                    Subtcats the designated number of years from the current calendar, and sets the current
+calendar page date to the new month.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>count</code> : Number<div class="sub-desc">The number of years to subtract from the current calendar</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="toString"></a>
+                <div class="mdetail alt">
+                <h3>toString</i></h3>
+                <code>public function toString()</code>
+                <div class="mdetail-desc">
+                    Returns a string representation of the object.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>String</code><div class="sub-desc">A string representation of the Calendar object.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                            <a name="validate"></a>
+                <div class="mdetail">
+                <h3>validate</i></h3>
+                <code>public function validate()</code>
+                <div class="mdetail-desc">
+                    Validates the calendar widget. This method has no default implementation
+and must be extended by subclassing the widget.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Should</code><div class="sub-desc">return true if the widget validates, and false if it doesn't.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DateMath.</div>
+                </div>
+                        </div>
+                    
+                    <h2 class="mdetail-head">Event Details</h2>
+            <div class="detail-wrap">
+                            <a name="beforeDeselectEvent"></a>
+                <div class="mdetail">
+                <h3>beforeDeselectEvent</i></h3>
+                <code>public event beforeDeselectEvent</code>
+                <div class="mdetail-desc">
+                Fired before a selection is made                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by DateMath.</div>
+                </div>
+                            <a name="beforeRenderEvent"></a>
+                <div class="mdetail alt">
+                <h3>beforeRenderEvent</i></h3>
+                <code>public event beforeRenderEvent</code>
+                <div class="mdetail-desc">
+                Fired before the Calendar is rendered                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by DateMath.</div>
+                </div>
+                            <a name="beforeSelectEvent"></a>
+                <div class="mdetail">
+                <h3>beforeSelectEvent</i></h3>
+                <code>public event beforeSelectEvent</code>
+                <div class="mdetail-desc">
+                Fired before a selection is made                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by DateMath.</div>
+                </div>
+                            <a name="changePageEvent"></a>
+                <div class="mdetail alt">
+                <h3>changePageEvent</i></h3>
+                <code>public event changePageEvent</code>
+                <div class="mdetail-desc">
+                Fired when the Calendar page is changed                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by DateMath.</div>
+                </div>
+                            <a name="clearEvent"></a>
+                <div class="mdetail">
+                <h3>clearEvent</i></h3>
+                <code>public event clearEvent</code>
+                <div class="mdetail-desc">
+                Fired when the Calendar is cleared                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by DateMath.</div>
+                </div>
+                            <a name="deselectEvent"></a>
+                <div class="mdetail alt">
+                <h3>deselectEvent</i></h3>
+                <code>public event deselectEvent</code>
+                <div class="mdetail-desc">
+                Fired when a selection is made                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>Array</code> : Array<div class="sub-desc">of Date field arrays in the format [YYYY, MM, DD].</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by DateMath.</div>
+                </div>
+                            <a name="renderEvent"></a>
+                <div class="mdetail">
+                <h3>renderEvent</i></h3>
+                <code>public event renderEvent</code>
+                <div class="mdetail-desc">
+                Fired when the Calendar is rendered                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by DateMath.</div>
+                </div>
+                            <a name="resetEvent"></a>
+                <div class="mdetail alt">
+                <h3>resetEvent</i></h3>
+                <code>public event resetEvent</code>
+                <div class="mdetail-desc">
+                Fired when the Calendar is reset                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by DateMath.</div>
+                </div>
+                            <a name="selectEvent"></a>
+                <div class="mdetail">
+                <h3>selectEvent</i></h3>
+                <code>public event selectEvent</code>
+                <div class="mdetail-desc">
+                Fired when a selection is made                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>Array</code> : Array<div class="sub-desc">of Date field arrays in the format [YYYY, MM, DD].</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by DateMath.</div>
+                </div>
+                        </div>
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    

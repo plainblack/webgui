@@ -1,0 +1,1120 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.widget.Module</title>
+        <link rel="stylesheet" type="text/css" href="../resources/reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../resources/style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../resources/print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="../resources/print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.widget.Module.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.widget.Module</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.widget</td></tr>
+            <tr><td class="label">Class:</td><td>Module</td></tr>
+                        <tr><td class="label">Extends:</td><td>Object</td></tr>
+                                    <tr><td class="label">Subclasses:</td><td><a href="YAHOO.widget.Overlay.html">Overlay</a></td></tr>
+                        <tr><td class="label">Defined In:</td><td><a href="container_core.js.html">container_core.js</a></td></tr>
+        </table>
+        <div class="description">
+            Module is a JavaScript representation of the Standard Module Format. Standard Module Format is a simple standard for markup containers where child nodes representing the header, body, and footer of the content are denoted using the CSS classes "hd", "bd", and "ft" respectively. Module is the base class for all other classes in the YUI Container package.        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Property</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_BODY&lt;static&gt;">CSS_BODY&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Constant representing the module body</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_FOOTER&lt;static&gt;">CSS_FOOTER&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Constant representing the module footer</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_HEADER&lt;static&gt;">CSS_HEADER&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Constant representing the module header</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_MODULE&lt;static&gt;">CSS_MODULE&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Constant for the default CSS class name that represents a Module</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#body">body</a> : HTMLElement</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The body element, denoted with CSS class "bd"</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#browser">browser</a> : String</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">String representing the current user-agent browser</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#cfg">cfg</a> : YAHOO.util.Config</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The Module's Config object used for monitoring configuration properties.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#contructor">contructor</a> : Function</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The class's constructor function</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#element">element</a> : HTMLElement</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The main module element that contains the header, body, and footer</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#footer">footer</a> : HTMLElement</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The footer element, denoted with CSS class "ft"</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#header">header</a> : HTMLElement</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The header element, denoted with CSS class "hd"</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#http">http</a> : String</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Constant representing the prefix path to use for non-secure images</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#https">https</a> : String</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Constant representing the prefix path to use for securely served images</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#id">id</a> : String</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The id of the element</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#imageRoot">imageRoot</a> : String</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The String representing the image root</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#isSecure">isSecure</a> : Boolean</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Boolean representing whether or not the current browsing context is secure (https)</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#javascript">javascript</a> : String</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Constant representing the url for the "src" attribute of the iframe used to monitor changes to the bro...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#platform">platform</a> : String</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">String representing the current user-agent platform</td>
+    </tr>
+            </table>
+                <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#Module">Module</a>(<code>String el</code>, <code>HTMLElement el</code>, <code>Object userConfig</code>)</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#appendToBody">appendToBody</a>(<code>HTMLElement element</code>) : void</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Appends the passed element to the body. If no body is present, one will be automatically created.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#appendToFooter">appendToFooter</a>(<code>HTMLElement element</code>) : void</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Appends the passed element to the footer. If no footer is present, one will be automatically created.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#appendToHeader">appendToHeader</a>(<code>HTMLElement element</code>) : void</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Appends the passed element to the header. If no header is present, one will be automatically created.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configMonitorResize">configMonitorResize</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Default event handler for the "monitorresize" configuration property</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configVisible">configVisible</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Default event handler for changing the visibility property of a Module. By default, this is achieved by switching the...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#destroy">destroy</a>() : void</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Removes the Module element from the DOM and sets all child elements to null.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#hide">hide</a>() : void</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Hides the Module element by setting the visible configuration property to false. Also fires two events: beforeHideEve...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#init">init</a>(<code>String el</code>, <code>HTMLElement el</code>, <code>Object userConfig</code>) : void</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The Module class's initialization method, which is executed for Module and all of its subclasses. This method is auto...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#initDefaultConfig">initDefaultConfig</a>() : void</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Initializes the custom events for Module which are fired automatically at appropriate times by the Module class.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#initEvents">initEvents</a>() : void</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Initializes the custom events for Module which are fired automatically at appropriate times by the Module class.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#initResizeMonitor">initResizeMonitor</a>() : void</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Initialized an empty IFRAME that is placed out of the visible area that can be used to detect text resize.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#onDomResize">onDomResize</a>(<code>DOMEvent e</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Event handler fired when the resize monitor element is resized.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#render">render</a>(<code>String appendToNode</code>, <code>HTMLElement appendToNode</code>, <code>HTMLElement moduleElement</code>) : Boolean</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Renders the Module by inserting the elements that are not already in the main Module into their correct places. Optio...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setBody">setBody</a>(<code>String bodyContent</code>, <code>HTMLElement bodyContent</code>) : void</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Sets the Module's body content to the HTML specified, or appends the passed element to the body. If no body is presen...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setFooter">setFooter</a>(<code>String footerContent</code>, <code>HTMLElement footerContent</code>) : void</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Sets the Module's footer content to the HTML specified, or appends the passed element to the footer. If no footer is ...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setHeader">setHeader</a>(<code>String headerContent</code>, <code>HTMLElement headerContent</code>) : void</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Sets the Module's header content to the HTML specified, or appends the passed element to the header. If no header is ...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#show">show</a>() : void</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Shows the Module element by setting the visible configuration property to true. Also fires two events: beforeShowEven...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#toString">toString</a>() : String</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Returns a String representation of the Object.</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Event</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#event-appendEvent">appendEvent</a> : ()</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr>
+        <td class="mdesc">CustomEvent fired when the Module is appended to the DOM</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#event-beforeHideEvent">beforeHideEvent</a> : ()</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">CustomEvent fired before the Module is hidden</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#event-beforeInitEvent">beforeInitEvent</a> : (<code>class classRef</code>)</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr>
+        <td class="mdesc">CustomEvent fired prior to class initalization.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#event-beforeRenderEvent">beforeRenderEvent</a> : ()</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">CustomEvent fired before the Module is rendered</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#event-beforeShowEvent">beforeShowEvent</a> : ()</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr>
+        <td class="mdesc">CustomEvent fired before the Module is shown</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#event-changeBodyEvent">changeBodyEvent</a> : (<code>String/HTMLElement content</code>)</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">CustomEvent fired when the body content of the Module is modified</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#event-changeContentEvent">changeContentEvent</a> : ()</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr>
+        <td class="mdesc">CustomEvent fired when the content of the Module is modified</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#event-changeFooterEvent">changeFooterEvent</a> : (<code>String/HTMLElement content</code>)</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">CustomEvent fired when the footer content of the Module is modified</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#event-changeHeaderEvent">changeHeaderEvent</a> : (<code>String/HTMLElement content</code>)</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr>
+        <td class="mdesc">CustomEvent fired when the header content of the Module is modified</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#event-destroyEvent">destroyEvent</a> : ()</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">CustomEvent fired when the Module is destroyed</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#event-hideEvent">hideEvent</a> : ()</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr>
+        <td class="mdesc">CustomEvent fired after the Module is hidden</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#event-initEvent">initEvent</a> : (<code>class classRef</code>)</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">CustomEvent fired after class initalization.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#event-renderEvent">renderEvent</a> : ()</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr>
+        <td class="mdesc">CustomEvent fired after the Module is rendered</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#event-showEvent">showEvent</a> : ()</td>
+        <td class="msource" rowspan="2">Module</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">CustomEvent fired after the Module is shown</td>
+    </tr>
+            </table>
+                
+                    <h2 class="mdetail-head">Property Details</h2>
+            <div class="detail-wrap">
+                            <a name="CSS_BODY&lt;static&gt;"></a>
+                <div class="mdetail">
+                <h3>CSS_BODY&lt;static&gt;</i></h3>
+                <code>public String CSS_BODY&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the module body                </div>
+                <div class="mdetail-def">This property is defined by Module.</div>
+                </div>
+                            <a name="CSS_FOOTER&lt;static&gt;"></a>
+                <div class="mdetail alt">
+                <h3>CSS_FOOTER&lt;static&gt;</i></h3>
+                <code>public String CSS_FOOTER&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the module footer                </div>
+                <div class="mdetail-def">This property is defined by Module.</div>
+                </div>
+                            <a name="CSS_HEADER&lt;static&gt;"></a>
+                <div class="mdetail">
+                <h3>CSS_HEADER&lt;static&gt;</i></h3>
+                <code>public String CSS_HEADER&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the module header                </div>
+                <div class="mdetail-def">This property is defined by Module.</div>
+                </div>
+                            <a name="CSS_MODULE&lt;static&gt;"></a>
+                <div class="mdetail alt">
+                <h3>CSS_MODULE&lt;static&gt;</i></h3>
+                <code>public String CSS_MODULE&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant for the default CSS class name that represents a Module                </div>
+                <div class="mdetail-def">This property is defined by Module.</div>
+                </div>
+                            <a name="body"></a>
+                <div class="mdetail">
+                <h3>body</i></h3>
+                <code>public HTMLElement body</code>
+                <div class="mdetail-desc">
+                    The body element, denoted with CSS class "bd"                </div>
+                <div class="mdetail-def">This property is defined by Module.</div>
+                </div>
+                            <a name="browser"></a>
+                <div class="mdetail alt">
+                <h3>browser</i></h3>
+                <code>public String browser</code>
+                <div class="mdetail-desc">
+                    String representing the current user-agent browser                </div>
+                <div class="mdetail-def">This property is defined by Module.</div>
+                </div>
+                            <a name="cfg"></a>
+                <div class="mdetail">
+                <h3>cfg</i></h3>
+                <code>public YAHOO.util.Config cfg</code>
+                <div class="mdetail-desc">
+                    The Module's Config object used for monitoring configuration properties.                </div>
+                <div class="mdetail-def">This property is defined by Module.</div>
+                </div>
+                            <a name="contructor"></a>
+                <div class="mdetail alt">
+                <h3>contructor</i></h3>
+                <code>public Function contructor</code>
+                <div class="mdetail-desc">
+                    The class's constructor function                </div>
+                <div class="mdetail-def">This property is defined by Module.</div>
+                </div>
+                            <a name="element"></a>
+                <div class="mdetail">
+                <h3>element</i></h3>
+                <code>public HTMLElement element</code>
+                <div class="mdetail-desc">
+                    The main module element that contains the header, body, and footer                </div>
+                <div class="mdetail-def">This property is defined by Module.</div>
+                </div>
+                            <a name="footer"></a>
+                <div class="mdetail alt">
+                <h3>footer</i></h3>
+                <code>public HTMLElement footer</code>
+                <div class="mdetail-desc">
+                    The footer element, denoted with CSS class "ft"                </div>
+                <div class="mdetail-def">This property is defined by Module.</div>
+                </div>
+                            <a name="header"></a>
+                <div class="mdetail">
+                <h3>header</i></h3>
+                <code>public HTMLElement header</code>
+                <div class="mdetail-desc">
+                    The header element, denoted with CSS class "hd"                </div>
+                <div class="mdetail-def">This property is defined by Module.</div>
+                </div>
+                            <a name="http"></a>
+                <div class="mdetail alt">
+                <h3>http</i></h3>
+                <code>public String http</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the prefix path to use for non-secure images                </div>
+                <div class="mdetail-def">This property is defined by Module.</div>
+                </div>
+                            <a name="https"></a>
+                <div class="mdetail">
+                <h3>https</i></h3>
+                <code>public String https</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the prefix path to use for securely served images                </div>
+                <div class="mdetail-def">This property is defined by Module.</div>
+                </div>
+                            <a name="id"></a>
+                <div class="mdetail alt">
+                <h3>id</i></h3>
+                <code>public String id</code>
+                <div class="mdetail-desc">
+                    The id of the element                </div>
+                <div class="mdetail-def">This property is defined by Module.</div>
+                </div>
+                            <a name="imageRoot"></a>
+                <div class="mdetail">
+                <h3>imageRoot</i></h3>
+                <code>public String imageRoot</code>
+                <div class="mdetail-desc">
+                    The String representing the image root                </div>
+                <div class="mdetail-def">This property is defined by Module.</div>
+                </div>
+                            <a name="isSecure"></a>
+                <div class="mdetail alt">
+                <h3>isSecure</i></h3>
+                <code>public Boolean isSecure</code>
+                <div class="mdetail-desc">
+                    Boolean representing whether or not the current browsing context is secure (https)                </div>
+                <div class="mdetail-def">This property is defined by Module.</div>
+                </div>
+                            <a name="javascript"></a>
+                <div class="mdetail">
+                <h3>javascript</i></h3>
+                <code>public String javascript</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the url for the "src" attribute of the iframe used to monitor changes to the browser's base font size                </div>
+                <div class="mdetail-def">This property is defined by Module.</div>
+                </div>
+                            <a name="platform"></a>
+                <div class="mdetail alt">
+                <h3>platform</i></h3>
+                <code>public String platform</code>
+                <div class="mdetail-desc">
+                    String representing the current user-agent platform                </div>
+                <div class="mdetail-def">This property is defined by Module.</div>
+                </div>
+                        </div>
+                
+                    <a name="Module"></a>
+            <h2 class="mdetail-head">Constructor Details</h2>
+            <div class="detail-wrap">
+                <div class="mdetail">
+                <h3>Module</i></h3>
+                <code>public function Module(<code>String el</code>, <code>HTMLElement el</code>, <code>Object userConfig</code>)</code>
+                <div class="mdetail-desc">
+                                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>el</code> : String<div class="sub-desc">The element ID representing the Module <em>OR</em></div></li><li><code>el</code> : HTMLElement<div class="sub-desc">The element representing the Module</div></li><li><code>userConfig</code> : Object<div class="sub-desc">The configuration Object literal containing the configuration that should be set for this module. See configuration documentation for more details.</div></li>                    </ul>
+                </div>
+                </div>
+                </div>
+            </div>
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="appendToBody"></a>
+                <div class="mdetail">
+                <h3>appendToBody</i></h3>
+                <code>public function appendToBody(<code>HTMLElement element</code>)</code>
+                <div class="mdetail-desc">
+                    Appends the passed element to the body. If no body is present, one will be automatically created.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>element</code> : HTMLElement<div class="sub-desc">The element to append to the body</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Module.</div>
+                </div>
+                            <a name="appendToFooter"></a>
+                <div class="mdetail alt">
+                <h3>appendToFooter</i></h3>
+                <code>public function appendToFooter(<code>HTMLElement element</code>)</code>
+                <div class="mdetail-desc">
+                    Appends the passed element to the footer. If no footer is present, one will be automatically created.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>element</code> : HTMLElement<div class="sub-desc">The element to append to the footer</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Module.</div>
+                </div>
+                            <a name="appendToHeader"></a>
+                <div class="mdetail">
+                <h3>appendToHeader</i></h3>
+                <code>public function appendToHeader(<code>HTMLElement element</code>)</code>
+                <div class="mdetail-desc">
+                    Appends the passed element to the header. If no header is present, one will be automatically created.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>element</code> : HTMLElement<div class="sub-desc">The element to append to the header</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Module.</div>
+                </div>
+                            <a name="configMonitorResize"></a>
+                <div class="mdetail alt">
+                <h3>configMonitorResize</i></h3>
+                <code>public function configMonitorResize(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    Default event handler for the "monitorresize" configuration property                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Module.</div>
+                </div>
+                            <a name="configVisible"></a>
+                <div class="mdetail">
+                <h3>configVisible</i></h3>
+                <code>public function configVisible(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    Default event handler for changing the visibility property of a Module. By default, this is achieved by switching the "display" style between "block" and "none".
+This method is responsible for firing showEvent and hideEvent.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Module.</div>
+                </div>
+                            <a name="destroy"></a>
+                <div class="mdetail alt">
+                <h3>destroy</i></h3>
+                <code>public function destroy()</code>
+                <div class="mdetail-desc">
+                    Removes the Module element from the DOM and sets all child elements to null.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Module.</div>
+                </div>
+                            <a name="hide"></a>
+                <div class="mdetail">
+                <h3>hide</i></h3>
+                <code>public function hide()</code>
+                <div class="mdetail-desc">
+                    Hides the Module element by setting the visible configuration property to false. Also fires two events: beforeHideEvent prior to the visibility change, and hideEvent after.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Module.</div>
+                </div>
+                            <a name="init"></a>
+                <div class="mdetail alt">
+                <h3>init</i></h3>
+                <code>public function init(<code>String el</code>, <code>HTMLElement el</code>, <code>Object userConfig</code>)</code>
+                <div class="mdetail-desc">
+                    The Module class's initialization method, which is executed for Module and all of its subclasses. This method is automatically called by the constructor, and  sets up all DOM references for pre-existing markup, and creates required markup if it is not already present.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>el</code> : String<div class="sub-desc">The element ID representing the Module <em>OR</em></div></li><li><code>el</code> : HTMLElement<div class="sub-desc">The element representing the Module</div></li><li><code>userConfig</code> : Object<div class="sub-desc">The configuration Object literal containing the configuration that should be set for this module. See configuration documentation for more details.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Module.</div>
+                </div>
+                            <a name="initDefaultConfig"></a>
+                <div class="mdetail">
+                <h3>initDefaultConfig</i></h3>
+                <code>public function initDefaultConfig()</code>
+                <div class="mdetail-desc">
+                    Initializes the custom events for Module which are fired automatically at appropriate times by the Module class.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Module.</div>
+                </div>
+                            <a name="initEvents"></a>
+                <div class="mdetail alt">
+                <h3>initEvents</i></h3>
+                <code>public function initEvents()</code>
+                <div class="mdetail-desc">
+                    Initializes the custom events for Module which are fired automatically at appropriate times by the Module class.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Module.</div>
+                </div>
+                            <a name="initResizeMonitor"></a>
+                <div class="mdetail">
+                <h3>initResizeMonitor</i></h3>
+                <code>public function initResizeMonitor()</code>
+                <div class="mdetail-desc">
+                    Initialized an empty IFRAME that is placed out of the visible area that can be used to detect text resize.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Module.</div>
+                </div>
+                            <a name="onDomResize"></a>
+                <div class="mdetail alt">
+                <h3>onDomResize</i></h3>
+                <code>public function onDomResize(<code>DOMEvent e</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    Event handler fired when the resize monitor element is resized.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>e</code> : DOMEvent<div class="sub-desc">The DOM resize event</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object passed to the handler</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Module.</div>
+                </div>
+                            <a name="render"></a>
+                <div class="mdetail">
+                <h3>render</i></h3>
+                <code>public function render(<code>String appendToNode</code>, <code>HTMLElement appendToNode</code>, <code>HTMLElement moduleElement</code>)</code>
+                <div class="mdetail-desc">
+                    Renders the Module by inserting the elements that are not already in the main Module into their correct places. Optionally appends the Module to the specified node prior to the render's execution. NOTE: For Modules without existing markup, the appendToNode argument is REQUIRED. If this argument is ommitted and the current element is not present in the document, the function will return false, indicating that the render was a failure.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>appendToNode</code> : String<div class="sub-desc">The element id to which the Module should be appended to prior to rendering <em>OR</em></div></li><li><code>appendToNode</code> : HTMLElement<div class="sub-desc">The element to which the Module should be appended to prior to rendering</div></li><li><code>moduleElement</code> : HTMLElement<div class="sub-desc">OPTIONAL. The element that represents the actual Standard Module container.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">Success or failure of the render</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Module.</div>
+                </div>
+                            <a name="setBody"></a>
+                <div class="mdetail alt">
+                <h3>setBody</i></h3>
+                <code>public function setBody(<code>String bodyContent</code>, <code>HTMLElement bodyContent</code>)</code>
+                <div class="mdetail-desc">
+                    Sets the Module's body content to the HTML specified, or appends the passed element to the body. If no body is present, one will be automatically created.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>bodyContent</code> : String<div class="sub-desc">The HTML used to set the body <em>OR</em></div></li><li><code>bodyContent</code> : HTMLElement<div class="sub-desc">The HTMLElement to append to the body</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Module.</div>
+                </div>
+                            <a name="setFooter"></a>
+                <div class="mdetail">
+                <h3>setFooter</i></h3>
+                <code>public function setFooter(<code>String footerContent</code>, <code>HTMLElement footerContent</code>)</code>
+                <div class="mdetail-desc">
+                    Sets the Module's footer content to the HTML specified, or appends the passed element to the footer. If no footer is present, one will be automatically created.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>footerContent</code> : String<div class="sub-desc">The HTML used to set the footer <em>OR</em></div></li><li><code>footerContent</code> : HTMLElement<div class="sub-desc">The HTMLElement to append to the footer</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Module.</div>
+                </div>
+                            <a name="setHeader"></a>
+                <div class="mdetail alt">
+                <h3>setHeader</i></h3>
+                <code>public function setHeader(<code>String headerContent</code>, <code>HTMLElement headerContent</code>)</code>
+                <div class="mdetail-desc">
+                    Sets the Module's header content to the HTML specified, or appends the passed element to the header. If no header is present, one will be automatically created.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>headerContent</code> : String<div class="sub-desc">The HTML used to set the header <em>OR</em></div></li><li><code>headerContent</code> : HTMLElement<div class="sub-desc">The HTMLElement to append to the header</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Module.</div>
+                </div>
+                            <a name="show"></a>
+                <div class="mdetail">
+                <h3>show</i></h3>
+                <code>public function show()</code>
+                <div class="mdetail-desc">
+                    Shows the Module element by setting the visible configuration property to true. Also fires two events: beforeShowEvent prior to the visibility change, and showEvent after.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Module.</div>
+                </div>
+                            <a name="toString"></a>
+                <div class="mdetail alt">
+                <h3>toString</i></h3>
+                <code>public function toString()</code>
+                <div class="mdetail-desc">
+                    Returns a String representation of the Object.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>String</code><div class="sub-desc">The string representation of the Module</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Module.</div>
+                </div>
+                        </div>
+                    
+                    <h2 class="mdetail-head">Event Details</h2>
+            <div class="detail-wrap">
+                            <a name="event-appendEvent"></a>
+                <div class="mdetail">
+                <h3>appendEvent</i></h3>
+                <code>public event appendEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired when the Module is appended to the DOM                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Module.</div>
+                </div>
+                            <a name="event-beforeHideEvent"></a>
+                <div class="mdetail alt">
+                <h3>beforeHideEvent</i></h3>
+                <code>public event beforeHideEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired before the Module is hidden                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Module.</div>
+                </div>
+                            <a name="event-beforeInitEvent"></a>
+                <div class="mdetail">
+                <h3>beforeInitEvent</i></h3>
+                <code>public event beforeInitEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired prior to class initalization.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>classRef</code> : class<div class="sub-desc">class reference of the initializing class, such as this.beforeInitEvent.fire(YAHOO.widget.Module)</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Module.</div>
+                </div>
+                            <a name="event-beforeRenderEvent"></a>
+                <div class="mdetail alt">
+                <h3>beforeRenderEvent</i></h3>
+                <code>public event beforeRenderEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired before the Module is rendered                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Module.</div>
+                </div>
+                            <a name="event-beforeShowEvent"></a>
+                <div class="mdetail">
+                <h3>beforeShowEvent</i></h3>
+                <code>public event beforeShowEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired before the Module is shown                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Module.</div>
+                </div>
+                            <a name="event-changeBodyEvent"></a>
+                <div class="mdetail alt">
+                <h3>changeBodyEvent</i></h3>
+                <code>public event changeBodyEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired when the body content of the Module is modified                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>content</code> : String/HTMLElement<div class="sub-desc">String/element representing the new body content</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Module.</div>
+                </div>
+                            <a name="event-changeContentEvent"></a>
+                <div class="mdetail">
+                <h3>changeContentEvent</i></h3>
+                <code>public event changeContentEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired when the content of the Module is modified                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Module.</div>
+                </div>
+                            <a name="event-changeFooterEvent"></a>
+                <div class="mdetail alt">
+                <h3>changeFooterEvent</i></h3>
+                <code>public event changeFooterEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired when the footer content of the Module is modified                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>content</code> : String/HTMLElement<div class="sub-desc">String/element representing the new footer content</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Module.</div>
+                </div>
+                            <a name="event-changeHeaderEvent"></a>
+                <div class="mdetail">
+                <h3>changeHeaderEvent</i></h3>
+                <code>public event changeHeaderEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired when the header content of the Module is modified                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>content</code> : String/HTMLElement<div class="sub-desc">String/element representing the new header content</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Module.</div>
+                </div>
+                            <a name="event-destroyEvent"></a>
+                <div class="mdetail alt">
+                <h3>destroyEvent</i></h3>
+                <code>public event destroyEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired when the Module is destroyed                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Module.</div>
+                </div>
+                            <a name="event-hideEvent"></a>
+                <div class="mdetail">
+                <h3>hideEvent</i></h3>
+                <code>public event hideEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired after the Module is hidden                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Module.</div>
+                </div>
+                            <a name="event-initEvent"></a>
+                <div class="mdetail alt">
+                <h3>initEvent</i></h3>
+                <code>public event initEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired after class initalization.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>classRef</code> : class<div class="sub-desc">class reference of the initializing class, such as this.beforeInitEvent.fire(YAHOO.widget.Module)</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Module.</div>
+                </div>
+                            <a name="event-renderEvent"></a>
+                <div class="mdetail">
+                <h3>renderEvent</i></h3>
+                <code>public event renderEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired after the Module is rendered                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Module.</div>
+                </div>
+                            <a name="event-showEvent"></a>
+                <div class="mdetail alt">
+                <h3>showEvent</i></h3>
+                <code>public event showEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired after the Module is shown                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Module.</div>
+                </div>
+                        </div>
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    

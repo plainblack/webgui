@@ -1,0 +1,858 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.util.Event</title>
+        <link rel="stylesheet" type="text/css" href="../reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.util.Event.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.util.Event</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.util</td></tr>
+            <tr><td class="label">Class:</td><td>Event</td></tr>
+                        <tr><td class="label">Extends:</td><td>Object</td></tr>
+                                    <tr><td class="label">Defined In:</td><td><a href="event.js.html">event.js</a></td></tr>
+        </table>
+        <div class="description">
+            The event utility provides functions to add and remove event listeners,
+event cleansing.  It also tries to automatically remove listeners it
+registers during the unload event.        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Property</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#ADJ_SCOPE">ADJ_SCOPE</a> : int</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Adjusted scope, either the element we are registering the event
+on or the custom object passed in by t...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#EL">EL</a> : int</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Element to bind, int constant</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#FN">FN</a> : int</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Function to execute, int constant</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#OBJ">OBJ</a> : int</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Object passed in by the user that will be returned as a 
+parameter to the callback, int constant</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#POLL_INTERVAL">POLL_INTERVAL</a> : int</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; The poll interval in milliseconds</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#POLL_RETRYS">POLL_RETRYS</a> : int</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; The number of times we should look for elements that are not
+in the DOM at the time the event is reque...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#TYPE">TYPE</a> : int</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Type of event, int constant</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#WFN">WFN</a> : int</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Function wrapped for scope correction and cleanup, int constant</td>
+    </tr>
+            </table>
+                <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#addListener">addListener</a>(<code>Object el</code>, <code>String sType</code>, <code>Function fn</code>, <code>Object obj</code>, <code>boolean override</code>) : boolean</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Appends an event handler</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#createEvent">createEvent</a>(<code>p_type {string}</code>, <code>p_config {object}</code>) : CustomEvent</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Creates a new custom event of the specified type.  If a custom event
+by that name already exists, it will not be re-c...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#fireEvent">fireEvent</a>(<code>p_type {string}</code>, <code>arguments {Object*}</code>) : boolean</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fire a custom event by name.  The callback functions will be executed
+from the scope specified when the event was cre...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#generateId">generateId</a>(<code>el the</code>) : string</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Generates an unique ID for the element if it does not already 
+have one.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getCharCode">getCharCode</a>(<code>Event ev</code>) : int</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Returns the charcode for an event</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getEvent">getEvent</a>(<code>Event e</code>) : Event</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Finds the event in the window object, the caller's arguments, or
+in the arguments of another method in...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getListeners">getListeners</a>(<code>el {HTMLElement}</code>, <code>sType {string}</code>) : Object</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Returns all listeners attached to the given element via addListener.
+Optionally, you can specify a spe...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getPageX">getPageX</a>(<code>Event ev</code>) : int</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Returns the event's pageX</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getPageY">getPageY</a>(<code>Event ev</code>) : int</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Returns the event's pageY</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getRelatedTarget">getRelatedTarget</a>(<code>Event ev</code>) : HTMLElement</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Returns the event's related target</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getTarget">getTarget</a>(<code>Event ev</code>, <code>boolean resolveTextNode</code>) : HTMLElement</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr>
+        <td class="mdesc"><b>Deprecated.</b> &lt;static&gt; Returns the event's target element</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getTime">getTime</a>(<code>Event ev</code>) : Date</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Returns the time of the event.  If the time is not included, the
+event is modified using the current t...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getXY">getXY</a>() : void</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Returns the pageX and pageY properties as an indexed array.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#hasEvent">hasEvent</a>(<code>type {string}</code>) : void</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Returns true if the custom event of the provided type has been created
+with createEvent.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#on">on</a>() : void</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; YAHOO.util.Event.on is an alias for addListener</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#onAvailable">onAvailable</a>(<code>string p_id</code>, <code>function p_fn</code>, <code>object p_obj</code>, <code>boolean p_override</code>) : void</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Executes the supplied callback when the item with the supplied
+id is found.  This is meant to be used ...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#onContentReady">onContentReady</a>(<code>string p_id</code>, <code>function p_fn</code>, <code>object p_obj</code>, <code>boolean p_override</code>) : void</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Works the same way as onAvailable, but additionally checks the
+state of sibling elements to determine ...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#preventDefault">preventDefault</a>(<code>Event ev</code>) : void</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Prevents the default behavior of the event</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#purgeElement">purgeElement</a>(<code>HTMLElement el</code>, <code>boolean recurse</code>, <code>string sType</code>) : void</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Removes all listeners attached to the given element via addListener.
+Optionally, the node's children c...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#removeListener">removeListener</a>(<code>Object el</code>, <code>String sType</code>, <code>Function fn</code>) : boolean</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Removes an event handler</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#resolveTextNode">resolveTextNode</a>(<code>HTMLElement node</code>) : HTMLElement</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; In some cases, some browsers will return a text node inside
+the actual element that was targeted.  Thi...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#stopEvent">stopEvent</a>(<code>Event ev</code>) : void</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Convenience method for stopPropagation + preventDefault</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#stopPropagation">stopPropagation</a>(<code>Event ev</code>) : void</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Stops event propagation</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#subscribe">subscribe</a>(<code>p_type {string}</code>, <code>p_fn {function}</code>, <code>p_obj </code>, <code>p_obj {Object}</code>, <code>p_override {boolean}</code>) : void</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Subscribe to a CustomEvent by event type</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#unsubscribe">unsubscribe</a>(<code>p_type {string}</code>, <code>p_fn {Function}</code>, <span class="optional" title="Optional">[<code>p_obj {Object}</code>]</span>) : boolean</td>
+        <td class="msource" rowspan="2">Event</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Unsubscribes the from the specified event</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+        <div class="no-members">This class has no public events.</div>        
+                    <h2 class="mdetail-head">Property Details</h2>
+            <div class="detail-wrap">
+                            <a name="ADJ_SCOPE"></a>
+                <div class="mdetail">
+                <h3>ADJ_SCOPE</i></h3>
+                <code>public int ADJ_SCOPE</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Adjusted scope, either the element we are registering the event
+on or the custom object passed in by the listener, int constant                </div>
+                <div class="mdetail-def">This property is defined by Event.</div>
+                </div>
+                            <a name="EL"></a>
+                <div class="mdetail alt">
+                <h3>EL</i></h3>
+                <code>public int EL</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Element to bind, int constant                </div>
+                <div class="mdetail-def">This property is defined by Event.</div>
+                </div>
+                            <a name="FN"></a>
+                <div class="mdetail">
+                <h3>FN</i></h3>
+                <code>public int FN</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Function to execute, int constant                </div>
+                <div class="mdetail-def">This property is defined by Event.</div>
+                </div>
+                            <a name="OBJ"></a>
+                <div class="mdetail alt">
+                <h3>OBJ</i></h3>
+                <code>public int OBJ</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Object passed in by the user that will be returned as a 
+parameter to the callback, int constant                </div>
+                <div class="mdetail-def">This property is defined by Event.</div>
+                </div>
+                            <a name="POLL_INTERVAL"></a>
+                <div class="mdetail">
+                <h3>POLL_INTERVAL</i></h3>
+                <code>public int POLL_INTERVAL</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; The poll interval in milliseconds                </div>
+                <div class="mdetail-def">This property is defined by Event.</div>
+                </div>
+                            <a name="POLL_RETRYS"></a>
+                <div class="mdetail alt">
+                <h3>POLL_RETRYS</i></h3>
+                <code>public int POLL_RETRYS</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; The number of times we should look for elements that are not
+in the DOM at the time the event is requested after the document
+has been loaded.  The default is 200@amp;50 ms, so it will poll
+for 10 seconds or until all outstanding handlers are bound
+(whichever comes first).                </div>
+                <div class="mdetail-def">This property is defined by Event.</div>
+                </div>
+                            <a name="TYPE"></a>
+                <div class="mdetail">
+                <h3>TYPE</i></h3>
+                <code>public int TYPE</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Type of event, int constant                </div>
+                <div class="mdetail-def">This property is defined by Event.</div>
+                </div>
+                            <a name="WFN"></a>
+                <div class="mdetail alt">
+                <h3>WFN</i></h3>
+                <code>public int WFN</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Function wrapped for scope correction and cleanup, int constant                </div>
+                <div class="mdetail-def">This property is defined by Event.</div>
+                </div>
+                        </div>
+                
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="addListener"></a>
+                <div class="mdetail">
+                <h3>addListener</i></h3>
+                <code>public function addListener(<code>Object el</code>, <code>String sType</code>, <code>Function fn</code>, <code>Object obj</code>, <code>boolean override</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Appends an event handler                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>el</code> : Object<div class="sub-desc">The html element to assign the event to</div></li><li><code>sType</code> : String<div class="sub-desc">The type of event to append</div></li><li><code>fn</code> : Function<div class="sub-desc">The method the event invokes</div></li><li><code>obj</code> : Object<div class="sub-desc">An arbitrary object that will be passed as a parameter to the handler</div></li><li><code>override</code> : boolean<div class="sub-desc">If true, the obj passed in becomes the execution scope of the listener</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>boolean</code><div class="sub-desc">True if the action was successful or defered, false if one or more of the elements could not have the event bound to it.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Event.</div>
+                </div>
+                            <a name="createEvent"></a>
+                <div class="mdetail alt">
+                <h3>createEvent</i></h3>
+                <code>public function createEvent(<code>p_type {string}</code>, <code>p_config {object}</code>)</code>
+                <div class="mdetail-desc">
+                    Creates a new custom event of the specified type.  If a custom event
+by that name already exists, it will not be re-created.  In either
+case the custom event is returned.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>{string}</code> : p_type<div class="sub-desc">the type, or name of the event</div></li><li><code>{object}</code> : p_config<div class="sub-desc">optional config params. Valid properties are: <ul> <li> scope: defines the default execution scope. If not defined the default scope will be this instance. </li> <li> silent: if true, the custom event will not generate log messages. This is false by default. </li> <li> onSubscribeCallback: specifies a callback to execute when the event has a new subscriber. This will fire immediately for each queued subscriber if any exist prior to the creation of the event. </li> </ul></div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>CustomEvent</code><div class="sub-desc">the custom event</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Event.</div>
+                </div>
+                            <a name="fireEvent"></a>
+                <div class="mdetail">
+                <h3>fireEvent</i></h3>
+                <code>public function fireEvent(<code>p_type {string}</code>, <code>arguments {Object*}</code>)</code>
+                <div class="mdetail-desc">
+                    Fire a custom event by name.  The callback functions will be executed
+from the scope specified when the event was created, and with the 
+following parameters:
+<ul>
+<li>The first argument fire() was executed with</li>
+<li>The custom object (if any) that was passed into the subscribe() 
+method</li>
+</ul>                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>{string}</code> : p_type<div class="sub-desc">the type, or name of the event</div></li><li><code>{Object*}</code> : arguments<div class="sub-desc">an arbitrary set of parameters to pass to the handler.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>boolean</code><div class="sub-desc">the return value from CustomEvent.fire, or null if the custom event does not exist.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Event.</div>
+                </div>
+                            <a name="generateId"></a>
+                <div class="mdetail alt">
+                <h3>generateId</i></h3>
+                <code>public function generateId(<code>el the</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Generates an unique ID for the element if it does not already 
+have one.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>the</code> : el<div class="sub-desc">element to create the id for</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>string</code><div class="sub-desc">the resulting id of the element</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Event.</div>
+                </div>
+                            <a name="getCharCode"></a>
+                <div class="mdetail">
+                <h3>getCharCode</i></h3>
+                <code>public function getCharCode(<code>Event ev</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Returns the charcode for an event                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>ev</code> : Event<div class="sub-desc">the event</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>int</code><div class="sub-desc">the event's charCode</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Event.</div>
+                </div>
+                            <a name="getEvent"></a>
+                <div class="mdetail alt">
+                <h3>getEvent</i></h3>
+                <code>public function getEvent(<code>Event e</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Finds the event in the window object, the caller's arguments, or
+in the arguments of another method in the callstack.  This is
+executed automatically for events registered through the event
+manager, so the implementer should not normally need to execute
+this function at all.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>e</code> : Event<div class="sub-desc">the event parameter from the handler</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Event</code><div class="sub-desc">the event</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Event.</div>
+                </div>
+                            <a name="getListeners"></a>
+                <div class="mdetail">
+                <h3>getListeners</i></h3>
+                <code>public function getListeners(<code>el {HTMLElement}</code>, <code>sType {string}</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Returns all listeners attached to the given element via addListener.
+Optionally, you can specify a specific type of event to return.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>{HTMLElement}</code> : el<div class="sub-desc">the element to inspect</div></li><li><code>{string}</code> : sType<div class="sub-desc">optional type of listener to return. If left out, all listeners will be returned</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Object</code><div class="sub-desc">the listener. Contains the following fields: &nbsp;&nbsp;type: (string) the type of event &nbsp;&nbsp;fn: (function) the callback supplied to addListener &nbsp;&nbsp;obj: (object) the custom object supplied to addListener &nbsp;&nbsp;adjust: (boolean) whether or not to adjust the default scope &nbsp;&nbsp;index: (int) its position in the Event util listener cache</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Event.</div>
+                </div>
+                            <a name="getPageX"></a>
+                <div class="mdetail alt">
+                <h3>getPageX</i></h3>
+                <code>public function getPageX(<code>Event ev</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Returns the event's pageX                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>ev</code> : Event<div class="sub-desc">the event</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>int</code><div class="sub-desc">the event's pageX</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Event.</div>
+                </div>
+                            <a name="getPageY"></a>
+                <div class="mdetail">
+                <h3>getPageY</i></h3>
+                <code>public function getPageY(<code>Event ev</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Returns the event's pageY                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>ev</code> : Event<div class="sub-desc">the event</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>int</code><div class="sub-desc">the event's pageY</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Event.</div>
+                </div>
+                            <a name="getRelatedTarget"></a>
+                <div class="mdetail alt">
+                <h3>getRelatedTarget</i></h3>
+                <code>public function getRelatedTarget(<code>Event ev</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Returns the event's related target                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>ev</code> : Event<div class="sub-desc">the event</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>HTMLElement</code><div class="sub-desc">the event's relatedTarget</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Event.</div>
+                </div>
+                            <a name="getTarget"></a>
+                <div class="mdetail">
+                <h3>getTarget</i></h3>
+                <code>public function getTarget(<code>Event ev</code>, <code>boolean resolveTextNode</code>)</code>
+                <div class="mdetail-desc">
+                    <b>Deprecated.</b> &lt;static&gt; Returns the event's target element                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>ev</code> : Event<div class="sub-desc">the event</div></li><li><code>resolveTextNode</code> : boolean<div class="sub-desc">when set to true the target's parent will be returned if the target is a text node.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>HTMLElement</code><div class="sub-desc">the event's target</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Event.</div>
+                </div>
+                            <a name="getTime"></a>
+                <div class="mdetail alt">
+                <h3>getTime</i></h3>
+                <code>public function getTime(<code>Event ev</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Returns the time of the event.  If the time is not included, the
+event is modified using the current time.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>ev</code> : Event<div class="sub-desc">the event</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Date</code><div class="sub-desc">the time of the event</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Event.</div>
+                </div>
+                            <a name="getXY"></a>
+                <div class="mdetail">
+                <h3>getXY</i></h3>
+                <code>public function getXY()</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Returns the pageX and pageY properties as an indexed array.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Event.</div>
+                </div>
+                            <a name="hasEvent"></a>
+                <div class="mdetail alt">
+                <h3>hasEvent</i></h3>
+                <code>public function hasEvent(<code>type {string}</code>)</code>
+                <div class="mdetail-desc">
+                    Returns true if the custom event of the provided type has been created
+with createEvent.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>{string}</code> : type<div class="sub-desc">the type, or name of the event</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Event.</div>
+                </div>
+                            <a name="on"></a>
+                <div class="mdetail">
+                <h3>on</i></h3>
+                <code>public function on()</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; YAHOO.util.Event.on is an alias for addListener                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Event.</div>
+                </div>
+                            <a name="onAvailable"></a>
+                <div class="mdetail alt">
+                <h3>onAvailable</i></h3>
+                <code>public function onAvailable(<code>string p_id</code>, <code>function p_fn</code>, <code>object p_obj</code>, <code>boolean p_override</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Executes the supplied callback when the item with the supplied
+id is found.  This is meant to be used to execute behavior as
+soon as possible as the page loads.  If you use this after the
+initial page load it will poll for a fixed time for the element.
+The number of times it will poll and the frequency are
+configurable.  By default it will poll for 10 seconds.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>p_id</code> : string<div class="sub-desc">the id of the element to look for.</div></li><li><code>p_fn</code> : function<div class="sub-desc">what to execute when the element is found.</div></li><li><code>p_obj</code> : object<div class="sub-desc">an optional object to be passed back as a parameter to p_fn.</div></li><li><code>p_override</code> : boolean<div class="sub-desc">If set to true, p_fn will execute in the scope of p_obj</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Event.</div>
+                </div>
+                            <a name="onContentReady"></a>
+                <div class="mdetail">
+                <h3>onContentReady</i></h3>
+                <code>public function onContentReady(<code>string p_id</code>, <code>function p_fn</code>, <code>object p_obj</code>, <code>boolean p_override</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Works the same way as onAvailable, but additionally checks the
+state of sibling elements to determine if the content of the
+available element is safe to modify.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>p_id</code> : string<div class="sub-desc">the id of the element to look for.</div></li><li><code>p_fn</code> : function<div class="sub-desc">what to execute when the element is ready.</div></li><li><code>p_obj</code> : object<div class="sub-desc">an optional object to be passed back as a parameter to p_fn.</div></li><li><code>p_override</code> : boolean<div class="sub-desc">If set to true, p_fn will execute in the scope of p_obj</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Event.</div>
+                </div>
+                            <a name="preventDefault"></a>
+                <div class="mdetail alt">
+                <h3>preventDefault</i></h3>
+                <code>public function preventDefault(<code>Event ev</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Prevents the default behavior of the event                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>ev</code> : Event<div class="sub-desc">the event</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Event.</div>
+                </div>
+                            <a name="purgeElement"></a>
+                <div class="mdetail">
+                <h3>purgeElement</i></h3>
+                <code>public function purgeElement(<code>HTMLElement el</code>, <code>boolean recurse</code>, <code>string sType</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Removes all listeners attached to the given element via addListener.
+Optionally, the node's children can also be purged.
+Optionally, you can specify a specific type of event to remove.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>el</code> : HTMLElement<div class="sub-desc">the element to purge</div></li><li><code>recurse</code> : boolean<div class="sub-desc">recursively purge this element's children as well. Use with caution.</div></li><li><code>sType</code> : string<div class="sub-desc">optional type of listener to purge. If left out, all listeners will be removed</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Event.</div>
+                </div>
+                            <a name="removeListener"></a>
+                <div class="mdetail alt">
+                <h3>removeListener</i></h3>
+                <code>public function removeListener(<code>Object el</code>, <code>String sType</code>, <code>Function fn</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Removes an event handler                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>el</code> : Object<div class="sub-desc">the html element or the id of the element to assign the event to.</div></li><li><code>sType</code> : String<div class="sub-desc">the type of event to remove.</div></li><li><code>fn</code> : Function<div class="sub-desc">the method the event invokes. If fn is undefined, then all event handlers for the type of event are removed.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>boolean</code><div class="sub-desc">true if the unbind was successful, false otherwise.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Event.</div>
+                </div>
+                            <a name="resolveTextNode"></a>
+                <div class="mdetail">
+                <h3>resolveTextNode</i></h3>
+                <code>public function resolveTextNode(<code>HTMLElement node</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; In some cases, some browsers will return a text node inside
+the actual element that was targeted.  This normalizes the
+return value for getTarget and getRelatedTarget.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>node</code> : HTMLElement<div class="sub-desc">node to resolve</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>HTMLElement</code><div class="sub-desc">the normized node</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Event.</div>
+                </div>
+                            <a name="stopEvent"></a>
+                <div class="mdetail alt">
+                <h3>stopEvent</i></h3>
+                <code>public function stopEvent(<code>Event ev</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Convenience method for stopPropagation + preventDefault                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>ev</code> : Event<div class="sub-desc">the event</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Event.</div>
+                </div>
+                            <a name="stopPropagation"></a>
+                <div class="mdetail">
+                <h3>stopPropagation</i></h3>
+                <code>public function stopPropagation(<code>Event ev</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Stops event propagation                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>ev</code> : Event<div class="sub-desc">the event</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Event.</div>
+                </div>
+                            <a name="subscribe"></a>
+                <div class="mdetail alt">
+                <h3>subscribe</i></h3>
+                <code>public function subscribe(<code>p_type {string}</code>, <code>p_fn {function}</code>, <code>p_obj </code>, <code>p_obj {Object}</code>, <code>p_override {boolean}</code>)</code>
+                <div class="mdetail-desc">
+                    Subscribe to a CustomEvent by event type                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>{string}</code> : p_type<div class="sub-desc">the type, or name of the event</div></li><li><code>{function}</code> : p_fn<div class="sub-desc">the function to exectute when the event fires</div></li><li><code></code> : p_obj<div class="sub-desc"></div></li><li><code>{Object}</code> : p_obj<div class="sub-desc">An object to be passed along when the event fires</div></li><li><code>{boolean}</code> : p_override<div class="sub-desc">If true, the obj passed in becomes the execution scope of the listener</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Event.</div>
+                </div>
+                            <a name="unsubscribe"></a>
+                <div class="mdetail">
+                <h3>unsubscribe</i></h3>
+                <code>public function unsubscribe(<code>p_type {string}</code>, <code>p_fn {Function}</code>, <span class="optional" title="Optional">[<code>p_obj {Object}</code>]</span>)</code>
+                <div class="mdetail-desc">
+                    Unsubscribes the from the specified event                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>{string}</code> : p_type<div class="sub-desc">The type, or name of the event</div></li><li><code>{Function}</code> : p_fn<div class="sub-desc">The function to execute</div></li><li><code>{Object}</code> : p_obj<div class="sub-desc">The custom object passed to subscribe (optional)</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>boolean</code><div class="sub-desc">true if the subscriber was found and detached.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Event.</div>
+                </div>
+                        </div>
+                    
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    

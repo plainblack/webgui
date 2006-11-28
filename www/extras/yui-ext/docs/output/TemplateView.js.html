@@ -1,0 +1,492 @@
+<html><head><title>TemplateView.js</title><link rel="stylesheet" type="text/css" href="../style.css" media="screen"/></head><body><div class="hl-main"><pre><span class="hl-comment">/**
+ * @class YAHOO.ext.View
+ * @extends YAHOO.ext.util.Observable
+ * Create a &quot;View&quot; for an element based on a data model or UpdateManager and the supplied DomHelper template. 
+ * This class also supports single and multi selection modes. &lt;br&gt;
+ * Create a data model bound view:
+&lt;pre&gt;&lt;code&gt;
+var dataModel = new YAHOO.ext.grid.XMLDataModel(...);
+var view = new YAHOO.ext.View('my-element', 
+           '&amp;lt;div id=&quot;{0}&quot;&amp;gt;{2} - {1}&amp;lt;/div&amp;gt;', // auto create template
+           dataModel, { 
+              singleSelect: true, 
+              selectedClass: 'ydataview-selected'
+           });
+
+// listen for node click?
+view.on('click', function(vw, index, node, e){
+    alert('Node &quot;' + node.id + '&quot; at index: ' + index + ' was clicked.');
+});
+
+// load XML data
+dataModel.load('foobar.xml');
+&lt;/code&gt;&lt;/pre&gt;
+For an example of creating a JSON/UpdateManager view, see {@link YAHOO.ext.JsonView}.
+ * &lt;br&gt;&lt;br&gt;
+ * &lt;b&gt;</span><span class="hl-inlinedoc">Note:</span><span class="hl-comment"> The root of your template must be a single node. Table/row implementations may work but are not supported due to
+ * IE's limited insertion support with tables and Opera's faulty event bubbling.&lt;/b&gt;
+ * @constructor
+ * Create a new View
+ * @param {String/HTMLElement/Element} container The container element where the view is to be rendered.
+ * @param {String/DomHelper.Template} tpl The rendering template or a string to create a template with
+ * @param {DataModel} dataModel The bound data model
+ * @param {Object} config The config object
+*/
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">View</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">container</span><span class="hl-code">, </span><span class="hl-identifier">tpl</span><span class="hl-code">, </span><span class="hl-identifier">dataModel</span><span class="hl-code">, </span><span class="hl-identifier">config</span><span class="hl-brackets">){
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code"> = </span><span class="hl-identifier">getEl</span><span class="hl-brackets">(</span><span class="hl-identifier">container</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">nodes</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-code">.</span><span class="hl-identifier">childNodes</span><span class="hl-code">;
+    </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">tpl</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">string</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+        </span><span class="hl-identifier">tpl</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">Template</span><span class="hl-brackets">(</span><span class="hl-identifier">tpl</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+    </span><span class="hl-identifier">tpl</span><span class="hl-code">.</span><span class="hl-identifier">compile</span><span class="hl-brackets">()</span><span class="hl-code">;
+    </span><span class="hl-comment">/**
+     * The template used by this View
+     * @type {YAHOO.ext.DomHelper.Template}
+     */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">tpl</span><span class="hl-code"> = </span><span class="hl-identifier">tpl</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">setDataModel</span><span class="hl-brackets">(</span><span class="hl-identifier">dataModel</span><span class="hl-brackets">)</span><span class="hl-code">;
+    
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">CE</span><span class="hl-code"> = </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">CustomEvent</span><span class="hl-code">;
+	</span><span class="hl-comment">/** @private */
+	</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">events</span><span class="hl-code"> = </span><span class="hl-brackets">{
+	    </span><span class="hl-comment">/**
+         * @event click
+         * Fires when a template node is clicked.
+         * @param {YAHOO.ext.View} this
+         * @param {Number} index The index of the target node
+         * @param {HTMLElement} node The target node
+         * @param {YAHOO.ext.EventObject} e The raw event object
+         */
+        </span><span class="hl-quotes">'</span><span class="hl-string">click</span><span class="hl-quotes">'</span><span class="hl-code"> : </span><span class="hl-reserved">new </span><span class="hl-identifier">CE</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">click</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">,
+	    </span><span class="hl-comment">/**
+         * @event dblclick
+         * Fires when a template node is double clicked.
+         * @param {YAHOO.ext.View} this
+         * @param {Number} index The index of the target node
+         * @param {HTMLElement} node The target node
+         * @param {YAHOO.ext.EventObject} e The raw event object
+         */
+        </span><span class="hl-quotes">'</span><span class="hl-string">dblclick</span><span class="hl-quotes">'</span><span class="hl-code"> : </span><span class="hl-reserved">new </span><span class="hl-identifier">CE</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">dblclick</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">,
+	    </span><span class="hl-comment">/**
+         * @event contextmenu
+         * Fires when a template node is right clicked.
+         * @param {YAHOO.ext.View} this
+         * @param {Number} index The index of the target node
+         * @param {HTMLElement} node The target node
+         * @param {YAHOO.ext.EventObject} e The raw event object
+         */
+        </span><span class="hl-quotes">'</span><span class="hl-string">contextmenu</span><span class="hl-quotes">'</span><span class="hl-code"> : </span><span class="hl-reserved">new </span><span class="hl-identifier">CE</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">contextmenu</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">,
+	    </span><span class="hl-comment">/**
+         * @event selectionchange
+         * Fires when the selected nodes change.
+         * @param {YAHOO.ext.View} this
+         * @param {Array} selections Array of the selected nodes
+         */
+        </span><span class="hl-quotes">'</span><span class="hl-string">selectionchange</span><span class="hl-quotes">'</span><span class="hl-code"> : </span><span class="hl-reserved">new </span><span class="hl-identifier">CE</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">selectionchange</span><span class="hl-quotes">'</span><span class="hl-brackets">)
+	}</span><span class="hl-code">;
+	</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">mon</span><span class="hl-brackets">(</span><span class="hl-quotes">&quot;</span><span class="hl-string">click</span><span class="hl-quotes">&quot;</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-builtin">onClick</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">mon</span><span class="hl-brackets">(</span><span class="hl-quotes">&quot;</span><span class="hl-string">dblclick</span><span class="hl-quotes">&quot;</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-builtin">onDblClick</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">mon</span><span class="hl-brackets">(</span><span class="hl-quotes">&quot;</span><span class="hl-string">contextmenu</span><span class="hl-quotes">&quot;</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onContextMenu</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+    
+    </span><span class="hl-comment">/**
+     * The css class to add to selected nodes
+     * @type {YAHOO.ext.DomHelper.Template}
+     */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selectedClass</span><span class="hl-code"> = </span><span class="hl-quotes">'</span><span class="hl-string">ydataview-selected</span><span class="hl-quotes">'</span><span class="hl-code">;
+    
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selections</span><span class="hl-code"> = </span><span class="hl-brackets">[]</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">lastSelection</span><span class="hl-code"> = </span><span class="hl-reserved">null</span><span class="hl-code">;
+    
+    </span><span class="hl-comment">/**
+     * The root property in the loaded json object that contains the data
+     * @type {String}
+     */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">jsonRoot</span><span class="hl-code"> = </span><span class="hl-reserved">null</span><span class="hl-code">;
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Config</span><span class="hl-code">.</span><span class="hl-identifier">apply</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-identifier">config</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">renderUpdates</span><span class="hl-code"> || </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">jsonRoot</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">um</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">getUpdateManager</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-identifier">um</span><span class="hl-code">.</span><span class="hl-identifier">setRenderer</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+}</span><span class="hl-default">;
+
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">extendX</span><span class="hl-brackets">(</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">View</span><span class="hl-code">, </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Observable</span><span class="hl-code">, </span><span class="hl-brackets">{
+    </span><span class="hl-comment">/**
+     * Returns the element this view is bound to.
+     * @return {YAHOO.ext.Element}
+     */
+    </span><span class="hl-identifier">getEl</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">;  
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">render</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-identifier">response</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">clearSelections</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">update</span><span class="hl-brackets">(</span><span class="hl-quotes">''</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">o</span><span class="hl-code">;
+        </span><span class="hl-reserved">try</span><span class="hl-brackets">{
+            </span><span class="hl-identifier">o</span><span class="hl-code"> = </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">JSON</span><span class="hl-code">.</span><span class="hl-identifier">decode</span><span class="hl-brackets">(</span><span class="hl-identifier">response</span><span class="hl-code">.</span><span class="hl-identifier">responseText</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">jsonRoot</span><span class="hl-brackets">){
+                </span><span class="hl-identifier">o</span><span class="hl-code"> = </span><span class="hl-identifier">eval</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">o.</span><span class="hl-quotes">'</span><span class="hl-code"> + </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">jsonRoot</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+        }</span><span class="hl-reserved">catch</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-brackets">){}
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">o</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">html</span><span class="hl-code"> = </span><span class="hl-brackets">[]</span><span class="hl-code">;
+            </span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">, </span><span class="hl-identifier">len</span><span class="hl-code"> = </span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code"> &lt; </span><span class="hl-identifier">len</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code">++</span><span class="hl-brackets">) {
+            	</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">renderEach</span><span class="hl-brackets">(</span><span class="hl-identifier">o</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">])</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">update</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">html</span><span class="hl-code">.</span><span class="hl-identifier">join</span><span class="hl-brackets">(</span><span class="hl-quotes">''</span><span class="hl-brackets">))</span><span class="hl-code">;
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">html</span><span class="hl-code"> = </span><span class="hl-reserved">null</span><span class="hl-code">;
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">nodes</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-code">.</span><span class="hl-identifier">childNodes</span><span class="hl-code">;
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">updateIndexes</span><span class="hl-brackets">(</span><span class="hl-number">0</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Refreshes the view. 
+     */
+     </span><span class="hl-identifier">refresh</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">clearSelections</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">update</span><span class="hl-brackets">(</span><span class="hl-quotes">''</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">html</span><span class="hl-code"> = </span><span class="hl-brackets">[]</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">dataModel</span><span class="hl-code">.</span><span class="hl-identifier">each</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">renderEach</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">update</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">html</span><span class="hl-code">.</span><span class="hl-identifier">join</span><span class="hl-brackets">(</span><span class="hl-quotes">''</span><span class="hl-brackets">))</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">html</span><span class="hl-code"> = </span><span class="hl-reserved">null</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">nodes</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-code">.</span><span class="hl-identifier">childNodes</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">updateIndexes</span><span class="hl-brackets">(</span><span class="hl-number">0</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Function to override to reformat the data that is sent to 
+     * the template for each node.
+     * @param {Array/Object} data The raw data (array of colData for a data model bound view or 
+     * a JSON object for an UpdateManager bound view).
+     * @param {Number} index The index of the data within the data model 
+     */
+    </span><span class="hl-identifier">prepareData</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">data</span><span class="hl-code">, </span><span class="hl-identifier">index</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">return </span><span class="hl-identifier">data</span><span class="hl-code">;  
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">renderEach</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">data</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">html</span><span class="hl-brackets">[</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">html</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">tpl</span><span class="hl-code">.</span><span class="hl-identifier">applyTemplate</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">prepareData</span><span class="hl-brackets">(</span><span class="hl-identifier">data</span><span class="hl-brackets">))</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Refresh an individual node.
+     * @param {Number} index 
+     */
+    </span><span class="hl-identifier">refreshNode</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">index</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">refreshNodes</span><span class="hl-brackets">(</span><span class="hl-identifier">index</span><span class="hl-code">, </span><span class="hl-identifier">index</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">refreshNodes</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">dm</span><span class="hl-code">, </span><span class="hl-identifier">startIndex</span><span class="hl-code">, </span><span class="hl-identifier">endIndex</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">clearSelections</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">dm</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">dataModel</span><span class="hl-code">;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">ns</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">nodes</span><span class="hl-code">;
+        </span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code"> = </span><span class="hl-identifier">startIndex</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code"> &lt;= </span><span class="hl-identifier">endIndex</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code">++</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">d</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">prepareData</span><span class="hl-brackets">(</span><span class="hl-identifier">dm</span><span class="hl-code">.</span><span class="hl-identifier">getRow</span><span class="hl-brackets">(</span><span class="hl-identifier">i</span><span class="hl-brackets">)</span><span class="hl-code">, </span><span class="hl-identifier">i</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">i</span><span class="hl-code"> &lt; </span><span class="hl-identifier">ns</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">-</span><span class="hl-number">1</span><span class="hl-brackets">){
+                </span><span class="hl-reserved">var </span><span class="hl-identifier">old</span><span class="hl-code"> = </span><span class="hl-identifier">ns</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">;
+                </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">tpl</span><span class="hl-code">.</span><span class="hl-identifier">insertBefore</span><span class="hl-brackets">(</span><span class="hl-identifier">old</span><span class="hl-code">, </span><span class="hl-identifier">d</span><span class="hl-brackets">)</span><span class="hl-code">;
+                </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-code">.</span><span class="hl-identifier">removeChild</span><span class="hl-brackets">(</span><span class="hl-identifier">old</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-brackets">}</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+                </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">tpl</span><span class="hl-code">.</span><span class="hl-identifier">append</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-code">, </span><span class="hl-identifier">d</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+        }
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">updateIndexes</span><span class="hl-brackets">(</span><span class="hl-identifier">startIndex</span><span class="hl-code">, </span><span class="hl-identifier">endIndex</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">deleteNodes</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">dm</span><span class="hl-code">, </span><span class="hl-identifier">startIndex</span><span class="hl-code">, </span><span class="hl-identifier">endIndex</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">clearSelections</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">startIndex</span><span class="hl-code"> == </span><span class="hl-number">0</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">endIndex</span><span class="hl-code"> &gt;= </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">nodes</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">-</span><span class="hl-number">1</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">update</span><span class="hl-brackets">(</span><span class="hl-quotes">''</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">el</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-code">;
+            </span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code"> = </span><span class="hl-identifier">startIndex</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code"> &lt;= </span><span class="hl-identifier">endIndex</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code">++</span><span class="hl-brackets">){
+                </span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">removeChild</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">nodes</span><span class="hl-brackets">[</span><span class="hl-identifier">startIndex</span><span class="hl-brackets">])</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">updateIndexes</span><span class="hl-brackets">(</span><span class="hl-identifier">startIndex</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">insertNodes</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">dm</span><span class="hl-code">, </span><span class="hl-identifier">startIndex</span><span class="hl-code">, </span><span class="hl-identifier">endIndex</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">nodes</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code"> == </span><span class="hl-number">0</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">refresh</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">clearSelections</span><span class="hl-brackets">()</span><span class="hl-code">;
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">t</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">tpl</span><span class="hl-code">;
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">before</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">nodes</span><span class="hl-brackets">[</span><span class="hl-identifier">startIndex</span><span class="hl-brackets">]</span><span class="hl-code">;
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">dm</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">dataModel</span><span class="hl-code">;
+            </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">before</span><span class="hl-brackets">){
+                </span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code"> = </span><span class="hl-identifier">startIndex</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code"> &lt;= </span><span class="hl-identifier">endIndex</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code">++</span><span class="hl-brackets">){
+                    </span><span class="hl-identifier">t</span><span class="hl-code">.</span><span class="hl-identifier">insertBefore</span><span class="hl-brackets">(</span><span class="hl-identifier">before</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">prepareData</span><span class="hl-brackets">(</span><span class="hl-identifier">dm</span><span class="hl-code">.</span><span class="hl-identifier">getRow</span><span class="hl-brackets">(</span><span class="hl-identifier">i</span><span class="hl-brackets">)</span><span class="hl-code">, </span><span class="hl-identifier">i</span><span class="hl-brackets">))</span><span class="hl-code">;
+                </span><span class="hl-brackets">}
+            }</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+                </span><span class="hl-reserved">var </span><span class="hl-identifier">el</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-code">;
+                </span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code"> = </span><span class="hl-identifier">startIndex</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code"> &lt;= </span><span class="hl-identifier">endIndex</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code">++</span><span class="hl-brackets">){
+                    </span><span class="hl-identifier">t</span><span class="hl-code">.</span><span class="hl-identifier">append</span><span class="hl-brackets">(</span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">prepareData</span><span class="hl-brackets">(</span><span class="hl-identifier">dm</span><span class="hl-code">.</span><span class="hl-identifier">getRow</span><span class="hl-brackets">(</span><span class="hl-identifier">i</span><span class="hl-brackets">)</span><span class="hl-code">, </span><span class="hl-identifier">i</span><span class="hl-brackets">))</span><span class="hl-code">;
+                </span><span class="hl-brackets">}
+            }
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">updateIndexes</span><span class="hl-brackets">(</span><span class="hl-identifier">startIndex</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">updateIndexes</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">dm</span><span class="hl-code">, </span><span class="hl-identifier">startIndex</span><span class="hl-code">, </span><span class="hl-identifier">endIndex</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">ns</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">nodes</span><span class="hl-code">;
+        </span><span class="hl-identifier">startIndex</span><span class="hl-code"> = </span><span class="hl-identifier">startIndex</span><span class="hl-code"> || </span><span class="hl-number">0</span><span class="hl-code">;
+        </span><span class="hl-identifier">endIndex</span><span class="hl-code"> = </span><span class="hl-identifier">endIndex</span><span class="hl-code"> || </span><span class="hl-identifier">ns</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">-</span><span class="hl-number">1</span><span class="hl-code">;
+        </span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code"> = </span><span class="hl-identifier">startIndex</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code"> &lt;= </span><span class="hl-identifier">endIndex</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code">++</span><span class="hl-brackets">){
+            </span><span class="hl-identifier">ns</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">nodeIndex</span><span class="hl-code"> = </span><span class="hl-identifier">i</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Changes the data model this view uses and refresh the view.
+     * @param {DataModel} dataModel 
+     */
+     </span><span class="hl-identifier">setDataModel</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">dm</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">unplugDataModel</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">dataModel</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">dataModel</span><span class="hl-code"> = </span><span class="hl-identifier">dm</span><span class="hl-code">;
+        </span><span class="hl-identifier">dm</span><span class="hl-code">.</span><span class="hl-identifier">on</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">cellupdated</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">refreshNode</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-identifier">dm</span><span class="hl-code">.</span><span class="hl-identifier">on</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">datachanged</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">refresh</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-identifier">dm</span><span class="hl-code">.</span><span class="hl-identifier">on</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">rowsdeleted</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">deleteNodes</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-identifier">dm</span><span class="hl-code">.</span><span class="hl-identifier">on</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">rowsinserted</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">insertNodes</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-identifier">dm</span><span class="hl-code">.</span><span class="hl-identifier">on</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">rowsupdated</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">refreshNodes</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-identifier">dm</span><span class="hl-code">.</span><span class="hl-identifier">on</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">rowssorted</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">refresh</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">refresh</span><span class="hl-brackets">()</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Unplug the data model and stop updates.
+     * @param {DataModel} dataModel 
+     */
+    </span><span class="hl-identifier">unplugDataModel</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">dm</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">dm</span><span class="hl-brackets">) </span><span class="hl-reserved">return</span><span class="hl-code">;
+        </span><span class="hl-identifier">dm</span><span class="hl-code">.</span><span class="hl-identifier">removeListener</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">cellupdated</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">refreshNode</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-identifier">dm</span><span class="hl-code">.</span><span class="hl-identifier">removeListener</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">datachanged</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">refresh</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-identifier">dm</span><span class="hl-code">.</span><span class="hl-identifier">removeListener</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">rowsdeleted</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">deleteNodes</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-identifier">dm</span><span class="hl-code">.</span><span class="hl-identifier">removeListener</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">rowsinserted</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">insertNodes</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-identifier">dm</span><span class="hl-code">.</span><span class="hl-identifier">removeListener</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">rowsupdated</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">refreshNodes</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-identifier">dm</span><span class="hl-code">.</span><span class="hl-identifier">removeListener</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">rowssorted</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">refresh</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">dataModel</span><span class="hl-code"> = </span><span class="hl-reserved">null</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Returns the template node the passed child belongs to or null if it doesn't belong to one.
+     * @param {HTMLElement} node
+     * @return {HTMLElement} The template node 
+     */
+    </span><span class="hl-identifier">findItemFromChild</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">node</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">el</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">node</span><span class="hl-code"> || </span><span class="hl-identifier">node</span><span class="hl-code">.</span><span class="hl-identifier">parentNode</span><span class="hl-code"> == </span><span class="hl-identifier">el</span><span class="hl-brackets">){
+		    </span><span class="hl-reserved">return </span><span class="hl-identifier">node</span><span class="hl-code">;
+	    </span><span class="hl-brackets">}
+	    </span><span class="hl-reserved">var </span><span class="hl-identifier">p</span><span class="hl-code"> = </span><span class="hl-identifier">node</span><span class="hl-code">.</span><span class="hl-identifier">parentNode</span><span class="hl-code">;
+	    </span><span class="hl-reserved">while</span><span class="hl-brackets">(</span><span class="hl-identifier">p</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">p</span><span class="hl-code"> != </span><span class="hl-identifier">el</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">p</span><span class="hl-code">.</span><span class="hl-identifier">parentNode</span><span class="hl-code"> == </span><span class="hl-identifier">el</span><span class="hl-brackets">){
+            	</span><span class="hl-reserved">return </span><span class="hl-identifier">p</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+            </span><span class="hl-identifier">p</span><span class="hl-code"> = </span><span class="hl-identifier">p</span><span class="hl-code">.</span><span class="hl-identifier">parentNode</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+	    </span><span class="hl-reserved">return null</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/** @ignore */
+    </span><span class="hl-builtin">onClick</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">item</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">findItemFromChild</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">getTarget</span><span class="hl-brackets">())</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">item</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">index</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">indexOf</span><span class="hl-brackets">(</span><span class="hl-identifier">item</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onItemClick</span><span class="hl-brackets">(</span><span class="hl-identifier">item</span><span class="hl-code">, </span><span class="hl-identifier">index</span><span class="hl-code">, </span><span class="hl-identifier">e</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">fireEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">click</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-identifier">index</span><span class="hl-code">, </span><span class="hl-identifier">item</span><span class="hl-code">, </span><span class="hl-identifier">e</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">clearSelections</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+
+    </span><span class="hl-comment">/** @ignore */
+    </span><span class="hl-identifier">onContextMenu</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">item</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">findItemFromChild</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">getTarget</span><span class="hl-brackets">())</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">item</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">fireEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">contextmenu</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">indexOf</span><span class="hl-brackets">(</span><span class="hl-identifier">item</span><span class="hl-brackets">)</span><span class="hl-code">, </span><span class="hl-identifier">item</span><span class="hl-code">, </span><span class="hl-identifier">e</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+
+    </span><span class="hl-comment">/** @ignore */
+    </span><span class="hl-builtin">onDblClick</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">item</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">findItemFromChild</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">getTarget</span><span class="hl-brackets">())</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">item</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">fireEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">dblclick</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">indexOf</span><span class="hl-brackets">(</span><span class="hl-identifier">item</span><span class="hl-brackets">)</span><span class="hl-code">, </span><span class="hl-identifier">item</span><span class="hl-code">, </span><span class="hl-identifier">e</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">onItemClick</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">item</span><span class="hl-code">, </span><span class="hl-identifier">index</span><span class="hl-code">, </span><span class="hl-identifier">e</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">multiSelect</span><span class="hl-code"> || </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">singleSelect</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">multiSelect</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">shiftKey</span><span class="hl-code"> &amp;&amp; </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">lastSelection</span><span class="hl-brackets">){
+                </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">select</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getNodes</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">indexOf</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">lastSelection</span><span class="hl-brackets">)</span><span class="hl-code">, </span><span class="hl-identifier">index</span><span class="hl-brackets">)</span><span class="hl-code">, </span><span class="hl-reserved">false</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-brackets">}</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+                </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">select</span><span class="hl-brackets">(</span><span class="hl-identifier">item</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">multiSelect</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">ctrlKey</span><span class="hl-brackets">)</span><span class="hl-code">;
+                </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">lastSelection</span><span class="hl-code"> = </span><span class="hl-identifier">item</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+        }
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Get the number of selected nodes.
+     * @return {Number}
+     */
+     </span><span class="hl-identifier">getSelectionCount</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">selections</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Get the currently selected nodes.
+     * @return {Array} An array of HTMLElements
+     */
+    </span><span class="hl-identifier">getSelectedNodes</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">selections</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Get the indexes of the selected nodes.
+     * @return {Array}
+     */
+    </span><span class="hl-identifier">getSelectedIndexes</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">indexes</span><span class="hl-code"> = </span><span class="hl-brackets">[]</span><span class="hl-code">;
+        </span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">, </span><span class="hl-identifier">len</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selections</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code"> &lt; </span><span class="hl-identifier">len</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code">++</span><span class="hl-brackets">) {
+        	</span><span class="hl-identifier">indexes</span><span class="hl-code">.</span><span class="hl-identifier">push</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selections</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">nodeIndex</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">return </span><span class="hl-identifier">indexes</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Clear all selections
+     * @param {Boolean} suppressEvent (optional) true to skip firing of the selectionchange event
+     */
+    </span><span class="hl-identifier">clearSelections</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">suppressEvent</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">multiSelect</span><span class="hl-code"> || </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">singleSelect</span><span class="hl-brackets">){
+            </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">removeClass</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selections</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selectedClass</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selections</span><span class="hl-code"> = </span><span class="hl-brackets">[]</span><span class="hl-code">;
+            </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">suppressEvent</span><span class="hl-brackets">){
+                </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">fireEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">selectionchange</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selections</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+        }
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Selects nodes.
+     * @param {Array/HTMLElement/String/Number} nodeInfo An HTMLElement template node, index of a template node, id of a template node or an array of any of those to select
+     * @param {Boolean} keepExisting (optional) true to keep existing selections
+     * @param {Boolean} suppressEvent (optional) true to skip firing of the selectionchange vent
+     */
+    </span><span class="hl-identifier">select</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">nodeInfo</span><span class="hl-code">, </span><span class="hl-identifier">keepExisting</span><span class="hl-code">, </span><span class="hl-identifier">suppressEvent</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">keepExisting</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">clearSelections</span><span class="hl-brackets">(</span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">nodeInfo </span><span class="hl-reserved">instanceof </span><span class="hl-builtin">Array</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">, </span><span class="hl-identifier">len</span><span class="hl-code"> = </span><span class="hl-identifier">nodeInfo</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code"> &lt; </span><span class="hl-identifier">len</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code">++</span><span class="hl-brackets">) {
+            	</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">select</span><span class="hl-brackets">(</span><span class="hl-identifier">nodeInfo</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+        }</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">node</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getNode</span><span class="hl-brackets">(</span><span class="hl-identifier">nodeInfo</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">node</span><span class="hl-brackets">){
+                </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">addClass</span><span class="hl-brackets">(</span><span class="hl-identifier">node</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selectedClass</span><span class="hl-brackets">)</span><span class="hl-code">;
+                </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selections</span><span class="hl-code">.</span><span class="hl-identifier">push</span><span class="hl-brackets">(</span><span class="hl-identifier">node</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+        }
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">suppressEvent</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">fireEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">selectionchange</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selections</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Gets a template node.
+     * @param {HTMLElement/String/Number} nodeInfo An HTMLElement template node, index of a template node or the id of a template node
+     * @return {HTMLElement} The node or null if it wasn't found
+     */
+     </span><span class="hl-identifier">getNode</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">nodeInfo</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">nodeInfo</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">object</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">return </span><span class="hl-identifier">nodeInfo</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-reserved">else if</span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">nodeInfo</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">string</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">return </span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">getElementById</span><span class="hl-brackets">(</span><span class="hl-identifier">nodeInfo</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-reserved">else if</span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">nodeInfo</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">number</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">nodes</span><span class="hl-brackets">[</span><span class="hl-identifier">nodeInfo</span><span class="hl-brackets">]</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">return null</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Gets a range template nodes.
+     * @param {Number} startIndex
+     * @param {Number} endIndex
+     * @return {Array} An array of nodes
+     */
+    </span><span class="hl-identifier">getNodes</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">start</span><span class="hl-code">, </span><span class="hl-identifier">end</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">ns</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">nodes</span><span class="hl-code">;
+        </span><span class="hl-identifier">startIndex</span><span class="hl-code"> = </span><span class="hl-identifier">startIndex</span><span class="hl-code"> || </span><span class="hl-number">0</span><span class="hl-code">;
+        </span><span class="hl-identifier">endIndex</span><span class="hl-code"> = </span><span class="hl-reserved">typeof </span><span class="hl-identifier">endIndex</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">undefined</span><span class="hl-quotes">'</span><span class="hl-code"> ? </span><span class="hl-identifier">ns</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">-</span><span class="hl-number">1</span><span class="hl-code"> : </span><span class="hl-identifier">endIndex</span><span class="hl-code">;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">nodes</span><span class="hl-code"> = </span><span class="hl-brackets">[]</span><span class="hl-code">;
+        </span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code"> = </span><span class="hl-identifier">start</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code"> &lt;= </span><span class="hl-identifier">end</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code">++</span><span class="hl-brackets">) {
+        	</span><span class="hl-identifier">nodes</span><span class="hl-code">.</span><span class="hl-identifier">push</span><span class="hl-brackets">(</span><span class="hl-identifier">ns</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">])</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">return </span><span class="hl-identifier">nodes</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Finds the index of the passed node
+     * @param {HTMLElement/String/Number} nodeInfo An HTMLElement template node, index of a template node or the id of a template node
+     * @return {Number} The index of the node or -1
+     */
+     </span><span class="hl-identifier">indexOf</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">node</span><span class="hl-brackets">){
+        </span><span class="hl-identifier">node</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getNode</span><span class="hl-brackets">(</span><span class="hl-identifier">node</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">node</span><span class="hl-code">.</span><span class="hl-identifier">nodeIndex</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">number</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">return </span><span class="hl-identifier">node</span><span class="hl-code">.</span><span class="hl-identifier">nodeIndex</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">ns</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">nodes</span><span class="hl-code">;
+        </span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">, </span><span class="hl-identifier">len</span><span class="hl-code"> = </span><span class="hl-identifier">ns</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code"> &lt; </span><span class="hl-identifier">len</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code">++</span><span class="hl-brackets">) {
+        	</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">ns</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code"> == </span><span class="hl-identifier">node</span><span class="hl-brackets">){
+        	    </span><span class="hl-reserved">return </span><span class="hl-identifier">i</span><span class="hl-code">;
+        	</span><span class="hl-brackets">}
+        }
+        </span><span class="hl-reserved">return</span><span class="hl-code"> -</span><span class="hl-number">1</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+})</span><span class="hl-default">;
+
+</span><span class="hl-comment">/**
+ * @class YAHOO.ext.JsonView
+ * @extends YAHOO.ext.View
+ * Shortcut class to create a JSON + UpdateManager template view. Usage:
+&lt;pre&gt;&lt;code&gt;
+var view = new YAHOO.ext.View('my-element', 
+           '&amp;lt;div id=&quot;{id}&quot;&amp;gt;{foo} - {bar}&amp;lt;/div&amp;gt;', // auto create template
+           { multiSelect: true, jsonRoot: 'data' });
+
+// listen for node click?
+view.on('click', function(vw, index, node, e){
+    alert('Node &quot;' + node.id + '&quot; at index: ' + index + ' was clicked.');
+});
+
+// direct load of JSON data
+view.load('foobar.php');
+&lt;/code&gt;&lt;/pre&gt;
+ * @constructor
+ * Create a new JsonView
+ * @param {String/HTMLElement/Element} container The container element where the view is to be rendered.
+ * @param {DomHelper.Template} tpl The rendering template
+ * @param {Object} config The config object
+ */ 
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">JsonView</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">container</span><span class="hl-code">, </span><span class="hl-identifier">tpl</span><span class="hl-code">, </span><span class="hl-identifier">config</span><span class="hl-brackets">){
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">cfg</span><span class="hl-code"> = </span><span class="hl-identifier">config</span><span class="hl-code"> || </span><span class="hl-brackets">{}</span><span class="hl-code">;
+    </span><span class="hl-identifier">cfg</span><span class="hl-code">.</span><span class="hl-identifier">renderUpdates</span><span class="hl-code"> = </span><span class="hl-reserved">true</span><span class="hl-code">;
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">JsonView</span><span class="hl-code">.</span><span class="hl-identifier">superclass</span><span class="hl-code">.</span><span class="hl-identifier">constructor</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-identifier">container</span><span class="hl-code">, </span><span class="hl-identifier">tpl</span><span class="hl-code">, </span><span class="hl-reserved">null</span><span class="hl-code">, </span><span class="hl-identifier">config</span><span class="hl-brackets">)</span><span class="hl-code">; 
+</span><span class="hl-brackets">}</span><span class="hl-default">;
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">extendX</span><span class="hl-brackets">(</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">JsonView</span><span class="hl-code">, </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">View</span><span class="hl-code">, </span><span class="hl-brackets">{
+    </span><span class="hl-comment">/**
+     * Direct access to the elements UpdateManager update() method (takes the same parameters).
+     * @param {String/Function} url The url for this request or a function to call to get the url
+     * @param {&lt;i&gt;String/Object&lt;/i&gt;} params (optional) The parameters to pass as either a url encoded string &quot;param1=1&amp;amp;param2=2&quot; or an object {param1: 1, param2: 2}
+     * @param {&lt;i&gt;Function&lt;/i&gt;} callback (optional) Callback when transaction is complete - called with signature (oElement, bSuccess)
+     * @param {&lt;i&gt;Boolean&lt;/i&gt;} discardUrl (optional) By default when you execute an update the defaultUrl is changed to the last used url. If true, it will not store the url.
+     */
+    </span><span class="hl-identifier">load</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">um</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">getUpdateManager</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-identifier">um</span><span class="hl-code">.</span><span class="hl-identifier">update</span><span class="hl-code">.</span><span class="hl-identifier">apply</span><span class="hl-brackets">(</span><span class="hl-identifier">um</span><span class="hl-code">, </span><span class="hl-identifier">arguments</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+})</span><span class="hl-default">;</span></pre></div><hr>Copyright &copy; 2006 Jack Slocum. All rights reserved.</body></html>

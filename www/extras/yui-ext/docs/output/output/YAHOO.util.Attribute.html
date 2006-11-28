@@ -1,0 +1,343 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.util.Attribute</title>
+        <link rel="stylesheet" type="text/css" href="../reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.util.Attribute.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.util.Attribute</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.util</td></tr>
+            <tr><td class="label">Class:</td><td>Attribute</td></tr>
+                        <tr><td class="label">Extends:</td><td>Object</td></tr>
+                                    <tr><td class="label">Defined In:</td><td><a href="tabview.js.html">tabview.js</a></td></tr>
+        </table>
+        <div class="description">
+            Provides Attribute configurations.        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Property</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#method">method</a> : Function</td>
+        <td class="msource" rowspan="2">Attribute</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The method to use when setting the attribute's value.
+The method recieves the new value as the only argument.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#name">name</a> : String</td>
+        <td class="msource" rowspan="2">Attribute</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The name of the attribute.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#owner">owner</a> : YAHOO.util.AttributeProvider</td>
+        <td class="msource" rowspan="2">Attribute</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The owner of the attribute.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#readOnly">readOnly</a> : Boolean</td>
+        <td class="msource" rowspan="2">Attribute</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Whether or not the attribute is read only.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#validator">validator</a> : Function</td>
+        <td class="msource" rowspan="2">Attribute</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The validator to use when setting the attribute's value.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#value">value</a> : String</td>
+        <td class="msource" rowspan="2">Attribute</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The value of the attribute.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#writeOnce">writeOnce</a> : Boolean</td>
+        <td class="msource" rowspan="2">Attribute</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Whether or not the attribute can only be written once.</td>
+    </tr>
+            </table>
+                <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#Attribute">Attribute</a>(<code>hash {Object}</code>, <code>YAHOO.util.AttributeProvider The</code>)</td>
+        <td class="msource" rowspan="2">Attribute</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configure">configure</a>(<code>Object map</code>, <code>Boolean init</code>) : void</td>
+        <td class="msource" rowspan="2">Attribute</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Allows for configuring the Attribute's properties.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getValue">getValue</a>() : any</td>
+        <td class="msource" rowspan="2">Attribute</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Retrieves the current value of the attribute.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#refresh">refresh</a>() : Boolean</td>
+        <td class="msource" rowspan="2">Attribute</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Resets the value to the current value.
+Useful when values may have gotten out of sync with actual properties.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#resetConfig">resetConfig</a>() : void</td>
+        <td class="msource" rowspan="2">Attribute</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Resets the attribute config to the initial config state.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#resetValue">resetValue</a>() : Boolean</td>
+        <td class="msource" rowspan="2">Attribute</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Resets the value to the initial config value.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setValue">setValue</a>(<code>Any value</code>, <code>Boolean silent</code>) : Boolean</td>
+        <td class="msource" rowspan="2">Attribute</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Sets the value of the attribute and fires beforeChange and change events.</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+        <div class="no-members">This class has no public events.</div>        
+                    <h2 class="mdetail-head">Property Details</h2>
+            <div class="detail-wrap">
+                            <a name="method"></a>
+                <div class="mdetail">
+                <h3>method</i></h3>
+                <code>public Function method</code>
+                <div class="mdetail-desc">
+                    The method to use when setting the attribute's value.
+The method recieves the new value as the only argument.                </div>
+                <div class="mdetail-def">This property is defined by Attribute.</div>
+                </div>
+                            <a name="name"></a>
+                <div class="mdetail alt">
+                <h3>name</i></h3>
+                <code>public String name</code>
+                <div class="mdetail-desc">
+                    The name of the attribute.                </div>
+                <div class="mdetail-def">This property is defined by Attribute.</div>
+                </div>
+                            <a name="owner"></a>
+                <div class="mdetail">
+                <h3>owner</i></h3>
+                <code>public YAHOO.util.AttributeProvider owner</code>
+                <div class="mdetail-desc">
+                    The owner of the attribute.                </div>
+                <div class="mdetail-def">This property is defined by Attribute.</div>
+                </div>
+                            <a name="readOnly"></a>
+                <div class="mdetail alt">
+                <h3>readOnly</i></h3>
+                <code>public Boolean readOnly</code>
+                <div class="mdetail-desc">
+                    Whether or not the attribute is read only.                </div>
+                <div class="mdetail-def">This property is defined by Attribute.</div>
+                </div>
+                            <a name="validator"></a>
+                <div class="mdetail">
+                <h3>validator</i></h3>
+                <code>public Function validator</code>
+                <div class="mdetail-desc">
+                    The validator to use when setting the attribute's value.                </div>
+                <div class="mdetail-def">This property is defined by Attribute.</div>
+                </div>
+                            <a name="value"></a>
+                <div class="mdetail alt">
+                <h3>value</i></h3>
+                <code>public String value</code>
+                <div class="mdetail-desc">
+                    The value of the attribute.                </div>
+                <div class="mdetail-def">This property is defined by Attribute.</div>
+                </div>
+                            <a name="writeOnce"></a>
+                <div class="mdetail">
+                <h3>writeOnce</i></h3>
+                <code>public Boolean writeOnce</code>
+                <div class="mdetail-desc">
+                    Whether or not the attribute can only be written once.                </div>
+                <div class="mdetail-def">This property is defined by Attribute.</div>
+                </div>
+                        </div>
+                
+                    <a name="Attribute"></a>
+            <h2 class="mdetail-head">Constructor Details</h2>
+            <div class="detail-wrap">
+                <div class="mdetail">
+                <h3>Attribute</i></h3>
+                <code>public function Attribute(<code>hash {Object}</code>, <code>YAHOO.util.AttributeProvider The</code>)</code>
+                <div class="mdetail-desc">
+                                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>{Object}</code> : hash<div class="sub-desc">The intial Attribute.</div></li><li><code>The</code> : YAHOO.util.AttributeProvider<div class="sub-desc">owner of the Attribute instance.</div></li>                    </ul>
+                </div>
+                </div>
+                </div>
+            </div>
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="configure"></a>
+                <div class="mdetail">
+                <h3>configure</i></h3>
+                <code>public function configure(<code>Object map</code>, <code>Boolean init</code>)</code>
+                <div class="mdetail-desc">
+                    Allows for configuring the Attribute's properties.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>map</code> : Object<div class="sub-desc">A key-value map of Attribute properties.</div></li><li><code>init</code> : Boolean<div class="sub-desc">Whether or not this should become the initial config.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Attribute.</div>
+                </div>
+                            <a name="getValue"></a>
+                <div class="mdetail alt">
+                <h3>getValue</i></h3>
+                <code>public function getValue()</code>
+                <div class="mdetail-desc">
+                    Retrieves the current value of the attribute.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>any</code><div class="sub-desc">The current value of the attribute.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Attribute.</div>
+                </div>
+                            <a name="refresh"></a>
+                <div class="mdetail">
+                <h3>refresh</i></h3>
+                <code>public function refresh()</code>
+                <div class="mdetail-desc">
+                    Resets the value to the current value.
+Useful when values may have gotten out of sync with actual properties.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">Whether or not the value was set.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Attribute.</div>
+                </div>
+                            <a name="resetConfig"></a>
+                <div class="mdetail alt">
+                <h3>resetConfig</i></h3>
+                <code>public function resetConfig()</code>
+                <div class="mdetail-desc">
+                    Resets the attribute config to the initial config state.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Attribute.</div>
+                </div>
+                            <a name="resetValue"></a>
+                <div class="mdetail">
+                <h3>resetValue</i></h3>
+                <code>public function resetValue()</code>
+                <div class="mdetail-desc">
+                    Resets the value to the initial config value.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">Whether or not the value was set.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Attribute.</div>
+                </div>
+                            <a name="setValue"></a>
+                <div class="mdetail alt">
+                <h3>setValue</i></h3>
+                <code>public function setValue(<code>Any value</code>, <code>Boolean silent</code>)</code>
+                <div class="mdetail-desc">
+                    Sets the value of the attribute and fires beforeChange and change events.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>value</code> : Any<div class="sub-desc">The value to apply to the attribute.</div></li><li><code>silent</code> : Boolean<div class="sub-desc">If true the change events will not be fired.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">Whether or not the value was set.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Attribute.</div>
+                </div>
+                        </div>
+                    
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    

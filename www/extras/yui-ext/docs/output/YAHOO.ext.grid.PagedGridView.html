@@ -1,0 +1,391 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.ext.grid.PagedGridView</title>
+        <link rel="stylesheet" type="text/css" href="../resources/reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../resources/style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../resources/print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="../resources/print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.ext.grid.PagedGridView.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.ext.grid.PagedGridView</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.ext.grid</td></tr>
+            <tr><td class="label">Class:</td><td>PagedGridView</td></tr>
+                        <tr><td class="label">Extends:</td><td><a href="YAHOO.ext.grid.GridView.html">GridView</a></td></tr>
+                                    <tr><td class="label">Defined In:</td><td><a href="PagedGridView.js.html">PagedGridView.js</a></td></tr>
+        </table>
+        <div class="description">
+            Extends the default GridView to add a paging interface.        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Property</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#afterPageText">afterPageText</a> : String</td>
+        <td class="msource" rowspan="2">PagedGridView</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Customizable piece of the default paging text (defaults to "of %0")</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#beforePageText">beforePageText</a> : String</td>
+        <td class="msource" rowspan="2">PagedGridView</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Customizable piece of the default paging text (defaults to "Page")</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#firstText">firstText</a> : String</td>
+        <td class="msource" rowspan="2">PagedGridView</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Customizable piece of the default paging text (defaults to "First Page")</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#lastText">lastText</a> : String</td>
+        <td class="msource" rowspan="2">PagedGridView</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Customizable piece of the default paging text (defaults to "Last Page")</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#nextText">nextText</a> : String</td>
+        <td class="msource" rowspan="2">PagedGridView</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Customizable piece of the default paging text (defaults to "Next Page")</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#prevText">prevText</a> : String</td>
+        <td class="msource" rowspan="2">PagedGridView</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Customizable piece of the default paging text (defaults to "Previous Page")</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#refreshText">refreshText</a> : String</td>
+        <td class="msource" rowspan="2">PagedGridView</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Customizable piece of the default paging text (defaults to "Refresh")</td>
+    </tr>
+            </table>
+                <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#PagedGridView">PagedGridView</a>()</td>
+        <td class="msource" rowspan="2">PagedGridView</td>
+    </tr>
+    <tr>
+        <td class="mdesc">This class is created for you automatically if your data model is set to use paging.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#autoSizeColumn">autoSizeColumn</a>(<code>Number colIndex</code>, <code>Boolean forceMinSize</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.ext.grid.GridView.html#autoSizeColumn">GridView</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Autofit a column to it's content.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#autoSizeColumns">autoSizeColumns</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.ext.grid.GridView.html#autoSizeColumns">GridView</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Autofits all columns to their content and then expands to fit any extra space in the grid</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#ensureVisible">ensureVisible</a>(<code>Number/HTMLElement row</code>, <code>Boolean disableDelay</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.ext.grid.GridView.html#ensureVisible">GridView</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Scrolls the specified row into view. This call is automatically buffered (delayed), to disable
+the delay, pass true f...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#fitColumns">fitColumns</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.ext.grid.GridView.html#fitColumns">GridView</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Autofits all columns to the grid's width proportionate with their current size</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#focusRow">focusRow</a>(<code>Number/HTMLElement row</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.ext.grid.GridView.html#focusRow">GridView</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Focuses the specified row. The preferred way to scroll to a row is <a href="#ensureVisible">ensureVisible</a>.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getCellAtPoint">getCellAtPoint</a>(<code>Number x</code>, <code>Number y</code>) : Array</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.ext.grid.GridView.html#getCellAtPoint">GridView</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Returns the rowIndex/columnIndex of the cell found at the passed page coordinates</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getPageToolbar">getPageToolbar</a>() : YAHOO.ext.Toolbar</td>
+        <td class="msource" rowspan="2">PagedGridView</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Returns the toolbar used for paging so you can add new buttons.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setCSSStyle">setCSSStyle</a>(<code>Number colIndex</code>, <code>String name</code>, <code>String value</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.ext.grid.GridView.html#setCSSStyle">GridView</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Set a css style for a column dynamically.</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+        <div class="no-members">This class has no public events.</div>        
+                    <h2 class="mdetail-head">Property Details</h2>
+            <div class="detail-wrap">
+                            <a name="afterPageText"></a>
+                <div class="mdetail">
+                <h3>afterPageText</i></h3>
+                <code>public String afterPageText</code>
+                <div class="mdetail-desc">
+                    Customizable piece of the default paging text (defaults to "of %0")                </div>
+                <div class="mdetail-def">This property is defined by PagedGridView.</div>
+                </div>
+                            <a name="beforePageText"></a>
+                <div class="mdetail alt">
+                <h3>beforePageText</i></h3>
+                <code>public String beforePageText</code>
+                <div class="mdetail-desc">
+                    Customizable piece of the default paging text (defaults to "Page")                </div>
+                <div class="mdetail-def">This property is defined by PagedGridView.</div>
+                </div>
+                            <a name="firstText"></a>
+                <div class="mdetail">
+                <h3>firstText</i></h3>
+                <code>public String firstText</code>
+                <div class="mdetail-desc">
+                    Customizable piece of the default paging text (defaults to "First Page")                </div>
+                <div class="mdetail-def">This property is defined by PagedGridView.</div>
+                </div>
+                            <a name="lastText"></a>
+                <div class="mdetail alt">
+                <h3>lastText</i></h3>
+                <code>public String lastText</code>
+                <div class="mdetail-desc">
+                    Customizable piece of the default paging text (defaults to "Last Page")                </div>
+                <div class="mdetail-def">This property is defined by PagedGridView.</div>
+                </div>
+                            <a name="nextText"></a>
+                <div class="mdetail">
+                <h3>nextText</i></h3>
+                <code>public String nextText</code>
+                <div class="mdetail-desc">
+                    Customizable piece of the default paging text (defaults to "Next Page")                </div>
+                <div class="mdetail-def">This property is defined by PagedGridView.</div>
+                </div>
+                            <a name="prevText"></a>
+                <div class="mdetail alt">
+                <h3>prevText</i></h3>
+                <code>public String prevText</code>
+                <div class="mdetail-desc">
+                    Customizable piece of the default paging text (defaults to "Previous Page")                </div>
+                <div class="mdetail-def">This property is defined by PagedGridView.</div>
+                </div>
+                            <a name="refreshText"></a>
+                <div class="mdetail">
+                <h3>refreshText</i></h3>
+                <code>public String refreshText</code>
+                <div class="mdetail-desc">
+                    Customizable piece of the default paging text (defaults to "Refresh")                </div>
+                <div class="mdetail-def">This property is defined by PagedGridView.</div>
+                </div>
+                        </div>
+                
+                    <a name="PagedGridView"></a>
+            <h2 class="mdetail-head">Constructor Details</h2>
+            <div class="detail-wrap">
+                <div class="mdetail">
+                <h3>PagedGridView</i></h3>
+                <code>public function PagedGridView()</code>
+                <div class="mdetail-desc">
+                This class is created for you automatically if your data model is set to use paging.                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                </div>
+            </div>
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="autoSizeColumn"></a>
+                <div class="mdetail">
+                <h3>autoSizeColumn</i></h3>
+                <code>public function autoSizeColumn(<code>Number colIndex</code>, <code>Boolean forceMinSize</code>)</code>
+                <div class="mdetail-desc">
+                    Autofit a column to it's content.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>colIndex</code> : Number<div class="sub-desc"></div></li><li><code>forceMinSize</code> : Boolean<div class="sub-desc">true to force the column to go smaller if possible</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.ext.grid.GridView.html#autoSizeColumn">GridView</a>.</div>
+                </div>
+                            <a name="autoSizeColumns"></a>
+                <div class="mdetail alt">
+                <h3>autoSizeColumns</i></h3>
+                <code>public function autoSizeColumns()</code>
+                <div class="mdetail-desc">
+                    Autofits all columns to their content and then expands to fit any extra space in the grid                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.ext.grid.GridView.html#autoSizeColumns">GridView</a>.</div>
+                </div>
+                            <a name="ensureVisible"></a>
+                <div class="mdetail">
+                <h3>ensureVisible</i></h3>
+                <code>public function ensureVisible(<code>Number/HTMLElement row</code>, <code>Boolean disableDelay</code>)</code>
+                <div class="mdetail-desc">
+                    Scrolls the specified row into view. This call is automatically buffered (delayed), to disable
+the delay, pass true for disableDelay.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>row</code> : Number/HTMLElement<div class="sub-desc">The index of a row or the row itself</div></li><li><code>disableDelay</code> : Boolean<div class="sub-desc"></div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.ext.grid.GridView.html#ensureVisible">GridView</a>.</div>
+                </div>
+                            <a name="fitColumns"></a>
+                <div class="mdetail alt">
+                <h3>fitColumns</i></h3>
+                <code>public function fitColumns()</code>
+                <div class="mdetail-desc">
+                    Autofits all columns to the grid's width proportionate with their current size                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.ext.grid.GridView.html#fitColumns">GridView</a>.</div>
+                </div>
+                            <a name="focusRow"></a>
+                <div class="mdetail">
+                <h3>focusRow</i></h3>
+                <code>public function focusRow(<code>Number/HTMLElement row</code>)</code>
+                <div class="mdetail-desc">
+                    Focuses the specified row. The preferred way to scroll to a row is <a href="#ensureVisible">ensureVisible</a>.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>row</code> : Number/HTMLElement<div class="sub-desc">The index of a row or the row itself</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.ext.grid.GridView.html#focusRow">GridView</a>.</div>
+                </div>
+                            <a name="getCellAtPoint"></a>
+                <div class="mdetail alt">
+                <h3>getCellAtPoint</i></h3>
+                <code>public function getCellAtPoint(<code>Number x</code>, <code>Number y</code>)</code>
+                <div class="mdetail-desc">
+                    Returns the rowIndex/columnIndex of the cell found at the passed page coordinates                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>x</code> : Number<div class="sub-desc"></div></li><li><code>y</code> : Number<div class="sub-desc"></div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Array</code><div class="sub-desc">[rowIndex, columnIndex]</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.ext.grid.GridView.html#getCellAtPoint">GridView</a>.</div>
+                </div>
+                            <a name="getPageToolbar"></a>
+                <div class="mdetail">
+                <h3>getPageToolbar</i></h3>
+                <code>public function getPageToolbar()</code>
+                <div class="mdetail-desc">
+                    Returns the toolbar used for paging so you can add new buttons.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>YAHOO.ext.Toolbar</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by PagedGridView.</div>
+                </div>
+                            <a name="setCSSStyle"></a>
+                <div class="mdetail alt">
+                <h3>setCSSStyle</i></h3>
+                <code>public function setCSSStyle(<code>Number colIndex</code>, <code>String name</code>, <code>String value</code>)</code>
+                <div class="mdetail-desc">
+                    Set a css style for a column dynamically.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>colIndex</code> : Number<div class="sub-desc">The index of the column</div></li><li><code>name</code> : String<div class="sub-desc">The css property name</div></li><li><code>value</code> : String<div class="sub-desc">The css value</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.ext.grid.GridView.html#setCSSStyle">GridView</a>.</div>
+                </div>
+                        </div>
+                    
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    

@@ -1,0 +1,444 @@
+<html><head><title>SelectionModel.js</title><link rel="stylesheet" type="text/css" href="../style.css" media="screen"/></head><body><div class="hl-main"><pre><span class="hl-comment">/**
+ @class YAHOO.ext.grid.DefaultSelectionModel
+ * @extends YAHOO.ext.util.Observable
+ * The default SelectionModel used by {@link YAHOO.ext.grid.Grid}. 
+ It supports multiple selections and keyboard selection/navigation. &lt;br&gt;&lt;br&gt;
+ @constructor
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">grid</span><span class="hl-default">.</span><span class="hl-identifier">DefaultSelectionModel</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selectedRows</span><span class="hl-code"> = </span><span class="hl-brackets">[]</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selectedRowIds</span><span class="hl-code"> = </span><span class="hl-brackets">[]</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">lastSelectedRow</span><span class="hl-code"> = </span><span class="hl-reserved">null</span><span class="hl-code">;
+    
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onRowSelect</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">CustomEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">SelectionTable.rowSelected</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onSelectionChange</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">CustomEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">SelectionTable.selectionChanged</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">events</span><span class="hl-code"> = </span><span class="hl-brackets">{
+        </span><span class="hl-comment">/**
+	     * @event selectionchange
+	     * Fires when the selection changes 
+	     * @param {SelectionModel} this
+	     * @param {Array} rows Array of row elements that are selected
+	     * @param {String} ids Array of ids that are selected
+	     */
+	    </span><span class="hl-quotes">'</span><span class="hl-string">selectionchange</span><span class="hl-quotes">'</span><span class="hl-code"> : </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onSelectionChange</span><span class="hl-code">,
+        </span><span class="hl-comment">/**
+	     * @event dragenter
+	     * Fires when a row is selected or deselected
+	     * @param {SelectionModel} this
+	     * @param {HTMLElement} row The row element
+	     * @param {Boolean} selected true if the row was selected, false if deselected
+	     */
+	    </span><span class="hl-quotes">'</span><span class="hl-string">rowselect</span><span class="hl-quotes">'</span><span class="hl-code"> : </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onRowSelect
+    </span><span class="hl-brackets">}</span><span class="hl-code">;
+    
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">locked</span><span class="hl-code"> = </span><span class="hl-reserved">false</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-default">;
+
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">grid</span><span class="hl-default">.</span><span class="hl-identifier">DefaultSelectionModel</span><span class="hl-default">.</span><span class="hl-identifier">prototype</span><span class="hl-default"> = </span><span class="hl-brackets">{
+    </span><span class="hl-comment">/** @ignore Called by the grid automatically. Do not call directly. */
+    </span><span class="hl-identifier">init</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">grid</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code"> = </span><span class="hl-identifier">grid</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">initEvents</span><span class="hl-brackets">()</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Lock the selections
+     */
+    </span><span class="hl-identifier">lock</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">locked</span><span class="hl-code"> = </span><span class="hl-reserved">true</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Unlock the selections
+     */
+    </span><span class="hl-identifier">unlock</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">locked</span><span class="hl-code"> = </span><span class="hl-reserved">false</span><span class="hl-code">;  
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Returns true if the selections are locked
+     * @return {Boolean}
+     */
+    </span><span class="hl-identifier">isLocked</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">locked</span><span class="hl-code">;    
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/** @ignore */
+    </span><span class="hl-identifier">initEvents</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">trackMouseOver</span><span class="hl-brackets">){
+        	</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">addListener</span><span class="hl-brackets">(</span><span class="hl-quotes">&quot;</span><span class="hl-string">mouseover</span><span class="hl-quotes">&quot;</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">handleOver</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        	</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">addListener</span><span class="hl-brackets">(</span><span class="hl-quotes">&quot;</span><span class="hl-string">mouseout</span><span class="hl-quotes">&quot;</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">handleOut</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">addListener</span><span class="hl-brackets">(</span><span class="hl-quotes">&quot;</span><span class="hl-string">rowclick</span><span class="hl-quotes">&quot;</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">rowClick</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">addListener</span><span class="hl-brackets">(</span><span class="hl-quotes">&quot;</span><span class="hl-string">keydown</span><span class="hl-quotes">&quot;</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">keyDown</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">fireEvent</span><span class="hl-code"> : </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Observable</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">fireEvent</span><span class="hl-code">,
+    </span><span class="hl-identifier">on</span><span class="hl-code"> : </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Observable</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">on</span><span class="hl-code">,
+    </span><span class="hl-identifier">addListener</span><span class="hl-code"> : </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Observable</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">addListener</span><span class="hl-code">,
+    </span><span class="hl-identifier">delayedListener</span><span class="hl-code"> : </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Observable</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">delayedListener</span><span class="hl-code">,
+    </span><span class="hl-identifier">removeListener</span><span class="hl-code"> : </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Observable</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">removeListener</span><span class="hl-code">,
+    </span><span class="hl-identifier">purgeListeners</span><span class="hl-code"> : </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Observable</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">purgeListeners</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/** @ignore Syncs selectedRows with the correct row by looking it up by id. 
+      Used after a sort moves data around. */
+    </span><span class="hl-identifier">syncSelectionsToIds</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getCount</span><span class="hl-brackets">()</span><span class="hl-code"> &gt; </span><span class="hl-number">0</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">ids</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selectedRowIds</span><span class="hl-code">.</span><span class="hl-identifier">concat</span><span class="hl-brackets">()</span><span class="hl-code">;
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">clearSelections</span><span class="hl-brackets">()</span><span class="hl-code">;
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selectRowsById</span><span class="hl-brackets">(</span><span class="hl-identifier">ids</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Set the selected rows by their ID(s). IDs must match what is returned by the DataModel getRowId(index).
+     * @param {String/Array} id The id(s) to select 
+     * @param {&lt;i&gt;Boolean&lt;/i&gt;} keepExisting (optional) True to retain existing selections 
+     */
+    </span><span class="hl-identifier">selectRowsById</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">id</span><span class="hl-code">, </span><span class="hl-identifier">keepExisting</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">rows</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">getRowsById</span><span class="hl-brackets">(</span><span class="hl-identifier">id</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-brackets">(</span><span class="hl-identifier">rows </span><span class="hl-reserved">instanceof </span><span class="hl-builtin">Array</span><span class="hl-brackets">)){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selectRow</span><span class="hl-brackets">(</span><span class="hl-identifier">rows</span><span class="hl-code">, </span><span class="hl-identifier">keepExisting</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-reserved">return</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selectRows</span><span class="hl-brackets">(</span><span class="hl-identifier">rows</span><span class="hl-code">, </span><span class="hl-identifier">keepExisting</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Gets the number of selected rows.
+     * @return {Number}
+     */
+    </span><span class="hl-identifier">getCount</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">selectedRows</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Selects the first row in the grid.
+     */
+    </span><span class="hl-identifier">selectFirstRow</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">j</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">; </span><span class="hl-identifier">j</span><span class="hl-code"> &lt; </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">rows</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; </span><span class="hl-identifier">j</span><span class="hl-code">++</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">isSelectable</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">rows</span><span class="hl-brackets">[</span><span class="hl-identifier">j</span><span class="hl-brackets">])){
+            	</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">focusRow</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">rows</span><span class="hl-brackets">[</span><span class="hl-identifier">j</span><span class="hl-brackets">])</span><span class="hl-code">;
+                </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">setRowState</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">rows</span><span class="hl-brackets">[</span><span class="hl-identifier">j</span><span class="hl-brackets">]</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+                </span><span class="hl-reserved">return</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+        }
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Selects the row immediately following the last selected row.
+     * @param {&lt;i&gt;Boolean&lt;/i&gt;} keepExisting (optional) True to retain existing selections
+     */
+    </span><span class="hl-identifier">selectNext</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">keepExisting</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">lastSelectedRow</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">j</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">lastSelectedRow</span><span class="hl-code">.</span><span class="hl-identifier">rowIndex</span><span class="hl-code">+</span><span class="hl-number">1</span><span class="hl-brackets">)</span><span class="hl-code">; </span><span class="hl-identifier">j</span><span class="hl-code"> &lt; </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">rows</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; </span><span class="hl-identifier">j</span><span class="hl-code">++</span><span class="hl-brackets">){
+                </span><span class="hl-reserved">var </span><span class="hl-identifier">row</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">rows</span><span class="hl-brackets">[</span><span class="hl-identifier">j</span><span class="hl-brackets">]</span><span class="hl-code">;
+                </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">isSelectable</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-brackets">)){
+                    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">focusRow</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-brackets">)</span><span class="hl-code">;
+                    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">setRowState</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-code">, </span><span class="hl-identifier">keepExisting</span><span class="hl-brackets">)</span><span class="hl-code">;
+                    </span><span class="hl-reserved">return</span><span class="hl-code">;
+                </span><span class="hl-brackets">}
+            }
+        }
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Selects the row that precedes the last selected row.
+     * @param {&lt;i&gt;Boolean&lt;/i&gt;} keepExisting (optional) True to retain existing selections 
+     */
+    </span><span class="hl-identifier">selectPrevious</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">keepExisting</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">lastSelectedRow</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">j</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">lastSelectedRow</span><span class="hl-code">.</span><span class="hl-identifier">rowIndex</span><span class="hl-code">-</span><span class="hl-number">1</span><span class="hl-brackets">)</span><span class="hl-code">; </span><span class="hl-identifier">j</span><span class="hl-code"> &gt;= </span><span class="hl-number">0</span><span class="hl-code">; </span><span class="hl-identifier">j</span><span class="hl-code">--</span><span class="hl-brackets">){
+                </span><span class="hl-reserved">var </span><span class="hl-identifier">row</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">rows</span><span class="hl-brackets">[</span><span class="hl-identifier">j</span><span class="hl-brackets">]</span><span class="hl-code">;
+                </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">isSelectable</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-brackets">)){
+                    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">focusRow</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-brackets">)</span><span class="hl-code">;
+                    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">setRowState</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-code">, </span><span class="hl-identifier">keepExisting</span><span class="hl-brackets">)</span><span class="hl-code">;
+                    </span><span class="hl-reserved">return</span><span class="hl-code">;
+                </span><span class="hl-brackets">}
+            }
+        }
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Returns the selected rows.
+     * @return {Array} Array of DOM row elements
+     */
+    </span><span class="hl-identifier">getSelectedRows</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">selectedRows</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Returns the selected row ids.
+     * @return {Array} Array of String ids
+     */
+    </span><span class="hl-identifier">getSelectedRowIds</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">selectedRowIds</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Clears all selections.
+     */
+    </span><span class="hl-identifier">clearSelections</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">isLocked</span><span class="hl-brackets">()) </span><span class="hl-reserved">return</span><span class="hl-code">;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">oldSelections</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selectedRows</span><span class="hl-code">.</span><span class="hl-identifier">concat</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">j</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">; </span><span class="hl-identifier">j</span><span class="hl-code"> &lt; </span><span class="hl-identifier">oldSelections</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; </span><span class="hl-identifier">j</span><span class="hl-code">++</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">setRowState</span><span class="hl-brackets">(</span><span class="hl-identifier">oldSelections</span><span class="hl-brackets">[</span><span class="hl-identifier">j</span><span class="hl-brackets">]</span><span class="hl-code">, </span><span class="hl-reserved">false</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selectedRows</span><span class="hl-code"> = </span><span class="hl-brackets">[]</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selectedRowIds</span><span class="hl-code"> = </span><span class="hl-brackets">[]</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+        
+    </span><span class="hl-comment">/**
+     * Selects all rows.
+     */
+    </span><span class="hl-identifier">selectAll</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">isLocked</span><span class="hl-brackets">()) </span><span class="hl-reserved">return</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selectedRows</span><span class="hl-code"> = </span><span class="hl-brackets">[]</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selectedRowIds</span><span class="hl-code"> = </span><span class="hl-brackets">[]</span><span class="hl-code">;
+        </span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">j</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">, </span><span class="hl-identifier">len</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">rows</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; </span><span class="hl-identifier">j</span><span class="hl-code"> &lt; </span><span class="hl-identifier">len</span><span class="hl-code">; </span><span class="hl-identifier">j</span><span class="hl-code">++</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">setRowState</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">rows</span><span class="hl-brackets">[</span><span class="hl-identifier">j</span><span class="hl-brackets">]</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Returns True if there is a selection.
+     * @return {Boolean}
+     */
+    </span><span class="hl-identifier">hasSelection</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">selectedRows</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code"> &gt; </span><span class="hl-number">0</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Returns True if the specified row is selected.
+     * @param {HTMLElement} row The row to check
+     * @return {Boolean}
+     */
+    </span><span class="hl-identifier">isSelected</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">return </span><span class="hl-identifier">row</span><span class="hl-code"> &amp;&amp; </span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-code">.</span><span class="hl-identifier">selected</span><span class="hl-code"> === </span><span class="hl-reserved">true</span><span class="hl-code"> || </span><span class="hl-identifier">row</span><span class="hl-code">.</span><span class="hl-identifier">getAttribute</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">selected</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">true</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Returns True if the specified row is selectable.
+     * @param {HTMLElement} row The row to check
+     * @return {Boolean}
+     */
+    </span><span class="hl-identifier">isSelectable</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">return </span><span class="hl-identifier">row</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">row</span><span class="hl-code">.</span><span class="hl-identifier">getAttribute</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">selectable</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code"> != </span><span class="hl-quotes">'</span><span class="hl-string">false</span><span class="hl-quotes">'</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/** @ignore */
+    </span><span class="hl-identifier">rowClick</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">grid</span><span class="hl-code">, </span><span class="hl-identifier">rowIndex</span><span class="hl-code">, </span><span class="hl-identifier">e</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">isLocked</span><span class="hl-brackets">()) </span><span class="hl-reserved">return</span><span class="hl-code">;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">row</span><span class="hl-code"> = </span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">getRow</span><span class="hl-brackets">(</span><span class="hl-identifier">rowIndex</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">isSelectable</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-brackets">)){
+            </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">shiftKey</span><span class="hl-code"> &amp;&amp; </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">lastSelectedRow</span><span class="hl-brackets">){
+                </span><span class="hl-reserved">var </span><span class="hl-identifier">lastIndex</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">lastSelectedRow</span><span class="hl-code">.</span><span class="hl-identifier">rowIndex</span><span class="hl-code">;
+                </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selectRange</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">lastSelectedRow</span><span class="hl-code">, </span><span class="hl-identifier">row</span><span class="hl-code">, </span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">ctrlKey</span><span class="hl-brackets">)</span><span class="hl-code">;
+                </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">lastSelectedRow</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-code">.</span><span class="hl-identifier">rows</span><span class="hl-brackets">[</span><span class="hl-identifier">lastIndex</span><span class="hl-brackets">]</span><span class="hl-code">;
+            </span><span class="hl-brackets">}</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+                </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">focusRow</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-brackets">)</span><span class="hl-code">;
+                </span><span class="hl-reserved">var </span><span class="hl-identifier">rowState</span><span class="hl-code"> = </span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">ctrlKey</span><span class="hl-code"> ? !</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">isSelected</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-brackets">)</span><span class="hl-code"> : </span><span class="hl-reserved">true</span><span class="hl-code">;
+                </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">setRowState</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-code">, </span><span class="hl-identifier">rowState</span><span class="hl-code">, </span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">hasModifier</span><span class="hl-brackets">())</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+        }
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Deprecated. Tries to focus the row and scroll it into view - Use grid.scrollTo or grid.getView().focusRow() instead.
+     * @deprecated
+     * @param {HTMLElement} row The row to focus
+     */
+    </span><span class="hl-identifier">focusRow</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-brackets">){
+    	</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">view</span><span class="hl-code">.</span><span class="hl-identifier">focusRow</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+
+    </span><span class="hl-comment">/**
+     * Selects a row.
+     * @param {Number/HTMLElement} row The row or index of the row to select
+     * @param {&lt;i&gt;Boolean&lt;/i&gt;} keepExisting (optional) True to retain existing selections 
+     */
+    </span><span class="hl-identifier">selectRow</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-code">, </span><span class="hl-identifier">keepExisting</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">setRowState</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getRow</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-brackets">)</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-code">, </span><span class="hl-identifier">keepExisting</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Selects multiple rows.
+     * @param {Array} rows Array of the rows or indexes of the row to select
+     * @param {&lt;i&gt;Boolean&lt;/i&gt;} keepExisting (optional) True to retain existing selections 
+     */
+    </span><span class="hl-identifier">selectRows</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">rows</span><span class="hl-code">, </span><span class="hl-identifier">keepExisting</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">keepExisting</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">clearSelections</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code"> &lt; </span><span class="hl-identifier">rows</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code">++</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selectRow</span><span class="hl-brackets">(</span><span class="hl-identifier">rows</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Deselects a row.
+     * @param {Number/HTMLElement} row The row or index of the row to deselect
+     */
+    </span><span class="hl-identifier">deselectRow</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">setRowState</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getRow</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-brackets">)</span><span class="hl-code">, </span><span class="hl-reserved">false</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/** @ignore */
+    </span><span class="hl-identifier">getRow</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">row</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">number</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+            </span><span class="hl-identifier">row</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">rows</span><span class="hl-brackets">[</span><span class="hl-identifier">row</span><span class="hl-brackets">]</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">return </span><span class="hl-identifier">row</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Selects a range of rows. All rows in between startRow and endRow are also selected.
+     * @param {Number/HTMLElement} startRow The row or index of the first row in the range
+     * @param {Number/HTMLElement} endRow The row or index of the last row in the range
+     * @param {&lt;i&gt;Boolean&lt;/i&gt;} keepExisting (optional) True to retain existing selections 
+     */
+    </span><span class="hl-identifier">selectRange</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">startRow</span><span class="hl-code">, </span><span class="hl-identifier">endRow</span><span class="hl-code">, </span><span class="hl-identifier">keepExisting</span><span class="hl-brackets">){
+        </span><span class="hl-identifier">startRow</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getRow</span><span class="hl-brackets">(</span><span class="hl-identifier">startRow</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-identifier">endRow</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getRow</span><span class="hl-brackets">(</span><span class="hl-identifier">endRow</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">setRangeState</span><span class="hl-brackets">(</span><span class="hl-identifier">startRow</span><span class="hl-code">, </span><span class="hl-identifier">endRow</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-code">, </span><span class="hl-identifier">keepExisting</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Deselects a range of rows. All rows in between startRow and endRow are also deselected.
+     * @param {Number/HTMLElement} startRow The row or index of the first row in the range
+     * @param {Number/HTMLElement} endRow The row or index of the last row in the range
+     */
+    </span><span class="hl-identifier">deselectRange</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">startRow</span><span class="hl-code">, </span><span class="hl-identifier">endRow</span><span class="hl-brackets">){
+        </span><span class="hl-identifier">startRow</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getRow</span><span class="hl-brackets">(</span><span class="hl-identifier">startRow</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-identifier">endRow</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getRow</span><span class="hl-brackets">(</span><span class="hl-identifier">endRow</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">setRangeState</span><span class="hl-brackets">(</span><span class="hl-identifier">startRow</span><span class="hl-code">, </span><span class="hl-identifier">endRow</span><span class="hl-code">, </span><span class="hl-reserved">false</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/** @ignore */
+    </span><span class="hl-identifier">setRowStateFromChild</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">childEl</span><span class="hl-code">, </span><span class="hl-identifier">selected</span><span class="hl-code">, </span><span class="hl-identifier">keepExisting</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">row</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">getRowFromChild</span><span class="hl-brackets">(</span><span class="hl-identifier">childEl</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">setRowState</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-code">, </span><span class="hl-identifier">selected</span><span class="hl-code">, </span><span class="hl-identifier">keepExisting</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/** @ignore */
+    </span><span class="hl-identifier">setRangeState</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">startRow</span><span class="hl-code">, </span><span class="hl-identifier">endRow</span><span class="hl-code">, </span><span class="hl-identifier">selected</span><span class="hl-code">, </span><span class="hl-identifier">keepExisting</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">isLocked</span><span class="hl-brackets">()) </span><span class="hl-reserved">return</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">keepExisting</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">clearSelections</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">curRow</span><span class="hl-code"> = </span><span class="hl-identifier">startRow</span><span class="hl-code">;
+        </span><span class="hl-reserved">while</span><span class="hl-brackets">(</span><span class="hl-identifier">curRow</span><span class="hl-code">.</span><span class="hl-identifier">rowIndex</span><span class="hl-code"> != </span><span class="hl-identifier">endRow</span><span class="hl-code">.</span><span class="hl-identifier">rowIndex</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">setRowState</span><span class="hl-brackets">(</span><span class="hl-identifier">curRow</span><span class="hl-code">, </span><span class="hl-identifier">selected</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-identifier">curRow</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-identifier">startRow</span><span class="hl-code">.</span><span class="hl-identifier">rowIndex</span><span class="hl-code"> &lt; </span><span class="hl-identifier">endRow</span><span class="hl-code">.</span><span class="hl-identifier">rowIndex</span><span class="hl-code"> ? 
+                        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">getRowAfter</span><span class="hl-brackets">(</span><span class="hl-identifier">curRow</span><span class="hl-brackets">)</span><span class="hl-code"> : </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">getRowBefore</span><span class="hl-brackets">(</span><span class="hl-identifier">curRow</span><span class="hl-brackets">))
+        }
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">setRowState</span><span class="hl-brackets">(</span><span class="hl-identifier">endRow</span><span class="hl-code">, </span><span class="hl-identifier">selected</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/** @ignore */
+    </span><span class="hl-identifier">setRowState</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-code">, </span><span class="hl-identifier">selected</span><span class="hl-code">, </span><span class="hl-identifier">keepExisting</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">isLocked</span><span class="hl-brackets">()) </span><span class="hl-reserved">return</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">isSelectable</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-brackets">)){
+            </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">selected</span><span class="hl-brackets">){
+                </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">keepExisting</span><span class="hl-brackets">){
+                    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">clearSelections</span><span class="hl-brackets">()</span><span class="hl-code">;
+                </span><span class="hl-brackets">}
+                </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">setRowClass</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">selected</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+                </span><span class="hl-identifier">row</span><span class="hl-code">.</span><span class="hl-identifier">selected</span><span class="hl-code"> = </span><span class="hl-reserved">true</span><span class="hl-code">;
+                </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selectedRows</span><span class="hl-code">.</span><span class="hl-identifier">push</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-brackets">)</span><span class="hl-code">;
+                </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selectedRowIds</span><span class="hl-code">.</span><span class="hl-identifier">push</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">dataModel</span><span class="hl-code">.</span><span class="hl-identifier">getRowId</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-code">.</span><span class="hl-identifier">rowIndex</span><span class="hl-brackets">))</span><span class="hl-code">;
+                </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">lastSelectedRow</span><span class="hl-code"> = </span><span class="hl-identifier">row</span><span class="hl-code">;
+            </span><span class="hl-brackets">}</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+                </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">setRowClass</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-code">, </span><span class="hl-quotes">''</span><span class="hl-brackets">)</span><span class="hl-code">;
+                </span><span class="hl-identifier">row</span><span class="hl-code">.</span><span class="hl-identifier">selected</span><span class="hl-code"> = </span><span class="hl-reserved">false</span><span class="hl-code">;
+                </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_removeSelected</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">fireEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">rowselect</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-identifier">row</span><span class="hl-code">, </span><span class="hl-identifier">selected</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">fireEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">selectionchange</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selectedRows</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selectedRowIds</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+
+    </span><span class="hl-comment">/** @ignore */
+    </span><span class="hl-identifier">handleOver</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">row</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">getRowFromChild</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">getTarget</span><span class="hl-brackets">())</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">isSelectable</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-brackets">)</span><span class="hl-code"> &amp;&amp; !</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">isSelected</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-brackets">)){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">setRowClass</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">over</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/** @ignore */
+    </span><span class="hl-identifier">handleOut</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">row</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">getRowFromChild</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">getTarget</span><span class="hl-brackets">())</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">isSelectable</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-brackets">)</span><span class="hl-code"> &amp;&amp; !</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">isSelected</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-brackets">)){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">setRowClass</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-code">, </span><span class="hl-quotes">''</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/** @ignore */
+    </span><span class="hl-identifier">keyDown</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">browserEvent</span><span class="hl-code">.</span><span class="hl-identifier">keyCode</span><span class="hl-code"> == </span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">DOWN</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selectNext</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">shiftKey</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">preventDefault</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-reserved">else if</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">browserEvent</span><span class="hl-code">.</span><span class="hl-identifier">keyCode</span><span class="hl-code"> == </span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">UP</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selectPrevious</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">shiftKey</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">preventDefault</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+
+    </span><span class="hl-comment">/** @ignore */
+    </span><span class="hl-identifier">setRowClass</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-code">, </span><span class="hl-identifier">cssClass</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">isSelectable</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-brackets">)){
+            </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">cssClass</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">selected</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+                </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">removeClass</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">ygrid-row-over</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+                </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">addClass</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">ygrid-row-selected</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-brackets">}</span><span class="hl-reserved">else if</span><span class="hl-brackets">(</span><span class="hl-identifier">cssClass</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">over</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+                </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">removeClass</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">ygrid-row-selected</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+                </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">addClass</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">ygrid-row-over</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-brackets">}</span><span class="hl-reserved">else if</span><span class="hl-brackets">(</span><span class="hl-identifier">cssClass</span><span class="hl-code"> == </span><span class="hl-quotes">''</span><span class="hl-brackets">){
+                </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">removeClass</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">ygrid-row-selected</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+                </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">removeClass</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">ygrid-row-over</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+        }
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/** @ignore */
+    </span><span class="hl-identifier">_removeSelected</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">sr</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selectedRows</span><span class="hl-code">;
+        </span><span class="hl-reserved">for </span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code"> &lt; </span><span class="hl-identifier">sr</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code">++</span><span class="hl-brackets">) {
+          </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">sr</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code"> === </span><span class="hl-identifier">row</span><span class="hl-brackets">){
+              </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selectedRows</span><span class="hl-code">.</span><span class="hl-identifier">splice</span><span class="hl-brackets">(</span><span class="hl-identifier">i</span><span class="hl-code">, </span><span class="hl-number">1</span><span class="hl-brackets">)</span><span class="hl-code">;
+              </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">selectedRowIds</span><span class="hl-code">.</span><span class="hl-identifier">splice</span><span class="hl-brackets">(</span><span class="hl-identifier">i</span><span class="hl-code">, </span><span class="hl-number">1</span><span class="hl-brackets">)</span><span class="hl-code">;
+              </span><span class="hl-reserved">return</span><span class="hl-code">;
+          </span><span class="hl-brackets">}
+        }
+    }
+}</span><span class="hl-default">;
+
+</span><span class="hl-comment">/**
+ @class YAHOO.ext.grid.SingleSelectionModel
+ @extends YAHOO.ext.grid.DefaultSelectionModel
+ Allows only one row to be selected at a time.
+ @constructor
+ * Create new SingleSelectionModel
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">grid</span><span class="hl-default">.</span><span class="hl-identifier">SingleSelectionModel</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">SingleSelectionModel</span><span class="hl-code">.</span><span class="hl-identifier">superclass</span><span class="hl-code">.</span><span class="hl-identifier">constructor</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-default">;
+
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">extendX</span><span class="hl-brackets">(</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">SingleSelectionModel</span><span class="hl-code">, </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">DefaultSelectionModel</span><span class="hl-brackets">)</span><span class="hl-default">;
+
+</span><span class="hl-comment">/** @ignore */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">grid</span><span class="hl-default">.</span><span class="hl-identifier">SingleSelectionModel</span><span class="hl-default">.</span><span class="hl-identifier">prototype</span><span class="hl-default">.</span><span class="hl-identifier">setRowState</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">row</span><span class="hl-code">, </span><span class="hl-identifier">selected</span><span class="hl-brackets">){
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">SingleSelectionModel</span><span class="hl-code">.</span><span class="hl-identifier">superclass</span><span class="hl-code">.</span><span class="hl-identifier">setRowState</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-identifier">row</span><span class="hl-code">, </span><span class="hl-identifier">selected</span><span class="hl-code">, </span><span class="hl-reserved">false</span><span class="hl-brackets">)</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-default">;
+
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">grid</span><span class="hl-default">.</span><span class="hl-identifier">DisableSelectionModel</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">DisableSelectionModel</span><span class="hl-code">.</span><span class="hl-identifier">superclass</span><span class="hl-code">.</span><span class="hl-identifier">constructor</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-default">;
+
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">extendX</span><span class="hl-brackets">(</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">DisableSelectionModel</span><span class="hl-code">, </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">grid</span><span class="hl-code">.</span><span class="hl-identifier">DefaultSelectionModel</span><span class="hl-brackets">)</span><span class="hl-default">;
+
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">grid</span><span class="hl-default">.</span><span class="hl-identifier">DisableSelectionModel</span><span class="hl-default">.</span><span class="hl-identifier">prototype</span><span class="hl-default">.</span><span class="hl-identifier">initEvents</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+}</span><span class="hl-default">;</span></pre></div><hr>Copyright &copy; 2006 Jack Slocum. All rights reserved.</body></html>

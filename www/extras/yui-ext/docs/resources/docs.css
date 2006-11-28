@@ -1,0 +1,87 @@
+.pkg h3 {
+    padding-left:34px;
+    font:normal 11px verdana,helvetica,tahoma,sans-serif;
+    height:18px;
+    cursor:pointer;
+}
+h3.collapser-expanded{
+    background: #fff url(pkg-open.gif) no-repeat 0px -1px;
+}
+h3.collapser-collapsed {
+    background: #fff url(pkg-closed.gif) no-repeat 0px -1px;
+}
+.pkg-body{
+    margin-left:16px;
+    font:normal 11px verdana,helvetica,tahoma,sans-serif;
+}
+#classes a{
+    font:normal 11px verdana,helvetica,tahoma,sans-serif;
+    display:block;
+    text-decoration:none;
+    height:18px;
+    color:black;
+    background: #fff url(class.gif) no-repeat 16px -1px;
+    padding-left:34px;
+    -moz-outline:none;
+    outline:none;
+	 white-space: nowrap;
+}
+#classes a:hover{
+	text-decoration: underline;
+}
+#classes a.ex{
+    background: #fff url(example.gif) no-repeat 16px -1px;
+}
+#classes{
+    overflow:auto;
+    padding:5px;
+}
+#class .loading-indicator{
+	font-size:12px;
+	height:18px;
+}
+#docs .ylayout-panel-north{
+   border:0px none;
+   background:#0000aa url(../../resources/images/basic-dialog/hd-sprite.gif) repeat-x 0px -83px;
+   padding-top:3px;
+   padding-left:3px;
+}
+#docs .ylayout-collapsed-west{
+   background-image: url(collapse-bg.gif);
+   background-repeat:no-repeat;
+   background-position:center;
+}
+#header {
+    font-family: Tahoma, Verdana, Arial, Helvetica, sans-serif;
+    color:white;
+}
+.loading-indicator {
+    font-size:8pt;
+    background-image:url('../../resources/images/grid/loading.gif');
+    background-repeat: no-repeat;
+    background-position:top left;
+    padding-left:20px;
+	height:18px;
+	text-align:left;
+}
+a#welcome-link{
+	background:#fff url(docs.gif) no-repeat 0px 0px;
+	padding-left:18px;
+}
+a#help-forums{
+	background:#fff url(forum.gif) no-repeat 16px 0px;
+	padding-left:34px;
+	display:block
+}
+#loading{
+	position:absolute;
+	left:45%;
+	top:40%;
+	border:3px solid #B2D0F7;
+	background:white url(block-bg.gif) repeat-x;
+	padding:10px;
+	font:bold 14px verdana,tahoma,helvetica;
+	color:#003366;
+	width:150px;
+	text-align:center;
+}

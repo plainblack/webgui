@@ -1,0 +1,493 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>LogReader</title>
+        <link rel="stylesheet" type="text/css" href="../reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="LogReader.html" target="_blank">Print Friendly</a></div>
+        <h1>Class LogReader</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>Global</td></tr>
+            <tr><td class="label">Class:</td><td>LogReader</td></tr>
+                        <tr><td class="label">Extends:</td><td>Object</td></tr>
+                                    <tr><td class="label">Defined In:</td><td><a href="logger-debug.js.html">logger-debug.js</a></td></tr>
+        </table>
+        <div class="description">
+            The LogReader class provides UI to read messages logged to YAHOO.widget.Logger.        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Property</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#bottom">bottom</a> : String</td>
+        <td class="msource" rowspan="2">LogReader</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Public member to access CSS bottom position of the log reader container.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#fontSize">fontSize</a> : String</td>
+        <td class="msource" rowspan="2">LogReader</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Public member to access CSS font size of the log reader container.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#footerEnabled">footerEnabled</a> : Boolean</td>
+        <td class="msource" rowspan="2">LogReader</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Whether or not the footer UI is enabled for the log reader.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#height">height</a> : String</td>
+        <td class="msource" rowspan="2">LogReader</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Public member to access CSS height of the log reader container.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#left">left</a> : String</td>
+        <td class="msource" rowspan="2">LogReader</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Public member to access CSS left position of the log reader container.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#logReaderEnabled">logReaderEnabled</a> : Boolean</td>
+        <td class="msource" rowspan="2">LogReader</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Whether or not the log reader is enabled to output log messages.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#newestOnTop">newestOnTop</a> : Boolean</td>
+        <td class="msource" rowspan="2">LogReader</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Whether or not newest message is printed on top.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#right">right</a> : String</td>
+        <td class="msource" rowspan="2">LogReader</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Public member to access CSS right position of the log reader container.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#thresholdMax">thresholdMax</a> : Number</td>
+        <td class="msource" rowspan="2">LogReader</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Maximum number of messages a LogReader console will display.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#thresholdMin">thresholdMin</a> : Number</td>
+        <td class="msource" rowspan="2">LogReader</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">When a LogReader console reaches its thresholdMax, it will clear out messages
+and print out the latest thresholdMin n...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#top">top</a> : String</td>
+        <td class="msource" rowspan="2">LogReader</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Public member to access CSS top position of the log reader container.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#verboseOutput">verboseOutput</a> : Boolean</td>
+        <td class="msource" rowspan="2">LogReader</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Whether or not output is verbose (more readable). Setting to true will make
+output more compact (less readable).</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#width">width</a> : String</td>
+        <td class="msource" rowspan="2">LogReader</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Public member to access CSS width of the log reader container.</td>
+    </tr>
+            </table>
+                <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#LogReader">LogReader</a>(<span class="optional" title="Optional">[<code>elContainer {HTMLElement}</code>]</span>, <span class="optional" title="Optional">[<code>elContainer {String}</code>]</span>, <span class="optional" title="Optional">[<code>oConfigs {Object}</code>]</span>)</td>
+        <td class="msource" rowspan="2">LogReader</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#formatMsg">formatMsg</a>(<code>oLogMsg {Object}</code>) : String</td>
+        <td class="msource" rowspan="2">LogReader</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Formats message string to HTML for output to console.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getLastTime">getLastTime</a>() : Date</td>
+        <td class="msource" rowspan="2">LogReader</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Gets timestamp of the last log.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#hide">hide</a>() : void</td>
+        <td class="msource" rowspan="2">LogReader</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Hides UI of log reader. Logging functionality is not disrupted.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#pause">pause</a>() : void</td>
+        <td class="msource" rowspan="2">LogReader</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Pauses output of log messages. While paused, log messages are not lost, but
+get saved to a buffer and then output upo...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#resume">resume</a>() : void</td>
+        <td class="msource" rowspan="2">LogReader</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Resumes output of log messages, including outputting any log messages that
+have been saved to buffer while paused.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setTitle">setTitle</a>(<code>sTitle {String}</code>) : void</td>
+        <td class="msource" rowspan="2">LogReader</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Updates title to given string.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#show">show</a>() : void</td>
+        <td class="msource" rowspan="2">LogReader</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Shows UI of log reader. Logging functionality is not disrupted.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#toString">toString</a>() : String</td>
+        <td class="msource" rowspan="2">LogReader</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Public accessor to the unique name of the LogReader instance.</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+        <div class="no-members">This class has no public events.</div>        
+                    <h2 class="mdetail-head">Property Details</h2>
+            <div class="detail-wrap">
+                            <a name="bottom"></a>
+                <div class="mdetail">
+                <h3>bottom</i></h3>
+                <code>public String bottom</code>
+                <div class="mdetail-desc">
+                    Public member to access CSS bottom position of the log reader container.                </div>
+                <div class="mdetail-def">This property is defined by LogReader.</div>
+                </div>
+                            <a name="fontSize"></a>
+                <div class="mdetail alt">
+                <h3>fontSize</i></h3>
+                <code>public String fontSize</code>
+                <div class="mdetail-desc">
+                    Public member to access CSS font size of the log reader container.                </div>
+                <div class="mdetail-def">This property is defined by LogReader.</div>
+                </div>
+                            <a name="footerEnabled"></a>
+                <div class="mdetail">
+                <h3>footerEnabled</i></h3>
+                <code>public Boolean footerEnabled</code>
+                <div class="mdetail-desc">
+                    Whether or not the footer UI is enabled for the log reader.                </div>
+                <div class="mdetail-def">This property is defined by LogReader.</div>
+                </div>
+                            <a name="height"></a>
+                <div class="mdetail alt">
+                <h3>height</i></h3>
+                <code>public String height</code>
+                <div class="mdetail-desc">
+                    Public member to access CSS height of the log reader container.                </div>
+                <div class="mdetail-def">This property is defined by LogReader.</div>
+                </div>
+                            <a name="left"></a>
+                <div class="mdetail">
+                <h3>left</i></h3>
+                <code>public String left</code>
+                <div class="mdetail-desc">
+                    Public member to access CSS left position of the log reader container.                </div>
+                <div class="mdetail-def">This property is defined by LogReader.</div>
+                </div>
+                            <a name="logReaderEnabled"></a>
+                <div class="mdetail alt">
+                <h3>logReaderEnabled</i></h3>
+                <code>public Boolean logReaderEnabled</code>
+                <div class="mdetail-desc">
+                    Whether or not the log reader is enabled to output log messages.                </div>
+                <div class="mdetail-def">This property is defined by LogReader.</div>
+                </div>
+                            <a name="newestOnTop"></a>
+                <div class="mdetail">
+                <h3>newestOnTop</i></h3>
+                <code>public Boolean newestOnTop</code>
+                <div class="mdetail-desc">
+                    Whether or not newest message is printed on top.                </div>
+                <div class="mdetail-def">This property is defined by LogReader.</div>
+                </div>
+                            <a name="right"></a>
+                <div class="mdetail alt">
+                <h3>right</i></h3>
+                <code>public String right</code>
+                <div class="mdetail-desc">
+                    Public member to access CSS right position of the log reader container.                </div>
+                <div class="mdetail-def">This property is defined by LogReader.</div>
+                </div>
+                            <a name="thresholdMax"></a>
+                <div class="mdetail">
+                <h3>thresholdMax</i></h3>
+                <code>public Number thresholdMax</code>
+                <div class="mdetail-desc">
+                    Maximum number of messages a LogReader console will display.                </div>
+                <div class="mdetail-def">This property is defined by LogReader.</div>
+                </div>
+                            <a name="thresholdMin"></a>
+                <div class="mdetail alt">
+                <h3>thresholdMin</i></h3>
+                <code>public Number thresholdMin</code>
+                <div class="mdetail-desc">
+                    When a LogReader console reaches its thresholdMax, it will clear out messages
+and print out the latest thresholdMin number of messages.                </div>
+                <div class="mdetail-def">This property is defined by LogReader.</div>
+                </div>
+                            <a name="top"></a>
+                <div class="mdetail">
+                <h3>top</i></h3>
+                <code>public String top</code>
+                <div class="mdetail-desc">
+                    Public member to access CSS top position of the log reader container.                </div>
+                <div class="mdetail-def">This property is defined by LogReader.</div>
+                </div>
+                            <a name="verboseOutput"></a>
+                <div class="mdetail alt">
+                <h3>verboseOutput</i></h3>
+                <code>public Boolean verboseOutput</code>
+                <div class="mdetail-desc">
+                    Whether or not output is verbose (more readable). Setting to true will make
+output more compact (less readable).                </div>
+                <div class="mdetail-def">This property is defined by LogReader.</div>
+                </div>
+                            <a name="width"></a>
+                <div class="mdetail">
+                <h3>width</i></h3>
+                <code>public String width</code>
+                <div class="mdetail-desc">
+                    Public member to access CSS width of the log reader container.                </div>
+                <div class="mdetail-def">This property is defined by LogReader.</div>
+                </div>
+                        </div>
+                
+                    <a name="LogReader"></a>
+            <h2 class="mdetail-head">Constructor Details</h2>
+            <div class="detail-wrap">
+                <div class="mdetail">
+                <h3>LogReader</i></h3>
+                <code>public function LogReader(<span class="optional" title="Optional">[<code>elContainer {HTMLElement}</code>]</span>, <span class="optional" title="Optional">[<code>elContainer {String}</code>]</span>, <span class="optional" title="Optional">[<code>oConfigs {Object}</code>]</span>)</code>
+                <div class="mdetail-desc">
+                                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>{HTMLElement}</code> : elContainer<div class="sub-desc">(optional) DOM element reference of an existing DIV.</div></li><li><code>{String}</code> : elContainer<div class="sub-desc">(optional) String ID of an existing DIV.</div></li><li><code>{Object}</code> : oConfigs<div class="sub-desc">(optional) Object literal of configuration params.</div></li>                    </ul>
+                </div>
+                </div>
+                </div>
+            </div>
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="formatMsg"></a>
+                <div class="mdetail">
+                <h3>formatMsg</i></h3>
+                <code>public function formatMsg(<code>oLogMsg {Object}</code>)</code>
+                <div class="mdetail-desc">
+                    Formats message string to HTML for output to console.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>{Object}</code> : oLogMsg<div class="sub-desc">Log message object.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>String</code><div class="sub-desc">HTML-formatted message for output to console.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by LogReader.</div>
+                </div>
+                            <a name="getLastTime"></a>
+                <div class="mdetail alt">
+                <h3>getLastTime</i></h3>
+                <code>public function getLastTime()</code>
+                <div class="mdetail-desc">
+                    Gets timestamp of the last log.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Date</code><div class="sub-desc">Timestamp of the last log.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by LogReader.</div>
+                </div>
+                            <a name="hide"></a>
+                <div class="mdetail">
+                <h3>hide</i></h3>
+                <code>public function hide()</code>
+                <div class="mdetail-desc">
+                    Hides UI of log reader. Logging functionality is not disrupted.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by LogReader.</div>
+                </div>
+                            <a name="pause"></a>
+                <div class="mdetail alt">
+                <h3>pause</i></h3>
+                <code>public function pause()</code>
+                <div class="mdetail-desc">
+                    Pauses output of log messages. While paused, log messages are not lost, but
+get saved to a buffer and then output upon resume of log reader.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by LogReader.</div>
+                </div>
+                            <a name="resume"></a>
+                <div class="mdetail">
+                <h3>resume</i></h3>
+                <code>public function resume()</code>
+                <div class="mdetail-desc">
+                    Resumes output of log messages, including outputting any log messages that
+have been saved to buffer while paused.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by LogReader.</div>
+                </div>
+                            <a name="setTitle"></a>
+                <div class="mdetail alt">
+                <h3>setTitle</i></h3>
+                <code>public function setTitle(<code>sTitle {String}</code>)</code>
+                <div class="mdetail-desc">
+                    Updates title to given string.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>{String}</code> : sTitle<div class="sub-desc">New title.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by LogReader.</div>
+                </div>
+                            <a name="show"></a>
+                <div class="mdetail">
+                <h3>show</i></h3>
+                <code>public function show()</code>
+                <div class="mdetail-desc">
+                    Shows UI of log reader. Logging functionality is not disrupted.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by LogReader.</div>
+                </div>
+                            <a name="toString"></a>
+                <div class="mdetail alt">
+                <h3>toString</i></h3>
+                <code>public function toString()</code>
+                <div class="mdetail-desc">
+                    Public accessor to the unique name of the LogReader instance.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>String</code><div class="sub-desc">Unique name of the LogReader instance.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by LogReader.</div>
+                </div>
+                        </div>
+                    
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    

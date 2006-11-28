@@ -1,0 +1,1150 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.widget.Tab</title>
+        <link rel="stylesheet" type="text/css" href="../reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.widget.Tab.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.widget.Tab</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.widget</td></tr>
+            <tr><td class="label">Class:</td><td>Tab</td></tr>
+                        <tr><td class="label">Extends:</td><td><a href="YAHOO.util.Element.html">Element</a></td></tr>
+                                    <tr><td class="label">Defined In:</td><td><a href="tabview.js.html">tabview.js</a></td></tr>
+        </table>
+        <div class="description">
+            A representation of a Tab's label and content.        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Property</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#ACTIVE_CLASSNAME">ACTIVE_CLASSNAME</a> : String
+@default</td>
+        <td class="msource" rowspan="2">Tab</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The class name applied to active tabs.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CLASSNAME">CLASSNAME</a> : Object</td>
+        <td class="msource" rowspan="2">Tab</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The className to add when building from scratch.
+@default "navset"</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CONTENT_PARENT_CLASSNAME">CONTENT_PARENT_CLASSNAME</a> : Object</td>
+        <td class="msource" rowspan="2">Tab</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The className of the HTMLElement containing the TabView's label elements
+to look for when building from existing mark...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#DISABLED_CLASSNAME">DISABLED_CLASSNAME</a> : String
+@default</td>
+        <td class="msource" rowspan="2">Tab</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The class name applied to disabled tabs.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#DOM_EVENTS">DOM_EVENTS</a> : Object</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Element.html#DOM_EVENTS">Element</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Dom events supported by the Element instance.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#LABEL_INNER_TAGNAME">LABEL_INNER_TAGNAME</a> : String
+@default</td>
+        <td class="msource" rowspan="2">Tab</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The default tag name for a Tab's inner element.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#LOADING_CLASSNAME">LOADING_CLASSNAME</a> : String
+@default</td>
+        <td class="msource" rowspan="2">Tab</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The class name applied to dynamic tabs while loading.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#TAB_PARENT_CLASSNAME">TAB_PARENT_CLASSNAME</a> : Object</td>
+        <td class="msource" rowspan="2">Tab</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The className of the HTMLElement containing the TabView's tab elements
+to look for when building from existing markup...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#dataConnection">dataConnection</a> : Object</td>
+        <td class="msource" rowspan="2">Tab</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Provides a reference to the connection request object when data is
+loaded dynamically.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#loadHandler">loadHandler</a> : object</td>
+        <td class="msource" rowspan="2">Tab</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Object containing success and failure callbacks for loading data.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#register">register</a> : YAHOO.widget.Tab</td>
+        <td class="msource" rowspan="2">Tab</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The tab currently active.
+@config activeTab</td>
+    </tr>
+            </table>
+                <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#Tab">Tab</a>(<span class="optional" title="Optional">[<code>element {HTMLElement</code>]</span>, <code>Object properties</code>)</td>
+        <td class="msource" rowspan="2">Tab</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#DOMEventHandler">DOMEventHandler</a>(<code>event e</code>) : void</td>
+        <td class="msource" rowspan="2">Tab</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Routes childNode events.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#addClass">addClass</a>(<code>String className</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Element.html#addClass">Element</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Wrapper for Dom method.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#addListener">addListener</a>(<code>String type</code>, <code>Function fn</code>, <code>Any obj</code>, <code>Object scope</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Element.html#addListener">Element</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Adds a listener for the given event.  These may be DOM or
+customEvent listeners.  Any event that is fired via fireEve...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#addTab">addTab</a>(<code>YAHOO.widget.Tab tab</code>, <code>Integer index</code>) : void</td>
+        <td class="msource" rowspan="2">Tab</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Adds a Tab to the TabView instance.
+If no index is specified, the tab is added to the end of the tab list.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#appendChild">appendChild</a>(<code>Boolean deep</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Element.html#appendChild">Element</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Wrapper for HTMLElement method.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#appendTo">appendTo</a>(<code>HTMLElement |</code>, <code>HTMLElement |</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Element.html#appendTo">Element</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Appends the HTMLElement into either the supplied parentNode.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#contentTransition">contentTransition</a>() : void</td>
+        <td class="msource" rowspan="2">Tab</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The transiton to use when switching between tabs.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#fireQueue">fireQueue</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Element.html#fireQueue">Element</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Apply any queued set calls.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getElementsByClassName">getElementsByClassName</a>(<code>String className</code>, <span class="optional" title="Optional">[<code>String tag</code>]</span>) : Array</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Element.html#getElementsByClassName">Element</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Wrapper for Dom method.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getElementsByTagName">getElementsByTagName</a>(<code>String tag</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Element.html#getElementsByTagName">Element</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Wrapper for HTMLElement method.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getStyle">getStyle</a>(<code>String property</code>) : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Element.html#getStyle">Element</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Wrapper for Dom method.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getTab">getTab</a>(<code>Integer index</code>) : YAHOO.widget.Tab</td>
+        <td class="msource" rowspan="2">Tab</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Returns the Tab instance at the specified index.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getTabIndex">getTabIndex</a>(<code>YAHOO.widget.Tab tab</code>) : int</td>
+        <td class="msource" rowspan="2">Tab</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Returns the index of given tab.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#hasChildNodes">hasChildNodes</a>() : Boolean</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Element.html#hasChildNodes">Element</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Wrapper for HTMLElement method.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#hasClass">hasClass</a>(<code>String className</code>) : Boolean</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Element.html#hasClass">Element</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Wrapper for Dom method.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#initAttributes">initAttributes</a>(<code>Object attr</code>) : void</td>
+        <td class="msource" rowspan="2">Tab</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Registers TabView specific properties.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#insertBefore">insertBefore</a>(<code>HTMLElement element</code>, <code>HTMLElement before</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Element.html#insertBefore">Element</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Wrapper for HTMLElement method.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#on">on</a>(<code>String type</code>, <code>Function fn</code>, <code>Any obj</code>, <code>Object scope</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Element.html#on">Element</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Alias for addListener</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#removeChild">removeChild</a>(<code>HTMLElement child</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Element.html#removeChild">Element</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Wrapper for HTMLElement method.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#removeClass">removeClass</a>(<code>String className</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Element.html#removeClass">Element</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Wrapper for Dom method.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#removeListener">removeListener</a>(<code>String type</code>, <code>Function fn</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Element.html#removeListener">Element</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Remove an event listener</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#removeTab">removeTab</a>(<code>YAHOO.widget.Tab item</code>) : void</td>
+        <td class="msource" rowspan="2">Tab</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Removes the specified Tab from the TabView.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#replaceChild">replaceChild</a>(<code>HTMLElement newNode</code>, <code>HTMLElement oldNode</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Element.html#replaceChild">Element</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Wrapper for HTMLElement method.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#replaceClass">replaceClass</a>(<code>String oldClassName</code>, <code>String newClassName</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Element.html#replaceClass">Element</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Wrapper for Dom method.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setStyle">setStyle</a>(<code>String property</code>, <code>String value</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Element.html#setStyle">Element</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Wrapper for Dom method.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#toString">toString</a>() : String</td>
+        <td class="msource" rowspan="2">Tab</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Provides a readable name for the TabView instance.</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Event</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#available">available</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.util.Element.html#available">Element</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fires when the Element's HTMLElement can be retrieved by Id.
+See: Element.addListener
+Event fields:
+&lt;String&gt; ty...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#beforeActiveChange">beforeActiveChange</a> : ()</td>
+        <td class="msource" rowspan="2">Tab</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Fires before the active state is changed.
+See: Element.addListener
+If handler returns false, the change will be cance...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#beforeActiveTabChange">beforeActiveTabChange</a> : ()</td>
+        <td class="msource" rowspan="2">Tab</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fires before the activeTab is changed.
+See: Element.addListener
+If handler returns false, the change will be cancelle...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#beforeContentChange">beforeContentChange</a> : ()</td>
+        <td class="msource" rowspan="2">Tab</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Fires before the tab content is changed.
+See: Element.addListener
+If handler returns false, the change will be cancel...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#beforeLabelChange">beforeLabelChange</a> : ()</td>
+        <td class="msource" rowspan="2">Tab</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fires before the tab label is changed.
+See: Element.addListener
+If handler returns false, the change will be cancelle...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#beforeOrientationChange">beforeOrientationChange</a> : ()</td>
+        <td class="msource" rowspan="2">Tab</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Fires before the orientation is changed.
+See: Element.addListener
+If handler returns false, the change will be cancel...</td>
+    </tr>
+            </table>
+                
+                    <h2 class="mdetail-head">Property Details</h2>
+            <div class="detail-wrap">
+                            <a name="ACTIVE_CLASSNAME"></a>
+                <div class="mdetail">
+                <h3>ACTIVE_CLASSNAME</i></h3>
+                <code>public String
+@default ACTIVE_CLASSNAME</code>
+                <div class="mdetail-desc">
+                    The class name applied to active tabs.                </div>
+                <div class="mdetail-def">This property is defined by Tab.</div>
+                </div>
+                            <a name="CLASSNAME"></a>
+                <div class="mdetail alt">
+                <h3>CLASSNAME</i></h3>
+                <code>public Object CLASSNAME</code>
+                <div class="mdetail-desc">
+                    The className to add when building from scratch.
+@default "navset"                </div>
+                <div class="mdetail-def">This property is defined by Tab.</div>
+                </div>
+                            <a name="CONTENT_PARENT_CLASSNAME"></a>
+                <div class="mdetail">
+                <h3>CONTENT_PARENT_CLASSNAME</i></h3>
+                <code>public Object CONTENT_PARENT_CLASSNAME</code>
+                <div class="mdetail-desc">
+                    The className of the HTMLElement containing the TabView's label elements
+to look for when building from existing markup, or to add when building
+from scratch.
+All childNodes of the content container are treated as content elements when
+building from existing markup.
+@default "nav-content"                </div>
+                <div class="mdetail-def">This property is defined by Tab.</div>
+                </div>
+                            <a name="DISABLED_CLASSNAME"></a>
+                <div class="mdetail alt">
+                <h3>DISABLED_CLASSNAME</i></h3>
+                <code>public String
+@default DISABLED_CLASSNAME</code>
+                <div class="mdetail-desc">
+                    The class name applied to disabled tabs.                </div>
+                <div class="mdetail-def">This property is defined by Tab.</div>
+                </div>
+                            <a name="DOM_EVENTS"></a>
+                <div class="mdetail">
+                <h3>DOM_EVENTS</i></h3>
+                <code>public Object DOM_EVENTS</code>
+                <div class="mdetail-desc">
+                    Dom events supported by the Element instance.                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.util.Element.html#DOM_EVENTS">Element</a>.</div>
+                </div>
+                            <a name="LABEL_INNER_TAGNAME"></a>
+                <div class="mdetail alt">
+                <h3>LABEL_INNER_TAGNAME</i></h3>
+                <code>public String
+@default LABEL_INNER_TAGNAME</code>
+                <div class="mdetail-desc">
+                    The default tag name for a Tab's inner element.                </div>
+                <div class="mdetail-def">This property is defined by Tab.</div>
+                </div>
+                            <a name="LOADING_CLASSNAME"></a>
+                <div class="mdetail">
+                <h3>LOADING_CLASSNAME</i></h3>
+                <code>public String
+@default LOADING_CLASSNAME</code>
+                <div class="mdetail-desc">
+                    The class name applied to dynamic tabs while loading.                </div>
+                <div class="mdetail-def">This property is defined by Tab.</div>
+                </div>
+                            <a name="TAB_PARENT_CLASSNAME"></a>
+                <div class="mdetail alt">
+                <h3>TAB_PARENT_CLASSNAME</i></h3>
+                <code>public Object TAB_PARENT_CLASSNAME</code>
+                <div class="mdetail-desc">
+                    The className of the HTMLElement containing the TabView's tab elements
+to look for when building from existing markup, or to add when building
+from scratch.
+All childNodes of the tab container are treated as Tabs when building
+from existing markup.
+@default "nav"                </div>
+                <div class="mdetail-def">This property is defined by Tab.</div>
+                </div>
+                            <a name="dataConnection"></a>
+                <div class="mdetail">
+                <h3>dataConnection</i></h3>
+                <code>public Object dataConnection</code>
+                <div class="mdetail-desc">
+                    Provides a reference to the connection request object when data is
+loaded dynamically.                </div>
+                <div class="mdetail-def">This property is defined by Tab.</div>
+                </div>
+                            <a name="loadHandler"></a>
+                <div class="mdetail alt">
+                <h3>loadHandler</i></h3>
+                <code>public object loadHandler</code>
+                <div class="mdetail-desc">
+                    Object containing success and failure callbacks for loading data.                </div>
+                <div class="mdetail-def">This property is defined by Tab.</div>
+                </div>
+                            <a name="register"></a>
+                <div class="mdetail">
+                <h3>register</i></h3>
+                <code>public YAHOO.widget.Tab register</code>
+                <div class="mdetail-desc">
+                    The tab currently active.
+@config activeTab                </div>
+                <div class="mdetail-def">This property is defined by Tab.</div>
+                </div>
+                        </div>
+                
+                    <a name="Tab"></a>
+            <h2 class="mdetail-head">Constructor Details</h2>
+            <div class="detail-wrap">
+                <div class="mdetail">
+                <h3>Tab</i></h3>
+                <code>public function Tab(<span class="optional" title="Optional">[<code>element {HTMLElement</code>]</span>, <code>Object properties</code>)</code>
+                <div class="mdetail-desc">
+                                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>{HTMLElement</code> : element<div class="sub-desc">| String} (optional) The html element that represents the TabView. An element will be created if none provided.</div></li><li><code>properties</code> : Object<div class="sub-desc">A key map of initial properties</div></li>                    </ul>
+                </div>
+                </div>
+                </div>
+            </div>
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="DOMEventHandler"></a>
+                <div class="mdetail">
+                <h3>DOMEventHandler</i></h3>
+                <code>public function DOMEventHandler(<code>event e</code>)</code>
+                <div class="mdetail-desc">
+                    Routes childNode events.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>e</code> : event<div class="sub-desc">The Dom event that is being handled.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Tab.</div>
+                </div>
+                            <a name="addClass"></a>
+                <div class="mdetail alt">
+                <h3>addClass</i></h3>
+                <code>public function addClass(<code>String className</code>)</code>
+                <div class="mdetail-desc">
+                    Wrapper for Dom method.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>className</code> : String<div class="sub-desc">The className to add</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Element.html#addClass">Element</a>.</div>
+                </div>
+                            <a name="addListener"></a>
+                <div class="mdetail">
+                <h3>addListener</i></h3>
+                <code>public function addListener(<code>String type</code>, <code>Function fn</code>, <code>Any obj</code>, <code>Object scope</code>)</code>
+                <div class="mdetail-desc">
+                    Adds a listener for the given event.  These may be DOM or
+customEvent listeners.  Any event that is fired via fireEvent
+can be listened for.  All handlers receive an event object.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The name of the event to listen for</div></li><li><code>fn</code> : Function<div class="sub-desc">The handler to call when the event fires</div></li><li><code>obj</code> : Any<div class="sub-desc">A variable to pass to the handler</div></li><li><code>scope</code> : Object<div class="sub-desc">The object to use for the scope of the handler</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Element.html#addListener">Element</a>.</div>
+                </div>
+                            <a name="addTab"></a>
+                <div class="mdetail alt">
+                <h3>addTab</i></h3>
+                <code>public function addTab(<code>YAHOO.widget.Tab tab</code>, <code>Integer index</code>)</code>
+                <div class="mdetail-desc">
+                    Adds a Tab to the TabView instance.
+If no index is specified, the tab is added to the end of the tab list.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>tab</code> : YAHOO.widget.Tab<div class="sub-desc">A Tab instance to add.</div></li><li><code>index</code> : Integer<div class="sub-desc">The position to add the tab.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Tab.</div>
+                </div>
+                            <a name="appendChild"></a>
+                <div class="mdetail">
+                <h3>appendChild</i></h3>
+                <code>public function appendChild(<code>Boolean deep</code>)</code>
+                <div class="mdetail-desc">
+                    Wrapper for HTMLElement method.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>deep</code> : Boolean<div class="sub-desc">Whether or not to do a deep clone</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Element.html#appendChild">Element</a>.</div>
+                </div>
+                            <a name="appendTo"></a>
+                <div class="mdetail alt">
+                <h3>appendTo</i></h3>
+                <code>public function appendTo(<code>HTMLElement |</code>, <code>HTMLElement |</code>)</code>
+                <div class="mdetail-desc">
+                    Appends the HTMLElement into either the supplied parentNode.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>|</code> : HTMLElement<div class="sub-desc">Element} parentNode The node to append to</div></li><li><code>|</code> : HTMLElement<div class="sub-desc">Element} before An optional node to insert before</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Element.html#appendTo">Element</a>.</div>
+                </div>
+                            <a name="contentTransition"></a>
+                <div class="mdetail">
+                <h3>contentTransition</i></h3>
+                <code>public function contentTransition()</code>
+                <div class="mdetail-desc">
+                    The transiton to use when switching between tabs.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Tab.</div>
+                </div>
+                            <a name="fireQueue"></a>
+                <div class="mdetail alt">
+                <h3>fireQueue</i></h3>
+                <code>public function fireQueue()</code>
+                <div class="mdetail-desc">
+                    Apply any queued set calls.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Element.html#fireQueue">Element</a>.</div>
+                </div>
+                            <a name="getElementsByClassName"></a>
+                <div class="mdetail">
+                <h3>getElementsByClassName</i></h3>
+                <code>public function getElementsByClassName(<code>String className</code>, <span class="optional" title="Optional">[<code>String tag</code>]</span>)</code>
+                <div class="mdetail-desc">
+                    Wrapper for Dom method.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>className</code> : String<div class="sub-desc">The className to collect</div></li><li><code>tag</code> : String<div class="sub-desc">(optional) The tag to use in conjunction with class name</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Array</code><div class="sub-desc">Array of HTMLElements</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Element.html#getElementsByClassName">Element</a>.</div>
+                </div>
+                            <a name="getElementsByTagName"></a>
+                <div class="mdetail alt">
+                <h3>getElementsByTagName</i></h3>
+                <code>public function getElementsByTagName(<code>String tag</code>)</code>
+                <div class="mdetail-desc">
+                    Wrapper for HTMLElement method.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>tag</code> : String<div class="sub-desc">The tagName to collect</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Element.html#getElementsByTagName">Element</a>.</div>
+                </div>
+                            <a name="getStyle"></a>
+                <div class="mdetail">
+                <h3>getStyle</i></h3>
+                <code>public function getStyle(<code>String property</code>)</code>
+                <div class="mdetail-desc">
+                    Wrapper for Dom method.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>property</code> : String<div class="sub-desc">The style property to retrieve</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>String</code><div class="sub-desc">The current value of the property</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Element.html#getStyle">Element</a>.</div>
+                </div>
+                            <a name="getTab"></a>
+                <div class="mdetail alt">
+                <h3>getTab</i></h3>
+                <code>public function getTab(<code>Integer index</code>)</code>
+                <div class="mdetail-desc">
+                    Returns the Tab instance at the specified index.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>index</code> : Integer<div class="sub-desc">The position of the Tab.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>YAHOO.widget.Tab</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Tab.</div>
+                </div>
+                            <a name="getTabIndex"></a>
+                <div class="mdetail">
+                <h3>getTabIndex</i></h3>
+                <code>public function getTabIndex(<code>YAHOO.widget.Tab tab</code>)</code>
+                <div class="mdetail-desc">
+                    Returns the index of given tab.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>tab</code> : YAHOO.widget.Tab<div class="sub-desc">The tab whose index will be returned.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>int</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Tab.</div>
+                </div>
+                            <a name="hasChildNodes"></a>
+                <div class="mdetail alt">
+                <h3>hasChildNodes</i></h3>
+                <code>public function hasChildNodes()</code>
+                <div class="mdetail-desc">
+                    Wrapper for HTMLElement method.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">Whether or not the element has childNodes</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Element.html#hasChildNodes">Element</a>.</div>
+                </div>
+                            <a name="hasClass"></a>
+                <div class="mdetail">
+                <h3>hasClass</i></h3>
+                <code>public function hasClass(<code>String className</code>)</code>
+                <div class="mdetail-desc">
+                    Wrapper for Dom method.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>className</code> : String<div class="sub-desc">The className to add</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">Whether or not the element has the class name</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Element.html#hasClass">Element</a>.</div>
+                </div>
+                            <a name="initAttributes"></a>
+                <div class="mdetail alt">
+                <h3>initAttributes</i></h3>
+                <code>public function initAttributes(<code>Object attr</code>)</code>
+                <div class="mdetail-desc">
+                    Registers TabView specific properties.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>attr</code> : Object<div class="sub-desc">Hash of initial attributes</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Tab.</div>
+                </div>
+                            <a name="insertBefore"></a>
+                <div class="mdetail">
+                <h3>insertBefore</i></h3>
+                <code>public function insertBefore(<code>HTMLElement element</code>, <code>HTMLElement before</code>)</code>
+                <div class="mdetail-desc">
+                    Wrapper for HTMLElement method.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>element</code> : HTMLElement<div class="sub-desc">The HTMLElement to insert</div></li><li><code>before</code> : HTMLElement<div class="sub-desc">The HTMLElement to insert the element before.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Element.html#insertBefore">Element</a>.</div>
+                </div>
+                            <a name="on"></a>
+                <div class="mdetail alt">
+                <h3>on</i></h3>
+                <code>public function on(<code>String type</code>, <code>Function fn</code>, <code>Any obj</code>, <code>Object scope</code>)</code>
+                <div class="mdetail-desc">
+                    Alias for addListener                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The name of the event to listen for</div></li><li><code>fn</code> : Function<div class="sub-desc">The function call when the event fires</div></li><li><code>obj</code> : Any<div class="sub-desc">A variable to pass to the handler</div></li><li><code>scope</code> : Object<div class="sub-desc">The object to use for the scope of the handler</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Element.html#on">Element</a>.</div>
+                </div>
+                            <a name="removeChild"></a>
+                <div class="mdetail">
+                <h3>removeChild</i></h3>
+                <code>public function removeChild(<code>HTMLElement child</code>)</code>
+                <div class="mdetail-desc">
+                    Wrapper for HTMLElement method.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>child</code> : HTMLElement<div class="sub-desc">The HTMLElement to remove</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Element.html#removeChild">Element</a>.</div>
+                </div>
+                            <a name="removeClass"></a>
+                <div class="mdetail alt">
+                <h3>removeClass</i></h3>
+                <code>public function removeClass(<code>String className</code>)</code>
+                <div class="mdetail-desc">
+                    Wrapper for Dom method.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>className</code> : String<div class="sub-desc">The className to remove</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Element.html#removeClass">Element</a>.</div>
+                </div>
+                            <a name="removeListener"></a>
+                <div class="mdetail">
+                <h3>removeListener</i></h3>
+                <code>public function removeListener(<code>String type</code>, <code>Function fn</code>)</code>
+                <div class="mdetail-desc">
+                    Remove an event listener                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The name of the event to listen for</div></li><li><code>fn</code> : Function<div class="sub-desc">The function call when the event fires</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Element.html#removeListener">Element</a>.</div>
+                </div>
+                            <a name="removeTab"></a>
+                <div class="mdetail alt">
+                <h3>removeTab</i></h3>
+                <code>public function removeTab(<code>YAHOO.widget.Tab item</code>)</code>
+                <div class="mdetail-desc">
+                    Removes the specified Tab from the TabView.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>item</code> : YAHOO.widget.Tab<div class="sub-desc">The Tab instance to be removed.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Tab.</div>
+                </div>
+                            <a name="replaceChild"></a>
+                <div class="mdetail">
+                <h3>replaceChild</i></h3>
+                <code>public function replaceChild(<code>HTMLElement newNode</code>, <code>HTMLElement oldNode</code>)</code>
+                <div class="mdetail-desc">
+                    Wrapper for HTMLElement method.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>newNode</code> : HTMLElement<div class="sub-desc">The HTMLElement to insert</div></li><li><code>oldNode</code> : HTMLElement<div class="sub-desc">The HTMLElement to replace</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Element.html#replaceChild">Element</a>.</div>
+                </div>
+                            <a name="replaceClass"></a>
+                <div class="mdetail alt">
+                <h3>replaceClass</i></h3>
+                <code>public function replaceClass(<code>String oldClassName</code>, <code>String newClassName</code>)</code>
+                <div class="mdetail-desc">
+                    Wrapper for Dom method.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>oldClassName</code> : String<div class="sub-desc">The className to replace</div></li><li><code>newClassName</code> : String<div class="sub-desc">The className to add</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Element.html#replaceClass">Element</a>.</div>
+                </div>
+                            <a name="setStyle"></a>
+                <div class="mdetail">
+                <h3>setStyle</i></h3>
+                <code>public function setStyle(<code>String property</code>, <code>String value</code>)</code>
+                <div class="mdetail-desc">
+                    Wrapper for Dom method.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>property</code> : String<div class="sub-desc">The style property to set</div></li><li><code>value</code> : String<div class="sub-desc">The value to apply to the style property</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.util.Element.html#setStyle">Element</a>.</div>
+                </div>
+                            <a name="toString"></a>
+                <div class="mdetail alt">
+                <h3>toString</i></h3>
+                <code>public function toString()</code>
+                <div class="mdetail-desc">
+                    Provides a readable name for the TabView instance.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>String</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Tab.</div>
+                </div>
+                        </div>
+                    
+                    <h2 class="mdetail-head">Event Details</h2>
+            <div class="detail-wrap">
+                            <a name="available"></a>
+                <div class="mdetail">
+                <h3>available</i></h3>
+                <code>public event available</code>
+                <div class="mdetail-desc">
+                Fires when the Element's HTMLElement can be retrieved by Id.
+<p>See: <a href="#addListener">Element.addListener</a></p>
+<p><strong>Event fields:</strong><br>
+<code>&lt;String&gt; type</code> available<br>
+<code>&lt;HTMLElement&gt;
+target</code> the HTMLElement bound to this Element instance<br>
+<p><strong>Usage:</strong><br>
+<code>var handler = function(e) {var target = e.target};<br>
+myTabs.addListener('available', handler);</code></p>                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.util.Element.html#available">Element</a>.</div>
+                </div>
+                            <a name="beforeActiveChange"></a>
+                <div class="mdetail alt">
+                <h3>beforeActiveChange</i></h3>
+                <code>public event beforeActiveChange</code>
+                <div class="mdetail-desc">
+                Fires before the active state is changed.
+<p>See: <a href="YAHOO.util.Element.html#addListener">Element.addListener</a></p>
+<p>If handler returns false, the change will be cancelled, and the value will not
+be set.</p>
+<p><strong>Event fields:</strong><br>
+<code>&lt;String&gt; type</code> beforeActiveChange<br>
+<code>&lt;Boolean&gt;
+prevValue</code> the current value<br>
+<code>&lt;Boolean&gt;
+newValue</code> the new value</p>
+<p><strong>Usage:</strong><br>
+<code>var handler = function(e) {var previous = e.prevValue};<br>
+myTabs.addListener('beforeActiveChange', handler);</code></p>                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Tab.</div>
+                </div>
+                            <a name="beforeActiveTabChange"></a>
+                <div class="mdetail">
+                <h3>beforeActiveTabChange</i></h3>
+                <code>public event beforeActiveTabChange</code>
+                <div class="mdetail-desc">
+                Fires before the activeTab is changed.
+<p>See: <a href="YAHOO.util.Element.html#addListener">Element.addListener</a></p>
+<p>If handler returns false, the change will be cancelled, and the value will not
+be set.</p>
+<p><strong>Event fields:</strong><br>
+<code>&lt;String&gt; type</code> beforeActiveTabChange<br>
+<code>&lt;<a href="YAHOO.widget.Tab.html">YAHOO.widget.Tab</a>&gt;
+prevValue</code> the currently active tab<br>
+<code>&lt;<a href="YAHOO.widget.Tab.html">YAHOO.widget.Tab</a>&gt;
+newValue</code> the tab to be made active</p>
+<p><strong>Usage:</strong><br>
+<code>var handler = function(e) {var previous = e.prevValue};<br>
+myTabs.addListener('beforeActiveTabChange', handler);</code></p>                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Tab.</div>
+                </div>
+                            <a name="beforeContentChange"></a>
+                <div class="mdetail alt">
+                <h3>beforeContentChange</i></h3>
+                <code>public event beforeContentChange</code>
+                <div class="mdetail-desc">
+                Fires before the tab content is changed.
+<p>See: <a href="YAHOO.util.Element.html#addListener">Element.addListener</a></p>
+<p>If handler returns false, the change will be cancelled, and the value will not
+be set.</p>
+<p><strong>Event fields:</strong><br>
+<code>&lt;String&gt; type</code> beforeContentChange<br>
+<code>&lt;String&gt;
+prevValue</code> the current value<br>
+<code>&lt;String&gt;
+newValue</code> the new value</p>
+<p><strong>Usage:</strong><br>
+<code>var handler = function(e) {var previous = e.prevValue};<br>
+myTabs.addListener('beforeContentChange', handler);</code></p>                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Tab.</div>
+                </div>
+                            <a name="beforeLabelChange"></a>
+                <div class="mdetail">
+                <h3>beforeLabelChange</i></h3>
+                <code>public event beforeLabelChange</code>
+                <div class="mdetail-desc">
+                Fires before the tab label is changed.
+<p>See: <a href="YAHOO.util.Element.html#addListener">Element.addListener</a></p>
+<p>If handler returns false, the change will be cancelled, and the value will not
+be set.</p>
+<p><strong>Event fields:</strong><br>
+<code>&lt;String&gt; type</code> beforeLabelChange<br>
+<code>&lt;String&gt;
+prevValue</code> the current value<br>
+<code>&lt;String&gt;
+newValue</code> the new value</p>
+<p><strong>Usage:</strong><br>
+<code>var handler = function(e) {var previous = e.prevValue};<br>
+myTabs.addListener('beforeLabelChange', handler);</code></p>                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Tab.</div>
+                </div>
+                            <a name="beforeOrientationChange"></a>
+                <div class="mdetail alt">
+                <h3>beforeOrientationChange</i></h3>
+                <code>public event beforeOrientationChange</code>
+                <div class="mdetail-desc">
+                Fires before the orientation is changed.
+<p>See: <a href="YAHOO.util.Element.html#addListener">Element.addListener</a></p>
+<p>If handler returns false, the change will be cancelled, and the value will not
+be set.</p>
+<p><strong>Event fields:</strong><br>
+<code>&lt;String&gt; type</code> beforeOrientationChange<br>
+<code>&lt;String&gt;
+prevValue</code> the current orientation<br>
+<code>&lt;String&gt;
+newValue</code> the new orientation to be applied</p>
+<p><strong>Usage:</strong><br>
+<code>var handler = function(e) {var previous = e.prevValue};<br>
+myTabs.addListener('beforeOrientationChange', handler);</code></p>                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Tab.</div>
+                </div>
+                        </div>
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    
