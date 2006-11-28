@@ -46,6 +46,11 @@ our $HELP = {
                                 description => '74 description',
                                 namespace => 'Asset_DataForm',
                         },
+			{
+				title => 'mail attachments',
+				description => 'mail attachments description',
+				namespace => 'Asset_DataForm',
+			},
                         {
                                 title => '744',
                                 description => '744 description',

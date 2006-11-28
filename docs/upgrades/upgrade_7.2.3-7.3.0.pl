@@ -21,8 +21,15 @@ my $quiet; # this line required
 my $session = start(); # this line required
 addWikiAssets($session);
 deleteOldFiles($session);
+addFileFieldsToDataForm($session);
 finish($session); # this line required
 
+#-------------------------------------------------
+sub addFileFieldsToDataForm {
+	my $session = shift;
+	print "\tAdding File Field Types to the Data Form Wobject\n" unless $quiet;
+	$session->db->write("alter table DataForm add column (mailAttachments int(11) default 0)");
+}
 
 #-------------------------------------------------
 sub deleteOldFiles {

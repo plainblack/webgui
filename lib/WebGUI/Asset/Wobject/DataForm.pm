@@ -166,6 +166,10 @@ sub definition {
 				defaultValue=>0,
 				fieldType=>"yesNo"
 				},
+			mailAttachments=>{
+				defaultValue=>0,
+				fieldType=>'yesNo',
+				},
 			defaultView=>{
 				defaultValue=>0,
 				fieldType=>"integer"
@@ -177,6 +181,20 @@ sub definition {
 			}
 		});
         return $class->SUPER::definition($session, $definition);
+}
+
+#-------------------------------------------------------------------
+sub deleteAttachedFiles {
+	my $self = shift;
+	my $fieldId = shift || '%';
+	
+	my $storageIds = $self->session->db->buildArrayRef("select value from DataForm_entryData as a, DataForm_field as b where a.DataForm_fieldId = b.DataForm_fieldId and
+						      b.type='file' and a.assetId=? and a.DataForm_fieldId=?",[$self->getId,$fieldId]);
+	foreach my $id (@$storageIds) {
+		my $file = WebGUI::Storage->get($self->session,$id);
+		$file->delete if defined $file;
+		$self->session->db->write("update DataForm_entryData set value='' where DataForm_fieldId=?",[$fieldId]);
+	}
 }
 
 #-------------------------------------------------------------------
@@ -206,6 +224,40 @@ sub duplicate {
 	}
 
 	return $newAsset;
+}
+
+#-------------------------------------------------------------------
+sub getAttachedFiles {
+	my $self = shift;
+	my $properties = shift;
+
+	my ($returnType, @storageIds, @paths, $filename, $fileIcon, $fileUrl);
+	$returnType = $properties->{returnType};
+
+	push(@storageIds, $properties->{storageId}) if $properties->{storageId};
+
+	if ($returnType eq 'attachments') {
+                my $entryId = $properties->{entryId};
+                push(@storageIds, $self->session->db->buildArray("select value from DataForm_entryData as a, DataForm_field as b where a.DataForm_fieldId = b.DataForm_fieldId and
+                                                                  b.type='file' and a.DataForm_entryId=? and a.assetId=?",[$entryId,$self->getId]));
+	}
+
+	foreach my $storageId (@storageIds) {
+		my $storage = WebGUI::Storage->get($self->session, $storageId);
+		next unless defined $storage;
+		
+		$filename = $storage->getFiles->[0];
+		$fileIcon = $storage->getFileIconUrl($filename);
+		$fileUrl  = $storage->getUrl($filename);
+		push(@paths, $storage->getPath($filename));
+	}	
+
+	if ($returnType eq 'link') {
+		 return sprintf("<img src='%s' class='DataformRecordFileIcon' /><a href='%s' class='DataformRecordFileLink'>%s</a>",$fileIcon,$fileUrl,$filename);
+        }
+	use Data::Dumper;
+	$self->session->errorHandler->warn("<pre>".Dumper(\@paths)."</pre>");
+	return \@paths;
 }
 
 #-------------------------------------------------------------------
@@ -267,6 +319,13 @@ sub getEditForm {
 		-value=>$self->getValue("mailData")
 		);
 
+	$tabform->getTab("properties")->yesNo(
+		-name=>"mailAttachments",
+		-label=>$i18n->get("mail attachments"),
+		-hoverHelp=>$i18n->get("mail attachments description"),
+		-value=>$self->getValue("mailAttachments"),
+		);
+
 	$tabform->getTab("security")->group(
 		-name=>"groupToViewEntries",
 		-label=>$i18n->get('group to view entries'),
@@ -325,14 +384,16 @@ sub getListTemplateVars {
 		where assetId=".$self->session->db->quote($self->getId)." order by submissionDate desc");
 	while (my $record = $entries->hashRef) {
 		my @dataLoop;
-		my $dloop = $self->session->db->read("select b.name, b.label, b.isMailField, a.value from DataForm_entryData a left join DataForm_field b
+		my $dloop = $self->session->db->read("select b.name, b.label, b.isMailField, b.type, a.value from DataForm_entryData a left join DataForm_field b
 			on a.DataForm_fieldId=b.DataForm_fieldId where a.DataForm_entryId=".$self->session->db->quote($record->{DataForm_entryId})."
 			order by b.sequenceNumber");
 		while (my $data = $dloop->hashRef) {
+			my $value = $data->{value};
+			$value = $self->getAttachedFiles({returnType=>'link',storageId=>$value}) if ($value && $data->{type} eq 'file');
 			push(@dataLoop,{
 				"record.data.name"=>$data->{name},
 				"record.data.label"=>$data->{label},
-				"record.data.value"=>$data->{value},
+				"record.data.value"=>$value,
 				"record.data.isMailField"=>$data->{isMailField}
 				});
 		}
@@ -454,6 +515,8 @@ sub getRecordTemplateVars {
 			my $value = $data{value};
 			$value = $self->session->datetime->epochToHuman($value,"%z") if ($data{type} eq "date");
 			$value = $self->session->datetime->epochToHuman($value,"%z %Z") if ($data{type} eq "dateTime");
+			my $subtext = $data{subtext};
+			$subtext = sprintf("<a href='%s'>%s</a>",$self->getUrl('func=deleteAttachedFile;fieldId='.$data{DataForm_fieldId}), $i18n->get("delete file")) if ($data{type} eq "file" && $value);
 			push(@fields, {
 				"tab.field.form" => $self->_createField(\%data),
 				"tab.field.name" => $data{name},
@@ -464,7 +527,7 @@ sub getRecordTemplateVars {
 				"tab.field.isHidden" => $hidden,
 				"tab.field.isDisplayed" => ($data{status} eq "visible" && !$hidden),
 				"tab.field.isRequired" => ($data{status} eq "required" && !$hidden),
-				"tab.field.subtext" => $data{subtext},
+				"tab.field.subtext" => $subtext,
 				"tab.field.controls" => $self->_fieldAdminIcons($data{DataForm_fieldId},$data{DataForm_tabId},$data{isMailField})
 			});
 		}
@@ -498,6 +561,9 @@ sub getRecordTemplateVars {
 		my $value = $data{value};
 		$value = $self->session->datetime->epochToHuman($value,"%z") if ($data{type} eq "date");
 		$value = $self->session->datetime->epochToHuman($value) if ($data{type} eq "dateTime");
+		my $subtext = $data{subtext};
+		$subtext = sprintf("<a href='%s'>%s</a>",$self->getUrl('func=deleteAttachedFile;fieldId='.$data{DataForm_fieldId}), $i18n->get("delete file")) if ($data{type} eq "file" && $value);
+
 		my %fieldProperties = (
 			"form" => $self->_createField(\%data),
 			"name" => $data{name},
@@ -509,7 +575,7 @@ sub getRecordTemplateVars {
 			"isHidden" => $hidden,
 			"isDisplayed" => ($data{status} eq "visible" && !$hidden),
 			"isRequired" => ($data{status} eq "required" && !$hidden),
-			"subtext" => $data{subtext},
+			"subtext" => $subtext,
 			"controls" => $self->_fieldAdminIcons($data{DataForm_fieldId},$data{DataForm_tabId},$data{isMailField})
 		);
 		push(@fields, { map {("field.".$_ => $fieldProperties{$_})} keys(%fieldProperties) });
@@ -636,6 +702,7 @@ sub processPropertiesFromFormPost {
 #-------------------------------------------------------------------
 sub purge {
 	my $self = shift;
+	$self->deleteAttachedFiles;
     	$self->session->db->write("delete from DataForm_field where assetId=".$self->session->db->quote($self->getId));
     	$self->session->db->write("delete from DataForm_entry where assetId=".$self->session->db->quote($self->getId));
     	$self->session->db->write("delete from DataForm_entryData where assetId=".$self->session->db->quote($self->getId));
@@ -647,6 +714,7 @@ sub purge {
 sub sendEmail {
 	my $self = shift;
 	my $var = shift;
+	my $attachments;
 	my $message = $self->processTemplate($var,$self->get("emailTemplateId"));
 	WebGUI::Macro::process($self->session,\$message);
 	my ($to, $subject, $from, $bcc, $cc);
@@ -663,10 +731,12 @@ sub sendEmail {
 			$subject = $row->{"field.value"};
 		}
 	}
+	$attachments = $self->getAttachedFiles({returnType=>'attachments',entryId=>$var->{entryId}}) if $self->get("mailAttachments");
 	if ($to =~ /\@/) {
 		my $mail = WebGUI::Mail::Send->create($self->session,{to=>$to, subject=>$subject, cc=>$cc, from=>$from, bcc=>$bcc});
 		$mail->addHtml($message);
 		$mail->addFooter;
+		map $mail->addAttachment($_), @{$attachments};
 		$mail->queue;
 	} else {
                 my ($userId) = $self->session->db->quickArray("select userId from users where username=".$self->session->db->quote($to));
@@ -688,12 +758,14 @@ sub sendEmail {
                         my $mail =  WebGUI::Mail::Send->create($self->session,{to=>$cc, subject=>$subject, from=>$from});
 			if ($cc) {
 				$mail->addHtml($message);
+				map $mail->addAttachment($_), @{$attachments};
 				$mail->addFooter;
 				$mail->queue;
                         }
                         if ($bcc) {
                                 WebGUI::Mail::Send->create($self->session, {to=>$bcc, subject=>$subject, from=>$from});
 				$mail->addHtml($message);
+				map $mail->addAttachment($_), @{$attachments};
 				$mail->addFooter;
 				$mail->queue;
                         }
@@ -736,12 +808,21 @@ sub www_deleteAllEntriesConfirm {
 	return $self->www_view;
 }
 
+#-------------------------------------------------------------------
+sub www_deleteAttachedFile {
+	my $self = shift;
+	my $fieldId = $self->session->form->process('fieldId');
+	return $self->session->privilege->insufficient() unless ($self->canEdit);
+	$self->deleteAttachedFiles($fieldId);
+	return $self->www_view;
+}
 
 #-------------------------------------------------------------------
 sub www_deleteEntry {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
         my $entryId = $self->session->form->process("entryId");
+	$self->deleteAttachedFiles($entryId);
 	$self->deleteCollateral("DataForm_entry","DataForm_entryId",$entryId);
 	$self->session->stow->set("mode","list");
 	return $self->www_view;
@@ -840,7 +921,7 @@ sub www_editField {
 		-label=>$i18n->get(23),
 		-hoverHelp=>$i18n->get('23 description'),
 		-value=>$field{type} || "text",
-		-types=>[qw(dateTime TimeField float zipcode text textarea HTMLArea url date email phone integer yesNo selectList radioList checkList selectBox)]
+		-types=>[qw(dateTime TimeField float zipcode text textarea HTMLArea url date email phone integer yesNo selectList radioList checkList selectBox file)]
 		);
 	$f->integer(
 		-name=>"width",

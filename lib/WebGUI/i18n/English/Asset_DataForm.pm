@@ -1,6 +1,24 @@
 package WebGUI::i18n::English::Asset_DataForm;
 
 our $I18N = {
+	'delete file' => {
+		message => q|Delete Attached File|,
+		lastUpdated => 0,
+		context => 'label for link displayed to delete the contents of a file field on a form entry.',
+	},
+
+	'mail attachments' => {
+		message => q|Mail Attachments?|,
+		lastUpdated => 0,
+		context => 'label for wobject property',
+	},
+
+	'mail attachments description' => {
+		message => q|Must be used in conjuction with 'Mail Data'.  Setting to yes will cause all files submitted via the file field type to be mailed as attachments.|,
+		lastUpdated => 0,
+		context => 'description of wobject property',
+	},
+
         'group to view entries' => {
                 message => q|Group To View DataForm Entries|,
                 lastUpdated => 1057208065

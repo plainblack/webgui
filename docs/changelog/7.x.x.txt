@@ -12,6 +12,10 @@
  - Implemented codespace caching in WebGUI::International.  This replaces the
    in-memory cache by symbol table lookups into the code itself and saves
    duplicating the i18n entries.
+ - RFE: DataForm file upload patch.  Thanks to mistoo for submitting the
+   original patch.  Although I couldn't use the code in wG 7, it inspired the RFE.
+   Also added the feature requested in the thread to allow the files to be
+   emailed as attachments.
 
 7.2.3
  - fix: minor bug with new template vars in Auth::createAccount
