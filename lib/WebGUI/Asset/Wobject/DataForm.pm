@@ -255,8 +255,6 @@ sub getAttachedFiles {
 	if ($returnType eq 'link') {
 		 return sprintf("<img src='%s' class='DataformRecordFileIcon' /><a href='%s' class='DataformRecordFileLink'>%s</a>",$fileIcon,$fileUrl,$filename);
         }
-	use Data::Dumper;
-	$self->session->errorHandler->warn("<pre>".Dumper(\@paths)."</pre>");
 	return \@paths;
 }
 
