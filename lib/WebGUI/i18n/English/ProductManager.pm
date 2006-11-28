@@ -549,9 +549,7 @@ through the properties of the product.<br />
 The syntax is the same as that of normal templates. Available
 template variables are:<br />
 <br />
-<span style="font-weight: bold;">&lt;tmpl_var base&gt;<span
-style="font-weight: bold;"> <br />
-</span></span>
+<span style="font-weight: bold;">&lt;tmpl_var base&gt;</span><br />
 <div style="margin-left: 40px;">The default SKU defined above.<br />
 <br />
 </div>
@@ -564,12 +562,12 @@ template variable is called <span style="font-style: italic;">&lt;tmpl_var
 param.color&gt;</span>. If you have defined a parameter with name
 'Number of pins' the template variable containing its SKU modifier is
 called <span style="font-style: italic;">&lt;tmpl_var
-param.number.of.pins&gt;.<br />
+param.number.of.pins&gt;.</span><br />
 <br />
-</span></div>
+</div>
 The complete list of available template variables is also printed above
 the form.<br />|,
-		lastUpdated => 1146607119,
+		lastUpdated => 1164742227,
 		context	=> q|The body of the edit sku template help page|
 	},
 
