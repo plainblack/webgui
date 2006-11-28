@@ -1026,6 +1026,10 @@ sub www_selectPaymentGateway {
 		my $paymentGateway = $pluginLoop[0]->{namespace};
 		return WebGUI::Operation::Commerce::www_selectPaymentGatewaySave($session, $paymentGateway);
 	}
+	# If the user is not authorized for any payment gateways, error
+	elsif (scalar(@pluginLoop) < 1) {
+		return $session->privilege->noAccess();
+	}
 	
 	$var{pluginLoop} = \@pluginLoop;
 	$var{message} = $i18n->get('select payment gateway');

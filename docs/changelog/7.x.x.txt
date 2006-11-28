@@ -26,6 +26,7 @@
 7.2.3
  - fix: minor bug with new template vars in Auth::createAccount
  - fix: How to get to List Pending Transactions screen?
+ - fix: Users not authorized for any payment gateway get appropriate message
 
 7.2.2
  - fix: Show Debugging option not working
