@@ -14,6 +14,7 @@ use base 'WebGUI::Asset';
 use strict;
 use Tie::IxHash;
 use WebGUI::International;
+use WebGUI::Storage::Image;
 use WebGUI::Utility;
 
 #-------------------------------------------------------------------
@@ -38,6 +39,48 @@ sub _appendFuncTemplateVars {
 			$var->{$func.'.confirm'} = "return confirm('$confirmation')";
 		}
 	}
+}
+
+#-------------------------------------------------------------------
+
+=head2 addChild ( )
+
+You can't add children to a wiki page.
+
+=cut
+
+sub addChild {
+	return undef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 addRevision ( )
+
+Override the default method in order to deal with attachments.
+
+=cut
+
+sub addRevision {
+        my $self = shift;
+        my $newSelf = $self->SUPER::addRevision(@_);
+        if ($self->get("storageId")) {
+                my $newStorage = WebGUI::Storage->get($self->session,$self->get("storageId"))->copy;
+                $newSelf->update({storageId=>$newStorage->getId});
+        }
+	my $now = time();
+	$newSelf->update({
+		isHidden => 1,
+		dateUpdated=>$now,
+		});
+        return $newSelf;
+}
+
+#-------------------------------------------------------------------
+sub canAdd {
+	my $class = shift;
+	my $session = shift;
+	$class->SUPER::canAdd($session, undef, '7');
 }
 
 #-------------------------------------------------------------------
@@ -111,6 +154,20 @@ sub duplicate {
 
 
 #-------------------------------------------------------------------
+sub getStorageLocation {
+	my $self = shift;
+	unless (exists $self->{_storageLocation}) {
+		if ($self->get("storageId") eq "") {
+			$self->{_storageLocation} = WebGUI::Storage::Image->create($self->session);
+			$self->update({storageId=>$self->{_storageLocation}->getId});
+		} else {
+			$self->{_storageLocation} = WebGUI::Storage::Image->get($self->session,$self->get("storageId"));
+		}
+	}
+	return $self->{_storageLocation};
+}
+
+#-------------------------------------------------------------------
 sub getWiki {
 	my $self = shift;
 	my $parent = $self->getParent;
@@ -127,19 +184,11 @@ sub indexContent {
 }
 
 #-------------------------------------------------------------------
-sub purge {
+sub isProtected {
 	my $self = shift;
-	$self->getWiki->updateTitleIndex([$self], from => 'purge');
-	$self->session->db->write("DELETE FROM WikiPage_protected WHERE assetId = ?", [$self->getId]);
-	$self->session->db->write("DELETE FROM WikiPage_extraHistory WHERE assetId = ?", [$self->getId]);
-	return $self->SUPER::purge;
-}
-
-#-------------------------------------------------------------------
-sub purgeRevision {
-	my $self = shift;
-	$self->getWiki->updateTitleIndex([$self], from => 'purgeRevision');
-	return $self->SUPER::purgeRevision;
+	return $self->{_isProtected} if exists $self->{_isProtected};
+	($self->{_isProtected}) = $self->session->db->quickArray("SELECT COUNT(assetId) FROM WikiPage_protected WHERE assetId = ?", [$self->getId]);
+	return $self->{_isProtected};
 }
 
 #-------------------------------------------------------------------
@@ -150,6 +199,13 @@ sub preparePageTemplate {
 	    WebGUI::Asset::Template->new($self->session, $self->getWiki->get('pageTemplateId'));
 	$self->{_pageTemplate}->prepare;
 	return $self->{_pageTemplate};
+}
+
+#-------------------------------------------------------------------
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView;
+	$self->preparePageTemplate;
 }
 
 #-------------------------------------------------------------------
@@ -175,38 +231,58 @@ sub processPageTemplate {
 }
 
 #-------------------------------------------------------------------
-sub prepareView {
-	my $self = shift;
-	$self->SUPER::prepareView;
-	$self->preparePageTemplate;
-}
-
-#-------------------------------------------------------------------
-sub view {
-	my $self = shift;
-	my $var = {};
-	my $title = $self->get('title');
-	my $content = $self->getWiki->autolinkHtml($self->get('content'));
-	return $self->getWiki->processMasterTemplate($title, $self->processPageTemplate($content, 'view'));
-}
-
-#-------------------------------------------------------------------
-sub isProtected {
-	my $self = shift;
-	return $self->{_isProtected} if exists $self->{_isProtected};
-	($self->{_isProtected}) = $self->session->db->quickArray("SELECT COUNT(assetId) FROM WikiPage_protected WHERE assetId = ?", [$self->getId]);
-	return $self->{_isProtected};
-}
-
-#-------------------------------------------------------------------
 sub processPropertiesFromFormPost {
 	my $self = shift;
-	my $ret = $self->SUPER::processPropertiesFromFormPost(@_);
+	$self->SUPER::processPropertiesFromFormPost(@_);
 	$self->update({ groupIdView => $self->getWiki->get('groupIdView'),
 			groupIdEdit => $self->getWiki->get('groupIdEdit') });
 	$self->getWiki->updateTitleIndex([$self], from => 'edit');
-	return $ret;
+	delete $self->{_storageLocation};
+	my $size = 0;
+        my $storage = $self->getStorageLocation;
+        foreach my $file (@{$storage->getFiles}) {
+                if ($storage->isImage($file)) {
+                        ##Use generateThumbnail to shrink size to site's max image size
+                        ##We should look into using the new resize method instead.
+                        $storage->generateThumbnail($file, $self->getWiki->get("maxImageSize") || $self->session->setting->get("maxImageSize"));
+                        $storage->deleteFile($file);
+                        $storage->renameFile('thumb-'.$file,$file);
+                        $storage->generateThumbnail($file, $self->getWiki->get("thumbnailSize"));
+                }
+                $size += $storage->getFileSize($file);
+        }
+        $self->setSize($size);
+	# allows us to let the cs post use it's own workflow approval process
+        my $currentTag = WebGUI::VersionTag->getWorking($self->session);
+        if ($currentTag->getAssetCount < 2) {
+                $currentTag->set({workflowId=>$self->getWiki->get("approvalWorkflow")});
+                $currentTag->requestCommit;
+        } else {
+                my $newTag = WebGUI::VersionTag->create($self->session, {
+                        name=>$self->getTitle." / ".$self->session->user->username,
+                        workflowId=>$self->getWiki->get("approvalWorkflow")
+                        });
+                $self->session->db->write("update assetData set tagId=? where assetId=? and tagId=?",[$newTag->getId, $self->getId, $currentTag->getId]);
+                $self->purgeCache;
+                $newTag->requestCommit;
+        }
 }	
+
+#-------------------------------------------------------------------
+sub purge {
+	my $self = shift;
+	$self->getWiki->updateTitleIndex([$self], from => 'purge');
+	$self->session->db->write("DELETE FROM WikiPage_protected WHERE assetId = ?", [$self->getId]);
+	$self->session->db->write("DELETE FROM WikiPage_extraHistory WHERE assetId = ?", [$self->getId]);
+	return $self->SUPER::purge;
+}
+
+#-------------------------------------------------------------------
+sub purgeRevision {
+	my $self = shift;
+	$self->getWiki->updateTitleIndex([$self], from => 'purgeRevision');
+	return $self->SUPER::purgeRevision;
+}
 
 #-------------------------------------------------------------------
 sub updateWikiHistory {
@@ -216,6 +292,13 @@ sub updateWikiHistory {
 	$self->session->db->write("INSERT INTO WikiPage_extraHistory (assetId, userId, dateStamp, actionTaken, url, title) VALUES (?, ?, ?, ?, ?, ?)", [$self->getId, $userId, $self->session->datetime->time, $action, $self->getUrl, $self->get('title')]);
 }
 
+#-------------------------------------------------------------------
+sub view {
+	my $self = shift;
+	my $var = {};
+	my $content = $self->getWiki->autolinkHtml($self->get('content'));
+	return $self->processPageTemplate($content, 'view');
+}
 
 #-------------------------------------------------------------------
 sub www_delete {
@@ -235,22 +318,9 @@ sub www_edit {
 	my $var = {};
 	my $newPage = 0;
 	$template->prepare;
-
-	if ($self->session->form->process('func') eq 'add') {
-		# New page.
-		$newPage = 1;
-		$var->{'form.header'} = join '',
-		    (WebGUI::Form::formHeader($self->session,
-					      { action => $self->getWiki->getUrl('func=addPageSave') }),
-		     WebGUI::Form::hidden($self->session, { name => 'class', value => ref $self }));
-	} else {
-		# Editing a page.
-		$newPage = 0;
-		$var->{'form.header'} = join '',
-		    (WebGUI::Form::formHeader($self->session,
-					      { action => $self->getUrl('func=editSave') }));
-	}
-
+	$var->{'form.header'} = WebGUI::Form::formHeader($self->session, { action => $self->getWiki->getUrl })
+		     .WebGUI::Form::hidden($self->session, { name => 'func', value => 'editSave' })
+		     .WebGUI::Form::hidden($self->session, { name => 'class', value => ref $self });
 	$var->{'form.title'} = WebGUI::Form::text
 	    ($self->session, { name => 'title', maxlength => 255,
 			       size => 40, value => $self->get('title') });
@@ -262,55 +332,23 @@ sub www_edit {
 	$var->{'form.footer'} = WebGUI::Form::formFooter($self->session);
 	$self->_appendFuncTemplateVars($var);
 
-	my $title = "Editing ".(defined($self->get('title'))? $self->get('title') : 'new page');
+	$var->{title} = "Editing ".(defined($self->get('title'))? $self->get('title') : 'new page');
 
-	return $self->getWiki->processStyle($self->getWiki->processMasterTemplate($title, $self->processPageTemplate($self->processTemplate($var, undef, $template), 'edit')));
-}
-
-#-------------------------------------------------------------------
-sub www_editSave {
-	my $self = shift;
-	return $self->session->privilege->insufficient unless $self->canEdit;
-
-	# TODO: refactor: duplication with A::W::Matrix::www_editListingSave
-	my $oldTag = WebGUI::VersionTag->getWorking($self->session, 1);
-	my $newTag = WebGUI::VersionTag->create
-	    ($self->session, { name => (sprintf "%s edit of %s - %s",
-					$self->getWiki->get('title'), $self->get('title'),
-					$self->session->user->username),
-			       workflowId => 'pbworkflow000000000003' });
-	$newTag->setWorking;
-
-	my $newSelf = $self->addRevision;
-	my $error = $newSelf->processPropertiesFromFormPost;
-	if (ref $error eq 'ARRAY') {
-		$self->session->stow->set('editFormErrors', $error);
-		$newTag->rollback;
-		$oldTag->setWorking if defined $oldTag;
-		return $self->www_edit;
-	}
-
-	$newSelf->updateHistory('edited');
-	$newTag->requestCommit;
-	$newTag->clearWorking;
-	$oldTag->setWorking if defined $oldTag;
-
-	return $newSelf->www_view;
+	return $self->getWiki->processStyle( $self->processPageTemplate($self->processTemplate($var, undef, $template), 'edit'));
 }
 
 #-------------------------------------------------------------------
 sub www_pageHistory {
 	my $self = shift;
-	my $title = sprintf(WebGUI::International->new($self->session, 'Asset_WikiPage')->get('pageHistory title'),
-			    $self->get('title'));
 	my $template = WebGUI::Asset::Template->new($self->session, $self->getWiki->get('pageHistoryTemplateId'));
 	$template->prepare;
 
 	# Buggo: hardcoded count
 	my $var = {};
+	$var->{title} = sprintf(WebGUI::International->new($self->session, 'Asset_WikiPage')->get('pageHistory title'), $self->get('title'));
 	$self->getWiki->_appendPageHistoryVars($var, [0, 50], $self);
 
-	return $self->getWiki->processStyle($self->getWiki->processMasterTemplate($title, $self->processPageTemplate($self->processTemplate($var, undef, $template), 'pageHistory')));
+	return $self->getWiki->processStyle($self->processPageTemplate($self->processTemplate($var, undef, $template), 'pageHistory'));
 }
 
 #-------------------------------------------------------------------

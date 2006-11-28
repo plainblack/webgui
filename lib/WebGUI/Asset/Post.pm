@@ -749,7 +749,20 @@ sub processPropertiesFromFormPost {
 	$self->getThread->subscribe if ($self->session->form->process("subscribe"));
 	delete $self->{_storageLocation};
 	$self->postProcess;
-	$self->requestCommit;
+	# allows us to let the cs post use it's own workflow approval process
+	my $currentTag = WebGUI::VersionTag->getWorking($self->session);
+	if ($currentTag->getAssetCount < 2) {
+		$currentTag->set({workflowId=>$self->getThread->getParent->get("approvalWorkflow")});
+		$currentTag->requestCommit;
+	} else {
+		my $newTag = WebGUI::VersionTag->create($self->session, {
+			name=>$self->getTitle." / ".$self->session->user->username,
+			workflowId=>$self->getThread->getParent->get("approvalWorkflow")
+			});
+		$self->session->db->write("update assetData set tagId=? where assetId=? and tagId=?",[$newTag->getId, $self->getId, $currentTag->getId]);
+		$self->purgeCache;
+		$newTag->requestCommit;
+	}
 }
 
 
@@ -867,25 +880,6 @@ sub rethreadUnder {
 	my $thread = shift;
 	$self->update({threadId => $thread->getId});
 	delete $self->{_thread};
-}
-
-#-------------------------------------------------------------------
-# allows us to let the cs post use it's own workflow approval process
-sub requestCommit {
-	my $self = shift;
-	my $currentTag = WebGUI::VersionTag->getWorking($self->session);
-	if ($currentTag->getAssetCount < 2) {
-		$currentTag->set({workflowId=>$self->getThread->getParent->get("approvalWorkflow")});
-		$currentTag->requestCommit;
-	} else {
-		my $newTag = WebGUI::VersionTag->create($self->session, {
-			name=>$self->getTitle." / ".$self->session->user->username,
-			workflowId=>$self->getThread->getParent->get("approvalWorkflow")
-			});
-		$self->session->db->write("update assetData set tagId=? where assetId=? and tagId=?",[$newTag->getId, $self->getId, $currentTag->getId]);
-		$self->purgeCache;
-		$newTag->requestCommit;
-	}
 }
 
 #-------------------------------------------------------------------

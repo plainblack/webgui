@@ -5,6 +5,40 @@ our $I18N =
  'assetName' =>
  { lastUpdated => 1160157064, message => 'Wiki' },
 
+        'approval workflow description' => {
+                message => q|Choose a workflow to be executed on each page as it gets submitted.|,
+                lastUpdated => 0,
+        },
+
+        'approval workflow' => {
+                message => q|Approval Workflow|,
+                lastUpdated => 0,
+        },
+
+	'max image size' => {
+		message => q|Maximum Image Size|,
+		lastUpdated => 0,
+		context => q|field label for image on display tab|
+		},
+
+	'max image size help' => {
+		message => q|Set the size of the image attachments for this Wiki. If you set it to 0 then the default size set in the master settings will be used. Also, changing this setting does not retroactively change the size of images already in the Wiki. You'll have to re-save each page to get the size to change.|,
+		lastUpdated => 0,
+		context => q|help for display setting label|
+		},
+
+	'thumbnail size' => {
+		message => q|Thumbnail Size|,
+		lastUpdated => 0,
+		context => q|field label for thumbnails on display tab|
+		},
+
+	'thumbnail size help' => {
+		message => q|Set the size of the thumbnails for this Wiki. If you set it to 0 then the default size set in the master settings will be used. Also, changing this setting does not retroactively change the size of thumbnails already in the Wiki. You'll have to re-save each page to get the size to change.|,
+		lastUpdated => 0,
+		context => q|help for display setting label|
+		},
+
  'groupToEditPages hoverHelp' =>
  { lastUpdated => 1160157064, message => q|Choose a group of users who will be able to edit pages in this wiki instance.  They will not, by default, be able to delete pages or revisions, or edit protected pages.| },
  'groupToEditPages label' =>
@@ -39,11 +73,6 @@ our $I18N =
  { lastUpdated => 1160505291, message => q|Which template to use for the page history display.| },
  'pageHistoryTemplateId label' =>
  { lastUpdated => 1160505291, message => q|Page History Template| },
-
- 'pageListTemplateId hoverHelp' =>
- { lastUpdated => 1160417517, message => q|Which template to use for displaying lists of pages.| },
- 'pageListTemplateId label' =>
- { lastUpdated => 1160417517, message => q|Page List Template| },
 
  'searchTemplateId hoverHelp' =>
  { lastUpdated => 1161031607, message => q|Which template to use for search results.| },

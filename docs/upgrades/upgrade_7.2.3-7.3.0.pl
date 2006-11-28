@@ -54,8 +54,6 @@ sub addWikiAssets {
     `groupToAdminister` varchar(22) character set utf8 collate utf8_bin NOT NULL,
     `richEditor` varchar(22) character set utf8 collate utf8_bin NOT NULL
                  default 'PBrichedit000000000002',
-    `masterTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL
-                       default 'WikiMasterTmpl00000001',
     `frontPageTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL
                           default 'WikiFrontTmpl000000001',
     `pageTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL
@@ -66,12 +64,13 @@ sub addWikiAssets {
                               default 'WikiRCTmpl000000000001',
     `pageHistoryTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL
                             default 'WikiPHTmpl000000000001',
-    `pageListTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL
-                         default 'WikiPLTmpl000000000001',
     `searchTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL
                        default 'WikiSearchTmpl00000001',
     `recentChangesCount` int(11) NOT NULL default 50,
     `recentChangesCountFront` int(11) NOT NULL default 10,
+    `thumbnailSize` int(11) NOT NULL default 0,
+    `maxImageSize` int(11) NOT NULL default 0,
+	`approvalWorkflow` varchar(22) binary not null default 'pbworkflow000000000003',
     PRIMARY KEY (`assetId`, `revisionDate`)
   ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 EOT
@@ -113,8 +112,7 @@ EOT
 EOT
 				   );
 
-	my $config = $session->config;
-	$config->addToArray('assetContainers', 'WebGUI::Asset::Wobject::WikiMaster');
+	$session->config->addToArray('assets', 'WebGUI::Asset::Wobject::WikiMaster');
 }
 
 # ---- DO NOT EDIT BELOW THIS LINE ----

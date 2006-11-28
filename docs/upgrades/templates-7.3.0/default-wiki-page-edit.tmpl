@@ -4,9 +4,12 @@
 #url:default-wiki-page-edit
 #title:Default Wiki Page Edit
 #menuTitle:Default Wiki Page Edit
-
 <tmpl_var form.header>
-<p>Title: <tmpl_var form.title><br />
-Content:<br /><tmpl_var form.content></p>
+<table>
+<tbody>
+<tr><td><label for="title">Title</label></td><td><tmpl_var form.title></td></tr>
+<tr><td><label for="content">Content</label></td><td><tmpl_var form.content></td></tr>
+</tbody>
+</table>
 <tmpl_var form.submit>
 <tmpl_var form.footer>

@@ -342,13 +342,6 @@ sub definition {
 			     hoverHelp => $i18n->get('richEditor hoverHelp'),
 			     label => $i18n->get('richEditor label') },
 
-	     masterTemplateId => { fieldType => 'template',
-				   namespace => 'WikiMaster',
-				   defaultValue => 'WikiMasterTmpl00000001',
-				   tab => 'display',
-				   hoverHelp => $i18n->get('masterTemplateId hoverHelp'),
-				   label => $i18n->get('masterTemplateId label') },
-
 	     frontPageTemplateId => { fieldType => 'template',
 				   namespace => 'WikiMaster_front',
 				      defaultValue => 'WikiFrontTmpl000000001',
@@ -377,13 +370,6 @@ sub definition {
 					  hoverHelp => $i18n->get('recentChangesTemplateId hoverHelp'),
 					  label => $i18n->get('recentChangesTemplateId label') },
 
-	     pageListTemplateId => { fieldType => 'template',
-				     namespace => 'WikiMaster_pageList',
-				     defaultValue => 'WikiPLTmpl000000000001',
-				     tab => 'display',
-				     hoverHelp => $i18n->get('pageListTemplateId hoverHelp'),
-				     label => $i18n->get('pageListTemplateId label') },
-
 	     searchTemplateId => { fieldType => 'template',
 				   namespace => 'WikiMaster_search',
 				   defaultValue => 'WikiSearchTmpl00000001',
@@ -402,7 +388,29 @@ sub definition {
 					  tab => 'display',
 					  hoverHelp => $i18n->get('recentChangesCountFront hoverHelp'),
 					  label => $i18n->get('recentChangesCountFront label') },
-    );
+                approvalWorkflow =>{
+                        fieldType=>"workflow",
+                        defaultValue=>"pbworkflow000000000003",
+                        type=>'WebGUI::VersionTag',
+                        tab=>'security',
+                        label=>$i18n->get('approval workflow'),
+                        hoverHelp=>$i18n->get('approval workflow description'),
+                        },    
+		thumbnailSize => {
+			fieldType => "integer",
+			defaultValue => 0,
+			tab => "display",
+			label => $i18n->get("thumbnail size"),
+			hoverHelp => $i18n->get("thumbnail size help")
+			},
+		maxImageSize => {
+			fieldType => "integer",
+			defaultValue => 0,
+			tab => "display",
+			label => $i18n->get("max image size"),
+			hoverHelp => $i18n->get("max image size help")
+			},
+		);
 
 	push @$definition,
 	     {
@@ -424,38 +432,11 @@ sub getContentLastModified {
 	return $lastModified;
 }
 
-#-------------------------------------------------------------------
-sub prepareMasterTemplate {
-	my $self = shift;
-	return $self->{_masterTemplate} if $self->{_masterTemplate};
-	$self->{_masterTemplate} =
-	    WebGUI::Asset::Template->new($self->session, $self->get('masterTemplateId'));
-	$self->{_masterTemplate}->prepare;
-	return $self->{_masterTemplate};
-}
-
-#-------------------------------------------------------------------
-sub processMasterTemplate {
-	my $self = shift;
-	my $title = shift;
-	my $content = shift;
-	my $var = {};
-	my $template = $self->prepareMasterTemplate;
-	
-	$var->{title} = $title;
-	$var->{content} = $content;
-	$var->{displayTitle} = $self->get('displayTitle');
-	$var->{canEdit} = $self->canEditPages;
-	$self->_appendFuncTemplateVars($var, qw/addPage listPages recentChanges view search/);
-
-	return $self->processTemplate($var, undef, $template);
-}
 
 #-------------------------------------------------------------------
 sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView;
-	$self->prepareMasterTemplate;
 	$self->{_frontPageTemplate} =
 	    WebGUI::Asset::Template->new($self->session, $self->get('frontPageTemplateId'));
 	$self->{_frontPageTemplate}->prepare;
@@ -464,19 +445,16 @@ sub prepareView {
 #-------------------------------------------------------------------
 sub processPropertiesFromFormPost {
 	my $self = shift;
-
 	my $groupsChanged =
 	    (($self->session->form->process('groupIdView') ne $self->get('groupIdView'))
 	     or ($self->session->form->process('groupIdEdit') ne $self->get('groupIdEdit')));
 	my $ret = $self->SUPER::processPropertiesFromFormPost(@_);
-
 	if ($groupsChanged) {
 		foreach my $child (@{$self->getLineage(['children'], {returnObjects => 1})}) {
 			$child->update({ groupIdView => $self->get('groupIdView'),
 					 groupIdEdit => $self->get('groupIdEdit') });
 		}
 	}
-
 	return $ret;
 }
 
@@ -494,7 +472,6 @@ sub updateTitleIndex {
 	my %opts = @_;
 	return unless @pages;
 	$self->session->db->write("DELETE FROM WikiMaster_titleIndex WHERE assetId = ? AND pageId IN (".join(', ', ('?') x @pages).")", [$self->getId, map{$_->getId} @pages]);
-
 	foreach my $page (@pages) {
 		my ($pageId, $title) = ($page->getId, $page->get('title'));
 		$self->session->db->write("INSERT INTO WikiMaster_titleIndex (assetId, pageId, title) VALUES (?, ?, ?)", [$self->getId, $pageId, $title]);
@@ -506,76 +483,23 @@ sub view {
 	my $self = shift;
 	my $var = {};
 	my $template = $self->{_frontPageTemplate};
-
 	$var->{'description'} = $self->autolinkHtml($self->get('description'));
 	$self->_appendSearchBoxVars($var);
 	$self->_appendRecentChangesVars($var, [0, $self->get('recentChangesCountFront')]);
 	$self->_appendFuncTemplateVars($var, qw/recentChanges/);
-
-	return $self->processMasterTemplate($self->get('title'), $self->processTemplate($var, undef, $template));
+	return $self->processTemplate($var, undef, $template);
 }
 
-#-------------------------------------------------------------------
-sub www_addPageSave {
-	my $self = shift;
-	my $pageClass = $self->session->form->process('class');
-	return $self->session->privilege->insufficient unless
-	    $self->canEditPages and UNIVERSAL::isa($pageClass, 'WebGUI::Asset::WikiPage');
-
-	# Refactor: duplication with A::W::Matrix::www_editListingSave
-	my $oldTag = WebGUI::VersionTag->getWorking($self->session, 1);
-	my $newTag = WebGUI::VersionTag->create
-	    ($self->session, { name => (sprintf "%s create of %s - %s",
-					$self->get('title'), $self->session->form->process('title'),
-					$self->session->user->username),
-			       workflowId => 'pbworkflow000000000003' });
-	$newTag->setWorking;
-
-	# Hrm.  Duplication with Asset::www_editSave.  How to fix that?
-	my $page = $self->addChild({ className => $pageClass });
-	$page->{_parent} = $self;
-
-	my $error = $page->processPropertiesFromFormPost;
-	if (ref $error eq 'ARRAY') {
-		$self->session->stow->set('editFormErrors', $error);
-		$page->purge;
-		return $self->www_add;
-	}
-
-	$page->updateHistory('edited');
-	$newTag->requestCommit;
-	$newTag->clearWorking;
-	$oldTag->setWorking if defined $oldTag;
-	return $page->www_view;
-}
-
-#-------------------------------------------------------------------
-sub www_listPages {
-	my $self = shift;
-	my $i18n = WebGUI::International->new($self->session, 'Asset_WikiMaster');
-	my $title = $i18n->get('listPages title');
-	my $template = WebGUI::Asset::Template->new($self->session, $self->get('pageListTemplateId'));
-	$template->prepare;
-
-	my @pages = sort { lc($a->get('title')) <=> lc($b->get('title')) }
-	    @{$self->getLineage(['children'], {returnObjects => 1})};
-	my $var = {};
-	$var->{'pl.entries'} = $self->_templateSubvarsRefOfPages(\@pages);
-
-	return $self->processStyle($self->processMasterTemplate($title, $self->processTemplate($var, undef, $template)));
-}
 
 #-------------------------------------------------------------------
 sub www_recentChanges {
 	my $self = shift;
-	my $title = WebGUI::International->new($self->session, 'Asset_WikiMaster')->get('recentChanges title');
 	my $template = WebGUI::Asset::Template->new($self->session, $self->get('recentChangesTemplateId'));
 	$template->prepare;
-
 	my $var = {};
+	$var->{title} = WebGUI::International->new($self->session, 'Asset_WikiMaster')->get('recentChanges title');
 	$self->_appendRecentChangesVars($var, [0, $self->get('recentChangesCount')]);
-
-	return $self->processStyle($self->processMasterTemplate($title, $self->processTemplate($var, undef, $template)));
+	return $self->processStyle($self->processTemplate($var, undef, $template));
 }
 
 #-------------------------------------------------------------------
@@ -584,7 +508,6 @@ sub www_search {
 	my $var = {};
 	my $queryString = $self->session->form->process('query', 'text');
 	$self->_appendSearchBoxVars($var, $queryString);
-
 	if (length $queryString) {
 		my $search = WebGUI::Search->new($self->session);
 		$search->search({ keywords => $queryString,
@@ -593,12 +516,10 @@ sub www_search {
 		my $rs = $search->getResultSet;
 		$self->_appendSearchResultVars($var, $rs);
 	}
-
-	my $title = WebGUI::International->new($self->session, 'Asset_WikiMaster')->get('search title');
+	$var->{title} = WebGUI::International->new($self->session, 'Asset_WikiMaster')->get('search title');
 	my $template = WebGUI::Asset::Template->new($self->session, $self->get('searchTemplateId'));
 	$template->prepare;
-
-	return $self->processStyle($self->processMasterTemplate($title, $self->processTemplate($var, undef, $template)));
+	return $self->processStyle($self->processTemplate($var, undef, $template));
 }
 
 1;

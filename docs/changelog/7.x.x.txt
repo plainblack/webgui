@@ -12,7 +12,13 @@
  - Implemented codespace caching in WebGUI::International.  This replaces the
    in-memory cache by symbol table lookups into the code itself and saves
    duplicating the i18n entries.
- - RFE: DataForm file upload patch.  Thanks to mistoo for submitting the
+ - Added accordion javascript object, which will eventually replace the
+   current adminbar accordion. This one is less of a cludge and uses the YUI
+   API.
+ - WebGUI now has a Wiki!
+ - Upgraded to YUI 0.12.0
+ - Upgraded to YUI-Ext 0.33 RC2
+ - Karma RFE: DataForm file upload patch.  Thanks to mistoo for submitting the
    original patch.  Although I couldn't use the code in wG 7, it inspired the RFE.
    Also added the feature requested in the thread to allow the files to be
    emailed as attachments.

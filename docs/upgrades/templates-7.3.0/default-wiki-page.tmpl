@@ -4,26 +4,117 @@
 #url:default-wiki-page
 #title:Default Wiki Page
 #menuTitle:Default Wiki Page
+<tmpl_if session.var.adminOn><p><tmpl_var controls></p></tmpl_if>
+<tmpl_if displayTitle><h2><tmpl_var title></h2></tmpl_if>
 
-<tmpl_var content>
-<tmpl_unless nonexistentPage><h3>This page</h3><ul>
-  <tmpl_unless inView><li><a href="<tmpl_var view.url>"><tmpl_var view.text></a></li></tmpl_unless>
-  <tmpl_unless inEdit>
-     <tmpl_if canEdit><li><a href="<tmpl_var edit.url>"><tmpl_var edit.text></a></li>
-     <tmpl_else><tmpl_if couldEdit><li>(Protected page)</li></tmpl_if></tmpl_if>
-  </tmpl_unless>
-  <tmpl_unless inHistory>
-    <li><a href="<tmpl_var pageHistory.url>"><tmpl_var pageHistory.text></a></li>
-  </tmpl_unless>
-  <tmpl_if canProtect>
-    <tmpl_if isProtected>
-      <li><a href="<tmpl_var unprotect.url>"><tmpl_var unprotect.text></a></li>
-    <tmpl_else>
-      <li><a href="<tmpl_var protect.url>"><tmpl_var protect.text></a></li>
-    </tmpl_if>
-  </tmpl_if>
-  <tmpl_if canDelete>
-    <li><a href="<tmpl_var delete.url>" onclick="<tmpl_var delete.confirm>"><tmpl_var delete.text></a></li>
-    <li><a href="<tmpl_var wikiPurgeRevision.url>" onclick="<tmpl_var wikiPurgeRevision.confirm>"><tmpl_var wikiPurgeRevision.text></a></li>
-  </tmpl_if>
-</ul></tmpl_unless>
+    <div id="wikipage" class="yui-navset">
+        <ul class="yui-nav">
+            <li class="selected"><a href="#wikipagecontent"><em><tmpl_var view.label></em></a></li>
+        </ul>
+        <div class="yui-content">
+            <div id="wikipagecontent">
+		<tmpl_var content>
+            </div>
+        </div>
+    </div>
+<script type="text/javascript">
+initWikiTabs = function() {
+    	var tabView = new YAHOO.widget.TabView('wikipage');
+		tabView.addTab(new YAHOO.widget.Tab({
+        	label: '<tmpl_var edit.label>',
+        	dataSrc: '<tmpl_var edit.url>',
+		cacheData: true
+    	}));
+    	var tabView = new YAHOO.widget.TabView('wikipage');
+		tabView.addTab(new YAHOO.widget.Tab({
+        	label: '<tmpl_var history.label>',
+        	dataSrc: '<tmpl_var history.url>',
+		cacheData: true
+    	}));
+};
+initWikiTabs();
+</script>
+<div style="padding: 8px;"><a href="<tmpl_var search.url>"><tmpl_var search.label></a> | <a href="<tmpl_var recentChanges.url>"><tmpl_var recentChanges.label></a> | <a href="<tmpl_var wikihome.url"><tmpl_var wikihome.label></a></div>
+
+~~~
+
+<link rel="stylesheet" type="text/css" href="^Extras(yui/build/tabview/assets/tabs.css);">
+<script type="text/javascript" src="^Extras(yui/build/yahoo/yahoo.js);"></script>
+<script type="text/javascript" src="^Extras(yui/build/event/event.js);"></script>
+<script type="text/javascript" src="^Extras(yui/build/dom/dom.js);"></script>
+<script type="text/javascript" src="^Extras(yui/build/connection/connection.js);"></script>
+<script type="text/javascript" src="^Extras(yui/build/tabview/tabview.js);"></script>
+
+<style type="text/css">
+#wikipage.yui-navset .yui-nav li a {
+    border:1px solid #000;  /* label and content borders */
+}
+
+#wikipage.yui-navset .yui-content {
+	border-top: 1px solid #000;
+	border-bottom: 1px solid #000;
+}
+
+#wikipage.yui-navset .yui-nav a:hover {
+    background-color:#f6f7ee; /* active tab, tab hover, and content bgcolor */
+}
+
+#wikipage.yui-navset .yui-nav .selected a {
+    background-color:black; /* active tab, tab hover, and content bgcolor */
+	color: white;
+}
+
+#wikipage.yui-navset-top .yui-nav .selected a {
+    border-bottom:0; /* no bottom border for active tab */
+    padding-bottom:1px; /* to match height of other tabs */
+}
+
+#wikipage.yui-navset-top .yui-content {
+    margin-top:-1px; /* for active tab overlap */
+}
+
+#wikipage.yui-navset-bottom .yui-nav .selected a {
+    border-top:0; /* no bottom border for active tab */
+    padding-top:1px; /* to match height of other tabs */
+}
+
+#wikipage.yui-navset-bottom .yui-content {
+    margin-bottom:-1px; /* for active tab overlap */
+}
+
+#wikipage.yui-navset-left .yui-nav li.selected a {
+    border-right:0; /* no bottom border for active tab */
+    padding-right:1px; /* to match height of other tabs */
+}
+
+#wikipage.yui-navset-left .yui-content {
+    margin-left:-1px; /* for active tab overlap */
+}
+
+#wikipage.yui-navset-right .yui-nav li.selected a {
+    border-left:0; /* no bottom border for active tab */
+    padding-left:1px; /* to match height of other tabs */
+}
+
+#wikipage.yui-navset-right .yui-content {
+    margin-right:-1px; /* for active tab overlap */
+    *margin-right:0; /* except IE */
+}
+
+#wikipage .yui-content {
+    padding-top:1em; 
+    padding-bottom:1em; 
+}
+#wikipage .loading {
+    background-image:url(^Extras(yui/build/tabview/img/loading.gif););
+    background-position:center center;
+    background-repeat:no-repeat;
+}
+
+#wikipage .loading * {
+    display:none;
+}
+</style>
+
+
+
