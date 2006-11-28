@@ -373,7 +373,8 @@ sub session {
 
 =head2 showDebug ( )
 
-Creates an HTML formatted string 
+Creates an HTML formatted string of all internally stored debug information, warns,
+errors, sql queries and form data.
 
 =cut
 
@@ -395,9 +396,9 @@ sub showDebug {
 		}
 	}
 	$text = JSON::objToJson($form, {pretty => 1, indent => 4, autoconv=>0, skipinvalid=>1});
-	$text =~ s/&/&amp;/xsg;
-	$text =~ s/>/&gt;/xsg;
-	$text =~ s/</&lt;/xsg;
+	$text =~ s/&/&amp;/sg;
+	$text =~ s/>/&gt;/sg;
+	$text =~ s/</&lt;/sg;
 	$text =~  s/\n/\<br \/\>\n/g;
 	$text =~  s/    /&nbsp; &nbsp; /g;
 	$output .= '<div style="text-align: left;background-color: #aaaaee;color: #000000;">'.$text."</div>\n";

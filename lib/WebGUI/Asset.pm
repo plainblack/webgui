@@ -1655,7 +1655,8 @@ sub processPropertiesFromFormPost {
 
 =head2 processTemplate ( vars, templateId, template )
 
-Returns the content generated from this template.
+Returns the content generated from this template.  It adds the Asset control
+bar to the template variables, as well as all Asset properties and metadata.
 
 =head3 hashRef
 

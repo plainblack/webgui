@@ -58,6 +58,10 @@ our $HELP = {
 				namespace => "Asset",
 				tag => "asset template"
 			},
+			{
+				tag => 'pagination template variables',
+				namespace => 'WebGUI'
+			},
 		],
 		fields => [
 		],
@@ -151,14 +155,6 @@ our $HELP = {
 				tag => 'article add/edit',
 				namespace => 'Asset_Article'
 			},
-			{
-				tag => 'pagination template variables',
-				namespace => 'WebGUI'
-			},
-			{
-				tag => 'wobject template',
-				namespace => 'Asset_Wobject'
-			}
 		]
 	},
 };

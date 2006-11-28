@@ -178,6 +178,16 @@ our $HELP = {
 		body => '83',
 		fields => [
 		],
+		isa => [
+			{
+				namespace => "Asset_Template",
+				tag => "template variables"
+			},
+			{
+				tag => 'wobject template',
+				namespace => 'Asset_Wobject'
+			}
+		],
 		variables => [
 		          {
 		            'name' => 'canEdit'
@@ -394,10 +404,6 @@ our $HELP = {
 				tag => 'data form add/edit',
 				namespace => 'Asset_DataForm'
 			},
-			{
-				tag => 'wobject template',
-				namespace => 'Asset_Wobject'
-			}
 		]
 	},
 
