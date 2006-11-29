@@ -45,4 +45,42 @@ sub auto_check {
 	$session->{_request} = $origSessionRequest;
 }
 
+
+
+#######################################################################
+
+=head2 get_request
+
+!!! TODO !!!
+
+Gets a Test::MockObject to be given to the session object that will allow for
+processing of form parameters. 
+
+This will be easier to manage, as you won't have
+to make multiple forms for elements that can return differently formatted data
+based on configuration.
+
+Usage:
+
+ my $old_request = $session->{_request};
+ 
+ my $request = WebGUI::Form_Checking::get_request($session,$value);
+ # $value can be either a scalar value or an array reference
+ $session->{_request} = $request;
+ 
+ # Test the value here
+ # Maybe make more mock request objects and test more values
+ 
+ # Reset the session back
+ $session->{_request} = $old_session;
+ 
+=cut
+
+sub get_request
+{
+	warn "WebGUI::Form_Checking::get_request is still TODO!";
+}
+
+
+
 1;
