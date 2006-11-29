@@ -55,10 +55,6 @@ our $HELP = {
 		],
 		related => [
 			{
-				tag => 'asset fields',
-				namespace => 'Asset'
-			},
-			{
 				tag => 'event add/edit',
 				namespace => 'Asset_Event'
 			},
@@ -72,9 +68,20 @@ our $HELP = {
 			}
 		]
 	},
+
 	'events calendar template' => {
 		title => '94',
 		body => '95',
+		isa => [
+			{
+				tag => 'wobject template',
+				namespace => 'Asset_Wobject'
+			},
+			{
+				tag => 'template language',
+				namespace => 'Asset_Template'
+			},
+		],
 		fields => [
 		],
 		variables => [
@@ -255,24 +262,15 @@ our $HELP = {
 		                               'name' => 'year'
 		                             }
 		                           ]
-		          }
+		          },
+		          {
+		            'name' => 'pagination.pageCount.isMultiple'
+		          },
 		],
 		related => [
 			{
 				tag => 'events calendar add/edit',
 				namespace => 'Asset_EventsCalendar'
-			},
-			{
-				tag => 'pagination template variables',
-				namespace => 'WebGUI'
-			},
-			{
-				tag => 'wobject template',
-				namespace => 'Asset_Wobject'
-			},
-			{
-				tag => 'template language',
-				namespace => 'Asset_Template'
 			},
 		]
 	},

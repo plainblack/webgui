@@ -21,6 +21,21 @@ our $I18N = {
 		lastUpdated => 1146455970
 		},
 
+	'cacheTimeout' => {
+		message => q|The amount of time this article will be cached.|,
+		lastUpdated => 1164841027
+		},
+
+	'templateId' => {
+		message => q|The Id of the template used to display this Asset.|,
+		lastUpdated => 1164841027
+		},
+
+	'storageId' => {
+		message => q|The Id of the storage object for this Asset that is used to store any attachments.|,
+		lastUpdated => 1164841027
+		},
+
 	'71' => {
 		message => q|<p>Articles are the Swiss Army knife of WebGUI. Most pieces of static content can be added via the Article.  Articles are Wobjects, so they inherit the properties of both Wobjects and Assets.</p>
 
@@ -60,6 +75,17 @@ use templates from the "page" namespace.|,
 		lastUpdated => 1119066250
 	},
 
+	'article asset template variables title' => {
+		message => q|Article Asset Template Variables|,
+		lastUpdated => 1164841146
+	},
+
+	'article asset template variables body' => {
+		message => q|Every asset provides a set of variables to most of its
+templates based on the internal asset properties.  Some of these variables may
+be useful, others may not.|,
+		lastUpdated => 1164841201
+	},
 
 	'28' => {
 		message => q|View Responses|,

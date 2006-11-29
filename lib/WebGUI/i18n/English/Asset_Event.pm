@@ -70,24 +70,34 @@ our $I18N = {
 		lastUpdated => 1149392729,
 	},
 
+	'eventStartDate' => {
+		message => q|The date and time this event starts as an epoch.|,
+		lastUpdated => 1164744850,
+	},
+
 	'start.date' => {
-		message => q|The date this event starts.|,
-		lastUpdated => 1149392729,
+		message => q|The date this event starts in the user's default date format.|,
+		lastUpdated => 1164744850,
 	},
 
 	'start.time' => {
-		message => q|The time this event starts.|,
-		lastUpdated => 1149392729,
+		message => q|The time this event starts in the user's default time format.|,
+		lastUpdated => 1164744852,
+	},
+
+	'eventEndDate' => {
+		message => q|The date and time this event ends as an epoch.|,
+		lastUpdated => 1164744850,
 	},
 
 	'end.date' => {
-		message => q|The date this event ends.|,
-		lastUpdated => 1149392729,
+		message => q|The date this event ends in the user's default date format.|,
+		lastUpdated => 1164744853,
 	},
 
 	'end.time' => {
-		message => q|The time this event ends.|,
-		lastUpdated => 1149392729,
+		message => q|The time this event ends in the user's default time format.|,
+		lastUpdated => 1164744855,
 	},
 
 	'end.label' => {

@@ -4,6 +4,12 @@ our $HELP = {
 	'event add/edit' => {
 		title => '72',
 		body => '73',
+		isa => [
+			{
+				tag => 'asset fields',
+				namespace => 'Asset'
+			},
+		],
 		fields => [
                         {
                                 title => '512',
@@ -38,18 +44,27 @@ our $HELP = {
                 ],
 		related => [
 			{
-				tag => 'asset fields',
-				namespace => 'Asset'
-			},
-			{
 				tag => 'event template',
 				namespace => 'Asset_Event'
 			},
 		]
 	},
+
+	##I didn't break out individual asset level variables here
+	##because there are so few of them. --ck
 	'event template' => {
 		title => '96',
 		body => '97',
+		isa => [
+			{
+				tag => 'asset template',
+				namespace => 'Asset'
+			},
+			{
+				tag => 'template language',
+				namespace => 'Asset_Template'
+			},
+		],
 		fields => [
 		],
 		variables => [
@@ -60,10 +75,16 @@ our $HELP = {
 		            'name' => 'start.label'
 		          },
 		          {
+		            'name' => 'eventStartDate'
+		          },
+		          {
 		            'name' => 'start.date'
 		          },
 		          {
 		            'name' => 'start.time'
+		          },
+		          {
+		            'name' => 'eventEndDate'
 		          },
 		          {
 		            'name' => 'end.date'

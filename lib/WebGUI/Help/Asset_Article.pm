@@ -46,10 +46,15 @@ our $HELP = {
 			},
 		],
 	},
+
 	'article template' => {
 		title => '72',
 		body => '73',
 		isa => [
+			{
+				namespace => "Asset_Article",
+				tag => "article asset template variables"
+			},
 			{
 				namespace => "Asset_Template",
 				tag => "template variables"
@@ -143,11 +148,37 @@ our $HELP = {
 		                             }
 		                           ]
 		          },
+		        ],
+		related => [
+			{
+				tag => 'article add/edit',
+				namespace => 'Asset_Article'
+			},
+		]
+	},
+
+	'article asset template variables' => {
+		title => 'article asset template variables title',
+		body => 'article asset template variables body',
+		isa => [
+		],
+		fields => [
+		],
+		variables => [
 		          {
 		            'name' => 'linkTitle'
 		          },
 		          {
 		            'name' => 'linkURL'
+		          },
+		          {
+		            'name' => 'cacheTimeout'
+		          },
+		          {
+		            'name' => 'templateId'
+		          },
+		          {
+		            'name' => 'storageId'
 		          },
 		        ],
 		related => [
@@ -157,6 +188,7 @@ our $HELP = {
 			},
 		]
 	},
+
 };
 
 1;

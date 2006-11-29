@@ -530,7 +530,13 @@ The title of an individual event.
           '507' => {
                      'lastUpdated' => 1108397891,
                      'message' => 'Calendar Scope'
-                   }
+                   },
+
+          'pagination.pageCount.isMultiple' => {
+                     message => q|Calendar Scope|,
+                     lastUpdated => 1108397891,
+                   },
+
         };
 
 1;

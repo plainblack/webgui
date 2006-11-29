@@ -397,7 +397,7 @@ our $HELP = {
 		],
 		related => [
 			{
-				tag => 'data form fields add/edit',
+				tag => 'data form list template',
 				namespace => 'Asset_DataForm'
 			},
 			{
@@ -410,6 +410,16 @@ our $HELP = {
 	'data form list template' => {
 		title => '88',
 		body => '89',
+		isa => [
+			{
+				namespace => "Asset_Template",
+				tag => "template variables"
+			},
+			{
+				tag => 'wobject template',
+				namespace => 'Asset_Wobject'
+			}
+		],
 		fields => [
 		],
 		variables => [
@@ -527,9 +537,13 @@ our $HELP = {
 		],
 		related => [
 			{
+				tag => 'data form template',
+				namespace => 'Asset_DataForm'
+			},
+			{
 				tag => 'data form add/edit',
 				namespace => 'Asset_DataForm'
-			}
+			},
 		]
 	},
 };
