@@ -42,6 +42,11 @@ my @testSets = (
 		output => q!%26!,
 		comment => q|ampersand|,
 	},
+	{
+		input => q!this, that and the other!,
+		output => q!this%2C%20that%20and%20the%20other!,
+		comment => q|inline comma|,
+	},
 );
 
 my $numTests = scalar @testSets;
