@@ -96,6 +96,7 @@ our $HELP = {
 			},
 		]
 	},
+
 	'data form fields add/edit' => {
 		title => '62',
 		body => '72',
@@ -180,6 +181,10 @@ our $HELP = {
 		],
 		isa => [
 			{
+				namespace => "Asset_DataForm",
+				tag => "data form asset template variables"
+			},
+			{
 				namespace => "Asset_Template",
 				tag => "template variables"
 			},
@@ -210,6 +215,15 @@ our $HELP = {
 		          },
 		          {
 		            'name' => 'export.tab.label'
+		          },
+		          {
+		            'name' => 'delete.url'
+		          },
+		          {
+		            'name' => 'delete.label'
+		          },
+		          {
+		            'name' => 'javascript.confirmation.deleteOne',
 		          },
 		          {
 		            'name' => 'back.url'
@@ -412,6 +426,10 @@ our $HELP = {
 		body => '89',
 		isa => [
 			{
+				namespace => "Asset_DataForm",
+				tag => "data form asset template variables"
+			},
+			{
 				namespace => "Asset_Template",
 				tag => "template variables"
 			},
@@ -544,6 +562,41 @@ our $HELP = {
 				tag => 'data form add/edit',
 				namespace => 'Asset_DataForm'
 			},
+		]
+	},
+
+	'data form asset template variables' => {
+		title => 'data form asset template variables title',
+		body => 'data form asset template variables body',
+		isa => [
+		],
+		fields => [
+		],
+		variables => [
+		          {
+		            'name' => 'templateId',
+		          },
+		          {
+		            'name' => 'emailTemplateId',
+		          },
+		          {
+		            'name' => 'acknowlegementTemplateId',
+		          },
+		          {
+		            'name' => 'listTemplateId',
+		          },
+		          {
+		            'name' => 'acknowledgement',
+		            'description' => 'acknowledgement var desc',
+		          },
+		          {
+		            'name' => 'mailAttachments',
+		          },
+		          {
+		            'name' => 'groupToViewEntries',
+		          },
+		],
+		related => [
 		]
 	},
 };

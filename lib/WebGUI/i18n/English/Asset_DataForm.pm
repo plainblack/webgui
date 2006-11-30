@@ -322,6 +322,16 @@ unless the user can edit the Data Form (<b>canEdit</b> it true).|,
 		lastUpdated => 1149392054,
 	},
 
+	'delete.url' => {
+		message => q|The URL to delete the current entry from the DataForm.|,
+		lastUpdated => 1164913871,
+	},
+
+	'delete.label' => {
+		message => q|The default label for the delete.url variable.|,
+		lastUpdated => 1164913874,
+	},
+
 	'export.tab.url' => {
 		message => q|Following this URL will export the data stored to this data form as a tab delimited file.|,
 		lastUpdated => 1149392054,
@@ -355,6 +365,11 @@ unless the user can edit the Data Form (<b>canEdit</b> it true).|,
 	'javascript.confirmation.deleteAll' => {
 		message => q|Javascript for an internationalized confirmation popup for deleting all entries.|,
 		lastUpdated => 1150411934,
+	},
+
+	'javascript.confirmation.deleteOne' => {
+		message => q|Javascript for an internationalized confirmation popup for deleting one entry.|,
+		lastUpdated => 1164913939,
 	},
 
 	'addField.url' => {
@@ -918,6 +933,58 @@ below to see which template variables may be used inside this loop.|,
         'data list' => {
 		 message => q|Data List|,
 		 lastUpdated => 1113435295,
+        },
+
+        'templateId' => {
+		 message => q|The ID of the template for displaying the form view of the DataForm.|,
+		 lastUpdated => 1164910794,
+        },
+
+        'emailTemplateId' => {
+		 message => q|The ID of the template for sending emails of user submitted data from the DataForm.|,
+		 lastUpdated => 1164910794,
+        },
+
+        'acknowlegementTemplateId' => {
+		 message => q|The ID of the template for displaying the acknowledgement to the user after they have submitted data to the DataForm.|,
+		 lastUpdated => 1164910794,
+        },
+
+        'listTemplateId' => {
+		 message => q|The ID of the template for displaying the list view of the DataForm.|,
+		 lastUpdated => 1164910794,
+        },
+
+        'acknowledgement var desc' => {
+		 message => q|The acknowledgement to display to the user after they have submitted data.|,
+		 lastUpdated => 1164910794,
+        },
+
+        'mailData' => {
+		 message => q|mailData will be true if the DataForm was configured to send emails.|,
+		 lastUpdated => 1164910794,
+        },
+
+        'mailAttachments' => {
+		 message => q|mailAttachments will be true if the DataForm was configured to email files submitted to the DataForm.|,
+		 lastUpdated => 1164910794,
+        },
+
+        'groupToViewEntries' => {
+		 message => q|The Group ID of the group set to view the list of all data submitted to the DataForm when it is in Form mode.|,
+		 lastUpdated => 1164910794,
+        },
+
+        'data form asset template variables title' => {
+		 message => q|DataForm Asset Template Variables|,
+		 lastUpdated => 1164910794,
+        },
+
+        'data form asset template variables body' => {
+		 message => q|Every asset provides a set of variables to most of its
+templates based on the internal asset properties.  Some of these variables may
+be useful, others may not.|,
+		 lastUpdated => 1164910794,
         },
 
 };
