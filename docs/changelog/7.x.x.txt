@@ -22,6 +22,9 @@
    original patch.  Although I couldn't use the code in wG 7, it inspired the RFE.
    Also added the feature requested in the thread to allow the files to be
    emailed as attachments.
+ - Fixed behaviour of the Encrypt Login setting, in such way that only the form 
+   post containing the login credentials is sent over https. After authentication
+   the user is redirected to http. (Martin Kamerbeek / Procolix)
 
 7.2.3
  - fix: minor bug with new template vars in Auth::createAccount

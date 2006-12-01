@@ -605,6 +605,12 @@ sub login {
    	$self->session->user({user=>$u});
 	$u->karma($self->session->setting->get("karmaPerLogin"),"Login","Just for logging in.") if ($self->session->setting->get("useKarma"));
 	$self->_logLogin($uid,"success");
+
+	if ($self->session->setting->get('encryptLogin')) {
+		my $currentUrl = $self->session->url->page(undef,1);
+		$currentUrl =~ s/^https:/http:/;
+		$self->session->http->setRedirect($currentUrl);
+	}
 	if ($self->session->scratch->get("redirectAfterLogin")) {
 		$self->session->http->setRedirect($self->session->scratch->get("redirectAfterLogin"));
 	  	$self->session->scratch->delete("redirectAfterLogin");
