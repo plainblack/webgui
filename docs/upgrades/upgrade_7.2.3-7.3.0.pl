@@ -22,6 +22,7 @@ my $session = start(); # this line required
 addWikiAssets($session);
 deleteOldFiles($session);
 addFileFieldsToDataForm($session);
+makeRSSFromParentAlwaysHidden($session);
 finish($session); # this line required
 
 #-------------------------------------------------
@@ -113,6 +114,19 @@ EOT
 				   );
 
 	$session->config->addToArray('assets', 'WebGUI::Asset::Wobject::WikiMaster');
+}
+
+sub makeRSSFromParentAlwaysHidden {
+	my $session = shift;
+	print "\tHiding RSS From Parent assets.\n" unless $quiet;
+
+	# Since it's internal anyway, might as well just do it directly to all the revisions.
+	$session->db->write($_) for(<<'EOT',
+  UPDATE assetData AS d INNER JOIN RSSFromParent AS r
+                                ON d.assetId = r.assetId AND d.revisionDate = r.revisionDate
+     SET d.isHidden = 1
+EOT
+				   );
 }
 
 # ---- DO NOT EDIT BELOW THIS LINE ----

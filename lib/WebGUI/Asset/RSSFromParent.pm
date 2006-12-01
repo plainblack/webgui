@@ -57,6 +57,13 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
+sub update {
+	# Re-force isHidden to 1 on each update; these should always be hidden.
+	my $self = shift;
+	my $properties = shift;
+	$self->SUPER::update(+{%$properties, isHidden => 1});
+}
+
 sub _escapeXml {
 	my $text = shift;
 	my %entities = ('<' => '&lt;', '>' => '&gt;', '"' => '&quot;', "'" => "&apos;");
