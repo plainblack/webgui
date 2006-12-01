@@ -26,6 +26,7 @@
    post containing the login credentials is sent over https. After authentication
    the user is redirected to http. (Martin Kamerbeek / Procolix)
  - fix: RSS From Parent assets should always be hidden from navigation
+ - fix: profile field i18ned possibleValues with apostrophes failing
 
 7.2.3
  - fix: minor bug with new template vars in Auth::createAccount

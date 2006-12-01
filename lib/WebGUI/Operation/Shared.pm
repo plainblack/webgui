@@ -109,8 +109,9 @@ sub secureEval {
 			my @param = split (/,\s*/,$2);
 			@param = map { s/^['"]|['"]$//g; $_; } @param;
 			my $output = $trusted{$function}(@param);
-			return $output if (ref $output);	
-			$code =~ s/\Q$cmd/'$output'/g;
+			return $output if (ref $output);
+			$output =~ s/\'/\\\'/g;
+			$code =~ s/\Q$cmd/\'$output\'/g;
 		}
 	}
 	
