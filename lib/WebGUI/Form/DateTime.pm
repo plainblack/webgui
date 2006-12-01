@@ -18,6 +18,7 @@ use strict;
 use base 'WebGUI::Form::Text';
 use WebGUI::Form::Hidden;
 use WebGUI::International;
+use WebGUI::DateTime;
 
 =head1 NAME
 
@@ -25,7 +26,13 @@ Package WebGUI::Form::DateTime
 
 =head1 DESCRIPTION
 
-Accepts and returns and epoch date and creates a date picker control.
+Accepts and returns an epoch date and creates a date picker control.
+
+If the default value is a MySQL date/time string, accepts and returns MySQL
+date/time strings.
+
+NOTE: Does not adjust for the user's time zone unless using MySQL date/time 
+strings.
 
 =head1 SEE ALSO
 
@@ -62,6 +69,9 @@ Flag that tells the User Profile system that this is a valid form element in a U
 =head4 defaultValue
 
 If no value is specified, this will be used. Defaults to today and now.
+
+If the defaultValue is a MySQL date/time string, this form control will return
+MySQL date/time strings adjusted for the user's time zone.
 
 =cut
 
@@ -100,7 +110,25 @@ Returns a validated form post result. If the result does not pass validation, it
 
 sub getValueFromPost {
 	my $self = shift;
-	return $self->session->datetime->setToEpoch($self->session->form->param($self->get("name")));
+	if (!$self->get("defaultValue") || $self->get("defaultValue") =~ m/^\d+$/) {
+		# Epoch format
+		return $self->session->datetime->setToEpoch($self->session->form->param($self->get("name")),1);
+	} else {
+		# MySQL format
+		# YY(YY)?-MM-DD HH:MM:SS
+		my $value	= $self->session->form->param($self->get("name"));
+		$self->session->errorHandler->warn("Date value: $value");
+		
+		# Verify format
+		return undef
+			unless ($value =~ m/(?:\d{2}|\d{4})\D\d{2}\D\d{2}\D\d{2}\D\d{2}\D\d{2}/);
+		
+		# Fix time zone
+		$value 	= WebGUI::DateTime->new(mysql => $value, time_zone => $self->session->user->profileField("timeZone"))
+			->set_time_zone("UTC")->toMysql;
+		
+		return $value;
+	}
 }
 
 #-------------------------------------------------------------------
@@ -113,7 +141,18 @@ Renders a date picker control.
 
 sub toHtml {
         my $self = shift;
-	my $value = $self->session->datetime->epochToSet($self->get("value"),1);
+	my $value;
+	if (!$self->get("defaultValue") || $self->get("defaultValue") =~ m/^\d+$/) {
+		# Epoch format
+		$value	= $self->session->datetime->epochToSet($self->get("value"),1);
+	} else {
+		# MySQL format
+		$value	= $self->get("value");
+		# Fix time zone
+		$value 	= WebGUI::DateTime->new($value)
+			->set_time_zone($self->session->user->profileField("timeZone"))
+			->toMysql;
+	}
 	my $i18n = WebGUI::International->new($self->session);
 	my $language  = $i18n->getLanguage($self->session->user->profileField("language"),"languageAbbreviation");
 	unless ($language) {
@@ -153,9 +192,22 @@ Renders the form field to HTML as a hidden field rather than whatever field type
 
 sub toHtmlAsHidden {
         my $self = shift;
+	my $value;
+	
+	if (!$self->get("defaultValue") || $self->get("defaultValue") =~ m/^\d+$/) {
+		$value = $self->session->datetime->epochToSet($self->get("value"),1);
+	} else {
+		# MySQL format
+		$value = $self->get("value");
+		# Fix Time zone
+		$value 	= WebGUI::DateTime->new($value)
+			->set_time_zone($self->session->user->profileField("timeZone"))
+			->toMysql;
+	}
+	
 	return WebGUI::Form::Hidden->new(
-		name=>$self->get("name"),
-		value=>$self->session->datetime->epochToSet($self->get("value"),1)	
+		name	=> $self->get("name"),
+		value	=> $value,
 		)->toHtmlAsHidden;
 }
 

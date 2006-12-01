@@ -299,6 +299,10 @@ A string containing extra where clause information for the query.
 
 A string containing an order by clause (without the "order by").
 
+=head4 limit
+
+The maximum amount of entries to return
+
 =cut
 
 sub getLineage {
@@ -408,6 +412,12 @@ sub getLineage {
 		$sortOrder = $rules->{orderByClause};
 	}
 	my $sql = "select $columns from $tables where $where group by assetData.assetId order by $sortOrder";
+	
+	# Add limit if necessary
+	if ($rules->{limit}) {
+		$sql	.= " limit ".$rules->{limit};
+	}
+	
 	my @lineage;
 	my %relativeCache;
 	my $sth = $self->session->db->read($sql);

@@ -27,6 +27,18 @@
    the user is redirected to http. (Martin Kamerbeek / Procolix)
  - fix: RSS From Parent assets should always be hidden from navigation
  - fix: profile field i18ned possibleValues with apostrophes failing
+ - Added a new DateTime subclass, WebGUI::DateTime, with convenience methods to
+   convert to and from MySQL Date/Time strings. Moving forward, this method
+   should be used in place of the existing WebGUI::Session::DateTime, which can
+   create problems when handling time zones.
+ - Form elements Date, DateTime, and TimeField now return MySQL Date/Time 
+   strings when given a MySQL Date/Time string as a default value. This is now
+   the recommended method of storing date/time in the database.
+ - WebGUI::Search now accepts more rules, "where" for specifying an additional
+   where clause, "join" for making join clauses, and "columns" for adding more
+   columns to return.
+ - WebGUI::TabForm->addTab now returns the WebGUI::HTMLForm created.
+ - WebGUI::AssetLineage::getLineage can now limit the number of records returned
 
 7.2.3
  - fix: minor bug with new template vars in Auth::createAccount

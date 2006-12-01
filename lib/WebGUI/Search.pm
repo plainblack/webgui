@@ -46,7 +46,11 @@ This is a private method and should never be used outside of this class.
 sub _getQuery { 
 	my $self = shift;
 	my $selectsRef = shift;
-	return ('select ' . join(', ', @$selectsRef,   ($self->{_score} ? $self->{_score} : ())) . ' from assetIndex where ' 
+	return ('select ' 
+		. join(', ', @$selectsRef,   ($self->{_score} ? $self->{_score} : ())) 
+		. ' from assetIndex '
+		. ($self->{_join} ? join(" ",@{$self->{_join}}) : '') # JOIN
+		. ' where ' 
 		. ($self->{_isPublic}? 'isPublic = 1 and ' : '') 
 		. '('.$self->{_where}.')' 
 		. ($self->{_score} ? ' order by score desc' : '')
@@ -64,7 +68,7 @@ Returns an array reference containing all the asset ids of the assets that match
 
 sub getAssetIds {
 	my $self = shift;
-	my $query = $self->_getQuery(['assetId']);
+	my $query = $self->_getQuery(['assetIndex.assetId']);
 	my $rs = $self->session->db->prepare($query);
 	$rs->execute($self->{_params});
 	my @ids = ();
@@ -85,7 +89,7 @@ Returns an array reference containing asset objects for those that matched.
 
 sub getAssets {
 	my $self = shift;
-	my $query = $self->_getQuery([qw(assetId className revisionDate)]);
+	my $query = $self->_getQuery([qw(assetIndex.assetId assetIndex.className assetIndex.revisionDate)]);
 	my $rs = $self->session->db->prepare($query);
 	$rs->execute($self->{_params});
 	my @assets = ();
@@ -131,7 +135,22 @@ sub getPaginatorResultSet {
 	my $paginate = shift;
 	my $pageNumber = shift;
 	my $formVar = shift;
-	my $query = $self->_getQuery([qw(assetId title url synopsis ownerUserId groupIdView groupIdEdit creationDate revisionDate className)]);
+	my @columns	= qw(	assetIndex.assetId 
+				assetIndex.title 
+				assetIndex.url 
+				assetIndex.synopsis 
+				assetIndex.ownerUserId 
+				assetIndex.groupIdView 
+				assetIndex.groupIdEdit 
+				assetIndex.creationDate 
+				assetIndex.revisionDate 
+				assetIndex.className
+			);
+	
+	push @columns, (@{$self->{_columns}})
+		if $self->{_columns};
+	
+	my $query = $self->_getQuery(\@columns);
 	my $paginator = WebGUI::Paginator->new($self->session, $url, $paginate, $pageNumber, $formVar);
 	$paginator->setDataByQuery($query, undef, undef, $self->{_params});
 	return $paginator;
@@ -141,13 +160,31 @@ sub getPaginatorResultSet {
 
 =head2 getResultSet ( ) 
 
-Returns a WebGUI::SQL::ResultSet object containing the search results with columns labeled "assetId", "title", "url", "synopsis", "ownerUserId", "groupIdView", "groupIdEdit", "creationDate", "revisionDate", and "className".
+Returns a WebGUI::SQL::ResultSet object containing the search results with 
+columns labeled "assetId", "title", "url", "synopsis", "ownerUserId", 
+"groupIdView", "groupIdEdit", "creationDate", "revisionDate", and "className", 
+in addition to any columns passed as rules.
 
 =cut
 
 sub getResultSet {
-	my $self = shift;
-	my $query = $self->_getQuery([qw(assetId title url synopsis ownerUserId groupIdView groupIdEdit creationDate revisionDate className)]);
+	my $self 	= shift;
+	my @columns	= qw(	assetIndex.assetId 
+				assetIndex.title 
+				assetIndex.url 
+				assetIndex.synopsis 
+				assetIndex.ownerUserId 
+				assetIndex.groupIdView 
+				assetIndex.groupIdEdit 
+				assetIndex.creationDate 
+				assetIndex.revisionDate 
+				assetIndex.className
+			);
+	
+	push @columns, (@{$self->{_columns}})
+		if $self->{_columns};
+	
+	my $query 	= $self->_getQuery(\@columns);
 	my $rs = $self->session->db->prepare($query);
 	$rs->execute($self->{_params});
 	return $rs;
@@ -255,6 +292,28 @@ This rule limits the search to a revision date range. It has two parameters: "st
        end=>30300003
     }
 
+=head4 where
+
+This rule adds an additional where clause to the search. 
+
+ where => 'className NOT LIKE "WebGUI::Asset::Wobject%"'
+
+=head4 join
+
+This rule allows for an array reference of table join clauses.
+
+ join => 'join assetData on assetId = assetData.assetId'
+
+=head4 columns
+
+This rule allows for additional columns to be returned by getResultSet().
+
+ columns => ['assetData.title','assetData.description']
+
+TODO: 'where' and 'join' were added hackishly. It'd be nicer to see a data 
+structure for 'join', and the ability to have multiple 'where' clauses with
+placeholders and parameters.
+
 =cut
 
 sub search {
@@ -321,6 +380,20 @@ sub search {
 		push(@clauses, "revisionDate between ? and ?");
 		push(@params, $start, $end);
 	}
+	if ($rules->{where}) {
+		push(@clauses, $rules->{where});
+	}
+	if ($rules->{join}) {	# This join happens in _getQuery
+		$rules->{join} = [$rules->{join}]
+			unless (ref $rules->{join} eq "ARRAY");
+		$self->{_join} = $rules->{join};
+	}
+	if ($rules->{columns}) {
+		$rules->{columns} = [$rules->{columns}]
+			unless (ref $rules->{columns} eq "ARRAY");
+		$self->{_columns} = $rules->{columns};
+	}
+	
 	$self->{_params} = \@params;
 	$self->{_where} = "(".join(") and (", @clauses).")";
 	return $self;

@@ -26,7 +26,13 @@ Package WebGUI::Form::TimeField
 
 =head1 DESCRIPTION
 
-Creates a time form field. 
+Creates a time form field.
+
+If the default value is a MySQL time, the value returned by this form element 
+will be a MySQL time. Note: Will not be adjusted for the user's time zone.
+
+Otherwise, the value returned by this form element will be a number of seconds,
+adjusted for the user's time zone..
 
 =head1 SEE ALSO
 
@@ -47,6 +53,10 @@ See the superclass for additional details.
 =head3 additionalTerms
 
 The following additional parameters have been added via this sub class.
+
+=head4 defaultValue
+
+Either a number of seconds or a MySQL time.
 
 =head4 maxlength
 
@@ -88,13 +98,25 @@ sub definition {
 
 =head2 getValueFromPost ( )
 
-Returns the number of seconds since 00:00:00 on a 24 hour clock. Note, this will adjust for the user's time offset in the reverse manner that the form field adjusts for it in order to make the times come out appropriately.
+If the defaultValue is a MySQL time, the value returned by this form element 
+will be a MySQL time. Note: Will not be adjusted for the user's time zone.
+
+Otherwise, the value returned by this form element will be a number of seconds,
+adjusted for the user's time zone..
 
 =cut
 
 sub getValueFromPost {
 	my $self = shift;
-	return $self->session->datetime->timeToSeconds($self->session->form->param($self->get("name")))-($self->session->user->profileField("timeOffset")*3600);
+	if (!$self->get("defaultValue") || $self->get("defaultValue") =~ /^\d+$/) {
+		# epoch format
+		return $self->session->datetime->timeToSeconds($self->session->form->param($self->get("name")))-($self->session->user->profileField("timeOffset")*3600);
+	} else {
+		# Mysql format
+		my $value = $self->session->form->param($self->get("name"));
+		return undef unless $value =~ /^\d{2}\D\d{2}(\D\d{2})?$/;
+		return $value;
+	}
 }
 
 #-------------------------------------------------------------------
@@ -107,7 +129,14 @@ Renders a time field.
 
 sub toHtml {
         my $self = shift;
-	my $value = $self->session->datetime->secondsToTime($self->get("value"));
+	my $value;
+	if ($self->get("value") =~ /^\d+$/) {
+		# Epoch format
+		$value 	= $self->session->datetime->secondsToTime($self->get("value"));
+	} else {
+		# MySQL format
+		$value	= $self->get("value");
+	}
 	my $i18n = WebGUI::International->new($self->session);
 	$self->session->style->setScript($self->session->url->extras('inputCheck.js'),{ type=>'text/javascript' });
 	$self->set("extras", $self->get('extras') . ' onkeyup="doInputCheck(document.getElementById(\''.$self->get("id").'\'),\'0123456789:\')"');
@@ -129,9 +158,17 @@ Renders the field as a hidden field.
 
 sub toHtmlAsHidden {
 	my $self = shift;
+	my $value;
+	if ($self->get("value") =~ /^\d+$/) {
+		# Epoch format
+		$value 	= $self->session->datetime->secondsToTime($self->get("value"));
+	} else {
+		# MySQL format
+		$value	= $self->get("value");
+	}
 	return WebGUI::Form::Hidden->new($self->session,
 		name=>$self->get("name"),
-		value=>$self->session->datetime->secondsToTime($self->get("value"))
+		value=>$value
 		)->toHtmlAsHidden;
 }
 

@@ -75,7 +75,7 @@ These methods are available from this class:
 
 =head2 addTab ( name, label, uiLevel ) 
 
-Adds a new tab to the tab form.
+Adds a new tab to the tab form. Returns the WebGUI::HTMLForm object created.
 
 =head3 name
 
@@ -99,6 +99,7 @@ sub addTab {
 	$self->{_tab}{$name}{form} = WebGUI::HTMLForm->new($self->session,uiLevelOverride=>$self->{_uiLevelOverride});
 	$self->{_tab}{$name}{label} = $label;
 	$self->{_tab}{$name}{uiLevel} = $uiLevel;
+	return $self->{_tab}{$name}{form};
 }
 
 #-------------------------------------------------------------------
