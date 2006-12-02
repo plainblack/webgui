@@ -28,8 +28,8 @@ sub _appendFuncTemplateVars {
 	    (addPage => 'func=add;class=WebGUI::Asset::WikiPage');
 
 	foreach my $func (@funcs) {
-		$var->{$func.'.url'} = $self->getUrl($specialFuncs{$func} || "func=$func");
-		$var->{$func.'.text'} = $i18n->get("func $func link text");
+		$var->{$func.'Url'} = $self->getUrl($specialFuncs{$func} || "func=$func");
+		$var->{$func.'Text'} = $i18n->get("func $func link text");
 	}
 }
 
@@ -43,8 +43,8 @@ sub _appendPageHistoryVars {
 	my $entries = $self->_templateSubvarsRefOfEdits($self->_editsRefOfPageHistory($page, $limit), $time);
 	my $days = $self->_daysRefOfTemplateSubvars($entries);
 
-	$var->{'ph.entries'} = $entries;
-	$var->{'ph.days'} = $days;
+	$var->{'pageHistoryEntries'} = $entries;
+	$var->{'pageHistoryDays'} = $days;
 	return $self;
 }
 
@@ -57,8 +57,8 @@ sub _appendRecentChangesVars {
 	my $entries = $self->_templateSubvarsRefOfEdits($self->_editsRefOfRecentChanges($limit), $time);
 	my $days = $self->_daysRefOfTemplateSubvars($entries);
 
-	$var->{'rc.entries'} = $entries;
-	$var->{'rc.days'} = $days;
+	$var->{'recentChangesEntries'} = $entries;
+	$var->{'recentChangesDays'} = $days;
 	return $self;
 }
 
@@ -69,12 +69,12 @@ sub _appendSearchBoxVars {
 	my $queryText = shift;
 	my $submitText = WebGUI::International->new($self->session, 'Asset_WikiMaster')->get('search submit');
 
-	$var->{'search.formHeader'} = join '',
+	$var->{'searchFormHeader'} = join '',
 	    (WebGUI::Form::formHeader($self->session, { action => $self->getUrl, method => 'GET' }),
 	     WebGUI::Form::hidden($self->session, { name => 'func', value => 'search' }));
-	$var->{'search.query'} = WebGUI::Form::text($self->session, { name => 'query', value => $queryText });
-	$var->{'search.submit'} = WebGUI::Form::submit($self->session, { value => $submitText });
-	$var->{'search.formFooter'} = WebGUI::Form::formFooter($self->session);
+	$var->{'searchQuery'} = WebGUI::Form::text($self->session, { name => 'query', value => $queryText });
+	$var->{'searchSubmit'} = WebGUI::Form::submit($self->session, { value => $submitText });
+	$var->{'searchFormFooter'} = WebGUI::Form::formFooter($self->session);
 	return $self;
 }
 
@@ -90,7 +90,7 @@ sub _appendSearchResultVars {
 		push @results, $self->_templateSubvarOfPage($row->{assetId});
 	}
 
-	$var->{'search.results'} = \@results;
+	$var->{'searchResults'} = \@results;
 
 	return $self;
 }
@@ -129,7 +129,7 @@ sub _daysRefOfTemplateSubvars {
 		}
 	}
 
-	return [map { {'day.date' => $$_[0]{date}, 'day.entries' => $_} } @days];
+	return [map { {'dayDate' => $$_[0]{date}, 'dayEntries' => $_} } @days];
 }
 
 #-------------------------------------------------------------------
@@ -216,8 +216,8 @@ sub _templateSubvarOfEdit {
 		$subvar->{isCreate} = 1;
 	}
 
-	$subvar->{actionN} = $i18n->get('actionN '.$subvar->{action});
-	$subvar->{actionNL} = lc $subvar->{actionN};
+	$subvar->{actionTaken} = $i18n->get('actionN '.$subvar->{action});
+	$subvar->{actionTakenLowerCase} = lc $subvar->{actionN};
 
 	return $subvar;
 }

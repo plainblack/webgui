@@ -5,11 +5,25 @@
 #title:Default Wiki Front Page
 #menuTitle:Default Wiki Front Page
 
+<tmpl_if session.var.adminOn><p><tmpl_var controls></p></tmpl_if>
+<tmpl_if displayTitle><h2><tmpl_var title></h2></tmpl_if>
+
 <tmpl_var description>
 <h3>Search</h3>
-<tmpl_var search.formHeader>Search: <tmpl_var search.query><tmpl_var search.submit><tmpl_var search.formFooter>
-<h3>Recent changes (<a href="<tmpl_var recentChanges.url>">more</a>)</h3>
-<ul><tmpl_loop rc.entries>
-<li><tmpl_var date> <tmpl_var time>: <a href="<tmpl_var viewLatest>"><tmpl_var title></a>
-<tmpl_var actionNL> by <tmpl_var username></li>
-</tmpl_loop></ul>
+<tmpl_var searchFormHeader>Search: <tmpl_var searchQuery><tmpl_var searchSubmit><tmpl_var searchFormFooter>
+<br />
+
+<div style="float: left;">
+	<h3><a href="<tmpl_var recentChangesUrl>"><tmpl_var recentChangesLabel></a></h3>
+	<ul><tmpl_loop recentChangesLoop>
+		<li><a href="<tmpl_var url>"><tmpl_var title></a></li>
+	</tmpl_loop></ul>
+</div>
+<div style="float: left;">
+	<h3><a href="<tmpl_var mostPopularUrl>"><tmpl_var mostPopularLabel></a></h3>
+	<ul><tmpl_loop mostPopularLoop>
+		<li><a href="<tmpl_var url>"><tmpl_var title></a></li>
+	</tmpl_loop></ul>
+
+</div>
+<div style="clear: both;"></div>

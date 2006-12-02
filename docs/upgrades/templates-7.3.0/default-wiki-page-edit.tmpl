@@ -4,12 +4,30 @@
 #url:default-wiki-page-edit
 #title:Default Wiki Page Edit
 #menuTitle:Default Wiki Page Edit
-<tmpl_var form.header>
+<tmpl_var formHeader>
 <table>
 <tbody>
-<tr><td><label for="title">Title</label></td><td><tmpl_var form.title></td></tr>
-<tr><td><label for="content">Content</label></td><td><tmpl_var form.content></td></tr>
+<tr><td><label for="title"><tmpl_var titleLabel></label></td><td><tmpl_var formTitle></td></tr>
+<tr><td><label for="content"><tmpl_var contentLabel></label></td><td><tmpl_var formContent></td></tr>
 </tbody>
 </table>
-<tmpl_var form.submit>
-<tmpl_var form.footer>
+<tmpl_var formSubmit>
+<tmpl_var formFooter>
+
+<tmpl_if canAdminister><tmpl_unless isNew>
+	<ul>
+		<li><a href="<tmpl_var deleteUrl>"><tmpl_var deleteLabel></a></li>
+		<li id="wikiPageProtect"><a href="javascript:wikiPageCall('func=protect');"><tmpl_var protectLabel></a></li>
+		<li id="wikiPageUnprotect"><a href="javascript:wikiPageCall('func=unprotect');"><tmpl_var unprotectLabel></a></li>
+	</ul>
+</tmpl_if></tmpl_if>
+
+<script type="text/javascript">
+var wikiPageIsProtected = <tmpl_var isProtected>;
+function wikiPageCall (params) {
+	var request = YAHOO.util.Connect.asyncRequest('GET', '<tmpl_var url>', { success:wikiPageCallSuccess, failure:wikiPageCallFail },params);
+}
+function wikiPageCallSuccess ( response ) {
+}
+</script>
+

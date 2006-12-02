@@ -9,7 +9,7 @@
 
     <div id="wikipage" class="yui-navset">
         <ul class="yui-nav">
-            <li class="selected"><a href="#wikipagecontent"><em><tmpl_var view.label></em></a></li>
+            <li class="selected"><a href="#wikipagecontent"><em><tmpl_var viewLabel></em></a></li>
         </ul>
         <div class="yui-content">
             <div id="wikipagecontent">
@@ -21,20 +21,20 @@
 initWikiTabs = function() {
     	var tabView = new YAHOO.widget.TabView('wikipage');
 		tabView.addTab(new YAHOO.widget.Tab({
-        	label: '<tmpl_var edit.label>',
-        	dataSrc: '<tmpl_var edit.url>',
+        	label: '<tmpl_var editLabel>',
+        	dataSrc: '<tmpl_var editUrl>',
 		cacheData: true
     	}));
     	var tabView = new YAHOO.widget.TabView('wikipage');
 		tabView.addTab(new YAHOO.widget.Tab({
-        	label: '<tmpl_var history.label>',
-        	dataSrc: '<tmpl_var history.url>',
+        	label: '<tmpl_var historyLabel>',
+        	dataSrc: '<tmpl_var historyUrl>',
 		cacheData: true
     	}));
 };
 initWikiTabs();
 </script>
-<div style="padding: 8px;"><a href="<tmpl_var search.url>"><tmpl_var search.label></a> | <a href="<tmpl_var recentChanges.url>"><tmpl_var recentChanges.label></a> | <a href="<tmpl_var wikihome.url"><tmpl_var wikihome.label></a></div>
+<div style="padding: 8px;"><a href="<tmpl_var searchUrl>"><tmpl_var searchLabel></a> | <a href="<tmpl_var recentChangesUrl>"><tmpl_var recentChangesLabel></a> | <a href="<tmpl_var wikiHomeUrl"><tmpl_var wikiHomeLabel></a></div>
 
 ~~~
 

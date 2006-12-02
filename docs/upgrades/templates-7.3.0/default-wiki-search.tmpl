@@ -4,8 +4,34 @@
 #url:default-wiki-search
 #title:Default Wiki Search
 #menuTitle:Default Wiki Search
+<tmpl_if session.var.adminOn><p><tmpl_var controls></p></tmpl_if>
+<tmpl_if displayTitle><h2><tmpl_var title></h2></tmpl_if>
 
-<tmpl_var search.formHeader>Search: <tmpl_var search.query><tmpl_var search.submit><tmpl_var search.formFooter>
-<tmpl_if search.results><h3>Results</h3>
-<ul><tmpl_loop search.results><li><a href="<tmpl_var viewLatest>"><tmpl_var title></a></li></tmpl_loop></ul>
+
+<tmpl_var search.formHeader><tmpl_var searchLabel>: <tmpl_var searchQuery><tmpl_var searchSubmit><tmpl_var searchFormFooter>
+<tmpl_if searchResults><h3>Results</h3>
+<ul><tmpl_loop searchResults><li><a href="<tmpl_var url>"><tmpl_var title></a></li></tmpl_loop></ul>
+	<p><tmpl_var notWhatYouWanted></p>
+	<p><a href="javascript:wiki_getAddForm('<tmpl_var url>');"><tmpl_var addPageLabel></a></p>
+<tmpl_else>
+	<p><tmpl_var nothingFoundLabel></p>
+	<p><a href="javascript:wiki_getAddForm('<tmpl_var url>');"><tmpl_var addPageLabel></a></p>
 </tmpl_if>
+<div id="addFormGoesHere"></div>
+<div style="padding: 8px;"><a href="<tmpl_var searchUrl>"><tmpl_var searchLabel></a> | <a href="<tmpl_var recentChangesUrl>"><tmpl_var recentChangesLabel></a> | <a href="<tmpl_var wikiHomeUrl"><tmpl_var wikiHomeLabel></a></div>
+~~~
+<script type="text/javascript" src="^Extras(yui/build/yahoo/yahoo.js);"></script>
+<script type="text/javascript" src="^Extras(yui/build/event/event.js);"></script>
+<script type="text/javascript" src="^Extras(yui/build/connection/connection.js);"></script>
+<script type="text/javascript">
+function wiki_getAddForm (url) {
+        var request = YAHOO.util.Connect.asyncRequest('GET', url, { success:wiki_displayAddForm, failure:wiki_connectFailure }, 'func=getAddForm');
+}
+function wiki_displayAddForm (response) {
+	document.getElementById("addFormGoesHere").innerHTML(response.responseText);	
+}
+function wiki_connectFailure (response) {
+	document.getElementById("addFormGoesHere").innerHTML("Couldn't connect to server: " + response.status + "(" + response.statusText+")"));
+}
+</script>
+

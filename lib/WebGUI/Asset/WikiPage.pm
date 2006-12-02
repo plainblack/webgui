@@ -30,13 +30,13 @@ sub _appendFuncTemplateVars {
 	@funcs = (qw/view edit pageHistory protect unprotect delete wikiPurgeRevision/) unless @funcs;
 
 	foreach my $func (@funcs) {
-		$var->{$func.'.url'} = $self->getUrl($specialFuncs{$func}
+		$var->{$func.'Url'} = $self->getUrl($specialFuncs{$func}
 						     || "func=$func$revisionSuffix");
-		$var->{$func.'.text'} = $i18n->get("func $func link text");
+		$var->{$func.'Label'} = $i18n->get("func $func link text");
 		my $confirmation = $i18n->get("func $func link confirm");
 		if (length $confirmation) {
 			$confirmation =~ s/\'/\\\'/g;
-			$var->{$func.'.confirm'} = "return confirm('$confirmation')";
+			$var->{$func.'Confirm'} = "return confirm('$confirmation')";
 		}
 	}
 }

@@ -5,9 +5,8 @@
 #title:Default Page History
 #menuTitle:Default Page History
 
-<ul><tmpl_loop ph.entries>
-<li><tmpl_var actionN> at <tmpl_var date>
-    (<tmpl_var interval><tmpl_if isCreateOrEdit>; <a href="<tmpl_var viewRevision>">view</a>,
-                                            <a href="<tmpl_var editRevision>">edit</a></tmpl_if>)
-    by <tmpl_var username></li>
-</tmpl_loop></ul>
+<ul>
+<tmpl_loop pageHistoryEntries>
+	<li><tmpl_var toolbar> <tmpl_var actionTaken> at <tmpl_var date> (<tmpl_var interval>) by <tmpl_var username></li>
+</tmpl_loop>
+</ul>
