@@ -226,34 +226,31 @@ sub migrateCalendars {
 	{
 		my $properties	= {%{$asset->get}};
 		$properties->{defaultDate}	= delete $properties->{defaultMonth};
-		warn "Found calendar ".$properties->{title};
+		#warn "Found calendar ".$properties->{title};
 		$properties->{className}	= "WebGUI::Asset::Wobject::Calendar";
 		
 		
 		# Add the new asset
 		my $newAsset = $asset->getParent->addChild($properties);
-		warn "Added Calendar ".$newAsset->get("title")." ".$newAsset->get("className");
+		#warn "Added Calendar ".$newAsset->get("title")." ".$newAsset->get("className");
 		
 		# Get this calendar's events and change to new parent
 		my $events	= $asset->getLineage(['descendants'],
 			{
 				includeOnlyClasses	=> ['WebGUI::Asset::Event'],
 			});
-		warn "Got lineage";
-		
-		
-		# Set the new asset's rank
-		$newAsset->swapRank($asset->getRank);
-		warn "Swapped rank";
+		#warn "Got lineage";
 		
 		
 		for my $event (@{$events})
 		{
-			warn "Got event: $event";
+			#warn "Got event: $event";
 			
 			# Add a child to the new calendar using the properties 
 			# from EventsCalendar_event
 			my %eventProperties = $session->db->quickHash("select * from asset left join assetData on asset.assetId=assetData.assetId left join EventsCalendar_event on asset.assetId = EventsCalendar_event.assetId where asset.assetId = ?",[$event]);
+			
+			delete $eventProperties{assetId};
 			
 			my ($startDate, $startTime) = split / /, WebGUI::DateTime->new(delete $eventProperties{eventStartDate})->toMysql;
 			my ($endDate, $endTime) = split / /, WebGUI::DateTime->new(delete $eventProperties{eventEndDate})->toMysql;
@@ -268,18 +265,18 @@ sub migrateCalendars {
 			$newAsset->addChild(\%eventProperties);
 			
 			# Remove this event from the old calendar
-			#$session->db->write("delete from EventsCalendar_event where assetId=?",[$event]);
-			#$session->db->write("delete from asset where assetId=?",[$event]);
-			#$session->db->write("delete from assetData where assetId=?",[$event]);
-			#$session->db->write("delete from assetIndex where assetId=?",[$event]);
-			#$session->db->write("delete from assetHistory where assetId=?",[$event]);
+			$session->db->write("delete from EventsCalendar_event where assetId=?",[$event]);
+			$session->db->write("delete from asset where assetId=?",[$event]);
+			$session->db->write("delete from assetData where assetId=?",[$event]);
+			$session->db->write("delete from assetIndex where assetId=?",[$event]);
+			$session->db->write("delete from assetHistory where assetId=?",[$event]);
 		}
-		warn "Set parents on events";
+		#warn "Set parents on events";
 		
 		
 		# Remove the old asset
 		$asset->purge;
-		warn "Purged old calendar";
+		#warn "Purged old calendar";
 	}
 }
 
