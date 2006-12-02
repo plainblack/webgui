@@ -23,6 +23,9 @@ addWikiAssets($session);
 deleteOldFiles($session);
 addFileFieldsToDataForm($session);
 makeRSSFromParentAlwaysHidden($session);
+#addNewCalendar($session);
+#migrateCalendars($session);
+#removeOldCalendar($session);
 finish($session); # this line required
 
 #-------------------------------------------------
@@ -129,6 +132,176 @@ EOT
 				   );
 }
 
+
+sub addNewCalendar {
+	my $session	= shift;
+	print "\tCreating Calendar and Event tables.\n" unless $quiet;
+	
+	$session->db->write($_) for (<<'ENDSQL',
+CREATE TABLE `Event` (
+  `assetId` varchar(22) NOT NULL, 
+  `revisionDate` bigint(20) unsigned NOT NULL,
+  `feedId` varchar(22) default NULL,
+  `startDate` date default NULL,
+  `endDate` date default NULL,
+  `userDefined1` text,
+  `userDefined2` text,
+  `userDefined3` text,
+  `userDefined4` text,
+  `userDefined5` text,
+  `recurId` varchar(22) default NULL,
+  `description` longtext,
+  `startTime` time default NULL,
+  `endTime` time default NULL,
+  `relatedLinks` longtext,
+  `location` varchar(255) default NULL,
+  PRIMARY KEY  (`assetId`,`revisionDate`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8
+ENDSQL
+		<<'ENDSQL',
+CREATE TABLE `Calendar` (
+  `assetId` varchar(22) NOT NULL,
+  `revisionDate` bigint(20) unsigned NOT NULL default '0',
+  `defaultDate` enum('current','first','last') default "current",
+  `defaultView` enum('month','week','day') default "month",
+  `visitorCacheTimeout` int(11) unsigned default NULL,
+  `templateIdMonth` varchar(22) default "CalendarMonth000000001",
+  `templateIdWeek` varchar(22) default "CalendarWeek0000000001",
+  `templateIdDay` varchar(22) default "CalendarDay00000000001",
+  `templateIdEvent` varchar(22) default "CalendarEvent000000001",
+  `templateIdEventEdit` varchar(22) default "CalendarEventEdit00001",
+  `templateIdSearch` varchar(22) default "CalendarSearch00000001",
+  `templateIdPrintMonth` varchar(22) default "CalendarPrintMonth0001",
+  `templateIdPrintWeek` varchar(22) default "CalendarPrintWeek00001",
+  `templateIdPrintDay` varchar(22) default "CalendarPrintDay000001",
+  `templateIdPrintEvent` varchar(22) default "CalendarPrintEvent0001",
+  `groupIdEventEdit` varchar(22) default "3",
+  `groupIdSubscribed` varchar(22) default NULL,
+  `subscriberNotifyOffset` int(11) default NULL,
+  PRIMARY KEY  (`assetId`,`revisionDate`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8
+ENDSQL
+		<<'ENDSQL',
+CREATE TABLE `Event_recur` (
+  `recurId` varchar(22) NOT NULL,
+  `recurType` varchar(16) default NULL,
+  `pattern` varchar(255) default NULL,
+  `startDate` date default NULL,
+  `endDate` varchar(10) default NULL,
+  PRIMARY KEY  (`recurId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8
+ENDSQL
+		<<'ENDSQL',
+CREATE TABLE `Calendar_feeds` (
+  `feedId` varchar(22) NOT NULL,
+  `assetId` varchar(22) NOT NULL,
+  `url` varchar(255) NOT NULL,
+  `lastUpdated` int(16) default NULL,
+  `lastResult` varchar(255) default NULL,
+  `feedType` varchar(30) NOT NULL,
+  PRIMARY KEY  (`feedId`,`assetId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+ENDSQL
+);
+	
+	$session->config->addToArray('assets', 'WebGUI::Asset::Wobject::Calendar');
+}
+
+
+sub migrateCalendars {
+	my $session	= shift;
+	
+	print "\tMigrating EventsCalendar to Calendar wobjects.\n" unless $quiet;
+	use WebGUI::DateTime;
+	
+	# For every EventsCalendar
+	#EventsCalendar.defaultMonth = Calendar.defaultDate
+	my $calendars	= WebGUI::Asset->getRoot($session)->getLineage(['descendents'],
+		{
+			includeOnlyClasses	=> ['WebGUI::Asset::Wobject::EventsCalendar'],
+			returnObjects		=> 1,
+		});
+	
+	for my $asset (@{$calendars})
+	{
+		my $properties	= {%{$asset->get}};
+		$properties->{defaultDate}	= delete $properties->{defaultMonth};
+		warn "Found calendar ".$properties->{title};
+		$properties->{className}	= "WebGUI::Asset::Wobject::Calendar";
+		
+		
+		# Add the new asset
+		my $newAsset = $asset->getParent->addChild($properties);
+		warn "Added Calendar ".$newAsset->get("title")." ".$newAsset->get("className");
+		
+		# Get this calendar's events and change to new parent
+		my $events	= $asset->getLineage(['descendants'],
+			{
+				includeOnlyClasses	=> ['WebGUI::Asset::Event'],
+			});
+		warn "Got lineage";
+		
+		
+		# Set the new asset's rank
+		$newAsset->swapRank($asset->getRank);
+		warn "Swapped rank";
+		
+		
+		for my $event (@{$events})
+		{
+			warn "Got event: $event";
+			
+			# Add a child to the new calendar using the properties 
+			# from EventsCalendar_event
+			my %eventProperties = $session->db->quickHash("select * from asset left join assetData on asset.assetId=assetData.assetId left join EventsCalendar_event on asset.assetId = EventsCalendar_event.assetId where asset.assetId = ?",[$event]);
+			
+			my ($startDate, $startTime) = split / /, WebGUI::DateTime->new(delete $eventProperties{eventStartDate})->toMysql;
+			my ($endDate, $endTime) = split / /, WebGUI::DateTime->new(delete $eventProperties{eventEndDate})->toMysql;
+			
+			$eventProperties{startDate} 	= $startDate;
+			$eventProperties{startTime} 	= $startTime;
+			$eventProperties{endDate} 	= $endDate;
+			$eventProperties{endTime} 	= $endTime;
+			#use Data::Dumper;
+			#warn Dumper \%eventProperties;
+			
+			$newAsset->addChild(\%eventProperties);
+			
+			# Remove this event from the old calendar
+			#$session->db->write("delete from EventsCalendar_event where assetId=?",[$event]);
+			#$session->db->write("delete from asset where assetId=?",[$event]);
+			#$session->db->write("delete from assetData where assetId=?",[$event]);
+			#$session->db->write("delete from assetIndex where assetId=?",[$event]);
+			#$session->db->write("delete from assetHistory where assetId=?",[$event]);
+		}
+		warn "Set parents on events";
+		
+		
+		# Remove the old asset
+		$asset->purge;
+		warn "Purged old calendar";
+	}
+}
+
+
+sub removeOldCalendar {
+	my $session	= shift;
+	print "\tRemoving old EventsCalendar tables, templates, .\n" unless $quiet;
+	
+	# Remove tables
+	$session->db->write("drop table EventsCalendar");
+	$session->db->write("drop table EventsCalendar_event");
+	
+	# Remove Plainblack's EventsCalendar / Events templates
+	#PBtmpl0000000000000022
+	WebGUI::Asset->newByDynamicClass($session,"PBtmpl0000000000000022")->purge;
+	#PBtmpl0000000000000023
+	WebGUI::Asset->newByDynamicClass($session,"PBtmpl0000000000000023")->purge;
+	
+	$session->config->deleteFromArray("assets","WebGUI::Asset::Wobject::EventsCalendar");
+}
+
+
 # ---- DO NOT EDIT BELOW THIS LINE ----
 
 #-------------------------------------------------
@@ -175,7 +348,7 @@ sub updateTemplates {
 		my %properties = (className=>"WebGUI::Asset::Template");
 		while (my $line = <FILE>) {
 			if ($first) {
-				$line =~ m/^\#(.*)$/;
+				$line =~ m/^\#(.{0,22})$/;
 				$properties{id} = $1;
 				$first = 0;
 			} elsif ($line =~ m/^\#create$/) {
@@ -191,7 +364,7 @@ sub updateTemplates {
 			}
 		}
 		close(FILE);
-		if ($create) {
+		if ($create && !WebGUI::Asset->newByDynamicClass($session,$properties{id})) {
 			$newFolder = createNewTemplatesFolder($importNode) unless (defined $newFolder);
 			my $template = $newFolder->addChild(\%properties, $properties{id});
 		} else {

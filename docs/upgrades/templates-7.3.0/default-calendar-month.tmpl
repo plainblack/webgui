@@ -1,0 +1,388 @@
+#CalendarMonth000000001
+#create
+#namespace:Calendar/Month
+#url:default-calendar-month
+#title:Default Calendar Month
+#menuTitle:Default Calendar Month
+<tmpl_if admin>
+	<p><tmpl_var adminControls></p>
+</tmpl_if>
+
+<tmpl_if displayTitle>
+	<h1><tmpl_var title></h1>
+</tmpl_if>
+
+<tmpl_if description>
+	<tmpl_var description>
+</tmpl_if>
+
+<div id="calendar">
+	<!-- tabs -->
+	<div class="tabs">
+		<a href="<tmpl_var urlDay>">Day</a>
+		<a href="<tmpl_var urlWeek>">Week</a>
+		<a href="<tmpl_var urlMonth>">Month</a>
+		<a href="/<tmpl_var url>?func=search">Search</a>
+	</div>
+	
+	<!-- other actions -->
+	<div class="actions">
+		<tmpl_if editor><a href="/<tmpl_var url>?func=add;class=WebGUI::Asset::Event">Add Event</a></tmpl_if>
+		<!--&bull; <a href="#">Print</a>
+		&bull; <a href="#">Subscribe</a>-->
+	</div>
+	
+	
+	<div class="navigation">
+		<!-- previous year -->
+		<div class="previous"><a href="<tmpl_var pagePrevUrl>">&laquo; <tmpl_var pagePrevYear></a></div>
+	
+		<!-- next year -->
+		<div class="next"><a href="<tmpl_var pageNextUrl>"><tmpl_var pageNextYear>&raquo;</a></div>
+	
+	
+		<!-- months in this year -->
+		<ul class="months">
+		<tmpl_loop months>
+		<li>
+			<a href="<tmpl_var monthUrl>" class="<tmpl_if monthCurrent>current</tmpl_if>"><tmpl_var monthAbbr></a>
+		</li>
+		</tmpl_loop>
+		</ul>
+	</div>
+	
+	
+	<!-- banner -->
+	<h2><tmpl_var monthName> <tmpl_var year></h2>
+	
+	
+	<!-- the calendar table -->
+	<table id="month">
+		<!-- day names -->
+		<tr><tmpl_loop dayNames>
+			<th><tmpl_var dayName></th>
+		</tmpl_loop></tr>
+		
+		<!-- the grid -->
+		<tmpl_loop weeks><tr>
+		<tmpl_loop days><td><div class="<tmpl_if dayMonth>active</tmpl_if><tmpl_if dayCurrent> current</tmpl_if>">
+			<tmpl_if dayMonth>
+			<a class="number" href="<tmpl_var dayUrl>"><tmpl_var dayMonth></a>
+
+			<tmpl_if events>
+			<ul class="events"><tmpl_loop events>
+				<li><a href="/<tmpl_var eventUrl>">
+					<tmpl_var eventMenuTitle>
+				</a></li>
+			</tmpl_loop></ul>			
+			<a href="#" onmouseover="DelayedRollover.showPopup('more<tmpl_var dayMonth>')" onmouseout="DelayedRollover.hidePopup('more<tmpl_var dayMonth>')" class="moreButton" onclick="return false;">
+				<img src="/extras/wobject/Calendar/images/more.gif" />
+			</a>
+			<div style="display: none" id="more<tmpl_var dayMonth>" class="moreDisplay" onmouseover="DelayedRollover.showPopup('more<tmpl_var dayMonth>')" onmouseout="DelayedRollover.hidePopup('more<tmpl_var dayMonth>')" >
+			<tmpl_loop events>
+			<a href="/<tmpl_var eventUrl>"><tmpl_var eventTitle></a><br/>
+			</tmpl_loop>
+			</div>
+			</tmpl_if> <!--/events-->
+			</tmpl_if> <!--/day-->
+		</div></td></tmpl_loop> <!--/days-->
+		</tr></tmpl_loop>
+	</table>
+</div>
+
+~~~
+<script type="text/javascript">
+// Delayed rollovers
+// From: http://www.pjhyett.com/articles/2006/07/05/timeout-your-mouseovers
+// Modified by: Doug Bell
+var DelayedRollover = {
+    timeout : new Array(),
+    showPopup : function(e){
+	element = document.getElementById(e);
+        clearTimeout(this.timeout[e]);
+        if(element.style.display == 'none'){
+            this.timeout[e] = setTimeout(function(){element.style.display="block"},10);
+        }
+    },
+    hidePopup : function(e){
+	element = document.getElementById(e);
+         if(element.style.display == 'none'){
+            clearTimeout(this.timeout[e]);
+        }else{
+            this.timeout[e] = setTimeout(function(){element.style.display="none"},10);
+        }
+    }    
+}
+</script>
+<style type="text/css">
+body * 
+{
+	margin:			0px;
+}
+
+#calendar *	
+{
+	/* Override any defaults that mess up our template */
+}
+
+#calendar
+{
+	width:			630px;
+}
+
+
+
+/**** DEFAULTS ****/
+#calendar td 
+{
+	font-size:		10px;
+	font-family:		Arial, sans-serif;
+}
+
+#calendar a 
+{
+	font-size:		11px;
+	color:			#517AC8;
+}
+
+#calendar h2 
+{
+	text-align:		center;
+	margin: 		2px 0px;
+	background-color:	#517AC8;
+	color:			white;
+	font-size:		14px;
+	font-weight:		bold;
+}
+
+
+/**** Tabs ****/
+#calendar .tabs
+{
+	list-style:		none;
+	float:			left;
+	text-align:		left;
+	margin:			0px;
+	padding:		0px;
+}
+
+#calendar .tabs a
+{	
+	-moz-border-radius-topLeft:	10px;
+	-moz-border-radius-topRight:	10px;
+	display:		block;
+	float:			left;
+	margin-right:		5px;
+	padding: 		2px 15px 0px 15px;
+	border-bottom-style:	none;
+	background-color:	#E9ECF3;
+	color:			#7588B5;
+	font-weight:		bold;
+	font-size:		10pt;
+	text-align:		center;
+	text-decoration:	none;
+}
+
+#calendar .tabs a:hover 
+{
+	color:			black;
+}
+
+
+/**** Actions ****/
+#calendar .actions
+{
+	float:			right;
+	vertical-align:		bottom;
+}
+
+
+/**** Navigation ****/
+#calendar .navigation 
+{
+	clear:			both;
+	text-align:		center;
+	background-color:	#DFE3EE;
+	padding:		3px 0px;		
+}
+
+#calendar .navigation .previous
+{
+	float:			left;
+}
+
+#calendar .navigation .next
+{
+	float:			right;
+}
+
+#calendar .navigation ul 
+{
+	list-style:		none;
+	margin:			0px;
+	padding:		0px;
+}
+
+#calendar .navigation li
+{
+	display:		inline;
+	margin:			0px;
+	padding:		0px;
+}
+
+#calendar .navigation a 
+{
+	text-decoration:	none;			
+	padding-left:		5px;
+	padding-right:		5px;
+	color:			#AAB8D5;
+	font-size:		12px;
+	font-weight:		bold;
+}	
+
+#calendar .navigation a.current, #calendar .navigation a:hover 
+{
+	-moz-border-radius:	5px;
+	font-weight:		bold;
+	color:			#517AC8;
+	background-color:	#fff;			
+}
+
+/**** Month view ****/
+/* Table */
+#calendar table#month
+{
+	z-index:		1;
+}
+
+#calendar table#month *
+{
+	padding:		0px;
+	margin:			0px;
+}
+
+#calendar table#month a
+{
+	text-decoration:	none;
+}
+
+#calendar table#month th
+{
+	-moz-box-sizing:border-box;
+	width:			85px;
+	background-color:	#517AC8;
+	text-align:		center;
+	font-weight:		bold;
+	color:			white;	
+}
+
+#calendar table#month div
+{
+	position:		relative;
+	width:			85px;
+	height:			85px;
+	margin:			0px;
+	background-color:	#E9ECF3;
+}
+
+#calendar table#month ul 
+{	
+	overflow:		hidden;
+}
+
+#calendar table#month .active 
+{
+	-moz-border-radius-topLeft:	8px;
+	-moz-border-radius-bottomLeft:	8px;
+	-moz-border-radius-bottomRight:	8px;
+	vertical-align:		top;		
+	background-color:	#CCD2E3;
+	border:			solid #CCD2E3 1px;
+}
+
+#calendar table#month .current 
+{
+	background-color:	#FFE4B3;
+	border-color:		orange;
+}
+
+#calendar table#month .number 
+{
+	-moz-border-radius-bottomLeft:5px;
+	display:		block;
+	position:		absolute;
+	top:			0px;
+	right:			0px;
+	height:			10px;
+	width:			10px;
+	background-color:	#516BA4;
+	color:			white;
+	text-align:		center;
+	vertical-align:		middle;
+	padding:		0px 3px 2px 2px;
+	font-weight:		bold;
+}
+
+#calendar table#month .current .number
+{
+	background-color:	orange;
+	color:			black;
+}
+
+#calendar table#month .events 
+{
+	padding:		3px;
+	padding-top:		8px;
+	font-weight:		bold;			
+}
+
+#calendar table#month .events a 
+{
+	color:			#4F4F4F;
+	text-decoration:	none;
+	font-size:		9px;
+}
+
+#calendar table#month .moreButton 
+{
+	border-style:		none;
+	position:		absolute;
+	bottom:			0px;
+	width:			100%;
+	height:			9px;
+	background-color:	#517AC8;	
+	font-size:		5px;
+	text-align:		center;
+	-moz-border-radius-bottomLeft:	8px;
+	-moz-border-radius-bottomRight:	8px;
+}
+
+#calendar table#month .moreButton img
+{
+	border:			none;
+}
+
+#calendar table#month .moreButton:hover
+{
+	background-color:	orange;
+}
+
+
+/* MORE STYLES */
+
+#calendar table#month .moreDisplay {
+position: absolute;
+left: 0px;
+top: 85px;
+border:solid orange 1px;
+border-top:solid orange 2px;
+font-family:arial;
+font-size:10px;
+width:300px;
+height: auto;
+padding:2px;
+background-color:#FFD3A8;
+z-index: 100;
+}
+* html body table#month td { position: relative; z-index: 1; }
+</style>
