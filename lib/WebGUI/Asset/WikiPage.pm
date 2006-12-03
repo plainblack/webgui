@@ -154,6 +154,36 @@ sub duplicate {
 
 
 #-------------------------------------------------------------------
+sub getEditForm {
+	my $self = shift;
+	my $i18n = WebGUI::International->new($self->session, "Asset_WikiPage");
+	my $newPage = 0;
+	my $wiki = $self->getWiki;
+	my $var = {
+		title=> $i18n->get("editing")." ".(defined($self->get('title'))? $self->get('title') : $i18n->get("assetName")),
+		formHeader => WebGUI::Form::formHeader($self->session, { action => $wiki->getUrl }) .WebGUI::Form::hidden($self->session, { name => 'func', value => 'editSave' }) .WebGUI::Form::hidden($self->session, { name => 'class', value => ref $self }),
+	 	formTitle => WebGUI::Form::text($self->session, { name => 'title', maxlength => 255, size => 40, value => $self->get('title') }),
+		formContent => WebGUI::Form::HTMLArea($self->session, { name => 'content', richEditId => $wiki->get('richEditor'), value => $self->get('content') }),
+		formSubmit => WebGUI::Form::submit($self->session, { value => 'Save' }),
+		formAttachment => '',
+		allowsAttachments => $wiki->get("maxAttachments"),
+		formFooter => WebGUI::Form::formFooter($self->session),
+		isNew => ($self->getId eq "new"),
+		canAdminister => $wiki->canAdminister,
+		titleLabel => $i18n->get("titleLabel"),
+		contentLabel => $i18n->get("contentLabel"),
+		protectLabel => $i18n->get("attachmentLabel"),
+		attachmentLabel => $i18n->get("attachmentLabel"),
+		unprotectLabel => $i18n->get("attachmentLabel"),
+		protectUrl => $self->get("func=protect"),
+		unprotectUrl => $self->get("func=unprotect"),
+		isProtected => $self->isProtected
+		};
+	$self->_appendFuncTemplateVars($var);
+	return $self->processTemplate($var, $wiki->getValue('pageEditTemplateId'));
+}
+
+#-------------------------------------------------------------------
 sub getStorageLocation {
 	my $self = shift;
 	unless (exists $self->{_storageLocation}) {
@@ -313,28 +343,7 @@ sub www_delete {
 sub www_edit {
 	my $self = shift;
 	return $self->session->privilege->insufficient unless $self->canEdit;
-
-	my $template = WebGUI::Asset::Template->new($self->session, $self->getWiki->get('pageEditTemplateId'));
-	my $var = {};
-	my $newPage = 0;
-	$template->prepare;
-	$var->{'form.header'} = WebGUI::Form::formHeader($self->session, { action => $self->getWiki->getUrl })
-		     .WebGUI::Form::hidden($self->session, { name => 'func', value => 'editSave' })
-		     .WebGUI::Form::hidden($self->session, { name => 'class', value => ref $self });
-	$var->{'form.title'} = WebGUI::Form::text
-	    ($self->session, { name => 'title', maxlength => 255,
-			       size => 40, value => $self->get('title') });
-	$var->{'form.content'} = WebGUI::Form::HTMLArea
-	    ($self->session, { name => 'content', richEditId => $self->getWiki->get('richEditor'),
-			       value => $self->get('content') });
-	$var->{'form.submit'} = WebGUI::Form::submit
-	    ($self->session, { value => 'Save' });
-	$var->{'form.footer'} = WebGUI::Form::formFooter($self->session);
-	$self->_appendFuncTemplateVars($var);
-
-	$var->{title} = "Editing ".(defined($self->get('title'))? $self->get('title') : 'new page');
-
-	return $self->getWiki->processStyle( $self->processPageTemplate($self->processTemplate($var, undef, $template), 'edit'));
+	return $self->getEditForm;
 }
 
 #-------------------------------------------------------------------
@@ -356,7 +365,6 @@ sub www_protect {
 	my $self = shift;
 	return $self->session->privilege->insufficient unless $self->canProtect;
 	return $self->www_view if $self->isProtected;
-
 	$self->session->db->write("DELETE FROM WikiPage_protected WHERE assetId = ?", [$self->getId]);
 	$self->session->db->write("INSERT INTO WikiPage_protected (assetId) VALUES (?)", [$self->getId]);
 	$self->{_isProtected} = 1;
@@ -369,7 +377,6 @@ sub www_unprotect {
 	my $self = shift;
 	return $self->session->privilege->insufficient unless $self->canProtect;
 	return $self->www_view if !$self->isProtected;
-
 	$self->session->db->write("DELETE FROM WikiPage_protected WHERE assetId = ?", [$self->getId]);
 	$self->{_isProtected} = 0;
 	$self->updateWikiHistory('unprotected');

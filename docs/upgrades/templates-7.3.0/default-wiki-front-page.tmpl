@@ -9,11 +9,11 @@
 <tmpl_if displayTitle><h2><tmpl_var title></h2></tmpl_if>
 
 <tmpl_var description>
-<h3>Search</h3>
-<tmpl_var searchFormHeader>Search: <tmpl_var searchQuery><tmpl_var searchSubmit><tmpl_var searchFormFooter>
+<h3><tmpl_var searchLabel></h3>
+<tmpl_var searchFormHeader><tmpl_var searchQuery><tmpl_var searchSubmit><tmpl_var searchFormFooter>
 <br />
 
-<div style="float: left;">
+<div style="float: left; width: 50%;">
 	<h3><a href="<tmpl_var recentChangesUrl>"><tmpl_var recentChangesLabel></a></h3>
 	<ul><tmpl_loop recentChangesLoop>
 		<li><a href="<tmpl_var url>"><tmpl_var title></a></li>

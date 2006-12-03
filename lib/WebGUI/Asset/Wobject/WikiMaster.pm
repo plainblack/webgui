@@ -67,31 +67,13 @@ sub _appendSearchBoxVars {
 	my $self = shift;
 	my $var = shift;
 	my $queryText = shift;
-	my $submitText = WebGUI::International->new($self->session, 'Asset_WikiMaster')->get('search submit');
-
+	my $submitText = WebGUI::International->new($self->session, 'Asset_WikiMaster')->get('searchLabel');
 	$var->{'searchFormHeader'} = join '',
-	    (WebGUI::Form::formHeader($self->session, { action => $self->getUrl, method => 'GET' }),
+	    (WebGUI::Form::formHeader($self->session, { action => $self->getUrl}),
 	     WebGUI::Form::hidden($self->session, { name => 'func', value => 'search' }));
 	$var->{'searchQuery'} = WebGUI::Form::text($self->session, { name => 'query', value => $queryText });
 	$var->{'searchSubmit'} = WebGUI::Form::submit($self->session, { value => $submitText });
 	$var->{'searchFormFooter'} = WebGUI::Form::formFooter($self->session);
-	return $self;
-}
-
-#-------------------------------------------------------------------
-sub _appendSearchResultVars {
-	my $self = shift;
-	my $var = shift;
-	my $rs = shift;
-	my @results = ();
-	my $dt = $self->session->datetime;
-
-	while (defined(my $row = $rs->hashRef)) {
-		push @results, $self->_templateSubvarOfPage($row->{assetId});
-	}
-
-	$var->{'searchResults'} = \@results;
-
 	return $self;
 }
 
@@ -377,6 +359,13 @@ sub definition {
 				   hoverHelp => $i18n->get('searchTemplateId hoverHelp'),
 				   label => $i18n->get('searchTemplateId label') },
 
+	     pageEditTemplateId => { fieldType => 'template',
+				   namespace => 'WikiPage_edit',
+				   defaultValue => 'WikiPageEditTmpl000001',
+				   tab => 'display',
+				   hoverHelp => $i18n->get('pageEditTemplateId hoverHelp'),
+				   label => $i18n->get('pageEditTemplateId label') },
+
 	     recentChangesCount => { fieldType => 'integer',
 				     defaultValue => 50,
 				     tab => 'display',
@@ -481,9 +470,16 @@ sub updateTitleIndex {
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
-	my $var = {};
+	my $i18n = WebGUI::International->new($self->session, "Asset_WikiMaster");
+	my $var = {
+		description => $self->autolinkHtml($self->get('description')),
+		searchLabel=>$i18n->get("searchLabel"),	
+		mostPopularUrl=>$self->getUrl("func=mostPopular"),
+		mostPopularLabel=>$i18n->get("mostPopularLabel"),
+		recentChangesUrl=>$self->getUrl("func=recentChanges"),
+		recentChangesLabel=>$i18n->get("recentChangesLabel"),
+		};
 	my $template = $self->{_frontPageTemplate};
-	$var->{'description'} = $self->autolinkHtml($self->get('description'));
 	$self->_appendSearchBoxVars($var);
 	$self->_appendRecentChangesVars($var, [0, $self->get('recentChangesCountFront')]);
 	$self->_appendFuncTemplateVars($var, qw/recentChanges/);
@@ -505,7 +501,19 @@ sub www_recentChanges {
 #-------------------------------------------------------------------
 sub www_search {
 	my $self = shift;
-	my $var = {};
+	my $i18n = WebGUI::International->new($self->session, "Asset_WikiMaster");
+	my $var = {
+		resultsLabel=>$i18n->get("resultsLabel"),
+		notWhatYouWanted=>$i18n->get("notWhatYouWantedLabel"),
+		nothingFoundLabel=>$i18n->get("nothingFoundLabel"),
+		addPageLabel=>$i18n->get("addPageLabel"),
+		wikiHomeLabel=>$i18n->get("wikiHomeLabel"),
+		searchLabel=>$i18n->get("searchLabel"),	
+		recentChangesUrl=>$self->getUrl("func=recentChanges"),
+		recentChangesLabel=>$i18n->get("recentChangesLabel"),
+		wikiHomeUrl=>$self->getUrl,
+		getEditFormUrl=>$self->getUrl("func=add;class=WebGUI::Asset::WikiPage"),
+		};
 	my $queryString = $self->session->form->process('query', 'text');
 	$self->_appendSearchBoxVars($var, $queryString);
 	if (length $queryString) {
@@ -514,12 +522,14 @@ sub www_search {
 				  lineage => [$self->get('lineage')],
 				  classes => ['WebGUI::Asset::WikiPage'] });
 		my $rs = $search->getResultSet;
-		$self->_appendSearchResultVars($var, $rs);
+		my @results = ();
+		while (defined(my $row = $rs->hashRef)) {
+			push @results, $self->_templateSubvarOfPage($row->{assetId});
+		}
+		$var->{'searchResults'} = \@results;
+		$var->{'performSearch'} = 1;
 	}
-	$var->{title} = WebGUI::International->new($self->session, 'Asset_WikiMaster')->get('search title');
-	my $template = WebGUI::Asset::Template->new($self->session, $self->get('searchTemplateId'));
-	$template->prepare;
-	return $self->processStyle($self->processTemplate($var, undef, $template));
+	return $self->processStyle($self->processTemplate($var, $self->get('searchTemplateId')));
 }
 
 1;

@@ -5,6 +5,15 @@ our $I18N =
  'assetName' =>
  { lastUpdated => 1160157064, message => 'Wiki' },
 
+		mostPopularLabel => {message=>q|Most Popular|, lastUpdated=>0},
+		recentChangesLabel => {message=>q|Recent Changes|, lastUpdated=>0},
+		searchLabel=>{message=>q|Search|, lastUpdated=>0},	
+		resultsLabel=>{message=>q|Results|, lastUpdated=>0},
+		notWhatYouWanted=>{message=>q|Didn't find what you were looking for?|, lastUpdated=>0},
+		nothingFoundLabel=>{message=>q|Your search returned no results.|, lastUpdated=>0},
+		addPageLabel=>{message=>q|Add a new page.|, lastUpdated=>0},
+		wikiHomeLabel=>{message=>q|Wiki Home|, lastUpdated=>0},
+
         'approval workflow description' => {
                 message => q|Choose a workflow to be executed on each page as it gets submitted.|,
                 lastUpdated => 0,
@@ -54,10 +63,10 @@ our $I18N =
  'richEditor label' =>
  { lastUpdated => 1160157064, message => q|Rich Editor| },
 
- 'pageTemplateId hoverHelp' =>
- { lastUpdated => 1160157064, message => q|Which template to use to display pages.| },
- 'pageTemplateId label' =>
- { lastUpdated => 1160157064, message => q|Page Template| },
+ 'pageTemplateId hoverHelp' => { lastUpdated => 1160157064, message => q|Which template to use to display pages?| },
+ 'pageTemplateId label' => { lastUpdated => 1160157064, message => q|Page Template| },
+ 'pageEditTemplateId hoverHelp' => { lastUpdated => 1160157064, message => q|Which template to use to edit pages?| },
+ 'pageEditTemplateId label' => { lastUpdated => 1160157064, message => q|Page Edit Template| },
 
  'frontPageTemplateId hoverHelp' =>
  { lastUpdated => 1161031607, message => q|Which template to use for the front page.| },
@@ -112,12 +121,6 @@ our $I18N =
  'actionN created' =>
  { lastUpdated => 1160505291, message => q|Created| },
 
- 'recentChanges title' =>
- { lastUpdated => 1161116593, message => q|Recent changes| },
- 'search submit' =>
- { lastUpdated => 1161031607, message => q|Search| },
- 'search title' =>
- { lastUpdated => 1161031607, message => q|Search| },
 };
 
 1;
