@@ -521,10 +521,12 @@ sub www_search {
 		$search->search({ keywords => $queryString,
 				  lineage => [$self->get('lineage')],
 				  classes => ['WebGUI::Asset::WikiPage'] });
-		my $rs = $search->getResultSet;
+		my $rs = $search->getPaginatorResultSet;
+		$rs->appendTemplateVars($var);
 		my @results = ();
-		while (defined(my $row = $rs->hashRef)) {
-			push @results, $self->_templateSubvarOfPage($row->{assetId});
+		foreach my $row (@{$rs->getPageData}) {
+			$row->{url} = $self->session->url->gateway($row->{url});
+			push @results, $row;
 		}
 		$var->{'searchResults'} = \@results;
 		$var->{'performSearch'} = 1;

@@ -156,18 +156,22 @@ sub duplicate {
 #-------------------------------------------------------------------
 sub getEditForm {
 	my $self = shift;
-	my $i18n = WebGUI::International->new($self->session, "Asset_WikiPage");
+	my $session = $self->session;
+	my $form = $session->form;
+	my $i18n = WebGUI::International->new($session, "Asset_WikiPage");
 	my $newPage = 0;
 	my $wiki = $self->getWiki;
 	my $var = {
 		title=> $i18n->get("editing")." ".(defined($self->get('title'))? $self->get('title') : $i18n->get("assetName")),
-		formHeader => WebGUI::Form::formHeader($self->session, { action => $wiki->getUrl }) .WebGUI::Form::hidden($self->session, { name => 'func', value => 'editSave' }) .WebGUI::Form::hidden($self->session, { name => 'class', value => ref $self }),
-	 	formTitle => WebGUI::Form::text($self->session, { name => 'title', maxlength => 255, size => 40, value => $self->get('title') }),
-		formContent => WebGUI::Form::HTMLArea($self->session, { name => 'content', richEditId => $wiki->get('richEditor'), value => $self->get('content') }),
-		formSubmit => WebGUI::Form::submit($self->session, { value => 'Save' }),
+		formHeader => WebGUI::Form::formHeader($session, { action => $wiki->getUrl }) 
+			.WebGUI::Form::hidden($session, { name => 'func', value => 'editSave' }) 
+			.WebGUI::Form::hidden($session, { name=>"proceed", value=>$form->process("proceed") }),
+	 	formTitle => WebGUI::Form::text($session, { name => 'title', maxlength => 255, size => 40, value => $self->get('title') }),
+		formContent => WebGUI::Form::HTMLArea($session, { name => 'content', richEditId => $wiki->get('richEditor'), value => $self->get('content') }),
+		formSubmit => WebGUI::Form::submit($session, { value => 'Save' }),
 		formAttachment => '',
 		allowsAttachments => $wiki->get("maxAttachments"),
-		formFooter => WebGUI::Form::formFooter($self->session),
+		formFooter => WebGUI::Form::formFooter($session),
 		isNew => ($self->getId eq "new"),
 		canAdminister => $wiki->canAdminister,
 		titleLabel => $i18n->get("titleLabel"),
@@ -179,6 +183,10 @@ sub getEditForm {
 		unprotectUrl => $self->get("func=unprotect"),
 		isProtected => $self->isProtected
 		};
+	if ($self->getId eq "new") {
+		$var->{formHeader} .= WebGUI::Form::hidden($session, { name=>"assetId", value=>"new" }) 
+			.WebGUI::Form::hidden($session, { name=>"class", value=>$form->process("class","className") });
+	}
 	$self->_appendFuncTemplateVars($var);
 	return $self->processTemplate($var, $wiki->getValue('pageEditTemplateId'));
 }
@@ -265,7 +273,8 @@ sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost(@_);
 	$self->update({ groupIdView => $self->getWiki->get('groupIdView'),
-			groupIdEdit => $self->getWiki->get('groupIdEdit') });
+			groupIdEdit => $self->getWiki->get('groupToAdminister'),
+			 isHidden => 1});
 	$self->getWiki->updateTitleIndex([$self], from => 'edit');
 	delete $self->{_storageLocation};
 	my $size = 0;
@@ -325,9 +334,21 @@ sub updateWikiHistory {
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
-	my $var = {};
-	my $content = $self->getWiki->autolinkHtml($self->get('content'));
-	return $self->processPageTemplate($content, 'view');
+	my $i18n = WebGUI::International->new($self->session, "Asset_WikiPage");
+	my $var = {
+		viewLabel => $i18n->get("viewLabel"),
+		editLabel => $i18n->get("editLabel"),
+		historyLabel => $i18n->get("historyLabel"),
+		wikiHomeLabel=>$i18n->get("wikiHomeLabel", "Asset_WikiMaster"),
+		searchLabel=>$i18n->get("searchLabel", "Asset_WikiMaster"),	
+		recentChangesUrl=>$self->getUrl("func=recentChanges"),
+		recentChangesLabel=>$i18n->get("recentChangesLabel", "Asset_WikiMaster"),
+		wikiHomeUrl=>$self->getUrl,
+		historyUrl=>$self->getUrl("func=getHistory"),
+		editUrl=>$self->getUrl("func=getEditForm"),
+		content => $self->getWiki->autolinkHtml($self->get('content')),	
+		};
+	return $self->processTemplate($var, $self->getWiki->get("pageTemplateId"));
 }
 
 #-------------------------------------------------------------------
@@ -340,24 +361,28 @@ sub www_delete {
 }
 
 #-------------------------------------------------------------------
+# here to keep backward compatibility with traditional editing
 sub www_edit {
+	my $self = shift;
+	return $self->session->privilege->insufficient unless $self->canEdit;
+	return $self->getWiki->processStyle($self->getEditForm);
+}
+
+#-------------------------------------------------------------------
+sub www_getEditForm {
 	my $self = shift;
 	return $self->session->privilege->insufficient unless $self->canEdit;
 	return $self->getEditForm;
 }
 
 #-------------------------------------------------------------------
-sub www_pageHistory {
+sub www_getHistory {
 	my $self = shift;
-	my $template = WebGUI::Asset::Template->new($self->session, $self->getWiki->get('pageHistoryTemplateId'));
-	$template->prepare;
-
 	# Buggo: hardcoded count
 	my $var = {};
 	$var->{title} = sprintf(WebGUI::International->new($self->session, 'Asset_WikiPage')->get('pageHistory title'), $self->get('title'));
 	$self->getWiki->_appendPageHistoryVars($var, [0, 50], $self);
-
-	return $self->getWiki->processStyle($self->processPageTemplate($self->processTemplate($var, undef, $template), 'pageHistory'));
+	return $self->processTemplate($var, $self->getWiki->get('pageHistoryTemplateId'));
 }
 
 #-------------------------------------------------------------------
@@ -370,6 +395,20 @@ sub www_protect {
 	$self->{_isProtected} = 1;
 	$self->updateWikiHistory('protected');
 	return $self->www_view;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_showConfirmation ( )
+
+Shows a confirmation message letting the user know their page has been submitted.
+
+=cut
+
+sub www_showConfirmation {
+	my $self = shift;
+	my $i18n = WebGUI::International->new($self->session, "Asset_WikiPage");
+	return $self->getWiki->processStyle('<p>'.$i18n->get("page received").'</p><p><a href="'.$self->getWiki->getUrl.'">'.$i18n->get("493","WebGUI").'</a></p>');
 }
 
 #-------------------------------------------------------------------

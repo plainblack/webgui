@@ -13,7 +13,12 @@
 	<h3><tmpl_var resultsLabel></h3>
 	<tmpl_if searchResults>
 		<ul><tmpl_loop searchResults><li><a href="<tmpl_var url>"><tmpl_var title></a></li></tmpl_loop></ul>
-		<p><tmpl_var notWhatYouWanted></p>
+		<tmpl_if pagination.pageCount.isMultiple>
+		<div class="pagination">
+			<tmpl_var pagination.previousPage> &#183; <tmpl_var pagination.pageList.upTo10> &#183; <tmpl_var pagination.nextPage>
+		</div>
+		</tmpl_if>
+	<p><tmpl_var notWhatYouWanted></p>
 		<p><a href="javascript:wiki_getAddForm('<tmpl_var getEditFormUrl>');"><tmpl_var addPageLabel></a></p>
 	<tmpl_else>
 		<p><tmpl_var nothingFoundLabel></p>
@@ -22,6 +27,7 @@
 </tmpl_if>
 <div id="addFormGoesHere" style="display: none;"></div>
 <div style="padding: 8px;"><a href="<tmpl_var recentChangesUrl>"><tmpl_var recentChangesLabel></a> | <a href="<tmpl_var wikiHomeUrl>"><tmpl_var wikiHomeLabel></a></div>
+
 ~~~
 <script type="text/javascript" src="^Extras(yui/build/yahoo/yahoo-min.js);"></script>
 <script type="text/javascript" src="^Extras(yui/build/connection/connection-min.js);"></script>

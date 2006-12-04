@@ -8,6 +8,7 @@ our $I18N =
  'editing' => { lastUpdated => 1160157064, message => 'Editing' },
  'assetName' => { lastUpdated => 1160157064, message => 'Wiki Page' },
 
+ 'page received' => { lastUpdated => 1160157064, message => q|Your page has been received and is being processed so it can be added to the site. It will be available for further editing after being processed. Please be patient.| },
  'editLabel' => { lastUpdated => 1160157064, message => q|Edit| },
  'viewLabel' => { lastUpdated => 1160157064, message => q|View| },
  'historyLabel' => { lastUpdated => 1160425002, message => q|History| },
