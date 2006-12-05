@@ -50,6 +50,12 @@ sub addSessionVars {
 					:$forms->{$field};
 		}
 	}
+        my $scratch = $self->session->scratch->{_data};
+        foreach my $field (keys %$scratch) {
+                if ($scratch->{$field}) {
+                        $vars->{"session.scratch.".$field} = $scratch->{$field};
+                }
+        }
 	$vars->{"webgui.version"} = $WebGUI::VERSION;
 	$vars->{"webgui.status"} = $WebGUI::STATUS;
 	return $vars;
