@@ -213,11 +213,11 @@ sub appendMostPopular {
 	my $self = shift;
 	my $var = shift;
 	my $limit = shift || $self->get("mostPopularCount");
-	my $rs = $self->session->db->read("select asset.assetId, assetData.revisionDate from assetData left join asset on  assetData.assetId=asset.assetId 
-		left join WikiPage on WikiPage.assetId=assetData.assetId and WikiPage.revisionDate=assetData.revisionDate 
-		where lineage like ? and lineage<>?  order by views limit ?", [$self->get("lineage").'%', $self->get("lineage"), $limit]);
-	while (my ($id, $version) = $rs->array) {
-		my $asset = WebGUI::Asset->new($self->session, $id, "WebGUI::Asset::WikiPage", $version);
+	my $rs = $self->session->db->read("select distinct(asset.assetId) from asset left join WikiPage on WikiPage.assetId=asset.assetId 
+		where lineage like ? and lineage<>? and revisionDate = (select max(revisionDate) from WikiPage where assetId = asset.assetId)
+		order by views desc limit ?", [$self->get("lineage").'%', $self->get("lineage"),  $limit]);
+	while (my ($id) = $rs->array) {
+		my $asset = WebGUI::Asset->new($self->session, $id, "WebGUI::Asset::WikiPage");
 		push(@{$var->{mostPopular}}, {
 			title=>$asset->getTitle,
 			url=>$asset->getUrl,
@@ -231,14 +231,14 @@ sub appendRecentChanges {
 	my $var = shift;
 	my $limit = shift || $self->get("recentChangesCount");
 	my $rs = $self->session->db->read("select asset.assetId, revisionDate from assetData left join asset on assetData.assetId=asset.assetId where
-		lineage like ? and lineage<>? order by revisionDate limit ?", [$self->get("lineage").'%', $self->get("lineage"), $self->get("recentChangesCount")]);
+		lineage like ? and lineage<>? order by revisionDate desc limit ?", [$self->get("lineage").'%', $self->get("lineage"), $self->get("recentChangesCount")]);
 	while (my ($id, $version) = $rs->array) {
 		my $asset = WebGUI::Asset->new($self->session, $id, "WebGUI::Asset::WikiPage", $version);
 		my $user = WebGUI::User->new($self->session, $asset->get("actionTakenBy"));
 		push(@{$var->{recentChanges}}, {
 			title=>$asset->getTitle,
 			url=>$asset->getUrl,
-			actionTaken=>$asset->get("lastAction"),
+			actionTaken=>$asset->get("actionTaken"),
 			username=>$user->username,
 			date=>$self->session->datetime->epochToHuman($asset->get("revisionDate"))
 			});
@@ -249,18 +249,14 @@ sub appendRecentChanges {
 sub autolinkHtml {
 	my $self = shift;
 	my $html = shift;
-
 	# TODO: ignore caching for now, but maybe do it later.
-	my %mapping = $self->session->db->buildHash("SELECT LOWER(i.title), d.url FROM WikiMaster_titleIndex AS i INNER JOIN assetData AS d ON i.pageId = d.assetId WHERE i.assetId = ?", [$self->getId]);
+	my %mapping = $self->session->db->buildHash("SELECT LOWER(d.title), d.url FROM asset AS i INNER JOIN assetData AS d ON i.assetId = d.assetId WHERE i.parentId = ? and className='WebGUI::Asset::WikiPage'", [$self->getId]);
 	return $html unless %mapping;
-
 	foreach my $key (keys %mapping) {
 		$mapping{$key} = WebGUI::HTML::format('/'.$mapping{$key}, 'text');
 	}
-
 	my $matchString = join('|', map{quotemeta} keys %mapping);
 	my $regexp = qr/\b($matchString)\b/i;
-
 	my @acc = ();
 	my $in_a = 0;
 	my $p = HTML::Parser->new;
@@ -285,7 +281,6 @@ sub autolinkHtml {
 	$p->parse($html);
 	$p->eof;
 	undef $p;		# Just in case there might be reference loops.
-
 	return join '', @acc;
 }
 
@@ -478,19 +473,6 @@ sub purge {
 }
 
 #-------------------------------------------------------------------
-sub updateTitleIndex {
-	my $self = shift;
-	my @pages = @{+shift};
-	my %opts = @_;
-	return unless @pages;
-	$self->session->db->write("DELETE FROM WikiMaster_titleIndex WHERE assetId = ? AND pageId IN (".join(', ', ('?') x @pages).")", [$self->getId, map{$_->getId} @pages]);
-	foreach my $page (@pages) {
-		my ($pageId, $title) = ($page->getId, $page->get('title'));
-		$self->session->db->write("INSERT INTO WikiMaster_titleIndex (assetId, pageId, title) VALUES (?, ?, ?)", [$self->getId, $pageId, $title]);
-	}
-}
-
-#-------------------------------------------------------------------
 sub view {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session, "Asset_WikiMaster");
@@ -516,17 +498,16 @@ sub www_mostPopular {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session, "Asset_WikiMaster");
 	my $var = {
-		resultsLabel=>$i18n->get("resultsLabel"),
-		title => WebGUI::International->new($self->session, 'Asset_WikiMaster')->get('recentChanges title'),
+		title => $i18n->get('mostPopularLabel'),
+		recentChangesUrl=>$self->getUrl("func=recentChanges"),
+		recentChangesLabel=>$i18n->get("recentChangesLabel"),
 		wikiHomeLabel=>$i18n->get("wikiHomeLabel"),
 		searchLabel=>$i18n->get("searchLabel"),	
 		searchUrl=>$self->getUrl("func=search"),
-		recentChangesUrl=>$self->getUrl("func=recentChanges"),
-		recentChangesLabel=>$i18n->get("recentChangesLabel"),
 		wikiHomeUrl=>$self->getUrl,
 		};
 	$self->appendMostPopular($var);
-	return $self->processStyle($self->processTemplate($var, $self->get('recentChangesTemplateId')));
+	return $self->processStyle($self->processTemplate($var, $self->get('mostPopularTemplateId')));
 }
 
 #-------------------------------------------------------------------
@@ -534,8 +515,7 @@ sub www_recentChanges {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session, "Asset_WikiMaster");
 	my $var = {
-		resultsLabel=>$i18n->get("resultsLabel"),
-		title => WebGUI::International->new($self->session, 'Asset_WikiMaster')->get('recentChanges title'),
+		title => $i18n->get('recentChangesLabel'),
 		wikiHomeLabel=>$i18n->get("wikiHomeLabel"),
 		searchLabel=>$i18n->get("searchLabel"),	
 		searchUrl=>$self->getUrl("func=search"),

@@ -93,14 +93,6 @@ EOT
     PRIMARY KEY (`assetId`, `revisionDate`)
   ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 EOT
-				    <<'EOT',
-  CREATE TABLE `WikiMaster_titleIndex` (
-    `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
-    `pageId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
-    `title` varchar(255) NOT NULL,
-    PRIMARY KEY (`assetId`, `pageId`)
-  ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-EOT
 				   );
 
 	$session->config->addToArray('assets', 'WebGUI::Asset::Wobject::WikiMaster');

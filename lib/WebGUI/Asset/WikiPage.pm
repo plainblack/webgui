@@ -255,7 +255,6 @@ sub processPropertiesFromFormPost {
 	if ($self->canAdminister) {
 		$self->update({isProtected => $self->session->form("isProtected")});
 	}
-	$self->getWiki->updateTitleIndex([$self], from => 'edit');
 	delete $self->{_storageLocation};
 	my $size = 0;
         my $storage = $self->getStorageLocation;
@@ -290,17 +289,8 @@ sub processPropertiesFromFormPost {
 #-------------------------------------------------------------------
 sub purge {
 	my $self = shift;
-	$self->getWiki->updateTitleIndex([$self], from => 'purge');
-	$self->session->db->write("DELETE FROM WikiPage_protected WHERE assetId = ?", [$self->getId]);
-	$self->session->db->write("DELETE FROM WikiPage_extraHistory WHERE assetId = ?", [$self->getId]);
+	$self->session->db->write("DELETE FROM WikiMaster_titleIndex WHERE assetId = ?", [$self->getId]);
 	return $self->SUPER::purge;
-}
-
-#-------------------------------------------------------------------
-sub purgeRevision {
-	my $self = shift;
-	$self->getWiki->updateTitleIndex([$self], from => 'purgeRevision');
-	return $self->SUPER::purgeRevision;
 }
 
 #-------------------------------------------------------------------
@@ -313,6 +303,7 @@ sub view {
 		historyLabel => $i18n->get("historyLabel"),
 		wikiHomeLabel=>$i18n->get("wikiHomeLabel", "Asset_WikiMaster"),
 		searchLabel=>$i18n->get("searchLabel", "Asset_WikiMaster"),	
+		searchUrl=>$self->getParent->getUrl("func=search"),
 		recentChangesUrl=>$self->getParent->getUrl("func=recentChanges"),
 		recentChangesLabel=>$i18n->get("recentChangesLabel", "Asset_WikiMaster"),
 		mostPopularUrl=>$self->getParent->getUrl("func=mostPopular"),
