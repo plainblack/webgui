@@ -39,6 +39,7 @@
    columns to return.
  - WebGUI::TabForm->addTab now returns the WebGUI::HTMLForm created.
  - WebGUI::AssetLineage::getLineage can now limit the number of records returned
+ - fix: IP addresses for adminModeSubnets not using X-Forwarded-For properly
 
 7.2.3
  - fix: minor bug with new template vars in Auth::createAccount
