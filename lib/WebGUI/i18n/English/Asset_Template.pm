@@ -280,6 +280,14 @@ If there is more than 1 value in a form variable, only the last will be returned
 		lastUpdated => 1148951191,
 	},
 
+	'session scratch variables' => {
+		message => q|<b>Session Scratch Variables</b><br />
+Any scratch variables will be available in the template with this syntax:<br/>
+&lt;tmpl_var session.scratch.<i>variable</i>&gt;<br />
+|,
+		lastUpdated => 1165343240,
+	},
+
 	'template variable body' => {
 		message => q|
 <p>These variables are available in any template, regardless of its type

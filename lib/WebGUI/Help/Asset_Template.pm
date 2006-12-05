@@ -84,7 +84,10 @@ our $HELP = {
 			  },
 			  {
 			    'name' => 'session form variables'
-			  }
+			  },
+			  {
+			    'name' => 'session scratch variables'
+			  },
 		],
 		related => [
 		]
