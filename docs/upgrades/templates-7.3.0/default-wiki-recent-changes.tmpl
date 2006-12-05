@@ -4,16 +4,11 @@
 #url:default-wiki-recent-changes
 #title:Default Recent Changes
 #menuTitle:Default Recent Changes
-<tmpl_if session.var.adminOn><p><tmpl_var controls></p></tmpl_if>
-<tmpl_if displayTitle><h2><tmpl_var title></h2></tmpl_if>
+<h2><tmpl_var title></h2>
 
-
-<tmpl_loop rcDays>
-<h3><tmpl_var dayDate></h3>
-<ul><tmpl_loop dayEntries>
-<li><tmpl_var date> <tmpl_var time>: <a href="<tmpl_var viewLatest>"><tmpl_var title></a>
-<tmpl_var actionTakenLowerCase> by <tmpl_var username></li>
+<ul><tmpl_loop recentChanges>
+<li><a href="<tmpl_var url>"><tmpl_var title></a> <tmpl_var actionTaken> on <tmpl_var date> by <tmpl_var username></li>
 </tmpl_loop></ul>
-</tmpl_loop>
-<div style="padding: 8px;"><a href="<tmpl_var searchUrl>"><tmpl_var searchLabel></a> | <a href="<tmpl_var recentChangesUrl>"><tmpl_var recentChangesLabel></a> | <a href="<tmpl_var wikiHomeUrl>"><tmpl_var wikiHomeLabel></a></div>
+
+<div style="padding: 8px;"><a href="<tmpl_var searchUrl>"><tmpl_var searchLabel></a> | <a href="<tmpl_var mostPopularUrl>"><tmpl_var mostPopularLabel></a> | <a href="<tmpl_var wikiHomeUrl>"><tmpl_var wikiHomeLabel></a></div>
 

@@ -34,21 +34,6 @@ sub _appendFuncTemplateVars {
 }
 
 #-------------------------------------------------------------------
-sub _appendPageHistoryVars {
-	my $self = shift;
-	my $var = shift;
-	my $limit = shift;
-	my $page = shift;
-	my $time = $self->session->datetime->time;
-	my $entries = $self->_templateSubvarsRefOfEdits($self->_editsRefOfPageHistory($page, $limit), $time);
-	my $days = $self->_daysRefOfTemplateSubvars($entries);
-
-	$var->{'pageHistoryEntries'} = $entries;
-	$var->{'pageHistoryDays'} = $days;
-	return $self;
-}
-
-#-------------------------------------------------------------------
 sub _appendRecentChangesVars {
 	my $self = shift;
 	my $var = shift;
@@ -115,14 +100,6 @@ sub _daysRefOfTemplateSubvars {
 }
 
 #-------------------------------------------------------------------
-sub _editsRefOfPageHistory {
-	my $self = shift;
-	my $page = shift;
-	my $limit = shift;
-	$self->_editsRefOfQuery("a.assetId = ?", [$page->getId], undef, $limit);
-}
-
-#-------------------------------------------------------------------
 sub _editsRefOfQuery {
 	my $self = shift;
 	my $queryPiece = shift || 'true';
@@ -183,13 +160,11 @@ sub _templateSubvarOfEdit {
 	$subvar->{isProtect} = ($subvar->{action} eq 'protected');
 	$subvar->{isUnprotect} = ($subvar->{action} eq 'unprotected');
 	$subvar->{isCreateOrEdit} = $subvar->{isEdit};
-
-	$subvar->{viewLatest} = $subvar->{url};
-	$subvar->{editLatest} = $subvar->{url}.'?func=edit';
-
 	if ($subvar->{isEdit}) {
-		$subvar->{viewRevision} = $subvar->{url}.'?func=view;revision='.$subvar->{dateStamp};
-		$subvar->{editRevision} = $subvar->{url}.'?func=edit;revision='.$subvar->{dateStamp};
+		my $icon = $self->session->icon;
+		$subvar->{toolbar} = $icon->delete("func=purgeRevision;revisionDate=".$subvar->{dateStamp}, $subvar->{url}, "Delete this revision?")
+			.$icon->edit('func=edit;revision='.$subvar->{dateStamp}, $subvar->{url})
+			.$icon->view('func=view;revision='.$subvar->{dateStamp}, $subvar->{url});
 	}
 
 	if ($subvar->{isEdit} and ($self->session->db->quickArray("SELECT MIN(revisionDate) FROM assetData WHERE assetId = ?", [$subvar->{assetId}]))[0] == $subvar->{dateStamp}) {
@@ -231,6 +206,43 @@ sub _templateSubvarsRefOfPages {
 	my $self = shift;
 	my $pages = shift;
 	return [map { $self->_templateSubvarOfPage($_) } @$pages];
+}
+
+#-------------------------------------------------------------------
+sub appendMostPopular {
+	my $self = shift;
+	my $var = shift;
+	my $limit = shift || $self->get("mostPopularCount");
+	my $rs = $self->session->db->read("select asset.assetId, assetData.revisionDate from assetData left join asset on  assetData.assetId=asset.assetId 
+		left join WikiPage on WikiPage.assetId=assetData.assetId and WikiPage.revisionDate=assetData.revisionDate 
+		where lineage like ? and lineage<>?  order by views limit ?", [$self->get("lineage").'%', $self->get("lineage"), $limit]);
+	while (my ($id, $version) = $rs->array) {
+		my $asset = WebGUI::Asset->new($self->session, $id, "WebGUI::Asset::WikiPage", $version);
+		push(@{$var->{mostPopular}}, {
+			title=>$asset->getTitle,
+			url=>$asset->getUrl,
+			});
+	}
+}
+
+#-------------------------------------------------------------------
+sub appendRecentChanges {
+	my $self = shift;
+	my $var = shift;
+	my $limit = shift || $self->get("recentChangesCount");
+	my $rs = $self->session->db->read("select asset.assetId, revisionDate from assetData left join asset on assetData.assetId=asset.assetId where
+		lineage like ? and lineage<>? order by revisionDate limit ?", [$self->get("lineage").'%', $self->get("lineage"), $self->get("recentChangesCount")]);
+	while (my ($id, $version) = $rs->array) {
+		my $asset = WebGUI::Asset->new($self->session, $id, "WebGUI::Asset::WikiPage", $version);
+		my $user = WebGUI::User->new($self->session, $asset->get("actionTakenBy"));
+		push(@{$var->{recentChanges}}, {
+			title=>$asset->getTitle,
+			url=>$asset->getUrl,
+			actionTaken=>$asset->get("lastAction"),
+			username=>$user->username,
+			date=>$self->session->datetime->epochToHuman($asset->get("revisionDate"))
+			});
+	}
 }
 
 #-------------------------------------------------------------------
@@ -345,6 +357,13 @@ sub definition {
 					hoverHelp => $i18n->get('pageHistoryTemplateId hoverHelp'),
 					label => $i18n->get('pageHistoryTemplateId label') },
 
+	     mostPopularTemplateId => { fieldType => 'template',
+					  namespace => 'WikiMaster_mostPopular',
+					  defaultValue => 'WikiMPTmpl000000000001',
+					  tab => 'display',
+					  hoverHelp => $i18n->get('mostPopularTemplateId hoverHelp'),
+					  label => $i18n->get('mostPopularTemplateId label') },
+
 	     recentChangesTemplateId => { fieldType => 'template',
 					  namespace => 'WikiMaster_recentChanges',
 					  defaultValue => 'WikiRCTmpl000000000001',
@@ -377,6 +396,18 @@ sub definition {
 					  tab => 'display',
 					  hoverHelp => $i18n->get('recentChangesCountFront hoverHelp'),
 					  label => $i18n->get('recentChangesCountFront label') },
+
+	     mostPopularCount => { fieldType => 'integer',
+				     defaultValue => 50,
+				     tab => 'display',
+				     hoverHelp => $i18n->get('mostPopularCount hoverHelp'),
+				     label => $i18n->get('mostPopularCount label') },
+
+	     mostPopularCountFront => { fieldType => 'integer',
+					  defaultValue => 10,
+					  tab => 'display',
+					  hoverHelp => $i18n->get('mostPopularCountFront hoverHelp'),
+					  label => $i18n->get('mostPopularCountFront label') },
                 approvalWorkflow =>{
                         fieldType=>"workflow",
                         defaultValue=>"pbworkflow000000000003",
@@ -413,14 +444,6 @@ sub definition {
 
         return $class->SUPER::definition($session, $definition);
 }
-
-#-------------------------------------------------------------------
-sub getContentLastModified {
-	my $self = shift;
-	my ($lastModified) = $self->session->db->quickArray("SELECT MAX(d.revisionDate) FROM assetData AS d INNER JOIN asset AS a ON a.assetId = d.assetId WHERE a.lineage LIKE CONCAT(?, '%')", [$self->get('lineage')]);
-	return $lastModified;
-}
-
 
 #-------------------------------------------------------------------
 sub prepareView {
@@ -481,21 +504,47 @@ sub view {
 		};
 	my $template = $self->{_frontPageTemplate};
 	$self->_appendSearchBoxVars($var);
-	$self->_appendRecentChangesVars($var, [0, $self->get('recentChangesCountFront')]);
+	$self->appendRecentChanges($var, $self->get('recentChangesCountFront'));
+	$self->appendMostPopular($var, $self->get('mostPopularCountFront'));
 	$self->_appendFuncTemplateVars($var, qw/recentChanges/);
 	return $self->processTemplate($var, undef, $template);
 }
 
 
 #-------------------------------------------------------------------
+sub www_mostPopular {
+	my $self = shift;
+	my $i18n = WebGUI::International->new($self->session, "Asset_WikiMaster");
+	my $var = {
+		resultsLabel=>$i18n->get("resultsLabel"),
+		title => WebGUI::International->new($self->session, 'Asset_WikiMaster')->get('recentChanges title'),
+		wikiHomeLabel=>$i18n->get("wikiHomeLabel"),
+		searchLabel=>$i18n->get("searchLabel"),	
+		searchUrl=>$self->getUrl("func=search"),
+		recentChangesUrl=>$self->getUrl("func=recentChanges"),
+		recentChangesLabel=>$i18n->get("recentChangesLabel"),
+		wikiHomeUrl=>$self->getUrl,
+		};
+	$self->appendMostPopular($var);
+	return $self->processStyle($self->processTemplate($var, $self->get('recentChangesTemplateId')));
+}
+
+#-------------------------------------------------------------------
 sub www_recentChanges {
 	my $self = shift;
-	my $template = WebGUI::Asset::Template->new($self->session, $self->get('recentChangesTemplateId'));
-	$template->prepare;
-	my $var = {};
-	$var->{title} = WebGUI::International->new($self->session, 'Asset_WikiMaster')->get('recentChanges title');
-	$self->_appendRecentChangesVars($var, [0, $self->get('recentChangesCount')]);
-	return $self->processStyle($self->processTemplate($var, undef, $template));
+	my $i18n = WebGUI::International->new($self->session, "Asset_WikiMaster");
+	my $var = {
+		resultsLabel=>$i18n->get("resultsLabel"),
+		title => WebGUI::International->new($self->session, 'Asset_WikiMaster')->get('recentChanges title'),
+		wikiHomeLabel=>$i18n->get("wikiHomeLabel"),
+		searchLabel=>$i18n->get("searchLabel"),	
+		searchUrl=>$self->getUrl("func=search"),
+		mostPopularUrl=>$self->getUrl("func=mostPopular"),
+		mostPopularLabel=>$i18n->get("mostPopularLabel"),
+		wikiHomeUrl=>$self->getUrl,
+		};
+	$self->appendRecentChanges($var);
+	return $self->processStyle($self->processTemplate($var, $self->get('recentChangesTemplateId')));
 }
 
 #-------------------------------------------------------------------
@@ -511,8 +560,10 @@ sub www_search {
 		searchLabel=>$i18n->get("searchLabel"),	
 		recentChangesUrl=>$self->getUrl("func=recentChanges"),
 		recentChangesLabel=>$i18n->get("recentChangesLabel"),
+		mostPopularUrl=>$self->getUrl("func=mostPopular"),
+		mostPopularLabel=>$i18n->get("mostPopularLabel"),
 		wikiHomeUrl=>$self->getUrl,
-		getEditFormUrl=>$self->getUrl("func=add;class=WebGUI::Asset::WikiPage"),
+		getEditFormUrl=>$self->getUrl("func=add;class=WebGUI::Asset::WikiPage;ajax=1"),
 		};
 	my $queryString = $self->session->form->process('query', 'text');
 	$self->_appendSearchBoxVars($var, $queryString);

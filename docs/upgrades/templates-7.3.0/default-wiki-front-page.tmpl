@@ -15,13 +15,13 @@
 
 <div style="float: left; width: 50%;">
 	<h3><a href="<tmpl_var recentChangesUrl>"><tmpl_var recentChangesLabel></a></h3>
-	<ul><tmpl_loop recentChangesLoop>
+	<ul><tmpl_loop recentChanges>
 		<li><a href="<tmpl_var url>"><tmpl_var title></a></li>
 	</tmpl_loop></ul>
 </div>
 <div style="float: left;">
 	<h3><a href="<tmpl_var mostPopularUrl>"><tmpl_var mostPopularLabel></a></h3>
-	<ul><tmpl_loop mostPopularLoop>
+	<ul><tmpl_loop mostPopular>
 		<li><a href="<tmpl_var url>"><tmpl_var title></a></li>
 	</tmpl_loop></ul>
 

@@ -73,10 +73,11 @@ our $I18N =
  'frontPageTemplateId label' =>
  { lastUpdated => 1161031607, message => q|Front Page Template| },
 
- 'recentChangesTemplateId hoverHelp' =>
- { lastUpdated => 1160157064, message => q|Which template to use for the recent changes display.| },
- 'recentChangesTemplateId label' =>
- { lastUpdated => 1160157064, message => q|Recent Changes Template| },
+ 'recentChangesTemplateId hoverHelp' => { lastUpdated => 1160157064, message => q|Which template to use for the recent changes display.| },
+ 'recentChangesTemplateId label' => { lastUpdated => 1160157064, message => q|Recent Changes Template| },
+
+ 'mostPopularTemplateId hoverHelp' => { lastUpdated => 1160157064, message => q|Which template should be used to display the most popular listing?| },
+ 'mostPopularTemplateId label' => { lastUpdated => 1160157064, message => q|Most Popular Template| },
 
  'pageHistoryTemplateId hoverHelp' =>
  { lastUpdated => 1160505291, message => q|Which template to use for the page history display.| },
@@ -88,14 +89,15 @@ our $I18N =
  'searchTemplateId label' =>
  { lastUpdated => 1161031607, message => q|Search Template| },
 
- 'recentChangesCount hoverHelp' =>
- { lastUpdated => 1161031607, message => q|Maximum number of changes to display on the recent changes page.| },
- 'recentChangesCount label' =>
- { lastUpdated => 1161031607, message => q|Recent Changes Count| },
- 'recentChangesCountFront hoverHelp' =>
- { lastUpdated => 1161031607, message => q|Maximum number of changes to display on the front page.| },
- 'recentChangesCountFront label' =>
- { lastUpdated => 1161031607, message => q|Front Page Recent Changes Count| },
+ 'recentChangesCount hoverHelp' => { lastUpdated => 1161031607, message => q|Maximum number of changes to display on the recent changes page.| },
+ 'recentChangesCount label' => { lastUpdated => 1161031607, message => q|Recent Changes Count| },
+ 'recentChangesCountFront hoverHelp' => { lastUpdated => 1161031607, message => q|Maximum number of changes to display on the front page.| },
+ 'recentChangesCountFront label' => { lastUpdated => 1161031607, message => q|Front Page Recent Changes Count| },
+
+ 'mostPopularCount hoverHelp' => { lastUpdated => 1161031607, message => q|Maximum number of popular page links to display on the most popular page.| },
+ 'mostPopularCount label' => { lastUpdated => 1161031607, message => q|Most Popular Count| },
+ 'mostPopularCountFront hoverHelp' => { lastUpdated => 1161031607, message => q|Maximum number of popular page links to display on the front page.| },
+ 'mostPopularCountFront label' => { lastUpdated => 1161031607, message => q|Front Page Most Popular Count| },
 
  'func addPage link text' =>
  { lastUpdated => 1160157064, message => q|Add a new page| },

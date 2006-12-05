@@ -135,6 +135,33 @@ sub getRevisionCount {
 
 #-------------------------------------------------------------------
 
+=head2 getRevisions ( [ status ] )
+
+Returns an array reference of the revision objects of this asset.
+
+=head3 status
+
+Optionally specify to get the revisions based upon the status of the revisions. Options are "approved", "archived", or "pending". Defaults to any status.
+
+=cut
+
+sub getRevisions {
+	my $self = shift;
+	my $status = shift;
+	my $statusClause = "";
+	if ($status) {
+		$statusClause = " and status=".$self->session->db->quote($status);
+	}
+	my @revisions = ();
+	my $rs = $self->session->db->read("select revisionDate from assetData where assetId=".$self->session->db->quote($self->getId).$statusClause);
+	while (my ($version) = $rs->array) {
+		push(@revisions, WebGUI::Asset->new($self->session, $self->getId, $self->get("className"), $version));
+	}
+	return \@revisions;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getTagCount ( )
 
 Returns the number of tags that have been attached to this asset. Think of it sort of like an absolute revision count, rather than counting the number of actual edits, we're counting the number of tags opened against this asset to be edited.

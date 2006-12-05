@@ -9,6 +9,9 @@
 <tbody>
 <tr><td><label for="title"><tmpl_var titleLabel></label></td><td><tmpl_var formTitle></td></tr>
 <tr><td><label for="content"><tmpl_var contentLabel></label></td><td><tmpl_var formContent></td></tr>
+<tmpl_if canAdminister>
+	<tr><td><label for="isProtected"><tmpl_var protectQuestionLabel></label></td><td><tmpl_var formProtect></td></tr>
+</tmpl_if>
 <tmpl_if allowsAttachments>
 	<tr><td><label for="storageId"><tmpl_var attachmentLabel></label></td><td><tmpl_var formAttachment></td></tr>
 </tmpl_if>
@@ -20,17 +23,7 @@
 <tmpl_if canAdminister><tmpl_unless isNew>
 	<ul>
 		<li><a href="<tmpl_var deleteUrl>"><tmpl_var deleteLabel></a></li>
-		<li id="wikiPageProtect"><a href="javascript:wikiPageCall('<tmpl_var protectUrl>');"><tmpl_var protectLabel></a></li>
-		<li id="wikiPageUnprotect"><a href="javascript:wikiPageCall('<tmpl_var unprotectUrl>');"><tmpl_var unprotectLabel></a></li>
 	</ul>
 </tmpl_unless></tmpl_if>
 
-<script type="text/javascript">
-var wikiPageIsProtected = <tmpl_var isProtected>;
-function wikiPageCall (url) {
-	var request = YAHOO.util.Connect.asyncRequest('GET', url, { success:wikiPageCallSuccess, failure:wikiPageCallFail });
-}
-function wikiPageCallSuccess ( response ) {
-}
-</script>
 

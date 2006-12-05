@@ -64,14 +64,16 @@ sub addWikiAssets {
                      default 'WikiPageTmpl0000000001',
     `pageEditTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL
                          default 'WikiPageEditTmpl000001',
-    `recentChangesTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL
-                              default 'WikiRCTmpl000000000001',
+    `recentChangesTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL default 'WikiRCTmpl000000000001',
+    `mostPopularTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL default 'WikiMPTmpl000000000001',
     `pageHistoryTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL
                             default 'WikiPHTmpl000000000001',
     `searchTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL
                        default 'WikiSearchTmpl00000001',
     `recentChangesCount` int(11) NOT NULL default 50,
     `recentChangesCountFront` int(11) NOT NULL default 10,
+    `mostPopularCount` int(11) NOT NULL default 50,
+    `mostPopularCountFront` int(11) NOT NULL default 10,
     `thumbnailSize` int(11) NOT NULL default 0,
     `maxImageSize` int(11) NOT NULL default 0,
 	`approvalWorkflow` varchar(22) binary not null default 'pbworkflow000000000003',
@@ -85,6 +87,9 @@ EOT
     `content` mediumtext,
     `storageId` varchar(22) character set utf8 collate utf8_bin NULL,
     `views` bigint(20) NOT NULL default 0,
+	isProtected int not null default 0,
+	actionTaken varchar(35) not null,
+	actionTakenBy varchar(22) binary not null,
     PRIMARY KEY (`assetId`, `revisionDate`)
   ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 EOT
@@ -94,24 +99,6 @@ EOT
     `pageId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
     `title` varchar(255) NOT NULL,
     PRIMARY KEY (`assetId`, `pageId`)
-  ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-EOT
-				    # Don't want protection to be versioned, so put it in a
-				    # separate table.
-				    <<'EOT',
-  CREATE TABLE `WikiPage_protected` (
-    `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
-    PRIMARY KEY (`assetId`)
-  ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-EOT
-				    <<'EOT',
-  CREATE TABLE `WikiPage_extraHistory` (
-    `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
-    `userId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
-    `dateStamp` bigint(20) NOT NULL,
-    `actionTaken` varchar(255) NOT NULL,
-    `url` varchar(255) NOT NULL,
-    `title` varchar(255) NOT NULL
   ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 EOT
 				   );

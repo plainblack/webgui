@@ -17,29 +17,6 @@ use WebGUI::International;
 use WebGUI::Storage::Image;
 use WebGUI::Utility;
 
-#-------------------------------------------------------------------
-# Buggo, semi-duplication with WikiMaster; move this into a common utility routine somewhere
-sub _appendFuncTemplateVars {
-	my $self = shift;
-	my $var = shift;
-	my @funcs = @_;
-	my $i18n = WebGUI::International->new($self->session, 'Asset_WikiPage');
-	my %specialFuncs = ();
-	my $revision = $self->session->form->process('revision');
-	my $revisionSuffix = defined($revision)? ";revision=$revision" : '';
-	@funcs = (qw/view edit pageHistory protect unprotect delete wikiPurgeRevision/) unless @funcs;
-
-	foreach my $func (@funcs) {
-		$var->{$func.'Url'} = $self->getUrl($specialFuncs{$func}
-						     || "func=$func$revisionSuffix");
-		$var->{$func.'Label'} = $i18n->get("func $func link text");
-		my $confirmation = $i18n->get("func $func link confirm");
-		if (length $confirmation) {
-			$confirmation =~ s/\'/\\\'/g;
-			$var->{$func.'Confirm'} = "return confirm('$confirmation')";
-		}
-	}
-}
 
 #-------------------------------------------------------------------
 
@@ -128,6 +105,26 @@ sub definition {
 			    defaultValue => undef },
 	     content => { fieldType => "HTMLArea",
 			  defaultValue => undef },
+		views => {
+			fieldType => "integer",
+			defaultValue => 0,
+			noFormPost => 1
+			},
+		isProtected => {
+			fieldType => "yesNo",
+			defaultValue => 0,
+			noFormPost => 1
+			},
+		actionTaken => {
+			fieldType => "text",
+			defaultValue => undef,
+			noFormPost => 1
+			},
+		actionTakenBy => {
+			fieldType => "user",
+			defaultValue => undef,
+			noFormPost => 1
+			},
 	    );
 
 	push @$definition,
@@ -161,33 +158,33 @@ sub getEditForm {
 	my $i18n = WebGUI::International->new($session, "Asset_WikiPage");
 	my $newPage = 0;
 	my $wiki = $self->getWiki;
+	my $url = ($self->getId eq "new") ? $wiki->getUrl : $self->getUrl;
 	my $var = {
 		title=> $i18n->get("editing")." ".(defined($self->get('title'))? $self->get('title') : $i18n->get("assetName")),
-		formHeader => WebGUI::Form::formHeader($session, { action => $wiki->getUrl }) 
+		formHeader => WebGUI::Form::formHeader($session, { action => $url}) 
 			.WebGUI::Form::hidden($session, { name => 'func', value => 'editSave' }) 
 			.WebGUI::Form::hidden($session, { name=>"proceed", value=>$form->process("proceed") }),
 	 	formTitle => WebGUI::Form::text($session, { name => 'title', maxlength => 255, size => 40, value => $self->get('title') }),
 		formContent => WebGUI::Form::HTMLArea($session, { name => 'content', richEditId => $wiki->get('richEditor'), value => $self->get('content') }),
 		formSubmit => WebGUI::Form::submit($session, { value => 'Save' }),
+		formProtect => WebGUI::Form::yesNo($session, { name => "isProtected", value=>$self->getValue("isProtected")}),
 		formAttachment => '',
 		allowsAttachments => $wiki->get("maxAttachments"),
 		formFooter => WebGUI::Form::formFooter($session),
 		isNew => ($self->getId eq "new"),
 		canAdminister => $wiki->canAdminister,
+		deleteLabel => $i18n->get("deleteLabel"),
+		deleteUrl => $self->getUrl("func=delete"),
 		titleLabel => $i18n->get("titleLabel"),
 		contentLabel => $i18n->get("contentLabel"),
-		protectLabel => $i18n->get("attachmentLabel"),
 		attachmentLabel => $i18n->get("attachmentLabel"),
-		unprotectLabel => $i18n->get("attachmentLabel"),
-		protectUrl => $self->get("func=protect"),
-		unprotectUrl => $self->get("func=unprotect"),
+		protectQuestionLabel => $i18n->get("protectQuestionLabel"),
 		isProtected => $self->isProtected
 		};
 	if ($self->getId eq "new") {
 		$var->{formHeader} .= WebGUI::Form::hidden($session, { name=>"assetId", value=>"new" }) 
 			.WebGUI::Form::hidden($session, { name=>"class", value=>$form->process("class","className") });
 	}
-	$self->_appendFuncTemplateVars($var);
 	return $self->processTemplate($var, $wiki->getValue('pageEditTemplateId'));
 }
 
@@ -224,9 +221,7 @@ sub indexContent {
 #-------------------------------------------------------------------
 sub isProtected {
 	my $self = shift;
-	return $self->{_isProtected} if exists $self->{_isProtected};
-	($self->{_isProtected}) = $self->session->db->quickArray("SELECT COUNT(assetId) FROM WikiPage_protected WHERE assetId = ?", [$self->getId]);
-	return $self->{_isProtected};
+	return $self->get("isProtected");
 }
 
 #-------------------------------------------------------------------
@@ -246,35 +241,20 @@ sub prepareView {
 	$self->preparePageTemplate;
 }
 
-#-------------------------------------------------------------------
-sub processPageTemplate {
-	my $self = shift;
-	my $content = shift;
-	my $func = shift || $self->session->form->process('func');
-	my $var = {};
-	my $template = $self->preparePageTemplate;
-
-	$var->{content} = $content;
-	$var->{canEdit} = $self->canEdit;
-	$var->{couldEdit} = $self->couldEdit;
-	$var->{canProtect} = $self->canProtect;
-	$var->{canDelete} = $self->canDelete;
-	$var->{isProtected} = $self->isProtected;
-	$var->{inEdit} = isIn($func, qw/edit add/);
-	$var->{inView} = isIn($func, qw/view/) || !defined $func;
-	$var->{inHistory} = isIn($func, qw/pageHistory/);
-	$self->_appendFuncTemplateVars($var);
-
-	return $self->processTemplate($var, undef, $template);
-}
 
 #-------------------------------------------------------------------
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost(@_);
+	my $actionTaken = ($self->session->form->process("assetId") eq "new") ? "Created" : "Edited";
 	$self->update({ groupIdView => $self->getWiki->get('groupIdView'),
 			groupIdEdit => $self->getWiki->get('groupToAdminister'),
-			 isHidden => 1});
+			 isHidden => 1,
+			actionTakenBy => $self->session->user->userId,
+			actionTaken => $actionTaken});
+	if ($self->canAdminister) {
+		$self->update({isProtected => $self->session->form("isProtected")});
+	}
 	$self->getWiki->updateTitleIndex([$self], from => 'edit');
 	delete $self->{_storageLocation};
 	my $size = 0;
@@ -324,14 +304,6 @@ sub purgeRevision {
 }
 
 #-------------------------------------------------------------------
-sub updateWikiHistory {
-	my $self = shift;
-	my $action = shift;
-	my $userId = shift || $self->session->user->userId;
-	$self->session->db->write("INSERT INTO WikiPage_extraHistory (assetId, userId, dateStamp, actionTaken, url, title) VALUES (?, ?, ?, ?, ?, ?)", [$self->getId, $userId, $self->session->datetime->time, $action, $self->getUrl, $self->get('title')]);
-}
-
-#-------------------------------------------------------------------
 sub view {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session, "Asset_WikiPage");
@@ -341,11 +313,13 @@ sub view {
 		historyLabel => $i18n->get("historyLabel"),
 		wikiHomeLabel=>$i18n->get("wikiHomeLabel", "Asset_WikiMaster"),
 		searchLabel=>$i18n->get("searchLabel", "Asset_WikiMaster"),	
-		recentChangesUrl=>$self->getUrl("func=recentChanges"),
+		recentChangesUrl=>$self->getParent->getUrl("func=recentChanges"),
 		recentChangesLabel=>$i18n->get("recentChangesLabel", "Asset_WikiMaster"),
-		wikiHomeUrl=>$self->getUrl,
+		mostPopularUrl=>$self->getParent->getUrl("func=mostPopular"),
+		mostPopularLabel=>$i18n->get("mostPopularLabel", "Asset_WikiMaster"),
+		wikiHomeUrl=>$self->getParent->getUrl,
 		historyUrl=>$self->getUrl("func=getHistory"),
-		editUrl=>$self->getUrl("func=getEditForm"),
+		editUrl=>$self->getUrl("func=edit;ajax=1"),
 		content => $self->getWiki->autolinkHtml($self->get('content')),	
 		};
 	return $self->processTemplate($var, $self->getWiki->get("pageTemplateId"));
@@ -365,36 +339,31 @@ sub www_delete {
 sub www_edit {
 	my $self = shift;
 	return $self->session->privilege->insufficient unless $self->canEdit;
+	if ($self->session->form->param("ajax")) {	
+		$self->session->style->sent(1);
+		return $self->getEditForm;
+	}
 	return $self->getWiki->processStyle($self->getEditForm);
-}
-
-#-------------------------------------------------------------------
-sub www_getEditForm {
-	my $self = shift;
-	return $self->session->privilege->insufficient unless $self->canEdit;
-	return $self->getEditForm;
 }
 
 #-------------------------------------------------------------------
 sub www_getHistory {
 	my $self = shift;
-	# Buggo: hardcoded count
 	my $var = {};
-	$var->{title} = sprintf(WebGUI::International->new($self->session, 'Asset_WikiPage')->get('pageHistory title'), $self->get('title'));
-	$self->getWiki->_appendPageHistoryVars($var, [0, 50], $self);
+	my ($icon, $date) = $self->session->quick(qw(icon datetime));
+	foreach my $revision (@{$self->getRevisions}) {
+		my $user = WebGUI::User->new($self->session, $self->get("actionTakenBy"));
+		push(@{$var->{pageHistoryEntries}}, {
+			toolbar => $icon->delete("func=purgeRevision;revisionDate=".$self->get("revisionDate"), $self->get("url"), "Delete this revision?")
+                        	.$icon->edit('func=edit;revision='.$self->get("revisionDate"), $self->get("url"))
+                        	.$icon->view('func=view;revision='.$self->get("revisionDate"), $self->get("url")),
+			date => $date->epochToHuman($self->get("revisionDate")),
+			username => $user->username,
+			actionTaken => $self->get("actionTaken"),
+			interval => join(" ", $date->secondsToInterval(time() - $self->get("revisionDate")))
+			});		
+	}
 	return $self->processTemplate($var, $self->getWiki->get('pageHistoryTemplateId'));
-}
-
-#-------------------------------------------------------------------
-sub www_protect {
-	my $self = shift;
-	return $self->session->privilege->insufficient unless $self->canProtect;
-	return $self->www_view if $self->isProtected;
-	$self->session->db->write("DELETE FROM WikiPage_protected WHERE assetId = ?", [$self->getId]);
-	$self->session->db->write("INSERT INTO WikiPage_protected (assetId) VALUES (?)", [$self->getId]);
-	$self->{_isProtected} = 1;
-	$self->updateWikiHistory('protected');
-	return $self->www_view;
 }
 
 #-------------------------------------------------------------------
@@ -412,17 +381,6 @@ sub www_showConfirmation {
 }
 
 #-------------------------------------------------------------------
-sub www_unprotect {
-	my $self = shift;
-	return $self->session->privilege->insufficient unless $self->canProtect;
-	return $self->www_view if !$self->isProtected;
-	$self->session->db->write("DELETE FROM WikiPage_protected WHERE assetId = ?", [$self->getId]);
-	$self->{_isProtected} = 0;
-	$self->updateWikiHistory('unprotected');
-	return $self->www_view;
-}
-
-#-------------------------------------------------------------------
 sub www_view {
 	my $self = shift;
 	return $self->session->privilege->noAccess unless $self->canView;
@@ -436,13 +394,5 @@ sub www_view {
 }
 
 
-#-------------------------------------------------------------------
-sub www_wikiPurgeRevision {
-	my $self = shift;
-	return $self->session->privilege->insufficient unless $self->canDelete;
-	$self->purgeRevision;
-	$self->session->asset($self->getParent);
-	return $self->getParent->www_view;
-}
 
 1;
