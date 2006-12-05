@@ -734,7 +734,7 @@ sub sendEmail {
 		my $mail = WebGUI::Mail::Send->create($self->session,{to=>$to, subject=>$subject, cc=>$cc, from=>$from, bcc=>$bcc});
 		$mail->addHtml($message);
 		$mail->addFooter;
-		map $mail->addAttachment($_), @{$attachments};
+		$mail->addAttachment($_) for (@{$attachments});
 		$mail->queue;
 	} else {
                 my ($userId) = $self->session->db->quickArray("select userId from users where username=".$self->session->db->quote($to));
@@ -756,14 +756,14 @@ sub sendEmail {
                         my $mail =  WebGUI::Mail::Send->create($self->session,{to=>$cc, subject=>$subject, from=>$from});
 			if ($cc) {
 				$mail->addHtml($message);
-				map $mail->addAttachment($_), @{$attachments};
+				$mail->addAttachment($_) for (@{$attachments});
 				$mail->addFooter;
 				$mail->queue;
                         }
                         if ($bcc) {
                                 WebGUI::Mail::Send->create($self->session, {to=>$bcc, subject=>$subject, from=>$from});
 				$mail->addHtml($message);
-				map $mail->addAttachment($_), @{$attachments};
+				$mail->addAttachment($_) for (@{$attachments});
 				$mail->addFooter;
 				$mail->queue;
                         }
