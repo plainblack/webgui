@@ -28,6 +28,7 @@ addEmailValidationExpiry($session);
 addNewCalendar($session);
 migrateCalendars($session);
 removeOldCalendar($session);
+fixCommerceTemplateSettings($session);
 finish($session); # this line required
 
 #-------------------------------------------------
@@ -313,6 +314,24 @@ EOT
 	my $class = 'WebGUI::Workflow::Activity::ExpireUnvalidatedEmailUsers';
 	@{$$activities{None}} = ((grep{$_ ne $class} @{$$activities{None}}), $class);
 	$session->config->set('workflowActivities', $activities);
+}
+
+#-------------------------------------------------
+sub fixCommerceTemplateSettings {
+	my $session = shift;
+	print "\tFixing up commerce template settings.\n" unless $quiet;
+	foreach my $spec (['commerceConfirmCheckoutTemplateId', 'PBtmpl0000000000000016'],
+			  ['commerceCheckoutCanceledTemplateId', 'PBtmpl0000000000000015'],
+			  ['commercePurchaseHistoryTemplateId', 'PBtmpl0000000000000019'],
+			  ['commerceSelectShippingMethodTemplateId', 'PBtmplCSSM000000000001'],
+			  ['commerceSelectPaymentGatewayTemplateId', 'PBtmpl0000000000000017'],
+			  ['commerceViewShoppingCartTemplateId', 'PBtmplVSC0000000000001'],
+			  ['commerceTransactionErrorTemplateId', 'PBtmpl0000000000000018']) {
+		my ($name, $value) = @$spec;
+		if ($session->setting->get($name) eq '1') {
+			$session->setting->set($name, $value);
+		}
+	}
 }
 
 # ---- DO NOT EDIT BELOW THIS LINE ----
