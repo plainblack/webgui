@@ -5,6 +5,12 @@ our $HELP = {
         'image add/edit' => {
 		title => 'image add/edit title',
 		body => 'image add/edit body',
+		isa => [
+			{
+				tag => 'file add/edit',
+				namespace => 'Asset_File'
+			},
+		],
 		fields => [
                         {
                                 title => 'thumbnail size',
@@ -35,14 +41,6 @@ our $HELP = {
 			{
 				tag => 'image resize',
 				namespace => 'Asset_Image',
-			},
-			{
-				tag => 'asset fields',
-				namespace => 'Asset'
-			},
-			{
-				tag => 'file add/edit',
-				namespace => 'Asset_File'
 			},
 		]
 	},

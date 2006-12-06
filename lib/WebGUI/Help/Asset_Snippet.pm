@@ -5,6 +5,12 @@ our $HELP = {
         'snippet add/edit' => {
 		title => 'snippet add/edit title',
 		body => 'snippet add/edit body',
+		isa => [
+			{
+				tag => 'asset fields',
+				namespace => 'Asset'
+			},
+		],
 		fields => [
                         {
                                 title => 'cache timeout',
@@ -27,12 +33,6 @@ our $HELP = {
                                 namespace => 'Asset_Snippet',
                         },
 		],
-		related => [
-			{
-				tag => 'asset fields',
-				namespace => 'Asset'
-			},
-		]
 	},
 
 };

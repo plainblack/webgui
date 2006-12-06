@@ -5,6 +5,12 @@ our $HELP = {
         'file add/edit' => {
 		title => 'file add/edit title',
 		body => 'file add/edit body',
+		isa => [
+			{
+				tag => 'asset fields',
+				namespace => 'Asset',
+			},
+		],
 		fields => [
                         {
                                 title => 'cache timeout',
@@ -29,10 +35,6 @@ our $HELP = {
                         },
 		],
 		related => [
-			{
-				tag => 'asset fields',
-				namespace => 'Asset',
-			},
 			{
 				tag => 'file template',
 				namespace => 'Asset_File',
@@ -82,14 +84,6 @@ our $HELP = {
 		fields => [
 		],
 		related => [
-			{
-				tag => 'asset template',
-				namespace => 'Asset',
-			},
-			{
-				tag => 'template language',
-				namespace => 'Asset_Template',
-			},
 			{
 				tag => 'file add/edit',
 				namespace => 'Asset_File',

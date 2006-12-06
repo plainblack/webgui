@@ -5,6 +5,12 @@ our $HELP = {
 	'template add/edit' => {
 		title => '684',
 		body => '639',
+		isa => [
+			{
+				tag => 'asset fields',
+				namespace => 'Asset'
+			},
+		],
 		fields => [
                         {
                                 title => 'namespace',
