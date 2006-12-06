@@ -43,7 +43,6 @@
  - add: workflow activity for expiry of email-unvalidated users.  This is not
    enabled by default; add an instance of it to an appropriate workflow if you
    want it to run.
- - fix: new profile fields and new users not handling profile defaults right
  - fix: subscription dates
  - fix: Default Rich Editor setting not rendering correctly
  - fix: visitor name disappearing on preview in CS
