@@ -1101,8 +1101,8 @@ sub www_edit {
 	$var{'user.isModerator'} = $self->getThread->getParent->canModerate;
 	$var{'user.isVisitor'} = ($self->session->user->userId eq '1');
 	$var{'visitorName.form'} = WebGUI::Form::text($self->session, {
-		name=>"visitorName",
-		value=>$self->getValue("visitorName")
+		name => "visitorName",
+		value => $self->session->form->process('visitorName') || $self->getValue("visitorName")
 		});
 	for my $x (1..5) {
 		my $userDefined = $self->session->form->process("userDefined".$x) || $self->getValue("userDefined".$x);
