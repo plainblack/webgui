@@ -14,8 +14,8 @@ our $I18N = { ##hashref of hashes
 	},
 
 	'search template description' => {
-		message => q|Controls the layout, look, and appearence of the Event Management System Search Page.|,
-		lastUpdated => 1131394072,
+		message => q|Controls the layout, look, and appearance of the Event Management System Search Page.|,
+		lastUpdated => 1165364261,
 		context => q|Describes this template field selector|
 	},     
         
@@ -26,7 +26,7 @@ our $I18N = { ##hashref of hashes
 	},
 
 	'add/edit help body' => { 
-		message => q|<p>The Event Management System (EMS) provides registration and payment for events inside WebGUI.  You can assign two groups who are allowed to do event management, one to add events to the manager and another to approve them.  You will also be able to setup several templates for the display of the list of events and the event checkout form.</p>
+		message => q|<p>WebGUI allows registration and payments to be made directly from the site with the Event Management System (EMS).  You can assign two groups who are allowed to do event management, one to add events to the manager and another to approve them.  You will also be able to set up several templates for the display of the list of events and the event checkout form.</p>
 		<p>Each event for sale is a Product from the Commerce System.</p>|,
 		lastUpdated => 1131394070,
 		context => q|Body for Add/Edit Event Managment System Help|
@@ -39,8 +39,8 @@ our $I18N = { ##hashref of hashes
 	},
 
 	'display template description' => {
-		message => q|Controls the layout, look, and appearence of an Event Management System.|,
-		lastUpdated => 1131394072,
+		message => q|Controls the layout, look, and appearance of an Event Management System.|,
+		lastUpdated => 1165364241,
 		context => q|Describes this template field selector|
 	},
 
@@ -51,8 +51,8 @@ our $I18N = { ##hashref of hashes
 	},
 
 	'checkout template description' => {
-		message => q|Controls the layout, look, and appearence of the Checkout screen in the Event Management System.|,
-		lastUpdated => 1145400973,
+		message => q|Controls the layout, look, and appearance of the Checkout screen in the Event Management System.|,
+		lastUpdated => 1165364248,
 		context => q|Describes this template field selector|
 	},
 
@@ -63,8 +63,8 @@ our $I18N = { ##hashref of hashes
 	},
 
 	'manage purchases template description' => {
-		message => q|Controls the layout, look, and appearence of the Manage Purchases screen in the Event Management System.|,
-		lastUpdated => 1145400970,
+		message => q|Controls the layout, look, and appearance of the Manage Purchases screen in the Event Management System.|,
+		lastUpdated => 1165364251,
 		context => q|Describes this template field selector|
 	},
 
@@ -75,8 +75,8 @@ our $I18N = { ##hashref of hashes
 	},
 
 	'view purchase template description' => {
-		message => q|Controls the layout, look, and appearence of the View Purchase screen in the Event Management System.|,
-		lastUpdated => 1145401024,
+		message => q|Controls the layout, look, and appearance of the View Purchase screen in the Event Management System.|,
+		lastUpdated => 1165364253,
 		context => q|Describes this template field selector|
 	},
 
@@ -87,8 +87,8 @@ our $I18N = { ##hashref of hashes
 	},
 
 	'add/edit event template description' => {
-		message => q|Controls the layout, look, and appearence of an individual Event in the Event Management System.|,
-		lastUpdated => 1131394072,
+		message => q|Controls the layout, look, and appearance of an individual Event in the Event Management System.|,
+		lastUpdated => 1165364256,
 		context => q|Describes the event template field selector|
 	},
 
@@ -302,8 +302,8 @@ our $I18N = { ##hashref of hashes
 	},
 
 	'global prerequisite description' => {
-		message => q|When set to yes, you may assign events belonging to another instance of an Event Management System Asset as a prerequisite event for one of the events defined in this instance os the asset.  When set to no, only events defined within this instance of the asset may be used as prerequisites.|,
-		lastUpdated => 1138312761,
+		message => q|When set to yes, you may assign events belonging to another instance of an Event Management System Asset as a prerequisite event for one of the events defined in this instance of the asset.  When set to no, only events defined within this instance of the asset may be used as prerequisites.|,
+		lastUpdated => 1165364300,
 	},
 
 	'price must be greater than zero' => {

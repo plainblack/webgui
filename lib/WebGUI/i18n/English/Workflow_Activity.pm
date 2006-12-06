@@ -2,9 +2,9 @@ package WebGUI::i18n::English::Workflow_Activity;
 
 our $I18N = {
 	'description help' => {
-		message => q|Put a long explaination here of what this activity is doing.|,
+		message => q|Put a long explanation here of what this activity is doing.|,
 		context => q|the hover help for the description field|,
-		lastUpdated => 0,
+		lastUpdated => 1165363730,
 	},
 
 	'description' => {
@@ -32,9 +32,9 @@ our $I18N = {
 	},
 
 	'add/edit workflow activity body' => {
-		message => q|Add/Edit Workflow Activity|,
-		context => q|<p>Most Workflow Activities have these basic fields and properties:</p>|,
-		lastUpdated => 0,
+		message => q|<p>Most Workflow Activities have these basic fields and properties:</p>|,
+		context => q|Body for the add and edit workflow activity screen|,
+		lastUpdated => 1165365265,
 	},
 
 	'list of installed activities' => {

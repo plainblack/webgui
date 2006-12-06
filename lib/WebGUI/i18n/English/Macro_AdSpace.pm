@@ -11,11 +11,12 @@ our $I18N = {
 <p><b>&#94;AdSpace;</b><br />
 <b>&#94;AdSpace(adName);</b><br />
 This macro is used to display advertisements from the AdSpace system on a page.  The macro
-takes a single argument, wihch is the name of the Ad Space from the AdSpace manager to display.
+takes a single argument, which is the name of the Ad Space from the AdSpace manager to display
+from the AdSpace manager.
 As a convenience, the AdSpace manager will display the macro code to put into a page to
 display each Ad Space.</p>
 |,
-		lastUpdated => 1144979672,
+		lastUpdated => 1165363527,
 	},
 
 	'macroName' => {

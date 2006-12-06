@@ -134,7 +134,7 @@ our $HELP = {
 	},
 
 	'manage ad spaces' => {
-                title => 'add ad space',
+                title => 'manage ad spaces',
                 body => 'add ad space body',
 		source => 'www_manageAdSpaces',
 		fields => [

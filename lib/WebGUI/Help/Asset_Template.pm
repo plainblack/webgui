@@ -59,9 +59,6 @@ our $HELP = {
 			    'name' => 'webgui.version'
 			  },
 			  {
-			    'name' => 'webgui.version'
-			  },
-			  {
 			    'name' => 'webgui.status'
 			  },
 			  {

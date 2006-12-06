@@ -80,8 +80,8 @@ is displayed as part of a Layout Asset, the Layout Asset's <b>Style Template</b>
         },
 
 	'85 description' => {
-                message => q|A content area in which you can place as much content as you wish. For instance, even before a FAQ there is usually a paragraph describing what is contained in the FAQ. |,
-                lastUpdated => 1119410887,
+                message => q|A content area in which you can place as much content as you wish. For instance, even before an FAQ there is usually a paragraph describing what is contained in the FAQ. |,
+                lastUpdated => 1165364350,
         },
 
 

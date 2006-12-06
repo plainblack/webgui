@@ -279,7 +279,7 @@ our $I18N = {
 
 		'timeRowTemplateId hoverhelp' => {
 			lastUpdated => 0,
-			message => q|Template to user for building rows in the time tracker|
+			message => q|Template to use for building rows in the time tracker|
 		},
 
 		'groupToManage hoverhelp' => {
@@ -313,8 +313,8 @@ our $I18N = {
 		},
 
 		'timetracking add/edit body' => {
-			lastUpdated => 0,
-			message => q|The Time Tracking Asset lets you define a set of tasks and then to track how well they are accomplished against an original estimate for the task.|,
+			lastUpdated => 1165365096,
+			message => q|The Time Tracking Asset lets you define a set of tasks and then track how well they are accomplished against an original estimate for the task.|,
 		},
 
 		'report.nextWeek.url' => {

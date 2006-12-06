@@ -11,9 +11,14 @@ our $HELP = {
 			{
 				tag => 'metadata manage',
 				namespace => 'Asset'
+			},
 			{
 				tag => 'settings',
 				namespace => 'WebGUI'
+			},
+			{
+				tag => 'aoi hits',
+				namespace => 'Macro_AOIHits',
 			},
 			{
 				tag => 'macros using',

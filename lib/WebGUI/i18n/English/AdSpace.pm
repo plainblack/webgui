@@ -139,6 +139,12 @@ our $I18N = {
 		context => q|a menu label for manageing ad spaces|
 	},
 
+	'manage ad spaces title' => {
+		message => q|Manage ad spaces|,
+		lastUpdated => 1165364029,
+		context => q|a title for the manage ad spaces screen|
+	},
+
 	'add an ad' => {
 		message => q|Add an ad.|,
 		lastUpdated => 0,

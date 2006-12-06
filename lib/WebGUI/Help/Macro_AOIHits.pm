@@ -9,12 +9,20 @@ our $HELP = {
 		],
 		related => [
 			{
-				tag => 'macros using',
-				namespace => 'Macros'
-			},
-			{
 				tag => 'metadata manage',
 				namespace => 'Asset'
+			},
+			{
+				tag => 'settings',
+				namespace => 'WebGUI'
+			},
+			{
+				tag => 'aoi rank',
+				namespace => 'Macro_AOIRank',
+			},
+			{
+				tag => 'macros using',
+				namespace => 'Macros'
 			},
 		]
 	},

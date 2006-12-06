@@ -385,10 +385,10 @@ a URL will be made from the parent's URL and the <b>Menu Title</b>.</p>|,
         },
 
         '108 description' => {
-                message => q|<p>The owner of a asset is usually the person who created the asset. This user always has full edit and viewing rights on the asset.</p>
+                message => q|<p>The owner of an asset is usually the person who created the asset. This user always has full edit and viewing rights of the asset.</p>
 <p><b>NOTE:</b> The owner can only be changed by an administrator.
 </p>|,
-                lastUpdated => 1146629493,
+                lastUpdated => 1165364456,
         },
 
         '872 description' => {
@@ -412,10 +412,10 @@ a URL will be made from the parent's URL and the <b>Menu Title</b>.</p>|,
         },
 
         'make package description' => {
-                message => q|<p>Many WebGUI tasks are very repetitive.  Automating such tasks in Webgui, such as
+                message => q|<p>Many WebGUI tasks are very repetitive.  Automating such tasks in WebGUI, such as
 creating an Asset, or sets of Assets, is done by creating a package that can be reused
-through the site.  Check yes if you want this Asset to be available as a package.</p>|,
-                lastUpdated => 1119149899,
+throughout the site.  Check yes if you want this Asset to be available as a package.</p>|,
+                lastUpdated => 1165365151,
         },
 
         'make prototype description' => {
