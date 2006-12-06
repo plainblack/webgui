@@ -211,12 +211,15 @@ function sp_showPanel(nr) {
   	this.aktPanel=nr;
   	l = this.panels.length;
   	for (i=0;i<l;i++) {
-    		//alert(nr);		
-		if (i>nr) {
-      			this.panels[i].obj.style.top=this.height-((l-i)*slidePanelButtonHeight)+"px";
-    		} else {
-      			this.panels[i].obj.style.top=i*slidePanelButtonHeight+"px";
-    		}
+    	   //alert(nr);		
+	   if (i>nr) {
+      	      this.panels[i].obj.style.top=this.height-((l-i)*slidePanelButtonHeight)+"px";
+    	   } else {
+      	      this.panels[i].obj.style.top=i*slidePanelButtonHeight+"px";
+    	   }
+
+	   // Fix bug with bits of other panels showing through.
+	   this.panels[i].objf.style.visibility = (i == nr)? 'visible' : 'hidden';
   	}
 }
 

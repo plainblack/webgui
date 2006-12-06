@@ -48,6 +48,7 @@
  - fix: visitor name disappearing on preview in CS
  - fix: HTTP proxy not passing form elements through
  - upgrade script patches some corrupted commerce template settings
+ - fix: bits of other panels showing through in admin bar
  - The Events Calendar is now the new Calendar with some fun new features.
    All your existing Events Calendars will be migrated automatically. 
  - rfe: multiple redirects on a page - which one?
