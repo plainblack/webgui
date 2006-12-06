@@ -104,20 +104,20 @@ sub definition {
                 		hoverHelp=>$i18n->get('article template description'),
                 		label=>$i18n->get(72)
 				},
-			linkURL=>{
-				tab=>"properties",
-				fieldType=>'url',
-				defaultValue=>undef,
-				label=>$i18n->get(8),
-                		hoverHelp=>$i18n->get('link url description'),
-                		uiLevel=>3
-				},
 			linkTitle=>{
 				tab=>"properties",
 				fieldType=>'text',
 				defaultValue=>undef,
 				label=>$i18n->get(7),
                 		hoverHelp=>$i18n->get('link title description'),
+                		uiLevel=>3
+				},
+			linkURL=>{
+				tab=>"properties",
+				fieldType=>'url',
+				defaultValue=>undef,
+				label=>$i18n->get(8),
+                		hoverHelp=>$i18n->get('link url description'),
                 		uiLevel=>3
 				},
 			storageId=>{
