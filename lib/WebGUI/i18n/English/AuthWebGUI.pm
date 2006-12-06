@@ -111,6 +111,16 @@ our $I18N = {
 		lastUpdated => 1071507721
 	},
 
+	'recoverFormUsername' => {
+		message => q|Username form field for password recovery.|,
+		lastUpdated => 1165440841,
+	},
+
+	'recoverFormUsernameLabel' => {
+		message => q|Label for the username form field for password recovery.|,
+		lastUpdated => 1165440841,
+	},
+
 	'title' => {
 		message => q|Default page title.|,
 		lastUpdated => 1164335682,
@@ -308,6 +318,26 @@ our $I18N = {
 	'login.label' => {
 		message => q|Default text label for login page link.|,
 		lastUpdated => 1149220395,
+	},
+
+	'recoverFormProfile' => {
+		message => q|Loop over profile fields necessary for password recovery.|,
+		lastUpdated => 1165440841,
+	},
+
+	'recoverFormProfile id' => {
+		message => q|The ID of the profile field.|,
+		lastUpdated => 1165440841,
+	},
+
+	'recoverFormProfile formElement' => {
+		message => q|A form element for the profile field.|,
+		lastUpdated => 1165440841,
+	},
+
+	'recoverFormProfile label' => {
+		message => q|The label for the profile field.|,
+		lastUpdated => 1165440841,
 	},
 
 	'recovery template body' => {

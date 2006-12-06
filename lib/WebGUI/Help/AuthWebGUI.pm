@@ -130,44 +130,74 @@ our $HELP = {
 		body => 'recovery template body',
 		variables => [
 		          {
-		            'name' => 'recover.form.header'
-		          },
-		          {
-		            'name' => 'recover.form.hidden'
-		          },
-		          {
-		            'name' => 'recover.form.footer'
-		          },
-		          {
-		            'name' => 'recover.form.submit'
-		          },
-		          {
-		            'name' => 'login.form.email'
-		          },
-		          {
-		            'name' => 'login.form.email.label'
-		          },
-		          {
 		            'name' => 'title',
 		          },
 		          {
-		            'name' => 'recover.message'
+		            'name' => 'recoverFormHeader',
+			    'description' => 'recover.form.header',
 		          },
 		          {
-		            'name' => 'anonymousRegistration.isAllowed',
+		            'name' => 'recoverFormHidden',
+			    'description' => 'recover.form.hidden',
 		          },
 		          {
-		            'name' => 'createAccount.url',
+		            'name' => 'recoverFormSubmit',
+			    'description' => 'recover.form.submit',
 		          },
 		          {
-		            'name' => 'createAccount.label',
+		            'name' => 'recoverFormFooter',
+			    'description' => 'recover.form.footer',
 		          },
 		          {
-		            'name' => 'login.url'
+		            'name' => 'recoverFormUsername',
+			    'description' => 'recoverFormUsername',
 		          },
 		          {
-		            'name' => 'login.label'
-		          }
+		            'name' => 'recoverFormUsernameLabel',
+			    'description' => 'recoverFormUsernameLabel',
+		          },
+		          {
+		            'name' => 'recoverMessage',
+			    'description' => 'recover.message',
+		          },
+		          {
+		            'name' => 'anonymousRegistrationIsAllowed',
+			    'description' => 'anonymousRegistration.isAllowed',
+		          },
+		          {
+		            'name' => 'createAccountUrl',
+			    'description' => 'createAccount.url',
+		          },
+		          {
+		            'name' => 'createAccountLabel',
+			    'description' => 'createAccount.label',
+		          },
+		          {
+		            'name' => 'loginUrl',
+			    'description' => 'login.url',
+		          },
+		          {
+		            'name' => 'loginLabel',
+			    'description' => 'login.label',
+		          },
+		          {
+		            'name' => 'recoverFormProfile',
+			    'description' => 'recoverFormProfile',
+			    'variables' => [
+					    {
+					     'name' => 'id',
+					     'description' => 'recoverFormProfile id',
+					    },
+					    {
+					     'name' => 'formElement',
+					     'description' => 'recoverFormProfile formElement',
+					    },
+					    {
+					     'name' => 'label',
+					     'description' => 'recoverFormProfile label',
+					    }
+					   ],
+		          },
 		],
 		fields => [
 		],
