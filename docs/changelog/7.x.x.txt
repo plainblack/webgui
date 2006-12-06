@@ -51,6 +51,8 @@
  - Major change: password recovery is now based on profile fields rather than
    email account access
    *** PLEASE READ THE GOTCHAS ***
+ - fix: Updated Snippets not being cleared from cache
+
 
 7.2.3
  - fix: minor bug with new template vars in Auth::createAccount

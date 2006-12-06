@@ -136,6 +136,21 @@ sub indexContent {
 	$indexer->setIsPublic(0);
 }
 
+#-------------------------------------------------------------------
+
+=head2 purgeCache ( )
+
+Extending purgeCache to handle caching of the rendered snippet
+
+=cut
+
+sub purgeCache {
+	my $self = shift;
+
+	WebGUI::Cache->new($self->session,"view__".$self->getId)->delete;
+	WebGUI::Cache->new($self->session,"view_1_".$self->getId)->delete;	
+	$self->SUPER::purgeCache();
+}
 
 #-------------------------------------------------------------------
 sub view {
