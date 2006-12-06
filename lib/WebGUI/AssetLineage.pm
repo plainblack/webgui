@@ -75,12 +75,12 @@ sub addChild {
 	$self->session->db->beginTransaction;
 	$self->session->db->write("insert into asset (assetId, parentId, lineage, creationDate, createdBy, className, state) values (?,?,?,?,?,?,'published')",
 		[$id,$self->getId,$lineage,$now,$self->session->user->userId,$properties->{className}]);
-	my $temp = WebGUI::Asset->newByPropertyHashRef($self->session,{
-		assetId=>$id,
-		className=>$properties->{className}
-		});
-	my $newAsset = $temp->addRevision($properties,$now);
 	$self->session->db->commit;
+	$properties->{assetId} = $id;
+	$properties->{parentId} = $self->getId;
+	my $temp = WebGUI::Asset->newByPropertyHashRef($self->session,$properties);
+	$temp->{_parent} = $self;
+	my $newAsset = $temp->addRevision($properties,$now);
 	$self->updateHistory("added child ".$id);
 	$self->session->http->setStatus(201,"Asset Creation Successful");
 	return $newAsset;

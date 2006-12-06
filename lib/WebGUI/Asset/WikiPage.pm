@@ -130,6 +130,13 @@ sub duplicate {
 
 
 #-------------------------------------------------------------------
+sub getAutoCommitWorkflowId {
+	my $self = shift;
+	return $self->getWiki->get("approvalWorkflow");
+}
+
+
+#-------------------------------------------------------------------
 sub getEditForm {
 	my $self = shift;
 	my $session = $self->session;
@@ -231,7 +238,7 @@ sub processPropertiesFromFormPost {
 			 isHidden => 1,
 			actionTakenBy => $self->session->user->userId,
 			actionTaken => $actionTaken});
-	if ($self->canAdminister) {
+	if ($self->getWiki->canAdminister) {
 		$self->update({isProtected => $self->session->form("isProtected")});
 	}
 	delete $self->{_storageLocation};
@@ -249,20 +256,6 @@ sub processPropertiesFromFormPost {
                 $size += $storage->getFileSize($file);
         }
         $self->setSize($size);
-	# allows us to let the cs post use it's own workflow approval process
-        my $currentTag = WebGUI::VersionTag->getWorking($self->session);
-        if ($currentTag->getAssetCount < 2) {
-                $currentTag->set({workflowId=>$self->getWiki->get("approvalWorkflow")});
-                $currentTag->requestCommit;
-        } else {
-                my $newTag = WebGUI::VersionTag->create($self->session, {
-                        name=>$self->getTitle." / ".$self->session->user->username,
-                        workflowId=>$self->getWiki->get("approvalWorkflow")
-                        });
-                $self->session->db->write("update assetData set tagId=? where assetId=? and tagId=?",[$newTag->getId, $self->getId, $currentTag->getId]);
-                $self->purgeCache;
-                $newTag->requestCommit;
-        }
 }	
 
 #-------------------------------------------------------------------
@@ -298,7 +291,7 @@ sub view {
 #-------------------------------------------------------------------
 sub www_delete {
 	my $self = shift;
-	return $self->session->privilege->insufficient unless $self->canAdminister;
+	return $self->session->privilege->insufficient unless $self->getWiki->canAdminister;
 	$self->trash;
 	$self->session->asset($self->getParent);
 	return $self->getParent->www_view;

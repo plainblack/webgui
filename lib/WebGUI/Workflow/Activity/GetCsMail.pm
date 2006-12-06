@@ -129,7 +129,6 @@ sub addPost {
 	}
 	$post->postProcess;
 	$post->getThread->unarchive if ($post->getThread->get("status") eq "archived");
-	$post->requestCommit;
 	return $post;
 }
 

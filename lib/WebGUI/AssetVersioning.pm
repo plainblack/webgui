@@ -58,7 +58,9 @@ sub addRevision {
         my $self = shift;
         my $properties = shift;
 	my $now = shift ||$self->session->datetime->time();
-	my $workingTag = WebGUI::VersionTag->getWorking($self->session);
+	my $autoCommitId = $self->getAutoCommitWorkflowId();
+	my $workingTag = ($autoCommitId) ? WebGUI::VersionTag->create($self->session, {groupToUse=>'12', workflowId=>$autoCommitId}) : WebGUI::VersionTag->getWorking($self->session);
+	$self->session->db->beginTransaction;
 	$self->session->db->write("insert into assetData (assetId, revisionDate, revisedBy, tagId, status, url,
 		ownerUserId, groupIdEdit, groupIdView) values (?, ?, ?, ?, 'pending', ?, '3','3','7')",
 		[$self->getId, $now, $self->session->user->userId, $workingTag->getId, $self->getId] );
@@ -67,12 +69,14 @@ sub addRevision {
                         $self->session->db->write("insert into ".$definition->{tableName}." (assetId,revisionDate) values (?,?)", [$self->getId, $now]);
                 }
         }
+	$self->session->db->commit;
         my $newVersion = WebGUI::Asset->new($self->session,$self->getId, $self->get("className"), $now);
         $newVersion->updateHistory("created revision");
 	$newVersion->update($self->get);
 	$newVersion->setVersionLock;
 	$properties->{status} = 'pending';
         $newVersion->update($properties);
+	$workingTag->requestCommit if ($autoCommitId);
         return $newVersion;
 }
 
@@ -109,6 +113,18 @@ sub commit {
 }
 
 
+
+#-------------------------------------------------------------------
+
+=head2 getAutoCommitWorkflowId  ( )
+
+Override this method in your asset if you want your asset to auto-commit its workflow each time addRevision() is called on it. Your overridden method must return the workflow Id of the workflow to run on autocommit.
+
+=cut
+
+sub getAutoCommitWorkflowId {
+	return undef;
+}
 
 #-------------------------------------------------------------------
 

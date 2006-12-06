@@ -601,6 +601,8 @@ sub getEditTabs {
 	return ();
 }
 
+#-------------------------------------------------------------------
+
 =head2 getEditForm ()
 
 Creates and returns a tabform to edit parameters of an Asset.
