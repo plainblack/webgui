@@ -7,13 +7,13 @@
 <tmpl_var formHeader>
 <table>
 <tbody>
-<tr><td><label for="title"><tmpl_var titleLabel></label></td><td><tmpl_var formTitle></td></tr>
-<tr><td><label for="content"><tmpl_var contentLabel></label></td><td><tmpl_var formContent></td></tr>
+<tr><td><label for="title_formId"><tmpl_var titleLabel></label></td><td><tmpl_var formTitle></td></tr>
+<tr><td><label for="content_formId"><tmpl_var contentLabel></label></td><td><tmpl_var formContent></td></tr>
 <tmpl_if canAdminister>
-	<tr><td><label for="isProtected"><tmpl_var protectQuestionLabel></label></td><td><tmpl_var formProtect></td></tr>
+	<tr><td><label for="isProtected_formId"><tmpl_var protectQuestionLabel></label></td><td><tmpl_var formProtect></td></tr>
 </tmpl_if>
 <tmpl_if allowsAttachments>
-	<tr><td><label for="storageId"><tmpl_var attachmentLabel></label></td><td><tmpl_var formAttachment></td></tr>
+	<tr><td><label for="storageId_formId"><tmpl_var attachmentLabel></label></td><td><tmpl_var formAttachment></td></tr>
 </tmpl_if>
 </tbody>
 </table>

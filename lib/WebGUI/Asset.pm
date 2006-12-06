@@ -1854,7 +1854,7 @@ Returns "".
 sub view {
 	my $self = shift;
 	if ($self->session->var->get("adminOn")) {
-		return $self->getToolbar;
+		return $self->getToolbar.' '.$self->getTitle;
 	} else {
 		return "";
 	}
