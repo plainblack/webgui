@@ -23,9 +23,9 @@ addWikiAssets($session);
 deleteOldFiles($session);
 addFileFieldsToDataForm($session);
 makeRSSFromParentAlwaysHidden($session);
-#addNewCalendar($session);
-#migrateCalendars($session);
-#removeOldCalendar($session);
+addNewCalendar($session);
+migrateCalendars($session);
+removeOldCalendar($session);
 finish($session); # this line required
 
 #-------------------------------------------------
@@ -121,6 +121,7 @@ CREATE TABLE `Event` (
   `assetId` varchar(22) NOT NULL, 
   `revisionDate` bigint(20) unsigned NOT NULL,
   `feedId` varchar(22) default NULL,
+  `feedUid` varchar(255) default NULL,
   `startDate` date default NULL,
   `endDate` date default NULL,
   `userDefined1` text,

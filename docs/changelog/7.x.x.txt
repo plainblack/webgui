@@ -40,6 +40,9 @@
  - WebGUI::TabForm->addTab now returns the WebGUI::HTMLForm created.
  - WebGUI::AssetLineage::getLineage can now limit the number of records returned
  - fix: IP addresses for adminModeSubnets not using X-Forwarded-For properly
+ - The Events Calendar is now the new Calendar with some fun new features.
+   All your existing Events Calendars will be migrated automatically. 
+   *** PLEASE READ THE GOTCHAS ***
 
 7.2.3
  - fix: minor bug with new template vars in Auth::createAccount

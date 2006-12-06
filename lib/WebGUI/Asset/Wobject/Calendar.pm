@@ -27,6 +27,7 @@ use WebGUI::DateTime;
 use base 'WebGUI::Asset::Wobject';
 
 use DateTime;
+use JSON;
 
 
 =head1 Name
@@ -348,7 +349,7 @@ sub duplicate
 	my @events	= $self->getLineage(["descendents"],
 		{
 			returnObjects		=> 1,
-			includeOnlyClasses	=> 'WebGUI::Asset::Event',
+			includeOnlyClasses	=> ['WebGUI::Asset::Event'],
 		});
 	
 	
@@ -368,7 +369,10 @@ sub duplicate
 
 =head2 getEditForm
 
-Adds an additional tab for feeds.
+Adds an additional tab for feeds. 
+
+TODO: Abstract the Javascript enough to export into extras/yui-webgui for use
+in other areas.
 
 =cut
 
@@ -379,10 +383,146 @@ sub getEditForm
 	my $form	= $self->SUPER::getEditForm;
 	my $i18n	= WebGUI::International->new($session,"Asset_Calendar");
 	
-	my $tab	= $form->addTab("feeds",$i18n->get("feeds"));
+	my $tab		= $form->addTab("feeds",$i18n->get("feeds"));
+	$tab->raw("<tr><td>");
+	
+	
+	$tab->raw(<<'ENDJS');
+	<script type="text/javascript">
+	var FeedsManager	= new Object();
+	
+	FeedsManager.addFeed = function (table,rowId,params) {
+		// TODO: Verify that feed URL is valid
+		
+		
+		var table	= document.getElementById(table);
+		
+		// If id is "new"
+		//  Add a number on the end.
+		if (rowId == "new")
+			rowId = "new" + Math.round(Math.random() * 10000000000000000);
+		
+		// Create 5 cells
+		var cells	= new Array();
+		for (var i = 0; i < 5; i++)
+			cells[i]	= document.createElement("td");
+		
+		
+		/*** [0] - Delete button */
+		var button	= document.createElement("img");
+		button.setAttribute("src","/extras/wobject/Calendar/images/delete.gif");
+		button.setAttribute("border","0");
+		
+		var deleteLink	= document.createElement("a");
+		deleteLink.setAttribute("href","#");
+		deleteLink.setAttribute("onclick","FeedsManager.deleteFeed('feeds','"+rowId+"'); return false;");
+		deleteLink.appendChild(button);
+		
+		cells[0].appendChild(deleteLink);
+		
+		
+		
+		/*** [1] - Feed link for teh clicking and form element for teh saving */
+		var feedLink	= document.createElement("a");
+		feedLink.setAttribute("href",params.url);
+		feedLink.setAttribute("target","_new"); // TODO: Use JS to open window. target="" is deprecated
+		feedLink.appendChild(document.createTextNode(params.url));
+		
+		var formElement	= document.createElement("input");
+		formElement.setAttribute("type","hidden");
+		formElement.setAttribute("name","feeds-"+rowId);
+		formElement.setAttribute("value",params.url);
+		
+		cells[1].appendChild(feedLink);
+		cells[1].appendChild(formElement);
+		
+		
+		
+		/*** [2] - Result (new) */
+		if (params.lastResult == undefined)
+			params.lastResult = "new";
+		var lastResult	= document.createTextNode(params.lastResult);
+		
+		cells[2].appendChild(lastResult);
+		
+		
+		
+		/*** [3] - Last updated */
+		if (params.lastUpdated == undefined)
+			params.lastUpdated = "never";
+		var lastUpdated	= document.createTextNode(params.lastUpdated);
+		
+		cells[3].appendChild(lastUpdated);
+		
+		
+		
+		/*** [4] - Update now! */
+		/* TODO */
+		
+		
+		/* Add the row to the table */
+		var row		= document.createElement("tr");
+		row.setAttribute("id",rowId);
+		for (var i = 0; i < cells.length; i++)
+			row.appendChild(cells[i]);
+		
+		table.appendChild(row);
+		FeedsManager.updateFeed(table.getAttribute("id"),rowId);
+	}
+	
+	
+	FeedsManager.updateFeed = function (table,rowId) {
+		/* TODO */
+		
+	}
+	
+	
+	FeedsManager.deleteFeed = function (table,rowId) {
+		row		= document.getElementById(rowId);
+		
+		row.parentNode.removeChild(row);
+	}
+	
+	
+	FeedsManager.setFeed	= function (table,rowId,params) {
+		
+		
+		
+	}
+	
+	</script>
+ENDJS
+	
+	
+	$tab->raw(<<'ENDHTML');
+	<label for="addFeed">Add a feed</label>
+	<input type="text" size="60" id="addFeed" name="addFeed" value="http://google.com" />
+	<input type="button" value="Add" onclick="FeedsManager.addFeed('feeds','new',{ 'url' : this.form.addFeed.value }); this.form.addFeed.value=''" />
+	
+	<table id="feeds" style="width: 100%;">
+	<thead>
+		<th style="width: 30px;">&nbsp;</th>
+		<th style="width: 50%;">Feed URL</th>
+		<th>Status</th>
+		<th>Last Updated</th>
+		<th>&nbsp;</th>
+	</thead>
+	</table>
+ENDHTML
 	
 	
 	
+	# Add the existing feeds
+	my $feeds	= $self->getFeeds();
+	$tab->raw('<script type="text/javascript">'."\n");
+	for my $feedId (keys %$feeds)
+	{
+		$tab->raw("FeedsManager.addFeed('feeds','".$feedId."',".objToJson($feeds->{$feedId}).");\n");
+	}
+	$tab->raw('</script>');
+	
+	
+	$tab->raw("</td></tr>");
 	return $form;
 }
 
@@ -483,6 +623,31 @@ sub getEventsIn
 
 ####################################################################
 
+=head2 getFeeds ( )
+
+Gets a hashref of hashrefs of all the feeds attached to this calendar.
+
+TODO: Format lastUpdated into the user's time zone
+
+=cut
+
+sub getFeeds
+{
+	my $self	= shift;
+	
+	return $self->session->db->buildHashRefOfHashRefs(
+		"select * from Calendar_feeds where assetId=?",
+		[$self->get("assetId")],
+		"feedId"
+		);
+}
+
+
+
+
+
+####################################################################
+
 =head2 getFirstEvent ( )
 
 Gets the first event in this calendar. Returns the Event object.
@@ -540,7 +705,7 @@ sub prepareView
 	my $view	= ucfirst lc $self->session->form->param("type")
 			|| ucfirst $self->get("defaultView") 
 			|| "Month";
-	$self->session->errorHandler->warn("Prepare view ".$view." with template ".$self->get("templateId".$view));
+	#$self->session->errorHandler->warn("Prepare view ".$view." with template ".$self->get("templateId".$view));
 	
 	my $template 	= WebGUI::Asset::Template->new($self->session, $self->get("templateId".$view));
 	$template->prepare;
@@ -566,9 +731,9 @@ Adds / removes feeds from the feed trough.
 
 sub processPropertiesFromFormPost 
 {
-	my $self = shift;
-	
-	# The super does most of the real work
+	my $self 	= shift;
+	my $session	= $self->session;
+	my $form	= $self->session->form;
 	$self->SUPER::processPropertiesFromFormPost;
 	
 	
@@ -578,6 +743,33 @@ sub processPropertiesFromFormPost
 	}
 	
 	
+	### Get feeds from the form
+	# Workaround WebGUI::Session::Form->param bug
+	my %feeds;
+	$feeds{$_}++ 
+		for map { s/^feeds-//; $_; } grep /^feeds-/,($form->param());
+	my @feeds	= keys %feeds;
+	
+	# Delete old feeds that are not in @feeds
+	for my $feedId ($session->db->buildArray("select feedId from Calendar_feeds where assetId=?",[$self->get("assetId")]))
+	{
+		unless (grep /^$feedId$/, @feeds)
+		{
+			$session->db->write("delete from Calendar_feeds where feedId=? and assetId=?",[$feedId,$self->get("assetId")]);
+		}
+	}
+	
+	
+	# Create new feeds
+	for my $feedId (grep /^new(\d+)/, @feeds)
+	{
+		$session->db->setRow("Calendar_feeds","feedId",{
+				feedId		=> "new",
+				assetId		=> $self->get("assetId"),
+				url		=> $form->param("feeds-".$feedId),
+				feedType	=> "ical",
+			});
+	}
 }
 
 
@@ -616,26 +808,26 @@ sub view
 	# Set defaults if necessary
 	unless ($params->{start})
 	{
-		if ($self->get("defaultDate") eq "first")
-		{
+		#if ($self->get("defaultDate") eq "first")
+		#{
 			#!! TODO: Get the first event's date
 				# select startDate from Events 
 				#	join assetLineage
 				#	order by startDate ASC, revisionDate DESC
 				#	limit 1
-		}
-		elsif ($self->get("defaultDate") eq "last")
-		{
+		#}
+		#elsif ($self->get("defaultDate") eq "last")
+		#{
 			#!! TODO: Get the last event's date
 				# select startDate from Events 
 				#	join assetLineage
 				#	order by startDate DESC, revisionDate DESC
 				#	limit 1
-		}
-		else
-		{
+		#}
+		#else
+		#{
 			$params->{start} = WebGUI::DateTime->from_epoch(epoch => time(), time_zone => $session->user->profileField("timeZone"))->toMysql;
-		}
+		#}
 	}
 	$params->{type}	||= $self->get("defaultView") || "Month";
 	
@@ -1172,34 +1364,51 @@ sub www_ical
 	
 	#!!! Events from what time period should we show? Default perpage?
 	# By default show the events for a month
-	my $type	= $form->param("type") || $self->get("defaultView") || "month";
+	my $type	= $form->param("type") || lc($self->get("defaultView")) || "month";
 	my $start	= $form->param("start");
 	my $end		= $form->param("end");
+	
+	
+	
+	
+	#!!! KLUDGE:
+	# An "adminId" may be passed as a parameter in order to facilitate
+	# calls between calendars on the same server getting administrator 
+	# privileges
+	# I do not know how dangerous this could possibly be, so THIS MUST 
+	# CHANGE
+	my $adminId	= $form->param("adminId");
+	if ($adminId 
+		&& ($self->session->db->quickArray("SELECT value FROM userSessionScratch WHERE sessionId=? and name=?",[$adminId,$self->get("assetId")]))[0] eq "SPECTRE")
+	{
+		$self->session->user({userId => 3});
+	}
+	#/KLUDGE
 	
 	
 	my $dt_start;
 	unless ($start)
 	{
-		if ($self->get("defaultDate") eq "first")
-		{
+		#if ($self->get("defaultDate") eq "first")
+		#{
 			#!! TODO: Get the first event's date
 				# select startDate from Events 
 				#	join assetLineage
 				#	order by startDate ASC, revisionDate DESC
 				#	limit 1
-		}
-		elsif ($self->get("defaultDate") eq "last")
-		{
+		#}
+		#elsif ($self->get("defaultDate") eq "last")
+		#{
 			#!! TODO: Get the last event's date
 				# select startDate from Events 
 				#	join assetLineage
 				#	order by startDate DESC, revisionDate DESC
 				#	limit 1
-		}
-		else
-		{
+		#}
+		#else
+		#{
 			$dt_start = WebGUI::DateTime->from_epoch(epoch => time(), time_zone => $session->user->profileField("timeZone"));
-		}
+		#}
 	}
 	else
 	{
@@ -1211,18 +1420,18 @@ sub www_ical
 	my $dt_end;
 	unless ($end)
 	{
-		if ($type eq "month")
-		{
+		#if ($type eq "month")
+		#{
 			$dt_end	= $dt_start->clone->add(months => 1);
-		}
-		elsif ($type eq "week")
-		{
-			$dt_end = $dt_start->clone->add(weeks => 1);
-		}
-		elsif ($type eq "day")
-		{
-			$dt_end = $dt_start->clone->add(days => 1);
-		}
+		#}
+		#elsif ($type eq "week")
+		#{
+		#	$dt_end = $dt_start->clone->add(weeks => 1);
+		#}
+		#elsif ($type eq "day")
+		#{
+		#	$dt_end = $dt_start->clone->add(days => 1);
+		#}
 	}
 	else
 	{
@@ -1246,32 +1455,41 @@ sub www_ical
 		
 		# Currently we only need
 		# UID
+		# TODO: Use feedUid if one exists
 		my $domain	= $session->config->get("sitename")->[0];
-		$ical	.= qq{UID:}.$event->get("assetId").'@'.$domain."\n";
+		$ical	.= qq{UID:}.$event->get("assetId").'@'.$domain."\x0D\x0A";
 		
 		# LAST-MODIFIED (revisionDate)
 		$ical	.= qq{LAST-MODIFIED:}
 			. WebGUI::DateTime->new($event->get("revisionDate"))->toIcal
-			. "\n";
+			. "\x0D\x0A";
 		
 		# CREATED (creationDate)
 		$ical	.= qq{CREATED:}
 			. WebGUI::DateTime->new($event->get("creationDate"))->toIcal
-			. "\n";
+			. "\x0D\x0A";
 		
 		# DTSTART
-		$ical	.= qq{DTSTART:}.$event->getIcalStart."\n";
+		$ical	.= qq{DTSTART:}.$event->getIcalStart."\x0D\x0A";
 		
 		# DTEND
-		$ical	.= qq{DTEND:}.$event->getIcalEnd."\n";
+		$ical	.= qq{DTEND:}.$event->getIcalEnd."\x0D\x0A";
 		
 		# Summary (the title)
 		# Wrapped at 75 columns
-		$ical	.= $self->wrapIcal("SUMMARY:".$event->get("title"))."\n";
+		$ical	.= $self->wrapIcal("SUMMARY:".$event->get("title"))."\x0D\x0A";
 				
 		# Description (the text)
 		# Wrapped at 75 columns
-		$ical	.= $self->wrapIcal("DESCRIPTION:".$event->get("description"))."\n";
+		$ical	.= $self->wrapIcal("DESCRIPTION:".$event->get("description"))."\x0D\x0A";
+		
+		
+		
+		# X-WEBGUI lines
+		$ical	.= "X-WEBGUI-GROUPIDVIEW:".$event->get("groupIdView")."\x0D\x0A";
+		$ical	.= "X-WEBGUI-GROUPIDEDIT:".$event->get("groupIdEdit")."\x0D\x0A";
+		$ical	.= "X-WEBGUI-URL:".$event->get("url")."\x0D\x0A";
+		
 		
 		$ical	.= qq{END:VEVENT\n};
 	}

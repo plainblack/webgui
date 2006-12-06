@@ -97,6 +97,14 @@ sub definition {
 			fieldType	=> "Text",
 			defaultValue	=> undef,
 		},
+		'feedId' => {
+			fieldType	=> "Text",
+			defaultValue	=> undef,
+		},
+		'feedUid' => {
+			fieldType	=> "Text",
+			defaultValue	=> undef,
+		},
 	);
 	
 	
