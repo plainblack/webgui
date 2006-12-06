@@ -56,8 +56,8 @@ sub addWikiAssets {
   CREATE TABLE `WikiMaster` (
     `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
     `revisionDate` bigint(20) NOT NULL,
-    `groupToEditPages` varchar(22) character set utf8 collate utf8_bin NOT NULL,
-    `groupToAdminister` varchar(22) character set utf8 collate utf8_bin NOT NULL,
+    `groupToEditPages` varchar(22) character set utf8 collate utf8_bin NOT NULL default '2',
+    `groupToAdminister` varchar(22) character set utf8 collate utf8_bin NOT NULL default '3',
     `richEditor` varchar(22) character set utf8 collate utf8_bin NOT NULL
                  default 'PBrichedit000000000002',
     `frontPageTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL

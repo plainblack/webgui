@@ -10,21 +10,19 @@
     <div id="wikipage" class="yui-navset">
         <ul class="yui-nav">
             <li class="selected"><a href="#wikipagecontent"><em><tmpl_var viewLabel></em></a></li>
+            <li><a href="#wikipageedit"><em><tmpl_var editLabel></em></a></li>
         </ul>
         <div class="yui-content">
             <div id="wikipagecontent">
 		<tmpl_var content>
             </div>
+            <div id="wikipageedit">
+		<tmpl_var editContent>
+            </div>
         </div>
     </div>
 <script type="text/javascript">
 initWikiTabs = function() {
-    	var tabView = new YAHOO.widget.TabView('wikipage');
-		tabView.addTab(new YAHOO.widget.Tab({
-        	label: '<tmpl_var editLabel>',
-        	dataSrc: '<tmpl_var editUrl>',
-		cacheData: true
-    	}));
     	var tabView = new YAHOO.widget.TabView('wikipage');
 		tabView.addTab(new YAHOO.widget.Tab({
         	label: '<tmpl_var historyLabel>',

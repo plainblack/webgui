@@ -4,7 +4,6 @@
 #url:default-wiki-search
 #title:Default Wiki Search
 #menuTitle:Default Wiki Search
-<tmpl_if session.var.adminOn><p><tmpl_var controls></p></tmpl_if>
 <tmpl_if displayTitle><h2><tmpl_var searchLabel></h2></tmpl_if>
 
 
@@ -19,29 +18,11 @@
 		</div>
 		</tmpl_if>
 	<p><tmpl_var notWhatYouWanted></p>
-		<p><a href="javascript:wiki_getAddForm('<tmpl_var getEditFormUrl>');"><tmpl_var addPageLabel></a></p>
+		<p><a href="<tmpl_var addPageUrl>"><tmpl_var addPageLabel></a></p>
 	<tmpl_else>
 		<p><tmpl_var nothingFoundLabel></p>
-		<p><a href="javascript:wiki_getAddForm('<tmpl_var getEditFormUrl>');"><tmpl_var addPageLabel></a></p>
+		<p><a href="<tmpl_var addPageUrl>"><tmpl_var addPageLabel></a></p>
 	</tmpl_if>
 </tmpl_if>
-<div id="addFormGoesHere" style="display: none;"></div>
 <div style="padding: 8px;"><a href="<tmpl_var mostPopularUrl>"><tmpl_var mostPopularLabel></a> | <a href="<tmpl_var recentChangesUrl>"><tmpl_var recentChangesLabel></a> | <a href="<tmpl_var wikiHomeUrl>"><tmpl_var wikiHomeLabel></a></div>
-
-~~~
-<script type="text/javascript" src="^Extras(yui/build/yahoo/yahoo-min.js);"></script>
-<script type="text/javascript" src="^Extras(yui/build/connection/connection-min.js);"></script>
-<script type="text/javascript">
-function wiki_getAddForm (url) {
-        var request = YAHOO.util.Connect.asyncRequest('GET', url, { success:wiki_displayAddForm, failure:wiki_connectFailure });
-}
-function wiki_displayAddForm (response) {
-	var thediv = document.getElementById("addFormGoesHere");
-	thediv.style.display = "block";
-	thediv.innerHTML = response.responseText;
-}
-function wiki_connectFailure (response) {
-	alert("Couldn't connect to server: " + response.status + "(" + response.statusText+")");
-}
-</script>
 

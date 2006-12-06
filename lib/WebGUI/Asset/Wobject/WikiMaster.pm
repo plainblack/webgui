@@ -19,196 +19,6 @@ use HTML::Parser;
 use URI::Escape;
 
 #-------------------------------------------------------------------
-sub _appendFuncTemplateVars {
-	my $self = shift;
-	my $var = shift;
-	my @funcs = @_;
-	my $i18n = WebGUI::International->new($self->session, 'Asset_WikiMaster');
-	my %specialFuncs =
-	    (addPage => 'func=add;class=WebGUI::Asset::WikiPage');
-
-	foreach my $func (@funcs) {
-		$var->{$func.'Url'} = $self->getUrl($specialFuncs{$func} || "func=$func");
-		$var->{$func.'Text'} = $i18n->get("func $func link text");
-	}
-}
-
-#-------------------------------------------------------------------
-sub _appendRecentChangesVars {
-	my $self = shift;
-	my $var = shift;
-	my $limit = shift;
-	my $time = $self->session->datetime->time;
-	my $entries = $self->_templateSubvarsRefOfEdits($self->_editsRefOfRecentChanges($limit), $time);
-	my $days = $self->_daysRefOfTemplateSubvars($entries);
-
-	$var->{'recentChangesEntries'} = $entries;
-	$var->{'recentChangesDays'} = $days;
-	return $self;
-}
-
-#-------------------------------------------------------------------
-sub _appendSearchBoxVars {
-	my $self = shift;
-	my $var = shift;
-	my $queryText = shift;
-	my $submitText = WebGUI::International->new($self->session, 'Asset_WikiMaster')->get('searchLabel');
-	$var->{'searchFormHeader'} = join '',
-	    (WebGUI::Form::formHeader($self->session, { action => $self->getUrl}),
-	     WebGUI::Form::hidden($self->session, { name => 'func', value => 'search' }));
-	$var->{'searchQuery'} = WebGUI::Form::text($self->session, { name => 'query', value => $queryText });
-	$var->{'searchSubmit'} = WebGUI::Form::submit($self->session, { value => $submitText });
-	$var->{'searchFormFooter'} = WebGUI::Form::formFooter($self->session);
-	return $self;
-}
-
-#-------------------------------------------------------------------
-sub _appendVarsOfDate {
-	my $self = shift;
-	my $var = shift;
-	my $date = shift;
-	my $prefix = shift;
-	my $relativeTo = shift;
-	my $dt = $self->session->datetime;
-
-	$var->{$prefix . (length($prefix)? 'Date':'date')} = $dt->epochToHuman($date, '%z');
-	$var->{$prefix . (length($prefix)? 'Time':'time')} = $dt->epochToHuman($date, '%Z');
-	if (defined $relativeTo) {
-		my $ago = WebGUI::International->new($self->session, 'Asset')->get('ago');
-		$var->{$prefix . (length($prefix)? 'Interval':'interval')} = sprintf '%s %s %s',
-		    ($dt->secondsToInterval($relativeTo - $date), $ago);
-	}
-
-	return $self;
-}
-
-#-------------------------------------------------------------------
-sub _daysRefOfTemplateSubvars {
-	my $self = shift;
-	my $subvars = shift;
-	my @days = ();
-
-	foreach my $subvar (@$subvars) {
-		if (!@days or $subvar->{date} ne $days[-1][0]{date}) {
-			push @days, [$subvar];
-		} else {
-			push @{$days[-1]}, $subvar;
-		}
-	}
-
-	return [map { {'dayDate' => $$_[0]{date}, 'dayEntries' => $_} } @days];
-}
-
-#-------------------------------------------------------------------
-sub _editsRefOfQuery {
-	my $self = shift;
-	my $queryPiece = shift || 'true';
-	my $placeholders = shift || [];
-	my $allowedActions = shift || [qw/edited trashed protected unprotected/];
-	my $allowedActionsPredicate = "IN (".join(', ', ('?') x @$allowedActions).")";
-	my $limit = shift;
-	my $limitClause = $limit? sprintf("LIMIT %d,%d", @$limit[0..1]) : "";
-
-	# Ick.  Apparently assetHistory.dateStamp isn't always equivalent to assetData.revisionDate.
-	# It looks like the relationship between them is in fact semi-arbitrary.  Then there's also that
-	# it doesn't seem to be safe to add extra possible values to assetHistory.  So we have to do this.
-	# Bleagh.
-	$self->session->db->buildArrayRefOfHashRefs(<<"EOT", [(@$placeholders, @$allowedActions) x 3]);
-SELECT h.userId AS userId, u.username AS username, h.dateStamp AS dateStamp,
-       h.actionTaken AS action, CONCAT('/', d.url) AS url, d.title AS title, a.assetId AS assetId
-  FROM assetHistory AS h LEFT JOIN users AS u ON h.userId = u.userId
-                         INNER JOIN asset AS a ON h.assetId = a.assetId
-                         INNER JOIN assetData AS d ON a.assetId = d.assetId AND h.dateStamp = d.revisionDate
- WHERE $queryPiece AND h.actionTaken $allowedActionsPredicate
-       UNION
-SELECT eh.userId AS userId, u.username AS username, eh.dateStamp AS dateStamp,
-       eh.actionTaken AS action, CONCAT('/', eh.url) AS url, eh.title AS title, a.assetId AS assetId
-  FROM WikiPage_extraHistory AS eh LEFT JOIN users AS u ON eh.userId = u.userId
-                                   INNER JOIN asset AS a ON eh.assetId = a.assetId
- WHERE $queryPiece AND eh.actionTaken $allowedActionsPredicate
-       UNION
-SELECT d.revisedBy AS userId, u.username AS username, d.revisionDate AS dateStamp,
-       'edited' AS action, CONCAT('/', d.url) AS url, d.title AS title, a.assetId AS assetId
-  FROM assetData AS d LEFT JOIN users AS u on d.revisedBy = u.userId
-                      INNER JOIN asset AS a ON d.assetId = a.assetId
- WHERE $queryPiece AND 'edited' $allowedActionsPredicate
-       ORDER BY dateStamp DESC
-       $limitClause
-EOT
-}
-
-#-------------------------------------------------------------------
-sub _editsRefOfRecentChanges {
-	my $self = shift;
-	my $limit = shift;
-	$self->_editsRefOfQuery("a.lineage LIKE CONCAT(?, '%') AND a.assetId <> ?", [$self->get('lineage'), $self->getId], [qw/edited trashed/], $limit);
-}
-
-#-------------------------------------------------------------------
-sub _templateSubvarOfEdit {
-	my $self = shift;
-	my $edit = shift;
-	my $time = shift;
-	my $i18n = WebGUI::International->new($self->session, 'Asset_WikiMaster');
-	my $subvar = +{%$edit};
-
-	$self->_appendVarsOfDate($subvar, $subvar->{dateStamp}, '', $time);
-
-	# If only HTML::Template::Expr were standard.
-	$subvar->{isDelete} = ($subvar->{action} eq 'trashed');
-	$subvar->{isEdit} = ($subvar->{action} eq 'edited');
-	$subvar->{isProtect} = ($subvar->{action} eq 'protected');
-	$subvar->{isUnprotect} = ($subvar->{action} eq 'unprotected');
-	$subvar->{isCreateOrEdit} = $subvar->{isEdit};
-	if ($subvar->{isEdit}) {
-		my $icon = $self->session->icon;
-		$subvar->{toolbar} = $icon->delete("func=purgeRevision;revisionDate=".$subvar->{dateStamp}, $subvar->{url}, "Delete this revision?")
-			.$icon->edit('func=edit;revision='.$subvar->{dateStamp}, $subvar->{url})
-			.$icon->view('func=view;revision='.$subvar->{dateStamp}, $subvar->{url});
-	}
-
-	if ($subvar->{isEdit} and ($self->session->db->quickArray("SELECT MIN(revisionDate) FROM assetData WHERE assetId = ?", [$subvar->{assetId}]))[0] == $subvar->{dateStamp}) {
-		$subvar->{action} = 'created';
-		$subvar->{isEdit} = 0;
-		$subvar->{isCreate} = 1;
-	}
-
-	$subvar->{actionTaken} = $i18n->get('actionN '.$subvar->{action});
-	$subvar->{actionTakenLowerCase} = lc $subvar->{actionN};
-
-	return $subvar;
-}
-
-#-------------------------------------------------------------------
-sub _templateSubvarOfPage {
-	my $self = shift;
-	my $page = shift;
-	my $subvar = {};
-	$page = WebGUI::Asset->newByDynamicClass($self->session, $page) unless ref $page;
-
-	$subvar->{title} = $page->get('title');
-	$subvar->{assetId} = $page->getId;
-	$subvar->{viewLatest} = $page->getUrl;
-	$subvar->{editLatest} = $page->getUrl('func=edit');
-	return $subvar;
-}
-
-#-------------------------------------------------------------------
-sub _templateSubvarsRefOfEdits {
-	my $self = shift;
-	my $edits = shift;
-	my $time = shift;
-	return [map { $self->_templateSubvarOfEdit($_, $time) } @$edits];
-}
-
-#-------------------------------------------------------------------
-sub _templateSubvarsRefOfPages {
-	my $self = shift;
-	my $pages = shift;
-	return [map { $self->_templateSubvarOfPage($_) } @$pages];
-}
-
-#-------------------------------------------------------------------
 sub appendMostPopular {
 	my $self = shift;
 	my $var = shift;
@@ -243,6 +53,21 @@ sub appendRecentChanges {
 			date=>$self->session->datetime->epochToHuman($asset->get("revisionDate"))
 			});
 	}
+}
+
+#-------------------------------------------------------------------
+sub appendSearchBoxVars {
+	my $self = shift;
+	my $var = shift;
+	my $queryText = shift;
+	my $submitText = WebGUI::International->new($self->session, 'Asset_WikiMaster')->get('searchLabel');
+	$var->{'searchFormHeader'} = join '',
+	    (WebGUI::Form::formHeader($self->session, { action => $self->getUrl}),
+	     WebGUI::Form::hidden($self->session, { name => 'func', value => 'search' }));
+	$var->{'searchQuery'} = WebGUI::Form::text($self->session, { name => 'query', value => $queryText });
+	$var->{'searchSubmit'} = WebGUI::Form::submit($self->session, { value => $submitText });
+	$var->{'searchFormFooter'} = WebGUI::Form::formFooter($self->session);
+	return $self;
 }
 
 #-------------------------------------------------------------------
@@ -287,9 +112,7 @@ sub autolinkHtml {
 #-------------------------------------------------------------------
 sub canAdminister {
 	my $self = shift;
-	my $userId = shift || $self->session->user->userId;
-	my $user = WebGUI::User->new($self->session, $userId);
-	return $self->canView($userId) && $user->isInGroup($self->get('groupToAdminister'));
+	return $self->session->user->isInGroup($self->get('groupToAdminister')) || $self->canEdit;
 }
 
 #-------------------------------------------------------------------
@@ -313,7 +136,7 @@ sub definition {
 	%properties =
 	    (
 	     groupToEditPages => { fieldType => 'group',
-				   defaultValue => ['7'],
+				   defaultValue => ['2'],
 				   tab => 'security',
 				   hoverHelp => $i18n->get('groupToEditPages hoverHelp'),
 				   label => $i18n->get('groupToEditPages label') },
@@ -485,10 +308,9 @@ sub view {
 		recentChangesLabel=>$i18n->get("recentChangesLabel"),
 		};
 	my $template = $self->{_frontPageTemplate};
-	$self->_appendSearchBoxVars($var);
+	$self->appendSearchBoxVars($var);
 	$self->appendRecentChanges($var, $self->get('recentChangesCountFront'));
 	$self->appendMostPopular($var, $self->get('mostPopularCountFront'));
-	$self->_appendFuncTemplateVars($var, qw/recentChanges/);
 	return $self->processTemplate($var, undef, $template);
 }
 
@@ -543,10 +365,10 @@ sub www_search {
 		mostPopularUrl=>$self->getUrl("func=mostPopular"),
 		mostPopularLabel=>$i18n->get("mostPopularLabel"),
 		wikiHomeUrl=>$self->getUrl,
-		getEditFormUrl=>$self->getUrl("func=add;class=WebGUI::Asset::WikiPage;ajax=1"),
+		addPageUrl=>$self->getUrl("func=add;class=WebGUI::Asset::WikiPage"),
 		};
 	my $queryString = $self->session->form->process('query', 'text');
-	$self->_appendSearchBoxVars($var, $queryString);
+	$self->appendSearchBoxVars($var, $queryString);
 	if (length $queryString) {
 		my $search = WebGUI::Search->new($self->session);
 		$search->search({ keywords => $queryString,

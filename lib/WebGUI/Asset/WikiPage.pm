@@ -61,33 +61,12 @@ sub canAdd {
 }
 
 #-------------------------------------------------------------------
-sub canDelete {
-	my $self = shift;
-	my $userId = shift || $self->session->user->userId;
-	return $self->getWiki->canAdminister($userId);
-}
-
-#-------------------------------------------------------------------
 sub canEdit {
 	my $self = shift;
-	my $userId = shift || $self->session->user->userId;
-	return 0 if $self->isProtected and not $self->getWiki->canAdminister($userId);
-	return $self->couldEdit($userId);
-}
-
-#-------------------------------------------------------------------
-sub canProtect {
-	my $self = shift;
-	my $userId = shift || $self->session->user->userId;
-	return $self->getWiki->canAdminister($userId);
-}
-
-#-------------------------------------------------------------------
-sub couldEdit {
-	my $self = shift;
-	my $userId = shift || $self->session->user->userId;
-	return 0 unless $self->getWiki->canEditPages($userId);
-	return 1;
+	my $form = $self->session->form;
+	return (($form->process("func") eq "add" || ($form->process("assetId") eq "new" && $form->process("func") eq "editSave" && $form->process("class","className") eq "WebGUI::Asset::WikiPage")) && $self->getWiki->canEditPages) # account for new pages
+		|| (!$self->isProtected && $self->getWiki->canEditPages)  # account for normal editing
+		|| $self->getWiki->canAdminister; # account for admins
 }
 
 #-------------------------------------------------------------------
@@ -163,7 +142,7 @@ sub getEditForm {
 		title=> $i18n->get("editing")." ".(defined($self->get('title'))? $self->get('title') : $i18n->get("assetName")),
 		formHeader => WebGUI::Form::formHeader($session, { action => $url}) 
 			.WebGUI::Form::hidden($session, { name => 'func', value => 'editSave' }) 
-			.WebGUI::Form::hidden($session, { name=>"proceed", value=>$form->process("proceed") }),
+			.WebGUI::Form::hidden($session, { name=>"proceed", value=>"showConfirmation" }),
 	 	formTitle => WebGUI::Form::text($session, { name => 'title', maxlength => 255, size => 40, value => $self->get('title') }),
 		formContent => WebGUI::Form::HTMLArea($session, { name => 'content', richEditId => $wiki->get('richEditor'), value => $self->get('content') }),
 		formSubmit => WebGUI::Form::submit($session, { value => 'Save' }),
@@ -310,7 +289,7 @@ sub view {
 		mostPopularLabel=>$i18n->get("mostPopularLabel", "Asset_WikiMaster"),
 		wikiHomeUrl=>$self->getParent->getUrl,
 		historyUrl=>$self->getUrl("func=getHistory"),
-		editUrl=>$self->getUrl("func=edit;ajax=1"),
+		editContent=>$self->getEditForm,
 		content => $self->getWiki->autolinkHtml($self->get('content')),	
 		};
 	return $self->processTemplate($var, $self->getWiki->get("pageTemplateId"));
@@ -319,27 +298,23 @@ sub view {
 #-------------------------------------------------------------------
 sub www_delete {
 	my $self = shift;
-	return $self->session->privilege->insufficient unless $self->canDelete;
+	return $self->session->privilege->insufficient unless $self->canAdminister;
 	$self->trash;
 	$self->session->asset($self->getParent);
 	return $self->getParent->www_view;
 }
 
 #-------------------------------------------------------------------
-# here to keep backward compatibility with traditional editing
 sub www_edit {
 	my $self = shift;
 	return $self->session->privilege->insufficient unless $self->canEdit;
-	if ($self->session->form->param("ajax")) {	
-		$self->session->style->sent(1);
-		return $self->getEditForm;
-	}
 	return $self->getWiki->processStyle($self->getEditForm);
 }
 
 #-------------------------------------------------------------------
 sub www_getHistory {
 	my $self = shift;
+	return $self->session->privilege->insufficient unless $self->canEdit;
 	my $var = {};
 	my ($icon, $date) = $self->session->quick(qw(icon datetime));
 	foreach my $revision (@{$self->getRevisions}) {
