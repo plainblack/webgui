@@ -13,7 +13,6 @@ $VERSION = "0.0.0";
 ####################################################################
 
 use strict;
-use warnings;
 
 use Tie::IxHash;
 
@@ -265,7 +264,9 @@ sub addChild
 		$self->session->errorHandler->security("add a ".$properties->{className}." to a ".$self->get("className"));
 		return undef;
 	}
+
 	
+		
 	return $self->SUPER::addChild($properties, @other);
 }
 
@@ -290,17 +291,49 @@ sub canEdit
 	my $form	= $self->session->form;
 	my $user	= $self->session->user;
 	
-	no warnings qw(uninitialized);
-	return 1 	if ($form->param("assetId") eq "new" 
-			&& $form->param("func") eq "editSave" 
-			&& $form->param("class") eq "WebGUI::Asset::Event"
-			&& $user->isInGroup($self->get("groupIdEventEdit"))
-			);
-	use warnings qw(all);
-	
-	return $self->SUPER::canEdit;
+        return (
+		(
+			(
+				$form->process("func") eq "add" || 
+				(
+					$form->process("assetId") eq "new" && 
+					$form->process("func") eq "editSave" && 
+					$form->process("class") eq "WebGUI::Asset::Post::Thread"
+				)
+			) && 
+			$self->canAddEvent
+		) || # account for new events
+		$self->SUPER::canEdit()
+	);
 }
 
+
+
+
+####################################################################
+
+=head2 canAddEvent
+
+Returns true if able to add events. Checks to make sure that the 
+Calendar has been committed at least once. Checks to make sure that
+the user is in the appropriate group.
+
+=cut
+
+sub canAddEvent
+{
+	my $self	= shift;
+	
+	return (
+		(
+			$self->get("status") eq "approved" || 
+			$self->getTagCount > 1 # checks to make sure that the cs has been committed at least once
+		) && (
+			$self->session->user->isInGroup($self->get("groupIdEventEdit")) 
+			|| $self->SUPER::canEdit
+		)
+	);
+}
 
 
 
@@ -861,7 +894,7 @@ sub view
 	}
 	
 	# Event editor
-	if ($self->session->user->isInGroup(3))
+	if ($self->canAddEvent)
 	{
 		$var->{'editor'}	= 1;
 	}

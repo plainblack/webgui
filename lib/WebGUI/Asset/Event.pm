@@ -230,12 +230,29 @@ sub generateRecurringEvents
 		$properties->{endDate}		= $dt->clone->add(days => $duration_days)->strftime('%F');
 		
 		
-		$parent->addChild($properties)->requestCommit;
+		$parent->addChild($properties);
 	}
 	
 	return 1;
 }
 
+
+
+
+
+####################################################################
+
+=head2 getAutoCommitWorkflowId
+
+Gets the WebGUI::VersionTag workflow to use to automatically commit Events. 
+By specifying this method, you activate this feature.
+
+=cut
+
+sub getAutoCommitWorkflowId {
+	my $self = shift;
+	return "pbworkflow000000000003"; 
+}
 
 
 
@@ -1458,56 +1475,10 @@ sub processPropertiesFromFormPost
 				$properties->{endDate}		= $event->get("endDate");
 				
 				$event->addRevision($self->get);
-				
-				# Request the commit
-				$event->requestCommit;
 			}
 		}
 	}
-	
-	
-	$self->requestCommit;
 }
-
-
-
-####################################################################
-
-=head2 requestCommit
-
-Requests that this event (and all events with the same recurId) are committed
-using the parent element's approval workflow.
-
-If the user is already working under a version tag, will remove the events from
-the version tag and place them under a new version tag, then try to commit using
-the parent element's approval workflow.
-
-=cut
-
-sub requestCommit
-{
-	my $self 	= shift;
-	my $currentTag 	= WebGUI::VersionTag->getWorking($self->session);
-	my $workflowId	= "pbworkflow000000000003"; ###!!TODO: make a config value for this
-	
-	if ($currentTag->getAssetCount <= 1) 
-	{
-		$currentTag->set({workflowId=>$workflowId});
-		$currentTag->requestCommit;
-	} 
-	else 
-	{
-		my $newTag = WebGUI::VersionTag->create($self->session, 
-			{
-				name		=> $self->getTitle." / ".$self->session->user->username,
-				workflowId	=> $workflowId,
-			});
-		$self->session->db->write("update assetData set tagId=? where assetId=? and tagId=?",[$newTag->getId, $self->getId, $currentTag->getId]);
-		$self->purgeCache;
-		$newTag->requestCommit;
-	}
-}
-
 
 
 
@@ -1679,7 +1650,8 @@ sub www_edit
 	my $tz		= $session->user->profileField("timeZone");
 	my $func	= lc $session->form->param("func");
 	my $var		= {};
-	
+
+	return $self->session->privilege->noAccess() unless $self->getParent->canAddEvent();	
 	
 	if ($func eq "add" || $form->param("assetId") eq "new")
 	{
@@ -1803,22 +1775,7 @@ sub www_edit
 		<div id="times">|
 		.q|Start: |.$var->{"formStartTime"}
 		.q|<br/>End: |.$var->{"formEndTime"}
-		.q|</div>
-		<script type="text/javascript">
-		function toggleTimes()
-		{
-			if (document.getElementById("allday_no").checked)
-			{
-				document.getElementById("times").style.display = "block";
-			}
-			else
-			{
-				document.getElementById("times").style.display = "none";
-			}
-		}
-		
-		toggleTimes();
-		</script>|;
+		.q|</div>|;
 	
 	# related links
 	$var->{"formRelatedLinks"}	= WebGUI::Form::textarea($session,
@@ -1962,35 +1919,6 @@ sub www_edit
 			</select>
 			</p>
 		</div>
-		
-		
-		<script type="text/javascript">
-		function toggleRecur()
-		{
-			document.getElementById("recurPattern_daily").style.display = "none";
-			document.getElementById("recurPattern_weekly").style.display = "none";
-			document.getElementById("recurPattern_monthly").style.display = "none";
-			document.getElementById("recurPattern_yearly").style.display = "none";
-			
-			if (document.getElementById("recurType_daily").checked)
-			{
-				document.getElementById("recurPattern_daily").style.display = "block";
-			}
-			else if (document.getElementById("recurType_weekly").checked)
-			{
-				document.getElementById("recurPattern_weekly").style.display = "block";
-			}
-			else if (document.getElementById("recurType_monthly").checked)
-			{
-				document.getElementById("recurPattern_monthly").style.display = "block";
-			}
-			else if (document.getElementById("recurType_yearly").checked)
-			{
-				document.getElementById("recurPattern_yearly").style.display = "block";
-			}
-		}
-		toggleRecur();
-		</script>
 		|;
 	
 	
@@ -2042,6 +1970,53 @@ sub www_edit
 				});
 	
 	
+	$var->{"script"}	= <<'ENDJS';
+		<script type="text/javascript">
+		function toggleTimes()
+		{
+			if (document.getElementById("allday_no").checked)
+			{
+				document.getElementById("times").style.display = "block";
+			}
+			else
+			{
+				document.getElementById("times").style.display = "none";
+			}
+		}
+		
+		toggleTimes();
+
+
+		function toggleRecur()
+		{
+			document.getElementById("recurPattern_daily").style.display = "none";
+			document.getElementById("recurPattern_weekly").style.display = "none";
+			document.getElementById("recurPattern_monthly").style.display = "none";
+			document.getElementById("recurPattern_yearly").style.display = "none";
+			
+			if (document.getElementById("recurType_daily").checked)
+			{
+				document.getElementById("recurPattern_daily").style.display = "block";
+			}
+			else if (document.getElementById("recurType_weekly").checked)
+			{
+				document.getElementById("recurPattern_weekly").style.display = "block";
+			}
+			else if (document.getElementById("recurType_monthly").checked)
+			{
+				document.getElementById("recurPattern_monthly").style.display = "block";
+			}
+			else if (document.getElementById("recurType_yearly").checked)
+			{
+				document.getElementById("recurPattern_yearly").style.display = "block";
+			}
+		}
+		toggleRecur();
+		</script>
+ENDJS
+	
+	
+		
 	### Show any errors if necessary
 	if ($self->session->stow->get("editFormErrors"))
 	{
