@@ -94,13 +94,13 @@ sub process {
 			name=>"method",
 			value=>"login"
 			});
-	$var{'username.label'} = '<label for="username_formId">'.$i18n->get(50, 'WebGUI').'</label>';
+	$var{'username.label'} = $i18n->get(50, 'WebGUI');
 	$var{'username.form'} = WebGUI::Form::text($session,{
 		name=>"username",
 		size=>$boxSize,
 		extras=>'class="loginBoxField"'
 		});
-        $var{'password.label'} = '<label for="identifier_formId">'.$i18n->get(51, 'WebGUI').'</label>';
+        $var{'password.label'} = $i18n->get(51, 'WebGUI');
         $var{'password.form'} = WebGUI::Form::password($session,{
 		name=>"identifier",
 		size=>$boxSize,
