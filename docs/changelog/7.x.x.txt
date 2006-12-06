@@ -45,6 +45,7 @@
    want it to run.
  - fix: new profile fields and new users not handling profile defaults right
  - fix: subscription dates
+ - fix: Default Rich Editor setting not rendering correctly
  - The Events Calendar is now the new Calendar with some fun new features.
    All your existing Events Calendars will be migrated automatically. 
  - Major change: password recovery is now based on profile fields rather than

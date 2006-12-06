@@ -176,9 +176,8 @@ sub definition {
 		name=>"richEditor",
 		label=>$i18n->get("default rich editor"),
 		hoverHelp=>$i18n->get("default rich editor description"),
-		defaultValue=>[$session->setting->get("richEditor")],
-		options=>WebGUI::Asset::RichEdit->getList($session),
-		defaultValue=>["PBrichedit000000000001"]
+		defaultValue=>[$session->setting->get("richEditor") || "PBrichedit000000000001"],
+		options=>WebGUI::Asset::RichEdit->getList($session)
 		});
 	push(@fields, {
 		tab=>"ui",
