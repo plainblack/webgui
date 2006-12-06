@@ -55,7 +55,7 @@ sub _hasMixedCaseCharacters {
 
 =head2 _isValidPassword (  )
 
-  Validates the password9.
+  Validates the password.
 
 =cut
 
@@ -427,11 +427,11 @@ sub editUserSettingsForm {
              -value=>$self->session->setting->get("webguiPasswordRecovery"),
              -label=>$i18n->get(6)
              );
-   $f->textarea(
-		-name=>"webguiRecoverPasswordEmail",
-		-label=>$i18n->get(134, 'WebGUI'),
-		-value=>$self->session->setting->get("webguiRecoverPasswordEmail")
-		);
+   $f->yesNo(
+	         -name=>"webguiPasswordRecoveryRequireUsername",
+             -value=>$self->session->setting->get("webguiPasswordRecoveryRequireUsername"),
+             -label=>$i18n->get('require username for password recovery')
+             );
    	$f->yesNo(
 		-name=>"webguiValidateEmail",
              	-value=>$self->session->setting->get("webguiValidateEmail"),
@@ -469,7 +469,7 @@ sub editUserSettingsForm {
 	$f->template(
 		-name=>"webguiPasswordRecoveryTemplate",
 		-value=>$self->session->setting->get("webguiPasswordRecoveryTemplate"),
-		-namespace=>"Auth/WebGUI/Recovery",
+		-namespace=>"Auth/WebGUI/Recovery2",
 		-label=>$i18n->get("password recovery template")
 		);
    return $f->printRowsOnly;
@@ -491,7 +491,7 @@ sub editUserSettingsFormSave {
 	$s->set("webguiChangeUsername", $f->process("webguiChangeUsername","yesNo"));
 	$s->set("webguiChangePassword", $f->process("webguiChangePassword","yesNo"));
 	$s->set("webguiPasswordRecovery", $f->process("webguiPasswordRecovery","yesNo"));
-	$s->set("webguiRecoverPasswordEmail", $f->process("webguiRecoverPasswordEmail","textarea"));
+	$s->set("webguiPasswordRecoveryRequireUsername", $f->process("webguiPasswordRecoveryRequireUsername","yesNo"));
 	$s->set("webguiValidateEmail", $f->process("webguiValidateEmail","yesNo"));
 	$s->set("webguiUseCaptcha", $f->process("webguiUseCaptcha","yesNo"));
 	$s->set("webguiAccountTemplate", $f->process("webguiAccountTemplate","template"));
@@ -570,63 +570,140 @@ sub new {
 #-------------------------------------------------------------------
 sub recoverPassword {
 	my $self = shift;
-	return $self->displayLogin if($self->userId ne "1");	
-	my $template = 'Auth/WebGUI/Recovery';
-	my $vars;
+	return $self->displayLogin unless $self->session->setting->get('webguiPasswordRecovery') and $self->userId eq '1';
+	my @fields = @{WebGUI::ProfileField->getPasswordRecoveryFields($self->session)};
+	return $self->displayLogin unless @fields;
+
+	my $vars = {};
 	my $i18n = WebGUI::International->new($self->session);
 	$vars->{title} = $i18n->get(71);
-	$vars->{'recover.form.header'} = "\n\n".WebGUI::Form::formHeader($self->session,{});
-	$vars->{'recover.form.hidden'} = WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"});
-	$vars->{'recover.form.hidden'} .= WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>"recoverPasswordFinish"});
+	$vars->{'recoverFormHeader'} = "\n\n".WebGUI::Form::formHeader($self->session,{});
+	$vars->{'recoverFormHidden'} = WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"});
+	$vars->{'recoverFormHidden'} .= WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>"recoverPasswordFinish"});
 
-	$vars->{'recover.form.submit'} = WebGUI::Form::submit($self->session,{});
-	$vars->{'recover.form.footer'} = WebGUI::Form::formFooter($self->session,);
-	$vars->{'login.url'} = $self->session->url->page('op=auth;method=init');
-	$vars->{'login.label'} = $i18n->get(58);
+	$vars->{'recoverFormSubmit'} = WebGUI::Form::submit($self->session,{});
+	$vars->{'recoverFormFooter'} = WebGUI::Form::formFooter($self->session,);
+	$vars->{'loginUrl'} = $self->session->url->page('op=auth;method=init');
+	$vars->{'loginLabel'} = $i18n->get(58);
 
-	$vars->{'anonymousRegistration.isAllowed'} = ($self->session->setting->get("anonymousRegistration"));
-	$vars->{'createAccount.url'} = $self->session->url->page('op=auth;method=createAccount');
-	$vars->{'createAccount.label'} = $i18n->get(67);
-	$vars->{'recover.message'} = $_[0] if ($_[0]);
-	$vars->{'recover.form.email'} = WebGUI::Form::text($self->session,{"name"=>"email"});
-	$vars->{'recover.form.email.label'} = $i18n->get(56);
+	$vars->{'anonymousRegistrationIsAllowed'} = ($self->session->setting->get("anonymousRegistration"));
+	$vars->{'createAccountUrl'} = $self->session->url->page('op=auth;method=createAccount');
+	$vars->{'createAccountLabel'} = $i18n->get(67);
+	$vars->{'recoverMessage'} = $_[0] if ($_[0]);
+
+	# Semi-duplication with WebGUI::Auth::createAccount.  -.-
+	$vars->{'recoverFormProfile'} = [];
+	foreach my $field (@fields) {
+		my ($id, $formField, $label) = ($field->getId, $field->formField, $field->getLabel);
+		push @{$vars->{'recoverFormProfile'}},
+		    +{ 'id' => $id, 'formElement' => $formField, 'label' => $label };
+
+		my $prefix = 'recoverFormProfileField' . ucfirst($id);
+		$vars->{$prefix.'FormElement'} = $formField;
+		$vars->{$prefix.'Label'} = $label;
+	}
+
+	if ($self->getSetting('passwordRecoveryRequireUsername')) {
+		$vars->{'recoverFormUsername'} = WebGUI::Form::text($self->session, {name => 'authWebGUI.username'});
+		$vars->{'recoverFormUsernameLabel'} = $i18n->get(50);
+	}
+
 	return WebGUI::Asset::Template->new($self->session,$self->getPasswordRecoveryTemplateId)->process($vars);
 }
 
 #-------------------------------------------------------------------
 sub recoverPasswordFinish {
-   my $self = shift;
+	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session);
-   return $self->recoverPassword('<ul><li>'.$i18n->get(743).'</li></ul>') if ($self->session->form->process("email") eq "");
-   return $self->displayLogin unless ($self->session->setting->get("webguiPasswordRecovery"));
-   
-   my($sth,$username,$userId,$password,$flag,$message,$output,$encryptedPassword,$authMethod);
-   $sth = $self->session->db->read("select users.username,users.userId from users, userProfileData where users.userId=userProfileData.userId and 
-                             users.authMethod='WebGUI' and userProfileData.fieldName='email' and userProfileData.fieldData=".$self->session->db->quote($self->session->form->process("email")));
-   $flag = 0;
-   while (($username,$userId) = $sth->array) {
-	   my $len = $self->session->setting->get("webguiPasswordLength") || 6;
-	   $password = "";
-	   for(my $i = 0; $i < $len; $i++) {
-          $password .= chr(ord('A') + randint(32));
-   	   }
-   	   $encryptedPassword = Digest::MD5::md5_base64($password);
-	   $self->saveParams($userId,"WebGUI",{identifier=>$encryptedPassword});
-	   $self->_logSecurityMessage();
-	   $self->session->errorHandler->security("recover a password.  Password emailed to: ".$self->session->form->process("email"));
-	   $message = $self->session->setting->get("webguiRecoverPasswordEmail");
-	   $message .= "\n".$i18n->get(50).": ".$username."\n";
-	   $message .= $i18n->get(51).": ".$password."\n";
-	   my $mail = WebGUI::Mail::Send->create($self->session, {to=>$self->session->form->process("email"),subject=>$i18n->get(74)});
-		$mail->addText($message);
-		$mail->addFooter;
-		$mail->send;
-	   $flag++;
+	my $i18n2 = WebGUI::International->new($self->session, 'AuthWebGUI');
+	return $self->displayLogin unless $self->session->setting->get('webguiPasswordRecovery') and $self->userId eq '1';
+
+	my $username;
+	if ($self->getSetting('passwordRecoveryRequireUsername')) {
+		$username = $self->session->form->process('authWebGUI.username');
+		return $self->recoverPassword($i18n2->get('password recovery no username')) unless defined $username;
 	}
-	$sth->finish();
-	 
-   return $self->displayLogin('<ul><li>'.$i18n->get(75).'</li></ul>') if($flag);
-   return $self->recoverPassword('<ul><li>'.$i18n->get(76).'</li></ul>');
+
+	my @fields = @{WebGUI::ProfileField->getPasswordRecoveryFields($self->session)};
+	return $self->displayLogin unless @fields;
+
+	my %fieldValues;
+	my @failedRequiredFields;
+	foreach my $field (@fields) {
+		my $value = $field->formProcess;
+		$fieldValues{$field->getId} = $value;
+		push @failedRequiredFields, $field unless defined $value;
+	}
+
+	if (@failedRequiredFields) {
+		my $errorMessage = '<ul>' . join("\n", map {
+		        '<li>' . $_->getLabel . ' ' . $i18n->get(451) . '</li>'
+		} @failedRequiredFields) . '</ul>';
+		return $self->recoverPassword($errorMessage);
+	}
+
+	my @fieldNames = keys %fieldValues;
+	my @fieldValues = values %fieldValues;
+	my $joins = join(' ', map{"INNER JOIN userProfileData AS p$_ ON u.userId = p$_.userId AND p$_.fieldName = ".$self->session->db->quote($fieldNames[$_])} (0..$#fieldNames));
+	my $wheres = join(' ', map{"AND p$_.fieldData = ?"} (0..$#fieldNames));
+	$wheres .= ' AND u.username = ?' if defined $username;
+	my $sql = "SELECT u.userId FROM users AS u $joins WHERE u.authMethod = 'WebGUI' $wheres";
+	my @userIds = $self->session->db->buildArray($sql, [@fieldValues, (defined($username)? ($username) : ())]);
+
+	if (@userIds == 0) {
+		return $self->recoverPassword($i18n2->get('password recovery no results'));
+	} elsif (@userIds > 1) {
+		return $self->recoverPassword($i18n2->get('password recovery multiple results'));
+	}
+
+	# Exactly one result.
+	my $userId = $userIds[0];
+	my ($password, $passwordConfirm) = ($self->session->form->process('authWebGUI.identifier'), $self->session->form->process('authWebGUI.identifierConfirm'));
+
+	unless (defined $password and defined $passwordConfirm) {
+		my $vars = {};
+		$vars->{title} = $i18n->get(71);
+		$vars->{'recoverFormHeader'} = "\n\n" . WebGUI::Form::formHeader($self->session, {});
+		$vars->{'recoverFormHidden'} =
+		    (WebGUI::Form::hidden($self->session, {name => 'op', value => 'auth'})
+		     . WebGUI::Form::hidden($self->session, {name => 'method', value => 'recoverPasswordFinish'})
+		     . (defined($username)?
+			WebGUI::Form::hidden($self->session, {name => 'authWebGUI.username',
+							      value => $username}) : '')
+		     . join('', map{WebGUI::Form::hidden($self->session, {name => $_, value => $fieldValues{$_}})}
+			    keys %fieldValues));
+		$vars->{'recoverFormSubmit'} = WebGUI::Form::submit($self->session, {});
+		$vars->{'recoverFormFooter'} = WebGUI::Form::formFooter($self->session);
+
+		# Duplication with above in recoverPassword.
+		$vars->{'loginUrl'} = $self->session->url->page('op=auth;method=init');
+		$vars->{'loginLabel'} = $i18n->get(58);
+
+		$vars->{'anonymousRegistrationIsAllowed'} = ($self->session->setting->get("anonymousRegistration"));
+		$vars->{'createAccountUrl'} = $self->session->url->page('op=auth;method=createAccount');
+		$vars->{'createAccountLabel'} = $i18n->get(67);
+		# End duplication.
+
+		$vars->{'recoverFormPassword'} = WebGUI::Form::password($self->session, {name => 'authWebGUI.identifier'});
+		$vars->{'recoverFormPasswordConfirm'} = WebGUI::Form::password($self->session, {name => 'authWebGUI.identifierConfirm'});
+		$vars->{'recoverFormPasswordLabel'} = $i18n->get(51);
+		$vars->{'recoverFormPasswordConfirmLabel'} = $i18n2->get(2);
+		
+		# Mrgh.  z.z
+		$vars->{'doingRecovery'} = 1;
+		return WebGUI::Asset::Template->new($self->session, $self->getPasswordRecoveryTemplateId)->process($vars);
+	}
+
+	if ($self->_isValidPassword($password, $passwordConfirm)) {
+		$self->user(WebGUI::User->new($self->session, $userId));
+		$self->saveParams($userId, $self->authMethod,
+				  { identifier => Digest::MD5::md5_base64($password),
+				    passwordLastUpdated => $self->session->datetime->time });
+		$self->_logSecurityMessage;
+		return $self->SUPER::login;
+	} else {
+		return $self->recoverPassword('<ul><li>'.$self->error.'</li></ul>');
+	}
 }
 
 #-------------------------------------------------------------------

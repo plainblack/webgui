@@ -272,6 +272,12 @@ sub www_editProfileField {
 		  -hoverHelp => $i18n->get('showAtRegistration hoverHelp'),
 		  -value => $data->{showAtRegistration}
 		 );
+	$f->yesNo(
+		  -name => 'requiredForPasswordRecovery',
+		  -label => $i18n->get('requiredForPasswordRecovery label'),
+		  -hoverHelp => $i18n->get('requiredForPasswordRecovery hoverHelp'),
+		  -value => $data->{requiredForPasswordRecovery}
+		 );
 	if ($data->{fieldType} eq "Image") {
 		$f->yesNo(
 			-name=>"forceImageOnly",
@@ -343,6 +349,7 @@ sub www_editProfileFieldSave {
 		visible=>$session->form->yesNo("visible"),
 		required=>$session->form->yesNo("required"),
 		showAtRegistration=>$session->form->yesNo("showAtRegistration"),
+		requiredForPasswordRecovery=>$session->form->yesNo("requiredForPasswordRecovery"),
 		possibleValues=>$session->form->textarea("possibleValues"),
 		dataDefault=>$session->form->textarea("dataDefault"),
 		fieldType=>$session->form->fieldType("fieldType"),

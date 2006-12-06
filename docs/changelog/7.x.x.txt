@@ -42,6 +42,8 @@
  - fix: IP addresses for adminModeSubnets not using X-Forwarded-For properly
  - The Events Calendar is now the new Calendar with some fun new features.
    All your existing Events Calendars will be migrated automatically. 
+ - Major change: password recovery is now based on profile fields rather than
+   email account access
    *** PLEASE READ THE GOTCHAS ***
 
 7.2.3

@@ -14,6 +14,16 @@ save you many hours of grief.
    running the entire test suite prior to SVN commits easier to do
    since it won't take so long.
 
+ * Password recovery has been redone.  It is now based on profile fields
+   rather than email access.  Since there's no real way to migrate the
+   latter to one to the other, this upgrade disables password recovery;
+   before enabling it again, use the profile fields editor to set certain
+   fields as required for password recovery.  Then any user who enters all
+   of those fields correctly can recover their password.  The template
+   variables are also different, so if you have a custom password recovery
+   template, you will have to update it.  See the new default password
+   recovery template for an example of how to use the new variables.
+
 7.2.0
 --------------------------------------------------------------------
  * NOTE: if you tried to upgrade to 7.2.0 and it failed during the

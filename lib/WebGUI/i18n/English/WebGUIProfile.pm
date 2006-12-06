@@ -351,6 +351,16 @@ new categories of profile settings.
                 message => "Show an entry for this field at the registration screen for newly-registering users.  The field will not actually be required unless Required is also set.",
                 lastUpdated => 1164237018
         },
+
+	'requiredForPasswordRecovery label' => {
+                message => "Required for password recovery?",
+                lastUpdated => 1165401097
+        },
+
+	'requiredForPasswordRecovery hoverHelp' => {
+                message => "Require users to enter this field for password recovery.  Only users that enter all such fields correctly and uniquely to them will be able to perform password recovery.",
+                lastUpdated => 1165401097
+        },
 };
 
 1;

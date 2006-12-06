@@ -23,6 +23,7 @@ addWikiAssets($session);
 deleteOldFiles($session);
 addFileFieldsToDataForm($session);
 makeRSSFromParentAlwaysHidden($session);
+addProfileFieldsOnPasswordRecovery($session);
 addNewCalendar($session);
 migrateCalendars($session);
 removeOldCalendar($session);
@@ -278,6 +279,20 @@ sub removeOldCalendar {
 	$session->config->deleteFromArray("assets","WebGUI::Asset::Wobject::EventsCalendar");
 }
 
+#-------------------------------------------------
+sub addProfileFieldsOnPasswordRecovery {
+	my $session = shift;
+	print "\tAdding requiredForPasswordRecovery to userProfileField rows.\n" unless $quiet;
+	$session->db->write($_) for(<<'EOT',
+  ALTER TABLE userProfileField
+   ADD COLUMN requiredForPasswordRecovery int(11) NOT NULL default '0'
+EOT
+				   );
+
+	$session->setting->set('webguiPasswordRecovery', 0);
+	$session->setting->add('webguiPasswordRecoveryRequireUsername', 1);
+	$session->setting->set('webguiPasswordRecoveryTemplate', 'PBtmpl0000000000000014');
+}
 
 # ---- DO NOT EDIT BELOW THIS LINE ----
 

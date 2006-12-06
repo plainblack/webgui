@@ -483,6 +483,21 @@ our $I18N = {
 		lastUpdated => 1128919828,
 	},
 
+	'require username for password recovery' => {
+		message => q|Require Username for Password Recovery?|,
+		lastUpdated => 1165402566,
+	},
+
+	'password recovery no results' => {
+		message => q|No users were found matching that profile data.  Please try again.|,
+		lastUpdated => 1165402566,
+	},
+
+	'password recovery multiple results' => {
+		message => q|Sorry, password recovery cannot be performed for this account.  Please contact an administrator.|,
+		lastUpdated => 1165402566,
+	},
+	
 };
 
 1;

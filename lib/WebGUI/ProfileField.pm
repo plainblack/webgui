@@ -343,6 +343,19 @@ sub getRegistrationFields {
 	return $class->_listFieldsWhere($session, "f.showAtRegistration = 1");
 }
 
+=head2 getPasswordRecoveryFields ( session )
+
+Returns an array reference of profile field objects that are required
+for password recovery.  Class method.
+
+=cut
+
+sub getPasswordRecoveryFields {
+	my $class = shift;
+	my $session = shift;
+	return $class->_listFieldsWhere($session, "f.requiredForPasswordRecovery = 1");
+}
+
 #-------------------------------------------------------------------
 
 =head2 isEditable ( )
