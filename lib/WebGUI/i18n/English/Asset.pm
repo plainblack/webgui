@@ -599,8 +599,8 @@ each asset under the tab &quot;Meta&quot; in the asset properties.</p>
     WebGUI config file.</p>
   </li>
   <li><p><b>Areas of Interest Ranking</b><br />
-    Metadata in combination with passive profiling produces AOI (Areas of
-    Interest) information. You can retrieve the value of a metadata property
+    Metadata in combination with passive profiling produces AOI (<b>Areas of
+    Interest</b>) information. You can retrieve the value of a metadata property
     with the &#94;AOIRank(); and &#94;AOIHits(); macros.</p>
   </li>
   <li><p><b>Show content based upon criteria</b><br />
@@ -619,7 +619,7 @@ each asset under the tab &quot;Meta&quot; in the asset properties.</p>
     to create meta tags from meta data, including the tags from the Dublin Core standard.</p></li>
 </ul>|,
                 context => q|Metadata help|,
-                lastUpdated => 1162233025
+                lastUpdated => 1165356337
         },
 
 	'metadata edit property' => {

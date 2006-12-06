@@ -9,12 +9,15 @@ our $HELP = {
 		],
 		related => [
 			{
-				tag => 'macros using',
-				namespace => 'Macros'
-			},
-			{
 				tag => 'metadata manage',
 				namespace => 'Asset'
+			{
+				tag => 'settings',
+				namespace => 'WebGUI'
+			},
+			{
+				tag => 'macros using',
+				namespace => 'Macros'
 			},
 		]
 	},
