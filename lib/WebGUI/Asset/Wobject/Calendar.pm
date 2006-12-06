@@ -1345,7 +1345,7 @@ sub wrapIcal
 	$text		=~ s/\n/\\n/g;
 	
 	my @text	= ($text =~ m/.{0,75}/g);
-	return join "\x0D\x0A ",@text;
+	return join "\r\n ",@text;
 }
 
 
@@ -1490,38 +1490,38 @@ sub www_ical
 		# UID
 		# TODO: Use feedUid if one exists
 		my $domain	= $session->config->get("sitename")->[0];
-		$ical	.= qq{UID:}.$event->get("assetId").'@'.$domain."\x0D\x0A";
+		$ical	.= qq{UID:}.$event->get("assetId").'@'.$domain."\r\n";
 		
 		# LAST-MODIFIED (revisionDate)
 		$ical	.= qq{LAST-MODIFIED:}
 			. WebGUI::DateTime->new($event->get("revisionDate"))->toIcal
-			. "\x0D\x0A";
+			. "\r\n";
 		
 		# CREATED (creationDate)
 		$ical	.= qq{CREATED:}
 			. WebGUI::DateTime->new($event->get("creationDate"))->toIcal
-			. "\x0D\x0A";
+			. "\r\n";
 		
 		# DTSTART
-		$ical	.= qq{DTSTART:}.$event->getIcalStart."\x0D\x0A";
+		$ical	.= qq{DTSTART:}.$event->getIcalStart."\r\n";
 		
 		# DTEND
-		$ical	.= qq{DTEND:}.$event->getIcalEnd."\x0D\x0A";
+		$ical	.= qq{DTEND:}.$event->getIcalEnd."\r\n";
 		
 		# Summary (the title)
 		# Wrapped at 75 columns
-		$ical	.= $self->wrapIcal("SUMMARY:".$event->get("title"))."\x0D\x0A";
+		$ical	.= $self->wrapIcal("SUMMARY:".$event->get("title"))."\r\n";
 				
 		# Description (the text)
 		# Wrapped at 75 columns
-		$ical	.= $self->wrapIcal("DESCRIPTION:".$event->get("description"))."\x0D\x0A";
+		$ical	.= $self->wrapIcal("DESCRIPTION:".$event->get("description"))."\r\n";
 		
 		
 		
 		# X-WEBGUI lines
-		$ical	.= "X-WEBGUI-GROUPIDVIEW:".$event->get("groupIdView")."\x0D\x0A";
-		$ical	.= "X-WEBGUI-GROUPIDEDIT:".$event->get("groupIdEdit")."\x0D\x0A";
-		$ical	.= "X-WEBGUI-URL:".$event->get("url")."\x0D\x0A";
+		$ical	.= "X-WEBGUI-GROUPIDVIEW:".$event->get("groupIdView")."\r\n";
+		$ical	.= "X-WEBGUI-GROUPIDEDIT:".$event->get("groupIdEdit")."\r\n";
+		$ical	.= "X-WEBGUI-URL:".$event->get("url")."\r\n";
 		
 		
 		$ical	.= qq{END:VEVENT\n};
@@ -1533,7 +1533,7 @@ sub www_ical
 	
 	# Set mime of text/icalendar
 	#$self->session->http->setMimeType("text/plain");
-	$self->session->http->setMimeType("text/calendar");
+	$self->session->http->setFilename("feed.ics","text/calendar");
 	return $ical;
 }
 
