@@ -1341,6 +1341,8 @@ sub wrapIcal
 	my $self	= shift;
 	my $text	= shift;
 	
+	return $text unless length $text >= 75;
+	
 	$text		=~ s/([,;\\])/\\$1/g;
 	$text		=~ s/\n/\\n/g;
 	
@@ -1477,14 +1479,14 @@ sub www_ical
 	my @events	= $self->getEventsIn($dt_start->toMysql,$dt_end->toMysql);
 	
 	
-	my $ical	= qq{BEGIN:VCALENDAR\n}
-			. qq{PRODID:WebGUI \n}		# TODO: Get WebGUI version!
-			. qq{VERSION:2.0\n};
+	my $ical	= qq{BEGIN:VCALENDAR\r\n}
+			. qq{PRODID:WebGUI \r\n}		# TODO: Get WebGUI version!
+			. qq{VERSION:2.0\r\n};
 	
 	# VEVENT:
 	for my $event (@events)
 	{
-		$ical	.= qq{BEGIN:VEVENT\n};
+		$ical	.= qq{BEGIN:VEVENT\r\n};
 		
 		# Currently we only need
 		# UID
@@ -1524,11 +1526,11 @@ sub www_ical
 		$ical	.= "X-WEBGUI-URL:".$event->get("url")."\r\n";
 		
 		
-		$ical	.= qq{END:VEVENT\n};
+		$ical	.= qq{END:VEVENT\r\n};
 	}
 	# ENDVEVENT
 	
-	$ical		.= qq{END:VCALENDAR\n};
+	$ical		.= qq{END:VCALENDAR\r\n};
 	
 	
 	# Set mime of text/icalendar
