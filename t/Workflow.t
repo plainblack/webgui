@@ -15,7 +15,7 @@ use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Workflow;
 use WebGUI::Utility qw/isIn/;
-use Test::More tests => 16; # increment this value for each test you create
+use Test::More tests => 25; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 my $wf = WebGUI::Workflow->create($session, {title => 'Title', description => 'Description',
@@ -47,8 +47,27 @@ ok(!$wf->get('enabled'), 'workflow is disabled again');
 $wf->delete;
 ok(!defined WebGUI::Workflow->new($session, $wfId), 'deleted workflow cannot be retrieved');
 
-# TODO: test activity class conformance checking
-# TODO: test activities and crons
+my $wf2 = WebGUI::Workflow->create($session, {title => 'Title', description => 'Description',
+					      type => 'WebGUI::VersionTag'});
+ok(defined $wf2, 'can create version tag workflow');
+isa_ok($wf2, 'WebGUI::Workflow', 'workflow');
+
+require WebGUI::Workflow::Activity::UnlockVersionTag;
+my $activity = WebGUI::Workflow::Activity::UnlockVersionTag->create($session, $wf2->getId);
+ok(defined $activity, 'can create activity');
+isa_ok($activity, 'WebGUI::Workflow::Activity::UnlockVersionTag', 'activity');
+isa_ok($activity, 'WebGUI::Workflow::Activity', 'activity');
+my $actId = $activity->getId;
+ok(defined $actId, 'activity has an ID');
+is(scalar @{$wf2->getActivities}, 1, 'workflow has one activity');
+
+# Mismatched activity with workflow.
+require WebGUI::Workflow::Activity::DecayKarma;
+my $badActivity = WebGUI::Workflow::Activity::DecayKarma->create($session, $wf2->getId);
+ok(!defined $badActivity, 'cannot create mismatched activity');
+is(scalar @{$wf->getActivities}, 1, 'workflow still has one activity');
+
+# TODO: test activities more, and crons
 
 # Local variables:
 # mode: cperl
