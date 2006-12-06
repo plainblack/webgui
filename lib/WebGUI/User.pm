@@ -63,6 +63,13 @@ sub _create {
 	$session->db->write("insert into users (userId,dateCreated) values (?,?)",[$userId, time()]);
 	WebGUI::Group->new($session,2)->addUsers([$userId]);
 	WebGUI::Group->new($session,7)->addUsers([$userId]);
+
+	# Give user all profile fields as default values.
+	foreach my $field (@{WebGUI::ProfileField->getFields($session)}) {
+		my $defaultValue = WebGUI::Operation::Shared::secureEval($session, $field->get('dataDefault'));
+		$session->db->write("INSERT INTO userProfileData (userId, fieldName, fieldData) VALUES (?, ?, ?)", [$userId, $field->getId, $defaultValue]);
+	}
+
         return $userId;
 }
 
@@ -385,22 +392,8 @@ sub new {
 		my %user;
 		tie %user, 'Tie::CPHash';
 		%user = $session->db->quickHash("select * from users where userId=".$session->db->quote($userId));
-		my %profile = $session->db->buildHash("select userProfileField.fieldName, userProfileData.fieldData 
-			from userProfileField, userProfileData where userProfileField.fieldName=userProfileData.fieldName and 
-			userProfileData.userId=".$session->db->quote($user{userId}));
-		my %default = $session->db->buildHash("select fieldName, dataDefault from userProfileField");
-		foreach my $key (keys %default) {
-			my $value;
-			if ($profile{$key} eq "" && $default{$key}) {
-				$value = eval($default{$key});
-				if (ref $value eq "ARRAY") {
-					$profile{$key} = $$value[0];
-				} else {
-					$profile{$key} = $value;
-				}
-			}
-		}
-		$profile{alias} = $user{username} if ($profile{alias} =~ /^\W+$/ || $profile{alias} eq "");
+		my %profile = $session->db->buildHash("SELECT fieldName, fieldData FROM userProfileData WHERE userId = ?", [$user{userId}]);
+		$profile{alias} = $user{username} if $profile{alias} !~ /\w/;
 		$userData = {
 			_userId => $userId,
 			_user => \%user,

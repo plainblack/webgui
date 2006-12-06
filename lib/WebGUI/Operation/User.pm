@@ -351,10 +351,11 @@ sub www_editUser {
 		foreach my $field (@{$category->getFields}) {
 			next if $field->getId =~ /contentPositions/;
 			my $label = $field->getLabel . ($field->isRequired ? "*" : '');
+			my $defaultValue = WebGUI::Operation::Shared::secureEval($session, $field->get('dataDefault'));
 			if ($field->getId eq "alias" && $u->userId eq '1') {
-				$tabform->getTab("profile")->raw($field->formField({label=>$label},1,undef,1));
+				$tabform->getTab("profile")->raw($field->formField({label=>$label, value=>$defaultValue},1,undef,1));
 			} else {
-				$tabform->getTab("profile")->raw($field->formField({label=>$label},1,$u));
+				$tabform->getTab("profile")->raw($field->formField({label=>$label, value=>$defaultValue},1,$u));
 			}
 		}
 		$tabform->getTab("profile")->fieldSetEnd($category->getLabel);

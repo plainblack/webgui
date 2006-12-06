@@ -107,6 +107,14 @@ sub create {
         my $self = $class->new($session,$id);
 	$self->setCategory($categoryId);
         $self->set($properties);
+
+	# Since we're creating a new profile field, give every user the default value for it.
+	my $default = WebGUI::Operation::Shared::secureEval($session,$properties->{dataDefault});
+	foreach my $userId ($session->db->buildArray("SELECT userId FROM users")) {
+		my $user = WebGUI::User->new($session, $userId);
+		$user->profileField($id, $default);
+	}
+
         return $self;
 }
 
@@ -183,7 +191,7 @@ sub formField {
 	} else {
 		$default = WebGUI::Operation::Shared::secureEval($self->session,$properties->{dataDefault});
 	}
-	$properties->{value} = $default;
+	$properties->{value} = $default unless defined $properties->{value};
 	if ($withWrapper == 1) {
 		return WebGUI::Form::DynamicField->new($self->session,%{$properties})->displayFormWithWrapper;
 	} elsif ($withWrapper == 2) {
