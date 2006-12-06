@@ -712,7 +712,6 @@ sub purge {
 sub sendEmail {
 	my $self = shift;
 	my $var = shift;
-	my $attachments;
 	my $message = $self->processTemplate($var,$self->get("emailTemplateId"));
 	WebGUI::Macro::process($self->session,\$message);
 	my ($to, $subject, $from, $bcc, $cc);
@@ -729,12 +728,14 @@ sub sendEmail {
 			$subject = $row->{"field.value"};
 		}
 	}
-	$attachments = $self->getAttachedFiles({returnType=>'attachments',entryId=>$var->{entryId}}) if $self->get("mailAttachments");
+	my @attachments = $self->get('mailAttachments')?
+	    @{$self->getAttachedFiles({returnType=>'attachments',entryId=>$var->{entryId}})}
+		: ();
 	if ($to =~ /\@/) {
 		my $mail = WebGUI::Mail::Send->create($self->session,{to=>$to, subject=>$subject, cc=>$cc, from=>$from, bcc=>$bcc});
 		$mail->addHtml($message);
 		$mail->addFooter;
-		$mail->addAttachment($_) for (@{$attachments});
+		$mail->addAttachment($_) for (@attachments);
 		$mail->queue;
 	} else {
                 my ($userId) = $self->session->db->quickArray("select userId from users where username=".$self->session->db->quote($to));
@@ -756,14 +757,14 @@ sub sendEmail {
                         my $mail =  WebGUI::Mail::Send->create($self->session,{to=>$cc, subject=>$subject, from=>$from});
 			if ($cc) {
 				$mail->addHtml($message);
-				$mail->addAttachment($_) for (@{$attachments});
+				$mail->addAttachment($_) for (@attachments);
 				$mail->addFooter;
 				$mail->queue;
                         }
                         if ($bcc) {
                                 WebGUI::Mail::Send->create($self->session, {to=>$bcc, subject=>$subject, from=>$from});
 				$mail->addHtml($message);
-				$mail->addAttachment($_) for (@{$attachments});
+				$mail->addAttachment($_) for (@attachments);
 				$mail->addFooter;
 				$mail->queue;
                         }
