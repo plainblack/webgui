@@ -238,8 +238,8 @@ has been set to some other language you will need to consult the documentation f
 	},
 
 	'webgui.status' => {
-		message => q|The release status for this version of WebGUI, stable, beta, gamma, etc.|,
-		lastUpdated => 1148951191,
+		message => q|The release status for this version of WebGUI (stable, beta, gamma, etc.)|,
+		lastUpdated => 1165365906,
 	},
 
 	'session.user.username' => {

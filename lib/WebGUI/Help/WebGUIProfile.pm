@@ -31,6 +31,21 @@ our $HELP = {
                                 namespace => 'WebGUIProfile',
                         },
                         {
+                                title => 'showAtRegistration label',
+                                description => 'showAtRegistration hoverHelp',
+                                namespace => 'WebGUIProfile',
+                        },
+                        {
+                                title => 'requiredForPasswordRecovery label',
+                                description => 'requiredForPasswordRecovery hoverHelp',
+                                namespace => 'WebGUIProfile',
+                        },
+                        {
+                                title => 'forceImageOnly label',
+                                description => 'forceImageOnly description',
+                                namespace => 'WebGUIProfile',
+                        },
+                        {
                                 title => '486',
                                 description => '486 description',
                                 namespace => 'WebGUIProfile',

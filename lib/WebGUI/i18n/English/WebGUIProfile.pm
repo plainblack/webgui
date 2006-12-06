@@ -342,6 +342,11 @@ new categories of profile settings.
                 lastUpdated => 1162945563
         },
 
+        'forceImageOnly description' => {
+                message => "If your profile field requires uploading an Image, you will provided with an additional field that will only allow image file types are uploaded.",
+                lastUpdated => 1165447428
+        },
+
 	'showAtRegistration label' => {
                 message => "Show at Registration?",
                 lastUpdated => 1164237018
