@@ -46,6 +46,7 @@
  - fix: subscription dates
  - fix: Default Rich Editor setting not rendering correctly
  - fix: visitor name disappearing on preview in CS
+ - fix: HTTP proxy not passing form elements through
  - The Events Calendar is now the new Calendar with some fun new features.
    All your existing Events Calendars will be migrated automatically. 
  - rfe: multiple redirects on a page - which one?

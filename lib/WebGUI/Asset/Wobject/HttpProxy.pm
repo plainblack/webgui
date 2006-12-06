@@ -31,7 +31,9 @@ sub appendToUrl {
         my $url = shift;
 	my $paramSet = shift;
 	my $seperator = ($self->get("useAmpersand")) ? "&" : ";";
-        if ($url =~ /\?/) {
+	if (index($url, '?') == length($url)-1) {
+		$url .= $paramSet;
+	} elsif (index($url, '?') >= 0) {
                 $url .= $seperator.$paramSet;
         } else {
                 $url .= '?'.$paramSet;
@@ -298,18 +300,21 @@ sub view {
 			if($requestMethod=~/GET/i) {  
 				my $params	= $self->session->form->paramsHashRef();
 				for my $key (keys %{$params}) {
+					my $value = $params->{$key};
 					next unless ($key =~ s/^HttpProxy_//); # Skip non-proxied params
-					if (ref $params->{$key} eq "ARRAY") {
+					if (ref $value eq "ARRAY") {
 						# Param value is an array reference
 						# Add all values to URL
-						for my $value (@{$params->{$key}}) {
-							$proxiedUrl = $self->appendToUrl($proxiedUrl,"$key=$value");
+						for my $subvalue (@$value) {
+							$proxiedUrl = $self->appendToUrl($proxiedUrl,"$key=$subvalue");
 						}
 					} else {
-						$proxiedUrl = $self->appendToUrl($proxiedUrl,"$key=".$params->{$key});
+						$proxiedUrl = $self->appendToUrl($proxiedUrl,"$key=$value");
 					}
 				}
 				### DEBUG
+				#require Data::Dumper;
+				#$self->session->errorHandler->warn("DEBUG: ".Data::Dumper::Dumper($params));
 				#$self->session->errorHandler->warn("URL: $proxiedUrl");
 				
 				$request = HTTP::Request->new(GET => $proxiedUrl, $header) || return "wrong url"; # Create GET request
