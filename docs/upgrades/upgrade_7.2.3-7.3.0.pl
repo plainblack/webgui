@@ -24,6 +24,7 @@ deleteOldFiles($session);
 addFileFieldsToDataForm($session);
 makeRSSFromParentAlwaysHidden($session);
 addProfileFieldsOnPasswordRecovery($session);
+addEmailValidationExpiry($session);
 addNewCalendar($session);
 migrateCalendars($session);
 removeOldCalendar($session);
@@ -292,6 +293,26 @@ EOT
 	$session->setting->set('webguiPasswordRecovery', 0);
 	$session->setting->add('webguiPasswordRecoveryRequireUsername', 1);
 	$session->setting->set('webguiPasswordRecoveryTemplate', 'PBtmpl0000000000000014');
+}
+
+#-------------------------------------------------
+sub addEmailValidationExpiry {
+	my $session = shift;
+	print "\tAdding email validation expiry.\n" unless $quiet;
+
+	# Remove email activation keys for active users so that if they deactivate themselves
+	# in the future the workflow activity doesn't treat them as deleted.
+	$session->db->write($_) for (<<'EOT',
+  DELETE FROM authentication
+        WHERE fieldName = 'emailValidationKey' AND
+              (SELECT status FROM users AS u WHERE u.userId = userId) = 'Active'
+EOT
+				    );
+
+	my $activities = $session->config->get('workflowActivities');
+	my $class = 'WebGUI::Workflow::Activity::ExpireUnvalidatedEmailUsers';
+	@{$$activities{None}} = ((grep{$_ ne $class} @{$$activities{None}}), $class);
+	$session->config->set('workflowActivities', $activities);
 }
 
 # ---- DO NOT EDIT BELOW THIS LINE ----

@@ -758,10 +758,11 @@ sub resetExpiredPasswordSave {
 #-------------------------------------------------------------------
 sub validateEmail {
 	my $self = shift;
-	my ($userId) = $self->session->db->quickArray("select userId from authentication where fieldData=".$self->session->db->quote($self->session->form->process("key"))." and fieldName='emailValidationKey' and authMethod='WebGUI'");
+	my ($userId) = $self->session->db->quickArray("select userId from authentication where fieldData=? and fieldName='emailValidationKey' and authMethod='WebGUI'", [$self->session->form->process("key")]);
 	if (defined $userId) {
 		my $u = WebGUI::User->new($self->session,$userId);
 		$u->status("Active");
+		$self->session->db->write("DELETE FROM authentication WHERE userId = ? AND fieldName = 'emailValidationKey'");
 	}
 	return $self->displayLogin;
 }

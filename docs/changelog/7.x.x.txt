@@ -40,6 +40,9 @@
  - WebGUI::TabForm->addTab now returns the WebGUI::HTMLForm created.
  - WebGUI::AssetLineage::getLineage can now limit the number of records returned
  - fix: IP addresses for adminModeSubnets not using X-Forwarded-For properly
+ - add: workflow activity for expiry of email-unvalidated users.  This is not
+   enabled by default; add an instance of it to an appropriate workflow if you
+   want it to run.
  - The Events Calendar is now the new Calendar with some fun new features.
    All your existing Events Calendars will be migrated automatically. 
  - Major change: password recovery is now based on profile fields rather than
