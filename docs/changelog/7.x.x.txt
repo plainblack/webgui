@@ -55,6 +55,8 @@
    email account access
    *** PLEASE READ THE GOTCHAS ***
  - fix: Updated Snippets not being cleared from cache
+ - fix: IE7 Asset Manager and Admin Console bug defeated!
+ - fix: fixed a 508 compliance issue with login macro.
 
 
 7.2.3
