@@ -1,11 +1,16 @@
-body{
+html,body {
+   margin: 0px;
+   padding: 0px;
+}
+
+.wrapper {
 	background-image: url(bg.jpg);
 	background-repeat: repeat-x;
 	border: 5px #214A7A solid; 
 	margin:0px;
 	padding:0px;
-	min-height: 590px;
-	_height: 590px;
+	position: relative;
+	top:0px;
 }
 
 th {
@@ -52,10 +57,9 @@ th {
 	padding: 15px;
 	-moz-border-radius: 10px;
 	background-color: #fafafa;
-	min-height: 400px;
-	_height: 400px;
 	width: 78%;
 	z-index: 10;
+	position: relative;
 }
 /* Hides from non-ie: the holly hack \*/
 * html .adminConsoleWorkArea {
