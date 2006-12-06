@@ -898,10 +898,10 @@ Couldn't open %-s because %-s <br />
 	},
 
 	'asset toolbar body' => {
-		message => q|<p>When you are viewing an asset, and you have editing privileges for that asset
-and you have Admin mode turned on, the assets will display an toolbar with icons that allow you
+		message => q|<p>When you are viewing an asset in Admin mode, and if you have editing privileges for that asset
+and you have Admin mode turned on, the asset will display a toolbar with icons that allow you
 to edit or modify that asset.</p>|,
-		lastUpdated => 0,
+		lastUpdated => 1165448599,
 	},
 
 	'Class Icon' => {
@@ -910,8 +910,8 @@ to edit or modify that asset.</p>|,
 	},
 
 	'Class Icon help' => {
-		message => q|Each Asset will also display a class icon.  Most Class Icons are unique to an Asset, and are smaller versions of the Icons diplayed in the Admin Console to add a new Asset to your site.  Clicking on the Class Icon will show a drop-down menu with additional editing options.|,
-		lastUpdated => 0,
+		message => q|Each Asset will also display a class icon.  Most Class Icons are unique to an Asset, and are smaller versions of the icons diplayed in the New Content menu of the Admin Console for that Asset.  Clicking on the Class Icon will show a drop-down menu with additional editing options.|,
+		lastUpdated => 1165448677,
 	},
 
 	'parent url' => {

@@ -7,7 +7,7 @@ our $I18N = {
 	},
 
 	'locked help' => {
-		message => q|Show a list of all revisions of this Asset.  This icon is only available if the asset isn't locked, or if it is locked and you are using the tag is was edited under.|,
+		message => q|Show a list of all revisions of this Asset.  This icon is only available if the asset isn't locked, or is locked and you are using the tag it was edited under.|,
 		lastUpdated => 1148591578
 	},
 
@@ -67,8 +67,8 @@ our $I18N = {
 	},
 
 	'Delete help' => {
-		message => q|Delete this asset and put a copy in the trash.  This icon is only available if the asset isn't locked, or if it is locked and you are using the tag is was edited under.|,
-		lastUpdated => 1148591221
+		message => q|Delete this asset and put a copy in the trash.  This icon is only available if the asset isn't locked, or if it is locked and you are using the tag it was edited under.|,
+		lastUpdated => 1165448627
 	},
 
 	'Wobject Settings' => {
@@ -92,8 +92,8 @@ our $I18N = {
 	},
 
 	'Edit help' => {
-		message => q|Edit the properties of this Asset.  This icon is only available if the asset isn't locked, or if it is locked and you are using the tag is was edited under.|,
-		lastUpdated => 1148591273
+		message => q|Edit the properties of this Asset.  This icon is only available if the asset isn't locked, or if it is locked and you are using the tag it was edited under.|,
+		lastUpdated => 1165448622
 	},
 
 	'Manage' => {
@@ -122,8 +122,8 @@ our $I18N = {
 	},
 
 	'Export help' => {
-		message => q|Bring up the Export as HTML screen for this Asset.|,
-		lastUpdated => 1096319561
+		message => q|If an export path was defined in the WebGUI config file for this site, a new menu item will be addded to the toolbar.  Selecting this menu item will bring up the Export as HTML screen for this Asset.|,
+		lastUpdated => 1165448862,
 	},
 
 };
