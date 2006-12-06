@@ -255,6 +255,16 @@ our $I18N = {
 		lastUpdated => 1071507760
 	},
 
+	'webguiPasswordRecovery hoverHelp' => {
+		message => q|Select "Yes" to permit users who know a particular combination of their profile fields to recover their passwords.  In order for this to take effect, at least one profile field must have its "Required for password recovery?" flag turned on.  It is highly advisable to pick several fields, as using only one field is usually very easy to break; remember that anyone who discovers all of those fields for a user can reset that user's password.|,
+		lastUpdated => 1071507760
+	},
+
+	'webguiPasswordRecoveryRequireUsername hoverHelp' => {
+		message => q|Select "Yes" if you want users to also have to enter their username for password recovery.  Otherwise, they will be able to reset their password and log themselves in by knowing only the other profile fields that are enabled for password recovery, even if they have forgotten their username.|,
+		lastUpdated => 1071507760
+	},
+
 	'recovery template title' => {
 		message => q|WebGUI Authentication Password Recovery Template|,
 		lastUpdated => 1078856556

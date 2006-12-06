@@ -423,14 +423,16 @@ sub editUserSettingsForm {
                 -label=>$i18n->get(18)
              );
    $f->yesNo(
-	         -name=>"webguiPasswordRecovery",
-             -value=>$self->session->setting->get("webguiPasswordRecovery"),
-             -label=>$i18n->get(6)
+	         -name => "webguiPasswordRecovery",
+                 -value => $self->session->setting->get("webguiPasswordRecovery"),
+                 -label => $i18n->get(6),
+	         -hoverHelp => $i18n->get('webguiPasswordRecovery hoverHelp')
              );
    $f->yesNo(
-	         -name=>"webguiPasswordRecoveryRequireUsername",
-             -value=>$self->session->setting->get("webguiPasswordRecoveryRequireUsername"),
-             -label=>$i18n->get('require username for password recovery')
+	         -name => "webguiPasswordRecoveryRequireUsername",
+                 -value => $self->session->setting->get("webguiPasswordRecoveryRequireUsername"),
+                 -label => $i18n->get('require username for password recovery'),
+	         -hoverHelp => $i18n->get('webguiPasswordRecoveryRequireUsername hoverHelp')
              );
    	$f->yesNo(
 		-name=>"webguiValidateEmail",
@@ -490,7 +492,11 @@ sub editUserSettingsFormSave {
 	$s->set("webguiWelcomeMessage", $f->process("webguiWelcomeMessage","textarea"));
 	$s->set("webguiChangeUsername", $f->process("webguiChangeUsername","yesNo"));
 	$s->set("webguiChangePassword", $f->process("webguiChangePassword","yesNo"));
-	$s->set("webguiPasswordRecovery", $f->process("webguiPasswordRecovery","yesNo"));
+
+	# Special case to make sure we have at least one field enabled before allowing
+	# password recovery to be turned on.
+	$s->set("webguiPasswordRecovery", $f->process("webguiPasswordRecovery","yesNo") && ($self->session->db->quickArray("SELECT COUNT(*) FROM userProfileField WHERE requiredForPasswordRecovery = 1"))[0] > 0);
+
 	$s->set("webguiPasswordRecoveryRequireUsername", $f->process("webguiPasswordRecoveryRequireUsername","yesNo"));
 	$s->set("webguiValidateEmail", $f->process("webguiValidateEmail","yesNo"));
 	$s->set("webguiUseCaptcha", $f->process("webguiUseCaptcha","yesNo"));

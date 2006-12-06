@@ -343,13 +343,24 @@ Returns the user to www_editProfileSettings when done.
 sub www_editProfileFieldSave {
 	my $session = shift;
         return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+
+	# Special case for WebGUI auth password recovery.
+	my $requiredForPasswordRecovery = $session->form->yesNo('requiredForPasswordRecovery');
+	if ($session->setting->get('authMethod') eq 'WebGUI'
+	    and $session->setting->get('webguiPasswordRecovery')
+	    and not $requiredForPasswordRecovery
+	    and ($session->db->quickArray("SELECT COUNT(*) FROM userProfileField WHERE requiredForPasswordRecovery = 1"))[0] == 1) {
+		# We'd be turning off the only one.  Don't do it.
+		$requiredForPasswordRecovery = 1;
+	}
+
 	my %data = (
 		label=>$session->form->text("label"),
 		editable=>$session->form->yesNo("editable"),
 		visible=>$session->form->yesNo("visible"),
 		required=>$session->form->yesNo("required"),
 		showAtRegistration=>$session->form->yesNo("showAtRegistration"),
-		requiredForPasswordRecovery=>$session->form->yesNo("requiredForPasswordRecovery"),
+		requiredForPasswordRecovery=>$requiredForPasswordRecovery,
 		possibleValues=>$session->form->textarea("possibleValues"),
 		dataDefault=>$session->form->textarea("dataDefault"),
 		fieldType=>$session->form->fieldType("fieldType"),
