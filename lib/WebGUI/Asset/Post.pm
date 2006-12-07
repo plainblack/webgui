@@ -534,7 +534,15 @@ Returns the Thread that this Post belongs to.  The method caches the result of t
 sub getThread {
 	my $self = shift;
 	unless (defined $self->{_thread}) {
-		$self->{_thread} = WebGUI::Asset::Post::Thread->new($self->session, $self->get("threadId"));
+		my $threadId = $self->get("threadId");
+                if ($threadId eq "") { # new post
+                        if ($self->getParent->get("className") eq "WebGUI::Asset::Wobject::Collaboration") {
+                                $threadId=$self->getId;
+                        } else {
+                                $threadId=$self->getParent->get("threadId");
+                        }
+                }
+                $self->{_thread} = WebGUI::Asset::Post::Thread->new($self->session, $threadId);
 	}
 	return $self->{_thread};	
 }

@@ -124,8 +124,10 @@ sub toHtml {
 		$style->setLink($url->extras("yui-ext/resources/css/resizable.css"), {type=>"text/css", rel=>"stylesheet"});
 		$out .= qq|
 		<script type="text/javascript">
-			var draggable_textarea = document.getElementById('|.$self->get('id').qq|_wrapper');
-			window.setTimeout("draggable_textarea.resize = new YAHOO.ext.Resizable(draggable_textarea, {resizeChild: true, minWidth:300, minHeight:150, disableTrackOver:true, multiDirectional: false})",1);
+			YAHOO.util.Event.addListener(window, 'load', function () {
+				var draggable_textarea = document.getElementById('|.$self->get('id').qq|_wrapper');
+				draggable_textarea.resize = new YAHOO.ext.Resizable(draggable_textarea, {resizeChild: true, minWidth:300, minHeight:150, disableTrackOver:true, multiDirectional: false});
+				});
 		</script>
 		|;
 	}
