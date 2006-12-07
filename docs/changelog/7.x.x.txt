@@ -3,6 +3,7 @@
    when loading edit screens.
  - Fixed a problem with the new autocommit code that caused reply posts not to
    work in the collaboration system.
+ - Storage deletes were throwing fatals when they should throw warnings.
 
 
 7.3.0

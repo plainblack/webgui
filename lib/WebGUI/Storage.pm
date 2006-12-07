@@ -384,13 +384,16 @@ sub delete {
 		rmtree($path) if ($path);
 		foreach my $subDir ($self->{_part1}.'/'.$self->{_part2}, $self->{_part1}) {
 			my $uDir = $self->session->config->get('uploadsPath') . '/' . $subDir;
-			opendir my $DH, $uDir or
-				$self->session->errorHandler->fatal("Unable to open $uDir for directory reading");
-			my @dirs = grep { !/^\.+$/ } readdir($DH);
-			if (scalar @dirs == 0) {
-				rmtree($uDir);
+			opendir my $DH, $uDir;
+			if (defined $DH) {
+				my @dirs = grep { !/^\.+$/ } readdir($DH);
+				if (scalar @dirs == 0) {
+					rmtree($uDir);
+				}
+				close $DH;
+			} else {
+				$self->session->errorHandler->warn("Unable to open $uDir for directory reading");
 			}
-			close $DH;
 		}
 	}
 	return;
