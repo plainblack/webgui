@@ -69,20 +69,45 @@ to validate any input that the user may supply.|,
         },
 
         '487 description' => {
-                message => q|<p>This field is used for the list types (like Checkbox List and Select List).  Enter the value and key pairs, one per line, surrounded by curly braces.  See the example below:</p>
+                message => q|<p>This area should only be used in with the following form fields:
+<br /><br />
+Checkbox List<br />
+Combo Box<br />
+Hidden List<br />
+Radio List<br />
+Select Box<br />
+Select List<br />
+<br><br>
+None of the other profile fields should use the Possible Values field as it will be ignored.<br />
+If you do enter a Possible Values list, it MUST be formatted as follows
 <pre>
-	{
-	"database value 1" => "form label 1",
-	"database value 2" => "form label 2",
-	"database value 3" => "form label 3",
-	}
-</pre>
-|,
+{
+   "key1"=>"value1",
+   "key2"=>"value2",
+   "key3"=>"value3"
+   ...
+}
+</pre><br />
+Braces, quotes and all.  You simply replace "key1"/"value1" with your own name/value pairs.|,
                 lastUpdated => 1132542146,
         },
 
         '488 description' => {
-                message => q|Enter the default value (if any) for the field.  For Yes/No fields, enter "yes" to select "Yes" and "no" to select "No".|,
+                message => q|<p>
+				   This area should only be used if you have used the Possible Values area above which is to say that it should only be used in conjunction with:
+<br />
+Checkbox List<br />
+Combo Box<br />
+Hidden List<br />
+Radio List<br />
+Select Box<br />
+Select List<br />
+<br><br>
+None of the other profile fields should use the Default Values field as it will be ignored.  If you do enter Default Values, they MUST directly reference one or more of your Possible Values keys as follows:
+<pre>["key1","key2",...]</pre><br />
+Brackets, quotes and all.<br /><br />
+If you wish to set the Default Value for any other field.  Create the field without setting this area, then go into the Visitor's profile and save the value you'd like to display by default for the newly created field.  This will result in the desired result of having the default field set whenever you create a new user.
+</p>|,
                 lastUpdated => 1122316558,
         },
 
