@@ -78,6 +78,8 @@ sub execute {
 	my $self = shift;
 	$self->session->user({userId => 3});
 	
+### TODO: If we take more than a minute, return WAITING so that some
+# other activity can run
 	
 	my $ua		= LWP::UserAgent->new(agent => "WebGUI");
 	my $dt		= WebGUI::DateTime->new(time)->toMysql;
@@ -288,7 +290,6 @@ sub execute {
 					if ($event)
 					{
 						$event->update($properties);
-						$event->requestCommit;
 						$updated++;
 					}
 				}
@@ -296,7 +297,6 @@ sub execute {
 				{
 					my $calendar	= WebGUI::Asset->newByDynamicClass($self->session,$feed->{assetId});
 					my $event	= $calendar->addChild($properties);
-					$event->requestCommit;
 					$added++;
 				}
 				

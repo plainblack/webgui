@@ -188,6 +188,12 @@ ENDSQL
 );
 	
 	$session->config->addToArray('assets', 'WebGUI::Asset::Wobject::Calendar');
+	
+	my $workflows = $session->config->get("workflowActivities");
+	push @{$workflows->{None}},"WebGUI::Workflow::Activity::CalendarUpdateFeeds";
+	$session->config->set("workflowActivities",$workflows);
+	
+	WebGUI::Workflow::new("pbworkflow000000000004")->addActivity($session,"WebGUI::Workflow::Activity::CalendarUpdateFeeds");
 }
 
 
