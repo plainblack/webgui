@@ -27,6 +27,13 @@ save you many hours of grief.
    enable password recovery.  It is highly advisable to pick several fields,
    as one field only is very easy to break.
 
+   There is a new Calendar wobject which replaces the current EventsCalendar
+   wobject.  The upgrade will migrate all of your events but it will *not*
+   migrate any of your custom templates.  All custom event calendar templates
+   will be *_D E L E T E D_* so make sure you have a backup if you need them.
+   Also, the Event List view of the calendar works a little different
+   than it used to.
+
 7.2.0
 --------------------------------------------------------------------
  * NOTE: if you tried to upgrade to 7.2.0 and it failed during the

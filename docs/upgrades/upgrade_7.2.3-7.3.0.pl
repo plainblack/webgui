@@ -12,7 +12,8 @@ use lib "../../lib";
 use strict;
 use Getopt::Long;
 use WebGUI::Session;
-
+use WebGUI::Workflow;
+use WebGUI::International;
 
 my $toVersion = "7.3.0"; # make this match what version you're going to
 my $quiet; # this line required
@@ -101,6 +102,7 @@ EOT
 	$session->config->addToArray('assets', 'WebGUI::Asset::Wobject::WikiMaster');
 }
 
+#-----------------------------------------------------
 sub makeRSSFromParentAlwaysHidden {
 	my $session = shift;
 	print "\tHiding RSS From Parent assets.\n" unless $quiet;
@@ -114,9 +116,10 @@ EOT
 				   );
 }
 
-
+#-------------------------------------------------
 sub addNewCalendar {
-	my $session	= shift;
+	my $session = shift;
+	my $i18n = WebGUI::International->new($session,'Asset_Calendar');
 	print "\tCreating Calendar and Event tables.\n" unless $quiet;
 	
 	$session->db->write($_) for (<<'ENDSQL',
@@ -193,10 +196,14 @@ ENDSQL
 	push @{$workflows->{None}},"WebGUI::Workflow::Activity::CalendarUpdateFeeds";
 	$session->config->set("workflowActivities",$workflows);
 	
-	WebGUI::Workflow::new("pbworkflow000000000004")->addActivity($session,"WebGUI::Workflow::Activity::CalendarUpdateFeeds");
+	# Add the Calendar Update Feeds activity to Hourly Maintenance workflow
+	my $workflow = WebGUI::Workflow->new($session,"pbworkflow000000000004");
+	my $activity = $workflow->addActivity("WebGUI::Workflow::Activity::CalendarUpdateFeeds");
+	$activity->set("title", $i18n->get("workflow updateFeeds"));
+	$activity->set("description", $i18n->get("workflow updateFeeds description"));	
 }
 
-
+#-------------------------------------------------
 sub migrateCalendars {
 	my $session	= shift;
 	
@@ -269,7 +276,7 @@ sub migrateCalendars {
 	}
 }
 
-
+#-------------------------------------------------
 sub removeOldCalendar {
 	my $session	= shift;
 	print "\tRemoving old EventsCalendar tables, templates, .\n" unless $quiet;

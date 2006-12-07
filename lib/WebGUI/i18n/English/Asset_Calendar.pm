@@ -268,8 +268,13 @@ our $I18N = {
 			message		=> q{Update Calendar Feeds},
 			lastUpdated	=> 0,
 			context		=> q{The name of the CalendarUpdateFeeds workflow activity},
-		},
-	
+	},
+
+	'workflow updateFeeds description' => {
+			message 	=> q{This activity imports calendar events from calendar feeds},
+			lastUpdated	=> 0,
+			context		=> q{Description of what the Calendar Update Feeds workflow activity does},
+	},	
 	
 #################### ASSET NAME ####################
 	'assetName' => {
