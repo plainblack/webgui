@@ -12,16 +12,40 @@
 our $webguiRoot;
 
 BEGIN {
-        $webguiRoot = $ARGV[0] || "..";
+        $webguiRoot = "..";
         unshift (@INC, $webguiRoot."/lib");
 }
 
 use strict;
 use CPAN;
+use Getopt::Long;
+
 
 print "\nWebGUI is checking your system environment:\n\n";
 
-my ($os, $prereq, $dbi, $dbDrivers);
+my ($os, $prereq, $dbi, $dbDrivers, $simpleReport, $help);
+
+GetOptions(
+	'simpleReport'=>\$simpleReport,
+	'help'=>\$help
+);
+
+if ($help){
+        print <<STOP;
+
+
+Usage: perl $0 
+
+Options:
+	
+   --help         Display this help message and exit.
+   --simpleReport Print a status report to stdout and do not upgrade any perl modules
+
+
+STOP
+        exit;
+}
+
 $prereq = 1;
 
 printTest("Operating System");
@@ -42,58 +66,34 @@ if ($] >= 5.006) {
 	failAndExit("Please upgrade to 5.6 or later! Cannot continue without Perl 5.6 or higher.");
 }
 
+
 checkModule("LWP",5.80);
 checkModule("HTTP::Request",1.40);
 checkModule("HTTP::Headers",1.61);
-checkModule("Test::More",0.61,1);
-checkModule("Test::MockObject",1.02,1);
-checkModule("Test::Deep",0.095,1);
-checkModule("Pod::Coverage",0.17,2);
-checkModule("Text::Balanced",1.95,1);
 checkModule("Digest::MD5",2.20);
 checkModule("DBI",1.40);
 checkModule("DBD::mysql",2.1021);
 checkModule("HTML::Parser",3.36);
 checkModule("Archive::Tar",1.05);
-checkModule("Archive::Zip",1.16);
 checkModule("IO::Zlib",1.01);
 checkModule("Compress::Zlib",1.34);
 checkModule("Net::SMTP",2.24);
-checkModule("MIME::Tools",5.419);
-checkModule("Net::POP3",2.28);
 checkModule("Tie::IxHash",1.21);
 checkModule("Tie::CPHash",1.001);
 checkModule("XML::Simple",2.09);
 checkModule("SOAP::Lite",0.60);
-checkModule("DateTime",0.2901);
 checkModule("Time::HiRes",1.38);
-checkModule("DateTime::Format::Strptime",1.0601);
-checkModule("DateTime::Format::Mail",0.2901);
-checkModule("Image::Magick",6.0);
+checkModule("Image::Magick",5.47,1);
 checkModule("Log::Log4perl",0.51);
 checkModule("Net::LDAP",0.25);
+checkModule("Date::Manip",5.42);
 checkModule("HTML::Highlight",0.20);
 checkModule("HTML::TagFilter",0.07);
 checkModule("HTML::Template",2.7);
-checkModule("HTML::Template::Expr",0.05,2);
-checkModule("Template",2.14,2);
 checkModule("Parse::PlainConfig",1.1);
 checkModule("XML::RSSLite",0.11);
-checkModule("JSON",0.991);
-checkModule("Net::Subnets",0.21);
-checkModule("Finance::Quote",1.08);
-checkModule("POE",0.3202);
-checkModule("POE::Component::IKC::Server",0.18);
-checkModule("POE::Component::Client::HTTP", 0.77);
-checkModule("Data::Structure::Util",0.11);
-checkModule("Apache2::Request",2.06);
-checkModule("Cache::Memcached",1.15,2);
-checkModule("URI::Escape","3.28");
-checkModule("POSIX");
-checkModule("List::Util");
-checkModule("Color::Calc");
-checkModule("Text::Aspell",0.01,2);
-checkModule("Locale::US");
+checkModule("DBIx::FullTextSearch",0.73);
+
 
 ###################################
 # Checking WebGUI
@@ -173,15 +173,17 @@ sub checkModule {
         my $module = shift;
 	my $version = shift || 0;
 	my $skipInstall = shift;
-        my $afterinstall = shift;
+        my $afterinstall = shift;	
         unless (defined $afterinstall) { $afterinstall = 0; }
         printTest("Checking for module $module");
         my $statement = "require ".$module.";";
+
         if ($afterinstall == 1) {
                 failAndExit("Install of $module failed!") unless eval($statement);
                 # //todo: maybe need to check new install module version 
 		printResult("OK");
 		return;
+	    
         } elsif (eval($statement)) {
 		$statement = '$'.$module."::VERSION";
 		my $currentVersion = eval($statement);
@@ -189,37 +191,38 @@ sub checkModule {
 			printResult("OK");
 		} else {
                 	printResult("Outdated - Current: ".$currentVersion." / Required: ".$version);
-			return if $skipInstall;
-			if (isRoot()) {
+			return if $simpleReport;
+			if ( isRootRequirementMet()) {
                 		my $installThisModule = prompt ("The perl module $module is outdated, do you want to upgrade it now?", "y", "y", "n");
                 		if ($installThisModule eq "y") {
                         		installModule($module);
                         		checkModule($module,$version,$skipInstall,1);
                 		} else {
-                        		failAndExit("Aborting test due to user input!");
+                        #		failAndExit("Aborting test due to user input!");
                 		}
 			} else {
 				failAndExit("Aborting test, not all modules available, and you're not root so I can't install them.");
 			}
-		}
+}
         } else {
 		if ($skipInstall == 2) {
 			printResult("Not Installed, but it's optional anyway");
 		} else {
                 	printResult("Not Installed");
 		}
-		return if $skipInstall;
-		if (isRoot()) {
+		return if $simpleReport;
+		if (  isRootRequirementMet()) {
                 	my $installThisModule = prompt ("The perl module $module is not installed, do you want to install it now?", "y", "y", "n");
                 	if ($installThisModule eq "y") {
                         	installModule($module);
                         	checkModule($module,$version,$skipInstall,1);
                 	} else {
-                        	failAndExit("Aborting test due to user input!");
+#                        	failAndExit("Aborting test due to user input!");
                 	}
 		} else {
 			failAndExit("Aborting test, not all modules available, and you're not root so I can't install them.");
 		}
+
         }
 }
 
@@ -275,8 +278,12 @@ sub isIn {
 }
 
 #----------------------------------------
-sub isRoot {
-	return ($< == 0 && getOs() eq "Linuxish");	
+sub isRootRequirementMet {
+    if (getOs() eq "Linuxish")	 {
+	return ($< == 0);	
+    } else {
+	return 1;
+    }
 }
 
 #----------------------------------------
@@ -305,5 +312,6 @@ sub prompt {
         $answer = prompt($question,$default,@answers) if (($#answers > 0 && !(isIn($answer,@answers))) || $answer eq "");
         return $answer;
 }
+
 
 
