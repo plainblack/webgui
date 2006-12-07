@@ -51,8 +51,8 @@ our $I18N = {
 	},
 
 	'url help' => {
-		message => q|The URL that this ad will link to. Note that this won't be used for Rich Media ads.|,
-		lastUpdated => 0,
+		message => q|The URL to which this ad will link. Note that this won't be used for Rich Media ads.|,
+		lastUpdated => 1165511641,
 		context => q|help for a form property in the ad editor|
 	},
 
@@ -218,8 +218,8 @@ our $I18N = {
 	},
 
 	'name help' => {
-		message => q|This string is used in combination with the AdSpace macro to place ads on the site. It should contain no spaces and only alpha-numeric chracters.|,
-		lastUpdated => 0,
+		message => q|This string is used in combination with the AdSpace macro to place ads on the site. It should contain no spaces and only alpha-numeric characters.|,
+		lastUpdated => 1165511561,
 		context => q|help for a form property in the ad manager|
 	},
 

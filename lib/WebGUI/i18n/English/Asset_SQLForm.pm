@@ -610,10 +610,10 @@ expression. The regex you enter here should be perl style.</p>|,
 	},
 
 	'no field types message' => {
-		message => q|In order to add fields to a SQLForm field types
+		message => q|In order to add fields to an SQLForm field types
 must be defined. Currently there are no field types defined, and therfore it is
 not possible ta add fields. Please add at least one field type by going to|,
-		lastUpdated => 0,
+		lastUpdated => 1165517851,
 	},
 
 	'manage field types title' => {

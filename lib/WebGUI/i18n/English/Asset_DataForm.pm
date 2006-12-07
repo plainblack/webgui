@@ -14,8 +14,8 @@ our $I18N = {
 	},
 
 	'mail attachments description' => {
-		message => q|Must be used in conjuction with 'Mail Data'.  Setting to yes will cause all files submitted via the file field type to be mailed as attachments.|,
-		lastUpdated => 0,
+		message => q|Must be used in conjunction with 'Mail Data'.  Setting to yes will cause all files submitted via the file field type to be mailed as attachments.|,
+		lastUpdated => 1165511233,
 		context => 'description of wobject property',
 	},
 
@@ -77,7 +77,7 @@ functions.</p>
                 message => q|<p>If set to yes, some additional fields will be added to your form for dealing with email. These fields will then be used to email any data entered into the form to a person of your choice.  By default the new fields are "Hidden" so that
 they can't be edited by the user.</p>
 <p>
-<b>NOTE:</b> The "To" field that is added as a result of setting this to yes can accept a standard email address, or a WebGUI username or a WebGUI group name.  To send an email to more than one address, separate them by commas.</p>|,
+<b>NOTE:</b> The "To" field that is added as a result of setting this to yes can accept a standard email address, a WebGUI username or a WebGUI group name.  To send an email to more than one address, separate them by commas.</p>|,
                 lastUpdated => 1146763307,
         },
 
@@ -104,9 +104,9 @@ they can't be edited by the user.</p>
 
         'defaultView description' => {
                 message => q|Select the default view for the Data Form, either Form view (the default) or
-List view.  When List view is selected, no acknowledgement will be displayed
+List view.  When List view is selected, no acknowledgment will be displayed
 after data is entered in the form.|,
-                lastUpdated => 1119071072,
+                lastUpdated => 1165511134,
         },
 
 	'744' => {
@@ -116,8 +116,8 @@ after data is entered in the form.|,
 
         '744 description' => {
                 message => q|After creating the Data Form, you can either begin to add fields to it
-or return to the page where the it was created.|,
-                lastUpdated => 1132354848,
+or return to the page where it was created.|,
+                lastUpdated => 1165511258,
         },
 
         '76 description' => {
@@ -136,7 +136,7 @@ or return to the page where the it was created.|,
         },
 
         '76 description' => {
-                message => q|Export the data from the Data Form in tab deliniated format.|,
+                message => q|Export the data from the Data Form in tab delineated format.|,
                 lastUpdated => 1119071072,
         },
 
@@ -473,8 +473,8 @@ unless the user can edit the Data Form (<b>canEdit</b> it true).|,
 	},
 
 	'tab.subtext' => {
-		message => q|A description of this tab that can explain more the tab contents than the label.|,
-		lastUpdated => 1149392054,
+		message => q|A description of this tab that can explain more about the tab contents than the label.|,
+		lastUpdated => 1165511090,
 	},
 
 	'tab.controls' => {
@@ -549,8 +549,8 @@ below to see which template variables may be used inside this loop.|,
 	},
 
 	'field_loop' => {
-		message => q|A loop containing all of the field information.  From outside the <b>field_loop</b> it's also possible to access all form fields directly. To accomplish this you should use these variables. Call them with <b>field.noloop.<i>fieldName</i>.<i>property</i></b>, where fieldName is the name of the field (not the label) and property is anyone of the properties supplied by the <b>field_loop</b>. If you want the form tag of field 'name' you should use <b>field.noloop.name.form</b> anywhere in your template. If you want to know if the field is required use <b>field.noloop.name.isRequired</b>.|,
-		lastUpdated => 1149392054,
+		message => q|A loop containing all of the field information.  From outside the <b>field_loop</b> it's also possible to access all form fields directly. To accomplish this you should use these variables. Call them with <b>field.noloop.<i>fieldName</i>.<i>property</i></b>, where fieldName is the name of the field (not the label) and property is any one of the properties supplied by the <b>field_loop</b>. If you want the form tag of field 'name' you should use <b>field.noloop.name.form</b> anywhere in your template. If you want to know if the field is required use <b>field.noloop.name.isRequired</b>.|,
+		lastUpdated => 1165511043,
 	},
 
 	'field.form' => {
@@ -733,7 +733,7 @@ below to see which template variables may be used inside this loop.|,
 	},
 
 	'record.submissionDate.epoch' => {
-		message => q|The epoch datestamp for this record entry.|,
+		message => q|The epoch date stamp for this record entry.|,
 		lastUpdated => 1149392138,
 	},
 

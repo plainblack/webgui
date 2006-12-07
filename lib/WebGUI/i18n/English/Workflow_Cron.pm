@@ -110,9 +110,9 @@ our $I18N = {
 	},
 
 	'priority help' => {
-		message => q|This determines the priority level of the workflow to be executed. Normally this should be left at "medium". If the workflow needs urgent execcution, then set it to "high". If it's a maintenance task and can be put off until the server is less busy, then set it to "low"|,
+		message => q|This determines the priority level of the workflow to be executed. Normally this should be left at "medium". If the workflow needs urgent execution, then set it to "high". If it's a maintenance task and can be put off until the server is less busy, then set it to "low"|,
 		context => q|the hover help for the priority|,
-		lastUpdated => 0,
+		lastUpdated => 1165510791,
 	},
 
 	'priority' => {

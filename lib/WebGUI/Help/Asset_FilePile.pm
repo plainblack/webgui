@@ -43,10 +43,6 @@ our $HELP = {
                         },
 		],
 		related => [
-			{
-				tag => 'asset fields',
-				namespace => 'Asset'
-			},
 		]
 	},
 

@@ -228,11 +228,10 @@ our $I18N = {
 	'help list products body' => {
 		message => q|<span style="font-weight: bold;">Overview</span><br />
 <br />
-Next to subscriptions WebGUI features products. Product allow you to
+In addition to subscriptions, WebGUI features products. Products allow you to
 sell your products with considerable ease. Just define a base product
 and add parameters to it if you need to. WebGUI generates all possible
-product configuration for you and sets the price, weight and sku values
-according to your wishes automatically.<br />
+product configurations for you and automatically sets the price, weight and sku values.<br />
 <br />
 For example you want to sell T-shirts in the sizes S, M, L and XL and
 the colors blue and grey. Also an XL costs $ 1.50 extra. <br />
@@ -246,7 +245,7 @@ Now you have created eight variants of your T-shirt product and only in
 about a minute. <br />
 <br />
 If you are out of blue large T-shirts, just disable this variant. You
-are in full controll.<br />
+are in full control.<br />
 <br />
 <span style="font-weight: bold;">Usage</span><br />
 <br />
@@ -319,7 +318,7 @@ of your product.
 Products consist of base Properties along with Parameters with various
 Options. The properties are the base of your product. They define the
 the default price, weight, sku and sku composition of the product and
-all it's variants.
+all its variants.
 </p>
 
 <p><b>Properties</b><br />
@@ -367,11 +366,11 @@ The delete button left of an option allows you to delete that option.
 <p><b>List variants</b><br />
 This menu option can be found in the righthand side menu, and allows
 you to view all product variants that are possible with the given
-options. Also this is the place to change the automatically generated
+options. Also, this is the place to change the automatically generated
 price, weight and sku values and set availability of a product variant.
 </p>
 |,
-		lastUpdated => 1146606324,
+		lastUpdated => 1165518436,
 		context => q|The body of the manage product help page|
 	},
 	
@@ -448,9 +447,8 @@ default weight for product variants consisting of this option.</p>|,
         },
 
         'edit option sku modifier description' => {
-                message => q|<p>The value that the template variable of
-the parameter this is an option of in the SKU template takes.</p>|,
-                lastUpdated => 1122609417,
+                message => q|<p>When this option is called in the SKU template as a template variable, the value that will be displayed.</p>|,
+                lastUpdated => 1165513384,
         },
 	'help list variants title' => {
 		message => q|List product variants|,
@@ -460,9 +458,9 @@ the parameter this is an option of in the SKU template takes.</p>|,
 	'help list variants body' => {
 		message => q|<span style="font-weight: bold;">Overview</span><br />
 <br />
-Product variants are that what customers can actually buy. This screen
+Product variants are what customers can actually buy. This screen
 shows all possible configurations of parameters and options and
-therfore define the product variants you can actually sell.<br />
+therefore define the product variants you can actually sell.<br />
 <span style="font-weight: bold;"></span><br />
 <span style="font-weight: bold;">The variant list<br />
 </span><br />
@@ -486,9 +484,10 @@ at the bottom and the top of the screen.<br />
 Also you can edit variants to override their automatically generated
 values for price, weight and SKU. To do this simply click on the edit
 button next to the variant you want to edit.<br />|,
-		lastUpdated => 0,
+		lastUpdated => 1165518232,
 		context => q|The body of the list variants help page|
 	},
+
 	'help edit variant title' => {
 		message => q|Edit product variant|,
 		lastUpdated => 0,
@@ -515,18 +514,18 @@ Please note that a field containing only spaces is not empty.</p>
 	},
 
         'price override description' => {
-                message => q|Here you can set the price for this variant.|,
-                lastUpdated => 1146607100,
+                message => q|The price for this variant.|,
+                lastUpdated => 1165513644,
         },
 
         'weight override description' => {
-                message => q|Here you can set yhe weight of this variant.|,
-                lastUpdated => 1146607101,
+                message => q|The weight of this variant.|,
+                lastUpdated => 1165513603,
         },
 
         'sku override description' => {
-                message => q|Here you can set the SKU of this variant.|,
-                lastUpdated => 1146607102,
+                message => q|The SKU of this variant.|,
+                lastUpdated => 1165513642,
         },
 
         'available description' => {

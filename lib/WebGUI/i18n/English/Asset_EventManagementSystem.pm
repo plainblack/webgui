@@ -416,8 +416,8 @@ our $I18N = { ##hashref of hashes
 	},
 
 	'checkout.url' => {
-		message => q|A URL to take the user the screen that displays the contents of their shopping cart.|,
-		lastUpdated => 1149828278,
+		message => q|A URL to take the user the screen that displays the contents of the shopping cart.|,
+		lastUpdated => 1165517333,
 	},
 
 	'checkout.label' => {
@@ -456,8 +456,8 @@ our $I18N = { ##hashref of hashes
 	},
 
 	'manageEvents.label' => {
-		message => q|An internationalized label to dispaly to the user the link for managing events.|,
-		lastUpdated => 1149828278,
+		message => q|An internationalized label to display to the user the link for managing events.|,
+		lastUpdated => 1165511492,
 	},
 
 	'managePurchases.url' => {
@@ -466,17 +466,17 @@ our $I18N = { ##hashref of hashes
 	},
 
 	'managePurchases.label' => {
-		message => q|An internationalized label to dispaly to the user the link for managing purchases.|,
-		lastUpdated => 1149828278,
+		message => q|An internationalized label to display to the user the link for managing purchases.|,
+		lastUpdated => 1165511507,
 	},
 
 	'template help body' => {
 		message => q|
 <p>This template is used to style the main page of the Event Management System where
-products are displayed to the user as well as providing a link for managing events
+products are displayed to the user as well as provide a link for managing events
 in the system.</p>
 |,
-		lastUpdated => 1149828856,
+		lastUpdated => 1165517304,
 	},
 
 	'event template help title' => {
@@ -490,8 +490,8 @@ in the system.</p>
 	},
 
 	'title.url' => {
-		message => q|A URL to display a list of events that have this event|,
-		lastUpdated => 1149828404,
+		message => q|A URL to display a list of events that contain this event|,
+		lastUpdated => 1165513731,
 	},
 
 	'description' => {
@@ -540,8 +540,8 @@ in the system.</p>
 	},
 
 	'eventIsFull' => {
-		message => q|A boolean that is true if the there are no available seats remaining in this event.|,
-		lastUpdated => 1149828404,
+		message => q|A boolean that is true if there are no available seats remaining in this event.|,
+		lastUpdated => 1165517259,
 	},
 
 	'eventIsApproved' => {
@@ -677,8 +677,8 @@ the user can manage their purchases.</p>
 	},
 
 	'registrationId' => {
-		message => q|The user's registrationId for this event.|,
-		lastUpdated => 1149828601,
+		message => q|The user's registration Id for this event.|,
+		lastUpdated => 1165511539,
 	},
 
 	'templateId' => {
@@ -822,8 +822,8 @@ by setting the "hide" form variable.|,
 	},
 
 	'addEvent.label' => {
-		message => q|An internationalized label to dispaly to the user the link for adding an event.|,
-		lastUpdated => 1149828900,
+		message => q|An internationalized label to display to the user the link for adding an event.|,
+		lastUpdated => 1165511512,
 	},
 
 	'message' => {
@@ -1334,8 +1334,8 @@ normal templates.|,
         },
 
         'associated user description' => {
-                message => q|It is possible to link up this registrant with a user from the WebGUI user database and to synchronize their registrant information with their WebGUI profile.  You may also create a new WebGUI user with their profile information started with their registrant information.|,
-                lastUpdated => 1147050958,
+                message => q|It is possible to link up this registrant with a user from the WebGUI user database and to synchronize their registrant information with their WebGUI profile.  Alternately, you can create a new WebGUI user.  If you do this, the new User's profile will be initially populated with their registrant information.|,
+                lastUpdated => 1165512195,
         },
 
         'badge id' => {

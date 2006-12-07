@@ -146,8 +146,8 @@ our $I18N = {
 	},
 
 	'email.wasSent' => {
-		message => q|A condition indicating whether an email message was sent or not.|,
-		lastUpdated => 1149784175,
+		message => q|A condition indicating whether or not an email message was sent.|,
+		lastUpdated => 1165518551,
 	},
 
 	'edit.url' => {

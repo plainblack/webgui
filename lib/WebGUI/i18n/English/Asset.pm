@@ -407,8 +407,8 @@ a URL will be made from the parent's URL and the <b>Menu Title</b>.</p>|,
         },
 
         'extra head tags description' => {
-                message => q|<p>These tags will be added to the &lt;head&gt; section of each page that the asset appears on.</p>|,
-                lastUpdated => 1126471216,
+                message => q|<p>These tags will be added to the &lt;head&gt; section of each page on which the asset appears.</p>|,
+                lastUpdated => 1165510986,
         },
 
         'make package description' => {

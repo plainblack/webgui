@@ -2,15 +2,15 @@ package WebGUI::i18n::English::Asset_HttpProxy;
 
 our $I18N = {
 	'use ampersand help' => {
-		message => q|By default we use semicolons to seperate parameters in a URL. However, some older applications require the use of ampersands.|,
+		message => q|By default we use semicolons to separate parameters in a URL. However, some older applications require the use of ampersands.|,
 		context => q|asset property hover help|,
-		lastUpdated => 0
+		lastUpdated => 1165517983
 		},
 
 	'use ampersand' => {
-		message => q|Use ampersand as seperator?|,
+		message => q|Use ampersand as separator?|,
 		context => q|asset property|,
-		lastUpdated => 0
+		lastUpdated => 1165517982
 		},
 
 	'cache timeout description' => {

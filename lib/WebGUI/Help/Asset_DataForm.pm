@@ -71,11 +71,6 @@ our $HELP = {
                                 description => '86 description',
                                 namespace => 'Asset_DataForm',
                         },
-                        {
-                                title => '76',
-                                description => '76 description',
-                                namespace => 'Asset_DataForm',
-                        },
                 ],
 		related => [
 			{

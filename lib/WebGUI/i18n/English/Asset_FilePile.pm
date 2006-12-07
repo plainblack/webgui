@@ -7,9 +7,9 @@ our $I18N = {
 	},
 
 	'file pile add/edit body' => {
-                message => q|<p>File Pile Assets allow you to upload lots of files to your site all at once.  This is the only function that File Piles have.  If you want to display the files that have been uploaded, you'll need to use another Asset or Wobject.</p>
+                message => q|<p>File Pile Assets allow you to upload lots of files to your site all at once.  This is the only function that the File Pile has.  If you want to display the files that have been uploaded, you'll need to use another Asset or Wobject.</p>
 
-<p>Unlike most Assets, File Piles do not share the base set of Asset properties.  All File Piles
+<p>Unlike most Assets, the File Pile does not share the base set of Asset properties.  All File Piles
 have the following properties:</p>
 
 |,
@@ -24,12 +24,6 @@ have the following properties:</p>
 
         '940 description' => {
                 message => q|<p>Select yes to open this asset in a new window.
-</p>|,
-                lastUpdated => 1119214815,
-        },
-
-        '108 description' => {
-                message => q|<p>The owner of a page is usually the person who created the page. This user always has full edit and viewing rights on the page.
 </p>|,
                 lastUpdated => 1119214815,
         },
@@ -97,11 +91,11 @@ have the following properties:</p>
                  },
 
         '108 description' => {
-                message => q|<p>The owner of a asset is usually the person who created the asset. This user always has full edit and viewing rights on the asset.
+                message => q|<p>The owner of an asset is usually the person who created the asset. This user always has full editing and viewing rights on the asset.
 </p>
 <p> <b>NOTE:</b> The owner can only be changed by an administrator.
 </p>|,
-                lastUpdated => 1119149899,
+                lastUpdated => 1165517660,
         },
 
         '872' => {

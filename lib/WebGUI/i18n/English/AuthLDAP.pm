@@ -590,8 +590,8 @@ Usually the RDN looks something like:</p>
         },
 
         '6 description' => {
-                message => q|The LDAP Identity is the unique identifier in the LDAP server that the user will be identified against. Often this field is <b>shortname</b>, which takes the form of first initial + last name. Example: jdoe. Therefore if you specify the LDAP identity to be <i>shortname</i> then Jon Doe would enter <i>jdoe</i> during the registration process.|,
-                lastUpdated => 1120164594,
+                message => q|The LDAP Identity is the unique identifier in the LDAP server that the user will be identified against. Often this field is <b>shortname</b>, which takes the form of first initial + last name. Example: jdoe. Therefore, if you specify the LDAP identity to be <i>shortname</i> then Jon Doe would enter <i>jdoe</i> during the registration process.|,
+                lastUpdated => 1165512076,
         },
 
         '7 description' => {
@@ -628,8 +628,8 @@ Usually the RDN looks something like:</p>
         },
 
         'login template description' => {
-                message => q|Template used to display login information to the user as an operation as opposed to inside of a page via a macro.|,
-                lastUpdated => 1120164594,
+                message => q|Template used to display login information to the user as an operation, as opposed to inside of a page via a macro.|,
+                lastUpdated => 1165512102,
         },
 
         'ldap connection add/edit body' => {

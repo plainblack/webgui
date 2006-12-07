@@ -16,11 +16,11 @@ our $I18N = {
 		message => q|
 
 <p><b>&#94;FormParam();</b><br />
-This macro is mainly used in generating dynamic queries in SQL Reports. Using this macro you can pull the value of any form field simply by specifying the name of the form field, like this: &#94;FormParam("phoneNumber");
+This macro is mainly used in generating dynamic queries in SQL Reports. Using this macro, you can pull the value of any form field simply by specifying the name of the form field, like this: &#94;FormParam("phoneNumber");
 </p>
 <p>If the macro is used to pull data from a form field that returns multiple values, like a dropdown list, then only the first value will be returned.</p>
 |,
-		lastUpdated => 1154143837,
+		lastUpdated => 1165517791,
 	},
 };
 

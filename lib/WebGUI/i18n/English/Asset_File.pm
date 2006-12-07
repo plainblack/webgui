@@ -19,11 +19,11 @@ our $I18N = {
 	'file add/edit body' => {
                 message => q|<p>File Assets are files on your site that are available for users to download. If you would like to have multiple files available, try using a FilePile Asset.</p>
 
-<p>Since Files are Assets, so they have all the properties that Assets do.  Below are the properties that are specific to Image Assets:</p>
+<p>Since Files are Assets, they have all the properties of Assets.  Below are the properties that are specific to Image Assets:</p>
 
 |,
 		context => 'Describing file add/edit form specific fields',
-		lastUpdated => 1119068839,
+		lastUpdated => 1165517702,
 	},
 
 	'file template title' => {
@@ -107,8 +107,8 @@ our $I18N = {
         },
 
 	'new file description' => {
-		message => q|Enter the path to a file, or use the "Browse" button to find a file on your local hard drive that you would like to be uploaded.|,
-		lastUpdated => 1119068745
+		message => q|Enter the path to a file, or use the "Browse" button to find a file on your local hard drive that you would like to be upload.|,
+		lastUpdated => 1165517718
 	},
 
 };

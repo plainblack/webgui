@@ -437,8 +437,8 @@ from working.|,
 	},
 
 	'form.dependants' => {
-		message => q|Form element for something I really don't understand.|,
-		lastUpdated => 1149825164,
+		message => q|Form element for entering in which task this task depends on, by number.|,
+		lastUpdated => 1165512623,
 	},
 
 	'form.resource' => {

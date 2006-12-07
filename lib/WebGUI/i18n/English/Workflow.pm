@@ -74,9 +74,9 @@ our $I18N = {
 	},
 
 	'description help' => {
-		message => q|Fill out a detailed description of what this workflow does and is used for for future reference.|,
+		message => q|Fill out a detailed description of what this workflow does and what it is used for for future reference.|,
 		context => q|the hover help for the description field|,
-		lastUpdated => 0,
+		lastUpdated => 1165513695,
 	},
 
 	'description' => {

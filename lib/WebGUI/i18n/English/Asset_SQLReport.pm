@@ -40,7 +40,7 @@ SQL Reports are Wobjects and Assets, so they share the properties of both.  SQL 
         },
 
         'Placeholder Parameters description' => {
-                message => q|<p>Placeholders, also called parameter markers, are used to indicate values in a SQL query that will be supplied later, before the statement is executed.</p>
+                message => q|<p>Placeholders, also called parameter markers, are used to indicate values in an SQL query that will be supplied later, before the statement is executed.</p>
 <p>There are four input types:</p>
 <div>
 <ul>

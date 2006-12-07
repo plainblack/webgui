@@ -327,8 +327,8 @@ our $I18N = {
 	},
 
 	'help manage pending transactions body' => {
-		message => q|<p>All transactions that are marked as 'Pending' are listed here. Transactions are marked pending if some extra review is required. For instance when a transaction is suspected of fraud. Pending transactions can also be transactions that yet have to be confirmed by something as or similar to PayPal's APN. If you have checked that the transaction is legit you can click on the 'Complete transaction' link.</p>|,
-		lastUpdated => 1101772650,
+		message => q|<p>All transactions that are marked as 'Pending' are listed here. Transactions are marked pending if some extra review is required. For instance when a transaction is suspected of fraud. Pending transactions can also be transactions that have yet to be confirmed by something as or similar to PayPal's APN. If you have checked that the transaction is legit you can click on the 'Complete transaction' link.</p>|,
+		lastUpdated => 1165518203,
 		context => q|The body of the help page of the list pending transactions screen.|
 	},
 

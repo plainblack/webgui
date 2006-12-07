@@ -1555,14 +1555,13 @@ sent in HTML format. No attachments can be included.|,
 	},
 
 	'620' => {
-		message => q|<p>As this function suggests you'll be deleting a group and removing all users from the group. Be careful not to restrict users from pages they should have access to by deleting a group that is in use.
+		message => q|<p>As this function suggests, you'll be deleting a group and removing all users from the group. Be careful not to restrict users from pages they should have access to by deleting a group that is in use.
 </p>
 
 <p>As with any delete operation, you are prompted to be sure you wish to proceed with the delete. If you answer yes, the delete will proceed and there is no recovery possible. If you answer no you'll be returned to the prior screen.
 </p>
-
 |,
-		lastUpdated => 1100154599
+		lastUpdated => 1165517903
 	},
 
 	'1004' => {
@@ -1840,7 +1839,7 @@ sent in HTML format. No attachments can be included.|,
         },
 
         '1005 description' => {
-                message => q|<p>Many organizations have external databases that map users to groups; for example an HR database might map Employee ID to Health Care Plan.  To validate users against an external database, you need to construct a SQL statement that will return the list of WebGUI userIds for users in the group.  You may use macros in this query to access data in a user's WebGUI profile, such as Employee ID.  Here is an example that checks a user against a fictional HR database.  This assumes you have created an additional WebGUI profile field called employeeId.</p>
+                message => q|<p>Many organizations have external databases that map users to groups; for example an HR database might map Employee ID to Health Care Plan.  To validate users against an external database, you need to construct an SQL statement that will return the list of WebGUI userIds for users in the group.  You may use macros in this query to access data in a user's WebGUI profile, such as Employee ID.  Here is an example that checks a user against a fictional HR database.  This assumes you have created an additional WebGUI profile field called employeeId.</p>
 <p>
 select userId from employees, health_plans, empl_plan_map<br />
 where employees.employee_id = &#94;User("employeeId");<br />
@@ -1851,7 +1850,7 @@ and health_plans.health_plan_id = empl_plan_mp.health_plan_id<br />
 <p>
 This group could then be named "Employees in HMO 1", and would allow you to restrict any page or wobject to only those users who are part of this health plan in the external database.
 </p>|,
-                lastUpdated => 1146592080,
+                lastUpdated => 1165517843,
         },
 
         '1004 description' => {
@@ -3791,9 +3790,9 @@ Select which of the configured LDAP connections to use to authenticate users.
 	},
 
 	'content filter body' => {
-		message => q|<p>WebGUI has many features to accept content from outside sources, such as users posting to message boards or pulling data from external websites via the HttpProxy or SyndicatedContent Assets.  However, this can expose pose a risk to your site, for example, through cross-site scripting attacks.</p>
+		message => q|<p>WebGUI has many features to accept content from outside sources, such as users posting to message boards or pulling data from external websites via the HttpProxy or SyndicatedContent Assets.  However, this can expose a risk to your site, for example, through cross-site scripting attacks.</p>
 <p>To help solve this problem
-many Assets have a <b>^International("418","WebGUI");</b> property that performs various leveling
+many Assets have a <b>^International("418","WebGUI");</b> property that performs various levels
 of filtering on content.  Each one is pretty self-explanatory:</p>
 <div>
 <dl>
@@ -3811,7 +3810,7 @@ JavaScript fields from HTML tags.</dd>
 <dd>Strips everything that it can, returning just plain old, safe text.</dd>
 </dl></div>
 |,
-		lastUpdated => 1113681314,
+		lastUpdated => 1165517754,
 	},
 
 	'glossary title' => {
@@ -3959,8 +3958,8 @@ Message Boards hold forums for users.  There are many different Wobjects in WebG
 	},
 
 	'allowed keywords description' => {
-		message => q|You can enter the statements that are allowed for this databaselink. A safe (read-only) choice is SELECT, DESCRIBE and SHOW. The different keywords should be seperated from each other by whitespace.|,
-		lastUpdated => 0,
+		message => q|You can enter the statements that are allowed for this databaselink. A safe (read-only) choice is SELECT, DESCRIBE and SHOW. The different keywords should be separated from each other by whitespace.|,
+		lastUpdated => 1165511447,
 	},
 
 	'preview' => {

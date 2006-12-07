@@ -99,13 +99,13 @@ our $I18N = {
         },
 
         'In Out Template description' => {
-                message => q|Choose a template to style the display of the In/Out Board to users.|,
-                lastUpdated => 1138988640,
+                message => q|Choose a template to display the In/Out Board to users.|,
+                lastUpdated => 1165518044,
         },
 
         '13 description' => {
-                message => q|Choose a template to style the display of the In/Out Board Report.|,
-                lastUpdated => 1138988640,
+                message => q|Choose a template to display the In/Out Board Report.|,
+                lastUpdated => 1165518045,
         },
 
         '3 description' => {
@@ -171,13 +171,13 @@ can alter their status.|,
 	},
 
 	'deptHasChanged' => {
-		message => q|A boolean value indicating whether or not this row of data is for a department that is differnet than the previous rows|,
-		lastUpdated => 1149393667,
+		message => q|A boolean value indicating whether or not this row of data is for a department that is different than the previous rows|,
+		lastUpdated => 1165518086,
 	},
 
 	'username' => {
-		message => q|A variable that returns the users name.  If the first and last name fields are defined in the user profile, that is what is returned.  Otherwise, the users WebGUI username is returned.  i.e., "John Doe" vs "Jdoe"|,
-		lastUpdated => 1149393667,
+		message => q|A variable that returns the user's name.  If the first and last name fields are defined in the user profile, that is what is returned.  Otherwise, the user's WebGUI username is returned.  i.e., "John Doe" vs "Jdoe"|,
+		lastUpdated => 1165518097,
 	},
 
 	'status' => {
