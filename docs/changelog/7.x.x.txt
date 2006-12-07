@@ -1,3 +1,5 @@
+7.3.1
+
 7.3.0
  - NOTICE: The Template Managers group is deprecated.  It has not been removed
    from the system, but you do not have to be in the Template Managers group
