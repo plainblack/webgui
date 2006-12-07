@@ -101,7 +101,9 @@ sub purge {
 
 	my $kids = $self->getLineage(["children"],{returnObjects=>1, statesToInclude=>['published', 'clipboard', 'clipboard-limbo','trash','trash-limbo']});
 	foreach my $kid (@{$kids}) {
-		$kid->purge;
+		# Technically get lineage should never return an undefined object from getLineage when called like this, but it did so this saves the world from destruction.
+		(defined $kid) ? $kid->purge :
+			$self->session->errorHandler->warn("getLineage returned an undefined object in the AssetTrash->purge method.  Unable to purge asset.");
 	}
 	$self->session->db->beginTransaction;
 	foreach my $definition (@{$self->definition($self->session)}) {

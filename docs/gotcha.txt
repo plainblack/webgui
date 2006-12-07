@@ -34,6 +34,10 @@ save you many hours of grief.
    Also, the Event List view of the calendar works a little different
    than it used to.
 
+   The upgrade script takes an unusually long time to migrate EventCalendar
+   wobjects to the new Calendar wobjects.  We're looking into the cause but
+   don't kill your upgrade thinking its hung up, we promise it will finish.
+
 7.2.0
 --------------------------------------------------------------------
  * NOTE: if you tried to upgrade to 7.2.0 and it failed during the
