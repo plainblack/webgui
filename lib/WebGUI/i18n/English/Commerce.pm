@@ -134,7 +134,7 @@ our $I18N = {
 
 
         'daily report email description' => {
-                message => q|<p>Everyday the scheduler plugin that checks and updates subscriptions send a report on on the successful and failed term payments. Here you can set to which email address it should send this report.</p>|,
+                message => q|<p>Everyday the scheduler plugin that checks and updates subscriptions sends a report with the successful and failed term payments. Here you can set to which email address it should send this report.</p>|,
                 lastUpdated => 1138922899,
         },
 
@@ -396,8 +396,8 @@ our $I18N = {
 	},
 
 	'salesTaxRate' => {
-		message => q|The sales tax rate, as determined by the user's homeState in their profile.|,
-		lastUpdated => 1161319799,
+		message => q|The sales tax rate, as determined by the user's homeState in his/her profile.|,
+		lastUpdated => 1165449949,
 	},
 
 	'totalSalesTax' => {
@@ -422,11 +422,11 @@ our $I18N = {
 
 
 	'help checkout confirm template body' => {
-		message => q|<p>This template separates normal and recurring items. A normal item is an item that is payed only once. Recurring items are payed once a period, like a subscription.</p>
+		message => q|<p>This template separates normal and recurring items. A normal item is an item that is paid only once. Recurring items are paid once a period, like a subscription.</p>
 
 <p>The following template variables are available in this template:</p>
 |,
-		lastUpdated => 1149221368,
+		lastUpdated => 1165449926,
 		context => q|The body of the help page of the confirm checkout template.|
 	},
 

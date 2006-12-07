@@ -356,7 +356,7 @@ our $I18N = {
 	},
 
 	'commit version tag body' => {
-		message => q|<p>Committing the version tag will make it the current version that is used and displayed on your website.</p>
+		message => q|<p>Committing the version tag will make its content the current version of content that is used and displayed on your website.</p>
 |,
 		lastUpdated => 1148444236,
 	},

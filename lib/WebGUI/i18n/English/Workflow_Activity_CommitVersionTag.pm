@@ -9,8 +9,8 @@ our $I18N = {
 	},
 
 	'commit version tag body' => {
-		message => q|<p>This workflow activity commits a version tag.  It should be used as the last step in any workflow dealing with committing version tags.  For example, if you built a workflow that required someone else to authorize the committing of a version tag, this activity would be the last step in the workflow and its execution would depend on the authorization actually heppening and being positive.</p>|,
-		lastUpdated => 0,
+		message => q|<p>This workflow activity commits a version tag.  It should be used as the last step in any workflow dealing with committing version tags.  For example, if you built a workflow that required someone else to authorize the committing of a version tag, this activity would be the last step in the workflow and its execution would depend on the authorization actually happening and being positive.</p>|,
+		lastUpdated => 1165449726,
 	},
 
 };

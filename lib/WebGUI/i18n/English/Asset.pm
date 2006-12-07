@@ -38,8 +38,8 @@ our $I18N = {
 	},
 
 	'confirm change url message' => {
-		message => q|Setting this to 'Yes' confirms that you want to permanently change this URL, thusly deleteing all old revisions of this asset.|,
-		lastUpdated => 0,
+		message => q|Setting this to 'Yes' confirms that you want to permanently change this URL, thus deleteing all old revisions of this asset.|,
+		lastUpdated => 1165449241,
 		context => q|explains the implications of the change url function|
 	},
 
@@ -61,7 +61,7 @@ our $I18N = {
 	},
 
 	'change url body' => {
-		message => q|<p>Suppose that you want to put a new Asset in the place of an old Asset and to use the old Asset's URL for the new Asset.  Normally, to do this you would have to change the URL in the latest revision of the Asset and then purge each and every revision of the old Asset (since the old revisions of the old Asset have the same URL).  Change URL allows you to do this easily.  Enter in the new URL for the old Asset, and it will perform all the work for you.</p>|,
+		message => q|<p>Suppose that you want to put a new Asset in the place of an old Asset, but to use the old Asset's URL for the new Asset.  Normally, to do this you would have to change the URL in the latest revision of the Asset and then purge each and every revision of the old Asset (since the old revisions of the old Asset have the same URL).  Change URL allows you to do this easily.  Enter in the new URL for the old Asset, and it will perform all the work for you.</p>|,
 		lastUpdated => 0,
 	},
 
@@ -609,7 +609,7 @@ each asset under the tab &quot;Meta&quot; in the asset properties.</p>
     contenttype = sport AND source != newspaper
     </div>
     <p>You can use the AOI macro's described above in the criteria, so you can
-    present content based upon the users Areas of Interest. Example:<br />
+    present content based upon the user's Areas of Interest. Example:<br />
     type = &#94;AOIRank(contenttype);</p></li>
    <li><p><b>Display</b><br />
     Metadata fields are exposed to the asset templates as their property name. So you can actually display the metadata
@@ -619,7 +619,7 @@ each asset under the tab &quot;Meta&quot; in the asset properties.</p>
     to create meta tags from meta data, including the tags from the Dublin Core standard.</p></li>
 </ul>|,
                 context => q|Metadata help|,
-                lastUpdated => 1165356337
+                lastUpdated => 1165450008
         },
 
 	'metadata edit property' => {
@@ -888,8 +888,8 @@ Couldn't open %-s because %-s <br />
 	},
 
 	'manage versions body' => {
-		message => q|<p>This screen displays a list of all versions for the current Asset, showing the date it was committed or opened, who owns the tag for that version, and the name of the version tag.  Icons will allow you purge a revision and remove it from the system or to view that particular version of the  Asset.  The version tag name is a link that will take you to the Manage Revisions in Tag screen.|,
-		lastUpdated => 0,
+		message => q|<p>This screen displays a list of all committed versions for the current Asset, showing the date it was committed or opened, who owns the tag for that version, and the name of the version tag.  Icons will allow you purge a revision and remove it from the system or to view that particular version of the  Asset.  The version tag name in the list is a link that will take you to the Manage Revisions in Tag screen.|,
+		lastUpdated => 1165449841,
 	},
 
 	'asset toolbar title' => {

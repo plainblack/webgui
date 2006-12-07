@@ -1063,8 +1063,8 @@ properties listed below:</p>
 	},
 
         'display last reply description' => {
-                message => q|If set to Yes, template variables will be added to allow the display the last Post.|,
-                lastUpdated => 1163013333,
+                message => q|If set to Yes, template variables will be added to allow the display of the last reply in this Thread.|,
+                lastUpdated => 1165449294,
         },
 
         'system template description' => {
@@ -1506,8 +1506,8 @@ the Collaboration Asset, the user will be notified.|,
 	},
 
 	'enable avatars description' => {
-		message => q|<p>Select "Yes" to display Avatars for users in the Collaboration System.  The Avatar field inthe User Profile has to be enabled, and users will need to upload an Avatar image to display.</p><p>Using Avatars will slow down the performance of Collaboration Systems.</p>|,
-		lastUpdated => 1131432717,
+		message => q|<p>Select "Yes" to display Avatars for users in the Collaboration System.  The Avatar field in the User Profile has to be enabled, and users will need to upload an Avatar image to display.</p><p>Using Avatars will slow down the performance of Collaboration Systems.</p>|,
+		lastUpdated => 1165449336,
 	},
 
 	'collaboration rss template title' => {
