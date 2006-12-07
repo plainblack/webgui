@@ -16,7 +16,7 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 12; # increment this value for each test you create
+use Test::More tests => 14; # increment this value for each test you create
 use WebGUI::Asset::Snippet;
 
 my $session = WebGUI::Test->session;
@@ -53,6 +53,11 @@ for (1..2) {
 # Rudimentry test of the view method
 my $output = $snippet->view;
 
+# See if cache purges on update
+$snippet->update({snippet=>"I pitty tha fool!"});
+like($snippet->view, qr/I pitty tha fool/,"cache for view method purges on update");
+like($snippet->www_view,qr/I pitty tha fool/,"cache for www_view method purges on update");
+
 # It should return something
 isnt ($output, undef, 'view method returns something');
 
@@ -68,8 +73,6 @@ isnt ($editOutput, undef, 'www_edit returns something');
 TODO: {
         local $TODO = "Tests to make later";
 	ok(0, 'Test indexContent method');
-	#ok(0, 'Test www_edit method');
-	#ok(0, 'Test www_view method... maybe?');
 }
 
 END {
