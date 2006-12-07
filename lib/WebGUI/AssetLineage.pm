@@ -36,7 +36,7 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 addChild ( properties [, id, revisionDate ] )
+=head2 addChild ( properties [, id, revisionDate, options ] )
 
 Adds a child asset to a parent. Creates a new AssetID for child. Makes the parent know that it has children. Adds a new asset to the asset table. Returns the newly created Asset.
 
@@ -52,6 +52,14 @@ A unique 22 character ID.  By default WebGUI will generate this and you should a
 
 An epoch representing the time this asset was created.
 
+=head3 options
+
+A hash reference that allows passed in options to change how this method behaves.
+
+=head4 skipAutoCommitWorkflows
+
+If this is set to 1 assets that normally autocommit their workflows (like CS Posts) won't do that.
+
 =cut
 
 sub addChild {
@@ -59,6 +67,7 @@ sub addChild {
 	my $properties = shift;
 	my $id = shift || $self->session->id->generate();
 	my $now = shift || $self->session->datetime->time();
+	my $options = shift;
 	# add a few things just in case the creator forgets
 	$properties->{ownerUserId} ||= '3';
 	$properties->{groupIdEdit} ||= '12';
@@ -80,7 +89,7 @@ sub addChild {
 	$properties->{parentId} = $self->getId;
 	my $temp = WebGUI::Asset->newByPropertyHashRef($self->session,$properties);
 	$temp->{_parent} = $self;
-	my $newAsset = $temp->addRevision($properties,$now);
+	my $newAsset = $temp->addRevision($properties,$now, {skipAutoCommitWorkflows=>$options->{skipAutoCommitWorkflows}});
 	$self->updateHistory("added child ".$id);
 	$self->session->http->setStatus(201,"Asset Creation Successful");
 	return $newAsset;

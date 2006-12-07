@@ -416,7 +416,7 @@
 
 #"availableDictionaries" : [
 #   	{
-#		"id" : "en",
+#		"id" : "en_US",
 #		"name" : "English",
 #		"default" : "1"
 #	},

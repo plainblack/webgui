@@ -1083,8 +1083,8 @@ sub view {
 		left join assetData on assetData.assetId=Thread.assetId and Thread.revisionDate = assetData.revisionDate
 		where asset.parentId=".$self->session->db->quote($self->getId)." and asset.state='published' and 
 		asset.className='WebGUI::Asset::Post::Thread' and assetData.revisionDate=(SELECT max(revisionDate) from assetData 
-			where assetData.assetId=asset.assetId) and (assetData.status='approved'  
-			or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")).") 
+			where assetData.assetId=asset.assetId and (assetData.status='approved'  
+			or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag"))."))
 		group by assetData.assetId order by Thread.isSticky desc, ".$sortBy." ".$sortOrder;
 	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->get("threadsPerPage"));
 	$p->setDataByQuery($sql);

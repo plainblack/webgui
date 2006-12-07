@@ -46,7 +46,7 @@ Duplicates this asset and the entire subtree below it.  Returns the root of the 
 
 sub duplicateBranch {
 	my $self = shift;
-	my $newAsset = $self->duplicate;
+	my $newAsset = $self->duplicate({skipAutoCommitWorkflows=>1});
 	my $contentPositions = $self->get("contentPositions");
 
 	foreach my $child (@{$self->getLineage(["children"],{returnObjects=>1})}) {
@@ -292,7 +292,7 @@ sub www_editBranchSave {
 				$data{url} .= $descendant->get("url");
 			}
 		}
-		my $newRevision = $descendant->addRevision(\%data);
+		my $newRevision = $descendant->addRevision(\%data, undef, {skipAutoCommitWorkflows=>1});
 		foreach my $form ($self->session->form->param) {
                 	if ($form =~ /^metadata_(.*)$/) {
 				my $fieldName = $1;

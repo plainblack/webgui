@@ -40,7 +40,7 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 addRevision ( properties [ , revisionDate ] )
+=head2 addRevision ( properties [ , revisionDate, options ] )
 
 Adds a revision of an existing asset. Note that programmers should almost never call this method directly, but rather use the update() method instead.
 
@@ -52,13 +52,22 @@ A hash reference containing a list of properties to associate with the child.
 
 An epoch date representing the date/time stamp that this revision was created. Defaults to$self->session->datetime->time().
 
+=head3 options
+
+A hash reference of options that change the behavior of this method.
+
+=head4 skipAutoCommitWorkflows
+
+If this is set to 1 then assets that would normally autocommit their workflow (like CS Posts) will instead add themselves to the normal working version tag.
+
 =cut
 
 sub addRevision {
         my $self = shift;
         my $properties = shift;
 	my $now = shift ||$self->session->datetime->time();
-	my $autoCommitId = $self->getAutoCommitWorkflowId();
+	my $options = shift;
+	my $autoCommitId = $self->getAutoCommitWorkflowId() unless ($options->{skipAutoCommitWorkflows});
 	my $workingTag = ($autoCommitId) ? WebGUI::VersionTag->create($self->session, {groupToUse=>'12', workflowId=>$autoCommitId}) : WebGUI::VersionTag->getWorking($self->session);
 	$self->session->db->beginTransaction;
 	$self->session->db->write("insert into assetData (assetId, revisionDate, revisedBy, tagId, status, url,

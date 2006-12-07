@@ -1847,7 +1847,7 @@ sub update {
 
 =head2 view ( )
 
-Returns "".
+The default view method for any asset that doesn't define one. Under all normal circumstances this should be overridden or your asset won't have any output.
 
 =cut
 
