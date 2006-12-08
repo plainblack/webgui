@@ -295,6 +295,8 @@ sub _listFieldsWhere {
 SQL
 }
 
+#-------------------------------------------------------------------
+
 =head2 getEditableFields ( session )
 
 Returns an array reference of WebGUI::ProfileField objects that are marked "editable" or "required". This is a class method.
@@ -306,6 +308,8 @@ sub getEditableFields {
 	my $session = shift;
 	return $class->_listFieldsWhere($session, "f.required = 1 OR f.editable = 1");
 }
+
+#-------------------------------------------------------------------
 
 =head2 getFields ( session )
 
@@ -319,6 +323,8 @@ sub getFields {
 	return $class->_listFieldsWhere($session, "1");
 }
 
+#-------------------------------------------------------------------
+
 =head2 getRequiredFields ( session )
 
 Returns an array reference of WebGUI::ProfileField objects that are marked "required". This is a class method.
@@ -330,6 +336,8 @@ sub getRequiredFields {
 	my $session = shift;
 	return $class->_listFieldsWhere($session, "f.required = 1");
 }
+
+#-------------------------------------------------------------------
 
 =head2 getRegistrationFields ( session )
 
