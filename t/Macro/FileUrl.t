@@ -84,9 +84,13 @@ my @testSets = (
 );
 
 
-my $numTests = scalar(@testSets);
+my $numTests = 0;
 $numTests += 1; #For the use_ok
 $numTests += 1; #non-existant URL
+
+foreach my $testSet (@testSets) {
+	$numTests += $testSet->{pass} ? 2 : 1;
+}
 
 plan tests => $numTests;
 
@@ -106,7 +110,10 @@ my $homeAsset = WebGUI::Asset->getDefault($session);
 foreach my $testSet (@testSets) {
 	my $output = WebGUI::Macro::FileUrl::process($session, $testSet->{url});
 	if ($testSet->{pass}) {
-		is($output, $testSet->{fileUrl}, $testSet->{comment});
+		my $storageId = $testSet->{asset}->get("storageId");
+		my $expectedUrl = WebGUI::Storage->get($session, $storageId)->getUrl($testSet->{filename});
+		ok($expectedUrl, $testSet->{comment}." returns non-null file");
+		is($output, $expectedUrl, $testSet->{comment});
 	}
 	else {
 		is($output, $testSet->{output}, $testSet->{comment});
@@ -127,6 +134,7 @@ sub setupTest {
 
 		my $storage = WebGUI::Storage->create($session);
 		my $filename = join '.', 'fileName', $testNum;
+		$testSet->{filename} = $filename;
 
 		##Store the filename in the file, just for reference.
 		$storage->addFileFromScalar($filename,$filename);
@@ -145,5 +153,6 @@ sub setupTest {
 }
 
 END { ##Clean-up after yourself, always
+	use Data::Dumper;
 	$versionTag->rollback;
 }
