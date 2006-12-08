@@ -384,7 +384,8 @@ sub delete {
 		rmtree($path) if ($path);
 		foreach my $subDir ($self->{_part1}.'/'.$self->{_part2}, $self->{_part1}) {
 			my $uDir = $self->session->config->get('uploadsPath') . '/' . $subDir;
-			opendir my $DH, $uDir;
+			my $DH;
+			opendir $DH, $uDir;
 			if (defined $DH) {
 				my @dirs = grep { !/^\.+$/ } readdir($DH);
 				if (scalar @dirs == 0) {
