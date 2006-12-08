@@ -248,7 +248,7 @@ Returns a WebGUI::ProfileCategory object for the category that this profile fiel
 
 sub getCategory {
 	my $self = shift;
-	return WebGUI::ProfileCategory->new($self->session,$self->get("categoryId"));
+	return WebGUI::ProfileCategory->new($self->session,$self->get("profileCategoryId"));
 }
 
 

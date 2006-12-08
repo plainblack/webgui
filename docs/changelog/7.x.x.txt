@@ -4,6 +4,8 @@
  - Fixed a problem with the new autocommit code that caused reply posts not to
    work in the collaboration system.
  - Storage deletes were throwing fatals when they should throw warnings.
+ - Fixed a bug in WebGUI::ProfileField->getCategory which caused it to always 
+   return undef. (Martin Kamerbeek / Procolix)
 
 
 7.3.0
