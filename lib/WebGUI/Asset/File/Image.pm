@@ -148,11 +148,12 @@ sub getEditForm {
 
 
 #-------------------------------------------------------------------
+
 sub getStorageLocation {
 	my $self = shift;
 	unless (exists $self->{_storageLocation}) {
 		if ($self->get("storageId") eq "") {
-		$self->{_storageLocation} = WebGUI::Storage::Image->create($self->session);
+			$self->{_storageLocation} = WebGUI::Storage::Image->create($self->session);
 			$self->update({storageId=>$self->{_storageLocation}->getId});
 		} else {
 			$self->{_storageLocation} = WebGUI::Storage::Image->get($self->session,$self->get("storageId"));
@@ -220,6 +221,18 @@ sub setSize {
 	my $storage = $self->getStorageLocation;
 	my $size = ($input > $storage->getFileSize($self->get("filename"))) ? $input : $storage->getFileSize($self->get("filename"));
 	return $self->SUPER::setSize($size);
+}
+
+#-------------------------------------------------------------------
+
+sub setStorageLocation {
+	my $self = shift;
+	if ($self->get("storageId") eq "") {
+		$self->{_storageLocation} = WebGUI::Storage::Image->create($self->session);
+		$self->update({storageId=>$self->{_storageLocation}->getId});
+	} else {
+		$self->{_storageLocation} = WebGUI::Storage::Image->get($self->session,$self->get("storageId"));
+	}
 }
 
 #-------------------------------------------------------------------

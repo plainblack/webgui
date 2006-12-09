@@ -6,7 +6,11 @@
  - Storage deletes were throwing fatals when they should throw warnings.
  - Fixed a bug in WebGUI::ProfileField->getCategory which caused it to always 
    return undef. (Martin Kamerbeek / Procolix)
-
+ - Fixed a bug in WebGUI::Asset::File where update did not update the
+   internally cached storage object inside of _storageLocation.
+   This is probably only a real problem in persistent code, like Workflow
+   Activities and tests.
+   Added tests for File and Image assets to verify that this happens correctly.
 
 7.3.0
  - NOTICE: The Template Managers group is deprecated.  It has not been removed

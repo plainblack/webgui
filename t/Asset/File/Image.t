@@ -10,27 +10,21 @@
 
 use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/../../lib";
 
 use WebGUI::Test;
-use WebGUI::Macro::Thumbnail;
 use WebGUI::Session;
 use WebGUI::Image;
 use WebGUI::Storage::Image;
+use WebGUI::Asset::File::Image;
 
 use Image::Magick;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
-plan tests => 8;
+plan tests => 7;
 
 my $session = WebGUI::Test->session;
-
-is(
-	WebGUI::Macro::Thumbnail::process($session, '/url-that-does-not-resolve'),
-	undef,
-	'non-existant URL returns undef'
-);
 
 my $square = WebGUI::Image->new($session, 100, 100);
 $square->setBackgroundColor('#0000FF');
@@ -50,46 +44,30 @@ cmp_bag($storage->getFiles, ['square.png'], 'Only 1 file in storage with correct
 
 $session->user({userId=>3});
 my $versionTag = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Thumbnail macro test"});
+$versionTag->set({name=>"Image Asset test"});
 my $properties = {
 	#     '1234567890123456789012'
-	id => 'ThumbnailAsset00000001',
-	title => 'Thumbnail macro test',
+	id => 'ImageAssetTest00000001',
+	title => 'Image Asset Test',
 	className => 'WebGUI::Asset::File::Image',
-	url => 'thumbnail-test',
+	url => 'image-asset-test',
 };
 my $defaultAsset = WebGUI::Asset->getDefault($session);
-$session->asset($defaultAsset);
 my $asset = $defaultAsset->addChild($properties, $properties->{id});
+
+ok($asset->get('storageId'), 'Image Asset created with initial storage location');
+ok($asset->getStorageLocation, 'Image Asset getStorageLocation initialized');
+is($asset->get('storageId'), $asset->getStorageLocation->getId, 'Asset storageId and cached storageId agree');
+
 $asset->update({
 	storageId => $storage->getId,
 	filename => 'square.png',
 });
+
+is($storage->getId, $asset->get('storageId'), 'Asset updated with correct new storageId');
+is($storage->getId, $asset->getStorageLocation->getId, 'Cached Asset storage location updated with correct new storageId');
+
 $versionTag->commit;
-
-
-$asset->generateThumbnail();
-
-##Call the Thumbnail Macro with that Asset's URL and see if it returns
-##the correct URL.
-
-my $output = WebGUI::Macro::Thumbnail::process($session, $asset->getUrl());
-my $macroUrl = $storage->getPath('thumb-square.png');
-is($output, $asset->getThumbnailUrl, 'Macro returns correct filename');
-
-my $thumbUrl = $asset->getThumbnailUrl;
-substr($thumbUrl, 0, length($session->config->get("uploadsURL"))) = '';
-my $thumbFile = $session->config->get('uploadsPath') . $thumbUrl;
-ok((-e $thumbFile), 'file actually exists');
-
-##Load the image into some parser and check a few pixels to see if they're blue-ish.
-##->Get('pixel[x,y]') hopefully returns color in hex triplets
-my $thumbImg = Image::Magick->new();
-$thumbImg->Read(filename => $thumbFile);
-
-cmp_bag([$thumbImg->GetPixels(width=>1, height=>1, x=>25, y=>25, map=>'RGB', normalize=>'true')], [0,0,1], 'blue pixel #1');
-cmp_bag([$thumbImg->GetPixels(width=>1, height=>1, x=>75, y=>75, map=>'RGB', normalize=>'true')], [0,0,1], 'blue pixel #2');
-cmp_bag([$thumbImg->GetPixels(width=>1, height=>1, x=>50, y=>50, map=>'RGB', normalize=>'true')], [0,0,1], 'blue pixel #3');
 
 END {
 	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
