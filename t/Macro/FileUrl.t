@@ -84,13 +84,9 @@ my @testSets = (
 );
 
 
-my $numTests = 0;
+my $numTests = scalar @testSets;
 $numTests += 1; #For the use_ok
 $numTests += 1; #non-existant URL
-
-foreach my $testSet (@testSets) {
-	$numTests += $testSet->{pass} ? 2 : 1;
-}
 
 plan tests => $numTests;
 
@@ -110,10 +106,7 @@ my $homeAsset = WebGUI::Asset->getDefault($session);
 foreach my $testSet (@testSets) {
 	my $output = WebGUI::Macro::FileUrl::process($session, $testSet->{url});
 	if ($testSet->{pass}) {
-		my $storageId = $testSet->{asset}->get("storageId");
-		my $expectedUrl = WebGUI::Storage->get($session, $storageId)->getUrl($testSet->{filename});
-		ok($expectedUrl, $testSet->{comment}." returns non-null file");
-		is($output, $expectedUrl, $testSet->{comment});
+		is($output, $testSet->{fileUrl}, $testSet->{comment});
 	}
 	else {
 		is($output, $testSet->{output}, $testSet->{comment});
@@ -141,10 +134,14 @@ sub setupTest {
 		$testSet->{fileUrl} = $storage->getUrl($filename);
 
 		my %properties = %{ $testSet };
-		$properties{storageId} = $storage->getId;
-		$properties{filename} = $filename;
 
 		my $asset = $homeAsset->addChild(\%properties, $properties{assetId});
+		##It is not recommended that you create the asset with the
+		##storageId and filename as properties.
+		$asset->update({
+				storageId => $storage->getId,
+				filename => $filename,
+				});
 		$testSet->{asset} = $asset;
 		++$testNum;
 	}
