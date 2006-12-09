@@ -28,7 +28,6 @@ use base 'WebGUI::Asset::Wobject';
 use DateTime;
 use JSON;
 
-
 =head1 Name
 
 
@@ -1359,7 +1358,7 @@ sub wrapIcal
 =head2 www_edit ( )
 
 Adds a submenu to the default edit page that includes links to Add an Event.
-	
+
 =cut
 
 sub www_edit 
