@@ -100,6 +100,94 @@ our $HELP = {
 		],
 	},
 
+	'wiki master search box variables' => {
+		title => 'search box variables title',
+		body => 'search box variables body',
+		isa => [
+		],
+		variables => [
+		          {
+		            'name' => 'searchFormHeader',
+		          },
+		          {
+		            'name' => 'searchQuery',
+		          },
+		          {
+		            'name' => 'searchSubmit',
+		          },
+		          {
+		            'name' => 'searchFormFooter',
+		          },
+		],
+		fields => [
+		],
+		related => [
+		],
+	},
+
+	'wiki master recent changes' => {
+		title => 'recent changes variables title',
+		body => 'recent changes variables body',
+		isa => [
+		],
+		variables => [
+		          {
+		            'name' => 'recentChanges',
+			    'variables' => [
+				  {
+				    'name' => 'title',
+				    'description' => 'recent changes title',
+				  },
+				  {
+				    'name' => 'url',
+				    'description' => 'recent changes url',
+				  },
+				  {
+				    'name' => 'actionTaken',
+				  },
+				  {
+				    'name' => 'username',
+				    'description' => 'recent changes username',
+				  },
+				  {
+				    'name' => 'date',
+				    'description' => 'recent changes date',
+				  },
+			    ]
+		          },
+		],
+		fields => [
+		],
+		related => [
+		],
+	},
+
+	'wiki master most popular' => {
+		title => 'most popular variables title',
+		body => 'most popular variables body',
+		isa => [
+		],
+		variables => [
+		          {
+		            'name' => 'mostPopular',
+			    'variables' => [
+				  {
+				    'name' => 'title',
+				    'description' => 'most popular title',
+				  },
+				  {
+				    'name' => 'url',
+				    'description' => 'most popular url',
+				  },
+			    ]
+		          },
+		],
+		fields => [
+		],
+		related => [
+		],
+	},
+
 };
 
 1;

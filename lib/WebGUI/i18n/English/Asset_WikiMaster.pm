@@ -133,6 +133,102 @@ our $I18N =
                 lastUpdated => 1165732631,
         },
 
+        'search box variables title' => {
+                message => q|Wiki Master, Search Box Variables|,
+                lastUpdated => 1165790228,
+        },
+
+        'search box variables body' => {
+                message => q|<p>These variables are available in many Wiki templates for creating a search box.</p>|,
+                lastUpdated => 1165790228,
+        },
+
+        'searchFormHeader' => {
+                message => q|HTML code to start the form for the search box.|,
+                lastUpdated => 1165790228,
+        },
+
+        'searchQuery' => {
+                message => q|HTML code for a text box to enter in search terms.|,
+                lastUpdated => 1165790228,
+        },
+
+        'searchSubmit' => {
+                message => q|A submit button with an internationalized label to perform the search.|,
+                lastUpdated => 1165790228,
+        },
+
+        'searchFormFooter' => {
+                message => q|HTML code to end the form for the search box.|,
+                lastUpdated => 1165790228,
+        },
+
+        'recent changes variables title' => {
+                message => q|Wiki Master, Recent Changes Variables|,
+                lastUpdated => 1165790228,
+        },
+
+        'recent changes variables body' => {
+                message => q|<p>These variables are available in many Wiki templates for displaying links to recently changed wiki pages.</p>|,
+                lastUpdated => 1165790228,
+        },
+
+        'recentChanges' => {
+                message => q|This loop contains information about wiki pages that have been recently changed.  The number of recently changed pages is determined in the Wiki Add/Edit screen.|,
+                lastUpdated => 1165790228,
+        },
+
+        'recent changes title' => {
+                message => q|The title of the recently changed page.|,
+                lastUpdated => 1165790228,
+        },
+
+        'recent changes url' => {
+                message => q|The url of the recently changed page.|,
+                lastUpdated => 1165790228,
+        },
+
+        'actionTaken' => {
+                message => q|What happened to this recently changed page, typically this is either "Edited" or "Created".|,
+                lastUpdated => 1165790228,
+                context => q|The Edited and Created words in the message are internationalized.  Please translate them.|,
+        },
+
+        'recent changes username' => {
+                message => q|The name of the user who changed the page, recently.|,
+                lastUpdated => 1165790228,
+        },
+
+        'recent changes date' => {
+                message => q|The date when the page was changed.|,
+                lastUpdated => 1165790228,
+        },
+
+        'most popular variables title' => {
+                message => q|Wiki Master, Most Popular Variables|,
+                lastUpdated => 1165790228,
+        },
+
+        'most popular variables body' => {
+                message => q|<p>These variables are available in many Wiki templates for displaying links to the wiki pages that are most popular.</p>|,
+                lastUpdated => 1165790228,
+        },
+
+        'mostPopular' => {
+                message => q|This loop contains information about wiki pages that are the most popular.  The number of pages displayed is determined in the Wiki Add/Edit screen.|,
+                lastUpdated => 1165790228,
+        },
+
+        'most popular title' => {
+                message => q|The title of a page from the set of most popular pages.|,
+                lastUpdated => 1165790228,
+        },
+
+        'most popular url' => {
+                message => q|The url of a page from the set of most popular pages.|,
+                lastUpdated => 1165790228,
+        },
+
 };
 
 1;
