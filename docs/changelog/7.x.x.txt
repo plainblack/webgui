@@ -11,6 +11,8 @@
    This is probably only a real problem in persistent code, like Workflow
    Activities and tests.
    Added tests for File and Image assets to verify that this happens correctly.
+ - fix - Unable to add EventsCalendar
+
 
 7.3.0
  - NOTICE: The Template Managers group is deprecated.  It has not been removed
