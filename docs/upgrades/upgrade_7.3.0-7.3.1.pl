@@ -32,7 +32,7 @@ sub cleanupEventsCalendar {
 	unlink("../../lib/WebGUI/Asset/Wobject/EventsCalendar.pm");
 	unlink("../../lib/WebGUI/i18n/English/Asset_EventsCalendar.pm");
 	unlink("../../lib/WebGUI/Help/Asset_EventsCalendar.pm");
-	$session->config->deleteFromArray("assets","WebGUI::Asset::Wobject::EventsCalendar")
+	$session->config->deleteFromArray("assets","WebGUI::Asset::Wobject::EventsCalendar");
 
 
 }
