@@ -93,11 +93,6 @@ my @tmplVarTable = (
 		id   => 'PBtmpl0000000000000141',
 		var  => [ qw(controls) ],
 	},
-	###EventsCalendar
-	{
-		id   => 'PBtmpl0000000000000022',
-		var  => [ qw(controls) ],
-	},
 	###Folder
 	{
 		id   => 'PBtmpl0000000000000078',
