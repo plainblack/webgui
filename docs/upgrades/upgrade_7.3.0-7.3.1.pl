@@ -21,11 +21,17 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 cleanupEventsCalendar($session);
+addWikiPage($session);
 
 finish($session); # this line required
 
+#-------------------------------------------------
+sub addWikiPage {
+	my $session = shift;
+	$session->config->addToArray("assetContainers","WebGUI::Asset::WikiPage");
+}
 
-##-------------------------------------------------
+#-------------------------------------------------
 sub cleanupEventsCalendar {
 	my $session = shift;
 	print "\tRemoving the rest of the old EventsCalendar wobject\n" unless ($quiet);
@@ -33,8 +39,6 @@ sub cleanupEventsCalendar {
 	unlink("../../lib/WebGUI/i18n/English/Asset_EventsCalendar.pm");
 	unlink("../../lib/WebGUI/Help/Asset_EventsCalendar.pm");
 	$session->config->deleteFromArray("assets","WebGUI::Asset::Wobject::EventsCalendar");
-
-
 }
 
 # ---- DO NOT EDIT BELOW THIS LINE ----
