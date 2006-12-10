@@ -123,6 +123,16 @@ our $I18N =
  'actionN created' =>
  { lastUpdated => 1160505291, message => q|Created| },
 
+        'add/edit title' => {
+                message => q|Wiki, Add/Edit|,
+                lastUpdated => 1165732630,
+        },
+
+        'add/edit body' => {
+                message => q|<p>The Wiki is very similar to the Collaboration System.  It manages Wiki Pages that are added to it.  These fields are available for configuring and customizing the Wiki.</p>|,
+                lastUpdated => 1165732631,
+        },
+
 };
 
 1;
