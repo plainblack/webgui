@@ -14,7 +14,7 @@ our $HELP = {
                         {
                                 title => 'trash after',
                                 description => 'trash after help',
-                                namespace => 'Asset_Event',
+                                namespace => 'Workflow_Activity_TrashExpiredEvents',
                         },
 		],
 		variables => [
