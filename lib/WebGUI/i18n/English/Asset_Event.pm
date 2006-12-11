@@ -16,7 +16,6 @@ our $I18N = {
 
 	'add/edit body'	=> {
 		message		=> q{This Asset has no documentation or internationalization.},
-		context		=> q{The ISO locale name for month and day labels.},
 		lastUpdated	=> 1165731356,
 	},
 

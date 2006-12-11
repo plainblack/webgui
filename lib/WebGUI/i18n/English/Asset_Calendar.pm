@@ -282,6 +282,16 @@ our $I18N = {
 		lastUpdated 	=> 1131394072,
 	},
 
+	'add/edit title' => {
+		message 	=> q|Calendar, Add/Edit|,
+		lastUpdated 	=> 1165878391,
+	},
+
+	'add/edit body' => {
+		message 	=> q|This Asset has no documentation.|,
+		lastUpdated 	=> 1165878391,
+	},
+
 };
 
 1;

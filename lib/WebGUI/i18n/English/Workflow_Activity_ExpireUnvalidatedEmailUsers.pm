@@ -17,11 +17,11 @@ our $I18N = {
 		lastUpdated => 1165406607,
 	},
 
-	'expire unvalidated email users' => {
+	'expire unvalidated email users body' => {
 		message => q|<p>This workflow activity will go through all users who requested new accounts but who never validated their email addresses and expire their accounts.  The expiration date is configurable.</p>
 <p>
 |,
-		lastUpdated => 0,
+		lastUpdated => 1165879515,
 	},
 };
 
