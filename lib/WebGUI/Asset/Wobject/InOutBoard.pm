@@ -172,6 +172,7 @@ sub view {
 	my $i18n = WebGUI::International->new($self->session, "Asset_InOutBoard");
 	if ($self->session->user->isInGroup($self->getValue("reportViewerGroup"))) {
 	  $var{'viewReportURL'} = $self->getUrl("func=viewReport");
+	  $var{'viewReportLabel'} = $i18n->get('view report label');
 	  $var{canViewReport} = 1;
 	}
 	else { $var{canViewReport} = 0; }
@@ -233,6 +234,7 @@ sub view {
 	  $var{displayForm} = 1;
 	  $var{'form'} = $f->print;
 	  $var{'selectDelegatesURL'} = $self->getUrl("func=selectDelegates");
+	  $var{'selectDelegatesLabel'} = $i18n->get('select delegates label');
 	}
 	else { $var{displayForm} = 0; }
 	
@@ -451,6 +453,7 @@ sub www_viewReport {
 		-hoverHelp=>$i18n->get('14 description'),
 	);
 	$f->submit(-value=>"Search");
+	$var{'reportTitleLabel'} = $i18n->get('report title');
 	$var{'form'} = $f->print;
 	my $url = $self->getUrl("func=viewReport;selectDepartment=".$self->session->form->process("selectDepartment").";reportPagination=".$self->session->form->process("reportPagination").";startDate=".$self->session->form->process("startDate").";endDate=".$self->session->form->process("endDate").";doit=1");
 	if ($self->session->form->process("doit")) {

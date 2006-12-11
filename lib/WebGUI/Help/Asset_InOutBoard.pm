@@ -124,6 +124,9 @@ our $HELP = {
 		body => '23',
 		variables => [
 		          {
+		            'name' => 'reportTitle'
+		          },
+		          {
 		            'name' => 'showReport'
 		          },
 		          {

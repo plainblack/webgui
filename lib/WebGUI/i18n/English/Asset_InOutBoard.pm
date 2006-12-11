@@ -400,6 +400,38 @@ can alter their status.|,
 		context => q|label for user profile field|,
 	},
 
+	'report title' => {
+		message => q|In/Out Board Report|,
+		lastUpdated =>1165810121,
+		context => q|Default i18n label for a In/Out Board Report|,
+	},
+
+	'reportTitle' => {
+		message => q|Internationalized title for an In/Out Board Report.|,
+		lastUpdated =>1165810121,
+	},
+
+	'select delegates label' => {
+		message => q|Select Delegates|,
+		lastUpdated =>1165810121,
+		context => q|Default i18n label for the URL to select delegates|,
+	},
+
+	'selectDelegatesLabel' => {
+		message => q|Internationalized title for the URL to select delegates.|,
+		lastUpdated =>1165810121,
+	},
+
+	'view report label' => {
+		message => q|View Report|,
+		lastUpdated =>1165810121,
+	},
+
+	'viewReportLabel' => {
+		message => q|Internationalized title for the URL to view reports.|,
+		lastUpdated =>1165810121,
+	},
+
 };
 
 1;
