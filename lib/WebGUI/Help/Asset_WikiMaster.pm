@@ -204,6 +204,10 @@ our $HELP = {
 				namespace => "Asset_WikiMaster",
 				tag => "wiki master search box variables"
 			},
+			{
+				namespace => "Asset_WikiMaster",
+				tag => "wiki master asset variables"
+			},
 		],
 		variables => [
 			  {
@@ -221,6 +225,79 @@ our $HELP = {
 			  },
 			  {
 			    'name' => 'recentChangesLabel',
+			  },
+		],
+		fields => [
+		],
+		related => [
+		],
+	},
+
+	'wiki master asset variables' => {
+		title => 'wiki master asset variables title',
+		body => 'wiki master asset variables body',
+		isa => [
+			{
+				namespace => "Asset_Wobject",
+				tag => "wobject template"
+			},
+			{
+				namespace => "Asset",
+				tag => "asset template"
+			},
+		],
+		variables => [
+			  {
+			    'name' => 'groupToEditPages',
+			  },
+			  {
+			    'name' => 'groupToAdminister',
+			  },
+			  {
+			    'name' => 'richEditor',
+			  },
+			  {
+			    'name' => 'frontPageTemplateId',
+			  },
+			  {
+			    'name' => 'pageTemplateId',
+			  },
+			  {
+			    'name' => 'pageHistoryTemplateId',
+			  },
+			  {
+			    'name' => 'mostPopularTemplateId',
+			  },
+			  {
+			    'name' => 'recentChangesTemplateId',
+			  },
+			  {
+			    'name' => 'searchTemplateId',
+			  },
+			  {
+			    'name' => 'recentChangesCount',
+			    'description' => 'recentChangesCount hoverHelp',
+			  },
+			  {
+			    'name' => 'recentChangesCountFront',
+			    'description' => 'recentChangesCountFront hoverHelp',
+			  },
+			  {
+			    'name' => 'mostPopularCount',
+			    'description' => 'mostPopularCount hoverHelp',
+			  },
+			  {
+			    'name' => 'mostPopularCountFront',
+			    'description' => 'mostPopularCountFront hoverHelp',
+			  },
+			  {
+			    'name' => 'approvalWorkflow',
+			  },
+			  {
+			    'name' => 'thumbnailSize',
+			  },
+			  {
+			    'name' => 'maxImageSize',
 			  },
 		],
 		fields => [

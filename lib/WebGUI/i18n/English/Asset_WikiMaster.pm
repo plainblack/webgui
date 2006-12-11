@@ -24,6 +24,11 @@ our $I18N =
                 lastUpdated => 0,
         },
 
+        'approvalWorkflow' => {
+                message => q|The Id of the Workflow used to approve pages in the Wiki.|,
+                lastUpdated => 0,
+        },
+
 	'max image size' => {
 		message => q|Maximum Image Size|,
 		lastUpdated => 0,
@@ -35,6 +40,11 @@ our $I18N =
 		lastUpdated => 0,
 		context => q|help for display setting label|
 		},
+
+	'maxImageSize' => {
+		message => q|The size of the image attachments set for this Wiki.|,
+		lastUpdated => 1165813764,
+	},
 
 	'thumbnail size' => {
 		message => q|Thumbnail Size|,
@@ -48,50 +58,106 @@ our $I18N =
 		context => q|help for display setting label|
 		},
 
+	'thumbnailSize' => {
+		message => q|The size of the thumbnails set for this Wiki.|,
+		lastUpdated => 1165813723,
+		},
+
  'groupToEditPages hoverHelp' =>
  { lastUpdated => 1160157064, message => q|Choose a group of users who will be able to edit pages in this wiki instance.  They will not, by default, be able to delete pages or revisions, or edit protected pages.| },
  'groupToEditPages label' =>
  { lastUpdated => 1160157064, message => q|Who can edit pages?| },
+
+	'groupToEditPages' => {
+		message => q|The id of the group that can edit pages.|,
+		lastUpdated => 1160157064,
+	},
 
  'groupToAdminister hoverHelp' =>
  { lastUpdated => 1160157064, message => q|Choose a group of users who will be able to perform administrative actions on pages in this wiki instance; such actions include deletion of pages and page revisions, and protecting and unprotecting of pages.| },
  'groupToAdminister label' =>
  { lastUpdated => 1160157064, message => q|Who can administer?| },
 
+	'groupToAdminister' => {
+		message => q|The id of the group that is allowed to administer the Wiki or to edit pages.|,
+		lastUpdated => 1160157064,
+	},
+
  'richEditor hoverHelp' =>
  { lastUpdated => 1160157064, message => q|Which rich editor to use for editing pages in this wiki instance.| },
  'richEditor label' =>
  { lastUpdated => 1160157064, message => q|Rich Editor| },
 
+	'richEditor' => {
+		message => q|The id of the Rich Editor that will be used to edit Wiki pages.|,
+		lastUpdated => 1160157064,
+	},
+
  'pageTemplateId hoverHelp' => { lastUpdated => 1160157064, message => q|Which template to use to display pages?| },
  'pageTemplateId label' => { lastUpdated => 1160157064, message => q|Page Template| },
+
+	'pageTemplateId' => {
+		message => q|The id of the template used to display the pages inside the Wiki.|,
+		lastUpdated => 1160157064,
+	},
+
  'pageEditTemplateId hoverHelp' => { lastUpdated => 1160157064, message => q|Which template to use to edit pages?| },
  'pageEditTemplateId label' => { lastUpdated => 1160157064, message => q|Page Edit Template| },
+
+	'pageEditTemplateId' => {
+		message => q|The id of the template that displays the screen for editing Wiki pages.|,
+		lastUpdated => 1160157064,
+	},
 
  'frontPageTemplateId hoverHelp' =>
  { lastUpdated => 1161031607, message => q|Which template to use for the front page.| },
  'frontPageTemplateId label' =>
  { lastUpdated => 1161031607, message => q|Front Page Template| },
 
+	'frontPageTemplateId' => {
+		message => q|The id of the template used to display the front page of the Wiki.|,
+		lastUpdated => 1160157064,
+	},
+
  'recentChangesTemplateId hoverHelp' => { lastUpdated => 1160157064, message => q|Which template to use for the recent changes display.| },
  'recentChangesTemplateId label' => { lastUpdated => 1160157064, message => q|Recent Changes Template| },
 
+	'recentChangesTemplateId' => {
+		message => q|The id of the template to display the list of recent changes to pages inside the Wiki.|,
+		lastUpdated => 1160157064,
+	},
+
  'mostPopularTemplateId hoverHelp' => { lastUpdated => 1160157064, message => q|Which template should be used to display the most popular listing?| },
  'mostPopularTemplateId label' => { lastUpdated => 1160157064, message => q|Most Popular Template| },
+
+	'mostPopularTemplateId' => {
+		message => q|The id of the template to display the list most popular pages inside the Wiki.|,
+		lastUpdated => 1160157064,
+	},
 
  'pageHistoryTemplateId hoverHelp' =>
  { lastUpdated => 1160505291, message => q|Which template to use for the page history display.| },
  'pageHistoryTemplateId label' =>
  { lastUpdated => 1160505291, message => q|Page History Template| },
 
+	'pageHistoryTemplateId' => {
+		message => q|The id of the template to display the list of all changes to any given page inside the Wiki.|,
+		lastUpdated => 1160157064,
+	},
+
  'searchTemplateId hoverHelp' =>
  { lastUpdated => 1161031607, message => q|Which template to use for search results.| },
  'searchTemplateId label' =>
  { lastUpdated => 1161031607, message => q|Search Template| },
 
- 'recentChangesCount hoverHelp' => { lastUpdated => 1161031607, message => q|Maximum number of changes to display on the recent changes page.| },
+	'searchTemplateId' => {
+		message => q|The id of the template to display a page to search pages inside the Wiki.|,
+		lastUpdated => 1160157064,
+	},
+
+ 'recentChangesCount hoverHelp' => { lastUpdated => 1165813593, message => q|The Maximum number of changes to display on the recent changes page.| },
  'recentChangesCount label' => { lastUpdated => 1161031607, message => q|Recent Changes Count| },
- 'recentChangesCountFront hoverHelp' => { lastUpdated => 1161031607, message => q|Maximum number of changes to display on the front page.| },
+ 'recentChangesCountFront hoverHelp' => { lastUpdated => 1165813596, message => q|The maximum number of changes to display on the front page.| },
  'recentChangesCountFront label' => { lastUpdated => 1161031607, message => q|Front Page Recent Changes Count| },
 
  'mostPopularCount hoverHelp' => { lastUpdated => 1161031607, message => q|Maximum number of popular page links to display on the most popular page.| },
@@ -240,8 +306,8 @@ our $I18N =
         },
 
         'description' => {
-                message => q|The description for this Wiki, with any recognized titles or urls from pages in this Wiki automatically converted to links to those pages.|,
-                lastUpdated => 1165812138,
+                message => q|The description for this Wiki, with any recognized titles or urls from pages in this Wiki automatically converted to links to those pages.  This template variable will override any other variables available in this template with the same name.|,
+                lastUpdated => 1165814035,
         },
 
         'searchLabel variable' => {
@@ -266,6 +332,16 @@ our $I18N =
 
         'recentChangesLabel' => {
                 message => q|An internationalized label to go with recentChangesUrl.|,
+                lastUpdated => 1165812138,
+        },
+
+        'wiki master asset variables title' => {
+                message => q|Wiki Asset Variables.|,
+                lastUpdated => 1165812138,
+        },
+
+        'wiki master asset variables body' => {
+                message => q|<p>These variables are available in many of the Wiki templates, but many of them may not be overly useful.</p>|,
                 lastUpdated => 1165812138,
         },
 
