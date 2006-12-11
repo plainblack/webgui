@@ -12,7 +12,6 @@
    Activities and tests.
    Added tests for File and Image assets to verify that this happens correctly.
  - fix - Unable to add EventsCalendar
- - fix - Wiki Page not added to config
  - fix - Some functions in InOutBoard not internationalized
 
 

@@ -21,15 +21,8 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 cleanupEventsCalendar($session);
-addWikiMaster($session);
 
 finish($session); # this line required
-
-#-------------------------------------------------
-sub addWikiMaster {
-	my $session = shift;
-	$session->config->addToArray("assetContainers","WebGUI::Asset::Wobject::WikiMaster");
-}
 
 #-------------------------------------------------
 sub cleanupEventsCalendar {
