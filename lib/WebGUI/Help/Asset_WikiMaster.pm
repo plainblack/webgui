@@ -314,15 +314,11 @@ our $HELP = {
 				namespace => "Asset_WikiMaster",
 				tag => "wiki master most popular variables"
 			},
-			{
-				namespace => "Asset_WikiMaster",
-				tag => "wiki master asset variables"
-			},
 		],
 		variables => [
 			  {
 			    'name' => 'title',
-			    'description' => 'most popular title',
+			    'description' => 'most popular title variable',
 			  },
 			  {
 			    'name' => 'recentChangesUrl',
@@ -343,6 +339,47 @@ our $HELP = {
 			  },
 			  {
 			    'name' => 'wikiHomeUrl',
+			  },
+		],
+		fields => [
+		],
+		related => [
+		],
+	},
+
+	'recent changes template' => {
+		title => 'recent changes template title',
+		body => 'recent changes template body',
+		isa => [
+			{
+				namespace => "Asset_WikiMaster",
+				tag => "wiki master recent changes variables"
+			},
+		],
+		variables => [
+			  {
+			    'name' => 'title',
+			    'description' => 'recent changes title',
+			  },
+			  {
+			    'name' => 'searchLabel',
+			    'description' => 'searchLabel variable',
+			  },
+			  {
+			    'name' => 'searchLabelUrl',
+			  },
+			  {
+			    'name' => 'wikiHomeLabel',
+			    'description' => 'wikiHomeLabel variable',
+			  },
+			  {
+			    'name' => 'wikiHomeUrl',
+			  },
+			  {
+			    'name' => 'mostPopularUrl',
+			  },
+			  {
+			    'name' => 'mostPopularLabel',
 			  },
 		],
 		fields => [

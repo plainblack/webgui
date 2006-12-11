@@ -370,9 +370,24 @@ our $I18N =
                 lastUpdated => 1165812138,
         },
 
-        'most popular title' => {
-                message => q|An internationalized title for the Most Popular Template|,
+        'most popular title variable' => {
+                message => q|An internationalized title for the Most Popular Template.|,
                 lastUpdated => 1165812138,
+        },
+
+        'recent changes template title' => {
+                message => q|Wiki Master, Recent Changes Template|,
+                lastUpdated => 1165812138,
+        },
+
+        'recent changes template body' => {
+                message => q|<p>These variables are available in the template for displaying the list of recent changes to pages in the Wiki.</p>|,
+                lastUpdated => 1165816631,
+        },
+
+        'recent changes title' => {
+                message => q|An internationalized title for the Recent Changes Template.|,
+                lastUpdated => 1165790228,
         },
 
 };
