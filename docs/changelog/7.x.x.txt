@@ -13,6 +13,7 @@
    Added tests for File and Image assets to verify that this happens correctly.
  - fix - Unable to add EventsCalendar
  - fix - Some functions in InOutBoard not internationalized
+ - fix: Calendar/Event not handling gateway properly.
 
 
 7.3.0

@@ -326,7 +326,7 @@ sub canAddEvent
 	return (
 		(
 			$self->get("status") eq "approved" || 
-			$self->getTagCount > 1 # checks to make sure that the cs has been committed at least once
+			$self->getTagCount > 1 # checks to make sure that the calendar has been committed at least once
 		) && (
 			$self->session->user->isInGroup($self->get("groupIdEventEdit")) 
 			|| $self->SUPER::canEdit
@@ -643,9 +643,8 @@ sub getEventsIn
 			whereClause		=> $where,
 		});
 	
-	# ? Perhaps use Stow to cache events ?
-	#$self->session->errorHandler->warn("Got ".scalar @{$events}." events in ($start -- $end || $startTz -- $endTz)");
-	#$self->session->errorHandler->warn("Ref: ".ref $events->[0]);
+	#? Perhaps use Stow to cache Events ?#
+	
 	return @{$events};
 }
 
@@ -737,7 +736,6 @@ sub prepareView
 	my $view	= ucfirst lc $self->session->form->param("type")
 			|| ucfirst $self->get("defaultView") 
 			|| "Month";
-	#$self->session->errorHandler->warn("Prepare view ".$view." with template ".$self->get("templateId".$view));
 	
 	my $template 	= WebGUI::Asset::Template->new($self->session, $self->get("templateId".$view));
 	$template->prepare;
@@ -776,7 +774,8 @@ sub processPropertiesFromFormPost
 	
 	
 	### Get feeds from the form
-	# Workaround WebGUI::Session::Form->param bug
+	# Workaround WebGUI::Session::Form->param bug that returns duplicate
+	# names.
 	my %feeds;
 	$feeds{$_}++ 
 		for map { s/^feeds-//; $_; } grep /^feeds-/,($form->param());
@@ -899,12 +898,11 @@ sub view
 	}
 	
 	# URLs
-	$var->{"urlDay"}	= "/".$session->url->append($self->get("url")
-				, "type=day;start=".$params->{start});
-	$var->{"urlWeek"}	= "/".$session->url->append($self->get("url")
-				, "type=week;start=".$params->{start});
-	$var->{"urlMonth"}	= "/".$session->url->append($self->get("url")
-				, "type=month;start=".$params->{start});
+	$var->{"urlDay"}	= $self->getUrl("type=day;start=".$params->{start});
+	$var->{"urlWeek"}	= $self->getUrl("type=week;start=".$params->{start});
+	$var->{"urlMonth"}	= $self->getUrl("type=month;start=".$params->{start});
+	$var->{"urlAdd"}	= $self->getUrl("func=add;class=WebGUI::Asset::Event");
+	$var->{"urlSearch"}	= $self->getUrl("func=search");
 	
 	# Parameters
 	$var->{"paramStart"}	= $params->{start};
@@ -916,8 +914,6 @@ sub view
 	# If user is only a Visitor and we've gotten this far, update the cache
 	
 	# Return the processed template to be displayed for the user
-	#use Data::Dumper; $session->errorHandler->warn(Dumper $var);
-	
 	return $self->processTemplate($var, undef, $self->{_viewTemplate});
 }
 
@@ -995,11 +991,9 @@ sub viewDay
 	
 	# Make the navigation bars
 	$var->{"pageNextStart"}		= $dt->clone->add(days=>1)->toMysql;
-	$var->{"pageNextUrl"}		= "/".$self->get("url")."?type=day;start="
-					. $var->{"pageNextStart"};
+	$var->{"pageNextUrl"}		= $self->getUrl("type=day;start=".$var->{"pageNextStart"});
 	$var->{"pagePrevStart"}		= $dt->clone->subtract(days=>1)->toMysql;
-	$var->{"pagePrevUrl"}		= "/".$self->get("url")."?type=day;start="
-					. $var->{"pagePrevStart"};
+	$var->{"pagePrevUrl"}		= $self->getUrl("type=day;start=".$var->{"pagePrevStart"});
 	# Some friendly dates
 	$var->{"dayName"}		= $dt->day_name;
 	$var->{"dayAbbr"}		= $dt->day_abbr;
@@ -1084,10 +1078,7 @@ sub viewMonth
 		# Add the day in the appropriate position
 		$var->{weeks}->[$week]->{days}->[$position] = {
 			"dayMonth"	=> $dt_day->day_of_month,
-			"dayUrl"	=> "/"
-					. $self->get("url")
-					. "?type=day;start="
-					. $dt_day->toMysql,
+			"dayUrl"	=> $self->getUrl("type=day;start=".$dt_day->toMysql),
 			"dayCurrent"	=> ($today eq $dt_day->toMysqlDate ? 1 : 0 ),
 		};
 	}
@@ -1133,10 +1124,7 @@ sub viewMonth
 			"monthName"	=> $dt_month->month_name,
 			"monthAbbr"	=> $dt_month->month_abbr,
 			"monthEpoch"	=> $dt_month->epoch,
-			"monthUrl"	=> "/"
-					. $self->get("url")
-					. "?type=month;start="
-					. $dt_month->toMysql,
+			"monthUrl"	=> $self->getUrl("type=month;start=".$dt_month->toMysql),
 			"monthCurrent"	=> ($dt_month->month eq $dt->month ? 1 : 0),
 			
 			};
@@ -1157,11 +1145,11 @@ sub viewMonth
 	
 	
 	$var->{"pageNextYear"}		= $dt->year + 1;
-	$var->{"pageNextUrl"}		= "/".$self->get("url")."?type=month;start="
-					. $dt->clone->add(years=>1)->toMysql;
+	$var->{"pageNextUrl"}		= $self->getUrl("type=month;start="
+					. $dt->clone->add(years=>1)->toMysql);
 	$var->{"pagePrevYear"}		= $dt->year - 1;
-	$var->{"pagePrevUrl"}		= "/".$self->get("url")."?type=month;start="
-					. $dt->clone->subtract(years=>1)->toMysql;
+	$var->{"pagePrevUrl"}		= $self->getUrl("type=month;start="
+					. $dt->clone->subtract(years=>1)->toMysql);
 	$var->{"monthName"}		= $dt->month_name;
 	$var->{"monthAbbr"}		= $dt->month_abbr;
 	$var->{"year"}			= $dt->year;
@@ -1274,10 +1262,10 @@ sub viewWeek
 	}
 	
 	# Make the navigation bars
-	$var->{"pageNextUrl"}		= "/".$self->get("url")."?type=week;start="
-					. $dt->clone->add(weeks=>1)->toMysql;
-	$var->{"pagePrevUrl"}		= "/".$self->get("url")."?type=week;start="
-					. $dt->clone->subtract(weeks=>1)->toMysql;
+	$var->{"pageNextUrl"}		= $self->getUrl("type=week;start="
+					. $dt->clone->add(weeks=>1)->toMysql);
+	$var->{"pagePrevUrl"}		= $self->getUrl("type=week;start="
+					. $dt->clone->subtract(weeks=>1)->toMysql);
 	
 	$var->{"startMonthName"}	= $dt->month_name;
 	$var->{"startMonthAbbr"}	= $dt->month_abbr;

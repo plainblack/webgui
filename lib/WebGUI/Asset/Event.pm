@@ -1262,13 +1262,10 @@ sub getTemplateVars
 	
 	# Make some friendly URLs
 	$dtStart->truncate(to=>"day");
-	$var{"urlDay"}		= "/".$self->getParent->get("url")."?type=day;start="
-				. $dtStart->toMysql;
-	$var{"urlWeek"}		= "/".$self->getParent->get("url")."?type=week;start="
-				. $dtStart->toMysql;
-	$var{"urlMonth"}	= "/".$self->getParent->get("url")."?type=month;start="
-				. $dtStart->toMysql;
-	$var{"urlParent"}	= "/".$self->getParent->get("url");		
+	$var{"urlDay"}		= $self->getParent->getUrl("type=day;start=".$dtStart->toMysql);
+	$var{"urlWeek"}		= $self->getParent->getUrl("type=week;start=".$dtStart->toMysql);
+	$var{"urlMonth"}	= $self->getParent->getUrl("type=month;start=".$dtStart->toMysql);
+	$var{"urlParent"}	= $self->getParent->getUrl;		
 	
 	
 	# Related links
@@ -1416,18 +1413,11 @@ sub processPropertiesFromFormPost
 		# Set storable to canonical so that we can compare data structures
 		$Storable::canonical = 1;
 		
-		#use Data::Dumper;
-		#$session->errorHandler->warn("OLD (".$self->get("recurId")."): ".Dumper \%recurrence_old);
-		#$session->errorHandler->warn("NEW: ".Dumper \%recurrence_new);
-		
 		# Pattern keys
 		if (nfreeze(\%recurrence_new) ne nfreeze(\%recurrence_old))
 		{
 			# Delete all old events and create new ones
 			my $old_id	= $self->get("recurId");
-			
-			#use Data::Dumper;
-			#$self->session->errorHandler->warn("Form recurrence: ".Dumper \%recurrence_new);
 	
 			return ["There's something wrong with your recurrence pattern."] 
 				unless $self->generateRecurringEvents(\%recurrence_new);
@@ -1453,9 +1443,7 @@ sub processPropertiesFromFormPost
 		# No change
 		else
 		{
-			# Just update related events
-			#$self->session->errorHandler->warn("No changes to recurrence.");
-			
+			# Just update related events			
 			my $properties	= $self->get;
 			delete $properties->{startDate};
 			delete $properties->{endDate};
@@ -1561,9 +1549,6 @@ sub setRecurrence
 		endDate		=> $end,
 		};
 	
-	#use Data::Dumper;
-	#$self->session->errorHandler->warn("Setting recurrence: ".Dumper $data);
-	
 	## Set to the database
 	## Return the new recurId
 	return $self->session->db->setRow("Event_recur","recurId",$data);
@@ -1619,11 +1604,11 @@ sub view
 	
 	# Next and previous events
 	my $next	= $self->getEventNext;
-	$var->{"nextUrl"}	= "/".$next->get("url")
+	$var->{"nextUrl"}	= $next->getUrl
 		if ($next);
 	
 	my $prev	= $self->getEventPrev;
-	$var->{"prevUrl"}	= "/".$prev->get("url")
+	$var->{"prevUrl"}	= $prev->getUrl
 		if ($prev);
 	
 	
@@ -1790,9 +1775,6 @@ sub www_edit
 	# Pattern
 	my %recur	= $self->getRecurrenceFromForm || $self->getRecurrence;
 	$recur{every}	||= 1;
-	
-	#use Data::Dumper;
-	#$self->session->errorHandler->warn("Assigning recurrence: ".Dumper \%recur);
 	
 	$var->{"formRecurPattern"}	= 
 		q|
@@ -1984,7 +1966,7 @@ sub www_edit
 			}
 		}
 		
-		toggleTimes();
+		toggleTimes(); // TODO: Insert into onLoad handler via YUI
 
 
 		function toggleRecur()
@@ -2011,7 +1993,7 @@ sub www_edit
 				document.getElementById("recurPattern_yearly").style.display = "block";
 			}
 		}
-		toggleRecur();
+		toggleRecur(); // TODO: Insert into onLoad handler via YUI
 		</script>
 ENDJS
 	
@@ -2081,9 +2063,8 @@ sub www_view {
 
 
 
-=head1 Todo
 
-Pages for Next Event >> and Prev Event << on the Event Details page
+=head1 Todo
 
 Pages for Next Occurence >> and Prev Occurrence << on the Event Details page
 
