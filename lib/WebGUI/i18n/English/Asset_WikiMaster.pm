@@ -229,6 +229,46 @@ our $I18N =
                 lastUpdated => 1165790228,
         },
 
+        'front page template title' => {
+                message => q|Wiki, Front Page Template|,
+                lastUpdated => 1165790228,
+        },
+
+        'front page template body' => {
+                message => q|<p>This template is main Wiki template, and is what most users will see when they view a Wiki asset.</p>|,
+                lastUpdated => 1165812138,
+        },
+
+        'description' => {
+                message => q|The description for this Wiki, with any recognized titles or urls from pages in this Wiki automatically converted to links to those pages.|,
+                lastUpdated => 1165812138,
+        },
+
+        'searchLabel variable' => {
+                message => q|The description for this Wiki, with any recognized titles or urls from pages in this Wiki automatically converted to links to those pages.|,
+                lastUpdated => 1165812138,
+        },
+
+        'mostPopularUrl' => {
+                message => q|A URL to take the user to the screen where the most popular Wiki pages are listed.|,
+                lastUpdated => 1165812138,
+        },
+
+        'mostPopularLabel' => {
+                message => q|An internationalized label to go with mostPopularUrl.|,
+                lastUpdated => 1165812138,
+        },
+
+        'recentChangesUrl' => {
+                message => q|A URL to take the user to the screen where all changes to the the pages in this Wiki are listed.|,
+                lastUpdated => 1165812138,
+        },
+
+        'recentChangesLabel' => {
+                message => q|An internationalized label to go with recentChangesUrl.|,
+                lastUpdated => 1165812138,
+        },
+
 };
 
 1;

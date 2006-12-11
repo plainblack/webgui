@@ -125,7 +125,7 @@ our $HELP = {
 		],
 	},
 
-	'wiki master recent changes' => {
+	'wiki master recent changes variables' => {
 		title => 'recent changes variables title',
 		body => 'recent changes variables body',
 		isa => [
@@ -162,7 +162,7 @@ our $HELP = {
 		],
 	},
 
-	'wiki master most popular' => {
+	'wiki master most popular variables' => {
 		title => 'most popular variables title',
 		body => 'most popular variables body',
 		isa => [
@@ -181,6 +181,47 @@ our $HELP = {
 				  },
 			    ]
 		          },
+		],
+		fields => [
+		],
+		related => [
+		],
+	},
+
+	'front page template' => {
+		title => 'front page template title',
+		body => 'front page template body',
+		isa => [
+			{
+				namespace => "Asset_WikiMaster",
+				tag => "wiki master most popular variables"
+			},
+			{
+				namespace => "Asset_WikiMaster",
+				tag => "wiki master recent changes variables"
+			},
+			{
+				namespace => "Asset_WikiMaster",
+				tag => "wiki master search box variables"
+			},
+		],
+		variables => [
+			  {
+			    'name' => 'searchLabel',
+			    'description' => 'searchLabel variable',
+			  },
+			  {
+			    'name' => 'mostPopularUrl',
+			  },
+			  {
+			    'name' => 'mostPopularLabel',
+			  },
+			  {
+			    'name' => 'recentChangesUrl',
+			  },
+			  {
+			    'name' => 'recentChangesLabel',
+			  },
 		],
 		fields => [
 		],
