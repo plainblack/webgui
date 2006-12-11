@@ -14,6 +14,16 @@ our $I18N =
 		addPageLabel=>{message=>q|Add a new page.|, lastUpdated=>0},
 		wikiHomeLabel=>{message=>q|Wiki Home|, lastUpdated=>0},
 
+	'wikiHomeLabel variable' => {
+		message=>q|An internationalized label to go with wikiHomeUrl.|,
+		lastUpdated=>1165816161,
+	},
+
+	'wikiHomeUrl' => {
+		message=>q|A URL to take the user back to the Wiki front page.|,
+		lastUpdated=>1165816166,
+	},
+
         'approval workflow description' => {
                 message => q|Choose a workflow to be executed on each page as it gets submitted.|,
                 lastUpdated => 0,
@@ -315,6 +325,11 @@ our $I18N =
                 lastUpdated => 1165812138,
         },
 
+        'searchLabelUrl' => {
+                message => q|A URL to take the user to the screen search pages in this Wiki.|,
+                lastUpdated => 1165816007,
+        },
+
         'mostPopularUrl' => {
                 message => q|A URL to take the user to the screen where the most popular Wiki pages are listed.|,
                 lastUpdated => 1165812138,
@@ -342,6 +357,21 @@ our $I18N =
 
         'wiki master asset variables body' => {
                 message => q|<p>These variables are available in many of the Wiki templates, but many of them may not be overly useful.</p>|,
+                lastUpdated => 1165812138,
+        },
+
+        'most popular template title' => {
+                message => q|Wiki Master, Most Popular Template|,
+                lastUpdated => 1165812138,
+        },
+
+        'most popular template body' => {
+                message => q|<p>These variables are available in the template for displaying the most popular pages in the Wiki.</p>|,
+                lastUpdated => 1165812138,
+        },
+
+        'most popular title' => {
+                message => q|An internationalized title for the Most Popular Template|,
                 lastUpdated => 1165812138,
         },
 
