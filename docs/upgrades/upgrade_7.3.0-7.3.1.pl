@@ -28,7 +28,7 @@ finish($session); # this line required
 #-------------------------------------------------
 sub addWikiMaster {
 	my $session = shift;
-	$session->config->addToArray("assetContainers","WebGUI::Asset::WikiMaster");
+	$session->config->addToArray("assetContainers","WebGUI::Asset::Wobject::WikiMaster");
 }
 
 #-------------------------------------------------
