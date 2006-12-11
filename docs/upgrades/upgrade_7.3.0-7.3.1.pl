@@ -21,14 +21,14 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 cleanupEventsCalendar($session);
-addWikiPage($session);
+addWikiMaster($session);
 
 finish($session); # this line required
 
 #-------------------------------------------------
-sub addWikiPage {
+sub addWikiMaster {
 	my $session = shift;
-	$session->config->addToArray("assetContainers","WebGUI::Asset::WikiPage");
+	$session->config->addToArray("assetContainers","WebGUI::Asset::WikiMaster");
 }
 
 #-------------------------------------------------
