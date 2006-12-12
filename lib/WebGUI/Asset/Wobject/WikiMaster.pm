@@ -304,6 +304,8 @@ sub view {
 		searchLabel=>$i18n->get("searchLabel"),	
 		mostPopularUrl=>$self->getUrl("func=mostPopular"),
 		mostPopularLabel=>$i18n->get("mostPopularLabel"),
+		addPageLabel=>$i18n->get("addPageLabel"),
+		addPageUrl=>$self->getUrl("func=add;class=WebGUI::Asset::WikiPage"),
 		recentChangesUrl=>$self->getUrl("func=recentChanges"),
 		recentChangesLabel=>$i18n->get("recentChangesLabel"),
 		};

@@ -226,6 +226,12 @@ our $HELP = {
 			  {
 			    'name' => 'recentChangesLabel',
 			  },
+			  {
+			    'name' => 'addPageUrl',
+			  },
+			  {
+			    'name' => 'addPageLabel',
+			  },
 		],
 		fields => [
 		],
@@ -395,6 +401,10 @@ our $HELP = {
 			{
 				namespace => "Asset_WikiMaster",
 				tag => "wiki master search box variables"
+			},
+			{
+				namespace => "WebGUI",
+				tag => "pagination template variables"
 			},
 		],
 		variables => [
