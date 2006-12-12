@@ -388,6 +388,78 @@ our $HELP = {
 		],
 	},
 
+	'search template' => {
+		title => 'search template title',
+		body => 'search template body',
+		isa => [
+			{
+				namespace => "Asset_WikiMaster",
+				tag => "wiki master search box variables"
+			},
+		],
+		variables => [
+			  {
+			    'name' => 'searchLabel',
+			    'description' => 'searchLabel variable',
+			  },
+			  {
+			    'name' => 'searchLabelUrl',
+			  },
+			  {
+			    'name' => 'wikiHomeLabel',
+			    'description' => 'wikiHomeLabel variable',
+			  },
+			  {
+			    'name' => 'wikiHomeUrl',
+			  },
+			  {
+			    'name' => 'mostPopularUrl',
+			  },
+			  {
+			    'name' => 'mostPopularLabel',
+			  },
+			  {
+			    'name' => 'recentChangesUrl',
+			  },
+			  {
+			    'name' => 'recentChangesLabel',
+			  },
+			  {
+			    'name' => 'resultsLabel',
+			  },
+			  {
+			    'name' => 'notWhatYouWanted variable',
+			  },
+			  {
+			    'name' => 'nothingFoundLabel variable',
+			  },
+			  {
+			    'name' => 'addPageUrl',
+			  },
+			  {
+			    'name' => 'addPageLabel',
+			  },
+			  {
+			    'name' => 'performSearch',
+			  },
+			  {
+			    'name' => 'searchResults',
+			    variables => [
+				  {
+				    'name' => 'search url variable',
+				  },
+				  {
+				    'name' => 'search title variable',
+				  },
+			    ],
+			  },
+		],
+		fields => [
+		],
+		related => [
+		],
+	},
+
 };
 
 1;

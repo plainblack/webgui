@@ -390,6 +390,61 @@ our $I18N =
                 lastUpdated => 1165790228,
         },
 
+        'resultsLabel variable' => {
+                message => q|An internationalized label for titling the results of the search.|,
+                lastUpdated => 1165945210,
+        },
+
+        'notWhatYouWanted variable' => {
+                message => q|An internationalized label for for asking the user if they did not find what they were looking for.|,
+                lastUpdated => 1165945210,
+        },
+
+        'nothingFoundLabel variable' => {
+                message => q|An internationalized label for telling the user that no results were found for their search.|,
+                lastUpdated => 1165945210,
+        },
+
+        'addPageUrl' => {
+                message => q|A URL to allow the user to add a page.|,
+                lastUpdated => 1165945210,
+        },
+
+        'addPageLabel variable' => {
+                message => q|An internationalized label to go with addPageUrl.|,
+                lastUpdated => 1165945210,
+        },
+
+        'performSearch' => {
+                message => q|The constant "1".|,
+                lastUpdated => 1165945210,
+        },
+
+        'searchResults' => {
+                message => q|A loop containing all the results of the users search.  The loop can be empty.|,
+                lastUpdated => 1165945210,
+        },
+
+        'search url variable' => {
+                message => q|The URL (with gateway) of a page returned in the search results.|,
+                lastUpdated => 1165945210,
+        },
+
+        'search title variable' => {
+                message => q|The title of a page returned in the search results.|,
+                lastUpdated => 1165945210,
+        },
+
+        'search template title' => {
+                message => q|Wiki Master, Search Template|,
+                lastUpdated => 1165946012,
+        },
+
+        'search template body' => {
+                message => q|<p>These variables are available in the template for displaying the search page in the Wiki.</p>|,
+                lastUpdated => 1165946014,
+        },
+
 };
 
 1;
