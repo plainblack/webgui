@@ -1747,12 +1747,12 @@ sub www_edit
 	# time
 	my $allday	= ($form->param("allday") eq "yes" ? 1 : $self->isAllDay);
 	$var->{"formTime"}	= 
-		q|<input onclick="toggleTimes()" id="allday_yes" type="radio" name="allday" value="yes" |
+		q|<input id="allday_yes" type="radio" name="allday" value="yes" |
 		.($allday ? 'checked="checked"' : '')
 		.q| />
 		<label for="allday_yes">No specific time (All day event)</label>
 		<br/>
-		<input onclick="toggleTimes()" id="allday_no" type="radio" name="allday" value="" |
+		<input id="allday_no" type="radio" name="allday" value="" |
 		.(!$allday ? 'checked="checked"' : '')
 		.q| />
 		<label for="allday_no">Specific start/end time</label>
@@ -1778,6 +1778,7 @@ sub www_edit
 	
 	$var->{"formRecurPattern"}	= 
 		q|
+		<div id="recurPattern">
 		<p><input type="radio" name="recurType" id="recurType_none" value="none" onclick="toggleRecur()" />
 		<label for="recurType_none">None</label></p>
 		
@@ -1901,6 +1902,7 @@ sub www_edit
 			</select>
 			</p>
 		</div>
+		</div>
 		|;
 	
 	
@@ -1914,7 +1916,7 @@ sub www_edit
 	
 	# End
 	$var->{"formRecurEnd"}		= q|
-		<input type="radio" name="recurEndType" id="recurEndType_none" value="none" |.(!$recur{endDate} && !$recur{endAfter} ? 'checked="checked"' : '').q|/>
+		<div><input type="radio" name="recurEndType" id="recurEndType_none" value="none" |.(!$recur{endDate} && !$recur{endAfter} ? 'checked="checked"' : '').q|/>
 		<label for="recurEndType_none">No end</label><br />
 		
 		<input type="radio" name="recurEndType" id="recurEndType_date" value="date" |.($recur{endDate} ? 'checked="checked"' : '' ).q| />
@@ -1927,6 +1929,7 @@ sub www_edit
 		<label for="recurEndType_after">After </label>
 		<input type="text" size="3" name="recurEndAfter" value="|.$recur{endAfter}.q|" /> 
 		occurences.
+		</div>
 	|;
 	
 	
@@ -1952,7 +1955,7 @@ sub www_edit
 				});
 	
 	
-	$var->{"script"}	= <<'ENDJS';
+	$var->{"formFooter"}	.= <<'ENDJS';
 		<script type="text/javascript">
 		function toggleTimes()
 		{
@@ -1966,8 +1969,10 @@ sub www_edit
 			}
 		}
 		
-		toggleTimes(); // TODO: Insert into onLoad handler via YUI
-
+		YAHOO.util.Event.onContentReady("times",function(e) { toggleTimes(); });
+		YAHOO.util.Event.on("allday_no",'click',function(e) { toggleTimes(); });
+		YAHOO.util.Event.on("allday_yes",'click',function(e) { toggleTimes(); });
+		
 
 		function toggleRecur()
 		{
@@ -1993,7 +1998,7 @@ sub www_edit
 				document.getElementById("recurPattern_yearly").style.display = "block";
 			}
 		}
-		toggleRecur(); // TODO: Insert into onLoad handler via YUI
+		YAHOO.util.Event.onAvailable("recurPattern",function(e) { toggleRecur(); });
 		</script>
 ENDJS
 	

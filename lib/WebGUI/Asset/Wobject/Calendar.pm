@@ -201,7 +201,7 @@ sub definition
 			fieldType	=>"template",  
 			defaultValue	=>'CalendarPrintEvent0001',
 			tab		=>"display",
-			namespace	=>"Calendar/Print/Day", 
+			namespace	=>"Calendar/Print/Event", 
 			hoverHelp	=>$i18n->get('templateIdPrintEvent description'),
 			label		=>$i18n->get('templateIdPrintEvent label'),
 		},

@@ -14,6 +14,10 @@
  - fix - Unable to add EventsCalendar
  - fix - Some functions in InOutBoard not internationalized
  - fix: Calendar/Event not handling gateway properly.
+ - fix: Calendar templates crushing other styles.
+ - fix: Using YUI to add the appropriate events when loading the Add/Edit Event
+   page. Should fix the strange IE bugs.
+   
 
 
 7.3.0
