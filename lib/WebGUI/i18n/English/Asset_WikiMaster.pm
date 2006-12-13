@@ -321,11 +321,11 @@ our $I18N =
         },
 
         'searchLabel variable' => {
-                message => q|The description for this Wiki, with any recognized titles or urls from pages in this Wiki automatically converted to links to those pages.|,
+                message => q|An internationalized label to go with searchUrl|,
                 lastUpdated => 1165812138,
         },
 
-        'searchLabelUrl' => {
+        'searchUrl' => {
                 message => q|A URL to take the user to the screen search pages in this Wiki.|,
                 lastUpdated => 1165816007,
         },
@@ -335,7 +335,7 @@ our $I18N =
                 lastUpdated => 1165812138,
         },
 
-        'mostPopularLabel' => {
+        'mostPopularLabel variable' => {
                 message => q|An internationalized label to go with mostPopularUrl.|,
                 lastUpdated => 1165812138,
         },
@@ -345,7 +345,7 @@ our $I18N =
                 lastUpdated => 1165812138,
         },
 
-        'recentChangesLabel' => {
+        'recentChangesLabel variable' => {
                 message => q|An internationalized label to go with recentChangesUrl.|,
                 lastUpdated => 1165812138,
         },

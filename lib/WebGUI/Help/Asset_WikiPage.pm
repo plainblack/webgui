@@ -64,6 +64,61 @@ our $HELP = {
 		],
 	},
 
+	'view template' => {
+		title => 'view title',
+		body => 'view body',
+		isa => [
+		],
+		variables => [
+                        {
+                                name => 'viewLabel',
+                                description => 'viewLabel variable',
+                        },
+                        {
+                                name => 'editLabel',
+                                description => 'editLabel variable',
+                        },
+                        {
+                                name => 'historyLabel',
+                                description => 'historyLabel variable',
+			},
+                        {
+                                name => 'historyUrl',
+			},
+			{
+				'name' => 'wikiHomeLabel',
+				'description' => 'wikiHomeLabel variable',
+			},
+			{
+				'name' => 'wikiHomeUrl',
+			},
+			{
+				'name' => 'mostPopularUrl',
+			},
+			{
+				'name' => 'mostPopularLabel variable',
+			},
+			{
+				'name' => 'recentChangesUrl',
+			},
+			{
+				'name' => 'recentChangesLabel',
+			},
+			{
+				'name' => 'searchLabel',
+				'description' => 'searchLabel variable',
+			},
+			{
+				'name' => 'editContent',
+			},
+			{
+				'name' => 'content',
+			},
+		],
+		related => [
+		],
+	},
+
 };
 
 1;

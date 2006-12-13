@@ -218,13 +218,13 @@ our $HELP = {
 			    'name' => 'mostPopularUrl',
 			  },
 			  {
-			    'name' => 'mostPopularLabel',
+			    'name' => 'mostPopularLabel variable',
 			  },
 			  {
 			    'name' => 'recentChangesUrl',
 			  },
 			  {
-			    'name' => 'recentChangesLabel',
+			    'name' => 'recentChangesLabel variable',
 			  },
 			  {
 			    'name' => 'addPageUrl',
@@ -330,14 +330,14 @@ our $HELP = {
 			    'name' => 'recentChangesUrl',
 			  },
 			  {
-			    'name' => 'recentChangesLabel',
+			    'name' => 'recentChangesLabel variable',
 			  },
 			  {
 			    'name' => 'searchLabel',
 			    'description' => 'searchLabel variable',
 			  },
 			  {
-			    'name' => 'searchLabelUrl',
+			    'name' => 'searchUrl',
 			  },
 			  {
 			    'name' => 'wikiHomeLabel',
@@ -372,7 +372,7 @@ our $HELP = {
 			    'description' => 'searchLabel variable',
 			  },
 			  {
-			    'name' => 'searchLabelUrl',
+			    'name' => 'searchUrl',
 			  },
 			  {
 			    'name' => 'wikiHomeLabel',
@@ -385,7 +385,7 @@ our $HELP = {
 			    'name' => 'mostPopularUrl',
 			  },
 			  {
-			    'name' => 'mostPopularLabel',
+			    'name' => 'mostPopularLabel variable',
 			  },
 		],
 		fields => [
@@ -413,7 +413,7 @@ our $HELP = {
 			    'description' => 'searchLabel variable',
 			  },
 			  {
-			    'name' => 'searchLabelUrl',
+			    'name' => 'searchUrl',
 			  },
 			  {
 			    'name' => 'wikiHomeLabel',
@@ -426,13 +426,13 @@ our $HELP = {
 			    'name' => 'mostPopularUrl',
 			  },
 			  {
-			    'name' => 'mostPopularLabel',
+			    'name' => 'mostPopularLabel variable',
 			  },
 			  {
 			    'name' => 'recentChangesUrl',
 			  },
 			  {
-			    'name' => 'recentChangesLabel',
+			    'name' => 'recentChangesLabel variable',
 			  },
 			  {
 			    'name' => 'resultsLabel',

@@ -91,13 +91,95 @@ our $I18N =
         },
 
         'add/edit title' => {
-                message => q|Wiki Page, Add/Edit|,
+                message => q|Wiki Page, Add/Edit Template|,
                 lastUpdated => 1165790228,
         },
 
         'add/edit body' => {
                 message => q|The add/edit screen for this Asset is templated.  Fields seen by the user will not have hoverHelp.  Variables available for use in the template are listed below:|,
                 lastUpdated => 1165790228,
+        },
+
+        'view title' => {
+                message => q|Wiki Page, View Template|,
+                lastUpdated => 1165790228,
+        },
+
+        'view body' => {
+                message => q|Variables available for use in the template are listed below:|,
+                lastUpdated => 1166047618,
+        },
+
+        'viewLabel variable' => {
+                message => q|An internationalized label for viewing the content of a page.  Useful for tabbed interfaces to
+		the Wiki Page.|,
+                lastUpdated => 1166047913,
+        },
+
+        'editLabel variable' => {
+                message => q|An internationalized label for editing the content of a page.  Useful for tabbed interfaces to
+		the Wiki Page.|,
+                lastUpdated => 1166047618,
+        },
+
+        'historyLabel variable' => {
+                message => q|An internationalized label to go with historyUrl.|,
+                lastUpdated => 1166047618,
+        },
+
+        'historyUrl' => {
+                message => q|A URL to take the user to a screen with a history of edits and changes to this page.|,
+                lastUpdated => 1166047618,
+        },
+
+	'wikiHomeLabel variable' => {
+		message=>q|An internationalized label to go with wikiHomeUrl.|,
+		lastUpdated=>1165816161,
+	},
+
+	'wikiHomeUrl' => {
+		message=>q|A URL to take the user back to the Wiki front page.|,
+		lastUpdated=>1165816166,
+	},
+
+        'recentChangesUrl' => {
+                message => q|A URL to take the user to the screen where all changes to the the pages in this Wiki are listed.|,
+                lastUpdated => 1165812138,
+        },
+
+        'recentChangesLabel' => {
+                message => q|An internationalized label to go with recentChangesUrl.|,
+                lastUpdated => 1165812138,
+        },
+
+        'mostPopularUrl' => {
+                message => q|A URL to take the user to the screen where the most popular Wiki pages are listed.|,
+                lastUpdated => 1165812138,
+        },
+
+        'mostPopularLabel variable' => {
+                message => q|An internationalized label to go with mostPopularUrl.|,
+                lastUpdated => 1165812138,
+        },
+
+        'searchLabel variable' => {
+                message => q|An internationalized label to go with searchUrl|,
+                lastUpdated => 1165812138,
+        },
+
+        'searchUrl' => {
+                message => q|A URL to take the user to the screen search pages in this Wiki.|,
+                lastUpdated => 1165816007,
+        },
+
+        'editContent' => {
+                message => q|The rendered form for editing the content of this page.|,
+                lastUpdated => 1165812138,
+        },
+
+        'content' => {
+                message => q|The content of this page, with recognized title and links changed into Wiki links.|,
+                lastUpdated => 1165812138,
         },
 
 };
