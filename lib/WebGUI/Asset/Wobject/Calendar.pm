@@ -1308,7 +1308,7 @@ sub viewWeek
 
 Unwraps and unescapes an iCalendar string according to RFC 2445, which says that 
 lines should be wrapped at 75 characters with a CRLF followed by a space, and 
-that ; , \ and newlines should be escaped.
+that ; , \ and newlines should be escaped by prepending them with a \.
 
 =cut
 
@@ -1331,7 +1331,7 @@ sub unwrapIcal
 
 Wraps and escapes an iCalendar string according to RFC 2445, which says that 
 lines should be wrapped at 75 characters with a CRLF followed by a space, and 
-that ; , \ and newlines should be escaped.
+that ; , \ and newlines should be escaped by prepending them with a \.
 
 =cut
 
