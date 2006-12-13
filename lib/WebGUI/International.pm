@@ -102,17 +102,14 @@ sub get {
 	$namespace =~ s/$safeRe//g;
 	my $cmd = "WebGUI::i18n::".$language."::".$namespace;
 
-	if (defined *{"$cmd\::I18N"}) {  ##Symbol table lookup
-		our $table;
-		*table = *{"$cmd\::I18N"};  ##Create alias into symbol table
-		return $table->{$id}->{message};  ##return key
+	if (!defined *{"$cmd\::I18N"}) {  ##Symbol table lookup
+		my $load = "use ".$cmd;
+		eval($load);
+		$self->session->errorHandler->warn($cmd." failed to compile because ".$@) if ($@);
 	}
-	my $load = "use ".$cmd;
-	eval($load);
-	$self->session->errorHandler->warn($cmd." failed to compile because ".$@) if ($@);
-	$cmd = "\$".$cmd."::I18N->{'".$id."'}{message}";
-	my $output = eval($cmd);	
-	$self->session->errorHandler->warn("Couldn't get value from ".$cmd." because ".$@) if ($@);
+	our $table;
+	*table = *{"$cmd\::I18N"};  ##Create alias into symbol table
+	my $output = $table->{$id}->{message};
 	$output = $self->get($id,$namespace,"English") if ($output eq "" && $language ne "English");
 	return $output;
 }

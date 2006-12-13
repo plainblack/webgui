@@ -18,7 +18,7 @@
  - fix: Using YUI to add the appropriate events when loading the Add/Edit Event
    page. Should fix the strange IE bugs.
  - RFE: Add wiki page variables to Wiki_Master.pm
-   
+ - fix: Not translated labels no displaing  
 
 
 7.3.0

@@ -14,11 +14,13 @@ use lib "$FindBin::Bin/lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; # increment this value for each test you create
+use File::Copy qw(cp);
 
 my $session = WebGUI::Test->session;
 
 my $numTests = 1; ##For conditional load check
-$numTests += 9;
+my $langTests = 2; ##For language look-up tests
+$numTests += 9 + $langTests;
 
 plan tests => $numTests;
 
@@ -45,4 +47,39 @@ is($i18n->getNamespace(), 'Asset', 'getNamespace: set namespace to Asset');
 is($i18n->get('topicName'), 'Assets', 'get: get English label for topicName in Asset: Assets');
 is($i18n->get('topicName', 'WebGUI'), 'WebGUI', 'get: test manual namespace override');
 
+installPigLatin();
+
+my $languages = $i18n->getLanguages();
+
+my $gotPigLatin = exists $languages->{PigLatin};
+
+SKIP: {
+	skip 'No PigLatin language pack for testing', $langTests unless $gotPigLatin;
+	is(
+		$i18n->get('account','WebGUI','English'),
+		$i18n->get('account','WebGUI','PigLatin'),
+		'Language check: missing key returns English key'
+	);
+	is(
+		$i18n->get('webgui','WebGUI','PigLatin'),
+		'ebGUIWay',
+		'Language check: existing key returns native language key'
+	);
+
+}
+
+}
+
+sub installPigLatin {
+	my $wgLib = WebGUI::Test->lib;
+	mkdir join('/', $wgLib, 'WebGUI/i18n/PigLatin');
+	cp 'supporting_collateral/WebGUI.pm', join('/', $wgLib, 'WebGUI/i18n/PigLatin/WebGUI.pm');
+	cp 'supporting_collateral/PigLatin.pm', join('/', $wgLib, 'WebGUI/i18n/PigLatin.pm');
+}
+
+END: {
+	my $wgLib = WebGUI::Test->lib;
+	unlink join('/', $wgLib, 'WebGUI/i18n/PigLatin/WebGUI.pm');
+	unlink join('/', $wgLib, 'WebGUI/i18n/PigLatin.pm');
+	rmdir join('/', $wgLib, 'WebGUI/i18n/PigLatin');
 }
