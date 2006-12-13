@@ -24,7 +24,7 @@ use WebGUI::Form;
 
 use base 'WebGUI::Asset';
 
-use DateTime;
+use WebGUI::DateTime;
 
 
 
@@ -1306,6 +1306,8 @@ sub isAllDay
 Prepares the view template to be used later. The template to be used is found 
 from this asset's parent (Usually a Calendar).
 
+If the "print" form parameter is set, will prepare the print template.
+
 =cut
 
 sub prepareView
@@ -1316,7 +1318,15 @@ sub prepareView
 	
 	if ($parent)
 	{
-		$templateId	= $parent->get("templateIdEvent")
+		if ($self->session->form->param("print"))
+		{
+			$templateId	= $parent->get("templateIdPrintEvent");
+			$self->session->style->makePrintable(1);
+		}
+		else
+		{
+			$templateId	= $parent->get("templateIdEvent");
+		}
 	}
 	else
 	{
@@ -2047,6 +2057,16 @@ ENDJS
 =head2 www_view
 
 Shows the event based on the parent asset's style and Event Details template
+
+=head3 URL Parameters
+
+=over 8
+
+=item print
+
+If true, will show the printable version of the event
+
+=back
 
 =cut
 

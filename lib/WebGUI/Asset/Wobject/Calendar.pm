@@ -725,6 +725,8 @@ sub getLastEvent
 
 Loads the template to be used by the view() method.
 
+Determines which template to load based on the "type" and "print" URL 
+parameters.
 
 =cut
 
@@ -737,11 +739,20 @@ sub prepareView
 			|| ucfirst $self->get("defaultView") 
 			|| "Month";
 	
+	if ($self->session->form->param("print"))
+	{
+		$view		= "Print".$view;
+		$self->session->style->makePrintable(1);
+	}
+	
+	#$self->session->errorHandler->warn("Prepare view ".$view." with template ".$self->get("templateId".$view));
+	
 	my $template 	= WebGUI::Asset::Template->new($self->session, $self->get("templateId".$view));
 	$template->prepare;
 	
 	$self->{_viewTemplate} = $template;
 }
+
 
 
 
@@ -903,6 +914,7 @@ sub view
 	$var->{"urlMonth"}	= $self->getUrl("type=month;start=".$params->{start});
 	$var->{"urlAdd"}	= $self->getUrl("func=add;class=WebGUI::Asset::Event");
 	$var->{"urlSearch"}	= $self->getUrl("func=search");
+	$var->{"urlPrint"}	= $self->getUrl("type=".$params->{type}.";start=".$params->{start}.";print=1");
 	
 	# Parameters
 	$var->{"paramStart"}	= $params->{start};
@@ -1681,6 +1693,36 @@ sub www_search
 
 
 
+
+
+####################################################################
+
+=head2 www_view ( )
+
+Shows the normal view
+
+=head3 URL Parameters
+
+=over 8
+
+=item type
+
+What view of the calendar to show. One of "month, "week", or "day".
+
+=item start
+
+What time to start the calendar. Must be a full MySQL Date/Time string in the
+format 2006-12-17 14:00:00. 
+
+The calendar will truncate the start to show the entire month, week, or day, 
+depending on the type.
+
+=item print
+
+If set to some true value (like "1"), will show the printable version of the 
+page.
+
+=back
 
 
 
