@@ -14,8 +14,9 @@ use lib "$FindBin::Bin/lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Workflow;
+use WebGUI::Workflow::Cron;
 use WebGUI::Utility qw/isIn/;
-use Test::More tests => 25; # increment this value for each test you create
+use Test::More tests => 29; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 my $wf = WebGUI::Workflow->create($session, {title => 'Title', description => 'Description',
@@ -67,10 +68,23 @@ TODO: {
 	require WebGUI::Workflow::Activity::DecayKarma;
 	my $badActivity = WebGUI::Workflow::Activity::DecayKarma->create($session, $wf2->getId);
 	ok(!defined $badActivity, 'cannot create mismatched activity');
-	is(scalar @{$wf->getActivities}, 1, 'workflow still has one activity');
+	is(scalar @{$wf2->getActivities}, 1, 'workflow still has one activity');
 }
 
-# TODO: test activities more, and crons
+my $cron = WebGUI::Workflow::Cron->create($session,
+					  {monthOfYear => '*', dayOfMonth => '5', hourOfDay => '2',
+					   minuteOfHour => '15', dayOfWeek => '*', enabled => 1,
+					   runOnce => 0, priority => 2, workflowId => $wf2->getId,
+					   title => 'Test Cron'});
+ok(defined $cron, 'can create cron');
+isa_ok($cron, 'WebGUI::Workflow::Cron', 'cron');
+is(scalar @{$wf2->getCrons}, 1, 'workflow has one cron');
+is($wf2->getCrons->[0]->getId, $cron->getId, 'one cron is same cron');
+$cron->delete;
+
+# More activity and cron tests here?
+
+$wf2->delete;
 
 # Local variables:
 # mode: cperl
