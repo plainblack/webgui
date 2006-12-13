@@ -16,7 +16,7 @@ use lib "$FindBin::Bin/../../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 3; # increment this value for each test you create
+use Test::More tests => 4; # increment this value for each test you create
 use WebGUI::Asset::Wobject::Calendar;
 use WebGUI::Asset::Event;
 

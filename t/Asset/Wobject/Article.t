@@ -64,11 +64,13 @@ foreach my $newSetting (keys %{$newArticleSettings}) {
 }
 
 # Test the duplicate method... not for assets, just the extended duplicate functionality of the article wobject
+my $path = $session->config->getWebguiRoot()."/t/supporting_collateral/";
 my $filename = "page_title.jpg";
 
 # Use some test collateral to create a storage location and assign it to our article
 my $storage = WebGUI::Storage::Image->create($session);
-my $storedFilename = $storage->addFileFromFilesystem("../../supporting_collateral/".$filename);
+system("pwd");
+my $storedFilename = $storage->addFileFromFilesystem($path.$filename);
 my $filenameOK = is ($storedFilename, $filename, 'storage created correctly');
 
 diag(join("\n", @{ $storage->getErrors })) unless $filenameOK;
