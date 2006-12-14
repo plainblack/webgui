@@ -1,6 +1,8 @@
 7.3.2
  - fix: Calendar and Event now have printable templates and URL parameters.
  - fix: Miscellaneous Calendar template fixes
+ - fix: Cannot manageAssets with a locked Thread -- NOTE: Kludgy, but any other
+   way would probably have to break API.
 
 7.3.1
  - Fixed a problem with IE and resizable text areas that caused IE to crash

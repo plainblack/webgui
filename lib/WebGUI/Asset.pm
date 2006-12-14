@@ -1173,7 +1173,8 @@ sub manageAssets {
 		$title =~ s/\'/\\\'/g;
 		my $locked;
 		my $edit;
-		if ($child->isLocked) {
+		#if ($child->isLocked) {
+		if ($child->lockedBy) {	# This is a stopgap to fix a bug when isLocked is overridden but does not function as in the API
 			my $username_html = WebGUI::HTML::format($child->lockedBy->username, "text");
 			$locked = '<img src="'.$self->session->url->extras('assetManager/locked.gif').'" alt="locked by '.$username_html.'" title="locked by '.$username_html.'" style="border: 0px;" />';
 			$edit = "'<a href=\"".$child->getUrl("func=edit;proceed=manageAssets")."\">Edit</a> | '+" if ($child->canEditIfLocked);
