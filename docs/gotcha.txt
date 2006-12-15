@@ -7,6 +7,11 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.3.2
+--------------------------------------------------------------------
+ * The testCodebase.pl script will now automatically set the CODE_COP
+   script unless you give it the --noLongTests switch.
+
 7.3.0
 --------------------------------------------------------------------
  * The i18n/label.t and help/setHelp.t test now require that you set

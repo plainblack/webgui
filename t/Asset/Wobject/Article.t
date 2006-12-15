@@ -10,6 +10,7 @@
 
 use FindBin;
 use strict;
+use File::Spec;
 use lib "$FindBin::Bin/../../lib";
 
 ##The goal of this test is to test the creation of Article Wobjects.
@@ -64,13 +65,12 @@ foreach my $newSetting (keys %{$newArticleSettings}) {
 }
 
 # Test the duplicate method... not for assets, just the extended duplicate functionality of the article wobject
-my $path = $session->config->getWebguiRoot()."/t/supporting_collateral/";
 my $filename = "page_title.jpg";
+my $pathedFile = File::Spec->catfile(WebGUI::Test->getTestCollateralPath, $filename);
 
 # Use some test collateral to create a storage location and assign it to our article
 my $storage = WebGUI::Storage::Image->create($session);
-system("pwd");
-my $storedFilename = $storage->addFileFromFilesystem($path.$filename);
+my $storedFilename = $storage->addFileFromFilesystem($pathedFile);
 my $filenameOK = is ($storedFilename, $filename, 'storage created correctly');
 
 diag(join("\n", @{ $storage->getErrors })) unless $filenameOK;

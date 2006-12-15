@@ -14,7 +14,8 @@ use lib "$FindBin::Bin/lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; # increment this value for each test you create
-use File::Copy qw(cp);
+use File::Copy;
+use File::Spec;
 
 my $session = WebGUI::Test->session;
 
@@ -71,15 +72,19 @@ SKIP: {
 }
 
 sub installPigLatin {
-	my $wgLib = WebGUI::Test->lib;
-	mkdir join('/', $wgLib, 'WebGUI/i18n/PigLatin');
-	cp 'supporting_collateral/WebGUI.pm', join('/', $wgLib, 'WebGUI/i18n/PigLatin/WebGUI.pm');
-	cp 'supporting_collateral/PigLatin.pm', join('/', $wgLib, 'WebGUI/i18n/PigLatin.pm');
+	mkdir File::Spec->catdir(WebGUI::Test->lib, 'WebGUI', 'i18n', 'PigLatin');
+	copy( 
+		File::Spec->catfile(WebGUI::Test->getTestCollateralPath, 'WebGUI.pm'),
+		File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin WebGUI.pm/)
+	);
+	copy(
+		File::Spec->catfile(WebGUI::Test->getTestCollateralPath, 'PigLatin.pm'),
+		File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin.pm/)
+	);
 }
 
 END: {
-	my $wgLib = WebGUI::Test->lib;
-	unlink join('/', $wgLib, 'WebGUI/i18n/PigLatin/WebGUI.pm');
-	unlink join('/', $wgLib, 'WebGUI/i18n/PigLatin.pm');
-	rmdir join('/', $wgLib, 'WebGUI/i18n/PigLatin');
+	unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin WebGUI.pm/);
+	unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin.pm/);
+	rmdir File::Spec->catdir(WebGUI::Test->lib, qw/WebGUI i18n PigLatin/);
 }

@@ -20,11 +20,13 @@ my $configFile;
 my $help;
 my $verbose;
 my $perlBase;
+my $noLongTests;
 
 GetOptions(
 	'verbose'=>\$verbose,
 	'configFile=s'=>\$configFile,
 	'perl-base=s'=>\$perlBase,
+	'noLongTests'=>\$noLongTests,
 	'help'=>\$help,
 	);
 
@@ -43,26 +45,31 @@ my $helpmsg=<<STOP;
 				use. Defaults to the perl installation in your
 				PATH.
 
+	--noLongTests		Prevent long tests from being run
+
 STOP
 
 my $verboseFlag = "-v" if ($verbose);
 
 $perlBase .= '/bin/' if ($perlBase);
 
-if ( $configFile ) {
-	if (! -e $configFile) {
-		##Probably given the name of the config file with no path, prepend
-		##the path to it.
-		$configFile = File::Spec->canonpath($FindBin::Bin.'/../etc/'.$configFile);
-	}
-	if (-e $configFile) {
-		system("WEBGUI_CONFIG=".$configFile." ".$perlBase."prove ".$verboseFlag." -r ../t");
-	}
-	else {
-		die "Unable to use $configFile as a WebGUI config file\n";
-	}
-} elsif ( defined @ENV{WEBGUI_CONFIG} ) {
-        system($perlBase."prove ".$verboseFlag." -r ../t");
-} else {
-	print $helpmsg;
+##Defaults to command-line switch
+$configFile ||= $ENV{WEBGUI_CONFIG};
+
+if (! -e $configFile) {
+	##Probably given the name of the config file with no path,
+	##attempt to prepend the path to it.
+	$configFile = File::Spec->canonpath($FindBin::Bin.'/../etc/'.$configFile);
 }
+
+die "Unable to use $configFile as a WebGUI config file\n"
+	unless(-e $configFile and -f _);
+
+my $prefix = "WEBGUI_CONFIG=".$configFile;
+
+##Run all tests unless explicitly forbidden
+$prefix .= " CODE_COP=1" unless $noLongTests;
+
+print(join ' ', $prefix, $perlBase."prove", $verboseFlag, '-r ../t'); print "\n";
+system(join ' ', $prefix, $perlBase."prove", $verboseFlag, '-r ../t');
+

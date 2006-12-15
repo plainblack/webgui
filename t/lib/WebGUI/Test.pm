@@ -3,7 +3,7 @@ package WebGUI::Test;
 use strict;
 use warnings;
 
-our ( $SESSION, $WEBGUI_ROOT, $CONFIG_FILE, $WEBGUI_LIB );
+our ( $SESSION, $WEBGUI_ROOT, $CONFIG_FILE, $WEBGUI_LIB, $WEBGUI_TEST_COLLATERAL );
 
 use Config     qw[];
 use IO::Handle qw[];
@@ -50,6 +50,7 @@ BEGIN {
     $CONFIG_FILE = ( File::Spec->splitpath( $WEBGUI_ROOT ) )[2];
     $WEBGUI_ROOT = substr( $WEBGUI_ROOT, 0, index( $WEBGUI_ROOT, File::Spec->catdir( 'etc', $CONFIG_FILE ) ) );
     $WEBGUI_ROOT = File::Spec->canonpath($WEBGUI_ROOT);
+    $WEBGUI_TEST_COLLATERAL = File::Spec->catdir($WEBGUI_ROOT, 't', 'supporting_collateral');
 
     $WEBGUI_LIB  ||= File::Spec->catpath( (File::Spec->splitpath($WEBGUI_ROOT))[0], $WEBGUI_ROOT, 'lib' );
 
@@ -105,6 +106,10 @@ sub session {
 
 sub root {
     return $WEBGUI_ROOT;
+}
+
+sub getTestCollateralPath {
+    return $WEBGUI_TEST_COLLATERAL;
 }
 
 1;

@@ -3,6 +3,10 @@
  - fix: Miscellaneous Calendar template fixes
  - fix: Cannot manageAssets with a locked Thread -- NOTE: Kludgy, but any other
    way would probably have to break API.
+ - t/lib/WebGUI/Test.pm now has a method for returning the path to the
+   test collateral directory.  The method is called getTestCollateralPath.
+   Existing tests using that directory have been modified to use the new
+   method instead of finding the path manually.
 
 7.3.1
  - Fixed a problem with IE and resizable text areas that caused IE to crash
