@@ -8,6 +8,7 @@
    Existing tests using that directory have been modified to use the new
    method instead of finding the path manually.
  - fix: Avatar in Thread & Posts of CS
+ - fix: CS Phishing Exploit.
 
 7.3.1
  - Fixed a problem with IE and resizable text areas that caused IE to crash

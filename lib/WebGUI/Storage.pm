@@ -208,7 +208,7 @@ sub addFileFromFormPost {
 		next if ($upload->size > 1024 * $self->session->setting->get("maxAttachmentSize"));
 		if ($tempFilename =~ /([^\/\\]+)$/) { $tempFilename = $1; }
 		my $type = $self->getFileExtension($tempFilename);
-		if (isIn($type, qw(pl perl sh cgi php asp))) { # make us safe from malicious uploads
+		if (isIn($type, qw(pl perl sh cgi php asp html htm))) { # make us safe from malicious uploads
 			$tempFilename =~ s/\./\_/g;
 			$tempFilename .= ".txt";
 		}
