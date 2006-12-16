@@ -1,7 +1,6 @@
 package WebGUI::i18n::English::Asset_WikiMaster;
 
-our $I18N =
-{
+our $I18N = {
  'assetName' =>
  { lastUpdated => 1160157064, message => 'Wiki' },
 
@@ -9,7 +8,7 @@ our $I18N =
 		recentChangesLabel => {message=>q|Recent Changes|, lastUpdated=>0},
 		searchLabel=>{message=>q|Search|, lastUpdated=>0},	
 		resultsLabel=>{message=>q|Results|, lastUpdated=>0},
-		notWhatYouWanted=>{message=>q|Didn't find what you were looking for?|, lastUpdated=>0},
+		notWhatYouWantedLabel=>{message=>q|Didn't find what you were looking for?|, lastUpdated=>0},
 		nothingFoundLabel=>{message=>q|Your search returned no results.|, lastUpdated=>0},
 		addPageLabel=>{message=>q|Add a new page.|, lastUpdated=>0},
 		wikiHomeLabel=>{message=>q|Wiki Home|, lastUpdated=>0},

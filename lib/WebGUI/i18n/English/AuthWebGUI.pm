@@ -533,6 +533,11 @@ our $I18N = {
 		lastUpdated => 1165402566,
 	},
 
+	'password recovery no username' => {
+		message => q|Password recovery requires a username.|,
+		lastUpdated => 1166244701,
+	},
+
 	'password recovery multiple results' => {
 		message => q|Sorry, password recovery cannot be performed for this account.  Please contact an administrator.|,
 		lastUpdated => 1165402566,

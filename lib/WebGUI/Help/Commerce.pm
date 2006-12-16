@@ -61,7 +61,7 @@ our $HELP = {
 	},
 
 	'list pending transactions' => {
-		title => 'help manage pending transactions title',
+		title => 'list pending transactions',
 		body => 'help manage pending transactions body',
 		fields => [
 		],

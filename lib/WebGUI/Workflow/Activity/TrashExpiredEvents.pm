@@ -50,9 +50,9 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, "Asset_Event");
+	my $i18n = WebGUI::International->new($session, "Workflow_Activity_TrashExpiredEvents");
 	push(@{$definition}, {
-		name=>$i18n->get("trash expired events"),
+		name=>$i18n->get("activityName"),
 		properties=> {
 			trashAfter  => {
 				fieldType=>"interval",
