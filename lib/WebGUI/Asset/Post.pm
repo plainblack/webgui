@@ -317,14 +317,14 @@ Returns a URL to the owner's avatar.
 
 sub getAvatarUrl {
 	my $self = shift;
-	my $avatarUrl;
 	my $parent = $self->getThread->getParent;
-	return undef unless $parent;
-	return $avatarUrl unless $parent->getValue("avatarsEnabled");
+	return '' unless $parent and $parent->getValue("avatarsEnabled");
 	my $user = WebGUI::User->new($self->session, $self->get('ownerUserId'));
 	#Get avatar field, storage Id.
 	my $storageId = $user->profileField("avatar");
+	return '' unless $storageId;
 	my $avatar = WebGUI::Storage::Image->get($self->session,$storageId);
+	my $avatarUrl = '';
 	if ($avatar) {
 		#Get url from storage object.
 		foreach my $imageName (@{$avatar->getFiles}) {
