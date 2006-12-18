@@ -182,6 +182,46 @@ our $I18N =
                 lastUpdated => 1165812138,
         },
 
+        'history title' => {
+                message => q|Wiki Page, Show History Template|,
+                lastUpdated => 1166050472,
+        },
+
+        'history body' => {
+                message => q|These variables are available for use in the template for displaying the history of edits and changes to a Wiki Page.|,
+                lastUpdated => 1165812138,
+        },
+
+        'history toolbar' => {
+                message => q|A toolbar with icons to delete, edit, or view revisions of this page.|,
+                lastUpdated => 1165812138,
+        },
+
+        'history date' => {
+                message => q|The date this revision of the page was committed.|,
+                lastUpdated => 1165812138,
+        },
+
+        'history username' => {
+                message => q|The name of the user who committed this page.|,
+                lastUpdated => 1165812138,
+        },
+
+        'history actionTaken' => {
+                message => q|The action that was taken in the revision, usually this will be "Edit".|,
+                lastUpdated => 1165812138,
+        },
+
+        'history interval' => {
+                message => q|How long ago the page was committed.|,
+                lastUpdated => 1165812138,
+        },
+
+        'delete confirmation' => {
+                message => q|Delete this revision?|,
+                lastUpdated => 1166484508,
+        },
+
 };
 
 1;

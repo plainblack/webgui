@@ -119,6 +119,32 @@ our $HELP = {
 		],
 	},
 
+	'history template' => {
+		title => 'history title',
+		body => 'history body',
+		isa => [
+		],
+		variables => [
+			{
+				'name' => 'history toolbar',
+			},
+			{
+				'name' => 'history date',
+			},
+			{
+				'name' => 'history username',
+			},
+			{
+				'name' => 'history actionTaken',
+			},
+			{
+				'name' => 'history interval',
+			},
+		],
+		related => [
+		],
+	},
+
 };
 
 1;

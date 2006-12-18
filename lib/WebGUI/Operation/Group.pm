@@ -118,7 +118,7 @@ sub getGroupSearchForm {
                 );
         $f->selectBox(
                 -name=>"modifier",
-                -value=>($session->scratch->get("groupSearchModifier") || $i18n->get("contains") ),
+                -value=>($session->scratch->get("groupSearchModifier") || "contains" ),
                 -options=>{
                         startsWith=>$i18n->get("starts with"),
                         contains=>$i18n->get("contains"),

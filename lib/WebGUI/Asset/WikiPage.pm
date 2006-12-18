@@ -310,16 +310,17 @@ sub www_getHistory {
 	return $self->session->privilege->insufficient unless $self->canEdit;
 	my $var = {};
 	my ($icon, $date) = $self->session->quick(qw(icon datetime));
+	my $i18n = WebGUI::International->new($self->session, 'Asset_WikPage');
 	foreach my $revision (@{$self->getRevisions}) {
-		my $user = WebGUI::User->new($self->session, $self->get("actionTakenBy"));
+		my $user = WebGUI::User->new($self->session, $revision->get("actionTakenBy"));
 		push(@{$var->{pageHistoryEntries}}, {
-			toolbar => $icon->delete("func=purgeRevision;revisionDate=".$self->get("revisionDate"), $self->get("url"), "Delete this revision?")
-                        	.$icon->edit('func=edit;revision='.$self->get("revisionDate"), $self->get("url"))
-                        	.$icon->view('func=view;revision='.$self->get("revisionDate"), $self->get("url")),
-			date => $date->epochToHuman($self->get("revisionDate")),
+			toolbar => $icon->delete("func=purgeRevision;revisionDate=".$revision->get("revisionDate"), $revision->get("url"), $i18n->get("delete confirmation"));
+                        	.$icon->edit('func=edit;revision='.$revision->get("revisionDate"), $revision->get("url"))
+                        	.$icon->view('func=view;revision='.$revision->get("revisionDate"), $revision->get("url")),
+			date => $date->epochToHuman($revision->get("revisionDate")),
 			username => $user->username,
-			actionTaken => $self->get("actionTaken"),
-			interval => join(" ", $date->secondsToInterval(time() - $self->get("revisionDate")))
+			actionTaken => $revision->get("actionTaken"),
+			interval => join(" ", $date->secondsToInterval(time() - $revision->get("revisionDate")))
 			});		
 	}
 	return $self->processTemplate($var, $self->getWiki->get('pageHistoryTemplateId'));
