@@ -310,11 +310,11 @@ sub www_getHistory {
 	return $self->session->privilege->insufficient unless $self->canEdit;
 	my $var = {};
 	my ($icon, $date) = $self->session->quick(qw(icon datetime));
-	my $i18n = WebGUI::International->new($self->session, 'Asset_WikPage');
+	my $i18n = WebGUI::International->new($self->session, 'Asset_WikiPage');
 	foreach my $revision (@{$self->getRevisions}) {
 		my $user = WebGUI::User->new($self->session, $revision->get("actionTakenBy"));
 		push(@{$var->{pageHistoryEntries}}, {
-			toolbar => $icon->delete("func=purgeRevision;revisionDate=".$revision->get("revisionDate"), $revision->get("url"), $i18n->get("delete confirmation"));
+			toolbar => $icon->delete("func=purgeRevision;revisionDate=".$revision->get("revisionDate"), $revision->get("url"), $i18n->get("delete confirmation"))
                         	.$icon->edit('func=edit;revision='.$revision->get("revisionDate"), $revision->get("url"))
                         	.$icon->view('func=view;revision='.$revision->get("revisionDate"), $revision->get("url")),
 			date => $date->epochToHuman($revision->get("revisionDate")),
