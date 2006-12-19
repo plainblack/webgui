@@ -9,7 +9,8 @@
    method instead of finding the path manually.
  - fix: Avatar in Thread & Posts of CS
  - fix: CS Phishing Exploit.
- - fix: Groups admin gui
+ - fix: Groups admin gui (1) Default should be contains
+ - fix: Groups admin gui (2,3) Make group form sticky
  - fix: Wiki does not show history correctly
  - fix: SQLForm - Field Constraint (Martin Kamerbeek / Oqapi)
  - fix: SQLForm - Default search template uses downloadUrl in stead of 

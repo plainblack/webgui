@@ -71,6 +71,7 @@ sub doGroupSearch {
         my $groupFilter = shift;
         push(@{$groupFilter},0);
         my $keyword = $session->scratch->get("groupSearchKeyword");
+	$session->errorHandler->warn("keyword: $keyword");
         if ($session->scratch->get("groupSearchModifier") eq "startsWith") {
                 $keyword .= "%";
         } elsif ($session->scratch->get("groupSearchModifier") eq "contains") {
@@ -97,8 +98,14 @@ sub getGroupSearchForm {
 	my $session = shift;
 	my $op = shift;
 	my $params = shift;
-	$session->scratch->set("groupSearchKeyword",$session->form->process("keyword"));
-        $session->scratch->set("groupSearchModifier",$session->form->process("modifier"));
+	my $keyword = $session->form->process("keyword");
+	if (defined $keyword) {
+		$session->scratch->set("groupSearchKeyword", $keyword);
+	}
+	my $modifier = $session->form->process("modifier");
+	if (defined $modifier) {
+		$session->scratch->set("groupSearchModifier", $modifier);
+	}
 	my $output = '<div align="center">';
 	my $i18n = WebGUI::International->new($session);
 	my $f = WebGUI::HTMLForm->new($session,1);
