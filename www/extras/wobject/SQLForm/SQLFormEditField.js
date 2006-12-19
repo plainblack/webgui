@@ -39,7 +39,10 @@ function updateFormFields() {
 	// Handle Field constraints section
 	if (document.getElementById('SQLFormFieldConstraintType').value > 0) {
 		enableField('SQLFormFieldConstraintTarget');
-		if (document.getElementById('SQLFormFieldConstraintTarget').value == 'value') {
+		if (
+			(document.getElementById('SQLFormFieldConstraintTarget').value == 'value') ||
+			(document.getElementById('SQLFormFieldConstraintTarget').value == '' && document.getElementById('SQLFormFieldConstraintValue').value != '')
+		) {
 			enableField('SQLFormFieldConstraintValue');
 		} else {
 			disableField('SQLFormFieldConstraintValue');

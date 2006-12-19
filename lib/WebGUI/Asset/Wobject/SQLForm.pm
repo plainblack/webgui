@@ -608,6 +608,49 @@ sub _createFieldType {
 
 #-------------------------------------------------------------------
 
+=head2 _databaseLinkHasPrivileges ( wantedPrivileges, databaseLink )
+
+Returns true if the database link has at least the given privileges.
+
+=head3 wantedPrivileges
+
+Arrayref containing the desired privileges (eg. ['SELECT','ALTER'])
+
+=head3 databaseName
+
+The name of the database you want to check the privileges of.
+
+=head3 databaseLink
+
+An instanciated databaselink object. Defaults to the databaselink of the sqlform table.
+
+=cut
+
+sub _databaseLinkHasPrivileges {
+	my (@privileges, @grants, $databaseName);
+	my $self = shift;
+	my $wantedPrivileges = shift;
+	my $dbLink = shift || $self->_getDbLink;
+
+	($databaseName = $dbLink->get->{DSN}) =~ s/^[^:]*:[^:]*:([^:]*)(:.*)?$/$1/;
+
+	@grants = $dbLink->db->buildArray('show grants for current_user');
+
+	foreach (@grants) {
+		if (m/GRANT ([\w\s\d,]*?) ON .$databaseName.*$/) {
+			push(@privileges, (split(/, /,$1)));
+		}
+	}
+
+	return 1 if (isIn('ALL PRIVILEGES', @privileges));
+	
+	foreach (@$wantedPrivileges) {
+		return 0 unless (isIn(uc($_), @privileges));
+	}
+}
+
+#-------------------------------------------------------------------
+
 =head2 _getDbLink ( )
 
 Returns a WebGUI::DatabaseLink object for the database the SQLForm table is in.
@@ -1178,7 +1221,14 @@ sub processPropertiesFromFormPost {
 	my $self = shift;
 
 	my $dbLink = WebGUI::DatabaseLink->new($self->session, $self->session->form->process("databaseLinkId"));
-	
+
+	# $dbLink->db will raise a fatal error if there is a connection error.
+#	return ["Can't connect to database through the selected database link"] unless ($dbLink->db);
+
+	unless ($self->_databaseLinkHasPrivileges([qw(ALTER CREATE DELETE INDEX INSERT SELECT UPDATE)], $dbLink)) {
+		return ["Databaselink does not have enough privileges (Needs ALTER, CREATE, DELETE, INDEX, INSERT, SELECT, UPDATE)"];
+	}
+
 	$tableName = $self->session->form->process("tableName");
 
 	if ($self->session->form->process("assetId") eq 'new') {
@@ -2359,7 +2409,13 @@ sub _getFormElement {
 		$fieldParameters->{options}			= $field->{options};
 		# make sure that previously selected items still appear for this for element, even if
 		# if is set to a set difference.
-		@{$fieldParameters->{options}}{@$fieldValue} 	= @{$field->{allOptions}}{@$fieldValue} if ($fieldValue && $field->{hasOptions});
+		if ($fieldValue && $field->{hasOptions}) {
+			if ($field->{canHaveMultipleValues}) {
+				@{$fieldParameters->{options}}{@$fieldValue} 	= @{$field->{allOptions}}{@$fieldValue};
+			} else {
+				$fieldParameters->{options}->{$fieldValue}	= $field->{allOptions}->{$fieldValue};
+			}
+		}
 		$fieldParameters->{options}->{''}		= '-leave empty-' if (!$field->{isRequired});
 		$fieldParameters->{name} 			= $field->{fieldName};
 		$fieldParameters->{value}			= $fieldValue unless ($fieldType eq 'file');
@@ -2658,6 +2714,7 @@ my			@results = $self->session->db->quickArray($sql);
 					push(@update, "__".$fieldName."_mimeType=".$self->session->db->quote($fileType));
 				}
 			} else {
+				push(@error, $i18n->get('ers field required').' '.$field->{displayName}) if ($field->{isRequired});
 			}
 		# Throw error if field is required and empty.
 		} elsif ($self->session->form->process($fieldName) eq '' && $field->{isRequired}) {

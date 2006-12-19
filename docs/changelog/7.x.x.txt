@@ -11,6 +11,15 @@
  - fix: CS Phishing Exploit.
  - fix: Groups admin gui
  - fix: Wiki does not show history correctly
+ - fix: SQLForm - Field Constraint (Martin Kamerbeek / Oqapi)
+ - fix: SQLForm - Default search template uses downloadUrl in stead of 
+   templateUrl for displaying thumbnails. (Martin Kamerbeek / Oqapi)
+ - fix: SQLForm - Required file fields could be left open (Martin Kamerbeek / 
+   Oqapi)
+ - fix: SQLForm - Using radio buttons would error when re-edited (Martin Kamerbeek /
+   Oqapi)
+ - fix: SQLForm - DBD Error handling (Martin Kamerbeek / Oqapi)
+ 
 
 7.3.1
  - Fixed a problem with IE and resizable text areas that caused IE to crash
