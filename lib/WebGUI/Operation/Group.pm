@@ -71,7 +71,6 @@ sub doGroupSearch {
         my $groupFilter = shift;
         push(@{$groupFilter},0);
         my $keyword = $session->scratch->get("groupSearchKeyword");
-	$session->errorHandler->warn("keyword: $keyword");
         if ($session->scratch->get("groupSearchModifier") eq "startsWith") {
                 $keyword .= "%";
         } elsif ($session->scratch->get("groupSearchModifier") eq "contains") {
