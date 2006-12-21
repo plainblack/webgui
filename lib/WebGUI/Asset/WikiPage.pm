@@ -259,13 +259,6 @@ sub processPropertiesFromFormPost {
 }	
 
 #-------------------------------------------------------------------
-sub purge {
-	my $self = shift;
-	$self->session->db->write("DELETE FROM WikiMaster_titleIndex WHERE assetId = ?", [$self->getId]);
-	return $self->SUPER::purge;
-}
-
-#-------------------------------------------------------------------
 sub view {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session, "Asset_WikiPage");
