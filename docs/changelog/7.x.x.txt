@@ -20,6 +20,7 @@
  - fix: SQLForm - Using radio buttons would error when re-edited (Martin Kamerbeek /
    Oqapi)
  - fix: SQLForm - DBD Error handling (Martin Kamerbeek / Oqapi)
+ - fix: Media folder permission check
  
 
 7.3.1

@@ -39,6 +39,8 @@ isa_ok($event, 'WebGUI::Asset::Event','Can add Events as a child to the calendar
 my $article = $cal->addChild({className=>"WebGUI::Asset::Wobject::Article"});
 isnt(ref $article, 'WebGUI::Asset::Wobject::Article', "Can't add an article as a child to the calendar.");
 
+
+
 TODO: {
         local $TODO = "Tests to make later";
         ok(0, 'Lots more to test');

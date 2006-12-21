@@ -373,7 +373,7 @@ sub www_richEditAddFolderSave {
 	# get base url
 	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
 	# check if user can edit the current asset
-	return WebGUI::Privilege::insufficient() unless $base->canEdit;
+	return $session->privilege->insufficient() unless $base->canEdit;
 
 	my $filename = $session->form->process('filename') || 'untitled';
 	$base->addChild({
