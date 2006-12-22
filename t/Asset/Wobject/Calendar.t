@@ -28,6 +28,7 @@ my $node = WebGUI::Asset->getImportNode($session);
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Calendar Test"});
 my $cal = $node->addChild({className=>'WebGUI::Asset::Wobject::Calendar'});
+$versionTag->commit();
 
 # Test for a sane object type
 isa_ok($cal, 'WebGUI::Asset::Wobject::Calendar');
