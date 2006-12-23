@@ -306,7 +306,8 @@ A string containing extra where clause information for the query.
 
 =head4 orderByClause 
 
-A string containing an order by clause (without the "order by").
+A string containing an order by clause (without the "order by"). If specified,
+will override the "invertTree" option.
 
 =head4 limit
 

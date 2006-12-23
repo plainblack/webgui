@@ -20,17 +20,32 @@ use base 'DateTime';
 
 =head1 NAME
 
-WebGUI::Session::Date - DateTime subclass with additional WebGUI methods
+WebGUI::DateTime - DateTime subclass with additional WebGUI methods
 
 =head1 SYNOPSIS
 
- my $dt		= $session->date->new("2006-11-06 21:12:45");
- my $dt		= $session->date->new(time);
- my $dt		= $session->date->new({ year => 2006, month => 11, day => 6 });
+ # Create an object from a MySQL date/time in the UTC time zone
+ my $dt		= WebGUI::DateTime->new("2006-11-06 21:12:45");
+ 
+ # Create an object from an epoch time
+ my $dt		= WebGUI::DateTime->new(time);
+ 
+ # Create an object from a MySQL date/time in a specific time zone
+ my $dt		= WebGUI::DateTime->new( mysql => "2006-11-06 21:12:45", time_zone => "America/Chicago" );
+ 
+ # Create an object from a hash of data
+ my $dt		= WebGUI::DateTime->new( year => 2006, month => 11, day => 6 );
+ 
  
  my $mysql	= $dt->toMysql;		# Make a MySQL date/time string
  my $mysqlDate	= $dt->toMysqlDate;	# Make a MySQL date string
  my $mysqlTime	= $dt->toMysqlTime;	# Make a MySQL time string
+ 
+ 
+ my $ical	= $dt->toIcal;		# Make an iCal date/time string
+ my $icalDate	= $dt->toIcalDate;	# Make an iCal date string
+ my $icalTime	= $dt->toIcalTime;	# Make an iCal time string
+ 
  
  ### See perldoc DateTime for additional methods ###
 
@@ -52,19 +67,25 @@ dealing with time zones.
 
 =head2 new ( string )
 
-Creates a new object from a MySQL Date/Time string with the UTC time zone.
+Creates a new object from a MySQL Date/Time string in the format 
+"2006-11-06 21:12:45". 
+
+This string is assumed to be in the UTC time zone. If it is not, use the 
+"mysql" => string constructor, below.
 
 =head2 new ( integer )
 
 Creates a new object from an epoch time.
 
-=head2 new ( "mysql" => string, "time_zone" => string)
+=head2 new ( "mysql" => string, "time_zone" => string )
 
-Creates a new object from a MySQL Date/Time string with the specified time zone
+Creates a new object from a MySQL Date/Time string that is in the specified 
+time zone
 
 =head2 new ( hash )
 
-Creates a new object from a hash of data passed directly to DateTime.
+Creates a new object from a hash of data passed directly to DateTime. See
+perldoc DateTime for the proper keys to be used.
 
 =cut
 
@@ -164,13 +185,13 @@ sub toIcalDate
 
 =head2 toMysql
 
-Returns a MySQL Date/Time string.
+Returns a MySQL Date/Time string in the UTC time zone
 
 =cut
 
 sub toMysql
 {
-	return $_[0]->strftime("%Y-%m-%d %H:%M:%S");
+	return $_[0]->clone->set_time_zone("UTC")->strftime("%Y-%m-%d %H:%M:%S");
 }
 
 
@@ -181,7 +202,7 @@ sub toMysql
 =head2 toMysqlDate
 
 Returns a MySQL Date string. Any time data stored by this object will be 
-ignored.
+ignored. Is not adjusted for time zone.
 
 =cut
 
@@ -198,7 +219,7 @@ sub toMysqlDate
 =head2 toMysqlTime
 
 Returns a MySQL Time string. Any date data stored by this object will be 
-ignored.
+ignored. Is not adjusted for time zone.
 
 =cut
 

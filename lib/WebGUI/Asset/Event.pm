@@ -358,18 +358,23 @@ Event object.
 sub getEventNext
 {
 	my $self	= shift;
+	my $db		= $self->session->db;
 	
 	my $where	= 'Event.startDate > "'.$self->get("startDate").'" || (Event.startDate = "'.$self->get("startDate").'" && ';
 	
 	# All day events must either look for null time or greater than 00:00:00
 	if ($self->isAllDay)
 	{
-		$where	.= "(Event.startTime IS NULL && assetData.title > '".$self->get("title")."') || Event.startTime >= '00:00:00'";
+		$where	.= "(Event.startTime IS NULL "
+			. "&& assetData.title > ".$db->quote($self->get("title")).") "
+			. "|| Event.startTime >= '00:00:00'";
 	}
 	# Non all-day events must look for greater than time
 	else
 	{
-		$where	.= "(Event.startTime = '".$self->get("startTime")."' && assetData.title > '".$self->get("title")."') || Event.startTime > '".$self->get("startTime")."'";
+		$where	.= "(Event.startTime = '".$self->get("startTime")."' "
+			. "&& assetData.title > ".$db->quote($self->get("title")).")"
+			. "|| Event.startTime > '".$self->get("startTime")."'";
 	}
 	$where	.= ")";
 	
@@ -403,18 +408,22 @@ object.
 sub getEventPrev
 {
 	my $self	= shift;
+	my $db		= $self->session->db;
 	
 	my $where	= 'Event.startDate < "'.$self->get("startDate").'" || (Event.startDate = "'.$self->get("startDate").'" && ';
 	
 	# All day events must either look for null time or greater than 00:00:00
 	if ($self->isAllDay)
 	{
-		$where	.= "(Event.startTime IS NULL && assetData.title < '".$self->get("title")."')";
+		$where	.= "(Event.startTime IS NULL "
+			. "&& assetData.title < ".$db->quote($self->get("title")).")";
 	}
 	# Non all-day events must look for greater than time
 	else
 	{
-		$where	.= "(Event.startTime = '".$self->get("startTime")."' && assetData.title < '".$self->get("title")."') || Event.startTime < '".$self->get("startTime")."'";
+		$where	.= "(Event.startTime = '".$self->get("startTime")."' "
+			. "&& assetData.title < ".$db->quote($self->get("title")).")"
+			. "|| Event.startTime < '".$self->get("startTime")."'";
 	}
 	$where	.= ")";
 	
@@ -1258,7 +1267,21 @@ sub getTemplateVars
 	
 	
 	$var{isAllDay}		= $self->isAllDay;
+	$var{isOneDay}		= 1 if ($var{isAllDay} && $var{startDateDmy} eq $var{endDateDmy});
 	
+	
+	# Make a Friendly date span
+	$var{dateSpan}		= $var{startDateDayName}.", "
+				. $var{startDateMonthName}." "
+				. $var{startDateDayOfMonth}." "
+				. ( !$var{isAllDay} ? $var{startDateHour}.":".$var{startDateMinute}." ".$var{startDateM} : "" )
+				. ( !$var{isOneDay} ? 
+					' &bull; '
+					. $var{endDateDayName}.", "
+					.$var{endDateMonthName}." "
+					.$var{endDateDayOfMonth}." "
+					. ( !$var{isAllDay} ? $var{endDateHour}.":".$var{endDateMinute}." ".$var{endDateM} : "")
+					: "");
 	
 	# Make some friendly URLs
 	$dtStart->truncate(to=>"day");

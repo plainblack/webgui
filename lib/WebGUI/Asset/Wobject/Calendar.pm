@@ -582,7 +582,12 @@ sub getEvent
 	
 	# ? Perhaps use Stow to cache events ?
 	
-	return Asset::newByDynamicClass($self->session, $assetId);
+	my $event = WebGUI::Asset->newByDynamicClass($self->session, $assetId);
+	
+	$self->session->errorHandler->warn("WebGUI::Asset::Wobject::Calendar->getEvent :: Event '$assetId' not a child of calendar '".$self->getId."'"), return
+		unless $event->get("parentId") eq $self->getId;
+	
+	return $event;
 }
 
 
@@ -602,6 +607,11 @@ This method expects that startDate and endDate are already adjusted for the
 user's time zone.
 
 TODO: Allow WebGUI::DateTime objects to be passed as the parameters.
+
+TODO: Allow for a hashref of options as the third parameter to specify such 
+things as a limit clause, or additional where clause, or something.
+
+This is the main way to get events from a calendar, so it must be capable.
 
 =cut
 
@@ -688,11 +698,19 @@ Gets the first event in this calendar. Returns the Event object.
 sub getFirstEvent
 {
 	my $self	= shift;
-	my $event;
+	my $lineage	= $self->get("lineage");
 	
-	$self->session->errorHandler->warn("getFirstEvent is not yet implemented");
+	my ($assetId)	= $self->session->db->quickArray(<<ENDSQL);
+		SELECT asset.assetId 
+		FROM asset
+		JOIN Event ON asset.assetId = Event.assetId
+		WHERE 	lineage LIKE "$lineage\%"
+		AND	className = "WebGUI::Asset::Event"
+		ORDER BY startDate ASC, startTime ASC, revisionDate DESC
+		LIMIT 1
+ENDSQL
 	
-	return $event;
+	return $self->getEvent($assetId);
 }
 
 
@@ -710,11 +728,19 @@ Gets the last event in this calendar. Returns the Event object.
 sub getLastEvent
 {
 	my $self	= shift;
-	my $event;
+	my $lineage	= $self->get("lineage");
 	
-	$self->session->errorHandler->warn("getLastEvent is not yet implemented");
+	my ($assetId)	= $self->session->db->quickArray(<<ENDSQL);
+		SELECT asset.assetId 
+		FROM asset
+		JOIN Event ON asset.assetId = Event.assetId
+		WHERE 	lineage LIKE "$lineage\%"
+		AND	className = "WebGUI::Asset::Event"
+		ORDER BY startDate DESC, startTime DESC, revisionDate DESC
+		LIMIT 1
+ENDSQL
 	
-	return $event;
+	return $self->getEvent($assetId);
 }
 
 
@@ -850,26 +876,18 @@ sub view
 	# Set defaults if necessary
 	unless ($params->{start})
 	{
-		#if ($self->get("defaultDate") eq "first")
-		#{
-			#!! TODO: Get the first event's date
-				# select startDate from Events 
-				#	join assetLineage
-				#	order by startDate ASC, revisionDate DESC
-				#	limit 1
-		#}
-		#elsif ($self->get("defaultDate") eq "last")
-		#{
-			#!! TODO: Get the last event's date
-				# select startDate from Events 
-				#	join assetLineage
-				#	order by startDate DESC, revisionDate DESC
-				#	limit 1
-		#}
-		#else
-		#{
+		if ($self->get("defaultDate") eq "first" && $self->getFirstEvent)
+		{
+			$params->{start} = $self->getFirstEvent->getDateTimeStart;
+		}
+		elsif ($self->get("defaultDate") eq "last" && $self->getLastEvent)
+		{
+			$params->{start} = $self->getLastEvent->getDateTimeStart;
+		}
+		else
+		{
 			$params->{start} = WebGUI::DateTime->from_epoch(epoch => time(), time_zone => $session->user->profileField("timeZone"))->toMysql;
-		#}
+		}
 	}
 	$params->{type}	||= $self->get("defaultView") || "Month";
 	
@@ -898,7 +916,7 @@ sub view
 	# Admin
 	if ($self->session->var->isAdminOn)
 	{
-		$var->{'admin'}			= 1;
+		$var->{'admin'}		= 1;
 		$var->{'adminControls'}	= $self->getToolbar;
 	}
 	
@@ -906,13 +924,13 @@ sub view
 	if ($self->canAddEvent)
 	{
 		$var->{'editor'}	= 1;
+		$var->{"urlAdd"}	= $self->getUrl("func=add;class=WebGUI::Asset::Event");
 	}
 	
 	# URLs
 	$var->{"urlDay"}	= $self->getUrl("type=day;start=".$params->{start});
 	$var->{"urlWeek"}	= $self->getUrl("type=week;start=".$params->{start});
 	$var->{"urlMonth"}	= $self->getUrl("type=month;start=".$params->{start});
-	$var->{"urlAdd"}	= $self->getUrl("func=add;class=WebGUI::Asset::Event");
 	$var->{"urlSearch"}	= $self->getUrl("func=search");
 	$var->{"urlPrint"}	= $self->getUrl("type=".$params->{type}.";start=".$params->{start}.";print=1");
 	
@@ -1479,7 +1497,7 @@ sub www_ical
 	
 	
 	my $ical	= qq{BEGIN:VCALENDAR\r\n}
-			. qq{PRODID:WebGUI \r\n}		# TODO: Get WebGUI version!
+			. qq{PRODID:WebGUI }.$WebGUI::VERSION."-".$WebGUI::STATUS.qq{\r\n}
 			. qq{VERSION:2.0\r\n};
 	
 	# VEVENT:
@@ -1489,9 +1507,15 @@ sub www_ical
 		
 		# Currently we only need
 		# UID
-		# TODO: Use feedUid if one exists
-		my $domain	= $session->config->get("sitename")->[0];
-		$ical	.= qq{UID:}.$event->get("assetId").'@'.$domain."\r\n";
+		if ($event->get("feedUid"))	# Use feed's UID to prevent over-propagation
+		{
+			$ical	.= qq{UID:}.$event->get("feedUid")."\r\n";
+		}
+		else	# Create a UID for feeds native to this calendar
+		{
+			my $domain	= $session->config->get("sitename")->[0];
+			$ical	.= qq{UID:}.$event->get("assetId").'@'.$domain."\r\n";
+		}
 		
 		# LAST-MODIFIED (revisionDate)
 		$ical	.= qq{LAST-MODIFIED:}
@@ -1731,6 +1755,8 @@ page.
 
 The templates provided by this Wobject and the parameters they contain
 
+!!! TODO !!!
+
 
 
 
@@ -1746,7 +1772,6 @@ Ordinal numbers (1st, 2nd, 3rd, etc...) are not handled, due to translation
 issues. 
 
 TODO: More abstraction so that certain methods can be tested.
-
 
 =cut
 

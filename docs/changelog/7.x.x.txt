@@ -1,5 +1,19 @@
 7.3.3
  - fix: Wiki Purge throws fatal
+ - fix: Calendar now reports proper product ID on iCal feed
+ - fix: Calendar now tries to use the feed ID when sending uid of event on iCal
+        feeds (to prevent over-propagation of events shared between calendars).
+ - fix: Bug in AssetLineage->getLineage documentation.
+ - rfe: Event now has a template var to toggle if an event only lasts one day
+ - rfe: WebGUI::DateTime->toMysql now automatically adjusts to UTC. NOTE:
+        toMysqlDate and toMysqlTime do NOT adjust for timezones. If you are 
+	using them you must adjust manually.
+ - fix: Bug in WebGUI::DateTime documentation
+ - fix: Calendar default date of "first event" or "last event" now works.
+ - fix: Calendar now handles Events that have ' in titles appropriately.
+ - rfe: Added a "dateSpan" Event template variable that will show a properly
+        formatted date/time span depending on how the event's start and end are.
+ 
 
 
 7.3.2
