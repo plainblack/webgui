@@ -27,7 +27,7 @@ WebGUI::DateTime - DateTime subclass with additional WebGUI methods
  # Create an object from a MySQL date/time in the UTC time zone
  my $dt		= WebGUI::DateTime->new("2006-11-06 21:12:45");
  
- # Create an object from an epoch time
+ # Create an object from an epoch time in the UTC time zone
  my $dt		= WebGUI::DateTime->new(time);
  
  # Create an object from a MySQL date/time in a specific time zone
@@ -86,6 +86,10 @@ time zone
 
 Creates a new object from a hash of data passed directly to DateTime. See
 perldoc DateTime for the proper keys to be used.
+
+Note: Unless you specify a time_zone, your object will exist in a "floating" 
+time zone. It is best that you always specify a time zone, and use UTC before
+doing date/time math.
 
 =cut
 
@@ -258,6 +262,13 @@ sub _splitMysql
 
 
 
+=head1 ABOUT TIME ZONES
+
+It is best that all date/time math be done in the UTC time zone, because of such
+wonderful things as "daylight savings time" and "leap seconds".
+
+To this end, read the documentation for each method to find out if they 
+automatically convert their result into UTC.
 
 =head1 SEE ALSO
 
