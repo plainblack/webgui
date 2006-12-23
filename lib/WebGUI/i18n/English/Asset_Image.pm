@@ -151,8 +151,8 @@ shown here.|,
 	},
 
 	'controls' => {
-		message => q|A toolbar for working with the file.|,
-		lastUpdated => 1148952544,
+		message => q|An iconic toolbar for working with the file.|,
+		lastUpdated => 1166827236,
 	},
 
 	'thumbnail variable' => {
@@ -190,12 +190,22 @@ shown here.|,
 		lastUpdated => 1148952544,
 	},
 
-
 	'image template body' => {
                 message => q|<p>The following variables are available in Image Templates:</p>
 		|,
 		context => 'Describing the image template variables',
 		lastUpdated => 1148952657,
+	},
+
+	'image template asset var title' => {
+		message => q|Image Template, Asset Variables|,
+        	lastUpdated => 1166827631,
+	},
+
+	'image template asset var body' => {
+                message => q|<p>The following variables are available in Image Templates.  They represent internal Asset properties and may or may not be particularly useful in your templates.</p>
+		|,
+		lastUpdated => 1166827628,
 	},
 
 };

@@ -116,6 +116,62 @@ our $HELP = {
 		]
 	},
 
+	'asset template asset variables' => {
+		title => 'asset template asset var title',
+		body => 'asset template asset var body',
+		variables => [
+			{
+				name => 'title',
+			}, 
+			{
+				name => 'menuTitle',
+			}, 
+			{
+				name => 'url',
+			}, 
+			{
+				name => 'isHidden',
+			}, 
+			{
+				name => 'newWindow',
+			}, 
+			{
+				name => 'encryptPage',
+			}, 
+			{
+				name => 'ownerUserId',
+			}, 
+			{
+				name => 'groupIdView',
+			}, 
+			{
+				name => 'groupIdEdit',
+			}, 
+			{
+				name => 'synopsis',
+			}, 
+			{
+				name => 'extraHeadTags',
+			}, 
+			{
+				name => 'isPackage',
+			}, 
+			{
+				name => 'isPrototype',
+			}, 
+			{
+				name => 'status',
+			}, 
+			{
+				name => 'assetSize',
+			}, 
+		],
+		fields => [
+		],
+		related => [
+		]
+	},
+
 	'asset toolbar' => {
 		title => 'asset toolbar title',
 		body => 'asset toolbar body',

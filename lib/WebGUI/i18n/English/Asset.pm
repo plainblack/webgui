@@ -1042,6 +1042,92 @@ to edit or modify that asset.</p>|,
 		lastUpdated => 1160773957,
 	},
 
+	'asset template asset var title' => {
+	    message => q|Asset Template Asset Variables|,
+	    lastUpdated => 1100463645,
+	},
+
+        'asset template asset var body' => {
+                message => q|<p>These template variables are common to almost every asset.  Many of them are internal asset properties that govern behavior and may not be very useful for templates.  One example of this would be the ID of templates used to display the Asset.  Depending on whether or not the user filled out the fields, they may or may not be blank.</p>
+        |,
+        lastUpdated => 1166825198,
+  },
+
+	'title' => {
+		message => q|The title of the Asset|,
+		lastUpdated => 1160773957,
+	},
+
+	'menuTitle' => {
+		message => q|The title of the Asset used in Navigations.|,
+		lastUpdated => 1160773957,
+	},
+
+	'url' => {
+		message => q|The Asset's URL.|,
+		lastUpdated => 1160773957,
+	},
+
+	'isHidden' => {
+		message => q|A boolean that will be true if this Asset is set not be displayed in Navigations.|,
+		lastUpdated => 1160773957,
+	},
+
+	'newWindow' => {
+		message => q|A boolean that will be true if this Asset is set open in a new browser window.|,
+		lastUpdated => 1160773957,
+	},
+
+	'encryptPage' => {
+		message => q|A boolean that will be true if this Asset is set to be served over SSL.|,
+		lastUpdated => 1160773957,
+	},
+
+	'ownerUserId' => {
+		message => q|The ID of the user who owns this Asset.|,
+		lastUpdated => 1160773957,
+	},
+
+	'groupIdView' => {
+		message => q|The ID of the group that is allowed to view this Asset.|,
+		lastUpdated => 1160773957,
+	},
+
+	'groupIdEdit' => {
+		message => q|The ID of the group that is allowed to edit this Asset.|,
+		lastUpdated => 1160773957,
+	},
+
+	'synopsis' => {
+		message => q|A short description of the contents of the Asset.|,
+		lastUpdated => 1160773957,
+	},
+
+	'extraHeadTags' => {
+		message => q|Extra tags that will be added to the header of the page containing the Asset.  These will be included by default so you do not need to add them youself, unless you want them to be in there twice.|,
+		lastUpdated => 1160773957,
+	},
+
+	'isPackage' => {
+		message => q|A boolean that will be true if this Asset is set to be a Package.|,
+		lastUpdated => 1160773957,
+	},
+
+	'isPrototype' => {
+		message => q|A boolean that will be true if this Asset is set to be a prototype.|,
+		lastUpdated => 1160773957,
+	},
+
+	'status' => {
+		message => q|With respect to version control, the status of this Asset.  Typically these are the English strings "approved", "pending", "committed".|,
+		lastUpdated => 1160773957,
+	},
+
+	'assetSize' => {
+		message => q|How big this asset is in bytes.  The sum of all database fields and attachments.|,
+		lastUpdated => 1160773957,
+	},
+
 };
 
 1;

@@ -13,7 +13,7 @@
  - fix: Calendar now handles Events that have ' in titles appropriately.
  - rfe: Added a "dateSpan" Event template variable that will show a properly
         formatted date/time span depending on how the event's start and end are.
- 
+ - fix: Disobedient Forum Rich Editor
 
 
 7.3.2
@@ -39,8 +39,8 @@
    Oqapi)
  - fix: SQLForm - DBD Error handling (Martin Kamerbeek / Oqapi)
  - fix: Media folder permission check
- 
 
+ 
 7.3.1
  - Fixed a problem with IE and resizable text areas that caused IE to crash
    when loading edit screens.

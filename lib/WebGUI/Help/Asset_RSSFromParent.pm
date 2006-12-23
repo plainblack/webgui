@@ -6,6 +6,10 @@ our $HELP = {
 		body => 'rss from parent body',
 		# use the following to inherit stuff other help entries
 		isa => [
+			{
+				tag => 'template variables',
+				namespace => 'Asset_Template'
+			},
 		],
 		fields => [	#This array is used to list hover help for form fields.
 		],

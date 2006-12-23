@@ -5,6 +5,12 @@ our $HELP = {
         'zip archive add/edit' => {
 		title => 'zip archive add/edit title',
 		body => 'zip archive add/edit body',
+		isa => [
+			{
+				namespace => "Asset_File",
+				tag => "file add/edit"
+			},
+		],
 		fields => [
 			{
 				title => 'new file',
@@ -25,16 +31,8 @@ our $HELP = {
 		],
 		related => [
 			{
-				tag => 'asset fields',
-				namespace => 'Asset',
-			},
-			{
 				tag => 'zip archive template',
 				namespace => 'Asset_ZipArchive',
-			},
-			{
-				tag => 'file add/edit',
-				namespace => 'Asset_File',
 			},
 		]
 	},
@@ -43,6 +41,10 @@ our $HELP = {
 		title => 'zip archive template title',
 		body => 'zip archive template body',
 		isa => [
+			{
+				namespace => "Asset_ZipArchive",
+				tag => "zip archive asset variables"
+			},
 			{
 				namespace => "Asset_Template",
 				tag => "template variables"
@@ -73,6 +75,29 @@ our $HELP = {
 				tag => 'template language',
 				namespace => 'Asset_Template',
 			},
+		]
+	},
+
+    'zip archive asset variables' => {
+		title => 'zip archive asset variables title',
+		body => 'zip archive asset variables body',
+		isa => [
+			{
+				namespace => "Asset_File",
+				tag => "file template asset variables"
+			},
+		],
+		fields => [
+		],
+		variables => [
+		          {
+		            'name' => 'showPage'
+		          },
+		          {
+		            'name' => 'templateId'
+		          },
+		        ],
+		related => [
 		]
 	},
 

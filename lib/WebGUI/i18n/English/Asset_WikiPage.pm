@@ -178,8 +178,48 @@ our $I18N =
         },
 
         'content' => {
-                message => q|The content of this page, with recognized title and links changed into Wiki links.|,
-                lastUpdated => 1165812138,
+                message => q|The content of this page, with recognized titles and links changed into Wiki links.|,
+                lastUpdated => 1166845905,
+        },
+
+        'vars title' => {
+                message => q|WikiPage Template Asset Variables.|,
+                lastUpdated => 1166845955,
+        },
+
+        'vars body' => {
+                message => q|<p>These variables are available in the WikiPage template.  They are based on internal Asset variables and may or may not be useful.</p>|,
+                lastUpdated => 1166845955,
+        },
+
+        'storageId' => {
+                message => q|The Id of the object used to store attachments for this WikiPage.|,
+                lastUpdated => 1166845955,
+        },
+
+        'content variable' => {
+                message => q|The raw content of the WikiPage, with no titles or links processed.  You should never see the contents of this variable as it will be overridden in the template.|,
+                lastUpdated => 1166846242,
+        },
+
+        'views' => {
+                message => q|The number of times this WikiPage has been viewed.|,
+                lastUpdated => 1166846242,
+        },
+
+        'isProtected' => {
+                message => q|A boolean which will be true if this WikiPage has been protected.|,
+                lastUpdated => 1166846242,
+        },
+
+        'actionTaken' => {
+                message => q|The action taken to produce the current version of the WikiPage.  On a brand new page, this will be "Created".  Otherwise it will be "Edited".|,
+                lastUpdated => 1166846242,
+        },
+
+        'actionTakenBy' => {
+                message => q|The ID of the User who edited the page last.|,
+                lastUpdated => 1166846434,
         },
 
         'history title' => {

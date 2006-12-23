@@ -47,6 +47,32 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
+=head2 _fetch_button_rows ( @toolbarRows )
+
+Return the definitions for toolbar rows.
+
+=head3 definition
+
+A hash reference passed in from a subclass definition.
+
+=cut
+
+sub _fetch_button_rows {
+        my $self = shift;
+	my @toolbarRows = @_;
+	my %toolbarRow = ();
+	foreach my $rowIndex (0..$#toolbarRows) {
+			$toolbarRow{'theme_advanced_buttons'.$rowIndex} =
+				join(',', @{$toolbarRows[$_]});
+	}
+	#(map { "theme_advanced_buttons".($_+1) =>  }
+	#(0..$#toolbarRows)),
+}
+
+
+
+#-------------------------------------------------------------------
+
 =head2 definition ( definition )
 
 Defines the properties of this asset.
@@ -433,9 +459,10 @@ sub getRichEditor {
 	my $self = shift;
 	return '' if ($self->getValue('disableRichEditor') || $self->session->env->get("HTTP_USER_AGENT") =~ /Safari/);
 	my $nameId = shift;
-	my @toolbarRows = grep{@$_} map{[split "\n", $self->getValue("toolbarRow$_")]} (1..3);
+	#my @toolbarRows = grep{@$_} map{[split "\n", $self->getValue("toolbarRow$_")]} (1..3);
+	my @toolbarRows = map{[split "\n", $self->getValue("toolbarRow$_")]} (1..3);
 	push(@{$toolbarRows[0]},"contextmenu") if ($self->getValue("enableContextMenu"));
-	my @toolbarButtons = map{@$_} @toolbarRows;
+	my @toolbarButtons = map{ @{$_} } @toolbarRows;
 	my @plugins;
 
 	my $i18n = WebGUI::International->new($self->session, 'Asset_RichEdit');
@@ -450,6 +477,7 @@ sub getRichEditor {
     		cleanup_callback => "tinyMCE_WebGUI_Cleanup",
     		urlconvertor_callback => "tinyMCE_WebGUI_URLConvertor",
 		theme_advanced_resizing => "true",
+		#$self->_fetch_button_rows(@toolbarRows),
 		      (map { "theme_advanced_buttons".($_+1) => (join ',', @{$toolbarRows[$_]}) }
 		       (0..$#toolbarRows)),
 		ask => $self->getValue("askAboutRichEdit") ? "true" : "false",

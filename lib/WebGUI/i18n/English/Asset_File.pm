@@ -111,6 +111,41 @@ our $I18N = {
 		lastUpdated => 1165517718
 	},
 
+	'file template asset var title' => {
+		message => q|File Template, Asset Variables|,
+        	lastUpdated => 1130456105,
+	},
+
+	'file template asset var body' => {
+                message => q|<p>The following variables are available in File Templates.  They may or may not be useful.</p>
+		|,
+		lastUpdated => 1166824158,
+	},
+
+	'cacheTimeout' => {
+                message => q|The length of time set for the cache timeout.
+		|,
+		lastUpdated => 1166824158,
+	},
+
+	'filename var' => {
+                message => q|The name of the file this Asset holds.  It does not include the path to the file.
+		|,
+		lastUpdated => 1166824158,
+	},
+
+	'storageId' => {
+                message => q|The ID of the WebGUI storage element used to store the file.
+		|,
+		lastUpdated => 1166824158,
+	},
+
+	'templateId' => {
+                message => q|The ID of the template used to display the file.
+		|,
+		lastUpdated => 1166824158,
+	},
+
 };
 
 1;

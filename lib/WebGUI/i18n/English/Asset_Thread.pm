@@ -135,8 +135,8 @@ of date submitted.|,
 	},
 
 	'stick.url' => {
-		message => q|The URL to make this thread sticky.|,
-		lastUpdated => 1149633755,
+		message => q|The URL to make this thread sticky.  Sticky threads will stay at the top of the list of threads.|,
+		lastUpdated => 1166847623,
 	},
 
 	'unstick.url' => {
@@ -145,8 +145,8 @@ of date submitted.|,
 	},
 
 	'isLocked' => {
-		message => q|A conditional indicating if the current thread is locked.|,
-		lastUpdated => 1149633755,
+		message => q|A conditional indicating if the current thread is locked.  Locked threads can no longer be edited.|,
+		lastUpdated => 1166847827,
 	},
 
 	'lock.url' => {
@@ -246,6 +246,47 @@ also contains a set of its own Post Template variables.|,
 	'new file description' => {
 		message => q|Enter the path to a file, or use the "Browse" button to find a file on your local hard drive that you would like to be uploaded.|,
 		lastUpdated => 1119068745
+	},
+
+	'subscriptionGroupId' => {
+		message => q|The group ID reserved for users who subscribe to this thread.|,
+		lastUpdated => 1166847458
+	},
+
+	'replies' => {
+		message => q|The total number of replies in this thread.|,
+		lastUpdated => 1166847458
+	},
+
+	'isSticky variable' => {
+		message => q|A boolean which will be true if the thread was set to be sticky.|,
+		lastUpdated => 1166847458
+	},
+
+	'isLocked variable' => {
+		message => q|A boolean which will be true if the thread was locked.|,
+		lastUpdated => 1166847458
+	},
+
+	'lastPostId' => {
+		message => q|The ID of the most recent Post in the Thread.|,
+		lastUpdated => 1166847458
+	},
+
+	'lastPostDate' => {
+		message => q|The date of the most recent Post in the Thread.|,
+		lastUpdated => 1166847458
+	},
+
+	'thread asset template title' => {
+		message => q|Thread Asset Template Variables|,
+                lastUpdated => 1166848379,
+        },
+
+	'thread asset template body' => {
+		message => q|<p>The variables below are available in the Thread template. Most of them are internal variable that are not overly useful.</p>
+|,
+		lastUpdated => 1166848381,
 	},
 
 };

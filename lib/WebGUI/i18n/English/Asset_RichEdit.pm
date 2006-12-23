@@ -8,8 +8,8 @@ our $I18N = {
 	},
 
 	'toolbar buttons description' => {
-		message => q|Shows which toolbar buttons will be used in the editor.|,
-        	lastUpdated => 1133760935,
+		message => q|Shows which toolbar buttons will be used in which toolbars in the editor.  To remove a toolbar, deselect all buttons in that toolbar's column.  Note that other fields may add buttons to a toolbar row as well, such as Enable Context Menu.|,
+        	lastUpdated => 1166844107,
 	},
 
 	'using rich edit' => {
@@ -377,8 +377,8 @@ our $I18N = {
         },
 
         'using rich edit description' => {
-                message => q|Ask the user whether or not to use the Rich Editor on this form.|,
-                lastUpdated => 1119584875,
+                message => q|Ask the user whether or not to use the Rich Editor on this form each time the form is accessed.|,
+                lastUpdated => 1166844446,
         },
 
         'preformatted description' => {
@@ -433,8 +433,8 @@ option is set to Yes, then all whitespace entered into the form will be preserve
         },
 
         'toolbar location description' => {
-                message => q|Set whether the toolbar should be placed above (top) or below (bottom) the form.|,
-                lastUpdated => 1119584875,
+                message => q|Set whether the toolbars should be placed above (top) or below (bottom) the form.|,
+                lastUpdated => 1166844385,
         },
 
         'css file description' => {

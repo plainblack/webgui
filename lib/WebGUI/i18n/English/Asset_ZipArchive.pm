@@ -93,6 +93,30 @@ our $I18N = {
 		lastUpdated => 1148953449,
 	},
 
+	 'zip archive asset variables title' => {
+		message => q|Zip Archive, Asset Template Variables|,
+        	lastUpdated => 1109287565,
+	 },
+
+	 'zip archive asset variables body' => {
+                message => q|<p>The following variables are included by default in the Zip Archive Templates.  They may or may not be particularly useful:</p>
+		|,
+		context => q|Describing the zip archive template asset variables|,
+		lastUpdated => 1148953449,
+	},
+
+	 'showPage' => {
+                message => q|The name of the file from the Zip Archive that will be displayed when this Asset is viewed.
+		|,
+		lastUpdated => 1166823840,
+	},
+
+	 'templateId' => {
+                message => q|The ID of the template used to display the contents of the Zip Archive.
+		|,
+		lastUpdated => 1166823840,
+	},
+
 
 };
 

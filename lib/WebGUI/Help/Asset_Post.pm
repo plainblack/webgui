@@ -13,6 +13,10 @@ our $HELP = {
 				tag => 'template language',
 				namespace => 'Asset_Template'
 			},
+			{
+				tag => 'post asset variables',
+				namespace => 'Asset_Post'
+			},
 		],
 		fields => [
 		],
@@ -265,6 +269,10 @@ our $HELP = {
 		title => 'post asset variables title',
 		body => 'post asset variables body',
 		isa => [
+			{
+				tag => 'asset template asset variables',
+				namespace => 'Asset'
+			},
 		],
 		variables => [
 		          {

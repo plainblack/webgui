@@ -50,6 +50,10 @@ our $HELP = {
 		body => 'image template body',
 		isa => [
 			{
+				namespace => "Asset_Image",
+				tag => "image template asset variables"
+			},
+			{
 				namespace => "Asset_Template",
 				tag => "template variables"
 			},
@@ -74,25 +78,6 @@ our $HELP = {
 			    'name' => 'thumbnail',
 			    'description' => 'thumbnail variable'
 			  },
-			  {
-			    'name' => 'thumbnailSize'
-			  },
-			  {
-			    'name' => 'parameters',
-			    'description' => 'parameters variable'
-			  },
-			  {
-			    'name' => 'filename'
-			  },
-			  {
-			    'name' => 'storageId'
-			  },
-			  {
-			    'name' => 'title'
-			  },
-			  {
-			    'name' => 'menuTitle'
-			  }
 			],
 		related => [
 			{
@@ -103,6 +88,30 @@ our $HELP = {
 				tag => 'template language',
 				namespace => 'Asset_Template',
 			},
+		]
+	},
+
+        'image template asset variables' => {
+		title => 'image template asset var title',
+		body => 'image template asset var body',
+		isa => [
+			{
+				namespace => "Asset_File",
+				tag => "file template asset variables"
+			},
+		],
+		fields => [
+		],
+		variables => [
+			  {
+			    'name' => 'thumbnailSize'
+			  },
+			  {
+			    'name' => 'parameters',
+			    'description' => 'parameters variable'
+			  },
+			],
+		related => [
 		]
 	},
 

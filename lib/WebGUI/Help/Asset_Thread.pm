@@ -4,6 +4,24 @@ our $HELP = {
 	'thread template variables' => {
 		title => 'thread template title',
 		body => 'thread template body',
+		isa => [
+			{
+				tag => 'template language',
+				namespace => 'Asset_Template'
+			},
+			{
+				tag => 'post template variables',
+				namespace => 'Asset_Post'
+			},
+			{
+				tag => 'collaboration template labels',
+				namespace => 'Asset_Collaboration'
+			},
+			{
+				tag => 'pagination template variables',
+				namespace => 'WebGUI'
+			},
+		],
 		fields => [
 		],
 		variables => [
@@ -145,22 +163,23 @@ our $HELP = {
 		          }
 		        ],
 		related => [
+		]
+	},
+
+	'thread asset template variables' => {
+		title => 'thread asset template title',
+		body => 'thread asset template body',
+		isa => [
 			{
-				tag => 'template language',
-				namespace => 'Asset_Template'
-			},
-			{
-				tag => 'post template variables',
+				tag => 'post asset variables',
 				namespace => 'Asset_Post'
 			},
-			{
-				tag => 'collaboration template labels',
-				namespace => 'Asset_Collaboration'
-			},
-			{
-				tag => 'pagination template variables',
-				namespace => 'WebGUI'
-			},
+		],
+		fields => [
+		],
+		variables => [
+		],
+		related => [
 		]
 	},
 

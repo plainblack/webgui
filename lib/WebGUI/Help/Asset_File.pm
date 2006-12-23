@@ -47,12 +47,12 @@ our $HELP = {
 		body => 'file template body',
 		isa => [
 			{
-				namespace => "Asset_Template",
-				tag => "template variables"
+				namespace => "Asset_File",
+				tag => "file template asset variables"
 			},
 			{
-				namespace => "Asset",
-				tag => "asset template"
+				namespace => "Asset_Template",
+				tag => "template variables"
 			},
 		],
 		variables => [
@@ -68,18 +68,40 @@ our $HELP = {
 			  {
 			    'name' => 'controls'
 			  },
+			],
+		fields => [
+		],
+		related => [
+			{
+				tag => 'file add/edit',
+				namespace => 'Asset_File',
+			},
+		]
+	},
+
+        'file template asset variables' => {
+		title => 'file template asset var title',
+		body => 'file template asset var body',
+		isa => [
+			{
+				namespace => "Asset",
+				tag => "asset template asset variables"
+			},
+		],
+		variables => [
 			  {
-			    'name' => 'filename'
+			    'name' => 'cacheTimeout'
+			  },
+			  {
+			    'name' => 'filename',
+			    'description' => 'filename var'
 			  },
 			  {
 			    'name' => 'storageId'
 			  },
 			  {
-			    'name' => 'title'
+			    'name' => 'templateId'
 			  },
-			  {
-			    'name' => 'menuTitle'
-			  }
 			],
 		fields => [
 		],

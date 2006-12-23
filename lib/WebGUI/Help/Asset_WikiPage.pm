@@ -68,6 +68,10 @@ our $HELP = {
 		title => 'view title',
 		body => 'view body',
 		isa => [
+			{
+				tag => 'wiki page asset template variables',
+				namespace => 'Asset_WikiPage'
+			},
 		],
 		variables => [
                         {
@@ -113,6 +117,35 @@ our $HELP = {
 			},
 			{
 				'name' => 'content',
+			},
+		],
+		related => [
+		],
+	},
+
+	'wiki page asset template variables' => {
+		title => 'vars title',
+		body => 'vars body',
+		isa => [
+		],
+		variables => [
+                        {
+                                name => 'storageId',
+                        },
+                        {
+                                name => 'content variable',
+                        },
+                        {
+                                name => 'views',
+			},
+                        {
+                                name => 'isProtected',
+			},
+			{
+				'name' => 'actionTaken',
+			},
+			{
+				'name' => 'actionTakenBy',
 			},
 		],
 		related => [
