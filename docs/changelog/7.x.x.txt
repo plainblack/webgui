@@ -16,6 +16,7 @@
  - fix: Disobedient Forum Rich Editor
  - fix: SQLForm - fixed a bug where regexes would sometimes be ignored (Martin
    Kamerbeek / Oqapi)
+ - fix: SQLForm - checkList/varchar (Martin Kamerbeek / Oqapi)
 
 7.3.2
  - fix: Calendar and Event now have printable templates and URL parameters.

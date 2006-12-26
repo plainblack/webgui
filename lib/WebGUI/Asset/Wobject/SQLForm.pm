@@ -2340,12 +2340,11 @@ sub _getFieldValue {
 	}
 
 	#### This might break? ####
-	if ($field->{canHaveMultipleValues} && !$readOnly) {
-		$fieldValue = [ $recordValues->{$field->{fieldName}} ];
+	if ($field->{canHaveMultipleValues}) {
+		$fieldValue = [ split(/\n/, $recordValues->{$field->{fieldName}}) ];
 		$fieldValue = [ $self->session->request->param($field->{fieldName}) ] if (defined $self->session->form->process($field->{fieldName}));
-		$fieldValue = join(', ', @$fieldValue) if ($readOnly);
 	}
-	
+
 	# Handle file uploads
 	if ($field->{formFieldType} eq 'file') {
 		unless ($recordValues->{$field->{fieldName}}) {
@@ -2398,7 +2397,7 @@ sub _getFormElement {
 	$fieldValue = $self->_getFieldValue($field, $recordValues, $readOnly);
 
 	# Resolve value to key in case of read only and key/value pairs
-	$fieldValue = $field->{allOptions}->{$fieldValue} if ($field->{hasOptions} && $readOnly);
+	$fieldValue = join(', ', @{$field->{allOptions}}{@$fieldValue}) if ($field->{hasOptions} && $readOnly);
 	$maxLength = $field->{maxFieldLength} || $allowedDbFieldTypes->{$field->{dbFieldType}}->{maxLength};
 
 	# Construct the form element
@@ -4116,7 +4115,8 @@ my			$value;
 			$fieldProperties->{$_} = $self->_getFieldProperties($_) unless (exists $fieldProperties->{$_});
 			
 			if ($fieldProperties->{$_}->{hasOptions}) {
-				$value = $fieldProperties->{$_}->{allOptions}->{$row{$fieldProperties->{$_}->{fieldName}}};
+				my @options = split(/\n/, $row{$fieldProperties->{$_}->{fieldName}});
+				$value = join(', ', @{$fieldProperties->{$_}->{allOptions}}{@options});
 			} else {
 				$value = $row{$fieldProperties->{$_}->{fieldName}};
 			}
