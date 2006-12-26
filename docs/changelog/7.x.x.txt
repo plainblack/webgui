@@ -14,7 +14,8 @@
  - rfe: Added a "dateSpan" Event template variable that will show a properly
         formatted date/time span depending on how the event's start and end are.
  - fix: Disobedient Forum Rich Editor
-
+ - fix: SQLForm - fixed a bug where regexes would sometimes be ignored (Martin
+   Kamerbeek / Oqapi)
 
 7.3.2
  - fix: Calendar and Event now have printable templates and URL parameters.

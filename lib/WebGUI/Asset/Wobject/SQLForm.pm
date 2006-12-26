@@ -863,11 +863,11 @@ sub _matchField {
 	my $self = shift;
 	my $data = shift;
 	my $regexId = shift;
-	
+
 	return 1 unless ($regexId);
 
 	my ($regex) = $self->session->db->quickArray('select regex from SQLForm_regexes where regexId='.$self->session->db->quote($regexId));
-	
+
 	return 1 unless ($regex);
 	
 	if ($data =~ m/$regex/) {
@@ -2741,7 +2741,7 @@ my 				$cmd = '$self->session->form->'.$field->{formFieldType}.'($fieldName)';
 			}
 
 			# Check if input matches its regex
-			if (_matchField($self, $fieldValue, $field->{regex})) {
+			if (_matchField($self, $self->session->form->process($fieldName), $field->{regex})) {
 				push(@update, "$fieldName = ".$self->session->db->quote($fieldValue));
 			} else {
 				push(@error, $i18n->get('ers regex mismatch').' '.$regexes{$field->{regex}}.' '.$field->{displayName});
