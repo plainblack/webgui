@@ -513,8 +513,8 @@ our $I18N = {
         },
 
 	'41' => {
-		message => q|Features are selling points for a product. IE: Reasons to buy your product. Features often result in benefits, so you may want to also add some benefits to this product.|,
-		lastUpdated => 1120335841
+		message => q|Features are selling points for a product(ie. reasons to buy your product). Features often result in benefits, so you may want to also add some benefits to this product.|,
+		lastUpdated => 1167186992
 	},
 
 	'58' => {

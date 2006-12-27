@@ -413,8 +413,8 @@ option is set to Yes, then all whitespace entered into the form will be preserve
         },
 
         'use br description' => {
-                message => q|Uses break tags &lt;BR&gt; instead of paragraph tags &lt;P&gt; when a newline is entered in the editor.|,
-                lastUpdated => 1119584875,
+                message => q|Uses break tags &lt;BR&gt; instead of paragraph tags &lt;P&gt; when a new line is entered in the editor.|,
+                lastUpdated => 1167187299,
         },
 
         'remove line breaks description' => {

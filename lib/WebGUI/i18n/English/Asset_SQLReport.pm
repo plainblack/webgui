@@ -17,14 +17,14 @@ our $I18N = {
 	},
 
 	'71' => {
-		message => q|<p>SQL Reports are perhaps the most powerful wobject in the WebGUI arsenal. They allow a user to query data from any database that they have access to. This is great for getting sales figures from your Accounting database or even summarizing all the message boards on your web site.</p>
+		message => q|<p>SQL Reports are perhaps the most powerful wobject in the WebGUI arsenal. They allow a user to query data from any database that they have access to. This is great for getting sales figures from your accounting database or even summarizing all the message boards on your web site.</p>
 <p><b>Nested query support</b><br />
-The SQL Report wobject supports up to 5 nested queries (1 base query and 4 subqueries). Each subsequent query is executed for each row in the previous query results. For example, if you have two queries: query1 and query2, then query2 will be executed once for each row returned in query1. You can use placeholder parameters to compose subqueries with data from prior queries. 
+The SQL Report wobject supports up to 5 nested queries (1 base query and 4 subqueries). Each subsequent query is executed for each row in the previous query results. For example, if you have two queries (query1 and query2), then query2 will be executed once for each row returned in query1. You can use placeholder parameters to compose subqueries with data from prior queries. 
 </p>
 <p>
 SQL Reports are Wobjects and Assets, so they share the properties of both.  SQL Reports also have these unique properties:
 </p>|,
-		lastUpdated => 1146785522,
+		lastUpdated => 1167187342,
 	},
 
         '72 description' => {

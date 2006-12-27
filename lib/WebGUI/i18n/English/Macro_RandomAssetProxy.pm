@@ -17,10 +17,10 @@ our $I18N = {
 <p><b>&#94;RandomAssetProxy</b>();<br />
 <b>&#94;RandomAssetProxy</b>(<i>Asset URL</i>);<br />
 This macro works similarly to the &#94;<b>AssetProxy</b>(); macro except instead of displaying the
-Asset, it picks a random Asset from the descendents of the Asset whose URL is supplied as the
+Asset, it picks a random Asset from the descendants of the Asset whose URL is supplied as the
 argument.</p>
 		|,
-		lastUpdated => 1146760545,
+		lastUpdated => 1167187099,
 	},
 
 	'childless' => {

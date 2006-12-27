@@ -15,7 +15,7 @@ our $I18N = {
 	'random thread body' => {
 		message => q|<p><b>&#94;RandomThread( [ startURL, relatives, templateURL ] );</b><br />
 The Collaboration System can be used for much more than just a forum. A few examples of its 
-possible usages are a FAQ, photo gallery, job listings, quotes database or weblog. For these 
+possible usages are an FAQ, photo gallery, job listings, quotes database or weblog. For these 
 applications (and others that you might think of) it can be nice to display a random entry 
 from such a CS somewhere on your site. That is exactly the functionality that this macro provides.</p>
 
@@ -24,7 +24,7 @@ depending on the parameters. The way the selected post is displayed is controlle
 the template variables that are normally available in a CS Post template are available in this macro as well.</p>
 
 <p><b>Parameters</b></p>
-<p>Although all the parameters can be omitted, it usually makes sense specify them all. If you
+<p>Although all the parameters can be omitted, it usually makes sense to specify them all. If you
 want to display a random thread from a single CS, we suggest you use the URL of the CS as the <i>startURL</i>
 and &quot;self&quot; as <i>relatives</i>.</p>
 <div>
@@ -63,7 +63,7 @@ of questions), then the example above can be used to display a random question f
 </dl>
 </div>
 |,
-		lastUpdated => 1146760592,
+		lastUpdated => 1167187168,
 	},
 };
 

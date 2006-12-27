@@ -84,8 +84,8 @@ our $I18N = {
 	},
 
 	'purge trash after help' => {
-		message => q|How long should an asset stay in the trash before it's considered old enough to purge? Note that when it get's purged all it's revisions and descendants will be purged as well.|,
-		lastUpdated => 0,
+		message => q|How long should an asset stay in the trash before it's considered old enough to purge? Note that when it gets purged all it's revisions and descendants will be purged as well.|,
+		lastUpdated => 1167187074,
 		context => q|the hover help for the purge trash after field|
 	},
 
