@@ -540,10 +540,10 @@ default Asset in the menu.</p>|,
 	},
 
         'Field Name description' => {
-                message => q|<p>The name of this metadata property.It must be unique. <br />
+                message => q|<p>The name of this metadata property.  It must be unique. <br />
 It is advisable to use only letters (a-z), numbers (0-9) or underscores (_) for
 the field names.</p>|,
-                lastUpdated => 1129329870,
+                lastUpdated => 1167186196,
         },
 
         'Metadata Description description' => {

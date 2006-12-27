@@ -480,13 +480,13 @@ a Google sitemap of your site.</p>
 	},
 
 	'page.isRankedFirst' => {
-		message => q|This property is true if this page is the first within this level. ie. has no left sister.|,
-		lastUpdated => 1149394665,
+		message => q|This property is true if this page is the first within this level(ie. has no left sister).|,
+		lastUpdated => 1167186300,
 	},
 
 	'page.isRankedLast' => {
-		message => q|This property is true if this page is the last within this level. ie. has no right sister.|,
-		lastUpdated => 1149394665,
+		message => q|This property is true if this page is the last within this level(ie. has no right sister).|,
+		lastUpdated => 1167186302,
 	},
 
 	'page.parent.menuTitle' => {

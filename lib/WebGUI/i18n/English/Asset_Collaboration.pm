@@ -616,28 +616,28 @@ our $I18N = {
 	},
 
 	'thread template' => {
-		message => q|Thread Template|,
-		lastUpdated => 1109698614,
+		message => q|Collaboration System, Thread Template|,
+		lastUpdated => 1167186381,
 	},
 
 	'post template' => {
-		message => q|Post Form Template|,
-		lastUpdated => 1109698614,
+		message => q|Collaboration System, Post Form Template|,
+		lastUpdated => 1167186383,
 	},
 
 	'search template' => {
-		message => q|Search Template|,
-		lastUpdated => 1109698614,
+		message => q|Collaboration System, Search Template|,
+		lastUpdated => 1167186384,
 	},
 
 	'notification template' => {
-		message => q|Notification Template|,
-		lastUpdated => 1109698614,
+		message => q|Collaboration System, Notification Template|,
+		lastUpdated => 1167186386,
 	},
 
 	'rss template' => {
-		message => q|RSS Template|,
-		lastUpdated => 1109698614,
+		message => q|Collaboration System, RSS Template|,
+		lastUpdated => 1167186387,
 	},
 
 	'who posts' => {

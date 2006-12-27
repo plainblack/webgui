@@ -176,8 +176,8 @@ our $I18N = {
 	},
 
 	'isPending' => {
-		message => q|A condition indicating whether this listing has been approved or not.|,
-		lastUpdated => 1149784175,
+		message => q|A conditional indicating whether or not this listing has been approved or not.|,
+		lastUpdated => 1167186037,
 	},
 
 	'lastUpdated.epoch' => {
@@ -216,8 +216,8 @@ our $I18N = {
 	},
 
 	'manufacturerName' => {
-		message => q|The name of the company that manufactuers theproduct or provides the service represented in this listing.|,
-		lastUpdated => 1149784175,
+		message => q|The name of the company that manufactures the product or provides the service represented in this listing.|,
+		lastUpdated => 1167186054,
 	},
 
 	'manufacturerUrl' => {
@@ -256,8 +256,8 @@ our $I18N = {
 	},
 
 	'CATEGORY_NAME_loop' => {
-		message => q|A loop is created for each category in this matrix. The name of the loop is the category name with spaces replaced with hypens and a _loop added to the end. So if you have a category called "Bells and Whistles" then the loop would be called "bells-and-whistles_loop".|,
-		lastUpdated => 1149784175,
+		message => q|A loop is created for each category in this matrix. The name of the loop is the category name with spaces replaced with hyphens and a _loop added to the end. So if you have a category called "Bells and Whistles" then the loop would be called "bells-and-whistles_loop".|,
+		lastUpdated => 1167186070,
 	},
 
 	'tmplVar name' => {
@@ -372,8 +372,8 @@ our $I18N = {
 	},
 
 	'tmplVar best.category' => {
-		message => q|The name of this cateogry.|,
-		lastUpdated => 1149795214,
+		message => q|The name of this category.|,
+		lastUpdated => 1167186103,
 	},
 
 	'tmplVar best.name' => {
@@ -407,7 +407,7 @@ our $I18N = {
 	},
 
 	'tmplVar worst.category' => {
-		message => q|The name of this cateogry.|,
+		message => q|The name of this category.|,
 		lastUpdated => 1149795214,
 	},
 
@@ -1018,7 +1018,7 @@ our $I18N = {
         },
 
         'field type description' => {
-                lastUpdated => 1135279558,
+                lastUpdated => 1167185918,
                 message => q|<p>The type of field you are creating.  Please select the type from the following options in the drop-down list.</p>
 		<div>
 		<dl>
@@ -1026,7 +1026,7 @@ our $I18N = {
 		<dd>Defines availability of a feature, has it, doesn't have it, limited functionality, free add on, etc.</dd>
 		<dt>Text</dt>
 		<dd>A single line of text, like a short description or title.</dd>
-		<dt>TextaArea</dt>
+		<dt>TextArea</dt>
 		<dd>Multiple lines of text.</dd>
 		<dt>URL</dt>
 		<dd>A URL.</dd>
