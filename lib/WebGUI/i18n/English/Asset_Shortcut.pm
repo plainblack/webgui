@@ -125,14 +125,14 @@ In an override's New Value field, you can put a substitution call for the value 
 
         'Resolve Multiples description' => {
                 message => q|Sets the order to use when multiple assets are selected. Random means that if multiple assets match the shortcut criteria then the shortcut will select a random asset.<br />
-Most Recent will select the most recent asset that match the shortcut criteria.|,
-                lastUpdated => 1146540399,
+Most Recent will select the most recent asset that matches the shortcut criteria.|,
+                lastUpdated => 1167190078,
         },
 
         'Criteria description' => {
-                message => q|A statement to determinate what to mirror, in the form of "color = blue and weight != heavy". Multiple expressions may be joined with "and" and "or". <br />
+                message => q|A statement to determine what to mirror, in the form of "color = blue and weight != heavy". Multiple expressions may be joined with "and" and "or". <br />
 A property or value must be quoted if it contains spaces. Feel free to use the criteria builder to build your statements.|,
-                lastUpdated => 1146540405,
+                lastUpdated => 1167190118,
         },
 
 
@@ -217,8 +217,8 @@ A property or value must be quoted if it contains spaces. Feel free to use the c
 	},
 
 	'isShortcut' => {
-		message => q|A boolean indicating that this Asset is a Shortcut.  This can be used in conjuction with another boolean for Admin mode to quickly show Content Managers that this is a Shortcut Asset.|,
-		lastUpdated => 1148953116,
+		message => q|A boolean indicating that this Asset is a Shortcut.  This can be used in conjunction with another boolean for Admin mode to quickly show Content Managers that this is a Shortcut Asset.|,
+		lastUpdated => 1167189870,
 	},
 
 	'shortcut.label' => {

@@ -134,8 +134,8 @@ our $I18N = {
         },
 
         'subscription group description' => {
-                message => q|<p>When a user payed the fee, he/she will be added to this group.</p>|,
-                lastUpdated => 1120861450,
+                message => q|<p>When a user paid the fee, he/she will be added to this group.</p>|,
+                lastUpdated => 1167190387,
         },
 
         'subscription duration description' => {
@@ -144,8 +144,8 @@ our $I18N = {
         },
 
         'execute on subscription description' => {
-                message => q|<p>A (Perl) script to call when someone has subscribed and payed.</p>|,
-                lastUpdated => 1120861450,
+                message => q|<p>A (Perl) script to call when someone has subscribed and paid.</p>|,
+                lastUpdated => 1167190394,
         },
 
         'subscription karma description' => {
@@ -155,9 +155,9 @@ our $I18N = {
 
 	'help edit subscription body' => {
 		message => q|<p>A subscription will allow the user a piece of content which he/she has
-payed for. The following is the list of properties attached to each Description.</p>
+paid for. The following is the list of properties attached to each Description.</p>
 |,
-		lastUpdated => 1120861475,
+		lastUpdated => 1167190398,
 		context => q|The Add/Edit subscription help page text.|
 	},
 
@@ -312,8 +312,8 @@ payed for. The following is the list of properties attached to each Description.
 	},
 
 	'help manage subscriptions body' => {
-		message => q|Subscriptions allow you to sell your users group access on a subscription basis. You can use subscriptions to sell content to your users by setting this content only viewable for the group a subscription add people to.|,
-		lastUpdated => 0,
+		message => q|Subscriptions allow you to sell your users group access on a subscription basis. To sell content to your users, set the content to be viewable by a certain group, then set that group to be used by the subscription.|,
+		lastUpdated => 1167190537,
 		context => q|The content of the Manage Subscriptions help page.|
 	},
 

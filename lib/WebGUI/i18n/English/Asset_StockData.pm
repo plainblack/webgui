@@ -104,8 +104,8 @@ our $I18N = {
 	},
 
 	'help_add_edit_stocklist_body' => {
-		message => q|<p>Stock Lists allow users to track stocks on your site.  Data is retrieved from various sources on the internet and displayed in tabluar format.  This application allows any registered user to configure stock lists as well as to set a default stock list for visitors or for users who have not configured one themselves</p>|,
-		lastUpdated => 1119066571,
+		message => q|<p>Stock Lists allow users to track stocks on your site.  Data is retrieved from various sources on the internet and displayed in tabular format.  This application allows any registered user to configure stock lists as well as to set a default stock list for visitors or for users who have not configured one themselves</p>|,
+		lastUpdated => 1167190305,
 	},
 
 	'template_label_description' => {
@@ -129,8 +129,8 @@ our $I18N = {
 	},
 
 	'failover_label_description' => {
-		message => q|Choosing yes indicates that all available internet sources will be searched to find each stock.  Choosing no restricts the search to your primary source.  This greatly improves the performance of searchs, but limits your users to stocks available from only once source.|,
-		lastUpdated => 1119066250
+		message => q|Choosing yes indicates that all available internet sources will be searched to find each stock.  Choosing no restricts the search to your primary source.  This greatly improves the performance of searches, but limits your users to stocks available from only once source.|,
+		lastUpdated => 1167190356
 	},
 
 	'help_add_edit_stock_title' => {

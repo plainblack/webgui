@@ -59,8 +59,8 @@ our $I18N = {
 	},
 
 	'lastPayedTerm' => {
-		message => q|The most recent term that has been payed. This is an integer.|,
-		lastUpdated => 1149222142,
+		message => q|The most recent term that has been paid. This is an integer.|,
+		lastUpdated => 1167190416,
 	},
 
 	'gateway' => {

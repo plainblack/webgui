@@ -3656,9 +3656,9 @@ and tracked by WebGUI.|,
         },
 
         'Enable passive profiling description' => {
-                message => q|Used in conjuction with Metadata, this keeps a record of every wobject viewed by
+                message => q|Used in conjunction with Metadata, this keeps a record of every wobject viewed by
 a user.|,
-                lastUpdated => 1120239343,
+                lastUpdated => 1167189802,
         },
 
         '164 description' => {
