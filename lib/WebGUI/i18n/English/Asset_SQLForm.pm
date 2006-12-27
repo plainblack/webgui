@@ -1043,8 +1043,8 @@ have been purged yet.</p>|,
 	'completeForm' => {
 		message => q|This contains the entire form, complete
 and layed out in a WebGUI-style table. You don't need to add a
-seperate form header, footer or anything else.|,
-		lastUpdated => 1149822620,
+separate form header, footer or anything else.|,
+		lastUpdated => 1167186643,
 	},
 
 	'formLoop' => {
@@ -1163,7 +1163,7 @@ automatically, using a default layout.</p>
 <p><b>formloop</b> handles placing everything that you need in a table,
 automatically.  This allows you some flexibility in your form layout.</p>
 <p>Finally there is the option of placing
-each seperate field by hand. This allows you to define the order and
+each separate field by hand. This allows you to define the order and
 place of each form element. Please note, however, that using this
 method will not automatically follow changes you make to the SQLForm.
 If you add, delete or rename a field you must update the template by
@@ -1171,7 +1171,7 @@ hand. Using this method also implies the use of <b>formHeader</b> and
 <b>formFooter.</b> You should use the following two template
 variables:</p>
 |,
-		lastUpdated => 1149822668,
+		lastUpdated => 1167186648,
 	},
 
 	'search template help title' => {

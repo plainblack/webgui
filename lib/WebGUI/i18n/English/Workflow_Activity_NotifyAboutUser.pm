@@ -26,9 +26,9 @@ our $I18N = {
 	},
 
 	'to help' => {
-		message => q|The email address to send the message to. You may put in mutliple email addresses seperated by commas.|,
+		message => q|The email address to send the message to. You may put in multiple email addresses separated by commas.|,
 		context => q|the hover help for the to field|,
-		lastUpdated => 0,
+		lastUpdated => 1167186609,
 	},
 
 	'to' => {

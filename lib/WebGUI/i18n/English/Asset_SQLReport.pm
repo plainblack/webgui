@@ -316,8 +316,8 @@ query, but will be prefixed with queryN where N goes from 2 to 5.</p>
 	'Prequery statements description' => {
 		message => q|<p>Prequery statements are sql statements executed before the real query. You can use prequery statements for instance to set variables that you want to use in the real query. For example:</p>
 		<div class="helpIndent">set @myVariable := 1</div>
-<p>The prequery statements are seperated from each other by returns and cannot use placeholders. You can use macro's within the prequery statements, however. Please note that prequery statements are only visible in the query they belong to and that you can only use statements that are allowed by the database link.</p>|,
-		lastUpdated => 0,
+<p>The prequery statements are separated from each other by returns and cannot use placeholders. You can use macro's within the prequery statements, however. Please note that prequery statements are only visible in the query they belong to and that you can only use statements that are allowed by the database link.</p>|,
+		lastUpdated => 1167186661,
 	},
 	
 	
