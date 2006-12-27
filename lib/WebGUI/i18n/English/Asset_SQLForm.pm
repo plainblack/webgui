@@ -45,10 +45,10 @@ field type manager. For more information please read the help on <b>Manage field
 types</b>, which you can visit using the link in the menu on the right.</p>
 
 <p>Please note that some other field properties like <b>Auto increment</b> and
-<b>Read only</b> will force the field to be readonly and thus render the form
+<b>Read only</b> will force the field to be read only and thus render the form
 type of no importance. The database field type is very important, though, and
 should chosen with proper care.</p>|,
-		lastUpdated => 0,
+		lastUpdated => 1167187624,
 	},
 
 	'ef signed' => {
@@ -57,12 +57,12 @@ should chosen with proper care.</p>|,
 	},
 
 	'ef signed description' => {
-		message => q|<p>This property determines wheter this field
+		message => q|<p>This property determines whether this field
 interprets number as signed or unsigned. The difference lies in the boundaries
 of allowed values.</p>
 
-<p>This property is available only for numeric fieldtypes like <i>int</i>.</p>|,
-		lastUpdated => 0,
+<p>This property is available only for numeric field types like <i>int</i>.</p>|,
+		lastUpdated => 1167187652,
 	},
 
 	'ef signed label' => {
@@ -83,13 +83,13 @@ of allowed values.</p>
 	'ef autoincrement description' => {
 		message => q|<p>Setting a field will cause it to assign itself a
 value that is the highest value of the field that is already in the database
-plus one. In other words each record will have a succesive number for this
+plus one. In other words each record will have a successive number for this
 field. The field value will increment automatically.</p>
 
 <p>Enabling autincrement for a field will mean necessarily that the field is
 forced read only and will not accept user input. Therefore the choice of
 form field type is irrelevant if autoincrement is enabled.</p>|,
-		lastUpdated => 0,
+		lastUpdated => 1167187683,
 	},
 
 	'ef form height' => {
@@ -125,12 +125,12 @@ have a settable width.</p>|,
 		message => q|<p>This property defines the number of characters that
 the value that is inputted into this field is allowed to have. This property
 applies only to form elements that allow a user to actually type. So if you
-chose, for instance, a select list a form field type this option will have no
+chose, for instance, a select list this option will have no
 effect.</p>
 
-<p>Please note that some database type define a limit for the value of this
+<p>Please note that some database types define a limit for the value of this
 property.</p>|,
-		lastUpdated => 0,
+		lastUpdated => 1167187734,
 	},
 
 	'ef regex' => {
@@ -141,13 +141,13 @@ property.</p>|,
 	'ef regex description' => {
 		message => q|<p>Regex is short for regular expression. A regex
 is used to precisely match data against a specific pattern. The regex property
-thus allows you to check the input user assign to this field.</p>
+thus allows you to check the user input assigned to this field.</p>
 
 <p>The list of regexes you can choose from is defined in the <b>Regex
 manager</b> of the SQLForm asset. For more information regarding it please read
 the help on <b>Manage regexes</b>, which you can access by clicking on the link
 in the menu on the right.</p>|,
-		lastUpdated => 0,
+		lastUpdated => 1167187797,
 	},
 
 	'ef required' => {
@@ -168,11 +168,11 @@ allowed to leave the field empty.</p>|,
 	},
 
 	'ef read only description' => {
-		message => q|<p>Setting this property to will cause the field to
+		message => q|<p>Setting this property will cause the field to
 be read only, meaning that users cannot input a value for it when adding or
 editing a record. The value that is stored in this field on record addition is
 the value given by the <b>Default value</b> property.</p>|,
-		lastUpdated => 0,
+		lastUpdated => 1167187902,
 	},
 
 	'ef default value' => {
@@ -201,7 +201,7 @@ neglected.</p>|,
 
 	'ef field constraint description' => {
 		message => q|<p>The field constraint property has a similar use
-as the regex. The big diffrence, however, is that you can use the field
+as the regex. The big difference, however, is that you can use the field
 constraint to apply a constraint on the actual value that is input by the user
 who adds a record, while a regex is used to constrain the form (or the pattern)
 of the input.</p>
@@ -214,7 +214,7 @@ you can also match against one of the columns of those tables.</p>
 
 <p>The field constrained property is ignored if the read only or the
 autoincrement property is set.</p>|,
-		lastUpdated => 0,
+		lastUpdated => 1167187945,
 	},
 
 	'ef searchable' => {
@@ -235,15 +235,15 @@ field.</p>|,
 	},
 
 	'ef fulltext description' => {
-		message => q|<p>Fulltext indices are used too speed up search
+		message => q|<p>Fulltext indices are used to speed up search
 queries, so setting this property to yes may increase performance of the SQLForm
 asset. Adding or editing records, however, will be somewhat slowed down by using
 a fulltext index.</p>
 
-<p>Fulltext indices are only apllicable to certain database field types like
+<p>Fulltext indices are only applicable to certain database field types like
 <i>text</i> or <i>longtext</i> but enabling this property on another field type
 won't affect the operation of the SQLForm.</p>|,
-		lastUpdated => 0,
+		lastUpdated => 1167187980,
 	},
 
 	'ef show in search' => {
@@ -269,9 +269,9 @@ however.</p>|,
 		message => q|<p>This property determines how much characters of the
 value of this field should shown in the search result list. The field value will
 be truncated to the number of characters you enter here. Setting this property
-to zero will disable this property and cause field value not to be truncated in
+to zero will disable this property and cause the field value not to be truncated in
 the search results list.</p>|,
-		lastUpdated => 0,
+		lastUpdated => 1167187996,
 	},
 
 	'ef populate keys' => {
@@ -325,7 +325,7 @@ neglected.</p>|,
 
 	'ef join selector description' => {
 		message => q|<p>You can connect this field to other tables using
-this property. This connection can be used for constraing field values and
+this property. This connection can be used for constraining field values and
 setting the keys and values of options of form elements like select list, radio
 lists and check lists.</p>
 
@@ -335,17 +335,17 @@ itself. You can add more tables by clicking on the join button that appears
 below the table selection. In order to do this you must choose the columns that
 connect the tables you have selected and the type of that connection.</p>
 
-<p>These columns should identify the rows they are in in exectly the same way so
+<p>These columns should identify the rows they are in in exactly the same way so
 that the SQLForm knows which record in one table belongs to a record in another.
 You can choose from two connection methods: by set-intersection and by
 set-difference.</p>
 
-<p>Suppose we have two tables, A and B, that we want to connect to eachother in
-order to get dat out of them into a select list. If you use an intersection the
+<p>Suppose we have two tables, A and B, that we want to connect to each other in
+order to get data out of them into a select list. If you use an intersection the
 tables are connected in such a way that only the elements that are in A as well
-as B are returned. If you use the difference method, only the rows that are in A
-but not B are returned.</p>|,
-		lastUpdated => 0,
+as B are returned. If you use the difference method, only the rows that are in A,
+but not B, are returned.</p>|,
+		lastUpdated => 1167188029,
 	},
 
 	'ef join constraint' => {
@@ -366,10 +366,10 @@ column, a constraint type and a value.</p>|,
 	},
 
 	'ef join keys description' => {
-		message => q|<p>Use this property to generate the keys of the
-options of option based form elements like select list from the table
+		message => q|<p>Use this property to generate the keys for the
+options of option based form elements, like select list, from the table
 definition.</p>|,
-		lastUpdated => 0,
+		lastUpdated => 1167188372,
 	},
 
 	'ef join values' => {
@@ -379,9 +379,9 @@ definition.</p>|,
 
 	'ef join values description' => {
 		message => q|<p>Use this property to generate the values of the
-options of option based form elements like select list from the table
+options of option based form elements, like select list, from the table
 definition.</p>|,
-		lastUpdated => 0,
+		lastUpdated => 1167188573,
 	},
 
 
@@ -858,8 +858,8 @@ kilobytes.</p>
 <p>Please note that WebGUI also has a system wide maximum file size setting,
 which cannot be overridden by this property. In other words, if you set this
 property to a larger value than that of the system wide setting, the maximum
-upload size will be the system wide.</p>|,
-		lastUpdated => 0,
+upload size will be the system wide setting.</p>|,
+		lastUpdated => 1167187555,
 	},
 
 	'gef send mail to' => {
@@ -881,9 +881,9 @@ If you do not want to use this feature, simply leave the field blank.</p>|,
 
 	'gef show meta data description' => {
 		message => q|<p>In the SQLForm each record has special meta data
-containing the state of the record. If you want some of this this information to
+containing the state of the record. If you want some of this information to
 be shown in search results, please set this property to yes.</p>|,
-		lastUpdated => 0,
+		lastUpdated => 1167187571,
 	},
 
 	'gef edit template' => {
@@ -943,12 +943,12 @@ delete and restore but not purge records.</p>|,
 		message => q|<p>The SQLForm asset allows you to dynamically
 create data input and storage functionality in your site. All data is put in a
 table of your choice in a database of your choice. An arbitrary form element can
-be tied to each field and input forms can be built in diffrent ways to ensure
+be tied to each field and input forms can be built in different ways to ensure
 optimal adaptability to your needs.</p>
 
 <p>The SQLForm features creation of new tables, import of existing tables and
 re-importing previously imported tables. Fields can be linked to other fields in
-other tables in serveral ways, making it possible to dynamically resolve id's to
+other tables in several ways, making it possible to dynamically resolve id's to
 values using joins, add constraints to inputted data or connect different
 SQLForms together.</p>
 
@@ -956,10 +956,10 @@ SQLForms together.</p>
 constraints that are definable by you. In addition it's possible to add an
 autoincrement flag and macros to fields, among other functionality.</p>
 
-<p>All inputted data is versioned and a two level (delete/purge) trash is build
+<p>All inputted data is versioned and a two level (delete/purge) trash is built
 in. Three privilege layers are available to split access to different
 actions.</p>|,
-		lastUpdated => 0,
+		lastUpdated => 1167187479,
 	},
 
 	'edit field title' => {
@@ -999,7 +999,7 @@ SQLForm assets that are in the trash and are not yet purged.</p>|,
 pattern of text. Regexes used in the SQLForm are of the perl-variant. The syntax
 of perl-style regular expressions can be found <a
 href="http://perldoc.perl.org/perlretut.html">here</a>. To ensure data integrity, 
-regular expressions can only be deleted if they're not is use by any SQLForm in
+regular expressions can only be deleted if they're not in use by any SQLForm in
 the system. Please note this also includes SQLForm that are in the trash and not
 have been purged yet.</p>|,
 		lastUpdated => 0,
@@ -1042,7 +1042,7 @@ have been purged yet.</p>|,
 
 	'completeForm' => {
 		message => q|This contains the entire form, complete
-and layed out in a WebGUI-style table. You don't need to add a
+and laid out in a WebGUI-style table. You don't need to add a
 separate form header, footer or anything else.|,
 		lastUpdated => 1167186643,
 	},
@@ -1144,15 +1144,15 @@ is new.|,
 	},
 
 	'record.controls' => {
-		message => q|Delete, edit and copy buttons for theis record. Only available if the user is 
+		message => q|Delete, edit and copy buttons for this record. Only available if the user is 
 allowed to edit the record.|,
-		lastUpdated => 1149822620,
+		lastUpdated => 1167189136,
 	},
 
 	'edit template help' => {
 		message => q|<p>The SQLForm provides you with three
 methods to construct record input and edit forms, offering three
-levels of flexibility. Please note that more flexibilty has the
+levels of flexibility. Please note that more flexibility has the
 downside of increased complexity.</p>
 <p>The three methods you can use are:
 <b>completeForm</b>, <b>formloop</b> or manual placement of form
@@ -1171,7 +1171,7 @@ hand. Using this method also implies the use of <b>formHeader</b> and
 <b>formFooter.</b> You should use the following two template
 variables:</p>
 |,
-		lastUpdated => 1167186648,
+		lastUpdated => 1167188606,
 	},
 
 	'search template help title' => {
@@ -1180,10 +1180,10 @@ variables:</p>
 	},
 
 	'showFieldsDefined' => {
-		message => q|Conditional which returns true if there are field that are defined to be shown.
+		message => q|Conditional which returns true if there are fields that are defined to be shown.
 In other words, this is false if every field is configured not to be displayed
 in the search results.|,
-		lastUpdated => 1149822982,
+		lastUpdated => 1167188632,
 	},
 
 	'searchForm' => {
@@ -1193,11 +1193,11 @@ in the search results.|,
 
 	'searchFormHeader' => {
 		message => q|The header of the form, available in normal and advanced search. If you are
-not using the complete <b>searchForm</b> You must include this variable
+not using the complete <b>searchForm</b>, you must include this variable
 before any other form variable. If you do use the complete <b>searchForm
 </b> variable, however, you must not use the <b>searchFormHeader</b>
 variable.|,
-		lastUpdated => 1149822982,
+		lastUpdated => 1167188652,
 	},
 
 	'searchFormTrash.label' => {
@@ -1243,8 +1243,9 @@ not using the complete <b>searchForm</b>.|,
 	},
 
 	'searchFormType.label' => {
-		message => q|The label for the search type option (or/and). Available in advanced search. Only use this if you are|,
-		lastUpdated => 1149822982,
+		message => q|The label for the search type option (or/and). Available in advanced search. Only use this if you are
+not using the complete <b>searchForm</b>.|,
+		lastUpdated => 1167188797,
 	},
 
 	'searchFormType.form' => {
@@ -1255,10 +1256,10 @@ not using the complete <b>searchForm</b>.|,
 
 	'searchFormFooter' => {
 		message => q|The footer of the form, available in normal and advanced search. If you are
-not using the complete <b>searchForm</b> You must use this variable
+not using the complete <b>searchForm</b>, you must use this variable
 after every other searchForm variable. If you do use the complete <b>searchForm</b>
 variable, however, you must not use the <b>searchFormFooter</b> variable.|,
-		lastUpdated => 1149822982,
+		lastUpdated => 1167188873,
 	},
 
 	'searchFormSubmit' => {
@@ -1326,9 +1327,9 @@ You can use this if you want to create a custom Advanced search form that comple
 	},
 
 	'headerLoop' => {
-		message => q|A loop containing the display names of each field, inclding sort controls. The
+		message => q|A loop containing the display names of each field, including sort controls. The
 following variables are provided within this loop:|,
-		lastUpdated => 1149822982,
+		lastUpdated => 1167188939,
 	},
 
 	'header.title' => {
@@ -1372,20 +1373,20 @@ variable between searchResults.header and searchResults.footer.|,
 	},
 
 	'searchResults.recordLoop' => {
-		message => q|The loop containg the results of the search query. This should be between
+		message => q|The loop containing the results of the search query. This should be between
 searchResults.header and searchResults.footer. Within this loop the following
 variables are available for use:|,
-		lastUpdated => 1149822982,
+		lastUpdated => 1167189201,
 	},
 
 	'record.deletionDate' => {
-		message => q|Contains the date this record was deleted. Only available for records|,
+		message => q|Contains the date this record was deleted. Only available for records.|,
 		lastUpdated => 1149822982,
 	},
 
 	'record.deletedBy' => {
-		message => q|Contains the username of the person that deleted this record. Only|,
-		lastUpdated => 1149822982,
+		message => q|Contains the username of the person that deleted this record. Only available for records.|,
+		lastUpdated => 1167189170,
 	},
 
 	'record.updateDate' => {
@@ -1394,13 +1395,13 @@ variables are available for use:|,
 	},
 
 	'record.updatedBy' => {
-		message => q|The username of the person that made the most recent update to this|,
-		lastUpdated => 1149822982,
+		message => q|The username of the person that made the most recent update to this.|,
+		lastUpdated => 1167189177,
 	},
 
 	'record.valueLoop' => {
-		message => q|A loop containing the values for each field of this record. This loop|,
-		lastUpdated => 1149822982,
+		message => q|A loop containing the values for each field of this record.|,
+		lastUpdated => 1167189240,
 	},
 
 	'record.value' => {
@@ -1446,8 +1447,8 @@ available for files and images.|,
 	},
 
 	'showMetaData' => {
-		message => q|A conditional indictating whether the show meta data flag is turned on.|,
-		lastUpdated => 1149822982,
+		message => q|A conditional indicating whether or not the show meta data flag is turned on.|,
+		lastUpdated => 1167189276,
 	},
 
 	'managementLinks' => {
@@ -1461,14 +1462,14 @@ as well as links to add record and search record.|,
 provides you with a way to customize the looks of the search
 functionality that the SQLForm offers.</p>
 
-<p>There are two separate search methods, being normal and advanced search, but
+<p>There are two separate search methods, normal and advanced search, but
 both use the same template. In both cases a complete <b>searchForm</b> is available. 
 The individual form Elements are also available, but note that different form Elements are used for normal and advanced search.
 </p>
 
 <p>The template provides variables for the search results that are the same for normal and advanced search:</p>
 |,
-		lastUpdated => 1149823247,
+		lastUpdated => 1167189433,
 	},
 
 	'dft cannot delete' => {
@@ -1499,11 +1500,11 @@ The individual form Elements are also available, but note that different form El
 	'gef import table description' => {
 		message => q|<p>This option is a safety measure against
 accidentally importing existing tables. Importing existing tables <b>will alter
-the table by removing primary keys and addinng columns</b>. Therefore make sure
+the table by removing primary keys and adding columns</b>. Therefore make sure
 that altering the table you want to import will not break other systems. If
 you're sure no harm can be done you must select this option to allow importing
 the table.</p>|,
-		lastUpdated => 0,
+		lastUpdated => 1167187507,
 	},
 
 	'ers change notification' => {
