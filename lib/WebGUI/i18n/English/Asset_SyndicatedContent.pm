@@ -51,10 +51,10 @@ our $I18N = {
 	},
 
 	'71' => {
-		lastUpdated => 1119977726,
+		lastUpdated => 1167193158,
 		message => q|<p>Syndicated content is content that is pulled from another site using the RDF/RSS specification. This technology is often used to pull headlines from various news sites like <a href="http://www.cnn.com/">CNN</a> and  <a href="http://slashdot.org/">Slashdot</a>. It can, of course, be used for other things like sports scores, stock market info, etc.
 </p>
-<p>The Syndicated Content system also has the ability to "republish" it's items as RSS 0.9, 0.91, 1.0 and 2.0 flavor feeds. This means you can aggregate a bunch of feeds together, filter on relevant keywords and then republish this aggregated feed, and the Syndicated Content wobject will take care of all the messy stuff for you. See the "Syndicated Content Template" help for additional information. 
+<p>The Syndicated Content system also has the ability to "republish" its items as RSS 0.9, 0.91, 1.0 and 2.0 flavor feeds. This means you can aggregate a bunch of feeds together, filter on relevant keywords and then republish this aggregated feed, and the Syndicated Content wobject will take care of all the messy stuff for you. See the "Syndicated Content Template" help for additional information. 
 </p>
 <p>The Syndicated Content client is a Wobject and an Asset, so it has the properties of both.  It also has
 these unique properties:

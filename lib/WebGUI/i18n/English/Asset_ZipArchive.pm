@@ -56,8 +56,8 @@ our $I18N = {
 	 },
 
 	 'zip archive add/edit body' => {
-         message => q|<p>Zip Archive Assets are assets on your site that are allow you to upload a zip archive (as either zip or tar) containing files that require collateral (static html pages with images or movies, etc) that you wish to display to your users outside of the WebGUI context, but retain WebGUI's file security.  The asset uzips the folder in a WebGUI storage location, and redirects the user to the initial page when the link provided is clicked</p>|,
-		 lastUpdated => 1119068839,
+         message => q|<p>Zip Archive Assets are assets on your site that are allow you to upload a zip archive (as either zip or tar) containing files that require collateral (static html pages with images or movies, etc) that you wish to display to your users outside of the WebGUI context, but retain WebGUI's file security.  The asset unzips the folder in a WebGUI storage location, and redirects the user to the initial page when the link provided is clicked</p>|,
+		 lastUpdated => 1167194166,
 	 },
 
 	 'zip archive template title' => {

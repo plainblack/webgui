@@ -101,8 +101,8 @@ Give this template a descriptive name so that you'll know what it is when you're
         },
 
         'show in forms description' => {
-                message => q|Should this template be shown in the list of template from this namespace?|,
-                lastUpdated => 1146455503,
+                message => q|Should this template be shown in the list of templates from this namespace?|,
+                lastUpdated => 1167193231,
         },
 
         'template description' => {

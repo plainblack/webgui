@@ -612,8 +612,8 @@ for this task.  Otherwise, just the start date will be displayed as text.|,
 
 	'task.dependants' => {
 		message => q|If the user is in the group to add projects, then this will be a form field to edit the dependants
-for this task.  Otherwise, just the list of dependants will be displayed as text.|,
-		lastUpdated => 1149824991,
+for this task.  Otherwise, just the list of dependents will be displayed as text.|,
+		lastUpdated => 1167193910,
 	},
 
 	'task.end' => {
@@ -635,8 +635,8 @@ Otherwise, just the duration will be displayed as text.|,
 	},
 
 	'task.isMilestone' => {
-		message => q|A conditiional indicating whether or not this task is a milestone.|,
-		lastUpdated => 1149824991,
+		message => q|A conditional indicating whether or not this task is a milestone.|,
+		lastUpdated => 1167193927,
 	},
 
 	'task.edit.url' => {

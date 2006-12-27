@@ -773,9 +773,9 @@ our $I18N = {
 
 	'4' => {
 		message => q|<p>Surveys allow you to gather information from your users. In the case of WebGUI surveys, you can also use them to test your user's knowledge.</p>
-<p>Surveys are Wobjects and Assets, so they have the properties of both.  Survery have these unique properties:</p>
+<p>Surveys are Wobjects and Assets, so they have the properties of both.  Surveys have these unique properties:</p>
 |,
-		lastUpdated => 1119849727
+		lastUpdated => 1167193063
 	},
 
         'view template description' => {
@@ -840,9 +840,9 @@ correct and what percentage answered were correct.|,
         },
 
         'what next description' => {
-                message => q|After creating a new Survey, you may either starting adding questions or go back to the page where
+                message => q|After creating a new Survey, you may either start adding questions or go back to the page where
 the survey was added.|,
-                lastUpdated => 1146455560,
+                lastUpdated => 1167193079,
         },
 
 
@@ -1004,8 +1004,8 @@ the survey was added.|,
 	},
 
 	'duration.seconds' => {
-		message => q|The remainder seconds the duration.minutes calculations.|,
-		lastUpdated => 1149654822,
+		message => q|The left over seconds from the duration.minutes.|,
+		lastUpdated => 1167193028,
 	},
 
 	'duration.seconds.label' => {

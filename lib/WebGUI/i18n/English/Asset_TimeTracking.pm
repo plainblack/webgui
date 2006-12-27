@@ -399,8 +399,8 @@ our $I18N = {
 		},
 
 		'time.entry.loop' => {
-			lastUpdated => 0,
-			message => q|A loop containing information and form elements for each task worked on during the week.  If a task is marked as complete, then that row in the loop will contain readonly status information for that task.  Otherwise a form elements will be generated for the user to enter status information.  Status information includes the project worked on, the task in the project that was worked on, on which days work was performed and the number of hours of work that were done.|,
+			lastUpdated => 1167193420,
+			message => q|A loop containing information and form elements for each task worked on during the week.  If a task is marked as complete, then that row in the loop will contain read only status information for that task.  Otherwise a form elements will be generated for the user to enter status information.  Status information includes the project worked on, the task in the project that was worked on, on which days work was performed and the number of hours of work that were done.|,
 		},
 
 		'row.id' => {
@@ -439,8 +439,8 @@ our $I18N = {
 		},
 
 		'entry.hours' => {
-			lastUpdated => 0,
-			message => q|This is similar to form.hours, except that it always contains the number ofhours entered by the user for work done on this task on a day.  If no hours have been entered, it will be 0.|,
+			lastUpdated => 1167193506,
+			message => q|This is similar to form.hours, except that it always contains the number of hours entered by the user for work done on this task on a day.  If no hours have been entered, it will be 0.|,
 		},
 
 		'manage projects body' => {

@@ -53,8 +53,8 @@ our $I18N = {
 
         '472 description' => {
                 message => q|A short, descriptive label displayed to the user.  This can be a call to WebGUI's
-Internationalizaton system if labels need to be localized.|,
-                lastUpdated => 1122316558,
+Internationalization system if labels need to be localized.|,
+                lastUpdated => 1167193730,
         },
 
         '474 description' => {
