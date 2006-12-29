@@ -239,6 +239,7 @@ sub getLatestWebguiVersion {
         my $currentversionUserAgent = new LWP::UserAgent;
 	$currentversionUserAgent->agent("WebGUI-Check/2.1");
         $currentversionUserAgent->timeout(30);
+        $currentversionUserAgent->env_proxy();
         my $header = new HTTP::Headers;
         my $referer = "http://".`hostname`."/webgui-cli-version";
         chomp $referer;
