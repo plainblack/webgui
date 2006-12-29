@@ -79,8 +79,8 @@ to do you want to go to the new Folder?</p>|,
 	},
 
 	'subfolder_loop' => {
-		message => q|A loop containing all Folder assets which are children of the Folder.|,
-		lastupdated => 0,
+		message => q|A loop containing all Folder assets which are children of the Folder.  The order of the Folders will be determined by the Sort Alphabetically flag in the edit screen.|,
+		lastupdated => 1167417470,
 		context => q|Template variable description.|
 	},
 
@@ -115,8 +115,8 @@ to do you want to go to the new Folder?</p>|,
 	},
 
 	'file_loop' => {
-		message => q|A loop containing all non-Folder assets which are children of the Folder.|,
-		lastupdated => 0,
+		message => q|A loop containing all non-Folder assets which are children of the Folder.  The order of the Folders will be determined by the Sort Alphabetically flag in the edit screen.|,
+		lastupdated => 1167417468,
 		context => q|Template variable description.|
 	},
 
@@ -226,6 +226,34 @@ to do you want to go to the new Folder?</p>|,
 		message => q|Add files.|,
 		lastUpdated => 1146649269,
 	},
+
+	'asset template variables title' => {
+		message => q|Folder Asset Template Variables|,
+		lastUpdated => 1167416930
+	},
+
+	'asset template variables body' => {
+		message => q|Every asset provides a set of variables to most of its
+templates based on the internal asset properties.  Some of these variables may
+be useful, others may not.|,
+		lastUpdated => 1167416933
+	},
+
+	'sortAlphabetically' => {
+		message => q|A conditional that indicates that subfolders and files will be sorted alphabetically.|,
+		lastUpdated => 1167416930
+	},
+
+	'templateId' => {
+		message => q|The ID of the template used to display the Folder contents.|,
+		lastUpdated => 1167416930
+	},
+
+	'visitorCacheTimeout' => {
+		message => q|In seconds, how long output from this Asset will be cached.|,
+		lastUpdated => 1167416930
+	},
+
 };
 
 1;

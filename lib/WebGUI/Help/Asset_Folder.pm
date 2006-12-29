@@ -23,6 +23,11 @@ our $HELP = {
                                 description => 'folder template description',
 				namespace => 'Asset_Folder',
                         },
+                        {
+                                title => 'sort alphabetically',
+                                description => 'sort alphabetically help',
+				namespace => 'Asset_Folder',
+                        },
 		],
 		related => [
 			{
@@ -37,8 +42,8 @@ our $HELP = {
 		body => 'folder template body',
 		isa => [
 			{
-				namespace => "Asset_Wobject",
-				tag => "wobject template variables"
+				namespace => "Asset_Folder",
+				tag => "folder template asset variables"
 			},
 		],
 		fields => [ ],
@@ -105,6 +110,39 @@ our $HELP = {
 					}
 				],	
 			}
+		],
+		related => [
+			{
+				tag => 'folder add/edit',
+				namespace => 'Asset_Folder',
+			},
+			{
+				tag => 'template language',
+				namespace => 'Asset_Template',
+			},
+		]
+	},
+
+        'folder template asset variables' => {
+		title => 'asset template variables title',
+		body => 'asset template variables body',
+		isa => [
+			{
+				namespace => "Asset_Wobject",
+				tag => "wobject template variables"
+			},
+		],
+		fields => [ ],
+		variables => [
+			{
+				name => 'sortAlphabetically',
+			},
+			{
+				name => 'templateId',
+			},
+			{
+				name => 'visitorCacheTimeout',
+			},
 		],
 		related => [
 			{

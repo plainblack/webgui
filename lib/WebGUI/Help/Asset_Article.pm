@@ -161,6 +161,10 @@ our $HELP = {
 		title => 'article asset template variables title',
 		body => 'article asset template variables body',
 		isa => [
+			{
+				namespace => "Asset_Wobject",
+				tag => "wobject template variables"
+			},
 		],
 		fields => [
 		],
