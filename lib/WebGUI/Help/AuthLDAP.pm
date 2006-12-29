@@ -139,10 +139,6 @@ our $HELP = {
 				tag => 'ldap authentication display account template',
 				namespace => 'AuthLDAP'
 			},
-			{
-				tag => 'wobject template',
-				namespace => 'Asset_Wobject'
-			},
 		]
 	},
 

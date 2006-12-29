@@ -119,10 +119,6 @@ our $HELP = {
 		          }
 		],
 		related => [
-			{
-				tag => 'wobject template',
-				namespace => 'Asset_Wobject'
-			}
 		]
 	},
 	'webgui authentication password recovery template' => {
@@ -202,10 +198,6 @@ our $HELP = {
 		fields => [
 		],
 		related => [
-			{
-				tag => 'wobject template',
-				namespace => 'Asset_Wobject'
-			}
 		]
 	},
 	'webgui authentication password expiration template' => {
@@ -252,10 +244,6 @@ our $HELP = {
 		fields => [
 		],
 		related => [
-			{
-				tag => 'wobject template',
-				namespace => 'Asset_Wobject'
-			}
 		]
 	},
 	'webgui deactivate account template' => {
