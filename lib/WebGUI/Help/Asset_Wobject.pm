@@ -98,12 +98,6 @@ our $HELP = {
 			{
 				'name' => 'assetId'
 			},
-			{
-				'name' => 'isShortcut'
-			},
-			{
-				'name' => 'originalURL'
-			},
 		],
 		related => [
 			{
@@ -116,6 +110,40 @@ our $HELP = {
 			},
 		]
 	},
+
+	'wobject template variables' => {
+		title => 'wobject template variables title',
+		body => 'wobject template variables body',
+		isa => [
+			{
+				tag => 'asset template asset variables',
+				namespace => 'Asset'
+			},
+		],
+		fields => [
+		],
+		variables => [
+			{
+				'name' => 'displayTitle'
+			},
+			{
+				'name' => 'description'
+			},
+			{
+				'name' => 'styleTemplateId'
+			},
+			{
+				'name' => 'printableStyleTemplateId'
+			},
+		],
+		related => [
+			{
+				tag => 'template language',
+				namespace => 'Asset_Template'
+			},
+		]
+	},
+
 };
 
 1;

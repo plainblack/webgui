@@ -245,7 +245,7 @@ our $HELP = {
 		isa => [
 			{
 				namespace => "Asset_Wobject",
-				tag => "wobject template"
+				tag => "wobject template variables"
 			},
 			{
 				namespace => "Asset",

@@ -22,9 +22,14 @@ our $I18N = {
 		lastUpdated => 1148750705,
 	},
 
-	'isShortcut' => {
-		message => q|A conditional indicating if this wobject is a shortcut to an original asset.|,
-		lastUpdated => 1148750705,
+	'styleTemplateId' => {
+		message => q|The assetId of the template for displaying the Asset.|,
+		lastUpdated => 1167374549,
+	},
+
+	'printableStyleTemplateId' => {
+		message => q|The assetId of the template for displaying the Asset for printing.|,
+		lastUpdated => 1167374550,
 	},
 
 	'originalURL' => {
@@ -149,6 +154,19 @@ is displayed as part of a Layout Asset, the Layout Asset's <b>Style Template</b>
                 message => q|Edit|,
                 lastUpdated => 1128575345,
         },
+
+	'wobject template variables title' => {
+		message => q|Wobject Template Asset Variables|,
+		lastUpdated => 1167374430,
+	},
+
+	'wobject template variables body' => {
+		message => q|<p>These template variables are common to almost every Wobject and include all the template variables common to Assets.  Many of them are internal asset properties that govern behavior and may not be very useful for templates.  One example of this would be the ID of templates used to display the Asset.  Depending on whether or not the user filled out the fields, they may or may not be blank.</p>
+|,
+		lastUpdated => 1167374417,
+	},
+
+
 
 };
 

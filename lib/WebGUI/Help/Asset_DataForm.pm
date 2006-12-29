@@ -184,7 +184,7 @@ our $HELP = {
 				tag => "template variables"
 			},
 			{
-				tag => 'wobject template',
+				tag => 'wobject template variables',
 				namespace => 'Asset_Wobject'
 			}
 		],
@@ -429,7 +429,7 @@ our $HELP = {
 				tag => "template variables"
 			},
 			{
-				tag => 'wobject template',
+				tag => 'wobject template variables',
 				namespace => 'Asset_Wobject'
 			}
 		],
