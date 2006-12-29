@@ -39,6 +39,10 @@ our $HELP = {
 		body => 'layout template body',
 		isa => [
 			{
+				namespace => "Asset_Layout",
+				tag => "layout template asset variables"
+			},
+			{
 				namespace => "Asset_Template",
 				tag => "template variables"
 			},
@@ -68,12 +72,40 @@ our $HELP = {
 		                             }
 		                           ]
 		          },
+		],
+		fields => [
+		],
+		related => [
+			{
+				tag => 'layout add/edit',
+				namespace => 'Asset_Layout'
+			},
+			{
+				tag => 'template language',
+				namespace => 'Asset_Template'
+			},
+		]
+	},
+
+        'layout template asset variables' => {
+		title => 'layout asset template variables title',
+		body => 'layout asset template variables body',
+		isa => [
+			{
+				namespace => "Asset_Wobject",
+				tag => "wobject template variables"
+			},
+		],
+		variables => [
 		          {
-		            'name' => 'attachment.size'
+		            'name' => 'templateId'
 		          },
 		          {
-		            'name' => 'attachment.type'
-		          }
+		            'name' => 'assetsToHide'
+		          },
+		          {
+		            'name' => 'contentPositions'
+		          },
 		],
 		fields => [
 		],

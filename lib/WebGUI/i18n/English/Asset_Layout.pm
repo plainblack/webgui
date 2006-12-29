@@ -77,16 +77,6 @@ specifically placed are put inside of position 1.|,
 		lastUpdated => 1148963207,
 	},
 
-	'attachment.size' => {
-		message => q|The size of the file.|,
-		lastUpdated => 1148963207,
-	},
-
-	'attachment.type' => {
-		message => q|The type of the file (PDF, etc.)|,
-		lastUpdated => 1148963207,
-	},
-
 	'layout template body' => {
                 message => q|<p>The following variables are available in Page Layout Templates:</p>
 		|,
@@ -107,6 +97,38 @@ specifically placed are put inside of position 1.|,
 	'847' => {
 		message => q|Go back to the current page.|,
 		lastUpdated => 1039587250
+	},
+
+	'layout asset template variables title' => {
+		message => q|Layout Asset Template Variables|,
+		lastUpdated => 1167425005
+	},
+
+	'layout asset template variables body' => {
+		message => q|Every asset provides a set of variables to most of its
+templates based on the internal asset properties.  Some of these variables may
+be useful, others may not.|,
+		lastUpdated => 1167425006
+	},
+
+	'templateId' => {
+		message => q|The Id of the template used to display this Asset.|,
+		lastUpdated => 1164841027
+	},
+
+	'assetsToHide' => {
+		message => q|The asset ID's of all Assets that should not be displayed in this Asset, separated by Unix-style newline characters.|,
+		lastUpdated => 1164841027
+	},
+
+	'contentPositions' => {
+		message => q|A string representing the different places for assets to be displayed, and which assets go in which place in the correct order.|,
+		lastUpdated => 1164841027
+	},
+
+	'templateId' => {
+		message => q|The Id of the template used to display this Asset.|,
+		lastUpdated => 1164841027
 	},
 
 };
