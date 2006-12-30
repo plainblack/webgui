@@ -73,10 +73,6 @@ our $HELP = {
 				namespace => 'Asset_Navigation'
 			},
 			{
-				tag => 'navigation manage',
-				namespace => 'Asset_Navigation'
-			},
-			{
 				tag => 'template add/edit',
 				namespace => 'Asset_Template'
 			}
@@ -86,7 +82,11 @@ our $HELP = {
 	'navigation template' => {
 		title => '1096',
 		body => '1097',
-		fields => [
+		isa => [
+			{
+				namespace => "Asset_Navigation",
+				tag => "navigation asset template variables"
+			},
 		],
 		variables => [
 		          {
@@ -289,7 +289,61 @@ our $HELP = {
 				namespace => 'Asset_Navigation'
 			},
 			{
-				tag => 'navigation manage',
+				tag => 'template language',
+				namespace => 'Asset_Template'
+			}
+		]
+	},
+
+	'navigation asset template variables' => {
+		title => 'navigation asset template variables title',
+		body => 'navigation asset template variables body',
+		isa => [
+			{
+				namespace => "Asset_Wobject",
+				tag => "wobject template variables"
+			},
+		],
+		fields => [
+		],
+		variables => [
+		          {
+		            'name' => 'templateId'
+		          },
+		          {
+		            'name' => 'mimeType variable'
+		          },
+		          {
+		            'name' => 'assetsToInclude'
+		          },
+		          {
+		            'name' => 'startType'
+		          },
+		          {
+		            'name' => 'startPoint'
+		          },
+		          {
+		            'name' => 'ancestorEndPoint'
+		          },
+		          {
+		            'name' => 'descendantEndPoint'
+		          },
+		          {
+		            'name' => 'showSystemPages'
+		          },
+		          {
+		            'name' => 'showHiddenPages'
+		          },
+		          {
+		            'name' => 'showUnprivilegedPages'
+		          },
+		          {
+		            'name' => 'reversePageLoop'
+		          },
+		],
+		related => [
+			{
+				tag => 'navigation add/edit',
 				namespace => 'Asset_Navigation'
 			},
 			{
@@ -299,22 +353,6 @@ our $HELP = {
 		]
 	},
 
-	'navigation manage' => {
-		title => '1094',
-		body => '1095',
-		fields => [
-		],
-		related => [
-			{
-				tag => 'navigation template',
-				namespace => 'Asset_Navigation'
-			},
-			{
-				tag => 'navigation add/edit',
-				namespace => 'Asset_Navigation'
-			}
-		]
-	},
 };
 
 1;

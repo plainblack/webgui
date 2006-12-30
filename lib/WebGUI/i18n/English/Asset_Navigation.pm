@@ -205,7 +205,7 @@ vertical, horizontal and crumbtrail.  These templates can often be styled via CS
 of rewriting the templates.</p>
 <p>The Navigation Asset can also be used to generate XML output by creating a
 template and setting the MIME Type appropriately.  This could be useful for building
-a Google sitemap of your site.</p>
+a Google sitemap of your site or RSS feeds.</p>
 |,
 
 		lastUpdated => 1140139614,
@@ -552,23 +552,6 @@ given page inside of the <b>page_loop</b></p>
 		lastUpdated => 1163720438,
 	},
 
-	'1094' => {
-		message => q|Navigation, Manage|,
-		lastUpdated => 1078208044
-	},
-
-	'1095' => {
-		message => q|<p>The general idea behind the navigation system is that instead of hardwiring all the various choices you might make into the code, the system manages a 'library' of these styles, just the way it does with Snippets, Images, Templates, Page Styles, and other types of reusable information.  You can create a new 'Navigation menu style', give it a name, and then use it anywhere on your site that you like.</p>
-<p>The navigation system consists of two parts:</p>
-<ol>
-<li>The <strong>&#94;Navigation();</strong> macro, which determines which files may be included in the menu and which template to use.</li>
-<li>The Navigation Template, which creates the menu and presents it to the user.</li>
-</ol>
-<p>To create a new menu for your site, place a <b>&#94;Navigation(myMenu);</b> macro into a style. An "edit myMenu" link will be displayed if "myMenu" is not defined. </p>
-<p>Note: In this example "myMenu" is used, but you can pick any name, as long as it is unique.</p>|,
-		lastUpdated => 1101774239
-	},
-
 	'mimeType' => {
 		message => q|MIME Type|,
         	lastUpdated => 1140129010,
@@ -579,6 +562,74 @@ given page inside of the <b>page_loop</b></p>
                 message => q|Allows you to specify the MIME type of this asset when viewed via the web; useful if you'd like to serve CSS, plain text,  javascript or other text files directly from the WebGUI asset system. Defaults to <b>text/html</b>.|,
                 lastUpdated => 1140129008,
         },
+
+	'navigation asset template variables title' => {
+		message => q|Navigation Asset Template Variables|,
+		lastUpdated => 1164841146
+	},
+
+	'navigation asset template variables body' => {
+		message => q|Every asset provides a set of variables to most of its
+templates based on the internal asset properties.  Some of these variables may
+be useful, others may not.|,
+		lastUpdated => 1164841201
+	},
+
+	'templateId' => {
+		message => q|The ID of the template used to display this Navigation|,
+		lastUpdated => 1164841201
+	},
+
+	'mimeType variable' => {
+		message => q|The MIME type of the page containing the Navigation.|,
+		lastUpdated => 1164841201
+	},
+
+	'assetsToInclude' => {
+		message => q|An newline separated string containg the kids of assets to include in the Navigation, by relationship.  Ancestors, the asset itself, siblings, descendents and/or pedigree.|,
+		lastUpdated => 1164841201
+	},
+
+	'startType' => {
+		message => q|A string that describes how the Navigation will be told to start finding Assets to display, "specificUrl", "relateiveToCurrentUrl", "relativeToRoot"|,
+		lastUpdated => 1164841201,
+		context => q|Note to translators, the strings in quotes should not be translated.|
+	},
+
+	'startPoint' => {
+		message => q|Depending on startType, this is specifies at which page the Navigation will begin listing Assets.|,
+		lastUpdated => 1164841201,
+	},
+
+	'ancestorEndPoint' => {
+		message => q|Depending on the startType, how many levels up to begin listing Assets in the Navigation.|,
+		lastUpdated => 1164841201,
+	},
+
+	'descendantEndPoint' => {
+		message => q|Depending on the startType, how many levels down to go before stopping the list of Assets for the Navigation.|,
+		lastUpdated => 1164841201,
+	},
+
+	'showSystemPages' => {
+		message => q|Whether or not the Navigation has been configured to display system pages, like the Trash.|,
+		lastUpdated => 1164841201,
+	},
+
+	'showHiddenPages' => {
+		message => q|Whether or not the Navigation has been configured to display Assets that are set to be hidden from Navigations.|,
+		lastUpdated => 1164841201,
+	},
+
+	'showUnprivilegedPages' => {
+		message => q|Whether or not the Navigation has been configured to display Assets that the current user is not allowed to see.|,
+		lastUpdated => 1164841201,
+	},
+
+	'reversePageLoop' => {
+		message => q|Whether or not the Navigation has been configured to display Assets depth first, instead of top to bottom.|,
+		lastUpdated => 1164841201,
+	},
 
 };
 
