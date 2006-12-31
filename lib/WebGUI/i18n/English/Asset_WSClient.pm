@@ -300,6 +300,11 @@ names set for them by the SOAP server (i.e. perhaps "localTime" for a time query
 		lastUpdated => 1033575504
 	},
 
+	'soapError' => {
+		message => q|If there were errors while fetching the SOAP|,
+		lastUpdated => 1167532858
+	},
+
 };
 
 1;

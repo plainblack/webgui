@@ -101,11 +101,14 @@ our $HELP = {
 		            'name' => 'disableWobject'
 		          },
 		          {
+		            'name' => 'numResults'
+		          },
+		          {
+		            'name' => 'soapError'
+		          },
+		          {
 		            'name' => 'results',
 		            'variables' => [
-		                             {
-		                               'name' => 'numResults'
-		                             },
 		                             {
 		                               'name' => 'firstPage'
 		                             },
