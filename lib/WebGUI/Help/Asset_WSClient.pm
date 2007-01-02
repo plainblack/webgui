@@ -96,6 +96,12 @@ our $HELP = {
 	'ws client template' => {
 		title => '72',
 		body => '73',
+		isa => [
+			{
+				tag => 'pagination template variables',
+				namespace => 'WebGUI'
+			},
+		],
 		variables => [
 		          {
 		            'name' => 'disableWobject'
@@ -108,33 +114,7 @@ our $HELP = {
 		          },
 		          {
 		            'name' => 'results',
-		            'variables' => [
-		                             {
-		                               'name' => 'firstPage'
-		                             },
-		                             {
-		                               'name' => 'lastPage'
-		                             },
-		                             {
-		                               'name' => 'nextPage'
-		                             },
-		                             {
-		                               'name' => 'pageList'
-		                             },
-		                             {
-		                               'name' => 'previousPage'
-		                             },
-		                             {
-		                               'name' => 'multiplePages'
-		                             },
-		                             {
-		                               'name' => 'numberOfPages'
-		                             },
-		                             {
-		                               'name' => 'pageNumber'
-		                             }
-		                           ]
-		          }
+		          },
 		],
 		fields => [
 		],

@@ -234,46 +234,6 @@ names set for them by the SOAP server (i.e. perhaps "localTime" for a time query
 		lastUpdated => 1149568071,
 	},
 
-	'firstPage' => {
-		message => q|Link to first page in a paginated set.|,
-		lastUpdated => 1149568071,
-	},
-
-	'lastPage' => {
-		message => q|Link to last page in a paginated set.|,
-		lastUpdated => 1149568071,
-	},
-
-	'nextPage' => {
-		message => q|Link to next page in a paginated set.|,
-		lastUpdated => 1149568071,
-	},
-
-	'pageList' => {
-		message => q|List of all pages in a paginated set.|,
-		lastUpdated => 1149568071,
-	},
-
-	'previousPage' => {
-		message => q|Link to previous page in a paginated set.|,
-		lastUpdated => 1149568071,
-	},
-
-	'multiplePages' => {
-		message => q|Boolean indicating multiple pages in a paginated set.|,
-		lastUpdated => 1149568071,
-	},
-
-	'numberOfPages' => {
-		message => q|Number of pages in a paginated set.|,
-		lastUpdated => 1149568071,
-	},
-
-	'pageNumber' => {
-		message => q|Current page number in a paginated set.|,
-		lastUpdated => 1149568071,
-	},
-
 	'73' => {
 		message => q|<p>This is the list of template variables available for Web Services Client templates.</p>
 |,

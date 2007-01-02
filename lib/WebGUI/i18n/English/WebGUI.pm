@@ -2363,16 +2363,6 @@ div.tabs {
 		lastUpdated => 1149182026,
 	},
 
-	'pagination.url' => {
-		message => q|The URL of page X, where X is the number in the loop we're at.|,
-		lastUpdated => 1149182026,
-	},
-
-	'pagination.text' => {
-		message => q|The number of page X, where X is the number in the loop we're at.|,
-		lastUpdated => 1149182026,
-	},
-
 	'pagination.pageList.upTo10' => {
 		message => q|A list of links to the 10 nearest in the paginator relative to the current page. So if you're on page 20, you'll see links for 15-25.|,
 		lastUpdated => 1149182026,
@@ -2382,17 +2372,6 @@ div.tabs {
 		message => q|Same as pagination.pageList.upTo10 except broken into individual elements.|,
 		lastUpdated => 1149182026,
 	},
-
-	'pagination.url' => {
-		message => q|The URL of page X, where X is the number in the loop we're at.|,
-		lastUpdated => 1149182026,
-	},
-
-	'pagination.text' => {
-		message => q|The number of page X, where X is the number in the loop we're at.|,
-		lastUpdated => 1149182026,
-	},
-
 
 	'1086' => {
 		message => q|<p>Many wobjects have pagination features. Though some wobjects define their own pagination variables, most use a common set of pagination variables:</p>

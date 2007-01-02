@@ -760,10 +760,10 @@ our $HELP = {
 		          },
 		          {
 		            'name' => 'pagination.pageList',
+		          },
+		          {
+		            'name' => 'pagination.pageLoop',
 		            'variables' => [
-		                             {
-		                               'name' => 'pagination.pageLoop'
-		                             },
 		                             {
 		                               'name' => 'pagination.url'
 		                             },
