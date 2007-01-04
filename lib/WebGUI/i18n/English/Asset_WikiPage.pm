@@ -207,11 +207,6 @@ our $I18N =
                 lastUpdated => 1166846242,
         },
 
-        'isProtected' => {
-                message => q|A boolean which will be true if this WikiPage has been protected.|,
-                lastUpdated => 1166846242,
-        },
-
         'actionTaken' => {
                 message => q|The action taken to produce the current version of the WikiPage.  On a brand new page, this will be "Created".  Otherwise it will be "Edited".|,
                 lastUpdated => 1166846242,
