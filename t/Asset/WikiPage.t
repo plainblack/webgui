@@ -27,7 +27,11 @@ my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Wiki Test"});
 
 my $wiki = $node->addChild({className=>'WebGUI::Asset::Wobject::WikiMaster'});
+$versionTag->commit;
 my $wikipage = $wiki->addChild({className=>'WebGUI::Asset::WikiPage'});
+
+# Wikis create and autocommit a version tag when a child is added.  Lets get the name so we can roll it back.
+my $secondVersionTag = WebGUI::VersionTag->new($session,$wikipage->get("tagId"));
 
 # Test for sane object types
 isa_ok($wiki, 'WebGUI::Asset::Wobject::WikiMaster');
@@ -41,5 +45,6 @@ TODO: {
 END {
 	# Clean up after thy self
 	$versionTag->rollback($versionTag->getId);
+	$secondVersionTag->rollback($secondVersionTag->getId);
 }
 

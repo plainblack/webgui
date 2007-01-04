@@ -27,6 +27,7 @@ my $node = WebGUI::Asset->getImportNode($session);
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Calendar Test"});
+
 my $cal = $node->addChild({className=>'WebGUI::Asset::Wobject::Calendar'});
 $versionTag->commit();
 
@@ -36,6 +37,9 @@ isa_ok($cal, 'WebGUI::Asset::Wobject::Calendar');
 # Test addChild to make sure we can only add Event assets as children to the calendar
 my $event = $cal->addChild({className=>'WebGUI::Asset::Event'});
 isa_ok($event, 'WebGUI::Asset::Event','Can add Events as a child to the calendar.');
+
+# Calendars create and autocommit a version tag when a child is added.  Lets get the name so we can roll it back.
+my $secondVersionTag = WebGUI::VersionTag->new($session, $event->get("tagId"));
 
 my $article = $cal->addChild({className=>"WebGUI::Asset::Wobject::Article"});
 isnt(ref $article, 'WebGUI::Asset::Wobject::Article', "Can't add an article as a child to the calendar.");
@@ -49,6 +53,7 @@ TODO: {
 
 END {
 	# Clean up after thy self
-	$versionTag->rollback($versionTag->getId);
+	$versionTag->rollback();
+	$secondVersionTag->rollback();
 }
 
