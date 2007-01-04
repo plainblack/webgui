@@ -1,3 +1,6 @@
+7.3.4
+
+
 7.3.3
  - fix: Wiki Purge throws fatal
  - fix: Calendar now reports proper product ID on iCal feed
