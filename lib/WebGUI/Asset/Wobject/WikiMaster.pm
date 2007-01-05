@@ -112,7 +112,33 @@ sub autolinkHtml {
 #-------------------------------------------------------------------
 sub canAdminister {
 	my $self = shift;
-	return $self->session->user->isInGroup($self->get('groupToAdminister')) || $self->canEdit;
+	return $self->session->user->isInGroup($self->get('groupToAdminister')) || $self->SUPER::canEdit;
+}
+
+#-------------------------------------------------------------------
+
+=head2 canEdit ( )
+
+Overriding canEdit method to check permissions correctly when someone is adding a wikipage
+
+=cut
+
+sub canEdit {
+        my $self = shift;
+        return (
+                (
+                        (
+                                $self->session->form->process("func") eq "add" ||
+                                (
+                                        $self->session->form->process("assetId") eq "new" &&
+                                        $self->session->form->process("func") eq "editSave" &&
+                                        $self->session->form->process("class") eq "WebGUI::Asset::WikiPage"
+                                )
+                        ) &&
+                        $self->canEditPages
+                ) || # account for new posts
+                $self->SUPER::canEdit()
+        );
 }
 
 #-------------------------------------------------------------------

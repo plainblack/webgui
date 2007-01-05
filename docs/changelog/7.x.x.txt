@@ -3,6 +3,7 @@
  - fix: Daily recurring payment reports should now be sent to the 
         configured "commerceSendDailyReportTo" address.
  - fix: Closed Posts Displaying in CS
+ - fix: Cannot add new page to the Wiki
 
 7.3.3
  - fix: Wiki Purge throws fatal
