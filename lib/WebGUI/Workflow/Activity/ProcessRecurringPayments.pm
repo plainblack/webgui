@@ -98,7 +98,7 @@ sub execute {
 		if ($term > $transaction->lastPayedTerm) {
 			my $payment = WebGUI::Commerce::Payment->load($self->session, $transaction->gateway);
  			$transaction->gatewayId;
-			my $status = $payment->getRecurringPaymentStatus($self->session, $transaction->gatewayId, $term);
+			my $status = $payment->getRecurringPaymentStatus($transaction->gatewayId, $term);
 			my $output = $item->name." (tid: ".$transaction->get('transactionId').") ";
 		        $output .= " by user ".WebGUI::User->new($self->session, $transaction->get("userId"))->username." (uid: ".$transaction->get("userId").") ";
 			$output .= " for term ". sprintf('% 6d', $term)." "; 
