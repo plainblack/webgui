@@ -1076,16 +1076,34 @@ sub view {
 	$var{"search.url"} = $self->getSearchUrl;
 	$var{"subscribe.url"} = $self->getSubscribeUrl;
 	$var{"unsubscribe.url"} = $self->getUnsubscribeUrl;
-	my $sql = "select asset.assetId,asset.className,assetData.revisionDate as revisionDate
-		from Thread
-		left join asset on Thread.assetId=asset.assetId
-		left join Post on Post.assetId=Thread.assetId and Thread.revisionDate = Post.revisionDate
-		left join assetData on assetData.assetId=Thread.assetId and Thread.revisionDate = assetData.revisionDate
-		where asset.parentId=".$self->session->db->quote($self->getId)." and asset.state='published' and 
-		asset.className='WebGUI::Asset::Post::Thread' and assetData.revisionDate=(SELECT max(revisionDate) from assetData 
-			where assetData.assetId=asset.assetId and (assetData.status='approved'  
-			or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag"))."))
-		group by assetData.assetId order by Thread.isSticky desc, ".$sortBy." ".$sortOrder;
+	my $sql = "
+		select 
+			asset.assetId,
+			asset.className,
+			assetData.revisionDate as revisionDate 
+		from Thread 
+			left join asset on Thread.assetId=asset.assetId 
+			left join Post on Post.assetId=Thread.assetId and Thread.revisionDate = Post.revisionDate 
+			left join assetData on assetData.assetId=Thread.assetId and Thread.revisionDate = assetData.revisionDate 
+		where 
+			asset.parentId=".$self->session->db->quote($self->getId)." 
+			and asset.state='published' 
+			and asset.className='WebGUI::Asset::Post::Thread' 
+			and assetData.revisionDate=(
+				SELECT 
+					max(revisionDate) 
+				from 
+					assetData 
+				where 
+					assetData.assetId=asset.assetId 
+					and (status='approved' or tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")).")
+				) 
+		group by 
+			assetData.assetId 
+		order by 
+			Thread.isSticky desc, 
+		".$sortBy." 
+			".$sortOrder;
 	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->get("threadsPerPage"));
 	$p->setDataByQuery($sql);
 	$self->appendPostListTemplateVars(\%var, $p);
