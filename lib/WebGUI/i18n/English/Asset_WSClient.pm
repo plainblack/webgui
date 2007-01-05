@@ -71,8 +71,8 @@ our $I18N = {
         },
 
         '5 description' => {
-                message => q|<p>If your SOAP call requires any additional parameters, include them here as a valid Perl hash, array or scalar.  For example: <code>'userid' => '12', companyid => '&#94;FormParam("companyid");  Whether you need to use scalar, hash or array is entirely dependent on what your SOAP service expects as input.  Likewise, what you get back is entirely dependent on what the service deems to return.'</code>.</p>|,
-                lastUpdated => 1119981444,
+                message => q|<p>If your SOAP call requires any additional parameters, include them here as a valid Perl hash, array or scalar.  For example: <code>'userid' => '12',<br />companyid => '&#94;FormParam("companyid");'  Whether you need to use scalar, hash or array is entirely dependent on what your SOAP service expects as input.  Likewise, what you get back is entirely dependent on what the service deems to return.</code>.</p>|,
+                lastUpdated => 1167970155,
         },
 
         '16 description' => {
@@ -92,8 +92,8 @@ property allows you to override the default MIME type for this page.|,
         },
 
         '15 description' => {
-                message => q|<p>This option will only display if you have Data::Structure::Util installed.  SOAP calls return UTF8 strings even if they may not have UTF8 characters within them.  This converts UTF8 characters to that there aren't collisions with any character sets specified in the page header.  Decoding is turned off by default, but try turning it on if you see goofy gibberish, especially with the display of copyright symbols and the like.</p>|,
-                lastUpdated => 1119981444,
+                message => q|<p>This option will only display if you have Data::Structure::Util installed.  SOAP calls return UTF8 strings even if they may not have UTF8 characters within them.  This converts UTF8 characters so that there aren't collisions with any character sets specified in the page header.  Decoding is turned off by default, but try turning it on if you see goofy gibberish, especially with the display of copyright symbols and the like.</p>|,
+                lastUpdated => 1167970807,
         },
 
         '28 description' => {
@@ -102,8 +102,8 @@ property allows you to override the default MIME type for this page.|,
         },
 
         '27 description' => {
-                message => q|<p>Number of seconds a SOAP return will be cached.  Set to 1 to essentially skip caching.</p>|,
-                lastUpdated => 1119981444,
+                message => q|<p>The number of seconds returned SOAP results will be cached.  Set to 1 to essentially skip caching.</p>|,
+                lastUpdated => 1167970680,
         },
 
 	'26' => {
@@ -225,8 +225,8 @@ be set to true.|,
 	'results' => {
 		message => q|This loop contains all the results from
 the SOAP call.  Within the loop, you may access specific data elements by the
-names set for them by the SOAP server (i.e. perhaps "localTime" for a time query).  In addition, there are a number of special template variables:|,
-		lastUpdated => 1149568071,
+names set for them by the SOAP server (i.e. perhaps "localTime" for a time query).|,
+		lastUpdated => 1167971387,
 	},
 
 	'numResults' => {
@@ -261,8 +261,90 @@ names set for them by the SOAP server (i.e. perhaps "localTime" for a time query
 	},
 
 	'soapError' => {
-		message => q|If there were errors while fetching the SOAP|,
-		lastUpdated => 1167532858
+		message => q|This template variable will contain any errors from trying to fetch the SOAP content.|,
+		lastUpdated => 1167969800
+	},
+
+	'templateId' => {
+		message => q|The ID of the template used to display this Asset.|,
+		lastUpdated => 1167969800
+	},
+
+	'callMethod' => {
+		message => q|The name of the function to be invoked by the SOAP server.|,
+		lastUpdated => 1167969800
+	},
+
+	'debugMode' => {
+		message => q|A boolean indicating whether or not debug and error messages should be displayed.|,
+		lastUpdated => 1167969800
+	},
+
+	'execute_by_default' => {
+		message => q|A boolean indicating whether or not the WSClient was set to execute by default.|,
+		lastUpdated => 1167969800
+	},
+
+	'paginateAfter' => {
+		message => q|The number of rows of SOAP results to paginate.|,
+		lastUpdated => 1167969800
+	},
+
+	'paginateVar' => {
+		message => q|Determins which variable in the SOAP data returned by the will be used for pagination.|,
+		lastUpdated => 1167969800
+	},
+
+	'params' => {
+		message => q|Any user entered parameters, as perl code.|,
+		lastUpdated => 1167969800
+	},
+
+	'preprocessMacros' => {
+		message => q|If set to true, then macros in the params and callMethod will be evaluated.|,
+		lastUpdated => 1167969800
+	},
+
+	'proxy' => {
+		message => q|The full name of the SOAP server and/or script.|,
+		lastUpdated => 1167969800
+	},
+
+	'uri' => {
+		message => q|The URI of the SOAP server.|,
+		lastUpdated => 1167969800
+	},
+
+	'decodeUtf8' => {
+		message => q|Whether or not SOAP UTF8 results should be converted to the encoding used by the page.|,
+		lastUpdated => 1167969800
+	},
+
+	'httpHeader' => {
+		message => q|An alternate HTTP header that may be used to override the default MIME type for this page.|,
+		lastUpdated => 1167969800
+	},
+
+	'cacheTTL' => {
+		message => q|The number of seconds to cache SOAP results.|,
+		lastUpdated => 1167969800
+	},
+
+	'sharedCache' => {
+		message => q|A boolean indicating whether or not cached SOAP results will be shared between users or whether each user will have their own individual cache.|,
+		lastUpdated => 1167970639
+	},
+
+	'ws client asset template variables title' => {
+		message => q|Web Services Client Asset Template Variables|,
+		lastUpdated => 1164841146
+	},
+
+	'ws client asset template variables body' => {
+		message => q|Every asset provides a set of variables to most of its
+templates based on the internal asset properties.  Some of these variables may
+be useful, others may not.|,
+		lastUpdated => 1164841201
 	},
 
 };
