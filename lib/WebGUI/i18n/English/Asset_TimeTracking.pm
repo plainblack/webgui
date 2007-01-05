@@ -3,7 +3,7 @@ package WebGUI::i18n::English::Asset_TimeTracking;
 our $I18N = {
 		'extras' => {
 			lastUpdated => 1151295441,
-			message => q|URL to the TimeTracking area in the extras directory, wobject/TimeTracking|
+			message => q|URL to the TimeTracking area in the extras directory, wobject/TimeTracking.|
 		},
 
 		'project.manage.url' => {
@@ -79,7 +79,7 @@ our $I18N = {
 
 		'There must be at least one row.  Please add more rows if you wish to delete this one' => {
 			lastUpdated => 1150997998,
-			message => q|There must be at least one row.  Please add more rows if you wish to delete this one|
+			message => q|There must be at least one row.  Please add more rows if you wish to delete this one.|
 		},
 
 		'manage project available task label' => {
@@ -94,7 +94,7 @@ our $I18N = {
 
 		'No  name was entered for new task' => {
 			lastUpdated => 1150997998,
-			message => q|No  name was entered for new task|
+			message => q|No name was entered for new task|
 		},
 
 		'time report task label' => {
@@ -138,13 +138,13 @@ our $I18N = {
 		},
 
 		'edit project tasks hoverhelp' => {
-			lastUpdated => 0,
-			message => q|Enter the project tasks, one per line, that you would like to track time against for this project|
+			lastUpdated => 1168038748,
+			message => q|Enter the project tasks, one per line, that you would like to track time against for this project.|
 		},
 
 		'Choose yes to pull projects and task information from the various project management assets on your site' => {
 			lastUpdated => 1150997998,
-			message => q|Choose yes to pull projects and task information from the various project management assets on your site|
+			message => q|Choose yes to pull projects and task information from the various project management assets on your site.|
 		},
 
 		'The highlighted fields are required if you wish to submit this form.' => {
@@ -173,8 +173,8 @@ our $I18N = {
 		},
 
 		'edit project name hoverhelp' => {
-			lastUpdated => 0,
-			message => q|Enter the name of the project you wish to show up in the projects drop down menu for this time tracker|
+			lastUpdated => 1168038763,
+			message => q|Enter the name of the project you wish to show up in the projects drop down menu for this time tracker.|
 		},
 
 		'Report Complete' => {
@@ -188,8 +188,8 @@ our $I18N = {
 		},
 
 		'edit project resource hoverhelp' => {
-			lastUpdated => 0,
-			message => q|Choose the resources you would like to be able to log time to this project|
+			lastUpdated => 1168038772,
+			message => q|Choose the resources you would like to be able to log time to this project.|
 		},
 
 		'time report date label' => {
@@ -209,7 +209,7 @@ our $I18N = {
 
 		'This project cannot be deleted as it is currently being used by existing time entry records and would corrupt this data.  The records must be deleted if you wish to remove this project' => {
 			lastUpdated => 1150997998,
-			message => q|This project cannot be deleted as it is currently being used by existing time entry records and would corrupt this data.  The records must be deleted if you wish to remove this project|
+			message => q|This project cannot be deleted as it is currently being used by existing time entry records and would corrupt this data.  The records must be deleted if you wish to remove this project.|
 		},
 
 		'time report header' => {
@@ -233,13 +233,13 @@ our $I18N = {
 		},
 
 		'no project message' => {
-			lastUpdated => 0,
-			message => q|No projects created.  Click <a href="%s">here</a> to add a new project|
+			lastUpdated => 1168038789,
+			message => q|No projects created.  Click <a href="%s">here</a> to add a new project.|
 		},
 
 		'managerViewTemplate hoverhelp' => {
 			lastUpdated => 0,
-			message => q|Template to use for manager view of Time Tracker Application|
+			message => q|Template to use for manager view of Time Tracker Application.|
 		},
 
 		'add project label' => {
@@ -278,13 +278,13 @@ our $I18N = {
 		},
 
 		'timeRowTemplateId hoverhelp' => {
-			lastUpdated => 0,
-			message => q|Template to use for building rows in the time tracker|
+			lastUpdated => 1168038693,
+			message => q|Template to use for building rows in the time tracker.|
 		},
 
 		'groupToManage hoverhelp' => {
-			lastUpdated => 0,
-			message => q|Group that is able to view all time sheets and update completed time records|
+			lastUpdated => 1168038364,
+			message => q|The group that is able to view all time sheets and update completed time records.|
 		},
 
 		'edit project id label' => {
@@ -455,7 +455,43 @@ our $I18N = {
 <p>Tasks are individual to each project, and consist of only a name.  To add a new task to the project, enter a task name and hit the submit button.  To delete a task, use the delete button next to the task you delete in the list of tasks.</p>|,
 		},
 
-	};
+	'time tracking asset template variables title' => {
+		message => q|Time Tracking System Asset Template Variables|,
+		lastUpdated => 1164841146
+	},
 
+	'time tracking asset template variables body' => {
+		message => q|Every asset provides a set of variables to most of its
+templates based on the internal asset properties.  Some of these variables may
+be useful, others may not.|,
+		lastUpdated => 1164841201
+	},
+
+	'userViewTemplateId' => {
+		message => q|The template that will be used to display this asset to a general user.|,
+		lastUpdated => 1168038164
+	},
+
+	'managerViewTemplateId' => {
+		message => q|The template that will be used to display this asset to a manager.|,
+		lastUpdated => 1168038164
+	},
+
+	'timeRowTemplateId' => {
+		message => q|The ID of the template that makes 1 row in the time sheet.|,
+		lastUpdated => 1168038164
+	},
+
+	'groupToManage' => {
+		message => q|The ID of the group that is able to view all time sheets and updated completed time records.|,
+		lastUpdated => 1168038164
+	},
+
+	'pmIntegration' => {
+		message => q|A conditional indicating whether or not this Time Tracking Asset has been configured for integration with the Project Manager|,
+		lastUpdated => 1168038164
+	},
+
+};
 
 1;

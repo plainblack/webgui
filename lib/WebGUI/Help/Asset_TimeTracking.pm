@@ -77,6 +77,12 @@ our $HELP = {
 	'user view template variables' => {
 		title => 'user view template title',
 		body => 'user view template body',
+		isa => [
+			{
+				namespace => "Asset_Wobject",
+				tag => "wobject template variables"
+			},
+		],
 		variables => [
 			{
 				'name' => 'extras',
@@ -123,6 +129,12 @@ our $HELP = {
 	'time row template variables' => {
 		title => 'time row template title',
 		body => 'time row template body',
+		isa => [
+			{
+				namespace => "Asset_Wobject",
+				tag => "wobject template variables"
+			},
+		],
 		variables => [
 			{
 				'name' => 'extras',
@@ -203,6 +215,38 @@ our $HELP = {
 		],
 		related => [
 		],
+	},
+
+	'time tracking asset template variables' => {
+		title => 'time tracking asset template variables title',
+		body => 'time tracking asset template variables body',
+		isa => [
+			{
+				namespace => "Asset_Wobject",
+				tag => "wobject template variables"
+			},
+		],
+		fields => [
+		],
+		variables => [
+		          {
+		            'name' => 'userViewTemplateId'
+		          },
+		          {
+		            'name' => 'managerViewTemplateId'
+		          },
+		          {
+		            'name' => 'timeRowTemplateId'
+		          },
+		          {
+		            'name' => 'groupToManage',
+		          },
+		          {
+		            'name' => 'pmIntegration'
+		          },
+		        ],
+		related => [
+		]
 	},
 
 };
