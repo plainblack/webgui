@@ -80,7 +80,27 @@ our $I18N = {
 		lastUpdated => 1149565185,
 	},
 
+	'templateId' => {
+		message => q|The ID of the template that will be used to display this Asset.|,
+		lastUpdated => 1167972308,
+	},
 
+	'locations' => {
+		message => q|The list of locations entered by the user.|,
+		lastUpdated => 1167972310,
+	},
+
+	'weatherdata asset template variables title' => {
+		message => q|WeatherData Asset Template Variables|,
+		lastUpdated => 1167972337
+	},
+
+	'weatherdata asset template variables body' => {
+		message => q|Every asset provides a set of variables to most of its
+templates based on the internal asset properties.  Some of these variables may
+be useful, others may not.|,
+		lastUpdated => 1164841201
+	},
 
 };
 

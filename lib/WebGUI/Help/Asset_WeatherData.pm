@@ -32,6 +32,12 @@ our $HELP = {
 	'weatherdata template' => {
 		title => 'WeatherData template title',
 		body => 'WeatherData template description',
+		isa => [
+			{
+				tag => "weatherdata asset template variables",
+				namespace => 'Asset_WeatherData'
+			},
+		],
 		fields => [
 		],
 		variables => [
@@ -56,7 +62,7 @@ our $HELP = {
 		                           ]
 		          }
 		],
-	related => [
+		related => [
 			{
 				tag => 'weather data add/edit',
 				namespace => 'Asset_WeatherData'
@@ -67,6 +73,30 @@ our $HELP = {
 			}
 		]
 	},
+
+	'weatherdata asset template variables' => {
+		title => 'weatherdata asset template variables title',
+		body => 'weatherdata asset template variables body',
+		isa => [
+			{
+				tag => "wobject template variables",
+				namespace => 'Asset_Wobject'
+			},
+		],
+		fields => [
+		],
+		variables => [
+			{
+			'name' => 'templateId'
+			},
+			{
+			'name' => 'locations'
+			},
+		],
+		related => [
+		],
+	},
+
 };
 
 1;
