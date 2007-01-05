@@ -1,5 +1,5 @@
 7.3.4
-
+ - fix: SQLForm - cannot add new asset (Martin Kamerbeek / Oqapi)
 
 7.3.3
  - fix: Wiki Purge throws fatal

@@ -627,13 +627,32 @@ An instanciated databaselink object. Defaults to the databaselink of the sqlform
 =cut
 
 sub _databaseLinkHasPrivileges {
-	my (@privileges, @grants, $databaseName);
+	my (@privileges, @grants, $databaseName, @dsnEntries);
 	my $self = shift;
 	my $wantedPrivileges = shift;
 	my $dbLink = shift || $self->_getDbLink;
 
-	($databaseName = $dbLink->get->{DSN}) =~ s/^[^:]*:[^:]*:([^:]*)(:.*)?$/$1/;
+	# DSN can have a potpourri of forms
+	# DBI:mysql:dbName:dbHost:dbPort (databaseHost and dbPort are optional)
+	# DBI:mysql:database=dbName;host=dbHost (databaseHost is optional)
+	# But also this:
+	# DBI:mysql:db=dbName;dbHost:dbPort etc, etc.
+	# The following code tries to extract the databasename
+	@dsnEntries = split(/[:;]/, $dbLink->get->{DSN});
 
+	if ($dsnEntries[2] !~ /=/) {
+		$databaseName = $dsnEntries[2];
+	} else {
+		foreach (@dsnEntries) {
+			if ($_ =~ m/^(database|db|dbname)=(.+)$/) {
+				$databaseName = $2;
+				last;
+			}
+		}
+	}
+
+	# Get all the grants for the db link user and fetch the one referring to the 
+	# database of the db link.
 	@grants = $dbLink->db->buildArray('show grants for current_user');
 
 	foreach (@grants) {
@@ -642,6 +661,7 @@ sub _databaseLinkHasPrivileges {
 		}
 	}
 
+	# Check ik all required privs are present.
 	return 1 if (isIn('ALL PRIVILEGES', @privileges));
 	
 	foreach (@$wantedPrivileges) {
