@@ -1,8 +1,8 @@
 package WebGUI::i18n::English::Asset_WikiMaster;
 
 our $I18N = {
- 'assetName' =>
- { lastUpdated => 1160157064, message => 'Wiki' },
+ 'assetName' => { lastUpdated => 1160157064, message => 'Wiki' },
+ 'asset description' => { lastUpdated => 1160157064, message => q|A wiki is a collaborative content publishing mechanism. Traditionally wiki's use the wiki markup language, but that's generally not much easier to deal with than HTML, so WebGUI's wiki instead just uses a rich editor to help users publish rich great looking content.| },
 
 		mostPopularLabel => {message=>q|Most Popular|, lastUpdated=>0},
 		recentChangesLabel => {message=>q|Recent Changes|, lastUpdated=>0},

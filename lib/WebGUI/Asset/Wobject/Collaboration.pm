@@ -1090,14 +1090,15 @@ sub view {
 			and asset.state='published' 
 			and asset.className='WebGUI::Asset::Post::Thread' 
 			and assetData.revisionDate=(
-				SELECT 
+				select
 					max(revisionDate) 
 				from 
 					assetData 
 				where 
 					assetData.assetId=asset.assetId 
-					and (status='approved' or tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")).")
-				) 
+					and (status='approved' or status='archived')
+			) 
+			and status='approved'
 		group by 
 			assetData.assetId 
 		order by 

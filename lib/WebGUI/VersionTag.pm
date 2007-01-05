@@ -365,10 +365,6 @@ sub requestCommit {
 
 A class method. Eliminates all revisions of all assets created under a specific version tag. Also removes the version tag.
 
-=head3 tagId
-
-The unique identifier of the version tag to be purged.
-
 =cut
 
 sub rollback {
