@@ -82,6 +82,14 @@ our $HELP = {
 				namespace => "Asset_Wobject",
 				tag => "wobject template variables"
 			},
+			{
+				namespace => "Asset_Template",
+				tag => "template variables"
+			},
+			{
+				namespace => "Asset",
+				tag => "asset template"
+			},
 		],
 		variables => [
 			{
@@ -133,6 +141,14 @@ our $HELP = {
 			{
 				namespace => "Asset_Wobject",
 				tag => "wobject template variables"
+			},
+			{
+				namespace => "Asset_Template",
+				tag => "template variables"
+			},
+			{
+				namespace => "Asset",
+				tag => "asset template"
 			},
 		],
 		variables => [
