@@ -165,7 +165,7 @@ our $HELP = {
 				'name' => 'time.report.header',
 			},
 			{
-				'name' => 'time.report.hours.label',
+				'name' => 'time.report.totalHours.label',
 			},
 			{
 				'name' => 'time.report.date.label',
@@ -183,7 +183,13 @@ our $HELP = {
 				'name' => 'time.report.comments.label',
 			},
 			{
+				'name' => 'time.add.row.label',
+			},
+			{
 				'name' => 'time.save.label',
+			},
+			{
+				'name' => 'time.report.complete.label',
 			},
 			{
 				'name' => 'report.isComplete',

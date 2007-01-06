@@ -334,6 +334,11 @@ our $I18N = {
 
 		'time.report.hours.label' => {
 			lastUpdated => 0,
+			message => q|The phrase "Hours", internationalized.|,
+		},
+
+		'time.report.totalHours.label' => {
+			lastUpdated => 1168112129,
 			message => q|The phrase "Total Hours", internationalized.|,
 		},
 
