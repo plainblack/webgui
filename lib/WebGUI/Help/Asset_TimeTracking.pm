@@ -110,6 +110,10 @@ our $HELP = {
 				'required' => 1,
 			},
 			{
+				'name' => 'project.task.array',
+				'required' => 1,
+			},
+			{
 				'name' => 'js.alert.removeRow.error',
 			},
 			{

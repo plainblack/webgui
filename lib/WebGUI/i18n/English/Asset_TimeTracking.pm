@@ -493,8 +493,13 @@ be useful, others may not.|,
 	},
 
 	'pmIntegration' => {
-		message => q|A conditional indicating whether or not this Time Tracking Asset has been configured for integration with the Project Manager|,
-		lastUpdated => 1168038164
+		message => q|A conditional indicating whether or not this Time Tracking Asset has been configured for integration with the Project Manager.|,
+		lastUpdated => 1168117979,
+	},
+
+	'project.task.array' => {
+		message => q|Javascript containing data about the project and tasks.|,
+		lastUpdated => 1168038164,
 	},
 
 };
