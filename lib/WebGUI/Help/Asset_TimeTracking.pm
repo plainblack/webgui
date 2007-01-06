@@ -6,8 +6,8 @@ our $HELP = {
 		body => 'timetracking add/edit body',
 		isa => [
 			{
-				namespace => "Asset_Wobject",
-				tag => "wobject add/edit"
+				namespace => 'Asset_Wobject',
+				tag => 'wobject add/edit'
 			},
 		],
 		fields => [
@@ -79,16 +79,20 @@ our $HELP = {
 		body => 'user view template body',
 		isa => [
 			{
-				namespace => "Asset_Wobject",
-				tag => "wobject template variables"
+				namespace => 'Asset_Wobject',
+				tag => 'wobject template variables'
 			},
 			{
-				namespace => "Asset_Template",
-				tag => "template variables"
+				namespace => 'Asset_Template',
+				tag => 'template variables'
 			},
 			{
-				namespace => "Asset",
-				tag => "asset template"
+				namespace => 'Asset',
+				tag => 'asset template'
+			},
+			{
+				namespace => 'Asset_TimeTracking',
+				tag => 'time tracking asset template variables'
 			},
 		],
 		variables => [
@@ -143,16 +147,20 @@ our $HELP = {
 		body => 'time row template body',
 		isa => [
 			{
-				namespace => "Asset_Wobject",
-				tag => "wobject template variables"
+				namespace => 'Asset_Wobject',
+				tag => 'wobject template variables'
 			},
 			{
-				namespace => "Asset_Template",
-				tag => "template variables"
+				namespace => 'Asset_Template',
+				tag => 'template variables'
 			},
 			{
-				namespace => "Asset",
-				tag => "asset template"
+				namespace => 'Asset',
+				tag => 'asset template'
+			},
+			{
+				namespace => 'Asset_TimeTracking',
+				tag => 'time tracking asset template variables'
 			},
 		],
 		variables => [
@@ -248,8 +256,8 @@ our $HELP = {
 		body => 'time tracking asset template variables body',
 		isa => [
 			{
-				namespace => "Asset_Wobject",
-				tag => "wobject template variables"
+				namespace => 'Asset_Wobject',
+				tag => 'wobject template variables'
 			},
 		],
 		fields => [
