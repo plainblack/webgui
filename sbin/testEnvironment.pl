@@ -92,7 +92,6 @@ checkModule("HTML::TagFilter",0.07);
 checkModule("HTML::Template",2.7);
 checkModule("Parse::PlainConfig",1.1);
 checkModule("XML::RSSLite",0.11);
-checkModule("DBIx::FullTextSearch",0.73);
 
 
 ###################################
@@ -237,6 +236,7 @@ sub failAndExit {
 sub getLatestWebguiVersion {
         printTest("Getting current WebGUI version");
         my $currentversionUserAgent = new LWP::UserAgent;
+	$currentversionUserAgent->env_proxy;
 	$currentversionUserAgent->agent("WebGUI-Check/2.1");
         $currentversionUserAgent->timeout(30);
         $currentversionUserAgent->env_proxy();

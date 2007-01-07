@@ -3,7 +3,10 @@
  - fix: Daily recurring payment reports should now be sent to the 
         configured "commerceSendDailyReportTo" address.
  - fix: Closed Posts Displaying in CS
+ - RFE: testEnvironment improvement
  - fix: Cannot add new page to the Wiki
+ - Removed the requirement for DBIx::FullTextSearch from testEnvironment.pl
+	since it hasn't been needed since 6.5. It was just never removed.
 
 7.3.3
  - fix: Wiki Purge throws fatal
