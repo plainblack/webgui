@@ -453,6 +453,10 @@ our $HELP = {
 			    'name' => 'performSearch',
 			  },
 			  {
+			    'name' => 'canAddPages',
+			    'description' => 'canAddPages variable',
+			  },
+			  {
 			    'name' => 'searchResults',
 			    variables => [
 				  {

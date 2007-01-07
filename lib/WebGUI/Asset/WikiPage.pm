@@ -233,17 +233,23 @@ sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost(@_);
 	my $actionTaken = ($self->session->form->process("assetId") eq "new") ? "Created" : "Edited";
+
 	$self->update({ groupIdView => $self->getWiki->get('groupIdView'),
 			groupIdEdit => $self->getWiki->get('groupToAdminister'),
 			 isHidden => 1,
 			actionTakenBy => $self->session->user->userId,
-			actionTaken => $actionTaken});
+			actionTaken => $actionTaken,
+			title => WebGUI::HTML::filter($self->get("title"), "all"),
+	});
+
 	if ($self->getWiki->canAdminister) {
 		$self->update({isProtected => $self->session->form("isProtected")});
 	}
+
 	delete $self->{_storageLocation};
 	my $size = 0;
         my $storage = $self->getStorageLocation;
+
         foreach my $file (@{$storage->getFiles}) {
                 if ($storage->isImage($file)) {
                         ##Use generateThumbnail to shrink size to site's max image size
@@ -255,8 +261,34 @@ sub processPropertiesFromFormPost {
                 }
                 $size += $storage->getFileSize($file);
         }
+
         $self->setSize($size);
 }	
+
+#-------------------------------------------------------------------
+
+=head2 scrubContent ( [ content ] )
+
+Uses WikiMaster settings to remove unwanted markup and apply site wide replacements.
+
+=head3 content
+
+Optionally pass the ontent that we want to run the filters on.  Otherwise we get it from self.
+
+=cut
+
+sub scrubContent {
+        my $self = shift;
+        my $content = shift || $self->get("content");
+
+        my $scrubbedContent = WebGUI::HTML::filter($content, $self->getWiki->get("filterCode"));
+
+        if ($self->getWiki->get("useContentFilter")) {
+                $scrubbedContent = WebGUI::HTML::processReplacements($self->session, $scrubbedContent);
+        }
+
+        return $scrubbedContent;
+}
 
 #-------------------------------------------------------------------
 sub view {
@@ -276,7 +308,7 @@ sub view {
 		wikiHomeUrl=>$self->getParent->getUrl,
 		historyUrl=>$self->getUrl("func=getHistory"),
 		editContent=>$self->getEditForm,
-		content => $self->getWiki->autolinkHtml($self->get('content')),	
+		content => $self->getWiki->autolinkHtml($self->scrubContent),	
 		};
 	return $self->processTemplate($var, $self->getWiki->get("pageTemplateId"));
 }

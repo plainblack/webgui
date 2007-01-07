@@ -67,6 +67,7 @@ sub appendSearchBoxVars {
 	$var->{'searchQuery'} = WebGUI::Form::text($self->session, { name => 'query', value => $queryText });
 	$var->{'searchSubmit'} = WebGUI::Form::submit($self->session, { value => $submitText });
 	$var->{'searchFormFooter'} = WebGUI::Form::formFooter($self->session);
+	$var->{'canAddPages'} = $self->canEditPages();
 	return $self;
 }
 
@@ -274,6 +275,20 @@ sub definition {
 			label => $i18n->get("max image size"),
 			hoverHelp => $i18n->get("max image size help")
 			},
+		useContentFilter =>{
+                        fieldType=>"yesNo",
+                        defaultValue=>1,
+                        tab=>'display',
+                        label=>$i18n->get('content filter'),
+                        hoverHelp=>$i18n->get('content filter description'),
+                        },
+                filterCode =>{
+                        fieldType=>"filterContent",
+                        defaultValue=>'javascript',
+                        tab=>'security',
+                        label=>$i18n->get('filter code'),
+                        hoverHelp=>$i18n->get('filter code description'),
+                        },
 		);
 
 	push @$definition,

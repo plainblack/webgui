@@ -18,6 +18,7 @@ package WebGUI::Workflow::Activity::GetSyndicatedContent;
 use strict;
 use base 'WebGUI::Workflow::Activity';
 use WebGUI::Asset::Wobject::SyndicatedContent;
+use JSON;
 
 =head1 NAME
 
@@ -69,20 +70,81 @@ See WebGUI::Workflow::Activity::execute() for details.
 
 sub execute {
 	my $self = shift;
-	#In the new Wobject, "rssURL" actually can refer to more than one URL.
-    	my @syndicatedWobjectURLs = $self->session->db->buildArray("select distinct SyndicatedContent.rssUrl from SyndicatedContent left join asset on SyndicatedContent.assetId=asset.assetId where asset.state='published'");
-    	foreach my $url(@syndicatedWobjectURLs) {
+	my $object = shift;
+	my $instance = shift;
+	unless (defined $instance) {
+		$self->session->errorHandler->error("Could not instanciate Workflow Instance in GetSyndicatedContent Activity");
+		return $self->ERROR;
+	}
+
+	my @syndicatedUrls = @{$self->getSyndicatedUrls($instance)};
+	my @arrayCopy = @syndicatedUrls;	# copy we can delete elements from inside the foreach loop
+	my $time = time();
+
+    	foreach my $urls (@syndicatedUrls) {
         	#Loop through the SyndicatedWobjects and split all the URLs they are syndicating off into
         	#a separate array.
-        	my @urlsToSyndicate = split(/\s+/,$url);
-        	foreach ((@urlsToSyndicate)) {
-            		WebGUI::Asset::Wobject::SyndicatedContent::_get_rss_data($self->session,$_);
+        	my @urlsToSyndicate = split(/\s+/,$urls);
+
+        	foreach my $url (@urlsToSyndicate) {
+			# We could timeout in here but I don't see a good way to handle that right now
+			# May need to fix this in the future.
+            		my $returnValue = WebGUI::Asset::Wobject::SyndicatedContent::_get_rss_data($self->session, $url);
+			unless (defined $returnValue) {
+				$self->session->errorHandler->error("GetSyndicatedContent Workflow Activity: _get_rss_data returned undef while trying to process syndicated content url $url");
+				return $self->ERROR;
+			}
         	}
+		
+		# Delete this element from the array
+		splice(@arrayCopy,0,1);
+
+		# Check for timeout
+		last unless (time() - $time <= 60);
     	}
+
+	# See if we're done
+	if (scalar(@arrayCopy) > 0) {
+		$instance->setScratch("syndicatedUrls", objToJson(@arrayCopy));
+		return $self->WAITING;
+	}
+
+	$instance->deleteScratch("syndicatedUrls");
 	return $self->COMPLETE;
 }
 
+#---------------------------------------------------------------------
 
+=head2 getWobjectUrls ( )
+
+Returns URLs from all of the Syndicated Content Wobjects from scratch or fetches them from the db if needed
+
+=head3 session
+
+A reference to the current webgui session
+
+=cut
+
+sub getSyndicatedUrls {
+	my $self = shift;
+	my $instance = shift;
+	my $syndicatedUrls = $instance->getScratch("syndicatedUrls");
+	
+	unless ($syndicatedUrls) { 
+		my $urls = $self->session->db->buildArrayRef("select 
+					   			distinct SyndicatedContent.rssUrl from SyndicatedContent 
+					   		left join 
+								asset on SyndicatedContent.assetId=asset.assetId 
+					   		where
+								asset.state='published'"
+		);
+		
+		$instance->setScratch("syndicatedUrls", objToJson($urls));
+		return $urls;
+	}
+
+	return jsonToObj($syndicatedUrls);
+}
 
 
 1;

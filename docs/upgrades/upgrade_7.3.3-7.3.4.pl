@@ -20,17 +20,19 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-# upgrade functions go here
+fixWiki($session);
 
 finish($session); # this line required
 
 
 ##-------------------------------------------------
-#sub exampleFunction {
-#	my $session = shift;
-#	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
-#	# and here's our code
-#}
+sub fixWiki {
+	my $session = shift;
+	print "\tImplementing replacements and content filtering for the Wiki Wobject.\n" unless ($quiet);
+	
+	$session->db->write("alter table WikiMaster add column useContentFilter int(11) default 0");
+	$session->db->write("alter table WikiMaster add column filterCode varchar(30) default 'javascript'");
+}
 
 
 

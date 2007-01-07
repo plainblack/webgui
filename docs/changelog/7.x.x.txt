@@ -5,6 +5,13 @@
  - fix: Closed Posts Displaying in CS
  - RFE: testEnvironment improvement
  - fix: Cannot add new page to the Wiki
+ - fix: Wiki does not have content type restrictions and can not use
+   	the content filtering system
+ - fix: GetSyndicatedContent Workflow Activity not trapping errors.
+ - fix: GetSyndicatedContent Workflow Activity not checking for timeout.
+ - fix: Wiki displays 'Add a new page" link to users who are not allowed to
+   	add pages.
+ - fix: XSS vulnerability in Wiki Page titles. 
  - Removed the requirement for DBIx::FullTextSearch from testEnvironment.pl
 	since it hasn't been needed since 6.5. It was just never removed.
 

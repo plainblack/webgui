@@ -13,6 +13,30 @@ our $I18N = {
 		addPageLabel=>{message=>q|Add a new page.|, lastUpdated=>0},
 		wikiHomeLabel=>{message=>q|Wiki Home|, lastUpdated=>0},
 
+	'filter code' => {
+		message => q|Filter Code|,
+		lastUpdated => 0,
+		context => q|Label for edit wobject screen|,
+	},
+
+	'filter code description' => {
+		message => q|Sets the level of HTML Filtering done on each Wiki entry|,
+		lastUpdated => 0,
+		context => q|Hover help for edit wobject screen|,
+	},
+
+	'content filter' => {
+		message => q|Use Content Filter?|,
+		lastUpdated => 0,
+		context => q|Label for edit wobject screen|,
+	},
+	
+	'content filter description' => {
+		message => q|Process the content of Wiki pages through the WebGUI Content Filtering system.  This can also be used to create custom markup symbols for inserting reusable content styling.|,
+		lastUpdated => 0,
+		context => q|Hover help for edit wobject screen|,
+	},
+
 	'wikiHomeLabel variable' => {
 		message=>q|An internationalized label to go with wikiHomeUrl.|,
 		lastUpdated=>1165816161,
@@ -443,6 +467,16 @@ our $I18N = {
                 message => q|<p>These variables are available in the template for displaying the search page in the Wiki.</p>|,
                 lastUpdated => 1165946014,
         },
+
+	'canAddPages' => {
+		message => q|canAddPages Variable|,
+		lastUpdated=>0,
+	},
+
+	'canAddPages variable' => {
+		message => q|Boolean value that is true when the user is allowed to add and edit pages in the Wiki.|,
+		lastUpdated=> 0,
+	},
 
 };
 
