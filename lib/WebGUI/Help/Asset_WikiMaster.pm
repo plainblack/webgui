@@ -91,6 +91,16 @@ our $HELP = {
                                 description => 'max image size help',
                                 namespace => 'Asset_WikiMaster',
                         },
+                        {
+                                title => 'content filter',
+                                description => 'content filter description',
+                                namespace => 'Asset_WikiMaster',
+                        },
+                        {
+                                title => 'filter code',
+                                description => 'filter code description',
+                                namespace => 'Asset_WikiMaster',
+                        },
 		],
 		related => [
 			{
@@ -301,6 +311,12 @@ our $HELP = {
 			  },
 			  {
 			    'name' => 'thumbnailSize',
+			  },
+			  {
+			    'name' => 'useContentFilter',
+			  },
+			  {
+			    'name' => 'filterCode',
 			  },
 			  {
 			    'name' => 'maxImageSize',

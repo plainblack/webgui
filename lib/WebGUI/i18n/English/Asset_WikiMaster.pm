@@ -478,6 +478,16 @@ our $I18N = {
 		lastUpdated=> 0,
 	},
 
+	'useContentFilter' => {
+		message => q|Boolean value that is true when this Wiki has been set to filter content.|,
+		lastUpdated=> 0,
+	},
+
+	'filterCode' => {
+		message => q|Strings that indicate the level of content filtering.|,
+		lastUpdated=> 0,
+	},
+
 };
 
 1;
