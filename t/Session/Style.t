@@ -19,7 +19,7 @@ use WebGUI::Asset;
 use WebGUI::VersionTag;
 use WebGUI;
 
-use Test::More tests => 55; # increment this value for each test you create
+use Test::More tests => 56; # increment this value for each test you create
 use Test::Deep;
  
 my $session = WebGUI::Test->session;
@@ -290,6 +290,47 @@ is($session->http->{_http}{cacheControl}, 'none', 'process: HTTP cacheControl se
 ####################################################
 #
 # process 
+# no duped headBlockContent
+#
+####################################################
+
+$style->useEmptyStyle(1);
+$style->sent(0);
+
+$session->scratch->set('personalStyleId', $templates->{headBlock}->getId);
+
+$styled = $style->process('body.content', 'notATemplateId');
+
+$head = $styled;
+$head =~ s/(^HEAD=.+$)/$1/s;
+
+@metas = fetchMultipleMetas($head);
+$expectedMetas = [
+           {
+             'name' => 'keywords',
+             'content' => 'keyword1,keyword2'
+           },
+           {
+             'content' => 'WebGUI '.$WebGUI::VERSION,
+             'name' => 'generator'
+           },
+           {
+             'http-equiv' => 'Content-Type',
+             'content' => 'text/html; charset=UTF-8'
+           },
+           {
+             'http-equiv' => 'Content-Script-Type',
+             'content' => 'text/javascript'
+           },
+           {
+             'http-equiv' => 'Content-Style-Type',
+             'content' => 'text/css'
+           },
+];
+cmp_bag(\@metas, $expectedMetas, 'process, headBlock:no duped headBlock from style template');
+####################################################
+#
+# process 
 # makePrintable
 # printableStyleId
 #
@@ -298,6 +339,8 @@ is($session->http->{_http}{cacheControl}, 'none', 'process: HTTP cacheControl se
 #
 ####################################################
 
+##Put original template back in place.
+$session->scratch->set('personalStyleId', $templates->{personal}->getId);
 $style->setPrintableStyleId($templates->{printable}->getId);
 is($style->{_printableStyleId}, $templates->{printable}->getId, 'printableStyleId: set');
 
@@ -397,6 +440,17 @@ sub setup_assets {
 		#     '1234567890123456789012'
 	};
 	$templates->{personal} = $importNode->addChild($properties, $properties->{id});
+	$properties = {
+		title => 'personal style test template with headBlock',
+		className => 'WebGUI::Asset::Template',
+		url => 'headblock_style',
+		namespace => 'Style',
+		template => 'HEADBLOCK STYLE TEMPLATE\n\nBODY=<tmpl_var body.content>\n\nHEAD=<tmpl_var head.tags>',
+		headBlock => q|<meta name="keywords" content="keyword1,keyword2" />|,
+		id => 'testTemplate_headblock',
+		#     '1234567890123456789012'
+	};
+	$templates->{headBlock} = $importNode->addChild($properties, $properties->{id});
 	$properties = {
 		title => 'personal style test template for printing',
 		className => 'WebGUI::Asset::Template',
