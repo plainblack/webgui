@@ -131,7 +131,16 @@ Retrieves the next available message from the server. Returns undef if there are
 			type=>'application/msword',
 			content=>' ---- binary content here ---- ',
 			filename => undef
-		}
+			alternative => [
+				{
+					type => 'text/html',
+					content => '---- alternative content for msword doc here ---- ',
+				},{
+					type => 'text/plain',
+					content => '---- even more alternative content for msword doc ---- ',
+				}
+			]
+ 		}
 	]
 }
 
@@ -152,7 +161,9 @@ sub getNextMessage {
 		return undef;
 	}
 	my $head = $parsedMessage->head;
-	# try to detect auto generated messages and drop them
+        my $type = $head->get("Content-Type");
+        my $alternate = 1 if lc $type =~ m{^multipart/alternative}; 
+        # try to detect auto generated messages and drop them
         my $skipAuto = 0;
         my @headlines = split("\n",$head->stringify);
         foreach my $headline (@headlines) {
@@ -197,6 +208,11 @@ sub getNextMessage {
 	my @segments = ();
 	my @parts = $parsedMessage->parts;
 	push(@parts, $parsedMessage) unless (@parts); # deal with the fact that there might be only one part
+	# If this message has alternates, the last is the most canonical
+	if ($alternate) {
+		@parts = reverse @parts;
+	}
+	
 	foreach my $part (@parts) {
 		my $type = $part->mime_type;
 		next if ($type eq "message/rfc822");
@@ -210,18 +226,33 @@ sub getNextMessage {
 			$content = $body->as_string;
 		}
 		next unless ($content);
-		push(@segments, {
-			filename=>$filename,
-			type=>$type,
-			content=>$content
-			});
+		
+		# If this is a multipart alternative message, and this is the first segment
+		# Or if this is a normal mime message
+		if (($alternate && !@segments) || !$alternate) {
+			# Add the segment 
+			push(@segments, {
+				filename=>$filename,
+				type=>$type,
+				content=>$content
+				});
+		}
+		# If this is a multipart alternative message, and this is not the first segment
+		elsif ($alternate) {
+			# Add an alternative to the last segment
+			push @{$segments[-1]->{alternative}}, {
+				type 		=> $type,
+				content 	=> $content,
+				};	 
+		}
 	}
 	unless (scalar(@segments) > 0) { # drop empty messages
 		$self->session->errorHandler->info("POP3: Dropped empty message ".$data{messageId}." from ".$data{from}." to ".$data{to});
 		return $self->getNextMessage;
 	}
 	$data{parts} = \@segments;
-	return \%data;
+        use Data::Dumper; $self->session->errorHandler->warn(Dumper \%data);
+        return \%data;
 }
 
 #-------------------------------------------------------------------

@@ -14,7 +14,10 @@
  - fix: XSS vulnerability in Wiki Page titles. 
  - Removed the requirement for DBIx::FullTextSearch from testEnvironment.pl
 	since it hasn't been needed since 6.5. It was just never removed.
-
+ - fix: WebGUI::Mail::Get now handles multipart/alternative messages
+        appropriately. This fixes the problem with CS posts sent via
+        e-mail showing two versions of the same post.
+        
 7.3.3
  - fix: Wiki Purge throws fatal
  - fix: Calendar now reports proper product ID on iCal feed
