@@ -17,6 +17,7 @@
  - fix: WebGUI::Mail::Get now handles multipart/alternative messages
         appropriately. This fixes the problem with CS posts sent via
         e-mail showing two versions of the same post.
+ - fix: Styles were printing double head block headers.
         
 7.3.3
  - fix: Wiki Purge throws fatal

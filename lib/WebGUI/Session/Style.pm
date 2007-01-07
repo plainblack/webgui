@@ -195,7 +195,6 @@ if ($self->session->user->isInGroup(2) || $self->session->setting->get("preventP
 	my $style = WebGUI::Asset::Template->new($self->session,$templateId);
 	my $output;
 	if (defined $style) {
-		$var{'head.tags'} .= $style->get("headBlock");
 		my $meta = {};
         	if ($self->session->setting->get("metaDataEnabled")) {
                 	$meta = $style->getMetaDataFields();
