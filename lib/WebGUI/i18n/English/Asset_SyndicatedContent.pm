@@ -217,15 +217,65 @@ these unique properties:
 <li><a href="http://w.moreover.com/">http://w.moreover.com/</a></li>
 </ul>
 </div>
-<p>Currently, we can handle RSS versions .90, .91, 1.0, and 2.0. Atom feeds aren't supported for now. Probably other RSS-ish files would work too.
+<p>Currently, WebGUI can handle RSS versions .90, .91, 1.0, and 2.0. Atom feeds aren't supported for now. Probably other RSS-ish files would work too.
 </p>
 <p>To create an aggregate RSS feed (one that pulls information from multiple RSS feeds), include a list of URLs, one on each line, instead of a single URL.  Items will be sorted by the date WebGUI first received the story.</p>|,
-                lastUpdated => 1146800018,
+                lastUpdated => 1168228049,
         },
 
 	'3 description' => {
-		message => q|Enter the maximum number of headlines that should be displayed.  Set to zero to allow any number of headlines.|,
-		lastUpdated => 1119977659,
+		message => q|Enter the maximum number of headlines that should be displayed.  Set to zero to allow any number of headlines.  Note that all headlines from all RSS URL's are still fetched, even if they are not displayed.|,
+		lastUpdated => 1168228412,
 	},
+
+	'cacheTimeout' => {
+		message => q|The amount of tie in seconds data from this Asset will be cached.|,
+		lastUpdated => 1168227896,
+	},
+
+	'templateId' => {
+		message => q|The ID of the template used to display this Asset.|,
+		lastUpdated => 1168227896,
+	},
+
+	'rssUrl' => {
+		message => q|A newline separated list of all RSS URLs.|,
+		lastUpdated => 1168227896,
+	},
+
+	'processMacrosInRssUrl' => {
+		message => q|A conditional that indicates whether or not this Asset was set to process Macros in the RSS Url field.|,
+		lastUpdated => 1168227896,
+	},
+
+	'maxHeadlines' => {
+		message => q|The maximum number of headlines that will be displayed.|,
+		lastUpdated => 1168227896,
+	},
+
+	'displayMode' => {
+		message => q|If the Asset was set to sort RSS headlines by the title of the originating RSS site, this will be the string "grouped".  Otherwise is will be "interleaved".|,
+		context => q|Translator's note:  Do not translate the words in quotes, they are constants in the source code.|,
+		lastUpdated => 1168227896,
+	},
+
+	'hasTerms' => {
+		message => q|Terms used to filter RSS items.|,
+		lastUpdated => 1168227896,
+	},
+
+	'syndicated content asset template variables title' => {
+		message => q|Syndicated Content Asset Template Variables|,
+		lastUpdated => 1164841146
+	},
+
+	'syndicated content asset template variables body' => {
+		message => q|Every asset provides a set of variables to most of its
+templates based on the internal asset properties.  Some of these variables may
+be useful, others may not.|,
+		lastUpdated => 1164841201
+	},
+
 };
+
 1;

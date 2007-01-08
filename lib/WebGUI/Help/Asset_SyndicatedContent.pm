@@ -6,8 +6,8 @@ our $HELP = {
 		body => '71',
 		isa => [
 			{
-				namespace => "Asset_Wobject",
-				tag => "wobject add/edit"
+				namespace => 'Asset_Wobject',
+				tag => 'wobject add/edit'
 			},
 		],
 		fields => [
@@ -52,16 +52,25 @@ our $HELP = {
 				tag => 'wobjects using',
 				namespace => 'Asset_Wobject'
 			},
-			{
-				tag => 'asset fields',
-				namespace => 'Asset'
-			},
-		]
+		],
 	},
+
 	'syndicated content template' => {
 		title => '72',
 		body => '73',
-		fields => [
+		isa => [
+			{
+				namespace => 'Asset_SyndicatedContent',
+				tag => 'syndicated content asset template variables',
+			},
+			{
+				namespace => 'Asset_Template',
+				tag => 'template variables'
+			},
+			{
+				namespace => 'Asset',
+				tag => 'asset template'
+			},
 		],
 		variables => [
 		          {
@@ -123,8 +132,49 @@ our $HELP = {
 				tag => 'wobject template',
 				namespace => 'Asset_Wobject'
 			}
-		]
+		],
+		fields => [
+		],
 	},
+
+	'syndicated content asset template variables' => {
+		title => 'syndicated content asset template variables title',
+		body => 'syndicated content asset template variables body',
+		isa => [
+			{
+				namespace => 'Asset_Wobject',
+				tag => 'wobject template variables'
+			},
+		],
+		variables => [
+		          {
+		            'name' => 'cacheTimeout'
+		          },
+		          {
+		            'name' => 'templateId'
+		          },
+		          {
+		            'name' => 'rssUrl'
+		          },
+		          {
+		            'name' => 'processMacrosInRssUrl'
+		          },
+		          {
+		            'name' => 'maxHeadlines'
+		          },
+		          {
+		            'name' => 'displayMode'
+		          },
+		          {
+		            'name' => 'hasTerms'
+		          },
+		],
+		related => [
+		],
+		fields => [
+		],
+	},
+
 };
 
 1;
