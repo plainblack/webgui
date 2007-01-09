@@ -186,7 +186,7 @@ sub dbSlave {
 		foreach (1..3) {
 			my $slave = $self->config->get("dbslave".$_);
 			if (exists $slave->{dsn}) {
-				push(@{$self->{_slave}},$self->db->connect($self, $slave->{dsn},$slave->{user},$slave->{pass}));
+				push(@{$self->{_slave}},WebGUI::SQL->connect($self, $slave->{dsn},$slave->{user},$slave->{pass}));
 			}
 		}
 	}
