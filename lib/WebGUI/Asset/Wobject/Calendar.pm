@@ -1608,7 +1608,7 @@ sub www_search
 	my $perpage	= $form->param("perpage");
 	
 	my $var		= $self->get;
-	
+        $var->{url}     = $self->getUrl;
 	
 	# If there is a search to perform
 	if ($keywords || $startDate || $endDate)

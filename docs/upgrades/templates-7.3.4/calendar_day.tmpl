@@ -1,0 +1,268 @@
+#CalendarDay00000000001
+<tmpl_if admin>
+    <p><tmpl_var adminControls></p>
+</tmpl_if>
+
+<tmpl_if displayTitle>
+    <h1><tmpl_var title></h1>
+</tmpl_if>
+
+<tmpl_if description>
+    <p><tmpl_var description></p>
+</tmpl_if>
+
+<table cellspacing="0" cellpadding="0" width="600" id="mCAL">
+<tr>
+    <td style="text-align:right">
+        <a href="<tmpl_var urlDay>" class="tab active">Day</a>
+        <a href="<tmpl_var urlWeek>" class="tab">Week</a>
+        <a href="<tmpl_var urlMonth>" class="tab">Month</a>
+        <a href="<tmpl_var urlSearch>" class="tab">Search</a>
+        
+        <div class="controls">
+            <tmpl_if editor><a href="<tmpl_var urlAdd>">Add Event</a> &bull;</tmpl_if>
+            <a href="<tmpl_var urlPrint>">Print</a> <!--&bull; <a href="#">Subscribe</a>-->
+        </div>
+    </td>
+</tr>
+<tr>
+    <td class="months">
+        <div style="padding:3px 0px;">
+            <a href="<tmpl_var pagePrevUrl>" style="font-weight:bold;margin-right:8px;">&laquo; Previous Day
+            </a>&bull;
+            
+            <span style="margin-right:8px;margin-left:8px;" class="monthLink current"><tmpl_var dayAbbr>, <tmpl_var monthAbbr> <tmpl_var dayOfMonth>. <tmpl_var year></span>&bull;
+                <a href="<tmpl_var pageNextUrl>" style="font-weight:bold;padding-left:8px">Next Day &raquo;</a> 
+        </div>
+    </td>
+</tr>
+<tr>
+    <td>
+        <div  class="curMonth">
+            <tmpl_var dayName>, <tmpl_var monthName> <tmpl_var dayOfMonth>, <tmpl_var year>
+        </div>
+    </td>
+</tr>
+<tr>
+    <td style="width:100%">
+        <table width="100%" cellspacing="2" cellpadding="0">
+        <tmpl_loop hours><tr>
+            <td class="heading">
+                <div style="padding:4px;"><tmpl_var hour12>:00<tmpl_var hourM></div>
+            </td>
+                                        <td class="day">
+                <ul class="eventList">
+                    <tmpl_loop events><li>
+                    <a href="<tmpl_var eventUrl>"><tmpl_var eventTitle></a>
+                    </tmpl_loop></li>
+                                </ul>
+            </td>
+        </tr></tmpl_loop>
+                </table>
+    </td>
+</tr>
+</table>
+~~~
+    <style type="text/css">
+        /* Edited with EditCSS */
+
+/**** Inline STYLE-tag style sheet ****/
+
+        #mCAL td {
+            font-size:10px;
+            font-family:arial;
+        }
+        #mCAL .tab {
+
+            border-bottom-style:none;
+            font-weight:bold;
+            padding: 2px 15px 0px 15px;
+            text-align;center;
+            background-color:#E9ECF3;
+            -moz-border-radius-topLeft:10px;
+            -moz-border-radius-topRight:10px;
+            color:#7588B5;
+            text-decoration:none;
+            font-size:10pt;
+            display:block;
+            float:left;
+            margin-right:5px;
+        }
+        #mCAL .tab:hover {
+            color:black;
+            }
+        #mCAL .active {
+            background-color:#DFE3EE;
+            color:#404F77;
+            border-bottom:solid #DFE3EE 1px;
+            }
+        #mCAL .controls {
+            float:right;
+            vertical-align:bottom;
+        }
+        #mCAL a {
+            font-size:11px;
+            color:#517AC8;
+            }
+        #mCAL .heading {
+            width:200px;
+            -moz-box-sizing:border-box;
+            background-color:#ABB7D1;
+            text-align:center;
+            font-weight:bold;
+            color:#374664;
+            font-size:9px;
+            letter-spacing:1px;
+            text-transform:uppercase;
+            text-align:right;
+            vertical-align:top;
+            -moz-border-radius-bottomRight:8px;
+                        -moz-border-radius-topRight:8px;
+        }
+        #mCAL .day {
+                        background-color:#E9ECF3;
+            width:400px;
+            position:relative;
+                    vertical-align:top;
+            -moz-border-radius-topLeft:8px;
+                        -moz-border-radius-bottomLeft:8px;
+            border:solid #CCD2E3 1px;
+        }
+        #mCAL .curDay {
+            background-color:#FFE4B3;
+            border-color:orange;
+        }
+                    #mCAL .dayWrapper {
+            height:100%;
+            width:100%;
+            position:relative;
+            z-index:0;
+                margin:0px;
+            padding:0px 0px 2px 5px;;
+            -moz-box-sizing:border-box;
+        }
+        html > body #mCAL .dayWrapper {
+            height:auto;
+            min-height:100%;
+        }
+        #mCAL .dayNum {
+            width:100%;
+            text-align:right;
+            
+        }
+
+                                    #mCAL span.border {
+                        text-align:center;
+            padding:5px;
+            font-weight:bold;
+            -moz-border-radius-bottomRight:5px;
+            -moz-border-radius-topLeft:5px;
+                        color:black;
+            border-right:solid #CCD2E3 1px;
+            border-bottom: solid #CCD2E3 1px;
+            background-color:#ABB7D1;
+            -moz-box-sizing:border-box;
+            top:5px;
+            position:relative;
+            
+        }
+        #mCAL .curDay span.border {
+            background-color:orange;
+            color:black;
+            border-color:orange;
+        }
+        #mCAL .event {
+            padding:3px;
+            padding-top:8px;
+            clear:left;
+                        font-weight:bold;
+        }
+        #mCAL .event a {
+            color:#4F4F4F;
+            text-decoration:none;
+            font-size:9px;
+        }
+        #mCAL .moreButton {
+            border-style:none;
+            z-index:5;
+            position:absolute;
+            bottom:0px;
+            width:100%;
+            height:9px;
+                background-color:#517AC8;
+            font-size:5px;
+            text-align:center;
+        }
+        #mCAL .moreButton:hover {
+            background-color:orange;
+        }
+        #mCAL .empty {
+            border-style:none;
+            background-color:#CCD2E3;
+            -moz-border-radius:10px;
+            
+        }
+        #mCAL .months {
+            text-align:center;
+                        background-color:#DFE3EE;
+        }
+        #mCAL .months a {
+            color:#517AC8;
+            text-decoration:none;
+        }
+        #mCAL .months .monthLink {
+                        text-decoration:none;
+            padding-left:5px;
+            padding-right:5px;
+            color:#AAB8D5;
+            font-size:12px;
+            font-weight:bold;
+            }
+        #mCAL .months .current {
+            color:#517AC8;
+        }
+        #mCAL .current {
+            font-weight:bold;
+            color:#517AC8;
+                        background-color:#fff;
+            -moz-border-radius:5px;
+        }
+        #mCAL .curMonth {
+            text-align:center;
+            margin: 2px 0px;
+            background-color:#517AC8;
+            color:white;
+            font-size:14px;
+            font-weight:bold;
+        }
+        
+        /* MORE STYLES */
+        #more1 {
+            position:absolute;
+            top:170px;
+                        left:10px;
+            
+        }
+        * html #more1 {
+            top:158px;
+            left:12px;
+
+        }
+        .moreDisplay {
+            border:solid orange 1px;
+            border-top:solid orange 2px;
+            font-family:arial;
+            font-size:10px;
+            width:300px;
+            padding:2px;
+            background-color:#FFD3A8;
+                        z-index:10;
+        }
+        ul.eventList {
+            margin:0px;
+            padding:0px;
+            margin-left:30px;
+            color:#526896;
+        }
+    </style>
+

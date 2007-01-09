@@ -1284,7 +1284,8 @@ sub getTemplateVars
 					: "");
 	
 	# Make some friendly URLs
-	$dtStart->truncate(to=>"day");
+        $var{"url"}             = $self->getUrl;
+        $dtStart->truncate(to=>"day");
 	$var{"urlDay"}		= $self->getParent->getUrl("type=day;start=".$dtStart->toMysql);
 	$var{"urlWeek"}		= $self->getParent->getUrl("type=week;start=".$dtStart->toMysql);
 	$var{"urlMonth"}	= $self->getParent->getUrl("type=month;start=".$dtStart->toMysql);
