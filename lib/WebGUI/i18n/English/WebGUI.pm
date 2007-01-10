@@ -2344,13 +2344,13 @@ div.tabs {
 	},
 
 	'pagination.url' => {
-		message => q|The URL of page X, where X is the number in the loop we're at.|,
-		lastUpdated => 1149182026,
+		message => q|The URL of a page in the page loop.|,
+		lastUpdated => 1168370951,
 	},
 
 	'pagination.text' => {
-		message => q|The number of page X, where X is the number in the loop we're at.|,
-		lastUpdated => 1149182026,
+		message => q|The number of a page in the page loop.|,
+		lastUpdated => 1168464885,
 	},
 
 	'pagination.pageList.upTo20' => {
