@@ -1,3 +1,6 @@
+7.3.5
+ 
+
 7.3.4
  - fix: SQLForm - cannot add new asset (Martin Kamerbeek / Oqapi)
  - fix: Daily recurring payment reports should now be sent to the 
