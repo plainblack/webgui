@@ -17,7 +17,7 @@ use Tie::IxHash;
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 21; # increment this value for each test you create
+use Test::More tests => 22; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -74,6 +74,7 @@ SKIP: {
 # round
 is(WebGUI::Utility::round(47.133984233, 0), 47, 'round() - 0 significant digits');
 is(WebGUI::Utility::round(47.133984233, 3), 47.134, 'round() - multiple significant digits');
+is(WebGUI::Utility::round(47.6, 0), 48, 'round() - rounds up, too');
 
 {
 	# Just some basic tests for now.

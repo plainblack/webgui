@@ -527,7 +527,7 @@ sub setDataByArrayRef {
 	my $self = shift;
 	my $rowRef = shift;
 	$self->{_rowRef} = $rowRef;
-	$self->{_totalRows} = $#{$rowRef};
+	$self->{_totalRows} = $#{$rowRef} + 1;
 }
 
 
