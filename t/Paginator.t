@@ -24,11 +24,10 @@ use POSIX qw(ceil);
 my $session = WebGUI::Test->session;
 
 my $startingRowNum =   0;
-my $endingRowNum   = 100;
+my $endingRowNum   =  99;
+my @paginatingData = ($startingRowNum..$endingRowNum);
 
-my @paginatingData = $startingRowNum .. $endingRowNum;
-
-plan tests => 6; # increment this value for each test you create
+plan tests => 11; # increment this value for each test you create
 
 my $rowCount       = $endingRowNum - $startingRowNum + 1;
 my $NumberOfPages  = ceil($rowCount/25); ##Default page size=25
@@ -43,12 +42,26 @@ is($p->getRowCount,      $rowCount,      'all data returned by paginator');
 is($p->getNumberOfPages, $NumberOfPages, 'paginator returns right number of pages (default setting)');
 
 my $page1Data = $p->getPageData(1);
-cmp_bag([0..24], $page1Data, 'page 1 data correct');
+cmp_bag([0..24],  $p->getPageData(1), 'page 1 data correct');
+cmp_bag([25..49], $p->getPageData(2), 'page 2 data correct');
+cmp_bag([      ], $p->getPageData(5), 'page 5 data correct');
 
-use Data::Dumper;
+$startingRowNum =   0;
+$endingRowNum   = 100;
+@paginatingData = ($startingRowNum..$endingRowNum);
 
-my $page2Data = $p->getPageData(2);
-cmp_bag([25..49], $page2Data, 'page 2 data correct');
+$rowCount       = $endingRowNum - $startingRowNum + 1;
+$NumberOfPages  = ceil($rowCount/25); ##Default page size=25
 
-my $page5Data = $p->getPageData(5);
-cmp_bag([100], $page5Data, 'page 5 data correct');
+$p = WebGUI::Paginator->new($session, '/home');
+
+$p->setDataByArrayRef(\@paginatingData);
+
+is($p->getRowCount,      $rowCount,      '(101) paginator returns correct number of rows');
+is($p->getNumberOfPages, $NumberOfPages, '(101) paginator returns right number of pages (default setting)');
+
+my $page1Data = $p->getPageData(1);
+cmp_bag([0..24],  $p->getPageData(1), '(101) page 1 data correct');
+cmp_bag([25..49], $p->getPageData(2), '(101) page 2 data correct');
+cmp_bag([100   ], $p->getPageData(5), '(101) page 5 data correct');
+
