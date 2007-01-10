@@ -924,12 +924,12 @@ to add or remove users from their groups.
 
 	'head.tags' => {
 		message => q|Tags that WebGUI automatically generates for you so that caching works the way it should, search engines can find you better, and other useful automated functionality. This should go in the &lt;head&gt; &lt;/head&gt; section of your style.
-</p>
-<p>We suggest using something like this in the &lt;title&gt; &lt;/title&gt; portion of your style:
-</p>
-<p>&lt;tmpl_var session.page.title&gt; - &lt;tmpl_var session.setting.companyName&gt;
-</p>
-<p>That particular example will help you get good ranking on search engines.|,
+<br />
+<br />We suggest using something like this in the &lt;title&gt; &lt;/title&gt; portion of your style:
+<br />
+<br />&lt;tmpl_var session.page.title&gt; - &lt;tmpl_var session.setting.companyName&gt;
+<br />
+<br />That particular example will help you get good ranking on search engines.|,
 		lastUpdated => 1149182155,
 	},
 

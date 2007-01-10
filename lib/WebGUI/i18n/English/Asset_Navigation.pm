@@ -453,8 +453,8 @@ a Google sitemap of your site or RSS feeds.</p>
 
 	'page.depthIsN' => {
 		message => q|A conditional indicating whether the depth of this page is N. This variable is useful if you want to style a certain level.
-</p>
-<p>&lt;tmpl_if page.depthIs1&gt;<br />
+<br />
+<br />&lt;tmpl_if page.depthIs1&gt;<br />
 &nbsp;&nbsp; &lt;img src="level1.gif"&gt;<br />&lt;tmpl_else&gt;<br />&nbsp;&nbsp; &lt;img src="defaultBullet.gif"&gt;<br />&lt;/tmpl_if&gt;|,
 		lastUpdated => 1149394665,
 	},

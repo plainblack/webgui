@@ -22,6 +22,7 @@
         Palamara)
  - fix: Paginator: addDataByArrayRef off by one error (perlDreamer Consulting
    LLC)
+ - fix: English help, really XHTML fixes (thanks to Klaus)
 
 7.3.3
  - fix: Wiki Purge throws fatal

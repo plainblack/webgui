@@ -1202,8 +1202,8 @@ variable.|,
 
 	'searchFormTrash.label' => {
 		message => q|The label for the search in trash option. Available in normal and advanced search. Only use this if you are
-not using the complete <b>searchForm</b>.</p>                                                                                                                                                             
-<p><b>searchFormTrash.form</b><br />
+not using the complete <b>searchForm</b>.<br />                                                                                                                                                             
+<br /><b>searchFormTrash.form</b><br />
 The form Element for the search in trash option. Available in normal and advanced search. Only use this if you are
 not using the complete <b>searchForm</b>.|,
 		lastUpdated => 1149822982,
@@ -1223,8 +1223,8 @@ not using the complete <b>searchForm</b>.|,
 
 	'searchFormQuery.label' => {
 		message => q|The label for the search query. Available in normal search. Only use this if you are
-not using the complete <b>searchForm</b>.</p>                                                                                                                                                              
-<p><b>searchFormQuery.form</b><br />
+not using the complete <b>searchForm</b>.<br />                                                                                                                                                              
+<br /><b>searchFormQuery.form</b><br />
 The form Element for the search query. Available in normal search. Only use this if you are
 not using the complete <b>searchForm</b>.|,
 		lastUpdated => 1149822982,

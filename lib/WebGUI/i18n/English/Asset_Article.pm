@@ -115,7 +115,7 @@ be useful, others may not.|,
 
 	'new.template' => {
 		message => q|Articles have the special ability to change their template so that you can allow users to see different views of the article. You do this by creating a link with a URL like this (replace 999 with the template Id you wish to use):
-</p>
+
 <p>
 &lt;a href="&lt;tmpl_var new.template&gt;999"&gt;Read more...&lt;/a&gt;|,
 		lastUpdated => 1148960553,

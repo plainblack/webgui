@@ -8,9 +8,7 @@ our $I18N = {
 	},
 
 	'expire subscription codes body' => {
-		message => q|<p>This workflow activity will go through all subscription codes and expire any subscription code whose status is unused after the expiration date for the subscription code has passed.  The expiration date is calculated from the date it was created and interval it was set to expire.</p>
-<p>
-|,
+		message => q|<p>This workflow activity will go through all subscription codes and expire any subscription code whose status is unused after the expiration date for the subscription code has passed.  The expiration date is calculated from the date it was created and interval it was set to expire.</p>|,
 		lastUpdated => 0,
 	},
 
