@@ -141,7 +141,7 @@ sub editSave {
 	foreach my $filename (@{$tempStorage->getFiles}) {
 		my $storage = WebGUI::Storage::Image->create($self->session);
 		$storage->addFileFromFilesystem($tempStorage->getPath($filename));
-		$storage->setPrivileges($self->getParent->get("ownerUserId"),$self->getParent->get("groupIdView"),$self->getParent->get("groupIdEdit"));
+		#$storage->setPrivileges($self->getParent->get("ownerUserId"),$self->getParent->get("groupIdView"),$self->getParent->get("groupIdEdit"));
 		my %data;
 		my $selfName = 'WebGUI::Asset::File';
 		$selfName = "WebGUI::Asset::File::Image" if ($storage->isImage($filename));
@@ -154,6 +154,7 @@ sub editSave {
 					);
 			}
 		}
+		$storage->setPrivileges($data{"ownerUserId"},$data{"groupIdView"},$data{"groupIdEdit"});
 		$data{className} = $selfName;
 		$data{storageId} = $storage->getId;
 		$data{filename} = $data{title} = $data{menuTitle} = $filename;

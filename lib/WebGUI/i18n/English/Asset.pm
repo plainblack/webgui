@@ -385,20 +385,20 @@ a URL will be made from the parent's URL and the <b>Menu Title</b>.</p>|,
         },
 
         '108 description' => {
-                message => q|<p>The owner of an asset is usually the person who created the asset. This user always has full edit and viewing rights of the asset.</p>
+                message => q|<p>The owner of an asset is usually the person who created the asset. This user always has full edit and viewing rights of the asset.  This will default to the owner of the parent asset.</p>
 <p><b>NOTE:</b> The owner can only be changed by an administrator.
 </p>|,
-                lastUpdated => 1165364456,
+                lastUpdated => 1168488001,
         },
 
         '872 description' => {
-                message => q|<p>Choose which group can view this asset. If you want both visitors and registered users to be able to view the asset then you should choose the "Everybody" group.</p>|,
-                lastUpdated => 1146629267,
+                message => q|<p>Choose which group can view this asset. If you want both visitors and registered users to be able to view the asset then you should choose the "Everybody" group.  This will default to the group which can view the parent of this asset.</p>|,
+                lastUpdated => 1168488020,
         },
 
         '871 description' => {
-                message => q|<p>Choose the group that can edit this asset. The group assigned editing rights can also always view the asset.</p>|,
-                lastUpdated => 1146629269,
+                message => q|<p>Choose the group that can edit this asset. The group assigned editing rights can also always view the asset.  This will default to the group that can edit the parent of this asset.</p>|,
+                lastUpdated => 1168488034,
         },
 
         '412 description' => {
