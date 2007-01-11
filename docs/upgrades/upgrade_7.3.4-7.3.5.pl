@@ -12,6 +12,8 @@ use lib "../../lib";
 use strict;
 use Getopt::Long;
 use WebGUI::Session;
+use WebGUI::Asset;
+use WebGUI::Asset::Snippet;
 
 
 my $toVersion = "7.3.5"; # make this match what version you're going to
@@ -21,16 +23,23 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
-
+fixCss03Snippet($session);
 finish($session); # this line required
 
 
-##-------------------------------------------------
-#sub exampleFunction {
-#	my $session = shift;
-#	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
-#	# and here's our code
-#}
+#-------------------------------------------------
+sub fixCss03Snippet {
+	my $session = shift;
+	print "\tFixing the css03.css file used in Style03.\n" unless ($quiet);
+	my $cssSnippet = WebGUI::Asset->newByUrl($session, 'style3/css03.css');
+	if (ref $cssSnippet ne 'WebGUI::Asset::Snippet') {
+		print "Snippet could not be found.  Skipping";
+		return;
+	}
+	my $snippetContents = $cssSnippet->get('snippet');
+	$snippetContents =~ s/-moz-box-sizing:border:box/-moz-box-sizing:border-box/s;
+	$cssSnippet->update({snippet => $snippetContents});
+}
 
 
 
