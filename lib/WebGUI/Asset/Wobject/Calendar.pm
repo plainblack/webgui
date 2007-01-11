@@ -939,7 +939,7 @@ sub view
 	$var->{"paramType"}	= $params->{type};
 	
 	
-	
+	$var->{"extrasUrl"} = $self->session->url->extras();
 	##### Process the template
 	# If user is only a Visitor and we've gotten this far, update the cache
 	
@@ -1136,11 +1136,12 @@ sub viewMonth
 			my $week	= int(($adjust + $mday) / 7);
 			my $position	= ($adjust + $mday) % 7;
 			
-			push @{$var->{weeks}->[$week]->{days}->[$position]->{events}}, {
+			my $eventRef = {
 				## Event data
 				(%eventVar),
-				(%eventDates),
+				(%eventDates)
 				};
+			push @{$var->{weeks}->[$week]->{days}->[$position]->{events}}, $eventRef;
 		}
 	}
 	
@@ -1183,7 +1184,6 @@ sub viewMonth
 	$var->{"monthName"}		= $dt->month_name;
 	$var->{"monthAbbr"}		= $dt->month_abbr;
 	$var->{"year"}			= $dt->year;
-	
 	
 	# Return the template
 	return $var;
