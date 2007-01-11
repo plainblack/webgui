@@ -183,10 +183,6 @@ our $HELP = {
 				namespace => "Asset_Template",
 				tag => "template variables"
 			},
-			{
-				tag => 'wobject template variables',
-				namespace => 'Asset_Wobject'
-			}
 		],
 		variables => [
 		          {
@@ -428,10 +424,6 @@ our $HELP = {
 				namespace => "Asset_Template",
 				tag => "template variables"
 			},
-			{
-				tag => 'wobject template variables',
-				namespace => 'Asset_Wobject'
-			}
 		],
 		fields => [
 		],
@@ -564,12 +556,20 @@ our $HELP = {
 		title => 'data form asset template variables title',
 		body => 'data form asset template variables body',
 		isa => [
+			{
+				namespace => "Asset_Wobject",
+				tag => "wobject template variables"
+			},
 		],
 		fields => [
 		],
 		variables => [
 		          {
 		            'name' => 'templateId',
+		          },
+		          {
+		            'name' => 'acknowledgement',
+		            'description' => 'acknowledgement var desc',
 		          },
 		          {
 		            'name' => 'emailTemplateId',
@@ -581,11 +581,14 @@ our $HELP = {
 		            'name' => 'listTemplateId',
 		          },
 		          {
-		            'name' => 'acknowledgement',
-		            'description' => 'acknowledgement var desc',
+		            'name' => 'mailData',
 		          },
 		          {
 		            'name' => 'mailAttachments',
+		          },
+		          {
+		            'name' => 'defaultView',
+		            'description' => 'defaultView var desc',
 		          },
 		          {
 		            'name' => 'groupToViewEntries',

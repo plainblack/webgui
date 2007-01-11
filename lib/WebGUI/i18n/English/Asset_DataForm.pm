@@ -926,6 +926,10 @@ below to see which template variables may be used inside this loop.|,
 		 message => q|Default view|,
 		 lastUpdated => 1112929856,
         },
+        'defaultView var desc' => {
+		 message => q|This will be true if the DataForm was configured to display the List view by default, instead of the Form.|,
+		 lastUpdated => 1168535997,
+        },
         'data form' => {
 		 message => q|Data Form|,
 		 lastUpdated => 1113435285,
