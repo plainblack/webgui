@@ -32,7 +32,7 @@ Contributing Developers..............Lucas Bartholemy
                                      Christian Kocourek
                                      John W. Krahn
                                      Len Kranendonk
-                                     Colin Kuskie
+                                     Colin Kuskie / perlDreamer Consulting LLC
                                      Christophe Marcant
                                      Tony Mountifield
                                      Tavis Parker / ParkerOne Consulting
