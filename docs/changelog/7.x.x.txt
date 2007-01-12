@@ -6,6 +6,7 @@
         correctly. (Martin Kamerbeek / Oqapi)
  - fix: Macro documentation now states whether or not a macro can be nested
         inside other macro and if so, under what conditions.
+ - fix: Media Folder (perlDreamer Consulting, LLC)
 
 7.3.4
  - fix: SQLForm - cannot add new asset (Martin Kamerbeek / Oqapi)

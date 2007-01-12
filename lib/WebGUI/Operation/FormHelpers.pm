@@ -458,7 +458,7 @@ sub www_richEditAddImageSave {
 	#my $base = $session->asset;
 	my $url = $base->getUrl;
 	# check if user can edit the current asset
-	return WebGUI::Privilege::insufficient() unless $base->canEdit;
+	return $session->privilege->insufficient() unless $base->canEdit;
 
 	my $storage = WebGUI::Storage::Image->create($session);
 	my $filename = $storage->addFileFromFormPost('filename');
