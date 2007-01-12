@@ -40,8 +40,9 @@ ranked, pass the macro the rank that you want to see.</p>
 <p>As users visit your site, each story they read will be counted up and added to the counter for
 the correct contentType.  As you visit you separate page, you'll see the three most popular types
 of stories.</p>
+<p>This Macro may be nested inside other Macros if the Metadata field does not contain commas or quotes.</p>
 |,
-		lastUpdated => 1165361640,
+		lastUpdated => 1168558455,
 	},
 };
 

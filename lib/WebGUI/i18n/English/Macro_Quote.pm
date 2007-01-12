@@ -17,8 +17,9 @@ our $I18N = {
 <p><b>&#94;Quote();</b><br />
 Use this to escape a string before using it in a database query.
 </p>
+<p>This Macro may be nested inside other Macros if the quoted string does not contain commas or unescaped quotes.</p>
 |,
-		lastUpdated => 1146609178,
+		lastUpdated => 1168622849,
 	},
 };
 

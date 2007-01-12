@@ -20,9 +20,10 @@ Can be used to display a web server environment variable on a page. The environm
 
 <p>The macro should be specified like this &#94;Env("REMOTE_ADDR");
 </p>
+<p>This Macro may be nested inside other Macros if the text returned does not contain commas or quotes.</p>
 
 |,
-		lastUpdated => 1155749273,
+		lastUpdated => 1168558879,
 	},
 };
 

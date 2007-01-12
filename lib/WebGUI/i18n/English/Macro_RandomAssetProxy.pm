@@ -19,8 +19,9 @@ our $I18N = {
 This macro works similarly to the &#94;<b>AssetProxy</b>(); macro except instead of displaying the
 Asset, it picks a random Asset from the descendants of the Asset whose URL is supplied as the
 argument.</p>
+<p>This Macro may not be nested inside other Macros.</p>
 		|,
-		lastUpdated => 1167187099,
+		lastUpdated => 1168622873,
 	},
 
 	'childless' => {

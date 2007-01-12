@@ -16,12 +16,13 @@ our $I18N = {
 		message => q|
 
 <p><b>&#94;Thumbnail(<i>url</i>);</b><br />
-This macro will allow you to fetch the thumbnail for any File or Image Asset by its
-url.
+This macro will allow you to fetch the filesystem URL for the thumbnail of any File or Image Asset by its
+Asset URL.
 </p>
+<p>This Macro may be nested inside other Macros.</p>
 
 |,
-		lastUpdated => 1146607225,
+		lastUpdated => 1168623188,
 	},
 };
 

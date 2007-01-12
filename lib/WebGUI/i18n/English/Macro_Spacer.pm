@@ -19,8 +19,9 @@ Create a spacer in your layout. Great for creating blocks of color with divs and
 </p>
 <p><i>Example:</i> &#94;Spacer("100","50");
 </p>
+<p>This Macro may not be nested inside other Macros.</p>
 |,
-		lastUpdated => 1146608671,
+		lastUpdated => 1168623039,
 	},
 };
 

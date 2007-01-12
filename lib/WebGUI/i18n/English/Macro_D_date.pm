@@ -52,9 +52,10 @@ The current date and time.
 </p>
 
 <p>You can also pass in an epoch date into this macro as a secondary parameter. If no date is specified then today's date and time will be used.</p>
+<p>This Macro may be nested inside other Macros if the formatted date does not contain commas or quotes.</p>
 
 |,
-		lastUpdated => 1146679159,
+		lastUpdated => 1168558613,
 	},
 };
 

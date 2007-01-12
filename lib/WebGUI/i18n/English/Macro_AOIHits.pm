@@ -38,8 +38,9 @@ You visited sports stories: &#94;AOIHits(contentType,Business); times</p>
 
 <p>You must give &#94;AOIRank(); two arguments, the Metadata property to use and the
 Metadata value whose count you want displayed to the user.</p>
+<p>This Macro may be nested inside other Macros.</p>
 |,
-		lastUpdated => 1165363159,
+		lastUpdated => 1168558407,
 	},
 };
 

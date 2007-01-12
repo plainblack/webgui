@@ -25,8 +25,9 @@ Displays a small text message to the user if they belong to the specified group.
 </p>
 <p><i>Example:</i> &#94;GroupText("Visitors","You need an account to do anything cool on this site!","We value our registered users!");
 </p>
+<p>This Macro may be nested inside other Macros if the text returned does not contain commas or quotes.</p>
 |,
-		lastUpdated => 1146686292,
+		lastUpdated => 1168622429,
 	},
 };
 

@@ -17,8 +17,9 @@ our $I18N = {
 <p><b>&#94;c;</b><br />
 The name of your company specified in the settings by your Administrator.
 </p>
+<p>This Macro may be nested inside other Macros if the text does not contain commas or quotes.</p>
 |,
-		lastUpdated => 1146679121,
+		lastUpdated => 1168558579,
 	},
 };
 

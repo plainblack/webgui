@@ -62,8 +62,9 @@ of questions), then the example above can be used to display a random question f
 <dd>Gets a random post from all Collaboration Systems in root 'home' with debug output.</dd>
 </dl>
 </div>
+<p>This Macro may be nested inside other Macros if the post does not contain commas or quotes.</p>
 |,
-		lastUpdated => 1167187168,
+		lastUpdated => 1168622915,
 	},
 };
 

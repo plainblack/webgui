@@ -17,8 +17,9 @@ our $I18N = {
 <p><b>&#94;@; - Username</b><br />
 The username of the currently logged in user.
 </p>
+<p>This Macro may be nested inside other Macros if all usernames do not contain commas or quotes.</p>
 |,
-		lastUpdated => 1146679072,
+		lastUpdated => 1168558540,
 	},
 };
 

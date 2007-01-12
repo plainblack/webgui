@@ -19,8 +19,9 @@ Returns the title of the root of the current page. For instance, the main root i
 </p>
 <p>If the macro is called outside of an asset, or if the root can't be found, then
 the macro returns an empty string</p>
+<p>This Macro may be nested inside other Macros if the title does not contain commas or quotes.</p>
 |,
-		lastUpdated => 1153849842,
+		lastUpdated => 1168622930,
 	},
 };
 

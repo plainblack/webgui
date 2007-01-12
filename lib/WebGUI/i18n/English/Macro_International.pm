@@ -20,8 +20,9 @@ Pull a translated message from the internationalization system.
 
 <p><i>Example:</i> &#94;International(45,"Article");
 </p>
+<p>This Macro may be nested inside other Macros if the message does not contain commas or quotes.</p>
 |,
-		lastUpdated => 1146686421,
+		lastUpdated => 1168622528,
 	},
 };
 

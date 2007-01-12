@@ -18,9 +18,10 @@ our $I18N = {
 <p><b>&#94;User();</b><br />
 This macro will allow you to display any information from the current user's account or profile. For instance, if you wanted to display a user's email address you'd create this macro: &#94;User("email");
 </p>
+<p>This Macro may be nested inside other Macros if the information returned does not contain commas or quotes.</p>
 
 |,
-		lastUpdated => 1153172116,
+		lastUpdated => 1168623231,
 	},
 };
 

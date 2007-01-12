@@ -27,9 +27,10 @@ images, links to files for downloading or for snippets.</p>
 <p>It can also be like a Shortcut Asset, displaying content from another
 part of the site on this page.  Unlike a Shortcut, it cannot override
 any part of the original Asset.</p>
+<p>This Macro may not be nested inside other Macros.</p>
 
         |,
-        lastUpdated => 1146679031,
+        lastUpdated => 1168558479,
     },
 
 };

@@ -17,8 +17,9 @@ our $I18N = {
 <p><b>&#94;/; - System URL</b><br />
 The URL to the gateway script (example: <i>/index.pl/</i>). 
 </p>
+<p>This Macro may be nested inside other Macros.</p>
 |,
-		lastUpdated => 1146760697,
+		lastUpdated => 1168623028,
 	},
 };
 

@@ -17,8 +17,9 @@ our $I18N = {
 <p><b>&#94;PageUrl;</b><br />
 The URL to the current page (example: <i>/index.pl/pagename</i>). 
 </p>
+<p>This Macro may be nested inside other Macros.</p>
 |,
-		lastUpdated => 1146759407,
+		lastUpdated => 1168622829,
 	},
 };
 

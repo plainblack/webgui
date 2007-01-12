@@ -41,9 +41,11 @@ It accepts two arguments, the Id of the subscription item and an optional
 template to use instead of the default template, specified by a template Id
 from the Macro/SubscriptionItem namespace.</p>
 
+<p>This Macro may not be nested inside other Macros.</p>
+
 <p>These variables are available in the template:</p>
 |,
-		lastUpdated => 1149217429,
+		lastUpdated => 1168623113,
 	},
 };
 

@@ -17,8 +17,9 @@ our $I18N = {
 <p><b>&#94;#; - User ID</b><br />
 The user id of the currently logged in user.
 </p>
+<p>This Macro may be nested inside other Macros.</p>
 |,
-		lastUpdated => 1146686310,
+		lastUpdated => 1168622446,
 	},
 };
 

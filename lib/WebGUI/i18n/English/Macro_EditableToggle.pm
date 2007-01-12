@@ -27,12 +27,13 @@ our $I18N = {
 <p><b>&#94;EditableToggle; or &#94;EditableToggle();</b><br />
 Exactly the same as AdminToggle, except that the toggle is only displayed if the user has the rights to edit the current Asset. This macro takes up to three parameters. The first is a label for "Turn Admin On", the second is a label for "Turn Admin Off", and the third is the name of a template in the Macro/EditableToggle namespace to replace the default template.
 </p>
+<p>This Macro may not be nested inside other Macros.</p>
 
 <p>The following variables are available in the template:
 </p>
 
 |,
-		lastUpdated => 1149218452,
+		lastUpdated => 1168558646,
 	},
 
 	'516' => {

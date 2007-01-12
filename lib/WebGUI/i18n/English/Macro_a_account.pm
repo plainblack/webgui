@@ -28,13 +28,16 @@ link and a template from the Macro/a_account namespace to be used to
 display the link and text.  If the <i>link text</i> is set to the word
 "linkonly" then only the URL will be returned.</p>
 
-<p><b>NOTES:</b> The .myAccountLink style sheet class is tied to this macro.
+<p><b>NOTES:</b><br />
+<ul>
+<li>The .myAccountLink style sheet class is tied to this macro.</li>
+<li>This Macro may only be nested inside other Macros if the "linkonly" option is used.</li>
 </p>
 
 <p>The following is a list of variables available in the template:</p>
 
 |,
-		lastUpdated => 1149177708,
+		lastUpdated => 1168558260,
 	},
 
 	'46' => {

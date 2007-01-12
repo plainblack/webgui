@@ -61,8 +61,16 @@ our $I18N = {
 <b>&#94;x</b>(<i>"First argument",2</i>);
 </p>
 
+<p>You may nest Macros, but only if they do not contains commas or quotes.  You should follow the following guidelines:
+<ul>
+<li>Macros which contain HTML or javascript cannot be nested.</li>
+<li>Macros which return user input that may contain quotes or commas may be nested, but it's dangerous.</li>
+<li>If your user input must contain quotes and/or commas, it is recommended that the HTML encodings for comma and quote be used.</li>
+</ul>
+</p>
+
 |,
-		lastUpdated => 1165518386,
+		lastUpdated => 1168556567,
         },
 
 	'topicName' => {

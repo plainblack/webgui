@@ -15,8 +15,9 @@ takes a single argument, which is the name of the Ad Space from the AdSpace mana
 from the AdSpace manager.
 As a convenience, the AdSpace manager will display the macro code to put into a page to
 display each Ad Space.</p>
+<p>This Macro may not be nested inside other Macros.</p>
 |,
-		lastUpdated => 1165363527,
+		lastUpdated => 1168558375,
 	},
 
 	'macroName' => {

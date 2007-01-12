@@ -38,10 +38,12 @@ Using this macro you can allow users to delete themselves from a group. The firs
 </ul>
 </div>
 
+<p>This Macro may not be nested inside other Macros.</p>
+
 <p>>These variables are available in the template:</p>
 
 |,
-		lastUpdated => 1149217752,
+		lastUpdated => 1168622413,
 	},
 };
 

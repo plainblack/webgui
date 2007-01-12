@@ -18,9 +18,10 @@ our $I18N = {
 <p><b>&#94;URLEncode();</b><br />
 This macro is mainly useful in SQL reports, but it could be useful elsewhere as well. It takes the input of a string and URL Encodes it so that the string can be passed through a URL. It's syntax looks like this: &#94;URLEncode("Is this my string?");
 </p>
+<p>This Macro may be nested inside other Macros if the encoded text does not contain commas or quotes.</p>
 
 |,
-		lastUpdated => 1146607207,
+		lastUpdated => 1168623216,
 	},
 };
 

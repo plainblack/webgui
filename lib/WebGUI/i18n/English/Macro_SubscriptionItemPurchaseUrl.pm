@@ -18,8 +18,9 @@ our $I18N = {
 <p><b>&#94;SubscriptionItemPurchaseUrl(<i>subscriptionId</i>);</b><br />
 This macro fetches the URL to purchase a subscription item identified
 by its subscriptionId.</p>
+<p>This Macro may be nested inside other Macros.</p>
 |,
-		lastUpdated => 1146607246,
+		lastUpdated => 1168623124,
 	},
 };
 

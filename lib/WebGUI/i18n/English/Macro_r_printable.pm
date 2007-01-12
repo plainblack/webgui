@@ -38,11 +38,15 @@ Creates a link to alter the style from a page to make it printable.
 
 <p>The third argument allows a different template be used to generate the HTML code for presenting the link and text, by specifying the URL of the template.  The following variables are available in the template:</p>
 
-<p><b>NOTES:</b>The <i>.makePrintableLink</i> style sheet class is tied to the default template for this macro.
+<p><b>NOTES:</b><br />
+<ul>
+<li>The <i>.makePrintableLink</i> style sheet class is tied to the default template for this macro.</li>
+<li>This Macro may only be nested inside other Macros if the "linkonly" option is used.</li>
+</ul>
 </p>
 
 |,
-		lastUpdated => 1155309743,
+		lastUpdated => 1168623000,
 	},
 
 	'53' => {

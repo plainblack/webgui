@@ -26,8 +26,9 @@ Display a message to a user that can edit the current Asset.
 <p>Do not use this Macro outside of an Asset as it will have unpredictable
 results.
 </p>
+<p>This Macro may be nested inside other Macros if the text does not contain commas or quotes.</p>
 |,
-		lastUpdated => 1146679107,
+		lastUpdated => 1168558566,
 	},
 };
 

@@ -50,10 +50,11 @@ our $I18N = {
 <b>&#94;AdminBar(<i>custom template ID</i>);</b><br />
 Places the administrative tool bar on the page. Omitting this macro will prevent you from adding content, pasting
 content from the clipboard, accessing the help system and other administrative functions.</p>
+<p>This Macro may not be nested inside other Macros.</p>
 <p>
 The macro may take one optional argument, an alternate template in the Macro/AdminBar namespace for generating the AdminBar.  The following variables are available in the template:</p>
 |,
-		lastUpdated => 1149178399,
+		lastUpdated => 1168558295,
 	},
 
 	'376' => {

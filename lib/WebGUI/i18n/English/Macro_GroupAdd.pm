@@ -40,10 +40,12 @@ Using this macro you can allow users to add themselves to a group. The first par
 </ul>
 </div>
 
+<p>This Macro may not be nested inside other Macros.</p>
+
 <p>These variables are available in the template:</p>
  
 |,
-		lastUpdated => 1149218365,
+		lastUpdated => 1168622402,
 	},
 };
 

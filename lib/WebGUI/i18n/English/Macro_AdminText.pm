@@ -17,8 +17,9 @@ our $I18N = {
 <p><b>&#94;AdminText(<i>text message</i>);</b><br />
 Displays a small text message to a user who is in admin mode. Example: &#94;AdminText("You are in admin mode!");
 </p>
+<p>This Macro may be nested inside other Macros if the text does not contain commas or quotes.</p>
 |,
-		lastUpdated => 1146631276,
+		lastUpdated => 1168558334,
 	},
 };
 

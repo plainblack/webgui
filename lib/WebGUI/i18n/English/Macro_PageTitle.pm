@@ -19,11 +19,14 @@ our $I18N = {
 Displays the title of the current page.
 </p>
 
-<p><b>NOTE:</b> If you begin using admin functions or the in-depth functions of any wobject, the page title will become a link that will quickly bring you back to the page.
+<p><b>NOTES:</b><br />
+<ul>
+<li>If you begin using admin functions or the in-depth functions of any wobject, the page title will become a link that will quickly bring you back to the page.</li>
+<li>This Macro may be nested inside other Macros if the title does not contain commas or quotes</li>
+</ul>
 </p>
-
 |,
-		lastUpdated => 1146609765,
+		lastUpdated => 1168622805,
 	},
 };
 

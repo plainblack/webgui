@@ -20,8 +20,9 @@ This can be used to retrieve information about the current asset. For instance i
 an asset, or if the property doesn't exist, then it returns nothing.
 </p>
 <p>Properties available for retrieval depend on the type of asset that is being queried.</p>
+<p>This Macro may be nested inside other Macros if the property returned does not contain commas or quotes.</p>
 |,
-		lastUpdated => 1153339253,
+		lastUpdated => 1168622743,
 	},
 };
 

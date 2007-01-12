@@ -23,8 +23,9 @@ A one line SQL report. Sometimes you just need to pull something back from the d
 </p>
 <p>If there are more numeric macros than selected columns in the SQL report the extra macros will be discarded.</p>
 <p>The rownum macro, &#94;rownum;, begins counting at 1.</p>
+<p>This Macro may be nested inside other Macros if the text returned does not contain commas or quotes.</p>
 |,
-		lastUpdated => 1151986323,
+		lastUpdated => 1168623083,
 	},
 
 	'illegal query' => {

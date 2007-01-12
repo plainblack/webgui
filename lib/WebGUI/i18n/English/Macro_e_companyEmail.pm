@@ -17,8 +17,9 @@ our $I18N = {
 <p><b>&#94;e;</b><br />
 The email address for your company specified in the settings by your Administrator.
 </p>
+<p>This Macro may be nested inside other Macros if the email address does not contain commas or quotes.</p>
 |,
-		lastUpdated => 1146679191,
+		lastUpdated => 1168558595,
 	},
 };
 

@@ -18,9 +18,10 @@ our $I18N = {
 <p><b>&#94;u; - Company URL</b><br />
 The URL for your company specified in the settings by your Administrator.
 </p>
+<p>This Macro may be nested inside other Macros.</p>
 
 |,
-		lastUpdated => 1146607213,
+		lastUpdated => 1168623198,
 	},
 };
 
