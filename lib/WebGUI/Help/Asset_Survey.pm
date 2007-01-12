@@ -6,8 +6,8 @@ our $HELP = {
 		body => '4',
 		isa => [
 			{
-				namespace => "Asset_Wobject",
-				tag => "wobject add/edit"
+				namespace => 'Asset_Wobject',
+				tag => 'wobject add/edit'
 			},
 		],
 		fields => [
@@ -196,8 +196,12 @@ our $HELP = {
 		],
 		isa => [
 			{
-				namespace => "Asset_Survey",
-				tag => "survey template common vars"
+				namespace => 'Asset_Survey',
+				tag => 'survey template common vars'
+			},
+			{
+				namespace => 'Asset_Survey',
+				tag => 'survey asset template variables'
 			},
 		],
 		variables => [
@@ -339,12 +343,9 @@ our $HELP = {
 				tag => 'survey add/edit',
 				namespace => 'Asset_Survey'
 			},
-			{
-				tag => 'wobject template',
-				namespace => 'Asset_Wobject'
-			}
 		]
 	},
+
 	'survey template common vars' => {
 		title => '90',
 		body => '91',
@@ -410,6 +411,7 @@ our $HELP = {
 			}
 		]
 	},
+
 	'gradebook report template' => {
 		title => '1087',
 		body => '1088',
@@ -417,8 +419,16 @@ our $HELP = {
 		],
 		isa => [
 			{
-				namespace => "Asset_Survey",
-				tag => "survey template common vars"
+				namespace => 'Asset_Survey',
+				tag => 'survey template common vars'
+			},
+			{
+				tag => 'pagination template variables',
+				namespace => 'WebGUI'
+			},
+			{
+				namespace => 'Asset_Survey',
+				tag => 'survey asset template variables'
 			},
 		],
 		variables => [
@@ -457,22 +467,23 @@ our $HELP = {
 		],
 		related => [
 			{
-				tag => 'pagination template variables',
-				namespace => 'WebGUI'
-			},
-			{
 				tag => 'survey template',
 				namespace => 'Asset_Survey'
 			},
 		]
 	},
+
 	'survey response template' => {
 		title => '1089',
 		body => '1090',
 		isa => [
 			{
-				namespace => "Asset_Survey",
-				tag => "survey template common vars"
+				namespace => 'Asset_Survey',
+				tag => 'survey template common vars'
+			},
+			{
+				namespace => 'Asset_Survey',
+				tag => 'survey asset template variables'
 			},
 		],
 		fields => [
@@ -569,6 +580,7 @@ our $HELP = {
 			}
 		]
 	},
+
 	'statistical overview report template' => {
 		title => '1091',
 		body => '1092',
@@ -576,8 +588,16 @@ our $HELP = {
 		],
 		isa => [
 			{
-				namespace => "Asset_Survey",
-				tag => "survey template common vars"
+				namespace => 'Asset_Survey',
+				tag => 'survey template common vars'
+			},
+			{
+				tag => 'pagination template variables',
+				namespace => 'WebGUI'
+			},
+			{
+				namespace => 'Asset_Survey',
+				tag => 'survey asset template variables'
 			},
 		],
 		variables => [
@@ -649,15 +669,66 @@ our $HELP = {
 		],
 		related => [
 			{
-				tag => 'pagination template variables',
-				namespace => 'WebGUI'
-			},
-			{
 				tag => 'survey add/edit',
 				namespace => 'Asset_Survey'
 			}
 		]
 	},
+
+	'survey asset template variables' => {
+		title => 'survey asset template variables body',
+		body => 'survey asset template variables title',
+		isa => [
+			{
+				namespace => 'Asset_Wobject',
+				tag => 'wobject template variables'
+			},
+		],
+		fields => [
+		],
+		variables => [
+		          {
+		            'name' => 'templateId'
+		          },
+		          {
+		            'name' => 'Survey_id'
+		          },
+		          {
+		            'name' => 'questionOrder'
+		          },
+		          {
+		            'name' => 'groupToTakeSurvey'
+		          },
+		          {
+		            'name' => 'groupToViewReports'
+		          },
+		          {
+		            'name' => 'mode'
+		          },
+		          {
+		            'name' => 'anonymous'
+		          },
+		          {
+		            'name' => 'maxResponsesPerUser'
+		          },
+		          {
+		            'name' => 'questionsPerPage'
+		          },
+		          {
+		            'name' => 'overviewTemplateId'
+		          },
+		          {
+		            'name' => 'gradebookTemplateId'
+		          },
+		          {
+		            'name' => 'responseTemplateId'
+		          },
+		          {
+		            'name' => 'defaultSectionId'
+		          },
+		],
+	},
+
 };
 
 1;

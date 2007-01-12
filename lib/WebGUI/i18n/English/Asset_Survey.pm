@@ -825,8 +825,8 @@ correct and what percentage answered were correct.|,
         },
 
         '85 description' => {
-                message => q|How many questions are given to each user?|,
-                lastUpdated => 1146455551,
+                message => q|The number of questions given to each user.|,
+                lastUpdated => 1168642765,
         },
 
         '12 description' => {
@@ -1236,8 +1236,92 @@ is correct or not.|,
         'what next answer description' => {
                 message => q|After defining the answer, you can add an answer to this question, addi
 		another question, edit the current question or go back to the page containing the
-		Survey|,
+		Survey.|,
                 lastUpdated => 1146455600,
+        },
+
+	'survey asset template variables title' => {
+		message => q|Survey Asset Template Variables|,
+		lastUpdated => 1168644075
+	},
+
+	'survey asset template variables body' => {
+		message => q|Every asset provides a set of variables to most of its
+templates based on the internal asset properties.  Some of these variables may
+be useful, others may not.|,
+		lastUpdated => 1168644077
+	},
+
+        'templateId' => {
+                message => q|The ID of the template to show the Survey.|,
+                lastUpdated => 1168639537,
+        },
+
+        'Survey_id' => {
+                message => q|The unique ID of this Survey.  This is different from the Asset ID.|,
+                lastUpdated => 1168639537,
+        },
+
+        'questionOrder' => {
+                message => q|Defines the order of the questions in the survey, "sequential", "random", "response" or "section".|,
+                context => q|The strings in quotes are literals.  They should not be translated.|,
+                lastUpdated => 1168639812,
+        },
+
+        'groupToTakeSurvey' => {
+                message => q|The ID of the group that is allowed to take the Survey.|,
+                lastUpdated => 1168639812,
+        },
+
+        'groupToViewReports' => {
+                message => q|The ID of the group that is allowed to view reports from the Survey.|,
+                lastUpdated => 1168639812,
+        },
+
+        'mode' => {
+                message => q|The mode the survey will run in, either "survey" or "quiz".|,
+                context => q|The strings in quotes are literals.  They should not be translated.|,
+                lastUpdated => 1168639812,
+        },
+
+        'anonymous' => {
+                message => q|A conditional variable showing whether or not this Survey as configured to be anonymous.|,
+                lastUpdated => 1168639812,
+        },
+
+        'maxResponsesPerUser' => {
+                message => q|The number of times the user can attempt to get the correct answer on each question.  The default is 1.|,
+                lastUpdated => 1168643566,
+        },
+
+        'questionsPerPage' => {
+                message => q|The number of questions given to each user.|,
+                lastUpdated => 1168643573,
+        },
+
+        'questionsPerPage' => {
+                message => q|The number of questions that will be displayed per page.|,
+                lastUpdated => 1168643669,
+        },
+
+        'overviewTemplateId' => {
+                message => q|The ID of the template used to show the overview screen.|,
+                lastUpdated => 1168643669,
+        },
+
+        'gradebookTemplateId' => {
+                message => q|The ID of the template used to show the gradebook screen.|,
+                lastUpdated => 1168643669,
+        },
+
+        'responseTemplateId' => {
+                message => q|The ID of the template used to show the Survey Response screen.|,
+                lastUpdated => 1168643669,
+        },
+
+        'defaultSectionId' => {
+                message => q|The ID of the default section.|,
+                lastUpdated => 1168643669,
         },
 
 };
