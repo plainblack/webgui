@@ -2,7 +2,8 @@
  - fix: CSS error in css03.css (perlDreamer Consulting, LLC)
  - fix: event tooltips are now displaying properly in all browsers
  - fix: .wgacess (perlDreamer Consulting, LLC)
- 
+ - fix: Fixed a bug where date form fields would not process epoch values 
+        correctly. (Martin Kamerbeek / Oqapi)
 
 7.3.4
  - fix: SQLForm - cannot add new asset (Martin Kamerbeek / Oqapi)

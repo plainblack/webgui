@@ -162,7 +162,7 @@ sub toHtml {
 	if ($self->get("_defaulted") && $self->get("noDate") ) {
 		# No default date
 		$value = $self->set("value",'');
-	} elsif (!$self->get("defaultValue") || $self->get("defaultValue") =~ m/^\d+$/) {
+	} elsif (!$self->get("defaultValue") || $self->get("value") =~ m/^\d+$/) {
 		# Epoch format
 		$value = $self->set("value",$self->session->datetime->epochToSet($self->get("value")));
 	} else {
