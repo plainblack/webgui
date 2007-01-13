@@ -395,6 +395,43 @@ our $I18N = {
 		lastUpdated => 1149567007
 	},
 
+	'stock data asset template variables title' => {
+		message => q|Stock Data Asset Template Variables|,
+		lastUpdated => 1164841146
+	},
+
+	'stock data asset template variables body' => {
+		message => q|Every asset provides a set of variables to most of its
+templates based on the internal asset properties.  Some of these variables may
+be useful, others may not.|,
+		lastUpdated => 1168646697
+	},
+
+	'templateId' => {
+		message => q|The ID of the template used to show the main screen for this Asset.|,
+		lastUpdated => 1168646698
+	},
+
+	'displayTemplateId' => {
+		message => q|The ID of the template used to show the user details about their stocks.|,
+		lastUpdated => 1168646698
+	},
+
+	'defaultStocks' => {
+		message => q|The default list of stocks if the user has not chosen any.  This is a string separated by newlines.|,
+		lastUpdated => 1168646896
+	},
+
+	'source' => {
+		message => q|The internet source to be used as the source of stock information.|,
+		lastUpdated => 1168646986
+	},
+
+	'failover' => {
+		message => q|A conditional indicating whether or not failover has been set for this Stock Data Asset.|,
+		lastUpdated => 1168646986
+	},
+
 };
 
 1;
