@@ -404,7 +404,7 @@ sub www_checkoutSubmit {
 	# check if user has already logged in
 	if ($session->user->userId eq '1') {
 		$session->scratch->set('redirectAfterLogin', $session->url->page('op=checkout'));
-		return WebGUI::Operation::execute($session,'displayLogin');
+		return WebGUI::Operation::execute($session,'auth');
 	}
 
 	# Check if a valid payment gateway has been selected. If not have the user do so.
