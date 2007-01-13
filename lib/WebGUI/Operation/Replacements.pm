@@ -79,7 +79,7 @@ sub www_deleteReplacement {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	$session->db->write("delete from replacements where replacementId=".$session->db->quote($session->form->process("replacementId")));
-	return www_listReplacements();
+	return www_listReplacements($session);
 }
 
 =head2 www_editReplacement ( $session )
@@ -146,7 +146,7 @@ sub www_editReplacementSave {
 		searchFor=>$session->form->process("searchFor"),
 		replaceWith=>$session->form->process("replaceWith")
 		});
-	return www_listReplacements();
+	return www_listReplacements($session);
 }
 
 =head2 www_listReplacements ( $session )
