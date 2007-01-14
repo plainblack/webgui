@@ -475,7 +475,7 @@ The URL of the current page including attributes. The page number will be append
 
 =head3 paginateAfter
 
-The number of rows to display per page. If left blank it defaults to 50.
+The number of rows to display per page. If left blank it defaults to 25.
 
 =head3 pageNumber 
 
