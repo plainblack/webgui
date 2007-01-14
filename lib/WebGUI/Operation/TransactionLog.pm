@@ -89,7 +89,7 @@ sub www_cancelRecurringTransaction {
 		$message = $i18n->get('cannot cancel');
 	}
 
-	return www_viewPurchaseHistory($message);
+	return www_viewPurchaseHistory($session, $message);
 }
 
 #-------------------------------------------------------------------
