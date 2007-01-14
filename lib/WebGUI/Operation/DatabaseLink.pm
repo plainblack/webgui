@@ -83,7 +83,7 @@ sub www_copyDatabaseLink {
 	my $session = shift;
         return $session->privilege->insufficient unless ($session->user->isInGroup(3));
 	WebGUI::DatabaseLink->new($session,$session->form->process("dlid"))->copy;
-        return www_listDatabaseLinks();
+        return www_listDatabaseLinks($session);
 }
 
 =head2 www_deleteDatabaseLink ( $session )
