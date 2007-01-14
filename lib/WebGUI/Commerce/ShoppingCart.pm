@@ -80,6 +80,10 @@ sub add {
 
 	$item = WebGUI::Commerce::Item->new($self->session,$itemId, $itemType);
 	return "" unless ($item->available);
+
+	# Fetch the itemId from the item plugin in stead of the given parameter.
+	# This allows item plugins to dynamically create new items.
+	$itemId = $item->id;
 	
 	$self->{_items}{$itemId."_".$itemType} = {
 		itemId		=> $itemId,

@@ -9,6 +9,8 @@
  - fix: Media Folder (perlDreamer Consulting, LLC)
  - fix: Cannot save new content filters.
  - fix: Cannot delete content filter.
+ - change: adapted WebGUI::Commerce::ShoppingCart to make it capable of 
+        handling dynamic item plugins. (Martin Kamerbeek / Oqapi)
 
 7.3.4
  - fix: SQLForm - cannot add new asset (Martin Kamerbeek / Oqapi)
