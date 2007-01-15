@@ -319,59 +319,214 @@ query, but will be prefixed with queryN where N goes from 2 to 5.</p>
 <p>The prequery statements are separated from each other by returns and cannot use placeholders. You can use macro's within the prequery statements, however. Please note that prequery statements are only visible in the query they belong to and that you can only use statements that are allowed by the database link.</p>|,
 		lastUpdated => 1167186661,
 	},
-	
-	
-	
+
 	'download type' => {
 		message => 'Download Type',
 		lastUpdated => 0,
 	},
-	
+
 	'download type description' => {
 		message => "The type of download to create.",
 		lastUpdated => 0,
 	},
-	
+
 	'download filename' => {
 		message => 'Download File Name',
 		lastUpdated => 0,
 	},
-	
+
 	'download filename description' => {
 		message => "The filename of the file to download. If left blank, will autogenerate.",
 		lastUpdated => 0,
 	},
-	
+
 	'download template' => {
 		message => "Download Template",
 		lastUpdated => 0,
 	},
-	
+
 	'download template description' => {
 		message => "The template to use to generate the download file.",
 		lastUpdated => 0,
 	},
-	
+
 	'download mimetype' => {
 		message => "Download Mime-Type",
 		lastUpdated => 0,
 	},
-	
+
 	'download mimetype description' => {
 		message => "Mime-Type for the downloaded template.",
 		lastUpdated => 0,
 	},
-	
+
 	'download usergroup' => {
 		message => "Download User Group",
 		lastUpdated => 0,
 	},
-	
+
 	'download usergroup description' => {
 		message => "Group of users allowed to download the report.",
 		lastUpdated => 0,
 	},
-	
+
+	'sql report asset template variables title' => {
+		message => q|SQL Report Asset Template Variables|,
+		lastUpdated => 1168887204
+	},
+
+	'sql report asset template variables body' => {
+		message => q|Every asset provides a set of variables to most of its
+templates based on the internal asset properties.  Some of these variables may
+be useful, others may not.|,
+		lastUpdated => 1168887206
+	},
+
+	'templateId' => {
+		message => q|The ID of the template to display the SQL Report to the user.|,
+		lastUpdated => 1168886083,
+	},
+
+	'cacheTimeout' => {
+		message => q|The amount of time in seconds the output will be cached.|,
+		lastUpdated => 1168886083,
+	},
+
+	'paginateAfter' => {
+		message => q|The number of rows or entries to show on each page of the report.|,
+		lastUpdated => 1168886083,
+	},
+
+	'dbQuery1' => {
+		message => q|The first database query.|,
+		lastUpdated => 1168886083,
+	},
+
+	'prequeryStatements1' => {
+		message => q|The first set of prequery SQL statements.|,
+		lastUpdated => 1168886083,
+	},
+
+	'preprocessMacros1' => {
+		message => q|A conditional indicating whether or not the first query will have embedded Macros processed before being executed.|,
+		lastUpdated => 1168886083,
+	},
+
+	'placeholderParams1' => {
+		message => q|A conditional indicating whether or not the first query will have embedded Macros processed before being executed.|,
+		lastUpdated => 1168886083,
+	},
+
+	'databaseLinkId1' => {
+		message => q|The identifier which describes which database the first query will be executed against.|,
+		lastUpdated => 1168886083,
+	},
+
+	'dbQuery2' => {
+		message => q|The second database query.|,
+		lastUpdated => 1168886083,
+	},
+
+	'prequeryStatements2' => {
+		message => q|The second set of prequery SQL statements.|,
+		lastUpdated => 1168886083,
+	},
+
+	'preprocessMacros2' => {
+		message => q|A conditional indicating whether or not the second query will have embedded Macros processed before being executed.|,
+		lastUpdated => 1168886083,
+	},
+
+	'placeholderParams2' => {
+		message => q|A conditional indicating whether or not the second query will have embedded Macros processed before being executed.|,
+		lastUpdated => 1168886083,
+	},
+
+	'databaseLinkId2' => {
+		message => q|The identifier which describes which database the second query will be executed against.|,
+		lastUpdated => 1168886083,
+	},
+
+	'dbQuery3' => {
+		message => q|The third database query.|,
+		lastUpdated => 1168886083,
+	},
+
+	'prequeryStatements3' => {
+		message => q|The third set of prequery SQL statements.|,
+		lastUpdated => 1168886083,
+	},
+
+	'preprocessMacros3' => {
+		message => q|A conditional indicating whether or not the third query will have embedded Macros processed before being executed.|,
+		lastUpdated => 1168886083,
+	},
+
+	'placeholderParams3' => {
+		message => q|A conditional indicating whether or not the third query will have embedded Macros processed before being executed.|,
+		lastUpdated => 1168886083,
+	},
+
+	'databaseLinkId3' => {
+		message => q|The identifier which describes which database the third query will be executed against.|,
+		lastUpdated => 1168886083,
+	},
+
+	'dbQuery4' => {
+		message => q|The fourth database query.|,
+		lastUpdated => 1168886083,
+	},
+
+	'prequeryStatements4' => {
+		message => q|The fourth set of prequery SQL statements.|,
+		lastUpdated => 1168886083,
+	},
+
+	'preprocessMacros4' => {
+		message => q|A conditional indicating whether or not the fourth query will have embedded Macros processed before being executed.|,
+		lastUpdated => 1168886083,
+	},
+
+	'placeholderParams4' => {
+		message => q|A conditional indicating whether or not the fourth query will have embedded Macros processed before being executed.|,
+		lastUpdated => 1168886083,
+	},
+
+	'databaseLinkId4' => {
+		message => q|The identifier which describes which database the fourth query will be executed against.|,
+		lastUpdated => 1168886083,
+	},
+
+	'dbQuery5' => {
+		message => q|The fifth database query.|,
+		lastUpdated => 1168886083,
+	},
+
+	'prequeryStatements5' => {
+		message => q|The fifth set of prequery SQL statements.|,
+		lastUpdated => 1168886083,
+	},
+
+	'preprocessMacros5' => {
+		message => q|A conditional indicating whether or not the fifth query will have embedded Macros processed before being executed.|,
+		lastUpdated => 1168886083,
+	},
+
+	'placeholderParams5' => {
+		message => q|A conditional indicating whether or not the fifth query will have embedded Macros processed before being executed.|,
+		lastUpdated => 1168886083,
+	},
+
+	'databaseLinkId5' => {
+		message => q|The identifier which describes which database the fifth query will be executed against.|,
+		lastUpdated => 1168886083,
+	},
+
+	'debugMode' => {
+		message => q|A conditional indicating whether or not the SQL Report can have debug information in the output.|,
+		lastUpdated => 1168886083,
+	},
+
 };
 
 1;
