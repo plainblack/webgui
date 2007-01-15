@@ -27,7 +27,7 @@ my $startingRowNum =   0;
 my $endingRowNum   =  99;
 my @paginatingData = ($startingRowNum..$endingRowNum);
 
-plan tests => 12; # increment this value for each test you create
+plan tests => 13; # increment this value for each test you create
 
 my $rowCount       = $endingRowNum - $startingRowNum + 1;
 my $NumberOfPages  = ceil($rowCount/25); ##Default page size=25
@@ -65,4 +65,6 @@ cmp_bag([0..24],  $p->getPageData(1), '(101) page 1 data correct');
 cmp_bag([25..49], $p->getPageData(2), '(101) page 2 data correct');
 cmp_bag([100   ], $p->getPageData(5), '(101) page 5 data correct');
 
-is($p->getPageNumber, 1, 'Default page number is 1');
+is('100', $p->getPage(5), '(101) page 5 stringification okay');
+
+is($p->getPageNumber, 1, 'Default page number is 1'); ##Additional page numbers are specified at instantiation
