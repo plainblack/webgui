@@ -106,6 +106,12 @@ our $HELP = {
 	'task edit template' => {
 		title => 'edit task template vars title',
 		body => 'edit task template vars body',
+		isa => [
+			{
+				namespace => "Asset_Template",
+				tag => "template variables"
+			},
+		],
 		variables => [
 		          {
 		            'required' => 1,
@@ -174,6 +180,12 @@ our $HELP = {
 	'view project template' => {
 		title => 'view project template vars title',
 		body => 'view project template vars body',
+		isa => [
+			{
+				namespace => "Asset_Template",
+				tag => "template variables"
+			},
+		],
 		variables => [
 		          {
 		            'name' => 'form.header'
@@ -305,6 +317,12 @@ our $HELP = {
 	'gantt chart template' => {
 		title => 'gantt chart template vars title',
 		body => 'gantt chart template vars body',
+		isa => [
+			{
+				namespace => "Asset_Template",
+				tag => "template variables"
+			},
+		],
 		variables => [
 		          {
 		            'name' => 'extras',
@@ -357,6 +375,44 @@ our $HELP = {
                                 namespace => 'Asset_ProjectManager',
                         },
 		],
+	},
+
+	'project manager asset template variables' => {
+		title => 'project manager asset template variables title',
+		body => 'project manager asset template variables body',
+		isa => [
+			{
+				namespace => "Asset_Wobject",
+				tag => "wobject template variables"
+			},
+		],
+		fields => [
+		],
+		variables => [
+		          {
+		            'name' => 'projectDashboardTemplateId'
+		          },
+		          {
+		            'name' => 'projectDisplayTemplateId'
+		          },
+		          {
+		            'name' => 'ganttChartTemplateId'
+		          },
+		          {
+		            'name' => 'editTaskTemplateId'
+		          },
+		          {
+		            'name' => 'resourcePopupTemplateId'
+		          },
+		          {
+		            'name' => 'resourceListTemplateId'
+		          },
+		          {
+		            'name' => 'groupToAdd'
+		          },
+		        ],
+		related => [
+		]
 	},
 
 };

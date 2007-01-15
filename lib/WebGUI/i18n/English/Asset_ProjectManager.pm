@@ -819,6 +819,54 @@ Otherwise, just the duration will be displayed as text.|,
 		message => q|Milestone|,
                 lastUpdated => 1159557353
         },
+
+	'projectDashboardTemplateId' => {
+		message => q|The ID of the template to display the main view of the Project Manager.|,
+                lastUpdated => 1168904548
+        },
+
+	'projectDisplayTemplateId' => {
+		message => q|The ID of the template to display one project from the Project Manager.|,
+                lastUpdated => 1168904548
+        },
+
+	'ganttChartTemplateId' => {
+		message => q|The ID of the template to display the gantt chart in the Project Manager.|,
+                lastUpdated => 1168904548
+        },
+
+	'editTaskTemplateId' => {
+		message => q|The ID of the template to edit a task in the Project Manager.|,
+                lastUpdated => 1168904548
+        },
+
+	'resourcePopupTemplateId' => {
+		message => q|The ID of the template to display a popup for selecting resources in the Project Manager.|,
+                lastUpdated => 1168904548
+        },
+
+	'resourceListTemplateId' => {
+		message => q|The ID of the template to display a popup for listing resources in the Project Manager.|,
+                lastUpdated => 1168904548
+        },
+
+	'groupToAdd' => {
+		message => q|The ID of group that is allowed to manage this project manager.|,
+                lastUpdated => 1168904548
+        },
+
+	'project manager asset template variables title' => {
+		message => q|Project Manager Asset Template Variables|,
+		lastUpdated => 1164841146
+	},
+
+	'project manager asset template variables body' => {
+		message => q|Every asset provides a set of variables to most of its
+templates based on the internal asset properties.  Some of these variables may
+be useful, others may not.|,
+		lastUpdated => 1164841201
+	},
+
 };
 
 1;
