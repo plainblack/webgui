@@ -38,9 +38,28 @@ our $HELP = {
 			},
 		]
 	},
+
 	'search template' => {
 		title => 'search template',
 		body => 'search template body',
+		isa => [
+			{
+				tag => 'pagination template variables',
+				namespace => 'WebGUI'
+			},
+			{
+				namespace => "Asset_Article",
+				tag => "article asset template variables"
+			},
+			{
+				namespace => "Asset_Template",
+				tag => "template variables"
+			},
+			{
+				namespace => "Asset",
+				tag => "asset template"
+			},
+		],
 		fields => [
 		],
 		variables => [
@@ -67,19 +86,38 @@ our $HELP = {
 		],
 		related => [
 			{
-				tag => 'asset fields',
-				namespace => 'Asset'
-			},
-			{
 				tag => 'wobject template',
 				namespace => 'Asset_Wobject'
 			},
-			{
-				tag => 'template language',
-				namespace => 'Asset_Template'
-			}
 		]
 	},
+
+	'search asset template variables' => {
+		title => 'search asset template variables title',
+		body => 'search asset template variables body',
+		isa => [
+			{
+				namespace => "Asset_Wobject",
+				tag => "wobject template variables"
+			},
+		],
+		fields => [
+		],
+		variables => [
+		          {
+		            'name' => 'templateId'
+		          },
+		          {
+		            'name' => 'searchRoot'
+		          },
+		          {
+		            'name' => 'classLimiter'
+		          },
+		        ],
+		related => [
+		]
+	},
+
 };
 
 1;

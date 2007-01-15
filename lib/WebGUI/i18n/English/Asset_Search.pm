@@ -90,6 +90,33 @@ our $I18N = { ##hashref of hashes
 		lastUpdated => 1142052519,
 	},
 
+	'search asset template variables title' => {
+		message => q|Search Asset Template Variables|,
+		lastUpdated => 1164841146
+	},
+
+	'search asset template variables body' => {
+		message => q|Every asset provides a set of variables to most of its
+templates based on the internal asset properties.  Some of these variables may
+be useful, others may not.|,
+		lastUpdated => 1164841201
+	},
+
+	'templateId' => {
+		message => q|The ID of the template used to display the Search Asset.|,
+		lastUpdated => 1168897708,
+	},
+
+	'searchRoot' => {
+		message => q|The ID of the Asset where the searching will begin.|,
+		lastUpdated => 1168897708,
+	},
+
+	'classLimiter' => {
+		message => q|A string with all types of Assets to search.|,
+		lastUpdated => 1168897708,
+	},
+
 };
 
 1;
