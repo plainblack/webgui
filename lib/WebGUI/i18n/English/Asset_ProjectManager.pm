@@ -268,6 +268,12 @@ our $I18N = {
 		context => q|Abbreviation for predecessor|,
 		},
 
+	'N_A' => {
+		message => q|N/A|,
+		context => q|This is the abbreviation for Not Available.  The translated version should be short.|,
+		lastUpdated => 1168969700
+	},
+
 	 'add task label' => {
 		message => q|Add Task|,
 		lastUpdated => 0
@@ -921,6 +927,86 @@ be useful, others may not.|,
 	'canEditProjects' => {
 		message => q|A conditional that will be true if the current user is allowed to view projects or manage projects.|,
 		lastUpdated => 1168925749,
+	},
+
+	'project.delete.warning' => {
+		message => q|An internationalized message used in the default template as a javascript pop-up.|,
+		lastUpdated => 1168969193,
+	},
+
+	'noProjects' => {
+		message => q|A conditional that is true if there are no project in the Project Manager.|,
+		lastUpdated => 1168969193,
+	},
+
+	'project.loop' => {
+		message => q|A loop containing all projects that the current user is allowed to see.|,
+		lastUpdated => 1168969193,
+	},
+
+	'project.view.url' => {
+		message => q|A URL to go to the screen to view this project.|,
+		lastUpdated => 1168969193,
+	},
+
+	'project.name.data' => {
+		message => q|The name of this project.|,
+		lastUpdated => 1168969193,
+	},
+
+	'project.description.data' => {
+		message => q|This project's description.|,
+		lastUpdated => 1168969193,
+	},
+
+	'project.startDate.data' => {
+		message => q|The project's starting date in YYYY-MM-DD format.  If no start date has been set, then it will have a short internationalized message.|,
+		lastUpdated => 1168969193,
+	},
+
+	'project.endDate.data' => {
+		message => q|The project's starting date in YYYY-MM-DD format.  If no start date has been set, then it will have a short internationalized message.|,
+		lastUpdated => 1168969193,
+	},
+
+	'project.cost.data.int' => {
+		message => q|The project's cost as an integer (whole number) with commas inserted.|,
+		lastUpdated => 1168969193,
+	},
+
+	'project.cost.data.float' => {
+		message => q|The project's cost with commas inserted.|,
+		lastUpdated => 1168969193,
+	},
+
+	'project.complete.data.int' => {
+		message => q|Pecentage completion for the project, as an integer.|,
+		lastUpdated => 1168969193,
+	},
+
+	'project.complete.data.float' => {
+		message => q|Pecentage completion for the project, as a floating number with two decimal places of accuracy.|,
+		lastUpdated => 1168969193,
+	},
+
+	'project.edit.url' => {
+		message => q|If the current user has permission to edit projects, then this variable will have a URL to edit the project.|,
+		lastUpdated => 1168969193,
+	},
+
+	'project.edit.title' => {
+		message => q|An internationalized label "Edit Project".|,
+		lastUpdated => 1168969193,
+	},
+
+	'project.delete.url' => {
+		message => q|If the current user has permission to edit projects, then this variable will have a URL to delete the project.|,
+		lastUpdated => 1168969193,
+	},
+
+	'project.delete.title' => {
+		message => q|An internationalized label "Delete Project".|,
+		lastUpdated => 1168969193,
 	},
 
 };

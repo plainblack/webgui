@@ -146,6 +146,53 @@ our $HELP = {
 		          {
 		            'name' => 'canEditProjects',
 		          },
+		          {
+		            'name' => 'project.delete.warning',
+		          },
+		          {
+		            'name' => 'noProjects',
+		          },
+		          {
+		            'name' => 'project.loop',
+			    'variables' => [
+				  {
+				    'name' => 'project.view.url',
+				  },
+				  {
+				    'name' => 'project.name.data',
+				  },
+				  {
+				    'name' => 'project.description.data',
+				  },
+				  {
+				    'name' => 'project.startDate.data',
+				  },
+				  {
+				    'name' => 'project.cost.data.int',
+				  },
+				  {
+				    'name' => 'project.cost.data.float',
+				  },
+				  {
+				    'name' => 'project.complete.data.int',
+				  },
+				  {
+				    'name' => 'project.complete.data.float',
+				  },
+				  {
+				    'name' => 'project.edit.url',
+				  },
+				  {
+				    'name' => 'project.edit.title',
+				  },
+				  {
+				    'name' => 'project.delete.url',
+				  },
+				  {
+				    'name' => 'project.delete.title',
+				  },
+			    ],
+		          },
 		],
 		fields => [ ],
 		related => [

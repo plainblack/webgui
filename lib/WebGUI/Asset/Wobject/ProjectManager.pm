@@ -371,8 +371,8 @@ sub view {
 	   $hash->{'project.view.url'} = $self->getUrl("func=viewProject;projectId=".$projectId);
 	   $hash->{'project.name.data'} = $project->{name};
 	   $hash->{'project.description.data'} = $project->{description};
-	   $hash->{'project.startDate.data'} = $project->{startDate}?$datetime->epochToSet($project->{startDate}):"N/A";
-	   $hash->{'project.endDate.data'} = $project->{endDate}?$datetime->epochToSet($project->{endDate}):"N/A";
+	   $hash->{'project.startDate.data'} = $project->{startDate}?$datetime->epochToSet($project->{startDate}):$i18n->get("N_A");
+	   $hash->{'project.endDate.data'} = $project->{endDate}?$datetime->epochToSet($project->{endDate}):$i18n->get("N_A");
 	   $hash->{'project.cost.data.int'} = WebGUI::Utility::commify(int($project->{targetBudget}));
 	   $hash->{'project.cost.data.float'} = WebGUI::Utility::commify($project->{targetBudget});
 	   $hash->{'project.complete.data.int'} = int($project->{percentComplete});
