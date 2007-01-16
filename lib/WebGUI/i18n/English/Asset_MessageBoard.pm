@@ -171,21 +171,6 @@ our $I18N = {
 		lastUpdated => 1149632734,
 	},
 
-	'default.description' => {
-		message => q|The description of the default forum.|,
-		lastUpdated => 1149632734,
-	},
-
-	'default.title' => {
-		message => q|The title of the default forum.|,
-		lastUpdated => 1149632734,
-	},
-
-	'default.controls' => {
-		message => q|The editing controls for the default forum.|,
-		lastUpdated => 1149632734,
-	},
-
 	'areMultipleForums' => {
 		message => q|A conditional indicating whether there is more than one forum.|,
 		lastUpdated => 1149632734,
@@ -208,10 +193,10 @@ our $I18N = {
 	},
 
 	'71' => {
-		message => q|<p>Message boards can contain one or more Forums and/or Discussion Boards, are a great way to add community to any site or intranet. Many companies use message boards internally to collaborate on projects.
+		message => q|<p>Message boards can contain one or more Forums and/or Discussion Boards.  They are a great way to add community to any site or intranet. Many companies use message boards internally to collaborate on projects.
 </p>
 |,
-		lastUpdated => 1146776095
+		lastUpdated => 1168991147
 	},
 
 	'61' => {
@@ -267,6 +252,28 @@ our $I18N = {
 	'lastpost' => {
 		message => q|Last Post|,
 		lastUpdated => 1109806115,
+	},
+
+	'message board asset template variables title' => {
+		message => q|Message Board Asset Template Variables|,
+		lastUpdated => 1164841146
+	},
+
+	'message board asset template variables body' => {
+		message => q|Every asset provides a set of variables to most of its
+templates based on the internal asset properties.  Some of these variables may
+be useful, others may not.|,
+		lastUpdated => 1164841201
+	},
+
+	'visitorCacheTimeout' => {
+		message => q|The amount of time this article will be cached for the Visitor user.|,
+		lastUpdated => 1164841027
+	},
+
+	'templateId' => {
+		message => q|The Id of the template used to display this Asset.|,
+		lastUpdated => 1164841027
 	},
 
 };
