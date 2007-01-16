@@ -217,6 +217,79 @@ width is 150 pixels.|,
 an image graph.|,
 		lastUpdated => 1031514049,
 	},
+
+	'poll asset template variables title' => {
+		message => q|Poll Asset Template Variables|,
+		lastUpdated => 1168983984,
+	},
+
+	'poll asset template variables body' => {
+		message => q|Every asset provides a set of variables to most of its
+templates based on the internal asset properties.  Some of these variables may
+be useful, others may not.|,
+		lastUpdated => 1168983986,
+	},
+
+	'templateId' => {
+		message => q|The ID of the template used to display this Asset.|,
+		lastUpdated => 1168983984,
+	},
+
+	'active' => {
+		message => q|A conditional that is true if this Poll is open for voting.|,
+		lastUpdated => 1168983984,
+	},
+
+	'karmaPerVote' => {
+		message => q|The amount of karma given to a user when they vote.|,
+		lastUpdated => 1168984674,
+	},
+
+	'graphWidth' => {
+		message => q|The width of the graph in pixels.|,
+		lastUpdated => 1168984674,
+	},
+
+	'voteGroup' => {
+		message => q|The ID of the group that is allowed to vote in the Poll.|,
+		lastUpdated => 1168984674,
+	},
+
+	'question' => {
+		message => q|The question to ask in the Poll.|,
+		lastUpdated => 1168984674,
+	},
+
+	'randomizeAnswers' => {
+		message => q|A conditional that will be true if the Poll was set to randomize the order answers are presented.|,
+		lastUpdated => 1168984674,
+	},
+
+	'aN' => {
+		message => q|The variables a1 through a20 store the answers for the Poll.|,
+		lastUpdated => 1168984674,
+	},
+
+	'graphConfiguration' => {
+		message => q|The type of graph.|,
+		lastUpdated => 1168985711,
+	},
+
+	'generateGraph' => {
+		message => q|A conditional that will be true if the Poll was set to display a graph.|,
+		lastUpdated => 1168985711,
+	},
+
+	'graphUrl' => {
+		message => q|A URL for the graph of Poll results.  This will only be set if the Poll was set to generate a graph and the graph configuration is valid.|,
+		lastUpdated => 1168985711,
+	},
+
+	'hasImageGraph' => {
+		message => q|A .|,
+		lastUpdated => 1168985711,
+	},
+
 };
 
 1;

@@ -6,8 +6,8 @@ our $HELP = {
 		body => '71',
 		isa => [
 			{
-				namespace => "Asset_Wobject",
-				tag => "wobject add/edit"
+				namespace => 'Asset_Wobject',
+				tag => 'wobject add/edit',
 			},
 		],
 		fields => [
@@ -60,76 +60,144 @@ our $HELP = {
 		related => [
 			{
 				tag => 'poll template',
-				namespace => 'Asset_Poll'
+				namespace => 'Asset_Poll',
 			},
 			{
 				tag => 'wobjects using',
-				namespace => 'Asset_Wobject'
+				namespace => 'Asset_Wobject',
 			}
 		]
 	},
+
 	'poll template' => {
 		title => '73',
 		body => '74',
+		isa => [
+			{
+				namespace => "Asset_Poll",
+				tag => "poll asset template variables"
+			},
+			{
+				namespace => "Asset_Template",
+				tag => "template variables"
+			},
+			{
+				namespace => "Asset",
+				tag => "asset template"
+			},
+		],
 		fields => [
 		],
 		variables => [
 		          {
-		            'name' => 'canVote'
+		            'name' => 'canVote',
 		          },
 		          {
-		            'name' => 'question'
+		            'name' => 'question',
 		          },
 		          {
-		            'name' => 'form.start'
+		            'name' => 'form.start',
+			    'required' => 1,
 		          },
 		          {
 		            'name' => 'answer_loop',
 		            'variables' => [
 		                             {
-		                               'name' => 'answer.form'
+		                               'name' => 'answer.form',
 		                             },
 		                             {
-		                               'name' => 'answer.text'
+		                               'name' => 'answer.text',
 		                             },
 		                             {
-		                               'name' => 'answer.number'
+		                               'name' => 'answer.number',
 		                             },
 		                             {
-		                               'name' => 'answer.graphWidth'
+		                               'name' => 'answer.graphWidth',
 		                             },
 		                             {
-		                               'name' => 'answer.percent'
+		                               'name' => 'answer.percent',
 		                             },
 		                             {
-		                               'name' => 'answer.total'
+		                               'name' => 'answer.total',
 		                             }
 		                           ]
 		          },
 		          {
-		            'name' => 'form.submit'
+		            'name' => 'form.submit',
+			    'required' => 1,
 		          },
 		          {
-		            'name' => 'form.end'
+		            'name' => 'form.end',
+			    'required' => 1,
 		          },
 		          {
-		            'name' => 'responses.label'
+		            'name' => 'responses.label',
 		          },
 		          {
-		            'name' => 'responses.total'
+		            'name' => 'responses.total',
+		          },
+		          {
+		            'name' => 'graphUrl',
+		          },
+		          {
+		            'name' => 'hasImageGraph',
 		          }
 		],
 		related => [
 			{
 				tag => 'poll add/edit',
-				namespace => 'Asset_Poll'
+				namespace => 'Asset_Poll',
 			},
-			{
-				tag => 'wobject template',
-				namespace => 'Asset_Wobject'
-			}
 		]
 	},
+
+	'poll asset template variables' => {
+		title => 'poll asset template variables title',
+		body => 'poll asset template variables body',
+		isa => [
+			{
+				namespace => 'Asset_Wobject',
+				tag => 'wobject template variables',
+			},
+		],
+		fields => [
+		],
+		variables => [
+		          {
+		            'name' => 'templateId',
+		          },
+		          {
+		            'name' => 'active',
+		          },
+		          {
+		            'name' => 'karmaPerVote',
+		          },
+		          {
+		            'name' => 'graphWidth',
+		          },
+		          {
+		            'name' => 'voteGroup',
+		          },
+		          {
+		            'name' => 'question',
+		          },
+		          {
+		            'name' => 'randomizeAnswers',
+		          },
+		          {
+		            'name' => 'aN',
+		          },
+		          {
+		            'name' => 'graphConfiguration',
+		          },
+		          {
+		            'name' => 'generateGraph',
+		          },
+		        ],
+		related => [
+		],
+	},
+
 };
 
 1;
