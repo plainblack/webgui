@@ -6,8 +6,8 @@ our $HELP = {
 		body => '39',
 		isa => [
 			{
-				namespace => "Asset_Wobject",
-				tag => "wobject add/edit"
+				namespace => 'Asset_Wobject',
+				tag => 'wobject add/edit'
 			},
 		],
 		fields => [
@@ -94,6 +94,7 @@ our $HELP = {
 			}
 		]
 	},
+
 	'product feature add/edit' => {
 		title => '40',
 		body => '41',
@@ -120,6 +121,7 @@ our $HELP = {
 			}
 		]
 	},
+
 	'product specification add/edit' => {
 		title => '42',
 		body => '43',
@@ -152,6 +154,7 @@ our $HELP = {
 			}
 		]
 	},
+
 	'product accessory add/edit' => {
 		title => '44',
 		body => '45',
@@ -174,6 +177,7 @@ our $HELP = {
 			}
 		]
 	},
+
 	'product related add/edit' => {
 		title => '46',
 		body => '47',
@@ -196,6 +200,7 @@ our $HELP = {
 			}
 		]
 	},
+
 	'product benefit add/edit' => {
 		title => '49',
 		body => '50',
@@ -222,9 +227,24 @@ our $HELP = {
 			}
 		]
 	},
+
 	'product template' => {
 		title => '62',
 		body => '63',
+		isa => [
+			{
+				namespace => 'Asset_Product',
+				tag => 'product asset template variables'
+			},
+			{
+				namespace => 'Asset_Template',
+				tag => 'template variables'
+			},
+			{
+				namespace => 'Asset',
+				tag => 'asset template'
+			},
+		],
 		fields => [
 		],
 		variables => [
@@ -376,10 +396,54 @@ our $HELP = {
 				tag => 'product add/edit',
 				namespace => 'Asset_Product'
 			},
+		]
+	},
+
+	'product asset template variables' => {
+		title => 'product asset template variables title',
+		body => 'product asset template variables body',
+		isa => [
 			{
-				tag => 'wobject template',
-				namespace => 'Asset_Wobject'
-			}
+				namespace => 'Asset_Wobject',
+				tag => 'wobject template variables'
+			},
+		],
+		fields => [
+		],
+		variables => [
+		          {
+		            'name' => 'cacheTimeout'
+		          },
+		          {
+		            'name' => 'templateId'
+		          },
+		          {
+		            'name' => 'price'
+		          },
+		          {
+		            'name' => 'image1'
+		          },
+		          {
+		            'name' => 'image2'
+		          },
+		          {
+		            'name' => 'image3'
+		          },
+		          {
+		            'name' => 'brochure'
+		          },
+		          {
+		            'name' => 'manual'
+		          },
+		          {
+		            'name' => 'warranty'
+		          },
+		        ],
+		related => [
+			{
+				tag => 'article add/edit',
+				namespace => 'Asset_Article'
+			},
 		]
 	},
 };

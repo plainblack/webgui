@@ -647,6 +647,68 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
+	'product asset template variables title' => {
+		message => q|Product Asset Template Variables|,
+		lastUpdated => 1164841146
+	},
+
+	'product asset template variables body' => {
+		message => q|Every asset provides a set of variables to most of its
+templates based on the internal asset properties.  Some of these variables may
+be useful, others may not.|,
+		lastUpdated => 1164841201
+	},
+
+	'cacheTimeout' => {
+		message => q|The amount of time in seconds output from this Asset will be cached.|,
+		lastUpdated => 1164841201
+	},
+
+	'templateId' => {
+		message => q|The ID of the template that will be used to display this Asset.|,
+		lastUpdated => 1164841201
+	},
+
+	'price' => {
+		message => q|The price of this Product.|,
+		lastUpdated => 1164841201
+	},
+
+	'productNumber' => {
+		message => q|The product number, SKU, ISBN, or other identifier for this product.|,
+		lastUpdated => 1164841201
+	},
+
+	'image1' => {
+		message => q|The unique identifier for the storage object for the first image.|,
+		lastUpdated => 1164841201
+	},
+
+	'image2' => {
+		message => q|The unique identifier for the storage object for the second image.|,
+		lastUpdated => 1164841201
+	},
+
+	'image3' => {
+		message => q|The unique identifier for the storage object for the third image.|,
+		lastUpdated => 1164841201
+	},
+
+	'brochure' => {
+		message => q|The unique identifier for the storage object for a product brochure .|,
+		lastUpdated => 1164841201
+	},
+
+	'manual' => {
+		message => q|The unique identifier for the storage object for a product manual.|,
+		lastUpdated => 1164841201
+	},
+
+	'warranty' => {
+		message => q|The unique identifier for the storage object for a product warranty.|,
+		lastUpdated => 1164841201
+	},
+
 };
 
 1;
