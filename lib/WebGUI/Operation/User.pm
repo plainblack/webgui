@@ -423,8 +423,12 @@ sub www_editUserSave {
 	#
 	# Also verify that the posted username is not blank (we need a username)
 	#
+	
+	my $postedUsername = $session->form->process("username");
+	$postedUsername = WebGUI::HTML::filter($postedUsername, "all");
+
 	if (($existingUserId eq $postedUserId || ($postedUserId eq "new" && !$existingUserId) || $existingUserId eq '')
-             && $session->form->process("username") ne '') 
+             && $postedUsername ne '') 
              {
 		# Create a user object with the id passed in.  If the Id is 'new', the new method will return a new user,
 		# otherwise return the existing users properties
@@ -432,7 +436,7 @@ sub www_editUserSave {
 	   	$actualUserId = $u->userId;
 	   	
 		# Update the user properties with passed in values.  These methods will save changes to the db.
-	   	$u->username($session->form->process("username"));
+	   	$u->username($postedUsername);
 	   	$u->authMethod($session->form->process("authMethod"));
 	   	$u->status($session->form->process("status"));
 
@@ -460,7 +464,7 @@ sub www_editUserSave {
 	# Display an error telling them the username they are trying to use is not available and suggest alternatives	
 	} else {
 		my $username = $session->form->process("username");
-       		$error = '<ul>' . sprintf($i18n->get(77), $username, $username, $username, $session->datetime->epochToHuman($session->datetime->time(),"%y")).'</ul>';
+       		$error = '<ul>' . sprintf($i18n->get(77), $postedUsername, $postedUsername, $postedUsername, $session->datetime->epochToHuman($session->datetime->time(),"%y")).'</ul>';
 	}
 	if ($isSecondary) {
 		return _submenu($session,{workarea => $i18n->get(978)});

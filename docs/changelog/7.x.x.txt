@@ -9,6 +9,7 @@
  - fix: Media Folder (perlDreamer Consulting, LLC)
  - fix: Cannot save new content filters.
  - fix: Cannot delete content filter.
+ - fix: XSS Vulnerability in WebGUI usernames
  - change: adapted WebGUI::Commerce::ShoppingCart to make it capable of 
         handling dynamic item plugins. (Martin Kamerbeek / Oqapi)
 
