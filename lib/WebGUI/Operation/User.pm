@@ -463,7 +463,6 @@ sub www_editUserSave {
 		
 	# Display an error telling them the username they are trying to use is not available and suggest alternatives	
 	} else {
-		my $username = $session->form->process("username");
        		$error = '<ul>' . sprintf($i18n->get(77), $postedUsername, $postedUsername, $postedUsername, $session->datetime->epochToHuman($session->datetime->time(),"%y")).'</ul>';
 	}
 	if ($isSecondary) {
