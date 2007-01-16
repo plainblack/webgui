@@ -1009,6 +1009,142 @@ be useful, others may not.|,
 		lastUpdated => 1168969193,
 	},
 
+	'add resource popup template title' => {
+		message => q|Project Manager, Select Resource Popup Template|,
+		lastUpdated => 1168925012
+	},
+
+	'add resource popup template body' => {
+		message => q|<p>This template displays a popup for adding either users or groups to a task.  Depending on which it is adding, template variables, especially labels, will contain information.</p>|,
+		lastUpdated => 1168925012
+	},
+
+	'title' => {
+		message => q|An internationalized message for either adding users or adding groups.|,
+		lastUpdated => 1168925012
+	},
+
+	'searchText' => {
+		message => q|An internationalized message for either searching for users or groups.|,
+		lastUpdated => 1168976576
+	},
+
+	'foundMessage' => {
+		message => q|An internationalized message labeling users or groups that were found.|,
+		lastUpdated => 1168925012
+	},
+
+	'notFoundMessage' => {
+		message => q|An internationalized message alerting the users that no groups or no users were found.|,
+		lastUpdated => 1168925012
+	},
+
+	'assetExtras' => {
+		message => q|The URL to the Extras directory for the Project Manager.|,
+		lastUpdated => 1168925012
+	},
+
+	'func' => {
+		message => q|The function that the form should call when it is submitted.|,
+		lastUpdated => 1168925012
+	},
+
+	'callback' => {
+		message => q|The name of the javascript callback to call.|,
+		lastUpdated => 1168976888
+	},
+
+	'exclude' => {
+		message => q|HTML formatted version of user supplied data for exclusions to the search.|,
+		lastUpdated => 1168976888
+	},
+
+	'previousSearch' => {
+		message => q|HTML formatted version of user supplied data for the previous search.|,
+		lastUpdated => 1168976888
+	},
+
+	'selfUrl' => {
+		message => q|HTML formatted URL to this Project Manager.  This is for display only, not for linking.|,
+		lastUpdated => 1168976888
+	},
+
+	'doingSearch' => {
+		message => q|A conditional that is true if this popup was called as part of a search form.|,
+		lastUpdated => 1168976888
+	},
+
+	'foundResults' => {
+		message => q|If this popup was called as part of a search, this will contain the number of results that were found.|,
+		lastUpdated => 1168976888
+	},
+
+	'resourceDiv' => {
+		message => q|If this popup was called as part of a search, this will contain HTML code for displaying all the results.|,
+		lastUpdated => 1168976888
+	},
+
+	'list resource popup template title' => {
+		message => q|Project Manager, List Resources Popup Template|,
+		lastUpdated => 1168925012
+	},
+
+	'list resource popup template body' => {
+		message => q|<p>This template displays a popup for adding either users or groups to a task.  Depending on which it is adding, template variables, especially labels, will contain information.</p>|,
+		lastUpdated => 1168925012
+	},
+
+	'resourceLoop' => {
+		message => q|A loop containing resources to display.|,
+		lastUpdated => 1168925012
+	},
+
+	'resourceKind' => {
+		message => q|The kind of resource, either "user" or "group".|,
+		context => q|Note to translators, the strings in quotes are literals.  Please do not translate them.|,
+		lastUpdated => 1168925012
+	},
+
+	'resourceId' => {
+		message => q|A unique identifier for this resource.|,
+		lastUpdated => 1168925012
+	},
+
+	'opCallbackJs' => {
+		message => q|The name of the javascript callback for the form that called the popup.|,
+		lastUpdated => 1168925012
+	},
+
+	'opIcon' => {
+		message => q|The name of an icon for the form, with no path.|,
+		lastUpdated => 1168925012
+	},
+
+	'opTitle' => {
+		message => q|The title for this form.|,
+		lastUpdated => 1168925012
+	},
+
+	'odd' => {
+		message => q|This will be true for odd rows in the list.  This can be used for making those cute little displays with alternating rows.|,
+		lastUpdated => 1168925012
+	},
+
+	'hiddenFields' => {
+		message => q|Extra hidden form fields that should be added to the form for it to function properly.|,
+		lastUpdated => 1168925012
+	},
+
+	'resourceName' => {
+		message => q|HTML version of the resource name, whether it is a group or a user.|,
+		lastUpdated => 1168925012
+	},
+
+	'resourceIcon' => {
+		message => q|The name of an icon this resource, specific to the type of resource.|,
+		lastUpdated => 1168925012
+	},
+
 };
 
 1;

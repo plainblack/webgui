@@ -8,8 +8,8 @@ our $HELP = {
 		body => 'pm add/edit body',
 		isa => [
 			{
-				namespace => "Asset_Wobject",
-				tag => "wobject add/edit"
+				namespace => 'Asset_Wobject',
+				tag => 'wobject add/edit'
 			},
 		],
 		fields => [
@@ -108,8 +108,12 @@ our $HELP = {
 		body => 'project dashboard template body',
 		isa => [
 			{
-				namespace => "Asset_Template",
-				tag => "template variables"
+				namespace => 'Asset_ProjectManager',
+				tag => 'project manager asset template variables'
+			},
+			{
+				namespace => 'Asset_Template',
+				tag => 'template variables'
 			},
 		],
 		variables => [
@@ -208,8 +212,12 @@ our $HELP = {
 		body => 'edit task template vars body',
 		isa => [
 			{
-				namespace => "Asset_Template",
-				tag => "template variables"
+				namespace => 'Asset_ProjectManager',
+				tag => 'project manager asset template variables'
+			},
+			{
+				namespace => 'Asset_Template',
+				tag => 'template variables'
 			},
 		],
 		variables => [
@@ -282,8 +290,12 @@ our $HELP = {
 		body => 'view project template vars body',
 		isa => [
 			{
-				namespace => "Asset_Template",
-				tag => "template variables"
+				namespace => 'Asset_ProjectManager',
+				tag => 'project manager asset template variables'
+			},
+			{
+				namespace => 'Asset_Template',
+				tag => 'template variables'
 			},
 		],
 		variables => [
@@ -419,8 +431,12 @@ our $HELP = {
 		body => 'gantt chart template vars body',
 		isa => [
 			{
-				namespace => "Asset_Template",
-				tag => "template variables"
+				namespace => 'Asset_ProjectManager',
+				tag => 'project manager asset template variables'
+			},
+			{
+				namespace => 'Asset_Template',
+				tag => 'template variables'
 			},
 		],
 		variables => [
@@ -482,8 +498,8 @@ our $HELP = {
 		body => 'project manager asset template variables body',
 		isa => [
 			{
-				namespace => "Asset_Wobject",
-				tag => "wobject template variables"
+				namespace => 'Asset_Wobject',
+				tag => 'wobject template variables'
 			},
 		],
 		fields => [
@@ -513,6 +529,135 @@ our $HELP = {
 		        ],
 		related => [
 		]
+	},
+
+	'add resource popup template' => {
+		title => 'add resource popup template title',
+		body => 'add resource popup template body',
+		isa => [
+			{
+				namespace => 'Asset_ProjectManager',
+				tag => 'project manager asset template variables'
+			},
+			{
+				namespace => 'Asset_Template',
+				tag => 'template variables'
+			},
+		],
+		variables => [
+		          {
+		            'name' => 'title',
+		          },
+		          {
+		            'name' => 'searchText',
+		          },
+		          {
+		            'name' => 'foundMessage',
+		          },
+		          {
+		            'name' => 'notFoundMessage',
+		          },
+		          {
+		            'name' => 'assetExtras',
+		          },
+		          {
+		            'required' => 1,
+		            'name' => 'func',
+		          },
+		          {
+		            'required' => 1,
+		            'name' => 'callback',
+		          },
+		          {
+		            'name' => 'exclude',
+		          },
+		          {
+		            'name' => 'previousSearch',
+		          },
+		          {
+		            'name' => 'selfUrl',
+		          },
+		          {
+		            'name' => 'doingSearch',
+		          },
+		          {
+		            'name' => 'foundResults',
+		          },
+		          {
+		            'required' => 1,
+		            'name' => 'resourceDiv',
+		          },
+		],
+		fields => [ ],
+		related => [
+                        {
+                                tag => 'project manager add/edit',
+                                namespace => 'Asset_ProjectManager',
+                        },
+		],
+	},
+
+	'list resource popup template' => {
+		title => 'list resource popup template title',
+		body => 'list resource popup template body',
+		isa => [
+			{
+				namespace => 'Asset_ProjectManager',
+				tag => 'project manager asset template variables'
+			},
+			{
+				namespace => 'Asset_Template',
+				tag => 'template variables'
+			},
+		],
+		variables => [
+		          {
+		            'name' => 'assetExtras',
+		          },
+		          {
+		            'name' => 'resourceLoop',
+			    'variables' => [
+				  {
+				    'name' => 'resourceKind',
+				  },
+				  {
+				    'name' => 'resourceId',
+				  },
+				  {
+				    'name' => 'opCallbackJs',
+				  },
+				  {
+				    'name' => 'opIcon',
+				  },
+				  {
+				    'name' => 'opTitle',
+				  },
+				  {
+				    'name' => 'odd',
+				  },
+				  {
+				    'required' => 1,
+				    'name' => 'hiddenFields',
+				  },
+				  {
+				    'name' => 'resourceName',
+				  },
+				  {
+				    'name' => 'resourceIcon',
+				  },
+				  {
+				    'name' => 'assetExtras',
+				  },
+			    ],
+		          },
+		],
+		fields => [ ],
+		related => [
+                        {
+                                tag => 'project manager add/edit',
+                                namespace => 'Asset_ProjectManager',
+                        },
+		],
 	},
 
 };
