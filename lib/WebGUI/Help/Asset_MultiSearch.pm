@@ -6,8 +6,8 @@ our $HELP = {
 		body => 'multisearch add/edit body',
 		isa => [
 			{
-				namespace => "Asset_Wobject",
-				tag => "wobject add/edit"
+				namespace => 'Asset_Wobject',
+				tag => 'wobject add/edit',
 			},
 		],
 		fields => [
@@ -26,13 +26,13 @@ our $HELP = {
 		related => [
 			{
 				tag => 'multisearch template',
-				namespace => 'Asset_MultiSearch'
+				namespace => 'Asset_MultiSearch',
 			},
 			{
 				tag => 'dashboard add/edit',
-				namespace => 'Asset_Dashboard'
+				namespace => 'Asset_Dashboard',
 			},
-		]
+		],
 	},
 
 	'multisearch template' => {
@@ -40,25 +40,29 @@ our $HELP = {
 		body => 'multisearch template body',
 		isa => [
 			{
-				namespace => "Asset_Template",
-				tag => "template variables"
+				namespace => 'Asset_MultiSearch',
+				tag => 'multi search asset template variables',
 			},
 			{
-				namespace => "Asset",
-				tag => "asset template"
+				namespace => 'Asset_Template',
+				tag => 'template variables',
+			},
+			{
+				namespace => 'Asset',
+				tag => 'asset template',
 			},
 		],
 		variables => [
 		          {
 		            'name' => 'search',
-		            'description' => 'search.variable'
+		            'description' => 'search.variable',
 		          },
 		          {
 		            'name' => 'for',
-		            'description' => 'for.variable'
+		            'description' => 'for.variable',
 		          },
 		          {
-		            'name' => 'submit'
+		            'name' => 'submit',
 		          }
 		],
 		fields => [
@@ -66,14 +70,33 @@ our $HELP = {
 		related => [
 			{
 				tag => 'multi search add/edit',
-				namespace => 'Asset_MultiSearch'
+				namespace => 'Asset_MultiSearch',
 			},
+		],
+	},
+
+	'multi search asset template variables' => {
+		title => 'multi search asset template variables title',
+		body => 'multi search asset template variables body',
+		isa => [
 			{
-				tag => 'wobject template',
-				namespace => 'Asset_Wobject'
-			}
-		]
-	}
+				namespace => 'Asset_Wobject',
+				tag => 'wobject template variables',
+			},
+		],
+		fields => [
+		],
+		variables => [
+		          {
+		            'name' => 'cacheTimeout',
+		          },
+		          {
+		            'name' => 'templateId',
+		          },
+		        ],
+		related => [
+		],
+	},
 };
 
 1;

@@ -74,6 +74,28 @@ as well as these:</p>
 		lastUpdated => 1141147361,
 	},
 
+	'multi search asset template variables title' => {
+		message => q|MultiSearch Asset Template Variables|,
+		lastUpdated => 1164841146
+	},
+
+	'multi search asset template variables body' => {
+		message => q|Every asset provides a set of variables to most of its
+templates based on the internal asset properties.  Some of these variables may
+be useful, others may not.|,
+		lastUpdated => 1164841201
+	},
+
+	'templateId' => {
+		message => q|The Id of the template used to display this Asset.|,
+		lastUpdated => 1164841027
+	},
+
+	'cacheTimeout' => {
+		message => q|The amount of time in seconds to cache the output of this MultiSearch.|,
+		lastUpdated => 1164841027
+	},
+
 };
 
 1;
