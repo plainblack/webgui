@@ -101,11 +101,6 @@ our $I18N = {
 		lastUpdated => 0
 		},
 
-	 'project name label' => {
-		message => q|Project Name|,
-		lastUpdated => 0
-		},
-
 	 'project description hoverhelp' => {
 		message => q|Enter a description for the project.|,
 		lastUpdated => 0
@@ -865,6 +860,67 @@ Otherwise, just the duration will be displayed as text.|,
 templates based on the internal asset properties.  Some of these variables may
 be useful, others may not.|,
 		lastUpdated => 1164841201
+	},
+
+	'project dashboard template title' => {
+		message => q|Project Manager, Default View (Dashboard) Template|,
+		lastUpdated => 1168925012
+	},
+
+	'project dashboard template body' => {
+		message => q|<p>The Default View (Dashboard) template has these template variables:</p>|,
+		lastUpdated => 1168925012
+	},
+
+	'project.create' => {
+		message => q|A URL to add a new project to the Project Manager.|,
+		lastUpdated => 1168925138,
+	},
+
+	'project.create.label' => {
+		message => q|An internationalized label to go with the <b>project.create</b> URL.|,
+		lastUpdated => 1168925138,
+	},
+
+	'project.name.label' => {
+		message => q|The internationalized label for "Project Name".|,
+		lastUpdated => 1168925138,
+	},
+
+	'project.startDate.label' => {
+		message => q|The internationalized label for "Start".|,
+		lastUpdated => 1168925138,
+	},
+
+	'project.endDate.label' => {
+		message => q|The internationalized label for "End".|,
+		lastUpdated => 1168925138,
+	},
+
+	'project.cost.label' => {
+		message => q|The internationalized label for "Estimated Cost".|,
+		lastUpdated => 1168925138,
+	},
+
+	'project.complete.label' => {
+		message => q|The internationalized label for "% Complete".|,
+		context => q|Percentage complete.|,
+		lastUpdated => 1168925138,
+	},
+
+	'project.actions.label' => {
+		message => q|The internationalized label for "Actions".|,
+		lastUpdated => 1168925138,
+	},
+
+	'empty.colspan' => {
+		message => q|The number of columns to span, by default, 5.  If <b>canEditProjects</b> is true, then it will become 6.|,
+		lastUpdated => 1168925749,
+	},
+
+	'canEditProjects' => {
+		message => q|A conditional that will be true if the current user is allowed to view projects or manage projects.|,
+		lastUpdated => 1168925749,
 	},
 
 };

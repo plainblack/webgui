@@ -103,6 +103,59 @@ our $HELP = {
 		],
 	},
 
+	'project dashboard template' => {
+		title => 'project dashboard template title',
+		body => 'project dashboard template body',
+		isa => [
+			{
+				namespace => "Asset_Template",
+				tag => "template variables"
+			},
+		],
+		variables => [
+		          {
+		            'name' => 'extras',
+		          },
+		          {
+		            'name' => 'project.create',
+		          },
+		          {
+		            'name' => 'project.create.label',
+		          },
+		          {
+		            'name' => 'project.name.label',
+		          },
+		          {
+		            'name' => 'project.startDate.label',
+		          },
+		          {
+		            'name' => 'project.endDate.label',
+		          },
+		          {
+		            'name' => 'project.cost.label',
+		          },
+		          {
+		            'name' => 'project.complete.label',
+		          },
+		          {
+		            'name' => 'project.actions.label',
+		          },
+		          {
+		            'name' => 'empty.colspan',
+		          },
+		          {
+		            'name' => 'canEditProjects',
+		          },
+		],
+		fields => [ ],
+		related => [
+                        {
+                                tag => 'project manager add/edit',
+                                namespace => 'Asset_ProjectManager',
+                        },
+		],
+	},
+
 	'task edit template' => {
 		title => 'edit task template vars title',
 		body => 'edit task template vars body',
