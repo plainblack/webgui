@@ -12,6 +12,8 @@
  - fix: XSS Vulnerability in WebGUI usernames
  - change: adapted WebGUI::Commerce::ShoppingCart to make it capable of 
         handling dynamic item plugins. (Martin Kamerbeek / Oqapi)
+ - fix: Using double quote in Project Manager task name breaks javascript
+   (perlDreamer Consulting LLC)
 
 7.3.4
  - fix: SQLForm - cannot add new asset (Martin Kamerbeek / Oqapi)
