@@ -341,20 +341,34 @@
 	  return findParentNodeFromChild (parent,tagName);
    }
    
+   
    //-----------------------------------------------------------------------------------   
    function showEvents(eventId) {
 	  var evt = YAHOO.util.Event.getEvent();
       var targ = YAHOO.util.Event.getTarget(evt);
 	  
 	  var elem = document.getElementById(eventId);
-	  var cDiv = findParentNodeFromChild(targ,"DIV");
-	  
-	  var pPagex = cDiv.offsetTop;
-	  var pPagey = cDiv.offsetLeft;
-	  
-	  var td = findParentNodeFromChild(cDiv,"TD");
-	  var tdHeight = td.offsetHeight;
-	  
+	  var td;
+      var pPagex;
+      var pPagey;
+          
+      //IE is stupid
+      var isIE = navigator.userAgent.indexOf("MSIE") > -1;
+      var isIE7 = navigator.userAgent.indexOf("MSIE 7") > -1;
+      if(isIE && !isIE7) {
+         //IE 6 and below don't register offsetTop or offsetLeft for the div
+         td = findParentNodeFromChild(targ,"TD");
+         pPagex = td.offsetTop;
+         pPagey = td.offsetLeft;
+      } else {
+         var cDiv = findParentNodeFromChild(targ,"DIV");
+	     pPagex = cDiv.offsetTop;
+	     pPagey = cDiv.offsetLeft;
+         td = findParentNodeFromChild(cDiv,"TD");
+      }
+      
+      var tdHeight = td.offsetHeight;
+
 	  var eventX = tdHeight + pPagex;
 	  var eventY = pPagey;
 		  
