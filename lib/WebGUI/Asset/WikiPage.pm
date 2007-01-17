@@ -159,6 +159,7 @@ sub getEditForm {
 		formFooter => WebGUI::Form::formFooter($session),
 		isNew => ($self->getId eq "new"),
 		canAdminister => $wiki->canAdminister,
+		deleteConfirm => $i18n->get("delete page confirmation"),
 		deleteLabel => $i18n->get("deleteLabel"),
 		deleteUrl => $self->getUrl("func=delete"),
 		titleLabel => $i18n->get("titleLabel"),

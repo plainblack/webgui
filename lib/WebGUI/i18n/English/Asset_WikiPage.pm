@@ -257,6 +257,11 @@ our $I18N =
                 lastUpdated => 1166484508,
         },
 
+        'delete page confirmation' => {
+                message => q|Delete this wiki page?|,
+                lastUpdated => 1169074288,
+        },
+
 };
 
 1;

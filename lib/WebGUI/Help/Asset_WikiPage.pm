@@ -59,6 +59,9 @@ our $HELP = {
                         {
                                 name => 'deleteUrl',
                         },
+                        {
+                                name => 'deleteConfirmation',
+                        },
 		],
 		related => [
 		],

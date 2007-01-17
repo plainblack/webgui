@@ -7,6 +7,17 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.3.5
+--------------------------------------------------------------------
+ * Template variables used in templates that use XML, or that are used
+   inside of Javascript need to be escaped to make quotes and other
+   characters safe.  This can be done by appending ESCAPE="HTML" or
+   ESCAPE="JS" to the tmpl_var tag.  Examples were added to the
+   Template Language help page.
+
+ * A javascript confirmation was added to the default Edit Wiki Page
+   template.  It will need to be manually added to custom templates.
+
 7.3.2
 --------------------------------------------------------------------
  * The testCodebase.pl script will now automatically set the CODE_COP

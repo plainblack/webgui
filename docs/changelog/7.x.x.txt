@@ -25,6 +25,7 @@
  - fixed corner case which causes the user profile to not load in cases where
    custom forms do not work or are broken. It now skips these and throws a
    warning
+ - fix: Added javascript confirmation for deleting wiki pages.
 
 
 7.3.4
