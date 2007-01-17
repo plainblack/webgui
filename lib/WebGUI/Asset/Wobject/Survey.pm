@@ -11,6 +11,7 @@ package WebGUI::Asset::Wobject::Survey;
 #-------------------------------------------------------------------
 
 use strict;
+use List::Util;
 use Tie::CPHash;
 use WebGUI::HTMLForm;
 use WebGUI::International;
@@ -454,7 +455,7 @@ sub getRandomQuestionIds {
 		$where .= " and Survey_questionId not in (".$self->session->db->quoteAndJoin(\@usedQuestionIds).")";
 	}
 	my @questions = $self->session->db->buildArray("select Survey_questionId from Survey_question".$where);
-	randomizeArray(\@questions);
+	@questions = List::Util::shuffle(@questions);
 	return @questions;
 }
 

@@ -27,6 +27,7 @@ use Tie::IxHash;
 use WebGUI::AdminConsole;
 use WebGUI::Cache;
 use WebGUI::Form;
+use WebGUI::HTML;
 use WebGUI::HTMLForm;
 use WebGUI::TabForm;
 use WebGUI::Utility;
@@ -224,7 +225,8 @@ sub definition {
 					label=>$i18n->get(99),
 					hoverHelp=>$i18n->get('99 description'),
                                         fieldType=>'text',
-                                        defaultValue=>undef
+                                        defaultValue=>'Untitled',
+					filter=>'fixTitle',
                                         },
                                 menuTitle=>{
 					tab=>"properties",
@@ -232,6 +234,7 @@ sub definition {
 					hoverHelp=>$i18n->get('411 description'),
 					uiLevel=>1,
                                         fieldType=>'text',
+					filter=>'fixTitle',
                                         defaultValue=>undef
                                         },
                                 url=>{
@@ -380,7 +383,13 @@ Any text string. Most likely will have been the Asset's name or title.
 
 sub fixUrl {
 	my $self = shift;
-	my $url = $self->session->url->urlize(shift);
+	my $url = shift;
+	unless ($url) {
+		$url = $self->getParent->get("url");
+		$url =~ s/(.*)\..*/$1/;
+		$url .= '/'.$self->getValue("menuTitle");
+	}
+	$url = $self->session->url->urlize($url);
 	my @badUrls = ($self->session->config->get("extrasURL"), $self->session->config->get("uploadsURL"));
 	foreach my $badUrl (@badUrls) {
 		if ($badUrl =~ /^http/) {
@@ -413,6 +422,24 @@ sub fixUrl {
                 $url = $self->fixUrl($url);
         }
 	return $url;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 fixTitle ( string )
+
+Fixes a title by eliminating HTML from it.
+
+=head3 string
+
+Any text string. Most likely will have been the Asset's name or title.
+
+=cut
+
+sub fixTitle {
+	my $self = shift;
+	return WebGUI::HTML::filter(shift || $self->getValue("title") || 'Untitled', 'all');
 }
 
 
@@ -1640,13 +1667,6 @@ sub processPropertiesFromFormPost {
 		if ($form =~ /^metadata_(.*)$/) {
 			$self->updateMetaData($1,$self->session->form->process($form));
 		}
-	}
-	$data{title} = "Untitled" unless ($data{title});
-	$data{menuTitle} = $data{title} unless ($data{menuTitle});
-	unless ($data{url}) {
-		$data{url} = $self->getParent->get("url");
-		$data{url} =~ s/(.*)\..*/$1/;
-		$data{url} .= '/'.$data{menuTitle};
 	}
 	$self->session->db->beginTransaction;
 	$self->update(\%data);

@@ -12,6 +12,7 @@ package WebGUI::Asset::Wobject::Poll;
 #-------------------------------------------------------------------
 
 use strict;
+use List::Util;
 use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::SQL;
@@ -382,7 +383,7 @@ sub view {
 			push(@labels, $self->get('a'.$i));
                 }
 	}
-	randomizeArray(\@answers) if ($self->get("randomizeAnswers"));
+	@answers = List::Util::shuffle(@answers) if ($self->get("randomizeAnswers"));
 	$var{answer_loop} = \@answers;
 
 	if ($self->getValue('generateGraph')) {

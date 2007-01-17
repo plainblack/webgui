@@ -239,7 +239,6 @@ sub processPropertiesFromFormPost {
 			 isHidden => 1,
 			actionTakenBy => $self->session->user->userId,
 			actionTaken => $actionTaken,
-			title => WebGUI::HTML::filter($self->get("title"), "all"),
 	});
 
 	if ($self->getWiki->canAdminister) {

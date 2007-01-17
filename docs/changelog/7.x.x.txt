@@ -10,6 +10,9 @@
  - fix: Cannot save new content filters.
  - fix: Cannot delete content filter.
  - fix: XSS Vulnerability in WebGUI usernames
+ - fix: XSS Vulnerability in WikiPage titles
+ - Depricated the random array function in WebGUI::Utility in favor of
+   List::Utils per the WebGUI Best Practices.
  - change: adapted WebGUI::Commerce::ShoppingCart to make it capable of 
         handling dynamic item plugins. (Martin Kamerbeek / Oqapi)
  - fix: Using double quote in Project Manager task name breaks javascript

@@ -296,13 +296,9 @@ sub randint {
 
 #-------------------------------------------------------------------
 
-=head2 randomizeArray ( array )
+=head2 randomizeArray (  )
 
-Resorts an array in random order.
-
-=head3 array
-
-A reference to the array to randomize.
+Don't use this function, it is depricated and will be removed at some point in the future. Instead use List::Util::shuffle()
 
 =cut
 
