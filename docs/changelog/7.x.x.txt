@@ -22,6 +22,9 @@
  - Fixed a bug with RSS feed generation and attachments.
  - fix: notifications from postings
  - Refactored the autocommit system to fix the notifications bug above.
+ - fixed corner case which causes the user profile to not load in cases where
+   custom forms do not work or are broken. It now skips these and throws a
+   warning
 
 
 7.3.4
