@@ -673,20 +673,39 @@ sub getRssItems {
 SQL
 	my $siteUrl = $self->session->url->getSiteURL();
 	my $datetime = $self->session->datetime;
-	return map {
-		my $postId = $_;
+
+    my @posts;
+    for my $postId (@postIds) {
 		my $post = WebGUI::Asset->new($self->session, $postId, 'WebGUI::Asset::Post::Thread');
 		my $postUrl = $siteUrl . $post->getUrl;
 		# Buggo: this is an abuse of 'author'.  'author' is supposed to be an email address.
 		# But this is how it was in the original Collaboration RSS, so.
-		({ author => $post->get('username'),
-		   title => $post->get('title'),
-		   'link' => $postUrl, guid => $postUrl,
-		   description => $post->get('synopsis'),
-		   pubDate => $datetime->epochToMail($post->get('dateUpdated')),
-		   attachmentLoop => $self->getRssItemsAttachments($post),
-		 })
-	} @postIds;
+        
+        # Create the attachment template loop
+        my $storage = $post->getStorageLocation;
+        my $attachmentLoop = [];
+        if ($post->get('storageId')) {
+            for my $file (@{$storage->getFiles}) {
+                push @{$attachmentLoop}, {
+                    'attachment.url'        => $storage->getUrl($file),
+                    'attachment.path'       => $storage->getPath($file),
+                    'attachment.length'     => $storage->getFileSize($file),
+                };
+            }
+        }
+        
+        push @posts, { 
+            author          => $post->get('username'),
+		    title           => $post->get('title'),
+		    'link'          => $postUrl, 
+            guid            => $postUrl,
+		    description     => $post->get('synopsis'),
+		    pubDate         => $datetime->epochToMail($post->get('dateUpdated')),
+		    attachmentLoop  => $attachmentLoop, 
+		 };
+	}
+
+    return @posts;
 }
 
 #-------------------------------------------------------------------

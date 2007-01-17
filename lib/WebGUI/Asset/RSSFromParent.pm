@@ -113,8 +113,9 @@ sub www_view {
 			$subvar->{pubDate} = _escapeXml($self->session->datetime->epochToMail($item->get('dateUpdated')));
 		} elsif (ref $item eq 'HASH') {
 			foreach my $key (keys %$item) {
-				my $value = $item->{$key};
-				$subvar->{$key} = (ref $value eq 'ARRAY')? join($,, @$value) : _escapeXml($value);
+                ### This does not do any XML escaping. A way must be found to
+                # recursively escape the entire data structure.
+				$subvar->{$key} = $item->{$key};
 			}
 		} else {
 			$self->session->errorHandler->error("Don't know what to do with this RSS item: $item");
