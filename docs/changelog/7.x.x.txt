@@ -26,6 +26,7 @@
    custom forms do not work or are broken. It now skips these and throws a
    warning
  - fix: Added javascript confirmation for deleting wiki pages.
+ - fix: Collaboration rss broken (perlDreamer Consulting, LLC)
 
 
 7.3.4
