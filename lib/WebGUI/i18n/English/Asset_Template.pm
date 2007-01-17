@@ -145,6 +145,20 @@ In the examples below, please note that the words <i>foo</i> and <i>bar</i> are 
 </p>
 
 <p>
+<b>Escaping text</b><br />
+Sometimes you would like to escape text to make it safe to use inside of XML and HTML tags or Javascript code.  There
+is a built-in way to do this for variables, using the ESCAPE option inside of &lt;tmpl_var&gt;.
+</p>
+
+<p>
+<i>Javascript safe:</i> &lt;tmpl_var foo ESCAPE="JS"&gt;
+</p>
+
+<p>
+<i>XML and HTML safe:</i> &lt;tmpl_var foo ESCAPE="HTML"&gt;
+</p>
+
+<p>
 <b>Conditions</b><br />
 To programmers conditions are nothing new, but to designers they can often be confusing at first. Conditions are really just true or false questions, and if you think of them that way, you'll have no trouble at all.
 </p>
