@@ -690,11 +690,11 @@ SQL
 					#returns this
 				   	[
 						map {
-							({ 
+							{ 
 								'attachment.url' => $storage->getUrl($_),
 					    			'attachment.path' => $storage->getPath($_),
 					    			'attachment.length' => $storage->getFileSize($_) 
-							})
+							}	
 				    		} @{$storage->getFiles}
 					]
 			   } 
