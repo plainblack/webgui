@@ -671,25 +671,27 @@ sub getRssItems {
    GROUP BY assetData.assetId
    ORDER BY $sortBy $sortOrder
 SQL
-
+	my $siteUrl = $self->session->url->getSiteURL();
+	my $datetime = $self->session->datetime;
 	return map {
 		my $postId = $_;
-		my $post = WebGUI::Asset->newByDynamicClass($self->session, $postId);
-		my $postUrl = $self->session->url->getSiteURL() . $post->getUrl;
+		my $post = WebGUI::Asset::Thread->new($self->session, $postId);
+		my $postUrl = $siteUrl . $post->getUrl;
 		# Buggo: this is an abuse of 'author'.  'author' is supposed to be an email address.
 		# But this is how it was in the original Collaboration RSS, so.
 		({ author => $post->get('username'),
 		   title => $post->get('title'),
-		   link => $postUrl, guid => $postUrl,
+		   'link' => $postUrl, guid => $postUrl,
 		   description => $post->get('synopsis'),
-		   pubDate => $self->session->datetime->epochToMail($post->get('dateUpdated')),
+		   pubDate => $datetime->epochToMail($post->get('dateUpdated')),
 		   attachmentLoop => do {
 			   if ($post->get('storageId')) {
 				   my $storage = $post->getStorageLocation;
-				   [map {({ 'attachment.url' => $storage->getUrl($_),
+				   [map {
+					({ 'attachment.url' => $storage->getUrl($_),
 					    'attachment.path' => $storage->getPath($_),
-					    'attachment.length' => $storage->getFileSize($_) })}
-				    @{$storage->getFiles}]
+					    'attachment.length' => $storage->getFileSize($_) })
+				    } @{$storage->getFiles}]
 			   } else { undef }
 		   }
 		 })
