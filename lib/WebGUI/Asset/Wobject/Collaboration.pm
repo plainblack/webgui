@@ -687,13 +687,21 @@ SQL
 		   attachmentLoop => do {
 			   if ($post->get('storageId')) {
 				   my $storage = $post->getStorageLocation;
-				   [map {
-					({ 'attachment.url' => $storage->getUrl($_),
-					    'attachment.path' => $storage->getPath($_),
-					    'attachment.length' => $storage->getFileSize($_) })
-				    } @{$storage->getFiles}]
-			   } else { undef }
-		   }
+					#returns this
+				   	[
+						map {
+							({ 
+								'attachment.url' => $storage->getUrl($_),
+					    			'attachment.path' => $storage->getPath($_),
+					    			'attachment.length' => $storage->getFileSize($_) 
+							})
+				    		} @{$storage->getFiles}
+					]
+			   } 
+			   else { 
+				[] 
+			   }
+		  }
 		 })
 	} @postIds;
 }
