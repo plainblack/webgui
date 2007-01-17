@@ -299,8 +299,12 @@ sub www_editProfileField {
 		next if $form eq 'DynamicField';
 		my $cmd = join '::', 'WebGUI::Form', $form;
 		eval "use $cmd";
-		my $w = eval {"$cmd"->new($session)};
-		push @profileForms, $form if $w->get("profileEnabled");
+        my $w = eval {"$cmd"->new($session)};
+		unless(defined $w) {
+           $session->errorHandler->warn("Could not load $cmd.  Please check the syntax of this module to make sure it works properly");
+           next;
+        }
+        push @profileForms, $form if $w->get("profileEnabled");
 	}
 
 	$fieldType->set("types", \@profileForms);
