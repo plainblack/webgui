@@ -163,8 +163,24 @@ our $HELP = {
 				    'name' => 'date',
 				    'description' => 'recent changes date',
 				  },
+				  {
+				    'name' => 'restoreUrl',
+				    'description' => 'recent changes restore url',
+				  },
+				  {
+				    'name' => 'isAvailable',
+				    'description' => 'recent changes is available',
+				  },
 			    ]
 		          },
+			{
+				name=>'canAdminister',
+				description => 'canAdminister'
+			},
+			{
+				name=>'retoreLabel',
+				description => 'restoreLabel'
+			},
 		],
 		fields => [
 		],

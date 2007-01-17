@@ -354,6 +354,16 @@ sub www_getHistory {
 
 #-------------------------------------------------------------------
 
+sub www_restoreWikiPage {
+	my $self = shift;
+	return $self->session->privilege->insufficient unless $self->getWiki->canAdminister;
+	$self->publish;	
+	return $self->www_view;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 www_showConfirmation ( )
 
 Shows a confirmation message letting the user know their page has been submitted.

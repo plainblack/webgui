@@ -22,10 +22,13 @@
  - Fixed a bug with RSS feed generation and attachments.
  - fix: notifications from postings
  - Refactored the autocommit system to fix the notifications bug above.
+ - fix: Security Update: Cross-Site Scripting Vulnerability
  - fixed corner case which causes the user profile to not load in cases where
    custom forms do not work or are broken. It now skips these and throws a
    warning
  - fix: Added javascript confirmation for deleting wiki pages.
+ - Made wiki page deletes more visable/useful from recent changes.
+ - fix: Wiki Deleting Pages
  - fix: Collaboration rss broken (perlDreamer Consulting, LLC)
 
 

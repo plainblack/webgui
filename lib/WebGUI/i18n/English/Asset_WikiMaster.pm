@@ -13,6 +13,12 @@ our $I18N = {
 		addPageLabel=>{message=>q|Add a new page.|, lastUpdated=>0},
 		wikiHomeLabel=>{message=>q|Wiki Home|, lastUpdated=>0},
 
+	'restoreLabel' => {
+		message => q|Restore|,
+		lastUpdated => 0,
+		context => q|label to restore the page back from the trash or clipboard|,
+	},
+
 	'filter code' => {
 		message => q|Filter Code|,
 		lastUpdated => 0,
@@ -277,8 +283,23 @@ our $I18N = {
                 lastUpdated => 1165790228,
         },
 
+        'canAdminister' => {
+                message => q|A boolean indicating whether the current user can administer the wiki.|,
+                lastUpdated => 1165790228,
+        },
+
         'recent changes title' => {
                 message => q|The title of the recently changed page.|,
+                lastUpdated => 1165790228,
+        },
+
+        'recent changes restore url' => {
+                message => q|The url to restore this page back to viewing status from the clipboard/trash.|,
+                lastUpdated => 1165790228,
+        },
+
+        'recent changes is page available' => {
+                message => q|A boolean indicating whether the page is available for viewing or in the trash/clipboard.|,
                 lastUpdated => 1165790228,
         },
 

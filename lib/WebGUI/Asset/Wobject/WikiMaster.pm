@@ -25,6 +25,7 @@ sub appendMostPopular {
 	my $limit = shift || $self->get("mostPopularCount");
 	my $rs = $self->session->db->read("select distinct(asset.assetId) from asset left join WikiPage on WikiPage.assetId=asset.assetId 
 		where lineage like ? and lineage<>? and revisionDate = (select max(revisionDate) from WikiPage where assetId = asset.assetId)
+		and state='published'
 		order by views desc limit ?", [$self->get("lineage").'%', $self->get("lineage"),  $limit]);
 	while (my ($id) = $rs->array) {
 		my $asset = WebGUI::Asset->new($self->session, $id, "WebGUI::Asset::WikiPage");
@@ -39,18 +40,31 @@ sub appendMostPopular {
 sub appendRecentChanges {
 	my $self = shift;
 	my $var = shift;
-	my $limit = shift || $self->get("recentChangesCount");
+	my $limit = shift || $self->get("recentChangesCount") || 50;
 	my $rs = $self->session->db->read("select asset.assetId, revisionDate from assetData left join asset on assetData.assetId=asset.assetId where
 		lineage like ? and lineage<>? order by revisionDate desc limit ?", [$self->get("lineage").'%', $self->get("lineage"), $self->get("recentChangesCount")]);
 	while (my ($id, $version) = $rs->array) {
 		my $asset = WebGUI::Asset->new($self->session, $id, "WebGUI::Asset::WikiPage", $version);
 		my $user = WebGUI::User->new($self->session, $asset->get("actionTakenBy"));
+		my $specialAction = '';
+		my $isAvailable = 1;
+		# no need to i18n cuz the other actions aren't
+		if ($asset->get('state') =~ m/trash/) {
+			$isAvailable = 0;
+			$specialAction = 'Deleted';
+		}
+		elsif ($asset->get('state') =~ m/clipboard/) {
+			$isAvailable = 0;
+			$specialAction = 'Cut';
+		}
 		push(@{$var->{recentChanges}}, {
 			title=>$asset->getTitle,
 			url=>$asset->getUrl,
-			actionTaken=>$asset->get("actionTaken"),
+			restoreUrl=>$asset->getUrl("func=restoreWikiPage"),
+			actionTaken=>$specialAction || $asset->get("actionTaken"),
 			username=>$user->username,
-			date=>$self->session->datetime->epochToHuman($asset->get("revisionDate"))
+			date=>$self->session->datetime->epochToHuman($asset->get("revisionDate")),
+			isAvailable=>$isAvailable,
 			});
 	}
 }
@@ -342,6 +356,8 @@ sub view {
 		addPageUrl=>$self->getUrl("func=add;class=WebGUI::Asset::WikiPage"),
 		recentChangesUrl=>$self->getUrl("func=recentChanges"),
 		recentChangesLabel=>$i18n->get("recentChangesLabel"),
+		restoreLabel => $i18n->get("restoreLabel"),
+		canAdminister => $self->canAdminister,
 		};
 	my $template = $self->{_frontPageTemplate};
 	$self->appendSearchBoxVars($var);
@@ -379,6 +395,8 @@ sub www_recentChanges {
 		searchUrl=>$self->getUrl("func=search"),
 		mostPopularUrl=>$self->getUrl("func=mostPopular"),
 		mostPopularLabel=>$i18n->get("mostPopularLabel"),
+		restoreLabel => $i18n->get("restoreLabel"),
+		canAdminister => $self->canAdminister,
 		wikiHomeUrl=>$self->getUrl,
 		};
 	$self->appendRecentChanges($var);
