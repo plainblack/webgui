@@ -28,7 +28,7 @@ Contributing Developers..............Lucas Bartholemy
                                      Chris Jackson
                                      Roy Johnson / Plain Black
                                      Koen de Jonge / ProcoliX
-                                     Martin Kamerbeek / ProcoliX
+                                     Martin Kamerbeek / Oqapi
                                      Christian Kocourek
                                      John W. Krahn
                                      Len Kranendonk

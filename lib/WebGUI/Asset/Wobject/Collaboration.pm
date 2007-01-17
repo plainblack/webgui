@@ -709,24 +709,6 @@ SQL
 }
 
 #-------------------------------------------------------------------
-sub getRssItemsAttachments {
-	my $self = shift;
-	my $post = shift;
-	if ($post->get('storageId')) {
-		my $storage = $post->getStorageLocation;
-		my @attachments = map {
-			{ 
-				'attachment.url' => $storage->getUrl($_),
-				'attachment.path' => $storage->getPath($_),
-				'attachment.length' => $storage->getFileSize($_) 
-			}	
-		} @{$storage->getFiles};
-		return \@attachments;
- 	}
-	return [];
-}
-
-#-------------------------------------------------------------------
 sub getEditTabs {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session,"Asset_Collaboration");

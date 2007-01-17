@@ -17,6 +17,9 @@
         handling dynamic item plugins. (Martin Kamerbeek / Oqapi)
  - fix: Using double quote in Project Manager task name breaks javascript
    (perlDreamer Consulting LLC)
+ - Fixed a bug in the 7.2.3-7.3.0 upgrade script related to calendar
+   migration.
+ - Fixed a bug with RSS feed generation and attachments.
 
 7.3.4
  - fix: SQLForm - cannot add new asset (Martin Kamerbeek / Oqapi)

@@ -220,6 +220,7 @@ sub migrateCalendars {
 	
 	for my $asset (@{$calendars})
 	{
+		next unless defined $asset;
 		my $properties	= {%{$asset->get}};
 		$properties->{defaultDate}	= delete $properties->{defaultMonth};
 		#warn "Found calendar ".$properties->{title};
