@@ -684,26 +684,27 @@ SQL
 		   'link' => $postUrl, guid => $postUrl,
 		   description => $post->get('synopsis'),
 		   pubDate => $datetime->epochToMail($post->get('dateUpdated')),
-		   attachmentLoop => do {
-			   if ($post->get('storageId')) {
-				   my $storage = $post->getStorageLocation;
-					#returns this
-				   	[
-						map {
-							{ 
-								'attachment.url' => $storage->getUrl($_),
-					    			'attachment.path' => $storage->getPath($_),
-					    			'attachment.length' => $storage->getFileSize($_) 
-							}	
-				    		} @{$storage->getFiles}
-					]
-			   } 
-			   else { 
-				[] 
-			   }
-		  }
+		   attachmentLoop => $self->getRssItemsAttachments($post),
 		 })
 	} @postIds;
+}
+
+#-------------------------------------------------------------------
+sub getRssItemsAttachments {
+	my $self = shift;
+	my $post = shift;
+	if ($post->get('storageId')) {
+		my $storage = $post->getStorageLocation;
+		my @attachments = map {
+			{ 
+				'attachment.url' => $storage->getUrl($_),
+				'attachment.path' => $storage->getPath($_),
+				'attachment.length' => $storage->getFileSize($_) 
+			}	
+		} @{$storage->getFiles};
+		return \@attachments;
+ 	}
+	return [];
 }
 
 #-------------------------------------------------------------------
