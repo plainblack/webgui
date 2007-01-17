@@ -16,7 +16,7 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 3; # increment this value for each test you create
+use Test::More tests => 5; # increment this value for each test you create
 use WebGUI::Asset::Wobject::WikiMaster;
 use WebGUI::Asset::WikiPage;
 
@@ -36,6 +36,14 @@ my $secondVersionTag = WebGUI::VersionTag->new($session,$wikipage->get("tagId"))
 # Test for sane object types
 isa_ok($wiki, 'WebGUI::Asset::Wobject::WikiMaster');
 isa_ok($wikipage, 'WebGUI::Asset::WikiPage');
+
+# Try to add content under a wiki page
+my $article = $wikipage->addChild({className=>'WebGUI::Asset::Wobject::Article'});
+is($article, undef, "Can't add an Article wobject as a child to a Wiki Page.");
+
+# See if the duplicate method works
+my $wikiPageCopy = $wikipage->duplicate();
+isa_ok($wikiPageCopy, 'WebGUI::Asset::WikiPage');
 
 TODO: {
         local $TODO = "Tests to make later";
