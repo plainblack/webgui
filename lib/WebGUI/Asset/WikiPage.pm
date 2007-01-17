@@ -262,6 +262,7 @@ sub processPropertiesFromFormPost {
         }
 
         $self->setSize($size);
+	$self->requestAutoCommit;
 }	
 
 #-------------------------------------------------------------------

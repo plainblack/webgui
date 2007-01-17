@@ -20,6 +20,9 @@
  - Fixed a bug in the 7.2.3-7.3.0 upgrade script related to calendar
    migration.
  - Fixed a bug with RSS feed generation and attachments.
+ - fix: notifications from postings
+ - Refactored the autocommit system to fix the notifications bug above.
+
 
 7.3.4
  - fix: SQLForm - cannot add new asset (Martin Kamerbeek / Oqapi)

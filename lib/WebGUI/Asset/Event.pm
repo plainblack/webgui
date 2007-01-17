@@ -230,7 +230,9 @@ sub generateRecurringEvents
 		$properties->{endDate}		= $dt->clone->add(days => $duration_days)->strftime('%F');
 		
 		
-		$parent->addChild($properties);
+		my $newEvent = $parent->addChild($properties);
+		$newEvent->requestAutoCommit;
+		
 	}
 	
 	return 1;
@@ -1497,9 +1499,11 @@ sub processPropertiesFromFormPost
 				$properties->{endDate}		= $event->get("endDate");
 				
 				$event->addRevision($self->get);
+				$event->requestAutoCommit;
 			}
 		}
 	}
+	$self->requestAutoCommit;
 }
 
 

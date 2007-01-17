@@ -85,7 +85,7 @@ sub addRevision {
 	$newVersion->setVersionLock;
 	$properties->{status} = 'pending';
         $newVersion->update($properties);
-	$workingTag->requestCommit if ($autoCommitId);
+	$newVersion->setAutoCommitTag($workingTag) if (defined $autoCommitId);
         return $newVersion;
 }
 
@@ -121,13 +121,11 @@ sub commit {
 	$self->indexContent;
 }
 
-
-
 #-------------------------------------------------------------------
 
 =head2 getAutoCommitWorkflowId  ( )
 
-Override this method in your asset if you want your asset to auto-commit its workflow each time addRevision() is called on it. Your overridden method must return the workflow Id of the workflow to run on autocommit.
+Override this method in your asset if you want your asset to automatically run its commit workflow. When this method is specified you addRevision() will instanciate the version tag, set this as the workflow for that version tag, and then call setAutoCommitTag(). Then sometime later in your code before the asset is destroyed you need to call requestAutoCommit() to trigger the workflow.
 
 =cut
 
@@ -256,6 +254,42 @@ sub purgeRevision {
 	}
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 requestAutoCommit ( )
+
+Requests an autocommit tag be commited. See also getAutoCommitWorkflowId() and setAutoCommitTag().
+
+=cut
+
+sub requestAutoCommit {
+	my $self = shift;
+	my $tag = $self->{_autoCommitTag};
+	if (defined $tag) {
+		$tag->requestCommit;
+		delete $self->{_autoCommitTag};
+	}
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 setAutoCommitTag ( tag )
+
+Stores the current working auto commit tag temporarily in the live asset object. See also requestAutoCommit() and getAutoCommitWorkflowId().
+
+=head3 tag
+
+A WebGUI::VersionTag object.
+
+=cut 
+
+sub setAutoCommitTag {
+	my $self = shift;
+	my $tag = shift;
+	$self->{_autoCommitTag} = $tag;
+}
 
 #-------------------------------------------------------------------
 

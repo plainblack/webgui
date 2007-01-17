@@ -297,6 +297,7 @@ sub execute {
 				{
 					my $calendar	= WebGUI::Asset->newByDynamicClass($self->session,$feed->{assetId});
 					my $event	= $calendar->addChild($properties);
+					$event->requestAutoCommit;
 					$added++;
 				}
 				

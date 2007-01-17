@@ -795,6 +795,7 @@ sub postProcess {
 		$size += $storage->getFileSize($file);
 	}
 	$self->setSize($size);
+	$self->requestAutoCommit;
 }
 
 #-------------------------------------------------------------------
