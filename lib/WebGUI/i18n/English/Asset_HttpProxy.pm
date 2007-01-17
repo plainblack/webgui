@@ -197,6 +197,89 @@ our $I18N = {
 		context => q|This entry is used to tell the user that the HttpProxy cannot leave this URL.  Please leeave the %s part of the string as is, since this entry is used in sprintf|,
 	},
 
+	'http proxy asset template variables title' => {
+		message => q|Http Proxy Asset Template Variables|,
+		lastUpdated => 1168994434
+	},
+
+	'http proxy asset template variables body' => {
+		message => q|Every asset provides a set of variables to most of its
+templates based on the internal asset properties.  Some of these variables may
+be useful, others may not.|,
+		lastUpdated => 1168994436
+	},
+
+	'templateId' => {
+		message => q|The ID of the template used to display the output of the Http Proxy.|,
+		lastUpdated => 1168994434
+	},
+
+	'proxiedUrl' => {
+		message => q|The URL to proxy.|,
+		lastUpdated => 1168994434
+	},
+
+	'useAmpersand' => {
+		message => q|A conditional which is true if the Http Proxy has been set to join parameters in the URL.|,
+		lastUpdated => 1168994434
+	},
+
+	'timeout' => {
+		message => q|The amount of time in seconds that WebGUI will wait for a connection before giving up on an external page.|,
+		lastUpdated => 1168994613
+	},
+
+	'removeStyle' => {
+		message => q|A conditional that will be true if the Http Proxy was configured to remove the stylesheet from the proxied page and replace it with the stylesheet from your site.|,
+		lastUpdated => 1168994613
+	},
+
+	'cacheTimeout' => {
+		message => q|The amount of time in seconds output from the Http Proxy will be cached.|,
+		lastUpdated => 1168994613
+	},
+
+	'filterHtml' => {
+		message => q|The level of HTML filtering that has been set for proxied content.|,
+		lastUpdated => 1168994613
+	},
+
+	'followExternal' => {
+		message => q|A conditional that is true if the Http Proxy is set up to allow it follow external links.|,
+		lastUpdated => 1168994613
+	},
+
+	'rewriteUrls' => {
+		message => q|A conditional that is true if the Http Proxy is set up to rewrite external links.|,
+		lastUpdated => 1168994613
+	},
+
+	'followRedirect' => {
+		message => q|A conditional that is true if the Http Proxy is set up to follow redirects.|,
+		lastUpdated => 1168994613
+	},
+
+	'searchFor' => {
+		message => q|A search string that will define the starting point for displayed content.|,
+		lastUpdated => 1168994613
+	},
+
+	'stopAt' => {
+		message => q|A search string that will define the stopping point for displayed content.|,
+		lastUpdated => 1168994613
+	},
+
+	'cookieJarStorageId' => {
+		message => q|The ID of the storage object where cookies will be stored.|,
+		lastUpdated => 1168994613
+	},
+
+	'fetch page error' => {
+		message => q|<b>Getting <a href='%s'>%s</a> failed</b><p><i>GET status line: %s</i>|,
+		context => q|Translator note: the "%s" tokens in the message should not be translated.|,
+		lastUpdated => 1168994613
+	},
+
 };
 
 1;

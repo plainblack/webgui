@@ -397,8 +397,7 @@ sub view {
 			}
 		} else { # Fetching page failed...
 			$var{header} = "text/html";
-			$var{content} = "<b>Getting <a href='$proxiedUrl'>$proxiedUrl</a> failed</b>".
-				"<p><i>GET status line: ".$response->status_line."</i>";
+			$var{content} = sprintf $i18n->get('fetch page error'), $proxiedUrl, $proxiedUrl, $response->status_line;
 		}
 		unless ($self->get("cacheTimeout") <= 10) {
 			$cacheContent->set($var{content},$self->get("cacheTimeout"));
