@@ -406,7 +406,7 @@ can alter their status.|,
 		context => q|Default i18n label for a In/Out Board Report|,
 	},
 
-	'reportTitle' => {
+	'reportTitleLabel' => {
 		message => q|Internationalized title for an In/Out Board Report.|,
 		lastUpdated =>1165810121,
 	},
@@ -430,6 +430,48 @@ can alter their status.|,
 	'viewReportLabel' => {
 		message => q|Internationalized title for the URL to view reports.|,
 		lastUpdated =>1165810121,
+	},
+
+	'in out board asset template variables title' => {
+		message => q|In/Out Board Asset Template Variables|,
+		lastUpdated => 1168992432
+	},
+
+	'in out board asset template variables body' => {
+		message => q|Every asset provides a set of variables to most of its
+templates based on the internal asset properties.  Some of these variables may
+be useful, others may not.|,
+		lastUpdated => 1168992436
+	},
+
+	'statusList' => {
+		message => q|A string with all of the possible board statuses separated by newlines.|,
+		lastUpdated => 1168992648
+	},
+
+	'reportViewerGroup' => {
+		message => q|The ID of the group that is allowed to view reports.|,
+		lastUpdated => 1168992648
+	},
+
+	'inOutGroup' => {
+		message => q|The ID of the group that is allowed to use the In/Out Board.|,
+		lastUpdated => 1168992648
+	},
+
+	'inOutTemplateId' => {
+		message => q|The ID of the template that is used to display the main screen of the In/Out Board.|,
+		lastUpdated => 1168992648
+	},
+
+	'reportTemplateId' => {
+		message => q|The ID of the template that is used to display In/Out Board reports.|,
+		lastUpdated => 1168992648
+	},
+
+	'paginateAfter' => {
+		message => q|The number of rows should be displayed per page in the main In/Out Board.|,
+		lastUpdated => 1168992648
 	},
 
 };

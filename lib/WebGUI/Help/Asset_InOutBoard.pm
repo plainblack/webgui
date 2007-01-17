@@ -6,8 +6,8 @@ our $HELP = {
 		body => '19',
 		isa => [
 			{
-				namespace => "Asset_Wobject",
-				tag => "wobject add/edit"
+				namespace => 'Asset_Wobject',
+				tag => 'wobject add/edit',
 			},
 		],
 		fields => [
@@ -45,108 +45,135 @@ our $HELP = {
 		related => [
 			{
 				tag => 'in out board template',
-				namespace => 'Asset_InOutBoard'
+				namespace => 'Asset_InOutBoard',
 			},
 			{
 				tag => 'in out board report template',
-				namespace => 'Asset_InOutBoard'
-			},
-			{
-				tag => 'wobject add/edit',
-				namespace => 'Asset_Wobject'
+				namespace => 'Asset_InOutBoard',
 			},
 			{
 				tag => 'wobjects using',
-				namespace => 'Asset_Wobject'
-			}
-		]
+				namespace => 'Asset_Wobject',
+			},
+		],
 	},
+
 	'in out board template' => {
 		title => '20',
 		body => '21',
+		isa => [
+			{
+				namespace => 'Asset_InOutBoard',
+				tag => 'in out board asset template variables',
+			},
+			{
+				namespace => 'Asset_Template',
+				tag => 'template variables',
+			},
+			{
+				namespace => 'Asset',
+				tag => 'asset template',
+			},
+		],
 		variables => [
 		          {
-		            'name' => 'canViewReport'
+		            'name' => 'canViewReport',
 		          },
 		          {
-		            'name' => 'viewReportURL'
+		            'name' => 'viewReportURL',
 		          },
 		          {
-		            'name' => 'selectDelegatesURL'
+		            'name' => 'viewReportLabel',
 		          },
 		          {
-		            'name' => 'displayForm'
+		            'name' => 'selectDelegatesURL',
 		          },
 		          {
-		            'name' => 'form'
+		            'name' => 'selectDelegatesLabel',
+		          },
+		          {
+		            'name' => 'displayForm',
+		          },
+		          {
+		            'name' => 'form',
 		          },
 		          {
 		            'name' => 'rows_loop',
 		            'variables' => [
 		                             {
-		                               'name' => 'deptHasChanged'
+		                               'name' => 'deptHasChanged',
 		                             },
 		                             {
-		                               'name' => 'username'
+		                               'name' => 'department',
 		                             },
 		                             {
-		                               'name' => 'status'
+		                               'name' => 'username',
 		                             },
 		                             {
-		                               'name' => 'dateStamp'
+		                               'name' => 'status',
 		                             },
 		                             {
-		                               'name' => 'message'
-		                             }
-		                           ]
+		                               'name' => 'dateStamp',
+		                             },
+		                             {
+		                               'name' => 'message',
+		                             },
+		                           ],
 		          },
 		          {
-		            'name' => 'paginateBar'
-		          }
+		            'name' => 'paginateBar',
+		          },
 		],
 		related => [
 			{
 				tag => 'in out board add/edit',
-				namespace => 'Asset_InOutBoard'
+				namespace => 'Asset_InOutBoard',
 			},
-			{
-				tag => 'template language',
-				namespace => 'Asset_Template'
-			},
-			{
-				tag => 'wobject template',
-				namespace => 'Asset_Wobject'
-			}
-		]
+		],
 	},
+
 	'in out board report template' => {
 		title => '22',
 		body => '23',
+		isa => [
+			{
+				namespace => 'Asset_InOutBoard',
+				tag => 'in out board asset template variables',
+			},
+			{
+				namespace => 'Asset_Template',
+				tag => 'template variables',
+			},
+			{
+				namespace => 'Asset',
+				tag => 'asset template',
+			},
+		],
 		variables => [
 		          {
-		            'name' => 'reportTitle'
+		            'name' => 'reportTitleLabel',
 		          },
 		          {
-		            'name' => 'showReport'
+		            'name' => 'showReport',
 		          },
 		          {
 		            'name' => 'form',
-		            'description' => 'report.form'
+		            'description' => 'report.form',
 		          },
 		          {
-		            'name' => 'username.label'
+		            'name' => 'username.label',
 		          },
 		          {
-		            'name' => 'status.label'
+		            'name' => 'status.label',
 		          },
 		          {
-		            'name' => 'date.label'
+		            'name' => 'date.label',
 		          },
 		          {
-		            'name' => 'message.label'
+		            'name' => 'message.label',
 		          },
 		          {
-		            'name' => 'updatedBy.label'
+		            'name' => 'updatedBy.label',
 		          },
 		          {
 		            'name' => 'rows_loop',
@@ -158,7 +185,7 @@ our $HELP = {
 		                               'name' => 'username',
 		                             },
 		                             {
-		                               'name' => 'department'
+		                               'name' => 'department',
 		                             },
 		                             {
 		                               'name' => 'status',
@@ -170,26 +197,58 @@ our $HELP = {
 		                               'name' => 'message',
 		                             },
 		                             {
-		                               'name' => 'createdBy'
-		                             }
+		                               'name' => 'createdBy',
+		                             },
 		                           ],
-		            'description' => 'report rows_loop'
+		            'description' => 'report rows_loop',
 		          },
 		          {
 		            'name' => 'paginateBar',
-		          }
+		          },
 		],
 		related => [
 			{
 				tag => 'in out board add/edit',
-				namespace => 'Asset_InOutBoard'
+				namespace => 'Asset_InOutBoard',
 			},
-			{
-				tag => 'template language',
-				namespace => 'Asset_Template'
-			}
-		]
+		],
 	},
+
+	'in out board asset template variables' => {
+		title => 'in out board asset template variables title',
+		body => 'in out board asset template variables body',
+		isa => [
+			{
+				namespace => 'Asset_Wobject',
+				tag => 'wobject template variables',
+			},
+		],
+		fields => [
+		],
+		variables => [
+		          {
+		            'name' => 'statusList',
+		          },
+		          {
+		            'name' => 'reportViewerGroup',
+		          },
+		          {
+		            'name' => 'inOutGroup',
+		          },
+		          {
+		            'name' => 'inOutTemplateId',
+		          },
+		          {
+		            'name' => 'reportTemplateId',
+		          },
+		          {
+		            'name' => 'paginateAfter',
+		          },
+		        ],
+		related => [
+		],
+	},
+
 };
 
 1;
