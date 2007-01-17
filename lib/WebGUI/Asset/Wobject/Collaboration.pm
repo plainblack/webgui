@@ -675,7 +675,7 @@ SQL
 	my $datetime = $self->session->datetime;
 	return map {
 		my $postId = $_;
-		my $post = WebGUI::Asset::Thread->new($self->session, $postId);
+		my $post = WebGUI::Asset->new($self->session, $postId, 'WebGUI::Asset::Post::Thread');
 		my $postUrl = $siteUrl . $post->getUrl;
 		# Buggo: this is an abuse of 'author'.  'author' is supposed to be an email address.
 		# But this is how it was in the original Collaboration RSS, so.
