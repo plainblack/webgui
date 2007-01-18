@@ -1,5 +1,8 @@
 7.3.6
-
+ - fix: Checkbox is no longer available when creating custom profile fields
+ - fix: profile fields do not ever set the default value
+ 
+ 
 7.3.5
  - fix: CSS error in css03.css (perlDreamer Consulting, LLC)
  - fix: event tooltips are now displaying properly in all browsers
