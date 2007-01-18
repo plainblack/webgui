@@ -1,3 +1,5 @@
+7.3.6
+
 7.3.5
  - fix: CSS error in css03.css (perlDreamer Consulting, LLC)
  - fix: event tooltips are now displaying properly in all browsers
