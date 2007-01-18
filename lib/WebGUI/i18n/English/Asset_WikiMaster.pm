@@ -298,7 +298,7 @@ our $I18N = {
                 lastUpdated => 1165790228,
         },
 
-        'recent changes is page available' => {
+        'recent changes is available' => {
                 message => q|A boolean indicating whether the page is available for viewing or in the trash/clipboard.|,
                 lastUpdated => 1165790228,
         },

@@ -262,6 +262,11 @@ our $I18N =
                 lastUpdated => 1169074288,
         },
 
+        'deleteConfirmation' => {
+                message => q|An internationalized message for confirming the deletion of a wiki page|,
+                lastUpdated => 1169141075,
+        },
+
 };
 
 1;
