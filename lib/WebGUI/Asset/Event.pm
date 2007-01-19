@@ -51,7 +51,7 @@ sub definition {
 	
 	my $i18n 	= WebGUI::International->new($session, 'Asset_Event');
 	
-	my $dt		= WebGUI::DateTime->new(time);
+	my $dt		= WebGUI::DateTime->new($session, time);
 	
 	### Set up list options ###
 	
@@ -215,15 +215,15 @@ sub generateRecurringEvents
 	# Get the distance between the event startDate and endDate
 	my $duration_days	= 0;
 	
-	my $event_start	= WebGUI::DateTime->new(delete($properties->{startDate})." 00:00:00");
-	my $event_end	= WebGUI::DateTime->new(delete($properties->{endDate})." 00:00:00");
+	my $event_start	= WebGUI::DateTime->new($self->session, delete($properties->{startDate})." 00:00:00");
+	my $event_end	= WebGUI::DateTime->new($self->session, delete($properties->{endDate})." 00:00:00");
 	$duration_days	= $event_end->subtract_datetime($event_start)->days;
 	
 	my @dates	= $self->getRecurrenceDates($recur);
 	
 	for my $date (@dates)
 	{
-		my $dt		= WebGUI::DateTime->new($date." 00:00:00");
+		my $dt		= WebGUI::DateTime->new($self->session, $date." 00:00:00");
 		
 		### TODO: Only generate if the recurId does not exist on this day
 		$properties->{startDate}	= $dt->strftime('%F');
@@ -289,13 +289,13 @@ sub getDateTimeStart
 	
 	if ($time)
 	{
-		my $dt	= new WebGUI::DateTime($date." ".$time);
+		my $dt	= new WebGUI::DateTime($self->session, $date." ".$time);
 		$dt->set_time_zone($tz);
 		return $dt;
 	}
 	else
 	{
-		my $dt	= new WebGUI::DateTime($date." 00:00:00");
+		my $dt	= new WebGUI::DateTime($self->session, $date." 00:00:00");
 		return $dt;
 	}
 }
@@ -333,13 +333,13 @@ sub getDateTimeEnd
 	
 	if ($time)
 	{
-		my $dt	= new WebGUI::DateTime($date." ".$time);
+		my $dt	= new WebGUI::DateTime($self->session, $date." ".$time);
 		$dt->set_time_zone($tz);
 		return $dt;
 	}
 	else
 	{
-		my $dt	= new WebGUI::DateTime($date." 23:59:59");
+		my $dt	= new WebGUI::DateTime($self->session, $date." 23:59:59");
 		return $dt;
 	}
 }
@@ -719,9 +719,9 @@ sub getRecurrenceDates
 		);
 	
 	
-	my $dt		= WebGUI::DateTime->new($recur->{startDate}." 00:00:00");
+	my $dt		= WebGUI::DateTime->new($self->session, $recur->{startDate}." 00:00:00");
 	my $dt_start	= $dt->clone; # Keep track of the initial start date
-	my $dt_end	= WebGUI::DateTime->new($recur->{endDate}." 00:00:00")
+	my $dt_end	= WebGUI::DateTime->new($self->session, $recur->{endDate}." 00:00:00")
 			if $recur->{endDate};
 	# Set an end for events with no end
 	#!!! TODO !!! - Get the appropriate configuration
@@ -829,7 +829,7 @@ sub getRecurrenceDates
 			# Pick out the correct day
 			my $startDate	= $dt->year."-".$dt->month."-".$recur->{dayNumber};
 			
-			my $dt_day	= WebGUI::DateTime->new($startDate." 00:00:00");
+			my $dt_day	= WebGUI::DateTime->new($self->session, $startDate." 00:00:00");
 			
 			# Only if today is not before the recurrence start
 			if ($dt_day->clone->truncate(to => "day") >= $dt_start->clone->truncate(to=>"day"))
@@ -951,7 +951,7 @@ sub getRecurrenceDates
 					# Pick out the correct day
 					my $startDate	= $dt_month->year."-".$dt_month->month."-".$recur->{dayNumber};
 					
-					my $dt_day	= WebGUI::DateTime->new($startDate." 00:00:00");
+					my $dt_day	= WebGUI::DateTime->new($self->session, $startDate." 00:00:00");
 					
 					# Only if today is not before the recurrence start
 					if ($dt_day->clone->truncate(to => "day") >= $dt_start->clone->truncate(to=>"day"))
@@ -1423,10 +1423,10 @@ sub processPropertiesFromFormPost
 		# Convert timezone
 		my $tz	= $self->session->user->profileField("timeZone");
 		
-		my ($startDate,$startTime) = split / /, WebGUI::DateTime->new(mysql => $self->get("startDate")." ".$self->get("startTime"), time_zone => $tz)
+		my ($startDate,$startTime) = split / /, WebGUI::DateTime->new($self->session, mysql => $self->get("startDate")." ".$self->get("startTime"), time_zone => $tz)
 					->set_time_zone("UTC")->toMysql;
 		
-		my ($endDate,$endTime) = split / /, WebGUI::DateTime->new(mysql => $self->get("endDate")." ".$self->get("endTime"), time_zone => $tz)
+		my ($endDate,$endTime) = split / /, WebGUI::DateTime->new($self->session, mysql => $self->get("endDate")." ".$self->get("endTime"), time_zone => $tz)
 					->set_time_zone("UTC")->toMysql;
 		
 		$self->update({	startDate	=> $startDate,
@@ -1747,39 +1747,42 @@ sub www_edit
 				});
 	
 	# start date
-	my $default_start	= WebGUI::DateTime->new($session->form->param("start") || time)
+	my $default_start	= WebGUI::DateTime->new($self->session, $session->form->param("start") || time)
 				->set_time_zone($tz);
-	my ($startDate,$startTime) = split / /, $self->getDateTimeStart->toMysql
+	my ($startDate,$startTime) = split / /, $self->getDateTimeStart->toUserTimeZone
 		unless $func eq "add" || $self->get("assetId") eq "new";
 	
 	$var->{"formStartDate"}= WebGUI::Form::date($session,
 			{
 				name		=> "startDate",
 				value		=> $form->process("startDate") || $startDate,
-				defaultValue	=> $default_start->toMysqlDate,
+				defaultValue	=> $default_start->toUserTimeZoneDate,
 			});
 	$var->{"formStartTime"} = WebGUI::Form::timeField($session,
 			{
 				name		=> "startTime",
 				value		=> $form->process("startTime") || $startTime,
-				defaultValue	=> $default_start->toMysqlTime,
+				defaultValue	=> $default_start->toUserTimeZoneTime,
 			});
 	
 	# end date
 	$default_start->add(hours => 1);
-	my ($endDate,$endTime) = split / /, $self->getDateTimeEnd->toMysql
+	#my ($endDate,$endTime) = split / /, $self->getDateTimeEnd->toMysql
+	my ($endDate,$endTime) = split / /, $self->getDateTimeEnd->toUserTimeZone
 		unless $func eq "add" || $self->get("assetId") eq "new";
 	$var->{"formEndDate"}	= WebGUI::Form::date($session,
 			{
 				name		=> "endDate",
 				value		=> $form->process("endDate") || $endDate,
-				defaultValue	=> $default_start->toMysqlDate,
+				#defaultValue	=> $default_start->toMysqlDate,
+				defaultValue	=> $default_start->toUserTimeZoneDate,
 			});
 	$var->{"formEndTime"} = WebGUI::Form::timeField($session,
 			{
 				name		=> "endTime",
 				value		=> $form->process("endTime") || $endTime,
 				defaultValue	=> $default_start->toMysqlTime,
+				#defaultValue	=> $default_start->toUserTimeZoneTime,
 			});
 	
 	# time

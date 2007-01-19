@@ -635,9 +635,9 @@ sub getEventsIn
 	my ($startDate,$startTime)	= split / /, $start;
 	my ($endDate,$endTime)		= split / /, $end;
 	
-	my $startTz			= WebGUI::DateTime->new(mysql => $start, time_zone => $tz)
+	my $startTz			= WebGUI::DateTime->new($self->session, mysql => $start, time_zone => $tz)
 					->set_time_zone("UTC")->toMysql;
-	my $endTz			= WebGUI::DateTime->new(mysql => $end, time_zone => $tz)
+	my $endTz			= WebGUI::DateTime->new($self->session, mysql => $end, time_zone => $tz)
 					->set_time_zone("UTC")->toMysql;
 	
 	my $where	= qq{(Event.startTime IS NULL && Event.endTime IS NULL && Event.startDate >= '$startDate' && Event.startDate < '$endDate')}
@@ -886,7 +886,7 @@ sub view
 		}
 		else
 		{
-			$params->{start} = WebGUI::DateTime->from_epoch(epoch => time(), time_zone => $session->user->profileField("timeZone"))->toMysql;
+			$params->{start} = WebGUI::DateTime->new($self->session, time)->toUserTimeZone;
 		}
 	}
 	$params->{type}	||= $self->get("defaultView") || "Month";
@@ -979,7 +979,7 @@ sub viewDay
 	
 	### Get all the events in this time period
 	# Get the range of the epoch of this day
-	my $dt		= WebGUI::DateTime->new($params->{start});
+	my $dt		= WebGUI::DateTime->new($self->session, $params->{start});
 	$dt->set_locale($i18n->get("locale"));
 	$dt->truncate( to => "day");
 	
@@ -1073,12 +1073,12 @@ sub viewMonth
 	my $i18n	= WebGUI::International->new($session,"Asset_Calendar");
 	my $var		= {};
 	my $tz		= $session->user->profileField("timeZone");
-	my $today	= WebGUI::DateTime->new(time)->set_time_zone($tz)
+	my $today	= WebGUI::DateTime->new($self->session, time)->set_time_zone($tz)
 			->toMysqlDate;
 	
 	#### Get all the events in this time period
 	# Get the range of the epoch of this month
-	my $dt		= WebGUI::DateTime->new($params->{start});
+	my $dt		= WebGUI::DateTime->new($self->session, $params->{start});
 	$dt->set_locale($i18n->get("locale"));
 	$dt->truncate( to => "month");
 	
@@ -1220,13 +1220,13 @@ sub viewWeek
 	my $i18n	= WebGUI::International->new($session,"Asset_Calendar");
 	my $var		= {};
 	my $tz		= $session->user->profileField("timeZone");
-	my $today	= WebGUI::DateTime->new(time)->set_time_zone($tz)
+	my $today	= WebGUI::DateTime->new($self->session, time)->set_time_zone($tz)
 			->toMysqlDate;
 	
 	
 	#### Get all the events in this time period
 	# Get the range of the epoch of this week
-	my $dt		= WebGUI::DateTime->new($params->{start});
+	my $dt		= WebGUI::DateTime->new($self->session, $params->{start});
 	$dt->truncate( to => "day");
 	
 	# Apply First Day of Week settings
@@ -1459,12 +1459,12 @@ sub www_ical
 		#}
 		#else
 		#{
-			$dt_start = WebGUI::DateTime->from_epoch(epoch => time(), time_zone => $session->user->profileField("timeZone"));
+			$dt_start = WebGUI::DateTime->new($self->session, time)->toUserTimeZone;
 		#}
 	}
 	else
 	{
-		$dt_start	= WebGUI::DateTime->new($start)->set_time_zone($session->user->profileField("timeZone"));
+		$dt_start	= WebGUI::DateTime->new($self->session, $start)->set_time_zone($session->user->profileField("timeZone"));
 	}
 	
 	
@@ -1487,7 +1487,7 @@ sub www_ical
 	}
 	else
 	{
-		$dt_end	= WebGUI::DateTime->new($end)->set_time_zone($session->user->profileField("timeZone"));
+		$dt_end	= WebGUI::DateTime->new($self->session, $end)->set_time_zone($session->user->profileField("timeZone"));
 	}
 	
 	
@@ -1519,12 +1519,12 @@ sub www_ical
 		
 		# LAST-MODIFIED (revisionDate)
 		$ical	.= qq{LAST-MODIFIED:}
-			. WebGUI::DateTime->new($event->get("revisionDate"))->toIcal
+			. WebGUI::DateTime->new($self->session, $event->get("revisionDate"))->toIcal
 			. "\r\n";
 		
 		# CREATED (creationDate)
 		$ical	.= qq{CREATED:}
-			. WebGUI::DateTime->new($event->get("creationDate"))->toIcal
+			. WebGUI::DateTime->new($self->session, $event->get("creationDate"))->toIcal
 			. "\r\n";
 		
 		# DTSTART
@@ -1640,7 +1640,7 @@ sub www_search
 			if ($self->session->user->userId eq $data->{ownerUserId} || $self->session->user->isInGroup($data->{groupIdView}) || $self->session->user->isInGroup($data->{groupIdEdit})) 
 			{
 				# Format the date
-				my $dt	= WebGUI::DateTime->new($data->{startDate}." ".($data->{startTime}?$data->{startTime}:"00:00:00"));
+				my $dt	= WebGUI::DateTime->new($self->session, $data->{startDate}." ".($data->{startTime}?$data->{startTime}:"00:00:00"));
 				$dt->set_time_zone($self->session->user->profileField("timeZone"))
 					if ($data->{startTime});
 				
@@ -1660,7 +1660,7 @@ sub www_search
 	}
 	
 	# Prepare the form
-	my $default_dt	= WebGUI::DateTime->new(time);
+	my $default_dt	= WebGUI::DateTime->new($self->session, time);
 	my $default_start	= $default_dt->toMysqlDate;
 	my $default_end		= $default_dt->add(years => 1)->toMysqlDate;
 	

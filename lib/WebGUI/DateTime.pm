@@ -15,7 +15,19 @@ package WebGUI::DateTime;
 =cut
 
 use strict;
+use WebGUI::International;
+
 use base 'DateTime';
+
+
+### Some formats for strftime()
+my $MYSQL_TIME     = '%H:%M:%S';
+my $MYSQL_DATE     = '%Y-%m-%d';
+my $MYSQL_DATETIME = $MYSQL_DATE . q{ } . $MYSQL_TIME;
+
+my $ICAL_DATETIME  = '%Y%m%dT%H%M%SZ';
+my $ICAL_DATE      = '%Y%m%d';
+
 
 
 =head1 NAME
@@ -46,6 +58,8 @@ WebGUI::DateTime - DateTime subclass with additional WebGUI methods
  my $icalDate	= $dt->toIcalDate;	# Make an iCal date string
  my $icalTime	= $dt->toIcalTime;	# Make an iCal time string
  
+ my $webguiDate = $dt->webguiDate($webguiFormat)  #return the date based on WebGUI's date format string
+ 
  
  ### See perldoc DateTime for additional methods ###
 
@@ -63,9 +77,10 @@ dealing with time zones.
 =cut
 
 
+
 #######################################################################
 
-=head2 new ( string )
+=head2 new (session, string )
 
 Creates a new object from a MySQL Date/Time string in the format 
 "2006-11-06 21:12:45". 
@@ -73,16 +88,16 @@ Creates a new object from a MySQL Date/Time string in the format
 This string is assumed to be in the UTC time zone. If it is not, use the 
 "mysql" => string constructor, below.
 
-=head2 new ( integer )
+=head2 new (session, integer )
 
 Creates a new object from an epoch time.
 
-=head2 new ( "mysql" => string, "time_zone" => string )
+=head2 new (session, "mysql" => string, "time_zone" => string )
 
 Creates a new object from a MySQL Date/Time string that is in the specified 
 time zone
 
-=head2 new ( hash )
+=head2 new (session, hash )
 
 Creates a new object from a hash of data passed directly to DateTime. See
 perldoc DateTime for the proper keys to be used.
@@ -97,7 +112,18 @@ sub new
 {
 	# Drop-in replacement for Perl's DateTime.pm
 	my $class	= shift;
-	my $self;
+    my $param0 = $_[0];
+    my $self;
+    my $locale = 'en_US';
+    my $session;
+        
+    if(ref $param0 eq "WebGUI::Session") {
+       $session = shift;
+       my $i18n = WebGUI::International->new($session);
+       my $language = $i18n->getLanguage($session->user->profileField('language'));
+	   $locale = $language->{languageAbbreviation} || 'en';
+       $locale .= "_".$language->{locale} if ($language->{locale});
+    }
 	
 	#use Data::Dumper;
 	#warn "Args to DateTime->new: ".Dumper \@_;
@@ -119,7 +145,7 @@ sub new
 	}
 	elsif ($_[0] =~ /^\d+$/)
 	{
-		$self	= DateTime->from_epoch(epoch=>$_[0], time_zone=>"UTC");
+		$self	= DateTime->from_epoch(epoch=>$_[0], time_zone=>"UTC", locale=>$locale);
 	}
 	else
 	{
@@ -129,17 +155,97 @@ sub new
 				);
 	}
 	
+    #Set the session object
+    $self->{_session} = $session;
+    
 	# If no DateTime object created yet, I don't know how
 	unless ($self)
 	{
 		return;
 	}
+    
 	
 	return bless $self, $class;
 }
 
 
 
+
+#######################################################################
+
+=head2 cloneToUTC
+
+Returns a clone of the current object with the time zone changed to UTC
+
+=cut
+
+sub cloneToUTC {
+    my $self = shift;
+    my $copy = $self->clone;
+    $copy->set_time_zone("UTC");
+    return $copy;
+}
+
+#######################################################################
+
+=head2 cloneToUserTimeZone
+
+Returns a clone of the current object with the time zone changed to the
+current users's time zone.
+
+=cut
+
+sub cloneToUserTimeZone {
+    my $self = shift;
+    my $copy = $self->clone;
+    my $timezone = $self->session->user->profileField("timeZone");
+    $copy->set_time_zone($timezone);
+    return $copy;
+}
+
+#######################################################################
+
+=head2 toDatabase
+
+Returns a MySQL Date/Time string in the UTC time zone
+
+=cut
+
+sub toDatabase {
+    my $self = shift;
+    my $copy = $self->cloneToUTC;
+    return $copy->strftime($MYSQL_DATETIME);
+}
+
+#######################################################################
+
+=head2 toDatabaseDate
+
+Returns a MySQL Date string. Any time data stored by this object will be 
+ignored. Is not adjusted for time zone.
+
+=cut
+
+sub toDatabaseDate {
+    my $self = shift;
+    my $copy = $self->cloneToUTC;
+    return $copy->strftime($MYSQL_DATE);
+}
+
+#######################################################################
+
+=head2 toDatabaseTime
+
+Returns a MySQL Time string adjusted to UTC. Any date data stored by this object will be 
+ignored.
+
+=cut
+
+sub toDatabaseTime {
+    my $self = shift;
+    my $copy = $self->cloneToUTC;
+    return $copy->strftime($MYSQL_TIME);
+}
 
 #######################################################################
 
@@ -157,11 +263,11 @@ sub toIcal
 	
 	if ($self->time_zone->is_utc)
 	{
-		return $self->strftime('%Y%m%dT%H%M%SZ');
+		return $self->strftime($ICAL_DATETIME);
 	}
 	else
 	{
-		return $self->clone->set_time_zone("UTC")->strftime('%Y%m%dT%H%M%SZ');
+		return $self->clone->set_time_zone("UTC")->strftime($ICAL_DATETIME);
 	}
 }
 
@@ -179,7 +285,7 @@ time zone.
 
 sub toIcalDate
 {
-	return $_[0]->strftime('%Y%m%d');
+	return $_[0]->strftime($ICAL_DATE);
 }
 
 
@@ -189,8 +295,9 @@ sub toIcalDate
 
 =head2 toMysql
 
-Returns a MySQL Date/Time string in the UTC time zone.  This method is deprecated
-and will be removed at some point in the future.
+This method is deprecated and will be removed in the future.
+
+Returns a MySQL Date/Time string in the UTC time zone.  
 
 =cut
 
@@ -206,10 +313,10 @@ sub toMysql
 
 =head2 toMysqlDate
 
-Returns a MySQL Date string. Any time data stored by this object will be 
-ignored. Is not adjusted for time zone.  This method is deprecated
-and will be removed at some point in the future.
+This method is deprecated and will be removed in the future.
 
+Returns a MySQL Date string. Any time data stored by this object will be 
+ignored. Is not adjusted for time zone.  
 
 =cut
 
@@ -225,10 +332,10 @@ sub toMysqlDate
 
 =head2 toMysqlTime
 
-Returns a MySQL Time string. Any date data stored by this object will be 
-ignored. Is not adjusted for time zone.  This method is deprecated
-and will be removed at some point in the future.
+This method is deprecated and will be removed in the future.
 
+Returns a MySQL Time string. Any date data stored by this object will be 
+ignored. Is not adjusted for time zone.  
 
 =cut
 
@@ -237,10 +344,163 @@ sub toMysqlTime
 	return $_[0]->strftime("%H:%M:%S");
 }
 
+#######################################################################
+
+=head2 toUserTimeZone
+
+Returns a MySQL Date/Time string in the user's time zone.
+
+=cut
+
+sub toUserTimeZone {
+    my $self = shift;
+    my $copy = $self->cloneToUserTimeZone;
+    return $copy->strftime($MYSQL_DATETIME);
+}
+
+#######################################################################
+
+=head2 toUserTimeZoneDate
+
+Returns a MySQL Date string adjusted to the current user's time
+zone. Any time data stored by this object will be ignored.
+
+=cut
+
+sub toUserTimeZoneDate {
+    my $self = shift;
+    my $copy = $self->cloneToUserTimeZone;
+    return $copy->strftime($MYSQL_DATE);
+}
+
+#######################################################################
+
+=head2 toUserTimeZoneTime
+
+Returns a MySQL Time string adjusted to the current user's time
+zone. Any date data stored by this object will be ignored.
+
+=cut
+
+sub toUserTimeZoneTime {
+    my $self = shift;
+    my $copy = $self->cloneToUserTimeZone;
+    return $copy->strftime($MYSQL_TIME);
+}
+
+#######################################################################
+
+=head2 session
+
+gets/sets the session variable in the object.  
+This is going to have to be changed eventually so you don't have to set the session
+
+=cut
+
+sub session {
+	my $self = shift;
+    my $session = shift;
+    
+    if($session) {
+       $self->{_session} = $session;
+    }
+    
+    return $self->{_session};
+}
 
 
 
 #######################################################################
+
+=head2 webguiDate ( format )
+
+Parses WebGUI dateFormat string and converts to DateTime format
+
+=head3 format
+
+A string representing the output format for the date. Defaults to '%z %Z'. You can use the following to format your date string:
+
+ %% = % (percent) symbol.
+ %c = The calendar month name.
+ %C = The calendar month name abbreviated.
+ %d = A two digit day.
+ %D = A variable digit day.
+ %h = A two digit hour (on a 12 hour clock).
+ %H = A variable digit hour (on a 12 hour clock).
+ %j = A two digit hour (on a 24 hour clock).
+ %J = A variable digit hour (on a 24 hour clock).
+ %m = A two digit month.
+ %M = A variable digit month.
+ %n = A two digit minute.
+ %O = Offset from GMT/UTC represented in four digit form with a sign. Example: -0600
+ %p = A lower-case am/pm.
+ %P = An upper-case AM/PM.
+ %s = A two digit second.
+ %t = Time zone name.
+ %w = Day of the week. 
+ %W = Day of the week abbreviated. 
+ %y = A four digit year.
+ %Y = A two digit year. 
+ %z = The current user's date format preference.
+ %Z = The current user's time format preference.
+
+=cut
+
+sub webguiDate {
+   my $self = shift;
+   my $session = $self->session;
+   return undef unless ($session);
+   my $format = shift || "%z %Z";
+   my $temp;
+   
+   #---date format preference
+   $temp = $session->user->profileField('dateFormat') || '%y-%M-%D';
+   $format =~ s/\%z/$temp/g;
+   
+   #---time format preference
+   $temp = $session->user->profileField('timeFormat') || '%H:%n %p';
+   $format =~ s/\%Z/$temp/g;
+   
+   #--- convert WebGUI date formats to DateTime formats
+   my %conversion = (
+		"c" => "B",
+		"C" => "b",
+		"d" => "d",
+		"D" => "e",
+		"h" => "I",
+		"H" => "l",
+		"j" => "H",
+		"J" => "k",
+		"m" => "m",
+		"M" => "_varmonth_",
+		"n" => "M",
+		"t" => "Z",
+		"O" => "z",
+		"p" => "P",
+		"P" => "p",
+		"s" => "S",
+		"w" => "A",
+		"W" => "a",
+		"y" => "Y",
+		"Y" => "y"
+		);
+   
+   $format =~ s/\%(\w)/\~$1/g;
+   foreach my $key (keys %conversion) {
+      my $replacement = $conversion{$key};
+	  $format =~ s/\~$key/\%$replacement/g;
+   }
+   
+   #--- %M
+   my $datestr = $self->strftime($format);
+   $temp = int($self->month);
+   $datestr =~ s/\%_varmonth_/$temp/g;
+   
+   #--- return
+   return $datestr;
+}
+#######################################################################
+
 
 =head2 _splitMysql ( string )
 
