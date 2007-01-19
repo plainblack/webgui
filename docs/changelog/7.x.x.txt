@@ -1,6 +1,7 @@
 7.3.6
  - fix: Checkbox is no longer available when creating custom profile fields
  - fix: profile fields do not ever set the default value
+ - fix: CS email message shows up as an attachment
  
  
 7.3.5

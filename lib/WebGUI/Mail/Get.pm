@@ -213,7 +213,8 @@ sub getNextMessage {
 		@parts = reverse @parts;
 	}
 	
-	foreach my $part (@parts) {
+	#foreach my $part (@parts) {
+	while ( my $part = shift @parts) {
 		my $type = $part->mime_type;
 		next if ($type eq "message/rfc822");
 		next if ($type eq "message/delivery-status");
@@ -224,9 +225,12 @@ sub getNextMessage {
 		my $content = "";
  		if (defined $body) {
 			$content = $body->as_string;
+		} else {
+			# handle nested multipart
+			$alternate = 1;
+			unshift(@parts, reverse $part->parts);
 		}
 		next unless ($content);
-		
 		# If this is a multipart alternative message, and this is the first segment
 		# Or if this is a normal mime message
 		if (($alternate && !@segments) || !$alternate) {
