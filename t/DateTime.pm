@@ -23,7 +23,7 @@ my $session = WebGUI::Test->session;
 
 # put your tests here
 
-my $numTests = 1 + 13;
+my $numTests = 1 + 17;
 plan tests => $numTests;
 
 my $loaded = use_ok("WebGUI::DateTime");
@@ -55,6 +55,14 @@ is($dt->time_zone()->name,       "UTC",                "original object is still
 is($copiedDt->toUserTimeZone(),     "2006-11-06 14:12:45", "toUserTimeZone obeys the time zone");
 is($copiedDt->toUserTimeZoneDate(), "2006-11-06",          "toUserTimeZoneDate obeys the time zone");
 is($copiedDt->toUserTimeZoneTime(), "14:12:45",            "toUserTimeZoneTime obeys the time zone");
+
+$copiedDt->add(hours => 1);
+
+isa_ok($copiedDt,          "WebGUI::DateTime", "add returns itself");
+isa_ok($copiedDt->session, "WebGUI::Session",  "add does not nuke $session");
+
+is($copiedDt->time_zone()->name, "America/Hermosillo",  "add does not change the time zone");
+is($copiedDt->toUserTimeZone(),  "2006-11-06 15:12:45", "add returns the correct time");
 
 my $epochDt = WebGUI::DateTime->new($session, "1169141075");
 isa_ok($epochDt, "WebGUI::DateTime", "epochal construction");
