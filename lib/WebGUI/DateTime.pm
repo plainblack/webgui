@@ -189,7 +189,8 @@ sub toIcalDate
 
 =head2 toMysql
 
-Returns a MySQL Date/Time string in the UTC time zone
+Returns a MySQL Date/Time string in the UTC time zone.  This method is deprecated
+and will be removed at some point in the future.
 
 =cut
 
@@ -206,7 +207,9 @@ sub toMysql
 =head2 toMysqlDate
 
 Returns a MySQL Date string. Any time data stored by this object will be 
-ignored. Is not adjusted for time zone.
+ignored. Is not adjusted for time zone.  This method is deprecated
+and will be removed at some point in the future.
+
 
 =cut
 
@@ -223,7 +226,9 @@ sub toMysqlDate
 =head2 toMysqlTime
 
 Returns a MySQL Time string. Any date data stored by this object will be 
-ignored. Is not adjusted for time zone.
+ignored. Is not adjusted for time zone.  This method is deprecated
+and will be removed at some point in the future.
+
 
 =cut
 
