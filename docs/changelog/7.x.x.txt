@@ -3,6 +3,8 @@
  - fix: profile fields do not ever set the default value
  - fix: CS email message shows up as an attachment
  - fix: Calendar: start/end date time off in edit interface (perlDreamer Consulting, LLC)
+ - Added a database optimization that will improve asset lookup performance by
+   as much as 600% on some sites.
  
  
 7.3.5
