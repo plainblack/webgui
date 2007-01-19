@@ -2,6 +2,7 @@
  - fix: Checkbox is no longer available when creating custom profile fields
  - fix: profile fields do not ever set the default value
  - fix: CS email message shows up as an attachment
+ - fix: Calendar: start/end date time off in edit interface (perlDreamer Consulting, LLC)
  
  
 7.3.5

@@ -205,6 +205,23 @@ sub cloneToUserTimeZone {
 
 #######################################################################
 
+=head2 from_object
+
+Handle copying all WebGUI::DateTime specific data.  This is a class method.
+
+=cut
+
+sub from_object {
+    my $class = shift;
+    my %args = @_;
+    my $session = $args{object}->session;
+    my $copy = $class->SUPER::from_object(@_);
+    $copy->session($session);
+    return $copy;
+}
+
+#######################################################################
+
 =head2 toDatabase
 
 Returns a MySQL Date/Time string in the UTC time zone
@@ -398,7 +415,7 @@ This is going to have to be changed eventually so you don't have to set the sess
 =cut
 
 sub session {
-	my $self = shift;
+    my $self = shift;
     my $session = shift;
     
     if($session) {

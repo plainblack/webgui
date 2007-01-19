@@ -289,13 +289,13 @@ sub getDateTimeStart
 	
 	if ($time)
 	{
-		my $dt	= new WebGUI::DateTime($self->session, $date." ".$time);
+		my $dt	= WebGUI::DateTime->new($self->session, $date." ".$time);
 		$dt->set_time_zone($tz);
 		return $dt;
 	}
 	else
 	{
-		my $dt	= new WebGUI::DateTime($self->session, $date." 00:00:00");
+		my $dt	= WebGUI::DateTime->new($self->session, $date." 00:00:00");
 		return $dt;
 	}
 }
@@ -333,13 +333,13 @@ sub getDateTimeEnd
 	
 	if ($time)
 	{
-		my $dt	= new WebGUI::DateTime($self->session, $date." ".$time);
+		my $dt	= WebGUI::DateTime->new($self->session, $date." ".$time);
 		$dt->set_time_zone($tz);
 		return $dt;
 	}
 	else
 	{
-		my $dt	= new WebGUI::DateTime($self->session, $date." 23:59:59");
+		my $dt	= WebGUI::DateTime->new($self->session, $date." 23:59:59");
 		return $dt;
 	}
 }
@@ -1767,22 +1767,19 @@ sub www_edit
 	
 	# end date
 	$default_start->add(hours => 1);
-	#my ($endDate,$endTime) = split / /, $self->getDateTimeEnd->toMysql
 	my ($endDate,$endTime) = split / /, $self->getDateTimeEnd->toUserTimeZone
 		unless $func eq "add" || $self->get("assetId") eq "new";
 	$var->{"formEndDate"}	= WebGUI::Form::date($session,
 			{
 				name		=> "endDate",
 				value		=> $form->process("endDate") || $endDate,
-				#defaultValue	=> $default_start->toMysqlDate,
 				defaultValue	=> $default_start->toUserTimeZoneDate,
 			});
 	$var->{"formEndTime"} = WebGUI::Form::timeField($session,
 			{
 				name		=> "endTime",
 				value		=> $form->process("endTime") || $endTime,
-				defaultValue	=> $default_start->toMysqlTime,
-				#defaultValue	=> $default_start->toUserTimeZoneTime,
+				defaultValue	=> $default_start->toUserTimeZoneTime,
 			});
 	
 	# time

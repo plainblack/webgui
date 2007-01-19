@@ -23,7 +23,7 @@ my $session = WebGUI::Test->session;
 
 # put your tests here
 
-my $numTests = 1 + 12;
+my $numTests = 1 + 13;
 plan tests => $numTests;
 
 my $loaded = use_ok("WebGUI::DateTime");
@@ -46,7 +46,8 @@ is($dt->toDatabaseTime, "21:12:45",            "toDatabaseTime returns the ident
 $session->user({user => $timeZoneUser});
 
 my $copiedDt = $dt->cloneToUserTimeZone;
-isa_ok($copiedDt, "WebGUI::DateTime", "cloneToUserTimeZone");
+isa_ok($copiedDt,          "WebGUI::DateTime", "cloneToUserTimeZone");
+isa_ok($copiedDt->session, "WebGUI::Session",  "cloneToUserTimeZone also copies over the session object");
 
 is($copiedDt->time_zone()->name, "America/Hermosillo", "cloned object has correct time zone");
 is($dt->time_zone()->name,       "UTC",                "original object is still UTC");
