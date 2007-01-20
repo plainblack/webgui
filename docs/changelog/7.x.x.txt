@@ -5,6 +5,7 @@
  - fix: Calendar: start/end date time off in edit interface (perlDreamer Consulting, LLC)
  - Added a database optimization that will improve asset lookup performance by
    as much as 600% on some sites.
+ - fix: Extra cruft in the Zip Archive template.
  
  
 7.3.5
