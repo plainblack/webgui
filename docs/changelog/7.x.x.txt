@@ -6,6 +6,7 @@
  - Added a database optimization that will improve asset lookup performance by
    as much as 600% on some sites.
  - fix: Extra cruft in the Zip Archive template.
+ - fix: fixed corner case in WebGUI::Operation::Workflow.pm which could cause the edit page to not load and display an error if an activity is undefined or cannot be defined.
  
  
 7.3.5
