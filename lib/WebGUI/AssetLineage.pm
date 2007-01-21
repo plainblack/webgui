@@ -264,6 +264,10 @@ A hash reference comprising modifiers to relative listing. Rules include:
 
 An array reference containing a list of states that should be returned. Defaults to 'published'. Options include 'published', 'trash', 'cliboard', 'clipboard-limbo' and 'trash-limbo'.
 
+=head4 statusToInclude
+
+An array reference containing a list of status that should be returned. Defaults to 'approved'. Options include 'approved', 'pending', 'deleted', and 'archived'.
+
 =head4 endingLineageLength
 
 An integer limiting the length of the lineages of the assets to be returned. This can help limit levels of depth in the asset tree.
@@ -391,12 +395,20 @@ sub getLineage {
 	} else {
 		$where = "asset.state='published'";
 	}
-	## get only approved items or those that i'm currently working on
-	my $archived = "";
-	if ($rules->{includeArchived}) {
-		$archived = " or assetData.status='archived' ";
-	}
-	$where .= " and (assetData.status='approved' $archived or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")).")";
+	
+    my $statusCodes = $rules->{statusToInclude} || [];
+    if($rules->{includeArchived}) {
+       if(!WebGUI::Utility::isIn($rules->{includeArchived},@{$statusCodes})) {
+          push(@{$statusCodes},'archived');
+       }
+    }
+    
+    my $status = "assetData.status='approved'";
+    if(scalar(@{$statusCodes})) {
+       $status = "assetData.status in (".$self->session->db->quoteAndJoin($statusCodes).")";
+    }
+    
+	$where .= " and ($status or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")).")";
 	## class exclusions
 	if (exists $rules->{excludeClasses}) {
 		my @set;
@@ -416,7 +428,7 @@ sub getLineage {
 	}
 	# based upon all available criteria, let's get some assets
 	my $columns = "asset.assetId, asset.className, asset.parentId, assetData.revisionDate";
-	$where .= " and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId and (assetData.status='approved' $archived or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")).")) ";
+	$where .= " and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId and ($status or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")).")) ";
 	my $sortOrder = ($rules->{invertTree}) ? "asset.lineage desc" : "asset.lineage asc"; 
 	if (exists $rules->{orderByClause}) {
 		$sortOrder = $rules->{orderByClause};
