@@ -7,6 +7,7 @@
    as much as 600% on some sites.
  - fix: Extra cruft in the Zip Archive template.
  - fix: fixed corner case in WebGUI::Operation::Workflow.pm which could cause the edit page to not load and display an error if an activity is undefined or cannot be defined.
+ - fix: testEnvironment.pl do not tests all modules (perlDreamer Consulting, LLC)
  
  
 7.3.5
