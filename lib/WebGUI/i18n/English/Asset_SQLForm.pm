@@ -827,10 +827,10 @@ not possible ta add fields. Please add at least one field type by going to|,
 	},
 
 	'gef table name description' => {
-		message => q|<p>This is the name the table you want to attach
-should get in the database, or if you want to attach the SQLForm to an existing
+		message => q|<p>This is the name the table you want to create
+create in the database, or if you want to attach the SQLForm to an existing
 table, the name of that table.</p>|,
-		lastUpdated => 0,
+		lastUpdated => 1169508646,
 	},
 
 	'gef database to use' => {
@@ -1525,6 +1525,73 @@ the table.</p>|,
 	'ers view url' => {
 		message => q|You can view this change by clicking on this url:|,
 		lastUpdated => 0,
+	},
+
+	'sql form asset template variables title' => {
+		message => q|SQLForm Asset Template Variables|,
+		lastUpdated => 1164841146
+	},
+
+	'sql form asset template variables body' => {
+		message => q|Every asset provides a set of variables to most of its
+templates based on the internal asset properties.  Some of these variables may
+be useful, others may not.|,
+		lastUpdated => 1164841201
+	},
+
+	'formId' => {
+		message => q|This variable will always be empty.|,
+		lastUpdated => 1169508478
+	},
+
+	'tableName' => {
+		message => q|The name of the table in the database that will be used.|,
+		lastUpdated => 1169508478
+	},
+
+	'maxFileSize' => {
+		message => q|The maximum size of files that will be uploaded in this SQLForm.|,
+		lastUpdated => 1169508478
+	},
+
+	'sendMailTo' => {
+		message => q|The email address of the person who will be notified via email every time a row is added or edited.|,
+		lastUpdated => 1169508478
+	},
+
+	'showMetaData' => {
+		message => q|A conditional indicating whether or not record meta data will be shown in search results.|,
+		lastUpdated => 1169508478
+	},
+
+	'searchTemplateId' => {
+		message => q|The ID of the template used to display the search interface to the user.|,
+		lastUpdated => 1169508478
+	},
+
+	'editTemplateId' => {
+		message => q|The ID of the template used to display the editing and viewing interface to the user|,
+		lastUpdated => 1169508478
+	},
+
+	'submitGroupId' => {
+		message => q|The ID of the group allowed to add, edit, delete and restore rows, but not to purge them.|,
+		lastUpdated => 1169508478
+	},
+
+	'alterGroupId' => {
+		message => q|This variable will always be false.|,
+		lastUpdated => 1169508478
+	},
+
+	'databaseLinkId' => {
+		message => q|The ID of the WebGUI Database Link to use.|,
+		lastUpdated => 1169508478
+	},
+
+	'defaultView' => {
+		message => q|A conditional that indicates whether the normal or advanced search interface will be used.|,
+		lastUpdated => 1169508478
 	},
 
 

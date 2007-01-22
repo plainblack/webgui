@@ -346,6 +346,20 @@ our $HELP = {
 	'edit record template' => {
 		title => 'edit template help title',
 		body => 'edit template help',
+		isa => [
+			{
+				namespace => "Asset_SQLForm",
+				tag => "sql form asset template variables"
+			},
+			{
+				namespace => "Asset_Template",
+				tag => "template variables"
+			},
+			{
+				namespace => "Asset",
+				tag => "asset template"
+			},
+		],
 		variables => [
 		          {
 		            'name' => 'showFieldsDefined'
@@ -522,10 +536,24 @@ our $HELP = {
 			},
 		],
 	},
-	
+
 	'search record template' => {
 		title => 'search template help title',
 		body => 'search template help',
+		isa => [
+			{
+				namespace => "Asset_SQLForm",
+				tag => "sql form asset template variables"
+			},
+			{
+				namespace => "Asset_Template",
+				tag => "template variables"
+			},
+			{
+				namespace => "Asset",
+				tag => "asset template"
+			},
+		],
 		variables => [
 		          {
 		            'name' => 'completeForm'
@@ -596,6 +624,60 @@ our $HELP = {
 				namespace => 'Asset_Template',
 			},
 		],
+	},
+
+	'sql form asset template variables' => {
+		title => 'sql form asset template variables title',
+		body => 'sql form asset template variables body',
+		isa => [
+			{
+				namespace => "Asset_Wobject",
+				tag => "wobject template variables"
+			},
+		],
+		fields => [
+		],
+		variables => [
+		          {
+		            'name' => 'formId'
+		          },
+		          {
+		            'name' => 'tableName'
+		          },
+		          {
+		            'name' => 'maxFileSize'
+		          },
+		          {
+		            'name' => 'sendMailTo'
+		          },
+		          {
+		            'name' => 'showMetaData'
+		          },
+		          {
+		            'name' => 'searchTemplateId'
+		          },
+		          {
+		            'name' => 'editTemplateId'
+		          },
+		          {
+		            'name' => 'submitGroupId'
+		          },
+		          {
+		            'name' => 'alterGroupId'
+		          },
+		          {
+		            'name' => 'databaseLinkId'
+		          },
+		          {
+		            'name' => 'defaultView'
+		          },
+		        ],
+		related => [
+			{
+				tag => 'article add/edit',
+				namespace => 'Asset_Article'
+			},
+		]
 	},
 
 };
