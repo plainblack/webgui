@@ -1261,7 +1261,7 @@ sub www_showConfirmation {
 sub www_view {
 	my $self = shift;
 	$self->incrementViews;
-	return $self->getThread->www_view;
+	return $self->getThread->www_view($self);
 }
 
 

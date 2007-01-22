@@ -1059,6 +1059,7 @@ Renders self->view based upon current style, subject to timeouts. Returns Privil
 
 sub www_view {
         my $self = shift;
+	my $currentPost = shift;
 	return $self->session->privilege->noAccess() unless $self->canView;
 	my $check = $self->checkView;
 	return $check if (defined $check);
@@ -1068,7 +1069,7 @@ sub www_view {
         my $style = $self->getParent->processStyle("~~~");
         my ($head, $foot) = split("~~~",$style);
         $self->session->output->print($head,1);
-        $self->session->output->print($self->view);
+        $self->session->output->print($self->view($currentPost));
         $self->session->output->print($foot,1);
         return "chunked";
 }
