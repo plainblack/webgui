@@ -10,8 +10,9 @@
  - fix: testEnvironment.pl do not tests all modules (perlDreamer Consulting, LLC)
  - fix: Fixed a bug where the isCurrentPost tmpl_var would always be set to the 
    first post of the thread in stead of the current post. (Martin Kamerbeek / Oqapi)
- 
- 
+ - fix: Non-existant variables in CS templates (perlDreamer Consulting, LLC)
+
+
 7.3.5
  - fix: CSS error in css03.css (perlDreamer Consulting, LLC)
  - fix: event tooltips are now displaying properly in all browsers
