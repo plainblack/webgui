@@ -20,16 +20,25 @@ Package WebGUI::Macro::Slash_gatewayUrl
 
 Macro for returning the gateway URL (defined in the WebGUI config file) to the site.
 
-=head2 process ( )
+=head2 process ( $session, $url )
 
 process is really a wrapper around $session->url->gateway();
+
+=head3 $session
+
+A WebGUI session variable.
+
+=head3 $url
+
+A url which will be passed to $session->url->gateway().
 
 =cut
 
 #-------------------------------------------------------------------
 sub process {
 	my $session = shift;
-	return $session->url->gateway();
+	my $url = shift;
+	return $session->url->gateway($url);
 }
 
 

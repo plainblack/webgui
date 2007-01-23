@@ -11,6 +11,7 @@ package WebGUI::Macro::PageUrl;
 #-------------------------------------------------------------------
 
 use strict;
+use URI;
 
 =head1 NAME
 
@@ -20,16 +21,33 @@ Package WebGUI::Macro::Page
 
 Macro for displaying the url for the current asset.
 
-=head2 process ( )
+=head2 process ( $session, $url )
 
 process is really a wrapper around $session->url->page();
+
+=head3 $session
+
+The current WebGUI session variable.
+
+=head3 $url
+
+A URL to safely append to the end of the page URL.
 
 =cut
 
 #-------------------------------------------------------------------
 sub process {
 	my $session = shift;
-	return $session->url->page();
+	my $url = shift;
+	my $pageUrl = $session->url->page();
+	if ($url) {
+		my $uri = URI->new($pageUrl);
+		##Append the requested URL to the path part of the URL
+		$uri->path(join "/", $uri->path, $url);
+		$pageUrl = $uri->as_string;
+	}
+	$pageUrl =~ tr{/}{/}s; ##Remove duplicate slashes.
+	return $pageUrl;
 }
 
 

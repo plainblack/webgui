@@ -11,6 +11,7 @@
  - fix: Fixed a bug where the isCurrentPost tmpl_var would always be set to the 
    first post of the thread in stead of the current post. (Martin Kamerbeek / Oqapi)
  - fix: Non-existant variables in CS templates (perlDreamer Consulting, LLC)
+ - fix: Slash_Gateway macro (perlDreamer Consulting, LLC)
 
 
 7.3.5
