@@ -28,8 +28,9 @@ Package WebGUI::Form::Date
 Accepts and returns and epoch date and creates a date picker control.
 
 If the current or default value is a MySQL date string, accepts and returns
-a MySQL date string. Note: Cannot do time zone conversion since it is not a 
-complete date/time string.
+a MySQL date string. 
+
+NOTE: Does not do time-zone conversion.
 
 =head1 SEE ALSO
 
@@ -114,11 +115,16 @@ Return the date in a human readable format for the Profile system.
 
 sub displayValue {
 	my ($self) = @_;
-	if (!$self->get("defaultValue") || $self->get("defaultValue") =~ m/^\d+$/) {
+    # This should probably be rewritten as a cascading ternary
+	if (!$self->get("defaultValue") 
+        || $self->get("defaultValue") =~ m/^\d+$/
+        || !$self->get("value")     
+        || $self->get("value") =~ m/^\d+$/) {
 		return $self->session->datetime->epochToHuman($self->get("value"),"%z");
 	} else {
 		# MySQL format
 		my $value = $self->get("value");
+        return $value;
 	}
 }
 
@@ -133,8 +139,11 @@ it returns undef instead.
 
 sub getValueFromPost {
 	my $self = shift;
-	if (!$self->get("defaultValue") || $self->get("defaultValue") =~ m/^\d+$/) {
-		# Epoch format
+    # This should probably be rewritten as a cascading ternary
+	if (!$self->get("defaultValue") 
+        || $self->get("defaultValue") =~ m/^\d+$/
+        || !$self->get("value")     
+        || $self->get("value") =~ m/^\d+$/) {
 		return $self->session->datetime->setToEpoch($self->session->form->param($self->get("name")));
 	} else {
 		# MySQL format
@@ -159,13 +168,19 @@ Renders a date picker control.
 sub toHtml {
         my $self = shift;
 	my $value;
-	if ($self->get("_defaulted") && $self->get("noDate") ) {
+	# This should probably be rewritten as a cascading ternary
+    if ($self->get("_defaulted") && $self->get("noDate") ) {
 		# No default date
 		$value = $self->set("value",'');
-	} elsif (!$self->get("defaultValue") || $self->get("value") =~ m/^\d+$/) {
+	}
+    elsif (!$self->get("defaultValue") 
+        || $self->get("defaultValue") =~ m/^\d+$/
+        || !$self->get("value")     
+        || $self->get("value") =~ m/^\d+$/) {
 		# Epoch format
 		$value = $self->set("value",$self->session->datetime->epochToSet($self->get("value")));
-	} else {
+	} 
+    else {
 		# MySQL format
 		$value = $self->get("value");
 		# NOTE: Cannot fix time zone since we don't have a complete date/time
@@ -208,10 +223,14 @@ Renders the form field to HTML as a hidden field rather than whatever field type
 =cut
 
 sub toHtmlAsHidden {
-        my $self = shift;
+    my $self = shift;
 	my $value;
 	
-	if (!$self->get("defaultValue") || $self->get("defaultValue") =~ m/^\d+$/) {
+    # This should probably be rewritten as a cascading ternary
+	if (!$self->get("defaultValue") 
+        || $self->get("defaultValue") =~ m/^\d+$/
+        || !$self->get("value")     
+        || $self->get("value") =~ m/^\d+$/) {
 		$value = $self->session->datetime->epochToSet($self->get("value"),"%z");
 	} else {
 		# MySQL format

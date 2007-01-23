@@ -12,6 +12,8 @@
    first post of the thread in stead of the current post. (Martin Kamerbeek / Oqapi)
  - fix: Non-existant variables in CS templates (perlDreamer Consulting, LLC)
  - fix: Slash_Gateway macro (perlDreamer Consulting, LLC)
+ - fix: Applied Martin Kamerbeek's fix for Date fields to DateTime and
+   TimeField fields. Also added a couple fixes for other possible circumstances.
 
 
 7.3.5

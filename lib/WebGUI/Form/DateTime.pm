@@ -110,9 +110,13 @@ Returns a validated form post result. If the result does not pass validation, it
 
 sub getValueFromPost {
 	my $self = shift;
-	if (!$self->get("defaultValue") || $self->get("defaultValue") =~ m/^\d+$/) {
+    # This should probably be rewritten as a cascading ternary
+	if (!$self->get("defaultValue") 
+        || $self->get("defaultValue") =~ m/^\d+$/
+        || !$self->get("value")     
+        || $self->get("value") =~ m/^\d+$/) {
 		# Epoch format
-		return $self->session->datetime->setToEpoch($self->session->form->param($self->get("name")),1);
+		return $self->session->datetime->setToEpoch($self->session->form->param($self->get("name")));
 	} else {
 		# MySQL format
 		# YY(YY)?-MM-DD HH:MM:SS
@@ -142,7 +146,11 @@ Renders a date picker control.
 sub toHtml {
         my $self = shift;
 	my $value;
-	if (!$self->get("defaultValue") || $self->get("defaultValue") =~ m/^\d+$/) {
+    # This should probably be rewritten as a cascading ternary
+	if (!$self->get("defaultValue") 
+        || $self->get("defaultValue") =~ m/^\d+$/
+        || !$self->get("value")     
+        || $self->get("value") =~ m/^\d+$/) {
 		# Epoch format
 		$value	= $self->session->datetime->epochToSet($self->get("value"),1);
 	} else {
@@ -194,7 +202,11 @@ sub toHtmlAsHidden {
         my $self = shift;
 	my $value;
 	
-	if (!$self->get("defaultValue") || $self->get("defaultValue") =~ m/^\d+$/) {
+    # This should probably be rewritten as a cascading ternary
+	if (!$self->get("defaultValue") 
+        || $self->get("defaultValue") =~ m/^\d+$/
+        || !$self->get("value")     
+        || $self->get("value") =~ m/^\d+$/) {
 		$value = $self->session->datetime->epochToSet($self->get("value"),1);
 	} else {
 		# MySQL format

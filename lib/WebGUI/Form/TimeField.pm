@@ -108,7 +108,11 @@ adjusted for the user's time zone..
 
 sub getValueFromPost {
 	my $self = shift;
-	if (!$self->get("defaultValue") || $self->get("defaultValue") =~ /^\d+$/) {
+    # This should probably be rewritten as a cascading ternary
+	if (!$self->get("defaultValue") 
+        || $self->get("defaultValue") =~ m/^\d+$/
+        || !$self->get("value")     
+        || $self->get("value") =~ m/^\d+$/) {
 		# epoch format
 		return $self->session->datetime->timeToSeconds($self->session->form->param($self->get("name")))-($self->session->user->profileField("timeOffset")*3600);
 	} else {
@@ -128,9 +132,13 @@ Renders a time field.
 =cut
 
 sub toHtml {
-        my $self = shift;
+    my $self = shift;
 	my $value;
-	if ($self->get("value") =~ /^\d+$/) {
+    # This should probably be rewritten as a cascading ternary
+	if (!$self->get("defaultValue") 
+        || $self->get("defaultValue") =~ m/^\d+$/
+        || !$self->get("value")     
+        || $self->get("value") =~ m/^\d+$/) {
 		# Epoch format
 		$value 	= $self->session->datetime->secondsToTime($self->get("value"));
 	} else {
@@ -159,7 +167,11 @@ Renders the field as a hidden field.
 sub toHtmlAsHidden {
 	my $self = shift;
 	my $value;
-	if ($self->get("value") =~ /^\d+$/) {
+    # This should probably be rewritten as a cascading ternary
+	if (!$self->get("defaultValue") 
+        || $self->get("defaultValue") =~ m/^\d+$/
+        || !$self->get("value")     
+        || $self->get("value") =~ m/^\d+$/) {
 		# Epoch format
 		$value 	= $self->session->datetime->secondsToTime($self->get("value"));
 	} else {
