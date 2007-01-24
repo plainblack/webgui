@@ -77,7 +77,7 @@ checkModule("Pod::Coverage",0.17,2);
 checkModule("Text::Balanced",1.95,1);
 checkModule("Digest::MD5",2.20);
 checkModule("DBI",1.40);
-checkModule("DBD::mysql",2.1021);
+checkModule("DBD::mysql",3.002);
 checkModule("HTML::Parser",3.36);
 checkModule("Archive::Tar",1.05);
 checkModule("Archive::Zip",1.16);
