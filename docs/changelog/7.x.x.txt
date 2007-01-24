@@ -1,4 +1,5 @@
 7.3.7
+ - Fixed a template variable rewriting problem with Template Toolkit.
 
 7.3.6
  - fix: Checkbox is no longer available when creating custom profile fields
@@ -6,7 +7,9 @@
  - fix: CS email message shows up as an attachment
  - fix: Calendar: start/end date time off in edit interface (perlDreamer Consulting, LLC)
  - Added a database optimization that will improve asset lookup performance by
-   as much as 600% on some sites.
+   as much as 600% on some sites and another small one that will improve a different
+   kind of lookup by more than 10%.
+
  - fix: Extra cruft in the Zip Archive template.
  - fix: fixed corner case in WebGUI::Operation::Workflow.pm which could cause the edit page to not load and display an error if an activity is undefined or cannot be defined.
  - fix: testEnvironment.pl do not tests all modules (perlDreamer Consulting, LLC)
