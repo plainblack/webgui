@@ -1,5 +1,7 @@
 7.3.7
  - Fixed a template variable rewriting problem with Template Toolkit.
+ - Fixed a bug with dealing with CS posts via email where
+   multipart/alternative messages would cause a blank post.
 
 7.3.6
  - fix: Checkbox is no longer available when creating custom profile fields

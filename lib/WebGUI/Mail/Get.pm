@@ -162,7 +162,6 @@ sub getNextMessage {
 	}
 	my $head = $parsedMessage->head;
         my $type = $head->get("Content-Type");
-        my $alternate = 1 if lc $type =~ m{^multipart/alternative}; 
         # try to detect auto generated messages and drop them
         my $skipAuto = 0;
         my @headlines = split("\n",$head->stringify);
@@ -205,58 +204,59 @@ sub getNextMessage {
 		"Return-Path" => $returnPath,
 		date => $self->session->datetime->mailToEpoch($head->get("Date")),
 		);
-	my @segments = ();
-	my @parts = $parsedMessage->parts;
-	push(@parts, $parsedMessage) unless (@parts); # deal with the fact that there might be only one part
-	# If this message has alternates, the last is the most canonical
-	if ($alternate) {
-		@parts = reverse @parts;
-	}
-	
-	#foreach my $part (@parts) {
-	while ( my $part = shift @parts) {
-		my $type = $part->mime_type;
-		next if ($type eq "message/rfc822");
-		next if ($type eq "message/delivery-status");
-        	my $body = $part->bodyhandle;
-		my $disposition = $part->head->get("Content-Disposition");
-		$disposition =~ m/filename=\"(.*)\"/;
-		my $filename = $1;
-		my $content = "";
- 		if (defined $body) {
-			$content = $body->as_string;
-		} else {
-			# handle nested multipart
-			$alternate = 1;
-			unshift(@parts, reverse $part->parts);
-		}
-		next unless ($content);
-		# If this is a multipart alternative message, and this is the first segment
-		# Or if this is a normal mime message
-		if (($alternate && !@segments) || !$alternate) {
-			# Add the segment 
-			push(@segments, {
-				filename=>$filename,
-				type=>$type,
-				content=>$content
-				});
-		}
-		# If this is a multipart alternative message, and this is not the first segment
-		elsif ($alternate) {
-			# Add an alternative to the last segment
-			push @{$segments[-1]->{alternative}}, {
-				type 		=> $type,
-				content 	=> $content,
-				};	 
-		}
-	}
-	unless (scalar(@segments) > 0) { # drop empty messages
+	$data{parts} = $self->parseParts($parsedMessage);
+	unless (scalar(@{$data{parts}}) > 0) { # drop empty messages
 		$self->session->errorHandler->info("POP3: Dropped empty message ".$data{messageId}." from ".$data{from}." to ".$data{to});
 		return $self->getNextMessage;
 	}
-	$data{parts} = \@segments;
-        use Data::Dumper; $self->session->errorHandler->warn(Dumper \%data);
         return \%data;
+}
+
+#-------------------------------------------------------------------
+
+=head2 parseParts ( message )
+
+Returns an array reference containing the parts of a message. This method can recursively extract the parts out of a multipart message, and even deals with multipart/alternative nastiness. Normally this is used by getNextMessage() and never needs to be called by you.
+
+=head3 message
+
+A message, or message part, that is a MIME::Entity object.
+
+=cut
+
+sub parseParts {
+	my $self = shift;
+	my $message = shift;
+	my $type = $message->effective_type;	
+	if ($type eq "message/rfc822" || $type eq "message/delivery-status") {
+		return [];
+	}
+	my $body = $message->bodyhandle;
+	if (defined $body) {
+		my $disposition = $message->head->get("Content-Disposition");
+		$disposition =~ m/filename=\"(.*)\"/;
+		my $filename = $1;
+		return [{content => $body->as_string, type=>$type, filename=>$filename}];
+	}
+	my @parts = ();
+	foreach my $part ($message->parts) {
+		@parts = (@parts, @{$self->parseParts($part)});
+	}
+	# deal with messages that have two or more chunks of the same content with different formatting
+	if ($type =~ m{multipart/alternative}i) {
+		my $first = {};
+		my @others = ();
+		foreach my $part (reverse @parts) {
+			if ($first->{type} eq "" && ($part->{type} eq "text/html" || $part->{type} eq "text/plain")) {
+				$first = $part;
+			} else {
+				push @others, $part;
+			}
+		}
+		$first->{alternative} = \@others;
+		return [$first];
+	}
+	return \@parts;
 }
 
 #-------------------------------------------------------------------
