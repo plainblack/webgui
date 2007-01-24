@@ -20,19 +20,10 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-cleanupEventsCalendar($session);
 
 finish($session); # this line required
 
 #-------------------------------------------------
-sub cleanupEventsCalendar {
-	my $session = shift;
-	print "\tRemoving the rest of the old EventsCalendar wobject\n" unless ($quiet);
-	unlink("../../lib/WebGUI/Asset/Wobject/EventsCalendar.pm");
-	unlink("../../lib/WebGUI/i18n/English/Asset_EventsCalendar.pm");
-	unlink("../../lib/WebGUI/Help/Asset_EventsCalendar.pm");
-	$session->config->deleteFromArray("assets","WebGUI::Asset::Wobject::EventsCalendar");
-}
 
 # ---- DO NOT EDIT BELOW THIS LINE ----
 
