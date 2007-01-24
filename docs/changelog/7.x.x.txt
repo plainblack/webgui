@@ -1,3 +1,5 @@
+7.3.7
+
 7.3.6
  - fix: Checkbox is no longer available when creating custom profile fields
  - fix: profile fields do not ever set the default value
