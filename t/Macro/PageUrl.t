@@ -63,3 +63,8 @@ TODO: {
 	local $TODO = "Tests to make later";
 	ok(0, 'Fetch url from locally made asset with known url');
 }
+
+END {
+	# See note in the Slash_gateway macro test about this.
+	$session->setting->set("preventProxyCache", $preventProxyCache);
+}
