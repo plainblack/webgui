@@ -689,6 +689,7 @@ SQL
                 push @{$attachmentLoop}, {
                     'attachment.url'        => $storage->getUrl($file),
                     'attachment.path'       => $storage->getPath($file),
+                    'attachment_thumbnail'  => $storage->getThumbnailUrl($file),
                     'attachment.length'     => $storage->getFileSize($file),
                 };
             }

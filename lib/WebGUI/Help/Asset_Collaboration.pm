@@ -719,6 +719,9 @@ our $HELP = {
 		                               'name' => 'attachmentLoop',
 		                               'variables' => [
 		                                                {
+		                                                  'name' => 'attachment_thumbnail'
+		                                                },
+		                                                {
 		                                                  'name' => 'attachment.url'
 		                                                },
 		                                                {

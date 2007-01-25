@@ -1606,7 +1606,7 @@ sub newByUrl {
 	$url =~ s/\"//;
 	my $asset;
 	if ($url ne "") {
-		my ($id, $class) = $session->db->quickArray("select distinct asset.assetId, asset.className from assetData join asset using (assetId) where assetData.url = ?", [ $url ]);
+		my ($id, $class) = $session->db->quickArray("select asset.assetId, asset.className from assetData join asset using (assetId) where assetData.url = ? limit 1", [ $url ]);
 		if ($id ne "" || $class ne "") {
 			return WebGUI::Asset->new($session,$id, $class, $revisionDate);
 		} else {
