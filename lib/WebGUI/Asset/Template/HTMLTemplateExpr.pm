@@ -21,21 +21,22 @@ use HTML::Template::Expr;
 
 #-------------------------------------------------------------------
 sub _rewriteVars { # replace dots with underscrores in keys (except in keys that aren't usable as variables (URLs etc.))
-	my $vars = shift;
-	foreach my $key (keys %$vars){
-		my $newKey = $key;
-		$newKey =~ s/\./_/g if $newKey !~ /\//; 
-		if(ref $vars->{$key} eq 'HASH'){
-			$vars->{$newKey} = _rewriteVars($vars->{$key});
-			delete $vars->{$key} if($key ne $newKey);			
-		}else{
-			if($key ne $newKey){
-				$vars->{$newKey} = $vars->{$key};
-				delete $vars->{$key};
+        my $vars = shift;
+	my $newVars = {};
+        foreach my $key (keys %$vars){
+                my $newKey = $key;
+                $newKey =~ s/\./_/g if $newKey !~ /\//;
+		if ( ref $vars->{$key} eq 'ARRAY') {
+			foreach my $entry (@{$vars->{$key}}) {
+				push(@{$newVars->{$newKey}}, _rewriteVars($entry));
 			}
-		}		
-	}
-	return $vars;
+                } elsif(ref $vars->{$key} eq 'HASH') {
+                        $newVars->{$newKey} = _rewriteVars($vars->{$key});
+                } else {
+                        $newVars->{$newKey} = $vars->{$key};
+                }
+        }
+        return $newVars;
 }
 
 #-------------------------------------------------------------------
