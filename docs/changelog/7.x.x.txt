@@ -4,6 +4,7 @@
    multipart/alternative messages would cause a blank post.
  - Fixed the 7.3.0-7.3.1 upgrade script so it doesn't cause multi-site 
    upgrades to fail.
+ - fix: ldap workflow bug (perlDreamer Consulting, LLC)
 
 7.3.6
  - fix: Checkbox is no longer available when creating custom profile fields

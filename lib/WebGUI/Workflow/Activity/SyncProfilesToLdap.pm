@@ -129,7 +129,7 @@ sub execute {
 	my @fieldNames = $self->session->db->buildArray("SELECT fieldName FROM userProfileField WHERE profileCategoryId <> 4");
 
 	my $index = $instance->getScratch('ldapSelectIndex') || 0;
-	my $sth = $self->session->db->read("SELECT u.userId AS userId, a1.fieldData AS ldapConnection FROM users AS u INNER JOIN authentication AS a1 ON u.userId = a1.userId WHERE a1.fieldName = 'ldapConnection' AND u.authMethod = 'LDAP' ORDER BY ldapConnection, userId LIMIT ?,18446744073709551615", [$index]);
+	my $sth = $self->session->db->read("SELECT u.userId AS userId, a1.fieldData AS ldapConnection FROM users AS u INNER JOIN authentication AS a1 ON u.userId = a1.userId WHERE a1.fieldName = 'ldapConnection' AND u.authMethod = 'LDAP' ORDER BY ldapConnection, userId LIMIT $index,18446744073709551615");
 	my ($currentLinkId, $link, $ldapUrl, $ldap);
 	my $skippingLink = 0;
 
