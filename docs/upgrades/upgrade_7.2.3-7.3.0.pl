@@ -259,8 +259,8 @@ sub migrateCalendars {
 			#use Data::Dumper;
 			#warn Dumper \%eventProperties;
 			
-			$newAsset->addChild(\%eventProperties);
-			
+            $newAsset->addChild(\%eventProperties,undef,undef,{skipAutoCommitWorkflows=>1});
+
 			# Remove this event from the old calendar
 			$session->db->write("delete from EventsCalendar_event where assetId=?",[$event]);
 			$session->db->write("delete from asset where assetId=?",[$event]);

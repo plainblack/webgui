@@ -7,6 +7,16 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.3.7
+--------------------------------------------------------------------
+ * For those who performed a multiple site upgrade from 7.2.3 to 
+   7.3.1 or higher and began having problems with navigation and 
+   calendar wobjects, you can fix those problems by restoring your 
+   7.2.3 database, restoring the 7.2.3 WebGUI source, re-applying 
+   the 7.3.7 WebGUI code, and running the upgrade again.
+   If you are not affected by these problems, you do not need to 
+   restore.
+
 7.3.5
 --------------------------------------------------------------------
  * Template variables used in templates that use XML, or that are used
