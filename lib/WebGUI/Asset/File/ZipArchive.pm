@@ -220,6 +220,9 @@ sub view {
 	unless($self->get("showPage")) {
 	   $var{pageError} = "true";
 	}
+	my $i18n = WebGUI::International->new($self->session,"Asset_ZipArchive");
+	$var{noInitialPage} = $i18n->get('noInitialPage');
+	$var{noFileSpecified} = $i18n->get('noFileSpecified');
        	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
 		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("cacheTimeout"));

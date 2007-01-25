@@ -86,27 +86,33 @@ our $I18N = {
 	},
 
 
-	 'zip archive template body' => {
+	'zip archive template body' => {
                 message => q|<p>The following variables are available in Zip Archive Templates:</p>
 		|,
 		context => q|Describing the zip archive template variables|,
 		lastUpdated => 1148953449,
 	},
 
-	 'zip archive asset variables title' => {
+	'zip archive asset variables title' => {
 		message => q|Zip Archive, Asset Template Variables|,
         	lastUpdated => 1109287565,
 	 },
 
-	 'zip archive asset variables body' => {
+	'zip archive asset variables body' => {
                 message => q|<p>The following variables are included by default in the Zip Archive Templates.  They may or may not be particularly useful:</p>
 		|,
 		context => q|Describing the zip archive template asset variables|,
 		lastUpdated => 1148953449,
 	},
 
-	 'showPage' => {
+	'showPage' => {
                 message => q|The name of the file from the Zip Archive that will be displayed when this Asset is viewed.
+		|,
+		lastUpdated => 1166823840,
+	},
+
+	'templateId' => {
+                message => q|The ID of the template used to display the contents of the Zip Archive.
 		|,
 		lastUpdated => 1166823840,
 	},
@@ -115,6 +121,26 @@ our $I18N = {
                 message => q|The ID of the template used to display the contents of the Zip Archive.
 		|,
 		lastUpdated => 1166823840,
+	},
+
+	 'noInitialPage' => {
+                message => q|Error:  No initial page specified.|,
+		lastUpdated => 1169699552,
+	},
+
+	 'noInitialPage var' => {
+                message => q|An internationalized label for an error when no initial page was specified.|,
+		lastUpdated => 1169699552,
+	},
+
+	 'noFileSpecified' => {
+                message => q|Error:  No file specified.|,
+		lastUpdated => 1169699552,
+	},
+
+	 'noFileSpecified var' => {
+                message => q|An internationalized label for an error when no file was specified.|,
+		lastUpdated => 1169699552,
 	},
 
 

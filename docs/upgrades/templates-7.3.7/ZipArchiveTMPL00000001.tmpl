@@ -1,0 +1,23 @@
+#ZipArchiveTMPL00000001
+
+<tmpl_if session.var.adminOn>
+   <tmpl_if controls>
+      <p><tmpl_var controls></p>
+   </tmpl_if>
+</tmpl_if>
+
+<tmpl_if error>
+<ul>
+  <li><tmpl_var error></li>
+</ul>
+</tmpl_if>
+
+<tmpl_if fileUrl>
+   <a href="<tmpl_var fileUrl>"><tmpl_var title></a>
+<tmpl_else>
+  <tmpl_if pageError>
+      <tmpl_var noInitialPage>
+  <tmpl_else>
+      <tmpl_var noFileSpecified>
+  </tmpl_if>
+</tmpl_if>	

@@ -64,6 +64,12 @@ our $HELP = {
 		            'name' => 'error'
 		          },
 		          {
+		            'name' => 'noInitialPage var'
+		          },
+		          {
+		            'name' => 'noFileSpecified var'
+		          },
+		          {
 		            'name' => 'fileUrl'
 		          },
 		          {
