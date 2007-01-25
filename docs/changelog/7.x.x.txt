@@ -1,6 +1,7 @@
 7.3.8
  - Fixed a template variable rewriting problem with HTML::Template::Expr
  - Added a attachment_thumbnail option to the CS RSS feed.
+ - No Reports In/Out Board (perlDreamer Consulting, LLC)
 
 7.3.7
  - Fixed a template variable rewriting problem with Template Toolkit.
