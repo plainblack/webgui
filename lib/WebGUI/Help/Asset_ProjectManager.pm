@@ -9,7 +9,7 @@ our $HELP = {
 		isa => [
 			{
 				namespace => 'Asset_Wobject',
-				tag => 'wobject add/edit'
+				tag => 'wobject add/edit',
 			},
 		],
 		fields => [
@@ -109,11 +109,11 @@ our $HELP = {
 		isa => [
 			{
 				namespace => 'Asset_ProjectManager',
-				tag => 'project manager asset template variables'
+				tag => 'project manager asset template variables',
 			},
 			{
 				namespace => 'Asset_Template',
-				tag => 'template variables'
+				tag => 'template variables',
 			},
 		],
 		variables => [
@@ -213,68 +213,128 @@ our $HELP = {
 		isa => [
 			{
 				namespace => 'Asset_ProjectManager',
-				tag => 'project manager asset template variables'
+				tag => 'project manager asset template variables',
 			},
 			{
 				namespace => 'Asset_Template',
-				tag => 'template variables'
+				tag => 'template variables',
 			},
 		],
 		variables => [
 		          {
 		            'required' => 1,
 		            'name' => 'form.header',
-		            'description' => 'edit form.header'
+		            'description' => 'edit form.header',
 		          },
 		          {
 		            'required' => 1,
-		            'name' => 'form.name'
+		            'name' => 'form.name',
+		          },
+		          {
+		            'name' => 'form.seqNum',
+		            'required' => 1,
 		          },
 		          {
 		            'required' => 1,
-		            'name' => 'form.duration'
+		            'name' => 'form.duration',
 		          },
 		          {
 		            'required' => 1,
-		            'name' => 'form.duration.units'
+		            'name' => 'form.duration.units',
 		          },
 		          {
 		            'required' => 1,
-		            'name' => 'form.start'
+		            'name' => 'form.lagTime',
 		          },
 		          {
 		            'required' => 1,
-		            'name' => 'form.end'
+		            'name' => 'form.lagTime.units',
 		          },
 		          {
 		            'required' => 1,
-		            'name' => 'form.dependants'
+		            'name' => 'form.start',
 		          },
 		          {
 		            'required' => 1,
-		            'name' => 'form.resource'
+		            'name' => 'form.end',
 		          },
 		          {
 		            'required' => 1,
-		            'name' => 'form.milestone'
+		            'name' => 'form.dependants',
 		          },
 		          {
 		            'required' => 1,
-		            'name' => 'form.percentComplete'
+		            'name' => 'form.addUser.id',
 		          },
 		          {
 		            'required' => 1,
-		            'name' => 'form.save'
+		            'name' => 'form.addUser.link',
+		          },
+		          {
+		            'required' => 1,
+		            'name' => 'form.addUser.text',
+		          },
+		          {
+		            'required' => 1,
+		            'name' => 'form.addGroup.id',
+		          },
+		          {
+		            'required' => 1,
+		            'name' => 'form.addGroup.link',
+		          },
+		          {
+		            'required' => 1,
+		            'name' => 'form.addGroup.text',
+		          },
+		          {
+		            'required' => 1,
+		            'name' => 'form.resourceDiv',
+		          },
+		          {
+		            'required' => 1,
+		            'name' => 'form.taskType',
+		          },
+		          {
+		            'required' => 1,
+		            'name' => 'form.percentComplete',
+		          },
+		          {
+		            'required' => 1,
+		            'name' => 'form.save',
 		          },
 		          {
 		            'required' => 1,
 		            'name' => 'form.footer',
-		            'description' => 'edit form.footer'
+		            'description' => 'edit form.footer',
 		          },
 		          {
 		            'name' => 'extras',
-		            'description' => 'extras.base'
-		          }
+		            'description' => 'extras.base',
+		          },
+		          {
+		            'name' => 'task_start_label',
+		          },
+		          {
+		            'name' => 'task_end_label',
+		          },
+		          {
+		            'name' => 'task_duration_label',
+		          },
+		          {
+		            'name' => 'task_lagTime_label',
+		          },
+		          {
+		            'name' => 'task_predecessor_label',
+		          },
+		          {
+		            'name' => 'task_complete_label',
+		          },
+		          {
+		            'name' => 'task_resource_label',
+		          },
+		          {
+		            'name' => 'task_save_label',
+		          },
 		],
 		fields => [ ],
 		related => [
@@ -291,126 +351,126 @@ our $HELP = {
 		isa => [
 			{
 				namespace => 'Asset_ProjectManager',
-				tag => 'project manager asset template variables'
+				tag => 'project manager asset template variables',
 			},
 			{
 				namespace => 'Asset_Template',
-				tag => 'template variables'
+				tag => 'template variables',
 			},
 		],
 		variables => [
 		          {
-		            'name' => 'form.header'
+		            'name' => 'form.header',
 		          },
 		          {
-		            'name' => 'form.footer'
+		            'name' => 'form.footer',
 		          },
 		          {
-		            'name' => 'project.canEdit'
+		            'name' => 'project.canEdit',
 		          },
 		          {
-		            'name' => 'project.resources.url'
+		            'name' => 'project.resources.url',
 		          },
 		          {
-		            'name' => 'project.resources.label'
+		            'name' => 'project.resources.label',
 		          },
 		          {
-		            'name' => 'extras'
+		            'name' => 'extras',
 		          },
 		          {
-		            'name' => 'extras.base'
+		            'name' => 'extras.base',
 		          },
 		          {
-		            'name' => 'project.durationUnits'
+		            'name' => 'project.durationUnits',
 		          },
 		          {
-		            'name' => 'project.hoursPerDay'
+		            'name' => 'project.hoursPerDay',
 		          },
 		          {
-		            'name' => 'task.name.label'
+		            'name' => 'task.name.label',
 		          },
 		          {
-		            'name' => 'task.duration.label'
+		            'name' => 'task.duration.label',
 		          },
 		          {
-		            'name' => 'task.start.label'
+		            'name' => 'task.start.label',
 		          },
 		          {
-		            'name' => 'task.end.label'
+		            'name' => 'task.end.label',
 		          },
 		          {
-		            'name' => 'task.dependants.label'
+		            'name' => 'task.dependants.label',
 		          },
 		          {
-		            'name' => 'form.name.error'
+		            'name' => 'form.name.error',
 		          },
 		          {
-		            'name' => 'form.start.error'
+		            'name' => 'form.start.error',
 		          },
 		          {
-		            'name' => 'form.start.error'
+		            'name' => 'form.start.error',
 		          },
 		          {
-		            'name' => 'form.greaterThan.error'
+		            'name' => 'form.greaterThan.error',
 		          },
 		          {
-		            'name' => 'form.previousPredecessor.error'
+		            'name' => 'form.previousPredecessor.error',
 		          },
 		          {
-		            'name' => 'form.previousPredecessor.error'
+		            'name' => 'form.previousPredecessor.error',
 		          },
 		          {
-		            'name' => 'form.invalidMove.error'
+		            'name' => 'form.invalidMove.error',
 		          },
 		          {
 		            'name' => 'task.loop',
 		            'variables' => [
 		                             {
-		                               'name' => 'task.number'
+		                               'name' => 'task.number',
 		                             },
 		                             {
-		                               'name' => 'task.row.id'
+		                               'name' => 'task.row.id',
 		                             },
 		                             {
-		                               'name' => 'task.name'
+		                               'name' => 'task.name',
 		                             },
 		                             {
-		                               'name' => 'task.start'
+		                               'name' => 'task.start',
 		                             },
 		                             {
-		                               'name' => 'task.dependants'
+		                               'name' => 'task.dependants',
 		                             },
 		                             {
-		                               'name' => 'task.end'
+		                               'name' => 'task.end',
 		                             },
 		                             {
-		                               'name' => 'task.duration'
+		                               'name' => 'task.duration',
 		                             },
 		                             {
-		                               'name' => 'task.duration.units'
+		                               'name' => 'task.duration.units',
 		                             },
 		                             {
-		                               'name' => 'task.isMilestone'
+		                               'name' => 'task.isMilestone',
 		                             },
 		                             {
-		                               'name' => 'task.edit.url'
+		                               'name' => 'task.edit.url',
 		                             },
 		                             {
-		                               'name' => 'task.edit.url'
+		                               'name' => 'task.edit.url',
 		                             }
 		                           ]
 		          },
 		          {
-		            'name' => 'project.gantt.rowspan'
+		            'name' => 'project.gantt.rowspan',
 		          },
 		          {
-		            'name' => 'project.ganttChart'
+		            'name' => 'project.ganttChart',
 		          },
 		          {
-		            'name' => 'task.back.url'
+		            'name' => 'task.back.url',
 		          },
 		          {
-		            'name' => 'task.back.label'
+		            'name' => 'task.back.label',
 		          }
 		],
 		fields => [ ],
@@ -432,11 +492,11 @@ our $HELP = {
 		isa => [
 			{
 				namespace => 'Asset_ProjectManager',
-				tag => 'project manager asset template variables'
+				tag => 'project manager asset template variables',
 			},
 			{
 				namespace => 'Asset_Template',
-				tag => 'template variables'
+				tag => 'template variables',
 			},
 		],
 		variables => [
@@ -444,40 +504,40 @@ our $HELP = {
 		            'name' => 'extras',
 		          },
 		          {
-		            'name' => 'sunday.label'
+		            'name' => 'sunday.label',
 		          },
 		          {
-		            'name' => 'monday.label'
+		            'name' => 'monday.label',
 		          },
 		          {
-		            'name' => 'tuesday.label'
+		            'name' => 'tuesday.label',
 		          },
 		          {
-		            'name' => 'wednesday.label'
+		            'name' => 'wednesday.label',
 		          },
 		          {
-		            'name' => 'thursday.label'
+		            'name' => 'thursday.label',
 		          },
 		          {
-		            'name' => 'friday.label'
+		            'name' => 'friday.label',
 		          },
 		          {
-		            'name' => 'saturday.label'
+		            'name' => 'saturday.label',
 		          },
 		          {
 		            'name' => 'daysLoop',
 		            'variables' => [
 		                             {
-		                               'name' => 'month.name'
+		                               'name' => 'month.name',
 		                             },
 		                             {
-		                               'name' => 'saturday.label'
+		                               'name' => 'saturday.label',
 		                             },
 		                             {
 		                               'name' => 'daysLoop',
 		                               'variables' => [
 		                                                {
-		                                                  'name' => 'day.number'
+		                                                  'name' => 'day.number',
 		                                                }
 		                                              ]
 		                             }
@@ -499,32 +559,32 @@ our $HELP = {
 		isa => [
 			{
 				namespace => 'Asset_Wobject',
-				tag => 'wobject template variables'
+				tag => 'wobject template variables',
 			},
 		],
 		fields => [
 		],
 		variables => [
 		          {
-		            'name' => 'projectDashboardTemplateId'
+		            'name' => 'projectDashboardTemplateId',
 		          },
 		          {
-		            'name' => 'projectDisplayTemplateId'
+		            'name' => 'projectDisplayTemplateId',
 		          },
 		          {
-		            'name' => 'ganttChartTemplateId'
+		            'name' => 'ganttChartTemplateId',
 		          },
 		          {
-		            'name' => 'editTaskTemplateId'
+		            'name' => 'editTaskTemplateId',
 		          },
 		          {
-		            'name' => 'resourcePopupTemplateId'
+		            'name' => 'resourcePopupTemplateId',
 		          },
 		          {
-		            'name' => 'resourceListTemplateId'
+		            'name' => 'resourceListTemplateId',
 		          },
 		          {
-		            'name' => 'groupToAdd'
+		            'name' => 'groupToAdd',
 		          },
 		        ],
 		related => [
@@ -537,11 +597,11 @@ our $HELP = {
 		isa => [
 			{
 				namespace => 'Asset_ProjectManager',
-				tag => 'project manager asset template variables'
+				tag => 'project manager asset template variables',
 			},
 			{
 				namespace => 'Asset_Template',
-				tag => 'template variables'
+				tag => 'template variables',
 			},
 		],
 		variables => [
@@ -603,11 +663,11 @@ our $HELP = {
 		isa => [
 			{
 				namespace => 'Asset_ProjectManager',
-				tag => 'project manager asset template variables'
+				tag => 'project manager asset template variables',
 			},
 			{
 				namespace => 'Asset_Template',
-				tag => 'template variables'
+				tag => 'template variables',
 			},
 		],
 		variables => [

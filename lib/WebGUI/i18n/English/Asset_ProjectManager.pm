@@ -252,6 +252,12 @@ our $I18N = {
 		lastUpdated => 0
 		},
 
+	'task lag time label' => {
+		message => q|Lag Time|,
+		context => q|Amount of time something is behind.|,
+		lastUpdated => 0
+	},
+
 	 'task start label' => {
 		message => q|Start|,
 		lastUpdated => 0
@@ -263,6 +269,12 @@ our $I18N = {
 		},
 
 	 'task dependant label' => {
+		message => q|Pred|,
+		lastUpdated => 0,
+		context => q|Abbreviation for predecessor|,
+		},
+
+	 'task predecessor label' => {
 		message => q|Pred|,
 		lastUpdated => 0,
 		context => q|Abbreviation for predecessor|,
@@ -442,13 +454,13 @@ from working.|,
 		lastUpdated => 1165512623,
 	},
 
-	'form.resource' => {
+	'form.resourceDiv' => {
 		message => q|Form element for selecting a user to accomplish this task.|,
-		lastUpdated => 1149825164,
+		lastUpdated => 1169766777,
 	},
 
-	'form.milestone' => {
-		message => q|Form element for setting this task to be a milestone in the project.|,
+	'form.taskType' => {
+		message => q|Form element for choosing the type of task.|,
 		lastUpdated => 1149825164,
 	},
 
@@ -1143,6 +1155,111 @@ be useful, others may not.|,
 	'resourceIcon' => {
 		message => q|The name of an icon this resource, specific to the type of resource.|,
 		lastUpdated => 1168925012
+	},
+
+	'task_start_label' => {
+		message => q|The internationalized word "Start".|,
+		lastUpdated => 1169764090,
+	},
+
+	'task_end_label' => {
+		message => q|The internationalized word "End".|,
+		lastUpdated => 1169764092,
+	},
+
+	'task_duration_label' => {
+		message => q|The internationalized word "Duration".|,
+		lastUpdated => 1169764123,
+	},
+
+	'task_lagTime_label' => {
+		message => q|The internationalized words "Lag Time".|,
+		lastUpdated => 1169764123,
+	},
+
+	'task_complete_label' => {
+		message => q|The internationalized word "Complete".|,
+		lastUpdated => 1169764123,
+	},
+
+	'task_predecessor_label' => {
+		message => q|The internationalized word "Predecessor".|,
+		lastUpdated => 1169764123,
+	},
+
+	'task_resource_label' => {
+		message => q|The internationalized word "Resource".|,
+		lastUpdated => 1169764123,
+	},
+
+	'task resource label' => {
+		message => q|Resource|,
+		lastUpdated => 1169764123,
+	},
+
+	'task save label' => {
+		message => q|Save|,
+		lastUpdated => 1169764123,
+	},
+
+	'task_save_label' => {
+		message => q|The internationalized word "Save".|,
+		lastUpdated => 1169764123,
+	},
+
+	'task name label' => {
+		message => q|Task Name|,
+		lastUpdated => 1169764879,
+	},
+
+	'task_name_label' => {
+		message => q|The internationalized words "Task Name".|,
+		lastUpdated => 1169764123,
+	},
+
+	'form.seqNum' => {
+		message => q|The sequence number of this task.|,
+		lastUpdated => 1169764123,
+	},
+
+	'form.lagTime' => {
+		message => q|Form element for entering in the lag time for this task.|,
+		lastUpdated => 1169764123,
+	},
+
+	'form.lagTime.units' => {
+		message => q|Form element for the units of the tasks's lag time.|,
+		lastUpdated => 1169764123,
+	},
+
+	'form.addUser.id' => {
+		message => q|A unique identifier for the link that creates the add user pop-up.|,
+		lastUpdated => 1169764123,
+	},
+
+	'form.addUser.link' => {
+		message => q|A full link for bringing up the Add User pop-up.|,
+		lastUpdated => 1169764123,
+	},
+
+	'form.addUser.text' => {
+		message => q|A unique identifier for the link that creates the add group pop-up.|,
+		lastUpdated => 1169764123,
+	},
+
+	'form.addGroup.id' => {
+		message => q|A unique identifier for the link that creates the Add Group pop-up.|,
+		lastUpdated => 1169764123,
+	},
+
+	'form.addGroup.link' => {
+		message => q|A full link for bringing up the Add Group pop-up.|,
+		lastUpdated => 1169764123,
+	},
+
+	'form.addGroup.text' => {
+		message => q|Internationalized label for "Add Group To Task".|,
+		lastUpdated => 1169764123,
 	},
 
 };
