@@ -1590,6 +1590,12 @@ the Collaboration Asset, the user will be notified.|,
 		lastUpdated => 1149656056,
 	},
 
+	'attachment_thumbnail' => {
+		message => q|The URL to the thumbnail for this attachment.  Files will be represented by an
+		icon depending on their type.  Images will have a true thumbnail.|,
+		lastUpdated => 1169747804,
+	},
+
 	'attachment.url' => {
 		message => q|The URL to this attachment.|,
 		lastUpdated => 1149656056,
