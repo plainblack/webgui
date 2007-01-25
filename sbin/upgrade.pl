@@ -34,6 +34,7 @@ my $mysqldump = "mysqldump";
 my $backupDir = "/tmp/backups";
 my $skipBackup;
 my $skipDelete;
+my $skipMaintenance;
 my $doit;
 
 GetOptions(
@@ -44,6 +45,7 @@ GetOptions(
 	'mysql=s'=>\$mysql,
 	'doit'=>\$doit,
 	'skipDelete' =>\$skipDelete,
+	'skipMaintenance' =>\$skipMaintenance,
 	'mysqldump=s'=>\$mysqldump,
 	'backupDir=s'=>\$backupDir,
 	'skipbackup'=>\$skipBackup
@@ -95,6 +97,11 @@ Options:
 			but can make the upgrade go very slowly.
 			Using this option skips the deletion of these
 			files.
+
+	--skipMaintenance  
+			The upgrade normally puts up a maintenance
+			page on all the sites while running, but this
+			option will skip that step.
 
 STOP
         exit;
@@ -190,8 +197,10 @@ foreach my $filename (keys %{$configs}) {
 		($config{$filename}{version}) = $session->db->quickArray("select webguiVersion from webguiVersion order by dateApplied desc, webguiVersion desc limit 1");
 		unless ($history) {
 			print "\tPreparing site for upgrade.\n" unless ($quiet);
-			$session->setting->remove('specialState');
-			$session->setting->add('specialState','upgrading');
+			unless ($skipMaintenance) {
+				$session->setting->remove('specialState');
+				$session->setting->add('specialState','upgrading');
+			}
 			unless ($skipDelete) {
 				print "\tDeleting temp files.\n" unless ($quiet);
 				my $path = $configs->{$filename}->get("uploadsPath").$slash."temp";
