@@ -37,10 +37,14 @@ my %newEnvHash = ( REMOTE_ADDR => '192.168.0.34');
 my $origEnv = $session->env->{_env};
 $session->env->{_env} = \%newEnvHash;
 
+my $var = WebGUI::Session::Var->new($session);
 my $varTime = time();
 my $varExpires = $varTime + $session->setting->get('sessionTimeout');
-my $var = WebGUI::Session::Var->new($session);
 isa_ok($var, 'WebGUI::Session::Var', 'new returns Var object');
+
+cmp_ok(abs($var->get('lastPageView') - $varTime), '<=', 1, 'lastPageView set correctly');
+cmp_ok(abs($var->get('expires') - $varExpires), '<=', 1, 'expires set correctly');
+
 is($var->get('userId'), 1, 'default userId is 1');
 
 is($var->get('sessionId'), $var->getId, "get('sessionId') and getId return the same thing");
@@ -49,9 +53,6 @@ is($var->getId, $session->getId, 'SessionId set to userSessionId from var');
 
 is($var->get('adminOn'), $var->isAdminOn, "get('adminOn') and isAdminOn return the same thing");
 is($var->get('adminOn'), 0, "adminOn is off by default"); ##retest
-
-cmp_ok(abs($var->get('lastPageView') - $varTime), '<=', 1, 'lastPageView set correctly');
-cmp_ok(abs($var->get('expires') - $varExpires), '<=', 1, 'expires set correctly');
 
 is($var->get('lastIP'), '192.168.0.34', "lastIP fetched");
 
