@@ -1,3 +1,5 @@
+7.3.9
+
 7.3.8
  - Fixed a template variable rewriting problem with HTML::Template::Expr
  - Added a attachment_thumbnail option to the CS RSS feed.
