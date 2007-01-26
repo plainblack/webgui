@@ -990,14 +990,14 @@ sub www_editTask {
    $var->{'extras'} = $config->get("extrasURL");
    $var->{'assetExtras'} = $config->get("extrasURL").'/wobject/ProjectManager';
 
-   $var->{'task_start_label'}       = $i18n->('task start label');
-   $var->{'task_end_label'}         = $i18n->('task end label');
-   $var->{'task_duration_label'}    = $i18n->('task duration label');
-   $var->{'task_lagTime_label'}     = $i18n->('task lag time label');
-   $var->{'task_predecessor_label'} = $i18n->('task predecessor label');
-   $var->{'task_complete_label'}    = $i18n->('task complete label');
-   $var->{'task_resource_label'}    = $i18n->('task resource label');
-   $var->{'task_save_label'}        = $i18n->('task save label');
+   $var->{'task_start_label'}       = $i18n->get('task start label');
+   $var->{'task_end_label'}         = $i18n->get('task end label');
+   $var->{'task_duration_label'}    = $i18n->get('task duration label');
+   $var->{'task_lagTime_label'}     = $i18n->get('task lag time label');
+   $var->{'task_predecessor_label'} = $i18n->get('task predecessor label');
+   $var->{'task_complete_label'}    = $i18n->get('task complete label');
+   $var->{'task_resource_label'}    = $i18n->get('task resource label');
+   $var->{'task_save_label'}        = $i18n->get('task save label');
 
    return $self->processTemplate($var,$self->getValue("editTaskTemplateId"))
 }
