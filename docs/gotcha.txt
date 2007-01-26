@@ -7,6 +7,18 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.3.8
+--------------------------------------------------------------------
+ * For those who upgraded to 7.3.7, any EventsCalendars (with their 
+   attached events) in the trash or on the clipboard during the 
+   7.2.3 - 7.3.0 upgrade were NOT migrated. This version will delete 
+   those from the database, since it is not possible to recover them 
+   based on their current state.
+   
+   Those who are upgrading from 7.2.3 - 7.3.8 will not lose any 
+   data.
+   
+
 7.3.7
 --------------------------------------------------------------------
  * For those who performed a multiple site upgrade from 7.2.3 to 

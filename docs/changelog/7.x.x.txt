@@ -2,6 +2,10 @@
  - Fixed a template variable rewriting problem with HTML::Template::Expr
  - Added a attachment_thumbnail option to the CS RSS feed.
  - No Reports In/Out Board (perlDreamer Consulting, LLC)
+ - fix: The 7.2.3-7.3.0 upgrade will no longer orphan EventsCalendars
+   and Events on the clipboard.
+ - fix: The upgrade script will remove any orphaned EventsCalendars and 
+   Events.
 
 7.3.7
  - Fixed a template variable rewriting problem with Template Toolkit.

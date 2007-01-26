@@ -21,6 +21,8 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+removeOrphanedEventsCalendars($session);
+removeOrphanedEvents($session);
 
 finish($session); # this line required
 
@@ -32,6 +34,49 @@ finish($session); # this line required
 #	# and here's our code
 #}
 
+##-------------------------------------------------
+sub removeOrphanedEventsCalendars {
+    my $session     = shift;
+    print "\tRemoving orphaned Events Calendars... ";
+
+    # Remove Events Calendars from asset, assetData, assetIndex, wobject
+    my @assetIds 
+        = $session->db->buildArray(
+            qq{select assetId from asset where className="WebGUI::Asset::Wobject::EventsCalendar"}
+        );
+
+    for my $assetId (@assetIds) {
+        for my $table (qw( assetData assetIndex wobject asset )) {
+            $session->db->write("delete from $table where assetId=?",[$assetId]);
+        }
+    }
+
+    print "OK!\n";
+}
+
+
+
+##-------------------------------------------------
+sub removeOrphanedEvents {
+    my $session     = shift;
+    print "\tRemoving orphaned Events... ";
+
+    # Remove Events from asset, assetData, assetIndex that do not exist in the Event table
+    my @assetIds 
+        = $session->db->buildArray(
+            qq{select assetId from asset where className="WebGUI::Asset::Event" }
+            . qq{and assetId NOT IN (select assetId from Event)}
+        );
+
+    for my $assetId (@assetIds) {
+        for my $table (qw( assetData assetIndex asset )) {
+            $session->db->write("delete from $table where assetId=?",[$assetId]);
+        }
+    }
+    
+
+    print "OK!\n";
+}
 
 
 # ---- DO NOT EDIT BELOW THIS LINE ----

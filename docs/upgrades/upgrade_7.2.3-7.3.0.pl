@@ -214,6 +214,8 @@ sub migrateCalendars {
 	#EventsCalendar.defaultMonth = Calendar.defaultDate
 	my $calendars	= WebGUI::Asset->getRoot($session)->getLineage(['descendents'],
 		{
+            statesToInclude     => ['published','trash','clipboard','clipboard-limbo','trash-limbo'],
+            statusToInclude     => ['pending','approved','deleted','archived'],
 			includeOnlyClasses	=> ['WebGUI::Asset::Wobject::EventsCalendar'],
 			returnObjects		=> 1,
 		});
@@ -226,14 +228,21 @@ sub migrateCalendars {
 		#warn "Found calendar ".$properties->{title};
 		$properties->{className}	= "WebGUI::Asset::Wobject::Calendar";
 		
-		
+        use Data::Dumper;
+        warn Dumper $properties;
+
 		# Add the new asset
 		my $newAsset = $asset->getParent->addChild($properties);
 		#warn "Added Calendar ".$newAsset->get("title")." ".$newAsset->get("className");
-		
+	
+        warn Dumper $asset->get;
+        warn "\n\n\n\n\n\n\n\n";
+
 		# Get this calendar's events and change to new parent
 		my $events	= $asset->getLineage(['descendants'],
 			{
+                statesToInclude     => ['published','trash','clipboard','clipboard-limbo','trash-limbo'],
+                statusToInclude     => ['pending','approved','deleted','archived'],
 				includeOnlyClasses	=> ['WebGUI::Asset::Event'],
 			});
 		#warn "Got lineage";
