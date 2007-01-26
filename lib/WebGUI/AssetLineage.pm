@@ -398,9 +398,8 @@ sub getLineage {
 	
     my $statusCodes = $rules->{statusToInclude} || [];
     if($rules->{includeArchived}) {
-       if(!WebGUI::Utility::isIn($rules->{includeArchived},@{$statusCodes})) {
-          push(@{$statusCodes},'archived');
-       }
+	        push(@{$statusCodes},'archived') if(!WebGUI::Utility::isIn('archived',@{$statusCodes}));
+          	push(@{$statusCodes},'approved') if(!WebGUI::Utility::isIn('approved',@{$statusCodes}));
     }
     
     my $status = "assetData.status='approved'";
