@@ -42,10 +42,12 @@ my $snippetAssetId = $snippet->getId;
 
 $versionTag->commit;
 
+sleep 2;
+
 my $duplicatedSnippet = $snippet->duplicate;
 
 is($duplicatedSnippet->get('title'), 'snippet',        'duplicated snippet has correct title');
-is($duplicatedSnippet->getId,        $snippetAssetId,  'duplicated snippet has correct id');
+isnt($duplicatedSnippet->getId,      $snippetAssetId,  'duplicated snippet does not have same assetId as original');
 is($snippet->getId,                  $snippetAssetId,  'original snippet has correct id');
 
 is($snippet->getParent->getId,           $root->getId, 'original snippet is a child of root');
