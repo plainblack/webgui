@@ -129,6 +129,7 @@ sub view {
 	my $i18n = WebGUI::International->new($self->session, 'Asset_MultiSearch');
 
 	#Set some template variables
+	my %var;
 	$var{'for'}    = $i18n->get('for');
 	$var{'search'} = $i18n->get('search');
 	$var{'submit'} = WebGUI::Form::Submit->new($self->session, {name=>'SearchSubmit',value=>$i18n->get('submit','WebGUI')})->toHtml();

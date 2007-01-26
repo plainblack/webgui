@@ -1981,6 +1981,7 @@ sub www_managePurchases {
 
 		push(@purchasesLoop,$purchase);
 	}
+	my %var;
 	$var{managePurchasesTitle} = $i18n->get('manage purchases');
 	$var{'purchaseId.label'} = $i18n->echo('Purchase Id');
 	$var{'datePurchasedHuman.label'} = $i18n->echo('Purchase Date');
@@ -2009,6 +2010,7 @@ sub www_viewPurchase {
 	my $returnWoStyle = shift;
 	my $badgeId = shift || $self->session->form->process('badgeId');
 	my $tid = $self->session->form->process('tid');
+	my %var;
 	if ($badgeId) {
 		my %var = $self->session->db->quickHash("select * from EventManagementSystem_badges where badgeId=?",[$badgeId]);
 		my $isAdmin = $self->canAddEvents;
