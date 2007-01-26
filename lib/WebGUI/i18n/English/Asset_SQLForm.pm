@@ -1143,6 +1143,11 @@ is new.|,
 		lastUpdated => 1149822620,
 	},
 
+        'record.id' => {
+                message => q|This record's id.|,
+                lastUpdated => 1169831704,
+        },
+
 	'record.controls' => {
 		message => q|Delete, edit and copy buttons for this record. Only available if the user is 
 allowed to edit the record.|,
