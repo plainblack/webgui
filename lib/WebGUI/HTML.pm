@@ -317,9 +317,11 @@ sub makeAbsolute {
 
 		$absolute .= "<".$tagname;
 
+		my $foundClosingSlash;
+
 		foreach (keys %$attr) {
 			if($_ eq '/') {
-				$absolute .= '/';
+				$foundClosingSlash = '1';
 				next;
 			}
 			if ($tag_attr{"$tagname $_"}) {	# make this absolute
@@ -327,7 +329,7 @@ sub makeAbsolute {
 			}
 			$absolute .= qq' $_="$attr->{$_}"';
 		}
-	
+		$absolute .= '/' if ($foundClosingSlash);
 		$absolute .= '>';
 	};
 	HTML::Parser->new(
