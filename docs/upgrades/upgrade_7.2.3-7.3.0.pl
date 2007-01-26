@@ -223,20 +223,23 @@ sub migrateCalendars {
 	for my $asset (@{$calendars})
 	{
 		next unless defined $asset;
+        
+        # If the asset is in the trash, ignore the migration, we're just going
+        # to purge it.
+        if ($asset->get("state") =~ m/trash/) {
+            next;
+        }
+
+
 		my $properties	= {%{$asset->get}};
 		$properties->{defaultDate}	= delete $properties->{defaultMonth};
 		#warn "Found calendar ".$properties->{title};
 		$properties->{className}	= "WebGUI::Asset::Wobject::Calendar";
 		
-        use Data::Dumper;
-        warn Dumper $properties;
-
 		# Add the new asset
 		my $newAsset = $asset->getParent->addChild($properties);
 		#warn "Added Calendar ".$newAsset->get("title")." ".$newAsset->get("className");
 	
-        warn Dumper $asset->get;
-        warn "\n\n\n\n\n\n\n\n";
 
 		# Get this calendar's events and change to new parent
 		my $events	= $asset->getLineage(['descendants'],
