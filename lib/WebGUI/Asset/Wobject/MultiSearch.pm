@@ -126,7 +126,6 @@ sub view {
 		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
 		return $out if $out;
 	}
-	my %var = $self->get();
 	my $i18n = WebGUI::International->new($self->session, 'Asset_MultiSearch');
 
 	#Set some template variables

@@ -1968,7 +1968,6 @@ sub www_managePurchases {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canView;
 	return $self->session->privilege->insufficient if $self->session->var->get('userId') eq '1';
-	my %var = $self->get();
 	my $isAdmin = $self->canAddEvents;
 	return $self->www_viewPurchase unless $isAdmin;
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
@@ -2087,7 +2086,6 @@ sub www_viewPurchase {
 		return $self->processTemplate(\%var,$self->getValue("viewPurchaseTemplateId")) if $returnWoStyle;
 		return $self->processStyle($self->processTemplate(\%var,$self->getValue("viewPurchaseTemplateId")));
 	} elsif($tid) {
-		my %var = $self->get();
 		my $showAll = $self->session->form->get('showAll');
 		my $isAdmin = $self->canAddEvents;
 		my ($userId) = $self->session->db->quickArray("select userId from transaction where transactionId=?",[$tid]);
@@ -2127,7 +2125,6 @@ sub www_viewPurchase {
 		$var{purchasesLoop} = \@purchasesLoop;
 		return $self->processStyle($self->processTemplate(\%var,$self->getValue("viewPurchaseTemplateId")));
 	} else {
-		my %var = $self->get();
 		my $isAdmin = $self->canAddEvents;
 		my $filter = ($isAdmin)?'':' and r.returned=0 ';
 		my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
@@ -2225,7 +2222,6 @@ Method to go into badge-addition mode.
 
 sub www_addEventsToBadge {
 	my $self = shift;
-	my %var = $self->get();
 	my $isAdmin = $self->canAddEvents;
 	my $bid = $self->session->form->process('bid') || 'none';
 	my $eventId = $self->session->form->process('eventId');
@@ -2308,7 +2304,6 @@ Method to set some registrations as returned.
 
 sub www_returnItem {
 	my $self = shift;
-	my %var = $self->get();
 	my $isAdmin = $self->canAddEvents;
 	my $rid = $self->session->form->process('rid');
 	my $tid = $self->session->form->process('tid');
