@@ -117,6 +117,21 @@ be useful, others may not.|,
 		lastUpdated => 1168897708,
 	},
 
+	'url' => {
+		message => q|The URL of the Asset found in the search.|,
+		lastUpdated => 1169843468,
+	},
+
+	'title' => {
+		message => q|The title of the Asset found in the search.|,
+		lastUpdated => 1169843466,
+	},
+
+	'synopsis' => {
+		message => q|The synopsis of the Asset found in the search.|,
+		lastUpdated => 1169843465,
+	},
+
 };
 
 1;

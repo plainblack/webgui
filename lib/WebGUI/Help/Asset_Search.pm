@@ -48,8 +48,8 @@ our $HELP = {
 				namespace => 'WebGUI'
 			},
 			{
-				namespace => "Asset_Article",
-				tag => "article asset template variables"
+				namespace => "Asset_Search",
+				tag => "search asset template variables"
 			},
 			{
 				namespace => "Asset_Template",
@@ -82,6 +82,17 @@ our $HELP = {
 		          {
 		            'name' => 'result_set',
 			    required => 1,
+			    variables => [
+				  {
+				    'name' => 'url',
+				  },
+				  {
+				    'name' => 'title',
+				  },
+				  {
+				    'name' => 'synopsis',
+				  },
+			    ],
 		          }
 		],
 		related => [
