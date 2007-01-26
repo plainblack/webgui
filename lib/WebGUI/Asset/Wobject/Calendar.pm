@@ -385,9 +385,9 @@ sub duplicate
 		});
 	
 	
-	for my $event (@events)
-	{
-		$newAsset->addChild($event->get);
+	for my $event (@events) {
+		my %eventProperties = %{ $event->get() };
+		$newAsset->addChild(\%eventProperties);
 	}
 	
 	return $newAsset;
