@@ -88,10 +88,17 @@ Returns a message stating that the user does not have the required privileges to
 
 sub insufficient {
 	my $self = shift;
+    my $noStyle = shift;
 	my $i18n = WebGUI::International->new($self->session);
 	$self->session->http->setStatus("401", "Insufficient Privileges");
 	my $output = '<h1>'.$i18n->get(37).'</h1>';
-	$output .= $i18n->get(38);
+    if ($noStyle) {
+        $self->session->style->useEmptyStyle(1);
+        $output .= $i18n->get('bare insufficient');
+    }
+    else {
+        $output .= $i18n->get(38);
+    }
 	return $self->session->style->userStyle($output);
 }
 

@@ -3288,6 +3288,11 @@ that Asset and all Assets below it.</p>
 		lastUpdated => 1031514049
 	},
 
+	'bare insufficient' => {
+		message => q|You do not have sufficient privileges to perform this operation. Please log in with an account that has sufficient privileges before attempting this operation.|,
+		lastUpdated => 1169790230
+	},
+
 	'164' => {
 		message => q|Authentication Method|,
 		lastUpdated => 1031514049

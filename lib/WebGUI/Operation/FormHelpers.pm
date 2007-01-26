@@ -373,7 +373,7 @@ sub www_richEditAddFolderSave {
 	# get base url
 	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
 	# check if user can edit the current asset
-	return $session->privilege->insufficient() unless $base->canEdit;
+	return $session->privilege->insufficient('bare') unless $base->canEdit;
 
 	my $filename = $session->form->process('filename') || 'untitled';
 	$base->addChild({
@@ -458,7 +458,7 @@ sub www_richEditAddImageSave {
 	#my $base = $session->asset;
 	my $url = $base->getUrl;
 	# check if user can edit the current asset
-	return $session->privilege->insufficient() unless $base->canEdit;
+	return $session->privilege->insufficient('bare') unless $base->canEdit;
 
 	my $storage = WebGUI::Storage::Image->create($session);
 	my $filename = $storage->addFileFromFormPost('filename');

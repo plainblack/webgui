@@ -3,11 +3,12 @@
  - Added a attachment_thumbnail option to the CS RSS feed.
  - fix: No closure
  - fix: content in packages made from page layout don't include content
- - No Reports In/Out Board (perlDreamer Consulting, LLC)
+ - fix: No Reports In/Out Board (perlDreamer Consulting, LLC)
  - fix: The 7.2.3-7.3.0 upgrade will no longer orphan EventsCalendars
    and Events on the clipboard.
  - fix: The upgrade script will remove any orphaned EventsCalendars and 
    Events.
+ - fix: Media Folder (perlDreamer Consulting, LLC)
 
 
 7.3.7
