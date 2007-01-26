@@ -2,6 +2,7 @@
  - Fixed a template variable rewriting problem with HTML::Template::Expr
  - Added a attachment_thumbnail option to the CS RSS feed.
  - fix: No closure
+ - fix: content in packages made from page layout don't include content
  - No Reports In/Out Board (perlDreamer Consulting, LLC)
  - fix: The 7.2.3-7.3.0 upgrade will no longer orphan EventsCalendars
    and Events on the clipboard.
