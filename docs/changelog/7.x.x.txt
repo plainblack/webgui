@@ -10,7 +10,8 @@
    Events.
  - fix: Media Folder (perlDreamer Consulting, LLC)
  - security: A vulnerability was found and fixed this morning that could allow a
-   malicious user to delete assets that they don't have rights to.
+   malicious user to delete assets that they don't have rights to. (Thanks to 
+   Lucas Bartholemy for discovering this defect.)
 
 
 7.3.7
