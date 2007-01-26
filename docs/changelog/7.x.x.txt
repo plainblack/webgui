@@ -9,6 +9,8 @@
  - fix: The upgrade script will remove any orphaned EventsCalendars and 
    Events.
  - fix: Media Folder (perlDreamer Consulting, LLC)
+ - security: A vulnerability was found and fixed this morning that could allow a
+   malicious user to delete assets that they don't have rights to.
 
 
 7.3.7

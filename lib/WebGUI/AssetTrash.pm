@@ -277,10 +277,9 @@ Purges a piece of content, including all it's revisions, from the system permane
 
 sub www_purgeList {
         my $self = shift;
-        return $self->session->privilege->insufficient() unless $self->canEdit;
         foreach my $id ($self->session->form->param("assetId")) {
                 my $asset = WebGUI::Asset->newByDynamicClass($self->session,$id);
-                $asset->purge;
+                $asset->purge unless $asset->canEdit;
         }
         if ($self->session->form->process("proceed") ne "") {
                 my $method = "www_".$self->session->form->process("proceed");
