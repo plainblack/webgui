@@ -1,5 +1,6 @@
 7.3.9
  - fix: Can't add task to project management (perlDreamer Consulting, LLC)
+ - fix: Error in RSS Feed (perlDreamer Consulting, LLC)
 
 7.3.8
  - Fixed a template variable rewriting problem with HTML::Template::Expr
