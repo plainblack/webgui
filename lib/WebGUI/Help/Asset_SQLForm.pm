@@ -343,9 +343,9 @@ our $HELP = {
 		],
 	},
 
-	'edit record template' => {
-		title => 'edit template help title',
-		body => 'edit template help',
+	'search record template' => {
+		title => 'search template help title',
+		body => 'search template help',
 		isa => [
 			{
 				namespace => "Asset_SQLForm",
@@ -537,9 +537,9 @@ our $HELP = {
 		],
 	},
 
-	'search record template' => {
-		title => 'search template help title',
-		body => 'search template help',
+	'edit record template' => {
+		title => 'edit template help title',
+		body => 'edit template help',
 		isa => [
 			{
 				namespace => "Asset_SQLForm",
