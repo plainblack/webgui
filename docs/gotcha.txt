@@ -17,6 +17,9 @@ save you many hours of grief.
    
    Those who are upgrading from 7.2.3 - 7.3.8 will not lose any 
    data.
+
+   NOTE: Any Events Calendars in the trash will be purged and no 
+   longer recoverable.
    
 
 7.3.7
