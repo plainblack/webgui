@@ -1480,9 +1480,9 @@ sub processPropertiesFromFormPost
 		else
 		{
 			# Just update related events			
-			my $properties	= $self->get;
-			delete $properties->{startDate};
-			delete $properties->{endDate};
+			my %properties	= %{ $self->get };
+			delete $properties{startDate};
+			delete $properties{endDate};
 			
 			my $events = $self->getLineage(["siblings"], 
 				{
@@ -1495,10 +1495,10 @@ sub processPropertiesFromFormPost
 			for my $event (@$events)
 			{
 				# Add a revision
-				$properties->{startDate}	= $event->get("startDate");
-				$properties->{endDate}		= $event->get("endDate");
+				$properties{startDate} = $event->get("startDate");
+				$properties{endDate}   = $event->get("endDate");
 				
-				$event->addRevision($self->get);
+				$event->addRevision(\%properties);
 				$event->requestAutoCommit;
 			}
 		}
