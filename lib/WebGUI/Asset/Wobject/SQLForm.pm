@@ -4102,6 +4102,7 @@ my 	@recordLoop;
 	while (my %row = $sth->hash) {
 		my %record;
 		my $fieldValues;
+		$record{'record.id'} = $row{__recordId};
 		if ($self->_canEditRecord) {
 			if ($row{__deleted}) {
 				$recordControls = WebGUI::Form::checkbox($self->session, {name=>'rid', value=>$row{__recordId}});

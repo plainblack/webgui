@@ -462,6 +462,9 @@ our $HELP = {
 		            'name' => 'searchResults.recordLoop',
 		            'variables' => [
 		                             {
+		                               'name' => 'record.id',
+		                             },
+		                             {
 		                               'name' => 'record.controls',
 		                             },
 		                             {
