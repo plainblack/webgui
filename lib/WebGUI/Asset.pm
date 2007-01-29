@@ -461,7 +461,8 @@ sub get {
 	if (defined $propertyName) {
 		return $self->{_properties}{$propertyName};
 	}
-	return $self->{_properties};
+	my %copyOfHashRef = %{$self->{_properties}};
+	return \%copyOfHashRef;
 }
 
 
