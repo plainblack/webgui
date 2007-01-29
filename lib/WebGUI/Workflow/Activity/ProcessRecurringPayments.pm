@@ -94,7 +94,12 @@ sub execute {
 		my $item = WebGUI::Commerce::Item->new($self->session, $itemProperties->{itemId}, $itemProperties->{itemType});
 		my $time = time;
 		$time -= $transaction->get('initDate');
-		my $term = int($time / $self->getDuration($item->duration)) + 1;
+		my $itemDuration = $self->getDuration($item->duration);
+                unless ($itemDuration) {
+                        push(@fatal, $itemProperties->{itemId}." has no duration");
+                        next;
+                }
+                my $term = int($time / $itemDuration) + 1;
 		if ($term > $transaction->lastPayedTerm) {
 			my $payment = WebGUI::Commerce::Payment->load($self->session, $transaction->gateway);
  			$transaction->gatewayId;
