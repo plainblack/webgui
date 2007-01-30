@@ -53,6 +53,49 @@ sub _addDaysForMonth {
 }
 
 #-------------------------------------------------------------------
+sub _clobberImproperDependants {
+	my $self = shift;
+	my $projectId = shift;
+	my @nondependTaskIds = $self->session->db->buildArray("SELECT sequenceNumber FROM PM_task WHERE projectId = ? AND taskType <> 'timed'", [$projectId]);
+	return unless @nondependTaskIds;
+	$self->session->db->write("UPDATE PM_task SET dependants = NULL WHERE projectId = ? AND dependants IN (".join(', ', ('?') x @nondependTaskIds).")", [$projectId, @nondependTaskIds]);
+}
+
+#-------------------------------------------------------------------
+sub _doGanttTaskResourceDisplay {
+	my $self = shift;
+	my $hash = shift;
+	my $task = shift;
+	my @resources = @{$self->_resourceListOfTask($task->{taskId})};
+	my @resourceNames = ();
+
+	foreach my $resource (@resources) {
+		my ($resourceKind, $resourceId) = @$resource{qw{resourceKind resourceId}};
+		if ($resourceKind eq 'user') {
+			my $u = WebGUI::User->new($self->session, $resourceId);
+			my $name = $u->username;
+			my $firstName = $u->profileField('firstName');
+			my $lastName = $u->profileField('lastName');
+			$name = "$firstName $lastName"
+			    if (length $firstName and length $lastName);
+			push @resourceNames, $name;
+		} elsif ($resourceKind eq 'group') {
+			my $g = WebGUI::Group->new($self->session, $resourceId);
+			push @resourceNames, $g->name;
+		} else {
+			# Whee.
+			push @resourceNames, "???"
+		}
+	}
+
+	if (@resources) {
+		$hash->{'task.hasResource'} = "true";
+		$hash->{'task.resource.name'} =
+		    join(', ', map { WebGUI::HTML::format($_, 'text') } @resourceNames);
+	}
+}
+
+#-------------------------------------------------------------------
 sub _getDurationUnitHash {
    my $self = shift;
    my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
@@ -72,6 +115,251 @@ sub _getDurationUnitHashAbbrev {
    %hash = ( "hours"=>$i18n->get("hours label abbrev"), "days"=>$i18n->get("days label abbrev") );
    
    return \%hash;
+}
+
+#-------------------------------------------------------------------
+sub _groupSearchQuery {
+	my $self = shift;
+	my $exclude = shift;
+	my $searchPattern = lc('%'.shift().'%');
+	my @exclude = ('1', '7', split /\;/, $exclude);
+	my $excludePlaceholders = '('.join(',', ('?') x @exclude).')';
+	my $query = <<"SQL";
+SELECT 'group' AS resourceKind, groups.groupId AS resourceId
+  FROM groups
+ WHERE (LOWER(groups.groupName) LIKE ?) AND (groups.groupId NOT IN $excludePlaceholders)
+       AND groups.isEditable = 1
+ ORDER BY groups.groupName
+SQL
+	my @placeholders = ($searchPattern, @exclude);
+	return ($query, \@placeholders);
+}
+
+#-------------------------------------------------------------------
+sub _htmlOfResourceList {
+	my $self = shift;
+	my %args = %{+shift};
+	my @resources = @_;
+	my @listItems;
+	my $assetExtras = $self->session->url->extras('wobject/ProjectManager');
+	my $var = {};
+
+	$var->{assetExtras} = $assetExtras;
+	$var->{resourceLoop} = [];
+
+	my $lastOdd = 0;
+	foreach my $row (@resources) {
+		my $subvar = {};
+		my ($resourceKind, $resourceId) = @$row{qw{resourceKind resourceId}};
+		my $odd = ($lastOdd = !$lastOdd);
+
+		$subvar->{resourceKind} = $resourceKind;
+		$subvar->{resourceId} = $resourceId;
+		$subvar->{opCallbackJs} = $args{opCallbackJs};
+		$subvar->{opIcon} = $args{opIcon};
+		$subvar->{opTitle} = $args{opTitle};
+		$subvar->{assetExtras} = $assetExtras;
+		$subvar->{odd} = $odd;
+		$subvar->{hiddenFields} = $args{hiddenFields};
+
+		if ($resourceKind eq 'group') {
+			my $group = WebGUI::Group->new($self->session, $resourceId);
+			$subvar->{resourceName} = WebGUI::HTML::format($group->name, 'text');
+			$subvar->{resourceIcon} = 'groups.gif';
+		} elsif ($resourceKind eq 'user') {
+			my $user = WebGUI::User->new($self->session, $resourceId);
+			my ($firstName, $lastName, $username) = ($user->profileField('firstName'), $user->profileField('lastName'), $user->username);
+			my $displayName = do {
+				if (length($firstName) && length($lastName)) { "$lastName, $firstName" }
+				elsif (length($firstName)) { $firstName }
+				elsif (length($lastName)) { $lastName }
+				else { $username }
+			};
+			$subvar->{resourceName} = WebGUI::HTML::format($displayName, 'text');
+			$subvar->{resourceIcon} = 'users.gif';
+		} else {
+			$self->session->errorHandler->fatal("Unknown kind of resource '$resourceKind'!");
+		}
+
+		push @{$var->{resourceLoop}}, $subvar;
+	}
+
+	return $self->processTemplate($var, $self->getValue('resourceListTemplateId'));
+}
+
+#-------------------------------------------------------------------
+sub _innerHtmlOfResources {
+	my $self = shift;
+	my @resources = @_;
+	my $i18n = WebGUI::International->new($self->session, 'Asset_ProjectManager');
+	return $self->_htmlOfResourceList({opCallbackJs => 'taskEdit_deleteResource', opIcon => 'delete.gif', opTitle => $i18n->get('resource remove opTitle'), hiddenFields => 1}, @resources);
+}
+
+#-------------------------------------------------------------------
+sub _resourceListOfTask {
+	my $self         = shift;
+	my $taskId       = shift;
+    my $resourceList = [];
+    
+    unless ($taskId eq 'new') {
+       my $sql = q|SELECT 
+                    resourceKind, resourceId 
+                  FROM 
+                    PM_taskResource 
+                  WHERE 
+                    taskId = ? 
+                  ORDER BY 
+                    sequenceNumber
+                 |;
+       $resourceList 
+           = $self->session->db->buildArrayRefOfHashRefs($sql,[$taskId]);
+    }
+    
+	return $resourceList;    
+}
+
+#-------------------------------------------------------------------
+sub _resourceSearchPopup {
+	my $self = shift;
+	my %args = @_;
+	my $i18n = WebGUI::International->new($self->session,'Asset_ProjectManager');
+
+	my $doSearch = $self->session->form->param('doSearch');
+	my $jsCallback = $self->session->form->param('callback');
+	$jsCallback =~ tr/A-Za-z0-9_//cd;
+	my $selfUrlHtml = WebGUI::HTML::format($self->getUrl, 'text');
+	my $assetExtras = $self->session->url->extras('wobject/ProjectManager');
+
+	my ($search, $exclude) = map {scalar $self->session->form->param($_)} ('search', 'exclude');
+	my ($searchHtml, $excludeHtml) = map {WebGUI::HTML::format($_, 'text')} ($search, $exclude);
+	my $var = {};
+
+	my $i18nprefix = $args{i18nprefix};
+	foreach my $key (qw/title searchText foundMessage notFoundMessage/) {
+		$var->{$key} = $i18n->get("$i18nprefix $key");
+	}
+
+	$var->{assetExtras} = $assetExtras;
+	$var->{func} = $args{func};
+	$var->{callback} = $jsCallback;
+	$var->{exclude} = $excludeHtml;
+	$var->{previousSearch} = $searchHtml;
+	$var->{selfUrl} = $selfUrlHtml;
+
+	if ($doSearch) {
+		my @resources = @{$self->session->db->buildArrayRefOfHashRefs($args{queryCallback}->($exclude, $search))};
+		$var->{doingSearch} = 1;
+		$var->{foundResults} = scalar @resources;
+
+		$var->{resourceDiv} = '<div id="taskEdit_resourceList_div">'.$self->_htmlOfResourceList({opCallbackJs => 'searchPopup_itemSelected', opIcon => 'add.gif', opTitle => $i18n->get('resource add opTitle'), hiddenFields => 0}, @resources).'</div>';
+	} else {
+		$var->{doingSearch} = 0;
+	}
+
+	return $self->processTemplate($var, $self->getValue('resourcePopupTemplateId'));
+}
+
+#-------------------------------------------------------------------
+sub _userSearchQuery {
+	my $self = shift;
+	my $exclude = shift;
+	my $searchPattern = lc('%'.shift().'%');
+	my @exclude = ('1', '3', split /\;/, $exclude);
+	my $excludePlaceholders = '('.join(',', ('?') x @exclude).')';
+
+	my $query = <<"SQL";
+SELECT 'user' AS resourceKind, users.userId AS resourceId
+  FROM users
+       LEFT JOIN userProfileData AS lastName ON users.userId = lastName.userId
+                                             AND lastName.fieldName = 'lastName'
+       LEFT JOIN userProfileData AS firstName ON users.userId = firstName.userId
+                                              AND firstName.fieldName = 'firstName'
+ WHERE (LOWER(lastName.fieldData) LIKE ? OR LOWER(firstName.fieldData) LIKE ?
+        OR LOWER(users.username) LIKE ?) AND (users.userId NOT IN $excludePlaceholders)
+ ORDER BY lastName.fieldData, firstName.fieldData
+SQL
+	my @placeholders  = (($searchPattern) x 3, @exclude);
+	return ($query, \@placeholders);
+}
+
+#-------------------------------------------------------------------
+sub _updateDependantDates {
+	my $self = shift;
+	my $db = $self->session->db;
+	my $dt = $self->session->datetime;
+	my ($projectId) = @_;
+	my $project = $self->getCollateral('PM_project', 'projectId', $projectId);
+
+	my $tasks = $db->buildArrayRefOfHashRefs("select * from PM_task where projectId=?",[$projectId]);
+   
+	my $taskHash = {};
+	foreach my $task (@{$tasks}) {
+		my $seqNum = $task->{sequenceNumber};
+
+		# Calculate initial duration in days and duration floor for this task.
+		my $totalDurationInDays = $task->{duration} + $task->{lagTime};
+		$totalDurationInDays = $totalDurationInDays / $project->{hoursPerDay} if( $project->{durationUnits} eq "hours" );
+		my $totalDurationFloor = floor($totalDurationInDays);
+
+		# If we have a predecessor, check against it.
+		if (my $predecessor = $task->{dependants}) {
+			my $pred = $taskHash->{$predecessor};
+			unless ($pred) {
+				# Predecessor has to have a lower sequence number, right?  Right?
+				$self->session->errorHandler->error("Internal: predecessor '$predecessor' of task with seqNum '$seqNum' not in task hash?!");
+				next;
+			}
+
+			# Need to fix the dates iff we intersect our predecessor.
+			if ($task->{startDate} <= $pred->{endDate}) {
+				# Update for fractional day part.
+				# Buggo: why?
+				$totalDurationInDays += $pred->{dayPart};
+				$totalDurationFloor = floor($totalDurationInDays);
+	           
+				# Set start and end dates of the current task.
+				$task->{startDate} = $pred->{endDate};
+				$task->{endDate} = $dt->addToDateTime($task->{startDate}, 0, 0, $totalDurationFloor);
+				# Update.
+				$self->setCollateral("PM_task","taskId",$task,1,0,"projectId",$projectId);
+			}
+		}
+	  
+		# Extract fractional day part.
+		my $totalDurationInDaysFrac = $totalDurationInDays - floor($totalDurationInDays);
+
+		$taskHash->{$seqNum} = { 
+					'startDate'=>$task->{startDate}, 
+					'endDate'=>$task->{endDate}, 
+					'duration'=>$task->{duration}, 
+					'dayPart'=>$totalDurationInDaysFrac
+				       };
+	}
+}
+
+#-------------------------------------------------------------------
+sub _userCanManageProject {
+    my $self = shift;
+    my $user = shift;
+    my $projectId = shift;
+    my ($managerGroup) = $self->session->db->quickArray("select projectManager from PM_project where projectId = ?", [$projectId]);
+    return $self->canView($user->userId) && ($user->isInGroup($managerGroup) || $user->isInGroup($self->get('groupToAdd')));
+}
+
+#-------------------------------------------------------------------
+sub _userCanManageProjectList {
+	my $self = shift;
+	my $user = shift;
+	return $self->canView($user->userId) && $user->isInGroup($self->get('groupToAdd'));
+}
+
+#-------------------------------------------------------------------
+sub _userCanObserveProject {
+	my $self = shift;
+	my $user = shift;
+	my $projectId = shift;
+	my ($managerGroup, $observerGroup) = $self->session->db->quickArray("select projectManager, projectObserver from PM_project where projectId = ?", [$projectId]);
+	return $self->canView($user->userId) && ($user->isInGroup($managerGroup) || $user->isInGroup($observerGroup) || $user->isInGroup($self->get('groupToAdd')));
 }
 
 #-------------------------------------------------------------------
@@ -209,6 +497,67 @@ SQL
 }
 
 #-------------------------------------------------------------------
+sub i18n {
+   my $self    = shift;
+   my $session = $self->session;
+   
+   unless ($self->{_i18n}) {
+      $self->{_i18n} 
+          = WebGUI::International->new($session,'Asset_ProjectManager');
+   }
+   
+   return $self->{_i18n};
+}
+
+#-------------------------------------------------------------------
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView();
+	my $template = WebGUI::Asset::Template->new($self->session, $self->get("projectDashboardTemplateId"));
+	$template->prepare;
+	$self->{_viewTemplate} = $template;
+}
+
+#-------------------------------------------------------------------
+sub processErrors {
+   my $self = shift;
+   my $errors = "";
+   if($_[0]) {
+      $errors = "<ul>";
+	  foreach (@{$_[0]}) {
+	     $errors .= "<li>$_</li>";
+	  }
+	  $errors .= "</ul>";
+   }
+   return $errors;
+}
+
+
+#-------------------------------------------------------------------
+sub purge {
+	my $self = shift;
+	#purge your wobject-specific data here.  This does not include fields 
+	# you create for your NewWobject asset/wobject table.
+	return $self->SUPER::purge;
+}
+
+#-------------------------------------------------------------------
+sub setSessionVars {
+   my $self = shift;
+   my $session = $self->session;
+   
+   return( 
+            $session,
+            $session->privilege,
+            $session->form,
+            $session->db,
+            $session->datetime,
+            $self->i18n,
+            $session->user,
+         );
+}
+
+#-------------------------------------------------------------------
 # API method called by Time Tracker to set percent complete field in the task and update the project cache
 sub updateProjectTask {
 	my $self = shift;
@@ -248,29 +597,6 @@ sub updateProjectTask {
 }
 
 #-------------------------------------------------------------------
-sub _userCanManageProject {
-	my $self = shift;
-	my $user = shift;
-	my $projectId = shift;
-	my ($managerGroup) = $self->session->db->quickArray("select projectManager from PM_project where projectId = ?", [$projectId]);
-	return $self->canView($user->userId) && ($user->isInGroup($managerGroup) || $user->isInGroup($self->get('groupToAdd')));
-}
-
-sub _userCanObserveProject {
-	my $self = shift;
-	my $user = shift;
-	my $projectId = shift;
-	my ($managerGroup, $observerGroup) = $self->session->db->quickArray("select projectManager, projectObserver from PM_project where projectId = ?", [$projectId]);
-	return $self->canView($user->userId) && ($user->isInGroup($managerGroup) || $user->isInGroup($observerGroup) || $user->isInGroup($self->get('groupToAdd')));
-}
-
-sub _userCanManageProjectList {
-	my $self = shift;
-	my $user = shift;
-	return $self->canView($user->userId) && $user->isInGroup($self->get('groupToAdd'));
-}
-
-#-------------------------------------------------------------------
 sub updateProject {
 	my $self = shift;
 	my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
@@ -289,46 +615,6 @@ sub updateProject {
 	$db->write("update PM_project set startDate=?, endDate=?, percentComplete=? where projectId=?",[$minStart,$maxEnd,$projectComplete,$projectId]);
 }
 
-#-------------------------------------------------------------------
-sub prepareView {
-	my $self = shift;
-	$self->SUPER::prepareView();
-	my $template = WebGUI::Asset::Template->new($self->session, $self->get("projectDashboardTemplateId"));
-	$template->prepare;
-	$self->{_viewTemplate} = $template;
-}
-
-#-------------------------------------------------------------------
-sub processErrors {
-   my $self = shift;
-   my $errors = "";
-   if($_[0]) {
-      $errors = "<ul>";
-	  foreach (@{$_[0]}) {
-	     $errors .= "<li>$_</li>";
-	  }
-	  $errors .= "</ul>";
-   }
-   return $errors;
-}
-
-
-#-------------------------------------------------------------------
-sub purge {
-	my $self = shift;
-	#purge your wobject-specific data here.  This does not include fields 
-	# you create for your NewWobject asset/wobject table.
-	return $self->SUPER::purge;
-}
-
-#-------------------------------------------------------------------
-sub setSessionVars {
-   my $self = shift;
-   my $session = $self->session;
-   my $i18n = WebGUI::International->new($session,'Asset_ProjectManager');
-   
-   return ($session,$session->privilege,$session->form,$session->db,$session->datetime,$i18n,$session->user);
-}
 
 #-------------------------------------------------------------------
 sub view {
@@ -457,993 +743,6 @@ sub www_deleteTask {
    $self->reorderCollateral("PM_task","taskId","projectId",$projectId);
    
    return $self->www_viewProject($projectId);
-}
-
-#-------------------------------------------------------------------
-sub www_editProject {
-   my $self = shift;
-   #Set Method Helpers
-   my ($session,$privilege,$form,$db,$datetime,$i18n,$user) = $self->setSessionVars;
-
-   #Check Privileges
-   return $privilege->insufficient unless $self->_userCanManageProjectList($user);
-   
-   #Set Local Vars
-   my $projectId = $form->get("projectId"); 
-   my $project = $db->quickHashRef("select * from PM_project where projectId=?",[$projectId]);
-   my $addEditText = ($projectId eq "new")?$i18n->get("create project"):$i18n->get("edit project");
-   
-   #Build Form
-   my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl, -extras=>q|onsubmit="return checkform(this);"|);
-   $f->hidden( 
-			    -name=>"func",
-				-value=>"editProjectSave" 
-   );
-   $f->hidden( 
-               -name=>"projectId", 
-               -value=>$projectId 
-   );
-   $f->readOnly(
-		-label=>$i18n->get("project id"),
-		-hoverHelp => $i18n->get('project name hoverhelp'),
-		-value=>$projectId
-   );
-   $f->text(
-		   -name  => "name",
-		   -value => $form->get("name") || $project->{name},
-		   -hoverHelp => $i18n->get('project name hoverhelp'),
-		   -label => $i18n->get('project name label')
-   );
-   $f->HTMLArea(
-		-name  => "description",
-		-value => $form->get("description") || $project->{description},
-		-hoverHelp => $i18n->get('project description hoverhelp'),
-		-label => $i18n->get('project description label')
-   );
-   $f->group(
-         -name=> "projectManager",
-		 -value=> $form->get("projectManager") || $project->{projectManager} || $self->get("groupToAdd"),
-		 -hoverHelp=> $i18n->get('project manager hoverhelp'),
-		 -label => $i18n->get('project manager label')
-   );
-   $f->group(
-         -name=> "projectObserver",
-		 -value=> $form->get("projectObserver") || $project->{projectObserver} || '7',
-		 -hoverHelp=> $i18n->get('project observer hoverhelp'),
-		 -label => $i18n->get('project observer label')
-   );
-   
-   my $dunitValue = $form->get("durationUnits") || $project->{durationUnits} || "hours";
-   $f->selectBox(
-          -name=>"durationUnits",
-		  -value=> $dunitValue,
-		  -options=>$self->_getDurationUnitHash,
-		  -hoverHelp => $i18n->get('duration units hoverhelp'),
-		  -label => $i18n->get('duration units label'),
-		  -extras=> q|onchange="if(this.value == 'hours'){ document.getElementById('hoursper').style.display='' } else { document.getElementById('hoursper').style.display='none' }"|
-   );
-   
-  
-   
-   my $hpdLabel = $i18n->get('hours per day label');
-   my $hpdHoverHelp = $i18n->get('hours per day hoverhelp');
-   $hpdHoverHelp =~ s/'/\\'/g;
-   my $hpdValue = $form->get("hoursPerDay") || $project->{hoursPerDay} || "8.0";
-   my $hpdStyle = ($dunitValue eq "days"?"display:none":"");
-   
-   my $html = qq|
-   <tr id="hoursper" style="$hpdStyle">
-      <td class="formDescription"  onmouseover="return escape('$hpdHoverHelp')" valign="top" style="width: 180px;">
-	     <label for="hoursPerDay_formId">$hpdLabel</label>
-	  </td>
-	  <td valign="top" class="tableData"  style="width: *;">
-	     <input id="hoursPerDay_formId" type="text" name="hoursPerDay" value="$hpdValue" size="11" maxlength="14" />
-	  </td>
-   </tr>|;
-   $f->raw($html);		
-   
-   $f->float (
-           -name=>"targetBudget",
-		   -value=> $form->get("targetBudget") || $project->{targetBudget} || "0.00",
-		   -hoverHelp => $i18n->get('target budget hoverhelp'),
-		   -label=> $i18n->get('target budget label')
-   );
-   $f->submit( 
-           -extras=>"name='subbutton'",
-		   -value=>$addEditText
-   );
-   
-   my $jscript = qq|
-      <script language="JavaScript">
-	     function checkform(form) {		 
-		    if(form.name.value == ""){ 
-		       alert("You must enter a project name");
-			   form.subbutton.value='$addEditText';
-			   return false;
-	        }
-		    return true;
-	     }
-	  </script>
-   |;
-   
-   my $errors = $self->processErrors($_[0]);
-   
-   my $output = $jscript."\n".$errors.$f->print;
-   return $self->getAdminConsole->render($output,$addEditText);
-}
-
-#-------------------------------------------------------------------
-sub www_editProjectSave {
-	my $self = shift;
-    #Set Method Helpers
-    my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
-    my $eh = $session->errorHandler;
-	
-    #Check Privileges
-    return $privilege->insufficient unless $self->_userCanManageProjectList($user);
-    
-	my $now = $dt->time();
-	my $uid = $user->userId;
-	my $projectId = $form->process("projectId","hidden");
-	my $origProjId = $projectId;
-	
-	#Set Properties
-	my $props = {};
-	$props->{projectId} = $projectId;
-	$props->{name} = $form->process("name","text");
-	$props->{description} = $form->process("description","HTMLArea");
-	$props->{projectManager} = $form->process("projectManager","group");
-	$props->{projectObserver} = $form->process("projectObserver","group");
-	$props->{durationUnits} = $form->process("durationUnits","selectBox");
-	$props->{hoursPerDay} = $form->process("hoursPerDay","float") || 8.0;
-	$props->{targetBudget} = $form->process("targetBudget","float");
-    if($projectId eq "new") {
-	   $props->{creationDate} = $now;
-	   $props->{createdBy} = $uid;
-	}
-    $props->{lastUpdateDate} = $now;
-    $props->{lastUpdatedBy} = $uid;
-	#Process Errors	
-	my @errors = ();
-	push(@errors,"You must enter a project name") unless ($props->{name});
-    if(scalar(@errors) > 0) {
-       return $self->www_editProject(\@errors);
-    }
-	
-	#Save the extended project data
-	my $projectId = $self->setCollateral("PM_project","projectId",$props,0,1);
-	
-	if($origProjId eq "new") {
-	   #Create Project Start Milestone Task for new projects
-	   $props = {};
-	   $props->{taskId} = "new";
-	   $props->{projectId} = $projectId;
-	   $props->{taskName} = $i18n->get("project start task label");
-	   $props->{duration} = 0;
-	   $props->{lagTime} = 0;
-	   $props->{startDate} = $dt->time();
-	   $props->{endDate} = $dt->time();
-	   $props->{taskType} = 'milestone';
-       $props->{creationDate} = $now;
-	   $props->{createdBy} = $uid;
-       $props->{lastUpdateDate} = $now;
-       $props->{lastUpdatedBy} = $uid;
-	   
-	   #Save the extended task data
-	   my $taskId = $self->setCollateral("PM_task","taskId",$props,1,0,"projectId",$projectId);
-    }
-	
-	return $self->www_viewProject($projectId);
-}
-
-#-------------------------------------------------------------------
-sub _htmlOfResourceList {
-	my $self = shift;
-	my %args = %{+shift};
-	my @resources = @_;
-	my @listItems;
-	my $assetExtras = $self->session->url->extras('wobject/ProjectManager');
-	my $var = {};
-
-	$var->{assetExtras} = $assetExtras;
-	$var->{resourceLoop} = [];
-
-	my $lastOdd = 0;
-	foreach my $row (@resources) {
-		my $subvar = {};
-		my ($resourceKind, $resourceId) = @$row{qw{resourceKind resourceId}};
-		my $odd = ($lastOdd = !$lastOdd);
-
-		$subvar->{resourceKind} = $resourceKind;
-		$subvar->{resourceId} = $resourceId;
-		$subvar->{opCallbackJs} = $args{opCallbackJs};
-		$subvar->{opIcon} = $args{opIcon};
-		$subvar->{opTitle} = $args{opTitle};
-		$subvar->{assetExtras} = $assetExtras;
-		$subvar->{odd} = $odd;
-		$subvar->{hiddenFields} = $args{hiddenFields};
-
-		if ($resourceKind eq 'group') {
-			my $group = WebGUI::Group->new($self->session, $resourceId);
-			$subvar->{resourceName} = WebGUI::HTML::format($group->name, 'text');
-			$subvar->{resourceIcon} = 'groups.gif';
-		} elsif ($resourceKind eq 'user') {
-			my $user = WebGUI::User->new($self->session, $resourceId);
-			my ($firstName, $lastName, $username) = ($user->profileField('firstName'), $user->profileField('lastName'), $user->username);
-			my $displayName = do {
-				if (length($firstName) && length($lastName)) { "$lastName, $firstName" }
-				elsif (length($firstName)) { $firstName }
-				elsif (length($lastName)) { $lastName }
-				else { $username }
-			};
-			$subvar->{resourceName} = WebGUI::HTML::format($displayName, 'text');
-			$subvar->{resourceIcon} = 'users.gif';
-		} else {
-			$self->session->errorHandler->fatal("Unknown kind of resource '$resourceKind'!");
-		}
-
-		push @{$var->{resourceLoop}}, $subvar;
-	}
-
-	return $self->processTemplate($var, $self->getValue('resourceListTemplateId'));
-}
-
-sub _resourceSearchPopup {
-	my $self = shift;
-	my %args = @_;
-	my $i18n = WebGUI::International->new($self->session,'Asset_ProjectManager');
-
-	my $doSearch = $self->session->form->param('doSearch');
-	my $jsCallback = $self->session->form->param('callback');
-	$jsCallback =~ tr/A-Za-z0-9_//cd;
-	my $selfUrlHtml = WebGUI::HTML::format($self->getUrl, 'text');
-	my $assetExtras = $self->session->url->extras('wobject/ProjectManager');
-
-	my ($search, $exclude) = map {scalar $self->session->form->param($_)} ('search', 'exclude');
-	my ($searchHtml, $excludeHtml) = map {WebGUI::HTML::format($_, 'text')} ($search, $exclude);
-	my $var = {};
-
-	my $i18nprefix = $args{i18nprefix};
-	foreach my $key (qw/title searchText foundMessage notFoundMessage/) {
-		$var->{$key} = $i18n->get("$i18nprefix $key");
-	}
-
-	$var->{assetExtras} = $assetExtras;
-	$var->{func} = $args{func};
-	$var->{callback} = $jsCallback;
-	$var->{exclude} = $excludeHtml;
-	$var->{previousSearch} = $searchHtml;
-	$var->{selfUrl} = $selfUrlHtml;
-
-	if ($doSearch) {
-		my @resources = @{$self->session->db->buildArrayRefOfHashRefs($args{queryCallback}->($exclude, $search))};
-		$var->{doingSearch} = 1;
-		$var->{foundResults} = scalar @resources;
-
-		$var->{resourceDiv} = '<div id="taskEdit_resourceList_div">'.$self->_htmlOfResourceList({opCallbackJs => 'searchPopup_itemSelected', opIcon => 'add.gif', opTitle => $i18n->get('resource add opTitle'), hiddenFields => 0}, @resources).'</div>';
-	} else {
-		$var->{doingSearch} = 0;
-	}
-
-	return $self->processTemplate($var, $self->getValue('resourcePopupTemplateId'));
-}
-
-#-------------------------------------------------------------------
-sub _userSearchQuery {
-	my $self = shift;
-	my $exclude = shift;
-	my $searchPattern = lc('%'.shift().'%');
-	my @exclude = ('1', '3', split /\;/, $exclude);
-	my $excludePlaceholders = '('.join(',', ('?') x @exclude).')';
-
-	my $query = <<"SQL";
-SELECT 'user' AS resourceKind, users.userId AS resourceId
-  FROM users
-       LEFT JOIN userProfileData AS lastName ON users.userId = lastName.userId
-                                             AND lastName.fieldName = 'lastName'
-       LEFT JOIN userProfileData AS firstName ON users.userId = firstName.userId
-                                              AND firstName.fieldName = 'firstName'
- WHERE (LOWER(lastName.fieldData) LIKE ? OR LOWER(firstName.fieldData) LIKE ?
-        OR LOWER(users.username) LIKE ?) AND (users.userId NOT IN $excludePlaceholders)
- ORDER BY lastName.fieldData, firstName.fieldData
-SQL
-	my @placeholders  = (($searchPattern) x 3, @exclude);
-	return ($query, \@placeholders);
-}
-
-sub www_userSearchPopup {
-	my $self = shift;
-
-	my %args = (func => 'userSearchPopup',
-		    i18nprefix => 'user add popup',
-		    queryCallback => sub { $self->_userSearchQuery(@_) },
-		   );
-	$self->_resourceSearchPopup(%args);
-}
-
-#-------------------------------------------------------------------
-sub _groupSearchQuery {
-	my $self = shift;
-	my $exclude = shift;
-	my $searchPattern = lc('%'.shift().'%');
-	my @exclude = ('1', '7', split /\;/, $exclude);
-	my $excludePlaceholders = '('.join(',', ('?') x @exclude).')';
-	my $query = <<"SQL";
-SELECT 'group' AS resourceKind, groups.groupId AS resourceId
-  FROM groups
- WHERE (LOWER(groups.groupName) LIKE ?) AND (groups.groupId NOT IN $excludePlaceholders)
-       AND groups.isEditable = 1
- ORDER BY groups.groupName
-SQL
-	my @placeholders = ($searchPattern, @exclude);
-	return ($query, \@placeholders);
-}
-
-sub www_groupSearchPopup {
-	my $self = shift;
-	my %args = (func => 'groupSearchPopup',
-		    i18nprefix => 'group add popup',
-		    queryCallback => sub { $self->_groupSearchQuery(@_) },
-		   );
-	$self->_resourceSearchPopup(%args);
-}
-
-#-------------------------------------------------------------------
-sub _resourceListOfTask {
-	# TODO: Should there be a getAllCollateral in Asset::Wobject?
-	my $self = shift;
-	my $taskId = shift;
-	return ($taskId eq 'new')? () :
-	    @{$self->session->db->buildArrayRefOfHashRefs("SELECT resourceKind, resourceId FROM PM_taskResource WHERE taskId = ? ORDER BY sequenceNumber", [$taskId])};
-}
-
-#-------------------------------------------------------------------
-sub _innerHtmlOfResources {
-	my $self = shift;
-	my @resources = @_;
-	my $i18n = WebGUI::International->new($self->session, 'Asset_ProjectManager');
-	return $self->_htmlOfResourceList({opCallbackJs => 'taskEdit_deleteResource', opIcon => 'delete.gif', opTitle => $i18n->get('resource remove opTitle'), hiddenFields => 1}, @resources);
-}
-
-#-------------------------------------------------------------------
-sub www_innerHtmlOfResources {
-	my $self = shift;
-	my @resources = map {
-		my ($resourceKind, $resourceId) = split / /, $_, 2;
-		{ resourceKind => $resourceKind, resourceId => $resourceId }
-	} split /\;/, $self->session->form->param('resources');
-	return $self->_innerHtmlOfResources(@resources);
-}
-
-#-------------------------------------------------------------------
-sub www_editTask {
-   my $self = shift;
-   my $var = {};
-   #Set Method Helpers
-   my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
-   my $config = $session->config;
-   
-   my $projectId = $form->get("projectId");
-   my $taskId = $form->get("taskId") || "new";
-  
-   my $project = $self->getCollateral('PM_project', 'projectId', $projectId);
-   my $task = $self->getCollateral('PM_task', 'taskId', $taskId);
-   
-   #Check Privileges
-   return $privilege->insufficient unless $self->_userCanManageProject($user, $projectId);
-   
-   my $taskType = ($task->{taskType} || 'timed');
-   my $seq = $task->{sequenceNumber};
-   my $disabledIfUntimed = ($taskType eq 'timed')? "" : " disabled";
-   my $disabledIfMilestone = ($taskType ne 'milestone')? "" : " disabled";
-
-   $var->{'form.header'} = WebGUI::Form::formHeader($session,{
-				action=>$self->getUrl,
-				extras=>q|name="editTaskForm"|
-				});
-   $var->{'form.header'} .= WebGUI::Form::hidden($session, {
-				-name=>"func",
-				-value=>"editTaskSave"
-				});
-   $var->{'form.header'} .= WebGUI::Form::hidden($session, {
-				-name=>"projectId",
-				-value=>$projectId
-				});
-   $var->{'form.header'} .= WebGUI::Form::hidden($session, {
-				-name=>"taskId",
-				-value=>$taskId
-				});
-   $var->{'form.header'} .= WebGUI::Form::hidden($session, {
-				-name=>"insertAt",
-				-value=>$form->get("insertAt")
-				});
-
-   my ($startEpoch, $endEpoch) = $db->quickArray('SELECT startDate, startDate FROM PM_task WHERE projectId = ? ORDER BY sequenceNumber LIMIT 1', [$projectId]);
-   my $dependant = $task->{dependants};
-   #my $duration = $task->{duration} || (($taskType eq 'timed')? (($project->{durationUnits} eq 'hours')? $project->{hoursPerDay} : 1) : 0);
-   my $duration = $task->{duration} || 0;   
-
-   $startEpoch = $endEpoch = time unless defined $startEpoch and defined $endEpoch;
-   $startEpoch = $task->{startDate} if $task->{startDate};
-   $endEpoch = $task->{endDate} if $task->{endDate};
-## Magic number = bad
-   $endEpoch += 86400 if $taskType eq 'timed' and !$task->{duration} and !$task->{endDate};
-   my ($start, $end) = ($dt->epochToSet($startEpoch), $dt->epochToSet($endEpoch));
-
-   # Set some hidden variables to make it easy to reset data in javascript
-   $var->{'form.header'} .= WebGUI::Form::hidden($session, {
-				-name=>"orig_duration",
-				-value=>$duration
-				});
-   $var->{'form.header'} .= WebGUI::Form::hidden($session, {
-				-name=>"orig_start",
-				-value=>$start
-				});
-   $var->{'form.header'} .= WebGUI::Form::hidden($session, {
-				-name=>"orig_end",
-				-value=>$end
-				}); 
-   $var->{'form.header'} .= WebGUI::Form::hidden($session, {
-				-name=>"orig_dependant",
-				-value=>$dependant
-				});
-   $var->{'form.name'} = WebGUI::Form::text($session,{
-				-name=>"name",
-				-value=>$task->{taskName}, 
-				-extras=>q|style="width:95%;"|
-				});
-
-   $var->{'form.seqNum'} = WebGUI::Form::hidden($session, {
-							   -name => "seqNum",
-							   -value => $seq,
-							  });
-   
-   my $durationEvents = qq|onchange="durationChanged(this.form, '', true)"  onblur="if (this.value == 0) durationChanged(this.form, '', true)"|;
-   my $startDateEvents = qq|onfocus="doCalendar(this.id)" onblur="startDateChanged(this.form, '', true)"|;
-   my $endDateEvents = qq|onfocus="doCalendar(this.id)" onblur="endDateChanged(this.form, '', true)"|;
-
-   $var->{'form.duration'} = WebGUI::Form::float($session,{
-				-name => "duration",
-				-value => $duration,
-				-extras => qq|style="width:70%;" $durationEvents $disabledIfMilestone|
-				});
-   $var->{'form.duration.units'} = $self->_getDurationUnitHashAbbrev->{$project->{durationUnits}};
-
-   $var->{'form.lagTime'} = WebGUI::Form::float($session,{
-                                -name => "lagTime",
-				-value => (($taskType eq 'timed')? $task->{lagTime} : 'N/A'),
-				-extras => qq|style="width:70%;" $durationEvents $disabledIfUntimed|
-							 });
-   $var->{'form.lagTime.units'} = $self->_getDurationUnitHashAbbrev->{$project->{durationUnits}};
-
-   $var->{'form.start'} = WebGUI::Form::text($session,{
-				-name=>"start",
-				-value=>$start,
-				-size=>"10",
-				-maxlength=>"10",
-				-extras=>qq|style="width:88%;" $startDateEvents|
-				});
-
-   $var->{'form.end'} = WebGUI::Form::text($session,{
-				-name=>"end",
-				-value=>$end,
-				-size=>"10",
-				-maxlength=>"10",
-				-extras=>qq|style="width:88%;" $endDateEvents $disabledIfUntimed|
-				});
-
-   $var->{'form.dependants'} = WebGUI::Form::integer($session,{
-				-name=>"dependants",
-				-value=>$dependant || "",
-				-defaultValue=>"",
-				-size=>4,
-				-maxlength=>10,
-				-extras=>qq|style="width:50%;" onchange="predecessorChanged(this.form, '', true)"|
-				});
-
-   tie my %users, "Tie::IxHash";
-   %users = $db->buildHash("select userId,username from users where userId not in ('1','3') order by userId");
-   %users = (""=>$i18n->get("resource none"),%users);
-
-   my @resources = $self->_resourceListOfTask($taskId);
-   my ($searchUserUrlHtml, $searchGroupUrlHtml) = map {
-	   my $kind = $_;
-	   my $exclude = $self->session->url->escape(join ';', map {$_->{resourceId}} grep {$_->{resourceKind} eq $kind} @resources);
-	   my $func = $kind.'SearchPopup';
-	   WebGUI::HTML::format($self->getUrl("func=$func;callback=taskEdit_queueAddResource;exclude=$exclude"), 'text');
-   } (qw/user group/);
-
-   $var->{'form.addUser.id'} = 'taskEdit_resourceList_addUser_a';
-   $var->{'form.addUser.link'} = $searchUserUrlHtml;
-   $var->{'form.addUser.text'} = $i18n->get('user add popup hover');
-   
-   $var->{'form.addGroup.id'} = 'taskEdit_resourceList_addGroup_a';
-   $var->{'form.addGroup.link'} = $searchGroupUrlHtml;
-   $var->{'form.addGroup.text'} = $i18n->get('group add popup hover');
-
-   $var->{'form.resourceDiv'} =
-       '<div id="taskEdit_resourceList_div">'.$self->_innerHtmlOfResources(@resources).'</div>';
-
-   my %taskTypeOptions;
-   tie %taskTypeOptions, 'Tie::IxHash';
-   foreach my $option (qw/timed progressive milestone/) {
-	   $taskTypeOptions{$option} = $i18n->get("taskType $option label");
-   }
-
-   $var->{'form.taskType'} = WebGUI::Form::radioList($session, {
-				-name=>'taskType',
-				-vertical=>0,
-				-options=>\%taskTypeOptions,
-			        -defaultValue=>$taskType,
-				-extras=>q|onclick="configureForTaskType(this.form)"|,
-				});
-   $var->{'form.percentComplete'} = WebGUI::Form::float($session, {
-				-name => "percentComplete",
-				-value => (($taskType eq 'timed')? $task->{percentComplete} : 'N/A'),
-				-extras => $disabledIfUntimed
-				});
-   $var->{'form.save'} = WebGUI::Form::submit($session, { 
-				-value=>"Save", 
-				-extras=>q|name="subbutton"| 
-				});
-   $var->{'form.footer'} = WebGUI::Form::formFooter($session);
-
-   $var->{'extras'} = $config->get("extrasURL");
-   $var->{'assetExtras'} = $config->get("extrasURL").'/wobject/ProjectManager';
-
-   $var->{'task_start_label'}       = $i18n->get('task start label');
-   $var->{'task_end_label'}         = $i18n->get('task end label');
-   $var->{'task_duration_label'}    = $i18n->get('task duration label');
-   $var->{'task_lagTime_label'}     = $i18n->get('task lag time label');
-   $var->{'task_predecessor_label'} = $i18n->get('task predecessor label');
-   $var->{'task_complete_label'}    = $i18n->get('task complete label');
-   $var->{'task_resource_label'}    = $i18n->get('task resource label');
-   $var->{'task_save_label'}        = $i18n->get('task save label');
-
-   return $self->processTemplate($var,$self->getValue("editTaskTemplateId"));
-}
-
-#-------------------------------------------------------------------
-sub www_editTaskSave {
-   my $self = shift;
-   my $var = {};
-   #Set Method Helpers
-   my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
-   my $config = $session->config;
-   my $eh = $session->errorHandler;
-
-   my $projectId = $form->get("projectId");
-   my $project = $db->quickHashRef("select * from PM_project where projectId=".$db->quote($projectId));
-
-   #Check Privileges
-   return $privilege->insufficient unless $self->_userCanManageProject($user, $projectId);
-   
-   my $taskType = $form->process("taskType", "radioList");
-   my ($isMilestone, $isUntimed) = ($taskType eq 'milestone', $taskType ne 'timed');
-   my $isProgressive = ($taskType eq 'progressive');
-   
-   my $props = {};
-   $props->{taskId} = $form->process("taskId","hidden");
-   $props->{projectId} = $projectId;
-   $props->{taskName} = $form->process("name","text");
-   $props->{duration} = $isMilestone? 0 : $form->process("duration","text");
-   $props->{lagTime} = $isUntimed? 0 : $form->process("lagTime","text");
-   $props->{startDate} = $form->process("start","date");
-   $props->{endDate} = $isMilestone? $props->{startDate} :
-       $isProgressive? undef : $form->process("end","date");
-   $props->{dependants} = $form->process("dependants","selectBox") unless $isUntimed;
-   $props->{taskType} = $taskType;
-   my @resourceSpecs = $form->process("resources","hiddenList");
-   $props->{percentComplete} = $isUntimed? 0 : $form->process("percentComplete","float");
-
-   unless (defined $props->{endDate}) {
-	   my $totalDuration = $props->{duration} + $props->{lagTime};
-	   my $totalDurationDays = ($project->{durationUnits} eq 'days')? $totalDuration : ($totalDuration / $project->{hoursPerDay});
-	   $props->{endDate} = $props->{startDate} + $totalDurationDays*86400;
-   }
-   
-   my $now = $dt->time();
-   if($props->{taskId} eq "new") {
-	   $props->{creationDate} = $now;
-	   $props->{createdBy} = $user->userId;
-   }
-   $props->{lastUpdateDate} = $now;
-   $props->{lastUpdatedBy} = $user->userId;
-
-   # Save the extended task data
-   my $taskId = $self->setCollateral("PM_task","taskId",$props,1,0,"projectId",$projectId);
-   $self->deleteCollateral('PM_taskResource', 'taskId', $taskId);
-   foreach my $resourceSpec (@resourceSpecs) {
-	   my ($resourceKind, $resourceId) = split / /, $resourceSpec, 2;
-	   $self->setCollateral('PM_taskResource', 'taskResourceId', {taskId => $taskId, resourceKind => $resourceKind, resourceId => $resourceId}, 1, 0, 'taskId', $taskId);
-   }
-
-   #Reorder tasks if task is inserted
-   my $insertAt = $form->get("insertAt");
-   if($insertAt) {
-      #$eh->warn("Inserting at $insertAt");
-	  my $tasks = $db->buildArrayRefOfHashRefs("select * from PM_task where projectId=? order by sequenceNumber",[$projectId]);
-	  my $taskLen = scalar(@{$tasks});
-	  #$eh->warn("Task Length = $taskLen");
-	  foreach my $task (@{$tasks}) {
-	     my $seqNum = $task->{sequenceNumber};
-		 next unless ($seqNum >= $insertAt);
-		 #$eh->warn("Fixing task $seqNum");		 
-		 my $newSeq = $seqNum + 1;
-		 if($seqNum eq $taskLen) {
-		    $newSeq = $insertAt;
-		 }
-		 #$eh->warn("New seqNum is $newSeq");
-		 my $dependant = $task->{dependants};
-		 #$eh->warn("Dependant is $dependant");
-		 #Only increment the dependant if it's greater than or equal to the insertAt point
-		 if($dependant >= $insertAt){
-		    $dependant++;
-		 }
-		 #$eh->warn("New dependant is $dependant");
-		 $db->write("update PM_task set sequenceNumber=?, dependants=? where taskId=?",[$newSeq,$dependant,$task->{taskId}]);
-	  }
-	  $self->reorderCollateral("PM_task","taskId","projectId",$projectId);
-   }
-  
-   $self->updateProject($projectId);
-   $self->_clobberImproperDependants($projectId);
-   $self->_updateDependantDates($projectId);
-   
-   return $self->www_viewProject($projectId,$taskId);
-}
-
-#-------------------------------------------------------------------
-sub _updateDependantDates {
-	my $self = shift;
-	my $db = $self->session->db;
-	my $dt = $self->session->datetime;
-	my ($projectId) = @_;
-	my $project = $self->getCollateral('PM_project', 'projectId', $projectId);
-
-	my $tasks = $db->buildArrayRefOfHashRefs("select * from PM_task where projectId=?",[$projectId]);
-   
-	my $taskHash = {};
-	foreach my $task (@{$tasks}) {
-		my $seqNum = $task->{sequenceNumber};
-
-		# Calculate initial duration in days and duration floor for this task.
-		my $totalDurationInDays = $task->{duration} + $task->{lagTime};
-		$totalDurationInDays = $totalDurationInDays / $project->{hoursPerDay} if( $project->{durationUnits} eq "hours" );
-		my $totalDurationFloor = floor($totalDurationInDays);
-
-		# If we have a predecessor, check against it.
-		if (my $predecessor = $task->{dependants}) {
-			my $pred = $taskHash->{$predecessor};
-			unless ($pred) {
-				# Predecessor has to have a lower sequence number, right?  Right?
-				$self->session->errorHandler->error("Internal: predecessor '$predecessor' of task with seqNum '$seqNum' not in task hash?!");
-				next;
-			}
-
-			# Need to fix the dates iff we intersect our predecessor.
-			if ($task->{startDate} <= $pred->{endDate}) {
-				# Update for fractional day part.
-				# Buggo: why?
-				$totalDurationInDays += $pred->{dayPart};
-				$totalDurationFloor = floor($totalDurationInDays);
-	           
-				# Set start and end dates of the current task.
-				$task->{startDate} = $pred->{endDate};
-				$task->{endDate} = $dt->addToDateTime($task->{startDate}, 0, 0, $totalDurationFloor);
-				# Update.
-				$self->setCollateral("PM_task","taskId",$task,1,0,"projectId",$projectId);
-			}
-		}
-	  
-		# Extract fractional day part.
-		my $totalDurationInDaysFrac = $totalDurationInDays - floor($totalDurationInDays);
-
-		$taskHash->{$seqNum} = { 
-					'startDate'=>$task->{startDate}, 
-					'endDate'=>$task->{endDate}, 
-					'duration'=>$task->{duration}, 
-					'dayPart'=>$totalDurationInDaysFrac
-				       };
-	}
-}
-
-#-------------------------------------------------------------------
-sub _clobberImproperDependants {
-	my $self = shift;
-	my $projectId = shift;
-	my @nondependTaskIds = $self->session->db->buildArray("SELECT sequenceNumber FROM PM_task WHERE projectId = ? AND taskType <> 'timed'", [$projectId]);
-	return unless @nondependTaskIds;
-	$self->session->db->write("UPDATE PM_task SET dependants = NULL WHERE projectId = ? AND dependants IN (".join(', ', ('?') x @nondependTaskIds).")", [$projectId, @nondependTaskIds]);
-}
-
-#-------------------------------------------------------------------
-sub www_saveExistingTasks {
-   my $self = shift;
-   my $var = {};
-   #Set Method Helpers
-   my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
-   my $config = $session->config;
-   
-   my $projectId = $form->get("projectId");
-   my $project = $db->quickHashRef("select * from PM_project where projectId=".$db->quote($projectId));
-   
-   #Check Privileges
-   return $privilege->insufficient unless $self->_userCanManageProject($user, $projectId);
-   
-   my $tasks = $db->buildArrayRefOfHashRefs("select * from PM_task where projectId=".$db->quote($projectId)." order by sequenceNumber asc");
-  
-   #Save each row
-   foreach my $task (@{$tasks}) {
-	   my $taskType = $task->{taskType};
-	   my $isUntimed = ($taskType ne 'timed');
-	   my $props = {};
-	   my $taskId = $task->{taskId};
-	   $props->{taskId} = $taskId;
-	   $props->{projectId} = $projectId;
-	   $props->{startDate} = $form->process("start_$taskId","date");
-	   $props->{endDate} = $form->process("end_$taskId","date");
-	   $props->{dependants} = $form->process("dependants_$taskId","selectBox"); 
-	   unless ($isUntimed) {
-		   $props->{duration} = $form->process("duration_$taskId","float");
-		   $props->{lagTime} = $form->process("lagTime_$taskId","float");
-	   }
-
-	   $props->{lastUpdateDate} = $dt->time();
-	   $props->{lastUpdatedBy} = $user->userId;
-
-	   $self->setCollateral("PM_task","taskId",$props,1,0,"projectId",$projectId);
-   }
-   
-   $self->updateProject($projectId);
-   $self->_updateDependantDates($projectId);
-   return $self->www_drawGanttChart();
-}
-
-#-------------------------------------------------------------------
-sub www_viewProject {
-	my $self = shift;
-	my $var = {};
-	#Set Method Helpers
-	my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
-	my $config = $session->config;
-	my $style = $session->style;
-	my $eh = $session->errorHandler;
-	my $projectId = $_[0] || $form->get("projectId");
-		
-	#Check Privileges
-	return $privilege->insufficient unless $self->_userCanObserveProject($user, $projectId);
-	
-	my $extras = $config->get("extrasURL");
-	my $assetExtras = $config->get("extrasURL")."/wobject/ProjectManager";
-	
-	$var->{'extras'} = $assetExtras;
-	$var->{'extras.base'} = $extras;
-	
-	#Set Some Style stuff	
-	$style->setLink($assetExtras."/subModal.css",{rel=>"stylesheet",type=>"text/css"});
-	$style->setLink($assetExtras."/taskEdit.css",{rel=>"stylesheet",type=>"text/css"});
-	$style->setLink($extras."/calendar/calendar-win2k-1.css",{rel=>"stylesheet",type=>"text/css"});
-	$style->setLink($assetExtras."/cMenu.css",{rel=>"stylesheet",type=>"text/css"});
-	
-	$style->setScript($assetExtras."/cMenu.js",{ type=>"text/javascript" });
-	$style->setScript($extras."/js/at/AjaxRequest.js",{ type=>"text/javascript" });
-	$style->setScript($extras."/js/modal/modal.js",{ type=>"text/javascript" });
-	$style->setScript($extras."/calendar/calendar.js",{ type=>"text/javascript" });
-	$style->setScript($extras."/contextMenu/contextMenu.js",{ type=>"text/javascript" });
-	$style->setScript($extras."/calendar/lang/calendar-en.js",{ type=>"text/javascript" });
-	$style->setScript($extras."/calendar/calendar-setup.js",{ type=>"text/javascript" });
-	$style->setScript($assetExtras."/projectDisplay.js",{ type=>"text/javascript" });
-	$style->setScript($assetExtras."/taskEdit.js",{ type=>"text/javascript" });
-	
-	#Get Project Data
-	my $project = $db->quickHashRef("select * from PM_project where projectId=".$db->quote($projectId));
-	my $canEditTasks = $self->_userCanManageProject($user, $projectId);
-	my $dunits = $self->_getDurationUnitHashAbbrev->{$project->{durationUnits}};
-	
-	#Set some JavaScript stuff
-	$var->{'project.durationUnits'} = $dunits;
-	$var->{'project.hoursPerDay'} = $project->{hoursPerDay} || "0";
-	
-	#Get Tasks
-	my $data = $db->buildArrayRefOfHashRefs("select * from PM_task where projectId=".$db->quote($projectId)." order by sequenceNumber asc");
-	
-	$var->{'task.name.label'} = $i18n->get("task name label");
-	$var->{'task.duration.label'} = $i18n->get("task duration label");
-	$var->{'task.start.label'} = $i18n->get("task start label");
-	$var->{'task.end.label'} = $i18n->get("task end label");
-	$var->{'task.dependants.label'} = $i18n->get("task dependant label");
-	
-	# JavaScript Alert Errors for Tasks
-	$var->{'form.name.error'} = $i18n->get("task name error");
-	$var->{'form.start.error'} = $i18n->get("task start error");
-	$var->{'form.end.error'} = $i18n->get("task end error");
-	$var->{'form.greaterthan.error'} = $i18n->get("task greaterthan error");
-	$var->{'form.previousPredecessor.error'} = $i18n->get("task previousPredecessor error");
-	$var->{'form.samePredecessor.error'} = $i18n->get("task samePredecessor error");
-	$var->{'form.noPredecessor.error'} = $i18n->get("task noPredecessor error");
-	$var->{'form.invalidMove.error'} = $i18n->get("task invalidMove error");
-	$var->{'form.untimedPredecessor.error'} = $i18n->get("task untimedPredecessor error");
-	
-	my @taskList = ();
-	my $count = 0;
-	foreach my $row (@{$data}) {
-	   my $hash = {};
-	   my $seq = $row->{sequenceNumber};
-	   my $id = $row->{taskId};
-	   my $taskType = $row->{taskType};
-	   my $isUntimed = ($taskType ne 'timed');
-	   my $startDate = $dt->epochToSet($row->{startDate});
-	   my $endDate = $dt->epochToSet($row->{endDate});
-	   my $duration = $row->{duration};
-	   my $lagTime = $row->{lagTime};
-	   
-	   $hash->{'task.number'} = $seq;
-	   $hash->{'task.row.id'} = $id;
-	   $hash->{'task.name'} = $row->{taskName};
-	   	  
-	   if($canEditTasks) {
-		   my $suffix = '_'.$id;
-
-		   $hash->{'task.start'} = WebGUI::Form::text($session,{
-                         -name=>'start'.$suffix,
-			 -value=>$startDate,
-			 -size=>"10",
-			 -maxlength=>"10",
-			 -extras=>qq<onfocus="doCalendar(this.id);" class="taskdate" onblur="startDateChanged(this.form, '$suffix', false);">
-                        });
-		  
-		  $hash->{'task.start'} .= WebGUI::Form::hidden($session,{
-			-name=>'orig_start'.$suffix,
-			-value=>$startDate,
-			});
-
-		  $hash->{'task.dependants'} = WebGUI::Form::integer($session,{
-			-name=>'dependants'.$suffix,
-			-value=>$row->{dependants} || "",
-			-defaultValue=>"", 
-			-extras=>qq|class="taskdependant" onchange="predecessorChanged(this.form, '$suffix', false);"|
-			});
-		  $hash->{'task.dependants'} .= WebGUI::Form::hidden($session,{
-			-name=>'orig_dependants'.$suffix,
-			-value=>$row->{dependants},
-			});
-
-		  $hash->{'task.end'} = WebGUI::Form::text($session,{
-		                                               -name=>'end'.$suffix,
-								     -value=>$endDate,
-								     -size=>"10",
-								     -maxlength=>"10",
-								     -extras=>qq|class="taskdate" onfocus="doCalendar(this.id);" onblur="endDateChanged(this.form, '$suffix', false);"|
-		                                            });
-		  $hash->{'task.end'} .= WebGUI::Form::hidden($session,{
-			-name=>'orig_end'.$suffix,
-			-value=>$endDate,
-			});
-
-		  # Don't display duration for untimed tasks.
-		  if ($isUntimed) {
-			$hash->{'task.duration'} = $row->{duration};
-			 $hash->{'task.duration'} .= WebGUI::Form::hidden($session,{
-				-name=>'duration'.$suffix,
-				-value=>$duration,
-				});
-		  } else {
-			  $hash->{'task.duration'} = WebGUI::Form::float($session,{
-				-name=>'duration'.$suffix,
-				-value=>$duration, 
-				-extras=>qq|class="taskduration" onchange="durationChanged(this.form, '$suffix', false);" |
-				});
-			 
-	      }
-	      $hash->{'task.lagTime'} = WebGUI::Form::hidden($session,{
-								       -name => 'lagTime'.$suffix,
-								       -value => $lagTime,
-								      });
-		   $hash->{'task.taskType'} = WebGUI::Form::hidden($session, {
-									      -name => 'taskType'.$suffix,
-									      -value => $taskType,
-									      });
-		   $hash->{'task.seqNum'} = WebGUI::Form::hidden($session, {
-									    -name => 'seqNum'.$suffix,
-									    -value => $seq
-									   });
-	   } else {
-	      $hash->{'task.duration'} = $duration;
-	      $hash->{'task.start'} = $startDate;
-	      $hash->{'task.end'} = $endDate;
-	      $hash->{'task.dependants'} = $row->{dependants} || "&nbsp;";
-	   }
-	   $hash->{'task.duration.units'} = $dunits;
-	   if($canEditTasks) {
-	      $hash->{'task.edit.url'} = $self->getUrl("func=editTask;projectId=$projectId;taskId=".$row->{taskId});
-		  $hash->{'task.edit.label'} = $i18n->get("edit task label");
-		  my $num = $row->{sequenceNumber};
-		  $hash->{'task.insertAbove.url'} = $self->getUrl("func=editTask;projectId=$projectId;taskId=new;insertAt=$num");
-		  $hash->{'task.insertAbove.label'} = $i18n->echo("Insert Task Above");
-		  $hash->{'task.insertBelow.url'} = $self->getUrl("func=editTask;projectId=$projectId;taskId=new;insertAt=".($num+1));
-		  $hash->{'task.insertBelow.label'} = $i18n->echo("Insert Task Below");
-		  $hash->{'task.delete.url'} = $self->getUrl("func=deleteTask;taskId=".$row->{taskId});
-		  $hash->{'task.delete.label'} = $i18n->echo("Delete Task");
-	   }
-	   push(@taskList, $hash);
-	}
-	$var->{'task.loop'} = \@taskList;
-	
-	#Set some javascript stuff;
-	my $taskLength = scalar(@taskList);
-	$var->{'project.task.length'} = $taskLength;
-	
-	if($canEditTasks) {
-	   #Build Form for submitting on the fly updates
-	   $var->{'form.header'} = WebGUI::Form::formHeader($session,{
-			action=>$self->getUrl,
-			extras=>q|name="editAll"|
-			});
-       $var->{'form.header'} .= WebGUI::Form::hidden($session, {
-			-name=>"func",
-			-value=>"saveExistingTasks"
-			});
-       $var->{'form.header'} .= WebGUI::Form::hidden($session, {
-			-name=>"projectId",
-			-value=>$projectId
-			});												   
-		$var->{'form.footer'} = WebGUI::Form::formFooter($session);
-		$var->{'project.canEdit'} = "true";
-		$var->{'task.resources.label'} = $i18n->get("task resources label");
-		$var->{'task.resources.url'} = $self->getUrl("func=manageResources");
-	}
-
-	if($canEditTasks) {
-		$var->{'task.add.label'} = $i18n->get("add task label");
-		$var->{'task.add.url'} = $self->getUrl("func=editTask;projectId=$projectId;taskId=new");
-		$var->{'task.canAdd'} = "true";
-	}
-
-
-	# Rowspan of gantt chart is 4 plus number of tasks
-	$var->{'project.gantt.rowspan'} = 4 + $taskLength;
-
-	$var->{'project.ganttChart'} = $self->www_drawGanttChart($projectId, $data, $var);
-
-	$var->{'task.back.label'} = $i18n->get("task back label");
-	$var->{'task.back.url'} = $self->getUrl;
-
-	return $style->process($self->processTemplate($var,$self->getValue("projectDisplayTemplateId")),$self->getValue("styleTemplateId"));
-}
-
-#-------------------------------------------------------------------
-sub _doGanttTaskResourceDisplay {
-	my $self = shift;
-	my $hash = shift;
-	my $task = shift;
-	my @resources = $self->_resourceListOfTask($task->{taskId});
-	my @resourceNames = ();
-
-	foreach my $resource (@resources) {
-		my ($resourceKind, $resourceId) = @$resource{qw{resourceKind resourceId}};
-		if ($resourceKind eq 'user') {
-			my $u = WebGUI::User->new($self->session, $resourceId);
-			my $name = $u->username;
-			my $firstName = $u->profileField('firstName');
-			my $lastName = $u->profileField('lastName');
-			$name = "$firstName $lastName"
-			    if (length $firstName and length $lastName);
-			push @resourceNames, $name;
-		} elsif ($resourceKind eq 'group') {
-			my $g = WebGUI::Group->new($self->session, $resourceId);
-			push @resourceNames, $g->name;
-		} else {
-			# Whee.
-			push @resourceNames, "???"
-		}
-	}
-
-	if (@resources) {
-		$hash->{'task.hasResource'} = "true";
-		$hash->{'task.resource.name'} =
-		    join(', ', map { WebGUI::HTML::format($_, 'text') } @resourceNames);
-	}
 }
 
 #-------------------------------------------------------------------
@@ -1691,6 +990,818 @@ sub www_drawGanttChart {
 	return $self->processTemplate($var,$self->getValue("ganttChartTemplateId"));
 }
 
+#-------------------------------------------------------------------
+sub www_editProject {
+   my $self = shift;
+   #Set Method Helpers
+   my ($session,$privilege,$form,$db,$datetime,$i18n,$user) = $self->setSessionVars;
+
+   #Check Privileges
+   return $privilege->insufficient unless $self->_userCanManageProjectList($user);
+   
+   #Set Local Vars
+   my $projectId = $form->get("projectId"); 
+   my $project = $db->quickHashRef("select * from PM_project where projectId=?",[$projectId]);
+   my $addEditText = ($projectId eq "new")?$i18n->get("create project"):$i18n->get("edit project");
+   
+   #Build Form
+   my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl, -extras=>q|onsubmit="return checkform(this);"|);
+   $f->hidden( 
+			    -name=>"func",
+				-value=>"editProjectSave" 
+   );
+   $f->hidden( 
+               -name=>"projectId", 
+               -value=>$projectId 
+   );
+   $f->readOnly(
+		-label=>$i18n->get("project id"),
+		-hoverHelp => $i18n->get('project name hoverhelp'),
+		-value=>$projectId
+   );
+   $f->text(
+		   -name  => "name",
+		   -value => $form->get("name") || $project->{name},
+		   -hoverHelp => $i18n->get('project name hoverhelp'),
+		   -label => $i18n->get('project name label')
+   );
+   $f->HTMLArea(
+		-name  => "description",
+		-value => $form->get("description") || $project->{description},
+		-hoverHelp => $i18n->get('project description hoverhelp'),
+		-label => $i18n->get('project description label')
+   );
+   $f->group(
+         -name=> "projectManager",
+		 -value=> $form->get("projectManager") || $project->{projectManager} || $self->get("groupToAdd"),
+		 -hoverHelp=> $i18n->get('project manager hoverhelp'),
+		 -label => $i18n->get('project manager label')
+   );
+   $f->group(
+         -name=> "projectObserver",
+		 -value=> $form->get("projectObserver") || $project->{projectObserver} || '7',
+		 -hoverHelp=> $i18n->get('project observer hoverhelp'),
+		 -label => $i18n->get('project observer label')
+   );
+   
+   my $dunitValue = $form->get("durationUnits") || $project->{durationUnits} || "hours";
+   $f->selectBox(
+          -name=>"durationUnits",
+		  -value=> $dunitValue,
+		  -options=>$self->_getDurationUnitHash,
+		  -hoverHelp => $i18n->get('duration units hoverhelp'),
+		  -label => $i18n->get('duration units label'),
+		  -extras=> q|onchange="if(this.value == 'hours'){ document.getElementById('hoursper').style.display='' } else { document.getElementById('hoursper').style.display='none' }"|
+   );
+   
+  
+   
+   my $hpdLabel = $i18n->get('hours per day label');
+   my $hpdHoverHelp = $i18n->get('hours per day hoverhelp');
+   $hpdHoverHelp =~ s/'/\\'/g;
+   my $hpdValue = $form->get("hoursPerDay") || $project->{hoursPerDay} || "8.0";
+   my $hpdStyle = ($dunitValue eq "days"?"display:none":"");
+   
+   my $html = qq|
+   <tr id="hoursper" style="$hpdStyle">
+      <td class="formDescription"  onmouseover="return escape('$hpdHoverHelp')" valign="top" style="width: 180px;">
+	     <label for="hoursPerDay_formId">$hpdLabel</label>
+	  </td>
+	  <td valign="top" class="tableData"  style="width: *;">
+	     <input id="hoursPerDay_formId" type="text" name="hoursPerDay" value="$hpdValue" size="11" maxlength="14" />
+	  </td>
+   </tr>|;
+   $f->raw($html);		
+   
+   $f->float (
+           -name=>"targetBudget",
+		   -value=> $form->get("targetBudget") || $project->{targetBudget} || "0.00",
+		   -hoverHelp => $i18n->get('target budget hoverhelp'),
+		   -label=> $i18n->get('target budget label')
+   );
+   $f->submit( 
+           -extras=>"name='subbutton'",
+		   -value=>$addEditText
+   );
+   
+   my $jscript = qq|
+      <script language="JavaScript">
+	     function checkform(form) {		 
+		    if(form.name.value == ""){ 
+		       alert("You must enter a project name");
+			   form.subbutton.value='$addEditText';
+			   return false;
+	        }
+		    return true;
+	     }
+	  </script>
+   |;
+   
+   my $errors = $self->processErrors($_[0]);
+   
+   my $output = $jscript."\n".$errors.$f->print;
+   return $self->getAdminConsole->render($output,$addEditText);
+}
+
+#-------------------------------------------------------------------
+sub www_editProjectSave {
+	my $self = shift;
+    #Set Method Helpers
+    my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
+    my $eh = $session->errorHandler;
+	
+    #Check Privileges
+    return $privilege->insufficient unless $self->_userCanManageProjectList($user);
+    
+	my $now = $dt->time();
+	my $uid = $user->userId;
+	my $projectId = $form->process("projectId","hidden");
+	my $origProjId = $projectId;
+	
+	#Set Properties
+	my $props = {};
+	$props->{projectId} = $projectId;
+	$props->{name} = $form->process("name","text");
+	$props->{description} = $form->process("description","HTMLArea");
+	$props->{projectManager} = $form->process("projectManager","group");
+	$props->{projectObserver} = $form->process("projectObserver","group");
+	$props->{durationUnits} = $form->process("durationUnits","selectBox");
+	$props->{hoursPerDay} = $form->process("hoursPerDay","float") || 8.0;
+	$props->{targetBudget} = $form->process("targetBudget","float");
+    if($projectId eq "new") {
+	   $props->{creationDate} = $now;
+	   $props->{createdBy} = $uid;
+	}
+    $props->{lastUpdateDate} = $now;
+    $props->{lastUpdatedBy} = $uid;
+	#Process Errors	
+	my @errors = ();
+	push(@errors,"You must enter a project name") unless ($props->{name});
+    if(scalar(@errors) > 0) {
+       return $self->www_editProject(\@errors);
+    }
+	
+	#Save the extended project data
+	my $projectId = $self->setCollateral("PM_project","projectId",$props,0,1);
+	
+	if($origProjId eq "new") {
+	   #Create Project Start Milestone Task for new projects
+	   $props = {};
+	   $props->{taskId} = "new";
+	   $props->{projectId} = $projectId;
+	   $props->{taskName} = $i18n->get("project start task label");
+	   $props->{duration} = 0;
+	   $props->{lagTime} = 0;
+	   $props->{startDate} = $dt->time();
+	   $props->{endDate} = $dt->time();
+	   $props->{taskType} = 'milestone';
+       $props->{creationDate} = $now;
+	   $props->{createdBy} = $uid;
+       $props->{lastUpdateDate} = $now;
+       $props->{lastUpdatedBy} = $uid;
+	   
+	   #Save the extended task data
+	   my $taskId = $self->setCollateral("PM_task","taskId",$props,1,0,"projectId",$projectId);
+    }
+	
+	return $self->www_viewProject($projectId);
+}
+
+
+#-------------------------------------------------------------------
+sub www_editTask {
+   my $self = shift;
+   my $var = {};
+   #Set Method Helpers
+   my $session   = $self->session;
+   my $privilege = $session->privilege;
+   my $form      = $session->form;
+   my $db        = $session->db;
+   my $dt        = $session->datetime;
+   my $config    = $session->config;
+   my $i18n      = $self->i18n;
+   my $user      = $session->user;
+   
+   #Set variables from form data
+   my $projectId = $form->get("projectId");
+   my $taskId    = $form->get("taskId") || "new";
+  
+   #Get the project data
+   my $project   = $self->getCollateral('PM_project', 'projectId', $projectId);
+   
+   #Get the task data
+   my $task      = $self->getCollateral('PM_task', 'taskId', $taskId);
+   
+   #Check Privileges
+   return $privilege->insufficient unless $self->_userCanManageProject($user, $projectId);
+   
+   my $taskType = ($task->{taskType} || 'timed');
+   my $seq = $task->{sequenceNumber};
+   my $disabledIfUntimed = ($taskType eq 'timed')? "" : " disabled";
+   my $disabledIfMilestone = ($taskType ne 'milestone')? "" : " disabled";
+   
+   #Build the form header
+   $var->{'form.header'} = WebGUI::Form::formHeader($session,{
+				action=>$self->getUrl,
+				extras=>q|name="editTaskForm"|
+				});
+   $var->{'form.header'} .= WebGUI::Form::hidden($session, {
+				-name=>"func",
+				-value=>"editTaskSave"
+				});
+   $var->{'form.header'} .= WebGUI::Form::hidden($session, {
+				-name=>"projectId",
+				-value=>$projectId
+				});
+   $var->{'form.header'} .= WebGUI::Form::hidden($session, {
+				-name=>"taskId",
+				-value=>$taskId
+				});
+   $var->{'form.header'} .= WebGUI::Form::hidden($session, {
+				-name=>"insertAt",
+				-value=>$form->get("insertAt")
+				});
+
+   my ($startEpoch, $endEpoch) = $db->quickArray('SELECT startDate, startDate FROM PM_task WHERE projectId = ? ORDER BY sequenceNumber LIMIT 1', [$projectId]);
+   my $dependant = $task->{dependants};
+   #my $duration = $task->{duration} || (($taskType eq 'timed')? (($project->{durationUnits} eq 'hours')? $project->{hoursPerDay} : 1) : 0);
+   my $duration = $task->{duration} || 0;   
+
+   $startEpoch = $endEpoch = time unless defined $startEpoch and defined $endEpoch;
+   $startEpoch = $task->{startDate} if $task->{startDate};
+   $endEpoch = $task->{endDate} if $task->{endDate};
+## Magic number = bad
+   $endEpoch += 86400 if $taskType eq 'timed' and !$task->{duration} and !$task->{endDate};
+   my ($start, $end) = ($dt->epochToSet($startEpoch), $dt->epochToSet($endEpoch));
+
+   # Set some hidden variables to make it easy to reset data in javascript
+   $var->{'form.header'} .= WebGUI::Form::hidden($session, {
+				-name=>"orig_duration",
+				-value=>$duration
+				});
+   $var->{'form.header'} .= WebGUI::Form::hidden($session, {
+				-name=>"orig_start",
+				-value=>$start
+				});
+   $var->{'form.header'} .= WebGUI::Form::hidden($session, {
+				-name=>"orig_end",
+				-value=>$end
+				}); 
+   $var->{'form.header'} .= WebGUI::Form::hidden($session, {
+				-name=>"orig_dependant",
+				-value=>$dependant
+				});
+   $var->{'form.name'} = WebGUI::Form::text($session,{
+				-name=>"name",
+				-value=>$task->{taskName}, 
+				-extras=>q|style="width:95%;"|
+				});
+
+   $var->{'form.seqNum'} = WebGUI::Form::hidden($session, {
+							   -name => "seqNum",
+							   -value => $seq,
+							  });
+   
+   my $durationEvents = qq|onchange="durationChanged(this.form, '', true)"  onblur="if (this.value == 0) durationChanged(this.form, '', true)"|;
+   my $startDateEvents = qq|onfocus="doCalendar(this.id)" onblur="startDateChanged(this.form, '', true)"|;
+   my $endDateEvents = qq|onfocus="doCalendar(this.id)" onblur="endDateChanged(this.form, '', true)"|;
+
+   $var->{'form.duration'} = WebGUI::Form::float($session,{
+				-name => "duration",
+				-value => $duration,
+				-extras => qq|style="width:70%;" $durationEvents $disabledIfMilestone|
+				});
+   $var->{'form.duration.units'} = $self->_getDurationUnitHashAbbrev->{$project->{durationUnits}};
+
+   $var->{'form.lagTime'} = WebGUI::Form::float($session,{
+                                -name => "lagTime",
+				-value => (($taskType eq 'timed')? $task->{lagTime} : 'N/A'),
+				-extras => qq|style="width:70%;" $durationEvents $disabledIfUntimed|
+							 });
+   $var->{'form.lagTime.units'} = $self->_getDurationUnitHashAbbrev->{$project->{durationUnits}};
+
+   $var->{'form.start'} = WebGUI::Form::text($session,{
+				-name=>"start",
+				-value=>$start,
+				-size=>"10",
+				-maxlength=>"10",
+				-extras=>qq|style="width:88%;" $startDateEvents|
+				});
+
+   $var->{'form.end'} = WebGUI::Form::text($session,{
+				-name=>"end",
+				-value=>$end,
+				-size=>"10",
+				-maxlength=>"10",
+				-extras=>qq|style="width:88%;" $endDateEvents $disabledIfUntimed|
+				});
+
+   $var->{'form.dependants'} = WebGUI::Form::integer($session,{
+				-name=>"dependants",
+				-value=>$dependant || "",
+				-defaultValue=>"",
+				-size=>4,
+				-maxlength=>10,
+				-extras=>qq|style="width:50%;" onchange="predecessorChanged(this.form, '', true)"|
+				});
+
+   my @resources = @{$self->_resourceListOfTask($taskId)};
+   my ($searchUserUrlHtml, $searchGroupUrlHtml) = map {
+	   my $kind = $_;
+	   my $exclude = $self->session->url->escape(join ';', map {$_->{resourceId}} grep {$_->{resourceKind} eq $kind} @resources);
+	   my $func = $kind.'SearchPopup';
+	   WebGUI::HTML::format($self->getUrl("func=$func;callback=taskEdit_queueAddResource;exclude=$exclude"), 'text');
+   } (qw/user group/);
+
+   $var->{'form.addUser.id'} = 'taskEdit_resourceList_addUser_a';
+   $var->{'form.addUser.link'} = $searchUserUrlHtml;
+   $var->{'form.addUser.text'} = $i18n->get('user add popup hover');
+   
+   $var->{'form.addGroup.id'} = 'taskEdit_resourceList_addGroup_a';
+   $var->{'form.addGroup.link'} = $searchGroupUrlHtml;
+   $var->{'form.addGroup.text'} = $i18n->get('group add popup hover');
+
+   $var->{'form.resourceDiv'} =
+       '<div id="taskEdit_resourceList_div">'.$self->_innerHtmlOfResources(@resources).'</div>';
+
+   my %taskTypeOptions;
+   tie %taskTypeOptions, 'Tie::IxHash';
+   foreach my $option (qw/timed progressive milestone/) {
+	   $taskTypeOptions{$option} = $i18n->get("taskType $option label");
+   }
+
+   $var->{'form.taskType'} = WebGUI::Form::radioList($session, {
+				-name=>'taskType',
+				-vertical=>0,
+				-options=>\%taskTypeOptions,
+			        -defaultValue=>$taskType,
+				-extras=>q|onclick="configureForTaskType(this.form)"|,
+				});
+   $var->{'form.percentComplete'} = WebGUI::Form::float($session, {
+				-name => "percentComplete",
+				-value => (($taskType eq 'timed')? $task->{percentComplete} : 'N/A'),
+				-extras => $disabledIfUntimed
+				});
+   $var->{'form.save'} = WebGUI::Form::submit($session, { 
+				-value=>"Save", 
+				-extras=>q|name="subbutton"| 
+				});
+   $var->{'form.footer'} = WebGUI::Form::formFooter($session);
+
+   $var->{'extras'} = $config->get("extrasURL");
+   $var->{'assetExtras'} = $config->get("extrasURL").'/wobject/ProjectManager';
+   
+   $var->{'task_name_label'}        = $i18n->get('task name label');
+   $var->{'task_start_label'}       = $i18n->get('task start label');
+   $var->{'task_end_label'}         = $i18n->get('task end label');
+   $var->{'task_duration_label'}    = $i18n->get('task duration label');
+   $var->{'task_lagTime_label'}     = $i18n->get('task lag time label');
+   $var->{'task_predecessor_label'} = $i18n->get('task predecessor label');
+   $var->{'task_complete_label'}    = $i18n->get('task complete label');
+   $var->{'task_resource_label'}    = $i18n->get('task resource label');
+   $var->{'task_save_label'}        = $i18n->get('task save label');
+
+   return $self->processTemplate($var,$self->getValue("editTaskTemplateId"));
+}
+
+#-------------------------------------------------------------------
+sub www_editTaskSave {
+   my $self = shift;
+   my $var = {};
+   #Set Method Helpers
+   my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
+   my $config = $session->config;
+   my $eh = $session->errorHandler;
+
+   my $projectId = $form->get("projectId");
+   my $project = $db->quickHashRef("select * from PM_project where projectId=".$db->quote($projectId));
+
+   #Check Privileges
+   return $privilege->insufficient unless $self->_userCanManageProject($user, $projectId);
+   
+   my $taskType = $form->process("taskType", "radioList");
+   my ($isMilestone, $isUntimed) = ($taskType eq 'milestone', $taskType ne 'timed');
+   my $isProgressive = ($taskType eq 'progressive');
+   
+   my $props = {};
+   $props->{taskId} = $form->process("taskId","hidden");
+   $props->{projectId} = $projectId;
+   $props->{taskName} = $form->process("name","text");
+   $props->{duration} = $isMilestone? 0 : $form->process("duration","text");
+   $props->{lagTime} = $isUntimed? 0 : $form->process("lagTime","text");
+   $props->{startDate} = $form->process("start","date");
+   $props->{endDate} = $isMilestone? $props->{startDate} :
+       $isProgressive? undef : $form->process("end","date");
+   $props->{dependants} = $form->process("dependants","selectBox") unless $isUntimed;
+   $props->{taskType} = $taskType;
+   my @resourceSpecs = $form->process("resources","hiddenList");
+   $props->{percentComplete} = $isUntimed? 0 : $form->process("percentComplete","float");
+
+   unless (defined $props->{endDate}) {
+	   my $totalDuration = $props->{duration} + $props->{lagTime};
+	   my $totalDurationDays = ($project->{durationUnits} eq 'days')? $totalDuration : ($totalDuration / $project->{hoursPerDay});
+	   $props->{endDate} = $props->{startDate} + $totalDurationDays*86400;
+   }
+   
+   my $now = $dt->time();
+   if($props->{taskId} eq "new") {
+	   $props->{creationDate} = $now;
+	   $props->{createdBy} = $user->userId;
+   }
+   $props->{lastUpdateDate} = $now;
+   $props->{lastUpdatedBy} = $user->userId;
+
+   # Save the extended task data
+   my $taskId = $self->setCollateral("PM_task","taskId",$props,1,0,"projectId",$projectId);
+   $self->deleteCollateral('PM_taskResource', 'taskId', $taskId);
+   foreach my $resourceSpec (@resourceSpecs) {
+	   my ($resourceKind, $resourceId) = split / /, $resourceSpec, 2;
+	   $self->setCollateral('PM_taskResource', 'taskResourceId', {taskId => $taskId, resourceKind => $resourceKind, resourceId => $resourceId}, 1, 0, 'taskId', $taskId);
+   }
+
+   #Reorder tasks if task is inserted
+   my $insertAt = $form->get("insertAt");
+   if($insertAt) {
+      #$eh->warn("Inserting at $insertAt");
+	  my $tasks = $db->buildArrayRefOfHashRefs("select * from PM_task where projectId=? order by sequenceNumber",[$projectId]);
+	  my $taskLen = scalar(@{$tasks});
+	  #$eh->warn("Task Length = $taskLen");
+	  foreach my $task (@{$tasks}) {
+	     my $seqNum = $task->{sequenceNumber};
+		 next unless ($seqNum >= $insertAt);
+		 #$eh->warn("Fixing task $seqNum");		 
+		 my $newSeq = $seqNum + 1;
+		 if($seqNum eq $taskLen) {
+		    $newSeq = $insertAt;
+		 }
+		 #$eh->warn("New seqNum is $newSeq");
+		 my $dependant = $task->{dependants};
+		 #$eh->warn("Dependant is $dependant");
+		 #Only increment the dependant if it's greater than or equal to the insertAt point
+		 if($dependant >= $insertAt){
+		    $dependant++;
+		 }
+		 #$eh->warn("New dependant is $dependant");
+		 $db->write("update PM_task set sequenceNumber=?, dependants=? where taskId=?",[$newSeq,$dependant,$task->{taskId}]);
+	  }
+	  $self->reorderCollateral("PM_task","taskId","projectId",$projectId);
+   }
+  
+   $self->updateProject($projectId);
+   $self->_clobberImproperDependants($projectId);
+   $self->_updateDependantDates($projectId);
+   
+   return $self->www_viewProject($projectId,$taskId);
+}
+
+#-------------------------------------------------------------------
+sub www_groupSearchPopup {
+	my $self = shift;
+	my %args = (func => 'groupSearchPopup',
+		    i18nprefix => 'group add popup',
+		    queryCallback => sub { $self->_groupSearchQuery(@_) },
+		   );
+	$self->_resourceSearchPopup(%args);
+}
+
+#-------------------------------------------------------------------
+sub www_innerHtmlOfResources {
+	my $self = shift;
+	my @resources = map {
+		my ($resourceKind, $resourceId) = split / /, $_, 2;
+		{ resourceKind => $resourceKind, resourceId => $resourceId }
+	} split /\;/, $self->session->form->param('resources');
+	return $self->_innerHtmlOfResources(@resources);
+}
+
+#-------------------------------------------------------------------
+sub www_saveExistingTasks {
+   my $self = shift;
+   my $var = {};
+   #Set Method Helpers
+   my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
+   my $config = $session->config;
+   
+   my $projectId = $form->get("projectId");
+   my $project = $db->quickHashRef("select * from PM_project where projectId=".$db->quote($projectId));
+   
+   #Check Privileges
+   return $privilege->insufficient unless $self->_userCanManageProject($user, $projectId);
+   
+   my $tasks = $db->buildArrayRefOfHashRefs("select * from PM_task where projectId=".$db->quote($projectId)." order by sequenceNumber asc");
+  
+   #Save each row
+   foreach my $task (@{$tasks}) {
+	   my $taskType = $task->{taskType};
+	   my $isUntimed = ($taskType ne 'timed');
+	   my $props = {};
+	   my $taskId = $task->{taskId};
+	   $props->{taskId} = $taskId;
+	   $props->{projectId} = $projectId;
+	   $props->{startDate} = $form->process("start_$taskId","date");
+	   $props->{endDate} = $form->process("end_$taskId","date");
+	   $props->{dependants} = $form->process("dependants_$taskId","selectBox"); 
+	   unless ($isUntimed) {
+		   $props->{duration} = $form->process("duration_$taskId","float");
+		   $props->{lagTime} = $form->process("lagTime_$taskId","float");
+	   }
+
+	   $props->{lastUpdateDate} = $dt->time();
+	   $props->{lastUpdatedBy} = $user->userId;
+
+	   $self->setCollateral("PM_task","taskId",$props,1,0,"projectId",$projectId);
+   }
+   
+   $self->updateProject($projectId);
+   $self->_updateDependantDates($projectId);
+   return $self->www_drawGanttChart();
+}
+
+#-------------------------------------------------------------------
+sub www_userSearchPopup {
+	my $self = shift;
+
+	my %args = (func => 'userSearchPopup',
+		    i18nprefix => 'user add popup',
+		    queryCallback => sub { $self->_userSearchQuery(@_) },
+		   );
+	$self->_resourceSearchPopup(%args);
+}
+
+#-------------------------------------------------------------------
+sub www_viewProject {
+	my $self      = shift;
+	my $var       = {};
+    
+	#Declare method variables
+	my $session     = $self->session;
+    my $privilege   = $session->privilege;
+    my $form        = $session->form;
+    my $db          = $session->db;
+    my $dt          = $session->datetime;
+    my $i18n        = $self->i18n;
+    my $user        = $session->user;
+    my $config      = $session->config;
+	my $style       = $session->style;
+	my $eh          = $session->errorHandler;
+	my $projectId   = shift || $form->get("projectId");
+		
+    #Check Privileges
+	return $privilege->insufficient unless $self->_userCanObserveProject($user, $projectId);
+	
+    #Set extras template variables
+    my $extras            = $config->get("extrasURL");
+	my $assetExtras       = $config->get("extrasURL")."/wobject/ProjectManager";	
+    $var->{'extras'     } = $assetExtras;
+	$var->{'extras.base'} = $extras;
+    
+	
+	#Set page styles
+	$style->setLink($assetExtras."/subModal.css", { 
+                        rel=>"stylesheet", 
+                        type=>"text/css", 
+                    }
+    );
+    $style->setLink($assetExtras."/taskEdit.css", {
+                        rel=>"stylesheet",
+                        type=>"text/css",
+                    }
+    );
+	$style->setLink($extras."/calendar/calendar-win2k-1.css",{
+                        rel=>"stylesheet",
+                        type=>"text/css",
+                    }
+    );
+	$style->setLink($assetExtras."/cMenu.css",{
+                        rel=>"stylesheet",
+                        type=>"text/css",
+                    }
+    );
+	
+    #Set page scripts
+	$style->setScript($assetExtras."/cMenu.js",{ 
+                          type=>"text/javascript",
+                      }
+    );
+	$style->setScript($extras."/js/at/AjaxRequest.js",{ 
+                          type=>"text/javascript" 
+                      }
+    );
+	$style->setScript($extras."/js/modal/modal.js",{ 
+                          type=>"text/javascript" 
+                      }
+    );
+	$style->setScript($extras."/calendar/calendar.js",{ 
+                          type=>"text/javascript" 
+                      }
+    );
+	$style->setScript($extras."/contextMenu/contextMenu.js",{ 
+                          type=>"text/javascript" 
+                      }
+    );
+	$style->setScript($extras."/calendar/lang/calendar-en.js",{ 
+                          type=>"text/javascript" 
+                      }
+    );
+	$style->setScript($extras."/calendar/calendar-setup.js",{ 
+                          type=>"text/javascript" 
+                      }
+    );
+	$style->setScript($assetExtras."/projectDisplay.js",{ 
+                          type=>"text/javascript" 
+                      }
+    );
+	$style->setScript($assetExtras."/taskEdit.js",{ 
+                          type=>"text/javascript" 
+                      }
+    );
+	
+	#Get Project Data
+    my $sql          = q|select * from PM_project where projectId=?|;   
+	my $project      = $db->quickHashRef($sql,[$projectId]);
+	
+    #Get User Privileges
+    my $canEditTasks = $self->_userCanManageProject($user, $projectId);
+	
+    #Set Duration Units
+    my $dunits = $self->_getDurationUnitHashAbbrev->{$project->{durationUnits}};
+	
+	#Set some variables for use by Java Script
+	$var->{'project.durationUnits'} = $dunits;
+	$var->{'project.hoursPerDay'  } = $project->{hoursPerDay} || "0";
+	
+	#Set Task Table Lables	
+	$var->{'task.name.label'      } = $i18n->get("task name label");
+	$var->{'task.duration.label'  } = $i18n->get("task duration label");
+	$var->{'task.start.label'     } = $i18n->get("task start label");
+	$var->{'task.end.label'       } = $i18n->get("task end label");
+	$var->{'task.dependants.label'} = $i18n->get("task dependant label");
+	
+	# JavaScript Alert Errors for Tasks
+	$var->{'form.name.error'               } = $i18n->get("task name error");
+	$var->{'form.start.error'              } = $i18n->get("task start error");
+	$var->{'form.end.error'                } = $i18n->get("task end error");
+	$var->{'form.greaterthan.error'        } = $i18n->get("task greaterthan error");
+	$var->{'form.previousPredecessor.error'} = $i18n->get("task previousPredecessor error");
+	$var->{'form.samePredecessor.error'    } = $i18n->get("task samePredecessor error");
+	$var->{'form.noPredecessor.error'      } = $i18n->get("task noPredecessor error");
+	$var->{'form.invalidMove.error'        } = $i18n->get("task invalidMove error");
+	$var->{'form.untimedPredecessor.error' } = $i18n->get("task untimedPredecessor error");
+	
+    #Get Tasks
+    $sql = "select * from PM_task where projectId=? order by sequenceNumber asc";
+    my $data = $db->buildArrayRefOfHashRefs($sql,[$projectId]);
+    
+    #Build Task Data
+	my @taskList = ();
+	my $count = 0;
+	foreach my $row (@{$data}) {
+	   my $hash      = {};
+	   my $seq       = $row->{sequenceNumber};
+	   my $id        = $row->{taskId};
+	   my $taskType  = $row->{taskType};
+	   my $isUntimed = ($taskType ne 'timed');
+	   my $startDate = $dt->epochToSet($row->{startDate});
+	   my $endDate   = $dt->epochToSet($row->{endDate});
+	   my $duration  = $row->{duration};
+	   my $lagTime   = $row->{lagTime};
+	   
+	   $hash->{'task.number'} = $seq;
+	   $hash->{'task.row.id'} = $id;
+	   $hash->{'task.name'  } = $row->{taskName};
+	   	  
+	   if($canEditTasks) {
+		   my $suffix = '_'.$id;
+
+		   $hash->{'task.start'} = WebGUI::Form::text($session,{
+                         -name=>'start'.$suffix,
+			 -value=>$startDate,
+			 -size=>"10",
+			 -maxlength=>"10",
+			 -extras=>qq<onfocus="doCalendar(this.id);" class="taskdate" onblur="startDateChanged(this.form, '$suffix', false);">
+                        });
+		  
+		  $hash->{'task.start'} .= WebGUI::Form::hidden($session,{
+			-name=>'orig_start'.$suffix,
+			-value=>$startDate,
+			});
+
+		  $hash->{'task.dependants'} = WebGUI::Form::integer($session,{
+			-name=>'dependants'.$suffix,
+			-value=>$row->{dependants} || "",
+			-defaultValue=>"", 
+			-extras=>qq|class="taskdependant" onchange="predecessorChanged(this.form, '$suffix', false);"|
+			});
+		  $hash->{'task.dependants'} .= WebGUI::Form::hidden($session,{
+			-name=>'orig_dependants'.$suffix,
+			-value=>$row->{dependants},
+			});
+
+		  $hash->{'task.end'} = WebGUI::Form::text($session,{
+		                                               -name=>'end'.$suffix,
+								     -value=>$endDate,
+								     -size=>"10",
+								     -maxlength=>"10",
+								     -extras=>qq|class="taskdate" onfocus="doCalendar(this.id);" onblur="endDateChanged(this.form, '$suffix', false);"|
+		                                            });
+		  $hash->{'task.end'} .= WebGUI::Form::hidden($session,{
+			-name=>'orig_end'.$suffix,
+			-value=>$endDate,
+			});
+
+		  # Don't display duration for untimed tasks.
+		  if ($isUntimed) {
+			$hash->{'task.duration'} = $row->{duration};
+			 $hash->{'task.duration'} .= WebGUI::Form::hidden($session,{
+				-name=>'duration'.$suffix,
+				-value=>$duration,
+				});
+		  } 
+          else {
+			  $hash->{'task.duration'} = WebGUI::Form::float($session,{
+				-name=>'duration'.$suffix,
+				-value=>$duration, 
+				-extras=>qq|class="taskduration" onchange="durationChanged(this.form, '$suffix', false);" |
+				});
+			 
+	      }
+	      $hash->{'task.lagTime'} = WebGUI::Form::hidden($session,{
+								       -name => 'lagTime'.$suffix,
+								       -value => $lagTime,
+								      });
+		   $hash->{'task.taskType'} = WebGUI::Form::hidden($session, {
+									      -name => 'taskType'.$suffix,
+									      -value => $taskType,
+									      });
+		   $hash->{'task.seqNum'} = WebGUI::Form::hidden($session, {
+									    -name => 'seqNum'.$suffix,
+									    -value => $seq
+									   });
+	   } 
+       else {
+	      $hash->{'task.duration'   } = $duration;
+	      $hash->{'task.start'      } = $startDate;
+	      $hash->{'task.end'        } = $endDate;
+	      $hash->{'task.dependants' } = $row->{dependants} || "&nbsp;";
+	   }
+	   $hash->{'task.duration.units'} = $dunits;
+	   if($canEditTasks) {
+	      my $num                           = $row->{sequenceNumber};
+          $hash->{'task.edit.url'         } = $self->getUrl("func=editTask;projectId=$projectId;taskId=".$row->{taskId});
+		  $hash->{'task.edit.label'       } = $i18n->get("edit task label");
+		  $hash->{'task.insertAbove.url'  } = $self->getUrl("func=editTask;projectId=$projectId;taskId=new;insertAt=$num");
+		  $hash->{'task.insertAbove.label'} = $i18n->echo("Insert Task Above");
+		  $hash->{'task.insertBelow.url'  } = $self->getUrl("func=editTask;projectId=$projectId;taskId=new;insertAt=".($num+1));
+		  $hash->{'task.insertBelow.label'} = $i18n->echo("Insert Task Below");
+		  $hash->{'task.delete.url'       } = $self->getUrl("func=deleteTask;taskId=".$row->{taskId});
+		  $hash->{'task.delete.label'     } = $i18n->echo("Delete Task");
+	   }
+	   push(@taskList, $hash);
+	}
+	$var->{'task.loop'} = \@taskList;
+	
+	#Set some javascript stuff;
+	my $taskLength = scalar(@taskList);
+	$var->{'project.task.length'} = $taskLength;
+	
+	if($canEditTasks) {
+	   #Build Form for submitting on the fly updates
+	    $var->{'form.header'} = WebGUI::Form::formHeader($session,{
+			action=>$self->getUrl,
+			extras=>q|name="editAll"|
+			});
+        $var->{'form.header'} .= WebGUI::Form::hidden($session, {
+			-name=>"func",
+			-value=>"saveExistingTasks"
+			});
+        $var->{'form.header'} .= WebGUI::Form::hidden($session, {
+			-name=>"projectId",
+			-value=>$projectId
+			});												   
+	    
+        $var->{'form.footer'         } = WebGUI::Form::formFooter($session);
+	    $var->{'project.canEdit'     } = "true";
+	    $var->{'task.resources.label'} = $i18n->get("task resources label");
+	    $var->{'task.resources.url'  } = $self->getUrl("func=manageResources");
+	}
+
+	if($canEditTasks) {
+		$var->{'task.add.label'      } = $i18n->get("add task label");
+		$var->{'task.add.url'        } = $self->getUrl("func=editTask;projectId=$projectId;taskId=new");
+		$var->{'task.canAdd'         } = "true";
+	}
+
+
+	# Rowspan of gantt chart is 4 plus number of tasks
+	$var->{'project.gantt.rowspan'} = 4 + $taskLength;
+
+	$var->{'project.ganttChart'} = $self->www_drawGanttChart($projectId, $data, $var);
+
+	$var->{'task.back.label'} = $i18n->get("task back label");
+	$var->{'task.back.url'} = $self->getUrl;
+
+	return $style->process($self->processTemplate($var,$self->getValue("projectDisplayTemplateId")),$self->getValue("styleTemplateId"));
+}
 
 
 1;
