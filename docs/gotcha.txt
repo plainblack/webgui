@@ -81,10 +81,6 @@ save you many hours of grief.
 
 7.2.0
 --------------------------------------------------------------------
- * IMPORTANT:  You must upgrade to 7.1.3 before upgrading to 7.2.0 or
-   higher.  Upgrading from a version prior to 7.1.3 directly to a
-   7.2.x or higher version will cause your upgrade to fail.
-
  * NOTE: if you tried to upgrade to 7.2.0 and it failed during the
    addition of RSS From Parent capability, there have been bugs fixed
    in that section of the relevant upgrade script in 7.2.1.

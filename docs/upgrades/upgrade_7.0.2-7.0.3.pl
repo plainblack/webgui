@@ -51,7 +51,7 @@ sub deleteTemplate {
 	print "\tDeleting a template that was accidentally added.\n" unless ($quiet);
 	my $template = WebGUI::Asset->newByDynamicClass($session, "wCIc38CvNHUK7aY92Ww4SQ");
 	if (defined $template) {
-		$template->purge;
+		$template->purge({skipExported=>1});
 	}
 }
 

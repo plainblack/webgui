@@ -269,8 +269,8 @@ foreach my $filename (keys %config) {
 	mkdir($backupTo);
 	while ($upgrade{$config{$filename}{version}}{sql} ne "" || $upgrade{$config{$filename}{version}}{pl} ne "") {
 		my $upgrade = $upgrade{$config{$filename}{version}}{from};
+		print "\n".$config{$filename}{db}." ".$upgrade{$upgrade}{from}."-".$upgrade{$upgrade}{to}."\n" unless ($quiet);
 		unless ($skipBackup) {
-			print "\n".$config{$filename}{db}." ".$upgrade{$upgrade}{from}."-".$upgrade{$upgrade}{to}."\n" unless ($quiet);
 			print "\tBacking up $config{$filename}{db} ($upgrade{$upgrade}{from})..." unless ($quiet);
 			my $cmd = qq!$dumpcmd -u"$config{$filename}{dbuser}" -p"$config{$filename}{dbpass}"!;
 			$cmd .= " --host=".$config{$filename}{host} if ($config{$filename}{host});

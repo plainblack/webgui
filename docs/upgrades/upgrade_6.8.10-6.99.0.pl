@@ -98,7 +98,7 @@ sub updateArticle {
 				}
 				foreach my $child (@{$children}) {
 					$child->getStorageLocation->copy($storage);
-					$child->purge;
+					$child->purge({skipExported=>1});
 				}
 			}
 			if ($asset->get("convertCarriageReturns")) {
@@ -264,7 +264,7 @@ sub convertMessageLogToInbox {
 	while (my ($id) = $rs->array) {
 		my $asset = WebGUI::Asset->new($session, $id, "WebGUI::Asset::Template");
 		if (defined $asset) {
-			$asset->purge;
+			$asset->purge({skipExported=>1});
 		}
 	}
 }
@@ -409,7 +409,7 @@ sub addWorkflow {
 	while (my ($id) = $rs->array) {
 		my $asset = WebGUI::Asset->newByDynamicClass($session, $id);
 		if (defined $asset && $asset->get("status") eq "denied") {
-			$asset->purge;
+			$asset->purge({skipExported=>1});
 		}
 	}
 	$session->db->write("update assetData set status='approved' where status='denied'");
@@ -621,7 +621,7 @@ sub updateTemplates {
 	$session->db->write("alter table template add column headBlock text");
 	my $template = WebGUI::Asset->new($session, "PBtmpl0000000000000003", "WebGUI::Asset::Template");
 	if (defined $template) {
-		$template->purge;
+		$template->purge({skipExported=>1});
 	}
 	opendir(DIR,"templates-6.99.0");
 	my @files = readdir(DIR);
@@ -1035,7 +1035,6 @@ sub removeFiles {
 	unlink '../../lib/WebGUI/ErrorHandler.pm';
 	unlink '../../lib/WebGUI/HTTP.pm';
 	unlink '../../lib/WebGUI/Privilege.pm';
-	unlink '../../lib/WebGUI/DateTime.pm';
 	unlink '../../lib/WebGUI/FormProcessor.pm';
 	unlink '../../lib/WebGUI/URL.pm';
 	unlink '../../lib/WebGUI/Id.pm';

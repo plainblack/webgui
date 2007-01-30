@@ -88,16 +88,27 @@ sub getAssetsInTrash {
 
 #-------------------------------------------------------------------
 
-=head2 purge ( )
+=head2 purge (  [ options ] )
 
 Deletes an asset from tables and removes anything bound to that asset, including descendants.
+
+=head3 options
+
+A hash refernece containing options that change the behavior of this method.
+
+=head4 skipExported
+
+A boolean that, if true, will skip dealing with exported files.
 
 =cut
 
 sub purge {
 	my $self = shift;
+	my $options = shift;
 	return undef if ($self->getId eq $self->session->setting->get("defaultPage") || $self->getId eq $self->session->setting->get("notFoundPage") || $self->get("isSystem"));
-	$self->_invokeWorkflowOnExportedFiles($self->session->setting->get('purgeWorkflow'), 1);
+	unless ($options->{skipExported}) {
+		$self->_invokeWorkflowOnExportedFiles($self->session->setting->get('purgeWorkflow'), 1);
+	}
 
 	my $kids = $self->getLineage(["children"],{returnObjects=>1, statesToInclude=>['published', 'clipboard', 'clipboard-limbo','trash','trash-limbo']});
 	foreach my $kid (@{$kids}) {
@@ -155,7 +166,7 @@ sub _invokeWorkflowOnExportedFiles {
 	my $workflowId = shift;
 	my $clearExportedAs = shift;
 
-	my ($lastExportedAs) = $self->session->db->quickArray("SELECT lastExportedAs FROM asset WHERE assetId = ?", [$self->getId]);
+	my ($lastExportedAs) = $self->get("lastExportedAs");
 	my $wfInstance = WebGUI::Workflow::Instance->create($self->session, { workflowId => $self->session->setting->get('trashWorkflow') });
 	$wfInstance->setScratch(WebGUI::Workflow::Activity::DeleteExportedFiles::DELETE_FILES_SCRATCH(), Storable::freeze([defined($lastExportedAs)? ($lastExportedAs) : ()]));
 	$clearExportedAs and $self->session->db->write("UPDATE asset SET lastExportedAs = NULL WHERE assetId = ?", [$self->getId]);
