@@ -279,6 +279,12 @@ our $I18N = {
 		lastUpdated => 0,
 		context => q|Abbreviation for predecessor|,
 		},
+        
+     'task predecessor edit label' => {
+        message => q|Predecessor|,
+        lastUpdated => 0,
+		context => q|Predecessor Label on Edit Task screen|,
+     },
 
 	'N_A' => {
 		message => q|N/A|,
