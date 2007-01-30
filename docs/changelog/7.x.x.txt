@@ -11,6 +11,9 @@
    and tested.
  - fix: lack of testing for valid object creation
  - fix: No mention of intermediate upgrade step in gotcha's
+ - fix: A newly released version of Html::Template fixes a bug with global
+   variables and nested loops.  testEnvironment.pl has been updated to
+   require that it be used.
 
 7.3.8
  - Fixed a template variable rewriting problem with HTML::Template::Expr

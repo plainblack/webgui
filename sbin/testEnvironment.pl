@@ -99,7 +99,7 @@ checkModule("Log::Log4perl",0.51);
 checkModule("Net::LDAP",0.25);
 checkModule("HTML::Highlight",0.20);
 checkModule("HTML::TagFilter",0.07);
-checkModule("HTML::Template",2.7);
+checkModule("HTML::Template",2.9);
 checkModule("HTML::Template::Expr",0.05,2);
 checkModule("Parse::PlainConfig",1.1);
 checkModule("XML::RSSLite",0.11);
