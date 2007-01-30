@@ -4,6 +4,7 @@
  - rfe: Asset->get should return a copy of the properties hashref
  - Fixed a typo in testEnvironment.pl version number for DBD::mysql
  - Fixed a Recurring Payments processing bug: illegal division by zero
+ - fix: Avatar profile field does not update immediatly when you are admin
  - fix: How to hose your assets (perlDreamer Consulting, LLC)
  - fix: Exporting fails with strange URLs.  Also factored the URL to path/file
    translation out into a seperate method so it can be more easily maintained

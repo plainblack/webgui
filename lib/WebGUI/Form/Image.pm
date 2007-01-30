@@ -143,7 +143,6 @@ See WebGUI::Form::File::getValueFromPost() for details. Generates a thumbnail.
 sub getValueFromPost {
 	my $self = shift;
 	my $id = $self->SUPER::getValueFromPost(@_);
-
 	if (defined $id) {
 		my $storage = WebGUI::Storage::Image->get($self->session, $id);
 		if (defined $storage) {
@@ -192,9 +191,8 @@ sub toHtml {
         	                $uploadControl .= 'fileIcons["'.$ext.'"] = "'.$self->session->url->extras('fileIcons/'.$file).'";'."\n";
                 	}
         	}
-        	$uploadControl .= sprintf q!var uploader = new FileUploadControl("%s", fileIcons, "%s","%d");
-        	uploader.addRow();
-        	</script>!, $self->get("name"), $i18n->get("removeLabel"), $maxNewFiles;
+        	$uploadControl .= sprintf q!var uploader = new FileUploadControl("%s", fileIcons, "%s","%d"); uploader.addRow(); </script>!, 
+			$self->get("name")."_file", $i18n->get("removeLabel"), $maxNewFiles;
 		$uploadControl .= WebGUI::Form::Hidden->new($self->session, {-name => $self->privateName('action'), -value => 'upload'})->toHtml()."<br />";
 	} else {
 		$uploadControl .= WebGUI::Form::Hidden->new($self->session, {-name => $self->get("name"), -value => $self->get("value")})->toHtml()."<br />";

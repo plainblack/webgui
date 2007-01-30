@@ -175,13 +175,21 @@ sub formField {
 	my $skipDefault = shift;
 	my $default;
 	if ($skipDefault) {
-	} elsif (defined $self->session->form->process($properties->{name})) {
+	} 
+	# display form version in case there is an error on submit, so they don't have to retype
+    	elsif (defined $self->session->form->process($properties->{name})) {
 		$default = $self->session->form->process($properties->{name});
-	} elsif (defined $u && defined $u->profileField($properties->{name})) {
+	} 
+	# get it from the user profile if we already have a user object
+	elsif (defined $u && defined $u->profileField($properties->{name})) {
 		$default = $u->profileField($properties->{name});
-	} elsif (!defined $u && defined $self->session->user->profileField($properties->{name})) {
+	} 
+	# get it from the user profile if we don't have the user object
+	elsif (!defined $u && defined $self->session->user->profileField($properties->{name})) {
 		$default = $self->session->user->profileField($properties->{name});
-	} else {
+	} 
+	# get it from the defaults if necessary
+ 	else {
 		$default = WebGUI::Operation::Shared::secureEval($self->session,$properties->{dataDefault});
 	}
 	$properties->{value} = $default;

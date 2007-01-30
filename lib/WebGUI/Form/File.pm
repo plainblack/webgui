@@ -149,30 +149,32 @@ deleting the file if it was specified.
 
 sub getValueFromPost {
 	my $self = shift;
-	my $value = $self->session->form->param($self->get("name"));
+	my $value = $self->get("value");
 	if ($self->session->form->param($self->privateName('delete'))) {
 		my $storage = WebGUI::Storage->get($self->session,$value);
-		$storage->delete;
+		$storage->delete if defined $storage;
 		return '';
 	} elsif ($self->session->form->param($self->privateName('action')) eq 'keep') {
 		return $value;
 	} elsif ($self->session->form->param($self->privateName('action')) eq 'upload') {
 		my $storage = undef;
-		if ($self->get("value") ne "") {
-			$storage = WebGUI::Storage::Image->get($self->session, $self->get("value"));
+		if ($value ne "") {
+			$storage = WebGUI::Storage::Image->get($self->session, $value);
 		} else {
 			$storage = WebGUI::Storage::Image->create($self->session);
 		}
-		$storage->addFileFromFormPost($self->get("name"),1000);
+		$storage->addFileFromFormPost($self->get("name")."_file",1000);
 		my @files = @{ $storage->getFiles };
 		if (scalar(@files) < 1) {
 			$storage->delete;
 			return undef;
 		} else {
 			my $id = $storage->getId;
+			$self->set("value", $id);
 			return $id;
 		}
 	}
+	return undef;
 }
 
 #-------------------------------------------------------------------
@@ -205,9 +207,8 @@ sub toHtml {
         	                $uploadControl .= 'fileIcons["'.$ext.'"] = "'.$self->session->url->extras('fileIcons/'.$file).'";'."\n";
                 	}
         	}
-        	$uploadControl .= sprintf q!var uploader = new FileUploadControl("%s", fileIcons, "%s","%d");
-        	uploader.addRow();
-        	</script>!, $self->get("name"), $i18n->get("removeLabel"), $maxFiles;
+        	$uploadControl .= sprintf q!var uploader = new FileUploadControl("%s", fileIcons, "%s","%d"); uploader.addRow(); </script>!
+			, $self->get("name")."_file", $i18n->get("removeLabel"), $maxFiles;
 		$uploadControl .= WebGUI::Form::Hidden->new($self->session, {-name => $self->privateName('action'), -value => 'upload'})->toHtml()."<br />";
 	} else {
 		$uploadControl .= WebGUI::Form::Hidden->new($self->session, {-name => $self->get("name"), -value => $self->get("value")})->toHtml()."<br />";
