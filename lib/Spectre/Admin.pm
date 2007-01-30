@@ -195,6 +195,7 @@ sub runTests {
 		next if $config =~ m/^demo/;
 		print "Testing $key\n";
 		 my $userAgent = new LWP::UserAgent;
+		$userAgent->env_proxy;
         	$userAgent->agent("Spectre");
         	$userAgent->timeout(30);
 		my $url = "http://".$configs->{$key}->get("sitename")->[0].":".$config->get("webguiPort").$configs->{$key}->get("gateway")."?op=spectreTest";
@@ -209,7 +210,7 @@ sub runTests {
 			} elsif ($response eq "spectre") {
 				print "ERROR: WebGUI cannot communicate with Spectre. Perhaps you need to adjust the spectreIp or spectrePort setting the this config file: $key.";
 			} elsif ($response ne "success") {
-				print "ERROR: Spectre received an invalid response from WebGUI while testing $key\n";
+				print "ERROR: Spectre received an invalid response ($response) from WebGUI while testing $key\n";
 			}
         	}
 	}	
