@@ -256,9 +256,9 @@ sub _translateUrlToPath {
 			$dataRef->{'error'} = "Cannot generate path for url $url.  Ambiguious.";
 		}
 	}
-	else {							# No slash in the url and no dots
+	else {							# Dots in the url but no slash
 		$dataRef->{'path'} = undef;
-		$dataRef->{'filename'} = $url;			# webgui url foo.html becomes filename foo.html
+		$dataRef->{'filename'} = $url;			# webgui url foo.html becomes no path, filename foo.html
 	}
 	
 	return $dataRef;
@@ -405,32 +405,5 @@ sub www_exportGenerate {
 	$self->session->output->print('<a target="_parent" href="'.$self->getUrl.'">'.$i18n->get(493,'WebGUI').'</a>');
 	return;
 }
-
-
-
-
-#	if ($url =~ /\./) { 				# If the URL has a dot in it somewhere  (i.e., /foo/index.html)
-#			if ($url =~ /^(.*)\/(.*)$/) {
-#				$path = $1;  			# part before the slash is "path"
-#				$filename = $2;			# part after the slash is "filename"	(becomes folder foo, file index.html)
-#				if ($path =~ /\./) {		# unless of course the dot is in the path  (i.e., /index.html/foo)
-#					$filename = $index;	#  then we want to use index as the filename
-#					$path = $2;		#  and filename as the path		(becomes folder foo, file index.html or whatever they set index to)
-#				}
-#				if ($filename eq "") {		#  If filename is blank, use path as filename and set path to null
-#					$filename = $path;
-#					$path = undef;
-#				}
-#			} else {				#  If filename is *not* blank, discard the path
-#				$path = undef;
-#				$filename = $url;		#  and set the filename equal to the url
-#			}
-#		} else {					#  No dot in the url, use the url as the path
-#			$path = $url;
-#			$filename = $index;			#  and make the filename whatever the user specifies for the index filename.
-#		}
-
-
-
 
 1;
