@@ -52,6 +52,8 @@ The current date and time.
 </p>
 
 <p>You can also pass in an epoch date into this macro as a secondary parameter. If no date is specified then today's date and time will be used.</p>
+<p>One common task done with this macro is to display the date that an Asset was last modified.  It uses the <b>revisionDate</b> template variable which is available for all Assets.</p>
+<p>&#94;D("%z",<tmpl_var revisionDate>);</p>
 <p>This Macro may be nested inside other Macros if the formatted date does not contain commas or quotes.</p>
 
 |,
