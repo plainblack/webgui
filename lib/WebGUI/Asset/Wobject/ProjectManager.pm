@@ -1353,11 +1353,11 @@ sub www_editTask {
    
    $var->{'task_name_label'}        = $i18n->get('task name label');
    $var->{'task_start_label'}       = $i18n->get('task start label');
-   $var->{'task_end_label'}         = $i18n->get('task end label');
+   $var->{'task_finish_label'}      = $i18n->get('task end label');
    $var->{'task_duration_label'}    = $i18n->get('task duration label');
    $var->{'task_lagTime_label'}     = $i18n->get('task lag time label');
-   $var->{'task_predecessor_label'} = $i18n->get('task predecessor label');
-   $var->{'task_complete_label'}    = $i18n->get('task complete label');
+   $var->{'task_predecessor_label'} = $i18n->get('task predecessor edit label');
+   $var->{'task_complete_label'}    = $i18n->get('project complete label');
    $var->{'task_resource_label'}    = $i18n->get('task resource label');
    $var->{'task_save_label'}        = $i18n->get('task save label');
 
