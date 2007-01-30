@@ -429,11 +429,10 @@ throughout the site.  Check yes if you want this Asset to be available as a pack
         },
 
         'prototype using body' => {
-                message => q|<p>Chances are if you like assets to be configured a certain way, then you'll find Prototypes useful. By setting an Asset as a Prototype you can create new items in your Add content menu configured exactly as you like. For instance, if you use the Collaboration System as a photo gallery, then create a photo gallery and mark it as a Prototype. From then on you can just "Add content > New Content > Photo Gallery".</p>
-<p>The title of the Asset is used as the name of the Content Prototype in the Add content menu.  If you set the title
-of your prototype to be the same as the name of an Asset (Article, DataForm, etc.) then it will replace the WebGUI
-default Asset in the menu.</p>|,
-                lastUpdated => 1127413713,
+                message => q|<p>Chances are if you like assets to be configured a certain way, then you'll find Prototypes useful. By setting an Asset as a Prototype you can create new items in your New Content menu configured exactly as you like. For instance, if you use the Collaboration System as a photo gallery, then create a photo gallery and mark it as a Prototype. From then on you can just "Add content > New Content > Photo Gallery".</p>
+<p>The title of the Asset is used as the name of the Content Prototype in the New Content menu. If you set the title of your prototype to be the same as the name of an Asset (Article, DataForm, etc.) then it will replace the WebGUI default Asset in the menu. When a content Prototype is added to an existing page layout, note that it will pick up the permissions and style information from the page where it is added. This will override the prototype settings, and may cause some changes in appearance.</p>
+|,
+                lastUpdated => 1170178159,
         },
 
 	'asset fields title' => {
