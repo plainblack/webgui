@@ -8,6 +8,7 @@
  - fix: Exporting fails with strange URLs.  Also factored the URL to path/file
    translation out into a seperate method so it can be more easily maintained
    and tested.
+ - fix: lack of testing for valid object creation
 
 7.3.8
  - Fixed a template variable rewriting problem with HTML::Template::Expr

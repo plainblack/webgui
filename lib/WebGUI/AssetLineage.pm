@@ -450,6 +450,10 @@ sub getLineage {
 				$asset =  $self;
 			} else {
 				$asset = WebGUI::Asset->new($self->session,$id, $class, $version);
+				if (!defined $asset) { # won't catch everything, but it will help some if an asset blows up
+					$self->session->errorHandler->error("AssetLineage::getLineage - failed to instanciate asset with assetId $id, className $class, and revision $version");
+					next;
+				}
 			}
 		} else {
 			$asset = $id;
