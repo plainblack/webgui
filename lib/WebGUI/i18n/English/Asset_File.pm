@@ -146,6 +146,18 @@ our $I18N = {
 		lastUpdated => 1166824158,
 	},
 
+	'file not found' => {
+		message => q|<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+			     <HTML><HEAD>
+			     <TITLE>404 Not Found</TITLE>
+			     </HEAD><BODY>
+			     <H1>Not Found</H1>
+			     The requested URL %s was not found on this server.<P>
+			     </BODY></HTML> 
+			    |,
+		lastUpdated => 0,
+	},
+
 };
 
 1;

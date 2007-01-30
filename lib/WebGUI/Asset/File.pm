@@ -401,9 +401,18 @@ sub exportHtml_view {
 	return 'chunked';
 }
 
+#--------------------------------------------------------------------
 sub www_view {
 	my $self = shift;
 	return $self->session->privilege->noAccess() unless $self->canView;
+	
+	# Check to make sure it's not in the trash or some other weird place
+	my $state = $self->get("state");
+	if ($state ne "published" && $state ne "archived") {
+		my $i18n = WebGUI::International->new($self->session,'Asset_File');
+		$self->session->http->setStatus("404");
+		return sprintf($i18n->get("file not found"), $self->getUrl());
+	}
 
 	$self->session->http->setRedirect($self->getFileUrl);
     	$self->session->http->setStreamedFile($self->getStorageLocation->getPath($self->get("filename")));

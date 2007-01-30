@@ -14,6 +14,7 @@
  - fix: A newly released version of Html::Template fixes a bug with global
    variables and nested loops.  testEnvironment.pl has been updated to
    require that it be used.
+ - fix: Image in trash though visible in article
  - fix: Direct 6.8.10-7.2+ Upgrade Problem
 
 
