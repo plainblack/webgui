@@ -9,6 +9,7 @@
    translation out into a seperate method so it can be more easily maintained
    and tested.
  - fix: lack of testing for valid object creation
+ - fix: No mention of intermediate upgrade step in gotcha's
 
 7.3.8
  - Fixed a template variable rewriting problem with HTML::Template::Expr
