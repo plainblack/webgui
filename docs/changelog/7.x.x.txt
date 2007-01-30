@@ -5,7 +5,9 @@
  - Fixed a typo in testEnvironment.pl version number for DBD::mysql
  - Fixed a Recurring Payments processing bug: illegal division by zero
  - fix: How to hose your assets (perlDreamer Consulting, LLC)
-
+ - fix: Exporting fails with strange URLs.  Also factored the URL to path/file
+   translation out into a seperate method so it can be more easily maintained
+   and tested.
 
 7.3.8
  - Fixed a template variable rewriting problem with HTML::Template::Expr

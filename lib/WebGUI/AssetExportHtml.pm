@@ -116,25 +116,13 @@ sub _exportAsHtml {
 			next;
 		}
 
-		my $path;
-		my $filename;
-
-		if ($url =~ /\./) {
-			if ($url =~ /^(.*)\/(.*)$/) {
-				$path = $1;
-				$filename = $2;
-				if ($filename eq "") {
-					$filename = $path;
-					$path = undef;
-				}
-			} else {
-				$path = undef;
-				$filename = $url;
-			}
-		} else {
-			$path = $url;
-			$filename = $index;
+		my $pathData = $self->_translateUrlToPath($url, $index);
+		if (my $error = $pathData->{'error'}) {
+			return (0, $error);
 		}
+
+		my $path = $pathData->{'path'};
+		my $filename = $pathData->{'filename'};
 
 		my $fullPath = (length($path)? "$path/" : "").$filename;
 		if ($asset->getId eq $defaultAssetId) {
@@ -212,6 +200,69 @@ sub _exportAsHtml {
 
 	return (1, sprintf($i18n->get('export information'), scalar(@{$assetIds}), ($self->session->datetime->time()-$startTime)));
 }
+
+#-------------------------------------------------------------------
+
+=head2 _translateUrlToPath ( url, index )
+
+Translates a url into an appropriate path and filename for exporting
+
+=head3 url 
+
+URL of the asset we need an export path for
+
+=head3 index
+
+index filename passed in from the UI
+
+=cut
+
+sub _translateUrlToPath {
+	my $self = shift;
+	my $url = shift;
+	my $index = shift;
+	my $dataRef;
+
+	if ($url !~ m{\.}) {					# If there is not a dot in the URL, this is easy
+		$dataRef->{'path'} = $url;
+		$dataRef->{'filename'} = $index;
+	}
+	elsif ($url =~ /^(.*)\/(.*)$/) {			# If there is a dot and a slash in the url 
+		my $dotCounter = 0;				# Track how many dots we found
+		my $preSlash = $1;		
+		my $postSlash = $2;
+
+		if ($preSlash =~ /\./) {			# webgui url index.html/foo becomes folder foo, filename index user specified
+			$dotCounter++;
+			$dataRef->{'path'} = $postSlash;
+			$dataRef->{'filename'} = $index;
+		}
+		
+		if ($postSlash =~ /\./) {			# webgui url foo/page.html becomes folder foo, filename page.html
+			$dotCounter++;
+			$dataRef->{'path'} = $preSlash;
+			$dataRef->{'filename'} = $postSlash;
+		}
+
+		if ($postSlash eq "") {				# webgui url foo.html/ becomes no path, filename foo.html
+			$dataRef->{'path'} = undef;
+			$dataRef->{'filename'} = $preSlash;
+		}
+
+		if ($dotCounter == 2) {				# webgui url foo.html/page.html becomes an error because this is non-sensical
+			$self->session->errorHandler->error("Cannot generate path for url $url.  Ambiguious.");
+			$dataRef->{'path'} = undef;
+			$dataRef->{'filename'} = undef;
+			$dataRef->{'error'} = "Cannot generate path for url $url.  Ambiguious.";
+		}
+	}
+	else {							# No slash in the url and no dots
+		$dataRef->{'path'} = undef;
+		$dataRef->{'filename'} = $url;			# webgui url foo.html becomes filename foo.html
+	}
+	
+	return $dataRef;
+}	
 
 #-------------------------------------------------------------------
 
@@ -354,5 +405,32 @@ sub www_exportGenerate {
 	$self->session->output->print('<a target="_parent" href="'.$self->getUrl.'">'.$i18n->get(493,'WebGUI').'</a>');
 	return;
 }
+
+
+
+
+#	if ($url =~ /\./) { 				# If the URL has a dot in it somewhere  (i.e., /foo/index.html)
+#			if ($url =~ /^(.*)\/(.*)$/) {
+#				$path = $1;  			# part before the slash is "path"
+#				$filename = $2;			# part after the slash is "filename"	(becomes folder foo, file index.html)
+#				if ($path =~ /\./) {		# unless of course the dot is in the path  (i.e., /index.html/foo)
+#					$filename = $index;	#  then we want to use index as the filename
+#					$path = $2;		#  and filename as the path		(becomes folder foo, file index.html or whatever they set index to)
+#				}
+#				if ($filename eq "") {		#  If filename is blank, use path as filename and set path to null
+#					$filename = $path;
+#					$path = undef;
+#				}
+#			} else {				#  If filename is *not* blank, discard the path
+#				$path = undef;
+#				$filename = $url;		#  and set the filename equal to the url
+#			}
+#		} else {					#  No dot in the url, use the url as the path
+#			$path = $url;
+#			$filename = $index;			#  and make the filename whatever the user specifies for the index filename.
+#		}
+
+
+
 
 1;
