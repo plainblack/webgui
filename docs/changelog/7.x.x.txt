@@ -9,6 +9,7 @@
  - fix: Exporting fails with strange URLs.  Also factored the URL to path/file
    translation out into a seperate method so it can be more easily maintained
    and tested.
+ - fix: Spectre needs new watch batteries
  - fix: lack of testing for valid object creation
  - fix: No mention of intermediate upgrade step in gotcha's
  - fix: A newly released version of Html::Template fixes a bug with global

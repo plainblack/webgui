@@ -181,7 +181,7 @@ Checks all the schedules of the jobs in the queue and triggers a workflow if a s
 sub checkSchedules {
 	my ($kernel, $self) = @_[KERNEL, OBJECT];
 	$self->debug("Checking schedules against current time.");
-	my $now = DateTime->from_epoch(epoch=>time());
+	my $now = DateTime->now(time_zone => 'local');
 	foreach my $id (keys %{$self->{_jobs}}) {
 		$kernel->yield("checkSchedule", $id, $now)
 	}
