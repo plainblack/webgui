@@ -4,6 +4,7 @@
  - rfe: Asset->get should return a copy of the properties hashref
  - Fixed a typo in testEnvironment.pl version number for DBD::mysql
  - Fixed a Recurring Payments processing bug: illegal division by zero
+ - fix: How to hose your assets (perlDreamer Consulting, LLC)
 
 
 7.3.8

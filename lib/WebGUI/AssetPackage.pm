@@ -135,12 +135,21 @@ sub importAssetData {
 	if (defined $asset) { # update an existing revision
 		$error->info("Updating an existing revision of asset $id");	
 		$asset->update($data->{properties});
-	} else {
+        ##Pending assets are assigned a new version tag
+        if ($data->{properties}->{status} eq 'pending') {
+            $self->session->db->write(
+                'update assetData set tagId=? where assetId=? and revisionDate='.$data->{properties}->{revisionDate},
+                [WebGUI::VersionTag->getWorking($self->session)->getId, $data->{properties}->{assetId}]
+            );
+        }
+	}
+    else {
 		$asset = WebGUI::Asset->new($self->session, $id, $class);
 		if (defined $asset) { # create a new revision of an existing asset
 			$error->info("Creating a new revision of asset $id");	
 			$asset = $asset->addRevision($data->{properties}, $version);
-		} else { # add an entirely new asset
+		}
+        else { # add an entirely new asset
 			$error->info("Adding $id that didn't previously exist.");	
 			$asset = $self->addChild($data->{properties}, $id, $version);
 		}
