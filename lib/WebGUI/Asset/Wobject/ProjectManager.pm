@@ -866,6 +866,7 @@ sub www_editTask {
    $startEpoch = $endEpoch = time unless defined $startEpoch and defined $endEpoch;
    $startEpoch = $task->{startDate} if $task->{startDate};
    $endEpoch = $task->{endDate} if $task->{endDate};
+## Magic number = bad
    $endEpoch += 86400 if $taskType eq 'timed' and !$task->{duration} and !$task->{endDate};
    my ($start, $end) = ($dt->epochToSet($startEpoch), $dt->epochToSet($endEpoch));
 
@@ -999,7 +1000,7 @@ sub www_editTask {
    $var->{'task_resource_label'}    = $i18n->get('task resource label');
    $var->{'task_save_label'}        = $i18n->get('task save label');
 
-   return $self->processTemplate($var,$self->getValue("editTaskTemplateId"))
+   return $self->processTemplate($var,$self->getValue("editTaskTemplateId"));
 }
 
 #-------------------------------------------------------------------

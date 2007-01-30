@@ -44,11 +44,10 @@ use JSON;
 
 ####################################################################
 
-sub definition 
-{
-	my $class 	= shift;
-	my $session 	= shift;
-	my $definition 	= shift || [];
+sub definition {
+	my $class       = shift;
+	my $session     = shift;
+	my $definition  = shift || [];
 	
 	my $i18n 	= WebGUI::International->new($session, 'Asset_Calendar');
 	

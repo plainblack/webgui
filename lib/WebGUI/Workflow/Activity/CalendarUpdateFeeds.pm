@@ -54,13 +54,13 @@ See WebGUI::Workflow::Activity::defintion() for details.
 =cut 
 
 sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, "Asset_Calendar");
+	my $class       = shift;
+	my $session     = shift;
+	my $definition  = shift;
+	my $i18n        = WebGUI::International->new($session, "Asset_Calendar");
 	push(@{$definition}, {
-		name=>$i18n->get("workflow updateFeeds"),
-		properties=> { }
+		name        => $i18n->get("workflow updateFeeds"),
+		properties  => { }
 		});
 	return $class->SUPER::definition($session,$definition);
 }
@@ -75,21 +75,21 @@ See WebGUI::Workflow::Activity::execute() for details.
 =cut
 
 sub execute {
-	my $self = shift;
+	my $self    = shift;
+    my $session = $self->session;
 	$self->session->user({userId => 3});
 	
-### TODO: If we take more than a minute, return WAITING so that some
-# other activity can run
+    ### TODO: If we take more than a minute, return WAITING so that some
+    # other activity can run
 	
 	my $ua		= LWP::UserAgent->new(agent => "WebGUI");
-	my $dt		= WebGUI::DateTime->new(time)->toMysql;
+	my $dt		= WebGUI::DateTime->new($session, time)->toMysql;
 	
-	my $sth	= $self->session->db->prepare("select * from Calendar_feeds");
+	my $sth	    = $self->session->db->prepare("select * from Calendar_feeds");
 	$sth->execute();
 	
 	
-	FEED:while (my $feed = $sth->hashRef)
-	{
+	FEED:while (my $feed = $sth->hashRef) {
 		#!!! KLUDGE - If the feed is on the same server, set a scratch value
 		# I do not know how dangerous this is, so THIS MUST CHANGE!
 		# Preferably: Spectre would add a userSession to the database, 
@@ -97,10 +97,9 @@ sub execute {
 		my $sitename	= $self->session->config->get("sitename")->[0];
 		if ($feed->{url} =~ m{http://[^/]*$sitename})
 		{
-			my $sessionId = $self->session->id->generate;
-			$feed->{url} .= ";adminId=".$sessionId;
-			$self->session->db->write("INSERT INTO userSessionScratch (sessionId,name,value) VALUES (?,?,?)",
-				[$sessionId,$feed->{assetId},"SPECTRE"]);
+			$feed->{url} .= ( $feed->{url} =~ /[?]/ ? ";" : "?" ) . "adminId=".$session->getId;
+			$self->session->db->write("REPLACE INTO userSessionScratch (sessionId,name,value) VALUES (?,?,?)",
+				[$session->getId,$feed->{assetId},"SPECTRE"]);
 		}
 		#/KLUDGE
 		#warn "FEED URL: ".$feed->{url} ."\n";
@@ -121,7 +120,8 @@ sub execute {
 			unless ($data =~ /^BEGIN:VCALENDAR/i)
 			{
 				# Update the result and last updated fields
-				$self->session->db->write("update Calendar_feeds set lastResult=?,lastUpdated=? where feedId=?",
+				$self->session->db->write(
+                    "update Calendar_feeds set lastResult=?,lastUpdated=? where feedId=?",
 					["Not an iCalendar feed",$dt,$feed->{feedId}]);
 				next FEED;
 			}
