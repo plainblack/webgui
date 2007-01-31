@@ -271,9 +271,9 @@ sub createAccountSave {
 	}
 	
 	
-	# If we have a redirectOnLogin, redirect the user
-	if ($self->session->scratch->get("redirectOnLogin")) {
-		my $url = $self->session->scratch->delete("redirectOnLogin");
+	# If we have a redirectAfterLogin, redirect the user
+	if ($self->session->scratch->get("redirectAfterLogin")) {
+		my $url = $self->session->scratch->delete("redirectAfterLogin");
 		$self->session->http->setRedirect($url);
 	} else {
 		$self->session->http->setStatus(201,"Account Registration Successful");
@@ -405,7 +405,7 @@ sub displayLogin {
 		|| $self->session->scratch->get("redirectAfterLogin") ) {
 	   	$self->session->scratch->set("redirectAfterLogin",$self->session->url->page($self->session->env->get("QUERY_STRING")));
 	}
-	my $i18n = WebGUI::International->new($self->session);
+    my $i18n = WebGUI::International->new($self->session);
 	$vars->{title} = $i18n->get(66);
 	my $action;
         if ($self->session->setting->get("encryptLogin")) {
@@ -619,7 +619,6 @@ sub login {
 	my $command = $self->session->config->get("runOnLogin");
 	if ($command ne "") {
 		WebGUI::Macro::process($self->session,\$command);
-		$self->session->errorHandler->warn("Executing $command");
 		my $error = qx($command);
 		$self->session->errorHandler->warn($error) if $error;
 	}
@@ -645,7 +644,6 @@ sub logout {
 	my $command = $self->session->config->get("runOnLogout");
     if ($command ne "") {
        WebGUI::Macro::process($self->session,\$command);
-	   $self->session->errorHandler->warn("Executing $command");
        my $error = qx($command);
        $self->session->errorHandler->warn($error) if $error;
     }
