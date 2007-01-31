@@ -21,7 +21,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
-fixCalendarFeedsLastUpdatedField();
+fixCalendarFeedsLastUpdatedField($session);
 
 
 finish($session); # this line required
