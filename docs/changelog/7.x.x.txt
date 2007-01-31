@@ -18,6 +18,10 @@
    require that it be used.
  - fix: Image in trash though visible in article
  - fix: Direct 6.8.10-7.2+ Upgrade Problem
+ - fix: Calendar feeds lastUpdated field only shows the year
+ - fix: Calendar feeds do not work
+ - fix: Sharing information between Calendars on the same server is now less
+        kludgy
  - fix: Adding tasks to project manager has long load time
  - fix: Project manager tasks get cached (not clearing) when bouncing between edit and new
 

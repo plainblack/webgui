@@ -88,8 +88,10 @@ sub execute {
 	my $sth	    = $self->session->db->prepare("select * from Calendar_feeds");
 	$sth->execute();
 	
-	
+	use Data::Dumper;
+
 	FEED:while (my $feed = $sth->hashRef) {
+
 		#!!! KLUDGE - If the feed is on the same server, set a scratch value
 		# I do not know how dangerous this is, so THIS MUST CHANGE!
 		# Preferably: Spectre would add a userSession to the database, 
@@ -214,7 +216,7 @@ sub execute {
 						split / /, WebGUI::DateTime(
 							year	=> $year,
 							month	=> $month,
-							day	=> $day,
+							day	    => $day,
 							hour	=> $hour,
 							minute	=> $minute,
 							second	=> $second,
@@ -274,6 +276,10 @@ sub execute {
 					{
 						$properties->{url} = $events{$id}->{$key}->[1];
 					}
+                    elsif (lc $property_name eq "menutitle")
+                    {
+                        $properties->{menuTitle} = $events{$id}->{$key}->[1];
+                    }
 				}
 				
 				

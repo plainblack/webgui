@@ -21,6 +21,8 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+fixCalendarFeedsLastUpdatedField();
+
 
 finish($session); # this line required
 
@@ -32,6 +34,13 @@ finish($session); # this line required
 #	# and here's our code
 #}
 
+
+##-------------------------------------------------
+sub fixCalendarFeedsLastUpdatedField {
+    my $session = shift;
+    print "\tFixing Calendar Feeds lastUpdated field.\n" unless ($quiet);
+    $session->db->write("alter table Calendar_feeds modify column lastUpdated datetime");
+}
 
 
 # ---- DO NOT EDIT BELOW THIS LINE ----
