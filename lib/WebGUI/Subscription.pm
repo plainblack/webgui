@@ -13,27 +13,53 @@ Package WebGUI::Subscription
 
 Base class for subscriptions
 
-=head2 _getDuration ( $duration )
+=head2 _getDuration ( duration, time )
 
 Internal utility function for calculating when a subscription expires.
 Returns the date in epoch format when it expires.
 
-=head3 $duration
+=head3 duration
 
 Text description of how long the subscription lasts.
+
+=head3 time
+
+time from which to calculate expiration date
 
 =cut
 
 sub _getDuration {
 	my $self = shift;
 	my $duration = shift;
-	return $self->session->datetime->addToDate(0,0,0,7) if $duration eq 'Weekly';
-	return $self->session->datetime->addToDate(0,0,0,14) if $duration eq 'BiWeekly';
-	return $self->session->datetime->addToDate(0,0,0,28) if $duration eq 'FourWeekly';
-	return $self->session->datetime->addToDate(0,0,1,0) if $duration eq 'Monthly';
-	return $self->session->datetime->addToDate(0,0,3,0) if $duration eq 'Quarterly';
-	return $self->session->datetime->addToDate(0,0,6,0) if $duration eq 'HalfYearly';
-	return $self->session->datetime->addToDate(0,1,0,0) if $duration eq 'Yearly';
+    my $now = shift || time();
+	return $self->session->datetime->addToDate($now,0,0,7) if $duration eq 'Weekly';
+	return $self->session->datetime->addToDate($now,0,0,14) if $duration eq 'BiWeekly';
+	return $self->session->datetime->addToDate($now,0,0,28) if $duration eq 'FourWeekly';
+	return $self->session->datetime->addToDate($now,0,1,0) if $duration eq 'Monthly';
+	return $self->session->datetime->addToDate($now,0,3,0) if $duration eq 'Quarterly';
+	return $self->session->datetime->addToDate($now,0,6,0) if $duration eq 'HalfYearly';
+	return $self->session->datetime->addToDate($now,1,0,0) if $duration eq 'Yearly';
+}
+
+#-------------------------------------------------------------------
+=head2 _getExpireOffset (durationType)
+
+Returns the offset in seconds based on what is passed in
+
+=head3 durationType
+
+Text descriptoin of how long the subscription lasts
+
+=cut
+
+sub _getExpireOffset {
+	my $self = shift;
+	my $duration = shift;
+    
+    my $now = time();
+	
+    my $durationExpirationDate = $self->_getDuration($duration,$now);
+    return ($durationExpirationDate - $now);
 }
 
 #-------------------------------------------------------------------
@@ -59,7 +85,7 @@ sub apply {
 	$groupId = $self->{_properties}{subscriptionGroup};
 	my $group = WebGUI::Group->new($self->session,$groupId);
 	# Make user part of the right group
-	$group->addUsers([$userId], $self->_getDuration($self->{_properties}{duration}));
+	$group->addUsers([$userId], $self->_getExpireOffset($self->{_properties}{duration}));
 
 	# Add karma
 	WebGUI::User->new($self->session,$userId)->karma($self->{_properties}{karma}, 'Subscription', 'Added for purchasing subscription '.$self->{_properties}{name});
