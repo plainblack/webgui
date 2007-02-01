@@ -209,33 +209,6 @@ sub getLogger {
 
 #-------------------------------------------------------------------
 
-=head2 getRunningQueue ( )
-
-Returns a reference to the queue of workflow instances that are running now.
-
-=cut
-
-sub getRunningQueue {
-	my $self = shift;
-	return $self->{_runningQueue};
-}
-
-#-------------------------------------------------------------------
-
-=head2 getWaitingQueue ( )
-
-Returns a reference to the queue of workflow instances waiting to run.
-
-=cut
-
-sub getWaitingQueue {
-	my $self = shift;
-	return $self->{_waitingQueue};
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 getNextInstance ( )
 
 Returns the next available instance.
@@ -256,6 +229,49 @@ sub getNextInstance {
 	$self->debug("Didn't see any workflow instances to run.");
 	return undef;
 }
+
+#-------------------------------------------------------------------
+
+=head2 getRunningQueue ( )
+
+Returns a reference to the queue of workflow instances that are running now.
+
+=cut
+
+sub getRunningQueue {
+	my $self = shift;
+	return $self->{_runningQueue};
+}
+
+#-------------------------------------------------------------------
+
+=head2 getStatus ( )
+
+Returns a formatted text status report about the workflow engine.
+
+=cut
+
+sub getStatus {
+ 	my ($kernel, $request, $self) = @_[KERNEL,ARG0,OBJECT];
+	my $output = "Running Workflows: ".$self->getRunningQueue->get_item_count."\n";
+	$output .= "Workflows Waiting To Run: ".$self->getWaitingQueue->get_item_count."\n";
+        my ($data, $rsvp) = @$request;
+        $kernel->call(IKC=>post=>$rsvp,$output);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getWaitingQueue ( )
+
+Returns a reference to the queue of workflow instances waiting to run.
+
+=cut
+
+sub getWaitingQueue {
+	my $self = shift;
+	return $self->{_waitingQueue};
+}
+
 
 #-------------------------------------------------------------------
 
@@ -284,7 +300,7 @@ sub new {
 	my $debug = shift;
 	my $self = {_debug=>$debug, _config=>$config, _logger=>$logger};
 	bless $self, $class;
-	my @publicEvents = qw(addInstance deleteInstance);
+	my @publicEvents = qw(addInstance deleteInstance getStatus);
 	POE::Session->create(
 		object_states => [ $self => [qw(_start _stop returnInstanceToRunnableState addInstance checkInstances deleteInstance suspendInstance runWorker workerResponse), @publicEvents] ],
 		args=>[\@publicEvents]
