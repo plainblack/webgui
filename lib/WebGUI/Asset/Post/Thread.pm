@@ -145,7 +145,12 @@ sub definition {
 				noFormPost=>1,
 				fieldType=>"integer",
 				defaultValue=>10
-				}
+				},
+			threadRating => {
+				noFormPost=>1,
+				fieldType=>"hidden",
+				defaultValue=>undef
+				},
 			},
 		});
 	return $class->SUPER::definition($session,$definition);
@@ -565,20 +570,17 @@ sub rate {
 	my $self = shift;
 	my $rating = shift;
 	return undef unless ($rating == -1 || $rating == 1);
-	unless ($self->hasRated) {
-		$self->session->db->write("insert into Post_rating (assetId,userId,ipAddress,dateOfRating,rating) values ("
-			.$self->session->db->quote($self->getId).", ".$self->session->db->quote($self->session->user->userId).", ".$self->session->db->quote($self->session->env->getIp).",
-		".$self->session->datetime->time().", ".$self->session->db->quote($rating).")");
-		my ($sum) = $self->session->db->quickArray("select sum(Post.rating) from Post left join asset on Post.assetId=asset.assetId where Post.threadId=".$self->session->db->quote($self->getId)." and Post.rating>0");
-		$self->update({rating=>$sum});
-		if ($self->session->setting->get("useKarma")) {
-			my $poster = WebGUI::User->new($self->session, $self->get("ownerUserId"));
-			$poster->karma($rating*$self->getParent->get("karmaRatingMultiplier"),"collaboration rating","someone rated post ".$self->getId);
-			my $rater = WebGUI::User->new($self->session->user->userId);
-			$rater->karma(-$self->getParent->get("karmaSpentToRate"),"collaboration rating","spent karma to rate post ".$self->getId);
-		}
-		$self->getParent->recalculateRating;
+	return undef if $self->hasRated;
+	$self->SUPER::rate($rating);
+
+	##Thread specific karma adjustment for CS
+	if ($self->session->setting->get("useKarma")) {
+		my $poster = WebGUI::User->new($self->session, $self->get("ownerUserId"));
+		$poster->karma($rating*$self->getParent->get("karmaRatingMultiplier"),"collaboration rating","someone rated post ".$self->getId);
+		my $rater = WebGUI::User->new($self->session->user->userId);
+		$rater->karma(-$self->getParent->get("karmaSpentToRate"),"collaboration rating","spent karma to rate post ".$self->getId);
 	}
+
 }
 
 
@@ -764,6 +766,33 @@ sub unsubscribe {
 	my $self = shift;
   my $group = WebGUI::Group->new($self->session,$self->get("subscriptionGroupId"));
   $group->deleteUsers([$self->session->user->userId]);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 updateThreadRating ( )
+
+Update the cumulative ratings in this thread
+
+=cut
+
+sub updateThreadRating {
+	my $self = shift;
+	my $ratingSumSQL = <<EOSQL;
+select sum(Post.rating) from Post
+	left join assetData on
+		Post.assetId=assetData.assetId
+	left join asset on
+		asset.assetId=assetData.assetId
+		and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId)
+	where
+		Post.threadId=?
+	
+EOSQL
+	my ($sum) = $self->session->db->quickArray($ratingSumSQL, [$self->getId]);
+	$self->update({threadRating=>$sum});
+	$self->getParent->recalculateRating;
 }
 
 

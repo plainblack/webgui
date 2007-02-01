@@ -83,7 +83,7 @@ sub appendPostListTemplateVars {
 		} else {
 			$url = $post->getUrl."#".$post->getId;
 		}
-                push(@{$var->{post_loop}}, {
+		my %postVars = (
 			%{$post->get},
                         "id"=>$post->getId,
                         "url"=>$url,
@@ -108,7 +108,11 @@ sub appendPostListTemplateVars {
                 	"user.isPoster"=>$post->isPoster,
                 	"avatar.url"=>$post->getAvatarUrl,
 			%lastReply
-                        });
+		);
+		if ($row->{className} eq 'WebGUI::Asset::Post::Thread') {
+			$postVars{'rating'} = $post->get('threadRating');
+		}
+                push(@{$var->{post_loop}}, \%postVars );
 		$i++;
 	}
 	$p->appendTemplateVars($var);
@@ -945,10 +949,10 @@ Calculates the rating of this forum from its threads and stores the new value in
 sub recalculateRating {
         my $self = shift;
         my ($count) = $self->session->db->quickArray("select count(*) from Thread left join asset on Thread.assetId=asset.assetId 
-		left join Post on Thread.assetId=Post.assetId where asset.parentId=".$self->session->db->quote($self->getId)." and Post.rating>0");
+		left join Post on Thread.assetId=Post.assetId where asset.parentId=?",[$self->getId]);
         $count = $count || 1;
         my ($sum) = $self->session->db->quickArray("select sum(Post.rating) from Thread left join asset on Thread.assetId=asset.assetId 
-		left join Post on Thread.assetId=Post.assetId where asset.parentId=".$self->session->db->quote($self->getId)." and Post.rating>0");
+		left join Post on Thread.assetId=Post.assetId where asset.parentId=?",[$self->getId]);
         my $average = round($sum/$count);
         $self->update({rating=>$average});
 }

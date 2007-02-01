@@ -12,6 +12,7 @@ use lib "../../lib";
 use strict;
 use Getopt::Long;
 use WebGUI::Session;
+use WebGUI::Asset;
 
 
 my $toVersion = "7.3.9"; # make this match what version you're going to
@@ -22,7 +23,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 fixCalendarFeedsLastUpdatedField($session);
-
+addThreadRatingColumn($session);
 
 finish($session); # this line required
 
@@ -40,6 +41,29 @@ sub fixCalendarFeedsLastUpdatedField {
     my $session = shift;
     print "\tFixing Calendar Feeds lastUpdated field.\n" unless ($quiet);
     $session->db->write("alter table Calendar_feeds modify column lastUpdated datetime");
+}
+
+##-------------------------------------------------
+sub addThreadRatingColumn {
+    my $session = shift;
+    print "\tAdding Thread rating column\n" unless ($quiet);
+    $session->db->write("alter table Thread add column threadRating integer default 0");
+    my $root = WebGUI::Asset->getRoot($session);
+    my $threads = $root->getLineage(
+    	['descendents'],
+        {
+            returnObjects      => 1,
+            includeOnlyClasses => ['WebGUI::Asset::Post::Thread'],
+            includeArchived    => 1,
+        },
+    );
+    foreach my $thread ( @{ $threads} ) {
+        ##Fix all double accounting on the thread
+        $thread->recalculatePostRating;
+
+        ##Recalculate the thread rating and also update the CS!
+        $thread->updateThreadRating;
+    }
 }
 
 

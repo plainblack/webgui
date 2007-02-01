@@ -622,6 +622,32 @@ sub incrementViews {
 
 #-------------------------------------------------------------------
 
+=head2 insertUserPostRating ( rating )
+
+Register the user's rating against this post.
+
+=head3 rating
+
+An integer indicating either thumbss up (+1) or thumbs down (-1)
+
+=cut
+
+sub insertUserPostRating {
+	my $self = shift;
+	my $rating = shift;
+	return undef unless ($rating == -1 || $rating == 1);
+	return undef if $self->hasRated;
+	$self->session->db->write("insert into Post_rating (assetId,userId,ipAddress,dateOfRating,rating) values (?,?,?,?,?)",
+		[$self->getId,
+		 $self->session->user->userId,
+		 $self->session->env->getIp,
+		 $self->session->datetime->time(),
+		 $rating,]
+	);
+}
+
+#-------------------------------------------------------------------
+
 =head2 isNew ( )
 
 Returns a boolean indicating whether this post is new (not an edit).
@@ -851,7 +877,7 @@ Stores a rating against this post.
 
 =head3 rating
 
-An integer between 1 and 5 (5 being best) to rate this post with.
+An integer indicating either thumbss up (+1) or thumbs down (-1)
 
 =cut
 
@@ -859,19 +885,29 @@ sub rate {
 	my $self = shift;
 	my $rating = shift;
 	return undef unless ($rating == -1 || $rating == 1);
-	unless ($self->hasRated) {
-        	$self->session->db->write("insert into Post_rating (assetId,userId,ipAddress,dateOfRating,rating) values ("
-                	.$self->session->db->quote($self->getId).", ".$self->session->db->quote($self->session->user->userId).", ".$self->session->db->quote($self->session->env->getIp).",
-			".$self->session->datetime->time().", ".$self->session->db->quote($rating).")");
-        	my ($sum) = $self->session->db->quickArray("select sum(rating) from Post_rating where assetId=".$self->session->db->quote($self->getId));
-        	$self->update({rating=>$sum});
-		$self->getThread->rate($rating);
-		if ($self->session->setting->get("useKarma")) {
-			$self->session->user->karma(-$self->getThread->getParent->get("karmaSpentToRate"), "Rated Post ".$self->getId, "Rated a CS Post.");
-			my $u = WebGUI::User->new($self->session, $self->get("ownerUserId"));
-			$u->karma($self->getThread->getParent->get("karmaRatingMultiplier"), "Post ".$self->getId." Rated by ".$self->session->user->userId, "Had post rated.");
-		}
+	return undef if $self->hasRated;
+	$self->insertUserPostRating($rating);
+	$self->recalculatePostRating();
+	$self->getThread->updateThreadRating();
+	if ($self->session->setting->get("useKarma")) {
+		$self->session->user->karma(-$self->getThread->getParent->get("karmaSpentToRate"), "Rated Post ".$self->getId, "Rated a CS Post.");
+		my $u = WebGUI::User->new($self->session, $self->get("ownerUserId"));
+		$u->karma($self->getThread->getParent->get("karmaRatingMultiplier"), "Post ".$self->getId." Rated by ".$self->session->user->userId, "Had post rated.");
 	}
+}
+
+#-------------------------------------------------------------------
+
+=head2 recalculatePostRating ( )
+
+Sum all the entries for this post from the ratings table and update its composite rating.
+
+=cut
+
+sub recalculatePostRating {
+	my $self = shift;
+	my ($sum) = $self->session->db->quickArray("select sum(rating) from Post_rating where assetId=?", [$self->getId]);
+	$self->update({rating=>$sum});
 }
 
 #-------------------------------------------------------------------

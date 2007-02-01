@@ -31,6 +31,7 @@
  - fix: Project manager tasks get cached (not clearing) when bouncing between edit and new
  - fix: Creating a new account when purchasing something properly redirects users to the checkout page
  - fix: Group expiration dates on subscriptions are now correct 
+ - fix: Rating numbers drop after rating asset (perlDreamer Consulting, LLC)
 
 7.3.8
  - Fixed a template variable rewriting problem with HTML::Template::Expr
