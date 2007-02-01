@@ -13,7 +13,6 @@ $VERSION = "0.0.0";
 ####################################################################
 
 use strict;
-use warnings;
 
 use Tie::IxHash;
 use Storable qw(nfreeze thaw);
