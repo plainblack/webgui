@@ -1760,7 +1760,7 @@ sub www_edit
     }
     
     my ($startDate, $startTime);
-    if ($form->param("func") ne "add") {
+    if ($form->param("func") ne "add" && $form->param("assetId") ne "new") {
         my $dtStart = $self->getDateTimeStart;
         if ($self->isAllDay) {
             $startDate  = $dtStart->toUserTimeZoneDate;
@@ -1774,13 +1774,13 @@ sub www_edit
     $var->{"formStartDate"}
         = WebGUI::Form::date($session, {
             name            => "startDate",
-            value           => $form->process("startDate") || $startDate,
+            value           => $form->param("startDate") || $startDate,
             defaultValue    => $default_start->toUserTimeZoneDate,
         });
     $var->{"formStartTime"} 
         = WebGUI::Form::timeField($session, {
             name            => "startTime",
-            value           => $form->process("startTime") || $startTime,
+            value           => $form->param("startTime") || $startTime,
             defaultValue    => $default_start->toUserTimeZoneTime,
         });
     
@@ -1789,7 +1789,7 @@ sub www_edit
     $default_start->add(hours => 1);
     
     my ($endDate, $endTime);
-    if ($form->process("func") ne "add") {
+    if ($form->param("func") ne "add" && $form->param("assetId") ne "new") {
         my $dtEnd = $self->getDateTimeEnd;
         if ($self->isAllDay) {
             $endDate    = $dtEnd->toUserTimeZoneDate;
@@ -1800,21 +1800,25 @@ sub www_edit
         }
     }
     
-    $var->{"formEndDate"}    = WebGUI::Form::date($session,
-            {
-                name        => "endDate",
-                value        => $form->process("endDate") || $endDate,
-                defaultValue    => $default_start->toUserTimeZoneDate,
-            });
-    $var->{"formEndTime"} = WebGUI::Form::timeField($session,
-            {
-                name        => "endTime",
-                value        => $form->process("endTime") || $endTime,
-                defaultValue    => $default_start->toUserTimeZoneTime,
-            });
+    $var->{"formEndDate"}    
+        = WebGUI::Form::date($session, {
+            name            => "endDate",
+            value           => $form->param("endDate") || $endDate,
+            defaultValue    => $default_start->toUserTimeZoneDate,
+        });
+    $var->{"formEndTime"} 
+        = WebGUI::Form::timeField($session, {
+            name            => "endTime",
+            value           => $form->param("endTime") || $endTime,
+            defaultValue    => $default_start->toUserTimeZoneTime,
+        });
     
     # time
-    my $allday    = ($form->param("allday") eq "yes" ? 1 : $self->isAllDay);
+    my $allday  = defined $form->param("allday")
+                ? $form->param("allday") 
+                : $self->isAllDay
+                ;
+
     $var->{"formTime"}    = 
         q|<input id="allday_yes" type="radio" name="allday" value="yes" |
         .($allday ? 'checked="checked"' : '')
