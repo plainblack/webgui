@@ -516,6 +516,40 @@ our $HELP = {
 		],
 	},
 
+	'ems checkout template' => {
+		source => 'sub getRegistrationInfo',
+		title => 'checkout template help title',
+		body => 'checkout template help body',
+		variables => [
+			  {
+				'name' => 'isError',
+				'description' => 'tmplVar isError',
+			  },
+		          {
+		            'name' => 'errorLoop',
+			    'description' => 'tmplLoop errorLoop',
+		            'variables' => [
+		                             {
+		                               'name' => 'error',
+					       'description' => 'tmplVar error'
+		                             },
+		                           ]
+		          },
+		],
+		fields => [
+		],
+		related => [
+			{
+				tag => 'event management system add/edit',
+				namespace => 'Asset_EventManagementSystem',
+			},
+			{
+				tag => 'template language',
+				namespace => 'Asset_Template',
+			},
+		],
+	},
+
 	'ems view purchase template' => {
 		source => 'sub www_viewPurchases',
 		title => 'view purchase template help title',

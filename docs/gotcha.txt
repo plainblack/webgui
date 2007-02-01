@@ -7,6 +7,14 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.3.9
+--------------------------------------------------------------------
+ * If you're using the Events Management System and have a custom
+   checkout template, you will need to use the following template
+   variables to implement the fix: isError, errorLoop, error.
+   Documentation on their use is in the online help and you can also
+   look at the default template for an example use.
+
 7.3.8
 --------------------------------------------------------------------
  * For those who upgraded to 7.3.7, any EventsCalendars (with their 

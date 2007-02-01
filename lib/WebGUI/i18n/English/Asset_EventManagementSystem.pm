@@ -1501,6 +1501,34 @@ added to the user's cart and would be discounted if the Attend All Sessions even
                 message => q|Are you sure you want to delete this item from your cart?  Any changes you have made to the current badge you are editing will also be lost.|,
                 lastUpdated => 1147108858,
         },
+	
+	'checkout template help title' => {
+		message => q|EMS Checkout Template|,
+		lastUpdated => 0,
+	},
+
+	'checkout template help body' => {
+		message => q|<p>The checkout template controls the display elements rendered during the Event Management Systems checkout process.  Note that this should not be confused with the Commerce portion of the checkout process when the user begins to enter payment details.  This template handles gathering registration information from users for the events, conflict resolution when a user has created an event schedule that overlaps, and prerequisite resolution when a user has events assigned to a badge that require subsequent events not selected by the user.
+			    |,
+		lastUpdated => 0,
+	},
+
+	'tmplVar isError' => {
+		message => q|This template variable is used inside of a tmpl_if statement and returns true if there is a processing error with a badge holders registration information.  This variable is only checked when the <b>registration</b> template variable is true.
+			    |,
+		lastUpdated => 0,
+	},
+
+	'tmplVar error' => {
+		message => q|Contains an internationalized error message informing the user that certain fields cannot be blank.  The field name returned inside this error message is the internationalized label for the field that was left blank.
+			    |,
+		lastUpdated => 0,
+	},
+	
+	'tmplLoop errorLoop' => {
+		message => q|A loop that returns error messages related to the completion of the user registration form for each badge.  This loop only contains messages when <b>isError</b> is true.|,
+		lastUpdated => 0,
+	},
 
 };
 

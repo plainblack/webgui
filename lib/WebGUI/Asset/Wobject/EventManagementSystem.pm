@@ -901,6 +901,7 @@ sub getRequiredEventNames {
 #------------------------------------------------------------------
 sub getRegistrationInfo {
 	my $self = shift;
+	my $error = shift || [];
 	my %var;
 	my $i18n = WebGUI::International->new($self->session, 'Asset_EventManagementSystem');
 	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl,method=>'GET'})
@@ -932,7 +933,10 @@ sub getRegistrationInfo {
 	$var{'form.email'} = WebGUI::Form::Email($self->session,{name=>'email'});
 	$var{'registration'} = 1;
 	$var{'cancelRegistration.url'} = $self->getUrl('func=resetScratchCart');
-	$var{'cancelRegistration.url.label'} = $i18n->get('cancel registration');	
+	$var{'cancelRegistration.url.label'} = $i18n->get('cancel registration');
+	$var{'isError'} = ($error) ? 1 : 0;
+	$var{'errorLoop'} = $error;
+	
 	return \%var;
 }
 
@@ -2652,6 +2656,25 @@ sub www_saveRegistrantInfo {
 	my $phoneNumber = $self->session->form->get("phone", "phone");
 	my $email = $self->session->form->get("email", "email");
 	my $addingNew = ($badgeId eq 'new') ? 1 : 0;
+
+	# Check required fields
+	my @error_loop;
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
+	my $requiredFieldRef = { 'first name' => $firstName, 'last name' => $lastName, 'email address' => $email };
+
+	foreach my $requiredField (keys %{$requiredFieldRef} ) {
+		my $fieldValue = $requiredFieldRef->{$requiredField};
+
+		# generate i18n error message for a null field that tells the user which field is null using the i18n label for that field
+		if ($fieldValue eq "") {
+			push(@error_loop, {
+				error => sprintf($i18n->get('null field error'), lc($i18n->get($requiredField))),
+			});
+		}
+	}
+	return $self->processStyle($self->processTemplate($self->getRegistrationInfo(\@error_loop),$self->getValue("checkoutTemplateId")))
+		if ( scalar(@error_loop) > 0 );
+	
 	my $details = {
 		badgeId => $badgeId, # if this is "new", setCollateral will return the new one.
 		firstName       => $firstName,
