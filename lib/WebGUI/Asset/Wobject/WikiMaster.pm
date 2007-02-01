@@ -23,16 +23,15 @@ sub appendMostPopular {
 	my $self = shift;
 	my $var = shift;
 	my $limit = shift || $self->get("mostPopularCount");
-	my $rs = $self->session->db->read("select distinct(asset.assetId) from asset left join WikiPage on WikiPage.assetId=asset.assetId 
-		where lineage like ? and lineage<>? and revisionDate = (select max(revisionDate) from WikiPage where assetId = asset.assetId)
-		and state='published'
-		order by views desc limit ?", [$self->get("lineage").'%', $self->get("lineage"),  $limit]);
-	while (my ($id) = $rs->array) {
-		my $asset = WebGUI::Asset->new($self->session, $id, "WebGUI::Asset::WikiPage");
-		push(@{$var->{mostPopular}}, {
-			title=>$asset->getTitle,
-			url=>$asset->getUrl,
-			});
+	while (my $asset = @{$self->getLineage(["children"],{returnObjects=>1, limit=>$limit, includeOnlyClasses=>["WebGUI::Asset::WikiPage"]})}) { 
+		if (defined $asset) {
+			push(@{$var->{mostPopular}}, {
+				title=>$asset->getTitle,
+				url=>$asset->getUrl,
+				});
+		} else {
+			$self->session->errorHandler->error("Couldn't instanciate wikipage for master ".$self->getId);
+		}
 	}
 }
 
@@ -42,7 +41,7 @@ sub appendRecentChanges {
 	my $var = shift;
 	my $limit = shift || $self->get("recentChangesCount") || 50;
 	my $rs = $self->session->db->read("select asset.assetId, revisionDate from assetData left join asset on assetData.assetId=asset.assetId where
-		lineage like ? and lineage<>? order by revisionDate desc limit ?", [$self->get("lineage").'%', $self->get("lineage"), $self->get("recentChangesCount")]);
+		lineage like ? and lineage<>? and status='approved' order by revisionDate desc limit ?", [$self->get("lineage").'%', $self->get("lineage"), $self->get("recentChangesCount")]);
 	while (my ($id, $version) = $rs->array) {
 		my $asset = WebGUI::Asset->new($self->session, $id, "WebGUI::Asset::WikiPage", $version);
 		my $user = WebGUI::User->new($self->session, $asset->get("actionTakenBy"));
