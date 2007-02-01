@@ -15,6 +15,7 @@ package WebGUI::Asset::RSSFromParent;
 =cut
 
 use strict;
+use HTML::Entities;
 use Tie::IxHash;
 use base 'WebGUI::Asset';
 use WebGUI::Utility;
@@ -64,30 +65,38 @@ sub update {
 	$self->SUPER::update(+{%$properties, isHidden => 1});
 }
 
+#------------------------------------------------
 sub _escapeXml {
 	my $text = shift;
-	my %entities = ('<' => '&lt;', '>' => '&gt;', '"' => '&quot;', "'" => "&apos;");
-	$text =~ s/([<>\"\'])/$entities{$1}/g;
-	return $text;
+    return $text unless (ref $text eq "");
+    return HTML::Entities::encode_numeric($text)
 }
 
+#------------------------------------------------
 sub _tlsOfAsset {
 	my $self = shift;
 	my $asset = shift;
-	return (_escapeXml($asset->get('title')),
-		_escapeXml($self->session->url->getSiteURL() . $asset->getUrl),
-		_escapeXml($asset->get('synopsis')));
+    #Fix Title
+    my $title = _escapeXml($asset->get('title'));    
+    #Fix Url
+    my $url = _escapeXml($self->session->url->getSiteURL() . $asset->getUrl);    
+    #Fix Description
+    my $description = _escapeXml($asset->get('synopsis'));	
+    return ($title,$url,$description);
 }
 
+#------------------------------------------------
 sub isValidRssItem { 0 }
+
+#------------------------------------------------
 sub displayInFolder2 { 0 }
 
+#------------------------------------------------
 sub www_view {
 	my $self = shift;
 	return '' unless $self->session->asset->getId eq $self->getId;
 	return '' unless $self->getParent->isa('WebGUI::Asset::RSSCapable');
 	my $parent = $self->getParent;
-
 	my $template = WebGUI::Asset::Template->new($self->session, $parent->get('rssCapableRssTemplateId'));
 	$template->prepare;
 	$self->session->http->setMimeType('text/xml');
@@ -101,10 +110,10 @@ sub www_view {
 
 	my @items = $parent->getRssItems;
 	$var->{'item_loop'} = [];
-
+    my $counter = 0;
 	foreach my $item (@items) {
 		my $subvar = {};
-
+       
 		if (UNIVERSAL::isa($item, 'WebGUI::Asset')) {
 			next unless $item->isValidRssItem;
 			$subvar = {};
@@ -112,16 +121,14 @@ sub www_view {
 			$subvar->{guid} = $subvar->{link};
 			$subvar->{pubDate} = _escapeXml($self->session->datetime->epochToMail($item->get('dateUpdated')));
 		} elsif (ref $item eq 'HASH') {
-			foreach my $key (keys %$item) {
-                ### This does not do any XML escaping. A way must be found to
-                # recursively escape the entire data structure.
-				$subvar->{$key} = $item->{$key};
-			}
+            foreach my $key (keys %$item) {
+                $subvar->{$key} = _escapeXml($item->{$key});
+            }
 		} else {
 			$self->session->errorHandler->error("Don't know what to do with this RSS item: $item");
 			next;
 		}
-
+        $counter++;
 		push @{$var->{'item_loop'}}, $subvar;
 	}
 
