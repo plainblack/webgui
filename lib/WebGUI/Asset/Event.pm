@@ -166,6 +166,9 @@ there is an error creating the recurrence pattern.
 If not given recurrence data, will use the event's existing recurrence. This is
 used for generating future occurrences of events that don't end.
 
+Returns the new recurrence pattern's ID, or undef if failure. (NOTE: This 
+should probably use croak instead)
+
 =cut
 
 sub generateRecurringEvents {
@@ -173,19 +176,19 @@ sub generateRecurringEvents {
     my $recur   = shift;
     my $parent  = $self->getParent;
     my $session = $self->session;
-    my $id;
+    my $recurId;
     
     if ($recur) {
-        $id    = $self->setRecurrence($recur);
-        return () unless $id;
+        $recurId    = $self->setRecurrence($recur);
+        return () unless $recurId;
     }
     else {
-        $id    = $self->get("recurId");
-        $recur = {$self->getRecurrence};
+        $recurId    = $self->get("recurId");
+        $recur      = {$self->getRecurrence};
     }
     
-    my $properties    = {%{$self->get}};
-    $properties->{recurId} = $id;
+    my $properties  = {%{$self->get}};
+    $properties->{recurId} = $recurId;
     
     # Get the distance between the event startDate and endDate
     # Only days, since event recurrence only changes the Date the event occurs, not
@@ -220,7 +223,7 @@ sub generateRecurringEvents {
         }
     }
     
-    return 1;
+    return $recurId;
 }
 
 
@@ -1446,11 +1449,14 @@ sub processPropertiesFromFormPost {
         # Pattern keys
         if (nfreeze(\%recurrence_new) ne nfreeze(\%recurrence_old)) {
             # Delete all old events and create new ones
-            my $old_id    = $self->get("recurId");
+            my $old_id  = $self->get("recurId");
     
-            return ["There's something wrong with your recurrence pattern."] 
-                unless $self->generateRecurringEvents(\%recurrence_new);
+            my $new_id  = $self->generateRecurringEvents(\%recurrence_new);
+            return ["There is something wrong with your recurrence pattern."]
+                unless $new_id;
             
+            ## Update with the new recurId
+            $self->update({ recurId => $new_id });
             
             ## Delete old events
             my $events = $self->getLineage(["siblings"], {
@@ -1662,6 +1668,7 @@ Edit the event.
 
 =cut
 
+# Author's note: This sub is ugly and should be refactored according to PBP
 sub www_edit
 {
     my $self        = shift;
@@ -1743,28 +1750,56 @@ sub www_edit
                 });
     
     # start date
-    my $default_start    = WebGUI::DateTime->new($self->session, $session->form->param("start") || time)
-                ->set_time_zone($tz);
-    my ($startDate,$startTime) = split / /, $self->getDateTimeStart->toUserTimeZone
-        unless $func eq "add" || $self->get("assetId") eq "new";
+    my $default_start;
+    if ($session->form->param("start")) {
+        $default_start 
+            = WebGUI::DateTime->new($session, $session->form->param("start"));
+    }
+    else {
+        $default_start  = WebGUI::DateTime->new($session, time);
+    }
     
-    $var->{"formStartDate"}= WebGUI::Form::date($session,
-            {
-                name        => "startDate",
-                value        => $form->process("startDate") || $startDate,
-                defaultValue    => $default_start->toUserTimeZoneDate,
-            });
-    $var->{"formStartTime"} = WebGUI::Form::timeField($session,
-            {
-                name        => "startTime",
-                value        => $form->process("startTime") || $startTime,
-                defaultValue    => $default_start->toUserTimeZoneTime,
-            });
+    my ($startDate, $startTime);
+    if ($form->param("func") ne "add") {
+        my $dtStart = $self->getDateTimeStart;
+        if ($self->isAllDay) {
+            $startDate  = $dtStart->toUserTimeZoneDate;
+            $startTime  = $dtStart->toUserTimeZoneTime;
+        }
+        else {
+            $startDate  = $dtStart->toDatabaseDate;
+        }
+    }
+
+    $var->{"formStartDate"}
+        = WebGUI::Form::date($session, {
+            name            => "startDate",
+            value           => $form->process("startDate") || $startDate,
+            defaultValue    => $default_start->toUserTimeZoneDate,
+        });
+    $var->{"formStartTime"} 
+        = WebGUI::Form::timeField($session, {
+            name            => "startTime",
+            value           => $form->process("startTime") || $startTime,
+            defaultValue    => $default_start->toUserTimeZoneTime,
+        });
     
     # end date
+    # By default, it's the default start date plus an hour
     $default_start->add(hours => 1);
-    my ($endDate,$endTime) = split / /, $self->getDateTimeEnd->toUserTimeZone
-        unless $func eq "add" || $self->get("assetId") eq "new";
+    
+    my ($endDate, $endTime);
+    if ($form->process("func") ne "add") {
+        my $dtEnd = $self->getDateTimeEnd;
+        if ($self->isAllDay) {
+            $endDate    = $dtEnd->toUserTimeZoneDate;
+            $endTime    = $dtEnd->toUserTimeZoneTime;
+        }
+        else {
+            $endDate    = $dtEnd->toDatabaseDate;
+        }
+    }
+    
     $var->{"formEndDate"}    = WebGUI::Form::date($session,
             {
                 name        => "endDate",

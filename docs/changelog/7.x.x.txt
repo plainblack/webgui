@@ -45,6 +45,10 @@
    gotchas.txt for details.
  - fix: AssetExportHtml now handles periods in URLs more gracefully.
  - fix: Calendar Event Details template now uses nice dateSpan variable
+ - fix: Calendar Recurring Event Duplication (when the original event
+        occurs on a day that ALSO has a recurrence of that event).
+ - fix: Calendar Event Edit erroneously apply time zone changes to all day
+        events.
 
 7.3.8
  - Fixed a template variable rewriting problem with HTML::Template::Expr
