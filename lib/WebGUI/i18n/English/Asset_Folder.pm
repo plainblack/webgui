@@ -169,8 +169,8 @@ to do you want to go to the new Folder?</p>|,
 	},
 
 	'type' => {
-		message => q|The type of this Asset.|,
-		lastupdated => 0,
+		message => q|The type, or the name, of this Asset, such as Post, Article, Collaboration System, etc.|,
+		lastupdated => 1170365384,
 		context => q|Template variable description.|
 	},
 
