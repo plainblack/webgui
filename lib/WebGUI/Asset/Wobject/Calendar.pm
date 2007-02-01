@@ -258,7 +258,7 @@ sub addChild {
         $self->session->errorHandler->security("add a ".$properties->{className}." to a ".$self->get("className"));
         return undef;
     }
-        
+       use Carp qw(cluck); use Data::Dumper; cluck Dumper $self;
     return $self->SUPER::addChild($properties, @other);
 }
 

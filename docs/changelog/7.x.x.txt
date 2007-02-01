@@ -42,6 +42,7 @@
    the use of new template variables in the EMS checkout template.  See
    gotchas.txt for details.
  - fix: AssetExportHtml now handles periods in URLs more gracefully.
+ - fix: Calendar Event Details template now uses nice dateSpan variable
 
 7.3.8
  - Fixed a template variable rewriting problem with HTML::Template::Expr

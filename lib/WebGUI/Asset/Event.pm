@@ -131,24 +131,6 @@ sub definition {
 
 
 
-####################################################################
-
-=head2 canAdd
-
-Returns true if a user can add this asset.
-
-=cut
-
-sub canAdd {
-    my $self     = shift;
-    my $session  = shift;
-    
-    return $session->user->isInGroup($self->getParent->get("groupIdEventEdit"));
-}
-
-
-
-
 
 
 ####################################################################
@@ -190,6 +172,7 @@ sub generateRecurringEvents {
     my $self    = shift;
     my $recur   = shift;
     my $parent  = $self->getParent;
+    my $session = $self->session;
     my $id;
     
     if ($recur) {
@@ -221,12 +204,20 @@ sub generateRecurringEvents {
     for my $date (@dates) {
         my $dt        = WebGUI::DateTime->new($self->session, $date." 00:00:00");
         
-        ### TODO: Only generate if the recurId does not exist on this day
         $properties->{startDate}    = $dt->strftime('%F');
         $properties->{endDate}      = $dt->clone->add(days => $duration_days)->strftime('%F');
         
-        my $newEvent = $parent->addChild($properties);
-        $newEvent->requestAutoCommit;
+        # Only generate if the recurId does not exist on this day
+        my ($exists) 
+            = $session->db->buildArray(
+                "select count(*) from Event where recurId=? and startDate=?",
+                [$properties->{recurId}, $properties->{startDate}],
+            );
+        
+        if (!$exists) {
+            my $newEvent = $parent->addChild($properties);
+            $newEvent->requestAutoCommit;
+        }
     }
     
     return 1;
