@@ -42,6 +42,7 @@ sub _getDuration {
 }
 
 #-------------------------------------------------------------------
+
 =head2 _getExpireOffset (durationType)
 
 Returns the offset in seconds based on what is passed in
