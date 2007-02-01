@@ -321,9 +321,9 @@ sub toHtml {
 		var inputEl_$uniqueness = document.forms[0]['$id-input'];
 		var $slider = new Slider(sliderEl_$uniqueness, inputEl_$uniqueness);
 		
-		$slider.setMaximum('|.$self->getSliderMaximum.qq|');
-		$slider.setMinimum('|.$self->getSliderMinimum.qq|');
-		$slider.setValue('|.$self->getSliderValue.qq|');
+		$slider.setMaximum(|.$self->getSliderMaximum.qq|);
+		$slider.setMinimum(|.$self->getSliderMinimum.qq|);
+		$slider.setValue(|.$self->getSliderValue.qq|);
 		
 		$slider.onchange = function () {|.
 			$self->getOnChangeSlider.qq|;

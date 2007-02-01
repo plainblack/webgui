@@ -37,6 +37,7 @@
  - fix: Creating a new account when purchasing something properly redirects users to the checkout page
  - fix: Group expiration dates on subscriptions are now correct 
  - fix: Rating numbers drop after rating asset (perlDreamer Consulting, LLC)
+ - fix: Sliders break if you set minimum value (thanks to Patrick (patspam))
  - fix: EMS: blank lines appearing in registrants.  Note - this fix requires
    the use of new template variables in the EMS checkout template.  See
    gotchas.txt for details.
