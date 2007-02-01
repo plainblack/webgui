@@ -107,9 +107,15 @@ sub _exportAsHtml {
                 endingLineageLength => $newSelf->getLineageLength+$self->session->form->process("depth")
             });
 
+    $tempSession->var->end;
+    $tempSession->close;
+    
     # We're going to walk up the URL branch, making the deepest paths first
 	foreach my $assetId (@{$assetIds}) {
-		my $asset = WebGUI::Asset->newByDynamicClass($tempSession, $assetId);
+        my $assetSession 
+            = WebGUI::Session->open($self->session->config->getWebguiRoot, $self->session->config->getFilename);
+        $assetSession->user({userId=>$userId});
+		my $asset = WebGUI::Asset->newByDynamicClass($assetSession, $assetId);
 
 		my $url = $asset->get("url");
 		$self->session->output->print(sprintf($i18n->get('exporting page'), $url)) unless $quiet;
@@ -158,10 +164,6 @@ sub _exportAsHtml {
 		$assetSession->close;
 		$self->session->output->print($i18n->get('done')) unless $quiet;
 	}
-
-    # We're done with the export sessions
-	$tempSession->var->end;
-	$tempSession->close;
     
     
     if ($extrasUploadsAction eq 'symlink') {
@@ -231,6 +233,9 @@ sub _translateUrlToPath {
 	my $index   = shift;
 	my $dataRef;
 
+    # Ignore trailing slashes
+    $url =~ s{/+$}{}g;
+
     # If there is not a dot in the URL, this is easy
 	if ($url !~ m{[.]}) {					
 		$dataRef->{'path'       } = $url;
@@ -239,7 +244,7 @@ sub _translateUrlToPath {
     # There is a dot 
     else {
         # The last part after a slash is the "name"
-        my ($path,$name) = $url =~ m{(.*)  /?  ([^/]+)  $}x;   # NOTE: Might be more efficient to use index() and substr()
+        my ($path,$name) = $url =~ m{(?:(.*)  /)?  ([^/]+)  $}x;   # NOTE: Might be more efficient to use index() and substr()
 
         # If it ends in a known file type handled by apache, use that 
         if ($name =~ m{[.](?:html|htm|txt)$}) {

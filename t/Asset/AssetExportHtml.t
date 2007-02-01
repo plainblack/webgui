@@ -46,13 +46,13 @@ my $urlMap = {
 			     	 },
 
 	'index.html/foo'      => {
-					path	 => 'foo',
+					path	 => 'index.html/foo',
 		 			filename => $index,
 			     	 },
 
 	'index.html/foo.html' => {
-					path	 => undef,
-					filename => undef,
+					path	 => 'index.html',
+					filename => 'foo.html',
 				 },
 };
 
