@@ -400,11 +400,13 @@ sub setScript {
 
 =head2 useEmptyStyle ( boolean ) 
 
-Tells the style system to use an empty style rather than outputing the normal style. This is useful when you want your code to dynamically generate a style.
+Tells the style system to use an empty style rather than outputing the normal
+style. This is useful when you want your code to dynamically generate a style.
 
 =head3 boolean
 
-If set to 1 it will use an empty style, if set to 0 it will use the regular style. Defaults to 0.
+If set to 1 it will use an empty style, if set to 0 it will use the regular
+style. Defaults to 0.
 
 =cut
 

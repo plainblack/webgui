@@ -104,7 +104,8 @@ sub _exportAsHtml {
 	# Get a list of the asset IDs we need, reverse sorted by URL
     my $assetIds 
         = $newSelf->getLineage(["self","descendants"],{ 
-                endingLineageLength => $newSelf->getLineageLength+$self->session->form->process("depth")
+                endingLineageLength => $newSelf->getLineageLength+$self->session->form->process("depth"),
+                orderByClause       => 'assetData.url DESC',
             });
 
     $tempSession->var->end;
@@ -138,27 +139,41 @@ sub _exportAsHtml {
 			$defaultAssetPath = $fullPath;
 		}
 
+        # Make sure that the filename is not a directory in this path
+        if (-d $exportPath . "/" . $fullPath) {
+            # A previous asset created this directory
+            # so make this asset the index of this directory
+            if (!-e "$exportPath/$fullPath/$index") {
+                $path       .= "/$filename";
+                $filename   = $index;
+                $fullPath   .= "/$index";
+            }
+            else {
+                return (0, sprintf($i18n->get('file exists when making directory index'), $fullPath, $@));
+            }
+        }
+
 		$self->session->db->write("UPDATE asset SET lastExportedAs = ? WHERE assetId = ?", [$fullPath, $asset->getId]);
 
-		$path = $exportPath . (length($path)? "/$path" : "");
-		eval { mkpath($path) };
-		if($@) {
-			return (0, sprintf($i18n->get('could not create path'), $path, $@));
-		}
-		$path .= "/".$filename;
+        $path = $exportPath . (length($path)? "/$path" : "");
+        eval { mkpath($path) };
+        if($@) {
+            return (0, sprintf($i18n->get('could not create path'), $path, $@));
+        }
+        $path .= "/".$filename;
 
-                my $file = eval { FileHandle->new(">".$path) or die "$!" };
-		if ($@) {
-			return (0, sprintf($i18n->get('could not open path'), $path, $@));
-		} else {
-			$assetSession->output->setHandle($file);
-			$assetSession->asset($asset);
-			my $content = $asset->exportHtml_view;
-			unless ($content eq "chunked") {
-				$assetSession->output->print($content);
-			}
-			$file->close;
-		}
+        my $file = eval { FileHandle->new(">".$path) or die "$!" };
+        if ($@) {
+            return (0, sprintf($i18n->get('could not open path'), $path, $@));
+        } else {
+            $assetSession->output->setHandle($file);
+            $assetSession->asset($asset);
+            my $content = $asset->exportHtml_view;
+            unless ($content eq "chunked") {
+                $assetSession->output->print($content);
+            }
+        $file->close;
+        }
 
 		$assetSession->var->end;
 		$assetSession->close;
@@ -384,8 +399,9 @@ Executes the export process and displays real time status. This operation is dis
 sub www_exportGenerate {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(13));
-	# This routine is called in an IFRAME and prints status output directly to the browser.
+    # This routine is called in an IFRAME and prints status output directly to the browser.
 	$|++;				# Unbuffered data output
+	$self->session->style->useEmptyStyle(1);
 	$self->session->http->sendHeader;
 
 	my $i18n = WebGUI::International->new($self->session, 'Asset');

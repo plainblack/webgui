@@ -40,6 +40,7 @@
  - fix: EMS: blank lines appearing in registrants.  Note - this fix requires
    the use of new template variables in the EMS checkout template.  See
    gotchas.txt for details.
+ - fix: AssetExportHtml now handles periods in URLs more gracefully.
 
 7.3.8
  - Fixed a template variable rewriting problem with HTML::Template::Expr

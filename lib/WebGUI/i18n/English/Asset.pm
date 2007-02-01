@@ -854,6 +854,13 @@ config file must be enabled for this function to be available.</p>
 		lastUpdated => 1129420080,
 	},
 
+    'file exists when making directory index' => {
+        message     => q{Couldn't create %-s because %-s <br />}
+                    . q{This most likely means you have a page with this URL already. }
+                    . q{Altering that page's URL to not end with your directory index will fix this.},
+        lastUpdated => 0,
+    },
+
 	'could not create path' => {
 		message => q|
 Couldn't create %-s because %-s <br />

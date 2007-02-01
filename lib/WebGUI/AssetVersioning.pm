@@ -36,6 +36,7 @@ This is a mixin package for WebGUI::Asset that contains all versioning related f
 
  # TODO: Add usage for all methods available from this class
 
+
 =head1 METHODS
 
 These methods are available from this class:
