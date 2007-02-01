@@ -707,6 +707,11 @@ SQL
 		    description     => $post->get('synopsis'),
 		    pubDate         => $datetime->epochToMail($post->get('dateUpdated')),
 		    attachmentLoop  => $attachmentLoop, 
+			userDefined1 => $post->get("userDefined1"),
+			userDefined2 => $post->get("userDefined2"),
+			userDefined3 => $post->get("userDefined3"),
+			userDefined4 => $post->get("userDefined4"),
+			userDefined5 => $post->get("userDefined5"),
 		 };
 	}
 
