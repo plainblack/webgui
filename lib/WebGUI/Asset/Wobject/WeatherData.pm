@@ -19,7 +19,7 @@ package WebGUI::Asset::Wobject::WeatherData;
 
 use strict;
 
-use LWP::UserAgent qw($ua);
+use LWP::UserAgent;
 use Tie::CPHash;
 use Tie::IxHash;
 use JSON;
