@@ -23,6 +23,7 @@
    require that it be used.
  - fix: Image in trash though visible in article
  - fix: Direct 6.8.10-7.2+ Upgrade Problem
+ - fix: Prototype creation with no permissions (perlDreamer Consulting, LLC)
  - fix: Calendar feeds lastUpdated field only shows the year
  - fix: Calendar feeds do not work
  - fix: Sharing information between Calendars on the same server is now less

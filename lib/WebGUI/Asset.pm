@@ -1894,6 +1894,7 @@ sub www_add {
 	my $self = shift;
 	my %prototypeProperties;
 	my $class = $self->session->form->process("class","className");
+	return $self->session->privilege->insufficient() unless ($class->canAdd($self->session));
 	if ($self->session->form->process('prototype')) {
 		my $prototype = WebGUI::Asset->new($self->session, $self->session->form->process("prototype"),$class);
 		foreach my $definition (@{$prototype->definition($self->session)}) { # cycle through rather than copying properties to avoid grabbing stuff we shouldn't grab
@@ -1920,7 +1921,6 @@ sub www_add {
 	$properties{isHidden} = 1 unless (WebGUI::Utility::isIn($class, @{$self->session->config->get("assetContainers")}));
 	my $newAsset = WebGUI::Asset->newByPropertyHashRef($self->session,\%properties);
 	$newAsset->{_parent} = $self;
-	return $self->session->privilege->insufficient() unless ($newAsset->canAdd($self->session));
 	return $newAsset->www_edit();
 }
 
