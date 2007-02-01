@@ -49,17 +49,27 @@ WebGUI::DateTime - DateTime subclass with additional WebGUI methods
  my $dt		= WebGUI::DateTime->new( year => 2006, month => 11, day => 6 );
  
  
- my $mysql	= $dt->toMysql;		# Make a MySQL date/time string
- my $mysqlDate	= $dt->toMysqlDate;	# Make a MySQL date string
- my $mysqlTime	= $dt->toMysqlTime;	# Make a MySQL time string
+ # Get a string to give to MySQL
+ my $mysqlDatetime  = $dt->toDatabase;
+ my $mysqlDate      = $dt->toDatabaseDate;
+ my $mysqlTime      = $dt->toDatabaseTime
+
+ # Get a string for WebGUI::Form elements
+ my $userDatetime   = $dt->toUserTimeZone;
+ my $userDate       = $dt->toUserTimeZoneDate;
+ my $userTime       = $dt->toUserTimeZoneTime;
  
+ # Get strings to be used for iCalendar feeds
+ my $ical	        = $dt->toIcal;		
+ my $icalDate	    = $dt->toIcalDate;	
+ my $icalTime	    = $dt->toIcalTime;	
  
- my $ical	= $dt->toIcal;		# Make an iCal date/time string
- my $icalDate	= $dt->toIcalDate;	# Make an iCal date string
- my $icalTime	= $dt->toIcalTime;	# Make an iCal time string
- 
- my $webguiDate = $dt->webguiDate($webguiFormat)  #return the date based on WebGUI's date format string
- 
+ # Get a string based on the user's preferred date/time format in the user's 
+ # time zone.
+ my $webguiDate     = $dt->webguiDate;
+
+ # Get a string based on a passed WebGUI date/time format
+ my $webguiDate     = $dt->webguiDate($webguiFormat);
  
  ### See perldoc DateTime for additional methods ###
 
@@ -209,13 +219,17 @@ sub cloneToUserTimeZone {
 
 Handle copying all WebGUI::DateTime specific data.  This is a class method.
 
+This method overrides the from_object in DateTime to keep WebGUI::DateTime
+specific information being passed between object instances. Most DateTime 
+math actually creates new objects.
+
 =cut
 
 sub from_object {
-    my $class = shift;
-    my %args = @_;
+    my $class   = shift;
+    my %args    = @_;
     my $session = $args{object}->session;
-    my $copy = $class->SUPER::from_object(@_);
+    my $copy    = $class->SUPER::from_object(@_);
     $copy->session($session);
     return $copy;
 }
@@ -239,7 +253,7 @@ sub toDatabase {
 =head2 toDatabaseDate
 
 Returns a MySQL Date string. Any time data stored by this object will be 
-ignored. Is not adjusted for time zone.
+ignored. Is adjusted to the UTC time zone.
 
 =cut
 

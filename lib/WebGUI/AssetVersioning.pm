@@ -31,6 +31,11 @@ This is a mixin package for WebGUI::Asset that contains all versioning related f
 
  use WebGUI::Asset;
 
+ my $newAsset   = $asset->addRevision(\%properties);
+ my $newAsset   = $asset->addRevision(\%properties, $revisionDate, \%options);
+
+ # TODO: Add usage for all methods available from this class
+ 
 =head1 METHODS
 
 These methods are available from this class:
@@ -42,7 +47,11 @@ These methods are available from this class:
 
 =head2 addRevision ( properties [ , revisionDate, options ] )
 
-Adds a revision of an existing asset. Note that programmers should almost never call this method directly, but rather use the update() method instead.
+Creates a new revision of an existing asset. Returns the new revision of
+the asset.
+
+Note that programmers should almost never call this method directly, but 
+rather use the update() method instead.
 
 =head3 properties
 
@@ -63,30 +72,46 @@ If this is set to 1 then assets that would normally autocommit their workflow (l
 =cut
 
 sub addRevision {
-        my $self = shift;
-        my $properties = shift;
-	my $now = shift ||$self->session->datetime->time();
-	my $options = shift;
-	my $autoCommitId = $self->getAutoCommitWorkflowId() unless ($options->{skipAutoCommitWorkflows});
-	my $workingTag = ($autoCommitId) ? WebGUI::VersionTag->create($self->session, {groupToUse=>'12', workflowId=>$autoCommitId}) : WebGUI::VersionTag->getWorking($self->session);
+    my $self            = shift;
+    my $properties      = shift;
+	my $now             = shift     || $self->session->datetime->time();
+	my $options         = shift;
+	
+    my $autoCommitId    = $self->getAutoCommitWorkflowId() unless ($options->{skipAutoCommitWorkflows});
+	my $workingTag      
+        = ($autoCommitId) 
+            ? WebGUI::VersionTag->create($self->session, {groupToUse=>'12', workflowId=>$autoCommitId}) 
+            : WebGUI::VersionTag->getWorking($self->session)
+            ;
+
 	$self->session->db->beginTransaction;
-	$self->session->db->write("insert into assetData (assetId, revisionDate, revisedBy, tagId, status, url,
-		ownerUserId, groupIdEdit, groupIdView) values (?, ?, ?, ?, 'pending', ?, '3','3','7')",
-		[$self->getId, $now, $self->session->user->userId, $workingTag->getId, $self->getId] );
-        foreach my $definition (@{$self->definition($self->session)}) {
-                unless ($definition->{tableName} eq "assetData") {
-                        $self->session->db->write("insert into ".$definition->{tableName}." (assetId,revisionDate) values (?,?)", [$self->getId, $now]);
-                }
+	$self->session->db->write(
+        "insert into assetData "
+        . "(assetId, revisionDate, revisedBy, tagId, status, url, ownerUserId, groupIdEdit, groupIdView) "
+        . "values (?, ?, ?, ?, 'pending', ?, '3','3','7')",
+		[$self->getId, $now, $self->session->user->userId, $workingTag->getId, $self->getId] 
+    );
+
+    foreach my $definition (@{$self->definition($self->session)}) {
+        unless ($definition->{tableName} eq "assetData") {
+            $self->session->db->write(
+                "insert into ".$definition->{tableName}." (assetId,revisionDate) values (?,?)", 
+                [$self->getId, $now]
+            );
         }
-	$self->session->db->commit;
-        my $newVersion = WebGUI::Asset->new($self->session,$self->getId, $self->get("className"), $now);
-        $newVersion->updateHistory("created revision");
-	$newVersion->update($self->get);
-	$newVersion->setVersionLock;
-	$properties->{status} = 'pending';
-        $newVersion->update($properties);
-	$newVersion->setAutoCommitTag($workingTag) if (defined $autoCommitId);
-        return $newVersion;
+    }
+    
+    $self->session->db->commit;
+    
+    my $newVersion = WebGUI::Asset->new($self->session,$self->getId, $self->get("className"), $now);
+    $newVersion->updateHistory("created revision");
+    $newVersion->update($self->get);
+    $newVersion->setVersionLock;
+    $properties->{status} = 'pending';
+    $newVersion->update($properties);
+    $newVersion->setAutoCommitTag($workingTag) if (defined $autoCommitId);
+    
+    return $newVersion;
 }
 
 

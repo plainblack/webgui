@@ -41,15 +41,17 @@ These methods are available from this class:
 
 =head2 checkExportPath ( )
 
-Returns a descriptive error message (HTML) if the export path is not writable, does not exist, or is not specified in the per-domain WebGUI config file.
+Returns a descriptive error message (HTML) if the export path is not 
+writable, does not exist, or is not specified in the per-domain WebGUI 
+config file.
 
 =cut
 
 sub checkExportPath {
 	my $self = shift;
 	my $error;
-	if(defined $self->session->config->get("exportPath")) {
-		if(-d $self->session->config->get("exportPath")) {
+	if (defined $self->session->config->get("exportPath")) {
+		if (-d $self->session->config->get("exportPath")) {
 			unless (-w $self->session->config->get("exportPath")) {
 				$error .= 'Error: The export path '.$self->session->config->get("exportPath").' is not writable.<br />
 						Make sure that the webserver has permissions to write to that directory';
@@ -76,22 +78,22 @@ sub checkExportPath {
 # further
 
 sub _exportAsHtml {
-	my $self = shift;
-	my $quiet = shift;
-	my $userId = shift;
-	my $index = shift;
+	my $self                = shift;
+	my $quiet               = shift;
+	my $userId              = shift;
+	my $index               = shift;
 	my $extrasUploadsAction = shift;
-	my $rootUrlAction = shift;
-	my $startTime = $self->session->datetime->time();
+	my $rootUrlAction       = shift;
+	my $startTime           = $self->session->datetime->time();
 
-	my $exportPathError = $self->checkExportPath();
+	my $exportPathError     = $self->checkExportPath();
 	if ($exportPathError) {
 		return (0, $exportPathError);
 	}
 
-	my $exportPath = $self->session->config->get('exportPath');
-	my $defaultAssetId = $self->session->setting->get('defaultPage');
-	my $defaultAssetPath = undef;
+	my $exportPath          = $self->session->config->get('exportPath');
+	my $defaultAssetId      = $self->session->setting->get('defaultPage');
+	my $defaultAssetPath    = undef;
 
 	my $i18n = WebGUI::International->new($self->session, 'Asset');
 
@@ -99,14 +101,15 @@ sub _exportAsHtml {
 	$tempSession->user({userId=>$userId});
 
 	my $newSelf = WebGUI::Asset->new($tempSession, $self->getId, $self->get("className"), $self->get("revisionDate"));
-	my $assetIds = $newSelf->getLineage(["self","descendants"],{endingLineageLength=>$newSelf->getLineageLength+$self->session->form->process("depth")});
-	$tempSession->var->end;
-	$tempSession->close;
+	# Get a list of the asset IDs we need, reverse sorted by URL
+    my $assetIds 
+        = $newSelf->getLineage(["self","descendants"],{ 
+                endingLineageLength => $newSelf->getLineageLength+$self->session->form->process("depth")
+            });
 
+    # We're going to walk up the URL branch, making the deepest paths first
 	foreach my $assetId (@{$assetIds}) {
-		my $assetSession = WebGUI::Session->open($self->session->config->getWebguiRoot, $self->session->config->getFilename);
-		$assetSession->user({userId => $userId});
-		my $asset = WebGUI::Asset->newByDynamicClass($assetSession, $assetId);
+		my $asset = WebGUI::Asset->newByDynamicClass($tempSession, $assetId);
 
 		my $url = $asset->get("url");
 		$self->session->output->print(sprintf($i18n->get('exporting page'), $url)) unless $quiet;
@@ -121,8 +124,8 @@ sub _exportAsHtml {
 			return (0, $error);
 		}
 
-		my $path = $pathData->{'path'};
-		my $filename = $pathData->{'filename'};
+		my $path        = $pathData->{'path'};
+		my $filename    = $pathData->{'filename'};
 
 		my $fullPath = (length($path)? "$path/" : "").$filename;
 		if ($asset->getId eq $defaultAssetId) {
@@ -156,7 +159,12 @@ sub _exportAsHtml {
 		$self->session->output->print($i18n->get('done')) unless $quiet;
 	}
 
-	if ($extrasUploadsAction eq 'symlink') {
+    # We're done with the export sessions
+	$tempSession->var->end;
+	$tempSession->close;
+    
+    
+    if ($extrasUploadsAction eq 'symlink') {
 		my ($extrasPath, $uploadsPath) = ($self->session->config->get('extrasPath'), $self->session->config->get('uploadsPath'));
 		my ($extrasUrl, $uploadsUrl) = ($self->session->config->get('extrasURL'), $self->session->config->get('uploadsURL'));
 		s#^/*## for ($extrasUrl, $uploadsUrl);
@@ -218,48 +226,33 @@ index filename passed in from the UI
 =cut
 
 sub _translateUrlToPath {
-	my $self = shift;
-	my $url = shift;
-	my $index = shift;
+	my $self    = shift;
+	my $url     = shift;
+	my $index   = shift;
 	my $dataRef;
 
-	if ($url !~ m{\.}) {					# If there is not a dot in the URL, this is easy
-		$dataRef->{'path'} = $url;
-		$dataRef->{'filename'} = $index;
+    # If there is not a dot in the URL, this is easy
+	if ($url !~ m{[.]}) {					
+		$dataRef->{'path'       } = $url;
+		$dataRef->{'filename'   } = $index;
 	}
-	elsif ($url =~ /^(.*)\/(.*)$/) {			# If there is a dot and a slash in the url 
-		my $dotCounter = 0;				# Track how many dots we found
-		my $preSlash = $1;		
-		my $postSlash = $2;
+    # There is a dot 
+    else {
+        # The last part after a slash is the "name"
+        my ($path,$name) = $url =~ m{(.*)  /?  ([^/]+)  $}x;   # NOTE: Might be more efficient to use index() and substr()
 
-		if ($preSlash =~ /\./) {			# webgui url index.html/foo becomes folder foo, filename index user specified
-			$dotCounter++;
-			$dataRef->{'path'} = $postSlash;
-			$dataRef->{'filename'} = $index;
-		}
-		
-		if ($postSlash =~ /\./) {			# webgui url foo/page.html becomes folder foo, filename page.html
-			$dotCounter++;
-			$dataRef->{'path'} = $preSlash;
-			$dataRef->{'filename'} = $postSlash;
-		}
-
-		if ($postSlash eq "") {				# webgui url foo.html/ becomes no path, filename foo.html
-			$dataRef->{'path'} = undef;
-			$dataRef->{'filename'} = $preSlash;
-		}
-
-		if ($dotCounter == 2) {				# webgui url foo.html/page.html becomes an error because this is non-sensical
-			$self->session->errorHandler->error("Cannot generate path for url $url.  Ambiguious.");
-			$dataRef->{'path'} = undef;
-			$dataRef->{'filename'} = undef;
-			$dataRef->{'error'} = "Cannot generate path for url $url.  Ambiguious.";
-		}
-	}
-	else {							# Dots in the url but no slash
-		$dataRef->{'path'} = undef;
-		$dataRef->{'filename'} = $url;			# webgui url foo.html becomes no path, filename foo.html
-	}
+        # If it ends in a known file type handled by apache, use that 
+        if ($name =~ m{[.](?:html|htm|txt)$}) {
+            $dataRef->{'path'       } = $path;
+            $dataRef->{'filename'   } = $name;
+        }
+        else {
+            # It doesn't end in a known file type
+            # Make a directory for it
+            $dataRef->{'path'       } = $url;
+            $dataRef->{'filename'   } = $index;
+        }
+    }
 	
 	return $dataRef;
 }	

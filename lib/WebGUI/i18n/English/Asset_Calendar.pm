@@ -276,13 +276,10 @@ our $I18N = {
 			context		=> q{Description of what the Calendar Update Feeds workflow activity does},
 	},	
 	
-#################### ASSET NAME ####################
-	'assetName' => {
-		message 	=> q{Calendar},
-		lastUpdated 	=> 1131394072,
-	},
 
-	'add/edit title' => {
+#################### HELP PAGES ####################
+    
+    'add/edit title' => {
 		message 	=> q|Calendar, Add/Edit|,
 		lastUpdated 	=> 1165878391,
 	},
@@ -292,6 +289,13 @@ our $I18N = {
 		lastUpdated 	=> 1165878391,
 	},
 
+
+
+#################### ASSET NAME ####################
+	'assetName' => {
+		message 	=> q{Calendar},
+		lastUpdated 	=> 1131394072,
+	},
 };
 
 1;
