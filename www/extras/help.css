@@ -1,3 +1,16 @@
 div.helpIndent {
 	margin-left: 20px;
 }
+
+dd {
+        margin-bottom:15px;
+}
+
+dl {
+        margin-top:15px;
+}
+
+dt {
+	font-weight: bold;
+}
+
