@@ -91,8 +91,8 @@ sub execute {
 			# May need to fix this in the future.
             		my $returnValue = WebGUI::Asset::Wobject::SyndicatedContent::_get_rss_data($self->session, $url);
 			unless (defined $returnValue) {
-				$self->session->errorHandler->error("GetSyndicatedContent Workflow Activity: _get_rss_data returned undef while trying to process syndicated content url $url");
-				return $self->ERROR;
+				$self->session->errorHandler->error("GetSyndicatedContent Workflow Activity: _get_rss_data returned undef while trying to process syndicated content url $url, which usually indicates an improper URL, or a malformed document");
+				next;
 			}
         	}
 		

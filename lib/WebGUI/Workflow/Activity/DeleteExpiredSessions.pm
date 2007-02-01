@@ -69,14 +69,18 @@ See WebGUI::Workflow::Activity::execute() for details.
 sub execute {
 	my $self = shift;
 	my $sth = $self->session->db->read("select sessionId from userSession where expires<?",[time()]);
+	my $time = time();
         while (my ($sessionId) = $sth->array) {
 		my $session = WebGUI::Session->open($self->session->config->getWebguiRoot, $self->session->config->getFilename, undef, undef, $sessionId, 1);
 		if (defined $session) {
 			$session->var->end;
 			$session->close;
 		}
+		if ((time() - $time) > 55) {
+        		$sth->finish;
+			return $self->WAITING;
+		}
         }
-        $sth->finish;
 	return $self->COMPLETE;
 }
 

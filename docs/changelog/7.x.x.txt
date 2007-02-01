@@ -14,6 +14,8 @@
  - fix: Added better error trapping for WikiMaster
  - fix: Wiki causes site to fail
  - fix: Wiki Error on plainblack.com
+ - Made exipred sessions workflow activity more fault tollerant. 
+ - Made rss fetching more fault tollerant.
  - fix: lack of testing for valid object creation
  - fix: No mention of intermediate upgrade step in gotcha's
  - fix: A newly released version of Html::Template fixes a bug with global
