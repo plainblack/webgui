@@ -20,6 +20,7 @@
  - rfe: added user defined fields to collaboration system rss (Dept of State)
  - Simplified Spectre's initial data load, and reduced memory footprint in the
    process.
+ - fix: Spectre needs to be restarted every day
  - fix: lack of testing for valid object creation
  - fix: No mention of intermediate upgrade step in gotcha's
  - fix: A newly released version of Html::Template fixes a bug with global
