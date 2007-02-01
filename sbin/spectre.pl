@@ -24,6 +24,7 @@ my $daemon;
 my $run;
 my $debug;
 my $test;
+my $status;
 
 GetOptions(
 	'help'=>\$help,
@@ -31,11 +32,12 @@ GetOptions(
 	'shutdown'=>\$shutdown,
 	'daemon'=>\$daemon,
 	'debug' =>\$debug,
+	'status' => \$status,
 	'run' => \$run,
 	'test' => \$test
 	);
 
-if ($help || !($ping||$shutdown||$daemon||$run||$test)) {
+if ($help || !($ping||$shutdown||$daemon||$run||$test||$status)) {
 	print <<STOP;
 
 	S.P.E.C.T.R.E. is the Supervisor of Perplexing Event-handling Contraptions for 
@@ -58,6 +60,8 @@ if ($help || !($ping||$shutdown||$daemon||$run||$test)) {
 	--run		Starts Spectre without forking it as a daemon.
 
 	--shutdown	Stops the running Spectre server.
+
+	--status	Returns a report about the internals of Spectre.
 
 	--test		Tests the connection between Spectre and WebGUI. Both Spectre
 			and WebGUI must be running to use this function.
@@ -95,6 +99,8 @@ if ($shutdown) {
 	my $res = ping();
 	print "Spectre is Alive!\n" unless $res;
 	print "Spectre is not responding.\n".$res if $res;
+} elsif ($status) {
+	print getStatusReport();
 } elsif ($test) {
 	Spectre::Admin->runTests($config);
 } elsif ($run) {
@@ -123,3 +129,19 @@ sub ping {
 	return 0 if ($result eq "pong");
 	return 1;
 }
+
+sub getStatusReport {
+	my $remote = create_ikc_client(
+	        port=>$config->get("port"),
+	        ip=>$config->get("ip"),
+	        name=>rand(100000),
+        	timeout=>10
+        	);
+	return $POE::Component::IKC::ClientLite::error unless $remote;
+	my $result = $remote->post_respond('workflow/getStatus');
+	return $POE::Component::IKC::ClientLite::error unless defined $result;
+	$remote->disconnect;
+	undef $remote;
+	return $result;
+}
+
