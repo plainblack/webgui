@@ -16,12 +16,15 @@ package Spectre::Admin;
 
 use strict;
 use HTTP::Request;
+use JSON;
+use Log::Log4perl;
 use LWP::UserAgent;
 use POE;
 use POE::Component::IKC::Server;
 use POE::Component::IKC::Specifier;
 use Spectre::Cron;
 use Spectre::Workflow;
+
 
 #-------------------------------------------------------------------
 
@@ -37,6 +40,7 @@ sub _start {
         my $serviceName = "admin";
         $kernel->alias_set($serviceName);
         $kernel->call( IKC => publish => $serviceName, $publicEvents );
+	$kernel->delay_set("loadSiteData",3);
 }
 
 #-------------------------------------------------------------------
@@ -109,7 +113,7 @@ sub error {
 
 #-------------------------------------------------------------------
 
-=head3 getLogger ( )
+=head2 getLogger ( )
 
 Returns a reference to the logger.
 
@@ -118,6 +122,51 @@ Returns a reference to the logger.
 sub getLogger {
 	my $self = shift;
 	return $self->{_logger};
+}
+
+#-------------------------------------------------------------------
+
+=head2 loadSiteData ( )
+
+Fetches the site from each defined site, and loads it into the Workflow and Cron governors.
+
+=cut
+
+sub loadSiteData {
+        my ( $kernel, $self) = @_[ KERNEL, OBJECT ];
+	my $configs = WebGUI::Config->readAllConfigs($self->{_config}->getWebguiRoot);
+	foreach my $key (keys %{$configs}) {
+		next if $key =~ m/^demo/;
+		$self->debug("Fetching site data for $key");
+		 my $userAgent = new LWP::UserAgent;
+		$userAgent->env_proxy;
+        	$userAgent->agent("Spectre");
+        	$userAgent->timeout(30);
+		my $url = "http://".$configs->{$key}->get("sitename")->[0].":".$self->{_config}->get("webguiPort").$configs->{$key}->get("gateway")."?op=spectreGetSiteData";
+        	my $request = new HTTP::Request (GET => $url);
+        	my $response = $userAgent->request($request);
+        	if ($response->is_error) {
+			$self->error( "Couldn't connect to WebGUI site $key");
+        	} 
+		else {
+			my $siteData = {};
+			eval { $siteData = JSON::jsonToObj($response->content); };
+			if ($@) {
+				$self->error("Couldn't fetch Spectre configuration data for $key");
+			}
+			else {
+				$self->debug("Loading workflow data for $key");
+				foreach my $instance (@{$siteData->{workflow}}) {
+					$kernel->post("workflow" ,"addInstance", $instance);
+				}
+				$self->debug("Loading scheduler data for $key");
+				foreach my $task (@{$siteData->{cron}}) {
+					$task->{config} = $key;
+					$kernel->post("cron", "addJob", $task);
+				}
+			}
+        	}
+	}	
 }
 
 #-------------------------------------------------------------------
@@ -152,7 +201,7 @@ sub new {
        	 	name => 'Spectre'
         	);
 	POE::Session->create(
-		object_states => [ $self => {_start=>"_start", _stop=>"_stop", "shutdown"=>"_stop", "ping"=>"ping"} ],
+		object_states => [ $self => {_start=>"_start", _stop=>"_stop", "shutdown"=>"_stop", "ping"=>"ping", "loadSiteData"=>"loadSiteData"} ],
 		args=>[["shutdown","ping"]]
         	);
 	Spectre::Workflow->new($config, $logger, $debug);
@@ -192,7 +241,7 @@ sub runTests {
 	print "Running connectivity tests.\n";
 	my $configs = WebGUI::Config->readAllConfigs($config->getWebguiRoot);
 	foreach my $key (keys %{$configs}) {
-		next if $config =~ m/^demo/;
+		next if $key =~ m/^demo/;
 		print "Testing $key\n";
 		 my $userAgent = new LWP::UserAgent;
 		$userAgent->env_proxy;

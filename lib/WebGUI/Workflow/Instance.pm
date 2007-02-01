@@ -144,6 +144,27 @@ sub get {
 
 #-------------------------------------------------------------------
 
+=head2 getAllInstances ( session )
+
+Returns an array reference of all the instance objects defined in this system. A class method.
+
+=cut
+
+sub getAllInstances {
+	my $class = shift;
+	my $session = shift;
+        my @instances = ();
+        my $rs = $session->db->read("SELECT instanceId FROM WorkflowInstance");
+        while (my ($instanceId) = $rs->array) {
+                push(@instances, WebGUI::Workflow::Instance->new($session, $instanceId));
+        }
+        return \@instances;	
+}
+
+
+
+#-------------------------------------------------------------------
+
 =head2 getId ( )
 
 Returns the ID of this instance.

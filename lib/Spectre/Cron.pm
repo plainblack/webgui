@@ -19,8 +19,6 @@ use DateTime;
 use HTTP::Request::Common;
 use HTTP::Cookies;
 use POE qw(Component::Client::HTTP);
-use WebGUI::Session;
-use WebGUI::Workflow::Cron;
 
 #-------------------------------------------------------------------
 
@@ -36,12 +34,6 @@ sub _start {
         my $serviceName = "cron";
         $kernel->alias_set($serviceName);
         $kernel->call( IKC => publish => $serviceName, $publicEvents );
-	$self->debug("Loading the schedules from all the sites.");
-	my $configs = WebGUI::Config->readAllConfigs($self->config->getWebguiRoot);
-	foreach my $config (keys %{$configs}) {
-		next if $config =~ m/^demo/;
-		$kernel->yield("loadSchedule", $config);
-	}
         $kernel->yield("checkSchedules");
 }
 
@@ -133,7 +125,6 @@ An integer (1,2,3) that determines what priority the workflow should be executed
 
 sub addJob {
 	my ($self, $params) = @_[OBJECT, ARG0];
-	return 0 unless ($params->{enabled});
 	my $id = $params->{config}."-".$params->{taskId};
 	$self->debug("Adding schedule ".$params->{taskId}." to the queue.");
 	$params->{schedule} = join(" ", $params->{minuteOfHour}, $params->{hourOfDay}, $params->{dayOfMonth}, $params->{monthOfYear}, $params->{dayOfWeek});
@@ -338,38 +329,10 @@ sub getLogger {
 	return $self->{_logger};
 }
 
-#-------------------------------------------------------------------
-
-=head2 loadSchedule ( config )
-
-Loads the workflow schedule from a particular site.
-
-=head3 config
-
-The config filename for the site to load the schedule.
-
-=cut
-
-sub loadSchedule {
-	my ($kernel, $self, $config) = @_[KERNEL, OBJECT, ARG0];
-	$self->debug("Loading schedules for $config.");
-	my $session = WebGUI::Session->open($self->config->getWebguiRoot, $config);
-	my $result = $session->db->read("select * from WorkflowSchedule");
-	while (my $data = $result->hashRef) {
-		my $params = JSON::jsonToObj($data->{parameters});
-		$data->{parameters} = $params->{parameters};
-		$data->{config} = $config;
-		$data->{gateway} = $session->config->get("gateway");
-		$data->{sitename} = $session->config->get("sitename")->[0];
-		$kernel->yield("addJob", $data);
-	}
-	$result->finish;
-	$session->close;
-}
 
 #-------------------------------------------------------------------
 
-=head2 new ( config, logger, workflow, [ debug ] )
+=head2 new ( config, logger, [ debug ] )
 
 Constructor.
 
@@ -380,10 +343,6 @@ A WebGUI::Config object that represents the spectre.conf file.
 =head3 logger
 
 A reference to the logger object.
-
-=head3 workflow
-
-A reference to the Worfklow session.
 
 =head3 debug
 
@@ -400,7 +359,7 @@ sub new {
 	bless $self, $class;
 	my @publicEvents = qw(runJob runJobResponse addJob deleteJob);
 	POE::Session->create(
-		object_states => [ $self => [qw(_start _stop runJob runJobResponse addJob deleteJob checkSchedules checkSchedule loadSchedule), @publicEvents] ],
+		object_states => [ $self => [qw(_start _stop runJob runJobResponse addJob deleteJob checkSchedules checkSchedule), @publicEvents] ],
 		args=>[\@publicEvents]
         	);
 	my $cookies = HTTP::Cookies->new(file => '/tmp/cookies');

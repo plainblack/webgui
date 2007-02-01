@@ -18,7 +18,6 @@ use strict;
 use HTTP::Request::Common;
 use HTTP::Cookies;
 use POE qw(Component::Client::HTTP);
-use WebGUI::Session;
 
 #-------------------------------------------------------------------
 
@@ -34,12 +33,6 @@ sub _start {
         my $serviceName = "workflow";
         $kernel->alias_set($serviceName);
         $kernel->call( IKC => publish => $serviceName, $publicEvents );
-	$self->debug("Reading workflow configs.");
-	my $configs = WebGUI::Config->readAllConfigs($self->config->getWebguiRoot);
-	foreach my $config (keys %{$configs}) {
-		next if $config =~ m/^demo/;
-		$kernel->yield("loadWorkflows", $configs->{$config});
-	}
         $kernel->yield("checkInstances");
 }
 
@@ -260,24 +253,6 @@ sub getNextInstance {
 
 #-------------------------------------------------------------------
 
-=head2 loadWorkflows ( )
-
-=cut 
-
-sub loadWorkflows {
-	my ($kernel, $self, $config) = @_[KERNEL, OBJECT, ARG0];
-	$self->debug("Loading workflows for ".$config->getFilename.".");
-	my $session = WebGUI::Session->open($config->getWebguiRoot, $config->getFilename);
-	my $result = $session->db->read("select instanceId,priority from WorkflowInstance");
-	while (my ($id, $priority) = $result->array) {
-		$kernel->yield("addInstance", {gateway=>$config->get("gateway"), sitename=>$config->get("sitename")->[0], instanceId=>$id, priority=>$priority});
-	}
-	$result->finish;
-	$session->close;
-}
-
-#-------------------------------------------------------------------
-
 =head2 new ( config, logger, [ , debug ] )
 
 Constructor. Loads all active workflows from each WebGUI site and begins executing them.
@@ -305,7 +280,7 @@ sub new {
 	bless $self, $class;
 	my @publicEvents = qw(addInstance deleteInstance);
 	POE::Session->create(
-		object_states => [ $self => [qw(_start _stop returnInstanceToRunnableState addInstance checkInstances deleteInstance suspendInstance loadWorkflows runWorker workerResponse), @publicEvents] ],
+		object_states => [ $self => [qw(_start _stop returnInstanceToRunnableState addInstance checkInstances deleteInstance suspendInstance runWorker workerResponse), @publicEvents] ],
 		args=>[\@publicEvents]
         	);
 	my $cookies = HTTP::Cookies->new(file => '/tmp/cookies');

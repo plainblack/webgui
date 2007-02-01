@@ -11,8 +11,11 @@ package WebGUI::Operation::Spectre;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::Utility;
+use JSON;
 use POE::Component::IKC::ClientLite;
+use WebGUI::Utility;
+use WebGUI::Workflow::Cron;
+use WebGUI::Workflow::Instance;
 
 =head1 NAME
 
@@ -23,6 +26,60 @@ Package WebGUI::Operation::Spectre
 Operations for Spectre.
 
 =cut
+
+#-------------------------------------------------------------------
+
+=head2 www_spectreGetSiteData ( )
+
+Checks to ensure the requestor is who we think it is, and then returns a JSON string with worklfow and cron data. We do it in one payload for efficiency.
+
+=cut
+
+sub www_spectreGetSiteData {
+        my $session = shift;
+	$session->http->setMimeType("text/json");
+	$session->http->setCacheControl("none");
+	my %siteData = ();
+	if (!isInSubnet($session->env->get("REMOTE_ADDR"), $session->config->get("spectreSubnets"))) {
+		$session->errorHandler->security("make a Spectre workflow data load request, but we're only allowed to accept requests from "
+			.join(",",@{$session->config->get("spectreSubnets")}).".");
+	} 
+  	else {
+		my $sitename = $session->config->get("sitename")->[0];
+		my $gateway = $session->config->get("gateway");
+		my $cookieName = $session->config->getCookieName;
+		my @instances = ();
+		foreach my $instance (@{WebGUI::Workflow::Instance->getAllInstances($session)}) {
+			next unless $instance->getWorkflow->get("enabled");
+			push(@instances, {
+				instanceId 	=> $instance->getId,
+				priority 	=> $instance->get("priority"),
+				cookieName	=> $cookieName,
+				gateway		=> $gateway, 
+				sitename	=> $sitename,
+				});
+		}
+		$siteData{workflow} = \@instances;
+		my @schedules = ();
+		foreach my $task (@{WebGUI::Workflow::Cron->getAllTasks($session)}) {
+			next unless $task->get("enabled");
+			push(@schedules, {
+				taskId 		=> $task->getId,
+				cookieName	=> $cookieName,
+				gateway		=> $gateway, 
+				sitename	=> $sitename,
+				minuteOfHour	=> $task->get('minuteOfHour'),
+				hourOfDay	=> $task->get('hourOfDay'),
+				dayOfMonth	=> $task->get('dayOfMonth'),
+				monthOfYear	=> $task->get('monthOfYear'),
+				dayOfWeek	=> $task->get('dayOfWeek'),
+				runOnce		=> $task->get('runOnce'),
+				});
+		}
+		$siteData{cron} = \@schedules;
+	}
+	return JSON::objToJson(\%siteData);
+}
 
 #-------------------------------------------------------------------
 

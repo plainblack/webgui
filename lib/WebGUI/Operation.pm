@@ -219,6 +219,7 @@ sub getOperations {
 		'editSettings' => 'WebGUI::Operation::Settings',
 		'saveSettings' => 'WebGUI::Operation::Settings',
 
+		'spectreGetSiteData' => 'WebGUI::Operation::Spectre',
 		'spectreTest' => 'WebGUI::Operation::Spectre',
 
 		'viewStatistics' => 'WebGUI::Operation::Statistics',

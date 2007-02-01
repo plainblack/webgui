@@ -124,6 +124,26 @@ sub get {
 
 #-------------------------------------------------------------------
 
+=head2 getAllTasks ( session )
+
+Returns an array reference of all the schedule objects defined in this system. A class method.
+
+=cut
+
+sub getAllTasks {
+	my $class = shift;
+	my $session = shift;
+        my @schedules = ();
+        my $rs = $session->db->read("SELECT taskId FROM WorkflowSchedule");
+        while (my ($taskId) = $rs->array) {
+                push(@schedules, WebGUI::Workflow::Cron->new($session, $taskId));
+        }
+        return \@schedules;	
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getId ( )
 
 Returns the ID of this instance.
