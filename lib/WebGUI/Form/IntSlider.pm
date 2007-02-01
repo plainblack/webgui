@@ -86,7 +86,7 @@ Returns the form element used for manual input.
 sub getInputElement {
 	my $self = shift;
 
-	return WebGUI::Form::integer($self->session, {
+	return WebGUI::Form::Integer($self->session, {
 		name	=> $self->get('name'),
 		value	=> $self->get('value'),
 		size	=> $self->get('size'),
@@ -143,7 +143,7 @@ sub getValueFromPost {
 		id	=> 'view-'.$self->get('id'),
 	};
 
-	return WebGUI::Form::integer->new($self->session, $properties)->getValueFromPost;
+	return WebGUI::Form::Integer->new($self->session, $properties)->getValueFromPost;
 }
 
 1;
