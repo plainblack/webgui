@@ -186,8 +186,9 @@ sub generateRecurringEvents {
         $recur      = {$self->getRecurrence};
     }
     
+    $self->update({ recurId => $recurId });
     my $properties  = {%{$self->get}};
-    $properties->{recurId} = $recurId;
+    $properties->{recurId}  = $recurId;
     
     # Get the distance between the event startDate and endDate
     # Only days, since event recurrence only changes the Date the event occurs, not
@@ -204,19 +205,27 @@ sub generateRecurringEvents {
     my @dates    = $self->getRecurrenceDates($recur);
     
     for my $date (@dates) {
-        my $dt        = WebGUI::DateTime->new($self->session, $date." 00:00:00");
-        
-        $properties->{startDate}    = $dt->strftime('%F');
-        $properties->{endDate}      = $dt->clone->add(days => $duration_days)->strftime('%F');
-        
         # Only generate if the recurId does not exist on this day
+        use Data::Dumper;
+        warn "COMPARING $date TO $properties->{startDate}";
+        warn Dumper $session->db->quickArray(
+            "select count(*) from Event where recurId=? and startDate=?",
+            [$properties->{recurId}, $date],
+        );
+
         my ($exists) 
-            = $session->db->buildArray(
+            = $session->db->quickArray(
                 "select count(*) from Event where recurId=? and startDate=?",
-                [$properties->{recurId}, $properties->{startDate}],
+                [$properties->{recurId}, $date],
             );
         
         if (!$exists) {
+            warn "Making event on $date";
+            my $dt        = WebGUI::DateTime->new($self->session, $date." 00:00:00");
+            
+            $properties->{startDate}    = $dt->toDatabaseDate;
+            $properties->{endDate}      = $dt->clone->add(days => $duration_days)->toDatabaseDate;
+            
             my $newEvent = $parent->addChild($properties);
             $newEvent->requestAutoCommit;
         }
@@ -1454,9 +1463,6 @@ sub processPropertiesFromFormPost {
             return ["There is something wrong with your recurrence pattern."]
                 unless $new_id;
             
-            ## Update with the new recurId
-            $self->update({ recurId => $new_id });
-            
             ## Delete old events
             my $events = $self->getLineage(["siblings"], {
                     returnObjects       => 1,
@@ -1667,7 +1673,7 @@ Edit the event.
 
 =cut
 
-# Author's note: This sub is ugly and should be refactored according to PBP
+# Author's note: This sub is ugly and should be reformatted according to PBP
 sub www_edit
 {
     my $self        = shift;
@@ -1726,20 +1732,20 @@ sub www_edit
                 });
     
     # menu title AS short title
-    $var->{"formMenuTitle"}    = WebGUI::Form::text($session,
-                {
-                    name    => "menuTitle",
-                    value    => $form->process("menuTitle") || $self->get("menuTitle"),
-                    maxlength => 15,
-                    size    => 16,
-                });
+    $var->{"formMenuTitle"} 
+        = WebGUI::Form::text($session, {
+            name        => "menuTitle",
+            value       => $form->process("menuTitle") || $self->get("menuTitle"),
+            maxlength   => 15,
+            size        => 22,
+        });
     
     # location
-    $var->{"formLocation"}    = WebGUI::Form::text($session,
-                {
-                    name    => "location",
-                    value    => $form->process("location") || $self->get("location"),
-                });
+    $var->{"formLocation"}
+        = WebGUI::Form::text($session, {
+            name        => "location",
+            value       => $form->process("location") || $self->get("location"),
+        });
     
     # description
     $var->{"formDescription"}= WebGUI::Form::HTMLArea($session,
@@ -1748,11 +1754,16 @@ sub www_edit
                     value    => $form->process("description") || $self->get("description"),
                 });
     
-    # start date
+    ### Start date
     my $default_start;
+    
+    # Try to get a default start date from the form
     if ($session->form->param("start")) {
         $default_start 
-            = WebGUI::DateTime->new($session, $session->form->param("start"));
+            = WebGUI::DateTime->new($session, 
+                mysql       => $session->form->param("start"),
+                time_zone   => $session->user->profileField("timeZone"),
+            );
     }
     else {
         $default_start  = WebGUI::DateTime->new($session, time);
@@ -1762,11 +1773,11 @@ sub www_edit
     if ($form->param("func") ne "add" && $form->param("assetId") ne "new") {
         my $dtStart = $self->getDateTimeStart;
         if ($self->isAllDay) {
-            $startDate  = $dtStart->toUserTimeZoneDate;
-            $startTime  = $dtStart->toUserTimeZoneTime;
+            $startDate  = $dtStart->toDatabaseDate;
         }
         else {
-            $startDate  = $dtStart->toDatabaseDate;
+            $startDate  = $dtStart->toUserTimeZoneDate;
+            $startTime  = $dtStart->toUserTimeZoneTime;
         }
     }
 
@@ -1785,17 +1796,17 @@ sub www_edit
     
     # end date
     # By default, it's the default start date plus an hour
-    $default_start->add(hours => 1);
+    my $default_end = $default_start->clone->add(hours => 1);
     
     my ($endDate, $endTime);
     if ($form->param("func") ne "add" && $form->param("assetId") ne "new") {
         my $dtEnd = $self->getDateTimeEnd;
         if ($self->isAllDay) {
-            $endDate    = $dtEnd->toUserTimeZoneDate;
-            $endTime    = $dtEnd->toUserTimeZoneTime;
+            $endDate    = $dtEnd->toDatabaseDate;
         }
         else {
-            $endDate    = $dtEnd->toDatabaseDate;
+            $endDate    = $dtEnd->toUserTimeZoneDate;
+            $endTime    = $dtEnd->toUserTimeZoneTime;
         }
     }
     
@@ -1803,13 +1814,13 @@ sub www_edit
         = WebGUI::Form::date($session, {
             name            => "endDate",
             value           => $form->param("endDate") || $endDate,
-            defaultValue    => $default_start->toUserTimeZoneDate,
+            defaultValue    => $default_end->toUserTimeZoneDate,
         });
     $var->{"formEndTime"} 
         = WebGUI::Form::timeField($session, {
             name            => "endTime",
             value           => $form->param("endTime") || $endTime,
-            defaultValue    => $default_start->toUserTimeZoneTime,
+            defaultValue    => $default_end->toUserTimeZoneTime,
         });
     
     # time

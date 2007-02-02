@@ -51,6 +51,8 @@
         events.
  - fix: Event edit doesn't re-apply "all day event" radio selector after 
         error.
+ - fix: Calendar Add Event now uses the last "start" passed in, or today 
+        by default. 
  - fix: RSS feeds should now process HTML characters properly for RSS 2.0 standard
  - fix: Corner case which could cause WeatherData.pm to fail has been fixed.
  - fix: wiki pagination broken (perlDreamer Consulting, LLC)
