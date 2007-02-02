@@ -461,7 +461,7 @@ sub getRowCount {
 
 #-------------------------------------------------------------------
 
-=head2 new ( session, currentURL [, paginateAfter, pageNumber, formVar ] )
+=head2 new ( session, currentURL [, paginateAfter, formVar, pageNumber ] )
 
 Constructor.
 
@@ -477,13 +477,13 @@ The URL of the current page including attributes. The page number will be append
 
 The number of rows to display per page. If left blank it defaults to 25.
 
-=head3 pageNumber 
-
-By default the page number will be determined by looking at $self->session->form->process("pn"). If that is empty the page number will be defaulted to "1". If you'd like to override the page number specify it here.
-
 =head3 formVar
 
 Specify the form variable the paginator should use in it's links.  Defaults to "pn".
+
+=head3 pageNumber 
+
+By default the page number will be determined by looking at $self->session->form->process("pn"). If that is empty the page number will be defaulted to "1". If you'd like to override the page number specify it here.
 
 =cut
 

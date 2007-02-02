@@ -23,7 +23,7 @@ sub appendMostPopular {
 	my $self = shift;
 	my $var = shift;
 	my $limit = shift || $self->get("mostPopularCount");
-	while (my $asset = @{$self->getLineage(["children"],{returnObjects=>1, limit=>$limit, includeOnlyClasses=>["WebGUI::Asset::WikiPage"]})}) { 
+	foreach my $asset (@{$self->getLineage(["children"],{returnObjects=>1, limit=>$limit, includeOnlyClasses=>["WebGUI::Asset::WikiPage"]})}) { 
 		if (defined $asset) {
 			push(@{$var->{mostPopular}}, {
 				title=>$asset->getTitle,
@@ -421,13 +421,19 @@ sub www_search {
 		addPageUrl=>$self->getUrl("func=add;class=WebGUI::Asset::WikiPage"),
 		};
 	my $queryString = $self->session->form->process('query', 'text');
+    if (defined $queryString) {
+        $self->session->scratch->set('wikiSearchQueryString', $queryString);
+    }
+    else {
+        $queryString = $self->session->scratch->get('wikiSearchQueryString');
+    }
 	$self->appendSearchBoxVars($var, $queryString);
 	if (length $queryString) {
 		my $search = WebGUI::Search->new($self->session);
 		$search->search({ keywords => $queryString,
 				  lineage => [$self->get('lineage')],
 				  classes => ['WebGUI::Asset::WikiPage'] });
-		my $rs = $search->getPaginatorResultSet;
+		my $rs = $search->getPaginatorResultSet($self->getUrl("func=search"),5);
 		$rs->appendTemplateVars($var);
 		my @results = ();
 		foreach my $row (@{$rs->getPageData}) {

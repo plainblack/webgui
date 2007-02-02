@@ -53,6 +53,7 @@
         error.
  - fix: RSS feeds should now process HTML characters properly for RSS 2.0 standard
  - fix: Corner case which could cause WeatherData.pm to fail has been fixed.
+ - fix: wiki pagination broken (perlDreamer Consulting, LLC)
 
 7.3.8
  - Fixed a template variable rewriting problem with HTML::Template::Expr

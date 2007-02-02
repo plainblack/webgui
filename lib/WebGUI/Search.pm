@@ -151,7 +151,7 @@ sub getPaginatorResultSet {
 		if $self->{_columns};
 	
 	my $query = $self->_getQuery(\@columns);
-	my $paginator = WebGUI::Paginator->new($self->session, $url, $paginate, $pageNumber, $formVar);
+	my $paginator = WebGUI::Paginator->new($self->session, $url, $paginate, $formVar, $pageNumber);
 	$paginator->setDataByQuery($query, undef, undef, $self->{_params});
 	return $paginator;
 }
