@@ -35,7 +35,7 @@ my $lib = WebGUI::Test->lib;
 
 my $digits  = qr/(\d+)/;
 my $bareword  = qr/(\w+)/;
-my $quotelike = qr/((['"])([^'"\s]+\s*)+(['"]))/;
+my $quotelike = qr/((['"])([^'"\s$]+\s*)+(['"]))/;
 my $sub_args  = qr/(($quotelike|$digits)(,\s*)?)+/;
 my $sess_arg = qr/(?:\$session|\$self->session)/;
 my $subroutine = qr/
