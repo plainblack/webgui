@@ -66,6 +66,13 @@ sub addThreadRatingColumn {
     }
 }
 
+##-------------------------------------------------
+sub addSkipNotificationColumn {
+    my $session = shift;
+    print "\tAdding Skip Notification column to Assets\n" unless ($quiet);
+    $session->db->write("alter table assetData add skipNotification integer not null default 0");
+}
+
 
 # ---- DO NOT EDIT BELOW THIS LINE ----
 
