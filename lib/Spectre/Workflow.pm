@@ -253,8 +253,31 @@ Returns a formatted text status report about the workflow engine.
 
 sub getStatus {
  	my ($kernel, $request, $self) = @_[KERNEL,ARG0,OBJECT];
-	my $output = "Running Workflows: ".$self->getRunningQueue->get_item_count."\n";
-	$output .= "Workflows Waiting To Run: ".$self->getWaitingQueue->get_item_count."\n";
+	my $pattern = "\t%8.8s %-30.30s %-22.22s\n";
+	my $summaryPattern = "%24.24s %4d\n";
+	my $waiting = $self->getWaitingQueue;
+	my $waitingCount = $waiting->get_item_count;
+	my $output = sprintf $summaryPattern, "Workflows Waiting To Run", $waitingCount;
+	if ($waitingCount > 0) {
+		$output .= sprintf $pattern, "Priority", "Sitename", "Instance Id";
+		foreach my $item ($waiting->peek_items(sub {1})) {	
+			my ($priority, $id, $instance) = @{$item};
+			$output .= sprintf $pattern, $priority, $instance->{sitename}, $instance->{instanceId};
+		}
+		$output .= "\n";
+	}
+	my $running = $self->getRunningQueue;
+	my $runningCount = $running->get_item_count;
+	$output .= sprintf $summaryPattern, "Running Workflows", $runningCount;
+	if ($runningCount > 0) {
+		$output .= sprintf $pattern, "Priority", "Sitename", "Instance Id";
+		foreach my $item ($running->peek_items(sub {1})) {	
+			my ($priority, $id, $instance) = @{$item};
+			$output .= sprintf $pattern, $priority, $instance->{sitename}, $instance->{instanceId};
+		}
+		$output .= "\n";
+	}
+	$output .= sprintf $summaryPattern, "Total Workflows", ($runningCount + $waitingCount);
         my ($data, $rsvp) = @$request;
         $kernel->call(IKC=>post=>$rsvp,$output);
 }
