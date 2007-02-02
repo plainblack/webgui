@@ -213,140 +213,146 @@ An array reference containing additional information to include with the default
 =cut
 
 sub definition {
-        my $class = shift;
-        my $session = shift;
-        my $definition = shift || [];
+    my $class = shift;
+    my $session = shift;
+    my $definition = shift || [];
 	my $i18n = WebGUI::International->new($session, "Asset");
 	my %properties;
 	tie %properties, 'Tie::IxHash';
 	%properties = (
-                                title=>{
-					tab=>"properties",
-					label=>$i18n->get(99),
-					hoverHelp=>$i18n->get('99 description'),
-                                        fieldType=>'text',
-                                        defaultValue=>'Untitled',
-					filter=>'fixTitle',
-                                        },
-                                menuTitle=>{
-					tab=>"properties",
-					label=>$i18n->get(411),
-					hoverHelp=>$i18n->get('411 description'),
-					uiLevel=>1,
-                                        fieldType=>'text',
-					filter=>'fixTitle',
-                                        defaultValue=>undef
-                                        },
-                                url=>{
-					tab=>"properties",
-					label=>$i18n->get(104),
-					hoverHelp=>$i18n->get('104 description'),
-					uiLevel=>3,
-                                        fieldType=>'text',
-                                        defaultValue=>undef,
-					filter=>'fixUrl'
-                                        },
-				isHidden=>{
-					tab=>"display",
-					label=>$i18n->get(886),
-					hoverHelp=>$i18n->get('886 description'),
-					uiLevel=>6,
-					fieldType=>'yesNo',
-					defaultValue=>0
+                    title=>{
+					    tab=>"properties",
+					    label=>$i18n->get(99),
+					    hoverHelp=>$i18n->get('99 description'),
+                        fieldType=>'text',
+                        defaultValue=>'Untitled',
+					    filter=>'fixTitle',
+                    },
+                    menuTitle=>{
+					    tab=>"properties",
+					    label=>$i18n->get(411),
+					    hoverHelp=>$i18n->get('411 description'),
+					    uiLevel=>1,
+                        fieldType=>'text',
+					    filter=>'fixTitle',
+                        defaultValue=>undef
+                    },
+                    url=>{
+					    tab=>"properties",
+					    label=>$i18n->get(104),
+					    hoverHelp=>$i18n->get('104 description'),
+					    uiLevel=>3,
+                        fieldType=>'text',
+                        defaultValue=>undef,
+					    filter=>'fixUrl'
+                    },
+				    isHidden=>{
+					    tab=>"display",
+					    label=>$i18n->get(886),
+					    hoverHelp=>$i18n->get('886 description'),
+					    uiLevel=>6,
+					    fieldType=>'yesNo',
+					    defaultValue=>0
 					},
-				newWindow=>{
-					tab=>"display",
-					label=>$i18n->get(940),
-					hoverHelp=>$i18n->get('940 description'),
-					uiLevel=>9,
-					fieldType=>'yesNo',
-					defaultValue=>0
+				    newWindow=>{
+					    tab=>"display",
+					    label=>$i18n->get(940),
+					    hoverHelp=>$i18n->get('940 description'),
+					    uiLevel=>9,
+					    fieldType=>'yesNo',
+					    defaultValue=>0
 					},
-				encryptPage=>{
-					fieldType=>'yesNo',
-					tab=>"security",
-					label=>$i18n->get('encrypt page'),
-					hoverHelp=>$i18n->get('encrypt page description'),
-					uiLevel=>6,
-					defaultValue=>0
+				    encryptPage=>{
+					    fieldType=>'yesNo',
+					    tab=>"security",
+					    label=>$i18n->get('encrypt page'),
+					    hoverHelp=>$i18n->get('encrypt page description'),
+					    uiLevel=>6,
+					    defaultValue=>0
 					},
-                                ownerUserId=>{
-					tab=>"security",
-					label=>$i18n->get(108),
-					hoverHelp=>$i18n->get('108 description'),
-					uiLevel=>6,
-                                        fieldType=>'user',
-                                        defaultValue=>'3'
-                                        },
-                                groupIdView=>{
-					tab=>"security",
-					label=>$i18n->get(872),
-					hoverHelp=>$i18n->get('872 description'),
-					uiLevel=>6,
-                                        fieldType=>'group',
-                                        defaultValue=>'7'
-                                        },
-                                groupIdEdit=>{
-					tab=>"security",
-					label=>$i18n->get(871),
-					excludeGroups=>[1,7],
-					hoverHelp=>$i18n->get('871 description'),
-					uiLevel=>6,
-                                        fieldType=>'group',
-                                        defaultValue=>'4'
-                                        },
-                                synopsis=>{
-					tab=>"meta",
-					label=>$i18n->get(412),
-					hoverHelp=>$i18n->get('412 description'),
-					uiLevel=>3,
-                                        fieldType=>'textarea',
-                                        defaultValue=>undef
-                                        },
-                                extraHeadTags=>{
-					tab=>"meta",
-					label=>$i18n->get("extra head tags"),
-					hoverHelp=>$i18n->get('extra head tags description'),
-					uiLevel=>5,
-                                        fieldType=>'textarea',
-                                        defaultValue=>undef
-                                        },
-				isPackage=>{
-					label=>$i18n->get("make package"),
-					tab=>"meta",
-					hoverHelp=>$i18n->get('make package description'),
-					uiLevel=>7,
-					fieldType=>'yesNo',
-					defaultValue=>0
+                    ownerUserId=>{
+					    tab=>"security",
+					    label=>$i18n->get(108),
+					    hoverHelp=>$i18n->get('108 description'),
+					    uiLevel=>6,
+                        fieldType=>'user',
+                        defaultValue=>'3'
+                    },
+                    groupIdView=>{
+					    tab=>"security",
+					    label=>$i18n->get(872),
+					    hoverHelp=>$i18n->get('872 description'),
+					    uiLevel=>6,
+                        fieldType=>'group',
+                        defaultValue=>'7'
+                    },
+                    groupIdEdit=>{
+					    tab=>"security",
+					    label=>$i18n->get(871),
+					    excludeGroups=>[1,7],
+					    hoverHelp=>$i18n->get('871 description'),
+					    uiLevel=>6,
+                        fieldType=>'group',
+                        defaultValue=>'4'
+                    },
+                    synopsis=>{
+					    tab=>"meta",
+					    label=>$i18n->get(412),
+					    hoverHelp=>$i18n->get('412 description'),
+					    uiLevel=>3,
+                        fieldType=>'textarea',
+                        defaultValue=>undef
+                    },
+                    extraHeadTags=>{
+					    tab=>"meta",
+					    label=>$i18n->get("extra head tags"),
+					    hoverHelp=>$i18n->get('extra head tags description'),
+					    uiLevel=>5,
+                        fieldType=>'textarea',
+                        defaultValue=>undef
+                    },
+				    isPackage=>{
+					    label=>$i18n->get("make package"),
+					    tab=>"meta",
+					    hoverHelp=>$i18n->get('make package description'),
+					    uiLevel=>7,
+					    fieldType=>'yesNo',
+					    defaultValue=>0
 					},
-				isPrototype=>{
-					tab=>"meta",
-					label=>$i18n->get("make prototype"),
-					hoverHelp=>$i18n->get('make prototype description'),
-					uiLevel=>9,
-					fieldType=>'yesNo',
-					defaultValue=>0
+				    isPrototype=>{
+					    tab=>"meta",
+					    label=>$i18n->get("make prototype"),
+					    hoverHelp=>$i18n->get('make prototype description'),
+					    uiLevel=>9,
+					    fieldType=>'yesNo',
+					    defaultValue=>0
 					},
-				status=>{
-					noFormPost=>1,
-					fieldType=>'hidden',
-					defaultValue=>'pending'
+				    status=>{
+					    noFormPost=>1,
+					    fieldType=>'hidden',
+					    defaultValue=>'pending'
 					},
-				assetSize=>{
-					noFormPost=>1,
-					fieldType=>'hidden',
-					defaultValue=>0
+				    assetSize=>{
+					    noFormPost=>1,
+					    fieldType=>'hidden',
+					    defaultValue=>0
 					},
-                        );
-        push(@{$definition}, {
-		assetName=>$i18n->get("asset"),
-                tableName=>'assetData',
+                    skipNotification=>{
+					    noFormPost=>1,
+					    fieldType=>'hidden',
+					    defaultValue=>0
+					},
+    );
+    push(@{$definition}, {
+	    assetName=>$i18n->get("asset"),
+        tableName=>'assetData',
 		autoGenerateForms=>1,
-                className=>'WebGUI::Asset',
+        className=>'WebGUI::Asset',
 		icon=>'assets.gif',
-                properties=>\%properties
-                });
-        return $definition;
+        properties=>\%properties
+        }
+    );
+    return $definition;
 }
 
 
