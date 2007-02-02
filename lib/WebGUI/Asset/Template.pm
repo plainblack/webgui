@@ -241,15 +241,16 @@ A parser class to use. Defaults to "WebGUI::Asset::Template::HTMLTemplate"
 =cut
 
 sub getParser {
-	my $class = shift;
-	my $session = shift;
-	my $parser = shift || $session->config->get("defaultTemplateParser") || "WebGUI::Asset::Template::HTMLTemplate";
-	if ($parser eq "") {
-		return WebGUI::Asset::Template::HTMLTemplate->new($session);
-	} else {
-		eval("use $parser");
-		return $parser->new($session);
-	}
+    my $class = shift;
+    my $session = shift;
+    my $parser = shift || $session->config->get("defaultTemplateParser") || "WebGUI::Asset::Template::HTMLTemplate";
+
+    if ($parser eq "") {
+        return WebGUI::Asset::Template::HTMLTemplate->new($session);
+    } else {
+        eval("use $parser");
+        return $parser->new($session);
+    }
 }
 
 
