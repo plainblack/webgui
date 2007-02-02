@@ -142,7 +142,9 @@ sub chopTitle {
 sub commit {
 	my $self = shift;
 	$self->SUPER::commit;
-        $self->notifySubscribers;
+    
+    $self->notifySubscribers unless ($self->get("skipNotification"));
+           
 	if ($self->isNew) {
 		if ($self->session->setting->get("useKarma") && $self->getThread->getParent->get("karmaPerPost")) {
 			my $u = WebGUI::User->new($self->session, $self->get("ownerUserId"));
