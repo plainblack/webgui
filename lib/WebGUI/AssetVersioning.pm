@@ -70,29 +70,48 @@ A hash reference of options that change the behavior of this method.
 
 If this is set to 1 then assets that would normally autocommit their workflow (like CS Posts) will instead add themselves to the normal working version tag.
 
+=head4 skipNotification
+
+If this is set to 1 then assets that normally send notifications will (like CS Posts) will know not to send them under certain conditions.
+
 =cut
 
 sub addRevision {
-    my $self            = shift;
-    my $properties      = shift;
-	my $now             = shift     || $self->session->datetime->time();
-	my $options         = shift;
+    my $self             = shift;
+    my $properties       = shift;
+	my $now              = shift     || $self->session->datetime->time();
+	my $options          = shift;
 	
-    my $autoCommitId    = $self->getAutoCommitWorkflowId() unless ($options->{skipAutoCommitWorkflows});
+    my $autoCommitId     = $self->getAutoCommitWorkflowId() unless ($options->{skipAutoCommitWorkflows});
+    
+    #Handle skip notifications
+    my $skipNotification = $options->{skipNotification} || 0;
+    $properties->{skipNotification} = $skipNotification;
+    
 	my $workingTag      
         = ($autoCommitId) 
             ? WebGUI::VersionTag->create($self->session, {groupToUse=>'12', workflowId=>$autoCommitId}) 
             : WebGUI::VersionTag->getWorking($self->session)
             ;
-
-	$self->session->db->beginTransaction;
-	$self->session->db->write(
-        "insert into assetData "
-        . "(assetId, revisionDate, revisedBy, tagId, status, url, ownerUserId, groupIdEdit, groupIdView) "
-        . "values (?, ?, ?, ?, 'pending', ?, '3','3','7')",
-		[$self->getId, $now, $self->session->user->userId, $workingTag->getId, $self->getId] 
+    
+    #Create a dummy revision to be updated with real data later
+    $self->session->db->beginTransaction;
+	
+    my $sql = "insert into assetData"
+            . " (assetId, revisionDate, revisedBy, tagId, status, url, ownerUserId, groupIdEdit, groupIdView, skipNotification)"
+            . " values (?, ?, ?, ?, 'pending', ?, '3','3','7',?)"
+            ;
+                  
+    $self->session->db->write($sql,[
+        $self->getId, 
+        $now, 
+        $self->session->user->userId, 
+        $workingTag->getId, 
+        $self->getId,
+        $skipNotification,
+        ]
     );
-
+    
     foreach my $definition (@{$self->definition($self->session)}) {
         unless ($definition->{tableName} eq "assetData") {
             $self->session->db->write(
@@ -101,9 +120,9 @@ sub addRevision {
             );
         }
     }
-    
     $self->session->db->commit;
     
+    #Instantiate new revision and fill with real data
     my $newVersion = WebGUI::Asset->new($self->session,$self->getId, $self->get("className"), $now);
     $newVersion->updateHistory("created revision");
     $newVersion->update($self->get);
