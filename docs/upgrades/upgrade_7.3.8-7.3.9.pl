@@ -24,6 +24,8 @@ my $session = start(); # this line required
 # upgrade functions go here
 fixCalendarFeedsLastUpdatedField($session);
 addThreadRatingColumn($session);
+addSkipNotificationColumn($session);
+updateTemplates($session);
 
 finish($session); # this line required
 
@@ -70,7 +72,7 @@ sub addThreadRatingColumn {
 sub addSkipNotificationColumn {
     my $session = shift;
     print "\tAdding Skip Notification column to Assets\n" unless ($quiet);
-    $session->db->write("alter table assetData add skipNotification integer not null default 0");
+    $session->db->write("alter table assetData add column skipNotification integer not null default 0");
 }
 
 
@@ -89,7 +91,6 @@ sub start {
 	my $versionTag = WebGUI::VersionTag->getWorking($session);
 	$versionTag->set({name=>"Upgrade to ".$toVersion});
 	$session->db->write("insert into webguiVersion values (".$session->db->quote($toVersion).",'upgrade',".$session->datetime->time().")");
-	updateTemplates($session);
 	return $session;
 }
 
