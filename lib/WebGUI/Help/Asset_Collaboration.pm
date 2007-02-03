@@ -256,6 +256,9 @@ our $HELP = {
 		            'name' => 'closed.label'
 		          },
 		          {
+		            'name' => 'collaborationAssetId'
+		          },
+		          {
 		            'name' => 'critical.label'
 		          },
 		          {

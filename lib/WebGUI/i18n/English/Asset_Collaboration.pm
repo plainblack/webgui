@@ -1617,6 +1617,11 @@ the Collaboration Asset, the user will be notified.|,
 		lastUpdated => 1149656374,
 	},
 
+	'collaborationAssetId' => {
+		message => q|The assetId of this Collaboration System.  Unlike the variable assetId, this one will not be overridden by the assetIds inside of Threads or Posts.|,
+		lastUpdated => 1170543345,
+	},
+
 
 };
 

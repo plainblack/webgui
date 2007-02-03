@@ -1098,6 +1098,7 @@ sub view {
 	$var{"search.url"} = $self->getSearchUrl;
 	$var{"subscribe.url"} = $self->getSubscribeUrl;
 	$var{"unsubscribe.url"} = $self->getUnsubscribeUrl;
+	$var{"collaborationAssetId"} = $self->getId;
 	my $sql = "
 		select 
 			asset.assetId,
