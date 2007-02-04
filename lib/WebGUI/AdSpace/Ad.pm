@@ -42,6 +42,8 @@ These methods are available from this class:
 
 =head2 create ( session, adSpaceId, properties ) 
 
+Object constructor for new Ads.
+
 =head3 session
 
 A reference to the current session
@@ -133,7 +135,7 @@ sub getId {
 
 =head2 new ( session, id )
 
-Constructor.
+Object constructor for fetching an existing Ad.
 
 =head3 session
 

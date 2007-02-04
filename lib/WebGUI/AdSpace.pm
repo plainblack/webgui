@@ -60,6 +60,8 @@ sub countClick {
 
 =head2 create ( session, properties ) 
 
+Object constructor for new AdSpaces.
+
 =head3 session
 
 A reference to the current session.
@@ -73,7 +75,7 @@ The properties used to create this object. See the set() method for details.
 sub create {
 	my $class = shift;
 	my $session = shift;
-	my $properties = shift;
+	my $properties = shift || {};
 	return undef unless $properties->{name};
 	my $test = $class->newByName($session, $properties->{name});
 	return undef if defined $test;
@@ -163,7 +165,7 @@ sub get {
 
 =head2 getAds ( )
 
-Returns an array reference containing all the ad objects in this ad space.
+Returns an array reference containing all the ads this ad space as objects.
 
 =cut
 
@@ -181,7 +183,7 @@ sub getAds {
 
 =head2 getAdSpaces ( session )
 
-Returns an array reference containing all the ad spaces. This is a class method.
+Returns an array reference containing all the ad spaces as objects. This is a class method.
 
 =cut
 
@@ -213,7 +215,7 @@ sub getId {
 
 =head2 new ( session, id )
 
-Constructor.
+Object constructor for fetching an existing AdSpace by id.
 
 =head3 session
 
@@ -238,7 +240,7 @@ sub new {
 
 =head2 newByName ( session, name )
 
-Constructor.
+Object constructor for fetching an existing AdSpace by name.
 
 =head3 session
 
