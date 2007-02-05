@@ -31,11 +31,12 @@ my $adSpace;
 
 SKIP: {
 
-	skip "Unable to load WebGUI::AdSpace::Ad", $numTests-1 unless $loaded;
-	 $adSpace = WebGUI::AdSpace->create($session, {name=>"Alfred"});
-	$ad=WebGUI::AdSpace::Ad->create($session, $adSpace->getId, {"type", "text"});
-	isa_ok($ad,"WebGUI::AdSpace::Ad","testing create with no properties");
+    skip "Unable to load WebGUI::AdSpace::Ad", $numTests-1 unless $loaded;
+    $adSpace = WebGUI::AdSpace->create($session, {name=>"Alfred"});
+    $ad=WebGUI::AdSpace::Ad->create($session, $adSpace->getId, {"type" => "text"});
+    isa_ok($ad,"WebGUI::AdSpace::Ad","testing create with no properties");
 }
+
 END {
 	if (defined $ad and ref $ad eq 'WebGUI::AdSpace::Ad') {
 		$ad->delete;

@@ -329,6 +329,7 @@ The height, in pixels, of this ad space.
 sub set {
 	my $self = shift;
 	my $properties = shift;
+	##create requires a name, default will never be used
 	$self->{_properties}{name} = $properties->{name} || $self->{_properties}{name} || "Unnamed";
 	$self->{_properties}{title} = $properties->{title} || $self->{_properties}{title} || "Untitled";
 	$self->{_properties}{description} = $properties->{description} || $self->{_properties}{description};

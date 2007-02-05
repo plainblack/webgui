@@ -213,7 +213,7 @@ The hex color to be used to display the border on a text based ad.
 
 =head4 textColor
 
-The hex color to be used to display the text on a test based ad.
+The hex color to be used to display the text on a text based ad.
 
 =head4 backgroundColor
 
