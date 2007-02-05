@@ -721,9 +721,8 @@ sub _getFieldProperties {
 		@keys = split(/[\r\n]+/, $definition{formPopulationKeys});
 		@values = split(/[\r\n]+/, $definition{formPopulationValues});
 
-		while (my $key = shift(@keys)) {
-			$options->{$key} = shift(@values);
-		}
+		##Assign all values to keys in an ordered, 1:1 way
+		@{ $options }{@keys} = @values;
 	}
 
 	
