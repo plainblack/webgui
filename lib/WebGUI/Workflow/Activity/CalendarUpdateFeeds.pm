@@ -213,7 +213,7 @@ sub execute {
 					my ($hour, $minute, $second) = $time =~ /(\d{2})(\d{2})(\d{2})/;
 					
 					($properties->{startDate}, $properties->{startTime}) = 
-						split / /, WebGUI::DateTime(
+						split / /, WebGUI::DateTime->new(
 							year	=> $year,
 							month	=> $month,
 							day	    => $day,
@@ -239,7 +239,7 @@ sub execute {
 					my ($hour, $minute, $second) = $time =~ /(\d{2})(\d{2})(\d{2})/;
 					
 					($properties->{endDate}, $properties->{endTime}) = 
-						split / /, WebGUI::DateTime(
+						split / /, WebGUI::DateTime->new(
 							year	=> $year,
 							month	=> $month,
 							day	=> $day,
@@ -302,6 +302,10 @@ sub execute {
 				else
 				{
 					my $calendar	= WebGUI::Asset->newByDynamicClass($self->session,$feed->{assetId});
+					if (!defined $calendar) {
+						$self->session->errorHandler->error("CalendarUpdateFeeds Activity: Calendar object failed to instanciate at line 304.  Did you commit the calendar wobject?");
+						return $self->ERROR;
+					}
 					my $event	= $calendar->addChild($properties);
 					$event->requestAutoCommit;
 					$added++;
