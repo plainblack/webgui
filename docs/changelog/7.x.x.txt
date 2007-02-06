@@ -61,6 +61,7 @@
  - fix: SQL Report download template (perlDreamer Consulting, LLC)
  - fix: Ignoring shortcut overrides.
  - fix: Calendar feeds not working.
+ - fix: multiple matrix sharing features
 
 7.3.8
  - Fixed a template variable rewriting problem with HTML::Template::Expr

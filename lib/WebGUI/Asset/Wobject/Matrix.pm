@@ -317,7 +317,7 @@ sub www_compare {
 				.$tableCount.".fieldId and ".$tableCount.".listingId=".$self->session->db->quote($cms);
 			$tableCount++;
 		}
-		my $sth = $self->session->db->read("$select $from where a.category=".$self->session->db->quote($category)." order by a.label");
+		my $sth = $self->session->db->read("$select $from where a.category=".$self->session->db->quote($category)." and a.assetId=".$self->session->db->quote($self->getId)." order by a.label");
 		while (my @row = $sth->array) {
 			my @columnloop;
 			my $first = 1;
