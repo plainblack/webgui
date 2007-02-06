@@ -1,9 +1,12 @@
 package WebGUI::Help::Asset_Calendar;
 
+use strict;
+use warnings;
+
 our $HELP   = {};
 
 #### Edit Calendar Page
-$editPage = $HELP->{'calendar add/edit'} = {};
+my $editPage = $HELP->{'calendar add/edit'} = {};
 
 $editPage->{ title      } = 'help add/edit title';
 $editPage->{ body       } = 'help add/edit body';
@@ -82,10 +85,7 @@ push @{$editPage->{ fields }},
     },
     ;
 
-push @{$editPage->{ related }},
-    "",
-    "",
-    ;
+
 
 #### View Calendar Page
 
@@ -102,7 +102,7 @@ push @{$editPage->{ related }},
 
 #### Search Template
 
-
+__END__
 our $HELP = {
 	'calendar add/edit' => {
 		title => 'add/edit title',
