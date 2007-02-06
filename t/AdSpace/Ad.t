@@ -15,10 +15,28 @@ use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::AdSpace;
 
-#use Test::More tests => 3;
 use Test::More;
+use Test::Deep;
 
-my $numTests = 1; # increment this value for each test you create
+my $newAdSettings = {
+    title             => "Untitled",
+    clicksBought      => 0, ##From db
+    impressionsBought => 0, ##From db
+    url               => undef,
+    adText            => undef,
+    storageId         => undef,
+    richMedia         => undef,
+    ownerUserId       => "3",
+    isActive          => 0, ##From db
+    type              => "text",
+    borderColor       => "#000000",
+    textColor         => "#000000",
+    backgroundColor   => "#ffffff",
+    priority          => "0",
+};
+
+my $numTests = 6; # increment this value for each test you create
+$numTests += scalar keys %{ $newAdSettings };
 ++$numTests; ##For conditional testing on module load
 
 plan tests => $numTests;
@@ -34,7 +52,26 @@ SKIP: {
     skip "Unable to load WebGUI::AdSpace::Ad", $numTests-1 unless $loaded;
     $adSpace = WebGUI::AdSpace->create($session, {name=>"Alfred"});
     $ad=WebGUI::AdSpace::Ad->create($session, $adSpace->getId, {"type" => "text"});
-    isa_ok($ad,"WebGUI::AdSpace::Ad","testing create with no properties");
+    isa_ok($ad,"WebGUI::AdSpace::Ad");
+
+    isa_ok($ad->session, 'WebGUI::Session');
+
+    my $ad2 = WebGUI::AdSpace::Ad->new($session, $ad->getId);
+    cmp_deeply($ad2, $ad, "new returns an identical object to the original what was created");
+
+    undef $ad2;
+
+	my $data = $session->db->quickHashRef("select adId, adSpaceId from advertisement where adId=?",[$ad->getId]);
+
+	ok(exists $data->{adId}, "create()");
+	is($data->{adId}, $ad->getId, "getId()");
+	is($data->{adSpaceId}, $ad->get('adSpaceId'), "get() adSpaceId");
+
+    foreach my $setting (keys %{ $newAdSettings } ) {
+        is($newAdSettings->{$setting}, $ad->get($setting),
+            sprintf "default setting for %s", $setting);
+    }
+
 }
 
 END {
