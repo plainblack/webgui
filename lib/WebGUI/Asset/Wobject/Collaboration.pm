@@ -940,6 +940,7 @@ See WebGUI::Asset::purgeCache() for details.
 sub purgeCache {
 	my $self = shift;
 	WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
+	WebGUI::Cache->new($self->session,$self->_visitorCacheKey)->delete;
 	$self->SUPER::purgeCache;
 }
 

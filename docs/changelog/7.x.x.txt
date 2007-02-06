@@ -59,6 +59,7 @@
  - fix: SQLForm: set issues (perlDreamer Consulting, LLC)
  - fix: Collab System FAQ: clicking top link does not bring you back to the top of FAQ (perlDreamer Consulting, LLC)
  - fix: SQL Report download template (perlDreamer Consulting, LLC)
+ - fix: Ignoring shortcut overrides.
 
 7.3.8
  - Fixed a template variable rewriting problem with HTML::Template::Expr

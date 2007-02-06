@@ -866,6 +866,7 @@ sub www_saveOverride {
 	$self->session->db->write("delete from Shortcut_overrides where assetId=".$self->session->db->quote($self->getId)." and fieldName=".$self->session->db->quote($fieldName));
 	$self->session->db->write("insert into Shortcut_overrides values (".$self->session->db->quote($self->getId).",".$self->session->db->quote($fieldName).",".$self->session->db->quote($value).")");
 	$self->uncacheOverrides;
+	$self->getShortcutOriginal->purgeCache();
 	return $self->www_manageOverrides;
 }
 
