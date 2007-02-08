@@ -131,9 +131,10 @@ sub authenticate {
 #-------------------------------------------------------------------
 sub createAccount {
    my $self = shift;
-	my $message = shift;
-	my $confirm = shift || $self->session->form->process("confirm");
-   my $vars;
+   my $message = shift;
+   my $confirm = shift || $self->session->form->process("confirm");
+   my $vars = shift || {}; 
+   
    if ($self->session->user->userId ne "1") {
       return $self->displayAccount;
    } elsif (!$self->session->setting->get("anonymousRegistration")) {
