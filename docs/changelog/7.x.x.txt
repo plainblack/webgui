@@ -62,6 +62,7 @@
  - fix: Ignoring shortcut overrides.
  - fix: Calendar feeds not working.
  - fix: multiple matrix sharing features
+ - fix: WebGUI Auth create account can now be properly overriden
 
 7.3.8
  - Fixed a template variable rewriting problem with HTML::Template::Expr
