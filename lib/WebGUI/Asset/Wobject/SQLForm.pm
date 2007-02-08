@@ -1376,29 +1376,17 @@ my $hasPrimaryKey = 0;
 				" ");
 			
 				# fill status fields
-				$sth = $dbLink->db->read("select * from $tableName");
-				while (my %row = $sth->hash) {
-					my @where = ();
-					foreach (@columnNames) {
-						if (defined $row{$_}) {
-							push(@where, $_." = ".$self->session->db->quote($row{$_}));
-						} else {
-							push(@where, "$_ IS NULL");
-						}
-					}
-					my $sql = 	
-						"update $tableName set ".
-						"__recordId = ".$self->session->db->quote($self->session->id->generate).", ".
-						"__creationDate = ".$self->session->db->quote(time).", ".
-						"__createdBy = ".$self->session->db->quote($self->session->user->userId).", ".
-						"__initDate = ".$self->session->db->quote(time).", ".
-						"__userId = ".$self->session->db->quote($self->session->user->userId).", ".
-						"__archived = 0, ".
-						"__revision = 1 ".
-						"where ".join(' and ', @where);
-					$dbLink->db->write($sql);
-					#print "$sql\n";
-				}	
+				my $sql = 	
+					"update $tableName set ".
+					"__recordId = (select concat(rand(),rand())),".
+					"__creationDate = ".$self->session->db->quote(time).", ".
+					"__createdBy = ".$self->session->db->quote($self->session->user->userId).", ".
+					"__initDate = ".$self->session->db->quote(time).", ".
+					"__userId = ".$self->session->db->quote($self->session->user->userId).", ".
+					"__archived = 0, ".
+					"__revision = 1 ";
+				$dbLink->db->write($sql);
+				#print "$sql\n";
 			}
 			
 			$dbLink->db->write("alter table $tableName add primary key (__recordId, __revision)");

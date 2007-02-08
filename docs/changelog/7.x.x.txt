@@ -1,4 +1,5 @@
 7.3.9
+ - fix: SQL Form and big table imports
  - fix: Can't add task to project management (perlDreamer Consulting, LLC)
  - fix: Error in RSS Feed (perlDreamer Consulting, LLC)
  - rfe: Asset->get should return a copy of the properties hashref
