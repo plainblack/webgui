@@ -255,7 +255,7 @@ Returns a formatted text status report about the workflow engine.
 
 sub getStatus {
  	my ($kernel, $request, $self) = @_[KERNEL,ARG0,OBJECT];
-	my $pattern = "\t%8.8s  %-30.30s  %-22.22s  %-15.15s\n";
+	my $pattern = "\t%8.8s  %-30.30s  %-22.22s  %-15.15s %-20.20s\n";
 	my $summaryPattern = "%19.19s %4d\n";
 	my %queues = ();
 	tie %queues, 'Tie::IxHash';
@@ -271,11 +271,11 @@ sub getStatus {
 		my $count = $queue->get_item_count;
 		$output .= sprintf $summaryPattern, $queueName." Workflows", $count;
 		if ($count > 0) {
-			$output .= sprintf $pattern, "Priority", "Sitename", "Instance Id", "Last State";
+			$output .= sprintf $pattern, "Priority", "Sitename", "Instance Id", "Last State", "Last Run Time";
 			foreach my $item ($queue->peek_items(sub {1})) {	
 				my ($priority, $id, $instance) = @{$item};
 				my $originalPriority = ($instance->{priority} - 1) * 10;
-				$output .= sprintf $pattern, $priority."/".$originalPriority, $instance->{sitename}, $instance->{instanceId}, $instance->{lastState};
+				$output .= sprintf $pattern, $priority."/".$originalPriority, $instance->{sitename}, $instance->{instanceId}, $instance->{lastState}, $instance->{lastRunTime};
 			}
 			$output .= "\n";
 		}
@@ -464,6 +464,7 @@ sub workerResponse {
 		}
 		my $state = $response->content; 
 		$instance->{lastState} = $state;
+		$instance->{lastRunTime} = localtime(time());
 		if ($state eq "waiting") {
 			$self->debug("Was told to wait on $instanceId because we're still waiting on some external event.");
 			$kernel->yield("suspendInstance",$instance);
@@ -486,8 +487,10 @@ sub workerResponse {
 	} elsif ($response->is_redirect) {
 		$self->error("Response for $instanceId was redirected. This should never happen if configured properly!!!");
 		$instance->{lastState} = "redirect";
+		$instance->{lastRunTime} = localtime(time());
 	} elsif ($response->is_error) {	
 		$instance->{lastState} = "comm error";
+		$instance->{lastRunTime} = localtime(time());
 		$self->error("Response for $instanceId had a communications error. ".$response->error_as_HTML);
 		$kernel->yield("suspendInstance",$instance)
 	}
