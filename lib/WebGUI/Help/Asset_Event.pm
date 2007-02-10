@@ -5,6 +5,10 @@ our $HELP = {
 		title => 'add/edit title',
 		body => 'add/edit body',
 		isa => [
+            {
+                namespace => "Asset_Event",
+                tag => "event asset template variables",
+            },
 		],
 		variables => [
 		          {
@@ -220,6 +224,83 @@ our $HELP = {
                         'name'     => 'linkUrl',
                       },
                     ],
+		          },
+        ],
+		related => [
+		],
+	},
+
+	'event view template' => {
+		title => 'event view template variables title',
+		body => 'event view template variables body',
+		isa => [
+            {
+                namespace => "Asset_Event",
+                tag => "event common variables",
+            },
+            {
+                namespace => "Asset_Event",
+                tag => "event asset template variables",
+            },
+		],
+		variables => [
+		          {
+		            'name'     => 'nextUrl',
+		          },
+		          {
+		            'name'     => 'prevUrl',
+		          },
+        ],
+		related => [
+		],
+	},
+
+	'event asset template variables' => {
+		title => 'event asset template variables title',
+		body => 'event asset template variables body',
+		isa => [
+            {
+                namespace => "Asset",
+				tag => 'asset template asset variables',
+            },
+		],
+		variables => [
+		          {
+		            'name'     => 'description',
+		          },
+		          {
+		            'name'     => 'startDate',
+		          },
+		          {
+		            'name'     => 'startTime',
+		          },
+		          {
+		            'name'     => 'endDate',
+		          },
+		          {
+		            'name'     => 'endTime',
+		          },
+		          {
+		            'name'     => 'recurId',
+		          },
+		          {
+		            'name'     => 'relatedLinks',
+		            'name'     => 'relatedLinks assetVar',
+		          },
+		          {
+		            'name'     => 'location',
+		          },
+		          {
+		            'name'     => 'feedId',
+		          },
+		          {
+		            'name'     => 'feedUid',
+		          },
+		          {
+		            'name'     => 'feedId',
+		          },
+		          {
+		            'name'     => 'UserDefinedN',
 		          },
         ],
 		related => [

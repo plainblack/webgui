@@ -351,6 +351,93 @@ our $I18N = {
 		lastUpdated 	=> 1171043883,
 	},
 
+	'event view template variables title'	=> {
+		message		=> q|Event View Template Variables|,
+		lastUpdated	=> 1171080606,
+	},
+
+	'event view template variables body'	=> {
+		message		=> q|<p>These template variables are used by the template that shows this event to users.</p>|,
+		lastUpdated	=> 1171080606,
+	},
+
+	'nextUrl'	=> {
+		message		=> q|A URL to take the user to the next event in the calendar, by date and time.|,
+		lastUpdated	=> 1171080606,
+	},
+
+	'prevUrl'	=> {
+		message		=> q|A URL to take the user to the previous event in the calendar, by date and time.|,
+		lastUpdated	=> 1171080606,
+	},
+
+	'event asset template variables title' => {
+		message => q|Event Asset Template Variables|,
+		lastUpdated => 1171123198
+	},
+
+	'event asset template variables body' => {
+		message => q|Every asset provides a set of variables to most of its
+templates based on the internal asset properties.  Some of these variables may
+be useful, others may not.|,
+		lastUpdated => 1171123200
+	},
+
+	'description' => {
+		message => q|The description of this Event.|,
+		lastUpdated => 1171123200
+	},
+
+	'startDate' => {
+		message => q|The date this Event starts.|,
+		lastUpdated => 1171123200
+	},
+
+	'startTime' => {
+		message => q|The date this Event starts.|,
+		lastUpdated => 1171123200
+	},
+
+	'endDate' => {
+		message => q|The date this Event ends.|,
+		lastUpdated => 1171123200
+	},
+
+	'endTime' => {
+		message => q|The date this Event ends.|,
+		lastUpdated => 1171123200
+	},
+
+	'recurId' => {
+		message => q|A unique identifier for this Event's recurrance in the db.|,
+		lastUpdated => 1171123200
+	},
+
+	'relatedLinks assetVar' => {
+		message => q|The original, unprocessed, related links from the form.  This will be all links in one string joined by newlines.|,
+		lastUpdated => 1171123200
+	},
+
+	'location' => {
+		message 	=> q|The location of this Event.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'feedId' => {
+		message 	=> q|The unique identifier for an iCal feed.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'feedUid' => {
+		message 	=> q|The location of this Event.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'UserDefinedN' => {
+		message => q|For each of the 5 User Defined fields, the value of that field.|,
+		lastUpdated => 1149829706,
+	},
+
 	'assetName' => {
 		message 	=> q{Event},
 		lastUpdated 	=> 1131394072,
