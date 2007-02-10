@@ -65,6 +65,7 @@
  - fix: multiple matrix sharing features
  - fix: Fixed a bug with processing macros in rich media ads. (perlDreamer Consulting, LLC)
  - fix: WebGUI Auth create account can now be properly overriden
+ - fix: WSClient pagination variables. (perlDreamer Consulting, LLC)
 
 7.3.8
  - Fixed a template variable rewriting problem with HTML::Template::Expr

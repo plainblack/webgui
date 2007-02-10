@@ -472,11 +472,25 @@ sub view {
 
       # set pagination links
       if ($p) {
-	$p->appendTemplateVars(\%var);
-         for ('pagination.firstPage','pagination.lastPage','pagination.nextPage','pagination.pageList',
-		'pagination.previousPage', 'pagination.pageList.upTo20', 'pagination.pageList.upTo10') {
+        local $_;
+        $p->appendTemplateVars(\%var);
+        ##Refer to them by name in a loop
+        foreach (qw/pagination.firstPage       pagination.firstPageUrl
+                    pagination.lastPage        pagination.lastPageUrl
+                    pagination.nextPage        pagination.nextPageUrl
+                    pagination.previousPage    pagination.previousPageUrl
+                    pagination.pageList        pagination.pageList.upTo20
+                    pagination.pageList.upTo10/) {
             $var{$_} =~ s/\?/\?cache=$cache_key\;/g;
-         }
+        }
+	 ##Operate on the variables directly for the loops
+	 foreach my $templateLoop (
+	 	@{ $var{'pagination.pageLoop'} },
+		@{ $var{'pagination.pageLoop.upTo20'} },
+		@{ $var{'pagination.pageLoop.upTo10'} },
+		) {
+            $templateLoop->{'pagination.url'} =~ s/\?/\?cache=$cache_key\;/g;
+	 }
       }
    } else {
       $self->session->errorHandler->debug($i18n->get(26) . $@) if $self->get('debugMode');
