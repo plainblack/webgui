@@ -79,6 +79,278 @@ our $I18N = {
 		lastUpdated	=> 1171067211,
 	},
 
+	'formRecurPattern'	=> {
+		message		=> q|HTML and Javascript for a form that defines how an event recurs.|,
+		lastUpdated	=> 1171067211,
+	},
+
+	'formRecurStart'	=> {
+		message		=> q|HTML Date form for entering the first date an event recurs.|,
+		lastUpdated	=> 1171067211,
+	},
+
+	'formRecurEnd'	=> {
+		message		=> q|HTML Date form for entering when a recurring event ends, if ever.|,
+		lastUpdated	=> 1171079974,
+	},
+
+	'formSave'	=> {
+		message		=> q|HTML code for a button to save the Event data.|,
+		lastUpdated	=> 1171079974,
+	},
+
+	'formCancel'	=> {
+		message		=> q|HTML for a button to cancel adding or editing an event.|,
+		lastUpdated	=> 1171079974,
+	},
+
+	'formErrors'	=> {
+		message		=> q|This loop contains any errors from processing the Event form data.|,
+		lastUpdated	=> 1171079974,
+	},
+
+	'message'	=> {
+		message		=> q|An error message.|,
+		lastUpdated	=> 1171079974,
+	},
+
+	'event common template variables title'	=> {
+		message		=> q|Event Common Template Variables|,
+		lastUpdated	=> 1171080606,
+	},
+
+	'event common template variables body'	=> {
+		message		=> q|<p>These template variables are used by both the Event and the Calendar.</p>|,
+		lastUpdated	=> 1171080606,
+	},
+
+	'isPublic'	=> {
+		message		=> q|A conditional that will be true if the group to view this Event is Everyone.|,
+		lastUpdated	=> 1171080606,
+	},
+
+	'groupToView'	=> {
+		message		=> q|The ID of the Group that is allowed to view this event.|,
+		lastUpdated	=> 1171080606,
+	},
+
+	'startDateSecond'	=> {
+		message		=> q|The second, formatted to two digits with leading zeroes, that this event starts.|,
+		lastUpdated	=> 1171080606,
+	},
+
+	'startDateMinute'	=> {
+		message		=> q|The minute, formatted to two digits with leading zeroes, that this event starts.|,
+		lastUpdated	=> 1171080606,
+	},
+
+	'startDateHour24'	=> {
+		message		=> q|The hour, on a 24 hour clock, that this event starts.|,
+		lastUpdated	=> 1171080606,
+	},
+
+	'startDateHour'	=> {
+		message		=> q|The hour that this event starts.|,
+		lastUpdated	=> 1171080606,
+	},
+
+	'startDateHourM'	=> {
+		message 	=> q|Depending on whether the event occurs in the morning or afternoon, either the strings "am" or "pm"|,
+		context 	=> q|Translator's note: Do not translate the strings in double quotes, they are literals.|,
+		lastUpdated	=> 1171080991,
+	},
+
+	'startDateDayName'	=> {
+		message 	=> q|The name of the day the Event starts.|,
+		lastUpdated	=> 1171080991,
+	},
+
+	'startDateDayAbbr'	=> {
+		message 	=> q|The abbreviation of the name of the day the Event starts.|,
+		lastUpdated	=> 1171080991,
+	},
+
+	'startDateDayOfMonth'	=> {
+		message 	=> q|The day of the month this Event starts, a number from 1 to 31.|,
+		lastUpdated	=> 1171080991,
+	},
+
+	'startDateDayOfWeek'	=> {
+		message 	=> q|The day of the week this Event starts, a number from 1 to 7.|,
+		lastUpdated	=> 1171080991,
+	},
+
+	'startDateMonthName'	=> {
+		message 	=> q|The name of the month this Event starts.|,
+		lastUpdated	=> 1171080991,
+	},
+
+	'startDateMonthAbbr'	=> {
+		message 	=> q|The abbreviation of the name of the month this Event starts.|,
+		lastUpdated	=> 1171080991,
+	},
+
+	'startDateYear' => {
+		message 	=> q|The year this Event starts, with 4 digits.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'startDateYmd' => {
+		message 	=> q|This Event's start date in yyyy-mm-dd format, where yyyy is the year, mm is the month and dd is the day.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'startDateMdy' => {
+		message 	=> q|This Event's start date in mm-dd-yyyy format, where yyyy is the year, mm is the month and dd is the day.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'startDateDmy' => {
+		message 	=> q|This Event's start date in dd-mm-yyyy format, where yyyy is the year, mm is the month and dd is the day.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'startDateHms' => {
+		message 	=> q|This Event's start time in hh:mm:ss format, where hh is the hour, mm is the minute and ss is the second.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'startDateEpoch' => {
+		message 	=> q|This Event's start date and time in epoch format.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'endDateSecond'	=> {
+		message		=> q|The second, formatted to two digits with leading zeroes, that this event ends.|,
+		lastUpdated	=> 1171080606,
+	},
+
+	'endDateMinute'	=> {
+		message		=> q|The minute, formatted to two digits with leading zeroes, that this event ends.|,
+		lastUpdated	=> 1171080606,
+	},
+
+	'endDateHour24'	=> {
+		message		=> q|The hour, on a 24 hour clock, that this event ends.|,
+		lastUpdated	=> 1171080606,
+	},
+
+	'endDateHour'	=> {
+		message		=> q|The hour that this event ends.|,
+		lastUpdated	=> 1171080606,
+	},
+
+	'endDateHourM'	=> {
+		message 	=> q|Depending on whether the event occurs in the morning or afternoon, either the strings "am" or "pm"|,
+		context 	=> q|Translator's note: Do not translate the strings in double quotes, they are literals.|,
+		lastUpdated	=> 1171080991,
+	},
+
+	'endDateDayName'	=> {
+		message 	=> q|The name of the day the Event ends.|,
+		lastUpdated	=> 1171080991,
+	},
+
+	'endDateDayAbbr'	=> {
+		message 	=> q|The abbreviation of the name of the day the Event ends.|,
+		lastUpdated	=> 1171080991,
+	},
+
+	'endDateDayOfMonth'	=> {
+		message 	=> q|The day of the month this Event ends, a number from 1 to 31.|,
+		lastUpdated	=> 1171080991,
+	},
+
+	'endDateDayOfWeek'	=> {
+		message 	=> q|The day of the week this Event ends, a number from 1 to 7.|,
+		lastUpdated	=> 1171080991,
+	},
+
+	'endDateMonthName'	=> {
+		message 	=> q|The name of the month this Event ends.|,
+		lastUpdated	=> 1171080991,
+	},
+
+	'endDateMonthAbbr'	=> {
+		message 	=> q|The abbreviation of the name of the month this Event ends.|,
+		lastUpdated	=> 1171080991,
+	},
+
+	'endDateYear' => {
+		message 	=> q|The year this Event ends, with 4 digits.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'endDateYmd' => {
+		message 	=> q|This Event's end date in yyyy-mm-dd format, where yyyy is the year, mm is the month and dd is the day.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'endDateMdy' => {
+		message 	=> q|This Event's end date in mm-dd-yyyy format, where yyyy is the year, mm is the month and dd is the day.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'endDateDmy' => {
+		message 	=> q|This Event's end date in dd-mm-yyyy format, where yyyy is the year, mm is the month and dd is the day.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'endDateHms' => {
+		message 	=> q|This Event's end time in hh:mm:ss format, where hh is the hour, mm is the minute and ss is the second.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'endDateEpoch' => {
+		message 	=> q|This Event's end date and time in epoch format.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'isAllDay' => {
+		message 	=> q|A conditional that is true is this Event has been set to be all day long.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'isOneDay' => {
+		message 	=> q|A conditional that is true is this Event starts and ends on the same day.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'dateSpan' => {
+		message 	=> q|A friendly display of this Event's start and end dates and times.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'url' => {
+		message 	=> q|The URL for this Event.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'urlDay' => {
+		message 	=> q|A URL to show all Events on the same day in this Event's Calendar.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'urlWeek' => {
+		message 	=> q|A URL to show all Events on the same week in this Event's Calendar.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'urlMonth' => {
+		message 	=> q|A URL to show all Events on the same month in this Event's Calendar.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'relatedLinks' => {
+		message 	=> q|This loop contains all links from this Event's set of related links.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'linkUrl' => {
+		message 	=> q|A URL from the set of related links.|,
+		lastUpdated 	=> 1171043883,
+	},
+
 	'assetName' => {
 		message 	=> q{Event},
 		lastUpdated 	=> 1131394072,
