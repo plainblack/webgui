@@ -35,7 +35,7 @@ my $newAdSettings = {
     priority          => "0",
 };
 
-my $numTests = 6; # increment this value for each test you create
+my $numTests = 7; # increment this value for each test you create
 $numTests += scalar keys %{ $newAdSettings };
 ++$numTests; ##For conditional testing on module load
 
@@ -45,6 +45,7 @@ my $loaded = use_ok('WebGUI::AdSpace::Ad');
 
 my $session = WebGUI::Test->session;
 my $ad;
+my $richAd;
 my $adSpace;
 
 SKIP: {
@@ -55,6 +56,7 @@ SKIP: {
     isa_ok($ad,"WebGUI::AdSpace::Ad");
 
     isa_ok($ad->session, 'WebGUI::Session');
+    isa($ad->get('type'), 'text', 'property set during object creation');
 
     my $ad2 = WebGUI::AdSpace::Ad->new($session, $ad->getId);
     cmp_deeply($ad2, $ad, "new returns an identical object to the original what was created");
@@ -72,11 +74,22 @@ SKIP: {
             sprintf "default setting for %s", $setting);
     }
 
+    $richAd = WebGUI::AdSpace::Ad->create($session, $adSpace->getId);
+    $richAd->set({
+    	type      => 'rich',
+	richMedia => 'This is rich, ^@;'
+    });
+    my $renderedAd = $richAd->get('renderedAd');
+    my $userName = $session->user->username;
+    like($renderedAd, qr/This is rich, $userName/, 'Rich media ads render macros');
+
 }
 
 END {
-	if (defined $ad and ref $ad eq 'WebGUI::AdSpace::Ad') {
-		$ad->delete;
+	foreach my $advertisement ($ad, $richAd) {
+		if (defined $advertisement and ref $advertisement eq 'WebGUI::AdSpace::Ad') {
+			$advertisement->delete;
+		}
 	}
 	if (defined $adSpace and ref $adSpace eq 'WebGUI::AdSpace') {
 		$adSpace->delete;

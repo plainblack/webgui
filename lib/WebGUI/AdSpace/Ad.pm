@@ -263,7 +263,7 @@ sub set {
 		$self->{_properties}{renderedAd} = '<div style="position:relative; width:'.$adSpace->get("width").'px; height:'.$adSpace->get("height").'px; margin:0px; overflow:hidden; border:0px;"><a href="'.$self->session->url->gateway(undef, "op=clickAd;id=".$self->getId).'" style="position:absolute; padding: 3px; top:0px; left:0px; width:100%; height:100%; z-index:10; display:block; text-decoration:none; vertical-align:top;"><img src="'.$storage->getUrl($storage->getFiles->[0]).'" alt="'.$self->get("title").'" style="z-index:0;position:relative;border-style:none;border: 0px;" alt="'.$self->get("title").'" /></a></div>';
 	} elsif ($self->get("type") eq "rich") {
 		my $ad = $self->get("richMedia");
-		WebGUI::Macro::process($self->session, $ad);
+		WebGUI::Macro::process($self->session, \$ad);
 		$self->{_properties}{renderedAd} = $ad;
 	}
 	$self->session->db->setRow("advertisement","adId",$self->{_properties});

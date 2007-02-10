@@ -1685,10 +1685,12 @@ sub www_search {
             defaultValue    => $default_end,
         });
     
+    my $i18n = WebGUI::International->new($session, 'Asset_Calendar');
+
     $var->{"form.submit"}    
         = WebGUI::Form::submit($session, {
             name            => "submit",
-            value           => "Search",
+            value           => $i18n->get('searchButtonLabel'),
         });
 
     # This is very bad! It should be $self->processStyle or whatnot.

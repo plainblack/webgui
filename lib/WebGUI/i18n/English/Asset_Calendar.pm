@@ -290,6 +290,191 @@ our $I18N = {
 	},
 
 
+#################### HELP PAGES ####################
+	'searchButtonLabel' => {
+		message 	=> q|Search|,
+		lastUpdated 	=> 1170803504,
+	},
+
+#################### HELP PAGES View Calendar ####################
+
+	'view calendar title' => {
+		message 	=> q|View Calendar Template Variables|,
+		lastUpdated 	=> 1171043337,
+	},
+
+	'view calendar body' => {
+		message 	=> q|<p>The Calendar can be viewed as an entire month, a week, or just a day.  Each view has its own individual template variables, but they also share several common variables.  These are listed below:</p>|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'admin' => {
+		message 	=> q|A conditional that will be true if the user has Admin mode turned on.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'adminControls' => {
+		message 	=> q|These are the icons and URLs that allow editing, cutting, copying, deleting and reordering the Asset.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'editor' => {
+		message 	=> q|A conditional that will be true if the user is in the group allowed to edit events in the calendar.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'urlAdd' => {
+		message 	=> q|A URL to add an event to the calendar.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'urlDay' => {
+		message 	=> q|A URL to the 1 day view of the calendar.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'urlWeek' => {
+		message 	=> q|A URL to the week view of the calendar.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'urlMonth' => {
+		message 	=> q|A URL to the month view of the calendar.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'urlSearch' => {
+		message 	=> q|A URL to the search form for the calendar.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'urlPrint' => {
+		message 	=> q|A URL to the printable view of the calendar.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'paramStart' => {
+		message 	=> q|The starting date of the calendar.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'paramType' => {
+		message 	=> q|The current view of the calendar, one of the strings "day", "week", "month".|,
+		context 	=> q|Translator's note: Do not translate the strings in double quotes, they are literals.|,
+		lastUpdated 	=> 1171062302,
+	},
+
+	'extrasUrl' => {
+		message 	=> q|A URL to the WebGUI extras directory.|,
+		lastUpdated 	=> 1171062302,
+	},
+
+	'view calendar day title' => {
+		message 	=> q|View Calendar Day Template Variables|,
+		lastUpdated 	=> 1171043337,
+	},
+
+	'view calendar day body' => {
+		message 	=> q|<p>This template shows all events in a single day in the calendar, sorted by hour.</p>|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'hours' => {
+		message 	=> q|This loop contains all the events and labels for the hours that they occur in.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'hour12' => {
+		message 	=> q|The hour in 12 hour format.  2:00 in the afternoon will be 2:00.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'hour24' => {
+		message 	=> q|The hour in 24 hour format.  2:00 in the afternoon will be 14:00.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'hourM' => {
+		message 	=> q|Depending on whether the hour occurs in the morning or afternoon, either the strings "am" or "pm"|,
+		context 	=> q|Translator's note: Do not translate the strings in double quotes, they are literals.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'pageNextStart' => {
+		message 	=> q|The date of the next day in the calendar in YYYY-MM-DD (Year, Month, Day) format.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'pageNextUrl' => {
+		message 	=> q|A URL to the next day in the calendar.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'pagePrevStart' => {
+		message 	=> q|The date of the previous day in the calendar in YYYY-MM-DD (Year, Month, Day) format.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'pagePrevUrl' => {
+		message 	=> q|A URL to the previous day in the calendar.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'dayName' => {
+		message 	=> q|The name of the current day.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'dayAbbr' => {
+		message 	=> q|The abbreviation for the name of the current day.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'dayOfMonth' => {
+		message 	=> q|Which day of the month this day is, an integer from 1..31.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'dayOfWeek' => {
+		message 	=> q|Which day of the week this day is, an integer from 1..7.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'monthName' => {
+		message 	=> q|The name of this month.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'monthAbbr' => {
+		message 	=> q|The abbreviation of the name for this month.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'year' => {
+		message 	=> q|The 4 digit year.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'ymd' => {
+		message 	=> q|This day's date in yyyy-mm-dd format, where yyyy is the year, mm is the month and dd is the day.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'mdy' => {
+		message 	=> q|This day's date in mm-dd-yyyy format, where yyyy is the year, mm is the month and dd is the day.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'dmy' => {
+		message 	=> q|This day's date in dd-mm-yyyy format, where yyyy is the year, mm is the month and dd is the day.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'epoch' => {
+		message 	=> q|This day's date in epoch format.|,
+		lastUpdated 	=> 1171043883,
+	},
+
 
 #################### ASSET NAME ####################
 	'assetName' => {
