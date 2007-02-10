@@ -22,7 +22,7 @@ Macro for displaying the Company URL entered into the WebGUI site settings
 
 =head2 process ( )
 
-returns the companyURL from the session variable.
+returns the companyURL from the session object.
 
 =cut
 

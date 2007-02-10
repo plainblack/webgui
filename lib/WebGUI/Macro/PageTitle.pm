@@ -24,7 +24,7 @@ Macro for returning the title of the current Asset.
 
 Returns the title of the current Asset.  If a WebGUI operation or function
 is active, then the title is returned as a link to the Asset.  If there is
-no asset cached in the session variable, undef is returned.
+no asset cached in the session object, undef is returned.
 
 =cut
 

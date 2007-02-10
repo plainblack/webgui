@@ -26,7 +26,7 @@ process is really a wrapper around $session->url->gateway();
 
 =head3 $session
 
-A WebGUI session variable.
+A WebGUI session object.
 
 =head3 $url
 

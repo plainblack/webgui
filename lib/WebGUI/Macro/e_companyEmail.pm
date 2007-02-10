@@ -22,7 +22,7 @@ Macro for displaying the Company Email entered into the WebGUI site settings
 
 =head2 process ( )
 
-returns the companyEmail from the session variable.
+returns the companyEmail from the session object.
 
 =cut
 

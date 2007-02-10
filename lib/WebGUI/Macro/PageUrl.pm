@@ -27,7 +27,7 @@ process is really a wrapper around $session->url->page();
 
 =head3 $session
 
-The current WebGUI session variable.
+The current WebGUI session object.
 
 =head3 $url
 

@@ -23,7 +23,7 @@ Macro for returning the title of the root for this page.
 
 =head2 process ( )
 
-If an asset exists in the session variable cache and and it's
+If an asset exists in the session object cache and and it's
 topmost parent (root) can be found the title for that asset
 is returned.  Otherwise an empty string is returned.
 

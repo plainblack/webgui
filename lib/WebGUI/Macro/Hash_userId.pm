@@ -22,7 +22,7 @@ Macro for userId of the current user.
 
 =head2 process
 
-Returns the userId from the session variable for the current user.
+Returns the userId from the session object for the current user.
 
 =cut
 

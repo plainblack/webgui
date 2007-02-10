@@ -22,7 +22,7 @@ Macro for displaying the Company Name entered into the WebGUI site settings
 
 =head2 process ( )
 
-returns the companyName from the session variable.
+returns the companyName from the session object.
 
 =cut
 

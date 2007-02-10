@@ -25,7 +25,7 @@ macro is mainly used for making SQL Reports with dynamic queries.
 
 =head3 fieldName
 
-The name of the field to pull from the session variable.
+The name of the field to pull from the session object.
 
 =cut
 

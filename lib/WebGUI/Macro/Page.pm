@@ -23,7 +23,7 @@ Macro for pulling information from the Asset in which it's embedded.
 =head2 process ( property )
 
 If the macro is called from outside of an Asset, or if there's no asset in
-session variable, returns an empty string.
+session object, returns an empty string.
 
 =head3 property
 
