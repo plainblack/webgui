@@ -380,7 +380,7 @@ our $I18N = {
 	},
 
 	'hours' => {
-		message 	=> q|This loop contains all the events and labels for the hours that they occur in.|,
+		message 	=> q|This loop contains all the events and labels for the hours that they occur in.  Hours with no events will not be placed into the loop.|,
 		lastUpdated 	=> 1171043883,
 	},
 
@@ -400,12 +400,17 @@ our $I18N = {
 		lastUpdated 	=> 1171043883,
 	},
 
+	'events dayVar' => {
+		message 	=> q|This loop contains all the events for this hour.|,
+		lastUpdated 	=> 1171169586,
+	},
+
 	'pageNextStart' => {
 		message 	=> q|The date of the next day in the calendar in YYYY-MM-DD (Year, Month, Day) format.|,
 		lastUpdated 	=> 1171043883,
 	},
 
-	'pageNextUrl' => {
+	'pageNextUrl dayVar' => {
 		message 	=> q|A URL to the next day in the calendar.|,
 		lastUpdated 	=> 1171043883,
 	},
@@ -415,7 +420,7 @@ our $I18N = {
 		lastUpdated 	=> 1171043883,
 	},
 
-	'pagePrevUrl' => {
+	'pagePrevUrl dayVar' => {
 		message 	=> q|A URL to the previous day in the calendar.|,
 		lastUpdated 	=> 1171043883,
 	},
@@ -472,6 +477,96 @@ our $I18N = {
 
 	'epoch' => {
 		message 	=> q|This day's date in epoch format.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'view calendar week title' => {
+		message 	=> q|View Calendar Week Template Variables|,
+		lastUpdated 	=> 1171172007,
+	},
+
+	'view calendar week body' => {
+		message 	=> q|<p>This template shows all events in a week in the calendar, sorted by day.</p>|,
+		lastUpdated 	=> 1171172004,
+	},
+
+	'days' => {
+		message 	=> q|This loop contains all the events and labels for the days that they occur in.  All days in a week are included in the loop, whether they contain events or not.|,
+		lastUpdated 	=> 1171172001,
+	},
+
+	'events weekVar' => {
+		message 	=> q|This loop contains all the events for this day.|,
+		lastUpdated 	=> 1171169586,
+	},
+
+	'pageNextUrl weekVar' => {
+		message 	=> q|A URL to the next week in the calendar.|,
+		lastUpdated 	=> 1171172001,
+	},
+
+	'pagePrevUrl weekVar' => {
+		message 	=> q|A URL to the previous week in the calendar.|,
+		lastUpdated 	=> 1171171998,
+	},
+
+	'startMonthName' => {
+		message 	=> q|The name of the month this week starts.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'startMonthAbbr' => {
+		message 	=> q|The abbreviation of the name of the month this week starts.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'startDayOfMonth' => {
+		message 	=> q|The day of the month this week starts, a number from 1 to 31.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'startDayName' => {
+		message 	=> q|The name of the day this week starts with.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'startDayAbbr' => {
+		message 	=> q|The abbreviation of the name of the day this week starts with.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'startYear' => {
+		message 	=> q|The year this week starts in.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'endMonthName' => {
+		message 	=> q|The name of the month this week ends.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'endMonthAbbr' => {
+		message 	=> q|The abbreviation of the name of the month this week ends.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'endDayOfMonth' => {
+		message 	=> q|The day of the month this week ends, a number from 1 to 31.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'endDayName' => {
+		message 	=> q|The name of the day this week ends with.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'endDayAbbr' => {
+		message 	=> q|The abbreviation of the name of the day this week ends with.|,
+		lastUpdated 	=> 1171043883,
+	},
+
+	'endYear' => {
+		message 	=> q|The year this week ends in.|,
 		lastUpdated 	=> 1171043883,
 	},
 

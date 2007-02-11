@@ -159,6 +159,113 @@ our $HELP   = {
 
 #### View Week Template
 
+	'view week template' => {
+		title => 'view calendar week title',
+		body => 'view calendar week body',
+		isa => [
+			{
+				namespace => "Asset_Calendar",
+				tag => "view calendar template"
+			},
+		],
+		fields => [
+		],
+		variables => [
+		          {
+		            'name'      => 'days',
+                    'variables' => [
+                          {
+                            'name' => 'dayName'
+                          },
+                          {
+                            'name' => 'dayAbbr'
+                          },
+                          {
+                            'name' => 'dayOfMonth'
+                          },
+                          {
+                            'name' => 'dayOfWeek'
+                          },
+                          {
+                            'name' => 'monthName'
+                          },
+                          {
+                            'name' => 'monthAbbr'
+                          },
+                          {
+                            'name' => 'year'
+                          },
+                          {
+                            'name' => 'ymd'
+                          },
+                          {
+                            'name' => 'mdy'
+                          },
+                          {
+                            'name' => 'dmy'
+                          },
+                          {
+                            'name' => 'epoch'
+                          },
+                          {
+                            'name'        => 'events',
+                            'description' => 'events weekVar',
+                          },
+                 ],
+		          },
+		          {
+		            'name'        => 'pageNextUrl',
+		            'description' => 'pageNextUrl weekVar'
+		          },
+		          {
+		            'name'        => 'pagePrevUrl',
+		            'description' => 'pagePrevUrl weekVar'
+		          },
+                  {
+                    'name' => 'startMonthName'
+                  },
+                  {
+                    'name' => 'startMonthAbbr'
+                  },
+                  {
+                    'name' => 'startDayOfMonth'
+                  },
+                  {
+                    'name' => 'startDayName'
+                  },
+                  {
+                    'name' => 'startDayAbbr'
+                  },
+                  {
+                    'name' => 'startYear'
+                  },
+                  {
+                    'name' => 'endMonthName'
+                  },
+                  {
+                    'name' => 'endMonthAbbr'
+                  },
+                  {
+                    'name' => 'endDayOfMonth'
+                  },
+                  {
+                    'name' => 'endDayName'
+                  },
+                  {
+                    'name' => 'endDayAbbr'
+                  },
+                  {
+                    'name' => 'endYear'
+                  },
+		],
+		related => [
+			{
+				tag => 'calendar add/edit',
+				namespace => 'Asset_Calendar'
+			},
+		]
+	},
+
 #### View Day Template
 
 	'view day template' => {
@@ -174,28 +281,36 @@ our $HELP   = {
 		],
 		variables => [
 		          {
-		            'name' => 'hours'
-		          },
-		          {
-		            'name' => 'hour12'
-		          },
-		          {
-		            'name' => 'hour24'
-		          },
-		          {
-		            'name' => 'hourM'
+		            'name'      => 'hours',
+                    'variables' => [
+                          {
+                            'name' => 'hour12'
+                          },
+                          {
+                            'name' => 'hour24'
+                          },
+                          {
+                            'name' => 'hourM'
+                          },
+                          {
+                            'name'        => 'events',
+                            'description' => 'events dayVar'
+                          },
+                 ],
 		          },
 		          {
 		            'name' => 'pageNextStart'
 		          },
 		          {
-		            'name' => 'pageNextUrl'
+		            'name'        => 'pageNextUrl',
+		            'description' => 'pageNextUrl dayVar'
 		          },
 		          {
 		            'name' => 'pagePrevStart'
 		          },
 		          {
-		            'name' => 'pagePrevUrl'
+		            'name'        => 'pagePrevUrl',
+		            'description' => 'pagePrevUrl dayVar'
 		          },
 		          {
 		            'name' => 'dayName'
