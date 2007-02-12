@@ -352,9 +352,9 @@ our $I18N = {
 
         '99 description' => {
                 message => q|<p>The title of the asset.  This should be descriptive, but not very long.  If left
-blank, this will be set to "Untitled".</p>
+blank, this will be set to "Untitled".  Macros, HTML and javascript may not be placed in the title.</p>
 <p><i>Note:</i> You should always specify a title, even if the Asset template will not use it. In various places on the site, like the Page Tree, Clipboard and Trash, the <b>Title</b> is used to distinguish this Asset from others.</p>|,
-                lastUpdated => 1146629119,
+                lastUpdated => 1171324396,
         },
 
         '411 description' => {
