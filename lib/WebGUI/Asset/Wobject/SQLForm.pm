@@ -2404,7 +2404,11 @@ sub _getFormElement {
 	$fieldValue = $self->_getFieldValue($field, $recordValues, $readOnly);
 
 	# Resolve value to key in case of read only and key/value pairs
-	$fieldValue = join(', ', @{$field->{allOptions}}{@$fieldValue}) if ($field->{hasOptions} && $readOnly);
+	if ($field->{canHaveMultipleValues}) {
+                $fieldValue = join(', ', @{$field->{allOptions}}{@$fieldValue}) if ($field->{hasOptions} && $readOnly);
+        }else{
+                $fieldValue = $field->{allOptions}->{$fieldValue} if ($field->{hasOptions} && $readOnly);
+        }
 	$maxLength = $field->{maxFieldLength} || $allowedDbFieldTypes->{$field->{dbFieldType}}->{maxLength};
 
 	# Construct the form element
