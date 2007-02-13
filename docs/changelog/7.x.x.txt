@@ -23,6 +23,7 @@
    around 40% in the process.
  - fix: Spectre needs to be restarted every day
  - Added a basic status interface to spectre, for troubleshooting.
+ - fix: The requested URL /uploads_macro was not found on this server
  - fix: lack of testing for valid object creation
  - fix: No mention of intermediate upgrade step in gotcha's
  - fix: A newly released version of Html::Template fixes a bug with global
