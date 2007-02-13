@@ -15,6 +15,9 @@ save you many hours of grief.
    Documentation on their use is in the online help and you can also
    look at the default template for an example use.
 
+ * The c_companyName macro now uses HTML encodings for comma and
+   single quote to make it safe to embed inside other macros.
+
 7.3.8
 --------------------------------------------------------------------
  * For those who upgraded to 7.3.7, any EventsCalendars (with their 

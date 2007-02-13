@@ -15,11 +15,12 @@ our $I18N = {
 	'company name body' => {
 		message => q|
 <p><b>&#94;c;</b><br />
-The name of your company specified in the settings by your Administrator.
-</p>
-<p>This Macro may be nested inside other Macros if the text does not contain commas or quotes.</p>
+The name of your company, specified in the settings by your Administrator.</p>
+
+<p>Any commas or quotes in the company name will be translated into HTML encodings so
+that you can always embed this macro inside of other macros.</p>
 |,
-		lastUpdated => 1168558579,
+		lastUpdated => 1171408777,
 	},
 };
 

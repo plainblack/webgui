@@ -83,11 +83,29 @@ my @filterSets = (
 	},
 );
 
-my $numTests = scalar @filterSets;
+my @macroParamSets = (
+	{
+		inputText => q|,|,
+		output => q|&#44;|,
+		comment => 'single comma',
+	},
+	{
+		inputText => q|'|,
+		output => q|&quot;|,
+		comment => 'single quote',
+	},
+);
+
+my $numTests = scalar @filterSets + scalar @macroParamSets;
 
 plan tests => $numTests;
 
 foreach my $testSet (@filterSets) {
 	my $output = WebGUI::HTML::filter($testSet->{inputText}, $testSet->{type});
 	is($output, $testSet->{output}, $testSet->{comment});
+}
+
+foreach my $testSet (@macroParamSets) {
+	WebGUI::HTML::makeParameterSafe(\$testSet->{inputText});
+	is($testSet->{inputText}, $testSet->{output}, $testSet->{comment});
 }

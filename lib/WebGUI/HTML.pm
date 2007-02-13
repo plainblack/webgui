@@ -342,6 +342,25 @@ sub makeAbsolute {
 
 #-------------------------------------------------------------------
 
+=head2 makeParameterSafe ( text )
+
+Encodes text to make it safe to embed in a macro by HTML encoding commas and quotes.
+
+=head3 html
+
+A reference to the text to be encoded.
+
+=cut
+
+sub makeParameterSafe {
+	my $text = shift;
+	${ $text } =~ s/,/&#44;/g;
+	${ $text } =~ s/'/&quot;/g;
+	return;
+}
+
+#-------------------------------------------------------------------
+
 =head2 processReplacements ( session, content )
 
 Processes text using the WebGUI replacements system.

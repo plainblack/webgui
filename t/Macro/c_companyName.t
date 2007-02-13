@@ -20,20 +20,28 @@ use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-my $numTests = 1+1;
+my $numTests = 2+1;
 
 plan tests => $numTests;
 
 my $macro = 'WebGUI::Macro::c_companyName';
 my $loaded = use_ok($macro);
 
+my $originalCompanyName = $session->setting->get('companyName');
+
 SKIP: {
 
 skip "Unable to load $macro", $numTests-1 unless $loaded;
 
-my ($value) = $session->dbSlave->quickArray(
-	"select value from settings where name='companyName'");
 my $output = WebGUI::Macro::c_companyName::process($session);
-is($output, $value, sprintf "Testing companyName");
+is($output, $originalCompanyName, "Testing companyName");
 
+$session->setting->set('companyName', q|Gooey's Consulting, LLC|);
+$output = WebGUI::Macro::c_companyName::process($session);
+is($output, q|Gooey&quot;s Consulting&#44; LLC|, "Testing companyName with embedded quote and comma");
+
+}
+
+END {
+	$session->setting->set('companyName', $originalCompanyName);
 }
