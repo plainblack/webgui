@@ -399,9 +399,9 @@ sub getListTemplateVars {
 		push(@recordLoop,{
 			"record.ipAddress"=>$record->{ipAddress},
 			"record.edit.url"=>$self->getFormUrl("func=view;entryId=".$record->{DataForm_entryId}),
-			"record.edit.icon"=>$self->session->icon->edit("func=view;entryId=".$record->{DataForm_entryId}, $self->getUrl),
+			"record.edit.icon"=>$self->session->icon->edit("func=view;entryId=".$record->{DataForm_entryId}, $self->get('url')),
 			"record.delete.url"=>$self->getUrl("func=deleteEntry;entryId=".$record->{DataForm_entryId}),
-			"record.delete.icon"=>$self->session->icon->delete("func=deleteEntry;entryId=".$record->{Asset_DataForm_entryId}, $self->getUrl, $i18n->get('Delete entry confirmation')),
+			"record.delete.icon"=>$self->session->icon->delete("func=deleteEntry;entryId=".$record->{Asset_DataForm_entryId}, $self->get('url'), $i18n->get('Delete entry confirmation')),
 			"record.username"=>$record->{username},
 			"record.userId"=>$record->{userId},
 			"record.submissionDate.epoch"=>$record->{submissionDate},

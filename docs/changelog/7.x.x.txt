@@ -69,6 +69,7 @@
  - fix: Home macro fails when company name has comma (perlDreamer Consulting, LLC)
  - fix: WSClient pagination variables. (DonorWare and perlDreamer Consulting, LLC)
  - fix: Add to Group Documentation (perlDreamer Consulting, LLC)
+ - fix: EMS url issues (Demo only) (perlDreamer Consulting, LLC)
 
 7.3.8
  - Fixed a template variable rewriting problem with HTML::Template::Expr

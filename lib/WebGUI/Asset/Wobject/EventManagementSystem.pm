@@ -1449,8 +1449,8 @@ sub addCartVars {
 				$purchase->{newPrice} += $_->{price};
 			}
 		}
-		$purchase->{editIcon} = $self->session->icon->edit("func=addEventsToBadge;bid=".$purchase->{badgeId}.";purchaseCounter=".$i, $self->getUrl());
-		$purchase->{deleteIcon} = $self->session->icon->delete("func=addEventsToBadge;bid=none;purchaseCounter=".$i,$self->getUrl,$i18n->get('confirm delete purchase'));
+		$purchase->{editIcon} = $self->session->icon->edit("func=addEventsToBadge;bid=".$purchase->{badgeId}.";purchaseCounter=".$i, $self->get('url')());
+		$purchase->{deleteIcon} = $self->session->icon->delete("func=addEventsToBadge;bid=none;purchaseCounter=".$i,$self->get('url'),$i18n->get('confirm delete purchase'));
 		$purchase->{'edit.url'} = $self->getUrl("func=addEventsToBadge;bid=".$purchase->{badgeId}.";purchaseCounter=".$i);
 		$purchase->{'delete.url'} = $self->getUrl("func=addEventsToBadge;bid=none;purchaseCounter=".$i);
 		push(@{$var->{'cart.purchaseLoop'}},$purchase);
@@ -1947,10 +1947,10 @@ sub www_manageEventMetadata {
 			my %row = %{$row1};
 			$count++;
 			$output .= "<div>".
-			$self->session->icon->delete('func=deleteEventMetaDataField;fieldId='.$row{fieldId},$self->getUrl,$i18n->get('confirm delete event metadata')).
-			$self->session->icon->edit('func=editEventMetaDataField;fieldId='.$row{fieldId}, $self->getUrl).
-			$self->session->icon->moveUp('func=moveEventMetaDataFieldUp;fieldId='.$row{fieldId}, $self->getUrl,($count == 1)?1:0);
-			$output .= $self->session->icon->moveDown('func=moveEventMetaDataFieldDown;fieldId='.$row{fieldId}, $self->getUrl,($count == $number)?1:0).
+			$self->session->icon->delete('func=deleteEventMetaDataField;fieldId='.$row{fieldId},$self->get('url'),$i18n->get('confirm delete event metadata')).
+			$self->session->icon->edit('func=editEventMetaDataField;fieldId='.$row{fieldId}, $self->get('url')).
+			$self->session->icon->moveUp('func=moveEventMetaDataFieldUp;fieldId='.$row{fieldId}, $self->get('url'),($count == 1)?1:0);
+			$output .= $self->session->icon->moveDown('func=moveEventMetaDataFieldDown;fieldId='.$row{fieldId}, $self->get('url'),($count == $number)?1:0).
 			" ".$row{name}." ( ".$row{label}." )</div>";
 		}
 	} else {
@@ -3047,11 +3047,11 @@ sub www_search {
 	  $eventFields{'eventIsCanceled'} = ($event->{'approved'} eq "-2");
 	  $eventFields{'eventIsDenied'}   = ($event->{'approved'} eq "0");
 	  $eventFields{'eventState.label'} = $self->getEventStateLabel($event->{approved});
-	  $eventFields{'manageToolbar'} = $self->session->icon->delete('func=deleteEvent;pid='.$event->{productId}, $self->getUrl,
+	  $eventFields{'manageToolbar'} = $self->session->icon->delete('func=deleteEvent;pid='.$event->{productId}, $self->get('url'),
 					  $i18n->get('confirm delete event')).
-					  $self->session->icon->edit('func=editEvent;pid='.$event->{productId}, $self->getUrl).
-					  $self->session->icon->moveUp('func=moveEventUp;pid='.$event->{productId}, $self->getUrl).
-					  $self->session->icon->moveDown('func=moveEventDown;pid='.$event->{productId}, $self->getUrl);
+					  $self->session->icon->edit('func=editEvent;pid='.$event->{productId}, $self->get('url')).
+					  $self->session->icon->moveUp('func=moveEventUp;pid='.$event->{productId}, $self->get('url')).
+					  $self->session->icon->moveDown('func=moveEventDown;pid='.$event->{productId}, $self->get('url'));
 
 	  if ($eventFields{'eventIsFull'}) {
 	  	$eventFields{'purchase.label'} = $i18n->get('sold out');
@@ -3234,9 +3234,9 @@ sub www_managePrereqSets {
 
 		while (my %row = $sth->hash) {
 			$output .= "<div>";
-			$output .= $self->session->icon->delete('func=deletePrereqSet;psid='.$row{prerequisiteId}, $self->getUrl,
+			$output .= $self->session->icon->delete('func=deletePrereqSet;psid='.$row{prerequisiteId}, $self->get('url'),
 							       $i18n->get('confirm delete prerequisite set')).
-				  $self->session->icon->edit('func=editPrereqSet;psid='.$row{prerequisiteId}, $self->getUrl).
+				  $self->session->icon->edit('func=editPrereqSet;psid='.$row{prerequisiteId}, $self->get('url')).
 				  " ".$row{name}."</div>";
 		}
 	} else {
@@ -3368,8 +3368,8 @@ sub www_manageRegistrants {
 	$p->setAlphabeticalKey('lastName');
 	foreach (@$data) {
 		$output .= "<div>";
-	#	$output .= $self->session->icon->delete('func=deleteRegistrant;psid='.$_->{badgeId}, $self->getUrl);
-		$output .= $self->session->icon->edit('func=editRegistrant;badgeId='.$_->{badgeId}, $self->getUrl).
+	#	$output .= $self->session->icon->delete('func=deleteRegistrant;psid='.$_->{badgeId}, $self->get('url'));
+		$output .= $self->session->icon->edit('func=editRegistrant;badgeId='.$_->{badgeId}, $self->get('url')).
 			"&nbsp;&nbsp;".$_->{lastName}.",&nbsp;".$_->{firstName}."&nbsp;&nbsp;(&nbsp;".$_->{email}."&nbsp;)</div>";
 	}
 	$output .= '<div>'.$p->getBarAdvanced.'</div>';
@@ -3618,8 +3618,8 @@ sub www_manageDiscountPasses {
 	if ($sth->rows) {
 		while (my $data = $sth->hashRef) {
 			$output .= "<div>";
-		#	$output .= $self->session->icon->delete('func=deleteDiscountPass;psid='.$data->{passId}, $self->getUrl);
-			$output .= $self->session->icon->edit('func=editDiscountPass;passId='.$data->{passId}, $self->getUrl).
+		#	$output .= $self->session->icon->delete('func=deleteDiscountPass;psid='.$data->{passId}, $self->get('url'));
+			$output .= $self->session->icon->edit('func=editDiscountPass;passId='.$data->{passId}, $self->get('url')).
 				"&nbsp;&nbsp;".$data->{name}."&nbsp;&nbsp;(".$data->{type}."&nbsp;".$data->{amount}."&nbsp;)</div>";
 		}
 	}

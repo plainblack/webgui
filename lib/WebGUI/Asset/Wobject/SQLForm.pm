@@ -3020,7 +3020,7 @@ my		$assetsUsing = $self->session->db->read(
 			' 	t1.property="fieldType" and t1.value='.$self->session->db->quote($row->{fieldTypeId}));
 my		$currentRow = '<tr align="left" bgcolor="#bbbbbb">';
 		$currentRow .= "<td>";
-		$currentRow .= $self->session->icon->delete('func=deleteFieldType;ftid='.$row->{fieldTypeId}, $self->getUrl, $i18n->get('lft delete confirm message')) unless ($assetsUsing->rows);
+		$currentRow .= $self->session->icon->delete('func=deleteFieldType;ftid='.$row->{fieldTypeId}, $self->get('url'), $i18n->get('lft delete confirm message')) unless ($assetsUsing->rows);
 		$currentRow .= "</td>";
 
 		$currentRow .= "<td>".$row->{dbFieldType}."</td><td>".$row->{formFieldType}."</td>";
@@ -3098,7 +3098,7 @@ my		$assetsUsing = $self->session->db->read(
 			' 	t1.property="regex" and t1.value='.$self->session->db->quote($row->{regexId}));
 my		$currentRow = '<tr align="left" bgcolor="#bbbbbb">';
 		$currentRow .= "<td>";
-		$currentRow .= $self->session->icon->delete('func=deleteRegex;regexId='.$row->{regexId}, $self->getUrl, 'Are you sure?') unless ($assetsUsing->rows);
+		$currentRow .= $self->session->icon->delete('func=deleteRegex;regexId='.$row->{regexId}, $self->get('url'), 'Are you sure?') unless ($assetsUsing->rows);
 		$currentRow .= "</td>";
 
 		$currentRow .= "<td>".$row->{name}."</td><td>".$row->{regex}."</td>";
