@@ -1555,13 +1555,16 @@ sent in HTML format. No attachments can be included.|,
 	},
 
 	'620' => {
-		message => q|<p>As this function suggests, you'll be deleting a group and removing all users from the group. Be careful not to restrict users from pages they should have access to by deleting a group that is in use.
-</p>
+		message => q|<p>As this function suggests, you will be deleting a group.  Users in that group are removed from the group,but are not deleted from the site.</p>
+		
+<p>Any Asset that uses that group will lose the privileges associated with that group.  For example, if a page was set to
+be viewable by the group you are deleting, then only Admins and the page owner will be able to see that page.  Do not delete
+groups lightly!</p>
 
-<p>As with any delete operation, you are prompted to be sure you wish to proceed with the delete. If you answer yes, the delete will proceed and there is no recovery possible. If you answer no you'll be returned to the prior screen.
+<p>As with any delete operation, you are prompted to be sure you wish to proceed with the delete. If you answer yes, the delete will proceed and there is no recovery possible. If you answer no then the delete will not take place.
 </p>
 |,
-		lastUpdated => 1165517903
+		lastUpdated => 1171410836
 	},
 
 	'1004' => {
@@ -1874,8 +1877,9 @@ Group membership is very flexible, determined from any or all of the following:<
 <p>Groups can also be setup to that
 users can add or remove themselves from the group, although it is
 strongly recommended that you not allow users to add themselves to
-default WebGUI groups such as Admin or Content Manager.</p> |,
-		lastUpdated => 1142647256,
+default WebGUI groups such as Admin or Content Manager.</p>
+<p>Custom profile fields cannot be added to Groups. If you would like to add custom profile fields, these can be added to Users globally under the User Profiling tab in the Admin Console.|,
+		lastUpdated => 1171413841,
 	},
 
 	'361' => {

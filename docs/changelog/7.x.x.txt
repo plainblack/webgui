@@ -68,6 +68,7 @@
  - fix: WebGUI Auth create account can now be properly overriden
  - fix: Home macro fails when company name has comma (perlDreamer Consulting, LLC)
  - fix: WSClient pagination variables. (DonorWare and perlDreamer Consulting, LLC)
+ - fix: Add to Group Documentation (perlDreamer Consulting, LLC)
 
 7.3.8
  - Fixed a template variable rewriting problem with HTML::Template::Expr
