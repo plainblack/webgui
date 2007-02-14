@@ -1449,7 +1449,7 @@ sub addCartVars {
 				$purchase->{newPrice} += $_->{price};
 			}
 		}
-		$purchase->{editIcon} = $self->session->icon->edit("func=addEventsToBadge;bid=".$purchase->{badgeId}.";purchaseCounter=".$i, $self->get('url')());
+		$purchase->{editIcon} = $self->session->icon->edit("func=addEventsToBadge;bid=".$purchase->{badgeId}.";purchaseCounter=".$i, $self->get('url'));
 		$purchase->{deleteIcon} = $self->session->icon->delete("func=addEventsToBadge;bid=none;purchaseCounter=".$i,$self->get('url'),$i18n->get('confirm delete purchase'));
 		$purchase->{'edit.url'} = $self->getUrl("func=addEventsToBadge;bid=".$purchase->{badgeId}.";purchaseCounter=".$i);
 		$purchase->{'delete.url'} = $self->getUrl("func=addEventsToBadge;bid=none;purchaseCounter=".$i);

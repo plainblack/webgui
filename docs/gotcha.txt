@@ -9,6 +9,12 @@ save you many hours of grief.
 
 7.3.9
 --------------------------------------------------------------------
+ * This upgrade may appear to freeze when it gets to the "Adding
+   thread rating column" step, especially if your site has a large
+   number of collaboration systems and posts.  Let it run, it's
+   working.  We have to recalculate the rating for every single post
+   and it can take upwards of an hour on large sites.
+
  * If you're using the Events Management System and have a custom
    checkout template, you will need to use the following template
    variables to implement the fix: isError, errorLoop, error.
