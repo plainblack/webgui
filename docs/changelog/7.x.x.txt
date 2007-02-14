@@ -1,3 +1,6 @@
+7.3.10
+
+
 7.3.9
  - fix: SQL Form and big table imports
  - fix: Can't add task to project management (perlDreamer Consulting, LLC)
