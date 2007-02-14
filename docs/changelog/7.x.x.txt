@@ -1,5 +1,7 @@
 7.3.10
-
+ - fix: Calendar Update Feeds now handles iCalendar "DURATION" field
+ - fix: Various potential bugs in WebGUI::DateTime due to inheritence from
+   DateTime.
 
 7.3.9
  - fix: SQL Form and big table imports

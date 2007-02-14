@@ -127,14 +127,14 @@ sub new
     my $locale = 'en_US';
     my $session;
         
-    if(ref $param0 eq "WebGUI::Session") {
+    if (ref $param0 eq "WebGUI::Session") {
        $session = shift;
        my $i18n = WebGUI::International->new($session);
        my $language = $i18n->getLanguage($session->user->profileField('language'));
 	   $locale = $language->{languageAbbreviation} || 'en';
        $locale .= "_".$language->{locale} if ($language->{locale});
     }
-	
+
 	#use Data::Dumper;
 	#warn "Args to DateTime->new: ".Dumper \@_;
 	
@@ -230,6 +230,28 @@ sub from_object {
     my %args    = @_;
     my $session = $args{object}->session;
     my $copy    = $class->SUPER::from_object(@_);
+    $copy->session($session);
+    return $copy;
+}
+
+#######################################################################
+
+=head2 set
+
+Handle copying all WebGUI::DateTime specific data. This is an object method.
+
+This method overrides the set in DateTime to keep WebGUI::DateTime specific
+information being passed between object instances. Some DateTime operations
+create a new object.
+
+=cut
+
+sub set {
+    my $self    = shift;
+    my $session = $self->session;
+
+    my $copy = $self->SUPER::set(@_);
+
     $copy->session($session);
     return $copy;
 }
@@ -418,6 +440,52 @@ sub toUserTimeZoneTime {
     my $copy = $self->cloneToUserTimeZone;
     return $copy->strftime($MYSQL_TIME);
 }
+
+#######################################################################
+
+=head2 truncate
+
+Handle copying all WebGUI::DateTime specific data. This is an object method.
+
+This method overrides the set in DateTime to keep WebGUI::DateTime specific
+information being passed between object instances. Some DateTime operations
+create a new object.
+
+=cut
+
+sub truncate {
+    my $self    = shift;
+    my $session = $self->session;
+
+    my $copy = $self->SUPER::truncate(@_);
+
+    $copy->session($session);
+    return $copy;
+}
+
+
+#######################################################################
+
+=head2 set
+
+Handle copying all WebGUI::DateTime specific data. This is an object method.
+
+This method overrides the set in DateTime to keep WebGUI::DateTime specific
+information being passed between object instances. Some DateTime operations
+create a new object.
+
+=cut
+
+sub set {
+    my $self    = shift;
+    my $session = $self->session;
+
+    my $copy = $self->SUPER::set(@_);
+
+    $copy->session($session);
+    return $copy;
+}
+
 
 #######################################################################
 

@@ -187,7 +187,8 @@ sub execute {
 			
 			my $added	= 0;
 			my $updated	= 0;
-			for my $id (keys %events)
+            my $errored = 0;
+			EVENT: for my $id (keys %events)
 			{
 				#use Data::Dumper;
 				#warn "EVENT: $id; ".Dumper $events{$id};
@@ -226,11 +227,19 @@ sub execute {
 				elsif ($dtstart =~ /(\d{4})(\d{2})(\d{2})/)
 				{
 					my ($year, $month, $day) = $dtstart =~ /(\d{4})(\d{2})(\d{2})/;
-					
 					$properties->{startDate} = join "-",$year,$month,$day;
 				}
+                elsif ($dtstart) {
+                    $session->errorHandler->warn(
+                        "Workflow::Activity::CalendarUpdateFeeds"
+                        . " -- '$dtstart' does not appear to be a valid date"
+                    );
+                    $errored++;
+                    next EVENT;
+                }
 				
-				my $dtend	= $events{$id}->{dtend}->[1];
+				my $dtend	    = $events{$id}->{dtend}->[1];
+                my $duration    = $events{$id}->{duration}->[1];
 				if ($dtend =~ /T/)
 				{
 					my ($date, $time) = split /T/, $dtend;
@@ -242,7 +251,7 @@ sub execute {
 						split / /, WebGUI::DateTime->new(
 							year	=> $year,
 							month	=> $month,
-							day	=> $day,
+							day	    => $day,
 							hour	=> $hour,
 							minute	=> $minute,
 							second	=> $second,
@@ -255,7 +264,51 @@ sub execute {
 					
 					$properties->{endDate} = join "-",$year,$month,$day;
 				}
-				
+                # If we can't parse it, forget the whole event 
+                elsif ($dtend) {
+                    $session->errorHandler->warn(
+                        "Workflow::Activity::CalendarUpdateFeeds"
+                        . " -- '$dtend' does not appear to be a valid date"
+                    );
+                    $errored++;
+                    next EVENT;
+                }
+                # No dtend, but we have duration!
+				elsif ($duration) {
+                    my ($days, $hours, $minutes, $seconds)
+                        = $duration =~ m{
+                            P
+                            (?:(\d+)D)?   # Days
+                            T
+                            (?:(\d+)H)?   # Hours
+                            (?:(\d+)M)?   # Minutes
+                            (?:(\d+)S)?   # Seconds
+                        }ix;
+                    my $startDate   = $properties->{startDate};
+                    # Fill in bogus value to get a WebGUI::DateTime object,
+                    # we'll figure out what we actually need later
+                    my $startTime   = $properties->{startTime} || "00:00:00";
+
+                    my $datetime    = WebGUI::DateTime->new($session,$startDate." ".$startTime);
+
+                    $datetime->add(
+                        days        => $days    || 0,
+                        hours       => $hours   || 0,
+                        minutes     => $minutes || 0,
+                        seconds     => $seconds || 0,
+                    );
+
+                    $properties->{endDate}  = $datetime->toDatabaseDate;
+                    # If it not an all-day event, set the end time too
+                    if ($properties->{startTime}) {
+                        $properties->{endTime}  = $datetime->toDatabaseTime;
+                    }
+                }
+                # No dtend, no duration, just copy the start
+                else {
+                    $properties->{endDate} = $properties->{startDate};
+                    $properties->{endTime} = $properties->{startTime};
+                }
 				
 				
 				# If there are X-WebGUI-* fields
@@ -296,6 +349,7 @@ sub execute {
 					if ($event)
 					{
 						$event->update($properties);
+                        $event->requestAutoCommit;
 						$updated++;
 					}
 				}
@@ -303,7 +357,7 @@ sub execute {
 				{
 					my $calendar	= WebGUI::Asset->newByDynamicClass($self->session,$feed->{assetId});
 					if (!defined $calendar) {
-						$self->session->errorHandler->error("CalendarUpdateFeeds Activity: Calendar object failed to instanciate at line 304.  Did you commit the calendar wobject?");
+						$self->session->errorHandler->error("CalendarUpdateFeeds Activity: Calendar object failed to instanciate.  Did you commit the calendar wobject?");
 						return $self->ERROR;
 					}
 					my $event	= $calendar->addChild($properties);
@@ -317,7 +371,7 @@ sub execute {
 			
 			# Update the result and last updated fields
 			$self->session->db->write("update Calendar_feeds set lastResult=?,lastUpdated=? where feedId=?",
-				["Success! $added added, $updated updated",$dt,$feed->{feedId}]);
+				["Success! $added added, $updated updated, $errored parsing errors",$dt,$feed->{feedId}]);
 		}
 		else
 		{
