@@ -589,13 +589,15 @@ sub _processQuery {
 						push(@{$self->{_debug_loop}},{
 							'debug.output' => $i18n->get('Prequery error').' "'.$prequeryStatement.'": '.$sth->errorMessage
 						});
-					} else {
+					} 
+					else {
 						push(@{$self->{_debug_loop}},{
 							'debug.output' => "Prequery: $prequeryStatement"
 						});
 					}
 					$sth->finish;
-				} else {
+				} 
+				else {
 					push(@{$self->{_debug_loop}},{'debug.output'=>$i18n->get("Prequery not allowed").$prequeryStatement});
 				}
 			}
@@ -607,28 +609,19 @@ sub _processQuery {
                                                 .'='.$self->session->url->escape($self->session->form->process($_)));
                                 }
                         }
-			my $paginateAfter;
-			if ($page)	# Set page length
-			{
-				$paginateAfter 	= $self->get("paginateAfter");
-				$paginateAfter 	= 1000 if($self->{_query}{$nr + 1}{dbQuery});
-			}
-			else
-			{
-				$paginateAfter	= 1000000;
-			}
+			my $paginateAfter = ($page == 1) ? $self->get("paginateAfter") : 99999999;
                         my $p = WebGUI::Paginator->new($self->session,$url,$paginateAfter);
                         my $error = $p->setDataByQuery($query,$dbh,1,$placeholderParams);
                         if ($error ne "") {
                                 $self->session->errorHandler->warn("There was a problem with the query: ".$error);
                                 push(@{$self->{_debug_loop}},{'debug.output'=>$i18n->get(11)." ".$error});
-                        } else {
+                        } 
+			else {
                                 my $first = 1;
                                 my @columns;
                                 my @rows;
                                 my $rownum = 1;
-                                my $rowdata = $p->getPageData;
-                                foreach my $data (@$rowdata) {
+                                foreach my $data (@{$p->getPageData}) {
 					$self->{_query}{$nr}{rowData} = $data;
                                         my %row;
                                         my $colnum = 1;
