@@ -337,11 +337,6 @@ sub definition {
 					    fieldType=>'hidden',
 					    defaultValue=>0
 					},
-                    skipNotification=>{
-					    noFormPost=>1,
-					    fieldType=>'hidden',
-					    defaultValue=>0
-					},
     );
     push(@{$definition}, {
 	    assetName=>$i18n->get("asset"),

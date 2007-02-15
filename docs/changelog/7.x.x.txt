@@ -4,6 +4,8 @@
    DateTime.
  - fix: SQL Report: Paginate After
  - fix: Incomplete asset cause manage Trash to fail
+ - Fixed a problem where you couldn't upgrade directly to 7.3.9 from versions
+   earlier than 7.3.8.
  - fix: Rich Text Editor - Add Asset Tree Link doesn't work with images
 
 7.3.9

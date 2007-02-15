@@ -84,10 +84,6 @@ sub addRevision {
 	
     my $autoCommitId     = $self->getAutoCommitWorkflowId() unless ($options->{skipAutoCommitWorkflows});
     
-    #Handle skip notifications
-    my $skipNotification = $options->{skipNotification} || 0;
-    $properties->{skipNotification} = $skipNotification;
-    
 	my $workingTag      
         = ($autoCommitId) 
             ? WebGUI::VersionTag->create($self->session, {groupToUse=>'12', workflowId=>$autoCommitId}) 
@@ -98,8 +94,8 @@ sub addRevision {
     $self->session->db->beginTransaction;
 	
     my $sql = "insert into assetData"
-            . " (assetId, revisionDate, revisedBy, tagId, status, url, ownerUserId, groupIdEdit, groupIdView, skipNotification)"
-            . " values (?, ?, ?, ?, 'pending', ?, '3','3','7',?)"
+            . " (assetId, revisionDate, revisedBy, tagId, status, url, ownerUserId, groupIdEdit, groupIdView)"
+            . " values (?, ?, ?, ?, 'pending', ?, '3','3','7')"
             ;
                   
     $self->session->db->write($sql,[
@@ -108,7 +104,6 @@ sub addRevision {
         $self->session->user->userId, 
         $workingTag->getId, 
         $self->getId,
-        $skipNotification,
         ]
     );
     
@@ -124,6 +119,7 @@ sub addRevision {
     
     #Instantiate new revision and fill with real data
     my $newVersion = WebGUI::Asset->new($self->session,$self->getId, $self->get("className"), $now);
+    $newVersion->setSkipNotification if ($options->{skipNotification});
     $newVersion->updateHistory("created revision");
     $newVersion->update($self->get);
     $newVersion->setVersionLock;
@@ -338,6 +334,19 @@ sub setAutoCommitTag {
 
 #-------------------------------------------------------------------
 
+=head2 setSkipNotification ( )
+
+Sets a flag so that developers know whether to send notifications out on certain types of edits.
+
+=cut
+
+sub setSkipNotification {
+	my $self = shift;
+	$self->session->db->write("update assetData set skipNotification=1 where assetId=? and revisionDate=?", [$self->getId, $self->get("revisionDate")]);
+}
+
+#-------------------------------------------------------------------
+
 =head2 setVersionLock ( )
 
 Sets the versioning lock to "on" so that this piece of content may not be edited by anyone else now that it has been edited.
@@ -349,6 +358,21 @@ sub setVersionLock {
 	$self->session->db->write("update asset set isLockedBy=".$self->session->db->quote($self->session->user->userId)." where assetId=".$self->session->db->quote($self->getId));
 	$self->updateHistory("locked");
 	$self->purgeCache;
+}
+
+
+
+#-------------------------------------------------------------------
+
+=head2 shouldSkipNotification ( )
+
+Returns true if the asset should disable whatever notifications it does for this edit.
+
+=cut
+
+sub shouldSkipNotification {
+	my $self = shift;
+	return $self->get("skipNotification");
 }
 
 

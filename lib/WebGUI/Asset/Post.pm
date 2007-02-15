@@ -143,7 +143,7 @@ sub commit {
 	my $self = shift;
 	$self->SUPER::commit;
     
-    $self->notifySubscribers unless ($self->get("skipNotification"));
+    $self->notifySubscribers unless ($self->shouldSkipNotification);
            
 	if ($self->isNew) {
 		if ($self->session->setting->get("useKarma") && $self->getThread->getParent->get("karmaPerPost")) {

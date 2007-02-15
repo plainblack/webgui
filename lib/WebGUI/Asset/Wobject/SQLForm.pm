@@ -958,7 +958,7 @@ sub definition {
 	push(@{$definition}, {
 		tableName=>'SQLForm',
 		className=>'WebGUI::Asset::Wobject::SQLForm',
-		name=>$i18n->get('assetName'),
+		assetName=>$i18n->get('assetName'),
 		icon=>'sqlform.gif',
 		properties=>{
 			formId		=> {
