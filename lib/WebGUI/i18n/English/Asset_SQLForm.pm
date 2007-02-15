@@ -930,12 +930,12 @@ delete and restore but not purge records.</p>|,
 	},
 
 	'assetName' => {
-		message => q|SQLForm|,
+		message => q|SQL Form|,
 		lastUpdated => 0,
 	},
 
 	'edit sqlform' => {
-		message => q|SQLForm, Add/Edit|,
+		message => q|SQL Form, Add/Edit|,
 		lastUpdated => 0,
 	},
 

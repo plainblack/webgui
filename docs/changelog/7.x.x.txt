@@ -3,7 +3,7 @@
  - fix: Various potential bugs in WebGUI::DateTime due to inheritence from
    DateTime.
  - fix: SQL Report: Paginate After
-
+ - fix: Incomplete asset cause manage Trash to fail
 
 7.3.9
  - fix: SQL Form and big table imports

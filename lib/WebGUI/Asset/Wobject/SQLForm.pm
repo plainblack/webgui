@@ -954,9 +954,11 @@ sub definition {
 	my $session = shift;
 	my $definition = shift;
 	
+	my $i18n = WebGUI::International->new($session, 'Asset_SQLForm');
 	push(@{$definition}, {
 		tableName=>'SQLForm',
 		className=>'WebGUI::Asset::Wobject::SQLForm',
+		name=>$i18n->get('assetName'),
 		icon=>'sqlform.gif',
 		properties=>{
 			formId		=> {
@@ -1206,20 +1208,6 @@ sub getIndexerParams {
 	}
 
 	return $result;
-}
-
-#-------------------------------------------------------------------
-
-=head2 getName ( )
-
-Return the internationalized name of the SQLForm.
-
-=cut
-
-sub getName {
-	my $self = shift;
-	my $i18n = WebGUI::International->new($self->session, 'Asset_SQLForm');
-	return $i18n->get('assetName');
 }
 
 #-------------------------------------------------------------------
