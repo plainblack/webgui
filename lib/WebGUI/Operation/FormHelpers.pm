@@ -179,7 +179,7 @@ function createLink() {
 	var link = '<a href="'+"^" + "/" + ";" + document.getElementById("url_formId").value+'"';
         var target = document.getElementById('target_formId').value;
         if (target != '_self') link += ' target="' + target + '"';
-	link += '>' + window.opener.tinyMceSelectedText + '</a>';
+	link += '>' + window.opener.tinyMCE.selectedInstance.selection.getSelectedHTML() + '</a>';
 	window.opener.tinyMCE.execCommand("mceInsertContent",false,link);
      window.close();
     }

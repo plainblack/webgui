@@ -4,6 +4,7 @@
    DateTime.
  - fix: SQL Report: Paginate After
  - fix: Incomplete asset cause manage Trash to fail
+ - fix: Rich Text Editor - Add Asset Tree Link doesn't work with images
 
 7.3.9
  - fix: SQL Form and big table imports
