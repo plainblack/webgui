@@ -7,6 +7,17 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.3.10
+--------------------------------------------------------------------
+ * This version fixes a bug in the 7.2.3-7.3.0 upgrade where the
+   incorrect revision of an Event would be migrated.
+   
+   If you have already upgraded, either restore from a backup or
+   go over your Calendars and ensure that your Event's informations
+   are accurate.
+   
+   If you have not yet upgraded, you do not need to do anything.
+
 7.3.9
 --------------------------------------------------------------------
  * This upgrade may appear to freeze when it gets to the "Adding

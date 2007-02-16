@@ -9,6 +9,10 @@
  - fix: Rich Text Editor - Add Asset Tree Link doesn't work with images
  - fix: Calendar Next / Previous when startTime was involved (Jukka Raimovaara / Axxion Oy)
  - fix: Creating users with same e-mail address doesn't work.
+ - fix: Problem with the 7.2.3-7.3.0 upgrade -- Upgrade now gets the last
+   committed revision of an Event, instead of a random revision.
+ - fix: Calendars created with the 7.2.3-7.3.0 upgrade now have the same URL as
+   the Events Calendars they replace.
 
 7.3.9
  - fix: SQL Form and big table imports
