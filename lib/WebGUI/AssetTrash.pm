@@ -79,7 +79,12 @@ sub getAssetsInTrash {
                         assetData.title desc
                         ");
         while (my ($id, $date, $class) = $sth->array) {
-                push(@assets, WebGUI::Asset->new($self->session,$id,$class,$date));
+		my $asset = WebGUI::Asset->new($self->session,$id,$class,$date);
+                if ($asset){
+                        push(@assets, $asset);
+                }else{
+                        $self->session->errorHandler->error("AssetTrash::getAssetsInTrash - failed to instanciate asset with assetId $id, className $class, and revisionDate $date");
+                }
         }
 	$sth->finish;
 	return \@assets;
