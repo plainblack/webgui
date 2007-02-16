@@ -21,6 +21,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+fixEventGroups($session);
 
 finish($session); # this line required
 
@@ -32,7 +33,31 @@ finish($session); # this line required
 #	# and here's our code
 #}
 
+#----------------------------------------------------------------------------
+sub fixEventGroups {
+    my $session     = shift;
+    print "\tFixing Event groups for Events created since 7.3.0.....";
 
+	my $events = WebGUI::Asset->getRoot($session)->getLineage(['descendents'], {
+        statesToInclude     => ['published','trash','clipboard','clipboard-limbo','trash-limbo'],
+        statusToInclude     => ['pending','approved','deleted','archived'],
+        includeOnlyClasses  => ['WebGUI::Asset::Event'],
+        returnObjects       => 1,
+        whereClause         => q{groupIdView = "" || groupIdEdit = "" || groupIdView IS NULL || groupIdEdit IS NULL},
+    });
+
+    for my $event (@$events) {
+        my $revisionProperties  = $event->get;
+
+        $revisionProperties->{groupIdView} ||= $event->getParent->get("groupIdView");
+        $revisionProperties->{groupIdEdit} ||= $event->getParent->get("groupIdEventEdit")
+                                           || $event->getParent->get("groupIdEdit");
+
+        $event->addRevision($revisionProperties, undef, {skipAutoCommitWorkflows=>1});
+    }
+
+    print "\tOK\n";
+}
 
 # ---- DO NOT EDIT BELOW THIS LINE ----
 

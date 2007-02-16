@@ -1407,9 +1407,25 @@ sub processPropertiesFromFormPost {
     }
 
     
-    ### Form is verified
+    ### Form is verified, fix properties
     # Events are always hidden from navigation
     $self->update({ isHidden => 1 });
+    
+    # If there is no security information, grab it from the parent
+    if (!$self->get("groupIdView")) {
+        $self->update({
+            groupIdView     => $self->getParent->get("groupIdView"),
+        });
+    }
+    if (!$self->get("groupIdEdit")) {
+        my $groupIdEdit =  $self->getParent->get("groupIdEventEdit")
+                        || $self->getParent->get("groupIdEdit")
+                        ;
+
+        $self->update({
+            groupIdEdit     => $groupIdEdit,
+        });
+    }
     
     # Fix times according to input (allday, timezone)
     if ($form->param("allday")) {
