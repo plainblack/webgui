@@ -8,6 +8,7 @@
    earlier than 7.3.8.
  - fix: Rich Text Editor - Add Asset Tree Link doesn't work with images
  - fix: Calendar Next / Previous when startTime was involved (Jukka Raimovaara / Axxion Oy)
+ - fix: Creating users with same e-mail address doesn't work.
 
 7.3.9
  - fix: SQL Form and big table imports

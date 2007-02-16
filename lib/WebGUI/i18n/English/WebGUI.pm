@@ -2509,7 +2509,8 @@ div.tabs {
 	},
 
 	'1078' => {
-		message => q|There is already a user of this system with the email address you've entered.  Press "Save" if you still wish to create this user|,
+		message => q|There is already a user of this system with the email address you've entered.  
+        Please re-complete the form and press "Save" if you still wish to create this user|,
 		lastUpdated => 1067951807
 	},
 

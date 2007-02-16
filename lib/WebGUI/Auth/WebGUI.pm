@@ -190,8 +190,8 @@ sub createAccountSave {
    $error .= $temp;
    
    return $self->createAccount($error) unless ($error eq "");
-   #If Email address is not unique, a warning is displayed
-   if($warning ne "" && !$self->session->form->process("confirm")){
+   # If Email address is not unique, a warning is displayed
+   if ($warning ne "" && !$self->session->form->process("confirm")) {
       return $self->createAccount('<li>'.$i18n->get(1078).'</li>', 1);
    }
 
