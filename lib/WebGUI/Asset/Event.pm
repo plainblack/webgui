@@ -353,16 +353,16 @@ sub getEventNext {
     
     # All day events must either look for null time or greater than 00:00:00
     if ($self->isAllDay) {
-        $where  .= "(Event.startTime IS NULL "
+        $where  .= "((Event.startTime IS NULL "
                 . "&& assetData.title > ".$db->quote($self->get("title")).") "
-                . "|| Event.startTime >= '00:00:00'";
+                . "|| Event.startTime >= '00:00:00')";
     }
     # Non all-day events must look for greater than time
     else
     {
-        $where  .= "(Event.startTime = '".$self->get("startTime")."' "
+        $where  .= "((Event.startTime = '".$self->get("startTime")."' "
                 . "&& assetData.title > ".$db->quote($self->get("title")).")"
-                . "|| Event.startTime > '".$self->get("startTime")."'";
+                . "|| Event.startTime > '".$self->get("startTime")."')";
     }
     $where    .= ")";
    
@@ -416,9 +416,9 @@ sub getEventPrev {
     }
     # Non all-day events must look for greater than time
     else {
-        $where  .= "(Event.startTime = '".$self->get("startTime")."' "
+        $where  .= "((Event.startTime = '".$self->get("startTime")."' "
                 . "&& assetData.title < ".$db->quote($self->get("title")).")"
-                . "|| Event.startTime < '".$self->get("startTime")."'";
+                . "|| Event.startTime < '".$self->get("startTime")."')";
     }
     $where    .= ")";
     
