@@ -255,7 +255,11 @@ sub www_importPackage {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless ($self->canEdit && $self->session->user->isInGroup(4));
 	my $storage = WebGUI::Storage->createTemp($self->session);
-	$storage->addFileFromFormPost("packageFile",1);
+
+	##This is a hack.  It should use the WebGUI::Form::File API to insulate
+	##us from future form name changes.
+	$storage->addFileFromFormPost("packageFile_file",1);
+
 	my $error = "";
 	if ($storage->getFileExtension($storage->getFiles->[0]) eq "wgpkg") {
 		$error = $self->importPackage($storage);

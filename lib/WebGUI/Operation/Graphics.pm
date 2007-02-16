@@ -261,7 +261,11 @@ sub www_editFontSave {
 	
 	if ($session->form->process('fid') eq 'new') {
 		my $storage = WebGUI::Storage->create($session, 'new');
-		my $filename = $storage->addFileFromFormPost('fontFile');
+
+		##This is a hack.  It should use the WebGUI::Form::File API to insulate
+		##us from future form name changes.
+		my $filename = $storage->addFileFromFormPost('fontFile_file');
+
 		if ($filename) {
 			my $font = WebGUI::Image::Font->new($session, 'new');
 			$font->setName($session->form->process('fontName'));

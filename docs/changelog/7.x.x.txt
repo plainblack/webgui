@@ -14,6 +14,7 @@
  - fix: Calendars created with the 7.2.3-7.3.0 upgrade now have the same URL as
    the Events Calendars they replace.
  - fix: Events are created with no group information.
+ - fix: Can't add files with File Pile (perlDreamer Consulting, LLC)
 
 7.3.9
  - fix: SQL Form and big table imports

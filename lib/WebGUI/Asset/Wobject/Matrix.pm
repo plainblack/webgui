@@ -697,7 +697,11 @@ sub www_editListingSave {
 		$storage = WebGUI::Storage::Image->create($self->session);
 		$data{storageId} = $storage->getId;
 	}
-	my $screenshot = $storage->addFileFromFormPost("screenshot");
+
+	##This is a hack.  File upload should go throught the WebGUI::Form::File API
+	##so that future changes don't affect us like this
+	my $screenshot = $storage->addFileFromFormPost("screenshot_file");
+
 	if (defined $screenshot) {
 		$data{filename} = $screenshot;
 		$storage->generateThumbnail($screenshot);

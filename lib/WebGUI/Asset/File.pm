@@ -247,7 +247,11 @@ sub processPropertiesFromFormPost {
 	$self->SUPER::processPropertiesFromFormPost;
 	delete $self->{_storageLocation};
 	my $storage = $self->getStorageLocation;
-	my $filename = $storage->addFileFromFormPost("file",1);
+
+	##The file form element adds a _file to each input name.
+	##This thing should really try to use the whole Form API, but that's a major
+	##change to this Asset
+	my $filename = $storage->addFileFromFormPost("file_file",1);
 	$storage->setPrivileges($self->get('ownerUserId'), $self->get('groupIdView'), $self->get('groupIdEdit'));
 	if (defined $filename && $filename ne $self->get("filename")) {
 		my %data;

@@ -461,7 +461,9 @@ sub www_richEditAddImageSave {
 	return $session->privilege->insufficient('bare') unless $base->canEdit;
 
 	my $storage = WebGUI::Storage::Image->create($session);
-	my $filename = $storage->addFileFromFormPost('filename');
+	##This is a hack.  It should use the WebGUI::Form::File API to insulate
+	##us from future form name changes.
+	my $filename = $storage->addFileFromFormPost('filename_file');
 	if ($filename) {
 		$base->addChild({
 			assetId     => 'new',

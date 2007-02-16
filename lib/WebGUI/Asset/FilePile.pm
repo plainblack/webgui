@@ -137,7 +137,10 @@ sub edit {
 sub editSave {
 	my $self = shift;
 	my $tempStorage = WebGUI::Storage->create($self->session);
-	$tempStorage->addFileFromFormPost("file");
+
+	##This is a hack.  File uploads should go through the WebGUI::Form::File API
+	$tempStorage->addFileFromFormPost("file_file");
+
 	foreach my $filename (@{$tempStorage->getFiles}) {
 		my $storage = WebGUI::Storage::Image->create($self->session);
 		$storage->addFileFromFilesystem($tempStorage->getPath($filename));
