@@ -1145,10 +1145,10 @@ sub viewMonth {
     unshift @dayNames,splice(@dayNames,$first_dow);
     unshift @dayAbbrs,splice(@dayAbbrs,$first_dow);
     
-    for my $day (0..$#dayNames) {
+    for my $dayIndex (0..$#dayNames) {
         push @{$var->{dayNames}}, {
-            "dayName"    => $dayNames[$_],
-            "dayAbbr"    => $dayAbbrs[$_],
+            "dayName"    => $dayNames[$dayIndex],
+            "dayAbbr"    => $dayAbbrs[$dayIndex],
         };
     }
     

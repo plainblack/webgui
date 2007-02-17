@@ -41,7 +41,7 @@ This package provides a mechanism for storing and retrieving files that are not 
  $store = WebGUI::Storage->get($self->session,$id);
 
  $filename = $store->addFileFromFilesystem($pathToFile);
- $filename = $store->addFileFromFormPost($formVarName);
+ $filename = $store->addFileFromFormPost($formVarName,$attachmentLimit);
  $filename = $store->addFileFromHashref($filename,$hashref);
  $filename = $store->addFileFromScalar($filename,$content);
 
