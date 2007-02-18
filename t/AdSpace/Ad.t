@@ -36,7 +36,7 @@ my $newAdSettings = {
     priority          => "0",
 };
 
-my $numTests = 22; # increment this value for each test you create
+my $numTests = 23; # increment this value for each test you create
 $numTests += scalar keys %{ $newAdSettings };
 ++$numTests; ##For conditional testing on module load
 
@@ -46,7 +46,7 @@ my $loaded = use_ok('WebGUI::AdSpace::Ad');
 
 my $session = WebGUI::Test->session;
 my $ad;
-my ($richAd, $textAd, $imageAd);
+my ($richAd, $textAd, $imageAd, $nonAd);
 my $adSpace;
 my $imageStorage = WebGUI::Storage::Image->create($session);
 $imageStorage->addFileFromScalar('foo.bmp', 'This is not really an image');
@@ -143,9 +143,9 @@ SKIP: {
 
     $imageAd = WebGUI::AdSpace::Ad->create($session, $adSpace->getId);
     $imageAd->set({
-    	type       => 'image',
-	title      => 'This is an image ad',
-	storageId  => $imageStorage->getId,
+        type       => 'image',
+        title      => 'This is an image ad',
+        storageId  => $imageStorage->getId,
     });
     my $renderedImageAd = $imageAd->get('renderedAd');
     
@@ -171,10 +171,19 @@ SKIP: {
     $style = $token->[1]{alt};
     is($style, $imageAd->get('title'), 'ad title matches, image');
 
+    my $nonAdProperties = {
+        type       => 'nothing',
+        title      => 'This ad will never render',
+    };
+    $nonAd = WebGUI::AdSpace::Ad->create($session, $adSpace->getId, $nonAdProperties);
+    my $renderedNonAd = $nonAd->get('renderedAd');
+
+    is($renderedNonAd, undef, 'undefined ad types are not rendered');
+
 }
 
 END {
-	foreach my $advertisement ($ad, $richAd, $textAd, $imageAd) {
+	foreach my $advertisement ($ad, $richAd, $textAd, $imageAd, $nonAd) {
 		if (defined $advertisement and ref $advertisement eq 'WebGUI::AdSpace::Ad') {
 			$advertisement->delete;
 		}
