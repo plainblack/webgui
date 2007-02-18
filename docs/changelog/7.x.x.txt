@@ -16,6 +16,7 @@
  - fix: Events are created with no group information.
  - fix: Can't add files with File Pile (perlDreamer Consulting, LLC)
  - fix: Calendar: Month View Always Shows Sunday (perlDreamer Consulting, LLC)
+ - fix: SQL Form and unsigned int (perlDreamer Consulting, LLC)
 
 7.3.9
  - fix: SQL Form and big table imports

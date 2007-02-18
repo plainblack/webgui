@@ -1270,6 +1270,7 @@ sub processPropertiesFromFormPost {
 
 					my $type = $columnDefinition->{Type};
 					my $set = $columnDefinition->{Type};
+                    my $unsigned;
 					my $length;
 					$set =~ s/^.*\(//;
 					$set =~ s/\)$//;
@@ -1278,11 +1279,13 @@ sub processPropertiesFromFormPost {
 					$length = $set + 0;
 					$type =~ s/\(.*\)//;
 
+                    ($type, $unsigned) = split /\s+/, $type;
+                    my $shouldBeUnsigned = lc $unsigned eq 'unsigned';
+
 					my $currentField = $allowedDbFieldTypes->{$type};
 					
 					# Get the fieldTypeId of this column
-					my ($fieldType) = $self->session->db->quickArray("select fieldTypeId from SQLForm_fieldTypes "
-						." where dbFieldType=".$self->session->db->quote($type)." and formFieldType=".$self->session->db->quote($currentField->{defaultFormElement}));
+					my ($fieldType) = $self->session->db->quickArray("select fieldTypeId from SQLForm_fieldTypes where dbFieldType=? and formFieldType=?",[$type, $currentField->{defaultFormElement}]);
 					
 					# Create the field type if it doesn't exist
 					unless ($fieldType) {
@@ -1311,7 +1314,7 @@ sub processPropertiesFromFormPost {
 					$processed->{regex} = $currentField->{defaultRegEx} if ($currentField->{defaultRegEx});
 					$processed->{fieldName} = $columnDefinition->{Field};
 					$processed->{displayName} = $columnDefinition->{Field};
-					$processed->{signed} = '1';
+					$processed->{signed} = $shouldBeUnsigned ? 0 : 1;
 					$processed->{showInSearchResults} = '1';
 					$processed->{isSearchable} = '1';
 					my $fieldId = $self->session->id->generate;
