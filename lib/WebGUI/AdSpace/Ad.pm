@@ -253,7 +253,7 @@ sub set {
 	$self->{_properties}{borderColor} = $properties->{borderColor} || $self->{_properties}{borderColor} || "#000000";
 	$self->{_properties}{textColor} = $properties->{textColor} || $self->{_properties}{textColor} || "#000000";
 	$self->{_properties}{backgroundColor} = $properties->{backgroundColor} || $self->{_properties}{backgroundColor} || "#ffffff";
-	$self->{_properties}{priority} = $properties->{priority} || $self->{_properties}{priority} || "0";
+	$self->{_properties}{priority} = exists $properties->{priority} ? $properties->{priority} : $self->{_properties}{priority};
 	# prerender the ad for faster display
 	my $adSpace = WebGUI::AdSpace->new($self->session, $self->get("adSpaceId"));
 	if ($self->get("type") eq "text") {

@@ -36,7 +36,7 @@ my $newAdSettings = {
     priority          => "0",
 };
 
-my $numTests = 23; # increment this value for each test you create
+my $numTests = 28; # increment this value for each test you create
 $numTests += scalar keys %{ $newAdSettings };
 ++$numTests; ##For conditional testing on module load
 
@@ -46,7 +46,7 @@ my $loaded = use_ok('WebGUI::AdSpace::Ad');
 
 my $session = WebGUI::Test->session;
 my $ad;
-my ($richAd, $textAd, $imageAd, $nonAd);
+my ($richAd, $textAd, $imageAd, $nonAd, $setAd);
 my $adSpace;
 my $imageStorage = WebGUI::Storage::Image->create($session);
 $imageStorage->addFileFromScalar('foo.bmp', 'This is not really an image');
@@ -180,10 +180,26 @@ SKIP: {
 
     is($renderedNonAd, undef, 'undefined ad types are not rendered');
 
+    $nonAd->delete;
+
+    $nonAd = WebGUI::AdSpace::Ad->new($session, 'nonExistantId');
+    is($nonAd, undef, 'requesting a non-existant id via new returns undef');
+
+    my $setAd = WebGUI::AdSpace::Ad->create($session, $adSpace->getId, {isActive => 1});
+    is($setAd->get('isActive'), 1, 'set isActive true during instantiation');
+    $setAd->set({isActive=>0});
+    is($setAd->get('isActive'), 0, 'set isActive false during instantiation');
+    $setAd->delete;
+
+    my $setAd = WebGUI::AdSpace::Ad->create($session, $adSpace->getId, {priority => 1});
+    is($setAd->get('priority'), 1, 'set priority=1 during instantiation');
+    $setAd->set({priority=>0});
+    is($setAd->get('priority'), 0, 'set priority=0');
+
 }
 
 END {
-	foreach my $advertisement ($ad, $richAd, $textAd, $imageAd, $nonAd) {
+	foreach my $advertisement ($ad, $richAd, $textAd, $imageAd, $nonAd, $setAd) {
 		if (defined $advertisement and ref $advertisement eq 'WebGUI::AdSpace::Ad') {
 			$advertisement->delete;
 		}
