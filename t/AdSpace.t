@@ -13,6 +13,7 @@ use strict;
 use lib "$FindBin::Bin/lib";
 use WebGUI::Test;
 use WebGUI::Session;
+use WebGUI::AdSpace::Ad;
 
 use Test::More;
 use Test::Deep;
@@ -30,7 +31,7 @@ my $newAdSpaceSettings = {
     height             => "300",
 };
 
-my $numTests = 12; # increment this value for each test you create
+my $numTests = 20; # increment this value for each test you create
 $numTests += 2 * scalar keys %{ $newAdSpaceSettings };
 ++$numTests; ##For conditional testing on module load
 
@@ -40,6 +41,7 @@ my $loaded = use_ok('WebGUI::AdSpace');
 
 my $session = WebGUI::Test->session;
 my ($adSpace, $alfred, $alfred2, $bruce, $catWoman, $defaultAdSpace );
+my ($jokerAd, $penguinAd, $twoFaceAd);
 
 SKIP: {
 
@@ -103,6 +105,40 @@ SKIP: {
             sprintf "empty call to set does not change %s", $setting);
     }
 
+    ##Create a set of ads for general purpose testing
+
+    $jokerAd   = WebGUI::AdSpace::Ad->create($session, $bruce->getId, {title => 'Joker', url => '/ha_ha'});
+    $penguinAd = WebGUI::AdSpace::Ad->create($session, $bruce->getId, {title => 'Penguin', url => '/fishy'});
+    $twoFaceAd = WebGUI::AdSpace::Ad->create($session, $catWoman->getId, {title => 'Two Face', url => '/dent'});
+
+    ##getAds
+    my @bruceAdTitles = map { $_->get('title') } @{ $bruce->getAds };
+    my @catWomanAdTitles = map { $_->get('title') } @{ $catWoman->getAds };
+
+    cmp_bag(\@bruceAdTitles,    ['Joker', 'Penguin'], 'Got the set of Ads for bruce');
+    cmp_bag(\@catWomanAdTitles, ['Two Face'],         'Got the set of Ads for catWoman');
+
+    ##countClicks
+    my $penguinUrl = WebGUI::AdSpace->countClick($session, $penguinAd->getId);
+    is($penguinUrl, $penguinAd->get('url'), 'clicking on the penguin ad returns the penguin url');
+    WebGUI::AdSpace->countClick($session, $penguinAd->getId);
+    WebGUI::AdSpace->countClick($session, $penguinAd->getId);
+
+    my $jokerUrl = WebGUI::AdSpace->countClick($session, $jokerAd->getId);
+    is($jokerUrl, $jokerAd->get('url'), 'clicking on the joker ad returns the joker url');
+
+    my $twoFaceUrl = WebGUI::AdSpace->countClick($session, $twoFaceAd->getId);
+    is($twoFaceUrl, $twoFaceAd->get('url'), 'clicking on the twoFace ad returns the twoFace url');
+
+    my ($penguinClicks) = $session->db->quickArray('select clicks from advertisement where adId=?',[$penguinAd->getId]); 
+    is($penguinClicks, 3, 'counted penguin clicks correctly');
+
+    my ($jokerClicks)   = $session->db->quickArray('select clicks from advertisement where adId=?',[$jokerAd->getId]); 
+    is($jokerClicks, 1, 'counted joker clicks correctly');
+
+    my ($twoFaceClicks) = $session->db->quickArray('select clicks from advertisement where adId=?',[$twoFaceAd->getId]); 
+    is($twoFaceClicks, 1, 'counted twoFace clicks correctly');
+
 }
 
 END {
@@ -111,4 +147,11 @@ END {
             $ad_space->delete;
         }
     }
+
+    foreach my $advert ($jokerAd, $penguinAd, $twoFaceAd) {
+        if (defined $advert and ref $advert eq 'WebGUI::AdSpace::Ad') {
+            $advert->delete;
+        }
+    }
+
 }
