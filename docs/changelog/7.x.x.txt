@@ -1,3 +1,5 @@
+7.3.11
+
 7.3.10
  - fix: Calendar Update Feeds now handles iCalendar "DURATION" field
  - fix: Various potential bugs in WebGUI::DateTime due to inheritence from
