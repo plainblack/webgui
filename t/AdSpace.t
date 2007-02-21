@@ -31,7 +31,7 @@ my $newAdSpaceSettings = {
     height             => "300",
 };
 
-my $numTests = 20; # increment this value for each test you create
+my $numTests = 25; # increment this value for each test you create
 $numTests += 2 * scalar keys %{ $newAdSpaceSettings };
 ++$numTests; ##For conditional testing on module load
 
@@ -107,9 +107,41 @@ SKIP: {
 
     ##Create a set of ads for general purpose testing
 
-    $jokerAd   = WebGUI::AdSpace::Ad->create($session, $bruce->getId, {title => 'Joker', url => '/ha_ha'});
-    $penguinAd = WebGUI::AdSpace::Ad->create($session, $bruce->getId, {title => 'Penguin', url => '/fishy'});
-    $twoFaceAd = WebGUI::AdSpace::Ad->create($session, $catWoman->getId, {title => 'Two Face', url => '/dent'});
+    ##The Joker and Penguin Ads go in the bruce adSpace
+    ##The Two Face ad goes in the catWoman adSpace
+
+    $jokerAd   = WebGUI::AdSpace::Ad->create($session, $bruce->getId,
+    	{
+            title      => 'Joker',
+            url        => '/ha_ha',
+            type       => 'rich',
+            richMedia  => 'Joker',
+            priority   => 2,
+            isActive   => 1,
+        }
+    );
+    $penguinAd = WebGUI::AdSpace::Ad->create($session, $bruce->getId,
+    	{
+            title      => 'Penguin',
+            url        => '/fishy',
+            type       => 'rich',
+            richMedia  => 'Penguin',
+            priority   => 3,
+            isActive   => 1,
+        }
+    );
+    $twoFaceAd = WebGUI::AdSpace::Ad->create($session, $catWoman->getId,
+    	{
+            title      => 'Two Face',
+            url        => '/dent',
+            type       => 'rich',
+            richMedia  => 'Two Face',
+            priority   => 500,
+            isActive   => 1,
+            clicksBought      => 0,
+            impressionsBought => 0,
+        }
+    );
 
     ##getAds
     my @bruceAdTitles = map { $_->get('title') } @{ $bruce->getAds };
@@ -138,6 +170,31 @@ SKIP: {
 
     my ($twoFaceClicks) = $session->db->quickArray('select clicks from advertisement where adId=?',[$twoFaceAd->getId]); 
     is($twoFaceClicks, 1, 'counted twoFace clicks correctly');
+
+    ##displayImpression
+    my ($twoFaceImpressions, $twoFacePriority) =
+        $session->db->quickArray('select impressions,nextInPriority from advertisement where adId=?',[$twoFaceAd->getId]); 
+    is($catWoman->displayImpression(1), $twoFaceAd->get('renderedAd'), 'displayImpression returns the ad');
+    cmp_bag(
+        [$twoFaceImpressions, $twoFacePriority],
+        [$session->db->quickArray('select impressions,nextInPriority from advertisement where adId=?',[$twoFaceAd->getId])],
+        'displayImpressions: impresssions and nextInPriority are not updated when dontCount=1',
+    );
+
+    $catWoman->displayImpression();
+    my $twoFaceTime = time();
+    is(
+        $session->db->quickArray('select impressions from advertisement where adId=?',[$twoFaceAd->getId]),
+        1, 'displayImpression added 1 impression'
+    );
+    my ($newTwoFacePriority) = $session->db->quickArray('select nextInPriority from advertisement where adId=?',[$twoFaceAd->getId]);
+    isnt($newTwoFacePriority, $twoFacePriority, 'displayImpression changed the nextInPriority');
+    cmp_ok(
+        abs($twoFaceTime + $twoFaceAd->get('priority') - $newTwoFacePriority),
+        '<=',
+        '2',
+        'displayImpression set the nextInPriority correctly'
+    );
 
 }
 
