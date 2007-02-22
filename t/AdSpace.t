@@ -31,7 +31,7 @@ my $newAdSpaceSettings = {
     height             => "300",
 };
 
-my $numTests = 25; # increment this value for each test you create
+my $numTests = 26; # increment this value for each test you create
 $numTests += 2 * scalar keys %{ $newAdSpaceSettings };
 ++$numTests; ##For conditional testing on module load
 
@@ -40,7 +40,7 @@ plan tests => $numTests;
 my $loaded = use_ok('WebGUI::AdSpace');
 
 my $session = WebGUI::Test->session;
-my ($adSpace, $alfred, $alfred2, $bruce, $catWoman, $defaultAdSpace );
+my ($adSpace, $alfred, $alfred2, $bruce, $catWoman, $twoFaceClone, $defaultAdSpace );
 my ($jokerAd, $penguinAd, $twoFaceAd);
 
 SKIP: {
@@ -196,6 +196,9 @@ SKIP: {
         'displayImpression set the nextInPriority correctly'
     );
 
+    $twoFaceClone = WebGUI::AdSpace::Ad->new($session, $twoFaceAd->getId);
+    is($twoFaceClone->get('isActive'), 0, 'displayImpression deactivates an ad if enough impressions and clicks are bought');
+
 }
 
 END {
@@ -205,7 +208,7 @@ END {
         }
     }
 
-    foreach my $advert ($jokerAd, $penguinAd, $twoFaceAd) {
+    foreach my $advert ($jokerAd, $penguinAd, $twoFaceClone, $twoFaceAd) {
         if (defined $advert and ref $advert eq 'WebGUI::AdSpace::Ad') {
             $advert->delete;
         }
