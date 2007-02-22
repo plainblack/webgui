@@ -730,6 +730,7 @@ sub setCallable {
 	my $self = shift;
 	my @callable = @{$self->{callable}};
 	@callable = (@callable,@{$_[0]});
+    $self->{callable} = \@callable;
 }
 
 #-------------------------------------------------------------------
