@@ -741,7 +741,8 @@ my		$sth = $dbLink->db->unconditionalRead($definition{sqlQuery}." order by ".$de
 	}
 
 	$properties->{options} = $options;
-	$properties->{processedDefaultValue} = WebGUI::Macro::process($self->session, $definition{defaultValue});
+	$properties->{processedDefaultValue} = $definition{defaultValue};
+        WebGUI::Macro::process($self->session,\$properties->{processedDefaultValue});
 	$properties->{fieldId} = $fieldId;
 
 	$self->{_fieldPropertiesCache}->{$fieldId} = {%definition, %$properties};
