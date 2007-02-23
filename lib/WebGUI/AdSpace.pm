@@ -135,7 +135,6 @@ sub displayImpression {
 	unless ($dontCount) {
 		my $isActive = 1;
 		if ($clicks >= $clicksBought && $impressions >= ($impressionsBought-1)) {
-		#if ($clicks >= $clicksBought && $impressions >= $impressionsBought) {
 			$isActive = 0;
 		}
 		$self->session->db->write("update advertisement set impressions=impressions+1, nextInPriority=?, isActive=? where adId=?", 
