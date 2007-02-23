@@ -31,7 +31,7 @@ my $newAdSpaceSettings = {
     height             => "300",
 };
 
-my $numTests = 26; # increment this value for each test you create
+my $numTests = 31; # increment this value for each test you create
 $numTests += 2 * scalar keys %{ $newAdSpaceSettings };
 ++$numTests; ##For conditional testing on module load
 
@@ -40,7 +40,7 @@ plan tests => $numTests;
 my $loaded = use_ok('WebGUI::AdSpace');
 
 my $session = WebGUI::Test->session;
-my ($adSpace, $alfred, $alfred2, $bruce, $catWoman, $twoFaceClone, $defaultAdSpace );
+my ($adSpace, $alfred, $alfred2, $bruce, $catWoman, $villianClone, $defaultAdSpace );
 my ($jokerAd, $penguinAd, $twoFaceAd);
 
 SKIP: {
@@ -118,6 +118,8 @@ SKIP: {
             richMedia  => 'Joker',
             priority   => 2,
             isActive   => 1,
+            clicksBought      => 0,
+            impressionsBought => 2,
         }
     );
     $penguinAd = WebGUI::AdSpace::Ad->create($session, $bruce->getId,
@@ -126,8 +128,10 @@ SKIP: {
             url        => '/fishy',
             type       => 'rich',
             richMedia  => 'Penguin',
-            priority   => 3,
+            priority   => 1,
             isActive   => 1,
+            clicksBought      => 4,
+            impressionsBought => 0,
         }
     );
     $twoFaceAd = WebGUI::AdSpace::Ad->create($session, $catWoman->getId,
@@ -196,9 +200,24 @@ SKIP: {
         'displayImpression set the nextInPriority correctly'
     );
 
-    $twoFaceClone = WebGUI::AdSpace::Ad->new($session, $twoFaceAd->getId);
-    is($twoFaceClone->get('isActive'), 0, 'displayImpression deactivates an ad if enough impressions and clicks are bought');
+    my ($twoFaceIsActive) = $session->db->quickArray('select isActive from advertisement where adId=?',[$twoFaceAd->getId]);
+    is($twoFaceIsActive, 0, 'displayImpression deactivates an ad if enough impressions and clicks are bought');
 
+    $session->db->write('update advertisement set nextInPriority=UNIX_TIMESTAMP()+100000 where adId=?',[$jokerAd->getId]);
+    is($bruce->displayImpression(), $penguinAd->get('renderedAd'), 'displayImpression returns earliest by nextInPriority, penguin has 3 clicks');
+    WebGUI::AdSpace->countClick($session, $penguinAd->getId); ##4 clicks
+    is($bruce->displayImpression(), $penguinAd->get('renderedAd'), 'displayImpression returns still returns penguinAd, but deactivates it after 4 clicks');
+
+    my ($penguinActive) = $session->db->quickArray('select isActive from advertisement where adId=?',[$penguinAd->getId]);
+    is($penguinActive, 0, 'displayImpression deactiveated penguinAd');
+    is($bruce->displayImpression(), $jokerAd->get('renderedAd'), 'displayImpression now returns jokerAd');
+
+    my ($jokerActive) = $session->db->quickArray('select isActive from advertisement where adId=?',[$jokerAd->getId]);
+    is($jokerActive, 1, 'displayImpression did not deactiveate jokerAd after one impression');
+
+    $bruce->displayImpression();
+    ($jokerActive) = $session->db->quickArray('select isActive from advertisement where adId=?',[$jokerAd->getId]);
+    is($jokerActive, 0, 'displayImpression deactivated jokerAd after two impressions');
 }
 
 END {
@@ -208,7 +227,7 @@ END {
         }
     }
 
-    foreach my $advert ($jokerAd, $penguinAd, $twoFaceClone, $twoFaceAd) {
+    foreach my $advert ($jokerAd, $penguinAd, $villianClone, $twoFaceAd) {
         if (defined $advert and ref $advert eq 'WebGUI::AdSpace::Ad') {
             $advert->delete;
         }
