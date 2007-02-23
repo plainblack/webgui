@@ -13,7 +13,8 @@ use strict;
 use lib "$FindBin::Bin/lib";
 
 use WebGUI::Test;
-use Test::More tests => 14; # increment this value for each test you create
+use Test::More tests => 15; # increment this value for each test you create
+use Test::Deep;
 
 my $config     = WebGUI::Test->config;
 my $configFile = WebGUI::Test->file;
@@ -81,4 +82,11 @@ if ($cookieName eq "") {
 	}
 
 	ok($ok, "asset classes are all valid asset classes");
+}
+
+$config->set('privateArray', ['a', 'b', 'c']);
+cmp_bag($config->get('privateArray'), ['a', 'b', 'c'], 'set: array, not scalar');
+
+END: {
+    $config->delete('privateArray');
 }

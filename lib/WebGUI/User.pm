@@ -134,7 +134,8 @@ sub canUseAdminMode {
 	if (scalar(@$subnets)) {
 		$pass = WebGUI::Utility::isInSubnet($self->session->env->getIp, $subnets);
 	}
-	return $pass && $self->session->user->isInGroup(12)
+
+	return $pass && $self->isInGroup(12)
 }
 
 #-------------------------------------------------------------------

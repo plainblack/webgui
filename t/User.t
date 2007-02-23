@@ -18,7 +18,7 @@ use WebGUI::Utility;
 use WebGUI::Cache;
 
 use WebGUI::User;
-use Test::More tests => 84; # increment this value for each test you create
+use Test::More tests => 90; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -301,14 +301,54 @@ WebGUI::Group->new($session, '7')->addUsers([1]);
 ok($visitor->isInGroup(1), "Visitor added back to group Visitor");
 ok($visitor->isInGroup(7), "Visitor added back to group Everyone");
 
+################################################################
+#
+# canUseAdminMode
+#
+################################################################
+
+my $dude = WebGUI::User->new($session, "new");
+
+ok(!$dude->canUseAdminMode, 'canUseAdminMode: newly created users cannot');
+
+$dude->addToGroups([12]);
+
+ok($dude->isInGroup(12), 'user successfully added to group 12');
+
+ok($dude->canUseAdminMode, 'canUseAdminMode: with no subnets set, user canUseAdminMode');
+
+$dude->deleteFromGroups([12]);
+
+##Spoof the IP address to test subnet level access control to adminMode
+my $origEnvHash = $session->env->{_env};
+my %newEnv = ( REMOTE_ADDR => '192.168.0.2' );
+$session->env->{_env} = \%newEnv;
+$session->config->set('adminModeSubnets', ['192.168.0.0/24']);
+
+ok(!$dude->isInGroup(12), 'user is not in group 12');
+ok(!$dude->canUseAdminMode, 'canUseAdminMode: just being in the subnet does not allow adminMode access');
+
+$dude->addToGroups([12]);
+
+ok($dude->canUseAdminMode, 'canUseAdminMode: with no subnets set, user canUseAdminMode');
+
+$newEnv{REMOTE_ADDR} = '10.0.0.2';
+
+ok(!$dude->canUseAdminMode, 'canUseAdminMode: even with the right group permission, user must be in subnet if subnet is set');
+
+##restore the original session variables
+$session->env->{_env} = $origEnvHash;
+$session->config->delete('adminModeSubnets');
+
 TODO: {
 	local $TODO = "Untested methods";
-	ok(0, 'canUseAdminMode');
 	ok(0, 'newByEmail');
 }
 
 END {
-        (defined $user  and ref $user  eq 'WebGUI::User') and $user->delete;
+    (defined $user  and ref $user  eq 'WebGUI::User') and $user->delete;
+    (defined $dude  and ref $dude  eq 'WebGUI::User') and $dude->delete;
+    $session->config->delete('adminModeSubnets');
 	$testCache->flush;
 }
 
