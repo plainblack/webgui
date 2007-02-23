@@ -315,7 +315,7 @@ Returns an array reference of WebGUI::ProfileField objects that are marked "edit
 sub getEditableFields {
         my $class = shift;
 	my $session = shift;
-	return $class->_listFieldsWhere($session, "f.required = 1 OR f.editable = 1");
+	return $class->_listFieldsWhere($session, "f.required = 1 OR f.editable = 1 OR f.showAtRegistration = 1");
 }
 
 #-------------------------------------------------------------------
