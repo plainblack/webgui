@@ -384,7 +384,7 @@ sub new {
 	unless ($userData->{_userId} && $userData->{_user}{username}) {
 		my %user;
 		tie %user, 'Tie::CPHash';
-		%user = $session->db->quickHash("select * from users where userId=".$session->db->quote($userId));
+		%user = $session->db->quickHash("select * from users where userId=?",[$userId]);
 		my %profile = $session->db->buildHash("select userProfileField.fieldName, userProfileData.fieldData 
 			from userProfileField, userProfileData where userProfileField.fieldName=userProfileData.fieldName and 
 			userProfileData.userId=".$session->db->quote($user{userId}));
@@ -609,7 +609,7 @@ Returns true if the userId exists in the users table.
 
 sub validUserId {
 	my ($class, $session, $userId) = @_;
-	my $sth = $session->db->read('select userId from users where userId='.$session->db->quote($userId));
+	my $sth = $session->db->read('select userId from users where userId=?',[$userId]);
 	return ($sth->rows == 1);
 }
 

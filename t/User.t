@@ -18,7 +18,7 @@ use WebGUI::Utility;
 use WebGUI::Cache;
 
 use WebGUI::User;
-use Test::More tests => 82; # increment this value for each test you create
+use Test::More tests => 84; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -300,6 +300,12 @@ WebGUI::Group->new($session, '7')->addUsers([1]);
 
 ok($visitor->isInGroup(1), "Visitor added back to group Visitor");
 ok($visitor->isInGroup(7), "Visitor added back to group Everyone");
+
+TODO: {
+	local $TODO = "Untested methods";
+	ok(0, 'canUseAdminMode');
+	ok(0, 'newByEmail');
+}
 
 END {
         (defined $user  and ref $user  eq 'WebGUI::User') and $user->delete;
