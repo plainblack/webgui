@@ -25,9 +25,10 @@ my $noLongTests;
 GetOptions(
 	'verbose'=>\$verbose,
 	'configFile=s'=>\$configFile,
-	'perl-base=s'=>\$perlBase,
+	'perlBase=s'=>\$perlBase,
 	'noLongTests'=>\$noLongTests,
 	'help'=>\$help,
+	'coverage'=>\$coverage,
 	);
 
 my $helpmsg=<<STOP;
@@ -39,13 +40,16 @@ my $helpmsg=<<STOP;
 				use a production config file as some tests may
 				be destructive.
 
-	--verbose		Turns on additional output.
+	--coverage		Turns on additional coverage tests. Note that
+				this can take a long time to run.
 
-	--perl-base		The path of the perl installation you want to 
+	--noLongTests		Prevent long tests from being run
+
+	--perlBase		The path of the perl installation you want to 
 				use. Defaults to the perl installation in your
 				PATH.
 
-	--noLongTests		Prevent long tests from being run
+	--verbose		Turns on additional output.
 
 STOP
 
@@ -69,6 +73,9 @@ my $prefix = "WEBGUI_CONFIG=".$configFile;
 
 ##Run all tests unless explicitly forbidden
 $prefix .= " CODE_COP=1" unless $noLongTests;
+
+# Add coverage tests
+$prefix .= " PERL5OPT='-MDevel::Cover'" if $coverage;
 
 print(join ' ', $prefix, $perlBase."prove", $verboseFlag, '-r ../t'); print "\n";
 system(join ' ', $prefix, $perlBase."prove", $verboseFlag, '-r ../t');
