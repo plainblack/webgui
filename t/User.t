@@ -18,7 +18,7 @@ use WebGUI::Utility;
 use WebGUI::Cache;
 
 use WebGUI::User;
-use Test::More tests => 93; # increment this value for each test you create
+use Test::More tests => 95; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -350,15 +350,32 @@ ok(!$dude->canUseAdminMode, 'canUseAdminMode: even with the right group permissi
 $session->env->{_env} = $origEnvHash;
 $session->config->delete('adminModeSubnets');
 
-TODO: {
-	local $TODO = "Untested methods";
-	ok(0, 'newByEmail');
-}
+################################################################
+#
+# newByEmail
+#
+################################################################
+
+$visitor->profileField('email', 'visitor@localdomain');
+$dude->profileField('email', 'dude@aftery2k.com');
+
+my $clone = WebGUI::User->newByEmail($session, 'visitor@localdomain');
+is($clone, undef, 'newByEmail returns undef if you look up the Visitor');
+
+$clone = WebGUI::User->newByEmail($session, 'dude@aftery2k.com');
+is($clone, undef, 'newByEmail returns undef if the user does not have a username');
+
+$dude->username('dude');
+
+$clone = WebGUI::User->newByEmail($session, 'dude@aftery2k.com');
+is($clone->username, 'dude', 'newByEmail returns valid user object');
 
 END {
     (defined $user  and ref $user  eq 'WebGUI::User') and $user->delete;
     (defined $dude  and ref $dude  eq 'WebGUI::User') and $dude->delete;
+    ##Note, do not delete the visitor account.  That would be really bad
     $session->config->delete('adminModeSubnets');
 	$testCache->flush;
+    $session->db->write(q!delete from userProfileData where userId='1' and fieldName='email'!);
 }
 
