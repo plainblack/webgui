@@ -1,4 +1,5 @@
 7.3.11
+ - Added an option for enabling coverage tests to testCodebase.pl.
  - fix: Off by 1 error while displaying ad impressions (perlDreamer Consulting, LLC)
 
 7.3.10
