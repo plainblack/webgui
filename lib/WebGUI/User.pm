@@ -388,7 +388,7 @@ sub new {
 		%user = $session->db->quickHash("select * from users where userId=?",[$userId]);
 		my %profile = $session->db->buildHash("select userProfileField.fieldName, userProfileData.fieldData 
 			from userProfileField, userProfileData where userProfileField.fieldName=userProfileData.fieldName and 
-			userProfileData.userId=".$session->db->quote($user{userId}));
+			userProfileData.userId=?",[$user{userId}]);
 		my %default = $session->db->buildHash("select fieldName, dataDefault from userProfileField");
 		foreach my $key (keys %default) {
 			my $value;
@@ -582,8 +582,8 @@ sub username {
 		$self->uncache;
                 $self->{_user}{"username"} = $value;
                 $self->{_user}{"lastUpdated"} = $self->session->datetime->time();
-                $self->session->db->write("update users set username=".$self->session->db->quote($value).",
-                        lastUpdated=".$self->session->datetime->time()." where userId=".$self->session->db->quote($self->userId));
+                $self->session->db->write("update users set username=?, lastUpdated=? where userId=?",
+                    [$value, $self->session->datetime->time(), $self->userId]);
         }
         return $self->{_user}{"username"};
 }

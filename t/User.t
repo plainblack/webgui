@@ -18,7 +18,7 @@ use WebGUI::Utility;
 use WebGUI::Cache;
 
 use WebGUI::User;
-use Test::More tests => 90; # increment this value for each test you create
+use Test::More tests => 93; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -83,8 +83,16 @@ cmp_ok(abs($user->lastUpdated-$lastUpdate), '<=', 1, 'lastUpdated() -- authmetho
 #See if date created is correct
 is($user->dateCreated, $userCreationTime, 'dateCreated()');
 
-#get/set karma
+################################################################
+#
+# get/set karma
+#
+################################################################
+
 my $oldKarma = $user->karma;
+$user->karma('69');
+$user->karma('69', 'wonder man');
+is($user->karma, $oldKarma, 'karma() -- requires amount, source and description');
 $user->karma('69', 'peter gibbons', 'test karma');
 is($user->karma, $oldKarma+69, 'karma() -- get/set add amount');
 
@@ -261,6 +269,7 @@ $cm->ipFilter(defined $origFilter ? $origFilter : '');
 ##Test for group membership
 $user = WebGUI::User->new($session, "new");
 ok($user->isInGroup(7), "addToGroups: New user is in group 7(Everyone)");
+ok(!$user->isInGroup(1),  "New user not in group 1 (Visitors)");
 
 $user->addToGroups([3]);
 
@@ -273,15 +282,16 @@ ok($user->isInGroup(14), "New user is in group 14(Product Managers)");
 
 $user->deleteFromGroups([3]);
 ok(!$user->isInGroup(3), "deleteFromGroups: New user is not in group 3(Admin)");
-ok(!$user->isInGroup(11), "Flush cache, new user not in group 11 (Secondary Admins)");
-ok(!$user->isInGroup(12), "Flush cache, new user not in group 12 (Turn On Admin)");
-ok(!$user->isInGroup(13), "Flush cache, new user not in group 13 (Export Managers)");
-ok(!$user->isInGroup(14), "Flush cache, new user not in group 14 (Product Managers)");
+ok(!$user->isInGroup(11), "New user not in group 11 (Secondary Admins)");
+ok(!$user->isInGroup(12), "New user not in group 12 (Turn On Admin)");
+ok(!$user->isInGroup(13), "New user not in group 13 (Export Managers)");
+ok(!$user->isInGroup(14), "New user not in group 14 (Product Managers)");
 
 $user->delete;
 
-ok($visitor->isInGroup(1), "Visitor is a member of group Visitor");
-ok($visitor->isInGroup(7), "Visitor is a member of group Everyone");
+ok($visitor->isInGroup(1),  "Visitor is a member of group Visitor");
+ok($visitor->isInGroup(7),  "Visitor is a member of group Everyone");
+ok(!$visitor->isInGroup(2), "Visitor is a not member of group 2 (Registered Users)");
 
 ##remove Visitor from those groups, and make sure we can add him back in.
 WebGUI::Group->new($session, '1')->deleteUsers([1]);
