@@ -411,7 +411,7 @@ sub fixUrl {
 		) {
 		$url .= ".".$self->session->setting->get("urlExtension");
 	}
-        if ($self->urlExists($self->session, $url, $self->getId)) {
+        if ($self->urlExists($self->session, $url, {assetId=>$self->getId})) {
                 my @parts = split(/\./,$url);
                 if ($parts[0] =~ /(.*)(\d+$)/) {
                         $parts[0] = $1.($2+1);
@@ -1867,7 +1867,7 @@ sub update {
 #-------------------------------------------------------------------
 
 
-=head2 urlExists ( session, url [, assetId] )
+=head2 urlExists ( session, url [, options] )
 
 Returns true if the asset URL is used within the system. This is a class method.
 
@@ -1879,7 +1879,11 @@ head3 url
 
 The asset url you'd like to check for.
 
-head3 assetId
+head3 options
+
+A hash reference of optional parameters.
+
+head4 assetId
 
 Limit the search to a specific assetId to see if that url exists for that asset.
 
@@ -1889,12 +1893,12 @@ sub urlExists {
 	my $class = shift;
 	my $session = shift;
 	my $url = lc(shift);
-	my $assetId = shift;
+	my $options = shift || {};
 	my $limit = "";
-	if (defined $assetId) {
+	if (defined $options->{assetId}) {
 		$limit = "and assetId<>?"	
 	}
-	my ($test) = $session->db->quickArray("select count(url) from assetData where url=? $limit", [$url, $assetId]);
+	my ($test) = $session->db->quickArray("select count(url) from assetData where url=? $limit", [$url, $options->{assetId}]);
 	return $test;
 }
 
