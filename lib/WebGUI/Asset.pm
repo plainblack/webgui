@@ -411,12 +411,11 @@ sub fixUrl {
 		) {
 		$url .= ".".$self->session->setting->get("urlExtension");
 	}
-	my ($test) = $self->session->db->quickArray("select url from assetData where assetId<>".$self->session->db->quote($self->getId)." and url=".$self->session->db->quote($url));
-        if ($test) {
+        if ($self->urlExists($self->session, $url, $self->getId)) {
                 my @parts = split(/\./,$url);
                 if ($parts[0] =~ /(.*)(\d+$)/) {
                         $parts[0] = $1.($2+1);
-                } elsif ($test ne "") {
+                } else {
                         $parts[0] .= "2";
                 }
                 $url = join(".",@parts);
@@ -1863,6 +1862,40 @@ sub update {
 		}
 	}
 	$self->purgeCache;
+}
+
+#-------------------------------------------------------------------
+
+
+=head2 urlExists ( session, url [, assetId] )
+
+Returns true if the asset URL is used within the system. This is a class method.
+
+=head3 session
+
+A reference to the current session.
+
+head3 url
+
+The asset url you'd like to check for.
+
+head3 assetId
+
+Limit the search to a specific assetId to see if that url exists for that asset.
+
+=cut
+
+sub urlExists {
+	my $class = shift;
+	my $session = shift;
+	my $url = lc(shift);
+	my $assetId = shift;
+	my $limit = "";
+	if (defined $assetId) {
+		$limit = "and assetId<>?"	
+	}
+	my ($test) = $session->db->quickArray("select count(url) from assetData where url=? $limit", [$url, $assetId]);
+	return $test;
 }
 
 
