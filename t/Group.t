@@ -104,8 +104,6 @@ foreach my $gid ('new', '') {
 	$g->delete;
 }
 
-my $empty = WebGUI::Group->new($session, '');
-
 my $g = WebGUI::Group->new($session, "new");
 
 my $gid = $g->getId;

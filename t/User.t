@@ -18,7 +18,8 @@ use WebGUI::Utility;
 use WebGUI::Cache;
 
 use WebGUI::User;
-use Test::More tests => 95; # increment this value for each test you create
+use Test::More tests => 100; # increment this value for each test you create
+use Test::Deep;
 
 my $session = WebGUI::Test->session;
 
@@ -287,6 +288,8 @@ ok(!$user->isInGroup(12), "New user not in group 12 (Turn On Admin)");
 ok(!$user->isInGroup(13), "New user not in group 13 (Export Managers)");
 ok(!$user->isInGroup(14), "New user not in group 14 (Product Managers)");
 
+ok(!$user->isInGroup(), "isInGroup, default group is 3");
+
 $user->delete;
 
 ok($visitor->isInGroup(1),  "Visitor is a member of group Visitor");
@@ -362,6 +365,9 @@ $dude->profileField('email', 'dude@aftery2k.com');
 my $clone = WebGUI::User->newByEmail($session, 'visitor@localdomain');
 is($clone, undef, 'newByEmail returns undef if you look up the Visitor');
 
+$clone = WebGUI::User->newByEmail($session, 'noone@localdomain');
+is($clone, undef, 'newByEmail returns undef if email address cannot be found');
+
 $clone = WebGUI::User->newByEmail($session, 'dude@aftery2k.com');
 is($clone, undef, 'newByEmail returns undef if the user does not have a username');
 
@@ -370,9 +376,48 @@ $dude->username('dude');
 $clone = WebGUI::User->newByEmail($session, 'dude@aftery2k.com');
 is($clone->username, 'dude', 'newByEmail returns valid user object');
 
+################################################################
+#
+# new, cached user profile data
+#
+################################################################
+
+my $buster = WebGUI::User->new($session, "new");
+
+TODO: {
+	local $TODO = "Tests to make later";
+	ok(0, 'Write a test to cover the conditional in sub new where the cache has a userId but no username');
+}
+
+################################################################
+#
+# getGroups
+#
+################################################################
+
+##Set up a group that has expired.
+
+my $expiredGroup = WebGUI::Group->new($session, 'new');
+$expiredGroup->name('Group that expires users automatically');
+$expiredGroup->expireOffset(-1000);
+
+$dude->addToGroups([$expiredGroup->getId]);
+
+my $dudeGroups = $dude->getGroups();
+cmp_bag($dudeGroups, ['12', '2', '7', $expiredGroup->getId], 'Dude belongs to Registered Users, Everyone and T.O.A');
+
+##Group lookups are cached, so we'll clear the cache by removing Dude from T.O.A.
+$dude->deleteFromGroups([12]);
+$dudeGroups = $dude->getGroups(1);
+cmp_bag($dudeGroups, ['2', '7'], 'Dude belongs to Registered Users, Everyone as unexpired group memberships');
+
 END {
-    (defined $user  and ref $user  eq 'WebGUI::User') and $user->delete;
-    (defined $dude  and ref $dude  eq 'WebGUI::User') and $dude->delete;
+    foreach my $account ($user, $dude, $buster) {
+        (defined $account  and ref $account  eq 'WebGUI::User') and $account->delete;
+    }
+
+    (defined $expiredGroup  and ref $expiredGroup  eq 'WebGUI::Group') and $expiredGroup->delete;
+
     ##Note, do not delete the visitor account.  That would be really bad
     $session->config->delete('adminModeSubnets');
 	$testCache->flush;
