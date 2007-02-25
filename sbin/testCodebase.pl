@@ -21,6 +21,7 @@ my $help;
 my $verbose;
 my $perlBase;
 my $noLongTests;
+my $coverage;
 
 GetOptions(
 	'verbose'=>\$verbose,
