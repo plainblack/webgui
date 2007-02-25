@@ -76,7 +76,7 @@ my $prefix = "WEBGUI_CONFIG=".$configFile;
 $prefix .= " CODE_COP=1" unless $noLongTests;
 
 # Add coverage tests
-$prefix .= " PERL5OPT='-MDevel::Cover'" if $coverage;
+$prefix .= " PERL5OPT='-MDevel::Cover=-db,/tmp/coverdb'" if $coverage;
 
 print(join ' ', $prefix, $perlBase."prove", $verboseFlag, '-r ../t'); print "\n";
 system(join ' ', $prefix, $perlBase."prove", $verboseFlag, '-r ../t');
