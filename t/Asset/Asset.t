@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::Asset;
 use WebGUI::Asset::Wobject::Navigation;
 
-use Test::More tests => 20; # increment this value for each test you create
+use Test::More tests => 25; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -95,3 +95,20 @@ my $importNode = WebGUI::Asset->getImportNode($session);
 isa_ok($importNode, 'WebGUI::Asset::Wobject::Folder');
 is($importNode->getId, 'PBasset000000000000002', 'Import Node Asset ID check');
 is($importNode->getParent->getId, $rootAsset->getId, 'Import Nodes parent is Root Asset');
+
+################################################################
+#
+# urlExists
+#
+################################################################
+
+##We need as asset with a URL for this one.
+
+my $importUrl = $importNode->get('url');
+my $importId  = $importNode->getId;
+
+ok( WebGUI::Asset->urlExists($session, $importUrl),      'url for import node exists');
+ok( !WebGUI::Asset->urlExists($session, '/foo/bar/baz'), 'made up url does not exist');
+ok( WebGUI::Asset->urlExists($session, $importUrl, {assetId => $importId}), 'url for import node exists at specific id');
+ok( !WebGUI::Asset->urlExists($session, '/foo/bar/baz', {assetId => $importId}), 'imaginary url does not exist at specific id');
+ok( !WebGUI::Asset->urlExists($session, $importUrl, {assetId => 'notAnWebGUIId'}), 'imaginary url does not exist at wrong id');

@@ -1895,10 +1895,12 @@ sub urlExists {
 	my $url = lc(shift);
 	my $options = shift || {};
 	my $limit = "";
-	if (defined $options->{assetId}) {
-		$limit = "and assetId<>?"	
+    my $placeholders = [ $url ];
+	if (exists $options->{assetId}) {
+		$limit = "and assetId=?";
+        push @{ $placeholders }, $options->{assetId};
 	}
-	my ($test) = $session->db->quickArray("select count(url) from assetData where url=? $limit", [$url, $options->{assetId}]);
+	my ($test) = $session->db->quickArray("select count(url) from assetData where url=? $limit", $placeholders);
 	return $test;
 }
 
