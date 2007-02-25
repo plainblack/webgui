@@ -20,17 +20,18 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-# upgrade functions go here
+fixWeather($session);
 
 finish($session); # this line required
 
 
-##-------------------------------------------------
-#sub exampleFunction {
-#	my $session = shift;
-#	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
-#	# and here's our code
-#}
+#-------------------------------------------------
+sub fixWeather {
+	my $session = shift;
+	print "\tConverting WeatherData asset to use weather.com\n" unless ($quiet);
+	$session->db->write("alter table WeatherData add column partnerId varchar(100)");
+	$session->db->write("alter table WeatherData add column licenseKey varchar(100)");
+}
 
 
 

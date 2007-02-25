@@ -12,24 +12,13 @@ package WebGUI::Asset::Wobject::WeatherData;
   http://www.plainblack.com                     info@plainblack.com
  -------------------------------------------------------------------
 
- Portions of the below are originally from Weather::Underground, 
- and are not included in this copyright.
-
 =cut
 
 use strict;
-
-use LWP::UserAgent;
-use Tie::CPHash;
-use Tie::IxHash;
-use JSON;
-use WebGUI::Cache;
+use Weather::Com::Simple;
 use WebGUI::International;
-use WebGUI::SQL;
-use WebGUI::Asset::Wobject;
+use base 'WebGUI::Asset::Wobject';
 use WebGUI::Utility;
-
-our @ISA = qw(WebGUI::Asset::Wobject);
 
 
 #-------------------------------------------------------------------
@@ -46,6 +35,21 @@ sub definition {
 	my $definition = shift;
 	my $i18n = WebGUI::International->new($session, "Asset_WeatherData");
 	my $properties = {
+		partnerId => {
+			fieldType 	=> "text",
+			tab 		=> "properties",
+			defaultValue	=> undef,
+			hoverHelp	=> "partnerId help",
+			label		=> "partnerId",
+			subtext		=> '<a href="http://www.weather.com/services/xmloap.html">'.$i18n->get("you need a weather.com key").'</a>',
+			},
+		licenseKey => {
+			fieldType	=> "text",
+			tab		=> "properties",
+			defaultValue	=> undef,
+			hoverHelp	=> "licenseKey help",
+			label		=> "licenseKey",
+			},
 		templateId =>{
 			fieldType=>"template",
 			tab=>"display",
@@ -56,7 +60,7 @@ sub definition {
 		},
 		locations=>{
 			fieldType=>"textarea",
-			defaultValue=>"Grayslake,IL",
+			defaultValue=>"Madison, WI\nToronto, Canada\n53536",
 			tab=>"properties",
 			hoverHelp=>$i18n->get("Your list of default weather locations"),
 			label=>$i18n->get("Default Locations")
@@ -71,49 +75,6 @@ sub definition {
 		properties=>$properties
 	});
 	return $class->SUPER::definition($session, $definition);
-}
-
-#-------------------------------------------------------------------
-
-=head2 _getLocationData ( )
-
-Accepts a location, and returns a hashref of information about the weather
-at that location.
-
-=cut
-
-sub _getLocationData {
-	my $self = shift;
-	my $location = shift;
-	my $cache = WebGUI::Cache->new($self->session,["weatherLocation",$location]);
-	my $locData = $cache->get;
-	unless ($locData->{cityState}) {
-		my $oldagent;
-		my $ua = LWP::UserAgent->new;
-		$ua->env_proxy;
-		$ua->timeout(10);
-		$oldagent = $ua->agent();
-		$ua->agent($self->session->env->get("HTTP_USER_AGENT")); # Act as a proxy.
-		my $response = $ua->get('http://www.srh.noaa.gov/port/port_zc.php?inputstring='.$location);
-		my $document = $response->content;
-		$document =~ s/\n/ /g;
-		$document =~ s/\s+/ /g;
-		$document =~ m!<div\salign="center">\s(.*?)<br>.*?<br>.*?<br>.*?<br>\s(.*?):\s(.*?) &deg;F<br>!;
-
-		my ($cityState, $sky, $tempF) = ($1, $2, $3);
-		my $iconBasename = $self->_chooseWeatherConditionsIcon($2);
-
-		$locData = {
-			query => $location,
-			cityState => $cityState || $location,
-			sky => $sky || 'N/A',
-			tempF => $tempF || 'N/A',
-			iconUrl => $self->session->url->extras("wobject/WeatherData/".$iconBasename.'.jpg'),
-		        iconAlt => $iconBasename,
-		};
-	$cache->set($locData, 60*60) if $locData->{sky} ne 'NULL';
-	}
-	return $locData;
 }
 
 #-------------------------------------------------------------------
@@ -228,22 +189,27 @@ to be displayed within the page style
 
 sub view {
 	my $self = shift;
-	my $var = $self->get();
-	#Set some template variables
-
-	#Build list of locations as an array
-	my $defaults = $self->get("locations");
-	#replace any windows newlines
-	$defaults =~ s/\r//gm;
-	my @array = split("\n",$defaults);
-	#trim locations of whitespace
-	my @locs = ();
-	for (my $i = 0; $i < scalar(@array); $i++) {
-		$array[$i] = $self->_trim($array[$i]);
-		push(@locs, $self->_getLocationData($array[$i]));
+	my %var;
+	foreach my $location (split("\n", $self->get("locations"))) {
+		my $weather = Weather::Com::Simple->new({
+			'partner_id' 	=> $self->get("partnerId"), 
+                        'license'    	=> $self->get("licenseKey"),
+			'place'		=> $location,
+			'cache'		=> '/tmp',
+			});	
+		foreach my $foundLocation (@{$weather->get_weather}) {
+			push(@{$var{'ourLocations.loop'}}, {
+       				query => $location,
+                        	cityState => $foundLocation->{place} || $location,
+                        	sky => $foundLocation->{conditions} || 'N/A',
+                        	tempF => $foundLocation->{temperature_fahrenheit} || 'N/A',
+				tempC => $foundLocation->{temperature_celsius} || 'N/A',
+                        	iconUrl => $self->session->url->extras("wobject/WeatherData/".$self->_chooseWeatherConditionsIcon($foundLocation->{conditions}).'.jpg'),
+                        	iconAlt => $foundLocation->{conditions},
+				});
+		}
 	}
-	$var->{'ourLocations.loop'} = \@locs;
-	return $self->processTemplate($var, undef, $self->{_viewTemplate});
+	return $self->processTemplate(\%var, undef, $self->{_viewTemplate});
 }
 
 

@@ -12,6 +12,16 @@ our $HELP = {
 		],
 		fields => [
 			{
+				title => 'partnerId',
+				description => 'partnerId help',
+				namespace => 'Asset_WeatherData',
+			},
+			{
+				title => 'licenseKey',
+				description => 'licenseKey help',
+				namespace => 'Asset_WeatherData',
+			},
+			{
 				title => 'Default Locations',
 				description => 'Your list of default weather locations',
 				namespace => 'Asset_WeatherData',

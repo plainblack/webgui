@@ -15,14 +15,13 @@ package WebGUI::Asset::File;
 =cut
 
 use strict;
-use WebGUI::Asset;
+use base 'WebGUI::Asset';
 use WebGUI::Cache;
 use WebGUI::Storage;
 use WebGUI::SQL;
 use WebGUI::Utility;
 use FileHandle;
 
-our @ISA = qw(WebGUI::Asset);
 
 
 =head1 NAME

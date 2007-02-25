@@ -7,6 +7,15 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.3.11
+--------------------------------------------------------------------
+
+ * The weather data asset stopped working because our old weather
+   provider went away. We've remade the weather asset using a data
+   feed from weather.com. The feed is free, but you'll have to
+   register to use it on your site. The up side is that the weather
+   asset now supports international cities.
+
 7.3.10
 --------------------------------------------------------------------
  * This version fixes a bug in the 7.2.3-7.3.0 upgrade where the

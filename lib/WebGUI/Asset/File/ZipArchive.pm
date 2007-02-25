@@ -15,7 +15,7 @@ package WebGUI::Asset::File::ZipArchive;
 =cut
 
 use strict;
-use WebGUI::Asset::File;
+use base 'WebGUI::Asset::File';
 use WebGUI::HTMLForm;
 use WebGUI::SQL;
 use WebGUI::Utility;
@@ -23,7 +23,6 @@ use WebGUI::Utility;
 use Archive::Tar;
 use Archive::Zip;
 
-our @ISA = qw(WebGUI::Asset::File);
 
 
 =head1 NAME

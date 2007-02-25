@@ -1,5 +1,8 @@
 7.3.11
  - Added an option for enabling coverage tests to testCodebase.pl.
+ - fix: WeatherData asset not displaying properly
+ - rfe: Weather-Data not only for US-Cities
+ - rfe: WeatherData Asset - Convert to International format
  - fix: Off by 1 error while displaying ad impressions (perlDreamer Consulting, LLC)
 
 7.3.10
