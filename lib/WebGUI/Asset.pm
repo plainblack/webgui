@@ -1885,7 +1885,7 @@ A hash reference of optional parameters.
 
 head4 assetId
 
-Limit the search to a specific assetId to see if that url exists for that asset.
+Excludes an asset, by assetId, for the search for the existance of the url.
 
 =cut
 
@@ -1897,7 +1897,7 @@ sub urlExists {
 	my $limit = "";
     my $placeholders = [ $url ];
 	if (exists $options->{assetId}) {
-		$limit = "and assetId=?";
+		$limit = "and assetId<>?";
         push @{ $placeholders }, $options->{assetId};
 	}
 	my ($test) = $session->db->quickArray("select count(url) from assetData where url=? $limit", $placeholders);

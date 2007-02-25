@@ -109,6 +109,6 @@ my $importId  = $importNode->getId;
 
 ok( WebGUI::Asset->urlExists($session, $importUrl),      'url for import node exists');
 ok( !WebGUI::Asset->urlExists($session, '/foo/bar/baz'), 'made up url does not exist');
-ok( WebGUI::Asset->urlExists($session, $importUrl, {assetId => $importId}), 'url for import node exists at specific id');
+ok( !WebGUI::Asset->urlExists($session, $importUrl, {assetId => $importId}), 'url for import node only exists at specific id');
 ok( !WebGUI::Asset->urlExists($session, '/foo/bar/baz', {assetId => $importId}), 'imaginary url does not exist at specific id');
-ok( !WebGUI::Asset->urlExists($session, $importUrl, {assetId => 'notAnWebGUIId'}), 'imaginary url does not exist at wrong id');
+ok( WebGUI::Asset->urlExists($session, $importUrl, {assetId => 'notAnWebGUIId'}), 'imaginary url does not exist at wrong id');
