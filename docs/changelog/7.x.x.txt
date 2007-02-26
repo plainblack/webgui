@@ -4,6 +4,8 @@
  - rfe: Weather-Data not only for US-Cities
  - rfe: WeatherData Asset - Convert to International format
  - fix: Off by 1 error while displaying ad impressions (perlDreamer Consulting, LLC)
+ - fix: Wrong link in template toolkit help (perlDreamer Consulting, LLC)
+ - fix: Outdated info in Env macro help (perlDreamer Consulting, LLC)
 
 7.3.10
  - fix: Calendar Update Feeds now handles iCalendar "DURATION" field
