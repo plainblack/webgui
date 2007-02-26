@@ -131,6 +131,24 @@ sub definition {
 
 
 
+#-------------------------------------------------------------------
+
+=head2 canAdd ( session )
+
+Class method to verify that the user has the privileges necessary to add this type of asset. Return a boolean.
+
+=head3 session
+
+The session variable.
+
+=cut
+
+sub canAdd {
+	my $class = shift;
+	my $session = shift;
+	$class->SUPER::canAdd($session, undef, '7');
+}
+
 
 ####################################################################
 
@@ -144,7 +162,8 @@ sub canEdit {
     my $self    = shift;
     my $session    = $self->session;
     
-    return $session->user->isInGroup($self->getParent->get("groupIdEventEdit"));
+    return $session->user->isInGroup($self->getParent->get("groupIdEventEdit"))
+        or $self->SUPER::canEdit;
 }
 
 
