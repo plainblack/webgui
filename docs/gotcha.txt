@@ -16,6 +16,9 @@ save you many hours of grief.
    register to use it on your site. The up side is that the weather
    asset now supports international cities.
 
+   You must now also have Weather::Com::Finder 0.5.1 installed. Do
+   this before you upgrade.
+
 7.3.10
 --------------------------------------------------------------------
  * This version fixes a bug in the 7.2.3-7.3.0 upgrade where the
