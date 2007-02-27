@@ -47,32 +47,6 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 _fetch_button_rows ( @toolbarRows )
-
-Return the definitions for toolbar rows.
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
-
-=cut
-
-sub _fetch_button_rows {
-        my $self = shift;
-	my @toolbarRows = @_;
-	my %toolbarRow = ();
-	foreach my $rowIndex (0..$#toolbarRows) {
-			$toolbarRow{'theme_advanced_buttons'.$rowIndex} =
-				join(',', @{$toolbarRows[$_]});
-	}
-	#(map { "theme_advanced_buttons".($_+1) =>  }
-	#(0..$#toolbarRows)),
-}
-
-
-
-#-------------------------------------------------------------------
-
 =head2 definition ( definition )
 
 Defines the properties of this asset.
@@ -471,13 +445,11 @@ sub getRichEditor {
 		elements => $nameId,
 		theme => "advanced",
 		relative_urls => "false",
-#		remove_script_host => "false",
-#		document_base_url => "/",
+		remove_script_host => "true",
 		auto_reset_designmode => "true",
     		cleanup_callback => "tinyMCE_WebGUI_Cleanup",
     		urlconvertor_callback => "tinyMCE_WebGUI_URLConvertor",
 		theme_advanced_resizing => "true",
-		#$self->_fetch_button_rows(@toolbarRows),
 		      (map { "theme_advanced_buttons".($_+1) => (join ',', @{$toolbarRows[$_]}) }
 		       (0..$#toolbarRows)),
 		ask => $self->getValue("askAboutRichEdit") ? "true" : "false",

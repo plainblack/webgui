@@ -176,7 +176,7 @@ function createLink() {
            alert("@{[$i18n->get("link enter alert")]}");
            document.getElementById("url_formId").focus();
         }
-	var link = '<a href="'+"^" + "/" + ";" + document.getElementById("url_formId").value+'"';
+	var link = '<a href="'+"^" + "/(" + document.getElementById("url_formId").value+');"';
         var target = document.getElementById('target_formId').value;
         if (target != '_self') link += ' target="' + target + '"';
 	link += '>' + window.opener.tinyMCE.selectedInstance.selection.getSelectedHTML() + '</a>';

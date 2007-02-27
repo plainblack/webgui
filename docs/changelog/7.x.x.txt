@@ -1,5 +1,6 @@
 7.3.11
  - Added an option for enabling coverage tests to testCodebase.pl.
+ - fix: Tiny MCE--> Relative Absolute URL for Images IE and Firefox different
  - fix: WeatherData asset not displaying properly
  - rfe: Weather-Data not only for US-Cities
  - rfe: WeatherData Asset - Convert to International format
