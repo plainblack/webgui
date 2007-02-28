@@ -218,6 +218,12 @@ our $HELP = {
 		            'name'     => 'urlMonth',
 		          },
 		          {
+		            'name'     => 'urlParent',
+		          },
+		          {
+		            'name'     => 'urlSearch',
+		          },
+		          {
 		            'name'     => 'relatedLinks',
                     variables  => [
                       {

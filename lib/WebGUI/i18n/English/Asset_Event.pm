@@ -341,6 +341,16 @@ our $I18N = {
 		lastUpdated 	=> 1171043883,
 	},
 
+	'urlParent' => {
+		message 	=> q|A URL the Calendar that contains this Event.|,
+		lastUpdated 	=> 1172693361,
+	},
+
+	'urlSearch' => {
+		message 	=> q|A URL to the Search form for the Calendar that contains this Event.|,
+		lastUpdated 	=> 1172693363,
+	},
+
 	'relatedLinks' => {
 		message 	=> q|This loop contains all links from this Event's set of related links.|,
 		lastUpdated 	=> 1171043883,

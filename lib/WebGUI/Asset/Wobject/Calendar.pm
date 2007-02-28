@@ -748,6 +748,21 @@ ENDSQL
 
 
 
+####################################################################
+
+=head2 getSearchUrl ( )
+
+Convenience method to be shared with the Event.
+
+=cut
+
+sub getSearchUrl {
+    my $self    = shift;
+    return $self->getUrl('func=search');
+}
+
+
+
 
 ####################################################################
 
@@ -918,7 +933,7 @@ sub view {
     $var->{"urlDay"}        = $self->getUrl("type=day;start=".$params->{start});
     $var->{"urlWeek"}       = $self->getUrl("type=week;start=".$params->{start});
     $var->{"urlMonth"}      = $self->getUrl("type=month;start=".$params->{start});
-    $var->{"urlSearch"}     = $self->getUrl("func=search");
+    $var->{"urlSearch"}     = $self->getSearchUrl;
     $var->{"urlPrint"}      = $self->getUrl("type=".$params->{type}.";start=".$params->{start}.";print=1");
     
     # Parameters

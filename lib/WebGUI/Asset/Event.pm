@@ -1303,6 +1303,7 @@ sub getTemplateVars {
     $var{"urlWeek"}        = $self->getParent->getUrl("type=week;start=".$dtStart->toMysql);
     $var{"urlMonth"}    = $self->getParent->getUrl("type=month;start=".$dtStart->toMysql);
     $var{"urlParent"}    = $self->getParent->getUrl;        
+    $var{"urlSearch"}    = $self->getParent->getSearchUrl;        
     
     
     # Related links
