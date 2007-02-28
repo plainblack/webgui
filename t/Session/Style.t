@@ -19,7 +19,7 @@ use WebGUI::Asset;
 use WebGUI::VersionTag;
 use WebGUI;
 
-use Test::More tests => 56; # increment this value for each test you create
+use Test::More tests => 57; # increment this value for each test you create
 use Test::Deep;
  
 my $session = WebGUI::Test->session;
@@ -227,6 +227,10 @@ my $styled = $style->process('body.content', 'notATemplateId');
 like($styled,
 qr/PERSONAL STYLE TEMPLATE/,
 'process:  personalStyleTemplate overrides submitted template');
+
+unlike($styled,
+qr{(?i)</?(html|head|body)>},
+'useEmptyStyle does not have html, head or body tags');
 
 my $head = $styled;
 $head =~ s/(^HEAD=.+$)/$1/s;
