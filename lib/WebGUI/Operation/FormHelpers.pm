@@ -483,6 +483,7 @@ sub www_richEditAddImageSave {
 			});
 	}
 	$session->http->setRedirect($url.'?op=richEditImageTree');
+    $imageObj->delete;
 	return "";
 }
 
