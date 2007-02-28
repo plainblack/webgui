@@ -426,7 +426,7 @@ sub www_richEditAddImage {
 		name		=> 'op',
 		value		=> 'richEditAddImageSave',
 		);
-	$f->file(
+	$f->image(
 		label		=> $i18n->get('File'),
 		name		=> 'filename',
 		size		=> 10,
@@ -460,15 +460,17 @@ sub www_richEditAddImageSave {
 	# check if user can edit the current asset
 	return $session->privilege->insufficient('bare') unless $base->canEdit;
 
-	my $storage = WebGUI::Storage::Image->create($session);
+	#my $imageId = WebGUI::Form::Image->create($session);
+	my $imageId = WebGUI::Form::Image->new($session,{name => 'filename'})->getValueFromPost;
+    my $imageObj = WebGUI::Storage::Image->get($session, $imageId);
 	##This is a hack.  It should use the WebGUI::Form::File API to insulate
 	##us from future form name changes.
-	my $filename = $storage->addFileFromFormPost('filename_file');
+	my $filename = $imageObj->getFiles->[0];
 	if ($filename) {
 		$base->addChild({
 			assetId     => 'new',
 			className   => 'WebGUI::Asset::File::Image',
-			storageId   => $storage->getId,
+			storageId   => $imageObj->getId,
 			filename    => $filename,
 			title       => $filename,
 			menuTitle   => $filename,
@@ -479,7 +481,6 @@ sub www_richEditAddImageSave {
 			ownerUserId => $session->var->get('userId'),
 			isHidden    => 1,
 			});
-		$storage->generateThumbnail($filename);
 	}
 	$session->http->setRedirect($url.'?op=richEditImageTree');
 	return "";

@@ -10,6 +10,8 @@
  - fix: Calendar: Only Turn Admin On group can add events (perlDreamer Consulting, LLC)
  - fix: Event -> canEdit (perlDreamer Consulting, LLC)
  - fix: import packages broke (perlDreamer Consulting, LLC)
+ - fix: Uploading images via the Rich Text Editor collateral system did not
+   make thumbnails (perlDreamer Consulting, LLC)
  - fix: A bunch of bugs in fileImport.pl and improved its performance very 
    significantly (Martin Kamerbeek / Oqapi)
  
