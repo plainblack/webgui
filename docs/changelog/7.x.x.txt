@@ -2,6 +2,8 @@
  - fix: Fixing bad link on the Event page to the search engine. Added a new
    Event template variable called urlSearch to handle it.  (perlDreamer Consulting, LLC)
  - fix: Set default groupIdEditEvent to groupIdEdit during upgrade (perlDreamer Consulting, LLC)
+ - Rewrote the sbin/thumbnail.pl script and added an option to only create
+   thumbnails for images without thumbnails. (perlDreamer Consulting, LLC)
 
 7.3.11
  - Added an option for enabling coverage tests to testCodebase.pl.

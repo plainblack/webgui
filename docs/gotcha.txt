@@ -7,6 +7,16 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.3.12
+--------------------------------------------------------------------
+
+ * The sbin/thumbnailer.pl script was almost completely rewritten.
+   It now accepts a script to only thumbnail things that do not
+   already have thumbnails, to help compensate for problems with
+   the RTE Collateral Image manager upload/thumbnail bug.
+   Run the script with no arguments to get a summary of the new
+   usage.
+
 7.3.11
 --------------------------------------------------------------------
 

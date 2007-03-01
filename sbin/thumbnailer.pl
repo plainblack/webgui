@@ -23,21 +23,26 @@ use WebGUI::Utility;
 
 my $thumbnailSize;
 my $onlyMissingThumbnails;
+my $help;
 
 my $path = shift @ARGV;
 
 my $ok = GetOptions(
         'size=i'=>\$thumbnailSize,
         'missing'=>\$onlyMissingThumbnails,
+        'help'=>\$help,
 );
 
-unless ($path ne "" and $ok){
+if ($help || ($path && $ok) ) {
   print <<USAGE;
 Usage: perl $0 <uploadsPath> [--size=thumbnailSize] [--missing]
 
 uploadsPath is the complete path to your uploads directory
---size allows you to override the default thumbnail size of 50
+
+--size=thumbSize allows you to override the default thumbnail size of 50.
+
 --missing says to only create thumbnails for images that are missing thumbnails.
+
 USAGE
 
 exit 0;
