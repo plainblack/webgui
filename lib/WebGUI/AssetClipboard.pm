@@ -50,8 +50,8 @@ sub cut {
 	my $self = shift;
 	return undef if ($self->getId eq $self->session->setting->get("defaultPage") || $self->getId eq $self->session->setting->get("notFoundPage"));
 	$self->session->db->beginTransaction;
-	$self->session->db->write("update asset set state='clipboard-limbo' where lineage like ".$self->session->db->quote($self->get("lineage").'%')." and state='published'");
-	$self->session->db->write("update asset set state='clipboard', stateChangedBy=".$self->session->db->quote($self->session->user->userId).", stateChanged=".$self->session->datetime->time()." where assetId=".$self->session->db->quote($self->getId));
+	$self->session->db->write("update asset set state='clipboard-limbo' where lineage like ? and state='published'",[$self->get("lineage").'%']);
+	$self->session->db->write("update asset set state='clipboard', stateChangedBy=?, stateChanged=? where assetId=?", [$self->session->user->userId, $self->session->datetime->time(), $self->getId]);
 	$self->session->db->commit;
 	$self->updateHistory("cut");
 	$self->{_properties}{state} = "clipboard";

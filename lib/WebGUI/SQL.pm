@@ -322,7 +322,7 @@ sub connect {
 		$session->errorHandler->fatal("Couldn't connect to database.");
 	}
 
-	if ( $dsn =~ /Oracle/ ) { # Set Oracle specific attributes
+	if ( $dsn =~ /Oracle/ || $dsn =~ /ODBC/ ) { # Set specific attributes for long Oracle and ODBC DSNs
 		$dbh->{LongReadLen} = 512 * 1024;
 		$dbh->{LongTruncOk} = 1;
 	}
