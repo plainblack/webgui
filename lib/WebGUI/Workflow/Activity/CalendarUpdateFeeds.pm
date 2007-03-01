@@ -88,7 +88,7 @@ sub execute {
 	my $sth	    = $self->session->db->prepare("select * from Calendar_feeds");
 	$sth->execute();
 	
-	use Data::Dumper;
+	#use Data::Dumper;
 
 	FEED:while (my $feed = $sth->hashRef) {
 

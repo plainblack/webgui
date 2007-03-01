@@ -176,9 +176,6 @@ our $HELP = {
 			my $i18n = WebGUI::International->new($session, 'Asset_Template');
 			my $yes = $i18n->get(138, 'WebGUI');
 			my $no = $i18n->get(139, 'WebGUI');
-			use Data::Dumper;
-			$session->errorHandler->warn(Dumper \@enabledPlugins);
-			$session->errorHandler->warn(Dumper \@plugins);
 			my $plugin_table =
 				join "\n", 
 				map { join '', '<tr><td>', $_,

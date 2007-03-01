@@ -75,8 +75,6 @@ our $HELP = {
 			my @activities = map { s/^WebGUI::Workflow::Activity:://; $_; }
 					map { @{ $workflows{$_} } }
 					keys %workflows;
-			#use Data::Dumper;
-			#$session->errorHandler->warn(Dumper \@activities);
 			return map {
 				my ($namespace, $tag) = ($_, $_);
 				$tag =~ s/([a-z])([A-Z])/$1 $2/g;  #Separate studly caps
