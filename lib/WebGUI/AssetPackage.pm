@@ -259,7 +259,6 @@ sub www_importPackage {
 	##This is a hack.  It should use the WebGUI::Form::File API to insulate
 	##us from future form name changes.
 	$storage->addFileFromFormPost("packageFile",1);
-    use Data::Dumper;
 
 	my $error = "";
 	if ($storage->getFileExtension($storage->getFiles->[0]) eq "wgpkg") {
